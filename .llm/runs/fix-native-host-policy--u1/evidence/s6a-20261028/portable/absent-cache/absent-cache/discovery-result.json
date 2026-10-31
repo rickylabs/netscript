@@ -1,0 +1,11 @@
+{
+  "code": 1,
+  "stdout": "",
+  "stderr": "Check $deno$stdin.ts\nerror: Uncaught (in promise) Error: Cannot find module 'lmdb'\nRequire stack:\n- C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6a-portable-20261028\\absent-cache\\owned-profile-6d9e01af4b43bf04\\deno\\npm\\registry.npmjs.org\\@durable-streams\\server\\0.3.9\\index.js\nconst entries = [require.resolve('lmdb'),\n                         ^\n    at Module._resolveFilename (node:module:4:14)\n    at require.resolve (node:module:5:3624)\n    at file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/$deno$stdin.ts:8:26\n",
+  "pid": 93840,
+  "startedAt": "2026-10-28T04:16:37.342Z",
+  "finishedAt": "2026-10-28T04:16:38.022Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

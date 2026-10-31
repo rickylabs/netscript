@@ -23,10 +23,9 @@ import {
 } from './plugin-registry-renderer.ts';
 import { frozenPluginInspection } from '../../../../kernel/adapters/runtime/process/frozen-plugin-inspection.ts';
 import { removeInactivePluginRegistries } from './plugin-registry-writer.ts';
-import {
-  EmptyPluginRegistryError,
-  type GeneratedPluginRegistry,
-  type GenerateInstalledPluginRegistries,
+import type {
+  GeneratedPluginRegistry,
+  GenerateInstalledPluginRegistries,
 } from './generate-installed-plugin-registries.ts';
 
 /** Create the manifest-driven installed-plugin registry generator. */
@@ -86,12 +85,6 @@ export function createInstalledRuntimeRegistryGenerator(
           ),
           target,
         })));
-      const itemCount = selectedTargets.reduce(
-        (count, target) => count + target.sourceFiles.length,
-        0,
-      );
-      if (itemCount === 0) throw new EmptyPluginRegistryError(installed.name);
-
       generated.push(...selectedTargets.map(({ sourceFiles, target }) => ({
         path: target.registryPath,
         plugin: installed.name,

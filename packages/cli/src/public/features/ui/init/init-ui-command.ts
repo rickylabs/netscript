@@ -5,7 +5,7 @@ import {
   TOKEN_CONFIG_FILE,
   TOKEN_PRESET_FILE,
 } from '../../../../kernel/domain/tokens/token-config.ts';
-import { applyUiPreset } from '../../../../kernel/application/ui/v2/apply-preset.ts';
+import { applyUiPreset } from '../../../../kernel/application/ui/v2/presets/apply-preset.ts';
 import { installUiRegistry } from '../../../../kernel/application/ui/v2/install-registry.ts';
 import type { UiRegistryDependencies } from '../../../../kernel/application/ui/v2/registry-client.ts';
 import { reportUiRegistry } from '../add/add-ui-output.ts';

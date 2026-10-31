@@ -1,0 +1,271 @@
+{
+    "schemaVersion":  1,
+    "createdAt":  "2026-10-27T23:05:45.0091412Z",
+    "archive":  "s3b-evidence.json.gz",
+    "archiveBytes":  603904,
+    "archiveSha256":  "8ca5e15e4e2e5bd5ec94470a71f4ad371055593401a397383645525be025df34",
+    "payloadSha256":  "b8b2650f9a52e33fc6b26150c08f2ab3ffd13f75aebbf2c5f2924187be003f4a",
+    "fileCount":  51,
+    "originalBytes":  1549003,
+    "roundtripVerifiedFiles":  51,
+    "allOriginalFilesRetained":  true,
+    "priorCommittedHistoryRewritten":  false,
+    "credentialOrProfileStateIncluded":  false,
+    "files":  [
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s3b/conformance-test.json",
+                      "bytes":  337,
+                      "sha256":  "5705a25736adc56474cebd66a8f05609c5d38f81b31e571bfda2108bf2ecd052"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s3b/conformance-test-raw.txt",
+                      "bytes":  167,
+                      "sha256":  "296fe6e79ee6e67ea09401740d8f8af4d693077a59b0c1260729a662b8131ced"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s3b/first-attempt/conformance-test.json",
+                      "bytes":  920,
+                      "sha256":  "7e9121ece2ffe7f3ef9e36e8948496d28dd9aea36497230a57e8a37bbcd155aa"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s3b/first-attempt/conformance-test-raw.txt",
+                      "bytes":  167,
+                      "sha256":  "c5e536cf3995c5b582701c4102735a4a67417fc4ce110f011d245e86463a3416"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s3b/first-attempt/fmt.json",
+                      "bytes":  552,
+                      "sha256":  "9a68a4308dfd7b4ad9c728c202eff23afde9bf71950b28474f89631b02fff405"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s3b/fmt.json",
+                      "bytes":  554,
+                      "sha256":  "b4502f062ac7c8fd1d059c569b10b7bc05f80470cd52971119b82ce54281d168"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/root-s3b-source-acceptance.md",
+                      "bytes":  2432,
+                      "sha256":  "0b8bbeef19145edaf981b5a4c91e92934578ad38281b91a927ba8250ab07557b"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/prove-s3b-source.ts",
+                      "bytes":  4288,
+                      "sha256":  "332aae776a42366f444250970a8d9bd0f956f063167ba1fb19ca6eb68ae26e90"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/review/s3b-protected-before.json",
+                      "bytes":  2287,
+                      "sha256":  "ffef7f5245cab2897ee04ce263a86348468ef609277a9e5bdc12d3cb4d743fd7"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/review/s3b-runtime-type-checkpoint.md",
+                      "bytes":  4035,
+                      "sha256":  "8786669419c9e96a0a9b1fc3adb904f8d42e3c7dc346495f6e72aeb40d5316be"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/run-native-s3b-completion.ts",
+                      "bytes":  6821,
+                      "sha256":  "816af98018cf4cd464277285cbf9700d7c61df708e4f00f05eed8fe36484b3eb"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/run-native-s3b-runtime-types.ts",
+                      "bytes":  6830,
+                      "sha256":  "fca2917e59e8ffabddb72c2a02ea6d0dfe6d13bbe1d033bb03e193f91b4a14c6"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/run-s3b-validation.ts",
+                      "bytes":  3486,
+                      "sha256":  "acaefc3c34efa562353faa0f742589629e6a6bbba765edeb6eab263efdfc3e23"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-completion/exit.json",
+                      "bytes":  407,
+                      "sha256":  "694b9b04f29766d464230d4ea448216461f4f2c964ebc6a28b5b06eef5e5aa97"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-completion/identity.json",
+                      "bytes":  5320,
+                      "sha256":  "8d939eb668c20be1b93388656e7bb02782149326671135c38ea98f4acfb445e5"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-completion/native.stdout.jsonl",
+                      "bytes":  235364,
+                      "sha256":  "bb13f298430dc1d851f5d74793e3deba212d6504dd62f921738894e5aba06952"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-completion/observed-cohort-1.json",
+                      "bytes":  1521,
+                      "sha256":  "14f5641df181a1010d716e424b7968e633a6f0088745abbd94977a6bb939c577"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-completion/postrun-cohort-absence.json",
+                      "bytes":  350,
+                      "sha256":  "64189c0af382cc291fe0b94571dba0d3da28dd25477f5f22a4a5814aadbb24f9"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-completion/qualified-init.json",
+                      "bytes":  3522,
+                      "sha256":  "bbf30eddfa0a3eed821b49c73c7793c069a4f419c2383010b44d326335d4d0af"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-completion-driver.log",
+                      "bytes":  471904,
+                      "sha256":  "7c2bb03016e66730fe837fdc3d5113d7b57275e3b23b3594e96eb04ae120ab50"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-runtime-types/compaction-metadata.json",
+                      "bytes":  17901,
+                      "sha256":  "1e5b609b2f823f97ff828bb5fcc0be75d743931e18ca790817e2664eb0201e52"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-runtime-types/compile-probe-evidence.json",
+                      "bytes":  4397,
+                      "sha256":  "4e1b8de066884fbad718b5fc09fea6caa85fee437febf389cad5e092a8bdaa3c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-runtime-types/exit.json",
+                      "bytes":  407,
+                      "sha256":  "80e1b52dcd4988a92dc067b73fdbe05744f1e2dc9d4314cb230ad4f08753887a"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-runtime-types/identity.json",
+                      "bytes":  5881,
+                      "sha256":  "ec56d702356b3c1d2997aa1483c52b0b83fce686d2a74d8a78237f102691c8e2"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-runtime-types/native.stdout.jsonl",
+                      "bytes":  243259,
+                      "sha256":  "903d66f96fffebd6ace3eaf37eb91041727fb1c2b31858bed6f193c58f59f93f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-runtime-types/observed-cohort-1.json",
+                      "bytes":  1522,
+                      "sha256":  "c0e6ed75361958ff4b73092ddd7e6d4c585d197f7efe74bc325f83d3320d5d8f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-runtime-types/postrun-cohort-absence.json",
+                      "bytes":  350,
+                      "sha256":  "a11dd8b72d3442f2d83f58970bca8bddb842180a5c0cc1f14ff58014d064a03e"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-runtime-types/protected-working-bytes.json",
+                      "bytes":  3281,
+                      "sha256":  "80521189c86aa14b8f15c1a50e1806d29b6190daf2bc236bf6d91ddd387f5248"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-runtime-types/qualified-init.json",
+                      "bytes":  3522,
+                      "sha256":  "b883c0c9fd95e7ea54e590731387e8e72ee8664b27cc6d72c7c136df2129c68c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-runtime-types/service-test-fixture.partial.ts",
+                      "bytes":  7418,
+                      "sha256":  "c4a574feedd8c95b1ae078c6caf1cbca1368b15d7b5e7a260b4967f30a7fa08e"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-runtime-types-driver.log",
+                      "bytes":  487506,
+                      "sha256":  "4ae45cd3d60e63dfba6fd91ced6bb8fa9e7b2794236c694b06951349c56301d6"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/cleanup.json",
+                      "bytes":  251,
+                      "sha256":  "d5c576a83f14f9f3c66ae3029957844b83bfbe27f2f76e56dda00e88f72e1d33"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/equivalence.json",
+                      "bytes":  544,
+                      "sha256":  "9284c7e20cb17c36338be8b5f3fd3b3216904d150d3633e5dd771909106a24a7"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/execution.json",
+                      "bytes":  3344,
+                      "sha256":  "cb8c22bc2ea8a3b490bfa139351da2361a4f97d9ba04040c3dfc92db95534de2"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/fmt.report.json",
+                      "bytes":  309,
+                      "sha256":  "38eae4cd16d0377a8e35a8fb7454861ff4da300ad0428f2e439b73ce6e98a939"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/fmt.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/fmt.stdout.log",
+                      "bytes":  252,
+                      "sha256":  "1d4531ed8debd67c109c63c64b42666fa444acb728c34a1742b90d35e521f803"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/lint.report.json",
+                      "bytes":  360,
+                      "sha256":  "0f32e3e3e1f2f81611f83a893204c62028842a329471b757cc7e94e9584cf788"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/lint.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/lint.stdout.log",
+                      "bytes":  247,
+                      "sha256":  "4e539a4b85fd05ac4d57952c89faacc26736f190a1871a3ff2a2010264810df2"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/postrun-cohort-absence.json",
+                      "bytes":  440,
+                      "sha256":  "5280612b955edb094a6afadf8be99d406a0ea0cdae1b827bcf72a7c1bdaa4188"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/source-guard.json",
+                      "bytes":  3527,
+                      "sha256":  "0674b436a4c4675da21e0d5e32f50449636772ef78eddba109e185a4867f88e5"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/source-review-seals.json",
+                      "bytes":  2441,
+                      "sha256":  "7781aea89d61510ce54e88ccada5799da7a33ad16a298c9fa49415f117688953"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/tests.report.json",
+                      "bytes":  411,
+                      "sha256":  "b4ac574cb3463aecd1e208bd39f809af5fdd565cb3065fbf4e7d9e858eba5df7"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/tests.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/tests.stdout.log",
+                      "bytes":  243,
+                      "sha256":  "faf09889a60b5fddd895c10cacb434594311571c39d8a31a452186f3b2e96c2f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/types.report.json",
+                      "bytes":  335,
+                      "sha256":  "1e19116eef48363ec550f413d29bd848ef1a2f12919463f01716035a5fcab599"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/types.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3b-validation/types.stdout.log",
+                      "bytes":  248,
+                      "sha256":  "f978ade63d4987a5dc72c00fb6652d61c1662628440812876a63ff67884ebb7f"
+                  },
+                  {
+                      "path":  ".llm/tmp/u1-s3b/compile-probe.ts",
+                      "bytes":  1880,
+                      "sha256":  "2078f3ede669f77c78f65ec49c00f6095a1bf7ec228bcbbeeb60582127afe5b1"
+                  },
+                  {
+                      "path":  ".llm/tmp/u1-s3b/conf-fmt.ts",
+                      "bytes":  7463,
+                      "sha256":  "28c93275ecf7b720746f54742fea66d51939a1d71a0b4abeb6e13e5581313fc8"
+                  }
+              ]
+}

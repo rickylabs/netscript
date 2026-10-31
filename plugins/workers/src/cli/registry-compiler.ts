@@ -157,7 +157,7 @@ function renderRegistrySource(
       }),
       '});',
       '',
-      'const jobDefinitionEntries: readonly [string, RegisterJobInput][] = Object.entries(jobDefinitionsById)',
+      'const jobDefinitionEntries: readonly [string, RegisterJobInput][] = Object.entries<RegisterJobInput>(jobDefinitionsById)',
       '  .map(([id, definition]) => [id, toRegisterJobInput(definition)]);',
       '',
       'export const jobDefinitions: ReadonlyMap<string, RegisterJobInput> = new Map(jobDefinitionEntries);',

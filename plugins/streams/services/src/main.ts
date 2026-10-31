@@ -20,118 +20,13 @@
  * @module
  */
 
-import { getAvailablePort } from '@std/net';
-import { healthChecks } from '@netscript/service';
-import { createPluginService } from '@netscript/plugin/service';
-import { createStreamsServer } from './bounded-file-store.ts';
-import { PLUGIN_PACKAGE_VERSION } from '../../src/package-metadata.generated.ts';
-import { createStreamsProxyHandler } from './proxy.ts';
-import { createStorageHealthCheck, describeStorageDurability } from './durability.ts';
+import { startStreamsService } from './service.ts';
 
-/** Connector version, single-sourced from the streams package `deno.json`. */
-const VERSION: string = PLUGIN_PACKAGE_VERSION;
+// The legacy plural entrypoint retains its authored public and wildcard-origin posture.
+const LEGACY_PUBLIC_REASON =
+  'Guarded adoption awaits caller credentials, runtime session seeding, per-service access policy and auth discovery references (#1383).';
 
-const portValue = Deno.env.get('PORT') ?? Deno.env.get('STREAMS_PORT');
-if (portValue === undefined) {
-  throw new Error('Streams requires the host-provided PORT environment variable.');
-}
-const port = Number.parseInt(portValue, 10);
-const dataDir = Deno.env.get('STREAMS_DATA_DIR');
-const durability = await describeStorageDurability(dataDir);
-if (!durability.durable) {
-  console.warn(`[streams] Warning: ${durability.message}`);
-}
-
-// ── Start the upstream streams server on an internal port ─────────────
-const internalPortOverride = Deno.env.get('STREAMS_INTERNAL_PORT');
-const preferredInternalPort = internalPortOverride ? parseInt(internalPortOverride, 10) : undefined;
-const internalPort = await getAvailablePort({
-  preferredPort: preferredInternalPort,
+await startStreamsService({
+  auth: { public: true, reason: LEGACY_PUBLIC_REASON },
+  cors: { origin: '*' },
 });
-
-const server = createStreamsServer({
-  port: internalPort,
-  host: '127.0.0.1',
-  dataDir,
-});
-
-const internalUrl = await server.start();
-void internalUrl;
-
-// ── Health check: verify upstream is reachable ────────────────────────
-const upstreamCheck = healthChecks.custom('durable-streams-server', async () => {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 3000);
-  try {
-    const res = await fetch(`http://127.0.0.1:${internalPort}/`, {
-      signal: controller.signal,
-    });
-    await res.body?.cancel();
-    return res.status < 500;
-  } finally {
-    clearTimeout(timeout);
-  }
-});
-
-// ── Transparent proxy to the upstream DurableStreamTestServer ─────────
-// Matches all paths (including nested routes like /v1/stream/...) that are not
-// handled by the health endpoints or the service-info root. The handler:
-//   - strips the upstream's bogus `content-encoding: gzip` and hop-by-hop
-//     headers so the response describes the bytes actually sent
-//     (netscript#219 / #239); and
-//   - reinterprets a live/subscribe poll (`?live=long-poll`) of a
-//     not-yet-created stream as an open, empty, up-to-date subscription instead
-//     of a terminal 404 (netscript#267). See ./proxy.ts.
-const proxyHandler = createStreamsProxyHandler({ internalPort });
-
-// ── Serve via the mandated createPluginService surface ────────────────
-// Empty router + serveRpc:false → no oRPC wiring (streams has no contract).
-// `serve()` owns the front listener and graceful SIGINT/SIGTERM/SIGBREAK
-// shutdown; the upstream server stop runs as an onShutdown hook.
-const running = await createPluginService({}, {
-  auth: {
-    public: true,
-    reason:
-      'Guarded adoption awaits caller credentials, runtime session seeding, per-service access policy and auth discovery references (#1383).',
-  },
-  name: 'streams',
-  version: VERSION,
-  port,
-  serveRpc: false,
-  cors: {
-    origin: '*',
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'],
-    allowHeaders: [
-      'Content-Type',
-      'Authorization',
-      'Stream-Seq',
-      'Stream-TTL',
-      'Stream-Expires-At',
-      'Stream-Closed',
-      'Producer-Id',
-      'Producer-Epoch',
-      'Producer-Seq',
-    ],
-    exposeHeaders: [
-      'Stream-Next-Offset',
-      'Stream-Cursor',
-      'Stream-Up-To-Date',
-      'Stream-Closed',
-      'Producer-Epoch',
-      'Producer-Seq',
-      'Producer-Expected-Seq',
-      'Producer-Received-Seq',
-      'etag',
-      'content-type',
-      'content-encoding',
-      'vary',
-    ],
-  },
-  healthChecks: [upstreamCheck, createStorageHealthCheck(durability)],
-  rawRoutes: [{ method: 'all', path: '/*', handler: proxyHandler }],
-  onShutdown: [async () => {
-    await server.stop();
-  }],
-}).serve();
-
-void running;

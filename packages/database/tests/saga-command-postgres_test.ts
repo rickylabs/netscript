@@ -2,6 +2,7 @@ import { assertEquals } from '@std/assert';
 import { join } from '@std/path';
 import { prepareLockedFixture } from '../../../.llm/tools/testing/locked-fixture.ts';
 import { appendPluginMigrations, pendingPluginMigrations } from '../scripts/plugin-migrations.ts';
+import { verifySagaStatusUpgrade } from './saga-status-upgrade.ts';
 
 for (const adoption of Deno.env.get('SAGA_COMMAND_TEST_FILTER') ? [false] : [false, true]) {
   Deno.test({
@@ -63,8 +64,14 @@ datasource db {
 }
 ${copiedModel}`,
         );
+        // First deploy the pre-fix schema and only its original outbox sidecar.
+        // The upgrade below must add the column and backfill existing rows, not just fresh ones.
         for (const file of installed) {
-          await Deno.writeTextFile(join(schemaPath, file.name), file.content);
+          if (file.name.endsWith('instance-status.migration.sql')) continue;
+          const legacy = file.content
+            .replace(/^ {2}status\s+String[^\n]*\n/m, '')
+            .replace(/^ {2}@@index\(\[sagaName, status\]\).*\n/m, '');
+          await Deno.writeTextFile(join(schemaPath, file.name), legacy);
         }
         const rootConfig = JSON.parse(await Deno.readTextFile('deno.json'));
         const workspaceImports: Record<string, string> = {};
@@ -194,6 +201,34 @@ ${copiedModel}`,
         assertEquals(pending.length, 1);
         await appendPluginMigrations(migrationsPath, [name], pending);
         await prisma(['migrate', 'deploy', '--config', join(temp, 'prisma.config.ts')]);
+        await verifySagaStatusUpgrade({
+          schemaPath,
+          migrationsPath,
+          configPath: join(temp, 'prisma.config.ts'),
+          installed,
+          prisma,
+          async sql(query, success = true) {
+            const result = await new Deno.Command(join(nativeBin, 'psql'), {
+              args: [
+                '-X',
+                '-qAt',
+                '-h',
+                Deno.env.get('COMMAND_POSTGRES_SOCKET')!,
+                '-d',
+                namespace,
+                '-v',
+                'ON_ERROR_STOP=1',
+                '-c',
+                query,
+              ],
+              stdin: 'null',
+              stdout: 'piped',
+              stderr: 'piped',
+            }).output();
+            assertEquals(result.success, success, new TextDecoder().decode(result.stderr));
+            return new TextDecoder().decode(result.stdout).trim();
+          },
+        });
         await prisma(['generate', '--schema', schemaPath]);
         const source = await Deno.readTextFile(
           new URL('./fixtures/saga-command/schema-conformance.ts.template', import.meta.url),

@@ -215,23 +215,29 @@ async function resolveRunnerConfiguration(
   bootstrapModule?: string,
 ): Promise<SagaRunnerConfiguration> {
   const context = bootstrapModule ? await loadRunnerContext(bootstrapModule) : undefined;
-  const appsettings = context
-    ? context.appsettings ?? context.settings ?? context.config
-    : await loadProjectAppsettings(
-      readEnv('NETSCRIPT_PROJECT_ROOT') ?? (options.cwd ?? Deno.cwd)(),
-    );
+  const appsettings = await loadSagaBackendSettings(
+    context?.env?.NETSCRIPT_PROJECT_ROOT ?? readEnv('NETSCRIPT_PROJECT_ROOT') ??
+      (options.cwd ?? Deno.cwd)(),
+    context?.appsettings ?? context?.settings ?? context?.config,
+  );
   return { context, input: backendInput(readEnv, context, appsettings) };
 }
 
-async function loadProjectAppsettings(projectRoot: string): Promise<unknown> {
-  let document: unknown;
-  try {
-    document = JSON.parse(
-      await Deno.readTextFile(projectFileUrl(SCAFFOLD_FILES.APPSETTINGS, projectRoot)),
-    );
-  } catch (cause) {
-    if (cause instanceof Deno.errors.NotFound) return undefined;
-    throw cause;
+/** Load saga backend settings with the same processor override for API and runner. */
+export async function loadSagaBackendSettings(
+  projectRoot: string,
+  appsettings?: unknown,
+): Promise<unknown> {
+  let document: unknown = appsettings;
+  if (document === undefined) {
+    try {
+      document = JSON.parse(
+        await Deno.readTextFile(projectFileUrl(SCAFFOLD_FILES.APPSETTINGS, projectRoot)),
+      );
+    } catch (cause) {
+      if (cause instanceof Deno.errors.NotFound) return undefined;
+      throw cause;
+    }
   }
   // Install-owned processor settings take precedence over project-wide saga settings.
   if (

@@ -1,0 +1,130 @@
+{
+  "context": "Resumed current-main merge working tree, before sign-off commit; command summaries are not immutable-head receipts. Private structured reports and receipts retained.",
+  "baselineMain": "f89260ac93e7045fbf87e028b3e3e00b65dd68dd",
+  "sourceRestoredAfterNegativeControl": true,
+  "protectedFilesMatchMain": true,
+  "lockMatchesMain": true,
+  "tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 111,
+      "failed": 0,
+      "ignored": 6,
+      "totalResults": 117,
+      "uniqueFailures": 0
+    }
+  },
+  "negativeRealStores": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 2,
+      "ignored": 0,
+      "totalResults": 2,
+      "uniqueFailures": 2
+    },
+    "assertions": [
+      {
+        "message": "AssertionError: Listener exhausted its budget before recovery.",
+        "tests": [
+          "real Redis queue recovers from repeated ACL write refusals beyond the burst budget"
+        ]
+      },
+      {
+        "message": "AssertionError: Listener exhausted its budget before recovery.",
+        "tests": [
+          "supervised real Deno KV writes recover repeatedly after closed-handle refusals"
+        ]
+      }
+    ]
+  },
+  "negativeSpaced": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "assertions": [
+      {
+        "message": "AssertionError: Values are not equal.",
+        "tests": [
+          "spaced listener failures replenish the budget without resetting cumulative restart counts"
+        ]
+      }
+    ]
+  },
+  "check": {
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 136,
+      "batches": 2,
+      "failedBatches": 0
+    }
+  },
+  "lint": {
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 9,
+      "batches": 1,
+      "failedBatches": 0
+    }
+  },
+  "fmt": {
+    "summary": {
+      "filesSelected": 9,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    }
+  },
+  "docLint": {
+    "summary": {
+      "totalPackages": 1,
+      "totalErrors": 2,
+      "totalPrivateTypeRef": 2,
+      "totalMissingJSDoc": 0,
+      "totalOther": 0
+    }
+  },
+  "quality": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "publish": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "jsrAudit": "No FAIL; inherited folder-cardinality and banner-based slow-type warnings.",
+  "sharedRuntimeE2E": "Not run locally per owner; coordinator must arm and obtain e2e-cli CI verdict.",
+  "agentDocsFreshness": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "exportCorpusFreshness": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "docsAccuracy": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "reviewThreads": {
+    "threads": 1,
+    "unanswered": 0,
+    "exitCode": 0
+  }
+}

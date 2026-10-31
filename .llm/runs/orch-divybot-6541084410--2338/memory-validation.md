@@ -1,0 +1,5 @@
+# Validation and review recipe
+
+RTK is absent. Core plus reference-server baseline: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --unstable-kv --frozen packages/plugin-streams-core plugins/streams/tests/service/durable-stream-producer-idempotency_test.ts` gives 77 passed. `deno task doc:lint --root packages/plugin-streams-core --pretty` lints combined export graph cleanly; isolated entrypoint counts are not its combined verdict. Native reviewer launcher is `.llm/tools/agentic/claude/claude-print.ts --model claude-opus-5-5 --effort high --prompt <file>`, stdin closed, reuse the same private session on resume. Keep raw logs outside Git.
+
+The standalone producer consumer fixture has no private lock. Use the structured check wrapper with `--deno-arg --config --deno-arg packages/plugin-streams-core/tests/type-fixtures/producer-consumer-deno.json --deno-arg --no-lock`; forcing --frozen asks for a nonexistent nested lock rather than testing the API. This preserves locks. `docs:snippets` does not have a help mode: --help runs the full normal census/check (26 tier-one fences on this baseline).

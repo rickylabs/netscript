@@ -1,0 +1,17 @@
+{
+    "model":  "claude-fable-5-1",
+    "effortObserved":  null,
+    "effortRequested":  "xhigh",
+    "suite":  ".llm/tools/agentic/claude/claude-print.ts",
+    "tier":  "architecture",
+    "provider":  "claude",
+    "subscriptionType":  "max",
+    "prompt":  "plan-brief.md",
+    "family":  "anthropic",
+    "authMethod":  "claude.ai",
+    "head":  "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+    "role":  "plan",
+    "noRivalProviderKeysInChild":  true,
+    "rawEncoding":  "PowerShell captured native JSON text as UTF8; not native byte-for-byte stdout claim",
+    "startedUtc":  "2026-10-27T16:52:28.0903527Z"
+}

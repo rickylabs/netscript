@@ -103,9 +103,6 @@ export async function renderRuntimeRegistries(
   for (const rawTarget of manifest.runtimeRegistries ?? []) {
     const target = applyProfile(rawTarget, options.profile);
     const targetDir = join(options.projectRoot, target.dir);
-    const hasConfiguredJobs = target.kind === 'workers-job' && options.workers &&
-      (options.workers.jobs.length > 0 ||
-        options.workers.groups.some((group) => group.jobs.length));
     const targetDirExists = await exists(targetDir, { isDirectory: true });
     const excludedSourceFiles: string[] = [];
     const files = targetDirExists
@@ -117,15 +114,6 @@ export async function renderRuntimeRegistries(
       }, excludedSourceFiles)
       : [];
     const registryPath = target.registryPath ?? `${target.dir}/_registry.ts`;
-    if ((!targetDirExists || files.length === 0) && !hasConfiguredJobs) {
-      rendered.push({
-        registryPath,
-        sourceFiles: [],
-        content: null,
-        ...(excludedSourceFiles.length ? { excludedSourceFiles } : {}),
-      });
-      continue;
-    }
     const registry = await generateRuntimeRegistry(
       options.projectRoot,
       target,
@@ -477,7 +465,7 @@ function appendJobDefinitions(entries: readonly GeneratedJobEntry[], lines: stri
   lines.push(
     '});',
     '',
-    'const jobDefinitionEntries: readonly [string, RegisterJobInput][] = Object.entries(jobDefinitionsById)',
+    'const jobDefinitionEntries: readonly [string, RegisterJobInput][] = Object.entries<RegisterJobInput>(jobDefinitionsById)',
     '  .map(([id, definition]) => [id, toRegisterJobInput(definition)]);',
     '',
     'export const jobDefinitions: ReadonlyMap<string, RegisterJobInput> = new Map(jobDefinitionEntries);',

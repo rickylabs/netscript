@@ -1,0 +1,11 @@
+{
+  "code": 0,
+  "stdout": "{\"mode\":\"cors\",\"nativeError\":{\"name\":\"TypeError\",\"message\":\"CORS wildcard origins cannot be combined with credentials\"}}\n{\"mode\":\"cors\",\"observedBound\":1,\"hostnameReads\":0,\"blockerPreserved\":false,\"identityPreserved\":false,\"returnedHandle\":false,\"reboundPorts\":[57563]}\ns6d-streams: startup rejection and native cleanup settled\n",
+  "stderr": "Check $deno$stdin.ts\n[streams] Warning: Streams storage is ephemeral; events are lost on process restart.\n",
+  "pid": 77812,
+  "startedAt": "2026-10-28T04:58:49.110Z",
+  "finishedAt": "2026-10-28T04:58:50.572Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

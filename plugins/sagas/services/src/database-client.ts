@@ -39,6 +39,7 @@ function isSagaServicePrismaClient(value: unknown): value is SagaServicePrismaCl
   const sagaExecutionHistory = Reflect.get(value, 'sagaExecutionHistory');
 
   return isObject(sagaInstance) &&
+    hasMethod(sagaInstance, 'findFirst') &&
     hasMethod(sagaInstance, 'findMany') &&
     hasMethod(sagaInstance, 'count') &&
     isObject(sagaExecutionHistory) &&

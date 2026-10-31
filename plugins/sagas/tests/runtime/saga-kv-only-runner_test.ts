@@ -54,7 +54,7 @@ export async function createPluginServiceContext() {
 `,
     );
     const { calls } = await import(bootstrap) as {
-      calls: { db: number; archives: { sagaName: string; state: { count: number } }[] };
+      calls: { db: number; archives: { sagaName: string; state: { state: { count: number } } }[] };
     };
     const definition = defineSaga('kv-only').state({ count: 0 })
       .on('Increment', (saga) => {
@@ -114,7 +114,7 @@ export async function createPluginServiceContext() {
         archiveToDb && backend === 'kv' ? 1 : 0,
       );
       assertEquals(calls.archives.some((archive) => archive.sagaName === 'no-archive'), false);
-      if (archiveToDb && backend === 'kv') assertEquals(calls.archives[0]?.state.count, 1);
+      if (archiveToDb && backend === 'kv') assertEquals(calls.archives[0]?.state.state.count, 1);
     } finally {
       await supervisor?.stop();
       await resetKv();

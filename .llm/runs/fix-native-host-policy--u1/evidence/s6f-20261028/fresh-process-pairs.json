@@ -1,0 +1,287 @@
+{
+  "pairs": [
+    {
+      "mode": "file",
+      "writerPid": 91964,
+      "readerPid": 76584,
+      "writerFinished": "2026-10-28T05:23:29.154Z",
+      "readerStarted": "2026-10-28T05:23:29.175Z",
+      "distinctProcesses": true,
+      "writerSettledBeforeReader": true,
+      "sameOwnedScratch": true,
+      "writerReceipt": {
+        "firstOffset": "0000000000000000_0000000000000012",
+        "finalOffset": "0000000000000000_0000000000000022",
+        "bytes": [
+          98,
+          101,
+          102,
+          111,
+          114,
+          101,
+          124,
+          97,
+          102,
+          116,
+          101,
+          114
+        ]
+      },
+      "writer": {
+        "observations": {
+          "row": "writer",
+          "mode": "file",
+          "storage": {
+            "mode": "file",
+            "durable": true,
+            "probe": "passed",
+            "message": "Streams file storage passed the startup write/read probe; orderly restart replay is supported."
+          },
+          "snapshot": {
+            "status": 200,
+            "bytes": [
+              98,
+              101,
+              102,
+              111,
+              114,
+              101,
+              124,
+              97,
+              102,
+              116,
+              101,
+              114
+            ],
+            "offset": "0000000000000000_0000000000000022"
+          },
+          "upstream": {
+            "status": 200,
+            "bytes": [
+              98,
+              101,
+              102,
+              111,
+              114,
+              101,
+              124,
+              97,
+              102,
+              116,
+              101,
+              114
+            ],
+            "offset": "0000000000000000_0000000000000022"
+          }
+        },
+        "reboundPorts": [
+          57539,
+          63336
+        ]
+      },
+      "reader": {
+        "observations": {
+          "row": "reader",
+          "mode": "file",
+          "storage": {
+            "mode": "file",
+            "durable": true,
+            "probe": "passed",
+            "message": "Streams file storage passed the startup write/read probe; orderly restart replay is supported."
+          },
+          "snapshot": {
+            "status": 200,
+            "bytes": [
+              98,
+              101,
+              102,
+              111,
+              114,
+              101,
+              124,
+              97,
+              102,
+              116,
+              101,
+              114
+            ],
+            "offset": "0000000000000000_0000000000000022"
+          },
+          "tail": {
+            "status": 200,
+            "bytes": [
+              97,
+              102,
+              116,
+              101,
+              114
+            ],
+            "offset": "0000000000000000_0000000000000022"
+          },
+          "upstream": {
+            "status": 200,
+            "bytes": [
+              98,
+              101,
+              102,
+              111,
+              114,
+              101,
+              124,
+              97,
+              102,
+              116,
+              101,
+              114
+            ],
+            "offset": "0000000000000000_0000000000000022"
+          }
+        },
+        "reboundPorts": [
+          63339,
+          61306
+        ]
+      }
+    },
+    {
+      "mode": "memory",
+      "writerPid": 86680,
+      "readerPid": 57936,
+      "writerFinished": "2026-10-28T05:23:32.126Z",
+      "readerStarted": "2026-10-28T05:23:32.146Z",
+      "distinctProcesses": true,
+      "writerSettledBeforeReader": true,
+      "sameOwnedScratch": true,
+      "writerReceipt": {
+        "firstOffset": "0000000000000000_0000000000000012",
+        "finalOffset": "0000000000000000_0000000000000022",
+        "bytes": [
+          98,
+          101,
+          102,
+          111,
+          114,
+          101,
+          124,
+          97,
+          102,
+          116,
+          101,
+          114
+        ]
+      },
+      "writer": {
+        "observations": {
+          "row": "writer",
+          "mode": "memory",
+          "storage": {
+            "mode": "memory",
+            "durable": false,
+            "probe": "not-applicable",
+            "message": "Streams storage is ephemeral; events are lost on process restart."
+          },
+          "snapshot": {
+            "status": 200,
+            "bytes": [
+              98,
+              101,
+              102,
+              111,
+              114,
+              101,
+              124,
+              97,
+              102,
+              116,
+              101,
+              114
+            ],
+            "offset": "0000000000000000_0000000000000022"
+          },
+          "upstream": {
+            "status": 200,
+            "bytes": [
+              98,
+              101,
+              102,
+              111,
+              114,
+              101,
+              124,
+              97,
+              102,
+              116,
+              101,
+              114
+            ],
+            "offset": "0000000000000000_0000000000000022"
+          }
+        },
+        "reboundPorts": [
+          61311,
+          58921
+        ]
+      },
+      "reader": {
+        "observations": {
+          "row": "reader",
+          "mode": "memory",
+          "storage": {
+            "mode": "memory",
+            "durable": false,
+            "probe": "not-applicable",
+            "message": "Streams storage is ephemeral; events are lost on process restart."
+          },
+          "snapshot": {
+            "status": 404,
+            "bytes": [
+              83,
+              116,
+              114,
+              101,
+              97,
+              109,
+              32,
+              110,
+              111,
+              116,
+              32,
+              102,
+              111,
+              117,
+              110,
+              100
+            ],
+            "offset": null
+          },
+          "upstream": {
+            "status": 404,
+            "bytes": [
+              83,
+              116,
+              114,
+              101,
+              97,
+              109,
+              32,
+              110,
+              111,
+              116,
+              32,
+              102,
+              111,
+              117,
+              110,
+              100
+            ],
+            "offset": null
+          }
+        },
+        "reboundPorts": [
+          58924,
+          50248
+        ]
+      }
+    }
+  ]
+}

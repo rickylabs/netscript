@@ -1,0 +1,10 @@
+{
+  "name": "NetScript token round-trip",
+  "id": "netscript-figma-round-trip",
+  "api": "1.0.0",
+  "main": "main.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": { "allowedDomains": ["https://api.github.com"] }
+}

@@ -36,6 +36,22 @@ binds them to a NetScript host.
 - **Aspire-native** — `./aspire` contributes the worker resources to the AppHost, so local
   orchestration and deployment see workers as first-class processes.
 
+## Installing before the first definition
+
+Install without example definitions, then generate the registry:
+
+```sh
+netscript plugin install workers --no-db --no-samples
+netscript generate plugins
+netscript plugin doctor
+```
+
+An installed plugin with zero definitions gets a typed empty registry. Doctor reports the empty
+registry as a warning and exits successfully; a missing or stale registry remains an error. With
+its configured dependencies available, the background runner starts idle and reports ready with
+zero definitions. Add your first definition and run `netscript generate plugins` again. Removing
+the last definition and regenerating keeps a valid empty registry.
+
 ## Excluding helpers from generated registries
 
 `netscript generate plugins` selects definition modules from `workers/jobs/*.ts` and plugin-provided
@@ -148,6 +164,62 @@ deno x -A jsr:@netscript/plugin-workers@<version>/cli list-jobs
 
 Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
 the pre-release line.
+
+## Host-owned Workers API
+
+Use the inert `@netscript/plugin-workers/service` entrypoint for a caller-owned listener. The
+factory requires a native auth policy, accepts native CORS and serve options, and returns the
+native running handle. The host supplies its database port, KV adapter and credential; the
+following recipe shows that composition boundary without opening a host database here:
+
+```ts
+import '@netscript/kv/redis'; // Register only the adapter selected by the host.
+import { getKv } from '@netscript/kv';
+import { createPluginServiceContext } from '@netscript/plugin/sdk';
+import { createStaticCredentialAuthenticator } from '@netscript/service/auth';
+import { startWorkersService } from '@netscript/plugin-workers/service';
+
+declare const openDatabaseClient: () => Promise<unknown>;
+declare const workerCredential: string; // Obtain from the host's secret authority.
+
+const context = await createPluginServiceContext('workers', {
+  getDatabaseClient: () => openDatabaseClient(),
+  getKv: () => getKv(),
+});
+const authenticator = createStaticCredentialAuthenticator({
+  credentials: {
+    [workerCredential]: {
+      subject: 'service:workers', scopes: ['workers:read'], roles: ['service'],
+    },
+  },
+});
+const controller = new AbortController();
+const running = await startWorkersService(context, {
+  auth: { authn: { authenticator } },
+  serve: { hostname: '127.0.0.1', port: 0, signal: controller.signal },
+});
+try {
+  console.log(running.addr.port); // Publish the allocated endpoint through the host.
+} finally {
+  await running.stop(); // Drains requests; the host still owns and closes its KV.
+}
+```
+
+`serve.port`, including zero, takes precedence over context `PORT`, then process `PORT`.
+Supply `auth: { public: true, reason: '...' }` only for an intentional public service. The factory
+forwards policy and listener options without changing them. Importing the singular entrypoint
+does not register Redis, read environment values or start a listener; the explicit host import
+above performs adapter registration.
+
+Grant runtime permissions for the chosen listener, KV backend and host configuration: network
+access to those endpoints, environment access to the configuration the host reads, and read/write
+access to the selected local KV path if used. Enable Deno KV with `--unstable-kv`. Restrict these
+permissions to the host's resources; the recipe's type check does not qualify a deployed host.
+
+The plural `@netscript/plugin-workers/services` default remains the legacy context delegate. It
+registers Redis, preserves the existing public policy reason, reads context `PORT` before process
+`PORT`, and uses native wildcard-host and signal defaults. Its direct-run bootstrap still requires
+`NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE`. Choose the singular factory to own auth and binding.
 
 ## Generated job policy
 
@@ -270,3 +342,6 @@ Atomic version checks prevent it from deleting a record updated after inspection
 records and open executions are preserved. This endpoint also removes legacy execution records
 written without TTL; normal new-record expiry is performed by the KV backend and needs no app
 session. Job/task definitions remain configuration rather than expiring execution history.
+
+For native policy/CORS/listener composition and explicit SDK credentials, see
+[Host workers and streams services](https://rickylabs.github.io/netscript/services-sdk/how-to/host-plugin-services/).

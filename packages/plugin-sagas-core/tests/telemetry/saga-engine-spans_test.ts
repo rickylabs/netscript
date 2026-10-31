@@ -613,6 +613,10 @@ class RecordingSpan implements SagaTelemetrySpan {
 }
 
 class FailingSagaStore extends MemorySagaStore {
+  override commitTransition(): Promise<never> {
+    return Promise.reject(new Error('persistence unavailable'));
+  }
+
   override save<TState extends SagaState>(
     _envelope: SagaStateEnvelope<TState>,
     _options?: SagaStoreWriteOptions,

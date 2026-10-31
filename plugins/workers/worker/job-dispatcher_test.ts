@@ -1,3 +1,5 @@
+import { configure, configureLogging, type LogRecord, resetLogging } from '@netscript/logger';
+import { stub } from '@std/testing/mock';
 import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
 import {
   assert,
@@ -985,3 +987,209 @@ function installTracePropagation(): () => void {
     propagation.disable();
   };
 }
+
+// Capture the structured records and console separately: a debug call must never bypass filtering.
+const WORKER_CONSOLE_METHODS = ['log', 'debug', 'info', 'warn', 'error', 'trace'] as const;
+type WorkerConsoleCall = Readonly<{
+  method: typeof WORKER_CONSOLE_METHODS[number];
+  args: readonly unknown[];
+}>;
+
+async function captureWorkerConsole(
+  run: (calls: WorkerConsoleCall[]) => Promise<void>,
+): Promise<void> {
+  const calls: WorkerConsoleCall[] = [];
+  const spies = WORKER_CONSOLE_METHODS.map((method) =>
+    stub(console, method, (...args: unknown[]) => {
+      calls.push({ method, args });
+    })
+  );
+  try {
+    await run(calls);
+  } finally {
+    await resetLogging();
+    for (const spy of spies) spy.restore();
+  }
+}
+
+async function runLifecycleJob(
+  job: JobDefinition,
+  duplicate = false,
+): Promise<MemoryExecutionState> {
+  await using kv = new MemoryKvAdapter();
+  const executionState = new MemoryExecutionState();
+  const workerPool = createWorkerPool();
+  await workerPool.initialize();
+  try {
+    const context = dispatchContext({
+      kv,
+      executionState,
+      taskExecutor: new CountingTaskExecutor([]),
+      workerPool,
+      job,
+    });
+    const message = jobMessage(job.id);
+    const delivery = messageContext('lifecycle-delivery');
+    await processWorkerJob(context, message, delivery);
+    if (duplicate) await processWorkerJob(context, message, delivery);
+    return executionState;
+  } finally {
+    await workerPool.shutdown();
+  }
+}
+
+Deno.test('worker lifecycle records are Debug with category and job identity, including duplicate skips', async () => {
+  await captureWorkerConsole(async (calls) => {
+    const records: LogRecord[] = [];
+    await configure({
+      reset: true,
+      sinks: { records: (record) => records.push(record) },
+      loggers: [
+        { category: ['netscript'], lowestLevel: 'debug', sinks: ['records'] },
+        { category: ['logtape', 'meta'], lowestLevel: 'error', sinks: [] },
+      ],
+    });
+    for (const source of ['local', 'plugin'] as const) {
+      for (const name of ['Send welcome email', undefined]) {
+        records.length = 0;
+        const job = {
+          ...inlineJob(`lifecycle-${source}`, () => ({ success: true })),
+          name,
+          source,
+          entrypoint: './lifecycle-job.ts',
+        };
+        const state = await runLifecycleJob(job, true);
+        assertEquals(state.completed.map((entry) => entry.options.status), ['completed']);
+        assertEquals(records.map((record) => record.rawMessage), [
+          'Processing job {jobId}',
+          'Resolving entrypoint for job {jobId}',
+          ...(source === 'plugin' ? ['Plugin job {jobId} resolved'] : []),
+          'Executing job {jobId} via WorkerPool',
+          'Processing job {jobId}',
+          'Skipping duplicate {concept} {targetId}',
+        ]);
+        for (const record of records) {
+          assertEquals(record.level, 'debug');
+          assertEquals(record.category, ['netscript', 'workers', 'runtime']);
+          assertEquals(record.properties.jobId, job.id);
+          assertEquals(record.properties.jobName, name ?? job.id);
+          assertEquals(record.properties.workerId, 'worker-test');
+        }
+      }
+    }
+    assertEquals(calls, []);
+  });
+});
+
+Deno.test('worker lifecycle stays off console at the default production Info threshold', async () => {
+  const envKeys = ['DENO_ENV', 'NETSCRIPT_LOG_LEVEL', 'NETSCRIPT_DEBUG'] as const;
+  const previous = envKeys.map((key) => Deno.env.get(key));
+  try {
+    Deno.env.set('DENO_ENV', 'production');
+    Deno.env.delete('NETSCRIPT_LOG_LEVEL');
+    Deno.env.delete('NETSCRIPT_DEBUG');
+    await captureWorkerConsole(async (calls) => {
+      await configureLogging();
+      calls.length = 0;
+      const state = await runLifecycleJob({
+        ...inlineJob('production-lifecycle', () => ({ success: true })),
+        name: 'Production lifecycle',
+        source: 'plugin',
+        entrypoint: './lifecycle-job.ts',
+      }, true);
+      assertEquals(state.completed.map((entry) => entry.options.status), ['completed']);
+      assertEquals(calls, []);
+    });
+  } finally {
+    envKeys.forEach((key, index) => {
+      const value = previous[index];
+      if (value === undefined) Deno.env.delete(key);
+      else Deno.env.set(key, value);
+    });
+  }
+});
+
+Deno.test('worker lifecycle is silent without logging setup and failures remain console errors', async () => {
+  await resetLogging();
+  await captureWorkerConsole(async (calls) => {
+    const state = await runLifecycleJob({
+      ...inlineJob('unconfigured-lifecycle', () => ({ success: true })),
+      entrypoint: './lifecycle-job.ts',
+      source: 'plugin',
+    }, true);
+    assertEquals(state.completed.map((entry) => entry.options.status), ['completed']);
+    assertEquals(calls, []);
+
+    await using kv = new MemoryKvAdapter();
+    const taskState = new MemoryExecutionState();
+    const context = dispatchContext({
+      kv,
+      executionState: taskState,
+      taskExecutor: new CountingTaskExecutor([{
+        success: false,
+        duration: 7,
+        error: 'task failed',
+      }]),
+      task: taskDefinition('failed-task'),
+    });
+    await processWorkerTask(context, {
+      taskId: 'failed-task',
+      topic: 'tasks',
+      triggeredBy: 'manual',
+    });
+    assertEquals(taskState.completed.map((entry) => entry.options.status), ['failed']);
+    assertEquals(calls.length, 1);
+    assertEquals(calls[0].method, 'error');
+    assertEquals(calls[0].args, ["[Worker worker-test] Task 'failed-task' failed in 7ms"]);
+
+    calls.length = 0;
+    await processWorkerJob(context, jobMessage('missing-job'));
+    assertEquals(calls.length, 1);
+    assertEquals(calls[0].method, 'error');
+    assertEquals(calls[0].args, [
+      "[Worker worker-test] Job 'missing-job' failed:",
+      "Job 'missing-job' not found in registry",
+    ]);
+  });
+});
+
+Deno.test('task processing, completion and duplicate skips use structured Debug records', async () => {
+  await captureWorkerConsole(async (calls) => {
+    const records: LogRecord[] = [];
+    await configure({
+      reset: true,
+      sinks: { records: (record) => records.push(record) },
+      loggers: [
+        { category: ['netscript'], lowestLevel: 'debug', sinks: ['records'] },
+        { category: ['logtape', 'meta'], lowestLevel: 'error', sinks: [] },
+      ],
+    });
+    await using kv = new MemoryKvAdapter();
+    const task = { ...taskDefinition('lifecycle-task'), name: 'Lifecycle task' };
+    const executionState = new MemoryExecutionState();
+    const context = dispatchContext({
+      kv,
+      executionState,
+      taskExecutor: new CountingTaskExecutor([{ success: true, duration: 7 }]),
+      task,
+    });
+    const message: TaskMessage = { taskId: task.id, topic: 'tasks', triggeredBy: 'manual' };
+    const delivery = messageContext('task-lifecycle-delivery');
+    await processWorkerTask(context, message, delivery);
+    await processWorkerTask(context, message, delivery);
+    assertEquals(executionState.completed.map((entry) => entry.options.status), ['completed']);
+    assertEquals(records.map((record) => record.rawMessage), [
+      'Processing task {taskId}',
+      'Task {taskId} completed',
+      'Processing task {taskId}',
+      'Skipping duplicate {concept} {targetId}',
+    ]);
+    for (const record of records) {
+      assertEquals(record.level, 'debug');
+      assertEquals(record.category, ['netscript', 'workers', 'runtime']);
+      assertEquals(record.properties.taskId, task.id);
+      assertEquals(record.properties.taskName, task.name);
+    }
+    assertEquals(calls, []);
+  });
+});

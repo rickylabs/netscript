@@ -1,0 +1,45 @@
+{
+  "reports": [
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6f-astra-20261028/gates/execution.json",
+      "sha256": "c6068637183eb08fd52a39710595b892b217f8c7aa4127b28f0c4191515825f7"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6f-astra-20261028/gates/tests.report.json",
+      "sha256": "b35d2ee2b362a40bf283cc4a518b42960d28cfa8a063730aac0050c77d02a3cf"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6f-astra-20261028/gates/types.report.json",
+      "sha256": "d8053f6d5f018fe9890a22ecb85112b29f2602a837532ca6b835b4378f09f1cd"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6f-astra-20261028/gates/lint.report.json",
+      "sha256": "7b396ab493bc9494b2987afe3adba9989eae0a8ddd917bdfbd675be2689aeb15"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6f-astra-20261028/gates/fmt.report.json",
+      "sha256": "e530b36e4fb261c9a7de99f25792a1a16289de49970458f0a090d7953a26d08b"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6f-astra-20261028/gates/quality-new.stdout.log",
+      "sha256": "e7754550393fb28d2dc21c1b79ef5d0bcc3059edde965e04e4ffee8a090cd530"
+    }
+  ],
+  "owners": [
+    {
+      "path": "plugins/streams/services/src/service-storage_test.ts",
+      "bytes": 11335,
+      "lines": 230,
+      "cap": 260,
+      "sha256": "16e377abc328f0255a12e8ec40a707d415376e53e1f5b22db7495de690b7a42c"
+    },
+    {
+      "path": "plugins/streams/services/src/tests/test_utils/service-runtime-fixture.ts",
+      "bytes": 12047,
+      "lines": 295,
+      "cap": 300,
+      "sha256": "52de7cb52753ede9437e01ddbb53205a2f1ca8823b3cf79ab58bc95bbfce13d5"
+    }
+  ],
+  "sourceProofSha256": "123afc364c965ae68832a76cc75f7a339e28e5ee4d4aea5cdaa61751e08bfca5"
+}

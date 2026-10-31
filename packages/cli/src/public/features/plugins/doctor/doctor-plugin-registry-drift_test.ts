@@ -22,6 +22,56 @@ const NOOP_EVIDENCE: DiagnosticEvidencePort = {
   appendDrift: () => Promise.resolve(),
 };
 
+Deno.test('plugin doctor warns for empty installed registries, exits zero and preserves missing-output errors', async () => {
+  const projectRoot = await Deno.makeTempDir({ prefix: 'netscript-doctor-empty-' });
+  try {
+    await writeProject(projectRoot);
+    const configPath = join(projectRoot, 'deno.json');
+    const config = JSON.parse(await Deno.readTextFile(configPath));
+    for (
+      const [name, entrypoint] of [
+        ['workers', 'plugins/workers/bin/runtime.ts'],
+        ['triggers', 'plugins/triggers/src/runtime/mod.ts'],
+      ]
+    ) {
+      config.imports[`@netscript/plugin-${name}/runtime`] =
+        toFileUrl(join(REPOSITORY_ROOT, entrypoint)).href;
+    }
+    await Deno.writeTextFile(configPath, JSON.stringify(config));
+    await write(
+      join(projectRoot, 'appsettings.json'),
+      JSON.stringify({
+        NetScript: {
+          Plugins: Object.fromEntries(
+            ['sagas', 'workers', 'triggers'].map((
+              name,
+            ) => [name, { Entrypoint: netscriptJsrSpecifier(`plugin-${name}`, '/services') }]),
+          ),
+        },
+      }),
+    );
+    const fs = new DenoFileSystem();
+    const generate = createGenerator(fs);
+    await generate({ dryRun: false, projectRoot });
+    const before = await snapshotProjectFiles(projectRoot);
+    const { command, output } = createDoctorHarness(projectRoot, fs, generate);
+    await command.parse(['--project-root', projectRoot]);
+    const text = output.join('\n');
+    assertEquals(
+      text.match(/Empty registry; the installed plugin has zero definitions/g)?.length,
+      3,
+    );
+    assertStringIncludes(text, 'warning');
+    assertEquals(await snapshotProjectFiles(projectRoot), before);
+    await Deno.remove(join(projectRoot, '.netscript/generated/plugin-sagas/sagas.registry.ts'));
+    const missing = createDoctorHarness(projectRoot, fs, generate);
+    await assertRejects(() => missing.command.parse(['--project-root', projectRoot]), RemoteError);
+    assertStringIncludes(missing.output.join('\n'), 'Generated registry does not exist');
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
+  }
+});
+
 Deno.test('plugin doctor names excluded trigger and worker factories without writing project files', async () => {
   const projectRoot = await Deno.makeTempDir({ prefix: 'netscript-doctor-opt-out-' });
   try {

@@ -365,7 +365,7 @@ Parameterized retirement is unsupported; unmatched concrete paths under guard st
 Clients inspecting HTTP responses can map `procedure_retired` to “client too old” and offer an
 upgrade without treating it as a permission denial. These are pre-dispatch middleware errors,
 not contract-defined oRPC errors. Use the response JSON `code`, not its human-readable message.
-`PROCEDURE_ERROR_CODES` and the derived `ProcedureErrorCode` type are available at the root and
+`PROCEDURE_ERROR_CODES` and the `ProcedureErrorCode` union are available at the root and
 `./auth`; `AuthzDecision.code` is optional so existing authorizers preserve their 403 responses.
 The matched branch of `ProcedurePolicyResolution` has an optional `retired?: true` marker;
 contract-overlay authorizers never set it and retain their current fallback semantics.
@@ -549,6 +549,12 @@ assertServiceAuthPolicy(policy);
 
 ## Command definitions and codecs
 
+For an executable introduction, read [Transactional commands](/services-sdk/commands/). Operational
+recovery, trust boundaries and durable-format changes are covered by
+[Operations](/services-sdk/command-operations/), [Security](/services-sdk/command-security/) and
+[Compatibility](/services-sdk/command-compatibility/).
+
+
 `@netscript/service/commands` defines immutable command policies and bounded canonical codecs
 without executing handlers. Importing, defining and encoding require no permissions; execution
 uses the explicitly supplied store/business operations and their permissions. JSON uses `jcs-v1`
@@ -654,6 +660,11 @@ obs-text remain accepted in the opaque suffix; empty tracestate positives are pr
 
 ## Command outbox relay
 
+[Relay committed command intents](/services-sdk/command-relay/) composes the shipped PostgreSQL
+adapter and checked worker sink. [Outbound webhooks](/orchestration-runtime/how-to/outbound-webhooks/)
+adds signed outbound delivery; inbound trigger verification is a separate direction.
+
+
 `createCommandOutboxRelay` starts no resource: existing scheduling calls `drainOnce` and shutdown
 awaits `stop`. It decodes canonical bounded payload and W3C fields, snapshots sink registration,
 publishes before settlement and preserves stable identities across retries/crashes. All drains
@@ -691,3 +702,44 @@ for migration, policies and persisted cursor examples.
 | `CommandOutboxPublication` | type alias | `type CommandOutboxPublication` | One publication/acceptance settlement. |
 | `CommandOutboxRelayStore` | interface | `interface CommandOutboxRelayStore` | Raw claim/mark/release port. |
 | `CommandOutboxRelease` | type alias | `type CommandOutboxRelease` | Retried or retained terminal row. |
+
+
+### Envelope and record policies
+
+| Field or policy | Contract |
+| --- | --- |
+| `input` | Detached, deeply frozen bounded I-JSON. Contract/input schema validation belongs to the service adapter. |
+| `actor` | Trusted principal/system origin; actor kind/subject participates in request identity, scheme does not. |
+| `correlationId` | Bounded transport identity; successful replay returns the original correlation. |
+| `idempotencyKey` | Required by default, 16–256 UTF-8 bytes; stored as a digest. Optional unkeyed execution has no receipt. |
+| `expectedVersion` | Optional normalized string included in request identity. The handler must implement atomic comparison/update. |
+| `trace` | Validated W3C propagation fields, excluded from request identity. |
+| `records.audit` / `records.outbox` | `required`, `optional` or `forbidden`; policy/codec failures roll back. |
+| `CommandRecordLimits` | Defaults: 64 audit rows, 64 outbox rows, 64 KiB shared canonical side-row bytes including metadata; tighten only. |
+| `CommandJsonLimits` | Defaults: depth 64, aggregate items 10,000, canonical bytes 1 MiB; tighten only. |
+
+### Relay policy bounds
+
+All five numerical policy options are required positive safe integers. `concurrency` must not exceed
+`batchSize`. Sink registry keys must equal the sink's bounded nonblank `id`; at most 64 sinks are
+allowed. The relay snapshots registrations at construction.
+
+| Option | Maximum | Meaning |
+| --- | --- | --- |
+| `batchSize` | 64 | Rows claimed by one drain. |
+| `concurrency` | 64 | Active publications within the serialized drains. |
+| `leaseMs` | 60,000 | Claim lifetime; the store fences both token and expiry. |
+| `maxAttempts` | 10,000 | Failed claims below this count can be rescheduled; exhaustion is retained terminal. |
+| `maxRetryDelayMs` | 86,400,000 | Upper bound on a strictly future `retryAt` result. |
+
+`clock.now` and `ids.next` are explicit ports. `classify` returns one of the six
+`COMMAND_RELAY_FAILURE_CLASSES`; `CommandRelayError` already carries its class. Invalid classifier
+or backoff output becomes `misconfigured`. If supplying `telemetry`, supply the actual database
+`provider` too. The relay's provider default without telemetry is `postgres`; this label is not
+provider certification.
+
+`CommandOutboxSink.publish` returns `void` or `{ identity, acceptedAt: Date }`. Checked worker sinks
+must validate their worker receipt before returning normalized acceptance. The store writes that
+acceptance with publication under a live-token CAS. `drainOnce(signal?)` returns settled-publication
+count; `stop()` awaits every active/queued drain and is idempotent. Neither outcome proves an
+external effect. See [reconciliation](/services-sdk/command-operations/#reconcile-a-lost-response).

@@ -52,3 +52,15 @@ Deno.test('sagas declares the shipped outbox constraint migration', async () => 
     const constraint of ['command_outbox_lease', 'command_outbox_acceptance', 'attempt_count >= 0']
   ) assert(sql.includes(constraint));
 });
+
+Deno.test('sagas declares the canonical instance-status backfill migration', async () => {
+  const contribution = sagasPlugin.contributions.migrations?.find((entry) =>
+    entry.name === 'instance-status'
+  );
+  assertEquals(contribution?.path, './database/instance-status.migration.sql');
+  const sql = await Deno.readTextFile(
+    new URL('../../database/instance-status.migration.sql', import.meta.url),
+  );
+  assert(sql.includes('UPDATE saga_instances'));
+  assert(sql.includes('saga_instances_status_check'));
+});

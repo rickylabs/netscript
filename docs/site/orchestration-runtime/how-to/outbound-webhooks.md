@@ -63,6 +63,11 @@ Reject missing or inactive endpoints, and never accept a URL or signing secret f
 
 ## Source deliveries from committed command outbox rows
 
+Start with [Transactional commands](/services-sdk/commands/) for the same-commit producer and
+[Relay committed command intents](/services-sdk/command-relay/) for the shipped PostgreSQL/worker
+composition. Use [Command operations](/services-sdk/command-operations/) to reconcile local commit,
+worker acceptance and the receiver effect as separate boundaries.
+
 The command outbox relay comes from `@netscript/service/commands/relay` and the checked worker sink
 from `@netscript/plugin-workers-core/integration/commands`. Use the existing service transaction
 and relay instead of sending HTTP during a request or starting a second polling loop.

@@ -10,6 +10,7 @@ import { SAGA_RUNTIME_CORRELATION_SELECTOR } from '@netscript/plugin-sagas-core/
 export class RunnerPrismaClient implements PrismaSagaStoreClient {
   queryReads = 0;
   readonly sagaInstance = {
+    findFirst: (): Promise<null> => Promise.resolve(null),
     findMany: (): Promise<[]> => {
       this.queryReads++;
       return Promise.resolve([]);
@@ -24,6 +25,28 @@ export class RunnerPrismaClient implements PrismaSagaStoreClient {
   readonly #states = new Map<string, StateRow>();
   readonly #transitions = new Map<string, TransitionRow>();
   readonly #correlations = new Map<string, CorrelationRow>();
+
+  readonly #applied = new Set<string>();
+  readonly sagaRuntimeCommandAppliedKey = {
+    findUnique: (
+      args: {
+        where: {
+          saga_runtime_command_applied_key_identity: { instanceId: string; keyHash: string };
+        };
+      },
+    ): Promise<unknown | null> => {
+      const { instanceId, keyHash } = args.where.saga_runtime_command_applied_key_identity;
+      return Promise.resolve(this.#applied.has(JSON.stringify([instanceId, keyHash])) ? {} : null);
+    },
+    createMany: (
+      args: { data: { instanceId: string; keyHash: string }; skipDuplicates: true },
+    ): Promise<{ count: number }> => {
+      const key = JSON.stringify([args.data.instanceId, args.data.keyHash]);
+      if (this.#applied.has(key)) return Promise.resolve({ count: 0 });
+      this.#applied.add(key);
+      return Promise.resolve({ count: 1 });
+    },
+  };
 
   readonly sagaRuntimeState = {
     findUnique: (args: { where: { instanceId: string } }): Promise<StateRow | null> =>
@@ -111,7 +134,7 @@ export class RunnerPrismaClient implements PrismaSagaStoreClient {
       where: {
         [SAGA_RUNTIME_CORRELATION_SELECTOR]: { sagaId: string; correlationKey: string };
       };
-      update: { instanceId: string };
+      update: { instanceId?: string };
       create: CorrelationRow;
     }): Promise<unknown> => {
       const key = correlationKey(args.where[SAGA_RUNTIME_CORRELATION_SELECTOR]);

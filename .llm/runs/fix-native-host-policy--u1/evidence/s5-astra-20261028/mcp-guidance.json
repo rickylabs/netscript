@@ -1,0 +1,92 @@
+{
+  "guidance": {
+    "intent": "Implement an inert streams service factory with native assertServiceAuthPolicy first, ServeOptions and CorsOptions identities, createPluginService raw transparent proxy, onShutdown upstream cleanup and failure before a RunningService exists.",
+    "confidence": "high",
+    "recommendations": [
+      {
+        "stage": "implementation",
+        "slug": "pages/web-layer/defer-streaming-ui",
+        "section": "streaming-ui-with-durable-streams",
+        "heading": "Streaming UI with durable streams",
+        "why": "Matches the task through: stream, service, factory, with.",
+        "excerpt": "The `@netscript/fresh/streams` subpath is the client SDK for end-to-end durable streams. It connects a Preact island to the durable streams server and keeps TanStack DB collections updating reactively as events arrive. `createNetScriptStreamDB()` is the entry point: a generic, TanStack DB-backed StreamDB factory that wraps `@durable-streams/state` with NetScript URL resolution. It returns a `NetScriptStreamDB` whose `.collections` are typed TanStack DB collections that update as events arrive from the server. ### Factory options `NetScriptStreamDBOptions` configures the stream database: - `str",
+        "code": [
+          {
+            "language": "ts",
+            "code": "import {\n  createNetScriptStreamDB,\n  useLiveQuery,\n} from \"@netscript/fresh/streams\";\nimport { myStreamSchema } from \"../schemas.ts\";\n\nconst db = createNetScriptStreamDB({\n  streamPath: \"/my-service/my-stream\",\n  schema: myStreamSchema,\n});\n\n// In a Preact island:\nconst { data: items } = useLiveQuery((q) =>\n  q.from({ i: db.collections.myEntity })\n);",
+            "source": {
+              "slug": "pages/web-layer/defer-streaming-ui",
+              "section": "streaming-ui-with-durable-streams",
+              "heading": "Streaming UI with durable streams"
+            }
+          }
+        ]
+      },
+      {
+        "stage": "implementation",
+        "slug": "pages/orchestration-runtime/how-to/graceful-shutdown",
+        "section": "step-1-drain-a-service-with-onshutdown",
+        "heading": "Step 1 — Drain a service with `.onShutdown()`",
+        "why": "Matches the task through: an, service, with, first.",
+        "excerpt": "`serve()` already drains in-flight HTTP requests. Add `.onShutdown(hook)` to close the things the framework does not own — your database client, an external connection, a flush buffer. Each `ShutdownHook` receives a `ShutdownContext` (`reason`, optional `signal`) and runs during the drain, in LIFO order (last registered, first to run). The drain is bounded by `drainTimeoutMs` (default `30_000`). When it elapses the service stops anyway and the returned `ShutdownReport` records `timedOut: true` plus a per-hook `ShutdownHookOutcome`. `running.stop()` runs the identical drain with reason `'manual",
+        "code": [
+          {
+            "language": "ts",
+            "code": "// services/users/src/main.ts\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\nimport { db } from '@database';\n\nconst running = await createService(router, { name: 'users', version: '1.0.0' })\n  .withRPC()\n  .withHealth()\n  .onShutdown(async ({ reason, signal }) => {\n    // reason: 'signal' | 'manual' | 'startup-failure'\n    audit.record({ event: 'shutdown', reason, signal });\n    await db.$disconnect();\n  })\n  .serve({\n    port: 3001, // note: your scaffold's port will differ\n    drainTimeoutMs: 10_000, // wait up to 10s for in-flight work\n    handleSignals: true,    // SIGINT/SIGTERM (SIGBREAK on Windows) — the default\n  });\n\n// In tests or a supervisor, trigger the same drain manually:\nawait running.stop();",
+            "source": {
+              "slug": "pages/orchestration-runtime/how-to/graceful-shutdown",
+              "section": "step-1-drain-a-service-with-onshutdown",
+              "heading": "Step 1 — Drain a service with `.onShutdown()`"
+            }
+          }
+        ]
+      },
+      {
+        "stage": "implementation",
+        "slug": "pages/explanation/aspire",
+        "section": "with-both-present-the-service-serves-https-http2-confirmed-with-curl-http2",
+        "heading": "With both present the service serves HTTPS + HTTP/2 — confirmed with `curl --http2`.",
+        "why": "Matches the task through: stream, service, with, serveoption.",
+        "excerpt": "bash netscript init my-app --db postgres --service --service-name users --yes",
+        "code": [
+          {
+            "language": "text",
+            "code": "> Plaintext HTTP/1.1 is still the default\n>\n> Opting into TLS does not change the default path: with no\n>\n> tls\n>\n> option and no\n>\n> NETSCRIPT_TLS_CERT_FILE\n>\n> /\n>\n> NETSCRIPT_TLS_KEY_FILE\n>\n> pair, the listener is byte-for-byte the same plain HTTP/1.1 server. That has one consequence worth knowing: browsers cap HTTP/1.1 at roughly\n>\n> six concurrent connections per origin\n>\n> , which SSE and durable streams can exhaust — the fix is to adopt HTTP/2 per service by enabling TLS as above. Automatic Aspire dev-certificate provisioning and a default flip to HTTP/2 are still on the roadmap, so today this remains a deliberate opt-in. See\n>\n> Durable streams\n>\n> for the connection-cap caveat and [the service reference](https://rickylabs.github.io/netscript/netscript/reference/service/)\n>\n> for `ServiceTlsOptions` and `ServeOptions.tls`.\n\n## The `--no-aspire` escape hatch\n\nAspire is the default and the recommended local path, but it is not mandatory. The `init` command takes a `--no-aspire` flag (`netscript init my-app --no-aspire`) that **skips scaffolding the orchestration layer entirely**: no `aspire/` folder, no AppHost to provision infrastructure, no dashboard. You start the generated Deno processes directly and provide your own infrastructure connection strings.",
+            "source": {
+              "slug": "pages/explanation/aspire",
+              "section": "with-both-present-the-service-serves-https-http2-confirmed-with-curl-http2",
+              "heading": "With both present the service serves HTTPS + HTTP/2 — confirmed with `curl --http2`."
+            }
+          }
+        ]
+      },
+      {
+        "stage": "implementation",
+        "slug": "pages/tutorials/chat/02-durable-chat-route",
+        "section": "step-3-the-one-stream-proxy",
+        "heading": "Step 3 — The one stream proxy",
+        "why": "Matches the task through: stream, service, and, raw.",
+        "excerpt": "The browser must not hold streams credentials, so it never talks to the durable-streams service directly. It reads through a single proxy that attaches auth server-side and keeps every response header accurate. Mount `createNetScriptChatStreamProxy` once as a catch-all: > Why a raw Request here, not a route contract > > This resolver is the one documented exception to NetScript's typed-route rule: > > createNetScriptChatStreamProxy > > 's > > target > > only ever receives the raw > > Request > > , so the session id is parsed from > > req.url > > by hand. Everywhere else you build a URL or read",
+        "code": [
+          {
+            "language": "ts",
+            "code": "// apps/dashboard/routes/api/chat-stream/[...path].ts\nimport { createNetScriptChatStreamProxy } from '@netscript/fresh/ai';\n\nconst proxy = createNetScriptChatStreamProxy({\n  // The session id is the last path segment: /api/chat-stream/ai/chat/{sessionId}\n  target: (req) => ({ sessionId: new URL(req.url).pathname.split('/').pop()! }),\n});\n\nexport const handler = { GET: proxy, POST: proxy };",
+            "source": {
+              "slug": "pages/tutorials/chat/02-durable-chat-route",
+              "section": "step-3-the-one-stream-proxy",
+              "heading": "Step 3 — The one stream proxy"
+            }
+          }
+        ]
+      }
+    ],
+    "related": [],
+    "truncated": true
+  },
+  "shutdown": {
+    "slug": "pages/orchestration-runtime/how-to/graceful-shutdown",
+    "title": "Graceful shutdown",
+    "section": "Step 1 — Drain a service with `.onShutdown()`",
+    "content": "`serve()` already drains in-flight HTTP requests. Add `.onShutdown(hook)` to close the things the framework does not own — your database client, an external connection, a flush buffer. Each `ShutdownHook` receives a `ShutdownContext` (`reason`, optional `signal`) and runs during the drain, in LIFO order (last registered, first to run).\n\n```ts\n// services/users/src/main.ts\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\nimport { db } from '@database';\n\nconst running = await createService(router, { name: 'users', version: '1.0.0' })\n  .withRPC()\n  .withHealth()\n  .onShutdown(async ({ reason, signal }) => {\n    // reason: 'signal' | 'manual' | 'startup-failure'\n    audit.record({ event: 'shutdown', reason, signal });\n    await db.$disconnect();\n  })\n  .serve({\n    port: 3001, // note: your scaffold's port will differ\n    drainTimeoutMs: 10_000, // wait up to 10s for in-flight work\n    handleSignals: true,    // SIGINT/SIGTERM (SIGBREAK on Windows) — the default\n  });\n\n// In tests or a supervisor, trigger the same drain manually:\nawait running.stop();\n```\n\nThe drain is bounded by `drainTimeoutMs` (default `30_000`). When it elapses the service stops anyway and the returned `ShutdownReport` records `timedOut: true` plus a per-hook `ShutdownHookOutcome`. `running.stop()` runs the identical drain with reason `'manual'`; both paths are idempotent, so a double `Ctrl+C` will not double-run hooks.\n\n**Shutdown contract (@netscript/service)**\n\n| Name | Type | Description |\n| --- | --- | --- |\n| `.onShutdown(hook)` | `ServiceBuilder method` | Registers an async teardown ShutdownHook. Hooks run LIFO during the drain. |\n| `ShutdownHook` | `(context: ShutdownContext) => Promise \\| void` | Your teardown callback. Throwing is captured, not fatal — it lands in the report as a failed hook. |\n| `ShutdownContext` | `{ reason: ShutdownReason; signal?: Deno.Signal }` | signal is set only when reason is 'signal'. |\n| `ShutdownReason` | `'signal' \\| '…[truncated]"
+  }
+}

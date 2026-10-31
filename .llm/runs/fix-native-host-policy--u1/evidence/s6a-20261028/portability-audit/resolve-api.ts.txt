@@ -1,0 +1,21 @@
+// Read-only native module resolution; no server import, addon load or listener.
+import { createRequire } from 'node:module';
+import { dirname } from 'node:path';
+const server = import.meta.resolve('npm:@durable-streams/server@0.3.9');
+console.log(JSON.stringify({ server }));
+const require = createRequire(server);
+const lmdb = require.resolve('lmdb');
+const msgpackr = require.resolve('msgpackr');
+const extract = createRequire(msgpackr).resolve('msgpackr-extract');
+const loader = createRequire(lmdb).resolve('node-gyp-build-optional-packages');
+console.log(JSON.stringify({ lmdb, msgpackr, extract, loader }));
+const load: unknown = createRequire(loader)(loader);
+if (typeof load !== 'function') throw new Error('Native loader is not callable');
+const resolve: unknown = Reflect.get(load, 'resolve');
+if (typeof resolve !== 'function') throw new Error('Native loader resolve is absent');
+for (const entry of [lmdb, extract]) {
+  const directory = dirname(entry).replace(/[\\/]dist$/, '');
+  const addon: unknown = resolve(directory);
+  if (typeof addon !== 'string') throw new Error('Native resolver returned a non-path');
+  console.log(JSON.stringify({ directory, addon }));
+}

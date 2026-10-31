@@ -1,3 +1,10 @@
+import {
+  requireSagaAtomicStore,
+  type SagaTransitionCommitPort,
+  type SagaTransitionCommitRequest,
+  type SagaTransitionCommitResult,
+  type SagaTransitionStore,
+} from '../ports/saga-transition-commit-port.ts';
 import type {
   SagaCorrelationIndexEntry,
   SagaStorePort,
@@ -14,6 +21,7 @@ import type {
 
 /** Operation captured by `RecordingSagaStore`. */
 export type RecordingSagaStoreOperation =
+  | Readonly<{ kind: 'commitTransition'; instanceId: SagaInstanceId; expectedVersion: number }>
   | Readonly<{ kind: 'load'; instanceId: SagaInstanceId }>
   | Readonly<{ kind: 'save'; instanceId: SagaInstanceId; expectedVersion?: number }>
   | Readonly<{ kind: 'appendTransition'; instanceId: SagaInstanceId; version: number }>
@@ -22,16 +30,39 @@ export type RecordingSagaStoreOperation =
   | Readonly<{ kind: 'delete'; instanceId: SagaInstanceId }>;
 
 /** Store wrapper that records persistence operations while delegating behavior. */
-export class RecordingSagaStore implements SagaStorePort {
+export class RecordingSagaStore implements SagaStorePort, SagaTransitionCommitPort {
   /** Stable store identifier. */
   readonly id: string;
-  readonly #delegate: SagaStorePort;
+  readonly #delegate: SagaTransitionStore;
+  /** Preserve the delegate's atomic state and worker-command guarantees exactly. */
+  readonly transitionCommitCapabilities: SagaTransitionCommitPort['transitionCommitCapabilities'];
   readonly #operations: RecordingSagaStoreOperation[] = [];
 
   /** Create a recording wrapper around another saga store. */
   constructor(delegate: SagaStorePort, id = 'recording-saga-store') {
     this.id = id;
-    this.#delegate = delegate;
+    this.#delegate = requireSagaAtomicStore(delegate);
+    this.transitionCommitCapabilities = this.#delegate.transitionCommitCapabilities;
+  }
+
+  /** Record and delegate one indivisible transition instead of granular writes. */
+  commitTransition(
+    request: SagaTransitionCommitRequest,
+    signal?: AbortSignal,
+  ): Promise<SagaTransitionCommitResult> {
+    this.#operations.push(
+      Object.freeze({
+        kind: 'commitTransition',
+        instanceId: request.envelope.metadata.instanceId,
+        expectedVersion: request.expectedVersion,
+      }),
+    );
+    return this.#delegate.commitTransition(request, signal);
+  }
+
+  /** Preserve the delegate's optional committed-replay lookup. */
+  hasAppliedTransition(instanceId: SagaInstanceId, keyHash: string): Promise<boolean> {
+    return this.#delegate.hasAppliedTransition?.(instanceId, keyHash) ?? Promise.resolve(false);
   }
 
   /** Record and delegate a state load. */

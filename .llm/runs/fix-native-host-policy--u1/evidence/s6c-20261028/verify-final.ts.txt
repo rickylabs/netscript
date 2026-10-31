@@ -1,0 +1,23 @@
+const out='C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6c-astra-20261028';
+const read=async(path:string)=>JSON.parse(await Deno.readTextFile(out+'/'+path));
+const first=await read('source-proof.json'),second=await read('source-proof-2.json');
+const children=[...first.children,...second.children];
+const cleanup=[];
+for(const entry of [...first.cleanup,...second.cleanup]){
+ const path=entry.profile??entry.scratch;let absent=false;
+ try{await Deno.stat(path);}catch(error){if(error instanceof Deno.errors.NotFound)absent=true;else throw error;}
+ cleanup.push({path,absent});
+}
+const expected=['c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e','6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08'];
+const native=[];
+for(const child of children.filter(row=>row.name==='discovery-result')){
+ const addons=JSON.parse(child.stdout);
+ if(!Array.isArray(addons)||addons.length!==2)throw new Error('Expected two native addons');
+ for(const[index,addon]of addons.entries())native.push({label:child.label,path:addon.path,bytes:addon.bytes,sha256:addon.sha256,matches:addon.sha256===expected[index]});
+}
+const child=second.children.find(row=>row.label==='tls'&&row.name==='child-1-result');
+const tls=JSON.parse(child.stdout.split('\n').find(line=>line.startsWith('{"observations":')));
+const result={childResults:children.length,settled:children.filter(row=>row.statusSettled&&row.pipesSettled&&row.stdinSettled).length,cleanupPaths:cleanup.length,cleanupAbsent:cleanup.filter(row=>row.absent).length,cleanup,nativeComparisons:native.length,nativeMatches:native.filter(row=>row.matches).length,native,tls,priorAuditFailure:'final-verification.json preserves a PowerShell ConvertFrom-Json nested-array count error (10 instead of20 comparisons); no test/source rerun followed'};
+await Deno.writeTextFile(out+'/final-verification-2.json',JSON.stringify(result,null,2),{createNew:true});
+if(result.childResults!==30||result.settled!==30||result.cleanupAbsent!==12||result.nativeComparisons!==20||result.nativeMatches!==20)throw new Error('Actual final evidence audit failed');
+console.log(JSON.stringify({childResults:result.childResults,settled:result.settled,cleanupAbsent:result.cleanupAbsent,nativeMatches:result.nativeMatches,tls}));

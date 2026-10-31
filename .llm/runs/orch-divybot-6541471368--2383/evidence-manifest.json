@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "description": "Privacy-preserving summaries of structured wrapper evidence; raw process receipts and provider logs are retained outside Git. Source hashes identify the validated implementation tree.",
+  "sources": {
+    "packages/plugin-sagas-core/tests/fixtures/compensation-retry.ts": "823b9b095a9eba9d5f99a958f1005f00b02676dcb9186986b5f22db74efb70b8",
+    "packages/plugin-sagas-core/tests/runtime/saga-compensation-retry_test.ts": "322e57911545df339172a17108e2b4adf5cb53409fce3d388eef6e351d73a578",
+    "packages/plugin-sagas-core/tests/fixtures/transition-store/postgres-conformance.ts.template": "b1ce78730f6bc3877f9ff95e117959c6b11c24a1d147b870e66d675bcd70e311",
+    "plugins/sagas/README.md": "901dcf01944b8eb3ed5b45651802be8335139c328500b11c281fb4c8546b23ad"
+  },
+  "gates": [
+    {
+      "id": "compensation-final",
+      "rawReportSha256": "4c91940dad085fef09380563b29b17d2b4f84201bf480766dab5930dbdc1d8b5",
+      "exitCode": 0,
+      "summary": {
+        "passed": 19,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 19,
+        "uniqueFailures": 0
+      },
+      "outcome": null,
+      "expectedFailure": false
+    },
+    {
+      "id": "negative-kv-final",
+      "rawReportSha256": "e3db8ecd6140bfb564537723cc39a854f6a7d427caaad71607ab0379d74001ea",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 9,
+        "ignored": 0,
+        "totalResults": 9,
+        "uniqueFailures": 6
+      },
+      "outcome": null,
+      "expectedFailure": true
+    },
+    {
+      "id": "negative-postgres-final",
+      "rawReportSha256": "2a4a300c10e0ca2aab6a032aea520cdd19019f79a0793fed2eeec526fc11454b",
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "outcome": null,
+      "expectedFailure": true
+    },
+    {
+      "id": "full-tests-final",
+      "rawReportSha256": "fc832ff6871173cb2dae2adfd301613a61117de526574aa8c0ca185fdd9d1654",
+      "exitCode": 0,
+      "summary": {
+        "passed": 291,
+        "failed": 0,
+        "ignored": 2,
+        "totalResults": 293,
+        "uniqueFailures": 0
+      },
+      "outcome": null,
+      "expectedFailure": false
+    },
+    {
+      "id": "check",
+      "rawReportSha256": "be99eea50c6e0a93f839c341f4d5747fa087b3f17e63b5691c086076a0feff65",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "outcome": null,
+      "expectedFailure": false
+    },
+    {
+      "id": "lint",
+      "rawReportSha256": "bb9c2ca4a3a57f9e64ba16db4e60330b3fbe017b698c46d3087478ffad797954",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "outcome": null,
+      "expectedFailure": false
+    },
+    {
+      "id": "fmt",
+      "rawReportSha256": "c8c0b60027dbc327a8158780dbb6bdba54a16b080920bc4db66e44d93443d267",
+      "exitCode": 0,
+      "summary": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "outcome": null,
+      "expectedFailure": false
+    },
+    {
+      "id": "quality-repair-receipt",
+      "rawReportSha256": "cda46ecf4533a1c1ff56c6744dcd2449361a52baa86608be0ad99eeb143bb0c6",
+      "exitCode": 0,
+      "summary": {},
+      "outcome": "PASS",
+      "expectedFailure": false
+    },
+    {
+      "id": "public-doc-policy",
+      "rawReportSha256": "b7ac937874e6ad42f4bb16df6384d67a8347acc285c0a5e6833d9d693398362b",
+      "exitCode": 0,
+      "summary": {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 4,
+        "uniqueFailures": 0
+      },
+      "outcome": null,
+      "expectedFailure": false
+    },
+    {
+      "id": "doc-lint-core",
+      "rawReportSha256": "808b302e6d01ab027b1328629461c59f736a3476f98803e1d25a3cd23eb00820",
+      "exitCode": 1,
+      "summary": {
+        "totalPackages": 1,
+        "totalErrors": 7,
+        "totalPrivateTypeRef": 7,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      },
+      "outcome": null,
+      "expectedFailure": false
+    },
+    {
+      "id": "doc-lint",
+      "rawReportSha256": "06424aabff374221eafd55521f4c1defe75451788f417e7c3af869f35a11c7c0",
+      "exitCode": 1,
+      "summary": {
+        "totalPackages": 1,
+        "totalErrors": 30,
+        "totalPrivateTypeRef": 30,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      },
+      "outcome": null,
+      "expectedFailure": false
+    }
+  ],
+  "providerChildren": {
+    "focusedPostgres": {
+      "passed": 12,
+      "failed": 0
+    },
+    "negativePostgres": {
+      "passed": 0,
+      "failed": 6
+    },
+    "fullPostgres": {
+      "passed": 18,
+      "failed": 0
+    }
+  }
+}

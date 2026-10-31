@@ -1,0 +1,2243 @@
+{
+  "head": "0292488bc2739e9e21c35a4a02bb89341addb12a",
+  "proposal": {
+    "path": ".llm/runs/fix-native-host-policy--u1/s6f-storage-denial-proposal.md",
+    "sha256": "6059a0e8549a5d5270cf5ff2d2c4a154dc46b6b7aa4473ebfd3893c6dc45aff4",
+    "lines": 81
+  },
+  "protectedCount": 370,
+  "protectedMatched": 370,
+  "rows": [
+    {
+      "path": ".llm/harness/debt/arch-debt.md",
+      "expected": "3ded2c685dce3b4b20730ac81593861a8c110470999f505d0adf6d4b2a92bc20",
+      "actual": "3ded2c685dce3b4b20730ac81593861a8c110470999f505d0adf6d4b2a92bc20",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--rust-workers-rfc/bench/parallel/wasmbuild-lcg/deno.lock",
+      "expected": "99537c6196d90ca77dbc4b5e074acb213136e2bf86cbdd8643a79749152a14c1",
+      "actual": "99537c6196d90ca77dbc4b5e074acb213136e2bf86cbdd8643a79749152a14c1",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/docs-rfc-runtime-versioned-automation--supervisor/evidence/current-state-probes/schema-fixture/deno.lock",
+      "expected": "ba1b593c2be6b5097a9a4d7c168a6c1abe9ab1df96d8fd635d9fe396735e2c93",
+      "actual": "ba1b593c2be6b5097a9a4d7c168a6c1abe9ab1df96d8fd635d9fe396735e2c93",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/plan-eval.md",
+      "expected": "7ecfaef6f105f43b5532bdc34bb3e70ac1a043cfcd10d8b3ad0278f0042546a5",
+      "actual": "7ecfaef6f105f43b5532bdc34bb3e70ac1a043cfcd10d8b3ad0278f0042546a5",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/plan-f5-debt-eval.md",
+      "expected": "849d68eca549e8bea01161ce33b3666e3ef77c9f69f983112d6e1a6a64cde9bf",
+      "actual": "849d68eca549e8bea01161ce33b3666e3ef77c9f69f983112d6e1a6a64cde9bf",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/plan-streams-f5-debt-eval.md",
+      "expected": "8f9907d5c4b0864467bb295dbca5c8534995721779f2411b2bafbc974a61f508",
+      "actual": "8f9907d5c4b0864467bb295dbca5c8534995721779f2411b2bafbc974a61f508",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/plan-type-closure-eval.md",
+      "expected": "9c249a787acf5c3a00c4c2ee3bf8993a90aa74649a4df9cf28125a0c18fe1bf9",
+      "actual": "9c249a787acf5c3a00c4c2ee3bf8993a90aa74649a4df9cf28125a0c18fe1bf9",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/root-f5-debt-disposition.md",
+      "expected": "3586a539e26777fdb51a6ffd320a7d2d47f6c7a33d35d0a9e6cb46ffb74c44cc",
+      "actual": "3586a539e26777fdb51a6ffd320a7d2d47f6c7a33d35d0a9e6cb46ffb74c44cc",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/root-s3f-scope-authorization.md",
+      "expected": "5bf3bf7ba419c181e031ee298bfcc7b6249bb368453107cd306265fefdc73033",
+      "actual": "5bf3bf7ba419c181e031ee298bfcc7b6249bb368453107cd306265fefdc73033",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/root-s3f-source-acceptance.md",
+      "expected": "eea4a4d9c1b95b9dd306dff93eba64a3816c3fe7965bee08ddbc3e944fe0608b",
+      "actual": "eea4a4d9c1b95b9dd306dff93eba64a3816c3fe7965bee08ddbc3e944fe0608b",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/root-s3g-source-acceptance.md",
+      "expected": "5a974908f75ad9900bea6de92ed286d13d988da260786be8333f5fecc3a1f5c1",
+      "actual": "5a974908f75ad9900bea6de92ed286d13d988da260786be8333f5fecc3a1f5c1",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/root-s4-source-acceptance.md",
+      "expected": "0dd4b5904bf60c708d8e04f4b3a7b09bd974360804279550e7338a018ae6016b",
+      "actual": "0dd4b5904bf60c708d8e04f4b3a7b09bd974360804279550e7338a018ae6016b",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/root-streams-f5-plan-acceptance.md",
+      "expected": "2a96620df8f3951b55c09ca7d4c316765222dfa62d3360b8fa366949a9408df8",
+      "actual": "2a96620df8f3951b55c09ca7d4c316765222dfa62d3360b8fa366949a9408df8",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/s3e-workers-abort-proposal.md",
+      "expected": "f0f28247f89e3f1048a770393758fa578811f02f3d052a1f8f53e580316efe8f",
+      "actual": "f0f28247f89e3f1048a770393758fa578811f02f3d052a1f8f53e580316efe8f",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/s3g-workers-legacy-proposal.md",
+      "expected": "a1336a83dffbc5c38df707393c607ce2be5130e9ff2cb0a6da84675aa418bef0",
+      "actual": "a1336a83dffbc5c38df707393c607ce2be5130e9ff2cb0a6da84675aa418bef0",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/s5-streams-factory-proposal.md",
+      "expected": "812515519cd70c5ebde68d226b6ef5fc7e2cedb9384772c112790ebd66426e9f",
+      "actual": "812515519cd70c5ebde68d226b6ef5fc7e2cedb9384772c112790ebd66426e9f",
+      "matches": true
+    },
+    {
+      "path": ".llm/tmp/native-host-policy-u1-implementation/runtime/s3-workers/tls-probe-evidence.json",
+      "expected": "b7de0297d56707a7db6c38e2eb204150a9868ef61be668d0831f89396da35a4a",
+      "actual": "b7de0297d56707a7db6c38e2eb204150a9868ef61be668d0831f89396da35a4a",
+      "matches": true
+    },
+    {
+      "path": ".llm/tmp/u1-s3/tls/out/ca.crt.pem",
+      "expected": "5695aa9d1a56ff8d38b57cd244e493c90a47a97b7c0a99660aa4c5e8329e6742",
+      "actual": "5695aa9d1a56ff8d38b57cd244e493c90a47a97b7c0a99660aa4c5e8329e6742",
+      "matches": true
+    },
+    {
+      "path": ".llm/tmp/u1-s3/tls/out/leaf.crt.pem",
+      "expected": "ee43bdba08abd0686941aac333864025a4dcfcdadb10cb615d50c4ac23228087",
+      "actual": "ee43bdba08abd0686941aac333864025a4dcfcdadb10cb615d50c4ac23228087",
+      "matches": true
+    },
+    {
+      "path": ".llm/tmp/u1-s3/tls/out/leaf.key.pem",
+      "expected": "15008d887835140560844dfd5ecb607557016c66d43e6a91dc11118bc684765e",
+      "actual": "15008d887835140560844dfd5ecb607557016c66d43e6a91dc11118bc684765e",
+      "matches": true
+    },
+    {
+      "path": ".llm/tmp/u1-s3/tls/out/receipt.json",
+      "expected": "7a871dbf2a35c4847b7269e35e11e19a0bbfc0fb4a55e1d1b35495bef0e902f9",
+      "actual": "7a871dbf2a35c4847b7269e35e11e19a0bbfc0fb4a55e1d1b35495bef0e902f9",
+      "matches": true
+    },
+    {
+      "path": "deno.json",
+      "expected": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "actual": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "matches": true
+    },
+    {
+      "path": "deno.lock",
+      "expected": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "actual": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "matches": true
+    },
+    {
+      "path": "docs/site/deno.lock",
+      "expected": "e03005b38fbb0ffdef75671067ad0c7b356ea8f04fef911c9926b16f5f21f057",
+      "actual": "e03005b38fbb0ffdef75671067ad0c7b356ea8f04fef911c9926b16f5f21f057",
+      "matches": true
+    },
+    {
+      "path": "docs/site/reference/workers/index.md",
+      "expected": "578b87f003e930319968d10bac3a28615237c7c9dabfd42e49d094cdcfc33bd9",
+      "actual": "578b87f003e930319968d10bac3a28615237c7c9dabfd42e49d094cdcfc33bd9",
+      "matches": true
+    },
+    {
+      "path": "packages/cli/e2e/fixtures/desktop-native/deno.lock",
+      "expected": "adc126281992b69e3dbbe0a325b2e5bcb2775358ecfb6a82465fc5fcdb943e8a",
+      "actual": "adc126281992b69e3dbbe0a325b2e5bcb2775358ecfb6a82465fc5fcdb943e8a",
+      "matches": true
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "expected": "18693dfeb7be838b924e8b2803d55994b34bcde981ab617e0c72eb30129fcf40",
+      "actual": "18693dfeb7be838b924e8b2803d55994b34bcde981ab617e0c72eb30129fcf40",
+      "matches": true
+    },
+    {
+      "path": "packages/service/src/auth/types.ts",
+      "expected": "26b3f8167cff14288f0cbd43d41e2b59906a921a991894e0e61bdc41b1e82ed6",
+      "actual": "26b3f8167cff14288f0cbd43d41e2b59906a921a991894e0e61bdc41b1e82ed6",
+      "matches": true
+    },
+    {
+      "path": "packages/service/src/builder/service-builder-impl.ts",
+      "expected": "c81161994461703ce6028075f6128a56efb33a1a9e1d3a3d5b7d19c7bc69cbe7",
+      "actual": "c81161994461703ce6028075f6128a56efb33a1a9e1d3a3d5b7d19c7bc69cbe7",
+      "matches": true
+    },
+    {
+      "path": "packages/service/src/builder/service-listener.ts",
+      "expected": "76da3884e47614b1ffffaa202403a392cb8b775cf3caaac27d2fc363b01f72dc",
+      "actual": "76da3884e47614b1ffffaa202403a392cb8b775cf3caaac27d2fc363b01f72dc",
+      "matches": true
+    },
+    {
+      "path": "packages/service/src/types.ts",
+      "expected": "0921e0d2d013fe5a7dcdeb4839a91aa68975b8fe4a4043388b2689696ddb2f1c",
+      "actual": "0921e0d2d013fe5a7dcdeb4839a91aa68975b8fe4a4043388b2689696ddb2f1c",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/README.md",
+      "expected": "41082b5452157c9529ccbfcc67435dc96c6b7bfabf752f04e7319271ff5145d8",
+      "actual": "41082b5452157c9529ccbfcc67435dc96c6b7bfabf752f04e7319271ff5145d8",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/cli.ts",
+      "expected": "39daecfcce3e189a120d3f44aaee091ed5a494e12a8b38c9e8d17b0659f66e43",
+      "actual": "39daecfcce3e189a120d3f44aaee091ed5a494e12a8b38c9e8d17b0659f66e43",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/mod.ts",
+      "expected": "2fb776ca319b17745148716a4050b22c04ef92987d1a1594ac8564e768fbc21e",
+      "actual": "2fb776ca319b17745148716a4050b22c04ef92987d1a1594ac8564e768fbc21e",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/package.json",
+      "expected": "a8afee82893425ddf33517e56175b3115017fabcf7e21c24c26369cf05defb36",
+      "actual": "a8afee82893425ddf33517e56175b3115017fabcf7e21c24c26369cf05defb36",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/scaffold.plugin.json",
+      "expected": "410c041de7244faf92fb24decb81dc22a0f69bb9b75e8a573a08c41b5b0894a8",
+      "actual": "410c041de7244faf92fb24decb81dc22a0f69bb9b75e8a573a08c41b5b0894a8",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/scaffold.runtime.json",
+      "expected": "4b60ff9fa7453f7a425908ab78cd117576ddbf87ddd41aa5164c7622e73cfdaf",
+      "actual": "4b60ff9fa7453f7a425908ab78cd117576ddbf87ddd41aa5164c7622e73cfdaf",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/scaffold.ts",
+      "expected": "31adc33fd7b06ebb07bd500835df180885b099891d9d66748c77fdaeea589d9e",
+      "actual": "31adc33fd7b06ebb07bd500835df180885b099891d9d66748c77fdaeea589d9e",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/bounded-file-store.ts",
+      "expected": "7b3c128cb6fddf889c5faa8700836f0c08c8bfa37f52a79c46b23b92b25f287c",
+      "actual": "7b3c128cb6fddf889c5faa8700836f0c08c8bfa37f52a79c46b23b92b25f287c",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/bounded-segment-log.ts",
+      "expected": "3e488a97081500b3fcd8632ee961c0b84835563c842a0f8c0689c3837957cbd7",
+      "actual": "3e488a97081500b3fcd8632ee961c0b84835563c842a0f8c0689c3837957cbd7",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/durability.ts",
+      "expected": "64bd5a5951f2f4ce4bb339318024aed151adad869c49322881d51946df982eb1",
+      "actual": "64bd5a5951f2f4ce4bb339318024aed151adad869c49322881d51946df982eb1",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/durability_test.ts",
+      "expected": "d11515af82ba72c91cd7438868b1a550330730c7da4f5ca1e46a35ecdf3400e9",
+      "actual": "d11515af82ba72c91cd7438868b1a550330730c7da4f5ca1e46a35ecdf3400e9",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/main.ts",
+      "expected": "4e7b9fc48b83b197f11286a78e0f2d16f4bc90413bf48c801ae8252093c4d72e",
+      "actual": "4e7b9fc48b83b197f11286a78e0f2d16f4bc90413bf48c801ae8252093c4d72e",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/main_test.ts",
+      "expected": "bff39b1dfdf5c4e02e4a17842bc1f73bdc23caabb423daa6d1cd84e73aa24b0e",
+      "actual": "bff39b1dfdf5c4e02e4a17842bc1f73bdc23caabb423daa6d1cd84e73aa24b0e",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/proxy-headers.ts",
+      "expected": "784736fe5db81b5070dd921cec23e60d289151f15d4f4686a5d4ba2221a72c1d",
+      "actual": "784736fe5db81b5070dd921cec23e60d289151f15d4f4686a5d4ba2221a72c1d",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/proxy.ts",
+      "expected": "69dc2ad279a4dc60a580dadaecb437af4b44107b222e9fb731c977bc4fb4181c",
+      "actual": "69dc2ad279a4dc60a580dadaecb437af4b44107b222e9fb731c977bc4fb4181c",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/proxy_test.ts",
+      "expected": "5dcc9788d0f21b30ec4d9d2f07fff6138616aebc3113929bf8740ff4cdd59d7a",
+      "actual": "5dcc9788d0f21b30ec4d9d2f07fff6138616aebc3113929bf8740ff4cdd59d7a",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/service_test.ts",
+      "expected": "d4b383c13f6f30dfa40de4842dd680cb33819321485de7e90dec7f2620d44678",
+      "actual": "d4b383c13f6f30dfa40de4842dd680cb33819321485de7e90dec7f2620d44678",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/sse-contract_conformance_test.ts",
+      "expected": "94c2cc90117d19658ca8146ffaa6aa3f923ff09e0c84708ceafb33666e5599ee",
+      "actual": "94c2cc90117d19658ca8146ffaa6aa3f923ff09e0c84708ceafb33666e5599ee",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/tests/bounded-file-store_test.ts",
+      "expected": "d6824ee98e2da835268863e7adc61fe0d6479e87cc59d52ccfbbd5ba1129d4ff",
+      "actual": "d6824ee98e2da835268863e7adc61fe0d6479e87cc59d52ccfbbd5ba1129d4ff",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/tests/bounded-segment-log_test.ts",
+      "expected": "36512b1e6258f1df76505171707acd6ae6c9b523f23b83f795bc371bf7549b0f",
+      "actual": "36512b1e6258f1df76505171707acd6ae6c9b523f23b83f795bc371bf7549b0f",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/tests/storage-restart_test.ts",
+      "expected": "a344828e6502bbb4a2b3dab7959ef33c422372daaf5a84a2b956a5bc53ebb321",
+      "actual": "a344828e6502bbb4a2b3dab7959ef33c422372daaf5a84a2b956a5bc53ebb321",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/tests/storage-rss_test.ts",
+      "expected": "14834a065310ff7b12eb617006debd8a50088f67ac57141aa0fcbcab0f668f64",
+      "actual": "14834a065310ff7b12eb617006debd8a50088f67ac57141aa0fcbcab0f668f64",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/tests/test_utils/storage-rss-worker.ts",
+      "expected": "c1b63c9087662f9669b5ed353c890879c3805e0b641e984e22be1805675192aa",
+      "actual": "c1b63c9087662f9669b5ed353c890879c3805e0b641e984e22be1805675192aa",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/plugin.ts",
+      "expected": "118e26dc43d51ff7b9cd4d6ec35281050d76ef8fa7df313c0acedb0a97dfaa48",
+      "actual": "118e26dc43d51ff7b9cd4d6ec35281050d76ef8fa7df313c0acedb0a97dfaa48",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/resources/barrel/barrel.stub.ts",
+      "expected": "050d23995c5d36e695c3b29a9c1c6d2bd3eb40a642d9f71c3ad5d76d44fd3a2c",
+      "actual": "050d23995c5d36e695c3b29a9c1c6d2bd3eb40a642d9f71c3ad5d76d44fd3a2c",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/resources/barrel/barrel.ts",
+      "expected": "2a1cada56d6c6fc6011085b59aa03e4e4bb9dcfaf2c22ee39b05d60795a148b3",
+      "actual": "2a1cada56d6c6fc6011085b59aa03e4e4bb9dcfaf2c22ee39b05d60795a148b3",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/resources/consumer/consumer.stub.ts",
+      "expected": "7efc903e7b9be64e611e02f6297cbe12c7b5d9961ba6dbcc9b3d059b91ff233c",
+      "actual": "7efc903e7b9be64e611e02f6297cbe12c7b5d9961ba6dbcc9b3d059b91ff233c",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/resources/consumer/consumer.ts",
+      "expected": "65b90095177f9776b02c412964b3327623b7ac6c67c2ec0f7fed26b739d18345",
+      "actual": "65b90095177f9776b02c412964b3327623b7ac6c67c2ec0f7fed26b739d18345",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/resources/input.ts",
+      "expected": "8f90598888a2b9fc33378826dafaf54fd3645b71886131aa9cf1695b2d06fad8",
+      "actual": "8f90598888a2b9fc33378826dafaf54fd3645b71886131aa9cf1695b2d06fad8",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/resources/mod.ts",
+      "expected": "71c831380b4c14d6271838b42789502acc1fe457a1338b2f3c077472ff4c0e63",
+      "actual": "71c831380b4c14d6271838b42789502acc1fe457a1338b2f3c077472ff4c0e63",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/resources/producer/producer.stub.ts",
+      "expected": "108d0cf88c56ede7e03a1a894bafcb3f6db227bb7e0c99ffa12f6d9cd272b688",
+      "actual": "108d0cf88c56ede7e03a1a894bafcb3f6db227bb7e0c99ffa12f6d9cd272b688",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/resources/producer/producer.ts",
+      "expected": "168e7a260cfac0c349175edd1892298631f4947cab089ddc20ce0a911b7e2266",
+      "actual": "168e7a260cfac0c349175edd1892298631f4947cab089ddc20ce0a911b7e2266",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/resources/resources.test.ts",
+      "expected": "5d56023e2e1719e872d9d30408c1bf3ebf3cee9696a0f61d5925d52c985804fb",
+      "actual": "5d56023e2e1719e872d9d30408c1bf3ebf3cee9696a0f61d5925d52c985804fb",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/resources/schema/schema.stub.ts",
+      "expected": "8cc6489cc1e24ced31de8b161bd0cd051c480c1a3b939d264467dc29efaaf78e",
+      "actual": "8cc6489cc1e24ced31de8b161bd0cd051c480c1a3b939d264467dc29efaaf78e",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/resources/schema/schema.ts",
+      "expected": "09e03f06a12508af8b04f02346bea1c7a2d61718a2833d8f35786d4e2553c6f3",
+      "actual": "09e03f06a12508af8b04f02346bea1c7a2d61718a2833d8f35786d4e2553c6f3",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/resources/stream/stream.stub.ts",
+      "expected": "0300b4c4f6550c0dd8e1298b886f35d1d510c53eeb5297cfa631498b7df15ca0",
+      "actual": "0300b4c4f6550c0dd8e1298b886f35d1d510c53eeb5297cfa631498b7df15ca0",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/adapter/resources/stream/stream.ts",
+      "expected": "6fc788bed3314f7b29ff5c00990377d3c1a98dc45c3789815d7b0e1256182ddf",
+      "actual": "6fc788bed3314f7b29ff5c00990377d3c1a98dc45c3789815d7b0e1256182ddf",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/aspire/mod.ts",
+      "expected": "35f7d8a7780bfccd082b77c5e895dc6e59d7d209500dc78ddf1add061e5e5308",
+      "actual": "35f7d8a7780bfccd082b77c5e895dc6e59d7d209500dc78ddf1add061e5e5308",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/aspire/streams-contribution.ts",
+      "expected": "1e035f05ab27f31b54661df88582aa4ef2e22ec73964bda1562b5096c77d1639",
+      "actual": "1e035f05ab27f31b54661df88582aa4ef2e22ec73964bda1562b5096c77d1639",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/cli/adapters/artifact-writer.ts",
+      "expected": "fc1f9429712d0825cb7db8b84ecd8093f528b1509cb31cbc44a2aa73559f28e8",
+      "actual": "fc1f9429712d0825cb7db8b84ecd8093f528b1509cb31cbc44a2aa73559f28e8",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/cli/adapters/runtime-client.ts",
+      "expected": "1da199418afe448b9b3d69624cf3e68a11e598a4d332fa79ffba2131fb1b865a",
+      "actual": "1da199418afe448b9b3d69624cf3e68a11e598a4d332fa79ffba2131fb1b865a",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/cli/adapters/topic-walker.ts",
+      "expected": "2b8553551031a96bddcbbd818b16786706d2c3c812133fcc5b2667fdb52a6478",
+      "actual": "2b8553551031a96bddcbbd818b16786706d2c3c812133fcc5b2667fdb52a6478",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/cli/composition/main.ts",
+      "expected": "1eb2a3ff0d8ad8f1d2c55d8ea45c04b7abbe56c89514e951871a94680618b4ea",
+      "actual": "1eb2a3ff0d8ad8f1d2c55d8ea45c04b7abbe56c89514e951871a94680618b4ea",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/cli/streams-cli.ts",
+      "expected": "8e9018046a35894d4952482aad79663d28ff70b74606b9b2dc6621b04d671b45",
+      "actual": "8e9018046a35894d4952482aad79663d28ff70b74606b9b2dc6621b04d671b45",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/cli/streams-types.ts",
+      "expected": "719e7bc14c8338a0b5290ea6be320754807892de8d59247b3f63ddbd83926bf7",
+      "actual": "719e7bc14c8338a0b5290ea6be320754807892de8d59247b3f63ddbd83926bf7",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/e2e/mod.ts",
+      "expected": "d4d622ecc7844cebd5fc94d61a6aea1e5bf39cf7449d7c932b14a8f8b367d25f",
+      "actual": "d4d622ecc7844cebd5fc94d61a6aea1e5bf39cf7449d7c932b14a8f8b367d25f",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/e2e/probes/health.ts",
+      "expected": "2eab537391ea5702220b4fa8f3bd6bf61e1495c0d5668c9b65c74632133946a3",
+      "actual": "2eab537391ea5702220b4fa8f3bd6bf61e1495c0d5668c9b65c74632133946a3",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/e2e/probes/probe-context.ts",
+      "expected": "506a5b397fd7ee99d2165c5b09169bb77cff400072b6779e5411e7e94f4a8762",
+      "actual": "506a5b397fd7ee99d2165c5b09169bb77cff400072b6779e5411e7e94f4a8762",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/e2e/probes/producer-reconnect.ts",
+      "expected": "7d81f2410b3d192f0ed78a19e4ac4d0b329cf464eeffd50956f57a731259bd9b",
+      "actual": "7d81f2410b3d192f0ed78a19e4ac4d0b329cf464eeffd50956f57a731259bd9b",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/e2e/probes/publish.ts",
+      "expected": "3fa3b8c763df8fa6303a1d2c442b0beed8f7729940bed8f316f15ad97dc17f3a",
+      "actual": "3fa3b8c763df8fa6303a1d2c442b0beed8f7729940bed8f316f15ad97dc17f3a",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/e2e/probes/subscribe.ts",
+      "expected": "606ecb3f2acba02eee9b5879619fb0ca5a54738f4ea6860675ae087e666886cd",
+      "actual": "606ecb3f2acba02eee9b5879619fb0ca5a54738f4ea6860675ae087e666886cd",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/e2e/streams-gates.ts",
+      "expected": "5bba12de0b056dcceb5c5d6cb04e50079dd0d3ba24606d0988cacb6ce1c0461f",
+      "actual": "5bba12de0b056dcceb5c5d6cb04e50079dd0d3ba24606d0988cacb6ce1c0461f",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/package-metadata.generated.ts",
+      "expected": "71dcdef87c93eee38a189c93adb28d961d88e2db811c041f2d12cc0d8708af27",
+      "actual": "71dcdef87c93eee38a189c93adb28d961d88e2db811c041f2d12cc0d8708af27",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/public/mod.ts",
+      "expected": "51122c122066ce961aa82e3d960e345c9a9cadba0949272d79eb55c5c64480e0",
+      "actual": "51122c122066ce961aa82e3d960e345c9a9cadba0949272d79eb55c5c64480e0",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/src/public/stream-api.ts",
+      "expected": "7ffa5b733297f1dacfcfa988e3e1aeebefb2513ca547eef78e52ed958e8ee39f",
+      "actual": "7ffa5b733297f1dacfcfa988e3e1aeebefb2513ca547eef78e52ed958e8ee39f",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/tests/aspire/streams-contribution_test.ts",
+      "expected": "c886251533a52de4d1ce23443db404b3a0c8e20ed5962ff58f5349a32a22f483",
+      "actual": "c886251533a52de4d1ce23443db404b3a0c8e20ed5962ff58f5349a32a22f483",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/tests/cli/add-dry-run_test.ts",
+      "expected": "34d4a7a9c45e0efb251910901102c79fc88c664b4435157c3d2473c107122cdc",
+      "actual": "34d4a7a9c45e0efb251910901102c79fc88c664b4435157c3d2473c107122cdc",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/tests/cli/streams-cli_test.ts",
+      "expected": "927d18bf6f2ba5aac6f71482f11f5c5562070cd666a9c8e643056a379a743774",
+      "actual": "927d18bf6f2ba5aac6f71482f11f5c5562070cd666a9c8e643056a379a743774",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/tests/docs/native-event-source-example_test.ts",
+      "expected": "5564573b6ed62b2f7772f272e2fcf7bfa4a755be87d6dcea3f2b1ccf9dd03bae",
+      "actual": "5564573b6ed62b2f7772f272e2fcf7bfa4a755be87d6dcea3f2b1ccf9dd03bae",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/tests/e2e/producer-reconnect_test.ts",
+      "expected": "24eee3f80cc7014943a1e81acc85e3cd68b7d570427ed49b0618e12f36059940",
+      "actual": "24eee3f80cc7014943a1e81acc85e3cd68b7d570427ed49b0618e12f36059940",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/tests/e2e/streams-gates_test.ts",
+      "expected": "628e25e5608f7debd11145cc99c503ac13884fc233e0d54427f29f0b82d112e4",
+      "actual": "628e25e5608f7debd11145cc99c503ac13884fc233e0d54427f29f0b82d112e4",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/tests/public/manifest_test.ts",
+      "expected": "aa1140a568c18c0781e89be7ee3164c0e03dd262f7a294c5746d1e31cc2141e6",
+      "actual": "aa1140a568c18c0781e89be7ee3164c0e03dd262f7a294c5746d1e31cc2141e6",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/tests/public/stream-api_test.ts",
+      "expected": "03f24c88a50a715395a305c550515065743cf9d853d838c6d41c0256269556c6",
+      "actual": "03f24c88a50a715395a305c550515065743cf9d853d838c6d41c0256269556c6",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/tests/service/chat-producer-fencing_test.ts",
+      "expected": "967c270874dbd6c697b7f409aac8f55a3a4d03845722527c522b6c571a568663",
+      "actual": "967c270874dbd6c697b7f409aac8f55a3a4d03845722527c522b6c571a568663",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/tests/service/durable-stream-producer-idempotency_test.ts",
+      "expected": "a93a9c3632765115305858e42a46f30860ad7a7dbfedf1cb2c6397b935c122b8",
+      "actual": "a93a9c3632765115305858e42a46f30860ad7a7dbfedf1cb2c6397b935c122b8",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/tests/service/durable-stream-retention_test.ts",
+      "expected": "11f2abd9ccc8e2ca41c92e8fb9a8134682cd0394f7f7272646d13246630ae906",
+      "actual": "11f2abd9ccc8e2ca41c92e8fb9a8134682cd0394f7f7272646d13246630ae906",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/tests/service/proxy-headers_test.ts",
+      "expected": "8939655e6dbb6b1c683e3fbcbfcf74c36d515512c50a2acc5a2f93b71c2f0489",
+      "actual": "8939655e6dbb6b1c683e3fbcbfcf74c36d515512c50a2acc5a2f93b71c2f0489",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/verify-plugin.ts",
+      "expected": "c9f26fbcdafa8e15c8af066048da3faf9185fa96df18551aad88462867005b8d",
+      "actual": "c9f26fbcdafa8e15c8af066048da3faf9185fa96df18551aad88462867005b8d",
+      "matches": true
+    },
+    {
+      "path": "plugins/workers/README.md",
+      "expected": "08dedaf7de469703735b73839e252b08be67eb7c1b906eb10ea7f9d4083f8e4d",
+      "actual": "08dedaf7de469703735b73839e252b08be67eb7c1b906eb10ea7f9d4083f8e4d",
+      "matches": true
+    },
+    {
+      "path": "plugins/workers/deno.json",
+      "expected": "3dcfff5a1ff00c68c3bc95e4d4729bda0971a856990b546758e902901fdf8db1",
+      "actual": "3dcfff5a1ff00c68c3bc95e4d4729bda0971a856990b546758e902901fdf8db1",
+      "matches": true
+    },
+    {
+      "path": "plugins/workers/services/mod.ts",
+      "expected": "67d44d87d42f3d72f9d8cf1f63715047ceeedf51c79be70a85954c18b0bb904d",
+      "actual": "67d44d87d42f3d72f9d8cf1f63715047ceeedf51c79be70a85954c18b0bb904d",
+      "matches": true
+    },
+    {
+      "path": "plugins/workers/services/src/main.ts",
+      "expected": "b01f3fb1dc8076d64591c2c310463ab078a7d0cc011a0770705e3918069dad23",
+      "actual": "b01f3fb1dc8076d64591c2c310463ab078a7d0cc011a0770705e3918069dad23",
+      "matches": true
+    },
+    {
+      "path": "plugins/workers/services/src/service-conformance_test.ts",
+      "expected": "035d29dc4957e6d69ef368b0828e7b7fb42b1446428ea1ee147ee11f31eddc64",
+      "actual": "035d29dc4957e6d69ef368b0828e7b7fb42b1446428ea1ee147ee11f31eddc64",
+      "matches": true
+    },
+    {
+      "path": "plugins/workers/services/src/service-legacy_test.ts",
+      "expected": "35ae8ac3fce5b0eac78605374345922c5659afd2672db62b9a00fc8ca0fa9cd0",
+      "actual": "35ae8ac3fce5b0eac78605374345922c5659afd2672db62b9a00fc8ca0fa9cd0",
+      "matches": true
+    },
+    {
+      "path": "plugins/workers/services/src/service-lifecycle_test.ts",
+      "expected": "7d772b6010487cc828227c49b7ae973b7944bd53d5cf35cb4295080088f3090b",
+      "actual": "7d772b6010487cc828227c49b7ae973b7944bd53d5cf35cb4295080088f3090b",
+      "matches": true
+    },
+    {
+      "path": "plugins/workers/services/src/service-test-fixture.ts",
+      "expected": "4da2aeb8b02dee4c508386acef9d432ac274bca7604a21e4f4e994897861e4d9",
+      "actual": "4da2aeb8b02dee4c508386acef9d432ac274bca7604a21e4f4e994897861e4d9",
+      "matches": true
+    },
+    {
+      "path": "plugins/workers/services/src/service.ts",
+      "expected": "d1188009379f9704fce90b8a42e8665a96c479e11613bea23ac494ec542af5d0",
+      "actual": "d1188009379f9704fce90b8a42e8665a96c479e11613bea23ac494ec542af5d0",
+      "matches": true
+    },
+    {
+      "path": "plugins/workers/services/src/service_test.ts",
+      "expected": "789da15ef02bd889bc053b965366d4097457062ffcdfba8e1a16f6ae57e6c08c",
+      "actual": "789da15ef02bd889bc053b965366d4097457062ffcdfba8e1a16f6ae57e6c08c",
+      "matches": true
+    },
+    {
+      "path": "resources/examples/expo-streams/deno.lock",
+      "expected": "3ae6c0fe813d94b743e3d3b853157d7c76f68e4f18b97c958a7d23c800d1b81e",
+      "actual": "3ae6c0fe813d94b743e3d3b853157d7c76f68e4f18b97c958a7d23c800d1b81e",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/service.ts",
+      "expected": "3628a4d991e0e717df0c5eb13b6ed3b609ba26fee6eee877d0852c48e88892eb",
+      "actual": "3628a4d991e0e717df0c5eb13b6ed3b609ba26fee6eee877d0852c48e88892eb",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/mod.ts",
+      "expected": "0aad246f0237f771e5cd1180a2821d2c5cd64396906384a5b2783625784674a4",
+      "actual": "0aad246f0237f771e5cd1180a2821d2c5cd64396906384a5b2783625784674a4",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/deno.json",
+      "expected": "4305f2ddc0c77dc98067e5cfa2b34345fc4ba33bca12adfd0c735982d332cd40",
+      "actual": "4305f2ddc0c77dc98067e5cfa2b34345fc4ba33bca12adfd0c735982d332cd40",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/tests/test_utils/service-runtime-fixture.ts",
+      "expected": "227414514886bd42086b3e814bd3e4822cdd7e64125b847e6edf453fac927f9c",
+      "actual": "227414514886bd42086b3e814bd3e4822cdd7e64125b847e6edf453fac927f9c",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/service-runtime_test.ts",
+      "expected": "c93526fe358ccbd67151f31d60a29eacfeaa8833e01f734c3cc30b292bc42054",
+      "actual": "c93526fe358ccbd67151f31d60a29eacfeaa8833e01f734c3cc30b292bc42054",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/service-tls_test.ts",
+      "expected": "057a02e7b7ba39504cbaeef0a6d5fd61c339a9523015900a19d0b689ecebc241",
+      "actual": "057a02e7b7ba39504cbaeef0a6d5fd61c339a9523015900a19d0b689ecebc241",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/context-pack.md",
+      "expected": "0fe165bd16df416f8416e7bd52a5be3eb957ab63e66f03fdca7525eec17686e9",
+      "actual": "0fe165bd16df416f8416e7bd52a5be3eb957ab63e66f03fdca7525eec17686e9",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/.gitattributes",
+      "expected": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "actual": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/CORRECTION_AUTHORITY.md",
+      "expected": "2024437125be3e212fb9b924d331c220590a0658850d5dd932e3154b06139d51",
+      "actual": "2024437125be3e212fb9b924d331c220590a0658850d5dd932e3154b06139d51",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/FIRST_FAILURE.md",
+      "expected": "786f91cf1e2873fb9e1535ef43b55b3523581ad6de332966f4a0db15576a7e65",
+      "actual": "786f91cf1e2873fb9e1535ef43b55b3523581ad6de332966f4a0db15576a7e65",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/REPORT.md",
+      "expected": "3ad62a9368b9ef8528ed384b5808ccfd17e100a923880d17730c862c8f4ca2a5",
+      "actual": "3ad62a9368b9ef8528ed384b5808ccfd17e100a923880d17730c862c8f4ca2a5",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/archive-map.json",
+      "expected": "39af478304364964d72b436dda9bbd94188bbfcdb2ee2720a692f216645256ee",
+      "actual": "39af478304364964d72b436dda9bbd94188bbfcdb2ee2720a692f216645256ee",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/authorized-correction.diff",
+      "expected": "cc8e7f9868de1e383f086642ab881ddaf1f7c55a6a9960b5359799a1695f47da",
+      "actual": "cc8e7f9868de1e383f086642ab881ddaf1f7c55a6a9960b5359799a1695f47da",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/final-verification.json",
+      "expected": "1840faffc3caf7342346c6498e5369aa1019965183dc7144cb9767d8855e9eff",
+      "actual": "1840faffc3caf7342346c6498e5369aa1019965183dc7144cb9767d8855e9eff",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gate-hashes-2.json",
+      "expected": "610b38d4790c33a0999512de638c48168af169556a0d499cbca989197ac0bc16",
+      "actual": "610b38d4790c33a0999512de638c48168af169556a0d499cbca989197ac0bc16",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gate-hashes.json",
+      "expected": "45bb0e2a7c95c237eb4d22fdf85fd79fe7da7231d5014f25e7f8edbbafe303c2",
+      "actual": "45bb0e2a7c95c237eb4d22fdf85fd79fe7da7231d5014f25e7f8edbbafe303c2",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/allocator-denied/cache-info.json",
+      "expected": "21843a25e0fb94ecaaf9cd27d413b5ccbac43f0e9c329b2a26273e57d23bdf1e",
+      "actual": "21843a25e0fb94ecaaf9cd27d413b5ccbac43f0e9c329b2a26273e57d23bdf1e",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/allocator-denied/child-1-input.json",
+      "expected": "ede70bbc507a2b4fe2c4ebc08e0814726dd42989f192a87a4d4ccdb310c987b8",
+      "actual": "ede70bbc507a2b4fe2c4ebc08e0814726dd42989f192a87a4d4ccdb310c987b8",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/allocator-denied/child-1-result.json",
+      "expected": "3fbd28f61e6975e67b3add36ce5606aad7eab8873d35166c1e70da86360b2326",
+      "actual": "3fbd28f61e6975e67b3add36ce5606aad7eab8873d35166c1e70da86360b2326",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/allocator-denied/cleanup.json",
+      "expected": "2a1f66ccd5a6dc90533aa5d457a7eccc9a76be04d1a07b7405a4acf374664b33",
+      "actual": "2a1f66ccd5a6dc90533aa5d457a7eccc9a76be04d1a07b7405a4acf374664b33",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/allocator-denied/discovery-input.json",
+      "expected": "1ea8903e6c58eb487c54a0015e6c40bcb87bdea62d2b5edfa7959222d0f66c10",
+      "actual": "1ea8903e6c58eb487c54a0015e6c40bcb87bdea62d2b5edfa7959222d0f66c10",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/allocator-denied/discovery-result.json",
+      "expected": "da2de1ba4d3d421f012bb9ea6cdcd736e1a1e03bf83e60ed8a07547fc748a82a",
+      "actual": "da2de1ba4d3d421f012bb9ea6cdcd736e1a1e03bf83e60ed8a07547fc748a82a",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/approved/cache-info.json",
+      "expected": "58442e429f74a6d7de307382d326932956aa1d994734f6055f6aa3876dc9d50c",
+      "actual": "58442e429f74a6d7de307382d326932956aa1d994734f6055f6aa3876dc9d50c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/approved/child-1-input.json",
+      "expected": "926af2712a91c75948789e2e61d5ef711e203461b01fa9465895ed9b038d8d61",
+      "actual": "926af2712a91c75948789e2e61d5ef711e203461b01fa9465895ed9b038d8d61",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/approved/child-1-result.json",
+      "expected": "875154e284237dd9dbd74e6cbeba30dc9b9a0e65f02bb4adb012de0a0221c3d4",
+      "actual": "875154e284237dd9dbd74e6cbeba30dc9b9a0e65f02bb4adb012de0a0221c3d4",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/approved/cleanup.json",
+      "expected": "04f768a91ec4c677da5913c5b109c6843c923300c3792d69e60b24486d5ad6c4",
+      "actual": "04f768a91ec4c677da5913c5b109c6843c923300c3792d69e60b24486d5ad6c4",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/approved/discovery-input.json",
+      "expected": "486ad611565b2535bf83ca0a68e782788d5fb1b80504ee32e98a57f0c51b3ffc",
+      "actual": "486ad611565b2535bf83ca0a68e782788d5fb1b80504ee32e98a57f0c51b3ffc",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/approved/discovery-result.json",
+      "expected": "bcbd651bf51bd7faf621288cc8eed8ffa2518c4ff65b957568ea909a44a10d2c",
+      "actual": "bcbd651bf51bd7faf621288cc8eed8ffa2518c4ff65b957568ea909a44a10d2c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/ffi-denied/cache-info.json",
+      "expected": "9fd8af0e3b95d66c850f4c9ad7a772e2790012fc2d2bbfbd6478b0fc8e71fbdb",
+      "actual": "9fd8af0e3b95d66c850f4c9ad7a772e2790012fc2d2bbfbd6478b0fc8e71fbdb",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/ffi-denied/child-1-input.json",
+      "expected": "36ff6028611ea0bcfe5b40c217d1d7d54cb2371ebf8c3f49cf8870ae39df7f68",
+      "actual": "36ff6028611ea0bcfe5b40c217d1d7d54cb2371ebf8c3f49cf8870ae39df7f68",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/ffi-denied/child-1-result.json",
+      "expected": "15e06e98b5da446c7eea02d370abc575d71746dce4e7dfa4ecb749733c8373f8",
+      "actual": "15e06e98b5da446c7eea02d370abc575d71746dce4e7dfa4ecb749733c8373f8",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/ffi-denied/cleanup.json",
+      "expected": "25584ae582614464decd7c928da35003ace8273c4ac48ea16cf290ab53e7fd32",
+      "actual": "25584ae582614464decd7c928da35003ace8273c4ac48ea16cf290ab53e7fd32",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/ffi-denied/discovery-input.json",
+      "expected": "37755667ca3b6ed15444e428ad4c431db091fa821c6c2feb7d9d74c6b1a65489",
+      "actual": "37755667ca3b6ed15444e428ad4c431db091fa821c6c2feb7d9d74c6b1a65489",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/ffi-denied/discovery-result.json",
+      "expected": "9e8dbe83c68a6bfa0bd46e911198b391b718ab39f2bc40a6de06169dc05a9024",
+      "actual": "9e8dbe83c68a6bfa0bd46e911198b391b718ab39f2bc40a6de06169dc05a9024",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/http/cache-info.json",
+      "expected": "47791daf7ae55c29a77dd5561e5779bfc87a3e16566588e35b3d8f0b03c7306c",
+      "actual": "47791daf7ae55c29a77dd5561e5779bfc87a3e16566588e35b3d8f0b03c7306c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/http/child-1-input.json",
+      "expected": "ac8656ca43fd71778dabd4bd52d2455b14f50dae340c2109c8f0b90687801ba9",
+      "actual": "ac8656ca43fd71778dabd4bd52d2455b14f50dae340c2109c8f0b90687801ba9",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/http/child-1-result.json",
+      "expected": "04a9f8e692e33323f227656e8168222bdda31e023be25913d859acd3da153086",
+      "actual": "04a9f8e692e33323f227656e8168222bdda31e023be25913d859acd3da153086",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/http/cleanup.json",
+      "expected": "26e36972d432c3e357235408981b17b2744f41b46e2087c80b897bcb0f6c078a",
+      "actual": "26e36972d432c3e357235408981b17b2744f41b46e2087c80b897bcb0f6c078a",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/http/discovery-input.json",
+      "expected": "07031da39d85d934ecc598e4618593d7ef6455f92f6032db492a517f6fbf6e21",
+      "actual": "07031da39d85d934ecc598e4618593d7ef6455f92f6032db492a517f6fbf6e21",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/http/discovery-result.json",
+      "expected": "1a6e0d30416bbe481f064c0c97e26869faa11f0db721a459ecae25705cfed1d3",
+      "actual": "1a6e0d30416bbe481f064c0c97e26869faa11f0db721a459ecae25705cfed1d3",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-bind/cache-info.json",
+      "expected": "ec6c66cbd5aadf94d441668589e30569875c43bf51e8452fefad2da3b7bc7ece",
+      "actual": "ec6c66cbd5aadf94d441668589e30569875c43bf51e8452fefad2da3b7bc7ece",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-bind/child-1-input.json",
+      "expected": "f4136bb11700cc8469b2ed420b00cbcb2c8d8ce2860c26de33d225bbcaa7799a",
+      "actual": "f4136bb11700cc8469b2ed420b00cbcb2c8d8ce2860c26de33d225bbcaa7799a",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-bind/child-1-result.json",
+      "expected": "d93d677586b56ce3cce3ce4c50c094fdc055b7654bca721b26a37a8a3092681f",
+      "actual": "d93d677586b56ce3cce3ce4c50c094fdc055b7654bca721b26a37a8a3092681f",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-bind/cleanup.json",
+      "expected": "d1d42c9108b33ad9cdadf2127540ee474acf13761db9aca621a1b82f78307b9e",
+      "actual": "d1d42c9108b33ad9cdadf2127540ee474acf13761db9aca621a1b82f78307b9e",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-bind/discovery-input.json",
+      "expected": "41b9b7bc2ebb9e3bb43c2bf470f4e326fd643bd56eb5cceddf6add170ea3b806",
+      "actual": "41b9b7bc2ebb9e3bb43c2bf470f4e326fd643bd56eb5cceddf6add170ea3b806",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-bind/discovery-result.json",
+      "expected": "0fbe0eae10b61a786f7cacf57e73ed97207c0062fa9ce1da71f6d5fab2c3f54c",
+      "actual": "0fbe0eae10b61a786f7cacf57e73ed97207c0062fa9ce1da71f6d5fab2c3f54c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-cors/cache-info.json",
+      "expected": "2331ac175cbb48e6c889cc6cb5691d0d53e1a599e7ddcf755c2e41bd217ea6f7",
+      "actual": "2331ac175cbb48e6c889cc6cb5691d0d53e1a599e7ddcf755c2e41bd217ea6f7",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-cors/child-1-input.json",
+      "expected": "b54ade7d2d9f0c824bbac8856b724e82ecaa09668f0b3556f6ba4544c0c407ed",
+      "actual": "b54ade7d2d9f0c824bbac8856b724e82ecaa09668f0b3556f6ba4544c0c407ed",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-cors/child-1-result.json",
+      "expected": "cbb584a4b53f78959c03403139035dee17720d9fbba661802507ed501a442eda",
+      "actual": "cbb584a4b53f78959c03403139035dee17720d9fbba661802507ed501a442eda",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-cors/cleanup.json",
+      "expected": "3baca9b5e271fd7ca6dd84b87cbe48971f5c613cd29d8a1659ae035bad2841c5",
+      "actual": "3baca9b5e271fd7ca6dd84b87cbe48971f5c613cd29d8a1659ae035bad2841c5",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-cors/discovery-input.json",
+      "expected": "66d62c6b1a79d4c8ef88026092d0cc9700232d78976baa72d23af10f741ee0cf",
+      "actual": "66d62c6b1a79d4c8ef88026092d0cc9700232d78976baa72d23af10f741ee0cf",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-cors/discovery-result.json",
+      "expected": "c39749a429d177b3591742566f2d5466ed2c0e03ef8e8f683e005446467f7a28",
+      "actual": "c39749a429d177b3591742566f2d5466ed2c0e03ef8e8f683e005446467f7a28",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-sentinel/cache-info.json",
+      "expected": "1fb53be75ed4ffdda95953ddf8fe5b36dd086b05ec3bb4bfa4ef559f4a9919fa",
+      "actual": "1fb53be75ed4ffdda95953ddf8fe5b36dd086b05ec3bb4bfa4ef559f4a9919fa",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-sentinel/child-1-input.json",
+      "expected": "d9aec20a07459fda50821570b454d1222bb0310f8fc62f9a94da3ef00d65363b",
+      "actual": "d9aec20a07459fda50821570b454d1222bb0310f8fc62f9a94da3ef00d65363b",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-sentinel/child-1-result.json",
+      "expected": "17e701fd8423887019430d4e82618b225eed93dc6f1a3af42d926df99fa6026b",
+      "actual": "17e701fd8423887019430d4e82618b225eed93dc6f1a3af42d926df99fa6026b",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-sentinel/cleanup.json",
+      "expected": "1a58b6b5995b505508797a12c91e73dea473488ddff123db86e721bb6279de06",
+      "actual": "1a58b6b5995b505508797a12c91e73dea473488ddff123db86e721bb6279de06",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-sentinel/discovery-input.json",
+      "expected": "27c2f2b268d1bf415d305fa2de8c27cd263e6fb4d2a650e1c9e456495c3c9806",
+      "actual": "27c2f2b268d1bf415d305fa2de8c27cd263e6fb4d2a650e1c9e456495c3c9806",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/startup-sentinel/discovery-result.json",
+      "expected": "9efdf318cae9fe3c80c0533b55fa97228b06d535d323ee819d1045230799ae90",
+      "actual": "9efdf318cae9fe3c80c0533b55fa97228b06d535d323ee819d1045230799ae90",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/tls/cache-info.json",
+      "expected": "e4aff1d6257cb9cc172b120a5f159305a766fde208bae3aa499c8d42ccca2252",
+      "actual": "e4aff1d6257cb9cc172b120a5f159305a766fde208bae3aa499c8d42ccca2252",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/tls/child-1-input.json",
+      "expected": "527060231efdc02ba908d9edb06e4a4a2593dd47e9140a17b510df8a41b86c1f",
+      "actual": "527060231efdc02ba908d9edb06e4a4a2593dd47e9140a17b510df8a41b86c1f",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/tls/child-1-result.json",
+      "expected": "a2f50da001699da85ee27d523fbcc9e214b4842a8dd751b6a4983a2972adb4b2",
+      "actual": "a2f50da001699da85ee27d523fbcc9e214b4842a8dd751b6a4983a2972adb4b2",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/tls/cleanup.json",
+      "expected": "36ce5ec38089b494f1b4a8cfbb62b841e88c3775ded0396f6024afdfd6a17523",
+      "actual": "36ce5ec38089b494f1b4a8cfbb62b841e88c3775ded0396f6024afdfd6a17523",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/tls/discovery-input.json",
+      "expected": "652cfc77d1c5f20ed568e8d82be9988cb8ad0e867271974e0ca3c8136dfc62a9",
+      "actual": "652cfc77d1c5f20ed568e8d82be9988cb8ad0e867271974e0ca3c8136dfc62a9",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/children/tls/discovery-result.json",
+      "expected": "ae780a2c32cc70aa68279f1bf3ec11a4bc317aa2423e5bfa0cd2273498fffad4",
+      "actual": "ae780a2c32cc70aa68279f1bf3ec11a4bc317aa2423e5bfa0cd2273498fffad4",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/cleanup.json",
+      "expected": "8564166c36d47b70db82cd4156f697b3c553d57fc004dd69fd4b69440b95b5b3",
+      "actual": "8564166c36d47b70db82cd4156f697b3c553d57fc004dd69fd4b69440b95b5b3",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/execution.json",
+      "expected": "242080a89d1378efe587796dd679d491871203733565d7b61f96052b373d6637",
+      "actual": "242080a89d1378efe587796dd679d491871203733565d7b61f96052b373d6637",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/fmt.report.json",
+      "expected": "cab1a7fedb4d8771a7b8cb8e4de93cf7807809c729f03195ee223772d9565aaf",
+      "actual": "cab1a7fedb4d8771a7b8cb8e4de93cf7807809c729f03195ee223772d9565aaf",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/fmt.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/fmt.stdout.log",
+      "expected": "f249420864c195bd26022b4ca0ac2378452c5fe5352f5d73101a4cf904ee3f38",
+      "actual": "f249420864c195bd26022b4ca0ac2378452c5fe5352f5d73101a4cf904ee3f38",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/format-edited.report.json",
+      "expected": "f017361a1c3e7970a0e048264f3d923a899e8416e25ac5c0d1e215560e67b31c",
+      "actual": "f017361a1c3e7970a0e048264f3d923a899e8416e25ac5c0d1e215560e67b31c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/format-edited.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/format-edited.stdout.log",
+      "expected": "d5e09c9cfe46d6e9819ad86d37734acb5f13d35bf21882093c640015578414b3",
+      "actual": "d5e09c9cfe46d6e9819ad86d37734acb5f13d35bf21882093c640015578414b3",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/lint.report.json",
+      "expected": "8065bfc38b9f8aa3655c26fb5f5a210207c0a2cdaa22c336fa935d4dec12827f",
+      "actual": "8065bfc38b9f8aa3655c26fb5f5a210207c0a2cdaa22c336fa935d4dec12827f",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/lint.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/lint.stdout.log",
+      "expected": "b43fb4cf34aff6afec8cbad34784425cd3734f7c27a0333479c9382b8dc35d8e",
+      "actual": "b43fb4cf34aff6afec8cbad34784425cd3734f7c27a0333479c9382b8dc35d8e",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/quality-new.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/quality-new.stdout.log",
+      "expected": "47b1cf10b95c8183df4bf1318e0049cf63fbc332c9e3459c6fd14d9ee842eed2",
+      "actual": "47b1cf10b95c8183df4bf1318e0049cf63fbc332c9e3459c6fd14d9ee842eed2",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/tests.report.json",
+      "expected": "007a24f06ce440ed1a66e1bdfa04d8e1dab2e27f7f2eb6d7c5f64a18e6d2ca41",
+      "actual": "007a24f06ce440ed1a66e1bdfa04d8e1dab2e27f7f2eb6d7c5f64a18e6d2ca41",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/tests.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/tests.stdout.log",
+      "expected": "dbcc191d388981994686647a733469e65a73f4121fa843f53b11e75a1e3cd57c",
+      "actual": "dbcc191d388981994686647a733469e65a73f4121fa843f53b11e75a1e3cd57c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/types.report.json",
+      "expected": "84396d625a83b5972a179167df0df14fa7df9d59be3d83c72e8874c3afaaf6d2",
+      "actual": "84396d625a83b5972a179167df0df14fa7df9d59be3d83c72e8874c3afaaf6d2",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/types.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates-2/types.stdout.log",
+      "expected": "afbb9af50166c3acff8d66896d780b20cf4018a8a6ab7a76cd5e5cd3b9570a78",
+      "actual": "afbb9af50166c3acff8d66896d780b20cf4018a8a6ab7a76cd5e5cd3b9570a78",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/allocator-denied/cache-info.json",
+      "expected": "caee235a6bd6f3c4be7e81949133940306bfa2c7d91c0bb4e2e4d66600819c88",
+      "actual": "caee235a6bd6f3c4be7e81949133940306bfa2c7d91c0bb4e2e4d66600819c88",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/allocator-denied/child-1-input.json",
+      "expected": "0abce0c26176f046d3dc9d73d6aaa08fedc365c6e8960850c663b300b1bbff3e",
+      "actual": "0abce0c26176f046d3dc9d73d6aaa08fedc365c6e8960850c663b300b1bbff3e",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/allocator-denied/child-1-result.json",
+      "expected": "6b8e244374d4831b7073349bfba0db09625994e5ef611065ba7da30cda87c6ba",
+      "actual": "6b8e244374d4831b7073349bfba0db09625994e5ef611065ba7da30cda87c6ba",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/allocator-denied/cleanup.json",
+      "expected": "128c7badbe9c496d16ff72cbe949d9791b7d5a5416f8b2ce5e3769db9b1e27e9",
+      "actual": "128c7badbe9c496d16ff72cbe949d9791b7d5a5416f8b2ce5e3769db9b1e27e9",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/allocator-denied/discovery-input.json",
+      "expected": "d6e45ea82353af4948b49af0cb2e6ed48365f1192bb1af82c51fb6b0f75eaedf",
+      "actual": "d6e45ea82353af4948b49af0cb2e6ed48365f1192bb1af82c51fb6b0f75eaedf",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/allocator-denied/discovery-result.json",
+      "expected": "beecadbb8a43df1ec8fcf7e271c5d58e90a4e6c477a8c23075b405de4db0c683",
+      "actual": "beecadbb8a43df1ec8fcf7e271c5d58e90a4e6c477a8c23075b405de4db0c683",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/approved/cache-info.json",
+      "expected": "d4ef6f92800ce85c307161a07f4da292e1bb454562cec4f31fb4c645aa5b9ae3",
+      "actual": "d4ef6f92800ce85c307161a07f4da292e1bb454562cec4f31fb4c645aa5b9ae3",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/approved/child-1-input.json",
+      "expected": "beefc63a2a05b45d7c261d1e062848509b54d9a908576d9a43efef25d170bcca",
+      "actual": "beefc63a2a05b45d7c261d1e062848509b54d9a908576d9a43efef25d170bcca",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/approved/child-1-result.json",
+      "expected": "5932d2f5742d8fa4830c16adc704860249ab734d303015759f28c9d82c08af37",
+      "actual": "5932d2f5742d8fa4830c16adc704860249ab734d303015759f28c9d82c08af37",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/approved/cleanup.json",
+      "expected": "5e4310d2bdcbdb4e4d4e363f9cca35c6e2899fc7f1c346d1d11cafd9f67eb0f5",
+      "actual": "5e4310d2bdcbdb4e4d4e363f9cca35c6e2899fc7f1c346d1d11cafd9f67eb0f5",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/approved/discovery-input.json",
+      "expected": "d18e8b8f7a65fcc93f4030a2ca39a70e29399fe7f87fbfa70eb896a77c28ad08",
+      "actual": "d18e8b8f7a65fcc93f4030a2ca39a70e29399fe7f87fbfa70eb896a77c28ad08",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/approved/discovery-result.json",
+      "expected": "5908307ef42edf847618d89ea4ca38de92cb22fc2891a87115869e11c6386b6d",
+      "actual": "5908307ef42edf847618d89ea4ca38de92cb22fc2891a87115869e11c6386b6d",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/ffi-denied/cache-info.json",
+      "expected": "5e63c704450729b9c1a1fadbe5331515f2310aafa8292d73c477354c59027cb0",
+      "actual": "5e63c704450729b9c1a1fadbe5331515f2310aafa8292d73c477354c59027cb0",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/ffi-denied/child-1-input.json",
+      "expected": "e05a56839a6c59343ee106363f6aea10904587e7edd6127d67913c74cf1f2c07",
+      "actual": "e05a56839a6c59343ee106363f6aea10904587e7edd6127d67913c74cf1f2c07",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/ffi-denied/child-1-result.json",
+      "expected": "aef10b22a118de6fdc6a25d490de09ab171aa1013a00a8281fdb5091c67f8464",
+      "actual": "aef10b22a118de6fdc6a25d490de09ab171aa1013a00a8281fdb5091c67f8464",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/ffi-denied/cleanup.json",
+      "expected": "57c7c154e3b403e523a60faf18f0d631a4e97de3865494ef69f8ae54610d4de4",
+      "actual": "57c7c154e3b403e523a60faf18f0d631a4e97de3865494ef69f8ae54610d4de4",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/ffi-denied/discovery-input.json",
+      "expected": "a1cf2000d3fa12af608c3d537a9fc9a86f3132c739411bdd9e39ffb4aaf68646",
+      "actual": "a1cf2000d3fa12af608c3d537a9fc9a86f3132c739411bdd9e39ffb4aaf68646",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/ffi-denied/discovery-result.json",
+      "expected": "ac70bb893e1d4a86cdb86e05c51b0a6ea958e60a7c5be2485e023eff7b593658",
+      "actual": "ac70bb893e1d4a86cdb86e05c51b0a6ea958e60a7c5be2485e023eff7b593658",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/http/cache-info.json",
+      "expected": "87722f1a7d3745df6594c0b5f7a058c942f1ce7429a6b42c4cba28e846df3c32",
+      "actual": "87722f1a7d3745df6594c0b5f7a058c942f1ce7429a6b42c4cba28e846df3c32",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/http/child-1-input.json",
+      "expected": "a7dc4d3334cf99168847fc0356357930846f5f453e353f967444e4e1e9ca7ae3",
+      "actual": "a7dc4d3334cf99168847fc0356357930846f5f453e353f967444e4e1e9ca7ae3",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/http/child-1-result.json",
+      "expected": "59b2e3c5fff30c3a9700bf36dd7ce17c72962b0166112f2b23167765d85e8d87",
+      "actual": "59b2e3c5fff30c3a9700bf36dd7ce17c72962b0166112f2b23167765d85e8d87",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/http/cleanup.json",
+      "expected": "839f7435dc7453a41a4f7d1decdb60540b8782203239d0be001617796bdcbc49",
+      "actual": "839f7435dc7453a41a4f7d1decdb60540b8782203239d0be001617796bdcbc49",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/http/discovery-input.json",
+      "expected": "c320b5fd80b27cd385087af67b5ae3eee07888b59213407855d51deeab67aa83",
+      "actual": "c320b5fd80b27cd385087af67b5ae3eee07888b59213407855d51deeab67aa83",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/http/discovery-result.json",
+      "expected": "c002983647b091c9f8055b3395766275341d8360e7aae12e87340509c0095192",
+      "actual": "c002983647b091c9f8055b3395766275341d8360e7aae12e87340509c0095192",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/startup-bind/cache-info.json",
+      "expected": "a637d2803498a80788f96d3dad9d84b3b02f45b64ef3e5132cf13cd829e2d6dc",
+      "actual": "a637d2803498a80788f96d3dad9d84b3b02f45b64ef3e5132cf13cd829e2d6dc",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/startup-bind/child-1-input.json",
+      "expected": "01d285a51bae20923dfc79c67cd28e1b1514666ac536b8ba502869c4035411ca",
+      "actual": "01d285a51bae20923dfc79c67cd28e1b1514666ac536b8ba502869c4035411ca",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/startup-bind/child-1-result.json",
+      "expected": "165dc2eafe0dcb7f2a16177c8739a7148651277efe6ae147b7206b3277d8b0d4",
+      "actual": "165dc2eafe0dcb7f2a16177c8739a7148651277efe6ae147b7206b3277d8b0d4",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/startup-bind/cleanup.json",
+      "expected": "2296f310cc70f35d8ea57d5c8d672dd3ece6d4adee767c40f8ef19b985eeeaa1",
+      "actual": "2296f310cc70f35d8ea57d5c8d672dd3ece6d4adee767c40f8ef19b985eeeaa1",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/startup-bind/discovery-input.json",
+      "expected": "53784960db55633dc537817fce1438cce4cb9a366027ed1a45fba96d4471f05b",
+      "actual": "53784960db55633dc537817fce1438cce4cb9a366027ed1a45fba96d4471f05b",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/startup-bind/discovery-result.json",
+      "expected": "1fdd03614b4482b02aad2b8b3e29efbee946792a7eb536cbe8f4dc07084b7b79",
+      "actual": "1fdd03614b4482b02aad2b8b3e29efbee946792a7eb536cbe8f4dc07084b7b79",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/tls/cache-info.json",
+      "expected": "febadad96733a7c3eefa2ae4454ba2ed8ec3132731002ea3da31b9ed391cff40",
+      "actual": "febadad96733a7c3eefa2ae4454ba2ed8ec3132731002ea3da31b9ed391cff40",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/tls/child-1-input.json",
+      "expected": "7e2c618788f373a7538a3b5c92b2eae02d3d632478aa6f6dcbfe4252adab50d1",
+      "actual": "7e2c618788f373a7538a3b5c92b2eae02d3d632478aa6f6dcbfe4252adab50d1",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/tls/child-1-result.json",
+      "expected": "f89c0e71379059a5e985a5532ca86931f9caec4edc94f00d7b21872560b67672",
+      "actual": "f89c0e71379059a5e985a5532ca86931f9caec4edc94f00d7b21872560b67672",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/tls/cleanup.json",
+      "expected": "c504154a881bfbcaad3ac4be25768df16937277b471745b64418dc43c6018095",
+      "actual": "c504154a881bfbcaad3ac4be25768df16937277b471745b64418dc43c6018095",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/tls/discovery-input.json",
+      "expected": "4875efaceb72a2f33a506a79f06c78277754d324c4885d74036eba3c5cdc2cf3",
+      "actual": "4875efaceb72a2f33a506a79f06c78277754d324c4885d74036eba3c5cdc2cf3",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/children/tls/discovery-result.json",
+      "expected": "32025ff87571f53ec15a4d7dbbb51379bc0a9bb809e0c17fa4121a7b0f0b9b81",
+      "actual": "32025ff87571f53ec15a4d7dbbb51379bc0a9bb809e0c17fa4121a7b0f0b9b81",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/cleanup.json",
+      "expected": "392fa0af789d15bf3229739ce1ae3b96983656678cd3b4a6b1ccd4f9773b973a",
+      "actual": "392fa0af789d15bf3229739ce1ae3b96983656678cd3b4a6b1ccd4f9773b973a",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/execution.json",
+      "expected": "70fd263478d26fed6367b2759e342ddb420936ae50d5f37f46f2e973a768268c",
+      "actual": "70fd263478d26fed6367b2759e342ddb420936ae50d5f37f46f2e973a768268c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/fmt.report.json",
+      "expected": "cab1a7fedb4d8771a7b8cb8e4de93cf7807809c729f03195ee223772d9565aaf",
+      "actual": "cab1a7fedb4d8771a7b8cb8e4de93cf7807809c729f03195ee223772d9565aaf",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/fmt.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/fmt.stdout.log",
+      "expected": "f434f4c5105544a033dc8e2b1b237a660083ec29afccb68b9221a76b2538b23c",
+      "actual": "f434f4c5105544a033dc8e2b1b237a660083ec29afccb68b9221a76b2538b23c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/format-edited.report.json",
+      "expected": "f017361a1c3e7970a0e048264f3d923a899e8416e25ac5c0d1e215560e67b31c",
+      "actual": "f017361a1c3e7970a0e048264f3d923a899e8416e25ac5c0d1e215560e67b31c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/format-edited.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/format-edited.stdout.log",
+      "expected": "78e6db192865bc7bbae1aa53bc354d90bce5d199b336084a58ee3810facd4095",
+      "actual": "78e6db192865bc7bbae1aa53bc354d90bce5d199b336084a58ee3810facd4095",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/lint.report.json",
+      "expected": "8065bfc38b9f8aa3655c26fb5f5a210207c0a2cdaa22c336fa935d4dec12827f",
+      "actual": "8065bfc38b9f8aa3655c26fb5f5a210207c0a2cdaa22c336fa935d4dec12827f",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/lint.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/lint.stdout.log",
+      "expected": "41a025e1ad7efc8c874a2f43d088c1aee599f1e178fd6c7581c5530b0b47f575",
+      "actual": "41a025e1ad7efc8c874a2f43d088c1aee599f1e178fd6c7581c5530b0b47f575",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/quality-new.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/quality-new.stdout.log",
+      "expected": "47b1cf10b95c8183df4bf1318e0049cf63fbc332c9e3459c6fd14d9ee842eed2",
+      "actual": "47b1cf10b95c8183df4bf1318e0049cf63fbc332c9e3459c6fd14d9ee842eed2",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/tests.report.json",
+      "expected": "7e82d4cfd1f6cbb06ab057462e890cbca7bec57c30fd0440d31c193ff575b4ca",
+      "actual": "7e82d4cfd1f6cbb06ab057462e890cbca7bec57c30fd0440d31c193ff575b4ca",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/tests.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/tests.stdout.log",
+      "expected": "b158baf8dbfa1c7f53de36c15d9cc76c097c873068a5536b9164d49df28b9d42",
+      "actual": "b158baf8dbfa1c7f53de36c15d9cc76c097c873068a5536b9164d49df28b9d42",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/types.report.json",
+      "expected": "84396d625a83b5972a179167df0df14fa7df9d59be3d83c72e8874c3afaaf6d2",
+      "actual": "84396d625a83b5972a179167df0df14fa7df9d59be3d83c72e8874c3afaaf6d2",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/types.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/gates/types.stdout.log",
+      "expected": "e6a130d4d662f9e7addb65f4a34801f507b6684d3498ca25db79821bd7f754d3",
+      "actual": "e6a130d4d662f9e7addb65f4a34801f507b6684d3498ca25db79821bd7f754d3",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/prepare-gates.ts.txt",
+      "expected": "f846ac69d39df7cc1cb7fe6af9fdcbd9754bfcba5c8e3af0f22e00c27b8ce69c",
+      "actual": "f846ac69d39df7cc1cb7fe6af9fdcbd9754bfcba5c8e3af0f22e00c27b8ce69c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/protected-bindings.json",
+      "expected": "2573fc3f15fc9b78148c062f7baeac9c6ed595810985c3f6dd8143b32842b248",
+      "actual": "2573fc3f15fc9b78148c062f7baeac9c6ed595810985c3f6dd8143b32842b248",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/prove-source.ts.txt",
+      "expected": "1ccad6fe771c6d769d206202a1504c437107286679cccb67c8bc42dd16b08110",
+      "actual": "1ccad6fe771c6d769d206202a1504c437107286679cccb67c8bc42dd16b08110",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/run-gates-2.ts.txt",
+      "expected": "0dd9e9afb5526323418960b923c36e131e9ea1131312d76404321399c13e87f0",
+      "actual": "0dd9e9afb5526323418960b923c36e131e9ea1131312d76404321399c13e87f0",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/run-gates.ts.txt",
+      "expected": "d58b7a71c798e59091f5e09ad99fde6fda4e59ca8ba36b64a4fb4d88ec6cf7ee",
+      "actual": "d58b7a71c798e59091f5e09ad99fde6fda4e59ca8ba36b64a4fb4d88ec6cf7ee",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source-2.diff",
+      "expected": "2d7c9b747822aca2017a3d32a72996266fb7cb685cc33353166fbf463a22f728",
+      "actual": "2d7c9b747822aca2017a3d32a72996266fb7cb685cc33353166fbf463a22f728",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source-first.ts.txt",
+      "expected": "fe0badb3b89163882a27a18495be528f5b24c2f841642702456107a9d77daba0",
+      "actual": "fe0badb3b89163882a27a18495be528f5b24c2f841642702456107a9d77daba0",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source-proof-2.json",
+      "expected": "331dd6826b93501d7ecbad995e0a23fdab64707c363db5afc570d7595223a136",
+      "actual": "331dd6826b93501d7ecbad995e0a23fdab64707c363db5afc570d7595223a136",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source-proof.json",
+      "expected": "d35d3e8984a76b602e6c1b5f767c1db339d0ec5d0b593a713068fa1df9482d09",
+      "actual": "d35d3e8984a76b602e6c1b5f767c1db339d0ec5d0b593a713068fa1df9482d09",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source.diff",
+      "expected": "5b66c44f6595a7089aaf0c2c53cb8554d8a0b51cace0fe8c52a335d3b7573998",
+      "actual": "5b66c44f6595a7089aaf0c2c53cb8554d8a0b51cace0fe8c52a335d3b7573998",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source.final-2.ts.txt",
+      "expected": "769b9a73f46c8b3a24dc4e0c2f44b27a6e9c40bd5b2b31186445c0205d5634b8",
+      "actual": "769b9a73f46c8b3a24dc4e0c2f44b27a6e9c40bd5b2b31186445c0205d5634b8",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/source.final.ts.txt",
+      "expected": "c5cd5dfc31cd78be0271d54b12ccfda8a7633adecaa5ca85af6489bf4a553096",
+      "actual": "c5cd5dfc31cd78be0271d54b12ccfda8a7633adecaa5ca85af6489bf4a553096",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6d-20261028/verify-final.ts.txt",
+      "expected": "79ea888ea1ef2826a5dccb51e0cba7945c50b272071bf8ff89d433231a45c731",
+      "actual": "79ea888ea1ef2826a5dccb51e0cba7945c50b272071bf8ff89d433231a45c731",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/receipts/s6d-evidence.md",
+      "expected": "7273fa21c11225bf92cf21806a5edab68f03d834b6ef23c53c92205c31be24ae",
+      "actual": "7273fa21c11225bf92cf21806a5edab68f03d834b6ef23c53c92205c31be24ae",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/root-s6d-source-acceptance.md",
+      "expected": "4aab6a60ce7d54b4d55ac92f804e96f98cf7feaf64ab50aa3bfde48aaae13ace",
+      "actual": "4aab6a60ce7d54b4d55ac92f804e96f98cf7feaf64ab50aa3bfde48aaae13ace",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/worklog.md",
+      "expected": "fe7b7e2bf8de82ae3688fd45aec8296ebd7836064fdcebca5265aa9b772e62f4",
+      "actual": "fe7b7e2bf8de82ae3688fd45aec8296ebd7836064fdcebca5265aa9b772e62f4",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/.gitattributes",
+      "expected": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "actual": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/REPORT.md",
+      "expected": "c14e4d694249f97327351ebfcb2c8d63e1f97590bb2aa9b974200b29f69464ec",
+      "actual": "c14e4d694249f97327351ebfcb2c8d63e1f97590bb2aa9b974200b29f69464ec",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/archive-map.json",
+      "expected": "01a932f1fdada5a82ae841ea8509813e07902263f06033a787033a2bb90cd16f",
+      "actual": "01a932f1fdada5a82ae841ea8509813e07902263f06033a787033a2bb90cd16f",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gate-hashes.json",
+      "expected": "ba339804e2c3039efbab7d54365e39feb4c92e1f429090d7d5d82b9dcfe33556",
+      "actual": "ba339804e2c3039efbab7d54365e39feb4c92e1f429090d7d5d82b9dcfe33556",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/abort-omitted/cache-info.json",
+      "expected": "8478216ab42da85bc2419a98b587f3f423a9714cb37e92b466a8b7c2cf864ad2",
+      "actual": "8478216ab42da85bc2419a98b587f3f423a9714cb37e92b466a8b7c2cf864ad2",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/abort-omitted/child-1-input.json",
+      "expected": "3b0cc67f1e82a23555f17893c0251f283215d14160d2d396e0233a7528ce4ff4",
+      "actual": "3b0cc67f1e82a23555f17893c0251f283215d14160d2d396e0233a7528ce4ff4",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/abort-omitted/child-1-result.json",
+      "expected": "452fad563d7d3af0451ac6ea0a92db0225bd532333896e7a71ac27fbe9d5cd17",
+      "actual": "452fad563d7d3af0451ac6ea0a92db0225bd532333896e7a71ac27fbe9d5cd17",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/abort-omitted/cleanup.json",
+      "expected": "9a740d34056516f8b924b78e9d365b188c55ea30feaed0fd71b194ebb65822c3",
+      "actual": "9a740d34056516f8b924b78e9d365b188c55ea30feaed0fd71b194ebb65822c3",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/abort-omitted/discovery-input.json",
+      "expected": "d0ed80949fa21b153193068af06fb82f48ba812b5927cf5408de9c36d7035b68",
+      "actual": "d0ed80949fa21b153193068af06fb82f48ba812b5927cf5408de9c36d7035b68",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/abort-omitted/discovery-result.json",
+      "expected": "27fc5a87190c4aa283e8382d2893466d31a7a3aea14bc074b4b0efe9de30dba1",
+      "actual": "27fc5a87190c4aa283e8382d2893466d31a7a3aea14bc074b4b0efe9de30dba1",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/abort-present/cache-info.json",
+      "expected": "0005c1eda1420ba8d1b30fa3a85665864d9e39d0c5b1acf7c67e992493405b76",
+      "actual": "0005c1eda1420ba8d1b30fa3a85665864d9e39d0c5b1acf7c67e992493405b76",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/abort-present/child-1-input.json",
+      "expected": "20e9196e692a123e6aa0a7e2b051dd7044dabbb60ec5d6a8870d652c66f6be5b",
+      "actual": "20e9196e692a123e6aa0a7e2b051dd7044dabbb60ec5d6a8870d652c66f6be5b",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/abort-present/child-1-result.json",
+      "expected": "3a7f7afef4572ad6afa89993be713d8a4ca1800e2f2794b4dc0901c739c6e531",
+      "actual": "3a7f7afef4572ad6afa89993be713d8a4ca1800e2f2794b4dc0901c739c6e531",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/abort-present/cleanup.json",
+      "expected": "afa0932c8e95bc7f23d74205ce39927d319fdeb8d7aebfc15917fbc84e3507b0",
+      "actual": "afa0932c8e95bc7f23d74205ce39927d319fdeb8d7aebfc15917fbc84e3507b0",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/abort-present/discovery-input.json",
+      "expected": "23366beabff6907b12d96684e82bc27a35f73b59262dee6841ca918bc712593e",
+      "actual": "23366beabff6907b12d96684e82bc27a35f73b59262dee6841ca918bc712593e",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/abort-present/discovery-result.json",
+      "expected": "e5243116fd656a7627785bcb618223ccabab1a11da423491299a7729184cbdcd",
+      "actual": "e5243116fd656a7627785bcb618223ccabab1a11da423491299a7729184cbdcd",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/allocator-denied/cache-info.json",
+      "expected": "3d7709a9ea126831035e60cffaae3a285500204fd910c21ce10f3cc5b321c543",
+      "actual": "3d7709a9ea126831035e60cffaae3a285500204fd910c21ce10f3cc5b321c543",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/allocator-denied/child-1-input.json",
+      "expected": "a29157fa8f9f713424e454a083d2601c7d49d2b5a76b7d07b657636b66fd7ed0",
+      "actual": "a29157fa8f9f713424e454a083d2601c7d49d2b5a76b7d07b657636b66fd7ed0",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/allocator-denied/child-1-result.json",
+      "expected": "e007b7f1277dcb893b49c7ba2569b6119766c98e7469c8ea5e2a5dd671c8a66a",
+      "actual": "e007b7f1277dcb893b49c7ba2569b6119766c98e7469c8ea5e2a5dd671c8a66a",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/allocator-denied/cleanup.json",
+      "expected": "74a62433e706162879511df3a01d2ca94287781e19489fdd1af545a9c3b2ebf5",
+      "actual": "74a62433e706162879511df3a01d2ca94287781e19489fdd1af545a9c3b2ebf5",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/allocator-denied/discovery-input.json",
+      "expected": "0f11f820f0f694fd748b7053502543af0f0546257f4a38b2994bc867b25f62fd",
+      "actual": "0f11f820f0f694fd748b7053502543af0f0546257f4a38b2994bc867b25f62fd",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/allocator-denied/discovery-result.json",
+      "expected": "430ac4807d350160facd8d39d9258b1e7dffda8f70d44bcc6952d2c3abb913e8",
+      "actual": "430ac4807d350160facd8d39d9258b1e7dffda8f70d44bcc6952d2c3abb913e8",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/approved/cache-info.json",
+      "expected": "46854bb3099c72da4fc28ac726d4a752a22e628fa555bd54b45d8810d7eb3e2a",
+      "actual": "46854bb3099c72da4fc28ac726d4a752a22e628fa555bd54b45d8810d7eb3e2a",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/approved/child-1-input.json",
+      "expected": "b31be11c605db2b25f0b3ad73c1c4796999a93c3c1e4900ed389bed193d4a994",
+      "actual": "b31be11c605db2b25f0b3ad73c1c4796999a93c3c1e4900ed389bed193d4a994",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/approved/child-1-result.json",
+      "expected": "031abeeae3872c8d6927879367298852381a8235b55cbcf16c8ebc899b1faeec",
+      "actual": "031abeeae3872c8d6927879367298852381a8235b55cbcf16c8ebc899b1faeec",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/approved/cleanup.json",
+      "expected": "db09c8d4e49eac5e967c7d2df01767d134e908dd3b0c075363d7c7ff3bbc3078",
+      "actual": "db09c8d4e49eac5e967c7d2df01767d134e908dd3b0c075363d7c7ff3bbc3078",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/approved/discovery-input.json",
+      "expected": "2bbcd89b160dda669ee2fcb071e7167c822d6741f1322b566081fe6191a29c47",
+      "actual": "2bbcd89b160dda669ee2fcb071e7167c822d6741f1322b566081fe6191a29c47",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/approved/discovery-result.json",
+      "expected": "211d3d268f88cd0683660e52c35a184a5b7c2a27cd5113c7d8864023708157bb",
+      "actual": "211d3d268f88cd0683660e52c35a184a5b7c2a27cd5113c7d8864023708157bb",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/drain-native/cache-info.json",
+      "expected": "a1021b47a78b2c93b64b70e23d28461550d98acee5b3c2ebef0d9838deebc755",
+      "actual": "a1021b47a78b2c93b64b70e23d28461550d98acee5b3c2ebef0d9838deebc755",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/drain-native/child-1-input.json",
+      "expected": "877466185506157e50e30ab2c7b9bb733fdf2d27d57a8dc7709e4bd1f6ca3ec8",
+      "actual": "877466185506157e50e30ab2c7b9bb733fdf2d27d57a8dc7709e4bd1f6ca3ec8",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/drain-native/child-1-result.json",
+      "expected": "ead1957cac8cf7b8a940ee1171511f3ac6dd7c96ffc9aeae525d817a997e71d7",
+      "actual": "ead1957cac8cf7b8a940ee1171511f3ac6dd7c96ffc9aeae525d817a997e71d7",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/drain-native/cleanup.json",
+      "expected": "7b4c145d4ec1c579086fabcdd0bb6a2fca6a21352d266d38ff5dac38c1940ae6",
+      "actual": "7b4c145d4ec1c579086fabcdd0bb6a2fca6a21352d266d38ff5dac38c1940ae6",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/drain-native/discovery-input.json",
+      "expected": "036d288a7ab7bb8391fa63f5bca9d4f7145dde9484ce6b49a3430ec6c5a483e3",
+      "actual": "036d288a7ab7bb8391fa63f5bca9d4f7145dde9484ce6b49a3430ec6c5a483e3",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/drain-native/discovery-result.json",
+      "expected": "28d1ff73ccc3105ff5ab831c56efc48a77bc21e7b08e667cd5347ffe1dfa33f1",
+      "actual": "28d1ff73ccc3105ff5ab831c56efc48a77bc21e7b08e667cd5347ffe1dfa33f1",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/drain-observation-negative/cache-info.json",
+      "expected": "bb9f075b8b9277f889991580f9d9710879f85a84079e091726b356a60e7920f7",
+      "actual": "bb9f075b8b9277f889991580f9d9710879f85a84079e091726b356a60e7920f7",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/drain-observation-negative/child-1-input.json",
+      "expected": "51b379df1883dd2a615ed2dff740a457f31515729e62fbdf04812bbc45505aa6",
+      "actual": "51b379df1883dd2a615ed2dff740a457f31515729e62fbdf04812bbc45505aa6",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/drain-observation-negative/child-1-result.json",
+      "expected": "4f635f014a699c8bdaf4886990ba94a976aba9d8a815242afd451aed07105990",
+      "actual": "4f635f014a699c8bdaf4886990ba94a976aba9d8a815242afd451aed07105990",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/drain-observation-negative/cleanup.json",
+      "expected": "4eb0f151eb1b01c3de3f7012cf2b14b8813ecbb609853440e7f5c4279a461eeb",
+      "actual": "4eb0f151eb1b01c3de3f7012cf2b14b8813ecbb609853440e7f5c4279a461eeb",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/drain-observation-negative/discovery-input.json",
+      "expected": "31cd023bad80c8c2fd2fa85f642263477d5c7cd0d8dbf0ce1e15b3ac334042d3",
+      "actual": "31cd023bad80c8c2fd2fa85f642263477d5c7cd0d8dbf0ce1e15b3ac334042d3",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/drain-observation-negative/discovery-result.json",
+      "expected": "3dacb937a392513b6e29bba1e9641c1ce77aca5bc13af93420be6c1f17dd0b35",
+      "actual": "3dacb937a392513b6e29bba1e9641c1ce77aca5bc13af93420be6c1f17dd0b35",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/ffi-denied/cache-info.json",
+      "expected": "1df272814a37bde148bc7c553f5d732b3301e529cfd13b80cd9a801a360a825c",
+      "actual": "1df272814a37bde148bc7c553f5d732b3301e529cfd13b80cd9a801a360a825c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/ffi-denied/child-1-input.json",
+      "expected": "ca7d537971df16db36dd7788b598a84c21264f1ec58fe0bf245996da8999452a",
+      "actual": "ca7d537971df16db36dd7788b598a84c21264f1ec58fe0bf245996da8999452a",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/ffi-denied/child-1-result.json",
+      "expected": "2c2f22e7232af3363e2bc9040d842f74c62e954513562abefa3ca046dad2569b",
+      "actual": "2c2f22e7232af3363e2bc9040d842f74c62e954513562abefa3ca046dad2569b",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/ffi-denied/cleanup.json",
+      "expected": "8fde8639f2a933c540851e5914ca85add12ef999247fcd75cadb0c198faa9762",
+      "actual": "8fde8639f2a933c540851e5914ca85add12ef999247fcd75cadb0c198faa9762",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/ffi-denied/discovery-input.json",
+      "expected": "ea69cc560f4e5a7f5fe01b433e1fc595ebd02bee59c7ca6b642866ea08b55fae",
+      "actual": "ea69cc560f4e5a7f5fe01b433e1fc595ebd02bee59c7ca6b642866ea08b55fae",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/ffi-denied/discovery-result.json",
+      "expected": "cde9b6c773d73971c3c7e44856ca85c5559b7b01ffcdccc425545ad2f9dc726c",
+      "actual": "cde9b6c773d73971c3c7e44856ca85c5559b7b01ffcdccc425545ad2f9dc726c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/http/cache-info.json",
+      "expected": "1a9e0107822e955984de4369b630c83943f884a998acb5616914caf22d551717",
+      "actual": "1a9e0107822e955984de4369b630c83943f884a998acb5616914caf22d551717",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/http/child-1-input.json",
+      "expected": "f6ab5b355ebefa15b71dffb3f137e0c7fb0901dc65258217487c8c3b61a1ee65",
+      "actual": "f6ab5b355ebefa15b71dffb3f137e0c7fb0901dc65258217487c8c3b61a1ee65",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/http/child-1-result.json",
+      "expected": "af9da12636b9135a57d391912f102651c4c182f16ac41c293a4d90104a863ab5",
+      "actual": "af9da12636b9135a57d391912f102651c4c182f16ac41c293a4d90104a863ab5",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/http/cleanup.json",
+      "expected": "c8cbfddb066507c77226d76cb9851b63451d8f588d3affecc9e4c330c272c520",
+      "actual": "c8cbfddb066507c77226d76cb9851b63451d8f588d3affecc9e4c330c272c520",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/http/discovery-input.json",
+      "expected": "0a58f569c7f9097ff0c201f605f230a17025d6ed850b58a0944e6222060384c9",
+      "actual": "0a58f569c7f9097ff0c201f605f230a17025d6ed850b58a0944e6222060384c9",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/http/discovery-result.json",
+      "expected": "22c8b6a2d179e196a728d126abe78c9d8057ad5880d06ac371ac292869aea971",
+      "actual": "22c8b6a2d179e196a728d126abe78c9d8057ad5880d06ac371ac292869aea971",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-bind/cache-info.json",
+      "expected": "57e10515cbcabfe0ed6498e5d1479de21b6d67bb36fc3212d2b49dc0fed5f234",
+      "actual": "57e10515cbcabfe0ed6498e5d1479de21b6d67bb36fc3212d2b49dc0fed5f234",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-bind/child-1-input.json",
+      "expected": "9c3a9656bab02855c77e0bc81a7b62183497cbac0842c8214b02a01d6c464d53",
+      "actual": "9c3a9656bab02855c77e0bc81a7b62183497cbac0842c8214b02a01d6c464d53",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-bind/child-1-result.json",
+      "expected": "7865dd74f4d7d3c1d496e5487f4fa2cf7e591ac666597491f6ebb84eb957b347",
+      "actual": "7865dd74f4d7d3c1d496e5487f4fa2cf7e591ac666597491f6ebb84eb957b347",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-bind/cleanup.json",
+      "expected": "ed47511c338ba3c8cac085e93644b9dc953a23e23d7fc6d1786f69f50b211d30",
+      "actual": "ed47511c338ba3c8cac085e93644b9dc953a23e23d7fc6d1786f69f50b211d30",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-bind/discovery-input.json",
+      "expected": "c6288471b27e763311a41a17ec1aa8b18a147a52b3aaf42bdcf7612f721420c5",
+      "actual": "c6288471b27e763311a41a17ec1aa8b18a147a52b3aaf42bdcf7612f721420c5",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-bind/discovery-result.json",
+      "expected": "c835736d3082bfd9440c5b0279c3e4152ff08a33376070990266fefc036623ce",
+      "actual": "c835736d3082bfd9440c5b0279c3e4152ff08a33376070990266fefc036623ce",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-cors/cache-info.json",
+      "expected": "cc2c2a6eecb41c72040220c7efbc7aaf25f8d75a0e372dfbfee7b849de3869f8",
+      "actual": "cc2c2a6eecb41c72040220c7efbc7aaf25f8d75a0e372dfbfee7b849de3869f8",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-cors/child-1-input.json",
+      "expected": "c0ef867d6e234d3a20eef79b7571e37ce87215bd39739b66f4d9700d80cde182",
+      "actual": "c0ef867d6e234d3a20eef79b7571e37ce87215bd39739b66f4d9700d80cde182",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-cors/child-1-result.json",
+      "expected": "01e73a5365056cc09432f18199802585dbe65899d597688572338da819486153",
+      "actual": "01e73a5365056cc09432f18199802585dbe65899d597688572338da819486153",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-cors/cleanup.json",
+      "expected": "6696c1164997fb153d8a980d71e6074b29376a883187443395184da28bc55d96",
+      "actual": "6696c1164997fb153d8a980d71e6074b29376a883187443395184da28bc55d96",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-cors/discovery-input.json",
+      "expected": "d91fc1d0b5449325d9a40a49ebd9e71bf8bd05a4d3efb1f3ddf7cd9c074f4997",
+      "actual": "d91fc1d0b5449325d9a40a49ebd9e71bf8bd05a4d3efb1f3ddf7cd9c074f4997",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-cors/discovery-result.json",
+      "expected": "b23e9db89d30198237085a28d852077248573398a37629b1d974d9e59e65af87",
+      "actual": "b23e9db89d30198237085a28d852077248573398a37629b1d974d9e59e65af87",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-sentinel/cache-info.json",
+      "expected": "947aff589f4a6ad879f27331a44631c8366a61bb57327f7b9bd361397b964923",
+      "actual": "947aff589f4a6ad879f27331a44631c8366a61bb57327f7b9bd361397b964923",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-sentinel/child-1-input.json",
+      "expected": "2215861207dbf24673603dfd4bf3b75a86421712b7f5ca7f123698a20bf36753",
+      "actual": "2215861207dbf24673603dfd4bf3b75a86421712b7f5ca7f123698a20bf36753",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-sentinel/child-1-result.json",
+      "expected": "245a9966eccc2f1604716f59652da2f5c43256f2ea47eaaeefd8d41acf74ee1d",
+      "actual": "245a9966eccc2f1604716f59652da2f5c43256f2ea47eaaeefd8d41acf74ee1d",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-sentinel/cleanup.json",
+      "expected": "a99779679941a55ee3b73a01fb5eb444689949b3baeff7e0f6fb9bef9fcdea53",
+      "actual": "a99779679941a55ee3b73a01fb5eb444689949b3baeff7e0f6fb9bef9fcdea53",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-sentinel/discovery-input.json",
+      "expected": "511c0c8bb76cd47c47f72885e89c22cfdc4c7f87341c7e8a2f8971454b123644",
+      "actual": "511c0c8bb76cd47c47f72885e89c22cfdc4c7f87341c7e8a2f8971454b123644",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/startup-sentinel/discovery-result.json",
+      "expected": "9d9d335cee35ae0020fa1dbc0fca5ae0d97e21e0640b8d722188b5da83ec7606",
+      "actual": "9d9d335cee35ae0020fa1dbc0fca5ae0d97e21e0640b8d722188b5da83ec7606",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/tls/cache-info.json",
+      "expected": "b0fc3a9517cec955b39b18936c9014817d7ba886402cb357bd388bc1a60cd391",
+      "actual": "b0fc3a9517cec955b39b18936c9014817d7ba886402cb357bd388bc1a60cd391",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/tls/child-1-input.json",
+      "expected": "36d88af6af7d38134699819fb6e3a5d66a0e86d8b889cbdb85d3533f9439c29c",
+      "actual": "36d88af6af7d38134699819fb6e3a5d66a0e86d8b889cbdb85d3533f9439c29c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/tls/child-1-result.json",
+      "expected": "a0d3ff91ece264cfa7e354010a477f8a804ab376e84c3a2cd8ee8ec4ec19ac2c",
+      "actual": "a0d3ff91ece264cfa7e354010a477f8a804ab376e84c3a2cd8ee8ec4ec19ac2c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/tls/cleanup.json",
+      "expected": "84d2866a99e2564e48d4a0f96260c957085917836436e9014273e5ca370fb5b7",
+      "actual": "84d2866a99e2564e48d4a0f96260c957085917836436e9014273e5ca370fb5b7",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/tls/discovery-input.json",
+      "expected": "6811b78455b839af4ce81966238bcc876128441d0eb634f9c2585ca9dc34f110",
+      "actual": "6811b78455b839af4ce81966238bcc876128441d0eb634f9c2585ca9dc34f110",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/children/tls/discovery-result.json",
+      "expected": "7dfeacb69358546d5564ec1b6286a34669eda5d0a68ba28b0769cd8637a1f708",
+      "actual": "7dfeacb69358546d5564ec1b6286a34669eda5d0a68ba28b0769cd8637a1f708",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/cleanup.json",
+      "expected": "777b7a3d284e8e3186ac4a1d38d5a38b548e3a2afc44b2b13af8b4ee9d094d78",
+      "actual": "777b7a3d284e8e3186ac4a1d38d5a38b548e3a2afc44b2b13af8b4ee9d094d78",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/execution.json",
+      "expected": "59d4579fba288e1e9df5bf406e7a3be985ff3108a6284ba5a7a6042c509c09da",
+      "actual": "59d4579fba288e1e9df5bf406e7a3be985ff3108a6284ba5a7a6042c509c09da",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/fmt.report.json",
+      "expected": "cab1a7fedb4d8771a7b8cb8e4de93cf7807809c729f03195ee223772d9565aaf",
+      "actual": "cab1a7fedb4d8771a7b8cb8e4de93cf7807809c729f03195ee223772d9565aaf",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/fmt.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/fmt.stdout.log",
+      "expected": "e5456ca43d546416c069cd6b7ad03877b2b729eff5d437ddb7c73cabaa93999e",
+      "actual": "e5456ca43d546416c069cd6b7ad03877b2b729eff5d437ddb7c73cabaa93999e",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/format-edited.report.json",
+      "expected": "f017361a1c3e7970a0e048264f3d923a899e8416e25ac5c0d1e215560e67b31c",
+      "actual": "f017361a1c3e7970a0e048264f3d923a899e8416e25ac5c0d1e215560e67b31c",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/format-edited.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/format-edited.stdout.log",
+      "expected": "83225a9563239fb2dca9ffe8eb3bfbe082ff0365fe08f2a0d5d81a6ad1cc3238",
+      "actual": "83225a9563239fb2dca9ffe8eb3bfbe082ff0365fe08f2a0d5d81a6ad1cc3238",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/lint.report.json",
+      "expected": "8065bfc38b9f8aa3655c26fb5f5a210207c0a2cdaa22c336fa935d4dec12827f",
+      "actual": "8065bfc38b9f8aa3655c26fb5f5a210207c0a2cdaa22c336fa935d4dec12827f",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/lint.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/lint.stdout.log",
+      "expected": "80bc2db01a15ba92ad1d0c9b37bf00404d0040d3fc4fd576f0b1a6b4369e1794",
+      "actual": "80bc2db01a15ba92ad1d0c9b37bf00404d0040d3fc4fd576f0b1a6b4369e1794",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/quality-new.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/quality-new.stdout.log",
+      "expected": "47b1cf10b95c8183df4bf1318e0049cf63fbc332c9e3459c6fd14d9ee842eed2",
+      "actual": "47b1cf10b95c8183df4bf1318e0049cf63fbc332c9e3459c6fd14d9ee842eed2",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/tests.report.json",
+      "expected": "5ab05205a908516566f938acf172b88e1669d38570567c6fc26af6552c2570ef",
+      "actual": "5ab05205a908516566f938acf172b88e1669d38570567c6fc26af6552c2570ef",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/tests.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/tests.stdout.log",
+      "expected": "666ee0c2c7970ff828eb1f5fad8a02501ff3cac619046ece56ac4566367e7723",
+      "actual": "666ee0c2c7970ff828eb1f5fad8a02501ff3cac619046ece56ac4566367e7723",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/types.report.json",
+      "expected": "84396d625a83b5972a179167df0df14fa7df9d59be3d83c72e8874c3afaaf6d2",
+      "actual": "84396d625a83b5972a179167df0df14fa7df9d59be3d83c72e8874c3afaaf6d2",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/types.stderr.log",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/gates/types.stdout.log",
+      "expected": "41255894b654908df7bbeb380e72d3de0aa66fecabf8e5ea124dcbd272c44b10",
+      "actual": "41255894b654908df7bbeb380e72d3de0aa66fecabf8e5ea124dcbd272c44b10",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/prepare-gates.ts.txt",
+      "expected": "6f43c82dfcce6800b91b92c9bd7ce68a8a3cad1aa272488a3b1aa275b9f08991",
+      "actual": "6f43c82dfcce6800b91b92c9bd7ce68a8a3cad1aa272488a3b1aa275b9f08991",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/protected-bindings.json",
+      "expected": "fb25a5970a8b3bbafb4cfba73cc066a1f0e1e562fa2680d4e2250672c77a51fc",
+      "actual": "fb25a5970a8b3bbafb4cfba73cc066a1f0e1e562fa2680d4e2250672c77a51fc",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/prove-source.ts.txt",
+      "expected": "ffc052532f9789c8db1543ee0da0567ea94a09b8279ca60f0ce87632c8ee2ace",
+      "actual": "ffc052532f9789c8db1543ee0da0567ea94a09b8279ca60f0ce87632c8ee2ace",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/run-gates.ts.txt",
+      "expected": "140d01385acf46a1cd0442875bdf800b738184537510cf8e8c19380edda2c291",
+      "actual": "140d01385acf46a1cd0442875bdf800b738184537510cf8e8c19380edda2c291",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/source-first.ts.txt",
+      "expected": "4833545d1551d8634624cfba8b04fef84699d1fcff59957ec7afae6cc6df5e7d",
+      "actual": "4833545d1551d8634624cfba8b04fef84699d1fcff59957ec7afae6cc6df5e7d",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/source-proof.json",
+      "expected": "139a09f3d56e8127fd98502142453746b5e7373bb5ac1525f309b716c850ce3d",
+      "actual": "139a09f3d56e8127fd98502142453746b5e7373bb5ac1525f309b716c850ce3d",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/source.diff",
+      "expected": "6ea6620baed0a007997533e3cab54cecc2f56bf110c579560183536fb8065963",
+      "actual": "6ea6620baed0a007997533e3cab54cecc2f56bf110c579560183536fb8065963",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/evidence/s6e-20261028/source.final.ts.txt",
+      "expected": "4833545d1551d8634624cfba8b04fef84699d1fcff59957ec7afae6cc6df5e7d",
+      "actual": "4833545d1551d8634624cfba8b04fef84699d1fcff59957ec7afae6cc6df5e7d",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/receipts/s6e-evidence.md",
+      "expected": "e0a45f8338342cc454f5284833b6e58750eb1296e203d7c69a91eac1fb5a5c50",
+      "actual": "e0a45f8338342cc454f5284833b6e58750eb1296e203d7c69a91eac1fb5a5c50",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-host-policy--u1/root-s6e-source-acceptance.md",
+      "expected": "62c1d45c778923c8fb580d4f5ece092e9847f0080b46343ed4fa0bae815850db",
+      "actual": "62c1d45c778923c8fb580d4f5ece092e9847f0080b46343ed4fa0bae815850db",
+      "matches": true
+    },
+    {
+      "path": "plugins/streams/services/src/service-lifecycle_test.ts",
+      "expected": "4833545d1551d8634624cfba8b04fef84699d1fcff59957ec7afae6cc6df5e7d",
+      "actual": "4833545d1551d8634624cfba8b04fef84699d1fcff59957ec7afae6cc6df5e7d",
+      "matches": true
+    }
+  ],
+  "help": {
+    "executable": "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "args": [
+      "run",
+      "--help"
+    ],
+    "code": 0,
+    "stdoutSha256": "6e96240f14250e42d2fdcfb582b096cbc7d227131e074bb0a714b9e3c176cb60",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "documentsDenyWrite": true
+  }
+}

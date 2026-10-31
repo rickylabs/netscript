@@ -150,7 +150,7 @@ for (
 for (
   const check of [
     'generated job registry exists',
-    'generated job registry is non-empty',
+    'generated job registry is initialized',
     'every declared job is registered',
   ]
 ) {

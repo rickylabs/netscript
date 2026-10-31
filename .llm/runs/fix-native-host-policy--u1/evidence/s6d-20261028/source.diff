@@ -1,0 +1,167 @@
+diff --git a/plugins/streams/services/src/service-lifecycle_test.ts b/plugins/streams/services/src/service-lifecycle_test.ts
+new file mode 100644
+index 000000000..13e1fe650
+--- /dev/null
++++ b/plugins/streams/services/src/service-lifecycle_test.ts
+@@ -0,0 +1,161 @@
++/**
++ * Real streams startup failures preserve primary errors and release owned upstreams.
++ * Each row uses a fresh checked child and the unchanged bounded native runtime fixture.
++ * Caller option access observes the already-bound upstream without replacing its lifecycle.
++ * Expected failures return no handle; only real listener rebind establishes release.
++ * @module
++ */
++import { assertEquals } from 'jsr:@std/assert@^1';
++import { fromFileUrl } from 'jsr:@std/path@^1';
++import { createRuntimeSandbox } from './tests/test_utils/service-runtime-fixture.ts';
++
++const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
++const MARKER = 's6d-streams: startup rejection and native cleanup settled';
++type FailureMode = 'bind' | 'sentinel' | 'cors';
++
++Deno.test({
++  name: 'streams startup: native bind, caller sentinel and CORS failures release upstream',
++  sanitizeResources: true,
++  sanitizeOps: true,
++  sanitizeExit: true,
++  async fn() {
++    const rows: readonly FailureMode[] = ['bind', 'sentinel', 'cors'];
++    for (const mode of rows) {
++      await using sandbox = await createRuntimeSandbox('startup-' + mode);
++      const ports = choosePorts();
++      const run = await sandbox.run(probe(sandbox.scratch, ports, mode), {
++        cwd: PLUGIN_ROOT,
++        preferredPorts: [ports[0]],
++      });
++      assertEquals(run.code, 0, `${mode}: exit ${run.code}\n${run.stderr}\n${run.stdout}`);
++      assertEquals(run.stdout.split(MARKER).length - 1, 1, run.stdout);
++      assertEquals(run.stdout.trimEnd().endsWith(MARKER), true, run.stdout);
++    }
++  },
++});
++
++/** Concurrent reservations keep the selected upstream and blocker ports distinct. */
++function choosePorts(): readonly [number, number] {
++  using upstream = Deno.listen({ hostname: '127.0.0.1', port: 0 });
++  using front = Deno.listen({ hostname: '127.0.0.1', port: 0 });
++  return [upstream.addr.port, front.addr.port];
++}
++
++/** No private upstream handle is exposed; native rebind is the independent cleanup oracle. */
++function probe(scratch: string, ports: readonly [number, number], mode: FailureMode): string {
++  return `import { assert, assertEquals, assertStrictEquals } from 'jsr:@std/assert@^1';
++import type { CorsOptions, RunningService, ServeOptions } from '@netscript/plugin-streams/service';
++
++const scratch = ${JSON.stringify(scratch)};
++const [upstream, front] = ${JSON.stringify(ports)};
++const mode: string = ${JSON.stringify(mode)};
++const sentinel = new Error('S6D_CALLER_HOSTNAME_SENTINEL');
++const failures: unknown[] = [];
++const reboundPorts: number[] = [];
++let blocker: Deno.TcpListener | undefined;
++let unexpected: RunningService | undefined;
++let observedBound = 0;
++let hostnameReads = 0;
++let blockerPreserved = false;
++let identityPreserved = false;
++let rejection: unknown;
++
++function assertOccupied(port: number): void {
++  let occupied = false;
++  try {
++    using probe = Deno.listen({ hostname: '127.0.0.1', port });
++    assertEquals(probe.addr.port, port);
++  } catch (error) {
++    if (!(error instanceof Deno.errors.AddrInUse)) throw error;
++    occupied = true;
++  }
++  assert(occupied, 'EXPECTED_OWNED_PORT_OCCUPIED: ' + port);
++}
++
++function observeUpstream(): void {
++  assertOccupied(upstream);
++  observedBound++;
++}
++
++function rebind(port: number): void {
++  using listener = Deno.listen({ hostname: '127.0.0.1', port });
++  assertEquals(listener.addr.port, port);
++  reboundPorts.push(port);
++}
++
++try {
++  Deno.chdir(scratch);
++  Deno.env.set('PORT', 'invalid ambient PORT');
++  Deno.env.set('STREAMS_PORT', 'invalid ambient STREAMS_PORT');
++  Deno.env.set('STREAMS_INTERNAL_PORT', String(upstream));
++  const { startStreamsService } = await import('@netscript/plugin-streams/service');
++  if (mode === 'bind') {
++    blocker = Deno.listen({ hostname: '127.0.0.1', port: front });
++    assertEquals(blocker.addr.port, front);
++  }
++  const serve: ServeOptions = {
++    port: mode === 'bind' ? front : 0,
++    handleSignals: false,
++    get hostname(): string {
++      hostnameReads++;
++      observeUpstream();
++      if (mode === 'sentinel') throw sentinel;
++      return '127.0.0.1';
++    },
++  };
++  const cors: CorsOptions | undefined = mode === 'cors' ? {
++    credentials: true,
++    get origin(): string {
++      observeUpstream();
++      return '*';
++    },
++  } : undefined;
++  try {
++    unexpected = await startStreamsService({
++      auth: { public: true, reason: 'S6d owned startup-failure qualification' },
++      serve,
++      cors,
++    });
++  } catch (error) {
++    rejection = error;
++  }
++  console.log(JSON.stringify({ mode, nativeError: rejection instanceof Error
++    ? { name: rejection.name, message: rejection.message } : String(rejection) }));
++  assertEquals(unexpected, undefined, 'Factory unexpectedly returned a live handle');
++  assertEquals(observedBound, 1, 'Upstream must be bound before the selected failure');
++  assertEquals(hostnameReads, mode === 'cors' ? 0 : 1);
++  if (mode === 'bind') {
++    assert(rejection instanceof Deno.errors.AddrInUse, String(rejection));
++    assert(rejection.message.includes('127.0.0.1:' + front), rejection.message);
++    assertOccupied(front);
++    blockerPreserved = true;
++  } else if (mode === 'sentinel') {
++    assertStrictEquals(rejection, sentinel);
++    identityPreserved = true;
++  } else {
++    assert(rejection instanceof TypeError, String(rejection));
++    assertEquals(rejection.message, 'CORS wildcard origins cannot be combined with credentials');
++  }
++  // This happens before closing the blocker or attempting any manual handle cleanup.
++  rebind(upstream);
++} catch (error) {
++  failures.push(error);
++}
++// Only an unexpected public success could yield a handle; never obtain or stop a private upstream.
++if (unexpected !== undefined) {
++  try { await unexpected.stop(); } catch (error) { failures.push(error); }
++}
++if (blocker !== undefined) {
++  try { blocker.close(); } catch (error) { failures.push(error); }
++  try { rebind(front); } catch (error) { failures.push(error); }
++}
++if (!reboundPorts.includes(upstream)) {
++  try { rebind(upstream); } catch (error) { failures.push(error); }
++}
++if (failures.length === 1) throw failures[0];
++if (failures.length > 1) throw new AggregateError(failures, failures.map(String).join('\\n'));
++console.log(JSON.stringify({ mode, observedBound, hostnameReads, blockerPreserved,
++  identityPreserved, returnedHandle: unexpected !== undefined, reboundPorts }));
++console.log('${MARKER}');
++`;
++}

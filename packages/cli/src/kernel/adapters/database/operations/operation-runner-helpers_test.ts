@@ -1,9 +1,11 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
+import type { AspireCommandExecutor } from './aspire-command-executor.ts';
 import {
   buildDbCliEnv,
   findRunningAppHost,
   isNoRunningAppHostOutput,
   resolveDbCliTimeoutSeconds,
+  watchExecutableCompletion,
 } from './operation-runner-helpers.ts';
 
 Deno.test('isNoRunningAppHostOutput accepts the documented line with allowed prefixes', () => {
@@ -77,3 +79,118 @@ Deno.test('resolveDbCliTimeoutSeconds rejects invalid override values', () => {
     else Deno.env.set(name, previous);
   }
 });
+
+function update(state: string | null, exitCode?: number, displayName = 'postgres-cli'): string {
+  return JSON.stringify({ displayName, resourceType: 'Executable', state, exitCode });
+}
+
+async function watchLines(lines: readonly string[], start: () => Promise<void> = async () => {}) {
+  let closed = false;
+  const executor: AspireCommandExecutor = {
+    output: () => {
+      throw new Error('Snapshot polling is forbidden');
+    },
+    spawn: () => {
+      throw new Error('Unexpected spawn');
+    },
+    async *stream() {
+      try {
+        yield* lines;
+      } finally {
+        closed = true;
+      }
+    },
+  };
+  try {
+    return await watchExecutableCompletion(executor, {
+      resourceName: 'postgres-cli',
+      apphostPath: 'project/aspire/apphost.mts',
+      cwd: '.',
+      timeoutMs: 1_000,
+      signal: new AbortController().signal,
+      start,
+    });
+  } finally {
+    assertEquals(closed, true);
+  }
+}
+
+Deno.test('watch ignores old terminal and stale terminal replay before a fresh lifecycle', async () => {
+  assertEquals(
+    await watchLines([
+      update('Finished', 0),
+      update('Finished', 0),
+      update('Running'),
+      update('Finished', 9),
+    ]),
+    9,
+  );
+});
+
+Deno.test('watch buffers a fast new run immediately after the initial snapshot', async () => {
+  let started = false;
+  assertEquals(
+    await watchLines([
+      update('Stopped', 77),
+      update('Starting'),
+      update('Finished', 0),
+    ], () => {
+      started = true;
+      return Promise.resolve();
+    }),
+    0,
+  );
+  assertEquals(started, true);
+});
+
+Deno.test('watch requires initial identity and ignores sibling resources and non-executables', async () => {
+  let started = false;
+  const initial = update('Stopped', 99);
+  assertEquals(
+    await watchLines([
+      update('Running', undefined, 'postgres-cli-sibling'),
+      initial,
+      update(null),
+      update('Running'),
+      update('Finished', 44, 'postgres-cli-sibling'),
+      JSON.stringify({
+        displayName: 'postgres-cli',
+        resourceType: 'Container',
+        state: 'Finished',
+        exitCode: 88,
+      }),
+      update('Finished', 5),
+    ], () => {
+      started = true;
+      return Promise.resolve();
+    }),
+    5,
+  );
+  assertEquals(started, true);
+});
+
+for (
+  const [label, lines, message] of [
+    ['malformed', ['not JSON'], 'Unexpected token'],
+    ['premature EOF', [], 'initial snapshot'],
+    [
+      'no new run',
+      [update('Finished', 0), update('Finished', 0)],
+      'ended before postgres-cli completed',
+    ],
+    [
+      'no terminal',
+      [update('Stopped', 0), update('Running')],
+      'ended before postgres-cli completed',
+    ],
+    [
+      'no exit code',
+      [update('Stopped', 0), update('Running'), update('Finished')],
+      'without an exit code',
+    ],
+  ] as const
+) {
+  Deno.test(`watch fails closed for ${label} and closes the stream`, async () => {
+    await assertRejects(() => watchLines(lines), Error, message);
+  });
+}

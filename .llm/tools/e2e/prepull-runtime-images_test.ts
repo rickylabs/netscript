@@ -6,6 +6,103 @@ import {
 } from './prepull-runtime-images.ts';
 import * as runtimePulls from './prepull-runtime-images.ts';
 import { SCAFFOLD_CACHE_CONTAINER_IMAGES } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-container-images.ts';
+import { SCAFFOLD_VERSIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
+import { join } from '@std/path';
+import {
+  GARNET_TOOL_PREPARATION_TIMEOUT_MS,
+  prepareRuntimeTier,
+  type ToolPreparationCommand,
+} from './prepull-runtime-images.ts';
+
+for (const tier of ['postgres', 'sqlite']) {
+  Deno.test(`${tier} preparation restores the pinned executable tool before any image pull`, async () => {
+    const root = await Deno.makeTempDir();
+    const report = join(root, 'report', 'images.json');
+    let restored = false;
+    let restores = 0;
+    const expected = await runtimeTierImages(tier, () => Promise.resolve('database-image'));
+    try {
+      await prepareRuntimeTier(tier, report, {
+        toolDirectory: root,
+        resolvePostgres: () => Promise.resolve('database-image'),
+        async runToolRestore(command) {
+          restores++;
+          const manifest = join(root, '.config', 'dotnet-tools.json');
+          assertEquals(command, {
+            command: 'dotnet',
+            args: ['tool', 'restore', '--tool-manifest', manifest],
+            timeoutMs: GARNET_TOOL_PREPARATION_TIMEOUT_MS,
+            stdout: 'inherit',
+            stderr: 'inherit',
+          });
+          assertEquals(GARNET_TOOL_PREPARATION_TIMEOUT_MS, 120_000);
+          assertEquals(JSON.parse(await Deno.readTextFile(manifest)), {
+            version: 1,
+            isRoot: true,
+            tools: {
+              'garnet-server': {
+                version: SCAFFOLD_VERSIONS.GARNET_TOOL,
+                commands: ['garnet-server'],
+              },
+            },
+          });
+          restored = true;
+          return 0;
+        },
+        pullImage(image) {
+          assertEquals(restored, true, 'the executable fallback must be restored before images');
+          return Promise.resolve({
+            image,
+            durationMs: 1,
+            attempts: [{ durationMs: 1, exitCode: 0 }],
+          });
+        },
+      });
+      assertEquals(restores, 1);
+      const measured: { image: string }[] = JSON.parse(await Deno.readTextFile(report));
+      assertEquals(measured.map(({ image }) => image), expected);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  });
+}
+
+for (const failure of ['exit', 'timeout', 'killed'] as const) {
+  Deno.test(`tool ${failure} aborts preparation once without pulling images or hiding the failure`, async () => {
+    const root = await Deno.makeTempDir();
+    let restores = 0;
+    let pulls = 0;
+    const runToolRestore = (_command: ToolPreparationCommand): Promise<number> => {
+      restores++;
+      if (failure === 'timeout') {
+        return Promise.reject(new DOMException('tool preparation deadline', 'TimeoutError'));
+      }
+      return Promise.resolve(failure === 'exit' ? 17 : 137);
+    };
+    try {
+      await assertRejects(
+        () =>
+          prepareRuntimeTier('sqlite', join(root, 'report.json'), {
+            toolDirectory: root,
+            runToolRestore,
+            pullImage(image) {
+              pulls++;
+              return Promise.resolve({ image, durationMs: 0, attempts: [] });
+            },
+          }),
+        failure === 'timeout' ? DOMException : Error,
+        failure === 'timeout'
+          ? 'tool preparation deadline'
+          : `exit code ${failure === 'exit' ? 17 : 137}`,
+      );
+      assertEquals(restores, 1);
+      assertEquals(pulls, 0);
+      await assertRejects(() => Deno.stat(join(root, 'report.json')), Deno.errors.NotFound);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  });
+}
 
 Deno.test('tier images use the scaffold cache owner and query the database SDK only for postgres', async () => {
   let queries = 0;

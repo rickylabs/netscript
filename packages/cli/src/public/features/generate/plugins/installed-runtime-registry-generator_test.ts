@@ -4,7 +4,6 @@ import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import type { DirEntry, FileInfo, WalkEntry } from '../../../../kernel/domain/core-types.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
-import { EmptyPluginRegistryError } from './generate-installed-plugin-registries.ts';
 import { createInstalledRuntimeRegistryGenerator } from './installed-runtime-registry-generator.ts';
 
 describe('installed runtime registry generator', () => {
@@ -51,7 +50,7 @@ describe('installed runtime registry generator', () => {
     );
   });
 
-  it('names the installed plugin and rejects a declared empty runtime', async () => {
+  it('runs the declared generator and reports zero items for an empty runtime', async () => {
     const fs = new MemoryFileSystem({
       '/workspace/app/appsettings.json': appsettings(
         'empty-api',
@@ -65,12 +64,11 @@ describe('installed runtime registry generator', () => {
       fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('empty'))),
     });
 
-    const error = await assertRejects(
-      () => generate({ dryRun: false, projectRoot: '/workspace/app' }),
-      EmptyPluginRegistryError,
-      '@acme/plugin-empty',
-    );
-    assertEquals(error.plugin, '@acme/plugin-empty');
+    assertEquals(await generate({ dryRun: false, projectRoot: '/workspace/app' }), [{
+      path: '.netscript/generated/plugin-empty/empty.registry.ts',
+      plugin: '@acme/plugin-empty',
+      registrableItems: 0,
+    }]);
   });
 
   it('dry-run reports canonical paths without executing or writing', async () => {
@@ -358,7 +356,7 @@ describe('installed runtime registry generator', () => {
     }
   });
 
-  it('preserves EmptyPluginRegistryError when an advertised report selects nothing', async () => {
+  it('reports an empty protocol 1 selection without substituting manifest candidates', async () => {
     const fs = new MemoryFileSystem({
       '/workspace/app/appsettings.json': appsettings(
         'custom-api',
@@ -383,11 +381,13 @@ describe('installed runtime registry generator', () => {
       fetchManifest: () => Promise.resolve(jsonResponse(runtimeManifest('custom', 1))),
     });
 
-    await assertRejects(
-      () => generate({ dryRun: true, projectRoot: '/workspace/app' }),
-      EmptyPluginRegistryError,
-      '@acme/plugin-custom',
-    );
+    assertEquals(await generate({ dryRun: true, projectRoot: '/workspace/app' }), [{
+      path: '.netscript/generated/plugin-custom/custom.registry.ts',
+      plugin: '@acme/plugin-custom',
+      registrableItems: 0,
+      sourceAuthority: 'generator',
+      sourceFiles: [],
+    }]);
   });
 
   it('does not substitute an unrelated marked source package for a third-party plugin', async () => {

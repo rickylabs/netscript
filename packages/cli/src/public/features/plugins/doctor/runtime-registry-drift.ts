@@ -86,9 +86,10 @@ export async function checkRuntimeRegistryDrift(
     return {
       id: `${CHECK_PREFIX}:${registryPath}`,
       title,
-      status: 'healthy' as const,
-      message:
-        `Verified ${registryPath} against ${files.length} ${declaredDescription} ${noun}${evidence}.${exclusions} ${evidenceBoundary}`,
+      status: files.length === 0 ? 'warning' as const : 'healthy' as const,
+      message: files.length === 0
+        ? `${registryPath}: Empty registry; the installed plugin has zero definitions and can start idle.${exclusions} ${evidenceBoundary}`
+        : `Verified ${registryPath} against ${files.length} ${declaredDescription} ${noun}${evidence}.${exclusions} ${evidenceBoundary}`,
     };
   }));
 }

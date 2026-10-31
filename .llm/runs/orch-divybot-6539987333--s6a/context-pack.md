@@ -47,3 +47,22 @@ CodeBlock independent IMPL-EVAL:PASS; all109hashes verified, both requested bloc
 and negative control substantive. Avatar conditional deferral accepted; failure streak0.
 Sign-off commit next. Main advanced to14816a4; two merge conflicts require reconciliation
 and same-evaluator review before final push/READY.
+
+Main reconciliation after repair5dff0c2: merge14816a409e31505bc528714332b0bf4670be2fcb.
+Five conflicts: preset helper import relocated by main; generated agent-docs prose; Fresh UI
+import map and root/package lock metadata. Preserve this branch’s Utility default and new
+highlight mapping alongside main’s Zod mapping; regenerate prose rather than hand-merging it.
+Native lock resolution, all carriers, fresh merged scaffold, relevant CLI preset/default tests,
+package/browser gates and same independent reconciliation review required before merge commit.
+No unrelated upstream behavior is altered. No force-push or labels.
+
+Merged-tree local gates terminalPASS: all335 package tests,22 CLI preset/default tests,
+36browser tests with0skips, app+fixturetypecheck and productionbuild. Package check/lint/fmt,
+init-source lint/fmt, all14 rootchecks, broadquality/architecture, docsaccuracy, tokenquality,
+releasepreflight and JSRaudit pass. Same independent reconciliation review underway;109paths
+frozen. Full local Docker/Aspire runtime and leak hygiene remainUNPROVEN.
+
+Main reconciliation independent IMPL-EVAL:PASS. Reviewer verified every frozenhash, all8
+overlap resolutions, byte-for-byte preservation of all one-sided upstream/PR changes, and
+all335package/22CLI/36browser tests plus14rootchecks. Failure streak0. Merge sign-off and
+non-force push next; exact-headCI must complete before renewedREADY.

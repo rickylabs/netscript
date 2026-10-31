@@ -55,3 +55,33 @@ export const registry = sagaRegistry;
     true,
   );
 });
+
+for (
+  const [label, source, ok] of [
+    [
+      'complete empty',
+      'const entries: readonly [string, unknown][] = [];\nexport const sagaRegistry = new Map(entries);\nexport const registry = sagaRegistry;',
+      true,
+    ],
+    ['truncated', '/** Registry - AUTO-GENERATED */', false],
+    ['missing runtime map', 'export const jobDefinitionsById = Object.freeze({});', false],
+  ] as const
+) {
+  Deno.test('sagas doctor checks ' + label + ' registry structure', async () => {
+    const report = await runDoctorCommand({
+      plugin: sagasAdapterPlugin,
+      context: {
+        workspaceRoot: '/workspace',
+        options: {},
+        config: { SAGAS_API_URL: 'configured' },
+        dryRun: true,
+        fileSystem: {
+          exists: () => Promise.resolve(true),
+          readText: () => Promise.resolve(source),
+          writeText: () => Promise.reject(new Error('read only')),
+        },
+      },
+    });
+    assertEquals(report.checks.every((check) => check.ok), ok);
+  });
+}

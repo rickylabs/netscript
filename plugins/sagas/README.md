@@ -37,6 +37,22 @@ them to a NetScript host.
 - **Durable streams + Aspire** — `./streams` publishes saga entities to durable stream topics;
   `./aspire` contributes the saga resources to the AppHost.
 
+## Installing before the first definition
+
+Install without example definitions, then generate the registry:
+
+```sh
+netscript plugin install sagas --no-db --saga-store-backend kv --no-samples
+netscript generate plugins
+netscript plugin doctor
+```
+
+An installed plugin with zero definitions gets a typed empty registry. Doctor reports the empty
+registry as a warning and exits successfully; a missing or stale registry remains an error. With
+its configured dependencies available, the background runner starts idle and reports ready with
+zero definitions. Add your first definition and run `netscript generate plugins` again. Removing
+the last definition and regenerating keeps a valid empty registry.
+
 ## Excluding helpers from generated registries
 
 `netscript generate plugins` selects definition modules from `sagas/*-saga.ts`. Keep a helper or a
@@ -210,6 +226,33 @@ configured saga window.
 See the
 [schema, migration and cursor recipe](https://rickylabs.github.io/netscript/reference/plugin-sagas-core/#installed-outbox-schema-and-postgresql-retention).
 
+## Compensation persistence and retry
+
+`SagaEngine.commitCompensation` uses the same `SagaTransitionCommitPort` as an ordinary saga
+transition. Its replay identity includes the saga, instance and version being compensated. The
+replay digest, next state, correlation ownership and transition history commit together:
+
+| Canonical store                                 | Guarantee                                                                                                                                                |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `KvSagaStore` on Deno KV                        | One atomic compare-and-swap includes every row and the replay digest. A rejected write leaves the previous `compensating` state and no committed digest. |
+| `KvSagaStore` on Redis                          | The same atomic batch commits through the Redis adapter; reopening the store preserves the same state/replay relationship.                               |
+| `PrismaSagaStore` on PostgreSQL                 | The replay insert and state/history writes share one interactive transaction. A failure after the insert rolls it back with the other rows.              |
+| `createPrismaSagaTransitionStore` on PostgreSQL | The existing transaction commits compensation state and replay together, including when the adapter also supports worker-command intents.                |
+
+Retry the **same compensation outcome**, with its original expected version, after a persistence
+failure. If the transaction failed, the retry can commit; if the commit succeeded but its
+acknowledgement was lost, the retry returns `committed: false` without appending another transition.
+This also applies to outcomes that record a compensation handler error as `failed`.
+
+Custom stores must implement the atomic state/replay capability before registration. Granular stores
+without it are rejected before handlers execute. `MemorySagaStore` supplies the same logical
+contract for tests, without persistence across process restarts.
+
+These guarantees concern canonical compensation outcomes. Redelivering an already committed inbound
+message does not reconstruct its cascades. Automatic recovery of scheduled/cascaded effects after
+the inbound commit requires the separate effects dispatcher; retrying an outcome does not provide
+that delivery guarantee. Query projections also remain separate from the canonical commit.
+
 ## KV retention
 
 Topic groups declare `retention.completedDays` (default 7) and `retention.archiveToDb` (default
@@ -246,3 +289,82 @@ terminal-instance cancellation/expiry contract, so their retention window is not
 change. Terminal records written before this policy was installed also need a migration/backfill;
 this change assigns deadlines when a terminal state is written. These remaining acceptance items
 keep issue #2109 open.
+
+## Instance API state migration
+
+Both `GET /instances/{sagaName}/{correlationId}` and the instance list return business
+state verbatim in `response.state`. Runtime lifecycle status, identifiers, version,
+and timestamps are sibling response fields. A saga's own `status`, `metadata`,
+`instanceId`, or other field is never replaced by runtime data:
+
+```json
+{
+  "sagaName": "checkout",
+  "correlationId": "order-123",
+  "state": { "status": "payment_pending", "metadata": { "customer": "example" } },
+  "status": "running",
+  "version": 1
+}
+```
+
+Consumers that previously read runtime status from `response.state.status` must use
+`response.status`. Read runtime identifiers, version and dates from their top-level
+response fields instead of `response.state` or `response.state.metadata`.
+`response.state.status` and `response.state.metadata` now belong exclusively to the
+application's business state. The v1 route and the published response schema stay
+in place; the payload semantics are corrected.
+
+The KV projection stores this separated response document. The Prisma projection's
+JSON `state` column stores the same document with `projectionVersion: 2`; its nested
+`state` property is the business payload. Raw Prisma readers should check that
+version and read `row.state.state` for business data. The relational `row.status`
+column is the canonical runtime lifecycle (`SAGA_INSTANCE_STATUSES`); new projections
+write it on both insert and update, alongside the versioned JSON document. Instance
+lists filter that column through the `[sagaName, status]` index, including `pending`,
+`running`, `completed`, `failed`, `compensating`, `compensated` and `cancelled`.
+Single-row reads use the same mapper. The legacy `isCompleted` column remains for
+existing cleanup consumers; it does not determine the status of new API responses.
+Stream startup reconciliation continues to validate the versioned JSON document;
+startup snapshots preserve the same business state as live updates.
+
+Existing KV query documents and flat Prisma JSON payloads remain readable in their
+legacy shape until a new committed transition writes an updated projection or
+retention removes them. The Prisma reader accepts rows without the new scalar
+value using the existing versioned/flat status mapping. Values already overwritten in an
+old projection cannot be recovered by a read-time migration. Restore them from
+canonical state or an application-controlled replay if a refreshed projection is
+needed; do not infer missing business values from runtime metadata.
+
+With a KV projection, single-instance GET reads the canonical correlation index and
+then loads that instance through the configured store, independently of list size
+or projection freshness. KV persistence needs exactly two KV reads for an existing
+instance; Prisma persistence with a KV projection uses two keyed runtime queries.
+Missing or expired canonical state returns `NOT_FOUND` even if an old projection
+remains. With a Prisma projection, GET uses one indexed query on saga name and
+correlation ID. With projection `none`, GET still reads the canonical store and
+lists remain empty. Direct canonical GET can omit optional `lastMessageType`, which
+is only recorded in the projection; it does not read transition history to fill it.
+
+
+### Upgrade the Prisma instance status column
+
+Stop older saga writers and API processes, synchronize the upgraded plugin assets,
+and run the application's normal `netscript db migrate` flow before starting the
+new runtime. Regenerate the host Prisma client with the upgraded schema. Avoid
+mixed-version writers: an older binary does not update the new status column.
+
+The declared `instance-status.migration.sql` contribution is appended by the
+database migration tooling after Prisma creates the defaulted `status` column and
+its index. It backfills existing rows using a valid version-2 document's runtime
+status first; for flat legacy rows, `is_completed` wins, then a valid top-level
+runtime status, otherwise `running`. It changes only the status column, preserving
+business JSON, ids, versions and timestamps. Historical lifecycle information
+already lost by an older projection cannot be reconstructed from a completion
+boolean alone.
+
+The forward migration makes filtered lists correct for existing rows immediately,
+while the read-compatible mapping keeps older document shapes readable. No
+runtime backfill or parallel query path is added. PostgreSQL rejects non-canonical
+column values with `saga_instances_status_check`. When the core lifecycle vocabulary
+changes, ship a new immutable migration to update that constraint; never edit an
+already-installed SQL contribution.

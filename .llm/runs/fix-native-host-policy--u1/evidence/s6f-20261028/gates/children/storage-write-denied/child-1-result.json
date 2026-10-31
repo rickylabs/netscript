@@ -1,0 +1,11 @@
+{
+  "code": 0,
+  "stdout": "{\"row\":\"write-denied\",\"nativeError\":{\"name\":\"NotCapable\",\"message\":\"Requires write access to \\\"C:\\\\Users\\\\ericc\\\\source\\\\repos\\\\netscript-native-host-policy-008\\\\.llm\\\\tmp\\\\native-host-policy-u1-s6f-astra-20261028\\\\gates\\\\owned-profile-a4646601653de1fa\\\\streams-service-runtime-e523443aeb367116\\\\data\\\\.netscript-storage-probe-00813de6-b7ef-47f9-a070-9d886bd97bbd\\\", run again with the --allow-write flag\"}}\n{\"observations\":{\"row\":\"write-denied\",\"mode\":\"file\",\"nativeError\":{\"name\":\"NotCapable\",\"message\":\"Requires write access to \\\"C:\\\\Users\\\\ericc\\\\source\\\\repos\\\\netscript-native-host-policy-008\\\\.llm\\\\tmp\\\\native-host-policy-u1-s6f-astra-20261028\\\\gates\\\\owned-profile-a4646601653de1fa\\\\streams-service-runtime-e523443aeb367116\\\\data\\\\.netscript-storage-probe-00813de6-b7ef-47f9-a070-9d886bd97bbd\\\", run again with the --allow-write flag\"},\"deniedProbe\":\"C:\\\\Users\\\\ericc\\\\source\\\\repos\\\\netscript-native-host-policy-008\\\\.llm\\\\tmp\\\\native-host-policy-u1-s6f-astra-20261028\\\\gates\\\\owned-profile-a4646601653de1fa\\\\streams-service-runtime-e523443aeb367116\\\\data\\\\.netscript-storage-probe-00813de6-b7ef-47f9-a070-9d886bd97bbd\"},\"reboundPorts\":[50074,50075]}\ns6f-streams: storage assertions and native cleanup settled\n",
+  "stderr": "Check $deno$stdin.ts\n",
+  "pid": 7296,
+  "startedAt": "2026-10-28T05:23:38.386Z",
+  "finishedAt": "2026-10-28T05:23:39.693Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

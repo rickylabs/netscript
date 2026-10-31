@@ -1,4 +1,5 @@
 import { assertEquals, assertStrictEquals, assertThrows } from '@std/assert';
+import { assertType, type IsExact } from '@std/testing/types';
 import { implement, os } from '@orpc/server';
 import { baseContract, SuccessSchema } from '@netscript/contracts';
 import {
@@ -69,6 +70,18 @@ function availabilityApp(paths = retiredPaths, denyByDefault = true) {
 }
 
 Deno.test('procedure availability codes are typed and identical on root and auth imports', () => {
+  assertType<IsExact<ProcedureErrorCode, 'procedure_not_found' | 'procedure_retired'>>(true);
+  assertType<IsExact<ProcedureErrorCode, AuthProcedureErrorCode>>(true);
+  assertType<
+    IsExact<ProcedureErrorCode, typeof PROCEDURE_ERROR_CODES[keyof typeof PROCEDURE_ERROR_CODES]>
+  >(true);
+  assertType<
+    IsExact<typeof PROCEDURE_ERROR_CODES, {
+      readonly NOT_FOUND: 'procedure_not_found';
+      readonly RETIRED: 'procedure_retired';
+    }>
+  >(true);
+  assertType<IsExact<typeof PROCEDURE_ERROR_CODES, typeof AUTH_PROCEDURE_ERROR_CODES>>(true);
   const code: ProcedureErrorCode = AUTH_PROCEDURE_ERROR_CODES.RETIRED;
   const authCode: AuthProcedureErrorCode = PROCEDURE_ERROR_CODES.RETIRED;
   assertEquals(code, 'procedure_retired');

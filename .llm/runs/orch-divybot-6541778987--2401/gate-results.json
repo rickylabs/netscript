@@ -1,0 +1,178 @@
+{
+  "tests-final": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "packages/cli/src/kernel/adapters/database/operations",
+      ".llm/tools/validation/check-aspire-resource-polling_test.ts"
+    ],
+    "exitCode": 0,
+    "durationMs": 3418,
+    "summary": {
+      "passed": 53,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 53,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "check-final": {
+    "source": {
+      "mode": "selection"
+    },
+    "command": "deno check --unstable-kv <files>",
+    "selection": {
+      "filesSelected": 13,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "lint-final": {
+    "source": {
+      "mode": "command",
+      "exitCode": 0
+    },
+    "selection": {
+      "filesSelected": 7,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "coverage": {
+      "filesSelected": 7,
+      "filesProcessed": 7,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "fmt-final": {
+    "command": "deno fmt --check",
+    "mode": "check",
+    "summary": {
+      "filesSelected": 7,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "coverage": {
+      "filesSelected": 7,
+      "filesProcessed": 7,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "findings": []
+  },
+  "negative-control": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "packages/cli/src/kernel/adapters/database/operations/operation-runner_test.ts"
+    ],
+    "exitCode": 1,
+    "durationMs": 151,
+    "summary": {
+      "passed": 9,
+      "failed": 3,
+      "ignored": 0,
+      "totalResults": 12,
+      "uniqueFailures": 3
+    },
+    "failures": [
+      {
+        "message": "2 test steps failed.",
+        "count": 1,
+        "tests": [
+          {
+            "name": "DbOperationRunner",
+            "file": "./packages/cli/src/kernel/adapters/database/operations/operation-runner_test.ts",
+            "line": 156
+          }
+        ]
+      },
+      {
+        "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    [\n      \"ps\",\n      \"wait\",\n      \"resource\",\n-     \"describe\",\n      \"logs\",\n      \"resource\",\n    ]\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at Object.<anonymous> (file://<cwd>/packages/cli/src/kernel/adapters/database/operations/operation-runner_test.ts:<line>:<column>)\n    at async TestSuiteInternal.runTest (https://jsr.io/@std/testing/1.0.21/_test_suite.ts:<line>:<column>)\n    at async TestSuiteInternal.runTest (https://jsr.io/@std/testing/1.0.21/_test_suite.ts:<line>:<column>)\n    at async fn (https://jsr.io/@std/testing/1.0.21/_test_suite.ts:<line>:<column>)\n    at async innerWrapped (ext:cli/40_test.js:<line>:<column>)\n    at async exitSanitizer (ext:cli/40_test.js:<line>:<column>)\n    at async Object.outerWrapped [as fn] (ext:cli/40_test.js:<line>:<column>)\n    at async TestContext.step (ext:cli/40_test.js:<line>:<column>)\n    at async TestSuiteInternal.run (https://jsr.io/@std/testing/1.0.21/_test_suite.ts:<line>:<column>)",
+        "count": 1,
+        "tests": [
+          {
+            "name": "keeps migration-name operations on the explicit-start compatibility resource",
+            "file": "./packages/cli/src/kernel/adapters/database/operations/operation-runner_test.ts",
+            "line": 415
+          }
+        ]
+      },
+      {
+        "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   0\n+   1\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at Object.<anonymous> (file://<cwd>/packages/cli/src/kernel/adapters/database/operations/operation-runner_test.ts:<line>:<column>)\n    at async TestSuiteInternal.runTest (https://jsr.io/@std/testing/1.0.21/_test_suite.ts:<line>:<column>)\n    at async TestSuiteInternal.runTest (https://jsr.io/@std/testing/1.0.21/_test_suite.ts:<line>:<column>)\n    at async fn (https://jsr.io/@std/testing/1.0.21/_test_suite.ts:<line>:<column>)\n    at async innerWrapped (ext:cli/40_test.js:<line>:<column>)\n    at async exitSanitizer (ext:cli/40_test.js:<line>:<column>)\n    at async Object.outerWrapped [as fn] (ext:cli/40_test.js:<line>:<column>)\n    at async TestContext.step (ext:cli/40_test.js:<line>:<column>)\n    at async TestSuiteInternal.run (https://jsr.io/@std/testing/1.0.21/_test_suite.ts:<line>:<column>)",
+        "count": 1,
+        "tests": [
+          {
+            "name": "one follow stream spans simulated minutes without snapshot polls",
+            "file": "./packages/cli/src/kernel/adapters/database/operations/operation-runner_test.ts",
+            "line": 239
+          }
+        ]
+      }
+    ]
+  },
+  "otherGates": {
+    "quality:gate": {
+      "exitCode": 0,
+      "findings": 0,
+      "baselineAllowances": 7
+    },
+    "check:aspire-host-ports": {
+      "exitCode": 0,
+      "scannedFiles": 1304
+    },
+    "docs:links": {
+      "exitCode": 0,
+      "docs": 105,
+      "brokenLinks": 0,
+      "brokenAnchors": 0
+    },
+    "scaffold.runtime": {
+      "state": "UNPROVEN",
+      "reason": "Required coordinator-owned e2e-cli CI verdict; no local runtime E2E authorized"
+    },
+    "cli-jsr-audit": {
+      "exitCode": 0,
+      "dryRun": "OK",
+      "slowTypeWarnings": 1,
+      "findings": "23 existing warnings, unchanged from baseline"
+    },
+    "docs-carrier": {
+      "generationExitCode": 0,
+      "freshnessExitCode": 0,
+      "fresh": true,
+      "changedPages": [
+        "pages/reference/aspire/index.md"
+      ],
+      "renderedHtmlFiles": 253
+    },
+    "review-threads": {
+      "exitCode": 0,
+      "threads": 0,
+      "unanswered": 0
+    }
+  }
+}

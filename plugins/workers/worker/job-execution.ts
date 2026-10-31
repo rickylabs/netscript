@@ -1,3 +1,4 @@
+import { workerJobLogger } from './job-logger.ts';
 import {
   DEFAULT_TOPIC,
   executeJobWithRetry,
@@ -54,9 +55,13 @@ async function executeDenoJob(
   signal?.throwIfAborted();
   const entrypoint = resolveDenoEntrypoint(context, jobDef);
 
-  console.log(
-    `[Worker ${context.workerId}] Executing job '${jobDef.id}' via WorkerPool, entrypoint: ${entrypoint}`,
-  );
+  workerJobLogger.debug('Executing job {jobId} via WorkerPool', {
+    workerId: context.workerId,
+    jobId: jobDef.id,
+    jobName: jobDef.name ?? jobDef.id,
+    executionId,
+    entrypoint,
+  });
 
   const message: JobMessage = {
     jobId: jobDef.id,
@@ -109,15 +114,25 @@ function resolveDenoEntrypoint(
     }
   }
 
-  console.log(
-    `[Worker ${context.workerId}] Resolving entrypoint for job '${jobDef.id}': source=${jobDef.source}, entrypoint=${jobEntrypoint}, projectRoot=${projectRoot}`,
-  );
+  workerJobLogger.debug('Resolving entrypoint for job {jobId}', {
+    workerId: context.workerId,
+    jobId: jobDef.id,
+    jobName: jobDef.name ?? jobDef.id,
+    source: jobDef.source,
+    entrypoint: jobEntrypoint,
+    projectRoot,
+  });
 
   if (jobDef.source === 'plugin') {
     const entrypoint = jobEntrypoint.startsWith('./')
       ? `${projectRoot}/${jobEntrypoint.slice(2)}`
       : `${projectRoot}/${jobEntrypoint}`;
-    console.log(`[Worker ${context.workerId}] Plugin job resolved to: ${entrypoint}`);
+    workerJobLogger.debug('Plugin job {jobId} resolved', {
+      workerId: context.workerId,
+      jobId: jobDef.id,
+      jobName: jobDef.name ?? jobDef.id,
+      entrypoint,
+    });
     return toLocalModuleSpecifier(entrypoint);
   }
 

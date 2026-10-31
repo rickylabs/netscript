@@ -1,0 +1,1301 @@
+{
+    "schemaVersion":  1,
+    "createdAt":  "2026-10-27T21:52:06.0322353Z",
+    "archive":  "s2-evidence.json.gz",
+    "archiveBytes":  4560761,
+    "archiveSha256":  "250cf1177af8877a991601325019a2143f07466756836ff7d683522a7df4407c",
+    "payloadSha256":  "a46137415bebc1b68fbd4a317b14b26a6926296540c2af549c055fd4a55031cd",
+    "fileCount":  257,
+    "originalBytes":  14612418,
+    "roundtripVerifiedFiles":  257,
+    "allOriginalFilesRetained":  true,
+    "priorCommittedHistoryRewritten":  false,
+    "credentialOrProfileStateIncluded":  false,
+    "files":  [
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/arch-check-workers-s2.txt",
+                      "bytes":  1206,
+                      "sha256":  "57390707de81202a68b8c9833bc07d7cccc6849916d2690cd7b485378151fc5f"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/01-authorized-shape.meta.txt",
+                      "bytes":  153,
+                      "sha256":  "e512070c62544de56119202fdca075cb506d6450864c883c4b091d33e0ec025c"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/01-authorized-shape.stderr.txt",
+                      "bytes":  2788,
+                      "sha256":  "98a7171666a9b4ca51cd64bedfb67df7b8eae375ac7a416a797bf02ae97bf7e7"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/01-authorized-shape.stdout.txt",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/02-closure-iteration.stderr.txt",
+                      "bytes":  2788,
+                      "sha256":  "98a7171666a9b4ca51cd64bedfb67df7b8eae375ac7a416a797bf02ae97bf7e7"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/03-closure-iteration.stderr.txt",
+                      "bytes":  1678,
+                      "sha256":  "3cb427ea1ab5ad15fa3b0ec18bfe83f1e921d572d728508cd776681dfabb9507"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/04-closure-iteration.stderr.txt",
+                      "bytes":  1136,
+                      "sha256":  "c9cbddc753d7b6c08a84aa6a520e1a1aeb1a89fc283439e03240d779388e7e9e"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/05-closure-iteration.stderr.txt",
+                      "bytes":  2330,
+                      "sha256":  "493b696c7274e192507569936c6b503b5aa66352361d2877f62dfe17587b83fc"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/06-closure-iteration.stderr.txt",
+                      "bytes":  1051,
+                      "sha256":  "faab2d1821f099e9976672f4dc62f139d638c4011d63a92c732087f9a7a97361"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/07-closure-iteration.stderr.txt",
+                      "bytes":  15,
+                      "sha256":  "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/closure-report.json",
+                      "bytes":  5531,
+                      "sha256":  "d36d56fff7db76d906507cdbc55a3e804eb4768fc8aadb6c8e827fad8cb87101"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/consumer-identity.check.txt",
+                      "bytes":  35,
+                      "sha256":  "b40a25d557fa4d4bf4fcd043ae5651a0caf449195ae2e85f439c053369805a96"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/consumer-identity-negative.check.txt",
+                      "bytes":  582,
+                      "sha256":  "556bfb562780a0516d7d4ace4436dcd7ab31a262303a4f38aee2ea81595c8e08"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/consumer-recipe-guarded.check.txt",
+                      "bytes":  2611,
+                      "sha256":  "d2d9566bf76d43662b77e9f4dd1acd7439f39358354b57e3e056bf4d05be6cc8"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/consumer-recipe-public.check.txt",
+                      "bytes":  405,
+                      "sha256":  "9a8ab9544f2017b3ec0263cca51024f4caac40a205c7cd104c221add45486707"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owner-hashes.txt",
+                      "bytes":  204,
+                      "sha256":  "b224c532fd8092a2ced5709dd704d78cbfe258bc0a559378bfcf1e2b040b47f4"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owner-hashes-final.txt",
+                      "bytes":  407,
+                      "sha256":  "1bb88915cfc3190a06e9e969477d682737afc88a6333cd72829f6bf68f824a00"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/01-service-root.meta.txt",
+                      "bytes":  60,
+                      "sha256":  "fef0c0982600046326d9c722705a30e191cea49f9cd879972bcfcc47edde5664"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/01-service-root.stderr.txt",
+                      "bytes":  15,
+                      "sha256":  "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/01-service-root.stdout.txt",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/02-service-auth.meta.txt",
+                      "bytes":  69,
+                      "sha256":  "82c014e6dcc671fc94141978429126934b7fb02a1394ff48203c88d182c65b30"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/02-service-auth.stderr.txt",
+                      "bytes":  15,
+                      "sha256":  "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/02-service-auth.stdout.txt",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/03-plugin-sdk.meta.txt",
+                      "bytes":  67,
+                      "sha256":  "5eea998b3ce9ecadb7c0589632ac1a6df521df611c589e7685ae4b306f0c7035"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/03-plugin-sdk.stderr.txt",
+                      "bytes":  15,
+                      "sha256":  "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/03-plugin-sdk.stdout.txt",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/04-plugin-service.meta.txt",
+                      "bytes":  71,
+                      "sha256":  "20115fcb9e826413829b9c9404f777ddac6d050f2241bf50d4aa0110568c2a7b"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/04-plugin-service.stderr.txt",
+                      "bytes":  2968,
+                      "sha256":  "fcbb543182f579183204889535d82ebd8d405b0e3a1df59a6edc6253a6353a82"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/04-plugin-service.stdout.txt",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/05-workers-legacy-services.meta.txt",
+                      "bytes":  73,
+                      "sha256":  "69fc3f08baacaa8e0a82f10420aaae14a16a4ca6cd8073b61b922a3ddca6f463"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/05-workers-legacy-services.stderr.txt",
+                      "bytes":  38260,
+                      "sha256":  "a95f58c973178c0b821ba39fe1b5da94d5d5f7d85422912aafb68a897ec74d8a"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/05-workers-legacy-services.stdout.txt",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/06-workers-root.meta.txt",
+                      "bytes":  59,
+                      "sha256":  "0bfb66ff7bb47f041248699c28ccaf3b28c6be601020afdefcb535f5a268cc90"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/06-workers-root.stderr.txt",
+                      "bytes":  15,
+                      "sha256":  "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/owners/06-workers-root.stdout.txt",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/published-_netscript_plugin_0.0.8_sdk.json",
+                      "bytes":  205576,
+                      "sha256":  "0c75cbfe599993efcd25224f9f63bca1f924cff3592f10e8545dae06c05efb97"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/published-_netscript_plugin_0.0.8_sdk.stderr.txt",
+                      "bytes":  12491,
+                      "sha256":  "ae502436cd578f3c8c80b1648e8ffb303a1c44e4f7f2057b1624a343c383f643"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/published-_netscript_service_0.0.8.json",
+                      "bytes":  456097,
+                      "sha256":  "a1222ac8572e1bbaf3364edbddda3cb3229c928494f0adca828be4b6fd68fa4b"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/published-_netscript_service_0.0.8.stderr.txt",
+                      "bytes":  48207,
+                      "sha256":  "b3802ddfdd69fb868380483568b1f574cdcce15b333f7214746aa0d01eb33364"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/published-_netscript_service_0.0.8_auth.json",
+                      "bytes":  181152,
+                      "sha256":  "4da7beeeabf19d82a3e4758e70a90cf36775b7fe5c64ab3918f9d5c6b9e651b3"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/published-_netscript_service_0.0.8_auth.stderr.txt",
+                      "bytes":  314,
+                      "sha256":  "e78ac401705abaa42768ea3b27dd8132d9a6598d4636583a1039d1a9ee106565"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/resolution-deno-info.json",
+                      "bytes":  1691367,
+                      "sha256":  "340945cbef89657130ce844cad74390900f1231266b2f24880bf0bbe4e898ff1"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/resolution-deno-info.stderr.txt",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/s2c-check.json",
+                      "bytes":  327,
+                      "sha256":  "2e34d00f570a07fb1e5e592b1698d2a408be89f2b2e4a8c34e7926aa5f80ec0e"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/s2c-doc-lint-authorized-shape.json",
+                      "bytes":  1318,
+                      "sha256":  "1625ecd3e690637265a29c660e3f1fbfbed45a5623eeea1304d2760c43b8ec2f"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/s2c-fmt.json",
+                      "bytes":  312,
+                      "sha256":  "d9c720b6efe05b18be9d44d242ad1929507311de30c1dfb508d777261651dd13"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/s2c-green-test.json",
+                      "bytes":  410,
+                      "sha256":  "435d466dfcf807df9dbc22bc1f7ed795d2ee4c9a77dc89cfc57030ded5a92b38"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/doc-lint-authorized/s2c-lint.json",
+                      "bytes":  363,
+                      "sha256":  "dae879b50c3c011e24a6e44c483a9dcabdc157155f1b5da291f463078365e8d9"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/quality-scan-workers-with-s2.json",
+                      "bytes":  297,
+                      "sha256":  "6249e64ff4286877ffd26bdf1e328dcb8e104210cf10a412be7db17a88427c3e"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/s2-check.json",
+                      "bytes":  327,
+                      "sha256":  "2e34d00f570a07fb1e5e592b1698d2a408be89f2b2e4a8c34e7926aa5f80ec0e"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/s2-doc-lint.json",
+                      "bytes":  833,
+                      "sha256":  "37a542c1b72ee948ca4c28d68cc9a2cbdc31359e8eaa17e5ecb6bd92fc96f679"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/s2-doc-lint-full-export-map.json",
+                      "bytes":  3993,
+                      "sha256":  "729ff4a4980f3c8bb29d9adef48f72bf0cefbfa635371bbc1381848be1610922"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/s2-fmt.json",
+                      "bytes":  312,
+                      "sha256":  "d9c720b6efe05b18be9d44d242ad1929507311de30c1dfb508d777261651dd13"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/s2-green-test.json",
+                      "bytes":  410,
+                      "sha256":  "c766d4762c2014308e8f2c9ee638882113791522671f1b1187d722bf119771c0"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/s2-green-test-raw.txt",
+                      "bytes":  580,
+                      "sha256":  "531b6b80fd52f7ba5b8efdf864f6e589452fb5b9d01a2663c214fb56489a4a0f"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/s2-lint.json",
+                      "bytes":  363,
+                      "sha256":  "dae879b50c3c011e24a6e44c483a9dcabdc157155f1b5da291f463078365e8d9"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/s2-plugin-task-check.txt",
+                      "bytes":  658,
+                      "sha256":  "39686e92e2ba29e30d181fb4752d59bb8aed911f89081a78d086becfba55afbf"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/s2-protected-hashes.txt",
+                      "bytes":  1550,
+                      "sha256":  "c768f9204c585da1d8142d6fdadcd2c7b05c0f39f7efcce7724fad8e75d8330f"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2/s2-public-symbol-count.json",
+                      "bytes":  2859,
+                      "sha256":  "2dc070ff808cc6ae0ba3190aaee3f14db2d11cbc7c67061dd44c3a360c32c239"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/arch-check-workers.txt",
+                      "bytes":  1206,
+                      "sha256":  "57390707de81202a68b8c9833bc07d7cccc6849916d2690cd7b485378151fc5f"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/check.json",
+                      "bytes":  327,
+                      "sha256":  "2e34d00f570a07fb1e5e592b1698d2a408be89f2b2e4a8c34e7926aa5f80ec0e"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/consumer-check.meta.txt",
+                      "bytes":  291,
+                      "sha256":  "02d93336d2b542e7c24d9965cffe7a57c4ad5603260739fa252a62819306abfd"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/consumer-identity-22.check.txt",
+                      "bytes":  35,
+                      "sha256":  "b40a25d557fa4d4bf4fcd043ae5651a0caf449195ae2e85f439c053369805a96"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/consumer-identity-22-negative.check.txt",
+                      "bytes":  577,
+                      "sha256":  "fc061d97bef1990d1f18ea7b41d411967d08950e836d35305c26a06035af91ef"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/consumer-recipe-function-example.check.txt",
+                      "bytes":  2611,
+                      "sha256":  "d2d9566bf76d43662b77e9f4dd1acd7439f39358354b57e3e056bf4d05be6cc8"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/consumer-recipe-guarded.check.txt",
+                      "bytes":  2611,
+                      "sha256":  "d2d9566bf76d43662b77e9f4dd1acd7439f39358354b57e3e056bf4d05be6cc8"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/consumer-recipe-public.check.txt",
+                      "bytes":  405,
+                      "sha256":  "9a8ab9544f2017b3ec0263cca51024f4caac40a205c7cd104c221add45486707"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/doc-lint-contracts-v1-other-owner.txt",
+                      "bytes":  541,
+                      "sha256":  "2577b754a50a692c55ed7db33de8d4e80ae87471ee181ed8e1d00d97df6e6749"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/doc-lint-full-export-map.json",
+                      "bytes":  3993,
+                      "sha256":  "729ff4a4980f3c8bb29d9adef48f72bf0cefbfa635371bbc1381848be1610922"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/doc-lint-public-service.json",
+                      "bytes":  833,
+                      "sha256":  "37a542c1b72ee948ca4c28d68cc9a2cbdc31359e8eaa17e5ecb6bd92fc96f679"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/doc-lint-public-service.meta.txt",
+                      "bytes":  68,
+                      "sha256":  "1f1da8ba9283e0d51b6a9930362759d0db2211f3f768b654a7db9a3c9677160d"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/doc-lint-public-service.stderr.txt",
+                      "bytes":  15,
+                      "sha256":  "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/doc-lint-public-service.stdout.txt",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/fmt.json",
+                      "bytes":  312,
+                      "sha256":  "d9c720b6efe05b18be9d44d242ad1929507311de30c1dfb508d777261651dd13"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/green-test.json",
+                      "bytes":  410,
+                      "sha256":  "c9c66231d95cb0b95639f85b6118b65f69b864202b119d719cdef9915c957a8d"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/green-test-raw.txt",
+                      "bytes":  580,
+                      "sha256":  "fe67b72d801185949955f7c0db747a6c0359e24532ebc148ba11b6fa9ba1680e"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/lint.json",
+                      "bytes":  363,
+                      "sha256":  "dae879b50c3c011e24a6e44c483a9dcabdc157155f1b5da291f463078365e8d9"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/owner-hashes.txt",
+                      "bytes":  500,
+                      "sha256":  "a55c5f96fbbbaa6c62a8351fb02826b393036cde5d2c867c026b9f9e47cf2ca3"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/protected-hashes.txt",
+                      "bytes":  2627,
+                      "sha256":  "b10c3d09e377ec3667b588e60fdacb74072ab2443ba35bf724d2128f13ae4066"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/public-symbol-audit.json",
+                      "bytes":  1053,
+                      "sha256":  "77df0ab62ed5c9c4eae8033dbea2b830c0d262e1c1d22570caff1e33e5da3d7d"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/quality-scan-workers.json",
+                      "bytes":  297,
+                      "sha256":  "6249e64ff4286877ffd26bdf1e328dcb8e104210cf10a412be7db17a88427c3e"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/s2-final/resolution.txt",
+                      "bytes":  285,
+                      "sha256":  "1d96110158ef4af9e4d091aa945b89410e6f989b7b3bcbbbb3c3073cb05aa9a2"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/argv.json",
+                      "bytes":  1405,
+                      "sha256":  "5a66a4a49d168d82ae887dc7b09a717e5d82239c13ede0a2b14641ab7387acfc"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/bindings-and-source-guard.json",
+                      "bytes":  19628,
+                      "sha256":  "5571a82efd6987c63571df31d076807eaeb8c623a70951fc5376c7550f64dac2"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/budget.json",
+                      "bytes":  1148,
+                      "sha256":  "1147e4f3a4600d156aadb8e0d3afe665bad3c7a1de0f98353144b9d378ebeace"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/checkpoint.md",
+                      "bytes":  4819,
+                      "sha256":  "ac003b41bbaca9e7f309b65f079780c987aa8c689f96b3e3cef73c93ebde337c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/checkpoint-provenance.json",
+                      "bytes":  955,
+                      "sha256":  "a9a7793e768855f3f37feb3674a3526c53529744636efa4ae238ab7f570bfcae"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/continuation-message.md",
+                      "bytes":  4359,
+                      "sha256":  "7b6c261dbd8433e57a8349ab70a1d6744be037d53493ee633a3c6f4174a19576"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/drift-append.md",
+                      "bytes":  587,
+                      "sha256":  "76aed73b3964accb2e44ea50baec1a012c53a8a0b35cd33e40b1fd35dbb4d89b"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/environment.json",
+                      "bytes":  5519,
+                      "sha256":  "798f0c8ec8f42c9762891f728d38663cb4557fc4ce938a245d7813a500305645"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/focused-source-brief.md",
+                      "bytes":  102506,
+                      "sha256":  "e93908c22ac79278507cf1127100112ea85e487b526cb732f40027513808c967"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/focused-source-provenance.json",
+                      "bytes":  7532,
+                      "sha256":  "8a1afed07ecb9f596676d18b84e9176529f88be92a1f3977b8facc267525259c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/observed-cohort.json",
+                      "bytes":  1336,
+                      "sha256":  "670bc585fa0f74704076db52060c46af4c891cecace2654bebce16142d6cd546"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/opencode-inline.json",
+                      "bytes":  4841,
+                      "sha256":  "6a9cc3147ffbfe337460ae657fed02025230f0577b525bb4a4233ae4e895b7bb"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/openrouter-allowance.json",
+                      "bytes":  106,
+                      "sha256":  "50b5db6043ddf08baa937586552f856ff149ca15553f023a22cd0748c26c1d34"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/packet-seals.json",
+                      "bytes":  8289,
+                      "sha256":  "1c78f0f839bf54a101b4002b7a8cc52a57eee126348cd554bc653ca5421ca75d"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/root-bridge.md",
+                      "bytes":  2821,
+                      "sha256":  "8d315359016a10098731140959c8a8b9312dd693691f2deaf15f6ae000a06513"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/runtime/finalization-receipt.json",
+                      "bytes":  1572,
+                      "sha256":  "3511bc3cf5b379cd7980f9b907040c162b96ba30da862c0dbd4ec0f5a69fbb2e"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/runtime/final-text-original.md",
+                      "bytes":  8548,
+                      "sha256":  "d451f98e276775ce28c3ef07e537540a34b8900b37d41751adb8f72f05bf1764"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/runtime/native-export-1793128376541.json",
+                      "bytes":  2001974,
+                      "sha256":  "72acfda316127ff1fa3ce27b989789218a3b7e40c7d86584477d2394b4842b04"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/runtime/native-export-1793128376541.stderr",
+                      "bytes":  50,
+                      "sha256":  "be0ea20f186c7bdb93ca5eff37dfca06bc4207b1b72743591e4860c918797114"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/runtime/root-bridge.exit.json",
+                      "bytes":  128,
+                      "sha256":  "362e0f3f0ab3e899544fd5fa5d109854a002add7bf2410684a6cfb92f841bae6"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/runtime/root-bridge.identity.json",
+                      "bytes":  547,
+                      "sha256":  "9ecb659ff84a9d71ff06f5d01372a5388beb7db59cb3780216dfea2d1d94c0b9"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/runtime/root-observed-cohort-1.json",
+                      "bytes":  2640,
+                      "sha256":  "ec696d4d451e92d0003316333051c397b1e60aad108f85977e2448a865d9da35"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/runtime/suite.stderr.log",
+                      "bytes":  1364,
+                      "sha256":  "9d2f71312fcba7f997054739907363a7726d43f788e22e00262ffccadb39af1b"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/runtime/suite.stdout.jsonl",
+                      "bytes":  586494,
+                      "sha256":  "e897c4db67b044a22fcb6bb6009478b778560165074cf0ce9cf12cc341168d9b"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/runtime/suite-receipt.jsonl",
+                      "bytes":  4343,
+                      "sha256":  "bc0001cdde7f6d6bf9ee3de6b2d93d7539e63d0722c3daa28c235a6db54ac66c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/static-validation.json",
+                      "bytes":  793,
+                      "sha256":  "c71058998a10eb0c4bda358a0030cb21ba1d6afc74156d0f1de222fb3e5114b2"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-plan-eval-continuation-20261027/worklog-append.md",
+                      "bytes":  619,
+                      "sha256":  "3689dc0e0158ab83b69b4ee4c71721edfd574119c300e286837a6f6cbd3e31e2"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/accepted-registry-entry.md",
+                      "bytes":  3328,
+                      "sha256":  "207f4183e07b4ae79fed90f41f7cb7c37a8cddd6270573eaba3896a218468869"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/argv.json",
+                      "bytes":  9414,
+                      "sha256":  "39b27f883dca3a2f0a1d3303f51f49aa8cdb47c16842de91f2ee7b6845cfc5d7"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/binding.json",
+                      "bytes":  38670,
+                      "sha256":  "0130ae1f945bdb0db1aa6efb45a1420a6a0196ee293514ab359615f24dba8246"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/budget.json",
+                      "bytes":  491,
+                      "sha256":  "761e9514addda8785e6ab2778483edd037361c506831f6eb9c5a0096f0817c8d"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/environment.json",
+                      "bytes":  5536,
+                      "sha256":  "db39a720f3a81512e3616ee026d1a5a3cb264aa239735173c3e2a19e7bb6e480"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/inline-message.md",
+                      "bytes":  8194,
+                      "sha256":  "1bd9d3330a89527f27416db715c8f1217d76d637bc8ccc1e04c82693aa236eaa"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/launch-through-existing-suite.ts",
+                      "bytes":  7118,
+                      "sha256":  "258ae8a98ffcd71723a17805ea5c7683586dce4094c31eead1b06f4c0e5c32bc"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/opencode-inline.json",
+                      "bytes":  4855,
+                      "sha256":  "7824a05568350741454971b86ffb7f8af3fd445dc7acaf0abbad1f798d082279"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/openrouter-allowance.json",
+                      "bytes":  101,
+                      "sha256":  "ae44d78408d78ee955439e1880071c8d6e37d7261fa46240b6e8c1dbd5ae7f57"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/packet-seals.json",
+                      "bytes":  4704,
+                      "sha256":  "cfbd8935bf9984ce3b133a1d1af968b3967e24138fdb53d8b3d0dd179b142ab9"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/registry-prefix-original.bin",
+                      "bytes":  202336,
+                      "sha256":  "d502eafa19ffb9eab3078ca1a5ed4d3a8a7816f115f33f53f3379defdd6d0042"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/registry-prefix-proof.json",
+                      "bytes":  1262,
+                      "sha256":  "65091b85dc586d0e576687a996256d7340eaf8d622a2b91bc52c0930e90ae9b8"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/completion-observation.json",
+                      "bytes":  759,
+                      "sha256":  "f9a18996719f5e9d2a24efff0f3b467cea0831136c2b031d7c68e070e422b50a"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/completion-seals.json",
+                      "bytes":  5826,
+                      "sha256":  "ecaaf8c61ad548ae10af95586f7d632188385bd7dd2f62299a48d78e5f189127"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/effective-config.json",
+                      "bytes":  1570,
+                      "sha256":  "9e36a4080206d6fcd32eb5bbc5f50eac72d9de18f13c847e3eac71baf8329fdf"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/export-identity.json",
+                      "bytes":  347,
+                      "sha256":  "8dd98610f714845dc134cc463b53a7b0c7168f87933bf44d587d159b4520bc5a"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/native-export-1793137015299.json",
+                      "bytes":  2597862,
+                      "sha256":  "1a37830cd7bd59a8f9cfcdfa19f1a3f520d3b6ecc963ccc567eaa73dc0bc6ed6"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/native-export-1793137015299.json.stderr",
+                      "bytes":  50,
+                      "sha256":  "be0ea20f186c7bdb93ca5eff37dfca06bc4207b1b72743591e4860c918797114"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/native-final-original.md",
+                      "bytes":  230,
+                      "sha256":  "ad3f8d80f977592ea80a44d1502bf8309b71e2ddc5cd85b34f6017cf266efccb"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/observed-cohort-1.json",
+                      "bytes":  3918,
+                      "sha256":  "f8264654f7ac66c704f3414b7c45bf79beef2f953b8d048215a1be7191e10d02"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/postrun-cohort-absence.json",
+                      "bytes":  724,
+                      "sha256":  "1983921466edc56fd93fc24181d542e0a8221e7c495d900314b4e304cac406c2"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/root-bridge.exit.json",
+                      "bytes":  145,
+                      "sha256":  "d995fbb3efca74223e7e98d31d5a1b8e5b777422a8c74f151bad0a5e62bd1edb"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/root-bridge.identity.json",
+                      "bytes":  575,
+                      "sha256":  "6a9e37518ad78219827a1e85984fae303683c7dda24c2afc794546e711a01616"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/suite.stderr.log",
+                      "bytes":  9289,
+                      "sha256":  "3d29a67233cc130b7b7dcb7bac6f0298c9338a1544f882e6de971d859b046b85"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/suite.stdout.jsonl",
+                      "bytes":  45470,
+                      "sha256":  "c88cd8650c7e7e0b228ebef976a4f3f093b0f30ee1b5630626633b891302f257"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/suite-receipt.jsonl",
+                      "bytes":  934,
+                      "sha256":  "15e65dbeb67950e0395bf82d8a41d829c2ab6589325d0e5b177040699eed3047"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/runtime/verdict-original.md",
+                      "bytes":  6960,
+                      "sha256":  "849d68eca549e8bea01161ce33b3666e3ef77c9f69f983112d6e1a6a64cde9bf"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-f5-debt-review-20261027/static-validation.json",
+                      "bytes":  311,
+                      "sha256":  "61280db7c1a1092ee1b942aad724241467b1fee24f863243724facaa78f45093"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/argv.json",
+                      "bytes":  1455,
+                      "sha256":  "eeeb3156d1489df6ed311785cd0643a5824cd9625a5fe32967234e0c66101abd"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/bindings.json",
+                      "bytes":  44187,
+                      "sha256":  "e3ad60d1d0185cf9442ca86c5071734dc9220278f6da24f7439b581ca8eff948"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/budget.json",
+                      "bytes":  1469,
+                      "sha256":  "63206991c9df6dca9cd2d9fdb02716e9e0f7093f448009ce139cf60a1d5088a3"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/clarification-message.md",
+                      "bytes":  5722,
+                      "sha256":  "4af1e3d58891293e3603ea370f5861524b6cd109871c32f43ec9f6188533a3a8"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/cohort-observation.json",
+                      "bytes":  869,
+                      "sha256":  "4b5bc3d8df7658e3c30043d1e490aa8a4c963aeb7409ec66f532690d2b028198"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/environment.json",
+                      "bytes":  5560,
+                      "sha256":  "95cb97b298d95fbed16e730e63b354fb496119114750d440838ac7e24fdff502"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/01-authorized-shape.meta.txt",
+                      "bytes":  153,
+                      "sha256":  "e512070c62544de56119202fdca075cb506d6450864c883c4b091d33e0ec025c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/01-authorized-shape.stderr.txt",
+                      "bytes":  2788,
+                      "sha256":  "98a7171666a9b4ca51cd64bedfb67df7b8eae375ac7a416a797bf02ae97bf7e7"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/02-closure-iteration.stderr.txt",
+                      "bytes":  2788,
+                      "sha256":  "98a7171666a9b4ca51cd64bedfb67df7b8eae375ac7a416a797bf02ae97bf7e7"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/03-closure-iteration.stderr.txt",
+                      "bytes":  1678,
+                      "sha256":  "3cb427ea1ab5ad15fa3b0ec18bfe83f1e921d572d728508cd776681dfabb9507"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/04-closure-iteration.stderr.txt",
+                      "bytes":  1136,
+                      "sha256":  "c9cbddc753d7b6c08a84aa6a520e1a1aeb1a89fc283439e03240d779388e7e9e"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/05-closure-iteration.stderr.txt",
+                      "bytes":  2330,
+                      "sha256":  "493b696c7274e192507569936c6b503b5aa66352361d2877f62dfe17587b83fc"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/06-closure-iteration.stderr.txt",
+                      "bytes":  1051,
+                      "sha256":  "faab2d1821f099e9976672f4dc62f139d638c4011d63a92c732087f9a7a97361"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/07-closure-iteration.stderr.txt",
+                      "bytes":  15,
+                      "sha256":  "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/closure-report.json",
+                      "bytes":  5531,
+                      "sha256":  "d36d56fff7db76d906507cdbc55a3e804eb4768fc8aadb6c8e827fad8cb87101"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/held-mod.ts.txt",
+                      "bytes":  3636,
+                      "sha256":  "8b53d328b1c75e8593a0c670758fd170f94044598abaa2c7d9a78c9739d04e5a"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/held-seals.json",
+                      "bytes":  906,
+                      "sha256":  "d047e20e405745fcaa44570fa3b0b42dd30d2cd4107c1642ac5f10c7c6661871"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/held-service.ts.txt",
+                      "bytes":  3989,
+                      "sha256":  "ca6a196186692ce3f98ab646bee546054e795cd7f150bffe35560ca4470b421f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/held-workers-deno.json.txt",
+                      "bytes":  3053,
+                      "sha256":  "3dcfff5a1ff00c68c3bc95e4d4729bda0971a856990b546758e902901fdf8db1"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/inline-import-type-probe.doc-lint.log",
+                      "bytes":  6710,
+                      "sha256":  "0a71a176393af7d8f423ddcddd0e4caaa5f1ba8cc508df81d77ea21eaad91796"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/inline-import-type-probe.doc-lint.utf8.log",
+                      "bytes":  3355,
+                      "sha256":  "fcf1472d8f669d315987ae332e6ad8827c6161556e78c7278ce40d2c7a87f3d2"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/inline-import-type-probe.receipt.json",
+                      "bytes":  297,
+                      "sha256":  "dca81b4fa3c059de8e8ba99fe14f928b3d882928cbf4b4a5837137e87775f004"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/inline-import-type-probe.ts",
+                      "bytes":  794,
+                      "sha256":  "bff98e1f9b9a1680d0eba7752a14f81f4aa89e36d9553e9808fec6fdd7c02e93"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/original-plan.md",
+                      "bytes":  19844,
+                      "sha256":  "ae8af33716b86ea742c6d89b31345bfac97adf25bcfbc13f414fa557b1af3ac9"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/original-plan-eval.md",
+                      "bytes":  7915,
+                      "sha256":  "7ecfaef6f105f43b5532bdc34bb3e70ac1a043cfcd10d8b3ad0278f0042546a5"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/original-plan-review-addendum.md",
+                      "bytes":  3515,
+                      "sha256":  "293f39b8b11ab54882b673ed2a6e0904adcdee76da48f6a6aa54cc677da0f660"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/original-root-s2-public-types-clarification.md",
+                      "bytes":  1712,
+                      "sha256":  "bc4fefe81f694989a9ac3abb392cf860cbbdc48b1f09d429677cbf8f8b24dabf"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/owner-01-service-root.meta.txt",
+                      "bytes":  60,
+                      "sha256":  "fef0c0982600046326d9c722705a30e191cea49f9cd879972bcfcc47edde5664"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/owner-02-service-auth.meta.txt",
+                      "bytes":  69,
+                      "sha256":  "82c014e6dcc671fc94141978429126934b7fb02a1394ff48203c88d182c65b30"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/owner-03-plugin-sdk.meta.txt",
+                      "bytes":  67,
+                      "sha256":  "5eea998b3ce9ecadb7c0589632ac1a6df521df611c589e7685ae4b306f0c7035"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/owner-04-plugin-service.meta.txt",
+                      "bytes":  71,
+                      "sha256":  "20115fcb9e826413829b9c9404f777ddac6d050f2241bf50d4aa0110568c2a7b"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/owner-05-workers-legacy-services.meta.txt",
+                      "bytes":  73,
+                      "sha256":  "69fc3f08baacaa8e0a82f10420aaae14a16a4ca6cd8073b61b922a3ddca6f463"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/owner-06-workers-root.meta.txt",
+                      "bytes":  59,
+                      "sha256":  "0bfb66ff7bb47f041248699c28ccaf3b28c6be601020afdefcb535f5a268cc90"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/evidence/owner-plugin-service.stderr.txt",
+                      "bytes":  2968,
+                      "sha256":  "fcbb543182f579183204889535d82ebd8d405b0e3a1df59a6edc6253a6353a82"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/focused-source-brief.md",
+                      "bytes":  35144,
+                      "sha256":  "543fe4691038ad0b50270cce00afd66b36956eefd610442eb5b1ad5186785cee"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/opencode-inline.json",
+                      "bytes":  4865,
+                      "sha256":  "e65ecc7081909b0516d72fa8a2851747f1a0ca1d6cbcfb8b2cea8aa3c5c0f09c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/openrouter-allowance.json",
+                      "bytes":  107,
+                      "sha256":  "1aecdd451185bc6cca1089ef13789717182ed9c727ccaf6f20d667043848b5b7"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/packet-seals.json",
+                      "bytes":  16006,
+                      "sha256":  "ecdddd43c5fbdf6e9d0c10fad96a4501d88222ffda9ff54958ac80480c46ea1f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/root-bridge.md",
+                      "bytes":  2204,
+                      "sha256":  "50b3b568ac32312b2f146281d0b601a46ee6e201f3655935485b024ddceb887f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-clarification-20261027/static-validation.json",
+                      "bytes":  555,
+                      "sha256":  "67f106b730524d6d6e4d30985c2e5c3ab9b0d3e6f23509308f3ec201ca617d57"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-20261027/argv.json",
+                      "bytes":  9984,
+                      "sha256":  "43b9318c12e848f85a864f76838915c9509fccd85ad950d0b7d152f4d3bfea3f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-20261027/binding.json",
+                      "bytes":  25217,
+                      "sha256":  "159080d8b095a2c16573bde16ae5916d47c08c634866ea8ab7a4fb5f2ffcbd22"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-20261027/budget.json",
+                      "bytes":  950,
+                      "sha256":  "a220b1b06d081a6fd85bbe184b7f20333a8efe20f4e16412ecf382ff49bf37c9"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-20261027/environment.json",
+                      "bytes":  5557,
+                      "sha256":  "c703495ac20b12747d09b47c8d649641f7cde385cf1c248adc375b788ddf1472"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-20261027/inline-message.md",
+                      "bytes":  8651,
+                      "sha256":  "652d8cb3398b570cb4531b0aa9e64a94c649fdac9ee0b7cb36f375eae636f843"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-20261027/launch-through-existing-suite.ts",
+                      "bytes":  7002,
+                      "sha256":  "30669210badfd9cae6fca4a1528c2acd79adf59c6bd5081460f180611205803c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-20261027/openrouter-allowance.json",
+                      "bytes":  107,
+                      "sha256":  "742b7cdb9e3b386a0c6ab2660b8c9eb5404356110b53e0d94ac08506b16b3987"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-20261027/packet-seals.json",
+                      "bytes":  3262,
+                      "sha256":  "b9d44395db4a54e6666a5c3fb4705f1a49633ca8b4e8c7928c9f27c040ca7882"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-20261027/static-validation.json",
+                      "bytes":  753,
+                      "sha256":  "1c7cad93e530cae29c4a643821003219c6a417d569c09d58af0b720c86f7f271"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/argv.json",
+                      "bytes":  9986,
+                      "sha256":  "9b1b6e69b00b66ac436f156370d0faeda9e0cb732b8163d89980a39ac28c0f6f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/binding.json",
+                      "bytes":  29507,
+                      "sha256":  "73ac91c9fb4df93e65d86d8c01eca88679a89c9bd40b94d81c98ab5310f498f5"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/budget.json",
+                      "bytes":  981,
+                      "sha256":  "1284e1de6d3c7639d6e28d31e43044e310ef949ab88b3602fa92f45d3135d9ee"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/encoding-correction.json",
+                      "bytes":  1867,
+                      "sha256":  "4fef72bbaae7b8a406de847f1ade75639624c4e541cf7a0287e4ceb215b6c04a"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/environment.json",
+                      "bytes":  5562,
+                      "sha256":  "1542c1668f81c04130017ad859aca7c8f8489475c5244463940df4e6be8aae14"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/inline-message.md",
+                      "bytes":  8643,
+                      "sha256":  "0f05e6760602b5d3ee9604dbc8c66669f25de37a781ece702ebf1924d304b18f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/launch-through-existing-suite.ts",
+                      "bytes":  7007,
+                      "sha256":  "660f4029ce0f1706bfda2cdd40eb2ce92e691dc1f06da8ba8dc440c6d909a892"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/openrouter-allowance.json",
+                      "bytes":  107,
+                      "sha256":  "742b7cdb9e3b386a0c6ab2660b8c9eb5404356110b53e0d94ac08506b16b3987"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/packet-seals.json",
+                      "bytes":  3688,
+                      "sha256":  "1ade0f23a9b0d54103eb300d1858b9418ce9422654380745accdc808d8018ba1"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/completion-observation.json",
+                      "bytes":  778,
+                      "sha256":  "36ed03285e4197d5b5f7052659c27f51993d708ffb3bbefdfc6d30c56d86217f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/completion-seals.json",
+                      "bytes":  7582,
+                      "sha256":  "60b434b35603be60fce7badd8316a242b18d5df1201919be304c6da815e320c4"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/effective-config.json",
+                      "bytes":  1580,
+                      "sha256":  "72a2a0f5bac19b1b226cfe5d8ad8a15cd85160c88a514d3355ad0d85d90eb3b6"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/export-identity.json",
+                      "bytes":  360,
+                      "sha256":  "87728f7ecfda19545d5c5dfe37a7dc9870062f6c1b4840ca6a6596444577034d"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/native-export-1793136404537.json",
+                      "bytes":  2453885,
+                      "sha256":  "8bc3618d8ab06b1ae34a6601aa5f274ed9ebf041246886809fa51f6129d4fc2e"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/native-export-1793136404537.json.stderr",
+                      "bytes":  50,
+                      "sha256":  "be0ea20f186c7bdb93ca5eff37dfca06bc4207b1b72743591e4860c918797114"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/native-final-original.md",
+                      "bytes":  214,
+                      "sha256":  "146a2d220272ad0d8cef7cb4ca6d96b981fc20656e60c50c4b9bad10fb01fb1a"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/observed-cohort-1.json",
+                      "bytes":  2812,
+                      "sha256":  "911987bcb12bb8cbf04e66274100239494ecd78473c15ee694c587749318542a"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/postrun-cohort-absence.json",
+                      "bytes":  591,
+                      "sha256":  "43c39745195b7a01960d5ebfb3b3e633ba5e718ab30b5404c8fdcc325fc7b213"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/root-bridge.exit.json",
+                      "bytes":  145,
+                      "sha256":  "f954b5e97f091ba9db5961175a705861a6c438184f178311ec2a8eae16fe1200"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/root-bridge.identity.json",
+                      "bytes":  575,
+                      "sha256":  "39b1f6e22488ac5d7609294e947caa7e25d1ed92588c18ccd4d7e8a0a46d150b"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/suite.stderr.log",
+                      "bytes":  9778,
+                      "sha256":  "3520403740b8313d30a84add4bca7ca26469e64a03ec908a61ec4f37bbdf2eb0"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/suite.stdout.jsonl",
+                      "bytes":  110469,
+                      "sha256":  "a4c47a82bf47e5d9c8142da4dc4379a9f53efad583e356e4c649a460b4a52ef7"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/suite-receipt.jsonl",
+                      "bytes":  934,
+                      "sha256":  "21375c94056cc3e0244637c72d98bb7accc7f2a7fb89cc8ded93e7ed1e3e5fc6"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/runtime/verdict-original.md",
+                      "bytes":  8344,
+                      "sha256":  "9c249a787acf5c3a00c4c2ee3bf8993a90aa74649a4df9cf28125a0c18fe1bf9"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-completion-utf8-20261027/static-validation.json",
+                      "bytes":  257,
+                      "sha256":  "5efb32fb52d618e2b9a10b40d498d66aace25f42b54bdc920d0f4204a107dc48"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/argv.json",
+                      "bytes":  1576,
+                      "sha256":  "a2b53e40fe07868aa8c07cfbf6efd0858670aff88ceec02d10813a10e5e52c64"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/binding.json",
+                      "bytes":  18303,
+                      "sha256":  "0169ce6d96d2d3cd00076755c48bb9e5693fa30566abba51bd121df0567faa59"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/environment.json",
+                      "bytes":  5555,
+                      "sha256":  "cbb5a9d8c2faba16b60bc02eb647a2df4f7c119d9b52175696d12bcc6d3834c0"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/launch-through-existing-suite.ts",
+                      "bytes":  6866,
+                      "sha256":  "024a8bc1a2c4fd00e09d9c5abe391ae6fc431ebb2e546f9499052706ee88e731"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/openrouter-allowance.json",
+                      "bytes":  107,
+                      "sha256":  "bd9d125706db6992a4a0806251be5b388a8d9bb4e4bb479eec10645285a1e425"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/packet-seals.json",
+                      "bytes":  2854,
+                      "sha256":  "2938dd23f46943ff6999917e57030e7c8d7d8005e9f947f1c6e79738d04214e2"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/root-dispatch-addendum.md",
+                      "bytes":  1925,
+                      "sha256":  "e48086e24d17f2c423be0dd9f94e13e93856a850e30a9e6d696f70085e38d180"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/runtime/completion-observation.json",
+                      "bytes":  650,
+                      "sha256":  "dea55a11c2acb27b0071719a9a765e4fa0d9857e138774e5009f3854096748c8"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/runtime/effective-config.json",
+                      "bytes":  1580,
+                      "sha256":  "72a2a0f5bac19b1b226cfe5d8ad8a15cd85160c88a514d3355ad0d85d90eb3b6"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/runtime/export-identity.json",
+                      "bytes":  353,
+                      "sha256":  "eec78e5d4b659bfa48f5c714dfb8be14412f50941ba656f16fedff6dc325d925"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/runtime/incomplete-final-original.md",
+                      "bytes":  1219,
+                      "sha256":  "ebcec4c3a803d8137b68ad8c3013e9dfbff97c22796e4cb3201be7ccbe306b06"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/runtime/native-export-1793135980656.json",
+                      "bytes":  2082890,
+                      "sha256":  "c84216bb6eddabffdb63cee1b320e936e535c2e8f591da55e8399badfc6ebaa0"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/runtime/native-export-1793135980656.json.stderr",
+                      "bytes":  50,
+                      "sha256":  "be0ea20f186c7bdb93ca5eff37dfca06bc4207b1b72743591e4860c918797114"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/runtime/observed-cohort-1.json",
+                      "bytes":  2104,
+                      "sha256":  "6f1a5ea79d6228af36fe16ec6318425423d52c57fec656592961ce4f8e4c9a49"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/runtime/postrun-cohort-absence.json",
+                      "bytes":  528,
+                      "sha256":  "6c8456ff8b3ed3fe85c004f871efd89f8f251cdd1dec4645b899015bd23d663c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/runtime/root-bridge.exit.json",
+                      "bytes":  145,
+                      "sha256":  "108a76823c564378ac2ef24adbe53c183b2774ccf7cb0c63bdc3eeb13034534e"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/runtime/root-bridge.identity.json",
+                      "bytes":  575,
+                      "sha256":  "5e29b6a89d42a0951b2955406524b66257ee97ca6666c34ddf89534a9a248cc3"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/runtime/suite.stderr.log",
+                      "bytes":  1536,
+                      "sha256":  "332caa2fa4c21dbf1338e0bc2a49a183f0c4df1c5b4436c9395318581ce43231"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/runtime/suite.stdout.jsonl",
+                      "bytes":  62436,
+                      "sha256":  "065dcb14d38876ca21d8a864bce35ce125719cd78eb57cd4cc89a08f016b5788"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/runtime/suite-receipt.jsonl",
+                      "bytes":  1532,
+                      "sha256":  "7d2ef8ddbf1871fba3e2d52656390f263870a342a55328e135dae06f52245b83"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-preflight/grok-u1-type-closure-dispatch-20261027/static-validation.json",
+                      "bytes":  671,
+                      "sha256":  "59164a95ce04ea7b19dc8be2cae8986680fa23fbf2fd71bd4297681d6bce56cf"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/review/s2-held-candidate/mod.ts.txt",
+                      "bytes":  3636,
+                      "sha256":  "8b53d328b1c75e8593a0c670758fd170f94044598abaa2c7d9a78c9739d04e5a"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/review/s2-held-candidate/seals.json",
+                      "bytes":  906,
+                      "sha256":  "d047e20e405745fcaa44570fa3b0b42dd30d2cd4107c1642ac5f10c7c6661871"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/review/s2-held-candidate/service.ts.txt",
+                      "bytes":  3989,
+                      "sha256":  "ca6a196186692ce3f98ab646bee546054e795cd7f150bffe35560ca4470b421f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/review/s2-held-candidate/workers-deno.json.txt",
+                      "bytes":  3053,
+                      "sha256":  "3dcfff5a1ff00c68c3bc95e4d4729bda0971a856990b546758e902901fdf8db1"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-finalization/coordinator-qualification.json",
+                      "bytes":  2256,
+                      "sha256":  "c479c3201ecc9bbd328f34a3df5ca67b7327b2474e8797d0d4339724eaed4001"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-finalization/exit.json",
+                      "bytes":  408,
+                      "sha256":  "fd0c73661b39d5bad79143e49c9b1ed5ee03427edecd898657a366644ce83d3b"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-finalization/identity.json",
+                      "bytes":  7062,
+                      "sha256":  "a5c3c781144785715800f90d2ff46eb497635b85a3fea7501f0d96fcbd9b3c9a"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-finalization/native.stdout.jsonl",
+                      "bytes":  108566,
+                      "sha256":  "5be94533c7841b1a853934b0a84b35f51f9275b4b1d9abc5a756287cf0f81c96"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-finalization/native-final-original.md",
+                      "bytes":  3054,
+                      "sha256":  "b6585f5c79a98d1447c0544d6f141fd939d88962ce845fe179f26243f58f82ed"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-finalization/observed-cohort-1.json",
+                      "bytes":  2177,
+                      "sha256":  "af320aa9845104d92db41fc9008d1cea2e4f08fa774aadc98c6037004521c7b1"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-finalization/postrun-cohort-absence.json",
+                      "bytes":  457,
+                      "sha256":  "0a605dbd3f1e4f958804a82109f09bd246d6ce58541292615986f6966fd82318"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-finalization/qualified-init.json",
+                      "bytes":  3522,
+                      "sha256":  "982ad6a4ee9387bb5dc9e0f143fd36ac709f5d2fe8f0175b161ea9c37a8ea411"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-finalization/source-and-gate-seals.json",
+                      "bytes":  14656,
+                      "sha256":  "7966f5e11b34946f02a4d62067b090dceff982f65d005c2ea7dcdf65cbe31a5f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-surface-correction/exit.json",
+                      "bytes":  408,
+                      "sha256":  "c444fba03a6a61921fbd10c15846e2453e537966f7ea2fbe1fc16631e37a662c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-surface-correction/identity.json",
+                      "bytes":  5651,
+                      "sha256":  "e2103521331becd95e2fcfef90faa373b13872a6adb211f14b5438457df7d563"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-surface-correction/native.stdout.jsonl",
+                      "bytes":  303917,
+                      "sha256":  "0c34b1174bac468b49496b65d296579406efb94f73355cb1c9aacb240ce2fb01"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-surface-correction/observed-cohort-1.json",
+                      "bytes":  1539,
+                      "sha256":  "ae61bcbdd3e6853897ff139f5074a67fed7b6ba59759f047098fde9b889e4efc"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-surface-correction/qualified-init.json",
+                      "bytes":  3522,
+                      "sha256":  "2a8cd9ba985c74cb8937380cadb2de045b0972d07d4fa1b165cd529d75a88e76"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-workers/exit.json",
+                      "bytes":  407,
+                      "sha256":  "defeda88e5bf46b9e409ebf2cffb8a0afb528d607ebf249aeba9819c85445450"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-workers/identity.json",
+                      "bytes":  5838,
+                      "sha256":  "fb5c1f6ad2b2a7e3d9f9e4a7f16cb6e365ccf50a4b4a90b2663a393e0c4ba19c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-workers/native.stdout.jsonl",
+                      "bytes":  582703,
+                      "sha256":  "0a0a81ed9279a23e8d659b9f8f7ca5f614cd9a92a3d124ee4d02c9b828f4ad38"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-workers/observed-absence.json",
+                      "bytes":  358,
+                      "sha256":  "66e96dec6617e97a5459b9573a6a069b153a6c75ac69ab238fad5491592a6c5c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-workers/observed-cohort-1.json",
+                      "bytes":  1537,
+                      "sha256":  "ac5d95c02fbe01561ea1cff611a51c07b2516e9bd92e3562000851337164850c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-workers/pre-source-guards.json",
+                      "bytes":  3363,
+                      "sha256":  "8c415c593e70021722fe7d0db5f405e6d1699f874ca15d8e1916c073627f7ecd"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s2-workers/qualified-init.json",
+                      "bytes":  3522,
+                      "sha256":  "c56bc0a7b4258fe2d95d0e1d7dce61aae1fda7a21da24536c43ba48a16a69e92"
+                  }
+              ]
+}

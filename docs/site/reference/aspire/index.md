@@ -327,3 +327,40 @@ mutations) adds it to an existing AppHost that lacks it, keeping project-owned e
 Aspire's PostgreSQL integration also attaches its own `<name>_check` (an Npgsql `SELECT 1`), whose
 description is the driver's raw message. `<name>_auth` is the classified, credential-free signal to
 build on. MySQL and SQL Server have listener readiness only.
+
+## Aspire 13.5.3 CLI polling and server memory
+
+Periodic Aspire CLI snapshots can grow a long-running AppHost server's heap. In the pinned
+13.5.3 implementation, [`ResourceNotificationService.WatchAsync`](https://github.com/microsoft/aspire/blob/v13.5.3/src/Aspire.Hosting/ApplicationModel/ResourceNotificationService.cs)
+subscribes an unbounded resource-event channel, then yields initial snapshots **before** entering
+its cleanup `try/finally`. A dashboard health wait that matches an initial snapshot disposes the
+iterator before that cleanup is active. The handler remains subscribed and retains later events.
+Short-lived `ps`, `describe`, and healthy-resource `wait` connections were observed to leave about
+two subscriptions each.
+
+The [NetScript investigation](https://github.com/rickylabs/netscript/issues/2401) reports a
+16-resource TypeScript AppHost reaching **14.3 GB RSS after 45.6 hours** when `ps` and `describe`
+ran once per minute. Growth at the end was 0.67 GB/hour versus a 0.31 GB/hour average; these are
+measurements from that investigation, not a NetScript benchmark or a fresh measurement of this
+mitigation. Both subscriber count and retained events grow over time, producing approximately
+quadratic accumulation. This leak is in the AppHost server, rather than the dashboard UI process.
+
+NetScript's database compatibility watcher uses one owned
+`aspire describe <resource> --follow --format Json` stream for the operation instead of repeatedly
+launching snapshot commands. It consumes the initial snapshot before starting the executable,
+then requires a fresh nonterminal transition before accepting a terminal state and exit code.
+The operation deadline and cancellation close and reap the follower. It fails on a broken stream
+instead of reconnecting or falling back to polling. One-shot discovery, diagnostic commands, and
+bounded readiness waits can still make CLI connections; the mitigation bounds command growth and
+does **not** repair the upstream leak.
+
+Generated health probes check their HTTP or protocol listener directly; they do not invoke the
+Aspire CLI on each health interval. For an external long-running supervisor, keep one follow stream
+per AppHost process, consume its NDJSON updates, and dispose it when that process exits. Resolve
+process identity once when attaching instead of adding periodic `aspire ps` calls. Restarting the
+AppHost server releases its leaked subscriptions; stopping only the dashboard does not address the
+retained server heap.
+
+No matching upstream issue was located in the 2026-10-31 search. The verified source above is the
+upstream cause; a [ready-to-file report](https://github.com/rickylabs/netscript/blob/881e8dda6aba17f58d35d8d975da9d475cbc6eea/.llm/runs/orch-divybot-6541778987--2401/upstream-report.md)
+is retained for the owner to submit. NetScript 0.0.9 keeps Aspire 13.5.3 pinned.

@@ -2963,6 +2963,90 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   diagnostics are preserved, with only status and signal observations in the fixture; the runtime
   now retains the Response. No fixture-only Response retention remains.
 
+
+## plugins/workers/services/mod.ts - F-5 native identity closure (23 symbols)
+
+- **ID:** `WORKERS-SERVICE-NATIVE-TYPE-CLOSURE-F5-U1-20261027`
+- **Reason:** The approved workers factory signature requires an exact 23-name public doc-lint
+  closure: 2 own symbols plus 21 existing native type-only identity re-exports. This exceeds the
+  F-5 numeric limit of 20 on this one `mod.ts`. All 23 still count; this is no type-only discount.
+  The original 7-name shape produced 5 real recursive `private-type-ref` errors; the
+  original 22-name experiment passed doc-lint before #2492.
+  Main #2492 added `code?: ProcedureErrorCode` to `AuthzDecision`, requiring the native
+  `ProcedureErrorCode` identity export and the exact 23-name closure. The coordinator-authorized
+  native explicit union removes its runtime-constant dependency without changing its type.
+  The numerical F-5 violation remains `DEBT_ACCEPTED`, not
+  `PASS`; doc-lint itself and all other F-5 clauses must pass independently.
+- **Exact scope:** Only `plugins/workers/services/mod.ts`. Own: `startWorkersService`,
+  `WorkersServiceOptions`. From `@netscript/plugin/sdk`: `PluginServiceContext`. From
+  `@netscript/service`: `CorsOptions`, `RunningService`, `RunningServiceAddress`, `ServeOptions`,
+  `ServiceApp`, `ServiceEnvironment`, `ServiceTlsOptions`. From `@netscript/service/auth`:
+  `AuthenticatorPort`, `AuthnOptions`, `AuthnRequest`, `AuthnResult`, `AuthorizerPort`,
+  `AuthzDecision`, `AuthzOptions`, `AuthzRequest`, `Principal`, `ProcedureErrorCode`,
+  `ServiceAuthPolicy`, `ServiceGuardedAuthPolicy`, `ServicePublicAuthPolicy`.
+- **Why deferred:** A compatible native doc-lint/public-signature solution needs separate review;
+  a doctrine amendment must also update fitness rules explicitly. This bounded migration does
+  neither implicitly. No doc-lint waiver, extra API, type alias, structural interface, cast,
+  suppression, runtime/policy behavior, dependency or lock change is covered.
+- **Owner:** NetScript native-host policy migration coordinator with repository maintainer
+  `rickylabs`.
+- **Target:** 2026-11-10. No automatic extension; no growth beyond the exact named 23 while open.
+- **Linked plan:** `.llm/runs/fix-native-host-policy--u1/plan.md` and
+  `.llm/runs/fix-native-host-policy--u1/plan-review-addendum.md`.
+- **Linked independent finding:** `.llm/runs/fix-native-host-policy--u1/plan-type-closure-eval.md`
+  (`FAIL_PLAN`, SHA256 `9c249a787acf5c3a00c4c2ee3bf8993a90aa74649a4df9cf28125a0c18fe1bf9`).
+- **Owner disposition:** `.llm/runs/fix-native-host-policy--u1/root-f5-debt-disposition.md`.
+- **Created:** 2026-10-27.
+- **Status:** open, `DEBT_ACCEPTED` by milestone coordinator; amended bounds require independent
+  re-review recorded in `.llm/runs/fix-native-host-policy--2396/native-source-debt-eval.md`.
+  This accepts numeric debt only, not documentation, source, runtime or release acceptance.
+- **Amended disposition:** Coordinator [#2474 disposition](https://github.com/rickylabs/netscript/issues/2474#issuecomment-6541660112) authorizes
+  exactly one additional native type, `ProcedureErrorCode`, with no further growth.
+- **Closing gate:** Land a reviewed compatible native doc-lint/public-signature solution that
+  meets the numeric F-5 cap, OR a separately reviewed explicit doctrine amendment with matching
+  fitness updates; prove public type identity, exact exported inventory, doc-lint zero and all
+  retained lifecycle/security gates, then close this entry with evidence. Existing violations or
+  future registry entries are not accepted by analogy.
+- **Excluded:** Streams closure is not judged or covered; it has no `PluginServiceContext`
+  parameter and must derive its own minimal closure. No U2/U3/E1, security, release or production
+  E2E acceptance is implied. Function-level `@example` and every other documentation obligation
+  remain unwaived.
+
+## plugins/streams/services/mod.ts - F-5 native identity closure (22 symbols)
+
+- **ID:** `STREAMS-SERVICE-NATIVE-TYPE-CLOSURE-F5-U1-20261028`
+- **Owner:** Native-host migration coordinator and repository maintainer `rickylabs`.
+- **Target:** 2026-11-10. No automatic extension or growth beyond these exact 22 names.
+- **Status:** Open, `DEBT_ACCEPTED`, after same original independent PLAN evaluator process PASS
+  and root acceptance. Numeric 22 exceeds 20; this is not numeric F-5 PASS or a type-only discount.
+- **Reason:** The approved streams signature needs this native public doc-lint closure.
+  The original six-name and 20-name probes failed; the 21-name probe passed before #2492. Main #2492 added
+  `code?: ProcedureErrorCode` to `AuthzDecision`, requiring the native `ProcedureErrorCode`
+  identity export and the exact 22-name closure. The coordinator-authorized native explicit
+  union removes its runtime-constant dependency without changing its type. Production doc-lint
+  and every other F-5 clause still require their own evidence.
+- **Exact scope:** `plugins/streams/services/mod.ts`. Own `startStreamsService`,
+  `StreamsServiceOptions`; service types `CorsOptions`, `RunningService`, `RunningServiceAddress`,
+  `ServeOptions`, `ServiceApp`, `ServiceEnvironment`, `ServiceTlsOptions`; auth types
+  `AuthenticatorPort`, `AuthnOptions`, `AuthnRequest`, `AuthnResult`, `AuthorizerPort`,
+  `AuthzDecision`, `AuthzOptions`, `AuthzRequest`, `Principal`, `ProcedureErrorCode`,
+  `ServiceAuthPolicy`, `ServiceGuardedAuthPolicy`, `ServicePublicAuthPolicy`. Twenty native names are direct
+  type-only identity re-exports, with no aliases, structural substitutes or wildcard.
+- **Linked plan:** `.llm/runs/fix-native-host-policy--u1/plan.md`, `plan-review-addendum.md`,
+  `s5-streams-factory-proposal.md` and `plan-streams-f5-debt-eval.md` in that run.
+- **Independent finding:** Same original Grok session `ses_e8149b729ffeT3e3Xjhrqyql5U`, verdict
+  SHA256 `8f9907d5c4b0864467bb295dbca5c8534995721779f2411b2bafbc974a61f508`.
+- **Amended disposition:** Coordinator [#2474 disposition](https://github.com/rickylabs/netscript/issues/2474#issuecomment-6541660112) authorizes
+  exactly one additional native type, `ProcedureErrorCode`, with no further growth. Independent
+  re-review: `.llm/runs/fix-native-host-policy--2396/native-source-debt-eval.md`.
+- **Closing gate:** Separately reviewed compatible native public-signature/doc-lint solution
+  meeting cap20 OR explicit doctrine amendment with matching fitness changes; exact public type
+  identity/inventory, doc-lint zero and retained lifecycle/security gates before closure.
+- **Excluded:** Workers debt, legacy streams main until separately reviewed S6, U2/U3/E1,
+  security/release/production E2E. No dependency/lock change, extra API, type erasure, cast,
+  suppression, checker override or acceptance by analogy. Function-level `@example` and every
+  other documentation obligation remain unwaived.
+
 ## Fresh/workers reader headers — native public type closure
 
 - **ID:** `U3-NATIVE-READER-HEADER-TYPE-CLOSURE`
@@ -3033,6 +3117,42 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   remove these directory-cardinality advisories from `deno task arch:check` without adding scan
   exclusions.
 
+## Host policy plugin publish graph — post-publish consumer gate (#2396)
+
+- **ID:** `HOST-POLICY-PUBLISHED-GRAPH-2396`.
+- **Reason:** The additive workers/streams `./service` exports change plugin publish shape.
+  A local graph and publication dry-run cannot prove a JSR consumer before that version exists.
+- **Owner:** 0.0.9 release coordinator, tracked by #2474, with repository maintainer rickylabs.
+- **Target:** First exact 0.0.9 canary containing #2396, necessarily before stable publication.
+- **Status:** Open, `DEBT_ACCEPTED` by independent implementation round1 at
+  `6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e` under `.llm/harness/gates/release-gates.md`.
+  No production consumer PASS is claimed.
+- **Cost:** One release-owned published CLI/plugin runtime run plus exact public factory imports;
+  stable readiness remains blocked until that real graph passes.
+- **Scope:** Post-publish graph proof only. No waiver for pre-merge check/tests, native policy,
+  publication dry-run, source/runtime CI, type identity or existing facade debt limits.
+- **Closing gate:** Publish the exact canary through the release workflow, prove both singular
+  factory imports and consumer types against that package graph, and pass `e2e-cli-prod` for the
+  same exact canary. Record the run/version evidence before stable. No implicit renewal.
+
+## Workers package metadata cardinality — required changelog (#2396)
+
+- **ID:** `WORKERS-HOST-METADATA-CARDINALITY-2396`.
+- **Reason:** Exact main has 19 immediate workers package-root entries under the generic audit;
+  the required export/migration `CHANGELOG.md` makes 20. Other workers source cardinality findings are inherited from main
+  and outside this metadata-only scope. New service source/test grouping meets cap 12 in both plugins.
+- **Exact scope:** `plugins/workers/` package-root metadata only, bounded at 20 entries. No new
+  runtime folder, public symbol, scan exclusion, file-size or native facade exception.
+- **Why deferred:** Consolidating the existing public CLI/runtime/resource roots requires a
+  separate package layout/export migration. Removing release notes would drop a documentation
+  obligation; unrelated source moves are outside this startup policy change.
+- **Owner:** Workers package maintainers with the 0.0.9 coordinator, #2474.
+- **Target:** Package layout review before 0.0.9 stable, no later than 2026-11-10. No renewal or growth.
+- **Status:** Open, `DEBT_ACCEPTED` by independent implementation round1 at
+  `6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e`; see the issue2396 run evaluate-round-1.md.
+- **Cost:** One additional metadata entry and its advisory; no runtime or type-system cost.
+- **Closing gate:** Consolidate the workers package-root layout to cap 12 while preserving every
+  public export and release note; pass publication dry-run and all native consumer tests.
 ## packages/queue/adapters — F-16 private Redis lease modules (redis-lease-cardinality)
 
 - **Reason:** The existing adapters directory already exceeded the advisory cap (15 direct

@@ -1,0 +1,43 @@
+{
+  "reports": [
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6e-astra-20261028/gates/execution.json",
+      "sha256": "59d4579fba288e1e9df5bf406e7a3be985ff3108a6284ba5a7a6042c509c09da"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6e-astra-20261028/gates/tests.report.json",
+      "sha256": "5ab05205a908516566f938acf172b88e1669d38570567c6fc26af6552c2570ef"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6e-astra-20261028/gates/types.report.json",
+      "sha256": "84396d625a83b5972a179167df0df14fa7df9d59be3d83c72e8874c3afaaf6d2"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6e-astra-20261028/gates/lint.report.json",
+      "sha256": "8065bfc38b9f8aa3655c26fb5f5a210207c0a2cdaa22c336fa935d4dec12827f"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6e-astra-20261028/gates/fmt.report.json",
+      "sha256": "cab1a7fedb4d8771a7b8cb8e4de93cf7807809c729f03195ee223772d9565aaf"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6e-astra-20261028/gates/quality-new.stdout.log",
+      "sha256": "47b1cf10b95c8183df4bf1318e0049cf63fbc332c9e3459c6fd14d9ee842eed2"
+    }
+  ],
+  "owner": {
+    "path": "plugins/streams/services/src/service-lifecycle_test.ts",
+    "bytes": 14793,
+    "lines": 357,
+    "cap": 430,
+    "sha256": "4833545d1551d8634624cfba8b04fef84699d1fcff59957ec7afae6cc6df5e7d"
+  },
+  "prefix": {
+    "path": "plugins/streams/services/src/service-lifecycle_test.ts",
+    "bytes": 6584,
+    "lines": 165,
+    "sha256": "769b9a73f46c8b3a24dc4e0c2f44b27a6e9c40bd5b2b31186445c0205d5634b8",
+    "actual": "769b9a73f46c8b3a24dc4e0c2f44b27a6e9c40bd5b2b31186445c0205d5634b8"
+  },
+  "sourceProofSha256": "139a09f3d56e8127fd98502142453746b5e7373bb5ac1525f309b716c850ce3d"
+}

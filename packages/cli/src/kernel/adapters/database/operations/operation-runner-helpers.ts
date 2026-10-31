@@ -1,4 +1,5 @@
 import type { DbOperationRequest } from '../../../domain/db-engine.ts';
+import type { AspireCommandExecutor } from './aspire-command-executor.ts';
 
 interface AspireResourceStatus {
   readonly displayName?: string;
@@ -20,6 +21,83 @@ export const TERMINAL_RESOURCE_STATES: ReadonlySet<string> = new Set([
   'Finished',
   'Stopped',
 ]);
+
+interface ExecutableWatchOptions {
+  readonly resourceName: string;
+  readonly apphostPath: string;
+  readonly cwd: string;
+  readonly timeoutMs: number;
+  readonly signal: AbortSignal;
+  readonly start: (signal: AbortSignal) => Promise<void>;
+}
+
+/** Establish the baseline before start, then observe only the new executable lifecycle. */
+export async function watchExecutableCompletion(
+  executor: AspireCommandExecutor,
+  options: ExecutableWatchOptions,
+): Promise<number> {
+  const { resourceName, apphostPath } = options;
+  const deadline = new AbortController();
+  const timer = setTimeout(() =>
+    deadline.abort(
+      new Error(`Timed out waiting for Aspire resource ${resourceName} to complete.`),
+    ), options.timeoutMs);
+  const signal = AbortSignal.any([options.signal, deadline.signal]);
+  const stream = executor.stream(
+    [
+      'describe',
+      resourceName,
+      '--follow',
+      '--format',
+      'Json',
+      '--apphost',
+      apphostPath,
+      '--non-interactive',
+      '--nologo',
+    ],
+    { cwd: options.cwd, signal },
+  );
+  try {
+    // A previous invocation may have left a terminal snapshot. Never accept it as this run's exit.
+    let baseline = false;
+    while (!baseline) {
+      const initial = await stream.next();
+      if (initial.done) {
+        throw new Error(`Aspire stream ended before ${resourceName} initial snapshot.`);
+      }
+      baseline = findExecutableStatus(initial.value, apphostPath, resourceName) !== null;
+    }
+    signal.throwIfAborted();
+    await options.start(signal);
+    let started = false;
+    for await (const line of stream) {
+      signal.throwIfAborted();
+      const resource = findExecutableStatus(line, apphostPath, resourceName);
+      if (!resource?.state) continue;
+      if (!TERMINAL_RESOURCE_STATES.has(resource.state)) {
+        started = true;
+        continue;
+      }
+      if (!started) continue;
+      if (
+        typeof resource.exitCode === 'number' && Number.isInteger(resource.exitCode) &&
+        resource.exitCode >= 0
+      ) {
+        return resource.exitCode;
+      }
+      throw new Error(
+        `Aspire resource ${resourceName} reached ${resource.state} without an exit code.`,
+      );
+    }
+    throw new Error(`Aspire stream ended before ${resourceName} completed.`);
+  } catch (error) {
+    signal.throwIfAborted();
+    throw error;
+  } finally {
+    clearTimeout(timer);
+    await stream.return();
+  }
+}
 
 const DB_CLI_ASPIRE_START_TIMEOUT_SECONDS = 300;
 const ASPIRE_CLI_START_TIMEOUT_ENV = 'ASPIRE_CLI_START_TIMEOUT';
@@ -131,6 +209,7 @@ function parseAspireResourceStatuses(
 
   const parsed = JSON.parse(statusJson) as unknown;
   if (!Array.isArray(parsed)) {
+    if (isResourceStatus(parsed)) return [parsed];
     if (isObjectWithResources(parsed)) {
       return [...parsed.resources];
     }
