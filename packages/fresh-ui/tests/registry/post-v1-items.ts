@@ -30,6 +30,7 @@ export const POST_V1_SUPPORT: readonly string[] = ['calendar-date', 'menu-items'
 
 /** Existing copies missing only their actual package runtime dependency. */
 export const LEGACY_RUNTIME_DEPENDENCY_REPAIRS = [
+  'alert',
   'command-palette',
   'code-block',
   'pagination',
@@ -41,6 +42,7 @@ export const FRESH_UI_RUNTIME_DEPENDENCY: string =
 
 /** Updated baseline copies also receive real consumer install/type-check coverage. */
 export const AUDITED_BASELINE_COMPONENTS: readonly string[] = [
+  'alert',
   'code-block',
   'label',
   'card',

@@ -1,3 +1,4 @@
+import { Alerts } from './gap-alert-fixture.tsx';
 import { DocsPrimitives } from './gap-docs-primitives-fixture.tsx';
 import { CodeBlocks } from './gap-code-block-fixture.tsx';
 import { DisplayMotion } from './gap-display-motion-fixture.tsx';
@@ -63,6 +64,7 @@ function Actions() {
       <DisplayMotion />
       <CodeBlocks />
       <DocsPrimitives />
+      <Alerts />
     </main>
   );
 }
