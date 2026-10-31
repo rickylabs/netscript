@@ -544,3 +544,8 @@ Final2a package/browser gates are terminal:608PASS/0FAIL/0ignored (full package 
 Final evaluation plan clarification: doctrine06/10 assigns Fresh UI primaryArchetype4 (Keep), with the small-contract concern folded into it and frontend/docs overlays. The earlier presentation/runtime phrase described tested UI behavior, not a separate package archetype. No scope/API/gate reduction or new builder/CLI command. Final evaluator receives the exact doctrine assignment and complete skill/protocol context.
 
 Phase2a mandatory same-session independent IMPL-EVAL PASS at4c4f41e52e9bf35d943dc85e06ac323842940993, report evaluate-phase2a.md. Confirms21new/104contracts/87shipped, allslice corrections,608pkg/302browser gates and unchanged documentation debt2531 validly recorded/accepted. PASS is SOURCE/EVIDENCE only: runtime remainsUNPROVEN and exact-head requiredCI pending, so no READY/merge claim. Evaluator says greenDocker-capable runtime evidence or recordedownerwaiver is required beforeREADY. Proceed with hostedCI using existingworkflow while full2bsource review unit continues independently; never treat draftskips asgreen. Original fullgoal remainsactive; no finalreporthandoff yet.
+
+
+## Recovery5 — latestmain reconciliation
+
+Rebased parent2488 onto d54879b8. Sole debt-log conflict resolved by retaining both CLI install and Fresh UI2531 entries. All612 package/browser files byte-identical to predecessor31cc758. Independent integration review PASS; full package tests PASS, four carrier checks PASS and quality/architecture PASS. Old608/302 and hosted runtime remain predecessor evidence; no new-head READY claim. Restack2538 next.
