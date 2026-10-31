@@ -19,3 +19,4 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 05:25 | `4060d1e61` | #2479 | #2187 | W1 (A1) | READY 00:05 missed by watcher gap; rebased by leaf; MERGE at 15fa0c6 |
 | 2026-10-31 05:42 | `67d4704b4` | #2496 | #2351 | W3 (A2) | A2 complete |
 | 2026-10-31 05:58 | `3d83caf1c` | #2498 | #2115 | W3 (D1) | package-only; resumed after orphan |
+| 2026-10-31 06:13 | `c6bce8f86` | #2497 | #2161 | W2 (A3) | relaunched after orphaned claim |

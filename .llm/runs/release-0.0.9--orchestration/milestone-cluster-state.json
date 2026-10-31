@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "3d83caf1ca50695a0064529113ea00eab52426dd",
+  "currentMainSha": "c6bce8f86f5f9e0bf61d1b5bdb228b153de37d59",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009d",
     "trackingIssue": 2474
@@ -187,7 +187,10 @@
     },
     {
       "number": 2161,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/pull/2497"
+      ]
     },
     {
       "number": 2162,
@@ -688,7 +691,7 @@
     {
       "id": "A3-2161",
       "lane": "fixes",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2497,
       "headSha": "e768c1f302342943eae6a21f90376d638bcf0e14",
@@ -697,7 +700,10 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2161",
       "receiptRefs": [],
-      "note": "READY e768c1f; e2e armed"
+      "note": "READY e768c1f; e2e armed",
+      "mergeCommit": "c6bce8f86f5f9e0bf61d1b5bdb228b153de37d59",
+      "mergedAt": "2026-10-31T06:13:55Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2161"
     },
     {
       "id": "D1-2115",
@@ -719,16 +725,16 @@
     {
       "id": "B1-2159",
       "lane": "fixes",
-      "phase": "ready",
+      "phase": "gating",
       "baseBranch": "main",
       "prNumber": 2499,
-      "headSha": "155051c5c1dce7f51a4cd583e919f3872a615ed6",
+      "headSha": "da931b73bcb2d7e46d6d91a37b5208fabd4f938e",
       "issueNumbers": [
         2159
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2159",
       "receiptRefs": [],
-      "note": "READY 155051c (slice 1; slice 2 split pending Eric); Opus MERGE; e2e queued after #2497"
+      "note": "READY 155051c; e2e armed"
     },
     {
       "id": "D1-2259",
@@ -858,10 +864,20 @@
     },
     {
       "id": "e2e-cli/scaffold.runtime",
-      "state": "running",
+      "state": "complete",
       "prNumber": 2497,
       "headSha": "e768c1f302342943eae6a21f90376d638bcf0e14",
       "startedAt": "2026-10-31T05:59:30.000Z",
+      "via": "label e2e-cli-gate",
+      "result": "SUCCESS both tiers",
+      "completedAt": "2026-10-31T06:13:46Z"
+    },
+    {
+      "id": "e2e-cli/scaffold.runtime",
+      "state": "running",
+      "prNumber": 2499,
+      "headSha": "da931b73bcb2d7e46d6d91a37b5208fabd4f938e",
+      "startedAt": "2026-10-31T06:14:15.000Z",
       "via": "label e2e-cli-gate"
     }
   ],
@@ -893,11 +909,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T05:58:59.000Z",
-    "nextReportDueAt": "2026-10-31T06:58:59.000Z",
+    "lastReportAt": "2026-10-31T06:14:15.000Z",
+    "nextReportDueAt": "2026-10-31T07:14:15.000Z",
     "lastReportRef": "worklog.md",
     "headline": "A1, A2 complete; canary .1 remaining: #2400 (e2e), #2161 (building), #2421 (final #2396 PR).",
-    "currentMainSha": "3d83caf1ca50695a0064529113ea00eab52426dd",
+    "currentMainSha": "c6bce8f86f5f9e0bf61d1b5bdb228b153de37d59",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -955,6 +971,7 @@
         2489,
         2492,
         2496,
+        2497,
         2498
       ],
       "closedIssues": [
@@ -964,6 +981,7 @@
         2115,
         2144,
         2151,
+        2161,
         2165,
         2187,
         2290,
@@ -981,9 +999,9 @@
       "queueDeltaExplanation": "Initial cluster bootstrap at Step 0."
     },
     "scope": {
-      "openIssueCount": 38,
-      "ownedIssueCount": 38,
-      "scheduledIssueCount": 38,
+      "openIssueCount": 37,
+      "ownedIssueCount": 37,
+      "scheduledIssueCount": 37,
       "unscheduledIssueNumbers": [],
       "openPullRequestCount": 8
     },
@@ -997,20 +1015,12 @@
         "nextAction": "READY at a4dc705 (source MERGE); landing order #2422 -> #2423 -> #2421; e2e pending"
       },
       {
-        "prNumber": 2482,
-        "lane": "internals",
-        "headSha": "6597b6452b22c72277509189b61ab78fba507648",
+        "prNumber": 2499,
+        "lane": "fixes",
+        "headSha": "da931b73bcb2d7e46d6d91a37b5208fabd4f938e",
         "state": "gating",
         "nextGate": "e2e-cli scaffold.runtime",
-        "nextAction": "READY 6597b64; Opus MERGE; e2e armed"
-      },
-      {
-        "prNumber": 2497,
-        "lane": "fixes",
-        "headSha": "e768c1f302342943eae6a21f90376d638bcf0e14",
-        "state": "ready",
-        "nextGate": "e2e-cli or exact-head verdict",
-        "nextAction": "READY e768c1f; Opus MERGE; e2e queued after #2482"
+        "nextAction": "READY 155051c; e2e armed"
       }
     ],
     "orchestratorMatrix": [
@@ -1038,7 +1048,6 @@
         "lane": "fixes",
         "state": "active",
         "activeItems": [
-          "#2497",
           "#2499"
         ],
         "lastConcreteProgressAt": "2026-10-30T22:30:00.000Z",
@@ -1105,7 +1114,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T06:09:38.000Z",
+  "updatedAt": "2026-10-31T06:14:15.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1276,7 +1285,7 @@
       "commentId": 6539498806,
       "postedAt": "2026-10-31T05:20:38.000Z",
       "route": "codex gpt-6.1-sol",
-      "state": "pr-open",
+      "state": "merged",
       "pr": 2497
     },
     {
@@ -1303,7 +1312,7 @@
       "commentId": 6539917426,
       "postedAt": "2026-10-31T06:09:13.000Z",
       "route": "codex gpt-6.1-sol",
-      "state": "posted",
+      "state": "started",
       "pr": null
     }
   ],
