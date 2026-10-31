@@ -15,7 +15,13 @@ import { describeTelemetryConfig, isTelemetryEnabled } from '@netscript/telemetr
 import { WorkerAttributes } from '@netscript/telemetry/attributes';
 import type { Span } from '@netscript/telemetry/tracer';
 import { processWorkerJob } from './job-dispatcher.ts';
-import { type WorkerListenerSnapshot, WorkerListenerSupervisor } from './listener-supervisor.ts';
+import {
+  resolveListenerHealthyResetMs,
+  type WorkerListenerFailureCause,
+  type WorkerListenerSnapshot,
+  WorkerListenerSupervisor,
+} from './listener-supervisor.ts';
+export type { WorkerListenerFailureCause } from './listener-supervisor.ts';
 import { startQueueTriggerListeners, startTaskQueueListener } from './queue-consumer.ts';
 import {
   type JobExecutionContext,
@@ -58,8 +64,12 @@ export interface WorkerHealthStatus {
     readonly status: 'idle' | 'running' | 'restarting' | 'failed' | 'stopped';
     /** Whether the listener is healthy. */
     readonly healthy: boolean;
-    /** Number of restart attempts. */
+    /** Cumulative restart attempts for this listener instance. */
     readonly restartCount: number;
+    /** Restart attempts charged since the last healthy running interval. */
+    readonly restartBudgetUsed: number;
+    /** Redacted cause of the most recent failure, retained as incident history on recovery. */
+    readonly failureCause?: WorkerListenerFailureCause;
     /** Last listener failure message. */
     readonly lastError?: string;
   }[];
@@ -79,6 +89,7 @@ export class Worker {
   private readonly jobsDir: string;
   private readonly queueTriggers: readonly QueueTriggerConfig[];
   private readonly listenerMaxRestarts: number;
+  private readonly listenerHealthyResetMs: number;
   private readonly listenerInitialBackoffMs: number;
   private readonly listenerMaxBackoffMs: number;
   private readonly triggerQueues: MessageQueue<unknown>[] = [];
@@ -97,6 +108,7 @@ export class Worker {
 
   /** Create a worker with queue, registry, execution, and task runtime dependencies. */
   constructor(options: WorkerOptions) {
+    this.listenerHealthyResetMs = resolveListenerHealthyResetMs(options.listenerHealthyResetMs);
     this.workerId = options.workerId;
     this.queueName = options.queueName ?? 'jobs';
     this.suppliedQueue = options.queue;
@@ -205,6 +217,7 @@ export class Worker {
       name: `jobs:${this.queueName}`,
       abortSignal: this.abortController.signal,
       maxRestarts: this.listenerMaxRestarts,
+      healthyResetMs: this.listenerHealthyResetMs,
       initialBackoffMs: this.listenerInitialBackoffMs,
       maxBackoffMs: this.listenerMaxBackoffMs,
       run: (signal) => this.listenForJobs(signal),
@@ -381,6 +394,7 @@ export class Worker {
       abortController: this.abortController,
       taskQueue: this.suppliedTaskQueue,
       listenerMaxRestarts: this.listenerMaxRestarts,
+      listenerHealthyResetMs: this.listenerHealthyResetMs,
       listenerInitialBackoffMs: this.listenerInitialBackoffMs,
       listenerMaxBackoffMs: this.listenerMaxBackoffMs,
       processJob: (message, queueContext, context) =>

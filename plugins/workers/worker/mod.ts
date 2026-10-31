@@ -54,6 +54,7 @@ export type {
   WorkerExecutionState,
   WorkerHealthStatus,
   WorkerJobRegistry,
+  WorkerListenerFailureCause,
   WorkerOptions,
   WorkerPayloadSchema,
   WorkerTaskExecutor,

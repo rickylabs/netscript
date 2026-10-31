@@ -81,6 +81,7 @@ function createListenerSupervisor(
     name,
     abortSignal: context.abortController?.signal,
     maxRestarts: context.listenerMaxRestarts,
+    healthyResetMs: context.listenerHealthyResetMs,
     initialBackoffMs: context.listenerInitialBackoffMs,
     maxBackoffMs: context.listenerMaxBackoffMs,
     run,

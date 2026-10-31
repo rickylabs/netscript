@@ -1,3 +1,7 @@
 # Resume #2400
 
 Draft PR2482, feature leaf, branch fix/workers-listener-restart-budget. PLAN2 PASS before any source change, same separate Opus5.5/high session retained privately. Implement plan.md with restartCount cumulative and restartBudgetUsed additive. Public health fixed cause text must reach worker.healthStatus.childHealth. Defaults60s, existing capped backoff and crashloop window preserved. Baseline tests6PASS, quality/archPASS, workers doclint inherited2 private-type refs with /worker clean. Private real Redis ready for integration, no Docker daemon. No dispatcher/execution/lock edits. Next implementation tests/gates, independent slice signoff, commit/push, ready+CI, final exact-head review and coordinator handoff.
+
+Implementation working tree complete. Tests72 PASS Redis-enabled/frozen, root quality/arch/deps PASS, checks124 PASS, member dry-run PASS; doclint2 unchanged core findings, /worker0. Real-store negative bothFAIL as expected then restored. Read gate-summary.json. Next independent precommit signoff (same private evaluator), commit source+run, push/readyCI, final exact-head verdict and READY handoff.
+
+IMPL1 precommitPASS in evaluate.md. Next push source signoff commit, readyPR2482 under CI-flow brief, request coordinator e2e-cli verdict; verify CI and exact-head final review same session. No new source edits unless a real failure warrants it. Root lock unchanged; no private data in run.

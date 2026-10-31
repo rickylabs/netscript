@@ -208,6 +208,40 @@ deploy-generated `.env` writes the same variable. To change it, edit the backgro
 [Runtime configuration](/orchestration-runtime/runtime-config/) covers the resolution order: schema
 default, config file, environment, override.
 
+## Listener recovery after store outages
+
+A `Worker` supervises its jobs, tasks and queue-trigger listeners separately. The constructor's
+`listenerMaxRestarts` defaults to **3 restart attempts per unhealthy burst**. A listener that runs
+continuously without throwing for `listenerHealthyResetMs` (default **60,000 ms**) replenishes that
+budget. Time spent waiting in restart backoff does not count as healthy running. The interval must
+be a finite positive number; invalid values throw `RangeError` before the worker starts resources.
+
+Restart delays grow exponentially from `listenerInitialBackoffMs` (default **100 ms**) to
+`listenerMaxBackoffMs` (default **5,000 ms**). A healthy interval also returns the next restart to the
+initial delay. For a custom host that should keep retrying store outages indefinitely, pass
+`listenerMaxRestarts: Number.POSITIVE_INFINITY`; delays still stay capped and `worker.stop()` aborts
+the listener and pending backoff. A finite budget still halts a persistently failing listener when
+failures occur inside the healthy window.
+
+These are `WorkerOptions` on `new Worker(...)` from `@netscript/plugin-workers/worker`; they are
+not `defineWorkers` config fields or scaffold environment variables. A custom host can pass, for
+example, `listenerHealthyResetMs: 120_000`, `listenerMaxRestarts: 5` and
+`listenerMaxBackoffMs: 30_000` alongside its queue, registry and execution dependencies.
+
+`worker.healthStatus.listeners` retains cumulative `restartCount` and reports the current burst's
+`restartBudgetUsed`. The shared `childHealth.restartCount` also remains cumulative. HTTP child
+health records a fixed, redacted failure category: store writes refused (including OOM, READONLY
+and NOPERM), connection unavailable, or listener error. The listener snapshot's `failureCause`
+retains that category after recovery as incident history. Exception messages, connection URLs and
+stacks are not included in the HTTP payload. The legacy local listener `lastError` and the local
+failure callback can still contain raw exception details; avoid publishing them as health payloads.
+The CLI/Aspire health reader currently replaces incident messages with generic redacted text.
+
+A separate shared crash-loop rule keeps HTTP health unhealthy after **3 restarts within a minute**
+until a full minute of uninterrupted running completes. Shortening the restart-budget reset window
+or choosing infinite retries does not bypass that health rule. A successful restart alone is not
+proof that a restart storm has recovered.
+
 ## Abort cleanup budget
 
 `InProcessJobRunner` accepts `abortGracePeriodMs` in its constructor options, with a default of

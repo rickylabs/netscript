@@ -154,8 +154,10 @@ export interface WorkerOptions {
   workerUrl?: string;
   /** Options for in-process job handler resolution. */
   workerPoolOptions?: WorkerPoolOptions;
-  /** Maximum listener restarts before worker health degrades. */
+  /** Maximum restarts per unhealthy burst (default 3); positive Infinity retries indefinitely. */
   listenerMaxRestarts?: number;
+  /** Continuous running interval that replenishes the restart budget; default 60,000 ms. */
+  listenerHealthyResetMs?: number;
   /** Initial listener restart backoff in milliseconds. */
   listenerInitialBackoffMs?: number;
   /** Maximum listener restart backoff in milliseconds. */
@@ -224,6 +226,7 @@ export interface WorkerQueueContext {
   setTaskQueue(queue: MessageQueue<TaskMessage> | null): void;
   reportListenerFailure(name: string, error: unknown, snapshot: WorkerListenerSnapshot): void;
   listenerMaxRestarts: number;
+  listenerHealthyResetMs: number;
   listenerInitialBackoffMs: number;
   listenerMaxBackoffMs: number;
 }
