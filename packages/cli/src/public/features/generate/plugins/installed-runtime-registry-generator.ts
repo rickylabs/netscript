@@ -141,6 +141,9 @@ export function createInstalledRuntimeRegistryGenerator(
         ...(input.dryRun
           ? { sourceAuthority: 'generator' as const, sourceFiles: file.sourceFiles }
           : {}),
+        ...(file.excludedSourceFiles?.length
+          ? { excludedSourceFiles: file.excludedSourceFiles }
+          : {}),
       });
     }
     if (!input.dryRun) {

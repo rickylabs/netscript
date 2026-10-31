@@ -4,12 +4,12 @@ import { freshUiRegistryManifest } from '../registry.manifest.ts';
 
 Deno.test('preview assets are opt-in and lightweight metadata excludes the compiler', async () => {
   assertEquals(APP_TOKEN_FILES.length, 5);
-  assertEquals(PREVIEW_TOKEN_FILES.length, 18);
+  assertEquals(PREVIEW_TOKEN_FILES.length, 24);
   for (const item of freshUiRegistryManifest.items.filter((item) => item.kind === 'theme')) {
     assert(!item.files.some((file) => file.target.startsWith('static/presets/')), item.name);
   }
   const previews = freshUiRegistryManifest.items.find((item) => item.name === 'theme-previews')!;
-  assertEquals(previews.files.length, 18);
+  assertEquals(previews.files.length, PREVIEW_TOKEN_FILES.length);
   const entry = new URL('../token-config.ts', import.meta.url).href;
   const output = await new Deno.Command(Deno.execPath(), {
     args: ['info', '--json', entry],

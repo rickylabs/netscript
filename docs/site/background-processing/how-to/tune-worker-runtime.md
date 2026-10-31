@@ -346,6 +346,60 @@ until a full minute of uninterrupted running completes. Shortening the restart-b
 or choosing infinite retries does not bypass that health rule. A successful restart alone is not
 proof that a restart storm has recovered.
 
+## Tune Redis pickup latency
+
+Redis honors the queue concurrency passed by `WORKERS_CONCURRENCY`. At concurrency `N`, at most
+`N` messages are in flight, including acknowledgement; the next message remains ready until a slot
+opens. A slow asynchronous job therefore leaves the other slots available. Concurrency 1 remains
+serial. Each delivery has an independent visibility receipt and the workers plugin's existing
+heartbeat. Synchronous CPU work still blocks this process's event loop.
+
+Two Redis-only settings control polling. Values are integer milliseconds from **10 to 60000**:
+
+| `ListenOptions` field | Environment variable | Default |
+| --- | --- | --- |
+| `pollIntervalMs` | `NETSCRIPT_REDIS_QUEUE_POLL_INTERVAL_MS` | 50 ms |
+| `delayedPollIntervalMs` | `NETSCRIPT_REDIS_DELAYED_POLL_INTERVAL_MS` | 1000 ms |
+
+Set the environment on the existing background worker resource or deployment to tune every queue
+it consumes, including generated workers. These variables are optional ambient/deployment overrides;
+AppHost generation and deploy `.env` do not inject them. For example:
+
+```bash
+WORKERS_CONCURRENCY=4 NETSCRIPT_REDIS_QUEUE_POLL_INTERVAL_MS=20 NETSCRIPT_REDIS_DELAYED_POLL_INTERVAL_MS=20 deno run -A plugins/workers/bin/combined.ts
+```
+
+Custom queue consumers can pass the fields directly to `queue.listen(handler, options)`. Explicit
+options override environment values, then defaults apply. Malformed/out-of-range values throw a
+configuration error before consumption. If scoped `--allow-env` permissions deny these optional
+variables, Redis uses defaults; explicit options do not need those permissions. Other queue adapters
+keep their existing polling behavior.
+
+For a free slot on a healthy backend with established queue/promotion connections and no delayed
+backlog, the polling contribution to ready
+pickup is at most `pollIntervalMs`. After a delayed message becomes eligible, it is at most
+`delayedPollIntervalMs + pollIntervalMs`. Add Redis command latency, server/client clock differences
+and event-loop scheduling. At the example's settings the polling contributions are **20 ms** and
+**40 ms**, compared with the defaults' **50 ms** and **1050 ms**. These are conditional polling
+bounds, not a guaranteed end-to-end latency. Saturation, reconnects, synchronous work, promotion
+contention, invalid delayed entries and backlogs beyond the existing 1000-member promotion pass can
+exceed them. Promotion connects lazily, so startup/reconnect can miss a pass while establishing the
+connection. Smaller intervals increase idle Redis traffic; measure under your actual load.
+
+Abort stops new admission and drains the in-flight set, including a claim that committed during
+abort, within the listener's `visibilityTimeout` (default 30 seconds). `stop()` waits for the same
+bounded drain, keeping fenced acknowledgements available until it ends. Unfinished claims remain
+recoverable and their old contexts cannot renew or acknowledge after the budget. Awaiting `stop()`
+from inside its own handler consumes that budget; signal cancellation to the host and let the
+handler return for normal acknowledgement. The worker runner and host shutdown budgets below are
+separate; keep the queue drain within your platform's shutdown window.
+
+When telemetry is enabled, `createQueue` already wraps the adapter with producer `queue.enqueue`
+and consumer `queue.dequeue` spans. The enqueue span injects its context into message headers and
+the consumer extracts it, preserving exact admission-to-pickup ancestry across concurrent handlers.
+Use those trace/span parents to measure queue wait; native filesystem propagation before admission
+needs its own upstream correlation and cannot be inferred from nearby timestamps.
+
 ## Abort cleanup budget
 
 `InProcessJobRunner` accepts `abortGracePeriodMs` in its constructor options, with a default of

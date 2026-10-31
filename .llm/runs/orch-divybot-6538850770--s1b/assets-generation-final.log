@@ -1,0 +1,3 @@
+Task gen:assets-barrel deno task --cwd packages/fresh-ui registry:embed && deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts
+Task registry:embed deno run --lock=deno.lock --frozen --allow-read=. --allow-write=src/registry/assets --allow-run=deno scripts/embed-registry-assets.ts
+Registry JSON embeddings generated.

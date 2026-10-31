@@ -150,7 +150,7 @@ Deno.test('official schemas accept source documents and reject malformed DTCG', 
   );
 });
 
-Deno.test('72 resolver inputs keep complete core maps and fixed preset geometry', () => {
+Deno.test('all resolver inputs keep complete core maps and fixed preset geometry', () => {
   const sources = defaultTokenSources();
   let count = 0;
   for (const preset of TOKEN_PRESETS) {
@@ -176,7 +176,7 @@ Deno.test('72 resolver inputs keep complete core maps and fixed preset geometry'
       count += 2;
     }
   }
-  assertEquals(count, 72);
+  assertEquals(count, TOKEN_PRESETS.length * 4);
   assertThrows(
     () => resolveTokenSources(sources, { theme: 'invented' }),
     Error,
@@ -237,6 +237,8 @@ Deno.test('NS One keeps every legacy declaration and imports no Figma core value
       if (!path.startsWith(`context.${scheme}.`)) continue;
       const name = path.split('.').at(-1)!;
       if (/^(studio|bloom|liquid|cupertino|tactile|fluent|pixel|terminal)-/.test(name)) continue;
+      // Newly introduced S1b names use the fresh Figma source; legacy/gap contracts stay stable.
+      if (!Object.hasOwn(old, name)) continue;
       assertEquals(token.$extensions?.netscript?.figma, undefined, name);
     }
   }

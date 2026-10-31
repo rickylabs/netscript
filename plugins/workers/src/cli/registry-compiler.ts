@@ -6,6 +6,7 @@ import {
   type ProjectFileEntry,
   type ProjectFiles,
   renderRegistryModule,
+  selectRegistrySources,
 } from '@netscript/plugin/cli';
 
 /** Result returned after compiling a static job registry. */
@@ -25,7 +26,13 @@ export async function compileWorkersRegistry(
     ['ts', 'js', 'mjs'].map((extension) => files.readTextFile(`netscript.config.${extension}`)),
   )).some((content) => content !== undefined);
   const workers = hasConfig ? await loadWorkersConfig(files.projectRoot) : undefined;
-  const jobs = await files.listFiles(workers?.jobsDir ?? 'workers/jobs', ['.ts']);
+  const candidates = await files.listFiles(workers?.jobsDir ?? 'workers/jobs', ['.ts']);
+  const { sourceFiles } = await selectRegistrySources(
+    files,
+    candidates.map((job) => job.relativePath),
+  );
+  const selected = new Set(sourceFiles);
+  const jobs = candidates.filter((job) => selected.has(job.relativePath));
   const policies = workers
     ? resolveConfiguredJobPolicies(
       files.projectRoot,

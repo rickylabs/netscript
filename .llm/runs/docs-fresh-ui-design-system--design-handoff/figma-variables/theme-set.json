@@ -1844,6 +1844,20 @@
       }
     },
     {
+      "name": "ink/d-fg",
+      "type": "COLOR",
+      "scopes": [],
+      "description": "Dark source for Scheme ink/fg (text on ink). Light-ink themes: own gray/d/1; Brutal keeps black ink in dark, so gray/d/12.",
+      "values": {
+        "A": {
+          "alias": "Theme/ink/d-fg"
+        },
+        "B": {
+          "alias": "Theme B/ink/d-fg"
+        }
+      }
+    },
+    {
       "name": "ink/l",
       "type": "COLOR",
       "scopes": [],

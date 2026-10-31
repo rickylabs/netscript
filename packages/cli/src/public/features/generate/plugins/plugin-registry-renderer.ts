@@ -162,7 +162,9 @@ export async function renderRuntimeRegistryPlan(
   const reported = new Set<string>();
   const rendered: RenderedPluginRegistry[] = [];
   for (const raw of document.registries) {
-    const entry = strictRecord(raw, ['registryPath', 'sourceFiles', 'content']);
+    const entry = strictRecord(raw, ['registryPath', 'sourceFiles', 'content'], [
+      'excludedSourceFiles',
+    ]);
     if (
       typeof entry.registryPath !== 'string' || !isPluginOutputPath(entry.registryPath) ||
       !targets.some((target) => target.registryPath === entry.registryPath) ||
@@ -173,6 +175,9 @@ export async function renderRuntimeRegistryPlan(
     reported.add(entry.registryPath.toLowerCase());
     if (
       !Array.isArray(entry.sourceFiles) || entry.sourceFiles.length > MAX_SOURCES ||
+      (entry.excludedSourceFiles !== undefined &&
+        (!Array.isArray(entry.excludedSourceFiles) ||
+          entry.excludedSourceFiles.length > MAX_SOURCES)) ||
       (entry.content !== null &&
         (typeof entry.content !== 'string' ||
           new TextEncoder().encode(entry.content).byteLength > MAX_CONTENT))
@@ -180,7 +185,8 @@ export async function renderRuntimeRegistryPlan(
       throw new Error('Invalid plugin rendered content or source evidence.');
     }
     const sources = new Set<string>();
-    for (const path of entry.sourceFiles) {
+    const excluded = entry.excludedSourceFiles as readonly unknown[] | undefined;
+    for (const path of [...entry.sourceFiles, ...(excluded ?? [])]) {
       if (
         typeof path !== 'string' || !isProjectPath(path) ||
         path.startsWith('.netscript/generated/') || sources.has(path.toLowerCase())
@@ -196,6 +202,7 @@ export async function renderRuntimeRegistryPlan(
       path: entry.registryPath,
       plugin: installed.name,
       sourceFiles: entry.sourceFiles,
+      ...(excluded?.length ? { excludedSourceFiles: excluded as readonly string[] } : {}),
       content: entry.content,
     });
   }
@@ -241,13 +248,18 @@ export async function canonicalizePluginOutputs(
   return selected.map((file, index) => ({ ...file, content: contents[index] }));
 }
 
-function strictRecord(value: unknown, keys: readonly string[]): Record<string, unknown> {
+function strictRecord(
+  value: unknown,
+  keys: readonly string[],
+  optionalKeys: readonly string[] = [],
+): Record<string, unknown> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     throw new Error('Invalid plugin inspection object.');
   }
   const record = value as Record<string, unknown>;
   if (
-    Object.keys(record).length !== keys.length || !keys.every((key) => Object.hasOwn(record, key))
+    !keys.every((key) => Object.hasOwn(record, key)) ||
+    Object.keys(record).some((key) => !keys.includes(key) && !optionalKeys.includes(key))
   ) throw new Error('Invalid plugin inspection fields.');
   return record;
 }

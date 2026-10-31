@@ -1,0 +1,3 @@
+# File-watch regression recipe
+
+Run structured tests with `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --unstable-kv --frozen packages/plugin-triggers-core plugins/triggers/src/runtime`. This run: 88 pass, 0 fail, 3 Redis-only skips (no Redis endpoint configured). New acceptance tests are tests/file-watch-idempotency_test.ts plus the colocated adapter tests. Both/adapter-only/TTL-only original-file controls produce 15/8/2 expected failures. The real upstream watcher smoke uses a polling strategy, performs physical writes two seconds apart and projects null fileInfo to exercise unavailable metadata. Polling clamps interval to 500ms, and the test waits for initial snapshot before writing.

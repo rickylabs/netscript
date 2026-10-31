@@ -48,6 +48,8 @@ export interface TokenMetadata {
   readonly category?: readonly string[];
   /** Composite recipe evaluated by the output formats. */
   readonly derive?: TokenDerivation;
+  /** Exact font style when DTCG has no corresponding fontStyle primitive. */
+  readonly figmaStyle?: string;
   /** Original value provenance in the approved Figma export. */
   readonly figma?: {
     /** Owning Figma collection. */
@@ -56,6 +58,12 @@ export interface TokenMetadata {
     readonly name: string;
     /** Selected mode in that collection. */
     readonly mode: string;
+    /** Selected router mode, independent of the origin collection. */
+    readonly themeSet?: 'A' | 'B';
+    /** Theme collection selected by the router. */
+    readonly themeCollection?: string;
+    /** Active language mode in that selected collection. */
+    readonly themeMode?: string;
   };
 }
 
@@ -123,7 +131,9 @@ export interface TokenPreset {
   readonly language: string;
   /** Studio data-flavor value, absent for other languages. */
   readonly flavor?: string;
-  /** Active mode in the Figma Theme collection. */
+  /** Active Theme set mode; defaults to A for existing callers. */
+  readonly themeSet?: 'A' | 'B';
+  /** Active mode in the Theme or Theme B collection selected by Theme set. */
   readonly themeMode: string;
   /** Active mode in the Figma Base gray collection. */
   readonly grayMode: string;

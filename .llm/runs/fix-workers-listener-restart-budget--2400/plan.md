@@ -39,3 +39,23 @@ the next delivery. This preserves the approved refusal/recovery acceptance.
 Add typed QueueConnectionError coverage using its existing CONNECTION_FAILED
 contract, both directly and under Error.cause, for review4429709762. Scope and
 public categories are unchanged; no further planning decision or new PLAN round.
+
+## R2 merge compatibility slice — Plan & Design — READY FOR REVIEW
+
+Merge origin/main at 592a446af into the existing PR branch without rebasing.
+Preserve listener healthy-window/budget/cause semantics and all upstream worker
+options, Redis concurrency, retry and execution behavior. Resolve authored conflicts
+only where needed; regenerate prose and MCP export carriers using their canonical
+tasks (supported dirty preview while merge is pending). One commit slice includes
+merge resolutions and updated run records; no new implementation or API is intended.
+
+Prove compatibility with focused supervisor, real-store recovery, all-family HTTP
+health, worker runtime/public tests and upstream Redis concurrency regressions;
+structured workers check plus changed-source lint/fmt; full quality/architecture,
+carrier freshness and regression tests. Reuse published negative-control evidence
+unless integration changes those assertions, then repeat the relevant controls.
+JSR/public surface is unchanged from the previously approved additive contract.
+Publish/doc checks will disclose inherited debt if unchanged. No accepted new debt.
+Obtain independent plan confirmation before merge, precommit signoff, and final
+exact-pushed-head IMPL-EVAL. Publish READY with current CI snapshot and coordinator
+request for both runtime tiers at that head. Stop; no merge/tag/release.

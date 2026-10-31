@@ -1,0 +1,245 @@
+Task doc:lint deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts '--root' 'packages/fresh-ui' '--pretty'
+{
+  "source": {
+    "mode": "auto",
+    "root": "packages/fresh-ui",
+    "entrypoints": [
+      "./contracts.json",
+      "./contracts.ts",
+      "./desktop.ts",
+      "./interactive.ts",
+      "./mod.ts",
+      "./primitives.tsx",
+      "./registry-v2.ts",
+      "./registry.ts",
+      "./src/ai/render-ui.tsx",
+      "./token-config.ts",
+      "./tokens.ts"
+    ],
+    "exitCode": 1
+  },
+  "summary": {
+    "totalPackages": 1,
+    "totalErrors": 124,
+    "totalPrivateTypeRef": 96,
+    "totalMissingJSDoc": 28,
+    "totalOther": 0
+  },
+  "packages": [
+    {
+      "name": "@netscript/fresh-ui",
+      "dir": "packages/fresh-ui",
+      "entrypoints": [
+        {
+          "path": "./contracts.json",
+          "privateTypeRef": 0,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "./contracts.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./desktop.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./interactive.ts",
+          "privateTypeRef": 96,
+          "missingJSDoc": 27,
+          "other": 0,
+          "total": 123
+        },
+        {
+          "path": "./mod.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./primitives.tsx",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./registry-v2.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./registry.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./src/ai/render-ui.tsx",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./token-config.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "./tokens.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        }
+      ],
+      "files": [
+        {
+          "path": "packages/fresh-ui/src/runtime/combobox/combobox.types.ts",
+          "privateTypeRef": 15,
+          "missingJSDoc": 18,
+          "other": 0,
+          "total": 33
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/popover/Popover.tsx",
+          "privateTypeRef": 10,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 11
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/popover/popover.types.ts",
+          "privateTypeRef": 10,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 10
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/dialog/Dialog.tsx",
+          "privateTypeRef": 6,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/drawer/Drawer.tsx",
+          "privateTypeRef": 6,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/sheet/Sheet.tsx",
+          "privateTypeRef": 6,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/tooltip/Tooltip.tsx",
+          "privateTypeRef": 6,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/accordion/Accordion.tsx",
+          "privateTypeRef": 5,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 6
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/dialog/dialog.types.ts",
+          "privateTypeRef": 6,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 6
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/sheet/sheet.types.ts",
+          "privateTypeRef": 6,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 6
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/tooltip/tooltip.types.ts",
+          "privateTypeRef": 6,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 6
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/accordion/accordion.types.ts",
+          "privateTypeRef": 5,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 5
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/tabs/Tabs.tsx",
+          "privateTypeRef": 4,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 5
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/tabs/tabs.types.ts",
+          "privateTypeRef": 4,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 4
+        },
+        {
+          "path": "packages/fresh-ui/src/runtime/combobox/Combobox.tsx",
+          "privateTypeRef": 1,
+          "missingJSDoc": 2,
+          "other": 0,
+          "total": 3
+        },
+        {
+          "path": "packages/fresh-ui/contracts.json",
+          "privateTypeRef": 0,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 1
+        }
+      ],
+      "combinedTotal": 124,
+      "combinedPrivateTypeRef": 96,
+      "combinedMissingJSDoc": 28,
+      "combinedOther": 0,
+      "combinedExitCode": 1,
+      "entrypointExitCodes": {
+        "./contracts.json": 1,
+        "./contracts.ts": 0,
+        "./desktop.ts": 0,
+        "./interactive.ts": 1,
+        "./mod.ts": 0,
+        "./primitives.tsx": 0,
+        "./registry-v2.ts": 0,
+        "./registry.ts": 0,
+        "./src/ai/render-ui.tsx": 0,
+        "./token-config.ts": 1,
+        "./tokens.ts": 0
+      }
+    }
+  ]
+}

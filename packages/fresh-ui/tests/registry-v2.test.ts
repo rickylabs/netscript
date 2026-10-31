@@ -4,7 +4,7 @@ import { REGISTRY_ITEM_TYPES, validateRegistry, validateRegistryItem } from '../
 
 Deno.test('authored Fresh UI registry validates against the published registry and item schemas', () => {
   const registry = validateRegistry(authored);
-  assertEquals(registry.items.length, 86);
+  assertEquals<unknown>(registry.items, authored.items);
   for (const item of registry.items) assertEquals(validateRegistryItem(item), item);
 });
 

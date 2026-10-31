@@ -26,3 +26,13 @@ original PR: the CLI/MCP prose bundle for the changed tuning guide and the MCP
 export corpus for the additive Worker public types. Refresh only through their
 native generation tasks. This required generated surface is added to supervisor
 write scope; no dependency/lock refresh is authorized or needed.
+
+## R2 integration observations (2026-10-31)
+
+Independent plan confirmation PASS against main592a446af. Upstream Redis listener
+now drains active handlers before rejecting a failed claim, bounded by visibility
+timeout. A custom healthy reset shorter than that drain can count this interval
+as running; default60s reset exceeds default30s drain. Shared crash-loop health
+remains independent. Advisory accepted as an existing composition interaction;
+no new failure/health protocol in this integration slice. Upstream now removes
+Redis abort callbacks in finally, superseding the earlier deferred risk.

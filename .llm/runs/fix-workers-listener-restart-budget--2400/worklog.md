@@ -110,3 +110,66 @@ PLAN2 PASS retained, no duplicated PR or issue, no label/milestone changes.
 Coordinator owns shared E2E and merge. After commit, run the corpus regression
 that clones committed HEAD, then final review and READY handoff; any pending CI
 or shared E2E remains explicitly unproven. No new architectural debt.
+
+## R2 routing, design and resume
+
+Feature matrix queried via `deno task agentic:matrix --tier feature --json`.
+Owner override verbatim: “Run PLAN-EVAL before implementing and IMPL-EVAL after,
+both in a separate session with claude -p --model claude-opus-5-5 --effort high,
+read-only, stdin closed, blockers only.” Rationale: owner requests final merge-delta
+review with the existing independent evaluator; generator and evaluator remain
+separate sessions and vendor families. Original PLAN2 PASS remains intact; R2 asks
+for confirmation of the bounded integration plan before source changes.
+
+Seven design items above remain authoritative: no new public surface, vocabulary,
+ports or constants; one merge compatibility slice, files/gates in plan.md; unrelated
+work deferred; contributor entry remains listener-supervisor.ts. Native MCP guidance
+and literal docs search consulted; no healthy-window docs match was returned.
+Memory consulted before source/build work, including native carrier and Lua ACL
+proof recipes. RTK absent; focused raw reads and structured wrappers are used.
+
+## R2 merged-tree gate evidence
+
+PLAN confirmation PASS before source changes (`r2-plan-eval.md`). Merged main592a446af
+without rebasing. Only authored conflict was adjacent guide sections; retained both
+listener recovery and Redis concurrency/polling/drain guidance. Both carriers were
+recreated through gen:agent-docs-prose and gen:mcp-export-corpus --allow-dirty.
+Supervisor/options/queue-consumer remain identical to previous reviewed PR head;
+Redis adapter, dispatcher/execution and root lock match merged main exactly.
+
+Workers111 PASS/0FAIL/6conditional ignores, with both #2400 real stores executed.
+Reset-negative real stores2 FAIL on explicit budget-exhaustion assertions;
+fake-clock negative1 FAIL on count assertion; restored source verified byte-identical.
+Redis concurrency regressions8 PASS/0FAIL/6Garnet-conditional ignores; executed real
+Redis admission, backpressure, slow sibling, drain, abort and optional env cases.
+Structured check136PASS, carrier check2PASS, changed-source lint/fmt8PASS. Full
+quality/architecture/dependency gate, docs accuracy, prose/export freshness PASS0.
+Catalog-materialized workers publish dry-run PASS0. Workers doclint exit1 with2
+unchanged core private-type-ref diagnostics; /worker clean. JSR no FAIL, inherited
+cardinality/banner warnings. Thread gate PASS1answered/0unanswered.
+
+Two invocation mistakes are not gate results: passing --unstable-kv to check wrapper
+(default already enables it) rejected the invocation; rerun without the flag passed.
+Passing --allow-dirty to export --check rejected the invocation; only writing accepts
+that flag. The ordinary check then passed. No suppressions or gate weakening.
+Read r2-gate-summary.json for sanitized summaries; private receipts record the
+premerge immutable HEAD and therefore do not certify a clean final commit.
+
+Native generated-carrier consumer/regression suite:11PASS/0FAIL/0ignored before
+commit. Exact committed-HEAD export generator regressions run after commit because
+those tests deliberately clone HEAD. They cannot certify uncommitted source.
+
+## R2 independent signoff and reconciliation
+
+Retained separate Opus5.5/high evaluator: precommit PASS (`r2-evaluate.md`). It
+independently ran worker tests74PASS/0FAIL/17Redis-or-Garnet skips and corpus --check0;
+accepted explicitly identified private real-store/static receipts without claiming
+it executed them. Required staging regenerated prose/run files before commit;
+completed and staged/working copies reconciled. Source families, dispatcher/execution,
+queue and lock ownership verified. No new blockers, debt, labels or milestones.
+Native carrier regressions11PASS/0FAIL/0ignored. Current issue has no acceptance
+checkboxes; READY must map owner-required proofs without changing issue scope.
+The main-carried historical run has3 trailing-whitespace lines in its existing
+plan-eval.md; no authored whitespace finding, no unrelated artifact cleanup.
+Next exact pushed-head verdict and committed-HEAD regression are PR comments to
+avoid a trailing commit moving the reviewed implementation.

@@ -1,4 +1,8 @@
-import { type ProjectFiles, renderRegistryModule } from '@netscript/plugin/cli';
+import {
+  type ProjectFiles,
+  renderRegistryModule,
+  selectRegistrySources,
+} from '@netscript/plugin/cli';
 
 /** Result returned after compiling the trigger runtime registry. */
 export type TriggerRegistryCompileResult = Readonly<{
@@ -20,10 +24,11 @@ const EXCLUDED_FILES = new Set([
 export async function compileTriggerRegistry(
   files: ProjectFiles,
 ): Promise<TriggerRegistryCompileResult> {
-  const triggerFiles = (await files.listFiles('triggers', ['.ts']))
+  const candidates = (await files.listFiles('triggers', ['.ts']))
     .map((entry) => entry.relativePath.replaceAll('\\', '/'))
     .filter((path) => isRegistryInput(path))
     .sort((left, right) => left.localeCompare(right));
+  const { sourceFiles: triggerFiles } = await selectRegistrySources(files, candidates);
 
   await files.writeTextFile(REGISTRY_PATH, renderRegistry(triggerFiles));
   return {

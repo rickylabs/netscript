@@ -25,3 +25,15 @@ Necessary generated surface discovered during validation: permit the native
 `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`.
 These carriers must match the approved tuning guide and public worker surface.
 No manual compressed/generated payload edits or unrelated generated changes.
+
+## R2 merge continuation (2026-10-31)
+
+Codex adopts PR #2482 at 6597b6452b22c72277509189b61ab78fba507648.
+Current main: 592a446afc9f9b20cac299edc015a3340c6e5df9. This continuation
+only integrates current main and proves compatibility. Permitted writes: the
+previously declared supervisor/options/tests/docs/carriers and this run directory;
+merge-carried upstream files retain upstream behavior. Redis adapter, dispatcher,
+and execution belong to main. Canonical generators alone resolve carrier conflicts.
+No dependency updates or independent lock edits. Same independent Opus 5.5/high
+read-only evaluator is resumed; raw handles/logs remain outside this checkout.
+The owner explicitly reserves local scaffold.runtime and E2E labels for coordinator.

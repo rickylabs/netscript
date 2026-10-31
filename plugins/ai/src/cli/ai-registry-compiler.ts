@@ -21,7 +21,9 @@
 import {
   type ProjectFileEntry,
   type ProjectFiles,
+  type RegistrySourceSelection,
   renderRegistryModule,
+  selectRegistrySources,
 } from '@netscript/plugin/cli';
 
 /** Type import emitted into a generated AI registry module header. */
@@ -105,13 +107,24 @@ export async function selectAiRegistrySources(
   files: ProjectFiles,
   target: AiRegistryTarget,
 ): Promise<readonly string[]> {
+  return (await selectAiRegistryInputs(files, target)).sourceFiles;
+}
+
+async function selectAiRegistryInputs(
+  files: ProjectFiles,
+  target: AiRegistryTarget,
+): Promise<RegistrySourceSelection> {
   const discovered = (await listResourceFiles(files, target.dir, target.fileSuffixes))
     .map((entry) => entry.relativePath.replaceAll('\\', '/'))
     .filter((path) => isRegistryInput(path, target))
     .sort((left, right) => left.localeCompare(right));
-  return target.kind === 'ai-tools'
-    ? await selectToolDefinitionModules(files, discovered)
-    : discovered;
+  const selection = await selectRegistrySources(files, discovered);
+  return {
+    sourceFiles: target.kind === 'ai-tools'
+      ? await selectToolDefinitionModules(files, selection.sourceFiles)
+      : selection.sourceFiles,
+    excludedSourceFiles: selection.excludedSourceFiles,
+  };
 }
 
 /** Build the version-1 AI inspection report from the same selector used by compilation. */
@@ -159,16 +172,25 @@ export async function renderAiRegistry(
   {
     readonly registryPath: string;
     readonly sourceFiles: readonly string[];
+    readonly excludedSourceFiles?: readonly string[];
     readonly content: string | null;
   }
 > {
-  const inputs = await selectAiRegistrySources(files, target);
+  const selection = await selectAiRegistryInputs(files, target);
+  const inputs = selection.sourceFiles;
   const content = inputs.length === 0
     ? null
     : target.kind === 'ai-agents'
     ? renderAgentRegistry(target, inputs)
     : renderToolRegistry(target, inputs);
-  return { registryPath: target.registryPath, sourceFiles: inputs, content };
+  return {
+    registryPath: target.registryPath,
+    sourceFiles: inputs,
+    content,
+    ...(selection.excludedSourceFiles.length
+      ? { excludedSourceFiles: selection.excludedSourceFiles }
+      : {}),
+  };
 }
 
 async function selectToolDefinitionModules(

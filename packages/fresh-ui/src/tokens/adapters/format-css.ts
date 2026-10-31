@@ -44,6 +44,7 @@ function appContextTokens(context: TokenContextOutput): Readonly<Record<string, 
   );
   const names = new Set(
     Object.entries(context.tokens).filter(([name, token]) =>
+      !token.sourceOnly &&
       ![...packs].some((pack) => name.startsWith(`${pack}-`)) &&
       (token.path[0] !== 'color' || Object.hasOwn(legacy.tokens, name))
     ).map(([name]) => name),

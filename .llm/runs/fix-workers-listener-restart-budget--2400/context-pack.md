@@ -28,3 +28,23 @@ precommit gates and ownership restrictions above are verified. Final exact-head
 review, clone-HEAD regression result, CI snapshot and coordinator e2e-cli request
 will live in the PR handoff comment and assignment publication file, without a
 subsequent commit moving the evaluated head. Historical run evidence retained.
+
+## R2 continuation, 2026-10-31
+
+Merged main592a446af into original PR2482 head6597b6452 (merge pending signoff).
+Independent plan confirmation PASS; see r2-plan-eval.md. No authored runtime edits:
+only retained both tuning-guide sections and regenerated native prose/export carriers.
+Main's Redis adapter, dispatcher/execution and lock preserved; existing supervisor
+matches reviewed head. Tests111/0/6 with real stores; negative controls explicit red;
+upstream Redis concurrency8/0/6; checks/lint/fmt/quality/freshness/publication PASS.
+Workers doclint inherited2 unchanged, /worker clean. r2-gate-summary.json has safe
+summaries. Next retained independent evaluator precommit signoff, commit/push existing
+branch, committed-corpus regression and exact-pushed-head final review. Post evidence
+on existing PR, prepare READY assignment report file. No labels/milestones/local
+scaffold.runtime/merge/tag/release. Coordinator re-arms both runtime tiers at new head.
+
+R2 independent precommit PASS now recorded in r2-evaluate.md; required staging of
+regenerated prose completed before merge signoff. Supervisor signs off merge commit.
+No runtime source changes beyond the already-reviewed listener implementation.
+Final pushed SHA, committed-HEAD corpus test and CI snapshot will be in PR comments
+and assignment report; no subsequent commit is intended.

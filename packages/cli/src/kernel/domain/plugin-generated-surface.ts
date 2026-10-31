@@ -56,6 +56,8 @@ export interface RenderedPluginRegistry {
   readonly plugin: string;
   /** Shared selector evidence, also reported as authored inputs. */
   readonly sourceFiles: readonly string[];
+  /** Modules explicitly opted out by the shared first-line registry directive. */
+  readonly excludedSourceFiles?: readonly string[];
   /** Rendered bytes, or null when normal generation skips an empty target. */
   readonly content: string | null;
 }

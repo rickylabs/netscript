@@ -1,0 +1,1 @@
+Task check deno run --allow-read --allow-write --allow-run ../../.llm/tools/run-deno-check.ts --cwd . --root . --ext ts,tsx --deno-arg --lock=deno.lock --deno-arg --frozen
