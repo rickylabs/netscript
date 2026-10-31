@@ -103,3 +103,7 @@ Separate read-only Claude Opus 5.5 returned PASS with no blockers. It independen
 The same independent read-only evaluator reviewed the final artifact additions and completed generator reports and returned final PASS, no blockers. It corrected the settings filename advisory to components.json and confirmed scope/privacy. Source/test/doc/carrier are unchanged from its passing review. Supervisor accepts the substantive independent slice review and commits the repair with its evidence. assets-barrel is intentionally the post-commit check; remote required checks must clear at the final head before READY.
 
 Reconcile: PR #2518 is still open and mergeable on the existing branch. No review threads are unanswered; no new issue/PR duplicates, labels, closing keywords, or merges. Refs #2516 only. Optional unrelated refactors remain deferred and no new architecture debt is accepted.
+
+## Repair post-commit reconcile
+
+Repair `97f8a05403e7dc3b6a55f3898e1500817ba1900c` committed and pushed normally to the existing branch. Post-commit `check:assets-barrel` PASS, exit 0, no generated drift: all 14 root checks now pass. No docs-site lock or assignment-file churn. Source/test/carrier remain the independently reviewed bytes. Final evidence-only commit records this gate; hosted checks must be read at that final head. Reconcile: same PR #2518, Refs #2516, no labels/merge; implementation scope and evidence posted to the PR.

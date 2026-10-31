@@ -138,5 +138,15 @@
     ],
     "rawOutputSha256": "ec5e811aecaa72aefc0e170a2920e42e16d5bc0116b4ba399e1a4020b0bc2e64"
   },
-  "assetsBarrel": "Scheduled after regenerated carrier commit"
+  "assetsBarrel": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "command": [
+      "deno",
+      "task",
+      "check:assets-barrel"
+    ],
+    "validatedHead": "97f8a05403e7dc3b6a55f3898e1500817ba1900c",
+    "rawOutputSha256": "8547bcd230d66be4223d6fe86989b690cce72ae8933dc2c93138071fedd4c34f"
+  }
 }
