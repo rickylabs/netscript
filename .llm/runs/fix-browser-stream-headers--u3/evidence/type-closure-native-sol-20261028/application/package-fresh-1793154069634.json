@@ -1,0 +1,15 @@
+{
+  "selected": "package-fresh",
+  "args": [
+    "task",
+    "--cwd",
+    "packages/fresh",
+    "check"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:21:09.637Z",
+  "ended": "2026-10-28T02:21:13.110Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/package-fresh-1793154069634"
+}

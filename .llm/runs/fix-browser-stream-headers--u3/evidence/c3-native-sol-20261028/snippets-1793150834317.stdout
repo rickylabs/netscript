@@ -1,0 +1,15 @@
+docs snippets: PASS scanned=655 ts=259 tsx=79 typescript=7 ts_like=345 tier1=41 checked=27 exempt=14 outside_floor=304 malformed=0
+web-layer/examples.md:90 — uses cached values supplied by the surrounding page loader
+web-layer/form.md:29 — counter-example intentionally omits bare Fresh setup
+web-layer/form.md:279 — partial field-array fragment uses the surrounding form state
+web-layer/form.md:353 — partial JSX fragment uses the surrounding form state
+web-layer/query-bridge.md:29 — counter-example intentionally omits bare Fresh setup
+web-layer/query-bridge.md:42 — counter-example intentionally omits bare TanStack setup
+web-layer/query-bridge.md:107 — pseudocode compares key shapes rather than defining runnable values
+web-layer/query-bridge.md:123 — partial invalidation fragment uses surrounding query utilities
+web-layer/query-bridge.md:138 — partial invalidation fragment uses surrounding cache values
+web-layer/query-bridge.md:163 — partial builder chain uses page-local declarations omitted here
+web-layer/query-bridge.md:197 — object-shape pseudocode documents generated query options
+web-layer/query-bridge.md:207 — partial component uses page-local types and view components
+web-layer/query-bridge.md:256 — partial builder chain continues from surrounding page code
+web-layer/query.md:71 — uses cache entries defined earlier in the surrounding application

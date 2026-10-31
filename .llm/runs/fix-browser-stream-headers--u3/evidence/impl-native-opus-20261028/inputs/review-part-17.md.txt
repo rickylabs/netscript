@@ -1,0 +1,695 @@
+# Preserved original failures and actual final runtime/gate receipts
+
+All bytes below are existing retained evidence, not new source-gate runs. Original RED and18/2 failures remain distinct from final passing receipts. The final evidence object binds actual commands/status/outputs, package/quality/doctrine/arch/publication limitations.
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/c1-native-sol-20261028/raw-gates/red-1793140216669-0.stdout
+
+Original-byte SHA256:a47f5b6a2be526e71685cf921dea50224cc48cae958313f1977a654bdd66d67f (JSON pretty view where parsable, no truncation)
+
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--frozen",
+    "--allow-all",
+    "--filter",
+    "U3 explicit header record reaches the client port",
+    "packages/fresh/tests/streamdb-headers-contract_test.ts"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+  "exitCode": 1,
+  "durationMs": 1430,
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "ignored": 0,
+    "totalResults": 1,
+    "uniqueFailures": 1
+  },
+  "failures": [
+    {
+      "message": "AssertionError: Explicit headers must reach the factory port by reference.\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at fn (file:///<cwd>/packages/fresh/tests/streamdb-headers-contract_test.ts:<line>:<column>)",
+      "count": 1,
+      "tests": [
+        {
+          "name": "U3 explicit header record reaches the client port",
+          "file": "./packages/fresh/tests/streamdb-headers-contract_test.ts",
+          "line": 22
+        }
+      ]
+    }
+  ]
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/c1-native-sol-20261028/raw-gates/tests-1793144524427-0.stdout
+
+Original-byte SHA256:ab411e8ec58540b78e97cafe7c8cc2b0a733c16e278843c71d775cd9a052ca51 (JSON pretty view where parsable, no truncation)
+
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--frozen",
+    "--allow-all",
+    "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+    "packages/fresh/src/runtime/streams/stream-db-recovery-adapter_test.ts",
+    "packages/fresh/tests/streamdb-headers-contract_test.ts"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+  "exitCode": 1,
+  "durationMs": 15140,
+  "summary": {
+    "passed": 18,
+    "failed": 2,
+    "ignored": 0,
+    "totalResults": 20,
+    "uniqueFailures": 2
+  },
+  "failures": [
+    {
+      "message": "AssertionError: StreamDB did not reach the expected state within the recovery window.\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at eventually (file:///<cwd>/packages/fresh/tests/streamdb-headers-contract_test.ts:<line>:<column>)\n    at async fn (file:///<cwd>/packages/fresh/tests/streamdb-headers-contract_test.ts:<line>:<column>)",
+      "count": 1,
+      "tests": [
+        {
+          "name": "U3 explicit per-request headers rotate across polls and reconnect at the retained offset",
+          "file": "./packages/fresh/tests/streamdb-headers-contract_test.ts",
+          "line": 100
+        }
+      ]
+    },
+    {
+      "message": "NotCapable: Requires env access to \"NODE_ENV\", run again with the --allow-env flag\n    at Object.getEnv [as get] (ext:deno_os/30_os.js:<line>:<column>)\n    at denoEnvGet (ext:deno_node/_process/process.ts:<line>:<column>)\n    at Object.get (ext:deno_node/_process/process.ts:<line>:<column>)\n    at getNodeEnvSafely (file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.js:<line>:<column>)\n    at warnIfUsingHttpInBrowser (file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.js:<line>:<column>)\n    at validateOptions (file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.js:<line>:<column>)\n    at new DurableStream (file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.js:<line>:<column>)\n    at defaultCreateStreamDB (file:///<cwd>/packages/fresh/src/runtime/streams/create-stream-db.ts:<line>:<column>)\n    at createNetScriptStreamDB (file:///<cwd>/packages/fresh/src/runtime/streams/create-stream-db.ts:<line>:<column>)\n    at fn (file:///<cwd>/packages/fresh/tests/streamdb-headers-contract_test.ts:<line>:<column>)",
+      "count": 1,
+      "tests": [
+        {
+          "name": "U3 explicit headers work and absent headers deny without env access",
+          "file": "./packages/fresh/tests/streamdb-headers-contract_test.ts",
+          "line": 269
+        }
+      ]
+    }
+  ]
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/c2-native-sol-20261028/c2/red-1793149753389.stdout
+
+Original-byte SHA256:f9fbf3135bd9ded20914e580e22cf15f2fc58fa411db17ef0e6f278dec2ffd8e (JSON pretty view where parsable, no truncation)
+
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--frozen",
+    "-A",
+    "--filter",
+    "U3 workers native headers",
+    "plugins/workers/tests/streams/factory-headers_test.ts"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+  "exitCode": 1,
+  "durationMs": 1936,
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "ignored": 0,
+    "totalResults": 1,
+    "uniqueFailures": 1
+  },
+  "failures": [
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   Bearer u3-workers-synthetic\n+   Bearer workers-v1\n\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file:///<cwd>/plugins/workers/tests/streams/factory-headers_test.ts:<line>:<column>\n    at async withServer (file:///<cwd>/plugins/workers/tests/streams/factory-headers_test.ts:<line>:<column>)\n    at async file:///<cwd>/plugins/workers/tests/streams/factory-headers_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "U3 workers native headers remain lazy and rotate on real requests",
+          "file": "./plugins/workers/tests/streams/factory-headers_test.ts",
+          "line": 22
+        }
+      ]
+    }
+  ]
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/c2-native-sol-20261028/failed-f15/application-failed.json
+
+Original-byte SHA256:fcc3ed1b566e732862cf9aab2a53872e20d662ec20ede5dacdda38df3b612fbd (JSON pretty view where parsable, no truncation)
+
+{
+  "status": "FAILED owning-doc condition; candidate reverted only by explicit root instruction",
+  "priorPlanDisposition": "Historical separate PLAN/debt decision preserved; actual owning closure was not qualified",
+  "owningFindings": 12,
+  "structuredFindings": 12,
+  "baselineUnwaived": 10,
+  "attemptedOwningRawPrefixes": [
+    "doc-1793149474316",
+    "doc-1793149545236",
+    "doc-1793149556909"
+  ],
+  "furtherDisposition": "Same independent evaluator corrective PLAN review required before any alternative",
+  "results": [
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "archive": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/f15/attempted-create-stream-db.ts",
+      "attemptedSHA256": "7a337093657ddd773fff64aaaf2d137048ddb7abbf2b2546845dddcbec73542c",
+      "restoredSHA256": "fe27fb217d8b39c707c7d4bd4bd773d5bddd31fbb08573dc283820c34ada823f"
+    },
+    {
+      "path": ".llm/harness/debt/arch-debt.md",
+      "archive": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/f15/attempted-arch-debt.md",
+      "attemptedSHA256": "f0743a6e630e023769ed3180b4778aa1d6fb5f28e5140386e216cda3ea7f9e29",
+      "restoredSHA256": "d502eafa19ffb9eab3078ca1a5ed4d3a8a7816f115f33f53f3379defdd6d0042"
+    }
+  ]
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/c2-native-sol-20261028/failed-f15/doc-1793149474316.stderr
+
+Original-byte SHA256:e0e5ef57ed62b6f3be426a05776ee8e76568766c7e3e28dc733290e4d6967c8d (JSON pretty view where parsable, no truncation)
+
+error[private-type-ref]: public type 'NetScriptStateSchema' references private type 'StateSchema'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\create-stream-db.ts:49:1
+    | 
+ 49 | export type NetScriptStateSchema<TDef extends NetScriptStreamStateDefinition> = StateSchema<TDef>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+166 | type StateSchema<T extends Record<string, CollectionDefinition>> = { [K in keyof T]: CollectionWithHelpers<T[K] extends CollectionDefinition<infer U> ? U : unknown> };
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptStreamDB["collections"]' references private type 'StreamDB'
+  --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\create-stream-db.ts:54:3
+   | 
+54 |   readonly collections: StreamDB<StateSchema<TDef>>['collections'];
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+67 | type StreamDB<TDef extends StreamStateDefinition> = {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptStreamDB["collections"]' references private type 'StateSchema'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\create-stream-db.ts:54:3
+    | 
+ 54 |   readonly collections: StreamDB<StateSchema<TDef>>['collections'];
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+166 | type StateSchema<T extends Record<string, CollectionDefinition>> = { [K in keyof T]: CollectionWithHelpers<T[K] extends CollectionDefinition<infer U> ? U : unknown> };
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptStreamDBFactoryInput["streamOptions"]' references private type 'HeadersRecord'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\create-stream-db.ts:70:3
+    | 
+ 70 |   streamOptions: {
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+154 | type HeadersRecord = {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptStreamDBOptions["headers"]' references private type 'HeadersRecord'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\create-stream-db.ts:122:3
+    | 
+122 |   headers?: HeadersRecord;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+154 | type HeadersRecord = {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptLiveQueryFactory' references private type 'Context'
+  --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:51:1
+   | 
+51 | export type NetScriptLiveQueryFactory<TContext extends Context = Context> = (
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+31 | export interface Context {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptLiveQueryFactory' references private type 'InitialQueryBuilder'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:51:1
+    | 
+ 51 | export type NetScriptLiveQueryFactory<TContext extends Context = Context> = (
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+463 | export type InitialQueryBuilder = Pick<BaseQueryBuilder<Context>, `from` | `unionAll`>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptLiveQueryFactory' references private type 'QueryBuilder'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:51:1
+    | 
+ 51 | export type NetScriptLiveQueryFactory<TContext extends Context = Context> = (
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+465 | export type QueryBuilder<TContext extends Context> = Omit<BaseQueryBuilder<TContext>, `from` | `unionAll` | `_getQuery`>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'Context'
+  --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:68:1
+   | 
+68 | export function useLiveQuery<TContext extends Context>(
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+31 | export interface Context {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'InferResultType'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:68:1
+    | 
+ 68 | export function useLiveQuery<TContext extends Context>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+542 | export type InferResultType<TContext extends Context> = TContext extends SingleResult ? GetResult<TContext> | undefined : Array<GetResult<TContext>>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'Context'
+  --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:85:1
+   | 
+85 | export function useLiveSuspenseQuery<TContext extends Context>(
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+31 | export interface Context {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'InferResultType'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:85:1
+    | 
+ 85 | export function useLiveSuspenseQuery<TContext extends Context>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+542 | export type InferResultType<TContext extends Context> = TContext extends SingleResult ? GetResult<TContext> | undefined : Array<GetResult<TContext>>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error: Found 12 documentation lint errors.
+
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/final-evidence.json
+
+Original-byte SHA256:681dbb5efa43c2727b8cf4c80459759ed56e932efc02dc67418a3807e40cd295 (JSON pretty view where parsable, no truncation)
+
+{
+  "capturedAt": "2026-10-28T02:25:44.502Z",
+  "sourceAcceptance": "Pending root source/gate review; no checkpoint",
+  "sources": [
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "sha256": "e46d3baa4c35d0ec45ea5c3fcbe47234c34d66d5a2e57336ed7819b8e5f97d2b",
+      "lines": 229,
+      "snapshot": ".llm/tmp/u3-type-closure-application-20261028/source-final/0-create-stream-db.ts",
+      "exactAcceptedSource": true
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/mod.ts",
+      "sha256": "148969fac7d5401855af15a4eff73ac92dfe9cb4d191328d9b81f08b70e4ec36",
+      "lines": 100,
+      "snapshot": ".llm/tmp/u3-type-closure-application-20261028/source-final/1-mod.ts",
+      "exactAcceptedSource": true
+    },
+    {
+      "path": "plugins/workers/streams/factory.ts",
+      "sha256": "18786a3bc5e5d13558fb2b5747d3f2278cc0f69dfa42cc4509817ae2867f055e",
+      "lines": 74,
+      "snapshot": ".llm/tmp/u3-type-closure-application-20261028/source-final/2-factory.ts",
+      "exactAcceptedSource": true
+    },
+    {
+      "path": "plugins/workers/streams/mod.ts",
+      "sha256": "b07b1e26b6eb07fb95d6073a04feee4ca60470da3310c5f8b467527512ccb318",
+      "lines": 39,
+      "snapshot": ".llm/tmp/u3-type-closure-application-20261028/source-final/3-mod.ts",
+      "exactAcceptedSource": true
+    },
+    {
+      "path": ".llm/harness/debt/arch-debt.md",
+      "sha256": "d7ada055665ff1d9efc031fbdbbda608040ab161f1d297fd12a14b05f3ad91e3",
+      "lines": 2978,
+      "snapshot": ".llm/tmp/u3-type-closure-application-20261028/source-final/4-arch-debt.md",
+      "exactAcceptedSource": false
+    }
+  ],
+  "gates": [
+    {
+      "selected": "doc-fresh",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "code": 1,
+      "started": "2026-10-28T02:20:19.670Z",
+      "ended": "2026-10-28T02:20:19.876Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/doc-fresh-1793154019653",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/doc-fresh-1793154019653.json",
+      "sha256": "6c818d06e722ccac328eded0c058d7aeb7cc8a2e5f4154e25d354903b91f8762",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "a7f26422892853738dfb83c87524e996bda22b74028298d88124b18c5a3bcc59"
+    },
+    {
+      "selected": "doc-workers",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "plugins/workers/streams/mod.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:19.987Z",
+      "ended": "2026-10-28T02:20:20.144Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/doc-workers-1793154019983",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/doc-workers-1793154019983.json",
+      "sha256": "ffc4dc8cd87084de2924932dd2f757c1cff7ab4cc55ede7c565b8242015aa0fb",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+    },
+    {
+      "selected": "json-fresh",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:20.245Z",
+      "ended": "2026-10-28T02:20:20.428Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-1793154020242",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-1793154020242.json",
+      "sha256": "c8a37e6e6c7f8a0c0d93b267948781bbb41c853a957c71012a74bd86d4f16db8",
+      "stdoutSha256": "cc1d83c192fbb4f0c48c8422da55d7b896c67940407ef8c6217d68a852a7b8ac",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "json-workers",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "plugins/workers/streams/mod.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:20.554Z",
+      "ended": "2026-10-28T02:20:20.701Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/json-workers-1793154020550",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-workers-1793154020550.json",
+      "sha256": "86a5de457ba7d470ccf59621099a265f772bebd943a9eb48195578ba1b2e7f81",
+      "stdoutSha256": "5c56954a50cc2c3ed9aeba2c6e2324c7bc2c8aac8930da7722e3a6263d18b1ed",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "json-fresh-source",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "packages/fresh/src/runtime/streams/create-stream-db.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:20.800Z",
+      "ended": "2026-10-28T02:20:20.950Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-source-1793154020796",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-source-1793154020796.json",
+      "sha256": "1e8ea484f368412902700e9d7254682c6aec8d07103bb3b2dba60dedfe744d0d",
+      "stdoutSha256": "c2a988b5375ed5aa23b6c8c9a6b0a859bd1e69a7e45af8b9ad14757a10053643",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "json-workers-source",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "plugins/workers/streams/factory.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:21.070Z",
+      "ended": "2026-10-28T02:20:21.210Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/json-workers-source-1793154021067",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/json-workers-source-1793154021067.json",
+      "sha256": "d8f47aee9f08738e80159d7d96eeb0a24a648132e71aaa7a4e1c4be912be322a",
+      "stdoutSha256": "ddb8f91cfc6b1c6c8d230470dcb8fcaa4e1e6386f8e6b86532e415503de0d5ad",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "c1-tests",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-test.ts",
+        "--",
+        "--frozen",
+        "-A",
+        "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+        "packages/fresh/src/runtime/streams/stream-db-recovery-adapter_test.ts",
+        "packages/fresh/tests/streamdb-headers-contract_test.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:21.324Z",
+      "ended": "2026-10-28T02:20:32.840Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/c1-tests-1793154021321",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/c1-tests-1793154021321.json",
+      "sha256": "113cf48746ca9e9d3a724adf2c71f57eb3073abbbda3b6e4b6bc1d7c82486be4",
+      "stdoutSha256": "5c8902c4eeb355adcd649bf62c1fa405abb21fe9b48ea01bf6e55afed20aacef",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "c2-tests",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-test.ts",
+        "--",
+        "--frozen",
+        "-A",
+        "plugins/workers/tests/streams/factory-headers_test.ts",
+        "plugins/workers/tests/streams/factory-discovery_test.ts",
+        "plugins/workers/tests/streams/live-query-consumer_test.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:32.971Z",
+      "ended": "2026-10-28T02:20:40.091Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/c2-tests-1793154032967",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/c2-tests-1793154032967.json",
+      "sha256": "f1322a2976a55c3c0266cbf62b1962f0df6d6b98968f25c80db65a149d3558cb",
+      "stdoutSha256": "c7e6fac422e0085ec95586e976cf058a35add3cbc641e0e9541910812e5e4d0b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "types",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-check.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/create-stream-db.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/mod.ts",
+        "--file",
+        "plugins/workers/streams/factory.ts",
+        "--file",
+        "plugins/workers/streams/mod.ts",
+        "--deno-arg",
+        "--frozen",
+        "--deno-arg",
+        "--unstable-kv"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:40.209Z",
+      "ended": "2026-10-28T02:20:42.515Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/types-1793154040205",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/types-1793154040205.json",
+      "sha256": "df2a14ad9db61b90153847873b07d78c295b01e4c11c6731604db33b5b6dd3a5",
+      "stdoutSha256": "6ab5e4dc25afd43fba9563146b17f8db12f7820dd7ce02c0d2bed242fbe859b1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "consumer-fresh",
+      "args": [
+        "task",
+        "--cwd",
+        "packages/fresh",
+        "check:streams-types"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:42.634Z",
+      "ended": "2026-10-28T02:20:42.846Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/consumer-fresh-1793154042630",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/consumer-fresh-1793154042630.json",
+      "sha256": "abdc63cbef8a754d345ac59beb510e3e34fb0a97d7513905522624ea73656798",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "dbf2fb7c3f4086b61a67b74b910274ebc5968d6dc85c66dd14b5f79ab36e0545"
+    },
+    {
+      "selected": "consumer-workers",
+      "args": [
+        "check",
+        "--frozen",
+        "--unstable-kv",
+        "plugins/workers/tests/streams/live-query-consumer_type.ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:42.952Z",
+      "ended": "2026-10-28T02:20:43.094Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/consumer-workers-1793154042948",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/consumer-workers-1793154042948.json",
+      "sha256": "dc3e732c91106bb9f0ac57ae6daae1e3b3cb37eee0bfa68c167793e5d778af3a",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "lint",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-lint.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/create-stream-db.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/mod.ts",
+        "--file",
+        "plugins/workers/streams/factory.ts",
+        "--file",
+        "plugins/workers/streams/mod.ts",
+        "--ext",
+        "ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:43.231Z",
+      "ended": "2026-10-28T02:20:44.600Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/lint-1793154043228",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/lint-1793154043228.json",
+      "sha256": "5d9568ed4ffbba305d50b86f4aed2f077453da5366afa591c2c065cebff4abd2",
+      "stdoutSha256": "ee3dd9af90bbbba3a87a74e93b7ba11a9c1bcf3c3cb8d2dcbfd5929b8ef1cfdb",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "fmt",
+      "args": [
+        "run",
+        "--frozen",
+        "-A",
+        ".llm/tools/run-deno-fmt.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/create-stream-db.ts",
+        "--file",
+        "packages/fresh/src/runtime/streams/mod.ts",
+        "--file",
+        "plugins/workers/streams/factory.ts",
+        "--file",
+        "plugins/workers/streams/mod.ts",
+        "--ext",
+        "ts"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:20:44.725Z",
+      "ended": "2026-10-28T02:20:44.998Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/fmt-1793154044722",
+      "receipt": ".llm/tmp/u3-type-closure-application-20261028/fmt-1793154044722.json",
+      "sha256": "9b6ed4ecc8caffc93a9f2e29220e7d3f6d429b4818213973e4dacdadf7e38a11",
+      "stdoutSha256": "b8631280c5db8e7a9f10c253fa42291e4aea4a01eb27e2c3fdce5242a38ed5f1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selected": "package-fresh",
+      "args": [
+        "task",
+        "--cwd",
+        "packages/fresh",
+        "check"
+      ],
+      "code": 0,
+      "started": "2026-10-28T02:21:09.637Z",
+      "ended": "2026-10-28T02:21:13.110Z",
+      "deadlineAborted": false,
+      "originalOutputAwaited": true,
+      "prefix": ".llm/tmp/u3-type-closure-application-20261028/package-fresh-1793154069634",

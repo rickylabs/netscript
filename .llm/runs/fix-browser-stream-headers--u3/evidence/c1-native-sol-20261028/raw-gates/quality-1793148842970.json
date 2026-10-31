@@ -1,0 +1,49 @@
+{
+  "selected": "quality",
+  "results": [
+    {
+      "args": [
+        "run",
+        "--frozen",
+        "--allow-all",
+        ".llm/tools/quality/scan-code-quality.ts",
+        "--root",
+        "packages/fresh",
+        "--max-allow",
+        "7"
+      ],
+      "code": 0,
+      "started": "2026-10-28T00:54:02.970Z",
+      "ended": "2026-10-28T00:54:03.411Z",
+      "originalChildStatusAwaited": true,
+      "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/quality-1793148842970-0.stdout",
+      "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/quality-1793148842970-0.stderr"
+    }
+  ],
+  "credentialFreeClearEnv": true,
+  "environmentNames": [
+    "ProgramFiles(x86)",
+    "SystemDrive",
+    "HTTPS_PROXY",
+    "ProgramW6432",
+    "windir",
+    "PATHEXT",
+    "HTTP_PROXY",
+    "NO_PROXY",
+    "ComSpec",
+    "ProgramFiles",
+    "SystemRoot",
+    "HOME",
+    "USERPROFILE",
+    "TEMP",
+    "TMP",
+    "DENO_TLS_CA_STORE",
+    "DENO_DIR",
+    "PATH",
+    "DENO_NO_PROMPT",
+    "DENO_NO_UPDATE_CHECK",
+    "OTEL_DENO",
+    "NO_COLOR"
+  ],
+  "authoredConsumerNoLockRetained": false
+}

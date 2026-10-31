@@ -1,0 +1,169 @@
+error[private-type-ref]: public type 'NetScriptStateSchema' references private type 'StateSchema'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\create-stream-db.ts:50:1
+    | 
+ 50 | export type NetScriptStateSchema<TDef extends NetScriptStreamStateDefinition> = StateSchema<TDef>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+166 | type StateSchema<T extends Record<string, CollectionDefinition>> = { [K in keyof T]: CollectionWithHelpers<T[K] extends CollectionDefinition<infer U> ? U : unknown> };
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptStreamDB["collections"]' references private type 'StreamDB'
+  --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\create-stream-db.ts:55:3
+   | 
+55 |   readonly collections: StreamDB<StateSchema<TDef>>['collections'];
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+67 | type StreamDB<TDef extends StreamStateDefinition> = {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptStreamDB["collections"]' references private type 'StateSchema'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\create-stream-db.ts:55:3
+    | 
+ 55 |   readonly collections: StreamDB<StateSchema<TDef>>['collections'];
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+166 | type StateSchema<T extends Record<string, CollectionDefinition>> = { [K in keyof T]: CollectionWithHelpers<T[K] extends CollectionDefinition<infer U> ? U : unknown> };
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptStreamDBFactoryInput["streamOptions"]' references private type 'HeadersRecord'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\create-stream-db.ts:71:3
+    | 
+ 71 |   streamOptions: {
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+154 | type HeadersRecord = {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptStreamDBOptions["headers"]' references private type 'HeadersRecord'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\create-stream-db.ts:123:3
+    | 
+123 |   headers?: HeadersRecord;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+154 | type HeadersRecord = {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptLiveQueryFactory' references private type 'Context'
+  --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:51:1
+   | 
+51 | export type NetScriptLiveQueryFactory<TContext extends Context = Context> = (
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+31 | export interface Context {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptLiveQueryFactory' references private type 'InitialQueryBuilder'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:51:1
+    | 
+ 51 | export type NetScriptLiveQueryFactory<TContext extends Context = Context> = (
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+463 | export type InitialQueryBuilder = Pick<BaseQueryBuilder<Context>, `from` | `unionAll`>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptLiveQueryFactory' references private type 'QueryBuilder'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:51:1
+    | 
+ 51 | export type NetScriptLiveQueryFactory<TContext extends Context = Context> = (
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+465 | export type QueryBuilder<TContext extends Context> = Omit<BaseQueryBuilder<TContext>, `from` | `unionAll` | `_getQuery`>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'Context'
+  --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:68:1
+   | 
+68 | export function useLiveQuery<TContext extends Context>(
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+31 | export interface Context {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'InferResultType'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:68:1
+    | 
+ 68 | export function useLiveQuery<TContext extends Context>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+542 | export type InferResultType<TContext extends Context> = TContext extends SingleResult ? GetResult<TContext> | undefined : Array<GetResult<TContext>>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'Context'
+  --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:85:1
+   | 
+85 | export function useLiveSuspenseQuery<TContext extends Context>(
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+31 | export interface Context {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'InferResultType'
+   --> C:\Users\ericc\source\repos\netscript-browser-stream-headers-008\packages\fresh\src\runtime\streams\mod.ts:85:1
+    | 
+ 85 | export function useLiveSuspenseQuery<TContext extends Context>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+542 | export type InferResultType<TContext extends Context> = TContext extends SingleResult ? GetResult<TContext> | undefined : Array<GetResult<TContext>>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error: Found 12 documentation lint errors.

@@ -1,0 +1,22 @@
+{
+  "selected": "lint",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-lint.ts",
+    "--file",
+    "plugins/workers/streams/factory.ts",
+    "--file",
+    "plugins/workers/tests/streams/factory-headers_test.ts",
+    "--file",
+    "plugins/workers/tests/streams/live-query-consumer_type.ts",
+    "--ext",
+    "ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T01:11:30.065Z",
+  "ended": "2026-10-28T01:11:31.030Z",
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/lint-1793149890061"
+}

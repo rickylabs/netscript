@@ -1,0 +1,19 @@
+{
+  "selected": "quality-workers",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/quality/scan-code-quality.ts",
+    "--root",
+    "plugins/workers",
+    "--max-allow",
+    "7"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:21:16.650Z",
+  "ended": "2026-10-28T02:21:17.311Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/quality-workers-1793154076647"
+}

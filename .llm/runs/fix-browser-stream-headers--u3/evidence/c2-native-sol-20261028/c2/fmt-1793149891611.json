@@ -1,0 +1,22 @@
+{
+  "selected": "fmt",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-fmt.ts",
+    "--file",
+    "plugins/workers/streams/factory.ts",
+    "--file",
+    "plugins/workers/tests/streams/factory-headers_test.ts",
+    "--file",
+    "plugins/workers/tests/streams/live-query-consumer_type.ts",
+    "--ext",
+    "ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T01:11:31.615Z",
+  "ended": "2026-10-28T01:11:31.815Z",
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/fmt-1793149891611"
+}

@@ -1,0 +1,37 @@
+{
+  "exactSource": "docs/site/durable-workflows/streams.md:309",
+  "body": "import { createWorkersStreamDB } from \"@netscript/plugin-workers/streams\";\ndeclare const readReaderToken: () => Promise<string>;\nconst workers = createWorkersStreamDB({\n  headers: { authorization: async () => `Bearer ${await readReaderToken()}` },\n});",
+  "results": [
+    {
+      "name": "positive",
+      "args": [
+        "check",
+        "--frozen",
+        "--unstable-kv",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/plugins/workers/tests/streams\\u3-docs-recipe-284d175c4bc17e6f/positive.ts"
+      ],
+      "code": 0,
+      "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c3/recipe-positive-1793151043761",
+      "source": "import { createWorkersStreamDB } from \"@netscript/plugin-workers/streams\";\ndeclare const readReaderToken: () => Promise<string>;\nconst workers = createWorkersStreamDB({\n  headers: { authorization: async () => `Bearer ${await readReaderToken()}` },\n});"
+    },
+    {
+      "name": "negative",
+      "args": [
+        "check",
+        "--frozen",
+        "--unstable-kv",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/plugins/workers/tests/streams\\u3-docs-recipe-284d175c4bc17e6f/negative.ts"
+      ],
+      "code": 1,
+      "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c3/recipe-negative-1793151045113",
+      "source": "import { createWorkersStreamDB } from \"@netscript/plugin-workers/streams\";\ndeclare const readReaderToken: () => Promise<string>;\nconst workers = createWorkersStreamDB({\n  headers: { authorization: 1 },\n});"
+    }
+  ],
+  "interpretation": "Supporting explicit public compiler control; global docs:snippets checks Tier-1 web pages and does not cover this streams page.",
+  "allOutputAwaited": true,
+  "sourceExecuted": false
+}

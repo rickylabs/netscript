@@ -1,0 +1,15 @@
+{
+  "selected": "doc-fresh",
+  "args": [
+    "doc",
+    "--lint",
+    "--frozen",
+    "packages/fresh/src/runtime/streams/mod.ts"
+  ],
+  "code": 1,
+  "started": "2026-10-28T02:20:19.670Z",
+  "ended": "2026-10-28T02:20:19.876Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/doc-fresh-1793154019653"
+}

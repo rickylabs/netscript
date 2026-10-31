@@ -1,0 +1,685 @@
+{
+  "capturedAt": "2026-10-28T02:30:57.323Z",
+  "byteVerified": true,
+  "policy": "Raw application and actual-source diagnostic records only. All earlier failures remain immutable. Account/operational usage and private model sessions excluded.",
+  "entries": [
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/accuracy-parent-1793154225917.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/accuracy-parent-1793154225917.json",
+      "bytes": 329,
+      "sha256": "8a06087d6504ef12bbad2e1e00a3423e908e822945b4a13915a0d79ffe01ca7f"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/accuracy-parent-1793154225917.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/accuracy-parent-1793154225917.stderr",
+      "bytes": 5590,
+      "sha256": "dea8905984471c36ef06e14313e59f084bd61d6322b2b4b3debdf5a06f565acb"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/accuracy-parent-1793154225917.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/accuracy-parent-1793154225917.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/application-review.md",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/application-review.md",
+      "bytes": 2880,
+      "sha256": "0490dcb5d0e4321022a088d1a8ecf3d6d1a35ee0a2c07c25d7eecdcfee26de4c"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/arch-1793154089431.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/arch-1793154089431.json",
+      "bytes": 304,
+      "sha256": "bd269909ed0a668584795e721d0a8791d5f785a47f85f365989130a03eb874a3"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/arch-1793154089431.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/arch-1793154089431.stderr",
+      "bytes": 1911,
+      "sha256": "4d818f9681f9695c962201dba20f2a8bdfe69592dffec380874724b524a1be07"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/arch-1793154089431.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/arch-1793154089431.stdout",
+      "bytes": 22395,
+      "sha256": "958d4c97036acd38b43b9e2418511a6d322f79e0ccca73dec75122bb8f644ad1"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/before/0-create-stream-db.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before/0-create-stream-db.ts",
+      "bytes": 8958,
+      "sha256": "809df1fd5b44af597399d60c972397b4b133252719782473d330e88e5d0141f9"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/before/1-mod.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before/1-mod.ts",
+      "bytes": 3315,
+      "sha256": "439fd1b14fd1021e172644f172b2ed23a028808b0f3dd7ec7c16b7837763d047"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/before/2-factory.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before/2-factory.ts",
+      "bytes": 2527,
+      "sha256": "ed94832c5778bf942fd7b0c1d8c38ea4a2ef416e893243249a65bc858ec76763"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/before/3-mod.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before/3-mod.ts",
+      "bytes": 969,
+      "sha256": "2692919e148f7ea1ba14c2195e6cada3bc16fcf61e6b0984412dddc819b31d8d"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/before/4-arch-debt.md",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before/4-arch-debt.md",
+      "bytes": 202336,
+      "sha256": "d502eafa19ffb9eab3078ca1a5ed4d3a8a7816f115f33f53f3379defdd6d0042"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/before/5-deno.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before/5-deno.json",
+      "bytes": 22366,
+      "sha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/before/6-deno.lock",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before/6-deno.lock",
+      "bytes": 191344,
+      "sha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/before/7-deno.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before/7-deno.json",
+      "bytes": 5333,
+      "sha256": "ecc1f7b2daeccc758904c123615992c0f38183ea05e604d5d53d1c9be4df0c56"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/before/8-deno.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before/8-deno.json",
+      "bytes": 2975,
+      "sha256": "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/before.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/before.json",
+      "bytes": 2729,
+      "sha256": "6dd68e0ae06cd0dc34f94c1036777eed45a3442099bcc67248c52eebe825edd0"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/c1-tests-1793154021321.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c1-tests-1793154021321.json",
+      "bytes": 596,
+      "sha256": "113cf48746ca9e9d3a724adf2c71f57eb3073abbbda3b6e4b6bc1d7c82486be4"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/c1-tests-1793154021321.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c1-tests-1793154021321.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/c1-tests-1793154021321.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c1-tests-1793154021321.stdout",
+      "bytes": 478,
+      "sha256": "5c8902c4eeb355adcd649bf62c1fa405abb21fe9b48ea01bf6e55afed20aacef"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/c2-tests-1793154032967.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c2-tests-1793154032967.json",
+      "bytes": 579,
+      "sha256": "f1322a2976a55c3c0266cbf62b1962f0df6d6b98968f25c80db65a149d3558cb"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/c2-tests-1793154032967.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c2-tests-1793154032967.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/c2-tests-1793154032967.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c2-tests-1793154032967.stdout",
+      "bytes": 458,
+      "sha256": "c7e6fac422e0085ec95586e976cf058a35add3cbc641e0e9541910812e5e4d0b"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/check-identity.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/check-identity.ts",
+      "bytes": 6993,
+      "sha256": "44c23b4e992edb49725de8b4e01a0eef9ebbf8b856c686a2fba37b7927d25b42"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-map-factory.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-map-factory.json",
+      "bytes": 529,
+      "sha256": "4c58bff86986ec9706aeabb0b1fc096c61257d5e2dd251aace790f5f90ccba3f"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-map-factory.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-map-factory.stderr",
+      "bytes": 2539,
+      "sha256": "fc03b07771672861e02e961dbc73a94aceb676b3fc160537dd417332e363553d"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-map-factory.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-map-factory.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-map-factory.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-map-factory.ts",
+      "bytes": 1676,
+      "sha256": "3a614f3335f85a496bcbb630fbc2af1d8feadcfa0323c4af1c044cce8185df27"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-numeric-async.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-numeric-async.json",
+      "bytes": 533,
+      "sha256": "4309760aebec668810ce11d01311406476a2d91c9ff7f887e4c8532eda51af03"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-numeric-async.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-numeric-async.stderr",
+      "bytes": 3256,
+      "sha256": "988abd80f8209f99169a4fde614a4768185bf61948b3a776040c9ed18089177b"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-numeric-async.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-numeric-async.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-numeric-async.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-numeric-async.ts",
+      "bytes": 1670,
+      "sha256": "2e8a75337cede718e79e2206f13fa1157ee4107c2736fba5816bd1701bb053d0"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-numeric-value.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-numeric-value.json",
+      "bytes": 533,
+      "sha256": "36e1b90d0491d9808c694ac6bb02e93917ae81e5b813e53e95747d8f847e65cb"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-numeric-value.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-numeric-value.stderr",
+      "bytes": 2287,
+      "sha256": "ba62f9c0e8ecc77e9f17bf7b9f8fb1632cc845fe5127360064ec969bb6c771a7"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-numeric-value.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-numeric-value.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-numeric-value.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-numeric-value.ts",
+      "bytes": 1634,
+      "sha256": "37f85d02c45d6a7b4ab8fb032cce3e6094f8b327914b54b2be21f133bda1c67b"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-positive.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-positive.json",
+      "bytes": 523,
+      "sha256": "47c81b0054bfca5e9aa20a0acba9856441c7714aa256975e983ad19c59653f86"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-positive.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-positive.stderr",
+      "bytes": 68,
+      "sha256": "415da6f12bec9ce02b347ecc9df8a6f0170df0a068911826bd0d73aac20ff84d"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-positive.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-positive.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-positive.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-positive.ts",
+      "bytes": 3051,
+      "sha256": "e835a01b93b814bf279e6b5131d6f0ec7a8eb7085a0c195436c0ce6020bdfa89"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/compiler-proof.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/compiler-proof.json",
+      "bytes": 2598,
+      "sha256": "41ebb46f5be5cda05c68c7785ca946e2b635fed9623263fe9e86ed0434b62df7"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/consumer-fresh-1793154042630.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/consumer-fresh-1793154042630.json",
+      "bytes": 368,
+      "sha256": "abdc63cbef8a754d345ac59beb510e3e34fb0a97d7513905522624ea73656798"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/consumer-fresh-1793154042630.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/consumer-fresh-1793154042630.stderr",
+      "bytes": 166,
+      "sha256": "dbf2fb7c3f4086b61a67b74b910274ebc5968d6dc85c66dd14b5f79ab36e0545"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/consumer-fresh-1793154042630.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/consumer-fresh-1793154042630.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/consumer-workers-1793154042948.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/consumer-workers-1793154042948.json",
+      "bytes": 413,
+      "sha256": "dc3e732c91106bb9f0ac57ae6daae1e3b3cb37eee0bfa68c167793e5d778af3a"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/consumer-workers-1793154042948.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/consumer-workers-1793154042948.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/consumer-workers-1793154042948.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/consumer-workers-1793154042948.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/doc-fresh-1793154019653.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doc-fresh-1793154019653.json",
+      "bytes": 374,
+      "sha256": "6c818d06e722ccac328eded0c058d7aeb7cc8a2e5f4154e25d354903b91f8762"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/doc-fresh-1793154019653.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doc-fresh-1793154019653.stderr",
+      "bytes": 6455,
+      "sha256": "a7f26422892853738dfb83c87524e996bda22b74028298d88124b18c5a3bcc59"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/doc-fresh-1793154019653.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doc-fresh-1793154019653.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/doc-workers-1793154019983.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doc-workers-1793154019983.json",
+      "bytes": 367,
+      "sha256": "ffc4dc8cd87084de2924932dd2f757c1cff7ab4cc55ede7c565b8242015aa0fb"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/doc-workers-1793154019983.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doc-workers-1793154019983.stderr",
+      "bytes": 15,
+      "sha256": "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/doc-workers-1793154019983.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doc-workers-1793154019983.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/doctrine-1793154077416.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doctrine-1793154077416.json",
+      "bytes": 411,
+      "sha256": "a07b177dd5ab3991bcd8f346798cf910d647225e909df53157382084307a0cc0"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/doctrine-1793154077416.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doctrine-1793154077416.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/doctrine-1793154077416.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/doctrine-1793154077416.stdout",
+      "bytes": 25843,
+      "sha256": "1fa1702a80909b4e5404ba89fad081347deaaca9beb4d6e117f75d434ca9f5e7"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/final-evidence.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/final-evidence.json",
+      "bytes": 46749,
+      "sha256": "681dbb5efa43c2727b8cf4c80459759ed56e932efc02dc67418a3807e40cd295"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/final.diff",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/final.diff",
+      "bytes": 6563,
+      "sha256": "0a687159db3156c00e761bfa520ef8825a5dabeb8d90eed839eba8cad589fe67"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/fmt-1793154044722.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/fmt-1793154044722.json",
+      "bytes": 613,
+      "sha256": "9b6ed4ecc8caffc93a9f2e29220e7d3f6d429b4818213973e4dacdadf7e38a11"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/fmt-1793154044722.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/fmt-1793154044722.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/fmt-1793154044722.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/fmt-1793154044722.stdout",
+      "bytes": 313,
+      "sha256": "b8631280c5db8e7a9f10c253fa42291e4aea4a01eb27e2c3fdce5242a38ed5f1"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-1793154020242.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/json-fresh-1793154020242.json",
+      "bytes": 376,
+      "sha256": "c8a37e6e6c7f8a0c0d93b267948781bbb41c853a957c71012a74bd86d4f16db8"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-1793154020242.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/json-fresh-1793154020242.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-1793154020242.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/json-fresh-1793154020242.stdout",
+      "bytes": 221215,
+      "sha256": "cc1d83c192fbb4f0c48c8422da55d7b896c67940407ef8c6217d68a852a7b8ac"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-source-1793154020796.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/json-fresh-source-1793154020796.json",
+      "bytes": 403,
+      "sha256": "1e8ea484f368412902700e9d7254682c6aec8d07103bb3b2dba60dedfe744d0d"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-source-1793154020796.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/json-fresh-source-1793154020796.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-source-1793154020796.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/json-fresh-source-1793154020796.stdout",
+      "bytes": 56023,
+      "sha256": "c2a988b5375ed5aa23b6c8c9a6b0a859bd1e69a7e45af8b9ad14757a10053643"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/json-workers-1793154020550.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/json-workers-1793154020550.json",
+      "bytes": 369,
+      "sha256": "86a5de457ba7d470ccf59621099a265f772bebd943a9eb48195578ba1b2e7f81"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/json-workers-1793154020550.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/json-workers-1793154020550.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/json-workers-1793154020550.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/json-workers-1793154020550.stdout",
+      "bytes": 185045,
+      "sha256": "5c56954a50cc2c3ed9aeba2c6e2324c7bc2c8aac8930da7722e3a6263d18b1ed"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/json-workers-source-1793154021067.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/json-workers-source-1793154021067.json",
+      "bytes": 387,
+      "sha256": "d8f47aee9f08738e80159d7d96eeb0a24a648132e71aaa7a4e1c4be912be322a"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/json-workers-source-1793154021067.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/json-workers-source-1793154021067.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/json-workers-source-1793154021067.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/json-workers-source-1793154021067.stdout",
+      "bytes": 51084,
+      "sha256": "ddb8f91cfc6b1c6c8d230470dcb8fcaa4e1e6386f8e6b86532e415503de0d5ad"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/lint-1793154043228.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/lint-1793154043228.json",
+      "bytes": 616,
+      "sha256": "5d9568ed4ffbba305d50b86f4aed2f077453da5366afa591c2c065cebff4abd2"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/lint-1793154043228.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/lint-1793154043228.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/lint-1793154043228.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/lint-1793154043228.stdout",
+      "bytes": 364,
+      "sha256": "ee3dd9af90bbbba3a87a74e93b7ba11a9c1bcf3c3cb8d2dcbfd5929b8ef1cfdb"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/package-fresh-1793154069634.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/package-fresh-1793154069634.json",
+      "bytes": 352,
+      "sha256": "ac3909eacb4d09808a5e36637750c28d5556c295cb776bbf9502a37a988598c0"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/package-fresh-1793154069634.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/package-fresh-1793154069634.stderr",
+      "bytes": 1405,
+      "sha256": "92204eea7cd9eb4e14685b03593b9deec85507ec14b7db16eea8cfcace63cad5"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/package-fresh-1793154069634.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/package-fresh-1793154069634.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/package-workers-1793154073219.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/package-workers-1793154073219.json",
+      "bytes": 357,
+      "sha256": "c8510b2beab8b108f124bdd5bff959b3a6761fee8441fbefb2846d17f1852391"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/package-workers-1793154073219.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/package-workers-1793154073219.stderr",
+      "bytes": 566,
+      "sha256": "e4468545b4dd509017e86a32f746d5a52291d271d5984a9fb6ae65d99652f69e"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/package-workers-1793154073219.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/package-workers-1793154073219.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/parity-external-1793154220399.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/parity-external-1793154220399.json",
+      "bytes": 575,
+      "sha256": "7ea3159cb21c14c9fb787f06c82de356f9a3367f55bd11182388f4a9aa52ffc2"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/parity-external-1793154220399.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/parity-external-1793154220399.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/parity-external-1793154220399.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/parity-external-1793154220399.stdout",
+      "bytes": 13345,
+      "sha256": "83f15ce3404499c38dd69139bdbc2d200144a061d61eccc92a797931bb507027"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/prepare-checkpoint.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/prepare-checkpoint.ts",
+      "bytes": 7341,
+      "sha256": "e4d71a03101bbbaf2f9f98c42817e3f8073039ef98c20e5694b8784118cd345f"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/prepare.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/prepare.ts",
+      "bytes": 1587,
+      "sha256": "708421e3d5cd64b8c8ab9ee208e0b7bd1ac681268e168c971aa05514f9d2768c"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/publish-fresh-1793154094343.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/publish-fresh-1793154094343.json",
+      "bytes": 362,
+      "sha256": "81911e80bb84aa51d35e682fe562a8c39f3dc03e7a5f39321847fe47879d6d3c"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/publish-fresh-1793154094343.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/publish-fresh-1793154094343.stderr",
+      "bytes": 21486,
+      "sha256": "762cb4630f2bc50b5c47f739be09b81506ed0b0d99cf33dfbe1dc4018e736d25"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/publish-fresh-1793154094343.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/publish-fresh-1793154094343.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/publish-workers-1793154097182.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/publish-workers-1793154097182.json",
+      "bytes": 367,
+      "sha256": "4dde624d2d7a563888a11f8ad38c2781fd191b84141c42e05c28cc53deab7720"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/publish-workers-1793154097182.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/publish-workers-1793154097182.stderr",
+      "bytes": 14276,
+      "sha256": "b514bd902ca45c8a6810c1a656e8ff2d6e8665c7b6c365cde8b5412cc33acbb8"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/publish-workers-1793154097182.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/publish-workers-1793154097182.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/quality-fresh-1793154076165.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/quality-fresh-1793154076165.json",
+      "bytes": 440,
+      "sha256": "02e5ec3e84cbbba323032af7ac95afb5f6dbdd2ad7792df001404094024dc366"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/quality-fresh-1793154076165.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/quality-fresh-1793154076165.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/quality-fresh-1793154076165.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/quality-fresh-1793154076165.stdout",
+      "bytes": 129,
+      "sha256": "73a7c15ab80e42ae0868b8c546b063838172d53c298d08bda5ab28560e1e5961"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/quality-workers-1793154076647.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/quality-workers-1793154076647.json",
+      "bytes": 445,
+      "sha256": "95d96baf0dd2ab272be15c84a8dca1cbae27b14e295826c4df4c5248635f26a5"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/quality-workers-1793154076647.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/quality-workers-1793154076647.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/quality-workers-1793154076647.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/quality-workers-1793154076647.stdout",
+      "bytes": 297,
+      "sha256": "6249e64ff4286877ffd26bdf1e328dcb8e104210cf10a412be7db17a88427c3e"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/run-gate.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/run-gate.ts",
+      "bytes": 5196,
+      "sha256": "bf6351cad520bfe69417a241113f1901c9f22a882b938658397e0d79e02d592c"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/seal.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/seal.ts",
+      "bytes": 9154,
+      "sha256": "c1798880712fc0c4815767a744e75b3f83253e734a974486954b1c88fc1df476"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/source-final/0-create-stream-db.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/source-final/0-create-stream-db.ts",
+      "bytes": 9017,
+      "sha256": "e46d3baa4c35d0ec45ea5c3fcbe47234c34d66d5a2e57336ed7819b8e5f97d2b"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/source-final/1-mod.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/source-final/1-mod.ts",
+      "bytes": 3358,
+      "sha256": "148969fac7d5401855af15a4eff73ac92dfe9cb4d191328d9b81f08b70e4ec36"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/source-final/2-factory.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/source-final/2-factory.ts",
+      "bytes": 2586,
+      "sha256": "18786a3bc5e5d13558fb2b5747d3f2278cc0f69dfa42cc4509817ae2867f055e"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/source-final/3-mod.ts",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/source-final/3-mod.ts",
+      "bytes": 1012,
+      "sha256": "b07b1e26b6eb07fb95d6073a04feee4ca60470da3310c5f8b467527512ccb318"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/source-final/4-arch-debt.md",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/source-final/4-arch-debt.md",
+      "bytes": 206071,
+      "sha256": "d7ada055665ff1d9efc031fbdbbda608040ab161f1d297fd12a14b05f3ad91e3"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/types-1793154040205.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/types-1793154040205.json",
+      "bytes": 669,
+      "sha256": "df2a14ad9db61b90153847873b07d78c295b01e4c11c6731604db33b5b6dd3a5"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/types-1793154040205.stderr",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/types-1793154040205.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": ".llm/tmp/u3-type-closure-application-20261028/types-1793154040205.stdout",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/types-1793154040205.stdout",
+      "bytes": 339,
+      "sha256": "6ab5e4dc25afd43fba9563146b17f8db12f7820dd7ce02c0d2bed242fbe859b1"
+    },
+    {
+      "source": ".llm/tmp/u3-doc-closure-exact-20261028/report.md",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/diagnostic/report.md",
+      "bytes": 4102,
+      "sha256": "c016dd45908224f35bd4ad383379a68c1cc19009cfd522f5b7797d4e4b98ec42"
+    },
+    {
+      "source": ".llm/tmp/u3-doc-closure-exact-20261028/diagnostic-proof.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/diagnostic/diagnostic-proof.json",
+      "bytes": 107140,
+      "sha256": "312c2023c857fab985e7036898b672988b64f86e19ee5a02e06312301ac3d71b"
+    },
+    {
+      "source": ".llm/tmp/u3-doc-closure-exact-20261028/candidate.diff",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/diagnostic/candidate.diff",
+      "bytes": 2222,
+      "sha256": "3c7170d3ef8a271ac81f221e5e867461702c08a2338a317b0117a7ea6f1126c1"
+    },
+    {
+      "source": ".llm/tmp/u3-doc-closure-exact-20261028/compiler-proof.json",
+      "copied": ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/diagnostic/compiler-proof.json",
+      "bytes": 3186,
+      "sha256": "1ec34eccd155f035a127048215e6c7f20415ca33c0990e0263fd194254cc6929"
+    }
+  ]
+}

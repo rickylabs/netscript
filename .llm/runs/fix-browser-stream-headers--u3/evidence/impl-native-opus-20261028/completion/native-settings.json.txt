@@ -1,0 +1,27 @@
+{
+  "disableClaudeAiConnectors": true,
+  "permissions": {
+    "defaultMode": "dontAsk",
+    "allow": [
+      "Read(./.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/**)",
+      "Read(C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/**)",
+      "mcp__netscript__search_docs",
+      "mcp__netscript__get_doc",
+      "mcp__netscript__find_guidance",
+      "mcp__netscript__find_export",
+      "mcp__netscript__get_export"
+    ],
+    "deny": [
+      "Read(**/.env*)",
+      "Read(**/auth.json)",
+      "Read(**/.claude.json)",
+      "Read(**/.credentials.json)",
+      "Read(C:/Users/ericc/.claude/**)",
+      "Edit",
+      "Write",
+      "Bash",
+      "Agent",
+      "Task"
+    ]
+  }
+}

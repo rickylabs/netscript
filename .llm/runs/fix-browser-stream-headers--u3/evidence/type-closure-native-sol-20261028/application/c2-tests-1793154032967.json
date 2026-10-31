@@ -1,0 +1,21 @@
+{
+  "selected": "c2-tests",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-test.ts",
+    "--",
+    "--frozen",
+    "-A",
+    "plugins/workers/tests/streams/factory-headers_test.ts",
+    "plugins/workers/tests/streams/factory-discovery_test.ts",
+    "plugins/workers/tests/streams/live-query-consumer_test.ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:32.971Z",
+  "ended": "2026-10-28T02:20:40.091Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/c2-tests-1793154032967"
+}

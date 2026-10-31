@@ -1,0 +1,679 @@
+  - `docs/architecture/doctrine/08-runtime-state-failure.md` when plugin contributes runtime work
+  - `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
+- Anti-patterns: AP-1, AP-3, AP-8, AP-9, AP-10, AP-11, AP-13, AP-14, AP-16, AP-19, AP-20, AP-22,
+  AP-23, AP-24, AP-25.
+- Fitness functions: F-1, F-3, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-13 when runtime
+  declarations require it, F-14, F-15, F-16, F-17, F-18, F-19.
+
+(These references point INTO doctrine; the authoritative prose lives there. This profile states the
+thinness law and points at doctrine — it does not rewrite doctrine.)
+
+## When This Archetype Applies
+
+Use this profile for first-party `plugins/*` packages. The plugin **wires** a slice of NetScript
+capability — services, database/schema, jobs, sagas, triggers, streams, verification — by
+**composing core-owned contracts and conventions**, not by originating them. Its job is to bind
+core primitives to a concrete integration and expose explicit service/background entrypoints; the
+contracts and conventions it uses are imported from `@netscript/*` core and sibling packages.
+
+## Minimum Folder Shape
+
+Use the canonical shape in
+`docs/architecture/doctrine/06-archetypes.md#archetype-5--plugin-package`. The package **reuses
+sibling package contracts instead of redefining them** and exposes explicit service/background
+entrypoints. The folder is composition wiring around imported primitives, not a second home for
+contracts that belong in core.
+
+Note: real first-party `plugins/*` place their contribution folders (`contracts/`, `services/`,
+`database/`, `jobs/`, `streams/`) at the top level as siblings of `src/`, together with top-level
+`mod.ts` and `verify-plugin.ts`. As of #306 (doctrine-revamp lane) this layout is **reconciled into
+doctrine**: `06-archetypes.md#archetype-5--plugin-package` now states the same top-level-siblings
+shape as authoritative, so doctrine and this profile agree. This profile follows doctrine; it does
+not rewrite it.
+
+## Skills to Activate
+
+- `netscript-doctrine`
+- `jsr-audit` when the plugin is published or exported
+- `aspire` when runtime/service validation is required
+
+## Read First
+
+1. The **core-owned contracts and conventions** the plugin wires — the base contract/service in
+   `@netscript/*` and any sibling package contracts it re-exports or consumes. Establish what core
+   already owns before reading the plugin, so you can see whether the plugin thinly reuses it.
+2. `docs/architecture/doctrine/06-archetypes.md#archetype-5--plugin-package`.
+3. `docs/architecture/doctrine/07-composition-and-extension.md#plugin-discovery-and-loading`.
+4. Plugin `contracts.ts`, `mod.ts`, `deno.json`, verification file, services, database files, and
+   runtime declarations — reading them as wiring over the core primitives from step 1.
+5. Host loader or consumer code that discovers the plugin.
+6. Relevant debt entries.
+
+## Required Gates in Order
+
+1. Static gates: plugin check slice, package check if sibling contracts changed, fmt, lint, doc
+   lint, publish dry-run when relevant.
+2. Fitness gates: listed F gates; F-13 only when runtime declarations require saga/worker/runtime
+   invariants.
+3. Runtime gates: required when plugin services, workers, sagas, triggers, or database contributions
+   are touched.
+4. Consumer gates: required for plugin loader, host imports, and sibling package contracts.
+
+## Anti-Patterns to Watch For
+
+- **Fat plugin owning what core should own**: the plugin defines a contract, base service, schema
+  convention, or event/kind vocabulary that is convention-bearing and therefore belongs in
+  `@netscript/*` core. Push it down into core and have the plugin import it (thinness law; cf. the
+  `auth-core` + adapters reference shape).
+- **Plugin re-implements a core convention instead of importing it**: re-deriving a
+  loading/registration/schema/runtime convention locally rather than reusing the core-owned one.
+  Import the convention; do not fork it.
+- AP-11: plugin load side effects or implicit discovery magic.
+- AP-14: redefining sibling package contracts instead of re-exporting.
+- AP-16: generic folders that hide plugin contributions.
+- AP-19: service/database permissions not declared.
+- AP-1: `mod.ts` or `contracts.ts` accumulating every plugin concern.
+- AP-22: sub-directory `mod.ts` barrel re-exporting a contribution folder instead of the
+  package-root surface.
+- AP-23: plugin discovery/registration wiring that inlines service or handler bodies instead of
+  referencing them.
+- AP-24: switch-over-kind dispatch (engine/event/adapter) instead of a typed registry populated at
+  composition.
+- AP-25: `Deno.*` / `console.*` / `fetch` side effects in a non-edge plugin file instead of an
+  injected port.
+
+## False-Done States
+
+- Plugin compiles but `verify-plugin.ts` is missing or stale.
+- Runtime declarations changed without host/loader validation.
+- Database schema contribution exists but is not referenced from the expected plugin folder.
+- The plugin **redefines or re-implements** a contract/convention (worker/saga/trigger contract,
+  loading/schema convention) already owned by core or a sibling — a fat-plugin false-done: it looks
+  complete but has duplicated what it should have imported.
+
+## Rescope Triggers
+
+- A plugin change requires sibling package contract redesign.
+- Host loader semantics need to change.
+- Runtime validation requires Aspire resources not available in session.
+- The plugin folder shape is wrong enough to require restructuring first.
+- Convention-bearing logic discovered inside the plugin belongs in core — pushing it down is a
+  core-package change, not a plugin edit.
+
+## Design Checkpoint Expectations
+
+The design checkpoint names, for each axis the plugin wires, **which core/sibling primitive it
+composes and re-exports** (never redefines): contracts, service entrypoints, database,
+jobs/sagas/triggers/streams, verification, host discovery, and consumer impact.
+
+The design section in `worklog.md` must include:
+
+- the axes the plugin wires, with the named core/sibling primitive each one composes and the plugin
+  files that wire it,
+- sibling package contracts consumed or **re-exported** (explicitly: none redefined),
+- constants for plugin config, event kinds, or schema identifiers — sourced from core vocabularies
+  where core owns them,
+- commit slices: reuse-core-contracts first, then service/runtime wiring, then verification, then
+  host integration,
+- contributor path for adding a new wired axis (which core primitive to import, where to wire it).
+
+## Concept of Done
+
+Beyond the universal slice checklist in `workflow/run-loop.md`:
+
+- `verify-plugin.ts` exists and passes,
+- runtime declarations are validated against host loader expectations,
+- database schema contributions reference the expected plugin folder,
+- sibling and core contracts are **re-exported/imported, not redefined**, and no convention-bearing
+  logic that belongs in core was re-implemented in the plugin.
+
+## Historical Notes
+
+Plugins are **thin integration points**, not capability owners. A green plugin-only check is not
+enough when the host loader or a sibling/core contract changes — and it is actively misleading when
+the plugin passed only because it re-implemented a convention core should own. The fat-plugin failure
+mode (owning contracts/conventions that belong in `@netscript/*` core) is the highest-value thing to
+catch in review; the `auth-core` + adapters split is the reference for how thin the plugin should be.
+
+
+## Exact canonical debt entry (.llm/harness/debt/arch-debt.md:2932)
+
+Full fileSHA:d7ada055665ff1d9efc031fbdbbda608040ab161f1d297fd12a14b05f3ad91e3
+
+## Fresh/workers reader headers — native public type closure
+
+- **ID:** `U3-NATIVE-READER-HEADER-TYPE-CLOSURE`
+- **Reason:** U3 preserves exact native client0.2.7 `HeadersRecord` identity for
+  string/sync/async values. Actual copied owning graphs measure Fresh10/12/10 and
+  workers0/1/0 for baseline/current/candidate. Both `HeadersRecord` and its native
+  `MaybePromise` dependency must be public at the four measured source/aggregate
+  sites. This is a bounded upstream-type and facade-growth exception, not a scanner PASS.
+- **Owner:** Milestone coordinator + rickylabs.
+- **Target:** 2026-11-10, fixed; no extension or growth under this disposition.
+- **Status:** Open, `DEBT_ACCEPTED` for this precise U3 delta after independent SAME
+  GLM5.3 corrective PLAN review and root acceptance; implementation gates remain required.
+- **Exact sites:** `packages/fresh/src/runtime/streams/create-stream-db.ts`, its
+  `mod.ts`, `plugins/workers/streams/factory.ts` and its `mod.ts`. Export only native
+  `HeadersRecord` and native `MaybePromise` by identity, type-only, without aliases.
+- **Boundary:** No fifth source site, extra native name, package, runtime value,
+  resolver/serializer, dependency/version, config/lock, authentication/issuer/bootstrap
+  policy or lifecycle change. Consumers still prefer their upstream type owner;
+  this is no general NetScript vendoring precedent.
+- **Gate:** Closure is `DEBT_ACCEPTED` for two distinct acknowledged violations:
+  upstream native type re-export (chapter02/AP-14/F-15) and measured two-name aggregate
+  facade growth (chapter11/F-5; Fresh52-to54, workers24-to26, prior surplus unwaived),
+  never an unqualified F-15 or F-5 PASS. Warning-free actual owning Fresh12-to10 must
+  retain exactly the same ten baseline finding identities; workers1-to0; nonempty
+  native declarations at all four sites; positive mutual identities/anti-any plus
+  three meaningful negative controls; unchanged runtime controls; scoped type/lint/fmt,
+  doctrine, quality, package/publish dry-run and independent IMPL evidence.
+  `MaybePromise` is exported solely because measured closure requires its public
+  shape; the closing gate removes both names together.
+- **Reference parity:** Pending root-scoped gate for the two added names per package.
+  Root selected no waiver. A genuinely green qualified existing reference contract
+  satisfies the gate without an invented page edit. Concrete missing-name findings
+  require a retained failing-parity receipt and exact root-authorized page scope.
+  A failing Windows coverage prerequisite or unrun parity never satisfies it.
+- **History:** The earlier `FRESH-NATIVE-HEADERS-TYPE-CLOSURE` PLAN verdict remains
+  immutable. Its source-only application failed owning12-to10 and was archived/reverted
+  with the appended debt. This corrective exception does not promote that failed
+  premise or transfer its narrower scope. Existing oRPC debt, ten Fresh baseline
+  findings and prior facade surplus remain separate and unwaived.
+- **Closing gate:** Remove both native facade names together through a compatible
+  public-doc solution retaining exact header identity and all controls, OR obtain
+  a separately reviewed doctrine amendment. No automatic renewal, baseline reset,
+  checker override, type erasure/cast/suppression or unrelated diagnostic reduction.
+- **Evidence:** [Actual corrective verdict](../../runs/fix-browser-stream-headers--u3/corrective-type-closure-plan-eval.md),
+  SHA256 `c12eef080d7b48478c85a6f0b4b42dc68f3b8c28db691d5bb292161a4b3ceaa4`;
+  [root scope/disposition](../../runs/fix-browser-stream-headers--u3/root-corrective-type-closure-plan-acceptance.md),
+  SHA256 `6b98133faed4871ae4cd6c9816c52449695a030d8ecdb6d50fc92ff70dc79b8c`.
+
+
+## Complete authored implementation diff
+
+diff --git a/docs/site/durable-workflows/streams.md b/docs/site/durable-workflows/streams.md
+index 2b42f07e7..dd7c8a3c3 100644
+--- a/docs/site/durable-workflows/streams.md
++++ b/docs/site/durable-workflows/streams.md
+@@ -299,6 +299,28 @@ diagnostic report for a schema (handy in tests and CLI doctors).
+   ]
+ }) }}
+ 
++### Caller-provided reader headers
++
++Fresh `createNetScriptStreamDB` and workers `createWorkersStreamDB` accept native
++`HeadersRecord` values from `@durable-streams/client`: each value is a string or
++a sync/async callback. The native client resolves callbacks per request, including
++reads after a Fresh reconnect.
++
++```ts
++import { createWorkersStreamDB } from "@netscript/plugin-workers/streams";
++declare const readReaderToken: () => Promise<string>;
++const workers = createWorkersStreamDB({
++  headers: { authorization: async () => `Bearer ${await readReaderToken()}` },
++});
++```
++
++Any supplied record, including `{}`, replaces ambient producer auth completely;
++only omission or `undefined` selects `getStreamsAuth()`. Fresh's exported custom
++`createStreamDB` port now accepts native header values instead of strings only:
++external serializers must forward the record unchanged to the native client.
++Header forwarding neither issues credentials nor authenticates a reader; callers
++still own reader credential and browser bootstrap policy.
++
+ ### Resolved stream URLs
+ 
+ When configuring `streamPath` (e.g. `streamPath: '/workers/executions'`), the framework automatically prepends `STREAMS_URL_PREFIX = '/v1/stream/netscript'` inside `buildStreamUrl`.
+diff --git a/packages/fresh/src/runtime/streams/create-stream-db.ts b/packages/fresh/src/runtime/streams/create-stream-db.ts
+index fff8a2cda..2b9b7fe19 100644
+--- a/packages/fresh/src/runtime/streams/create-stream-db.ts
++++ b/packages/fresh/src/runtime/streams/create-stream-db.ts
+@@ -7,8 +7,8 @@
+  * URL resolution and auth header injection.
+  *
+  * Plugin-specific factories (`createWorkersStreamDB`, `createSagasStreamDB`,
+- * `createTriggersStreamDB`) live in their own plugin packages and call this
+- * internally.
++ * `createTriggersStreamDB`) live in their own plugin packages. Use this generic
++ * factory for other compatible stream schemas.
+  *
+  * @module
+  */
+@@ -18,6 +18,8 @@ import { createStreamDB } from '@durable-streams/state/db';
+ import type { StateSchema, StreamStateDefinition } from '@durable-streams/state';
+ import type { StreamDB } from '@durable-streams/state/db';
+ import { DurableStream } from '@durable-streams/client';
++import type { HeadersRecord, MaybePromise } from '@durable-streams/client';
++export type { HeadersRecord, MaybePromise };
+ import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
+ import { createStreamDBRecoveryAdapter } from './stream-db-recovery-adapter.ts';
+ 
+@@ -70,8 +72,14 @@ export interface NetScriptStreamDBFactoryInput<TDef extends NetScriptStreamState
+     url: string;
+     /** Content type sent to the durable streams endpoint. */
+     contentType: 'application/json';
+-    /** Auth headers sent to the durable streams endpoint. */
+-    headers: Record<string, string>;
++    /**
++     * Headers forwarded untouched to the durable streams client; function values resolve per request.
++     *
++     * External adapters that serialize `headers` as plain strings must forward the record
++     * to the upstream client, which owns per-request resolution; the framework
++     * provides no string serializer.
++     */
++    headers: HeadersRecord;
+   };
+   /** State schema passed to the underlying stream DB adapter. */
+   state: NetScriptStateSchema<TDef>;
+@@ -103,6 +111,15 @@ export interface NetScriptStreamDBOptions<TDef extends NetScriptStreamStateDefin
+   schema: NetScriptStateSchema<TDef>;
+   /** Optional factory port for tests or alternate stream DB adapters. */
+   createStreamDB?: NetScriptStreamDBFactory<TDef>;
++  /**
++   * Explicit reader headers, forwarded untouched to the durable streams client.
++   *
++   * Any supplied record (including `{}`) replaces env-resolved producer auth
++   * entirely; omit to keep `getStreamsAuth()`. The upstream client owns
++   * per-request resolution of function values; the framework provides no
++   * string serializer for external adapters.
++   */
++  headers?: HeadersRecord;
+   /** Bounded reconnect policy; the default adapter resumes the last consumed batch. */
+   reconnect?: NetScriptStreamDBReconnectOptions;
+ }
+@@ -147,7 +164,7 @@ export function createNetScriptStreamDB<TDef extends NetScriptStreamStateDefinit
+     streamOptions: {
+       url: buildStreamUrl(options.streamPath, baseUrl),
+       contentType: 'application/json',
+-      headers: getStreamsAuth(),
++      headers: options.headers === undefined ? getStreamsAuth() : options.headers,
+     },
+     state: options.schema,
+     ...(options.reconnect ? { reconnect: options.reconnect } : {}),
+diff --git a/packages/fresh/src/runtime/streams/create-stream-db_test.ts b/packages/fresh/src/runtime/streams/create-stream-db_test.ts
+index 7ba591956..2d13660f9 100644
+--- a/packages/fresh/src/runtime/streams/create-stream-db_test.ts
++++ b/packages/fresh/src/runtime/streams/create-stream-db_test.ts
+@@ -4,12 +4,11 @@ import { workersStreamSchema } from '../../../../plugin-workers-core/src/streams
+ import { createQueryCollection } from '../../../../sdk/src/collections/create-query-collection.ts';
+ import { createNetScriptQueryClient } from '../../../../sdk/src/query-client/query-client-factory.ts';
+ import { DurableStream } from '@durable-streams/client';
+-import { fromFileUrl } from '@std/path';
+-import { TextLineStream } from 'jsr:@std/streams@^1/text-line-stream';
+ import { createStateSchema } from '@durable-streams/state';
+ import { createStreamDB } from '@durable-streams/state/db';
+ import { z } from 'zod';
+ import { createNetScriptStreamDB, type NetScriptStreamDBFactoryInput } from './create-stream-db.ts';
++import { startReferenceServer } from '../../../tests/_fixtures/stream-db-test-runtime.ts';
+ 
+ const stateDefinition = {
+   events: {
+@@ -59,78 +58,6 @@ async function eventually(predicate: () => boolean): Promise<void> {
+   assert(predicate(), 'StreamDB did not reach the expected state within the recovery window.');
+ }
+ 
+-async function startReferenceServer(dataDir: string, port = 0) {
+-  const fixture = new URL('../../../tests/_fixtures/stream-db-server.ts', import.meta.url);
+-  const config = new URL('../../../../../deno.json', import.meta.url);
+-  const child = new Deno.Command(Deno.execPath(), {
+-    args: [
+-      'run',
+-      '--allow-all',
+-      '--config',
+-      fromFileUrl(config),
+-      fromFileUrl(fixture),
+-      JSON.stringify({
+-        dataDir,
+-        port,
+-      }),
+-    ],
+-    stdout: 'piped',
+-    stderr: 'piped',
+-  }).spawn();
+-  let stderr = '';
+-  const errors = child.stderr.pipeTo(
+-    new WritableStream<Uint8Array>({
+-      write(bytes) {
+-        stderr += new TextDecoder().decode(bytes);
+-      },
+-    }),
+-  );
+-  let resolveReady!: (url: string) => void;
+-  let rejectReady!: (error: Error) => void;
+-  const ready = new Promise<string>((resolve, reject) => {
+-    resolveReady = resolve;
+-    rejectReady = reject;
+-  });
+-  const output = (async () => {
+-    for await (
+-      const line of child.stdout.pipeThrough(new TextDecoderStream()).pipeThrough(
+-        new TextLineStream(),
+-      )
+-    ) {
+-      if (!line.startsWith('{')) continue;
+-      const message = JSON.parse(line);
+-      if (typeof message.ready === 'string') resolveReady(message.ready);
+-    }
+-    rejectReady(new Error(`Reference server exited before readiness: ${stderr}`));
+-  })();
+-  try {
+-    return {
+-      url: await Promise.race([
+-        ready,
+-        new Promise<never>((_, reject) => {
+-          const timer = setTimeout(
+-            () => reject(new Error('Reference server readiness deadline exceeded.')),
+-            10_000,
+-          );
+-          void ready.finally(() => clearTimeout(timer)).catch(() => {});
+-        }),
+-      ]),
+-      async kill() {
+-        child.kill('SIGKILL');
+-        await child.status;
+-        await Promise.all([output, errors]);
+-      },
+-    };
+-  } catch (error) {
+-    try {
+-      child.kill('SIGKILL');
+-    } catch { /* Child may already have exited. */ }
+-    await child.status;
+-    await Promise.all([output, errors]);
+-    throw error;
+-  }
+-}
+-
+ Deno.test('createNetScriptStreamDB recovers after the persistent stream server is killed without replay', async () => {
+   const dataDir = await Deno.makeTempDir();
+   const schema = createStateSchema(stateDefinition);
+@@ -289,14 +216,17 @@ Deno.test('createNetScriptStreamDB stop settles concurrent preloads while respon
+ });
+ 
+ Deno.test('default worker stream Collection enters the actual Fresh adapter and SDK query family', async () => {
+-  const server = Deno.serve({ port: 0, onListen() {} }, () =>
+-    new Response('[]', {
+-      headers: {
+-        'Content-Type': 'application/json',
+-        'Stream-Next-Offset': '0',
+-        'Stream-Up-To-Date': 'true',
+-      },
+-    }));
++  const server = Deno.serve(
++    { hostname: '127.0.0.1', port: 0, onListen() {} },
++    () =>
++      new Response('[]', {
++        headers: {
++          'Content-Type': 'application/json',
++          'Stream-Next-Offset': '0',
++          'Stream-Up-To-Date': 'true',
++        },
++      }),
++  );
+   const baseUrl = new URL(`http://${server.addr.hostname}:${server.addr.port}`).origin;
+   const db = createNetScriptStreamDB({
+     baseUrl,
+diff --git a/packages/fresh/src/runtime/streams/mod.ts b/packages/fresh/src/runtime/streams/mod.ts
+index 67df3c8df..4875c9a2f 100644
+--- a/packages/fresh/src/runtime/streams/mod.ts
++++ b/packages/fresh/src/runtime/streams/mod.ts
+@@ -11,13 +11,15 @@
+  * - Re-exports of useful types from `@durable-streams/state`
+  *
+  * Plugin-specific factories (`createWorkersStreamDB`, etc.) live in their
+- * respective plugin packages and import from here via `@netscript/fresh/streams`.
++ * respective plugin packages; this subpath provides the generic stream factory.
+  *
+  * @module
+  */
+ 
+ export {
+   createNetScriptStreamDB,
++  type HeadersRecord,
++  type MaybePromise,
+   type NetScriptStateSchema,
+   type NetScriptStreamDB,
+   type NetScriptStreamDBFactory,
+diff --git a/packages/fresh/tests/_fixtures/stream-db-test-runtime.ts b/packages/fresh/tests/_fixtures/stream-db-test-runtime.ts
+new file mode 100644
+index 000000000..09ae83923
+--- /dev/null
++++ b/packages/fresh/tests/_fixtures/stream-db-test-runtime.ts
+@@ -0,0 +1,80 @@
++/** Shared reference-server harness for StreamDB contract tests. @module */
++
++import { fromFileUrl } from '@std/path';
++import { TextLineStream } from 'jsr:@std/streams@^1/text-line-stream';
++
++/** Start the persistent upstream reference server used by StreamDB tests. */
++export async function startReferenceServer(
++  dataDir: string,
++  port = 0,
++): Promise<{ url: string; kill(): Promise<void> }> {
++  const fixture = new URL('./stream-db-server.ts', import.meta.url);
++  const config = new URL('../../../../deno.json', import.meta.url);
++  const child = new Deno.Command(Deno.execPath(), {
++    args: [
++      'run',
++      '--allow-all',
++      '--config',
++      fromFileUrl(config),
++      fromFileUrl(fixture),
++      JSON.stringify({
++        dataDir,
++        port,
++      }),
++    ],
++    stdout: 'piped',
++    stderr: 'piped',
++  }).spawn();
++  let stderr = '';
++  const errors = child.stderr.pipeTo(
++    new WritableStream<Uint8Array>({
++      write(bytes) {
++        stderr += new TextDecoder().decode(bytes);
++      },
++    }),
++  );
++  let resolveReady!: (url: string) => void;
++  let rejectReady!: (error: Error) => void;
++  const ready = new Promise<string>((resolve, reject) => {
++    resolveReady = resolve;
++    rejectReady = reject;
++  });
++  const output = (async () => {
++    for await (
++      const line of child.stdout.pipeThrough(new TextDecoderStream()).pipeThrough(
++        new TextLineStream(),
++      )
++    ) {
++      if (!line.startsWith('{')) continue;
++      const message = JSON.parse(line);
++      if (typeof message.ready === 'string') resolveReady(message.ready);
++    }
++    rejectReady(new Error(`Reference server exited before readiness: ${stderr}`));
++  })();
++  try {
++    return {
++      url: await Promise.race([
++        ready,
++        new Promise<never>((_, reject) => {
++          const timer = setTimeout(
++            () => reject(new Error('Reference server readiness deadline exceeded.')),
++            10_000,
++          );
++          void ready.finally(() => clearTimeout(timer)).catch(() => {});
++        }),
++      ]),
++      async kill() {
++        child.kill('SIGKILL');
++        await child.status;
++        await Promise.all([output, errors]);
++      },
++    };
++  } catch (error) {
++    try {
++      child.kill('SIGKILL');
++    } catch { /* Child may already have exited. */ }
++    await child.status;
++    await Promise.all([output, errors]);
++    throw error;
++  }
++}
+diff --git a/packages/fresh/tests/streamdb-headers-contract_test.ts b/packages/fresh/tests/streamdb-headers-contract_test.ts
+new file mode 100644
+index 000000000..e6df32dbe
+--- /dev/null
++++ b/packages/fresh/tests/streamdb-headers-contract_test.ts
+@@ -0,0 +1,478 @@
++/** U3 caller-header forwarding contract for `createNetScriptStreamDB`. @module */
++
++import { assert, assertEquals, assertExists, assertRejects, assertThrows } from '@std/assert';
++import { DurableStream } from '@durable-streams/client';
++import { createStateSchema } from '@durable-streams/state';
++import { createStreamDB } from '@durable-streams/state/db';
++import { fromFileUrl } from '@std/path';
++import { z } from 'zod';
++import {
++  createNetScriptStreamDB,
++  type NetScriptStreamDB,
++  type NetScriptStreamDBFactoryInput,
++} from '../src/runtime/streams/create-stream-db.ts';
++import { startReferenceServer } from './_fixtures/stream-db-test-runtime.ts';
++
++const stateDefinition = {
++  events: { schema: z.object({ id: z.string() }), type: 'event', primaryKey: 'id' },
++};
++type TestState = typeof stateDefinition;
++const schema = createStateSchema(stateDefinition);
++
++async function eventually(predicate: () => boolean, attempts = 200): Promise<void> {
++  for (let attempt = 0; attempt < attempts; attempt++) {
++    if (predicate()) return;
++    await new Promise((resolve) => setTimeout(resolve, 10));
++  }
++  assert(predicate(), 'StreamDB did not reach the expected state within the recovery window.');
++}
++
++async function preloadDeadline(pending: Promise<void>, ms = 5_000): Promise<void> {
++  let timer: ReturnType<typeof setTimeout> | undefined;
++  try {
++    await Promise.race([
++      pending,
++      new Promise<never>((_, reject) => {
++        timer = setTimeout(() => reject(new Error('Preload deadline exceeded.')), ms);
++      }),
++    ]);
++  } finally {
++    clearTimeout(timer);
++  }
++}
++
++function upToDateStub() {
++  return Deno.serve({ port: 0, hostname: '127.0.0.1', onListen() {} }, () =>
++    new Response('[]', {
++      headers: {
++        'content-type': 'application/json',
++        'stream-next-offset': 'end',
++        'stream-up-to-date': 'true',
++      },
++    }));
++}
++
++function test(
++  name: string,
++  fn: Deno.TestDefinition['fn'],
++  permissions?: Deno.TestDefinition['permissions'],
++) {
++  Deno.test({
++    name,
++    fn,
++    permissions,
++    sanitizeOps: true,
++    sanitizeResources: true,
++    sanitizeExit: true,
++  });
++}
++
++async function cleanup(...steps: Array<() => void | Promise<void>>) {
++  const failures: unknown[] = [];
++  for (const step of steps) {
++    try {
++      await step();
++    } catch (error) {
++      failures.push(error);
++    }
++  }
++  if (failures.length) throw new AggregateError(failures, 'StreamDB test cleanup failed.');
++}
++
++function observeFetch(onRead: (url: URL, headers: Headers) => void = () => {}) {
++  const original = globalThis.fetch;
++  const pending = new Set<Promise<Response>>();
++  const responses: Array<{ response: Response; signal?: AbortSignal | null }> = [];
++  globalThis.fetch = (input, init) => {
++    const request = input instanceof Request ? input : undefined;
++    let signal: AbortSignal | null | undefined;
++    if ((init?.method ?? request?.method ?? 'GET').toUpperCase() === 'GET') {
++      signal = init?.signal ?? request?.signal;
++      onRead(
++        new URL(request?.url ?? String(input)),
++        new Headers(init?.headers ?? request?.headers),
++      );
++    }
++    const fetched = original(input, init).then((response) => {
++      responses.push({ response, signal });
++      return response;
++    });
++    pending.add(fetched);
++    void fetched.then(() => pending.delete(fetched), () => pending.delete(fetched));
++    return fetched;
++  };
++  return async () => {
++    globalThis.fetch = original;
++    // Consumed bodies stay locked in Deno; native read abort closes transport.
++    // Aggregate fetch-drain and body errors while still attempting every cleanup.
++    await cleanup(
++      () => preloadDeadline(Promise.allSettled(pending).then(() => {})),
++      () =>
++        cleanup(...responses.map(({ response, signal }) => async () => {
++          if (!response.body) return;
++          if (!response.body.locked) await response.body.cancel();
++          else assert(response.bodyUsed || signal?.aborted, `Locked unread body: ${response.url}`);
++          assert(!signal || signal.aborted, `Native read still active: ${response.url}`);
++        })),
++    );
++  };
++}
++
++test('U3 explicit header record reaches the client port', async () => {
++  const previousSecret = Deno.env.get('STREAMS_SECRET');
++  let syncCalls = 0;
++  let asyncCalls = 0;
++  const suppliedHeaders = {
++    'x-u3-static': 'red-static',
++    'x-u3-sync': () => {
++      syncCalls += 1;
++      return 'red-sync';
++    },
++    authorization: () => {
++      asyncCalls += 1;
++      return Promise.resolve('Bearer red-async');
++    },
++  };
++  let captured: NetScriptStreamDBFactoryInput<TestState> | undefined;
++  const factoryOptions = {
++    baseUrl: 'https://streams.example.test',
++    streamPath: '/u3-red',
++    schema,
++    headers: suppliedHeaders,
++    createStreamDB(input: NetScriptStreamDBFactoryInput<TestState>) {
++      captured = input;
++      return createStreamDB(input);
++    },
++  };
++  let db: NetScriptStreamDB<TestState> | undefined;
++  try {
++    Deno.env.set('STREAMS_SECRET', 'u3-red-synthetic');
++    db = createNetScriptStreamDB<TestState>(factoryOptions);
++    assertExists(captured);

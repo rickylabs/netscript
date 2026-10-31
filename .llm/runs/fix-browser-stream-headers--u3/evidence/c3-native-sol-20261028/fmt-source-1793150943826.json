@@ -1,0 +1,21 @@
+{
+  "selected": "fmt-source",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-fmt.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/create-stream-db.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/mod.ts",
+    "--ext",
+    "ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T01:29:03.829Z",
+  "ended": "2026-10-28T01:29:04.028Z",
+  "originalOutputAwaited": true,
+  "deadlineAborted": false,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c3/fmt-source-1793150943826"
+}

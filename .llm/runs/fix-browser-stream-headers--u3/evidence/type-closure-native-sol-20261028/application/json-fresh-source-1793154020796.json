@@ -1,0 +1,15 @@
+{
+  "selected": "json-fresh-source",
+  "args": [
+    "doc",
+    "--json",
+    "--frozen",
+    "packages/fresh/src/runtime/streams/create-stream-db.ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:20.800Z",
+  "ended": "2026-10-28T02:20:20.950Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/json-fresh-source-1793154020796"
+}

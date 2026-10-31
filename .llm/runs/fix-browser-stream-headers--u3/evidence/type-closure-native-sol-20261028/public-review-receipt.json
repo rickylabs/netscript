@@ -1,0 +1,77 @@
+{
+  "method": "Curated public identity/coverage only; original raw bindings retained ignored. No account allowance, operational usage, private session export or reasoning.",
+  "sourceCoverageSha256": "1af081dc11b8e3eb4ddb0ede0d3d8ce489edca442d991495a0dfaed77b57da93",
+  "sourceIdentitySha256": "96144f751b7dccb110f9404bc94b875c0a8d325eccdd4351ab654b469f366d84",
+  "sessionIDs": [
+    "ses_e80a72a47ffeLBfZ0Wdc7vh0h6"
+  ],
+  "reads": [
+    {
+      "name": "corrective-plan.md",
+      "expectedLines": 61,
+      "complete": true,
+      "readCalls": 1
+    },
+    {
+      "name": "proposed-debt-entry.md",
+      "expectedLines": 45,
+      "complete": true,
+      "readCalls": 1
+    },
+    {
+      "name": "source-evidence-packet.md",
+      "expectedLines": 828,
+      "complete": true,
+      "readCalls": 1
+    }
+  ],
+  "mcp": [
+    {
+      "tool": "netscript_find_export",
+      "input": {
+        "symbol": "HeadersRecord"
+      },
+      "status": "completed"
+    }
+  ],
+  "failures": [],
+  "textEventCount": 2,
+  "steps": [
+    {
+      "reason": "tool-calls"
+    },
+    {
+      "reason": "tool-calls"
+    },
+    {
+      "reason": "stop"
+    }
+  ],
+  "sessionID": "ses_e80a72a47ffeLBfZ0Wdc7vh0h6",
+  "requestedVariant": "provider_default; actual effort not attested",
+  "addedAssistants": [
+    {
+      "id": "msg_18046a7f6001RG7kf4jwjVlfx7",
+      "sessionID": "ses_e80a72a47ffeLBfZ0Wdc7vh0h6",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3",
+      "finish": "tool-calls"
+    },
+    {
+      "id": "msg_18046c362001G8Af3vGrq9Uiyl",
+      "sessionID": "ses_e80a72a47ffeLBfZ0Wdc7vh0h6",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3",
+      "finish": "tool-calls"
+    },
+    {
+      "id": "msg_1804752a9001A8iMuDeZJZxRTV",
+      "sessionID": "ses_e80a72a47ffeLBfZ0Wdc7vh0h6",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3",
+      "finish": "stop"
+    }
+  ],
+  "verdictPath": ".llm/runs/fix-browser-stream-headers--u3/corrective-type-closure-plan-eval.md",
+  "verdictSha256": "c12eef080d7b48478c85a6f0b4b42dc68f3b8c28db691d5bb292161a4b3ceaa4"
+}
