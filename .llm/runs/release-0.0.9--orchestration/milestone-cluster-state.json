@@ -104,7 +104,10 @@
     },
     {
       "number": 1366,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2542 7312ba498; box5 \u2192 #429-#431; consumer proof \u2192 #2545"
+      ]
     },
     {
       "number": 1367,
@@ -147,7 +150,10 @@
     },
     {
       "number": 2068,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2541 8a2cbc1f3; EIS-Chat adoption \u2192 https://github.com/rickylabs/eis-chat/issues/518"
+      ]
     },
     {
       "number": 2108,
@@ -200,7 +206,10 @@
     },
     {
       "number": 2159,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2499 f68394636; effects follow-up #2543"
+      ]
     },
     {
       "number": 2160,
@@ -232,7 +241,10 @@
     },
     {
       "number": 2185,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "CI local-engine runs 41217778710, 41227279424 (owner-accepted)"
+      ]
     },
     {
       "number": 2187,
@@ -258,7 +270,10 @@
     },
     {
       "number": 2268,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "#2521 b11c26c2f; box 1 \u2192 #2544"
+      ]
     },
     {
       "number": 2269,
@@ -833,7 +848,7 @@
     {
       "id": "D1-2259",
       "lane": "internals",
-      "phase": "blocked",
+      "phase": "moved",
       "baseBranch": "main",
       "prNumber": 2501,
       "headSha": "f32e8a75e55a3419943f7227527ec29b7c7b76c4",
@@ -842,7 +857,7 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2259",
       "receiptRefs": [],
-      "note": "negative spike: Aspire 13.5.3 cannot mask composed connection strings; owner decision on #2474 (defer to #2278 recommended)"
+      "note": "deferred to #2278 (Backlog / Triage) per owner 2026-10-31; spike PR #2501 closed, evidence kept"
     },
     {
       "id": "C1-2267",
@@ -1255,7 +1270,7 @@
     {
       "id": "G1-1655",
       "lane": "internals",
-      "phase": "blocked",
+      "phase": "moved",
       "baseBranch": "main",
       "prNumber": 2539,
       "headSha": "da47496133bbbdd3942294edd0f0cf41496e4487",
@@ -1264,7 +1279,7 @@
       ],
       "implementerAgentId": "codex-gpt-6.1-sol (continuation chain of the #2373 worker)",
       "receiptRefs": [],
-      "note": "BLOCKED: WorkersContractDefinition is NetScript-owned (not covered by doctrine 02); decision for Eric posted on #2474 (recommend move out of 0.0.9)"
+      "note": "moved to Backlog / Triage per owner 2026-10-31; research PR #2539 closed, evidence kept"
     },
     {
       "id": "F1-2379",
@@ -1792,10 +1807,10 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T18:16:37Z",
-    "nextReportDueAt": "2026-10-31T19:16:37Z",
-    "lastReportRef": "https://github.com/rickylabs/netscript/issues/2474#issuecomment-6547307997",
-    "headline": "combined canary READY TO CUT at 6c3f8a118",
+    "lastReportAt": "2026-10-31T18:50:11Z",
+    "nextReportDueAt": "2026-10-31T19:50:11Z",
+    "lastReportRef": "https://github.com/rickylabs/netscript/issues/2474",
+    "headline": "owner decisions executed; left: #2233, #2406, #2396",
     "currentMainSha": "6c3f8a1182b8df89fbe3334fa81ce35f541c26ac",
     "canary": {
       "target": "0.0.9-canary.1",
@@ -1982,7 +1997,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T18:16:37Z",
+  "updatedAt": "2026-10-31T18:50:12Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -2457,6 +2472,15 @@
       "pr": null,
       "startedAt": "2026-10-31T14:36:14Z",
       "note": "no local Docker in leaf env; decision for Eric on #2474 (recommend accepting CI runner run 41197676281)"
+    },
+    {
+      "issue": 2233,
+      "lane": "internals",
+      "commentId": 6547675177,
+      "postedAt": "2026-10-31T18:49:55Z",
+      "route": "codex gpt-6.1-sol medium",
+      "state": "posted",
+      "pr": null
     }
   ],
   "coordinatorArtifactPr": 2475,

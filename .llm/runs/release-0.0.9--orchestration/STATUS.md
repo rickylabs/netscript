@@ -1,12 +1,9 @@
 # STATUS — 0.0.9 (mc009e; one line per group; reread first after a compact)
 - COMBINED CANARY READY TO CUT at 6c3f8a118 (18:16Z, comment 6547307997; supersedes .1 15cffa2fe and .2 7feb24c7d; includes Fresh UI S6a) · Eric cuts
 - H01/H02/A1/A2/A3/E1 DONE (all closed)
-- B1 DONE (#2499 #2512 #2517 #2522 #2526; #2390 closed: no repro); #2159 OPEN for Eric's effects follow-up placement
-- B2 DONE: #2162 #2369 #2149 #2108 merged; #2108 issue open until its worker finishes (then close with the posted evidence)
+- DECISIONS EXECUTED (Eric "Approved" ~18:45Z): #2159 closed (follow-up #2543), #2259 → Backlog (#2278), #1655 → Backlog, #2185 closed, #2268 closed (box1 → #2544), #1366 closed (box5 → #429-431, consumer proof → #2545), #2068 closed (eis-chat#518)
+- LEFT for stable: #2233 option b (in flight); #2406 (Fresh UI PR #2408); #2396 (published-graph proof after Eric cuts the combined canary 6c3f8a118)
 - C1 DONE: #2267 #2132 #2338 #1367 #2377 #2373 #2390 closed
-- D1 #2396 all PRs merged; open for the release-owned published-graph proof on the first published canary · #2259 BLOCKED → Eric
-- E2 #2385 #2155 #1491 #2269 closed; #2268 partial merged, box-1 live-AppHost proof in flight (continuation on test/mcp-live-apphost-parity)
 - F1 #2384 #2375 #2411 #2379 closed; #2409 in flight (fixes lane); #2406 waits on the Fresh UI lane's PR #2408 (asked Cockpit 14:52Z)
-- G1 #1912 closed; #1366 box 6 merged (box 5 and consumer proof → Eric); #2068 published proof merged, reopened (EIS-Chat box → Eric); #1655 → Eric (14:37Z); #2185 → Eric (14:40Z); #2233 → Eric
 - BUDGET: Codex weekly at 89% (Cockpit 16:05Z): no new Codex leaves unless canary-blocking; finish running ones
 - Rules: merge.sh confirms MERGED before recording; drop e2e label when a PR's e2e completes; keep a leaf's issue open while its worker continues; check closingIssuesReferences before partial merges

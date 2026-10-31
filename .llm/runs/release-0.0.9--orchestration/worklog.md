@@ -322,3 +322,12 @@
 - 17:48:52Z: Merge hold lifted (Cockpit): S6a #2503 merged 17:48Z (`6c3f8a118`).
 - 18:01:00Z: Fresh UI design-system session (via Eric): land a canary tonight from main. Qualifying main `6c3f8a118` (includes #2503 and all canary .1/.2 content) as one combined canary: e2e-cli 41227279424 and command-postgres 41227281728 dispatched 18:00Z. Lanes merge-quiet until readiness is posted.
 - 18:16:37Z: **Combined canary readiness posted** on #2474 (comment 6547307997): candidate main `6c3f8a118`, which supersedes the uncut .1 and .2 candidates; includes Fresh UI S6a and the design lane's release notes; all gates green.
+- 18:40:24Z: #2185 orchid run stopped (operator-timeout) while blocked; the decision stays with Eric.
+- 18:47:47Z: **Eric: 'Approved'** (session message, ~18:45Z), read as approval of the 17:33Z decision table. Executing: #2159 follow-up filed in Durable Background Work and #2159 closed; #2259 deferred to #2278 (Backlog); #1655 moved to Backlog with debt rows kept; #2185 closed on the CI local-engine runs; #2268 box 1 moved to a follow-up and #2268 closed; #1366 box 5 carried to #429–#431, consumer proof to a new follow-up (#1343 is closed), #1366 closed; #2068 closed with adoption tracked in EIS-Chat; #2233 option b dispatched.
+- 18:48:09Z: #2159 closed; effects follow-up filed as #2543 (Durable Background Work).
+- 18:48:22Z: #2259 moved to Backlog / Triage (deferred to the Aspire 13.6 epic #2278); spike PR #2501 closed with its evidence kept.
+- 18:48:34Z: #1655 moved to Backlog / Triage (debt rows kept, upstream trigger); research PR #2539 closed.
+- 18:48:57Z: #2185 closed on the owner-accepted CI local-engine evidence. #2268 closed: box 1 moved to #2544 (Backlog / Triage); plan-only draft #2540 closed.
+- 18:49:16Z: #1366 closed: box 5 carried to #429/#430/#431, consumer proof moved to #2545 (Backlog / Triage).
+- 18:49:36Z: #2068 closed on the in-repo published proof; EIS-Chat adoption tracked at https://github.com/rickylabs/eis-chat/issues/518.
+- 18:49:55Z: dispatched #2233 option (b) per the owner's approval (G1, internals), comment 6547675177. Needed for stable; one small leaf within the budget rule.
