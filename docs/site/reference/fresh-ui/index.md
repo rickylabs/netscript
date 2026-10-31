@@ -281,8 +281,13 @@ contracts in this section are also public exports.
 
 ### Action menu and combobox behavior
 
-`ActionMenu` exposes item intents through `ACTION_MENU_ITEM_INTENTS` and reports why its open state
-changed with `ActionMenuOpenChangeReason`. `Combobox` exposes its controlled filtering seam through
+`ActionMenu` exposes item intents through `ACTION_MENU_ITEM_INTENTS` and semantic roles through
+`ACTION_MENU_ITEM_ROLES` / `ActionMenuItemRole`: `menuitem`, `menuitemcheckbox`, and `menuitemradio`.
+Checkable items receive caller-owned `aria-checked`; `closeOnSelect={false}` keeps the menu open
+for repeated adjustments. `ActionMenuContentProps.initialFocus` selects first or last entry,
+supporting application-menu ArrowDown/ArrowUp. Escape and explicit close restore trigger focus;
+outside dismissal preserves the destination focus. `ActionMenuOpenChangeReason` reports why the
+open state changed. `Combobox` exposes its controlled filtering seam through
 `UseComboboxOptions` and `UseComboboxReturn`; its compound namespace includes input, content, item,
 and empty-state parts.
 
@@ -291,7 +296,7 @@ and empty-state parts.
 | Symbol | Kind | Family | Description |
 | --- | --- | --- | --- |
 | `AccordionNamespace` / `AccordionRootProps` / `AccordionItemProps` / `AccordionItemTriggerProps` / `AccordionItemContentProps` / `AccordionItemIndicatorProps` | type alias | Accordion | Public compound namespace and root/item contracts. |
-| `ACTION_MENU_ITEM_INTENTS` / `ActionMenuNamespace` / `ActionMenuRootProps` / `ActionMenuTriggerProps` / `ActionMenuContentProps` / `ActionMenuItemProps` / `ActionMenuSeparatorProps` / `ActionMenuItemIntent` / `ActionMenuOpenChangeReason` | const / interface / type alias | Action menu | Public namespace, part props, supported intents, and open-state reason. |
+| `ACTION_MENU_ITEM_INTENTS` / `ACTION_MENU_ITEM_ROLES` / `ActionMenuNamespace` / `ActionMenuRootProps` / `ActionMenuTriggerProps` / `ActionMenuContentProps` / `ActionMenuItemProps` / `ActionMenuSeparatorProps` / `ActionMenuItemIntent` / `ActionMenuItemRole` / `ActionMenuOpenChangeReason` | const / interface / type alias | Action menu | Public namespace, part props, supported intents and roles, and open-state reason. |
 | `ComboboxNamespace` / `ComboboxRootProps` / `ComboboxInputProps` / `ComboboxContentProps` / `ComboboxItemProps` / `ComboboxEmptyProps` / `UseComboboxOptions` / `UseComboboxReturn` | type alias / interface | Combobox | Public namespace, part props, and controlled filtering contracts. |
 | `DialogNamespace` / `DialogRootProps` / `DialogTriggerProps` / `DialogContentProps` / `DialogTitleProps` / `DialogDescriptionProps` / `DialogCloseProps` | type alias | Dialog | Public namespace and structural-part props. |
 | `DrawerNamespace` / `DrawerRootProps` / `DrawerTriggerProps` / `DrawerContentProps` / `DrawerTitleProps` / `DrawerDescriptionProps` / `DrawerCloseProps` | type alias / reference | Drawer | Public namespace and structural-part props. |
