@@ -1,3 +1,13 @@
+# Resume — auth runtime collaborator fix
+
+Current reviewed head3b219fd has all ordinary CI and full SQLite runtime PASS (113 gates,0failed,0skipped, cleanup included). PostgreSQL full runtime run41202168922 fails runtime.aspire-start: auth service main unconditionally calls ctx.db.getClient despite KV RequiresDb:false, so the host correctly provides no SQL URI and auth exits. Main15c passes the same full runtime. No flaky rerun or discovery change is justified.
+
+Repair contract: use canonical backend resolution with identical appsettings/env precedence to select SQL only for better-auth; omit service DB context otherwise. Strengthen real KV cookie-jar and WorkOS main tests with throwing SQL seams and retain a better-auth control requiring one SQL client request. Both new throwing SQL seams fail before the fix; focused15 and all99 auth service tests pass after. Structured source check/lint/fmt cover all5 changed files; quality:gate and MCP export-corpus freshness pass. Evidence is auth-bootstrap-evidence.json. Ready for normal commit/push. No local full runtime, label edits, rebase/force-push or merge.
+
+Review accounting:5 IMPL-EVAL rounds are now spent; latest exact MERGE3b219fd is historical once source changes. The coordinator has now explicitly authorized one bounded review of this new PostgreSQL CI-repair delta: see review-authorization.md and PR comment6543624351. Initial five rounds remain recorded; the next review is round6 in the same independent read-only Opus session at the new exact pushed head. This is a recorded new owner decision, not silent counter reset or general approval for further loops. Runtime acceptance remains unchecked until the corrected head's actual suite and cleanup pass.
+
+## Historical context
+
 # Resume — SQLite CI regression repair in progress
 
 Coordinator authorized round 4 at ce431da; same Opus session returned exact-head MERGE and evidence is published on PR2519. Review checkbox proven. Direct READY phase comment made the coordinator handoff visible; the coordinator armed e2e-cli-gate. Runtime run 41200678341 fails SQLite database.codegen on raw PostgreSQL-native types copied from ordinary plugin packages. Main run 41197676281 at base15c passes the same SQLite gate/full job. Latest user asks to fix and push. Do not waive runtime or reuse ce431da review at the upcoming source fix SHA.

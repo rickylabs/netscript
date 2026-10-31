@@ -11,6 +11,7 @@ import {
   type AuthServiceBackendRegistry,
   createAuthServiceBackendRegistry,
   type CreateAuthServiceBackendRegistryOptions,
+  resolveActiveBackendName,
 } from './backend-registry.ts';
 export type { AuthServiceBackendRegistry } from './backend-registry.ts';
 
@@ -22,6 +23,14 @@ export interface AuthPluginServiceContext extends PluginServiceContext {
   readonly workos?: CreateAuthServiceBackendRegistryOptions['workos'];
 }
 
+/** Request host SQL only for the backend whose persistence uses it. */
+export async function resolveAuthServiceDatabase(ctx: PluginServiceContext): Promise<unknown> {
+  const { env, appsettings } = serviceConfiguration(ctx);
+  return resolveActiveBackendName(env, appsettings) === 'better-auth'
+    ? await ctx.db.getClient()
+    : undefined;
+}
+
 /** Resolve and construct the auth backend registry from host service context. */
 export async function initializeAuthService(
   ctx: PluginServiceContext,
@@ -29,12 +38,23 @@ export async function initializeAuthService(
 ): Promise<AuthServiceBackendRegistry> {
   const kv = watchableKv(ctx.kv);
   return await createAuthServiceBackendRegistry({
-    env: { ...Deno.env.toObject(), ...ctx.env },
-    appsettings: serviceAppsettings(ctx),
+    ...serviceConfiguration(ctx),
     dbClient,
     kv,
     workos: serviceWorkos(ctx),
   });
+}
+
+function serviceConfiguration(ctx: PluginServiceContext) {
+  const appsettings = serviceAppsettings(ctx);
+  return {
+    env: {
+      ...(appsettings?.auth?.environment ?? appsettings?.Auth?.Environment ?? {}),
+      ...Deno.env.toObject(),
+      ...ctx.env,
+    },
+    appsettings,
+  };
 }
 
 function serviceWorkos(

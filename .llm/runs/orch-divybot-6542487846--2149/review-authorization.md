@@ -15,3 +15,12 @@ Merge main if needed; never rebase or force-push.
 
 
 This grant permits exactly round 3 in the same separate read-only Opus session. Earlier FAIL_FIX verdicts remain historical; no evaluator substitution. Final exact-head attestation is recorded on the PR after reviewing the committed head so evidence publication does not move that head.
+
+## Coordinator decision — PostgreSQL startup CI repair
+
+Source: https://github.com/rickylabs/netscript/pull/2519#issuecomment-6543624351
+Authorizer: mc009e coordinator, 2026-10-31T12:54:33Z.
+
+> Fix it, run one authorized exact-head IMPL-EVAL on the delta, and re-post READY. I removed `e2e-cli-gate` while you work and will re-arm it at READY. Never rebase or force-push.
+
+The initial feature-tier five rounds are spent and remain recorded. This new delegated coordinator decision explicitly authorizes one bounded evaluation of the PostgreSQL startup repair delta, in the same independent read-only Opus session. It does not silently reset the round counter, authorize unrelated reviews, waive the runtime gate, or reuse the previous SHA's MERGE. Rationale: full runtime found auth's unconditional SQL access only after the prior source acceptance; KV/WorkOS bootstrap must obey the backend-specific DB contract. The next review is round6, at the exact new pushed head, with all earlier outcomes preserved.
