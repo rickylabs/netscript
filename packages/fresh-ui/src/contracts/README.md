@@ -90,3 +90,45 @@ the localized label visually hidden so assistive technology still receives the m
 The title uses body size and Medium label weight. After uncontrolled dismissal the browser may
 move focus to the document body; native Tab continues after the former dismiss button. Applications
 that require a particular restoration target own that policy.
+
+
+## Native Layout components
+
+`ui:add scroll-area`, `ui:add aspect-ratio` and `ui:add direction` install the
+real sources. ScrollArea requires `label` to name its native viewport; the caller
+sets frame dimensions. Its viewport is always tabbable for stable SSR/hydration.
+Vertical, horizontal and both axes use native overflow. Scrollbar, thumb and
+corner are native parts: standard thin-scrollbar geometry is platform-dependent;
+exact 6/8px hover growth is available only in older WebKit styling implementations.
+No fake scrollbar controls are rendered.
+
+AspectRatio defaults to16:9 and also accepts4:3,1:1,21:9. It clips media to the
+existing card radius; the host owns image alternatives and interactive labels.
+The frame adds no keyboard stop.
+
+DirectionProvider aliases Direction. The JSX-safe `as` form renders the caller's
+native boundary directly; no extra wrapper is added. Supported containers are
+`div`, `section`, `main`, `article`, `aside`, `nav`, `header`, `footer`, `form`, `span`.
+Native props, class, style and handlers pass through; `boundaryRef` refers to the
+native element. Direction owns `dir` and its contract markers. Nested boundaries
+remain local and never mutate document direction.
+
+```tsx
+import { Direction } from './components/ui/direction.tsx';
+
+<Direction as='section' dir='rtl'><input aria-label='Search' /></Direction>;
+```
+
+Without `as`, pass exactly one unscoped native HTML VNode. It is cloned with its
+key, ref and existing props preserved; supplied native props override the child's,
+and Direction overwrites its `dir`. Fragments, arrays, custom components and
+already scoped boundaries fail clearly. Preact precompile represents static JSX
+as template fragments, so use `as` for ordinary JSX, or `h` to create an explicitly
+cloneable boundary. Both forms render a single native boundary.
+
+From the first phase2b identity, `tests/contracts/strict-render-policy.ts` selects
+strict checks explicitly. Rendered data attributes must be scope/part markers,
+canonical axes on their declared parts, or independently reviewed private
+component/part bindings with a purpose. Unknown attributes, bare/unquoted
+attributes, undeclared `data-x-*`, wrong-part axes and invalid values fail. The
+all-style slice extends this same policy to existing source fixtures.

@@ -11,3 +11,15 @@
 Direction rejects an already scoped child to preserve existing component identity; markers go on the same native HTML boundary. It never adds a wrapper. No HTML-tag enumeration; caller boundary must be a native string-tag VNode (not fragment/custom component). Runtime rejects existing data-scope/data-part and nonstring tags. No contextOnly exemption; catalog root becomes actual element boundary. Root-level dir passthrough on ScrollArea supports local RTL.
 
 Direction owns dir: overwrite an existing child dir and document this, preserving all other input attributes/key/ref/style/class/handlers. Strict new-identity list is explicit; only scope/part plus declared axes on declared parts or independently classified private bindings pass, unknown/x/wrong-part/bad-value negatives required. ScrollArea always has a stable named tabstop; standard native scrollbar styling, platformthumbgeometrylimitation explicitly disclosed.
+
+
+## Reviewed source correction
+
+The independent source review rejected h-only JSX ergonomics. Direction adds
+as with closed native containers (div/section/main/article/aside/nav/header/footer/
+form/span), native props and explicit boundaryRef for the underlying HTML element.
+This form renders the caller's single boundary directly; clone mode remains for
+one existing native VNode. Both reject scoped boundary inputs. Ordinary precompiled
+JSX/nesting are covered by real installed TSX SSR and browser RTL tests. The render
+checker counts independent roots, preserving nested instances while still rejecting
+parallel duplicated roots. Source re-review is required before commit.

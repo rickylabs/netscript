@@ -11,3 +11,18 @@ unregistered; only eligible source-style registry items can declare extensions
 and every registered item goes through the reader; name normalization and exact
 mapping/collision rules are deterministic. Explicit likely9c/12b split points
 preserve the source-file budget. Await same evaluator round2; failure streak1.
+
+
+Slice9a: Preact precompile turns static JSX children into template nodes, not
+cloneable native HTML VNodes. Direction keeps the approved single-native-VNode
+boundary and explicitly requires h() for that boundary under precompile; it
+rejects template/custom/fragment nodes with an actionable diagnostic. Actual
+installed SSR and public usage cover h(). No wrapper/global/context workaround.
+
+
+Independent source review FAIL_FIX rejected h-only ergonomics. Added a JSX-safe
+as form that renders the caller's single native container directly, forwards
+native props/handlers and an explicit boundaryRef, and retains the clone form.
+Closed native-container choices are documented. No extra wrapper/context/global
+mutation. Installed tests must render actual precompiled JSX including nesting;
+browser RTL scenarios use as. Failure streak1 until re-review PASS.

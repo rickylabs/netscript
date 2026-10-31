@@ -23,6 +23,9 @@ export const POST_V1_COMPONENTS: readonly string[] = [
   'collapsible',
   'chart',
   'carousel',
+  'scroll-area',
+  'aspect-ratio',
+  'direction',
 ];
 
 /** Non-component support items added after the frozen v1 baseline. */
