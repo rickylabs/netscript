@@ -9,3 +9,18 @@
 - Phase2a source/run remains read-only predecessor context. Its hosted E2E run is in progress on exactly31cc758; do not push its branch merely to refresh state or cancel that run. Cockpit owns merges.
 - Public paths are repo-relative only. No machine paths, session IDs or thumbprints in run/PR artifacts. Leak/resource output is verdict/counts only; raw receipts/transports stay in the private project run. Audit failure must stop push control flow.
 - No labels, closing keywords, merge/tag/release. Draft stacked PR uses Refs #2416 and links PR2488. No canonical final-report handoff until the full assignment is complete and readiness gates hold.
+
+
+Current integration: parent2488 was rebased for the owner-reported conflict onto
+d54879b8 and verified/pushed at037d048b; hosted31cc758 proof is historical, not
+in progress or new-head proof. Phase2b is now at3c059e3f with9a/9b complete.
+Supporting9c0 explicitly owns packages/fresh-ui/src/runtime/dialog/use-dialog.ts
+only to preserve the existing controlled Escape contract required by the approved
+mobile shell. A real browser negative reproduced native closure despite refusal;
+no unrelated runtime work is authorized by this addition.
+
+
+9c0 corrected scope additionally includes src/runtime/sheet/use-sheet.ts and
+src/runtime/_internal/native-dialog.ts: both modal hooks share the native sync
+policy, so cancelability and next-render reconciliation must stay coherent. This
+is the existing controlled/open contract, with no new API or generic engine.

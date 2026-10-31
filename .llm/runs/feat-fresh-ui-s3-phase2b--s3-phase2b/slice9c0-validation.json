@@ -1,0 +1,90 @@
+{
+  "verdict": "PASS",
+  "tests": {
+    "nativeAdapterContracts": {
+      "exitCode": 0,
+      "passed": 357,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 357,
+      "uniqueFailures": 0
+    },
+    "runtime": {
+      "exitCode": 0,
+      "passed": 42,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 42,
+      "uniqueFailures": 0
+    }
+  },
+  "wrappers": {
+    "source-check": {
+      "verdict": "PASS",
+      "selected": 4,
+      "dropped": 0
+    },
+    "source-lint": {
+      "verdict": "PASS",
+      "selected": 4,
+      "dropped": 0
+    },
+    "source-fmt": {
+      "verdict": "PASS",
+      "selected": 4,
+      "dropped": 0
+    },
+    "browser-check": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    },
+    "browser-fixture-check": {
+      "verdict": "PASS",
+      "selected": 2,
+      "dropped": 0
+    },
+    "browser-lint": {
+      "verdict": "PASS",
+      "selected": 2,
+      "dropped": 0
+    }
+  },
+  "browser": {
+    "passed": 117,
+    "failed": 0,
+    "ignored": 0,
+    "flaky": 0,
+    "newOwnershipCases": 32,
+    "seriousCriticalAxe": 0,
+    "scope": "Utility/studio-utility light/dark390/1280 plus related touch controls",
+    "platformControl": "Real adjacent Escape keypresses with no intervening DOM evaluation; cancelability true/false and exactly one native-close."
+  },
+  "qualityArchitecture": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "preflight": {
+    "exitCode": 0,
+    "verdict": "PASS"
+  },
+  "docsAccuracy": {
+    "exitCode": 0,
+    "verdict": "PASS"
+  },
+  "docsExportsDrift": {
+    "exitCode": 0,
+    "verdict": "PASS"
+  },
+  "docsSiteBuild": "NOT_APPLICABLE_TO_SLICE_NO_DOCS_SITE_CHANGES",
+  "publicationAudit": "slice9c0-publication-audit.json",
+  "independentSourceReview": "PASS",
+  "inventory": {
+    "total": 104,
+    "shipped": 91,
+    "pending": 13,
+    "nativeRegistryItems": 119
+  },
+  "carriers": "PENDING_AFTER_SOURCE_COMMIT",
+  "wholePhase2b": "IN_PROGRESS"
+}

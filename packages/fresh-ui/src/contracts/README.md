@@ -182,3 +182,24 @@ package runtime dependency used by the public Icon primitive; no drag library is
 installed. Native keyboard, pointer/touch, controlled refusal, responsive bounds,
 cleanup and strict accessibility evidence live in
 `tools/fresh-ui-browser/gap-tests/resizable.spec.ts`.
+
+
+### Native modal close ownership
+
+Dialog and Sheet share native dialog synchronization. A cancelable Escape is a
+close proposal: a controlled parent may refuse it. Consumer onCancel vetoes and
+closeOnEscape=false still apply to cancelable requests. Repeated platform close
+requests can become non-cancelable; that native close stands and reports
+onOpenChange(false, { reason: 'native-close' }). Controlled parents should accept
+false for native-close to keep the modal closed. A later parent render that still
+accepts open=true asks the synchronizer to reopen it, even when the prop value did
+not change. The close handler never schedules a render just to reopen a modal.
+Uncontrolled state follows native closure.
+
+An accepted escape-key close is followed by the queued native-close notification;
+that existing reason order is preserved. The real-keyboard regression cases are
+in tools/fresh-ui-browser/gap-tests/dialog-ownership.spec.ts. Keep consecutive
+Escape presses adjacent: automation DOM queries can grant user activation between
+presses and obscure the browser's forced-close path. See the
+[HTML close-request standard](https://html.spec.whatwg.org/dev/interaction.html)
+and [native dialog guidance](https://developer.chrome.com/docs/modern-web-guidance/guides/ui-components/dialog).

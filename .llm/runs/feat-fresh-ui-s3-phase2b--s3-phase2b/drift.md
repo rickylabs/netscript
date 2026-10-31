@@ -34,3 +34,21 @@ exists. Both panels are consistently tabbable, named groups; endLabel defaults t
 Secondary panel. Child controls retain native tab order around those panel stops.
 SSR aria-hidden uses the explicit string true because precompile boolean values
 otherwise serialize as a bare attribute. Tests preserve the strict axe verdict.
+
+
+Shell9c0 negative control reproduced before production edits: the controlled
+Dialog proposed false, the parent refused, but native Escape still closed the
+modal. The visibility assertion failed (one expected negative). Canonical cancel
+ownership is a supporting complete unit before shell integration, with no new API
+or key map and no shell-local duplicate Escape handler.
+
+
+9c0 checkpoint review round1 FAIL_FIX corrected before production edits: native
+anti-trap double Escape must force closure and report native-close; a subsequent
+accepted parent render must reconcile unchanged open=true. Primary standard and
+real consecutive-key browser probe confirm cancelability true/false. No DOM
+queries between Escapes: Playwright evaluation grants activation and obscures the
+case. The native element is the physical source of truth, checked on each accepted
+render without an internal forced-close re-render. Shared Dialog/Sheet policy,
+consumer veto, no immediate reopen/new API and precise gates are now locked.
+Await same evaluator round2; failure streak1.

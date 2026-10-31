@@ -96,12 +96,10 @@ export function useSheet({
       onCancel: composeEventHandlers(
         props.onCancel,
         (event: JSX.TargetedEvent<HTMLDialogElement, Event>) => {
-          if (!closeOnEscape) {
-            event.preventDefault();
-            return;
-          }
-
-          setOpen(false, 'escape-key');
+          // A non-cancelable request is the platform's escape hatch; its close event owns the report.
+          if (!event.cancelable) return;
+          event.preventDefault();
+          if (closeOnEscape) setOpen(false, 'escape-key');
         },
       ),
       onClick: composeEventHandlers(

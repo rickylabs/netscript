@@ -78,3 +78,23 @@ churn. Reconcile current source before commit; carriers follow SOURCE commit.
 
 
 9b independent committed-source evidence reconciliation PASS. Native source8c5bcc25 and all4carriers verified; public privacy audit precedes evidence commit/push. Next9c shell research must preserve SidebarToggle island compatibility and useful SSR, with one active nav branch/native mobile modal after hydration; no9csource yet.
+
+
+9b source8c5bcc25/evidence3c059e3f pushed; comment6545161833. Starting9c0 supporting Dialog Escape ownership verification before the shell family: no new API/keyboard behavior, actual refused/accepted/uncontrolled browser controls first, canonical hook fix only if reproduced. Seven-item checkpoint written; no product change yet.
+
+
+9c0 checkpoint review round1 FAIL_FIX corrected before production edits: native
+anti-trap double Escape must force closure and report native-close; a subsequent
+accepted parent render must reconcile unchanged open=true. Primary standard and
+real consecutive-key browser probe confirm cancelability true/false. No DOM
+queries between Escapes: Playwright evaluation grants activation and obscures the
+case. The native element is the physical source of truth, checked on each accepted
+render without an internal forced-close re-render. Shared Dialog/Sheet policy,
+consumer veto, no immediate reopen/new API and precise gates are now locked.
+Await same evaluator round2; failure streak1.
+
+
+9c0 corrected checkpoint round2 PASS; failure streak reset0. Implement shared Dialog/Sheet cancelability guard and native-state reconciliation on each accepted render, with no forced-close re-render/reopen. Real double-Escape and unchanged-parent-prop recovery controls remain mandatory; accepted-close duplicate native-close report is unchanged and must be pinned.
+
+
+9c0 substantive source review PASS; failure streak0. Shared Dialog/Sheet cancelable Escape honors controlled refusal, non-cancelable platform closure reports only native-close, and the next accepted render reconciles unchanged open=true without a close-triggered internal reopen.117related browser/42runtime/357adapter-contract PASS,0failed/ignored/flaky/seriouscriticalaxe. Scoped source/browser wrappers, quality/architecture, preflight/docsaccuracy/exportdrift/nativepublish PASS. Inherited raw124doclint failure stays explicit debt2531 with exact123identities unchanged/0new/0removed. Inventory104/91/13/119 unchanged. Source commit first; all4carriers/evidence review/privacy audit/push/comment follow. Whole assignment remains in progress.

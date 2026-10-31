@@ -84,10 +84,11 @@ export function syncNativeDialog(
 /**
  * Keep a native `<dialog>` in sync with hook state; returns the ref callback for the element.
  *
- * Synchronizes when `open`/`modal` change and whenever a new element attaches, so
- * content mounted (or remounted) under an already-open root still enters the top
- * layer. Runs as a layout effect, and an attachment re-render is microtask-scheduled,
- * so a modal dialog holds focus in the top layer before the browser paints.
+ * Audits native state on each accepted render, including an unchanged `open`
+ * value after a platform-forced close. No close handler schedules a render just
+ * to reopen a modal; the next parent render can explicitly retain its open intent.
+ * Attachment identity schedules synchronization for newly mounted content without
+ * looping as composed refs reattach. The layout effect runs before painting.
  */
 export function useNativeDialogSync(
   open: boolean,
@@ -95,7 +96,7 @@ export function useNativeDialogSync(
 ): (element: NativeDialogElement | null) => void {
   const elementRef = useRef<NativeDialogElement | null>(null);
   // Only the identity of the last attached element matters: it re-runs the effect.
-  const [attached, setAttached] = useState<NativeDialogElement | null>(null);
+  const [, setAttached] = useState<NativeDialogElement | null>(null);
 
   const attach = useCallback((element: NativeDialogElement | null) => {
     elementRef.current = element;
@@ -111,7 +112,7 @@ export function useNativeDialogSync(
     if (element) {
       syncNativeDialog(element, open, modal);
     }
-  }, [attached, modal, open]);
+  });
 
   return attach;
 }

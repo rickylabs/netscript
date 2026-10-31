@@ -1,3 +1,4 @@
+import { DialogOwnership } from './gap-dialog-ownership-fixture.tsx';
 import { Resizables } from './gap-resizable-fixture.tsx';
 import { PageHeaders } from './gap-page-header-fixture.tsx';
 import { NativeLayouts } from './gap-native-layout-fixture.tsx';
@@ -75,6 +76,7 @@ function Actions() {
       <PageHeaders />
       <NativeLayouts />
       <Resizables />
+      <DialogOwnership />
     </main>
   );
 }

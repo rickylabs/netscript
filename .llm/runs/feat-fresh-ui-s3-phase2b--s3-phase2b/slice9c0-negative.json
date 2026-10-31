@@ -1,0 +1,29 @@
+{
+  "verdict": "EXPECTED_FAIL",
+  "passed": 0,
+  "failed": 1,
+  "ignored": 0,
+  "finding": "Native Escape closed a controlled Dialog despite parent refusal; false proposal was observed before visibility failed.",
+  "productionEditedBeforeNegative": false,
+  "cases": [
+    {
+      "name": "controlled-cancelable-Escape",
+      "verdict": "EXPECTED_FAIL",
+      "passed": 0,
+      "failed": 1
+    },
+    {
+      "name": "native-forced-close-and-unchanged-parent-render",
+      "verdict": "EXPECTED_FAIL",
+      "passed": 0,
+      "failed": 1,
+      "cancelable": [
+        true,
+        false
+      ],
+      "nativeCloseNotifications": 1,
+      "incorrectEscapeKeyNotifications": 1,
+      "visibleAfterParentRender": false
+    }
+  ]
+}
