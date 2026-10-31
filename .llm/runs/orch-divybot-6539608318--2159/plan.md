@@ -46,3 +46,21 @@ Pure handlers can rerun on CAS races; only committed transitions are exactly-onc
 Old orphaned reservation markers are not evidence of an atomic commit and must not be trusted.
 Effect loss after commit remains explicit unproven acceptance, covered by the single follow-up.
 No new architecture debt is accepted; deferred product functionality stays on #2159.
+
+## PLAN-EVAL round 1 amendment
+
+- Bridge routing is explicit: expose an engine `usesAtomicReplay` read-only capability. When an
+  atomic store is configured, skip SagaIdempotencyPort reservation in publish and cascaded send,
+  for every definition. Storeless composition retains its legacy behavior.
+- Engine ignores injected appliedKeys for ordinary handling AND commitCompensation whenever a
+  canonical store is configured. Both commit replay identities in that store transaction.
+- Persisted SIGKILL proof runs through production runner/supervisor composition with durable
+  bridge and applied-key stores injected. Pause after handler completion at commitTransition,
+  kill with SIGKILL, restart the runner on the same KV, redeliver and assert one history row.
+- Upgrade negative control seeds orphaned legacy bridge reservation and engine applied key in
+  the same production keyspace before redelivery; they must not suppress the atomic transition.
+- New KV replay digest uses a distinct nested namespace under the applied family so legacy raw
+  idempotency keys cannot alias it and existing terminal retention sweeps still discover it.
+- Ordinary Prisma marker insertion must use conflict-ignore semantics (Prisma createMany with
+  skipDuplicates, which emits INSERT ON CONFLICT DO NOTHING), never create/P2002 inside a
+  transaction. Preserve the existing shipped applied-key identity and document retention ownership.

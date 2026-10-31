@@ -1,5 +1,11 @@
 import { SagaKvRetention, sagaRetentionRemaining } from './saga-kv-retention.ts';
 import { SagasError } from '../domain/mod.ts';
+import { snapshotTransitionCommit } from '../application/validate-transition-commit.ts';
+import type {
+  SagaTransitionCommitPort,
+  SagaTransitionCommitRequest,
+  SagaTransitionCommitResult,
+} from '../ports/saga-transition-commit-port.ts';
 import { getKv } from '@netscript/kv';
 import type { AtomicMutation, KvKey, KvStore } from '@netscript/kv';
 import type {
@@ -26,6 +32,7 @@ export type {
 } from '@netscript/kv';
 
 const DEFAULT_SAGA_KV_PREFIX = ['sagas'] as const satisfies KvKey;
+const ATOMIC_APPLIED_KEY_NAMESPACE = 'transition-v1';
 const SAGA_KV_PATH_ENV = 'NETSCRIPT_SAGA_KV_PATH';
 
 /** Options for the KV-backed saga runtime store. */
@@ -44,9 +51,16 @@ export function openSagaRuntimeKv(): Promise<KvStore> {
 }
 
 /** KV-backed saga state store for durable native saga execution. */
-export class KvSagaStore implements SagaStorePort {
+export class KvSagaStore implements SagaStorePort, SagaTransitionCommitPort {
   /** Stable store identifier used by runtime diagnostics. */
   readonly id = 'kv-saga-store';
+  /** State and replay share one CAS; worker command delivery needs its own supported adapter. */
+  readonly transitionCommitCapabilities: SagaTransitionCommitPort['transitionCommitCapabilities'] =
+    Object.freeze({
+      transitionOutbox: 'unsupported',
+      optimisticVersion: true,
+      replay: 'same_commit',
+    });
   readonly #kv: KvStore;
   readonly #prefix: KvKey;
   readonly #now: () => Date;
@@ -56,11 +70,88 @@ export class KvSagaStore implements SagaStorePort {
 
   /** Create a saga store over the supplied KV adapter. */
   constructor(options: KvSagaStoreOptions) {
+    requireAtomic(options.kv);
     this.#kv = options.kv;
     this.#prefix = options.prefix ?? DEFAULT_SAGA_KV_PREFIX;
     this.#now = options.now ?? (() => new Date());
     this.#days = options.completedRetentionDays ?? 7;
     this.#retention = new SagaKvRetention(this.#kv, this.#prefix, this.#now);
+  }
+
+  /** Read only committed digests, independently of legacy pre-handler reservations. */
+  async hasAppliedTransition(instanceId: SagaInstanceId, keyHash: string): Promise<boolean> {
+    return await this.#kv.get(this.#atomicAppliedKey(instanceId, keyHash)) !== null;
+  }
+
+  /** Commit state, history, correlation ownership and replay in one crash-safe compare-and-swap. */
+  async commitTransition(
+    request: SagaTransitionCommitRequest,
+    signal?: AbortSignal,
+  ): Promise<SagaTransitionCommitResult> {
+    signal?.throwIfAborted();
+    const value = snapshotTransitionCommit(request);
+    if (value.commands.length) {
+      throw new TypeError('KV saga store does not support worker commands.');
+    }
+    const { envelope, correlation, record, appliedKeyHash, expectedVersion } = value;
+    const instanceId = envelope.metadata.instanceId;
+    const appliedKey = appliedKeyHash === undefined
+      ? undefined
+      : this.#atomicAppliedKey(instanceId, appliedKeyHash);
+    if (appliedKey && await this.#kv.get(appliedKey)) return { committed: false };
+    const stateKey = this.#stateKey(instanceId);
+    const correlationKey = this.#correlationKey(correlation.sagaId, correlation.correlationKey);
+    const [state, owner] = await Promise.all([
+      this.#kv.get<SagaStateEnvelope>(stateKey),
+      this.#kv.get<SagaInstanceId>(correlationKey),
+    ]);
+    if (
+      (expectedVersion === 0
+        ? state !== null
+        : state?.value.metadata.version !== expectedVersion) ||
+      (owner !== null && owner.value !== instanceId)
+    ) {
+      if (appliedKey && await this.#kv.get(appliedKey)) return { committed: false };
+      throw SagasError.retryable(`Saga store version mismatch for ${instanceId}.`);
+    }
+    const expireIn = this.#remaining(envelope);
+    if (expireIn !== undefined && expireIn <= 0) {
+      throw SagasError.validationFailed('Cannot commit an already-expired saga transition.');
+    }
+    const mutations: AtomicMutation[] = [
+      { type: 'set', key: stateKey, value: envelope, expireIn },
+      { type: 'set', key: correlationKey, value: instanceId, expireIn },
+      {
+        type: 'set',
+        key: [...this.#prefix, 'correlation-instance', instanceId],
+        value: correlation,
+        expireIn,
+      },
+      {
+        type: 'set',
+        key: this.#transitionKey(instanceId, record.version),
+        value: record,
+        expireIn,
+      },
+      expireIn === undefined
+        ? { type: 'delete', key: this.#retention.key(instanceId) }
+        : this.#retention.mutation(instanceId, this.#now().getTime() + expireIn),
+    ];
+    if (appliedKey) mutations.push({ type: 'set', key: appliedKey, value: true, expireIn });
+    signal?.throwIfAborted();
+    const result = await requireAtomic(this.#kv)([
+      { key: stateKey, versionstamp: state?.versionstamp ?? null },
+      { key: correlationKey, versionstamp: owner?.versionstamp ?? null },
+      ...(appliedKey ? [{ key: appliedKey, versionstamp: null }] : []),
+    ], mutations);
+    if (result.ok) return { committed: true };
+    if (appliedKey && await this.#kv.get(appliedKey)) return { committed: false };
+    throw SagasError.retryable(`Saga store version mismatch for ${instanceId}.`);
+  }
+
+  // Nested below the raw-key depth: legacy keys cannot masquerade as committed digests.
+  #atomicAppliedKey(instanceId: SagaInstanceId, keyHash: string): KvKey {
+    return [...this.#prefix, 'applied', instanceId, ATOMIC_APPLIED_KEY_NAMESPACE, keyHash];
   }
 
   /** Load a saga state envelope by instance id. */

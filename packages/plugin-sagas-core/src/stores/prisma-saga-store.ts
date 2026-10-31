@@ -1,3 +1,9 @@
+import { snapshotTransitionCommit } from '../application/validate-transition-commit.ts';
+import type {
+  SagaTransitionCommitPort,
+  SagaTransitionCommitRequest,
+  SagaTransitionCommitResult,
+} from '../ports/saga-transition-commit-port.ts';
 import { SagasError } from '../domain/mod.ts';
 import type {
   SagaCorrelationIndexEntry,
@@ -79,7 +85,7 @@ export type SagaRuntimeCorrelationDelegate = Readonly<{
     where: {
       [SAGA_RUNTIME_CORRELATION_SELECTOR]: { sagaId: string; correlationKey: string };
     };
-    update: { instanceId: string };
+    update: { instanceId?: string };
     create: SagaRuntimeCorrelationWrite;
   }): Promise<unknown>;
   deleteMany(args: { where: { instanceId: string } }): Promise<WriteResult>;
@@ -114,17 +120,37 @@ export type SagaRuntimeCorrelationWrite = Readonly<{
   instanceId: string;
 }>;
 
+/** Existing #1932 replay-marker delegate; conflict-ignore inserts keep replays transactional. */
+export type SagaRuntimeAppliedKeyDelegate = Readonly<{
+  findUnique(
+    args: {
+      where: { saga_runtime_command_applied_key_identity: { instanceId: string; keyHash: string } };
+    },
+  ): Promise<unknown | null>;
+  createMany(
+    args: { data: { instanceId: string; keyHash: string }; skipDuplicates: true },
+  ): Promise<WriteResult>;
+}>;
+
 /** Prisma client shape consumed by `PrismaSagaStore`. */
-export type PrismaSagaStoreClient = Readonly<{
+export type PrismaSagaStoreTransaction = Readonly<{
+  sagaRuntimeCommandAppliedKey: SagaRuntimeAppliedKeyDelegate;
   sagaRuntimeState: SagaRuntimeStateDelegate;
   sagaRuntimeTransition: SagaRuntimeTransitionDelegate;
   sagaRuntimeCorrelation: SagaRuntimeCorrelationDelegate;
-  $transaction<T>(handler: (tx: PrismaSagaStoreClient) => Promise<T>): Promise<T>;
 }>;
+
+/** Host-owned interactive transaction runner; callback handles never need nested transactions. */
+export type PrismaSagaStoreClient =
+  & PrismaSagaStoreTransaction
+  & Readonly<{
+    $transaction<T>(handler: (tx: PrismaSagaStoreTransaction) => Promise<T>): Promise<T>;
+  }>;
 
 /** Validate all runtime delegates before constructing a Prisma-backed saga store. */
 export function isPrismaSagaStoreClient(candidate: unknown): candidate is PrismaSagaStoreClient {
   return isClientRecord(candidate) && typeof candidate.$transaction === 'function' &&
+    hasDelegateMethods(candidate.sagaRuntimeCommandAppliedKey, ['findUnique', 'createMany']) &&
     hasDelegateMethods(candidate.sagaRuntimeState, [
       'findUnique',
       'findMany',
@@ -152,14 +178,91 @@ export type PrismaSagaStoreOptions = Readonly<{
 }>;
 
 /** Prisma/Postgres-backed saga state store for durable native saga execution. */
-export class PrismaSagaStore implements SagaStorePort {
+export class PrismaSagaStore implements SagaStorePort, SagaTransitionCommitPort {
   /** Stable store identifier used by runtime diagnostics. */
   readonly id = 'prisma-saga-store';
+  /** Interactive transaction covers canonical rows and replay; command production stays explicit. */
+  readonly transitionCommitCapabilities: SagaTransitionCommitPort['transitionCommitCapabilities'] =
+    Object.freeze({
+      transitionOutbox: 'unsupported',
+      optimisticVersion: true,
+      replay: 'same_commit',
+    });
   readonly #prisma: PrismaSagaStoreClient;
 
   /** Create a saga store over a host-owned Prisma client. */
   constructor(options: PrismaSagaStoreOptions) {
+    if (!isPrismaSagaStoreClient(options.prisma)) {
+      throw new TypeError('Prisma saga store requires the runtime and applied-key delegates.');
+    }
     this.#prisma = options.prisma;
+  }
+
+  /** Read a committed replay digest using the identity shipped with the command protocol. */
+  async hasAppliedTransition(instanceId: SagaInstanceId, keyHash: string): Promise<boolean> {
+    return await this.#prisma.sagaRuntimeCommandAppliedKey.findUnique({
+      where: { saga_runtime_command_applied_key_identity: { instanceId, keyHash } },
+    }) !== null;
+  }
+
+  /** Atomically commit ordinary saga state, correlation, history and the applied marker. */
+  async commitTransition(
+    request: SagaTransitionCommitRequest,
+    signal?: AbortSignal,
+  ): Promise<SagaTransitionCommitResult> {
+    signal?.throwIfAborted();
+    const value = snapshotTransitionCommit(request);
+    if (value.commands.length) {
+      throw new TypeError('Ordinary Prisma saga store does not support worker commands.');
+    }
+    return await this.#prisma.$transaction(async (tx) => {
+      const { envelope, correlation, record, appliedKeyHash, expectedVersion } = value;
+      const instanceId = envelope.metadata.instanceId;
+      signal?.throwIfAborted();
+      if (appliedKeyHash !== undefined) {
+        const marked = await tx.sagaRuntimeCommandAppliedKey.createMany({
+          data: { instanceId, keyHash: appliedKeyHash },
+          skipDuplicates: true,
+        });
+        if (marked.count === 0) return { committed: false };
+      }
+      signal?.throwIfAborted();
+      const write = { ...stateWriteFromEnvelope(envelope), sagaId: correlation.sagaId };
+      if (expectedVersion === 0) {
+        await tx.sagaRuntimeState.create({ data: write });
+      } else {
+        const result = await tx.sagaRuntimeState.updateMany({
+          where: { instanceId, version: expectedVersion },
+          data: { sagaId: write.sagaId, version: write.version, envelope: write.envelope },
+        });
+        if (result.count !== 1) {
+          throw SagasError.retryable(`Saga store version mismatch for ${instanceId}.`);
+        }
+      }
+      signal?.throwIfAborted();
+      const where = {
+        [SAGA_RUNTIME_CORRELATION_SELECTOR]: {
+          sagaId: correlation.sagaId,
+          correlationKey: correlation.correlationKey,
+        },
+      };
+      // A no-op upsert locks the owner without letting a concurrent writer steal its correlation.
+      await tx.sagaRuntimeCorrelation.upsert({ where, update: {}, create: correlation });
+      const owner = await tx.sagaRuntimeCorrelation.findUnique({ where });
+      if (owner?.instanceId !== instanceId) {
+        throw SagasError.retryable(`Saga store version mismatch for ${instanceId}.`);
+      }
+      signal?.throwIfAborted();
+      await tx.sagaRuntimeTransition.create({
+        data: {
+          instanceId,
+          version: record.version,
+          record: serializeSagaJson(record),
+        },
+      });
+      signal?.throwIfAborted();
+      return { committed: true };
+    });
   }
 
   /** Load a saga state envelope by instance id. */

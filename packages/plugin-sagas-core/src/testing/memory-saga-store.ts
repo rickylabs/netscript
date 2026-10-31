@@ -93,6 +93,11 @@ export class MemorySagaStore implements SagaStorePort, SagaTransitionCommitPort 
     }
   }
 
+  /** Read only replay markers already committed with canonical state and history. */
+  hasAppliedTransition(instanceId: SagaInstanceId, keyHash: string): Promise<boolean> {
+    return Promise.resolve(this.#applied.has(JSON.stringify([instanceId, keyHash])));
+  }
+
   /** Inspect snapshotted producer intents without implementing a second relay. */
   commandIntents(): readonly StoredCommandOutbox[] {
     return Object.freeze(structuredClone([...this.#commands.values()]));
