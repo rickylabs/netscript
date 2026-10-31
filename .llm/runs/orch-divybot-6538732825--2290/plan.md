@@ -1,7 +1,8 @@
 # Plan & Design — READY FOR REVIEW
 
-Scope: issue #2290, milestone 0.0.9 group D1. Archetype 2 Integration for the auth adapter,
-with the Service overlay. The enclosing service runtime is unchanged; exercise its real in-process
+Scope: issue #2290, milestone 0.0.9 group D1. Archetype 4 DSL/Builder for the owning service package,
+folding its auth integration seam inside it, with Service and Docs overlays. Current doctrine
+verdict: Refactor (builder separation); this focused change does not deepen that debt. The enclosing service runtime is unchanged; exercise its real in-process
 Hono/oRPC request pipeline rather than start Aspire or the forbidden local scaffold runtime suite.
 
 ## Locked decisions
@@ -16,7 +17,9 @@ Hono/oRPC request pipeline rather than start Aspire or the forbidden local scaff
    Snapshot into a Set once. No prefixes or implicit REST/RPC alias expansion.
 3. Active REST/RPC/alias/deprecated procedure matching, declared raw policies, and internal
    guards precede retired lookup. The shared resolver marks a retired path as authentication
-   required, even outside protect prefixes; a `retired?: true` tag lets authorization return 410.
+   required, even outside protect prefixes; a public optional `retired?: true` tag on the matched
+   `ProcedurePolicyResolution` branch lets authorization return 410. This field gets JSDoc,
+   doc-lint coverage and reference documentation. Overlay resolutions never set it.
    Unmatched guarded authenticated requests get 404, anonymous requests retain their existing
    401. Outside protected coverage, undeclared requests keep current behavior.
 4. Existing fallback is consulted only for matched metadata-less procedures; never for retired or
@@ -31,7 +34,13 @@ Hono/oRPC request pipeline rather than start Aspire or the forbidden local scaff
    add HTTP and direct-authorizer regression tests and update superseded unknown-path assertions.
    Update authz tutorial, service reference, README and CHANGELOG. Files: declared service auth
    sources, two public manifests, tests/auth, and the named docs. Gate: structured check/test/lint/
-   fmt, quality:gate, doc lint, JSR audit, member publish dry-run and negative control. Independent
+   fmt, quality:gate, doc lint, JSR audit, member publish dry-run and negative control. Documentation validation also runs the structured wrapper over
+   `.llm/tools/docs/guarded-client-docs_test.ts` and
+   `packages/service/tests/_fixtures/readme-examples_test.ts`, plus `docs:exports-drift`,
+   `docs:snippets`, and `docs:readme-fences` (using supported scope filters if available).
+   Consumer import validation: a new auth regression imports the constant/type from root and
+   ./auth, type-checks those imports, and exercises them at runtime; also run deps:prod-install
+   scoped to the service package when supported. Independent
    slice/implementation review before commit, then push and comment with evidence.
 2. Evidence/handoff reconciliation if needed; run artifacts only unless evaluator blockers require
    scoped fixes. Mark ready after no-blocker review, inspect CI state without waiting, answer all

@@ -122,7 +122,9 @@ export type {
   AuthzRequest,
   MatchAwareAuthorizerPort,
   Principal,
+  ProcedureErrorCode,
 } from './src/auth/types.ts';
+export { PROCEDURE_ERROR_CODES } from './src/auth/types.ts';
 
 export {
   createOpenAPISpec,

@@ -5,3 +5,8 @@ connector is exposed; consult committed run memory first and retain discoveries 
 Deno doc --filter accepts a symbol name, not a regular-expression alternation.
 Member publication: deno task publish:dry-run --member packages/service.
 Specific issue operator directives require Refs and no labels; generic footer conflicts yield.
+
+For evaluator resumes, keep the launch process alive through exec_command (subprocess.run or
+awaited Deno command). A Popen-only launcher can be reaped when its exec cell exits, leaving an
+empty output file; that is a transport non-launch, not an evaluator verdict or consumed review
+round. Preserve full stream-json privately and copy only the visible review to public artifacts.

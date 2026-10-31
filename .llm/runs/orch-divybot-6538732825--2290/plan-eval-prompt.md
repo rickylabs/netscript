@@ -8,3 +8,8 @@ requires Claude Opus 5.5 high and separate vendor/session. No local scaffold.run
 resources. Output a concise review with only blocking findings and end with exactly
 VERDICT: PASS or VERDICT: FAIL_PLAN. Do not include environment paths, hosts, ports, session ids,
 or secrets in your visible answer. You may read repository-relative files using tools.
+
+## SKILL
+Use netscript-harness, netscript-doctrine, netscript-tools, netscript-pr, jsr-audit and the
+provided leaf workflow; no profiles/ files. The owning package is Archetype 4 (doctrine verdict
+Refactor) with Service and Docs overlays. No builder redesign is in scope.

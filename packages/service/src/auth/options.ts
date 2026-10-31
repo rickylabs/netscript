@@ -99,6 +99,14 @@ export interface ContractAuthorizerOptions {
   /** Raw routes mounted beside the contract router; any other unmatched route stays denied. */
   readonly rawRoutes?: readonly ContractAuthorizerRawRoute[];
   /**
+   * Exact mounted absolute paths that return 410 `procedure_retired` after authentication.
+   * Applies to every method, even outside `protect` or inside `allowAnonymous`. Active contract
+   * procedures, internal guards and declared raw routes take precedence. Declare REST, RPC and
+   * alias paths separately. No parameters, prefixes, encoding, query, fragment or trailing slash.
+   * Invalid or duplicate declarations throw during authorizer construction.
+   */
+  readonly retiredPaths?: readonly string[];
+  /**
    * Decides which principals satisfy `access.audience: 'internal'`. Defaults to
    * `isInternalServicePrincipal`, which accepts only internal-credential principals.
    */

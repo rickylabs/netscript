@@ -240,7 +240,7 @@ Deno.test('declared raw route rejects an unauthenticated caller with 401', async
   }
 });
 
-Deno.test('undeclared raw sibling stays denied with authz.no-contract-procedure', async () => {
+Deno.test('undeclared raw sibling returns typed not found after authentication', async () => {
   const app = rawRouteApp(DECLARED_MCP);
 
   const response = await app.request('/api/tools/other', {
@@ -248,10 +248,11 @@ Deno.test('undeclared raw sibling stays denied with authz.no-contract-procedure'
     headers: { authorization: 'Bearer user' },
   });
 
-  assertEquals(response.status, 403);
+  assertEquals(response.status, 404);
   assertEquals(await response.json(), {
-    error: 'FORBIDDEN',
+    error: 'NOT_FOUND',
     message: 'authz.no-contract-procedure',
+    code: 'procedure_not_found',
   });
 });
 
@@ -263,10 +264,11 @@ Deno.test('raw route declaration matches exactly, without prefix confusion', asy
       method: 'POST',
       headers: { authorization: 'Bearer user' },
     });
-    assertEquals(response.status, 403, path);
+    assertEquals(response.status, 404, path);
     assertEquals(await response.json(), {
-      error: 'FORBIDDEN',
+      error: 'NOT_FOUND',
       message: 'authz.no-contract-procedure',
+      code: 'procedure_not_found',
     }, path);
   }
 });
