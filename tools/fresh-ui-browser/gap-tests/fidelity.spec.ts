@@ -1,15 +1,16 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Locator, test } from '@playwright/test';
 import { AxeBuilder } from '@axe-core/playwright';
 
 test.beforeEach(async ({ page }, info) => {
   await page.goto(`/?scheme=${info.project.name.startsWith('dark') ? 'dark' : 'light'}`);
 });
 
-test('code-block/syntax-contrast-on-every-row', async ({ page }, info) => {
-  const matrix = page.locator('#code-syntax-contrast');
-  await expect(matrix.locator('[data-part="syntax"]')).toHaveCount(28);
-  // Canvas resolves modern CSS colors into the actual display RGB channels.
-  const measured = await matrix.evaluate((root) => {
+async function measureSyntax(
+  matrix: Locator,
+  selector: string,
+  roles: readonly (readonly [string, string])[] = [],
+) {
+  return await matrix.evaluate((root, { selector, roles }) => {
     const canvas = document.createElement('canvas');
     canvas.width = 1;
     canvas.height = 1;
@@ -28,11 +29,19 @@ test('code-block/syntax-contrast-on-every-row', async ({ page }, info) => {
       });
       return linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
     };
-    return Array.from(root.querySelectorAll<HTMLElement>('[data-part="syntax"]')).map((element) => {
+    return Array.from(root.querySelectorAll<HTMLElement>(selector)).map((element) => {
       const probe = document.createElement('span');
       probe.style.color = 'var(--ns-fg)';
       element.append(probe);
       const plain = rgba(getComputedStyle(probe).color);
+      const syntax = element.dataset.syntax ??
+        roles.find((entry) => element.matches(entry[1]))?.[0];
+      if (!syntax) throw new Error('Every measured token must map to a known syntax role');
+      const row = element.closest<HTMLElement>('[data-line-variant]')?.dataset.lineVariant;
+      probe.style.color = row === 'default'
+        ? 'var(--ns-code-syntax-' + syntax + ')'
+        : 'color-mix(in srgb, var(--ns-code-syntax-' + syntax + ') 80%, var(--ns-fg))';
+      const expected = rgba(getComputedStyle(probe).color);
       probe.remove();
       const ink = rgba(getComputedStyle(element).color);
       const stack: number[][] = [];
@@ -46,17 +55,28 @@ test('code-block/syntax-contrast-on-every-row', async ({ page }, info) => {
       }, [255, 255, 255]);
       const foregroundLum = luminance(ink), backgroundLum = luminance(background);
       return {
-        syntax: element.dataset.syntax,
-        row: element.closest<HTMLElement>('[data-line-variant]')?.dataset.lineVariant,
+        syntax,
+        row,
+        matchesRole: ink.slice(0, 3).every((channel, index) =>
+          Math.abs(channel - expected[index]) <= 1
+        ),
         contrast: (Math.max(foregroundLum, backgroundLum) + 0.05) /
           (Math.min(foregroundLum, backgroundLum) + 0.05),
         differsFromPlainText: ink.slice(0, 3).some((channel, index) => channel !== plain[index]),
       };
     });
-  });
+  }, { selector, roles });
+}
+
+test('code-block/syntax-contrast-on-every-row', async ({ page }, info) => {
+  const matrix = page.locator('#code-syntax-contrast');
+  await expect(matrix.locator('[data-part="syntax"]')).toHaveCount(28);
+  // Canvas resolves modern CSS colors into the actual display RGB channels.
+  const measured = await measureSyntax(matrix, '[data-part="syntax"]');
   expect(measured).toHaveLength(28);
   for (const cell of measured) {
     expect(cell.contrast, `${cell.syntax} on ${cell.row}`).toBeGreaterThanOrEqual(4.5);
+    expect(cell.matchesRole, `${cell.syntax} on ${cell.row}`).toBe(true);
     // Neutral comments/punctuation may share an ink; chromatic roles must retain color.
     if (!['comment', 'punctuation'].includes(cell.syntax!)) {
       expect(cell.differsFromPlainText, `${cell.syntax} on ${cell.row}`).toBe(true);
@@ -108,4 +128,36 @@ test('alert-dialog/canonical-destructive-roles', async ({ page }, info) => {
   await expect(dialog).not.toBeVisible();
   await expect(page.getByLabel('Confirmed changes')).toHaveText('1');
   await expect(page.getByRole('button', { name: 'Review deletion', exact: true })).toBeFocused();
+});
+
+test('code-block/automatic-syntax-contextual-roles-and-contrast', async ({ page }, info) => {
+  const matrix = page.locator('#code-automatic-contrast');
+  const roles = [
+    ['keyword', '.hljs-keyword'],
+    ['function', '.hljs-title.function_'],
+    ['type', '.hljs-built_in'],
+    ['string', '.hljs-string'],
+    ['number', '.hljs-number'],
+    ['comment', '.hljs-comment'],
+    ['punctuation', '.hljs-punctuation'],
+  ] as const;
+  const measured = await measureSyntax(matrix, roles.map((entry) => entry[1]).join(','), roles);
+  expect(measured.length).toBeGreaterThanOrEqual(28);
+  for (const variant of ['default', 'added', 'removed', 'highlighted']) {
+    for (const [role] of roles) {
+      expect(measured.some((cell) => cell.row === variant && cell.syntax === role)).toBe(true);
+    }
+  }
+  for (const cell of measured) {
+    expect(cell.contrast, cell.syntax + ' on ' + cell.row).toBeGreaterThanOrEqual(4.5);
+    expect(cell.matchesRole, cell.syntax + ' on ' + cell.row).toBe(true);
+    if (!['comment', 'punctuation'].includes(cell.syntax)) {
+      expect(cell.differsFromPlainText).toBe(true);
+    }
+  }
+  const axe = await new AxeBuilder({ page }).include('#code-automatic-contrast').analyze();
+  expect(axe.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? ''))).toEqual(
+    [],
+  );
+  await matrix.screenshot({ path: info.outputPath('automatic-syntax-contrast.png') });
 });

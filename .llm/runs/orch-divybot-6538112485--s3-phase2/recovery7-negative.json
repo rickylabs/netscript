@@ -1,0 +1,22 @@
+{
+  "regressions": [
+    {
+      "kind": "automatic-merge-dependency-loss",
+      "cause": "Two dependencies keys in the CodeBlock registry JSON item; parsing retained only the later runtime dependency",
+      "fix": "One field containing both approved dependencies; frozen compatibility mutant and CodeBlock-only installer assertion before Markdown can mask it"
+    },
+    {
+      "kind": "fixture-accessible-label-collision",
+      "passedBeforeFix": 1,
+      "failedBeforeFix": 1,
+      "fix": "Give the new callback output a unique label; existing test unchanged"
+    },
+    {
+      "kind": "fixture-JSX-entity-input",
+      "passedBeforeFix": 7,
+      "failedBeforeFix": 1,
+      "fix": "Pass the intended literal entity text through a string variable; exact-text assertion retained"
+    }
+  ],
+  "newWaivers": 0
+}

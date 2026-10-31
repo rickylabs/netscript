@@ -50,8 +50,8 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
         },
       }),
     );
-    for (const name of installedNames) {
-      await run(repo, [
+    const install = (name: string) =>
+      run(repo, [
         'run',
         '-A',
         '--frozen',
@@ -64,7 +64,12 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
         join(repo, 'packages/fresh-ui'),
         '--force',
       ]);
-    }
+    // Prove CodeBlock alone contributes its parser before Markdown can mask a missing dependency.
+    await install('code-block');
+    const codeConfig = JSON.parse(await Deno.readTextFile(join(root, 'deno.json')));
+    assertEquals(codeConfig.imports['highlight.js'], 'npm:highlight.js@^11');
+    assertEquals(codeConfig.imports['@netscript/fresh-ui'], FRESH_UI_RUNTIME_DEPENDENCY);
+    for (const name of installedNames) await install(name);
     const installedConfig = JSON.parse(await Deno.readTextFile(join(root, 'deno.json')));
     assertEquals(
       installedConfig.imports['@netscript/fresh-ui'],
@@ -84,6 +89,14 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
       );
       // The copy installer relocates only the canonical lib/ui imports.
       assertEquals(installed.replaceAll('@/lib/cn.ts', '../../lib/cn.ts'), source);
+      if (name === 'code-block') {
+        assertEquals(
+          await Deno.readTextFile(join(root, 'assets/ui/code-block.css')),
+          await Deno.readTextFile(
+            join(repo, 'packages/fresh-ui/registry/components/ui/code-block.css'),
+          ),
+        );
+      }
       if (names.includes(name)) assertStringIncludes(installed, `data-scope='${name}'`);
     }
     await run(root, [

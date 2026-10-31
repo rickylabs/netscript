@@ -1,10 +1,18 @@
 import { expect, test } from '@playwright/test';
 import { AxeBuilder } from '@axe-core/playwright';
 
+const errors: string[] = [];
 test.beforeEach(async ({ page }, info) => {
+  errors.length = 0;
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('console', (e) => {
+    if (e.type() === 'error') errors.push(e.text());
+  });
   await page.goto(`/?scheme=${info.project.name.startsWith('dark') ? 'dark' : 'light'}`);
   await expect(page.getByRole('heading', { name: 'CodeBlock components' })).toBeVisible();
 });
+
+test.afterEach(() => expect(errors).toEqual([]));
 
 test('code-block/tabs-and-rtl', async ({ page }) => {
   const source = page.getByRole('group', { name: 'Project source', exact: true });
@@ -157,3 +165,104 @@ test('code-block/strict-accessibility-and-local-review', async ({ page }) => {
     await component.screenshot({ path: test.info().outputPath(`${id}.png`) });
   }
 });
+
+const automaticSource = [
+  '/* open',
+  'const hidden = 42;',
+  '*/ const visible = "</span><script>safe</script>&amp;";',
+  '',
+].join('\r\n');
+test('code-block/automatic-multiline-syntax-and-exact-native-clipboard', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  const source = page.getByRole('group', { name: 'Automatic source', exact: true });
+  const panel = source.getByRole('tabpanel');
+  const rows = panel.locator('[data-part="line"]');
+  expect(await rows.locator('> [data-part="code"]').allTextContents()).toEqual(
+    automaticSource.split('\r\n'),
+  );
+  await expect(rows.nth(1).locator('.hljs-comment')).toHaveText('const hidden = 42;');
+  await expect(rows.nth(1).locator('.hljs-keyword, .hljs-number')).toHaveCount(0);
+  await expect(rows.nth(2).locator('.hljs-keyword')).toHaveText('const');
+  await expect(panel.locator('script')).toHaveCount(0);
+  await expect(rows.locator('[data-part="line-number"]')).toHaveText(['1', '2', '3', '4']);
+  const button = source.getByRole('button', { name: 'Copy code' });
+  await button.focus();
+  await page.keyboard.press('Enter');
+  await expect(source.getByRole('status')).toHaveText('Copied code.');
+  expect(await page.getByLabel('Automatic transfer', { exact: true }).textContent()).toBe(
+    automaticSource,
+  );
+  // Only read the known source written by this native activation.
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(automaticSource);
+  await expect(button).toBeFocused();
+});
+
+test('code-block/per-file-language-runtime-tab-changes-and-recognition', async ({ page }) => {
+  const section = page.locator('#code-automatic');
+  const source = section.getByRole('group', { name: 'Automatic source', exact: true });
+  await source.getByRole('tab', { name: 'automatic.ts', exact: true }).focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(source.getByRole('tab', { name: 'automatic.json', exact: true })).toBeFocused();
+  await expect(source.getByRole('tabpanel').locator('.hljs-punctuation')).toHaveCount(3);
+  expect(await source.getByRole('tabpanel').locator('[data-part="code"]').allTextContents())
+    .toEqual(['{"ready":true}']);
+  await section.getByRole('button', { name: 'Toggle JSON language recognition' }).click();
+  await expect(source.getByRole('tabpanel').locator('[class*="hljs-"]')).toHaveCount(0);
+  await expect(source.getByRole('tabpanel')).toContainText('{"ready":true}');
+  await section.getByRole('button', { name: 'Toggle JSON language recognition' }).click();
+  await expect(source.getByRole('tabpanel').locator('.hljs-punctuation')).toHaveCount(3);
+  await section.getByRole('button', { name: 'Add extra language file' }).click();
+  await expect(source.getByRole('tab')).toHaveCount(3);
+  await source.getByRole('tab', { name: 'automatic.json', exact: true }).focus();
+  await page.keyboard.press('End');
+  await expect(source.getByRole('tab', { name: 'automatic.xml', exact: true })).toBeFocused();
+  await expect(source.getByRole('tabpanel').locator('.hljs-tag')).toHaveCount(2);
+  await expect(source.getByRole('tabpanel').locator('article')).toHaveCount(0);
+  expect(await source.getByRole('tabpanel').locator('[data-part="code"]').allTextContents())
+    .toEqual(['<article>Read &amp; write</article>']);
+  await section.getByRole('button', { name: 'Remove extra language file' }).click();
+  await expect(source.getByRole('tab')).toHaveCount(2);
+  await expect(source.getByRole('tab', { name: 'automatic.ts', exact: true })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
+  expect(await source.getByRole('tabpanel').locator('[data-part="code"]').allTextContents())
+    .toEqual(automaticSource.split('\r\n'));
+});
+
+test(
+  'code-block/explicit-content-unknown-language-and-nested-row-semantics',
+  async ({ page }, info) => {
+    const explicit = page.getByRole('group', { name: 'Explicit source', exact: true });
+    expect(await explicit.locator('[data-part="code"]').allTextContents()).toEqual([
+      '<b>Caller literal</b>',
+      '<em>Explicit token</em>',
+    ]);
+    await expect(explicit.locator('b, em, [class*="hljs-"]')).toHaveCount(0);
+    await expect(explicit.locator('[data-syntax="keyword"]')).toHaveText('<em>Explicit token</em>');
+    const unknown = page.getByRole('group', { name: 'Unknown source', exact: true });
+    await expect(unknown.locator('[data-part="code"]')).toHaveText('<div>Literal &amp; text</div>');
+    await expect(unknown.locator('code div, [class*="hljs-"]')).toHaveCount(0);
+    const nested = page.getByRole('group', { name: 'Nested syntax source', exact: true });
+    expect(await nested.locator('[data-part="code"]').allTextContents()).toEqual([
+      '\x60hello ${\nNumber(42)',
+      '} last\x60',
+    ]);
+    await expect(nested.locator('.hljs-number')).toHaveText('42');
+    expect(
+      await nested.locator('.hljs-number').evaluate((e) => e.closest('.hljs-subst')?.textContent),
+    ).toContain('Number(42)');
+    await expect(nested.locator('[data-part="line"]').nth(1).locator('.hljs-subst')).toHaveText(
+      '}',
+    );
+    const axe = await new AxeBuilder({ page }).include('#code-automatic').include(
+      '#code-automatic-contrast',
+    ).analyze();
+    expect(axe.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? ''))).toEqual(
+      [],
+    );
+    await page.locator('#code-automatic').screenshot({
+      path: info.outputPath('automatic-syntax.png'),
+    });
+  },
+);

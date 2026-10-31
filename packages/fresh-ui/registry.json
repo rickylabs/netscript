@@ -2337,13 +2337,14 @@
     },
     {
       "name": "code-block",
-      "description": "Syntax-highlighted code surface with filename/language header and a copy affordance for assistant messages.",
+      "description": "Syntax-highlighted code surface with native file tabs, diff rows and exact clipboard feedback.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
       ],
       "dependencies": [
-        "npm:highlight.js@^11"
+        "npm:highlight.js@^11",
+        "jsr:@netscript/fresh-ui@0.0.8"
       ],
       "type": "registry:component",
       "files": [
@@ -2375,10 +2376,7 @@
             }
           ]
         }
-      },
-      "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.8"
-      ]
+      }
     },
     {
       "name": "model-selector",

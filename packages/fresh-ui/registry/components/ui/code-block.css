@@ -329,37 +329,44 @@
 }
 
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='code-block'][data-part='root'] :is(.hljs-comment,.hljs-quote,.hljs-meta) {
-  color: var(--ns-code-syntax-comment);
+  --ns-code-syntax-ink: var(--ns-code-syntax-comment);
+  color: var(--ns-code-syntax-ink);
   font-style: normal;
 }
 
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='code-block'][data-part='root'] :is(.hljs-keyword,.hljs-selector-tag,.hljs-doctag,.hljs-tag,.hljs-name) {
-  color: var(--ns-code-syntax-keyword);
+  --ns-code-syntax-ink: var(--ns-code-syntax-keyword);
+  color: var(--ns-code-syntax-ink);
   font-style: normal;
 }
 
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='code-block'][data-part='root'] :is(.hljs-string,.hljs-regexp,.hljs-addition) {
-  color: var(--ns-code-syntax-string);
+  --ns-code-syntax-ink: var(--ns-code-syntax-string);
+  color: var(--ns-code-syntax-ink);
   font-style: normal;
 }
 
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='code-block'][data-part='root'] :is(.hljs-number,.hljs-literal,.hljs-symbol,.hljs-bullet) {
-  color: var(--ns-code-syntax-number);
+  --ns-code-syntax-ink: var(--ns-code-syntax-number);
+  color: var(--ns-code-syntax-ink);
   font-style: normal;
 }
 
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='code-block'][data-part='root'] :is(.hljs-title,.hljs-section,.hljs-attr,.hljs-attribute,.hljs-selector-id,.hljs-selector-class) {
-  color: var(--ns-code-syntax-function);
+  --ns-code-syntax-ink: var(--ns-code-syntax-function);
+  color: var(--ns-code-syntax-ink);
   font-style: normal;
 }
 
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='code-block'][data-part='root'] :is(.hljs-built_in,.hljs-type,.hljs-class) {
-  color: var(--ns-code-syntax-type);
+  --ns-code-syntax-ink: var(--ns-code-syntax-type);
+  color: var(--ns-code-syntax-ink);
   font-style: normal;
 }
 
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='code-block'][data-part='root'] :is(.hljs-punctuation,.hljs-operator) {
-  color: var(--ns-code-syntax-punctuation);
+  --ns-code-syntax-ink: var(--ns-code-syntax-punctuation);
+  color: var(--ns-code-syntax-ink);
   font-style: normal;
 }
 
@@ -372,4 +379,9 @@
     transition: none;
     animation: none;
   }
+}
+
+/* Automatic syntax keeps the same contextual ink as explicit CodeBlock.Token content. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='code-block'][data-part='root'] [data-line-variant]:not([data-line-variant='default']) :is(.hljs-comment,.hljs-quote,.hljs-meta,.hljs-keyword,.hljs-selector-tag,.hljs-doctag,.hljs-tag,.hljs-name,.hljs-string,.hljs-regexp,.hljs-addition,.hljs-number,.hljs-literal,.hljs-symbol,.hljs-bullet,.hljs-title,.hljs-section,.hljs-attr,.hljs-attribute,.hljs-selector-id,.hljs-selector-class,.hljs-built_in,.hljs-type,.hljs-class,.hljs-punctuation,.hljs-operator) {
+  color: color-mix(in srgb, var(--ns-code-syntax-ink, var(--ns-fg)) 80%, var(--ns-fg));
 }

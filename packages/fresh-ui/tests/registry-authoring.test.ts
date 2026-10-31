@@ -115,6 +115,17 @@ Deno.test('JSON authoring preserves every legacy file target, dependency, CSS co
       'command-palette': { ...actual['command-palette'], registryDependencies: ['theme-seed'] },
     })
   );
+  assertThrows(() =>
+    assertLegacyCompatibility({
+      ...actual,
+      'code-block': {
+        ...actual['code-block'],
+        dependencies: actual['code-block'].dependencies?.filter((dependency) =>
+          !dependency.startsWith('npm:highlight.js@')
+        ) ?? [],
+      },
+    })
+  );
   const { toggle: _toggle, ...missingAddition } = actual;
   assertEquals(_toggle.name, 'toggle');
   assertThrows(() => assertLegacyCompatibility(missingAddition));

@@ -15,6 +15,7 @@
     "tailwind-merge": "npm:tailwind-merge@^3.7.0",
     "@netscript/fresh-ui/interactive": "../../packages/fresh-ui/interactive.ts",
     "@preact/signals": "npm:@preact/signals@2.11.3",
-    "@netscript/fresh-ui/primitives": "../../packages/fresh-ui/primitives.tsx"
+    "@netscript/fresh-ui/primitives": "../../packages/fresh-ui/primitives.tsx",
+    "highlight.js": "npm:highlight.js@^11"
   }
 }

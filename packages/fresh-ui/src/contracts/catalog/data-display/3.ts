@@ -394,7 +394,7 @@ export const data_display_3: readonly ComponentContract[] = [
       'Ledger modes single/tabbed/diff and tone replace the old design-only vocabulary; published default/destructive/added/removed/highlighted aliases remain supported.',
       'Legacy header none/title/tabs aliases remain; header=tabs without files renders a title header. Header=false removes file chrome/copy but never removes essential tab controls.',
       'Native horizontal scrollbar/thumb and native copy title tooltip are platform internals, not fabricated layout parts.',
-      'Syntax content is a trusted application slot; plain raw text is escaped, with no tokenizer or unsafe HTML.',
+      'Recognized languages use escaped highlight.js common output with whole-source multiline scopes; unknown languages remain escaped text. Explicit Token/row content takes precedence and is never interpreted as highlighter HTML.',
       'Syntax roles apply directly on code/bg. Tinted diff/highlight rows retain each syntax hue with a contextual 80% syntax/20% text foreground mix; no shared token value changes.',
       'Clipboard result callbacks are separate from native onCopy. Actual status ignores stale file/text requests; controlled state may render a chosen visual snapshot.',
     ],

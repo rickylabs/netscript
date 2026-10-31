@@ -102,3 +102,37 @@ the checkpoint and verdict. Protect hook order with an independently mounted
 CodeRows child per tab or a single stable memo, never hooks inside a map. Test
 runtime tab additions/removals, trusted-only highlight injection and hostile
 source, deterministic recognized-language fallback and contextual contrast.
+
+
+## Recovery7 combined source validation
+
+Parent rebase onto43aa891e is complete at186a3e94 (50commits). All258main-only
+paths preserved exactly, all3topiclockdeltas0. Ten maintained conflict paths
+combined, derived conflicts canonically regenerated. Source reconciliation adds
+16post-rebase source/carrier files, including restoration of both CodeBlock
+runtime/highlighter dependencies after duplicate JSON keys were discovered.
+Whole-source public upstream highlighting preserves row/tab/diff/clipboard APIs,
+caller content precedence, multiline scopes and stable hooks on dynamic files.
+No private upstream APIs, token values, version choices or keyboard changes.
+
+Full parent package622PASS; full parent browser318PASS including touch,160private
+captures; focused CodeBlock/fidelity44PASS,28captures. Actual Firefox/WebKit12
+focused cases PASS at light390/1280 (scope disclosed, not full certification).
+Both explicit and actual automatic syntax cover7roles×4surfaces with exact
+semantic/contextual ink and AA; no axe allowances. Source7/browser2fixture2spec/
+lintfmt4 wrappers PASS0drop. Broaderquality/preflight/docsaccuracy/exportdrift/
+site259/nativepublication0slowtypes PASS. RawDoclint124exact123TypeScriptmultiset
+unchanged plus JSON1 remains accepted2531, not green. Reviewthread0unanswered.
+
+Same independent integration SOURCE review is next, then focused source commit,
+all4committed-source carriers/current-headquality/publication and same evidence
+review before audited parent force-push with exact71d8df6f lease. Childd0d8d922
+restack and fresh review/gates follow before11b/12/13. Runtime/currentrequiredCI
+unproven, full assignment in progress, no READY/final report.
+
+Recovery7 same independent integration SOURCE PASS, no blockers, failure streak0.
+README incorporates the non-blocking note that automatic diff highlighting shares
+lexical state across interleaved old/new display rows; explicit content overrides
+it. No maintained source change after review. Commit the16source/carrier files and
+run evidence, then all4carriers/current-sourcequality/publication/evidence review
+before exact-lease parent push and required child restack. No READY.

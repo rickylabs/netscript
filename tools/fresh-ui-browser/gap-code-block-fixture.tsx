@@ -160,6 +160,105 @@ export function CodeBlocks() {
           footerContent='Run from the repository root'
         />
       </section>
+      <AutomaticCodeExamples />
+    </>
+  );
+}
+
+function AutomaticCodeExamples() {
+  const unknownSource = '<div>Literal &amp; text</div>';
+  const [extra, setExtra] = useState(false);
+  const [known, setKnown] = useState(true);
+  const [copied, setCopied] = useState('');
+  const source = [
+    '/* open',
+    'const hidden = 42;',
+    '*/ const visible = "</span><script>safe</script>&amp;";',
+    '',
+  ].join('\r\n');
+  const files = [
+    { value: 'typed', label: 'automatic.ts', lang: 'typescript', code: source },
+    {
+      value: 'json',
+      label: 'automatic.json',
+      lang: known ? 'json' : 'unknown-language',
+      code: '{"ready":true}',
+    },
+    ...(extra
+      ? [{
+        value: 'xml',
+        label: 'automatic.xml',
+        lang: 'xml',
+        code: '<article>Read &amp; write</article>',
+      }]
+      : []),
+  ];
+  return (
+    <>
+      <section id='code-automatic' aria-label='Automatic syntax behavior'>
+        <CodeBlock aria-label='Automatic source' tabs={files} lineNumbers onCopied={setCopied} />
+        <button type='button' onClick={() => setExtra(!extra)}>
+          {extra ? 'Remove extra language file' : 'Add extra language file'}
+        </button>
+        <button type='button' onClick={() => setKnown(!known)}>
+          Toggle JSON language recognition
+        </button>
+        <output aria-label='Automatic transfer'>{copied}</output>
+        <CodeBlock
+          aria-label='Explicit source'
+          lang='typescript'
+          header={false}
+          copy={false}
+          lines={[
+            { text: 'const ignored = 1;', content: '<b>Caller literal</b>' },
+            {
+              text: 'const other = 2;',
+              content: <CodeBlock.Token type='keyword'>{'<em>Explicit token</em>'}
+              </CodeBlock.Token>,
+            },
+          ]}
+        />
+        <CodeBlock
+          aria-label='Unknown source'
+          lang='unknown-language'
+          header={false}
+          copy={false}
+          code={unknownSource}
+        />
+        <CodeBlock
+          aria-label='Nested syntax source'
+          lang='typescript'
+          header={false}
+          copy={false}
+          lines={[
+            { text: '\x60hello ${\nNumber(42)' },
+            { text: '} last\x60' },
+          ]}
+        />
+      </section>
+      <section id='code-automatic-contrast' aria-label='Automatic syntax on every code surface'>
+        {(['default', 'added', 'removed', 'highlighted'] as const).flatMap((variant) => [
+          <CodeBlock
+            key={'ts' + variant}
+            aria-label={'Automatic TypeScript ' + variant}
+            lang='typescript'
+            header={false}
+            copy={false}
+            lines={[{
+              variant,
+              text: 'function greet(value: string) { return "hello" + String(42); } // note',
+            }]}
+          />,
+          <CodeBlock
+            key={'json' + variant}
+            aria-label={'Automatic JSON ' + variant}
+            lang='json'
+            header={false}
+            copy={false}
+            lines={[{ variant, text: '{"message":"hello","count":42}' }]}
+          />,
+        ])}
+      </section>
     </>
   );
 }

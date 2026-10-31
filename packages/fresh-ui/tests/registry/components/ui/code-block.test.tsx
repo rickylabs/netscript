@@ -147,3 +147,91 @@ Deno.test('CodeBlock escapes hostile source in highlighted and plain fallback la
   }
   assert(!render(<CodeBlock code={source} lang='unknown-language' />).includes('hljs-'));
 });
+
+Deno.test('CodeBlock preserves multiline lexical state across independent numbered diff rows', () => {
+  const html = render(
+    <CodeBlock
+      lang='typescript'
+      variant='diff'
+      lineNumbers
+      lines={[
+        { text: '/* open', variant: 'removed' },
+        { text: 'const value = 42;', variant: 'added' },
+        { text: '*/ const answer = "yes";', variant: 'highlighted' },
+      ]}
+    />,
+  );
+  assertStringIncludes(html, 'class="hljs-comment">const value = 42;</span>');
+  assertStringIncludes(html, 'class="hljs-comment">*/</span>');
+  assertStringIncludes(html, 'class="hljs-keyword">const</span>');
+  assertEquals((html.match(/data-part="line"/g) ?? []).length, 3);
+  for (const number of [1, 2, 3]) assertStringIncludes(html, 'data-part="line-number">' + number);
+  for (const variant of ['removed', 'added', 'highlighted']) {
+    assertStringIncludes(html, 'data-line-variant="' + variant + '"');
+  }
+});
+
+Deno.test('CodeBlock balances nested multiline syntax and groups fragments into caller rows', () => {
+  const html = render(
+    <CodeBlock
+      lang='typescript'
+      lines={[
+        { text: '\x60hello ${\nNumber(42)' },
+        { text: '} last\x60' },
+      ]}
+    />,
+  );
+  assertEquals((html.match(/data-part="line"/g) ?? []).length, 2);
+  assertStringIncludes(html, 'class="hljs-subst">');
+  assertStringIncludes(html, 'class="hljs-number">42</span>');
+  assertStringIncludes(html, 'class="hljs-string">');
+  assertEquals((html.match(/<span(?:\s|>)/g) ?? []).length, (html.match(/<\/span>/g) ?? []).length);
+});
+
+Deno.test('CodeBlock never treats explicit caller strings or Token content as highlighter HTML', () => {
+  const html = render(
+    <CodeBlock
+      lang='typescript'
+      lines={[
+        { text: 'const source = 1;', content: '<b>Caller text</b>' },
+        {
+          text: 'const other = 2;',
+          content: (
+            <CodeBlock.Token type='keyword'>{'</span><script>alert(1)</script>'}</CodeBlock.Token>
+          ),
+        },
+      ]}
+    />,
+  );
+  assert(!html.includes('class="hljs-'));
+  assert(!html.includes('<b>') && !html.includes('<script>'));
+  assertStringIncludes(html, '&lt;b>Caller text&lt;/b>');
+  assertStringIncludes(html, 'data-syntax="keyword"');
+});
+
+Deno.test('CodeBlock highlights each hidden file with its own explicit language', () => {
+  const html = render(
+    <CodeBlock
+      lang='plaintext'
+      tabs={[
+        { value: 'data', label: 'data.json', lang: 'json', code: '{"ready":true}' },
+        { value: 'source', label: 'source.ts', lang: 'typescript', code: 'const ready = true;' },
+      ]}
+    />,
+  );
+  assertStringIncludes(html, 'class="hljs-punctuation"');
+  assertStringIncludes(html, 'class="hljs-keyword">const</span>');
+  assertStringIncludes(html, 'data-clipboard="{&quot;ready&quot;:true}"');
+});
+
+Deno.test('CodeBlock preserves empty rows, raw CRLF copy text and hostile closing tags', () => {
+  const source = 'const ready = true;\r\n\r\n';
+  const html = render(<CodeBlock code={source} lang='typescript' />);
+  assertEquals((html.match(/data-part="line"/g) ?? []).length, 3);
+  assertStringIncludes(html, 'data-clipboard="' + source + '"');
+  for (const lang of ['xml', 'typescript', 'unknown', undefined]) {
+    const hostile = render(<CodeBlock code='</span><script>alert(1)</script>&amp;' lang={lang} />);
+    assert(!hostile.includes('<script>') && !hostile.includes('<img '));
+    assertStringIncludes(hostile, '&lt;');
+  }
+});
