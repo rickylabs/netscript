@@ -16,3 +16,5 @@
 - Evaluation: maximum 2 plan rounds / 5 implementation rounds, same evaluator re-steered.
 - Only coordinator merges or changes labels/milestones. Full scaffold runtime is CI-only.
 - Privacy: no private operational identifiers in committed evidence or GitHub comments.
+
+- Follow-up CI write surface: `packages/cli/e2e/src/application/gates/scaffold/package-backed-plugin-doctor-fixture.ts`, to align its check-title expectation with the reviewed doctor title change.

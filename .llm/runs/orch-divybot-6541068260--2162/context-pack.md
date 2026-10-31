@@ -20,3 +20,8 @@ Precommit independent IMPL-EVAL/S2 review PASS. Final source gates remain 64 tes
 check/lint/fmt, quality:gate PASS. Broad doc lint has inherited private-type-ref failures (sagas 30,
 workers 2), detailed in validation.md; do not call that gate green. Next: push S2, ready PR,
 review exact pushed head with same evaluator, capture CI state, queue READY handoff and stop.
+
+S3 follow-up: coordinator armed e2e-cli-gate. CI exposed a stale package-backed doctor fixture
+check title. One-line expectation fix passed the actual fixture and scoped wrappers/quality:gate;
+independent S3 review PASS. Renew exact-head review after push. Aspire SDK restore succeeded,
+Docker unavailable; unrelated running AppHost untouched. No local runtime was started.

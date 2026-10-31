@@ -94,3 +94,21 @@ JSR dry runs pass. Review thread gate: PASS, threads=0, unanswered=0.
 S2 reconcile: #2162 is open, #2509 remains the only implementation PR; coordinator-owned CI
 runtime evidence is still required. No issue boxes, labels or milestones changed. No new debt
 accepted; only inherited doc-lint findings remain outside this change.
+
+## S3 — package-backed doctor CI fixture
+
+Coordinator applied e2e-cli-gate and run 41187118118 started at 048856c. Static E2E found the
+package-backed doctor fixture still expected the old "generated job registry is non-empty"
+check title. Changed exactly that expectation to "is initialized"; all healthy-status, populated
+registry, registration, permission and forbidden-diagnostic assertions remain intact.
+Actual fixture run with the maintainer CLI and published 0.0.8 dependencies exits 0 and reports
+PACKAGE_BACKED_PLUGIN_DOCTOR_PASS. Structured check/lint/fmt for the changed fixture and
+quality:gate pass. Independent same-session Opus S3 review PASS explicitly classifies the old
+assertion as stale and confirms no gate weakened. Final pushed-head evaluation will be renewed.
+
+Focused Aspire preflight: SDK restore succeeded; Docker daemon is unavailable and an unrelated
+AppHost is running. No AppHost or containers started/stopped; foreign resources left untouched.
+Actual zero-definition Aspire proof remains unproven. Full runtime is still CI-only.
+
+S3 reconcile: #2162 remains open and #2509 ready for review. No labels/milestones changed by this
+leaf; coordinator's runtime gate is now armed. No locks/caches deleted or committed.

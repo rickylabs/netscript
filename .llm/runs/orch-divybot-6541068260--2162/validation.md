@@ -22,3 +22,13 @@ logs remain outside Git; commands and observed results are recorded here and in 
 
 The JSR audit counts its normal "Checking for slow types" banner as one warning; actual package
 dry-runs report OK. No public exports, dependency versions or lockfiles changed.
+
+## S3 CI expectation follow-up
+
+Run 41187118118 exposed the stale package-backed doctor check title. Updating its exact expected
+healthy title preserves all behavioral checks (independently reviewed). Actual fixture run:
+`deno run -A packages/cli/e2e/src/application/gates/scaffold/package-backed-plugin-doctor-fixture.ts
+--project-root <owned scratch project> --repo-root . --cli-entrypoint
+packages/cli/bin/netscript-dev.ts --package-version 0.0.8` — exit 0,
+PACKAGE_BACKED_PLUGIN_DOCTOR_PASS. Structured check/lint/fmt for this fixture and quality:gate
+pass. The original 64-test / installed startup evidence remains applicable to unchanged source.

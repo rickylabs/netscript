@@ -9,3 +9,7 @@
   not a shipping source change. It retains Aspire scaffold files but no AppHost is started.
 - Root lint/fmt excludes CLI; used explicit config retaining root style/rules and verified
   structured coverage for every selected file. No weakening or suppression introduced.
+
+- S3 CI found one stale E2E fixture title expectation outside the original source-file list.
+  Expanding validation-fixture scope only; no test assertion removed or relaxed. Coordinator
+  has applied e2e-cli-gate. This invalidates the old exact-head attestation when S3 is pushed.

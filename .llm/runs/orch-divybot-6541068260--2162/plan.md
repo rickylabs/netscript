@@ -40,3 +40,11 @@ for affected packages, independent implementation evaluation, commit/push and re
 No unresolved implementation decisions. No new architecture debt accepted. Deferred: release,
 merge, full runtime CI execution/label ownership, non-registry topology redesign, new doctor
 severity API. Contributor entry: installed-runtime-registry-integration_test.ts.
+
+## S3 — CI fixture follow-up
+
+The coordinator armed runtime CI. Static E2E found a stale package-backed doctor assertion
+requiring the old "is non-empty" check title. Update only that expectation to "is initialized";
+retain healthy status, registry content, declared-job registration and permissions assertions.
+Run the actual package-backed fixture, focused wrappers and quality:gate; independent slice
+review before commit, then exact-pushed-head evaluation again. No source behavior redesign.
