@@ -127,3 +127,7 @@
 - 06:17Z: #2267 → PR #2502.
 - 06:29Z: #2499 (#2159) e2e **red on both tiers** at `da931b7` (the head moved from `155051c`): `behavior.plugins-health`, sagas runner child Running/unhealthy. A product failure; steered the leaf via PR comment with the evidence. The expensive gate is released.
 - 06:22:20Z: dispatched #2132 (C1, features), comment 6540033818; no binding after 7 min (possibly cap-held, which now auto-releases; not reposted).
+- 06:32Z: #2132 has no orchid binding after 10 min. Treated as cap-held (auto-release since cockpit 6b5dc26); not reposted. Builder count is fuzzy: re-steered workers (#2159, #2400, #2421) are active again, so no new dispatch until a worker finishes.
+- 06:36Z: #2502 (#2267) READY at `29626e4`, Opus MERGE; memory KV adapter and tests only, so required CI suffices.
+- 06:39:18Z: #2132 started; the held launch auto-released after about 17 min.
+- 06:42Z: **merged** #2502 (`59902cf6f`) for #2267; #2267 closed.

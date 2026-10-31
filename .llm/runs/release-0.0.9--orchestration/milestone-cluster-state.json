@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.9",
   "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
-  "currentMainSha": "c6bce8f86f5f9e0bf61d1b5bdb228b153de37d59",
+  "currentMainSha": "59902cf6f32c7a87ad4fbcec0144ab046067a347",
   "coordinator": {
     "agentId": "coord-0.0.9@claude-opus-5-5-xhigh/mc009d",
     "trackingIssue": 2474
@@ -224,7 +224,10 @@
     },
     {
       "number": 2267,
-      "state": "open"
+      "state": "closed",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/pull/2502"
+      ]
     },
     {
       "number": 2268,
@@ -728,7 +731,7 @@
       "phase": "implementing",
       "baseBranch": "main",
       "prNumber": 2499,
-      "headSha": "da931b73bcb2d7e46d6d91a37b5208fabd4f938e",
+      "headSha": "4824597d8222b286d9e199dc761eb88c7dc4a680",
       "issueNumbers": [
         2159
       ],
@@ -753,7 +756,7 @@
     {
       "id": "C1-2267",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
       "prNumber": 2502,
       "headSha": "29626e4b654057f8601335124fa20cea494a2674",
@@ -761,7 +764,11 @@
         2267
       ],
       "implementerAgentId": "codex-gpt-6.1-sol/orchid-leaf-2267",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "note": "READY 29626e4; Opus MERGE; memory adapter only -> required CI",
+      "mergeCommit": "59902cf6f32c7a87ad4fbcec0144ab046067a347",
+      "mergedAt": "2026-10-31T06:42:21Z",
+      "evaluatorAgentId": "claude-opus-5-5-high/leaf-impl-eval-2267"
     }
   ],
   "expensiveGates": [
@@ -924,11 +931,11 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T06:14:15.000Z",
-    "nextReportDueAt": "2026-10-31T07:14:15.000Z",
+    "lastReportAt": "2026-10-31T06:42:34.000Z",
+    "nextReportDueAt": "2026-10-31T07:42:34.000Z",
     "lastReportRef": "worklog.md",
     "headline": "A1, A2 complete; canary .1 remaining: #2400 (e2e), #2161 (building), #2421 (final #2396 PR).",
-    "currentMainSha": "c6bce8f86f5f9e0bf61d1b5bdb228b153de37d59",
+    "currentMainSha": "59902cf6f32c7a87ad4fbcec0144ab046067a347",
     "canary": {
       "target": "0.0.9-canary.1",
       "state": "planned",
@@ -987,7 +994,8 @@
         2492,
         2496,
         2497,
-        2498
+        2498,
+        2502
       ],
       "closedIssues": [
         1364,
@@ -999,6 +1007,7 @@
         2161,
         2165,
         2187,
+        2267,
         2290,
         2351,
         2367,
@@ -1014,30 +1023,13 @@
       "queueDeltaExplanation": "Initial cluster bootstrap at Step 0."
     },
     "scope": {
-      "openIssueCount": 37,
-      "ownedIssueCount": 37,
-      "scheduledIssueCount": 37,
+      "openIssueCount": 36,
+      "ownedIssueCount": 36,
+      "scheduledIssueCount": 36,
       "unscheduledIssueNumbers": [],
       "openPullRequestCount": 8
     },
-    "mergeQueue": [
-      {
-        "prNumber": 2421,
-        "lane": "features",
-        "headSha": "c875e3893458f92a701239ff10461df2c56c2c9f",
-        "state": "ready",
-        "nextGate": "e2e-cli or exact-head verdict",
-        "nextAction": "READY at a4dc705 (source MERGE); landing order #2422 -> #2423 -> #2421; e2e pending"
-      },
-      {
-        "prNumber": 2499,
-        "lane": "fixes",
-        "headSha": "da931b73bcb2d7e46d6d91a37b5208fabd4f938e",
-        "state": "gating",
-        "nextGate": "e2e-cli scaffold.runtime",
-        "nextAction": "READY 155051c; e2e armed"
-      }
-    ],
+    "mergeQueue": [],
     "orchestratorMatrix": [
       {
         "lane": "docs",
@@ -1129,7 +1121,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T06:29:26.000Z",
+  "updatedAt": "2026-10-31T06:42:34.000Z",
   "dispatches": [
     {
       "issue": 2438,
@@ -1327,7 +1319,7 @@
       "commentId": 6539917426,
       "postedAt": "2026-10-31T06:09:13.000Z",
       "route": "codex gpt-6.1-sol",
-      "state": "pr-open",
+      "state": "merged",
       "pr": 2502
     },
     {
@@ -1336,7 +1328,7 @@
       "commentId": 6540033818,
       "postedAt": "2026-10-31T06:22:20.000Z",
       "route": "codex gpt-6.1-sol",
-      "state": "posted",
+      "state": "started",
       "pr": null
     }
   ],
