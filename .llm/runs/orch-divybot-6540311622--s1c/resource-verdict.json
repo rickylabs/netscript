@@ -1,0 +1,12 @@
+{
+  "verdict": "UNPROVEN",
+  "survivorsByOwnership": {
+    "unproven": 24
+  },
+  "ownedSurvivors": 0,
+  "probeCounts": {
+    "ok": 2,
+    "failed": 3
+  },
+  "mutatedResources": 0
+}

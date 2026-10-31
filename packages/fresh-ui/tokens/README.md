@@ -137,13 +137,30 @@ source-over alpha compositing against the opaque preset ground. Hex output does
 not quantize the values before measurement. The report includes every measured
 use; it does not omit accepted failures from the count.
 
+An inactive UI text pair must explicitly declare `"exemption": "inactive-component"`.
+The foreground must be a text role named `state-disabled-*` or `*-disabled`, and
+its recorded threshold stays 4.5. Background names alone never exempt active text;
+muted, hover, read-only, chart and focus uses retain their requirements. Before
+adding an annotation, audit component consumers and aliases to confirm that the
+role is used only for inactive UI text. Any active consumer needs an active-use
+pair without this annotation. This policy applies the inactive-component exception
+in [WCAG 2.2 SC 1.4.3](https://www.w3.org/TR/WCAG22/#contrast-minimum).
+
+Exempt uses are measured even when they pass, remain in the total check count,
+and appear in `exempt` with a reason and criterion. Unknown annotations, annotations
+on non-text/active roles, and annotations applying to no context fail validation.
+An exemption never consumes an exact source exclusion; an obsolete exclusion for
+an exempt use fails as stale. Pair data remains version 1 with additive metadata.
+
 `contrast-exclusions.json` binds one preset, scheme, pair, threshold, measured
 ratio and rendered foreground/background colors, with source provenance and a
 reason. Ratios are recorded to twelve decimal places after the AA decision.
 Unused, fixed, changed or duplicate entries fail. Figma values stay unchanged;
-the owner corrects and re-exports them. Inherited S0 color failures are separately
-identified to preserve NS One compatibility. Newly introduced NS One gaps use
-suitable existing palette aliases rather than adding avoidable exceptions.
+the owner corrects and re-exports them. NS One owns its legacy colors: S1c adjusts only primary/secondary hover, destructive,
+input-border and ring semantic values to meet AA, preserving its primitive palette and geometry.
+The legacy CSS prefix is synchronized with those owned values. Shipped exclusions are empty.
+Component destructive text and icons use `destructive-text`; `destructive` is a solid fill.
+The component-colors regression prevents a fill correction from lowering label contrast.
 
 The required negative controls deliberately exit nonzero:
 
@@ -151,9 +168,10 @@ The required negative controls deliberately exit nonzero:
 deno task tokens:validate --negative-control=unknown-name
 deno task tokens:validate --negative-control=raw-semantic
 deno task tokens:validate --negative-control=contrast
+deno task tokens:validate --negative-control=exempt-active
 ```
 
-The package tests invoke the real checker for all three controls. A separate
+The package tests invoke the real checker for all four controls. A separate
 policy regression rejects unpaired roles, missing focus checks, weakened text
 thresholds and stale exclusions. `tokens:report` emits JSON on stdout; the normal
 validation task also prints its source-freshness preflight.
@@ -168,10 +186,15 @@ deno task tokens:embed
 ```
 
 It writes every failing pair with preset, scheme, foreground role, background paint
-stack, unrounded-decision ratio and required ratio to `failing-pairs.json`. The short
-`failing-pairs.md` table shows the worst relative failure and count per preset/scheme.
-Omit `--write-exclusions` for a report without updating policy. Contrast value
-burn-down stays open for the Figma owner; the report is feedback, not a value fix.
+stack, unrounded-decision ratio and required ratio to `failing-pairs.json`. The JSON also includes every exempt measurement with roles, source, reason and
+criterion, separately from failures. The short
+`failing-pairs.md` table enumerates every preset/scheme, including zero failures, measured uses
+and disabled-exempt counts; the JSON `contexts` array carries the same totals.
+Omit `--write-exclusions` for a report without updating policy. The #2506 source value pass and S1c code corrections leave zero active failures and zero
+exclusions. The existing `accent-fg/accent-hover` pair uses the theme-aware Scheme hover;
+Base accent's dark-only `accent-solid-hover` remains source data, without an invented label use.
+Liquid's tinted-primary material is primary-button glass: its white `liquid-primary-fg` label
+is measured instead of pairing every Liquid text role with it.
 
 ## Consuming app commands
 

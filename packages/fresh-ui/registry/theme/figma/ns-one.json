@@ -441,8 +441,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-badge-solid-destructive-bg)",
       "values": {
-        "Light": "#d9584c",
-        "Dark": "#d9584c"
+        "Light": "#c9493f",
+        "Dark": "#c9493f"
       }
     },
     {
@@ -1721,8 +1721,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-brand-d-default)",
       "values": {
-        "Light": "#e5332a",
-        "Dark": "#e5332a"
+        "Light": "#da291c",
+        "Dark": "#da291c"
       }
     },
     {
@@ -1731,8 +1731,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-brand-d-fg)",
       "values": {
-        "Light": "#eeeeee",
-        "Dark": "#eeeeee"
+        "Light": "#ffffff",
+        "Dark": "#ffffff"
       }
     },
     {
@@ -2231,8 +2231,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-component-button-hover)",
       "values": {
-        "Light": "#a36034",
-        "Dark": "#a36034"
+        "Light": "#ac693d",
+        "Dark": "#ac693d"
       }
     },
     {
@@ -2351,8 +2351,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-component-input-border)",
       "values": {
-        "Light": "#c1bfbb",
-        "Dark": "#ebe4d21a"
+        "Light": "#807e7b",
+        "Dark": "#807e7b"
       }
     },
     {
@@ -2391,8 +2391,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-component-input-ring)",
       "values": {
-        "Light": "#bd774c",
-        "Dark": "#bd774c"
+        "Light": "#a36034",
+        "Dark": "#a36034"
       }
     },
     {
@@ -2411,8 +2411,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-component-key-border)",
       "values": {
-        "Light": "#c1bfbb",
-        "Dark": "#ebe4d21a"
+        "Light": "#807e7b",
+        "Dark": "#807e7b"
       }
     },
     {
@@ -2491,8 +2491,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-component-tabs-ring)",
       "values": {
-        "Light": "#bd774c",
-        "Dark": "#bd774c"
+        "Light": "#a36034",
+        "Dark": "#a36034"
       }
     },
     {
@@ -3071,8 +3071,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-destructive)",
       "values": {
-        "Light": "#d9584c",
-        "Dark": "#d9584c"
+        "Light": "#c9493f",
+        "Dark": "#c9493f"
       }
     },
     {
@@ -4071,8 +4071,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-fluent-text-tertiary)",
       "values": {
-        "Light": "#00000072",
-        "Dark": "#ffffff87"
+        "Light": "#0000008b",
+        "Dark": "#ffffff96"
       }
     },
     {
@@ -4801,8 +4801,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-input-border)",
       "values": {
-        "Light": "#c1bfbb",
-        "Dark": "#ebe4d21a"
+        "Light": "#807e7b",
+        "Dark": "#807e7b"
       }
     },
     {
@@ -5651,8 +5651,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-liquid-material-segment-thumb)",
       "values": {
-        "Light": "#00000017",
-        "Dark": "#ffffff24"
+        "Light": "#ffffffd1",
+        "Dark": "#2b2e36c7"
       }
     },
     {
@@ -5722,7 +5722,7 @@
       "codeSyntax": "var(--ns-liquid-primary-text)",
       "values": {
         "Light": "#0066cc",
-        "Dark": "#409cff"
+        "Dark": "#439eff"
       }
     },
     {
@@ -5841,7 +5841,7 @@
       "scopes": [],
       "codeSyntax": "var(--ns-liquid-success-text)",
       "values": {
-        "Light": "#1e7b34",
+        "Light": "#1d7632",
         "Dark": "#30d158"
       }
     },
@@ -5882,7 +5882,7 @@
       "codeSyntax": "var(--ns-liquid-surface-raised)",
       "values": {
         "Light": "#e8e8ed",
-        "Dark": "#3a3a3c"
+        "Dark": "#313133"
       }
     },
     {
@@ -6841,8 +6841,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-primary-hover)",
       "values": {
-        "Light": "#a36034",
-        "Dark": "#a36034"
+        "Light": "#ac693d",
+        "Dark": "#ac693d"
       }
     },
     {
@@ -7301,8 +7301,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-ring)",
       "values": {
-        "Light": "#bd774c",
-        "Dark": "#bd774c"
+        "Light": "#a36034",
+        "Dark": "#a36034"
       }
     },
     {
@@ -7491,8 +7491,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-secondary-hover)",
       "values": {
-        "Light": "#606b7b",
-        "Dark": "#606b7b"
+        "Light": "#6e7a8a",
+        "Dark": "#6e7a8a"
       }
     },
     {
@@ -8321,7 +8321,7 @@
       "scopes": [],
       "codeSyntax": "var(--ns-studio-badge-solid-success-bg)",
       "values": {
-        "Light": "#2a7e3b",
+        "Light": "#203c25",
         "Dark": "#25482d"
       }
     },
@@ -8362,7 +8362,7 @@
       "codeSyntax": "var(--ns-studio-brand)",
       "values": {
         "Light": "#da291c",
-        "Dark": "#e5332a"
+        "Dark": "#da291c"
       }
     },
     {
@@ -8372,7 +8372,7 @@
       "codeSyntax": "var(--ns-studio-brand-on)",
       "values": {
         "Light": "#fcfcfc",
-        "Dark": "#eeeeee"
+        "Dark": "#ffffff"
       }
     },
     {
@@ -9062,7 +9062,7 @@
       "codeSyntax": "var(--ns-studio-signal-brand)",
       "values": {
         "Light": "#da291c",
-        "Dark": "#e5332a"
+        "Dark": "#da291c"
       }
     },
     {
@@ -10051,8 +10051,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-tactile-accent)",
       "values": {
-        "Light": "#1e7bff",
-        "Dark": "#3b8bff"
+        "Light": "#1a6fe8",
+        "Dark": "#1a6fe8"
       }
     },
     {
@@ -10581,8 +10581,8 @@
       "scopes": [],
       "codeSyntax": "var(--ns-terminal-key-border)",
       "values": {
-        "Light": "#c1bfbb",
-        "Dark": "#ebe4d21a"
+        "Light": "#807e7b",
+        "Dark": "#807e7b"
       }
     },
     {

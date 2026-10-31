@@ -14,8 +14,8 @@ import { formatFigmaPreset } from '../../src/tokens/adapters/format-figma.ts';
 import { normalizeFontStyle, roundTokenNumber } from '../../src/tokens/domain/figma-aliases.ts';
 import compatibilityNames from './ns-one-css-names.json' with { type: 'json' };
 import nameMigrations from '../../tokens/name-migrations.json' with { type: 'json' };
-import { LEGACY_ROLE_MAP } from '../../src/tokens/domain/preset-role-map.ts';
 import contrastExclusions from '../../tokens/contrast-exclusions.json' with { type: 'json' };
+import { evaluateTokenContrast } from '../../src/tokens/domain/check-token-contrast.ts';
 import { defaultContrastCoverage } from '../../src/tokens/adapters/default-token-quality.ts';
 import Color from 'npm:colorjs.io@0.5.2';
 import { tokenContrastColor } from '../../src/tokens/adapters/contrast-color.ts';
@@ -316,49 +316,35 @@ Deno.test('builder rejects resolver contexts that have no registered preset', as
   await assertRejects(() => buildTokens({ sources }), Error, 'registered public contexts');
 });
 
-Deno.test('S0-tagged NS One exclusions contain only legacy roles or exact inherited component colors', async () => {
+Deno.test('shipped contrast has zero active failures and checks the actual accent and Liquid labels', async () => {
   const build = await built();
-  for (
-    const entry of contrastExclusions.exclusions.filter((entry) =>
-      entry.preset === 'ns-one' && !entry.source.startsWith('S0')
-    )
-  ) {
-    assertStringIncludes(entry.source, 'Figma export #2493');
-  }
-  const pairs = new Map(defaultContrastCoverage().pairs.map((pair) => [pair.id, pair]));
-  const inherited: Readonly<Record<string, string>> = {
-    'component-button-fg': 'primary-fg',
-    'component-button-hover': 'primary-hover',
-    'component-input-bg': 'surface',
-    'component-tabs-ring': 'ring',
-    'component-tabs-bg': 'muted',
-  };
-  for (
-    const exclusion of contrastExclusions.exclusions.filter((entry) =>
-      entry.preset === 'ns-one' && entry.source.startsWith('S0')
-    )
-  ) {
-    const pair = pairs.get(exclusion.pair)!;
-    const context = build.contexts.find((entry) =>
-      entry.preset.id === 'ns-one' && entry.scheme === exclusion.scheme
+  const coverage = defaultContrastCoverage();
+  const report = evaluateTokenContrast(build.contexts, coverage, [], tokenContrastColor);
+  assertEquals(report.failures, []);
+  assertEquals(report.excluded, []);
+  assertEquals(contrastExclusions.exclusions, []);
+  assertEquals(report.exempt.length, 58);
+  assertEquals(report.exempt.filter((row) => row.ratio < row.minimum).length, 56);
+  assertEquals(coverage.pairs.some((pair) => pair.id === 'accent-fg/accent-solid-hover'), false);
+  const accent = coverage.pairs.find((pair) => pair.id === 'accent-fg/accent-hover')!;
+  assertEquals(accent.foreground, 'accent-fg');
+  assertEquals(accent.background, ['accent-hover']);
+  const glass = coverage.pairs.filter((pair) =>
+    pair.background.includes('liquid-material-tinted-primary')
+  );
+  assertEquals(glass.length, 1);
+  assertEquals(glass[0].foreground, 'liquid-primary-fg');
+  for (const scheme of ['light', 'dark']) {
+    const context = build.contexts.find((row) =>
+      row.preset.id === 'liquid' && row.scheme === scheme
     )!;
-    for (const name of [pair.foreground, ...pair.background]) {
-      if (Object.hasOwn(legacy.tokens, name)) continue;
-      if (Object.hasOwn(LEGACY_ROLE_MAP, name)) {
-        assertEquals(context.tokens[name].resolved, context.tokens[LEGACY_ROLE_MAP[name]].resolved);
-        continue;
-      }
-      assertEquals(
-        name.startsWith('component-') && Object.hasOwn(inherited, name),
-        true,
-        `A new NS One gap cannot be excluded as S0: ${name}`,
-      );
-      assertEquals(
-        context.tokens[name].resolved,
-        context.tokens[inherited[name]].resolved,
-        `Component color must exactly match its S0 role: ${name}`,
-      );
-    }
+    const measured = tokenContrastColor.measure(
+      context.tokens[glass[0].foreground].resolved,
+      glass[0].background.map((name) => context.tokens[name].resolved),
+      context.tokens.bg.resolved,
+    );
+    assertEquals(measured.foreground, '#ffffff');
+    assertEquals(measured.ratio >= 4.5, true);
   }
 });
 

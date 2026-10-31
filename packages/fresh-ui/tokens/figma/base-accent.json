@@ -552,23 +552,19 @@
           "alias": "Theme set/gray/l/12"
         },
         "Blue": {
-          "alias": "Primitives/color/blue/l/11"
+          "alias": "Primitives/color/blue/l/11-hover"
         },
         "Violet": {
           "alias": "Primitives/color/violet/l/11"
         },
-        "Orange": {
-          "alias": "Primitives/color/orange/l/11"
-        },
+        "Orange": "#af4607",
         "Indigo": {
           "alias": "Primitives/color/indigo/l/11"
         },
         "Tomato": {
-          "alias": "Primitives/color/tomato/l/11"
+          "alias": "Primitives/color/tomato/l/11-hover"
         },
-        "Lime": {
-          "alias": "Primitives/color/lime/l/11"
-        }
+        "Lime": "#55702b"
       }
     },
     {

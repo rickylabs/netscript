@@ -125,7 +125,7 @@
       ],
       "values": {
         "Utility": {
-          "alias": "Theme set/accent/d/solid-fg"
+          "alias": "Primitives/color/white"
         },
         "Cloud": {
           "alias": "Theme set/accent/d/solid-fg"
@@ -184,7 +184,7 @@
       ],
       "values": {
         "Utility": {
-          "alias": "Primitives/color/swiss-red/d/9"
+          "alias": "Primitives/color/swiss-red/l/9"
         },
         "Cloud": {
           "alias": "Base accent/accent/d/9"

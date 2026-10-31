@@ -1,0 +1,115 @@
+{
+  "matrixCases": 12,
+  "added": [],
+  "changedRemaining": [],
+  "removed": [
+    {
+      "case": "/design/components|dark-1280",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "target": [
+        ".ns-btn[data-variant=\"destructive\"][data-size=\"md\"] > span[data-scope=\"button\"][data-part=\"label\"]"
+      ],
+      "count": 1
+    },
+    {
+      "case": "/design/components|dark-390",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "target": [
+        ".ns-btn[data-variant=\"destructive\"][data-size=\"md\"] > span[data-scope=\"button\"][data-part=\"label\"]"
+      ],
+      "count": 1
+    },
+    {
+      "case": "/design/components|light-1280",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "target": [
+        ".ns-badge[data-variant=\"destructive\"][data-emphasis=\"subtle\"] > span[data-part=\"label\"][data-scope=\"badge\"]"
+      ],
+      "count": 1
+    },
+    {
+      "case": "/design/components|light-1280",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "target": [
+        ".ns-btn[data-variant=\"destructive\"][data-size=\"md\"] > span[data-scope=\"button\"][data-part=\"label\"]"
+      ],
+      "count": 1
+    },
+    {
+      "case": "/design/components|light-1280",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "target": [
+        ".ns-error-text"
+      ],
+      "count": 1
+    },
+    {
+      "case": "/design/components|light-390",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "target": [
+        ".ns-badge[data-variant=\"destructive\"][data-emphasis=\"subtle\"] > span[data-part=\"label\"][data-scope=\"badge\"]"
+      ],
+      "count": 1
+    },
+    {
+      "case": "/design/components|light-390",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "target": [
+        ".ns-btn[data-variant=\"destructive\"][data-size=\"md\"] > span[data-scope=\"button\"][data-part=\"label\"]"
+      ],
+      "count": 1
+    },
+    {
+      "case": "/design/components|light-390",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "target": [
+        ".ns-error-text"
+      ],
+      "count": 1
+    },
+    {
+      "case": "/design/tokens|dark-1280",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "target": [
+        "button[data-token-copy=\"var(--ns-destructive)\"] > strong"
+      ],
+      "count": 1
+    },
+    {
+      "case": "/design/tokens|dark-390",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "target": [
+        "button[data-token-copy=\"var(--ns-destructive)\"] > strong"
+      ],
+      "count": 1
+    },
+    {
+      "case": "/design/tokens|light-1280",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "target": [
+        "button[data-token-copy=\"var(--ns-destructive)\"] > strong"
+      ],
+      "count": 1
+    },
+    {
+      "case": "/design/tokens|light-390",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "target": [
+        "button[data-token-copy=\"var(--ns-destructive)\"] > strong"
+      ],
+      "count": 1
+    }
+  ]
+}
