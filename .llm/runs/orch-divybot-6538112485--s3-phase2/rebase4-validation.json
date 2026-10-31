@@ -37,11 +37,38 @@
     "status": "PASS",
     "htmlPages": 259
   },
-  "independentIntegrationReview": "PASS;source and finalized package/browser/wrapper/quality/docs evidence signed off; carrier freshness follows source commit",
+  "independentIntegrationReview": "PASS;source/evidence signed off",
   "ready": false,
   "fullGoalComplete": false,
   "existingColorGuard": {
     "passed": 1,
     "failed": 0
+  },
+  "sourceCommit": "5f937dd5a56db48d874ffce8660d8541cc4d580a",
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
   }
 }
