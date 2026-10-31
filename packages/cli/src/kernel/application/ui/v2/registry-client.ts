@@ -10,6 +10,7 @@ import type { UiRegistryTransportPort } from '../../../ports/ui-registry-port.ts
 import type { UiRegistryPathPort } from '../../../ports/ui-registry-port.ts';
 import type { FileSystemPort } from '../../../ports/file-system-port.ts';
 import type { TokenEnginePort } from '../../../ports/token-engine-port.ts';
+import type { UiRegistryCollection } from '../registry.ts';
 
 /** Source bytes attached to an item before any install plan is allowed to write files. */
 export interface UiResolvedItem {
@@ -40,6 +41,8 @@ export interface UiRegistryDependencies extends UiRegistryClientDependencies {
 /** One request-scoped registry client, with dependency, namespace and source caches. */
 export interface UiRegistryClient {
   catalog(namespace?: string): Promise<Registry>;
+  /** Read validated built-in collection membership without resolving item files. */
+  collections(): Promise<readonly UiRegistryCollection[]>;
   item(ref: string): Promise<UiResolvedItem>;
   resolve(refs: readonly string[], theme?: string): Promise<readonly UiResolvedItem[]>;
 }
@@ -77,6 +80,8 @@ export async function createUiRegistryClient(
         registry: module.freshUiRegistryJson,
         content: module.FRESH_UI_REGISTRY_CONTENT,
       }));
+  const collections = async (): Promise<readonly UiRegistryCollection[]> =>
+    collectionsSchema.parse((await builtin()).registry.meta?.collections ?? []);
   const read = (url: string, headers: Readonly<Record<string, string>>): Promise<string> => {
     if (!deps.transport) throw new Error('Remote registry transport is not configured');
     const key = JSON.stringify([url, headers]);
@@ -180,6 +185,7 @@ export async function createUiRegistryClient(
   };
   return {
     catalog,
+    collections,
     item,
     resolve: async (refs, theme) => {
       const result: UiResolvedItem[] = [];
@@ -216,9 +222,7 @@ export async function createUiRegistryClient(
           await visit(ref);
           continue;
         }
-        const collection = collectionsSchema.parse(
-          (await builtin()).registry.meta?.collections ?? [],
-        ).find((entry) => entry.name === ref);
+        const collection = (await collections()).find((entry) => entry.name === ref);
         if (collection) { for (const name of collection.items) await visit(name); }
         else await visit(ref);
       }

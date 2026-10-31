@@ -1,0 +1,5 @@
+# Locked collection update identity
+
+Lock items store resolved member refs, never collection names. A names-only installed-set guard rejects ui:update surface-core after ui:add surface-core. Use the same validated built-in collection metadata as registry-client.resolve, and recognize nonempty collections only when all declared member names have own lock entries. Empty locks remain authoritative; no file-discovery fallback. Check the entire explicit selection before resolving any item content or writing.
+
+Unknown bare names require a local metadata query to determine whether they are collections. Distinguish that from item-file or remote resolution: count source-content getter reads and transport requests, and verify unchanged filesystem snapshots. Direct locked names and empty locks can skip metadata. Keep legacy no-lock partial-copy/collection recovery unchanged. Actual surface-core and injected complete/partial/empty/mixed tests make the difference observable; red2/2/0 then focused9/0/0.

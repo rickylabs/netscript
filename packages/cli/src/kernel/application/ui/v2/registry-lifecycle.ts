@@ -7,7 +7,7 @@ import { listUiRegistryItems, removeUiRegistryItem, updateUiRegistryItems } from
 import { readUiConfig, readUiLock, writeUiMetadata } from './config-lock.ts';
 import { installUiRegistry } from './install-registry.ts';
 import { reconcileUiStyles } from './registry-effects.ts';
-import type { UiRegistryDependencies } from './registry-client.ts';
+import { createUiRegistryClient, type UiRegistryDependencies } from './registry-client.ts';
 import { isUiManagedCoreFile } from './style-history.ts';
 import { planUiWrites } from './ui-write-plan.ts';
 
@@ -19,6 +19,15 @@ export async function updateUiRegistry(
 ): Promise<{ readonly updated: readonly string[]; readonly drifted: readonly string[] }> {
   const lock = await readUiLock(root, deps.fs);
   const installed = new Set(Object.keys(lock?.items ?? {}));
+  if (lock && installed.size && names.some((name) => !installed.has(name))) {
+    const client = await createUiRegistryClient(await readUiConfig(root, deps.fs), deps);
+    for (const collection of await client.collections()) {
+      if (
+        collection.items.length > 0 &&
+        collection.items.every((name) => Object.hasOwn(lock.items, name))
+      ) installed.add(collection.name);
+    }
+  }
   if (!lock && names.length) {
     const legacy = await listUiRegistryItems(root, deps.fs, { includePartial: true });
     for (const item of legacy.items) if (item.installed) installed.add(item.name);

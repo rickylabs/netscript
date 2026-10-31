@@ -8,13 +8,13 @@ import { installUiRegistryItems, listUiRegistryItems } from '../../registry.ts';
 import { updateUiRegistry } from '../registry-lifecycle.ts';
 
 for (const populated of [false, true]) {
-  Deno.test(`named update refuses uninstalled items before resolving or writing (${populated ? 'populated' : 'empty'} lock)`, async () => {
+  Deno.test(`named update refuses uninstalled items before copying or writing (${populated ? 'populated' : 'empty'} lock)`, async () => {
     const fs = new MemoryFileSystemAdapter();
-    let resolutions = 0;
+    let catalogReads = 0;
     const deps: UiRegistryDependencies = {
       fs,
       builtin: () => {
-        resolutions++;
+        catalogReads++;
         return Promise.resolve({
           registry: {
             items: [{
@@ -43,7 +43,7 @@ for (const populated of [false, true]) {
     };
     await writeUiMetadata('/app', UiConfigSchema.parse({}), { version: 1, items: {} }, fs);
     if (populated) await installUiRegistry({ root: '/app', names: ['installed'] }, deps);
-    resolutions = 0;
+    catalogReads = 0;
     const before = new Map(fs.getFiles());
     await assertRejects(
       () => updateUiRegistry('/app', populated ? ['installed', 'x'] : ['x'], deps),
@@ -52,9 +52,9 @@ for (const populated of [false, true]) {
     );
     assertEquals(fs.getFiles(), before);
     assertEquals(
-      resolutions,
-      0,
-      'Missing lock entries must be rejected before registry resolution',
+      catalogReads,
+      populated ? 1 : 0,
+      'Only local collection metadata may be read before rejecting an absent item',
     );
     if (!populated) {
       assertEquals(await updateUiRegistry('/app', [], deps), { updated: [], drifted: [] });
