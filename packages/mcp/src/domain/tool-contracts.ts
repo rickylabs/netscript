@@ -29,6 +29,10 @@ const objectSchema = (
   additionalProperties: false,
 });
 const stringProperty = { type: 'string' } as const;
+const docsCitationShape = objectSchema({
+  frameworkVersion: stringProperty,
+  sha256: { type: 'string', minLength: 64, maxLength: 64 },
+}, ['frameworkVersion', 'sha256']);
 const limitProperty = { type: 'integer', minimum: 1, maximum: 100 } as const;
 const searchLimitProperty = { type: 'integer', minimum: 1, maximum: 20 } as const;
 const operationAccessValueProperty = { type: 'string', minLength: 1, maxLength: 2000 } as const;
@@ -306,6 +310,9 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     families: { type: 'array', maxItems: 4, items: doctorFamilyShape },
   }, ['status', 'endpoint', 'counts', 'checks', 'families']),
   search_docs: objectSchema({
+    citation: docsCitationShape,
+    confidence: { enum: ['low'] },
+    fallback: { type: 'string', maxLength: GUIDANCE_MAX_FALLBACK_CHARACTERS },
     count: { type: 'integer' },
     matches: {
       type: 'array',
@@ -319,6 +326,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     },
   }, ['count', 'matches']),
   list_docs: objectSchema({
+    citation: docsCitationShape,
     count: { type: 'integer' },
     corpus: objectSchema({
       kind: { enum: ['filesystem', 'embedded'] },
@@ -336,6 +344,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     },
   }, ['count', 'corpus', 'docs']),
   get_doc: objectSchema({
+    citation: docsCitationShape,
     contractVersion: { enum: [2] },
     mode: { enum: ['verbatim', 'extract', 'full'] },
     description: stringProperty,
@@ -365,6 +374,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     'contractVersion',
   ]),
   find_guidance: objectSchema({
+    citation: docsCitationShape,
     intent: { type: 'string', maxLength: GUIDANCE_MAX_INTENT_CHARACTERS },
     confidence: { enum: [...GUIDANCE_CONFIDENCE_LEVELS] },
     recommendations: {

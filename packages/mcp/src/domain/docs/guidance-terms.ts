@@ -145,6 +145,7 @@ export const GUIDANCE_STOP_WORDS: ReadonlySet<string> = new Set(
     'need',
     'no',
     'nor',
+    'netscript',
     'not',
     'of',
     'off',
@@ -186,6 +187,8 @@ export const GUIDANCE_STOP_WORDS: ReadonlySet<string> = new Set(
     'us',
     've',
     'very',
+    'versus',
+    'vs',
     'want',
     'was',
     'we',
@@ -251,6 +254,11 @@ export class GuidanceTermWeights {
       sectionCount,
       Math.ceil(sectionCount * commonDocumentRatio),
     );
+  }
+
+  /** Whether the corpus contains a stem at all, including in section identity fields. */
+  has(stem: string): boolean {
+    return this.#inverseFrequency.has(stem);
   }
 
   /** Non-negative BM25 inverse document frequency of a stem. */

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "issue": 2269,
+  "guidance": [
+    {
+      "intent": "publish revisioned validated documents from existing producers to native KV with expireIn and half-life renewal",
+      "expected": "low"
+    },
+    {
+      "intent": "gate service readiness separately from liveness",
+      "expected": "page",
+      "pages": [
+        "pages/services-sdk/services"
+      ],
+      "section": "health-readiness-liveness"
+    },
+    {
+      "intent": "bounded abortable worker stream catch-up",
+      "expected": "low"
+    },
+    {
+      "intent": "KV prepared-view",
+      "expected": "low"
+    },
+    {
+      "intent": "TTL renewal",
+      "expected": "low"
+    },
+    {
+      "intent": "getMany",
+      "expected": "low"
+    },
+    {
+      "intent": "KV watch capability",
+      "expected": "page",
+      "pages": [
+        "pages/reference/kv"
+      ]
+    },
+    {
+      "intent": "readiness and liveness",
+      "expected": "page",
+      "pages": [
+        "pages/services-sdk/services"
+      ],
+      "section": "health-readiness-liveness"
+    },
+    {
+      "intent": "bounded abortable stream-reader",
+      "expected": "low"
+    },
+    {
+      "intent": "quantum entanglement without polling",
+      "expected": "low"
+    },
+    {
+      "intent": "quantum entanglement ledger with existing services",
+      "expected": "low"
+    }
+  ],
+  "search": [
+    {
+      "query": "withReadinessCheck",
+      "expected": "missing"
+    },
+    {
+      "query": "getMany",
+      "expected": "missing"
+    },
+    {
+      "query": "ReadinessHandler",
+      "expected": "page",
+      "pages": [
+        "pages/services-sdk/services"
+      ]
+    },
+    {
+      "query": "expireIn",
+      "expected": "page",
+      "pages": [
+        "pages/reference/kv",
+        "pages/data-persistence/kv-queues-cron"
+      ]
+    },
+    {
+      "query": "stream reader",
+      "expected": "page",
+      "pages": [
+        "pages/durable-workflows/streams"
+      ]
+    }
+  ]
+}

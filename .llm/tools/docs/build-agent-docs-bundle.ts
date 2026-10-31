@@ -180,7 +180,7 @@ async function syncCompositionPolicy(check: boolean): Promise<void> {
   const source = await Deno.readTextFile(join(REPO_ROOT, 'docs/site/_plugins/llms-policy.ts'));
   const expected =
     '// @generated from docs/site/_plugins/llms-policy.ts by gen:agent-docs-prose.\n' + source;
-  const output = join(REPO_ROOT, 'packages/cli/src/kernel/assets/llms-policy.generated.ts');
+  const output = join(REPO_ROOT, 'packages/mcp/src/infrastructure/docs/llms-policy.generated.ts');
   if (check) {
     if (await Deno.readTextFile(output).catch(() => '') !== expected) {
       throw new Error('CLI llms composition policy is stale; run deno task gen:agent-docs-prose');

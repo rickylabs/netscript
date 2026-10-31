@@ -1,0 +1,171 @@
+{
+  "implementationHead": "a74b039a20137f564c1cf524fdc848c4869574e4",
+  "consumer": "local CLI MCP stdio, empty project",
+  "responses": [
+    {
+      "tool": "get_doc",
+      "input": {
+        "slug": "reference/kv"
+      },
+      "citation": {
+        "frameworkVersion": "0.0.8",
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
+      },
+      "slug": "pages/reference/kv"
+    },
+    {
+      "tool": "get_doc",
+      "input": {
+        "slug": "observability/telemetry"
+      },
+      "citation": {
+        "frameworkVersion": "0.0.8",
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
+      },
+      "slug": "pages/observability/telemetry"
+    },
+    {
+      "tool": "get_doc",
+      "input": {
+        "slug": "observability"
+      },
+      "citation": {
+        "frameworkVersion": "0.0.8",
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
+      },
+      "slug": "pages/observability"
+    },
+    {
+      "tool": "get_doc",
+      "input": {
+        "slug": "data-persistence/kv-queues-cron"
+      },
+      "citation": {
+        "frameworkVersion": "0.0.8",
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
+      },
+      "slug": "pages/data-persistence/kv-queues-cron"
+    },
+    {
+      "tool": "get_doc",
+      "input": {
+        "slug": "background-processing/workers"
+      },
+      "citation": {
+        "frameworkVersion": "0.0.8",
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
+      },
+      "slug": "pages/background-processing/workers"
+    },
+    {
+      "tool": "get_doc",
+      "input": {
+        "slug": "durable-workflows/streams"
+      },
+      "citation": {
+        "frameworkVersion": "0.0.8",
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
+      },
+      "slug": "pages/durable-workflows/streams"
+    },
+    {
+      "tool": "find_guidance",
+      "input": {
+        "intent": "publish revisioned validated documents from existing producers to native KV with expireIn and half-life renewal"
+      },
+      "citation": {
+        "frameworkVersion": "0.0.8",
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
+      },
+      "confidence": "low",
+      "top": [
+        {
+          "slug": "pages/data-persistence/how-to/queue-kv-cron",
+          "section": "use-kv-queues-and-cron"
+        },
+        {
+          "slug": "pages/data-persistence/how-to/queue-kv-cron",
+          "section": "recipe-1-kv-read-and-write-durable-state"
+        },
+        {
+          "slug": "pages/data-persistence/how-to/queue-kv-cron",
+          "section": "recipe-2-queue-enqueue-and-consume-a-message"
+        }
+      ]
+    },
+    {
+      "tool": "find_guidance",
+      "input": {
+        "intent": "gate service readiness separately from liveness"
+      },
+      "citation": {
+        "frameworkVersion": "0.0.8",
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
+      },
+      "confidence": "low",
+      "top": [
+        {
+          "slug": "pages/services-sdk/services",
+          "section": "health-readiness-liveness"
+        },
+        {
+          "slug": "pages/services-sdk/services",
+          "section": "services-contracts"
+        },
+        {
+          "slug": "pages/services-sdk/services",
+          "section": "endpoints-ports"
+        }
+      ]
+    },
+    {
+      "tool": "find_guidance",
+      "input": {
+        "intent": "bounded abortable worker stream catch-up"
+      },
+      "citation": {
+        "frameworkVersion": "0.0.8",
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
+      },
+      "confidence": "low",
+      "top": [
+        {
+          "slug": "pages/durable-workflows/how-to/bound-stream-retention",
+          "section": "bound-stream-retention"
+        },
+        {
+          "slug": "pages/durable-workflows/how-to/bound-stream-retention",
+          "section": "choose-absolute-expiry-for-a-hard-bound"
+        },
+        {
+          "slug": "pages/durable-workflows/how-to/bound-stream-retention",
+          "section": "delete-known-segments-in-a-background-worker"
+        }
+      ]
+    },
+    {
+      "tool": "search_docs",
+      "input": {
+        "query": "withReadinessCheck"
+      },
+      "citation": {
+        "frameworkVersion": "0.0.8",
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
+      },
+      "count": 0,
+      "fallback": "No seam documented for this query in this corpus. Use find_export or search_exports for public APIs."
+    },
+    {
+      "tool": "search_docs",
+      "input": {
+        "query": "ReadinessHandler"
+      },
+      "citation": {
+        "frameworkVersion": "0.0.8",
+        "sha256": "485b9453e5ec9ebd870a29784bc0f5c7e31347aac70864e2a30e3fb24b3bed10"
+      },
+      "count": 2,
+      "fallback": null
+    }
+  ]
+}
