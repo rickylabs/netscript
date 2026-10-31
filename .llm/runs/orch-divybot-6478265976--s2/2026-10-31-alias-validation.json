@@ -1,0 +1,114 @@
+{
+  "sourceHead": "4655c6b787af103e6ee71db58f9c2442e5fa5de5",
+  "repairBaseline": "29e66fadc286e5bbc6e6067cf7d657c48b1973d9",
+  "aliasBefore": {
+    "passed": 4,
+    "failed": 1,
+    "ignored": 0,
+    "defaultControl": "PASS before production repair"
+  },
+  "diagnosticsBefore": {
+    "passed": 0,
+    "failed": 3,
+    "ignored": 0
+  },
+  "legacyRecoveryBefore": {
+    "passed": 0,
+    "failed": 2,
+    "ignored": 0
+  },
+  "correctedFocused": {
+    "passed": 12,
+    "failed": 0,
+    "ignored": 0
+  },
+  "completeUiRegression": {
+    "passed": 116,
+    "failed": 0,
+    "ignored": 0,
+    "exitCode": 0,
+    "processFailure": null
+  },
+  "wrappers": {
+    "filesSelected": 7,
+    "checkFindings": 0,
+    "lintFindings": 0,
+    "fmtFindings": 0,
+    "droppedFiles": [],
+    "refusals": []
+  },
+  "releasePreflight": "PASS: zero findings",
+  "reviewThreads": {
+    "total": 0,
+    "unanswered": 0,
+    "outcome": "PASS"
+  },
+  "gates": [
+    {
+      "gate": "quality-gate",
+      "gitHead": "4655c6b787af103e6ee71db58f9c2442e5fa5de5",
+      "actualGitHead": "4655c6b787af103e6ee71db58f9c2442e5fa5de5",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "589caecd6b6aef38f9bf61a6da8a64caf5f326cc37c435499b8fbd6a3bf9b5c8"
+    },
+    {
+      "gate": "assets-barrel",
+      "gitHead": "4655c6b787af103e6ee71db58f9c2442e5fa5de5",
+      "actualGitHead": "4655c6b787af103e6ee71db58f9c2442e5fa5de5",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "faa153afe85855a5f1f9cfba4d8e1033117365f6be14b10d3c5b560779e974bd"
+    },
+    {
+      "gate": "publish-assets",
+      "gitHead": "4655c6b787af103e6ee71db58f9c2442e5fa5de5",
+      "actualGitHead": "4655c6b787af103e6ee71db58f9c2442e5fa5de5",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "620c8bd89b8b148ee5afd65f060a315a2226f58f22e340d94d8064fde57183b1"
+    },
+    {
+      "gate": "mcp-export-corpus",
+      "gitHead": "4655c6b787af103e6ee71db58f9c2442e5fa5de5",
+      "actualGitHead": "4655c6b787af103e6ee71db58f9c2442e5fa5de5",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "d534c4cb800c11f1906051ca3a871c3dc9f7ac1a43f8c5c2f9edaab1c00df981"
+    },
+    {
+      "gate": "agent-docs-prose",
+      "gitHead": "4655c6b787af103e6ee71db58f9c2442e5fa5de5",
+      "actualGitHead": "4655c6b787af103e6ee71db58f9c2442e5fa5de5",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "6a1356308b2d927758e40d910242a91e06036a02cc04a6ef09d064b240ed7247"
+    },
+    {
+      "gate": "publish-dry-run",
+      "gitHead": "4655c6b787af103e6ee71db58f9c2442e5fa5de5",
+      "actualGitHead": "4655c6b787af103e6ee71db58f9c2442e5fa5de5",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "receiptSha256": "7e6b0bcba7ae0d4a75b7f760f38cc3b4e3b8994f2561cda8d01c6bd4d008222c"
+    }
+  ],
+  "independentReview": {
+    "firstVerdict": "FAIL_FIX at7d3bcfd58; preserved",
+    "correctedVerdict": "PASS at4655c6b78",
+    "requestedModel": "claude-opus-5-5",
+    "requestedEffort": "high",
+    "observedModelUsage": [
+      "claude-opus-5-5"
+    ],
+    "exitCode": 0,
+    "sourceCleanUnchanged": true,
+    "reviewerExecutedCommands": false
+  },
+  "legacyNote": "Unlocked apps retain file-based item/collection recovery, including shared-theme heuristic; existing lock entries are authoritative. Default discovery completeness is unchanged.",
+  "finalRemoteCi": "PENDING at final evidence head: ci.yml and e2e-cli.yml whole-workflow SUCCESS, actual8 shards/check-test/quality, scaffold-static and both executed full runtime+cleanup steps required. deps-report policy skip separate.",
+  "retainedLimitations": [
+    "Earlier local Docker-unavailable scaffold attempt unproven until actual new remote runtime success",
+    "123 existing S3 component doc-lint findings"
+  ]
+}
