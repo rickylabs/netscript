@@ -43,8 +43,9 @@ Bounded JSON health payload for one background child.
 
 `registryReady` confirms the generated definitions loaded and validated. `dependencyReady` confirms
 startup checks succeeded and no listener failure is active. `restartCount` is cumulative for this
-child instance. `lastFatalError` contains only a fixed redacted message and an epoch timestamp; the
-raw exception and stack never leave the process.
+child instance, including prior processes when restart history is configured. `lastFatalError`
+contains only a fixed redacted message and an epoch timestamp; the raw exception and stack never
+leave the process.
 
 Example:
 
@@ -78,7 +79,11 @@ const incident: ChildFatalError = {
 Restarts at or above the threshold within the window latch crash-looping.
 
 Recovery requires a full window of uninterrupted running with registry and dependencies ready. A
-restart or fatal failure resets that running window; a brief ready interval cannot hide a storm.
+restart or fatal failure resets that running window; a brief ready interval cannot hide a storm. The
+default is 3 restarts within 60 seconds, including the window boundary. Configure
+`ChildHealthMonitor` with its second argument's `crashLoopThreshold` option to change both values.
+Generated sagas and triggers retain restart history across process replacements. Healthy Deno watch
+reloads in the same process do not count; a reload after a fatal failure does count.
 
 Example:
 

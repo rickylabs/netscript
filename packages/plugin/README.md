@@ -121,12 +121,62 @@ readiness means the generated definitions were loaded and validated. Dependency 
 runtime registration, startup checks, and listener failures, rather than a continuous
 backing-service heartbeat.
 
-Three restarts within 60 seconds latch `crash-looping`. Recovery requires a full 60 seconds of
-uninterrupted running with both readiness fields true; a brief retry cannot turn the child green. A
-new failure resets the clean window, and clean shutdown reports `stopped`. Restart history retains
-at most three timestamps. Health responses return HTTP 200 only for `ready` with both readiness
-fields true; all other states return HTTP 503. Raw exception messages, stacks, credentials, and
-definition data never enter this payload.
+By default, **three restarts within 60 seconds**, including the window boundary, latch
+`crash-looping`. Recovery requires a full 60 seconds of uninterrupted running with both readiness
+fields true; a brief retry cannot turn the child green. A new failure resets the clean window, and
+clean shutdown reports `stopped`. Restart history retains at most the configured number of
+timestamps. Health responses return HTTP 200 only for `ready` with both readiness fields true; all
+other states return HTTP 503. Raw exception messages, stacks, credentials, and definition data never
+enter this payload.
+
+Generated sagas and triggers retain this history across process replacements in
+`.data/child-health/sagas.json` and `.data/child-health/triggers.json`, relative to the background
+service's working directory. The project already ignores `.data/`. The first boot does not count as
+a restart. A recorded fatal failure counts on the next boot, including Deno watch reloads in the
+same OS process. An unclean replacement with a different process identity also counts. Ordinary
+healthy watch reloads and a restart after clean shutdown do not count. At the third restart in the
+window, `/health` reports `crash-looping` and HTTP 503 during bootstrap and after brief successful
+starts. A single failed boot followed by stable running stays `ready`.
+
+Configure the threshold through the health monitor options and pass the same monitor to runtime and
+process transport:
+
+```ts
+import { ChildHealthMonitor, runChildHealthProcess } from '@netscript/plugin/health';
+
+const health = new ChildHealthMonitor(Date.now, {
+  crashLoopThreshold: { restarts: 5, windowMs: 120_000 },
+});
+await runChildHealthProcess(
+  async (monitor, signal) => {
+    monitor.registryLoaded();
+    monitor.dependenciesReady();
+    monitor.running();
+    await new Promise<void>((resolve) => {
+      if (signal.aborted) resolve();
+      else signal.addEventListener('abort', () => resolve(), { once: true });
+    });
+  },
+  undefined,
+  { health, restartHistoryPath: '.data/child-health/custom.json' },
+);
+```
+
+Both threshold values must be positive; the restart count must be a safe integer and the window must
+be finite. `TriggerHealthMonitor` accepts the same options as its second constructor argument. Each
+history path has one process owner: replicas need separate paths on persistent local storage. The
+service needs read/write access to the parent directory. `FileChildRestartHistory` atomically
+replaces a versioned record, storing only process identity, failure status, bounded timestamps and
+restart accounting. A missing record means first boot; corrupt, oversized or unwritable history
+fails health closed. Storage loss resets process history, so ephemeral filesystems and distributed
+replica detection are outside this local guarantee. Healthy polling reads memory; it does not read
+the filesystem. A complete live ready window clears the stored latch; downtime never counts as
+recovery. Workers retain their existing in-process listener restart budget and health behavior.
+
+To extend storage, implement the synchronous `ChildRestartHistoryPort` and call
+`health.trackProcess(history, processId)` before bootstrap. Synchronous writes ensure abrupt
+termination cannot skip a pending accounting write. Read this section as the contributor entry
+point, then run the generated-process regressions in `tests/health/generated-crash-loop_test.ts`.
 
 Generated workers, triggers, and sagas glue starts the health listener before bootstrap and keeps a
 failed child observable during a one-second grace period before exiting nonzero. These processes run
