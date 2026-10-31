@@ -1,4 +1,6 @@
+import { Resizables } from './gap-resizable-fixture.tsx';
 import { PageHeaders } from './gap-page-header-fixture.tsx';
+import { NativeLayouts } from './gap-native-layout-fixture.tsx';
 import { CommandPalettes } from './gap-command-palette-fixture.tsx';
 import { ProseExamples } from './gap-prose-fixture.tsx';
 import { Alerts } from './gap-alert-fixture.tsx';
@@ -71,6 +73,8 @@ function Actions() {
       <ProseExamples />
       <CommandPalettes />
       <PageHeaders />
+      <NativeLayouts />
+      <Resizables />
     </main>
   );
 }

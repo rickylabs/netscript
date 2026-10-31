@@ -90,3 +90,95 @@ the localized label visually hidden so assistive technology still receives the m
 The title uses body size and Medium label weight. After uncontrolled dismissal the browser may
 move focus to the document body; native Tab continues after the former dismiss button. Applications
 that require a particular restoration target own that policy.
+
+
+## Native Layout components
+
+`ui:add scroll-area`, `ui:add aspect-ratio` and `ui:add direction` install the
+real sources. ScrollArea requires `label` to name its native viewport; the caller
+sets frame dimensions. Its viewport is always tabbable for stable SSR/hydration.
+Vertical, horizontal and both axes use native overflow. Scrollbar, thumb and
+corner are native parts: standard thin-scrollbar geometry is platform-dependent;
+exact 6/8px hover growth is available only in older WebKit styling implementations.
+No fake scrollbar controls are rendered.
+
+AspectRatio defaults to16:9 and also accepts4:3,1:1,21:9. It clips media to the
+existing card radius; the host owns image alternatives and interactive labels.
+The frame adds no keyboard stop.
+
+DirectionProvider aliases Direction. The JSX-safe `as` form renders the caller's
+native boundary directly; no extra wrapper is added. Supported containers are
+`div`, `section`, `main`, `article`, `aside`, `nav`, `header`, `footer`, `form`, `span`.
+Native props, class, style and handlers pass through; `boundaryRef` refers to the
+native element. Direction owns `dir` and its contract markers. Nested boundaries
+remain local and never mutate document direction.
+
+```tsx
+import { Direction } from './components/ui/direction.tsx';
+
+<Direction as='section' dir='rtl'><input aria-label='Search' /></Direction>;
+```
+
+Without `as`, pass exactly one unscoped native HTML VNode. It is cloned with its
+key, ref and existing props preserved; supplied native props override the child's,
+and Direction overwrites its `dir`. Fragments, arrays, custom components and
+already scoped boundaries fail clearly. Preact precompile represents static JSX
+as template fragments, so use `as` for ordinary JSX, or `h` to create an explicitly
+cloneable boundary. Both forms render a single native boundary.
+
+From the first phase2b identity, `tests/contracts/strict-render-policy.ts` selects
+strict checks explicitly. Rendered data attributes must be scope/part markers,
+canonical axes on their declared parts, or independently reviewed private
+component/part bindings with a purpose. Unknown attributes, bare/unquoted
+attributes, undeclared `data-x-*`, wrong-part axes and invalid values fail. The
+all-style slice extends this same policy to existing source fixtures.
+
+
+### Resizable
+
+`ui:add resizable` installs two panels and a native focusable splitter. Hydrate it
+inside a Fresh island. The host sets frame dimensions and owns its panel content:
+
+```tsx
+import { Resizable } from './components/ui/resizable.tsx';
+
+<Resizable
+  label='Contents'
+  endLabel='Document'
+  style={{ height: 240 }}
+  startContent={<a href='#chapter'>Chapter one</a>}
+  endContent={<article id='chapter'>Chapter content</article>}
+/>;
+```
+
+`direction` defaults to horizontal; vertical stacks the panels. The primary size
+is in **pixels**: `defaultSize` initially uses280 horizontal or160 vertical.
+For controlled state pass `size` and accept proposals through `onSizeChange`.
+Refusing a proposal keeps the visible controlled size. Arrow keys use `step`
+(default10); Home/End use current bounds. Horizontal arrows follow local native
+RTL direction. This is the resize-only APG subset: no Enter collapse or F6 mode.
+
+`minSize` defaults to80, `maxSize` is unbounded, and `endMinSize` defaults to80.
+Tiny containers adapt both minima to the available extent. Container resizing
+clamps displayed geometry without invoking `onSizeChange`; the requested size
+is retained and restored when space returns. The next interaction proposes from
+current displayed geometry and current bounds. Pointer drags use native capture;
+only the handle disables touch scrolling. Observers and active captures are
+released on unmount or direction change.
+
+`label` names the primary panel and separator. `labelledBy` may point both names
+at a visible heading; a nonblank fallback label remains required. `endLabel`
+names the secondary panel. Both independently scrollable panels are consistently
+tabbable, including text-only overflow; native child controls retain their place
+in source order. Before hydration and positive measurement, the handle is a
+static decorative part with no invented separator values or keyboard stop.
+After measurement it exposes actual percentage bounds/current value, pixel text,
+and `aria-controls` pointing at the primary group. `grip={false}` hides only the
+decorative grip; the24px hit target and keyboard behavior remain.
+
+The grip uses the shared `grip-vertical` Lucide glyph (10px, six source circles),
+with its existing source/license notice. The registry item contributes the
+package runtime dependency used by the public Icon primitive; no drag library is
+installed. Native keyboard, pointer/touch, controlled refusal, responsive bounds,
+cleanup and strict accessibility evidence live in
+`tools/fresh-ui-browser/gap-tests/resizable.spec.ts`.

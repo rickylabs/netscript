@@ -1,3 +1,5 @@
+import { resizableFixtures, resizableKeyboard } from './utility-resizable.tsx';
+import { nativeLayoutFixtures, nativeLayoutKeyboard } from './utility-native-layout.tsx';
 import { pageHeaderFixtures, pageHeaderKeyboard } from './utility-page-header.tsx';
 import { commandPaletteFixtures, commandPaletteKeyboard } from './utility-command-palette.tsx';
 import { alertFixtures, alertKeyboard } from './utility-alert.tsx';
@@ -38,6 +40,8 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...alertFixtures,
     ...commandPaletteFixtures,
     ...pageHeaderFixtures,
+    ...nativeLayoutFixtures,
+    ...resizableFixtures,
     proseFixture,
   ],
   keyboard: [
@@ -53,6 +57,8 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...alertKeyboard,
     ...commandPaletteKeyboard,
     ...pageHeaderKeyboard,
+    ...nativeLayoutKeyboard,
+    ...resizableKeyboard,
     ...proseKeyboard,
   ],
 }];

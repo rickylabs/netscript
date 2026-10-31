@@ -10,7 +10,7 @@ import { h } from 'preact';
 import type { ComponentChildren, JSX } from 'preact';
 
 /*!
- * arrow-left, arrow-right, bell, circle-check, circle-alert, corner-down-left and file-text paths: Lucide / Feather.
+ * arrow-left, arrow-right, bell, circle-check, circle-alert, corner-down-left, file-text and grip-vertical paths: Lucide / Feather.
  * https://github.com/lucide-icons/lucide/tree/main/icons
  *
  * ISC License
@@ -81,6 +81,15 @@ export const ICON_PATHS = {
     'M10 9H8',
     'M16 13H8',
     'M16 17H8',
+  ],
+  // Lucide's six radius-1 grip circles represented losslessly with closed arc paths.
+  'grip-vertical': [
+    'M10 12a1 1 0 1 0-2 0a1 1 0 1 0 2 0Z',
+    'M10 5a1 1 0 1 0-2 0a1 1 0 1 0 2 0Z',
+    'M10 19a1 1 0 1 0-2 0a1 1 0 1 0 2 0Z',
+    'M16 12a1 1 0 1 0-2 0a1 1 0 1 0 2 0Z',
+    'M16 5a1 1 0 1 0-2 0a1 1 0 1 0 2 0Z',
+    'M16 19a1 1 0 1 0-2 0a1 1 0 1 0 2 0Z',
   ],
   info: ['M12 16v-4', 'M12 8h.01', 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z'],
   menu: ['M4 6h16', 'M4 12h16', 'M4 18h16'],
