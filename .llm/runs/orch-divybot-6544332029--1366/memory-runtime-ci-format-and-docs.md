@@ -1,0 +1,5 @@
+# Runtime CI output and sibling export closure
+
+Both runtime tiers on 99cda63 failed generated.deno-fmt-check after 45 passing gates. The only unformatted output is triggers/runtime.ts: adding a third runChildHealthProcess argument requires a multiline call. Formatting the TypeScript stub file does not format string-array source. Test the actual collectInstallArtifacts output through Deno's formatter, then compare bytes. Latest available main runtime run 41197676281 passed both tiers, so this is leaf-specific and must be corrected.
+
+Test-2 is a separate real public-doc-lint failure, not discovery and not just the noisy @types/node warnings: ChildHealthMonitor.trackProcess references ChildRestartHistoryPort. The health owner exports that port, but the plugins that re-export ChildHealthMonitor must also re-export the port contract. Preserve shared ownership, do not duplicate the interface or suppress doc diagnostics. Existing workers non-contract type-refs test is the failing gate. Add sibling runtime/worker surfaces to verification whenever expanding the monitor's public methods.

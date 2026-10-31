@@ -13,3 +13,9 @@ Final READY report must use .divybot-final-report.md file handoff, no direct iss
 Owner resumed for test-5 failure. S3 fixes stale temporary-file permissions in the adapter; deterministic fixture reproduces 0644/0600 mismatch before correction and seven adapter/history tests pass after. Full focused gates run before commit/push. Prior exact-head verdict covers e1c68e5 only and must be renewed at the next pushed head. Same independent evaluator retained; rounds 4 (slice review) and 5 (final exact head) remain within the owner limit. See memory-stale-history-permissions.md and worklog.md.
 
 S3 verification complete: 83 focused tests pass; two-file check/lint/fmt and repository quality scan pass; independent R4 slice review PASS. Source correction remains isolated to the adapter and deterministic test. Final exact-head review will be R5 after push.
+
+## S4 runtime/public-doc repair
+
+Owner resumed for both scaffold-runtime formatting failures and test-2/check-test. Root causes: emitted triggers/runtime.ts layout and a missing shared history port in the monitor's sibling public facades. Actual emitted-format test fails before correction; workers public-doc test also fails before correction. After both fixes, 88 focused tests pass, check/lint/fmt/quality and four canonical freshness gates pass. Wider sibling doc probe's 25 diagnostics exactly match clean main; no suppression/new debt. Await supplemental independent CI-repair review, commit/push, then exact-head review and fresh CI. Prior final verdict covers 99cda63 only. No local full runtime suite or PR merge.
+
+Supplemental independent CI-repair review 1 passed with no blockers; all local/source/carrier gates complete. Push S4 and review its exact head; both runtime tiers remain required. Do not report the prior red workflow as passed.

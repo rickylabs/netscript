@@ -164,5 +164,88 @@
     "independentSliceReview": "IMPL-EVAL round 4 PASS; final round 5 must pin new pushed head",
     "corpusFreshnessExitCode": 0,
     "publishFreshnessExitCode": 0
+  },
+  "runtimeCiRepair": {
+    "reportedHead": "99cda632399925cf2431a1ba391b50e53de23f55",
+    "runtimeRun": "https://github.com/rickylabs/netscript/actions/runs/41211348591",
+    "postgresAndSqliteFailure": {
+      "gate": "generated.deno-fmt-check",
+      "file": "triggers/runtime.ts",
+      "eachTierSummary": {
+        "passed": 45,
+        "failed": 1,
+        "skipped": 0
+      }
+    },
+    "latestMainRuntime": {
+      "run": "https://github.com/rickylabs/netscript/actions/runs/41197676281",
+      "postgres": "success",
+      "sqlite": "success"
+    },
+    "emittedFormattingBefore": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "workersDocBefore": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "workersDocAfter": {
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 4,
+      "uniqueFailures": 0
+    },
+    "combinedFocusedAfter": {
+      "passed": 88,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 88,
+      "uniqueFailures": 0
+    },
+    "check": {
+      "selectedFiles": 7,
+      "newFindings": 0
+    },
+    "lintAndFormat": {
+      "selectedSourceFiles": 6,
+      "newFindings": 0
+    },
+    "qualityScan": {
+      "exitCode": 0,
+      "newFindings": 0
+    },
+    "widerSiblingDocLint": {
+      "inheritedPrivateTypeRef": 25,
+      "exactDiagnosticMessagesMatchCleanMain": true,
+      "newFindings": 0,
+      "wholeProbeExitCode": 1
+    },
+    "canonicalFreshness": {
+      "assets": {
+        "exitCode": 0,
+        "receiptSha256": "094c2c0f99bfa2d069d18169d65741419bab7bf5fab7edf217d7091de2933194"
+      },
+      "corpus": {
+        "exitCode": 0,
+        "receiptSha256": "4832f6bca9860ac4f2da26ed82923911e67dcdee7a68761f890ab0058c7054a2"
+      },
+      "docs": {
+        "exitCode": 0,
+        "receiptSha256": "388f4b4451f0c7e1dc29e8d906844ac9956ec1402d6d2d12ec1305bde03e1b49"
+      },
+      "publish": {
+        "exitCode": 0,
+        "receiptSha256": "0aeb92aac0214c2abebec0a19e542b3a387b81a83e9511b8566f38a2e3b8c240"
+      }
+    },
+    "localFullScaffoldRuntime": "not run by owner instruction; require both CI tiers after push"
   }
 }

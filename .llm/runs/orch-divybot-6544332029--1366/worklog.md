@@ -54,3 +54,17 @@ Owner override verbatim: “Run PLAN-EVAL before implementing and IMPL-EVAL afte
 
 - S3 gates complete: full focused set 83 passed, zero failed/ignored; changed adapter/test type check, lint and format passed; repository quality scan passed with zero findings/seven inherited allowances. Independent IMPL-EVAL R4 passed with no blockers. Existing crash-loop detector-removal evidence remains valid: monitor and generated-runtime source unchanged.
 - Reconciliation: correction is exactly one native permission-restoration operation plus a deterministic fixture setup. No assertion weakened, no public shape or carrier content changed, no lock churn. Commit/push S3 and renew the final evaluator verdict at the new head.
+
+## S4 owner-requested runtime CI follow-up
+
+- Re-read gh pr checks and gh run view --log-failed. Both runtime tiers fail only generated.deno-fmt-check after 45 passing gates; the emitted triggers/runtime.ts call needs multiline layout. Latest available main runtime run 41197676281 passes both tiers.
+- Added a regression formatting the actual trigger install artifact with the consumer formatting policy: it fails before correction, passes after the string-array stub emits the required layout. No runtime behavior or threshold changes.
+- Test-2 independently fails the existing workers non-contract documentation gate because the public monitor's new method references an unexported ChildRestartHistoryPort through sibling entrypoints. Re-export the existing shared record and port at all four monitor type facades; no copied contracts and no worker supervisor changes. The existing failing test reproduces before the correction and passes afterward (four workers public tests).
+- Combined focused suite now passes 88 tests with zero failures/ignores, including emitted formatting and workers public doc-lint. Seven-entrypoint type check is clean. Broader sibling doc-lint exploration reports pre-existing non-health diagnostics; compare with clean main rather than widening this leaf.
+- The latest owner message explicitly reopens a bounded CI repair after the prior five-round feature loop ended at READY. Keep the same independent evaluator; record supplemental CI-repair review separately and retain a bounded five-pass correction loop, not unbounded retries. Final review still pins the exact new pushed head, and no merge is authorized.
+
+- S4 source gates complete: 88 focused tests pass, zero failures/ignores; seven-entrypoint check and six-file lint/fmt pass; repository quality scan passes. All four canonical carrier freshness checks pass. Existing workers non-contract public doc-lint test is green.
+- Wider sibling doc probe: 25 private-type diagnostics remain, exactly matching clean main by diagnostic message; no new finding. This exploratory whole probe is explicitly not called green. Clean-main comparison worktree removed after the read-only audit.
+- Reconciliation: no test-discovery failures occurred in these CI artifacts. Both runtime failures are the same emitted-format issue; check-test is an aggregate of the single test-2 doc-lint failure. No assertions or runtime gates were weakened. Generated export corpus is canonically regenerated for the shared type re-exports.
+
+- Supplemental CI-repair review 1: PASS with no blockers. All required local and carrier gates are now complete. Commit/push S4 normally, require supplemental exact-head review 2 and the fresh remote workflows before declaring CI green.

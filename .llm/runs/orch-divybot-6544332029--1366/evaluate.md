@@ -87,3 +87,44 @@ The only moment the temp file still has its old mode is while it is empty, so no
 - The required `scaffold.runtime` CI check is still pending and owned by the coordinator; it is not proven by this review.
 
 VERDICT: PASS
+
+
+# Owner-requested CI repair — independent review 1
+
+**CI-REPAIR-EVAL 1 (pre-commit correction review): #1366 box 6**
+
+I found no blockers; this pass is a PASS. The fixes are narrow and address the two real CI failures. The third red check, the aggregate check-test job, only fails because test-2 fails.
+
+**1. Formatting of the emitted triggers runtime is fixed.**
+- `plugins/triggers/src/adapter/resources/glue/runtime.stub.ts` now emits the `runChildHealthProcess(...)` call in the multiline layout Deno fmt expects. Only whitespace changed: the arguments, the history path (`.data/child-health/triggers.json`) and the `health` pass-through are the same. The sagas stub was already multiline, so it needed no change.
+- The new regression test is sound:
+  - It takes the real `collectInstallArtifacts(triggersAdapterPlugin)` output for `triggers/runtime.ts`.
+  - It pipes that through `deno fmt --config <root deno.json> --ext ts -`.
+  - It asserts both exit 0 and byte equality with the input.
+  - The relative path `../../../../../deno.json` correctly resolves to the repo root from `src/adapter/resources/`.
+  - The root formatting settings (lineWidth 100, singleQuote, semicolons, 2-space indent) match the consumer policy, so the test stands in for CI's `generated.deno-fmt-check`.
+  - It tests the actual emitted bytes, not the stub text, so it would also catch future formatting drift.
+
+**2. Public type closure is fixed.** `ChildHealthMonitor.trackProcess(history: ChildRestartHistoryPort, …)` now has its port type re-exported, along with `ChildRestartHistory`, which the port refers to. Both are type-only re-exports from `@netscript/plugin/health` at all four facades that expose the monitor:
+- `plugins/workers/bin/runtime.ts`
+- `plugins/workers/worker/mod.ts`
+- `plugins/sagas/src/runtime/mod.ts`
+- `plugins/triggers/src/runtime/mod.ts`
+
+Nothing is duplicated, no runtime values or worker behaviour change, and both types already exist on the `./health` subpath. The failing gate (`plugins/workers/tests/public/type-refs_test.ts`, `deno doc --lint` over non-contract entrypoints) is the right test to prove it, and your before/after result matches.
+
+**3. Scope holds.** No changes to monitor behaviour, thresholds, persistence or the adapter, and no lock churn. The drift and worklog entries correctly record this as an owner-requested, bounded repair, separate from the five closed feature rounds.
+
+**Not blockers:**
+- `ChildHealthMonitorOptions`, which this PR added as a constructor parameter of `ChildHealthMonitor` and `TriggerHealthMonitor`, is still not re-exported from those four facades. Your passing doc-lint gate shows Deno doesn't flag it, and consumers can import it from `@netscript/plugin/health`. Adding it to the same export lists would make the closure complete, but it is optional.
+- I could not run commands here, so I did not check the regenerated corpus rows line by line. The 9 `ChildRestartHistory` occurrences in the diff are consistent with the new re-exports. Rely on the freshness gate exiting 0.
+
+**Before commit:** finish and record the six-file lint/format results, the repository quality scan, carrier and corpus freshness, and the clean-main comparison showing the wider sibling doc-lint errors are inherited.
+
+**Still required after push:**
+- An exact-head review of the new head.
+- Fresh CI on that head, including both e2e-cli `scaffold.runtime` tiers. That check is owned by the coordinator, is still unproven, and must not be run locally.
+
+I am not claiming the earlier red runtime jobs passed. Latest main run 41197676281 passing is only a baseline, not evidence for this branch.
+
+VERDICT: PASS

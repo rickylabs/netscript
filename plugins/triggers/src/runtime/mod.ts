@@ -96,4 +96,6 @@ export type {
   ChildHealthMonitor,
   ChildHealthSnapshot,
   ChildHealthState,
+  ChildRestartHistory,
+  ChildRestartHistoryPort,
 } from '@netscript/plugin/health';
