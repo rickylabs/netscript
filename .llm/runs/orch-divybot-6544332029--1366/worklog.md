@@ -44,3 +44,13 @@ Owner override verbatim: “Run PLAN-EVAL before implementing and IMPL-EVAL afte
 - Review-thread gate passed: zero threads/unanswered.
 - Reconciliation: implementation source remains identical to the reviewed S1 source; only canonical publication metadata needs additional output beyond the main merge. No lock churn, no lost source, no private run identity in this leaf's diff.
 - Commit and push this integration, mark PR ready because implementation review has no blockers, then require final independent IMPL-EVAL of that exact pushed head. Final verdict and live CI snapshot belong in the PR phase comment and canonical READY report, avoiding a self-referential extra commit after evaluation. Coordinator owns final merge and the e2e-cli gate label.
+
+## S3 CI test-5 correction
+
+- Exact-head CI test-5 failed one test out of 1,342 results: interrupted history replacement retained POSIX mode 0644 instead of 0600. The structured uploaded test report identifies only the new adapter fixture; 1,337 passed and four ignored in that shard.
+- Strengthened the fixture to explicitly set the stale temporary file to 0644, reproducing the CI failure locally regardless of umask (one failed, one passed before correction).
+- Adapter now restores 0600 on the opened temporary file before writing and atomic rename, because OpenOptions.mode applies only at creation. The original permission assertion remains intact. Adapter/history regression set after correction: seven passed, zero failures/ignores.
+- Scope is the existing adapter, its test and this run record; no public API or restart-policy changes. Full focused regressions and source wrappers are running before independent slice review and push.
+
+- S3 gates complete: full focused set 83 passed, zero failed/ignored; changed adapter/test type check, lint and format passed; repository quality scan passed with zero findings/seven inherited allowances. Independent IMPL-EVAL R4 passed with no blockers. Existing crash-loop detector-removal evidence remains valid: monitor and generated-runtime source unchanged.
+- Reconciliation: correction is exactly one native permission-restoration operation plus a deterministic fixture setup. No assertion weakened, no public shape or carrier content changed, no lock churn. Commit/push S3 and renew the final evaluator verdict at the new head.

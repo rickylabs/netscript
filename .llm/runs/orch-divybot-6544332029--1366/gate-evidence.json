@@ -123,5 +123,46 @@
       "unanswered": 0,
       "exitCode": 0
     }
+  },
+  "permissionsCorrection": {
+    "failingCiJob": "https://github.com/rickylabs/netscript/actions/runs/41210312572/job/124563871879",
+    "originalShardSummary": {
+      "passed": 1337,
+      "failed": 1,
+      "ignored": 4,
+      "totalResults": 1342,
+      "uniqueFailures": 1
+    },
+    "deterministicBeforeFix": {
+      "passed": 1,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 2,
+      "uniqueFailures": 1
+    },
+    "afterFix": {
+      "passed": 83,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 83,
+      "uniqueFailures": 0
+    },
+    "changedSourceCheckLintFormat": {
+      "files": 2,
+      "exitCodes": [
+        0,
+        0,
+        0
+      ]
+    },
+    "repositoryQualityScan": {
+      "exitCode": 0,
+      "newFindings": 0,
+      "existingAllowances": 7
+    },
+    "fix": "Restore POSIX 0600 on an already-existing temporary history file before writing and rename; fixture explicitly sets stale file to 0644.",
+    "independentSliceReview": "IMPL-EVAL round 4 PASS; final round 5 must pin new pushed head",
+    "corpusFreshnessExitCode": 0,
+    "publishFreshnessExitCode": 0
   }
 }

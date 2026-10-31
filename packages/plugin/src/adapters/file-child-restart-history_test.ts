@@ -19,6 +19,8 @@ Deno.test('file history survives adapter replacement and ignores interrupted tem
     assertEquals(history.read(), undefined);
     history.write(RECORD);
     await Deno.writeTextFile(`${path}.tmp`, '{');
+    // A stale replacement can come from an earlier run with a less restrictive umask.
+    if (Deno.build.os !== 'windows') await Deno.chmod(`${path}.tmp`, 0o644);
     const replacement = new FileChildRestartHistory(path);
     const record = replacement.read();
     assertEquals(record?.restartCount, 3);

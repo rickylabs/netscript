@@ -75,6 +75,8 @@ export class FileChildRestartHistory implements ChildRestartHistoryPort {
         truncate: true,
         mode: 0o600,
       });
+      // OpenOptions.mode only applies to newly created files, not interrupted replacements.
+      if (Deno.build.os !== 'windows') Deno.chmodSync(temporary, 0o600);
       let offset = 0;
       while (offset < bytes.length) offset += file.writeSync(bytes.subarray(offset));
       file.syncSync();

@@ -7,3 +7,9 @@ S1 is pushed at 3fd5770681b548812d7efb31aa8871255d25fecc. Current-main integrati
 Scope: default three restarts in 60 seconds (inclusive), configurable monitor options; failed watch reloads count, healthy same-process reloads and clean restarts do not. Abrupt OS replacement counts. History is single-owner local persisted state in the generated project's ignored .data directory. Workers behavior and redacted fatal marker unchanged. Dashboard and installed-consumer proof deferred.
 
 Final READY report must use .divybot-final-report.md file handoff, no direct issue post and no closing keyword. No operator/session details in tracked files.
+
+## CI follow-up
+
+Owner resumed for test-5 failure. S3 fixes stale temporary-file permissions in the adapter; deterministic fixture reproduces 0644/0600 mismatch before correction and seven adapter/history tests pass after. Full focused gates run before commit/push. Prior exact-head verdict covers e1c68e5 only and must be renewed at the next pushed head. Same independent evaluator retained; rounds 4 (slice review) and 5 (final exact head) remain within the owner limit. See memory-stale-history-permissions.md and worklog.md.
+
+S3 verification complete: 83 focused tests pass; two-file check/lint/fmt and repository quality scan pass; independent R4 slice review PASS. Source correction remains isolated to the adapter and deterministic test. Final exact-head review will be R5 after push.

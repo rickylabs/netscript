@@ -51,3 +51,39 @@ I found no blocking issues in the sagas/triggers implementation; passing on the 
 **Before commit:** `plugins/sagas/src/adapter/resources/resources.test.ts` and the triggers glue tests check the glue stub text with `assertStringIncludes`. Those assertions still match, because the new `restartHistoryPath` argument was only added to the stubs. Make sure the regenerated docs, corpus and carriers are committed, and the final review will pin the exact pushed head.
 
 VERDICT: PASS
+
+
+# IMPL-EVAL round 4 — permissions CI correction
+
+**IMPL-EVAL round 4 (CI-fix slice): #1366 box 6**
+
+I found no blockers in the permissions fix; this round passes.
+
+**Stale temp files now end up private.** `Deno.openSync(..., { mode: 0o600 })` sets the mode only when it creates a file. Reopening a leftover `.tmp` with `truncate` kept its old, broader mode, and the rename then carried that mode onto the history file. The new `Deno.chmodSync(temporary, 0o600)` runs right after open and before any bytes are written, so the published file is always 0600. That holds for a freshly created temp too, where umask would otherwise decide the final mode.
+
+**The order is safe.** The sequence is:
+1. Open with truncate, which empties the stale file before anything else happens.
+2. Chmod to 0600.
+3. Write, then sync.
+4. Close the handle, then rename.
+
+The only moment the temp file still has its old mode is while it is empty, so no history record is exposed. The existing Windows condition is reused, which avoids POSIX mode calls where they do not apply.
+
+**Errors still fail closed.** If the chmod throws, `using` still closes the handle, `write()` throws, and the monitor's `#persist` latches `#historyFailed`, so health reports `failed`. Nothing is renamed, and the previous history file is left as it was.
+
+**The test now reproduces the CI failure on any machine.**
+- The fixture explicitly sets the stale `.tmp` to 0644 after the first write.
+- `replacement.read()` correctly ignores the temp file.
+- The second write reuses that 0644 temp file. Before the fix, it renames a 0644 file into place and the unchanged 0600 assertion fails, whatever the local umask is. That matches your one-fail/one-pass result before the fix and the CI failure (420 = 0644 against 384 = 0600).
+- The assertion is not weakened, and the Windows guard matches the adapter's.
+
+**Nothing else changed.** The diff touches only the adapter, its test, and run-record text. Public types, thresholds, restart counting, glue, and generated carriers are untouched, so no regeneration is needed.
+
+**Not a blocker:** the chmod goes by path, not by the open handle, so a swapped symlink between open and chmod could be followed in a hostile directory. The adapter's documented single-owner, private `.data` directory model already covers this, and open-with-create follows symlinks the same way.
+
+**Still to do:**
+- Record the full focused set and the scoped check, lint, format and quality results before you commit.
+- The final verdict belongs to round 5 on the exact pushed head.
+- The required `scaffold.runtime` CI check is still pending and owned by the coordinator; it is not proven by this review.
+
+VERDICT: PASS
