@@ -94,3 +94,7 @@
 - 04:32Z: **second rule violation:** the #2369 leaf force-pushed PR #2487 (03:40Z, 04:19Z; rebase onto main). Posted a no-force-push / merge-not-rebase reminder on live leaf PRs #2479, #2482 and #2494 (orchid relays PR comments). Leaves without a PR yet (#2115, #2351) got the tightened brief only if dispatched after the template change (#2351 yes; #2115 is a continuation).
 - 04:33Z: #2351 → PR #2496 (draft).
 - 04:35Z: **merged** #2487 (`8902e1a58`) for #2369 (B2); #2369 closed. Next expensive gate: #2492 (#2290).
+- 04:36Z: **expensive-gate.acquired** on #2492 (#2290).
+- 04:45Z: #2155 (PR #2494) BLOCKED: all 12 items reconciled, but the agent-docs-prose generated carrier needs regeneration, which the docs lane forbids. Decision: authorize generated-carrier regeneration through the canonical generators only (same exception as #2489), steered via a PR comment (`briefs/2155.steer-1.md`). Docs-lane gate amended: generated carrier output is allowed, framework source is not.
+- 04:54Z: #2492 head moved `4d1ebfb` → `0d93cb3`. Postgres tier FAIL at aspire-start: garnet state=Finished, `garnet_resp` Unhealthy (the #2483 diagnostic). SQLite+garnet passed at the same head, and #2487's Postgres tier (including #2483) passed at 04:35, so this is treated as an infra flake. Reran the failed job once.
+- 05:05Z: **merged** #2492 (`f89260ac9`) for #2290; #2290 closed.

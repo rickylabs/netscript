@@ -12,3 +12,4 @@
 | 2026-10-31 | Leaves never force-push | #2385 leaf force-pushed (rebased onto main) PR #2489 at 04:00:47Z | Leaf ignored 'No force-push'; effect contained (leaf branch only, fresh exact-head MERGE, CI green). Brief template tightened: update from main only by merging main into the branch | worklog.md |
 | 2026-10-31 | #2115 in 'features' | #2115 back to 'internals' | Internals has room again (#2482 implementing, #2492 ready); features needs the slot for A2 #2351 | worklog.md |
 | 2026-10-31 | Leaves never force-push | #2369 leaf force-pushed PR #2487 twice (03:40Z, 04:19Z) | Same rebase habit; contained by a fresh exact-head MERGE (`07a77f0`) and CI at the new head; reminders posted on live leaf PRs | worklog.md |
+| 2026-10-31 | Leaves never force-push | #2290 leaf force-pushed PR #2492 (rebase onto main) | Same habit (third leaf); fresh exact-head MERGE at `0d93cb3`; the tightened template applies to new dispatches only | worklog.md |
