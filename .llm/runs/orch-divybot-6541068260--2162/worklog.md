@@ -112,3 +112,8 @@ Actual zero-definition Aspire proof remains unproven. Full runtime is still CI-o
 
 S3 reconcile: #2162 remains open and #2509 ready for review. No labels/milestones changed by this
 leaf; coordinator's runtime gate is now armed. No locks/caches deleted or committed.
+
+S3 publication correction: the read-only leak reporter wrote a report into this run directory.
+It was accidentally included in the slice stage selection. Replaced operational details with a
+public ownership summary immediately; raw evidence is retained privately. No credentials were
+present. This correction changes evidence only, and a new exact-head review follows.

@@ -25,3 +25,6 @@ S3 follow-up: coordinator armed e2e-cli-gate. CI exposed a stale package-backed 
 check title. One-line expectation fix passed the actual fixture and scoped wrappers/quality:gate;
 independent S3 review PASS. Renew exact-head review after push. Aspire SDK restore succeeded,
 Docker unavailable; unrelated running AppHost untouched. No local runtime was started.
+
+Leak reporter output is retained as a public ownership summary only; detailed observations remain
+private. SDK restore alone started no AppHost/resources and required no runtime cleanup.
