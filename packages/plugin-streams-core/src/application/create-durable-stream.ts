@@ -34,6 +34,8 @@ export interface DurableStreamProducerOptions<TDef extends StreamStateDefinition
   readonly schema: StateSchema<TDef>;
   /** Stable producer identity for idempotent delivery. */
   readonly producerId: string;
+  /** Persisted session epoch; allocate a higher value on restart. Explicit epochs fence stale sessions. */
+  readonly initialEpoch?: number;
   /** Server retention applied only when the stream is first created. */
   readonly retention?: StreamRetentionPolicyV1;
   /** Optional finite reconnect policy overrides. */
@@ -78,6 +80,7 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
       headers: getStreamsAuth(),
       retention,
       producerId: options.producerId,
+      initialEpoch: options.initialEpoch,
       transport: options.transport ?? new DurableStreamProducerTransport(),
       clock: options.clock ?? new SystemStreamProducerClock(),
       random: options.random ?? new SystemStreamProducerRandom(),
@@ -269,7 +272,14 @@ function resolveRequiredStreamUrl(streamPath: string): string {
 function producerFingerprint<TDef extends StreamStateDefinition>(
   options: DurableStreamProducerOptions<TDef>,
 ): string {
+  if (
+    options.initialEpoch !== undefined &&
+    (!Number.isSafeInteger(options.initialEpoch) || options.initialEpoch < 0)
+  ) {
+    throw new RangeError('initialEpoch must be a non-negative safe integer');
+  }
   return JSON.stringify({
+    initialEpoch: options.initialEpoch ?? null,
     producerId: options.producerId,
     reconnectPolicy: options.reconnectPolicy ?? {},
     bufferPolicy: options.bufferPolicy ?? {},
