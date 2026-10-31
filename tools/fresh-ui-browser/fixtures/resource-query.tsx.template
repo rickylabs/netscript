@@ -1,0 +1,46 @@
+import { render } from 'preact';
+import { dehydrateQueryClient, getIslandQueryClient } from '@netscript/fresh/query';
+import PeopleIsland from './resource/routes/people/(_islands)/PeopleIsland.tsx';
+import { usersQueries } from './resource/users-query.ts';
+
+interface QueryState {
+  data?: unknown;
+  isLoading?: boolean;
+  isError?: boolean;
+}
+
+/** Exercise the complete canonical resource island with real query hooks and controlled query data. */
+export async function renderState(query: QueryState, withQuery = true): Promise<void> {
+  let container = document.querySelector('#query-result-fixture');
+  if (!container) {
+    container = document.createElement('main');
+    container.id = 'query-result-fixture';
+    document.body.append(container);
+  }
+  render(null, container);
+  const client = getIslandQueryClient();
+  client.removeQueries({ queryKey: ['users', 'list'], exact: true });
+  if (query.isError) {
+    const record = client.getQueryCache().build(client, usersQueries.list.queryOptions({}));
+    record.setState({ status: 'error', error: new Error('Fixture error'), fetchStatus: 'idle' });
+  }
+  render(
+    <PeopleIsland
+      input={{}}
+      initialData={query.isLoading || query.isError ? undefined : query.data}
+      cachedAt={Date.now()}
+      dehydratedState={dehydrateQueryClient(client)}
+    />,
+    container,
+  );
+  await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+  if (!withQuery) client.removeQueries({ queryKey: ['users', 'list'], exact: true });
+}
+
+/** Leave unrelated markup while retaining the query cache to prove the surface requirement. */
+export async function renderUnrelated(): Promise<void> {
+  await renderState({ data: [] });
+  const container = document.querySelector('#query-result-fixture')!;
+  render(null, container);
+  container.innerHTML = '<output>legacy</output><dl><dt>Label</dt><dd>Value</dd></dl>';
+}

@@ -3,6 +3,10 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
+import {
+  QUERY_RESULT_RETURN,
+  QUERY_RESULT_TEMPLATE,
+} from '../../packages/cli/src/kernel/application/ui/page/query-result-template.ts';
 
 // The owned webServer invokes this from its generated app before starting Vite.
 const app = process.cwd();
@@ -47,4 +51,25 @@ if (negative === '1') {
   );
   if (withoutMemo === source) throw new Error('No-memo negative control did not match CodeBlock');
   writeFileSync(path, withoutMemo);
+}
+
+// Compile the shipped query-result markup, so runtime selectors cannot drift from generated pages.
+writeFileSync(
+  join(app, 'browser-fixtures/test-query-result.tsx'),
+  readFileSync(new URL('./fixtures/query-result.tsx.template', import.meta.url), 'utf8')
+    .replace('/* QUERY_RESULT_TEMPLATE */', QUERY_RESULT_TEMPLATE)
+    .replace('/* QUERY_RESULT_RETURN */', QUERY_RESULT_RETURN),
+);
+
+const resourceFixture = spawnSync('deno', [
+  'run',
+  '-A',
+  '--frozen',
+  '--config',
+  'deno.json',
+  'tools/fresh-ui-browser/render-resource-fixture.ts',
+  app,
+], { cwd: repository, stdio: 'inherit' });
+if (resourceFixture.status !== 0) {
+  throw new Error('Cannot render the canonical resource island fixture');
 }

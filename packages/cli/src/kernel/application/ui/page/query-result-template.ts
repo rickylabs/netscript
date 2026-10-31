@@ -37,8 +37,15 @@ function QueryResult({ value }: { value: unknown }): VNode {
 }
 `;
 
+/** Shared successful result surface for page and resource-island generators. */
+export const QUERY_RESULT_SUCCESS_RETURN: string = `  return (
+    <div data-query-result>
+      <QueryResult value={query.data} />
+    </div>
+  );`;
+
 /** Query-state presentation keeps stale data visible while a background refresh runs. */
 export const QUERY_RESULT_RETURN: string =
   `  if (query.isLoading) return <p role='status'>Loading records…</p>;
   if (query.isError) return <p role='alert'>Unable to load records. Please try again.</p>;
-  return <QueryResult value={query.data} />;`;
+${QUERY_RESULT_SUCCESS_RETURN}`;

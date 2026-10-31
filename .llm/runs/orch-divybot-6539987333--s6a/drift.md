@@ -60,3 +60,31 @@ Expo and desktop reference lock metadata to be refreshed by native Deno tooling;
 the original write surface solely for lock consistency. Resolved versions remain unchanged.
 Optional Utility photo-download suppression is deferred because Avatar has no SSR preset input;
 CSS-only hiding cannot prevent the download, and preserving legacy photos needs a theme contract.
+
+## Runtime CI repair at7b847c3
+
+Both full runtime suites ran and cleaned up, but their final hydration probe failed only because
+it selects main output, removed by S6a semantic QueryResult rendering. PostgreSQL108pass/1fail,
+SQLite101pass/1fail. All otherCIchecks pass. READY remains withheld.
+
+Public surface: successful generated query content gains a data-query-result container; loading
+and error states do not. Domain: query-result surface means successfully rendered payload, even
+empty/null/scalar. Ports: existing QueryResult template, public query singleton and browser probe.
+Constants: keep the query module path in the probe; extract its browser expression as a pure
+function accepting that path so Playwright executes the same observation. Slice: template marker,
+probe expression and tests/browser fixture, then carriers and gates, independent same-reviewer
+sign-off, push and full CI. Deferred: no runtime readiness/network assertions removed or weakened.
+Contributor path: query-result-template.ts owns the generated markup; browser regression uses its
+actual template and the real public singleton, with positive/negative DOM states.
+
+Authorized surface extends existing CLI/E2E and browser harness files only. Prove the stale output
+selector fails the new actual-DOM test; retain query-client/list-query requirements. Full runtime
+proof remains CI-only because local Docker/Aspire are unavailable.
+
+Hydration IMPL-EVAL round1:FAIL_FIX. Reviewer traced /people to generate resource, whose
+ResourceIsland template duplicated QueryResult and did not use QUERY_RESULT_RETURN. The page
+fixture therefore proved the wrong generator. Failure streak1; stop after a second consecutive
+failure. Repair before re-review: share successful return and QueryResult body across BOTH
+generators, update resource goldens, and compile/render the actual canonical PeopleIsland
+with its real QueryIsland/useIslandQuery hooks in the browser. Repeat old-selector negative
+control against that resource surface. No commit/push before independentPASS.

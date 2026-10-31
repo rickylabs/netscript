@@ -12,6 +12,7 @@ import { DenoGeneratedSourceFormatter } from '../../../adapters/runtime/process/
 import { readTemplateAsset } from '../../../adapters/templates/template-asset.ts';
 import { TEMPLATE_KEYS } from '../../../assets/manifest.ts';
 import { scaffoldUiIsland, scaffoldUiPage } from './web-scaffold.ts';
+import { QUERY_RESULT_SUCCESS_RETURN, QUERY_RESULT_TEMPLATE } from './query-result-template.ts';
 
 const APP_ROOT = '/workspace/shop/apps/dashboard';
 const ROUTER_PATH = `${APP_ROOT}/router.ts`;
@@ -104,6 +105,7 @@ function assertDataScreenPlan(files: readonly PlannedFile[]): void {
       'initialData: props.initialData',
       'initialDataUpdatedAt: props.cachedAt',
       'QueryResult value={query.data}',
+      'data-query-result',
       "role='status'",
       "role='alert'",
     ]
@@ -558,6 +560,8 @@ Deno.test('edited app and resource templates emit canonical generated source', a
     'resource-slice/(_islands)/ResourceIsland.tsx.template',
   ];
   const values: Readonly<Record<string, string>> = {
+    queryResultReturn: QUERY_RESULT_SUCCESS_RETURN,
+    queryResultTemplate: QUERY_RESULT_TEMPLATE.trim(),
     name: 'shop',
     appName: 'dashboard',
     resource: 'orders',

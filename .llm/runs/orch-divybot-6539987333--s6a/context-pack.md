@@ -66,3 +66,51 @@ Main reconciliation independent IMPL-EVAL:PASS. Reviewer verified every frozenha
 overlap resolutions, byte-for-byte preservation of all one-sided upstream/PR changes, and
 all335package/22CLI/36browser tests plus14rootchecks. Failure streak0. Merge sign-off and
 non-force push next; exact-headCI must complete before renewedREADY.
+
+## Runtime CI repair at7b847c3
+
+Both full runtime suites ran and cleaned up, but their final hydration probe failed only because
+it selects main output, removed by S6a semantic QueryResult rendering. PostgreSQL108pass/1fail,
+SQLite101pass/1fail. All otherCIchecks pass. READY remains withheld.
+
+Public surface: successful generated query content gains a data-query-result container; loading
+and error states do not. Domain: query-result surface means successfully rendered payload, even
+empty/null/scalar. Ports: existing QueryResult template, public query singleton and browser probe.
+Constants: keep the query module path in the probe; extract its browser expression as a pure
+function accepting that path so Playwright executes the same observation. Slice: template marker,
+probe expression and tests/browser fixture, then carriers and gates, independent same-reviewer
+sign-off, push and full CI. Deferred: no runtime readiness/network assertions removed or weakened.
+Contributor path: query-result-template.ts owns the generated markup; browser regression uses its
+actual template and the real public singleton, with positive/negative DOM states.
+
+Authorized surface extends existing CLI/E2E and browser harness files only. Prove the stale output
+selector fails the new actual-DOM test; retain query-client/list-query requirements. Full runtime
+proof remains CI-only because local Docker/Aspire are unavailable.
+
+Hydration repair local gates PASS:32focused generator/probe tests,40browser tests with0skips,
+source/browser/installed-fixture typechecks, lint/fmt, all14rootchecks, broadquality, docsaccuracy
+and releasepreflight. Old-selector mutation fails4/4 exactly on missing successful surface;
+restored full matrix passes.114source paths frozen. Independent same-evaluator review next.
+Runtime remains failed at priorhead until the new full CI suites pass; noREADY.
+
+Hydration IMPL-EVAL round1:FAIL_FIX. Reviewer traced /people to generate resource, whose
+ResourceIsland template duplicated QueryResult and did not use QUERY_RESULT_RETURN. The page
+fixture therefore proved the wrong generator. Failure streak1; stop after a second consecutive
+failure. Repair before re-review: share successful return and QueryResult body across BOTH
+generators, update resource goldens, and compile/render the actual canonical PeopleIsland
+with its real QueryIsland/useIslandQuery hooks in the browser. Repeat old-selector negative
+control against that resource surface. No commit/push before independentPASS.
+
+Hydration round2 local gates PASS: shared successful-return and QueryResult body now feed
+both page and ResourceIsland generators. Actual canonical people/users/list/partial island
+and loader compile in Chromium with real QueryIsland/useIslandQuery and controlled queryport.
+All44browser cases and41focused generator/probe tests pass; all14rootchecks, scoped/source/
+installed-fixture check/lint/fmt, broadquality, docsaccuracy and releasepreflight pass.
+Old-selector control8red; missing-resource-marker control4resource red/4pagegreen; restored
+full44green. Only4resource-island golden hashes changed.118currenthashes frozen. Same evaluator
+round2next; failure streak1 untilPASS, no commit/push before verdict.
+
+Hydration round2 independent IMPL-EVAL:PASS. Actual resource render path and unchanged
+canonical island/loader fixture verified; all118hashes and final44browser/41focused/14root
+checks verified. Failure streak reset0. Sign-off commit/push next; require newfullPostgreSQL
+andSQLite CI runtime results plus requiredchecks beforeREADY. No further code changes pending.
