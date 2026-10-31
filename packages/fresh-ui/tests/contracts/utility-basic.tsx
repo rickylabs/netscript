@@ -38,7 +38,7 @@ import Toast from '../../registry/islands/Toast.tsx';
 import McpUiWidget from '../../registry/islands/McpUiWidget.tsx';
 
 export const basicFixtures: readonly ContractRenderFixture[] = [
-  { component: 'icon', props: [], scenario: 'glyph', render: () => <Icon name='check' /> },
+  { component: 'icon', props: ['name'], scenario: 'glyph', render: () => <Icon name='check' /> },
   {
     component: 'button',
     props: [],

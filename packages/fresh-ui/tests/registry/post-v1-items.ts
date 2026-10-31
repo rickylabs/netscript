@@ -13,6 +13,9 @@ export const POST_V1_COMPONENTS: readonly string[] = [
   'navigation-menu',
   'stepper',
   'menubar',
+  'alert-dialog',
+  'hover-card',
+  'context-menu',
 ];
 
 /** Non-component support items added after the frozen v1 baseline. */

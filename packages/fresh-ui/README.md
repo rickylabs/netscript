@@ -253,3 +253,19 @@ ActionMenu.Content supports `initialFocus='first' | 'last'`. Outside dismissal
 keeps the destination focus; explicit Escape/close actions return to the trigger.
 Stepper is an ordered list with per-step status and optional native links, and
 LocationMarker is decorative. Neither adds a composite keyboard manager.
+
+The `overlays` collection adds AlertDialog, HoverCard and ContextMenu. AlertDialog
+requires trigger/title/description/action labels and delegates modal focus to
+Dialog; Cancel is the initial focus target and outside clicks do not dismiss.
+Application callbacks, pending state and controlled open state remain caller-owned.
+HoverCard opens on hover, focus or button activation without moving focus, and
+keeps content usable across pointer transfer. Touch/pen use activation-only toggles;
+mouse hover previews and a subsequent click closes the preview. Its description/meta/avatar are
+content slots. ContextMenu accepts ordinary region content plus menu records,
+opens at pointer coordinates or with Shift+F10/ContextMenu, and shares the
+action/choice/submenu behavior of Menubar. Hydrate these controls in islands.
+
+AlertDialog's Utility destructive action temporarily inverts the existing
+destructive-text/card pair to keep small text readable. The canonical
+destructive/default palette remains owned by the token workstream; no palette
+values change here.

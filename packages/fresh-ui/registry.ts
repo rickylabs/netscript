@@ -85,5 +85,6 @@ export type FreshUiRegistryManifest = {
  * - `desktop`: theme-seed, desktop-tray-menu, desktop-dialog, desktop-notification, desktop-window-chrome, desktop-update-prompt, desktop-only
  * - `actions`: theme-seed, button, icon-button, button-group, toggle, toggle-group
  * - `navigation`: theme-seed, location-marker, navigation-menu, menubar, stepper
+ * - `overlays`: theme-seed, alert-dialog, hover-card, context-menu
  */
 export const freshUiRegistryManifest: FreshUiRegistryManifest = manifest;

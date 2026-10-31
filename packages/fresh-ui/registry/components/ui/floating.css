@@ -1,7 +1,9 @@
 :where(
   [data-scope='popover'][data-part='content'],
   [data-scope='tooltip'][data-part='content'],
-  [data-scope='menubar'][data-part='content']
+  [data-scope='menubar'][data-part='content'],
+  [data-scope='hover-card'][data-part='content'],
+  [data-scope='context-menu'][data-part='content']
 ) {
   position: fixed;
   inset: var(
@@ -15,7 +17,9 @@
 :where(
   [data-scope='popover'][data-part='content'],
   [data-scope='tooltip'][data-part='content'],
-  [data-scope='menubar'][data-part='content']
+  [data-scope='menubar'][data-part='content'],
+  [data-scope='hover-card'][data-part='content'],
+  [data-scope='context-menu'][data-part='content']
 )[data-state='closed'] {
   display: none;
 }
@@ -23,7 +27,9 @@
 :where(
   [data-scope='popover'][data-part='content'],
   [data-scope='tooltip'][data-part='content'],
-  [data-scope='menubar'][data-part='content']
+  [data-scope='menubar'][data-part='content'],
+  [data-scope='hover-card'][data-part='content'],
+  [data-scope='context-menu'][data-part='content']
 ):popover-open {
   display: block;
 }
@@ -40,7 +46,9 @@
   :where(
     [data-scope='popover'][data-part='content'],
     [data-scope='tooltip'][data-part='content'],
-    [data-scope='menubar'][data-part='content']
+    [data-scope='menubar'][data-part='content'],
+    [data-scope='hover-card'][data-part='content'],
+    [data-scope='context-menu'][data-part='content']
   ) {
     inset: auto;
     position-anchor: var(--ns-floating-anchor-name);

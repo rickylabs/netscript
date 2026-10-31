@@ -37,3 +37,11 @@ promotion moves to layout; outside dismissal preserves the destination focus.
 These focused shared-runtime changes are necessary for Menubar and the upcoming
 ContextMenu and will receive full browser regression and independent slice review.
 No unrelated runtime, tokens, dependencies or locks are changed.
+
+Overlay source: destructive/default with white text fails the new AlertDialog
+axe scan at3.91:1 (existing shared palette, small Utility label). Existing
+destructive-text/card pair is inverted on this component's solid action to keep
+strict AA without changing any token value or global Button styling. Utility
+fill is therefore an explicit temporary visual deviation from the handoff;
+#2450 owns the canonical pair. Follow-up cost: remove one scoped rule and refresh
+visual proof once that pair passes. No axe allowance is added.

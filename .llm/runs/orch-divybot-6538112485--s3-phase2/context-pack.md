@@ -66,3 +66,19 @@ Latest-base recovery: Theme B main is included; six new main themes are preserve
 Latest-base integration independently reviewed PASS (rebase2-review.md). All112 rebuilt-source browser cases PASS; release preflight and docs accuracy PASS. Registry/source/prose assets regenerated from combined source. Remaining clean-source corpus refresh and carrier freshness checks precede the recovery push. This is recovery of reviewed slices, not phase completion.
 
 Recovery source4d9a356 includes latest main3d83caf (auth cookie fix) without additional conflicts. All four generated carrier freshness checks PASS; clean-source MCP corpus is unchanged after regeneration. Focused135/browser112/quality/publication/docs gates and independent integration review PASS. Full Fresh UI package regression suite is still running and is not claimed green by this recovery push. Phase implementation continues; draft remains incomplete.
+
+Slice6 Overlays implemented:82 shipped/22 remaining; native104 items,16 new
+components/2 support.158 focused and132 full browser PASS, plus143 focused and
+installed-copy rerun after private timer type fix. Full package378/378 PASS.
+8 hover browser cases pass after default Avatar's existing control-radius
+refinement. Quality/preflight/docs accuracy/exports and scoped wrappers PASS.
+Independent same reviewer is evaluating. No Data display yet. Destructive action
+uses an explicitly recorded existing-role inverse pair to preserve strict AA;
+no token/global Button changes. Coordinator all-added-line path audit still
+required at exact READY head; new public evidence uses relative paths.
+
+Post-rebase baseline full Fresh UI suite PASS372/372. Saved Overlay source restored, preserving recovery/coordinator notes and main Theme B registrations; native inventory110 (92 main +16 new components +2 supports), shipped82/104. The corrected Overlay snapshot under independent review matches restored sources; rerun current-base gates before signoff.
+
+Overlay corrective review terminal PASS: mouse-only hover preview and pointer/focus sequencing fix real touch taps; second tap closes, keyboard focus opens, existing scoped Escape preserved. Restored source equals reviewed snapshot in11 files. Current-base focused192, source/browser wrappers, quality and docs exports/prose PASS; browser137 matrix in flight. Native items110, shipped82/104. Refresh clean-source corpus/carriers, commit/push/comment before starting Data display.
+
+Current-base full Overlay/browser regression matrix PASS137/137 (four light/dark desktop viewport projects plus actual touch). Captures refreshed from this source. Independent corrective review PASS and192 focused tests/source-browser wrappers/quality/docs exports/prose PASS. No token values or lockfiles changed. Final publication/docs accuracy and clean-source generated carrier checks precede the slice push. Evidence scope and pending whole-phase gates are explicit in overlays-validation.json.

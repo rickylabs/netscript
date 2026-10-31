@@ -36,6 +36,8 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
           preact: 'npm:preact@^10.29.2',
           '@netscript/fresh-ui/interactive':
             toFileUrl(join(repo, 'packages/fresh-ui/interactive.ts')).href,
+          '@netscript/fresh-ui/primitives':
+            toFileUrl(join(repo, 'packages/fresh-ui/primitives.tsx')).href,
           '@preact/signals': 'npm:@preact/signals@2.11.3',
         },
         compilerOptions: {

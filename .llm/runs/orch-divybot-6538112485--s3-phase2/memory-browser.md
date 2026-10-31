@@ -33,3 +33,12 @@ ref on a native wrapper and query its trigger. Native popover promotion in a
 layout effect must suppress hydrated button's duplicate default popovertarget
 toggle, while retaining no-JS attributes and explicit submit/reset behavior.
 ActionMenu.Content sets first/last entry autofocus and retries on native toggle.
+
+2026-10-31 Hover preview timers must use ReturnType<typeof setTimeout>, not
+number: the full package graph includes Node typings where the handle is Timeout.
+A narrow DOM fixture type check will miss it; the full package suite caught it.
+Keep strict standalone axe: existing destructive/default-white is3.91:1 at small
+Utility text. A scoped existing-role pair can satisfy AA without palette changes,
+but record the visual divergence and let the token workstream own the canonical fix.
+
+2026-10-31 A desktop viewport is not touch coverage. Touch may emit pointerenter and focus before click, causing hover/focus opening to be toggled closed by click. Preview only mouse pointer events, suppress focus opening during a pointer press, and exercise real hasTouch/tap plus a delay beyond the close grace. Keep ordinary keyboard focus opening and desktop hover/click transitions covered separately.

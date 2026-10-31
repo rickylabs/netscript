@@ -1,3 +1,4 @@
+import { overlayFixtures, overlayKeyboard } from './utility-overlays.tsx';
 import { navigationFixtures, navigationKeyboard } from './utility-navigation.tsx';
 import { calendarFixtures, calendarKeyboard } from './utility-calendar.tsx';
 import { formFixtures, formKeyboard } from './utility-forms.tsx';
@@ -22,7 +23,14 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...formFixtures,
     ...calendarFixtures,
     ...navigationFixtures,
+    ...overlayFixtures,
     proseFixture,
   ],
-  keyboard: [...actionKeyboard, ...formKeyboard, ...calendarKeyboard, ...navigationKeyboard],
+  keyboard: [
+    ...actionKeyboard,
+    ...formKeyboard,
+    ...calendarKeyboard,
+    ...navigationKeyboard,
+    ...overlayKeyboard,
+  ],
 }];
