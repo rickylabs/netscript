@@ -79,8 +79,10 @@ product code, especially the owner’s new additive-extension boundary.
    duplicate names/targets, wrong default types, non-finite numbers, foreign
    block scopes and non-x targets. The registry adapter validates syntax;
    the contract harness also validates the declared component against its
-   independent canonical catalog. Types live on the existing contracts public
-   subpath and the metadata reader on registry-v2, with full documentation.
+   independent canonical catalog. Public StyleExtension/StyleExtensionType data live on the existing contracts
+   subpath; getStyleExtensions(item: RegistryItem) returns a validated readonly
+   declaration array on registry-v2. Registry validation calls that same adapter
+   before publication. All new symbols/fields have full documentation.
 8. A declaration can add only its mapped attribute or optional slot/block.
    Existing base props/parts/attributes/values/slots/APG/keyboard items are
    immutable. It cannot rename/remove a base item, extend an existing enum,
