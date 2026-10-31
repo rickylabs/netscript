@@ -6628,6 +6628,15 @@
       "priority": "P0",
       "shipped": true,
       "props": {
+        "children": {
+          "kind": "slot",
+          "description": "DataTable frame and compound section content."
+        },
+        "interactive": {
+          "kind": "boolean",
+          "default": false,
+          "description": "DataTable frame hover/focus styling; adds no activation handler."
+        },
         "state": {
           "kind": "enum",
           "values": [
@@ -6635,42 +6644,48 @@
             "selection",
             "empty",
             "loading"
-          ]
-        },
-        "breakpoint": {
-          "kind": "enum",
-          "values": [
-            "desktop",
-            "mobile"
-          ]
-        },
-        "children": {
-          "kind": "slot",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          ],
+          "description": "DataTable defaults to default. DataGrid derives empty/selection/default when omitted; explicit loading/empty shows supplied content."
         },
         "columns": {
           "kind": "collection",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "description": "DataGrid columns; header accepts Renderable, headerLabel supplies mobile text, sort describes native aria-sort, width sets tracks and cell is strong or num."
         },
         "rows": {
           "kind": "collection",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "description": "DataGrid rows retain data/id/selected snapshots and mutually exclusive onSelect/href. Optional row label names its native activation."
+        },
+        "label": {
+          "kind": "text",
+          "description": "DataGrid native table accessible name."
         },
         "selectedIds": {
           "kind": "collection",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "description": "Controlled row identities; stale IDs do not inflate the visible count."
         },
         "onSelectionChange": {
           "kind": "callback",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "description": "Receives a complete next selection set; refusal preserves physical checkbox checked/mixed properties."
         },
         "renderBulkActions": {
-          "kind": "slot",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "kind": "callback",
+          "description": "DataGrid callback receiving visible count, selectedIds and clearSelection; its returned content sits outside the table."
         },
         "renderRowActions": {
+          "kind": "callback",
+          "description": "DataGrid callback receiving data and row/selected context; returned controls are independent of row activation."
+        },
+        "empty": {
           "kind": "slot",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "description": "DataGrid caller-owned empty content in one spanning native cell; absent content stays empty."
+        },
+        "loading": {
+          "kind": "slot",
+          "description": "DataGrid caller-owned loading content in one spanning native cell; absent content stays empty with aria-busy."
+        },
+        "Row.cols": {
+          "kind": "text",
+          "description": "DataTable.Row native grid track value; preserves native string or object styles."
         }
       },
       "parts": [
@@ -6679,63 +6694,75 @@
         },
         {
           "name": "header",
-          "when": "when the corresponding content or subcomponent is supplied"
-        },
-        {
-          "name": "bulk-actions",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "the corresponding DataTable section or DataGrid structure is supplied"
         },
         {
           "name": "body",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "the corresponding DataTable section or DataGrid structure is supplied"
         },
         {
           "name": "row",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "the corresponding DataTable section or DataGrid structure is supplied"
         },
         {
           "name": "footer",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "the corresponding DataTable section or DataGrid structure is supplied"
         },
         {
           "name": "table",
-          "when": "when the corresponding content or subcomponent is supplied"
-        },
-        {
-          "name": "cell",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "DataGrid is supplied"
         },
         {
           "name": "head",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
-        },
-        {
-          "name": "selection",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "when": "DataGrid is supplied"
         },
         {
           "name": "header-cell",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "when": "DataGrid is supplied"
+        },
+        {
+          "name": "cell",
+          "when": "DataGrid is supplied"
+        },
+        {
+          "name": "bulk-actions",
+          "when": "visible selected rows and renderBulkActions are supplied outside empty/loading states"
+        },
+        {
+          "name": "selection",
+          "when": "DataGrid selection controls are enabled"
+        },
+        {
+          "name": "actions",
+          "when": "renderRowActions supplies a cell"
         },
         {
           "name": "row-action",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "when": "a row has onSelect"
         },
         {
-          "name": "row-actions",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "name": "row-link",
+          "when": "a row has href"
         },
         {
-          "name": "cell-link",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "name": "cell-strong",
+          "when": "a column uses cell=strong"
         },
         {
-          "name": "cell-value",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "name": "cell-num",
+          "when": "a column uses cell=num"
         },
         {
-          "name": "footer-action",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "name": "cell-label",
+          "when": "a DataGrid cell supplies its noninteractive mobile label"
+        },
+        {
+          "name": "empty",
+          "when": "the empty state supplies its spanning content cell"
+        },
+        {
+          "name": "loading",
+          "when": "the loading state supplies its spanning content cell"
         }
       ],
       "attributes": {
@@ -6746,7 +6773,6 @@
             "empty",
             "loading"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
           "compatibilityValues": [
             "rest",
             "selected"
@@ -6754,28 +6780,108 @@
           "parts": [
             "root",
             "row"
-          ]
+          ],
+          "description": "Root presentation state; selected is the retained visual row snapshot. Native checkboxes own live selection semantics."
         },
-        "data-breakpoint": {
+        "data-type": {
           "values": [
-            "desktop",
-            "mobile"
-          ]
+            "header",
+            "button",
+            "link"
+          ],
+          "parts": [
+            "row"
+          ],
+          "description": "Header row or the kind of native row activation; plain rows omit it."
+        },
+        "data-interactive": {
+          "values": [
+            "true"
+          ],
+          "parts": [
+            "root",
+            "row"
+          ],
+          "description": "Present only for an interactive frame or native row action/link."
+        },
+        "data-variant": {
+          "values": [
+            "strong",
+            "num"
+          ],
+          "parts": [
+            "cell"
+          ],
+          "description": "Existing public DataGrid cell treatments; unstyled cells omit the axis."
         }
       },
-      "booleans": [],
-      "slots": [],
-      "apg": "native rows and action controls",
-      "keyboard": [],
+      "booleans": [
+        "interactive"
+      ],
+      "slots": [
+        {
+          "name": "children",
+          "part": "root"
+        },
+        {
+          "name": "Header.children",
+          "part": "header"
+        },
+        {
+          "name": "Body.children",
+          "part": "body"
+        },
+        {
+          "name": "Row.children",
+          "part": "row"
+        },
+        {
+          "name": "Footer.children",
+          "part": "footer"
+        },
+        {
+          "name": "empty",
+          "part": "empty"
+        },
+        {
+          "name": "loading",
+          "part": "loading"
+        }
+      ],
+      "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/table/",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Visit independent native child controls in source order; static table cells and rows add no tab stop."
+        },
+        {
+          "key": "Enter",
+          "action": "Activate the focused native row link/button or caller-owned action; child activation never activates its row."
+        },
+        {
+          "key": "Space",
+          "action": "Activate the focused native button or checkbox; selection and action controls never trigger row activation."
+        }
+      ],
       "tokenRoles": [
         "space/card/padding",
-        "space/inline/gap"
+        "space/inline/gap",
+        "surface/card",
+        "surface/hover",
+        "surface/selected",
+        "border/default",
+        "text/fg",
+        "text/muted",
+        "border/ring"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them.",
-        "DataTable has compound slots; DataGrid is its rows/columns-driven package presentation. Native row links/buttons retain Tab/Enter/Space behavior, without an ARIA grid navigation claim.",
-        "Utility compatibility anatomy is included for existing shipped helpers; it does not implement a design gap.",
-        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
+        "DataTable is the copied composition frame; DataGrid is its package rows/columns presentation under the same canonical identity. A frame may intentionally contain an independently rendered DataGrid root.",
+        "The audit replaces role=grid without grid navigation and whole-button/anchor role=row with a native table and independent native actions. Caller callback/data APIs are retained; there is no grid keyboard manager.",
+        "Native DOM attributes pass through. DataTable owns its frame state without leaking Card size/variant axes; selected row snapshots keep data-state, while checkboxes own checked/mixed state.",
+        "Header strings remain valid. The widened Renderable header port requires readers to narrow before string operations; headerLabel supplies plain mobile text without duplicating controls.",
+        "Responsive mobile cards use native CSS and retain visible header controls, not a breakpoint prop or serialized data-breakpoint axis.",
+        "Research-only row-actions/cell-link/cell-value/footer-action anatomy is replaced by the actual actions/row-link/row-action and cell content parts emitted by these public surfaces.",
+        "Sorting, filtering, paging, row data and empty/loading content remain caller-owned. No engine or sample rows are synthesized."
       ]
     },
     {

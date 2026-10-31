@@ -1,3 +1,4 @@
+import { DataTableExamples } from './gap-data-table-fixture.tsx';
 import { StatsGrids } from './gap-stats-grid-fixture.tsx';
 import { ShellExamples } from './gap-shell-fixture.tsx';
 import SidebarToggle from '../../packages/fresh-ui/registry/islands/SidebarToggle.tsx';
@@ -85,6 +86,8 @@ function Actions() {
 }
 if (location.pathname === '/shell-static') {
   hydrate(<SidebarToggle />, document.getElementById('standalone-toggle')!);
+} else if (location.pathname === '/data-table') {
+  render(<DataTableExamples />, document.getElementById('app')!);
 } else if (location.pathname === '/stats-grid') {
   render(<StatsGrids />, document.getElementById('app')!);
 } else if (location.pathname === '/shell') {

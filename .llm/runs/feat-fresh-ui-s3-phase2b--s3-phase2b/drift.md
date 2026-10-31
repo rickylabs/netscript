@@ -72,3 +72,6 @@ Recovery6 stacked integration: parent71d8df6f on main7feb24c7 is independently v
 
 
 9c-b audit is split into complete9c-b1StatsGrid and9c-b2DataTableDataGrid units to keep each source review under30files. Same approved scope and remaining obligations; no feature removed.
+
+
+9c-b2 nativepointerproof:ControlOrMeta primarybodyclick opensnativeTab, but forwardedauxclick fails browserdefaultnavigation becauseitissynthetic. Applytheindependentreviewerexplicitfallback:stopforwardingauxiliarybodyclicks, showactualnativeactivationarrow, middle-click/contextmenuonthatvisiblelinkremainnative. No customnavigationengine/windowopen; plain/modifiedprimarybodyclick/textselection/nativekeys preserved. READMErecordscompatibilitydetail. This is an implementation refinement withinapprovedpointerreview, not a test waiver.

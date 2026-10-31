@@ -1,35 +1,217 @@
-/* DataTable block styles. Host-agnostic: every layout rule the block needs
-   lives here so it renders identically with or without a utility framework. */
-
-.ns-data-table {
+/* The copied frame and package DataGrid share this registered stylesheet. */
+.ns-card.ns-data-table {
+  min-width: 0;
   overflow: hidden;
+  border: 0;
+  border-block-start: var(--ns-border-width) solid var(--ns-border);
+  border-radius: 0;
+  background: var(--ns-card);
+  box-shadow: none;
 }
-
-/* Combines with .ns-card__header, which is a flex column for stacked
-   title/description; reset the axis explicitly for the table header rail. */
-.ns-data-table__header {
+.ns-card.ns-data-table > .ns-data-table__header {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: var(--ns-space-3) var(--ns-space-4);
+  gap: var(--ns-inline-gap, var(--ns-space-3));
+  padding: var(--ns-card-padding) 0;
+  border: 0;
 }
-
+.ns-data-table__body {
+  min-width: 0;
+}
 .ns-data-table__body > * + * {
-  border-top: 1px solid var(--ns-border);
+  border-top: var(--ns-border-width) solid var(--ns-border);
 }
-
 .ns-data-table__row {
   display: grid;
   align-items: center;
   gap: var(--ns-space-4);
   padding: var(--ns-space-4) var(--ns-space-5);
 }
-
 .ns-data-table__footer {
-  border-top: 1px solid var(--ns-border);
-  padding: var(--ns-space-4) var(--ns-space-5);
+  border-top: var(--ns-border-width) solid var(--ns-border);
+  padding: var(--ns-card-padding) 0;
+}
+.ns-data-grid {
+  container-type: inline-size;
+  container-name: ns-data-grid;
+  min-width: 0;
+  overflow-x: auto;
+  color: var(--ns-fg);
+}
+.ns-data-grid__table {
+  display: block;
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+  font-size: var(--ns-text-small, var(--ns-text-sm));
+}
+.ns-data-grid__head,
+.ns-data-grid__body {
+  display: block;
+}
+.ns-data-grid__row {
+  display: grid;
+  position: relative;
+  isolation: isolate;
+  align-items: center;
+  min-width: 0;
+  gap: var(--ns-inline-gap, var(--ns-space-3));
+  border-block-end: var(--ns-border-width) solid var(--ns-border);
+  padding: var(--ns-space-2) 0;
+}
+.ns-data-grid__header-cell,
+.ns-data-grid__cell,
+.ns-data-grid__selection,
+.ns-data-grid__actions {
+  display: block;
+  min-width: 0;
+  padding: var(--ns-space-1) var(--ns-space-2);
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+.ns-data-grid__header-cell {
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  font-weight: var(--ns-weight-label, 500);
+  color: var(--ns-muted-fg);
+}
+.ns-data-grid__cell-num {
+  font-family: var(--ns-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.ns-data-grid__cell[data-variant='num'] {
+  text-align: end;
+}
+.ns-data-grid__cell-strong {
+  font-weight: var(--ns-weight-strong, 600);
+}
+.ns-data-grid__cell-label {
+  display: none;
+}
+.ns-data-grid__row[data-interactive='true'] {
+  cursor: pointer;
+}
+.ns-data-grid__row[data-interactive='true']:hover {
+  background: var(--ns-hover);
+}
+.ns-data-grid__row[data-state='selected'] {
+  background: var(--ns-selected);
+}
+.ns-data-grid__row-action,
+.ns-data-grid__row-link {
+  display: inline-flex;
+  position: static;
+  align-items: center;
+  vertical-align: middle;
+  width: 1em;
+  height: 1em;
+  padding: 0;
+  margin: 0;
+  margin-inline-start: var(--ns-space-2);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  appearance: none;
+  line-height: 0;
+  outline: none;
+  user-select: text;
+}
+.ns-data-grid__row-action::after,
+.ns-data-grid__row-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.ns-data-grid__row-action:focus-visible::after,
+.ns-data-grid__row-link:focus-visible::after {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: -2px;
+}
+/* Caller controls stay above the row's native activation hit area, including
+   controls in the first cell. No arbitrary cell renderer is nested in a button. */
+.ns-data-grid__cell :is(a, button, input, select, textarea, summary, [tabindex], [contenteditable]):not(.ns-data-grid__row-action):not(.ns-data-grid__row-link),
+.ns-data-grid__selection input,
+.ns-data-grid__actions :is(a, button, input, select, textarea, summary, [tabindex]) {
+  position: relative;
+  z-index: 1;
+}
+.ns-data-grid__selection input {
+  accent-color: var(--ns-primary);
+}
+.ns-data-grid__bulk-actions {
+  margin-block: var(--ns-space-2);
+  padding: var(--ns-space-2) var(--ns-space-3);
+  background: var(--ns-muted);
+}
+.ns-data-grid__action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ns-inline-gap, var(--ns-space-3));
+}
+.ns-data-grid__status-row {
+  display: block;
+}
+.ns-data-grid__status {
+  display: block;
+  padding: var(--ns-card-padding);
+}
+
+@container ns-data-grid (max-width: 640px) {
+  .ns-data-grid__head > .ns-data-grid__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ns-space-2);
+  }
+  /* Keep real header controls in view; hide only static duplicate column labels. */
+  .ns-data-grid__head th:not(:has(:is(a, button, input, select, textarea, summary, [tabindex]))) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .ns-data-grid__body > .ns-data-grid__row {
+    grid-template-columns: 2.5rem minmax(0, 1fr) auto !important;
+    gap: var(--ns-space-1) 0;
+  }
+  .ns-data-grid__body > .ns-data-grid__row:not(:has(> .ns-data-grid__selection)) {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+  }
+  .ns-data-grid__body .ns-data-grid__selection {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .ns-data-grid__body .ns-data-grid__actions {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .ns-data-grid__body .ns-data-grid__cell {
+    grid-column: 2;
+    text-align: start;
+  }
+  .ns-data-grid__body > .ns-data-grid__row:not(:has(> .ns-data-grid__selection)) > .ns-data-grid__cell {
+    grid-column: 1;
+  }
+  .ns-data-grid__body > .ns-data-grid__row:not(:has(> .ns-data-grid__selection)) > .ns-data-grid__actions {
+    grid-column: 2;
+  }
+  .ns-data-grid__cell-label:not(:empty) {
+    display: inline-block;
+    margin-inline-end: var(--ns-space-2);
+    font-family: var(--ns-font-mono);
+    font-size: var(--ns-text-2xs);
+    color: var(--ns-muted-fg);
+  }
 }
 
 /* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */

@@ -77,6 +77,8 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
       'The installer must contribute its runtime package mapping; local subpath aliases cannot prove that.',
     );
     // Compile the unreleased local API only after proving the production root mapping was installed.
+    installedConfig.imports['@netscript/fresh-ui'] =
+      toFileUrl(join(repo, 'packages/fresh-ui/mod.ts')).href;
     installedConfig.imports['@netscript/fresh-ui/interactive'] =
       toFileUrl(join(repo, 'packages/fresh-ui/interactive.ts')).href;
     installedConfig.imports['@netscript/fresh-ui/primitives'] =
@@ -133,7 +135,10 @@ import { Direction } from './components/ui/direction.tsx';
 import { Resizable } from './components/ui/resizable.tsx';
 import { SidebarShell } from './components/ui/sidebar-shell.tsx';
 import { StatsGrid } from './components/ui/stats-grid.tsx';
+import { DataTable } from './components/ui/data-table.tsx';
+import { DataGrid } from '@netscript/fresh-ui';
 console.log(JSON.stringify({
+  'data-table': render(<DataTable state='default'><DataTable.Header>Orders</DataTable.Header><DataTable.Body><DataGrid label='Orders' columns={[{key:'name',header:<button type='button'>Sort name</button>,headerLabel:'Name',sort:'ascending',cell:'strong'}]} rows={[{id:'one',data:{name:'First order'},href:'/orders/one',label:'Read first order'}]} /></DataTable.Body><DataTable.Footer><a href='#next-orders'>Next orders</a></DataTable.Footer></DataTable>),
   'stats-grid': render(<StatsGrid columns={3} joined><StatsGrid.Card label='Revenue' value='$284,920' detail='+8.2% versus the previous period' delta='up' variant='hero' badge={<button type='button'>Inspect revenue</button>} /></StatsGrid>),
   'sidebar-shell': render(<SidebarShell layout='docs' pathname='/orders' navigation={[{label:'Work',items:[{href:'/orders',label:'Orders',count:'12'}]}]} brand={<a href='/'>NetScript</a>} rail railContent={<a href='#installation'>Installation</a>} mobileRailContent={<details><summary>On this page</summary>Contents</details>}><h1>Orders</h1></SidebarShell>),
   resizable: render(<Resizable label='Contents' startContent={<button type='button'>Open chapter</button>} endContent={<a href='#chapter'>Read chapter</a>} style={{height: 240}} />),

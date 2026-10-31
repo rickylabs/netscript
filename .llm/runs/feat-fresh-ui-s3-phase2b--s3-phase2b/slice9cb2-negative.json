@@ -1,0 +1,11 @@
+{
+  "sourcePredecessor": "af52a0e76686ea0ef0fbcfde6db50f1ac4872a5e",
+  "productionFixApplied": false,
+  "scenario": "data-table/child-checkbox-space-isolation",
+  "browser": "Chromium Utility light390",
+  "rawExitCode": 1,
+  "expectedFailedCases": 1,
+  "expectedRowActivations": 0,
+  "actualRowActivations": 1,
+  "verdict": "EXPECTED_FAILURE_REPRODUCED"
+}

@@ -9,6 +9,9 @@ export const DATA_GRID_CELL_VARIANTS = ['strong', 'num'] as const;
  */
 export type DataGridCellVariant = typeof DATA_GRID_CELL_VARIANTS[number];
 
+/** Body presentation; the host owns the rows and any empty or loading content. */
+export type DataGridState = 'default' | 'selection' | 'empty' | 'loading';
+
 /**
  * Structural node returned by `DataGrid`.
  */
@@ -49,9 +52,13 @@ export interface DataGridColumn<T> {
    */
   readonly key: string;
   /**
-   * Visible column header.
+   * Visible column header, including a caller-owned native sort control.
    */
-  readonly header: string;
+  readonly header: DataGridRenderable;
+  /** Mobile cell label; defaults to a string header, otherwise the column key. */
+  readonly headerLabel?: string;
+  /** Native header sort state; the host owns ordering and the header control. */
+  readonly sort?: 'none' | 'ascending' | 'descending' | 'other';
   /**
    * CSS grid track width for the column, such as `2fr` or `minmax(0, 12rem)`.
    */
@@ -118,9 +125,11 @@ export type DataGridRow<T> =
      */
     readonly selected?: boolean;
     /**
-     * Click handler that renders the row as a button.
+     * Click handler for the native row activation button and row body hit area.
      */
     readonly onSelect: () => void;
+    /** Accessible activation name; defaults to `Open row <id>`. */
+    readonly label?: string;
     readonly href?: never;
   }
   | {
@@ -137,9 +146,11 @@ export type DataGridRow<T> =
      */
     readonly selected?: boolean;
     /**
-     * Destination that renders the row as a Fresh client-navigation link.
+     * Destination for the native row link and its row body hit area.
      */
     readonly href: string;
+    /** Accessible activation name; defaults to `Open row <id>`. */
+    readonly label?: string;
     readonly onSelect?: never;
   };
 
@@ -163,6 +174,12 @@ export interface DataGridProps<T> {
    * Accessible label for the grid region.
    */
   readonly label?: string;
+  /** Omit to derive empty, selection or default from the supplied rows and selection. */
+  readonly state?: DataGridState;
+  /** Caller-owned content in the spanning empty cell; absent content stays empty. */
+  readonly empty?: DataGridRenderable;
+  /** Caller-owned content in the spanning loading cell; absent content stays empty. */
+  readonly loading?: DataGridRenderable;
   /** Controlled selected row identities. Supplying this enables selection chrome. */
   readonly selectedIds?: ReadonlySet<string>;
   /** Receives the complete next controlled selection set. */

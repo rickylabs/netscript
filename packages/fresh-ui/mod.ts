@@ -33,6 +33,7 @@ export {
   type DataGridRow,
   type DataGridRowActionContext,
   type DataGridSelectionContext,
+  type DataGridState,
 } from './src/presentation/data-grid.tsx';
 export {
   getToast,

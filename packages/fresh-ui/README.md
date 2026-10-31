@@ -110,7 +110,7 @@ type Session = { name: string; tokens: number; status: string };
 />;
 ```
 
-Controlled collection actions are opt-in; omitting these props preserves the legacy grid markup:
+Controlled collection actions are opt-in; omitting these props keeps the existing caller data and callback shape:
 
 ```tsx
 import { DataGrid } from '@netscript/fresh-ui';
@@ -332,3 +332,77 @@ enable the corresponding content with value `1`, using native CSS style queries.
 browsers without style-query support hide these decorations with no layout space. Utility disables
 all three. No series, fetching or chart engine is synthesized. Grid, borders, surfaces and typography
 consume the existing KPI/theme roles; no token values change.
+
+### DataTable composition and native DataGrid
+
+`ui:add data-table` installs the copied frame and the stylesheet that also styles package `DataGrid`.
+Importing `DataGrid` from the package alone does not install CSS. A frame-only installation leaves
+the package optional: use `deno add jsr:@netscript/fresh-ui` when consuming package `DataGrid`; the
+static copied frame does not require or create that package mapping. Both remain the same canonical
+DataTable identity: use `DataTable.Header`, `.Body` and `.Footer` to compose host-owned controls,
+with a `DataGrid` inside the body. The frame's `state` defaults to `default`; it also accepts
+`selection`, `empty` and `loading`. Loading exposes native busy state. `DataTable.Row` keeps its
+optional `cols` grid template and preserves native string or object styles.
+
+```tsx
+import { DataGrid } from '@netscript/fresh-ui';
+import { DataTable } from './components/ui/data-table.tsx';
+
+<DataTable>
+  <DataTable.Header>Recent sessions</DataTable.Header>
+  <DataTable.Body>
+    <DataGrid
+      label='Recent sessions'
+      columns={[
+        { key: 'name', header: 'Session', cell: 'strong' },
+        { key: 'tokens', header: 'Tokens', cell: 'num' },
+      ]}
+      rows={[{
+        id: 'vs3',
+        label: 'Open session VS3',
+        data: { name: 'VS3', tokens: 18420 },
+        href: '/sessions/vs3',
+      }]}
+    />
+  </DataTable.Body>
+  <DataTable.Footer>Caller-owned pagination</DataTable.Footer>
+</DataTable>;
+```
+
+DataGrid uses a native table containing independent native controls. Tab/Shift+Tab move through
+buttons, links and checkboxes; Enter activates buttons and links, Space activates buttons and
+checkboxes. It adds no grid focus manager. Row activation is a native button (`onSelect`) or Fresh
+link (`href`) inside a cell, with primary body clicks forwarded to that native control. Arbitrary caller-rendered cell content
+is its sibling, so cell links, inputs and row actions keep their own behavior. A row's optional
+`label` names this activation and can localize the fallback `Open row <id>`. Control/Meta primary body clicks use the owned native link with a temporary new-tab target,
+restored after activation. Shift, Alt and combined-modifier body clicks are not forwarded; use the
+visible native link for those operations. Body clicks are delegated activations; direct controls
+retain raw native event semantics. Middle-click and the native link
+context menu are available directly on the visible row-link arrow; auxiliary body clicks are not
+forwarded. Native text selection stays available. Control/Meta body clicks on `onSelect` rows activate their
+button normally. Selection and action cells retain their existing click-propagation isolation; other
+independent controls keep their native behavior. The serialized `aria-checked` hint remains for
+compatibility and updates with the same accepted render as the authoritative native checked and
+indeterminate properties. Selection checked and
+mixed properties are controlled; refusing `onSelectionChange` preserves the actual checkbox state.
+`selected` row snapshots remain available without a controlled set, and stale IDs do not inflate
+the visible selected count.
+
+`DataGridColumn.header` now accepts the existing `DataGridRenderable` type, including a native sort
+button. `sort` sets `aria-sort` on the native column header; the caller owns ordering and state.
+`headerLabel` supplies a noninteractive mobile cell label and defaults to a string header or the
+column key. Narrow containers stack rows while keeping header controls reachable, including inside a wide viewport.
+
+DataGrid's optional `state` accepts the exported `DataGridState` union: `default`, `selection`,
+`empty` or `loading`. When omitted it derives empty from no rows, selection from visible selected
+rows, otherwise default. The `empty` and `loading` ports accept caller-owned content in a spanning
+cell; absent content stays empty. Loading exposes `aria-busy`. Compose existing Skeleton, EmptyState,
+filters, menus and Pagination as needed. DataGrid fetches no data and implements no backend sorting,
+filtering, paging or editing.
+
+Compatibility: the audit preserves the caller data/callback API while correcting the old
+`role=grid` without grid navigation and whole-row button/link elements carrying `role=row`.
+Rows now contain real native actions, and selection lives on checkboxes rather than unsupported
+`aria-selected` on static table rows. Consumers that inspect `column.header` as a string should
+narrow it before string operations, or use `headerLabel`. Keep stylesheet imports from `ui:add`
+to receive both the frame and package presentation styles.
