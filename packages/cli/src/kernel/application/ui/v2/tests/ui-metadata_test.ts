@@ -106,3 +106,60 @@ Deno.test('staging exposes planned bytes but preflights every destination before
   await plan.commit();
   assertEquals(await fs.readFile('/app/one.ts'), 'one');
 });
+
+Deno.test('registry URL diagnostics distinguish query strings, fragments and credentials without reflecting secrets', () => {
+  for (
+    const [suffix, message] of [
+      ['?token=private-query', 'Registry URLs must not contain a query string'],
+      ['#private-fragment', 'Registry URLs must not contain a fragment'],
+      ['?token=private-query#private-fragment', 'Registry URLs must not contain a query string'],
+    ]
+  ) {
+    const error = assertThrows(
+      () => uiRegistryUrl(`https://example.com/r/x.json${suffix}`),
+      Error,
+      message,
+    );
+    assertEquals(error.message, message);
+  }
+  const error = assertThrows(
+    () =>
+      uiRegistryUrl(
+        'https://user:private-password@example.com/r/x.json?private-query#private-fragment',
+      ),
+    Error,
+    'Registry credentials belong in environment-backed headers, not URLs',
+  );
+  assertEquals(
+    error.message,
+    'Registry credentials belong in environment-backed headers, not URLs',
+  );
+});
+
+Deno.test('configured registry sources preserve distinct URL diagnostics without reflecting secrets', () => {
+  for (
+    const [url, message] of [
+      [
+        'https://example.com/r/{name}.json?private-query',
+        'Registry URLs must not contain a query string',
+      ],
+      [
+        'https://example.com/r/{name}.json#private-fragment',
+        'Registry URLs must not contain a fragment',
+      ],
+      [
+        'https://user:private-password@example.com/r/{name}.json',
+        'Registry credentials belong in environment-backed headers, not URLs',
+      ],
+      ['https://private-password@', 'Invalid registry URL'],
+    ]
+  ) {
+    for (const source of [url, { url }, { url: 'https://example.com/r/{name}.json', index: url }]) {
+      const result = UiConfigSchema.safeParse({ registries: { '@acme': source } });
+      assertEquals(result.success, false);
+      if (result.success) throw new Error('Expected invalid registry config');
+      assertStringIncludes(result.error.message, message);
+      assertEquals(result.error.message.includes('private-'), false);
+    }
+  }
+});

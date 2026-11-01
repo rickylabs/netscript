@@ -215,23 +215,10 @@ Keep the page to its own content:
 - Never copy a header, navigation, or `ThemeToggle` into a page. Duplicated chrome drifts and breaks
   client navigation. Edit `navigation.ts` or `_layout.tsx` instead.
 
-## Upgrade an app scaffolded before tokens v2
+## Upgrade an older app
 
-Older apps keep working. `[data-theme='dark']` and `[data-theme='light']` still resolve NS One, and
-every earlier `--ns-*` property remains. To adopt the new attributes:
-
-1. Move hand edits in `assets/tokens.css` into the override file where the alias layer can hold
-   them. Applying a preset replaces the generated files.
-2. Run `netscript ui:apply --preset ns-one` to generate `theme-preset.json` and `fonts.json` for
-   the earlier look.
-3. Update `routes/_app.tsx` and `lib/theme.ts` to match a new scaffold: stamp `data-theme`,
-   `data-density`, and `data-flavor` on `<html>`, link the fonts, and make the preference script
-   set `data-scheme`, keeping the `ns-theme` key. Update `ThemeToggle` and the light
-   `color-scheme` selector the same way.
-4. Run `netscript ui:update` to merge registry copies. It lists files you edited for a manual merge.
-5. Switch presets with `netscript ui:apply --preset studio-utility`.
-
-Component copies from 0.0.8 also need `netscript ui:migrate variants`. Preview it with `--dry-run`.
+See [Upgrade an app to tokens v2](/web-layer/how-to/upgrade-tokens-v2/) to adopt the theme
+attributes and migrate earlier component copies.
 
 ## Check your work
 

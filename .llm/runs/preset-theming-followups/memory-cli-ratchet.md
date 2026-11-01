@@ -1,0 +1,3 @@
+# CLI CI ratchet
+
+Root lint/fmt wrappers exclude packages/cli even when the CLI is explicitly selected. `quality:cli` uses `.llm/tools/quality/cli-quality.deno.json` (same root rules, no exclusion) and exact SHA-256 baseline files. Baseline: 29 lint files / 50 occurrences, 163 fmt files. Current wrapper selections: 1253 lint and 1119 fmt, zero dropped files/refusals, all green. Edits remove exemptions automatically; new bad lint, new bad format, changed debt, parser crashes and empty selection are covered with real wrapper subprocesses in isolated fixtures. Hosted quality runs the allowlisted cli-quality gate and uploads its receipt; local ci:quality includes it too.

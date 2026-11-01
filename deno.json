@@ -28,7 +28,8 @@
         "deps:check",
         "deps:check:ai-peers",
         "check:netscript-jsr-specifiers",
-        "check:aspire-host-ports"
+        "check:aspire-host-ports",
+        "quality:cli"
       ]
     },
     "check": {
@@ -189,7 +190,8 @@
     "docs:tagline:check": "deno run --no-lock --allow-read .llm/tools/validation/check-jsr-tagline-length.ts --pretty",
     "arch:check": "deno task deps:check && deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots",
     "arch:check:repo": "deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots",
-    "deps:check:db": "deno run --allow-read --allow-write --allow-env --allow-run .llm/tools/deps/check-db-alignment.ts"
+    "deps:check:db": "deno run --allow-read --allow-write --allow-env --allow-run .llm/tools/deps/check-db-alignment.ts",
+    "quality:cli": "deno run --allow-read --allow-write --allow-run .llm/tools/quality/cli-quality.ts"
   },
   "imports": {
     "@harness/matrix": "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/delegation-matrix.ts",
@@ -201,7 +203,8 @@
     "@std/testing": "jsr:@std/testing@^1",
     "@std/http/cookie": "jsr:@std/http@^1/cookie",
     "@std/semver": "jsr:@std/semver@^1",
-    "@std/path": "jsr:@std/path@1"
+    "@std/path": "jsr:@std/path@1",
+    "zod": "catalog:"
   },
   "compilerOptions": {
     "strict": true,

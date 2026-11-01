@@ -80,6 +80,30 @@ Deno.test('name, mode, type and cycle failures cause zero Figma mutations', asyn
   assertEquals(api.mutations, 0);
 });
 
+Deno.test('indexed import rejects duplicate existing identities and incompatible types before mutation', async () => {
+  for (const failure of ['collection', 'variable', 'type']) {
+    const api = fixtureFigma(collections);
+    const collection = api.collections[0];
+    const variable = api.variables[0];
+    if (failure === 'collection') api.collections.push({ ...collection, id: 'duplicate' });
+    if (failure === 'variable') api.variables.push({ ...variable, id: 'duplicate' });
+    if (failure === 'type') {
+      api.variables[0] = {
+        ...variable,
+        resolvedType: variable.resolvedType === 'COLOR' ? 'FLOAT' : 'COLOR',
+      };
+    }
+    await assertRejects(
+      () => importSnapshot(api, collections),
+      Error,
+      failure === 'collection'
+        ? 'Ambiguous Figma collection'
+        : 'Incompatible existing Figma variable',
+    );
+    assertEquals(api.mutations, 0);
+  }
+});
+
 Deno.test('Scheme + Theme proof changes only values in the complete portable registry item', () => {
   const baseline = themeItem(collections, 'studio-utility');
   const changed = themeItem(modifiedFixture(collections), 'studio-utility');

@@ -15,11 +15,29 @@ export async function importSnapshot(api: FigmaVariablesPort, input: unknown): P
   assertFigmaAliasCycles(collections);
   const existingCollections = await api.getLocalVariableCollectionsAsync();
   const existingVariables = await api.getLocalVariablesAsync();
+  // Index once while retaining duplicate candidates for the no-mutation compatibility preflight.
+  const collectionsByName = new Map<string, CollectionHandle[]>();
+  for (const collection of existingCollections) {
+    const matches = collectionsByName.get(collection.name) ?? [];
+    matches.push(collection);
+    collectionsByName.set(collection.name, matches);
+  }
+  const variablesByCollection = new Map<string, Map<string, VariableHandle[]>>();
+  for (const variable of existingVariables) {
+    let byName = variablesByCollection.get(variable.variableCollectionId);
+    if (!byName) {
+      byName = new Map();
+      variablesByCollection.set(variable.variableCollectionId, byName);
+    }
+    const matches = byName.get(variable.name) ?? [];
+    matches.push(variable);
+    byName.set(variable.name, matches);
+  }
   const handles = new Map<string, CollectionHandle>();
   const variables = new Map<string, VariableHandle>();
   // Existing mode and type incompatibilities must fail before creating even one collection.
   for (const collection of collections) {
-    const matching = existingCollections.filter((entry) => entry.name === collection.collection);
+    const matching = collectionsByName.get(collection.collection) ?? [];
     if (matching.length > 1) {
       throw new Error(`Ambiguous Figma collection: ${collection.collection}`);
     }
@@ -30,9 +48,7 @@ export async function importSnapshot(api: FigmaVariablesPort, input: unknown): P
         JSON.stringify(collection.modes.slice(0, handle.modes.length))
     ) throw new Error(`Incompatible existing Figma modes: ${collection.collection}`);
     for (const variable of collection.variables) {
-      const matches = existingVariables.filter((entry) =>
-        entry.variableCollectionId === handle.id && entry.name === variable.name
-      );
+      const matches = variablesByCollection.get(handle.id)?.get(variable.name) ?? [];
       if (matches.length > 1 || matches[0] && matches[0].resolvedType !== variable.type) {
         throw new Error(
           `Incompatible existing Figma variable: ${collection.collection}/${variable.name}`,
@@ -41,7 +57,7 @@ export async function importSnapshot(api: FigmaVariablesPort, input: unknown): P
     }
   }
   for (const collection of collections) {
-    let handle = existingCollections.find((entry) => entry.name === collection.collection);
+    let handle = collectionsByName.get(collection.collection)?.[0];
     if (!handle) {
       handle = api.createVariableCollection(collection.collection);
       handle.renameMode(handle.modes[0].modeId, collection.modes[0]);
@@ -51,9 +67,7 @@ export async function importSnapshot(api: FigmaVariablesPort, input: unknown): P
     }
     handles.set(collection.collection, handle);
     for (const variable of collection.variables) {
-      const entry = existingVariables.find((entry) =>
-        entry.variableCollectionId === handle.id && entry.name === variable.name
-      ) ??
+      const entry = variablesByCollection.get(handle.id)?.get(variable.name)?.[0] ??
         api.createVariable(variable.name, handle, variable.type);
       variables.set(`${collection.collection}/${variable.name}`, entry);
     }

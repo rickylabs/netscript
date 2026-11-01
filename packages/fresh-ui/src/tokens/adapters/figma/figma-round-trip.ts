@@ -13,6 +13,21 @@ import {
   type FigmaTokenBundle,
   figmaVariableResolver,
 } from '../../domain/figma/figma-token-bundle.ts';
+// Shared transport validators are immutable across colors and modes.
+const SrgbColorSchema = z.object({
+  colorSpace: z.literal('srgb'),
+  components: z.tuple([
+    z.number().min(0).max(1),
+    z.number().min(0).max(1),
+    z.number().min(0).max(1),
+  ]),
+  alpha: z.number().min(0).max(1),
+  hex: z.string().optional(),
+});
+const SourceColorExtensionSchema = z.object({
+  netscript: z.object({ oklch: z.object({ sourceHex: z.string().optional() }) }),
+});
+
 /** Convert a complete variable snapshot to DTCG 2025.10, retaining oklch in extensions. */
 export function exportFigmaTokenBundle(input: readonly FigmaCollection[]): FigmaTokenBundle {
   const collections = validateFigmaSnapshot(input);
@@ -114,24 +129,14 @@ export function importFigmaTokenBundle(input: unknown): readonly FigmaCollection
           return [mode, value === 1];
         }
         if (variable.type !== 'COLOR') return [mode, value];
-        const color = z.object({
-          colorSpace: z.literal('srgb'),
-          components: z.tuple([
-            z.number().min(0).max(1),
-            z.number().min(0).max(1),
-            z.number().min(0).max(1),
-          ]),
-          alpha: z.number().min(0).max(1),
-          hex: z.string().optional(),
-        }).parse(value);
+        const color = SrgbColorSchema.parse(value);
         const channels = [
           ...color.components.map((channel) => Math.round(channel * 255)),
           ...(color.alpha === 1 ? [] : [Math.round(color.alpha * 255)]),
         ];
         const hex = '#' + channels.map((channel) => channel.toString(16).padStart(2, '0')).join('');
-        const sourceHex = z.object({
-          netscript: z.object({ oklch: z.object({ sourceHex: z.string().optional() }) }),
-        }).safeParse(token.$extensions).data?.netscript.oklch.sourceHex;
+        const sourceHex = SourceColorExtensionSchema.safeParse(token.$extensions).data?.netscript
+          .oklch.sourceHex;
         return [mode, sourceHex === hex + 'ff' ? sourceHex : hex];
       })),
     })),

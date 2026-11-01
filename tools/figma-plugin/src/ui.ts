@@ -1,4 +1,4 @@
-import { z } from 'npm:zod@^4.6.5';
+import { z } from 'zod';
 import { TOKEN_PRESETS } from '../../../packages/fresh-ui/src/tokens/domain/token-presets.ts';
 import {
   exportFigmaTokenBundle,
