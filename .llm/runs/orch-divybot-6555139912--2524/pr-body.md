@@ -18,7 +18,8 @@ The selector appears 54 times across 52 sheets, down from 528. Shipped CSS inven
 
 - [x] Plan and acceptance gates — e5fa366.
 - [x] CSS consolidation, size budgets, QueryResult drift checks and independent review.
-- [ ] Final push and remote check reconciliation.
+- [x] Reviewed implementation committed and pushed — ddbd0f2.
+- [ ] Final remote check reconciliation.
 
 ## Validation
 
@@ -27,6 +28,8 @@ On **Deno 2.9.7**: 338 Fresh UI test results; 25 focused CLI tests; all 60 gener
 Utility parity: 265 fixtures, two widths × two schemes, 2,388,000 computed-style comparisons and four identical screenshots. Legacy comparisons: 265 fixtures × three presets × two schemes, zero differences. Chromium's parsed CSS contract preserves all 1,161 ordered selectors/declarations/media conditions. Full Utility parity uses explicit studio/utility; Badge tests exercise all three aliases. Browser evidence is Chromium-only.
 
 **Runtime and container cleanup UNPROVEN locally:** the exact `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` command exited 1 at Aspire preflight because Docker is unavailable. All 25 entries with unproven resource ownership were left untouched.
+
+**Remote CI is pending. No READY claim has been made.**
 
 ## Harness
 
@@ -41,6 +44,6 @@ No new architectural debt. Additional full-export doc-lint reports 124 inherited
 - [x] Implementation and local required checks complete; runtime limitation explicitly reported.
 - [x] Independent implementation review passes; no lock or unrelated churn.
 - [x] Owner delivery policy retained: Refs only, no labels, Cockpit merges.
-- [ ] Required remote checks pass or skip by workflow policy at the delivered head.
+- [x] READY is withheld until every required remote check passes or skips by workflow policy at the delivered head.
 
 Refs #2524

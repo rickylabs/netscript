@@ -95,3 +95,17 @@ claude-opus-5-5; effort is requested, not attested. See evaluate.md. Failure str
 Optional coverage/compatibility notes are recorded in drift.md. No source change after review.
 Main remains baseline 6a1d84a; no merge or conflict resolution required. Implementation sign-off
 commit and ordinary push follow; exact-head remote checks remain pending. No READY claim yet.
+
+## Slice 2 reconcile and delivery metadata repair
+
+Reviewed implementation commit ddbd0f2e3ab5e689469545569e96327841dffb79 pushed normally;
+PR #2558 marked ready for review and implementation evidence posted. Main remains
+6a1d84a; no conflict. All 50 reviewed source hashes still match.
+
+CI close-gate failed because the PR body had an unchecked assertion that every remote
+check had passed, while those checks (including the close gate itself) were running.
+The body now states the truthful current invariant: READY is withheld until every
+required check passes or policy-skips. Remote CI remains explicitly pending in Validation
+and the delivery slice. No check, acceptance test, or READY prerequisite is bypassed.
+This metadata/evidence-only commit addresses the owner's CI follow-up; product source
+and the independent PASS remain unchanged. The final-head CI gate still must complete.

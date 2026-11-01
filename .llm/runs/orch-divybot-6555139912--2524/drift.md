@@ -17,3 +17,8 @@
   pinned installation. No reusable framework abstraction was introduced.
 - Additional full-export doc-lint reports 124 inherited findings in 16 unchanged source
   files. Evidence is disclosed separately; no existing debt was deepened by this change.
+- Delivery metadata: close-gate rejected an unchecked PR-body assertion about all remote
+  checks while those checks were still running, including close-gate itself. Replace
+  that circular assertion with the completed/current invariant that READY is withheld
+  until all required checks pass or policy-skip. Remote CI stays explicitly pending;
+  no code/test/check exemption. Owner requested correction and normal push.
