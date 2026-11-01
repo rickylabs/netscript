@@ -4,7 +4,13 @@
 
 User:“Your PR merged…pick the NEXT subtask in scope…implement it, and open the next PR. Don't stop while the tracker still has unfinished cells.” This authorizes continuation beyond the earlier STOP-at-READY boundary. Selected#2565 after live ownership/PR checks;#2569 is already dispatched separately.
 
-Continuing owner route:“Relaunch on Sol6.1xhigh”; evaluation:“PLAN-EVAL and IMPL-EVAL: `claude -p --model claude-opus-5-5 --effort high`, read-only.” The feature matrix was queried before writing. This owner override replaces evaluation cells while retaining separate sessions and vendor families; no session IDs are published. Same evaluator is retained across rounds of this leaf. Stop after two consecutive terminal failures; no third loop.
+Continuing explicit owner overrides, verbatim:
+
+“Relaunch on Sol 6.1 xhigh (owner: Astra is only for pure design work; the earlier Astra trigger was withdrawn).”
+“PLAN-EVAL and IMPL-EVAL: `claude -p --model claude-opus-5-5 --effort high`, read-only.”
+
+The feature matrix was queried before writing. These continuing owner preferences replace the evaluator cells while retaining separate sessions and vendor families; no session IDs are published. The same evaluator is retained across rounds of this leaf. Stop after two consecutive terminal failures; no third loop.
+
 
 ## Design
 
@@ -17,3 +23,15 @@ Continuing owner route:“Relaunch on Sol6.1xhigh”; evaluation:“PLAN-EVAL an
 7. Contributor path:.llm/tools/docs/generate-design-skill.ts with its fixture tests.
 
 PLAN-EVAL selected for the source-bundle integrity/release-materialization boundary; pending. No product implementation yet.
+
+PLAN-EVAL round 1: FAIL_PLAN; all three contract gaps incorporated into plan.md. Token source remains generator-owned, emitted as runtime data; this avoids a generator importing its own output as authority. Round 2 retains the same independent evaluator. No product changes yet.
+
+PLAN-EVAL round 2: PASS. Product implementation begins after this verdict.
+
+Implementation candidate: 12 generator tests and 69 consumer/scaffold tests PASS. Scoped check/lint/fmt each cover all 8 owned TS files; corrected wrapper invocation uses its default --unstable-kv, not a custom command. No dependency changes. Quality:gate and CLI JSR audit PASS. One-pass scaffold.runtime raw exit1: preflight/cleanup blocked by inaccessible Docker; runtime remains UNPROVEN locally. Read-only leak reporter reviewed unknown/foreign resources without mutation; public report contains counts only.
+
+Merged origin/main 1e4e58f normally (acceptance-mirroring leaf), without conflicts. Generator uses existing --allow-dirty for export corpus extraction; all source carriers generated in order. Candidate source/outputs are staged before read-only regeneration checks so git diff tests regeneration changes against the staged candidate; this is not a clean-tree claim.
+
+Candidate gates complete: 81 focused tests, 15 root checks (review-threads explicit PR args), scoped wrappers 8/8 with no drops, docs and CLI publish gates PASS. Runtime UNPROVEN as recorded. Ready for independent same-session IMPL-EVAL, before implementation commit.
+
+Independent IMPL-EVAL: PASS, no blockers, before source commit. Optional notes retained: exact-token replacement guard is redundant but enforces the locked contract, and the semver canary fixture is intentionally valid even though release tooling currently uses a shorter canary tag shape. No behavior change is needed to support either prerelease form. Source Markdown is provenance; MCP/local docs remain the readable entry. Fresh receipts/CI follow this sign-off commit.

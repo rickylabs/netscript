@@ -129,6 +129,14 @@ export const xref: Record<string, XrefTarget> = {
     href: '/observability/how-to/add-opentelemetry/',
     label: 'Add OpenTelemetry',
   },
+  'howto:theme-your-app': {
+    href: '/web-layer/how-to/theme-your-app/',
+    label: 'Theme your app',
+  },
+  'concept:design-system': {
+    href: '/design-system/',
+    label: 'Design system gallery',
+  },
   'howto:customize-fresh-ui': {
     href: '/web-layer/how-to/customize-fresh-ui/',
     label: 'Customize Fresh UI',

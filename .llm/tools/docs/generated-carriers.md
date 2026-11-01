@@ -53,6 +53,11 @@ normal PR CI and review. Generic maintenance uses the repository's `Backlog / Tr
 Tracking is created before optional milestone lookup/assignment; metadata failures never suppress
 the issue. Newly generated untracked carriers are included in the allowlisted repair output.
 
+`gen:design-skill` owns the design SKILL, exact guideline reference, and CLI
+`design-guidance.generated.ts` metadata. `check:design-skill` checks all three read-only before
+asset regeneration. Agent init verifies the original skill bundle, then fills release-ref links
+only in the design SKILL from the invoking CLI version.
+
 ## Carrier audit
 
 The audit covers every tracked `*.generated.ts` under packages and plugins:
@@ -62,6 +67,7 @@ The audit covers every tracked `*.generated.ts` under packages and plugins:
 | Shared full-corpus policy             | One generated copy of the docs site composition source; no independent policy |
 | Shared MCP/CLI prose                          | One sorted, compressed page per row; no binary twin or full-text aggregate    |
 | MCP export surfaces                | One sorted, independently compressed entrypoint per row                       |
+| CLI design guidance              | Manifest-derived doc slugs and one release-ref placeholder; no runtime docs imports |
 | CLI agent docs export map          | One sorted package export map per row                                         |
 | CLI skills and agent tools         | One sorted source file per row; derive aggregate hashes                       |
 | MCP published prose                | Derive from shared page rows; no second stored prose corpus                      |

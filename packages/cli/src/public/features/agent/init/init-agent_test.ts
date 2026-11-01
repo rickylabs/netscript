@@ -1,3 +1,4 @@
+import { DESIGN_GUIDANCE } from '../../../../kernel/assets/design-guidance.generated.ts';
 import { EMBEDDED_AGENT_TOOL_FILES } from '../../../../kernel/assets/agent-tools.generated.ts';
 import {
   assert,
@@ -193,7 +194,13 @@ Deno.test('#1675 installs canonical skills and a Claude discovery bridge', async
     };
     for (const path of manifest.files.filter((path) => path !== 'manifest.json')) {
       const canonical = await Deno.readTextFile(join(allRoot, '.agents', 'skills', path));
-      assertEquals(canonical, EMBEDDED_SKILL_FILES[path], `Canonical skill diverged at ${path}`);
+      const expected = path === 'netscript-design/SKILL.md'
+        ? EMBEDDED_SKILL_FILES[path].replaceAll(
+          DESIGN_GUIDANCE.releaseRefToken,
+          `v${NETSCRIPT_RELEASE_VERSION}`,
+        )
+        : EMBEDDED_SKILL_FILES[path];
+      assertEquals(canonical, expected, `Canonical skill diverged at ${path}`);
       assertFalse(await fs.exists(join(allRoot, '.claude', 'skills', path)));
     }
 
@@ -685,7 +692,7 @@ Deno.test('S9 installs discoverable design guidance and a canonical local refere
       assertStringIncludes(skill, 'references/GUIDELINES.md');
       assertStringIncludes(skill, '**Studio Utility** (`studio-utility`)');
       assertStringIncludes(skill, 'netscript ui:apply --preset <preset-id>');
-      assertStringIncludes(skill, 'web-layer/how-to/theme-your-app/');
+      assertStringIncludes(skill, `MCP/local-doc slug: \`${DESIGN_GUIDANCE.themeGuideSlug}\``);
       for (const id of presets) {
         for (const file of ['DESIGN.md', 'SKILL.md']) {
           assertStringIncludes(skill, `\`.agents/skills/fresh-ui-theme-${id}/${file}\``);
@@ -714,7 +721,7 @@ Deno.test('S9 installs discoverable design guidance and a canonical local refere
         for (const file of ['DESIGN.md', 'SKILL.md']) {
           assertStringIncludes(
             skill,
-            `https://raw.githubusercontent.com/rickylabs/netscript/main/docs/design-system/themes/${id}/${file}`,
+            `https://raw.githubusercontent.com/rickylabs/netscript/v${NETSCRIPT_RELEASE_VERSION}/docs/design-system/themes/${id}/${file}`,
           );
         }
       }
@@ -1508,6 +1515,122 @@ Deno.test('embedded consumer check runner is self-contained and rejects excluded
     assertEquals(JSON.parse(new TextDecoder().decode(broken.stdout)).groups[0].code, 'TS2322');
     await Deno.writeTextFile(target, 'export const value: string = "valid";\n');
     assertEquals((await run()).code, 0);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('design guidance pins stable and canary installs to the invoking release', async () => {
+  for (const releaseVersion of ['0.0.8', '0.0.9-canary.20261101.1']) {
+    const root = await Deno.makeTempDir();
+    try {
+      const dependencies = {
+        fs: new DenoAgentInitFileSystem(),
+        aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+        releaseVersion,
+      };
+      await initAgent({ projectRoot: root, host: 'all' }, dependencies);
+      const skill = await Deno.readTextFile(join(root, '.agents/skills/netscript-design/SKILL.md'));
+      assertStringIncludes(skill, `/v${releaseVersion}/docs/design-system/themes/studio/DESIGN.md`);
+      assertStringIncludes(
+        skill,
+        `/v${releaseVersion}/docs/site/web-layer/how-to/theme-your-app.md`,
+      );
+      assertStringIncludes(skill, `/tree/v${releaseVersion}/docs/design-system/`);
+      assertFalse(skill.includes('/main/'));
+      assertFalse(skill.includes('{{NETSCRIPT_RELEASE_REF}}'));
+      assertEquals(
+        await Deno.readTextFile(
+          join(root, '.agents/skills/netscript-design/references/GUIDELINES.md'),
+        ),
+        EMBEDDED_SKILL_FILES['netscript-design/references/GUIDELINES.md'],
+      );
+      assertEquals(
+        (await initAgent({ projectRoot: root, host: 'all' }, dependencies)).changedFiles,
+        [],
+      );
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  }
+});
+
+Deno.test('release materialization rejects missing or misplaced tokens before writing any project file', async () => {
+  for (
+    const [design, reference, message] of [
+      ['Already rendered v0.0.8', 'Exact reference', 'missing its release-ref token'],
+      [
+        'Source {{NETSCRIPT_RELEASE_REF}}',
+        'Wrong {{NETSCRIPT_RELEASE_REF}}',
+        'Unexpected release-ref token',
+      ],
+    ]
+  ) {
+    const root = await Deno.makeTempDir();
+    try {
+      const paths = ['netscript-design/SKILL.md', 'netscript-design/references/GUIDELINES.md'];
+      const files: Record<string, string> = {
+        'manifest.json': JSON.stringify({ files: paths }),
+        [paths[0]]: design,
+        [paths[1]]: reference,
+      };
+      const hash = await sha256(paths.map((path) => `${path}\0${files[path]}`).join('\0'));
+      await assertRejects(
+        () =>
+          initAgent({ projectRoot: root, host: 'vscode' }, {
+            fs: new DenoAgentInitFileSystem(),
+            aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+            bundle: { files, hash },
+          }),
+        Error,
+        message,
+      );
+      assertEquals((await Array.fromAsync(Deno.readDir(root))).length, 0);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  }
+});
+
+Deno.test('release versions fail closed on noncanonical refs and metadata before installation', async () => {
+  for (
+    const releaseVersion of ['v0.0.8', '01.0.0', '0.0.8+build.1', '0.0.8/main', '0.0.8?ref=main']
+  ) {
+    const root = await Deno.makeTempDir();
+    try {
+      await assertRejects(() =>
+        initAgent({ projectRoot: root, host: 'vscode' }, {
+          fs: new DenoAgentInitFileSystem(),
+          aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+          releaseVersion,
+        }), Error);
+      assertEquals((await Array.fromAsync(Deno.readDir(root))).length, 0);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  }
+});
+
+Deno.test('original design bundle hash is verified before attempting release materialization', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await assertRejects(
+      () =>
+        initAgent({ projectRoot: root, host: 'vscode' }, {
+          fs: new DenoAgentInitFileSystem(),
+          aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+          bundle: {
+            files: {
+              ...EMBEDDED_SKILL_FILES,
+              'netscript-design/SKILL.md': 'Tampered without a token',
+            },
+            hash: 'incorrect-original-hash',
+          },
+        }),
+      Error,
+      'Skill bundle hash mismatch',
+    );
+    assertEquals((await Array.fromAsync(Deno.readDir(root))).length, 0);
   } finally {
     await Deno.remove(root, { recursive: true });
   }
