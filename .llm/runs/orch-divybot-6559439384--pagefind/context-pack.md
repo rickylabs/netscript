@@ -1,0 +1,3 @@
+# Resume from here
+
+Issue #2453, feature leaf. Main baseline `1e4e58f`; strict 1.3.0 two-build failure retained. Native upstream #1124 shipped in new stable 1.6.0; use exact site import-map override and URL-sorted ingestion through existing Lume plugin. No output transforms or S8/token changes. Read plan.md and worklog Design before editing. Independent read-only Claude Opus 5.5/high PLAN review next; mandatory IMPL review later. Draft PR bootstrap pending. Owner requires Refs #2453, no labels, exact-head READY only with green/legitimately skipped checks; cockpit owns merge. Logs/probes remain local project evidence. Deno 2.9.7, RTK unavailable. Keep root lock unchanged.
