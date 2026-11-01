@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 import process from 'node:process';
 import type { Buffer } from 'node:buffer';
-import { chromium } from 'playwright-core';
+import { chromium, type Page } from 'playwright-core';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
@@ -27,14 +27,23 @@ async function readSpecimens(path: string): Promise<Specimen[]> {
 }
 
 async function registryCss(root: string): Promise<string> {
+  async function cssFiles(directory: string): Promise<string[]> {
+    const files: string[] = [];
+    const entries = await readdir(directory, { withFileTypes: true });
+    for (const entry of entries.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)) {
+      const path = join(directory, entry.name);
+      if (entry.isSymbolicLink()) throw new Error(`CSS fixture symlink is unsupported: ${path}`);
+      if (entry.isDirectory()) files.push(...await cssFiles(path));
+      else if (entry.name.endsWith('.css')) files.push(path);
+    }
+    return files;
+  }
   const files = [
     join(root, 'registry/theme/tokens.css'),
-    join(root, 'registry/styles/layouts.css'),
+    ...await cssFiles(join(root, 'registry/styles')),
   ];
   for (const folder of ['registry/components/ui', 'registry/islands']) {
-    for (const entry of (await readdir(join(root, folder))).sort()) {
-      if (entry.endsWith('.css')) files.push(join(root, folder, entry));
-    }
+    files.push(...await cssFiles(join(root, folder)));
   }
   return (await Promise.all(files.map((file) => readFile(file, 'utf8')))).join(
     '\n',
@@ -94,6 +103,26 @@ const PROPERTIES = [
   'overflow',
   'cursor',
 ];
+
+/** Settle native anchor/font paint after forced pseudo states without allowing pixel drift. */
+async function stableScreenshot(page: Page): Promise<Buffer> {
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+    );
+  });
+  let previous = await page.screenshot({ fullPage: true, animations: 'disabled' });
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await page.evaluate(() =>
+      new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+    );
+    const current = await page.screenshot({ fullPage: true, animations: 'disabled' });
+    if (current.equals(previous)) return current;
+    previous = current;
+  }
+  throw new Error('CSS parity screenshot did not stabilize across consecutive frames');
+}
 
 /** Compare real baseline and migrated markup/CSS with the same Utility token bytes. */
 async function main(): Promise<void> {
@@ -216,10 +245,7 @@ async function main(): Promise<void> {
                 })
               ),
             );
-            const png = await page.screenshot({
-              fullPage: true,
-              animations: 'disabled',
-            });
+            const png = await stableScreenshot(page);
             await writeFile(
               join(output, `${label}-${scheme}-${width}.png`),
               png,
