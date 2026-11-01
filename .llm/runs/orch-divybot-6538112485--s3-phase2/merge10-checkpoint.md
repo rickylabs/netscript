@@ -72,3 +72,17 @@ SAME separate evaluator; no new reviewer/session. New-loop failure count: 0.
    owner policy and integration preservation. No new abstraction or credit list
    in test code. All raw transports/receipts remain private; public audit reports
    verdict/counts only, with portable paths and no session IDs/thumbprints.
+
+
+## Binding plan-review refinements before source
+
+Same independent merge PLAN-EVAL round1 PASS, new-loop failure0. Nest ONLY under
+main's exact single compound Utility root; do not introduce class-root nesting
+or a parent selector list. Existing added files with no repeated Utility root
+need no such factoring; enumerate them. Compare absolute ordered selectors AND
+computed specificity, plus declarations/media conditions and real browser output.
+Child must measure at parent caps first, increasing failing kinds only by its
+additional measured growth; preserve existing headroom. Original-cap and raw/gzip
+overrun negatives remain required without introducing credit logic. The owner
+READY instruction is acknowledged: integration status is posted after each push,
+but READY remains withheld until11b3b/12/13and required exact-head checks pass.
