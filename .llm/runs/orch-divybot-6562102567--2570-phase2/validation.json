@@ -432,5 +432,73 @@
       "outcome": "PASS",
       "report": "s4-review.md"
     }
+  },
+  "referenceProbeFollowup": {
+    "sourceBase": "fa24e09e6ecabb903fbb035297b4b550b94e25e2",
+    "previousRuntime": {
+      "url": "https://github.com/rickylabs/netscript/actions/runs/41348134322",
+      "sqlite": {
+        "passed": 101,
+        "failed": [
+          "behavior.app-reference"
+        ],
+        "overview": "PASS"
+      },
+      "failure": "Expected obsolete Cache-first query heading on redesigned example."
+    },
+    "previousTest3": {
+      "passed": 1861,
+      "failed": 0,
+      "ignored": 17
+    },
+    "fix": "Match current authored service/form/summary headings; reject markers found only in scripts; retain every route, viewport and seeded-cell assertion.",
+    "focusedTests": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 63,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 63,
+        "uniqueFailures": 0
+      }
+    },
+    "scopedCheck": {
+      "filesSelected": 2,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "scopedLint": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "scopedFmt": {
+      "filesSelected": 2,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "qualityAndArchitecture": "PASS",
+    "liveReference": {
+      "outcome": "PASS",
+      "routes": [
+        "/examples/orders",
+        "/people"
+      ],
+      "widths": [
+        1440,
+        390
+      ],
+      "fixture": ".llm/tmp/scaffold-2570-phase2/final/acceptance",
+      "adjustments": "Custom service fixture names Orders and Seed Order; production CI expectations retain Users and Seed User."
+    },
+    "sourceReview": {
+      "outcome": "PASS",
+      "report": "s5-review.md"
+    },
+    "visualReconciliation": "No product, template, stylesheet or generated carrier changes. Prior visual approval unchanged.",
+    "ci": "PENDING new head full runtime and required core checks"
   }
 }

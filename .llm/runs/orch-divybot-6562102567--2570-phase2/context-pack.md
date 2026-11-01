@@ -1,5 +1,7 @@
 # Resume
 
+S5 is the latest follow-up: SQLite runtime passed Overview, then exposed obsolete app-reference headings. Probe now matches authored headings and rejects script-only markers; same reviewer PASS,63focusedtests/scoped2/quality/actual service+People browserDOM1440/390PASS. Product and visual source unchanged. Push S5 and require full new-head CI before READY. See s5-review.md and validation.json referenceProbeFollowup.
+
 S4 supersedes pending S3 CI: previous core run failed only canonical init/regenerate parity (shards2/3); previous PostgreSQL/SQLite runtime runs failed only populated Overview readiness markers (106passed each). Both corrected and independently approved in s4-review.md. Local 163tests, scoped7, generated126, root4198, quality/architecture, carrier4, all15check:* and actual live workers/streams home probe PASS. Push S4, rerun core and full runtime CI; do not hand off READY until new-head checks pass. Metadata/DOM-attribute-only follow-up preserves visual presentation.
 
 Phase 2 #2570, PR #2586, branch `orch/divybot-6562102567`. S1/S2 source slices passed. S3 has independent final source approval and visual PASS: every page group >=8/10, density/craft >=Figma in all four variants; Command 8.5. See `impl-eval.md`, `visual-eval.md`, `validation.json`, `reviewed-source.json`, and `screens/README.md`. Failed rounds remain as history.

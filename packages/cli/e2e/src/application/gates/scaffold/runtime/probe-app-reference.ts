@@ -47,12 +47,12 @@ export const REFERENCE_EXPECTATIONS: readonly ReferenceExpectation[] = [
   },
   {
     path: '/examples/users',
-    markers: ['Users', 'Cache-first query', 'Managed form', 'Deferred summary'],
+    markers: ['Users', 'Service records', 'Validate a note', 'Users summary'],
     seededRecord: 'Seed User',
   },
   {
     path: '/people',
-    markers: ['People', 'Cache-first query', 'Deferred summary'],
+    markers: ['People', 'Service records', 'People summary'],
   },
 ];
 
@@ -62,8 +62,8 @@ export function assertReferenceDom(
   expectation: ReferenceExpectation,
   viewport: BrowserViewport,
 ): void {
+  const markup = dom.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
   if (expectation.seededRecord) {
-    const markup = dom.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
     const fields = [...markup.matchAll(/<(td|dd)\b[^>]*>([\s\S]*?)<\/\1>/gi)];
     for (const value of [expectation.seededRecord, ...(expectation.seededFields ?? [])]) {
       if (!fields.some((field) => field[2].replace(/<[^>]*>/g, '').includes(value))) {
@@ -74,7 +74,7 @@ export function assertReferenceDom(
     }
   }
   for (const marker of expectation.markers) {
-    if (!dom.includes(marker)) {
+    if (!markup.includes(marker)) {
       throw new Error(
         `${viewport.name} reference probe ${expectation.path} did not render ${marker}`,
       );

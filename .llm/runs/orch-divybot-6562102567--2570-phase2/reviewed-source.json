@@ -1,6 +1,14 @@
 {
   "files": [
     {
+      "path": "packages/cli/e2e/src/application/gates/scaffold/runtime/probe-app-reference.ts",
+      "sha256": "d834aed12f9ebf4202643cea7493fb22d84fcf94bd387aeffa61c5618b2a943e"
+    },
+    {
+      "path": "packages/cli/e2e/tests/application/gates/probe-app-reference_test.ts",
+      "sha256": "57513109d11c13c3abcac40e525d15f641b9888086e898d0b4e5eddf892813d7"
+    },
+    {
       "path": "packages/cli/src/kernel/adapters/database/sample-records_test.ts",
       "sha256": "aaae6e2b5b8e775a21c62e3d6ad6f2624ae6275bd02897d2f1c427484b48078e"
     },

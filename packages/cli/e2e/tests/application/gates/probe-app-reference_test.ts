@@ -28,12 +28,12 @@ const EXPECTED_REFERENCES = [
   { path: '/design/composition', markers: ['Composition', 'L0'] },
   {
     path: '/examples/users',
-    markers: ['Users', 'Cache-first query', 'Managed form', 'Deferred summary'],
+    markers: ['Users', 'Service records', 'Validate a note', 'Users summary'],
     seededRecord: 'Seed User',
   },
   {
     path: '/people',
-    markers: ['People', 'Cache-first query', 'Deferred summary'],
+    markers: ['People', 'Service records', 'People summary'],
   },
 ] as const;
 
@@ -155,5 +155,26 @@ Deno.test('rich records proof requires each field in cells and rejects script-on
       Error,
       missing,
     );
+  }
+});
+
+Deno.test('service reference headings must render outside hydration scripts', () => {
+  for (const path of ['/examples/users', '/people']) {
+    const expectation = REFERENCE_EXPECTATIONS.find((entry) => entry.path === path)!;
+    // The resource name also occurs in its summary title; test the distinct section headings.
+    for (const missing of expectation.markers.slice(1)) {
+      const headings = expectation.markers.filter((marker) => marker !== missing)
+        .map((marker) => `<h2>${marker}</h2>`).join('');
+      assertThrows(
+        () =>
+          assertReferenceDom(
+            `<html>${headings}<td>Seed User</td><script>${missing}</script></html>`,
+            expectation,
+            REFERENCE_VIEWPORTS[0],
+          ),
+        Error,
+        `did not render ${missing}`,
+      );
+    }
   }
 });
