@@ -1,0 +1,5 @@
+# Whole CLI native suite prerequisites
+
+The default N5 TMPDIR is mounted noexec. Whole packages/cli tests include generated Aspire executable fixtures, browser process fixtures and relocated compiled binaries, all of which require a project-owned executable TMPDIR. Real browser conformance tests also require a working Chrome-family executable via NETSCRIPT_E2E_BROWSER_EXECUTABLE. Cached Chromium can run with pre-provisioned project-run libraries, supplied only inside a private Chrome wrapper. Do not export LD_LIBRARY_PATH over the entire test process: Deno's granular --allow-run=deno children refuse subprocess creation while it is inherited. The private run retains the exact wrapper and launch command. Tests are never skipped or weakened to accommodate the host.
+
+Whole suite costs about 20 minutes cold. Do not start a canonical whole-suite receipt while source or carriers are still being edited: imported generated carrier modules can retain old bytes and mismatch dynamic reads. Finish source/carrier commits, then run on a clean head with complete native prerequisites. Earlier exploratory results must remain marked as such.

@@ -1,0 +1,248 @@
+{
+  "note": "Sanitized command-receipt index; receipts prove only their commands, not merge sufficiency. Exploratory precommit runs are identified by gitHead; targeted repair tests cover later config changes. Raw receipts are under .llm/tmp/gate-receipts/preset-theming and logs remain private.",
+  "gates": [
+    {
+      "gateId": "assets-barrel",
+      "argv": [
+        "deno",
+        "task",
+        "check:assets-barrel"
+      ],
+      "gitHead": "f3c84f73e255f817610eac1d5ab83420945a4b07",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 3499,
+      "stdoutSha256": "0ecd048fa9c7095048ab35ccf506ebb45905bff90b610b9647950cd616023ad8",
+      "stderrSha256": "3ddf2e275bcd6d8b9382be406c0dbcd909b9797fc104773b9c765c62122d57a3"
+    },
+    {
+      "gateId": "cli-quality",
+      "argv": [
+        "deno",
+        "task",
+        "quality:cli"
+      ],
+      "gitHead": "f3c84f73e255f817610eac1d5ab83420945a4b07",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 728,
+      "stdoutSha256": "84e5fe4902764740146db39ecf333e4b9356ce9ef16dbef14e6b598c81e52da6",
+      "stderrSha256": "bc60cb57d0d2f9dc69b3ec071560dbd759ef6404a052464eee64583d37abedc3"
+    },
+    {
+      "gateId": "cli-quality",
+      "argv": [
+        "deno",
+        "task",
+        "quality:cli"
+      ],
+      "gitHead": "ac85479e95c5d785ce1da460ce605662006b8592",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 840,
+      "stdoutSha256": "84e5fe4902764740146db39ecf333e4b9356ce9ef16dbef14e6b598c81e52da6",
+      "stderrSha256": "bc60cb57d0d2f9dc69b3ec071560dbd759ef6404a052464eee64583d37abedc3"
+    },
+    {
+      "gateId": "test",
+      "argv": [
+        "deno",
+        "task",
+        "test",
+        "--unstable-kv",
+        "packages/cli",
+        "--report-output",
+        ".llm/tmp/gate-receipts/preset-theming/cli-tests.report.json"
+      ],
+      "gitHead": "ac85479e95c5d785ce1da460ce605662006b8592",
+      "outcome": "RUNNING",
+      "exitCode": null,
+      "durationMs": null,
+      "stdoutSha256": null,
+      "stderrSha256": null
+    },
+    {
+      "gateId": "emitted-samples",
+      "argv": [
+        "deno",
+        "task",
+        "check:emitted-samples"
+      ],
+      "gitHead": "008685f6bc8263107e576cc2fb5e4823226c1140",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 9903,
+      "stdoutSha256": "d3004ac9a69e35d543eb9fb16481313b5894aac26b6d581382f65d1945e305e4",
+      "stderrSha256": "7e193c49d263b777ac7908130d515ed1b9ade3669765884f307c1bb66917fe3c"
+    },
+    {
+      "gateId": "figma-ci",
+      "argv": [
+        "deno",
+        "task",
+        "figma:ci"
+      ],
+      "gitHead": "ac85479e95c5d785ce1da460ce605662006b8592",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 11270,
+      "stdoutSha256": "fb1bba3aae3b8360d7d369cfd698d58aab2ca62133d7c1ec196f2a2074d01e0d",
+      "stderrSha256": "c02d0786c13da7846a1bc2633841d99991a74675dba5c4d02ee5031f8b3ba201"
+    },
+    {
+      "gateId": "figma-ci",
+      "argv": [
+        "deno",
+        "task",
+        "figma:ci"
+      ],
+      "gitHead": "ac85479e95c5d785ce1da460ce605662006b8592",
+      "outcome": "FAIL",
+      "exitCode": 1,
+      "durationMs": 1933,
+      "stdoutSha256": "2a66dda94fbebe1acaf36a7ffc277ad44fdc847c0560241c6e9647cd03c4ce86",
+      "stderrSha256": "bfc72dbb77ff2c6ea5c0280f266ecb4fa43dd74c3c9f9534d0a1a99a155b1782"
+    },
+    {
+      "gateId": "mcp-export-corpus",
+      "argv": [
+        "deno",
+        "task",
+        "check:mcp-export-corpus"
+      ],
+      "gitHead": "f3c84f73e255f817610eac1d5ab83420945a4b07",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 11576,
+      "stdoutSha256": "85af3ab887c8fa7ee0bfcccc79ed668b6efbb2783141797bb3b6d0f7aea13cb3",
+      "stderrSha256": "bb580eff463cfaf5dab19bd77fe1a02b60387837eefea2b91f07a60a6cb25650"
+    },
+    {
+      "gateId": "publish-dry-run",
+      "argv": [
+        "deno",
+        "task",
+        "publish:dry-run"
+      ],
+      "gitHead": "008685f6bc8263107e576cc2fb5e4823226c1140",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 67677,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "b526e9c7d337d8efcfe0a306144eadb049365c55cbdb7d8979e64a39f136fec7"
+    },
+    {
+      "gateId": "quality-gate",
+      "argv": [
+        "deno",
+        "task",
+        "quality:gate"
+      ],
+      "gitHead": "f3c84f73e255f817610eac1d5ab83420945a4b07",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 18391,
+      "stdoutSha256": "d83904dee663d0421950c83e78772c76885f9bef635e8cbad52a39fce84bbfda",
+      "stderrSha256": "b955f31a06d43ed010377b7afa4432a2ace77f037267d2f5ad0515474f25d02b"
+    },
+    {
+      "gateId": "quality-gate",
+      "argv": [
+        "deno",
+        "task",
+        "quality:gate"
+      ],
+      "gitHead": "ac85479e95c5d785ce1da460ce605662006b8592",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 18436,
+      "stdoutSha256": "d83904dee663d0421950c83e78772c76885f9bef635e8cbad52a39fce84bbfda",
+      "stderrSha256": "b955f31a06d43ed010377b7afa4432a2ace77f037267d2f5ad0515474f25d02b"
+    },
+    {
+      "gateId": "quality-gate",
+      "argv": [
+        "deno",
+        "task",
+        "quality:gate"
+      ],
+      "gitHead": "ac85479e95c5d785ce1da460ce605662006b8592",
+      "outcome": "FAIL",
+      "exitCode": 1,
+      "durationMs": 6162,
+      "stdoutSha256": "2ca645c6815082c99d24bda8abdbe677e095ee7bfd6307bf53dde943e2b63d02",
+      "stderrSha256": "68beb425d4936d009547afde5c4d853b41a0a85cd3b9bc1fe716421ff53f9efb"
+    },
+    {
+      "gateId": "check",
+      "argv": [
+        "deno",
+        "task",
+        "check",
+        "--output",
+        ".llm/tmp/gate-receipts/preset-theming/root-check.report.json"
+      ],
+      "gitHead": "f3c84f73e255f817610eac1d5ab83420945a4b07",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 251704,
+      "stdoutSha256": "0a80caf7c6bbeaad86d56c5653b93ad12e9bf97197833028092b86a6432e849e",
+      "stderrSha256": "12c8d49b9ed8f4548f273328195d2e1da17c189f64c2323fc5450e199486f468"
+    },
+    {
+      "gateId": "fmt-check-report",
+      "argv": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-fmt.ts",
+        "--root",
+        "packages",
+        "--root",
+        "plugins",
+        "--ext",
+        "ts,tsx",
+        "--exclude",
+        "^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)",
+        "--ignore-line-endings",
+        "--output",
+        ".llm/tmp/gate-receipts/preset-theming/root-fmt.report.json"
+      ],
+      "gitHead": "008685f6bc8263107e576cc2fb5e4823226c1140",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 4706,
+      "stdoutSha256": "e91fd8518d3b7f9933b109aaf1ad8049f745194b77028a4e3703f065a82ea4ef",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "gateId": "lint-report",
+      "argv": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-lint.ts",
+        "--root",
+        "packages",
+        "--root",
+        "plugins",
+        "--ext",
+        "ts,tsx",
+        "--exclude",
+        "^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)",
+        "--output",
+        ".llm/tmp/gate-receipts/preset-theming/root-lint.report.json"
+      ],
+      "gitHead": "008685f6bc8263107e576cc2fb5e4823226c1140",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 11227,
+      "stdoutSha256": "5bf8800ee621de8afb2dd6fdf02322ddc864a3439f0e31b0f445f58253b2e7da",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

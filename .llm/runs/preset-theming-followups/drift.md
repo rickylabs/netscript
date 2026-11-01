@@ -8,3 +8,7 @@
 - Write scope extends to `.llm/tools/gates/catalog.ts` for the uploaded CLI quality receipt, plus root lock metadata required by catalog mapping.
 
 - Generated-carrier order refined by live guard: export-corpus refuses dirty generated package sources too. Commit agent docs/publish carriers first, then regenerate export corpus from that clean head. Aspire manifest needs one derived inventory row for the new baseline file that mentions Aspire paths; refresh with canonical generator.
+
+- Close artifact surface includes `.llm/2026-11-01-preset-theming-followups.md`, the dated lesson required by the leaf profile.
+
+- Broad exploratory CLI run completed: 2926 passed, 17 failed. Executable fixtures and real browser need host prerequisites; a path-extraction integration test must distinguish quoted get_doc slugs from app filesystem paths. Extend the test repair scope to `packages/cli/src/public/features/root/public-command-tree_test.ts`. Its quoted guide references remain validated against canonical docs. The stale carrier MANIFEST mismatch comes from a process importing old carrier bytes before regeneration. Fresh clean-head full CLI rerun required; earlier run is exploratory only.

@@ -1,0 +1,18 @@
+[
+  {
+    "path": "deno.lock",
+    "baseline": "6a1d84a6e04c0d39df3926528e0380e267316aee",
+    "resolvedNpmGraphUnchanged": true,
+    "resolvedJsrGraphUnchanged": true,
+    "specifiersUnchanged": true,
+    "workspaceDependencyAdded": "npm:zod@^4.6.5"
+  },
+  {
+    "path": "packages/fresh-ui/deno.lock",
+    "baseline": "6a1d84a6e04c0d39df3926528e0380e267316aee",
+    "resolvedNpmGraphUnchanged": true,
+    "resolvedJsrGraphUnchanged": true,
+    "specifiersUnchanged": true,
+    "workspaceDependencyAdded": "npm:zod@^4.6.5"
+  }
+]
