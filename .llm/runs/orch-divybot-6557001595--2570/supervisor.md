@@ -65,3 +65,7 @@ S3 terminal: independent code and visual PASS, accepted for sign-off.
 
 Final independent IMPL-EVAL codePASS accepted for S4 sign-off. RuntimeUNPROVEN
 prevents READY; draft retained. No next implementation slice or self-certification.
+
+Supplemental same-session policy review distinguishes runtime cost-policy skip
+(valid) from draft-skipped requiredCI (unproven). Initial draft delivery fulfilled;
+review transition authorized to execute requiredCI. No labels or merge.

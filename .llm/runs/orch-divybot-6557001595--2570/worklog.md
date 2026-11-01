@@ -213,3 +213,20 @@ Only test/evidence files changed since S3 visual/current-carrier acceptance; fin
 302-test run includes the fix. No source/lock churn after review. PR remains draft.
 The remaining work is one dependent runtime verification on a working Docker host,
 not independent product scope to fan out. #2488 stillOPEN; merge/reverify if it lands.
+
+## Continuation — readiness policy correction
+
+Previous goal turn made progress: implementation/evidence pushed. Current state
+revalidated at5842e30:open draft,mergeable,clean tracked tree;Docker unavailable.
+Fresh Aspire doctor also identifies missing.NETSDK as preflight failure. Same
+independent evaluator withdrew its assertion that runtime blocks readiness: the
+non-opt-in cost policy in e2e-cli.yml applies even after draft removal; no labels
+were added/removed to manufacture a skip. Runtime remains UNPROVEN honestly.
+
+However, required ci.yml contexts are draft-skipped and must materialize. Interpret
+owner's "Draft PR" as the initial review process (fulfilled), together with the
+assignment's explicit instruction to mark completed/local-tested work ready for
+review. This is a review transition, not READY declaration or merge authorization.
+Keep labels empty. Commit this supplemental policy evidence, then transition the
+PR to review so required CI executes on that exact head. Cockpit retains merge.
+Do not dispatch optional full runtime merely to defeat a documented cost policy.

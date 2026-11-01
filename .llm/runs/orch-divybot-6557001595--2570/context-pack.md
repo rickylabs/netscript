@@ -53,3 +53,13 @@ packages/cli/src/kernel/assets/app/README.md. Full evidence is this run director
 Public paths are repo-relative, no sessionids. Raw identities/logs remain private.
 The final assignment report is queued only through untracked .divybot-final-report.md;
 its existence does not prove publication. Refs2570/2566,no labels,owner process applies.
+
+## Superseding readiness update
+
+Read readiness-policy-review.md: same independent evaluator confirms runtime's
+non-opt-in workflow policy is valid despite UNPROVEN runtime. Previous blanket
+"no policy skip" conclusion is withdrawn. Required ci.yml checks are merely draft
+skipped. Transition to review is now authorized by the assignment's completed-local-
+tests instruction; initial draft delivery is fulfilled. No READY until required
+CI green; no labels,no merge. See s4-workflow-policy-state.json and fresh prerequisite
+receipt. Source unchanged since independently reviewed sign-off.

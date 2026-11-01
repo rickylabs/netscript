@@ -4,7 +4,7 @@ The generated app now uses the Figma Studio Utility dashboard, records/detail, s
 
 The shared command palette now filters results, dispatches keyboard selection and exposes visible dismissal and keyboard help. Existing canonical service examples remain the mutation surface. No showcase data or new provider/workload plumbing is added.
 
-**Draft — runtime acceptance UNPROVEN.** Independent visual review passed all96 screenshots. Independent Claude Opus5.5 high implementation review passed with no blocking code findings. The required runtime command could not pass Aspire/Docker preflight; no policy skip is claimed.
+**Review candidate — runtime UNPROVEN; required CI pending.** Independent visual review passed all96 screenshots. Independent Claude Opus5.5 high implementation review passed with no blocking code findings. The runtime command could not pass Aspire preflight (.NET SDK missing; Docker unavailable). A supplemental independent review confirms the existing non-opt-in runtime policy permits that lane to skip. Required CI checks must still finish green.
 
 ## Scope
 
@@ -19,7 +19,7 @@ Reuses current main components; #2488 remains open. Showcase plumbing belongs to
 - [x] Shared shell and absent-capability pages.
 - [x] Typed live capability wiring and post-init connection.
 - [x] Desktop/mobile, light/dark renders and independent visual acceptance.
-- [ ] Final independent implementation evaluation and required runtime acceptance.
+- [ ] Final required CI acceptance (independent implementation evaluation passed).
 
 ## Validation
 
@@ -40,5 +40,5 @@ Accepted CLI-SCAFFOLD-WORKERS-CONTRACT-DEPENDENCY: no-workers apps resolve the w
 - [x] Requested pages derive content from actual generated capabilities.
 - [x] No static placeholder business rows or misleading capability claims.
 - [x] Independent visual fidelity and quality scores >=8/10 on every page.
-- [ ] Required checks green or explicitly skipped by workflow policy; runtime remains UNPROVEN.
+- [ ] Required checks green or explicitly skipped by workflow policy; required CI is pending, runtime remains UNPROVEN under the non-opt-in policy.
 - [x] Independent IMPL-EVAL passes.
