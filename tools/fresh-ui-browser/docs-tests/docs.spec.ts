@@ -600,6 +600,19 @@ test(
         source: '.control { border-color: var(--ns-studio-signal-brand); }',
       });
     }
+    if (process.env.DOCS_UI_NEGATIVE_CONTROL === 'red-token') {
+      const nonRedTokenValues = {
+        ...sources.find((source) => source.path === 'styles/tokens.css')?.nonRedTokenValues,
+        '--ns-primary': 'red',
+      };
+      sources.push({
+        path: 'styles/control.css',
+        kind: 'css' as const,
+        tokenLayer: true,
+        nonRedTokenValues,
+        source: ':root { --ns-primary: red; } .control { color: var(--ns-primary); }',
+      });
+    }
     const findings = await page.evaluate(analyzeStylePolicy, sources);
     const path = info.outputPath('style-policy.json');
     await writeFile(
@@ -727,6 +740,50 @@ test('style policy negative contracts reject literal, named and aliased colours'
     .toBe(true);
 });
 
+test('style policy token exceptions are restricted to approved names and exact values', async ({ page }) => {
+  await visit(page, './');
+  const orange = '#582d1d';
+  const nonRedTokenValues = {
+    '--ns-studio-api-kind-number-text': orange,
+    '--ns-primary': 'red',
+  };
+  const layer: StyleSource = {
+    path: 'styles/tokens.css',
+    kind: 'css',
+    tokenLayer: true,
+    nonRedTokenValues,
+    source: `:root { --ns-studio-api-kind-number-text: ${orange}; --ns-primary: red; }`,
+  };
+  const usage = (source: string): StyleSource => ({
+    path: 'styles/control.css',
+    kind: 'css',
+    source,
+  });
+  expect(
+    await page.evaluate(analyzeStylePolicy, [
+      layer,
+      usage(
+        '.number { color: var(--ns-studio-api-kind-number-text); }',
+      ),
+    ]),
+  ).toEqual([]);
+  for (
+    const source of [
+      '.control { color: var(--ns-primary); }',
+      '.control { --alias: var(--ns-primary); color: var(--alias); }',
+      ':root { --ns-studio-api-kind-number-text: red; } .control { color: var(--ns-studio-api-kind-number-text); }',
+    ]
+  ) {
+    const findings = await page.evaluate(analyzeStylePolicy, [layer, usage(source)]);
+    expect(findings.some((finding) => finding.kind === 'red-outside-state'), source).toBe(true);
+  }
+  const untrusted = await page.evaluate(analyzeStylePolicy, [
+    { ...layer, tokenLayer: false },
+    usage('.number { color: var(--ns-studio-api-kind-number-text); }'),
+  ]);
+  expect(untrusted.some((finding) => finding.kind === 'red-outside-state')).toBe(true);
+});
+
 test('callouts: semantic tone, default body and ink links', async ({ page }) => {
   await visit(page, 'design-system/docs-kit/callouts/');
   for (
@@ -771,6 +828,22 @@ test('callouts: semantic tone, default body and ink links', async ({ page }) => 
       true,
     );
   }
+});
+
+test('all generated Markdown twins use GitHub-supported alert markers', async () => {
+  const supported = new Set(['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']);
+  let alerts = 0;
+  for (const path of (await collectFiles(SITE)).filter((path) => path.endsWith('.md'))) {
+    const source = (await readFile(path, 'utf8')).replace(
+      /^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1[ \t]*$/gm,
+      '',
+    );
+    for (const match of source.matchAll(/^>[ \t]*\[!([A-Za-z]+)\][ \t]*$/gm)) {
+      expect(supported.has(match[1]), `${relative(SITE, path)}: ${match[1]}`).toBe(true);
+      alerts++;
+    }
+  }
+  expect(alerts).toBeGreaterThan(100);
 });
 
 test('callout labels: one body-sized label, first-line icon alignment and typed twins', async ({ page }) => {
@@ -836,7 +909,8 @@ test('callout labels: one body-sized label, first-line icon alignment and typed 
   expect(callouts).toHaveLength(12);
   const twin = await readFile(resolve(SITE, 'design-system/docs-kit/callouts/index.md'), 'utf8');
   expect(twin.match(/^> \[![A-Z]+\]$/gm)).toHaveLength(callouts.length);
-  const markdown = (kind: string) => kind === 'danger' ? 'CAUTION' : kind.toUpperCase();
+  const markdown = (kind: string) =>
+    ['danger', 'error'].includes(kind) ? 'CAUTION' : kind.toUpperCase();
   const wrappedKinds = new Set<string>();
   for (const callout of callouts) {
     const type = types[callout.kind];

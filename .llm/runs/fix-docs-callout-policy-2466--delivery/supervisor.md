@@ -10,7 +10,7 @@ separate Anthropic session, resumed for repairs. No target-repository profiles a
 
 Permitted tracked writes:
 - `.llm/runs/fix-docs-callout-policy-2466--delivery/**`
-- `tools/docs-site/{callout-types.ts,callout-types_test.ts,style-policy.ts}`
+- `tools/docs-site/{callout-types.ts,callout-types_test.ts,style-policy.ts,README.md}`
 - `tools/fresh-ui-browser/docs-tests/**` (actual browser policy/Markdown regressions)
 - `docs/site/_plugins/**` and `docs/site/_components/callout.vto` if necessary for real export tests
 - `docs/site/design-system/docs-kit/callouts.md` if contract clarification is required
