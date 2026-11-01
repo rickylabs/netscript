@@ -2,6 +2,10 @@ import { assertEquals, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 
 const SOURCE = new URL('../../../packages/fresh-ui/tests/publish-size.test.ts', import.meta.url);
+const BUDGETS = new URL(
+  '../../../tools/docs-site/fresh-ui/payload-budgets.ts',
+  import.meta.url,
+);
 
 /** Exercise the real package budget test with matching authored and embedded fixture bytes. */
 async function runBudgetFixture(
@@ -11,11 +15,16 @@ async function runBudgetFixture(
   const temporary = await Deno.makeTempDir({ prefix: 'css-budget-location-' });
   try {
     const root = join(temporary, checkoutName, 'checkout');
+    await Deno.mkdir(join(temporary, 'tools/docs-site/fresh-ui'), { recursive: true });
+    await Deno.writeTextFile(
+      join(temporary, 'tools/docs-site/fresh-ui/payload-budgets.ts'),
+      await Deno.readTextFile(BUDGETS),
+    );
     await Deno.mkdir(join(root, 'tests'), { recursive: true });
     await Deno.mkdir(join(root, 'registry/components/ui'), { recursive: true });
     await Deno.mkdir(join(root, 'registry/theme/presets'), { recursive: true });
     const source = options.oversized
-      ? Array.from({ length: 6000 }, (_, i) => `.sample-${i}{--id:${i * 7919};padding:${i}px}\n`)
+      ? Array.from({ length: 9000 }, (_, i) => `.sample-${i}{--id:${i * 7919};padding:${i}px}\n`)
         .join('')
       : '.sample{color:red}\n';
     const theme = '/*' + 'theme bytes excluded '.repeat(20_000) + '*/';

@@ -15,3 +15,5 @@ and canonical report remain untouched. This run handles only the direct #2561 fo
   evidence for this scope. No product CSS/token/markup or dependency/lock change is intended.
 - Independent R1 found implicit-parent CSSNestedDeclarations were not rejected. Added
   conservative rejection and two real-browser regressions; original supported rewrite remains.
+- CI caught tracked-only inventory missing the new CSS README before git add. Regenerate
+  Aspire manifest after staging additions; one generated tooling-doc row is the repair.
