@@ -70,10 +70,10 @@ export async function createNetScriptAppHost(
   await wireServiceReferences(config, services, plugins);
 
   // 7. Register background processors
-  await registerBackgroundProcessors(builder, config, infrastructure, services, plugins, appHostDir, installationSecretFile);
+  const backgroundProcessors = await registerBackgroundProcessors(builder, config, infrastructure, services, plugins, appHostDir, installationSecretFile);
 
   // 8. Register applications
-  await registerApps(builder, config, infrastructure, services, plugins, appHostDir);
+  await registerApps(builder, config, infrastructure, services, plugins, appHostDir, backgroundProcessors);
 
   // 9. Register development tools
   await registerTools(builder, config, infrastructure, appHostDir);

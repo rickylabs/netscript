@@ -3,7 +3,7 @@ import { scaffoldAmount, scaffoldDate, scaffoldInitials, scaffoldRecordCount, sc
 import { appRoutes } from '@app/router.ts';
 import { CapabilityEmpty } from './capability-empty.tsx';
 import { RecordTable } from './record-table.tsx';
-import { SCAFFOLD_PERIOD_DAYS, type ScaffoldMetric, type ScaffoldOverview } from '@app/lib/scaffold-projections.ts';
+import { SCAFFOLD_PERIOD_DAYS, scaffoldWeeklyCounts, type ScaffoldMetric, type ScaffoldOverview } from '@app/lib/scaffold-projections.ts';
 
 interface DashboardProps {
   readonly overview: ScaffoldOverview;
@@ -12,10 +12,10 @@ interface DashboardProps {
   readonly locale?: string;
 }
 
-/** A new baseline is explicitly new; refund-rate improvements have the opposite tone. */
+/** Direction is explicit; ordinary declines are neutral, with red reserved for failures. */
 function MetricDelta({ metric, inverse = false, points = false, locale }: { metric: ScaffoldMetric; inverse?: boolean; points?: boolean; locale?: string }) {
   const change = points ? metric.delta : metric.percentChange;
-  const tone = metric.delta === 0 ? 'neutral' : (metric.delta > 0) !== inverse ? 'success' : 'danger';
+  const tone = metric.delta > 0 && !inverse ? 'success' : 'neutral';
   return <><span class='workspace-delta' data-tone={tone}>{change === null ? 'New' : `${metric.delta > 0 ? '↗' : metric.delta < 0 ? '↘' : '—'} ${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(Math.abs(change))}${points ? ' pts' : '%'}`}</span> <span>vs. previous {SCAFFOLD_PERIOD_DAYS} days</span></>;
 }
 
@@ -38,10 +38,10 @@ export default function DashboardView({ records, overview, capabilities, locale 
         <StatsGrid.Card label='Refund rate' value={new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(data.totals.refundRate.current) + '%'} detail={<MetricDelta metric={data.totals.refundRate} points inverse locale={locale} />} />
       </StatsGrid>
       <div class='workspace-overview-grid workspace-charts'>
-        <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Daily records</h2><p>{scaffoldRecordCount(data.totals.records.current, locale)} created in this period · UTC</p></div><Badge variant='muted'>Last {SCAFFOLD_PERIOD_DAYS} days</Badge></header>
-          <ChartBlock variant='column' aria-label='Daily record count for the current period' data={data.daily.slice(-SCAFFOLD_PERIOD_DAYS).map((day) => ({ label: new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(day.date)), value: day.count, tone: 'primary' }))} />
+        <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Records by week</h2><p>{scaffoldRecordCount(data.totals.records.current, locale)} created · 7-day groups, final group 2 days · UTC</p></div><Badge variant='muted'>Last {SCAFFOLD_PERIOD_DAYS} days</Badge></header>
+          <ChartBlock variant='column' valueDisplay='interactive' aria-label='Weekly record counts for the current 30-day period; final group contains two days' unit=' records' data={scaffoldWeeklyCounts(data.daily.slice(-SCAFFOLD_PERIOD_DAYS)).map((week) => ({ label: new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', timeZone: 'UTC' }).formatRange(new Date(week.from), new Date(week.to)), value: week.count, tone: 'secondary' }))} />
         </section>
-        <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Status breakdown</h2><p>All records in your workspace</p></div></header><Donut class='workspace-status-chart' total={data.statusCounts.reduce((total, item) => total + item.count, 0)} aria-label='Record status breakdown' data={data.statusCounts.filter((item) => item.count > 0).map((item) => ({ label: `${scaffoldStatuses[item.status].label} · ${item.count}`, value: item.count, tone: item.status === 'paid' ? 'success' : item.status === 'cancelled' ? 'destructive' : item.status === 'awaiting_payment' ? 'warning' : item.status === 'shipped' ? 'primary' : 'secondary' }))} />{data.state === 'empty' && <p class='workspace-muted'>Create your first record to see its status here.</p>}</section>
+        <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Status breakdown</h2><p>All records in your workspace</p></div></header><Donut class='workspace-status-chart' total={data.statusCounts.reduce((total, item) => total + item.count, 0)} aria-label='Record status breakdown' data={data.statusCounts.filter((item) => item.count > 0).map((item) => ({ label: `${scaffoldStatuses[item.status].label} · ${item.count}`, value: item.count, tone: item.status === 'paid' ? 'success' : item.status === 'cancelled' ? 'secondary' : item.status === 'awaiting_payment' ? 'warning' : item.status === 'shipped' ? 'primary' : 'secondary' }))} />{data.state === 'empty' && <p class='workspace-muted'>Create your first record to see its status here.</p>}</section>
       </div>
     </> : <CapabilityEmpty capability={{ id: 'overview', label: 'Record summary', state: overview.state, description: overview.message, command: 'command' in overview ? overview.command : undefined }} />}
     <div class='workspace-overview-grid'>

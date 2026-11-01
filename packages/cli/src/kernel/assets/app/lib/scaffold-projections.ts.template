@@ -96,3 +96,12 @@ export function projectScaffoldOverview(records: ScaffoldRecords, options: { rea
     latest: [...records.rows].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt) || a.reference.localeCompare(b.reference)).slice(0, latestLimit),
   };
 }
+
+/** Seven-day groups within the supplied window; the final group may be shorter. */
+export function scaffoldWeeklyCounts(days: readonly ScaffoldDailyBucket[]) {
+  const DAYS_PER_WEEK = 7;
+  return Array.from({ length: Math.ceil(days.length / DAYS_PER_WEEK) }, (_, index) => {
+    const group = days.slice(index * DAYS_PER_WEEK, (index + 1) * DAYS_PER_WEEK);
+    return { from: group[0]!.date, to: group.at(-1)!.date, count: group.reduce((total, day) => total + day.count, 0) };
+  });
+}

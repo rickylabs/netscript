@@ -11,7 +11,9 @@ const projectionUrl = moduleUrl(
     JSON.stringify(contractUrl),
   ),
 );
-const { projectScaffoldOverview: project, scaffoldMetric } = await import(projectionUrl);
+const { projectScaffoldOverview: project, scaffoldMetric, scaffoldWeeklyCounts } = await import(
+  projectionUrl
+);
 const now = new Date('2026-11-01T23:59:00Z');
 
 function row(id: number, createdAt: string, amount = 100, status = 'paid', currency = 'USD') {
@@ -293,4 +295,21 @@ Deno.test('activity selects latest changes before limiting, independently of rec
   });
   assertEquals(result.latest[0].id, '2');
   assertEquals(result.changes[0].id, '1');
+});
+
+Deno.test('weekly chart preserves the complete current window and identifies the partial last group', () => {
+  const overview = project({
+    state: 'ready',
+    message: '',
+    rows: [row(1, '2026-10-03T12:45:00Z'), row(2, '2026-11-01T17:22:00Z')],
+  }, { now });
+  const weeks = scaffoldWeeklyCounts(overview.daily.slice(-30));
+  assertEquals(weeks.length, 5);
+  assertEquals(weeks[0], { from: '2026-10-03', to: '2026-10-09', count: 1 });
+  assertEquals(weeks[4], { from: '2026-10-31', to: '2026-11-01', count: 1 });
+  assertEquals(
+    weeks.reduce((total: number, week: { count: number }) => total + week.count, 0),
+    overview.totals.records.current,
+  );
+  assertEquals(scaffoldWeeklyCounts([]), []);
 });

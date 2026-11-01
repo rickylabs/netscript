@@ -1,5 +1,6 @@
 const SAMPLE_RECORD_COUNT = 40;
-const SAMPLE_WINDOW_DAYS = 60;
+// Bursts, quiet days and a busier recent month make the sample useful for time-series views.
+const SAMPLE_DAY_OFFSETS = [0, 0, 1, 2, 2, 2, 4, 5, 6, 6, 9, 10, 12, 12, 13, 16, 17, 17, 19, 20, 21, 21, 22, 25, 27, 29, 31, 33, 33, 36, 38, 40, 42, 45, 45, 48, 50, 54, 57, 59] as const;
 const FIRST_REFERENCE = 10482;
 const DAY_MS = 86400000;
 
@@ -18,11 +19,12 @@ export function createSampleRecords(anchor: Date = new Date()) {
   return Array.from({ length: SAMPLE_RECORD_COUNT }, (_, index) => {
     const [ownerName, ownerEmail] = owners[index % owners.length]!;
     const status = statuses[index % statuses.length]!;
-    const createdAt = new Date(day - Math.floor(index * (SAMPLE_WINDOW_DAYS - 1) / (SAMPLE_RECORD_COUNT - 1)) * DAY_MS).toISOString();
+    const minutes = 20 * 60 + 37 - (index % 6) * 93;
+    const createdAt = new Date(day - SAMPLE_DAY_OFFSETS[index]! * DAY_MS + minutes * 60000).toISOString();
     const value = 8990 + (index * 13751) % 180000;
     return {
       reference: `REC-${FIRST_REFERENCE - index}`,
-      name: index === 0 ? 'Seed {{modelName}}' : `${names[index % names.length]} ${index + 1}`,
+      name: index === 0 ? 'Seed {{modelName}}' : names[index % names.length]!,
       ownerName, ownerEmail, status,
       amount: status === 'refunded' ? -value : status === 'cancelled' ? 0 : value,
       currency: 'USD', createdAt, updatedAt: createdAt,

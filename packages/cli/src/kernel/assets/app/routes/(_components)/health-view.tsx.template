@@ -35,7 +35,7 @@ export default function HealthView({ payload }: HealthRouteData) {
         <span class='workspace-health-dot' />
         <div>
           <h2>
-            {healthy} operational{unlinked > 0 && <>· {unlinked} not linked</>}
+            {healthy} operational{unlinked > 0 && <>{' '}· {unlinked} not linked</>}
           </h2>
           <p>
             Last checked{' '}
@@ -68,8 +68,8 @@ export default function HealthView({ payload }: HealthRouteData) {
         <div>
           <dt>Web uptime</dt>
           <dd>
-            {Math.floor(payload.uptime / 60)}
-            <small>min</small>
+            {payload.uptime < 60 ? payload.uptime : Math.floor(payload.uptime / 60)}
+            <small>{payload.uptime < 60 ? 'sec' : 'min'}</small>
           </dd>
         </div>
       </dl>
@@ -78,8 +78,8 @@ export default function HealthView({ payload }: HealthRouteData) {
           <div>
             <h2>Resource status</h2>
             <p>
-              Response latency at this check. Web time includes dependency checks. Not linked means
-              this app has no discovery endpoint.
+              Response latency at this check. Background processes report their own readiness. Web
+              time includes dependency checks.
             </p>
           </div>
         </header>
@@ -91,7 +91,7 @@ export default function HealthView({ payload }: HealthRouteData) {
               </span>
               <div>
                 <h3>{resource.name}</h3>
-                <p>{resource.kind}</p>
+                <p>{resource.kind === 'Background' ? 'Background process' : resource.kind}</p>
               </div>
               <span class='workspace-health-latency'>
                 {resource.latencyMs === undefined ? '—' : `${resource.latencyMs} ms`}

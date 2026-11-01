@@ -62,3 +62,20 @@ Deno.test('ChartBlock reserves the chart palette for automatic series and preser
   );
   assert(html.includes('data-tone="destructive"'), 'explicit destructive intent survives');
 });
+
+Deno.test('interactive columns expose exact values to keyboard and assistive technology, including zero', () => {
+  const html = render(
+    ChartBlock({
+      variant: 'column',
+      valueDisplay: 'interactive',
+      unit: ' records',
+      data: [{ label: 'Oct 3–9', value: 0 }, { label: 'Oct 10–16', value: 7 }],
+    }),
+  );
+  assert(html.includes('data-values="interactive"'));
+  assert((html.match(/tabindex="0"/g) ?? []).length === 2);
+  assert(html.includes('aria-label="Oct 3–9: 0 records"'));
+  assert(html.includes('aria-label="Oct 10–16: 7 records"'));
+  const defaultHtml = render(ChartBlock({ variant: 'column', data: DATA }));
+  assert(!defaultHtml.includes('tabindex='), 'existing consumers retain their default interaction');
+});

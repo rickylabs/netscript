@@ -26,8 +26,24 @@ Deno.test('shared sample has forty deterministic rich rows across sixty UTC days
   assertEquals(new Set(rows.map((row: { ownerEmail: string }) => row.ownerEmail)).size, 5);
   assertEquals(rows[0].reference, 'REC-10482');
   assertEquals(rows[0].name, 'Seed Shipment');
-  assertEquals(rows[0].createdAt, '2026-11-01T00:00:00.000Z');
-  assertEquals(rows[39].createdAt, '2026-09-03T00:00:00.000Z');
+  assertEquals(rows[0].createdAt, '2026-11-01T20:37:00.000Z');
+  assertEquals(rows[39].createdAt, '2026-09-03T15:58:00.000Z');
+  const counts = new Map<string, number>();
+  for (const row of rows) {
+    counts.set(row.createdAt.slice(0, 10), (counts.get(row.createdAt.slice(0, 10)) ?? 0) + 1);
+  }
+  assert(new Set(counts.values()).size >= 3, 'sample has single days and varied bursts');
+  assert(
+    rows.every((row: { name: string; createdAt: string }) =>
+      !/\d+$/.test(row.name) && !row.createdAt.includes('T00:00:00')
+    ),
+  );
+  assert(
+    rows.every((row: { createdAt: string }, index: number) =>
+      index === 0 || row.createdAt <= rows[index - 1].createdAt
+    ),
+    'reference and insertion order remain chronological',
+  );
   assert(
     rows.every((row: { amount: number; status: string; currency: string }) =>
       Number.isSafeInteger(row.amount) && row.currency === 'USD' &&

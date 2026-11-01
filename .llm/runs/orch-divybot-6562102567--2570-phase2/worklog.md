@@ -76,3 +76,31 @@ S4 — terminal PASS: same read-only Astra source reviewer approved explicit uni
 S5 CI contract reconciliation: S4 test3 is green (1,861passed,0failed), and SQLite runtime passed the restored Overview gate before exposing obsolete behavior.app-reference expectations for the former Cache-first query/Managed form/Deferred summary headings. Update the E2E expected headings to the authored Service records/Validate a note/resource summary surface, preserving seeded-cell requirements, both viewport sizes and every route. Strip script bodies before semantic-marker checks so hydration-only strings cannot satisfy them. Scope: app-reference probe/tests and run evidence; no product or visual change. Same source reviewer and full CI rerun required.
 
 S5 — terminal PASS: same independent read-only Astra source reviewer confirms current authored headings and unchanged route/viewport/seeded-cell scope.63probe/builder/registry tests, scoped2filecheck/lint/fmt and quality/architecture PASS. Live browser DOM passed the updated assertions on the seeded Orders example plus freshly CLI-generated People resource at1440/390; fixture labels adapt Users→Orders and Seed User→Seed Order only. Owned preview stopped. No product/visual/carrier changes; source manifest reconciled. Rerun full CI after this signoff commit.
+
+## S6 — owner polish checkpoint, 2026-11-01
+
+Owner direction places PR #2586 on hold and supersedes the previous READY. Baseline bc0d1cd; normal merge of origin/main a182c37 is already satisfied. Same branch and evaluator override; no rebase or force push.
+
+1. Public surface: five weekly count bins with axis and hover/keyboard values; varied sample dates and natural names; neutral cancellations and declines; genuine background readiness; consistent filters and record names.
+2. Vocabulary: weekly bin is a consecutive group of up to seven UTC days within the current 30-day period; background readiness means the child's own registry and dependency flags, never the API sibling's availability.
+3. Ports: existing service projections, ChartBlock, generated Aspire resource maps and server-only discovery, child /health, canonical sample factory. No dependency or authentication changes.
+4. Constants: named seven-day bin width and deterministic sample day offsets/time slots; existing theme tokens for ink, field sizing and typography.
+5. Slice: S6 implements required #2587 items 1/2/5/6 (owner list 1–4), meaningful focused tests, source and emitted gates, live screenshots and independent source/visual review; commit includes this run. Carriers and all check:* gates plus full runtime CI required on final head.
+6. Deferred scope: assess record mutation event publication and seed-triggered jobs separately; preserve them in #2587 if their lifecycle/authentication work cannot fit the roughly two-hour window. Do not present fixture-triggered work as shipped seed behavior.
+7. Contributor path: app/lib/scaffold-projections.ts.template explains chart data; service/sample-records.ts.template owns seed realism. Existing canonical scaffold README remains the architecture entry point.
+
+Architecture: CLI/tooling archetype 6 plus existing Fresh UI component contract. Shared ChartBlock needs an opt-in interactive value mode because the current component has neither focus targets nor hover values; retain default rendering for existing consumers. Aspire generator passes background resources to app registration and injects only readiness-bearing Deno/KV child endpoints server-side. No new public network API or architectural debt.
+
+### S6 optional-scope decision
+
+Keep #2587 open for issue items 3/4 (owner items 5/6): attributed record create/update stream events require a distinct event contract and explicit topic access/actor mapping; automatic seed execution needs an idempotent handoff because DB CLI mode returns before plugin/worker registration. Neither should be improvised as UI data or a seed-time call to an absent worker. The roughly two-hour pass prioritizes the four required groups and repeats full live, independent review and CI gates. The acceptance fixture continues to trigger its real health-check job explicitly; that demonstrates progress/events but is not claimed as shipped seed automation.
+
+### S6 implementation and local evidence
+
+Independent source round1 found generic QueryResult cancellation still destructive; corrected it, added rendered cancelled/failed coverage and regenerated canonical goldens. Same evaluator round2 PASS. Browser found class-only filter selects missed Utility scope rules; replaced them with installed shared Select. Allfourvariants now report32pxheight/14pxsans for each control. Fresh40-record SQLite workspace with workers+streams reports5healthy resources including the actual background child. Explicit fixture health-check execution completed100% and generated real stream events.
+
+Deno2.9.7:79focusedtests,232regressions,11renderer/goldenchecks and28finalparity/CSSchecks passed (overlapping groups); scopedcheck/lint/fmt10files, emitted134files and root4198files/35batches passed. Quality/architecture and all15rootcheck:* tasks passed.68freshscreens and browserinteractions passed allfourvariants. Independent newvisual review and new-headCI stillpending; no READY untilbothpass. See polish/validation.json and polish/source-review.md.
+
+### S6 supervisor sign-off and reconcile
+
+Independent source PASS and fresh independent visual PASS: all78images inspected (10Figma,68actual); everypagegroup/allfourvariants meetsdensity/craftbar, minima8.0–8.5. Requiredowneritems1–4 arecomplete; owneritems5/6remainin#2587. No unresolvedsource/visualfindings. Latestorigin/main remainsa182c37alreadymergednormally. Finalsourcehashesmatchpolish/reviewed-source.json; allrequiredlocalgatespass. OwnedAppHoststopped, zero provenrun-owned survivors;24unknown-ownerentriesleftuntouched. Commit/pushS6normally, thenrequirefullnew-headcore+runtimeCIbeforeNEWREADY.

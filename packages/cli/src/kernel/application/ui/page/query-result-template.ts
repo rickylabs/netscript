@@ -136,7 +136,7 @@ function QueryResult({ value, amountUnit }: { value: unknown; amountUnit?: Amoun
                             data-part='root'
                             data-variant={row[field] === 'paid' || row[field] === 'completed'
                               ? 'success'
-                              : row[field] === 'cancelled' || row[field] === 'failed'
+                              : row[field] === 'failed'
                               ? 'destructive'
                               : row[field] === 'awaiting_payment'
                               ? 'warning'

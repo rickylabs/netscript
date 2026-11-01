@@ -28,7 +28,7 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      '69cbd4c62327e79d98b8c64d8232d44dddb662c7cfcc4d67119adc545c4fadc2',
+      'cebfafc0bb3ebf148f867394626b46ccf0d77f78696337354fb517e02e7ad977',
     ],
     [
       'routes/orders/(_shared)/orders-loaders.ts',
@@ -58,7 +58,7 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      '69cbd4c62327e79d98b8c64d8232d44dddb662c7cfcc4d67119adc545c4fadc2',
+      'cebfafc0bb3ebf148f867394626b46ccf0d77f78696337354fb517e02e7ad977',
     ],
     [
       'routes/orders/(_lib)/orders-form.ts',
@@ -92,7 +92,7 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      '69cbd4c62327e79d98b8c64d8232d44dddb662c7cfcc4d67119adc545c4fadc2',
+      'cebfafc0bb3ebf148f867394626b46ccf0d77f78696337354fb517e02e7ad977',
     ],
     [
       'routes/orders/(_shared)/orders-loaders.ts',
@@ -122,7 +122,7 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      '69cbd4c62327e79d98b8c64d8232d44dddb662c7cfcc4d67119adc545c4fadc2',
+      'cebfafc0bb3ebf148f867394626b46ccf0d77f78696337354fb517e02e7ad977',
     ],
     [
       'routes/orders/(_islands)/OrdersStream.tsx',

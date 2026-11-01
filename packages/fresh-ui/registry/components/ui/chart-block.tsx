@@ -30,6 +30,8 @@ interface ChartBlockProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'clas
   sub?: string;
   unit?: string;
   variant?: 'bar' | 'column';
+  /** Column values can be revealed on hover or keyboard focus instead of always shown. */
+  valueDisplay?: 'always' | 'interactive';
   class?: string;
 }
 
@@ -57,7 +59,16 @@ function formatTick(n: number): string {
  * Renders a horizontal-bar or vertical-column metric chart.
  */
 export function ChartBlock(
-  { data, title, sub, unit = '', variant = 'bar', class: className, ...props }: ChartBlockProps,
+  {
+    data,
+    title,
+    sub,
+    unit = '',
+    variant = 'bar',
+    valueDisplay = 'always',
+    class: className,
+    ...props
+  }: ChartBlockProps,
 ): VNode {
   const max = niceMax(Math.max(0, ...data.map((datum) => datum.value)));
 
@@ -67,6 +78,7 @@ export function ChartBlock(
       <div
         {...props}
         class={cn('ns-colchart', className)}
+        data-values={valueDisplay}
         data-part='root'
         data-scope='chart-block'
       >
@@ -95,7 +107,17 @@ export function ChartBlock(
           </div>
           <div class='ns-colchart__grid' data-part='grid' data-scope='chart-block'>
             {data.map((datum, i) => (
-              <div key={i} class='ns-colchart__col' data-part='col' data-scope='chart-block'>
+              <div
+                key={i}
+                class='ns-colchart__col'
+                data-part='col'
+                data-scope='chart-block'
+                tabIndex={valueDisplay === 'interactive' ? 0 : undefined}
+                role={valueDisplay === 'interactive' ? 'img' : undefined}
+                aria-label={valueDisplay === 'interactive'
+                  ? `${datum.label}: ${datum.value}${unit}`
+                  : undefined}
+              >
                 <div
                   class='ns-colchart__bar'
                   data-part='bar'

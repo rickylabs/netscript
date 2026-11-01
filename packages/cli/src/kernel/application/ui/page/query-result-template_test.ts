@@ -110,3 +110,12 @@ Deno.test('pagination presents boolean navigation metadata while retaining unkno
     'Custom navigation metadata',
   );
 });
+
+Deno.test('cancellation is neutral while actual failures retain destructive semantics', async () => {
+  const render = await renderer();
+  const cancelled = render([{ status: 'cancelled' }]);
+  const failed = render([{ status: 'failed' }]);
+  assertStringIncludes(cancelled, 'data-variant="muted"');
+  assert(!cancelled.includes('destructive'));
+  assertStringIncludes(failed, 'data-variant="destructive"');
+});

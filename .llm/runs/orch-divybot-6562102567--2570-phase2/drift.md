@@ -15,3 +15,7 @@ S2 emitted-app check caught plugin-streams-core redefining ImportMeta.env with a
 S2 public evidence hygiene: the initial leak reporter wrote host paths into its public summary. Replaced that auto-generated report with ownership counts and repository-relative preview roots; raw details remain private. No history rewrite or resource mutation.
 
 S2 review expanded focused tests to execute emitted generic TSX (preact/render-to-string from existing root catalog, no dependency pin change), and added an internal ResourceResultPresentation argument for the known sample contract. Health includes configured BackgroundProcessors. Public activity only; app-owned authorization for private topics remains an explicit extension point, not a credential bypass.
+
+### S6 optional-scope decision
+
+Keep #2587 open for issue items 3/4 (owner items 5/6): attributed record create/update stream events require a distinct event contract and explicit topic access/actor mapping; automatic seed execution needs an idempotent handoff because DB CLI mode returns before plugin/worker registration. Neither should be improvised as UI data or a seed-time call to an absent worker. The roughly two-hour pass prioritizes the four required groups and repeats full live, independent review and CI gates. The acceptance fixture continues to trigger its real health-check job explicitly; that demonstrates progress/events but is not claimed as shipped seed automation.

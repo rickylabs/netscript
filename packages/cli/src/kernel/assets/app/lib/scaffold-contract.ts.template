@@ -18,7 +18,7 @@ export const scaffoldStatuses = {
   paid: { label: 'Paid', tone: 'success', badgeVariant: 'success' },
   shipped: { label: 'Shipped', tone: 'info', badgeVariant: 'info' },
   refunded: { label: 'Refunded', tone: 'neutral', badgeVariant: 'muted' },
-  cancelled: { label: 'Cancelled', tone: 'danger', badgeVariant: 'destructive' },
+  cancelled: { label: 'Cancelled', tone: 'neutral', badgeVariant: 'muted' },
 } as const;
 export type ScaffoldStatus = keyof typeof scaffoldStatuses;
 

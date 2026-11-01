@@ -11,3 +11,5 @@ Routing query: `deno task agentic:matrix --tier feature --json` at baseline. Def
 Scope: real projection-driven Utility pages; seeded live/plugin/browser proof; source, emitted-app, carrier and CI gates. No fake template data, rebase, force push, labels, merge, public absolute paths or session IDs. Specific owner process (draft, Refs #2570, READY only after required checks) supersedes generic assignment boilerplate.
 
 S2 support scope: packages/plugin-streams-core/src/application/stream-browser-environment.d.ts, correcting ambient declaration merging required to consume the public streams API from Fresh/Vite. No new runtime API.
+
+S6 scope: owner #2587 polish includes ChartBlock interactive values and generated Aspire background discovery. All writes remain inside the declared CLI/Fresh UI/run surfaces.
