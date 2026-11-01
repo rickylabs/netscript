@@ -72,8 +72,9 @@ Deno.test('no-service scaffold loader has no missing contract imports or static 
     const route = renderTemplate(crud, { ...variables, hasService });
     assertStringIncludes(
       route,
-      `serviceHref: ${hasService} ? appRoutes.serviceExample.href() : undefined`,
+      'serviceHref: HAS_EXAMPLE_SERVICE ? appRoutes.serviceExample.href() : undefined',
     );
+    assertStringIncludes(route, `const HAS_EXAMPLE_SERVICE = ${hasService};`);
     assertStringIncludes(route, 'recordsHref: appRoutes.records.href()');
   }
   const crudView = readTemplateAssetSync(TEMPLATE_KEYS.appRoutesExamplesComponentsCrudView);
@@ -84,7 +85,8 @@ Deno.test('no-service scaffold loader has no missing contract imports or static 
     readTemplateAssetSync(TEMPLATE_KEYS.appRoutesExamplesIndex),
     variables,
   );
-  assertStringIncludes(examples, 'canonicalHref: false ?');
+  assertStringIncludes(examples, 'const HAS_EXAMPLE_SERVICE = false;');
+  assertStringIncludes(examples, 'canonicalHref: HAS_EXAMPLE_SERVICE ?');
   assertEquals(examples.includes('Placeholder'), false);
 });
 

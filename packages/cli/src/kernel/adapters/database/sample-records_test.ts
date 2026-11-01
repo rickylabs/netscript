@@ -58,6 +58,10 @@ Deno.test('emitted seed upserts every reference, preserves edits on rerun and di
   const { runSeed } = await import(moduleUrl(source));
   await runSeed();
   assertEquals(database.rows.size, 40);
+  // Fresh auto-increment IDs preserve chronology, so the default descending CRUD page is recent.
+  const inserted = [...database.rows.values()];
+  assertEquals(inserted[0].reference, 'REC-10443');
+  assertEquals(inserted.at(-1).reference, 'REC-10482');
   database.rows.get('REC-10482').name = 'Owner edited this';
   await runSeed();
   assertEquals(database.rows.size, 40);

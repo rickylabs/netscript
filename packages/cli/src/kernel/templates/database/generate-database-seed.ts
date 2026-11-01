@@ -26,7 +26,8 @@ export function generateDatabaseSeed(options: DatabaseSeedOptions): string {
   const delegateName = toCamelCase(modelName);
   const body = `  const client = await db.getClient();
   try {
-    for (const row of createSampleRecords()) {
+    // Insert oldest first so the generic CRUD page's ID-descending default also shows recent data.
+    for (const row of createSampleRecords().toReversed()) {
       await client.${delegateName}.upsert({
         where: { reference: row.reference },
         create: { ...row, createdAt: new Date(row.createdAt), updatedAt: new Date(row.updatedAt) },

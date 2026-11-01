@@ -41,3 +41,11 @@ The Pages build on 4689292 failed documentation snippet compilation because the 
 Proof after repair: docs:snippets PASS (36 compiled fences, 49 in tier 1); scaffold.service PASS (8/8 gates including two-service client reconciliation and generated workspace check); real SQLite generated check PASS (133 files). Same independent Claude reviewer returned SLICE_REVIEW_PASS for this repair.
 
 Reconcile: current-head failures are understood and repaired locally; push normally, rerun current-head CI runtime, and do not claim READY until those jobs are green or policy-skipped.
+
+## Runtime repair slice
+
+Both manual runtime lanes at 44491ca passed 42/43 gates, failing generated.quality-negative on three pre-existing literal boolean conditions in example templates. Replaced literal ternary conditions with a named scaffold configuration binding; no page layout, checker or lint policy changed. Also insert seed rows oldest first so the unchanged generic ID-descending ten-row page contains the latest representative record. Upserts still preserve existing IDs and edits.
+
+Independent same-session review: SLICE_REVIEW_PASS. Execution: 219/219 focused tests, generated project lint PASS across 139 files, and a fresh real SQLite migration/seed proves the first ID-descending row is REC-10482 / Seed User (id 40). Existing UI proof fields and projection arithmetic remain unchanged. Scoped lint/fmt cover the changed source.
+
+Reconcile: prior Pages build and static/native CI are green; runtime failures are current and repaired locally, not waived. Commit/push, run current-head carrier checks, dispatch the canonical full runtime again, and resume the same final evaluator after terminal results.

@@ -73,3 +73,47 @@ I read the uncommitted diff against HEAD `4689292`, which touches four files: th
 - A green CI run at the new commit for the documentation compile build and `scaffold-static`.
 - The post-commit assets-barrel check.
 - The CI `scaffold.runtime` receipt.
+
+
+# Runtime repair slice
+
+**SLICE_REVIEW_PASS**
+
+I reviewed the uncommitted diff on top of `44491ca`: two example route templates, the seed generator, three test files, the embedded carrier and a `drift.md` entry. I ran no tests and changed nothing. Your focused tests and the generated-project lint are still running, and I'm relying on them for execution proof.
+
+## 1. Lint fix in the example routes (`examples/crud.tsx.template`, `examples/index.tsx.template`)
+
+- **What changed.** Each template now binds `{{hasService}}` to `const HAS_EXAMPLE_SERVICE` at the top. All three conditions now test that name: `serviceHref` in crud, and `canonicalHref` plus the service/telemetry spread in index.
+- **Why it works.** Deno's `no-constant-condition` rule only flags conditions that are literal values. It does not follow const bindings, so the rule stays fully on and nothing is suppressed. I'm reasoning from how the rule behaves; your generated-project lint and the CI rerun will confirm it.
+- **Same output either way.** For both `true` and `false`, the same branches render with the same types as before. The no-service case still compiles, because `appRoutes.serviceExample` was already referenced in the unused branch before this change.
+- **Tests.** They now check the binding for both values and that each condition uses the name.
+- **Carrier.** `embedded.generated.ts` changes exactly those two template entries. Each new string is present once per template.
+- **Scope.** No layout, copy or lint configuration changed.
+
+## 2. Seed insertion order (`generate-database-seed.ts:30`)
+
+- **What changed.** The seed now loops over `createSampleRecords().toReversed()`, so rows are written oldest first. On a fresh database, REC-10443 gets the first auto-increment ID and REC-10482 ("Seed {{modelName}}") gets the last.
+- **Why it matters.** The generic CRUD list defaults to ID descending, 10 per page. With oldest-first insertion, its first page shows the ten newest samples, including the representative Seed row. The probe looks for that row.
+- **Nothing else changes.**
+  - Reruns still upsert by reference with an empty update, so existing IDs and edits are preserved.
+  - Sample content, schema, contracts and projections are unchanged.
+  - The records page and overview sort by `createdAt` explicitly, so they don't depend on insertion order.
+  - The memory repository doesn't use this seed and defaults to `createdAt` descending.
+- **`toReversed()`.** It's ES2023 and supported by Deno 2.9's runtime and default type libraries. It returns a copy, so the source array isn't mutated.
+- **Test.** The seed test now checks that the first and last upsert calls are REC-10443 and REC-10482. All the existing idempotence and disconnect checks are kept. Call order is a reasonable stand-in for ID order with auto-increment.
+
+## Fit with the plan
+
+This stays within the locked plan ("upsert by reference, update empty, reruns preserve edits") and the existing generic CRUD behaviour. No checker, gate or exemption was weakened. `drift.md` records both repairs and the reason for each.
+
+## Residual notes (not findings)
+
+- **Another literal in the records page.** `records/index.tsx.template:11` still renders `{ {{hasService}} && <Button…> }`, which becomes a literal `true && …` / `false && …`. CI didn't report it, which is consistent with `no-constant-condition` checking only `if`/loop/ternary tests. If a stricter rule is enabled later, apply the same named-constant pattern there.
+- **Old databases.** A database seeded by an earlier head keeps its original IDs. The new insertion order only applies to fresh databases, which is the scaffold case.
+
+## Still needed at the new head before final IMPL-EVAL
+
+- Green focused tests and generated-project lint.
+- Regenerated-carrier checks after commit (assets-barrel and publish-assets).
+- A full manual e2e-cli run with both lanes green: postgres `scaffold.runtime` (43/43 gates, including generated.quality-negative) and SQLite runtime.
+- Source-tree equality between the evaluated head and the final evidence head, outside `.llm/runs/`.
