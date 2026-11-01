@@ -401,6 +401,8 @@ export async function writeNormalizedAppFiles(
   // Utility page assets share the canonical template registry and renderer.
   const workspacePages = [
     ['lib/scaffold-contract.ts', appAssets.appScaffoldContract],
+    ['lib/scaffold-projections.ts', appAssets.appScaffoldProjections],
+    ['lib/scaffold-overview.ts', appAssets.appScaffoldOverview],
     ['lib/scaffold-capabilities.ts', appAssets.appScaffoldCapabilities],
     ['lib/scaffold-plugin-capabilities.ts', appAssets.appScaffoldPluginCapabilities],
     ['lib/scaffold-service-context.ts', appAssets.appScaffoldServiceContext],

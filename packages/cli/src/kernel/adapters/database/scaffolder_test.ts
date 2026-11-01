@@ -148,8 +148,8 @@ describe('DatabaseScaffolder', () => {
       seededCrudZod,
       'export const ProductUpdateInput = ProductCreateInput.partial();',
     );
-    assertStringIncludes(seed, 'const existing = await client.product.findFirst(');
-    assertStringIncludes(seed, 'await client.product.create({');
+    assertStringIncludes(seed, 'await client.product.upsert(');
+    assertStringIncludes(seed, 'where: { reference: row.reference }');
   });
 
   it('derives unique container database names for added engines', async () => {
@@ -181,6 +181,6 @@ describe('DatabaseScaffolder', () => {
 
     assertStringIncludes(mysql.databaseName, 'alpha-app-mysql-db');
     assertStringIncludes(mssql.databaseName, 'alpha-app-mssql-db');
-    assertStringIncludes(defaultSeed, 'client.exampleRecord.findFirst(');
+    assertStringIncludes(defaultSeed, 'client.exampleRecord.upsert(');
   });
 });

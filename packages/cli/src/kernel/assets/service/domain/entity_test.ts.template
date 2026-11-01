@@ -3,11 +3,18 @@ import { listQuery, pagination } from './{{entityName}}.ts';
 Deno.test('{{modelName}} list policy bounds the page and rejects unknown sort fields', () => {
   const input = { page: 2, limit: 10, sortBy: 'unsafe', sortOrder: 'desc' as const };
   const query = listQuery(input);
-  if (query.skip !== 10 || query.take !== 10 || query.orderBy.id !== 'desc') {
+  if (query.skip !== 10 || query.take !== 10 || query.orderBy[0].id !== 'desc' || query.orderBy.length !== 1) {
     throw new Error('Unexpected list query');
   }
   const result = pagination(input, 25);
   if (result.totalPages !== 3 || !result.hasNext || !result.hasPrev) {
     throw new Error('Unexpected pagination');
+  }
+});
+
+Deno.test('{{modelName}} list policy preserves status and uses one id tiebreaker for amount sorting', () => {
+  const query = listQuery({ page: 1, limit: 10, sortBy: 'amount', sortOrder: 'asc', status: 'paid' });
+  if (query.orderBy.length !== 2 || query.orderBy[0].amount !== 'asc' || query.orderBy[1].id !== 'asc' || query.where.status !== 'paid') {
+    throw new Error('Unexpected status filter or deterministic sort');
   }
 });

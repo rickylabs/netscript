@@ -11,13 +11,31 @@ export interface ScaffoldCapability {
   readonly command?: string;
 }
 
+/** Stable status labels and semantic tones for sample records. */
+export const scaffoldStatuses = {
+  pending: { label: 'Pending', tone: 'neutral', badgeVariant: 'muted' },
+  awaiting_payment: { label: 'Awaiting payment', tone: 'warning', badgeVariant: 'warning' },
+  paid: { label: 'Paid', tone: 'success', badgeVariant: 'success' },
+  shipped: { label: 'Shipped', tone: 'info', badgeVariant: 'info' },
+  refunded: { label: 'Refunded', tone: 'neutral', badgeVariant: 'muted' },
+  cancelled: { label: 'Cancelled', tone: 'danger', badgeVariant: 'destructive' },
+} as const;
+export type ScaffoldStatus = keyof typeof scaffoldStatuses;
+
 /** A presentation record projected from a typed service result. */
 export interface ScaffoldRecord {
   readonly id: string;
   readonly name: string;
   readonly description: string;
-  readonly status?: string;
-  readonly createdAt?: string;
+  readonly reference: string;
+  readonly ownerName: string;
+  readonly ownerEmail: string;
+  readonly status: ScaffoldStatus;
+  /** Signed integer minor units; never add amounts with different currency codes. */
+  readonly amount: number;
+  readonly currency: string;
+  readonly createdAt: string;
+  readonly updatedAt: string;
   readonly fields: readonly { readonly label: string; readonly value: string }[];
 }
 
@@ -28,6 +46,8 @@ export interface ScaffoldRecords {
   readonly total?: number;
   readonly page?: number;
   readonly hasNext?: boolean;
+  /** Serialized list controls, preserved when navigating to another page. */
+  readonly query?: Readonly<Record<string, string>>;
   readonly message: string;
   readonly command?: string;
 }
@@ -48,4 +68,21 @@ export interface ScaffoldRecordDetail {
   readonly notFound?: boolean;
   readonly message: string;
   readonly command?: string;
+}
+
+/** List query vocabulary shared by both generated storage adapters. */
+export const scaffoldSortFields = ['id', 'reference', 'name', 'ownerName', 'status', 'amount', 'currency', 'createdAt', 'updatedAt'] as const;
+
+/** Parse supported table controls; invalid values fall back to the stable default sort. */
+export function scaffoldRecordQuery(request: Request) {
+  const params = new URL(request.url).searchParams;
+  const rawPage = Number(params.get('page') ?? 1);
+  const sortBy = scaffoldSortFields.find((field) => field === params.get('sortBy')) ?? 'createdAt';
+  const status = (Object.keys(scaffoldStatuses) as ScaffoldStatus[]).find((value) => value === params.get('status'));
+  return { page: Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1, sortBy, sortOrder: params.get('sortOrder') === 'asc' ? 'asc' as const : 'desc' as const, ...(status ? { status } : {}) };
+}
+
+/** Preserve the active server query when navigating the records table. */
+export function scaffoldPageHref(base: string, records: ScaffoldRecords, page: number): string {
+  return base + '?' + new URLSearchParams({ ...records.query, page: String(page) });
 }

@@ -9,6 +9,8 @@ const APP_TEMPLATE_URLS: TemplateUrlMap = {
   appScaffoldContract: TEMPLATE_KEYS.appScaffoldContract,
   appScaffoldCapabilities: TEMPLATE_KEYS.appScaffoldCapabilities,
   appScaffoldPluginCapabilities: TEMPLATE_KEYS.appScaffoldPluginCapabilities,
+  appScaffoldProjections: TEMPLATE_KEYS.appScaffoldProjections,
+  appScaffoldOverview: TEMPLATE_KEYS.appScaffoldOverview,
   appScaffoldRecords: TEMPLATE_KEYS.appScaffoldRecords,
   appScaffoldServiceContext: TEMPLATE_KEYS.appScaffoldServiceContext,
   appScaffoldRecordsMemory: TEMPLATE_KEYS.appScaffoldRecordsMemory,

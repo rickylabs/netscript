@@ -1,11 +1,13 @@
 import { Badge, Button, EmptyState, ResponsiveTable, type ResponsiveTableColumn } from '@app/components/ui/mod.ts';
 import { appRoutes } from '@app/router.ts';
-import type { ScaffoldRecord, ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
+import { scaffoldStatuses, type ScaffoldRecord, type ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
 
 const columns: readonly ResponsiveTableColumn<ScaffoldRecord>[] = [
-  { key: 'id', label: 'Record', priority: 'primary', cell: (row) => <a class='workspace-record-link' href={appRoutes.record.href({ path: { id: row.id } })}>{row.id}</a> },
+  { key: 'id', label: 'Record', priority: 'primary', cell: (row) => <a class='workspace-record-link' href={appRoutes.record.href({ path: { id: row.id } })}>{row.reference}</a> },
   { key: 'name', label: 'Name', cell: (row) => <div><strong>{row.name}</strong><span class='workspace-record-description'>{row.description}</span></div> },
-  { key: 'status', label: 'Status', cell: (row) => row.status ? <Badge variant='muted'>{row.status}</Badge> : <span aria-label='Not provided'>—</span> },
+  { key: 'owner', label: 'Owner', cell: (row) => <div><strong>{row.ownerName}</strong><span class='workspace-record-description'>{row.ownerEmail}</span></div> },
+  { key: 'amount', label: 'Amount', align: 'end', cell: (row) => new Intl.NumberFormat('en', { style: 'currency', currency: row.currency }).format(row.amount / 10 ** new Intl.NumberFormat('en', { style: 'currency', currency: row.currency }).resolvedOptions().maximumFractionDigits!) },
+  { key: 'status', label: 'Status', cell: (row) => row.status ? <Badge variant={scaffoldStatuses[row.status].badgeVariant}>{scaffoldStatuses[row.status].label}</Badge> : <span aria-label='Not provided'>—</span> },
   { key: 'created', label: 'Created', align: 'end', cell: (row) => row.createdAt ? new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(row.createdAt)) : '—' },
 ];
 

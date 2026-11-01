@@ -1,0 +1,95 @@
+// Server-only, pure page projections. Read this file to extend the overview contract.
+import { scaffoldStatuses, type CapabilityState, type ScaffoldRecord, type ScaffoldRecords, type ScaffoldStatus } from './scaffold-contract.ts';
+
+export const SCAFFOLD_PERIOD_DAYS = 30;
+const DAY_MS = 86400000;
+
+/** Percent change is null for a new nonzero value with a zero baseline. */
+export interface ScaffoldMetric {
+  readonly current: number;
+  readonly previous: number;
+  readonly delta: number;
+  readonly percentChange: number | null;
+}
+/** Signed amounts across all statuses, in minor units and separated by currency; no revenue recognition or FX conversion. */
+export interface ScaffoldCurrencyMetrics {
+  readonly currency: string;
+  readonly amount: ScaffoldMetric;
+  readonly averageAmount: ScaffoldMetric;
+}
+/** UTC calendar-day bucket; days without records still appear with count zero. */
+export interface ScaffoldDailyBucket {
+  readonly date: string;
+  readonly count: number;
+  readonly amounts: readonly { readonly currency: string; readonly amount: number }[];
+}
+/** Bounds are inclusive from/exclusive to; current includes the whole UTC day containing now. */
+export interface ScaffoldPeriod {
+  readonly from: string;
+  readonly to: string;
+}
+interface OverviewData {
+  readonly periods: { readonly current: ScaffoldPeriod; readonly previous: ScaffoldPeriod };
+  readonly totals: {
+    readonly records: ScaffoldMetric;
+    /** Refunded records / all records, as a percentage; delta is percentage points. */
+    readonly refundRate: ScaffoldMetric;
+    readonly currencies: readonly ScaffoldCurrencyMetrics[];
+  };
+  /** Sixty zero-filled UTC days, oldest first, across both comparison periods. */
+  readonly daily: readonly ScaffoldDailyBucket[];
+  /** All loaded records, including those outside the comparison windows. */
+  readonly statusCounts: readonly { readonly status: ScaffoldStatus; readonly count: number }[];
+  readonly latest: readonly ScaffoldRecord[];
+}
+/** Failed/absent reads have no numeric payload, so they cannot masquerade as zero activity. */
+export type ScaffoldOverview =
+  | (OverviewData & { readonly state: 'ready' | 'empty'; readonly message: string })
+  | { readonly state: Exclude<CapabilityState, 'ready' | 'empty'>; readonly message: string; readonly command?: string };
+
+/** Compare signed amounts correctly even when the previous period was negative. */
+export function scaffoldMetric(current: number, previous: number): ScaffoldMetric {
+  const delta = current - previous;
+  return { current, previous, delta, percentChange: previous === 0 ? current === 0 ? 0 : null : delta / Math.abs(previous) * 100 };
+}
+
+/** Project a complete service read, never a paginated subset, into the page data contract. */
+export function projectScaffoldOverview(records: ScaffoldRecords, options: { readonly now?: Date; readonly latestLimit?: number } = {}): ScaffoldOverview {
+  if (records.state !== 'ready' && records.state !== 'empty') return { state: records.state, message: records.message, command: records.command };
+  const now = options.now ?? new Date();
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  if (!Number.isFinite(today)) throw new RangeError('Overview requires a valid date');
+  const end = today + DAY_MS;
+  const currentStart = end - SCAFFOLD_PERIOD_DAYS * DAY_MS;
+  const previousStart = currentStart - SCAFFOLD_PERIOD_DAYS * DAY_MS;
+  const dated = records.rows.map((row) => ({ row, timestamp: Date.parse(row.createdAt) }));
+  const current = dated.filter(({ timestamp }) => timestamp >= currentStart && timestamp < end).map(({ row }) => row);
+  const previous = dated.filter(({ timestamp }) => timestamp >= previousStart && timestamp < currentStart).map(({ row }) => row);
+  const currencies = [...new Set(records.rows.map((row) => row.currency))].sort();
+  const sum = (rows: readonly ScaffoldRecord[], currency: string) => rows.filter((row) => row.currency === currency).reduce((total, row) => total + row.amount, 0);
+  const average = (rows: readonly ScaffoldRecord[], currency: string) => {
+    const count = rows.filter((row) => row.currency === currency).length;
+    return count ? sum(rows, currency) / count : 0;
+  };
+  const refundRate = (rows: readonly ScaffoldRecord[]) => rows.length ? rows.filter((row) => row.status === 'refunded').length / rows.length * 100 : 0;
+  const latestLimit = options.latestLimit ?? 5;
+  if (!Number.isSafeInteger(latestLimit) || latestLimit < 0) throw new RangeError('latestLimit must be a nonnegative integer');
+  const period = (from: number, to: number): ScaffoldPeriod => ({ from: new Date(from).toISOString(), to: new Date(to).toISOString() });
+  return {
+    state: records.state,
+    message: records.message,
+    periods: { current: period(currentStart, end), previous: period(previousStart, currentStart) },
+    totals: {
+      records: scaffoldMetric(current.length, previous.length),
+      refundRate: scaffoldMetric(refundRate(current), refundRate(previous)),
+      currencies: currencies.map((currency) => ({ currency, amount: scaffoldMetric(sum(current, currency), sum(previous, currency)), averageAmount: scaffoldMetric(average(current, currency), average(previous, currency)) })),
+    },
+    daily: Array.from({ length: SCAFFOLD_PERIOD_DAYS * 2 }, (_, index) => {
+      const from = previousStart + index * DAY_MS;
+      const rows = dated.filter(({ timestamp }) => timestamp >= from && timestamp < from + DAY_MS).map(({ row }) => row);
+      return { date: new Date(from).toISOString().slice(0, 10), count: rows.length, amounts: currencies.map((currency) => ({ currency, amount: sum(rows, currency) })) };
+    }),
+    statusCounts: (Object.keys(scaffoldStatuses) as ScaffoldStatus[]).map((status) => ({ status, count: records.rows.filter((row) => row.status === status).length })),
+    latest: [...records.rows].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt) || a.reference.localeCompare(b.reference)).slice(0, latestLimit),
+  };
+}
