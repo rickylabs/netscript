@@ -248,6 +248,7 @@ Deno.test('all workflow concurrency mappings are classified and repo-wide litera
     'e2e-cli-prod-local.yml',
     'e2e-cli-prod.yml',
     'e2e-cli.yml',
+    'figma-component-library.yml',
     'fresh-ui-quality.yml',
     'generated-carriers.yml',
     'jsr-settings.yml',
