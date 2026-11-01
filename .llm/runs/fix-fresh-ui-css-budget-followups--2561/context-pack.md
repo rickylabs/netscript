@@ -30,3 +30,9 @@ will re-review after full replay; no sign-off commit until PASS.
 Final independent round2 PASS in evaluate.md. All16source hashes verified immediately
 before sign-off commit; implementation and evidence ready for ordinary push. PR2563
 fully resolves2561; umbrella2412 remains open. Remote CI pending; Cockpit owns merge.
+
+Post-push CI quality failure: generated Aspire manifest omitted the new tracked README.
+Canonical one-row refresh passes actual parity gate; same evaluator repair review pending.
+
+CI manifest repair independently PASS in evaluate-ci-repair.md; 17hashes verified.
+Ordinary push refreshes CI; original implementation verdict remains valid.

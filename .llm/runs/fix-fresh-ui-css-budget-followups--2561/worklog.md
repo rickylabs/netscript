@@ -89,3 +89,15 @@ required findings. Full post-repair replay PASS. The supervisor accepts that ind
 slice sign-off for this commit. Main advanced to0af8fd9; only deno.json overlaps and
 its design-skill task additions are separate from this branch CSS tasks. PR is MERGEABLE;
 no merge/rebase needed. No source changed after reviewed hash freeze. Remote CI pending.
+
+## Current-head CI repair
+
+CI run41293022496 quality failed only Aspire manifest freshness. Tracked-path scanning
+omitted the untracked new CSS README locally; CI saw it after commit. Canonical generator
+adds exactly its one tooling-doc row. Actual check:aspire-version-parity now passes with
+all source tracked. No runtime/source-policy change. Existing16source hashes unchanged;
+manifest added as17th reviewed file. Separate original evaluator will review this repair.
+
+Independent CI-repair PASS: same Anthropic evaluator verified all17hashes and reran actual
+Aspire parity gate:1022checked,zero failures,manifestFresh true. This generated-only repair
+is signed off for commit. Original product/tooling16files remain unchanged.
