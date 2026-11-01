@@ -10,12 +10,12 @@ export function {{resourcePascalCase}}Summary({ initialData, cachedAt }: Props) 
   const payload: unknown = initialData;
   const rows = Array.isArray(payload) ? payload : payload && typeof payload === 'object' && 'data' in payload && Array.isArray(payload.data) ? payload.data : payload && typeof payload === 'object' && 'items' in payload && Array.isArray(payload.items) ? payload.items : [];
   return (
-    <section id='{{resource}}-summary'>
+    <section class='workspace-resource-summary' id='{{resource}}-summary'>
       <Card>
         <Card.Header>
           <Card.Title>{{resourcePascalCase}} summary</Card.Title>
           <Card.Description>
-            Deferred at {new Date(cachedAt).toLocaleTimeString()}.
+            Current query snapshot.
           </Card.Description>
         </Card.Header>
         <Card.Body>

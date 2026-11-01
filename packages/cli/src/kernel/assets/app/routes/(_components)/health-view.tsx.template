@@ -1,9 +1,19 @@
-import { Badge, Button, PageHeader, StatsGrid } from '@app/components/ui/mod.ts';
+import { Badge, Button, PageHeader } from '@app/components/ui/mod.ts';
 import { appRoutes } from '@app/router.ts';
 import type { HealthRouteData } from '../(_shared)/health.ts';
 
 export default function HealthView({ payload }: HealthRouteData) {
   const healthy = payload.resources.filter((item) => item.state === 'healthy').length;
+  const unlinked = payload.resources.filter((item) => item.state === 'unwired').length;
+  const failed = payload.resources.some((item) => item.state === 'unavailable');
+  const restricted = payload.resources.some((item) => item.state === 'unauthorized');
+  const condition = failed
+    ? 'Degraded'
+    : restricted
+    ? 'Access required'
+    : unlinked
+    ? 'Discovery incomplete'
+    : 'Operational';
   return (
     <div class='workspace-page'>
       <PageHeader class='workspace-heading'>
@@ -21,16 +31,14 @@ export default function HealthView({ payload }: HealthRouteData) {
           </PageHeader.Actions>
         </PageHeader.Layout>
       </PageHeader>
-      <div class='workspace-health-banner' data-state={payload.status}>
+      <div class='workspace-health-banner' data-state={failed ? 'degraded' : 'healthy'}>
         <span class='workspace-health-dot' />
         <div>
           <h2>
-            {payload.status === 'healthy'
-              ? 'All systems operational'
-              : 'Some resources need attention'}
+            {healthy} operational{unlinked > 0 && <>· {unlinked} not linked</>}
           </h2>
           <p>
-            {healthy} of {payload.resources.length} resources responding · checked{' '}
+            Last checked{' '}
             <time dateTime={payload.timestamp}>
               {new Intl.DateTimeFormat(undefined, {
                 hour: '2-digit',
@@ -41,23 +49,30 @@ export default function HealthView({ payload }: HealthRouteData) {
             </time>
           </p>
         </div>
-        <Badge variant={payload.status === 'healthy' ? 'success' : 'warning'}>
-          {payload.status === 'healthy' ? 'Operational' : 'Degraded'}
+        <Badge variant={failed || restricted ? 'warning' : unlinked ? 'muted' : 'success'}>
+          {condition}
         </Badge>
       </div>
-      <StatsGrid class='workspace-stats'>
-        <StatsGrid.Card label='Responding' value={healthy} detail='Successful health responses' />
-        <StatsGrid.Card
-          label='Resources'
-          value={payload.resources.length}
-          detail='Web, services, plugins and background work'
-        />
-        <StatsGrid.Card
-          label='Web uptime'
-          value={`${Math.floor(payload.uptime / 60)}m`}
-          detail={`${payload.uptime} seconds since start`}
-        />
-      </StatsGrid>
+      <dl class='workspace-health-summary'>
+        <div>
+          <dt>Responding</dt>
+          <dd>
+            {healthy}
+            <small>/ {payload.resources.length}</small>
+          </dd>
+        </div>
+        <div>
+          <dt>Resources</dt>
+          <dd>{payload.resources.length}</dd>
+        </div>
+        <div>
+          <dt>Web uptime</dt>
+          <dd>
+            {Math.floor(payload.uptime / 60)}
+            <small>min</small>
+          </dd>
+        </div>
+      </dl>
       <section class='workspace-section'>
         <header class='workspace-section-heading'>
           <div>
@@ -86,7 +101,9 @@ export default function HealthView({ payload }: HealthRouteData) {
                   ? 'success'
                   : resource.state === 'disabled'
                   ? 'muted'
-                  : resource.state === 'unauthorized' || resource.state === 'unwired'
+                  : resource.state === 'unwired'
+                  ? 'muted'
+                  : resource.state === 'unauthorized'
                   ? 'warning'
                   : 'destructive'}
               >

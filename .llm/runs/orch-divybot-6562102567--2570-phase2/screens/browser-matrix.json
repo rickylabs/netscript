@@ -1,0 +1,310 @@
+[
+  {
+    "name": "overview",
+    "width": 1440,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "records",
+    "width": 1440,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "detail",
+    "width": 1440,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "examples",
+    "width": 1440,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "example",
+    "width": 1440,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "settings",
+    "width": 1440,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "health",
+    "width": 1440,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "sign-in",
+    "width": 1440,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "interactions",
+    "width": 1440,
+    "scheme": "light",
+    "checks": [
+      "lowercase reference search, URL persistence and singular result",
+      "selection and CSV including numeric refunds",
+      "empty search",
+      "out-of-range page",
+      "settings save",
+      "real palette results and Escape"
+    ]
+  },
+  {
+    "name": "overview",
+    "width": 1440,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "records",
+    "width": 1440,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "detail",
+    "width": 1440,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "examples",
+    "width": 1440,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "example",
+    "width": 1440,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "settings",
+    "width": 1440,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "health",
+    "width": 1440,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "sign-in",
+    "width": 1440,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "interactions",
+    "width": 1440,
+    "scheme": "dark",
+    "checks": [
+      "lowercase reference search, URL persistence and singular result",
+      "selection and CSV including numeric refunds",
+      "empty search",
+      "out-of-range page",
+      "settings save",
+      "real palette results and Escape"
+    ]
+  },
+  {
+    "name": "overview",
+    "width": 390,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "records",
+    "width": 390,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "detail",
+    "width": 390,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "examples",
+    "width": 390,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "example",
+    "width": 390,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "settings",
+    "width": 390,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "health",
+    "width": 390,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "sign-in",
+    "width": 390,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "interactions",
+    "width": 390,
+    "scheme": "light",
+    "checks": [
+      "lowercase reference search, URL persistence and singular result",
+      "selection and CSV including numeric refunds",
+      "empty search",
+      "out-of-range page",
+      "settings save",
+      "real palette results and Escape"
+    ]
+  },
+  {
+    "name": "overview",
+    "width": 390,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "records",
+    "width": 390,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "detail",
+    "width": 390,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "examples",
+    "width": 390,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "example",
+    "width": 390,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "settings",
+    "width": 390,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "health",
+    "width": 390,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "sign-in",
+    "width": 390,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "name": "interactions",
+    "width": 390,
+    "scheme": "dark",
+    "checks": [
+      "lowercase reference search, URL persistence and singular result",
+      "selection and CSV including numeric refunds",
+      "empty search",
+      "out-of-range page",
+      "settings save",
+      "real palette results and Escape"
+    ]
+  }
+]

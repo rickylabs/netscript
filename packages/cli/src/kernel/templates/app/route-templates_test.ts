@@ -545,7 +545,7 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, '.build();');
     assertStringIncludes(route, 'export { page as default };');
     assertStringIncludes(view, 'interface ExamplesViewProps {');
-    assertStringIncludes(view, 'ResponsiveTable');
+    assertStringIncludes(view, 'workspace-example-list');
     assertStringIncludes(view, 'href={canonicalHref}');
     assertStringIncludes(view, 'Open team-members flow');
   });

@@ -222,7 +222,7 @@ function pageOptionLayers(
         `    initial: () => ${camel}FormInitialValues,\n` +
         `    mutate: (input) => copy${pascal}FormValues(input),\n` +
         `    onSuccess: () => ({\n` +
-        `      message: '${pascal} note saved.',\n` +
+        `      message: '${pascal} note validated.',\n` +
         `      nextValues: ${camel}FormInitialValues,\n` +
         `    }),\n` +
         `  })`,
@@ -261,8 +261,8 @@ function viewOptionLinks(
   options: readonly ResourceSliceVariant[],
 ): string {
   const links: string[] = [];
-  if (options.includes('form')) links.push(optionLink(resource, 'form', 'Managed form'));
-  if (options.includes('partial')) links.push(optionLink(resource, 'summary', 'Deferred summary'));
+  if (options.includes('form')) links.push(optionLink(resource, 'form', 'Note form'));
+  if (options.includes('partial')) links.push(optionLink(resource, 'summary', 'Summary'));
   if (options.includes('stream')) links.push(optionLink(resource, 'stream', 'Live stream'));
   return links.length > 0 ? `${links.join('\n')}\n` : '';
 }

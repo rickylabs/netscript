@@ -105,7 +105,7 @@ function QueryResult({ value, amountUnit }: { value: unknown; amountUnit?: Amoun
         : [...new Set(value.flatMap((row) => Object.keys(row)))];
       return (
         <div class='workspace-query-scroll' role='region' aria-label='Service results' tabIndex={0}>
-          <table class='workspace-query-table'>
+          <table class='workspace-query-table' data-rich={rich ? 'true' : undefined}>
             <thead>
               <tr>
                 {fields.map((field) => (
@@ -120,29 +120,49 @@ function QueryResult({ value, amountUnit }: { value: unknown; amountUnit?: Amoun
               {value.map((row, index) => (
                 <tr key={typeof row.id === 'string' || typeof row.id === 'number' ? row.id : index}>
                   {fields.map((field) => (
-                    <td key={field}>
+                    <td
+                      key={field}
+                      data-field={field}
+                      data-label={field === 'ownerName' ? 'Owner' : fieldLabel(field)}
+                    >
                       {rich && field !== 'status'
                         ? <RichRecordValue row={row} field={field} amountUnit={amountUnit} />
                         : field === 'status' && typeof row[field] === 'string'
                         ? (
                           <span
                             class='ns-badge'
+                            data-emphasis='subtle'
+                            data-scope='badge'
+                            data-part='root'
                             data-variant={row[field] === 'paid' || row[field] === 'completed'
                               ? 'success'
                               : row[field] === 'cancelled' || row[field] === 'failed'
                               ? 'destructive'
-                              : row[field] === 'pending' || row[field] === 'awaiting_payment'
+                              : row[field] === 'awaiting_payment'
                               ? 'warning'
+                              : row[field] === 'shipped'
+                              ? 'info'
                               : 'muted'}
                           >
-                            {fieldLabel(row[field])}
+                            <span
+                              class='ns-badge__dot'
+                              data-part='dot'
+                              data-scope='badge'
+                              aria-hidden='true'
+                            />
+                            <span data-part='label' data-scope='badge'>
+                              {fieldLabel(row[field]).replace(
+                                /^./,
+                                (letter) => letter.toUpperCase(),
+                              )}
+                            </span>
                           </span>
                         )
                         : <QueryResult value={row[field]} amountUnit={amountUnit} />}
                     </td>
                   ))}
                   {extraFields.length > 0 && (
-                    <td>
+                    <td data-field='details' data-label='Details'>
                       <details>
                         <summary>More fields</summary>
                         <QueryResult
@@ -179,26 +199,42 @@ function QueryResult({ value, amountUnit }: { value: unknown; amountUnit?: Amoun
     const fields = Object.entries(value).filter(([key]) =>
       !pagination ||
       !['page', 'total', 'totalPages'].includes(key) &&
-        !(key === 'limit' && typeof value.limit === 'number')
+        !(key === 'limit' && typeof value.limit === 'number') &&
+        !(['hasNext', 'hasPrev'].includes(key) && typeof value[key] === 'boolean')
     );
     if (!fields.length && !pagination) return <p role='status'>No fields returned.</p>;
     return (
       <div class='workspace-query-fields'>
         {pagination && (
-          <p class='workspace-query-pagination'>
-            Page {String(value.page)} of {Math.max(1, Number(value.totalPages))} ·{' '}
-            {String(value.total)} {value.total === 1 ? 'record' : 'records'}
-            {typeof value.limit === 'number' && <>· {value.limit} per page</>}
-          </p>
+          <div class='workspace-query-pagination' role='status'>
+            <span>
+              Page {String(value.page)} of {Math.max(1, Number(value.totalPages))} ·{' '}
+              {String(value.total)} {value.total === 1 ? 'record' : 'records'}
+              {typeof value.limit === 'number' && <>· {value.limit} per page</>}
+            </span>
+            <span>
+              {value.hasNext === true
+                ? 'More records available →'
+                : value.hasNext === false
+                ? 'End of results'
+                : ''}
+              {value.hasPrev === true && ' · Earlier records available'}
+            </span>
+          </div>
         )}
         {fields.map(([label, field]) =>
           Array.isArray(field)
             ? (
               <section key={label}>
-                <h3 class='workspace-query-label'>{fieldLabel(label)}</h3>
+                {label !== 'data' && label !== 'items' && (
+                  <h3 class='workspace-query-label'>{fieldLabel(label)}</h3>
+                )}
                 <QueryResult value={field} amountUnit={amountUnit} />
               </section>
             )
+            : label === 'pagination' && isFieldRecord(field) && typeof field.page === 'number' &&
+                typeof field.total === 'number' && typeof field.totalPages === 'number'
+            ? <QueryResult key={label} value={field} amountUnit={amountUnit} />
             : (
               <dl key={label} class='workspace-query-field'>
                 <dt>{fieldLabel(label)}</dt>

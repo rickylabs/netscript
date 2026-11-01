@@ -91,8 +91,13 @@ export function scaffoldPageHref(base: string, records: ScaffoldRecords, page: n
 
 /** Negotiate the user's language without trusting malformed Accept-Language input. */
 export function scaffoldLocale(request: Request): string | undefined {
-  for (const part of (request.headers.get('accept-language') ?? '').split(',')) {
-    const language = part.trim().split(';')[0];
+  const preferences = (request.headers.get('accept-language') ?? '').split(',').map((part) => {
+    const [language, ...parameters] = part.trim().split(';');
+    const quality = parameters.map((value) => value.trim()).find((value) => /^q=/i.test(value));
+    return { language, weight: quality ? Number(quality.slice(2)) : 1 };
+  }).filter(({ weight }) => Number.isFinite(weight) && weight > 0 && weight <= 1)
+    .sort((left, right) => right.weight - left.weight);
+  for (const { language } of preferences) {
     try { if (language && Intl.DateTimeFormat.supportedLocalesOf([language]).length) return language; } catch { /* Ignore invalid language tags. */ }
   }
   return undefined;
@@ -118,4 +123,13 @@ export function scaffoldInitials(name: string): string {
 /** Counts use the actual singular form for one record. */
 export function scaffoldRecordCount(count: number, locale?: string): string {
   return `${new Intl.NumberFormat(locale).format(count)} ${count === 1 ? 'record' : 'records'}`;
+}
+
+/** CSV retains signed numeric minor units and protects untrusted text from spreadsheet formulas. */
+export function scaffoldRecordsCsv(rows: readonly ScaffoldRecord[]): string {
+  const cell = (value: string | number) => {
+    const text = typeof value === 'number' ? String(value) : (/^\s*[=+@-]/.test(value) || value.charCodeAt(0) < 32) ? "'" + value : value;
+    return '"' + text.replaceAll('"', '""') + '"';
+  };
+  return [['Reference', 'Owner', 'Email', 'Status', 'Amount (minor units)', 'Currency'], ...rows.map((row) => [row.reference, row.ownerName, row.ownerEmail, scaffoldStatuses[row.status].label, row.amount, row.currency])].map((row) => row.map(cell).join(',')).join('\r\n');
 }

@@ -73,3 +73,43 @@ Deno.test('record page composes registry controls and canonical service route', 
   assertStringIncludes(detail, 'scaffoldDate(record.updatedAt, locale, true)');
   assertEquals(detail.includes('Date.toString'), false);
 });
+
+Deno.test('CSV preserves negative numeric amounts while neutralizing formula-like text', () => {
+  const csv = presentation.scaffoldRecordsCsv([{
+    reference: '=SUM(A1:A2)',
+    ownerName: '\n+danger',
+    ownerEmail: '  @example',
+    status: 'refunded',
+    amount: -8990,
+    currency: 'USD',
+  }]);
+  assertStringIncludes(csv, '"-8990"');
+  assertEquals(csv.includes("'-8990"), false);
+  assertStringIncludes(csv, '"\'=SUM(A1:A2)"');
+  assertStringIncludes(csv, '"\'\n+danger"');
+  assertStringIncludes(csv, '"\'  @example"');
+});
+
+Deno.test('locale negotiation honors exclusions, priority and equal-quality header order', () => {
+  const locale = (header: string) =>
+    presentation.scaffoldLocale(
+      new Request('https://app.test', { headers: { 'accept-language': header } }),
+    );
+  assertEquals(locale('fr;q=0,en-US;q=1'), 'en-US');
+  assertEquals(locale('en-US;q=0.5,de-DE;q=0.9'), 'de-DE');
+  assertEquals(locale('fr;q=0.8,de-DE;q=0.8'), 'fr');
+  assertEquals(locale('fr;q=invalid,de-DE;q=2,en-US;q=1'), 'en-US');
+});
+
+Deno.test('empty and detail navigation describe the read-only service example honestly', () => {
+  assertEquals(
+    readTemplateAssetSync(TEMPLATE_KEYS.appScaffoldRecordsDatabase).includes(
+      'Create the first one',
+    ),
+    false,
+  );
+  assertEquals(
+    readTemplateAssetSync(TEMPLATE_KEYS.appRecordRoute).includes('Manage record'),
+    false,
+  );
+});

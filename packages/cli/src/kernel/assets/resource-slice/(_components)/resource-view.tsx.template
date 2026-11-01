@@ -12,14 +12,13 @@ export function {{resourcePascalCase}}View(props: Props) {
   return (
     <div class='workspace-page'>
       <header class='workspace-heading'><h1>{{resourcePascalCase}}</h1><p>Live records from your connected service.</p></header>
-    <Card>
+    <Card class='workspace-service-records'>
       <Card.Header>
         <Card.Title>Service records</Card.Title>
         <Card.Description>
           Live records returned by your connected {{resource}} service.
         </Card.Description>
         <div class='flex flex-wrap gap-2 text-xs text-ns-muted-fg'>
-          <span class='rounded-full border border-ns-border px-2 py-1'>Cache-first query</span>
 {{viewOptionLinks}}        </div>
       </Card.Header>
       <Card.Body>

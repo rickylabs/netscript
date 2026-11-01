@@ -88,3 +88,25 @@ Deno.test('rich-looking rows and pagination preserve structured values in presen
   }
   assert(!html.includes('[object Object]'));
 });
+
+Deno.test('pagination presents boolean navigation metadata while retaining unknown values', async () => {
+  const render = await renderer();
+  const page = {
+    page: 1,
+    total: 40,
+    totalPages: 2,
+    limit: 25,
+    items: [],
+    hasNext: true,
+    hasPrev: false,
+  };
+  const html = render(page);
+  assertStringIncludes(html, 'More records available');
+  assert(!html.includes('has Next'));
+  assert(!html.includes('has Prev'));
+  assertStringIncludes(render({ ...page, hasNext: false, hasPrev: true }), 'End of results');
+  assertStringIncludes(
+    render({ ...page, hasNext: { reason: 'Custom navigation metadata' } }),
+    'Custom navigation metadata',
+  );
+});

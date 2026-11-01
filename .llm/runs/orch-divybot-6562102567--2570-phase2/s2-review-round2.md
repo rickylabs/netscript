@@ -8,7 +8,7 @@
 | Bounded recent activity | Pagination, read limits, HEAD skipping, and qualified freshness descriptions address the original problems. The new persistent cursor needs reset recovery. |
 | Stream privacy | The shared-credential concern is resolved for the supplied public entrypoint: activity GET and HEAD requests send no credentials, and denied GET responses return no cached items. |
 
-1. **[P2] Rich-row rendering still loses values that its eligibility check accepts.**  
+1. **[P2] Rich-row rendering still loses values that its eligibility check accepts.**
    In [query-result-template.ts](packages/cli/src/kernel/application/ui/page/query-result-template.ts), `rich` validates `reference`, `ownerName`, `currency`, and `amount`, but `mappedFields` also removes `name` and `ownerEmail` from the generic details. Those two values are rendered through `String(...)`.
 
    For example, this valid unknown payload passes the rich-row check:
@@ -28,7 +28,7 @@
 
    **Fix:** consume those fields only when their values match the formatter’s supported types. Otherwise retain them in generic rendering, or make the row fall back to the generic table. Add a behavioral assertion that both nested values remain visible.
 
-2. **[P2] A rejected saved stream cursor is retried indefinitely without recovery.**  
+2. **[P2] A rejected saved stream cursor is retried indefinitely without recovery.**
    In [scaffold-plugin-capabilities.ts.template](packages/cli/src/kernel/assets/app/lib/scaffold-plugin-capabilities.ts.template), every non-404 unsuccessful activity response leaves `snapshot.offset` unchanged. The supplied streams entrypoint documents that the default memory backend loses its history on restart, while the app’s process snapshot can survive that restart.
 
    After a successful read saves a cursor, restarting and recreating the topic can invalidate that cursor. If the server rejects it with a cursor error rather than 404, every refresh submits the same rejected cursor. Successful readiness probes cannot restore activity; recovery requires app restart or incidental cache eviction.

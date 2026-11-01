@@ -1,0 +1,256 @@
+{
+  "runtime": "Deno 2.9.7",
+  "sourceBase": "66dec2d650c5d41f1c55dd96c8206223536e969e",
+  "finalReviewFixes": "CSV numeric fidelity, locale quality weights, truthful service actions and note confirmation; responsive tables, charts, filters, palette and health discovery presentation after independent review.",
+  "rootCheck": {
+    "outcome": "PASS",
+    "exitCode": 0,
+    "files": 4198,
+    "batches": 35
+  },
+  "focusedTests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 122,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 122,
+      "uniqueFailures": 0
+    }
+  },
+  "confirmationCopyTests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 8,
+      "uniqueFailures": 0
+    }
+  },
+  "scopedCheck": {
+    "filesSelected": 25,
+    "batches": 1,
+    "failedBatches": 0
+  },
+  "scopedLint": {
+    "totalOccurrences": 0,
+    "uniqueOccurrences": 0,
+    "uniqueRules": 0,
+    "uniquePaths": 0
+  },
+  "scopedFmt": {
+    "filesSelected": 25,
+    "batches": 1,
+    "failedBatches": 0,
+    "findings": 0,
+    "ignoredFindings": 0
+  },
+  "generatedCheck": {
+    "filesSelected": 126,
+    "batches": 2,
+    "failedBatches": 0
+  },
+  "carrierChain": [
+    {
+      "gate": "gen:agent-docs-prose",
+      "exitCode": 0
+    },
+    {
+      "gate": "gen:mcp-export-corpus",
+      "exitCode": 0
+    },
+    {
+      "gate": "gen:assets-barrel",
+      "exitCode": 0
+    },
+    {
+      "gate": "gen:publish-assets",
+      "exitCode": 0
+    }
+  ],
+  "rootCheckTasks": [
+    {
+      "gate": "check:desktop-native-fixture",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:emitted-samples",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:streams-types",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:child-health-docs",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:mcp-export-corpus",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:assets-barrel",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:agent-docs-prose",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:publish-assets",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:scaffold-versions",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:aspire-version-parity",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:netscript-jsr-specifiers",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:aspire-host-ports",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:figma-names",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:review-threads",
+      "exitCode": 0
+    },
+    {
+      "gate": "check:design-skill",
+      "exitCode": 0
+    }
+  ],
+  "broaderGates": [
+    {
+      "gate": "lint-report",
+      "exitCode": 0,
+      "seconds": 9.12
+    },
+    {
+      "gate": "fmt-check-report",
+      "exitCode": 0,
+      "seconds": 4.03
+    },
+    {
+      "gate": "arch-check",
+      "exitCode": 0,
+      "seconds": 12.57
+    },
+    {
+      "gate": "quality-gate",
+      "exitCode": 0,
+      "seconds": 14.51
+    },
+    {
+      "gate": "docs-accuracy",
+      "exitCode": 0,
+      "seconds": 6.85
+    },
+    {
+      "gate": "public-doc-lint",
+      "exitCode": 1,
+      "seconds": 0.43
+    },
+    {
+      "gate": "publish-dry-run",
+      "exitCode": 0,
+      "seconds": 54.8
+    },
+    {
+      "gate": "release:preflight",
+      "exitCode": 0
+    }
+  ],
+  "cliPublicDocLint": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "existingStreamsDocLint": {
+    "outcome": "BASELINE_FAILURE",
+    "rule": "private-type-ref",
+    "unchangedFiles": [
+      {
+        "path": "packages/plugin-streams-core/mod.ts",
+        "unchangedFromMain": true
+      },
+      {
+        "path": "packages/plugin-streams-core/src/application/create-durable-stream.ts",
+        "unchangedFromMain": true
+      },
+      {
+        "path": "packages/plugin-streams-core/src/telemetry/instrumentation.ts",
+        "unchangedFromMain": true
+      }
+    ]
+  },
+  "cssBudgetTests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 4,
+      "uniqueFailures": 0
+    }
+  },
+  "appWorkspaceCss": {
+    "rawBytes": 23113,
+    "gzipBytes": 4362
+  },
+  "browser": {
+    "routes": 8,
+    "palette": true,
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      1440,
+      390
+    ],
+    "fullCaptures": 36,
+    "viewportCompanions": 32,
+    "evidence": "screens/browser-matrix.json"
+  },
+  "ciRuntime": "PENDING final committed head; manual e2e-cli workflow required before READY",
+  "nestedDetailsBrowser": {
+    "outcome": "PASS",
+    "width": 390,
+    "labels": [
+      {
+        "text": "A1",
+        "label": "\"sku\"",
+        "display": "block"
+      },
+      {
+        "text": "2",
+        "label": "\"quantity\"",
+        "display": "block"
+      }
+    ]
+  },
+  "formBrowser": {
+    "outcome": "PASS",
+    "check": "Actual note POST returns validation-only confirmation; invalid POST shows errors and removes success"
+  },
+  "visualReview": {
+    "outcome": "PASS",
+    "minimumScore": 8,
+    "commandScore": 8.5,
+    "everyVariantDensityAtLeastFigma": true,
+    "everyVariantCraftAtLeastFigma": true,
+    "imagesInspected": 78,
+    "report": "visual-eval.md"
+  }
+}

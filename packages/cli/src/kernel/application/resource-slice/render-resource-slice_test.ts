@@ -24,11 +24,11 @@ const GOLDEN_HASHES: Readonly<
   'core': [
     [
       'routes/orders/(_components)/orders-view.tsx',
-      'a091e188501b253420dcc687825e32c731f8ee751b9e82cfa8b9342eb26a6b19',
+      'ed963139530f0ce26351dccbed98e2f25f3306002e2da8d24b4189f5075e1ac2',
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      'b1e112019b91c4fd06a9c9768b3829e79bd58f55c7a45fef7e14103d2bd0b7ae',
+      '69cbd4c62327e79d98b8c64d8232d44dddb662c7cfcc4d67119adc545c4fadc2',
     ],
     [
       'routes/orders/(_shared)/orders-loaders.ts',
@@ -44,21 +44,21 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/index.tsx',
-      '48e41fc9a953602ef74707c9bf3209c0f29b3a7ba43c681ac85668f59d462046',
+      '5fc31d035c8c9d3f7ec7b0726ec58d733bb13948fd3f227859bd874380b7290b',
     ],
   ],
   'form': [
     [
       'routes/orders/(_components)/orders-form.tsx',
-      '8d2c8a430164f3828356480473b7433f5b2559989c7205e73a46edaa04d00172',
+      '50eb51a18d893fcd00e8069014d5c9210118dde5bb9e4dcb6a0e3df9fac05ea6',
     ],
     [
       'routes/orders/(_components)/orders-view.tsx',
-      'c477cda3bc236ee9084d458eccb011ab2268f80581afb873881d657664a6d339',
+      '0fa4c162df9a92798b167b8ad1510208c047f6d960c2112cf5f3f89023f343ae',
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      'b1e112019b91c4fd06a9c9768b3829e79bd58f55c7a45fef7e14103d2bd0b7ae',
+      '69cbd4c62327e79d98b8c64d8232d44dddb662c7cfcc4d67119adc545c4fadc2',
     ],
     [
       'routes/orders/(_lib)/orders-form.ts',
@@ -78,21 +78,21 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/index.tsx',
-      '35ac7bbf7e9cb9f466dc9d9ef15132200e656aa1f932ac795f51cdd6f877c9fe',
+      'bf05a5cc911614a194ac61bba4b68b4cbb21a558cc0b08e3bab6d5263dcfb66f',
     ],
   ],
   'partial': [
     [
       'routes/orders/(_components)/orders-summary.tsx',
-      'caad505bfb715c0db22132d31a8c2f18064fe4d87b34b52f32a8cad8829bc58c',
+      '8629b1169e808ea6c7185372eb93a9a74b99d299b4872fd730742b7d9692e163',
     ],
     [
       'routes/orders/(_components)/orders-view.tsx',
-      'f60fe89f51ea8b220975cd23c8e8143fb2c9ee32116ce20b056d5b7475db86e8',
+      '456f18b057f76b52fc26488c7f7b8dda318b351594e48d6dc2d7de3c74bb2d60',
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      'b1e112019b91c4fd06a9c9768b3829e79bd58f55c7a45fef7e14103d2bd0b7ae',
+      '69cbd4c62327e79d98b8c64d8232d44dddb662c7cfcc4d67119adc545c4fadc2',
     ],
     [
       'routes/orders/(_shared)/orders-loaders.ts',
@@ -108,7 +108,7 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/index.tsx',
-      '6b0cbc09cc929354ce11149d8b86f1f7c55e688149bf5cc3ea24ea3c548a5a22',
+      '0358d4ba43047287c7fd06ec16e0b50dc52706ebb61a2daaf659b4871fa9d52d',
     ],
     [
       'routes/partials/orders/summary.tsx',
@@ -118,11 +118,11 @@ const GOLDEN_HASHES: Readonly<
   'stream': [
     [
       'routes/orders/(_components)/orders-view.tsx',
-      'b66f12548bae7a2fea061da2f77b2e8c86f65973ae4892f9a4298aab38920505',
+      '6281279d858ef8b99493886ee1f343d4444794441e8bc307fbaf0fdd5c232441',
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      'b1e112019b91c4fd06a9c9768b3829e79bd58f55c7a45fef7e14103d2bd0b7ae',
+      '69cbd4c62327e79d98b8c64d8232d44dddb662c7cfcc4d67119adc545c4fadc2',
     ],
     [
       'routes/orders/(_islands)/OrdersStream.tsx',
@@ -142,7 +142,7 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/index.tsx',
-      'da1fe76700682106c97d8085fae9d29e7bfb20eedfb62fdfbc7405a3465ee745',
+      'b0ce94e009622f19ad556741c4d67d33ba325281ed949eaef1939d4b9349df03',
     ],
   ],
 };

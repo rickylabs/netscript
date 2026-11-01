@@ -1,15 +1,14 @@
 import { useState } from 'preact/hooks';
 import { Badge, Button, DataTable, EmptyState } from '@app/components/ui/mod.ts';
 import { appRoutes } from '@app/router.ts';
-import { scaffoldAmount, scaffoldInitials, scaffoldPageHref, scaffoldRecordCount, scaffoldStatuses, type ScaffoldRecord, type ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
+import { scaffoldAmount, scaffoldInitials, scaffoldPageHref, scaffoldRecordCount, scaffoldRecordsCsv, scaffoldStatuses, type ScaffoldRecord, type ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
 
 const COLUMNS = '32px minmax(105px, 1fr) minmax(175px, 1.8fr) minmax(130px, 1fr) minmax(100px, 1fr) 44px';
 const headers = [{ key: 'reference', label: 'Reference' }, { key: 'ownerName', label: 'Owner' }, { key: 'status', label: 'Status' }, { key: 'amount', label: 'Amount' }] as const;
 
 /** CSV export contains only the rows loaded from the service and neutralizes spreadsheet formulas. */
 function exportRecords(rows: readonly ScaffoldRecord[]) {
-  const cell = (value: string) => '"' + (/^[=+@\-\t\r]/.test(value) ? "'" + value : value).replaceAll('"', '""') + '"';
-  const csv = [['Reference', 'Owner', 'Email', 'Status', 'Amount (minor units)', 'Currency'], ...rows.map((row) => [row.reference, row.ownerName, row.ownerEmail, scaffoldStatuses[row.status].label, String(row.amount), row.currency])].map((row) => row.map(cell).join(',')).join('\r\n');
+  const csv = scaffoldRecordsCsv(rows);
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
   const link = document.createElement('a'); link.href = url; link.download = 'records.csv'; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
