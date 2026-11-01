@@ -1,3 +1,53 @@
+# Current resume — Recovery8 parent review PASS, docs condition closed
+
+The same independent parent evidence review passes at source3add67a1. A fresh
+dedicated docs browser run also passes140/0/0with0retries/flaky/new allowances
+at that source head, closing its remaining condition. Earlier local component
+acceptance used gap.playwright.config.ts; docs.playwright.config.ts is the
+separate existing docs browser/style-policy CI surface and was run fresh here.
+The260-page build, own-head quality/native publication0slow types,4carriers
+withdelta0,24CLI/installed tests and627-path/three-lock/main22preservation all
+remain PASS. Sources/configs were not changed by docs testing.
+
+Next: explicit-path evidence commit, repeat source equality and public audits,
+verify remote426c5d09and force-push with that exact lease. Then child replay
+from6e0a5c3f/source19d6onto the new parent evidence head. Child requires its
+own byte proof/gates/review, including a fresh dedicated docs browser suite,
+then audited exact-d0d8lease push and2538comment. Full11b/12/13still required;
+no READY or final report. Unknown-owner native diagnostic remains untracked,
+outside all publishable roots and untouched; task owner informed.
+
+---
+
+# Current resume — Recovery8 parent onto6a1d84a6
+
+Parent source3add67a1rebases the53topic commits onto latest6a1d84a6. Only one
+derived publication carrier conflicted and was canonically regenerated. All
+627Fresh UI/browser/config/map paths equal the parent's own prior426c5d09;
+all3locks match. All22maintained main paths of its25changed paths are exact.
+No maintained or semantic conflict occurred.
+
+Own-head quality/native publication with0slow types, all4carrier checks with
+actual delta0,260-page docs build, preflight/accuracy/export and24new CLI plus
+installed-consumer cases pass. See recovery8-validation.json. The prior622/
+318/44/12and63release-pin proofs remain prior executions; child765/675/336
+proofs are not parent proofs. Doc-lint124remains accepted#2531with unchanged
+source attribution. Runtime/current required CI remains UNPROVEN.
+
+The same parent evidence review is next, then explicit-path bookkeeping, full
+public audit and exact-lease push against426c5d09after re-checking the remote.
+Then replay child6e0a5c3f/source19d6d1d7onto the new parent with its own byte
+comparison, own-head gates and SAME review/audit/leased push againstd0d8d922.
+No product unit before terminal restack/comment. Full11b/12/13 remains active;
+no READY, label, closing keyword, early promotion, merge or final report.
+
+One untracked native diagnostic is outside all35publishable roots; task owner
+informed, diagnostic owner unknown, left untouched and excluded from staging.
+Future owned browser launches have core dumps disabled. Only verdict/counts
+are public; raw logs/receipts/identities remain private.
+
+---
+
 # Resume S3 phase2a — PR2488
 
 Branch orch/divybot-6538112485; draft PR2488; current base main15cffa2 (older slice hashes below are historical). Read plan.md and latest worklog entries. Owner requires Refs #2416 only, no labels/session IDs, never commit assignment/final-report files. Stop at READY; Cockpit merges. Approved split:2a core gaps,2b Layout/AI/Desktop/Docs and all-style harness. Neither closes the issue prematurely.

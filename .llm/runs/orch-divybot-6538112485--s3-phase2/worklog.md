@@ -639,3 +639,41 @@ all4carriers reconcile; predecessor renderer/browser proof is scoped by byte
 identity. Evidence-only commit then verify remote main/parent, mandatory public
 audit and exact-lease parent push. Childd0d8d922 restack/freshgates/review next
 before11b; full11b/12/13 remains required, no READY or final publication.
+
+
+## Recovery8 parent — approved docs-only base, own-head gates
+
+Replayed53topic commits from426c5d09onto6a1d84a6at3add67a1. The sole conflict
+was the derived publication carrier and was canonically regenerated. All627
+Fresh UI/browser/config/map paths and all3locks match the parent's own prior
+head exactly; all22maintained main paths are preserved,3derived carriers follow
+their canonical generators. No maintained conflict or new component/API occurs.
+
+All4carrier checks pass, actual generated delta0. Actual-head durable quality/
+architecture and native publication pass at3add67a1with0slow types, together
+with260HTML pages, preflight/accuracy/export and24structured CLI/installed-copy
+tests from the three declared files. Render and doc-lint evidence remains
+correctly labelled predecessor executions through unchanged sources; no child
+execution is claimed as parent evidence. Same parent review follows before
+bookkeeping/audit/remote-lease verification/push. Then child replay, its own
+gates/review/audited lease/push/comment, followed by all remaining11b/12/13.
+
+
+### Recovery8 parent review PASS — docs scope condition closed
+
+Same independent parent evidence review passes with0blockers/failure streak0.
+Earlier local component acceptance used gap.playwright.config.ts; the separate
+docs.playwright.config.ts covers the existing docs browser/style-policy CI
+surface. This recovery executes that suite fresh at3add67a1:140passed/0failed/
+0ignored,0retry/flaky/new axe allowances. It exercises the260-page built site,
+keyboard/search/TOC/code/native/no-JS/contrast/style-policy cases across light/
+dark390/1280. Raw JSON/screenshots remain private. The first private config
+wrapper failed its server-cwd precondition before collecting tests; the actual
+checked-in config then ran in the correct directory with no source/test change.
+
+All other own-head gates and627-path/three-lock/main22byte proofs remain
+unchanged. This explicit-path evidence commit is followed by repeated source
+equality, public added-line/run audits, remote426c5d09verification and exact
+force-with-lease push. Child replay has its own gates/review/fresh dedicated
+docs suite before its audited exact-lease push and comment. All11b/12/13
+remains active; no partial READY.
