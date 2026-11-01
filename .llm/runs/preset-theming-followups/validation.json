@@ -1,0 +1,156 @@
+{
+  "denoVersion": "2.9.7",
+  "canonicalSourceHead": "5e50ad8ce6df82f6fc1b1f01af04d8bde038d593",
+  "wholeCli": {
+    "summary": {
+      "passed": 2944,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 2944,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0,
+    "durationMs": 1173811,
+    "sourceAndCarriersHeldFixed": true,
+    "environment": "Executable project-owned TMPDIR; working cached Chromium via private wrapper; browser libraries scoped only to that wrapper.",
+    "rawReportSha256": "0885b1c9b2707c3a7235119cf4b23b08c5a0119c676d342a2955aa48ee452c79"
+  },
+  "focusedRepairs": {
+    "conventionsCarrierAndRealBrowser": {
+      "passed": 5,
+      "failed": 0
+    },
+    "nativeFixtures": {
+      "passed": 47,
+      "failed": 0
+    },
+    "ciContracts": {
+      "passed": 12,
+      "failed": 0
+    }
+  },
+  "rootCheckTasks": [
+    {
+      "task": "check:desktop-native-fixture",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:emitted-samples",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:streams-types",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:child-health-docs",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:assets-barrel",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:publish-assets",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:scaffold-versions",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:figma-names",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:review-threads",
+      "outcome": "PASS"
+    }
+  ],
+  "siteCheckTasks": [
+    {
+      "task": "check:source-format",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:rendered-output",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:links",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:caveats",
+      "outcome": "PASS"
+    }
+  ],
+  "manualGates": [
+    {
+      "task": "release:preflight",
+      "exitCode": 0,
+      "outputSha256": "1aa81de338e3c45f8ee9f17d7a7503709f4d754e5bf4773433a3f42bce3eaf1f"
+    },
+    {
+      "task": "docs:links",
+      "exitCode": 0,
+      "outputSha256": "82891b724aa6e4087b6c666ec14944c8182ecf42063078478a9df6efef1b478d"
+    },
+    {
+      "task": "docs:accuracy",
+      "exitCode": 0,
+      "outputSha256": "357eb5dcda7dabb254280720b990bc9ccd82dcdc0014fa759e77ebac474b8002"
+    },
+    {
+      "task": "docs:snippets",
+      "exitCode": 0,
+      "outputSha256": "a89a6f4edac461145da2c481f51d89fc2a4c99a1cf4558697ae441554121b9f2"
+    },
+    {
+      "task": "docs-site build",
+      "exitCode": 0,
+      "outputSha256": "5418d367d13d07959c598d8c19aadffe59be43e96c11f8b4cd8ed61cee619aec"
+    },
+    {
+      "task": "CLI JSR audit",
+      "exitCode": 0,
+      "outputSha256": "476440fe29eb12f314b1b2d0312a69d36aa60d4157218af86bead9827077a6a6"
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0,
+      "outputSha256": "2d189b1486b36e34332b9e54a915bb8d94674750c12439e938132c1c007292eb"
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0,
+      "outputSha256": "70bc4b06374ff6f561f02b223ee735b7bf25bb21e4a9811a8183d6279a83735b"
+    }
+  ],
+  "runtime": {
+    "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+    "outcome": "UNPROVEN",
+    "exitCode": 1,
+    "reason": "Docker unavailable; Aspire doctor and cleanup preflight failed. No unknown resources mutated."
+  }
+}

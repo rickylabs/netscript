@@ -54,3 +54,18 @@ The early whole-CLI process completed: 2926 passed, 17 failed (2943 total). It i
 Fixed focused proof: 5/5 (native public-init conventions, fresh MANIFEST carrier, real browser conformance and both negative controls) with executable project-owned temp and private browser wrapper. Native fixture modules: 47/47 passed. The wrapper scopes browser libraries to Chromium only, avoiding Deno granular allow-run failures from a globally inherited LD_LIBRARY_PATH. All original failed classes are addressed; a new full suite will start on a clean committed source/carrier head with those prerequisites. Same independent evaluator requested this rerun and is reviewing the integration test repair before commit. No terminal IMPL-EVAL issued yet.
 
 Independent integration-test repair review PASS (integration-review.md). The source test repair, dated lesson and generated manifest row are committed together before the clean full-suite retry. Reconcile: same draft PR #2559, Refs #2516/#2556, no labels; no product changes after 008685f6. The earlier whole CLI receipt is superseded exploratory evidence, not a pass. Keep public run files unchanged while the clean committed-head whole suite runs; raw logs/receipts remain excluded.
+
+## Canonical whole CLI and final review handoff
+
+Canonical whole CLI on clean head 5e50ad8ce6df82f6fc1b1f01af04d8bde038d593: 2944 passed, 0 failed, 0 ignored; exit 0, 1173811 ms. Source/carriers and public run files remained fixed for the entire run. Fresh Figma CI receipt at the same head also PASS. No test skips or acceptance weakening. Earlier ac85479e whole-CLI run is explicitly superseded exploratory evidence. validation.json and gate-evidence.json index observed results; raw receipts/logs retained privately. All 14 root check:* tasks and all four site checks pass. Terminal same-session IMPL-EVAL requested next.
+
+Owner route override, verbatim (also recorded in supervisor.md at bootstrap):
+- IMPL-EVAL: `claude -p --model claude-opus-5-5 --effort high`, read-only.
+
+PR milestone aligned to originating issue #2516's existing owner-assigned release 0.0.9; #2556 remains a related theme follow-up. No labels. Reconcile: same PR #2559, scope complete, references unchanged; mandatory final evaluation/ready transition and exact-final-head required CI remain before READY. No merge action authorized for this agent.
+
+## Terminal evaluation and evidence-only handoff
+
+Independent read-only Claude Opus 5.5 terminal IMPL-EVAL: PASS at source head 5e50ad8c (evaluate.md). Requested high effort; observed model identity claude-opus-5-5, effort not independently attested. Reviewer verified raw clean whole-CLI and Figma receipts, exact source identity, final test-only repair, public hygiene, all scope and required local gate evidence. No unresolved findings. Review-thread gate re-run exits 0. No source or carrier changes after the canonical suite/evaluation.
+
+This final commit changes run evidence only. Normal push, ready transition and exact-final-head required hosted checks follow before canonical READY report publication via the assignment file handoff. Milestone 0.0.9 inherited from originating issue; labels remain empty. No assignment-file staging, attribution footers, rebase, force-push, issue closure or merge. Reconcile: one PR #2559, Refs #2516 and Refs #2556; every assigned implementation item complete, no new architecture debt. Runtime limitation remains UNPROVEN and explicit.

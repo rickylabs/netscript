@@ -11,19 +11,19 @@ Archetype 6 CLI/tooling and existing token adapters. Refs #2516 and Refs #2556. 
 - [x] Plan & Design — READY FOR REVIEW
 - [x] Scoped source/docs/CI fixes and independent repaired slice review — `008685f6`
 - [x] Generated docs/publish carriers and Aspire inventory — `f3c84f73`
-- [ ] Final evaluation and required-check handoff
+- [x] Terminal independent evaluation and handoff evidence
 
 ## Validation
 
-Deno 2.9.7. Focused suite: 44 passed; subsequent diagnostic/ratchet repair: 8 passed; CI contracts: 12 passed. Red/green evidence captured. Independent repaired slice review PASS, including 8 independently rerun tests.
+Deno 2.9.7. **Whole CLI suite: 2,944 passed, 0 failed, 0 ignored**, run from clean committed source head `5e50ad8c` with source/carriers held fixed and native prerequisites supplied. Earlier exploratory failures are retained as superseded evidence. Focused repairs: 5 passed (native conventions/carrier/real browser and negative controls), native fixtures: 47 passed, CI contracts: 12 passed. Red/green regressions recorded.
 
-All 14 root `check:*` tasks and four site checks pass. Release preflight, docs links/accuracy/snippets, docs build, root lint/fmt, scoped check, CLI quality ratchet, Figma CI, quality:gate, CLI JSR audit and package publish dry-run pass. Repository-wide type check passes. The early exploratory CLI run had 2926 passing and 17 failing tests; native prerequisites and a quoted-doc-slug integration assertion are repaired (focused proofs: 5/5 and 47/47). A new clean-head whole-CLI run and final same-session IMPL-EVAL follow.
+All 14 root `check:*` tasks and four site checks pass. Release preflight, docs links/accuracy/snippets, docs build, repository-wide type check, root lint/fmt, CLI quality ratchet, fresh Figma CI, quality:gate, CLI JSR audit and package publish dry-run pass. Independent repaired slice and integration-test reviews PASS; **terminal same-session IMPL-EVAL: PASS** at source head `5e50ad8c`.
 
 Full `scaffold.runtime --cleanup` attempted once: UNPROVEN, exit 1 at Aspire doctor/Docker cleanup because Docker is unavailable. Read-only leak reporter: 25 unproven survivors, none mutated.
 
 ## Harness
 
-Run dir: `.llm/runs/preset-theming-followups/`. PLAN-EVAL: N/A for bounded owner-defined corrections. Independent read-only Claude Opus 5.5/high final IMPL-EVAL remains required. Do not merge until final evaluation and required checks pass.
+Run dir: `.llm/runs/preset-theming-followups/`. PLAN-EVAL: N/A for bounded owner-defined corrections. Independent read-only Claude Opus 5.5/high final IMPL-EVAL: PASS; see `evaluate.md`. Required hosted checks are verified on the final PR head before the READY handoff. Cockpit owns merging.
 
 ## Drift / Debt
 
@@ -31,10 +31,10 @@ The CLI baseline preserves 29 existing lint and 163 formatting debt files only w
 
 ## Definition of Done
 
-- [ ] Whole CLI suite and required local validation completed
+- [x] Whole CLI suite and required local validation completed
 - [x] Required docs, release preflight, carrier checks and docs build pass
 - [x] CLI lint/fmt coverage runs in CI with recorded strict baseline
-- [ ] Independent final implementation evaluation passes
+- [x] Independent final implementation evaluation passes
 - [x] No unrelated source or lock churn
 
 Refs #2516

@@ -52,9 +52,10 @@
     ],
     "exitCode": 0,
     "durationMs": 497,
-    "outputSha256": "16275ffe4435a81f3b81d37eac9a32ef4acb0caa821fff4bdb85207138bd23a7",
+    "outputSha256": "2c220b5982295c8c521a8e1665512f80c4b36445b944daef0a9eb73c6cfb3e15",
     "initialExitCode": 1,
-    "repair": "Canonical manifest regeneration adds the CLI baseline inventory row."
+    "repair": "Canonical manifest regeneration adds the CLI baseline inventory row.",
+    "initialOutputSha256": "16275ffe4435a81f3b81d37eac9a32ef4acb0caa821fff4bdb85207138bd23a7"
   },
   {
     "task": "check:netscript-jsr-specifiers",
