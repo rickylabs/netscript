@@ -1,6 +1,12 @@
 # Current resume — 2026-11-01
 
-Existing PR #2452 and branch fix/docs-review-followups are being refreshed by a normal merge of main 6a1d84a. All maintained source matches main after resolving seven conflicts. Independent integration slice review PASS is in slice-review-refresh.md. All ten #2451 findings are audited in research.md; #2450 retains token-source ownership and #2453 remains deferred after a fresh strict reproduction. Initial docs and structured gates pass. Native carrier chain, every root check:* task, full browser and final same-session IMPL-EVAL remain pending. Refs #2451 only; READY handoff through the excluded report file; Cockpit merges.
+Existing PR #2452, branch fix/docs-review-followups. Normal merge d096ad665 incorporates main 6a1d84a and preserves every maintained source byte for byte. Seven conflict resolutions and all ten #2451 findings are audited in research.md. Token-source consolidation retains #2450 ownership. #2453 remains separate after strict reproduction of only Pagefind filter/meta/entry entropy; the existing bounded workflow check passes all 917 outputs.
+
+All local verification is complete under Deno 2.9.7: native carrier chain and all 14 root check:* tasks pass without carrier/lock changes; docs build/rendered-output, links/accuracy/snippets/exports and fixtures pass; full browser 140/0/0 with zero flaky results and 36 axe audits with no serious/critical findings; broad root check passes 4131 files/35 batches; quality/architecture passes. Current details are in gate-evidence-refresh.json.
+
+Fresh independent integration review and final IMPL-EVAL both PASS, recorded in slice-review-refresh.md and evaluate-refresh.md. Same separate read-only Anthropic session, requested/observed claude-opus-5-5, high effort requested. Source identity is supervisor-attested; the evaluator's shell was denied and its limits are explicit. Old evaluate.md and the handoff below are historical, not current certification.
+
+This final sign-off changes only evidence and the dated lesson. Delivery steps: normally push the evidence commit to the existing branch, refresh the PR body and phase comment, mark ready, and reconcile actual current-head required checks as green or policy-skipped. Do not use draft-only skipped checks as readiness proof. Queue READY with the exact final head through the excluded final-report file, then stop. Cockpit owns merging and issue disposition; no replacement PR, force-push, rebase, manual merge or issue close.
 
 # Historical handoff below
 

@@ -1,6 +1,6 @@
 # Independent integration slice review — 2026-11-01
 
-Requested: Anthropic Claude Opus 5.5, high effort; separate read-only session restricted to Read/Glob/Grep. Original response follows verbatim; session and machine state are private.
+Requested and observed: claude-opus-5-5, high effort requested; separate read-only session restricted to Read/Glob/Grep. Original response follows verbatim; session and machine state are private.
 
 **Verdict: PASS.** I found no source-correctness blockers in the merge resolution at the integration checkpoint. This is not a merge-readiness claim for the current head.
 
