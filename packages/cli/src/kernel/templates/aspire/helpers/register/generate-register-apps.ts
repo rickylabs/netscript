@@ -138,6 +138,18 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
     // Read references at AppHost execution time so settings edits take effect on restart.
     if (type === 'desktop' || type === 'app') {
       appendDiscoveryReferences(lines, id, name, type === 'app');
+      // Match registerBackgroundProcessors' endpoint predicate; never expose child URLs to Vite.
+      lines.push(`    for (const [name, resource] of _backgroundProcessors) {`);
+      lines.push(`      const entry = config.BackgroundProcessors[name];`);
+      lines.push(
+        `      if (entry?.Enabled === false || entry?.Runtime !== 'deno' || !entry.RequiresKv) continue;`,
+      );
+      lines.push(`      const endpoint = await getResourceEndpoint(resource, 'http');`);
+      lines.push(
+        '      if (endpoint) await ' + id +
+          '.withEnvironment(`services__${name}__http__0`, endpoint);',
+      );
+      lines.push(`    }`);
     }
 
     // --- Common: KV cache dependency ---

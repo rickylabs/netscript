@@ -26,8 +26,24 @@ Deno.test('shared sample has forty deterministic rich rows across sixty UTC days
   assertEquals(new Set(rows.map((row: { ownerEmail: string }) => row.ownerEmail)).size, 5);
   assertEquals(rows[0].reference, 'REC-10482');
   assertEquals(rows[0].name, 'Seed Shipment');
-  assertEquals(rows[0].createdAt, '2026-11-01T00:00:00.000Z');
-  assertEquals(rows[39].createdAt, '2026-09-03T00:00:00.000Z');
+  assertEquals(rows[0].createdAt, '2026-11-01T20:37:00.000Z');
+  assertEquals(rows[39].createdAt, '2026-09-03T15:58:00.000Z');
+  const counts = new Map<string, number>();
+  for (const row of rows) {
+    counts.set(row.createdAt.slice(0, 10), (counts.get(row.createdAt.slice(0, 10)) ?? 0) + 1);
+  }
+  assert(new Set(counts.values()).size >= 3, 'sample has single days and varied bursts');
+  assert(
+    rows.every((row: { name: string; createdAt: string }) =>
+      !/\d+$/.test(row.name) && !row.createdAt.includes('T00:00:00')
+    ),
+  );
+  assert(
+    rows.every((row: { createdAt: string }, index: number) =>
+      index === 0 || row.createdAt <= rows[index - 1].createdAt
+    ),
+    'reference and insertion order remain chronological',
+  );
   assert(
     rows.every((row: { amount: number; status: string; currency: string }) =>
       Number.isSafeInteger(row.amount) && row.currency === 'USD' &&
@@ -154,6 +170,7 @@ for (const engine of ['postgres', 'mysql', 'sqlite', 'mssql'] as const) {
     );
     assertEquals(listSchema.safeParse({ status: 'invented' }).success, false);
     const entity = renderTemplateAssetSync(TEMPLATE_KEYS.serviceDomainEntity, {
+      searchMode: '',
       serviceName: 'shipments',
       modelName: 'Shipment',
       projectName: 'sample',
@@ -207,4 +224,53 @@ Deno.test('memory sample supports status filtering and stable sorting before pag
   assertEquals(copy.status, 'refunded');
   assertEquals(first.items[0].status, 'paid');
   assertEquals((await createMemoryMembersRepository().list(query)).total, 7);
+});
+
+Deno.test('database search uses PostgreSQL insensitive mode without leaking it into SQLite', async () => {
+  for (const searchMode of ['', ", mode: 'insensitive' as const"]) {
+    const source = renderTemplateAssetSync(TEMPLATE_KEYS.serviceDomainEntity, {
+      serviceName: 'shipments',
+      modelName: 'Shipment',
+      projectName: 'sample',
+      searchMode,
+    });
+    const { listQuery } = await import(moduleUrl(source));
+    const query = listQuery({
+      page: 2,
+      limit: 3,
+      search: ' rec-10482 ',
+      status: 'paid',
+      sortOrder: 'desc',
+    });
+    assertEquals(query.where.status, 'paid');
+    assertEquals(
+      query.where.OR.map((filter: Record<string, unknown>) => Object.values(filter)[0]),
+      Array(4).fill(
+        searchMode ? { contains: 'rec-10482', mode: 'insensitive' } : { contains: 'rec-10482' },
+      ),
+    );
+    assertEquals(query.skip, 3);
+  }
+});
+
+Deno.test('memory search returns a matching total and page for lowercase reference and owner', async () => {
+  const source = renderTemplateAssetSync(TEMPLATE_KEYS.serviceMemoryRepository, {
+    serviceName: 'members',
+    projectName: 'sample',
+    entityName: 'members',
+  }).replace("'./sample-records.ts'", JSON.stringify(moduleUrl(sampleSource)));
+  const { createMemoryMembersRepository } = await import(moduleUrl(source));
+  const repository = createMemoryMembersRepository();
+  const exact = await repository.list({
+    offset: 0,
+    limit: 2,
+    search: 'rec-10482',
+    sortOrder: 'desc',
+  });
+  assertEquals(exact.total, 1);
+  assertEquals(exact.items[0].reference, 'REC-10482');
+  const owner = await repository.list({ offset: 2, limit: 3, search: 'maya', sortOrder: 'desc' });
+  assertEquals(owner.total, 8);
+  assertEquals(owner.items.length, 3);
+  assert(owner.items.every((row: { ownerName: string }) => row.ownerName === 'Maya Rossi'));
 });

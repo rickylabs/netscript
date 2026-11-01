@@ -1,0 +1,39 @@
+{
+  "status": "healthy",
+  "app": "web",
+  "version": "0.0.0",
+  "timestamp": "2026-11-01T21:58:53.083Z",
+  "uptime": 1,
+  "resources": [
+    {
+      "name": "web",
+      "kind": "Web",
+      "state": "healthy",
+      "latencyMs": 6.1
+    },
+    {
+      "name": "orders",
+      "kind": "Service",
+      "state": "healthy",
+      "latencyMs": 2.9
+    },
+    {
+      "name": "streams",
+      "kind": "Plugin",
+      "state": "healthy",
+      "latencyMs": 1.6
+    },
+    {
+      "name": "workers-api",
+      "kind": "Plugin",
+      "state": "healthy",
+      "latencyMs": 1.7
+    },
+    {
+      "name": "workers",
+      "kind": "Background",
+      "state": "healthy",
+      "latencyMs": 1.7
+    }
+  ]
+}

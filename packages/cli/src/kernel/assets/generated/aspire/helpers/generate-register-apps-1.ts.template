@@ -73,6 +73,7 @@ export async function registerApps(
   _services: Map<string, unknown>,
   _plugins: Map<string, unknown>,
   appHostDir: string,
+  _backgroundProcessors: ReadonlyMap<string, unknown> = new Map(),
 ): Promise<Map<string, unknown>> {
   const apps = new Map<string, unknown>();
   let corsOrigins: ReferenceExpression | undefined;

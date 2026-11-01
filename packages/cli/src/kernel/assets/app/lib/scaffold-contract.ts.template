@@ -1,11 +1,11 @@
 /** State displayed by a capability; installation alone never proves readiness. */
-export type CapabilityState = 'absent' | 'installed-unwired' | 'ready' | 'empty' | 'unauthorized' | 'unavailable';
+export type CapabilityState = 'absent' | 'configured' | 'installed-unwired' | 'ready' | 'empty' | 'unauthorized' | 'unavailable';
 
 /** Safe capability metadata passed from server loaders to page views. */
 export interface ScaffoldCapability {
   readonly id: string;
   readonly label: string;
-  readonly items?: readonly { readonly label: string; readonly detail: string }[];
+  readonly items?: readonly { readonly label: string; readonly detail: string; readonly state?: string; readonly progress?: number | null; readonly timestamp?: string }[];
   readonly state: CapabilityState;
   readonly description: string;
   readonly command?: string;
@@ -18,7 +18,7 @@ export const scaffoldStatuses = {
   paid: { label: 'Paid', tone: 'success', badgeVariant: 'success' },
   shipped: { label: 'Shipped', tone: 'info', badgeVariant: 'info' },
   refunded: { label: 'Refunded', tone: 'neutral', badgeVariant: 'muted' },
-  cancelled: { label: 'Cancelled', tone: 'danger', badgeVariant: 'destructive' },
+  cancelled: { label: 'Cancelled', tone: 'neutral', badgeVariant: 'muted' },
 } as const;
 export type ScaffoldStatus = keyof typeof scaffoldStatuses;
 
@@ -45,6 +45,7 @@ export interface ScaffoldRecords {
   readonly rows: readonly ScaffoldRecord[];
   readonly total?: number;
   readonly page?: number;
+  readonly pageSize?: number;
   readonly hasNext?: boolean;
   /** Serialized list controls, preserved when navigating to another page. */
   readonly query?: Readonly<Record<string, string>>;
@@ -79,10 +80,56 @@ export function scaffoldRecordQuery(request: Request) {
   const rawPage = Number(params.get('page') ?? 1);
   const sortBy = scaffoldSortFields.find((field) => field === params.get('sortBy')) ?? 'createdAt';
   const status = (Object.keys(scaffoldStatuses) as ScaffoldStatus[]).find((value) => value === params.get('status'));
-  return { page: Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1, sortBy, sortOrder: params.get('sortOrder') === 'asc' ? 'asc' as const : 'desc' as const, ...(status ? { status } : {}) };
+  const search = (params.get('search') ?? '').trim().slice(0, 200);
+  return { ...(search ? { search } : {}), page: Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1, sortBy, sortOrder: params.get('sortOrder') === 'asc' ? 'asc' as const : 'desc' as const, ...(status ? { status } : {}) };
 }
 
 /** Preserve the active server query when navigating the records table. */
 export function scaffoldPageHref(base: string, records: ScaffoldRecords, page: number): string {
   return base + '?' + new URLSearchParams({ ...records.query, page: String(page) });
+}
+
+/** Negotiate the user's language without trusting malformed Accept-Language input. */
+export function scaffoldLocale(request: Request): string | undefined {
+  const preferences = (request.headers.get('accept-language') ?? '').split(',').map((part) => {
+    const [language, ...parameters] = part.trim().split(';');
+    const quality = parameters.map((value) => value.trim()).find((value) => /^q=/i.test(value));
+    return { language, weight: quality ? Number(quality.slice(2)) : 1 };
+  }).filter(({ weight }) => Number.isFinite(weight) && weight > 0 && weight <= 1)
+    .sort((left, right) => right.weight - left.weight);
+  for (const { language } of preferences) {
+    try { if (language && Intl.DateTimeFormat.supportedLocalesOf([language]).length) return language; } catch { /* Ignore invalid language tags. */ }
+  }
+  return undefined;
+}
+
+/** Format signed minor units using the currency's actual decimal precision. */
+export function scaffoldAmount(amount: number, currency: string, locale?: string): string {
+  const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency });
+  return formatter.format(amount / 10 ** (formatter.resolvedOptions().maximumFractionDigits ?? 2));
+}
+
+/** Dates are presented in the user's locale; invalid data never crashes a page. */
+export function scaffoldDate(value: string, locale?: string, time = false): string {
+  const date = new Date(value);
+  return Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', ...(time ? { timeStyle: 'short' as const } : {}), timeZone: 'UTC' }).format(date) : '—';
+}
+
+/** Owners without profile photos use their real name's initials. */
+export function scaffoldInitials(name: string): string {
+  return name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => [...part][0]).join('').toLocaleUpperCase();
+}
+
+/** Counts use the actual singular form for one record. */
+export function scaffoldRecordCount(count: number, locale?: string): string {
+  return `${new Intl.NumberFormat(locale).format(count)} ${count === 1 ? 'record' : 'records'}`;
+}
+
+/** CSV retains signed numeric minor units and protects untrusted text from spreadsheet formulas. */
+export function scaffoldRecordsCsv(rows: readonly ScaffoldRecord[]): string {
+  const cell = (value: string | number) => {
+    const text = typeof value === 'number' ? String(value) : (/^\s*[=+@-]/.test(value) || value.charCodeAt(0) < 32) ? "'" + value : value;
+    return '"' + text.replaceAll('"', '""') + '"';
+  };
+  return [['Reference', 'Owner', 'Email', 'Status', 'Amount (minor units)', 'Currency'], ...rows.map((row) => [row.reference, row.ownerName, row.ownerEmail, scaffoldStatuses[row.status].label, row.amount, row.currency])].map((row) => row.map(cell).join(',')).join('\r\n');
 }

@@ -1,6 +1,7 @@
 import type { ResourceSliceTemplateAssets } from '../../adapters/templates/scaffold-template-assets.ts';
 import type { TemplatePort } from '../../ports/template-port.ts';
 import type {
+  ResourceResultPresentation,
   ResourceSliceCandidateLeaf,
   ResourceSlicePlan,
   ResourceSlicePlannedLeaf,
@@ -41,20 +42,31 @@ const TEMPLATE_ASSET_NAMES: Readonly<
   '(_islands)/ResourceStream.tsx': 'streamIslandTemplate',
 };
 
+export type { ResourceResultPresentation } from './resource-slice-contract.ts';
+
 /** Render every planned leaf and attach canonical reconciliation provenance. */
 export async function renderResourceSlice(
   plan: ResourceSlicePlan,
   templates: ResourceSliceTemplateAssets,
   templateRenderer: TemplatePort,
+  presentation: ResourceResultPresentation = {},
 ): Promise<readonly ResourceSliceCandidateLeaf[]> {
   const candidates: ResourceSliceCandidateLeaf[] = [];
   for (const leaf of plan.leaves) {
-    const content = await renderOwnedLeaf(plan, leaf, leaf.options, templates, templateRenderer);
+    const content = await renderOwnedLeaf(
+      plan,
+      leaf,
+      leaf.options,
+      templates,
+      templateRenderer,
+      presentation,
+    );
     const previousCanonicalContents = await renderPreviousCanonicalContents(
       plan,
       leaf,
       templates,
       templateRenderer,
+      presentation,
     );
     candidates.push({
       path: leaf.path,
@@ -73,11 +85,14 @@ async function renderPreviousCanonicalContents(
   leaf: ResourceSlicePlannedLeaf,
   templates: ResourceSliceTemplateAssets,
   templateRenderer: TemplatePort,
+  presentation: ResourceResultPresentation = {},
 ): Promise<readonly string[]> {
   if (leaf.role !== 'page' && leaf.role !== 'view') return [];
   const previous: string[] = [];
   for (const options of strictOptionSubsets(leaf.options)) {
-    previous.push(await renderOwnedLeaf(plan, leaf, options, templates, templateRenderer));
+    previous.push(
+      await renderOwnedLeaf(plan, leaf, options, templates, templateRenderer, presentation),
+    );
   }
   return previous;
 }
@@ -88,13 +103,20 @@ async function renderOwnedLeaf(
   options: readonly ResourceSliceVariant[],
   templates: ResourceSliceTemplateAssets,
   templateRenderer: TemplatePort,
+  presentation: ResourceResultPresentation = {},
 ): Promise<string> {
   const template = templateFor(templates, leaf.template);
-  const body = await templateRenderer.render(template, renderVariables(plan, options));
+  const body = await templateRenderer.render(
+    template,
+    renderVariables(plan, options, presentation),
+  );
   return await markOwnedResourceSliceLeaf({
     resource: plan.input.resource,
     role: leaf.role,
     options,
+    ...(leaf.role === 'island' && presentation.amountUnit !== undefined
+      ? { amountUnit: presentation.amountUnit }
+      : {}),
     ...(leaf.role === 'loaders' && plan.input.procedure.initialInput !== undefined
       ? { queryInput: plan.input.procedure.initialInput }
       : {}),
@@ -115,12 +137,18 @@ function isResourceSliceTemplateName(name: string): name is ResourceSliceTemplat
 function renderVariables(
   plan: ResourceSlicePlan,
   options: readonly ResourceSliceVariant[],
+  presentation: ResourceResultPresentation,
 ): Record<string, string> {
   const { input } = plan;
   const partialName = `${input.resource}-summary`;
   const partialRoute = `/partials/${input.routeSegments.join('/')}/summary`;
   return {
-    queryResultReturn: QUERY_RESULT_SUCCESS_RETURN,
+    queryResultReturn: presentation.amountUnit
+      ? QUERY_RESULT_SUCCESS_RETURN.replace(
+        'value={query.data}',
+        `value={query.data} amountUnit='${presentation.amountUnit}'`,
+      )
+      : QUERY_RESULT_SUCCESS_RETURN,
     queryResultTemplate: QUERY_RESULT_TEMPLATE.trim(),
     resource: input.resource,
     resourceCamelCase: input.resourceCamelCase,
@@ -195,7 +223,7 @@ function pageOptionLayers(
         `    initial: () => ${camel}FormInitialValues,\n` +
         `    mutate: (input) => copy${pascal}FormValues(input),\n` +
         `    onSuccess: () => ({\n` +
-        `      message: '${pascal} note saved.',\n` +
+        `      message: '${pascal} note validated.',\n` +
         `      nextValues: ${camel}FormInitialValues,\n` +
         `    }),\n` +
         `  })`,
@@ -234,8 +262,8 @@ function viewOptionLinks(
   options: readonly ResourceSliceVariant[],
 ): string {
   const links: string[] = [];
-  if (options.includes('form')) links.push(optionLink(resource, 'form', 'Managed form'));
-  if (options.includes('partial')) links.push(optionLink(resource, 'summary', 'Deferred summary'));
+  if (options.includes('form')) links.push(optionLink(resource, 'form', 'Note form'));
+  if (options.includes('partial')) links.push(optionLink(resource, 'summary', 'Summary'));
   if (options.includes('stream')) links.push(optionLink(resource, 'stream', 'Live stream'));
   return links.length > 0 ? `${links.join('\n')}\n` : '';
 }

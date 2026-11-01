@@ -123,9 +123,9 @@ Deno.test('readiness app splice type-checks deferred CORS for multiple enabled w
   });
   assertStringIncludes(source, 'ReferenceExpression.create`${corsOrigins},${app_1_origin}`');
   const injected = injectReadinessFixtureApps(source);
-  // Discovery loops intentionally reuse these names in distinct lexical scopes. The
-  // compiler below proves the splice introduces no conflicting declarations.
-  assertEquals(duplicateConstBindings(injected), ['endpoint', 'vite']);
+  // Service/plugin and background discovery loops intentionally reuse these names in
+  // distinct lexical scopes. The compiler below still rejects conflicting declarations.
+  assertEquals(duplicateConstBindings(injected), ['endpoint', 'vite', 'entry']);
   await assertGeneratedModuleChecks(injected);
 });
 
@@ -264,6 +264,7 @@ export const OtlpProtocol = { HttpProtobuf: 'http-protobuf' } as const;
 export interface NetScriptConfig {
   Apps: Record<string, { Enabled?: boolean; ServiceReferences?: readonly string[]; PluginReferences?: readonly string[] }>;
   Version: string;
+  BackgroundProcessors: Record<string, { Enabled?: boolean; Runtime?: string; RequiresKv?: boolean }>;
   Services: Record<string, { Environment?: Record<string, string>; Env?: Record<string, string> }>;
   Plugins: Record<string, { Environment?: Record<string, string>; Env?: Record<string, string> }>;
 }

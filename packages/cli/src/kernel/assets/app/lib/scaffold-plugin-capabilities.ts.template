@@ -2,6 +2,7 @@
 import { getServiceUrl } from '@netscript/sdk/discovery';
 import { workersContract } from '@netscript/plugin-workers-core/contracts/v1';
 import { z } from 'zod';
+import { buildStreamUrl } from '@netscript/plugin-streams-core';
 import type { ScaffoldCapability } from './scaffold-contract.ts';
 import { scaffoldServiceClient } from './scaffold-service-context.ts';
 
@@ -11,21 +12,114 @@ type AiRuntime = { chatModel?: () => Promise<unknown> };
 const aiModels = import.meta.glob<AiModels>('../../../ai/models.ts');
 const aiRuntimes = import.meta.glob<AiRuntime>('../../../ai/ai.ts');
 const readinessSchema = z.object({ ready: z.literal(true) });
+// App-owned public activity topic. Protected topics stay denied: never use a service secret here.
+const ACTIVITY_STREAM_PATH = '/workers/executions';
+const MAX_ACTIVITY_BYTES = 1024 * 1024;
+const MAX_ACTIVITY_BATCHES = 3;
+const MAX_ACTIVITY_SOURCES = 16;
+const MAX_DISPLAY_JOBS = 5;
+const MAX_RECENT_EXECUTIONS = 50;
+const activitySchema = z.array(z.object({ type: z.string(), key: z.union([z.string(), z.number()]), headers: z.object({ operation: z.enum(['upsert', 'delete']) }), value: z.object({ name: z.string().optional(), jobId: z.string().optional(), reference: z.string().optional(), status: z.string().optional(), progressMessage: z.string().nullish(), completedAt: z.string().nullish(), startedAt: z.string().nullish(), triggeredAt: z.string().optional() }).optional() }));
+type ActivityItems = NonNullable<ScaffoldCapability['items']>;
+type ActivitySnapshot = { offset: string; items: ActivityItems; skippedHistory: boolean; pending?: Promise<Projection> };
+const activitySnapshots = new Map<string, ActivitySnapshot>();
+class ActivityBudgetExceeded extends Error {}
+
+/** Bound each batch before parsing and retain only five safe display projections. */
+async function activityItems(response: Response): Promise<ActivityItems> {
+  if (!response.body) return [];
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let size = 0; let text = '';
+  try { while (true) { const next = await reader.read(); if (next.done) break; size += next.value.byteLength; if (size > MAX_ACTIVITY_BYTES) throw new ActivityBudgetExceeded(); text += decoder.decode(next.value, { stream: true }); } text += decoder.decode(); }
+  finally { await reader.cancel(); reader.releaseLock(); }
+  if (!text.trim()) return [];
+  const events = activitySchema.parse(JSON.parse(text));
+  return events.slice(-5).reverse().map((event) => ({ label: event.value?.name ?? event.value?.jobId ?? event.value?.reference ?? String(event.key), detail: event.headers.operation === 'delete' ? 'Removed from stream' : event.value?.progressMessage ?? event.value?.status?.replaceAll('_', ' ') ?? event.type, state: event.headers.operation === 'delete' ? 'deleted' : event.value?.status, timestamp: event.value?.completedAt ?? event.value?.startedAt ?? event.value?.triggeredAt }));
+}
+
+/** Opaque cursors are committed only after a complete batch; bounded catch-up continues next read. */
+async function readActivity(url: string, snapshot: ActivitySnapshot, signal: AbortSignal): Promise<Projection> {
+  let resetAttempted = false;
+  for (let batch = 0; batch < MAX_ACTIVITY_BATCHES; batch++) {
+    const target = new URL(url);
+    target.searchParams.set('offset', snapshot.offset);
+    const response = await fetch(target, { signal, redirect: 'error' });
+    if (response.status === 404) {
+      await response.body?.cancel(); snapshot.offset = '-1'; snapshot.items = []; snapshot.skippedHistory = false;
+      return { state: 'empty', description: 'No activity has reached the connected workers topic yet.' };
+    }
+    // Durable Streams catch-up: 400 invalid offset, 410 expired history. Retry from start once.
+    if ((response.status === 400 || response.status === 410) && snapshot.offset !== '-1' && !resetAttempted) {
+      await response.body?.cancel(); snapshot.offset = '-1'; snapshot.items = []; snapshot.skippedHistory = false; resetAttempted = true;
+      continue;
+    }
+    if (!response.ok) {
+      await response.body?.cancel();
+      return { state: response.status === 401 || response.status === 403 ? 'unauthorized' : 'unavailable', description: 'The activity topic could not be read. Protected topics require an app-owned authorized reader.' };
+    }
+    const nextOffset = response.headers.get('Stream-Next-Offset');
+    const caughtUp = response.headers.has('Stream-Up-To-Date');
+    let items: ActivityItems;
+    try { items = await activityItems(response); }
+    catch (error) {
+      if (!(error instanceof ActivityBudgetExceeded)) throw error;
+      // The protocol has no last-N endpoint. Skip oversized old history using its opaque HEAD.
+      const head = await fetch(url, { method: 'HEAD', signal, redirect: 'error' });
+      await head.body?.cancel();
+      const offset = head.headers.get('Stream-Next-Offset');
+      if (!head.ok || !offset) throw new Error('Activity head is unavailable');
+      snapshot.offset = offset; snapshot.items = []; snapshot.skippedHistory = true;
+      return { state: 'empty', description: 'Connected. Earlier activity exceeds the preview budget; new events will appear on the next refresh.' };
+    }
+    if (!nextOffset || (!caughtUp && nextOffset === snapshot.offset)) throw new Error('Activity cursor did not advance');
+    snapshot.offset = nextOffset;
+    snapshot.items = [...items, ...snapshot.items].slice(0, 5);
+    if (caughtUp) return {
+      state: snapshot.items.length ? 'ready' : 'empty', items: snapshot.items,
+      description: snapshot.skippedHistory ? 'Events observed since the preview skipped earlier history.' : 'Latest events from the workers execution stream.',
+    };
+  }
+  return { state: snapshot.items.length ? 'ready' : 'empty', items: snapshot.items, description: 'Catching up with stream history. Refresh to continue; these are the latest events read so far.' };
+}
+
+/** Snapshots contain public reads only; each refresh rechecks the topic's access policy. */
+async function recentActivity(url: string, signal: AbortSignal): Promise<Projection> {
+  let snapshot = activitySnapshots.get(url);
+  if (!snapshot) {
+    if (activitySnapshots.size >= MAX_ACTIVITY_SOURCES) activitySnapshots.delete(activitySnapshots.keys().next().value!);
+    snapshot = { offset: '-1', items: [], skippedHistory: false };
+    activitySnapshots.set(url, snapshot);
+  }
+  if (snapshot.pending) return await snapshot.pending;
+  snapshot.pending = readActivity(url, snapshot, signal);
+  try { return await snapshot.pending; }
+  finally { snapshot.pending = undefined; }
+}
 
 /** Read only installed capabilities, using existing contracts and service discovery. */
 export async function probeScaffoldPlugin(id: 'workers' | 'streams' | 'ai', name: string, request?: Request): Promise<Projection> {
   try {
     if (id === 'workers') {
       const { client, context } = await scaffoldServiceClient(workersContract, name, 'workers', request, { unmarked: 'optional' });
-      const result = await client.listJobs({ limit: 5, offset: 0 }, { context });
-      return { state: result.jobs.length ? 'ready' : 'empty', description: `${result.total} registered jobs.`, items: result.jobs.map((job) => ({ label: job.name, detail: job.id })), command: result.total ? undefined : 'netscript plugin info @netscript/plugin-workers' };
+      const [result, history] = await Promise.all([
+        client.listJobs({ limit: MAX_DISPLAY_JOBS, offset: 0 }, { context }),
+        client.listExecutions({ limit: MAX_RECENT_EXECUTIONS, offset: 0 }, { context }),
+      ]);
+      const completeHistory = history.total <= history.executions.length;
+      const items = result.jobs.map((job) => {
+        const latest = history.executions.filter((execution) => execution.jobId === job.id)
+          .sort((left, right) => right.triggeredAt.localeCompare(left.triggeredAt))[0];
+        return { label: job.name, detail: latest?.progressMessage ?? (latest ? job.id : completeHistory ? 'No executions yet' : 'No execution in the recent history window'), state: latest?.status ?? (!job.enabled ? 'disabled' : completeHistory ? 'idle' : 'unknown'), progress: latest?.progressPercent, timestamp: latest?.completedAt ?? latest?.startedAt ?? latest?.triggeredAt };
+      });
+      return { state: result.jobs.length ? 'ready' : 'empty', description: `${result.total} registered ${result.total === 1 ? 'job' : 'jobs'}. Recent execution history (up to ${MAX_RECENT_EXECUTIONS} executions).`, items, command: result.total ? undefined : 'netscript plugin info @netscript/plugin-workers' };
     }
     if (id === 'streams') {
       const signal = request ? AbortSignal.any([request.signal, AbortSignal.timeout(3000)]) : AbortSignal.timeout(3000);
       const response = await fetch(new URL('/health/ready', getServiceUrl(name)), { signal });
       if (!response.ok) { await response.body?.cancel(); return { state: response.status === 401 || response.status === 403 ? 'unauthorized' : 'unavailable', description: 'The stream service could not be read.', command: 'netscript plugin doctor' }; }
       readinessSchema.parse(await response.json());
-      return { state: 'ready', description: 'Stream service ready. Connect a topic to display its activity.', command: 'netscript plugin info @netscript/plugin-streams' };
+      return await recentActivity(buildStreamUrl(ACTIVITY_STREAM_PATH, getServiceUrl(name)), signal);
     }
     const loadModels = Object.values(aiModels)[0];
     const loadRuntime = Object.values(aiRuntimes)[0];

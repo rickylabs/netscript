@@ -1,0 +1,111 @@
+{
+  "baseline": "7eb1d7749e829a863b68514e6e601f72a6f1d4f2",
+  "deno": "2.9.7",
+  "scope": [
+    "dependency-free SSR liveness",
+    "bounded worker history reads",
+    "configuration-only sign-in/settings"
+  ],
+  "focusedTests": {
+    "passed": 39,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 39,
+    "uniqueFailures": 0
+  },
+  "livenessNegativeControl": {
+    "original": "FAIL: no-Accept called records and workers",
+    "mutation": "FAIL: restored dependency branch triggered the same assertion",
+    "restored": "PASS: no-Accept and wildcard have zero dependency/topology calls; explicit HTML/JSON probe exactly once"
+  },
+  "checks": {
+    "scopedCheck": {
+      "selection": {
+        "filesSelected": 3,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      }
+    },
+    "scopedLint": {
+      "selection": {
+        "filesSelected": 3,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "coverage": {
+        "filesSelected": 3,
+        "filesProcessed": 3,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    "scopedFmt": {
+      "summary": {
+        "filesSelected": 3,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 3,
+        "filesProcessed": 3,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    "generatedCheck": {
+      "selection": {
+        "filesSelected": 126,
+        "batches": 2,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      }
+    }
+  },
+  "qualityGate": {
+    "exitCode": 0
+  },
+  "carrierGate": {
+    "exitCode": 0
+  },
+  "rootCheck": {
+    "files": 4198,
+    "batches": 35,
+    "failedBatches": 0
+  },
+  "browser": {
+    "pageVariants": 32,
+    "interactionSets": 4,
+    "errors": 0,
+    "overflow": false,
+    "evidence": "s8-screens/browser-matrix.json"
+  },
+  "offline": "s8-offline-proof.json",
+  "sourceReview": "s8-review.md",
+  "ci": "Required on the pushed S8 head; final workflow links belong in NEW READY.",
+  "visualReview": "s8-visual.md",
+  "visualMinimumScores": {
+    "overview": 8.5,
+    "health": 8.5,
+    "settings": 8,
+    "signIn": 8
+  }
+}

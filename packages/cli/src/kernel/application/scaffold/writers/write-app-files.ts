@@ -223,7 +223,7 @@ export async function writeNormalizedAppFiles(
   );
   const uiInstall = await installUiRegistryItems({
     projectRoot: appDir,
-    names: [...DEFAULT_UI_INIT_ITEMS, 'command-palette'],
+    names: [...DEFAULT_UI_INIT_ITEMS, 'command-palette', 'chart-block', 'donut'],
     theme: UI_DEFAULT_THEME,
     overwrite: true,
   }, { fs: context.fs });
@@ -407,6 +407,7 @@ export async function writeNormalizedAppFiles(
   }
   // Utility page assets share the canonical template registry and renderer.
   const workspacePages = [
+    ['islands/RecordTable.tsx', appAssets.appRecordTableIsland],
     ['lib/scaffold-contract.ts', appAssets.appScaffoldContract],
     ['lib/scaffold-projections.ts', appAssets.appScaffoldProjections],
     ['lib/scaffold-overview.ts', appAssets.appScaffoldOverview],

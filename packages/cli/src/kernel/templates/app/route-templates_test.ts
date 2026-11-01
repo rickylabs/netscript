@@ -276,8 +276,9 @@ describe('app route template rendering', () => {
         'StatsGrid',
         'RecordTable',
         'CapabilityEmpty',
-        'generatedPageCount()',
-        'appTheme().label',
+        'data.totals.records.current',
+        'ChartBlock',
+        'Donut',
         "import.meta.env.MODE === 'development'",
         'href={appRoutes.design.href()}',
         'href={appRoutes.designComposition.href()}',
@@ -301,22 +302,24 @@ describe('app route template rendering', () => {
     );
     assertStringIncludes(
       route,
-      "import { buildPayload, toHealthRouteData } from './(_shared)/health.ts';",
+      "import { buildLivenessPayload, buildPayload, toHealthRouteData } from './(_shared)/health.ts';",
     );
     assertStringIncludes(route, "import { appRoutes } from '@app/router.ts';");
     assertStringIncludes(route, "import { definePage } from '@app/utils.ts';");
     assertStringIncludes(route, 'export const healthPage = definePage()');
     assertStringIncludes(route, '.withRoute(appRoutes.health)');
-    assertStringIncludes(route, ".withHandler('GET', (ctx) => {");
+    assertStringIncludes(route, ".withHandler('GET', async (ctx) => {");
     assertStringIncludes(route, '.build();');
     assertStringIncludes(
       route,
       'export const { handler, default: page } = healthPage;',
     );
     assertStringIncludes(view, 'export default function HealthView');
-    assertStringIncludes(view, 'Accept: application/json');
+    assertStringIncludes(view, 'Resource status');
+    assert(!view.includes('JSON.stringify'));
+    assertStringIncludes(view, 'resource.latencyMs');
     assertStringIncludes(shared, 'export interface HealthPayload {');
-    assertStringIncludes(shared, 'export function buildPayload');
+    assertStringIncludes(shared, 'export async function buildPayload');
     assertStringIncludes(shared, 'export function toHealthRouteData');
   });
 
@@ -328,7 +331,8 @@ describe('app route template rendering', () => {
     const adapter = makeAdapter();
     const route = await adapter.render(appHealthRouteTemplate, SAMPLE_APP_VARS);
 
-    assertStringIncludes(route, ".withLayer('panel', HealthView,");
+    assertStringIncludes(route, "'panel',");
+    assertStringIncludes(route, 'HealthView,');
     assertStringIncludes(route, '.withLayout((slots) => slots.panel())');
     assertStringIncludes(
       route,
@@ -541,7 +545,7 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, '.build();');
     assertStringIncludes(route, 'export { page as default };');
     assertStringIncludes(view, 'interface ExamplesViewProps {');
-    assertStringIncludes(view, 'ResponsiveTable');
+    assertStringIncludes(view, 'workspace-example-list');
     assertStringIncludes(view, 'href={canonicalHref}');
     assertStringIncludes(view, 'Open team-members flow');
   });

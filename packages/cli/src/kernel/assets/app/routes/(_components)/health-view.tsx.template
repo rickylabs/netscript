@@ -1,27 +1,130 @@
+import { Badge, Button, PageHeader } from '@app/components/ui/mod.ts';
+import { appRoutes } from '@app/router.ts';
 import type { HealthRouteData } from '../(_shared)/health.ts';
 
 export default function HealthView({ payload }: HealthRouteData) {
+  const healthy = payload.resources.filter((item) => item.state === 'healthy').length;
+  const unlinked = payload.resources.filter((item) => item.state === 'unwired').length;
+  const failed = payload.resources.some((item) => item.state === 'unavailable');
+  const restricted = payload.resources.some((item) => item.state === 'unauthorized');
+  const condition = failed
+    ? 'Degraded'
+    : restricted
+    ? 'Access required'
+    : unlinked
+    ? 'Discovery incomplete'
+    : 'Operational';
   return (
-    <main class='min-w-0 bg-ns-bg text-ns-fg'>
-      <section class='ns-shell ns-section'>
-        <div class='mx-auto w-full min-w-0 max-w-3xl ns-stack ns-stack--md'>
-          <div class='ns-stack ns-stack--xs'>
-            <span class='ns-badge w-fit' data-variant='success'>healthy</span>
-            <h1 class='text-3xl font-semibold text-ns-fg sm:text-4xl'>{{name}} health</h1>
-            <p class='text-sm leading-7 text-ns-muted-fg sm:text-base'>
-              Requesting <code>/health</code> with <code>Accept: application/json</code>{' '}
-              returns the probe payload directly. Browser requests render the same payload through
-              the shared builder route.
+    <div class='workspace-page'>
+      <PageHeader class='workspace-heading'>
+        <PageHeader.Layout>
+          <PageHeader.Main>
+            <PageHeader.Intro>
+              <h1>System health</h1>
+              <p>Current availability across your workspace.</p>
+            </PageHeader.Intro>
+          </PageHeader.Main>
+          <PageHeader.Actions>
+            <Button type='link' href={appRoutes.health.href()} variant='outline'>
+              ↻ Check again
+            </Button>
+          </PageHeader.Actions>
+        </PageHeader.Layout>
+      </PageHeader>
+      <div class='workspace-health-banner' data-state={failed ? 'degraded' : 'healthy'}>
+        <span class='workspace-health-dot' />
+        <div>
+          <h2>
+            {healthy} operational{unlinked > 0 && <>{' '}· {unlinked} not linked</>}
+          </h2>
+          <p>
+            Last checked{' '}
+            <time dateTime={payload.timestamp}>
+              {new Intl.DateTimeFormat(undefined, {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: 'UTC',
+              }).format(new Date(payload.timestamp))} UTC
+            </time>
+          </p>
+        </div>
+        <Badge variant={failed || restricted ? 'warning' : unlinked ? 'muted' : 'success'}>
+          {condition}
+        </Badge>
+      </div>
+      <dl class='workspace-health-summary'>
+        <div>
+          <dt>Responding</dt>
+          <dd>
+            {healthy}
+            <small>/ {payload.resources.length}</small>
+          </dd>
+        </div>
+        <div>
+          <dt>Resources</dt>
+          <dd>{payload.resources.length}</dd>
+        </div>
+        <div>
+          <dt>Web uptime</dt>
+          <dd>
+            {payload.uptime < 60 ? payload.uptime : Math.floor(payload.uptime / 60)}
+            <small>{payload.uptime < 60 ? 'sec' : 'min'}</small>
+          </dd>
+        </div>
+      </dl>
+      <section class='workspace-section'>
+        <header class='workspace-section-heading'>
+          <div>
+            <h2>Resource status</h2>
+            <p>
+              Response latency at this check. Background processes report their own readiness. Web
+              time includes dependency checks.
             </p>
           </div>
-
-          <div class='min-w-0 max-w-full overflow-hidden border border-ns-border bg-ns-surface p-5'>
-            <pre class='overflow-x-auto text-sm leading-6 text-ns-muted-fg'>
-              {JSON.stringify(payload, null, 2)}
-            </pre>
-          </div>
+        </header>
+        <div class='workspace-health-list'>
+          {payload.resources.map((resource) => (
+            <article class='workspace-health-row' key={resource.kind + resource.name}>
+              <span class='workspace-resource-icon' aria-hidden='true'>
+                {resource.kind === 'Web' ? '◫' : resource.kind === 'Service' ? '⌘' : '◇'}
+              </span>
+              <div>
+                <h3>{resource.name}</h3>
+                <p>{resource.kind === 'Background' ? 'Background process' : resource.kind}</p>
+              </div>
+              <span class='workspace-health-latency'>
+                {resource.latencyMs === undefined ? '—' : `${resource.latencyMs} ms`}
+              </span>
+              <Badge
+                variant={resource.state === 'healthy'
+                  ? 'success'
+                  : resource.state === 'disabled'
+                  ? 'muted'
+                  : resource.state === 'unwired'
+                  ? 'muted'
+                  : resource.state === 'unauthorized'
+                  ? 'warning'
+                  : 'destructive'}
+              >
+                {resource.state === 'healthy'
+                  ? 'Operational'
+                  : resource.state === 'unauthorized'
+                  ? 'Access required'
+                  : resource.state === 'unwired'
+                  ? 'Not linked'
+                  : resource.state === 'disabled'
+                  ? 'Disabled'
+                  : 'Unavailable'}
+              </Badge>
+            </article>
+          ))}
         </div>
       </section>
-    </main>
+      <footer class='workspace-reference'>
+        <a href={appRoutes.dashboard.href()}>← Overview</a>
+        <span>Checks are a point-in-time snapshot.</span>
+      </footer>
+    </div>
   );
 }

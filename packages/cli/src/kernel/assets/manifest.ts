@@ -10,6 +10,7 @@ export const TEMPLATE_KEYS = {
   appScaffoldRecordsMemory: 'app/lib/scaffold-records.memory.ts.template',
   appScaffoldRecordsDatabase: 'app/lib/scaffold-records.database.ts.template',
   appCapabilityEmpty: 'app/routes/(_components)/capability-empty.tsx.template',
+  appRecordTableIsland: 'app/islands/RecordTable.tsx.template',
   appRecordTable: 'app/routes/(_components)/record-table.tsx.template',
   appRecordsRoute: 'app/routes/records/index.tsx.template',
   appRecordRoute: 'app/routes/records/[id].tsx.template',

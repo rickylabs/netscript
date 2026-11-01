@@ -1,20 +1,27 @@
-import { Badge, Button, EmptyState, PageHeader } from '@app/components/ui/mod.ts';
-import { scaffoldStatuses, type ScaffoldRecordDetail } from '@app/lib/scaffold-contract.ts';
+import { Badge, Button, DetailLayout, EmptyState, PageHeader } from '@app/components/ui/mod.ts';
+import { scaffoldAmount, scaffoldDate, scaffoldInitials, scaffoldLocale, scaffoldStatuses, type ScaffoldRecordDetail } from '@app/lib/scaffold-contract.ts';
 import { loadScaffoldRecord } from '@app/lib/scaffold-records.ts';
 import { appRoutes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
 
+function RecordView({ detail, locale }: { readonly detail: ScaffoldRecordDetail; readonly locale?: string }) {
+  const record = detail.record;
+  return <div class='workspace-page'>
+    <PageHeader class='workspace-heading'><PageHeader.Layout><PageHeader.Main><PageHeader.Intro><h1>{record?.reference ?? (detail.notFound ? 'Record not found' : 'Record details')}</h1><p>{record ? `${record.name} · Created ${scaffoldDate(record.createdAt, locale)}` : detail.message}</p></PageHeader.Intro></PageHeader.Main><PageHeader.Actions><Button type='link' href={appRoutes.records.href()} variant='outline'>Back to records</Button>{record && <Button type='link' href={appRoutes.serviceExample.href()}>Open service</Button>}</PageHeader.Actions></PageHeader.Layout></PageHeader>
+    {record ? <DetailLayout><DetailLayout.Main><section class='workspace-section'><header class='workspace-section-heading'><h2>Record information</h2><Badge variant={scaffoldStatuses[record.status].badgeVariant}>{scaffoldStatuses[record.status].label}</Badge></header>
+      <div class='workspace-detail-amount'>{scaffoldAmount(record.amount, record.currency, locale)} <span>{record.currency}</span></div>
+      <dl class='workspace-details'>{[{ label: 'Reference', value: record.reference }, { label: 'Name', value: record.name }, { label: 'Owner', value: record.ownerName }, { label: 'Email', value: record.ownerEmail }, { label: 'Created', value: scaffoldDate(record.createdAt, locale, true) }, { label: 'Last updated', value: scaffoldDate(record.updatedAt, locale, true) }].map((field) => <div key={field.label}><dt>{field.label}</dt><dd>{field.value}</dd></div>)}</dl>
+      {record.description && <p class='workspace-muted'>{record.description}</p>}
+    </section></DetailLayout.Main><DetailLayout.Aside><section class='workspace-section'><header class='workspace-section-heading'><h2>Owner</h2></header><div class='workspace-owner'><span class='workspace-avatar'>{scaffoldInitials(record.ownerName)}</span><div><strong>{record.ownerName}</strong><a class='workspace-record-description' href={`mailto:${record.ownerEmail}`}>{record.ownerEmail}</a></div></div></section>
+    <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Record timeline</h2><p>Saved timestamps · UTC</p></div></header><ol class='workspace-timeline'>
+      {record.updatedAt !== record.createdAt && <li><span class='workspace-timeline-dot' /><div><strong>Last updated</strong><p>Current status: {scaffoldStatuses[record.status].label}</p><time dateTime={record.updatedAt}>{scaffoldDate(record.updatedAt, locale, true)}</time></div></li>}
+      <li><span class='workspace-timeline-dot' /><div><strong>Record created</strong><p>{record.reference} added to the workspace</p><time dateTime={record.createdAt}>{scaffoldDate(record.createdAt, locale, true)}</time></div></li>
+    </ol></section></DetailLayout.Aside></DetailLayout> : <EmptyState class='workspace-empty' heading={detail.notFound ? 'This record could not be found' : detail.state === 'unauthorized' ? 'Sign in to view this record' : detail.state === 'unavailable' ? 'Record unavailable' : 'No record connected'}><p>{detail.message}</p>{detail.command && <code class='workspace-command'>{detail.command}</code>}{detail.state === 'unauthorized' && <Button type='link' href={appRoutes.signIn.href()}>Sign in</Button>}</EmptyState>}
+  </div>;
+}
 export const recordPage = definePage().withRoute(appRoutes.record)
   .withMeta(() => ({ title: '{{name}} — Record details' }))
-  .withLayer('record', ({ detail }: { readonly detail: ScaffoldRecordDetail }) => <div class='workspace-page'>
-    <PageHeader class='workspace-heading'><PageHeader.Layout><PageHeader.Main><PageHeader.Intro><h1>{detail.record?.name ?? (detail.notFound ? 'Record not found' : 'Record details')}</h1><p>{detail.record?.description || detail.message}</p></PageHeader.Intro></PageHeader.Main><PageHeader.Actions><Button type='link' href={appRoutes.records.href()} variant='outline'>Back to records</Button></PageHeader.Actions></PageHeader.Layout></PageHeader>
-    {detail.record ? <section class='workspace-section'><header class='workspace-section-heading'><h2>Record information</h2>{detail.record.status && <Badge variant={scaffoldStatuses[detail.record.status].badgeVariant}>{scaffoldStatuses[detail.record.status].label}</Badge>}</header>
-      <dl class='workspace-details'>{detail.record.fields.map((field) => <div key={field.label}><dt>{field.label}</dt><dd>{field.value}</dd></div>)}</dl>
-    </section> : <EmptyState class='workspace-empty' heading={detail.notFound ? 'This record could not be found' : detail.state === 'unauthorized' ? 'Sign in to view this record' : detail.state === 'unavailable' ? 'Record unavailable' : 'No record connected'}><p>{detail.message}</p>{detail.command && <code class='workspace-command'>{detail.command}</code>}{detail.state === 'unauthorized' && <Button type='link' href={appRoutes.signIn.href()}>Sign in</Button>}</EmptyState>}
-  </div>, { loader: async (ctx) => {
-    const detail = await loadScaffoldRecord(ctx.req, ctx.path.id);
-    return { detail };
-  } })
+  .withLayer('record', RecordView, { loader: async (ctx) => ({ detail: await loadScaffoldRecord(ctx.req, ctx.path.id), locale: scaffoldLocale(ctx.req) }) })
   .withLayout((slots) => slots.record()).build();
 export const { default: page } = recordPage;
 export { page as default };

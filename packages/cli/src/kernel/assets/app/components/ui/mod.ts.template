@@ -41,3 +41,5 @@ export { Spinner, type SpinnerSize } from './spinner.tsx';
 export { StatsGrid } from './stats-grid.tsx';
 export { Switch, type SwitchProps } from './switch.tsx';
 export { Textarea } from './textarea.tsx';
+export { ChartBlock } from './chart-block.tsx';
+export { Donut } from './donut.tsx';

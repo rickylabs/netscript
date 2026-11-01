@@ -1,0 +1,9 @@
+**PASS — the S8 corrections address all three findings. No actionable source blocker remains in the supplied changes.**
+
+- **Liveness:** `packages/cli/src/kernel/assets/app/routes/health.tsx.template` keeps no-Accept and wildcard requests on the SSR path, using only `buildLivenessPayload`. The layer fallback also stays local. Explicit HTML and JSON requests call `buildPayload` once; HTML rendering reuses the handler’s payload. The shared helper retains the background child checks requiring `state: 'ready'`, `registryReady: true`, and `dependencyReady: true`.
+- **Worker reads:** `packages/cli/src/kernel/assets/app/lib/scaffold-plugin-capabilities.ts.template` replaces per-job requests with two bounded calls: five jobs and fifty global executions. It correlates by `jobId` and selects the newest `triggeredAt`. Given the stated endpoint ordering and total-count contract, missing history produces `unknown` when truncated, `idle` when complete, or `disabled` for a disabled job, without inventing execution progress.
+- **Configuration pages:** Settings and sign-in no longer load records. Configuration mode returns before runtime plugin probing, while preserving local installation, application-link, enabled-state, and authentication-route checks. The new `configured` state and corresponding copy distinguish configuration from observed runtime readiness.
+
+The emitted handler/helper regression exercises both liveness entry points and checks that HTML rendering does not repeat dependency requests. The worker tests cover bounded calls, correlation, and incomplete-history behavior. No new suppressions or debt waivers appear in this patch.
+
+This is **source approval only**; I ran no tools. The reported 39 test passes and regression-mutation results are supporting evidence supplied by you. Generated checks, live proof, and visual continuation for the changed copy remain separate pending gates.

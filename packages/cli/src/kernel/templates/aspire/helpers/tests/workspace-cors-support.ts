@@ -101,6 +101,7 @@ interface GeneratedModule {
     services: Map<string, RecordingResource>,
     plugins: Map<string, RecordingResource>,
     root: string,
+    background?: Map<string, RecordingResource>,
   ): Promise<Map<string, unknown>>;
 }
 
@@ -126,6 +127,9 @@ export async function registerWorkspace(
     ) => [name, new RecordingResource(name)]),
   );
   const apps = new Map<string, RecordingResource>();
+  const background = new Map(
+    Object.keys(config.BackgroundProcessors).map((name) => [name, new RecordingResource(name)]),
+  );
   // Existing declarations are overridden by the workspace origin policy.
   for (const target of [...services.values(), ...plugins.values()]) {
     target.withEnvironment('NETSCRIPT_CORS_ORIGINS', 'https://stale.example');
@@ -170,6 +174,7 @@ export async function registerWorkspace(
       services,
       plugins,
       root,
+      background,
     );
     return { services, plugins, apps };
   } finally {

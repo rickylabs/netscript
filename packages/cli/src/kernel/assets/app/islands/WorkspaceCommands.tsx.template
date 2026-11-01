@@ -1,10 +1,32 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { CommandPalette } from '@app/components/ui/command-palette.tsx';
+import { appRoutes } from '@app/router.ts';
+import { scaffoldAmount, scaffoldStatuses, type ScaffoldRecord } from '@app/lib/scaffold-contract.ts';
 import type { NavigationItem } from '@app/navigation.ts';
 
 /** Global keyboard navigation uses only routes rendered in this application. */
 export default function WorkspaceCommands({ navigation }: { readonly navigation: readonly NavigationItem[] }) {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [records, setRecords] = useState<readonly ScaffoldRecord[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [recordStatus, setRecordStatus] = useState('');
+  useEffect(() => {
+    if (!open) return;
+    const controller = new AbortController();
+    setLoading(true);
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(appRoutes.records.href() + '?' + new URLSearchParams({ search: query }), { signal: controller.signal, headers: { accept: 'application/json' } });
+        if (!response.ok) throw new Error('Record search unavailable');
+        const result = await response.json() as { state: string; rows: ScaffoldRecord[]; message: string };
+        if (controller.signal.aborted) return;
+        setRecords(result.rows); setRecordStatus(result.state === 'ready' || result.state === 'empty' ? '' : result.message);
+      } catch { if (!controller.signal.aborted) { setRecords([]); setRecordStatus('Record search is unavailable. Page navigation is still available.'); } }
+      finally { if (!controller.signal.aborted) setLoading(false); }
+    }, 150);
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [open, query]);
   const openState = useRef(false);
   const [shortcut, setShortcut] = useState('Ctrl K');
   const trigger = useRef<HTMLButtonElement>(null);
@@ -17,8 +39,12 @@ export default function WorkspaceCommands({ navigation }: { readonly navigation:
     globalThis.addEventListener('keydown', onKey, true);
     return () => globalThis.removeEventListener('keydown', onKey, true);
   }, []);
-  function changeOpen(next: boolean) { openState.current = next; setOpen(next); if (!next) trigger.current?.focus(); }
+  function changeOpen(next: boolean) { if (next) { setQuery(''); setRecords([]); } openState.current = next; setOpen(next); if (!next) trigger.current?.focus(); }
   return <><button ref={trigger} type='button' class='workspace-search' onClick={() => changeOpen(true)} aria-label='Search pages' aria-haspopup='dialog'><span aria-hidden='true'>⌕</span><span>Search pages…</span><kbd>{shortcut}</kbd></button>
-    <CommandPalette open={open} onOpenChange={changeOpen} placeholder='Search pages…' groups={[{ id: 'pages', label: 'Pages', items: navigation.map((item) => ({ id: item.label.toLowerCase(), label: item.label, hash: item.href, kind: 'Page', onSelect: () => { globalThis.location.href = item.href; } })) }]} />
+    <CommandPalette class='workspace-palette' open={open} onOpenChange={changeOpen} onQueryChange={setQuery} placeholder='Search records, pages and actions…' loading={loading} filters={<div class='workspace-command-scope'>Workspace <span>Pages · Records · Actions</span></div>} footer={<>{recordStatus ? <p role='status'>{recordStatus}</p> : <><span>↑↓ Navigate · ↵ Open</span><span class='workspace-command-more'>Scroll results ↓</span></>}</>} groups={[
+      { id: 'pages', label: 'Pages', items: navigation.map((item) => ({ id: 'page-' + item.href, label: item.label, url: item.href, type: 'page' as const, icon: '◫', excerpt: item.label === 'Overview' ? 'Period totals, daily activity and connected work.' : item.label === 'Records' ? 'Search, sort and export real service records.' : item.label === 'Health' ? 'Availability and response times for each resource.' : item.label === 'Settings' ? 'Workspace details, appearance and access.' : `Open ${item.label.toLowerCase()}.`, onSelect: () => { globalThis.location.href = item.href; } })) },
+      { id: 'records', label: query ? 'Matching records' : 'Recent records', items: records.map((row) => ({ id: 'record-' + row.id, label: row.reference, type: 'page' as const, kind: 'Record', icon: '▤', url: appRoutes.record.href({ path: { id: row.id } }), excerpt: `${row.name} · ${row.ownerName} · ${scaffoldAmount(row.amount, row.currency)} · ${scaffoldStatuses[row.status].label}`, onSelect: () => { globalThis.location.href = appRoutes.record.href({ path: { id: row.id } }); } })) },
+      { id: 'actions', label: 'Actions', items: [{ id: 'export-records', label: 'Export records', type: 'action' as const, icon: '↓', excerpt: 'Choose records and download a CSV from the records table.', onSelect: () => { globalThis.location.href = appRoutes.records.href() + '#record-export'; } }, { id: 'appearance', label: 'Change appearance', type: 'action' as const, icon: '◐', excerpt: 'Choose light, dark or your device setting.', onSelect: () => { globalThis.location.href = appRoutes.settings.href() + '#appearance-settings'; } }] },
+    ]} />
   </>;
 }

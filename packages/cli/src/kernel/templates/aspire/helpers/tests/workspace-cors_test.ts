@@ -207,3 +207,53 @@ Deno.test('app discovery reads current plugin links and injects only linked endp
     false,
   );
 });
+
+Deno.test('background readiness is wired to server discovery independently of plugin references', async () => {
+  const registered = await registerWorkspace({
+    ...EMPTY_CONFIG,
+    Apps: { web: UNPINNED_APP },
+    BackgroundProcessors: {
+      renamedWorker: {
+        Telemetry: false,
+        WatchMode: false,
+        RequiresDb: false,
+        Enabled: true,
+        Runtime: 'deno',
+        RequiresKv: true,
+        Entrypoint: 'main.ts',
+      },
+      disabled: {
+        Telemetry: false,
+        WatchMode: false,
+        RequiresDb: false,
+        Enabled: false,
+        Runtime: 'deno',
+        RequiresKv: true,
+        Entrypoint: 'main.ts',
+      },
+      task: {
+        Telemetry: false,
+        WatchMode: false,
+        RequiresDb: false,
+        Enabled: true,
+        Runtime: 'deno',
+        RequiresKv: false,
+        Entrypoint: 'main.ts',
+      },
+    },
+  });
+  const environment = registered.apps.get('web')!.environment;
+  const child = environment.filter((entry) => entry.key.includes('renamedWorker'));
+  assertEquals(child.length, 1);
+  assertEquals(child[0].key, 'services__renamedWorker__http__0');
+  assertEquals(
+    allocatedValue(child[0].value, new Map([['renamedWorker', 'http://localhost:43217']])),
+    'http://localhost:43217',
+  );
+  assertEquals(
+    environment.some((entry) =>
+      entry.key.includes('disabled') || entry.key.includes('services__task')
+    ),
+    false,
+  );
+});

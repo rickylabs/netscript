@@ -1,10 +1,13 @@
 import { JsrImportResolver } from '../../../../public/adapters/jsr-import-resolver.ts';
 import { generateAppDenoJson } from '../../../adapters/templates/app/generate-app-deno-json.ts';
-import { assert, assertEquals, assertStringIncludes } from '@std/assert';
+import { assert, assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
 import { renderTemplate } from '../../../adapters/scaffold/template-adapter.ts';
 import { readTemplateAssetSync } from '../../../adapters/templates/template-asset.ts';
 import { TEMPLATE_KEYS } from '../../../assets/manifest.ts';
 import { createServiceAddCommand } from '../../../../public/features/services/add/add-service-command.ts';
+
+import workspace from '../../../../../../../deno.json' with { type: 'json' };
+import { assertReadyCapabilities } from '../../../../../e2e/src/application/gates/scaffold/probe-app-home.ts';
 
 const variables = {
   name: 'acme',
@@ -23,8 +26,11 @@ Deno.test('#2566: home uses shared generated overview without fabricated CRUD or
   const dashboard = readTemplateAssetSync(TEMPLATE_KEYS.appRoutesComponentsDashboardView);
   const navigation = readTemplateAssetSync(TEMPLATE_KEYS.appNavigation);
   assertStringIncludes(home, "from './dashboard-view.tsx'");
-  assertStringIncludes(dashboard, 'appTheme().label');
-  assertStringIncludes(dashboard, 'generatedPageCount()');
+  assertStringIncludes(dashboard, 'data.totals.records.current');
+  assertStringIncludes(dashboard, 'ChartBlock');
+  assertStringIncludes(dashboard, 'Donut');
+  assertEquals(dashboard.includes('generatedPageCount()'), false);
+  assertEquals(dashboard.includes('appTheme().label'), false);
   assertStringIncludes(navigation, 'walk(routePatterns)');
   assertStringIncludes(navigation, "import.meta.env.MODE !== 'development'");
   for (
@@ -200,4 +206,82 @@ Deno.test('scaffold worker reader and official plugin share the release-pinned c
     app.imports[`${core.name}/contracts/v1`],
     `jsr:${core.name}@${core.version}/contracts/v1`,
   );
+});
+
+Deno.test('populated overview exposes actual capability readiness to the runtime probe', async () => {
+  const preact = `npm:preact@${workspace.catalog.preact}`;
+  const { h } = await import(preact);
+  const { renderToString } = await import(
+    `npm:preact-render-to-string@${workspace.catalog['preact-render-to-string']}`
+  );
+  const contract = `data:application/typescript,${
+    encodeURIComponent(
+      renderTemplate(readTemplateAssetSync(TEMPLATE_KEYS.appScaffoldContract), variables),
+    )
+  }`;
+  // Keep the actual panel branches; isolate component styling and route infrastructure.
+  const source = renderTemplate(
+    readTemplateAssetSync(TEMPLATE_KEYS.appRoutesComponentsDashboardView),
+    variables,
+  )
+    .replace(
+      /^import .* from '@app\/components\/ui\/mod.ts';/m,
+      `
+      const Box = ({children}: {children?: ComponentChildren}) => <div>{children}</div>;
+      const Badge = Box, Button = Box, ChartBlock = Box, Donut = Box, Progress = Box;
+      const PageHeader = Object.assign(Box, {Layout: Box, Main: Box, Intro: Box, Actions: Box});
+      const StatsGrid = Object.assign(Box, {Card: Box});
+    `,
+    )
+    .replace("'@app/lib/scaffold-contract.ts'", JSON.stringify(contract))
+    .replace(
+      "import { appRoutes } from '@app/router.ts';",
+      `
+      const route = {href: () => '/'};
+      const appRoutes = {records: route, dashboard: route, health: route, serviceExample: route};
+    `,
+    )
+    .replace(
+      "import { CapabilityEmpty } from './capability-empty.tsx';",
+      'const CapabilityEmpty = () => null;',
+    )
+    .replace("import { RecordTable } from './record-table.tsx';", 'const RecordTable = () => null;')
+    .replace(
+      /^import .* from '@app\/lib\/scaffold-projections.ts';/m,
+      'const SCAFFOLD_PERIOD_DAYS = 30;',
+    )
+    .replace("import.meta.env.MODE === 'development'", 'false');
+  const module = await import(
+    'data:text/tsx,' + encodeURIComponent(
+      `/** @jsx h */
+/** @jsxFrag Fragment */
+import {h, Fragment, type ComponentChildren} from ${JSON.stringify(preact)};
+${source}`,
+    )
+  );
+  const render = (workers: string, streams: string) =>
+    renderToString(h(module.default, {
+      records: { state: 'empty', rows: [] },
+      overview: { state: 'absent', message: 'No service' },
+      capabilities: [
+        {
+          id: 'workers',
+          state: workers,
+          items: [{ label: 'Actual job', detail: 'Processing', state: 'running', progress: 37 }],
+        },
+        {
+          id: 'streams',
+          state: streams,
+          items: [{ label: 'Actual event', detail: 'Job started', state: 'running' }],
+        },
+      ],
+    }));
+  const html = render('ready', 'ready');
+  assertStringIncludes(html, 'Actual job');
+  assertStringIncludes(html, 'Actual event');
+  assertReadyCapabilities(html, ['workers', 'streams']);
+  for (const state of ['absent', 'installed-unwired', 'empty', 'unavailable', 'unauthorized']) {
+    assertThrows(() => assertReadyCapabilities(render(state, 'ready'), ['workers', 'streams']));
+    assertThrows(() => assertReadyCapabilities(render('ready', state), ['workers', 'streams']));
+  }
 });

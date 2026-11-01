@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
-import { Alert, Button, EmptyState, FormField, Input, PageHeader, Select } from '@app/components/ui/mod.ts';
+import { Alert, Badge, Button, EmptyState, FormField, Input, PageHeader, Select } from '@app/components/ui/mod.ts';
 import { appRoutes } from '@app/router.ts';
 import type { ScaffoldCapability } from '@app/lib/scaffold-contract.ts';
 
@@ -7,7 +7,7 @@ const APPEARANCE_KEY = 'ns-theme';
 const appearanceOptions = [{ value: 'system', label: 'Use system setting' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }];
 
 /** Browser preferences are saved locally; project identity is deliberately read-only. */
-export default function SettingsForm({ projectName, appName, theme, auth }: { readonly projectName: string; readonly appName: string; readonly theme: string; readonly auth: ScaffoldCapability }) {
+export default function SettingsForm({ projectName, appName, theme, auth, capabilities }: { readonly projectName: string; readonly appName: string; readonly theme: string; readonly auth: ScaffoldCapability; readonly capabilities: readonly ScaffoldCapability[] }) {
   const [appearance, setAppearance] = useState('system');
   const [saved, setSaved] = useState('system');
   const [message, setMessage] = useState('');
@@ -25,9 +25,9 @@ export default function SettingsForm({ projectName, appName, theme, auth }: { re
     <PageHeader class='workspace-heading'><PageHeader.Layout><PageHeader.Main><PageHeader.Intro><h1>Settings</h1><p>Workspace details and your browsing preferences.</p></PageHeader.Intro></PageHeader.Main><PageHeader.Actions>
       <Button type='button' variant='outline' onClick={() => { setAppearance(saved); setMessage(''); }}>Discard</Button><Button type='submit'>Save changes</Button>
     </PageHeader.Actions></PageHeader.Layout></PageHeader>
-    <div class='workspace-settings-layout'><nav class='workspace-settings-nav' aria-label='Settings sections'><a href='#general'>General</a><a href='#appearance-settings'>Appearance</a><a href='#access'>Access</a></nav>
+    <div class='workspace-settings-layout'><nav class='workspace-settings-nav' aria-label='Settings sections'><a href='#general' aria-current='page'>General</a><a href='#appearance-settings'>Appearance</a><a href='#access'>Access</a><a href='#connections'>Connections</a></nav>
       <div class='workspace-settings-content'>
-        {message && <div role='status'><Alert variant={error ? 'destructive' : 'success'} title={error ? 'Could not save' : 'Settings saved'}>{message}</Alert></div>}
+        {message && <Alert variant={error ? 'destructive' : 'success'} title={error ? 'Could not save' : 'Settings saved'}>{message}</Alert>}
         <div class='workspace-form-columns'><section id='general' class='workspace-form-section'><h2>Workspace details</h2><p>Generated project information.</p>
           <FormField name='project-name' label='Workspace name'><Input id='project-name' value={projectName} readOnly /></FormField>
           <FormField name='app-name' label='Application'><Input id='app-name' value={appName} readOnly /></FormField>
@@ -35,8 +35,9 @@ export default function SettingsForm({ projectName, appName, theme, auth }: { re
         </section><div class='workspace-form-section'><section id='appearance-settings' class='workspace-form-section'><h2>Appearance</h2><p>Choose how this workspace looks on your device.</p>
           <FormField name='appearance' label='Color scheme' helpText='This preference is stored only in this browser.'><Select id='appearance' value={appearance} options={appearanceOptions} onChange={(event) => setAppearance(event.currentTarget.value)} /></FormField>
         </section><section id='access' class='workspace-form-section'><h2>Access</h2><p>Sign in through your configured provider.</p>
-          {auth.state === 'ready' ? <Button type='link' href={appRoutes.signIn.href()} variant='outline'>Manage sign-in</Button> : <EmptyState heading='Authentication not connected'><p>{auth.description}</p><code class='workspace-command'>{auth.command}</code></EmptyState>}
+          {auth.state === 'ready' ? <Button type='link' href={appRoutes.signIn.href()} variant='outline'>Manage sign-in</Button> : <EmptyState heading={auth.state === 'unavailable' ? 'Authentication unavailable' : auth.state === 'unauthorized' ? 'Sign in required' : auth.state === 'installed-unwired' ? 'Finish connecting authentication' : 'Authentication not connected'}><p>{auth.description}</p><code class='workspace-command'>{auth.command}</code></EmptyState>}
         </section></div></div>
+        <section id='connections' class='workspace-section'><header class='workspace-section-heading'><div><h2>Workspace connections</h2><p>Capabilities available to this application.</p></div><a href={appRoutes.health.href()}>System health →</a></header><div class='workspace-connection-grid'>{capabilities.map((item) => <article class='workspace-connection' key={item.id}><div class='workspace-job-heading'><h3>{item.label}</h3><Badge variant={item.state === 'ready' || item.state === 'empty' ? 'success' : item.state === 'unavailable' ? 'destructive' : 'muted'}>{item.state === 'ready' || item.state === 'empty' ? 'Connected' : item.state === 'configured' ? 'Configured' : item.state === 'installed-unwired' ? 'Needs connection' : item.state === 'absent' ? 'Not connected' : item.state === 'unauthorized' ? 'Sign-in required' : 'Unavailable'}</Badge></div><p>{item.description}</p></article>)}</div></section>
       </div>
     </div>
   </form>;
