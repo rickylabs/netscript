@@ -17,6 +17,8 @@ const ACTIVITY_STREAM_PATH = '/workers/executions';
 const MAX_ACTIVITY_BYTES = 1024 * 1024;
 const MAX_ACTIVITY_BATCHES = 3;
 const MAX_ACTIVITY_SOURCES = 16;
+const MAX_DISPLAY_JOBS = 5;
+const MAX_RECENT_EXECUTIONS = 50;
 const activitySchema = z.array(z.object({ type: z.string(), key: z.union([z.string(), z.number()]), headers: z.object({ operation: z.enum(['upsert', 'delete']) }), value: z.object({ name: z.string().optional(), jobId: z.string().optional(), reference: z.string().optional(), status: z.string().optional(), progressMessage: z.string().nullish(), completedAt: z.string().nullish(), startedAt: z.string().nullish(), triggeredAt: z.string().optional() }).optional() }));
 type ActivityItems = NonNullable<ScaffoldCapability['items']>;
 type ActivitySnapshot = { offset: string; items: ActivityItems; skippedHistory: boolean; pending?: Promise<Projection> };
@@ -100,12 +102,17 @@ export async function probeScaffoldPlugin(id: 'workers' | 'streams' | 'ai', name
   try {
     if (id === 'workers') {
       const { client, context } = await scaffoldServiceClient(workersContract, name, 'workers', request, { unmarked: 'optional' });
-      const result = await client.listJobs({ limit: 5, offset: 0 }, { context });
-      const items = await Promise.all(result.jobs.map(async (job) => {
-        const latest = (await client.listExecutions({ jobId: job.id, limit: 1, offset: 0 }, { context })).executions[0];
-        return { label: job.name, detail: latest?.progressMessage ?? (latest ? job.id : 'No executions yet'), state: latest?.status ?? (job.enabled ? 'idle' : 'disabled'), progress: latest?.progressPercent, timestamp: latest?.completedAt ?? latest?.startedAt ?? latest?.triggeredAt };
-      }));
-      return { state: result.jobs.length ? 'ready' : 'empty', description: `${result.total} registered ${result.total === 1 ? 'job' : 'jobs'}. Latest execution for each job.`, items, command: result.total ? undefined : 'netscript plugin info @netscript/plugin-workers' };
+      const [result, history] = await Promise.all([
+        client.listJobs({ limit: MAX_DISPLAY_JOBS, offset: 0 }, { context }),
+        client.listExecutions({ limit: MAX_RECENT_EXECUTIONS, offset: 0 }, { context }),
+      ]);
+      const completeHistory = history.total <= history.executions.length;
+      const items = result.jobs.map((job) => {
+        const latest = history.executions.filter((execution) => execution.jobId === job.id)
+          .sort((left, right) => right.triggeredAt.localeCompare(left.triggeredAt))[0];
+        return { label: job.name, detail: latest?.progressMessage ?? (latest ? job.id : completeHistory ? 'No executions yet' : 'No execution in the recent history window'), state: latest?.status ?? (!job.enabled ? 'disabled' : completeHistory ? 'idle' : 'unknown'), progress: latest?.progressPercent, timestamp: latest?.completedAt ?? latest?.startedAt ?? latest?.triggeredAt };
+      });
+      return { state: result.jobs.length ? 'ready' : 'empty', description: `${result.total} registered ${result.total === 1 ? 'job' : 'jobs'}. Recent execution history (up to ${MAX_RECENT_EXECUTIONS} executions).`, items, command: result.total ? undefined : 'netscript plugin info @netscript/plugin-workers' };
     }
     if (id === 'streams') {
       const signal = request ? AbortSignal.any([request.signal, AbortSignal.timeout(3000)]) : AbortSignal.timeout(3000);

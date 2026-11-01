@@ -1,5 +1,5 @@
 /** State displayed by a capability; installation alone never proves readiness. */
-export type CapabilityState = 'absent' | 'installed-unwired' | 'ready' | 'empty' | 'unauthorized' | 'unavailable';
+export type CapabilityState = 'absent' | 'configured' | 'installed-unwired' | 'ready' | 'empty' | 'unauthorized' | 'unavailable';
 
 /** Safe capability metadata passed from server loaders to page views. */
 export interface ScaffoldCapability {

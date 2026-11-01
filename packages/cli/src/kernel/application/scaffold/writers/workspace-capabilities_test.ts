@@ -26,7 +26,7 @@ async function capabilityFixture(root: string, app: string) {
     )
     .replace(
       "import { probeScaffoldPlugin } from './scaffold-plugin-capabilities.ts';",
-      "const probeScaffoldPlugin = async (_id: string, name: string) => ({state: 'ready' as const, description: name});",
+      "export let liveReads = 0; const probeScaffoldPlugin = async (_id: string, name: string) => { liveReads++; return {state: 'ready' as const, description: name}; };",
     )
     .replaceAll('Deno.cwd()', JSON.stringify(app))
     .replace("'./scaffold-contract.ts'", JSON.stringify(contract))
@@ -105,6 +105,13 @@ Deno.test('request-time topology follows service add and renamed plugin metadata
     const workers = (await module.readScaffoldCapabilities())[2];
     assertEquals(workers.state, 'ready');
     assertEquals(workers.description, 'queue-api');
+    const liveReads = module.liveReads;
+    const configured = await module.readScaffoldCapabilities(undefined, undefined, 'configuration');
+    assertEquals(configured[0].state, 'configured');
+    assertEquals(configured[2].state, 'configured');
+    assertStringIncludes(configured[2].description, 'check availability');
+    assertEquals(module.liveReads, liveReads, 'configuration pages must not call plugin services');
+
     await Deno.writeTextFile(
       `${root}/plugins/renamed/scaffold.plugin.json`,
       JSON.stringify({
@@ -209,7 +216,15 @@ Deno.test('service failures distinguish access denial and never expose raw error
 
 Deno.test('plugin projections read real result shapes and reject false stream readiness', async () => {
   const contextUrl = moduleUrl(
-    `let jobs: unknown[] = []; let options: unknown; export function readOptions() { return options; } export function setJobs(next: unknown[]) { jobs = next; } export const scaffoldServiceClient = async (...args: unknown[]) => { options = args[4]; return {client: {listJobs: async () => ({jobs,total:jobs.length}), listExecutions: async () => ({executions:[{status:'running',progressPercent:37,progressMessage:'Processing records',triggeredAt:'2026-11-01T00:00:00Z'}]})},context:{}}; };`,
+    `let jobs: unknown[] = []; let options: unknown; let executions: unknown[] = []; let total = 0;
+      export const calls: { method: string; input: unknown }[] = [];
+      export function readOptions() { return options; }
+      export function setJobs(next: unknown[]) { jobs = next; }
+      export function setExecutions(next: unknown[], count = next.length) { executions = next; total = count; }
+      export const scaffoldServiceClient = async (...args: unknown[]) => { options = args[4]; return {client: {
+        listJobs: async (input: unknown) => { calls.push({method:'jobs',input}); return {jobs,total:jobs.length}; },
+        listExecutions: async (input: unknown) => { calls.push({method:'executions',input}); return {executions,total}; }
+      },context:{}}; };`,
   );
   const context = await import(contextUrl);
   const source = renderTemplate(
@@ -234,7 +249,14 @@ Deno.test('plugin projections read real result shapes and reject false stream re
   const module = await import(moduleUrl(source));
   assertEquals((await module.probeScaffoldPlugin('workers', 'queue-api')).state, 'empty');
   assertEquals(context.readOptions(), { unmarked: 'optional' });
-  context.setJobs([{ id: 'job-one', name: 'Configured job' }]);
+  context.setJobs([{ id: 'job-one', name: 'Configured job', enabled: true }]);
+  context.setExecutions([{
+    jobId: 'job-one',
+    status: 'running',
+    progressPercent: 37,
+    progressMessage: 'Processing records',
+    triggeredAt: '2026-11-01T00:00:00Z',
+  }]);
   const workers = await module.probeScaffoldPlugin('workers', 'queue-api');
   assertEquals(workers.state, 'ready');
   assertEquals(workers.items, [{
@@ -244,6 +266,34 @@ Deno.test('plugin projections read real result shapes and reject false stream re
     progress: 37,
     timestamp: '2026-11-01T00:00:00Z',
   }]);
+  context.setJobs(
+    Array.from(
+      { length: 5 },
+      (_, index) => ({ id: `job-${index}`, name: `Job ${index}`, enabled: index !== 4 }),
+    ),
+  );
+  context.setExecutions([
+    { jobId: 'job-0', status: 'completed', triggeredAt: '2026-10-30T00:00:00Z' },
+    { jobId: 'job-1', status: 'failed', triggeredAt: '2026-11-01T00:00:00Z' },
+    { jobId: 'job-0', status: 'running', progressPercent: 42, triggeredAt: '2026-11-01T00:00:00Z' },
+  ], 100);
+  context.calls.length = 0;
+  const bounded = await module.probeScaffoldPlugin('workers', 'queue-api');
+  assertEquals(context.calls, [
+    { method: 'jobs', input: { limit: 5, offset: 0 } },
+    { method: 'executions', input: { limit: 50, offset: 0 } },
+  ], 'five jobs still require only two bounded requests');
+  assertEquals(bounded.items.map((item: { state: string }) => item.state), [
+    'running',
+    'failed',
+    'unknown',
+    'unknown',
+    'disabled',
+  ]);
+  assertEquals(bounded.items[0].progress, 42);
+  assertStringIncludes(bounded.items[2].detail, 'recent history window');
+  context.setExecutions([]);
+  assertEquals((await module.probeScaffoldPlugin('workers', 'queue-api')).items[2].state, 'idle');
   const originalFetch = globalThis.fetch;
   const originalError = console.error;
   console.error = () => {};
@@ -412,4 +462,12 @@ export const browserSessionContext = (request: Request) => ({ signal: request.si
   assertEquals(auth.readOptions(), { unmarked: 'optional' });
   await module.scaffoldServiceClient({}, 'users', 'users', request);
   assertEquals(auth.readOptions(), {});
+});
+
+Deno.test('settings and sign-in use configuration capabilities without loading records', () => {
+  for (const key of [TEMPLATE_KEYS.appSettingsRoute, TEMPLATE_KEYS.appSignInRoute]) {
+    const source = renderTemplate(readTemplateAssetSync(key), variables);
+    assertEquals(source.includes('loadScaffoldRecords'), false);
+    assertStringIncludes(source, "readScaffoldCapabilities(ctx.req, undefined, 'configuration')");
+  }
 });

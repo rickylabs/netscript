@@ -302,7 +302,7 @@ describe('app route template rendering', () => {
     );
     assertStringIncludes(
       route,
-      "import { buildPayload, toHealthRouteData } from './(_shared)/health.ts';",
+      "import { buildLivenessPayload, buildPayload, toHealthRouteData } from './(_shared)/health.ts';",
     );
     assertStringIncludes(route, "import { appRoutes } from '@app/router.ts';");
     assertStringIncludes(route, "import { definePage } from '@app/utils.ts';");

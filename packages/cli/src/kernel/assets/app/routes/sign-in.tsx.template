@@ -1,7 +1,6 @@
 import { Badge, Button, EmptyState, Progress } from '@app/components/ui/mod.ts';
 import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';
 import { appTheme } from '@app/lib/theme.ts';
-import { loadScaffoldRecords } from '@app/lib/scaffold-records.ts';
 import type { ScaffoldCapability } from '@app/lib/scaffold-contract.ts';
 import { readScaffoldCapabilities } from '@app/lib/scaffold-capabilities.ts';
 import { appRoutes } from '@app/router.ts';
@@ -11,15 +10,15 @@ export const signInPage = definePage().withRoute(appRoutes.signIn)
   .withMeta(() => ({ title: '{{name}} — Sign in' }))
   .withLayer('signin', ({ capabilities }: { capabilities: readonly ScaffoldCapability[] }) => {
     const auth = capabilities.find((item) => item.id === 'auth')!;
-    const connected = capabilities.filter((item) => item.state === 'ready' || item.state === 'empty').length;
+    const configured = capabilities.filter((item) => item.state === 'configured' || item.state === 'ready' || item.state === 'empty').length;
     return <div class='workspace-auth'><header class='workspace-auth-top'><a class='workspace-brand' href={appRoutes.home.href()}><span class='workspace-mark' aria-hidden='true'>N</span>{{name}}</a><ThemeToggle /></header>
       <div class='workspace-auth-columns'><section class='workspace-auth-panel'><h1>Sign in to {{name}}</h1><p>Continue to your workspace.</p>
         {auth.state === 'ready' ? <form method='post' action='/auth/signin'><p>Your identity provider handles authentication securely.</p><Button type='submit'>Continue to sign in <span aria-hidden='true'>→</span></Button></form>
           : <EmptyState heading={auth.state === 'unavailable' ? 'Sign-in unavailable' : auth.state === 'unauthorized' ? 'Sign-in required' : 'Connect authentication'}><p>{auth.description}</p><code class='workspace-command'>{auth.command}</code></EmptyState>}
         <footer><a href={appRoutes.home.href()}>Back to workspace</a></footer>
-      </section><section class='workspace-auth-setup'><h2>Your workspace, connected</h2><p>{connected} of {capabilities.length} capabilities connected to {{appName}}.</p><Progress value={connected} max={capabilities.length} label='Connected workspace capabilities' /><ol class='workspace-setup-list'>{capabilities.map((item, index) => <li key={item.id}><span class='workspace-setup-step'>{item.state === 'ready' || item.state === 'empty' ? '✓' : index + 1}</span><div><strong>{item.label}</strong><p>{item.description}</p></div><Badge variant={item.state === 'ready' || item.state === 'empty' ? 'success' : 'muted'}>{item.state === 'ready' || item.state === 'empty' ? 'Connected' : item.state === 'unauthorized' ? 'Sign in' : 'Not ready'}</Badge></li>)}</ol><dl class='workspace-details'><div><dt>Project</dt><dd>{{name}}</dd></div><div><dt>Application</dt><dd>{{appName}}</dd></div><div><dt>Theme</dt><dd>{appTheme().label}</dd></div></dl><p class='workspace-muted'>Access is managed by your workspace’s identity provider.</p></section></div>
+      </section><section class='workspace-auth-setup'><h2>Your workspace, connected</h2><p>{configured} of {capabilities.length} capabilities configured for {{appName}}.</p><Progress value={configured} max={capabilities.length} label='Configured workspace capabilities' /><ol class='workspace-setup-list'>{capabilities.map((item, index) => <li key={item.id}><span class='workspace-setup-step'>{item.state === 'configured' || item.state === 'ready' || item.state === 'empty' ? '✓' : index + 1}</span><div><strong>{item.label}</strong><p>{item.description}</p></div><Badge variant={item.state === 'ready' || item.state === 'empty' ? 'success' : 'muted'}>{item.state === 'ready' || item.state === 'empty' ? 'Connected' : item.state === 'configured' ? 'Configured' : item.state === 'unauthorized' ? 'Sign in' : 'Not ready'}</Badge></li>)}</ol><dl class='workspace-details'><div><dt>Project</dt><dd>{{name}}</dd></div><div><dt>Application</dt><dd>{{appName}}</dd></div><div><dt>Theme</dt><dd>{appTheme().label}</dd></div></dl><p class='workspace-muted'>Access is managed by your workspace’s identity provider.</p></section></div>
     </div>;
-  }, { loader: async (ctx) => ({ capabilities: await readScaffoldCapabilities(ctx.req, await loadScaffoldRecords(ctx.req)) }) })
+  }, { loader: async (ctx) => ({ capabilities: await readScaffoldCapabilities(ctx.req, undefined, 'configuration') }) })
   .withLayout((slots) => slots.signin()).build();
 export const { default: page } = signInPage;
 export { page as default };

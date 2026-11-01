@@ -34,17 +34,17 @@ export async function readScaffoldPluginIdentities(root: string) {
   return installed;
 }
 
-/** Project current topology, including post-init installs, then read supported live surfaces. */
-export async function readScaffoldCapabilities(request?: Request, records?: ScaffoldRecords): Promise<readonly ScaffoldCapability[]> {
+/** Configuration mode reads local topology only; live mode also checks supported runtime surfaces. */
+export async function readScaffoldCapabilities(request?: Request, records?: ScaffoldRecords, mode: 'live' | 'configuration' = 'live'): Promise<readonly ScaffoldCapability[]> {
   try {
     const root = await findWorkspaceRoot(Deno.cwd());
     const settings = settingsSchema.parse(JSON.parse(await Deno.readTextFile(join(root, 'appsettings.json'))));
     const services = Object.entries(settings.NetScript.Services).filter(([, entry]) => entry.Enabled !== false);
     const service = services.find(([name]) => name === '{{serviceName}}') ?? services[0];
     const capabilities: ScaffoldCapability[] = [{
-      id: 'service', label: labels.service, state: records?.state ?? (service ? 'installed-unwired' : 'absent'),
-      description: records?.message ?? (service ? `Connect the ${service[0]} typed client to a resource page.` : 'Add a service to start working with records.'),
-      command: records ? records.command : service ? `netscript generate resource ${service[0]} --app {{appName}} --client ${service[0]} --procedure list` : capabilityCommands.service,
+      id: 'service', label: labels.service, state: records?.state ?? (service ? mode === 'configuration' ? 'configured' : 'installed-unwired' : 'absent'),
+      description: records?.message ?? (service && mode === 'configuration' ? `The ${service[0]} service is configured. Open Records to check availability.` : service ? `Connect the ${service[0]} typed client to a resource page.` : 'Add a service to start working with records.'),
+      command: mode === 'configuration' && service ? undefined : records ? records.command : service ? `netscript generate resource ${service[0]} --app {{appName}} --client ${service[0]} --procedure list` : capabilityCommands.service,
     }];
     const installed = await readScaffoldPluginIdentities(root);
     const appRefs = settings.NetScript.Apps['{{appName}}']?.PluginReferences;
@@ -61,6 +61,7 @@ export async function readScaffoldCapabilities(request?: Request, records?: Scaf
         return { id, label: labels[id], state: authRoute && resource ? 'ready' : 'installed-unwired', description: authRoute && resource ? 'Continue with your configured identity provider.' : 'The authentication route is not connected to this app.', command: authRoute && resource ? undefined : 'netscript plugin doctor' };
       }
       if (!resource && id !== 'ai') return { id, label: labels[id], state: 'installed-unwired', description: 'Installed, but its runtime resource is not configured.', command: 'netscript plugin doctor' };
+      if (mode === 'configuration') return { id, label: labels[id], state: 'configured', description: 'Configured for this application. Open Overview or System health to check availability.' };
       return { id, label: labels[id], ...await probeScaffoldPlugin(id, identity.name, request) };
     }));
     return [...capabilities, ...plugins];
