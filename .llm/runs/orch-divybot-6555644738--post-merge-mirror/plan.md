@@ -21,7 +21,7 @@ unresolved architecture decisions. Mandatory independent IMPL-EVAL remains selec
 - Regressing CI: pin label-gated, closing-reference-only behavior and write default.
 - Squashed heads: check every cited SHA in selected evidence, including checked boxes;
   fail closed for unreachable or ambiguous commits. Compare SHA to literal `main`.
-- False SHA matches: recognize 7–40 digit hexadecimal citations; ordinary numeric run
+- False SHA matches: recognize 7–40 digit hexadecimal citations and 4–40 digit explicitly labelled citations; ordinary numeric run
   IDs are not implicit commits. Explicit commit links and SHA/commit labels allow
   numeric-only hashes. Deduplicate checks. No SHA requirement is added to the grammar.
 - Comment pagination: read all pages so later evidence is reachable.
