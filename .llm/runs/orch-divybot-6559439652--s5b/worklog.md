@@ -54,3 +54,31 @@ Live revalidation: PR #2576 remains open/draft at 70c2eb9; worktree clean; both 
 ## Plan confirmation
 
 PASS from the same independent read-only Claude evaluator after the user's continuation grant; exact suffix grammar independently tested against all 87 contracts. Implementation begins only after this PASS. Both S3 PRs remain OPEN; main has not advanced beyond the original baseline.
+
+## Slice 1 — generator candidate
+
+Implemented typed portable bundle, strict shared-contract validation, registry style/source identity join, complete Cartesian variants, exact token-role expansion/resolution and canonical semantic regeneration validation. Tests include malformed contracts, unknown/missing/duplicate mappings, stale aliases, unsafe variants, missing tokens and tampered output; app-shell suffix shorthand is a positive control.
+
+Current data: 52 eligible registry items, 2,046 variants, 35 unmatched contracts (14 shipped runtime-only and 21 planned). All 51 non-prose items generate independently. The only expected source gap is markdown/prose → Theme set/prose/h4/tracking; full generation fails before returning a bundle. These fixture/current-contract checks do not prove all-S5/editor acceptance.
+
+Structured native gates: check/lint/fmt cover 9 TypeScript files; generator tests 8 passed, 0 failed. Independent substantive slice review pending before sign-off commit. Root/tooling quality scans and final full gate set remain for completion.
+
+## Slice 1 review repairs
+
+Independent reviewer returned FAIL_FIX: duplicate contract claims, absent root anatomy and untested deferred coverage. Repaired all three and all advisory findings (trimmed variant values, exact range identity, ambiguous source refusal, specific negative-control diagnostics and lexical role validation across the full catalog). Added source-map completeness checks so unreferenced visual registry items or missing cross-style entries cannot silently shrink inventory. Source defaults now determine the first Cartesian variant.
+
+Exact gate commands (all exit 0):
+
+- `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root tools/figma-component-library --ext ts --deno-arg --frozen` — 10 files, no diagnostics.
+- `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-lint.ts --root tools/figma-component-library --ext ts --config tools/figma-component-library/lint.deno.json` — 10/10 processed, no findings.
+- `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root tools/figma-component-library --ext ts --config tools/figma-component-library/lint.deno.json` — 10/10 processed, no findings.
+- `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --unstable-kv --frozen tools/figma-component-library/tests` — 12 passed, 0 failed.
+- Explicit tools-root code-quality scan — PASS, no allowances/findings.
+
+Broader quality:gate and existing figma:ci both PASS through allowlisted durable gate runner; these commands do not themselves cover the new tool, whose explicit wrappers remain required. One full scaffold.runtime attempt exited 1 at Aspire doctor; Docker and cleanup inspection unavailable. Runtime verdict UNPROVEN, not green. Read-only leak reporter lists 24 unproven-ownership survivors; all left untouched. No container/runtime provisioning reached.
+
+## Slice 1 sign-off / reconciliation
+
+Independent same-session substantive slice review: PASS in slice-review-pass.md. It re-ran all four structured gates and confirmed every blocking/advisory repair against real data. Supervisor signs off this slice after that independent PASS. The earlier 9-file/8-test entry is historical; the final verdict covers 10 files/12 tests.
+
+Reconcile: existing draft #2576 remains the single PR for #2568; source-parent and S3 boundaries unchanged. No labels, external issue closure, source contract/token changes or lock churn. Slice2 will colocate native port/import/export in src/native to keep the source folder bounded.

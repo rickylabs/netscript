@@ -28,12 +28,12 @@ These map registry item → contract, never anatomy or variant data:
 - desktop-window-chrome → window-chrome (contract render fixture; registry/components/ui/desktop-window-chrome.tsx).
 - desktop-update-prompt → update-prompt (contract render fixture; registry/components/ui/desktop-update-prompt.tsx).
 
-Reject stale overrides, unknown targets and duplicate logical/source mappings. List every unmatched contract in derived coverage, including the current 22 shipped runtime-only contracts; do not turn them into fake registry items.
+Reject stale overrides, unknown targets and duplicate logical/source mappings. List every unmatched contract in derived coverage, including the current 14 shipped runtime-only contracts; do not turn them into fake registry items.
 
 ## Slices
 
 1. Contracts, inventory/token joins, deterministic generation and negative-control fixtures: `tools/figma-component-library/src/{contract,validate-contract,inventory,token-bindings,generate,validate-library}.ts`, tests and run evidence. Gate: structured scoped static/test wrappers; independent slice review.
-2. Native import/export, separate plugin entry/build, Code Connect publication, CLI and docs, explicit CI workflow. Files: src/{figma-port,import-library,export-library,code-connect,publication,default-sources}.ts; plugin/{main,ui}.ts; plugin/ui.html; manifest.json; build.ts; cli.ts; ci.ts; lint.deno.json; README.md; tests/{native,connect,command,bundle}_test.ts and mock-figma.ts; .github/workflows/figma-component-library.yml (under 30 files including run updates by keeping evidence updates in existing files). figma.config.json is generated only, not an authoring input. Gate: complete unit CI wrappers/build, existing figma CI, release preflight, docs accuracy, applicable quality/architecture, full CLI E2E attempt; independent IMPL-EVAL.
+2. Native import/export, separate plugin entry/build, Code Connect publication, CLI and docs, explicit CI workflow. Files: src/native/{figma-port,import-library,export-library}.ts and src/{code-connect,publication,default-sources}.ts; plugin/{main,ui}.ts; plugin/ui.html; manifest.json; build.ts; cli.ts; ci.ts; lint.deno.json; README.md; tests/{native,connect,command,bundle}_test.ts and mock-figma.ts; .github/workflows/figma-component-library.yml (under 30 files including run updates by keeping evidence updates in existing files). figma.config.json is generated only, not an authoring input. Gate: complete unit CI wrappers/build, existing figma CI, release preflight, docs accuracy, applicable quality/architecture, full CLI E2E attempt; independent IMPL-EVAL.
 
 ## Risks and mitigation
 
