@@ -1,0 +1,37 @@
+{
+  "head": "9288ea2939f56eeb75fa53b6260f6cf1e91f31f0",
+  "session": "a4d71fd7-efc6-4444-8141-7fa312a2977a",
+  "actualModel": "claude-opus-5",
+  "requestedEffort": "xhigh",
+  "actualResponseEffortAttested": false,
+  "generatorFamilies": [
+    "meta",
+    "openai"
+  ],
+  "evaluatorFamily": "anthropic",
+  "transport": "native Claude first-party subscription",
+  "sameSession": true,
+  "first": {
+    "nativeExit": 1,
+    "resultSubtype": "error_max_turns",
+    "turns": 7,
+    "canonicalFinal": false
+  },
+  "completion": {
+    "nativeExit": 0,
+    "resultSubtype": "success",
+    "turns": 1,
+    "wrapperExit": 1,
+    "wrapperFailure": "Exact lexical regex rejected ## VERDICT: PASS"
+  },
+  "rootOffline": {
+    "sourceVerdict": "PASS",
+    "allProtectedMatched": 163,
+    "physicalAnchors": 16,
+    "reportUnchanged": true,
+    "mergeAccepted": false
+  },
+  "ownMcpCalls": 7,
+  "fullPacketReads": 19,
+  "noInferenceOrSourceGateRerunDuringPublicPreparation": true
+}

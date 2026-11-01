@@ -31,3 +31,94 @@
   border-top: 1px solid var(--ns-border);
   padding: var(--ns-space-4) var(--ns-space-5);
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='root'][data-variant='default'] {
+  border-color: var(--ns-card-border);
+  border-width: var(--ns-card-border-top) var(--ns-card-border-side) var(--ns-card-border-bottom);
+  border-radius: var(--ns-radius-card);
+  background: var(--ns-card-bg);
+  box-shadow: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-body);
+  font-weight: var(--ns-weight-body);
+  line-height: var(--ns-leading-body);
+  letter-spacing: var(--ns-tracking-body);
+  display: grid;
+  min-height: var(--ns-table-row-height);
+  padding-inline: var(--ns-table-cell-padding-x);
+  background: var(--ns-table-row-bg);
+  border-bottom: var(--ns-table-row-rule-width) solid var(--ns-table-row-rule);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row']:hover {
+  background: var(--ns-table-hover);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row'][aria-selected='true'] {
+  background: var(--ns-selected);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row']:focus-visible {
+  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+  outline-offset: var(--ns-focus-ring-offset);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row-link']:focus-visible {
+  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+  outline-offset: var(--ns-focus-ring-offset);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='header-cell'] {
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-label);
+  font-weight: var(--ns-weight-label);
+  line-height: var(--ns-leading-label);
+  letter-spacing: var(--ns-tracking-label);
+  color: var(--ns-muted-fg);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='head'] {
+  background: var(--ns-table-head);
+  border-bottom: var(--ns-table-head-rule-width) solid var(--ns-table-head-rule);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='bulk-actions'] {
+  padding: var(--ns-stack-gap) var(--ns-table-cell-padding-x);
+  background: var(--ns-selected);
+  border-bottom: var(--ns-border-width) solid var(--ns-border);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row'] {
+  align-items: center;
+  padding-block: var(--ns-space-2);
+  border-top: none;
+}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row'][aria-selected='true'] {
+  border-inline-start: var(--ns-space-0-5) solid var(--ns-marker);
+}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row'][aria-selected='true']:hover {
+  background: color-mix(in srgb, var(--ns-fg) calc(var(--ns-state-hover-opacity) * 1%),
+    var(--ns-selected));
+}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='header-cell'] {
+  text-transform: uppercase;
+}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='selection'] > input {
+  accent-color: var(--ns-marker);
+  width: var(--ns-size-icon-sm);
+  height: var(--ns-size-icon-sm);
+}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='selection'] > input:focus-visible {
+  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+  outline-offset: var(--ns-focus-ring-offset);
+}
+
+/* Keep the header rail horizontal even when shared Card styles load later. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='header'] {
+  flex-direction: row;
+  align-items: center;
+}

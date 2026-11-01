@@ -1,0 +1,5 @@
+# 2026-10-31 — Preset import safety
+
+Preset preparation must precede both public scaffolding and maintainer package sync. Decode, fetch and validate through the shared resolver, then retain that resolved selection for application so the response cannot change between validation and use. Require HTTPS while allowing exact loopback HTTP hosts for development; keep policy shared with ui:apply. Red native-CLI tests exposed real scaffold residue for malformed URLs and invalid preset/theme schemas in both binaries. Green tests verify no residue, no HTTP fetch on rejection, loopback acceptance and cached-payload reuse.
+
+CLI files are excluded by root lint/fmt config; explicit scoped configs plus wrapper processed-file coverage prevent false greens. Docs carriers must be committed before assets-barrel's Git diff check. Docker-unavailable runtime is UNPROVEN, never PASS. Draft CI jobs are intentionally skipped; moving to review materializes the required checks, while READY still requires exact-head checks.

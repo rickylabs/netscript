@@ -2,8 +2,8 @@
  * @module templates/aspire/helpers/generate-register-infrastructure_test
  */
 
-import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1'
-import { describe, it } from 'jsr:@std/testing@^1/bdd'
+import { assert, assertEquals, assertStringIncludes } from '@std/assert'
+import { describe, it } from '@std/testing/bdd'
 
 import { generateRegisterInfrastructure } from '../register/generate-register-infrastructure.ts'
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts'
@@ -319,12 +319,15 @@ describe('generateRegisterInfrastructure', () => {
           output,
           `builder.addContainer("garnet", "ghcr.io/microsoft/garnet:${SCAFFOLD_VERSIONS.GARNET_TOOL}")`,
         )
+        assertStringIncludes(output, '.withArgs(["--lua","--lua-transaction-mode"])')
       }
       if (Mode !== 'Container') {
         assertStringIncludes(
           output,
           `ensureGarnetToolManifest(appHostDir, "${SCAFFOLD_VERSIONS.GARNET_TOOL}")`,
         )
+        assertStringIncludes(output, 'await args.add("--lua");')
+        assertStringIncludes(output, 'await args.add("--lua-transaction-mode");')
       }
       assertEquals(
         countOccurrences(output, 'return createRespPingCheck({ host, port })();'),
@@ -332,6 +335,23 @@ describe('generateRegisterInfrastructure', () => {
       )
       assert(!output.includes('addGarnet('))
     }
+  })
+
+  it('enables transactional Lua for every Auto fallback but excludes Redis container arguments', () => {
+    for (const Engine of ['Redis', 'DenoKv'] as const) {
+      const output = generateRegisterInfrastructure({
+        databases: {},
+        caches: { cache: { Enabled: true, Engine, Mode: 'Auto' } },
+      })
+      assertStringIncludes(output, 'await args.add("--lua");')
+      assertStringIncludes(output, 'await args.add("--lua-transaction-mode");')
+      assert(!output.includes('.withArgs(["--lua","--lua-transaction-mode"])'))
+    }
+    const redis = generateRegisterInfrastructure({
+      databases: {},
+      caches: { cache: { Enabled: true, Engine: 'Redis', Mode: 'Container' } },
+    })
+    assert(!redis.includes('--lua'))
   })
 
   it('emits deno-kv Local cache as in-process wiring without an Aspire resource', () => {
@@ -703,7 +723,12 @@ describe('generateRegisterInfrastructure', () => {
         mysql: { Enabled: true, Engine: 'Mysql', Mode: 'Container', Persistent: false },
         mssql: { Enabled: true, Engine: 'Mssql', Mode: 'Container', Persistent: false },
         external: { Enabled: true, Engine: 'Postgres', Mode: 'External', Persistent: false },
-        sqlite: { Enabled: true, Engine: 'Sqlite', DataPath: '.data/app.sqlite', Persistent: false },
+        sqlite: {
+          Enabled: true,
+          Engine: 'Sqlite',
+          DataPath: '.data/app.sqlite',
+          Persistent: false,
+        },
       },
       caches: {},
     })

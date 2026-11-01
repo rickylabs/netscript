@@ -37,6 +37,7 @@ const defaultDependencies: PrepareReleaseDependencies = {
 export const PREPARED_RELEASE_GENERATED_OUTPUTS: readonly string[] = [
   ...PUBLISH_ASSET_OUTPUTS,
   EXPORT_SURFACE_CORPUS_OUTPUT,
+  'packages/fresh-ui/src/registry/assets/registry.generated.ts',
 ];
 
 /** Combine the bump writer's discovered files with every generator-owned release output. */

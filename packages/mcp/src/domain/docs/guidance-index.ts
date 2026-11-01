@@ -37,6 +37,8 @@ export interface GuidanceRankingPolicy {
   readonly closeScoreGap: number;
   readonly commonDocumentRatio: number;
   readonly graphDepth: 1;
+  readonly minimumIntentCoverage: number;
+  readonly pageContextShare: number;
 }
 
 /** Locked deterministic retrieval policy approved by PLAN-EVAL. */
@@ -58,6 +60,10 @@ export const GUIDANCE_RANKING_POLICY: GuidanceRankingPolicy = Object.freeze({
   // A stem in at least a fifth of all sections (`service`, `plugin`, `data`) is common.
   commonDocumentRatio: 0.2,
   graphDepth: 1,
+  // A majority of the original task must be supported, even after a concept expands it.
+  minimumIntentCoverage: 0.6,
+  // A strong section lends bounded context to other lexically supported sections of that page.
+  pageContextShare: 0.5,
 });
 
 /** Each activated concept with its stop-word-free content terms, resolved once per query. */
@@ -112,6 +118,7 @@ export class GuidanceIndex {
       this.#rank(entry, normalizedIntent, queryTerms, conceptTerms)
     ).filter((entry): entry is RankedGuidanceSection => entry !== undefined);
     this.#applyLinkBoosts(ranked);
+    if (concepts.length === 0) this.#applyPageContext(ranked);
     orderGuidanceSections(ranked, concepts);
     const top = ranked[0];
 
@@ -130,7 +137,7 @@ export class GuidanceIndex {
       toGuidanceRecommendation(entry, matchedTerms)
     );
     const related = collectGuidanceRelated(ranked, (entry) => this.#links.get(entry.id) ?? []);
-    const confidence = this.#confidence(top);
+    const confidence = this.#confidence(top, normalizedIntent, concepts);
     return {
       intent: guidanceOneLine(intent),
       confidence,
@@ -149,9 +156,54 @@ export class GuidanceIndex {
    * The cap applies with or without an activated concept: a curated route that matched nothing
    * distinctive is still weak evidence.
    */
-  #confidence(top: RankedGuidanceSection): GuidanceConfidence {
+  #confidence(
+    top: RankedGuidanceSection,
+    intent: string,
+    concepts: readonly GuidanceConcept[],
+  ): GuidanceConfidence {
     if (top.matchedTerms.every((term) => this.#weights.isCommon(term.stem))) return 'low';
+    // A recognized phrase bridges task vocabulary only for concepts supported by this section.
+    const aliases = new Set(
+      concepts.filter((concept) =>
+        concept.requiredAnyTerms.some((term) =>
+          top.entry.tokenCounts.has(normalizeGuidanceToken(term))
+        )
+      ).flatMap((concept) => concept.aliases.filter((alias) => intent.includes(alias)))
+        .flatMap((alias) => guidanceContentTerms(alias).map((term) => term.stem)),
+    );
+    const original = guidanceContentTerms(intent);
+    let supported = 0;
+    let total = 0;
+    for (const term of original) {
+      const covered = aliases.has(term.stem) || top.entry.tokenCounts.has(term.stem) ||
+        identityBoost(top.entry.identity, term) > 0;
+      // Unknown task qualifiers cannot be made true by a familiar concept or a large BM25 score.
+      if (!covered && !this.#weights.has(term.stem)) return 'low';
+      const weight = this.#weights.inverseFrequency(term.stem);
+      total += weight;
+      if (covered) supported += weight;
+    }
+    if (total > 0 && supported / total < GUIDANCE_RANKING_POLICY.minimumIntentCoverage) {
+      return 'low';
+    }
     return top.score >= 24 ? 'high' : top.score >= 8 ? 'medium' : 'low';
+  }
+
+  #applyPageContext(ranked: readonly RankedGuidanceSection[]): void {
+    const anchor = ranked.reduce<RankedGuidanceSection | undefined>(
+      (best, entry) => !best || entry.score > best.score ? entry : best,
+      undefined,
+    );
+    if (!anchor) return;
+    const bonus = anchor.score * GUIDANCE_RANKING_POLICY.pageContextShare;
+    for (const candidate of ranked) {
+      if (candidate !== anchor && candidate.entry.slug === anchor.entry.slug) {
+        candidate.score = Math.min(
+          candidate.score + bonus,
+          anchor.score - GUIDANCE_RANKING_POLICY.closeScoreGap - Number.EPSILON,
+        );
+      }
+    }
   }
 
   #rank(

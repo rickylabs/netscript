@@ -6,6 +6,7 @@ import {
   type ProjectFileEntry,
   type ProjectFiles,
   renderRegistryModule,
+  selectRegistrySources,
 } from '@netscript/plugin/cli';
 
 /** Result returned after compiling a static job registry. */
@@ -25,7 +26,13 @@ export async function compileWorkersRegistry(
     ['ts', 'js', 'mjs'].map((extension) => files.readTextFile(`netscript.config.${extension}`)),
   )).some((content) => content !== undefined);
   const workers = hasConfig ? await loadWorkersConfig(files.projectRoot) : undefined;
-  const jobs = await files.listFiles(workers?.jobsDir ?? 'workers/jobs', ['.ts']);
+  const candidates = await files.listFiles(workers?.jobsDir ?? 'workers/jobs', ['.ts']);
+  const { sourceFiles } = await selectRegistrySources(
+    files,
+    candidates.map((job) => job.relativePath),
+  );
+  const selected = new Set(sourceFiles);
+  const jobs = candidates.filter((job) => selected.has(job.relativePath));
   const policies = workers
     ? resolveConfiguredJobPolicies(
       files.projectRoot,
@@ -72,6 +79,7 @@ function renderRegistrySource(
       `  readonly ${JSON.stringify(jobId(job.relativePath))}: ResolvedJobHandler<typeof ${alias}>;`,
     ],
     header: [
+      "import { jobRetryRegistration } from '@netscript/plugin-workers-core/runtime';",
       "import type { JobPayloadMap, JobPayloadSchema, RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';",
     ],
     body: (entries) => [
@@ -149,7 +157,7 @@ function renderRegistrySource(
       }),
       '});',
       '',
-      'const jobDefinitionEntries: readonly [string, RegisterJobInput][] = Object.entries(jobDefinitionsById)',
+      'const jobDefinitionEntries: readonly [string, RegisterJobInput][] = Object.entries<RegisterJobInput>(jobDefinitionsById)',
       '  .map(([id, definition]) => [id, toRegisterJobInput(definition)]);',
       '',
       'export const jobDefinitions: ReadonlyMap<string, RegisterJobInput> = new Map(jobDefinitionEntries);',
@@ -183,6 +191,7 @@ function renderRegistrySource(
       '    metadata: undefined,',
       '    retention: undefined,',
       '    ...policy,',
+      '    ...jobRetryRegistration(policy ?? {}, handler),',
       '    handler,',
       '    payloadSchema: handler.payloadSchema,',
       '  };',

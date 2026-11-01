@@ -52,7 +52,11 @@ Deno.test('shipped WorkOS registry and main share the host KV, cookie policy, wo
     env,
     kv,
     workos,
-    db: { getClient: () => Promise.resolve({}) },
+    db: {
+      getClient: () => {
+        throw new Error('WorkOS auth must not request the host SQL client.');
+      },
+    },
     contracts: {},
     logger: {
       error: (message: string, fields: Record<string, unknown>) => logs.push({ message, fields }),

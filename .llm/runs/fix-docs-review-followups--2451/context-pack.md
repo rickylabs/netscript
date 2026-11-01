@@ -1,4 +1,8 @@
-# Resume
+# Current resume — 2026-11-01
+
+Existing PR #2452 and branch fix/docs-review-followups are being refreshed by a normal merge of main 6a1d84a. All maintained source matches main after resolving seven conflicts. Independent integration slice review PASS is in slice-review-refresh.md. All ten #2451 findings are audited in research.md; #2450 retains token-source ownership and #2453 remains deferred after a fresh strict reproduction. Initial docs and structured gates pass. Native carrier chain, every root check:* task, full browser and final same-session IMPL-EVAL remain pending. Refs #2451 only; READY handoff through the excluded report file; Cockpit merges.
+
+# Historical handoff below
 
 PR2452 source complete on fix/docs-review-followups. Source-tested head f8db7ee; final independent IMPL-EVAL PASS. Post-main browser52/0/0,24axe zero serious/critical, repro gate806files protects all except reported Pagefind metadata,23970links,15caveats, four native freshness gates0 and quality/architecture0. Final evidence-only commit pending. Hosted canonical CLI40690612382 and PR Pages/core CI pending; no waiver or readiness claim. Check actual hosted results before merge-readiness. S9 issue2431 remains unclaimed and ready for independent work; S1 is actively owned byPR2435, later phases depend on it. Separate Pagefind task2453 queued.
 

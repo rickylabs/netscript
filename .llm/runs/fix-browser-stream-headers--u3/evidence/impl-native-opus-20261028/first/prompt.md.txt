@@ -1,0 +1,29 @@
+use harness
+
+## SKILL
+Use netscript-harness/doctrine/tools/jsr-audit/pr/deno; featureIMPL, Archetypes1/5 and docs overlay.
+Independent Anthropic Opus5/xhigh; Meta and OpenAI generated this leaf, new session only. CurrentHEAD9288ea2939f56eeb75fa53b6260f6cf1e91f31f0.
+Read ALL19 full packets from offset1 throughEOF (limit2000+) in batches, then make YOUR OWN relevant NetScript MCP search_docs/find_export about createNetScriptStreamDB native headers. No preparer/preflight query substitutes.
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-01.md (450lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-02.md (803lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-03.md (858lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-04.md (601lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-05.md (504lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-06.md (801lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-07.md (460lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-08.md (683lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-09.md (604lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-10.md (405lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-11.md (225lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-12.md (360lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-13.md (268lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-14.md (651lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-15.md (679lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-16.md (741lines)
+Review full current source/diff, exact debt/caps/scope/PLAN history and native protocol/compiler/cleanup oracles. Omitted vs explicitempty, replacement-notmerge, lazy callback mutation/rotation, envfalse/nativeclose, defaultstop/status, checkpoint nonempty/not-1/restart/entityidentity, allsanitizers, native compiler deadlines/positive/TS2322 controls; nocasts/suppressions/transportclones. Fresh478/cap480 and workers237/cap400. Native MaybePromise/HeadersRecord identity, exact4sites+8/-2, F15AND F5 DEBT_ACCEPTED fixedNov10/nogrowth/noextension; Fresh10baseline/surplus stayunwaived. Generated carriers canonical only; fullcurrentCIlimits inpacket. No authentication/issuer/bootstrap/CEF/release claims.
+No filewriting, shell, delegation, model fallback or extra inference. Return public final exactHEAD and VERDICT: PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT (selectone), substantive canonical evaluate report with evidence-backedrows/file:line/severity/remedies and unresolvedgates. Missing evidence isfinding, no forcedPASS/wholeCI/merge claim. No private reasoning. Max6native modelturns/20min/24MiBstdout/64KiBstderr; nativequota/entitlement must be admitted byroot beforelaunch. Feature max5reviewcycles/notifyafter3/samesession correction, noautomatic continuation.
+
+Required supplemental full EOF reads (same offset1/limit2000+, batch with original reads):
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-17.md (695lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-18.md (817lines)
+C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-successor-20261028/inputs/review-part-19.md (124lines)

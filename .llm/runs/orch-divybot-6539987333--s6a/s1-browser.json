@@ -1,0 +1,49 @@
+{
+  "browser": "Chromium 153 / Playwright 1.63.0",
+  "generatedPreset": "studio-utility",
+  "development": [
+    {
+      "viewport": 390,
+      "status": 200,
+      "documentWidth": 390,
+      "designLink": true,
+      "headerBottom": 124.5,
+      "mainTop": 124.5
+    },
+    {
+      "viewport": 1280,
+      "status": 200,
+      "documentWidth": 1280,
+      "designLink": true,
+      "headerBottom": 56,
+      "mainTop": 56
+    }
+  ],
+  "production": {
+    "build": "PASS",
+    "status": 200,
+    "designLink": false
+  },
+  "queryStates": [
+    "null",
+    "empty array",
+    "empty object",
+    "records and booleans",
+    "nested fields",
+    "scalar",
+    "escaped HTML-like text",
+    "loading",
+    "error"
+  ],
+  "limitations": [
+    "Query state captures render emitted view markup; they do not claim backend integration.",
+    "Shared topbar minimum subsequently restored to legacy 52px; Utility-specific geometry is S4."
+  ],
+  "runtime": "UNPROVEN: Docker daemon unavailable",
+  "leakCheck": {
+    "verdict": "UNPROVEN",
+    "survivors": 24,
+    "unknownOwnership": 24,
+    "mutations": 0
+  }
+}

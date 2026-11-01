@@ -97,16 +97,17 @@ for (const forceFallback of [false, true]) {
         );
         assertEquals(evalProbe?.calls.length ?? 1, 1, 'one capability detection per client');
 
+        capabilities.splice(0).forEach((capability) => capability[Symbol.dispose]());
         const delivered: number[] = [];
         const claims: string[] = [];
         const counts: number[] = [];
-        await Promise.all(queues.map(async (queue, index) => {
-          // Finite nonblocking pop-push calls exercise the same atomic pickup as listen().
+        await Promise.all(queues.map(async (queue) => {
+          // Exercise the same receipt-backed atomic pickup as listen().
           for (;;) {
-            const encoded = await clients[index].rpoplpush(readyKey, processingKey);
-            if (encoded === null) return;
-            assert(expected.includes(encoded), 'envelope bytes are preserved');
-            await queue['handleEncodedMessage'](encoded, async (message, context) => {
+            const claim = await queue['ensureLeases']().claim();
+            if (claim === null) return;
+            assert(expected.includes(claim.raw), 'envelope bytes are preserved');
+            await queue['handleEncodedMessage'](claim, async (message, context) => {
               delivered.push(message.id);
               claims.push(context.messageId);
               counts.push(context.deliveryCount);

@@ -1,0 +1,22 @@
+# S8c supervisor contract
+
+- Baseline: `d6dfab0cb0e57f76b5d976f59e3603d8fff3dce0` (main).
+- Branch: `orch/divybot-6470427461`.
+- Implementer: OpenAI Codex, feature tier, implementation role (matrix primary `sol`).
+- Independent reviewer: native Claude, owner-requested `claude-opus-5-5`, high effort, read-only. Separate vendor family and session. Re-steer the same evaluator for repair rounds.
+- Owner override: “Run PLAN-EVAL before implementing and IMPL-EVAL after, both with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only. Fix once, record both verdicts.” This overrides the feature evaluator cells; no inferred promotion or alternative model.
+- Public evidence uses repository-relative paths and excludes private runtime identity.
+
+## Declared write surface
+
+`docs/site/` (components, configuration, styles, enhancement scripts, fixture galleries and generated tracked content if required); `tools/docs-site/`; `tools/fresh-ui-browser/docs-tests/`; `.github/workflows/pages.yml`; `.github/scripts/ci-classify-changes.ts`; `.github/scripts/ci-classify-changes.test.ts`; `.llm/tools/docs/` (existing follow-up tests/helpers only); `.llm/runs/orch-divybot-6470427461--s8c/`; `.llm/runs/orch-divybot-6463056924--s8/drift.md` (the explicitly requested stale-note repair); generated documentation carriers under `packages/cli/src/kernel/assets/`, `packages/mcp/src/publish-assets.generated.ts`, and `.llm/assets/agent-docs/provenance.json` only through native generators. Ignored docs build, browser results and temporary reports are outputs, not source.
+
+No package API, dependency upgrade, labels, merge, tag or release is authorized. Do not stage the assignment or final-publication handoff files.
+
+The native publish-assets task may write the exact checked-in paths in `PUBLISH_ASSET_OUTPUTS` in `.llm/tools/generate-publish-assets.ts`, solely to regenerate existing assets. Inspect every resulting diff; unrelated generator drift is not silently accepted.
+
+Owner-revision carrier slice also authorizes packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts solely through gen:mcp-export-corpus, in the explicitly requested native generation order.
+
+Latest user synchronization authorization: rebase onto latest main and force-push, explicitly superseding prior merge-only/no-force constraints for this reconciliation. Use exact --force-with-lease against old remoteae2f4002b; target main0825bd0f4. PR merge/tag/release and label changes remain forbidden. Canonical upstream docs are inherited unchanged, never manually edited by this slice.
+
+Latest cross-family remediation authorizes docs/design-system/themes/studio/DESIGN.md only to document the coordinator-requested step12 kind-text contrast policy and docs-adapter role manifest. Actual colours still resolve from the immutable Figma export. Latest refs-only/no-force supersedes older closing-line/force permissions; docs/site/deno.lock pins are intentionally committed while ROOT deno.lock is preserved.

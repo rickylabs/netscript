@@ -1,3 +1,5 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { delay } from '@std/async';
 import { createWatcher } from '@netscript/watchers';
 import type { WatcherOptions as UpstreamWatcherOptions } from '@netscript/watchers';
 import type {
@@ -8,7 +10,19 @@ import type {
   TriggerEventId,
   TriggerId,
 } from '../domain/mod.ts';
-import type { FileWatcherHandle, FileWatcherPort } from '../ports/mod.ts';
+import { FILE_WATCH_STATES } from '../ports/mod.ts';
+import type {
+  FileWatcherHandle,
+  FileWatcherPort,
+  FileWatchState,
+  FileWatchStatusEvent,
+} from '../ports/mod.ts';
+
+const [WATCHING, UNAVAILABLE] = FILE_WATCH_STATES;
+const INITIAL_RETRY_DELAY_MS = 250;
+const MAX_RETRY_DELAY_MS = 30_000;
+
+const FILE_WATCH_KEY_PREFIX = 'file-watch:';
 
 /** Minimal file metadata emitted by a runtime watcher. */
 export type RuntimeWatchFileInfo = Readonly<{
@@ -36,6 +50,7 @@ export type RuntimeWatcherOptions = Readonly<{
     stableChecks?: number;
     timeoutMs?: number;
   }>;
+  onReady?: () => void | Promise<void>;
   signal?: AbortSignal;
 }>;
 
@@ -48,22 +63,31 @@ export type WatcherInstance = Readonly<{
 /** Handler invoked when a file-watch trigger observes a matching event. */
 export type FileWatchHandler = (event: TriggerEvent<'file-watch'>) => Promise<void>;
 
+/** Identifies live adapter callbacks without treating later descendants as reentrant. */
+type WatchCallbackScope = { active: boolean };
+
 type WatchersFileWatcherRecord =
-  & FileWatcherHandle
-  & Readonly<{
+  & Omit<FileWatcherHandle, 'paused'>
+  & {
+    paused: boolean;
     definition: FileWatchDefinition<string, never, never>;
-    watcher: WatcherInstance;
+    watcher?: WatcherInstance;
     controller: AbortController;
     ignored: readonly RegExp[];
     handler: FileWatchHandler;
+    state?: FileWatchState;
     task: Promise<void>;
-  }>;
+  };
 
 /** Options for constructing a file-watch trigger adapter. */
 export type WatchersFileWatcherAdapterOptions = Readonly<{
   now?: () => Date;
   watcherFactory?: (options: RuntimeWatcherOptions) => WatcherInstance;
   onError?: (error: unknown, handle: FileWatcherHandle) => void | Promise<void>;
+  /** Observe initial readiness, unavailability, and recovery without invoking file handlers. */
+  onStatusChange?: (event: FileWatchStatusEvent) => void | Promise<void>;
+  /** Retry delay doubles until capped; both values must be positive and finite. */
+  retry?: Readonly<{ initialDelayMs?: number; maxDelayMs?: number }>;
 }>;
 
 /** File-watch adapter that wraps the standalone `@netscript/watchers` primitive. */
@@ -72,6 +96,11 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
   readonly #now: () => Date;
   readonly #watcherFactory: (options: RuntimeWatcherOptions) => WatcherInstance;
   readonly #onError?: (error: unknown, handle: FileWatcherHandle) => void | Promise<void>;
+  readonly #onStatusChange?: WatchersFileWatcherAdapterOptions['onStatusChange'];
+  readonly #initialDelayMs: number;
+  readonly #maxDelayMs: number;
+  readonly #tasks = new Set<Promise<void>>();
+  readonly #callbackScope = new AsyncLocalStorage<WatchCallbackScope>();
   #sequence = 0;
 
   /** Create a file-watch adapter with optional watcher and clock injection. */
@@ -80,6 +109,15 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
     this.#watcherFactory = options.watcherFactory ??
       ((watcherOptions) => createWatcher(watcherOptions as UpstreamWatcherOptions));
     this.#onError = options.onError;
+    this.#onStatusChange = options.onStatusChange;
+    this.#initialDelayMs = options.retry?.initialDelayMs ?? INITIAL_RETRY_DELAY_MS;
+    this.#maxDelayMs = options.retry?.maxDelayMs ?? MAX_RETRY_DELAY_MS;
+    if (
+      !Number.isFinite(this.#initialDelayMs) || this.#initialDelayMs <= 0 ||
+      !Number.isFinite(this.#maxDelayMs) || this.#maxDelayMs < this.#initialDelayMs
+    ) {
+      throw new RangeError('Watch retry delays must be positive, finite, and ordered.');
+    }
   }
 
   /** Register a file-watch definition and return its runtime handle. */
@@ -89,14 +127,6 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
   ): Promise<FileWatcherHandle> {
     await this.unwatch(definition.id);
     const controller = new AbortController();
-    const watcher = this.#watcherFactory({
-      paths: definition.paths,
-      patterns: definition.patterns,
-      events: definition.on,
-      debounceMs: definition.debounceMs,
-      stabilityThreshold: definition.stabilityThreshold,
-      signal: controller.signal,
-    });
     const handle: FileWatcherHandle = {
       id: definition.id,
       paths: definition.paths,
@@ -106,30 +136,36 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
     const record: WatchersFileWatcherRecord = {
       ...handle,
       definition,
-      watcher,
       controller,
       ignored: compileIgnoredPatterns(definition.ignored ?? []),
       handler,
       task: Promise.resolve(),
     };
-    const runningRecord = {
-      ...record,
-      task: this.#run(record),
-    };
-    this.#records.set(definition.id, runningRecord);
+    // A concurrent registration may have appeared while the old task drained.
+    const previous = this.#records.get(definition.id);
+    previous?.controller.abort();
+    previous?.watcher?.stop();
+    this.#records.set(definition.id, record);
+    record.task = this.#run(record);
+    this.#tasks.add(record.task);
+    void record.task.finally(() => {
+      this.#tasks.delete(record.task);
+      if (this.#tasks.size === 0) this.#callbackScope.disable();
+    });
     return handle;
   }
 
-  /** Remove a file-watch trigger if it exists. */
-  unwatch(id: TriggerId): Promise<boolean> {
+  /** Cancel a watch; callers outside adapter callbacks also await its task. */
+  async unwatch(id: TriggerId): Promise<boolean> {
     const record = this.#records.get(id);
     if (record === undefined) {
-      return Promise.resolve(false);
+      return false;
     }
     record.controller.abort();
-    record.watcher.stop();
+    record.watcher?.stop();
     this.#records.delete(id);
-    return Promise.resolve(true);
+    if (!this.#callbackScope.getStore()?.active) await record.task;
+    return true;
   }
 
   /** List handles for every active file-watch trigger. */
@@ -153,36 +189,80 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
     return Promise.resolve(this.#setPaused(id, false));
   }
 
-  /** Stop all active file-watch triggers and await their tasks. */
+  /** Cancel all watches; external callers drain tasks, while callbacks never self-await. */
   async stop(): Promise<void> {
     const records = [...this.#records.values()];
     this.#records.clear();
     for (const record of records) {
       record.controller.abort();
-      record.watcher.stop();
+      record.watcher?.stop();
     }
-    await Promise.all(records.map((record) => record.task));
+    if (!this.#callbackScope.getStore()?.active) await Promise.all(this.#tasks);
   }
 
   async #run(record: WatchersFileWatcherRecord): Promise<void> {
-    try {
-      for await (const event of record.watcher.watch()) {
-        const current = this.#records.get(record.id);
-        if (current === undefined || current.paused || isIgnored(event.path, current.ignored)) {
-          continue;
+    let retryDelayMs = this.#initialDelayMs;
+    await this.#reportStatus(record, UNAVAILABLE);
+    while (this.#isCurrent(record)) {
+      try {
+        record.watcher = this.#watcherFactory({
+          paths: record.paths,
+          patterns: record.patterns,
+          events: record.definition.on,
+          debounceMs: record.definition.debounceMs,
+          stabilityThreshold: record.definition.stabilityThreshold,
+          signal: record.controller.signal,
+          onReady: async () => {
+            if (!this.#isCurrent(record)) return;
+            retryDelayMs = this.#initialDelayMs;
+            await this.#reportStatus(record, WATCHING);
+          },
+        });
+        for await (const event of record.watcher.watch()) {
+          if (!this.#isCurrent(record)) break;
+          if (record.paused || isIgnored(event.path, record.ignored)) continue;
+          await this.#dispatch(record, event);
         }
-        await this.#dispatch(current, event);
+        if (this.#isCurrent(record)) throw new Error('File watcher ended unexpectedly.');
+      } catch (error) {
+        if (this.#isCurrent(record)) {
+          await this.#reportStatus(record, UNAVAILABLE);
+          await this.#reportError(error, stripRuntime(record));
+        }
+      } finally {
+        record.watcher?.stop();
+        record.watcher = undefined;
       }
-    } catch (error) {
-      if (!record.controller.signal.aborted) {
-        await this.#reportError(error, stripRuntime(record));
-      }
+      if (!this.#isCurrent(record)) return;
+      await delay(retryDelayMs, { signal: record.controller.signal }).catch(() => {});
+      retryDelayMs = Math.min(retryDelayMs * 2, this.#maxDelayMs);
+    }
+  }
+
+  #isCurrent(record: WatchersFileWatcherRecord): boolean {
+    return !record.controller.signal.aborted && this.#records.get(record.id) === record;
+  }
+
+  async #reportStatus(record: WatchersFileWatcherRecord, state: FileWatchState): Promise<void> {
+    if (!this.#isCurrent(record) || record.state === state) return;
+    record.state = state;
+    try {
+      await this.#invokeCallback(() =>
+        this.#onStatusChange?.({
+          triggerId: record.id,
+          state,
+          occurredAt: this.#now().toISOString(),
+        })
+      );
+    } catch {
+      // Diagnostics cannot interrupt a watch or its recovery.
     }
   }
 
   async #dispatch(record: WatchersFileWatcherRecord, event: RuntimeWatchEvent): Promise<void> {
     try {
-      await record.handler(this.#eventFor(record, event));
+      const triggerEvent = await this.#eventFor(record, event);
+      await this.#invokeCallback(() => record.handler(triggerEvent));
     } catch (error) {
       await this.#reportError(error, stripRuntime(record));
     }
@@ -190,9 +270,19 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
 
   async #reportError(error: unknown, handle: FileWatcherHandle): Promise<void> {
     try {
-      await this.#onError?.(error, handle);
+      await this.#invokeCallback(() => this.#onError?.(error, handle));
     } catch {
       // Watcher callbacks are isolated from both handler and error-hook failures.
+    }
+  }
+
+  async #invokeCallback(callback: () => void | Promise<void>): Promise<void> {
+    const scope: WatchCallbackScope = { active: true };
+    try {
+      await this.#callbackScope.run(scope, callback);
+    } finally {
+      // A timer spawned by a finished callback is an external caller when it later runs.
+      scope.active = false;
     }
   }
 
@@ -201,34 +291,59 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
     if (record === undefined) {
       return false;
     }
-    this.#records.set(id, { ...record, paused });
+    record.paused = paused;
     return true;
   }
 
-  #eventFor(
+  async #eventFor(
     record: WatchersFileWatcherRecord,
     event: RuntimeWatchEvent,
-  ): TriggerEvent<'file-watch', FileWatchTriggerPayload> {
+  ): Promise<TriggerEvent<'file-watch', FileWatchTriggerPayload>> {
     this.#sequence += 1;
+    const id = `file_watch_${this.#sequence}` as TriggerEventId;
     const detectedAt = event.timestamp.toISOString();
+    const payload: FileWatchTriggerPayload = {
+      path: event.path,
+      kind: event.kind as FileWatchLifecycle,
+      size: event.fileInfo?.size,
+      modifiedAt: event.fileInfo?.modifiedAt?.toISOString(),
+      stableChecks: record.definition.stabilityThreshold?.stableChecks,
+    };
     return {
-      id: `file_watch_${this.#sequence}` as TriggerEventId,
+      id,
       triggerId: record.id,
       kind: 'file-watch',
       status: 'pending',
-      payload: {
-        path: event.path,
-        kind: event.kind as FileWatchLifecycle,
-        size: event.fileInfo?.size,
-        modifiedAt: event.fileInfo?.modifiedAt?.toISOString(),
-        stableChecks: record.definition.stabilityThreshold?.stableChecks,
-      },
+      payload,
+      idempotencyKey: await fileChangeKey(record.id, payload),
       attempt: 0,
       detectedAt,
       updatedAt: this.#now().toISOString(),
       metadata: event.contentHash === null ? undefined : { contentHash: event.contentHash },
     };
   }
+}
+
+/** Bound metadata identities for KV; without a complete snapshot each observation is distinct. */
+async function fileChangeKey(
+  triggerId: TriggerId,
+  payload: FileWatchTriggerPayload,
+): Promise<string> {
+  if (payload.modifiedAt === undefined || payload.size === undefined) {
+    return `${FILE_WATCH_KEY_PREFIX}${crypto.randomUUID()}`;
+  }
+  const identity = JSON.stringify([
+    triggerId,
+    payload.path,
+    payload.kind,
+    payload.modifiedAt,
+    payload.size,
+  ]);
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(identity));
+  const hex = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join(
+    '',
+  );
+  return `${FILE_WATCH_KEY_PREFIX}${hex}`;
 }
 
 function stripRuntime(record: WatchersFileWatcherRecord): FileWatcherHandle {

@@ -1,5 +1,25 @@
 # Architecture Debt Registry
 
+## packages/plugin-workers-core — WORKERS-RETRY-DOMAIN-CARDINALITY (13 immediate domain children)
+
+- **Reason:** A cohesive retry-policy schema and resolver are a separate domain concern. This adds
+  one immediate child to the existing domain directory, exceeding the F-16 advisory cap of 12 by
+  one. Moving unrelated job/task contracts in this runtime fix would widen its review surface.
+- **Owner:** Workers core maintainers.
+- **Target:** Next workers domain organization review after milestone 0.0.9.
+- **Linked plan:** `.llm/runs/orch-divybot-6536190825--2144/plan.md`, issue #2144.
+- **Created:** 2026-10-31
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-16: JSR package audit reports at most 12 immediate domain children without merging
+  independent retry behavior into an unrelated contract file.
+- **Notes:** Cost is one additional sibling to navigate; no dependency-direction violation or
+  runtime overhead is accepted. Existing parent/executor-adapter cardinality warnings predate this
+  change. The plugin's already-over-cap `worker/` directory grows from 22 to 25 immediate children:
+  one retry regression file, one typed job DLQ specialization module and its regression file.
+  Cost is three more sibling entries in the existing runtime folder. The same maintainers' next
+  worker organization review owns that F-16 follow-up; closing evidence must also remove this
+  folder-cardinality increase without combining independent runtime concerns.
+
 Seeded from `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` on 2026-04-29. Entries
 track packages with `Refactor`, `Restructure`, or `Rewrite` doctrine verdicts. `Keep` and `Defer`
 verdicts are not seeded here.
@@ -2319,6 +2339,22 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   by the central contract registry; package tests, scoped gates, public schema parity, doctrine,
   doc-lint, and publish dry-run must remain green.
 
+### 2026-10-31 maintenance extension — #2269
+
+- **Reason:** Release citations add 10 lines to the already-deferred central contract table
+  (459 → 469). The shared full corpus adds one real documentation asset group under
+  `src/infrastructure` (17 → 18 immediate children), beyond the existing F-16 cap of 12.
+  It replaces the CLI's stored corpus and MCP's curated copy; it does not introduce another corpus.
+- **Cost:** Ten more schema lines remain in the central registry and one additional adapter-layer
+  group must be considered during the existing MCP shape cleanup. No runtime resource or eager
+  full-corpus decoding cost is accepted.
+- **Owner:** MCP / internals maintainers; coordination in #2474, implementation #2269.
+- **Target:** Before the next MCP documentation-tool or corpus-surface expansion.
+- **Status:** DEBT_ACCEPTED for this scoped maintenance extension, subject to coordinator review.
+- **Gate:** Extract the documentation schemas into their domain module and group existing docs
+  adapters with the documentation assets so F-16 does not grow; preserve schema parity, every-page
+  retrieval, independent citations, and green check/test/lint/fmt/doc-lint and carrier freshness.
+
 ## packages/cli/e2e — scaffold runtime registry and gate directory remain over cap (`scaffold-runtime-a8-f16-1333`)
 
 - **Reason:** PR #1427 deepens `e2e/src/application/gates/scaffold/runtime-gates.ts` from 865 to 906
@@ -2820,6 +2856,20 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** F-1. Close when `src/builder/service-builder-impl.ts` is within its 500-line cap and
   `src/types.ts` within its 300-line cap, with the service package suite and CORS conformance still
   green. `arch:check` currently exits zero with these size warnings.
+- **U4 health-registration delta (root disposition, 2026-10-27):** Numeric F-1 remains
+  **DEBT_ACCEPTED**, not PASS. Only health state / `installHealth()` may grow the existing
+  `service-builder-impl.ts` baseline of 629 physical/logical lines by at most 32 (maximum 661,
+  using the same count convention); no broad decomposition or size waiver is granted.
+  - **Owner:** NetScript service migration coordinator + rickylabs.
+  - **Remediation deadline:** 2026-11-10 or the stable API line, whichever is earlier; no automatic
+    extension. Remediate this additional growth within the existing builder decomposition debt.
+  - **Authority:** `.llm/runs/fix-native-service-policy--u2-u4/plan.md` revision 4 and
+    `root-policy-addendum.md` targeted owner disposition. Independent PLAN-EVAL must assess this
+    bounded delta before implementation; this entry does not authorize source by itself.
+  - `src/types.ts` stays inspect-only at its existing 335-line baseline. Runtime, behavior-test,
+    docs, publication/release and independent review gates remain required. This F-1 delta does not
+    waive F-10: all affected test files must stay at or below 480 physical lines; an explicit
+    conditional focused health-order proving owner may be selected before implementation.
 
 ## plugins/sagas — SAGAS-WORKER-DISPATCH-FIXTURE
 
@@ -2928,3 +2978,245 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Fixture:** Main merged PR #2318 during this leaf. Its event-driven cancellation fixture and
   diagnostics are preserved, with only status and signal observations in the fixture; the runtime
   now retains the Response. No fixture-only Response retention remains.
+
+
+## plugins/workers/services/mod.ts - F-5 native identity closure (23 symbols)
+
+- **ID:** `WORKERS-SERVICE-NATIVE-TYPE-CLOSURE-F5-U1-20261027`
+- **Reason:** The approved workers factory signature requires an exact 23-name public doc-lint
+  closure: 2 own symbols plus 21 existing native type-only identity re-exports. This exceeds the
+  F-5 numeric limit of 20 on this one `mod.ts`. All 23 still count; this is no type-only discount.
+  The original 7-name shape produced 5 real recursive `private-type-ref` errors; the
+  original 22-name experiment passed doc-lint before #2492.
+  Main #2492 added `code?: ProcedureErrorCode` to `AuthzDecision`, requiring the native
+  `ProcedureErrorCode` identity export and the exact 23-name closure. The coordinator-authorized
+  native explicit union removes its runtime-constant dependency without changing its type.
+  The numerical F-5 violation remains `DEBT_ACCEPTED`, not
+  `PASS`; doc-lint itself and all other F-5 clauses must pass independently.
+- **Exact scope:** Only `plugins/workers/services/mod.ts`. Own: `startWorkersService`,
+  `WorkersServiceOptions`. From `@netscript/plugin/sdk`: `PluginServiceContext`. From
+  `@netscript/service`: `CorsOptions`, `RunningService`, `RunningServiceAddress`, `ServeOptions`,
+  `ServiceApp`, `ServiceEnvironment`, `ServiceTlsOptions`. From `@netscript/service/auth`:
+  `AuthenticatorPort`, `AuthnOptions`, `AuthnRequest`, `AuthnResult`, `AuthorizerPort`,
+  `AuthzDecision`, `AuthzOptions`, `AuthzRequest`, `Principal`, `ProcedureErrorCode`,
+  `ServiceAuthPolicy`, `ServiceGuardedAuthPolicy`, `ServicePublicAuthPolicy`.
+- **Why deferred:** A compatible native doc-lint/public-signature solution needs separate review;
+  a doctrine amendment must also update fitness rules explicitly. This bounded migration does
+  neither implicitly. No doc-lint waiver, extra API, type alias, structural interface, cast,
+  suppression, runtime/policy behavior, dependency or lock change is covered.
+- **Owner:** NetScript native-host policy migration coordinator with repository maintainer
+  `rickylabs`.
+- **Target:** 2026-11-10. No automatic extension; no growth beyond the exact named 23 while open.
+- **Linked plan:** `.llm/runs/fix-native-host-policy--u1/plan.md` and
+  `.llm/runs/fix-native-host-policy--u1/plan-review-addendum.md`.
+- **Linked independent finding:** `.llm/runs/fix-native-host-policy--u1/plan-type-closure-eval.md`
+  (`FAIL_PLAN`, SHA256 `9c249a787acf5c3a00c4c2ee3bf8993a90aa74649a4df9cf28125a0c18fe1bf9`).
+- **Owner disposition:** `.llm/runs/fix-native-host-policy--u1/root-f5-debt-disposition.md`.
+- **Created:** 2026-10-27.
+- **Status:** open, `DEBT_ACCEPTED` by milestone coordinator; amended bounds require independent
+  re-review recorded in `.llm/runs/fix-native-host-policy--2396/native-source-debt-eval.md`.
+  This accepts numeric debt only, not documentation, source, runtime or release acceptance.
+- **Amended disposition:** Coordinator [#2474 disposition](https://github.com/rickylabs/netscript/issues/2474#issuecomment-6541660112) authorizes
+  exactly one additional native type, `ProcedureErrorCode`, with no further growth.
+- **Closing gate:** Land a reviewed compatible native doc-lint/public-signature solution that
+  meets the numeric F-5 cap, OR a separately reviewed explicit doctrine amendment with matching
+  fitness updates; prove public type identity, exact exported inventory, doc-lint zero and all
+  retained lifecycle/security gates, then close this entry with evidence. Existing violations or
+  future registry entries are not accepted by analogy.
+- **Excluded:** Streams closure is not judged or covered; it has no `PluginServiceContext`
+  parameter and must derive its own minimal closure. No U2/U3/E1, security, release or production
+  E2E acceptance is implied. Function-level `@example` and every other documentation obligation
+  remain unwaived.
+
+## plugins/streams/services/mod.ts - F-5 native identity closure (22 symbols)
+
+- **ID:** `STREAMS-SERVICE-NATIVE-TYPE-CLOSURE-F5-U1-20261028`
+- **Owner:** Native-host migration coordinator and repository maintainer `rickylabs`.
+- **Target:** 2026-11-10. No automatic extension or growth beyond these exact 22 names.
+- **Status:** Open, `DEBT_ACCEPTED`, after same original independent PLAN evaluator process PASS
+  and root acceptance. Numeric 22 exceeds 20; this is not numeric F-5 PASS or a type-only discount.
+- **Reason:** The approved streams signature needs this native public doc-lint closure.
+  The original six-name and 20-name probes failed; the 21-name probe passed before #2492. Main #2492 added
+  `code?: ProcedureErrorCode` to `AuthzDecision`, requiring the native `ProcedureErrorCode`
+  identity export and the exact 22-name closure. The coordinator-authorized native explicit
+  union removes its runtime-constant dependency without changing its type. Production doc-lint
+  and every other F-5 clause still require their own evidence.
+- **Exact scope:** `plugins/streams/services/mod.ts`. Own `startStreamsService`,
+  `StreamsServiceOptions`; service types `CorsOptions`, `RunningService`, `RunningServiceAddress`,
+  `ServeOptions`, `ServiceApp`, `ServiceEnvironment`, `ServiceTlsOptions`; auth types
+  `AuthenticatorPort`, `AuthnOptions`, `AuthnRequest`, `AuthnResult`, `AuthorizerPort`,
+  `AuthzDecision`, `AuthzOptions`, `AuthzRequest`, `Principal`, `ProcedureErrorCode`,
+  `ServiceAuthPolicy`, `ServiceGuardedAuthPolicy`, `ServicePublicAuthPolicy`. Twenty native names are direct
+  type-only identity re-exports, with no aliases, structural substitutes or wildcard.
+- **Linked plan:** `.llm/runs/fix-native-host-policy--u1/plan.md`, `plan-review-addendum.md`,
+  `s5-streams-factory-proposal.md` and `plan-streams-f5-debt-eval.md` in that run.
+- **Independent finding:** Same original Grok session `ses_e8149b729ffeT3e3Xjhrqyql5U`, verdict
+  SHA256 `8f9907d5c4b0864467bb295dbca5c8534995721779f2411b2bafbc974a61f508`.
+- **Amended disposition:** Coordinator [#2474 disposition](https://github.com/rickylabs/netscript/issues/2474#issuecomment-6541660112) authorizes
+  exactly one additional native type, `ProcedureErrorCode`, with no further growth. Independent
+  re-review: `.llm/runs/fix-native-host-policy--2396/native-source-debt-eval.md`.
+- **Closing gate:** Separately reviewed compatible native public-signature/doc-lint solution
+  meeting cap20 OR explicit doctrine amendment with matching fitness changes; exact public type
+  identity/inventory, doc-lint zero and retained lifecycle/security gates before closure.
+- **Excluded:** Workers debt, legacy streams main until separately reviewed S6, U2/U3/E1,
+  security/release/production E2E. No dependency/lock change, extra API, type erasure, cast,
+  suppression, checker override or acceptance by analogy. Function-level `@example` and every
+  other documentation obligation remain unwaived.
+
+## Fresh/workers reader headers — native public type closure
+
+- **ID:** `U3-NATIVE-READER-HEADER-TYPE-CLOSURE`
+- **Reason:** U3 preserves exact native client0.2.7 `HeadersRecord` identity for
+  string/sync/async values. Actual copied owning graphs measure Fresh10/12/10 and
+  workers0/1/0 for baseline/current/candidate. Both `HeadersRecord` and its native
+  `MaybePromise` dependency must be public at the four measured source/aggregate
+  sites. This is a bounded upstream-type and facade-growth exception, not a scanner PASS.
+- **Owner:** Milestone coordinator + rickylabs.
+- **Target:** 2026-11-10, fixed; no extension or growth under this disposition.
+- **Status:** Open, `DEBT_ACCEPTED` for this precise U3 delta after independent SAME
+  GLM5.3 corrective PLAN review and root acceptance; implementation gates remain required.
+- **Exact sites:** `packages/fresh/src/runtime/streams/create-stream-db.ts`, its
+  `mod.ts`, `plugins/workers/streams/factory.ts` and its `mod.ts`. Export only native
+  `HeadersRecord` and native `MaybePromise` by identity, type-only, without aliases.
+- **Boundary:** No fifth source site, extra native name, package, runtime value,
+  resolver/serializer, dependency/version, config/lock, authentication/issuer/bootstrap
+  policy or lifecycle change. Consumers still prefer their upstream type owner;
+  this is no general NetScript vendoring precedent.
+- **Gate:** Closure is `DEBT_ACCEPTED` for two distinct acknowledged violations:
+  upstream native type re-export (chapter02/AP-14/F-15) and measured two-name aggregate
+  facade growth (chapter11/F-5; Fresh52-to54, workers24-to26, prior surplus unwaived),
+  never an unqualified F-15 or F-5 PASS. Warning-free actual owning Fresh12-to10 must
+  retain exactly the same ten baseline finding identities; workers1-to0; nonempty
+  native declarations at all four sites; positive mutual identities/anti-any plus
+  three meaningful negative controls; unchanged runtime controls; scoped type/lint/fmt,
+  doctrine, quality, package/publish dry-run and independent IMPL evidence.
+  `MaybePromise` is exported solely because measured closure requires its public
+  shape; the closing gate removes both names together.
+- **Reference parity:** Pending root-scoped gate for the two added names per package.
+  Root selected no waiver. A genuinely green qualified existing reference contract
+  satisfies the gate without an invented page edit. Concrete missing-name findings
+  require a retained failing-parity receipt and exact root-authorized page scope.
+  A failing Windows coverage prerequisite or unrun parity never satisfies it.
+- **History:** The earlier `FRESH-NATIVE-HEADERS-TYPE-CLOSURE` PLAN verdict remains
+  immutable. Its source-only application failed owning12-to10 and was archived/reverted
+  with the appended debt. This corrective exception does not promote that failed
+  premise or transfer its narrower scope. Existing oRPC debt, ten Fresh baseline
+  findings and prior facade surplus remain separate and unwaived.
+- **Closing gate:** Remove both native facade names together through a compatible
+  public-doc solution retaining exact header identity and all controls, OR obtain
+  a separately reviewed doctrine amendment. No automatic renewal, baseline reset,
+  checker override, type erasure/cast/suppression or unrelated diagnostic reduction.
+- **Evidence:** [Actual corrective verdict](../../runs/fix-browser-stream-headers--u3/corrective-type-closure-plan-eval.md),
+  SHA256 `c12eef080d7b48478c85a6f0b4b42dc68f3b8c28db691d5bb292161a4b3ceaa4`;
+  [root scope/disposition](../../runs/fix-browser-stream-headers--u3/root-corrective-type-closure-plan-acceptance.md),
+  SHA256 `6b98133faed4871ae4cd6c9816c52449695a030d8ecdb6d50fc92ff70dc79b8c`.
+
+## packages/fresh-ui — TOKEN-EXPORT-DIRECTORY-CARDINALITY
+
+- **ID:** `TOKEN-EXPORT-DIRECTORY-CARDINALITY`
+- **Reason:** S1b exports 24 preset configurations, 24 separate preset CSS files and 34 Figma index/collection files in the
+  `registry/theme/presets/` and `registry/theme/figma/` directories. Their flat export names exceed
+  the generic F-16 directory-child advisory cap. Existing root cardinality also grows by one
+  documented public token entrypoint.
+- **Why deferred:** Original Figma collection filenames/index shape and registry copy-source paths
+  form the S1 round-trip contract. A directory regrouping needs an explicit export-path migration;
+  generated data is deterministic and is covered by the complete output freshness gate.
+- **Cost:** Longer generated directory listings and additional advisory output; no runtime
+  ownership or dependency-layer exception.
+- **Owner:** Fresh UI design-system maintainers, epic #2412.
+- **Target:** Token schema/export-layout follow-up before the round-trip consumer freezes paths.
+- **Linked plan:** `.llm/runs/orch-divybot-6462582366--s1/plan.md`; S1b extension `.llm/runs/orch-divybot-6538850770--s1b/plan.md`.
+- **Created:** 2026-10-28; metrics updated 2026-10-31.
+- **Status:** open, DEBT_ACCEPTED.
+- **Closing gate:** Version the export-path migration, keep all original and computed collections
+  discoverable through the index, pass frozen token build/freshness and registry copy tests, and
+  remove these directory-cardinality advisories from `deno task arch:check` without adding scan
+  exclusions.
+
+## Host policy plugin publish graph — post-publish consumer gate (#2396)
+
+- **ID:** `HOST-POLICY-PUBLISHED-GRAPH-2396`.
+- **Reason:** The additive workers/streams `./service` exports change plugin publish shape.
+  A local graph and publication dry-run cannot prove a JSR consumer before that version exists.
+- **Owner:** 0.0.9 release coordinator, tracked by #2474, with repository maintainer rickylabs.
+- **Target:** First exact 0.0.9 canary containing #2396, necessarily before stable publication.
+- **Status:** Open, `DEBT_ACCEPTED` by independent implementation round1 at
+  `6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e` under `.llm/harness/gates/release-gates.md`.
+  No production consumer PASS is claimed.
+- **Cost:** One release-owned published CLI/plugin runtime run plus exact public factory imports;
+  stable readiness remains blocked until that real graph passes.
+- **Scope:** Post-publish graph proof only. No waiver for pre-merge check/tests, native policy,
+  publication dry-run, source/runtime CI, type identity or existing facade debt limits.
+- **Closing gate:** Publish the exact canary through the release workflow, prove both singular
+  factory imports and consumer types against that package graph, and pass `e2e-cli-prod` for the
+  same exact canary. Record the run/version evidence before stable. No implicit renewal.
+
+## Workers package metadata cardinality — required changelog (#2396)
+
+- **ID:** `WORKERS-HOST-METADATA-CARDINALITY-2396`.
+- **Reason:** Exact main has 19 immediate workers package-root entries under the generic audit;
+  the required export/migration `CHANGELOG.md` makes 20. Other workers source cardinality findings are inherited from main
+  and outside this metadata-only scope. New service source/test grouping meets cap 12 in both plugins.
+- **Exact scope:** `plugins/workers/` package-root metadata only, bounded at 20 entries. No new
+  runtime folder, public symbol, scan exclusion, file-size or native facade exception.
+- **Why deferred:** Consolidating the existing public CLI/runtime/resource roots requires a
+  separate package layout/export migration. Removing release notes would drop a documentation
+  obligation; unrelated source moves are outside this startup policy change.
+- **Owner:** Workers package maintainers with the 0.0.9 coordinator, #2474.
+- **Target:** Package layout review before 0.0.9 stable, no later than 2026-11-10. No renewal or growth.
+- **Status:** Open, `DEBT_ACCEPTED` by independent implementation round1 at
+  `6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e`; see the issue2396 run evaluate-round-1.md.
+- **Cost:** One additional metadata entry and its advisory; no runtime or type-system cost.
+- **Closing gate:** Consolidate the workers package-root layout to cap 12 while preserving every
+  public export and release note; pass publication dry-run and all native consumer tests.
+## packages/queue/adapters — F-16 private Redis lease modules (redis-lease-cardinality)
+
+- **Reason:** The existing adapters directory already exceeded the advisory cap (15 direct
+  children versus 12). The #2395 crash-recovery fix adds four cohesive private modules:
+  receipt types/normalization, atomic scripts, bounded script transport, and recovery policy.
+  Folding these into redis.adapter.ts would deepen its existing orchestration size and mix
+  independently reviewed failure boundaries. Issue #2351 adds one private admission/drain module
+  to keep the adapter below the 500-line gate while preserving independent receipt lifetimes.
+  Direct children now total 20.
+- **Owner:** NetScript queue maintainers.
+- **Target:** Next queue adapter organization pass after the 0.0.9 recovery fix.
+- **Linked plan:** .llm/runs/orch-divybot-6536806908--2395/plan.md; issue #2395.
+  Concurrency extension: .llm/runs/orch-divybot-6538963429--2351/plan.md; issue #2351.
+- **Created:** 2026-10-31.
+- **Status:** open.
+- **Gate:** F-16 adapters cardinality at or below 12, with all Redis/Garnet lease, delayed
+  promotion, public-export and scaffold-runtime regressions retained.
+- **Notes:** Cost is contributor navigation across five additional private modules; no public
+  export or dependency is added for these modules. A follow-up can group private implementation
+  concerns without changing the adapter contract. No scanner exemption or runtime gate waiver.
+
+## packages/fresh-ui token emphasis style — A1/A2 (mixed Figma style/weight name)
+
+- **Reason:** Fresh Figma `type/em/style` uses Italic in most modes but aliases body weight in Signal, Brutal and Terminal. WEB names `--ns-weight-em` and `--ns-studio-weight-em` therefore mix CSS font-style and font-weight semantics. DTCG 2025.10 has no fontStyle primitive. S1b preserves the source style through explicit `figmaStyle`/`sourceStyle` metadata and CSS while keeping a schema-valid regular fontWeight carrier for Italic. Code must not invent a replacement Figma value.
+- **Owner:** Fresh UI design-system maintainers / Figma vocabulary owner.
+- **Target:** Before the next stable Fresh UI design-system release; vocabulary follow-up to #2450.
+- **Linked plan:** `.llm/runs/orch-divybot-6538850770--s1b/plan.md`.
+- **Created:** 2026-10-31.
+- **Status:** open.
+- **Gate:** Split emphasis font-style and font-weight names with an explicit migration, preserve Figma round-trip, and pass DTCG schema/name/CSS tests across every preset.
+- **Notes:** Cost: standard DTCG consumers see regular weight for Italic unless they read the style extension; CSS consumers cannot use the mixed source WEB name in one fixed property across every preset. No current in-repo component consumes these names. Preserve exact original export and expose the limitation until the naming migration is ratified. Independent slice-review F1 identified this risk; scoped owner authorization covers recording it, not closing the design burn-down.
+
+## packages/cli — CLI-INSTALL-PERSISTENCE-SELECTION-SHAPE
+
+- **ID:** `CLI-INSTALL-PERSISTENCE-SELECTION-SHAPE`
+- **Reason:** Issue #2149 adds backend-dependent SQL selection before install planning. The existing
+  public install module grows from 712 to 758 lines, above the 500-line F-1 warning threshold, and
+  its existing over-cap directory grows from 15 to 18 immediate children. The selector, schema
+  resolver and colocated regression remain named, focused modules rather than further inlining.
+- **Cost:** Three additional sibling entries and 46 orchestration lines in an already oversized
+  feature; no new runtime process, service abstraction or per-request work.
+- **Why deferred:** Splitting unrelated installer confirmation, metadata persistence and dispatch
+  responsibilities would widen the auth persistence fix beyond its consumer acceptance proof.
+- **Owner:** CLI plugin-install maintainers.
+- **Target:** Before adding another plugin persistence selection axis.
+- **Linked plan:** `.llm/runs/orch-divybot-6542487846--2149/plan.md`.
+- **Created:** 2026-10-31.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Split install orchestration below 500 lines and feature folders to at most 12 immediate
+  children while preserving plugin install/dispatch/mutator tests, auth backend consumer proofs,
+  package publish dry-run and the coordinator's full `scaffold.runtime` verdict.

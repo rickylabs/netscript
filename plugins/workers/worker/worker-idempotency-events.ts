@@ -1,3 +1,4 @@
+import { workerJobLogger } from './job-logger.ts';
 import type { TracedMessageContext } from '@netscript/telemetry/instrumentation';
 import type { WorkerIdempotencyClaim } from '@netscript/plugin-workers-core/runtime';
 import type { WorkerDispatchContext } from './worker-options.ts';
@@ -7,6 +8,7 @@ export function recordIdempotentSkip(
   context: WorkerDispatchContext,
   concept: 'job' | 'task',
   targetId: string,
+  targetName: string,
   claim: WorkerIdempotencyClaim,
   tracedContext?: TracedMessageContext,
 ): void {
@@ -20,7 +22,13 @@ export function recordIdempotentSkip(
   tracedContext?.span?.addEvent(eventName, attributes);
   context.workerSpan?.addEvent(eventName, attributes);
   context.workerSpan?.setAttribute('worker.idempotency.skipped', true);
-  console.log(
-    `[Worker ${context.workerId}] Skipping duplicate ${concept} '${targetId}' (idempotency=${claim.key}, alreadyApplied=${claim.alreadyApplied})`,
-  );
+  workerJobLogger.debug('Skipping duplicate {concept} {targetId}', {
+    workerId: context.workerId,
+    concept,
+    targetId,
+    [`${concept}Id`]: targetId,
+    [`${concept}Name`]: targetName,
+    idempotencyKey: claim.key,
+    alreadyApplied: claim.alreadyApplied,
+  });
 }

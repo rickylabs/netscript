@@ -1,0 +1,133 @@
+{
+  "baseline": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 148,
+      "failed": 0,
+      "ignored": 41,
+      "totalResults": 189,
+      "uniqueFailures": 0
+    }
+  },
+  "originalFileNegativeControl": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 12,
+      "ignored": 0,
+      "totalResults": 12,
+      "uniqueFailures": 2
+    },
+    "failures": [
+      {
+        "message": "AssertionError: Values are not equal: sibling must exist before the first notification\n\n\n    [Diff] Actual / Expected\n\n\n-   20n\n+   200n\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/packages/kv/tests/memory-atomic-watch_test.ts:<line>:<column>",
+        "count": 10,
+        "tests": [
+          {
+            "name": "MemoryKvAdapter atomic keys notifications follow all writes: set with TTL",
+            "file": "./packages/kv/tests/memory-atomic-watch_test.ts",
+            "line": 59
+          },
+          {
+            "name": "MemoryKvAdapter atomic keys notifications follow all writes: delete",
+            "file": "./packages/kv/tests/memory-atomic-watch_test.ts",
+            "line": 59
+          },
+          {
+            "name": "MemoryKvAdapter atomic keys notifications follow all writes: sum",
+            "file": "./packages/kv/tests/memory-atomic-watch_test.ts",
+            "line": 59
+          },
+          {
+            "name": "MemoryKvAdapter atomic keys notifications follow all writes: min",
+            "file": "./packages/kv/tests/memory-atomic-watch_test.ts",
+            "line": 59
+          },
+          {
+            "name": "MemoryKvAdapter atomic keys notifications follow all writes: max",
+            "file": "./packages/kv/tests/memory-atomic-watch_test.ts",
+            "line": 59
+          },
+          {
+            "name": "MemoryKvAdapter atomic prefix notifications follow all writes: set with TTL",
+            "file": "./packages/kv/tests/memory-atomic-watch_test.ts",
+            "line": 59
+          },
+          {
+            "name": "MemoryKvAdapter atomic prefix notifications follow all writes: delete",
+            "file": "./packages/kv/tests/memory-atomic-watch_test.ts",
+            "line": 59
+          },
+          {
+            "name": "MemoryKvAdapter atomic prefix notifications follow all writes: sum",
+            "file": "./packages/kv/tests/memory-atomic-watch_test.ts",
+            "line": 59
+          },
+          {
+            "name": "MemoryKvAdapter atomic prefix notifications follow all writes: min",
+            "file": "./packages/kv/tests/memory-atomic-watch_test.ts",
+            "line": 59
+          },
+          {
+            "name": "MemoryKvAdapter atomic prefix notifications follow all writes: max",
+            "file": "./packages/kv/tests/memory-atomic-watch_test.ts",
+            "line": 59
+          }
+        ]
+      },
+      {
+        "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   11n\n+   null\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/packages/kv/tests/memory-atomic-watch_test.ts:<line>:<column>",
+        "count": 2,
+        "tests": [
+          {
+            "name": "MemoryKvAdapter atomic keys notifications follow all writes: repeated key",
+            "file": "./packages/kv/tests/memory-atomic-watch_test.ts",
+            "line": 59
+          },
+          {
+            "name": "MemoryKvAdapter atomic prefix notifications follow all writes: repeated key",
+            "file": "./packages/kv/tests/memory-atomic-watch_test.ts",
+            "line": 59
+          }
+        ]
+      }
+    ]
+  },
+  "fixed": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 160,
+      "failed": 0,
+      "ignored": 41,
+      "totalResults": 201,
+      "uniqueFailures": 0
+    }
+  },
+  "sourceSha256": {
+    "packages/kv/adapters/memory.adapter.ts": "39c3bb83c12e85c3036c6d7a45ebb515a5106b3f007c9d687741a114e1622aca",
+    "packages/kv/tests/memory-atomic-watch_test.ts": "7088163a2271737a6a02e1b996607b930af4ed7759c3baa46dc4c78a5aeb69ad"
+  },
+  "missingDeliveryNegativeControl": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "TimeoutError: The operation was aborted due to timeout\n    at Object.<anonymous> (ext:deno_web/03_abort_signal.js:<line>:<column>)\n    at listOnTimeout (ext:core/02_timers.js:<line>:<column>)\n    at Object.processTimers (ext:core/02_timers.js:<line>:<column>)\n    at __processTimers (ext:core/01_core.js:<line>:<column>)",
+        "count": 1,
+        "tests": [
+          {
+            "name": "MemoryKvAdapter atomic prefix notifications follow all writes: set with TTL",
+            "file": "./packages/kv/tests/memory-atomic-watch_test.ts",
+            "line": 59
+          }
+        ]
+      }
+    ]
+  }
+}

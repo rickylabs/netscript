@@ -11,7 +11,7 @@ import {
   type SagaDeliveryMessage,
 } from '../../src/runtime/saga-delivery.ts';
 import {
-  ProjectingSagaStore,
+  createProjectingSagaStore,
   type SagaInstanceProjection,
   type SagaInstanceProjectionPort,
 } from '../../src/runtime/saga-instance-projection.ts';
@@ -23,6 +23,7 @@ import type {
 
 const emptyDatabase: SagaServiceDatabaseClient = Object.freeze({
   sagaInstance: Object.freeze({
+    findFirst: () => Promise.resolve(null),
     findMany: () => Promise.resolve([]),
     count: () => Promise.resolve(0),
   }),
@@ -95,7 +96,7 @@ Deno.test('HTTP saga publish reaches the runner, persists, projects, and schedul
           ...options,
           native: {
             ...options.native,
-            store: new ProjectingSagaStore(new MemorySagaStore(), projection),
+            store: createProjectingSagaStore(new MemorySagaStore(), projection),
           },
         }),
     },

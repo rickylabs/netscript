@@ -1,7 +1,4 @@
-import {
-  agentDocsFullCorpus,
-  decodeAgentDocsPages,
-} from '../../../kernel/assets/agent-docs-transport.ts';
+import { agentDocsFullCorpus, decodeAgentDocsPages } from '@netscript/mcp/docs';
 import { join, resolve, toFileUrl } from '@std/path';
 import {
   EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS,
@@ -238,6 +235,12 @@ export class DenoAgentDocsGenerator implements AgentDocsGenerator {
     }
 
     const files: Record<string, string> = { ...await inflateProse() };
+    // Hash decoded prose, including the derived aggregate, so transport and rebuild identity do not matter.
+    const proseBytes = new TextEncoder().encode(JSON.stringify({
+      schemaVersion: 1,
+      files: Object.fromEntries(Object.keys(files).sort().map((path) => [path, files[path]])),
+    }));
+    const proseDigest = new Uint8Array(await crypto.subtle.digest('SHA-256', proseBytes)).toHex();
     let apiExportCount = 0;
     for (const pkg of installed) {
       const subpaths = EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS[pkg.name];
@@ -274,6 +277,7 @@ export class DenoAgentDocsGenerator implements AgentDocsGenerator {
       installed,
       Object.keys(files).length,
       apiExportCount,
+      proseDigest,
     );
     return {
       files,
@@ -288,12 +292,16 @@ export class DenoAgentDocsGenerator implements AgentDocsGenerator {
     installed: readonly InstalledNetScriptPackage[],
     pageCount: number,
     apiExportCount: number,
+    proseDigest: string,
   ): string {
     const packages = installed.map((pkg) => `| \`${pkg.name}\` | \`${pkg.version}\` |`).join('\n');
     return `# NetScript offline documentation\n\n` +
       `Generated for the exact NetScript packages installed in this project. Start with \`llms.txt\` for the task router and use \`llms-full.txt\` as the grep target.\n\n` +
       `| Field | Value |\n| --- | --- |\n` +
       `| Framework / CLI version | \`${NETSCRIPT_RELEASE_VERSION}\` |\n` +
+      // Preserve the historical row labels with content identity and a release label, not Git or time.
+      `| Prose source commit | \`sha256:${proseDigest}\` |\n` +
+      `| Prose extraction time | \`release:${EMBEDDED_AGENT_DOCS_PROVENANCE.version}\` |\n` +
       `| API generation time | \`${this.now().toISOString()}\` |\n` +
       `| Prose files | ${(EMBEDDED_AGENT_DOCS_PAGES.length + 1)} |\n` +
       `| Total files | ${pageCount + 1} |\n` +

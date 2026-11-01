@@ -1,0 +1,17 @@
+# Resume
+
+Issue #1491, docs leaf E2 of #2474. Baseline and allowed paths in supervisor.md. Research and locked plan complete; PLAN-EVAL required before docs edits. Draft PR is the plan review surface. Implement S1 then regenerate carriers in S2; independent evaluator reviews substantive slices and exact final pushed head. Final READY report goes through the excluded .divybot-final-report.md handoff, not a direct issue comment. Coordinator alone merges; do not alter labels/milestones or run local scaffold.runtime.
+
+PLAN-EVAL round 1 returned FAIL_PLAN; repaired provider inventory, eight-concern mapping and named extracted-fence execution test. Await round 2 before implementation. Draft PR #2514 exists.
+
+S1 authored and targeted gates pass. Exact full extractor-file baseline failure documented in worklog/memory. Independent substantive slice review is next; no sign-off commit yet. S2 regenerates canonical carriers and runs complete docs/freshness gates.
+
+Independent S1 review PASS recorded in slice-review.md. S1 is ready to commit/push, then S2 canonical carrier generation may start. Reuse the same independent reviewer for IMPL-EVAL; private resume identity stays outside Git.
+
+S2 canonical carrier generation is complete. Accuracy, export drift, MCP export corpus, prose/publish freshness and docs/snippets pass. Corpus delta is exactly five added pages plus four related updates; no removals/context changes. Await independent S2 carrier review before commit, then run assets-barrel after commit and record final evidence. Exact-head IMPL-EVAL and ready transition remain.
+
+Independent S2 carrier review PASS. Commit/push the carrier delta, run postcommit assets-barrel, then finish acceptance evidence and exact-head evaluation.
+
+All requested docs/carrier gates now pass including postcommit assets-barrel; native receipt extracts and acceptance table updated. Final IMPL-EVAL at pushed head is next. Retain the honestly reproduced unrelated cancellation test failure. Final evaluation result will also be linked in the PR timeline because committing an exact-head verdict would itself move the head.
+
+Implementation IMPL-EVAL PASS at 5f54380147cfdb634c1926b08e0547999c8cd202, same reviewer, independently executed consumer tests. All requested local gates pass and review threads are clear. Commit this evidence-only update, push/comment, mark ready, then resume same evaluator for exact final pushed head. Final external attestation/CI snapshot belong in PR timeline and excluded READY report, so do not commit again after the final attestation. Only coordinator merges.

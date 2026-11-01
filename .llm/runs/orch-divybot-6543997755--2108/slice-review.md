@@ -1,0 +1,21 @@
+**S1 sign-off: PASS.** I reviewed the uncommitted delta against the merge head plus the new fixture and test files, and found no blockers. This does not certify runtime acceptance; the live consumer proof and the docs handoff belong to S2.
+
+**What checks out**
+- **Local service export selection:** this only applies to installs from a local source path that is not a dry run. The service entrypoint is taken from the package's own `./services` export, which workers, sagas, triggers, auth and streams all declare. The absolute-path branch it relies on already existed on main. Public JSR installs are untouched, so the versioned JSR pins stay as they were. The call order inside the install flow is still safe, because both root `deno.json` writes happen before `appsettings` is updated.
+- **Runtime package discovery:** the new local lookup runs only after JSR parsing fails, where main threw immediately. It reads the package name and version from the nearest package config, then goes through the existing order: workspace member, then the marked source root, then the published manifest. This adds a fallback without changing the existing paths.
+- **Generated helper contracts:** the empty services and tools helpers still return a promise with the same arity, and the empty case now uses underscore-prefixed parameters with no database imports. The DB CLI-mode parameters are renamed only when there are no database targets. The workers registry now emits each factory only when something calls it, and I checked each condition against the code that generates the calls. The `_aspire-compat` change, which converts string socket data to bytes, is safe.
+- **Browser-auth reconciler:** it only adds the `@std/http/cookie` import when the key is missing, so existing aliases are kept. The BFF template has a single render path, and the import is added before that file is written. The reporting changes merged from main are intact.
+- **Consumer assertions:** the consumer is created with `init --db none`, and every plugin is installed with `--no-db`, with auth on kv-oauth.
+  - It requires empty `Databases`, `RequiresDb` false on all API and background entries, no database environment variables, no consumer `.prisma` file, and no database binding in the helpers.
+  - Every API entrypoint must be a real source file.
+  - It checks and lints the real generated output. Two controls inject a database requirement and an unused helper variable, and both fail as expected.
+- **Logs and controls:** the logs show 65, 35 and 98 tests passing, and structured check, lint and fmt clean over 17 files. `quality:gate` and dependency checks pass, with no lock or CI-tier changes. The three source mutations each fail one targeted test, and the original source was restored.
+- **Scope:** the workers registry generator, the browser-auth reconciler and the runtime discovery change fall outside the original write surface. Each fixes a defect the consumer proof found, and each is recorded in `drift.md` and `supervisor.md`.
+
+**Non-blocking points to carry into S2 / IMPL-EVAL**
+1. **CI runtime verdict:** local-source installs now write an absolute source-path entrypoint, so local-source `scaffold.runtime` will launch the plugin services from local source instead of the published JSR release. That makes the e2e-cli CI verdict essential. The live proof should also show that the API processes can read source outside the project root under their configured permissions.
+2. **Empty workers registry:** with no jobs, the generated registry still imports `jobRetryRegistration` and declares the `ResolvedJobHandler` type, and nothing uses either one. Main had the same problem in a different form, so this is not a regression. The consumer only lints the populated registry. Consider gating both on there being entries, or adding an empty-registry lint test.
+3. **Missing unit tests:** neither the new service-entrypoint return/override nor the local package lookup has a focused unit test. Only the heavy consumer test would fail if either were reverted. The package lookup also walks up without stopping at the project root.
+4. **Unreported `deno.json` write:** the reconciler writes the root `deno.json` without listing it in its written files or report. It also creates a `{}` `deno.json` if none exists.
+
+VERDICT: PASS

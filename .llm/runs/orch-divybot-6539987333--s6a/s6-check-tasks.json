@@ -1,0 +1,21 @@
+{
+  "check:desktop-native-fixture": 0,
+  "check:emitted-samples": 0,
+  "check:streams-types": 0,
+  "check:child-health-docs": 0,
+  "check:mcp-export-corpus": 0,
+  "check:assets-barrel": 0,
+  "check:agent-docs-prose": 0,
+  "check:publish-assets": 0,
+  "check:scaffold-versions": 0,
+  "check:aspire-version-parity": 0,
+  "check:netscript-jsr-specifiers": 0,
+  "check:aspire-host-ports": 0,
+  "check:review-threads": 0,
+  "tokens:check": 0,
+  "release:preflight": 0,
+  "docs:accuracy": 0,
+  "quality:gate": 0,
+  "package:check": 0,
+  "package:lint": 0
+}

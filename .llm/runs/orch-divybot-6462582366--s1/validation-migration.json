@@ -1,0 +1,169 @@
+{
+  "state": "all implementation slices signed off; final IMPL-EVAL pending",
+  "historicalSourceIteration": "validation-source-stopped.json",
+  "parent": "adb1aa61792b7e174c78aa3cf03d54df6ea6ef13",
+  "packageTests": {
+    "rawReportSha256": "9e4e729b384c5d1aceec95ecf0ac98686bda756a21bdd91c3ba3b47bb1cce339",
+    "summary": {
+      "passed": 209,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 209,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  "cliFlowTests": {
+    "rawReportSha256": "941b13704674e3827180fa90f6ea47283a0a1fd125e2b068c62a44b101913328",
+    "summary": {
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 14,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  "cliTemplateTests": {
+    "rawReportSha256": "60d13c20e82b43929f024f39d828cb78282ff73fa0c6e34712fde967a206c023",
+    "summary": {
+      "passed": 29,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 29,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  "appTypecheck": {
+    "rawReportSha256": "e81e8cdfdae468e450f34f2c1db9edcec5caab2f0903630aa7f8c49f5677554a",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "exitCode": 0
+  },
+  "browserTypecheck": {
+    "rawReportSha256": "6165acc1183bcd28937543600e32e3489c802f924e586be57d20fe00d6e9453b",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "exitCode": 0
+  },
+  "qualityGate": {
+    "gateId": "quality-gate",
+    "gitHead": "adb1aa61792b7e174c78aa3cf03d54df6ea6ef13",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "rawReceiptSha256": "1d7ebfd403b4ebae6c5e4b1e87b00dc66e30a85fd834ea75da64777cae63189a"
+  },
+  "tokenQualityGate": {
+    "gateId": "fresh-ui-token-quality",
+    "gitHead": "adb1aa61792b7e174c78aa3cf03d54df6ea6ef13",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "rawReceiptSha256": "29f6c0fc675cda027df0db8fe5b4363a3ea4798cd86739c1772e2955b16c8a44"
+  },
+  "dtcg": {
+    "result": "PASS",
+    "version": "2025.10",
+    "resolverInputs": 72,
+    "presets": 18,
+    "registeredRoles": 903,
+    "styleDictionary": "5.7.1",
+    "outputs": 50
+  },
+  "contrast": {
+    "result": "PASS_WITH_EXACT_SOURCE_EXCLUSIONS",
+    "effectiveContexts": 36,
+    "uses": 4066,
+    "exclusions": 406,
+    "figmaExclusions": 389,
+    "inheritedS0Exclusions": 17,
+    "unapprovedViolations": 0
+  },
+  "negativeControls": {
+    "unknownNameExit": 1,
+    "rawSemanticExit": 1,
+    "seededContrastExit": 1
+  },
+  "compatibility": {
+    "declarationEvidence": "compatibility.md",
+    "componentProof": "component-proof/",
+    "pixelIdenticalPairs": 8,
+    "computedStyleValuesCompared": 144,
+    "computedStyleDifferences": 0,
+    "legacySelectorBrowserProof": "PASS",
+    "fullGalleryPixelIdentityClaimed": false
+  },
+  "browser": {
+    "passed": 12,
+    "failed": 0,
+    "utilityCases": 4,
+    "utilitySeriousCriticalFindings": 0,
+    "baselineReductions": 2,
+    "newOrIncreasedSeriousCritical": 0,
+    "smallIconGeometryRegression": "PASS",
+    "axeDelta": "axe-delta.md"
+  },
+  "cliScaffoldOverride": {
+    "initExit": 0,
+    "buildExit": 0,
+    "rawSemanticExit": 1,
+    "existingAssetHashesPreserved": true,
+    "cleanExit": 0,
+    "cleanRemovedOnlyKnownFive": true,
+    "rebuildExit": 0
+  },
+  "publishing": {
+    "cliDryRun": "PASS",
+    "freshUiDryRun": "PASS",
+    "releasePerformed": false
+  },
+  "pages": {
+    "exports": "PASS",
+    "snippets": "PASS",
+    "accuracy": "97/97 direct;162 recursive",
+    "build": "PASS",
+    "renderedHtml": 236,
+    "internalLinks": 38777,
+    "links": "PASS",
+    "caveatMarkers": 15,
+    "caveatPages": 12,
+    "caveats": "PASS"
+  },
+  "sliceReviews": {
+    "sources": "PASS after authorized resumed repair",
+    "outputs": [
+      "FAIL_FIX",
+      "PASS"
+    ],
+    "checks": [
+      "FAIL_FIX",
+      "PASS"
+    ],
+    "cli": [
+      "PASS"
+    ],
+    "migration": [
+      "FAIL_FIX",
+      "PASS"
+    ]
+  },
+  "fullRuntimeE2e": {
+    "verdict": "UNPROVEN_HOST_PREREQUISITES",
+    "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+    "rawExitCode": 1,
+    "passed": 1,
+    "failed": 2,
+    "skipped": 0,
+    "reason": "Aspire doctor exits1; Docker daemon unavailable, including cleanup inspection. Suite stops at preflight."
+  },
+  "implementationEvaluation": "PENDING",
+  "ready": false
+}

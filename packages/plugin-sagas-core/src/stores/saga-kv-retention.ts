@@ -84,7 +84,7 @@ export class SagaKvRetention {
           value: {
             expiresAt: cursor.expiresAt,
             family: finishedFamily ? 'applied' : cursor.family,
-            // These key families have no child keys: extending the key skips it on every adapter.
+            // Advance beyond this leaf while retaining later nested applied-digest keys.
             start: finishedFamily ? undefined : [...entries.at(-1)!.key, ''],
           } satisfies RetentionCursor,
         },

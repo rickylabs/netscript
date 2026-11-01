@@ -67,6 +67,7 @@ export const GATE_CATALOG = {
     '--ignore-line-endings',
   ],
   'doc-lint': ['deno', 'task', 'doc:lint'],
+  'figma-ci': ['deno', 'task', 'figma:ci'],
   'quality-gate': ['deno', 'task', 'quality:gate'],
   'prod-install': ['deno', 'task', 'deps:prod-install'],
   test: ['deno', 'task', 'test'],
@@ -101,6 +102,7 @@ export const GATE_CATALOG = {
   'public-doc-lint': ['deno', 'doc', '--lint'],
   'fresh-browser': ['deno', 'task', 'test:browser'],
   'fresh-ui-token-build': ['deno', 'task', 'tokens:build'],
+  'fresh-ui-token-quality': ['deno', 'task', 'tokens:validate'],
   'fresh-ui-tokens': ['deno', 'task', 'tokens:check'],
   'fresh-ui-browser': ['npm', 'test'],
   'fresh-ui-browser-contract': [

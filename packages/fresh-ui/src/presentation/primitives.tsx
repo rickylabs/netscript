@@ -222,6 +222,8 @@ export function Icon(props: IconProps): PrimitiveNode {
     {
       ...(svgProps as JSX.SVGAttributes<SVGSVGElement>),
       'aria-hidden': ariaHidden ?? (hasAccessibleName ? undefined : true),
+      'data-part': 'root',
+      'data-scope': 'icon',
       fill: 'none',
       height: size,
       role: role ?? (hasAccessibleName ? 'img' : undefined),
@@ -234,7 +236,9 @@ export function Icon(props: IconProps): PrimitiveNode {
       xmlns: 'http://www.w3.org/2000/svg',
     },
     title === undefined ? null : h('title', null, title),
-    ...ICON_PATHS[name].map((d) => h('path', { d, key: d })),
+    ...ICON_PATHS[name].map((d) =>
+      h('path', { d, key: d, 'data-part': 'glyph', 'data-scope': 'icon' })
+    ),
   );
 }
 

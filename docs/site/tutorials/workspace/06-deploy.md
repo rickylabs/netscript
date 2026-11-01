@@ -1,27 +1,19 @@
 ---
 layout: layouts/base.vto
-title: Deploy locally
+title: Run the team workspace under Aspire
 templateEngine: [vento, md]
 prev: { label: "5 · Route authz", href: "/tutorials/workspace/05-route-authz/" }
-next: { label: "How-to guides", href: "/how-to/" }
+next: { label: "Build", href: "/how-to/" }
 ---
 
-# Deploy locally
+# Run the team workspace under Aspire
 
-You have built every layer of the team workspace: scaffold, an identity layer, isolated team data, a
-provisioning job that never blocks the caller, and routes that fail closed. This final chapter runs
-the whole thing as one coherent system — the point where the app stops being a set of chapters and
-becomes something a team could actually sit inside. A single `aspire start` stands up Postgres, the
-Redis cache, your `workspace` service, the `auth-api` service on `:8094`, the Workers API, and every
-background processor — all wired together and visible in one dashboard. It is the
-**local** story, and this chapter is precise about exactly that: a complete observable stack on one
-machine, not a production deployer.
-
-The one-command reach is the differentiator, and you hand-wrote none of it: `netscript init`
-generated the AppHost in Chapter 1, each plugin you installed since — `auth`, then `workers` —
-contributed its own service and processor to the resource graph, and one `aspire start` boots the
-whole thing with cross-references resolved into injected environment. Scaffold to a running,
-observable stack, with no orchestration wiring you maintain by hand.
+In this chapter you run the whole team workspace as one system. A single `aspire start` brings up
+Postgres, the Redis cache, your `workspace` service, the `auth-api` service at its allocated endpoint, the Workers
+API and every background processor, wired together and visible in one dashboard. `netscript init`
+generated the AppHost in chapter 1, and each plugin you installed since (`auth`, then `workers`)
+added its own service and processor to the resource graph, so there is no orchestration wiring to
+maintain by hand.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
@@ -34,16 +26,25 @@ observable stack, with no orchestration wiring you maintain by hand.
 
 ## What you will build
 
-Your complete `my-workspace/` running under one Aspire AppHost: every service, plugin API, background
-processor, and backing container in a single resource graph, observable from the dashboard on `:18888`
-— including the `:8094` auth service you added in chapter 2. By the end you can read the whole running
-topology, including the exact port each resource bound, from one pane.
+Your complete `my-workspace/` running under one Aspire AppHost: every service, plugin API,
+background processor and backing container in a single resource graph, observable from the dashboard
+at the URL Aspire prints, including the auth service from chapter 2. At the end you can read the running
+topology, with the exact port each resource bound, from one pane.
+
+{{ comp callout { type: "warning", title: "Aspire runs the local topology, not production" } }}
+<code>aspire start</code> turns <code>git clone</code> plus one command into a complete, observable,
+correctly wired stack on <strong>one machine</strong>. The Postgres and Redis it starts are throwaway
+Docker containers, <strong>not</strong> your production database or cache, and the
+<code>kv-oauth</code> session store and auth credentials here are local development values. For a
+remote target, point processes at managed infrastructure and let your platform own the lifecycle;
+see the <a href="/orchestration-runtime/how-to/deploy/">Deploy</a> recipe.
+{{ /comp }}
 
 ## Before you begin
 
 You need everything from chapters 1–5: the scaffolded workspace, the `auth` plugin, the second
-database, the workers plugin and `provision-member` job, and the guarded `workspace` service. The
-AppHost was scaffolded by `netscript init` in chapter 1 (you did not pass `--no-aspire`). Confirm the
+database, the workers plugin and `provision-member` job, and the guarded `workspace` service.
+`netscript init` scaffolded the AppHost in chapter 1 (you didn't pass `--no-aspire`). Confirm the
 orchestration entry point is on disk and the workspace type-checks:
 
 ```sh
@@ -52,19 +53,10 @@ ls aspire/apphost.mts aspire/aspire.config.json
 deno task check
 ```
 
-{{ comp callout { type: "important", title: "The order is: scaffold → orchestrate → database" } }}
-Aspire is <strong>step 2</strong>, before any database command. <code>netscript init</code> wrote the
-<code>aspire/</code> AppHost; <code>aspire start</code> provisions Postgres and Redis and starts every
-process; <strong>only then</strong> do <code>netscript db</code> commands work, because they migrate
-<em>through</em> the running AppHost. The graph is derived from your installed plugins — adding the
-<code>auth</code> and <code>workers</code> plugins in earlier chapters is exactly why their services and
-processors now appear in it.
-{{ /comp }}
-
 ## Step 1 — Restore the AppHost SDK (once)
 
-The AppHost runs on its own isolated Node runtime inside `aspire/`, so its dependency graph never leaks
-into your Deno workspace. Restore that runtime once per machine (and after an SDK bump):
+The AppHost runs on its own isolated Node runtime inside `aspire/`, so its dependencies never leak
+into your Deno workspace. Restore that runtime once per machine, and again after an SDK bump:
 
 ```sh
 cd aspire
@@ -73,100 +65,84 @@ aspire restore
 
 ## Step 2 — Start the whole graph
 
-A single `aspire start` translates `appsettings.json` plus your plugin contributions into a coherent
-resource graph and boots all of it — infrastructure first, then services, plugin APIs, and background
-processors, with cross-references resolved into injected environment variables:
+`aspire start` turns `appsettings.json` and your plugin contributions into a resource graph and boots
+all of it: infrastructure first, then services, plugin APIs and background processors, with
+cross-references resolved into injected environment variables.
 
 ```sh
-# Still inside aspire/. Boots the whole graph; prints the dashboard URL + a login token.
+# Still inside aspire/. Boots the whole graph; prints the dashboard URL.
 aspire start
 ```
 
-When boot finishes, `aspire start` prints the dashboard address and a one-time login token. This is the
-graph your complete app stands up:
+When boot finishes, `aspire start` prints the allocated dashboard address. The graph
+it brings up:
 
 {{ comp.apiTable({
   caption: "The local resource graph aspire start brings up",
   rows: [
-    { name: "aspire (dashboard)", type: "https://localhost:18888", desc: "The Aspire dashboard — live resource list, console logs, structured logs, and traces. A login token is printed on start." },
-    { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint; framework spans (job dispatch/execution, scheduler runs) land here automatically." },
-    { name: "postgres", type: "Container", desc: "The primary datasource — the auth.prisma migration from chapter 2 lives here." },
+    { name: "aspire (dashboard)", type: "the URL Aspire prints", desc: "The Aspire dashboard — live resource list, console logs, structured logs, and traces. The generated local profile allows anonymous dashboard access." },
+    { name: "OTLP collector", type: "the OTLP URL Aspire prints", desc: "OpenTelemetry endpoint; framework spans (job dispatch/execution, scheduler runs) land here automatically." },
+    { name: "postgres", type: "Container", desc: "The primary datasource from chapter 1. Chapter 2 uses kv-oauth sessions in KV and adds no auth SQL tables." },
     { name: "workspace (second db)", type: "Container", desc: "The isolated workspace datasource from chapter 3, provisioned alongside the primary." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads and the kv-oauth session store." },
-    { name: "workspace (service)", type: ":3001", desc: "Your guarded oRPC service from chapter 5 (note: this tutorial assumes port 3001; in unpinned scaffolds, each project is allocated its own randomized high-range ports) — /api/workspace requires a scoped principal, /health stays public." },
-    { name: "auth-api", type: ":8094 (pinned in chapter 2)", desc: "The auth plugin's service from chapter 2 — /api/v1/auth/* (signin, callback, signout, sessions/revoke, session, me)." },
+    { name: "workspace (service)", type: "allocated endpoint", desc: "Your guarded oRPC service from chapter 5 — /api/workspace/{workspace}/members requires a scoped principal, /health stays public." },
+    { name: "auth-api", type: "allocated endpoint", desc: "The auth plugin's service from chapter 2 — /api/v1/auth/* (signin, callback, signout, sessions/revoke, session, me)." },
     { name: "workers-api", type: "allocated port", desc: "The Workers API from chapter 4 — triggers and inspects the provision-member job." },
     { name: "background processors", type: "executables (no port)", desc: "The workers processor that drains the job queue — a separate process, not a thread in the API." }
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Only pinned ports are predictable" } }}
-Two host ports here are predictable because <em>you</em> pinned them: <code>workspace</code> on
-<code>:3001</code> (chapter 1's <code>--service-port</code>) and <code>auth-api</code> on
-<code>:8094</code> (chapter 2's <code>--port</code>). The Workers API you installed without a
-<code>--port</code>, so its entry carries no <code>HostPort</code> and Aspire allocates its host port
-at every start. Read the actual number from the dashboard's resource list rather than assuming.
+{{ comp callout { type: "note", title: "Read allocated endpoints" } }}
+Open the dashboard at the URL Aspire prints and read each resource's endpoint from its Resources
+view. The auth and worker APIs need no conventional host port. The generated app's BFF owns the
+browser callback; use the app origin configured with your identity provider.
 {{ /comp }}
 
 ## Step 3 — Use the dashboard
 
-Open `https://localhost:18888`, paste the login token `aspire start` printed, and you have one pane over
-the running graph:
+Open the URL Aspire prints (the generated local profile allows anonymous access):
 
 {{ comp.apiTable({
   caption: "Aspire dashboard surfaces",
   rows: [
     { name: "Resources", type: "tab", desc: "Every container and executable above with status, endpoints, and the resolved environment. The authority for which port each resource bound." },
     { name: "Console logs", type: "tab", desc: "stdout/stderr per resource — a failing auth-api or workers processor is one click away." },
-    { name: "Structured logs + Traces", type: "tab", desc: "Spans and structured logs correlated by traceparent across services — collected via the OTLP endpoint at :4318." }
+    { name: "Structured logs + Traces", type: "tab", desc: "Spans and structured logs correlated by traceparent across services — collected via the OTLP endpoint at the OTLP URL Aspire prints." }
   ]
 }) }}
 
 ## Verify your progress
 
-With the graph up, walk the whole app end to end — the auth service, the guarded route, and the job:
+With the graph up, check the app end to end: the auth service, the guarded route and the job.
 
 ```sh
-# Auth service is up (chapter 2)
-curl http://localhost:8094/health/ready
-
-# The guarded route rejects an anonymous caller (chapter 5)
-curl -i http://localhost:3001/api/workspace            # 401 UNAUTHORIZED
-
-# ...and allows a correctly-scoped one
-curl -i -H 'authorization: Bearer read' http://localhost:3001/api/workspace   # 200
-
-# The Workers API is live (chapter 4)
-curl <workers-endpoint>/api/v1/workers/jobs            # provision-member appears
+netscript service list
+netscript contract inspect workspace
+netscript plugin doctor
+ns-workers executions --limit=10 --json
 ```
 
+Use `list_api_services` → `list_service_operations` → `get_operation_schema` to inspect the live
+`workspace.members` operation. Call it through the server-side session client from chapter 5 with
+`{ workspace: 'ws-1', limit: 20, offset: 0 }`. A request without a session returns 401; a session
+without `workspace:read` returns 403; a member with that scope receives the members list.
+
 - [ ] `aspire restore` and `aspire start` succeed from inside `aspire/`.
-- [ ] The dashboard on `:18888` lists `postgres`, `workspace` (db), `redis`, `workspace` (service), `auth-api`, and `workers-api` — all green.
-- [ ] `curl http://localhost:8094/health/ready` succeeds.
-- [ ] An anonymous `GET /api/workspace` returns `401`; `Bearer read` returns `200`.
-- [ ] `GET /api/v1/workers/jobs` lists `provision-member`.
+- [ ] The dashboard at the URL Aspire prints lists `postgres`, `workspace` (db), `redis`, `workspace` (service), `auth-api`, and `workers-api` — all green.
+- [ ] Aspire reports the auth service ready at its allocated endpoint.
+- [ ] The workspace app handler returns 401 without a session, and an authorized typed members call returns data.
+- [ ] `ns-workers show-job provision-member --json` confirms the registered job, and executions show its result.
 
-{{ comp callout { type: "warning", title: "Aspire is the LOCAL story — not a production deployer" } }}
-<code>aspire start</code> exists to make <code>git clone</code> &rarr; one command produce a complete,
-observable, correctly-wired stack on <strong>one machine</strong>. The Postgres and Redis it starts
-are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or
-cache, and the <code>kv-oauth</code> session store and auth credentials here are local-dev values. For
-a remote target you point processes at managed infrastructure and let your platform own lifecycle;
-that is the <a href="/orchestration-runtime/how-to/deploy/">Deploy</a> recipe.
-{{ /comp }}
-
-{{ comp callout { type: "warning", title: "Footguns when aspire start will not boot" } }}
+{{ comp callout { type: "tip", title: "If aspire start won't boot" } }}
 <ul>
-<li><strong>Docker not running.</strong> Aspire provisions Postgres + Redis (and the second workspace
-db) through Docker; no daemon means the happy path does not start.</li>
-<li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire start</code> run from
-inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root.</li>
-<li><strong>db command before aspire start.</strong> Every <code>netscript db</code> command needs a live
-Postgres — bring the graph up first.</li>
-<li><strong>Ports in use.</strong> The dashboard wants <code>:18888</code>/<code>:18889</code> and OTLP
-<code>:4318</code>; your pinned <code>workspace</code> and <code>auth-api</code> claim <code>:3001</code>
-and <code>:8094</code>, and the remaining plugin runtimes claim allocated ports in
-<code>49152–65535</code>. A stale prior run holding a port blocks boot.</li>
+<li><strong>Docker isn't running.</strong> Aspire provisions Postgres, Redis and the second workspace
+database through Docker.</li>
+<li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire start</code> run
+from inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root.</li>
+<li><strong>A db command ran before <code>aspire start</code>.</strong> Every <code>netscript db</code>
+command needs a live Postgres. Bring the graph up first.</li>
+<li><strong>Ports in use.</strong> Stop an earlier run only when you know it owns the conflicting
+resource. Read the current run's allocated endpoints from Aspire, then retry.</li>
 </ul>
 {{ /comp }}
 
@@ -174,20 +150,16 @@ and <code>:8094</code>, and the remaining plugin runtimes claim allocated ports 
 
 The complete authenticated team-workspace backend, running locally as one orchestrated system:
 Postgres, an isolated workspace database, Redis, the guarded `workspace` service, the `auth-api`
-auth service on `:8094`, and the Workers API and its processor — all in one Aspire resource graph,
-observable from one dashboard. You walked the whole arc: a pluggable auth backend, a session, team
-data on its own catalog datasource, off-path provisioning, and a route-authz seam that fails closed —
-single-tenant by design, with org scoping an explicit app-level extension. The off-boarded contractor
-gets a `401`; the engineer you paged gets provisioned without anyone waiting on the write.
+service at its allocated endpoint, and the Workers API with its processor, all in one Aspire resource graph. Across
+the track you added a pluggable auth backend, a session, team data in its own datasource, off-path
+provisioning and a route-authz seam that fails closed. The app is single-tenant by design, with org
+scoping as an app-level extension.
 
-## Where to go next
+## Next steps
 
-- **Ship it remotely** → [Deploy](/orchestration-runtime/how-to/deploy/) — the production companion: deployable units,
-  managed backing services, and the `--no-aspire` path.
-- **Go deeper on auth** → [Authentication capability](/capabilities/auth/) and
+- **Deploy remotely** → [Deploy](/orchestration-runtime/how-to/deploy/): deployable units, managed
+  backing services and the `--no-aspire` path.
+- **Go deeper on auth** → [Authentication capability](/identity-access/auth/) and
   [The authentication model](/explanation/auth-model/).
 - **Understand the orchestrator** → [Orchestration with Aspire](/explanation/aspire/).
-- **Browse more recipes** → the [how-to guides](/how-to/).
-
-{{ comp.nextPrev({ prev: { label: "5 · Route authz", href: "/tutorials/workspace/05-route-authz/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}
-</content>
+- **Browse more recipes** → the recipes in [Build](/how-to/).

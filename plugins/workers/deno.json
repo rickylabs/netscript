@@ -13,6 +13,7 @@
     "./jobs/health-check.ts": "./jobs/health-check.ts",
     "./runtime": "./bin/runtime.ts",
     "./scaffold": "./scaffold.ts",
+    "./service": "./services/mod.ts",
     "./services": "./services/src/main.ts",
     "./streams": "./streams/mod.ts",
     "./streams/server": "./streams/server.ts",
@@ -22,6 +23,7 @@
     "@netscript/config": "jsr:@netscript/config@0.0.8",
     "@netscript/contracts": "jsr:@netscript/contracts@0.0.8",
     "@netscript/cron": "jsr:@netscript/cron@0.0.8",
+    "@netscript/logger": "jsr:@netscript/logger@0.0.8",
     "@netscript/kv": "jsr:@netscript/kv@0.0.8",
     "@netscript/plugin": "jsr:@netscript/plugin@0.0.8",
     "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.8",
@@ -37,7 +39,7 @@
     "zod": "catalog:"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts cli.ts scaffold.ts bin/runtime.ts src/adapter/plugin.ts src/adapter/resources/mod.ts src/aspire/mod.ts src/cli/composition/main.ts contracts/v1/mod.ts services/src/main.ts streams/mod.ts streams/server.ts worker/mod.ts",
+    "check": "deno check --unstable-kv mod.ts cli.ts scaffold.ts bin/runtime.ts src/adapter/plugin.ts src/adapter/resources/mod.ts src/aspire/mod.ts src/cli/composition/main.ts contracts/v1/mod.ts services/mod.ts services/src/service.ts services/src/main.ts streams/mod.ts streams/server.ts worker/mod.ts",
     "test": "deno test --allow-all",
     "dev": "deno run --allow-net --allow-env --allow-read --watch services/src/main.ts",
     "start": "deno run --allow-net --allow-env --allow-read services/src/main.ts",

@@ -1,3 +1,4 @@
+import type { DoctorReport } from '@netscript/plugin/adapter';
 import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { join } from '@std/path';
 
@@ -42,6 +43,8 @@ export interface RemovePluginResult {
   readonly removedSchemaDirs: readonly string[];
   /** Aspire helper files regenerated after cleanup. */
   readonly helperFiles: readonly string[];
+  /** Informational browser-auth preservation checks. */
+  readonly browserAuthReport: DoctorReport;
   /** Optional plugin CLI dispatch result. */
   readonly dispatchResult?: PluginDispatchResult;
 }
@@ -101,7 +104,7 @@ export async function removePlugin(
       await reverseManagedInstallFiles(input.projectRoot, plan.installState, dependencies.fs);
     }
     await reconcilePluginReferences(input.projectRoot, dependencies.fs);
-    const browserAuthFiles = await reconcileBrowserAuth(
+    const { written: browserAuthFiles, report: browserAuthReport } = await reconcileBrowserAuth(
       input.projectRoot,
       dependencies.fs,
       dependencies.formatter,
@@ -116,6 +119,7 @@ export async function removePlugin(
     return {
       dispatchResult,
       helperFiles,
+      browserAuthReport,
       removedAppsettings,
       removedGeneratedDirs,
       removedNetScriptConfigPlugin,

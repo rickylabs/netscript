@@ -1,0 +1,14 @@
+--- a/.llm/tools/e2e/prepull-runtime-images.ts
++++ b/.llm/tools/e2e/prepull-runtime-images.ts
+@@ -192,10 +192,7 @@
+ ): Promise<void> {
+   const images = await runtimeTierImages(tier, options.resolvePostgres);
+   const started = performance.now();
+-  await restoreRuntimeGarnet(
+-    options.toolDirectory ?? '.llm/tmp/e2e-garnet-tool',
+-    options.runToolRestore,
+-  );
++  // Negative control: omit the executable tool prerequisite.
+   console.info(`Garnet tool preparation: ${Math.round(performance.now() - started)}ms`);
+   const measurements: ImagePullMeasurement[] = [];
+   for (const image of images) {

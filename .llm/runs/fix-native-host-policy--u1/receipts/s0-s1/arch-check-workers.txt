@@ -1,0 +1,15 @@
+Download https://jsr.io/@std/cli/meta.json
+Download https://jsr.io/@std/cli/1.0.32_meta.json
+Download https://jsr.io/@std/cli/1.0.32/parse_args.ts
+# Doctrine readiness — workers
+  FAIL=0 WARN=8 INFO=2
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  INFO A12: package implements durable workflow concepts — verify state machine model is documented in docs/architecture.md
+  WARN A13: Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead (test-api.ts)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (cli.ts:18)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (jobs\health-check.ts:286)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (scaffold.ts:23)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (services\src\main.ts:45)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src\adapter\resources\job\job.stub.ts:33)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src\adapter\resources\job\webhook-delivery.stub.ts:234)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src\cli\official-sample-configuration.ts:416)

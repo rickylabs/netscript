@@ -16,6 +16,9 @@
  * @module
  */
 
+import { appendPluginMigrations, pendingPluginMigrations } from './plugin-migrations.ts';
+
+/** Application migration inputs, execution bounds and injectable process boundary. */
 export interface MigrationOptions {
   /** Database provider ('mssql' | 'postgres' | 'mysql' | 'sqlite') */
   provider: 'mssql' | 'postgres' | 'mysql' | 'sqlite';
@@ -63,6 +66,8 @@ export interface MigrationOptions {
   attemptTimeoutMs?: number;
   /** Migration directory to inventory before and after creation. */
   migrationsPath?: string;
+  /** Schema directory containing installed *.migration.sql contributions (default schema). */
+  schemaPath?: string;
   /** Override terminal detection for hosts and deterministic tests. */
   interactive?: boolean;
   /** Injectable Prisma process boundary. */
@@ -343,6 +348,9 @@ export async function runMigrationWithArtifacts(
     log('-------------------------------------');
   }
 
+  const pending = provider === 'postgres'
+    ? await pendingPluginMigrations(options.schemaPath ?? 'schema', migrationsPath)
+    : [];
   const before = await listMigrationArtifacts(migrationsPath);
   log(
     migrationName
@@ -351,6 +359,7 @@ export async function runMigrationWithArtifacts(
   );
   const args = ['migrate', 'dev', '--config', configPath];
   if (migrationName) args.push('--name', migrationName);
+  if (pending.length) args.push('--create-only');
   const createCode = await runPrismaWithRetry(
     { label: 'migrate dev', args },
     {
@@ -370,12 +379,35 @@ export async function runMigrationWithArtifacts(
   }
 
   const after = await listMigrationArtifacts(migrationsPath);
-  const created = after.filter((name) => !before.includes(name));
+  const created = await appendPluginMigrations(
+    migrationsPath,
+    after.filter((name) => !before.includes(name)),
+    pending,
+  );
   if (created.length === 0) {
     log('Migration creation returned success but created no migration artifact.');
     if (nonInteractive) log(headlessMigrationGuidance(migrationName));
     reportMigrationSets(log, [], []);
     return { code: 1, created: [], applied: [] };
+  }
+
+  if (pending.length) {
+    const deployCode = await runPrismaWithRetry(
+      { label: 'migrate deploy', args: ['migrate', 'deploy', '--config', configPath] },
+      {
+        interactive: false,
+        maxAttempts,
+        baseRetryDelayMs,
+        maxRetryDelayMs,
+        attemptTimeoutMs,
+        log,
+        spawn,
+      },
+    );
+    if (deployCode !== 0) {
+      reportMigrationSets(log, created, []);
+      return { code: deployCode, created, applied: [] };
+    }
   }
 
   const statusCode = await runPrismaWithRetry(

@@ -1,20 +1,16 @@
 ---
 layout: layouts/base.vto
-title: Triggers & ingress
+title: Event triggers
 templateEngine: [vento, md]
-prev: { label: "Durable sagas", href: "/durable-workflows/sagas/" }
-next: { label: "Durable streams", href: "/durable-workflows/streams/" }
-order: 3
+order: 2
 ---
 
-# Triggers & ingress
+# Event triggers
 
-The **triggers** plugin is NetScript's front door for the outside world. It turns
-external events — inbound webhooks, files dropped on disk, and cron schedules —
-into durable background work. A trigger handler does one job: receive an event and
-return a list of *actions*. The canonical action is `enqueueJob(...)`, which hands
-the payload to the [workers](/background-processing/workers/) plugin so the heavy
-lifting happens off the request path. The HTTP call returns immediately; the job
+This page covers the **triggers** plugin, which turns inbound webhooks, files dropped on disk, and
+cron schedules into durable background work. A trigger handler receives an event and returns a list
+of *actions*. The usual action is `enqueueJob(...)`, which hands the payload to the
+[workers](/background-processing/workers/) plugin. The HTTP call returns immediately, and the job
 runs durably behind it.
 
 {{ comp.diagram({
@@ -23,66 +19,32 @@ runs durably behind it.
   caption: "Two ingress edges, one processor: webhook POST → HMAC verify → event store → handler → enqueueJob; file-watch → debounce + stability → handler. Both converge on the trigger processor, which retries and DLQs."
 }) }}
 
-This closes the continuous-app loop. A webhook lands on the triggers service, it
-`enqueueJob`s a workers job, that job publishes a saga message, and the
-[saga](/durable-workflows/sagas/) advances a workflow — all from one inbound
-POST.
-
-The failure modes ingress must absorb are mundane and expensive: a payment provider retries the
-same webhook five times because your handler took too long, or a half-written CSV fires an import
-mid-copy on a network share. Each has a declared answer here — `idempotencyKey` collapses sender
-retries and `stabilityThreshold` waits out the half-written file. Because every trigger is a frozen
-definition rather than routing code, the registry surface can list what fires what — the same
-property that lets a coding agent enumerate an app's ingress edges before touching one.
-
-{{ comp callout { type: "important", title: "Typed oRPC contract, raw webhook ingress" } }}
-Like <a href="/services-sdk/services/">services</a>, <a href="/background-processing/workers/">workers</a>,
-and <a href="/durable-workflows/sagas/">sagas</a>, the triggers API service serves a
-<strong>typed v1 oRPC contract</strong> for trigger and event introspection plus management —
-describing triggers, listing and fetching triggers and events, firing a trigger, testing a webhook,
-previewing a schedule, enabling/disabling a trigger, and subscribing to an SSE event stream. The one
-deliberate exception is the <strong>webhook ingress endpoint</strong> itself
-(<code>POST /api/v1/webhooks/:triggerId</code>, plus a legacy <code>GET /api/v1/events</code>): it stays
-a <strong>raw, signature-verifying route</strong>, not an oRPC procedure, because it must verify an HMAC
-signature over the raw request bytes — incompatible with oRPC's Zod body parsing. That keeps it open to
-any third-party webhook sender, which has no NetScript typed client and just POSTs to the plain URL.
-{{ /comp }}
+Ingress has to absorb two common failures. A payment provider retries the same webhook five times
+because your handler took too long, or a half-written CSV fires an import mid-copy on a network
+share. `idempotencyKey` collapses sender retries, and `stabilityThreshold` waits out the
+half-written file.
 
 ## What it is
 
-A trigger is a **declarative event source** plus a handler. NetScript ships three
-authorable trigger builders from `@netscript/plugin-triggers-core/builders` —
-`defineWebhook` (inbound HTTP), `defineFileWatch` (filesystem events), and
-`defineScheduledTrigger` (cron). All three return a frozen *definition* the runtime
-walker discovers; all three share one handler contract — `(event, context) =>
-Promise<TriggerActionResult[]>` — and one runtime processor that verifies, persists,
-retries, and dead-letters. Three more kinds (`queue`, `stream`, `manual`) are reserved
-in the type surface but not yet executable. The processing engine itself lives in
-[`@netscript/watchers`](/reference/watchers/) (file watching) and the trigger
-processor/ingress runtime (`@netscript/plugin-triggers-core/runtime`).
+A trigger is a declarative event source plus a handler. `@netscript/plugin-triggers-core/builders`
+ships three builders: `defineWebhook` (inbound HTTP), `defineFileWatch` (filesystem events), and
+`defineScheduledTrigger` (cron). Each returns a frozen *definition* that the runtime walker
+discovers. All three share one handler contract, `(event, context) =>
+Promise<TriggerActionResult[]>`, and one runtime processor that verifies, persists, retries, and
+dead-letters. Three more kinds (`queue`, `stream`, `manual`) are reserved in the type surface but
+not yet executable. File watching runs on [`@netscript/watchers`](/reference/watchers/); ingress
+and processing run on `@netscript/plugin-triggers-core/runtime`. Add the plugin with
+[Add a plugin](/orchestration-runtime/how-to/add-a-plugin/).
 
-## Learn / Do
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Learn — Ingest a webhook",
-    body: "Storefront Track A, rung 05: scaffold the triggers plugin, author a webhook, POST to :8093, and watch it enqueue a job — closing the continuous-app ladder.",
-    href: "/tutorials/storefront/05-shipping-webhook/",
-    icon: "→"
-  },
-  {
-    title: "Do — Add a plugin",
-    body: "The how-to recipe for public plugin package install and the local netscript-dev contributor path for source-backed trigger samples.",
-    href: "/orchestration-runtime/how-to/add-a-plugin/",
-    icon: "◆"
-  }
-] }) }}
+{{ comp callout { type: "important", title: "Webhook ingress is a raw route" } }}
+Like <a href="/services-sdk/services/">services</a>, <a href="/background-processing/workers/">workers</a> and <a href="/durable-workflows/sagas/">sagas</a>, the triggers API serves a <strong>typed v1 oRPC contract</strong> to describe triggers, list and fetch triggers and events, fire a trigger, test a webhook, preview a schedule, enable or disable a trigger, and subscribe to an SSE event stream. The <strong>webhook ingress endpoint</strong> (<code>POST /api/v1/webhooks/:triggerId</code>, plus a legacy <code>GET /api/v1/events</code>) is the exception: it is a raw, signature-verifying route, because it verifies an HMAC over the raw request bytes, which oRPC's Zod body parsing does not allow. Any third-party sender can POST to the plain URL without a NetScript client.
+{{ /comp }}
 
 ## Minimal example — a verified payment webhook
 
-The 80% case: a webhook that verifies an HMAC signature, then fans the inbound
-payment event out to a single durable job. The handler returns immediately; the
-real work runs on the [workers](/background-processing/workers/) plugin.
+This webhook verifies an HMAC signature, then hands the payment event to one durable job. The
+handler returns immediately; the work runs on the [workers](/background-processing/workers/)
+plugin.
 
 ```ts
 // plugins/triggers/payment-status-webhook.ts
@@ -120,11 +82,9 @@ export const paymentStatusWebhook = defineWebhook(
 export default paymentStatusWebhook;
 ```
 
-## Key types first — the webhook definition
+## The webhook definition
 
-`defineWebhook(handler, spec)` takes your handler and a static `WebhookSpec`. These
-are the **actual** fields the builder accepts (confirmed via `deno doc`), shown
-before any prose so you can read the contract at a glance.
+`defineWebhook(handler, spec)` takes your handler and a static `WebhookSpec` with these fields:
 
 {{ comp.apiTable({
   caption: "WebhookSpec — the second argument to defineWebhook(handler, spec)",
@@ -139,20 +99,22 @@ before any prose so you can read the contract at a glance.
   ]
 }) }}
 
-The handler receives a `TriggerEvent<'webhook', WebhookTriggerPayload>`. The payload
-carries the captured HTTP request: `body` (parsed/raw), `headers`, `method` (always
-`"POST"`), `path`, and an optional `remoteAddr`. The event envelope also surfaces
-`idempotencyKey`, `traceparent`/`tracestate`, and `requestHeaders` — so de-duplicating
-sender retries is a one-liner, as in the example above.
+`retry` belongs to the returned definition, not this builder spec. See
+[per-trigger retry policy](#per-trigger-retry-policy) for the supported override and discovery limit.
 
-## HMAC verification — proving the sender
+The handler receives a `TriggerEvent<'webhook', WebhookTriggerPayload>`. The payload carries the
+captured HTTP request: `body` (parsed/raw), `headers`, `method` (always `"POST"`), `path`, and an
+optional `remoteAddr`. The event envelope also carries `idempotencyKey`,
+`traceparent`/`tracestate`, and `requestHeaders`, so the example above de-duplicates sender retries
+in one line.
+
+## HMAC verification
 
 `verifier: 'hmac-sha256'` activates the `HmacSha256WebhookVerifier` adapter from
-`@netscript/plugin-triggers-core/adapters`. Ingress hashes the raw request body with
-the secret (resolved from `secretEnv`) and compares it against the signature header
-*before* persisting the event or running your handler — a bad signature is rejected at
-the edge. The `'memory'` verifier (`MemoryWebhookVerifier`) accepts everything and is
-for local iteration only.
+`@netscript/plugin-triggers-core/adapters`. Ingress hashes the raw request body with the secret
+resolved from `secretEnv`, and compares the result with the signature header *before* it persists
+the event or runs your handler, so a bad signature is rejected at the edge. The `'memory'` verifier
+(`MemoryWebhookVerifier`) accepts everything and is for local iteration only.
 
 {{ comp.apiTable({
   caption: "HmacSha256WebhookVerifier — constructor options (from @netscript/plugin-triggers-core/adapters)",
@@ -163,22 +125,18 @@ for local iteration only.
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "How the verifier is wired" } }}
-You rarely construct the adapter yourself. The webhook spec declares
-<code>verifier: 'hmac-sha256'</code> and <code>secretEnv</code>, and the ingress runtime
-(<code>createTriggerIngress</code>) resolves the secret and selects the verifier per
-definition (its <code>verifier</code>, <code>selectVerifier</code>, and
-<code>resolveSecret</code> options). The verifier's <code>verify(request)</code> returns
-<code>{ ok, idempotencyKey?, reason? }</code> — <code>ok: false</code> stops the event at the edge.
-{{ /comp }}
+You rarely construct the adapter yourself. The webhook spec declares `verifier: 'hmac-sha256'` and
+`secretEnv`, and the ingress runtime (`createTriggerIngress`) resolves the secret and selects the
+verifier per definition through its `verifier`, `selectVerifier`, and `resolveSecret` options. The
+verifier's `verify(request)` returns `{ ok, idempotencyKey?, reason? }`; `ok: false` stops the
+event at the edge.
 
-## File-watch triggers — react to dropped files
+## File-watch triggers
 
-`defineFileWatch(handler, spec)` turns filesystem events into the same durable-work
-pipeline. The watching primitive lives in [`@netscript/watchers`](/reference/watchers/);
-the trigger builder wraps it so a dropped file becomes a handler invocation that
-returns `enqueueJob` actions. Below: a CSV drop-folder that enqueues one import job per
-stable file.
+`defineFileWatch(handler, spec)` feeds filesystem events into the same durable-work pipeline. It
+wraps the watching primitive from [`@netscript/watchers`](/reference/watchers/), so a dropped file
+becomes a handler call that returns `enqueueJob` actions. This drop folder enqueues one import job
+per stable CSV file:
 
 ```ts
 // plugins/triggers/product-import.ts
@@ -232,15 +190,36 @@ export default productImportWatch;
   ]
 }) }}
 
-The handler receives a `TriggerEvent<'file-watch', FileWatchTriggerPayload>`; the
-payload carries `path`, `kind` (the lifecycle event), and — when the watcher could read
-them — `size`, `modifiedAt`, and `stableChecks`.
+`retry` belongs to the returned definition, not this builder spec. See
+[per-trigger retry policy](#per-trigger-retry-policy) for the supported override and discovery limit.
+
+The handler receives a `TriggerEvent<'file-watch', FileWatchTriggerPayload>`. The payload carries
+`path`, `kind` (the lifecycle event), and, when the watcher could read them, `size`, `modifiedAt`,
+and `stableChecks`.
+
+File-watch triggers default to **in-flight deduplication**: their completed deduplication TTL is
+`0`, rather than the 24-hour default for webhook and scheduled triggers. Concurrent observations
+of the same change share an active claim, so only one handler runs. Once processing completes,
+another observation is eligible again, even if its metadata is unchanged.
+
+When both modification time and size are available, the adapter sets `event.idempotencyKey` to a
+bounded SHA-256 identity of `(triggerId, path, kind, modifiedAt, size)`. A different path, lifecycle
+kind, modification time, size, or trigger gets a different key. When either metadata field is
+missing, each observation gets a UUID key; identical payloads cannot establish that two changes
+are duplicates. Callback timestamps and process-local event counters are not change identities.
+An explicit `deduplication.ttlMs` on a composed `FileWatchDefinition` overrides the default;
+`deduplication.key(event)` retains precedence over the adapter key.
+
+The CSV example deliberately sets the worker action's key to the path for one import per file
+path within the worker's deduplication window. To enqueue work for each distinct change, use
+`event.idempotencyKey`, or omit the action key to inherit it. Worker deduplication and the
+underlying watcher's debounce, stability, and content-hash filters have their own policies.
 
 ### The underlying watcher
 
-For lower-level or standalone file watching (outside the trigger pipeline), call
-`createWatcher(options)` from `@netscript/watchers` directly. It returns a `FileWatcher`
-whose `watch()` is an async generator of `WatchEvent`s.
+For standalone file watching outside the trigger pipeline, call `createWatcher(options)` from
+`@netscript/watchers`. It returns a `FileWatcher` whose `watch()` is an async generator of
+`WatchEvent`s.
 
 ```ts
 // scripts/watch-incoming.ts
@@ -276,20 +255,25 @@ for await (const event of watcher.watch()) {
   ]
 }) }}
 
-The watcher selects the strategy for you: native OS notifications for local paths,
-polling for network paths or when `forcePolling: true`, and a `HybridStrategy` that
-blends both. Events pass a filter pipeline before you see them — `GlobFilter` limits
-filenames, `DebounceFilter` collapses rapid burst events per path, `StabilityFilter`
-waits for files to stop growing, and `DedupFilter` skips repeated content hashes
-within its window. The concrete `NativeStrategy`, `PollingStrategy`, and `HybridStrategy`
-classes are internal; construct watchers with `createWatcher` or `new FileWatcher(...)`.
+The watcher picks a strategy: native OS notifications for local paths, polling for network paths or
+when `forcePolling: true`, and a `HybridStrategy` that blends both. Events then pass a filter
+pipeline:
+
+| Filter | Effect |
+| --- | --- |
+| `GlobFilter` | Limits events to matching filenames. |
+| `DebounceFilter` | Collapses rapid bursts of events per path. |
+| `StabilityFilter` | Waits for files to stop growing. |
+| `DedupFilter` | Skips repeated content hashes within its window. |
+
+The `NativeStrategy`, `PollingStrategy`, and `HybridStrategy` classes are internal. Construct
+watchers with `createWatcher` or `new FileWatcher(...)`.
 
 ## Scheduled triggers — cron without a daemon
 
-`defineScheduledTrigger(handler, spec)` fires a handler on a cron schedule. The spec
-combines discovery metadata (`id`, `description`, `tags`, `metadata`) with the cron
-`ScheduledTriggerSpec`. The scheduler runs inside the trigger processor entrypoint, not
-the Hono API service.
+`defineScheduledTrigger(handler, spec)` fires a handler on a cron schedule. The spec combines
+discovery metadata (`id`, `description`, `tags`, `metadata`) with the cron `ScheduledTriggerSpec`.
+The scheduler runs inside the trigger processor entrypoint, not the Hono API service.
 
 ```ts
 // plugins/triggers/nightly-reconcile.ts
@@ -328,31 +312,74 @@ export default nightlyReconcile;
   ]
 }) }}
 
+`DefineScheduledTriggerSpec` likewise does not accept `retry`. Use the same
+[definition-level retry override](#per-trigger-retry-policy) as webhook and file-watch triggers.
+
+## Per-trigger retry policy
+
+The processor reads `TriggerDefinition.retry`, a full `TriggerRetryPolicy`; if it is absent, it
+uses `defaultRetryPolicy()`. The three builder specs (`WebhookSpec`, `FileWatchSpec`, and
+`DefineScheduledTriggerSpec`) currently expose no `retry` input and do not copy one into their
+results. Adding it to a builder's second argument is not a supported override.
+
+Keep the builder result private and export only the configured definition. All five required
+policy fields are explicit because a definition policy replaces the default; it is not merged:
+
+```ts
+// triggers/retrying-webhook.ts
+import { defineWebhook } from '@netscript/plugin-triggers-core/builders';
+import type { TriggerRetryPolicy } from '@netscript/plugin-triggers-core/domain';
+
+const retryPolicy = Object.freeze({
+  maxAttempts: 4,
+  initialDelayMs: 250,
+  maxDelayMs: 5000,
+  backoffMultiplier: 2,
+  jitter: true,
+}) satisfies TriggerRetryPolicy;
+
+const base = defineWebhook(
+  () => Promise.resolve([]), // Replace with the handler that enqueues your work.
+  { id: 'retrying-webhook', path: 'retrying', verifier: 'memory' },
+);
+
+// Export one definition per id; exporting base as well could overwrite this policy.
+export default Object.freeze({ ...base, retry: retryPolicy }) satisfies typeof base;
+```
+
+The `'memory'` verifier is only for local development; use HMAC verification for external callers.
+Put the module directly in `triggers/` and run `netscript generate plugins` to refresh the runtime
+registry. That registry loads the default export, so the override reaches the processor. Static
+contribution discovery recognizes direct exported builder calls and does not list this wrapped
+export in its contribution counts. A manual barrel fallback must explicitly re-export a default
+as a named export (`export { default as retryingWebhook } from './retrying-webhook.ts'`);
+`export *` omits defaults. The generated runtime registry is the normal path.
+
 ## Supported trigger actions
 
-Every trigger handler returns **actions** — declarative descriptions of what should
-happen after the event is accepted. The runtime processor reads each action and
-dispatches it. Both action variants are wired end-to-end: jobs enqueue immediately, while deferred
-events are persisted and replayed once their due time arrives.
+Every trigger handler returns **actions** that describe what happens after the event is accepted.
+The runtime processor reads and dispatches each one. Jobs enqueue immediately; deferred events are
+persisted and replayed when their due time arrives.
 
 {{ comp.apiTable({
   caption: "Trigger actions — what the runtime processor actually does",
   rows: [
-    { name: "enqueueJob(job, opts)", type: "✅ live", desc: "Hands the payload to the workers plugin. The supported, end-to-end path — it closes the continuous-app loop (event → job → saga). opts: { payload?, idempotencyKey?, concurrencyKey?, priority? }." },
-    { name: "defer({ until })", type: "✅ live", desc: "Persists the processed event for one-shot replay at or after the ISO timestamp. Pending records survive runtime restarts; successful replay removes the record." }
+    { name: "enqueueJob(job, opts)", type: "live", desc: "Hands the payload to the workers plugin, which continues the event → job → saga chain. opts: { payload?, idempotencyKey?, concurrencyKey?, priority? }." },
+    { name: "defer({ until })", type: "live", desc: "Persists the processed event for one-shot replay at or after the ISO timestamp. Pending records survive runtime restarts; successful replay removes the record." }
   ]
 }) }}
 
-Deferred replay is durable and at-least-once. The runtime persists the event before reporting
-<code>deferred</code>, resolves its current trigger definition after restart, and deletes the record
-only after successful replay. Keep handlers idempotent because a crash after dispatch but before
-record deletion can replay the event again.
+Deferred replay is durable and at-least-once. The runtime persists the event before it reports
+`deferred`, resolves the current trigger definition after a restart, and deletes the record only
+after a successful replay. Keep handlers idempotent: a crash after dispatch but before record
+deletion replays the event again. Use `defer` for one-shot replay and a `defineScheduledTrigger`
+cron for recurring work.
 
 ## Runtime — ingress, processor, retry
 
-The trigger runtime (`@netscript/plugin-triggers-core/runtime`) assembles the pieces
-the API service and background processor use. You configure these when wiring a custom
-host; the scaffold wires them for you.
+The trigger runtime (`@netscript/plugin-triggers-core/runtime`) assembles the pieces that the API
+service and background processor use. The scaffold wires them; you configure them only when you
+wire a custom host.
 
 {{ comp.apiTable({
   caption: "Trigger runtime entry points (from @netscript/plugin-triggers-core/runtime)",
@@ -363,23 +390,19 @@ host; the scaffold wires them for you.
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Where the background work runs" } }}
-The triggers API service (port <code>8093</code>) is the HTTP edge — it hosts
-<code>createTriggerIngress</code> behind a raw Hono router. The actual trigger
-processing — cron, file-watch, and DLQ handling — runs in a separate background
-processor entrypoint at <code>plugins/triggers/src/runtime/trigger-processor.ts</code>. Aspire wires
-both as resources (<code>triggers-api</code> and <code>trigger-processor</code>) when you <code>aspire start</code>.
-{{ /comp }}
+The triggers API service exposes a typed oRPC management contract and hosts `createTriggerIngress` behind a raw Hono
+router. Cron, file-watch, and DLQ processing run in a separate background processor entrypoint,
+`plugins/triggers/src/runtime/trigger-processor.ts`. `aspire start` runs both as resources,
+`triggers-api` and `trigger-processor`.
 
-## Endpoints & port
+## Endpoints
 
-The triggers API service runs on **`:8093`**. The webhook router resolves the inbound
-`:triggerId` segment against your registered `defineWebhook` definitions — so a
-definition with `path: 'payments/status'` is reachable at
-`POST :8093/api/v1/webhooks/payments/status`.
+The triggers API service runs on its assigned port. The webhook router resolves the inbound
+`:triggerId` segment against your registered `defineWebhook` definitions, so a definition with
+`path: 'payments/status'` answers at `POST /api/v1/webhooks/payments/status`.
 
 {{ comp.apiTable({
-  caption: "Triggers API — runtime surface (port 8093, Hono)",
+  caption: "Triggers API — runtime surface (Hono, on its assigned port)",
   rows: [
     { name: "POST /api/v1/webhooks/:triggerId", type: "Hono route", desc: "Generic dispatch — :triggerId matches the path of any registered defineWebhook definition. Verifies, persists, responds 202 Accepted." },
     { name: "POST /api/v1/webhooks/inbound/generic", type: "Hono route", desc: "The scaffold's generic inbound webhook. Posting JSON here resolves trigger id 'inbound/generic' and runs its actions." },
@@ -388,24 +411,18 @@ definition with `path: 'payments/status'` is reachable at
   ]
 }) }}
 
-## Author + call a trigger
+## Author and call a trigger
 
-The simple case is one webhook that fans an inbound request out to a single job. The
-advanced case validates the payload first, then enqueues. The simple case is adapted
-from the scaffold's `plugins/triggers/generic-webhook.ts` sample and compiles as-is; the
-advanced tab is an illustrative pattern, not scaffold code — the real
+The simple tab sends an inbound request to one job; it is adapted from the scaffold's
+`plugins/triggers/generic-webhook.ts` sample and compiles as-is. The advanced tab validates the
+payload first, then enqueues. It is an illustrative pattern, not scaffold code: the real
 `plugins/triggers/webhook-validate-data.ts` is an accept-and-drop sample
-(`() => Promise.resolve([])`) that imports no zod and enqueues no job. Every handler
-returns an array of `enqueueJob` actions — the only supported trigger action.
+(`() => Promise.resolve([])`) that imports no zod and enqueues no job.
 
-{{ comp callout { type: "note", title: "ns-workers is a shorthand you install once" } }}
-<code>ns-workers</code> is a name <em>you</em> give the workers plugin's CLI — the scaffold does
-not create it. Install it once, globally, and the <code>ns-workers</code> command below
-works as written:
+{{ comp callout { type: "note", title: "Install ns-workers once" } }}
+<code>ns-workers</code> is a name <em>you</em> give the workers plugin's CLI; the scaffold does not create it. Install it once, globally, and the <code>ns-workers</code> command below works as written:
 <pre><code class="language-bash">deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli</code></pre>
-Rather not install it? <code>ns-workers &lt;verb …&gt;</code> is exactly
-<code>deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> — run
-that full form instead.
+Without the install, run <code>deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> in place of <code>ns-workers &lt;verb …&gt;</code>.
 {{ /comp }}
 
 {{ comp.tabbedCode({ tabs: [
@@ -422,84 +439,34 @@ that full form instead.
   {
     label: "Call it — curl",
     lang: "bash",
-    code: "# Triggers API runs on its assigned port. POST to the webhook's resolved path.\n# Replace <triggers-port> with your assigned triggers API port.\ncurl -X POST http://localhost:<triggers-port>/api/v1/webhooks/inbound/generic \\\n  -H 'content-type: application/json' \\\n  -d '{\"verbose\": false}'\n\n# Watch the resulting ingress events:\ncurl 'http://localhost:<triggers-port>/api/v1/events?limit=10'\n\n# The enqueued job lands on the workers plugin (on its assigned port):\nns-workers executions --limit=10 --json"
+    code: "# Triggers API runs on its assigned port. POST to the webhook's resolved path.\n# Replace <triggers-port> with your assigned triggers API port.\ncurl -X POST \"$TRIGGERS_URL/api/v1/webhooks/inbound/generic\" \\\n  -H 'content-type: application/json' \\\n  -d '{\"verbose\": false}'\n\n# Watch the resulting ingress events:\ndeno x -A jsr:@netscript/plugin-triggers" + releaseSpecifier + "/cli events --limit=10 --json\n\n# The enqueued job lands on the workers plugin (on its assigned port):\nns-workers executions --limit=10 --json"
   }
 ] }) }}
 
 ## How it wires to the rest of the app
 
-This is the last rung of the continuous-app thread. The `generic-inbound-webhook`
-enqueues the workers health-check job; the `create-user-settings` job (authored in the
-[background jobs](/background-processing/workers/) tutorial) publishes a
-`UserSettingsCreated` saga message; the saga from the
-[durable workflow](/durable-workflows/sagas/) tutorial handles it. One inbound POST
-drives the whole chain — and every link is real scaffold code that compiles.
+One inbound POST drives the scaffold's whole chain, and every link is scaffold code that compiles.
+The `generic-inbound-webhook` enqueues the workers health-check job. The `create-user-settings`
+job, from the [background jobs](/background-processing/workers/) page, publishes a
+`UserSettingsCreated` saga message, and the [saga](/durable-workflows/sagas/) handles it.
 
 ## Production notes
 
-{{ comp callout { type: "warning", title: "Production pitfalls" } }}
-<ul>
-<li><strong>Never ship the <code>'memory'</code> verifier publicly.</strong> It accepts any POST so
-you can iterate fast. Before exposing a webhook, set <code>verifier: 'hmac-sha256'</code> and a
-<code>secretEnv</code> so only a sender holding the secret can enqueue work.</li>
-<li><strong>The signing secret lives in env, not the definition.</strong> <code>secretEnv</code>
-names the env var; the runtime resolves it (<code>resolveSecret</code>) at ingress. Keep the secret
-out of source and out of the definition object.</li>
-<li><strong>Return fast, work later.</strong> A handler should verify, validate, and
-<code>enqueueJob</code> — not do the work inline. Webhook senders time out and retry; durable
-processing belongs on the workers plugin.</li>
-<li><strong>De-dupe sender retries.</strong> Pass <code>idempotencyKey</code> (the event's key, or a
-stable field) to <code>enqueueJob</code> so a retried POST collapses to one job.</li>
-<li><strong>File watches need stability on network shares.</strong> Set
-<code>stabilityThreshold</code> so a half-written CSV does not fire mid-copy; use
-<code>forcePolling</code> on the underlying watcher for network filesystems that miss native events.</li>
-<li><strong>Use <code>defer</code> for one-shot event replay, not recurring schedules.</strong> The
-record survives restart and re-runs the handler at or after <code>until</code>; use a
-<code>defineScheduledTrigger</code> cron for recurring work.</li>
-</ul>
+{{ comp callout { type: "caution", title: "Never ship the memory verifier" } }}
+The <code>'memory'</code> verifier accepts any POST. Before you expose a webhook, set <code>verifier: 'hmac-sha256'</code> and a <code>secretEnv</code>, so only a sender that holds the secret can enqueue work. Keep the secret in the environment variable that <code>secretEnv</code> names, never in source or in the definition object; the runtime resolves it at ingress with <code>resolveSecret</code>.
 {{ /comp }}
 
-## Where ingress lives, compared
+- **Return fast, work later.** A handler verifies, validates, and calls `enqueueJob`; it does not
+  do the work inline. Webhook senders time out and retry, so durable processing belongs on the
+  workers plugin.
+- **De-duplicate sender retries.** Pass `idempotencyKey`, the event's key or a stable field, to
+  `enqueueJob`, so a retried POST collapses to one job.
+- **Stabilize file watches on network shares.** Set `stabilityThreshold` so a half-written CSV does
+  not fire mid-copy. Use `forcePolling` on the underlying watcher for network filesystems that miss
+  native events.
 
-Inngest — the closest neighbor for this event-to-work shape — models ingress as events sent to its
-platform: your app or a webhook transform sends events to Inngest's event API, and Inngest invokes
-the matching functions over HTTP, owning the scheduling and retry loop. A NetScript trigger keeps
-the same shape inside your workspace: the definition is a TypeScript file the runtime walker
-discovers, ingress is your own `:8093` service verifying HMAC over the raw request bytes, and the
-retry policy, event store, and dead-letter queue run in your trigger processor under Aspire. The
-difference to weigh is operational locus, not capability count — with triggers, the pieces that
-decide whether an event becomes work are resources in your own Aspire graph, inspectable in your
-own telemetry, and yours to run.
+## Next steps
 
-## Reference
-
-{{ comp.xref({ key: "ref:triggers" }) }}
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Look up — triggers core reference",
-    body: "The full generated API surface for the triggers unit: builders (defineWebhook / defineFileWatch / defineScheduledTrigger), runtime (ingress + processor), adapters (HMAC verifier), and the Hono router types.",
-    href: "/reference/triggers/",
-    icon: "≡"
-  },
-  {
-    title: "Look up — watchers reference",
-    body: "createWatcher, FileWatcher, strategies (native/polling/hybrid), and the GlobFilter / StabilityFilter / DedupFilter pipeline.",
-    href: "/reference/watchers/",
-    icon: "≡"
-  },
-  {
-    title: "Do — Background jobs",
-    body: "Where the enqueued work runs: defineJobHandler, worker runtimes, and the enqueue path triggers hand off to.",
-    href: "/background-processing/workers/",
-    icon: "◆"
-  },
-  {
-    title: "Understand — Durable sagas",
-    body: "The next link in the chain: how an enqueued job's saga message advances a durable workflow.",
-    href: "/durable-workflows/sagas/",
-    icon: "◎"
-  }
-] }) }}
-
-{{ comp.nextPrev({ prev: { label: "Durable sagas", href: "/durable-workflows/sagas/" }, next: { label: "Durable streams", href: "/durable-workflows/streams/" } }) }}
+Build a verified shipping webhook end to end in the
+[storefront tutorial](/tutorials/storefront/05-shipping-webhook/). The full API is in the
+{{ comp.xref({ key: "ref:triggers", text: "triggers reference" }) }}.

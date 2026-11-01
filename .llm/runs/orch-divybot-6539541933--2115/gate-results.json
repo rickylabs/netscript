@@ -1,0 +1,46 @@
+{
+  "note": "Source working tree validated before implementation commit. Compact projections of native receipts; not an evidence-set sufficiency claim. Raw local receipts include command output hashes.",
+  "gates": [
+    {
+      "gateId": "quality-gate",
+      "argv": [
+        "deno",
+        "task",
+        "quality:gate"
+      ],
+      "gitHead": "e383cf08dec4d724b05e27703829bafd163b90a4",
+      "outcome": "PASS",
+      "durationMs": 17239,
+      "exitCode": 0
+    },
+    {
+      "gateId": "publish-dry-run",
+      "argv": [
+        "deno",
+        "task",
+        "publish:dry-run",
+        "--member",
+        "packages/auth-kv-oauth"
+      ],
+      "gitHead": "e383cf08dec4d724b05e27703829bafd163b90a4",
+      "outcome": "PASS",
+      "durationMs": 7649,
+      "exitCode": 0
+    },
+    {
+      "gateId": "doc-lint",
+      "argv": [
+        "deno",
+        "task",
+        "doc:lint",
+        "--root",
+        "packages/auth-kv-oauth",
+        "--pretty"
+      ],
+      "gitHead": "e383cf08dec4d724b05e27703829bafd163b90a4",
+      "outcome": "FAIL",
+      "durationMs": 1848,
+      "exitCode": 1
+    }
+  ]
+}

@@ -1,9 +1,7 @@
 /**
- * App-owned snapshot of the @netscript/fresh-ui registry catalog, for the
- * /design/components gallery. Generated from registry/manifest.ts
- * (fresh-ui-foundation v0.1.0); regenerate when the registry changes.
+ * App-owned registry catalog for /design/components.
+ * Generated from packages/fresh-ui/registry.manifest.ts by gen:assets-barrel.
  */
-
 export type RegistryItemKind =
   | 'theme'
   | 'style'
@@ -27,444 +25,614 @@ export interface RegistryCatalogCollection {
 }
 
 export const registryMeta = {
-  name: 'fresh-ui-foundation',
-  version: '0.1.0',
-  packageName: '@netscript/fresh-ui',
-  total: 66,
+  'name': 'fresh-ui-foundation',
+  'version': '0.1.0',
+  'packageName': '@netscript/fresh-ui',
+  'total': 91,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
   {
-    name: 'cn',
-    kind: 'lib',
-    layer: null,
-    description: 'Shared class-name merge helper for copied registry components.',
+    'name': 'theme-ns-one',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'ns-one language preset; fixed comfortable density (Comfortable Figma geometry).',
   },
   {
-    name: 'public-types',
-    kind: 'lib',
-    layer: null,
-    description: 'Shared renderable and component result types for copied registry components.',
+    'name': 'theme-studio-utility',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'studio-utility language preset; fixed compact density (Compact Figma geometry).',
   },
   {
-    name: 'control-props',
-    kind: 'support',
-    layer: 2,
-    description: 'Control-prop narrowing helpers used by registry verification and form seams.',
+    'name': 'theme-studio-cloud',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'studio-cloud language preset; fixed comfortable density (Comfortable Figma geometry).',
   },
   {
-    name: 'form-control-styles',
-    kind: 'style',
-    layer: 2,
-    description: 'Shared input, select, and textarea control CSS blocks.',
+    'name': 'theme-studio-workshop',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'studio-workshop language preset; fixed comfortable density (Chunky Figma geometry).',
   },
   {
-    name: 'choice-styles',
-    kind: 'style',
-    layer: 2,
-    description: 'Shared choice-control CSS blocks for checkbox and switch seams.',
+    'name': 'theme-studio-playful',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'studio-playful language preset; fixed comfortable density (Chunky Figma geometry).',
   },
   {
-    name: 'surface-styles',
-    kind: 'style',
-    layer: 2,
-    description: 'Shared card and panel surface CSS blocks.',
+    'name': 'theme-studio-ledger',
+    'kind': 'theme',
+    'layer': null,
+    'description': 'studio-ledger language preset; fixed compact density (Dense Figma geometry).',
   },
   {
-    name: 'sheet-styles',
-    kind: 'style',
-    layer: 2,
-    description: 'Platform dialog sheet CSS blocks for package-owned sheet runtime.',
+    'name': 'theme-studio-atelier',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'studio-atelier language preset; fixed comfortable density (Airy Figma geometry).',
   },
   {
-    name: 'floating-styles',
-    kind: 'style',
-    layer: 2,
-    description:
+    'name': 'theme-studio-signal',
+    'kind': 'theme',
+    'layer': null,
+    'description': 'studio-signal language preset; fixed compact density (Dense Figma geometry).',
+  },
+  {
+    'name': 'theme-tonal',
+    'kind': 'theme',
+    'layer': null,
+    'description': 'tonal language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-bloom',
+    'kind': 'theme',
+    'layer': null,
+    'description': 'bloom language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-cupertino',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'cupertino language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-liquid',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'liquid language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-fluent',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'fluent language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-brutal',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'brutal language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-filigrane',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'filigrane language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-terminal',
+    'kind': 'theme',
+    'layer': null,
+    'description': 'terminal language preset; fixed compact density (Compact Figma geometry).',
+  },
+  {
+    'name': 'theme-pixel',
+    'kind': 'theme',
+    'layer': null,
+    'description': 'pixel language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-tactile',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'tactile language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'cn',
+    'kind': 'lib',
+    'layer': null,
+    'description': 'Shared class-name merge helper for copied registry components.',
+  },
+  {
+    'name': 'public-types',
+    'kind': 'lib',
+    'layer': null,
+    'description': 'Shared renderable and component result types for copied registry components.',
+  },
+  {
+    'name': 'control-props',
+    'kind': 'support',
+    'layer': 2,
+    'description': 'Control-prop narrowing helpers used by registry verification and form seams.',
+  },
+  {
+    'name': 'form-control-styles',
+    'kind': 'style',
+    'layer': 2,
+    'description': 'Shared input, select, and textarea control CSS blocks.',
+  },
+  {
+    'name': 'choice-styles',
+    'kind': 'style',
+    'layer': 2,
+    'description': 'Shared choice-control CSS blocks for checkbox and switch seams.',
+  },
+  {
+    'name': 'surface-styles',
+    'kind': 'style',
+    'layer': 2,
+    'description': 'Shared card and panel surface CSS blocks.',
+  },
+  {
+    'name': 'sheet-styles',
+    'kind': 'style',
+    'layer': 2,
+    'description': 'Platform dialog sheet CSS blocks for package-owned sheet runtime.',
+  },
+  {
+    'name': 'floating-styles',
+    'kind': 'style',
+    'layer': 2,
+    'description':
       'Popover API and CSS anchor-positioning styles with fixed/inset fallback for package-owned floating runtimes.',
   },
   {
-    name: 'alert-styles',
-    kind: 'style',
-    layer: 2,
-    description: 'Shared alert and inline-notice feedback CSS blocks.',
+    'name': 'alert-styles',
+    'kind': 'style',
+    'layer': 2,
+    'description': 'Shared alert and inline-notice feedback CSS blocks.',
   },
   {
-    name: 'theme-seed',
-    kind: 'theme',
-    layer: null,
-    description:
+    'name': 'theme-seed',
+    'kind': 'theme',
+    'layer': null,
+    'description':
       'NS One theme: DTCG-generated token artifacts plus base element styles. Components consume only the semantic --ns-* vocabulary this theme provides.',
   },
   {
-    name: 'layout-objects',
-    kind: 'style',
-    layer: 2,
-    description:
+    'name': 'theme-previews',
+    'kind': 'lib',
+    'layer': null,
+    'description': 'Opt-in stylesheets for development-only design preset previews.',
+  },
+  {
+    'name': 'layout-objects',
+    'kind': 'style',
+    'layer': 2,
+    'description':
       'Theme-independent CSS layout objects — Shell, Stack, Cluster, Grid, Switcher, Cover, Sidebar, Section, Split, Toolbar, ScrollRegion, ContentRail, and the dashboard scaffold — consuming only semantic spacing and color tokens.',
   },
   {
-    name: 'button',
-    kind: 'component',
-    layer: 2,
-    description: 'Generic action primitive using semantic theme classes.',
+    'name': 'button',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Generic action primitive using semantic theme classes.',
   },
   {
-    name: 'icon-button',
-    kind: 'component',
-    layer: 2,
-    description: 'Accessible icon-only action button built on the shared Button seam.',
+    'name': 'icon-button',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Accessible icon-only action button built on the shared Button seam.',
   },
   {
-    name: 'input',
-    kind: 'component',
-    layer: 2,
-    description: 'Generic text input with token-driven error styling.',
+    'name': 'input',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Generic text input with token-driven error styling.',
   },
   {
-    name: 'textarea',
-    kind: 'component',
-    layer: 2,
-    description: 'Generic multi-line text input with the shared field styling contract.',
+    'name': 'textarea',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Generic multi-line text input with the shared field styling contract.',
   },
   {
-    name: 'checkbox',
-    kind: 'component',
-    layer: 2,
-    description: 'CSS-first native checkbox seam with inline label and helper copy.',
+    'name': 'checkbox',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'CSS-first native checkbox seam with inline label and helper copy.',
   },
   {
-    name: 'switch',
-    kind: 'component',
-    layer: 2,
-    description: 'CSS-first native switch seam for binary dashboard settings.',
+    'name': 'switch',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'CSS-first native switch seam for binary dashboard settings.',
   },
   {
-    name: 'label',
-    kind: 'component',
-    layer: 2,
-    description: 'Accessible field label with required-state support.',
+    'name': 'label',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Accessible field label with required-state support.',
   },
   {
-    name: 'select',
-    kind: 'component',
-    layer: 2,
-    description: 'Native select wrapper with semantic token styling.',
+    'name': 'select',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native select wrapper with semantic token styling.',
   },
   {
-    name: 'form-field',
-    kind: 'component',
-    layer: 2,
-    description: 'Composed field wrapper for labels, help text, and errors.',
+    'name': 'form-field',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Composed field wrapper for labels, help text, and errors.',
   },
   {
-    name: 'card',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'card',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'Primary content surface with header/body/footer sub-seams for dashboard composition.',
   },
   {
-    name: 'panel',
-    kind: 'component',
-    layer: 2,
-    description: 'Dense secondary surface for filters, rails, and grouped operational controls.',
+    'name': 'panel',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Dense secondary surface for filters, rails, and grouped operational controls.',
   },
   {
-    name: 'badge',
-    kind: 'component',
-    layer: 2,
-    description: 'Compact semantic status seam for tags, counts, and entity state labels.',
+    'name': 'badge',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Compact semantic status seam for tags, counts, and entity state labels.',
   },
   {
-    name: 'avatar',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'avatar',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'Identity chip for a person or agent — initials or image with size, presence, and agent variants.',
   },
   {
-    name: 'citation-chip',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'citation-chip',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'Inline per-claim source marker [n] that pairs with a sources list — the grounded-agent citation UX.',
   },
   {
-    name: 'code-block',
-    kind: 'component',
-    layer: 2,
-    description:
-      'Fenced code surface with filename/language header and a copy affordance for assistant messages.',
+    'name': 'code-block',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'Syntax-highlighted code surface with filename/language header and a copy affordance for assistant messages.',
   },
   {
-    name: 'model-selector',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'model-selector',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'Disclosure-backed model/provider picker for the prompt composer (native <details>).',
   },
   {
-    name: 'tool-call-card',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'tool-call-card',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'Inline MCP/tool invocation + result as a native <details> disclosure with status badge and IO panel.',
   },
   {
-    name: 'chart-block',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'chart-block',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'Inline token-driven metric chart — horizontal bars or a vertical column chart with y-axis ticks and data-tone intents.',
   },
   {
-    name: 'donut',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'donut',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'Token-driven donut/pie chart — SVG arc segments with a center total and legend; segment colors from data-tone or a semantic-token cycle.',
   },
   {
-    name: 'prompt-input',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'prompt-input',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'Chat composer: auto-grow textarea with a toolbar of research/grounding pills, model picker, attach/screenshot/voice, and send.',
   },
   {
-    name: 'message',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'message',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'Chat message: author/time, inline-markup body (bold/code/[n] citations), tool-call + chart/code blocks, follow-up chips, and a typing indicator. Exports renderInline + TypingIndicator.',
   },
   {
-    name: 'markdown',
-    kind: 'component',
-    layer: 3,
-    description:
+    'name': 'markdown',
+    'kind': 'component',
+    'layer': 3,
+    'description':
       'Sanitized GFM + math + syntax-highlighted renderer for streamed assistant output — direct unified/rehype-react rendering through the Preact JSX runtime with remark-gfm/remark-math/remarkCitations, rehype-katex/rehype-highlight, and a MANDATORY rehype-sanitize content pass.',
   },
   {
-    name: 'command-palette',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'command-palette',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'Modal ⌘K command palette — the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts.',
   },
   {
-    name: 'search',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'search',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'Compact nav search affordance — a button styled as an input with a ⌘K hint that opens the command palette.',
   },
   {
-    name: 'dropzone',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'dropzone',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'File-drop affordance — a dashed drop target (label/hint/icon) that wraps a native file input; drag-over via data-active.',
   },
   {
-    name: 'separator',
-    kind: 'component',
-    layer: 2,
-    description: 'Lightweight divider seam for cards, forms, panels, and toolbars.',
+    'name': 'separator',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Lightweight divider seam for cards, forms, panels, and toolbars.',
   },
   {
-    name: 'alert',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'alert',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'Persistent section-level feedback banner for success, warning, info, and error states.',
   },
   {
-    name: 'inline-notice',
-    kind: 'component',
-    layer: 2,
-    description: 'Compact contextual feedback seam for inline guidance inside forms and panels.',
+    'name': 'inline-notice',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Compact contextual feedback seam for inline guidance inside forms and panels.',
   },
   {
-    name: 'spinner',
-    kind: 'component',
-    layer: 2,
-    description: 'Small loading indicator for async actions and deferred regions.',
+    'name': 'spinner',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Small loading indicator for async actions and deferred regions.',
   },
   {
-    name: 'progress',
-    kind: 'component',
-    layer: 2,
-    description:
+    'name': 'progress',
+    'kind': 'component',
+    'layer': 2,
+    'description':
       'Determinate or indeterminate progress seam for jobs, uploads, and background work.',
   },
   {
-    name: 'skeleton',
-    kind: 'component',
-    layer: 2,
-    description: 'Generic dashboard loading scaffold for table, stats, detail, and form surfaces.',
+    'name': 'skeleton',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'Generic dashboard loading scaffold for table, stats, detail, and form surfaces.',
   },
   {
-    name: 'breadcrumb',
-    kind: 'block',
-    layer: 3,
-    description: 'Accessible breadcrumb block for dashboard drill-down navigation.',
+    'name': 'breadcrumb',
+    'kind': 'block',
+    'layer': 3,
+    'description': 'Accessible breadcrumb block for dashboard drill-down navigation.',
   },
   {
-    name: 'sidebar-shell',
-    kind: 'block',
-    layer: 3,
-    description:
+    'name': 'sidebar-shell',
+    'kind': 'block',
+    'layer': 3,
+    'description':
       'Reusable dashboard sidebar shell that accepts app-owned IA, breadcrumbs, and topbar actions.',
   },
   {
-    name: 'page-header',
-    kind: 'block',
-    layer: 3,
-    description:
+    'name': 'page-header',
+    'kind': 'block',
+    'layer': 3,
+    'description':
       'Composed page-intro block with shared badge, action, and status-row layout seams.',
   },
   {
-    name: 'filter-form',
-    kind: 'block',
-    layer: 3,
-    description:
+    'name': 'filter-form',
+    'kind': 'block',
+    'layer': 3,
+    'description':
       'Card-backed filter block for search, faceting, and action rails above directory tables.',
   },
   {
-    name: 'stats-grid',
-    kind: 'block',
-    layer: 3,
-    description:
+    'name': 'stats-grid',
+    'kind': 'block',
+    'layer': 3,
+    'description':
       'Responsive summary-metric grid for dashboard overview and route-level status cards.',
   },
   {
-    name: 'detail-layout',
-    kind: 'block',
-    layer: 3,
-    description:
+    'name': 'detail-layout',
+    'kind': 'block',
+    'layer': 3,
+    'description':
       'Two-column detail block for record pages with a primary flow and supporting side rail.',
   },
   {
-    name: 'data-table',
-    kind: 'block',
-    layer: 3,
-    description: 'Composed table/list block with a shared header, row body, and footer seam.',
+    'name': 'data-table',
+    'kind': 'block',
+    'layer': 3,
+    'description': 'Composed table/list block with a shared header, row body, and footer seam.',
   },
   {
-    name: 'responsive-table',
-    kind: 'block',
-    layer: 3,
-    description:
+    'name': 'responsive-table',
+    'kind': 'block',
+    'layer': 3,
+    'description':
       'Semantic table block that collapses dense operational rows into labeled mobile cells.',
   },
   {
-    name: 'pagination',
-    kind: 'block',
-    layer: 3,
-    description: 'Shared pagination meta/actions block for directory and activity lists.',
+    'name': 'pagination',
+    'kind': 'block',
+    'layer': 3,
+    'description': 'Shared pagination meta/actions block for directory and activity lists.',
   },
   {
-    name: 'empty-state',
-    kind: 'block',
-    layer: 3,
-    description:
+    'name': 'empty-state',
+    'kind': 'block',
+    'layer': 3,
+    'description':
       'Shared empty-state callout block for list rails, table gaps, and detail sidebars.',
   },
   {
-    name: 'section-divider',
-    kind: 'block',
-    layer: 3,
-    description: 'Editorial section label + rule block for detail and form pages.',
+    'name': 'section-divider',
+    'kind': 'block',
+    'layer': 3,
+    'description': 'Editorial section label + rule block for detail and form pages.',
   },
   {
-    name: 'theme-toggle',
-    kind: 'island',
-    layer: 2,
-    description: 'Small, generic Fresh island for dark/light theme switching.',
+    'name': 'theme-toggle',
+    'kind': 'island',
+    'layer': 2,
+    'description': 'Small, generic Fresh island for dark/light theme switching.',
   },
   {
-    name: 'sidebar-toggle',
-    kind: 'island',
-    layer: 3,
-    description: 'Responsive mobile drawer toggle island for sidebar-shell consumers.',
+    'name': 'sidebar-toggle',
+    'kind': 'island',
+    'layer': 3,
+    'description': 'Responsive mobile drawer toggle island for sidebar-shell consumers.',
   },
   {
-    name: 'toast-support',
-    kind: 'support',
-    layer: null,
-    description: 'Query-string helpers for redirect-flash toasts.',
+    'name': 'toast-support',
+    'kind': 'support',
+    'layer': null,
+    'description': 'Query-string helpers for redirect-flash toasts.',
   },
   {
-    name: 'toast',
-    kind: 'island',
-    layer: 2,
-    description: 'Global notification island for redirect-flash feedback.',
+    'name': 'toast',
+    'kind': 'island',
+    'layer': 2,
+    'description': 'Global notification island for redirect-flash feedback.',
   },
   {
-    name: 'chat-render',
-    kind: 'lib',
-    layer: 2,
-    description:
+    'name': 'chat-render',
+    'kind': 'lib',
+    'layer': 2,
+    'description':
       'Curated generative-UI block parser: projects fenced chart/donut/table/stats/line markdown into a typed RenderPart[] tree with a reload-fidelity inverse projection.',
   },
   {
-    name: 'desktop-tray-menu',
-    kind: 'component',
-    layer: 2,
-    description: 'Declarative tray and application-menu preview that emits stable action IDs.',
+    'name': 'desktop-tray-menu',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Declarative tray and application-menu preview that emits stable action IDs.',
   },
   {
-    name: 'desktop-dialog',
-    kind: 'component',
-    layer: 2,
-    description: 'Side-effect-free alert, confirm, and prompt intents for a desktop controller.',
+    'name': 'desktop-dialog',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Side-effect-free alert, confirm, and prompt intents for a desktop controller.',
   },
   {
-    name: 'desktop-notification',
-    kind: 'component',
-    layer: 2,
-    description: 'Side-effect-free native notification preview and explicit host request control.',
+    'name': 'desktop-notification',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'Side-effect-free native notification preview and explicit host request control.',
   },
   {
-    name: 'desktop-window-chrome',
-    kind: 'component',
-    layer: 2,
-    description: 'Accessible title-bar actions limited to documented Deno Desktop window operations.',
+    'name': 'desktop-window-chrome',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'Accessible title-bar actions limited to documented Deno Desktop window operations.',
   },
   {
-    name: 'desktop-update-prompt',
-    kind: 'component',
-    layer: 2,
-    description: 'Exhaustive update-ready UX for automatic restart and Windows manual installer paths.',
+    'name': 'desktop-update-prompt',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'Exhaustive update-ready UX for automatic restart and Windows manual installer paths.',
   },
   {
-    name: 'desktop-only',
-    kind: 'island',
-    layer: 2,
-    description: 'Hydration-safe content gate that no-ops without the NetScript Deno Desktop RPC binding.',
+    'name': 'desktop-only',
+    'kind': 'island',
+    'layer': 2,
+    'description':
+      'Hydration-safe content gate that no-ops without the NetScript Deno Desktop RPC binding.',
   },
   {
-    name: 'mcp-ui-widget',
-    kind: 'island',
-    layer: 3,
-    description:
+    'name': 'mcp-ui-widget',
+    'kind': 'island',
+    'layer': 3,
+    'description':
       'Themed sandboxed MCP ui:// widget frame — an allow-scripts-only iframe keyed on the active theme so theme changes force a full remount.',
   },
   {
-    name: 'render-ui',
-    kind: 'lib',
-    layer: 2,
-    description:
+    'name': 'render-ui',
+    'kind': 'lib',
+    'layer': 2,
+    'description':
       'Safe recursive render_ui payload renderer with depth and block-vocabulary guards for Fresh UI generative surfaces.',
+  },
+  {
+    'name': 'theme-ledger',
+    'kind': 'theme',
+    'layer': null,
+    'description': 'ledger language preset; fixed compact density (Dense Figma geometry).',
+  },
+  {
+    'name': 'theme-signal',
+    'kind': 'theme',
+    'layer': null,
+    'description': 'signal language preset; fixed compact density (Dense Figma geometry).',
+  },
+  {
+    'name': 'theme-glass',
+    'kind': 'theme',
+    'layer': null,
+    'description': 'glass language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-macos-27',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'macos-27 language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-apple-classic',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'apple-classic language preset; fixed comfortable density (Comfortable Figma geometry).',
+  },
+  {
+    'name': 'theme-fluent-2-web',
+    'kind': 'theme',
+    'layer': null,
+    'description':
+      'fluent-2-web language preset; fixed comfortable density (Comfortable Figma geometry).',
   },
 ];
 
 export const registryCollections: readonly RegistryCatalogCollection[] = [
   {
-    name: 'foundation',
-    items: [
+    'name': 'foundation',
+    'items': [
       'theme-seed',
       'sheet-styles',
       'button',
@@ -514,8 +682,8 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
     ],
   },
   {
-    name: 'ai',
-    items: [
+    'name': 'ai',
+    'items': [
       'theme-seed',
       'avatar',
       'citation-chip',
@@ -534,8 +702,8 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
     ],
   },
   {
-    name: 'forms-core',
-    items: [
+    'name': 'forms-core',
+    'items': [
       'theme-seed',
       'button',
       'icon-button',
@@ -549,12 +717,18 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
     ],
   },
   {
-    name: 'surface-core',
-    items: ['theme-seed', 'card', 'panel', 'badge', 'separator'],
+    'name': 'surface-core',
+    'items': [
+      'theme-seed',
+      'card',
+      'panel',
+      'badge',
+      'separator',
+    ],
   },
   {
-    name: 'feedback-core',
-    items: [
+    'name': 'feedback-core',
+    'items': [
       'theme-seed',
       'alert',
       'inline-notice',
@@ -566,12 +740,14 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
     ],
   },
   {
-    name: 'layout-foundations',
-    items: ['layout-objects'],
+    'name': 'layout-foundations',
+    'items': [
+      'layout-objects',
+    ],
   },
   {
-    name: 'dashboard-blocks',
-    items: [
+    'name': 'dashboard-blocks',
+    'items': [
       'theme-seed',
       'breadcrumb',
       'sidebar-shell',
@@ -588,8 +764,8 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
     ],
   },
   {
-    name: 'desktop',
-    items: [
+    'name': 'desktop',
+    'items': [
       'theme-seed',
       'desktop-tray-menu',
       'desktop-dialog',

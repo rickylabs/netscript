@@ -1,0 +1,820 @@
+{
+ "group": "G1",
+ "styles": [
+  "tonal",
+  "bloom"
+ ],
+ "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+ "updated": "2026-10-28",
+ "tonal": {
+  "page": "16:2",
+  "styleComponents": "459:84565",
+  "modesOnStyleComponents": {
+   "Theme set": "A 239:7",
+   "Theme": "Tonal 14:0",
+   "Scheme": "Light 3:0",
+   "Density": "Comfortable 3:2"
+  },
+  "kitsRenamed": [
+   "16:28 Tonal/Specimen kit/Button",
+   "16:34 Tonal/Specimen kit/Extended FAB",
+   "16:47 Tonal/Specimen kit/Icon button",
+   "16:86 Tonal/Specimen kit/Text field",
+   "16:93 Tonal/Specimen kit/Checkbox",
+   "16:100 Tonal/Specimen kit/Switch",
+   "17:52 Tonal/Specimen kit/Segmented button",
+   "17:74 Tonal/Specimen kit/Chip",
+   "17:89 Tonal/Specimen kit/Nav rail item",
+   "17:118 Tonal/Specimen kit/Status",
+   "17:126 Tonal/Specimen kit/List item",
+   "22:309 Tonal/Specimen kit/Avatar",
+   "22:328 Tonal/Specimen kit/Connected button",
+   "22:333 Tonal/Specimen kit/Wavy progress",
+   "22:339 Tonal/Specimen kit/Text area"
+  ],
+  "categories": {
+   "actions": {
+    "status": "done",
+    "frame": "459:84566",
+    "setsFrame": "459:84571",
+    "review": "461:67311",
+    "strip": "461:68322",
+    "png": [
+     "review/styles/tonal/actions.png",
+     "review/styles/tonal/actions-strip.png"
+    ],
+    "swapTest": "pass (Button label+iconStart, Button iconEnd, Toggle label+iconEnd, Icon button, Action bar count kept)",
+    "sets": [
+     {
+      "name": "Tonal/Icon",
+      "id": "459:84572",
+      "baseId": "252:11798",
+      "variants": 3
+     },
+     {
+      "name": "Tonal/Spinner",
+      "id": "459:84579",
+      "baseId": "252:11837",
+      "variants": 18
+     },
+     {
+      "name": "Tonal/.Focus ring",
+      "id": "459:84634",
+      "baseId": "252:11805",
+      "variants": 0
+     },
+     {
+      "name": "Tonal/.State layer",
+      "id": "459:84635",
+      "baseId": "252:11806",
+      "variants": 0
+     },
+     {
+      "name": "Tonal/Button / md",
+      "id": "460:8605",
+      "baseId": "253:372",
+      "variants": 30
+     },
+     {
+      "name": "Tonal/Button / lg",
+      "id": "460:8826",
+      "baseId": "254:721",
+      "variants": 30
+     },
+     {
+      "name": "Tonal/Button / sm",
+      "id": "460:9047",
+      "baseId": "254:371",
+      "variants": 30
+     },
+     {
+      "name": "Tonal/Button / xs",
+      "id": "460:9268",
+      "baseId": "254:1071",
+      "variants": 30
+     },
+     {
+      "name": "Tonal/Icon button / md",
+      "id": "460:11412",
+      "baseId": "255:262",
+      "variants": 25
+     },
+     {
+      "name": "Tonal/Icon button / lg",
+      "id": "460:11588",
+      "baseId": "255:740",
+      "variants": 25
+     },
+     {
+      "name": "Tonal/Icon button / sm",
+      "id": "460:11764",
+      "baseId": "255:501",
+      "variants": 25
+     },
+     {
+      "name": "Tonal/Icon button / xs",
+      "id": "460:11940",
+      "baseId": "255:979",
+      "variants": 25
+     },
+     {
+      "name": "Tonal/Toggle / md",
+      "id": "460:13561",
+      "baseId": "256:281",
+      "variants": 16
+     },
+     {
+      "name": "Tonal/Toggle / sm",
+      "id": "460:13706",
+      "baseId": "256:437",
+      "variants": 16
+     },
+     {
+      "name": "Tonal/Toggle / lg",
+      "id": "460:13851",
+      "baseId": "256:593",
+      "variants": 16
+     },
+     {
+      "name": "Tonal/Icon toggle / md",
+      "id": "460:13996",
+      "baseId": "276:8291",
+      "variants": 16
+     },
+     {
+      "name": "Tonal/Icon toggle / sm",
+      "id": "460:14093",
+      "baseId": "276:8431",
+      "variants": 16
+     },
+     {
+      "name": "Tonal/Icon toggle / lg",
+      "id": "460:14190",
+      "baseId": "276:8571",
+      "variants": 16
+     },
+     {
+      "name": "Tonal/Button group",
+      "id": "460:48194",
+      "baseId": "257:839",
+      "variants": 6
+     },
+     {
+      "name": "Tonal/Toggle group",
+      "id": "460:48651",
+      "baseId": "257:528",
+      "variants": 12
+     },
+     {
+      "name": "Tonal/.Action bar / actions",
+      "id": "461:56126",
+      "baseId": "258:544",
+      "variants": 0
+     },
+     {
+      "name": "Tonal/Action bar",
+      "id": "461:56176",
+      "baseId": "258:663",
+      "variants": 2
+     },
+     {
+      "name": "Tonal/Theme toggle",
+      "id": "461:56272",
+      "baseId": "258:742",
+      "variants": 6
+     }
+    ],
+    "swaps": [
+     "Button/Icon button/Toggle/Icon toggle: state-layer -> Tonal/.State layer, focus-ring -> Tonal/.Focus ring, spinner -> Tonal/Spinner",
+     "Button group items -> Tonal/Button / sm|lg + Tonal/Icon button / sm|lg",
+     "Toggle group items -> Tonal/Toggle / sm|md",
+     "Action bar actions default -> Tonal/.Action bar / actions; close -> Tonal/Icon button / lg|sm ghost",
+     "Theme toggle -> Tonal/Icon button / md ghost"
+    ],
+    "deviations": [
+     "Button: the 16px icon-side padding is not drawn (padding cannot follow the iconStart/iconEnd booleans); symmetric 24.",
+     "Button link: state layer never shown (text link); underline only on hover and pressed.",
+     "Button group / Toggle group vertical: outer corners 20 (derived from the options-group ends) instead of full, which reads as a capsule at 48px.",
+     "Action bar floating: actions stay text buttons (Tonal/.Action bar / actions row) rather than 48px icon buttons; left padding 24 before the count text, right 8.",
+     "Focus ring on chips follows radius/badge (8), not 8+2."
+    ]
+   },
+   "forms": {
+    "status": "done",
+    "frame": "461:85289",
+    "setsFrame": "461:85294",
+    "review": "461:165170",
+    "strip": "461:166343",
+    "png": [
+     "review/styles/tonal/forms.png",
+     "review/styles/tonal/forms-strip.png"
+    ],
+    "swapTest": "pass (Input value+iconStart, Checkbox label+description, Switch label, Select placeholder, Field error kept)",
+    "sets": [
+     {
+      "name": "Tonal/Label",
+      "id": "461:85295",
+      "baseId": "278:45",
+      "variants": 6
+     },
+     {
+      "name": "Tonal/Input",
+      "id": "461:85320",
+      "baseId": "279:312",
+      "variants": 24
+     },
+     {
+      "name": "Tonal/Textarea",
+      "id": "461:85706",
+      "baseId": "280:597",
+      "variants": 12
+     },
+     {
+      "name": "Tonal/Select",
+      "id": "461:85529",
+      "baseId": "281:1023",
+      "variants": 24
+     },
+     {
+      "name": "Tonal/Select content",
+      "id": "461:85833",
+      "baseId": "281:826",
+      "variants": 0
+     },
+     {
+      "name": "Tonal/Checkbox",
+      "id": "461:105433",
+      "baseId": "283:1470",
+      "variants": 15
+     },
+     {
+      "name": "Tonal/Radio",
+      "id": "461:105579",
+      "baseId": "284:1828",
+      "variants": 10
+     },
+     {
+      "name": "Tonal/Radio group",
+      "id": "461:105680",
+      "baseId": "284:1885",
+      "variants": 2
+     },
+     {
+      "name": "Tonal/Switch",
+      "id": "461:105791",
+      "baseId": "285:2329",
+      "variants": 20
+     },
+     {
+      "name": "Tonal/Field",
+      "id": "461:110470",
+      "baseId": "287:2656",
+      "variants": 6
+     },
+     {
+      "name": "Tonal/Field set",
+      "id": "461:110669",
+      "baseId": "287:2743",
+      "variants": 2
+     },
+     {
+      "name": "Tonal/Input group",
+      "id": "461:110813",
+      "baseId": "297:3861",
+      "variants": 16
+     },
+     {
+      "name": "Tonal/OTP slot",
+      "id": "461:111206",
+      "baseId": "301:4385",
+      "variants": 12
+     },
+     {
+      "name": "Tonal/Input OTP",
+      "id": "461:111255",
+      "baseId": "301:4490",
+      "variants": 4
+     },
+     {
+      "name": "Tonal/Slider",
+      "id": "461:136464",
+      "baseId": "303:5022",
+      "variants": 16
+     },
+     {
+      "name": "Tonal/Combobox",
+      "id": "461:142402",
+      "baseId": "305:5623",
+      "variants": 10
+     },
+     {
+      "name": "Tonal/Calendar day",
+      "id": "461:136625",
+      "baseId": "307:6154",
+      "variants": 30
+     },
+     {
+      "name": "Tonal/Calendar",
+      "id": "461:136746",
+      "baseId": "309:8620",
+      "variants": 8
+     },
+     {
+      "name": "Tonal/Date picker",
+      "id": "461:141008",
+      "baseId": "313:14889",
+      "variants": 10
+     },
+     {
+      "name": "Tonal/Search",
+      "id": "461:162760",
+      "baseId": "316:16426",
+      "variants": 8
+     },
+     {
+      "name": "Tonal/Dropzone",
+      "id": "461:162961",
+      "baseId": "319:16832",
+      "variants": 7
+     }
+    ],
+    "swaps": [
+     "Field label/control -> Tonal/Label + Tonal/Input",
+     "Field set fields -> Tonal/Field",
+     "Input group control -> Tonal/Input / Tonal/Textarea, addon button -> Tonal/Icon button / md ghost",
+     "Input OTP slots -> Tonal/OTP slot",
+     "Radio group -> Tonal/Radio",
+     "Calendar days/nav/month select -> Tonal/Calendar day, Tonal/Icon button / md, Tonal/Select sm",
+     "Date picker trigger/calendar -> Tonal/Select, Tonal/Calendar",
+     "Combobox input/content -> Tonal/Input, Tonal/Select content",
+     "Search field -> Tonal/Input (pill override)",
+     "Dropzone button -> Tonal/Button / sm outline"
+    ],
+    "pendingSweeps": [
+     "Select content + Combobox rows -> Tonal/Menu item (Overlays)",
+     "Search kbd -> Tonal/Kbd, Combobox chips -> Tonal/Badge (Data display 1)"
+    ],
+    "deviations": [
+     "Input field-label is a theme-only text layer (no text property: protocol allows only theme-only boolean properties); override per instance",
+     "Textarea container is a fixed 112 (top-pinned) rather than stretching to the footer",
+     "Checkbox unchecked edge uses border/input (crafted frames measure muted-fg)",
+     "Checkbox invalid+checked uses destructive/default fill with destructive/fg check (derived)",
+     "Field description inset uses a 16 first-line indent (text node, no wrapper allowed)",
+     "Slider value label is plain T.data text, no tooltip pill (text node in the flow)",
+     "Dropzone icon badge is a rounded-16 square approximating the crafted KPI shape; uploading bar is straight, not the T.wave vector",
+     "Search avatar is a theme-only frame bound to the theme-only boolean avatar"
+    ]
+   },
+   "navigation": {
+    "status": "done",
+    "frame": "462:79585",
+    "setsFrame": "462:79590",
+    "review": "462:199918",
+    "strip": "462:201453",
+    "png": [
+     "review/styles/tonal/navigation.png",
+     "review/styles/tonal/navigation-strip.png"
+    ],
+    "swapTest": "pass (Tab label+count, Nav item label+count, Page key label, Step title+description kept)",
+    "sets": [
+     {
+      "name": "Tonal/Location marker",
+      "id": "462:79591",
+      "baseId": "337:22",
+      "variants": 2
+     },
+     {
+      "name": "Tonal/Breadcrumb item",
+      "id": "462:79594",
+      "baseId": "338:92",
+      "variants": 9
+     },
+     {
+      "name": "Tonal/Breadcrumb",
+      "id": "462:79661",
+      "baseId": "338:161",
+      "variants": 2
+     },
+     {
+      "name": "Tonal/Page key",
+      "id": "462:79784",
+      "baseId": "339:270",
+      "variants": 20
+     },
+     {
+      "name": "Tonal/Pager tile",
+      "id": "462:80030",
+      "baseId": "339:319",
+      "variants": 6
+     },
+     {
+      "name": "Tonal/Pagination",
+      "id": "462:80079",
+      "baseId": "339:379",
+      "variants": 2
+     },
+     {
+      "name": "Tonal/Tab / horizontal",
+      "id": "462:111556",
+      "baseId": "342:402",
+      "variants": 24
+     },
+     {
+      "name": "Tonal/Tab / vertical",
+      "id": "462:111737",
+      "baseId": "342:599",
+      "variants": 24
+     },
+     {
+      "name": "Tonal/Tabs list",
+      "id": "462:111918",
+      "baseId": "343:424",
+      "variants": 6
+     },
+     {
+      "name": "Tonal/Tabs",
+      "id": "462:112615",
+      "baseId": "343:489",
+      "variants": 2
+     },
+     {
+      "name": "Tonal/Nav item",
+      "id": "462:179063",
+      "baseId": "345:601",
+      "variants": 20
+     },
+     {
+      "name": "Tonal/Nav group",
+      "id": "462:179229",
+      "baseId": "346:611",
+      "variants": 6
+     },
+     {
+      "name": "Tonal/Sidebar",
+      "id": "462:179560",
+      "baseId": "347:994",
+      "variants": 6
+     },
+     {
+      "name": "Tonal/Top bar",
+      "id": "462:180526",
+      "baseId": "351:1349",
+      "variants": 4
+     },
+     {
+      "name": "Tonal/.Brand logo",
+      "id": "462:80457",
+      "baseId": "344:410",
+      "variants": 0
+     },
+     {
+      "name": "Tonal/Nav menu item",
+      "id": "462:112808",
+      "baseId": "349:1036",
+      "variants": 10
+     },
+     {
+      "name": "Tonal/.Nav menu link",
+      "id": "462:112869",
+      "baseId": "348:1108",
+      "variants": 3
+     },
+     {
+      "name": "Tonal/Navigation menu",
+      "id": "462:112885",
+      "baseId": "349:1132",
+      "variants": 2
+     },
+     {
+      "name": "Tonal/Menubar trigger",
+      "id": "462:113053",
+      "baseId": "349:1153",
+      "variants": 5
+     },
+     {
+      "name": "Tonal/Menubar",
+      "id": "462:113074",
+      "baseId": "349:1236",
+      "variants": 2
+     },
+     {
+      "name": "Tonal/Step",
+      "id": "462:80191",
+      "baseId": "352:1355",
+      "variants": 8
+     },
+     {
+      "name": "Tonal/Stepper",
+      "id": "462:80260",
+      "baseId": "352:1424",
+      "variants": 2
+     },
+     {
+      "name": "Tonal/Sidebar toggle",
+      "id": "462:80388",
+      "baseId": "344:462",
+      "variants": 4
+     }
+    ],
+    "swaps": [
+     "Breadcrumb -> Tonal/Breadcrumb item",
+     "Pagination -> Tonal/Page key + Tonal/Pager tile; Page key prev/next -> Tonal/Button / sm ghost",
+     "Stepper -> Tonal/Step",
+     "Sidebar toggle -> Tonal/Icon button / sm|lg",
+     "Tabs list -> Tonal/Tab; Tabs -> Tonal/Tabs list",
+     "Navigation menu -> Tonal/Nav menu item + Tonal/.Nav menu link",
+     "Menubar -> Tonal/Menubar trigger",
+     "Nav group -> Tonal/Nav item; Sidebar -> Tonal/Nav group, Tonal/.Brand logo",
+     "Top bar -> Tonal/Search (avatar on, kbd off), Tonal/Icon button, Tonal/Theme toggle, Tonal/Sidebar toggle, Tonal/Breadcrumb, Tonal/Navigation menu, Tonal/.Brand logo"
+    ],
+    "pendingSweeps": [
+     "Menubar open menu -> Tonal/Menu content (Overlays)",
+     "Tab and Nav item count -> Tonal/Badge plain (Data display 1)"
+    ],
+    "deviations": [
+     "Nav item rail: the base collapsed item has no label, so Tonal adds a nav-label text bound to the label property; existing base rail data carries the default label (every rail item in the Sidebar reads 'Orders' until instances set labels)",
+     "Tonal/Top bar: the tonal (secondary) bell swap did not match the nested glyph; the bell renders as the standard ghost icon button",
+     "Sidebar rail keeps Tonal/.Brand logo at the top instead of a panel-left icon button",
+     "Vertical connected tabs use 20 outer corners (full corners read as capsules at 48px)",
+     "Tab line indicator and rail indicator are theme-only layers named indicator"
+    ]
+   },
+   "overlays": {
+    "status": "done",
+    "frame": "463:90021",
+    "setsFrame": "463:90026",
+    "review": "463:192536",
+    "strip": "463:193713",
+    "png": [
+     "review/styles/tonal/overlays.png",
+     "review/styles/tonal/overlays-strip.png"
+    ],
+    "swapTest": "pass (Menu item label+shortcut, Tooltip label, Alert dialog title+description, Dialog title+footer kept)",
+    "sets": [
+     {
+      "name": "Tonal/Menu item",
+      "id": "463:90027",
+      "baseId": "371:587",
+      "variants": 30
+     },
+     {
+      "name": "Tonal/Menu label",
+      "id": "463:90466",
+      "baseId": "373:35",
+      "variants": 0
+     },
+     {
+      "name": "Tonal/Menu separator",
+      "id": "463:90469",
+      "baseId": "373:38",
+      "variants": 0
+     },
+     {
+      "name": "Tonal/Menu group",
+      "id": "463:90471",
+      "baseId": "373:248",
+      "variants": 3
+     },
+     {
+      "name": "Tonal/Menu content",
+      "id": "463:90800",
+      "baseId": "373:256",
+      "variants": 0
+     },
+     {
+      "name": "Tonal/Dropdown menu",
+      "id": "463:91091",
+      "baseId": "374:382",
+      "variants": 2
+     },
+     {
+      "name": "Tonal/Context menu",
+      "id": "463:91421",
+      "baseId": "374:653",
+      "variants": 2
+     },
+     {
+      "name": "Tonal/Dialog",
+      "id": "463:159713",
+      "baseId": "378:743",
+      "variants": 6
+     },
+     {
+      "name": "Tonal/Alert dialog",
+      "id": "463:160098",
+      "baseId": "378:880",
+      "variants": 4
+     },
+     {
+      "name": "Tonal/Sheet",
+      "id": "463:160291",
+      "baseId": "379:1004",
+      "variants": 8
+     },
+     {
+      "name": "Tonal/Drawer",
+      "id": "463:160804",
+      "baseId": "379:1150",
+      "variants": 4
+     },
+     {
+      "name": "Tonal/Popover",
+      "id": "463:161005",
+      "baseId": "381:937",
+      "variants": 4
+     },
+     {
+      "name": "Tonal/Tooltip",
+      "id": "463:161116",
+      "baseId": "381:1030",
+      "variants": 12
+     },
+     {
+      "name": "Tonal/Hover card",
+      "id": "463:161189",
+      "baseId": "381:1093",
+      "variants": 4
+     },
+     {
+      "name": "Tonal/Command item",
+      "id": "463:175315",
+      "baseId": "382:1015",
+      "variants": 9
+     },
+     {
+      "name": "Tonal/Command palette",
+      "id": "463:175466",
+      "baseId": "383:1355",
+      "variants": 6
+     }
+    ],
+    "swaps": [
+     "Menu group/Menu content -> Tonal/Menu label, item, separator",
+     "Dropdown/Context menu -> Tonal/Menu content; trigger Tonal/Button / md outline + chevron",
+     "Dialog/Alert dialog/Sheet/Drawer/Popover buttons -> Tonal/Button / md (cancel ghost), close Tonal/Icon button / md|sm ghost",
+     "Command palette -> Tonal/Command item, Tonal/Input; sweep: Tonal/Select content rows -> Tonal/Menu item; Tonal/Menubar open menu -> Tonal/Menu content"
+    ],
+    "pendingSweeps": [
+     "Menu item shortcut, Tooltip kbd, Command item shortcut, Command palette Esc -> Tonal/Kbd; Hover card avatar -> Tonal/Avatar (Data display 1)"
+    ],
+    "deviations": [
+     "Popover/Tooltip/Hover card arrows: the arrow frame is bound to the arrow boolean, so its tip is hidden and the frame kept (an 8px gap remains when arrow is on)",
+     "Alert dialog media badge is rounded 16, approximating the crafted banner shape badge",
+     "Command palette filters kept their base layout where they are not Tab instances",
+     "Command item kind chip uses the info tone with a theme-only kind-icon"
+    ]
+   },
+   "data-display-1": {
+    "status": "done",
+    "frame": "463:225811",
+    "setsFrame": "463:225816",
+    "review": "463:306327",
+    "strip": "463:308114",
+    "png": [
+     "review/styles/tonal/data-display-1.png",
+     "review/styles/tonal/data-display-1-strip.png"
+    ],
+    "swapTest": "pass (Badge label+remove, Avatar initials+presence, Stat card label+value+detail, Card title+description kept; the Avatar diff is only the added theme-only sunny property)",
+    "sets": [
+     {
+      "name": "Tonal/Kbd",
+      "id": "463:225817",
+      "baseId": "403:28",
+      "variants": 4
+     },
+     {
+      "name": "Tonal/Kbd group",
+      "id": "463:225826",
+      "baseId": "403:96",
+      "variants": 8
+     },
+     {
+      "name": "Tonal/Badge",
+      "id": "463:225907",
+      "baseId": "405:180",
+      "variants": 20
+     },
+     {
+      "name": "Tonal/Badge / kind",
+      "id": "463:226048",
+      "baseId": "405:211",
+      "variants": 10
+     },
+     {
+      "name": "Tonal/Avatar",
+      "id": "463:226083",
+      "baseId": "406:95",
+      "variants": 12
+     },
+     {
+      "name": "Tonal/Avatar presence",
+      "id": "463:226079",
+      "baseId": "406:43",
+      "variants": 3
+     },
+     {
+      "name": "Tonal/Avatar group",
+      "id": "463:226147",
+      "baseId": "406:150",
+      "variants": 3
+     },
+     {
+      "name": "Tonal/Item",
+      "id": "463:234593",
+      "baseId": "408:792",
+      "variants": 27
+     },
+     {
+      "name": "Tonal/Item group",
+      "id": "463:235327",
+      "baseId": "408:996",
+      "variants": 2
+     },
+     {
+      "name": "Tonal/.Item icon tile",
+      "id": "463:226253",
+      "baseId": "408:82",
+      "variants": 0
+     },
+     {
+      "name": "Tonal/.Item image",
+      "id": "463:226256",
+      "baseId": "408:85",
+      "variants": 0
+     },
+     {
+      "name": "Tonal/Card",
+      "id": "463:247177",
+      "baseId": "409:951",
+      "variants": 16
+     },
+     {
+      "name": "Tonal/Stat card",
+      "id": "463:248002",
+      "baseId": "409:1270",
+      "variants": 6
+     },
+     {
+      "name": "Tonal/Table header cell",
+      "id": "463:281400",
+      "baseId": "410:546",
+      "variants": 27
+     },
+     {
+      "name": "Tonal/Table cell",
+      "id": "463:281563",
+      "baseId": "410:383",
+      "variants": 27
+     },
+     {
+      "name": "Tonal/Table row",
+      "id": "463:281766",
+      "baseId": "412:1187",
+      "variants": 20
+     },
+     {
+      "name": "Tonal/Table",
+      "id": "463:291392",
+      "baseId": "413:1367",
+      "variants": 6
+     },
+     {
+      "name": "Tonal/Data table",
+      "id": "463:292679",
+      "baseId": "416:4605",
+      "variants": 10
+     }
+    ],
+    "swaps": [
+     "Kbd group -> Tonal/Kbd",
+     "Avatar presence/group -> Tonal",
+     "Item media -> Tonal/.Item icon tile (mediaContent default), actions -> Tonal/Button / sm outline",
+     "Item group -> Tonal/Item",
+     "Card actions -> Tonal/Button / sm ghost + secondary",
+     "Stat card badge -> Tonal/Badge subtle",
+     "Table cell -> Tonal/Badge, Tonal/Avatar md, Tonal/Checkbox, Tonal/Icon button / md ghost",
+     "Table row -> Tonal/Table cell; Table -> Tonal/Table header cell/cell/row",
+     "Data table -> Tonal/Search sm, Tonal/Toggle / md outline chips, Tonal/Toggle group segmented, Tonal/Button / md outline, Tonal/Action bar inline, Tonal/Table, Tonal/Pagination, Tonal/Menu content",
+     "SWEEP done: Tonal/Kbd into Tonal/Menu item, Tooltip, Command item, Command palette, Search; Tonal/Badge into Tonal/Tab h+v counts, Nav item counts, Combobox chips; Tonal/Avatar into Tonal/Hover card (155 nested swaps)"
+    ],
+    "deviations": [
+     "Badge plain hides the dot glyph by unbinding it from the dot property in the plain variants",
+     "Avatar sunny is a theme-only 8-point star behind the circle (scalloped edge), not the crafted sunny vector",
+     "Item icon tile and Stat card icon badge are 14-radius squircles approximating the Expressive shape",
+     "Stat card value uses literal 32/40 and 45/52 Medium where type/kpi-sm and type/kpi are absent",
+     "Table fixture data (per-row names, totals, badge tones) was re-applied after the clean swap",
+     "Data table toolbar slightly overflows its fixed 1016 width at desktop (Tonal search and chips are wider)"
+    ]
+   }
+  },
+  "status": "all five categories built (101 sets); review frames + strips captured"
+ },
+ "bloom": {
+  "page": "102:808",
+  "categories": {}
+ },
+ "remaining": [
+  "bloom: all categories (Actions, Forms, Navigation, Overlays, Data display 1) - not started",
+  "tonal follow-ups: optional FAB/floating toolbar extras not built; Top bar tonal bell not applied; rail labels in Sidebar fixture read 'Orders'"
+ ]
+}

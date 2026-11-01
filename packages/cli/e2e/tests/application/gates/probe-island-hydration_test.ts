@@ -18,12 +18,25 @@ Deno.test('hydration receipt requires the generated resource surface and QueryCl
     receiptFromIslandInteraction({
       queryClientFound: true,
       listQueryFound: true,
-      freshIslandElement: 'output',
+      freshIslandElement: 'div',
     }),
     {
       islandHydrated: true,
-      freshIslandElement: 'output',
+      freshIslandElement: 'div',
     },
+  );
+});
+
+Deno.test('hydration receipt rejects an absent generated result surface', () => {
+  assertThrows(
+    () =>
+      receiptFromIslandInteraction({
+        queryClientFound: true,
+        listQueryFound: true,
+        freshIslandElement: null,
+      }),
+    Error,
+    'surface was not rendered',
   );
 });
 
@@ -33,7 +46,7 @@ Deno.test('hydration receipt rejects a server-rendered resource without a browse
       receiptFromIslandInteraction({
         queryClientFound: false,
         listQueryFound: false,
-        freshIslandElement: 'output',
+        freshIslandElement: 'div',
       }),
     Error,
     'QueryClient was not reachable',
@@ -43,7 +56,7 @@ Deno.test('hydration receipt rejects a server-rendered resource without a browse
       receiptFromIslandInteraction({
         queryClientFound: true,
         listQueryFound: false,
-        freshIslandElement: 'output',
+        freshIslandElement: 'div',
       }),
     Error,
     'users.list query was not present',
@@ -63,14 +76,14 @@ Deno.test('hydration probe targets the generated people resource', async () => {
         return Promise.resolve({
           queryClientFound: true,
           listQueryFound: true,
-          freshIslandElement: 'output',
+          freshIslandElement: 'div',
         });
       },
     },
   );
 
   assertEquals(requested, ['http://localhost:41234/people']);
-  assertEquals(receipt, { islandHydrated: true, freshIslandElement: 'output' });
+  assertEquals(receipt, { islandHydrated: true, freshIslandElement: 'div' });
 });
 
 Deno.test('resource query refetch requires the hydrated list query, one request, and success', async () => {
@@ -142,7 +155,13 @@ Deno.test('browser hydration and refetch use the public shared query singleton',
     ),
   );
   assertStringIncludes(source, "const QUERY_MODULE_PATH = '/@id/@netscript/fresh/query';");
-  assertStringIncludes(source, 'const { getIslandQueryClient } = await import(');
+  const observation = await Deno.readTextFile(
+    new URL(
+      '../../../src/application/gates/scaffold/runtime/island-hydration-observation.ts',
+      import.meta.url,
+    ),
+  );
+  assertStringIncludes(observation, 'const { getIslandQueryClient } = await import(');
   assertStringIncludes(source, 'queryClient.invalidateQueries');
   assertFalse(source.includes('new WeakSet'));
 });

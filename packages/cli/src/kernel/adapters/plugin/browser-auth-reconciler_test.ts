@@ -59,7 +59,7 @@ Deno.test('auth scaffold is request-scoped, idempotent, and preserves authored p
   await fs.writeFile(join(root, 'apps/web/utils.ts'), '');
   await fs.writeFile(join(root, 'services/users/src/main.ts'), main);
   await writeInstalledAuthFixture(fs, root);
-  const created = await reconcileBrowserAuth(root, fs);
+  const { written: created } = await reconcileBrowserAuth(root, fs);
   assertEquals(created.length, 4);
   assertStringIncludes(
     await fs.readFile(join(root, 'apps/web/routes/auth/[action].ts')),
@@ -76,7 +76,7 @@ Deno.test('auth scaffold is request-scoped, idempotent, and preserves authored p
   const config = JSON.parse(await fs.readFile(join(root, 'appsettings.json')));
   assertEquals(config.NetScript.Apps.web.PluginReferences, ['auth']);
   assertEquals(config.NetScript.Services.users.PluginReferences, ['auth']);
-  assertEquals(await reconcileBrowserAuth(root, fs), []);
+  assertEquals((await reconcileBrowserAuth(root, fs)).written, []);
   await fs.writeFile(
     join(root, 'apps/web/routes/auth/[action].ts'),
     '// custom route',
@@ -146,6 +146,8 @@ Deno.test('auth install and subsequent service add emit the BFF topology before 
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
     });
     assert(installed.helperFiles.includes(join(root, 'auth/bff.ts')));
+    assertEquals(installed.browserAuthReport, { plugin: 'browser-auth', checks: [] });
+    await fs.writeFile(join(root, 'auth/bff.ts'), '// preserve custom helper\n');
     assertStringIncludes(
       await fs.readFile(join(root, 'services/users/src/main.ts')),
       'authenticator: browserAuthenticator',
@@ -178,6 +180,9 @@ Deno.test('auth install and subsequent service add emit the BFF topology before 
     });
     const billingPath = join(root, 'services/billing/src/main.ts');
     assert(added.helperFiles.includes(billingPath));
+    assertEquals(added.browserAuthReport.checks.map((check) => check.name), ['auth/bff.ts']);
+    assertStringIncludes(added.browserAuthReport.checks[0].message ?? '', 'divergent');
+    assertEquals(await fs.readFile(join(root, 'auth/bff.ts')), '// preserve custom helper\n');
     assertStringIncludes(await fs.readFile(billingPath), 'authenticator: browserAuthenticator');
     const config = JSON.parse(await fs.readFile(join(root, 'appsettings.json')));
     assertEquals(config.NetScript.Services.billing.PluginReferences, ['auth']);
@@ -273,7 +278,7 @@ Deno.test('browser auth rewrites a custom entrypoint and rejects drift in the sc
   const path = join(root, 'services/users/server.ts');
   await fs.writeFile(path, main);
   await writeInstalledAuthFixture(fs, root);
-  assert((await reconcileBrowserAuth(root, fs)).includes(path));
+  assert((await reconcileBrowserAuth(root, fs)).written.includes(path));
   assertStringIncludes(await fs.readFile(path), 'authenticator: browserAuthenticator');
   await fs.writeFile(path, main.replace('#1382 L2', '#1382 changed'));
   await assertRejects(
@@ -307,10 +312,10 @@ for (
     await fs.writeFile(join(root, 'apps/web/utils.ts'), '');
     await fs.writeFile(path, `await defineService(router, {\n  ${policy}\n  name: 'users' });\n`);
     await writeInstalledAuthFixture(fs, root);
-    assert((await reconcileBrowserAuth(root, fs)).includes(path));
+    assert((await reconcileBrowserAuth(root, fs)).written.includes(path));
     assertStringIncludes(await fs.readFile(path), 'authenticator: browserAuthenticator');
     assertStringIncludes(await fs.readFile(path), 'createContractAuthorizer(router)');
-    assertEquals(await reconcileBrowserAuth(root, fs), []);
+    assertEquals((await reconcileBrowserAuth(root, fs)).written, []);
     const custom =
       `await defineService(router, { auth: { public: true, reason: 'Owner-authored policy' } });`;
     await fs.writeFile(path, custom);
@@ -338,7 +343,7 @@ Deno.test('browser auth preserves the scaffold public opt-out when auth is disab
   const installed = JSON.parse(await fs.readFile(join(root, 'appsettings.json')));
   installed.NetScript.Plugins.auth.Enabled = false;
   await fs.writeFile(join(root, 'appsettings.json'), JSON.stringify(installed));
-  assertEquals(await reconcileBrowserAuth(root, fs), []);
+  assertEquals((await reconcileBrowserAuth(root, fs)).written, []);
   assertEquals(await fs.readFile(path), publicMain);
   assertEquals(await fs.exists(join(root, 'auth/service.ts')), false);
 });
@@ -356,14 +361,14 @@ Deno.test('browser auth emits a server SDK session route and snapshots it while 
   await writeInstalledAuthFixture(fs, root);
   const path = join(root, 'apps/web/routes/examples/users/session.ts');
   assert((await browserAuthReconciliationPaths(root, fs)).includes(path));
-  assert((await reconcileBrowserAuth(root, fs)).includes(path));
+  assert((await reconcileBrowserAuth(root, fs)).written.includes(path));
   const content = await fs.readFile(path);
   assertStringIncludes(content, 'createBrowserSessionClient');
   assertStringIncludes(content, 'browserSessionContext(ctx.req)');
   assertStringIncludes(content, 'client.session(undefined, { context })');
   assertStringIncludes(content, "'../../../../../auth/bff.ts'");
   assertEquals(content.includes('fetch('), false);
-  assertEquals(await reconcileBrowserAuth(root, fs), []);
+  assertEquals((await reconcileBrowserAuth(root, fs)).written, []);
   await fs.writeFile(path, '// authored route');
   await reconcileBrowserAuth(root, fs);
   assertEquals(await fs.readFile(path), '// authored route');
@@ -400,7 +405,7 @@ for (const present of [false, true]) {
       for (const path of paths) await fs.writeFile(join(root, path), `// authored ${path}\n`);
     }
     for (let rerun = 0; rerun < 2; rerun++) {
-      assertEquals(await reconcileBrowserAuth(root, fs), []);
+      assertEquals((await reconcileBrowserAuth(root, fs)).written, []);
       for (const path of paths) {
         assertEquals(await fs.exists(join(root, path)), present);
         if (present) assertEquals(await fs.readFile(join(root, path)), `// authored ${path}\n`);
@@ -436,7 +441,7 @@ Deno.test('mixed browser topology scaffolds only the opted-in app and preserves 
   assertEquals(await fs.exists(join(root, 'apps/web/routes/auth/[action].ts')), false);
   assertEquals(await fs.exists(join(root, 'apps/admin/routes/auth/[action].ts')), true);
   assertEquals(await fs.exists(join(root, 'auth/bff.ts')), true);
-  assertEquals(await reconcileBrowserAuth(root, fs), []);
+  assertEquals((await reconcileBrowserAuth(root, fs)).written, []);
 });
 
 Deno.test('authored app topology still wires an independently scaffold-owned service policy', async () => {
@@ -477,12 +482,12 @@ Deno.test('default browser helpers remain scaffold-owned for non-browser app typ
     }),
   );
   await writeInstalledAuthFixture(fs, root);
-  assertEquals(await reconcileBrowserAuth(root, fs), [
+  assertEquals((await reconcileBrowserAuth(root, fs)).written, [
     join(root, 'auth/bff.ts'),
     join(root, 'auth/service.ts'),
   ]);
   assertEquals(await fs.exists(join(root, 'apps/build/routes/auth/[action].ts')), false);
-  assertEquals(await reconcileBrowserAuth(root, fs), []);
+  assertEquals((await reconcileBrowserAuth(root, fs)).written, []);
 });
 
 Deno.test('authored browser topology with non-browser apps creates no shared helpers', async () => {
@@ -505,7 +510,7 @@ Deno.test('authored browser topology with non-browser apps creates no shared hel
     await fs.writeFile(join(root, 'apps/web/utils.ts'), '');
     await writeInstalledAuthFixture(fs, root);
     for (let rerun = 0; rerun < 2; rerun++) {
-      assertEquals(await reconcileBrowserAuth(root, fs), [], type);
+      assertEquals((await reconcileBrowserAuth(root, fs)).written, [], type);
       for (const path of ['auth/bff.ts', 'auth/service.ts', 'apps/web/routes/auth/[action].ts']) {
         assertEquals(await fs.exists(join(root, path)), false, `${type}: ${path}`);
       }
@@ -546,6 +551,6 @@ Deno.test('browser ownership ignores unrelated invalid app fields', async () => 
     assertEquals(await fs.exists(join(root, 'auth/bff.ts')), scaffold);
     assertEquals(await fs.exists(join(root, 'auth/service.ts')), scaffold);
     assertEquals(await fs.exists(join(root, 'apps/web/routes/auth/[action].ts')), scaffold);
-    assertEquals(await reconcileBrowserAuth(root, fs), []);
+    assertEquals((await reconcileBrowserAuth(root, fs)).written, []);
   }
 });

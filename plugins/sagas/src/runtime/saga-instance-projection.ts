@@ -1,6 +1,8 @@
+import { z } from 'zod';
+import { SAGA_INSTANCE_STATUSES } from '@netscript/plugin-sagas-core/domain';
 import { loadSagaRetention } from './load-saga-retention.ts';
 import {
-  isSagaTransitionStore,
+  isSagaAtomicStore,
   type SagaTransitionCommitRequest,
   type SagaTransitionCommitResult,
   type SagaTransitionStore,
@@ -17,6 +19,9 @@ import type {
   SagaTransitionRecord,
 } from '@netscript/plugin-sagas-core/domain';
 import { getKv, type WatchableKv } from '@netscript/kv';
+
+/** Version of the nested business-state document stored in the Prisma JSON column. */
+export const SAGA_INSTANCE_PROJECTION_VERSION = 2;
 
 /** Query-model projection written after one durable saga transition. */
 export type SagaInstanceProjection = Readonly<{
@@ -67,6 +72,27 @@ export type SagaInstanceReadModel = Readonly<{
   lastMessageType?: string;
 }>;
 
+const SagaInstanceReadModelSchema: z.ZodType<SagaInstanceReadModel> = z.object({
+  sagaName: z.string(),
+  sagaId: z.string(),
+  instanceId: z.string(),
+  correlationId: z.string(),
+  correlationKey: z.string(),
+  state: z.record(z.string(), z.unknown()),
+  status: z.enum(SAGA_INSTANCE_STATUSES),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  completedAt: z.string().optional(),
+  version: z.number(),
+  messageCount: z.number(),
+  lastMessageType: z.string().optional(),
+});
+
+/** Validate the shared HTTP/stream document without interpreting business fields. */
+export function parseSagaInstanceReadModel(value: unknown): SagaInstanceReadModel {
+  return SagaInstanceReadModelSchema.parse(value);
+}
+
 /** KV implementation used when the generated Prisma client has no saga delegates. */
 export class KvSagaInstanceProjection implements SagaInstanceProjectionPort {
   readonly #injectedKv?: WatchableKv;
@@ -102,7 +128,7 @@ export class KvSagaInstanceProjection implements SagaInstanceProjectionPort {
     if (expireIn !== undefined && expireIn <= 0) await kv.delete(key);
     else {await kv.set(
         key,
-        readModel(projection),
+        sagaInstanceReadModel(projection, projection.transition.transition.message.type),
         expireIn === undefined ? undefined : { expireIn },
       );}
   }
@@ -134,13 +160,17 @@ export class PrismaSagaInstanceProjection implements SagaInstanceProjectionPort 
   /** Upsert a stable row keyed by saga definition and engine instance id. */
   async upsert(projection: SagaInstanceProjection): Promise<void> {
     if (!this.#shouldProject(projection.sagaId)) return;
-    const state = projectionState(projection);
+    const state = {
+      ...sagaInstanceReadModel(projection, projection.transition.transition.message.type),
+      projectionVersion: SAGA_INSTANCE_PROJECTION_VERSION,
+    };
     const dates = projectionDates(projection.envelope.metadata);
     const create = {
       id: projection.instanceId,
       sagaName: projection.sagaId,
       correlationId: projection.correlationKey,
       version: projection.envelope.metadata.version,
+      status: projection.envelope.metadata.status,
       isCompleted: projection.envelope.metadata.status === 'completed',
       state,
       createdAt: dates.createdAt,
@@ -157,6 +187,7 @@ export class PrismaSagaInstanceProjection implements SagaInstanceProjectionPort 
       update: {
         correlationId: projection.correlationKey,
         version: projection.envelope.metadata.version,
+        status: projection.envelope.metadata.status,
         isCompleted: projection.envelope.metadata.status === 'completed',
         state,
         updatedAt: dates.updatedAt,
@@ -183,7 +214,7 @@ export function createProjectingSagaStore(
   delegate: SagaStorePort,
   projection: SagaInstanceProjectionPort,
 ): SagaStorePort {
-  return isSagaTransitionStore(delegate)
+  return isSagaAtomicStore(delegate)
     ? new AtomicProjectingSagaStore(delegate, projection)
     : new ProjectingSagaStore(delegate, projection);
 }
@@ -302,6 +333,11 @@ class AtomicProjectingSagaStore implements SagaTransitionStore {
     return result;
   }
 
+  /** Preserve the delegate's committed-replay fast path without exposing legacy markers. */
+  hasAppliedTransition(instanceId: SagaInstanceId, keyHash: string): Promise<boolean> {
+    return this.#delegate.hasAppliedTransition?.(instanceId, keyHash) ?? Promise.resolve(false);
+  }
+
   load<TState extends SagaState>(
     instanceId: SagaInstanceId,
   ): Promise<SagaStateEnvelope<TState> | undefined> {
@@ -342,32 +378,11 @@ class AtomicProjectingSagaStore implements SagaTransitionStore {
   }
 }
 
-function projectionState(projection: SagaInstanceProjection): Readonly<Record<string, unknown>> {
-  const { metadata } = projection.envelope;
-  const dates = projectionDates(metadata);
-  return Object.freeze({
-    ...projection.envelope.state,
-    sagaId: projection.sagaId,
-    instanceId: projection.instanceId,
-    correlationKey: projection.correlationKey,
-    status: metadata.status,
-    lastMessageType: projection.transition.transition.message.type,
-    metadata: {
-      sagaId: projection.sagaId,
-      instanceId: projection.instanceId,
-      version: metadata.version,
-      status: metadata.status,
-      durability: metadata.durability,
-      createdAt: dates.createdAt.toISOString(),
-      updatedAt: dates.updatedAt.toISOString(),
-      completedAt: dates.completedAt?.toISOString(),
-      traceparent: metadata.traceparent,
-      tracestate: metadata.tracestate,
-    },
-  });
-}
-
-function readModel(projection: SagaInstanceProjection): SagaInstanceReadModel {
+/** Map canonical state to an API view without merging runtime metadata into business state. */
+export function sagaInstanceReadModel(
+  projection: Pick<SagaInstanceProjection, 'sagaId' | 'instanceId' | 'correlationKey' | 'envelope'>,
+  lastMessageType?: string,
+): SagaInstanceReadModel {
   const metadata = projection.envelope.metadata;
   const dates = projectionDates(metadata);
   return Object.freeze({
@@ -376,14 +391,14 @@ function readModel(projection: SagaInstanceProjection): SagaInstanceReadModel {
     instanceId: projection.instanceId,
     correlationId: projection.correlationKey,
     correlationKey: projection.correlationKey,
-    state: projectionState(projection),
+    state: projection.envelope.state,
     status: metadata.status,
     createdAt: dates.createdAt.toISOString(),
     updatedAt: dates.updatedAt.toISOString(),
     completedAt: dates.completedAt?.toISOString(),
     version: metadata.version,
     messageCount: metadata.version,
-    lastMessageType: projection.transition.transition.message.type,
+    lastMessageType,
   });
 }
 

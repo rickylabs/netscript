@@ -1,0 +1,3 @@
+# Supported Aspire telemetry reads
+
+Aspire v13.5.3 TelemetryCommandHelpers resolves an AppHost to DashboardInfoV2 (API base + token); explicit dashboard login URLs exchange their browser token at /api/telemetry/validateToken. Origin-only normalization loses login auth. HTTP API snapshots return wrapped data.resourceSpans/resourceLogs with counts; there is no since timestamp filter and no native metrics/histogram query endpoint. Apply time windows locally. The shared TelemetryQueryPort implementation swallows failures; assigned MCP analysis tools need a strict acquisition boundary. MCP executeAspireCliCommand is the reusable cancellable command edge. #2515 allows bounded one-shot reads; prohibits timer-based repeated resource snapshots.

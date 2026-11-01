@@ -1,0 +1,3 @@
+# Repair validation recipes
+
+The actual preset CLI implementation is under `public/features/ui/protocol/preset`, and its native registry/preset acceptance tests live under `public/features/ui/protocol`. There is no `public/features/ui/preset` folder: passing it to Deno test exits before selecting any tests. Run init/apply/add/v2 registry tests plus the protocol folder through run-deno-test.ts. Scoped check/lint/fmt use repeated --file on the five changed TypeScript files; external config copies root fmt/lint settings without include/exclude for complete CLI coverage. A type-guard mutation should run before the broad test suite to avoid changing source underneath a parallel test.

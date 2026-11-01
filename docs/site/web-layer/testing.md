@@ -2,42 +2,32 @@
 layout: layouts/base.vto
 title: Testing Fresh pages
 templateEngine: [vento, md]
-order: 10
+order: 15
 ---
 
 # Testing Fresh pages
 
-The `@netscript/fresh` testing export provides fixtures for exercising routes,
-loaders, and layouts without standing up an HTTP server. Reach for it when you
-want to unit-test a page's loader logic, assert on the context a route receives,
-or drive defer-region helpers with a controlled policy. The helpers build the
-same shape your route code reads at runtime, so a test can call your loader
-directly and inspect the result.
+This page shows how to unit-test Fresh routes, loaders, layouts, and defer regions with
+`@netscript/fresh/testing`, without an HTTP server. The fixtures build the same context shape your
+route code reads at runtime, so a test calls your loader directly and inspects the result.
 
 ## What the testing surface provides
 
-The export centers on two factory functions:
+The export has two factories. Each takes a plain options object, so a test sets only the fields it
+needs:
 
-- `createMockRouteContext()` builds a minimal page context fixture for route,
-  loader, and layout tests. It returns a `MockRouteContext` that mirrors the
-  request URL, route params, parsed path and search values, layer data, named
-  resources, and an abort signal — everything a loader or layout reads from its
-  context.
-- `createMockDeferPolicy()` builds a defer policy fixture accepted by
-  defer-region helpers, so tests that cover deferred or streaming partials can
-  pin freshness and prewarm behavior.
-
-Both factories take a plain options object, so a test composes only the fields
-it cares about and leaves the rest at their fixture defaults.
+- `createMockRouteContext()` returns a `MockRouteContext` with the request URL, route params, parsed
+  path and search values, layer data, named resources, and an abort signal: everything a loader or
+  layout reads from its context.
+- `createMockDeferPolicy()` returns a defer policy for defer-region helpers, so tests of deferred or
+  streaming partials can pin freshness and prewarm behavior.
 
 ## Testing a route loader
 
-`createMockRouteContext()` accepts `MockRouteContextOptions`. Every field is
-optional: supply a `url`, `params`, `state`, parsed `path` and `search` values,
-a `routePattern`, named `resources`, an explicit `req`, or a `signal`. The
-returned `MockRouteContext` exposes those values as readonly properties, plus a
-`resource(key)` method that returns a single named resource and a `nav` fixture
-with `makeHref()`.
+`createMockRouteContext()` accepts `MockRouteContextOptions`. Every field is optional: `url`,
+`params`, `state`, parsed `path` and `search` values, `routePattern`, named `resources`, `req`, and
+`signal`. The returned context exposes them as readonly properties, plus a `resource(key)` method
+for one named resource and a `nav` fixture with `makeHref()`.
 
 ```ts
 import { assertEquals } from "@std/assert";
@@ -72,19 +62,15 @@ Deno.test("dashboard loader reads the path id and metrics resource", () => {
 });
 ```
 
-The fixture's `url` is a `URL`, `req` is a `Request`, `params` is a
-`Record<string, string | undefined>`, and `signal` is an `AbortSignal`. Tests
-that need to assert on cancellation can pass their own `signal` through the
-options and observe it on the returned context.
+To assert on cancellation, pass your own `signal` in the options and observe it on the returned
+context. [`MockRouteContext` properties](#mockroutecontext-properties) lists every property type.
 
 ## Testing a bound route contract
 
-A [route contract](/web-layer/route/) owns the parsing of a route's path and
-search params, so its `parsePath`/`parseSearch` (and the non-throwing
-`safeParsePath`/`safeParseSearch`) are worth testing directly — no context fixture
-needed. Bind the contract to a pattern, then assert on what it parses and what it
-rejects. This is the typed alternative to testing hand-rolled `URLSearchParams`
-juggling: the schema is the single source of truth, and the test pins it.
+A [route contract](/web-layer/route/) parses a route's path and search params, so test its
+`parsePath`/`parseSearch` and the non-throwing `safeParsePath`/`safeParseSearch` directly. No
+context fixture is needed: bind the contract to a pattern, then assert on what it parses and what it
+rejects.
 
 ```ts
 import { assert, assertEquals } from "@std/assert";
@@ -117,16 +103,14 @@ Deno.test("orders route rejects an out-of-enum status", () => {
 });
 ```
 
-`safeParsePath`/`safeParseSearch` return a `SchemaParseResult` — a
-`{ success: true, data }` success or a `{ success: false, error? }` failure — so a
-test can assert both the happy path and the rejection without a `try`/`catch`. The
-throwing `parsePath`/`parseSearch` variants suit tests that expect valid input.
+`safeParsePath`/`safeParseSearch` return a `SchemaParseResult`: `{ success: true, data }` or
+`{ success: false, error? }`. A test can assert both the happy path and the rejection without
+`try`/`catch`. The throwing `parsePath`/`parseSearch` suit tests that expect valid input.
 
 ## Testing layouts
 
-Layout tests read `layerData` from the context, a `Record<string, unknown>`
-carrying the data a layout receives. Construct a fixture with the layer data your
-layout expects and pass the context to the layout under test.
+A layout reads `layerData` from its context, a `Record<string, unknown>` with the data the layout
+receives. Build a fixture and pass the context to the layout under test.
 
 ```ts
 import { createMockRouteContext } from "@netscript/fresh/testing";
@@ -142,15 +126,11 @@ const layerData = ctx.layerData;
 
 ## Defer policy fixtures
 
-`createMockDeferPolicy()` accepts either a `MockDeferPolicyProfile` name or a
-`MockDeferPolicyInput` override object, and returns the resolved policy for use
-with defer-region helpers. The profile names are `"balanced"`,
-`"aggressive-first-paint"`, `"background-refresh"`, and `"low-bandwidth"`. The
-`MockDeferPolicyInput` form lets a test start from a named `profile` and then
-override individual fields: `staleTimeMs` for the freshness window,
-`prewarmOnMiss` and `prewarmOnStale` for cache-prewarm behavior, and
-`clientRefreshOnFreshCache` and `skipClientWhenServerPrewarm` for client refresh
-behavior.
+`createMockDeferPolicy()` accepts a `MockDeferPolicyProfile` name (`"balanced"`,
+`"aggressive-first-paint"`, `"background-refresh"`, or `"low-bandwidth"`) or a
+`MockDeferPolicyInput` object that starts from a `profile` and overrides individual fields. It
+returns the resolved policy for defer-region helpers.
+[`MockDeferPolicyInput` properties](#mockdeferpolicyinput-properties) lists the fields.
 
 ```ts
 import { createMockDeferPolicy } from "@netscript/fresh/testing";
@@ -166,12 +146,6 @@ const tuned = createMockDeferPolicy({
   skipClientWhenServerPrewarm: true,
 });
 ```
-
-{{ comp callout { type: "note" } }}
-The defer policy fixture pairs with the deferred and streaming UI surface. See
-[Deferred and streaming UI](/web-layer/defer-streaming-ui/) for how policies
-drive partial freshness and prewarming at runtime.
-{{ /comp }}
 
 ## API summary
 
@@ -213,15 +187,9 @@ drive partial freshness and prewarming at runtime.
 | `clientRefreshOnFreshCache` | `boolean` | Allow client refresh even when server cache is fresh. |
 | `skipClientWhenServerPrewarm` | `boolean` | Skip client refresh when the server is already prewarming. |
 
-## Related
+## Next steps
 
-{{ comp.cardsGrid({ columns: 3, cards: [ { title: "Routing and route contracts", body: "The route context your loaders read at runtime.", href: "/web-layer/route/" }, { title: "Data loading and the query cache", body: "Load data into a route from named resources.", href: "/web-layer/query/" }, { title: "Deferred and streaming UI", body: "The defer regions your policy fixtures drive.", href: "/web-layer/defer-streaming-ui/" } ] }) }}
-
-- [The Fresh page model](/web-layer/server/)
-- [Pages and the define-page builder](/web-layer/builders/)
-- [Server-validated forms](/web-layer/form/)
-- [Interactive islands](/web-layer/interactive/)
-- [Error handling and diagnostics](/web-layer/error/)
-- [Examples and sandbox](/web-layer/examples/)
-- [Web Layer overview](/web-layer/)
-- [Tutorial: Build a live dashboard](/tutorials/live-dashboard/)
+See how these policies drive partial freshness and prewarming at runtime in
+[Deferred and streaming UI](/web-layer/defer-streaming-ui/). See also
+[Routing and route contracts](/web-layer/route/) and
+[Error handling and diagnostics](/web-layer/error/).

@@ -1,3 +1,5 @@
+> Historical verdict for the 2026-10-28 source head f8db7ee. This does not certify the 2026-11-01 refresh. The fresh review is recorded separately in evaluate-refresh.md once complete.
+
 **Verdict: PASS** for the #2451 implementation at `f8db7ee`.
 
 **Merge readiness isn't covered by this verdict.** The post-integration reruns and the hosted CI and runtime runs are still pending.

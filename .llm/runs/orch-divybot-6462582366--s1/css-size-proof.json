@@ -1,0 +1,21 @@
+{
+  "before": {
+    "bytes": 2466154,
+    "gzipBytes": 414792,
+    "declarations": 56919,
+    "effectiveContexts": 36,
+    "contextBasis": "Distinct preset/scheme contexts in the pre-fix formatter"
+  },
+  "ns-one": {
+    "bytes": 130436,
+    "gzipBytes": 24542,
+    "declarations": 3035,
+    "effectiveContexts": 2
+  },
+  "studio-utility": {
+    "bytes": 259738,
+    "gzipBytes": 46937,
+    "declarations": 6045,
+    "effectiveContexts": 4
+  }
+}

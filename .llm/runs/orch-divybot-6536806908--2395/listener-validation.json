@@ -1,0 +1,241 @@
+{
+  "scope": "W1 correction after final authorized round5. Corrected-head independent review is UNPROVEN pending coordinator authorization of a fresh evaluation cycle.",
+  "gates": [
+    {
+      "gate": "survival-positive",
+      "rawReportSha256": "da2010802952cd3588b221d0a64a08c56b22f75089c2115524198991b01db0f6",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "--unstable-kv",
+        "plugins/workers/worker/worker-lease-survival_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 6,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "survival-negative",
+      "rawReportSha256": "55287a042c17eb6d6863887d6bcf1314cd91518d0bb3127034bdfe5f6484d05c",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "--unstable-kv",
+        "plugins/workers/worker/worker-lease-survival_test.ts"
+      ],
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 4,
+        "ignored": 0,
+        "totalResults": 4,
+        "uniqueFailures": 1
+      },
+      "expectedExitCode": 1,
+      "failingTests": [
+        "Redis repeated disabled tasks do not spend the listener restart budget",
+        "Redis repeated active-duplicate tasks do not spend the listener restart budget",
+        "Garnet repeated disabled tasks do not spend the listener restart budget",
+        "Garnet repeated active-duplicate tasks do not spend the listener restart budget"
+      ]
+    },
+    {
+      "gate": "dlq-retry-compatibility",
+      "rawReportSha256": "6b9427905a428c5f4ac116adfc6e863bad923fae4cddf2ba69029ce97244dc7c",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "--unstable-kv",
+        "plugins/workers/worker/worker-lease-survival_test.ts",
+        "plugins/workers/worker/job-dead-letters_test.ts",
+        "plugins/workers/worker/job-retry_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 29,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 29,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "type-check",
+      "rawReportSha256": "6beae876dd3564c6f0080efb7ea0baeb84dfb3402f0d5ff4ae11a7942f94302b",
+      "command": "deno check --unstable-kv <files>",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 32,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    {
+      "gate": "lint",
+      "rawReportSha256": "00e586dbfee93047e83ec74749fb00df3a674fa89985383ed64ac80a2ef0e2ee",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 32,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 32,
+        "filesProcessed": 32,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gate": "format",
+      "rawReportSha256": "fa52b9328ceaa3e332c4d541bef349ad6ea7d428cc61bfa891b042104c27dcec",
+      "command": "deno fmt --check",
+      "summary": {
+        "filesSelected": 32,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 32,
+        "filesProcessed": 32,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gate": "combined-final",
+      "rawReportSha256": "5b14b53153215764883c135e10a86f1a19e26302fe6c65db61998133acbbd9a4",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "--unstable-kv",
+        "packages/queue/tests",
+        "packages/plugin-workers-core/src/stores/kv-worker-idempotency-store_test.ts",
+        "packages/plugin-workers-core/src/stores/kv-worker-idempotency-concurrency_test.ts",
+        "packages/plugin-workers-core/tests/runtime/job-retry-policy_test.ts",
+        "plugins/workers/worker",
+        "packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts",
+        "packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 281,
+        "failed": 0,
+        "ignored": 2,
+        "totalResults": 283,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "generated-helper-compile-and-generators",
+      "rawReportSha256": "ca28fff35b28b7210b44ed1b16cb72b05b31a4bacc86f70f10dd1c3ad531c532",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "packages/cli/src/kernel/templates/aspire/helpers/tests/generated-helpers-compile_test.ts",
+        "packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts",
+        "packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 52,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 52,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "generated-helper-compile-final",
+      "rawReportSha256": "11fd4c4c9fe809c0a7620063018a9ff34444a730b32961b9169c5b814d70db81",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "packages/cli/src/kernel/templates/aspire/helpers/tests/generated-helpers-compile_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "compile-fixture-lint",
+      "rawReportSha256": "6930f782a952d1be2c5f44e1afbcc960e597c0d502c8cc4ad8442e09bebbeb4f",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 1,
+        "filesProcessed": 1,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gate": "compile-fixture-types",
+      "rawReportSha256": "7b9e409026596bd029e69f82cd7ceb792e0e042ef461a74c535bcd64f4e9a81d",
+      "command": "deno check --unstable-kv <files>",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    }
+  ],
+  "additionalGates": {
+    "qualityArchitectureDependencies": "PASS, durable receipt retained privately",
+    "nativeMcpCorpusFreshness": "PASS, public signatures unchanged",
+    "combinedSuite": "PASS: 281 passed,0 failed,2 CI-only skipped",
+    "independentReview": "UNPROVEN on corrected head; round5 CHANGES on 1edb71eeeb72ddd4d84327bc9bd97f79ce5c31b3",
+    "scaffoldRuntimeCI": "UNPROVEN: coordinator-owned e2e-cli-gate not armed",
+    "ciShard4": "Prior-head sole failure was incomplete SDK fixture; supported withArgs method added with Container coverage, compile regression passes; corrected-head CI rerun pending",
+    "upstreamSdkContract": "https://aspire.dev/reference/api/typescript/aspire.hosting/withargs/"
+  }
+}

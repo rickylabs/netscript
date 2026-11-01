@@ -1,5 +1,6 @@
 /** Why a PostgreSQL connection string cannot be translated faithfully. */
 export type PostgresConnectionStringErrorReason =
+  | 'duplicate-key'
   | 'unsupported-key'
   | 'unsupported-value'
   | 'invalid-format';
@@ -18,7 +19,7 @@ export type PostgresConnectionStringErrorReason =
 export class PostgresConnectionStringError extends Error {
   /** Machine-readable refusal reason. */
   readonly reason: PostgresConnectionStringErrorReason;
-  /** Lowercase option key, when the refusal concerns a specific option. */
+  /** Lowercase option key; duplicates identify the canonical option, not its alias. */
   readonly key?: string;
 
   /** Construct a refusal without including the connection string or option value. */

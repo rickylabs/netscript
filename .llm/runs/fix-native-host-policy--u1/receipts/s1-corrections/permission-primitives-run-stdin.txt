@@ -1,0 +1,42 @@
+deno 2.9.7 ; DENY=--cached-only --deny-read --deny-env --deny-net --deny-write --deny-run --deny-sys --deny-ffi ; module source via stdin (deno run -)
+=== Q  (cwd .llm/tmp/u1-s1c/ctl)
+{"env":"denied","read":"denied"}
+exit=0
+=== Q-eval-ignores-deny  (cwd .llm/tmp/u1-s1c/ctl)
+{"env":"granted","read":"granted"}
+exit=0
+=== P1 static local import  (cwd .llm/tmp/u1-s1c/ctl)
+denied
+exit=0
+=== N1 dynamic local import  (cwd .llm/tmp/u1-s1c/ctl)
+dyn
+exit=0
+=== N2 runtime readTextFile  (cwd .llm/tmp/u1-s1c/ctl)
+error: Uncaught (in promise) NotCapable: Requires read access to "C:\Users\ericc\source\repos\netscript-native-host-policy-008\.llm\tmp\u1-s1c\ctl\inert.ts", run again with the --allow-read flag
+await Deno.readTextFile(new URL("./inert.ts", import.meta.url));
+exit=1
+=== N3 env read  (cwd .llm/tmp/u1-s1c/ctl)
+error: Uncaught (in promise) NotCapable: Requires env access to "PORT", run again with the --allow-env flag
+Deno.env.get("PORT")
+exit=1
+=== N4 listen  (cwd .llm/tmp/u1-s1c/ctl)
+error: Uncaught (in promise) NotCapable: Requires net access to "127.0.0.1:0", run again with the --allow-net flag
+Deno.listen({hostname:"127.0.0.1",port:0})
+exit=1
+=== P2 resolve legacy subpath (self-ref)  (cwd plugins/workers)
+file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/workers/services/src/main.ts
+exit=0
+=== R1 resolve NEW subpath (RED)  (cwd plugins/workers)
+error: Uncaught (in promise) TypeError: Unknown export './service' for '@netscript/plugin-workers'.
+  Package exports:
+exit=1
+=== R2 static import NEW subpath (RED)  (cwd plugins/workers)
+error: Unknown export './service' for '@netscript/plugin-workers'.
+  Package exports:
+exit=1
+=== P4 static import @netscript/service/auth  (cwd plugins/workers)
+exit=0
+=== B1 legacy ./services subpath under full deny (baseline, not S1 scope)  (cwd plugins/workers)
+error: Uncaught (in promise) NotCapable: Requires env access, run again with the --allow-env flag
+exports.inspectOpts = Object.keys(process.env).filter(key => {
+exit=1

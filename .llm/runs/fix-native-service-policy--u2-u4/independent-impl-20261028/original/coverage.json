@@ -1,0 +1,199 @@
+{
+  "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+  "reads": [
+    {
+      "name": "part-01.md",
+      "expectedLines": 434,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-02.md",
+      "expectedLines": 406,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-03.md",
+      "expectedLines": 358,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-04.md",
+      "expectedLines": 239,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-05.md",
+      "expectedLines": 366,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-06.md",
+      "expectedLines": 399,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-07.md",
+      "expectedLines": 658,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-08.md",
+      "expectedLines": 540,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-09.md",
+      "expectedLines": 900,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-10.md",
+      "expectedLines": 900,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-11.md",
+      "expectedLines": 900,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-12.md",
+      "expectedLines": 900,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-13.md",
+      "expectedLines": 821,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-14.md",
+      "expectedLines": 874,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-15.md",
+      "expectedLines": 900,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-16.md",
+      "expectedLines": 900,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-17.md",
+      "expectedLines": 119,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "part-18-current-delta.md",
+      "expectedLines": 214,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "original-review-questions.md",
+      "expectedLines": 156,
+      "complete": true,
+      "calls": 1
+    },
+    {
+      "name": "current-ci-context.md",
+      "expectedLines": 13,
+      "complete": true,
+      "calls": 1
+    }
+  ],
+  "mcp": [
+    {
+      "tool": "netscript_search_docs",
+      "input": {
+        "query": "withCors",
+        "limit": 3
+      },
+      "status": "completed"
+    },
+    {
+      "tool": "netscript_get_doc",
+      "input": {
+        "slug": "pages/reference/service",
+        "section": "cors-origins"
+      },
+      "status": "completed"
+    },
+    {
+      "tool": "netscript_get_doc",
+      "input": {
+        "slug": "pages/reference/service",
+        "section": "pipeline-order"
+      },
+      "status": "completed"
+    }
+  ],
+  "steps": [
+    {
+      "reason": "tool-calls",
+      "cost": 0.04104,
+      "tokens": {
+        "total": 17814,
+        "input": 14877,
+        "output": 1329,
+        "reasoning": 456,
+        "cache": {
+          "write": 0,
+          "read": 1152
+        }
+      }
+    },
+    {
+      "reason": "tool-calls",
+      "cost": 0.434424,
+      "tokens": {
+        "total": 192488,
+        "input": 158126,
+        "output": 68,
+        "reasoning": 18294,
+        "cache": {
+          "write": 0,
+          "read": 16000
+        }
+      }
+    },
+    {
+      "reason": "stop",
+      "cost": 0.225168,
+      "tokens": {
+        "total": 209792,
+        "input": 19036,
+        "output": 2808,
+        "reasoning": 13868,
+        "cache": {
+          "write": 0,
+          "read": 174080
+        }
+      }
+    }
+  ],
+  "failures": [],
+  "targetHead": "de9f6df3561d9e27587dd63687c8825254e9c3d5",
+  "publicReportsRequired": 1,
+  "manualRootRelevanceAndVerdictRequired": true
+}

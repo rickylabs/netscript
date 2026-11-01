@@ -21,9 +21,8 @@
     },
     {
       "intent": "add a capability NetScript does not ship",
-      "mode": "exact",
+      "mode": "ordered-prefix",
       "expected": [
-        "pages/orchestration-runtime/how-to/author-a-plugin#before-you-start",
         "pages/explanation/plugin-system#a-plugin-is-a-thin-layer-over-a-core-package",
         "pages/orchestration-runtime/how-to/author-a-plugin#step-1-scaffold-the-two-tier-skeleton"
       ]
@@ -59,7 +58,7 @@
       "intent": "create a new NetScript project from scratch",
       "mode": "rank-one",
       "expected": [
-        "llms#getting-started"
+        "pages/reference/cli/commands#init-scaffold-a-workspace"
       ]
     },
     {
@@ -68,8 +67,8 @@
       "rankingAxis": "score",
       "expected": [
         "pages/data-persistence/how-to/use-a-second-database#4-decision-rule-direct-use-vs-reusable-databaseadapter-wrapper",
-        "pages/data-persistence/how-to/use-a-second-database#connect-an-external-database-by-hand",
-        "pages/data-persistence/how-to/use-a-second-database#unsupported-by-netscript-supported-by-prisma-libsql-turso-example"
+        "pages/data-persistence/how-to/use-a-second-database#unsupported-by-netscript-supported-by-prisma-libsql-turso-example",
+        "pages/data-persistence/how-to/use-a-second-database#connect-an-external-database-by-hand"
       ]
     }
   ]

@@ -1,0 +1,39 @@
+{
+  "sourceHead": "de9f6df3561d9e27587dd63687c8825254e9c3d5",
+  "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+  "canonicalPath": ".llm/harness/debt/arch-debt.md",
+  "canonicalSha256": "74e43f6a6c914c5af55edd107d9c5a06a289ae795d5b980d37af89c0a38d7fb9",
+  "debtNumstat": "14\t0\t.llm/harness/debt/arch-debt.md",
+  "ownerPhysicalLines": {
+    "packages/service/src/builder/service-builder-impl.ts": 633,
+    "packages/service/src/types.ts": 335,
+    "packages/service/tests/auth/builder-auth_test.ts": 433,
+    "packages/service/tests/auth/define-service-auth_test.ts": 299,
+    "packages/service/tests/auth/health-auth-order_test.ts": 332,
+    "packages/service/tests/auth/middleware_test.ts": 477
+  },
+  "originalFinalSha256": "a839caaf0b26df3bc6aee66e2f1907f595ed6370c832bf70d5d918b798cb8ccb",
+  "requiredReads": [
+    {
+      "name": "debt-completion-20261028/canonical-entry.md",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/debt-completion-20261028/canonical-entry.md",
+      "lines": 29,
+      "bytes": 2358,
+      "sha256": "57dab883258a1b544640f77cf60d8c9cc11d448df5b79b86fa556b6beaf86272"
+    },
+    {
+      "name": "debt-completion-20261028/original-public-final.utf8.md",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/debt-completion-20261028/original-public-final.utf8.md",
+      "lines": 67,
+      "bytes": 10592,
+      "sha256": "a839caaf0b26df3bc6aee66e2f1907f595ed6370c832bf70d5d918b798cb8ccb"
+    },
+    {
+      "name": "debt-completion-20261028/root-gap-and-debt-delta.md",
+      "path": "C:/Users/ericc/source/repos/netscript-native-service-policy-008/.llm/tmp/native-service-policy-grok-impl-20261028/host/debt-completion-20261028/root-gap-and-debt-delta.md",
+      "lines": 62,
+      "bytes": 4222,
+      "sha256": "392553909b4654fbc182359798262cc2ae51b12c40171b22265cb75e57e85515"
+    }
+  ]
+}

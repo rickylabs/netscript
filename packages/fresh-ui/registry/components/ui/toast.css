@@ -17,19 +17,19 @@
   pointer-events: auto;
 }
 
-.ns-toast--success {
+:where(.ns-toast)[data-type='success'] {
   border-color: color-mix(in srgb, var(--ns-success) 24%, transparent);
 }
 
-.ns-toast--error {
+:where(.ns-toast)[data-type='error'] {
   border-color: color-mix(in srgb, var(--ns-destructive) 24%, transparent);
 }
 
-.ns-toast--warning {
+:where(.ns-toast)[data-type='warning'] {
   border-color: color-mix(in srgb, var(--ns-warning) 24%, transparent);
 }
 
-.ns-toast--info {
+:where(.ns-toast)[data-type='info'] {
   border-color: color-mix(in srgb, var(--ns-secondary) 24%, transparent);
 }
 
@@ -75,19 +75,19 @@
   color: var(--ns-secondary);
 }
 
-.ns-toast--success .ns-toast__symbol {
+:where(.ns-toast)[data-type='success'] .ns-toast__symbol {
   border-color: color-mix(in srgb, var(--ns-success) 18%, transparent);
   background: color-mix(in srgb, var(--ns-success) 8%, transparent);
   color: var(--ns-success);
 }
 
-.ns-toast--error .ns-toast__symbol {
+:where(.ns-toast)[data-type='error'] .ns-toast__symbol {
   border-color: color-mix(in srgb, var(--ns-destructive) 18%, transparent);
   background: color-mix(in srgb, var(--ns-destructive) 8%, transparent);
-  color: var(--ns-destructive);
+  color: var(--ns-destructive-text);
 }
 
-.ns-toast--warning .ns-toast__symbol {
+:where(.ns-toast)[data-type='warning'] .ns-toast__symbol {
   border-color: color-mix(in srgb, var(--ns-warning) 18%, transparent);
   background: color-mix(in srgb, var(--ns-warning) 8%, transparent);
   color: var(--ns-warning);
@@ -120,15 +120,15 @@
   color: color-mix(in srgb, var(--ns-secondary) 88%, var(--ns-fg) 12%);
 }
 
-.ns-toast--success .ns-toast__eyebrow {
+:where(.ns-toast)[data-type='success'] .ns-toast__eyebrow {
   color: var(--ns-success);
 }
 
-.ns-toast--error .ns-toast__eyebrow {
-  color: var(--ns-destructive);
+:where(.ns-toast)[data-type='error'] .ns-toast__eyebrow {
+  color: var(--ns-destructive-text);
 }
 
-.ns-toast--warning .ns-toast__eyebrow {
+:where(.ns-toast)[data-type='warning'] .ns-toast__eyebrow {
   color: var(--ns-warning);
 }
 
@@ -171,15 +171,15 @@
   background: var(--ns-secondary);
 }
 
-.ns-toast--success .ns-toast__progress-bar {
+:where(.ns-toast)[data-type='success'] .ns-toast__progress-bar {
   background: var(--ns-success);
 }
 
-.ns-toast--error .ns-toast__progress-bar {
+:where(.ns-toast)[data-type='error'] .ns-toast__progress-bar {
   background: var(--ns-destructive);
 }
 
-.ns-toast--warning .ns-toast__progress-bar {
+:where(.ns-toast)[data-type='warning'] .ns-toast__progress-bar {
   background: var(--ns-warning);
 }
 
@@ -232,5 +232,177 @@
   .ns-toast-enter,
   .ns-toast-exit {
     animation-duration: 0.01ms;
+  }
+}
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--ns-radius-card);
+  border: var(--ns-border-width) solid var(--ns-border);
+  background: var(--ns-surface-raised);
+  box-shadow: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='panel'] {
+  padding: var(--ns-card-padding);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='eyebrow'] {
+  display: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='title'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-strong);
+  font-weight: var(--ns-weight-strong);
+  line-height: var(--ns-leading-strong);
+  letter-spacing: var(--ns-tracking-strong);
+  margin: 0;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='title-row'] {
+  gap: var(--ns-control-gap);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='symbol'] {
+  width: var(--ns-leading-strong);
+  height: var(--ns-leading-strong);
+  font-size: var(--ns-size-icon-md);
+  border: none;
+  background: transparent;
+  color: var(--ns-fg);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='message'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-body);
+  font-weight: var(--ns-weight-body);
+  line-height: var(--ns-leading-body);
+  letter-spacing: var(--ns-tracking-body);
+  margin-block: var(--ns-space-0-5) 0;
+  margin-inline-start: calc(var(--ns-leading-strong) + var(--ns-control-gap));
+  padding: 0;
+  border: none;
+  color: var(--ns-fg);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='progress-track'] {
+  order: 1;
+  height: var(--ns-focus-ring-width);
+  background: var(--ns-border);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='progress-bar'] {
+  background: var(--ns-fg);
+  transform-origin: left center;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='progress-bar']:dir(rtl) {
+  transform-origin: right center;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='dismiss'] {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--ns-muted-fg);
+  cursor: pointer;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='dismiss']:focus-visible {
+  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+  outline-offset: var(--ns-focus-ring-offset);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='info'] {
+  background: var(--ns-info-subtle);
+  border-color: var(--ns-info-border);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='info'] [data-scope='toast'][data-part='title'],
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='info'] [data-scope='toast'][data-part='symbol'] {
+  color: var(--ns-info-text);
+  background: transparent;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='info'] [data-scope='toast'][data-part='progress-track'] {
+  background: var(--ns-info-border);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='info'] [data-scope='toast'][data-part='progress-bar'] {
+  background: var(--ns-info-text);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='success'] {
+  background: var(--ns-success-subtle);
+  border-color: var(--ns-success-border);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='success'] [data-scope='toast'][data-part='title'],
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='success'] [data-scope='toast'][data-part='symbol'] {
+  color: var(--ns-success-text);
+  background: transparent;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='success'] [data-scope='toast'][data-part='progress-track'] {
+  background: var(--ns-success-border);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='success'] [data-scope='toast'][data-part='progress-bar'] {
+  background: var(--ns-success-text);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='warning'] {
+  background: var(--ns-warning-subtle);
+  border-color: var(--ns-warning-border);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='warning'] [data-scope='toast'][data-part='title'],
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='warning'] [data-scope='toast'][data-part='symbol'] {
+  color: var(--ns-warning-text);
+  background: transparent;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='warning'] [data-scope='toast'][data-part='progress-track'] {
+  background: var(--ns-warning-border);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='warning'] [data-scope='toast'][data-part='progress-bar'] {
+  background: var(--ns-warning-text);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='error'] {
+  background: var(--ns-destructive-subtle);
+  border-color: var(--ns-destructive-border);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='error'] [data-scope='toast'][data-part='title'],
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='error'] [data-scope='toast'][data-part='symbol'] {
+  color: var(--ns-destructive-text);
+  background: transparent;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='error'] [data-scope='toast'][data-part='progress-track'] {
+  background: var(--ns-destructive-border);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='toast'][data-part='root'][data-type='error'] [data-scope='toast'][data-part='progress-bar'] {
+  background: var(--ns-destructive-text);
+}
+
+/* The shipped wrapper has no public part; identify it by its contracted toast child. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) .ns-toast-wrapper:has(> [data-scope='toast'][data-part='root']) {
+  top: auto;
+  bottom: var(--ns-space-4);
+  right: auto;
+  inset-inline-end: var(--ns-space-4);
+}
+
+@media (max-width: 640px) {
+  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) .ns-toast-wrapper:has(> [data-scope='toast'][data-part='root']) {
+    inset-inline-start: var(--ns-space-4);
+    inset-inline-end: var(--ns-space-4);
   }
 }

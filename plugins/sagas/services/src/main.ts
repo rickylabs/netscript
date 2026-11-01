@@ -20,13 +20,12 @@ import '@netscript/kv/redis';
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import type { RunningService } from '@netscript/service';
 import { createPluginService } from '@netscript/plugin/service';
-import { resolveSagaProjectionBackend } from '@netscript/plugin-sagas-core/stores';
+import { resolveSagaInstanceQuery } from './instance-query.ts';
+import { loadSagaBackendSettings } from '../../src/runtime/saga-runner.ts';
 import { startSagasStreamMirror } from '../../streams/server.ts';
 import { createSagaDeliveryPublisher } from '../../src/runtime/saga-delivery.ts';
-import { resolveSagaServicePrismaClient } from './database-client.ts';
 import { router } from './router.ts';
 import { registerSagas } from './init.ts';
-import type { SagaServiceDatabaseClient } from './routers/v1-types.ts';
 
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
 
@@ -45,21 +44,26 @@ type PluginServiceBootstrap = {
  */
 export default async function createSagasService(
   ctx: PluginServiceContext,
+  options: Readonly<{
+    /** Request-start level; defaults to debug rather than the native middleware's info. */
+    readonly requestLevel?: 'debug' | 'info';
+    /** Successful-response level; defaults to debug rather than the native middleware's info. */
+    readonly responseLevel?: 'debug' | 'info';
+  }> = {},
 ): Promise<RunningService> {
   const portValue = ctx.env.PORT ?? Deno.env.get('PORT');
   if (portValue === undefined) {
     throw new Error('Sagas API requires the host-provided PORT environment variable.');
   }
   const port = Number.parseInt(portValue, 10);
-  const projectionBackend = resolveSagaProjectionBackend({
+  const query = await resolveSagaInstanceQuery({
     env: { ...Deno.env.toObject(), ...ctx.env },
-    appsettings: serviceAppsettings(ctx),
-  });
-  const sagaDbClient = projectionBackend === 'prisma'
-    ? resolveSagaServicePrismaClient(await ctx.db.getClient(), 'prisma')
-    : undefined;
-  const dbClient: SagaServiceDatabaseClient = sagaDbClient ?? emptySagaDatabaseClient;
-  const useKvProjection = projectionBackend === 'kv';
+    appsettings: await loadSagaBackendSettings(
+      ctx.env.NETSCRIPT_PROJECT_ROOT ?? Deno.env.get('NETSCRIPT_PROJECT_ROOT') ?? Deno.cwd(),
+      serviceAppsettings(ctx),
+    ),
+  }, { loadPrisma: () => ctx.db.getClient() });
+  const sagaDbClient = query.prisma;
   const sagaPublisher = createSagaDeliveryPublisher();
 
   const service = await createPluginService(router, {
@@ -68,6 +72,10 @@ export default async function createSagasService(
       reason:
         'Guarded adoption awaits caller credentials, runtime session seeding, per-service access policy and auth discovery references (#1383).',
     },
+    logger: {
+      requestLevel: options.requestLevel ?? 'debug',
+      responseLevel: options.responseLevel ?? 'debug',
+    },
     name: 'sagas',
     version: '1.0.0',
     port,
@@ -75,7 +83,7 @@ export default async function createSagasService(
       title: 'Sagas API',
       description: 'Sagas service for workflow orchestration and management',
     },
-    context: () => ({ db: dbClient, sagaRuntime: sagaPublisher, useKvProjection }),
+    context: () => ({ ...query.context, sagaRuntime: sagaPublisher }),
     onShutdown: [() => sagaPublisher.stop()],
   }).serve();
 
@@ -95,29 +103,6 @@ export default async function createSagasService(
   console.log(`[Sagas API] Running on http://localhost:${port}`);
 
   return service;
-}
-
-const emptySagaDatabaseClient: SagaServiceDatabaseClient = Object.freeze({
-  sagaInstance: Object.freeze({
-    findMany: listNoSagaInstances,
-    count: countNoSagaRows,
-  }),
-  sagaExecutionHistory: Object.freeze({
-    findMany: listNoSagaHistory,
-    count: countNoSagaRows,
-  }),
-});
-
-function listNoSagaInstances(): Promise<[]> {
-  return Promise.resolve([]);
-}
-
-function listNoSagaHistory(): Promise<[]> {
-  return Promise.resolve([]);
-}
-
-function countNoSagaRows(): Promise<0> {
-  return Promise.resolve(0);
 }
 
 function serviceAppsettings(ctx: PluginServiceContext): SagaServiceContextSettings | undefined {

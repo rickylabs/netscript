@@ -1,0 +1,51 @@
+{
+  "selected": "tests",
+  "results": [
+    {
+      "args": [
+        "run",
+        "--frozen",
+        "--allow-all",
+        ".llm/tools/run-deno-test.ts",
+        "--",
+        "--frozen",
+        "--allow-all",
+        "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+        "packages/fresh/src/runtime/streams/stream-db-recovery-adapter_test.ts",
+        "packages/fresh/tests/streamdb-headers-contract_test.ts"
+      ],
+      "code": 1,
+      "started": "2026-10-27T23:41:49.820Z",
+      "ended": "2026-10-27T23:41:51.886Z",
+      "originalChildStatusAwaited": true,
+      "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/tests-1793144509820-0.stdout",
+      "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/tests-1793144509820-0.stderr"
+    }
+  ],
+  "credentialFreeClearEnv": true,
+  "environmentNames": [
+    "HTTPS_PROXY",
+    "SystemDrive",
+    "HTTP_PROXY",
+    "ProgramFiles",
+    "ProgramW6432",
+    "NO_PROXY",
+    "PATHEXT",
+    "ComSpec",
+    "SystemRoot",
+    "windir",
+    "ProgramFiles(x86)",
+    "HOME",
+    "USERPROFILE",
+    "TEMP",
+    "TMP",
+    "DENO_TLS_CA_STORE",
+    "DENO_DIR",
+    "PATH",
+    "DENO_NO_PROMPT",
+    "DENO_NO_UPDATE_CHECK",
+    "OTEL_DENO",
+    "NO_COLOR"
+  ],
+  "authoredConsumerNoLockRetained": false
+}

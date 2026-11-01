@@ -1,0 +1,24 @@
+{
+  "sourceCommit": "e9236a3434f04a90291de07c21f99cfa65bb7e65",
+  "positive": {
+    "gate": "stable-generated-output-freshness",
+    "result": "PASS",
+    "publisherInvoked": false
+  },
+  "negative": {
+    "gate": "stable-generated-output-freshness-negative",
+    "result": "EXPECTED_REJECTION",
+    "message": "Error: Stable publication blocked: deno task --cwd packages/fresh-ui registry:embed:check did not reproduce the generated release outputs.\nTask registry:embed:check deno run --lock=deno.lock --frozen --allow-read=. --allow-run=deno scripts/embed-registry-assets.ts --check\nerror: Uncaught (in promise) Error: Stale embedded registry assets: src/registry/assets/registry.generated.ts\n    throw new Error('Stale embedded registry assets: src/registry/assets/registry.generated.ts');\n          ^\n    at packages/fresh-ui/scripts/embed-registry-assets.ts:45:11",
+    "publisherInvoked": false
+  },
+  "negativeFixture": "Only the compressed registry carrier was changed to embed a stale sdk pin; canonical registry.json remained current. The altered carrier was committed only in the disposable clone so the production clean-tree guard also ran.",
+  "entrypoint": "assertPreparedReleaseGeneratedOutputsFresh(Deno.cwd()) from .llm/tools/release/github-release.ts with default production dependencies",
+  "positiveExitCode": 0,
+  "negativeHarnessExitCode": 0,
+  "negativeGate": "registry:embed:check rejected the stale carrier as expected",
+  "publisherInvoked": false,
+  "rawLogSha256": {
+    "stable-freshness-positive": "76bcd42709a9bfb998c2e84235568dd0d1b243c1d464171d0b4e30229d9c5614",
+    "stable-freshness-negative": "85aeb6be6de9ef337b5644cb7f6847c227276d760df46a3c69eb25b4ce036abe"
+  }
+}

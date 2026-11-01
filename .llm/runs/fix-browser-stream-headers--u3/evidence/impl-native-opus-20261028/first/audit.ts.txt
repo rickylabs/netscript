@@ -1,0 +1,33 @@
+import {directory,host,head,nativeModel,json} from './common.ts';
+export async function audit(expectedSession:string):Promise<void>{
+  const events=(await Deno.readTextFile(`${directory}/native.public.jsonl`)).trim().split('\n').map(line=>JSON.parse(line));
+  const ids=[...new Set(events.map(e=>e.session_id).filter(Boolean))];
+  const init=events.find(e=>e.type==='system'&&e.subtype==='init');
+  const models=events.filter(e=>e.type==='assistant').map(e=>e.message?.model).filter(Boolean);
+  const results=events.filter(e=>e.type==='result');const result=results.at(-1);
+  if(ids.length!==1||ids[0]!==expectedSession||init?.model!==nativeModel||models.some(model=>model!==nativeModel)||
+    !models.length||init.permissionMode!=='dontAsk'||init.mcp_servers?.length!==1||
+    init.mcp_servers[0]?.name!=='netscript'||init.mcp_servers[0]?.status!=='connected')throw new Error('Native identity/readonly/sole-MCP init unqualified.');
+  const efforts=[init.effort,init.effortLevel,init.outputEffort].filter((value:unknown)=>typeof value==='string');
+  if(efforts.some(value=>value!=='xhigh'))throw new Error('Observed native effort differs from selected xhigh.');
+  const calls=events.filter(e=>e.type==='assistant').flatMap(e=>e.message.content).filter(p=>p.type==='tool_use');
+  const outputs=events.filter(e=>e.type==='user').flatMap(e=>e.message.content).filter(p=>p.type==='tool_result');
+  const text=(p:any):string=>typeof p.content==='string'?p.content:(p.content??[]).map((x:{text:string})=>x.text).join('\n');
+  const manifest:{requiredReads:{name:string;lines:number}[]}=JSON.parse(await Deno.readTextFile(`${directory}/packet-manifest.json`));
+  const reads=[];
+  for(const entry of manifest.requiredReads){
+    const expected=(await Deno.readTextFile(`${host}/${entry.name}`)).trimEnd().split('\n').map(line=>line.replace(/\r$/,''));
+    const matching=calls.filter(p=>p.name==='Read'&&String(p.input?.file_path??'').replaceAll('\\','/')===`${host}/${entry.name}`&&(p.input.offset===undefined||p.input.offset===1));
+    const complete=matching.some(call=>outputs.filter(p=>p.tool_use_id===call.id&&!p.is_error).some(output=>{
+      const numbered=new Map(text(output).split('\n').flatMap(line=>{const m=line.match(/^\s*(\d+)(?:\t|→)(.*)$/);return m?[[Number(m[1]),m[2]]]:[];}));
+      return expected.every((line,index)=>numbered.get(index+1)===line);
+    }));reads.push({name:entry.name,expectedLines:expected.length,complete});
+  }
+  const mcp=calls.filter(p=>/^mcp__netscript__(search_docs|get_doc|find_guidance|find_export|get_export)$/.test(p.name)&&outputs.some(o=>o.tool_use_id===p.id&&!o.is_error));
+  const final=typeof result?.result==='string'?result.result:'';
+  await json('coverage.json',{session:expectedSession,requestedModel:nativeModel,models,requestedEffort:'xhigh',observedEfforts:efforts,
+    actualEffortIndependentlyAttested:efforts.includes('xhigh'),effortResponseAbsentIsQualificationLimit:!efforts.length,
+    reads,mcp:mcp.map(p=>({name:p.name,input:p.input})),nativeTurns:result?.num_turns,manualRootContentRelevanceAndVerdictRequired:true});
+  if(results.length!==1||result?.subtype!=='success'||result.is_error||!Number.isInteger(result.num_turns)||result.num_turns<1||result.num_turns>6||reads.some(r=>!r.complete)||!mcp.length||!final.includes(head)||!/^VERDICT:\s*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT)\s*$/m.test(final))throw new Error('Full sealed reads/ownMCP/public verdict incomplete.');
+  await Deno.writeTextFile(`${directory}/final-verdict.md`,final,{createNew:true});
+}

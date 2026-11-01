@@ -1,5 +1,5 @@
 import { type Prisma, PrismaClient } from './.generated/client.ts';
-import { PrismaPg } from 'npm:@prisma/adapter-pg@7.8.0';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@1';
 import { delay } from 'jsr:@std/async@1';
 import { createPrismaSagaTransitionStore } from '@netscript/plugin-sagas-core/stores';
@@ -68,7 +68,7 @@ function refuseReadModel(): never {
   throw new Error('Publish conformance must not read the metadata projection');
 }
 const unusedReadModel: SagaServiceDatabaseClient = {
-  sagaInstance: { findMany: refuseReadModel, count: refuseReadModel },
+  sagaInstance: { findFirst: refuseReadModel, findMany: refuseReadModel, count: refuseReadModel },
   sagaExecutionHistory: { findMany: refuseReadModel, count: refuseReadModel },
 };
 
@@ -154,7 +154,7 @@ async function start(schema: string, temp: string, crashKey = '') {
     args: [
       'run',
       '--no-check',
-      '--no-lock',
+      '--frozen',
       '--config',
       new URL('deno.json', import.meta.url).pathname,
       '--unstable-kv',

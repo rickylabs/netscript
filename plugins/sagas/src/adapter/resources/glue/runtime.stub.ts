@@ -27,6 +27,7 @@ export const runtimeGlueStub: StubSource<never> = defineStub({
     '      }',
     '    },',
     '    () => supervisor?.snapshot().childHealth,',
+    "    { restartHistoryPath: '.data/child-health/sagas.json' },",
     '  );',
     '}',
     '',

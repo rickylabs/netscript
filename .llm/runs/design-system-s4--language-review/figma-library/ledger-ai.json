@@ -1,0 +1,95 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "ai-builder",
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "page": { "Components · AI": "229:347" },
+  "step": "B9-ai built I1-I12 (owner review pending): 15 sets (115 variants), 12 component reviews + composed Chat review (Utility light | dark), page restacked in spec order with Doc/Section labels",
+  "addedVariables": {
+    "note": "none added. Every binding goes to Theme set (VariableCollectionId:239:156), Scheme (3:2) or Density (3:64). Text roles used: T.body, T.strong, T.strong-sm, T.small, T.caption, T.heading, T.eyebrow (font/eyebrow + type/label + type/eyebrow/style), T.mono (font/mono + type/code size/line + type/mono/style + type/small tracking), mono caption (font/mono + type/caption size/line/tracking + type/mono/style)."
+  },
+  "components": {
+    "Message": { "id": "593:405063", "variants": 7, "axes": "role user|assistant|system x state rest|pending|streaming|error, sparse: user rest|error, assistant rest|pending|streaming|error, system rest", "props": "avatar, header, toolCall, widget, citations, actions, followups, footer", "nests": "Avatar md, Bubble, Tool call card, MCP UI widget, Citation chip, Marker, Inline notice, Button / xs (exposed: body Bubble, tool-call, widget)" },
+    "Bubble": { "id": "590:37432", "variants": 14, "axes": "variant default|secondary|muted|tinted|outline|ghost|destructive x align start|end", "props": "content, reactions" },
+    "Message scroller": { "id": "593:418223", "variants": 4, "axes": "scrollable none|up|down|both", "props": "exposed Message items" },
+    "Marker": { "id": "590:37184", "variants": 3, "axes": "variant default|border|separator", "props": "icon, label" },
+    "Trace line": { "id": "593:60957", "variants": 8, "axes": "status done|running|pending|error x open", "props": "title, description, collapsible, connector" },
+    "Trace": { "id": "593:61286", "variants": 3, "axes": "status running|done|error", "props": "exposed Trace line rows" },
+    "Questionnaire choice": { "id": "593:309813", "variants": 10, "axes": "multiple x state rest|hover|focus|selected|disabled", "props": "label, shortcut" },
+    "Questionnaire": { "id": "593:310030", "variants": 3, "axes": "step question|freeform|complete", "props": "progress, description, error" },
+    "Attachment": { "id": "591:815", "variants": 30, "axes": "state idle|uploading|processing|error|done x size default|sm|xs x orientation horizontal|vertical", "props": "title, media, mediaContent (swap .Item icon tile 408:82 | .Item image 408:85), description, actions" },
+    "Prompt input": { "id": "593:311257", "variants": 10, "axes": "state rest|focus|typing|busy|disabled x compact", "props": "attachments, tools, modelSelector, hint" },
+    "Model option": { "id": "593:61328", "variants": 4, "axes": "state rest|hover|focus|selected", "props": "label, desc" },
+    "Model selector": { "id": "593:61441", "variants": 4, "axes": "open x align left|right", "props": "exposed Model option rows" },
+    "Tool call card": { "id": "592:9863", "variants": 8, "axes": "status pending|running|done|error x open", "props": "name" },
+    "Citation chip": { "id": "590:37153", "variants": 4, "axes": "state rest|hover|focus|active", "props": "index" },
+    "MCP UI widget": { "id": "592:9986", "variants": 3, "axes": "state loading|ready|error", "props": "source" }
+  },
+  "showcase": {
+    "pageHeader": "231:11275",
+    "containers": {
+      "Message": "593:404642", "Bubble": "590:37190", "Message scroller": "593:417200", "Marker": "590:37161",
+      "Trace": "593:60230", "Questionnaire": "593:309643", "Attachment": "591:23", "Prompt input": "593:310037",
+      "Model selector": "593:61293", "Tool call card": "592:8882", "Citation chip": "590:37142", "MCP UI widget": "592:9872"
+    },
+    "reviews": {
+      "Message": "594:153081", "Bubble": "594:95544", "Message scroller": "594:153713", "Marker": "594:95252",
+      "Trace": "594:422892", "Questionnaire": "595:84343", "Attachment": "595:85071", "Prompt input": "595:86607",
+      "Model selector": "595:88236", "Tool call card": "594:423937", "Citation chip": "594:95075", "MCP UI widget": "594:424816",
+      "Chat": "595:185594"
+    },
+    "sectionLabels": {
+      "Message": "595:186937", "Bubble": "595:186941", "Message scroller": "595:186945", "Marker": "595:186949",
+      "Trace": "595:186953", "Questionnaire": "595:186957", "Attachment": "595:186961", "Prompt input": "595:186965",
+      "Model selector": "595:186969", "Tool call card": "595:186973", "Citation chip": "595:186977", "MCP UI widget": "595:186981",
+      "Chat": "595:186985"
+    },
+    "reviewPngs": "review/ai/ (review-message, review-bubble, review-message-scroller, review-marker, review-trace, review-questionnaire, review-attachment, review-prompt-input, review-model-selector, review-tool-call-card, review-citation-chip, review-mcp-ui-widget, review-chat)"
+  },
+  "audit": {
+    "scope": "every node of the 15 sets' variants, not descending into nested instances (their bindings belong to the nested set); instance roots checked for collection",
+    "nodes": 902, "textNodes": 201, "instances": 367, "solidPaints": 378,
+    "unboundPaints": 0, "unboundEffects": 0,
+    "textMissingAnyOfFive": 0,
+    "bindingsOutsideThemeSetSchemeDensity": 0,
+    "fractionalEdges": "24 found (1px spacers, separator rules and trace connectors centred on odd heights, centred texts); fixed: spacers stretch, rules/connectors are 2px boxes with a single border/width edge stroke, centred texts stretch; recheck 0",
+    "literalSpacing": {
+      "Message": "gaps 2 (actions), 4 (typing dots, error row), 6 (follow-ups), 12 (citations); typing padding-y 6",
+      "Bubble": "padding-y 8 (spec lit 8), reactions gap 4",
+      "Message scroller": "viewport padding 24 x 60",
+      "Trace line": "main gap 2, rail gap 4, rail padding-top 3 (centres the 14px icon on the 20px title line), collapsible-content padding-top 6",
+      "Questionnaire": "item gap 4, choices gap 6",
+      "Attachment": "padding 8 | 6 | 4 by size (spec lit 8), description-row gap 4",
+      "Prompt input": "tools/actions/hint gap 4, attachments gap 8, hint padding-left 4",
+      "Model option": "padding-y 6",
+      "Model selector": "root gap 4, menu padding 4 (O8 lit 4)",
+      "Tool call card": "io gap 4, skeleton gap 6",
+      "Citation chip": "padding-x 4 (spec lit)",
+      "MCP UI widget": "source padding-x 4, ready frame gap 2, loading frame padding 12 + gap 8"
+    },
+    "sizeLiterals": "Message W 640; Bubble text max W 320; scroller 760 x 640, content W 640; Marker separator W 560; Trace W 480; Questionnaire choice W 400, Questionnaire W 480; Attachment W 240/208/176 (vertical 160/136/112), media 40/32/24 (vertical H 96/80/64); Prompt input W 640; Model option W 256, menu W 288; Tool call card W 480; Citation chip H 18, min W 18; MCP UI widget W 480, frame H 176; typing dots 6 x 6; caret W 2 (H bound to type/body/line)",
+    "progressValues": "Progress value is the track padding-right (instance override): Attachment uploading 36% (reads 64%), Questionnaire 50% (question) and 0% (freeform)"
+  },
+  "deviations": [
+    "Message is a sparse 7-variant set (user rest|error, assistant rest|pending|streaming|error, system rest) instead of the spec role x state 3 x 2 = 6. Streaming and error come from the brief; combinations that cannot occur (user streaming, system pending) are not drawn.",
+    "Message has no TEXT properties: author, time and body differ per role, and a TEXT property overwrites every variant with one default (feedback-builder finding). Edit the text in the instance; the user body is an exposed Bubble with its own content property.",
+    "Message head shows 'thinking…' (pending) and 'streaming…' (streaming) in mono caption in place of the time; a footer (tokens · time · durable offset) and a user error row ('Not sent · the connection dropped' + Retry) were added. Assistant error = Inline notice destructive with its action relabelled Retry.",
+    "Streaming caret: the text is a paragraph plus a tail row (last line + caret) at gap 0, because a caret cannot sit inline at the end of a wrapping text node. The caret is a 2px marker/default bar whose height is bound to type/body/line.",
+    "Bubble: the tail corner (bottom-start or bottom-end) is bound to radius/badge, following the code's tail idiom; spec says radius/card on every corner. Same in Utility (both 0).",
+    "Message scroller: overflow is shown with border/subtle edge rules (edge-top, edge-bottom) instead of gradient fades, so every paint stays variable-bound. The scroll-button keeps the Icon button's radius/control instead of the spec's lit 999 (owner note: shape literals must become theme variables).",
+    "Trace line adds a duration (mono caption) and a done icon (check, success/text); running uses Spinner tone warning to match the tool card. Connectors and Marker separator rules are 2px boxes with one border/width edge stroke, which keeps the 1px line on whole pixels.",
+    "Questionnaire choice selected stroke is primary/stroke, not primary/default: primary/default is graphite (#313131) in Utility dark and the selected row was invisible.",
+    "Attachment media reuses the Data display private helpers .Item icon tile and .Item image (resized to 40/32/24) instead of a new lit-40 tile; xs horizontal shows a trailing state glyph (Spinner, alert-circle, check) and no description.",
+    "Prompt input state is rest|focus|typing|busy|disabled (5) x compact = 10, not the spec's rest|focus|busy|disabled x compact = 8: 'typing' covers the brief; 'with attachments' is the attachments boolean; 'sending' = busy (send becomes stop, square). The compact field is a strokeless Input md, not the Textarea. The focus ring sits on the root per the spec (the code uses primary-border).",
+    "Model option is its own set with O8 Menu item metrics, not a Menu item instance, because Menu item has no selected or focus state. The selector button is a custom row (provider mono caption + label T.strong-sm + chevron), not a ghost Button, because the code's button carries a provider span. The menu opens below the button.",
+    "Tool call card status is pending|running|done|error (4) x open = 8, not running|done|error (3) x 2 = 6: pending is from the brief, and 'success' is the code's done. Badge tones follow the code's STATUS_VARIANT (running warning, done success, error destructive; pending neutral). A duration was added. Running shows Skeleton lines for the result; pending streams partial arguments; error renders the result in Code block / sm tone destructive.",
+    "Citation chip index is font/mono + type/caption + type/mono/style (the code is mono; spec T.caption). active = marker/default + text/inverse (the code's filled chip), not primary/subtle like hover, which made hover and active identical; primary/default would be graphite in Utility dark.",
+    "MCP UI widget root fill is surface/raised (the code), and a source row (globe, ui:// uri, 'sandboxed'; prop source) was added; frame H 176 instead of the code's 16rem min height.",
+    "No themes strip for the AI page: the brief asks only for the composed chat review; the style pass will cover AI later.",
+    "Code block (D8, built by the Data display 2 builder) is nested for tool arguments/results and trace output with header, copy, footer and line numbers off; its Code line text is overridden with JSON and syntax ranges bound to code/syntax/*. If the D8 builder renames Code line parts, these overrides may need a refresh."
+  ],
+  "ownerNotes": [
+    "Utility look: chrome stays ink (Avatar agent tile, send/stop, active citation, caret, selected choice stroke); content uses semantic colour: tool and trace status use the status tones (Spinner warning, check success/text, alert destructive/text, Badge outline + 6px square dot).",
+    "Dark is designed: graphite user bubble and send button, light-ink active chip and selected stroke (primary/default is graphite in dark), raised graphite menus and tooltips.",
+    "Real-world content follows docs/site/ai/durable-chat.md and tutorials/chat: restored durable session marker, searchDocs tool card with citations, search:search_docs MCP call with a ui:// widget, streaming reply with a running call, busy composer, durable offsets in footers."
+  ]
+}

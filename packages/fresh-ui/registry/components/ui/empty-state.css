@@ -12,3 +12,24 @@
   font-weight: 600;
   color: var(--ns-fg);
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='empty-state'][data-part='root'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-body);
+  font-weight: var(--ns-weight-body);
+  line-height: var(--ns-leading-body);
+  letter-spacing: var(--ns-tracking-body);
+  border-radius: var(--ns-radius-card);
+  padding: var(--ns-card-padding);
+  text-align: center;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='empty-state'][data-part='heading'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-heading);
+  font-weight: var(--ns-weight-heading);
+  line-height: var(--ns-leading-heading);
+  letter-spacing: var(--ns-tracking-heading);
+  margin-block: 0 var(--ns-space-1);
+}

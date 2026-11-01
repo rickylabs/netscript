@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "reviewedBaseline": "76d93e6b741f6f733419e77c7dd6411d035787b5",
+  "baseIntegrated": "8827f866e",
+  "mergeCommit": "ea8ec624838abb1b2ece34fd3e744b29df957992",
+  "pushPolicy": "refs only; normal push; no merge/tag/release",
+  "planEval": "PASS after one spec-authority repair",
+  "implementationEval": "PASS for review; no blockers, not merge/release certification",
+  "toolTests": 16,
+  "workflowIntegrationTests": 4,
+  "typedCheckLintFmt": "PASS",
+  "generatedTypeCheck": "PASS (correct infrastructure export-corpus path; initial wrong path invocation rejected)",
+  "browser": {
+    "passed": 124,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "axeAudits": 36,
+    "seriousCritical": 0,
+    "screenshots": 60,
+    "receipt": {
+      "requestHash": "89d044d0398adf977836741c96e109f4abdcd402ca5791c39cfef6d854a322a6",
+      "outcome": "PASS",
+      "durationMs": 135035,
+      "exitCode": 0
+    },
+    "sourceScope": "all UI sources unchanged by normal main merge; hosted capture will use final head"
+  },
+  "negativeControls": {
+    "raw-colour": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedDiagnostic": "raw-colour",
+      "diagnosticFound": true
+    },
+    "raw-custom": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedDiagnostic": "raw-colour",
+      "diagnosticFound": true
+    },
+    "red-role": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedDiagnostic": "red-outside-state",
+      "diagnosticFound": true
+    }
+  },
+  "links": {
+    "count": 24225,
+    "pages": 254,
+    "outcome": "PASS"
+  },
+  "caveats": 15,
+  "docsBuild": "PASS",
+  "quality": "PASS",
+  "exports": "PASS",
+  "snippets": 671,
+  "afterMainSnippets": "PASS",
+  "repro": {
+    "html": 254,
+    "twins": 205,
+    "outcome": "PASS except known upstream Pagefind metadata only; strict default unchanged"
+  },
+  "fourNativeGenerators": "PASS in required order",
+  "fourCarrierFreshness": "prose, MCP and publish PASS; assets-barrel postcommit required",
+  "carrierComparison": "review-blockers-carrier-comparison.json",
+  "rootLockUnchanged": true,
+  "docsLock": "seven native lightningcss graph pins intentionally retained",
+  "cleanGitBuildProof": "pending postcommit",
+  "privacyScan": "no operator home/WSL/project/session paths; loopback hits only existing embedded product tutorial examples",
+  "limits": "local Docker/runtime unavailable, no merge certification; existing #2450/#2453 debt"
+}

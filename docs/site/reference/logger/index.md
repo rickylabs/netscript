@@ -5,43 +5,43 @@ title: "@netscript/logger"
 
 # `@netscript/logger`
 
-Structured logging for NetScript packages, services, workers, and jobs. This page is written
-against the package's public surface reported by `deno doc`. For the full index of
-packages and plugins return to the [reference overview](/reference/).
+Structured logging for NetScript packages, services, workers and jobs, built on
+[LogTape](https://jsr.io/@logtape/logtape). Use it to create scoped loggers and to log Hono and
+oRPC requests with correlated request IDs and redacted debug input.
 
-The root entrypoint (`@netscript/logger`) exposes the lightweight core surface only:
-the NetScript logger creators and configuration helpers, plus a curated re-export of the
-underlying [LogTape](https://jsr.io/@logtape/logtape) primitives. Two sub-path exports
-carry the framework integrations:
+## Sub-path exports
 
-- [`@netscript/logger/middleware`](#sub-path-exports) — Hono request-logging middleware.
-- [`@netscript/logger/orpc`](#sub-path-exports) — the oRPC logging plugin.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/logger` | `./mod.ts` | Core surface: [configuration](#configuration), [logger creators](#logger-creators) and [re-exported LogTape primitives](#re-exported-logtape-primitives). |
+| `@netscript/logger/middleware` | `./middleware.ts` | [Hono request-logging middleware](#netscriptloggermiddleware). |
+| `@netscript/logger/orpc` | `./orpc.ts` | [oRPC logging plugin](#netscriptloggerorpc). |
 
 ## Configuration
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `configureLogging` | `async function configureLogging(config?: LoggingConfig): Promise<void>` | Configure LogTape for NetScript applications, using the provided options or sensible defaults. |
-| `ensureLogging` | `async function ensureLogging(config?: LoggingConfig): Promise<void>` | Ensure logging is configured, initializing with defaults if needed. |
-| `isLoggingConfigured` | `function isLoggingConfigured(): boolean` | Check whether logging has been configured. |
-| `markConfigured` | `function markConfigured(): void` | Mark logging as configured (for manual configuration scenarios). |
-| `resetLogging` | `async function resetLogging(): Promise<void>` | Reset the LogTape configuration. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `configureLogging` | function | `async function configureLogging(config?: LoggingConfig): Promise<void>` | Configure LogTape for NetScript applications, using the provided options or sensible defaults. |
+| `ensureLogging` | function | `async function ensureLogging(config?: LoggingConfig): Promise<void>` | Ensure logging is configured, initializing with defaults if needed. |
+| `isLoggingConfigured` | function | `function isLoggingConfigured(): boolean` | Check whether logging has been configured. |
+| `markConfigured` | function | `function markConfigured(): void` | Mark logging as configured (for manual configuration scenarios). |
+| `resetLogging` | function | `async function resetLogging(): Promise<void>` | Reset the LogTape configuration. |
 
 ## Logger creators
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createLogger` | `function createLogger(category): Logger` | Create a logger with a custom category hierarchy. |
-| `createServiceLogger` | `function createServiceLogger(serviceName: string): Logger` | Create a logger for a NetScript service. |
-| `createPackageLogger` | `function createPackageLogger(packageName: string): Logger` | Create a logger for a NetScript package. |
-| `createWorkerLogger` | `function createWorkerLogger(workerName: string): Logger` | Create a logger for workers/jobs. |
-| `createJobLogger` | `function createJobLogger(jobId: string): Logger` | Create a logger for a job. |
-| `createChildLogger` | `function createChildLogger(parent: Logger, name: string): Logger` | Create a child logger from a parent logger, preserving the parent hierarchy. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createLogger` | function | `function createLogger(category): Logger` | Create a logger with a custom category hierarchy. |
+| `createServiceLogger` | function | `function createServiceLogger(serviceName: string): Logger` | Create a logger for a NetScript service. |
+| `createPackageLogger` | function | `function createPackageLogger(packageName: string): Logger` | Create a logger for a NetScript package. |
+| `createWorkerLogger` | function | `function createWorkerLogger(workerName: string): Logger` | Create a logger for workers/jobs. |
+| `createJobLogger` | function | `function createJobLogger(jobId: string): Logger` | Create a logger for a job. |
+| `createChildLogger` | function | `function createChildLogger(parent: Logger, name: string): Logger` | Create a child logger from a parent logger, preserving the parent hierarchy. |
 
 ## Re-exported LogTape primitives
 
-These symbols are re-exported unchanged from [`@logtape/logtape`](https://jsr.io/@logtape/logtape)
-and form the core logging contract.
+Re-exported unchanged from [`@logtape/logtape`](https://jsr.io/@logtape/logtape); they form the core
+logging contract.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -62,18 +62,7 @@ and form the core logging contract.
 | `LoggingConfig` | interface | Logging configuration options accepted by `configureLogging`. |
 | `RequestLogContext` | interface | Request context used by the logging middleware. |
 
-## Sub-path exports
-
-The following entrypoints are published alongside the root export. Their public symbols are
-documented here from each entrypoint's own `deno doc` surface.
-
-| Export | Entrypoint | Purpose |
-| --- | --- | --- |
-| `@netscript/logger` | `./mod.ts` | Core logging surface (documented above). |
-| `@netscript/logger/middleware` | `./middleware.ts` | Hono request-logging middleware. |
-| `@netscript/logger/orpc` | `./orpc.ts` | oRPC logging plugin. |
-
-### `@netscript/logger/middleware`
+## `@netscript/logger/middleware`
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -91,7 +80,7 @@ documented here from each entrypoint's own `deno doc` surface.
 | `loggerMiddleware` | function | Creates the full Hono integration: injects a service logger and request ID, skips configured paths, and logs request start, completion, and failure. |
 | `requestLoggerMiddleware` | function | Creates the lightweight integration that injects a service logger and request ID and logs request receipt before running the downstream handler. |
 
-### `@netscript/logger/orpc`
+## `@netscript/logger/orpc`
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -112,11 +101,11 @@ documented here from each entrypoint's own `deno doc` surface.
 
 ### Request correlation and debug redaction
 
-`LoggingPlugin` logs are correlated: every request and procedure line carries the `requestId` of
-the request it belongs to, and request durations are measured from that request's own start, also
-under concurrent traffic. The root interceptor passes the ID to procedure interceptors through the
-request's own oRPC context (`next({ context })`) rather than through state shared across requests.
-Procedures inside one batched request share that request's ID.
+Every `LoggingPlugin` request and procedure line carries the `requestId` of the request it belongs
+to, and request durations are measured from that request's own start, also under concurrent
+traffic. The root interceptor passes the ID to procedure interceptors through the request's own oRPC
+context (`next({ context })`), not through state shared across requests. Procedures inside one
+batched request share that request's ID.
 
 In debug mode the plugin logs the procedure `input` and an `inputSummary` of top-level values. Both
 apply the same case-insensitive redaction, replacing sensitive values with `[REDACTED]`:
@@ -140,8 +129,4 @@ const plugin = new LoggingPlugin({
 
 Services built with `@netscript/service` pass the same option through `.withRPC({ debug: true,
 redactFields: ['brief'] })`. Redaction runs inside the service's RPC handler, so it covers
-service-to-service traffic made under a service identity exactly as it covers browser calls.
-
----
-
-Back to the [reference overview](/reference/).
+service-to-service traffic made under a service identity in the same way as browser calls.

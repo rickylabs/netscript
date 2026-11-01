@@ -1,0 +1,23 @@
+{
+  "oldFeatureTip": "ae2f4002b671937da936571926408b2ad0fa8b4c",
+  "targetMain": "0825bd0f421c83757234044235ae4ed00323d0fd",
+  "rebasedHeadBeforeRegeneration": "f99a4835628406025f854e6b8615812a4a60595c",
+  "upstreamCanonicalDocs": [
+    "docs/design-system/GUIDELINES.md",
+    "docs/design-system/themes/_template/DESIGN.md",
+    "docs/design-system/themes/_template/SKILL.md",
+    "docs/design-system/themes/studio/DESIGN.md",
+    "docs/design-system/themes/studio/SKILL.md"
+  ],
+  "upstreamCanonicalDocsByteIdentical": true,
+  "allOtherHandAuthoredFeatureSourceByteIdentical": true,
+  "conflictedPaths": [
+    "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts"
+  ],
+  "conflictedReplayCommits": [
+    "9769d7b91",
+    "ae2f4002b"
+  ],
+  "conflictSide": "fixed upstream0825bd0f4",
+  "noCommitsSkipped": true
+}

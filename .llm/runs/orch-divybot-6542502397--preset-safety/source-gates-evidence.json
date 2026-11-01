@@ -1,0 +1,114 @@
+[
+  {
+    "gate": "check",
+    "verdict": "PASS",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 10,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "rawReportSha256": "592684df251718ea9a596124d10e956bd4940e2478dafd1eb57e17408aa4d4d1"
+  },
+  {
+    "gate": "check-final-test",
+    "verdict": "PASS",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 1,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "rawReportSha256": "b3c01fc1f36d28dad35e7619acab882c2223dd876c979ec334f2ec8328d4945c"
+  },
+  {
+    "gate": "lint",
+    "verdict": "PASS",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 10,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "coverage": {
+      "filesSelected": 10,
+      "filesProcessed": 10,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "rawReportSha256": "fe8d749af9b739c69c655f0f4ec38f137bd4b56e7b9a43e28e4d2eb205c81947"
+  },
+  {
+    "gate": "lint-final-test",
+    "verdict": "PASS",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 1,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "coverage": {
+      "filesSelected": 1,
+      "filesProcessed": 1,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "rawReportSha256": "256f879ae20fc254f38635a07a2ca6334a9a6f68d24cd7d89a34e723b8ff65f4"
+  },
+  {
+    "gate": "fmt",
+    "verdict": "PASS",
+    "summary": {
+      "filesSelected": 10,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "coverage": {
+      "filesSelected": 10,
+      "filesProcessed": 10,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "rawReportSha256": "5be3b98fc2cc9a634d00ab57a6fe5a478085aaecaf26ad66f767a73b541cc900"
+  },
+  {
+    "gate": "fmt-final-test",
+    "verdict": "PASS",
+    "summary": {
+      "filesSelected": 1,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "coverage": {
+      "filesSelected": 1,
+      "filesProcessed": 1,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "rawReportSha256": "53b8474b21425474dab9b69d93ab2d9dc666cd6c296aff3848b844bc23839758"
+  }
+]

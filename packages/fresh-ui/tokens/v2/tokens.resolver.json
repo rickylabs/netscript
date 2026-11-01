@@ -1,0 +1,205 @@
+{
+  "$schema": "https://www.designtokens.org/schemas/2025.10/resolver.json",
+  "version": "2025.10",
+  "name": "NetScript tokens v2",
+  "sets": {
+    "primitives": {
+      "sources": [
+        {
+          "$ref": "primitives.tokens.json"
+        }
+      ]
+    },
+    "semantics": {
+      "sources": [
+        {
+          "$ref": "semantic.tokens.json"
+        }
+      ]
+    },
+    "components": {
+      "sources": [
+        {
+          "$ref": "component.tokens.json"
+        }
+      ]
+    }
+  },
+  "modifiers": {
+    "scheme": {
+      "default": "light",
+      "contexts": {
+        "light": [
+          {
+            "$ref": "themes/light.tokens.json"
+          }
+        ],
+        "dark": [
+          {
+            "$ref": "themes/dark.tokens.json"
+          }
+        ]
+      }
+    },
+    "theme": {
+      "default": "ns-one",
+      "contexts": {
+        "ns-one": [
+          {
+            "$ref": "presets.tokens.json#/ns-one"
+          }
+        ],
+        "studio-utility": [
+          {
+            "$ref": "presets.tokens.json#/studio-utility"
+          }
+        ],
+        "studio-cloud": [
+          {
+            "$ref": "presets.tokens.json#/studio-cloud"
+          }
+        ],
+        "studio-workshop": [
+          {
+            "$ref": "presets.tokens.json#/studio-workshop"
+          }
+        ],
+        "studio-playful": [
+          {
+            "$ref": "presets.tokens.json#/studio-playful"
+          }
+        ],
+        "studio-ledger": [
+          {
+            "$ref": "presets.tokens.json#/studio-ledger"
+          }
+        ],
+        "studio-atelier": [
+          {
+            "$ref": "presets.tokens.json#/studio-atelier"
+          }
+        ],
+        "studio-signal": [
+          {
+            "$ref": "presets.tokens.json#/studio-signal"
+          }
+        ],
+        "ledger": [
+          {
+            "$ref": "presets.tokens.json#/ledger"
+          }
+        ],
+        "signal": [
+          {
+            "$ref": "presets.tokens.json#/signal"
+          }
+        ],
+        "glass": [
+          {
+            "$ref": "presets.tokens.json#/glass"
+          }
+        ],
+        "macos-27": [
+          {
+            "$ref": "presets.tokens.json#/macos-27"
+          }
+        ],
+        "apple-classic": [
+          {
+            "$ref": "presets.tokens.json#/apple-classic"
+          }
+        ],
+        "fluent-2-web": [
+          {
+            "$ref": "presets.tokens.json#/fluent-2-web"
+          }
+        ],
+        "tonal": [
+          {
+            "$ref": "presets.tokens.json#/tonal"
+          }
+        ],
+        "bloom": [
+          {
+            "$ref": "presets.tokens.json#/bloom"
+          }
+        ],
+        "cupertino": [
+          {
+            "$ref": "presets.tokens.json#/cupertino"
+          }
+        ],
+        "liquid": [
+          {
+            "$ref": "presets.tokens.json#/liquid"
+          }
+        ],
+        "fluent": [
+          {
+            "$ref": "presets.tokens.json#/fluent"
+          }
+        ],
+        "brutal": [
+          {
+            "$ref": "presets.tokens.json#/brutal"
+          }
+        ],
+        "filigrane": [
+          {
+            "$ref": "presets.tokens.json#/filigrane"
+          }
+        ],
+        "terminal": [
+          {
+            "$ref": "presets.tokens.json#/terminal"
+          }
+        ],
+        "pixel": [
+          {
+            "$ref": "presets.tokens.json#/pixel"
+          }
+        ],
+        "tactile": [
+          {
+            "$ref": "presets.tokens.json#/tactile"
+          }
+        ]
+      }
+    },
+    "density": {
+      "default": "comfortable",
+      "contexts": {
+        "comfortable": [
+          {
+            "$ref": "density.tokens.json#/comfortable"
+          }
+        ],
+        "compact": [
+          {
+            "$ref": "density.tokens.json#/compact"
+          }
+        ]
+      }
+    }
+  },
+  "resolutionOrder": [
+    {
+      "$ref": "#/sets/primitives"
+    },
+    {
+      "$ref": "#/sets/semantics"
+    },
+    {
+      "$ref": "#/modifiers/density"
+    },
+    {
+      "$ref": "#/modifiers/theme"
+    },
+    {
+      "$ref": "#/modifiers/scheme"
+    },
+    {
+      "$ref": "#/sets/components"
+    }
+  ]
+}

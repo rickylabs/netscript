@@ -27,6 +27,8 @@ export type {
 export type {
   FileWatcherHandle,
   FileWatcherPort,
+  FileWatchState,
+  FileWatchStatusEvent,
   ScheduledTriggerHandle,
   TriggerSchedulerPort,
   TriggerSchedulerStopOptions,

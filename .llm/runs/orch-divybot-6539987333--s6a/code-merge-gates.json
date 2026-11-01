@@ -1,0 +1,169 @@
+{
+  "repairHead": "5dff0c26bdcfb6f14a705daa865e3d4ac033f959",
+  "mergedMain": "14816a409e31505bc528714332b0bf4670be2fcb",
+  "conflictsResolved": [
+    "packages/cli/src/public/features/ui/init/init-ui-command.ts",
+    "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+    "packages/fresh-ui/deno.json",
+    "deno.lock",
+    "packages/fresh-ui/deno.lock"
+  ],
+  "source": "109 current frozen paths; CodeBlock and browser fixture logic unchanged from the reviewed repair.",
+  "locks": "All four lockfiles preserve their resolved npm/JSR graphs versus the repair commit.",
+  "rootChecks": {
+    "check:desktop-native-fixture": 0,
+    "check:emitted-samples": 0,
+    "check:streams-types": 0,
+    "check:child-health-docs": 0,
+    "check:mcp-export-corpus": 0,
+    "check:assets-barrel": 0,
+    "check:agent-docs-prose": 0,
+    "check:publish-assets": 0,
+    "check:scaffold-versions": 0,
+    "check:aspire-version-parity": 0,
+    "check:netscript-jsr-specifiers": 0,
+    "check:aspire-host-ports": 0,
+    "check:figma-names": 0,
+    "check:review-threads": 0
+  },
+  "gates": {
+    "quality-gate": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "5dff0c26bdcfb6f14a705daa865e3d4ac033f959",
+      "durationMs": 30708,
+      "receiptSha256": "cd5e1e563bafc7b69b860b7a260a2f0603e4a521daf06b9b1e25141b8b969111"
+    },
+    "docs-accuracy": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "5dff0c26bdcfb6f14a705daa865e3d4ac033f959",
+      "durationMs": 13387,
+      "receiptSha256": "18c900053cc3cd320a326aa0cb17f071d1953ed230ab23547e152a4a4d11cc76"
+    },
+    "fresh-ui-token-quality": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "5dff0c26bdcfb6f14a705daa865e3d4ac033f959",
+      "durationMs": 40769,
+      "receiptSha256": "65ffac969a49686d0084323dd0b4c2d0ec78c40659415cd81e117ed1c2c1becf"
+    },
+    "browser": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "5dff0c26bdcfb6f14a705daa865e3d4ac033f959",
+      "durationMs": 196085,
+      "receiptSha256": "1dc49618f13e764bc236ba6335d1bfe82a90d2efb6b3e82d96e821811be7b6cb"
+    },
+    "package-check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 276,
+        "batches": 3,
+        "failedBatches": 0
+      }
+    },
+    "package-lint": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 276,
+        "batches": 2,
+        "failedBatches": 0
+      }
+    },
+    "package-fmt": {
+      "summary": {
+        "filesSelected": 276,
+        "batches": 2,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      }
+    },
+    "init-lint": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "init-fmt": {
+      "summary": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      }
+    },
+    "installed-check": {
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "cli-tests": {
+      "summary": {
+        "passed": 22,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 22,
+        "uniqueFailures": 0
+      },
+      "exitCode": 0,
+      "durationMs": 227987
+    },
+    "browserStats": {
+      "startTime": "2026-10-31T12:42:55.724Z",
+      "duration": 194738.837,
+      "expected": 36,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "productionBuild": {
+      "exitCode": 0
+    },
+    "releasePreflight": {
+      "exitCode": 0
+    },
+    "jsrAudit": {
+      "failedFindings": 0
+    },
+    "package-test": {
+      "summary": {
+        "passed": 335,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 335,
+        "uniqueFailures": 0
+      },
+      "exitCode": 0,
+      "durationMs": 471279
+    }
+  },
+  "runtime": "Local full Docker/Aspire runtime and leak hygiene remain UNPROVEN."
+}

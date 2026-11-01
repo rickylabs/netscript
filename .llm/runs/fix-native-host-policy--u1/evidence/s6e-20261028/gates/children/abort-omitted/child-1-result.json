@@ -1,0 +1,11 @@
+{
+  "code": 1,
+  "stdout": "05:10:41.370 INF netscript·services·streams Service listening\n05:10:41.375 INF netscript·services·streams HTTP request started\n05:10:41.376 INF netscript·services·streams auth decision allow\n05:10:41.383 INF netscript·services·streams HTTP request completed\n05:10:41.387 INF netscript·services·streams HTTP request started\n05:10:41.387 INF netscript·services·streams auth decision allow\n05:10:41.388 INF netscript·services·streams HTTP request completed\n05:10:43.406 INF netscript·services·streams Service shutdown completed\n{\"observations\":{\"mode\":\"abort\",\"negative\":true,\"upstreamRead\":[200,\"s6e-abort-real-stream\"],\"frontRead\":[200,\"s6e-abort-real-stream\"],\"nativeStopsSettled\":0},\"authCalls\":2,\"rebinds\":[{\"phase\":\"after-native-stop\",\"port\":56343},{\"phase\":\"after-native-stop\",\"port\":57234}]}\ns6e-streams: response, native stops and both ports settled\n",
+  "stderr": "Check $deno$stdin.ts\n[streams] Warning: Streams storage is ephemeral; events are lost on process restart.\nerror: Uncaught (in promise) Error: ABORT_DID_NOT_RELEASE\n    if (performance.now() >= deadline) throw new Error(failure);\n                                             ^\n    at waitReleased (file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/$deno$stdin.ts:38:46)\n    at async file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/$deno$stdin.ts:85:5\n",
+  "pid": 16444,
+  "startedAt": "2026-10-28T05:10:40.117Z",
+  "finishedAt": "2026-10-28T05:10:43.426Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

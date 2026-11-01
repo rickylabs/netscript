@@ -1,0 +1,68 @@
+{
+  "deno.lock": {
+    "addedNpmEntries": 116,
+    "removedNpmEntries": 4,
+    "addedPackageVersions": 113,
+    "removedPackageVersions": [
+      "@prisma/debug@7.8.0"
+    ],
+    "changedRetainedIntegrities": [],
+    "addedEntriesWithLifecycleScripts": [
+      "@prisma/engines@7.10.0",
+      "prisma@7.10.0_typescript@7.0.2_@types+react@19.3.0_react@19.2.8_react-dom@19.3.1"
+    ],
+    "driverAdapterUtilsBefore": {
+      "integrity": "sha512-u8zkcRLlaryO652T4qavBg0HmzNW5tSKdsCn6hc1PhWAp/J6k0vrxLuUs+b9o+HcjsK7Dfa01o4OFSn0frauJA==",
+      "dependencies": [
+        "@prisma/debug"
+      ]
+    },
+    "driverAdapterUtilsAfter": {
+      "integrity": "sha512-u8zkcRLlaryO652T4qavBg0HmzNW5tSKdsCn6hc1PhWAp/J6k0vrxLuUs+b9o+HcjsK7Dfa01o4OFSn0frauJA==",
+      "dependencies": [
+        "@prisma/debug@7.10.0"
+      ]
+    },
+    "peerContextBefore": {
+      "npm:@prisma/client@^7.10.0": "7.10.0_typescript@7.0.2",
+      "npm:better-auth@^1.7.7": "1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1"
+    },
+    "peerContextAfter": {
+      "npm:@prisma/client@^7.10.0": "7.10.0_prisma@7.10.0_@types+react@19.3.0_react@19.2.8_react-dom@19.3.1",
+      "npm:better-auth@^1.7.7": "1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_prisma@7.10.0_react@19.2.8_react-dom@19.3.1_@types+react@19.3.0"
+    }
+  },
+  "packages/fresh-ui/deno.lock": {
+    "addedNpmEntries": 115,
+    "removedNpmEntries": 4,
+    "addedPackageVersions": 112,
+    "removedPackageVersions": [
+      "@prisma/debug@7.8.0"
+    ],
+    "changedRetainedIntegrities": [],
+    "addedEntriesWithLifecycleScripts": [
+      "@prisma/engines@7.10.0",
+      "prisma@7.10.0_typescript@7.0.2_@types+react@19.3.0_react@19.2.8_react-dom@19.3.1"
+    ],
+    "driverAdapterUtilsBefore": {
+      "integrity": "sha512-u8zkcRLlaryO652T4qavBg0HmzNW5tSKdsCn6hc1PhWAp/J6k0vrxLuUs+b9o+HcjsK7Dfa01o4OFSn0frauJA==",
+      "dependencies": [
+        "@prisma/debug"
+      ]
+    },
+    "driverAdapterUtilsAfter": {
+      "integrity": "sha512-u8zkcRLlaryO652T4qavBg0HmzNW5tSKdsCn6hc1PhWAp/J6k0vrxLuUs+b9o+HcjsK7Dfa01o4OFSn0frauJA==",
+      "dependencies": [
+        "@prisma/debug@7.10.0"
+      ]
+    },
+    "peerContextBefore": {
+      "npm:@prisma/client@^7.10.0": "7.10.0_typescript@7.0.2",
+      "npm:better-auth@^1.7.7": "1.7.14_@prisma+client@7.10.0_mysql2@3.24.5_pg@8.23.1_react@19.2.8_@opentelemetry+api@1.9.1"
+    },
+    "peerContextAfter": {
+      "npm:@prisma/client@^7.10.0": "7.10.0_prisma@7.10.0_@types+react@19.3.0_react@19.2.8_react-dom@19.3.1",
+      "npm:better-auth@^1.7.7": "1.7.14_@prisma+client@7.10.0__prisma@7.10.0__@types+react@19.3.0__react@19.2.8__react-dom@19.3.1_mysql2@3.24.5_pg@8.23.1_prisma@7.10.0_react@19.2.8_react-dom@19.3.1_@types+react@19.3.0"
+    }
+  }
+}

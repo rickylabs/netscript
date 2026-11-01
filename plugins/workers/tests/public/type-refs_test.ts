@@ -27,7 +27,7 @@ import type {
 } from '@netscript/plugin-workers/streams/server';
 import manifest from '../../deno.json' with { type: 'json' };
 
-Deno.test('workers keeps all thirteen published export targets', () => {
+Deno.test('workers keeps all legacy targets and adds the singular service export', () => {
   assertEquals(Object.keys(manifest.exports).sort(), [
     '.',
     './adapter-cli',
@@ -38,6 +38,7 @@ Deno.test('workers keeps all thirteen published export targets', () => {
     './jobs/health-check.ts',
     './runtime',
     './scaffold',
+    './service',
     './services',
     './streams',
     './streams/server',

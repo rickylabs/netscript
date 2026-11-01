@@ -1,0 +1,268 @@
+      "sha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "match": true
+    },
+    {
+      "path": "packages/fresh/deno.json",
+      "sha256": "ecc1f7b2daeccc758904c123615992c0f38183ea05e604d5d53d1c9be4df0c56",
+      "match": true
+    },
+    {
+      "path": "plugins/workers/deno.json",
+      "sha256": "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a",
+      "match": true
+    }
+  ],
+  "generatedOwners": [
+    "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+    "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts"
+  ],
+  "evidence": [
+    {
+      "source": ".llm/tmp/root-ci-generation-20261028/prose-freshness.json",
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/prose-freshness.json",
+      "sha256": "b0476dd5c1943a2e49e03c7c21d27f81890202118050635a2065156c77933f9d"
+    },
+    {
+      "source": ".llm/tmp/root-ci-generation-20261028/mcp-freshness.json",
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-freshness.json",
+      "sha256": "7729cbccc308ec61009cef9b5cc5fc36586a41494fced94f2a78ac1dd261c570"
+    },
+    {
+      "source": ".llm/tmp/root-ci-generation-20261028/mcp-tests.json",
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-tests.json",
+      "sha256": "6013d837c903ecd4e6fca8d77f9a8cacbc8230fb2f73b88c1cb026a5817c49bc"
+    },
+    {
+      "source": ".llm/tmp/root-ci-generation-20261028/decoded-delta.json",
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/decoded-delta.json",
+      "sha256": "f780e4e9f9c2e665f4b5189e9e2cdaf47f2abce67da97386b848fa1e2a265480"
+    },
+    {
+      "source": ".llm/tmp/root-ci-generation-20261028/review.ts",
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/review.ts.txt",
+      "sha256": "bbcf053383e533b82700fb354c77f1be9e6b19209d0d23649eb48ee9a3ba82f0"
+    },
+    {
+      "source": ".llm/tmp/root-ci-generation-20261028/review-v2.ts",
+      "target": ".llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/review-v2.ts.txt",
+      "sha256": "2de6e64501d0f83f21ff0ce6ce83940c4b69c89d57bd6fbed6421a4d27ea9adb"
+    },
+    {
+      "source": "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+      "target": "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+      "sha256": "22d0110ceccac7956008746785a5bfbc684cb77d18f6d8c7bcf7a7347de98498"
+    },
+    {
+      "source": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+      "target": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+      "sha256": "83ec73db03b7cef8142387a5fd2dfa49ab678342f8f543db3aa3e2e02c6c73b1"
+    }
+  ],
+  "sourceAcceptance": "Root accepts exact canonical generated delta only; independent feature IMPL and integration remain open."
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/decoded-delta.json
+
+Original-byte SHA256:f780e4e9f9c2e665f4b5189e9e2cdaf47f2abce67da97386b848fa1e2a265480 (complete parsed JSON pretty view; original bytes remain bound)
+
+{
+  "mcpSurfaces": 299,
+  "mcp": [
+    {
+      "key": "fresh/./streams",
+      "changed": [
+        {
+          "name": "NetScriptStreamDBOptions",
+          "before": [
+            "NetScriptStreamDBOptions",
+            "interface",
+            "interface NetScriptStreamDBOptions<TDef extends NetScriptStreamStateDefinition> { streamPath: string; baseUrl?: string; schema: NetScriptStateSchema<TDef>; createStreamDB?: NetScriptStreamDBFactory<TDef>; reconnect?: NetScriptStreamDBReconnectOptions }",
+            "Options for `createNetScriptStreamDB`."
+          ],
+          "after": [
+            "NetScriptStreamDBOptions",
+            "interface",
+            "interface NetScriptStreamDBOptions<TDef extends NetScriptStreamStateDefinition> { streamPath: string; baseUrl?: string; schema: NetScriptStateSchema<TDef>; createStreamDB?: NetScriptStreamDBFactory<TDef>; headers?: HeadersRecord; reconnect?: NetScriptStreamDBReconnectOptions }",
+            "Options for `createNetScriptStreamDB`."
+          ]
+        },
+        {
+          "name": "HeadersRecord",
+          "after": [
+            "HeadersRecord",
+            "typeAlias",
+            "type HeadersRecord = unknown",
+            "Headers record where values can be static strings or async functions.\nFollowing the @electric-sql/client pattern for dynamic headers.\n\n**Important**: Functions are called **for each request**, not once per session.\nIn live mode with long-polling, the same function may be called many times\nto fetch fresh values (e.g., refreshed auth tokens) for each poll.\n@example ```typescript\nheaders: {\n  Authorization: `Bearer ${token}`,           // Static - same for all requests\n  'X-Tenant-Id': () => getCurrentTenant(),    // Called per-request\n  'X-Auth': async () => await refreshToken()  // Called per-request (can refresh)\n}\n```"
+          ]
+        },
+        {
+          "name": "MaybePromise",
+          "after": [
+            "MaybePromise",
+            "typeAlias",
+            "type MaybePromise<T> = unknown",
+            "Type for values that can be provided immediately or resolved asynchronously."
+          ]
+        }
+      ]
+    },
+    {
+      "key": "plugin-workers/./streams",
+      "changed": [
+        {
+          "name": "HeadersRecord",
+          "after": [
+            "HeadersRecord",
+            "typeAlias",
+            "type HeadersRecord = unknown",
+            "Headers record where values can be static strings or async functions.\nFollowing the @electric-sql/client pattern for dynamic headers.\n\n**Important**: Functions are called **for each request**, not once per session.\nIn live mode with long-polling, the same function may be called many times\nto fetch fresh values (e.g., refreshed auth tokens) for each poll.\n@example ```typescript\nheaders: {\n  Authorization: `Bearer ${token}`,           // Static - same for all requests\n  'X-Tenant-Id': () => getCurrentTenant(),    // Called per-request\n  'X-Auth': async () => await refreshToken()  // Called per-request (can refresh)\n}\n```"
+          ]
+        },
+        {
+          "name": "MaybePromise",
+          "after": [
+            "MaybePromise",
+            "typeAlias",
+            "type MaybePromise<T> = unknown",
+            "Type for values that can be provided immediately or resolved asynchronously."
+          ]
+        }
+      ]
+    }
+  ],
+  "prosePages": 189,
+  "prose": [
+    {
+      "key": "pages/durable-workflows/streams/index.md",
+      "beforeBytes": 29971,
+      "afterBytes": 31006,
+      "beforeHash": "d367c036e4920e03c808913e7b7e2159e9e1d399fbba601ca2c20aa7218f5a7d",
+      "afterHash": "fbc1ff9b3adf9d5932036de183606d97aa527c9778191883a5a8d97e7d82c732"
+    }
+  ]
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-freshness.json
+
+Original-byte SHA256:7729cbccc308ec61009cef9b5cc5fc36586a41494fced94f2a78ac1dd261c570 (complete parsed JSON pretty view; original bytes remain bound)
+
+{
+  "gateId": "mcp-export-corpus",
+  "invocationId": "root-u3-generated-exports",
+  "argv": [
+    "deno",
+    "task",
+    "check:mcp-export-corpus"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+  "gitHead": "4de0d3d6a55e6ffd522ec7ee40feddf08d8bac9a",
+  "actualGitHead": "4de0d3d6a55e6ffd522ec7ee40feddf08d8bac9a",
+  "timeoutMs": 120000,
+  "runnerIdentity": "root",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "cff938a558f2d2d346c5d82919f6a7a8546b669ad1a91cd4b73a03d84d9e9e6a",
+  "lifecycleId": "root:root-u3-generated-exports:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T03:01:08.003Z",
+  "startedAt": "2026-10-28T03:01:08.009Z",
+  "finishedAt": "2026-10-28T03:01:23.994Z",
+  "durationMs": 15985,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 232,
+    "sha256": "f1d2b1b835372765f1e694563ac936a2c990d26e55237bb6e914291dcfd600ef",
+    "tail": "{\"schemaVersion\":1,\"frameworkVersion\":\"0.0.8\",\"sha256\":\"afc85193bffbf8ceb0f5ff9a014094206106c1f136fd05901b78c23b6fbfc614\",\"uncompressedBytes\":2572574,\"compressedBytes\":389882,\"packageCount\":35,\"subpathCount\":299,\"symbolCount\":8902}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 148,
+    "sha256": "bb580eff463cfaf5dab19bd77fe1a02b60387837eefea2b91f07a60a6cb25650",
+    "tail": "Task check:mcp-export-corpus deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/generate-export-surface-corpus.ts --check\n",
+    "truncated": false
+  }
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/mcp-tests.json
+
+Original-byte SHA256:6013d837c903ecd4e6fca8d77f9a8cacbc8230fb2f73b88c1cb026a5817c49bc (complete parsed JSON pretty view; original bytes remain bound)
+
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--frozen",
+    "--cached-only",
+    "--sanitize-ops",
+    "--sanitize-resources",
+    "--trace-leaks",
+    "--allow-all",
+    "packages/mcp/tests/embedded-export-surface-corpus_test.ts",
+    "packages/mcp/tests/export-surface-flows_test.ts"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+  "exitCode": 0,
+  "durationMs": 1902,
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 7,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}
+
+## .llm/runs/fix-browser-stream-headers--u3/evidence/root-ci-generation-20261028/prose-freshness.json
+
+Original-byte SHA256:b0476dd5c1943a2e49e03c7c21d27f81890202118050635a2065156c77933f9d (complete parsed JSON pretty view; original bytes remain bound)
+
+{
+  "gateId": "agent-docs-prose",
+  "invocationId": "root-u3-generated-prose",
+  "argv": [
+    "deno",
+    "task",
+    "check:agent-docs-prose"
+  ],
+  "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+  "gitHead": "4de0d3d6a55e6ffd522ec7ee40feddf08d8bac9a",
+  "actualGitHead": "4de0d3d6a55e6ffd522ec7ee40feddf08d8bac9a",
+  "timeoutMs": 180000,
+  "runnerIdentity": "root",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "b057555964f9e2035492afe68c8c428ca18ccaf3addc4a1498d406f95d86bb43",
+  "lifecycleId": "root:root-u3-generated-prose:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-28T03:01:07.989Z",
+  "startedAt": "2026-10-28T03:01:07.998Z",
+  "finishedAt": "2026-10-28T03:01:22.474Z",
+  "durationMs": 14476,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 50944,
+    "sha256": "d03102120bfb1cd5548d44fa00658d9ce439209b0be32c88f3d0e123c21eaf07",
+[Original review line 7005: concatenate the following literal fragments without inserted characters.]
+    "tail": "index <- (generated)\n🔥 /pagefind/index/en_89ba71c.pf_index <- (generated)\n🔥 /pagefind/index/en_b4e0fe6.pf_index <- (generated)\n🔥 /pagefind/index/en_768b8f1.pf_index <- (generated)\n🔥 /pagefind/index/en_761c5fb.pf_index <- (generated)\n🔥 /pagefind/index/en_548ef7e.pf_index <- (generated)\n🔥 /pagefind/index/en_ede2238.pf_index <- (generated)\n🔥 /pagefind/index/en_9e3a16a.pf_index <- (generated)\n🔥 /pagefind/pagefind.js <- (generated)\n🔥 /pagefind/pagefind-highlight.js <- (generated)\n🔥 /pagefind/pagefind-ui.js <- (generated)\n🔥 /pagefind/pagefind-ui.css <- (generated)\n🔥 /pagefind/pagefind-modular-ui.js <- (generated)\n🔥 /pagefind/pagefind-modular-ui.css <- (generated)\n🔥 /pagefind/wasm.unknown.pagefind <- (generated)\n🔥 /pagefind/pagefind-entry.json <- (generated)\n🔥 /web-layer/query-bridge/ <- /web-layer/query-bridge.md\n🔥 /web-layer/partials/ <- /web-layer/partials.md\n🔥 /web-layer/layers/ <- /web-layer/layers.md\n🔥 /web-layer/interactive/ <- /web-layer/interactive.md\n🔥 /web-layer/ <- /web-layer/index.md\n🔥 /web-layer/how-to/ <- /web-layer/how-to/index.md\n🔥 /web-layer/how-to/customize-fresh-ui/ <- /web-layer/how-to/customize-fresh-ui.md\n🔥 /web-layer/how-to/build-a-server-validated-form/ <- /web-layer/how-to/build-a-server-validated-form.md\n🔥 /web-layer/how-to/build-a-desktop-frontend/ <- /web-layer/how-to/build-a-desktop-frontend.md\n🔥 /web-layer/generated-surface/ <- /web-layer/generated-surface.md\n🔥 /web-layer/fresh-ui/ <- /we
+b-layer/fresh-ui.md\n🔥 /web-layer/form/ <- /web-layer/form.md\n🔥 /web-layer/examples/ <- /web-layer/examples.md\n🔥 /web-layer/error/ <- /web-layer/error.md\n🔥 /web-layer/defer-streaming-ui/ <- /web-layer/defer-streaming-ui.md\n🔥 /web-layer/builders/ <- /web-layer/builders.md\n🔥 /tutorials/workspace/ <- /tutorials/workspace/index.md\n🔥 /tutorials/workspace/06-deploy/ <- /tutorials/workspace/06-deploy.md\n🔥 /tutorials/workspace/05-route-authz/ <- /tutorials/workspace/05-route-authz.md\n🔥 /tutorials/workspace/04-provision-job/ <- /tutorials/workspace/04-provision-job.md\n🔥 /tutorials/workspace/03-workspace-data/ <- /tutorials/workspace/03-workspace-data.md\n🔥 /tutorials/workspace/02-auth/ <- /tutorials/workspace/02-auth.md\n🔥 /tutorials/workspace/01-scaffold/ <- /tutorials/workspace/01-scaffold.md\n🔥 /tutorials/storefront/ <- /tutorials/storefront/index.md\n🔥 /tutorials/storefront/07-deploy/ <- /tutorials/storefront/07-deploy.md\n🔥 /tutorials/storefront/06-storefront-ui/ <- /tutorials/storefront/06-storefront-ui.md\n🔥 /tutorials/storefront/05-shipping-webhook/ <- /tutorials/storefront/05-shipping-webhook.md\n🔥 /tutorials/storefront/04-checkout-saga/ <- /tutorials/storefront/04-checkout-saga.md\n🔥 /tutorials/storefront/03-cart-contracts/ <- /tutorials/storefront/03-cart-contracts.md\n🔥 /tutorials/storefront/02-catalog-service/ <- /tutorials/storefront/02-catalog-service.md\n🔥 /tutorials/storefront/01-scaffold/ <- /tutorials/storefront/01-scaffold.md\n🔥 /tutor
+ials/live-dashboard/ <- /tutorials/live-dashboard/index.md\n🔥 /tutorials/live-dashboard/06-deploy/ <- /tutorials/live-dashboard/06-deploy.md\n🔥 /tutorials/live-dashboard/05-live-stream/ <- /tutorials/live-dashboard/05-live-stream.md\n🔥 /tutorials/live-dashboard/04-definePage-QueryIsland/ <- /tutorials/live-dashboard/04-definePage-QueryIsland.md\n🔥 /tutorials/live-dashboard/03-sdk-cache-first-query/ <- /tutorials/live-dashboard/03-sdk-cache-first-query.md\n🔥 /tutorials/live-dashboard/02-contract-to-service/ <- /tutorials/live-dashboard/02-contract-to-service.md\n🔥 /tutorials/live-dashboard/01-scaffold/ <- /tutorials/live-dashboard/01-scaffold.md\n🔥 /tutorials/ <- /tutorials/index.md\n🔥 /tutorials/erp-sync/ <- /tutorials/erp-sync/index.md\n🔥 /tutorials/erp-sync/05-deploy/ <- /tutorials/erp-sync/05-deploy.md\n🔥 /tutorials/erp-sync/04-queue-and-cron/ <- /tutorials/erp-sync/04-queue-and-cron.md\n🔥 /tutorials/erp-sync/03-polyglot-transform/ <- /tutorials/erp-sync/03-polyglot-transform.md\n🔥 /tutorials/erp-sync/02-import-job/ <- /tutorials/erp-sync/02-import-job.md\n🔥 /tutorials/erp-sync/01-scaffold/ <- /tutorials/erp-sync/01-scaffold.md\n🔥 /tutorials/eis-chat/ <- /tutorials/eis-chat/index.md\n🔥 /tutorials/eis-chat/04-live-stream/ <- /tutorials/eis-chat/04-live-stream.md\n🔥 /tutorials/eis-chat/03-deliver-worker/ <- /tutorials/eis-chat/03-deliver-worker.md\n🔥 /tutorials/eis-chat/02-message-contract/ <- /tutorials/eis-chat/02-message-contract.md\n🔥 /tutorials/eis-cha
+t/01-scaffold/ <- /tutorials/eis-chat/01-scaffold.md\n🔥 /tutorials/chat/ <- /tutorials/chat/index.md\n🔥 /tutorials/chat/06-live-streaming/ <- /tutorials/chat/06-live-streaming.md\n🔥 /tutorials/chat/05-mcp/ <- /tutorials/chat/05-mcp.md\n🔥 /tutorials/chat/04-tool-call/ <- /tutorials/chat/04-tool-call.md\n🔥 /tutorials/chat/03-chat-ui/ <- /tutorials/chat/03-chat-ui.md\n🔥 /tutorials/chat/02-durable-chat-route/ <- /tutorials/chat/02-durable-chat-route.md\n🔥 /tutorials/chat/01-scaffold/ <- /tutorials/chat/01-scaffold.md\n🔥 /services-sdk/services/ <- /services-sdk/services.md\n🔥 /services-sdk/service-layout/ <- /services-sdk/service-layout.md\n🔥 /services-sdk/sdk/ <- /services-sdk/sdk.md\n🔥 /services-sdk/ <- /services-sdk/index.md\n🔥 /services-sdk/how-to/protect-an-anonymous-route/ <- /services-sdk/how-to/protect-an-anonymous-route.md\n🔥 /services-sdk/how-to/ <- /services-sdk/how-to/index.md\n🔥 /services-sdk/how-to/expose-openapi-scalar/ <- /services-sdk/how-to/expose-openapi-scalar.md\n🔥 /services-sdk/how-to/discover-services/ <- /services-sdk/how-to/discover-services.md\n🔥 /services-sdk/how-to/call-internal-procedures/ <- /services-sdk/how-to/call-internal-procedures.md\n🔥 /services-sdk/how-to/add-a-service/ <- /services-sdk/how-to/add-a-service.md\n🔥 /reference/workers/ <- /reference/workers/index.md\n🔥 /reference/watchers/ <- /reference/watchers/index.md\n🔥 /reference/triggers/ <- /reference/triggers/index.md\n🔥 /reference/telemetry/ <- /reference/telemetry/i
+ndex.md\n🔥 /reference/telemetry/convention/ <- /reference/telemetry/convention.md\n🔥 /assets/diagrams/polyglot-task-execution.svg <- /assets/diagrams/polyglot-task-execution.svg\n🔥 /favicon.svg <- /favicon.svg\n🔥 /assets/diagrams/architecture-overview.svg <- /assets/diagrams/architecture-overview.svg\n🔥 /assets/diagrams/aspire-resource-graph.svg <- /assets/diagrams/aspire-resource-graph.svg\n🔥 /assets/diagrams/auth-flow.svg <- /assets/diagrams/auth-flow.svg\n🔥 /assets/diagrams/contract-flow.svg <- /assets/diagrams/contract-flow.svg\n🔥 /assets/diagrams/database-schema-aggregation.svg <- /assets/diagrams/database-schema-aggregation.svg\n🔥 /assets/diagrams/fresh-page-model.svg <- /assets/diagrams/fresh-page-model.svg\n🔥 /assets/diagrams/otel-traceparent.svg <- /assets/diagrams/otel-traceparent.svg\n🔥 /assets/diagrams/plugin-thread-isolation.svg <- /assets/diagrams/plugin-thread-isolation.svg\n🔥 /assets/diagrams/queue-worker-scheduler.svg <- /assets/diagrams/queue-worker-scheduler.svg\n🔥 /assets/diagrams/request-lifecycle.svg <- /assets/diagrams/request-lifecycle.svg\n🔥 /assets/diagrams/runtime-config-resolution.svg <- /assets/diagrams/runtime-config-resolution.svg\n🔥 /assets/diagrams/saga-state-machine.svg <- /assets/diagrams/saga-state-machine.svg\n🔥 /assets/diagrams/sdk-data-flow.svg <- /assets/diagrams/sdk-data-flow.svg\n🔥 /assets/diagrams/streams-pipeline.svg <- /assets/diagrams/streams-pipeline.svg\n🔥 /assets/diagrams/trigger-ingress-flow.svg <- /assets/di
+agrams/trigger-ingress-flow.svg\n🔥 /styles/docs.css <- /styles/docs.css\n🔥 /styles/tokens.css <- /styles/tokens.css\n🍾 Site built into _site\n  669 files generated in 9.50 seconds\nRendered output: OK (homepage semantics; 236 HTML files; 4 documented-syntax allowances)\n{\"fresh\":true,\"stalePaths\":[],\"provenance\":{\"schemaVersion\":1,\"version\":\"0.0.8\",\"files\":[\"context/01-how-the-web-became-the-default.mdx\",\"context/02-how-the-web-stack-grew-up.mdx\",\"llms-full.txt\",\"llms.txt\",\"pages/ai/agent-tooling/index.md\",\"pages/ai/chat-ui/index.md\",\"pages/ai/durable-chat/index.md\",\"pages/ai/engine/index.md\",\"pages/ai/how-to/build-a-durable-chat/index.md\",\"pages/ai/how-to/index.md\",\"pages/ai/index.md\",\"pages/ai/mcp/index.md\",\"pages/background-processing/how-to/add-a-task-runtime-adapter/index.md\",\"pages/background-processing/how-to/index.md\",\"pages/background-processing/how-to/restrict-worker-task-permissions/index.md\",\"pages/background-processing/how-to/run-a-polyglot-task/index.md\",\"pages/background-processing/how-to/tune-worker-runtime/index.md\",\"pages/background-processing/index.md\",\"pages/background-processing/polyglot-tasks/index.md\",\"pages/background-processing/workers/index.md\",\"pages/cli-reference/index.md\",\"pages/comparisons/backend/index.md\",\"pages/comparisons/frontend/index.md\",\"pages/comparisons/index.md\",\"pages/concepts/index.md\",\"pages/data-persistence/database/index.md\",\"pages/data-persistence/how-to/choose
+-a-queue-provider/index.md\",\"pages/data-persistence/how-to/database-migration/index.md\",\"pages/data-persistence/how-to/index.md\",\"pages/data-persistence/how-to/queue-kv-cron/index.md\",\"pages/data-persistence/how-to/use-a-second-database/index.md\",\"pages/data-persistence/index.md\",\"pages/data-persistence/kv-queues-cron/index.md\",\"pages/durable-workflows/expo-streams/index.md\",\"pages/durable-workflows/how-to/bound-stream-retention/index.md\",\"pages/durable-workflows/how-to/build-a-validated-ingestion-queue/index.md\",\"pages/durable-workflows/how-to/index.md\",\"pages/durable-workflows/how-to/publish-a-durable-stream/index.md\",\"pages/durable-workflows/index.md\",\"pages/durable-workflows/sagas/index.md\",\"pages/durable-workflows/streams/index.md\",\"pages/durable-workflows/triggers/index.md\",\"pages/explanation/architecture/index.md\",\"pages/explanation/aspire/index.md\",\"pages/explanation/auth-model/index.md\",\"pages/explanation/compared/index.md\",\"pages/explanation/contracts/index.md\",\"pages/explanation/durability-model/index.md\",\"pages/explanation/index.md\",\"pages/explanation/observability/index.md\",\"pages/explanation/plugin-system/index.md\",\"pages/glossary/index.md\",\"pages/how-to/index.md\",\"pages/identity-access/auth/index.md\",\"pages/identity-access/better-auth-plugins/index.md\",\"pages/identity-access/how-to/add-authentication/index.md\",\"pages/identity-access/how-to/index.md\",\"pages/identity-access/index.md\",\"pages/identity-
+access/session-lifecycles/index.md\",\"pages/index.md\",\"pages/observability/how-to/add-opentelemetry/index.md\",\"pages/observability/how-to/index.md\",\"pages/observability/index.md\",\"pages/observability/telemetry/index.md\",\"pages/orchestration-runtime/child-health/index.md\",\"pages/orchestration-runtime/cli-scaffold/index.md\",\"pages/orchestration-runtime/how-to/add-a-plugin/index.md\",\"pages/orchestration-runtime/how-to/author-a-plugin/index.md\",\"pages/orchestration-runtime/how-to/deno-lsp-code-intelligence/index.md\",\"pages/orchestration-runtime/how-to/deploy-deno-deploy/index.md\",\"pages/orchestration-runtime/how-to/deploy-local-aspire/index.md\",\"pages/orchestration-runtime/how-to/deploy/index.md\",\"pages/orchestration-runtime/how-to/detached-start-agents-ci/index.md\",\"pages/orchestration-runtime/how-to/graceful-shutdown/index.md\",\"pages/orchestration-runtime/how-to/index.md\",\"pages/orchestration-runtime/how-to/outbound-webhooks/index.md\",\"pages/orchestration-runtime/how-to/roll-out-runtime-overrides/index.md\",\"pages/orchestration-runtime/index.md\",\"pages/orchestration-runtime/runtime-config/index.md\",\"pages/quickstart/aspire/index.md\",\"pages/quickstart/index.md\",\"pages/reference/ai/index.md\",\"pages/reference/ai/skills/index.md\",\"pages/reference/aspire/index.md\",\"pages/reference/auth-better-auth/index.md\",\"pages/reference/auth-kv-oauth/index.md\",\"pages/reference/auth-workos/index.md\",\"pages/reference/auth/index.md\",\"pages/r
+eference/cli/commands/index.md\",\"pages/reference/cli/index.md\",\"pages/reference/config/index.md\",\"pages/reference/contracts/index.md\",\"pages/reference/cron/index.md\",\"pages/reference/database/index.md\",\"pages/reference/fresh-ui/index.md\",\"pages/reference/fresh/index.md\",\"pages/reference/index.md\",\"pages/reference/kv/index.md\",\"pages/reference/logger/index.md\",\"pages/reference/mcp/index.md\",\"pages/reference/plugin-ai-core/index.md\",\"pages/reference/plugin-ai/index.md\",\"pages/reference/plugin-auth-core/index.md\",\"pages/reference/plugin-auth/index.md\",\"pages/reference/plugin-sagas-core/index.md\",\"pages/reference/plugin-streams-core/index.md\",\"pages/reference/plugin-triggers-core/index.md\",\"pages/reference/plugin-workers-core/index.md\",\"pages/reference/plugin/index.md\",\"pages/reference/prisma-adapter-mysql/index.md\",\"pages/reference/queue/index.md\",\"pages/reference/runtime-config/index.md\",\"pages/reference/sagas/index.md\",\"pages/reference/sdk/index.md\",\"pages/reference/service/index.md\",\"pages/reference/streams/index.md\",\"pages/reference/telemetry/index.md\",\"pages/reference/triggers/index.md\",\"pages/reference/watchers/index.md\",\"pages/reference/workers/index.md\",\"pages/services-sdk/how-to/add-a-service/index.md\",\"pages/services-sdk/how-to/call-internal-procedures/index.md\",\"pages/services-sdk/how-to/discover-services/index.md\",\"pages/services-sdk/how-to/expose-openapi-scalar/index.md\",\"pages/services-sdk/how-
+to/index.md\",\"pages/services-sdk/how-to/protect-an-anonymous-route/index.md\",\"pages/services-sdk/index.md\",\"pages/services-sdk/sdk/index.md\",\"pages/services-sdk/service-layout/index.md\",\"pages/services-sdk/services/index.md\",\"pages/tutorials/chat/01-scaffold/index.md\",\"pages/tutorials/chat/02-durable-chat-route/index.md\",\"pages/tutorials/chat/03-chat-ui/index.md\",\"pages/tutorials/chat/04-tool-call/index.md\",\"pages/tutorials/chat/05-mcp/index.md\",\"pages/tutorials/chat/06-live-streaming/index.md\",\"pages/tutorials/chat/index.md\",\"pages/tutorials/erp-sync/01-scaffold/index.md\",\"pages/tutorials/erp-sync/02-import-job/index.md\",\"pages/tutorials/erp-sync/03-polyglot-transform/index.md\",\"pages/tutorials/erp-sync/04-queue-and-cron/index.md\",\"pages/tutorials/erp-sync/05-deploy/index.md\",\"pages/tutorials/erp-sync/index.md\",\"pages/tutorials/index.md\",\"pages/tutorials/live-dashboard/01-scaffold/index.md\",\"pages/tutorials/live-dashboard/02-contract-to-service/index.md\",\"pages/tutorials/live-dashboard/03-sdk-cache-first-query/index.md\",\"pages/tutorials/live-dashboard/04-definePage-QueryIsland/index.md\",\"pages/tutorials/live-dashboard/05-live-stream/index.md\",\"pages/tutorials/live-dashboard/06-deploy/index.md\",\"pages/tutorials/live-dashboard/index.md\",\"pages/tutorials/storefront/01-scaffold/index.md\",\"pages/tutorials/storefront/02-catalog-service/index.md\",\"pages/tutorials/storefront/03-cart-contracts/index.md\",\"pages/tutorials/stor
+efront/04-checkout-saga/index.md\",\"pages/tutorials/storefront/05-shipping-webhook/index.md\",\"pages/tutorials/storefront/06-storefront-ui/index.md\",\"pages/tutorials/storefront/07-deploy/index.md\",\"pages/tutorials/storefront/index.md\",\"pages/tutorials/workspace/01-scaffold/index.md\",\"pages/tutorials/workspace/02-auth/index.md\",\"pages/tutorials/workspace/03-workspace-data/index.md\",\"pages/tutorials/workspace/04-provision-job/index.md\",\"pages/tutorials/workspace/05-route-authz/index.md\",\"pages/tutorials/workspace/06-deploy/index.md\",\"pages/tutorials/workspace/index.md\",\"pages/web-layer/builders/index.md\",\"pages/web-layer/defer-streaming-ui/index.md\",\"pages/web-layer/error/index.md\",\"pages/web-layer/examples/index.md\",\"pages/web-layer/form/index.md\",\"pages/web-layer/fresh-ui/index.md\",\"pages/web-layer/generated-surface/index.md\",\"pages/web-layer/how-to/build-a-desktop-frontend/index.md\",\"pages/web-layer/how-to/build-a-server-validated-form/index.md\",\"pages/web-layer/how-to/customize-fresh-ui/index.md\",\"pages/web-layer/how-to/index.md\",\"pages/web-layer/index.md\",\"pages/web-layer/interactive/index.md\",\"pages/web-layer/layers/index.md\",\"pages/web-layer/partials/index.md\",\"pages/web-layer/query-bridge/index.md\",\"pages/web-layer/query/index.md\",\"pages/web-layer/resources/index.md\",\"pages/web-layer/response/index.md\",\"pages/web-layer/route/index.md\",\"pages/web-layer/server/index.md\",\"pages/web-layer/testing/index.md\",\"p
+ages/web-layer/vite/index.md\",\"pages/why/index.md\"],\"uncompressedBytes\":5499378,\"compressedBytes\":1307922,\"sha256\":\"e54f2e6c6f7c719fed8c2692af6d3c847b2d534dd2786cd3e0b7269b56a95d37\"}}\n",
+[End literal fragments.]
+    "truncated": true
+  },
+  "stderr": {
+    "bytes": 2903,
+    "sha256": "97777de0df54f03ccb5514c2286289b0f16abe61cd21a00440c06b7687efaab3",
+[Original review line 7011: concatenate the following literal fragments without inserted characters.]
+    "tail": "Task check:agent-docs-prose deno task check:child-health-docs && deno task gen:agent-docs-prose --check\nTask check:child-health-docs deno task gen:child-health-docs --check\nTask gen:child-health-docs deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/docs/generate-child-health-docs.ts '--check'\nTask gen:agent-docs-prose deno task gen:child-health-docs && deno task --cwd docs/site build && deno run --no-lock --allow-read --allow-write --allow-run=git .llm/tools/docs/build-agent-docs-bundle.ts --site-dir docs/site/_site '--check'\nTask gen:child-health-docs deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/docs/generate-child-health-docs.ts\nWarning: config file file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/docs/site/deno.json is not a member of the workspace at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/. Ignoring the parent workspace config.\nTask build deno task check:source-format && deno task lume && deno task check:rendered-output\nWarning: config file file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/docs/site/deno.json is not a member of the workspace at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/. Ignoring the parent workspace config.\nTask check:source-format deno run --no-lock --allow-read _plugins/check-source-format.ts .\nWarning: config file file:///C:/Users/ericc/source/repos/netscript-browser

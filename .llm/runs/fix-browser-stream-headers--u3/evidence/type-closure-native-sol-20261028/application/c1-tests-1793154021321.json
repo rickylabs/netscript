@@ -1,0 +1,21 @@
+{
+  "selected": "c1-tests",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-test.ts",
+    "--",
+    "--frozen",
+    "-A",
+    "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+    "packages/fresh/src/runtime/streams/stream-db-recovery-adapter_test.ts",
+    "packages/fresh/tests/streamdb-headers-contract_test.ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:21.324Z",
+  "ended": "2026-10-28T02:20:32.840Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/c1-tests-1793154021321"
+}

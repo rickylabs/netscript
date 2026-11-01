@@ -1,3 +1,7 @@
+import {
+  createDefaultJobDeadLetterStore,
+  type JobDeadLetterStorePort,
+} from './job-dead-letters.ts';
 /**
  * Worker process for the NetScript workers plugin.
  *
@@ -7,7 +11,7 @@
 import { ChildHealthMonitor, type ChildHealthSnapshot } from '@netscript/plugin/health';
 import { delay } from '@std/async';
 import { createQueue, type MessageQueue } from '@netscript/queue';
-import type { WorkerIdempotencyPort } from '@netscript/plugin-workers-core/runtime';
+import type { JobRunnerClock, WorkerIdempotencyPort } from '@netscript/plugin-workers-core/runtime';
 import type { JobMessage, TaskMessage } from '@netscript/plugin-workers-core/runtime';
 import { createWorkerPool, type WorkerPool } from './job-runner-pool.ts';
 import { startWorkerSpan, type TracedMessageContext } from '@netscript/telemetry/instrumentation';
@@ -15,7 +19,13 @@ import { describeTelemetryConfig, isTelemetryEnabled } from '@netscript/telemetr
 import { WorkerAttributes } from '@netscript/telemetry/attributes';
 import type { Span } from '@netscript/telemetry/tracer';
 import { processWorkerJob } from './job-dispatcher.ts';
-import { type WorkerListenerSnapshot, WorkerListenerSupervisor } from './listener-supervisor.ts';
+import {
+  resolveListenerHealthyResetMs,
+  type WorkerListenerFailureCause,
+  type WorkerListenerSnapshot,
+  WorkerListenerSupervisor,
+} from './listener-supervisor.ts';
+export type { WorkerListenerFailureCause } from './listener-supervisor.ts';
 import { startQueueTriggerListeners, startTaskQueueListener } from './queue-consumer.ts';
 import {
   type JobExecutionContext,
@@ -46,6 +56,8 @@ export type {
 
 /** Health snapshot for a worker runtime. */
 export interface WorkerHealthStatus {
+  /** Durable job dead-letter sample, populated by readHealthStatus(). */
+  readonly deadLetters?: Readonly<{ available: boolean; depth: number | null }>;
   /** Aggregate worker health state. */
   readonly status: 'healthy' | 'degraded';
   /** Shared child health contract for the background health route. */
@@ -58,8 +70,12 @@ export interface WorkerHealthStatus {
     readonly status: 'idle' | 'running' | 'restarting' | 'failed' | 'stopped';
     /** Whether the listener is healthy. */
     readonly healthy: boolean;
-    /** Number of restart attempts. */
+    /** Cumulative restart attempts for this listener instance. */
     readonly restartCount: number;
+    /** Restart attempts charged since the last healthy running interval. */
+    readonly restartBudgetUsed: number;
+    /** Redacted cause of the most recent failure, retained as incident history on recovery. */
+    readonly failureCause?: WorkerListenerFailureCause;
     /** Last listener failure message. */
     readonly lastError?: string;
   }[];
@@ -67,6 +83,8 @@ export interface WorkerHealthStatus {
 
 /** Worker process that consumes queued jobs and tasks for one runtime instance. */
 export class Worker {
+  /** Durable terminal job store; also supports listing and controlled reprocessing. */
+  readonly deadLetters: JobDeadLetterStorePort;
   private readonly workerId: string;
   private readonly queueName: string;
   private readonly concurrency: number;
@@ -76,9 +94,11 @@ export class Worker {
   private readonly taskRegistry: WorkerTaskRegistry;
   private readonly idempotency: WorkerIdempotencyPort;
   private readonly workerPool: WorkerPool;
+  private readonly retryClock?: JobRunnerClock;
   private readonly jobsDir: string;
   private readonly queueTriggers: readonly QueueTriggerConfig[];
   private readonly listenerMaxRestarts: number;
+  private readonly listenerHealthyResetMs: number;
   private readonly listenerInitialBackoffMs: number;
   private readonly listenerMaxBackoffMs: number;
   private readonly triggerQueues: MessageQueue<unknown>[] = [];
@@ -97,8 +117,10 @@ export class Worker {
 
   /** Create a worker with queue, registry, execution, and task runtime dependencies. */
   constructor(options: WorkerOptions) {
+    this.listenerHealthyResetMs = resolveListenerHealthyResetMs(options.listenerHealthyResetMs);
     this.workerId = options.workerId;
     this.queueName = options.queueName ?? 'jobs';
+    this.deadLetters = options.deadLetters ?? createDefaultJobDeadLetterStore(this.queueName);
     this.suppliedQueue = options.queue;
     this.suppliedTaskQueue = options.taskQueue;
     this.concurrency = options.concurrency ?? 1;
@@ -107,6 +129,7 @@ export class Worker {
     this.taskExecutor = options.taskExecutor;
     this.taskRegistry = options.taskRegistry;
     this.idempotency = options.idempotency;
+    this.retryClock = options.retryClock;
     this.jobsDir = options.jobsDir ?? './jobs';
     this.queueTriggers = resolveWorkerQueueTriggers(options.queueTriggers);
     this.listenerMaxRestarts = options.listenerMaxRestarts ?? 3;
@@ -172,6 +195,22 @@ export class Worker {
     };
   }
 
+  /** Read current durable DLQ depth; a storage outage makes dependency health unavailable. */
+  async readHealthStatus(): Promise<WorkerHealthStatus> {
+    try {
+      const depth = await this.deadLetters.depth();
+      return { ...this.healthStatus, deadLetters: { available: true, depth } };
+    } catch {
+      const health = this.healthStatus;
+      return {
+        ...health,
+        status: 'degraded',
+        childHealth: { ...health.childHealth, dependencyReady: false },
+        deadLetters: { available: false, depth: null },
+      };
+    }
+  }
+
   /** Start queue consumption for this worker instance. */
   async start(): Promise<void> {
     if (this.running) {
@@ -205,6 +244,7 @@ export class Worker {
       name: `jobs:${this.queueName}`,
       abortSignal: this.abortController.signal,
       maxRestarts: this.listenerMaxRestarts,
+      healthyResetMs: this.listenerHealthyResetMs,
       initialBackoffMs: this.listenerInitialBackoffMs,
       maxBackoffMs: this.listenerMaxBackoffMs,
       run: (signal) => this.listenForJobs(signal),
@@ -307,6 +347,7 @@ export class Worker {
               `[Worker ${this.workerId}] Unexpected error processing job '${message.jobId}':`,
               error instanceof Error ? error.message : String(error),
             );
+            throw error;
           }
         },
         { signal, concurrency: this.concurrency },
@@ -357,6 +398,8 @@ export class Worker {
   private dispatchContext(): WorkerDispatchContext {
     return {
       workerId: this.workerId,
+      deadLetters: this.deadLetters,
+      queueName: this.queueName,
       concurrency: this.concurrency,
       registry: this.registry,
       executionState: this.executionState,
@@ -368,6 +411,7 @@ export class Worker {
       activeJobs: this.activeJobs,
       workerSpan: this.workerSpan,
       shutdownSignal: this.abortController?.signal,
+      retryClock: this.retryClock,
     };
   }
 
@@ -381,6 +425,7 @@ export class Worker {
       abortController: this.abortController,
       taskQueue: this.suppliedTaskQueue,
       listenerMaxRestarts: this.listenerMaxRestarts,
+      listenerHealthyResetMs: this.listenerHealthyResetMs,
       listenerInitialBackoffMs: this.listenerInitialBackoffMs,
       listenerMaxBackoffMs: this.listenerMaxBackoffMs,
       processJob: (message, queueContext, context) =>

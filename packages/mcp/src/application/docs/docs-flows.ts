@@ -37,6 +37,7 @@ export function createDocsFlows(
         return {
           ok: true,
           value: {
+            ...(corpus.citation ? { citation: corpus.citation } : {}),
             count: docs.length,
             docs,
             ...(selection ? { corpus: { ...selection, documentCount: allDocs.length } } : {}),
@@ -53,7 +54,21 @@ export function createDocsFlows(
       const limit = boundedLimit(input, DEFAULT_SEARCH_LIMIT, MAX_SEARCH_LIMIT);
       try {
         const matches = (await corpus.search(input.query)).slice(0, limit);
-        return { ok: true, value: { count: matches.length, matches } };
+        return {
+          ok: true,
+          value: {
+            count: matches.length,
+            matches,
+            ...(corpus.citation ? { citation: corpus.citation } : {}),
+            ...(matches.length === 0
+              ? {
+                confidence: 'low',
+                fallback:
+                  'No seam documented for this query in this corpus. Use find_export or search_exports for public APIs.',
+              }
+              : {}),
+          },
+        };
       } catch (error) {
         return corpusFailure(error);
       }

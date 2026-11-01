@@ -33,10 +33,15 @@ import {
   resolvePluginDescriptorBeforePlanning,
   runPluginOwnedScaffold,
 } from '../../../../public/features/plugins/install/install-plugin.ts';
+import {
+  requiresPackageSchemaFragments,
+  resolvePluginSchemaFragments,
+} from '../../../../public/features/plugins/install/plugin-schema-fragments.ts';
 import { planPluginInstall } from '../../../../public/features/plugins/install/plan-plugin-install.ts';
 import { resolvePluginPackageSpec } from '../../../../public/features/plugins/install/plugin-package-resolver.ts';
 import { renderPluginSupport } from '../../../../public/features/plugins/install/render-plugin.ts';
 import {
+  ensureLocalPluginImports,
   ensurePluginServiceContext,
   mergeUniqueReferences,
   toWorkspaceRelativePath,
@@ -76,6 +81,8 @@ export interface InstallLocalPluginDependencies {
   readonly pluginValidator?: JsrPluginValidatorPort;
   /** Process runner reserved for plugin-owned scaffold execution. */
   readonly processRunner?: ProcessPort;
+  /** Environment accessor supplied by the command edge. */
+  readonly readEnvironment?: (key: string) => string | undefined;
   /** JSR file fetcher used for plugin-owned scaffold integrity checks. */
   readonly packageFileFetcher?: JsrPackageFileFetcher;
   /** Discover a first-party plugin source checkout. */
@@ -104,6 +111,7 @@ export async function installLocalPlugin(
     registry,
     dependencies.pluginValidator,
     dependencies.fs,
+    dependencies.readEnvironment,
   );
   const planningRequest = resolvedPlugin?.planningKind === undefined
     ? descriptorRequest
@@ -149,21 +157,51 @@ export async function installLocalPlugin(
       serviceReferences: plan.serviceReferences,
     };
 
-  const schemaCopies = await copyPluginSchemasToRootDb(
+  const contributesSchemas =
+    resolvedPlugin?.descriptor.manifest.databaseRequirement === undefined ||
+    resolvedPlugin.descriptor.manifest.capabilities.hasDatabaseMigrations;
+  const packageFragments = resolvedPlugin && plan.dbDetection.requiresDb && contributesSchemas
+    ? await resolvePluginSchemaFragments(
+      resolvedPlugin,
+      dependencies.fs,
+      dependencies.packageFileFetcher,
+    )
+    : [];
+  const schemaCopies = !contributesSchemas ? [] : await copyPluginSchemasToRootDb(
     plan.projectRoot,
     plan.pluginName,
     plan.dbDetection,
     { fs: dependencies.fs, scaffolder: dependencies.scaffolder },
-    { overwrite: plan.overwrite },
+    {
+      overwrite: plan.overwrite,
+      packageFragments,
+      schemaDeclared: resolvedPlugin !== undefined &&
+        requiresPackageSchemaFragments(resolvedPlugin) &&
+        resolvedPlugin.descriptor.manifest.capabilities.hasDatabaseMigrations,
+    },
   );
+  await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
+  const localServiceEntrypoint =
+    resolvedPlugin?.source.kind === 'local-path' && request.dryRun !== true
+      ? await ensureLocalPluginImports(
+        plan.projectRoot,
+        resolvedPlugin.source.path,
+        resolvedPlugin.descriptor.manifest.name,
+        dependencies.fs,
+      )
+      : undefined;
+  const runtimeProvider = localServiceEntrypoint
+    ? { ...plan.provider, defaultServiceEntrypoint: localServiceEntrypoint }
+    : plan.provider;
   await dependencies.workspaceMutator.updateAppsettings(
     plan.projectRoot,
     rendered.plugin,
-    plan.provider,
+    runtimeProvider,
     {
       serviceReferences: mergeUniqueReferences(plan.serviceReferences, rendered.serviceReferences),
       pluginReferences: mergeUniqueReferences(plan.pluginReferences, rendered.pluginReferences),
       requiresDb: plan.dbDetection.requiresDb,
+      environment: resolvedPlugin?.configuration,
       sagaStoreBackend: plan.sagaStoreBackend,
     },
   );
@@ -173,7 +211,6 @@ export async function installLocalPlugin(
     pluginOwned === undefined ? rendered.plugin.pluginDir : pluginConfigDirectory,
     pluginOwned === undefined ? 'mod.ts' : 'plugin.ts',
   );
-  await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
   const provisionedCache = plan.provider.defaultRequiresKv
     ? await dependencies.workspaceMutator.ensureSharedCache(plan.projectRoot)
     : false;
@@ -193,7 +230,7 @@ export async function installLocalPlugin(
     await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
   }
   await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
-  const browserAuthFiles = await reconcileBrowserAuth(
+  const { written: browserAuthFiles, report: browserAuthReport } = await reconcileBrowserAuth(
     plan.projectRoot,
     dependencies.fs,
     dependencies.formatter,
@@ -218,6 +255,7 @@ export async function installLocalPlugin(
     provisionedCache,
     schemaCopies,
     helperFiles,
+    browserAuthReport,
   };
 }
 

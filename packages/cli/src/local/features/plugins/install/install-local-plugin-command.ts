@@ -1,3 +1,4 @@
+import { renderDoctorReport } from '../../../../kernel/presentation/output/render-doctor-report.ts';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import {
@@ -74,13 +75,18 @@ export function createLocalPluginInstallCommand(
         noCopySource: options.copySource === false,
         projectRoot,
         overwrite: options.force ?? false,
-      }, dependencies.installPluginDependencies);
+      }, {
+        ...dependencies.installPluginDependencies,
+        readEnvironment: dependencies.installPluginDependencies.readEnvironment ??
+          ((key) => Deno.env.get(key)),
+      });
 
       print(
         `Installed ${result.plugin.kind} plugin "${result.plugin.configKey}" on port ${result.plugin.servicePort}.`,
       );
       print(`Created ${result.plugin.scaffoldResult.filesCreated.length} plugin files.`);
       print(`Regenerated ${result.helperFiles.length} Aspire helper files.`);
+      renderDoctorReport(result.browserAuthReport, print);
     });
 }
 

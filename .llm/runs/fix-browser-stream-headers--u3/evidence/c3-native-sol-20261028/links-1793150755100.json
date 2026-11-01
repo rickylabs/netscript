@@ -1,0 +1,13 @@
+{
+  "selected": "links",
+  "args": [
+    "task",
+    "docs:links"
+  ],
+  "code": 1,
+  "started": "2026-10-28T01:25:55.132Z",
+  "ended": "2026-10-28T01:25:55.551Z",
+  "originalOutputAwaited": true,
+  "deadlineAborted": false,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c3/links-1793150755100"
+}

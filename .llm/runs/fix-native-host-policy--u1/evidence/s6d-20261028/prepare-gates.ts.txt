@@ -1,0 +1,9 @@
+const root='C:/Users/ericc/source/repos/netscript-native-host-policy-008';
+const out=root+'/.llm/tmp/native-host-policy-u1-s6d-astra-20261028';
+const original=await Deno.readTextFile(root+'/.llm/tmp/native-host-policy-u1-s6c-astra-20261028/run-gates-2.ts');
+const script=original.replaceAll('s6c-astra','s6d-astra').replace("/gates-2'","/gates'").replace("const owners=['plugins/streams/services/src/service-tls_test.ts'];","const owners=['plugins/streams/services/src/service-lifecycle_test.ts'];").replace("'plugins/streams/services/mod.ts'];","'plugins/streams/services/mod.ts','plugins/streams/services/src/service-tls_test.ts'];").replace('files[3],files[2],owners[0]','files[3],files[2],files[6],owners[0]');
+await Deno.writeTextFile(out+'/run-gates.ts',script,{createNew:true});
+const before=JSON.parse(await Deno.readTextFile(root+'/.llm/tmp/native-host-policy-u1-s6c-astra-20261028/source-proof-2.json'));
+const bindings=[...before.protectedRows.map(row=>({path:row.path,expected:row.expected})),{path:before.owner.path,expected:before.owner.sha256}];
+await Deno.writeTextFile(out+'/protected-bindings.json',JSON.stringify({head:'e6cdfea360c885efcd33fca21039b7975babe73f',rows:bindings},null,2),{createNew:true});
+console.log(JSON.stringify({protectedBindings:bindings.length}));

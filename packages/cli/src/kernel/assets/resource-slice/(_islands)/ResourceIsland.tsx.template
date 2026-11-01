@@ -1,4 +1,5 @@
 // @netscript/directory-role islands: client hydration only
+import type { VNode } from 'preact';
 import type { InferDefinePageLayerLoaderProps } from '@netscript/fresh/builders';
 import { QueryIsland, useIslandQuery } from '@netscript/fresh/query';
 import { {{queryFactoryName}} } from '{{clientModuleSpecifier}}';
@@ -19,12 +20,10 @@ function {{resourcePascalCase}}Data(props: Props) {
   if (query.isLoading) return <p role='status'>Loading {{resource}}…</p>;
   if (query.isError) return <p role='alert'>Unable to load {{resource}}.</p>;
 
-  return (
-    <output class='block overflow-x-auto rounded-xl bg-ns-surface-raised/30 p-4 text-sm'>
-      <pre>{JSON.stringify(query.data, null, 2)}</pre>
-    </output>
-  );
+{{queryResultReturn}}
 }
+
+{{queryResultTemplate}}
 
 export default function {{resourcePascalCase}}Island(props: Props) {
   return (

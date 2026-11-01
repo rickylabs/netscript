@@ -149,7 +149,9 @@ export type SagaInstanceResponse = Readonly<{
   instanceId?: string;
   correlationId: string;
   correlationKey?: string;
+  /** Verbatim business state, including any business `status` or `metadata` fields. */
   state: Readonly<Record<string, unknown>>;
+  /** Runtime lifecycle status, independent of the business state. */
   status: (typeof SAGA_INSTANCE_STATUSES)[number];
   createdAt: string;
   updatedAt: string;

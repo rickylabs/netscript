@@ -1,0 +1,15 @@
+{
+  "selected": "json-workers",
+  "args": [
+    "doc",
+    "--json",
+    "--frozen",
+    "plugins/workers/streams/mod.ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:20.554Z",
+  "ended": "2026-10-28T02:20:20.701Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/json-workers-1793154020550"
+}

@@ -8,19 +8,10 @@ next: { label: "4 · Provision job", href: "/tutorials/workspace/04-provision-jo
 
 # Workspace data
 
-Your app can sign users in, but it has nothing of its own to store yet. This chapter gives the
-workspace its own data: a **second, isolated database** with its own Prisma schema, migration history,
-and generated client — separate from the primary Postgres the auth plugin migrated into. The reason to
-isolate it is the same reason teams isolate any domain: an independent lifecycle you can migrate, scale,
-and back up on its own. It also bounds the blast radius — a bad migration to your team schema cannot
-take the auth tables down with it, and vice versa.
-
-What makes this a NetScript capability and not just "run two Postgres containers" is the **typed
-data layer**: one `netscript db add` scaffolds the datasource, joins it to the Aspire graph, and —
-after a single migrate/generate loop — hands you a fully typed Prisma client scoped to *that*
-datasource, with its own migration history. The isolation is real at the type level, not just the
-connection string, and the whole `db` toolchain is multi-database-aware, so every command takes a
-`--db` target rather than leaving you to juggle two schemas by hand.
+In this chapter you give the workspace a **second, isolated database** with its own Prisma schema,
+migration history and generated client, separate from the primary Postgres that holds the auth
+tables. One `netscript db add` scaffolds the datasource and joins it to the Aspire graph; after one
+migrate-and-generate pass you have a typed Prisma client scoped to that datasource.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
@@ -33,44 +24,34 @@ connection string, and the whole `db` toolchain is multi-database-aware, so ever
 
 ## What you will build
 
-A second Postgres datasource named `workspace`, scaffolded by `netscript db add`, with its own
-`Member` and `Workspace` models, its own migration, and its own typed Prisma client. By the end you can
-import that client at `database/workspace/schema/.generated/client.server.ts` and query workspace
-records — fully independent from the primary database and the auth tables.
+A second Postgres datasource named `workspace`, scaffolded by `netscript db add`, with `Member` and
+`Workspace` models, its own migration and its own typed Prisma client. At the end you import that
+client from `database/workspace/schema/.generated/client.server.ts` and query workspace records,
+independently of the primary database and the KV-backed auth sessions.
 
 ## Before you begin
 
-You need the auth layer from [chapter 2](/tutorials/workspace/02-auth/) and **Aspire running**. The
-second database is provisioned as its own container in the Aspire graph, so Docker must be up too.
-Confirm the primary is migrated and Aspire is live:
+You need the auth layer from [chapter 2](/tutorials/workspace/02-auth/) and **`aspire start`
+running**. The second database runs as its own container in the Aspire graph, so Docker must be up
+too:
 
 ```sh
 # In my-workspace/, with `aspire start` up in another terminal
-netscript db status        # primary datasource is migrated (chapter 2)
 docker info                # Docker engine is running
 ```
 
 {{ comp callout { type: "important", title: "A second database is a deliberate choice" } }}
-A second datasource is the right tool when you need an <strong>isolated</strong> data domain — a
-separate migration lifecycle and a datasource you can scale and back up independently. If you only
-wanted a new <em>table</em>, you would add a model to the primary schema instead. Adding a whole
-datasource means a second migration history and a second generated client to manage. This track adds
-one on purpose, to keep workspace records cleanly separate from auth.
-{{ /comp }}
-
-{{ comp callout { type: "note", title: "This split is how a real NetScript app stores its data" } }}
-A production context-accumulator chat application built on NetScript uses exactly
-this shape: one <strong>org-catalog</strong> datasource (Prisma-managed: who exists, which projects
-and channels there are) kept separate from the datastores each channel accumulates context into.
-Not everything is one database. The catalog answers "what is there and who belongs to it"; the
-domain data lives on its own lifecycle. Your <code>workspace</code> datasource here plays the
-catalog role for your team records.
+Use a second datasource when you need an <strong>isolated</strong> data domain: its own migration
+lifecycle, scaled and backed up independently, so a bad migration in one can't take the other down.
+If you only need a new <em>table</em>, add a model to the primary schema instead. This track adds a
+datasource on purpose, to keep workspace records separate from auth.
 {{ /comp }}
 
 ## Step 1 — Scaffold the second database
 
-From the workspace root, run `netscript db add <engine>`. The `--name` flag sets the **config key** the
-datasource is registered under — use `workspace` so it does not collide with the primary `postgres`:
+From the workspace root, run `netscript db add <engine>`. The `--name` flag sets the **config key**
+the datasource is registered under. Use `workspace` so it doesn't collide with the primary
+`postgres`:
 
 ```sh
 # Add a second Postgres for workspace records. Registered under
@@ -78,49 +59,44 @@ datasource is registered under — use `workspace` so it does not collide with t
 netscript db add postgres --name workspace
 ```
 
-In one pass, `db add` scaffolds a workspace at `database/workspace/` (its own
-`schema/schema.prisma`, `prisma.config.ts`, and `scripts/`), registers the datasource in
-`appsettings.json` under `NetScript.Databases.workspace`, adds it as a project member, and regenerates
-the Aspire config so the new container joins the resource graph.
+`db add` does four things in one pass:
+
+- scaffolds a workspace at `database/workspace/` with its own `schema/schema.prisma`,
+  `prisma.config.ts` and `scripts/`;
+- registers the datasource in `appsettings.json` under `NetScript.Databases.workspace`;
+- adds it as a project member;
+- regenerates the Aspire config so the new container joins the resource graph.
+
+It does **not** run a migration or generate a client: `schema.prisma` ships a starter schema and
+there is no `.generated/` directory yet. You run the migration yourself in Step 4.
 
 {{ comp callout { type: "note", title: "The engine is swappable" } }}
-This track uses <code>postgres</code>, but <code>db add</code> is polyglot: swap <code>postgres</code> for
-<code>mysql</code>, <code>mssql</code>, or <code>sqlite</code> to scaffold that engine instead. Postgres,
-MySQL, and SQL Server each provision an Aspire container; SQLite is file-backed and adds no container
-resource. Keep <code>postgres</code> to follow the rest of this tutorial as written.
-{{ /comp }}
-
-{{ comp callout { type: "note", title: "The new datasource starts empty" } }}
-<code>db add</code> scaffolds the workspace and registers the datasource, but it does
-<strong>not</strong> run a migration or generate a client — the new
-<code>database/workspace/schema/schema.prisma</code> ships a starter schema and no
-<code>.generated/</code> directory yet. You run the migration loop yourself in Step 4, targeting the
-new datasource with <code>--db</code>.
+<code>db add</code> also accepts <code>mysql</code>, <code>mssql</code> and <code>sqlite</code>.
+Postgres, MySQL and SQL Server each provision an Aspire container; SQLite is file-backed and adds no
+container resource. Keep <code>postgres</code> to follow this tutorial as written.
 {{ /comp }}
 
 ## Step 2 — Restart Aspire so the container joins the graph
 
-Because `db add` regenerated the Aspire config, the new database becomes a container in the resource
-graph. Restart the AppHost so it provisions:
+`db add` regenerated the Aspire config, so restart the AppHost to provision the new container:
 
 ```sh
 cd aspire
 aspire start
 ```
 
-Open the dashboard at [https://localhost:18888](https://localhost:18888) and confirm the new
-`workspace` resource goes green alongside the existing `postgres` and `redis`.
+Open the dashboard at the URL Aspire prints and confirm the new
+`workspace` resource goes green next to `postgres` and `redis`.
 
-{{ comp callout { type: "warning", title: "Restart is not optional" } }}
-The new container only appears because <code>db add</code> <strong>regenerated the Aspire helpers</strong>.
-If you skip the restart, the AppHost will not know about the datasource and the resource never shows
-up — and the migration in Step 4 has nothing to reach.
+{{ comp callout { type: "warning", title: "Don't skip the restart" } }}
+Until you restart, the AppHost doesn't know about the datasource: the resource never appears and the
+migration in Step 4 has nothing to reach.
 {{ /comp }}
 
 ## Step 3 — Define the workspace models
 
-Edit the second datasource's schema to hold workspace records. A `Workspace` row is a team; a `Member`
-row links a signed-in user (by their auth `subject`) to a workspace:
+Edit the second datasource's schema. A `Workspace` row is a team; a `Member` row links a signed-in
+user, by their auth `subject`, to a workspace:
 
 ```prisma
 // database/workspace/schema/schema.prisma — add these models
@@ -144,14 +120,14 @@ model Member {
 }
 ```
 
-The `subject` column is the link back to auth: it stores the `Principal.subject` value the auth backend
-resolves for a signed-in user, so a workspace member is "this auth identity, in this workspace."
+The `subject` column links back to auth: it stores the `Principal.subject` the auth backend resolves
+for a signed-in user. A member is "this auth identity, in this workspace".
 
 ## Step 4 — Migrate and generate the second datasource
 
-The `netscript db` operations are **multi-database aware**: every one takes a `--db <target>` flag,
-where the target is a config key, a database name, or `all`. Point each command at the `workspace`
-datasource. Run these from the workspace root with `aspire start` up:
+Every `netscript db` operation takes a `--db <target>` flag, where the target is a config key, a
+database name or `all`. Point each command at the `workspace` datasource, from the workspace root,
+with `aspire start` up:
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -171,20 +147,20 @@ datasource. Run these from the workspace root with `aspire start` up:
   }
 ] }) }}
 
-Each datasource keeps its **own** migration history and generated client. Migrating `--db workspace`
-never touches the primary Postgres (or the auth tables), and vice versa.
+Each datasource keeps its **own** migration history and generated client. Migrating
+`--db workspace` never touches the primary Postgres or the KV-backed auth sessions. Each database migration targets its selected datasource.
 
 {{ comp callout { type: "note", title: "Omitting --db targets the primary" } }}
-A <code>db</code> command with no <code>--db</code> resolves to the <strong>primary</strong> datasource
-(the default Postgres the auth plugin migrated into). Always pass <code>--db workspace</code> when you
-mean the second one, or <code>--db all</code> to fan out across every registered datasource.
+A <code>db</code> command without <code>--db</code> runs against the <strong>primary</strong>
+datasource, the Postgres the auth plugin migrated into. Pass <code>--db workspace</code> for the
+second one, or <code>--db all</code> to run against every registered datasource.
 {{ /comp }}
 
 ## Step 5 — Query the workspace client
 
-After `db generate --db workspace`, the second datasource has its own typed client. Import it exactly
-like the primary — just from the new path. It is an independent `PrismaClient`, typed off the
-`Workspace`/`Member` models:
+After `db generate --db workspace`, the second datasource has its own typed client. Import it like
+the primary client, from the new path. It is an independent `PrismaClient`, typed from the
+`Workspace` and `Member` models:
 
 ```ts
 // services/workspace/src/db.ts
@@ -199,22 +175,20 @@ console.log(teams.length);
 ```
 
 {{ comp callout { type: "warning", title: "Import the right client" } }}
-The primary client lives at <code>database/postgres/schema/.generated/client.server.ts</code>; the
-workspace client at <code>database/workspace/schema/.generated/client.server.ts</code>. They are
-distinct <code>PrismaClient</code>s — crossing the imports queries the wrong database. Re-run
-<code>netscript db generate --db workspace</code> after every schema edit, or your code is typed
-against the old shape.
+The primary client lives at <code>database/postgres/schema/.generated/client.server.ts</code> and the
+workspace client at <code>database/workspace/schema/.generated/client.server.ts</code>. Crossing the
+imports queries the wrong database. Re-run <code>netscript db generate --db workspace</code> after
+every schema edit, or your code is typed against the old shape.
 {{ /comp }}
 
 ## Extend — app-level org scoping
 
-The data model above is **single-tenant**: every `Member` belongs to a `Workspace`, but there is no
-framework-managed notion of an organization that owns many workspaces. NetScript does not ship orgs,
-tenants, or RBAC roles — if you want multi-tenant scoping, you add it yourself, in your own schema and
-your own queries.
+The model above is **single-tenant**: every `Member` belongs to a `Workspace`, but nothing models an
+organization that owns many workspaces. NetScript doesn't ship orgs, tenants or RBAC roles. For
+multi-tenant scoping, you add it in your own schema and your own queries.
 
 {{ comp callout { type: "note", title: "Multi-Tenancy and Org Scoping Design Boundary" } }}
-NetScript's identity system provides authentication (resolving a <code>Principal</code> with a <code>subject</code> and claims), but does not natively enforce organization boundaries or multi-tenant database scoping in the core runtime. This design boundary keeps authentication decoupled from application-level data isolation patterns. Today, multi-tenant scoping (such as filtering by <code>orgId</code> or managing role hierarchies) must be implemented in your application logic. Adding first-class, typed organization and multi-tenancy primitives is planned under roadmap item R3.
+NetScript's identity system resolves a <code>Principal</code> with a <code>subject</code> and claims, but the core runtime does not enforce organization boundaries or multi-tenant database scoping. This keeps authentication decoupled from application-level data isolation. Implement multi-tenant scoping, such as filtering by <code>orgId</code> or managing role hierarchies, in your application logic. First-class, typed organization and multi-tenancy primitives are planned under roadmap item R3.
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 
@@ -227,8 +201,8 @@ netscript db status --db workspace
 ls database/workspace/schema/.generated/client.server.ts
 ```
 
-`db status --db workspace` should report it migrated and in sync, and the generated client file should
-exist.
+`db status --db workspace` reports the datasource migrated and in sync, and the generated client file
+exists.
 
 - [ ] `netscript db add postgres --name workspace` scaffolded `database/workspace/`.
 - [ ] The `workspace` resource is green in the Aspire dashboard.
@@ -238,11 +212,6 @@ exist.
 
 ## What you built
 
-Your workspace now owns its data: a second, isolated Postgres datasource with `Workspace` and `Member`
-models, its own migration history, and its own typed client — the same catalog-versus-domain split a
-real NetScript app runs on, cleanly separate from auth and the primary database. You also saw the
-boundary: org scoping is app-level, not a framework primitive. Next comes the moment this data model
-exists for — adding a member to a team — and you do it off the request path with a background job.
-
-{{ comp.nextPrev({ prev: { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" }, next: { label: "4 · Provision job", href: "/tutorials/workspace/04-provision-job/" } }) }}
-</content>
+A second, isolated Postgres datasource with `Workspace` and `Member` models, its own migration
+history and its own typed client, separate from auth and the primary database. Org scoping stays
+app-level. Next, you add members to a team with a background job that runs off the request path.

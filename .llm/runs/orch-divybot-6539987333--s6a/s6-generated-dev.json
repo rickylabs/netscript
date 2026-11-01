@@ -1,0 +1,93 @@
+{
+  "rows": [
+    {
+      "mode": "dev",
+      "width": 390,
+      "status": 200,
+      "theme": {
+        "theme": "studio",
+        "scheme": "light",
+        "density": "compact",
+        "flavor": "utility"
+      },
+      "main": {
+        "x": 0,
+        "y": 115,
+        "width": 390,
+        "height": 452.359375,
+        "top": 115,
+        "right": 390,
+        "bottom": 567.359375,
+        "left": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 115,
+        "top": 0,
+        "right": 390,
+        "bottom": 115,
+        "left": 0
+      },
+      "viewport": 390,
+      "design": true
+    },
+    {
+      "mode": "dev",
+      "width": 390,
+      "code": {
+        "keywords": 1,
+        "copy": "// Copied registry code\nconst answer = 42;",
+        "keyword": "oklch(0.507832 0.158918 288.637)",
+        "number": "oklch(0.585488 0.174261 42.7357)",
+        "text": "oklch(0.243535 0 0)"
+      }
+    },
+    {
+      "mode": "dev",
+      "width": 1280,
+      "status": 200,
+      "theme": {
+        "theme": "studio",
+        "scheme": "light",
+        "density": "compact",
+        "flavor": "utility"
+      },
+      "main": {
+        "x": 0,
+        "y": 49,
+        "width": 1280,
+        "height": 401.859375,
+        "top": 49,
+        "right": 1280,
+        "bottom": 450.859375,
+        "left": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 49,
+        "top": 0,
+        "right": 1280,
+        "bottom": 49,
+        "left": 0
+      },
+      "viewport": 1280,
+      "design": true
+    },
+    {
+      "mode": "dev",
+      "width": 1280,
+      "code": {
+        "keywords": 1,
+        "copy": "// Copied registry code\nconst answer = 42;",
+        "keyword": "oklch(0.507832 0.158918 288.637)",
+        "number": "oklch(0.585488 0.174261 42.7357)",
+        "text": "oklch(0.243535 0 0)"
+      }
+    }
+  ],
+  "errors": []
+}

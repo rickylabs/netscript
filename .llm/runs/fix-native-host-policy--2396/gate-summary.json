@@ -1,0 +1,465 @@
+{
+  "sourceCheckpoint": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+  "receiptScope": "Earlier receipt entries are retained history. latestValidation below is the authoritative current-main union proof; the following checkpoint changes run records only.",
+  "receipts": [
+    {
+      "receipt": "check.json",
+      "gateId": "check",
+      "gitHead": "0d5084563335c47e800b05e8878deb1e4a94a155",
+      "actualGitHead": "0d5084563335c47e800b05e8878deb1e4a94a155",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 257572
+    },
+    {
+      "receipt": "final-agent-docs-prose.json",
+      "gateId": "agent-docs-prose",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 13493
+    },
+    {
+      "receipt": "final-assets-barrel.json",
+      "gateId": "assets-barrel",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1695
+    },
+    {
+      "receipt": "final-mcp-export-corpus.json",
+      "gateId": "mcp-export-corpus",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 9838
+    },
+    {
+      "receipt": "final-publish-assets.json",
+      "gateId": "publish-assets",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 538
+    },
+    {
+      "receipt": "layout-final-agent-docs-prose.json",
+      "gateId": "agent-docs-prose",
+      "gitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "actualGitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 10927
+    },
+    {
+      "receipt": "layout-final-assets-barrel.json",
+      "gateId": "assets-barrel",
+      "gitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "actualGitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1702
+    },
+    {
+      "receipt": "layout-final-mcp-export-corpus.json",
+      "gateId": "mcp-export-corpus",
+      "gitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "actualGitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 7861
+    },
+    {
+      "receipt": "layout-final-publish-assets.json",
+      "gateId": "publish-assets",
+      "gitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "actualGitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 482
+    },
+    {
+      "receipt": "layout-publish-plugins-streams.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "actualGitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 5607
+    },
+    {
+      "receipt": "layout-publish-plugins-workers.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "actualGitHead": "878dc1f7aa53dc77afc1efcea8ebf101ae52987e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 8240
+    },
+    {
+      "receipt": "layout-quality.json",
+      "gateId": "quality-gate",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 17769
+    },
+    {
+      "receipt": "publish-packages-cli.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 10550
+    },
+    {
+      "receipt": "publish-packages-fresh.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 8116
+    },
+    {
+      "receipt": "publish-packages-mcp.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 4285
+    },
+    {
+      "receipt": "publish-packages-service.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 5259
+    },
+    {
+      "receipt": "publish-plugins-streams.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 5945
+    },
+    {
+      "receipt": "publish-plugins-workers.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "actualGitHead": "47a20607835b29f993b396ccb154de5b03f37962",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 11005
+    },
+    {
+      "receipt": "quality.json",
+      "gateId": "quality-gate",
+      "gitHead": "0d5084563335c47e800b05e8878deb1e4a94a155",
+      "actualGitHead": "0d5084563335c47e800b05e8878deb1e4a94a155",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 15095
+    },
+    {
+      "receipt": "fixture-quality.json",
+      "gateId": "quality-gate",
+      "gitHead": "6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e",
+      "actualGitHead": "6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 17444
+    },
+    {
+      "receipt": "fixture-publish-workers.json",
+      "gateId": "publish-dry-run",
+      "gitHead": "6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e",
+      "actualGitHead": "6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 13509
+    }
+  ],
+  "rootCheck": {
+    "files": 3849,
+    "batches": 33,
+    "diagnostics": 0,
+    "exitCode": 0
+  },
+  "relocatedCheck": {
+    "files": 19,
+    "diagnostics": 0,
+    "exitCode": 0
+  },
+  "tests": {
+    "workersStreams": {
+      "passed": 231,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 231,
+      "uniqueFailures": 0
+    },
+    "nativeSdkCredentialsDiscovery": {
+      "passed": 137,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 137,
+      "uniqueFailures": 0
+    }
+  },
+  "lintFormat": {
+    "filesSelected": 204,
+    "filesProcessed": 204,
+    "droppedFiles": [],
+    "findings": 0
+  },
+  "documentation": {
+    "jsdocExamples": 479,
+    "jsdocFailures": 0,
+    "jsdocExemptions": 0,
+    "siteSnippets": 26,
+    "newHostGuideExamples": 3,
+    "newGuideCompileExitCode": 0,
+    "rootLockUnchanged": true,
+    "internalLinks": "PASS",
+    "exportDrift": "PASS",
+    "canonicalFreshness": "PASS"
+  },
+  "docLint": {
+    "factorySubpaths": {
+      "workers": 0,
+      "streams": 0
+    },
+    "fullPackages": {
+      "workers": 2,
+      "streams": 3,
+      "FreshPrerequisite": 45
+    },
+    "outcome": "FAIL at identical measured main baseline; no waiver or new finding",
+    "comparison": "doc-lint-baseline.json"
+  },
+  "publishDryRunMembers": [
+    "plugins/workers",
+    "plugins/streams",
+    "packages/service",
+    "packages/fresh",
+    "packages/mcp",
+    "packages/cli"
+  ],
+  "actualPublishedGraph": "UNPROVEN; release-owned HOST-POLICY-PUBLISHED-GRAPH-2396",
+  "runtimeCI": "UNPROVEN while draft; coordinator owns e2e-cli-gate",
+  "localScaffoldRuntime": "NOT RUN by explicit owner instruction",
+  "reviewThreads": {
+    "2421": 0,
+    "2422": 0,
+    "2423": 0
+  },
+  "prerequisiteEvidence": {
+    "service": ".llm/runs/fix-native-service-policy--2396/gate-summary.json",
+    "readerHeaders": ".llm/runs/fix-browser-stream-headers--2396/gate-summary.json"
+  },
+  "fixtureCorrection": {
+    "workersTests": {
+      "passed": 148,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 148,
+      "uniqueFailures": 0
+    },
+    "sourceCheckFiles": 6,
+    "workersLintFmtFiles": 131,
+    "findings": 0,
+    "testHelperExcludedFromNativeJsrIncludedFileList": true,
+    "includedFileCount": 92,
+    "fileList": "publish-file-list.json",
+    "streamsUnchangedTests": 83
+  },
+  "independentPreliminaryReview": {
+    "head": "6a6e390fcdaf8bab60d5cf1a1c1e280e9ab83a8e",
+    "verdict": "CHANGES",
+    "blockers": 1,
+    "blocker": "Published worker test helper; corrected in this slice",
+    "debtDecisions": "Accepted unchanged facade, postpublish and bounded metadata entries"
+  },
+  "currentMainHead": "4aa734e2b6ca93119462ec2e0cd34b729df51bfd",
+  "latestValidation": {
+    "mainHead": "4aa734e2b6ca93119462ec2e0cd34b729df51bfd",
+    "sourceHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+    "rootCheck": {
+      "files": 3857,
+      "batches": 33,
+      "diagnostics": 0,
+      "exitCode": 0
+    },
+    "combinedTests": {
+      "passed": 1504,
+      "failed": 0,
+      "ignored": 4,
+      "totalResults": 1508,
+      "uniqueFailures": 0
+    },
+    "testScope": [
+      "packages/service",
+      "packages/plugin",
+      "packages/fresh",
+      "plugins/workers",
+      "plugins/streams",
+      "packages/plugin-workers-core/tests/runtime/job-retry-policy_test.ts",
+      "five native SDK credential/discovery/ownership test files"
+    ],
+    "ignoredTests": "Four unchanged main job-retry redis adapter cases require NETSCRIPT_TEST_REDIS_URL; no local Redis configured. Core CI supplies its owned Redis.",
+    "lintFormat": {
+      "filesSelected": 333,
+      "filesProcessed": 333,
+      "droppedFiles": [],
+      "findings": 0
+    },
+    "documentation": {
+      "serviceFullExportFindings": 0,
+      "workersFullExportFindings": 2,
+      "streamsFullExportFindings": 3,
+      "freshFullExportFindings": 45,
+      "singularFactoryFindings": 0,
+      "baselineComparison": "doc-lint-baseline-refreshed.json",
+      "jsdocChecked": 479,
+      "jsdocExempt": 0,
+      "jsdocFailures": 0,
+      "exportDrift": "PASS"
+    },
+    "nativeJsrFileList": {
+      "file": "publish-file-list.json",
+      "includedFiles": 93,
+      "testOrHelperIncluded": false
+    },
+    "generatedCorpus": {
+      "packages": 35,
+      "subpaths": 303,
+      "symbols": 8992
+    },
+    "receipts": [
+      {
+        "receipt": "refreshed-check.json",
+        "gateId": "check",
+        "gitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "actualGitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 244463
+      },
+      {
+        "receipt": "refreshed-final-agent-docs-prose.json",
+        "gateId": "agent-docs-prose",
+        "gitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "actualGitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 18662
+      },
+      {
+        "receipt": "refreshed-final-assets-barrel.json",
+        "gateId": "assets-barrel",
+        "gitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "actualGitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 2258
+      },
+      {
+        "receipt": "refreshed-final-mcp-export-corpus.json",
+        "gateId": "mcp-export-corpus",
+        "gitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "actualGitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 14480
+      },
+      {
+        "receipt": "refreshed-final-publish-assets.json",
+        "gateId": "publish-assets",
+        "gitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "actualGitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 710
+      },
+      {
+        "receipt": "refreshed-publish-packages-cli.json",
+        "gateId": "publish-dry-run",
+        "gitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "actualGitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 14195
+      },
+      {
+        "receipt": "refreshed-publish-packages-fresh.json",
+        "gateId": "publish-dry-run",
+        "gitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "actualGitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 10986
+      },
+      {
+        "receipt": "refreshed-publish-packages-mcp.json",
+        "gateId": "publish-dry-run",
+        "gitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "actualGitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 5726
+      },
+      {
+        "receipt": "refreshed-publish-packages-service.json",
+        "gateId": "publish-dry-run",
+        "gitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "actualGitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 12314
+      },
+      {
+        "receipt": "refreshed-publish-plugins-streams.json",
+        "gateId": "publish-dry-run",
+        "gitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "actualGitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 12782
+      },
+      {
+        "receipt": "refreshed-publish-plugins-workers.json",
+        "gateId": "publish-dry-run",
+        "gitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "actualGitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 22862
+      },
+      {
+        "receipt": "refreshed-quality.json",
+        "gateId": "quality-gate",
+        "gitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "actualGitHead": "a45a1db4014e3a8f987497a80a8bb2d7875af693",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "durationMs": 16468
+      }
+    ],
+    "conflicts": "Only canonical generated carriers; regenerated over both source histories. No authored runtime or test conflict.",
+    "locks": "Exact incoming main; no leaf dependency/lock churn",
+    "mergeability": "MERGEABLE against current main after source merge; CI/runtime still require exact final-head results"
+  }
+}

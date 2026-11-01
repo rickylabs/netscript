@@ -1,4 +1,12 @@
 import manifest from '@app/assets/tokens.json' with { type: 'json' };
+import { themeLabel } from '@app/lib/theme.ts';
+
+/** Default metadata is also used by the components gallery. */
+export const tokenManifestMeta = {
+  version: manifest.version,
+  generatedBy: manifest.generatedBy,
+  total: Object.keys(manifest.tokens).length,
+} as const;
 
 /**
  * One entry from the generated design-token manifest (`assets/tokens.json`).
@@ -23,8 +31,6 @@ export interface SemanticIntent {
   readonly tokens: readonly DesignToken[];
 }
 
-const RAMP_ORDER = ['gray', 'copper', 'teal', 'slate', 'red', 'amber'] as const;
-
 const INTENT_ORDER = [
   'primary',
   'secondary',
@@ -32,6 +38,7 @@ const INTENT_ORDER = [
   'success',
   'warning',
   'destructive',
+  'info',
 ] as const;
 
 const FOUNDATION_ORDER = [
@@ -51,79 +58,107 @@ const FOUNDATION_ORDER = [
   'ring',
 ] as const;
 
-const allTokens: readonly DesignToken[] = Object.entries(manifest.tokens).map(
-  ([name, token]) => ({
+/** Build a request-local projection; static manifest data is never changed. */
+export function createDesignTokenModel(presetId: keyof typeof manifest.presets) {
+  const preset = manifest.presets[presetId];
+  const values: Readonly<Record<string, string>> = preset.schemes.light;
+  const selected = presetId === manifest.defaultPreset ? manifest.tokens : Object.fromEntries(
+    Object.entries(manifest.definitions).map((
+      [name, token],
+    ) => [name, { ...token, value: values[name] }]),
+  );
+  const allTokens: readonly DesignToken[] = Object.entries(selected).map(([name, token]) => ({
     name,
     type: token.type,
     value: String(token.value),
     cssVar: token.cssVar,
     path: token.path,
-  }),
-);
+  }));
+  const byName = new Map(allTokens.map((token) => [token.name, token]));
+  const tokensIn = (group: string) => allTokens.filter((token) => token.path[0] === group);
+  const rampDefinitions = presetId === manifest.defaultPreset ? manifest.ramps : manifest.allRamps;
+  /** Sorts spacing tokens by their resolved pixel size. */
+  function spaceSize(token: DesignToken): number {
+    if (token.value.endsWith('px')) return Number.parseFloat(token.value);
+    return Number.parseFloat(token.value) * 16;
+  }
 
-function tokensIn(group: string): DesignToken[] {
-  return allTokens.filter((token) => token.path[0] === group);
+  /** Manifest metadata for the page header. */
+  const tokenManifestMeta = {
+    version: manifest.version,
+    generatedBy: manifest.generatedBy,
+    total: allTokens.length,
+  } as const;
+
+  /** Primitive color ramps in display order. */
+  const colorRamps: readonly ColorRamp[] = rampDefinitions.map((ramp) => ({
+    name: ramp.name,
+    steps: ramp.steps.map((name) => byName.get(name)).filter((token): token is DesignToken =>
+      token !== undefined
+    ),
+  }));
+
+  /** Theme-independent semantic foundation tokens (surfaces, text, borders). */
+  const foundationTokens: readonly DesignToken[] = FOUNDATION_ORDER.map(
+    (name) => tokensIn('semantic').find((token) => token.name === name),
+  ).filter((token): token is DesignToken => token !== undefined);
+
+  /** Semantic intents with their full companion sets (base, fg, hover, subtle, border). */
+  const semanticIntents: readonly SemanticIntent[] = INTENT_ORDER.map((role) => ({
+    role,
+    tokens: tokensIn('semantic').filter(
+      (token) => token.name === role || token.name.startsWith(`${role}-`),
+    ),
+  }));
+
+  /** Font family tokens. */
+  const fontTokens: readonly DesignToken[] = tokensIn('font');
+
+  /** Type scale tokens in ascending size order. */
+  const textTokens: readonly DesignToken[] = tokensIn('text');
+
+  /** Line-height tokens. */
+  const leadingTokens: readonly DesignToken[] = tokensIn('leading');
+
+  /** Letter-spacing tokens. */
+  const trackingTokens: readonly DesignToken[] = tokensIn('tracking');
+
+  /** Spacing scale sorted by resolved size. */
+  const spaceTokens: readonly DesignToken[] = [...tokensIn('space')].sort(
+    (a, b) => spaceSize(a) - spaceSize(b),
+  );
+
+  /** Corner radius tokens. */
+  const radiusTokens: readonly DesignToken[] = tokensIn('radius');
+
+  /** Elevation (box-shadow) tokens. */
+  const shadowTokens: readonly DesignToken[] = tokensIn('shadow');
+
+  /** Motion (duration + easing) tokens. */
+  const easeTokens: readonly DesignToken[] = tokensIn('ease');
+
+  /** Z-index scale tokens in stacking order. */
+  const zTokens: readonly DesignToken[] = [...tokensIn('z')].sort(
+    (a, b) => Number.parseFloat(a.value) - Number.parseFloat(b.value),
+  );
+
+  return {
+    presetLabel: themeLabel(presetId),
+    tokenManifestMeta,
+    colorRamps,
+    foundationTokens,
+    semanticIntents,
+    fontTokens,
+    textTokens,
+    leadingTokens,
+    trackingTokens,
+    spaceTokens,
+    radiusTokens,
+    shadowTokens,
+    easeTokens,
+    zTokens,
+  };
 }
 
-/** Sorts spacing tokens by their resolved pixel size. */
-function spaceSize(token: DesignToken): number {
-  if (token.value.endsWith('px')) return Number.parseFloat(token.value);
-  return Number.parseFloat(token.value) * 16;
-}
-
-/** Manifest metadata for the page header. */
-export const tokenManifestMeta = {
-  version: manifest.version,
-  generatedBy: manifest.generatedBy,
-  total: allTokens.length,
-} as const;
-
-/** Primitive color ramps in display order. */
-export const colorRamps: readonly ColorRamp[] = RAMP_ORDER.map((name) => ({
-  name,
-  steps: tokensIn('color').filter((token) => token.path[1] === name),
-}));
-
-/** Theme-independent semantic foundation tokens (surfaces, text, borders). */
-export const foundationTokens: readonly DesignToken[] = FOUNDATION_ORDER.map(
-  (name) => tokensIn('semantic').find((token) => token.name === name),
-).filter((token): token is DesignToken => token !== undefined);
-
-/** Semantic intents with their full companion sets (base, fg, hover, subtle, border). */
-export const semanticIntents: readonly SemanticIntent[] = INTENT_ORDER.map((role) => ({
-  role,
-  tokens: tokensIn('semantic').filter(
-    (token) => token.name === role || token.name.startsWith(`${role}-`),
-  ),
-}));
-
-/** Font family tokens. */
-export const fontTokens: readonly DesignToken[] = tokensIn('font');
-
-/** Type scale tokens in ascending size order. */
-export const textTokens: readonly DesignToken[] = tokensIn('text');
-
-/** Line-height tokens. */
-export const leadingTokens: readonly DesignToken[] = tokensIn('leading');
-
-/** Letter-spacing tokens. */
-export const trackingTokens: readonly DesignToken[] = tokensIn('tracking');
-
-/** Spacing scale sorted by resolved size. */
-export const spaceTokens: readonly DesignToken[] = [...tokensIn('space')].sort(
-  (a, b) => spaceSize(a) - spaceSize(b),
-);
-
-/** Corner radius tokens. */
-export const radiusTokens: readonly DesignToken[] = tokensIn('radius');
-
-/** Elevation (box-shadow) tokens. */
-export const shadowTokens: readonly DesignToken[] = tokensIn('shadow');
-
-/** Motion (duration + easing) tokens. */
-export const easeTokens: readonly DesignToken[] = tokensIn('ease');
-
-/** Z-index scale tokens in stacking order. */
-export const zTokens: readonly DesignToken[] = [...tokensIn('z')].sort(
-  (a, b) => Number.parseFloat(a.value) - Number.parseFloat(b.value),
-);
+/** Presentation data is passed into the view rather than stored in mutable module state. */
+export type DesignTokenModel = ReturnType<typeof createDesignTokenModel>;

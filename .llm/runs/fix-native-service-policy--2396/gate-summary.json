@@ -1,0 +1,149 @@
+{
+  "sourceHead": "24c73ee2f37c6c4257e3d245c3afda59cbd7d3d0",
+  "receipts": [
+    {
+      "gateId": "assets-barrel",
+      "gitHead": "24c73ee2f37c6c4257e3d245c3afda59cbd7d3d0",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1789
+    },
+    {
+      "gateId": "check",
+      "gitHead": "24c73ee2f37c6c4257e3d245c3afda59cbd7d3d0",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 199298
+    },
+    {
+      "gateId": "mcp-export-corpus",
+      "gitHead": "24c73ee2f37c6c4257e3d245c3afda59cbd7d3d0",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 10099
+    },
+    {
+      "gateId": "doc-lint",
+      "gitHead": "24c73ee2f37c6c4257e3d245c3afda59cbd7d3d0",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1725
+    },
+    {
+      "gateId": "publish-dry-run",
+      "gitHead": "24c73ee2f37c6c4257e3d245c3afda59cbd7d3d0",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 3542
+    },
+    {
+      "gateId": "agent-docs-prose",
+      "gitHead": "24c73ee2f37c6c4257e3d245c3afda59cbd7d3d0",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 12463
+    },
+    {
+      "gateId": "publish-assets",
+      "gitHead": "24c73ee2f37c6c4257e3d245c3afda59cbd7d3d0",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 495
+    },
+    {
+      "gateId": "publish-dry-run",
+      "gitHead": "24c73ee2f37c6c4257e3d245c3afda59cbd7d3d0",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 7674
+    },
+    {
+      "gateId": "quality-gate",
+      "gitHead": "24c73ee2f37c6c4257e3d245c3afda59cbd7d3d0",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 18200
+    }
+  ],
+  "tests": {
+    "passed": 824,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 824,
+    "uniqueFailures": 0
+  },
+  "testCommand": "deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --unstable-kv --allow-all packages/service packages/plugin .llm/tools/docs/check-exports-drift_test.ts .llm/tools/docs/jsdoc-example-compiler_test.ts .llm/tools/docs/jsdoc-example-policy_test.ts",
+  "scopedLintAndFormat": {
+    "root": "packages/service",
+    "files": 126,
+    "exitCode": 0
+  },
+  "finalSourceHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+  "finalSourceReceipts": [
+    {
+      "gateId": "check",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 98310
+    },
+    {
+      "gateId": "publish-dry-run",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 4075
+    },
+    {
+      "gateId": "publish-dry-run",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 5995
+    },
+    {
+      "gateId": "quality-gate",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 17308
+    },
+    {
+      "gateId": "agent-docs-prose",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 23629
+    },
+    {
+      "gateId": "assets-barrel",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 2273
+    },
+    {
+      "gateId": "mcp-export-corpus",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 19228
+    },
+    {
+      "gateId": "publish-assets",
+      "gitHead": "37f26c1dc07da57a83a7cfbccc5344a349d1414c",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 724
+    }
+  ],
+  "finalSourceTests": {
+    "passed": 824,
+    "failed": 0,
+    "ignored": 0
+  },
+  "finalSourceDocLint": {
+    "entrypoints": 8,
+    "findings": 0
+  }
+}

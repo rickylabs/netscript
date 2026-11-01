@@ -1,0 +1,8 @@
+const root='C:/Users/ericc/source/repos/netscript-native-host-policy-008';
+const out=root+'/.llm/tmp/native-host-policy-u1-s6f-astra-20261028';
+const fixture='plugins/streams/services/src/tests/test_utils/service-runtime-fixture.ts';
+const baseline=JSON.parse(await Deno.readTextFile(root+'/.llm/tmp/native-host-policy-u1-s6f-proposal-20261028/proposal-bindings.json'));
+const result={head:baseline.head,fixtureException:baseline.rows.find(row=>row.path===fixture),rows:baseline.rows.filter(row=>row.path!==fixture)};
+await Deno.writeTextFile(out+'/protected-bindings.json',JSON.stringify(result,null,2),{createNew:true});
+if(result.rows.length!==369||result.fixtureException.expected!=='227414514886bd42086b3e814bd3e4822cdd7e64125b847e6edf453fac927f9c')throw new Error('Protected scope differs');
+console.log(JSON.stringify({protectedBindings:result.rows.length,fixtureException:result.fixtureException.path}));

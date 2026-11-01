@@ -22,20 +22,41 @@ export function Checkbox(
 ): VNode {
   return (
     <label
-      class={cn(
-        'ns-choice',
-        disabled && 'ns-choice--disabled',
-        error && 'ns-choice--error',
-        className,
-      )}
+      class={cn('ns-choice', className)}
+      data-disabled={disabled ? ('true') : undefined}
+      data-invalid={error ? 'true' : undefined}
+      data-state={disabled ? 'disabled' : error ? 'invalid' : 'rest'}
+      data-checked={(props.checked ?? props.defaultChecked) ? 'true' : 'false'}
+      data-part='root'
+      data-scope='checkbox'
     >
-      <span class='ns-choice__control'>
-        <input {...props} type='checkbox' disabled={disabled} class='ns-checkbox' />
-        <span aria-hidden='true' class='ns-checkbox__indicator'>✓</span>
+      <span class='ns-choice__control' data-part='control' data-scope='checkbox'>
+        <input
+          {...props}
+          type='checkbox'
+          disabled={disabled}
+          class='ns-checkbox'
+          data-part='control'
+          data-scope='checkbox'
+        />
+        <span
+          aria-hidden='true'
+          class='ns-checkbox__indicator'
+          data-part='indicator'
+          data-scope='checkbox'
+        >
+          ✓
+        </span>
       </span>
-      <span class='ns-choice__body'>
-        <span class='ns-choice__label'>{children}</span>
-        {description ? <span class='ns-choice__description'>{description}</span> : null}
+      <span class='ns-choice__body' data-part='body' data-scope='checkbox'>
+        <span class='ns-choice__label' data-part='label' data-scope='checkbox'>{children}</span>
+        {description
+          ? (
+            <span class='ns-choice__description' data-part='description' data-scope='checkbox'>
+              {description}
+            </span>
+          )
+          : null}
       </span>
     </label>
   );

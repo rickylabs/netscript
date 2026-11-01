@@ -1,0 +1,11 @@
+{
+  "code": 1,
+  "stdout": "05:10:46.509 INF netscript·services·streams Service listening\n05:10:46.515 INF netscript·services·streams HTTP request started\n05:10:46.516 INF netscript·services·streams auth decision allow\n05:10:46.523 INF netscript·services·streams HTTP request completed\n05:10:46.527 INF netscript·services·streams HTTP request started\n05:10:46.548 INF netscript·services·streams auth decision allow\n05:10:46.550 INF netscript·services·streams HTTP request completed\n05:10:46.563 INF netscript·services·streams Service shutdown completed\n{\"observations\":{\"mode\":\"drain\",\"negative\":true,\"upstreamRead\":[200,\"s6e-drain-real-stream\"],\"actualBeforeRelease\":[\"pending\",\"pending\"],\"observedBeforeRelease\":[\"fulfilled\",\"pending\"],\"frontRead\":[200,\"s6e-drain-real-stream\"],\"nativeStopsSettled\":2},\"authCalls\":2,\"rebinds\":[{\"phase\":\"while-auth-held\",\"port\":51612},{\"phase\":\"after-native-stop\",\"port\":61882},{\"phase\":\"after-native-stop\",\"port\":51612}]}\ns6e-streams: response, native stops and both ports settled\n",
+  "stderr": "Check $deno$stdin.ts\n[streams] Warning: Streams storage is ephemeral; events are lost on process restart.\nerror: Uncaught (in promise) Error: DRAIN_COMPLETED_BEFORE_RELEASE\n      if (state.status === 'fulfilled') throw new Error('DRAIN_COMPLETED_BEFORE_RELEASE');\n                                              ^\n    at file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/streams/$deno$stdin.ts:102:47\n",
+  "pid": 69656,
+  "startedAt": "2026-10-28T05:10:45.257Z",
+  "finishedAt": "2026-10-28T05:10:46.578Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

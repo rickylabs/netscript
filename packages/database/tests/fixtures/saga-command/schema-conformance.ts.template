@@ -1,0 +1,33 @@
+import { assertEquals, assertRejects } from 'jsr:@std/assert@1';
+import { PrismaClient } from './.generated/client.ts';
+import { PrismaPg } from '@prisma/adapter-pg';
+const namespace = 'public';
+const root = new PrismaClient({ adapter: new PrismaPg({ host: Deno.env.get('COMMAND_POSTGRES_SOCKET'), database: Deno.env.get('SAGA_COMMAND_NAMESPACE')!, user: Deno.env.get('PGUSER'), port: Number(Deno.env.get('PGPORT')) }, { schema: namespace }) });
+Deno.test('installed outbox migration matches fixture columns, indexes and CHECK constraints', async () => {
+ const reference = namespace + '_reference';
+ try {
+  await root.$executeRawUnsafe(`CREATE SCHEMA "${reference}"`);
+  await root.$transaction(async tx => {
+   await tx.$executeRawUnsafe(`SET LOCAL search_path = "${reference}"`);
+   for (const sql of (await Deno.readTextFile('reference.sql')).replace(/^--.*$/gm, '').split(';').filter(s=>s.trim())) await tx.$executeRawUnsafe(sql);
+  });
+  const columns = (schema:string) => root.$queryRawUnsafe(`SELECT column_name, data_type, udt_name, is_nullable, column_default, datetime_precision, character_maximum_length FROM information_schema.columns WHERE table_schema=$1 AND table_name='netscript_command_outbox' ORDER BY ordinal_position`,schema);
+  assertEquals(await columns(namespace), await columns(reference));
+  const constraints = (schema:string) => root.$queryRawUnsafe(`SELECT conname, pg_get_constraintdef(c.oid) AS definition FROM pg_constraint c JOIN pg_class t ON t.oid=c.conrelid JOIN pg_namespace n ON n.oid=t.relnamespace WHERE n.nspname=$1 AND t.relname='netscript_command_outbox' ORDER BY conname`,schema);
+  assertEquals(await constraints(namespace), await constraints(reference));
+  const indexes = async(schema:string) => (await root.$queryRawUnsafe<{indexname:string,indexdef:string}[]>(`SELECT indexname,indexdef FROM pg_indexes WHERE schemaname=$1 AND tablename='netscript_command_outbox' ORDER BY indexname`,schema)).map(r=>({...r,indexdef:r.indexdef.replaceAll(schema+'.','')}));
+  assertEquals(await indexes(namespace), await indexes(reference));
+  // Adopting an application with the original constraints is idempotent.
+  await root.$transaction(async tx => {
+   await tx.$executeRawUnsafe(`SET LOCAL search_path = "${namespace}"`);
+   await tx.$executeRawUnsafe(await Deno.readTextFile('constraints.sql'));
+  });
+  const data = {id:'constraint',executionId:'e',commandName:'c',commandVersion:1,destination:'w',topic:'t',payloadJson:'{}',dedupeKey:'d',correlationId:'c',availableAt:new Date(0)};
+  await assertRejects(()=>root.netScriptCommandOutbox.create({data:{...data,attemptCount:-1}}));
+  await assertRejects(()=>root.netScriptCommandOutbox.create({data:{...data,claimToken:'unpaired'}}));
+  await assertRejects(()=>root.netScriptCommandOutbox.create({data:{...data,acceptanceIdentity:'unpaired'}}));
+ } finally {
+  await root.$executeRawUnsafe(`DROP SCHEMA IF EXISTS "${reference}" CASCADE`);
+  await root.$disconnect();
+ }
+});

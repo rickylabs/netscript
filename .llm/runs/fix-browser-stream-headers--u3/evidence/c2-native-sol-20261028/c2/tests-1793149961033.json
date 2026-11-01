@@ -1,0 +1,20 @@
+{
+  "selected": "tests",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-test.ts",
+    "--",
+    "--frozen",
+    "-A",
+    "plugins/workers/tests/streams/factory-headers_test.ts",
+    "plugins/workers/tests/streams/factory-discovery_test.ts",
+    "plugins/workers/tests/streams/live-query-consumer_test.ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T01:12:41.036Z",
+  "ended": "2026-10-28T01:12:47.446Z",
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/tests-1793149961033"
+}

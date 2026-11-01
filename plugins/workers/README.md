@@ -36,6 +36,60 @@ binds them to a NetScript host.
 - **Aspire-native** — `./aspire` contributes the worker resources to the AppHost, so local
   orchestration and deployment see workers as first-class processes.
 
+## Installing before the first definition
+
+Install without example definitions, then generate the registry:
+
+```sh
+netscript plugin install workers --no-db --no-samples
+netscript generate plugins
+netscript plugin doctor
+```
+
+An installed plugin with zero definitions gets a typed empty registry. Doctor reports the empty
+registry as a warning and exits successfully; a missing or stale registry remains an error. With
+its configured dependencies available, the background runner starts idle and reports ready with
+zero definitions. Add your first definition and run `netscript generate plugins` again. Removing
+the last definition and regenerating keeps a valid empty registry.
+
+## Excluding helpers from generated registries
+
+`netscript generate plugins` selects definition modules from `workers/jobs/*.ts` and plugin-provided
+job directories. Keep a helper or a dependency-injected factory beside those definitions by putting
+this exact comment on its first line:
+
+```ts
+// @netscript-registry-ignore
+export function scopedId(scope: string, name: string): string {
+  return `${scope}.${name}`;
+}
+```
+
+For example, add it to `workers/jobs/helper.ts`. The directive is shared by all plugin runtime
+registries and standalone registry compilers. It excludes the whole module before generating
+imports; ordinary imports from your application keep working. Use a separate module for a top-level
+job definition that should remain registered.
+
+The marker must be the complete first-line comment, before any license header or code. Indentation,
+a UTF-8 BOM and CRLF are accepted; a later comment, a string containing the marker, or extra text on
+the line does not opt out. Existing manifest suffix and filename exclusions still apply.
+
+Regenerate and inspect the result:
+
+```sh
+netscript generate plugins
+netscript plugin doctor
+```
+
+Doctor names eligible modules carrying the directive as `Explicitly excluded registry modules`, on
+both healthy and stale registries. Remove the directive and regenerate to register the module again.
+Unmarked modules retain the plugin's existing definition validation. Keep the CLI, shared plugin
+package and installed plugins on matching release versions so their selector and inspection protocol
+agree.
+
+A workers config entry pointing at an excluded job remains an unmatched-path error. Remove that
+config entry or restore a registrable module; exclusion does not silently disable configured jobs.
+
 ## Architecture
 
 ```mermaid
@@ -60,6 +114,27 @@ cleanup. An in-process handler that ignores cancellation may continue running; C
 delay timers. Forward `context.signal` to cancellable operations. Task-executor cancellation is a
 separate path. Optional `queue` and `taskQueue` dependencies use the existing `MessageQueue` ports;
 this worker owns and stops supplied queues as it does the defaults.
+
+## Job retries and dead letters
+
+Declare `retry: { maxRetries, backoff, delayMs, maxDelayMs }` on a discovered schema-backed handler
+with `Object.assign(handler, { id, retry })`, or use the core builder's `.retry(...)` method.
+Handler fields override definition defaults, and both registry generators preserve the policy.
+In-process and polyglot jobs share one bounded retry executor: `maxRetries` counts retries after the
+initial attempt, and zero still runs once. Timeout is terminal; shutdown requeues without a job dead
+letter.
+
+Exhausted jobs are stored through `Worker.deadLetters` before the transport acknowledges them. Its
+default is a KV-backed specialization of the queue's canonical dead-letter port in a separate
+namespace. `WorkerOptions.deadLetters` accepts a replacement; the port supports listing, depth and
+controlled reprocessing. `Worker.readHealthStatus()` and the generated background health route read
+durable depth, and a storage outage makes dependency readiness unavailable. Job retries retain one
+delivery, so size visibility and active-claim leases for the full retry budget and make effects
+idempotent across transport redelivery.
+
+See
+[Tune the worker runtime](https://rickylabs.github.io/netscript/background-processing/how-to/tune-worker-runtime/)
+for handler examples, backoff formulas, precedence, replay, and time-budget sizing.
 
 ## Install
 
@@ -89,6 +164,62 @@ deno x -A jsr:@netscript/plugin-workers@<version>/cli list-jobs
 
 Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
 the pre-release line.
+
+## Host-owned Workers API
+
+Use the inert `@netscript/plugin-workers/service` entrypoint for a caller-owned listener. The
+factory requires a native auth policy, accepts native CORS and serve options, and returns the
+native running handle. The host supplies its database port, KV adapter and credential; the
+following recipe shows that composition boundary without opening a host database here:
+
+```ts
+import '@netscript/kv/redis'; // Register only the adapter selected by the host.
+import { getKv } from '@netscript/kv';
+import { createPluginServiceContext } from '@netscript/plugin/sdk';
+import { createStaticCredentialAuthenticator } from '@netscript/service/auth';
+import { startWorkersService } from '@netscript/plugin-workers/service';
+
+declare const openDatabaseClient: () => Promise<unknown>;
+declare const workerCredential: string; // Obtain from the host's secret authority.
+
+const context = await createPluginServiceContext('workers', {
+  getDatabaseClient: () => openDatabaseClient(),
+  getKv: () => getKv(),
+});
+const authenticator = createStaticCredentialAuthenticator({
+  credentials: {
+    [workerCredential]: {
+      subject: 'service:workers', scopes: ['workers:read'], roles: ['service'],
+    },
+  },
+});
+const controller = new AbortController();
+const running = await startWorkersService(context, {
+  auth: { authn: { authenticator } },
+  serve: { hostname: '127.0.0.1', port: 0, signal: controller.signal },
+});
+try {
+  console.log(running.addr.port); // Publish the allocated endpoint through the host.
+} finally {
+  await running.stop(); // Drains requests; the host still owns and closes its KV.
+}
+```
+
+`serve.port`, including zero, takes precedence over context `PORT`, then process `PORT`.
+Supply `auth: { public: true, reason: '...' }` only for an intentional public service. The factory
+forwards policy and listener options without changing them. Importing the singular entrypoint
+does not register Redis, read environment values or start a listener; the explicit host import
+above performs adapter registration.
+
+Grant runtime permissions for the chosen listener, KV backend and host configuration: network
+access to those endpoints, environment access to the configuration the host reads, and read/write
+access to the selected local KV path if used. Enable Deno KV with `--unstable-kv`. Restrict these
+permissions to the host's resources; the recipe's type check does not qualify a deployed host.
+
+The plural `@netscript/plugin-workers/services` default remains the legacy context delegate. It
+registers Redis, preserves the existing public policy reason, reads context `PORT` before process
+`PORT`, and uses native wildcard-host and signal defaults. Its direct-run bootstrap still requires
+`NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE`. Choose the singular factory to own auth and binding.
 
 ## Generated job policy
 
@@ -211,3 +342,6 @@ Atomic version checks prevent it from deleting a record updated after inspection
 records and open executions are preserved. This endpoint also removes legacy execution records
 written without TTL; normal new-record expiry is performed by the KV backend and needs no app
 session. Job/task definitions remain configuration rather than expiring execution history.
+
+For native policy/CORS/listener composition and explicit SDK credentials, see
+[Host workers and streams services](https://rickylabs.github.io/netscript/services-sdk/how-to/host-plugin-services/).

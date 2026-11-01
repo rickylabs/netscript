@@ -1,0 +1,3 @@
+# Aspire reference carrier freshness
+
+Changing docs/site/reference/aspire/index.md stales the consumer CLI compressed prose corpus. Canonical `deno task gen:agent-docs-prose` builds the site and regenerates the carrier. Decoding baseline and current gzip/base64 rows showed exactly one changed page: pages/reference/aspire/index.md, with the new leak section; no other generated file changed. Verify built-site freshness with `deno run --no-lock --allow-read --allow-write --allow-run=git .llm/tools/docs/build-agent-docs-bundle.ts --site-dir docs/site/_site --check`. Root check:agent-docs-prose also rebuilds; assets-barrel ends with git diff --exit-code and should be checked after committing intentional carrier changes.

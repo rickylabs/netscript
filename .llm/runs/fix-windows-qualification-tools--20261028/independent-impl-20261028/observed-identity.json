@@ -1,0 +1,142 @@
+{
+  "sessionID": "ses_e7f7e1f2fffeXF2xqxTB3BtiwD",
+  "assistants": [
+    {
+      "id": "msg_18081e295001yUdvleFl0G0R99",
+      "sessionID": "ses_e7f7e1f2fffeXF2xqxTB3BtiwD",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "tool-calls",
+      "cost": 0.002605,
+      "tokens": {
+        "total": 15451,
+        "input": 14630,
+        "output": 240,
+        "reasoning": 581,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      }
+    },
+    {
+      "id": "msg_1808222df001BrtPwo6dUFMdH8",
+      "sessionID": "ses_e7f7e1f2fffeXF2xqxTB3BtiwD",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "tool-calls",
+      "cost": 0.00422027,
+      "tokens": {
+        "total": 39074,
+        "input": 24339,
+        "output": 234,
+        "reasoning": 37,
+        "cache": {
+          "write": 0,
+          "read": 14464
+        }
+      }
+    },
+    {
+      "id": "msg_180823c74001htwgNxedoZQ9LR",
+      "sessionID": "ses_e7f7e1f2fffeXF2xqxTB3BtiwD",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "tool-calls",
+      "cost": 0.00559223,
+      "tokens": {
+        "total": 67819,
+        "input": 28997,
+        "output": 119,
+        "reasoning": 47,
+        "cache": {
+          "write": 0,
+          "read": 38656
+        }
+      }
+    },
+    {
+      "id": "msg_1808249f9001EXvTWYmhL98RV1",
+      "sessionID": "ses_e7f7e1f2fffeXF2xqxTB3BtiwD",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "tool-calls",
+      "cost": 0.00441038,
+      "tokens": {
+        "total": 83022,
+        "input": 15418,
+        "output": 118,
+        "reasoning": 30,
+        "cache": {
+          "write": 0,
+          "read": 67456
+        }
+      }
+    },
+    {
+      "id": "msg_18082576d001DzKsEKeJLsrf7f",
+      "sessionID": "ses_e7f7e1f2fffeXF2xqxTB3BtiwD",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "tool-calls",
+      "cost": 0.00498129,
+      "tokens": {
+        "total": 99044,
+        "input": 16221,
+        "output": 120,
+        "reasoning": 15,
+        "cache": {
+          "write": 0,
+          "read": 82688
+        }
+      }
+    },
+    {
+      "id": "msg_1808263f8001cLtOHhblEOEuSS",
+      "sessionID": "ses_e7f7e1f2fffeXF2xqxTB3BtiwD",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "tool-calls",
+      "cost": 0.01038484,
+      "tokens": {
+        "total": 124805,
+        "input": 16098,
+        "output": 133,
+        "reasoning": 9886,
+        "cache": {
+          "write": 0,
+          "read": 98688
+        }
+      }
+    },
+    {
+      "id": "msg_18083a7b5001vtSGacrZHwYtug",
+      "sessionID": "ses_e7f7e1f2fffeXF2xqxTB3BtiwD",
+      "providerID": "openrouter",
+      "modelID": "z-ai/glm-5.3-flash",
+      "finish": "stop",
+      "cost": 0.00759945,
+      "tokens": {
+        "total": 131622,
+        "input": 12481,
+        "output": 2576,
+        "reasoning": 2005,
+        "cache": {
+          "write": 0,
+          "read": 114560
+        }
+      }
+    }
+  ],
+  "freshTaskProfile": true,
+  "rawExportSha256": "1f19f612ed5185982a8bf5e4927753a3ecd5bf65136e1de3b61da36154bc9eaa",
+  "capture": {
+    "stdoutCapturedBytes": 923861,
+    "stderrCapturedBytes": 50,
+    "statusAwaited": true,
+    "pipesAwaited": true,
+    "terminationRequested": false
+  },
+  "requestedVariant": "provider_default; actual effort not independently attested",
+  "privateReasoningPersisted": false
+}

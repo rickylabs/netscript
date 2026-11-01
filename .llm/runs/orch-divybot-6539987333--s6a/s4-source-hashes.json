@@ -1,0 +1,23 @@
+{
+  "packages/cli/src/kernel/assets/app/routes/_layout.tsx.template": "f68337edad4744c9b47ad7814b6536227f89e0f4a773a4ed88b8a621dad1a0aa",
+  "packages/fresh-ui/contracts.json": "cb9a709c86407e44cd38a2673bb6b8979f981378525bf8b4c7e51dc9023f3a08",
+  "packages/fresh-ui/registry/components/ui/chart-block.css": "e0eafd4317fea2f972efb1b2cffbae8cd101acdc220e143087e461564c9d22a9",
+  "packages/fresh-ui/registry/components/ui/chart-block.tsx": "8c0a4b4613e4ad2e980aab8fd1ea8a4132d8e8c6cd906f706949eca30a57ee3b",
+  "packages/fresh-ui/registry/components/ui/command-palette.css": "d3abad9ea33c54ee837ad274ec598773069f5c86963280d69ad6a5945c7e618a",
+  "packages/fresh-ui/registry/components/ui/data-table.css": "b966b9c8768f27964703f7eb4b49aa5709740db1aacbe287b16563b6311cbdf4",
+  "packages/fresh-ui/registry/components/ui/detail-layout.css": "8b4534a1c909ef7421386be6cf47ae16633f7765a26eb899b6c2480c766f1198",
+  "packages/fresh-ui/registry/components/ui/donut.css": "e8b4f5b95aeb50c6f79bf728aa7e852c3e5e47cacc8e5d9de37659ef5daf47f3",
+  "packages/fresh-ui/registry/components/ui/donut.tsx": "c52d233036e8af22f5081f59a647751581067c27464ea75cb88ca061361c56d6",
+  "packages/fresh-ui/registry/components/ui/floating.css": "d65ed146e37487f58b59b281671714584cfb307121af9ba20257ecb5dce489fe",
+  "packages/fresh-ui/registry/components/ui/page-header.css": "ded252fc0d2adef8ad0a8c5fe61681edd5e105a919747bcf3ca8c986ce4c849b",
+  "packages/fresh-ui/registry/components/ui/pagination.css": "c6dc34d4efc849b77a774f70c3139570badb9744bad718d136f29541927feb0b",
+  "packages/fresh-ui/registry/components/ui/responsive-table.css": "b765af2a9c4f97c89413a8fa4a45d22fe396442db1780ca487c024e76b377f5d",
+  "packages/fresh-ui/registry/components/ui/sheet.css": "1959b0698aeb94026cf7906b93e2cf1351696706a6587d65511003c8b71eeb25",
+  "packages/fresh-ui/registry/components/ui/stats-grid.css": "b44f52143e04ddd1a24d5ebc4d5fe56494233faefef706d8fabfaf1cc4e7fe00",
+  "packages/fresh-ui/registry/islands/theme-toggle.css": "734950a9d55255c61304dc5df25b45059de979348e528a2009dc6a23e91259b8",
+  "packages/fresh-ui/registry/styles/layouts.css": "ebb964323cf9b80023872ee2af26f65fa5a56211ee04f1f46fe5690880f8169b",
+  "packages/fresh-ui/src/contracts/catalog/data-display/4.ts": "9b9c5e554e090ce56ad4a6f1fb3d56363bb89eb54d437576594e676f04761f62",
+  "packages/fresh-ui/tests/contracts/utility-basic.tsx": "d59d3966170ab7b74d4068ed7c3a96abc7248139fe4f7dff7a47b2760250a28d",
+  "packages/fresh-ui/tests/registry/components/ui/chart-block.test.tsx": "7188b4c996be4a16d8479649fb4ed65818c9b5dcfd6f98472f33ea3700d3a922",
+  "packages/fresh-ui/tests/registry/components/ui/donut.test.tsx": "bdfe43a880df37b62456e8bcc3e733f7f205fa5dfead09e79a326d69d564d10d"
+}

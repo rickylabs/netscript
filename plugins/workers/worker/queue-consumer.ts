@@ -63,6 +63,8 @@ export function startTaskQueueListener(
             `[Worker ${queueContext.workerId}] Unexpected error processing task '${message.taskId}':`,
             error instanceof Error ? error.message : String(error),
           );
+          if (!context.extendVisibility) throw error;
+          await context.nack({ requeue: true });
         }
       },
       { signal },
@@ -81,6 +83,7 @@ function createListenerSupervisor(
     name,
     abortSignal: context.abortController?.signal,
     maxRestarts: context.listenerMaxRestarts,
+    healthyResetMs: context.listenerHealthyResetMs,
     initialBackoffMs: context.listenerInitialBackoffMs,
     maxBackoffMs: context.listenerMaxBackoffMs,
     run,

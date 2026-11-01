@@ -1,0 +1,133 @@
+{
+  "head": "9288ea2939f56eeb75fa53b6260f6cf1e91f31f0",
+  "requiredReads": [
+    {
+      "name": "review-part-01.md",
+      "lines": 450,
+      "bytes": 29962,
+      "sha256": "7638626a92ad53eac5eaf8a7ceca9efa1d379c1ae7d5863d7b588bf8dc5ce095"
+    },
+    {
+      "name": "review-part-02.md",
+      "lines": 803,
+      "bytes": 29987,
+      "sha256": "c9e86fdc048d42f4925ee018c3606ac1374d1cfce4f5425fcf0a7bdbc485c15b"
+    },
+    {
+      "name": "review-part-03.md",
+      "lines": 858,
+      "bytes": 29991,
+      "sha256": "1345630d4b0f3a83585e03cb85eafb09290224fa8ef3879fb9fb3d106ace5275"
+    },
+    {
+      "name": "review-part-04.md",
+      "lines": 601,
+      "bytes": 29951,
+      "sha256": "25c225d27eece410203fabfc7c4a4cb981bf0ff15b979823453813ec2f28cfc6"
+    },
+    {
+      "name": "review-part-05.md",
+      "lines": 504,
+      "bytes": 29988,
+      "sha256": "776a2cd8eab7d60ece88183c328422bd38d8aa29c4bee75eb390f2b40b5683c4"
+    },
+    {
+      "name": "review-part-06.md",
+      "lines": 801,
+      "bytes": 29952,
+      "sha256": "807bc5fb08a976e875d4d986c8086da23c930b587dab83b60ca608a4ea81e8a2"
+    },
+    {
+      "name": "review-part-07.md",
+      "lines": 460,
+      "bytes": 29981,
+      "sha256": "976096b34b3905eac4be5585117cecb29d8fc7bf9e8920f554a2ebf565e021a7"
+    },
+    {
+      "name": "review-part-08.md",
+      "lines": 683,
+      "bytes": 29951,
+      "sha256": "de61738903da52e40ab4c6b25ba56866df60fd82a90cb38e1240b6a4b8522dee"
+    },
+    {
+      "name": "review-part-09.md",
+      "lines": 604,
+      "bytes": 29945,
+      "sha256": "ee992f720633124222bdaf6f40cda36db3c5f07ec099a4f7551857421ec2dc3f"
+    },
+    {
+      "name": "review-part-10.md",
+      "lines": 405,
+      "bytes": 29580,
+      "sha256": "2740d9d3c2868434a27e47bfb4ed917ea533dd590af7b0ec89b6d6ef675b2b6a"
+    },
+    {
+      "name": "review-part-11.md",
+      "lines": 225,
+      "bytes": 29992,
+      "sha256": "85d019c1d5b1f7806c7dee3f9ca36b4467b29f01627355bcbeec8d6489f516a4"
+    },
+    {
+      "name": "review-part-12.md",
+      "lines": 360,
+      "bytes": 29932,
+      "sha256": "132a97fcdf3a1289cb7c410e197d772e947db8fa7f9a74772ace5405668d0792"
+    },
+    {
+      "name": "review-part-13.md",
+      "lines": 268,
+      "bytes": 29494,
+      "sha256": "23719c0d489caa7b3a6ccfe240749da7fdb8355bef6236fb9b451972811242d8"
+    },
+    {
+      "name": "review-part-14.md",
+      "lines": 651,
+      "bytes": 29932,
+      "sha256": "960b6c39a22d3649c78f57d58102ebb0f7e8adf92e673a80ff2fdbf5590bddb5"
+    },
+    {
+      "name": "review-part-15.md",
+      "lines": 679,
+      "bytes": 29919,
+      "sha256": "2aee251b6261bc91b36a804ff1b2be31b7f9c15a40391e41885aec1d78be082f"
+    },
+    {
+      "name": "review-part-16.md",
+      "lines": 741,
+      "bytes": 29896,
+      "sha256": "8427377b12aad0b5d5421ca41a57fa5a7c03b6958450cbc5f5d84c8d5251779c"
+    },
+    {
+      "name": "review-part-17.md",
+      "lines": 695,
+      "bytes": 29934,
+      "sha256": "b3a0a0452d7564e3bd5b1c1907485d388b54139b95a4b741bcd7b7e03ba62320"
+    },
+    {
+      "name": "review-part-18.md",
+      "lines": 817,
+      "bytes": 29970,
+      "sha256": "c45af4d31a8036b12f90ed871beb30f9002f71909166efc60e6eb4422b4a386d"
+    },
+    {
+      "name": "review-part-19.md",
+      "lines": 124,
+      "bytes": 4601,
+      "sha256": "d4f03a2e06bac9da257e355a2b4e0a0ee250ebdf96972a5af6a1857fbabe43f1"
+    }
+  ],
+  "authoredOwners": 12,
+  "canonicalDebtOwner": 1,
+  "generatedOwners": 2,
+  "sourceGateReruns": false,
+  "supplementalHistoricalAndFinalGateEvidence": [
+    ".llm/runs/fix-browser-stream-headers--u3/evidence/c1-native-sol-20261028/raw-gates/red-1793140216669-0.stdout",
+    ".llm/runs/fix-browser-stream-headers--u3/evidence/c1-native-sol-20261028/raw-gates/tests-1793144524427-0.stdout",
+    ".llm/runs/fix-browser-stream-headers--u3/evidence/c2-native-sol-20261028/c2/red-1793149753389.stdout",
+    ".llm/runs/fix-browser-stream-headers--u3/evidence/c2-native-sol-20261028/failed-f15/application-failed.json",
+    ".llm/runs/fix-browser-stream-headers--u3/evidence/c2-native-sol-20261028/failed-f15/doc-1793149474316.stderr",
+    ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/final-evidence.json",
+    ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c1-tests-1793154021321.stdout",
+    ".llm/runs/fix-browser-stream-headers--u3/evidence/type-closure-native-sol-20261028/application/c2-tests-1793154032967.stdout"
+  ]
+}

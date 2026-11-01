@@ -5,54 +5,66 @@ title: "@netscript/service"
 
 # `@netscript/service`
 
-Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript
-applications. This page is written against the package's public surface reported by `deno doc`.
-For the full index of packages and plugins return to the
-[reference overview](/reference/).
+Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript services. Use
+it to turn a contract router into a running HTTP service with health, OpenAPI, CORS, rate limits,
+authentication and command execution.
 
-The package has three layers. **Layer 1** exposes small primitives for health, error, RPC,
-OpenAPI, and Scalar docs handlers. **Layer 2** exposes `createService()`, a fluent builder
-that materializes a mountable `ServiceApp` or starts a listener. **Layer 3** exposes
-`defineService()`, the preset used by generated service entrypoints.
+## Sub-path exports
 
-The service router is always an input to the builder. `build()` returns a non-listening
-`ServiceApp`, which keeps the RFC 14 unified-platform seam open for callers that mount
-service apps into another host. `serve()` starts a Deno listener and returns a
-`RunningService` handle with `stop()` for tests, local development, and process supervisors.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/service` | `./mod.ts` | Full service surface: [builder and presets](#builder-and-presets), [health](#health-primitives), [handlers](#rpc-openapi-and-docs-handlers), [limits](#request-body-limit) and types. |
+| `@netscript/service/auth` | `./src/auth/mod.ts` | [Service authentication and authorization handlers](#netscriptserviceauth-surface). |
+| `@netscript/service/rate-limit` | `./src/rate-limit/mod.ts` | [Route quotas, atomic stores, and trusted client-address resolution](#rate-limits-and-client-addresses). |
+| `@netscript/service/rpc-path` | `./src/primitives/rpc-path.ts` | Type-safe RPC route mapping utilities. |
+| `@netscript/service/internal-credential` | `./src/auth/internal-credential/mod.ts` | [Dependency-free installation secret loading and internal credential derivation](#internal-procedures-and-the-internal-service-credential). |
+| `@netscript/service/commands` | `./commands.ts` | [Opaque command definitions, once-only executor and codecs](#command-definitions-and-codecs). |
+| `@netscript/service/commands/relay` | `./commands-relay.ts` | [Decoded bounded relay and checked sink lifecycle](#command-outbox-relay). |
+| `@netscript/service/commands/testing` | `./commands-testing.ts` | [Atomic memory store and explicit test controls](#command-testing). |
 
-Public types are package-owned structural mirrors: callers do not need to import Hono or oRPC
-types to describe a service surface. Runtime interoperability still uses the real Hono app and
-oRPC handlers internally. `LoggerMiddlewareOptions` is re-exported from the sibling
-[`@netscript/logger/middleware`](/reference/logger/) package because it is a first-party
-`@netscript/*` contract, not an upstream vendor surface.
+The package has three layers:
+
+1. Primitives for health, error, RPC, OpenAPI and Scalar docs handlers.
+2. `createService()`, a fluent builder that materializes a mountable `ServiceApp` or starts a
+   listener.
+3. `defineService()`, the preset used by generated service entrypoints.
+
+The service router is always an input to the builder. `build()` returns a non-listening `ServiceApp`
+that callers can mount into another host. `serve()` starts a Deno listener and returns a
+`RunningService` handle with `stop()` for tests, local development and process supervisors.
+
+Public types are package-owned structural mirrors, so you don't import Hono or oRPC types to
+describe a service surface; the runtime still uses the real Hono app and oRPC handlers.
+`LoggerMiddlewareOptions` is re-exported from the first-party
+[`@netscript/logger/middleware`](/reference/logger/) package.
 
 ## Builder and presets
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createService` | `function createService<T extends ServiceRouter>(router: T, config: ServiceConfig): ServiceBuilder<T>` | Factory function to create a new service builder. |
-| `defineService` | `async function defineService<T extends ServiceRouter>(router: T, options: DefineServiceOptions): Promise<RunningService>` | One-liner preset for creating a fully-configured service. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createService` | function | `function createService<T extends ServiceRouter>(router: T, config: ServiceConfig): ServiceBuilder<T>` | Factory function to create a new service builder. |
+| `defineService` | function | `async function defineService<T extends ServiceRouter>(router: T, options: DefineServiceOptions): Promise<RunningService>` | One-liner preset for creating a fully-configured service. |
 
 ## Health primitives
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createHealthHandler` | `function createHealthHandler(options?: HealthHandlerOptions): ServiceHandler` | Creates a comprehensive health check handler that runs all checks in parallel. |
-| `createLivenessHandler` | `function createLivenessHandler(): ServiceHandler` | Creates a simple liveness check handler. |
-| `createReadinessHandler` | `function createReadinessHandler(checks: Array<() => Promise<boolean>>): ServiceHandler` | Creates a readiness check handler that runs multiple async checks. |
-| `healthChecks` | `const healthChecks: { database; kv; service; custom }` | Pre-built health checks for common dependencies (`database`, `kv`, `service`, `custom`). |
-| `HEALTH_STATUS` | `const HEALTH_STATUS: { healthy; degraded; unhealthy }` | Health status values emitted by service health handlers. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createHealthHandler` | function | `function createHealthHandler(options?: HealthHandlerOptions): ServiceHandler` | Creates a comprehensive health check handler that runs all checks in parallel. |
+| `createLivenessHandler` | function | `function createLivenessHandler(): ServiceHandler` | Creates a simple liveness check handler. |
+| `createReadinessHandler` | function | `function createReadinessHandler(checks: Array<() => Promise<boolean>>): ServiceHandler` | Creates a readiness check handler that runs multiple async checks. |
+| `healthChecks` | const | `const healthChecks: { database; kv; service; custom }` | Pre-built health checks for common dependencies (`database`, `kv`, `service`, `custom`). |
+| `HEALTH_STATUS` | const | `const HEALTH_STATUS: { healthy; degraded; unhealthy }` | Health status values emitted by service health handlers. |
 
 ## RPC, OpenAPI, and docs handlers
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createRPCHandler` | `function createRPCHandler<T extends ServiceRouter>(router: T, config?: RPCHandlerConfig): FetchHandler` | Creates an oRPC RPC handler for type-safe client communication. |
-| `createRPCPlugins` | `function createRPCPlugins(config: RPCHandlerConfig): ServiceHandlerPlugin[]` | Creates the standard set of oRPC plugins. |
-| `createOpenAPIHandler` | `function createOpenAPIHandler<T extends ServiceRouter>(router: T, config?: RPCHandlerConfig): FetchHandler` | Creates an oRPC OpenAPI handler for REST-style API access. |
-| `createOpenAPISpec` | `function createOpenAPISpec<T extends ServiceRouter>(router: T, config: OpenAPIConfig): ServiceHandler` | Creates an OpenAPI specification endpoint handler. |
-| `createScalarDocs` | `function createScalarDocs(options: ScalarDocsOptions): ServiceHandler` | Creates a Scalar API documentation UI handler. |
-| `createScalarJs` | `function createScalarJs(): ServiceHandler` | Creates a handler to serve the bundled Scalar JS file. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createRPCHandler` | function | `function createRPCHandler<T extends ServiceRouter>(router: T, config?: RPCHandlerConfig): FetchHandler` | Creates an oRPC RPC handler for type-safe client communication. |
+| `createRPCPlugins` | function | `function createRPCPlugins(config: RPCHandlerConfig): ServiceHandlerPlugin[]` | Creates the standard set of oRPC plugins. |
+| `createOpenAPIHandler` | function | `function createOpenAPIHandler<T extends ServiceRouter>(router: T, config?: RPCHandlerConfig): FetchHandler` | Creates an oRPC OpenAPI handler for REST-style API access. |
+| `createOpenAPISpec` | function | `function createOpenAPISpec<T extends ServiceRouter>(router: T, config: OpenAPIConfig): ServiceHandler` | Creates an OpenAPI specification endpoint handler. |
+| `createScalarDocs` | function | `function createScalarDocs(options: ScalarDocsOptions): ServiceHandler` | Creates a Scalar API documentation UI handler. |
+| `createScalarJs` | function | `function createScalarJs(): ServiceHandler` | Creates a handler to serve the bundled Scalar JS file. |
 
 When a procedure declares `NetScriptProcedureMeta.access`, `createOpenAPISpec()` preserves the
 operation and projects access as follows:
@@ -65,16 +77,15 @@ operation and projects access as follows:
 | `authentication: 'optional'` | `security: [{}, { bearerAuth: [] }]` |
 | No authentication declaration | No generated operation-level `security` field |
 
-The generated `bearerAuth` component uses HTTP bearer authentication. Optional access remains
-visible in the generated specification even though the current contract authorizer rejects it at
-construction.
+The generated `bearerAuth` component uses HTTP bearer authentication. Optional access stays visible
+in the generated specification even though the contract authorizer rejects it at construction.
 
 ## Request-body limit
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createBodyLimitMiddleware` | `function createBodyLimitMiddleware(options: ServiceBodyLimitOptions): ServiceMiddleware` | Creates middleware that rejects request bodies larger than `maxBytes` with a typed JSON `413` before any handler parses them. Throws `RangeError` unless `maxBytes` is a positive safe integer. |
-| `PAYLOAD_TOO_LARGE_ERROR` | `const PAYLOAD_TOO_LARGE_ERROR: 'PAYLOAD_TOO_LARGE'` | Error code carried by the JSON body of a `413` body-limit rejection. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createBodyLimitMiddleware` | function | `function createBodyLimitMiddleware(options: ServiceBodyLimitOptions): ServiceMiddleware` | Creates middleware that rejects request bodies larger than `maxBytes` with a typed JSON `413` before any handler parses them. Throws `RangeError` unless `maxBytes` is a positive safe integer. |
+| `PAYLOAD_TOO_LARGE_ERROR` | const | `const PAYLOAD_TOO_LARGE_ERROR: 'PAYLOAD_TOO_LARGE'` | Error code carried by the JSON body of a `413` body-limit rejection. |
 
 The builder form is `createService(...).withBodyLimit({ maxBytes })` and the preset form is
 `defineService(router, { bodyLimit: { maxBytes } })`. A request that declares `Content-Length` is
@@ -95,7 +106,8 @@ timeout.
 | 4 | Caller middleware, in order | `use()` / `DefineServiceOptions.middleware` |
 | 5 | Authentication, then authorization | `withAuthn()` / `withAuthz()`, installed by `build()` |
 | 6 | Request-body limit | `withBodyLimit()` / `DefineServiceOptions.bodyLimit`, installed by `build()` |
-| 7 | OpenAPI spec, docs, RPC and OpenAPI projections, custom routes | `build()` |
+| 7 | Health, liveness and readiness routes | `withHealth()`, installed by `build()` |
+| 8 | OpenAPI spec, docs, RPC and OpenAPI projections, custom routes | `build()` |
 
 `use()` registers middleware immediately, so builder middleware runs in call order relative to
 `withCors()` and `withLogger()`. It always runs before the stages that `build()` installs. A
@@ -103,35 +115,35 @@ rejection returned at stage 4 or 6 keeps the CORS headers and is logged.
 
 ## Rate limits and client addresses
 
-`createService(...).withRateLimit(options)` adds middleware through the existing `use()` seam. It
-runs in call order, before deferred routes and both RPC/REST projections. Install it before
-immediate health/info routes if those routes should be limited. Repeated calls add stages.
+`createService(...).withRateLimit(options)` adds middleware through `use()`. It runs in call order,
+before deferred health routes and both RPC/REST projections, including when added after
+`withHealth()`. Install it before `withServiceInfo()` if the immediate service-info route should
+be limited. Repeated calls add stages. Configure health checks before building.
 
 The root also exports `ServiceRateLimitOptions`, `ServiceProxyTrust`, `RateLimitStore`,
 `RateLimitRequest`, and `RateLimitDecision` for builder/port contracts.
 
 The `@netscript/service/rate-limit` subpath exposes:
 
-| Symbol                        | Kind      | Description                                                                                 |
-| ----------------------------- | --------- | ------------------------------------------------------------------------------------------- |
-| `createRateLimitMiddleware`   | function  | Creates route-scoped quota middleware returning JSON 429 and whole-second Retry-After.      |
-| `createKvRateLimitStore`      | function  | Uses KV atomic compare-and-set plus TTL in a dedicated prefix, with a bounded retry budget. |
-| `createMemoryRateLimitStore`  | function  | Creates a synchronous, capped development store with bounded TTL eviction.                  |
-| `resolveServiceClientAddress` | function  | Resolves the socket peer or explicitly trusted XFF hops, walking right to left.             |
-| `ServiceRateLimitOptions`     | interface | `routes`, `limit`, `windowMs`, `store`, and optional `key`, `trustProxy`, `ipv6Prefix`, `now`.            |
-| `ServiceProxyTrust`           | type      | `false` or an address predicate identifying trusted proxy hops; default off.                |
-| `RateLimitStore`              | interface | Port reserving one slot atomically with `consume(request)`.                                 |
-| `RateLimitRequest`            | interface | Key, quota, window, epoch milliseconds, and optional request cancellation signal.           |
-| `RateLimitDecision`           | interface | Whether a slot was reserved and the epoch-millisecond window end.                           |
-| `KvRateLimitStoreOptions`     | interface | Dedicated `prefix` and optional `maxAttempts` (default 8, maximum 32).                      |
-| `MemoryRateLimitStoreOptions` | interface | Optional retained-key cap `maxKeys` (default 10,000).                                       |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createRateLimitMiddleware` | function | Creates route-scoped quota middleware returning JSON 429 and whole-second Retry-After. |
+| `createKvRateLimitStore` | function | Uses KV atomic compare-and-set plus TTL in a dedicated prefix, with a bounded retry budget. |
+| `createMemoryRateLimitStore` | function | Creates a synchronous, capped development store with bounded TTL eviction. |
+| `resolveServiceClientAddress` | function | Resolves the socket peer or explicitly trusted XFF hops, walking right to left. |
+| `ServiceRateLimitOptions` | interface | `routes`, `limit`, `windowMs`, `store`, and optional `key`, `trustProxy`, `ipv6Prefix`, `now`. |
+| `ServiceProxyTrust` | type alias | `false` or an address predicate identifying trusted proxy hops; default off. |
+| `RateLimitStore` | interface | Port reserving one slot atomically with `consume(request)`. |
+| `RateLimitRequest` | interface | Key, quota, window, epoch milliseconds, and optional request cancellation signal. |
+| `RateLimitDecision` | interface | Whether a slot was reserved and the epoch-millisecond window end. |
+| `KvRateLimitStoreOptions` | interface | Dedicated `prefix` and optional `maxAttempts` (default 8, maximum 32). |
+| `MemoryRateLimitStoreOptions` | interface | Optional retained-key cap `maxKeys` (default 10,000). |
 
 The subpath also re-exports the first-party integration types `ServiceContext`,
 `ServiceEnvironment`, `ServiceMiddleware`, `KvStore`, `KvKey`, `KvEntry`, `KvListOptions`,
 `KvSetOptions`, `AtomicCheck`, `AtomicMutation`, and `AtomicResult` used by these signatures.
-The six ancillary KV types are intentional: the accepted `KvStore` port references them through
-its public methods. Re-exporting them preserves the upstream port and makes Deno's documentation
-lint resolve its transitive signature types, without introducing a duplicate KV interface.
+The `KvStore` port references the six KV types through its public methods, so they are re-exported
+with it rather than duplicated.
 
 Selected routes share one quota per key and epoch-aligned window. Paths are exact or end in `/*` for
 a subtree (including its root). Rejections return `{ error: 'RATE_LIMITED' }` with `429` and
@@ -149,11 +161,12 @@ and custom keys stay unchanged. This grouping affects quota keys only, not
 socket metadata or proxy trust. A mounted app without metadata uses a shared `unknown` bucket and
 logs a warning once per stage through the request logger or service package logger.
 
-KV counter TTL bounds each key's lifetime, not total live cardinality. Distinct attacker-chosen
-keys can allocate distinct counters until window expiry; use backend admission/capacity controls
-and stable custom keys. The memory store instead rejects new keys when its live-key cap is full.
+> [!CAUTION]
+> KV counter TTL bounds each key's lifetime, not total live cardinality. Distinct attacker-chosen
+> keys can allocate distinct counters until window expiry; use backend admission/capacity controls
+> and stable custom keys. The memory store instead rejects new keys when its live-key cap is full.
 
-Like auth's #2026 transport policy, forwarded headers are ignored by default. Explicit proxy trust
+As in the auth transport policy, forwarded headers are ignored by default. Explicit proxy trust
 identifies permitted socket/hop addresses; malformed or excessive XFF chains fall back to the
 socket. Auth's HTTPS helper is protocol-specific and has no reusable hop resolver, so this client
 address resolver does not alter `deriveHttps` or `trustProxyHeaders`.
@@ -163,10 +176,10 @@ examples and storage/performance guarantees.
 
 ## Error and routing handlers
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createErrorHandler` | `function createErrorHandler(serviceName: string): ServiceErrorHandler` | Creates a global error handler for uncaught exceptions. |
-| `createNotFoundHandler` | `function createNotFoundHandler(serviceName: string): ServiceHandler` | Creates a 404 Not Found handler for unmatched routes. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createErrorHandler` | function | `function createErrorHandler(serviceName: string): ServiceErrorHandler` | Creates a global error handler for uncaught exceptions. |
+| `createNotFoundHandler` | function | `function createNotFoundHandler(serviceName: string): ServiceHandler` | Creates a 404 Not Found handler for unmatched routes. |
 
 ## Configuration and option types
 
@@ -199,8 +212,7 @@ service and plugin service resource. This generated value overrides a declared r
 value; a workspace without enabled web apps supplies an empty allowlist. Independent services must
 configure their launch environment themselves. Origins outside the allowlist receive no
 `Access-Control-Allow-Origin` header. CORS controls browser response access; it does not authenticate
-callers. The chosen [browser authentication topology](https://github.com/rickylabs/netscript/blob/main/docs/architecture/doctrine/07-composition-and-extension.md#browser-authentication-topology-008-owner-decision)
-uses a BFF; scaffolding that topology is separate follow-up scope.
+callers.
 
 ### Listener bind address
 
@@ -255,12 +267,12 @@ who must reach it.
 
 ## Router and context type aliases
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `ServiceRouter` | `type ServiceRouter = Record<string, unknown>` | Router definition accepted by the service builder and handler factories. |
-| `ContextFactory<TCustom>` | `type ContextFactory<TCustom extends object = Record<never, never>> = (context: ServiceContext) => TCustom` | Creates the custom part of each service handler context. |
-| `ServiceHandlerContext<TCustom>` | `type ServiceHandlerContext<TCustom extends object = Record<never, never>> = Readonly<TCustom> & { db?; traceHeaders?; principal?; }` | Context visible after framework fields are composed. `principal` is optional and must be narrowed by handlers that require identity. |
-| `DbContext` | `type DbContext = Record<string, unknown>` | Database context injected into service handler context. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `ServiceRouter` | type alias | `type ServiceRouter = Record<string, unknown>` | Router definition accepted by the service builder and handler factories. |
+| `ContextFactory<TCustom>` | type alias | `type ContextFactory<TCustom extends object = Record<never, never>> = (context: ServiceContext) => TCustom` | Creates the custom part of each service handler context. |
+| `ServiceHandlerContext<TCustom>` | type alias | `type ServiceHandlerContext<TCustom extends object = Record<never, never>> = Readonly<TCustom> & { db?; traceHeaders?; principal?; }` | Context visible after framework fields are composed. `principal` is optional and must be narrowed by handlers that require identity. |
+| `DbContext` | type alias | `type DbContext = Record<string, unknown>` | Database context injected into service handler context. |
 
 ## Contract-declared authentication and authorization
 
@@ -297,7 +309,7 @@ const app = createService(router, { name: 'orders' })
 
 Contract enforcement is opt-in: existing unguarded services, scaffolds, and standalone
 `createScopeAuthorizer()` consumers are unchanged. It activates only when an application passes a
-`createContractAuthorizer(contract, { fallback?, rawRoutes? })` result to `.withAuthz()`.
+`createContractAuthorizer(contract, { fallback?, rawRoutes?, retiredPaths? })` result to `.withAuthz()`.
 
 Contract metadata wins on disagreement. A match-aware fallback, including
 `createScopeAuthorizer()`, is consulted only when a matched procedure has no access metadata. No
@@ -306,17 +318,61 @@ metadata and no matching fallback rule denies, regardless of the fallback's stan
 aliases and shares it between authn and authz, so a declared public procedure is not rejected by an
 earlier authentication stage.
 
-`createScopeAuthorizer()` remains a supported standalone legacy path-prefix authorizer and a
-match-aware migration fallback; it is not deprecated.
+`createScopeAuthorizer()` is a supported standalone path-prefix authorizer and a match-aware
+migration fallback; it is not deprecated.
 
-`authentication: 'optional'` is declared for future support, currently rejected.
-`createContractAuthorizer()` throws
-`[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` during
-construction, before any request.
+> [!WARNING]
+> `authentication: 'optional'` is declared but rejected. `createContractAuthorizer()` throws
+> `[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` during
+> construction, before any request.
+
+### Unknown and retired procedures
+
+An authenticated request under guarded coverage that matches no served procedure returns **404**:
+
+```json
+{ "error": "NOT_FOUND", "message": "authz.no-contract-procedure", "code": "procedure_not_found" }
+```
+
+Declare removed mounted paths when an app needs an explicit upgrade signal:
+
+```ts
+const authorizer = createContractAuthorizer(OrdersContractV1, {
+  retiredPaths: ['/api/v1/orders', '/api/rpc/v1/orders/list', '/stream'],
+});
+```
+
+These paths return **410** after authentication:
+
+```json
+{ "error": "GONE", "message": "authz.procedure-retired", "code": "procedure_retired" }
+```
+
+Missing or invalid credentials retain the existing 401 `UNAUTHORIZED` response without a procedure
+code. Retirement requires authentication even outside `protect` or inside `allowAnonymous`.
+Active REST/RPC procedures (including aliases), internal audience guards and declared raw routes
+win over retirement. Their scope/role denials remain 403; public procedures stay public. A fallback
+cannot turn a missing or retired path into an allowed request. Undeclared paths outside protected
+coverage keep their previous behavior.
+
+`retiredPaths` contains exact, case-sensitive, canonical mounted absolute paths for all methods,
+with query strings ignored. Declare REST/RPC/alias paths separately. No trailing slash, percent
+encoding, parameters, wildcards, repeated separators, dot segments, backslashes, whitespace, query
+or fragment is allowed in a declaration; invalid or duplicate declarations throw during
+construction. Encoded requests, slash variants, siblings and descendants do not match retirement.
+Parameterized retirement is unsupported; unmatched concrete paths under guard still return 404.
+
+Clients inspecting HTTP responses can map `procedure_retired` to “client too old” and offer an
+upgrade without treating it as a permission denial. These are pre-dispatch middleware errors,
+not contract-defined oRPC errors. Use the response JSON `code`, not its human-readable message.
+`PROCEDURE_ERROR_CODES` and the `ProcedureErrorCode` union are available at the root and
+`./auth`; `AuthzDecision.code` is optional so existing authorizers preserve their 403 responses.
+The matched branch of `ProcedurePolicyResolution` has an optional `retired?: true` marker;
+contract-overlay authorizers never set it and retain their current fallback semantics.
 
 ### Raw routes beside a contract router
 
-A request under the guarded prefix that matches no contract procedure is denied with
+A request under the guarded prefix that matches no contract procedure returns 404 `procedure_not_found` after authentication, with message
 `authz.no-contract-procedure`, including raw routes added with `.route(method, path, handler)`.
 Declare each raw route that should be served through the `rawRoutes` option:
 
@@ -338,7 +394,7 @@ is outside `protect` or inside `allowAnonymous`, so a declaration never makes a 
 optional `authorization: { scopes?, roles? }` is enforced like a procedure's declared
 authorization. Matching is exact and case-sensitive, and ignores only a trailing slash. Declaring
 `/api/tools/mcp` covers neither `/api/tools/mcp-admin` nor `/api/tools/mcp/nested`, and every
-undeclared sibling stays denied with `authz.no-contract-procedure`.
+undeclared guarded sibling returns 404 `procedure_not_found` after authentication.
 
 Declarations are validated before any request. Construction throws
 `[netscript.service.contract-policy] invalid raw route: <path> ...` for a path that is not absolute,
@@ -365,7 +421,7 @@ value, and for procedures with different access that share one OpenAPI route.
 `createContractOverlayAuthorizer(contract, { fallback?, isInternalCaller? })` governs only
 procedures that declare `meta.access`. Every other request keeps the service's own policy: the
 `protect`/`allowAnonymous` path guard, plus the optional fallback authorizer. Marking a few
-internal procedures therefore never forces authentication onto public ones. To keep an otherwise
+internal procedures never forces authentication onto public ones. To keep an otherwise
 public service public, set `allowAnonymous: ['/api', '/health']`; access-marked procedures are
 resolved before the path guard. `createContractAuthorizer` also enforces the audience, but it
 still governs every procedure in the contract.
@@ -421,8 +477,11 @@ an actionable `TypeError` as well as TypeScript callers receiving a missing-fiel
 Guarded policies install the existing native stages unchanged; public policies deliberately skip
 them. `/api` is guarded and `/health` stays anonymous with native defaults.
 
-In 0.0.8, search existing entrypoints for `defineService(` and choose native guards or explicitly
-record a public service's reason. The exact public migration is:
+> [!IMPORTANT]
+> **Changed in 0.0.8**
+>
+> Search existing entrypoints for `defineService(` and either choose native
+> guards or record a public service's reason. The public opt-out looks like this:
 
 ```diff
 -await defineService(router, { name: 'status' });
@@ -449,8 +508,8 @@ authorization, including this contract requirement: anonymous `session` calls th
 or configure a guarded service policy to enforce it; the probe reports whether the runtime
 provided a principal.
 
-This policy requirement applies to the preset; lower-level `createService()` callers still compose
-their middleware explicitly.
+This policy requirement applies to the preset; lower-level `createService()` callers compose their
+middleware explicitly.
 
 ```ts
 import { assertServiceAuthPolicy, type ServiceAuthPolicy } from '@netscript/service/auth';
@@ -464,42 +523,37 @@ assertServiceAuthPolicy(policy);
 
 ### `@netscript/service/auth` surface
 
-| Symbol | Description |
-| --- | --- |
-| `ServiceAuthPolicy` | Native guarded posture or an explicit public opt-out. |
-| `ServiceGuardedAuthPolicy` | Native authentication with optional authorization; excludes public fields. |
-| `ServicePublicAuthPolicy` | Literal public opt-out with a nonblank reason; excludes guard fields. |
-| `assertServiceAuthPolicy` | Validates an explicit posture and required callable ports without changing options. |
-| `createContractAuthorizer` | Traverses a metadata-bearing contract and returns an opt-in authorizer bound by the service builder. |
-| `createContractOverlayAuthorizer` | Enforces only access-marked procedures and leaves every other request to the service's own policy. |
-| `createInternalCredentialAuthenticator` | Accepts the internal bearer derived for this service and mints internal service principals. |
-| `isInternalServicePrincipal` | Default `InternalCallerPredicate`; true only for principals minted by the internal-credential authenticator. |
-| `createCompositeAuthenticator` | Tries authenticators in order over one `AuthenticatorPort` and returns the first success. |
-| `loadInstallationSecret` / `createInstallationSecret` | Import the per-installation secret from its file reference or from memory. |
-| `deriveInternalCredential` | Derives the per-service internal bearer from the installation secret. |
-| `createScopeAuthorizer` | Ordered scope/role rules usable standalone or as a match-aware legacy fallback. |
-| `createStaticCredentialAuthenticator` | Maps configured credentials to principals. |
-| `createTrustedHeaderAuthenticator` | Maps trusted upstream identity headers to principals. |
-| `Principal` | Service-owned identity contract. |
-| `ContractPolicyAuthorizerPort` | Authorizer that binds to the builder's REST/RPC projection paths. |
-| `ContractAuthorizerRawRoute` | Exact, authentication-required raw route declared through `createContractAuthorizer(contract, { rawRoutes })`. |
-
-## Exports
-
-The following entrypoints are published alongside the root export:
-
-| Export | Entrypoint | Purpose |
+| Symbol | Kind | Description |
 | --- | --- | --- |
-| `@netscript/service` | `./mod.ts` | Full service surface (documented above). |
-| `@netscript/service/commands/relay` | `./commands-relay.ts` | Decoded bounded relay and checked sink lifecycle. |
-| `@netscript/service/commands/testing` | `./commands-testing.ts` | Atomic memory store and explicit test controls. |
-| `@netscript/service/commands` | `./commands.ts` | Opaque command definitions, once-only executor and codecs. |
-| `@netscript/service/auth` | `./src/auth/mod.ts` | Service authentication and authorization handlers. |
-| `@netscript/service/rate-limit` | `./src/rate-limit/mod.ts` | Route quotas, atomic stores, and trusted client-address resolution. |
-| `@netscript/service/rpc-path` | `./src/primitives/rpc-path.ts` | Type-safe RPC route mapping utilities. |
-| `@netscript/service/internal-credential` | `./src/auth/internal-credential/mod.ts` | Dependency-free installation secret loading and internal credential derivation. |
+| `ServiceAuthPolicy` | type alias | Native guarded posture or an explicit public opt-out. |
+| `ServiceGuardedAuthPolicy` | interface | Native authentication with optional authorization; excludes public fields. |
+| `ServicePublicAuthPolicy` | interface | Literal public opt-out with a nonblank reason; excludes guard fields. |
+| `assertServiceAuthPolicy` | function | Validates an explicit posture and required callable ports without changing options. |
+| `createContractAuthorizer` | function | Traverses a metadata-bearing contract and returns an opt-in authorizer bound by the service builder. |
+| `createContractOverlayAuthorizer` | function | Enforces only access-marked procedures and leaves every other request to the service's own policy. |
+| `createInternalCredentialAuthenticator` | function | Accepts the internal bearer derived for this service and mints internal service principals. |
+| `isInternalServicePrincipal` | function | Default `InternalCallerPredicate`; true only for principals minted by the internal-credential authenticator. |
+| `createCompositeAuthenticator` | function | Tries authenticators in order over one `AuthenticatorPort` and returns the first success. |
+| `loadInstallationSecret` / `createInstallationSecret` | function | Import the per-installation secret from its file reference or from memory. |
+| `deriveInternalCredential` | function | Derives the per-service internal bearer from the installation secret. |
+| `createScopeAuthorizer` | function | Ordered scope/role rules usable standalone or as a match-aware legacy fallback. |
+| `createStaticCredentialAuthenticator` | function | Maps configured credentials to principals. |
+| `createTrustedHeaderAuthenticator` | function | Maps trusted upstream identity headers to principals. |
+| `Principal` | interface | Service-owned identity contract. |
+| `PROCEDURE_ERROR_CODES` | constant | Stable `NOT_FOUND` (`procedure_not_found`) and `RETIRED` (`procedure_retired`) HTTP error codes. |
+| `ProcedureErrorCode` | type alias | Union of the stable unknown/retired procedure codes. |
+| `AuthzDecision` | type alias | Allow or deny, with an optional procedure failure code selecting 404/410. |
+| `ProcedurePolicyResolution` | type alias | Shared matched policy or miss; `retired?: true` marks authenticated retirement. |
+| `ContractPolicyAuthorizerPort` | interface | Authorizer that binds to the builder's REST/RPC projection paths. |
+| `ContractAuthorizerRawRoute` | interface | Exact, authentication-required raw route declared through `createContractAuthorizer(contract, { rawRoutes })`. |
 
 ## Command definitions and codecs
+
+For an executable introduction, read [Transactional commands](/services-sdk/commands/). Operational
+recovery, trust boundaries and durable-format changes are covered by
+[Operations](/services-sdk/command-operations/), [Security](/services-sdk/command-security/) and
+[Compatibility](/services-sdk/command-compatibility/).
+
 
 `@netscript/service/commands` defines immutable command policies and bounded canonical codecs
 without executing handlers. Importing, defining and encoding require no permissions; execution
@@ -537,10 +591,6 @@ identity to keep replay stable.
 | `CommandFailure`            | type alias       | Bounded discriminated failure and retry vocabulary.               |
 | `IsolationLevel` | type alias | Database-owned transaction isolation vocabulary, re-exported as a type. |
 
----
-
-Back to the [reference overview](/reference/).
-
 ## Command testing
 
 `@netscript/service/commands/testing` exports `createMemoryCommandStore`, `MemoryCommandStore`,
@@ -577,12 +627,12 @@ byte budget; limits only tighten published defaults. Transactions receive a five
 Replay validates receipt material without handler/side writes. Busy and cancellation surface only
 after rollback; arbitrary business errors retain identity. Provider failures use the database-owned
 `CommandStoreError` contract. Audit, outbox and receipt completion share the winning receipt ID and
-flush in that order. Optional unkeyed attempts skip receipts. The telemetry port prepares the later
-adapter; no transport, hidden retry or production fault option is provided.
+flush in that order. Optional unkeyed attempts skip receipts. Telemetry goes through the
+`CommandTelemetryPort`; no transport, hidden retry or production fault option is provided.
 
 ### Command conformance fixtures
 
-The focused `@netscript/service/commands/testing` subpath provides an instance-bound
+`@netscript/service/commands/testing` also provides an instance-bound
 `CommandFaultController`, `createTestingCommandExecutor()` and a generic
 `CommandConformanceFixture<TTx>`. Production executor options contain no fault controls. The testing
 factory uses the production algorithm and the exact seven command boundaries, including a
@@ -610,6 +660,11 @@ obs-text remain accepted in the opaque suffix; empty tracestate positives are pr
 
 ## Command outbox relay
 
+[Relay committed command intents](/services-sdk/command-relay/) composes the shipped PostgreSQL
+adapter and checked worker sink. [Outbound webhooks](/orchestration-runtime/how-to/outbound-webhooks/)
+adds signed outbound delivery; inbound trigger verification is a separate direction.
+
+
 `createCommandOutboxRelay` starts no resource: existing scheduling calls `drainOnce` and shutdown
 awaits `stop`. It decodes canonical bounded payload and W3C fields, snapshots sink registration,
 publishes before settlement and preserves stable identities across retries/crashes. All drains
@@ -619,6 +674,16 @@ acceptance is checked and normalized before the database writes it together with
 Uncertain settlement errors surface without a speculative release. Optional C4-compatible tracing
 selects finite command attributes and preserves deferred/producer propagation without raw identity
 attributes. The database owns leases; no second relay, queue or runtime DDL is introduced.
+
+The sagas plugin contributes the Prisma command outbox model and its reviewed SQL constraints.
+Apply the normal application migration after installation. For bounded maintenance, the PostgreSQL
+relay store exposes `pruneSettled`; the composed saga API also prunes atomic replay keys according
+to terminal completion and the saga group's completed-retention window (default seven days).
+Pending work, leases and active saga markers survive; eligibility is rechecked at deletion.
+See [outbox retention](../database/index.md#bounded-outbox-retention) and the
+[Prisma saga retention recipe](../plugin-sagas-core/index.md#installed-outbox-schema-and-postgresql-retention)
+for migration, policies and persisted cursor examples.
+
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -637,3 +702,44 @@ attributes. The database owns leases; no second relay, queue or runtime DDL is i
 | `CommandOutboxPublication` | type alias | `type CommandOutboxPublication` | One publication/acceptance settlement. |
 | `CommandOutboxRelayStore` | interface | `interface CommandOutboxRelayStore` | Raw claim/mark/release port. |
 | `CommandOutboxRelease` | type alias | `type CommandOutboxRelease` | Retried or retained terminal row. |
+
+
+### Envelope and record policies
+
+| Field or policy | Contract |
+| --- | --- |
+| `input` | Detached, deeply frozen bounded I-JSON. Contract/input schema validation belongs to the service adapter. |
+| `actor` | Trusted principal/system origin; actor kind/subject participates in request identity, scheme does not. |
+| `correlationId` | Bounded transport identity; successful replay returns the original correlation. |
+| `idempotencyKey` | Required by default, 16–256 UTF-8 bytes; stored as a digest. Optional unkeyed execution has no receipt. |
+| `expectedVersion` | Optional normalized string included in request identity. The handler must implement atomic comparison/update. |
+| `trace` | Validated W3C propagation fields, excluded from request identity. |
+| `records.audit` / `records.outbox` | `required`, `optional` or `forbidden`; policy/codec failures roll back. |
+| `CommandRecordLimits` | Defaults: 64 audit rows, 64 outbox rows, 64 KiB shared canonical side-row bytes including metadata; tighten only. |
+| `CommandJsonLimits` | Defaults: depth 64, aggregate items 10,000, canonical bytes 1 MiB; tighten only. |
+
+### Relay policy bounds
+
+All five numerical policy options are required positive safe integers. `concurrency` must not exceed
+`batchSize`. Sink registry keys must equal the sink's bounded nonblank `id`; at most 64 sinks are
+allowed. The relay snapshots registrations at construction.
+
+| Option | Maximum | Meaning |
+| --- | --- | --- |
+| `batchSize` | 64 | Rows claimed by one drain. |
+| `concurrency` | 64 | Active publications within the serialized drains. |
+| `leaseMs` | 60,000 | Claim lifetime; the store fences both token and expiry. |
+| `maxAttempts` | 10,000 | Failed claims below this count can be rescheduled; exhaustion is retained terminal. |
+| `maxRetryDelayMs` | 86,400,000 | Upper bound on a strictly future `retryAt` result. |
+
+`clock.now` and `ids.next` are explicit ports. `classify` returns one of the six
+`COMMAND_RELAY_FAILURE_CLASSES`; `CommandRelayError` already carries its class. Invalid classifier
+or backoff output becomes `misconfigured`. If supplying `telemetry`, supply the actual database
+`provider` too. The relay's provider default without telemetry is `postgres`; this label is not
+provider certification.
+
+`CommandOutboxSink.publish` returns `void` or `{ identity, acceptedAt: Date }`. Checked worker sinks
+must validate their worker receipt before returning normalized acceptance. The store writes that
+acceptance with publication under a live-token CAS. `drainOnce(signal?)` returns settled-publication
+count; `stop()` awaits every active/queued drain and is idempotent. Neither outcome proves an
+external effect. See [reconciliation](/services-sdk/command-operations/#reconcile-a-lost-response).

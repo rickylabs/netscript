@@ -155,6 +155,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_pages != 'false' }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
@@ -175,6 +176,7 @@ jobs:
         run: deno task docs:exports-drift
       - name: Check documentation snippets
         if: env.RUN == 'true'
+        timeout-minutes: 5
         run: deno task docs:snippets
       - name: Build Lume site
         if: env.RUN == 'true'
@@ -204,6 +206,7 @@ jobs:
       pages: write
       id-token: write
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -240,7 +243,7 @@ jobs:
           deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root tools/docs-site --ext ts
           deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root tools/docs-site --ext ts --config docs/site/deno.json
           deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root tools/docs-site --ext ts
-          deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-read tools/docs-site/generate-tokens_test.ts tools/docs-site/inline-diagram_test.ts tools/docs-site/navigation_test.ts
+          deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-read tools/docs-site/generate-tokens_test.ts tools/docs-site/inline-diagram_test.ts tools/docs-site/navigation_test.ts tools/docs-site/code-languages_test.ts tools/docs-site/api-kinds_test.ts tools/docs-site/callout-types_test.ts tools/docs-site/syntax-contrast_test.ts
       - name: Reproduce rendered docs, twins and anchor fragments before browser verification
         run: deno run --allow-read --allow-run --allow-env tools/docs-site/check-reproducible.ts --allow-pagefind-metadata
       - name: Install locked browser tooling

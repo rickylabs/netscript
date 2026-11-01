@@ -1,41 +1,39 @@
 ---
 layout: layouts/base.vto
 title: Deliver outbound webhooks
+description: Send signed events from a worker with bounded retries and a dead-letter queue.
 templateEngine: [vento, md]
-order: 112
+order: 109
 ---
 
 # Deliver outbound webhooks
 
-**Goal:** deliver signed outbox events with retries and a DLQ.
+This recipe sends signed outbox events from a background worker, with bounded retries and a
+dead-letter queue (DLQ). It uses the existing workers plugin for authenticated delivery, bounded
+retries and durable records of terminal failures, and adds no new package, plugin or runtime
+primitive. [Inbound `defineWebhook`]({{ 'tut:ingest-webhook' |> xref }}) is the opposite direction:
+it verifies events arriving at your service.
 
-Use the existing workers plugin for authenticated delivery, bounded retries, and durable
-terminal-failure records. This recipe creates no new package, plugin, or runtime primitive.
-
-Delivery is **at-least-once, never exactly-once**. A receiver can commit the effect and lose its
-HTTP response, or a worker can crash after sending and before recording completion. Both permit
-duplicates. The attempt budget bounds one handler execution, not all crash redeliveries. Successful
-receipt is not an SLA: after exhaustion the delivery remains in the DLQ for an operator to inspect
-or reprocess.
-
-[Inbound `defineWebhook`]({{ 'tut:ingest-webhook' |> xref }}) is the **opposite direction**: it
-verifies events arriving at your service. This recipe sends events from your background worker.
+{{ comp callout { type: "important", title: "At-least-once delivery" } }}
+Delivery is <strong>at-least-once, never exactly-once</strong>. A receiver can commit the effect and lose its HTTP response, or a worker can crash after sending and before recording completion; both allow duplicates. The attempt budget bounds one handler execution, not every crash redelivery. Successful receipt is not an SLA: after exhaustion, the delivery stays in the DLQ for an operator to inspect or reprocess.
+{{ /comp }}
 
 ## Generate the delivery job
 
-Install the workers plugin using [Add a plugin]({{ 'howto:add-a-plugin' |> xref }}), then run its
-plugin CLI from your workspace root:
+1. Install the workers plugin with [Add a plugin]({{ 'howto:add-a-plugin' |> xref }}).
+2. From your workspace root, run the workers plugin CLI:
 
-```sh
-deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli add job deliver-webhook --template=webhook-delivery
-```
+   ```sh
+   deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli add job deliver-webhook --template=webhook-delivery
+   ```
 
-The command emits `workers/jobs/deliver-webhook.ts` and regenerates the static worker registry. It
-contains a schema-backed handler, a `defineJob` definition, and a configuration-injected
-`createDeliveryHandler` factory. Register the exported `deliveryJob` with **maxRetries 0** (the
-builder uses `.retry(0)`); keep that value in your workers configuration as well. The handler owns
-HTTP retries. Crash recovery belongs to the queue/runtime; this recipe does not guarantee replay
-after cancellation. Do not multiply this budget with runtime job retries.
+   The command emits `workers/jobs/deliver-webhook.ts` and regenerates the static worker registry.
+   The file contains a schema-backed handler, a `defineJob` definition and a
+   configuration-injected `createDeliveryHandler` factory.
+3. Register the exported `deliveryJob` with **maxRetries 0** (the builder uses `.retry(0)`), and
+   keep that value in your workers configuration. The handler owns HTTP retries and crash recovery
+   belongs to the queue and runtime, so don't multiply this budget with runtime job retries. This
+   recipe doesn't guarantee replay after cancellation.
 
 Inject these values into the **worker service**, under a service identity:
 
@@ -48,34 +46,40 @@ Inject these values into the **worker service**, under a service identity:
 | `WEBHOOK_MAX_ATTEMPTS`   | Total HTTP attempts per execution, default 5, integer from 1 to 100.     |
 
 The generated default handler opens that configured KV database and closes its connection in
-`finally`. It uses the existing `KvDeadLetterStore`, implementing `DeadLetterStorePort`. Mount
-persistent storage; an ephemeral worker filesystem cannot preserve failures. For a remote queue
-backend, replace this composition with an existing durable queue store suited to your deployment.
-See [Queue reference](/reference/queue/).
+`finally`. It uses the existing `KvDeadLetterStore`, which implements `DeadLetterStorePort`. Mount
+persistent storage: an ephemeral worker filesystem can't preserve failures. For a remote queue
+backend, replace this composition with an existing durable queue store suited to your deployment;
+see the [Queue reference](/reference/queue/).
 
-For multiple endpoints, own registry rows with `id`, `url`, `secretReference`, and `active`. Resolve
-secret references using your service's configuration provider, then inject a snapshot map and your
-existing DLQ store through `createDeliveryHandler`. Reject missing/inactive endpoints; never accept
-a URL or signing secret from an untrusted producer payload. The default entrypoint illustrates one
-active configured endpoint. Subscription CRUD, secret storage, URL authorization and endpoint
-lifecycle remain consumer-owned. The template requires HTTPS and refuses redirects and URL
-credentials.
+The default entrypoint shows one active configured endpoint. For multiple endpoints, own registry
+rows with `id`, `url`, `secretReference` and `active`. Resolve secret references with your
+service's configuration provider, then inject a snapshot map and your existing DLQ store through
+`createDeliveryHandler`. Subscription CRUD, secret storage, URL authorization and endpoint lifecycle
+stay with you. The template requires HTTPS and refuses redirects and URL credentials.
+
+{{ comp callout { type: "caution", title: "Endpoints and secrets come from your configuration" } }}
+Reject missing or inactive endpoints, and never accept a URL or signing secret from an untrusted producer payload.
+{{ /comp }}
 
 ## Source deliveries from committed command outbox rows
 
-The command outbox relay is available now through `@netscript/service/commands/relay` and the
-checked worker sink through `@netscript/plugin-workers-core/integration/commands`. Use the existing
-service transaction and relay, rather than sending HTTP during a request or starting a second
-polling loop.
+Start with [Transactional commands](/services-sdk/commands/) for the same-commit producer and
+[Relay committed command intents](/services-sdk/command-relay/) for the shipped PostgreSQL/worker
+composition. Use [Command operations](/services-sdk/command-operations/) to reconcile local commit,
+worker acceptance and the receiver effect as separate boundaries.
+
+The command outbox relay comes from `@netscript/service/commands/relay` and the checked worker sink
+from `@netscript/plugin-workers-core/integration/commands`. Use the existing service transaction
+and relay instead of sending HTTP during a request or starting a second polling loop.
 
 At the relay boundary, **deliveryId = `CommandOutboxDelivery.id`**, the stable command-outbox ID.
 Persist the raw JSON body once, reuse it across attempts, and keep `enqueuedAt` from the durable
 producer record. Do not substitute the worker run ID or generate a fresh UUID on redelivery. The
 relay's `dedupeKey` is the worker command acceptance key; it may differ from the outbox row ID.
 
-This adapter wraps the checked worker sink to pass the outbox ID in the selected job's payload while
-preserving the existing worker acceptance protocol. `checkedWorkerSink` must already target the
-schema-backed delivery job; `resolveEndpointId` selects a consumer-owned active endpoint and
+This adapter wraps the checked worker sink to pass the outbox ID in the selected job's payload and
+keeps the existing worker acceptance protocol. `checkedWorkerSink` must already target the
+schema-backed delivery job, `resolveEndpointId` selects a consumer-owned active endpoint, and
 `readEnqueuedAt` reads its durable creation timestamp.
 
 ```ts
@@ -109,9 +113,9 @@ receiver deduplication is still required. See
 [Checked worker command sink](/reference/plugin-workers-core/#checked-command-sink).
 
 If you enqueue directly in a request without the transactional outbox, the **announcement is
-at-most-once**: the service can commit then crash before enqueueing. The worker may retry an
-accepted job, but cannot recover an announcement it never received. The phone and web application
-only issue commands; delivery never depends on an open application or an owner session.
+at-most-once**: the service can commit, then crash before enqueueing. The worker may retry an
+accepted job, but can't recover an announcement it never received. Client applications only issue
+commands; delivery never depends on an open application or a user session.
 
 ## Signing and receiver deduplication
 
@@ -172,17 +176,26 @@ invoking a command handler; never silently prefer the unsigned envelope value. T
 adapter must explicitly supply this verified key to its command boundary. Do not assume NetScript
 automatically reads these outbound headers as command metadata.
 
-Persist a unique `(endpointId, deliveryId)` receipt **atomically with the receiver's domain
-effect**. On a duplicate return a successful 2xx response without repeating the effect. A read
-followed by a separate write is racy; use a unique constraint/transaction or an atomic
-compare-and-set. Keep dedup records at least as long as the producer's retry and operator replay
-retention. Checking signatures alone does not prevent authenticated retries from repeating effects.
+{{ comp callout { type: "warning", title: "Signatures don't stop duplicate effects" } }}
+Checking signatures alone doesn't prevent authenticated retries from repeating effects. Persist a unique <code>(endpointId, deliveryId)</code> receipt <strong>atomically with the receiver's domain effect</strong>, and on a duplicate return a successful 2xx response without repeating the effect.
+{{ /comp }}
+
+A read followed by a separate write is racy; use a unique constraint or transaction, or an atomic
+compare-and-set. Keep deduplication records at least as long as the producer's retry and operator
+replay retention.
 
 ## Retry budget, outcome and dead letters
 
-The generated policy defaults to 5 total attempts, a 1-second base, a 30-second cap and a 10-second
-per-attempt timeout. After failure number `n`, full jitter selects a delay in
-`[0, min(30000, 1000 * 2^(n - 1)))`. Every non-2xx response and network failure consumes an attempt;
+The generated retry policy defaults:
+
+| Setting | Default |
+| --- | --- |
+| Total attempts | 5 |
+| Base delay | 1 second |
+| Delay cap | 30 seconds |
+| Per-attempt timeout | 10 seconds |
+
+After failure number `n`, full jitter selects a delay in `[0, min(30000, 1000 * 2^(n - 1)))`. Every non-2xx response and network failure consumes an attempt;
 there is no sleep after the last failure. Response bodies are canceled without being read. Attempt
 count and HTTP outcome are reported through the existing job progress callback; completion returns
 `delivered` or `dead_lettered` with the delivery ID and count.
@@ -202,21 +215,22 @@ After the configured maximum attempts or handler-observed deadline exhaustion, t
 never acknowledges a silently dropped delivery. The delivery ID stays stable; the existing KV store
 keys terminal records by namespace, failure time and message ID, so separate exhausted executions
 can retain separate failure records. No signing secret or arbitrary receiver response text is stored
-in the record. Protect DLQ access because the original event payload can contain private data.
+in the record.
+
+{{ comp callout { type: "caution", title: "Protect DLQ access" } }}
+Dead-letter records keep the original event payload, which can contain private data.
+{{ /comp }}
 
 Use the existing store's `list`, `depth` and `reprocess` methods to inspect and replay failures.
 Replays keep the original delivery ID and body; resolve the current service secret and generate a
 fresh signature timestamp. Operators own replay authorization and retention.
 
-## Non-goals and verification
+## Non-goals
 
-This recipe is not a delivery SLA, subscription management API, receiver-side framework, new plugin,
-or an exactly-once primitive. It changes no inbound trigger behavior. Runtime retry/DLQ ownership
-could be reconsidered when workers expose attempts and a terminal-store seam; this recipe uses the
-current handler context and existing queue vocabulary.
+This recipe is not a delivery SLA, a subscription management API, a receiver-side framework, a new
+plugin or an exactly-once primitive. It changes no inbound trigger behavior.
 
-The generated-worker tests prove raw-body signatures, capped jitter, the attempt cap, durable-store
-routing, cancellation, deadlines, and rejection of a hardcoded endpoint. The page's TypeScript
-fences are extracted and checked against package export entrypoints. Full scaffold runtime E2E and a
-later consumer observation are separate release evidence; local template execution does not
-establish them.
+## Next steps
+
+To handle the opposite direction, verify inbound events in the
+[webhook ingestion tutorial]({{ 'tut:ingest-webhook' |> xref }}).

@@ -1,0 +1,44 @@
+const root='C:/Users/ericc/source/repos/netscript-native-host-policy-008';
+const out=root+'/.llm/tmp/native-host-policy-u1-s6c-astra-20261028';
+const text=new TextDecoder();
+const read=async(path:string)=>JSON.parse((await Deno.readTextFile(path)).replace(/^\uFEFF/,''));
+const sha=async(bytes:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
+const hash=async(path:string)=>await sha(await Deno.readFile(path));
+const sourcePath='plugins/streams/services/src/service-tls_test.ts';
+const source=await Deno.readFile(root+'/'+sourcePath);
+const content=text.decode(source);
+const protectedRows=[];
+for(const row of(await read(root+'/.llm/tmp/native-host-policy-u1-s6a-checkpoint-20261028/tls-proposal-bindings.json')).rows){
+ const actual=await hash(root+'/'+row.path);protectedRows.push({...row,actual,matches:actual===row.expected});
+}
+const workers=await Deno.readTextFile(root+'/plugins/workers/services/src/service-conformance_test.ts');
+const pem=[];
+for(const name of ['TLS_TEST_CA','TLS_TEST_LEAF_CERT','TLS_TEST_LEAF_KEY']){
+ const pattern=new RegExp('const '+name+' = `([\\s\\S]*?)`;');
+ const before=workers.match(pattern)?.[0],after=content.match(pattern)?.[0];
+ if(before===undefined||after===undefined)throw new Error('Missing public PEM constant '+name);
+ const bytes=new TextEncoder().encode(after);
+ pem.push({name,bytes:bytes.length,sha256:await sha(bytes),matches:before===after});
+}
+await Deno.writeFile(out+'/source.final-2.ts',source,{createNew:true});
+const diff=await new Deno.Command('git',{args:['diff','--no-index','--','/dev/null',sourcePath],cwd:root,stdout:'piped',stderr:'piped'}).output();
+if(diff.code!==1||diff.stderr.length)throw new Error('Source diff failed: '+text.decode(diff.stderr));
+await Deno.writeFile(out+'/source-2.diff',diff.stdout,{createNew:true});
+const children=[],cleanup=[];
+async function absent(path:string){try{await Deno.stat(path);return false;}catch(error){if(error instanceof Deno.errors.NotFound)return true;throw error;}}
+const profile=await read(out+'/gates-2/cleanup.json');
+cleanup.push({...profile,absentVerified:await absent(profile.profile)});
+for(const label of ['approved','allocator-denied','ffi-denied','http','tls']){
+ const folder=out+'/gates-2/children/'+label;
+ const row=await read(folder+'/cleanup.json');cleanup.push({label,...row,absentVerified:await absent(row.scratch)});
+ for(const name of ['cache-info','discovery-result','child-1-result']){
+  const result=await read(folder+'/'+name+'.json');
+  children.push({label,name,...result,stdoutBytes:new TextEncoder().encode(result.stdout).length,stderrBytes:new TextEncoder().encode(result.stderr).length});
+ }
+}
+const git=await new Deno.Command('git',{args:['diff','--name-only'],cwd:root,stdout:'piped',stderr:'piped'}).output();
+const owner={path:sourcePath,bytes:source.length,lines:content.trimEnd().split('\n').length,cap:220,sha256:await sha(source)};
+const result={head:'1ef664b9270835e2c5133fc514c879044f1b28ea',owner,protectedCount:protectedRows.length,protectedMatched:protectedRows.filter(v=>v.matches).length,protectedRows,pem,children,cleanup,trackedDiff:text.decode(git.stdout),tests:await read(out+'/gates-2/tests.report.json'),types:await read(out+'/gates-2/types.report.json'),lint:await read(out+'/gates-2/lint.report.json'),fmt:await read(out+'/gates-2/fmt.report.json'),quality:await read(out+'/gates-2/quality-new.stdout.log'),sourceDiffSha256:await hash(out+'/source-2.diff'),limits:['Windows TLS qualification only; Linux remains pending genuine CI','First source.final.ts/source-proof.json and gates/6-pass-1-fail remain preserved; root explicitly approved Error-valued native cause oracle','No production, fixture, permission, configuration, debt or lock edit; no composite architecture rerun or checkpoint']};
+await Deno.writeTextFile(out+'/source-proof-2.json',JSON.stringify(result,null,2)+'\n',{createNew:true});
+if(result.protectedCount!==115||result.protectedMatched!==115||!pem.every(v=>v.matches)||owner.lines>owner.cap||result.trackedDiff||cleanup.some(v=>!v.absentVerified)||children.some(v=>!v.statusSettled||!v.pipesSettled||!v.stdinSettled||v.stdoutBytes>32768||v.stderrBytes>32768))throw new Error('Protected/source/PEM/cleanup proof failed');
+console.log(JSON.stringify({owner,protectedMatched:result.protectedMatched,pemMatches:pem.filter(v=>v.matches).length,children:children.length,cleanups:cleanup.length,tests:result.tests.summary,sourceDiffSha256:result.sourceDiffSha256,proofSha256:await hash(out+'/source-proof-2.json')}));

@@ -1,0 +1,3 @@
+# Parity renderer compiler context
+
+External archives need an isolated Deno config beside the archive containing the same compilerOptions as Fresh UI. Selecting the current workspace member config still leaves an external archive on classic JSX. This changes numeric line-height serialization (1 versus 1px), causing a false SidebarToggle height difference. Matching precompile options makes both serialize 1px. Use cached-only imports resolved to existing locked versions and --no-lock for the isolated replay; frozen root locks otherwise reject pruning workspace metadata. Repository locks are never changed. Capture production component code and CSS unchanged.

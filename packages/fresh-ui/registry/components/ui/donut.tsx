@@ -43,8 +43,15 @@ export function Donut({ data, total, class: className, ...props }: DonutProps): 
   let offset = 0;
 
   return (
-    <div {...props} class={cn('ns-donut', className)}>
-      <svg class='ns-donut__svg' viewBox='0 0 100 100' role='img' aria-hidden='true'>
+    <div {...props} class={cn('ns-donut', className)} data-part='root' data-scope='donut'>
+      <svg
+        class='ns-donut__svg'
+        data-part='svg'
+        data-scope='donut'
+        viewBox='0 0 100 100'
+        role='img'
+        aria-hidden='true'
+      >
         <g transform='rotate(-90 50 50)'>
           {data.map((datum, index) => {
             const tone = datum.tone ?? CYCLE[index % CYCLE.length];
@@ -52,7 +59,10 @@ export function Donut({ data, total, class: className, ...props }: DonutProps): 
             const ring = (
               <circle
                 class='ns-donut__ring'
+                data-part='ring'
+                data-scope='donut'
                 data-tone={tone}
+                data-series={datum.tone ? undefined : (index % CYCLE.length) + 1}
                 cx='50'
                 cy='50'
                 r={RADIUS}
@@ -67,11 +77,17 @@ export function Donut({ data, total, class: className, ...props }: DonutProps): 
           })}
         </g>
       </svg>
-      <div class='ns-donut__center'>{total ?? sum}</div>
-      <ul class='ns-donut__legend'>
+      <div class='ns-donut__center' data-part='center' data-scope='donut'>{total ?? sum}</div>
+      <ul class='ns-donut__legend' data-part='legend' data-scope='donut'>
         {data.map((datum, index) => (
-          <li class='ns-donut__row'>
-            <span class='ns-donut__swatch' data-tone={datum.tone ?? CYCLE[index % CYCLE.length]} />
+          <li class='ns-donut__row' data-part='row' data-scope='donut'>
+            <span
+              class='ns-donut__swatch'
+              data-part='swatch'
+              data-scope='donut'
+              data-tone={datum.tone ?? CYCLE[index % CYCLE.length]}
+              data-series={datum.tone ? undefined : (index % CYCLE.length) + 1}
+            />
             {datum.label}
           </li>
         ))}

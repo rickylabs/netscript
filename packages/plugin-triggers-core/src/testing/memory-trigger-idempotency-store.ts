@@ -68,7 +68,11 @@ async function resolveKey(input: TriggerIdempotencyKeyInput): Promise<
   if (headerKey !== undefined && headerKey.length > 0) {
     return { key: headerKey, source: 'request-header' };
   }
-  return { key: await payloadHash(input.event.payload), source: 'payload-hash' };
+  // Identical payloads from independent triggers must not share an automatic claim.
+  return {
+    key: await payloadHash([input.event.triggerId, input.event.payload]),
+    source: 'payload-hash',
+  };
 }
 
 async function payloadHash(payload: unknown): Promise<string> {

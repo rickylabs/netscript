@@ -1,0 +1,58 @@
+[
+  {
+    "command": [
+      "deno",
+      "task",
+      "release:preflight"
+    ],
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "deno",
+      "task",
+      "check:netscript-jsr-specifiers"
+    ],
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "deno",
+      "task",
+      "check:agent-docs-prose"
+    ],
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "deno",
+      "task",
+      "check:mcp-export-corpus"
+    ],
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "deno",
+      "task",
+      "check:assets-barrel"
+    ],
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "deno",
+      "task",
+      "check:publish-assets"
+    ],
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "deno",
+      "task",
+      "check:aspire-version-parity"
+    ],
+    "exitCode": 0
+  }
+]

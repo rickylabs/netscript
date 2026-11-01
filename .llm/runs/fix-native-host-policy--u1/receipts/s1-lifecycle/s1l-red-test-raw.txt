@@ -1,0 +1,78 @@
+running 4 tests from ./plugins/workers/services/src/service_test.ts
+permission controls: static module loading survives --deny-read while runtime read, env and net are refused ... ok (448ms)
+child controls: a stuck child and an over-cap stream are failures that still settle ... ok (625ms)
+@netscript/plugin-workers/service resolves to services/mod.ts and imports inertly with every capability denied under a cleared environment ... FAILED (111ms)
+denied child: the auth assertion precedes every env, KV, storage and listener capability ... FAILED (112ms)
+
+ ERRORS 
+
+@netscript/plugin-workers/service resolves to services/mod.ts and imports inertly with every capability denied under a cleared environment => ./plugins/workers/services/src/service_test.ts:134:6
+error: AssertionError: Values are not equal.
+
+
+    [Diff] Actual / Expected
+
+
+-   error: Unknown export './service' for '@netscript/plugin-workers'.\n
+-     Package exports:\n
+-    * .\n
+-    * ./adapter-cli\n
+-    * ./aspire\n
+-    * ./cli\n
+-    * ./contracts\n
+-    * ./doctor\n
+-    * ./jobs/health-check.ts\n
+-    * ./runtime\n
+-    * ./scaffold\n
+-    * ./services\n
+-    * ./streams\n
+-    * ./streams/server\n
+-    * ./worker\n
+-       at file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/workers/$deno$stdin.mts:1:8\n
+    
+
+
+  throw new AssertionError(message);
+        ^
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
+    at fn (file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/workers/services/src/service_test.ts:146:5)
+
+denied child: the auth assertion precedes every env, KV, storage and listener capability => ./plugins/workers/services/src/service_test.ts:152:6
+error: AssertionError: Values are not equal.
+
+
+    [Diff] Actual / Expected
+
+
+-   error: Unknown export './service' for '@netscript/plugin-workers'.\n
+-     Package exports:\n
+-    * .\n
+-    * ./adapter-cli\n
+-    * ./aspire\n
+-    * ./cli\n
+-    * ./contracts\n
+-    * ./doctor\n
+-    * ./jobs/health-check.ts\n
+-    * ./runtime\n
+-    * ./scaffold\n
+-    * ./services\n
+-    * ./streams\n
+-    * ./streams/server\n
+-    * ./worker\n
+-       at file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/workers/$deno$stdin.mts:1:37\n
+    
+
+
+  throw new AssertionError(message);
+        ^
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
+    at fn (file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/plugins/workers/services/src/service_test.ts:160:5)
+
+ FAILURES 
+
+@netscript/plugin-workers/service resolves to services/mod.ts and imports inertly with every capability denied under a cleared environment => ./plugins/workers/services/src/service_test.ts:134:6
+denied child: the auth assertion precedes every env, KV, storage and listener capability => ./plugins/workers/services/src/service_test.ts:152:6
+
+FAILED | 2 passed | 2 failed (1s)
+
+error: Test failed

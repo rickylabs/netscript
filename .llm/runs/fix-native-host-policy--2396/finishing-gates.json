@@ -1,0 +1,120 @@
+{
+  "baseline": "d3a52cb1bf09e9baf0faf857a76e5102fa3c60a4",
+  "incomingMain": "f6839463668c5dae4ca7234d26909e74e10b89c0",
+  "testedTree": "coherent uncommitted normal-merge union; command receipts record baseline HEAD, not a future clean head",
+  "generation": [
+    {
+      "task": "gen:mcp-export-corpus",
+      "args": [
+        "--allow-dirty"
+      ],
+      "exitCode": 0,
+      "durationMs": 9811
+    },
+    {
+      "task": "gen:agent-docs-prose",
+      "args": [],
+      "exitCode": 0,
+      "durationMs": 13846
+    },
+    {
+      "task": "gen:assets-barrel",
+      "args": [],
+      "exitCode": 0,
+      "durationMs": 1376
+    },
+    {
+      "task": "gen:publish-assets",
+      "args": [],
+      "exitCode": 0,
+      "durationMs": 397
+    }
+  ],
+  "gates": [
+    {
+      "gateId": "mcp-export-corpus",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 12053,
+      "requestHash": "f114134238161f7dd7ecb67287a883e560d1ec0faa728f09998da2013c16d1e4"
+    },
+    {
+      "gateId": "agent-docs-prose",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 17666,
+      "requestHash": "c4f4754f7ce1accc43609d96f620550c65ff869120569165d4b4dbd46d975399"
+    },
+    {
+      "gateId": "assets-barrel",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 2700,
+      "requestHash": "f5a8cb6b5ab5258ba73ea931801193aef6adf531dcf06f9850e230281e813df1"
+    },
+    {
+      "gateId": "publish-assets",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 584,
+      "requestHash": "91c9d373b0950ff52df3b0395a508176ae9e4c38d397b37a98ce4d7460a43911"
+    },
+    {
+      "gateId": "quality-gate",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 18967,
+      "requestHash": "9ae3ddf22aaa1aaef777744cc6e72613a05b62c3e14cb60db499c307c3788976"
+    }
+  ],
+  "publicDocLint": {
+    "workers": {
+      "exitCode": 1,
+      "reason": "AuthzDecision references private ProcedureErrorCode"
+    },
+    "streams": {
+      "exitCode": 1,
+      "reason": "AuthzDecision references private ProcedureErrorCode"
+    }
+  },
+  "publicTypeRefs": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 3,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 4,
+      "uniqueFailures": 1
+    },
+    "failure": "workers non-contract entrypoints have no documentation diagnostics"
+  },
+  "scratchClosure": {
+    "oneApprovedName": "FAIL both: ProcedureErrorCode references private PROCEDURE_ERROR_CODES",
+    "twoTypeOnlyNativeNames": "PASS both at workers24/streams23; research only",
+    "omissionControls": {
+      "workers": 22,
+      "streams": 21,
+      "allFail": true
+    }
+  },
+  "sourceEquality": {
+    "incomingChangedPaths": 53,
+    "exceptions": [
+      ".llm/tools/validation/fixtures/aspire-surface-manifest.tsv",
+      "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts"
+    ],
+    "exceptionMeaning": "canonical generated corpus union and preserved host-guide Aspire inventory row",
+    "factoriesAndTests": "unchanged from baseline",
+    "debtBounds": "unchanged exact22/21; target2026-11-10",
+    "nativeAuth": "unchanged from baseline and incoming main",
+    "locks": "exact incoming main"
+  },
+  "reviewThreads": {
+    "exitCode": 0,
+    "unanswered": 0
+  },
+  "combinedSuite": "NOT_RUN on this finishing union after stop condition; historical reconciliation1872/1/18 remains historical, not new-head proof",
+  "runtimeCI": "UNPROVEN; no local scaffold.runtime; coordinator alone arms runtime",
+  "publishedConsumerGraph": "UNPROVEN; existing release-owned canary debt unchanged",
+  "state": "BLOCKED: two-name native closure exceeds authorized23/22"
+}

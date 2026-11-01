@@ -1,3 +1,4 @@
+import { prepareLockedFixture } from '../../../../../../.llm/tools/testing/locked-fixture.ts';
 import { checkGeneratedFiles } from '../../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
@@ -12,6 +13,11 @@ const provider = new DbEngineRegistry().get('postgres');
 const sourceRoot = new URL('../../../../../../', import.meta.url).pathname;
 const npgsql = 'Host=localhost;Database=app;Username=app;Password=secret;SSL Mode=VerifyFull';
 const verifyFullUrl = 'postgres://app:secret@localhost:5432/app?sslmode=verify-full';
+const duplicateInputs = [
+  'Host=h;SSL Mode=Require;SslMode=Disable',
+  'Host=h;hOsT=h',
+  'Password="sensitive;""bytes=one";Pwd=sensitive-two',
+];
 
 async function withFixture(
   mode: 'local' | 'jsr',
@@ -87,6 +93,11 @@ export class PrismaClient {
 }
 `,
     );
+    await prepareLockedFixture(
+      root,
+      [],
+      new URL('../../../../tests/fixtures/postgres-normalizer/deno.lock', import.meta.url),
+    );
     await run(root, database);
   } finally {
     await Deno.remove(root, { recursive: true });
@@ -101,8 +112,13 @@ async function probe(
   expected: string,
 ): Promise<void> {
   await Deno.writeTextFile(`${database}/probe.ts`, script);
+  await prepareLockedFixture(
+    root,
+    [`${database}/probe.ts`],
+    new URL('../../../../tests/fixtures/postgres-normalizer/deno.lock', import.meta.url),
+  );
   const result = await new Deno.Command('deno', {
-    args: ['run', '-A', '--no-lock', '--config', `${root}/deno.json`, 'probe.ts'],
+    args: ['run', '-A', '--config', `${root}/deno.json`, 'probe.ts'],
     cwd: database,
     env: { POSTGRES_URI: input, DATABASE_URL: input, EXPECTED_URL: expected, OTEL_DENO: 'false' },
     stdout: 'piped',
@@ -118,11 +134,16 @@ import { loadConfigFromFile } from 'npm:@prisma/config@^7.10.0';
 import 'prisma/config';
 const result = await loadConfigFromFile({ configFile: 'prisma.config.ts', configRoot: Deno.cwd() });
 const expected = Deno.env.get('EXPECTED_URL');
-if (expected === 'unsupported-value') {
+if (expected === 'unsupported-value' || expected === 'duplicate-key') {
   if (!result.error || !('error' in result.error) ||
       result.error.error.name !== 'PostgresConnectionStringError' ||
+      result.error.error.reason !== expected ||
       !result.error.error.message.includes(expected)) {
-    throw new Error('Generated config did not preserve its typed refusal: ' + JSON.stringify(result.error));
+    throw new Error('Generated config did not preserve its typed refusal');
+  }
+  const diagnostics = result.error.error.message + JSON.stringify(result.error.error);
+  if (diagnostics.includes('sensitive') || result.error.error.cause !== undefined) {
+    throw new Error('Generated config refusal exposed credentials');
   }
 } else {
   if (result.error) throw new Error('Actual Prisma loader failed: ' + JSON.stringify(result.error));
@@ -138,6 +159,15 @@ for (const mode of ['local', 'jsr'] as const) {
     await withFixture(mode, async (root, database) => {
       await probe(root, database, prismaProbe, npgsql, verifyFullUrl);
       await probe(root, database, prismaProbe, `  ${verifyFullUrl}\n`, verifyFullUrl);
+      for (const sslmode of ['verify-ca', 'verify-full']) {
+        await probe(
+          root,
+          database,
+          prismaProbe,
+          'Host=localhost;Port=05432;SSL Mode=' + sslmode,
+          'postgres://postgres:@localhost:5432/postgres?sslmode=' + sslmode,
+        );
+      }
       await probe(
         root,
         database,
@@ -145,6 +175,14 @@ for (const mode of ['local', 'jsr'] as const) {
         'Host=localhost;SSL Mode=Allow',
         'unsupported-value',
       );
+    });
+  });
+
+  Deno.test(`Postgres generated Prisma config duplicate refusal (${mode})`, async () => {
+    await withFixture(mode, async (root, database) => {
+      for (const input of duplicateInputs) {
+        await probe(root, database, prismaProbe, input, 'duplicate-key');
+      }
     });
   });
 }
@@ -155,7 +193,6 @@ Deno.test('Postgres generated engine type-checks and runs with its generated loc
       args: [
         'check',
         '--unstable-kv',
-        '--no-lock',
         '--config',
         `${root}/deno.json`,
         'mod.ts',
@@ -175,5 +212,36 @@ console.log('generated normalizer: PASS');
 `;
     await probe(root, database, engineProbe, npgsql, verifyFullUrl);
     await probe(root, database, engineProbe, `  ${verifyFullUrl}\n`, verifyFullUrl);
+  });
+});
+
+Deno.test('Postgres generated engine duplicate refusal preserves credentials and environment', async () => {
+  await withFixture('local', async (root, database) => {
+    const engineRefusalProbe = `
+import { getPostgres } from './mod.ts';
+const input = Deno.env.get('POSTGRES_URI');
+let refused = false;
+try {
+  await getPostgres();
+} catch (error) {
+  if (!(error instanceof Error) || error.name !== 'PostgresConnectionStringError' ||
+      !('reason' in error) || error.reason !== 'duplicate-key') {
+    throw new Error('Generated engine did not preserve its typed duplicate refusal');
+  }
+  const diagnostics = error.message + error.stack + JSON.stringify(error);
+  if (diagnostics.includes('sensitive') || error.cause !== undefined) {
+    throw new Error('Generated engine refusal exposed credentials');
+  }
+  refused = true;
+}
+if (!refused) throw new Error('Generated engine accepted duplicate options');
+if (Deno.env.get('POSTGRES_URI') !== input || Deno.env.get('DATABASE_URL') !== input) {
+  throw new Error('Generated engine changed environment before refusing duplicate options');
+}
+console.log('generated normalizer: PASS');
+`;
+    for (const input of duplicateInputs) {
+      await probe(root, database, engineRefusalProbe, input, 'duplicate-key');
+    }
   });
 });

@@ -70,6 +70,8 @@ export type { KvSagaStoreOptions } from './kv-saga-store.ts';
 export type {
   PrismaSagaStoreClient,
   PrismaSagaStoreOptions,
+  PrismaSagaStoreTransaction,
+  SagaRuntimeAppliedKeyDelegate,
   SagaRuntimeCorrelationDelegate,
   SagaRuntimeCorrelationRow,
   SagaRuntimeCorrelationWrite,
@@ -101,6 +103,7 @@ export type {
   SagaTransitionStore,
 } from '../ports/saga-transition-commit-port.ts';
 export type {
+  CommandOutboxRetentionResult,
   DatabaseProvider,
   IsolationLevel,
   PostgresCommandClient,
@@ -108,3 +111,11 @@ export type {
   TransactionClientPort,
   TransactionOptions,
 } from '@netscript/database/commands/postgres';
+
+export {
+  createPrismaSagaCommandRetention,
+  type PrismaSagaCommandRetention,
+  type PrismaSagaCommandRetentionOptions,
+  type SagaCommandRetentionCursor,
+  type SagaCommandRetentionResult,
+} from './prisma-saga-command-retention.ts';

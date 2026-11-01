@@ -1,0 +1,29 @@
+﻿{
+    "name":  "q2-final",
+    "startedUtc":  "2026-10-28T01:26:55.4332664Z",
+    "finishedUtc":  "2026-10-28T01:26:59.9805570Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "run",
+                      "--cached-only",
+                      "--frozen",
+                      "--allow-read",
+                      "--allow-write",
+                      "--allow-run",
+                      ".llm/tools/run-deno-test.ts",
+                      "--output",
+                      ".llm/tmp/native-service-qualification-sol-20261028/q2-final.json",
+                      "--",
+                      "--cached-only",
+                      "--frozen",
+                      "--check",
+                      "--allow-all",
+                      "--sanitize-ops",
+                      "--sanitize-resources",
+                      "--trace-leaks",
+                      "packages/service/tests/legacy-abort_test.ts"
+                  ],
+    "exitCode":  0,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-qualification-sol-20261028\\q2-final.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-qualification-sol-20261028\\q2-final.stderr.log"
+}

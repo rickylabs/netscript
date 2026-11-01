@@ -27,7 +27,9 @@ const SSL_MODES: ReadonlyMap<string, string> = new Map([
   ['prefer', 'prefer'],
   ['require', 'require'],
   ['verifyca', 'verify-ca'],
+  ['verify-ca', 'verify-ca'],
   ['verifyfull', 'verify-full'],
+  ['verify-full', 'verify-full'],
 ]);
 
 /**
@@ -37,11 +39,14 @@ const SSL_MODES: ReadonlyMap<string, string> = new Map([
  * quoted values support delimiters and doubled quote escapes. Missing fields use
  * localhost:5432, database/user postgres and an empty password. Absent SSL Mode
  * leaves driver defaults; explicit modes preserve the requested TLS policy.
+ * Repeated keys (including aliases and identical values) are refused before
+ * overwriting an option. VerifyCA/VerifyFull and verify-ca/verify-full are accepted
+ * case-insensitively; decimal ports are emitted without leading zeros.
  *
  * @param connectionString - PostgreSQL URI or semicolon-separated Npgsql settings.
  * @returns A PostgreSQL URI with encoded credentials and database name.
- * @throws {PostgresConnectionStringError} For unknown keys, unrepresentable values,
- * certificate settings, SSL Mode=Allow, or malformed syntax.
+ * @throws {PostgresConnectionStringError} For duplicate or unknown keys,
+ * unrepresentable values, certificate settings, SSL Mode=Allow, or malformed syntax.
  * @example
  * ```ts
  * import { normalizePostgresConnectionString } from '@netscript/database/connection-strings/postgres';
@@ -71,6 +76,7 @@ function readPostgresOptions(input: string): Map<string, string> {
     for (const { key, value } of tokenizeAdoNetConnectionString(input)) {
       const option = OPTION_KEYS.get(key);
       if (!option) throw new PostgresConnectionStringError('unsupported-key', key);
+      if (parts.has(option)) throw new PostgresConnectionStringError('duplicate-key', option);
       parts.set(option, translatePostgresValue(option, key, value));
     }
   } catch (error) {
@@ -91,7 +97,9 @@ function translatePostgresValue(option: string, key: string, value: string): str
     if (isSingleHost(value)) return value;
     if (isSingleHost(`[${value}]`)) return `[${value}]`;
   } else if (option === 'port') {
-    if (/^\d+$/.test(value) && Number(value) >= 1 && Number(value) <= 65535) return value;
+    if (/^\d+$/.test(value) && Number(value) >= 1 && Number(value) <= 65535) {
+      return String(Number(value));
+    }
   } else if (option === 'database') {
     if (value && value !== '.' && value !== '..') return encodePostgresValue(value, key);
   } else if (option === 'password' || value) {

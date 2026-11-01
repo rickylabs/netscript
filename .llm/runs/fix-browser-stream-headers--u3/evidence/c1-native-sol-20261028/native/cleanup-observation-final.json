@@ -1,0 +1,17 @@
+{
+    "capturedAt":  "2026-10-28T00:58:31.0745304+00:00",
+    "scope":  "Current Deno command lines matching exact worktree and gate-owned TEMP only",
+    "taskDenoCommandLineMatches":  [
+                                       {
+                                           "ProcessId":  50136,
+                                           "ParentProcessId":  52668,
+                                           "CommandLine":  "\"C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe\" run --no-lock --config C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/continuation-4/typecheck-deno-runtime-with-map.json -A C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-reader-policy\\.llm\\runs\\plan-netscript-008-reader-policy--e1\\native-plan-packet-same-session-final-text\\run-native-plan.ts --execute --authorization C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-reader-policy\\.llm\\runs\\plan-netscript-008-reader-policy--e1\\native-plan-root-authorization-final-text-20261028T005648Z.json"
+                                       }
+                                   ],
+    "taskDenoCommandLineMatchCount":  1,
+    "gateTempEntries":  [
+
+                        ],
+    "gateTempEntryCount":  0,
+    "historicalOrGlobalCleanlinessClaimed":  false
+}

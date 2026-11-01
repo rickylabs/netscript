@@ -1,0 +1,17 @@
+const root='C:/Users/ericc/source/repos/netscript-native-host-policy-008';
+const out=root+'/.llm/tmp/native-host-policy-u1-s6d-astra-20261028';
+const read=async(path:string)=>JSON.parse(await Deno.readTextFile(out+'/'+path));
+const hash=async(path:string)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await Deno.readFile(path))),v=>v.toString(16).padStart(2,'0')).join('');
+const first=await read('source-proof.json'),final=await read('source-proof-2.json');
+const children=[...first.children,...final.children],cleanup=[...first.cleanup,...final.cleanup],native=[...first.native,...final.native];
+const absent=[];
+for(const row of cleanup){const path=row.profile??row.scratch;try{await Deno.stat(path);absent.push({path,absent:false});}catch(error){if(error instanceof Deno.errors.NotFound)absent.push({path,absent:true});else throw error;}}
+const diff=await new Deno.Command('git',{args:['diff','--no-index','--',out+'/source.final.ts',out+'/source.final-2.ts'],cwd:root,stdout:'piped',stderr:'piped'}).output();
+if(diff.code!==1||diff.stderr.length)throw new Error('Correction diff failed');
+await Deno.writeFile(out+'/authorized-correction.diff',diff.stdout,{createNew:true});
+const rowHashes=[];
+for(const label of ['bind','sentinel','cors']){const path=out+'/gates-2/children/startup-'+label+'/child-1-result.json';rowHashes.push({label,path,sha256:await hash(path)});}
+const result={firstSourceSha256:await hash(out+'/source.final.ts'),firstProofSha256:await hash(out+'/source-proof.json'),finalSourceSha256:await hash(out+'/source.final-2.ts'),finalProofSha256:await hash(out+'/source-proof-2.json'),correctionDiffSha256:await hash(out+'/authorized-correction.diff'),childCount:children.length,settled:children.filter(row=>row.statusSettled&&row.pipesSettled&&row.stdinSettled).length,cleanupCount:absent.length,cleanupAbsent:absent.filter(row=>row.absent).length,cleanup:absent,nativeCount:native.length,nativeMatched:native.filter(row=>row.matches).length,rowHashes,observations:final.observations};
+await Deno.writeTextFile(out+'/final-verification.json',JSON.stringify(result,null,2),{createNew:true});
+if(result.firstSourceSha256!=='c5cd5dfc31cd78be0271d54b12ccfda8a7633adecaa5ca85af6489bf4a553096'||result.firstProofSha256!=='d35d3e8984a76b602e6c1b5f767c1db339d0ec5d0b593a713068fa1df9482d09'||result.childCount!==42||result.settled!==42||result.cleanupAbsent!==16||result.nativeCount!==28||result.nativeMatched!==28)throw new Error('Final combined evidence proof failed');
+console.log(JSON.stringify({childCount:result.childCount,settled:result.settled,cleanupAbsent:result.cleanupAbsent,nativeMatched:result.nativeMatched,rowHashes,verificationSha256:await hash(out+'/final-verification.json')}));

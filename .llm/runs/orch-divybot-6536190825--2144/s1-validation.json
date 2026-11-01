@@ -1,0 +1,555 @@
+{
+  "regression-tests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "packages/plugin-workers-core/tests/runtime",
+      "packages/plugin-workers-core/tests/config",
+      "plugins/workers/worker",
+      "plugins/workers/tests/runtime",
+      "plugins/workers/tests/cli"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 0,
+    "durationMs": 19107,
+    "summary": {
+      "passed": 114,
+      "failed": 0,
+      "ignored": 4,
+      "totalResults": 118,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "s1-check": {
+    "source": {
+      "mode": "selection",
+      "cwd": "<worktree>"
+    },
+    "command": "deno check --unstable-kv --no-lock <files>",
+    "selection": {
+      "filesSelected": 20,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "s1-lint": {
+    "source": {
+      "mode": "command",
+      "cwd": "<worktree>",
+      "exitCode": 0
+    },
+    "selection": {
+      "filesSelected": 20,
+      "batches": 2,
+      "failedBatches": 0
+    },
+    "coverage": {
+      "filesSelected": 20,
+      "filesProcessed": 20,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "s1-fmt": {
+    "command": "deno fmt --check",
+    "cwd": "<worktree>",
+    "mode": "check",
+    "summary": {
+      "filesSelected": 20,
+      "batches": 2,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "coverage": {
+      "filesSelected": 20,
+      "filesProcessed": 20,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "findings": []
+  },
+  "negative-retry": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "--filter",
+      "fails twice",
+      "plugins/workers/worker/job-retry_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 1,
+    "durationMs": 3127,
+    "summary": {
+      "passed": 0,
+      "failed": 6,
+      "ignored": 3,
+      "totalResults": 9,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   1\n+   3\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at fn (file://<cwd>/plugins/workers/worker/job-retry_test.ts:<line>:<column>)",
+        "count": 6,
+        "tests": [
+          {
+            "name": "kv-polling: deno job fails twice then succeeds with declared fixed backoff",
+            "file": "./plugins/workers/worker/job-retry_test.ts",
+            "line": 42
+          },
+          {
+            "name": "kv-polling: deno job fails twice then succeeds with declared linear backoff",
+            "file": "./plugins/workers/worker/job-retry_test.ts",
+            "line": 42
+          },
+          {
+            "name": "kv-polling: deno job fails twice then succeeds with declared exponential backoff",
+            "file": "./plugins/workers/worker/job-retry_test.ts",
+            "line": 42
+          },
+          {
+            "name": "deno-kv: deno job fails twice then succeeds with declared fixed backoff",
+            "file": "./plugins/workers/worker/job-retry_test.ts",
+            "line": 42
+          },
+          {
+            "name": "deno-kv: deno job fails twice then succeeds with declared linear backoff",
+            "file": "./plugins/workers/worker/job-retry_test.ts",
+            "line": 42
+          },
+          {
+            "name": "deno-kv: deno job fails twice then succeeds with declared exponential backoff",
+            "file": "./plugins/workers/worker/job-retry_test.ts",
+            "line": 42
+          }
+        ]
+      }
+    ]
+  },
+  "negative-shutdown": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "--filter",
+      "shutdown during backoff",
+      "plugins/workers/worker/job-retry_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 1,
+    "durationMs": 5730,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "Error: Queue regression timed out\n    at Timeout._onTimeout (file://<cwd>/plugins/workers/worker/job-retry_test.ts:<line>:<column>)",
+        "count": 1,
+        "tests": [
+          {
+            "name": "KV queue replays a job after shutdown during backoff and releases its claim",
+            "file": "./plugins/workers/worker/job-retry_test.ts",
+            "line": 143
+          }
+        ]
+      }
+    ]
+  },
+  "negative-registry": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "--filter",
+      "both registry generators honor",
+      "plugins/workers/tests/cli/runtime-registry-generator_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 1,
+    "durationMs": 3744,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   3\n+   2\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/plugins/workers/tests/cli/runtime-registry-generator_test.ts:<line>:<column>\n    at async withTempProject (file://<cwd>/plugins/workers/tests/cli/runtime-registry-generator_test.ts:<line>:<column>)\n    at async file://<cwd>/plugins/workers/tests/cli/runtime-registry-generator_test.ts:<line>:<column>",
+        "count": 1,
+        "tests": [
+          {
+            "name": "both registry generators honor handler retry inside a group with retry fields omitted",
+            "file": "./plugins/workers/tests/cli/runtime-registry-generator_test.ts",
+            "line": 527
+          }
+        ]
+      }
+    ]
+  },
+  "negative-listener": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "--filter",
+      "Worker KV listener",
+      "plugins/workers/worker/job-retry_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 1,
+    "durationMs": 2772,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "AssertionError: Values are not equal: shutdown must preserve the queued job\n\n\n    [Diff] Actual / Expected\n\n\n-   0\n+   1\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/plugins/workers/worker/job-retry_test.ts:<line>:<column>",
+        "count": 1,
+        "tests": [
+          {
+            "name": "Worker KV listener replays a job after shutdown during backoff and releases its claim",
+            "file": "./plugins/workers/worker/job-retry_test.ts",
+            "line": 145
+          }
+        ]
+      }
+    ]
+  },
+  "negative-timeout": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "--filter",
+      "polyglot timeout",
+      "plugins/workers/worker/job-retry_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 1,
+    "durationMs": 2528,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   3\n+   1\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/plugins/workers/worker/job-retry_test.ts:<line>:<column>",
+        "count": 1,
+        "tests": [
+          {
+            "name": "polyglot timeout is terminal after one attempt and records timeout without a retry wait",
+            "file": "./plugins/workers/worker/job-retry_test.ts",
+            "line": 216
+          }
+        ]
+      }
+    ]
+  },
+  "negative-zero": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "--no-lock",
+      "--filter",
+      "maxRetries zero",
+      "plugins/workers/worker/job-retry_test.ts"
+    ],
+    "cwd": "<worktree>",
+    "exitCode": 1,
+    "durationMs": 3261,
+    "summary": {
+      "passed": 0,
+      "failed": 2,
+      "ignored": 1,
+      "totalResults": 3,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   0\n+   1\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at fn (file://<cwd>/plugins/workers/worker/job-retry_test.ts:<line>:<column>)",
+        "count": 2,
+        "tests": [
+          {
+            "name": "kv-polling: maxRetries zero executes a failing deno job exactly once",
+            "file": "./plugins/workers/worker/job-retry_test.ts",
+            "line": 80
+          },
+          {
+            "name": "deno-kv: maxRetries zero executes a failing deno job exactly once",
+            "file": "./plugins/workers/worker/job-retry_test.ts",
+            "line": 80
+          }
+        ]
+      }
+    ]
+  },
+  "doc-lint": {
+    "source": {
+      "mode": "auto",
+      "root": "packages/plugin-workers-core",
+      "entrypoints": [
+        "./commands.ts",
+        "./mod.ts",
+        "./src/abstracts/mod.ts",
+        "./src/builders/discovery.ts",
+        "./src/builders/mod.ts",
+        "./src/config/mod.ts",
+        "./src/contracts/v1/mod.ts",
+        "./src/domain/public-schema.ts",
+        "./src/executor/mod.ts",
+        "./src/presets/mod.ts",
+        "./src/registry/mod.ts",
+        "./src/runtime/mod.ts",
+        "./src/shutdown/mod.ts",
+        "./src/state/mod.ts",
+        "./src/stores/mod.ts",
+        "./src/streams/mod.ts",
+        "./src/telemetry/mod.ts",
+        "./src/testing/mod.ts",
+        "./src/workflow/mod.ts"
+      ],
+      "exitCode": 1
+    },
+    "summary": {
+      "totalPackages": 1,
+      "totalErrors": 2,
+      "totalPrivateTypeRef": 2,
+      "totalMissingJSDoc": 0,
+      "totalOther": 0
+    },
+    "packages": [
+      {
+        "name": "@netscript/plugin-workers-core",
+        "dir": "packages/plugin-workers-core",
+        "entrypoints": [
+          {
+            "path": "./commands.ts",
+            "privateTypeRef": 0,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 0
+          },
+          {
+            "path": "./mod.ts",
+            "privateTypeRef": 1,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 1
+          },
+          {
+            "path": "./src/abstracts/mod.ts",
+            "privateTypeRef": 2,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 2
+          },
+          {
+            "path": "./src/builders/discovery.ts",
+            "privateTypeRef": 0,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 0
+          },
+          {
+            "path": "./src/builders/mod.ts",
+            "privateTypeRef": 13,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 13
+          },
+          {
+            "path": "./src/config/mod.ts",
+            "privateTypeRef": 0,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 0
+          },
+          {
+            "path": "./src/contracts/v1/mod.ts",
+            "privateTypeRef": 2,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 2
+          },
+          {
+            "path": "./src/domain/public-schema.ts",
+            "privateTypeRef": 0,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 0
+          },
+          {
+            "path": "./src/executor/mod.ts",
+            "privateTypeRef": 1,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 1
+          },
+          {
+            "path": "./src/presets/mod.ts",
+            "privateTypeRef": 10,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 10
+          },
+          {
+            "path": "./src/registry/mod.ts",
+            "privateTypeRef": 2,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 2
+          },
+          {
+            "path": "./src/runtime/mod.ts",
+            "privateTypeRef": 2,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 2
+          },
+          {
+            "path": "./src/shutdown/mod.ts",
+            "privateTypeRef": 0,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 0
+          },
+          {
+            "path": "./src/state/mod.ts",
+            "privateTypeRef": 0,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 0
+          },
+          {
+            "path": "./src/stores/mod.ts",
+            "privateTypeRef": 0,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 0
+          },
+          {
+            "path": "./src/streams/mod.ts",
+            "privateTypeRef": 0,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 0
+          },
+          {
+            "path": "./src/telemetry/mod.ts",
+            "privateTypeRef": 1,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 1
+          },
+          {
+            "path": "./src/testing/mod.ts",
+            "privateTypeRef": 15,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 15
+          },
+          {
+            "path": "./src/workflow/mod.ts",
+            "privateTypeRef": 7,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 7
+          }
+        ],
+        "files": [
+          {
+            "path": "<worktree>/packages/plugin-workers-core/src/contracts/v1/workers.contract-types.ts",
+            "privateTypeRef": 2,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 2
+          }
+        ],
+        "combinedTotal": 2,
+        "combinedPrivateTypeRef": 2,
+        "combinedMissingJSDoc": 0,
+        "combinedOther": 0,
+        "combinedExitCode": 1,
+        "entrypointExitCodes": {
+          "./commands.ts": 0,
+          "./mod.ts": 1,
+          "./src/abstracts/mod.ts": 1,
+          "./src/builders/discovery.ts": 0,
+          "./src/builders/mod.ts": 1,
+          "./src/config/mod.ts": 0,
+          "./src/contracts/v1/mod.ts": 1,
+          "./src/domain/public-schema.ts": 0,
+          "./src/executor/mod.ts": 1,
+          "./src/presets/mod.ts": 1,
+          "./src/registry/mod.ts": 1,
+          "./src/runtime/mod.ts": 1,
+          "./src/shutdown/mod.ts": 0,
+          "./src/state/mod.ts": 0,
+          "./src/stores/mod.ts": 0,
+          "./src/streams/mod.ts": 0,
+          "./src/telemetry/mod.ts": 1,
+          "./src/testing/mod.ts": 1,
+          "./src/workflow/mod.ts": 1
+        }
+      }
+    ]
+  }
+}

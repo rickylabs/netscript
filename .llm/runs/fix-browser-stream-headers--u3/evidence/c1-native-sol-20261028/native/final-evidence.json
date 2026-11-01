@@ -1,0 +1,310 @@
+{
+  "capturedAt": "2026-10-28T00:55:17.789Z",
+  "head": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "sourceAcceptance": "PENDING root review; automated gates are not acceptance",
+  "sources": [
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "sha256": "fe27fb217d8b39c707c7d4bd4bd773d5bddd31fbb08573dc283820c34ada823f",
+      "lines": 228,
+      "snapshot": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/source-after/create-stream-db.ts"
+    },
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+      "sha256": "3dab3c70c9cd9298a43e2d9d240c577fef1d5ed1e5a76293487b090e18eb94bf",
+      "lines": 266,
+      "snapshot": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/source-after/create-stream-db_test.ts"
+    },
+    {
+      "path": "packages/fresh/tests/streamdb-headers-contract_test.ts",
+      "sha256": "c087155cf65e5b68f4872d2695957b30e3577627394b929e6c7a94fd6588ace8",
+      "lines": 478,
+      "snapshot": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/source-after/streamdb-headers-contract_test.ts"
+    },
+    {
+      "path": "packages/fresh/tests/_fixtures/stream-db-test-runtime.ts",
+      "sha256": "e83c140f5770a509fef2ff80a0494f0fe503a97af0195930479e14c1d1b4f5bb",
+      "lines": 80,
+      "snapshot": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/source-after/stream-db-test-runtime.ts"
+    },
+    {
+      "path": "packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts",
+      "sha256": "4ffadae7cfef4d983f156d21378d1e4c2633b86c9ceb5f15a5ba978790bb870d",
+      "lines": 87,
+      "snapshot": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/source-after/streamdb-wrapper_type.ts"
+    }
+  ],
+  "protectedResults": [
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\packages\\fresh\\src\\runtime\\streams\\create-stream-db.ts",
+      "sha256": "fe27fb217d8b39c707c7d4bd4bd773d5bddd31fbb08573dc283820c34ada823f",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\packages\\fresh\\tests\\_fixtures\\stream-db-test-runtime.ts",
+      "sha256": "e83c140f5770a509fef2ff80a0494f0fe503a97af0195930479e14c1d1b4f5bb",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\.llm\\tmp\\browser-stream-headers-u3-c1\\continuation-2\\gate.ts",
+      "sha256": "e6b3569612c9cd3eefb3ac158c8d3b5b1a9c5fcb33311e124583db76796dd1e8",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\deno.json",
+      "sha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\deno.lock",
+      "sha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\.agents\\skills\\netscript-harness\\SKILL.md",
+      "sha256": "09fb65b00dc0c2a7f8df6aa8f815af91219b0ede2ab0e846bf09091b268eb215",
+      "unchanged": true
+    }
+  ],
+  "finalGates": [
+    {
+      "selected": "tests",
+      "path": ".llm/tmp/browser-stream-headers-u3-c1/gates/tests-1793148827425.json",
+      "sha256": "1374c966d463c3f693831f24afcf3e09b201fe975779df631c3bba4b00126540",
+      "results": [
+        {
+          "args": [
+            "run",
+            "--frozen",
+            "--allow-all",
+            ".llm/tools/run-deno-test.ts",
+            "--",
+            "--frozen",
+            "--allow-all",
+            "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+            "packages/fresh/src/runtime/streams/stream-db-recovery-adapter_test.ts",
+            "packages/fresh/tests/streamdb-headers-contract_test.ts"
+          ],
+          "code": 0,
+          "started": "2026-10-28T00:53:47.425Z",
+          "ended": "2026-10-28T00:53:56.474Z",
+          "originalChildStatusAwaited": true,
+          "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/tests-1793148827425-0.stdout",
+          "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/tests-1793148827425-0.stderr"
+        }
+      ]
+    },
+    {
+      "selected": "types",
+      "path": ".llm/tmp/browser-stream-headers-u3-c1/gates/types-1793148837254.json",
+      "sha256": "abb513be0d4dd412b2d6f5048f5ed903c9fce89a93320a878e3043d267e50565",
+      "results": [
+        {
+          "args": [
+            "run",
+            "--frozen",
+            "--allow-all",
+            ".llm/tools/run-deno-check.ts",
+            "--file",
+            "packages/fresh/src/runtime/streams/create-stream-db.ts",
+            "--file",
+            "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+            "--file",
+            "packages/fresh/tests/streamdb-headers-contract_test.ts",
+            "--file",
+            "packages/fresh/tests/_fixtures/stream-db-test-runtime.ts",
+            "--deno-arg",
+            "--frozen"
+          ],
+          "code": 0,
+          "started": "2026-10-28T00:53:57.254Z",
+          "ended": "2026-10-28T00:53:59.052Z",
+          "originalChildStatusAwaited": true,
+          "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/types-1793148837254-0.stdout",
+          "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/types-1793148837254-0.stderr"
+        }
+      ]
+    },
+    {
+      "selected": "consumer",
+      "path": ".llm/tmp/browser-stream-headers-u3-c1/gates/consumer-1793148839823.json",
+      "sha256": "33421dac22a4761221e3d6d95719f20931fe27fbc919717b6c0a6a5625bcbf75",
+      "results": [
+        {
+          "args": [
+            "task",
+            "--cwd",
+            "packages/fresh",
+            "check:streams-types"
+          ],
+          "code": 0,
+          "started": "2026-10-28T00:53:59.823Z",
+          "ended": "2026-10-28T00:54:00.110Z",
+          "originalChildStatusAwaited": true,
+          "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/consumer-1793148839823-0.stdout",
+          "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/consumer-1793148839823-0.stderr"
+        }
+      ]
+    },
+    {
+      "selected": "lint",
+      "path": ".llm/tmp/browser-stream-headers-u3-c1/gates/lint-1793148840849.json",
+      "sha256": "3af00f640e8162c69a4366ada28ab1e0b67fe6e96a3e94f0dabecc2db41629ed",
+      "results": [
+        {
+          "args": [
+            "run",
+            "--frozen",
+            "--allow-all",
+            ".llm/tools/run-deno-lint.ts",
+            "--file",
+            "packages/fresh/src/runtime/streams/create-stream-db.ts",
+            "--file",
+            "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+            "--file",
+            "packages/fresh/tests/streamdb-headers-contract_test.ts",
+            "--file",
+            "packages/fresh/tests/_fixtures/stream-db-test-runtime.ts",
+            "--ext",
+            "ts"
+          ],
+          "code": 0,
+          "started": "2026-10-28T00:54:00.849Z",
+          "ended": "2026-10-28T00:54:01.297Z",
+          "originalChildStatusAwaited": true,
+          "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/lint-1793148840849-0.stdout",
+          "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/lint-1793148840849-0.stderr"
+        },
+        {
+          "args": [
+            "lint",
+            "--no-config",
+            "packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts"
+          ],
+          "code": 0,
+          "started": "2026-10-28T00:54:01.298Z",
+          "ended": "2026-10-28T00:54:01.327Z",
+          "originalChildStatusAwaited": true,
+          "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/lint-1793148840849-1.stdout",
+          "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/lint-1793148840849-1.stderr"
+        }
+      ]
+    },
+    {
+      "selected": "fmt",
+      "path": ".llm/tmp/browser-stream-headers-u3-c1/gates/fmt-1793148842004.json",
+      "sha256": "3208343b900c9804054766d2ab55a070c73c1cd2e3cbba4bbd4f6c2f312731b3",
+      "results": [
+        {
+          "args": [
+            "run",
+            "--frozen",
+            "--allow-all",
+            ".llm/tools/run-deno-fmt.ts",
+            "--file",
+            "packages/fresh/src/runtime/streams/create-stream-db.ts",
+            "--file",
+            "packages/fresh/src/runtime/streams/create-stream-db_test.ts",
+            "--file",
+            "packages/fresh/tests/streamdb-headers-contract_test.ts",
+            "--file",
+            "packages/fresh/tests/_fixtures/stream-db-test-runtime.ts",
+            "--ext",
+            "ts"
+          ],
+          "code": 0,
+          "started": "2026-10-28T00:54:02.004Z",
+          "ended": "2026-10-28T00:54:02.223Z",
+          "originalChildStatusAwaited": true,
+          "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/fmt-1793148842004-0.stdout",
+          "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/fmt-1793148842004-0.stderr"
+        },
+        {
+          "args": [
+            "fmt",
+            "--no-config",
+            "--single-quote",
+            "--line-width",
+            "100",
+            "--check",
+            "packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts"
+          ],
+          "code": 0,
+          "started": "2026-10-28T00:54:02.224Z",
+          "ended": "2026-10-28T00:54:02.254Z",
+          "originalChildStatusAwaited": true,
+          "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/fmt-1793148842004-1.stdout",
+          "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/fmt-1793148842004-1.stderr"
+        }
+      ]
+    },
+    {
+      "selected": "quality",
+      "path": ".llm/tmp/browser-stream-headers-u3-c1/gates/quality-1793148842970.json",
+      "sha256": "0a4f1d4bc5da9e7e64ded1979f4b5599c37cbe1a2a87bc19f87db884bf572778",
+      "results": [
+        {
+          "args": [
+            "run",
+            "--frozen",
+            "--allow-all",
+            ".llm/tools/quality/scan-code-quality.ts",
+            "--root",
+            "packages/fresh",
+            "--max-allow",
+            "7"
+          ],
+          "code": 0,
+          "started": "2026-10-28T00:54:02.970Z",
+          "ended": "2026-10-28T00:54:03.411Z",
+          "originalChildStatusAwaited": true,
+          "stdoutPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/quality-1793148842970-0.stdout",
+          "stderrPath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gates/quality-1793148842970-0.stderr"
+        }
+      ]
+    }
+  ],
+  "exactDiffPass": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/diff-successor-attempt2.log",
+  "exactDiffSuccessorReceipt": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/gate-successor-receipt.json",
+  "testResult": {
+    "passed": 20,
+    "failed": 0,
+    "ignored": 0,
+    "newRegistrations": 6,
+    "sanitizeOps": true,
+    "sanitizeResources": true,
+    "sanitizeExit": true
+  },
+  "cleanupEvidence": "Native read signals asserted aborted, delegated fetch promises awaited, unlocked responses cancelled, unread locked bodies fail; all sanitizers passed. Native compiler Command.output is awaited with a 30-second AbortController deadline and cleared timer. Deadline fault injection was not run.",
+  "preservedLegacyEvidence": [
+    {
+      "path": ".llm/tmp/browser-stream-headers-u3-c1/gates/red-1793140216669.json",
+      "sha256": "0e475e666f91cf3ca6794f4843343670dbba3788e99148192d06a9baf9e18224"
+    },
+    {
+      "path": ".llm/tmp/browser-stream-headers-u3-c1/gates/red-1793140599170.json",
+      "sha256": "b16e8c7d203ad2f07e0de51cc50257442976b18be1dfac6588a30c0ed3b14cc4"
+    },
+    {
+      "path": ".llm/tmp/browser-stream-headers-u3-c1/gates/tests-1793140600861.json",
+      "sha256": "2aa4f6b58237818ebd78684f7d4b494e643ed4c717221bf85053dab5a4d0a497"
+    },
+    {
+      "path": ".llm/tmp/browser-stream-headers-u3-c1/gates/tests-1793140734875.json",
+      "sha256": "b7581c820bdfd00ae5cb5ff89f0fccb6dee00eeceb41b02b7133cf6bfea12395"
+    },
+    {
+      "path": ".llm/tmp/browser-stream-headers-u3-c1/gates/tests-1793144509820.json",
+      "sha256": "5b1827c0c5fee0c020ba592326cc5e2e601484d2ff4681ba0110548229fe3f78"
+    },
+    {
+      "path": ".llm/tmp/browser-stream-headers-u3-c1/gates/tests-1793144524427.json",
+      "sha256": "4a43b0b72d99472333e5303a696ecb02770301ebb6bb0fcd308b6c62d048018b"
+    },
+    {
+      "path": ".llm/tmp/browser-stream-headers-u3-c1/gates/tests-1793144583715.json",
+      "sha256": "ab93ae572e71aa579a3c5dd16af5c9dc428c1604718aa26621b95ac509d32382"
+    }
+  ],
+  "noCommitPushC2OrF15": true
+}

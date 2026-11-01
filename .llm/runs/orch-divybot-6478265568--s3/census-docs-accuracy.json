@@ -1,0 +1,12 @@
+{
+  "gateId": "docs-accuracy",
+  "argv": [
+    "deno",
+    "task",
+    "docs:accuracy"
+  ],
+  "gitHead": "8f9394c7146fda19c621acabebc7588310795f42",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "durationMs": 5541
+}

@@ -1,0 +1,32 @@
+﻿[
+    {
+        "path":  "packages/service/tests/legacy-abort_test.ts",
+        "u2":  "AA504CEB712A6B9228580151E655FB629B9E30DD2EB943F86D0EF104F7A05D14",
+        "u1":  "AA504CEB712A6B9228580151E655FB629B9E30DD2EB943F86D0EF104F7A05D14",
+        "match":  true
+    },
+    {
+        "path":  "packages/service/tests/body-limit_test.ts",
+        "u2":  "91877EE10614193217271A0FF299C1E9AA155EAF4A6092720C058568AE171E66",
+        "u1":  "91877EE10614193217271A0FF299C1E9AA155EAF4A6092720C058568AE171E66",
+        "match":  true
+    },
+    {
+        "path":  "packages/service/tests/define-service_test.ts",
+        "u2":  "4CE566039D75488F81EDA1EF89998E2DDD2FC437A9947439B50597BDE4165686",
+        "u1":  "4CE566039D75488F81EDA1EF89998E2DDD2FC437A9947439B50597BDE4165686",
+        "match":  true
+    },
+    {
+        "path":  "packages/service/tests/rate-limit-address-key_test.ts",
+        "u2":  "B34460A150DC9772BC59C4209C7664A246539233AB98EFC3139E617B79BE490E",
+        "u1":  "B34460A150DC9772BC59C4209C7664A246539233AB98EFC3139E617B79BE490E",
+        "match":  true
+    },
+    {
+        "path":  "packages/plugin/tests/service/create-plugin-service-auth_test.ts",
+        "u2":  "44CD3C3533966FEC794892B3E24E574AAF0AE809E875A11AF04BD18E68DA94C3",
+        "u1":  "44CD3C3533966FEC794892B3E24E574AAF0AE809E875A11AF04BD18E68DA94C3",
+        "match":  true
+    }
+]

@@ -1,0 +1,187 @@
+{
+  "baselineBridge": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 0
+    },
+    "durationMs": 3617
+  },
+  "fixedBridge": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 0
+    },
+    "durationMs": 1613
+  },
+  "invertedGuard": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 1,
+      "failed": 16,
+      "ignored": 0,
+      "totalResults": 17,
+      "uniqueFailures": 2
+    },
+    "durationMs": 1117,
+    "failures": [
+      {
+        "message": "Error: Could not parse rendered fixture\n    at article (file://<cwd>/_plugins/markdown-render-fixture.ts:<line>:<column>)\n    at file://<cwd>/_plugins/markdown-render-fixture.ts:<line>:<column>",
+        "count": 14,
+        "tests": [
+          {
+            "name": "a tree fence renders the fileTree component and leaves other fences alone",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 82
+          },
+          {
+            "name": "a tree fence renders exactly what comp.fileTree renders for the same nodes",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 102
+          },
+          {
+            "name": "comp.fileTree still accepts a single root `tree` argument",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 134
+          },
+          {
+            "name": "an ASCII tree fence renders the same component as the Unicode one",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 144
+          },
+          {
+            "name": "an empty or malformed tree fence warns and renders as plain text",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 159
+          },
+          {
+            "name": "each alert type renders the callout markup",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 194
+          },
+          {
+            "name": "a bold first paragraph becomes the title, in either GitHub-compatible form",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 244
+          },
+          {
+            "name": "bold text is body, not title, when it is all the body or not the whole paragraph",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 261
+          },
+          {
+            "name": "quotes GitHub does not render as alerts stay plain blockquotes and warn",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 273
+          },
+          {
+            "name": "alerts inside HTML containers stay plain and warn until the container closes",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 293
+          },
+          {
+            "name": "void tags, closed tags and HTML comments do not contain later alerts",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 324
+          },
+          {
+            "name": "escaped strong delimiters and extra inline tokens stay in the body",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 333
+          },
+          {
+            "name": "a parsed text title is escaped without interpreting its text again",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 351
+          },
+          {
+            "name": "ordinary blockquotes are untouched and do not warn",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 358
+          }
+        ]
+      },
+      {
+        "message": "Error: Could not parse rendered fixture\n    at article (file://<cwd>/_plugins/markdown-render-fixture.ts:<line>:<column>)\n    at twin (file://<cwd>/_plugins/markdown-render-fixture.ts:<line>:<column>)\n    at file://<cwd>/_plugins/markdown-render-fixture.ts:<line>:<column>",
+        "count": 2,
+        "tests": [
+          {
+            "name": "the Markdown twin keeps a tree fence as its ASCII text",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 154
+          },
+          {
+            "name": "the Markdown twin writes alerts back as authored",
+            "file": "./_plugins/markdown-render-fixture.ts",
+            "line": 365
+          }
+        ]
+      }
+    ]
+  },
+  "restoredFixture": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 17,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 17,
+      "uniqueFailures": 0
+    },
+    "durationMs": 306
+  },
+  "baselineRepositoryQuality": {
+    "gateId": "quality-scan-repo",
+    "outcome": "FAIL",
+    "exitCode": 1,
+    "gitHead": "693ad46eaf8d15c50bc0e52b7d38b8458de10338",
+    "durationMs": 5167,
+    "sourceState": "clean bootstrap",
+    "ok": false,
+    "mode": "repository",
+    "scanned": [
+      "packages",
+      "plugins",
+      ".llm/tools/fitness",
+      ".llm/tools/quality",
+      "docs/site"
+    ],
+    "findings": [
+      {
+        "rule": "unsafe-cast",
+        "file": "docs/site/_plugins/markdown-render-fixture.ts",
+        "line": 48,
+        "text": "return element as unknown as Element;"
+      }
+    ],
+    "allowCount": 7,
+    "allowanceFailures": []
+  },
+  "fixedWorkingTreeRepositoryQuality": {
+    "gateId": "quality-scan-repo",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "693ad46eaf8d15c50bc0e52b7d38b8458de10338",
+    "durationMs": 2685,
+    "sourceState": "modified fixture before implementation commit",
+    "ok": true,
+    "mode": "repository",
+    "scanned": [
+      "packages",
+      "plugins",
+      ".llm/tools/fitness",
+      ".llm/tools/quality",
+      "docs/site"
+    ],
+    "findings": [],
+    "allowCount": 7,
+    "allowanceFailures": []
+  }
+}

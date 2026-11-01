@@ -1,0 +1,9 @@
+﻿# @netscript/service@0.0.8
+  root: packages/service
+  exports: ., ./auth, ./rpc-path, ./internal-credential, ./commands, ./commands/testing, ./commands/relay, ./rate-limit
+  files=125 loc=19753
+  docs: README=true(720L) docs/=false desc=99c
+  tests: 45 files
+  surface: .=25, ./auth=14, ./rpc-path=4, ./internal-credential=4, ./commands=7, ./commands/testing=7, ./commands/relay=3, ./rate-limit=4
+  dry-run: OK slowTypeWarnings=0
+  findings: 0

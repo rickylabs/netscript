@@ -6,10 +6,11 @@
   font-size: var(--ns-text-sm);
   color: var(--ns-fg);
   background: var(--ns-card);
-  border: 1px solid var(--ns-input-border);
-  border-radius: var(--ns-radius-md);
+  border: var(--ns-border-width) solid var(--ns-component-input-border);
+  border-radius: var(--ns-component-input-radius);
   padding: var(--ns-space-2) var(--ns-space-3);
-  transition: border-color var(--ns-ease-normal), box-shadow var(--ns-ease-normal);
+  transition: border-color var(--ns-motion-duration-normal) var(--ns-motion-easing-normal),
+    box-shadow var(--ns-motion-duration-normal) var(--ns-motion-easing-normal);
 }
 
 .ns-input::placeholder,
@@ -43,14 +44,77 @@
   cursor: not-allowed;
 }
 
-.ns-input--error,
-.ns-select--error,
-.ns-textarea--error {
+:where(.ns-input)[data-invalid='true'],
+:where(.ns-select)[data-invalid='true'],
+:where(.ns-textarea)[data-invalid='true'] {
   border-color: var(--ns-destructive);
 }
 
-.ns-input--error:focus,
-.ns-select--error:focus,
-.ns-textarea--error:focus {
+:where(.ns-input)[data-invalid='true']:focus,
+:where(.ns-select)[data-invalid='true']:focus,
+:where(.ns-textarea)[data-invalid='true']:focus {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--ns-destructive) 15%, transparent);
+}
+
+:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark']) :is(.ns-input, .ns-select) {
+  min-height: var(--ns-component-input-height);
+  padding-inline: var(--ns-control-padding-x);
+}
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-body);
+  line-height: var(--ns-leading-body);
+  font-weight: var(--ns-weight-body);
+  letter-spacing: var(--ns-tracking-body);
+  background: var(--ns-card);
+  border-color: var(--ns-input-border);
+  border-radius: var(--ns-radius-input);
+  border-width: var(--ns-border-width);
+  padding-inline: var(--ns-control-padding-x);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root']:where(:hover):not(:disabled) {
+  border-color: var(--ns-border-control);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root']:focus {
+  border-color: var(--ns-input-border);
+  box-shadow: none;
+  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+  outline-offset: var(--ns-focus-ring-offset);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root'][data-invalid='true'] {
+  border-color: var(--ns-destructive);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root'][data-invalid='true']:focus {
+  border-color: var(--ns-destructive);
+  box-shadow: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root']:disabled {
+  background: var(--ns-muted);
+  color: var(--ns-muted-fg);
+  border-color: var(--ns-border);
+  outline: none;
+  box-shadow: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='input'][data-part='root'] {
+  height: var(--ns-control-height);
+  padding-block: 0;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='select'][data-part='root'] {
+  height: var(--ns-control-height);
+  padding-block: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root'] {
+    transition: none;
+  }
 }

@@ -1,0 +1,1 @@
+{"ok":true,"mode":"repository","scanned":["plugins/workers"],"findings":[],"allowCount":1,"allowances":[{"file":"plugins/workers/streams/producer.ts","line":52,"issue":1276,"reason":"durable-stream mutation hook upstream type omits the worker execution extension fields"}],"allowanceFailures":[]}

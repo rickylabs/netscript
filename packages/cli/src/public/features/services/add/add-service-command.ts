@@ -1,4 +1,5 @@
-import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
+import { renderDoctorReport } from '../../../../kernel/presentation/output/render-doctor-report.ts';
+import type { CliffyCommand } from '../../../../kernel/presentation/command-types.ts';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
@@ -55,6 +56,7 @@ export function createServiceAddCommand(
       print(`Created ${result.contract.scaffoldResult.filesCreated.length} contract files.`);
       print(`Created ${result.service.scaffoldResult.filesCreated.length} service files.`);
       print(`Regenerated ${result.helperFiles.length} Aspire helper files.`);
+      renderDoctorReport(result.browserAuthReport, print);
       if (result.clientPath) print(`Created typed client helpers at ${result.clientPath}.`);
     });
 }

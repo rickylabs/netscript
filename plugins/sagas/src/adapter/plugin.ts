@@ -81,16 +81,18 @@ const sagaRegistryChecks: readonly DoctorCheckSpec[] = [{
     };
   },
 }, {
-  name: 'generated saga registry is non-empty',
+  name: 'generated saga registry is initialized',
   async run(context) {
     const source = await readSagaRegistry(context);
     const populated = source !== undefined && /const entries[^=]*=\s*\[\s*\[/.test(source);
     return {
-      name: 'generated saga registry is non-empty',
-      ok: populated,
+      name: 'generated saga registry is initialized',
+      ok: populated || isEmptySagaRegistry(source),
       message: populated
         ? 'Generated saga definitions are present.'
-        : `No generated sagas are registered. Run: ${GENERATE_SAGA_REGISTRY}`,
+        : isEmptySagaRegistry(source)
+        ? 'Empty saga registry; the runner can start idle with zero definitions.'
+        : `Saga registry is incomplete. Run: ${GENERATE_SAGA_REGISTRY}`,
     };
   },
 }, {
@@ -102,7 +104,7 @@ const sagaRegistryChecks: readonly DoctorCheckSpec[] = [{
     const loadable = source !== undefined &&
       source.includes('export const sagaRegistry') &&
       source.includes('export const registry') &&
-      declared > 0 && registered === declared * 2;
+      (declared > 0 || isEmptySagaRegistry(source)) && registered === declared * 2;
     return {
       name: 'every declared saga is registered',
       ok: loadable,
@@ -112,6 +114,14 @@ const sagaRegistryChecks: readonly DoctorCheckSpec[] = [{
     };
   },
 }];
+
+/** Recognize the complete empty output shared by both saga registry writers. */
+function isEmptySagaRegistry(source: string | undefined): boolean {
+  return source !== undefined &&
+    /const entries[^=]*=\s*\[\s*\]/.test(source) &&
+    source.includes('export const sagaRegistry') &&
+    source.includes('export const registry');
+}
 
 /** Thin connector object consumed by `@netscript/plugin/adapter`. */
 export const sagasAdapterPlugin: NetScriptPlugin = {

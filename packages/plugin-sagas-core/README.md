@@ -275,7 +275,7 @@ Migrate the shipped `plugins/sagas/database/sagas.prisma` runtime models, includ
 `SagaRuntimeCommandAppliedKey`, and the command outbox schema before selecting this adapter. The
 reviewed PostgreSQL fixture migrations under `tests/fixtures/transition-store/` show the incremental
 replay addition and existing runtime layout; production construction performs no DDL. The marker
-covers this command-transition protocol only and does not implement general Prisma idempotency
+covers canonical saga transitions and does not implement general transport idempotency
 parity. Deleting a saga instance retains committed outbox commands and replay markers for their
 independent delivery lifetime. The host owns provider connections and shutdown.
 
@@ -283,6 +283,23 @@ Use the C5 command relay and its checked worker receipt sink for delivery. Deliv
 once; exactly once effective application additionally requires durable downstream idempotency. The
 saga package adds no relay timer, leasing, retry or settlement loop. Worker progress continues
 through the native durable execution stream; worker completion uses `publishSagaOrThrow()`.
+
+## PostgreSQL command retention
+
+The sagas plugin contributes `NetScriptCommandOutbox` and `SagaRuntimeCommandAppliedKey` through
+its installed Prisma schema. SQL sidecars supply the reviewed outbox CHECK constraints; the normal
+application migration command appends pending contributions before deployment. Existing equivalent
+copied models are deduplicated without dropping their tables.
+
+Use `createPrismaSagaCommandRetention` from `@netscript/plugin-sagas-core/stores` in the existing
+background retention job. Pass the saga groups' completed-days policy as
+`completedRetentionDaysBySaga` (seven-day default), and persist `nextCursor` between invocations.
+Each page examines/deletes at most 100 rows per family. Pending/leased outbox records and active
+saga markers survive; terminal marker age starts at completion, and deletion rechecks fresh state.
+Keep canonical state until replay markers are gone. The shared outbox window defaults to the
+longest configured saga window.
+
+See the [schema, migration and cursor recipe](https://rickylabs.github.io/netscript/reference/plugin-sagas-core/#installed-outbox-schema-and-postgresql-retention).
 
 ## KV retention
 
@@ -367,3 +384,33 @@ patterns for the plugin SDK `additionalBuilders` option. `defineSaga` → `sagas
 excluded (no independent contribution id), `defineQuery` → excluded (no independent contribution
 id). The CLI composes first-party metadata before walking the project, independently of plugin
 update order.
+
+### Atomic applied keys and transition persistence
+
+Every configured native saga store must implement `SagaTransitionCommitPort` with atomic state
+and replay support (`isSagaAtomicStore`). The engine commits the applied digest, next envelope,
+correlation ownership and transition history together **after** a handler succeeds. A handler error,
+failed write or process kill before that commit leaves the message eligible for redelivery. A
+committed key makes redelivery a no-op; concurrent writers still arbitrate through the atomic
+version check. Handlers must remain pure because an uncommitted handler can run again.
+
+`KvSagaStore` supports this protocol over persisted Deno KV and Redis. Its committed digests live
+under a separate nested namespace within the existing `applied` retention family. Legacy bridge
+reservations and raw applied-key records are ignored by stored sagas, including after an upgrade.
+Open-instance digests remain durable; terminal digests follow the configured completed retention.
+
+`PrismaSagaStore` requires the shipped `SagaRuntimeCommandAppliedKey` model and its generated
+`findUnique`/`createMany` delegates. It uses one interactive transaction and conflict-ignore inserts
+for replay. Hosts own Prisma marker/history retention through `createPrismaSagaCommandRetention`;
+the ordinary durable runtime does not start that retention loop automatically. Existing hosts must
+apply the shipped replay-marker migration and regenerate their Prisma client before upgrading.
+
+KV and ordinary Prisma advertise `transitionOutbox: 'unsupported'` and reject worker-command intents
+before writing any rows. `isSagaTransitionStore` remains the stricter worker-command capability;
+use `createPrismaSagaTransitionStore` for atomic worker commands. Custom stores must migrate to the
+atomic commit contract before registration. Projection and recording decorators preserve their
+delegate's exact guarantees.
+
+Scheduled and cascaded effects still dispatch after the transition commit. Recovery across a crash
+in that later window requires the separate `SagaOutboxPort` dispatcher follow-up tracked by #2159.
+This state/replay change does not claim recoverable delivery of those effects.

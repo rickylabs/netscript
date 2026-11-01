@@ -24,11 +24,10 @@ export function Separator(
       {...props}
       role='separator'
       aria-orientation={orientation}
-      class={cn(
-        'ns-separator',
-        orientation === 'vertical' && 'ns-separator--vertical',
-        className,
-      )}
+      class={cn('ns-separator', className)}
+      data-orientation={(orientation === 'vertical') ? ('vertical') : undefined}
+      data-part='root'
+      data-scope='separator'
     />
   );
 }

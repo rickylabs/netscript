@@ -1,0 +1,604 @@
+- Every exported function has at least one `@example`.
+- The total exported symbol count per `mod.ts` is ≤ 20 (or split into subpaths).
+
+This is the single most important fitness function: it is what turns "good docs" from aspiration
+into a measurable score.
+
+### F-6. JSR publishability gate
+
+`deno publish --dry-run` runs in CI for every package. Slow types and unportable filenames fail the
+build.
+
+### F-7. Doc-score gate
+
+JSR's documentation score must be 100 for stable packages. Below 100 is a failed build for stable;
+experimental packages must declare `@experimental` in JSDoc.
+
+### F-8. Workspace `lib` override check
+
+For each member `deno.json` whose `compilerOptions.lib` overrides the root, verify it includes
+`"deno.unstable"`.
+
+### F-9. Permission declaration check
+
+Each package's README has a "Required permissions" block. CI parses it and asserts it matches the
+actual `Deno.*` calls in the package's source. Mismatch fails the build.
+
+### F-10. Test-shape audit
+
+Static check that no `_test.ts` exceeds 500 LOC. Test files that fail are flagged for splitting.
+
+### F-11. Forbidden-folder lint
+
+Forbids `utils/`, `common/`, `lib/`, `helpers/`, `interfaces/` under `packages/*/src/`. Allows
+`application/`, `adapters/`, `domain/`, `ports/`, `runtime/`, `state/`, `middleware/`, `presets/`,
+`registry/`, `diagnostics/`, `presentation/`, `testing/`, `internal/` per the role vocabulary.
+
+### F-12. Naming-convention lint
+
+Forbids `interface I*`, `type *_T`, `class *Impl`, `class Abstract*` where the class is not actually
+abstract.
+
+### F-13. Saga and runtime invariants
+
+Custom checks for stateful packages:
+
+- Every `defineSaga()` declaration has at least one terminal transition.
+- Every `defineWorker()` declares a retry policy.
+- Every long-running runtime exposes a `stop()` method.
+- Every async public method whose body performs IO accepts an `AbortSignal`.
+
+### F-14. Console-log lint
+
+Forbids `console.*` outside `presentation/` and `examples/`.
+
+### F-15. Re-export-of-upstream lint
+
+Forbids `export * from 'npm:...'` and `export { ... } from 'jsr:...'` when the source is not a
+`@netscript/*` package or `@std/*`.
+
+### F-16. Folder-cardinality lint
+
+Walks every directory under `packages/*/src/` and `plugins/*/src/`. Fails any directory with more
+than 12 immediate children (combined files + subdirectories) and any path nested more than 4 levels
+below `src/`. Maps to AP-21 and R-FOLD-CARD.
+
+Per-archetype overrides may relax the cap (e.g. an `assets/` folder of `.template` files is exempt,
+declared in the archetype doc). The override is named, not implicit.
+
+### F-17. Abstract-derived co-location lint
+
+For each `abstract class X` declared under `packages/*/src/`:
+
+- Locate every `class Y extends X` in the same package.
+- If the count of concrete subclasses is ≥ 2, assert the abstract and all subclasses live in the
+  same folder.
+- The folder name is the plural concept (heuristic: matches `<concept-name>s` or
+  `<concept-name>-<plural-suffix>`).
+
+Maps to R-FOLD-AD-COLOC. Implemented via the TypeScript compiler API.
+
+### F-18. Sub-barrel lint
+
+Forbids `mod.ts` and `index.ts` files inside `packages/*/src/**` _subdirectories_ (depth ≥ 2 from
+the package root). Allowed locations: package-root `mod.ts`, files declared as a subpath export in
+the package's `deno.json`, the package's `extension-points.ts`, and `testing.ts`. Maps to AP-22.
+
+A sub-barrel that genuinely aggregates (constructs one symbol from many, not just re-exports) is
+allowed via a `// arch:barrel-ok
+<reason>` comment, recorded in the audit registry.
+
+### F-19. Scoped source gate runners
+
+Check, lint, and formatting evidence for package/plugin quality runs targets source TypeScript, not
+the whole repository by directory accident. The gates run over `.ts` and `.tsx` source under the
+owned or current-wave package/plugin roots, exclude generated output (`.generated/`, generated
+client trees, scaffold scratch), and exclude future-wave packages that the current plan does not
+own.
+
+Doctrine-root discovery covers the top-level units under `packages/*` and `plugins/*`. The nested
+`packages/cli/e2e` workspace member is an end-to-end harness for the CLI, not an independently
+published top-level doctrine unit, so it is intentionally excluded from that root set.
+
+Raw root `deno check .`, `deno lint`, or `deno fmt --check` over scratch workspaces, copied
+templates, generated output, Markdown, or legacy line-ending-only drift is not a package-quality
+verdict source unless the plan explicitly owns a repo-wide normalization pass. For ordinary
+package-quality work, use the scoped wrapper family:
+
+```powershell
+deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root <pkg> --ext ts,tsx --exclude <generated-or-future-wave-regex>
+deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root <pkg> --ext ts,tsx --exclude <generated-or-future-wave-regex>
+deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root <pkg> --ext ts,tsx --exclude <generated-or-future-wave-regex>
+```
+
+## How fitness functions ship
+
+The doctrine prescribes the _checks_; implementation lives in `.llm/tools/`:
+
+- `check-file-sizes.ts`
+- `check-helper-reinvention.ts`
+- `check-layering.ts`
+- `check-inheritance.ts`
+- `check-doc-coverage.ts`
+- `check-workspace-lib.ts`
+- `check-naming.ts`
+- `check-saga-invariants.ts`
+- `check-console-usage.ts`
+- `check-upstream-reexport.ts`
+- `check-folder-cardinality.ts`
+- `check-abstract-coloc.ts`
+- `check-sub-barrels.ts`
+
+Each script:
+
+- runs as `deno task arch:check:<name>`,
+- emits structured JSON output compatible with the `.llm/tools/run-deno-*.ts` wrapper family,
+- exits non-zero on violation,
+- supports a `--allow <package>` opt-out (with mandatory justification recorded in
+  `.llm/arch-debt.md`).
+
+A composite task `deno task arch:check` runs all of them.
+
+## Architectural debt as a registry
+
+When a violation is acknowledged but cannot be fixed in the same PR, it is recorded in
+`.llm/arch-debt.md`:
+
+```md
+## packages/cli/src/commands/init/pipeline.ts — AP-1 (1,869 LOC)
+
+- Reason: pending refactor under refactor/cli-e2e-validation-suite
+- Owner: <name>
+- Target: split per concern by 2026-Q3
+- Linked plan: .llm/tmp/run/refactor-cli-e2e-validation-suite/plan.md
+```
+
+The registry is the doctrine's pressure release. Without it, the gates either become noise (silenced
+everywhere) or block work (blocking everywhere). With it, debt is _named_, _owned_, and
+_time-bounded_.
+
+## Fitness-function checklist for review
+
+- [ ] PR runs `deno task arch:check`. All checks pass or are explicitly opted-out with a
+      `arch-debt.md` entry.
+- [ ] New code never introduces a new `arch-debt.md` entry without a time-bounded plan.
+- [ ] Removed `arch-debt.md` entries match the fix in the PR.
+- [ ] New fitness functions added in the same PR as the doctrine change that motivated them (gates
+      and rules ship together).
+
+
+## .llm/harness/evaluator/protocol.md
+
+Original-byte SHA256:cf48f3132820c2a6f492462b9701ecd45947c3e0cf96316fa04ecf3a26709241
+
+# Evaluator Protocol
+
+This protocol governs **IMPL-EVAL**, the **final** evaluator pass. The Plan-Gate's **PLAN-EVAL** is
+a separate, earlier pass governed by `plan-protocol.md`. Both passes are separate sessions.
+
+The evaluator is a separate session from the generator. Its job is to verify the approved plan
+against the changed state, not to continue implementation.
+
+Select the evaluator from the run's workload tier in `workflow/lane-policy.md`. The typed resolver
+must skip any candidate from the selected generator's vendor family, then choose the first healthy,
+capable, allowance-proven transport in the canonical provider order. Never infer a model, effort,
+transport, or fallback from historical lane names.
+
+`complex` and `architecture` are privileged rows. Do not select either from inferred complexity: the
+run must contain explicit owner or milestone-coordinator authorization and its rationale. When that
+evidence is absent, evaluation is capped at the `feature` row.
+
+The supervisor triggers the evaluator; a sub-agent never auto-dispatches one. Record the tier,
+phase, fallback reason, requested and observed route identity, session, exact head, and expense
+decision where a paid OpenCode route is selected. OpenRouter paid-training eligibility is allowed by
+owner preference and is not a routing blocker.
+
+IMPL-EVAL remains mandatory unless the owner explicitly waives it. Re-steer the same evaluator
+session after a failure and obey the tier-specific loop limit:
+
+- simple: the owner did not specify a maximum; record this explicitly rather than inventing one;
+- straightforward, feature, complex: maximum five, notify the owner after three;
+- architecture: maximum three, notify the owner after two;
+- documentation: use the tier's policy with a hard maximum of two.
+
+These notification points do not freeze unrelated work and do not replace a smaller explicit limit.
+The selected generator and evaluator must remain different vendor families in every cycle.
+
+## Required Inputs
+
+| Input                                        | Required                    | Purpose                                                |
+| -------------------------------------------- | --------------------------- | ------------------------------------------------------ |
+| `workflow/run-loop.md`                       | yes                         | run-loop phases and design checkpoint rules            |
+| `verdict-definitions.md`                     | yes                         | verdict rules                                          |
+| selected archetype profile                   | yes for package/plugin work | doctrine gates, concept of done, and false-done states |
+| selected scope overlays                      | when applicable             | frontend/service/docs gates                            |
+| run `plan.md`                                | yes                         | approved scope                                         |
+| run `plan-eval.md`                           | when PLAN-EVAL selected     | conditional planning verdict                           |
+| run `worklog.md`                             | yes                         | design checkpoint and generator evidence               |
+| run `context-pack.md`                        | yes when present            | resumable state                                        |
+| run `drift.md`                               | yes when present            | plan/doctrine drift                                    |
+| draft-PR commit list + per-slice PR comments | yes when commits exist      | implementation history (the commit trail)              |
+| `debt/arch-debt.md`                          | yes                         | debt delta                                             |
+
+## Operating Rules
+
+1. Evaluate against the approved plan and archetype gates.
+2. Verify either the selected Plan-Gate passed before implementation (`plan-eval.md` = `PASS`) or
+   the run recorded a justified `PLAN-EVAL: N/A` before implementation. Missing both is a process
+   failure.
+3. Verify the Design checkpoint exists in `worklog.md` and commit slices follow it. Missing design
+   evidence is a finding.
+4. Verify each commit slice has its named gate passing.
+5. Check the Concept of Done (run-loop § 5 + archetype profile) for each slice.
+6. Run or manually verify the applicable gates independently.
+7. Treat missing evidence as a finding.
+8. Name doctrine violations by AP code when possible.
+9. Use `FAIL_DEBT` when the only blocking issue is unrecorded or malformed architecture debt.
+10. Use `FAIL_RESCOPE` when the plan is materially wrong, not merely incomplete.
+11. Do not fix implementation except for minimal read-only validation commands.
+12. Verify the **close-gate** (`netscript-pr` → "Merge close-gate (#387)") is honored before any
+    `status:ready-merge` / `Closes #N` merge: for every referenced issue, its acceptance criteria
+    and every `gate:` checkbox are checked with linked evidence, and the PR's Definition-of-Done
+    checklist is complete. An unchecked `gate:` box on a referenced issue (the #260 failure) blocks
+    the pass.
+13. Verify every agent brief/prompt (implementation, evaluation, side-fix) carries a `## SKILL`
+    chapter naming the relevant skills (harness rule; a missing SKILL chapter in a brief is a
+    finding). PR bodies are governed by the `netscript-pr` templates and do NOT require a `## SKILL`
+    chapter — never raise its absence from a PR body as a finding.
+14. For a **cut or release-gating run**, verify the **release-gate class** (`gates/release-gates.md`
+    — `scaffold.runtime`, `e2e-cli-prod`, and the composite release gate) is green with
+    raw-exit-code evidence before any `status:ready-merge` / release. A red or unrun release gate on
+    a release cut blocks the pass. The gate definitions are owned by #309 release engineering (the
+    `netscript-release` skill); the evaluator confirms they ran, it does not redefine them.
+    Non-release runs treat this rule as `n/a`.
+
+## Output
+
+Write `.llm/runs/<run-id>/evaluate.md` using `templates/evaluate.md`.
+
+## Evidence Standard
+
+Every `PASS` row must have evidence: command, file, trace, route, consumer path, or debt entry. A
+blank `PASS` is not a pass.
+
+
+## .llm/harness/evaluator/verdict-definitions.md
+
+Original-byte SHA256:adf719c74f3ae1c627f5fac065324d23b87281b0acd2e73d4d138716833610d7
+
+# Verdict Definitions
+
+Evaluator verdicts are stable values. Use exactly one.
+
+## PASS
+
+Use `PASS` when all are true:
+
+- approved scope is complete,
+- required static gates pass or are not applicable,
+- required fitness gates pass, are not applicable, or have valid debt entries,
+- required runtime and consumer gates have evidence,
+- no unrecorded doctrine violation was introduced or deepened,
+- docs and run artifacts are updated enough for resume.
+
+## FAIL_PLAN
+
+`FAIL_PLAN` is emitted only by PLAN-EVAL at the Plan-Gate. The plan is incomplete or unsound (an
+unchecked `gates/plan-gate.md` box). Returns the run to Plan & Design; no implementation slice may
+be committed. Two `FAIL_PLAN` cycles, then escalate to the user.
+
+## FAIL_FIX
+
+Use `FAIL_FIX` when the plan remains valid but the implementation or docs need more work. Examples:
+
+- a required gate fails,
+- evidence is missing,
+- a path/link is wrong,
+- a consumer import was not updated,
+- a false-done state from the profile is present.
+
+## FAIL_RESCOPE
+
+Use `FAIL_RESCOPE` when the approved plan is materially wrong or too small. Examples:
+
+- the task requires a package/API redesign not named in the plan,
+- the selected archetype is wrong,
+- a docs run uncovers code reality that needs a separate implementation plan,
+- external/runtime validation cannot be performed without adding new scope.
+
+## FAIL_DEBT
+
+Use `FAIL_DEBT` when code/docs may otherwise satisfy the plan, but architecture debt handling is
+invalid. Examples:
+
+- a doctrine violation is introduced without an `arch-debt.md` entry,
+- an entry lacks owner, target, reason, linked plan, or status,
+- new work deepens an existing debt entry without updating it,
+- a run closes a debt entry without evidence that the relevant gate now passes.
+
+`FAIL_DEBT` means the required fix is debt bookkeeping or debt rationale, not necessarily
+implementation.
+
+## Choosing Between Verdicts
+
+| Condition                                                    | Verdict        |
+| ------------------------------------------------------------ | -------------- |
+| Plan incomplete or unsound at the Plan-Gate (PLAN-EVAL only) | `FAIL_PLAN`    |
+| Code/docs incomplete, plan valid                             | `FAIL_FIX`     |
+| Plan/archetype/scope invalid                                 | `FAIL_RESCOPE` |
+| Only debt registry is blocking                               | `FAIL_DEBT`    |
+| All applicable gates and debt rules satisfied                | `PASS`         |
+
+
+## .llm/harness/workflow/run-loop.md
+
+Original-byte SHA256:0adebf021aa499317ea1cb6d59df97c74f1fcac1a27db1e3f5b8a06ce89a0120
+
+# Run Loop
+
+Harness runs in nine phases: Bootstrap, Research, Plan & Design, Plan-Gate, Implement, Gate,
+Evaluate, Release, Close.
+
+The loop has one mandatory evaluator pass and one conditional pass: **PLAN-EVAL** is used before
+implementation when the work is genuinely complex, decision-heavy, or benefits from adversarial plan
+advice; **IMPL-EVAL** runs after implementation unless the owner explicitly waives it. Every
+evaluator pass that runs uses a separate session.
+
+## 1. Bootstrap
+
+1. Identify the scope and affected package/plugin surfaces.
+2. Select the smallest doctrine archetype that fits.
+3. Apply any scope overlay for frontend, service, or docs work.
+4. Read `debt/arch-debt.md` for relevant open debt.
+5. Read the current doctrine verdict in
+   `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md`.
+6. Seed `plan.md`.
+
+## 2. Research
+
+Produce `research.md` before locking the plan. Research exists to make the plan true, not merely
+plausible.
+
+1. **Re-baseline** — if any plan, audit, or run was carried in from another branch or repo,
+   re-derive its facts against the current `main`. A carried-in plan is a starting skeleton, never
+   ground truth. Record what changed.
+2. **Findings** — the concrete facts the plan depends on (existing dispatch infrastructure, real
+   counts, stub depth, empty arrays, legacy config keys). State each finding so a reviewer can
+   verify it.
+3. **jsr-audit surface scan** (package/plugin waves) — apply the `jsr-audit` skill's publishability
+   rubric to the _current_ public surface and record the slow-type / surface risks the plan must
+   address.
+4. **Open questions** — anything unresolved the plan must close.
+
+## 3. Plan & Design
+
+One phase, two artifacts; it ends by putting the draft PR into the **"Plan & Design — READY FOR
+REVIEW"** state.
+
+### 3a. plan.md
+
+`plan.md` names:
+
+- the archetype and the current doctrine verdict;
+- the expected gate set (from the archetype matrix) and scope overlays;
+- **architecture decisions LOCKED** with rationale;
+- an **open-decision sweep** — every decision still open, each marked "safe to defer" or "must
+  resolve now"; any decision that would force rework if deferred must be resolved before the
+  Plan-Gate;
+- a **risk register** with mitigations;
+- debt implications;
+- deferred scope.
+
+### 3b. Design checkpoint (worklog.md)
+
+Before creating implementation files, record a `## Design` section in `worklog.md` with:
+
+1. **Public surface** — exported functions, entry points, CLI commands.
+2. **Domain vocabulary** — types, interfaces, discriminated unions the implementation needs today
+   (not speculatively).
+3. **Ports** — consumed abstractions. Only create a port when the plan names a real external
+   dependency or a testability seam the slice exercises.
+4. **Constants** — finite domain values as constants with derived union types. Name known IDs
+   (suites, gates, phases, plugins) here before creating files.
+5. **Commit slices** — ordered list. Each slice names what it introduces, which gate proves it
+   works, and which files it creates or changes. Target < 30.
+6. **Deferred scope** — capabilities intentionally left out and why.
+7. **Contributor path** — how a new developer navigates the result to add a feature.
+
+Every file created during implementation must trace back to a concept named here. Files that exist
+only to satisfy a folder template are speculative seams — they do not belong in the plan.
+
+### 3c. Commit and open the plan PR
+
+Commit the plan + design artifacts. Put the draft PR into the **"Plan & Design — READY FOR REVIEW"**
+state with a body summarizing findings, locked decisions, commit slices, risk register, and selected
+gates (the PR #95 shape). The body must say: _do not merge until any selected Plan-Gate and the
+mandatory final evaluator pass are complete (unless the owner explicitly waives IMPL-EVAL)._
+
+## 4. Conditional Plan-Gate (PLAN-EVAL)
+
+PLAN-EVAL is required only for genuinely critical or complex topics: material architecture or
+public-contract decisions, multi-package/multi-PR sequencing, destructive or release/runtime risk,
+or an unresolved trade-off whose wrong answer would force meaningful rework. Wanting generic
+adversarial advice is not sufficient. When selected, it is a **hard stop**: no implementation slice
+may be committed until its verdict is `PASS`.
+
+Skip PLAN-EVAL for routine documentation corrections, mechanical fixes, generated refreshes, and
+bounded test/gate repairs whose issue body and current evidence already provide the contract, scope,
+acceptance criteria, and gates. Record `PLAN-EVAL: N/A` plus the concrete risk-selection reason in
+`worklog.md`/`phase-registry.md`; do not create a ceremonial evaluator session. Tier-A slice review
+and IMPL-EVAL still apply.
+
+PLAN-EVAL is a **separate session**. The plan evaluator:
+
+1. reads `evaluator/plan-protocol.md` and `gates/plan-gate.md`;
+2. reads `research.md`, `plan.md`, and the `## Design` section;
+3. checks every box in `gates/plan-gate.md`;
+4. writes `plan-eval.md` from `templates/plan-eval.md`;
+5. emits `PASS` or `FAIL_PLAN`.
+
+`FAIL_PLAN` returns the plan with the specific unchecked items. Two `FAIL_PLAN` cycles are allowed
+before escalation to the user.
+
+## 5. Implement
+
+1. Implement one commit slice at a time in the Design order.
+2. After each slice:
+   - run the slice's named gate,
+   - **Slice review gate (Amendment A1)** — before the sign-off commit, the Tier-A supervisor
+     substantively reviews the landed slice (correctness, coherence with already-landed slices,
+     doctrine-fit, gaps/overreach). No implementation lane (Tier B/C/D) self-certifies; passing
+     automated gates is not a sign-off. See `workflow/lane-policy.md` §"Slice review gate (Amendment
+     A1)" for the lane-agnostic invariant this step enforces.
+   - commit (the **sign-off commit**, the supervisor's) with a message that names what the slice
+     proves, not what it contains,
+   - push, then comment on the draft PR with the slice scope, commit hash, and gate evidence — the
+     draft-PR commit list + per-slice PR comments are the commit trail (there is no `commits.md`),
+   - update `worklog.md` + `context-pack.md` as part of the same slice (a slice whose commit does
+     not touch the run dir is incomplete),
+   - run the **post-slice reconcile loop** (below) and write one reconcile note in `worklog.md`.
+3. Append `drift.md` when facts diverge from the plan, RFC, or doctrine.
+
+Before committing, inspect `git status --short` and do not fold in unrelated user changes. If an
+unrelated change shares a file you must edit, work with the current content instead of reverting it.
+
+### Concept of Done (per slice)
+
+A slice is done when:
+
+- every file in the slice is reachable from the public surface or a test,
+- no file exists to satisfy a folder shape without being used,
+- constants replace string literals for finite domain vocabularies,
+- public functions have a JSDoc one-liner (what it does, not how),
+- a contributor can extend the slice by reading one file and copying a pattern,
+- the slice's gate passes.
+
+### Post-slice reconcile loop
+
+After each slice completes (and before starting the next), reconcile the GitHub surface with the
+run:
+
+1. **Sweep related issues** — check their state, any needed `status:`/`area:`/milestone moves, and
+   that the resolving PR carries the right closing keyword (`Closes #N` for full resolution, a bare
+   reference for partial work — see `netscript-pr`).
+2. **Read new issue/PR comments** since the last sweep (evaluator verdicts, reviewer notes,
+   OpenHands output).
+3. **Record readjustments** — fold plan changes into `plan.md`; append `drift.md` when reality
+   diverged from the plan or doctrine.
+
+Write **one reconcile note per slice** in `worklog.md`.
+
+## 6. Gate
+
+Before handing off, the generator runs the full gate set required by the archetype matrix and scope
+overlays:
+
+- static gates,
+- fitness gates when implemented or explicitly pending for Phase A,
+- runtime gates when the run touches runtime behavior,
+- consumer gates when exports or downstream contracts change,
+- **jsr-audit** as a required gate for package/plugin waves,
+- **the code-quality gate** (`deno task quality:scan` + `deno task arch:check`) as a required gate
+  for any wave touching `packages/**` or `plugins/**`.
+
+**The scoped check/lint/fmt wrappers are necessary but NOT sufficient.** They pass code containing
+`any` and they honor inline `// deno-lint-ignore no-explicit-any`, so they cannot catch the two
+violation classes that reached `main` in the beta.9 CLI wave (#745): (1) `any` + manual casting
+(`Command<any,…>` under a lint-ignore, `as unknown as`/`as any`), and (2) host-side hardcoded
+plugin-name coupling (`plugin.name === 'auth'`, `kind === 'ai'`). Running `quality:scan` (which
+fails on both) and `arch:check` (doctrine fitness) per slice is what catches them. A green scoped
+wrapper is never a substitute for these two gates on a framework-source wave. A
+`// deno-lint-ignore` added to make a wrapper pass is itself a finding — never silence a gate to
+green it.
+
+Gate **evidence is wrapper-sourced and mandatory**: type-check / test / lint / format from the
+structured wrappers (`.llm/tools/run-deno-check|test|lint|fmt.ts`), doc-lint from
+`deno task doc:lint`, and dependency / publishability from the `deno task deps:*` wrappers — raw
+root `deno check .` / `deno fmt --check` and hand-rolled registry curls are non-verdicts. The full
+tool surface is indexed in `workflow/tooling.md`; the command map and gotchas live in the
+**netscript-tools** and **netscript-deno-toolchain** skills (do not restate them here).
+
+Record results as tables in `worklog.md`.
+
+## 7. Evaluate (IMPL-EVAL)
+
+The final evaluation is mandatory unless the owner explicitly waives it, and always uses a separate
+session. Operating instructions live in `evaluator/protocol.md`.
+
+1. Read `evaluator/protocol.md` and `evaluator/verdict-definitions.md`.
+2. Read the archetype profile, overlays, research, plan, plan-eval, worklog, context pack, drift,
+   and the draft-PR commit list + per-slice PR comments (the commit trail).
+3. Verify the Design checkpoint exists and was followed.
+4. Verify commit slices match the Design checkpoint.
+5. Verify either the selected Plan-Gate passed (`plan-eval.md` = `PASS`) before implementation, or
+   the run recorded a justified `PLAN-EVAL: N/A` under §4 before implementation began.
+6. Run the applicable gate set independently.
+7. Fill `evaluate.md` from `templates/evaluate.md`.
+8. Emit `PASS`, `FAIL_FIX`, `FAIL_RESCOPE`, or `FAIL_DEBT`.
+
+Two consecutive terminal IMPL-EVAL failures are allowed on one leaf. After the second, stop the
+evaluator loop, release the evaluator lease, keep the canonical implementation author available
+rather than frozen, and surface the exact unresolved decision plus both verdicts to the user in the
+primary coordinator task. Do not infer a third evaluator/fix loop; continue every independent lane.
+
+## 8. Release (release-cutting runs only)
+
+Runs that cut or gate a release call the hard release gates here — **`e2e-cli-prod`,
+`scaffold.runtime`, and the release-gate class**. The harness-side single source for this class —
+which gate is required when, and the evidence bar — is `gates/release-gates.md`. This phase does
+**not** define the gates themselves: their definitions, sequencing, and race-free production
+verification are owned by **#309's release engineering** (see the `netscript-release` skill).
+Reference and call them here; do not redefine them. For a run that does not cut a release, this
+phase is a no-op.
+
+## 9. Close
+
+1. If the run failed and you do not know what is still running, `behavior.service-health` timed out,
+   ports are already in use, or a `postgres-*` container appeared that you did not start, run
+   `deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree>`. Report foreign and
+   unknown-owner resources; never mutate them. Preview owned cleanup with `maint:teardown` and add
+   `--apply` only when positive ownership proof is present.
+2. Update `context-pack.md`.
+3. Update `debt/arch-debt.md` for any created or closed debt entries.
+4. Promote repeated lessons to `lessons/` only when the promotion rule is met.
+5. Write a dated `.llm/YYYY-MM-DD-description.md` session record.
+
+
+## .llm/harness/archetypes/SCOPE-docs.md
+
+Original-byte SHA256:11bbcf4317f7ed797c3851223a885c323be7f3f38899f35d31a76c5fc44c7885
+
+# Scope Overlay — Docs
+
+Use this overlay for RFCs, README files, knowledge-base pages, harness docs, run artifacts, and
+doctrine-facing documentation.
+
+## Doctrine Boundary
+
+Docs may describe either current state or doctrine target state. Keep those separate:
+
+- `.claude/` describes current repo reality and points to doctrine status.
+- doctrine files define package/plugin target rules.
+- harness files describe agent operating procedure.
+- run artifacts describe one run.
+
+## Additional Read First
+
+- current authoritative doc being changed
+- source code, package README, RFC, or run artifact the doc must match
+- doctrine file and section when the doc references package/plugin rules
+- `../DOCTRINE-REF.md`
+
+## Additional Gates
+
+| Gate             | Requirement                                                     |
+| ---------------- | --------------------------------------------------------------- |
+| Source alignment | Every prescriptive claim points to doctrine, RFC, or code       |
+| Scope separation | Current-state docs do not silently become target-state doctrine |
+| Link integrity   | Referenced local paths exist                                    |
+| Terminology      | Names match doctrine and `.claude/09-glossary.md`               |
+| Drift log        | Material mismatch is recorded in run `drift.md`                 |
+
+## False-Done States
+
+- Polished prose duplicates doctrine instead of referencing it.

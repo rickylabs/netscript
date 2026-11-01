@@ -1,0 +1,127 @@
+[
+  {
+    "control": "revert-login-auth",
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "AssertionError\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at file://<cwd>/packages/mcp/tests/telemetry-binding_test.ts:<line>:<column>",
+        "count": 1,
+        "tests": [
+          {
+            "name": "bound telemetry snapshot returns exactly the traces served by the fake dashboard API",
+            "file": "./packages/mcp/tests/telemetry-binding_test.ts",
+            "line": 21
+          }
+        ]
+      }
+    ],
+    "processFailure": null
+  },
+  {
+    "control": "revert-failure-propagation",
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "AssertionError\n    at assertFalse (https://jsr.io/@std/assert/1.0.19/false.ts:<line>:<column>)\n    at file://<cwd>/packages/mcp/tests/telemetry-binding_test.ts:<line>:<column>",
+        "count": 1,
+        "tests": [
+          {
+            "name": "wrong project binding diagnoses every assigned tool instead of returning zeros",
+            "file": "./packages/mcp/tests/telemetry-binding_test.ts",
+            "line": 73
+          }
+        ]
+      }
+    ],
+    "processFailure": null
+  },
+  {
+    "control": "revert-token-redaction",
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "AssertionError: Leaked private value in analyze_service_performance\n    at assertFalse (https://jsr.io/@std/assert/1.0.19/false.ts:<line>:<column>)\n    at file://<cwd>/packages/mcp/tests/telemetry-binding_test.ts:<line>:<column>",
+        "count": 1,
+        "tests": [
+          {
+            "name": "all three tool envelopes exclude dashboard login tokens, API keys and config values",
+            "file": "./packages/mcp/tests/telemetry-binding_test.ts",
+            "line": 104
+          }
+        ]
+      }
+    ],
+    "processFailure": null
+  },
+  {
+    "control": "revert-otlp-logs",
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "AssertionError\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at file://<cwd>/packages/mcp/tests/telemetry-binding_test.ts:<line>:<column>",
+        "count": 1,
+        "tests": [
+          {
+            "name": "status reads real OTLP error logs and retains emitter identity",
+            "file": "./packages/mcp/tests/telemetry-binding_test.ts",
+            "line": 153
+          }
+        ]
+      }
+    ],
+    "processFailure": null
+  },
+  {
+    "control": "revert-partial-coverage",
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   telemetry_no_data\n+   telemetry_partial\n\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/packages/mcp/tests/telemetry-binding_test.ts:<line>:<column>",
+        "count": 1,
+        "tests": [
+          {
+            "name": "successful empty windows have no zero-latency statistics and capped windows remain partial",
+            "file": "./packages/mcp/tests/telemetry-binding_test.ts",
+            "line": 183
+          }
+        ]
+      }
+    ],
+    "processFailure": null
+  }
+]

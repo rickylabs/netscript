@@ -1,3 +1,4 @@
+import { render } from 'npm:preact-render-to-string@^6.7.0';
 import { assert } from '@std/assert';
 import { Donut } from '../../../../registry/components/ui/donut.tsx';
 
@@ -38,4 +39,19 @@ Deno.test('Donut cycles semantic tones and honors explicit total', () => {
   // first three cycle entries: primary, success, warning
   assert(json.includes('success') && json.includes('warning'), 'token-cycle tones');
   assert(!/#[0-9a-fA-F]{3,8}/.test(json), 'no raw hex');
+});
+
+Deno.test('Donut reserves the chart palette for automatic series and preserves explicit error intent', () => {
+  const html = render(Donut({
+    data: [
+      { label: 'Category', value: 10 },
+      { label: 'Error', value: 2, tone: 'destructive' },
+    ],
+  }));
+  assert(html.includes('data-series="1"'), 'automatic category has a palette role');
+  assert(
+    !html.includes('data-series="2"'),
+    'explicit error must not be replaced by a category colour',
+  );
+  assert(html.includes('data-tone="destructive"'), 'explicit destructive intent survives');
 });

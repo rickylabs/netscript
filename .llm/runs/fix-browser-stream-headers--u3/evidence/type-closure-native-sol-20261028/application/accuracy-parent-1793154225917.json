@@ -1,0 +1,13 @@
+{
+  "selected": "accuracy-parent",
+  "args": [
+    "task",
+    "docs:accuracy"
+  ],
+  "code": 1,
+  "started": "2026-10-28T02:23:45.920Z",
+  "ended": "2026-10-28T02:23:47.671Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/accuracy-parent-1793154225917"
+}

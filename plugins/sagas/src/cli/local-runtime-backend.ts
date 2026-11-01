@@ -11,6 +11,7 @@ import type { SagasCliBackend, SagasCliCommandDefinition } from './command-types
 import { upsertFluentCall } from './fluent-call-editor.ts';
 import { generateSagaRegistry } from './registry-generator.ts';
 import { inspectSagasProject, type InspectSagasResult } from './saga-inspector.ts';
+import { SAGA_ROOT_CONFIG } from './saga-declarations.ts';
 
 /** Options for local sagas runtime CLI command execution. */
 export interface LocalSagasRuntimeBackendOptions {
@@ -224,6 +225,15 @@ function sagaPaths(
   inspected: InspectSagasResult,
   id: string,
 ): Readonly<{ definition?: string; config?: string }> {
+  if (
+    inspected.entries.some((entry) =>
+      entry.sourcePath === SAGA_ROOT_CONFIG && entry.configIds.includes(id)
+    )
+  ) {
+    throw new Error(
+      `Saga ${id} is declared in ${SAGA_ROOT_CONFIG}. Edit the root declaration manually before update-saga or remove-saga; no files were changed.`,
+    );
+  }
   return {
     definition: inspected.entries.find((entry) => entry.sagaIds.includes(id))?.sourcePath,
     config: inspected.entries.find((entry) => entry.configIds.includes(id))?.sourcePath,

@@ -1,0 +1,26 @@
+[
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\packages\\fresh\\src\\runtime\\streams\\create-stream-db.ts",
+        "Hash":  "FE27FB217D8B39C707C7D4BD4BD773D5BDDD31FBB08573DC283820C34ADA823F"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\packages\\fresh\\tests\\_fixtures\\stream-db-test-runtime.ts",
+        "Hash":  "E83C140F5770A509FEF2FF80A0494F0FE503A97AF0195930479E14C1D1B4F5BB"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\.llm\\tmp\\browser-stream-headers-u3-c1\\continuation-2\\gate.ts",
+        "Hash":  "E6B3569612C9CD3EEFB3AC158C8D3B5B1A9C5FCB33311E124583DB76796DD1E8"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\deno.json",
+        "Hash":  "B1FF8E07A20969535AE8BEDAFA869C8FC5A792AFE0857D1BE1FD71C785B90870"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\deno.lock",
+        "Hash":  "F53F7A5D017E002582B43B886003F64D19C0EDBC137EBE74674C2E59DF4A5D32"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008\\.agents\\skills\\netscript-harness\\SKILL.md",
+        "Hash":  "09FB65B00DC0C2A7F8DF6AA8F815AF91219B0EDE2AB0E846BF09091B268EB215"
+    }
+]

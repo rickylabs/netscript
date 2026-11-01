@@ -1,0 +1,19 @@
+/** Direct consumer runner: no Aspire supervisor or host service context. */
+import '@netscript/kv/redis';
+import { startSagaRunner } from '@netscript/plugin-sagas/runtime';
+
+const supervisor = await startSagaRunner();
+const health = supervisor.snapshot().childHealth;
+if (health.state !== 'ready' || !health.registryReady || !health.dependencyReady) {
+  throw new Error('Detached saga runner is not ready');
+}
+await Deno.writeTextFile('.netscript/e2e/detached-ready.json', JSON.stringify(health));
+const stopped = Promise.withResolvers<void>();
+const stop = () => stopped.resolve();
+Deno.addSignalListener('SIGTERM', stop);
+try {
+  await stopped.promise;
+} finally {
+  Deno.removeSignalListener('SIGTERM', stop);
+  await supervisor.stop('detached-proof-complete');
+}

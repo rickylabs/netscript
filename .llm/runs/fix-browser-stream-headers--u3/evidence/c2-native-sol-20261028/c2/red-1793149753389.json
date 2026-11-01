@@ -1,0 +1,20 @@
+{
+  "selected": "red",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-test.ts",
+    "--",
+    "--frozen",
+    "-A",
+    "--filter",
+    "U3 workers native headers",
+    "plugins/workers/tests/streams/factory-headers_test.ts"
+  ],
+  "code": 1,
+  "started": "2026-10-28T01:09:13.392Z",
+  "ended": "2026-10-28T01:09:15.501Z",
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/red-1793149753389"
+}

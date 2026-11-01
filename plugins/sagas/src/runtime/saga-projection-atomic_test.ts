@@ -119,7 +119,7 @@ Deno.test('projected atomic runtime commits worker intent and state together, th
       await durable.dispose();
     }
   }
-  assertEquals(calls.length, 2);
+  assertEquals(calls.length, 1);
   assertEquals(calls[0].commands.length, 1);
   assertEquals(calls[0].envelope.state.count, 1);
   assertEquals(delegate.transitions(calls[0].correlation.instanceId).length, 1);
@@ -182,26 +182,23 @@ Deno.test('projection errors propagate after atomic commit and explicit recovery
     sagaName: 'document',
     correlationId: 'one',
     version: 1,
+    status: 'running',
     isCompleted: false,
     state: {
-      ...envelope.state,
+      projectionVersion: 2,
+      sagaName: 'document',
       sagaId: 'document',
       instanceId: request.correlation.instanceId,
+      correlationId: 'one',
       correlationKey: 'one',
+      state: envelope.state,
       status: 'running',
+      createdAt: new Date(0).toISOString(),
+      updatedAt: new Date(0).toISOString(),
+      completedAt: undefined,
+      version: 1,
+      messageCount: 1,
       lastMessageType: 'start',
-      metadata: {
-        sagaId: 'document',
-        instanceId: request.correlation.instanceId,
-        version: 1,
-        status: 'running',
-        durability: 't2',
-        createdAt: new Date(0).toISOString(),
-        updatedAt: new Date(0).toISOString(),
-        completedAt: undefined,
-        traceparent: undefined,
-        tracestate: undefined,
-      },
     },
     createdAt: new Date(0),
     updatedAt: new Date(0),

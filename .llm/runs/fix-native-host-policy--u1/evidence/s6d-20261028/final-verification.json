@@ -1,0 +1,177 @@
+{
+  "firstSourceSha256": "c5cd5dfc31cd78be0271d54b12ccfda8a7633adecaa5ca85af6489bf4a553096",
+  "firstProofSha256": "d35d3e8984a76b602e6c1b5f767c1db339d0ec5d0b593a713068fa1df9482d09",
+  "finalSourceSha256": "769b9a73f46c8b3a24dc4e0c2f44b27a6e9c40bd5b2b31186445c0205d5634b8",
+  "finalProofSha256": "331dd6826b93501d7ecbad995e0a23fdab64707c363db5afc570d7595223a136",
+  "correctionDiffSha256": "cc8e7f9868de1e383f086642ab881ddaf1f7c55a6a9960b5359799a1695f47da",
+  "childCount": 42,
+  "settled": 42,
+  "cleanupCount": 16,
+  "cleanupAbsent": 16,
+  "cleanup": [
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates\\owned-profile-fd9f6d2832e99ce0",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-7519d4316fdce6a6",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-4186950e424ae316",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-58e79b7a4e02b5a",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-1fd7f3e249e99099",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-82e181ffb8a16c56",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates\\owned-profile-fd9f6d2832e99ce0\\streams-service-runtime-c61b0aeb21044e58",
+      "absent": true
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2\\owned-profile-4599205b85c6b237",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates-2\\owned-profile-4599205b85c6b237\\streams-service-runtime-9451197a6af40d",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates-2\\owned-profile-4599205b85c6b237\\streams-service-runtime-e4fa26eebbad1e69",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates-2\\owned-profile-4599205b85c6b237\\streams-service-runtime-251210f1bfb42a61",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates-2\\owned-profile-4599205b85c6b237\\streams-service-runtime-b863177e12e7046e",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates-2\\owned-profile-4599205b85c6b237\\streams-service-runtime-5e961ff5ec341c53",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates-2\\owned-profile-4599205b85c6b237\\streams-service-runtime-e86aa37335bd1af6",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates-2\\owned-profile-4599205b85c6b237\\streams-service-runtime-2707f09552404ea",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6d-astra-20261028\\gates-2\\owned-profile-4599205b85c6b237\\streams-service-runtime-e3313e410de39416",
+      "absent": true
+    }
+  ],
+  "nativeCount": 28,
+  "nativeMatched": 28,
+  "rowHashes": [
+    {
+      "label": "bind",
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-bind/child-1-result.json",
+      "sha256": "d93d677586b56ce3cce3ce4c50c094fdc055b7654bca721b26a37a8a3092681f"
+    },
+    {
+      "label": "sentinel",
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-sentinel/child-1-result.json",
+      "sha256": "17e701fd8423887019430d4e82618b225eed93dc6f1a3af42d926df99fa6026b"
+    },
+    {
+      "label": "cors",
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6d-astra-20261028/gates-2/children/startup-cors/child-1-result.json",
+      "sha256": "cbb584a4b53f78959c03403139035dee17720d9fbba661802507ed501a442eda"
+    }
+  ],
+  "observations": [
+    {
+      "label": "startup-bind",
+      "code": 0,
+      "rows": [
+        {
+          "mode": "bind",
+          "nativeError": {
+            "name": "AddrInUse",
+            "message": "Une seule utilisation de chaque adresse de socket (protocole/adresse réseau/port) est habituellement autorisée. (os error 10048)"
+          }
+        },
+        {
+          "mode": "bind",
+          "observedBound": 1,
+          "hostnameReads": 1,
+          "blockerPreserved": true,
+          "blockerEndpoint": {
+            "hostname": "127.0.0.1",
+            "port": 51178,
+            "transport": "tcp",
+            "servePort": 51178
+          },
+          "identityPreserved": false,
+          "returnedHandle": false,
+          "reboundPorts": [
+            51177,
+            51178
+          ]
+        }
+      ]
+    },
+    {
+      "label": "startup-cors",
+      "code": 0,
+      "rows": [
+        {
+          "mode": "cors",
+          "nativeError": {
+            "name": "TypeError",
+            "message": "CORS wildcard origins cannot be combined with credentials"
+          }
+        },
+        {
+          "mode": "cors",
+          "observedBound": 1,
+          "hostnameReads": 0,
+          "blockerPreserved": false,
+          "identityPreserved": false,
+          "returnedHandle": false,
+          "reboundPorts": [
+            57563
+          ]
+        }
+      ]
+    },
+    {
+      "label": "startup-sentinel",
+      "code": 0,
+      "rows": [
+        {
+          "mode": "sentinel",
+          "nativeError": {
+            "name": "Error",
+            "message": "S6D_CALLER_HOSTNAME_SENTINEL"
+          }
+        },
+        {
+          "mode": "sentinel",
+          "observedBound": 1,
+          "hostnameReads": 1,
+          "blockerPreserved": false,
+          "identityPreserved": true,
+          "returnedHandle": false,
+          "reboundPorts": [
+            51593
+          ]
+        }
+      ]
+    }
+  ]
+}

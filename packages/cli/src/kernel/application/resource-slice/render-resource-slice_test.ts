@@ -24,7 +24,7 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      'c113807e2d66651b7fb9472d37bd138466b7148cc5b72b1a53edec092c072a40',
+      '7123b8424b72a7f9b01c18e28e819ac85071fcee5d6ba7bbc5bc660694f29662',
     ],
     [
       'routes/orders/(_shared)/orders-loaders.ts',
@@ -51,7 +51,7 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      'c113807e2d66651b7fb9472d37bd138466b7148cc5b72b1a53edec092c072a40',
+      '7123b8424b72a7f9b01c18e28e819ac85071fcee5d6ba7bbc5bc660694f29662',
     ],
     [
       'routes/orders/(_lib)/orders-form.ts',
@@ -82,7 +82,7 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      'c113807e2d66651b7fb9472d37bd138466b7148cc5b72b1a53edec092c072a40',
+      '7123b8424b72a7f9b01c18e28e819ac85071fcee5d6ba7bbc5bc660694f29662',
     ],
     [
       'routes/orders/(_shared)/orders-loaders.ts',
@@ -109,7 +109,7 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      'c113807e2d66651b7fb9472d37bd138466b7148cc5b72b1a53edec092c072a40',
+      '7123b8424b72a7f9b01c18e28e819ac85071fcee5d6ba7bbc5bc660694f29662',
     ],
     [
       'routes/orders/(_islands)/OrdersStream.tsx',
@@ -189,6 +189,7 @@ Deno.test('core render is neutral, cache-first, and canonically marked', async (
       'useIslandQuery',
       'initialData: props.initialData',
       'initialDataUpdatedAt: props.cachedAt',
+      'data-query-result',
     ]
   ) assertStringIncludes(source, expected);
   for (

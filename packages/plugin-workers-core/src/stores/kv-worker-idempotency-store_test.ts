@@ -81,6 +81,39 @@ Deno.test('KvWorkerIdempotencyStore rejects incomplete KV implementations', asyn
   );
 });
 
+Deno.test('newer broker delivery takes over its stranded marker and fences the former owner', async () => {
+  await using kv = new MemoryKvAdapter();
+  const store = new KvWorkerIdempotencyStore({ kv });
+  const input = {
+    concept: 'task' as const,
+    targetId: 'recover',
+    idempotencyKey: 'same-effect',
+    messageId: 'original-message',
+    deliveryCount: 1,
+  };
+  const first = await store.claim(input);
+  assertEquals(first.claimed, true);
+  const other = await store.claim({ ...input, messageId: 'other-message', deliveryCount: 2 });
+  assertEquals(other.claimed, false, 'a different message cannot steal a caller key');
+  assertEquals((await store.claim(input)).claimed, false, 'same-generation duplicates wait');
+  const replacements = await Promise.all(
+    Array.from({ length: 8 }, () => store.claim({ ...input, deliveryCount: 2 })),
+  );
+  assertEquals(replacements.filter((claim) => claim.claimed).length, 1);
+  const replacement = replacements.find((claim) => claim.claimed)!;
+  await store.release(first.key, first.token);
+  assertEquals((await store.claim({ ...input, deliveryCount: 2 })).claimed, false);
+  await assertRejects(
+    () => store.markApplied(first.key, undefined, first.token),
+    Error,
+    'claim lost',
+  );
+  await store.markApplied(replacement.key, undefined, replacement.token);
+  const duplicate = await store.claim({ ...input, deliveryCount: 3 });
+  assertEquals(duplicate.claimed, false);
+  assertEquals(duplicate.alreadyApplied, true, 'completed markers survive broker redelivery');
+});
+
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

@@ -25,6 +25,8 @@ export interface HybridStrategyOptions {
   readonly events?: readonly EventKind[];
   /** Polling interval fallback in milliseconds. @default 5000 */
   readonly pollIntervalMs?: number;
+  /** Called when the selected strategy is ready. */
+  readonly onReady?: () => void | Promise<void>;
   /** Abort signal for graceful shutdown. */
   readonly signal?: AbortSignal;
 }
@@ -62,6 +64,7 @@ export class HybridStrategy implements WatchStrategyHandler {
       paths: this.options.paths,
       events: this.options.events,
       signal: this.options.signal,
+      onReady: this.options.onReady,
     });
 
     try {
@@ -72,6 +75,11 @@ export class HybridStrategy implements WatchStrategyHandler {
       // AbortError is a clean shutdown — don't fall back
       if (error instanceof DOMException && error.name === 'AbortError') {
         return;
+      }
+
+      // A removed root needs a fresh watch; polling would conceal the lost subscription.
+      if (error instanceof Deno.errors.NotFound || error instanceof Deno.errors.NotADirectory) {
+        throw error;
       }
 
       console.warn(
@@ -85,6 +93,7 @@ export class HybridStrategy implements WatchStrategyHandler {
         events: this.options.events,
         pollIntervalMs: this.options.pollIntervalMs,
         signal: this.options.signal,
+        onReady: this.options.onReady,
       });
 
       yield* polling.watch();

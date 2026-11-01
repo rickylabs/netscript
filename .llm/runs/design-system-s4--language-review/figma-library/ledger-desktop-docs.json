@@ -1,0 +1,341 @@
+{
+ "runId": "ns-figma-library-2026-10-28",
+ "agent": "desktop-docs-builder",
+ "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+ "date": "2026-10-31",
+ "pages": {
+  "Components · Desktop": "229:348",
+  "Components · Docs kit": "229:349"
+ },
+ "step": "B9-library-desktop-docs built K1–K6 and X1–X9 (owner review pending): Desktop 5 sets / 37 variants + K6 annotation + composed Desktop app review; Docs kit 15 sets (14 public + .Docs card private) + File tree component / 66 variants + composed Docs article review; 17 Theme set twins added (prose/* ×16, type/em/style); binding audit clean; 0 off-pixel nodes in every set",
+ "components": {
+  "Window chrome": {
+   "id": "593:105839",
+   "variants": 12,
+   "axes": "platform macos|windows|linux × state focused|hover|unfocused|disabled",
+   "props": {
+    "title": "title#593:72",
+    "appIcon": "appIcon#593:85"
+   },
+   "parts": "root H 40 (surface/surface, border/subtle bottom rule at border/width, rule outside layout) → identity (app-icon 16 brand/default + N monogram · title T.strong-sm) · actions (macOS: 3 × 12px ellipse lights close/minimize/zoom in destructive|warning|success/default, hover glyphs x/minus/plus in */fg; Windows: minimize/maximize/close 46 × 40, close hover destructive/default + destructive/fg; Linux: Icon button / xs secondary, unfocused ghost, close hover destructive) · spacer (keeps the title centred on macOS/Linux)",
+   "nests": "Icon glyphs (x, minus, plus, square), Icon button / xs"
+  },
+  "Tray menu": {
+   "id": "593:308054",
+   "variants": 4,
+   "axes": "source tray|application-menu × state rest|disabled",
+   "parts": "root → items = O8 Menu content instance (Menu label = source eyebrow, Menu item action/submenu/checkbox rows with Kbd accelerators, Menu separator; unused label/radio rows hidden, row icons off)",
+   "nests": "Menu content (373:256), Menu item, Menu label, Menu separator, Kbd"
+  },
+  "Desktop dialog": {
+   "id": "593:309348",
+   "variants": 6,
+   "axes": "kind alert|confirm|prompt × state rest|disabled",
+   "parts": "root (O1 recipe: surface/card, border/default, radius/card, R.float shadow, padding + gap space/card/padding, W 400) → copy (title T.heading, message T.small text/muted, input = Input md content=value for prompt) · actions (Button / sm outline Cancel + primary)",
+   "nests": "Button / sm, Input"
+  },
+  "Desktop notification": {
+   "id": "593:403674",
+   "variants": 10,
+   "axes": "tone neutral|info|success|warning|destructive × state rest|disabled",
+   "props": {
+    "meta": "meta#593:198",
+    "action": "action#593:209"
+   },
+   "parts": "root R.float (surface/raised, border/default, radius/card, overlay shadow), W 360, padding space/card/padding, gap space/inline/gap → icon (32, radius/input: brand tile for neutral; <tone>/subtle + <tone>/border + glyph in <tone>/text) · copy (meta T.caption muted · title T.strong · body T.small muted) · action (Button / sm outline)",
+   "nests": "Button / sm, Icon glyphs"
+  },
+  "Update prompt": {
+   "id": "593:404332",
+   "variants": 5,
+   "axes": "state available|downloading|ready|manual|error",
+   "parts": "root W 520 (surface/card + border/default; manual = info tone, error = destructive tone; radius/card; padding + gap space/card/padding) → lead (icon box = type/strong/line with size/icon/md glyph or Spinner sm · copy: title T.strong, description T.small muted, Progress sm with value while downloading) · actions (Button / sm)",
+   "nests": "Button / sm, Spinner, Progress"
+  },
+  "Prose heading": {
+   "id": "594:426154",
+   "variants": 4,
+   "axes": "level h1|h2|h3|h4",
+   "props": {
+    "anchor": "anchor#594:0",
+    "eyebrow": "eyebrow#594:5"
+   },
+   "parts": "root (W prose/measure) → eyebrow (T.eyebrow, hidden) · heading (text · anchor # in font/mono text/muted)"
+  },
+  "Prose block": {
+   "id": "594:426190",
+   "variants": 6,
+   "axes": "element lede|p|blockquote|ul|ol|hr",
+   "parts": "W prose/measure; p/lede text with font/mono prose/code/size ranges; blockquote rule marker/default; ul item → marker (Location marker / sm) · text; ol item → numeral (mono caption) · text; hr rule topbar/rule",
+   "nests": "Location marker"
+  },
+  "Prose inline": {
+   "id": "594:426215",
+   "variants": 10,
+   "axes": "element link|code|kbd|strong|em × state rest|hover",
+   "parts": "link: text + underline part (link/underline → marker/default on hover); code: surface/surface chip radius/badge; kbd: Kbd md; strong; em (type/em/style)",
+   "nests": "Kbd"
+  },
+  "File path chip": {
+   "id": "595:187010",
+   "variants": 4,
+   "axes": "state rest|hover|focus|copied",
+   "props": {
+    "path": "path#595:6",
+    "copy": "copy#595:11"
+   },
+   "parts": "root (surface/surface, border/subtle, radius/badge, padding 2/5, gap 6) → path (font/mono 12/18) · copy (20 × 20 button, radius/control, copy|check glyph size/icon/sm; focus = .Focus ring)",
+   "nests": "Icon glyphs, .Focus ring"
+  },
+  "Attribute chip": {
+   "id": "595:187227",
+   "variants": 2,
+   "axes": "size sm|md",
+   "props": {
+    "name": "name#595:16",
+    "value": "value#595:19"
+   },
+   "parts": "root (surface/surface, radius/badge, no border) → name (font/mono text/muted) · value (font/mono text/fg)"
+  },
+  "Toc item": {
+   "id": "595:187344",
+   "variants": 6,
+   "axes": "level 2|3 × state rest|hover|current",
+   "props": {
+    "label": "label#595:22"
+   },
+   "parts": "root W 240, padding 5/0/5/15|24, border/subtle left edge (the rail) → label (13/20) · marker (Location marker md on the rail, visibility deco/marker; current only)",
+   "nests": "Location marker"
+  },
+  "Toc": {
+   "id": "595:187386",
+   "variants": 2,
+   "axes": "breakpoint desktop|mobile",
+   "parts": "desktop: eyebrow · rail (13 Toc item rows, the Quickstart outline) · links (View as Markdown, Back to top); mobile: 48 bar (surface/bg, border/subtle bottom) → eyebrow · current (marker + section, truncates) · chevron-down",
+   "nests": "Toc item, Location marker, Icon glyph"
+  },
+  "File tree row": {
+   "id": "599:493",
+   "variants": 8,
+   "axes": "type folder|file × ownership owned|generated|guidance|none",
+   "props": {
+    "name": "name#599:0",
+    "comment": "comment#599:9"
+   },
+   "parts": "root H 26, gap 6 → icon (Icon/folder|file size/icon/sm) · name (font/mono type/code) · comment (# note, mono 12 text/muted) · spacer · tag ([ownership], mono 11; owned text/fg, generated mutes the row)",
+   "nests": "Icon glyphs"
+  },
+  "File tree": {
+   "id": "599:524",
+   "variants": 0,
+   "note": "single component: border/subtle frame, surface/bg, padding 16/20, width prose/wide; 15 File tree row instances (the Quickstart scaffold), indent 20 per level as a padding-left override",
+   "nests": "File tree row"
+  },
+  "Figure": {
+   "id": "599:1203",
+   "variants": 4,
+   "axes": "width prose|wide × media image|diagram",
+   "props": {
+    "caption": "caption#599:18"
+   },
+   "parts": "root (W prose/measure|prose/wide) → media (border/subtle, radius 0; image placeholder surface/surface + camera glyph, 16:9; diagram surface/bg with mono nodes) · caption (T.small text/muted, 8 above)",
+   "nests": "Icon glyph"
+  },
+  "Anchor nav": {
+   "id": "599:1567",
+   "variants": 2,
+   "axes": "state rest|scrolled",
+   "parts": "root H 44, W prose/wide, surface/bg, topbar/rule bottom at topbar/rule-width, gap 24 → anchor × 6 (Tab / horizontal variant=default; selected carries the marker)",
+   "nests": "Tab / horizontal"
+  },
+  ".Docs card": {
+   "id": "600:291572",
+   "variants": 4,
+   "private": true,
+   "axes": "variant feature|ruled × state rest|hover",
+   "parts": "feature: card/border top hairline, eyebrow · head (title 16/24 + ↗) · body 14/22 muted · action link; ruled: padding 24, head (icon tile mono 11 + border/default · title 14/22) · body 13/20 muted · ↗ top-right; hover = surface/surface"
+  },
+  "Ruled grid": {
+   "id": "600:291846",
+   "variants": 6,
+   "axes": "columns 2|3|4 × variant ruled|feature",
+   "parts": "W 960; ruled = topbar/rule top rule + 2 rows of cells with border/subtle right/bottom rules (integer cell widths 480|320|240); feature = one row of .Docs card feature pillars, gap 32",
+   "nests": ".Docs card"
+  },
+  "Hero": {
+   "id": "600:292319",
+   "variants": 4,
+   "axes": "layout split|centered × breakpoint desktop|mobile",
+   "parts": "root (hero/bg, padding-y hero/pad) → display (eyebrow · title T.display (mobile T.title) · lede prose/lede text/muted · actions Button / md primary + outline) · aside (eyebrow · Code block single sm, name bash, lang Shell, gutter on mobile only · eyebrow · path-stack of File path chips)",
+   "nests": "Button / md, Code block, File path chip"
+  }
+ },
+ "showcase": {
+  "Components · Desktop": {
+   "containers": {
+    "Window chrome": "593:105837",
+    "Tray menu": "593:308055",
+    "Desktop dialog": "593:309349",
+    "Desktop notification": "593:403675",
+    "Update prompt": "593:404333"
+   },
+   "reviews": {
+    "Window chrome": "593:105853",
+    "Tray menu": "593:308063",
+    "Desktop dialog": "593:309358",
+    "Desktop notification": "593:403686",
+    "Update prompt": "593:404343",
+    "Desktop app (composed)": "594:3154"
+   },
+   "annotation": {
+    "Desktop only (K6)": "593:417152"
+   },
+   "sectionLabels": {
+    "Window chrome": "593:105849",
+    "Tray menu": "593:309181",
+    "Desktop dialog": "593:309639",
+    "Desktop notification": "593:404175",
+    "Update prompt": "593:404638",
+    "Desktop only": "593:417196",
+    "Desktop app": "594:4124"
+   },
+   "pageHeader": "231:11283",
+   "layout": "label y → container y+52 → review container-end+48 → next label review-end+200, first label at y 352; Desktop only annotation and the Desktop app review follow Update prompt"
+  },
+  "Components · Docs kit": {
+   "containers": {
+    "Prose": "594:426216",
+    "File path chip": "595:187011",
+    "Attribute chip": "595:187228",
+    "Toc": "595:187387",
+    "File tree": "599:660",
+    "Figure": "599:1240",
+    "Anchor nav": "599:1568",
+    "Ruled grid": "600:292320",
+    "Hero": "600:293079"
+   },
+   "reviews": {
+    "Prose": "594:426245",
+    "File path chip": "595:187020",
+    "Attribute chip": "595:187235",
+    "Toc": "595:187402",
+    "File tree": "599:672",
+    "Figure": "599:1248",
+    "Anchor nav": "599:1575",
+    "Ruled grid": "600:292336",
+    "Hero": "600:293087",
+    "Docs article (composed)": "601:3073"
+   },
+   "sectionLabels": {
+    "Prose": "594:426656",
+    "File path chip": "595:187217",
+    "Attribute chip": "595:187326",
+    "Toc": "595:187591",
+    "File tree": "599:1157",
+    "Figure": "599:1377",
+    "Anchor nav": "599:1784",
+    "Ruled grid": "600:293075",
+    "Hero": "600:293854",
+    "Docs article": "601:4310"
+   },
+   "pageHeader": "231:11291",
+   "layout": "same rhythm as Desktop; order Prose, File path chip, Attribute chip, Toc, File tree, Figure, Anchor nav, Ruled grid, Hero, Docs article"
+  },
+  "composedReviews": {
+   "Desktop app": "desktop backdrop (surface/muted) + menu bar with tray icon; window = Window chrome (macos, focused) over App shell (581:54792, sidebar=expanded, breakpoint=desktop, content swapped to .Page content 581:52759); Desktop notification (success) top-right; Update prompt (ready) docked bottom-right in the window",
+   "Docs article": "live /quickstart/ at 1440: Top bar docs/desktop (Start lane selected), sidebar (Start eyebrow + subtitle, Nav item ×2, Quickstart selected), breadcrumb from Breadcrumb item instances with '/' separators, View as Markdown link, article 720 (Prose heading h1/h2/h3, Prose block lede/p/ul, Alert info subtle 'Prerequisites' as the callout, two Code blocks, File tree, Edit this page) + Toc desktop rail"
+  },
+  "reviewPngs": {
+   "desktop": "review/desktop/ (review-window-chrome, review-tray-menu, review-desktop-dialog, review-desktop-notification, review-update-prompt, annotation-desktop-only, review-desktop-app)",
+   "docs-kit": "review/docs-kit/ (review-prose, review-file-path-chip, review-attribute-chip, review-toc, review-file-tree, review-figure, review-anchor-nav, review-ruled-grid, review-hero, review-docs-article)"
+  }
+ },
+ "addedVariables": {
+  "prose/*": {
+   "why": "Prose sizes live only in Studio flavor (SF:prose/*); the build rule routes every theme-level binding through Theme set, so each SF prose variable got a Theme / Theme B / Theme set twin (hero/pad pattern)",
+   "Theme set (bind these)": {
+    "prose/body/size": "594:153030",
+    "prose/body/line": "594:153033",
+    "prose/lede/size": "594:153036",
+    "prose/lede/line": "594:153039",
+    "prose/h2/size": "594:153042",
+    "prose/h2/line": "594:153045",
+    "prose/h2/tracking": "594:153048",
+    "prose/h3/size": "594:153051",
+    "prose/h3/line": "594:153054",
+    "prose/h3/tracking": "594:153057",
+    "prose/h4/size": "594:153060",
+    "prose/h4/line": "594:153063",
+    "prose/code/size": "594:153066",
+    "prose/code/line": "594:153069",
+    "prose/measure": "594:153072",
+    "prose/wide": "594:153075"
+   },
+   "Theme / Theme B": "each Theme set id minus 2 (Theme) and minus 1 (Theme B), e.g. prose/body/size Theme 594:153028, Theme B 594:153029",
+   "values": "Theme Studio → alias Studio flavor prose/* (173:336–351); every other Theme mode and every Theme B mode = the Utility literals 16/26, 19/30, 26/34/-0.4, 19/28/-0.2, 16/24, 13/22, 544, 720",
+   "scopes": "size FONT_SIZE, line LINE_HEIGHT, tracking LETTER_SPACING, measure/wide WIDTH_HEIGHT",
+   "code": "var(--ns-prose-<group>-<prop>)"
+  },
+  "type/em/style": {
+   "why": "Prose inline em needs an italic face; no style variable carried one",
+   "Studio flavor": "594:153077 (Italic in Utility, Cloud, Workshop, Playful, Ledger, Atelier; Regular in Signal: Geist Mono has no italic)",
+   "Theme": "594:153078 (Studio → Studio flavor; Italic in Ledger, Filigrane, Tonal, Glass, Fluent, Tactile, Pixel; Signal and Brutal alias type/body/style: Geist and Space Grotesk have no italic)",
+   "Theme B": "594:153079 (Italic everywhere except Terminal → type/body/style)",
+   "Theme set": "594:153080 (bind this)",
+   "scope": "FONT_STYLE",
+   "code": "var(--ns-weight-em) / var(--ns-studio-weight-em)",
+   "verified": "each italic value checked against listAvailableFontsAsync for the mode's resolved font/sans"
+  }
+ },
+ "audit": {
+  "scope": "Desktop 5 sets / 37 variants / 561 nodes; Docs kit 14 sets + File tree / 62 variants / 999 nodes (instance internals included)",
+  "paints": "1066 visible solid fills/strokes (Desktop 411, Docs 655) incl. 17 rich-text range segments: 0 unbound, every paint seeded with its resolved Utility colour",
+  "text": "538 text nodes (Desktop 152, Docs 386) bind fontFamily, fontStyle, fontSize, lineHeight and letterSpacing; inline-code ranges bind all five at range level; mono caption text uses type/mono/style",
+  "effects": "62 drop shadows (R.float), colour + offsetY + radius bound (effect/shadow-overlay, shadow/overlay/y|blur)",
+  "collections": "Scheme, Theme set and Density only: 0 Theme, Theme B or Studio flavor bindings on any node in the sets",
+  "wholePixels": "0 off-pixel frames/rectangles/instances/ellipses in every set after fixes (were 105 Desktop + 133 Docs): bottom rules taken out of layout (Window chrome, Anchor nav, Toc mobile, Figure media), integer Ruled grid widths, 1px centring parity on Hero and Update prompt (pixel-snap wrappers or +1 padding)",
+  "literals": {
+   "Window chrome": "H 40 (spec), caption buttons 46, traffic lights 12 with 8 gap, spacer 52|78, app icon 16",
+   "Desktop dialog": "W 400 (O1 sm), copy gap 4",
+   "Desktop notification": "W 360 (spec), icon 32 (spec), copy gap 2",
+   "Update prompt": "W 520, copy gap 2",
+   "Prose": "heading gap 6|12, anchor gap 8, list gap 8, marker columns 20|24, blockquote gap 16, hr margins 48, inline code padding 4, link underline offset (y 23)",
+   "File path chip / Attribute chip": "padding 2/5 and 2/6 (1/4 sm), gap 6, copy button 20 (live CSS)",
+   "Toc": "W 240, item padding 5/15|24, marker at x -3 y 12, eyebrow 20 below, links 28 above, mobile bar 390 × 48, padding 20, gap 14 (live CSS)",
+   "File tree": "row H 26, comment indent 8, tag min gap 20, indent 20 per level, frame padding 16/20 (live CSS)",
+   "Figure": "media heights 306|405 (16:9), 200|240 (diagram), caption 8",
+   "Anchor nav": "H 44, gap 24 (live CSS)",
+   "Ruled grid": "W 960, feature gap 32, card paddings 20/0 and 24, eyebrow 14, body 10, action 20 (live CSS)",
+   "Hero": "1120 = 680 | 80 | 360, eyebrow 24, title 30, lede 36, ctas 12, aside 12/32 (live CSS); mobile 390 with 20 padding",
+   "docChrome": "container/review/label text follows the earlier categories: fills bound, fonts literal Host Grotesk / Fragment Mono"
+  }
+ },
+ "deviations": [
+  "K1 Window chrome: state focused|hover|unfocused|disabled (spec focused|blurred|disabled): 'unfocused' per the brief, and 'hover' added to show the close affordance. Light/dark are Scheme modes, not a variant. The code's reload/hide/close actions map to the platform controls; no app-action Icon buttons.",
+  "K1 traffic lights use destructive/warning/success/default (Utility-neutral), not cupertino/traffic-*; the Cupertino style restyles them.",
+  "K2: no separate 'Tray menu item' set. The brief says reuse Menu content, so rows are O8 Menu item/label/separator instances; role items (About, Hide) are action rows without an accelerator. Accelerators are the Menu item's Kbd, not T.mono text. The Tray menu set adds state rest|disabled to the spec source axis (4).",
+  "K3 primary action is Button primary (primary/default), not an accent/default override: overriding the fill would detach it from the Button states; in Utility, Ink accent equals primary.",
+  "K4 Desktop notification: tone axis (5) added per the brief (10 variants); padding space/card/padding (code space-4, Toast precedent) instead of spec space/stack/gap; tone shows in the icon tile only (native notifications are not tinted); meta line (app · time) added as a boolean.",
+  "K5 Update prompt: state available|downloading|ready|manual|error per the brief (spec automatic|manual = ready|manual); manual uses the info tone (subtle + border + text), error the destructive tone, per the owner's content-colour rule; padding space/card/padding.",
+  "K6 Desktop only: annotation frame with a browser-vs-webview illustration (Update prompt instance), no set.",
+  "Desktop showcase: the App shell content slot is swapped to .Page content (Layout's own review does the same); the notification floats over the window corner like a system notification.",
+  "X1 Prose: bound to new Theme set prose/* twins instead of SF:prose/* (rule: theme-level variables only through Theme set). Lede max width is prose/measure (live CSS), not lit 640. Inline code inside p/ul uses font/mono + prose/code/size ranges (13; live is 0.875em = 14) without a chip; Prose inline/code is the chip. Prose block has no TEXT properties: a TEXT property would flatten the inline-code ranges. Non-link inline hovers equal rest (spec axis kept).",
+  "X2 File path chip follows the live CSS (padding 2/5, height 26, copy glyph at size/icon/sm 14 vs live 12) rather than spec h 24 / padding-x 8.",
+  "X3 Attribute chip has no border (live CSS) although the spec lists border/subtle.",
+  "X4 Toc item text is 13/20 (type/small/size + type/strong/line) to match the live 13/20; mobile Toc is the closed bar; the open state is not a variant.",
+  "X5 File tree row axes are type × ownership (8), not spec type × state × open (12): the live tree is read-only ('not an interactive ARIA tree') with no chevrons, hover, selection or indent guides. Row height 26 and indent 20 follow the live CSS (spec 28/16). Tag text is a per-variant layer (edit for [owned config], [generated history], [CLI-managed]).",
+  "X6 Figure image media is a surface/surface placeholder with a camera glyph (the plugin API used here cannot create image fills); replace the fill with the real image.",
+  "X7 Anchor nav: 'scrolled' moves the current anchor later and documents the pinned bar; Utility has no shadow, so there is no extra visual chrome. Tab default labels are 14/20 (live 13).",
+  "X8 Ruled grid nests a private '.Docs card' (live .ns-card anatomy: eyebrow, ↗ arrow, muted body, underlined action; ruled cells with a mono icon tile) instead of D3 Card, whose anatomy differs from the live docs card. Feature gap 32 (live) instead of space/section/gap (16).",
+  "X9 Hero: centered layout is not on the live site; it stacks the aside below a centred display column. Mobile title uses T.title (48/52) because there is no 44/48 variable (live 44/48).",
+  "Docs article showcase: the breadcrumb is Breadcrumb item instances with separator off plus mono '/' texts (the live docs breadcrumb uses '/', N1 uses a chevron); the callout is Alert info subtle with a custom title; code headers read 'Shell · bash' (D8 name + lang) where the live header shows 'Shell' + a Copy text button."
+ ],
+ "findings": [
+  "Instances keep the FIXED sizing their main had when they were placed: after switching a main to hug, existing instances must be switched too (fixed in the Prose review).",
+  "A bottom/side stroke counted in auto layout shifts centred children by 0.5px; set strokesIncludedInLayout=false on rule-carrying bars.",
+  "Several Utility bindings are inert in other themes by design until styles land: traffic-light tones, Window chrome geometry (Cupertino/Liquid/Fluent K1 language variants per spec §1.1).",
+  "Live docs callouts/breadcrumb/code header details differ slightly from the base components (see deviations); a docs style pass could add a '/' separator option to Breadcrumb and a text 'Copy' action to Code block."
+ ],
+ "fonts": "Host Grotesk Regular/Medium/Italic and Fragment Mono Regular; italic availability checked for all 24 theme/flavor fonts",
+ "figmaCalls": "≈75 (1 create_session, 3 skill reads, ≈41 use_figma incl. 5 failed/rolled back and 2 lost connections, ≈30 get_screenshot)"
+}

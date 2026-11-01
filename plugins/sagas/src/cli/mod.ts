@@ -61,6 +61,7 @@ export type {
   InspectSagasResult,
   SagaInspectionEntry,
 } from './saga-inspector.ts';
+export type { SagaRuntimeDeclaration } from './saga-declarations.ts';
 export { SAGAS_PLUGIN_ID, SAGAS_PLUGIN_VERSION } from '../constants.ts';
 
 /** Default CLI instance used by standalone and host-mounted saga commands. */

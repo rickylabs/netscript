@@ -1,0 +1,3 @@
+# API and prose carrier refresh
+
+Commit reviewed package source before `deno task gen:mcp-export-corpus`; the native generator refuses dirty package/plugin inputs. `initialEpoch` is exposed by both plugin-streams-core root and sdk/streams, so two corpus rows change transitively. Restart guide edits require `deno task gen:agent-docs-prose` (includes full docs build and rendered-output checks), then `deno task gen:publish-assets`. Here only the MCP corpus and CLI agent-docs-prose carrier changed; publish assets were already current. Native freshness checks for mcp-export-corpus, agent-docs-prose and publish-assets pass. Never hand-edit encoded carriers.

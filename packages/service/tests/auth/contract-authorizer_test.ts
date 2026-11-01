@@ -242,6 +242,7 @@ Deno.test('contract authorizer enforces raw route requirements and denies undecl
   assertEquals(await authorizer.authorize(request('/api/tools/other', service, 'POST')), {
     allow: false,
     reason: 'authz.no-contract-procedure',
+    code: 'procedure_not_found',
   });
 });
 

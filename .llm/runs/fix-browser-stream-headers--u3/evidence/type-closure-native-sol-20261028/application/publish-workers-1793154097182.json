@@ -1,0 +1,15 @@
+{
+  "selected": "publish-workers",
+  "args": [
+    "task",
+    "--cwd",
+    "plugins/workers",
+    "publish:dry-run"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:21:37.186Z",
+  "ended": "2026-10-28T02:21:40.707Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/publish-workers-1793154097182"
+}

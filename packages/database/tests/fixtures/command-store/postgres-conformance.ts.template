@@ -1,5 +1,5 @@
 import { PrismaClient } from './.generated/client.ts';
-import { PrismaPg } from 'npm:@prisma/adapter-pg@7.8.0';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@1';
 import { createPostgresCommandStore } from '../../../commands-postgres.ts';
 import { transactionClient } from './command-store.ts';

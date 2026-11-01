@@ -1,0 +1,59 @@
+{
+  "baseline": "4771da92972ac90c9cb4188ef9d043c628e1e73c",
+  "entrypoints": 8,
+  "symbolCounts": {
+    ".": 111,
+    "./auth": 55,
+    "./commands": 48,
+    "./commands/relay": 25,
+    "./commands/testing": 58,
+    "./internal-credential": 6,
+    "./rate-limit": 22,
+    "./rpc-path": 4
+  },
+  "rawSignatureChanges": [
+    {
+      "kind": "major",
+      "package": "@netscript/service",
+      "export": ".",
+      "symbol": "PROCEDURE_ERROR_CODES",
+      "reason": "export signature changed"
+    },
+    {
+      "kind": "major",
+      "package": "@netscript/service",
+      "export": ".",
+      "symbol": "ProcedureErrorCode",
+      "reason": "export signature changed"
+    },
+    {
+      "kind": "major",
+      "package": "@netscript/service",
+      "export": "./auth",
+      "symbol": "PROCEDURE_ERROR_CODES",
+      "reason": "export signature changed"
+    },
+    {
+      "kind": "major",
+      "package": "@netscript/service",
+      "export": "./auth",
+      "symbol": "ProcedureErrorCode",
+      "reason": "export signature changed"
+    }
+  ],
+  "interpretation": "The syntax-hash normalizer reports four major-classified representation changes: the alias and explicitly annotated constant at root/auth. It does not resolve semantic types. Before doc JSON widens inferred as-const properties to string and omits readonly; explicit annotations now render their true literal/readonly types. An independent compiler/runtime fixture imports actual baseline native source and current public root/auth: IsExact proves both code types and full const types equal; runtime objects are equal. No names, effective consumer type, values, keys or behavior change. No scanner/baseline was changed and no major declaration was added.",
+  "actualBaselineCompatibility": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 0
+    },
+    "baselineSource": "git show 4771da92972ac90c9cb4188ef9d043c628e1e73c:packages/service/src/auth/types.ts"
+  },
+  "fallback24_23Used": false,
+  "baselineSourceSha256": "9bd0d09269c38d58609a5f9e089f437d602498aedaaf76295edf5703993456bb",
+  "comparisonFixtureSha256": "9d10225e29f786276a8bc1ff50fc6ceedb36cbac2977cce85566202c37712ad0"
+}

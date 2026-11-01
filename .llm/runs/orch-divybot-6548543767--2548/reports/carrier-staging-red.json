@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "--unstable-kv",
+    ".llm/tools/deps/bump-version-registry_test.ts"
+  ],
+  "cwd": ".",
+  "exitCode": 1,
+  "durationMs": 864,
+  "summary": {
+    "passed": 0,
+    "failed": 2,
+    "ignored": 0,
+    "totalResults": 2,
+    "uniqueFailures": 1
+  },
+  "failures": [
+    {
+      "message": "AssertionError: Values are not equal: release commits must stage the regenerated registry consumed by ui:add\n\n\n    [Diff] Actual / Expected\n\n\n-   false\n+   true\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/deps/bump-version-registry_test.ts:<line>:<column>",
+      "count": 2,
+      "tests": [
+        {
+          "name": "coordinated release discovers and bumps registry dependencies to 1.2.4",
+          "file": "./.llm/tools/deps/bump-version-registry_test.ts",
+          "line": 14
+        },
+        {
+          "name": "coordinated release discovers and bumps registry dependencies to 1.2.4-canary.1",
+          "file": "./.llm/tools/deps/bump-version-registry_test.ts",
+          "line": 14
+        }
+      ]
+    }
+  ]
+}

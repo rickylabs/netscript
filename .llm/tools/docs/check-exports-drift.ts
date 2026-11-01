@@ -39,13 +39,7 @@ export type DenoExportTarget = string | DenoConditionalExportTarget;
 
 export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
-export const EXCLUDED_REFERENCE_PAGES: readonly ExcludedReferencePage[] = [
-  {
-    docPath: 'docs/site/reference/auth/index.md',
-    reason:
-      'Multi-package auth hub indexing @netscript/plugin-auth, @netscript/plugin-auth-core, @netscript/auth-kv-oauth, @netscript/auth-workos, and @netscript/auth-better-auth; it is not the reference page for a single package.',
-  },
-];
+export const EXCLUDED_REFERENCE_PAGES: readonly ExcludedReferencePage[] = [];
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
@@ -189,7 +183,7 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     symbolCoverage: {
       mode: 'entrypoints-only',
       reason:
-        'The page guarantees all three entrypoints while curating selected root and CLI APIs: root/CLI exports such as createServiceEndpointDirectory, EndpointSourcePort, and MCP_AGENT_INSTRUCTIONS are omitted, and the OpenAPI projection symbols including indexOpenApiOperations, resolveCanonicalOperation, and projectOperationSchemaViews have no per-symbol section.',
+        'The page guarantees all four entrypoints, including the shared docs transport, while curating selected root and CLI APIs: root/CLI exports such as createServiceEndpointDirectory, EndpointSourcePort, and MCP_AGENT_INSTRUCTIONS are omitted, and the OpenAPI projection symbols including indexOpenApiOperations, resolveCanonicalOperation, and projectOperationSchemaViews have no per-symbol section.',
     },
   },
   {
@@ -332,7 +326,7 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     excludedExports: [],
     symbolCoverage: {
       mode: 'complete',
-      reason: 'All six published entrypoints are maintained as one complete reference surface.',
+      reason: 'All seven published entrypoints are maintained as one complete reference surface.',
       documentedNonExports: [{
         reason:
           'Dropzone is an explicitly labeled copy-source registry component, not a package export.',
@@ -834,7 +828,7 @@ export async function discoverReferencePagePaths(root: string = Deno.cwd()): Pro
   const paths: string[] = [];
   for await (const entry of Deno.readDir(referenceRoot)) {
     if (!entry.isDirectory) continue;
-    const relativePath = join('docs/site/reference', entry.name, 'index.md');
+    const relativePath = `docs/site/reference/${entry.name}/index.md`;
     try {
       if ((await Deno.stat(join(root, relativePath))).isFile) paths.push(relativePath);
     } catch (error) {

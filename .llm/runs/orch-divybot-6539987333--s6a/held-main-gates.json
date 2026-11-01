@@ -1,0 +1,61 @@
+{
+  "previousHead": "d53e422cc5d96934b77455f1d8d57088286b9b4c",
+  "mergedMain": "19bca622338b7ac79913def27d17051b097329b6",
+  "carriers": [
+    {
+      "command": [
+        "deno",
+        "task",
+        "gen:agent-docs-prose"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "deno",
+        "task",
+        "gen:mcp-export-corpus",
+        "--allow-dirty"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "deno",
+        "task",
+        "gen:assets-barrel"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "deno",
+        "task",
+        "gen:publish-assets"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "rootChecks": {
+    "check:desktop-native-fixture": 0,
+    "check:emitted-samples": 0,
+    "check:streams-types": 0,
+    "check:child-health-docs": 0,
+    "check:mcp-export-corpus": 0,
+    "check:assets-barrel": 0,
+    "check:agent-docs-prose": 0,
+    "check:publish-assets": 0,
+    "check:scaffold-versions": 0,
+    "check:aspire-version-parity": 0,
+    "check:netscript-jsr-specifiers": 0,
+    "check:aspire-host-ports": 0,
+    "check:figma-names": 0,
+    "check:review-threads": 0
+  },
+  "quality": {
+    "quality:gate": 0,
+    "docs:accuracy": 0,
+    "release:preflight": 0
+  },
+  "proofScope": "Fresh UI source/tests unchanged; prior335package/60browser historical; newexactheadCI required."
+}

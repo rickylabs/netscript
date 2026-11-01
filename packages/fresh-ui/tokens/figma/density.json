@@ -1,0 +1,301 @@
+{
+  "collection": "Density",
+  "modes": [
+    "Comfortable",
+    "Compact",
+    "Dense",
+    "Airy",
+    "Chunky"
+  ],
+  "variables": [
+    {
+      "name": "space/badge/height",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-badge-height)",
+      "values": {
+        "Comfortable": 22,
+        "Compact": 20,
+        "Dense": 18,
+        "Airy": 22,
+        "Chunky": 26
+      }
+    },
+    {
+      "name": "space/badge/padding-x",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-badge-padding-x)",
+      "values": {
+        "Comfortable": 8,
+        "Compact": 6,
+        "Dense": 5,
+        "Airy": 8,
+        "Chunky": 10
+      }
+    },
+    {
+      "name": "space/card/padding",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-card-padding)",
+      "values": {
+        "Comfortable": 20,
+        "Compact": 16,
+        "Dense": 12,
+        "Airy": 28,
+        "Chunky": 24
+      }
+    },
+    {
+      "name": "space/control/gap",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-control-gap)",
+      "values": {
+        "Comfortable": 8,
+        "Compact": 6,
+        "Dense": 4,
+        "Airy": 10,
+        "Chunky": 10
+      }
+    },
+    {
+      "name": "space/control/height",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-control-height)",
+      "values": {
+        "Comfortable": 36,
+        "Compact": 32,
+        "Dense": 28,
+        "Airy": 40,
+        "Chunky": 44
+      }
+    },
+    {
+      "name": "space/control/height-lg",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-control-height-lg)",
+      "description": "Large control height (lg buttons, icon buttons, toggles, action bar).",
+      "values": {
+        "Comfortable": 44,
+        "Compact": 40,
+        "Dense": 36,
+        "Airy": 48,
+        "Chunky": 52
+      }
+    },
+    {
+      "name": "space/control/height-sm",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-control-height-sm)",
+      "values": {
+        "Comfortable": 30,
+        "Compact": 28,
+        "Dense": 24,
+        "Airy": 34,
+        "Chunky": 36
+      }
+    },
+    {
+      "name": "space/control/height-xs",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-control-height-xs)",
+      "description": "Extra-small control height (xs buttons and icon buttons, input-group addons).",
+      "values": {
+        "Comfortable": 24,
+        "Compact": 22,
+        "Dense": 20,
+        "Airy": 26,
+        "Chunky": 28
+      }
+    },
+    {
+      "name": "space/control/padding-x",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-control-padding-x)",
+      "values": {
+        "Comfortable": 14,
+        "Compact": 12,
+        "Dense": 10,
+        "Airy": 18,
+        "Chunky": 20
+      }
+    },
+    {
+      "name": "space/control/padding-x-sm",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-control-padding-x-sm)",
+      "description": "Horizontal padding of sm controls.",
+      "values": {
+        "Comfortable": 10,
+        "Compact": 8,
+        "Dense": 6,
+        "Airy": 12,
+        "Chunky": 14
+      }
+    },
+    {
+      "name": "space/inline/gap",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-inline-gap)",
+      "values": {
+        "Comfortable": 8,
+        "Compact": 8,
+        "Dense": 6,
+        "Airy": 10,
+        "Chunky": 10
+      }
+    },
+    {
+      "name": "space/page/padding-x",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-page-padding-x)",
+      "values": {
+        "Comfortable": 32,
+        "Compact": 24,
+        "Dense": 20,
+        "Airy": 56,
+        "Chunky": 32
+      }
+    },
+    {
+      "name": "space/page/padding-y",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-page-padding-y)",
+      "values": {
+        "Comfortable": 28,
+        "Compact": 20,
+        "Dense": 16,
+        "Airy": 44,
+        "Chunky": 32
+      }
+    },
+    {
+      "name": "space/section/gap",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-section-gap)",
+      "values": {
+        "Comfortable": 24,
+        "Compact": 16,
+        "Dense": 12,
+        "Airy": 40,
+        "Chunky": 24
+      }
+    },
+    {
+      "name": "space/sidebar/width",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-sidebar-width)",
+      "description": "Expanded sidebar width (Sidebar, App shell).",
+      "values": {
+        "Comfortable": 240,
+        "Compact": 224,
+        "Dense": 208,
+        "Airy": 272,
+        "Chunky": 256
+      }
+    },
+    {
+      "name": "space/stack/gap",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-stack-gap)",
+      "values": {
+        "Comfortable": 12,
+        "Compact": 8,
+        "Dense": 6,
+        "Airy": 16,
+        "Chunky": 14
+      }
+    },
+    {
+      "name": "space/table/cell-padding-x",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-table-cell-padding-x)",
+      "values": {
+        "Comfortable": 16,
+        "Compact": 12,
+        "Dense": 8,
+        "Airy": 16,
+        "Chunky": 16
+      }
+    },
+    {
+      "name": "space/table/row-height",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-table-row-height)",
+      "values": {
+        "Comfortable": 52,
+        "Compact": 44,
+        "Dense": 32,
+        "Airy": 56,
+        "Chunky": 56
+      }
+    },
+    {
+      "name": "space/topbar/height",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-topbar-height)",
+      "values": {
+        "Comfortable": 56,
+        "Compact": 48,
+        "Dense": 40,
+        "Airy": 72,
+        "Chunky": 64
+      }
+    }
+  ]
+}

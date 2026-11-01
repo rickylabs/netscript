@@ -1,8 +1,10 @@
 import { createDurableStream, type DurableStreamProducer } from '@netscript/plugin-streams-core';
 import type { StreamProducerPort } from '@netscript/plugin-streams-core';
-import type {
-  SagaInstanceProjection,
-  SagaInstanceProjectionPort,
+import {
+  parseSagaInstanceReadModel,
+  SAGA_INSTANCE_PROJECTION_VERSION,
+  type SagaInstanceProjection,
+  type SagaInstanceProjectionPort,
 } from '../src/runtime/saga-instance-projection.ts';
 import { type SagasStreamDefinition, sagasStreamSchema } from './schema.ts';
 
@@ -146,8 +148,25 @@ async function startSagaStateReconciliation(
   }
 }
 
-function mapSagaRecordToEntity(record: SagaInstanceRecord): Record<string, unknown> {
+/** Map persisted legacy or versioned projections to the same state shape as live updates. */
+export function mapSagaRecordToEntity(record: SagaInstanceRecord): Record<string, unknown> {
   const state = isRecord(record.state) ? record.state : {};
+  if (state.projectionVersion === SAGA_INSTANCE_PROJECTION_VERSION) {
+    const instance = parseSagaInstanceReadModel(state);
+    return {
+      instanceId: `${record.sagaName}:${record.correlationId}`,
+      sagaId: record.sagaName,
+      correlationKey: record.correlationId,
+      status: instance.status,
+      state: instance.state,
+      version: instance.version,
+      messageCount: instance.messageCount,
+      lastMessageType: instance.lastMessageType,
+      startedAt: instance.createdAt,
+      updatedAt: instance.updatedAt,
+      completedAt: instance.completedAt,
+    };
+  }
   const metadata = isRecord(state.metadata) ? state.metadata : undefined;
   const version = typeof metadata?.version === 'number' ? metadata.version : record.version;
   const isCompleted = typeof metadata?.isCompleted === 'boolean'

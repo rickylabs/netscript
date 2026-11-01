@@ -1,0 +1,348 @@
+{
+  "schemaVersion": 1,
+  "baseline": "46b22e63608eb4ba067145445b523536d6e48aa9",
+  "backend": "real Redis 7.0.15, isolated instance, persistence disabled",
+  "testSourceSha256": {
+    "packages/kv/src/testing/watchable-kv-contract.ts": "4150c6b0a4f2f7894665460a4b92070107c2939e032b06fd2e6c53a211370c02",
+    "packages/kv/tests/redis-internals_test.ts": "c1a39ff7a2fbe92159a076f818029e6a134072f568bd571af880ace67250e80b"
+  },
+  "focused": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 90,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 90,
+      "uniqueFailures": 0
+    }
+  },
+  "stress": {
+    "load": "Two independent CPU workers active throughout all sequential and concurrent trials",
+    "results": [
+      {
+        "run": "sequential-01",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1842
+      },
+      {
+        "run": "sequential-02",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1561
+      },
+      {
+        "run": "sequential-03",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1791
+      },
+      {
+        "run": "sequential-04",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1694
+      },
+      {
+        "run": "sequential-05",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1647
+      },
+      {
+        "run": "sequential-06",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1838
+      },
+      {
+        "run": "sequential-07",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 2080
+      },
+      {
+        "run": "sequential-08",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1872
+      },
+      {
+        "run": "sequential-09",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1807
+      },
+      {
+        "run": "sequential-10",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1992
+      },
+      {
+        "run": "sequential-11",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1852
+      },
+      {
+        "run": "sequential-12",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1898
+      },
+      {
+        "run": "sequential-13",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1708
+      },
+      {
+        "run": "sequential-14",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1638
+      },
+      {
+        "run": "sequential-15",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1644
+      },
+      {
+        "run": "sequential-16",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1672
+      },
+      {
+        "run": "sequential-17",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1565
+      },
+      {
+        "run": "sequential-18",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1609
+      },
+      {
+        "run": "sequential-19",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1769
+      },
+      {
+        "run": "sequential-20",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 1839
+      },
+      {
+        "run": "concurrent-1",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 2038
+      },
+      {
+        "run": "concurrent-2",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 2101
+      },
+      {
+        "run": "concurrent-3",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 2121
+      },
+      {
+        "run": "concurrent-4",
+        "exitCode": 0,
+        "summary": {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 9,
+          "uniqueFailures": 0
+        },
+        "durationMs": 2027
+      }
+    ]
+  },
+  "negativeControl": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 2,
+      "ignored": 0,
+      "totalResults": 2,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "TimeoutError: The operation was aborted due to timeout\n    at Object.<anonymous> (ext:deno_web/03_abort_signal.js:<line>:<column>)\n    at listOnTimeout (ext:core/02_timers.js:<line>:<column>)\n    at Object.processTimers (ext:core/02_timers.js:<line>:<column>)\n    at __processTimers (ext:core/01_core.js:<line>:<column>)",
+        "count": 2,
+        "tests": [
+          {
+            "name": "RedisKvAdapter contract: aborting during a debounce window ends the stream without another batch",
+            "file": "./packages/kv/tests/kv-conformance_test.ts",
+            "line": 40
+          },
+          {
+            "name": "WatchBatchQueue ends an active debounce window on abort",
+            "file": "./packages/kv/tests/redis-internals_test.ts",
+            "line": 79
+          }
+        ]
+      }
+    ]
+  },
+  "gates": {
+    "check": 0,
+    "lint": 0,
+    "format": 0,
+    "quality:gate": 0,
+    "doc:lint": 0
+  },
+  "scope": "test harness and tests only; no production implementation or lock changes"
+}

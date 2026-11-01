@@ -1,3 +1,4 @@
+import { emptyTelemetryProvenance } from '../src/domain/telemetry/telemetry-diagnostics.ts';
 import { assertEquals } from '@std/assert';
 import {
   KVAttributes,
@@ -95,10 +96,16 @@ Deno.test('service performance uses nearest-rank percentiles and stable grouping
   assertEquals({ p50: result.p50DurationMs, p95: result.p95DurationMs }, { p50: 20, p95: 40 });
   assertEquals(result.topOperations.map((item) => item.name), ['slow', 'fast']);
   assertEquals(result.errorRate, 0.25);
-  validateSchema(TOOL_OUTPUT_SCHEMAS.analyze_service_performance, result);
+  validateSchema(TOOL_OUTPUT_SCHEMAS.analyze_service_performance, {
+    ...result,
+    provenance: emptyTelemetryProvenance({ sinceUnixMs: 0, untilUnixMs: 60_000 }, 'fixture'),
+  });
   validateSchema(
     TOOL_OUTPUT_SCHEMAS.analyze_service_performance,
-    aggregateServicePerformance([], { service: 'api', sinceUnixMs: 0, nowUnixMs: 60_000 }),
+    {
+      ...aggregateServicePerformance([], { service: 'api', sinceUnixMs: 0, nowUnixMs: 60_000 }),
+      provenance: emptyTelemetryProvenance({ sinceUnixMs: 0, untilUnixMs: 60_000 }, 'fixture'),
+    },
   );
 });
 
@@ -122,10 +129,16 @@ Deno.test('db bottlenecks include NetScript KV and OTel db namespace and rank to
   assertEquals(result.sampleCount, 2);
   assertEquals(result.operations.map((item) => item.operation), ['get', 'SELECT 1']);
   assertEquals(result.operations[1]?.errorCount, 1);
-  validateSchema(TOOL_OUTPUT_SCHEMAS.analyze_db_bottlenecks, result);
+  validateSchema(TOOL_OUTPUT_SCHEMAS.analyze_db_bottlenecks, {
+    ...result,
+    provenance: emptyTelemetryProvenance({ sinceUnixMs: 0, untilUnixMs: 60_000 }, 'fixture'),
+  });
   validateSchema(
     TOOL_OUTPUT_SCHEMAS.analyze_db_bottlenecks,
-    aggregateDbBottlenecks([], { sinceUnixMs: 0 }),
+    {
+      ...aggregateDbBottlenecks([], { sinceUnixMs: 0 }),
+      provenance: emptyTelemetryProvenance({ sinceUnixMs: 0, untilUnixMs: 60_000 }, 'fixture'),
+    },
   );
 });
 

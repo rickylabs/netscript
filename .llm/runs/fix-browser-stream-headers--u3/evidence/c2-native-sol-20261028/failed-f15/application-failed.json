@@ -1,0 +1,27 @@
+{
+  "status": "FAILED owning-doc condition; candidate reverted only by explicit root instruction",
+  "priorPlanDisposition": "Historical separate PLAN/debt decision preserved; actual owning closure was not qualified",
+  "owningFindings": 12,
+  "structuredFindings": 12,
+  "baselineUnwaived": 10,
+  "attemptedOwningRawPrefixes": [
+    "doc-1793149474316",
+    "doc-1793149545236",
+    "doc-1793149556909"
+  ],
+  "furtherDisposition": "Same independent evaluator corrective PLAN review required before any alternative",
+  "results": [
+    {
+      "path": "packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "archive": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/f15/attempted-create-stream-db.ts",
+      "attemptedSHA256": "7a337093657ddd773fff64aaaf2d137048ddb7abbf2b2546845dddcbec73542c",
+      "restoredSHA256": "fe27fb217d8b39c707c7d4bd4bd773d5bddd31fbb08573dc283820c34ada823f"
+    },
+    {
+      "path": ".llm/harness/debt/arch-debt.md",
+      "archive": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/f15/attempted-arch-debt.md",
+      "attemptedSHA256": "f0743a6e630e023769ed3180b4778aa1d6fb5f28e5140386e216cda3ea7f9e29",
+      "restoredSHA256": "d502eafa19ffb9eab3078ca1a5ed4d3a8a7816f115f33f53f3379defdd6d0042"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "code": 0,
+  "stdout": "03:41:32.223 INF netscript·services·streams Service listening\n03:41:32.229 INF netscript·services·streams HTTP request started\n03:41:32.230 INF netscript·services·streams HTTP request completed\n03:41:32.247 INF netscript·services·streams Service shutdown completed\n{\"reboundPorts\":[61696,64257]}\ns6a-streams: assertions and native cleanup settled\n",
+  "stderr": "Check $deno$stdin.ts\n[streams] Warning: Streams storage is ephemeral; events are lost on process restart.\n",
+  "pid": 88456,
+  "startedAt": "2026-10-28T03:41:30.786Z",
+  "finishedAt": "2026-10-28T03:41:32.264Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

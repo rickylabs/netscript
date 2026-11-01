@@ -29,6 +29,21 @@ without provisioning any database.
 > [`@netscript/plugin-streams-core`](https://jsr.io/@netscript/plugin-streams-core) — this package
 > wires the streams service into a NetScript host.
 
+## Host-owned startup
+
+Import `startStreamsService` from `@netscript/plugin-streams/service` to choose native auth, CORS
+and listener options. This singular import is inert. Required `auth` is validated before runtime
+I/O; guarded raw stream routes need native `authn.protect: ['/']` or the intended stream prefix.
+Supply `cors.origin` for an exact allowlist, or omit it for `NETSCRIPT_CORS_ORIGINS`. The factory
+retains stream protocol headers/methods and returns a native `RunningService`; `stop()` drains its
+front listener and stops its owned upstream. Host `serve.port`, including zero, takes precedence
+over `PORT` and `STREAMS_PORT`; `serve.hostname`, TLS and signal options remain native.
+
+The plural `@netscript/plugin-streams/services` entrypoint retains its existing start-on-import
+public/wildcard policy and delegates to the same factory. The full typed recipe and adoption
+boundary are in
+[Host workers and streams services](https://rickylabs.github.io/netscript/services-sdk/how-to/host-plugin-services/).
+
 ## Storage contract and operations
 
 The runtime manifest records `metadata.storage.defaultMode = "memory"`, `ephemeral = true`, and the
@@ -38,26 +53,37 @@ the `STREAMS_DATA_DIR` opt-in. `/health` includes a `checks` entry named `stream
 memory mode means the service is reachable; it explicitly reports `durable: false`. Local directory
 paths are omitted from health.
 
-The generated AppHost already supports `Environment` on plugin entries. Provision a project-local
-persistent directory yourself, ignore it in Git, then add this to the existing
-`NetScript.Plugins.streams` entry in `appsettings.json` and regenerate the Aspire helpers with
-`netscript generate aspire`:
+The generated AppHost can provision storage explicitly. Add `DataDirectories` to the existing
+`NetScript.Plugins.streams` entry in `appsettings.json`, then run `netscript generate aspire`:
 
 ```json
 {
-  "Environment": {
+  "DataDirectories": {
     "STREAMS_DATA_DIR": ".netscript/data/streams"
   }
 }
 ```
 
-Paths resolve from the streams resource working directory (the project root in the default
-scaffold). Create `.netscript/data/streams` before starting the AppHost and add `.netscript/data/`
-to `.gitignore`. The generated plugin registration passes `STREAMS_DATA_DIR` through
-`withEnvironment`. For a deployed process, mount a persistent writable directory and set the
-equivalent environment value; a container's disposable filesystem does not provide persistent
-storage. Unset means memory; empty, missing, non-directory, or unwritable values fail startup
-without falling back.
+On AppHost start, the generated registration creates the directory (including missing parents)
+and passes its absolute path through `STREAMS_DATA_DIR` before streams starts. Relative paths
+resolve from the resource's `Workdir` (the project root for the default streams resource).
+Add `.netscript/data/` to `.gitignore`. Existing contents are retained across resource and AppHost
+restarts. There is no directory provisioning or file-storage binding when `DataDirectories` is
+omitted. Directory bindings override a conflicting `Environment` value. Directory-creation failure
+(for example, a file at the target or an unwritable parent) aborts AppHost composition. If an
+existing directory cannot pass the streams startup write/read probe, the streams service fails
+startup before health can claim file mode.
+
+Programmatic hosts can declare the same opt-in using
+`new StreamsAspireContribution({ dataDir: '.netscript/data/streams' })` from
+`@netscript/plugin-streams/aspire`. Its service spec carries `dataDirectories` and the environment
+binding for the host's Aspire builder; the contribution itself does no filesystem I/O.
+
+The existing `Environment.STREAMS_DATA_DIR` setting still forwards a manually provisioned directory
+without creating it. In deployments, mount persistent writable storage separately: creating a
+folder in a disposable container filesystem is not a persistence guarantee. Removing both the
+`DataDirectories` binding and any manual environment opt-in restores ephemeral storage on the next
+AppHost generation/start; retained files are not deleted. Do not share a directory between AppHosts.
 
 The process-boundary acceptance test in `services/src/tests/storage-restart_test.ts` uses
 `DurableStreamProducer` upserts and a delete, flushes, stops the service process, restarts it on the
@@ -82,8 +108,8 @@ For backup, stop producers and gracefully stop streams, then copy the **entire**
 (LMDB metadata and native segment files together). Restore that complete copy into an existing,
 writable directory with the service stopped, keep the same storage/protocol versions, and verify
 HTTP replay before resuming producers. Live file copies are not a supported consistent backup.
-Durable-by-default provisioning and migration are tracked in
-[#2114](https://github.com/rickylabs/netscript/issues/2114) for 0.0.9.
+Durable-by-default provisioning and migration remain separate work in
+[#2114](https://github.com/rickylabs/netscript/issues/2114).
 
 Durable recovery reads native frame headers through a reusable 64 KiB window. Tail reads seek from
 recent verified frame boundaries and allocate only the requested complete messages. The recent

@@ -10,6 +10,7 @@ export {
   PluginInstallerManifestSchema,
 } from './manifest.ts';
 export type {
+  PluginDatabaseRequirement,
   PluginInstallerManifest,
   PluginInstallerManifestSchemaIssue,
   PluginInstallerManifestValidator,

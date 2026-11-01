@@ -79,36 +79,118 @@ export function CommandPalette(
 
   return (
     <Dialog.Root open={open} onOpenChange={(next) => onOpenChange?.(next)} modal>
-      <Dialog.Content class='ns-cmdk__backdrop' aria-label='Command palette'>
+      <Dialog.Content
+        class='ns-cmdk__backdrop'
+        data-part='backdrop'
+        data-scope='command-palette'
+        aria-label='Command palette'
+      >
         <Combobox.Root onValueChange={() => {}} defaultOpen>
-          <div class={cn('ns-cmdk', className)}>
-            <div class='ns-cmdk__input-row'>
-              <span class='ns-cmdk__search-icon' aria-hidden='true'>⌕</span>
-              <Combobox.Input class='ns-cmdk__input' placeholder={placeholder} />
+          <div class={cn('ns-cmdk', className)} data-part='root' data-scope='command-palette'>
+            <div data-part='content' data-scope='command-palette' style={{ display: 'contents' }}>
+              <div class='ns-cmdk__input-row' data-part='input-row' data-scope='command-palette'>
+                <span
+                  class='ns-cmdk__search-icon'
+                  data-part='search-icon'
+                  data-scope='command-palette'
+                  aria-hidden='true'
+                >
+                  ⌕
+                </span>
+                <Combobox.Input
+                  class='ns-cmdk__input'
+                  data-part='input'
+                  data-scope='command-palette'
+                  placeholder={placeholder}
+                />
+              </div>
+              <Combobox.Content
+                class='ns-cmdk__list'
+                data-part='list'
+                data-scope='command-palette'
+              >
+                {groups.map((group) => (
+                  <div
+                    key={group.id}
+                    class='ns-cmdk__group'
+                    data-part='group'
+                    data-scope='command-palette'
+                    role='group'
+                  >
+                    {group.label
+                      ? (
+                        <div
+                          class='ns-cmdk__group-label'
+                          data-part='group-label'
+                          data-scope='command-palette'
+                        >
+                          {group.label}
+                        </div>
+                      )
+                      : null}
+                    {group.items.map((item) => (
+                      <Combobox.Item
+                        key={item.id}
+                        value={item.id}
+                        class='ns-cmdk__item'
+                        data-part='item'
+                        data-scope='command-palette'
+                        onClick={() => select(item)}
+                      >
+                        {item.icon
+                          ? (
+                            <span
+                              class='ns-cmdk__item-icon'
+                              data-part='item-icon'
+                              data-scope='command-palette'
+                              aria-hidden='true'
+                            >
+                              {item.icon}
+                            </span>
+                          )
+                          : null}
+                        <span
+                          class='ns-cmdk__item-label'
+                          data-part='item-label'
+                          data-scope='command-palette'
+                        >
+                          {item.label}
+                        </span>
+                        {item.hash
+                          ? (
+                            <span
+                              class='ns-cmdk__item-hash'
+                              data-part='item-hash'
+                              data-scope='command-palette'
+                            >
+                              {item.hash}
+                            </span>
+                          )
+                          : null}
+                        {item.kind
+                          ? (
+                            <span
+                              class='ns-cmdk__item-kind'
+                              data-part='item-kind'
+                              data-scope='command-palette'
+                            >
+                              {item.kind}
+                            </span>
+                          )
+                          : null}
+                      </Combobox.Item>
+                    ))}
+                  </div>
+                ))}
+                <Combobox.Empty
+                  class='ns-cmdk__empty'
+                  data-part='empty'
+                  data-scope='command-palette'
+                >
+                  {emptyLabel}
+                </Combobox.Empty>
+              </Combobox.Content>
             </div>
-            <Combobox.Content class='ns-cmdk__list'>
-              {groups.map((group) => (
-                <div key={group.id} class='ns-cmdk__group' role='group'>
-                  {group.label ? <div class='ns-cmdk__group-label'>{group.label}</div> : null}
-                  {group.items.map((item) => (
-                    <Combobox.Item
-                      key={item.id}
-                      value={item.id}
-                      class='ns-cmdk__item'
-                      onClick={() => select(item)}
-                    >
-                      {item.icon
-                        ? <span class='ns-cmdk__item-icon' aria-hidden='true'>{item.icon}</span>
-                        : null}
-                      <span class='ns-cmdk__item-label'>{item.label}</span>
-                      {item.hash ? <span class='ns-cmdk__item-hash'>{item.hash}</span> : null}
-                      {item.kind ? <span class='ns-cmdk__item-kind'>{item.kind}</span> : null}
-                    </Combobox.Item>
-                  ))}
-                </div>
-              ))}
-              <Combobox.Empty class='ns-cmdk__empty'>{emptyLabel}</Combobox.Empty>
-            </Combobox.Content>
           </div>
         </Combobox.Root>
       </Dialog.Content>

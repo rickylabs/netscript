@@ -1,0 +1,22 @@
+{
+  "previousHead": "53f3794405b573159a7ed6271acded46051f76cb",
+  "mergedMain": "7feb24c7d09518a045c3955555967dbbde51e92a",
+  "mergeBase": "7312ba498b4400ea4e6d0a154f847d59e8f0324d",
+  "mainOnlyPaths": 82,
+  "mainOnlyMismatches": [],
+  "overlapPaths": [
+    "deno.lock",
+    "packages/cli/src/kernel/assets/embedded.generated.ts",
+    "packages/fresh-ui/deno.lock",
+    "packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts",
+    "packages/mcp/src/publish-assets.generated.ts"
+  ],
+  "changedReviewedPaths": [
+    "deno.lock",
+    "packages/cli/src/kernel/assets/embedded.generated.ts",
+    "packages/fresh-ui/deno.lock",
+    "packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts",
+    "packages/mcp/src/publish-assets.generated.ts"
+  ],
+  "unchangedFreshUIAuthoredSource": true
+}

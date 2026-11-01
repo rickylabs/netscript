@@ -1,3 +1,4 @@
+import type { PreparedInitPreset } from '../../../kernel/application/ui/v2/presets/apply-init-preset.ts';
 import { resolve } from '@std/path';
 
 import type { DbEngineChoice } from '../../../kernel/domain/db-engine.ts';
@@ -27,6 +28,8 @@ export interface MaintainerInitRequest {
   readonly json?: boolean;
   /** Named scaffold preset to apply before generation. */
   readonly from?: string;
+  /** UI preset code or portable JSON URL, applied after local package sync. */
+  readonly preset?: string;
   /** Skip `git init` after scaffolding. */
   readonly noGit: boolean;
   /** Skip Aspire orchestration output. */
@@ -71,6 +74,8 @@ export interface MaintainerInitResult {
 export interface MaintainerInitDependencies {
   /** Current working directory provider. */
   readonly cwd: () => string;
+  /** Fetch and validate before scaffolding; apply the retained selection after local sync. */
+  readonly preparePreset?: (preset: string) => Promise<PreparedInitPreset>;
   /** Detect a monorepo root from the requested scaffold location. */
   readonly detectMonorepoRoot: (startDir: string) => Promise<string | undefined>;
   /** Execute the shared scaffold workflow in local mode. */
@@ -94,9 +99,18 @@ export async function orchestrateMaintainerInit(
     );
   }
 
+  let applyPreset: PreparedInitPreset | undefined;
+  if (!request.dryRun && request.preset) {
+    if (!dependencies.preparePreset) {
+      throw new Error('Init UI preset dependencies are not configured');
+    }
+    applyPreset = await dependencies.preparePreset(request.preset);
+  }
+
   const localBase = '.';
+  const { preset: _preset, ...scaffoldRequest } = request;
   const init = await dependencies.runInit({
-    ...request,
+    ...scaffoldRequest,
     importMode: 'local',
     localBase,
     sourceRoot,
@@ -110,6 +124,14 @@ export async function orchestrateMaintainerInit(
     packageCopier: { copyLocalPackages: dependencies.syncPackages },
   });
 
+  if (!request.dryRun && applyPreset && request.preset) {
+    await applyPreset({
+      projectRoot: init.targetPath,
+      name: request.name,
+      appName: request.appName,
+      preset: request.preset,
+    });
+  }
   return {
     init,
     sourceRoot,

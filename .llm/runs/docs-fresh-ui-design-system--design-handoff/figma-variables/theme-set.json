@@ -1,0 +1,5178 @@
+{
+  "collection": "Theme set",
+  "modes": [
+    "A",
+    "B"
+  ],
+  "variables": [
+    {
+      "name": "accent/d/1",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/1"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/1"
+        }
+      }
+    },
+    {
+      "name": "accent/d/10",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/10"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/10"
+        }
+      }
+    },
+    {
+      "name": "accent/d/11",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/11"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/11"
+        }
+      }
+    },
+    {
+      "name": "accent/d/12",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/12"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/12"
+        }
+      }
+    },
+    {
+      "name": "accent/d/2",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/2"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/2"
+        }
+      }
+    },
+    {
+      "name": "accent/d/3",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/3"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/3"
+        }
+      }
+    },
+    {
+      "name": "accent/d/4",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/4"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/4"
+        }
+      }
+    },
+    {
+      "name": "accent/d/5",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/5"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/5"
+        }
+      }
+    },
+    {
+      "name": "accent/d/6",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/6"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/6"
+        }
+      }
+    },
+    {
+      "name": "accent/d/7",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/7"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/7"
+        }
+      }
+    },
+    {
+      "name": "accent/d/8",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/8"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/8"
+        }
+      }
+    },
+    {
+      "name": "accent/d/9",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/9"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/9"
+        }
+      }
+    },
+    {
+      "name": "accent/d/contrast",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/contrast"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/contrast"
+        }
+      }
+    },
+    {
+      "name": "accent/d/solid",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/solid"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/solid"
+        }
+      }
+    },
+    {
+      "name": "accent/d/solid-fg",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/solid-fg"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/solid-fg"
+        }
+      }
+    },
+    {
+      "name": "accent/d/solid-hover",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/d/solid-hover"
+        },
+        "B": {
+          "alias": "Theme B/accent/d/solid-hover"
+        }
+      }
+    },
+    {
+      "name": "accent/l/1",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/1"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/1"
+        }
+      }
+    },
+    {
+      "name": "accent/l/10",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/10"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/10"
+        }
+      }
+    },
+    {
+      "name": "accent/l/11",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/11"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/11"
+        }
+      }
+    },
+    {
+      "name": "accent/l/12",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/12"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/12"
+        }
+      }
+    },
+    {
+      "name": "accent/l/2",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/2"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/2"
+        }
+      }
+    },
+    {
+      "name": "accent/l/3",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/3"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/3"
+        }
+      }
+    },
+    {
+      "name": "accent/l/4",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/4"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/4"
+        }
+      }
+    },
+    {
+      "name": "accent/l/5",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/5"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/5"
+        }
+      }
+    },
+    {
+      "name": "accent/l/6",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/6"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/6"
+        }
+      }
+    },
+    {
+      "name": "accent/l/7",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/7"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/7"
+        }
+      }
+    },
+    {
+      "name": "accent/l/8",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/8"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/8"
+        }
+      }
+    },
+    {
+      "name": "accent/l/9",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/9"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/9"
+        }
+      }
+    },
+    {
+      "name": "accent/l/contrast",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/contrast"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/contrast"
+        }
+      }
+    },
+    {
+      "name": "accent/l/solid",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/solid"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/solid"
+        }
+      }
+    },
+    {
+      "name": "accent/l/solid-hover",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/accent/l/solid-hover"
+        },
+        "B": {
+          "alias": "Theme B/accent/l/solid-hover"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/d/destructive/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-d-destructive-bg)",
+      "description": "Theme set switch for badge/solid/d/destructive/bg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/d/destructive/bg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/d/destructive/bg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/d/destructive/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-d-destructive-fg)",
+      "description": "Theme set switch for badge/solid/d/destructive/fg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/d/destructive/fg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/d/destructive/fg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/d/info/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-d-info-bg)",
+      "description": "Theme set switch for badge/solid/d/info/bg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/d/info/bg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/d/info/bg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/d/info/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-d-info-fg)",
+      "description": "Theme set switch for badge/solid/d/info/fg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/d/info/fg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/d/info/fg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/d/neutral/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-d-neutral-bg)",
+      "description": "Theme set switch for badge/solid/d/neutral/bg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/d/neutral/bg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/d/neutral/bg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/d/neutral/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-d-neutral-fg)",
+      "description": "Theme set switch for badge/solid/d/neutral/fg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/d/neutral/fg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/d/neutral/fg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/d/success/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-d-success-bg)",
+      "description": "Theme set switch for badge/solid/d/success/bg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/d/success/bg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/d/success/bg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/d/success/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-d-success-fg)",
+      "description": "Theme set switch for badge/solid/d/success/fg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/d/success/fg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/d/success/fg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/d/warning/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-d-warning-bg)",
+      "description": "Theme set switch for badge/solid/d/warning/bg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/d/warning/bg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/d/warning/bg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/d/warning/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-d-warning-fg)",
+      "description": "Theme set switch for badge/solid/d/warning/fg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/d/warning/fg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/d/warning/fg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/l/destructive/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-l-destructive-bg)",
+      "description": "Theme set switch for badge/solid/l/destructive/bg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/l/destructive/bg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/l/destructive/bg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/l/destructive/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-l-destructive-fg)",
+      "description": "Theme set switch for badge/solid/l/destructive/fg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/l/destructive/fg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/l/destructive/fg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/l/info/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-l-info-bg)",
+      "description": "Theme set switch for badge/solid/l/info/bg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/l/info/bg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/l/info/bg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/l/info/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-l-info-fg)",
+      "description": "Theme set switch for badge/solid/l/info/fg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/l/info/fg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/l/info/fg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/l/neutral/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-l-neutral-bg)",
+      "description": "Theme set switch for badge/solid/l/neutral/bg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/l/neutral/bg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/l/neutral/bg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/l/neutral/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-l-neutral-fg)",
+      "description": "Theme set switch for badge/solid/l/neutral/fg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/l/neutral/fg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/l/neutral/fg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/l/success/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-l-success-bg)",
+      "description": "Theme set switch for badge/solid/l/success/bg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/l/success/bg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/l/success/bg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/l/success/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-l-success-fg)",
+      "description": "Theme set switch for badge/solid/l/success/fg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/l/success/fg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/l/success/fg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/l/warning/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-l-warning-bg)",
+      "description": "Theme set switch for badge/solid/l/warning/bg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/l/warning/bg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/l/warning/bg"
+        }
+      }
+    },
+    {
+      "name": "badge/solid/l/warning/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-badge-solid-l-warning-fg)",
+      "description": "Theme set switch for badge/solid/l/warning/fg: A → Theme, B → Theme B.",
+      "values": {
+        "A": {
+          "alias": "Theme/badge/solid/l/warning/fg"
+        },
+        "B": {
+          "alias": "Theme B/badge/solid/l/warning/fg"
+        }
+      }
+    },
+    {
+      "name": "border/d/default",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/border/d/default"
+        },
+        "B": {
+          "alias": "Theme B/border/d/default"
+        }
+      }
+    },
+    {
+      "name": "border/d/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/border/d/subtle"
+        },
+        "B": {
+          "alias": "Theme B/border/d/subtle"
+        }
+      }
+    },
+    {
+      "name": "border/l/default",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/border/l/default"
+        },
+        "B": {
+          "alias": "Theme B/border/l/default"
+        }
+      }
+    },
+    {
+      "name": "border/l/subtle",
+      "type": "COLOR",
+      "scopes": [
+        "STROKE_COLOR"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/border/l/subtle"
+        },
+        "B": {
+          "alias": "Theme B/border/l/subtle"
+        }
+      }
+    },
+    {
+      "name": "border/width",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/border/width"
+        },
+        "B": {
+          "alias": "Theme B/border/width"
+        }
+      }
+    },
+    {
+      "name": "brand/d/default",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-brand-d-default)",
+      "description": "Dark source for Scheme brand/default. Studio: Studio flavor/signal/d/brand; other themes: accent/d/solid.",
+      "values": {
+        "A": {
+          "alias": "Theme/brand/d/default"
+        },
+        "B": {
+          "alias": "Theme B/brand/d/default"
+        }
+      }
+    },
+    {
+      "name": "brand/d/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-brand-d-fg)",
+      "description": "Dark source for Scheme brand/fg. Studio: Studio flavor/primary/d/fg; other themes: accent/d/solid-fg.",
+      "values": {
+        "A": {
+          "alias": "Theme/brand/d/fg"
+        },
+        "B": {
+          "alias": "Theme B/brand/d/fg"
+        }
+      }
+    },
+    {
+      "name": "brand/l/default",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-brand-l-default)",
+      "description": "Light source for Scheme brand/default. Studio: Studio flavor/signal/l/brand; other themes: accent/l/solid.",
+      "values": {
+        "A": {
+          "alias": "Theme/brand/l/default"
+        },
+        "B": {
+          "alias": "Theme B/brand/l/default"
+        }
+      }
+    },
+    {
+      "name": "brand/l/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-brand-l-fg)",
+      "description": "Light source for Scheme brand/fg. Studio: Studio flavor/primary/l/fg; other themes: accent/l/contrast.",
+      "values": {
+        "A": {
+          "alias": "Theme/brand/l/fg"
+        },
+        "B": {
+          "alias": "Theme B/brand/l/fg"
+        }
+      }
+    },
+    {
+      "name": "card/border-bottom",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-card-border-bottom)",
+      "description": "Card bottom border width. Studio: Studio flavor card/border-bottom; other themes: border/width.",
+      "values": {
+        "A": {
+          "alias": "Theme/card/border-bottom"
+        },
+        "B": {
+          "alias": "Theme B/card/border-bottom"
+        }
+      }
+    },
+    {
+      "name": "card/border-side",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-card-border-side)",
+      "description": "Card left and right border width. Studio: Studio flavor card/border-side; other themes: border/width.",
+      "values": {
+        "A": {
+          "alias": "Theme/card/border-side"
+        },
+        "B": {
+          "alias": "Theme B/card/border-side"
+        }
+      }
+    },
+    {
+      "name": "card/border-top",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-card-border-top)",
+      "description": "Card top border width. Studio: Studio flavor card/border-top; other themes: border/width.",
+      "values": {
+        "A": {
+          "alias": "Theme/card/border-top"
+        },
+        "B": {
+          "alias": "Theme B/card/border-top"
+        }
+      }
+    },
+    {
+      "name": "card/d/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-card-d-bg)",
+      "description": "Dark source for Scheme card/bg. Studio: Studio flavor/card/d/bg (transparent in Utility: cards have no fill); other themes: surface/d/paper (the surface/card source).",
+      "values": {
+        "A": {
+          "alias": "Theme/card/d/bg"
+        },
+        "B": {
+          "alias": "Theme B/card/d/bg"
+        }
+      }
+    },
+    {
+      "name": "card/d/border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-card-d-border)",
+      "description": "Dark source for Scheme card/border. Studio: Studio flavor/card/d/border; other themes: border/d/default.",
+      "values": {
+        "A": {
+          "alias": "Theme/card/d/border"
+        },
+        "B": {
+          "alias": "Theme B/card/d/border"
+        }
+      }
+    },
+    {
+      "name": "card/d/footer",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-card-d-footer)",
+      "description": "Dark source for Scheme card/footer. Studio: Studio flavor/card/d/footer; other themes: tone/d/muted.",
+      "values": {
+        "A": {
+          "alias": "Theme/card/d/footer"
+        },
+        "B": {
+          "alias": "Theme B/card/d/footer"
+        }
+      }
+    },
+    {
+      "name": "card/l/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-card-l-bg)",
+      "description": "Light source for Scheme card/bg. Studio: Studio flavor/card/l/bg (transparent in Utility: cards have no fill); other themes: surface/l/paper (the surface/card source).",
+      "values": {
+        "A": {
+          "alias": "Theme/card/l/bg"
+        },
+        "B": {
+          "alias": "Theme B/card/l/bg"
+        }
+      }
+    },
+    {
+      "name": "card/l/border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-card-l-border)",
+      "description": "Light source for Scheme card/border. Studio: Studio flavor/card/l/border; other themes: border/l/default.",
+      "values": {
+        "A": {
+          "alias": "Theme/card/l/border"
+        },
+        "B": {
+          "alias": "Theme B/card/l/border"
+        }
+      }
+    },
+    {
+      "name": "card/l/footer",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-card-l-footer)",
+      "description": "Light source for Scheme card/footer. Studio: Studio flavor/card/l/footer; other themes: tone/l/muted.",
+      "values": {
+        "A": {
+          "alias": "Theme/card/l/footer"
+        },
+        "B": {
+          "alias": "Theme B/card/l/footer"
+        }
+      }
+    },
+    {
+      "name": "chart/d/1",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-chart-d-1)",
+      "description": "Dark source for Scheme chart/1. Studio: Studio flavor chart/d/1; other modes: that theme categorical palette.",
+      "values": {
+        "A": {
+          "alias": "Theme/chart/d/1"
+        },
+        "B": {
+          "alias": "Theme B/chart/d/1"
+        }
+      }
+    },
+    {
+      "name": "chart/d/2",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-chart-d-2)",
+      "description": "Dark source for Scheme chart/2. Studio: Studio flavor chart/d/2; other modes: that theme categorical palette.",
+      "values": {
+        "A": {
+          "alias": "Theme/chart/d/2"
+        },
+        "B": {
+          "alias": "Theme B/chart/d/2"
+        }
+      }
+    },
+    {
+      "name": "chart/d/3",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-chart-d-3)",
+      "description": "Dark source for Scheme chart/3. Studio: Studio flavor chart/d/3; other modes: that theme categorical palette.",
+      "values": {
+        "A": {
+          "alias": "Theme/chart/d/3"
+        },
+        "B": {
+          "alias": "Theme B/chart/d/3"
+        }
+      }
+    },
+    {
+      "name": "chart/d/4",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-chart-d-4)",
+      "description": "Dark source for Scheme chart/4. Studio: Studio flavor chart/d/4; other modes: that theme categorical palette.",
+      "values": {
+        "A": {
+          "alias": "Theme/chart/d/4"
+        },
+        "B": {
+          "alias": "Theme B/chart/d/4"
+        }
+      }
+    },
+    {
+      "name": "chart/d/5",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-chart-d-5)",
+      "description": "Dark source for Scheme chart/5. Studio: Studio flavor chart/d/5; other modes: that theme categorical palette.",
+      "values": {
+        "A": {
+          "alias": "Theme/chart/d/5"
+        },
+        "B": {
+          "alias": "Theme B/chart/d/5"
+        }
+      }
+    },
+    {
+      "name": "chart/l/1",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-chart-l-1)",
+      "description": "Light source for Scheme chart/1. Studio: Studio flavor chart/l/1; other modes: that theme categorical palette.",
+      "values": {
+        "A": {
+          "alias": "Theme/chart/l/1"
+        },
+        "B": {
+          "alias": "Theme B/chart/l/1"
+        }
+      }
+    },
+    {
+      "name": "chart/l/2",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-chart-l-2)",
+      "description": "Light source for Scheme chart/2. Studio: Studio flavor chart/l/2; other modes: that theme categorical palette.",
+      "values": {
+        "A": {
+          "alias": "Theme/chart/l/2"
+        },
+        "B": {
+          "alias": "Theme B/chart/l/2"
+        }
+      }
+    },
+    {
+      "name": "chart/l/3",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-chart-l-3)",
+      "description": "Light source for Scheme chart/3. Studio: Studio flavor chart/l/3; other modes: that theme categorical palette.",
+      "values": {
+        "A": {
+          "alias": "Theme/chart/l/3"
+        },
+        "B": {
+          "alias": "Theme B/chart/l/3"
+        }
+      }
+    },
+    {
+      "name": "chart/l/4",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-chart-l-4)",
+      "description": "Light source for Scheme chart/4. Studio: Studio flavor chart/l/4; other modes: that theme categorical palette.",
+      "values": {
+        "A": {
+          "alias": "Theme/chart/l/4"
+        },
+        "B": {
+          "alias": "Theme B/chart/l/4"
+        }
+      }
+    },
+    {
+      "name": "chart/l/5",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-chart-l-5)",
+      "description": "Light source for Scheme chart/5. Studio: Studio flavor chart/l/5; other modes: that theme categorical palette.",
+      "values": {
+        "A": {
+          "alias": "Theme/chart/l/5"
+        },
+        "B": {
+          "alias": "Theme B/chart/l/5"
+        }
+      }
+    },
+    {
+      "name": "deco/blockbars",
+      "type": "BOOLEAN",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "codeSyntax": "var(--ns-deco-blockbars)",
+      "description": "Shows block-bar decorations. Studio: Studio flavor deco/blockbars; other themes: false.",
+      "values": {
+        "A": {
+          "alias": "Theme/deco/blockbars"
+        },
+        "B": {
+          "alias": "Theme B/deco/blockbars"
+        }
+      }
+    },
+    {
+      "name": "deco/marker",
+      "type": "BOOLEAN",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "codeSyntax": "var(--ns-deco-marker)",
+      "description": "Shows the 6px location marker (Tabs, Nav item, Navigation menu). Studio: Studio flavor deco/marker; other themes: false.",
+      "values": {
+        "A": {
+          "alias": "Theme/deco/marker"
+        },
+        "B": {
+          "alias": "Theme B/deco/marker"
+        }
+      }
+    },
+    {
+      "name": "deco/sparkline",
+      "type": "BOOLEAN",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "codeSyntax": "var(--ns-deco-sparkline)",
+      "description": "Shows stat-card sparklines. Studio: Studio flavor deco/sparkline; other themes: false.",
+      "values": {
+        "A": {
+          "alias": "Theme/deco/sparkline"
+        },
+        "B": {
+          "alias": "Theme B/deco/sparkline"
+        }
+      }
+    },
+    {
+      "name": "deco/ticks",
+      "type": "BOOLEAN",
+      "scopes": [
+        "ALL_SCOPES"
+      ],
+      "codeSyntax": "var(--ns-deco-ticks)",
+      "description": "Shows tick decorations. Studio: Studio flavor deco/ticks; other themes: false.",
+      "values": {
+        "A": {
+          "alias": "Theme/deco/ticks"
+        },
+        "B": {
+          "alias": "Theme B/deco/ticks"
+        }
+      }
+    },
+    {
+      "name": "effect/d/control-shadow",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-effect-d-control-shadow)",
+      "description": "Dark source for Scheme effect/control-shadow. Studio: Studio flavor/button/d/shadow; other themes: shadow/d/color.",
+      "values": {
+        "A": {
+          "alias": "Theme/effect/d/control-shadow"
+        },
+        "B": {
+          "alias": "Theme B/effect/d/control-shadow"
+        }
+      }
+    },
+    {
+      "name": "effect/l/control-shadow",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-effect-l-control-shadow)",
+      "description": "Light source for Scheme effect/control-shadow. Studio: Studio flavor/button/l/shadow; other themes: shadow/l/color.",
+      "values": {
+        "A": {
+          "alias": "Theme/effect/l/control-shadow"
+        },
+        "B": {
+          "alias": "Theme B/effect/l/control-shadow"
+        }
+      }
+    },
+    {
+      "name": "focus/ring-offset",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-focus-ring-offset)",
+      "description": "Gap between control and focus ring in px (drives code; Figma draws a literal 2).",
+      "values": {
+        "A": {
+          "alias": "Theme/focus/ring-offset"
+        },
+        "B": {
+          "alias": "Theme B/focus/ring-offset"
+        }
+      }
+    },
+    {
+      "name": "focus/ring-width",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-focus-ring-width)",
+      "description": "Focus ring stroke width in px.",
+      "values": {
+        "A": {
+          "alias": "Theme/focus/ring-width"
+        },
+        "B": {
+          "alias": "Theme B/focus/ring-width"
+        }
+      }
+    },
+    {
+      "name": "font/data",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-data)",
+      "values": {
+        "A": {
+          "alias": "Theme/font/data"
+        },
+        "B": {
+          "alias": "Theme B/font/data"
+        }
+      }
+    },
+    {
+      "name": "font/eyebrow",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-eyebrow)",
+      "description": "Eyebrow family. Studio follows Studio flavor font/eyebrow; other themes use font/label.",
+      "values": {
+        "A": {
+          "alias": "Theme/font/eyebrow"
+        },
+        "B": {
+          "alias": "Theme B/font/eyebrow"
+        }
+      }
+    },
+    {
+      "name": "font/heading",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-heading)",
+      "values": {
+        "A": {
+          "alias": "Theme/font/heading"
+        },
+        "B": {
+          "alias": "Theme B/font/heading"
+        }
+      }
+    },
+    {
+      "name": "font/kpi",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-kpi)",
+      "values": {
+        "A": {
+          "alias": "Theme/font/kpi"
+        },
+        "B": {
+          "alias": "Theme B/font/kpi"
+        }
+      }
+    },
+    {
+      "name": "font/label",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-label)",
+      "values": {
+        "A": {
+          "alias": "Theme/font/label"
+        },
+        "B": {
+          "alias": "Theme B/font/label"
+        }
+      }
+    },
+    {
+      "name": "font/mono",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-mono)",
+      "values": {
+        "A": {
+          "alias": "Theme/font/mono"
+        },
+        "B": {
+          "alias": "Theme B/font/mono"
+        }
+      }
+    },
+    {
+      "name": "font/sans",
+      "type": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": "var(--ns-font-sans)",
+      "values": {
+        "A": {
+          "alias": "Theme/font/sans"
+        },
+        "B": {
+          "alias": "Theme B/font/sans"
+        }
+      }
+    },
+    {
+      "name": "frame/inset",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-frame-inset)",
+      "description": "Outer inset around the app frame (floating top bar). Studio: Studio flavor frame/inset; other themes: 0.",
+      "values": {
+        "A": {
+          "alias": "Theme/frame/inset"
+        },
+        "B": {
+          "alias": "Theme B/frame/inset"
+        }
+      }
+    },
+    {
+      "name": "gray/d/1",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/d/1"
+        },
+        "B": {
+          "alias": "Theme B/gray/d/1"
+        }
+      }
+    },
+    {
+      "name": "gray/d/10",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/d/10"
+        },
+        "B": {
+          "alias": "Theme B/gray/d/10"
+        }
+      }
+    },
+    {
+      "name": "gray/d/11",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/d/11"
+        },
+        "B": {
+          "alias": "Theme B/gray/d/11"
+        }
+      }
+    },
+    {
+      "name": "gray/d/12",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/d/12"
+        },
+        "B": {
+          "alias": "Theme B/gray/d/12"
+        }
+      }
+    },
+    {
+      "name": "gray/d/2",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/d/2"
+        },
+        "B": {
+          "alias": "Theme B/gray/d/2"
+        }
+      }
+    },
+    {
+      "name": "gray/d/3",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/d/3"
+        },
+        "B": {
+          "alias": "Theme B/gray/d/3"
+        }
+      }
+    },
+    {
+      "name": "gray/d/4",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/d/4"
+        },
+        "B": {
+          "alias": "Theme B/gray/d/4"
+        }
+      }
+    },
+    {
+      "name": "gray/d/5",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/d/5"
+        },
+        "B": {
+          "alias": "Theme B/gray/d/5"
+        }
+      }
+    },
+    {
+      "name": "gray/d/6",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/d/6"
+        },
+        "B": {
+          "alias": "Theme B/gray/d/6"
+        }
+      }
+    },
+    {
+      "name": "gray/d/7",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/d/7"
+        },
+        "B": {
+          "alias": "Theme B/gray/d/7"
+        }
+      }
+    },
+    {
+      "name": "gray/d/8",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/d/8"
+        },
+        "B": {
+          "alias": "Theme B/gray/d/8"
+        }
+      }
+    },
+    {
+      "name": "gray/d/9",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/d/9"
+        },
+        "B": {
+          "alias": "Theme B/gray/d/9"
+        }
+      }
+    },
+    {
+      "name": "gray/d/ink-hover",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/d/ink-hover"
+        },
+        "B": {
+          "alias": "Theme B/gray/d/ink-hover"
+        }
+      }
+    },
+    {
+      "name": "gray/l/1",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/l/1"
+        },
+        "B": {
+          "alias": "Theme B/gray/l/1"
+        }
+      }
+    },
+    {
+      "name": "gray/l/10",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/l/10"
+        },
+        "B": {
+          "alias": "Theme B/gray/l/10"
+        }
+      }
+    },
+    {
+      "name": "gray/l/11",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/l/11"
+        },
+        "B": {
+          "alias": "Theme B/gray/l/11"
+        }
+      }
+    },
+    {
+      "name": "gray/l/12",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/l/12"
+        },
+        "B": {
+          "alias": "Theme B/gray/l/12"
+        }
+      }
+    },
+    {
+      "name": "gray/l/2",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/l/2"
+        },
+        "B": {
+          "alias": "Theme B/gray/l/2"
+        }
+      }
+    },
+    {
+      "name": "gray/l/3",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/l/3"
+        },
+        "B": {
+          "alias": "Theme B/gray/l/3"
+        }
+      }
+    },
+    {
+      "name": "gray/l/4",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/l/4"
+        },
+        "B": {
+          "alias": "Theme B/gray/l/4"
+        }
+      }
+    },
+    {
+      "name": "gray/l/5",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/l/5"
+        },
+        "B": {
+          "alias": "Theme B/gray/l/5"
+        }
+      }
+    },
+    {
+      "name": "gray/l/6",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/l/6"
+        },
+        "B": {
+          "alias": "Theme B/gray/l/6"
+        }
+      }
+    },
+    {
+      "name": "gray/l/7",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/l/7"
+        },
+        "B": {
+          "alias": "Theme B/gray/l/7"
+        }
+      }
+    },
+    {
+      "name": "gray/l/8",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/l/8"
+        },
+        "B": {
+          "alias": "Theme B/gray/l/8"
+        }
+      }
+    },
+    {
+      "name": "gray/l/9",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/l/9"
+        },
+        "B": {
+          "alias": "Theme B/gray/l/9"
+        }
+      }
+    },
+    {
+      "name": "gray/l/ink-hover",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/gray/l/ink-hover"
+        },
+        "B": {
+          "alias": "Theme B/gray/l/ink-hover"
+        }
+      }
+    },
+    {
+      "name": "hero/d/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-hero-d-bg)",
+      "description": "Dark source for Scheme hero/bg. Studio: Studio flavor/hero/d/bg; other themes: surface/d/canvas.",
+      "values": {
+        "A": {
+          "alias": "Theme/hero/d/bg"
+        },
+        "B": {
+          "alias": "Theme B/hero/d/bg"
+        }
+      }
+    },
+    {
+      "name": "hero/l/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-hero-l-bg)",
+      "description": "Light source for Scheme hero/bg. Studio: Studio flavor/hero/l/bg; other themes: surface/l/canvas.",
+      "values": {
+        "A": {
+          "alias": "Theme/hero/l/bg"
+        },
+        "B": {
+          "alias": "Theme B/hero/l/bg"
+        }
+      }
+    },
+    {
+      "name": "hero/pad",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-hero-pad)",
+      "description": "Hero inner padding. Studio: Studio flavor hero/pad; other themes: 0.",
+      "values": {
+        "A": {
+          "alias": "Theme/hero/pad"
+        },
+        "B": {
+          "alias": "Theme B/hero/pad"
+        }
+      }
+    },
+    {
+      "name": "hover/d",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/hover/d"
+        },
+        "B": {
+          "alias": "Theme B/hover/d"
+        }
+      }
+    },
+    {
+      "name": "hover/l",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/hover/l"
+        },
+        "B": {
+          "alias": "Theme B/hover/l"
+        }
+      }
+    },
+    {
+      "name": "icon/stroke",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-icon-stroke-width)",
+      "description": "Icon stroke width. Studio follows Studio flavor icon/stroke; 2 elsewhere.",
+      "values": {
+        "A": {
+          "alias": "Theme/icon/stroke"
+        },
+        "B": {
+          "alias": "Theme B/icon/stroke"
+        }
+      }
+    },
+    {
+      "name": "ink/d",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/ink/d"
+        },
+        "B": {
+          "alias": "Theme B/ink/d"
+        }
+      }
+    },
+    {
+      "name": "ink/d-fg",
+      "type": "COLOR",
+      "scopes": [],
+      "description": "Dark source for Scheme ink/fg (text on ink). Light-ink themes: own gray/d/1; Brutal keeps black ink in dark, so gray/d/12.",
+      "values": {
+        "A": {
+          "alias": "Theme/ink/d-fg"
+        },
+        "B": {
+          "alias": "Theme B/ink/d-fg"
+        }
+      }
+    },
+    {
+      "name": "ink/l",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/ink/l"
+        },
+        "B": {
+          "alias": "Theme B/ink/l"
+        }
+      }
+    },
+    {
+      "name": "input/d",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-input-d)",
+      "description": "Dark source for Scheme border/input. Studio: Studio flavor input/d/border (gray 9 in Utility); other themes: gray/d/10.",
+      "values": {
+        "A": {
+          "alias": "Theme/input/d"
+        },
+        "B": {
+          "alias": "Theme B/input/d"
+        }
+      }
+    },
+    {
+      "name": "input/l",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-input-l)",
+      "description": "Light source for Scheme border/input. Studio: Studio flavor input/l/border (gray 9 in Utility); other themes: gray/l/10.",
+      "values": {
+        "A": {
+          "alias": "Theme/input/l"
+        },
+        "B": {
+          "alias": "Theme B/input/l"
+        }
+      }
+    },
+    {
+      "name": "kpi/border-bottom",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-kpi-border-bottom)",
+      "description": "Stat card bottom border width. Studio: Studio flavor kpi/border-bottom; other themes: border/width.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/border-bottom"
+        },
+        "B": {
+          "alias": "Theme B/kpi/border-bottom"
+        }
+      }
+    },
+    {
+      "name": "kpi/border-left",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-kpi-border-left)",
+      "description": "Stat card left border width. Studio: Studio flavor kpi/border-left; other themes: border/width.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/border-left"
+        },
+        "B": {
+          "alias": "Theme B/kpi/border-left"
+        }
+      }
+    },
+    {
+      "name": "kpi/border-right",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-kpi-border-right)",
+      "description": "Stat card right border width. Studio: Studio flavor kpi/border-right; other themes: border/width.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/border-right"
+        },
+        "B": {
+          "alias": "Theme B/kpi/border-right"
+        }
+      }
+    },
+    {
+      "name": "kpi/border-top",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-kpi-border-top)",
+      "description": "Stat card top border width. Studio: Studio flavor kpi/border-top; other themes: border/width.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/border-top"
+        },
+        "B": {
+          "alias": "Theme B/kpi/border-top"
+        }
+      }
+    },
+    {
+      "name": "kpi/d/bg-1",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-d-bg-1)",
+      "description": "Dark source for Scheme kpi/bg-1. Studio: Studio flavor/kpi/d/bg-1; other themes: surface/d/paper.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/d/bg-1"
+        },
+        "B": {
+          "alias": "Theme B/kpi/d/bg-1"
+        }
+      }
+    },
+    {
+      "name": "kpi/d/bg-2",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-d-bg-2)",
+      "description": "Dark source for Scheme kpi/bg-2. Studio: Studio flavor/kpi/d/bg-2; other themes: surface/d/paper.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/d/bg-2"
+        },
+        "B": {
+          "alias": "Theme B/kpi/d/bg-2"
+        }
+      }
+    },
+    {
+      "name": "kpi/d/bg-3",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-d-bg-3)",
+      "description": "Dark source for Scheme kpi/bg-3. Studio: Studio flavor/kpi/d/bg-3; other themes: surface/d/paper.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/d/bg-3"
+        },
+        "B": {
+          "alias": "Theme B/kpi/d/bg-3"
+        }
+      }
+    },
+    {
+      "name": "kpi/d/bg-4",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-d-bg-4)",
+      "description": "Dark source for Scheme kpi/bg-4. Studio: Studio flavor/kpi/d/bg-4; other themes: surface/d/paper.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/d/bg-4"
+        },
+        "B": {
+          "alias": "Theme B/kpi/d/bg-4"
+        }
+      }
+    },
+    {
+      "name": "kpi/d/border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-d-border)",
+      "description": "Dark source for Scheme kpi/border. Studio: Studio flavor/kpi/d/border; other themes: border/d/default.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/d/border"
+        },
+        "B": {
+          "alias": "Theme B/kpi/d/border"
+        }
+      }
+    },
+    {
+      "name": "kpi/first-left",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-kpi-first-left)",
+      "description": "Left border width of the first stat card. Studio: Studio flavor kpi/first-left; other themes: border/width.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/first-left"
+        },
+        "B": {
+          "alias": "Theme B/kpi/first-left"
+        }
+      }
+    },
+    {
+      "name": "kpi/gap",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-kpi-gap)",
+      "description": "Gap between stat cards. Studio: Studio flavor kpi/gap; other themes: 16.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/gap"
+        },
+        "B": {
+          "alias": "Theme B/kpi/gap"
+        }
+      }
+    },
+    {
+      "name": "kpi/l/bg-1",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-l-bg-1)",
+      "description": "Light source for Scheme kpi/bg-1. Studio: Studio flavor/kpi/l/bg-1; other themes: surface/l/paper.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/l/bg-1"
+        },
+        "B": {
+          "alias": "Theme B/kpi/l/bg-1"
+        }
+      }
+    },
+    {
+      "name": "kpi/l/bg-2",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-l-bg-2)",
+      "description": "Light source for Scheme kpi/bg-2. Studio: Studio flavor/kpi/l/bg-2; other themes: surface/l/paper.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/l/bg-2"
+        },
+        "B": {
+          "alias": "Theme B/kpi/l/bg-2"
+        }
+      }
+    },
+    {
+      "name": "kpi/l/bg-3",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-l-bg-3)",
+      "description": "Light source for Scheme kpi/bg-3. Studio: Studio flavor/kpi/l/bg-3; other themes: surface/l/paper.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/l/bg-3"
+        },
+        "B": {
+          "alias": "Theme B/kpi/l/bg-3"
+        }
+      }
+    },
+    {
+      "name": "kpi/l/bg-4",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-l-bg-4)",
+      "description": "Light source for Scheme kpi/bg-4. Studio: Studio flavor/kpi/l/bg-4; other themes: surface/l/paper.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/l/bg-4"
+        },
+        "B": {
+          "alias": "Theme B/kpi/l/bg-4"
+        }
+      }
+    },
+    {
+      "name": "kpi/l/border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-kpi-l-border)",
+      "description": "Light source for Scheme kpi/border. Studio: Studio flavor/kpi/l/border; other themes: border/l/default.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/l/border"
+        },
+        "B": {
+          "alias": "Theme B/kpi/l/border"
+        }
+      }
+    },
+    {
+      "name": "kpi/pad-x",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-kpi-pad-x)",
+      "description": "Stat card horizontal padding. Studio: Studio flavor kpi/pad-x; other themes: 20.",
+      "values": {
+        "A": {
+          "alias": "Theme/kpi/pad-x"
+        },
+        "B": {
+          "alias": "Theme B/kpi/pad-x"
+        }
+      }
+    },
+    {
+      "name": "link/d/underline",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-link-d-underline)",
+      "description": "Dark source for Scheme link/underline. Studio: Studio flavor/signal/d/underline; other themes: accent/d/11.",
+      "values": {
+        "A": {
+          "alias": "Theme/link/d/underline"
+        },
+        "B": {
+          "alias": "Theme B/link/d/underline"
+        }
+      }
+    },
+    {
+      "name": "link/l/underline",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-link-l-underline)",
+      "description": "Light source for Scheme link/underline. Studio: Studio flavor/signal/l/underline; other themes: accent/l/11.",
+      "values": {
+        "A": {
+          "alias": "Theme/link/l/underline"
+        },
+        "B": {
+          "alias": "Theme B/link/l/underline"
+        }
+      }
+    },
+    {
+      "name": "marker/d/default",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-marker-d-default)",
+      "description": "Dark source for Scheme marker/default. Studio: Studio flavor/signal/d/marker; other themes: accent/d/solid.",
+      "values": {
+        "A": {
+          "alias": "Theme/marker/d/default"
+        },
+        "B": {
+          "alias": "Theme B/marker/d/default"
+        }
+      }
+    },
+    {
+      "name": "marker/l/default",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-marker-l-default)",
+      "description": "Light source for Scheme marker/default. Studio: Studio flavor/signal/l/marker; other themes: accent/l/solid.",
+      "values": {
+        "A": {
+          "alias": "Theme/marker/l/default"
+        },
+        "B": {
+          "alias": "Theme B/marker/l/default"
+        }
+      }
+    },
+    {
+      "name": "material/d/fill",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/material/d/fill"
+        },
+        "B": {
+          "alias": "Theme B/material/d/fill"
+        }
+      }
+    },
+    {
+      "name": "material/d/fill-strong",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/material/d/fill-strong"
+        },
+        "B": {
+          "alias": "Theme B/material/d/fill-strong"
+        }
+      }
+    },
+    {
+      "name": "material/d/stroke",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/material/d/stroke"
+        },
+        "B": {
+          "alias": "Theme B/material/d/stroke"
+        }
+      }
+    },
+    {
+      "name": "material/d/track",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/material/d/track"
+        },
+        "B": {
+          "alias": "Theme B/material/d/track"
+        }
+      }
+    },
+    {
+      "name": "material/l/fill",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/material/l/fill"
+        },
+        "B": {
+          "alias": "Theme B/material/l/fill"
+        }
+      }
+    },
+    {
+      "name": "material/l/fill-strong",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/material/l/fill-strong"
+        },
+        "B": {
+          "alias": "Theme B/material/l/fill-strong"
+        }
+      }
+    },
+    {
+      "name": "material/l/stroke",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/material/l/stroke"
+        },
+        "B": {
+          "alias": "Theme B/material/l/stroke"
+        }
+      }
+    },
+    {
+      "name": "material/l/track",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/material/l/track"
+        },
+        "B": {
+          "alias": "Theme B/material/l/track"
+        }
+      }
+    },
+    {
+      "name": "nav/d/active",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-nav-d-active)",
+      "description": "Dark source for Scheme nav/active. Studio: Studio flavor/nav/d/active; other themes: selected/d.",
+      "values": {
+        "A": {
+          "alias": "Theme/nav/d/active"
+        },
+        "B": {
+          "alias": "Theme B/nav/d/active"
+        }
+      }
+    },
+    {
+      "name": "nav/l/active",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-nav-l-active)",
+      "description": "Light source for Scheme nav/active. Studio: Studio flavor/nav/l/active; other themes: selected/l.",
+      "values": {
+        "A": {
+          "alias": "Theme/nav/l/active"
+        },
+        "B": {
+          "alias": "Theme B/nav/l/active"
+        }
+      }
+    },
+    {
+      "name": "nav/pad",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-nav-pad)",
+      "description": "Extra sidebar padding around nav items. Studio: Studio flavor nav/pad; other themes: 0.",
+      "values": {
+        "A": {
+          "alias": "Theme/nav/pad"
+        },
+        "B": {
+          "alias": "Theme B/nav/pad"
+        }
+      }
+    },
+    {
+      "name": "nav/radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-nav-radius)",
+      "description": "Nav item radius. Studio: Studio flavor nav/radius; other themes: radius/control.",
+      "values": {
+        "A": {
+          "alias": "Theme/nav/radius"
+        },
+        "B": {
+          "alias": "Theme B/nav/radius"
+        }
+      }
+    },
+    {
+      "name": "primary/d/stroke",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-primary-d-stroke)",
+      "description": "Dark source for Scheme primary/stroke. Studio: Studio flavor/primary/d/stroke; other themes: accent/d/solid.",
+      "values": {
+        "A": {
+          "alias": "Theme/primary/d/stroke"
+        },
+        "B": {
+          "alias": "Theme B/primary/d/stroke"
+        }
+      }
+    },
+    {
+      "name": "primary/l/stroke",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-primary-l-stroke)",
+      "description": "Light source for Scheme primary/stroke. Studio: Studio flavor/primary/l/stroke; other themes: accent/l/solid.",
+      "values": {
+        "A": {
+          "alias": "Theme/primary/l/stroke"
+        },
+        "B": {
+          "alias": "Theme B/primary/l/stroke"
+        }
+      }
+    },
+    {
+      "name": "prose/body/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-prose-body-line)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/body/line"
+        },
+        "B": {
+          "alias": "Theme B/prose/body/line"
+        }
+      }
+    },
+    {
+      "name": "prose/body/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-prose-body-size)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/body/size"
+        },
+        "B": {
+          "alias": "Theme B/prose/body/size"
+        }
+      }
+    },
+    {
+      "name": "prose/code/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-prose-code-line)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/code/line"
+        },
+        "B": {
+          "alias": "Theme B/prose/code/line"
+        }
+      }
+    },
+    {
+      "name": "prose/code/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-prose-code-size)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/code/size"
+        },
+        "B": {
+          "alias": "Theme B/prose/code/size"
+        }
+      }
+    },
+    {
+      "name": "prose/h2/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-prose-h2-line)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/h2/line"
+        },
+        "B": {
+          "alias": "Theme B/prose/h2/line"
+        }
+      }
+    },
+    {
+      "name": "prose/h2/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-prose-h2-size)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/h2/size"
+        },
+        "B": {
+          "alias": "Theme B/prose/h2/size"
+        }
+      }
+    },
+    {
+      "name": "prose/h2/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-prose-h2-tracking)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/h2/tracking"
+        },
+        "B": {
+          "alias": "Theme B/prose/h2/tracking"
+        }
+      }
+    },
+    {
+      "name": "prose/h3/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-prose-h3-line)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/h3/line"
+        },
+        "B": {
+          "alias": "Theme B/prose/h3/line"
+        }
+      }
+    },
+    {
+      "name": "prose/h3/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-prose-h3-size)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/h3/size"
+        },
+        "B": {
+          "alias": "Theme B/prose/h3/size"
+        }
+      }
+    },
+    {
+      "name": "prose/h3/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-prose-h3-tracking)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/h3/tracking"
+        },
+        "B": {
+          "alias": "Theme B/prose/h3/tracking"
+        }
+      }
+    },
+    {
+      "name": "prose/h4/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-prose-h4-line)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/h4/line"
+        },
+        "B": {
+          "alias": "Theme B/prose/h4/line"
+        }
+      }
+    },
+    {
+      "name": "prose/h4/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-prose-h4-size)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/h4/size"
+        },
+        "B": {
+          "alias": "Theme B/prose/h4/size"
+        }
+      }
+    },
+    {
+      "name": "prose/lede/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-prose-lede-line)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/lede/line"
+        },
+        "B": {
+          "alias": "Theme B/prose/lede/line"
+        }
+      }
+    },
+    {
+      "name": "prose/lede/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-prose-lede-size)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/lede/size"
+        },
+        "B": {
+          "alias": "Theme B/prose/lede/size"
+        }
+      }
+    },
+    {
+      "name": "prose/measure",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-prose-measure)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/measure"
+        },
+        "B": {
+          "alias": "Theme B/prose/measure"
+        }
+      }
+    },
+    {
+      "name": "prose/wide",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-prose-wide)",
+      "values": {
+        "A": {
+          "alias": "Theme/prose/wide"
+        },
+        "B": {
+          "alias": "Theme B/prose/wide"
+        }
+      }
+    },
+    {
+      "name": "radius/avatar",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-radius-avatar)",
+      "description": "Avatar radius. Studio: Studio flavor avatar/radius; other themes: 999 (Pixel and Filigrane 0).",
+      "values": {
+        "A": {
+          "alias": "Theme/radius/avatar"
+        },
+        "B": {
+          "alias": "Theme B/radius/avatar"
+        }
+      }
+    },
+    {
+      "name": "radius/badge",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-radius-badge)",
+      "values": {
+        "A": {
+          "alias": "Theme/radius/badge"
+        },
+        "B": {
+          "alias": "Theme B/radius/badge"
+        }
+      }
+    },
+    {
+      "name": "radius/card",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-radius-card)",
+      "values": {
+        "A": {
+          "alias": "Theme/radius/card"
+        },
+        "B": {
+          "alias": "Theme B/radius/card"
+        }
+      }
+    },
+    {
+      "name": "radius/checkbox",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-radius-checkbox)",
+      "description": "Checkbox corner radius. Studio follows Studio flavor radius/checkbox.",
+      "values": {
+        "A": {
+          "alias": "Theme/radius/checkbox"
+        },
+        "B": {
+          "alias": "Theme B/radius/checkbox"
+        }
+      }
+    },
+    {
+      "name": "radius/control",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-radius-control)",
+      "values": {
+        "A": {
+          "alias": "Theme/radius/control"
+        },
+        "B": {
+          "alias": "Theme B/radius/control"
+        }
+      }
+    },
+    {
+      "name": "radius/input",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-radius-input)",
+      "values": {
+        "A": {
+          "alias": "Theme/radius/input"
+        },
+        "B": {
+          "alias": "Theme B/radius/input"
+        }
+      }
+    },
+    {
+      "name": "ring/d",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/ring/d"
+        },
+        "B": {
+          "alias": "Theme B/ring/d"
+        }
+      }
+    },
+    {
+      "name": "ring/l",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/ring/l"
+        },
+        "B": {
+          "alias": "Theme B/ring/l"
+        }
+      }
+    },
+    {
+      "name": "scrollbar/d/thumb",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-scrollbar-d-thumb)",
+      "description": "Dark source for Scheme scrollbar/thumb. Studio: Theme/gray/d/10; other themes: gray/d/8.",
+      "values": {
+        "A": {
+          "alias": "Theme/scrollbar/d/thumb"
+        },
+        "B": {
+          "alias": "Theme B/scrollbar/d/thumb"
+        }
+      }
+    },
+    {
+      "name": "scrollbar/l/thumb",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-scrollbar-l-thumb)",
+      "description": "Light source for Scheme scrollbar/thumb. Studio: Theme/gray/l/10; other themes: gray/l/8.",
+      "values": {
+        "A": {
+          "alias": "Theme/scrollbar/l/thumb"
+        },
+        "B": {
+          "alias": "Theme B/scrollbar/l/thumb"
+        }
+      }
+    },
+    {
+      "name": "selected/d",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/selected/d"
+        },
+        "B": {
+          "alias": "Theme B/selected/d"
+        }
+      }
+    },
+    {
+      "name": "selected/l",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/selected/l"
+        },
+        "B": {
+          "alias": "Theme B/selected/l"
+        }
+      }
+    },
+    {
+      "name": "shadow/blur",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/shadow/blur"
+        },
+        "B": {
+          "alias": "Theme B/shadow/blur"
+        }
+      }
+    },
+    {
+      "name": "shadow/control/x",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-shadow-control-x)",
+      "description": "Button shadow x offset. Studio follows Studio flavor button/shadow-x; Brutal 4.",
+      "values": {
+        "A": {
+          "alias": "Theme/shadow/control/x"
+        },
+        "B": {
+          "alias": "Theme B/shadow/control/x"
+        }
+      }
+    },
+    {
+      "name": "shadow/control/y",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-shadow-control-y)",
+      "description": "Button shadow y offset. Studio follows Studio flavor button/shadow-y; Brutal 4.",
+      "values": {
+        "A": {
+          "alias": "Theme/shadow/control/y"
+        },
+        "B": {
+          "alias": "Theme B/shadow/control/y"
+        }
+      }
+    },
+    {
+      "name": "shadow/d/color",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/shadow/d/color"
+        },
+        "B": {
+          "alias": "Theme B/shadow/d/color"
+        }
+      }
+    },
+    {
+      "name": "shadow/l/color",
+      "type": "COLOR",
+      "scopes": [
+        "EFFECT_COLOR"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/shadow/l/color"
+        },
+        "B": {
+          "alias": "Theme B/shadow/l/color"
+        }
+      }
+    },
+    {
+      "name": "shadow/overlay/blur",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-shadow-overlay-blur)",
+      "description": "Floating-surface (popover, menu, toast) shadow blur.",
+      "values": {
+        "A": {
+          "alias": "Theme/shadow/overlay/blur"
+        },
+        "B": {
+          "alias": "Theme B/shadow/overlay/blur"
+        }
+      }
+    },
+    {
+      "name": "shadow/overlay/y",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-shadow-overlay-y)",
+      "description": "Floating-surface (popover, menu, toast) shadow y offset.",
+      "values": {
+        "A": {
+          "alias": "Theme/shadow/overlay/y"
+        },
+        "B": {
+          "alias": "Theme B/shadow/overlay/y"
+        }
+      }
+    },
+    {
+      "name": "shadow/x",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-shadow-x)",
+      "description": "Card shadow x offset. Studio follows Studio flavor shadow/x; Brutal 4; 0 elsewhere.",
+      "values": {
+        "A": {
+          "alias": "Theme/shadow/x"
+        },
+        "B": {
+          "alias": "Theme B/shadow/x"
+        }
+      }
+    },
+    {
+      "name": "shadow/y",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/shadow/y"
+        },
+        "B": {
+          "alias": "Theme B/shadow/y"
+        }
+      }
+    },
+    {
+      "name": "size/avatar/lg",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-avatar-lg)",
+      "description": "Large avatar size in px.",
+      "values": {
+        "A": {
+          "alias": "Theme/size/avatar/lg"
+        },
+        "B": {
+          "alias": "Theme B/size/avatar/lg"
+        }
+      }
+    },
+    {
+      "name": "size/avatar/md",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-avatar-md)",
+      "description": "Default avatar size in px.",
+      "values": {
+        "A": {
+          "alias": "Theme/size/avatar/md"
+        },
+        "B": {
+          "alias": "Theme B/size/avatar/md"
+        }
+      }
+    },
+    {
+      "name": "size/avatar/sm",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-avatar-sm)",
+      "description": "Small avatar size in px.",
+      "values": {
+        "A": {
+          "alias": "Theme/size/avatar/sm"
+        },
+        "B": {
+          "alias": "Theme B/size/avatar/sm"
+        }
+      }
+    },
+    {
+      "name": "size/checkbox",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-checkbox)",
+      "description": "Checkbox and radio box size in px.",
+      "values": {
+        "A": {
+          "alias": "Theme/size/checkbox"
+        },
+        "B": {
+          "alias": "Theme B/size/checkbox"
+        }
+      }
+    },
+    {
+      "name": "size/icon/lg",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-icon-lg)",
+      "description": "Large icon box in px.",
+      "values": {
+        "A": {
+          "alias": "Theme/size/icon/lg"
+        },
+        "B": {
+          "alias": "Theme B/size/icon/lg"
+        }
+      }
+    },
+    {
+      "name": "size/icon/md",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-icon-md)",
+      "description": "Default icon box in px.",
+      "values": {
+        "A": {
+          "alias": "Theme/size/icon/md"
+        },
+        "B": {
+          "alias": "Theme B/size/icon/md"
+        }
+      }
+    },
+    {
+      "name": "size/icon/sm",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-icon-sm)",
+      "description": "Small icon box in px.",
+      "values": {
+        "A": {
+          "alias": "Theme/size/icon/sm"
+        },
+        "B": {
+          "alias": "Theme B/size/icon/sm"
+        }
+      }
+    },
+    {
+      "name": "size/kbd",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-kbd)",
+      "description": "Kbd key height and minimum width in px.",
+      "values": {
+        "A": {
+          "alias": "Theme/size/kbd"
+        },
+        "B": {
+          "alias": "Theme B/size/kbd"
+        }
+      }
+    },
+    {
+      "name": "size/kbd-sm",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-kbd-sm)",
+      "description": "Kbd height at size sm (D7). 16 in every theme; size/kbd is the md height.",
+      "values": {
+        "A": {
+          "alias": "Theme/size/kbd-sm"
+        },
+        "B": {
+          "alias": "Theme B/size/kbd-sm"
+        }
+      }
+    },
+    {
+      "name": "size/switch/height",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-switch-height)",
+      "description": "Switch track height in px.",
+      "values": {
+        "A": {
+          "alias": "Theme/size/switch/height"
+        },
+        "B": {
+          "alias": "Theme B/size/switch/height"
+        }
+      }
+    },
+    {
+      "name": "size/switch/height-sm",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-switch-height-sm)",
+      "description": "Switch track height in px for the sm size. Studio 16; themes that draw a single switch size alias their md value (size/switch/height).",
+      "values": {
+        "A": {
+          "alias": "Theme/size/switch/height-sm"
+        },
+        "B": {
+          "alias": "Theme B/size/switch/height-sm"
+        }
+      }
+    },
+    {
+      "name": "size/switch/thumb",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-switch-thumb)",
+      "description": "Switch thumb diameter in px.",
+      "values": {
+        "A": {
+          "alias": "Theme/size/switch/thumb"
+        },
+        "B": {
+          "alias": "Theme B/size/switch/thumb"
+        }
+      }
+    },
+    {
+      "name": "size/switch/thumb-sm",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-switch-thumb-sm)",
+      "description": "Switch thumb diameter in px for the sm size. Studio 12; themes that draw a single switch size alias their md value (size/switch/thumb).",
+      "values": {
+        "A": {
+          "alias": "Theme/size/switch/thumb-sm"
+        },
+        "B": {
+          "alias": "Theme B/size/switch/thumb-sm"
+        }
+      }
+    },
+    {
+      "name": "size/switch/width",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-switch-width)",
+      "description": "Switch track width in px.",
+      "values": {
+        "A": {
+          "alias": "Theme/size/switch/width"
+        },
+        "B": {
+          "alias": "Theme B/size/switch/width"
+        }
+      }
+    },
+    {
+      "name": "size/switch/width-sm",
+      "type": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-size-switch-width-sm)",
+      "description": "Switch track width in px for the sm size. Studio 28; themes that draw a single switch size alias their md value (size/switch/width).",
+      "values": {
+        "A": {
+          "alias": "Theme/size/switch/width-sm"
+        },
+        "B": {
+          "alias": "Theme B/size/switch/width-sm"
+        }
+      }
+    },
+    {
+      "name": "state/disabled-opacity",
+      "type": "FLOAT",
+      "scopes": [
+        "OPACITY"
+      ],
+      "codeSyntax": "var(--ns-state-disabled-opacity)",
+      "description": "Disabled root opacity in percent (Figma opacity unit; CSS 0.38).",
+      "values": {
+        "A": {
+          "alias": "Theme/state/disabled-opacity"
+        },
+        "B": {
+          "alias": "Theme B/state/disabled-opacity"
+        }
+      }
+    },
+    {
+      "name": "state/hover-opacity",
+      "type": "FLOAT",
+      "scopes": [
+        "OPACITY"
+      ],
+      "codeSyntax": "var(--ns-state-hover-opacity)",
+      "description": "Hover state-layer opacity in percent (Figma opacity unit; CSS 0.08).",
+      "values": {
+        "A": {
+          "alias": "Theme/state/hover-opacity"
+        },
+        "B": {
+          "alias": "Theme B/state/hover-opacity"
+        }
+      }
+    },
+    {
+      "name": "state/pressed-opacity",
+      "type": "FLOAT",
+      "scopes": [
+        "OPACITY"
+      ],
+      "codeSyntax": "var(--ns-state-pressed-opacity)",
+      "description": "Pressed state-layer opacity in percent (Figma opacity unit; CSS 0.12).",
+      "values": {
+        "A": {
+          "alias": "Theme/state/pressed-opacity"
+        },
+        "B": {
+          "alias": "Theme B/state/pressed-opacity"
+        }
+      }
+    },
+    {
+      "name": "surface/d/canvas",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/surface/d/canvas"
+        },
+        "B": {
+          "alias": "Theme B/surface/d/canvas"
+        }
+      }
+    },
+    {
+      "name": "surface/d/container",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/surface/d/container"
+        },
+        "B": {
+          "alias": "Theme B/surface/d/container"
+        }
+      }
+    },
+    {
+      "name": "surface/d/container-high",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/surface/d/container-high"
+        },
+        "B": {
+          "alias": "Theme B/surface/d/container-high"
+        }
+      }
+    },
+    {
+      "name": "surface/d/container-highest",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/surface/d/container-highest"
+        },
+        "B": {
+          "alias": "Theme B/surface/d/container-highest"
+        }
+      }
+    },
+    {
+      "name": "surface/d/paper",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/surface/d/paper"
+        },
+        "B": {
+          "alias": "Theme B/surface/d/paper"
+        }
+      }
+    },
+    {
+      "name": "surface/d/raised",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/surface/d/raised"
+        },
+        "B": {
+          "alias": "Theme B/surface/d/raised"
+        }
+      }
+    },
+    {
+      "name": "surface/l/canvas",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/surface/l/canvas"
+        },
+        "B": {
+          "alias": "Theme B/surface/l/canvas"
+        }
+      }
+    },
+    {
+      "name": "surface/l/container",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/surface/l/container"
+        },
+        "B": {
+          "alias": "Theme B/surface/l/container"
+        }
+      }
+    },
+    {
+      "name": "surface/l/container-high",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/surface/l/container-high"
+        },
+        "B": {
+          "alias": "Theme B/surface/l/container-high"
+        }
+      }
+    },
+    {
+      "name": "surface/l/container-highest",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/surface/l/container-highest"
+        },
+        "B": {
+          "alias": "Theme B/surface/l/container-highest"
+        }
+      }
+    },
+    {
+      "name": "surface/l/paper",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/surface/l/paper"
+        },
+        "B": {
+          "alias": "Theme B/surface/l/paper"
+        }
+      }
+    },
+    {
+      "name": "surface/l/raised",
+      "type": "COLOR",
+      "scopes": [],
+      "values": {
+        "A": {
+          "alias": "Theme/surface/l/raised"
+        },
+        "B": {
+          "alias": "Theme B/surface/l/raised"
+        }
+      }
+    },
+    {
+      "name": "switch/d/thumb",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-switch-d-thumb)",
+      "description": "Dark source for Scheme switch/thumb: #111113 in Glass, the primary/fg source of the same mode elsewhere.",
+      "values": {
+        "A": {
+          "alias": "Theme/switch/d/thumb"
+        },
+        "B": {
+          "alias": "Theme B/switch/d/thumb"
+        }
+      }
+    },
+    {
+      "name": "switch/l/thumb",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-switch-l-thumb)",
+      "description": "Light source for Scheme switch/thumb: white in Glass, the primary/fg source of the same mode elsewhere.",
+      "values": {
+        "A": {
+          "alias": "Theme/switch/l/thumb"
+        },
+        "B": {
+          "alias": "Theme B/switch/l/thumb"
+        }
+      }
+    },
+    {
+      "name": "table/cell-rule-width",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-table-cell-rule-width)",
+      "description": "Table vertical cell rule width. Studio: Studio flavor table/cell-rule; other themes: 0.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/cell-rule-width"
+        },
+        "B": {
+          "alias": "Theme B/table/cell-rule-width"
+        }
+      }
+    },
+    {
+      "name": "table/d/cell-rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-cell-rule)",
+      "description": "Dark source for Scheme table/cell-rule. Studio: Studio flavor/table/d/cell-rule; other themes: border/d/subtle.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/d/cell-rule"
+        },
+        "B": {
+          "alias": "Theme B/table/d/cell-rule"
+        }
+      }
+    },
+    {
+      "name": "table/d/head",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-head)",
+      "description": "Dark source for Scheme table/head. Studio: Studio flavor/table/d/head; other themes: tone/d/muted.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/d/head"
+        },
+        "B": {
+          "alias": "Theme B/table/d/head"
+        }
+      }
+    },
+    {
+      "name": "table/d/head-rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-head-rule)",
+      "description": "Dark source for Scheme table/head-rule. Studio: Studio flavor/table/d/head-rule; other themes: border/d/default.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/d/head-rule"
+        },
+        "B": {
+          "alias": "Theme B/table/d/head-rule"
+        }
+      }
+    },
+    {
+      "name": "table/d/hover",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-hover)",
+      "description": "Dark source for Scheme table/hover. Studio: Studio flavor/table/d/hover; other themes: hover/d.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/d/hover"
+        },
+        "B": {
+          "alias": "Theme B/table/d/hover"
+        }
+      }
+    },
+    {
+      "name": "table/d/row-bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-row-bg)",
+      "description": "Dark source for Scheme table/row-bg. Studio: Studio flavor/table/d/row-bg; other themes: surface/d/paper.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/d/row-bg"
+        },
+        "B": {
+          "alias": "Theme B/table/d/row-bg"
+        }
+      }
+    },
+    {
+      "name": "table/d/row-rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-row-rule)",
+      "description": "Dark source for Scheme table/row-rule. Studio: Studio flavor/table/d/row-rule; other themes: border/d/subtle.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/d/row-rule"
+        },
+        "B": {
+          "alias": "Theme B/table/d/row-rule"
+        }
+      }
+    },
+    {
+      "name": "table/d/zebra",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-d-zebra)",
+      "description": "Dark source for Scheme table/zebra. Studio: Studio flavor/table/d/zebra; other themes: tone/d/sunken.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/d/zebra"
+        },
+        "B": {
+          "alias": "Theme B/table/d/zebra"
+        }
+      }
+    },
+    {
+      "name": "table/head-rule-width",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-table-head-rule-width)",
+      "description": "Table header rule width. Studio: Studio flavor table/head-rule; other themes: border/width.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/head-rule-width"
+        },
+        "B": {
+          "alias": "Theme B/table/head-rule-width"
+        }
+      }
+    },
+    {
+      "name": "table/inset",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-table-inset)",
+      "description": "Table body inset (pill-row tables). Studio: Studio flavor table/inset; other themes: 0.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/inset"
+        },
+        "B": {
+          "alias": "Theme B/table/inset"
+        }
+      }
+    },
+    {
+      "name": "table/l/cell-rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-cell-rule)",
+      "description": "Light source for Scheme table/cell-rule. Studio: Studio flavor/table/l/cell-rule; other themes: border/l/subtle.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/l/cell-rule"
+        },
+        "B": {
+          "alias": "Theme B/table/l/cell-rule"
+        }
+      }
+    },
+    {
+      "name": "table/l/head",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-head)",
+      "description": "Light source for Scheme table/head. Studio: Studio flavor/table/l/head; other themes: tone/l/muted.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/l/head"
+        },
+        "B": {
+          "alias": "Theme B/table/l/head"
+        }
+      }
+    },
+    {
+      "name": "table/l/head-rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-head-rule)",
+      "description": "Light source for Scheme table/head-rule. Studio: Studio flavor/table/l/head-rule; other themes: border/l/default.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/l/head-rule"
+        },
+        "B": {
+          "alias": "Theme B/table/l/head-rule"
+        }
+      }
+    },
+    {
+      "name": "table/l/hover",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-hover)",
+      "description": "Light source for Scheme table/hover. Studio: Studio flavor/table/l/hover; other themes: hover/l.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/l/hover"
+        },
+        "B": {
+          "alias": "Theme B/table/l/hover"
+        }
+      }
+    },
+    {
+      "name": "table/l/row-bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-row-bg)",
+      "description": "Light source for Scheme table/row-bg. Studio: Studio flavor/table/l/row-bg; other themes: surface/l/paper.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/l/row-bg"
+        },
+        "B": {
+          "alias": "Theme B/table/l/row-bg"
+        }
+      }
+    },
+    {
+      "name": "table/l/row-rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-row-rule)",
+      "description": "Light source for Scheme table/row-rule. Studio: Studio flavor/table/l/row-rule; other themes: border/l/subtle.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/l/row-rule"
+        },
+        "B": {
+          "alias": "Theme B/table/l/row-rule"
+        }
+      }
+    },
+    {
+      "name": "table/l/zebra",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-table-l-zebra)",
+      "description": "Light source for Scheme table/zebra. Studio: Studio flavor/table/l/zebra; other themes: tone/l/sunken.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/l/zebra"
+        },
+        "B": {
+          "alias": "Theme B/table/l/zebra"
+        }
+      }
+    },
+    {
+      "name": "table/row-gap",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-table-row-gap)",
+      "description": "Gap between table rows (pill-row tables). Studio: Studio flavor table/row-gap; other themes: 0.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/row-gap"
+        },
+        "B": {
+          "alias": "Theme B/table/row-gap"
+        }
+      }
+    },
+    {
+      "name": "table/row-radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-table-row-radius)",
+      "description": "Table row radius (pill-row tables). Studio: Studio flavor table/row-radius; other themes: 0.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/row-radius"
+        },
+        "B": {
+          "alias": "Theme B/table/row-radius"
+        }
+      }
+    },
+    {
+      "name": "table/row-rule-width",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-table-row-rule-width)",
+      "description": "Table row rule width. Studio: Studio flavor table/row-rule; other themes: border/width.",
+      "values": {
+        "A": {
+          "alias": "Theme/table/row-rule-width"
+        },
+        "B": {
+          "alias": "Theme B/table/row-rule-width"
+        }
+      }
+    },
+    {
+      "name": "tabs/d/idle-border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-d-idle-border)",
+      "description": "Dark source for Scheme tabs/idle-border. Studio: Studio flavor/tabs/d/idle-border; other themes: transparent.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/d/idle-border"
+        },
+        "B": {
+          "alias": "Theme B/tabs/d/idle-border"
+        }
+      }
+    },
+    {
+      "name": "tabs/d/sel-bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-d-sel-bg)",
+      "description": "Dark source for Scheme tabs/sel-bg. Studio: Studio flavor/tabs/d/sel-bg; other themes: surface/d/paper.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/d/sel-bg"
+        },
+        "B": {
+          "alias": "Theme B/tabs/d/sel-bg"
+        }
+      }
+    },
+    {
+      "name": "tabs/d/sel-border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-d-sel-border)",
+      "description": "Dark source for Scheme tabs/sel-border. Studio: Studio flavor/tabs/d/sel-border; other themes: border/d/default.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/d/sel-border"
+        },
+        "B": {
+          "alias": "Theme B/tabs/d/sel-border"
+        }
+      }
+    },
+    {
+      "name": "tabs/d/track",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-d-track)",
+      "description": "Dark source for Scheme tabs/track. Studio: Studio flavor/tabs/d/track; other themes: tone/d/muted.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/d/track"
+        },
+        "B": {
+          "alias": "Theme B/tabs/d/track"
+        }
+      }
+    },
+    {
+      "name": "tabs/gap",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-tabs-gap)",
+      "description": "Gap between tab triggers. Studio: Studio flavor tabs/gap; other themes: 2.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/gap"
+        },
+        "B": {
+          "alias": "Theme B/tabs/gap"
+        }
+      }
+    },
+    {
+      "name": "tabs/idle-stroke",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-tabs-idle-stroke)",
+      "description": "Idle tab stroke width. Studio: Studio flavor tabs/idle-stroke; other themes: 0.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/idle-stroke"
+        },
+        "B": {
+          "alias": "Theme B/tabs/idle-stroke"
+        }
+      }
+    },
+    {
+      "name": "tabs/item-pad",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-tabs-item-pad)",
+      "description": "Tab trigger horizontal padding. Studio: Studio flavor tabs/item-pad; other themes: 12.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/item-pad"
+        },
+        "B": {
+          "alias": "Theme B/tabs/item-pad"
+        }
+      }
+    },
+    {
+      "name": "tabs/item-radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-tabs-item-radius)",
+      "description": "Tab trigger radius. Studio: Studio flavor tabs/item-radius; other themes: radius/control.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/item-radius"
+        },
+        "B": {
+          "alias": "Theme B/tabs/item-radius"
+        }
+      }
+    },
+    {
+      "name": "tabs/l/idle-border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-l-idle-border)",
+      "description": "Light source for Scheme tabs/idle-border. Studio: Studio flavor/tabs/l/idle-border; other themes: transparent.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/l/idle-border"
+        },
+        "B": {
+          "alias": "Theme B/tabs/l/idle-border"
+        }
+      }
+    },
+    {
+      "name": "tabs/l/sel-bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-l-sel-bg)",
+      "description": "Light source for Scheme tabs/sel-bg. Studio: Studio flavor/tabs/l/sel-bg; other themes: surface/l/paper.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/l/sel-bg"
+        },
+        "B": {
+          "alias": "Theme B/tabs/l/sel-bg"
+        }
+      }
+    },
+    {
+      "name": "tabs/l/sel-border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-l-sel-border)",
+      "description": "Light source for Scheme tabs/sel-border. Studio: Studio flavor/tabs/l/sel-border; other themes: border/l/default.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/l/sel-border"
+        },
+        "B": {
+          "alias": "Theme B/tabs/l/sel-border"
+        }
+      }
+    },
+    {
+      "name": "tabs/l/track",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tabs-l-track)",
+      "description": "Light source for Scheme tabs/track. Studio: Studio flavor/tabs/l/track; other themes: tone/l/muted.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/l/track"
+        },
+        "B": {
+          "alias": "Theme B/tabs/l/track"
+        }
+      }
+    },
+    {
+      "name": "tabs/pad",
+      "type": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": "var(--ns-tabs-pad)",
+      "description": "Tab list (track) padding. Studio: Studio flavor tabs/pad; other themes: 3.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/pad"
+        },
+        "B": {
+          "alias": "Theme B/tabs/pad"
+        }
+      }
+    },
+    {
+      "name": "tabs/radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-tabs-radius)",
+      "description": "Tab list (track) radius. Studio: Studio flavor tabs/radius; other themes: radius/control.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/radius"
+        },
+        "B": {
+          "alias": "Theme B/tabs/radius"
+        }
+      }
+    },
+    {
+      "name": "tabs/sel-bottom",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-tabs-sel-bottom)",
+      "description": "Selected tab bottom stroke width. Studio: Studio flavor tabs/sel-bottom; other themes: border/width.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/sel-bottom"
+        },
+        "B": {
+          "alias": "Theme B/tabs/sel-bottom"
+        }
+      }
+    },
+    {
+      "name": "tabs/sel-box",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-tabs-sel-box)",
+      "description": "Selected tab stroke width on all sides. Studio: Studio flavor tabs/sel-box; other themes: border/width.",
+      "values": {
+        "A": {
+          "alias": "Theme/tabs/sel-box"
+        },
+        "B": {
+          "alias": "Theme B/tabs/sel-box"
+        }
+      }
+    },
+    {
+      "name": "tone/d/muted",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/tone/d/muted"
+        },
+        "B": {
+          "alias": "Theme B/tone/d/muted"
+        }
+      }
+    },
+    {
+      "name": "tone/d/sunken",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/tone/d/sunken"
+        },
+        "B": {
+          "alias": "Theme B/tone/d/sunken"
+        }
+      }
+    },
+    {
+      "name": "tone/l/muted",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/tone/l/muted"
+        },
+        "B": {
+          "alias": "Theme B/tone/l/muted"
+        }
+      }
+    },
+    {
+      "name": "tone/l/sunken",
+      "type": "COLOR",
+      "scopes": [
+        "FRAME_FILL",
+        "SHAPE_FILL"
+      ],
+      "values": {
+        "A": {
+          "alias": "Theme/tone/l/sunken"
+        },
+        "B": {
+          "alias": "Theme B/tone/l/sunken"
+        }
+      }
+    },
+    {
+      "name": "tooltip/d/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tooltip-d-bg)",
+      "description": "Dark source for Scheme tooltip/bg (chip fill). Studio and every other theme: surface/d/raised. Tonal and Bloom (M3 inverse surface in both schemes): gray/d/12.",
+      "values": {
+        "A": {
+          "alias": "Theme/tooltip/d/bg"
+        },
+        "B": {
+          "alias": "Theme B/tooltip/d/bg"
+        }
+      }
+    },
+    {
+      "name": "tooltip/d/border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tooltip-d-border)",
+      "description": "Dark source for Scheme tooltip/border (hairline). Studio and every other theme: border/d/default. Tonal and Bloom (M3 inverse surface in both schemes): gray/d/12.",
+      "values": {
+        "A": {
+          "alias": "Theme/tooltip/d/border"
+        },
+        "B": {
+          "alias": "Theme B/tooltip/d/border"
+        }
+      }
+    },
+    {
+      "name": "tooltip/d/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tooltip-d-fg)",
+      "description": "Dark source for Scheme tooltip/fg (label colour). Studio and every other theme: gray/d/12. Tonal and Bloom (M3 inverse surface in both schemes): gray/d/1.",
+      "values": {
+        "A": {
+          "alias": "Theme/tooltip/d/fg"
+        },
+        "B": {
+          "alias": "Theme B/tooltip/d/fg"
+        }
+      }
+    },
+    {
+      "name": "tooltip/d/kbd",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tooltip-d-kbd)",
+      "description": "Dark source for Scheme tooltip/kbd (kbd chip fill). Studio and every other theme: surface/d/raised. Tonal and Bloom (M3 inverse surface in both schemes): gray/l/5.",
+      "values": {
+        "A": {
+          "alias": "Theme/tooltip/d/kbd"
+        },
+        "B": {
+          "alias": "Theme B/tooltip/d/kbd"
+        }
+      }
+    },
+    {
+      "name": "tooltip/d/muted",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tooltip-d-muted)",
+      "description": "Dark source for Scheme tooltip/muted (secondary text (kbd hint)). Studio and every other theme: gray/d/11. Tonal and Bloom (M3 inverse surface in both schemes): gray/l/11.",
+      "values": {
+        "A": {
+          "alias": "Theme/tooltip/d/muted"
+        },
+        "B": {
+          "alias": "Theme B/tooltip/d/muted"
+        }
+      }
+    },
+    {
+      "name": "tooltip/l/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tooltip-l-bg)",
+      "description": "Light source for Scheme tooltip/bg (chip fill). Studio and every other theme: gray/l/12. Tonal and Bloom (M3 inverse surface in both schemes): gray/l/12.",
+      "values": {
+        "A": {
+          "alias": "Theme/tooltip/l/bg"
+        },
+        "B": {
+          "alias": "Theme B/tooltip/l/bg"
+        }
+      }
+    },
+    {
+      "name": "tooltip/l/border",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tooltip-l-border)",
+      "description": "Light source for Scheme tooltip/border (hairline). Studio and every other theme: gray/l/12. Tonal and Bloom (M3 inverse surface in both schemes): gray/l/12.",
+      "values": {
+        "A": {
+          "alias": "Theme/tooltip/l/border"
+        },
+        "B": {
+          "alias": "Theme B/tooltip/l/border"
+        }
+      }
+    },
+    {
+      "name": "tooltip/l/fg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tooltip-l-fg)",
+      "description": "Light source for Scheme tooltip/fg (label colour). Studio and every other theme: gray/l/1. Tonal and Bloom (M3 inverse surface in both schemes): gray/l/1.",
+      "values": {
+        "A": {
+          "alias": "Theme/tooltip/l/fg"
+        },
+        "B": {
+          "alias": "Theme B/tooltip/l/fg"
+        }
+      }
+    },
+    {
+      "name": "tooltip/l/kbd",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tooltip-l-kbd)",
+      "description": "Light source for Scheme tooltip/kbd (kbd chip fill). Studio and every other theme: gray/d/5. Tonal and Bloom (M3 inverse surface in both schemes): gray/d/5.",
+      "values": {
+        "A": {
+          "alias": "Theme/tooltip/l/kbd"
+        },
+        "B": {
+          "alias": "Theme B/tooltip/l/kbd"
+        }
+      }
+    },
+    {
+      "name": "tooltip/l/muted",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-tooltip-l-muted)",
+      "description": "Light source for Scheme tooltip/muted (secondary text (kbd hint)). Studio and every other theme: gray/d/11. Tonal and Bloom (M3 inverse surface in both schemes): gray/d/11.",
+      "values": {
+        "A": {
+          "alias": "Theme/tooltip/l/muted"
+        },
+        "B": {
+          "alias": "Theme B/tooltip/l/muted"
+        }
+      }
+    },
+    {
+      "name": "topbar/d/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-topbar-d-bg)",
+      "description": "Dark source for Scheme topbar/bg. Studio: Studio flavor/topbar/d/bg; other themes: surface/d/canvas.",
+      "values": {
+        "A": {
+          "alias": "Theme/topbar/d/bg"
+        },
+        "B": {
+          "alias": "Theme B/topbar/d/bg"
+        }
+      }
+    },
+    {
+      "name": "topbar/d/rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-topbar-d-rule)",
+      "description": "Dark source for Scheme topbar/rule. Studio: Studio flavor/topbar/d/rule; other themes: border/d/subtle.",
+      "values": {
+        "A": {
+          "alias": "Theme/topbar/d/rule"
+        },
+        "B": {
+          "alias": "Theme B/topbar/d/rule"
+        }
+      }
+    },
+    {
+      "name": "topbar/l/bg",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-topbar-l-bg)",
+      "description": "Light source for Scheme topbar/bg. Studio: Studio flavor/topbar/l/bg; other themes: surface/l/canvas.",
+      "values": {
+        "A": {
+          "alias": "Theme/topbar/l/bg"
+        },
+        "B": {
+          "alias": "Theme B/topbar/l/bg"
+        }
+      }
+    },
+    {
+      "name": "topbar/l/rule",
+      "type": "COLOR",
+      "scopes": [],
+      "codeSyntax": "var(--ns-topbar-l-rule)",
+      "description": "Light source for Scheme topbar/rule. Studio: Studio flavor/topbar/l/rule; other themes: border/l/subtle.",
+      "values": {
+        "A": {
+          "alias": "Theme/topbar/l/rule"
+        },
+        "B": {
+          "alias": "Theme B/topbar/l/rule"
+        }
+      }
+    },
+    {
+      "name": "topbar/radius",
+      "type": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": "var(--ns-topbar-radius)",
+      "description": "Top bar radius. Studio: Studio flavor topbar/radius; other themes: 0.",
+      "values": {
+        "A": {
+          "alias": "Theme/topbar/radius"
+        },
+        "B": {
+          "alias": "Theme B/topbar/radius"
+        }
+      }
+    },
+    {
+      "name": "topbar/rule-width",
+      "type": "FLOAT",
+      "scopes": [
+        "STROKE_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-topbar-rule-width)",
+      "description": "Top bar bottom rule width. Studio: Studio flavor topbar/rule; other themes: border/width.",
+      "values": {
+        "A": {
+          "alias": "Theme/topbar/rule-width"
+        },
+        "B": {
+          "alias": "Theme B/topbar/rule-width"
+        }
+      }
+    },
+    {
+      "name": "topbar/shadow-blur",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-topbar-shadow-blur)",
+      "description": "Top bar shadow blur. Studio: Studio flavor topbar/shadow-blur; other themes: 0.",
+      "values": {
+        "A": {
+          "alias": "Theme/topbar/shadow-blur"
+        },
+        "B": {
+          "alias": "Theme B/topbar/shadow-blur"
+        }
+      }
+    },
+    {
+      "name": "topbar/shadow-y",
+      "type": "FLOAT",
+      "scopes": [
+        "EFFECT_FLOAT"
+      ],
+      "codeSyntax": "var(--ns-topbar-shadow-y)",
+      "description": "Top bar shadow y offset. Studio: Studio flavor topbar/shadow-y; other themes: 0.",
+      "values": {
+        "A": {
+          "alias": "Theme/topbar/shadow-y"
+        },
+        "B": {
+          "alias": "Theme B/topbar/shadow-y"
+        }
+      }
+    },
+    {
+      "name": "type/body/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-body)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/body/line"
+        },
+        "B": {
+          "alias": "Theme B/type/body/line"
+        }
+      }
+    },
+    {
+      "name": "type/body/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-body)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/body/size"
+        },
+        "B": {
+          "alias": "Theme B/type/body/size"
+        }
+      }
+    },
+    {
+      "name": "type/body/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-body)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/body/style"
+        },
+        "B": {
+          "alias": "Theme B/type/body/style"
+        }
+      }
+    },
+    {
+      "name": "type/body/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-body)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/body/tracking"
+        },
+        "B": {
+          "alias": "Theme B/type/body/tracking"
+        }
+      }
+    },
+    {
+      "name": "type/caption/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-caption)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/caption/line"
+        },
+        "B": {
+          "alias": "Theme B/type/caption/line"
+        }
+      }
+    },
+    {
+      "name": "type/caption/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-caption)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/caption/size"
+        },
+        "B": {
+          "alias": "Theme B/type/caption/size"
+        }
+      }
+    },
+    {
+      "name": "type/caption/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-caption)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/caption/style"
+        },
+        "B": {
+          "alias": "Theme B/type/caption/style"
+        }
+      }
+    },
+    {
+      "name": "type/caption/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-caption)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/caption/tracking"
+        },
+        "B": {
+          "alias": "Theme B/type/caption/tracking"
+        }
+      }
+    },
+    {
+      "name": "type/code/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-code)",
+      "description": "Code, path and kbd line height.",
+      "values": {
+        "A": {
+          "alias": "Theme/type/code/line"
+        },
+        "B": {
+          "alias": "Theme B/type/code/line"
+        }
+      }
+    },
+    {
+      "name": "type/code/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-code)",
+      "description": "Code, path and kbd font size.",
+      "values": {
+        "A": {
+          "alias": "Theme/type/code/size"
+        },
+        "B": {
+          "alias": "Theme B/type/code/size"
+        }
+      }
+    },
+    {
+      "name": "type/display/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-display)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/display/line"
+        },
+        "B": {
+          "alias": "Theme B/type/display/line"
+        }
+      }
+    },
+    {
+      "name": "type/display/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-display)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/display/size"
+        },
+        "B": {
+          "alias": "Theme B/type/display/size"
+        }
+      }
+    },
+    {
+      "name": "type/display/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-display)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/display/style"
+        },
+        "B": {
+          "alias": "Theme B/type/display/style"
+        }
+      }
+    },
+    {
+      "name": "type/display/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-display)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/display/tracking"
+        },
+        "B": {
+          "alias": "Theme B/type/display/tracking"
+        }
+      }
+    },
+    {
+      "name": "type/em/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-em)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/em/style"
+        },
+        "B": {
+          "alias": "Theme B/type/em/style"
+        }
+      }
+    },
+    {
+      "name": "type/eyebrow/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-eyebrow)",
+      "description": "Eyebrow font style, paired with font/eyebrow. Studio follows Studio flavor type/eyebrow/style; other themes use type/label/style.",
+      "values": {
+        "A": {
+          "alias": "Theme/type/eyebrow/style"
+        },
+        "B": {
+          "alias": "Theme B/type/eyebrow/style"
+        }
+      }
+    },
+    {
+      "name": "type/heading/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-heading)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/heading/line"
+        },
+        "B": {
+          "alias": "Theme B/type/heading/line"
+        }
+      }
+    },
+    {
+      "name": "type/heading/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-heading)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/heading/size"
+        },
+        "B": {
+          "alias": "Theme B/type/heading/size"
+        }
+      }
+    },
+    {
+      "name": "type/heading/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-heading)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/heading/style"
+        },
+        "B": {
+          "alias": "Theme B/type/heading/style"
+        }
+      }
+    },
+    {
+      "name": "type/heading/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-heading)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/heading/tracking"
+        },
+        "B": {
+          "alias": "Theme B/type/heading/tracking"
+        }
+      }
+    },
+    {
+      "name": "type/kpi-sm/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-kpi-sm)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/kpi-sm/line"
+        },
+        "B": {
+          "alias": "Theme B/type/kpi-sm/line"
+        }
+      }
+    },
+    {
+      "name": "type/kpi-sm/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-kpi-sm)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/kpi-sm/size"
+        },
+        "B": {
+          "alias": "Theme B/type/kpi-sm/size"
+        }
+      }
+    },
+    {
+      "name": "type/kpi-sm/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-kpi-sm)",
+      "description": "Small KPI font style; follows type/kpi/style.",
+      "values": {
+        "A": {
+          "alias": "Theme/type/kpi-sm/style"
+        },
+        "B": {
+          "alias": "Theme B/type/kpi-sm/style"
+        }
+      }
+    },
+    {
+      "name": "type/kpi-sm/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-kpi-sm)",
+      "description": "Small KPI letter spacing; follows type/kpi/tracking.",
+      "values": {
+        "A": {
+          "alias": "Theme/type/kpi-sm/tracking"
+        },
+        "B": {
+          "alias": "Theme B/type/kpi-sm/tracking"
+        }
+      }
+    },
+    {
+      "name": "type/kpi/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-kpi)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/kpi/line"
+        },
+        "B": {
+          "alias": "Theme B/type/kpi/line"
+        }
+      }
+    },
+    {
+      "name": "type/kpi/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-kpi)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/kpi/size"
+        },
+        "B": {
+          "alias": "Theme B/type/kpi/size"
+        }
+      }
+    },
+    {
+      "name": "type/kpi/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-kpi)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/kpi/style"
+        },
+        "B": {
+          "alias": "Theme B/type/kpi/style"
+        }
+      }
+    },
+    {
+      "name": "type/kpi/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-kpi)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/kpi/tracking"
+        },
+        "B": {
+          "alias": "Theme B/type/kpi/tracking"
+        }
+      }
+    },
+    {
+      "name": "type/label-strong/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-type-label-strong-style)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/label-strong/style"
+        },
+        "B": {
+          "alias": "Theme B/type/label-strong/style"
+        }
+      }
+    },
+    {
+      "name": "type/label/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-label)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/label/line"
+        },
+        "B": {
+          "alias": "Theme B/type/label/line"
+        }
+      }
+    },
+    {
+      "name": "type/label/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-label)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/label/size"
+        },
+        "B": {
+          "alias": "Theme B/type/label/size"
+        }
+      }
+    },
+    {
+      "name": "type/label/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-label)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/label/style"
+        },
+        "B": {
+          "alias": "Theme B/type/label/style"
+        }
+      }
+    },
+    {
+      "name": "type/label/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-label)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/label/tracking"
+        },
+        "B": {
+          "alias": "Theme B/type/label/tracking"
+        }
+      }
+    },
+    {
+      "name": "type/mono-strong/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-mono-strong)",
+      "description": "Strong weight of font/mono. A follows Theme, B follows Theme B. Bind this one.",
+      "values": {
+        "A": {
+          "alias": "Theme/type/mono-strong/style"
+        },
+        "B": {
+          "alias": "Theme B/type/mono-strong/style"
+        }
+      }
+    },
+    {
+      "name": "type/mono/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-type-mono-style)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/mono/style"
+        },
+        "B": {
+          "alias": "Theme B/type/mono/style"
+        }
+      }
+    },
+    {
+      "name": "type/small/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-small)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/small/line"
+        },
+        "B": {
+          "alias": "Theme B/type/small/line"
+        }
+      }
+    },
+    {
+      "name": "type/small/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-small)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/small/size"
+        },
+        "B": {
+          "alias": "Theme B/type/small/size"
+        }
+      }
+    },
+    {
+      "name": "type/small/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-small)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/small/style"
+        },
+        "B": {
+          "alias": "Theme B/type/small/style"
+        }
+      }
+    },
+    {
+      "name": "type/small/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-small)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/small/tracking"
+        },
+        "B": {
+          "alias": "Theme B/type/small/tracking"
+        }
+      }
+    },
+    {
+      "name": "type/strong/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-strong)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/strong/line"
+        },
+        "B": {
+          "alias": "Theme B/type/strong/line"
+        }
+      }
+    },
+    {
+      "name": "type/strong/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-strong)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/strong/size"
+        },
+        "B": {
+          "alias": "Theme B/type/strong/size"
+        }
+      }
+    },
+    {
+      "name": "type/strong/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-strong)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/strong/style"
+        },
+        "B": {
+          "alias": "Theme B/type/strong/style"
+        }
+      }
+    },
+    {
+      "name": "type/strong/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-strong)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/strong/tracking"
+        },
+        "B": {
+          "alias": "Theme B/type/strong/tracking"
+        }
+      }
+    },
+    {
+      "name": "type/title/line",
+      "type": "FLOAT",
+      "scopes": [
+        "LINE_HEIGHT"
+      ],
+      "codeSyntax": "var(--ns-leading-title)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/title/line"
+        },
+        "B": {
+          "alias": "Theme B/type/title/line"
+        }
+      }
+    },
+    {
+      "name": "type/title/size",
+      "type": "FLOAT",
+      "scopes": [
+        "FONT_SIZE"
+      ],
+      "codeSyntax": "var(--ns-text-title)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/title/size"
+        },
+        "B": {
+          "alias": "Theme B/type/title/size"
+        }
+      }
+    },
+    {
+      "name": "type/title/style",
+      "type": "STRING",
+      "scopes": [
+        "FONT_STYLE"
+      ],
+      "codeSyntax": "var(--ns-weight-title)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/title/style"
+        },
+        "B": {
+          "alias": "Theme B/type/title/style"
+        }
+      }
+    },
+    {
+      "name": "type/title/tracking",
+      "type": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": "var(--ns-tracking-title)",
+      "values": {
+        "A": {
+          "alias": "Theme/type/title/tracking"
+        },
+        "B": {
+          "alias": "Theme B/type/title/tracking"
+        }
+      }
+    }
+  ]
+}

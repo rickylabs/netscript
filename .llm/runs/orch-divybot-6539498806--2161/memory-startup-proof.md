@@ -1,0 +1,3 @@
+# Installed startup proof
+
+A no-DB local-source fixture can run both production startup APIs using getKv({provider: deno-kv, path: :memory:, skipServiceDiscovery: true}). Workers combined startup requires a streams reference even with no job execution, so supply an isolated HTTP test double; no Aspire restore/start is needed. Wait for the trigger health monitor and the workers onStarted snapshot to report ready, then abort, await both runtimes, close KV and shut down the HTTP server. Deno test sanitizers must pass. See installed-startup-smoke.specimen.ts and installed-proof.md for the runnable recipe.

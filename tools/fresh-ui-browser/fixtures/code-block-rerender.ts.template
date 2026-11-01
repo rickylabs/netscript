@@ -1,0 +1,67 @@
+import { h, render } from 'preact';
+import hljs from 'highlight.js/lib/common';
+import { Message } from '../components/ui/message.tsx';
+
+/** Exercise the installed component through a real client Message tree. */
+export function exerciseCodeBlock() {
+  const container = document.createElement('div');
+  document.body.append(container);
+  const highlight = hljs.highlight;
+  let calls = 0;
+  hljs.highlight = new Proxy(highlight, {
+    apply(target, receiver, args) {
+      calls++;
+      return Reflect.apply(target, receiver, args);
+    },
+  });
+  const snapshots: Array<{
+    name: string;
+    calls: number;
+    body: string | null | undefined;
+    code: string | null | undefined;
+    clipboard: string | null | undefined;
+    filename: string | null | undefined;
+    syntaxSpans: number;
+    injectedElements: number;
+  }> = [];
+  const update = (name: string, body: string, code: string, lang?: string, filename = 'demo.ts') => {
+    render(h(Message, {
+      message: {
+        role: 'assistant',
+        author: { name: 'Assistant' },
+        body,
+        blocks: [{ type: 'code', code, lang, filename }],
+      },
+    }), container);
+    snapshots.push({
+      name,
+      calls,
+      body: container.querySelector('[data-part="text"][data-scope="message"]')?.textContent,
+      code: container.querySelector('code[data-scope="code-block"]')?.textContent,
+      clipboard: container.querySelector('[data-clipboard]')?.getAttribute('data-clipboard'),
+      filename: container.querySelector('[data-part="name"][data-scope="code-block"]')?.textContent,
+      syntaxSpans: container.querySelectorAll('code[data-scope="code-block"] span').length,
+      injectedElements: container.querySelectorAll('code script, code img').length,
+    });
+  };
+  try {
+    update('initial', 'Token 0', 'const value = 1;', 'typescript');
+    for (let token = 1; token <= 10; token++) {
+      update(`stream-${token}`, `Token ${token}`, 'const value = 1;', 'typescript');
+    }
+    update('filename', 'Token 10', 'const value = 1;', 'typescript', 'renamed.ts');
+    update('code', 'Token 10', 'const value = 2;', 'typescript');
+    update('language', 'Token 10', 'const value = 2;', 'javascript');
+    const hostile = '<img src=x onerror="alert(1)"><script>alert(1)</script>';
+    update('unknown', 'Token 10', hostile, 'unknown-language');
+    update('plain', 'Token 10', hostile);
+    update('known-again', 'Token 10', 'const value = 2;', 'javascript');
+    render(null, container);
+    update('remount', 'New message', 'const value = 2;', 'javascript');
+    return snapshots;
+  } finally {
+    hljs.highlight = highlight;
+    render(null, container);
+    container.remove();
+  }
+}

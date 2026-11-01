@@ -1,7 +1,5 @@
-{{# Existing type/title/content contract; informational notices are monochrome, warnings semantic. #}}
-{{ set kind = type || "note" }}
-{{ set icons = { note: "ⓘ", tip: "✓", important: "ⓘ", warning: "△", error: "ⓧ" } }}
-<aside class="ns-callout" data-variant="{{ kind }}"{{ if kind === "important" }} data-emphasis="strong"{{ /if }} role="note">
-  <div class="ns-callout__head"><span class="ns-callout__icon" aria-hidden="true">{{ icons[kind] || icons.note }}</span><span class="ns-eyebrow">{{ kind }}</span>{{ if title }}<span class="ns-callout__title">{{ title |> ic }}</span>{{ /if }}</div>
-  <div class="ns-callout__body">{{ content }}</div>
-</aside>
+{{# Shared contract rejects unknown types instead of downgrading security notices. #}}
+{{# The markup lives in _plugins/callout.ts, shared with Markdown alerts. #}}
+{{ set kind = type |> calloutType }}
+{{ set label = title }}
+{{ content |> calloutHtml(kind, label) }}

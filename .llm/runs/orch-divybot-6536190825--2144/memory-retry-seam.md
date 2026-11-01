@@ -1,0 +1,3 @@
+# Worker retry seam
+
+At the assignment baseline, `plugins/workers/worker/job-execution.ts:executeWorkerJob` selects Deno pool vs polyglot executor. Neither retries. Passing maxRetries into MultiRuntimeTaskExecutor does not implement retries; it invokes its runtime adapter once. The dispatcher swallows failures and completes the queue callback. Builder retry options live in metadata.retry. Generated definitions originate in `plugins/workers/src/cli/runtime-registry-generator.ts`, not packages/cli. Registry persistence normalizes through JobDefinitionSchema, so metadata is the existing durable behavior channel.

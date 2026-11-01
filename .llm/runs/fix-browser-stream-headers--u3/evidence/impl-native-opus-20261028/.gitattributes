@@ -1,0 +1,2 @@
+# Exact public evaluator evidence, confined to raw TXT carriers.
+*.txt -text
