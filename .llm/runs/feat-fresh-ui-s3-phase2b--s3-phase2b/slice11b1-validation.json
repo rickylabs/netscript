@@ -1,5 +1,5 @@
 {
-  "status": "SOURCE_ROUND2_PASS_COMMIT_PROOFS_PENDING",
+  "status": "COMMITTED_SOURCE_EVIDENCE_PASS",
   "baselineHead": "3e88d48774722987d039250b099aafeade5a6971",
   "workingTree": true,
   "sourceFiles": 26,
@@ -149,5 +149,7 @@
     "all-style base/extension/browser harness",
     "whole-phase gates and final independent evaluation"
   ],
-  "ready": false
+  "ready": false,
+  "sourceHead": "4ca68e4c7880d8fc3f7d5d940353412163ccbf0f",
+  "committedSourceEvidenceReview": "PASS"
 }

@@ -1,3 +1,24 @@
+## Current — Docs11b1 evidence PASS; audited push/reconcile next
+
+Source4ca68e4c, SAMEsource2 andcommitted-evidence PASS0blockers/streak0.
+Four canonical carriers6commands0/delta0,actual-head quality/nativepub0slowtypes.
+Frozen26source/7build still exact;786/739/200/140 are precommit executions on
+identical bytes. Next run-onlycommit,repeatfrozen/privacy0/remote exact3e88
+leasepush/PR2538comment/reconcile. Then 11b2 checkpoint before code. Full
+RuledGrid/Hero/Desktop/productionx/allstyle/13mandatory,noREADY.
+
+Earlier notes below historical.
+
+## Current — Docs11b1 committed-source gates PASS; SAME evidence review pending
+
+Source4ca68e4c,6canonical carrier commands0/actual generated delta0, durable
+quality actual-head PASS/nativepublication0slowtypes. Source26/build7 remain
+exact frozen bytes from fresh786/739/200/140 runs. SAMEsource2PASS/failurestreak0.
+Next same evidence review, explicit run-only commit, public audit0/exact remote
+3e88lease push/PR comment/reconcile. Full11b2/12/13 mandatory,noREADY.
+
+Earlier notes below historical.
+
 ## Current — Docs11b1 source round2 PASS; committed proofs next
 
 Same source review passed,0blockers/failurestreak0. Read source-review-round2
