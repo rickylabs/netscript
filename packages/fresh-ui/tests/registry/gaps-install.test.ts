@@ -77,6 +77,8 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
       'The installer must contribute its runtime package mapping; local subpath aliases cannot prove that.',
     );
     // Compile the unreleased local API only after proving the production root mapping was installed.
+    installedConfig.imports['@netscript/fresh-ui'] =
+      toFileUrl(join(repo, 'packages/fresh-ui/mod.ts')).href;
     installedConfig.imports['@netscript/fresh-ui/interactive'] =
       toFileUrl(join(repo, 'packages/fresh-ui/interactive.ts')).href;
     installedConfig.imports['@netscript/fresh-ui/primitives'] =
@@ -97,8 +99,44 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
           ),
         );
       }
-      if (names.includes(name)) assertStringIncludes(installed, `data-scope='${name}'`);
+      if (
+        [
+          'marker',
+          'trace',
+          'attachment',
+          'message-scroller',
+          'questionnaire',
+          'file-path-chip',
+          'attribute-chip',
+          'file-tree',
+          'figure',
+          'toc',
+          'anchor-nav',
+          'ruled-grid',
+          'hero',
+          'desktop-window-chrome',
+          'desktop-tray-menu',
+        ].includes(name)
+      ) {
+        assertEquals(
+          await Deno.readTextFile(join(root, 'assets/ui', name + '.css')),
+          await Deno.readTextFile(
+            join(repo, 'packages/fresh-ui/registry/components/ui', name + '.css'),
+          ),
+          'Reviewed component styles must preserve actual installed CSS bytes.',
+        );
+      }
+      if (names.includes(name)) {
+        assertStringIncludes(
+          installed,
+          name === 'direction' ? "'data-scope': 'direction'" : `data-scope='${name}'`,
+        );
+      }
     }
+    assertEquals(
+      await Deno.readTextFile(join(root, 'lib/section-navigation.ts')),
+      await Deno.readTextFile(join(repo, 'packages/fresh-ui/registry/lib/section-navigation.ts')),
+    );
     await run(root, [
       'check',
       '--unstable-kv',
@@ -111,7 +149,7 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
     ]);
     // Audited baseline components preserve overridable scopes; verify actual installed rendering.
     await Deno.writeTextFile(
-      join(root, 'render-audited.ts'),
+      join(root, 'render-audited.tsx'),
       `
 import { h } from 'preact';
 import { render } from 'npm:preact-render-to-string@^6.7.0';
@@ -122,7 +160,52 @@ import { Pagination } from './components/ui/pagination.tsx';
 import { Alert } from './components/ui/alert.tsx';
 import { CommandPalette } from './components/ui/command-palette.tsx';
 import { PageHeader } from './components/ui/page-header.tsx';
+import { ScrollArea } from './components/ui/scroll-area.tsx';
+import { AspectRatio } from './components/ui/aspect-ratio.tsx';
+import { Direction } from './components/ui/direction.tsx';
+import { Resizable } from './components/ui/resizable.tsx';
+import { SidebarShell } from './components/ui/sidebar-shell.tsx';
+import { StatsGrid } from './components/ui/stats-grid.tsx';
+import { DataTable } from './components/ui/data-table.tsx';
+import { DataGrid } from '@netscript/fresh-ui';
+import { Marker } from './components/ui/marker.tsx';
+import { Trace } from './components/ui/trace.tsx';
+import { Attachment } from './components/ui/attachment.tsx';
+import { MessageScroller } from './components/ui/message-scroller.tsx';
+import { Questionnaire } from './components/ui/questionnaire.tsx';
+import { FilePathChip } from './components/ui/file-path-chip.tsx';
+import { AttributeChip } from './components/ui/attribute-chip.tsx';
+import { FileTree } from './components/ui/file-tree.tsx';
+import { Figure } from './components/ui/figure.tsx';
+import { Toc } from './components/ui/toc.tsx';
+import { AnchorNav } from './components/ui/anchor-nav.tsx';
+import { RuledGrid } from './components/ui/ruled-grid.tsx';
+import { Hero } from './components/ui/hero.tsx';
+import { DesktopWindowChrome } from './components/ui/desktop-window-chrome.tsx';
+import { DesktopTrayMenu } from './components/ui/desktop-tray-menu.tsx';
 console.log(JSON.stringify({
+  'window-chrome': render(<DesktopWindowChrome platform='macos' state='hover' title='Installed window' leading='App' actions={['show','hide','focus','reload','close']} />),
+  'tray-menu': render(<DesktopTrayMenu source='tray' type='submenu' state='hover' items={[{type:'action',id:'open',label:'Open',accelerator:'Ctrl+O'},{type:'separator'},{type:'submenu',label:'Edit',items:[{type:'role',role:'copy'}]}]} />),
+  'ruled-grid': render(<RuledGrid columns='4' variant='feature'><RuledGrid.Cell title={<a href='#native'>Native</a>} icon='CLI' eyebrow='CONTRACT' action={<button type='button'>Run</button>}>Boundary</RuledGrid.Cell></RuledGrid>),
+  hero: render(<Hero title='Boundary' headingLevel='2' layout='centered' breakpoint='mobile' actions={<button type='button'>Start</button>} aside={<pre>deno task start</pre>} paths={<a href='#owned'>Owned files</a>}>Carry it through the stack.</Hero>),
+  toc: render(<Toc breakpoint='mobile' currentId='install' links={<a href='#top'>Back to top</a>}><Toc.Item href='#install' level='3'>Installation</Toc.Item></Toc>),
+  'anchor-nav': render(<AnchorNav state='scrolled' currentId='install'><AnchorNav.Link href='#install'>Installation</AnchorNav.Link></AnchorNav>),
+  'file-path-chip': render(<FilePathChip path='src/routes/index.tsx' />),
+  'attribute-chip': render(<AttributeChip name='data-variant' value='outline' />),
+  'file-tree': render(<FileTree items={[{id:'src',type:'folder',name:'src',ownership:'owned',children:[{id:'page',type:'file',name:<a href='#page'>index.tsx</a>,ownership:'generated',comment:'# generated route'}]}]} />),
+  figure: render(<Figure width='wide' media='diagram' caption={<a href='#diagram'>Architecture</a>}><svg role='img' aria-label='Application architecture' viewBox='0 0 20 10'><path d='M0 0h20v10H0z' /></svg></Figure>),
+  'message-scroller': render(<MessageScroller label='Conversation' style={{height:320}}><MessageScroller.Item><a href='#source'>Read source</a></MessageScroller.Item></MessageScroller>),
+  questionnaire: render(<Questionnaire title='Which storage?' options={[{value:'postgres',label:'PostgreSQL',shortcut:'1'},{value:'sqlite',label:'SQLite'}]} defaultValue={['postgres']} description='Choose project storage' error='Review the answer' actions={<button type='submit'>Next</button>} />),
+  marker: render(<Marker variant='separator' icon='ⓘ' label='Restored' />),
+  trace: render(<Trace status='running' title='Run'><Trace.Line title='Search' status='running' collapsible defaultOpen description='Searching docs' duration='312ms'><button type='button'>Read output</button></Trace.Line></Trace>),
+  attachment: render(<Attachment title='report.pdf' description='PDF · 248 KB' state='error' size='xs' media='PDF' actions={<button type='button'>Retry</button>} />),
+  'data-table': render(<DataTable state='default'><DataTable.Header>Orders</DataTable.Header><DataTable.Body><DataGrid label='Orders' columns={[{key:'name',header:<button type='button'>Sort name</button>,headerLabel:'Name',sort:'ascending',cell:'strong'}]} rows={[{id:'one',data:{name:'First order'},href:'/orders/one',label:'Read first order'}]} /></DataTable.Body><DataTable.Footer><a href='#next-orders'>Next orders</a></DataTable.Footer></DataTable>),
+  'stats-grid': render(<StatsGrid columns={3} joined><StatsGrid.Card label='Revenue' value='$284,920' detail='+8.2% versus the previous period' delta='up' variant='hero' badge={<button type='button'>Inspect revenue</button>} /></StatsGrid>),
+  'sidebar-shell': render(<SidebarShell layout='docs' pathname='/orders' navigation={[{label:'Work',items:[{href:'/orders',label:'Orders',count:'12'}]}]} brand={<a href='/'>NetScript</a>} rail railContent={<a href='#installation'>Installation</a>} mobileRailContent={<details><summary>On this page</summary>Contents</details>}><h1>Orders</h1></SidebarShell>),
+  resizable: render(<Resizable label='Contents' startContent={<button type='button'>Open chapter</button>} endContent={<a href='#chapter'>Read chapter</a>} style={{height: 240}} />),
+  'scroll-area': render(h(ScrollArea, { label: 'Recent activity', orientation: 'both', children: h('a', { href: '#activity' }, 'Activity') })),
+  'aspect-ratio': render(h(AspectRatio, { ratio: '4:3', children: h('button', { type: 'button' }, 'Play') })),
+  direction: render(<Direction as='section' dir='rtl'><Direction as='div' dir='ltr'><input aria-label='Search' /></Direction></Direction>),
   'page-header': render(h(PageHeader, { title: 'Overview', eyebrow: 'Commerce', description: 'Recent orders', variant: 'with-status', status: 'Operational', actions: h('button', {children: 'Create order'}) })),
   'command-palette': render(h(CommandPalette, { scrim: false, groups: [{id: 'docs', label: 'Docs', items: [{id: 'start', label: 'Start', type: 'page', excerpt: 'Read the guide', shortcut: 'Enter'}]}] })),
   'code-block': render(h(CodeBlock, { tabs: [{ value: 'source', label: 'Source', code: 'x' }] })),
@@ -134,10 +217,52 @@ console.log(JSON.stringify({
 `,
     );
     const rendered: Record<string, string> = JSON.parse(
-      await run(root, ['run', '--node-modules-dir=auto', 'render-audited.ts']),
+      await run(root, ['run', '--node-modules-dir=auto', 'render-audited.tsx']),
     );
-    assertEquals(Object.keys(rendered).sort(), [...AUDITED_BASELINE_COMPONENTS].sort());
-    for (const name of AUDITED_BASELINE_COMPONENTS) {
+    const renderedNames = [
+      ...AUDITED_BASELINE_COMPONENTS.map((name) =>
+        name === 'desktop-window-chrome'
+          ? 'window-chrome'
+          : name === 'desktop-tray-menu'
+          ? 'tray-menu'
+          : name
+      ),
+      'scroll-area',
+      'aspect-ratio',
+      'direction',
+      'resizable',
+      'marker',
+      'trace',
+      'attachment',
+      'message-scroller',
+      'questionnaire',
+      'file-path-chip',
+      'attribute-chip',
+      'file-tree',
+      'figure',
+      'toc',
+      'anchor-nav',
+      'ruled-grid',
+      'hero',
+    ];
+    assertEquals(Object.keys(rendered).sort(), renderedNames.sort());
+    for (const name of renderedNames) {
+      if (name === 'sidebar-shell') {
+        for (const component of ['app-shell', 'sidebar', 'top-bar']) {
+          const contract = componentContracts.components.find((contract) =>
+            contract.name === component
+          )!;
+          assertEquals(
+            renderViolations(
+              contract,
+              { component, scenario: 'installed-shell', props: [] },
+              rendered[name],
+            ),
+            [],
+          );
+        }
+        continue;
+      }
       const contract = componentContracts.components.find((contract) => contract.name === name)!;
       assertEquals(
         renderViolations(contract, {

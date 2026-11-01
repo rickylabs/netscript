@@ -1,0 +1,25 @@
+# Slice9a contract checkpoint
+
+1. Public: ScrollArea required label string (accessible native viewport region), optional orientation vertical(default)/horizontal/both, children, native root props/class. Native viewport own tabIndex0. Root dimensions caller-owned; demos320x200. AspectRatio ratio closed16:9default/4:3/1:1/21:9, children; native root props/class, media wrapper. Direction/DirectionProvider same function accepting dir ltrdefault/rtl and exactlyone existing native HTMLVNode; clone preserves childkey/ref/class/handlers/style/identity, sets native dir plus data-dir and scope/part on existingboundary, reject fragments/arrays/customcomponent and conflicting scopedboundary. No added DOM/globaldir/context implementation. Correct planned contextmetadata to actual element boundary, explicit native dir input/alias doc.
+2. Vocabulary: viewport, native scrollbar/thumb/corner, ratio/media, local inheriteddirection, strict rendereddata binding.
+3. Ports: native HTML/CSSscrolling/bidi, PreactcloneElement/isValidElement, existingcn. No new runtime/dependencyfamily.
+4. Constants: closedorientations/ratios; nativeaxisCSSrules; existing --ns-scrollbar-thumb (verifiedbridge), border/card/muted/radius/cardpadding/ring. Track10px/thumb6rest8hover are ledgerliteralgeometry, notnewtokens. NativebarsOSdependent, documentlimits/no fakeDOM.
+5. Commit complete3identities/checkerseam/catalog/registrycollections/providers/install/browser/README; expected~20files +carriers separateevidencecommit. Ifstrictseamplus3components>30splitcompletestrictcheckerfirst and review/pushbefore9acomponents. Testscheckno unknownattrs/newx/wrongaxispartinvalidvalues; contextOnlycannotbypassforDirectionelement; nativefocus/render/tabscrollRTLratios and actualinstalledSSR.
+6. Deferred: Resizable9b, shell9c, existing27privatebindings12b, extensions12a/b. No tokenvalues/syntheticstyles/desktopservice/observerneeded.
+7. Contributor src/contracts/README.md documents strict policy and componentusage.
+
+Direction rejects an already scoped child to preserve existing component identity; markers go on the same native HTML boundary. It never adds a wrapper. No HTML-tag enumeration; caller boundary must be a native string-tag VNode (not fragment/custom component). Runtime rejects existing data-scope/data-part and nonstring tags. No contextOnly exemption; catalog root becomes actual element boundary. Root-level dir passthrough on ScrollArea supports local RTL.
+
+Direction owns dir: overwrite an existing child dir and document this, preserving all other input attributes/key/ref/style/class/handlers. Strict new-identity list is explicit; only scope/part plus declared axes on declared parts or independently classified private bindings pass, unknown/x/wrong-part/bad-value negatives required. ScrollArea always has a stable named tabstop; standard native scrollbar styling, platformthumbgeometrylimitation explicitly disclosed.
+
+
+## Reviewed source correction
+
+The independent source review rejected h-only JSX ergonomics. Direction adds
+as with closed native containers (div/section/main/article/aside/nav/header/footer/
+form/span), native props and explicit boundaryRef for the underlying HTML element.
+This form renders the caller's single boundary directly; clone mode remains for
+one existing native VNode. Both reject scoped boundary inputs. Ordinary precompiled
+JSX/nesting are covered by real installed TSX SSR and browser RTL tests. The render
+checker counts independent roots, preserving nested instances while still rejecting
+parallel duplicated roots. Source re-review is required before commit.

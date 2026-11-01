@@ -1,0 +1,49 @@
+{
+  "status": "DESIGN_PROTOTYPE_NOT_FINAL_SOURCE",
+  "actualRendererControls": 12,
+  "baselineWebkitMaxDrift": 144.21875,
+  "otherEngineBaselineMaxDrift": 0,
+  "noPseudoRestoresGeometryButRemovesRail": true,
+  "gradientAndInsetRestoreGeometry": true,
+  "insetPaintPrototype": {
+    "passed": 24,
+    "failed": 0,
+    "maxDrift": 0,
+    "actualRailPixelsMatch": true,
+    "engines": 3,
+    "schemes": 2,
+    "widths": 2,
+    "directions": 2
+  },
+  "noPublicPathOrSessionData": true,
+  "redFirstRegression": {
+    "verdict": "EXPECTED_FAILURE",
+    "passed": 0,
+    "failed": 1,
+    "exitCode": 1,
+    "actualWebkitWide": true,
+    "ordersSelectionCellWidthDrift": 121.25,
+    "tolerance": 0.75,
+    "cssAndBuildMatchPreFixBaseline": true
+  },
+  "missing-rail": {
+    "verdict": "EXPECTED_FAILURE",
+    "exitCode": 1,
+    "failed": 1,
+    "passed": 0,
+    "channelDifference": 196,
+    "fixedChannelTolerance": 1,
+    "importsActualRegressionSpec": true,
+    "mutatesSourceOrBundle": false
+  },
+  "opposite-rail": {
+    "verdict": "EXPECTED_FAILURE",
+    "exitCode": 1,
+    "failed": 1,
+    "passed": 0,
+    "channelDifference": 196,
+    "fixedChannelTolerance": 1,
+    "importsActualRegressionSpec": true,
+    "mutatesSourceOrBundle": false
+  }
+}

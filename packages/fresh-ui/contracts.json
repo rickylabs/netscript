@@ -28,6 +28,8 @@
             "download",
             "external-link",
             "file-text",
+            "folder",
+            "grip-vertical",
             "info",
             "menu",
             "minus",
@@ -3470,57 +3472,89 @@
       "priority": "P0",
       "shipped": true,
       "props": {
-        "variant": {
+        "sidebarVariant": {
           "kind": "enum",
           "values": [
             "sidebar",
             "floating",
             "inset"
-          ]
+          ],
+          "default": "sidebar"
         },
-        "collapsible": {
+        "sidebar": {
           "kind": "enum",
           "values": [
             "expanded",
-            "icon",
-            "offcanvas"
-          ]
+            "collapsed",
+            "none"
+          ],
+          "default": "expanded"
         },
-        "state": {
-          "kind": "enum",
-          "values": [
-            "rest",
-            "hover",
-            "focus",
-            "selected",
-            "disabled"
-          ]
+        "navigation": {
+          "kind": "collection",
+          "required": true
         },
-        "level": {
+        "navigation[].collapsible": {
+          "kind": "boolean",
+          "default": false
+        },
+        "navigation[].defaultOpen": {
+          "kind": "boolean",
+          "default": true
+        },
+        "navigation[].label": {
+          "kind": "text",
+          "description": "Required nonblank for collapsible native sections."
+        },
+        "navigation[].items[].href": {
+          "kind": "text",
+          "required": true
+        },
+        "navigation[].items[].label": {
+          "kind": "text",
+          "required": true
+        },
+        "navigation[].items[].icon": {
+          "kind": "slot"
+        },
+        "navigation[].items[].count": {
+          "kind": "slot"
+        },
+        "navigation[].items[].level": {
           "kind": "enum",
           "values": [
             "1",
             "2"
-          ]
+          ],
+          "default": "1"
         },
-        "collapsed": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+        "navigation[].items[].disabled": {
+          "kind": "boolean",
+          "default": false
         },
-        "icon": {
-          "kind": "boolean"
+        "navigation[].items[].marker": {
+          "kind": "boolean",
+          "default": true
         },
-        "count": {
-          "kind": "boolean"
+        "navigation[].items[].chevron": {
+          "kind": "boolean",
+          "default": false
         },
-        "chevron": {
-          "kind": "boolean"
+        "navigation[].items[].matchPrefix": {
+          "kind": "boolean",
+          "default": false
         },
-        "marker": {
-          "kind": "boolean"
+        "navigation[].items[].isActive": {
+          "kind": "callback"
+        },
+        "brand": {
+          "kind": "slot"
+        },
+        "brandBadge": {
+          "kind": "slot"
+        },
+        "footer": {
+          "kind": "slot"
         }
       },
       "parts": [
@@ -3591,19 +3625,11 @@
             "sidebar",
             "floating",
             "inset"
-          ],
-          "plannedValues": [
-            "floating",
-            "inset"
           ]
         },
         "data-collapsible": {
           "values": [
             "expanded",
-            "icon",
-            "offcanvas"
-          ],
-          "plannedValues": [
             "icon",
             "offcanvas"
           ]
@@ -3616,30 +3642,61 @@
             "selected",
             "disabled"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "nav-item"
+          ]
         },
         "data-level": {
           "values": [
             "1",
             "2"
+          ],
+          "parts": [
+            "nav-item"
           ]
         },
         "data-collapsed": {
           "values": [
             "false",
             "true"
+          ],
+          "parts": [
+            "nav-item"
           ]
         }
       },
       "booleans": [
-        "icon",
-        "count",
-        "chevron",
-        "marker",
-        "collapsible"
+        "navigation[].collapsible",
+        "navigation[].defaultOpen",
+        "navigation[].items[].disabled",
+        "navigation[].items[].marker",
+        "navigation[].items[].chevron",
+        "navigation[].items[].matchPrefix"
       ],
-      "slots": [],
-      "apg": "native navigation links",
+      "slots": [
+        {
+          "name": "brand",
+          "part": "brand-group"
+        },
+        {
+          "name": "brandBadge",
+          "part": "sidebar-header"
+        },
+        {
+          "name": "footer",
+          "part": "sidebar-footer"
+        },
+        {
+          "name": "navigation[].items[].icon",
+          "part": "nav-icon"
+        },
+        {
+          "name": "navigation[].items[].count",
+          "part": "count"
+        }
+      ],
+      "apg": "native navigation links and native details disclosures",
       "keyboard": [
         {
           "key": "Tab",
@@ -3648,6 +3705,10 @@
         {
           "key": "Enter",
           "action": "Follow link"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Toggle a native collapsible section summary."
         }
       ],
       "tokenRoles": [
@@ -3661,7 +3722,9 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Audited baseline: research-only flat state/level/count/etc props are actual SidebarShell navigation records; variant maps to sidebarVariant. Native hover/focus are CSS, while rest/selected/disabled are derived. Root collapsible derives expanded/icon/offcanvas from desktop presentation and measured mobile geometry.",
+        "Native ul/li/a destinations retain aria-current; disabled items omit href, collapsed items retain accessible labels. Groups use native details/summary, independent of the outer static shell disclosure."
       ]
     },
     {
@@ -3671,19 +3734,23 @@
       "priority": "P0",
       "shipped": true,
       "props": {
-        "variant": {
-          "kind": "enum",
-          "values": [
-            "app",
-            "docs"
-          ]
+        "topbarStart": {
+          "kind": "slot"
         },
-        "breakpoint": {
+        "topbarEnd": {
+          "kind": "slot"
+        },
+        "topbarBrand": {
+          "kind": "slot"
+        },
+        "layout": {
           "kind": "enum",
           "values": [
-            "desktop",
-            "mobile"
-          ]
+            "dashboard",
+            "chat",
+            "docs"
+          ],
+          "default": "dashboard"
         }
       },
       "parts": [
@@ -3700,11 +3767,13 @@
         },
         {
           "name": "logo",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "context"
         },
         {
           "name": "wordmark",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "when the corresponding content or subcomponent is supplied",
+          "representation": "context"
         },
         {
           "name": "topbar-end",
@@ -3722,11 +3791,25 @@
           "values": [
             "desktop",
             "mobile"
-          ]
+          ],
+          "description": "Measured after hydration; absent on SSR, tablet and mobile both use mobile topbar geometry."
         }
       },
       "booleans": [],
-      "slots": [],
+      "slots": [
+        {
+          "name": "topbarStart",
+          "part": "topbar-start"
+        },
+        {
+          "name": "topbarEnd",
+          "part": "topbar-end"
+        },
+        {
+          "name": "topbarBrand",
+          "part": "brand"
+        }
+      ],
       "apg": "native buttons and links",
       "keyboard": [
         {
@@ -3747,7 +3830,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Audited baseline: SidebarShell owns this topbar. variant app/docs and breakpoint are derived, not independent accepted props. Host owns logo/wordmark within topbarBrand. No future post-canary navigation promotion is included."
       ]
     },
     {
@@ -4124,12 +4208,30 @@
       "priority": "P2",
       "shipped": true,
       "props": {
-        "open": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+        "class": {
+          "kind": "text"
+        },
+        "sidebarSelector": {
+          "kind": "text",
+          "default": "[data-sidebar]"
+        },
+        "backdropSelector": {
+          "kind": "text",
+          "default": "[data-sidebar-backdrop]"
+        },
+        "openLabel": {
+          "kind": "text",
+          "default": "Open sidebar"
+        },
+        "closeLabel": {
+          "kind": "text",
+          "default": "Close sidebar"
+        },
+        "openIcon": {
+          "kind": "slot"
+        },
+        "closeIcon": {
+          "kind": "slot"
         }
       },
       "parts": [
@@ -4143,6 +4245,30 @@
             "false",
             "true"
           ]
+        },
+        "data-state": {
+          "values": [
+            "rest"
+          ],
+          "default": "rest"
+        },
+        "data-variant": {
+          "values": [
+            "ghost"
+          ],
+          "default": "ghost"
+        },
+        "data-size": {
+          "values": [
+            "sm"
+          ],
+          "default": "sm"
+        },
+        "data-icon": {
+          "values": [
+            "true"
+          ],
+          "default": "true"
         }
       },
       "booleans": [],
@@ -4163,7 +4289,8 @@
         "text/fg"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Audited baseline: open is derived native state, never an accepted prop. Default selectors connect to the nearest shell; explicit overrides retain standalone behavior. aria-controls is absent until the owned target is connected; controlled refusal does not flip aria-expanded."
       ]
     },
     {
@@ -4331,6 +4458,7 @@
         "text/muted"
       ],
       "notes": [
+        "Cancelable Escape proposes closure and controlled parents may refuse. Non-cancelable platform close stands and reports native-close; accept false to keep closed, otherwise a subsequent accepted open=true render reopens the native modal.",
         "Native DOM attributes pass through where the implementation accepts them.",
         "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
@@ -4699,6 +4827,7 @@
         "surface/card"
       ],
       "notes": [
+        "Cancelable Escape proposes closure and controlled parents may refuse. Non-cancelable platform close stands and reports native-close; accept false to keep closed, otherwise a subsequent accepted open=true render reopens the native modal.",
         "Native DOM attributes pass through where the implementation accepts them.",
         "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
       ]
@@ -6500,6 +6629,15 @@
       "priority": "P0",
       "shipped": true,
       "props": {
+        "children": {
+          "kind": "slot",
+          "description": "DataTable frame and compound section content."
+        },
+        "interactive": {
+          "kind": "boolean",
+          "default": false,
+          "description": "DataTable frame hover/focus styling; adds no activation handler."
+        },
         "state": {
           "kind": "enum",
           "values": [
@@ -6507,42 +6645,48 @@
             "selection",
             "empty",
             "loading"
-          ]
-        },
-        "breakpoint": {
-          "kind": "enum",
-          "values": [
-            "desktop",
-            "mobile"
-          ]
-        },
-        "children": {
-          "kind": "slot",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          ],
+          "description": "DataTable defaults to default. DataGrid derives empty/selection/default when omitted; explicit loading/empty shows supplied content."
         },
         "columns": {
           "kind": "collection",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "description": "DataGrid columns; header accepts Renderable, headerLabel supplies mobile text, sort describes native aria-sort, width sets tracks and cell is strong or num."
         },
         "rows": {
           "kind": "collection",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "description": "DataGrid rows retain data/id/selected snapshots and mutually exclusive onSelect/href. Optional row label names its native activation."
+        },
+        "label": {
+          "kind": "text",
+          "description": "DataGrid native table accessible name."
         },
         "selectedIds": {
           "kind": "collection",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "description": "Controlled row identities; stale IDs do not inflate the visible count."
         },
         "onSelectionChange": {
           "kind": "callback",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "description": "Receives a complete next selection set; refusal preserves physical checkbox checked/mixed properties."
         },
         "renderBulkActions": {
-          "kind": "slot",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "kind": "callback",
+          "description": "DataGrid callback receiving visible count, selectedIds and clearSelection; its returned content sits outside the table."
         },
         "renderRowActions": {
+          "kind": "callback",
+          "description": "DataGrid callback receiving data and row/selected context; returned controls are independent of row activation."
+        },
+        "empty": {
           "kind": "slot",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "description": "DataGrid caller-owned empty content in one spanning native cell; absent content stays empty."
+        },
+        "loading": {
+          "kind": "slot",
+          "description": "DataGrid caller-owned loading content in one spanning native cell; absent content stays empty with aria-busy."
+        },
+        "Row.cols": {
+          "kind": "text",
+          "description": "DataTable.Row native grid track value; preserves native string or object styles."
         }
       },
       "parts": [
@@ -6551,63 +6695,75 @@
         },
         {
           "name": "header",
-          "when": "when the corresponding content or subcomponent is supplied"
-        },
-        {
-          "name": "bulk-actions",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "the corresponding DataTable section or DataGrid structure is supplied"
         },
         {
           "name": "body",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "the corresponding DataTable section or DataGrid structure is supplied"
         },
         {
           "name": "row",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "the corresponding DataTable section or DataGrid structure is supplied"
         },
         {
           "name": "footer",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "the corresponding DataTable section or DataGrid structure is supplied"
         },
         {
           "name": "table",
-          "when": "when the corresponding content or subcomponent is supplied"
-        },
-        {
-          "name": "cell",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "DataGrid is supplied"
         },
         {
           "name": "head",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
-        },
-        {
-          "name": "selection",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "when": "DataGrid is supplied"
         },
         {
           "name": "header-cell",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "when": "DataGrid is supplied"
+        },
+        {
+          "name": "cell",
+          "when": "DataGrid is supplied"
+        },
+        {
+          "name": "bulk-actions",
+          "when": "visible selected rows and renderBulkActions are supplied outside empty/loading states"
+        },
+        {
+          "name": "selection",
+          "when": "DataGrid selection controls are enabled"
+        },
+        {
+          "name": "actions",
+          "when": "renderRowActions supplies a cell"
         },
         {
           "name": "row-action",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "when": "a row has onSelect"
         },
         {
-          "name": "row-actions",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "name": "row-link",
+          "when": "a row has href"
         },
         {
-          "name": "cell-link",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "name": "cell-strong",
+          "when": "a column uses cell=strong"
         },
         {
-          "name": "cell-value",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "name": "cell-num",
+          "when": "a column uses cell=num"
         },
         {
-          "name": "footer-action",
-          "when": "Utility compatibility anatomy when the corresponding content is supplied"
+          "name": "cell-label",
+          "when": "a DataGrid cell supplies its noninteractive mobile label"
+        },
+        {
+          "name": "empty",
+          "when": "the empty state supplies its spanning content cell"
+        },
+        {
+          "name": "loading",
+          "when": "the loading state supplies its spanning content cell"
         }
       ],
       "attributes": {
@@ -6618,7 +6774,6 @@
             "empty",
             "loading"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
           "compatibilityValues": [
             "rest",
             "selected"
@@ -6626,28 +6781,108 @@
           "parts": [
             "root",
             "row"
-          ]
+          ],
+          "description": "Root presentation state; selected is the retained visual row snapshot. Native checkboxes own live selection semantics."
         },
-        "data-breakpoint": {
+        "data-type": {
           "values": [
-            "desktop",
-            "mobile"
-          ]
+            "header",
+            "button",
+            "link"
+          ],
+          "parts": [
+            "row"
+          ],
+          "description": "Header row or the kind of native row activation; plain rows omit it."
+        },
+        "data-interactive": {
+          "values": [
+            "true"
+          ],
+          "parts": [
+            "root",
+            "row"
+          ],
+          "description": "Present only for an interactive frame or native row action/link."
+        },
+        "data-variant": {
+          "values": [
+            "strong",
+            "num"
+          ],
+          "parts": [
+            "cell"
+          ],
+          "description": "Existing public DataGrid cell treatments; unstyled cells omit the axis."
         }
       },
-      "booleans": [],
-      "slots": [],
-      "apg": "native rows and action controls",
-      "keyboard": [],
+      "booleans": [
+        "interactive"
+      ],
+      "slots": [
+        {
+          "name": "children",
+          "part": "root"
+        },
+        {
+          "name": "Header.children",
+          "part": "header"
+        },
+        {
+          "name": "Body.children",
+          "part": "body"
+        },
+        {
+          "name": "Row.children",
+          "part": "row"
+        },
+        {
+          "name": "Footer.children",
+          "part": "footer"
+        },
+        {
+          "name": "empty",
+          "part": "empty"
+        },
+        {
+          "name": "loading",
+          "part": "loading"
+        }
+      ],
+      "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/table/",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Visit independent native child controls in source order; static table cells and rows add no tab stop."
+        },
+        {
+          "key": "Enter",
+          "action": "Activate the focused native row link/button or caller-owned action; child activation never activates its row."
+        },
+        {
+          "key": "Space",
+          "action": "Activate the focused native button or checkbox; selection and action controls never trigger row activation."
+        }
+      ],
       "tokenRoles": [
         "space/card/padding",
-        "space/inline/gap"
+        "space/inline/gap",
+        "surface/card",
+        "surface/hover",
+        "surface/selected",
+        "border/default",
+        "text/fg",
+        "text/muted",
+        "border/ring"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them.",
-        "DataTable has compound slots; DataGrid is its rows/columns-driven package presentation. Native row links/buttons retain Tab/Enter/Space behavior, without an ARIA grid navigation claim.",
-        "Utility compatibility anatomy is included for existing shipped helpers; it does not implement a design gap.",
-        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
+        "DataTable is the copied composition frame; DataGrid is its package rows/columns presentation under the same canonical identity. A frame may intentionally contain an independently rendered DataGrid root.",
+        "The audit replaces role=grid without grid navigation and whole-button/anchor role=row with a native table and independent native actions. Caller callback/data APIs are retained; there is no grid keyboard manager.",
+        "Native DOM attributes pass through. DataTable owns its frame state without leaking Card size/variant axes; selected row snapshots keep data-state, while checkboxes own checked/mixed state.",
+        "Header strings remain valid. The widened Renderable header port requires readers to narrow before string operations; headerLabel supplies plain mobile text without duplicating controls.",
+        "Responsive mobile cards use native CSS and retain visible header controls, not a breakpoint prop or serialized data-breakpoint axis.",
+        "Research-only row-actions/cell-link/cell-value/footer-action anatomy is replaced by the actual actions/row-link/row-action and cell content parts emitted by these public surfaces.",
+        "Sorting, filtering, paging, row data and empty/loading content remain caller-owned. No engine or sample rows are synthesized."
       ]
     },
     {
@@ -8871,32 +9106,102 @@
             "dashboard",
             "chat",
             "docs"
-          ]
+          ],
+          "default": "dashboard"
         },
-        "breakpoint": {
+        "sidebar": {
           "kind": "enum",
           "values": [
-            "desktop",
-            "tablet",
-            "mobile"
-          ]
+            "expanded",
+            "collapsed",
+            "none"
+          ],
+          "default": "expanded"
         },
         "nav": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+          "kind": "boolean",
+          "default": true
         },
         "rail": {
+          "kind": "boolean",
+          "default": false
+        },
+        "sidebarVariant": {
           "kind": "enum",
           "values": [
-            "false",
-            "true"
-          ]
+            "sidebar",
+            "floating",
+            "inset"
+          ],
+          "default": "sidebar"
+        },
+        "pathname": {
+          "kind": "text",
+          "required": true
+        },
+        "navigation": {
+          "kind": "collection",
+          "required": true
+        },
+        "brand": {
+          "kind": "slot",
+          "required": true
+        },
+        "brandBadge": {
+          "kind": "slot"
+        },
+        "footer": {
+          "kind": "slot"
+        },
+        "topbarStart": {
+          "kind": "slot"
+        },
+        "topbarEnd": {
+          "kind": "slot"
+        },
+        "topbarBrand": {
+          "kind": "slot"
         },
         "children": {
+          "kind": "slot",
+          "required": true
+        },
+        "railContent": {
           "kind": "slot"
+        },
+        "mobileRailContent": {
+          "kind": "slot"
+        },
+        "session": {
+          "kind": "slot"
+        },
+        "thread": {
+          "kind": "slot",
+          "description": "Replaces children in the chat thread when supplied."
+        },
+        "composer": {
+          "kind": "slot"
+        },
+        "sidebarOpen": {
+          "kind": "boolean"
+        },
+        "defaultSidebarOpen": {
+          "kind": "boolean",
+          "default": false
+        },
+        "onSidebarOpenChange": {
+          "kind": "callback"
+        },
+        "contentId": {
+          "kind": "text",
+          "default": "main-content"
+        },
+        "navLabel": {
+          "kind": "text",
+          "default": "Sidebar navigation"
+        },
+        "class": {
+          "kind": "text"
         }
       },
       "parts": [
@@ -8935,7 +9240,24 @@
         },
         {
           "name": "sidebar-backdrop",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "Native modal ::backdrop on the composed Dialog content.",
+          "representation": "pseudo"
+        },
+        {
+          "name": "sidebar-disclosure",
+          "when": "Corresponding optional content or native disclosure is present."
+        },
+        {
+          "name": "sidebar-summary",
+          "when": "Corresponding optional content or native disclosure is present."
+        },
+        {
+          "name": "rail",
+          "when": "Corresponding optional content or native disclosure is present."
+        },
+        {
+          "name": "mobile-rail",
+          "when": "Corresponding optional content or native disclosure is present."
         }
       ],
       "attributes": {
@@ -8951,7 +9273,8 @@
             "desktop",
             "tablet",
             "mobile"
-          ]
+          ],
+          "description": "Measured after hydration; absent during SSR. Native media queries govern the static fallback."
         },
         "data-nav": {
           "values": [
@@ -8964,27 +9287,105 @@
             "false",
             "true"
           ]
+        },
+        "data-sidebar-presentation": {
+          "values": [
+            "expanded",
+            "collapsed",
+            "none"
+          ],
+          "default": "expanded"
+        },
+        "data-sidebar-mode": {
+          "values": [
+            "static",
+            "hydrated"
+          ],
+          "default": "static"
         }
       },
       "booleans": [
         "nav",
-        "rail"
+        "rail",
+        "sidebarOpen",
+        "defaultSidebarOpen"
       ],
       "slots": [
         {
           "name": "children",
           "part": "content"
+        },
+        {
+          "name": "brand",
+          "part": "sidebar"
+        },
+        {
+          "name": "brandBadge",
+          "part": "sidebar"
+        },
+        {
+          "name": "footer",
+          "part": "sidebar"
+        },
+        {
+          "name": "topbarStart",
+          "part": "topbar"
+        },
+        {
+          "name": "topbarEnd",
+          "part": "topbar"
+        },
+        {
+          "name": "topbarBrand",
+          "part": "topbar"
+        },
+        {
+          "name": "railContent",
+          "part": "rail"
+        },
+        {
+          "name": "mobileRailContent",
+          "part": "mobile-rail"
+        },
+        {
+          "name": "session",
+          "part": "session"
+        },
+        {
+          "name": "thread",
+          "part": "thread"
+        },
+        {
+          "name": "composer",
+          "part": "composer"
         }
       ],
-      "apg": "noninteractive presentation",
-      "keyboard": [],
+      "apg": "native layout with progressive details navigation and composed native modal Dialog",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Follow native links/controls; hydrated mobile modal contains focus."
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Toggle the static native summary, a navigation group summary, or a sidebar button."
+        },
+        {
+          "key": "Escape",
+          "action": "Use composed native Dialog dismissal; cancelable proposals honor refusal and platform-forced close wins."
+        }
+      ],
       "tokenRoles": [
         "space/page/padding-x|y",
         "space/section/gap",
         "surface/bg"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Audited baseline: breakpoint is derived, not a prop. SidebarShell is the single app-shell/sidebar/top-bar family. nav=false aliases sidebar=none; topbar derives docs/app.",
+        "Static SSR contains one initially open native details navigation in normal flow; whole-shell hydration selects one aside or mobile Dialog. Mobile expanded fallback may shift layout on hydration. sidebarOpen ports apply only to hydrated mobile navigation.",
+        "Server-only Shell plus independently hydrated SidebarToggle is supported; whole-shell islands require serializable props/JSX slots. Navigation isActive functions and callback ports must be defined inside the same island.",
+        "Chat children supply the thread unless thread is supplied; host owns messages, composer and business effects. Desktop rail is280px; mobileRailContent is its explicit mobile path."
       ]
     },
     {
@@ -9215,20 +9616,10 @@
       "priority": "P0",
       "shipped": true,
       "props": {
-        "variant": {
-          "kind": "enum",
-          "values": [
-            "default",
-            "hero"
-          ]
-        },
-        "delta": {
-          "kind": "enum",
-          "values": [
-            "up",
-            "down",
-            "none"
-          ]
+        "children": {
+          "kind": "slot",
+          "required": true,
+          "description": "StatsGrid root content."
         },
         "columns": {
           "kind": "enum",
@@ -9236,46 +9627,66 @@
             "2",
             "3",
             "4"
-          ]
+          ],
+          "description": "Optional maximum column count, typed as 2 | 3 | 4. Unset retains container-adaptive auto-fit."
         },
         "joined": {
+          "kind": "boolean",
+          "default": false,
+          "description": "Root joined strip; cards retain one-pixel dividers when wrapping."
+        },
+        "variant": {
           "kind": "enum",
           "values": [
-            "false",
-            "true"
-          ]
+            "default",
+            "hero"
+          ],
+          "default": "default",
+          "description": "StatsGrid.Card surface."
         },
-        "children": {
-          "kind": "slot",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+        "delta": {
+          "kind": "enum",
+          "values": [
+            "up",
+            "down",
+            "none"
+          ],
+          "default": "none",
+          "description": "StatsGrid.Card decorative direction arrow; the caller conveys its meaning in detail text."
         },
         "label": {
           "kind": "slot",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "required": true,
+          "description": "StatsGrid.Card metric label."
         },
         "value": {
           "kind": "slot",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "required": true,
+          "description": "StatsGrid.Card metric value."
         },
         "detail": {
           "kind": "slot",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "description": "Optional StatsGrid.Card supporting content, including a signed change."
         },
         "badge": {
           "kind": "slot",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "description": "Optional StatsGrid.Card header badge; native child controls retain their behavior."
         },
         "icon": {
-          "kind": "boolean"
+          "kind": "slot",
+          "description": "Optional StatsGrid.Card decorative icon, inert and hidden from assistive technology."
         },
         "sparkline": {
-          "kind": "boolean"
+          "kind": "slot",
+          "description": "Optional caller-owned decorative content, empty by default and visible only when its theme role enables it."
         },
         "ticks": {
-          "kind": "boolean"
+          "kind": "slot",
+          "description": "Optional caller-owned decorative content, empty by default and visible only when its theme role enables it."
         },
         "blockbars": {
-          "kind": "boolean"
+          "kind": "slot",
+          "description": "Optional caller-owned decorative content, empty by default and visible only when its theme role enables it."
         }
       },
       "parts": [
@@ -9284,50 +9695,77 @@
         },
         {
           "name": "card",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "StatsGrid.Card is supplied"
         },
         {
           "name": "header",
-          "when": "when the corresponding content or subcomponent is supplied"
-        },
-        {
-          "name": "label",
-          "when": "when the corresponding content or subcomponent is supplied"
-        },
-        {
-          "name": "badge",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "StatsGrid.Card is supplied"
         },
         {
           "name": "body",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "StatsGrid.Card is supplied"
+        },
+        {
+          "name": "label",
+          "when": "StatsGrid.Card is supplied"
         },
         {
           "name": "value",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "StatsGrid.Card is supplied"
+        },
+        {
+          "name": "badge",
+          "when": "the corresponding StatsGrid.Card slot is supplied"
         },
         {
           "name": "detail",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "the corresponding StatsGrid.Card slot is supplied"
+        },
+        {
+          "name": "icon",
+          "when": "the corresponding StatsGrid.Card slot is supplied"
         },
         {
           "name": "sparkline",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "the corresponding StatsGrid.Card slot is supplied"
         },
         {
           "name": "ticks",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "the corresponding StatsGrid.Card slot is supplied"
         },
         {
           "name": "blockbars",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "the corresponding StatsGrid.Card slot is supplied"
+        },
+        {
+          "name": "delta",
+          "when": "detail is supplied and delta is up or down"
         }
       ],
       "attributes": {
+        "data-columns": {
+          "values": [
+            "2",
+            "3",
+            "4"
+          ],
+          "description": "Only emitted when an explicit column cap is supplied."
+        },
+        "data-joined": {
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
         "data-variant": {
           "values": [
             "default",
             "hero"
+          ],
+          "default": "default",
+          "parts": [
+            "card"
           ]
         },
         "data-delta": {
@@ -9335,45 +9773,90 @@
             "up",
             "down",
             "none"
-          ]
-        },
-        "data-columns": {
-          "values": [
-            "2",
-            "3",
-            "4"
-          ]
-        },
-        "data-joined": {
-          "values": [
-            "false",
-            "true"
+          ],
+          "default": "none",
+          "parts": [
+            "card"
           ]
         }
       },
       "booleans": [
-        "badge",
-        "icon",
-        "detail",
-        "sparkline",
-        "ticks",
-        "blockbars"
+        "joined"
       ],
-      "slots": [],
-      "apg": "noninteractive presentation",
-      "keyboard": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "root"
+        },
+        {
+          "name": "label",
+          "part": "label"
+        },
+        {
+          "name": "value",
+          "part": "value"
+        },
+        {
+          "name": "detail",
+          "part": "detail"
+        },
+        {
+          "name": "badge",
+          "part": "badge"
+        },
+        {
+          "name": "icon",
+          "part": "icon"
+        },
+        {
+          "name": "sparkline",
+          "part": "sparkline"
+        },
+        {
+          "name": "ticks",
+          "part": "ticks"
+        },
+        {
+          "name": "blockbars",
+          "part": "blockbars"
+        }
+      ],
+      "apg": "noninteractive presentation with native child controls",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move through caller-owned native controls in source order; the grid and cards add no tab stops."
+        }
+      ],
       "tokenRoles": [
-        "destructive/text",
-        "primary/default",
-        "primary/fg",
+        "kpi/bg-1..4",
+        "kpi/border",
+        "kpi/border-top",
+        "kpi/border-right",
+        "kpi/border-bottom",
+        "kpi/border-left",
+        "kpi/first-left",
+        "kpi/gap",
+        "kpi/pad-x",
         "radius/card",
         "space/card/padding",
-        "success/text",
         "text/fg",
-        "text/muted"
+        "text/muted",
+        "primary/default",
+        "primary/fg",
+        "success/text",
+        "destructive/text",
+        "deco/sparkline",
+        "deco/ticks",
+        "deco/blockbars"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through; owned contract markers take precedence.",
+        "Root columns/joined and Card variant/delta are independent axes. The default grid remains container-adaptive rather than viewport-driven.",
+        "Figma visibility booleans map to optional Renderable slots; empty slots render no part. Decorations are inert, aria-hidden and hidden without layout space when disabled by the theme.",
+        "The card retains ns-card styling compatibility but owns its native element; Card-owned state and size axes do not leak into this scope.",
+        "The category ledger wins: joined strips have an outer top/right/bottom rule, per-card left dividers and zero card radius.",
+        "Series, tone and deltaTone promotions belong to the owner-approved phase after the Utility canary."
       ]
     },
     {
@@ -10409,19 +10892,24 @@
             "macos",
             "windows",
             "linux"
-          ]
+          ],
+          "description": "Presentation snapshot only. Omitted actions: macos close/hide/reload; windows/linux hide/reload/close; omitted platform reload/hide/close. Explicit actions preserve caller order."
         },
         "state": {
           "kind": "enum",
           "values": [
             "focused",
             "blurred",
-            "disabled"
-          ]
+            "disabled",
+            "hover",
+            "unfocused"
+          ],
+          "description": "Emitted verbatim; blurred/unfocused share visuals without disabling actions. disabled prop or state disables all native buttons."
         },
         "title": {
           "kind": "text",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+          "description": "Window title; retains caller render-content support.",
+          "required": true
         },
         "actions": {
           "kind": "collection",
@@ -10434,6 +10922,10 @@
         "disabled": {
           "kind": "boolean",
           "description": "Supported Utility public prop; native attributes pass through separately."
+        },
+        "leading": {
+          "kind": "slot",
+          "description": "Optional caller content before title."
         }
       },
       "parts": [
@@ -10470,7 +10962,9 @@
           "values": [
             "focused",
             "blurred",
-            "disabled"
+            "disabled",
+            "hover",
+            "unfocused"
           ],
           "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.",
           "compatibilityValues": [
@@ -10481,12 +10975,43 @@
             "root",
             "action"
           ]
+        },
+        "data-action": {
+          "values": [
+            "show",
+            "hide",
+            "focus",
+            "reload",
+            "close"
+          ],
+          "parts": [
+            "action"
+          ],
+          "description": "Public styling operation identity. Legacy data-desktop-action is a private callback payload."
         }
       },
       "booleans": [],
-      "slots": [],
+      "slots": [
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "leading",
+          "part": "leading"
+        }
+      ],
       "apg": "noninteractive presentation",
-      "keyboard": [],
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Visit enabled native window operation buttons in DOM order"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Activate focused native window operation exactly once"
+        }
+      ],
       "tokenRoles": [
         "border/subtle",
         "destructive/default",
@@ -10495,7 +11020,9 @@
       ],
       "notes": [
         "Native DOM attributes pass through where the implementation accepts them.",
-        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.",
+        "The frame remains presentational; only native child buttons are interactive. No native action runs on render or focus.",
+        "hover/unfocused are additive ledger states. Published focused/blurred/disabled and legacy active/enabled remain."
       ]
     },
     {
@@ -10512,14 +11039,16 @@
             "role",
             "submenu",
             "separator"
-          ]
+          ],
+          "description": "Optional declaration-kind presentation snapshot; never filters or rewrites items."
         },
         "source": {
           "kind": "enum",
           "values": [
             "tray",
             "application-menu"
-          ]
+          ],
+          "required": true
         },
         "state": {
           "kind": "enum",
@@ -10527,10 +11056,62 @@
             "rest",
             "hover",
             "disabled"
-          ]
+          ],
+          "description": "Optional verbatim snapshot; omission retains active/enabled compatibility. disabled prop or state disables actions."
         },
         "accelerator": {
-          "kind": "boolean"
+          "kind": "boolean",
+          "default": true,
+          "description": "Show caller shortcut labels without executing shortcuts or rewriting declarations."
+        },
+        "items": {
+          "kind": "collection",
+          "description": "Required ordered recursive declarations; stable action IDs are callback payloads.",
+          "required": true
+        },
+        "onAction": {
+          "kind": "callback",
+          "description": "Receives only the explicitly activated enabled action ID."
+        },
+        "disabled": {
+          "kind": "boolean",
+          "description": "Disable summary and all action declarations.",
+          "default": false
+        },
+        "Item.type": {
+          "kind": "enum",
+          "description": "Declaration discriminator; no checkbox kind is invented.",
+          "values": [
+            "action",
+            "role",
+            "submenu",
+            "separator"
+          ]
+        },
+        "Item.id": {
+          "kind": "text",
+          "description": "Stable action payload; duplicate IDs preserve separate DOM traversal."
+        },
+        "Item.label": {
+          "kind": "text",
+          "description": "Action or expanded submenu label."
+        },
+        "Item.accelerator": {
+          "kind": "text",
+          "description": "Optional action shortcut label."
+        },
+        "Item.enabled": {
+          "kind": "boolean",
+          "description": "False disables an individual action.",
+          "default": true
+        },
+        "Item.role": {
+          "kind": "text",
+          "description": "Native OS role; read-only disabled browser preview."
+        },
+        "Item.items": {
+          "kind": "collection",
+          "description": "Expanded submenu declarations with labelled group ownership."
         }
       },
       "parts": [
@@ -10589,6 +11170,13 @@
             "role",
             "submenu",
             "separator"
+          ],
+          "parts": [
+            "root",
+            "action-item",
+            "role-item",
+            "submenu",
+            "separator"
           ]
         },
         "data-source": {
@@ -10631,6 +11219,14 @@
         {
           "key": "Escape",
           "action": "Dismiss menu"
+        },
+        {
+          "key": "Enter/Space on summary",
+          "action": "Toggle native disclosure; enabled actions remain native Tab stops before hydration"
+        },
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Leave naturally and close after focus enters then leaves this hydrated menu"
         }
       ],
       "tokenRoles": [
@@ -10639,7 +11235,10 @@
       "notes": [
         "Native DOM attributes pass through where the implementation accepts them.",
         "Utility compatibility anatomy is included for existing shipped helpers; it does not implement a design gap.",
-        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.",
+        "Initially-open native details preserves every enabled action in SSR/no-script Tab order. Arrow roving, Escape and Tab-to-close require a caller island. No mount focus.",
+        "Submenus are expanded labelled groups; OS roles are disabled read-only menuitem previews. Native host outcomes remain separate.",
+        "Legacy data-action-id is a private callback payload; no CSS reads it."
       ]
     },
     {
@@ -11079,7 +11678,7 @@
       "specId": "L9",
       "category": "Layout & blocks",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "orientation": {
           "kind": "enum",
@@ -11087,35 +11686,35 @@
             "vertical",
             "horizontal",
             "both"
-          ]
+          ],
+          "default": "vertical"
         },
         "children": {
           "kind": "slot"
+        },
+        "label": {
+          "kind": "text",
+          "required": true,
+          "description": "Accessible name of the native viewport"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
-          "name": "viewport",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "name": "viewport"
         },
         {
           "name": "scrollbar",
-          "planned": true,
           "representation": "native"
         },
         {
           "name": "thumb",
-          "planned": true,
           "representation": "native"
         },
         {
           "name": "corner",
-          "planned": true,
           "representation": "native"
         }
       ],
@@ -11125,7 +11724,8 @@
             "vertical",
             "horizontal",
             "both"
-          ]
+          ],
+          "default": "vertical"
         }
       },
       "booleans": [],
@@ -11151,7 +11751,8 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-layout adds a bordered radius/card frame; scrollbar anatomy is native and must not require fake scrollbar elements."
+        "ledger-layout adds a bordered radius/card frame; scrollbar anatomy is native and must not require fake scrollbar elements.",
+        "The viewport is always tabbable for stable server rendering; scrollbar geometry and hover sizing follow native platform limits."
       ]
     },
     {
@@ -11159,14 +11760,19 @@
       "specId": "L10",
       "category": "Layout & blocks",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
+        "endLabel": {
+          "kind": "text",
+          "default": "Secondary panel"
+        },
         "direction": {
           "kind": "enum",
           "values": [
             "horizontal",
             "vertical"
-          ]
+          ],
+          "default": "horizontal"
         },
         "startContent": {
           "kind": "slot"
@@ -11175,30 +11781,61 @@
           "kind": "slot"
         },
         "grip": {
-          "kind": "boolean"
+          "kind": "boolean",
+          "default": true
+        },
+        "label": {
+          "kind": "text",
+          "required": true,
+          "description": "Shared primary-panel and separator accessible name"
+        },
+        "labelledBy": {
+          "kind": "text"
+        },
+        "size": {
+          "kind": "number"
+        },
+        "defaultSize": {
+          "kind": "number",
+          "description": "Initial pixels:280 horizontal or160 vertical"
+        },
+        "onSizeChange": {
+          "kind": "callback",
+          "description": "User pixel proposal; viewport clamps do not invoke it"
+        },
+        "minSize": {
+          "kind": "number",
+          "default": 80
+        },
+        "maxSize": {
+          "kind": "number",
+          "description": "Unbounded by default; never serialized as Infinity"
+        },
+        "endMinSize": {
+          "kind": "number",
+          "default": 80
+        },
+        "step": {
+          "kind": "number",
+          "default": 10
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
-          "name": "panel-group",
-          "planned": true
+          "name": "panel-group"
         },
         {
-          "name": "panel",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "name": "panel"
         },
         {
-          "name": "handle",
-          "planned": true
+          "name": "handle"
         },
         {
           "name": "grip",
-          "planned": true
+          "when": "grip is enabled"
         }
       ],
       "attributes": {
@@ -11206,7 +11843,8 @@
           "values": [
             "horizontal",
             "vertical"
-          ]
+          ],
+          "default": "horizontal"
         }
       },
       "booleans": [
@@ -11242,7 +11880,8 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-layout: 10px grip glyph; fixed default start panel size 280 horizontal or 160 vertical instead of 50/50."
+        "ledger-layout: 10px grip glyph; fixed default start panel size 280 horizontal or 160 vertical instead of 50/50.",
+        "Both scrollable panels are named and always tabbable, preserving keyboard access to text-only overflow. Resize-only APG subset: no Enter collapse or F6 mode. Hydrate in a Fresh island; until positive measurement, handle is decorative/unfocusable and omits separator role and value attributes. Controlled viewport clamping is geometry-only; next interaction proposes from displayed size/current bounds."
       ]
     },
     {
@@ -11250,7 +11889,7 @@
       "specId": "L11",
       "category": "Layout & blocks",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "ratio": {
           "kind": "enum",
@@ -11259,7 +11898,8 @@
             "4:3",
             "1:1",
             "21:9"
-          ]
+          ],
+          "default": "16:9"
         },
         "children": {
           "kind": "slot"
@@ -11267,13 +11907,10 @@
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
-          "name": "media",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "name": "media"
         }
       ],
       "attributes": {
@@ -11283,7 +11920,8 @@
             "4:3",
             "1:1",
             "21:9"
-          ]
+          ],
+          "default": "16:9"
         }
       },
       "booleans": [],
@@ -11308,14 +11946,34 @@
       "specId": "L12",
       "category": "Layout & blocks",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
+        "as": {
+          "kind": "enum",
+          "values": [
+            "div",
+            "section",
+            "main",
+            "article",
+            "aside",
+            "nav",
+            "header",
+            "footer",
+            "form",
+            "span"
+          ]
+        },
+        "boundaryRef": {
+          "kind": "callback",
+          "description": "Native boundary ref; accepts a Preact ref callback or ref object"
+        },
         "dir": {
           "kind": "enum",
           "values": [
             "ltr",
             "rtl"
-          ]
+          ],
+          "default": "ltr"
         },
         "children": {
           "kind": "slot"
@@ -11324,8 +11982,7 @@
       "parts": [
         {
           "name": "root",
-          "planned": true,
-          "representation": "context"
+          "representation": "element"
         }
       ],
       "attributes": {
@@ -11333,7 +11990,8 @@
           "values": [
             "ltr",
             "rtl"
-          ]
+          ],
+          "default": "ltr"
         }
       },
       "booleans": [],
@@ -11350,7 +12008,8 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "No Figma set: direction context has no additional visual wrapper; native dir on the application boundary supplies mirroring."
+        "No Figma set: direction context has no additional visual wrapper; native dir on the application boundary supplies mirroring.",
+        "DirectionProvider aliases Direction: as renders the caller-selected native boundary with native props/boundaryRef, supporting precompiled JSX; otherwise clone one unscoped native HTML VNode preserving key/ref and existing props. Direction owns dir/markers. Reject unsupported as tags, scoped boundary props and invalid clone children. No extra wrapper or global mutation."
       ]
     },
     {
@@ -11358,51 +12017,57 @@
       "specId": "I3",
       "category": "AI",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
-        "scrollable": {
-          "kind": "enum",
-          "values": [
-            "none",
-            "up",
-            "down",
-            "both"
-          ]
+        "label": {
+          "kind": "text",
+          "required": true,
+          "description": "Nonblank accessible native viewport name."
         },
         "children": {
+          "kind": "slot"
+        },
+        "followEnd": {
+          "kind": "boolean",
+          "default": true,
+          "description": "Follow growth only while already pinned; first mount pins when true."
+        },
+        "endThreshold": {
+          "kind": "number",
+          "default": 1,
+          "description": "Finite nonnegative native CSS pixel tolerance for pinning."
+        },
+        "scrollLabel": {
+          "kind": "text",
+          "default": "Scroll to latest"
+        },
+        "Item.children": {
           "kind": "slot"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
-          "name": "viewport",
-          "planned": true
+          "name": "viewport"
         },
         {
-          "name": "content",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "name": "content"
+        },
+        {
+          "name": "scroll-button"
         },
         {
           "name": "item",
-          "planned": true
-        },
-        {
-          "name": "scroll-button",
-          "planned": true
+          "when": "when Item is supplied"
         },
         {
           "name": "edge-top",
-          "planned": true,
           "representation": "pseudo"
         },
         {
           "name": "edge-bottom",
-          "planned": true,
           "representation": "pseudo"
         }
       ],
@@ -11413,14 +12078,22 @@
             "up",
             "down",
             "both"
-          ]
+          ],
+          "default": "none",
+          "description": "Derived native geometry, never an input prop. SSR none; all four states measured after hydration."
         }
       },
-      "booleans": [],
+      "booleans": [
+        "followEnd"
+      ],
       "slots": [
         {
           "name": "children",
           "part": "content"
+        },
+        {
+          "name": "Item.children",
+          "part": "item"
         }
       ],
       "apg": "native scrollable region and button",
@@ -11442,7 +12115,10 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-ai uses border/subtle edge rules, not gradients; scroll button keeps radius/control."
+        "ledger-ai uses border/subtle edge rules, not gradients; scroll button keeps radius/control.",
+        "Caller owns finite root height or constrained flex/grid parent; native scroll anchoring and keys remain intact.",
+        "Scroll button stays mounted/visible while focused after pinning; otherwise pinned/unfocused visibility hidden removes it from native tab order. No live region; host owns new-message announcements.",
+        "Ledger viewport24x60, max content640 (spec720), subtle border edge rules rather than gradients; no new glyph: existing arrow-right rotates90degrees."
       ]
     },
     {
@@ -11450,7 +12126,7 @@
       "specId": "I4",
       "category": "AI",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "variant": {
           "kind": "enum",
@@ -11458,29 +12134,30 @@
             "default",
             "border",
             "separator"
-          ]
+          ],
+          "default": "default"
         },
         "icon": {
           "kind": "slot"
         },
         "children": {
           "kind": "slot"
+        },
+        "label": {
+          "kind": "slot",
+          "description": "Takes precedence over children when supplied, preserving empty text and zero."
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "icon",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when icon supplied"
         },
         {
-          "name": "content",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "name": "content"
         }
       ],
       "attributes": {
@@ -11489,7 +12166,8 @@
             "default",
             "border",
             "separator"
-          ]
+          ],
+          "default": "default"
         }
       },
       "booleans": [],
@@ -11500,6 +12178,10 @@
         },
         {
           "name": "children",
+          "part": "content"
+        },
+        {
+          "name": "label",
           "part": "content"
         }
       ],
@@ -11520,80 +12202,129 @@
       "specId": "I5",
       "category": "AI",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "status": {
+          "kind": "enum",
+          "values": [
+            "running",
+            "done",
+            "error"
+          ],
+          "default": "running",
+          "description": "Aggregate status; pending is a Line status only."
+        },
+        "statusLabel": {
+          "kind": "text",
+          "description": "Localizable static status text, default Running/Done/Error."
+        },
+        "title": {
+          "kind": "slot"
+        },
+        "duration": {
+          "kind": "slot"
+        },
+        "children": {
+          "kind": "slot",
+          "description": "Trace.Line LI children form a native ordered list."
+        },
+        "Line.status": {
           "kind": "enum",
           "values": [
             "done",
             "running",
             "pending",
             "error"
-          ]
+          ],
+          "default": "pending"
         },
-        "open": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+        "Line.statusLabel": {
+          "kind": "text",
+          "description": "Localizable static text included in summary name, default Done/Running/Pending/Error."
         },
-        "children": {
+        "Line.title": {
+          "kind": "slot",
+          "required": true
+        },
+        "Line.description": {
           "kind": "slot"
         },
-        "title": {
+        "Line.duration": {
           "kind": "slot"
         },
-        "description": {
+        "Line.children": {
           "kind": "slot"
         },
-        "duration": {
-          "kind": "slot"
+        "Line.collapsible": {
+          "kind": "boolean",
+          "default": false
         },
-        "collapsible": {
-          "kind": "boolean"
+        "Line.connector": {
+          "kind": "boolean",
+          "default": true
+        },
+        "Line.open": {
+          "kind": "boolean",
+          "description": "Controlled accepted disclosure state; ignored for static lines."
+        },
+        "Line.defaultOpen": {
+          "kind": "boolean",
+          "default": false
+        },
+        "Line.onOpenChange": {
+          "kind": "callback",
+          "description": "One proposal per native activation; refusal retains physical accepted state."
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
+        },
+        {
+          "name": "list"
+        },
+        {
+          "name": "status-label"
+        },
+        {
+          "name": "header",
+          "when": "when the corresponding content or line is supplied"
         },
         {
           "name": "line",
-          "planned": true
+          "when": "when the corresponding content or line is supplied"
         },
         {
           "name": "icon",
-          "planned": true
+          "when": "when the corresponding content or line is supplied"
         },
         {
           "name": "title",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when the corresponding content or line is supplied"
         },
         {
           "name": "description",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when the corresponding content or line is supplied"
         },
         {
           "name": "duration",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when the corresponding content or line is supplied"
+        },
+        {
+          "name": "disclosure",
+          "when": "when the corresponding content or line is supplied"
         },
         {
           "name": "collapsible-trigger",
-          "planned": true
+          "when": "when the corresponding content or line is supplied"
         },
         {
           "name": "collapsible-content",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when the corresponding content or line is supplied"
         },
         {
           "name": "connector",
-          "planned": true
+          "when": "when the corresponding content or line is supplied"
         }
       ],
       "attributes": {
@@ -11603,41 +12334,87 @@
             "running",
             "pending",
             "error"
-          ]
+          ],
+          "parts": [
+            "root",
+            "line"
+          ],
+          "description": "Root accepts running/done/error only; pending belongs to Line."
         },
         "data-open": {
           "values": [
             "false",
             "true"
-          ]
+          ],
+          "parts": [
+            "line"
+          ],
+          "description": "Actual accepted disclosure state; static lines always false."
+        },
+        "data-collapsible": {
+          "values": [
+            "false",
+            "true"
+          ],
+          "parts": [
+            "line"
+          ],
+          "default": "false"
+        },
+        "data-connector": {
+          "values": [
+            "false",
+            "true"
+          ],
+          "parts": [
+            "line"
+          ],
+          "default": "true"
         }
       },
       "booleans": [
-        "collapsible"
+        "Line.collapsible",
+        "Line.connector"
       ],
       "slots": [
         {
           "name": "children",
-          "part": "collapsible-content"
+          "part": "list"
         },
         {
           "name": "title",
           "part": "title"
         },
         {
-          "name": "description",
+          "name": "duration",
+          "part": "duration"
+        },
+        {
+          "name": "Line.title",
+          "part": "title"
+        },
+        {
+          "name": "Line.description",
           "part": "description"
         },
         {
-          "name": "duration",
+          "name": "Line.duration",
           "part": "duration"
+        },
+        {
+          "name": "Line.children",
+          "part": "collapsible-content"
         }
       ],
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/",
       "keyboard": [
         {
           "key": "Enter/Space",
-          "action": "Toggle the focused disclosure"
+          "action": "Toggle the focused native summary"
+        },
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between summaries and visible native child controls; static lines add no tab stop"
         }
       ],
       "tokenRoles": [
@@ -11649,7 +12426,10 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-ai adds duration and success check icon; running uses warning spinner. Status pending belongs to Trace line; the Trace aggregate draws running/done/error."
+        "ledger-ai adds duration and success check icon; running uses warning spinner. Status pending belongs to Trace line; the Trace aggregate draws running/done/error.",
+        "Trace renders a native ordered list; Line is an LI and must be placed in Trace or a native list. Summary content is presentation only; native actions belong in collapsible-content.",
+        "All statuses have static text equivalents; glyphs are decorative. No automatic live announcements or backend run state.",
+        "Native open/defaultOpen and controlled refusal are reconciled after every render; static lines ignore open."
       ]
     },
     {
@@ -11657,7 +12437,7 @@
       "specId": "I6",
       "category": "AI",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "step": {
           "kind": "enum",
@@ -11665,10 +12445,12 @@
             "question",
             "freeform",
             "complete"
-          ]
+          ],
+          "default": "question"
         },
         "title": {
-          "kind": "slot"
+          "kind": "slot",
+          "required": true
         },
         "description": {
           "kind": "slot"
@@ -11676,73 +12458,111 @@
         "error": {
           "kind": "slot"
         },
-        "children": {
+        "progress": {
           "kind": "slot"
         },
         "actions": {
           "kind": "slot"
         },
+        "children": {
+          "kind": "slot"
+        },
+        "options": {
+          "kind": "collection",
+          "description": "Unique nonempty value, label, optional decorative shortcut and disabled."
+        },
         "multiple": {
-          "kind": "boolean"
+          "kind": "boolean",
+          "default": false
+        },
+        "name": {
+          "kind": "text",
+          "default": "answer",
+          "description": "Native answer control name scoped per form."
+        },
+        "disabled": {
+          "kind": "boolean",
+          "default": false
+        },
+        "value": {
+          "kind": "collection",
+          "description": "Controlled readonly accepted choice values; single uses first only."
+        },
+        "defaultValue": {
+          "kind": "collection",
+          "description": "Initial uncontrolled values, default empty."
+        },
+        "onValueChange": {
+          "kind": "callback"
+        },
+        "text": {
+          "kind": "text",
+          "description": "Controlled accepted freeform text."
+        },
+        "defaultText": {
+          "kind": "text",
+          "default": ""
+        },
+        "onTextChange": {
+          "kind": "callback"
+        },
+        "placeholder": {
+          "kind": "text"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
+        },
+        {
+          "name": "item"
+        },
+        {
+          "name": "title"
         },
         {
           "name": "progress",
-          "planned": true
-        },
-        {
-          "name": "item",
-          "planned": true
-        },
-        {
-          "name": "title",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "description",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "choices",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "choice",
-          "planned": true
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "shortcut",
-          "planned": true
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "label",
-          "planned": true
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "indicator",
-          "planned": true
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "input",
-          "planned": true
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "error",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding content or answer control is supplied"
         },
         {
           "name": "actions",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding content or answer control is supplied"
+        },
+        {
+          "name": "content",
+          "when": "when corresponding content or answer control is supplied"
         }
       ],
       "attributes": {
@@ -11751,11 +12571,37 @@
             "question",
             "freeform",
             "complete"
-          ]
+          ],
+          "default": "question"
+        },
+        "data-multiple": {
+          "values": [
+            "false",
+            "true"
+          ],
+          "parts": [
+            "choices",
+            "choice"
+          ],
+          "default": "false"
+        },
+        "data-state": {
+          "values": [
+            "rest",
+            "hover",
+            "focus",
+            "selected",
+            "disabled"
+          ],
+          "parts": [
+            "choice"
+          ],
+          "description": "Accepted checked/disabled state; transient hover/focus use native pseudo-classes."
         }
       },
       "booleans": [
-        "multiple"
+        "multiple",
+        "disabled"
       ],
       "slots": [
         {
@@ -11771,12 +12617,16 @@
           "part": "error"
         },
         {
-          "name": "children",
-          "part": "choices"
+          "name": "progress",
+          "part": "progress"
         },
         {
           "name": "actions",
           "part": "actions"
+        },
+        {
+          "name": "children",
+          "part": "content"
         }
       ],
       "apg": "native form, radio and checkbox controls",
@@ -11787,15 +12637,15 @@
         },
         {
           "key": "Arrow keys",
-          "action": "Move between radio choices"
+          "action": "Move within native radio groups"
         },
         {
           "key": "Space",
-          "action": "Select the focused radio or checkbox"
+          "action": "Select a focused native radio or checkbox"
         },
         {
           "key": "Enter",
-          "action": "Submit the current form"
+          "action": "Activate a focused submit button; textarea Enter retains native newline behavior"
         }
       ],
       "tokenRoles": [
@@ -11808,7 +12658,10 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-ai selects with primary/stroke, not primary/default; rendering never calls an AI/backend service."
+        "ledger-ai selects with primary/stroke, not primary/default; rendering never calls an AI/backend service.",
+        "One real form; never nest inside another form. Caller owns native onSubmit/FormData, progression, validation messages and action button types.",
+        "Controlled proposals restore all owned radio/checkbox siblings and textarea before callbacks. Native reset then a guarded microtask restores accepted controlled/initial uncontrolled state only; other supplied native fields keep platform behavior.",
+        "Actions are outside the disabled answer fieldset. Shortcut text is decorative, not an installed hotkey. Complete renders no answer inputs or hidden persisted values."
       ]
     },
     {
@@ -11816,7 +12669,7 @@
       "specId": "I7",
       "category": "AI",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "state": {
           "kind": "enum",
@@ -11826,7 +12679,8 @@
             "processing",
             "error",
             "done"
-          ]
+          ],
+          "default": "idle"
         },
         "size": {
           "kind": "enum",
@@ -11834,17 +12688,20 @@
             "default",
             "sm",
             "xs"
-          ]
+          ],
+          "default": "default"
         },
         "orientation": {
           "kind": "enum",
           "values": [
             "horizontal",
             "vertical"
-          ]
+          ],
+          "default": "horizontal"
         },
         "title": {
-          "kind": "slot"
+          "kind": "slot",
+          "required": true
         },
         "media": {
           "kind": "slot"
@@ -11854,36 +12711,49 @@
         },
         "actions": {
           "kind": "slot"
+        },
+        "stateLabel": {
+          "kind": "text",
+          "description": "Localizable static non-idle state text, default Uploading/Processing/Error/Done; never a live region."
+        },
+        "progress": {
+          "kind": "slot",
+          "description": "Optional caller-owned progress content; omitted at xs horizontal."
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
+        },
+        {
+          "name": "content"
+        },
+        {
+          "name": "title"
         },
         {
           "name": "media",
-          "planned": true,
-          "when": "when corresponding content is supplied"
-        },
-        {
-          "name": "content",
-          "planned": true
-        },
-        {
-          "name": "title",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding content/state is supplied"
         },
         {
           "name": "description",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding content/state is supplied"
         },
         {
           "name": "actions",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding content/state is supplied"
+        },
+        {
+          "name": "progress",
+          "when": "when corresponding content/state is supplied"
+        },
+        {
+          "name": "state-label",
+          "when": "when corresponding content/state is supplied"
+        },
+        {
+          "name": "state-icon",
+          "when": "when corresponding content/state is supplied"
         }
       ],
       "attributes": {
@@ -11894,20 +12764,23 @@
             "processing",
             "error",
             "done"
-          ]
+          ],
+          "default": "idle"
         },
         "data-size": {
           "values": [
             "default",
             "sm",
             "xs"
-          ]
+          ],
+          "default": "default"
         },
         "data-orientation": {
           "values": [
             "horizontal",
             "vertical"
-          ]
+          ],
+          "default": "horizontal"
         }
       },
       "booleans": [],
@@ -11927,6 +12800,10 @@
         {
           "name": "actions",
           "part": "actions"
+        },
+        {
+          "name": "progress",
+          "part": "progress"
         }
       ],
       "apg": "native action controls in a noninteractive attachment surface",
@@ -11951,7 +12828,9 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-ai media sizes40/32/24; xs horizontal omits description and uses trailing state glyph."
+        "ledger-ai media sizes40/32/24; xs horizontal omits description and uses trailing state glyph.",
+        "Every non-idle state has visually hidden static text at all sizes; glyphs are decorative. xs horizontal visually hides description but retains it in the accessibility tree.",
+        "Native child actions remain independent; no upload, fetch, timer, remove/retry behavior or automatic live region. Media and alt text are caller-owned."
       ]
     },
     {
@@ -11959,42 +12838,48 @@
       "specId": "X2",
       "category": "Docs kit",
       "priority": "P2",
-      "shipped": false,
+      "shipped": true,
       "props": {
-        "state": {
-          "kind": "enum",
-          "values": [
-            "rest",
-            "hover",
-            "focus",
-            "copied"
-          ]
-        },
         "path": {
-          "kind": "slot"
+          "kind": "text",
+          "required": true,
+          "description": "Exact original clipboard text, rendered escaped; never a JSX slot."
         },
         "copy": {
-          "kind": "boolean"
+          "kind": "boolean",
+          "default": true
+        },
+        "copyLabel": {
+          "kind": "text",
+          "default": "Copy path"
+        },
+        "copiedLabel": {
+          "kind": "text",
+          "default": "Path copied"
+        },
+        "errorLabel": {
+          "kind": "text",
+          "default": "Could not copy path"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
-          "name": "path",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "name": "path"
+        },
+        {
+          "name": "status"
         },
         {
           "name": "copy",
-          "planned": true
+          "when": "when copy is true"
         },
         {
           "name": "focus-ring",
-          "planned": true,
-          "representation": "pseudo"
+          "when": "when the native copy button is keyboard focused",
+          "representation": "native"
         }
       ],
       "attributes": {
@@ -12004,18 +12889,15 @@
             "hover",
             "focus",
             "copied"
-          ]
+          ],
+          "default": "rest",
+          "description": "Derived actual rest/copied outcome; hover/focus use native CSS. Error feedback is visible status text, never a fake Copied variant."
         }
       },
       "booleans": [
         "copy"
       ],
-      "slots": [
-        {
-          "name": "path",
-          "part": "path"
-        }
-      ],
+      "slots": [],
       "apg": "native button",
       "keyboard": [
         {
@@ -12034,7 +12916,9 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-desktop-docs follows live padding2/5, height26, 20px copy target and size/icon/sm glyph."
+        "ledger-desktop-docs follows live padding2/5, height26, 20px copy target and size/icon/sm glyph.",
+        "Copy description references exact path. Clipboard failures are visible and announced; stale/out-of-order/path-changed/unmounted completions cannot update current UI. No clipboard polyfill or automatic timer.",
+        "copy=false removes the native button. Native span attributes pass through; writable state is not a prop."
       ]
     },
     {
@@ -12042,36 +12926,35 @@
       "specId": "X3",
       "category": "Docs kit",
       "priority": "P2",
-      "shipped": false,
+      "shipped": true,
       "props": {
+        "name": {
+          "kind": "text",
+          "required": true
+        },
+        "value": {
+          "kind": "text",
+          "required": true,
+          "description": "Escaped String(value) in quotes; accepts string, number, boolean or null."
+        },
         "size": {
           "kind": "enum",
           "values": [
             "sm",
             "md"
-          ]
-        },
-        "name": {
-          "kind": "slot"
-        },
-        "value": {
-          "kind": "slot"
+          ],
+          "default": "md"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
-          "name": "name",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "name": "name"
         },
         {
-          "name": "value",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "name": "value"
         }
       ],
       "attributes": {
@@ -12079,20 +12962,12 @@
           "values": [
             "sm",
             "md"
-          ]
+          ],
+          "default": "md"
         }
       },
       "booleans": [],
-      "slots": [
-        {
-          "name": "name",
-          "part": "name"
-        },
-        {
-          "name": "value",
-          "part": "value"
-        }
-      ],
+      "slots": [],
       "apg": "noninteractive presentation",
       "keyboard": [],
       "tokenRoles": [
@@ -12104,7 +12979,8 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-desktop-docs: no border, following live docs CSS."
+        "ledger-desktop-docs: no border, following live docs CSS.",
+        "Native escaped textual code example only, not a DOM attribute editor; zero/false/empty are preserved. Native span attributes pass through."
       ]
     },
     {
@@ -12112,71 +12988,100 @@
       "specId": "X4",
       "category": "Docs kit",
       "priority": "P2",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "breakpoint": {
           "kind": "enum",
           "values": [
             "desktop",
             "mobile"
-          ]
+          ],
+          "description": "Forced view or responsive island measurement. Unforced server-only output stays desktop."
         },
-        "level": {
+        "label": {
+          "kind": "text",
+          "default": "On this page"
+        },
+        "children": {
+          "kind": "slot",
+          "required": true
+        },
+        "links": {
+          "kind": "slot"
+        },
+        "currentId": {
+          "kind": "text",
+          "description": "Controlled accepted section ID; explicit null means no current. Refusal never changes the marker."
+        },
+        "defaultCurrentId": {
+          "kind": "text",
+          "default": null,
+          "description": "Initial uncontrolled ID; SSR never reads location. A valid initial hash proposes after hydration."
+        },
+        "onCurrentChange": {
+          "kind": "callback",
+          "description": "Distinct native hash or optional scroll proposals; reason hash|scroll. Never writes URL or moves focus."
+        },
+        "observe": {
+          "kind": "boolean",
+          "default": false,
+          "description": "Optional passive section tracking in the caller-owned island; respects native scroll padding and heading scroll margins."
+        },
+        "Item.href": {
+          "kind": "text",
+          "required": true
+        },
+        "Item.children": {
+          "kind": "slot",
+          "required": true
+        },
+        "Item.level": {
           "kind": "enum",
           "values": [
             "2",
             "3"
-          ]
+          ],
+          "default": "2"
         },
-        "state": {
+        "Item.state": {
           "kind": "enum",
           "values": [
             "rest",
-            "hover",
-            "current"
-          ]
-        },
-        "children": {
-          "kind": "slot"
-        },
-        "links": {
-          "kind": "slot"
+            "hover"
+          ],
+          "default": "rest",
+          "description": "Forced preview only; accepted root selection derives current and wins. Live hover is native CSS."
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
-          "name": "eyebrow",
-          "planned": true
+          "name": "eyebrow"
         },
         {
-          "name": "rail",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "name": "rail"
         },
         {
           "name": "item",
-          "planned": true
+          "when": "when Item children are supplied"
         },
         {
           "name": "links",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when footer links are supplied"
         },
         {
           "name": "current",
-          "planned": true
+          "when": "in the mobile native disclosure summary"
         },
         {
           "name": "marker",
-          "planned": true
+          "when": "when a link is the accepted current or its text is shown in the mobile summary"
         },
         {
           "name": "chevron-down",
-          "planned": true
+          "when": "in the mobile summary"
         }
       ],
       "attributes": {
@@ -12184,20 +13089,30 @@
           "values": [
             "desktop",
             "mobile"
-          ]
+          ],
+          "default": "desktop"
         },
         "data-level": {
           "values": [
             "2",
             "3"
-          ]
+          ],
+          "parts": [
+            "item"
+          ],
+          "default": "2"
         },
         "data-state": {
           "values": [
             "rest",
             "hover",
             "current"
-          ]
+          ],
+          "parts": [
+            "item"
+          ],
+          "default": "rest",
+          "description": "Derived current overrides forced rest/hover preview; actual live hover/focus stays CSS."
         }
       },
       "booleans": [],
@@ -12209,6 +13124,10 @@
         {
           "name": "links",
           "part": "links"
+        },
+        {
+          "name": "Item.children",
+          "part": "item"
         }
       ],
       "apg": "native navigation links and disclosure",
@@ -12234,7 +13153,10 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-desktop-docs mobile starts closed; open is native disclosure state, not a variant. Toc item13/20."
+        "ledger-desktop-docs mobile starts closed; open is native disclosure state, not a variant. Toc item13/20.",
+        "Unshipped placeholder root level/state normalized to Item.level/Item.state; all settled data values and native keys remain. Current is root-owned, never an Item input.",
+        "One native responsive branch; automatic island measurement uses767px, unforced SSR remains desktop. Forced mobile native details starts closed and its open state persists across current updates.",
+        "Native pass-through is preserved; scope/part/level/state/aria-current are owned. Hash/scroll proposals are deduplicated and controlled refusal preserves accepted state. No tab roles, scroll commands or live region."
       ]
     },
     {
@@ -12242,61 +13164,98 @@
       "specId": "X5",
       "category": "Docs kit",
       "priority": "P2",
-      "shipped": false,
+      "shipped": true,
       "props": {
-        "type": {
+        "items": {
+          "kind": "collection",
+          "required": true,
+          "description": "Readonly discriminated folder/file entries with stable unique nonblank IDs."
+        },
+        "label": {
+          "kind": "text",
+          "default": "Project files"
+        },
+        "tag": {
+          "kind": "boolean",
+          "default": true,
+          "description": "Controls visible annotations; hidden annotation text remains accessible."
+        },
+        "typeLabels": {
+          "kind": "collection",
+          "description": "Optional localizable folder/file equivalents; blank uses defaults."
+        },
+        "Entry.id": {
+          "kind": "text",
+          "required": true
+        },
+        "Entry.type": {
           "kind": "enum",
           "values": [
             "folder",
             "file"
-          ]
+          ],
+          "required": true
         },
-        "ownership": {
+        "Entry.name": {
+          "kind": "slot",
+          "required": true
+        },
+        "Entry.comment": {
+          "kind": "slot"
+        },
+        "Entry.ownership": {
           "kind": "enum",
           "values": [
             "none",
             "owned",
             "generated",
             "guidance"
-          ]
+          ],
+          "default": "none"
         },
-        "children": {
-          "kind": "slot"
+        "Entry.tag": {
+          "kind": "text",
+          "description": "Full annotation text overriding default bracketed ownership."
         },
-        "name": {
-          "kind": "slot"
-        },
-        "tag": {
-          "kind": "slot"
+        "Entry.children": {
+          "kind": "collection",
+          "description": "Folder-only readonly child entries; no collapse/selection state."
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
+        },
+        {
+          "name": "list"
+        },
+        {
+          "name": "node",
+          "when": "when corresponding entries or annotations are supplied"
         },
         {
           "name": "row",
-          "planned": true,
-          "when": "when corresponding content is supplied"
-        },
-        {
-          "name": "indent",
-          "planned": true
+          "when": "when corresponding entries or annotations are supplied"
         },
         {
           "name": "icon",
-          "planned": true
+          "when": "when corresponding entries or annotations are supplied"
         },
         {
           "name": "name",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding entries or annotations are supplied"
+        },
+        {
+          "name": "comment",
+          "when": "when corresponding entries or annotations are supplied"
         },
         {
           "name": "tag",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when corresponding entries or annotations are supplied"
+        },
+        {
+          "name": "type-label",
+          "when": "when corresponding entries or annotations are supplied"
         }
       ],
       "attributes": {
@@ -12304,6 +13263,9 @@
           "values": [
             "folder",
             "file"
+          ],
+          "parts": [
+            "row"
           ]
         },
         "data-ownership": {
@@ -12312,26 +13274,37 @@
             "owned",
             "generated",
             "guidance"
-          ]
+          ],
+          "parts": [
+            "row"
+          ],
+          "default": "none"
         }
       },
-      "booleans": [],
+      "booleans": [
+        "tag"
+      ],
       "slots": [
         {
-          "name": "children",
-          "part": "row"
-        },
-        {
-          "name": "name",
+          "name": "Entry.name",
           "part": "name"
         },
         {
-          "name": "tag",
-          "part": "tag"
+          "name": "Entry.comment",
+          "part": "comment"
         }
       ],
-      "apg": "noninteractive presentation",
-      "keyboard": [],
+      "apg": "native read-only nested lists and supplied native child controls",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Visit supplied native child controls; list frames add no tab stop"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Retain supplied native child control behavior; no tree selection or collapse keys"
+        }
+      ],
       "tokenRoles": [
         "surface/bg",
         "border/subtle",
@@ -12341,7 +13314,9 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-desktop-docs wins: read-only list, not an ARIA tree; no chevrons/hover/selection/open state/indent guides. Rows26 high, indent20. Ownership tags support owned config, generated history and CLI-managed annotations."
+        "ledger-desktop-docs wins: read-only list, not an ARIA tree; no chevrons/hover/selection/open state/indent guides. Rows26 high, indent20. Ownership tags support owned config, generated history and CLI-managed annotations.",
+        "Every row retains a static folder/file type equivalent. Ownership annotations remain readable when visually hidden. Duplicate IDs, cycles and file children fail structural validation; no filesystem inspection.",
+        "Native list/listitem roles preserve semantics under list-style:none. All nodes remain visible; names/comments may contain caller-owned native links."
       ]
     },
     {
@@ -12349,24 +13324,27 @@
       "specId": "X6",
       "category": "Docs kit",
       "priority": "P2",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "width": {
           "kind": "enum",
           "values": [
             "prose",
             "wide"
-          ]
+          ],
+          "default": "prose"
         },
         "media": {
           "kind": "enum",
           "values": [
             "image",
             "diagram"
-          ]
+          ],
+          "default": "image"
         },
         "children": {
-          "kind": "slot"
+          "kind": "slot",
+          "required": true
         },
         "caption": {
           "kind": "slot"
@@ -12374,18 +13352,14 @@
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
-          "name": "media",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "name": "media"
         },
         {
           "name": "caption",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when caption is supplied"
         }
       ],
       "attributes": {
@@ -12393,13 +13367,15 @@
           "values": [
             "prose",
             "wide"
-          ]
+          ],
+          "default": "prose"
         },
         "data-media": {
           "values": [
             "image",
             "diagram"
-          ]
+          ],
+          "default": "image"
         }
       },
       "booleans": [],
@@ -12413,8 +13389,17 @@
           "part": "caption"
         }
       ],
-      "apg": "noninteractive presentation",
-      "keyboard": [],
+      "apg": "native figure, caller media and optional figcaption",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Visit supplied native media/link controls; figure adds no tab stop"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Retain supplied native child control behavior"
+        }
+      ],
       "tokenRoles": [
         "border/subtle",
         "surface/surface",
@@ -12422,7 +13407,9 @@
         "text/muted"
       ],
       "notes": [
-        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec."
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "Caller supplies actual media and alternative text/diagram name; no placeholder or fetch. Native intrinsic aspect ratio is preserved.",
+        "Widths reuse existing optional prose-measure/wide roles with100%fallback, matching Markdown; native figure attributes pass through."
       ]
     },
     {
@@ -12430,32 +13417,63 @@
       "specId": "X7",
       "category": "Docs kit",
       "priority": "P2",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "state": {
           "kind": "enum",
           "values": [
             "rest",
             "scrolled"
-          ]
+          ],
+          "default": "rest",
+          "description": "Caller snapshot only with observe=false. Types forbid state with observe=true; measured geometry wins at runtime."
+        },
+        "label": {
+          "kind": "text",
+          "default": "Sections"
         },
         "children": {
-          "kind": "slot"
+          "kind": "slot",
+          "required": true
+        },
+        "currentId": {
+          "kind": "text",
+          "description": "Controlled accepted section ID; explicit null means no current. Refusal never changes the marker."
+        },
+        "defaultCurrentId": {
+          "kind": "text",
+          "default": null,
+          "description": "Initial uncontrolled ID; SSR never reads location. A valid initial hash proposes after hydration."
+        },
+        "onCurrentChange": {
+          "kind": "callback",
+          "description": "Distinct native hash or optional scroll proposals; reason hash|scroll. Never writes URL or moves focus."
+        },
+        "observe": {
+          "kind": "boolean",
+          "default": false,
+          "description": "Optional passive section tracking in the caller-owned island; respects native scroll padding and heading scroll margins."
+        },
+        "Link.href": {
+          "kind": "text",
+          "required": true
+        },
+        "Link.children": {
+          "kind": "slot",
+          "required": true
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "anchor",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when Link children are supplied"
         },
         {
           "name": "marker",
-          "planned": true
+          "when": "when a Link is the accepted current"
         }
       ],
       "attributes": {
@@ -12463,13 +13481,18 @@
           "values": [
             "rest",
             "scrolled"
-          ]
+          ],
+          "default": "rest"
         }
       },
       "booleans": [],
       "slots": [
         {
           "name": "children",
+          "part": "anchor"
+        },
+        {
+          "name": "Link.children",
           "part": "anchor"
         }
       ],
@@ -12492,7 +13515,9 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-desktop-docs: scrolled changes current anchor and pinned position, without extra Utility shadow."
+        "ledger-desktop-docs: scrolled changes current anchor and pinned position, without extra Utility shadow.",
+        "Observed scrolled state requires a later accepted section and actual pinned geometry. Before hydration it is rest; non-observed snapshots default to rest.",
+        "Native anchor/Tab/Enter navigation, never ARIA tabs. Root state is owned; link aria-current/scope/part are owned and illicit data-level/data-state are omitted. No observer writes URL or moves focus."
       ]
     },
     {
@@ -12500,7 +13525,7 @@
       "specId": "X8",
       "category": "Docs kit",
       "priority": "P2",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "columns": {
           "kind": "enum",
@@ -12508,28 +13533,74 @@
             "2",
             "3",
             "4"
-          ]
+          ],
+          "default": "3"
         },
         "variant": {
           "kind": "enum",
           "values": [
             "ruled",
             "feature"
-          ]
+          ],
+          "default": "ruled"
         },
         "children": {
+          "kind": "slot"
+        },
+        "Cell.eyebrow": {
+          "kind": "slot"
+        },
+        "Cell.icon": {
+          "kind": "slot"
+        },
+        "Cell.title": {
+          "kind": "slot"
+        },
+        "Cell.children": {
+          "kind": "slot"
+        },
+        "Cell.action": {
           "kind": "slot"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
+        },
+        {
+          "name": "grid"
         },
         {
           "name": "cell",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when Cell is supplied"
+        },
+        {
+          "name": "card",
+          "when": "when Cell is supplied"
+        },
+        {
+          "name": "eyebrow",
+          "when": "when Cell.eyebrow is supplied"
+        },
+        {
+          "name": "icon",
+          "when": "when Cell.icon is supplied"
+        },
+        {
+          "name": "title",
+          "when": "when Cell.title is supplied"
+        },
+        {
+          "name": "description",
+          "when": "when Cell.children is supplied"
+        },
+        {
+          "name": "action",
+          "when": "when Cell.action is supplied"
+        },
+        {
+          "name": "arrow",
+          "when": "when Cell is supplied; decorative only"
         }
       ],
       "attributes": {
@@ -12538,12 +13609,20 @@
             "2",
             "3",
             "4"
+          ],
+          "default": "3",
+          "parts": [
+            "root"
           ]
         },
         "data-variant": {
           "values": [
             "ruled",
             "feature"
+          ],
+          "default": "ruled",
+          "parts": [
+            "root"
           ]
         }
       },
@@ -12552,10 +13631,39 @@
         {
           "name": "children",
           "part": "cell"
+        },
+        {
+          "name": "Cell.eyebrow",
+          "part": "eyebrow"
+        },
+        {
+          "name": "Cell.icon",
+          "part": "icon"
+        },
+        {
+          "name": "Cell.title",
+          "part": "title"
+        },
+        {
+          "name": "Cell.children",
+          "part": "description"
+        },
+        {
+          "name": "Cell.action",
+          "part": "action"
         }
       ],
-      "apg": "noninteractive presentation",
-      "keyboard": [],
+      "apg": "native caller-owned controls in noninteractive Docs card frames",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Visit supplied native controls; card and grid frames add no tab stop"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Retain supplied native child control behavior"
+        }
+      ],
       "tokenRoles": [
         "border/subtle",
         "topbar/rule",
@@ -12563,7 +13671,9 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-desktop-docs uses private Docs card anatomy, not D3 Card; feature gap32 follows live CSS."
+        "ledger-desktop-docs uses private Docs card anatomy, not D3 Card; feature gap32 follows live CSS.",
+        "Explicit normalization of unshipped X8: qualified Cell slots and private Docs-card parts; never imports D3 Card. No Cell axes or whole-card click handler.",
+        "Container widths <=767 use1column;767<width<=1100 use2;above1100 use requested columns. Complementary ranges cover fractional widths; logical inline-end/bottom rules are single edges."
       ]
     },
     {
@@ -12571,27 +13681,30 @@
       "specId": "X9",
       "category": "Docs kit",
       "priority": "P2",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "layout": {
           "kind": "enum",
           "values": [
             "split",
             "centered"
-          ]
+          ],
+          "default": "split"
         },
         "breakpoint": {
           "kind": "enum",
           "values": [
             "desktop",
             "mobile"
-          ]
+          ],
+          "description": "Optional forced desktop/mobile reference; absent means CSS container responsiveness, no data-breakpoint attribute."
         },
         "eyebrow": {
           "kind": "slot"
         },
         "title": {
-          "kind": "slot"
+          "kind": "slot",
+          "required": true
         },
         "children": {
           "kind": "slot"
@@ -12601,45 +13714,58 @@
         },
         "aside": {
           "kind": "slot"
+        },
+        "headingLevel": {
+          "kind": "enum",
+          "values": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"
+          ],
+          "default": "1",
+          "description": "Native heading rank only; typography follows responsive presentation."
+        },
+        "paths": {
+          "kind": "slot",
+          "description": "Caller-owned file-path chips follow content inside the aside."
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
-          "name": "display",
-          "planned": true
+          "name": "layout"
+        },
+        {
+          "name": "display"
         },
         {
           "name": "eyebrow",
-          "planned": true,
           "when": "when corresponding content is supplied"
         },
         {
           "name": "title",
-          "planned": true,
           "when": "when corresponding content is supplied"
         },
         {
           "name": "lede",
-          "planned": true,
           "when": "when corresponding content is supplied"
         },
         {
           "name": "actions",
-          "planned": true,
           "when": "when corresponding content is supplied"
         },
         {
           "name": "aside",
-          "planned": true,
-          "when": "when corresponding content is supplied"
+          "when": "when aside or paths is supplied"
         },
         {
           "name": "path-stack",
-          "planned": true
+          "when": "when paths is supplied"
         }
       ],
       "attributes": {
@@ -12647,12 +13773,19 @@
           "values": [
             "split",
             "centered"
+          ],
+          "default": "split",
+          "parts": [
+            "root"
           ]
         },
         "data-breakpoint": {
           "values": [
             "desktop",
             "mobile"
+          ],
+          "parts": [
+            "root"
           ]
         }
       },
@@ -12677,6 +13810,10 @@
         {
           "name": "aside",
           "part": "aside"
+        },
+        {
+          "name": "paths",
+          "part": "path-stack"
         }
       ],
       "apg": "native action controls in a section",
@@ -12699,7 +13836,9 @@
       ],
       "notes": [
         "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
-        "ledger-desktop-docs places File path chips in aside path-stack, not display. Mobile uses existing title role; centered stacks aside below display."
+        "ledger-desktop-docs places File path chips in aside path-stack, not display. Mobile uses existing title role; centered stacks aside below display.",
+        "Explicit normalization of unshipped X9: string headingLevel1..6, optional paths slot and necessary container-query layout part. Forced data-breakpoint is absent in automatic mode.",
+        "CSS container width<=767 stacks with title role;767<width<=1100 uses fluid1.5:1/gap40;above1100 uses17:9/gap80 capped1120. Forced snapshots bypass automatic queries. No duplicated DOM, hooks or L2 imports."
       ]
     }
   ]

@@ -1,9 +1,16 @@
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { useState } from 'preact/hooks';
 import { LocationMarker } from '../../packages/fresh-ui/registry/components/ui/location-marker.tsx';
 import { NavigationMenu } from '../../packages/fresh-ui/registry/components/ui/navigation-menu.tsx';
 import { Menubar } from '../../packages/fresh-ui/registry/components/ui/menubar.tsx';
 import { Stepper } from '../../packages/fresh-ui/registry/components/ui/stepper.tsx';
 import { ActionMenu, Dialog } from '../../packages/fresh-ui/interactive.ts';
+
+/** Caller paint keeps headless native controls legible without adding data axes. */
+const CALLER_BUTTON_STYLE = Object.freeze({
+  background: 'var(--ns-primary)',
+  color: 'var(--ns-primary-fg)',
+});
 
 export function Navigation() {
   const [action, setAction] = useState(''),
@@ -44,7 +51,7 @@ export function Navigation() {
           },
         ]}
       />
-      <button type='button' id='before-menubar'>Before menus</button>
+      <Button type='button' id='before-menubar'>Before menus</Button>
       <Menubar
         label='Application'
         id='application-menu'
@@ -105,12 +112,12 @@ export function Navigation() {
           },
         ]}
       />
-      <button type='button' id='after-menubar'>After menus</button>
+      <Button type='button' id='after-menubar'>After menus</Button>
       <output aria-label='Menu action'>{action}</output>
       <div id='marker-example'>
-        <button type='button'>Before marker</button>
+        <Button type='button'>Before marker</Button>
         <LocationMarker />
-        <button type='button'>After marker</button>
+        <Button type='button'>After marker</Button>
       </div>
       <Stepper
         id='steps'
@@ -134,9 +141,9 @@ export function Navigation() {
           { id: 'review', title: 'Review', status: 'upcoming', description: 'Confirm order' },
         ]}
       />
-      <button type='button' id='after-steps'>After steps</button>
+      <Button type='button' id='after-steps'>After steps</Button>
       <Dialog.Root>
-        <Dialog.Trigger>Mobile navigation</Dialog.Trigger>
+        <Dialog.Trigger style={CALLER_BUTTON_STYLE}>Mobile navigation</Dialog.Trigger>
         <Dialog.Content>
           <Dialog.Title>Mobile navigation</Dialog.Title>
           <Dialog.Description>Browse mobile site links.</Dialog.Description>
@@ -156,12 +163,12 @@ export function Navigation() {
               },
             ]}
           />
-          <Dialog.Close>Close navigation</Dialog.Close>
+          <Dialog.Close style={CALLER_BUTTON_STYLE}>Close navigation</Dialog.Close>
         </Dialog.Content>
       </Dialog.Root>
       <div id='independent-menu'>
         <ActionMenu.Root>
-          <ActionMenu.Trigger>Independent actions</ActionMenu.Trigger>
+          <ActionMenu.Trigger style={CALLER_BUTTON_STYLE}>Independent actions</ActionMenu.Trigger>
           <ActionMenu.Content
             aria-label='Independent actions'
             aria-labelledby=''
@@ -170,7 +177,7 @@ export function Navigation() {
             <ActionMenu.Item>Inspect</ActionMenu.Item>
           </ActionMenu.Content>
         </ActionMenu.Root>
-        <button type='button' id='outside-menu'>Outside action</button>
+        <Button type='button' id='outside-menu'>Outside action</Button>
       </div>
     </section>
   );

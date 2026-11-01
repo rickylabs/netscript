@@ -6,17 +6,28 @@
  */
 
 import type { ComponentChildren, VNode } from 'preact';
+import { cn } from '../../lib/cn.ts';
 
 /** Window operations that can be represented by desktop chrome controls. */
 export type DesktopWindowChromeAction = 'show' | 'hide' | 'focus' | 'reload' | 'close';
 
+/** Caller-selected platform presentation; it does not detect a native host. */
+export type DesktopWindowChromePlatform = 'macos' | 'windows' | 'linux';
+
+/** Focus snapshots preserve both the published blurred and ledger unfocused spelling. */
+export type DesktopWindowChromeState = 'focused' | 'blurred' | 'hover' | 'unfocused' | 'disabled';
+
 /** Props for the desktop window chrome component. */
 export interface DesktopWindowChromeProps {
+  /** Optional platform presentation; omission preserves the legacy action order. */
+  readonly platform?: DesktopWindowChromePlatform;
+  /** Controlled presentation snapshot; focus changes never invoke a native operation. */
+  readonly state?: DesktopWindowChromeState;
   /** Window title or app identity. */
   readonly title: ComponentChildren;
   /** Optional content rendered before the action group. */
   readonly leading?: ComponentChildren;
-  /** Documented native actions to render. Defaults to reload, hide, and close. */
+  /** Documented native actions to render. Defaults depend on platform; explicit arrays preserve caller order. */
   readonly actions?: readonly DesktopWindowChromeAction[];
   /** Receives the selected documented action. */
   readonly onAction?: (action: DesktopWindowChromeAction) => void;
@@ -32,6 +43,13 @@ interface ActionPresentation {
 }
 
 const DEFAULT_ACTIONS: readonly DesktopWindowChromeAction[] = ['reload', 'hide', 'close'];
+const PLATFORM_ACTIONS: Readonly<
+  Record<DesktopWindowChromePlatform, readonly DesktopWindowChromeAction[]>
+> = {
+  macos: ['close', 'hide', 'reload'],
+  windows: ['hide', 'reload', 'close'],
+  linux: ['hide', 'reload', 'close'],
+};
 
 const ACTION_PRESENTATION: Readonly<Record<DesktopWindowChromeAction, ActionPresentation>> = {
   show: { label: 'Show window', symbol: '□' },
@@ -41,27 +59,26 @@ const ACTION_PRESENTATION: Readonly<Record<DesktopWindowChromeAction, ActionPres
   close: { label: 'Close window', symbol: '×' },
 };
 
-function classes(...values: Array<string | undefined>): string {
-  return values.filter((value): value is string => value !== undefined && value.length > 0).join(
-    ' ',
-  );
-}
-
 /** Render a draggable-looking title bar whose controls emit only documented window operations. */
 export function DesktopWindowChrome({
   title,
   leading,
-  actions = DEFAULT_ACTIONS,
+  platform,
+  state,
+  actions = platform === undefined ? DEFAULT_ACTIONS : PLATFORM_ACTIONS[platform],
   onAction,
   disabled = false,
   class: className,
 }: DesktopWindowChromeProps): VNode {
+  const unavailable = disabled || state === 'disabled';
   return (
     <header
-      class={classes('ns-desktop-window-chrome', className)}
+      class={cn('ns-desktop-window-chrome', className)}
       data-scope='window-chrome'
       data-part='root'
-      data-state={disabled ? 'disabled' : 'active'}
+      data-platform={platform}
+      data-state={unavailable ? 'disabled' : state ?? 'active'}
+      style={{ '--ns-window-action-count': actions.length }}
     >
       <div
         class='ns-desktop-window-chrome__identity'
@@ -98,13 +115,13 @@ export function DesktopWindowChrome({
             <button
               type='button'
               aria-label={presentation.label}
-              class={classes('ns-desktop-window-chrome__action')}
-              data-action={(action === 'close') ? ('close') : undefined}
+              class={cn('ns-desktop-window-chrome__action')}
+              data-action={action}
               data-scope='window-chrome'
               data-desktop-action={action}
               data-part='action'
-              data-state={disabled ? 'disabled' : 'enabled'}
-              disabled={disabled}
+              data-state={unavailable ? 'disabled' : state ?? 'enabled'}
+              disabled={unavailable}
               onClick={() => onAction?.(action)}
             >
               <span aria-hidden='true'>{presentation.symbol}</span>

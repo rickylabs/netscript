@@ -3,17 +3,24 @@ import { Card } from './card.tsx';
 import { cn } from '../../lib/cn.ts';
 import type { Renderable } from '../../lib/public-types.ts';
 
-interface DataTableSectionProps
+/** Native content seam for the copied DataTable frame. */
+export interface DataTableSectionProps
   extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
   children: Renderable;
   class?: string;
 }
 
-interface DataTableProps extends DataTableSectionProps {
+/** Presentation state of the caller-owned table composition. */
+export type DataTableState = 'default' | 'selection' | 'empty' | 'loading';
+
+/** Frame props; native child controls own interaction. */
+export interface DataTableProps extends DataTableSectionProps {
   interactive?: boolean;
+  state?: DataTableState;
 }
 
-interface DataTableRowProps extends DataTableSectionProps {
+/** Grid row for caller-owned compound content. */
+export interface DataTableRowProps extends DataTableSectionProps {
   /**
    * CSS `grid-template-columns` for this row's cells, e.g. `'2fr 1fr 1fr'` or
    * `'minmax(0, 1fr) auto'`. Without it the row is a single-column grid and
@@ -29,16 +36,21 @@ type DataTableComponent = ((props: DataTableProps) => VNode) & {
   Footer: (props: DataTableSectionProps) => VNode;
 };
 
-function DataTableRoot({ children, class: className, ...props }: DataTableProps): VNode {
+function DataTableRoot(
+  { children, class: className, state = 'default', interactive = false, ...props }: DataTableProps,
+): VNode {
   return (
-    <Card
+    <div
       {...props}
-      class={cn('ns-data-table', className)}
+      class={cn('ns-card ns-data-table', className)}
       data-part='root'
       data-scope='data-table'
+      data-state={state}
+      data-interactive={interactive ? 'true' : undefined}
+      aria-busy={state === 'loading' ? 'true' : props['aria-busy']}
     >
       {children}
-    </Card>
+    </div>
   );
 }
 
@@ -72,7 +84,9 @@ function DataTableRow(
   { children, class: className, cols, style, ...props }: DataTableRowProps,
 ): VNode {
   const gridStyle = cols
-    ? { ...(style && typeof style === 'object' ? style : null), gridTemplateColumns: cols }
+    ? typeof style === 'string'
+      ? `${style};grid-template-columns:${cols}`
+      : { ...style, gridTemplateColumns: cols }
     : style;
   return (
     <div

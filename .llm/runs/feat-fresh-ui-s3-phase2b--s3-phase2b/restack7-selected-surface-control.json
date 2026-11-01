@@ -1,0 +1,32 @@
+{
+  "status": "DESIGN_PROTOTYPE_NOT_FINAL_SOURCE",
+  "rawExitCode": 0,
+  "actualRendererAudits": 72,
+  "baselineAudits": 36,
+  "baselineAuditsWithViolations": 15,
+  "candidateAudits": 36,
+  "candidateAuditsWithViolations": 0,
+  "candidateSeriousCritical": 0,
+  "engines": 3,
+  "schemes": 2,
+  "widths": 2,
+  "selectedTargets": 3,
+  "labelOnlyPrototype": {
+    "audits": 12,
+    "callerControlFailures": 3
+  },
+  "productionSourceChanges": 0,
+  "themeTokenChanges": 0,
+  "strictAxeAllowances": 0,
+  "redFirstRegression": {
+    "verdict": "EXPECTED_FAILURE",
+    "exitCode": 1,
+    "failed": 1,
+    "passed": 0,
+    "actualChromiumLight390": true,
+    "explicitHover": true,
+    "contrast": 4.44,
+    "requiredContrast": 4.5,
+    "cssAndFixtureMatchPreFixSource": true
+  }
+}

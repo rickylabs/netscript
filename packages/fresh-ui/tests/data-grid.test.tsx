@@ -1,176 +1,241 @@
-import { assert, assertEquals, assertStrictEquals } from '@std/assert';
+import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { h } from 'preact';
+import { render } from 'npm:preact-render-to-string@^6.7.0';
 import { DataGrid } from '../mod.ts';
+import type { DataGridColumn, DataGridProps, DataGridState } from '../mod.ts';
 
-type Session = {
-  name: string;
-  tokens: number;
-  status: 'active' | 'idle';
-};
-
-interface VNodeLike {
+type Session = { name: string; tokens: number; status: 'active' | 'idle' };
+interface NodeLike {
   type: unknown;
   props: Record<string, unknown>;
   ref?: unknown;
 }
-
-function asVNode(value: unknown): VNodeLike {
-  assert(value && typeof value === 'object' && 'props' in value, 'expected vnode');
-  return value as VNodeLike;
+function node(value: unknown): NodeLike {
+  assert(value && typeof value === 'object' && 'props' in value);
+  return value as NodeLike;
 }
-
-function childrenOf(value: unknown): unknown[] {
-  const children = asVNode(value).props.children;
-  return Array.isArray(children) ? children : [children];
+function descendants(value: unknown): NodeLike[] {
+  if (Array.isArray(value)) return value.flatMap(descendants);
+  if (!value || typeof value !== 'object' || !('props' in value)) return [];
+  const current = node(value);
+  return [current, ...descendants(current.props.children)];
 }
-
-function rowGroupRows(grid: unknown): VNodeLike[] {
-  const rootChildren = childrenOf(grid);
-  const body = asVNode(rootChildren[1]);
-  return childrenOf(body).map(asVNode);
+function part(value: unknown, name: string): NodeLike[] {
+  return descendants(value).filter((n) =>
+    n.props['data-scope'] === 'data-table' && n.props['data-part'] === name
+  );
 }
-
-function firstRowCells(grid: unknown): VNodeLike[] {
-  return childrenOf(rowGroupRows(grid)[0]).map(asVNode);
-}
-
-function renderGrid(): unknown {
-  return DataGrid<Session>({
+const columns: readonly DataGridColumn<Session>[] = [
+  { key: 'name', header: 'Session', width: '2fr', cell: 'strong' },
+  { key: 'tokens', header: 'Tokens', width: '8rem', cell: 'num' },
+  { key: 'status', header: 'Status', render: (row) => h('em', null, row.status) },
+];
+const data: Session = { name: 'One', tokens: 10, status: 'active' };
+function props(): DataGridProps<Session> {
+  return {
+    columns,
     label: 'Sessions',
-    columns: [
-      { key: 'name', header: 'Session', width: '2fr', cell: 'strong' },
-      { key: 'tokens', header: 'Tokens', width: '8rem', cell: 'num' },
-      { key: 'status', header: 'Status', render: (row) => h('em', null, row.status) },
-    ],
     rows: [
-      { id: 'plain', data: { name: 'Plain', tokens: 10, status: 'idle' } },
-      {
-        id: 'button',
-        data: { name: 'Button', tokens: 20, status: 'active' },
-        selected: true,
-        onSelect: () => undefined,
-      },
-      { id: 'link', data: { name: 'Link', tokens: 30, status: 'active' }, href: '/docs/link' },
+      { id: 'plain', data },
+      { id: 'button', data, selected: true, label: 'Inspect session', onSelect: () => {} },
+      { id: 'link', data, href: '/sessions/one', label: 'Read session' },
     ],
+  };
+}
+interface InputSnapshot {
+  checked: boolean;
+  indeterminate: boolean;
+}
+function change(input: NodeLike): InputSnapshot {
+  const target = { checked: !input.props.checked, indeterminate: false };
+  (input.props.onChange as (event: { currentTarget: InputSnapshot }) => void)({
+    currentTarget: target,
   });
+  return target;
 }
 
-Deno.test('DataGrid renders a plain row with role-grid structure', () => {
-  const grid = renderGrid();
-  const root = asVNode(grid);
-  const row = rowGroupRows(grid)[0];
-
-  assertStrictEquals(root.type, 'div');
-  assertStrictEquals(root.props.role, 'grid');
-  assertStrictEquals(root.props['aria-label'], 'Sessions');
-  assertStrictEquals(row.type, 'div');
-  assertStrictEquals(row.props.role, 'row');
+Deno.test('DataGrid uses native table rows and independent native actions with no grid keyboard claim', () => {
+  const grid = DataGrid(props());
+  assertEquals(part(grid, 'table').map((n) => [n.type, n.props.role, n.props['aria-label']]), [[
+    'table',
+    'table',
+    'Sessions',
+  ]]);
+  const rows = part(grid, 'row');
+  assertEquals(rows.map((n) => n.type), ['tr', 'tr', 'tr', 'tr']);
+  assertEquals(
+    rows.every((n) =>
+      n.props.tabIndex === undefined && n.props.onKeyDown === undefined &&
+      n.props['aria-selected'] === undefined
+    ),
+    true,
+  );
+  const button = part(grid, 'row-action')[0];
+  const link = part(grid, 'row-link')[0];
+  assertEquals([button.type, button.props.type, button.props['aria-label']], [
+    'button',
+    'button',
+    'Inspect session',
+  ]);
+  assertEquals([link.type, link.props.href, link.props['f-client-nav'], link.props['aria-label']], [
+    'a',
+    '/sessions/one',
+    true,
+    'Read session',
+  ]);
+  assertEquals(rows[2].props['data-state'], 'selected');
+  assertEquals(node(grid).props['data-state'], 'selection');
 });
 
-Deno.test('DataGrid renders an onSelect row as a selected button row', () => {
-  const row = rowGroupRows(renderGrid())[1];
-
-  assertStrictEquals(row.type, 'button');
-  assertStrictEquals(row.props.type, 'button');
-  assertStrictEquals(row.props.role, 'row');
-  assertStrictEquals(row.props['aria-selected'], 'true');
-  assertEquals(typeof row.props.onClick, 'function');
+Deno.test('DataGrid retains cell rendering, widths and treatments for linked and ordinary rows', () => {
+  const grid = DataGrid(props());
+  assertEquals(part(grid, 'table')[0].props.style, part(grid, 'row')[1].props.style);
+  assertEquals(part(grid, 'row')[1].props.style, {
+    gridTemplateColumns: '2fr 8rem minmax(0, 1fr)',
+  });
+  assertEquals(part(grid, 'cell-strong').length, 3);
+  assertEquals(part(grid, 'cell-num').length, 3);
+  assertEquals(part(grid, 'cell').filter((n) => n.props['data-variant'] === 'num').length, 3);
+  assertEquals(descendants(grid).filter((n) => n.type === 'em').map((n) => n.props.children), [
+    'active',
+    'active',
+    'active',
+  ]);
 });
 
-Deno.test('DataGrid renders an href row as a Fresh client-nav link row', () => {
-  const row = rowGroupRows(renderGrid())[2];
-
-  assertStrictEquals(row.type, 'a');
-  assertStrictEquals(row.props.href, '/docs/link');
-  assertStrictEquals(row.props.role, 'row');
-  assertStrictEquals(row.props['f-client-nav'], true);
-});
-
-Deno.test('DataGrid renders templated columns and built-in strong and num cells', () => {
-  const [nameCell, tokensCell, statusCell] = firstRowCells(renderGrid());
-  const nameContent = asVNode(nameCell.props.children);
-  const tokensContent = asVNode(tokensCell.props.children);
-  const statusContent = asVNode(statusCell.props.children);
-
-  assertStrictEquals(nameCell.props.role, 'gridcell');
-  assertStrictEquals(nameContent.type, 'strong');
-  assertStrictEquals(nameContent.props.children, 'Plain');
-  assertStrictEquals(tokensContent.type, 'span');
-  assertStrictEquals(tokensContent.props.children, 10);
-  assertStrictEquals(statusContent.type, 'em');
-  assertStrictEquals(statusContent.props.children, 'idle');
-});
-
-Deno.test('DataGrid applies column widths as grid-template-columns', () => {
-  const row = rowGroupRows(renderGrid())[0];
-  const style = row.props.style as Record<string, unknown>;
-
-  assertEquals(style.gridTemplateColumns, '2fr 8rem minmax(0, 1fr)');
-});
-
-Deno.test('DataGrid controlled selection emits row and select-all sets with mixed state', () => {
+Deno.test('DataGrid controlled row and select-all proposals retain physical refusal and mixed state', () => {
   const changes: ReadonlySet<string>[] = [];
+  const selected = new Set(['one', 'stale']);
   const grid = DataGrid<Session>({
-    columns: [{ key: 'name', header: 'Session' }],
-    rows: [
-      { id: 'one', data: { name: 'One', tokens: 1, status: 'active' } },
-      { id: 'two', data: { name: 'Two', tokens: 2, status: 'idle' } },
-    ],
-    selectedIds: new Set(['one']),
+    columns,
+    rows: [{ id: 'one', data }, { id: 'two', data }],
+    selectedIds: selected,
     onSelectionChange: (ids) => changes.push(ids),
   });
-  const [head, body] = childrenOf(grid).map(asVNode);
-  const headerCheckbox = asVNode(childrenOf(asVNode(childrenOf(head)[0]))[0]);
-  const headerInput = asVNode(headerCheckbox.props.children);
-  assertStrictEquals(headerInput.props['aria-checked'], 'mixed');
-  let indeterminate = false;
-  (headerInput.ref as (element: unknown) => void)({
-    set indeterminate(value: boolean) {
-      indeterminate = value;
+  const inputs = descendants(grid).filter((n) => n.type === 'input');
+  assertEquals(inputs[0].props['aria-checked'], 'mixed');
+  const mounted = { indeterminate: false };
+  (inputs[0].ref as (element: { indeterminate: boolean }) => void)(mounted);
+  assertEquals(mounted.indeterminate, true);
+  assertEquals(change(inputs[0]), { checked: false, indeterminate: true });
+  assertEquals([...changes[0]], ['one', 'two']);
+  assertEquals(change(inputs[2]), { checked: false, indeterminate: false });
+  assertEquals([...changes[1]], ['one', 'stale', 'two']);
+  assertEquals([...selected], ['one', 'stale']);
+  assertEquals(change(inputs[1]), { checked: true, indeterminate: false });
+  assertEquals([...changes[2]], ['stale']);
+});
+
+Deno.test('DataGrid bulk and row action contexts count visible IDs and preserve clear callbacks', () => {
+  const clears: ReadonlySet<string>[] = [];
+  const seen: unknown[] = [];
+  const grid = DataGrid<Session>({
+    columns,
+    rows: [{ id: 'one', data }],
+    selectedIds: new Set(['one', 'stale']),
+    onSelectionChange: (ids) => clears.push(ids),
+    renderBulkActions: (context) => {
+      assertEquals(context.count, 1);
+      assertEquals([...context.selectedIds], ['one', 'stale']);
+      context.clearSelection();
+      return h('button', null, 'Archive');
+    },
+    renderRowActions: (value, context) => {
+      seen.push([value, context.row.id, context.selected]);
+      return h('button', null, 'Actions');
     },
   });
-  assertStrictEquals(indeterminate, true);
-  (headerInput.props.onChange as () => void)();
-  assertEquals([...changes[0]], ['one', 'two']);
-
-  const secondRow = asVNode(childrenOf(body)[1]);
-  const rowInput = asVNode(asVNode(childrenOf(secondRow).flat()[0]).props.children);
-  (rowInput.props.onChange as () => void)();
-  assertEquals([...changes[1]], ['one', 'two']);
+  assertEquals([...clears[0]], []);
+  assertEquals(seen, [[data, 'one', true]]);
+  assertEquals(part(grid, 'bulk-actions')[0].props.role, 'group');
+  assertEquals(part(grid, 'bulk-actions')[0].props['aria-label'], '1 selected');
+  const table = part(grid, 'table')[0];
+  assertEquals(part(table, 'bulk-actions'), []);
+  const stale = DataGrid<Session>({
+    columns,
+    rows: [{ id: 'one', data }],
+    selectedIds: new Set(['stale']),
+    renderBulkActions: () => {
+      throw new Error('Stale selection must not show bulk actions.');
+    },
+  });
+  assertEquals(part(stale, 'bulk-actions').length, 0);
+  assertEquals(node(stale).props['data-state'], 'default');
 });
 
-Deno.test('DataGrid checkbox and action cells isolate row activation', () => {
-  let selected = 0;
-  let stopped = 0;
+Deno.test('DataGrid caller-owned empty/loading cells keep controls and callbacks out of hidden data', () => {
+  for (const state of ['empty', 'loading'] satisfies DataGridState[]) {
+    const grid = DataGrid<Session>({
+      columns,
+      rows: [{ id: 'one', data }],
+      selectedIds: new Set(['one']),
+      state,
+      empty: 'No sessions',
+      loading: 'Loading sessions',
+      renderBulkActions: () => {
+        throw new Error('No bulk actions in a status body.');
+      },
+      renderRowActions: () => {
+        throw new Error('No row action callbacks in a status body.');
+      },
+    });
+    assertEquals(part(grid, state)[0].props.colSpan, 5);
+    assertEquals(
+      part(grid, state)[0].props.children,
+      state === 'empty' ? 'No sessions' : 'Loading sessions',
+    );
+    assertEquals(
+      part(grid, 'table')[0].props['aria-busy'],
+      state === 'loading' ? 'true' : undefined,
+    );
+    assertEquals(descendants(grid).filter((n) => n.type === 'input')[0].props.disabled, true);
+  }
+  const empty = DataGrid<Session>({ columns, rows: [] });
+  assertEquals(node(empty).props['data-state'], 'empty');
+  assertEquals(part(empty, 'empty')[0].props.children, undefined);
+});
+
+Deno.test('DataGrid Renderable headers carry native sort and separate plain mobile labels', () => {
   const grid = DataGrid<Session>({
-    columns: [{ key: 'name', header: 'Session' }],
-    rows: [{
-      id: 'one',
-      data: { name: 'One', tokens: 1, status: 'active' },
-      onSelect: () => selected++,
+    columns: [{
+      key: 'name',
+      header: h('button', null, 'Sort session'),
+      headerLabel: 'Session name',
+      sort: 'ascending',
     }],
-    selectedIds: new Set(),
-    onSelectionChange: () => undefined,
-    renderRowActions: () => h('button', null, 'Actions'),
+    rows: [{ id: 'one', data }],
   });
-  const body = asVNode(childrenOf(grid)[1]);
-  const row = asVNode(childrenOf(body)[0]);
-  const [selectionCell, , actionCell] = childrenOf(row).flat().filter(Boolean).map(asVNode);
-  const checkbox = asVNode(selectionCell.props.children);
-  (checkbox.props.onClick as (event: { stopPropagation(): void }) => void)({
-    stopPropagation: () => stopped++,
-  });
-  (actionCell.props.onClick as (event: { stopPropagation(): void }) => void)({
-    stopPropagation: () => stopped++,
-  });
-  assertStrictEquals(stopped, 2);
-  assertStrictEquals(selected, 0);
-  assertStrictEquals(row.type, 'div');
+  const head = part(grid, 'header-cell')[0];
+  assertEquals([head.type, head.props.role, head.props.scope, head.props['aria-sort']], [
+    'th',
+    'columnheader',
+    'col',
+    'ascending',
+  ]);
+  assertEquals(part(grid, 'cell-label')[0].props.children, 'Session name');
+  assertEquals(part(grid, 'cell-label')[0].props['aria-hidden'], 'true');
+  assertEquals(descendants(grid).filter((n) => n.type === 'button').length, 1);
 });
 
-Deno.test('DataGrid legacy call shape retains the pre-selection DOM contract', () => {
-  const grid = renderGrid();
-  assertStrictEquals(childrenOf(grid).length, 2);
-  assertStrictEquals(rowGroupRows(grid)[1].type, 'button');
-  assertStrictEquals(rowGroupRows(grid)[2].type, 'a');
+Deno.test('DataGrid zero-column actions remain native and root attributes/styles survive SSR', () => {
+  let opened = 0;
+  const grid = DataGrid<Session>({
+    columns: [],
+    rows: [{ id: 'zero', data, onSelect: () => opened++ }],
+    class: 'host-grid',
+    style: 'max-width:320px',
+    id: 'sessions',
+  });
+  assertEquals(part(grid, 'cell').length, 1);
+  const action = part(grid, 'row-action')[0];
+  (action.props.onClick as () => void)();
+  assertEquals(opened, 1);
+  assertEquals(action.props['aria-label'], 'Open row zero');
+  const html = render(
+    <DataGrid {...props()} class='host-grid' style='max-width:320px' id='sessions' />,
+  );
+  assertStringIncludes(html, 'ns-data-grid host-grid');
+  assertStringIncludes(html, 'max-width:320px');
+  assertStringIncludes(html, 'id="sessions"');
+  assertEquals(html.includes('role="grid"'), false);
 });

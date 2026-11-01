@@ -168,6 +168,7 @@ export const overlays_1: readonly ComponentContract[] = [
       'text/muted',
     ],
     'notes': [
+      'Cancelable Escape proposes closure and controlled parents may refuse. Non-cancelable platform close stands and reports native-close; accept false to keep closed, otherwise a subsequent accepted open=true render reopens the native modal.',
       'Native DOM attributes pass through where the implementation accepts them.',
       'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
     ],
@@ -533,6 +534,7 @@ export const overlays_1: readonly ComponentContract[] = [
       'surface/card',
     ],
     'notes': [
+      'Cancelable Escape proposes closure and controlled parents may refuse. Non-cancelable platform close stands and reports native-close; accept false to keep closed, otherwise a subsequent accepted open=true render reopens the native modal.',
       'Native DOM attributes pass through where the implementation accepts them.',
       'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
     ],

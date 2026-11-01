@@ -1,3 +1,14 @@
+import { desktopControlFixtures, desktopControlKeyboard } from './utility-desktop-controls.tsx';
+import { docsCompositionFixtures, docsCompositionKeyboard } from './utility-docs-composition.tsx';
+import { docsNavigationFixtures, docsNavigationKeyboard } from './utility-docs-navigation.tsx';
+import { docsStructureFixtures, docsStructureKeyboard } from './utility-docs-structure.tsx';
+import { aiInteractionFixtures, aiInteractionKeyboard } from './utility-ai-interaction.tsx';
+import { aiFixtures, aiKeyboard } from './utility-ai.tsx';
+import { dataTableFixtures, dataTableKeyboard } from './utility-data-table.tsx';
+import { statsGridFixtures, statsGridKeyboard } from './utility-stats-grid.tsx';
+import { shellFixtures, shellKeyboard } from './utility-shell.tsx';
+import { resizableFixtures, resizableKeyboard } from './utility-resizable.tsx';
+import { nativeLayoutFixtures, nativeLayoutKeyboard } from './utility-native-layout.tsx';
 import { pageHeaderFixtures, pageHeaderKeyboard } from './utility-page-header.tsx';
 import { commandPaletteFixtures, commandPaletteKeyboard } from './utility-command-palette.tsx';
 import { alertFixtures, alertKeyboard } from './utility-alert.tsx';
@@ -38,6 +49,17 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...alertFixtures,
     ...commandPaletteFixtures,
     ...pageHeaderFixtures,
+    ...nativeLayoutFixtures,
+    ...resizableFixtures,
+    ...shellFixtures,
+    ...statsGridFixtures,
+    ...dataTableFixtures,
+    ...aiFixtures,
+    ...aiInteractionFixtures,
+    ...docsStructureFixtures,
+    ...docsNavigationFixtures,
+    ...docsCompositionFixtures,
+    ...desktopControlFixtures,
     proseFixture,
   ],
   keyboard: [
@@ -53,6 +75,17 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...alertKeyboard,
     ...commandPaletteKeyboard,
     ...pageHeaderKeyboard,
+    ...nativeLayoutKeyboard,
+    ...resizableKeyboard,
+    ...shellKeyboard,
+    ...statsGridKeyboard,
+    ...dataTableKeyboard,
+    ...aiKeyboard,
+    ...aiInteractionKeyboard,
+    ...docsStructureKeyboard,
+    ...docsNavigationKeyboard,
+    ...docsCompositionKeyboard,
+    ...desktopControlKeyboard,
     ...proseKeyboard,
   ],
 }];

@@ -1,0 +1,148 @@
+{
+  "sourceFiles": 26,
+  "tests": {
+    "final-contracts-installed": {
+      "exitCode": 0,
+      "passed": 453,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 453,
+      "uniqueFailures": 0
+    },
+    "registry": {
+      "exitCode": 0,
+      "passed": 121,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 121,
+      "uniqueFailures": 0
+    }
+  },
+  "wrappers": {
+    "source-check": {
+      "verdict": "PASS",
+      "selected": 10,
+      "dropped": 0
+    },
+    "source-lint": {
+      "verdict": "PASS",
+      "selected": 10,
+      "dropped": 0
+    },
+    "source-fmt": {
+      "verdict": "PASS",
+      "selected": 10,
+      "dropped": 0
+    },
+    "browser-fixture-check": {
+      "verdict": "PASS",
+      "selected": 5,
+      "dropped": 0
+    },
+    "browser-spec-check": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    },
+    "browser-lint": {
+      "verdict": "PASS",
+      "selected": 7,
+      "dropped": 0
+    },
+    "browser-fmt": {
+      "verdict": "PASS",
+      "selected": 7,
+      "dropped": 0
+    }
+  },
+  "browser": {
+    "chromium": {
+      "passed": 60,
+      "failed": 0,
+      "ignored": 0,
+      "flaky": 0,
+      "scope": "Utility light/dark390/1280, measured4scroll states, pinned/unpinned growth/resize, wheel/key/growth races, inert and child-control input, exact viewport listener/observer/frame ownership and teardown, native form/refusal/reset/initial defaults/FormData/host wizard, no-JS/SSR hydration, native radio edge parity"
+    },
+    "additionalEngines": {
+      "passed": 60,
+      "failed": 0,
+      "scope": "Same15 scenarios in actual Firefox/WebKit light390/1280, not full dark/preset engine certification"
+    },
+    "shellRegression": {
+      "passed": 40,
+      "failed": 0,
+      "scope": "Existing Shell matrix with the same chat fixture and updated actual inner viewport assertion"
+    },
+    "seriousCriticalAxe": 0,
+    "allowances": 0,
+    "pageConsoleErrors": 0,
+    "captures": 32
+  },
+  "qualityArchitecture": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "sourceCommit": "f08cafb756208ab444aa2d815dd1af9b55f20210"
+  },
+  "preflight": "PASS",
+  "docsAccuracy": "PASS",
+  "docsExportsDrift": "PASS",
+  "docsSiteBuild": {
+    "verdict": "PASS",
+    "command": "deno task gen:agent-docs-prose",
+    "scope": "Site built to extract prose"
+  },
+  "nativeMemberPublishDryRun": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "slowTypes": 0,
+    "sourceCommit": "f08cafb756208ab444aa2d815dd1af9b55f20210"
+  },
+  "publicationAudit": "slice10b-publication-audit.json",
+  "negativeRegressionEvidence": "slice10b-negative.json",
+  "independentDesignReviews": "PASS_INITIAL_RESET_AND_NATIVE_ANCHORING",
+  "independentSourceReview": "PASS",
+  "independentEvidenceReview": "PASS",
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "inventory": {
+    "total": 104,
+    "shipped": 96,
+    "pending": 8,
+    "nativeRegistryItems": 125
+  },
+  "reviewThreads": {
+    "pr": 2538,
+    "verdict": "PASS",
+    "unanswered": 0
+  },
+  "runtime": "NEW_HEAD_UNPROVEN",
+  "requiredRemoteCI": "PENDING_DRAFT_CHECKS_SKIPPED",
+  "wholePhase2b": "IN_PROGRESS",
+  "ready": false,
+  "sourceCommit": "f08cafb756208ab444aa2d815dd1af9b55f20210",
+  "generatedCarriersAfterSource": []
+}

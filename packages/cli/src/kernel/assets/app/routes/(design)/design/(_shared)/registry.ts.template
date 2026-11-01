@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 114,
+  'total': 133,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -441,7 +441,7 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'kind': 'block',
     'layer': 3,
     'description':
-      'Reusable dashboard sidebar shell that accepts app-owned IA, breadcrumbs, and topbar actions.',
+      'Responsive dashboard/chat/docs shell with native SSR disclosure, mobile modal navigation and app-owned slots.',
   },
   {
     'name': 'page-header',
@@ -765,6 +765,123 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 2,
     'description': 'Manual native scroll-snap carousel with stable-focus boundary controls.',
   },
+  {
+    'name': 'scroll-area',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Named native scrolling viewport with caller-owned dimensions.',
+  },
+  {
+    'name': 'aspect-ratio',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native CSS media frame with four shared aspect ratios.',
+  },
+  {
+    'name': 'direction',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Wrapper-free local native direction on an existing HTML boundary.',
+  },
+  {
+    'name': 'resizable',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'Native two-panel layout with bounded pixel proposals and pointer/keyboard resizing.',
+  },
+  {
+    'name': 'sidebar-support',
+    'kind': 'lib',
+    'layer': 3,
+    'description': 'Private copied navigation and native shell/toggle DOM interoperability.',
+  },
+  {
+    'name': 'marker',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'In-thread event label with optional icon and separator rules.',
+  },
+  {
+    'name': 'trace',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Caller-owned run status with native ordered step disclosures.',
+  },
+  {
+    'name': 'attachment',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Media and caller-owned transfer state with native child actions.',
+  },
+  {
+    'name': 'message-scroller',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'Native named message viewport with pinned-only growth following and stable latest-action focus.',
+  },
+  {
+    'name': 'questionnaire',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native answer form with caller-owned state, validation and progression.',
+  },
+  {
+    'name': 'file-path-chip',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Exact copyable path with real clipboard outcomes and stale-result protection.',
+  },
+  {
+    'name': 'attribute-chip',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Escaped scalar attribute examples in two presentation sizes.',
+  },
+  {
+    'name': 'file-tree',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Read-only native nested file lists and ownership annotations.',
+  },
+  {
+    'name': 'figure',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native figure, caller media and optional semantic caption.',
+  },
+  {
+    'name': 'section-navigation',
+    'kind': 'lib',
+    'layer': 3,
+    'description': 'Private copied native fragment/current and passive section geometry policy.',
+  },
+  {
+    'name': 'toc',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native document outline and mobile disclosure.',
+  },
+  {
+    'name': 'anchor-nav',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native horizontal section navigation and passive current tracking.',
+  },
+  {
+    'name': 'ruled-grid',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Responsive private Docs cards with native caller controls and logical rules.',
+  },
+  {
+    'name': 'hero',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'CSS-responsive document introduction with native actions and caller-owned aside.',
+  },
 ];
 
 export const registryCollections: readonly RegistryCatalogCollection[] = [
@@ -887,6 +1004,23 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
     'name': 'layout-foundations',
     'items': [
       'layout-objects',
+      'scroll-area',
+      'aspect-ratio',
+      'direction',
+      'resizable',
+      'marker',
+      'trace',
+      'attachment',
+      'message-scroller',
+      'questionnaire',
+      'file-path-chip',
+      'attribute-chip',
+      'file-tree',
+      'figure',
+      'toc',
+      'anchor-nav',
+      'ruled-grid',
+      'hero',
     ],
   },
   {

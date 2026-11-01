@@ -1,4 +1,4 @@
-import { assertEquals, assertStringIncludes } from '@std/assert';
+import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { render } from 'npm:preact-render-to-string@^6.7.0';
 import { FRESH_UI_REGISTRY_CONTENT } from '../../../../registry.generated.ts';
 import { freshUiRegistryManifest } from '../../../../registry.manifest.ts';
@@ -12,9 +12,9 @@ const UPDATE_VERSION = ['0', '0', '2'].join('.');
 
 Deno.test('DesktopTrayMenu renders the D3 declaration union and stable action IDs', () => {
   const html = render(
-    DesktopTrayMenu({
-      source: 'application-menu',
-      items: [
+    <DesktopTrayMenu
+      source='application-menu'
+      items={[
         { type: 'action', id: 'open-settings', label: 'Settings', accelerator: 'CmdOrCtrl+,' },
         { type: 'separator' },
         {
@@ -22,8 +22,8 @@ Deno.test('DesktopTrayMenu renders the D3 declaration union and stable action ID
           label: 'Edit',
           items: [{ type: 'role', role: 'copy' }],
         },
-      ],
-    }),
+      ]}
+    />,
   );
 
   assertStringIncludes(html, 'data-source="application-menu"');
@@ -138,11 +138,20 @@ Deno.test('desktop registry items obey the L2 authority chain and form a desktop
       const source = await Deno.readTextFile(
         new URL(`../../../../${file.source}`, import.meta.url),
       );
-      assertEquals(
-        /from ['"]\.\.?\//.test(source),
-        false,
-        `${file.source} must not import another copy-source module`,
+      const localImports = [...source.matchAll(/from ['"](\.\.?\/[^'"]+)['"]/g)].map((match) =>
+        match[1]
       );
+      for (const dependency of localImports) {
+        assertEquals(
+          dependency,
+          '../../lib/cn.ts',
+          `${file.source} must not import another L2 copy-source component`,
+        );
+        assert(
+          item.registryDependencies?.includes('cn'),
+          'The canonical L1 class helper must be declared in the registry',
+        );
+      }
       assertEquals(
         FRESH_UI_REGISTRY_CONTENT[file.source],
         source,

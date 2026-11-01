@@ -76,6 +76,8 @@ test('carousel/native-controls-and-boundaries', async ({ page }) => {
 test('carousel/native-scroll-resize-vertical-and-rtl', async ({ page }, info) => {
   const carousel = page.getByRole('region', { name: 'Projects', exact: true });
   const viewport = carousel.locator('[data-part="viewport"]');
+  await carousel.scrollIntoViewIfNeeded();
+  await expect(carousel).toBeInViewport({ ratio: 1 });
   await carousel.getByRole('link', { name: 'Project One', exact: true }).focus();
   await viewport.hover();
   await page.mouse.wheel(await viewport.evaluate((element) => element.clientWidth), 0);

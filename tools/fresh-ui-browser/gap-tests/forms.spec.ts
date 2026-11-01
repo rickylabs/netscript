@@ -62,7 +62,6 @@ test('input-otp/native-edit-and-paste', async ({ page }) => {
   await page.keyboard.press('Home');
   await page.keyboard.press('Delete');
   await expect(input).toHaveValue('3');
-  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.evaluate(() => navigator.clipboard.writeText('12 34-56'));
   await input.focus();
   await page.keyboard.press('Control+A');

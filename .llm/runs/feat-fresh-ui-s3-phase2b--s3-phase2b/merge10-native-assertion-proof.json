@@ -1,0 +1,32 @@
+{
+  "files": [
+    {
+      "file": "tools/fresh-ui-browser/gap-tests/forms.spec.ts",
+      "originalAssertions": 50,
+      "currentAssertions": 50,
+      "missing": 0,
+      "added": 0
+    },
+    {
+      "file": "tools/fresh-ui-browser/gap-tests/calendar.spec.ts",
+      "originalAssertions": 55,
+      "currentAssertions": 61,
+      "missing": 0,
+      "added": 6,
+      "movedBlockOccurrencesInOriginalCase": 0,
+      "movedBlockOccurrencesInNewCase": 1
+    },
+    {
+      "file": "tools/fresh-ui-browser/gap-tests/overlays.spec.ts",
+      "originalAssertions": 81,
+      "currentAssertions": 85,
+      "missing": 0,
+      "added": 4,
+      "movedBlockOccurrencesInOriginalCase": 0,
+      "movedBlockOccurrencesInNewCase": 1
+    }
+  ],
+  "navigationSpecUnchanged": true,
+  "newBoundaryCasesMaintainedChromium": true,
+  "newBoundaryCasesNotSelectedInPrivateFirefoxWebKit": true
+}

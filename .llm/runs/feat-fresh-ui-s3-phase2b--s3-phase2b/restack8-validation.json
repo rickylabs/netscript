@@ -1,0 +1,127 @@
+{
+  "status": "CHILD_EVIDENCE_REVIEW_PASS_PRE_PUSH",
+  "sourceHead": "759fb34ddc240627a99075677ffe8215d21c1ba6",
+  "parent": "c5877ff8610f5fbafd5276e0115c114f92d1cb16",
+  "baseMain": "6a1d84a6e04c0d39df3926528e0380e267316aee",
+  "prebaseSource": "19d6d1d79b485ebe49bf2791bee16c3e4aa45b23",
+  "prebaseEvidence": "6e0a5c3fb57a05cbbb5114118f484a1e1773d057",
+  "preservation": {
+    "selectedPaths": 691,
+    "sourceConfigMapDifferencesAgainstBothHeads": 0,
+    "mainChangedPaths": 25,
+    "mainMaintainedPaths": 22,
+    "mainMaintainedDifferences": 0,
+    "lockPaths": 3,
+    "lockDifferences": 0,
+    "fourteenReviewedFileDifferences": 0
+  },
+  "conflicts": {
+    "maintained": 0,
+    "generated": 1,
+    "resolution": "Canonical publication/assets generators"
+  },
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "generatedDelta": 0,
+  "qualityArchitecture": {
+    "verdict": "PASS",
+    "gitHead": "759fb34ddc240627a99075677ffe8215d21c1ba6",
+    "exitCode": 0
+  },
+  "nativePublication": {
+    "verdict": "PASS",
+    "gitHead": "759fb34ddc240627a99075677ffe8215d21c1ba6",
+    "exitCode": 0,
+    "slowTypes": 0
+  },
+  "preflight": "PASS",
+  "docsAccuracy": "PASS",
+  "docsExportsDrift": "PASS",
+  "docsBuild": {
+    "verdict": "PASS",
+    "htmlFiles": 260
+  },
+  "cliAndInstalledConsumer": {
+    "passed": 24,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 24,
+    "uniqueFailures": 0,
+    "exitCode": 0,
+    "files": [
+      "packages/cli/src/kernel/application/ui/page/web-scaffold_test.ts",
+      "packages/cli/src/kernel/templates/app/agent-conventions_test.ts",
+      "packages/fresh-ui/tests/registry/gaps-install.test.ts"
+    ]
+  },
+  "dedicatedDocsBrowser": {
+    "suite": "docs.playwright.config.ts",
+    "verdict": "PASS",
+    "sourceHead": "759fb34ddc240627a99075677ffe8215d21c1ba6",
+    "exitCode": 0,
+    "passed": 140,
+    "failed": 0,
+    "ignored": 0,
+    "flaky": 0,
+    "retries": 0,
+    "newAxeAllowances": 0,
+    "captures": 128
+  },
+  "predecessorComponentEvidence": {
+    "label": "Reviewed predecessor executions on691verified identical source/config/map paths; not new current-head executions",
+    "fullPackage": 765,
+    "fullChromium": 675,
+    "affectedFirefoxWebkit": 336,
+    "focused": 72,
+    "axeBearingWebkit": 24,
+    "retries": 0,
+    "flaky": 0,
+    "newAxeAllowances": 0,
+    "railNegativeTolerance": 1,
+    "railNegativeDifference": 208
+  },
+  "docLint": {
+    "status": "ACCEPTED_EXISTING_DEBT",
+    "issue": 2531,
+    "diagnostics": 124,
+    "typeScript": 123,
+    "jsonLimitation": 1,
+    "new": 0,
+    "removed": 0,
+    "label": "Unchanged-source predecessor attribution"
+  },
+  "runtimeAndExactRequiredCI": "UNPROVEN",
+  "coreDiagnostic": {
+    "untracked": 1,
+    "containingPublishableRoots": 0,
+    "unknownOwnerLeftUntouched": true,
+    "taskOwnerInformed": true
+  },
+  "remaining": "Child SAMEreview/audit/exact-d0d8lease push/comment, then full11b/12/13",
+  "evidenceReview": "PASS",
+  "failureStreak": 0
+}

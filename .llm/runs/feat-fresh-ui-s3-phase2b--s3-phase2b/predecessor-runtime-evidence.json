@@ -1,0 +1,37 @@
+{
+  "predecessorHead": "31cc75892363eb0a025ba58c9b617a692d3540ac",
+  "workflow": "https://github.com/rickylabs/netscript/actions/runs/41204476360",
+  "postgres": {
+    "suite": "scaffold.runtime",
+    "verdict": "PASS",
+    "commandExitCode": 0,
+    "passed": 120,
+    "failed": 0,
+    "skipped": 0,
+    "retriedGates": 0,
+    "cleanup": "PASS",
+    "job": "https://github.com/rickylabs/netscript/actions/runs/41204476360/job/124546799138",
+    "artifact": "https://github.com/rickylabs/netscript/actions/runs/41204476360/artifacts/13044392622"
+  },
+  "sqlite": {
+    "suite": "scaffold.runtime.sqlite",
+    "verdict": "PASS",
+    "commandExitCode": 0,
+    "passed": 113,
+    "failed": 0,
+    "skipped": 0,
+    "job": "https://github.com/rickylabs/netscript/actions/runs/41204476360/job/124546799064"
+  },
+  "nativeDesktop": {
+    "suiteVerdict": "FAIL",
+    "passed": 2,
+    "failed": 1,
+    "skipped": 0,
+    "workflowPolicyVerdict": "accepted-issue-859",
+    "issue": 859,
+    "issueState": "open",
+    "nativeDesktopPassClaimed": false
+  },
+  "phase2bRuntimeProof": false,
+  "parentRequiredChecksAtFinalHead": "Still separate; draft-skipped checks do not count as green"
+}

@@ -1,0 +1,205 @@
+# Phase2b drift
+
+No product-code drift yet. The approved whole plan already split these categories into the second stacked review unit. New owner additive x-extension decision must be incorporated into its detailed plan before PLAN-EVAL; it does not permit changing/removing base items. Phase2a source and runtime limits remain explicit, not reset by a new branch.
+
+
+## PLAN-EVAL round1 correction
+
+FAIL_PLAN: four additive-harness ambiguities corrected before any product code.
+New identities use the strict checker from9a; synthetic extension fixtures stay
+unregistered; only eligible source-style registry items can declare extensions
+and every registered item goes through the reader; name normalization and exact
+mapping/collision rules are deterministic. Explicit likely9c/12b split points
+preserve the source-file budget. Await same evaluator round2; failure streak1.
+
+
+Slice9a: Preact precompile turns static JSX children into template nodes, not
+cloneable native HTML VNodes. Direction keeps the approved single-native-VNode
+boundary and explicitly requires h() for that boundary under precompile; it
+rejects template/custom/fragment nodes with an actionable diagnostic. Actual
+installed SSR and public usage cover h(). No wrapper/global/context workaround.
+
+
+Independent source review FAIL_FIX rejected h-only ergonomics. Added a JSX-safe
+as form that renders the caller's single native container directly, forwards
+native props/handlers and an explicit boundaryRef, and retains the clone form.
+Closed native-container choices are documented. No extra wrapper/context/global
+mutation. Installed tests must render actual precompiled JSX including nesting;
+browser RTL scenarios use as. Failure streak1 until re-review PASS.
+
+
+Slice9b native overflow found by strict axe: text-only panels can overflow at
+minimum widths and need their own keyboard focus, even when no child control
+exists. Both panels are consistently tabbable, named groups; endLabel defaults to
+Secondary panel. Child controls retain native tab order around those panel stops.
+SSR aria-hidden uses the explicit string true because precompile boolean values
+otherwise serialize as a bare attribute. Tests preserve the strict axe verdict.
+
+
+Shell9c0 negative control reproduced before production edits: the controlled
+Dialog proposed false, the parent refused, but native Escape still closed the
+modal. The visibility assertion failed (one expected negative). Canonical cancel
+ownership is a supporting complete unit before shell integration, with no new API
+or key map and no shell-local duplicate Escape handler.
+
+
+9c0 checkpoint review round1 FAIL_FIX corrected before production edits: native
+anti-trap double Escape must force closure and report native-close; a subsequent
+accepted parent render must reconcile unchanged open=true. Primary standard and
+real consecutive-key browser probe confirm cancelability true/false. No DOM
+queries between Escapes: Playwright evaluation grants activation and obscures the
+case. The native element is the physical source of truth, checked on each accepted
+render without an internal forced-close re-render. Shared Dialog/Sheet policy,
+consumer veto, no immediate reopen/new API and precise gates are now locked.
+Await same evaluator round2; failure streak1.
+
+
+9c-a implementation findings: native Tab can move into browser chrome (BODY
+sentinel), while outside controls remain inert; no focus-trap clone was added.
+Actual viewport test caught a hidden built-in trigger being chosen before the
+connected custom control; a cancellable owned microtask selects a visible
+trigger after child layout effects. CSS specificity now keeps desktop/none
+custom buttons hidden despite later button CSS. SidebarToggle native typing
+now uses ButtonHTMLAttributes, so disabled is accepted rather than merely spread
+at runtime. Copied support dependencies and installed SSR checks pass; frozen
+legacy snapshot remains unchanged. New canonical app-shell axis uses
+ data-sidebar-presentation to avoid colliding with the legacy bare data-sidebar
+selector on the actual aside. Native ::backdrop represents the app-shell
+sidebar-backdrop part without a duplicate fake DOM layer.
+
+
+Recovery6 stacked integration: parent71d8df6f on main7feb24c7 is independently verified/pushed. Child restacked from2cd89188;636 maintained Fresh UI/browser files excluding only main-owned private lock are byte-identical. Three generated-only conflicts resolved by canonical regeneration. Full package/quality/carriers and same independent review next, then privacy audit and leased push. No9c-b product source; whole task active, runtime/new-headCI unproven.
+
+
+9c-b audit is split into complete9c-b1StatsGrid and9c-b2DataTableDataGrid units to keep each source review under30files. Same approved scope and remaining obligations; no feature removed.
+
+
+9c-b2 nativepointerproof:ControlOrMeta primarybodyclick opensnativeTab, but forwardedauxclick fails browserdefaultnavigation becauseitissynthetic. Applytheindependentreviewerexplicitfallback:stopforwardingauxiliarybodyclicks, showactualnativeactivationarrow, middle-click/contextmenuonthatvisiblelinkremainnative. No customnavigationengine/windowopen; plain/modifiedprimarybodyclick/textselection/nativekeys preserved. READMErecordscompatibilitydetail. This is an implementation refinement withinapprovedpointerreview, not a test waiver.
+
+
+## 2026-11-01 — Utility muted foreground on selected-hover surfaces
+
+Owner: Fresh UI theming. Tracked follow-up: Refs #2450, which remains open for
+role contrast and exclusion burn-down. The existing issue owns theme values;
+this slice does not alter tokens or add a contrast exclusion.
+
+Actual native row hover in all three engines measures4.44contrast for the global
+muted foreground on Utility's selected-hover background, below4.5. DataGrid
+compensates only its own column labels through existing-role contextual ink.
+The fixture host chooses the existing outline Button variant for its body actions;
+Button and foreign-widget paint remain outside DataGrid's ownership. The README
+discloses the caller's surface responsibility. The cost of the remaining theme
+follow-up is auditing the role/surface pairing at the source, including tinted
+host surfaces; global muted text is not certified over arbitrary selected tints.
+
+This is not an AA waiver: current-scope source/browser axe must be zero, with
+strict explicit selected-rest/hover controls and no additional allowance. The
+label-only prototype's caller failure and the final red-first native regression
+are preserved as negative proof. Final-source gates are still pending.
+
+## Desktop audit implementation slicing
+
+The complete existing six-component audit is partitioned into chrome/menu
+controls11b3a and dialog/notification/update/conditional rendering11b3b to
+respect the maintained-source budget. All scope/gates remain; no owner rescope
+or acceptance waiver is inferred. Published main contracts constrain repairs.
+
+Desktop11b3a full package found a Phase1 modifier-class violation; first-row
+hover now uses the already-declared action data-state instead. The existing
+Desktop authority-chain test now explicitly permits only the declared canonical
+L1 cn helper while rejecting other local copy-source imports; hooked Tray SSR
+is invoked through JSX. This necessary baseline test adds one maintained path,
+keeping the final source unit at23. No acceptance waiver or next-unit work.
+
+Desktop11b3a full-gate drift: native-tab fixture destination startup coupling.
+The real server now has a small destination route, and the native-tab test
+asserts its content. No DataGrid product change or keyboard/API waiver. See the
+checkpoint evidence/amendment written before the test-only edit.24paths total.
+
+Main advanced during11b3a gates to0af8fd9e, including Utility CSS consolidation
+and size budgets. A stack rebase/reconciliation is now required before push.
+This is upstream integration work within the existing assignment, not dropped
+Desktop/harness scope or an acceptance waiver. Current frozen source review
+does not certify the new base.
+
+
+## Significant scope drift — latest-main CSS guard
+
+Main #2558 adds a fixed combined-CSS limit based on the 66-component baseline,
+while this assignment adds 38 components. Actual parent 281179raw/36011gzip
+fails the configured220000/27000 gate. Two same-evaluator terminal failures
+(FAIL_PLAN, FAIL_RESCOPE) end the loop. No guard edit or waiver was introduced.
+See reconcile9-rescope.md for measured baselines and the four owner decisions.
+Stop is required by the supplied leaf profile, not an inferred approval rule.
+
+
+## Owner override — merge-only Git workflow
+
+Cockpit prohibits all future rebases and force-pushes. Earlier workflow steps
+are historical. Preserve remote ancestry through merge commits and ordinary
+pushes, after the distinct CSS-policy scope decision permits resumption.
+
+
+## Owner policy resolves historical scope stop
+
+Parent merge10 independently passes and is plain-pushed2be. Child integration
+now follows its own seven-item checkpoint under the explicit owner consolidation-
+then-measured-cap decision. No budget waiver, scope removal or history rewrite.
+Fresh integration proof may be scoped by exhaustive CSS semantic parity and
+unchanged controller bytes; SAME design review selects sufficiency before code.
+Full final browser/runtime/evaluation/CI acceptance remains required later.
+
+
+## Desktop merge disposition — reviewed replacements retained
+
+All11oldWindowand12oldTray Utility blocks are enumerated in
+merge10-child-desktop-utility-disposition.md. They were already absent/replaced
+in reviewedc3d; both full CSS files still matchc3dand1afdexactly. Parent2be's
+entire old Utility lists match mergebasec587including ordered declarations/media:
+0post-base new semantic rules. Thus no old overrides are reintroduced, and no
+new parent semantic addition is silently dropped. DataTable/StatsGrid/layouts
+retain reviewed child rules while factoring repeated exact Utility roots only
+within contiguous segments, preserving intervening legacy/container rules.
+
+
+## Latest owner overrides final headroom/readiness policy
+
+Eric/Cockpit now chooses final measured global raw/gzip ×1.02 ceiling with the
+dated2488reason at each constant. Earlier fixed4019/473headroom remains truthful
+intermediate merge history only. Final CI may be green or policy-skipped at
+exact head; failed/pending is not accepted. Guard logic/5MBcap remain intact.
+
+
+## Runtime defect found by the broader three-engine merge gate
+
+The earlier no-controller-change assumption is explicitly amended for ONLY
+MessageScroller's input rAF ownership, an existing documented native-key
+contract. See merge10-reader-frame-checkpoint.md. No CSS/dependency/API changes.
+Original791/866/140passing runs remain historical after any implementation edit;
+896cross failure is preserved. New prospective native-wheel regression and
+complete fresh gates are required, not a narrower or skipped acceptance.
+
+
+### Merge10: caller fixture contrast exception
+
+Focused AI all3engine run terminal168PASS/1FAIL/23notrun,0flaky/retry; dark
+WebKit native caller buttons contrast1.81. SAME scoped PLAN1PASS before
+mechanical17plainbutton tag replacements with already imported shippedButton.
+Native type/handlers/labels/position unchanged; strict axe unchanged; no package
+CSS/API/token/globalreset/allowance/skip. New full192focused run next, then all
+bound fresh full gates. This fixture is an explicit non-CSS preservation
+exception; old focused run stays failed. Failurestreak0.
+
+
+## Complete consuming caller-control paint correction
+
+PreviousfullChrome795/package866/docs140PASS, completeFFWK888PASS16FAIL,0skip/
+flaky/retry. Everycrossfailure is nativecallerbuttondarkWebKitcontrast. SAME
+PLAN1PASS precedes18fixture/84tag replacements+12imports/11headlesspaint sites/
+2localreadonlytokenpairs. Four ordinary unnamed sentinel wrappers preserve
+existing strict rootscreenshotselectors; no spec/assertion change. Mechanical
+proof0othersemantic edits; all18wrappers check/lint/fmt0/0dropped.
+Fresh1280case all3engine focusedunion now running. Refreeze711, only18fixtures
+changed; other693/597product/90CSS/957site files exact. Reuse approved uninvolved
+gates only with readsetproof; refreshroot/quality and full795Chrome904FFWK after
+focused terminalPASS. All original remaining Desktop12/13scope stillmandatory.

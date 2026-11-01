@@ -1,0 +1,260 @@
+{
+  "unit": "11b3a",
+  "status": "SOURCE_PASS_NEW_MAIN_RECONCILIATION_PENDING",
+  "maintainedPaths": 26,
+  "frozenBuildPaths": 10,
+  "lockDelta": 0,
+  "designReview": "PASS",
+  "failureStreak": 0,
+  "sourceCheckLintFormat": {
+    "selectedEach": 11,
+    "dropped": 0,
+    "verdict": "PASS"
+  },
+  "browserCheck": {
+    "fixtures": 4,
+    "testAndConfigFiles": 4,
+    "lintFormatEach": 8,
+    "dropped": 0,
+    "verdict": "PASS"
+  },
+  "focusedChromium": {
+    "passed": 24,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "retries": 0,
+    "durationMs": 46818,
+    "verdict": "PASS"
+  },
+  "fullPackage": {
+    "verdict": "PASS",
+    "passed": 863,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 863,
+    "uniqueFailures": 0,
+    "exitCode": 0,
+    "durationMs": 680682
+  },
+  "fullChromium": {
+    "verdict": "PASS",
+    "passed": 791,
+    "exitCode": 0,
+    "retries": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "captures": 436,
+    "durationMs": 1240211.3399999999
+  },
+  "affectedFirefoxWebKit": {
+    "verdict": "PASS",
+    "passed": 72,
+    "exitCode": 0,
+    "retries": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "captures": 32,
+    "durationMs": 311825.52800000005
+  },
+  "dedicatedDocs": {
+    "verdict": "PASS",
+    "passed": 140,
+    "exitCode": 0,
+    "retries": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "captures": 128,
+    "durationMs": 218883.337
+  },
+  "sourceReview": {
+    "round": 1,
+    "verdict": "PASS",
+    "blockers": 0,
+    "failureStreak": 0,
+    "scope": "Frozen26paths against unchanged child base; new-main integration pending"
+  },
+  "committedEvidenceReview": "NOT_REQUESTED",
+  "focusedPackage": {
+    "passed": 16,
+    "failed": 0,
+    "ignored": 0
+  },
+  "qualityArchitecture": "PASS",
+  "preflight": "PASS",
+  "docsAccuracy": "PASS",
+  "exportsDrift": "PASS",
+  "siteBuild": {
+    "verdict": "PASS",
+    "html": 260,
+    "registryArtifacts": 135,
+    "existingSyntaxAllowances": 4
+  },
+  "docLint": {
+    "rawExitCode": 1,
+    "acceptedExistingIssue": 2531,
+    "typescriptFindings": 123,
+    "jsonLimitations": 1,
+    "new": 0,
+    "removed": 0
+  },
+  "nativePublication": {
+    "verdict": "PASS",
+    "rawExitCode": 0,
+    "slowTypes": 0,
+    "ranAfterAllBrowsersTerminal": true
+  },
+  "nativeTabConfirmation": {
+    "verdict": "PASS",
+    "passed": 200,
+    "exitCode": 0,
+    "retries": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "captures": 0,
+    "durationMs": 265764.311
+  },
+  "historicalFullChromium": {
+    "passed": 257,
+    "failed": 1,
+    "notRun": 533,
+    "reason": "Uncanceled native auxclick/new-tab destination startup coupling; preserved failed results"
+  },
+  "nativeTabDestinationControls": {
+    "realServerMiddlePassed": 20,
+    "isolatedPlainAndTableComparisonsPassed": 80,
+    "modifiedInputDelay": false,
+    "timeoutIncrease": false,
+    "retriesAdded": 0
+  },
+  "nativeFullChromiumTrial": {
+    "passed": 200,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "retries": 0,
+    "verdict": "PASS"
+  },
+  "headlessShellStressHistorical": {
+    "passed": 43,
+    "failed": 1,
+    "notRun": 156,
+    "verdict": "FAIL"
+  },
+  "nativeTabRootCause": "Headless-shell behavior observed; exact browser internal cause unproven. Maintained full Chromium mode validated by200-case trial.",
+  "containedFocused": {
+    "passed": 28,
+    "failed": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "retries": 0,
+    "verdict": "PASS"
+  },
+  "wheelConfirmation": {
+    "verdict": "PASS",
+    "passed": 20,
+    "exitCode": 0,
+    "retries": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "captures": 0,
+    "durationMs": 85329.639
+  },
+  "historicalFullModeWheel": {
+    "passed": 97,
+    "failed": 1,
+    "notRun": 693,
+    "finding": "Wheel fixture had not explicitly brought entire carousel into view before native input; current unchanged Carousel reaches offset246/counter2/3."
+  },
+  "browsers": {
+    "full-chromium": {
+      "verdict": "PASS",
+      "passed": 791,
+      "exitCode": 0,
+      "retries": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "captures": 436,
+      "durationMs": 1240211.3399999999
+    },
+    "cross": {
+      "verdict": "PASS",
+      "passed": 72,
+      "exitCode": 0,
+      "retries": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "captures": 32,
+      "durationMs": 311825.52800000005
+    },
+    "docs-browser": {
+      "verdict": "PASS",
+      "passed": 140,
+      "exitCode": 0,
+      "retries": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "captures": 128,
+      "durationMs": 218883.337
+    },
+    "native-tab-confirmation": {
+      "verdict": "PASS",
+      "passed": 200,
+      "exitCode": 0,
+      "retries": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "captures": 0,
+      "durationMs": 265764.311
+    },
+    "wheel-confirmation": {
+      "verdict": "PASS",
+      "passed": 20,
+      "exitCode": 0,
+      "retries": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "captures": 0,
+      "durationMs": 85329.639
+    }
+  },
+  "wrappers": {
+    "source-check": {
+      "verdict": "PASS",
+      "selected": 11,
+      "dropped": 0
+    },
+    "source-lint": {
+      "verdict": "PASS",
+      "selected": 11,
+      "dropped": 0
+    },
+    "source-fmt": {
+      "verdict": "PASS",
+      "selected": 11,
+      "dropped": 0
+    },
+    "browser-fixture-check": {
+      "verdict": "PASS",
+      "selected": 4,
+      "dropped": 0
+    },
+    "browser-spec-check": {
+      "verdict": "PASS",
+      "selected": 4,
+      "dropped": 0
+    },
+    "browser-lint": {
+      "verdict": "PASS",
+      "selected": 8,
+      "dropped": 0
+    },
+    "browser-fmt": {
+      "verdict": "PASS",
+      "selected": 8,
+      "dropped": 0
+    }
+  },
+  "frozenDifferences": 0,
+  "ready": false
+}

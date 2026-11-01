@@ -1,0 +1,4 @@
+.ns-attribute-chip { display: inline-flex; flex-wrap: wrap; align-items: center; box-sizing: border-box; min-block-size: 22px; max-inline-size: 100%; padding: 2px 6px; border: 0; border-radius: var(--ns-radius-badge); background: var(--ns-surface); font-family: var(--ns-font-mono); font-size: var(--ns-text-caption); line-height: 18px; overflow-wrap: anywhere;  }
+.ns-attribute-chip[data-size='sm'] { font-size: var(--ns-text-2xs); line-height: 14px; min-block-size: 18px; }
+.ns-attribute-chip > [data-part='name'] { min-inline-size: 0; color: var(--ns-muted-fg); }
+.ns-attribute-chip > [data-part='value'] { min-inline-size: 0; color: var(--ns-fg); }

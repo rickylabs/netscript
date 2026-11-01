@@ -1,0 +1,168 @@
+{
+  "tests": {
+    "contracts": {
+      "exitCode": 0,
+      "passed": 399,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 399,
+      "uniqueFailures": 0
+    },
+    "installed": {
+      "exitCode": 0,
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 10,
+      "uniqueFailures": 0
+    },
+    "catalog": {
+      "exitCode": 0,
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 14,
+      "uniqueFailures": 0
+    }
+  },
+  "wrappers": {
+    "source-check": {
+      "verdict": "PASS",
+      "selected": 11,
+      "dropped": 0
+    },
+    "source-lint": {
+      "verdict": "PASS",
+      "selected": 11,
+      "dropped": 0
+    },
+    "source-fmt": {
+      "verdict": "PASS",
+      "selected": 11,
+      "dropped": 0
+    },
+    "browser-fixture-check": {
+      "verdict": "PASS",
+      "selected": 2,
+      "dropped": 0
+    },
+    "browser-spec-check": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    },
+    "browser-lint": {
+      "verdict": "PASS",
+      "selected": 3,
+      "dropped": 0
+    },
+    "browser-fmt": {
+      "verdict": "PASS",
+      "selected": 3,
+      "dropped": 0
+    }
+  },
+  "browser": {
+    "chromium": {
+      "passed": 76,
+      "failed": 0,
+      "ignored": 0,
+      "flaky": 0,
+      "scope": "Utility light/dark390/1280, four states plus RTL, narrow containers, native roles/keys, selection refusal, row/body and independent controls, sorting/filtering/paging/menu host compositions, pointer text selection, exact target restoration and observer count",
+      "pageConsoleErrors": 0
+    },
+    "additionalEngines": {
+      "passed": 44,
+      "failed": 0,
+      "scope": "Focused Firefox/WebKit light390/1280: native table roles, controlled selection, text selection, row activation, modifiers and target restoration, Shift guard, native middle-click, first-cell controls, Tab order and zero-column action; not full engine certification"
+    },
+    "freshProductionConsumer": {
+      "passed": 2,
+      "failed": 0,
+      "widths": [
+        390,
+        1280
+      ],
+      "pageConsoleErrors": 0,
+      "scope": "Actual ui:add copied DataTable TSX/CSS fidelity, Fresh production build/island hydration, three exact target values with native new tabs and unchanged current document, one observer per click, native Fresh partial navigation"
+    },
+    "seriousCriticalAxe": 0,
+    "allowances": 0,
+    "captures": 24
+  },
+  "qualityArchitecture": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "sourceCommit": "2fc482994f67cc42b17bdae3add7643857ff4cb1"
+  },
+  "preflight": {
+    "verdict": "PASS",
+    "exitCode": 0
+  },
+  "docsAccuracy": {
+    "verdict": "PASS",
+    "exitCode": 0
+  },
+  "docsExportsDrift": {
+    "verdict": "PASS",
+    "exitCode": 0
+  },
+  "docsSiteBuild": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "command": "deno task gen:agent-docs-prose"
+  },
+  "nativeMemberPublishDryRun": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "slowTypes": 0
+  },
+  "inventory": {
+    "total": 104,
+    "shipped": 91,
+    "pending": 13,
+    "nativeRegistryItems": 120
+  },
+  "independentDesignReview": "PASS",
+  "independentPointerRefinementReviews": "PASS",
+  "independentSourceReview": "PASS",
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "publicationAudit": "slice9cb2-publication-audit.json",
+  "runtime": "NEW_HEAD_UNPROVEN",
+  "requiredRemoteCI": "PENDING_DRAFT_CHECKS_SKIPPED",
+  "wholePhase2b": "IN_PROGRESS",
+  "ready": false,
+  "sourceFiles": 22,
+  "sourceCommit": "2fc482994f67cc42b17bdae3add7643857ff4cb1",
+  "independentEvidenceReview": "PASS",
+  "sourceCommitFiles": 20,
+  "generatedCarriersAfterSource": [
+    "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+    "packages/mcp/src/publish-assets.generated.ts"
+  ]
+}

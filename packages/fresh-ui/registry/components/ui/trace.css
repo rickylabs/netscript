@@ -1,0 +1,28 @@
+.ns-trace { min-inline-size: 0; color: var(--ns-fg); font-size: var(--ns-text-small); }
+.ns-trace > [data-part='list'] { list-style: none; margin: 0; padding: 0; }
+.ns-trace__header { display: flex; justify-content: space-between; gap: var(--ns-control-gap); margin-block-end: var(--ns-space-2); }
+.ns-trace [data-part='title'] { min-inline-size: 0; font-weight: var(--ns-weight-strong); overflow-wrap: anywhere; }
+.ns-trace [data-part='duration'] { margin-inline-start: auto; flex: none; color: var(--ns-muted-fg); font-family: var(--ns-font-mono); font-size: var(--ns-text-caption); font-weight: normal; }
+.ns-trace__line { position: relative; min-inline-size: 0; padding-block-end: var(--ns-space-2); list-style: none; }
+.ns-trace__summary { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ns-control-gap); min-block-size: 20px; line-height: var(--ns-leading-small); }
+summary.ns-trace__summary { cursor: pointer; list-style: none; }
+summary.ns-trace__summary::-webkit-details-marker { display: none; }
+summary.ns-trace__summary:focus-visible { outline: 2px solid var(--ns-ring); outline-offset: 2px; border-radius: var(--ns-radius-input); }
+.ns-trace__line [data-part='description'],
+.ns-trace__line [data-part='collapsible-content'] { margin-inline-start: calc(14px + var(--ns-control-gap)); min-inline-size: 0; overflow-wrap: anywhere; }
+.ns-trace__line [data-part='description'] { flex-basis: calc(100% - 14px - var(--ns-control-gap)); color: var(--ns-muted-fg); font-size: var(--ns-text-small); }
+.ns-trace__line [data-part='collapsible-content'] { padding-block-start: var(--ns-space-1); }
+.ns-trace__line[data-status='error'] [data-part='description'] { color: var(--ns-destructive-text); }
+.ns-trace__status { display: inline-flex; flex: none; align-items: center; justify-content: center; inline-size: 14px; block-size: 14px; color: var(--ns-muted-fg); }
+.ns-trace__line[data-status='done'] .ns-trace__status { color: var(--ns-success-text); }
+.ns-trace__line[data-status='error'] .ns-trace__status { color: var(--ns-destructive-text); }
+.ns-trace__line[data-status='pending'] .ns-trace__status > span { inline-size: 12px; block-size: 12px; border: 1px solid currentColor; border-radius: 50%; box-sizing: border-box; }
+.ns-trace__line[data-status='running'] .ns-trace__status { color: var(--ns-warning-text); }
+.ns-trace__line[data-status='running'] .ns-trace__status > span { inline-size: 12px; block-size: 12px; border: 1px solid currentColor; border-inline-end-color: transparent; border-radius: 50%; animation: ns-trace-spin 0.8s linear infinite; box-sizing: border-box; }
+.ns-trace__connector { position: absolute; inset-inline-start: 6px; inset-block-start: 20px; inset-block-end: 0; inline-size: 2px; border-inline-start: 1px solid var(--ns-border-subtle); pointer-events: none; }
+.ns-trace__sr { position: absolute; inline-size: 1px; block-size: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.ns-trace :is(a,button):focus-visible { outline: 2px solid var(--ns-ring); outline-offset: 2px; }
+@keyframes ns-trace-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .ns-trace__line[data-status='running'] .ns-trace__status > span { animation-duration: 2s; }
+}

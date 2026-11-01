@@ -1,0 +1,142 @@
+{
+  "sourceFiles": 28,
+  "tests": {
+    "final-contracts-installed": {
+      "exitCode": 0,
+      "passed": 603,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 603,
+      "uniqueFailures": 0
+    },
+    "installed-current": {
+      "exitCode": 0,
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 5,
+      "uniqueFailures": 0
+    }
+  },
+  "wrappers": {
+    "source-check": {
+      "verdict": "PASS",
+      "selected": 14,
+      "dropped": 0
+    },
+    "source-lint": {
+      "verdict": "PASS",
+      "selected": 14,
+      "dropped": 0
+    },
+    "source-fmt": {
+      "verdict": "PASS",
+      "selected": 14,
+      "dropped": 0
+    },
+    "browser-fixture-check": {
+      "verdict": "PASS",
+      "selected": 2,
+      "dropped": 0
+    },
+    "browser-spec-check": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    },
+    "browser-lint": {
+      "verdict": "PASS",
+      "selected": 3,
+      "dropped": 0
+    },
+    "browser-fmt": {
+      "verdict": "PASS",
+      "selected": 3,
+      "dropped": 0
+    }
+  },
+  "browser": {
+    "chromium": {
+      "passed": 32,
+      "failed": 0,
+      "ignored": 0,
+      "flaky": 0,
+      "scope": "Utility light/dark390/1280, real native clipboard write/read known text, missing/rejected API, out-of-order/path/copy/unmount races, native keys/focus, escaped scalars, native nested lists/annotations, actual media ratio/width/caption, RTL and long content"
+    },
+    "additionalEngines": {
+      "passed": 32,
+      "failed": 0,
+      "scope": "Same8 scenarios in actual Firefox/WebKit light390/1280 on final CSS. Real native writes pass; read-back only Chromium permissions. Not full dark/preset certification."
+    },
+    "seriousCriticalAxe": 0,
+    "allowances": 0,
+    "pageConsoleErrors": 0,
+    "captures": 40
+  },
+  "qualityArchitecture": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "sourceCommit": "dbcb96ff5a7ff97b89437c9f872e6301497bb7d4"
+  },
+  "preflight": "PASS",
+  "docsAccuracy": "PASS",
+  "docsExportsDrift": "PASS",
+  "docsSiteBuild": {
+    "verdict": "PASS",
+    "command": "deno task gen:agent-docs-prose",
+    "pages": 259
+  },
+  "nativeMemberPublishDryRun": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "slowTypes": 0,
+    "sourceCommit": "dbcb96ff5a7ff97b89437c9f872e6301497bb7d4"
+  },
+  "publicationAudit": "slice11a-publication-audit.json",
+  "independentDesignReview": "PASS",
+  "independentSourceReview": "PASS",
+  "independentEvidenceReview": "PASS",
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "inventory": {
+    "total": 104,
+    "shipped": 100,
+    "pending": 4,
+    "nativeRegistryItems": 129
+  },
+  "reviewThreads": {
+    "pr": 2538,
+    "verdict": "PASS",
+    "unanswered": 0
+  },
+  "runtime": "NEW_HEAD_UNPROVEN",
+  "requiredRemoteCI": "PENDING_DRAFT_CHECKS_SKIPPED",
+  "wholePhase2b": "IN_PROGRESS",
+  "ready": false,
+  "sourceCommit": "dbcb96ff5a7ff97b89437c9f872e6301497bb7d4",
+  "generatedCarriersAfterSource": []
+}

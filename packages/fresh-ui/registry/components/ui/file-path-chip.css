@@ -1,0 +1,7 @@
+.ns-file-path-chip { box-sizing: border-box; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; max-inline-size: 100%; min-block-size: 26px; padding: 2px 5px; border: 1px solid var(--ns-border-subtle); border-radius: var(--ns-radius-badge); background: var(--ns-surface); color: var(--ns-fg); vertical-align: middle; }
+.ns-file-path-chip > [data-part='path'] { min-inline-size: 0; font-family: var(--ns-font-mono); font-size: var(--ns-text-caption); line-height: 18px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ns-file-path-chip > [data-part='copy'] { display: grid; place-items: center; flex: none; inline-size: 20px; block-size: 20px; padding: 0; border: 0; border-radius: var(--ns-radius-control); color: var(--ns-muted-fg); background: transparent; cursor: pointer; }
+.ns-file-path-chip > [data-part='copy']:hover { background: var(--ns-muted); color: var(--ns-fg); }
+.ns-file-path-chip > [data-part='copy']:focus-visible { outline: 2px solid var(--ns-ring); outline-offset: 2px; }
+.ns-file-path-chip__sr { position: absolute; inline-size: 1px; block-size: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.ns-file-path-chip__error { flex-basis: 100%; font-size: var(--ns-text-caption); line-height: 18px; color: var(--ns-destructive-text); }

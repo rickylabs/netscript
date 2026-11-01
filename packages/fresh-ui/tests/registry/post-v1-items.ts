@@ -23,10 +23,32 @@ export const POST_V1_COMPONENTS: readonly string[] = [
   'collapsible',
   'chart',
   'carousel',
+  'scroll-area',
+  'aspect-ratio',
+  'direction',
+  'resizable',
+  'marker',
+  'trace',
+  'attachment',
+  'message-scroller',
+  'questionnaire',
+  'file-path-chip',
+  'attribute-chip',
+  'file-tree',
+  'figure',
+  'toc',
+  'anchor-nav',
+  'ruled-grid',
+  'hero',
 ];
 
 /** Non-component support items added after the frozen v1 baseline. */
-export const POST_V1_SUPPORT: readonly string[] = ['calendar-date', 'menu-items'];
+export const POST_V1_SUPPORT: readonly string[] = [
+  'calendar-date',
+  'menu-items',
+  'sidebar-support',
+  'section-navigation',
+];
 
 /** Existing copies missing only their actual package runtime dependency. */
 export const LEGACY_RUNTIME_DEPENDENCY_REPAIRS = [
@@ -34,11 +56,16 @@ export const LEGACY_RUNTIME_DEPENDENCY_REPAIRS = [
   'command-palette',
   'code-block',
   'pagination',
+  'sidebar-shell',
 ] as const;
 
 /** Explicit new copied dependencies for audited existing components. */
 export const LEGACY_REGISTRY_DEPENDENCY_REPAIRS: Readonly<Record<string, readonly string[]>> = {
   'command-palette': ['kbd', 'spinner'],
+  'desktop-window-chrome': ['cn'],
+  'desktop-tray-menu': ['cn'],
+  'sidebar-shell': ['sidebar-support'],
+  'sidebar-toggle': ['sidebar-support'],
 };
 
 /** The registry and its package-owned runtime must install at the same release. */
@@ -47,6 +74,11 @@ export const FRESH_UI_RUNTIME_DEPENDENCY: string =
 
 /** Updated baseline copies also receive real consumer install/type-check coverage. */
 export const AUDITED_BASELINE_COMPONENTS: readonly string[] = [
+  'desktop-window-chrome',
+  'desktop-tray-menu',
+  'data-table',
+  'stats-grid',
+  'sidebar-shell',
   'page-header',
   'command-palette',
   'alert',

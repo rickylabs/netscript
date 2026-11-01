@@ -1,0 +1,40 @@
+{
+  "sourceHead": "fa28a6454f17dd43c0d191cf441136ba7c5cb0d3",
+  "canonicalCommands": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "generatedTrackedDelta": 0,
+  "sourceAndBuildHashesUnchanged": true,
+  "committedQualityPublication": {
+    "quality": "PASS",
+    "nativePublication": "PASS",
+    "slowTypes": 0,
+    "actualHead": "fa28a6454f17dd43c0d191cf441136ba7c5cb0d3"
+  },
+  "evidenceReview": "PASS",
+  "ready": false,
+  "failureStreak": 0
+}

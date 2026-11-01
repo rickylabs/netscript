@@ -6,8 +6,13 @@ import { FRESH_UI_REGISTRY_CONTENT } from '../registry.generated.ts';
 // Budget the actual uncompressed publish file set, not a directory approximation or tar size.
 const PUBLISH_BUDGET_BYTES = 5_000_000;
 
-// Budget all copied non-theme CSS; gap components from #2488 add 62,782 raw / 9,350 gzip bytes.
-const COMPONENT_CSS_BUDGET = { raw: 282_782, gzip: 36_350 } as const;
+// Budget every authored and shipped non-theme CSS byte.
+const COMPONENT_CSS_BUDGET = {
+  // gap components from #2488 (owner decision 2026-11-01)
+  raw: 342_504,
+  // gap components from #2488 (owner decision 2026-11-01)
+  gzip: 45_716,
+} as const;
 
 Deno.test('shipped component CSS stays within raw and gzip budgets', async (t) => {
   const root = new URL('../', import.meta.url);

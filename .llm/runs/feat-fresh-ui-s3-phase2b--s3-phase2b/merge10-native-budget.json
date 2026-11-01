@@ -1,0 +1,17 @@
+{
+  "measuredBytes": {
+    "raw": 335788,
+    "gzip": 44819
+  },
+  "files": 90,
+  "caps": {
+    "raw": 342504,
+    "gzip": 45716
+  },
+  "headroomBytes": {
+    "raw": 6716,
+    "gzip": 897
+  },
+  "reason": "gap components from #2488 (owner decision 2026-11-01)",
+  "sourceCarrierEquality": true
+}

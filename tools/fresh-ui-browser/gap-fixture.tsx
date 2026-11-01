@@ -1,4 +1,23 @@
+import { DesktopControlsExamples } from './gap-desktop-controls-fixture.tsx';
+import { DocsCompositionExamples } from './gap-docs-composition-fixture.tsx';
+import {
+  ClippedDocsComposition,
+  DocsNavigationExamples,
+  InsetDesktopContents,
+  InsetMobileContents,
+  InsetSections,
+} from './gap-docs-navigation-fixture.tsx';
+import { DocsStructureExamples } from './gap-docs-structure-fixture.tsx';
+import { AIInteractionExamples } from './gap-ai-interaction-fixture.tsx';
+import { AIExamples } from './gap-ai-fixture.tsx';
+import { DataTableExamples } from './gap-data-table-fixture.tsx';
+import { StatsGrids } from './gap-stats-grid-fixture.tsx';
+import { ShellExamples } from './gap-shell-fixture.tsx';
+import SidebarToggle from '../../packages/fresh-ui/registry/islands/SidebarToggle.tsx';
+import { DialogOwnership } from './gap-dialog-ownership-fixture.tsx';
+import { Resizables } from './gap-resizable-fixture.tsx';
 import { PageHeaders } from './gap-page-header-fixture.tsx';
+import { NativeLayouts } from './gap-native-layout-fixture.tsx';
 import { CommandPalettes } from './gap-command-palette-fixture.tsx';
 import { ProseExamples } from './gap-prose-fixture.tsx';
 import { Alerts } from './gap-alert-fixture.tsx';
@@ -10,7 +29,7 @@ import { Overlays } from './gap-overlays-fixture.tsx';
 import { Navigation } from './gap-navigation-fixture.tsx';
 import { Calendars } from './gap-calendar-fixture.tsx';
 import { Forms } from './gap-forms-fixture.tsx';
-import { render } from 'preact';
+import { hydrate, render } from 'preact';
 import { useState } from 'preact/hooks';
 import { ButtonGroup } from '../../packages/fresh-ui/registry/components/ui/button-group.tsx';
 import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
@@ -58,7 +77,7 @@ function Actions() {
           <Toggle key={size} variant='outline' size={size} selected>{size}</Toggle>
         ))}
       </section>
-      <button type='button' id='after'>After components</button>
+      <Button type='button' id='after'>After components</Button>
       <Forms />
       <Calendars />
       <Navigation />
@@ -71,7 +90,52 @@ function Actions() {
       <ProseExamples />
       <CommandPalettes />
       <PageHeaders />
+      <NativeLayouts />
+      <Resizables />
+      <DialogOwnership />
     </main>
   );
 }
-render(<Actions />, document.getElementById('app')!);
+if (location.pathname === '/docs-composition-shell') {
+  hydrate(<DocsCompositionExamples embedded />, document.getElementById('composition-island')!);
+} else if (location.pathname === '/desktop-controls') {
+  hydrate(<DesktopControlsExamples />, document.getElementById('app')!);
+} else if (location.pathname === '/desktop-controls-static') {
+  // Preserve native SSR disclosure and every enabled action Tab stop.
+} else if (location.pathname === '/docs-composition-static') {
+  // This static route intentionally retains its useful server-rendered native controls.
+} else if (location.pathname === '/docs-composition') {
+  render(
+    <main>
+      <DocsCompositionExamples />
+    </main>,
+    document.body,
+  );
+} else if (location.pathname === '/docs-navigation-inset-static') {
+  hydrate(<InsetDesktopContents />, document.getElementById('inset-desktop-island')!);
+  hydrate(<InsetMobileContents />, document.getElementById('inset-mobile-island')!);
+  hydrate(<InsetSections />, document.getElementById('inset-sections-island')!);
+} else if (location.pathname === '/docs-navigation-composition') {
+  render(<ClippedDocsComposition />, document.body);
+} else if (location.pathname === '/shell-static') {
+  hydrate(<SidebarToggle />, document.getElementById('standalone-toggle')!);
+} else if (location.pathname === '/ai-interaction-static') {
+  hydrate(<AIInteractionExamples />, document.body);
+} else if (location.pathname === '/docs-navigation') {
+  render(<DocsNavigationExamples />, document.body);
+} else if (location.pathname === '/docs-structure') {
+  render(<DocsStructureExamples />, document.body);
+} else if (location.pathname === '/ai-interaction') {
+  render(<AIInteractionExamples />, document.body);
+} else if (location.pathname === '/ai-static') {
+  hydrate(<AIExamples />, document.body);
+} else if (location.pathname === '/ai') {
+  render(<AIExamples />, document.body);
+} else if (location.pathname === '/data-table') {
+  render(<DataTableExamples />, document.getElementById('app')!);
+} else if (location.pathname === '/stats-grid') {
+  render(<StatsGrids />, document.getElementById('app')!);
+} else if (location.pathname === '/shell') {
+  document.body.style.padding = '0';
+  render(<ShellExamples />, document.getElementById('app')!);
+} else render(<Actions />, document.getElementById('app')!);

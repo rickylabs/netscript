@@ -110,7 +110,7 @@ type Session = { name: string; tokens: number; status: string };
 />;
 ```
 
-Controlled collection actions are opt-in; omitting these props preserves the legacy grid markup:
+Controlled collection actions are opt-in; omitting these props keeps the existing caller data and callback shape:
 
 ```tsx
 import { DataGrid } from '@netscript/fresh-ui';
@@ -141,6 +141,10 @@ declare const setSelectedIds: (next: ReadonlySet<string>) => void;
   )}
 />;
 ```
+
+On Utility's hovered selected rows, the global muted foreground can fall below AA. DataGrid
+adjusts its own column labels for that surface. Text and controls supplied by callers should use
+foreground roles there, such as an outline Button or ActionMenu.
 
 ## API at a glance
 
@@ -180,6 +184,62 @@ Studio Utility is available as `theme-studio-utility` in the registry. The
 three-tier source and extension guide is [tokens/README.md](tokens/README.md).
 
 ## Component contracts
+
+### Document section navigation
+
+`ui:add toc` and `ui:add anchor-nav` install native navigation links and their
+shared copied section-tracking support. Import from your copied components:
+
+```tsx
+import { Toc } from '@/components/ui/toc.tsx';
+import { AnchorNav } from '@/components/ui/anchor-nav.tsx';
+
+<Toc breakpoint='desktop' defaultCurrentId='installation'>
+  <Toc.Item href='#installation'>Installation</Toc.Item>
+  <Toc.Item href='#configuration' level='3'>Configuration</Toc.Item>
+</Toc>;
+<AnchorNav observe>
+  <AnchorNav.Link href='#installation'>Installation</AnchorNav.Link>
+  <AnchorNav.Link href='#configuration'>Configuration</AnchorNav.Link>
+</AnchorNav>;
+```
+
+The root owns `currentId` (string or null), `defaultCurrentId` and optional
+`onCurrentChange(id, {reason: 'hash' | 'scroll'})`. Defined `currentId`, including
+null, is controlled. Refusing a proposal preserves the accepted marker. Equal
+accepted values and repeated unchanged refused candidates produce no callback.
+SSR reads only those props. After hydration a valid decoded initial hash is
+proposed once; empty, malformed, foreign and missing targets are ignored. Links
+keep native Enter/hash/scroll behavior; the components never rewrite the URL or
+move focus when a current proposal arrives. `observe` defaults to false and adds
+passive current tracking for actual linked targets in window or nested scrolling,
+respecting native scroll padding and heading scroll margins. At the scroll end,
+the last partly visible linked heading can become current.
+
+Toc accepts `label` (default On this page), `children`, optional `links` footer,
+and optional `breakpoint='desktop' | 'mobile'`. Item accepts native anchor props,
+required href/content, `level='2' | '3'` and preview `state='rest' | 'hover'`.
+Accepted current always wins over preview state; live hover/focus remains CSS.
+Mobile uses an initially closed, uncontrolled native details/summary. Its open
+state survives current updates. Without a forced breakpoint, SSR stays desktop;
+inside a caller-owned Fresh island, hydration selects mobile at767px and below.
+Only one content branch exists. A resize replacing a focused branch moves focus
+to its corresponding desktop link or mobile summary. Other focus stays put.
+For server-only/no-JS layouts, explicitly compose forced mobile/desktop views.
+An unforced server-only Toc remains a static, working desktop rail at narrow widths.
+
+AnchorNav accepts native nav props, `label` (default Sections) and native Link
+children. With `observe` enabled, actual pinned/later-section geometry owns
+`data-state`. Its types forbid a simultaneous `state` preview prop; JavaScript
+cannot override measured state either. With observation disabled, optional
+`state='rest' | 'scrolled'` defaults to rest. The caller owns sticky top/scroll
+padding through ordinary styles. Overflowing anchors remain native scrollable
+links, with no tab roles or arrow-key selection.
+
+Both require a caller-owned island for hooks, observers or callbacks. Native
+attributes pass through, while scope/part/state/level and aria-current are owned.
+Compose Toc through SidebarShell's existing `railContent` and `mobileRailContent`
+slots at the caller; use distinct link IDs when explicitly authoring both views.
 
 Import types and the JSON serializer from `@netscript/fresh-ui/contracts`. This pure-data
 subpath describes props, anatomy, data attributes, slots, APG patterns, keyboard maps and token
@@ -295,3 +355,382 @@ Legacy `header="tabs"` without a file collection renders the filename/copy heade
 `Card variant='rule' size='sm'` provides the docs surface with a top border, no resting fill/radius/shadow and compact sections. Existing Header/Title/Description/Body/Footer composition remains, with optional `Card.Action`. Section visibility follows composition. `interactive` enables hover/focus-within styling; the card adds no aggregate tab stop or click handler. Native child actions retain their behavior; `state` can supply a visual snapshot.
 
 `Pagination variant='pager'` composes `Pagination.Previous` and `Pagination.Next` with native `href` destinations and automatic previous/next relations. Numbered pagination retains Meta/Actions and adds Link/current/disabled plus decorative Ellipsis. Disabled destinations have no href or tab stop and block activation callbacks. Horizontal arrows mirror with document direction; narrow layouts stack document tiles. The existing Icon primitive also supports arrow-left/right, sourced from [Lucide](https://lucide.dev/icons/arrow-left) with its Lucide/Feather notices retained in source.
+
+### StatsGrid metrics
+
+`ui:add stats-grid` installs the responsive block and its existing theme/layout/Card dependencies.
+Keep the automatic column layout, or cap it with `columns={2}`, `3` or `4`. Every mode adapts to the
+container: a narrow rail still stacks its cards. `joined` creates one ruled strip, including when
+cards wrap. Both options belong to the grid; `variant` and `delta` belong to each card.
+
+```tsx
+import { StatsGrid } from './components/ui/stats-grid.tsx';
+
+<StatsGrid columns={3} joined>
+  <StatsGrid.Card
+    label='Net revenue'
+    value='$284,920'
+    variant='hero'
+    delta='up'
+    detail='+8.2% versus the previous 30 days'
+  />
+  <StatsGrid.Card label='Orders' value='3,182' detail='Same period' />
+  <StatsGrid.Card label='Average order value' value='$89.54' delta='down' detail='-1.3%' />
+</StatsGrid>;
+```
+
+`StatsGrid.Card` keeps `label`, `value`, optional `detail` and `badge`, native attributes and classes.
+`variant` defaults to `default` (also `hero`); `delta` defaults to `none` (also `up` and `down`).
+The arrow appears only when `detail` is supplied. It is decorative: include the sign and meaning in the caller's `detail` text. Badge and
+supporting-content controls keep native Tab, Enter and Space behavior; neither the grid nor its cards
+add focus stops or handlers. The card retains the `ns-card` class while owning its stat-specific axes.
+
+`icon`, `sparkline`, `ticks` and `blockbars` accept optional caller-owned decorative content and are
+empty by default. Their wrappers are inert and hidden from assistive technology; put controls in
+`badge` or `detail`. Theme roles `--ns-deco-sparkline`, `--ns-deco-ticks` and `--ns-deco-blockbars`
+enable the corresponding content with value `1`, using native CSS style queries. Disabled roles and
+browsers without style-query support hide these decorations with no layout space. Utility disables
+all three. No series, fetching or chart engine is synthesized. Grid, borders, surfaces and typography
+consume the existing KPI/theme roles; no token values change.
+
+### DataTable composition and native DataGrid
+
+`ui:add data-table` installs the copied frame and the stylesheet that also styles package `DataGrid`.
+Importing `DataGrid` from the package alone does not install CSS. A frame-only installation leaves
+the package optional: use `deno add jsr:@netscript/fresh-ui` when consuming package `DataGrid`; the
+static copied frame does not require or create that package mapping. Both remain the same canonical
+DataTable identity: use `DataTable.Header`, `.Body` and `.Footer` to compose host-owned controls,
+with a `DataGrid` inside the body. The frame's `state` defaults to `default`; it also accepts
+`selection`, `empty` and `loading`. Loading exposes native busy state. `DataTable.Row` keeps its
+optional `cols` grid template and preserves native string or object styles.
+
+```tsx
+import { DataGrid } from '@netscript/fresh-ui';
+import { DataTable } from './components/ui/data-table.tsx';
+
+<DataTable>
+  <DataTable.Header>Recent sessions</DataTable.Header>
+  <DataTable.Body>
+    <DataGrid
+      label='Recent sessions'
+      columns={[
+        { key: 'name', header: 'Session', cell: 'strong' },
+        { key: 'tokens', header: 'Tokens', cell: 'num' },
+      ]}
+      rows={[{
+        id: 'vs3',
+        label: 'Open session VS3',
+        data: { name: 'VS3', tokens: 18420 },
+        href: '/sessions/vs3',
+      }]}
+    />
+  </DataTable.Body>
+  <DataTable.Footer>Caller-owned pagination</DataTable.Footer>
+</DataTable>;
+```
+
+DataGrid uses a native table containing independent native controls. Tab/Shift+Tab move through
+buttons, links and checkboxes; Enter activates buttons and links, Space activates buttons and
+checkboxes. It adds no grid focus manager. Row activation is a native button (`onSelect`) or Fresh
+link (`href`) inside a cell, with primary body clicks forwarded to that native control. Arbitrary caller-rendered cell content
+is its sibling, so cell links, inputs and row actions keep their own behavior. A row's optional
+`label` names this activation and can localize the fallback `Open row <id>`. Control/Meta primary body clicks use the owned native link with a temporary new-tab target,
+restored after activation. Shift, Alt and combined-modifier body clicks are not forwarded; use the
+visible native link for those operations. Body clicks are delegated activations; direct controls
+retain raw native event semantics. Middle-click and the native link
+context menu are available directly on the visible row-link arrow; auxiliary body clicks are not
+forwarded. Native text selection stays available. In WebKit, a click that dismisses an active selection\ncan finish without activating the row; a subsequent click activates it.
+Control/Meta body clicks on `onSelect` rows activate their
+button normally. Selection and action cells retain their existing click-propagation isolation; other
+independent controls keep their native behavior. The serialized `aria-checked` hint remains for
+compatibility and updates with the same accepted render as the authoritative native checked and
+indeterminate properties. Selection checked and
+mixed properties are controlled; refusing `onSelectionChange` preserves the actual checkbox state.
+`selected` row snapshots remain available without a controlled set, and stale IDs do not inflate
+the visible selected count.
+
+`DataGridColumn.header` now accepts the existing `DataGridRenderable` type, including a native sort
+button. `sort` sets `aria-sort` on the native column header; the caller owns ordering and state.
+`headerLabel` supplies a noninteractive mobile cell label and defaults to a string header or the
+column key. Narrow containers stack rows while keeping header controls reachable, including inside a wide viewport.
+
+DataGrid's optional `state` accepts the exported `DataGridState` union: `default`, `selection`,
+`empty` or `loading`. When omitted it derives empty from no rows, selection from visible selected
+rows, otherwise default. The `empty` and `loading` ports accept caller-owned content in a spanning
+cell; absent content stays empty. Loading exposes `aria-busy`. Compose existing Skeleton, EmptyState,
+filters, menus and Pagination as needed. DataGrid fetches no data and implements no backend sorting,
+filtering, paging or editing.
+
+Compatibility: the audit preserves the caller data/callback API while correcting the old
+`role=grid` without grid navigation and whole-row button/link elements carrying `role=row`.
+Rows now contain real native actions, and selection lives on checkboxes rather than unsupported
+`aria-selected` on static table rows. Consumers that inspect `column.header` as a string should
+narrow it before string operations, or use `headerLabel`. Keep stylesheet imports from `ui:add`
+to receive both the frame and package presentation styles.
+
+### AI event labels, step traces and attachments
+
+Install `marker`, `trace` or `attachment` with `ui:add`; import the copied
+component from `@/components/ui/<name>.tsx`. Their Utility CSS is installed through
+the registry. Marker uses presentation variants `default`, `border` and
+`separator`; optional `label` takes precedence over `children`, and `icon` is
+decorative. Supplied native child controls keep their ordinary tab order.
+
+```tsx
+import { Trace } from '@/components/ui/trace.tsx';
+import { Attachment } from '@/components/ui/attachment.tsx';
+
+<Trace status='running' title='Agent trace' duration='2.1s'>
+  <Trace.Line
+    title='Search docs'
+    status='running'
+    description='Querying the documentation index'
+    duration='312ms'
+    collapsible
+    defaultOpen
+  >
+    <a href='/sources'>Read sources</a>
+  </Trace.Line>
+</Trace>;
+
+<Attachment
+  title='report.pdf'
+  description='Upload failed: file exceeds the limit'
+  state='error'
+  stateLabel='Transfer failed'
+  size='xs'
+  media={<span>PDF</span>}
+  actions={<button type='button'>Retry</button>}
+/>;
+```
+
+Trace renders a native ordered list. Place `Trace.Line` only inside Trace or a
+native list. Aggregate `status` accepts `running | done | error`; a line also
+accepts `pending`. Static lines add no tab stop. Collapsible lines use native
+details/summary, including useful SSR and native Enter/Space behavior. Keep
+title/description/duration presentation-only inside the summary; put native
+actions in the line's children. Keep descriptions brief: they are visible while
+collapsed and form part of the summary's accessible name. `open`/`onOpenChange` are controlled proposals:
+refusal retains the accepted physical state; `defaultOpen` supplies uncontrolled
+initial state. Static lines ignore open. `connector={false}` removes a final
+step's rail. `statusLabel` localizes the static status text on both root and line;
+glyphs are decorative and no live region or agent runtime is created.
+
+Attachment accepts `idle | uploading | processing | error | done`, three sizes
+(`default | sm | xs`) and two orientations (`horizontal | vertical`). The caller
+owns media/alt text, description, actions and optional `progress` content, such
+as a named native progress element. It performs no upload, fetch, remove or retry
+operation. Every non-idle state includes static text (Uploading, Processing, Error
+or Done), localizable through `stateLabel`. At xs horizontal, description stays
+in the accessibility tree while visually hidden; progress is omitted and the
+trailing glyph carries the visual state. Busy state updates preserve native
+action identity and focus. Use caller content or host announcements for detailed
+transfer outcomes; these components never create automatic live announcements.
+
+### Pinned message scrolling and native questionnaires
+
+Install message-scroller or questionnaire with ui:add and import the copied
+component from @/components/ui/. MessageScroller requires a nonblank label and a
+finite height, or a parent with a constrained flex/grid track:
+
+    <MessageScroller label='Conversation' style={{ height: 320 }}>
+      <MessageScroller.Item>
+        <p>Caller-owned message content.</p>
+        <a href='/sources'>Read sources</a>
+      </MessageScroller.Item>
+    </MessageScroller>
+
+The named native viewport supports normal Arrow/Page/Home/End scrolling and child
+Tab order. Its data-scrollable value is measured none/up/down/both, never a prop.
+SSR reports none until geometry is available. First mount follows the end when
+followEnd is true (the default); later text, content and size changes follow only
+while already pinned. Input frames measure the native position without scrolling
+back to the end. Scrolling away preserves the reader's position. Turning
+followEnd on later does not force an unpinned reader to move. endThreshold is a
+finite nonnegative pixel tolerance, default 1. scrollLabel localizes "Scroll to
+latest". That native action keeps focus after reaching the end; when pinned and
+unfocused it leaves the tab order. The component adds no live region: the host
+owns new-message announcements. Every instance owns and cleans up its observers,
+native listener and pending frame.
+
+Questionnaire renders one real native form with the ledger's 480px maximum width.
+Never nest it inside another form;
+compose a multi-step flow by rendering one Questionnaire per form. title names
+the form and answer group. step is question (default), freeform or complete; the
+caller owns progression and validation messages. options have unique nonempty
+value, label, optional decorative shortcut and disabled. Shortcut text installs
+no keyboard binding. Native radios provide single selection and arrow keys;
+multiple enables named checkboxes. Radio edge wrapping follows the browser's
+native policy. name defaults to answer, scoped to each form.
+value/defaultValue are readonly string arrays; single mode uses the first value.
+onValueChange proposes an answer; controlled refusal retains the accepted
+physical state of the entire native group. text/defaultText and onTextChange
+provide the corresponding freeform textarea port, with optional placeholder.
+Textarea Enter remains a newline. Restoring refused controlled text can move the\ncaret to the end, following native value-assignment behavior.
+
+Use native onSubmit/FormData and caller-supplied actions with explicit button
+types. Native action/method submission also works before hydration. Actions sit
+outside the disabled answer fieldset, so the host can offer Previous, Skip or
+Edit while answers are disabled. description/error link to answer controls;
+progress and children are caller content. Complete renders no answer controls or
+hidden persisted values; retain submitted answers in the host. A native reset
+honors onReset prevention, resets uncontrolled answers to their initial
+defaultValue/defaultText, and retains controlled accepted answers. Later changes
+to default* props do not change that initial reset baseline. Other supplied
+native form fields keep their own native reset behavior. Reset synthesizes no
+change or submit callback.
+
+
+### Documentation paths, attributes, file lists and figures
+
+Copy FilePathChip, AttributeChip, FileTree and Figure with `netscript ui:add`
+using the item names `file-path-chip`, `attribute-chip`, `file-tree` and `figure`.
+Import each component from its copied `@/components/ui/` module. FilePathChip and
+FileTree use the public L0 Icon surface; the curated folder glyph retains its
+Lucide ISC/Feather MIT notice. AttributeChip and Figure need no runtime package
+import. Each item installs its own CSS through the normal registry support.
+
+    <FilePathChip path='src/routes/index.tsx' />
+    <AttributeChip name='data-variant' value='outline' size='sm' />
+    <FileTree label='Project files' items={[
+      { id: 'src', type: 'folder', name: 'src', ownership: 'owned', children: [
+        { id: 'index', type: 'file', name: 'index.tsx', ownership: 'generated' },
+      ] },
+    ]} />
+    <Figure width='wide' media='image' caption='The application architecture'>
+      <img src='/architecture.svg' alt='Application modules and their dependencies' />
+    </Figure>
+
+FilePathChip displays escaped code and writes the exact original path through
+native `navigator.clipboard.writeText` on its optional button. Enter and Space
+retain native activation and focus. `copy={false}` removes the button and adds no
+tab stop. `copyLabel`, `copiedLabel` and `errorLabel` accept localized text; the
+button's accessible description is the exact displayed path. Copied state and
+its polite status follow a successful request. Missing access or rejection shows
+and announces an error. The button stays available during a pending request;
+only the latest request for the mounted path may update feedback. A new attempt,
+path change or copy change clears the previous outcome. Unmount invalidates
+pending feedback without claiming to cancel an OS clipboard write. There is no
+clipboard fallback or timer. Hover/focus remain native CSS states.
+
+AttributeChip renders a textual name, equals sign and JSON-quoted String(value).
+It preserves zero, false, null and empty strings and escapes embedded quotes,
+newlines and markup. Quotes and newlines use JSON escapes rather than HTML
+attribute escaping. It never applies that attribute to the document. `size`
+accepts `md` (default) or `sm`; both are borderless and add no focus target.
+
+FileTree is a read-only named group of native nested lists. Each entry has a
+unique nonblank `id`, `type` folder or file and a `name`; folders may have children.
+Duplicate IDs, cycles, invalid ownership and file children are rejected. Names
+and comments may contain caller links, which retain native Tab and activation.
+Every row stays visible. Ownership is caller-declared none, owned, generated or
+guidance; `tag` on an entry overrides its default annotation text. Root `tag={false}`
+hides those annotations visually while retaining their accessible meaning.
+`typeLabels` localizes the hidden folder/file equivalents; decorative glyphs
+never substitute for those labels. There is no filesystem access, selection,
+collapse model or tree keyboard manager.
+
+Figure uses native figure and figcaption with caller-owned image, diagram, video
+or controls. Supply meaningful alternative text or diagram labels yourself.
+`caption` preserves zero and empty content. `media` accepts image or diagram;
+`width` chooses prose or wide using the existing optional Studio prose roles
+(Utility currently 544px/720px), with a 100% fallback. Replaced media keeps its
+intrinsic ratio and shrinks for narrow containers. No placeholder, cropping,
+fetching or extra tab stop is introduced. Captions and native child controls
+remain part of the figure's ordinary semantics and keyboard order.
+
+### Docs composition: RuledGrid and Hero
+
+Install `ruled-grid` / `hero` through `ui:add` and include their generated CSS.
+`RuledGrid` accepts string `columns='2'|'3'|'4'` (default `'3'`) and
+`variant='ruled'|'feature'` (default `'ruled'`). Its `Cell` member has optional
+`eyebrow`, `icon`, `title`, `children` (description) and `action` slots. Cells use
+the Docs-card anatomy from the ledger; they add no click handler, link role or
+tab stop. Supply native links/buttons in title/action/content. A supplied heading
+owns its own document rank. Ruled cells have logical inline-end and bottom rules;
+feature cards have separate top hairlines and a 32px gap.
+
+`Hero` is a native section with required `title`, optional `eyebrow`, `children`
+(lede), `actions`, `aside` and `paths`. The string `headingLevel='1'..'6'` defaults
+to `'1'` and changes heading rank only. `paths` renders inside the aside after its
+other content; supply actual FilePathChip/CodeBlock/Figure components at the
+caller. Hero imports no other layer-2 component. `layout='split'|'centered'`
+defaults to `'split'`. Both blocks work as server-rendered markup without their
+own island; caller-owned interactive children may need an island.
+
+Automatic layout measures the block's own inline size, including inside a docs
+Shell content column. Named container queries style one necessary inner part
+(`grid` or `layout`). The complementary ranges include fractional widths:
+
+| Container width | RuledGrid actual columns | Automatic split Hero |
+| --- | --- | --- |
+| `<=767px` | 1 for every request | One column; gap 32, inline padding 20, title role |
+| `>767px` and `<=1100px` | 2 for every request | Fluid 1.5:1 tracks, gap 40, display role |
+| `>1100px` | Requested 2, 3 or 4 | Fluid 17:9 tracks, gap 80, maximum width 1120 |
+
+At 1120px the wide Hero tracks are 680/360. Centered desktop layout stacks the
+aside below centered copy; mobile copy aligns to the inline start. Optional
+`breakpoint='desktop'|'mobile'` forces a reference presentation and owns
+`data-breakpoint`; omission leaves the attribute absent and uses the container.
+Forced desktop still has fluid minimum-zero tracks. Native controls retain the
+same DOM and order at every width. Long text wraps; no JavaScript breakpoint,
+observer, duplicated branch or token-value change is involved.
+
+Toc/AnchorNav passive observation covers ordinary document scrolling and nested
+non-body scroll containers. A caller that makes `body` a separate scrolling box
+with fixed html/body height currently receives viewport measurements; that
+composition is not covered by the section-observation guarantees.
+
+
+### Desktop controls and host ownership
+
+`DesktopWindowChrome` renders native buttons and calls `onAction` only when the
+user activates one. Its five operation payloads remain `show`, `hide`, `focus`,
+`reload`, and `close`; reload always uses a reload glyph. `leading` and `title`
+accept caller content. The host supplies optional `platform` and `state`
+snapshots; neither triggers native operations or detects the OS.
+
+| Omitted `actions` | Default DOM / callback order |
+| --- | --- |
+| Omitted platform | reload, hide, close |
+| macos | close, hide, reload |
+| windows | hide, reload, close |
+| linux | hide, reload, close |
+
+Explicit `actions` arrays preserve order, including an empty array. The supplied
+`focused`, `blurred`, `hover`, `unfocused`, or `disabled` state is emitted verbatim.
+`blurred` and `unfocused` share visual treatment. Either `disabled` prop or state
+disables the native buttons; unfocused controls remain usable. Omitted state
+preserves legacy root `active` and action `enabled` markers. Utility chrome is
+40px high and follows its container width, containing long identity content; macOS lights use existing semantic colors and a truthful reload glyph,
+Windows captions are46px wide, and Linux controls are24px square.
+
+`DesktopTrayMenu` takes ordered `items`, `source`, and optional `onAction`. The
+four declaration kinds stay action, role, submenu, separator. `type` is an
+optional root presentation snapshot; it never filters items. `accelerator=false`
+hides shortcut labels without rewriting declarations or executing shortcuts.
+`state` accepts rest/hover/disabled, preserving active/enabled when omitted.
+Disabled actions are native disabled buttons. OS role entries are read-only
+disabled browser previews; expanded submenus form labelled groups. Only an
+explicit enabled action activation emits its ID. Duplicate IDs remain separate
+DOM controls and preserve their callback payloads.
+
+The menu uses initially-open native `details`: **all enabled actions retain the
+native Tab order in SSR and before hydration**, including with JavaScript off.
+Hydrate it inside a caller island to enable arrow-key roving, Escape dismissal
+and focus return, and Tab-to-close after focus actually enters and leaves that
+menu. No focus is taken on mount. Summary Enter/Space toggles natively; hydrated
+ArrowDown/Up opens and focuses first/last enabled action, then wraps through the
+menu. Enter/Space activates exactly once. Escape returns to that menu's summary;
+Tab leaves naturally. Action activation keeps the preview open. A dismissed menu
+stays dismissed through unrelated parent/item updates. No global listeners or
+native bridge effects are installed.
+
+Install the controls with `ui:add desktop-window-chrome` or `ui:add desktop-tray-menu`.
+Each includes its CSS, theme seed and canonical class helper. Canonical Desktop
+contracts and actual source/browser fixtures are shared by all styles. Private
+`data-desktop-action` and `data-action-id` carry callback payloads only; public
+platform/state/source/type/action axes remain contract-checked. These DOM tests
+do not prove native OS effects (#859). The separate Dialog, Notification,
+UpdatePrompt and DesktopOnly audit and the all-style extension harness remain
+required in this phase.

@@ -1783,7 +1783,7 @@
     },
     {
       "name": "layout-objects",
-      "description": "Theme-independent CSS layout objects — Shell, Stack, Cluster, Grid, Switcher, Cover, Sidebar, Section, Split, Toolbar, ScrollRegion, ContentRail, and the dashboard scaffold — consuming only semantic spacing and color tokens.",
+      "description": "Theme-independent CSS layout objects \u2014 Shell, Stack, Cluster, Grid, Switcher, Cover, Sidebar, Section, Split, Toolbar, ScrollRegion, ContentRail, and the dashboard scaffold \u2014 consuming only semantic spacing and color tokens.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2259,7 +2259,7 @@
     },
     {
       "name": "avatar",
-      "description": "Identity chip for a person or agent — initials or image with size, presence, and agent variants.",
+      "description": "Identity chip for a person or agent \u2014 initials or image with size, presence, and agent variants.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2298,7 +2298,7 @@
     },
     {
       "name": "citation-chip",
-      "description": "Inline per-claim source marker [n] that pairs with a sources list — the grounded-agent citation UX.",
+      "description": "Inline per-claim source marker [n] that pairs with a sources list \u2014 the grounded-agent citation UX.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2460,7 +2460,7 @@
     },
     {
       "name": "chart-block",
-      "description": "Inline token-driven metric chart — horizontal bars or a vertical column chart with y-axis ticks and data-tone intents.",
+      "description": "Inline token-driven metric chart \u2014 horizontal bars or a vertical column chart with y-axis ticks and data-tone intents.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2499,7 +2499,7 @@
     },
     {
       "name": "donut",
-      "description": "Token-driven donut/pie chart — SVG arc segments with a center total and legend; segment colors from data-tone or a semantic-token cycle.",
+      "description": "Token-driven donut/pie chart \u2014 SVG arc segments with a center total and legend; segment colors from data-tone or a semantic-token cycle.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2622,7 +2622,7 @@
     },
     {
       "name": "markdown",
-      "description": "Sanitized GFM + math + syntax-highlighted renderer for streamed assistant output — direct unified/rehype-react rendering through the Preact JSX runtime with remark-gfm/remark-math/remarkCitations, rehype-katex/rehype-highlight, and a MANDATORY rehype-sanitize content pass.",
+      "description": "Sanitized GFM + math + syntax-highlighted renderer for streamed assistant output \u2014 direct unified/rehype-react rendering through the Preact JSX runtime with remark-gfm/remark-math/remarkCitations, rehype-katex/rehype-highlight, and a MANDATORY rehype-sanitize content pass.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed",
@@ -2685,7 +2685,7 @@
     },
     {
       "name": "command-palette",
-      "description": "Modal ⌘K command palette — the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts.",
+      "description": "Modal \u2318K command palette \u2014 the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed",
@@ -2730,7 +2730,7 @@
     },
     {
       "name": "search",
-      "description": "Compact nav search affordance — a button styled as an input with a ⌘K hint that opens the command palette.",
+      "description": "Compact nav search affordance \u2014 a button styled as an input with a \u2318K hint that opens the command palette.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2770,7 +2770,7 @@
     },
     {
       "name": "dropzone",
-      "description": "File-drop affordance — a dashed drop target (label/hint/icon) that wraps a native file input; drag-over via data-active.",
+      "description": "File-drop affordance \u2014 a dashed drop target (label/hint/icon) that wraps a native file input; drag-over via data-active.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -3078,12 +3078,13 @@
     },
     {
       "name": "sidebar-shell",
-      "description": "Reusable dashboard sidebar shell that accepts app-owned IA, breadcrumbs, and topbar actions.",
+      "description": "Responsive dashboard/chat/docs shell with native SSR disclosure, mobile modal navigation and app-owned slots.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed",
         "layout-objects",
-        "breadcrumb"
+        "breadcrumb",
+        "sidebar-support"
       ],
       "type": "registry:block",
       "files": [
@@ -3105,7 +3106,10 @@
             "block"
           ]
         }
-      }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
     },
     {
       "name": "page-header",
@@ -3517,7 +3521,8 @@
         "theme-seed",
         "layout-objects",
         "sidebar-shell",
-        "button"
+        "button",
+        "sidebar-support"
       ],
       "type": "registry:component",
       "files": [
@@ -3640,7 +3645,8 @@
       "description": "Declarative tray and application-menu preview that emits stable action IDs.",
       "author": "NetScript",
       "registryDependencies": [
-        "theme-seed"
+        "theme-seed",
+        "cn"
       ],
       "type": "registry:component",
       "files": [
@@ -3758,7 +3764,8 @@
       "description": "Accessible title-bar actions limited to documented Deno Desktop window operations.",
       "author": "NetScript",
       "registryDependencies": [
-        "theme-seed"
+        "theme-seed",
+        "cn"
       ],
       "type": "registry:component",
       "files": [
@@ -3869,7 +3876,7 @@
     },
     {
       "name": "mcp-ui-widget",
-      "description": "Themed sandboxed MCP ui:// widget frame — an allow-scripts-only iframe keyed on the active theme so theme changes force a full remount.",
+      "description": "Themed sandboxed MCP ui:// widget frame \u2014 an allow-scripts-only iframe keyed on the active theme so theme changes force a full remount.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -4039,7 +4046,25 @@
           "kbd": "kbd",
           "collapsible": "collapsible",
           "chart": "chart",
-          "carousel": "carousel"
+          "carousel": "carousel",
+          "scroll-area": "scroll-area",
+          "aspect-ratio": "aspect-ratio",
+          "direction": "direction",
+          "resizable": "resizable",
+          "marker": "marker",
+          "trace": "trace",
+          "attachment": "attachment",
+          "message-scroller": "message-scroller",
+          "questionnaire": "questionnaire",
+          "file-path-chip": "file-path-chip",
+          "attribute-chip": "attribute-chip",
+          "file-tree": "file-tree",
+          "figure": "figure",
+          "section-navigation": "section-navigation",
+          "toc": "toc",
+          "anchor-nav": "anchor-nav",
+          "ruled-grid": "ruled-grid",
+          "hero": "hero"
         }
       }
     },
@@ -5403,6 +5428,751 @@
           ]
         }
       }
+    },
+    {
+      "name": "scroll-area",
+      "type": "registry:component",
+      "description": "Named native scrolling viewport with caller-owned dimensions.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/scroll-area.tsx",
+          "type": "registry:component",
+          "target": "@ui/scroll-area.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/scroll-area.css",
+          "type": "registry:file",
+          "target": "@assets/ui/scroll-area.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "layout",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/scroll-area.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "aspect-ratio",
+      "type": "registry:component",
+      "description": "Native CSS media frame with four shared aspect ratios.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/aspect-ratio.tsx",
+          "type": "registry:component",
+          "target": "@ui/aspect-ratio.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/aspect-ratio.css",
+          "type": "registry:file",
+          "target": "@assets/ui/aspect-ratio.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "layout",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/aspect-ratio.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "direction",
+      "type": "registry:component",
+      "description": "Wrapper-free local native direction on an existing HTML boundary.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/direction.tsx",
+          "type": "registry:component",
+          "target": "@ui/direction.tsx"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "layout",
+            "keyboard",
+            "contract"
+          ]
+        }
+      }
+    },
+    {
+      "name": "resizable",
+      "type": "registry:component",
+      "description": "Native two-panel layout with bounded pixel proposals and pointer/keyboard resizing.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/resizable.tsx",
+          "type": "registry:component",
+          "target": "@ui/resizable.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/resizable.css",
+          "type": "registry:file",
+          "target": "@assets/ui/resizable.css"
+        }
+      ],
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "layout",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/resizable.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "sidebar-support",
+      "description": "Private copied navigation and native shell/toggle DOM interoperability.",
+      "type": "registry:lib",
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/lib/sidebar-events.ts",
+          "type": "registry:lib",
+          "target": "@lib/sidebar-events.ts"
+        },
+        {
+          "path": "packages/fresh-ui/registry/lib/sidebar-navigation.tsx",
+          "type": "registry:lib",
+          "target": "@lib/sidebar-navigation.tsx"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "lib",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "layout",
+            "support"
+          ]
+        }
+      }
+    },
+    {
+      "name": "marker",
+      "type": "registry:component",
+      "description": "In-thread event label with optional icon and separator rules.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/marker.tsx",
+          "type": "registry:component",
+          "target": "@ui/marker.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/marker.css",
+          "type": "registry:file",
+          "target": "@assets/ui/marker.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/marker.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "trace",
+      "type": "registry:component",
+      "description": "Caller-owned run status with native ordered step disclosures.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/trace.tsx",
+          "type": "registry:component",
+          "target": "@ui/trace.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/trace.css",
+          "type": "registry:file",
+          "target": "@assets/ui/trace.css"
+        }
+      ],
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/trace.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "attachment",
+      "type": "registry:component",
+      "description": "Media and caller-owned transfer state with native child actions.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/attachment.tsx",
+          "type": "registry:component",
+          "target": "@ui/attachment.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/attachment.css",
+          "type": "registry:file",
+          "target": "@assets/ui/attachment.css"
+        }
+      ],
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/attachment.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "message-scroller",
+      "type": "registry:component",
+      "description": "Native named message viewport with pinned-only growth following and stable latest-action focus.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/message-scroller.tsx",
+          "type": "registry:component",
+          "target": "@ui/message-scroller.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/message-scroller.css",
+          "type": "registry:file",
+          "target": "@assets/ui/message-scroller.css"
+        }
+      ],
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/message-scroller.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "questionnaire",
+      "type": "registry:component",
+      "description": "Native answer form with caller-owned state, validation and progression.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/questionnaire.tsx",
+          "type": "registry:component",
+          "target": "@ui/questionnaire.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/questionnaire.css",
+          "type": "registry:file",
+          "target": "@assets/ui/questionnaire.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "ai",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/questionnaire.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "file-path-chip",
+      "type": "registry:component",
+      "description": "Exact copyable path with real clipboard outcomes and stale-result protection.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/file-path-chip.tsx",
+          "type": "registry:component",
+          "target": "@ui/file-path-chip.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/file-path-chip.css",
+          "type": "registry:file",
+          "target": "@assets/ui/file-path-chip.css"
+        }
+      ],
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "docs",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/file-path-chip.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "attribute-chip",
+      "type": "registry:component",
+      "description": "Escaped scalar attribute examples in two presentation sizes.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/attribute-chip.tsx",
+          "type": "registry:component",
+          "target": "@ui/attribute-chip.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/attribute-chip.css",
+          "type": "registry:file",
+          "target": "@assets/ui/attribute-chip.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "docs",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/attribute-chip.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "file-tree",
+      "type": "registry:component",
+      "description": "Read-only native nested file lists and ownership annotations.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/file-tree.tsx",
+          "type": "registry:component",
+          "target": "@ui/file-tree.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/file-tree.css",
+          "type": "registry:file",
+          "target": "@assets/ui/file-tree.css"
+        }
+      ],
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "docs",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/file-tree.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "figure",
+      "type": "registry:component",
+      "description": "Native figure, caller media and optional semantic caption.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/figure.tsx",
+          "type": "registry:component",
+          "target": "@ui/figure.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/figure.css",
+          "type": "registry:file",
+          "target": "@assets/ui/figure.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "docs",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/figure.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "section-navigation",
+      "description": "Private copied native fragment/current and passive section geometry policy.",
+      "type": "registry:lib",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/lib/section-navigation.ts",
+          "type": "registry:lib",
+          "target": "@lib/section-navigation.ts"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "lib",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "docs",
+            "support"
+          ]
+        }
+      }
+    },
+    {
+      "name": "toc",
+      "type": "registry:component",
+      "description": "Native document outline and mobile disclosure.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/toc.tsx",
+          "type": "registry:component",
+          "target": "@ui/toc.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/toc.css",
+          "type": "registry:file",
+          "target": "@assets/ui/toc.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "section-navigation"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "docs",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/toc.css';"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
+    },
+    {
+      "name": "anchor-nav",
+      "type": "registry:component",
+      "description": "Native horizontal section navigation and passive current tracking.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/anchor-nav.tsx",
+          "type": "registry:component",
+          "target": "@ui/anchor-nav.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/anchor-nav.css",
+          "type": "registry:file",
+          "target": "@assets/ui/anchor-nav.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "section-navigation"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "docs",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/anchor-nav.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ruled-grid",
+      "type": "registry:component",
+      "description": "Responsive private Docs cards with native caller controls and logical rules.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/ruled-grid.tsx",
+          "type": "registry:component",
+          "target": "@ui/ruled-grid.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/ruled-grid.css",
+          "type": "registry:file",
+          "target": "@assets/ui/ruled-grid.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "docs",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/ruled-grid.css';"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "hero",
+      "type": "registry:component",
+      "description": "CSS-responsive document introduction with native actions and caller-owned aside.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/hero.tsx",
+          "type": "registry:component",
+          "target": "@ui/hero.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/hero.css",
+          "type": "registry:file",
+          "target": "@assets/ui/hero.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "docs",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/hero.css';"
+            }
+          ]
+        }
+      }
     }
   ],
   "meta": {
@@ -5535,9 +6305,26 @@
       },
       {
         "name": "layout-foundations",
-        "description": "CSS-first B seams shipped as the layout-objects style item: Stack, Cluster, Grid, Toolbar, Section, Split, and ScrollRegion.",
+        "description": "CSS layout objects and native scroll, media-ratio and local direction primitives.",
         "items": [
-          "layout-objects"
+          "layout-objects",
+          "scroll-area",
+          "aspect-ratio",
+          "direction",
+          "resizable",
+          "marker",
+          "trace",
+          "attachment",
+          "message-scroller",
+          "questionnaire",
+          "file-path-chip",
+          "attribute-chip",
+          "file-tree",
+          "figure",
+          "toc",
+          "anchor-nav",
+          "ruled-grid",
+          "hero"
         ]
       },
       {

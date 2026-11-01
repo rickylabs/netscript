@@ -12,7 +12,7 @@ export function PageHeaders() {
       <h2>Page header examples</h2>
       {(['default', 'with-tabs', 'with-status'] as const).map((variant) => (
         <section key={variant} id={`page-header-${variant}`} aria-label={`${variant} page header`}>
-          <button type='button' data-before-header>Before header</button>
+          <Button type='button' data-before-header>Before header</Button>
           <Tabs.Root defaultValue='overview'>
             <PageHeader
               variant={variant}
@@ -86,7 +86,7 @@ export function PageHeaders() {
               </>
             )}
           </Tabs.Root>
-          <button type='button' data-after-header>After header</button>
+          <Button type='button' data-after-header>After header</Button>
         </section>
       ))}
       <output aria-label='Page header actions'>{actions}</output>

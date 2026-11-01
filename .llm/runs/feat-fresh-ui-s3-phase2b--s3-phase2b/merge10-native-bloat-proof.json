@@ -1,0 +1,28 @@
+{
+  "raw": {
+    "bytes": {
+      "raw": 343829,
+      "gzip": 45015
+    },
+    "exitCode": 1,
+    "onlyExpectedBudgetFails": true,
+    "canonicalGeneration": true
+  },
+  "gzip": {
+    "bytes": {
+      "raw": 339329,
+      "gzip": 48435
+    },
+    "exitCode": 1,
+    "onlyExpectedBudgetFails": true,
+    "canonicalGeneration": true
+  },
+  "restored": {
+    "bytes": {
+      "raw": 335788,
+      "gzip": 44819
+    },
+    "exactHashes": true,
+    "positiveExitCode": 0
+  }
+}

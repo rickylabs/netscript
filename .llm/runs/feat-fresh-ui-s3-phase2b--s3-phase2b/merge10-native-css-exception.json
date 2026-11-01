@@ -1,0 +1,51 @@
+{
+  "files": 90,
+  "hashIdentical": 89,
+  "intentionalChangedFile": "packages/fresh-ui/registry/components/ui/navigation-menu.css",
+  "sourcePrefixByteIdentical": true,
+  "engines": [
+    {
+      "engine": "chromium",
+      "originalRules": 14,
+      "newRules": 15,
+      "oldRulesIdentical": true,
+      "addedRule": ".ns-navigation-menu summary > [data-scope=\"navigation-menu\"]:is([data-part=\"label\"], [data-part=\"chevron\"])",
+      "specificity": [
+        0,
+        3,
+        1
+      ],
+      "pointerScopeExact": true,
+      "summaryHoverUnchanged": true
+    },
+    {
+      "engine": "firefox",
+      "originalRules": 14,
+      "newRules": 15,
+      "oldRulesIdentical": true,
+      "addedRule": ".ns-navigation-menu summary > [data-scope=\"navigation-menu\"]:is([data-part=\"label\"], [data-part=\"chevron\"])",
+      "specificity": [
+        0,
+        3,
+        1
+      ],
+      "pointerScopeExact": true,
+      "summaryHoverUnchanged": true
+    },
+    {
+      "engine": "webkit",
+      "originalRules": 14,
+      "newRules": 15,
+      "oldRulesIdentical": true,
+      "addedRule": ".ns-navigation-menu summary > [data-scope=\"navigation-menu\"]:is([data-part=\"label\"], [data-part=\"chevron\"])",
+      "specificity": [
+        0,
+        3,
+        1
+      ],
+      "pointerScopeExact": true,
+      "summaryHoverUnchanged": true
+    }
+  ],
+  "existingHoverRuleDependenciesChanged": 0
+}

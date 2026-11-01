@@ -1,0 +1,193 @@
+{
+  "status": "COMMITTED_SOURCE_EVIDENCE_PASS",
+  "baselineHead": "f1889578720858e42448f5069b412db1dd8f1ef7",
+  "workingTree": true,
+  "sourceCarrierPaths": 23,
+  "sourceTypeScript": 9,
+  "browserTypeScript": 5,
+  "canonicalBuildArtifacts": 9,
+  "frozenDifferences": 0,
+  "inventory": 104,
+  "shippedWorkingTree": 104,
+  "phase2bMissingIdentitiesDelivered": 17,
+  "phase2bMissingTotal": 17,
+  "sourceWrappers": "PASS_9_EACH_0_DROPPED",
+  "browserWrappers": "PASS_4_PLUS_1_CHECK_5_LINT_FMT_0_DROPPED",
+  "nativePublication": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "slowTypes": 0
+  },
+  "qualityArchitecture": "PASS",
+  "releasePreflight": "PASS",
+  "docsAccuracy": "PASS",
+  "exportsDrift": "PASS",
+  "docsBuild": {
+    "verdict": "PASS",
+    "htmlFiles": 260,
+    "registryArtifacts": 135,
+    "existingDocumentedSyntaxAllowances": 4
+  },
+  "docLint": {
+    "rawExitCode": 1,
+    "acceptedExistingIssue": 2531,
+    "diagnostics": 124,
+    "typeScript": 123,
+    "jsonLimitations": 1,
+    "new": 0,
+    "removed": 0
+  },
+  "previousFocusedChromium": {
+    "passed": 28,
+    "label": "before final fixture formatting/visual corrections; historical, not final source proof"
+  },
+  "regressionControls": {
+    "border": "EXPECTED_FAIL_EXIT_1",
+    "nestedSourceContainment": "EXPECTED_FAIL_EXIT_1"
+  },
+  "fullPackage": {
+    "verdict": "PASS",
+    "passed": 801,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 801,
+    "uniqueFailures": 0,
+    "exitCode": 0,
+    "durationMs": 457995
+  },
+  "fullChromium": {
+    "status": "RUNNING",
+    "selected": 767
+  },
+  "affectedFirefoxWebkit": {
+    "verdict": "PASS",
+    "passed": 256,
+    "exitCode": 0,
+    "retries": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "captures": 120,
+    "durationMs": 475113
+  },
+  "dedicatedDocsBrowser": {
+    "verdict": "PASS",
+    "passed": 140,
+    "retries": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "exitCode": 0,
+    "captures": 128
+  },
+  "sameDesignReview": {
+    "round1": "FAIL_PLAN",
+    "round2": "PASS",
+    "failureStreak": 0,
+    "binding": "complementary ranges plus fractional width cases"
+  },
+  "sourceReview": {
+    "round1": "PASS",
+    "failureStreak": 0
+  },
+  "remaining": [
+    "actual six-component Desktop audit",
+    "production declared x extensions",
+    "all-style base/extension/browser harness",
+    "whole-phase runtime/final independent evaluation/exact-required-green-CI"
+  ],
+  "ready": false,
+  "latestFocused": {
+    "chromium": 28,
+    "firefoxWebkit": 56,
+    "verdict": "PASS",
+    "exitCode": 0,
+    "schemes": 2,
+    "widths": [
+      390,
+      1280
+    ],
+    "directions": [
+      "ltr",
+      "rtl"
+    ],
+    "newAxeAllowances": 0
+  },
+  "historicalAffectedFailure": {
+    "passed": 194,
+    "failed": 1,
+    "didNotRun": 61,
+    "label": "Before native caller Button correction; never final proof",
+    "reason": "WebKit dark raw fixture button contrast 1.81"
+  },
+  "browsers": {
+    "full-chromium": {
+      "verdict": "PASS",
+      "passed": 767,
+      "exitCode": 0,
+      "retries": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "captures": 420,
+      "durationMs": 911189.347
+    },
+    "cross": {
+      "verdict": "PASS",
+      "passed": 256,
+      "exitCode": 0,
+      "retries": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "captures": 120,
+      "durationMs": 475112.892
+    },
+    "docs-browser": {
+      "verdict": "PASS",
+      "passed": 140,
+      "exitCode": 0,
+      "retries": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "captures": 128,
+      "durationMs": 168126.55000000002
+    }
+  },
+  "wrappers": {
+    "source-check": {
+      "verdict": "PASS",
+      "selected": 9,
+      "dropped": 0
+    },
+    "source-lint": {
+      "verdict": "PASS",
+      "selected": 9,
+      "dropped": 0
+    },
+    "source-fmt": {
+      "verdict": "PASS",
+      "selected": 9,
+      "dropped": 0
+    },
+    "browser-fixture-check": {
+      "verdict": "PASS",
+      "selected": 4,
+      "dropped": 0
+    },
+    "browser-spec-check": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    },
+    "browser-lint": {
+      "verdict": "PASS",
+      "selected": 5,
+      "dropped": 0
+    },
+    "browser-fmt": {
+      "verdict": "PASS",
+      "selected": 5,
+      "dropped": 0
+    }
+  },
+  "failureStreak": 0,
+  "sourceHead": "fa28a6454f17dd43c0d191cf441136ba7c5cb0d3",
+  "committedSourceEvidenceReview": "PASS"
+}

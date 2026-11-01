@@ -86,8 +86,10 @@ from `@netscript/fresh-ui/primitives`.
 
 `DataGrid` is a generic, templated data-grid component exported from the package root. Unlike the
 copy-source registry items, it is a runtime export you import directly; you don't
-`netscript ui:add` it. It renders a token-styled `role="grid"` region from a `columns` contract and
-a `rows` contract, and supports plain, button, and Fresh client-navigation rows.
+`netscript ui:add` it. It renders a native table from `columns` and `rows`, with independent native
+checkboxes, buttons and Fresh links. Install its stylesheet with `netscript ui:add data-table`.
+A static DataTable frame needs no package runtime; using DataGrid also requires the package mapping
+(`deno add jsr:@netscript/fresh-ui`). The table adds no grid keyboard navigation engine.
 
 ### DataGrid props
 
@@ -95,8 +97,14 @@ a `rows` contract, and supports plain, button, and Fresh client-navigation rows.
 | --------------------- | ------------------------------ | ------------------------------------------------------------- |
 | `columns`             | `readonly DataGridColumn<T>[]` | Ordered column definitions (required).                        |
 | `rows`                | `readonly DataGridRow<T>[]`    | Ordered row definitions (required).                           |
-| `label`               | `string`                       | Accessible label applied as `aria-label` on the grid region.  |
+| `label`               | `string`                       | Accessible label applied to the native table.  |
 | `class`               | `string`                       | Additional class names appended to the `ns-data-grid` root.   |
+| `state` | `DataGridState` | Optional default/selection/empty/loading presentation; derives from rows and selection when omitted. |
+| `empty` / `loading` | `DataGridRenderable` | Caller-owned content in a spanning body cell; absent content stays empty. |
+| `selectedIds` | `ReadonlySet<string>` | Controlled row selection; visible counts ignore stale identities. |
+| `onSelectionChange` | `(ids: ReadonlySet<string>) => void` | Proposes a complete next set; refusal preserves checked and mixed properties. |
+| `renderBulkActions` | `(context: DataGridSelectionContext) => DataGridRenderable` | Visible selection actions outside the native table. |
+| `renderRowActions` | `(data: T, context: DataGridRowActionContext<T>) => DataGridRenderable` | Independent row-action controls. |
 | `[attribute: string]` | `unknown`                      | Any further native attributes are forwarded to the grid root. |
 
 ### `DataGridColumn<T>`
@@ -104,7 +112,9 @@ a `rows` contract, and supports plain, button, and Fresh client-navigation rows.
 | Field    | Type                             | Description                                                                                |
 | -------- | -------------------------------- | ------------------------------------------------------------------------------------------ |
 | `key`    | `string`                         | Property key used for fallback cell content and stable cell identity.                      |
-| `header` | `string`                         | Visible column header text.                                                                |
+| `header` | `DataGridRenderable` | Header text or caller-owned native sort control.                                                                |
+| `headerLabel` | `string` | Noninteractive mobile label; defaults to a string header or the key. |
+| `sort` | `"none"` / `"ascending"` / `"descending"` / `"other"` | Native header `aria-sort`; the host owns sorting. |
 | `width`  | `string`                         | CSS grid track width, e.g. `2fr` or `minmax(0, 12rem)`. Defaults to `minmax(0, 1fr)`.      |
 | `cell`   | `DataGridCellVariant`            | Optional built-in cell treatment: `"strong"` (bold) or `"num"` (monospace, right-aligned). |
 | `render` | `(row: T) => DataGridRenderable` | Optional per-column template receiving the row payload.                                    |
@@ -117,9 +127,22 @@ most one of `onSelect` or `href`.
 
 | Shape  | Distinguishing field          | Renders as                                                     |
 | ------ | ----------------------------- | -------------------------------------------------------------- |
-| Plain  | neither `onSelect` nor `href` | a `role="row"` `<div>`.                                        |
-| Button | `onSelect: () => void`        | a `role="row"` `<button>` that calls `onSelect` on click.      |
-| Link   | `href: string`                | a `role="row"` `<a f-client-nav>` for Fresh client navigation. |
+| Plain  | neither `onSelect` nor `href` | a native `<tr>` with no activation.                                        |
+| Button | `onSelect: () => void`        | a native `<tr>` containing an independent button.      |
+| Link   | `href: string`                | a native `<tr>` containing an independent Fresh link. |
+
+A row's optional `label` names its native activation and can localize the fallback `Open row <id>`.
+Primary body clicks activate that control; descendant controls and text selection remain independent.
+Control/Meta primary link-body clicks use the owned native link to open a new tab and restore its
+previous target. Shift, Alt and combined-modifier body clicks are not forwarded; direct links retain
+raw native event semantics. Middle-click and the native link
+context menu operate directly on its visible arrow, rather than the row body. Tab/Shift+Tab visit
+native controls; Enter activates links/buttons and Space activates buttons/checkboxes.
+
+Compatibility: this corrects the previous `role=grid` without grid navigation and whole-row action
+elements carrying `role=row`. The callback/data API stays available; static table rows no longer
+claim `aria-selected`. Header strings still work, but code reading the widened `header` value must
+narrow it before string operations or use `headerLabel`.
 
 ### DataGrid symbols
 
@@ -130,6 +153,7 @@ most one of `onSelect` or `href`.
 | `DataGridColumn<T>` / `DataGridProps<T>` / `DataGridRow<T>`   | interfaces / types | Column, props, and row contracts.                                                          |
 | `DataGridNode` / `DataGridRenderable` / `DataGridCellVariant` | types              | Structural node, renderable cell content, and the cell-variant union.                      |
 | `DataGridRowActionContext` / `DataGridSelectionContext`       | interfaces         | Context passed to row actions and selection observers.                                     |
+| `DataGridState` | type | Presentation union: default, selection, empty, loading. |
 
 ### DataGrid example
 
@@ -148,9 +172,10 @@ const columns: DataGridColumn<Invoice>[] = [
 ];
 
 const rows: DataGridRow<Invoice>[] = [
-  { id: 'inv-1', data: { id: 'inv-1', customer: 'Acme', total: 420 }, href: '/invoices/inv-1' },
+  { id: 'inv-1', label: 'Open Acme invoice', data: { id: 'inv-1', customer: 'Acme', total: 420 }, href: '/invoices/inv-1' },
   {
     id: 'inv-2',
+    label: 'Open Globex invoice',
     data: { id: 'inv-2', customer: 'Globex', total: 130 },
     selected: true,
     href: '/invoices/inv-2',

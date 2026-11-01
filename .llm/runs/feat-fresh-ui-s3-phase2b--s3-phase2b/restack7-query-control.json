@@ -1,0 +1,11 @@
+{
+  "verdict": "NATIVE_PARTITION_CONFIRMED",
+  "cases": 21,
+  "exclusiveModeCases": 21,
+  "neitherOrBothModeCases": 0,
+  "componentModeMatchesNativeReference": 21,
+  "webkitFractionalWidthsUseNarrow": 3,
+  "chromiumFirefoxFractionalWidthsUseWide": 6,
+  "settledFramesChangeCases": 0,
+  "productionChanges": 0
+}

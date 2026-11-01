@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import type { ComponentChildren, JSX } from 'preact';
 import { cn } from '../../registry/lib/cn.ts';
-
+import { Icon } from './primitives.tsx';
 import type {
   DataGridCellVariant,
   DataGridColumn,
@@ -20,22 +20,24 @@ export type {
   DataGridRow,
   DataGridRowActionContext,
   DataGridSelectionContext,
+  DataGridState,
 } from './data-grid-contract.ts';
 export { DATA_GRID_CELL_VARIANTS } from './data-grid-contract.ts';
 
-interface FreshAnchorNavigationAttributes extends JSX.AnchorHTMLAttributes<HTMLAnchorElement> {
-  'f-client-nav'?: boolean;
-}
+const ROW_CONTROL_SELECTOR =
+  'a,button,input,select,textarea,summary,label,[tabindex],[contenteditable],[role="button"],[role="link"],[role="checkbox"],[role="radio"],[role="switch"],[role="combobox"],[role="textbox"],[role="slider"],[role="spinbutton"],[role="menuitem"]';
+const DEFAULT_COLUMN_TRACK = 'minmax(0, 1fr)';
 
-/**
- * Renders a generic, templated, token-styled data grid.
- */
+/** Native table presentation with caller-owned data, content and controlled selection. */
 export function DataGrid<T>(
   {
     columns,
     rows,
     class: className,
     label,
+    state: requestedState,
+    empty,
+    loading,
     selectedIds,
     onSelectionChange,
     renderBulkActions,
@@ -43,204 +45,190 @@ export function DataGrid<T>(
     ...props
   }: DataGridProps<T>,
 ): DataGridNode {
-  if (!selectedIds && !onSelectionChange && !renderBulkActions && !renderRowActions) {
-    return renderLegacyDataGrid({ columns, rows, class: className, label, ...props });
-  }
-
-  const selected = selectedIds ?? new Set<string>();
-  const selectableIds = rows.map((row) => row.id);
-  const selectedCount = selectableIds.filter((id) => selected.has(id)).length;
-  const allSelected = rows.length > 0 && selectedCount === rows.length;
-  const indeterminate = selectedCount > 0 && !allSelected;
-  const selectionEnabled = Boolean(selectedIds || onSelectionChange);
+  const selected = selectedIds ?? new Set(rows.filter((row) => row.selected).map((row) => row.id));
+  const state = requestedState ??
+    (rows.length === 0
+      ? 'empty'
+      : rows.some((row) => selected.has(row.id))
+      ? 'selection'
+      : 'default');
+  const bodyState = state === 'empty' || state === 'loading';
+  const visibleRows = bodyState ? [] : rows;
+  const ids = visibleRows.map((row) => row.id);
+  const selectedCount = ids.filter((id) => selected.has(id)).length;
+  const allSelected = ids.length > 0 && selectedCount === ids.length;
+  const selectionEnabled = selectedIds !== undefined || onSelectionChange !== undefined;
   const selectionContext: DataGridSelectionContext = {
     count: selectedCount,
     selectedIds: selected,
     clearSelection: () => onSelectionChange?.(new Set()),
   };
-  const templateColumns = columns.map((column) => column.width ?? 'minmax(0, 1fr)').join(' ');
-  const tracks = [selectionEnabled ? '2.5rem' : '', templateColumns, renderRowActions ? 'auto' : '']
-    .filter(Boolean).join(' ');
+  const tracks = [
+    selectionEnabled ? '2.5rem' : '',
+    ...(columns.length
+      ? columns.map((column) => column.width ?? DEFAULT_COLUMN_TRACK)
+      : [DEFAULT_COLUMN_TRACK]),
+    renderRowActions ? 'auto' : '',
+  ].filter(Boolean).join(' ');
   const gridStyle: JSX.CSSProperties = { gridTemplateColumns: tracks };
-
-  const headCells: DataGridNode[] = [];
+  const columnCount = Math.max(
+    1,
+    Math.max(1, columns.length) + Number(selectionEnabled) + Number(Boolean(renderRowActions)),
+  );
+  const head: DataGridNode[] = [];
   if (selectionEnabled) {
-    headCells.push(renderSelectionCheckbox({
+    head.push(selectionCell({
+      header: true,
       checked: allSelected,
-      indeterminate,
+      indeterminate: selectedCount > 0 && !allSelected,
+      disabled: ids.length === 0,
       label: allSelected ? 'Clear selection' : 'Select all rows',
-      onChange: () => onSelectionChange?.(new Set(allSelected ? [] : selectableIds)),
+      onChange: () => onSelectionChange?.(new Set(allSelected ? [] : ids)),
     }));
   }
-  headCells.push(
-    ...columns.map((column) =>
+  head.push(...columns.map((column) =>
+    h('th', {
+      key: column.key,
+      scope: 'col',
+      role: 'columnheader',
+      'aria-sort': column.sort,
+      class: 'ns-data-grid__header-cell',
+      'data-part': 'header-cell',
+      'data-scope': 'data-table',
+    }, column.header as ComponentChildren)
+  ));
+  if (columns.length === 0) {
+    head.push(h('th', {
+      scope: 'col',
+      role: 'columnheader',
+      'aria-label': label ?? 'Row',
+      class: 'ns-data-grid__header-cell',
+      'data-part': 'header-cell',
+      'data-scope': 'data-table',
+    }));
+  }
+  if (renderRowActions) {
+    head.push(h('th', {
+      scope: 'col',
+      role: 'columnheader',
+      'aria-label': 'Row actions',
+      class: 'ns-data-grid__actions',
+      'data-part': 'actions',
+      'data-scope': 'data-table',
+    }));
+  }
+  const body = bodyState
+    ? [
       h(
-        'span',
+        'tr',
         {
-          key: column.key,
-          role: 'columnheader',
-          class: 'ns-data-grid__header-cell',
-          'data-part': 'header-cell',
+          role: 'row',
+          class: 'ns-data-grid__status-row',
+          'data-part': 'row',
           'data-scope': 'data-table',
         },
-        column.header,
-      ) as DataGridNode
-    ),
-  );
-  if (renderRowActions) {
-    headCells.push(
-      h('span', { role: 'columnheader', 'aria-label': 'Row actions' }) as DataGridNode,
+        h('td', {
+          role: 'cell',
+          colSpan: columnCount,
+          class: 'ns-data-grid__status',
+          'data-part': state,
+          'data-scope': 'data-table',
+        }, (state === 'loading' ? loading : empty) as ComponentChildren),
+      ),
+    ]
+    : visibleRows.map((row) =>
+      dataRow(
+        row,
+        columns,
+        gridStyle,
+        selected,
+        onSelectionChange,
+        selectionEnabled,
+        renderRowActions,
+      )
     );
-  }
-
   const children: DataGridNode[] = [];
   if (selectedCount > 0 && renderBulkActions) {
     children.push(h(
       'div',
       {
+        role: 'group',
+        'aria-label': `${selectedCount} selected`,
         class: 'ns-data-grid__bulk-actions',
         'data-part': 'bulk-actions',
         'data-scope': 'data-table',
-        role: 'toolbar',
-        'aria-label': `${selectedCount} selected`,
       },
       h('div', {
+        class: 'ns-data-grid__action-bar',
         'data-part': 'root',
         'data-scope': 'action-bar',
         'data-variant': 'inline',
-        style: { display: 'contents' },
       }, renderBulkActions(selectionContext) as ComponentChildren),
-    ) as DataGridNode);
+    ));
   }
-  children.push(
+  children.push(h(
+    'table',
+    {
+      role: 'table',
+      'aria-label': label,
+      'aria-labelledby': props['aria-labelledby'],
+      'aria-describedby': props['aria-describedby'],
+      'aria-busy': state === 'loading' ? 'true' : undefined,
+      class: 'ns-data-grid__table',
+      // Wide containers share these tracks through native CSS subgrid.
+      style: gridStyle,
+      'data-part': 'table',
+      'data-scope': 'data-table',
+    },
     h(
-      'div',
+      'thead',
       {
         role: 'rowgroup',
         class: 'ns-data-grid__head',
         'data-part': 'head',
         'data-scope': 'data-table',
       },
-      h('div', {
+      h('tr', {
         role: 'row',
         class: 'ns-data-grid__row',
         'data-type': 'header',
         'data-part': 'row',
         'data-scope': 'data-table',
         style: gridStyle,
-      }, headCells as ComponentChildren),
-    ) as DataGridNode,
-    h(
-      'div',
-      {
-        role: 'rowgroup',
-        class: 'ns-data-grid__body',
-        'data-part': 'body',
-        'data-scope': 'data-table',
-      },
-      rows.map((row) =>
-        renderEnhancedDataGridRow(
-          row,
-          columns,
-          gridStyle,
-          selected,
-          onSelectionChange,
-          selectionEnabled,
-          renderRowActions,
-        )
-      ),
-    ) as DataGridNode,
-  );
-
-  return h(
-    'div',
-    {
-      ...props,
-      role: 'grid',
-      'aria-label': label,
-      class: cn('ns-data-grid', className),
-      'data-part': 'root',
+      }, head as ComponentChildren),
+    ),
+    h('tbody', {
+      role: 'rowgroup',
+      class: 'ns-data-grid__body',
+      'data-part': 'body',
       'data-scope': 'data-table',
-      'data-responsive': '',
-      style: { overflowX: 'auto', ...(props.style as JSX.CSSProperties | undefined) },
-    },
-    children as ComponentChildren,
-  ) as DataGridNode;
+    }, body as ComponentChildren),
+  ));
+  return h('div', {
+    ...props,
+    class: cn('ns-data-grid', className),
+    'data-part': 'root',
+    'data-scope': 'data-table',
+    'data-state': state,
+  }, children as ComponentChildren);
 }
 
-function renderLegacyDataGrid<T>(
-  { columns, rows, class: className, label, ...props }: DataGridProps<T>,
-): DataGridNode {
-  const templateColumns = columns.map((column) => column.width ?? 'minmax(0, 1fr)').join(' ');
-  const gridStyle: JSX.CSSProperties = { gridTemplateColumns: templateColumns };
-  return h(
-    'div',
-    {
-      ...props,
-      role: 'grid',
-      'aria-label': label,
-      class: cn('ns-data-grid', className),
-      'data-part': 'root',
-      'data-scope': 'data-table',
-    },
-    h(
-      'div',
-      {
-        role: 'rowgroup',
-        class: 'ns-data-grid__head',
-        'data-part': 'head',
-        'data-scope': 'data-table',
-      },
-      h(
-        'div',
-        {
-          role: 'row',
-          class: 'ns-data-grid__row',
-          'data-type': 'header',
-          'data-part': 'row',
-          'data-scope': 'data-table',
-          style: gridStyle,
-        },
-        columns.map((column) =>
-          h(
-            'span',
-            {
-              key: column.key,
-              role: 'columnheader',
-              class: 'ns-data-grid__header-cell',
-              'data-part': 'header-cell',
-              'data-scope': 'data-table',
-            },
-            column.header,
-          )
-        ),
-      ),
-    ),
-    h(
-      'div',
-      {
-        role: 'rowgroup',
-        class: 'ns-data-grid__body',
-        'data-part': 'body',
-        'data-scope': 'data-table',
-      },
-      rows.map((row) => renderDataGridRow(row, columns, gridStyle)),
-    ),
-  ) as DataGridNode;
-}
-
-interface SelectionCheckboxOptions {
+interface SelectionOptions {
+  header?: boolean;
   checked: boolean;
   indeterminate: boolean;
+  disabled?: boolean;
   label: string;
   onChange: () => void;
 }
 
-function renderSelectionCheckbox(options: SelectionCheckboxOptions): DataGridNode {
+/** Reconcile native properties before proposing selection so a refusal is physical. */
+function selectionCell(options: SelectionOptions): DataGridNode {
   return h(
-    'span',
+    options.header ? 'th' : 'td',
     {
-      role: 'gridcell',
+      role: options.header ? 'columnheader' : 'cell',
+      scope: options.header ? 'col' : undefined,
       class: 'ns-data-grid__selection',
       'data-part': 'selection',
       'data-scope': 'data-table',
@@ -248,18 +236,23 @@ function renderSelectionCheckbox(options: SelectionCheckboxOptions): DataGridNod
     h('input', {
       type: 'checkbox',
       checked: options.checked,
+      disabled: options.disabled,
       'aria-label': options.label,
       'aria-checked': options.indeterminate ? 'mixed' : String(options.checked),
       ref: (element: HTMLInputElement | null) => {
         if (element) element.indeterminate = options.indeterminate;
       },
       onClick: (event: Event) => event.stopPropagation(),
-      onChange: options.onChange,
+      onChange: (event: JSX.TargetedEvent<HTMLInputElement>) => {
+        event.currentTarget.checked = options.checked;
+        event.currentTarget.indeterminate = options.indeterminate;
+        options.onChange();
+      },
     }),
-  ) as DataGridNode;
+  );
 }
 
-function renderEnhancedDataGridRow<T>(
+function dataRow<T>(
   row: DataGridRow<T>,
   columns: readonly DataGridColumn<T>[],
   gridStyle: JSX.CSSProperties,
@@ -271,7 +264,7 @@ function renderEnhancedDataGridRow<T>(
   const selected = selectedIds.has(row.id);
   const cells: DataGridNode[] = [];
   if (selectionEnabled) {
-    cells.push(renderSelectionCheckbox({
+    cells.push(selectionCell({
       checked: selected,
       indeterminate: false,
       label: `Select row ${row.id}`,
@@ -282,167 +275,123 @@ function renderEnhancedDataGridRow<T>(
       },
     }));
   }
-  cells.push(
-    ...columns.map((column, index) =>
-      row.href && index === 0
-        ? renderDataGridLinkCell(row.data, column, row.href)
-        : renderDataGridCell(row.data, column)
-    ),
-  );
+  const activation = rowActivation(row);
+  cells.push(...columns.map((column, index) => {
+    const content = column.render
+      ? column.render(row.data)
+      : fallbackCellContent(row.data, column.key);
+    return h(
+      'td',
+      {
+        key: column.key,
+        role: 'cell',
+        class: 'ns-data-grid__cell',
+        'data-part': 'cell',
+        'data-scope': 'data-table',
+        'data-variant': column.cell,
+      },
+      h('span', {
+        class: 'ns-data-grid__cell-label',
+        'data-part': 'cell-label',
+        'data-scope': 'data-table',
+        'aria-hidden': 'true',
+      }, column.headerLabel ?? (typeof column.header === 'string' ? column.header : column.key)),
+      renderCellContent(content, column.cell) as ComponentChildren,
+      index === 0 ? activation as ComponentChildren : null,
+    );
+  }));
+  if (columns.length === 0) {
+    cells.push(
+      h('td', {
+        role: 'cell',
+        class: 'ns-data-grid__cell',
+        'data-part': 'cell',
+        'data-scope': 'data-table',
+      }, activation as ComponentChildren),
+    );
+  }
   if (renderRowActions) {
-    cells.push(h('span', {
-      role: 'gridcell',
+    cells.push(h('td', {
+      role: 'cell',
       class: 'ns-data-grid__actions',
       'data-part': 'actions',
       'data-scope': 'data-table',
       onClick: (event: Event) => event.stopPropagation(),
-    }, renderRowActions(row.data, { row, selected }) as ComponentChildren) as DataGridNode);
+    }, renderRowActions(row.data, { row, selected }) as ComponentChildren));
   }
-  const activate = row.onSelect;
-  return h(
-    'div',
-    {
-      key: row.id,
-      role: 'row',
-      'aria-selected': selected ? 'true' : undefined,
-      class: cn('ns-data-grid__row'),
-      'data-state': selected ? ('selected') : undefined,
-      'data-interactive': (row.onSelect || row.href) ? ('true') : undefined,
-      'data-part': 'row',
-      'data-scope': 'data-table',
-      style: gridStyle,
-      tabIndex: activate ? 0 : undefined,
-      onClick: activate,
-      onKeyDown: activate
-        ? (event: KeyboardEvent) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            activate();
-          }
-        }
-        : undefined,
-    },
-    cells as ComponentChildren,
-  ) as DataGridNode;
+  return h('tr', {
+    key: row.id,
+    role: 'row',
+    class: 'ns-data-grid__row',
+    style: gridStyle,
+    'data-part': 'row',
+    'data-scope': 'data-table',
+    'data-state': selected ? 'selected' : undefined,
+    'data-interactive': row.onSelect || row.href !== undefined ? 'true' : undefined,
+    'data-type': row.onSelect ? 'button' : row.href !== undefined ? 'link' : undefined,
+    onClick: activation ? activateRowFromPointer : undefined,
+  }, cells as ComponentChildren);
 }
 
-function renderDataGridLinkCell<T>(
-  row: T,
-  column: DataGridColumn<T>,
-  href: string,
-): DataGridNode {
-  const content = column.render ? column.render(row) : fallbackCellContent(row, column.key);
-  return h(
-    'span',
-    {
-      key: column.key,
-      role: 'gridcell',
-      class: 'ns-data-grid__cell',
-      'data-part': 'cell',
-      'data-scope': 'data-table',
-    },
-    h(
-      'a',
-      {
-        href,
-        'f-client-nav': true,
-        class: 'ns-data-grid__row-link',
-        'data-part': 'row-link',
-        'data-scope': 'data-table',
-      },
-      renderCellContent(content, column.cell) as ComponentChildren,
-    ),
-  ) as DataGridNode;
+/** Body clicks use the real control without intercepting native text selection or child controls. */
+function activateRowFromPointer(event: JSX.TargetedMouseEvent<HTMLTableRowElement>): void {
+  if (!event.isTrusted || event.defaultPrevented) return;
+  if (event.type !== 'click' || event.button !== 0) return;
+  if (event.shiftKey || event.altKey || (event.ctrlKey && event.metaKey)) return;
+  const row = event.currentTarget;
+  const target = event.target;
+  if (
+    !(target instanceof Element) || target.closest('tr') !== row ||
+    target.closest(ROW_CONTROL_SELECTOR)
+  ) return;
+  const selection = row.ownerDocument.getSelection();
+  if (
+    selection && !selection.isCollapsed &&
+    (row.contains(selection.anchorNode) || row.contains(selection.focusNode))
+  ) return;
+  const activation = Array.from(row.querySelectorAll<HTMLButtonElement | HTMLAnchorElement>(
+    '.ns-data-grid__row-action, .ns-data-grid__row-link',
+  )).find((control) => control.closest('tr') === row);
+  if (!activation) return;
+  if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
+    activation.focus({ preventScroll: true });
+  }
+  if (activation instanceof HTMLAnchorElement && (event.ctrlKey || event.metaKey)) {
+    const target = activation.getAttribute('target');
+    try {
+      activation.setAttribute('target', '_blank');
+      activation.click();
+    } finally {
+      if (target === null) activation.removeAttribute('target');
+      else activation.setAttribute('target', target);
+    }
+  } else activation.dispatchEvent(new MouseEvent(event.type, event));
+  event.stopPropagation();
 }
 
-function renderDataGridRow<T>(
-  row: DataGridRow<T>,
-  columns: readonly DataGridColumn<T>[],
-  gridStyle: JSX.CSSProperties,
-): DataGridNode {
-  const rowClass = cn('ns-data-grid__row');
-  const cells = columns.map((column) => renderDataGridCell(row.data, column));
-  const selected = row.selected ? 'true' : undefined;
-
+/** Real sibling control: arbitrary cell renderers are never nested in this action. */
+function rowActivation<T>(row: DataGridRow<T>): DataGridNode | null {
   if (row.onSelect) {
-    return h(
-      'button',
-      {
-        key: row.id,
-        type: 'button',
-        role: 'row',
-        'aria-selected': selected,
-        class: rowClass,
-        'data-state': (row.selected) ? ('selected') : undefined,
-        'data-type': row.href ? 'link' : 'button',
-        'data-part': 'row',
-        'data-scope': 'data-table',
-        style: gridStyle,
-        onClick: row.onSelect,
-      },
-      cells as ComponentChildren,
-    ) as DataGridNode;
+    return h('button', {
+      type: 'button',
+      class: 'ns-data-grid__row-action',
+      onClick: row.onSelect,
+      'aria-label': row.label ?? `Open row ${row.id}`,
+      'data-part': 'row-action',
+      'data-scope': 'data-table',
+    }, Icon({ name: 'arrow-right', size: 14 }) as ComponentChildren);
   }
-
-  if (row.href) {
-    const linkProps: FreshAnchorNavigationAttributes = {
+  if (row.href !== undefined) {
+    return h('a', {
       href: row.href,
       'f-client-nav': true,
-    };
-
-    return h(
-      'a',
-      {
-        key: row.id,
-        ...linkProps,
-        role: 'row',
-        'aria-selected': selected,
-        class: rowClass,
-        'data-state': (row.selected) ? ('selected') : undefined,
-        'data-type': row.href ? 'link' : 'button',
-        'data-part': 'row',
-        'data-scope': 'data-table',
-        style: gridStyle,
-      },
-      cells as ComponentChildren,
-    ) as DataGridNode;
+      class: 'ns-data-grid__row-link',
+      'aria-label': row.label ?? `Open row ${row.id}`,
+      'data-part': 'row-link',
+      'data-scope': 'data-table',
+    }, Icon({ name: 'arrow-right', size: 14 }) as ComponentChildren);
   }
-
-  return h(
-    'div',
-    {
-      key: row.id,
-      role: 'row',
-      'aria-selected': selected,
-      class: rowClass,
-      'data-state': (row.selected) ? ('selected') : undefined,
-      'data-type': ((row.href) ? ('link') : undefined) ?? ((row.onSelect) ? ('button') : undefined),
-      'data-part': 'row',
-      'data-scope': 'data-table',
-      style: gridStyle,
-    },
-    cells as ComponentChildren,
-  ) as DataGridNode;
-}
-
-function renderDataGridCell<T>(
-  row: T,
-  column: DataGridColumn<T>,
-): DataGridNode {
-  const content = column.render ? column.render(row) : fallbackCellContent(row, column.key);
-
-  return h(
-    'span',
-    {
-      key: column.key,
-      role: 'gridcell',
-      class: cn('ns-data-grid__cell', column.cell && ''),
-      'data-variant': (column.cell) ? (column.cell) : undefined,
-      'data-part': 'cell',
-      'data-scope': 'data-table',
-    },
-    renderCellContent(content, column.cell) as ComponentChildren,
-  ) as DataGridNode;
+  return null;
 }
 
 function renderCellContent(
@@ -456,7 +405,6 @@ function renderCellContent(
       'data-scope': 'data-table',
     }, content as ComponentChildren);
   }
-
   if (variant === 'num') {
     return h('span', {
       class: 'ns-data-grid__cell-num',
@@ -464,27 +412,13 @@ function renderCellContent(
       'data-scope': 'data-table',
     }, content as ComponentChildren);
   }
-
   return content;
 }
 
 function fallbackCellContent<T>(row: T, key: string): DataGridRenderable {
-  if (!row || typeof row !== 'object' || !(key in row)) {
-    return null;
-  }
-
+  if (!row || typeof row !== 'object' || !(key in row)) return null;
   const value = (row as Record<string, unknown>)[key];
-  if (value === null || value === undefined || typeof value === 'boolean') {
-    return value;
-  }
-
-  if (typeof value === 'string' || typeof value === 'number') {
-    return value;
-  }
-
-  if (typeof value === 'bigint') {
-    return value.toString();
-  }
-
+  if (value === null || value === undefined || typeof value === 'boolean') return value;
+  if (typeof value === 'string' || typeof value === 'number') return value;
   return String(value);
 }

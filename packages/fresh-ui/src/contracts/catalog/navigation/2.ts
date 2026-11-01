@@ -9,57 +9,89 @@ export const navigation_2: readonly ComponentContract[] = [
     'priority': 'P0',
     'shipped': true,
     'props': {
-      'variant': {
+      'sidebarVariant': {
         'kind': 'enum',
         'values': [
           'sidebar',
           'floating',
           'inset',
         ],
+        'default': 'sidebar',
       },
-      'collapsible': {
+      'sidebar': {
         'kind': 'enum',
         'values': [
           'expanded',
-          'icon',
-          'offcanvas',
+          'collapsed',
+          'none',
         ],
+        'default': 'expanded',
       },
-      'state': {
-        'kind': 'enum',
-        'values': [
-          'rest',
-          'hover',
-          'focus',
-          'selected',
-          'disabled',
-        ],
+      'navigation': {
+        'kind': 'collection',
+        'required': true,
       },
-      'level': {
+      'navigation[].collapsible': {
+        'kind': 'boolean',
+        'default': false,
+      },
+      'navigation[].defaultOpen': {
+        'kind': 'boolean',
+        'default': true,
+      },
+      'navigation[].label': {
+        'kind': 'text',
+        'description': 'Required nonblank for collapsible native sections.',
+      },
+      'navigation[].items[].href': {
+        'kind': 'text',
+        'required': true,
+      },
+      'navigation[].items[].label': {
+        'kind': 'text',
+        'required': true,
+      },
+      'navigation[].items[].icon': {
+        'kind': 'slot',
+      },
+      'navigation[].items[].count': {
+        'kind': 'slot',
+      },
+      'navigation[].items[].level': {
         'kind': 'enum',
         'values': [
           '1',
           '2',
         ],
+        'default': '1',
       },
-      'collapsed': {
-        'kind': 'enum',
-        'values': [
-          'false',
-          'true',
-        ],
-      },
-      'icon': {
+      'navigation[].items[].disabled': {
         'kind': 'boolean',
+        'default': false,
       },
-      'count': {
+      'navigation[].items[].marker': {
         'kind': 'boolean',
+        'default': true,
       },
-      'chevron': {
+      'navigation[].items[].chevron': {
         'kind': 'boolean',
+        'default': false,
       },
-      'marker': {
+      'navigation[].items[].matchPrefix': {
         'kind': 'boolean',
+        'default': false,
+      },
+      'navigation[].items[].isActive': {
+        'kind': 'callback',
+      },
+      'brand': {
+        'kind': 'slot',
+      },
+      'brandBadge': {
+        'kind': 'slot',
+      },
+      'footer': {
+        'kind': 'slot',
       },
     },
     'parts': [
@@ -131,18 +163,10 @@ export const navigation_2: readonly ComponentContract[] = [
           'floating',
           'inset',
         ],
-        'plannedValues': [
-          'floating',
-          'inset',
-        ],
       },
       'data-collapsible': {
         'values': [
           'expanded',
-          'icon',
-          'offcanvas',
-        ],
-        'plannedValues': [
           'icon',
           'offcanvas',
         ],
@@ -157,11 +181,17 @@ export const navigation_2: readonly ComponentContract[] = [
         ],
         'description':
           'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+        'parts': [
+          'nav-item',
+        ],
       },
       'data-level': {
         'values': [
           '1',
           '2',
+        ],
+        'parts': [
+          'nav-item',
         ],
       },
       'data-collapsed': {
@@ -169,17 +199,42 @@ export const navigation_2: readonly ComponentContract[] = [
           'false',
           'true',
         ],
+        'parts': [
+          'nav-item',
+        ],
       },
     },
     'booleans': [
-      'icon',
-      'count',
-      'chevron',
-      'marker',
-      'collapsible',
+      'navigation[].collapsible',
+      'navigation[].defaultOpen',
+      'navigation[].items[].disabled',
+      'navigation[].items[].marker',
+      'navigation[].items[].chevron',
+      'navigation[].items[].matchPrefix',
     ],
-    'slots': [],
-    'apg': 'native navigation links',
+    'slots': [
+      {
+        'name': 'brand',
+        'part': 'brand-group',
+      },
+      {
+        'name': 'brandBadge',
+        'part': 'sidebar-header',
+      },
+      {
+        'name': 'footer',
+        'part': 'sidebar-footer',
+      },
+      {
+        'name': 'navigation[].items[].icon',
+        'part': 'nav-icon',
+      },
+      {
+        'name': 'navigation[].items[].count',
+        'part': 'count',
+      },
+    ],
+    'apg': 'native navigation links and native details disclosures',
     'keyboard': [
       {
         'key': 'Tab',
@@ -188,6 +243,10 @@ export const navigation_2: readonly ComponentContract[] = [
       {
         'key': 'Enter',
         'action': 'Follow link',
+      },
+      {
+        'key': 'Enter/Space',
+        'action': 'Toggle a native collapsible section summary.',
       },
     ],
     'tokenRoles': [
@@ -202,6 +261,8 @@ export const navigation_2: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Audited baseline: research-only flat state/level/count/etc props are actual SidebarShell navigation records; variant maps to sidebarVariant. Native hover/focus are CSS, while rest/selected/disabled are derived. Root collapsible derives expanded/icon/offcanvas from desktop presentation and measured mobile geometry.',
+      'Native ul/li/a destinations retain aria-current; disabled items omit href, collapsed items retain accessible labels. Groups use native details/summary, independent of the outer static shell disclosure.',
     ],
   },
   {
@@ -211,19 +272,23 @@ export const navigation_2: readonly ComponentContract[] = [
     'priority': 'P0',
     'shipped': true,
     'props': {
-      'variant': {
+      'topbarStart': {
+        'kind': 'slot',
+      },
+      'topbarEnd': {
+        'kind': 'slot',
+      },
+      'topbarBrand': {
+        'kind': 'slot',
+      },
+      'layout': {
         'kind': 'enum',
         'values': [
-          'app',
+          'dashboard',
+          'chat',
           'docs',
         ],
-      },
-      'breakpoint': {
-        'kind': 'enum',
-        'values': [
-          'desktop',
-          'mobile',
-        ],
+        'default': 'dashboard',
       },
     },
     'parts': [
@@ -241,10 +306,12 @@ export const navigation_2: readonly ComponentContract[] = [
       {
         'name': 'logo',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'context',
       },
       {
         'name': 'wordmark',
         'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'context',
       },
       {
         'name': 'topbar-end',
@@ -263,10 +330,25 @@ export const navigation_2: readonly ComponentContract[] = [
           'desktop',
           'mobile',
         ],
+        'description':
+          'Measured after hydration; absent on SSR, tablet and mobile both use mobile topbar geometry.',
       },
     },
     'booleans': [],
-    'slots': [],
+    'slots': [
+      {
+        'name': 'topbarStart',
+        'part': 'topbar-start',
+      },
+      {
+        'name': 'topbarEnd',
+        'part': 'topbar-end',
+      },
+      {
+        'name': 'topbarBrand',
+        'part': 'brand',
+      },
+    ],
     'apg': 'native buttons and links',
     'keyboard': [
       {
@@ -288,6 +370,7 @@ export const navigation_2: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Audited baseline: SidebarShell owns this topbar. variant app/docs and breakpoint are derived, not independent accepted props. Host owns logo/wordmark within topbarBrand. No future post-canary navigation promotion is included.',
     ],
   },
   {

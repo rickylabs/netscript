@@ -31,7 +31,7 @@ export function DisplayBasics() {
         <output aria-label='Order reviews'>{count}</output>
       </section>
       <section aria-label='Keyboard notation' id='display-kbd'>
-        <button type='button' id='before-kbd'>Before notation</button>
+        <Button type='button' id='before-kbd'>Before notation</Button>
         <p>
           Press{' '}
           <Kbd.Group>
@@ -49,14 +49,14 @@ export function DisplayBasics() {
             <Kbd>P</Kbd>
           </Kbd.Group>
         </span>
-        <button type='button' id='after-kbd'>After notation</button>
+        <Button type='button' id='after-kbd'>After notation</Button>
       </section>
       <section aria-label='Native disclosure' id='display-disclosure'>
         <Collapsible label='Repository details'>
           <a href='#repository'>Open repository</a>
         </Collapsible>
         <Collapsible label='Unavailable details' disabled>
-          <button type='button'>Hidden action</button>
+          <Button type='button'>Hidden action</Button>
         </Collapsible>
         <Collapsible
           label='Controlled details'
@@ -66,10 +66,10 @@ export function DisplayBasics() {
           <a href='#controlled-details'>Controlled content</a>
         </Collapsible>
         <output aria-label='Disclosure requests'>{requests}</output>
-        <button type='button' onClick={() => setControlled(!controlled)}>
+        <Button type='button' onClick={() => setControlled(!controlled)}>
           Set disclosure externally
-        </button>
-        <button type='button' id='after-disclosure'>After disclosure</button>
+        </Button>
+        <Button type='button' id='after-disclosure'>After disclosure</Button>
       </section>
     </>
   );

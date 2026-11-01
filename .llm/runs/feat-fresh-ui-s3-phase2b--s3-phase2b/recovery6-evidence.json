@@ -1,0 +1,54 @@
+{
+  "base": "7feb24c7d09518a045c3955555967dbbde51e92a",
+  "parent": "71d8df6fca2340f1ccc0dcce19accbb88fa44e64",
+  "reviewedHead": "3c6fde06df01b59e34dd4445ebb1c07e5b5635c7",
+  "sourceComparison": {
+    "files": 636,
+    "changed": 0,
+    "excludedInheritedLock": "packages/fresh-ui/deno.lock",
+    "topicLockDelta": 0
+  },
+  "packageTests": {
+    "exitCode": 0,
+    "passed": 640,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 640,
+    "uniqueFailures": 0
+  },
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "qualityArchitecture": {
+    "verdict": "PASS",
+    "exitCode": 0
+  },
+  "independentIntegrationReview": "PASS",
+  "browser": "UNCHANGED_SOURCE_PREDECESSOR_PROOF_ONLY",
+  "runtime": "NEW_HEAD_UNPROVEN",
+  "requiredRemoteCI": "PENDING_DRAFT_CHECKS_SKIPPED",
+  "ready": false
+}

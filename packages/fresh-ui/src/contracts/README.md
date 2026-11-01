@@ -90,3 +90,175 @@ the localized label visually hidden so assistive technology still receives the m
 The title uses body size and Medium label weight. After uncontrolled dismissal the browser may
 move focus to the document body; native Tab continues after the former dismiss button. Applications
 that require a particular restoration target own that policy.
+
+
+## Native Layout components
+
+`ui:add scroll-area`, `ui:add aspect-ratio` and `ui:add direction` install the
+real sources. ScrollArea requires `label` to name its native viewport; the caller
+sets frame dimensions. Its viewport is always tabbable for stable SSR/hydration.
+Vertical, horizontal and both axes use native overflow. Scrollbar, thumb and
+corner are native parts: standard thin-scrollbar geometry is platform-dependent;
+exact 6/8px hover growth is available only in older WebKit styling implementations.
+No fake scrollbar controls are rendered.
+
+AspectRatio defaults to16:9 and also accepts4:3,1:1,21:9. It clips media to the
+existing card radius; the host owns image alternatives and interactive labels.
+The frame adds no keyboard stop.
+
+DirectionProvider aliases Direction. The JSX-safe `as` form renders the caller's
+native boundary directly; no extra wrapper is added. Supported containers are
+`div`, `section`, `main`, `article`, `aside`, `nav`, `header`, `footer`, `form`, `span`.
+Native props, class, style and handlers pass through; `boundaryRef` refers to the
+native element. Direction owns `dir` and its contract markers. Nested boundaries
+remain local and never mutate document direction.
+
+```tsx
+import { Direction } from './components/ui/direction.tsx';
+
+<Direction as='section' dir='rtl'><input aria-label='Search' /></Direction>;
+```
+
+Without `as`, pass exactly one unscoped native HTML VNode. It is cloned with its
+key, ref and existing props preserved; supplied native props override the child's,
+and Direction overwrites its `dir`. Fragments, arrays, custom components and
+already scoped boundaries fail clearly. Preact precompile represents static JSX
+as template fragments, so use `as` for ordinary JSX, or `h` to create an explicitly
+cloneable boundary. Both forms render a single native boundary.
+
+From the first phase2b identity, `tests/contracts/strict-render-policy.ts` selects
+strict checks explicitly. Rendered data attributes must be scope/part markers,
+canonical axes on their declared parts, or independently reviewed private
+component/part bindings with a purpose. Unknown attributes, bare/unquoted
+attributes, undeclared `data-x-*`, wrong-part axes and invalid values fail. The
+all-style slice extends this same policy to existing source fixtures.
+
+
+### Resizable
+
+`ui:add resizable` installs two panels and a native focusable splitter. Hydrate it
+inside a Fresh island. The host sets frame dimensions and owns its panel content:
+
+```tsx
+import { Resizable } from './components/ui/resizable.tsx';
+
+<Resizable
+  label='Contents'
+  endLabel='Document'
+  style={{ height: 240 }}
+  startContent={<a href='#chapter'>Chapter one</a>}
+  endContent={<article id='chapter'>Chapter content</article>}
+/>;
+```
+
+`direction` defaults to horizontal; vertical stacks the panels. The primary size
+is in **pixels**: `defaultSize` initially uses280 horizontal or160 vertical.
+For controlled state pass `size` and accept proposals through `onSizeChange`.
+Refusing a proposal keeps the visible controlled size. Arrow keys use `step`
+(default10); Home/End use current bounds. Horizontal arrows follow local native
+RTL direction. This is the resize-only APG subset: no Enter collapse or F6 mode.
+
+`minSize` defaults to80, `maxSize` is unbounded, and `endMinSize` defaults to80.
+Tiny containers adapt both minima to the available extent. Container resizing
+clamps displayed geometry without invoking `onSizeChange`; the requested size
+is retained and restored when space returns. The next interaction proposes from
+current displayed geometry and current bounds. Pointer drags use native capture;
+only the handle disables touch scrolling. Observers and active captures are
+released on unmount or direction change.
+
+`label` names the primary panel and separator. `labelledBy` may point both names
+at a visible heading; a nonblank fallback label remains required. `endLabel`
+names the secondary panel. Both independently scrollable panels are consistently
+tabbable, including text-only overflow; native child controls retain their place
+in source order. Before hydration and positive measurement, the handle is a
+static decorative part with no invented separator values or keyboard stop.
+After measurement it exposes actual percentage bounds/current value, pixel text,
+and `aria-controls` pointing at the primary group. `grip={false}` hides only the
+decorative grip; the24px hit target and keyboard behavior remain.
+
+The grip uses the shared `grip-vertical` Lucide glyph (10px, six source circles),
+with its existing source/license notice. The registry item contributes the
+package runtime dependency used by the public Icon primitive; no drag library is
+installed. Native keyboard, pointer/touch, controlled refusal, responsive bounds,
+cleanup and strict accessibility evidence live in
+`tools/fresh-ui-browser/gap-tests/resizable.spec.ts`.
+
+
+### Native modal close ownership
+
+Dialog and Sheet share native dialog synchronization. A cancelable Escape is a
+close proposal: a controlled parent may refuse it. Consumer onCancel vetoes and
+closeOnEscape=false still apply to cancelable requests. Repeated platform close
+requests can become non-cancelable; that native close stands and reports
+onOpenChange(false, { reason: 'native-close' }). Controlled parents should accept
+false for native-close to keep the modal closed. A later parent render that still
+accepts open=true asks the synchronizer to reopen it, even when the prop value did
+not change. The close handler never schedules a render just to reopen a modal.
+Uncontrolled state follows native closure.
+
+An accepted escape-key close is followed by the queued native-close notification;
+that existing reason order is preserved. The real-keyboard regression cases are
+in tools/fresh-ui-browser/gap-tests/dialog-ownership.spec.ts. Keep consecutive
+Escape presses adjacent: automation DOM queries can grant user activation between
+presses and obscure the browser's forced-close path. See the
+[HTML close-request standard](https://html.spec.whatwg.org/dev/interaction.html)
+and [native dialog guidance](https://developer.chrome.com/docs/modern-web-guidance/guides/ui-components/dialog).
+
+
+### SidebarShell: one responsive shell family
+
+`ui:add sidebar-shell` installs the single AppShell/Sidebar/TopBar family; its
+existing copy target and inputs remain supported. `ui:add sidebar-toggle` adds
+an independently hydrated control for server-only shells. Both use the private
+copied `sidebar-support` item. Extend the public anatomy in the canonical L1,
+N4/N5/N10 catalogs before adding a new component part or attribute.
+
+The shell accepts required `pathname`, `navigation`, `brand` and `children`,
+plus the existing `brandBadge`, `footer`, `topbarStart`, `topbarEnd`, `contentId`
+(default `main-content`), `navLabel`, native root attributes and `class`.
+`layout` is `dashboard` (default), `chat` or `docs`; docs places its topbar across
+both columns. `sidebar` is `expanded` (default), `collapsed` or `none`; `nav=false`
+also selects none. `sidebarVariant` is `sidebar`, `floating` or `inset`.
+`topbarBrand` is optional, with app-owned logo/wordmark content.
+
+`rail=true` enables an optional 280px desktop `railContent` lane;
+`mobileRailContent` supplies its explicit mobile path. Chat places optional
+`session`, a scrollable `thread`, and optional `composer` in the bounded viewport.
+`children` supplies the thread unless `thread` is explicitly provided. Hosts own
+messages, forms, business effects and document content. `breakpoint` is measured
+after hydration, never an accepted input; the server omits the unknown attribute.
+
+Navigation sections keep `label`/`items` and can use `collapsible` with a required
+nonblank label and `defaultOpen` (default true). Items keep href/label/icon,
+matchPrefix and isActive; add optional level 1/2, disabled, count, marker (default
+true) and chevron (default false). They remain native list links, not an ARIA
+menu or tree. Disabled destinations omit href and tab stops; collapsed links
+retain an accessible label. Collapsible groups use native details/summary.
+
+SSR renders one initially open native details navigation. It remains in normal
+flow and works without JavaScript, including nested group summaries. The mobile
+fallback may initially be expanded and shift when whole-shell hydration selects
+the native mobile modal. A server-only Shell plus independently hydrated
+SidebarToggle keeps this native disclosure. Its default selectors connect only
+to the nearest shell; explicit selector overrides preserve standalone behavior.
+Disabled, absent or unconnected custom controls leave the built-in access path.
+
+Whole-shell hydration must happen within a Fresh island. All props crossing that
+boundary must be serializable: JSX slots and plain navigation records work;
+`isActive` functions and callback ports must be defined inside the island that
+owns the shell. The first client render matches the static server disclosure;
+a layout effect then chooses one desktop aside or one native mobile/tablet
+Dialog, with no duplicate navigation. Browser modality owns inertness, focus,
+Escape, backdrop and return. Native Tab may enter browser chrome; this is not a
+reason to install a document-level focus trap.
+
+`sidebarOpen`, `defaultSidebarOpen` (default false) and
+`onSidebarOpenChange(open, {reason})` govern only the hydrated mobile modal.
+The reason vocabulary is the existing Dialog vocabulary. A cancelable Escape or
+Close button proposal can be refused. A platform-forced `native-close` stands
+immediately: accept false to keep it closed, or retain true on a later parent
+render to reopen. Desktop geometry removes the modal without changing the
+host's accepted logical intent. A later mobile viewport projects that intent.
+No shell handler overrides document body overflow. Media-query and own-root
+listeners are removed on unmount; viewport focus handoff applies only when its
+own focused navigation branch is replaced.

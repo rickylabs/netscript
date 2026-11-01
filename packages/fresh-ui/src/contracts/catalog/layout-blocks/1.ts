@@ -16,31 +16,101 @@ export const layout_blocks_1: readonly ComponentContract[] = [
           'chat',
           'docs',
         ],
+        'default': 'dashboard',
       },
-      'breakpoint': {
+      'sidebar': {
         'kind': 'enum',
         'values': [
-          'desktop',
-          'tablet',
-          'mobile',
+          'expanded',
+          'collapsed',
+          'none',
         ],
+        'default': 'expanded',
       },
       'nav': {
-        'kind': 'enum',
-        'values': [
-          'false',
-          'true',
-        ],
+        'kind': 'boolean',
+        'default': true,
       },
       'rail': {
+        'kind': 'boolean',
+        'default': false,
+      },
+      'sidebarVariant': {
         'kind': 'enum',
         'values': [
-          'false',
-          'true',
+          'sidebar',
+          'floating',
+          'inset',
         ],
+        'default': 'sidebar',
+      },
+      'pathname': {
+        'kind': 'text',
+        'required': true,
+      },
+      'navigation': {
+        'kind': 'collection',
+        'required': true,
+      },
+      'brand': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'brandBadge': {
+        'kind': 'slot',
+      },
+      'footer': {
+        'kind': 'slot',
+      },
+      'topbarStart': {
+        'kind': 'slot',
+      },
+      'topbarEnd': {
+        'kind': 'slot',
+      },
+      'topbarBrand': {
+        'kind': 'slot',
       },
       'children': {
         'kind': 'slot',
+        'required': true,
+      },
+      'railContent': {
+        'kind': 'slot',
+      },
+      'mobileRailContent': {
+        'kind': 'slot',
+      },
+      'session': {
+        'kind': 'slot',
+      },
+      'thread': {
+        'kind': 'slot',
+        'description': 'Replaces children in the chat thread when supplied.',
+      },
+      'composer': {
+        'kind': 'slot',
+      },
+      'sidebarOpen': {
+        'kind': 'boolean',
+      },
+      'defaultSidebarOpen': {
+        'kind': 'boolean',
+        'default': false,
+      },
+      'onSidebarOpenChange': {
+        'kind': 'callback',
+      },
+      'contentId': {
+        'kind': 'text',
+        'default': 'main-content',
+      },
+      'navLabel': {
+        'kind': 'text',
+        'default': 'Sidebar navigation',
+      },
+      'class': {
+        'kind': 'text',
       },
     },
     'parts': [
@@ -79,7 +149,24 @@ export const layout_blocks_1: readonly ComponentContract[] = [
       },
       {
         'name': 'sidebar-backdrop',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'Native modal ::backdrop on the composed Dialog content.',
+        'representation': 'pseudo',
+      },
+      {
+        'name': 'sidebar-disclosure',
+        'when': 'Corresponding optional content or native disclosure is present.',
+      },
+      {
+        'name': 'sidebar-summary',
+        'when': 'Corresponding optional content or native disclosure is present.',
+      },
+      {
+        'name': 'rail',
+        'when': 'Corresponding optional content or native disclosure is present.',
+      },
+      {
+        'name': 'mobile-rail',
+        'when': 'Corresponding optional content or native disclosure is present.',
       },
     ],
     'attributes': {
@@ -96,6 +183,8 @@ export const layout_blocks_1: readonly ComponentContract[] = [
           'tablet',
           'mobile',
         ],
+        'description':
+          'Measured after hydration; absent during SSR. Native media queries govern the static fallback.',
       },
       'data-nav': {
         'values': [
@@ -109,19 +198,95 @@ export const layout_blocks_1: readonly ComponentContract[] = [
           'true',
         ],
       },
+      'data-sidebar-presentation': {
+        'values': [
+          'expanded',
+          'collapsed',
+          'none',
+        ],
+        'default': 'expanded',
+      },
+      'data-sidebar-mode': {
+        'values': [
+          'static',
+          'hydrated',
+        ],
+        'default': 'static',
+      },
     },
     'booleans': [
       'nav',
       'rail',
+      'sidebarOpen',
+      'defaultSidebarOpen',
     ],
     'slots': [
       {
         'name': 'children',
         'part': 'content',
       },
+      {
+        'name': 'brand',
+        'part': 'sidebar',
+      },
+      {
+        'name': 'brandBadge',
+        'part': 'sidebar',
+      },
+      {
+        'name': 'footer',
+        'part': 'sidebar',
+      },
+      {
+        'name': 'topbarStart',
+        'part': 'topbar',
+      },
+      {
+        'name': 'topbarEnd',
+        'part': 'topbar',
+      },
+      {
+        'name': 'topbarBrand',
+        'part': 'topbar',
+      },
+      {
+        'name': 'railContent',
+        'part': 'rail',
+      },
+      {
+        'name': 'mobileRailContent',
+        'part': 'mobile-rail',
+      },
+      {
+        'name': 'session',
+        'part': 'session',
+      },
+      {
+        'name': 'thread',
+        'part': 'thread',
+      },
+      {
+        'name': 'composer',
+        'part': 'composer',
+      },
     ],
-    'apg': 'noninteractive presentation',
-    'keyboard': [],
+    'apg': 'native layout with progressive details navigation and composed native modal Dialog',
+    'keyboard': [
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Follow native links/controls; hydrated mobile modal contains focus.',
+      },
+      {
+        'key': 'Enter/Space',
+        'action':
+          'Toggle the static native summary, a navigation group summary, or a sidebar button.',
+      },
+      {
+        'key': 'Escape',
+        'action':
+          'Use composed native Dialog dismissal; cancelable proposals honor refusal and platform-forced close wins.',
+      },
+    ],
     'tokenRoles': [
       'space/page/padding-x|y',
       'space/section/gap',
@@ -129,6 +294,10 @@ export const layout_blocks_1: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Audited baseline: breakpoint is derived, not a prop. SidebarShell is the single app-shell/sidebar/top-bar family. nav=false aliases sidebar=none; topbar derives docs/app.',
+      'Static SSR contains one initially open native details navigation in normal flow; whole-shell hydration selects one aside or mobile Dialog. Mobile expanded fallback may shift layout on hydration. sidebarOpen ports apply only to hydrated mobile navigation.',
+      'Server-only Shell plus independently hydrated SidebarToggle is supported; whole-shell islands require serializable props/JSX slots. Navigation isActive functions and callback ports must be defined inside the same island.',
+      'Chat children supply the thread unless thread is supplied; host owns messages, composer and business effects. Desktop rail is280px; mobileRailContent is its explicit mobile path.',
     ],
   },
   {
@@ -353,171 +522,132 @@ export const layout_blocks_1: readonly ComponentContract[] = [
     ],
   },
   {
-    'name': 'stats-grid',
-    'specId': 'L3',
-    'category': 'Layout & blocks',
-    'priority': 'P0',
-    'shipped': true,
-    'props': {
-      'variant': {
-        'kind': 'enum',
-        'values': [
-          'default',
-          'hero',
-        ],
+    name: 'stats-grid',
+    specId: 'L3',
+    category: 'Layout & blocks',
+    priority: 'P0',
+    shipped: true,
+    props: {
+      children: { kind: 'slot', required: true, description: 'StatsGrid root content.' },
+      columns: {
+        kind: 'enum',
+        values: ['2', '3', '4'],
+        description:
+          'Optional maximum column count, typed as 2 | 3 | 4. Unset retains container-adaptive auto-fit.',
       },
-      'delta': {
-        'kind': 'enum',
-        'values': [
-          'up',
-          'down',
-          'none',
-        ],
+      joined: {
+        kind: 'boolean',
+        default: false,
+        description: 'Root joined strip; cards retain one-pixel dividers when wrapping.',
       },
-      'columns': {
-        'kind': 'enum',
-        'values': [
-          '2',
-          '3',
-          '4',
-        ],
+      variant: {
+        kind: 'enum',
+        values: ['default', 'hero'],
+        default: 'default',
+        description: 'StatsGrid.Card surface.',
       },
-      'joined': {
-        'kind': 'enum',
-        'values': [
-          'false',
-          'true',
-        ],
+      delta: {
+        kind: 'enum',
+        values: ['up', 'down', 'none'],
+        default: 'none',
+        description:
+          'StatsGrid.Card decorative direction arrow; the caller conveys its meaning in detail text.',
       },
-      'children': {
-        'kind': 'slot',
-        'description': 'Supported Utility public prop; native attributes pass through separately.',
+      label: { kind: 'slot', required: true, description: 'StatsGrid.Card metric label.' },
+      value: { kind: 'slot', required: true, description: 'StatsGrid.Card metric value.' },
+      detail: {
+        kind: 'slot',
+        description: 'Optional StatsGrid.Card supporting content, including a signed change.',
       },
-      'label': {
-        'kind': 'slot',
-        'description': 'Supported Utility public prop; native attributes pass through separately.',
+      badge: {
+        kind: 'slot',
+        description:
+          'Optional StatsGrid.Card header badge; native child controls retain their behavior.',
       },
-      'value': {
-        'kind': 'slot',
-        'description': 'Supported Utility public prop; native attributes pass through separately.',
+      icon: {
+        kind: 'slot',
+        description:
+          'Optional StatsGrid.Card decorative icon, inert and hidden from assistive technology.',
       },
-      'detail': {
-        'kind': 'slot',
-        'description': 'Supported Utility public prop; native attributes pass through separately.',
+      sparkline: {
+        kind: 'slot',
+        description:
+          'Optional caller-owned decorative content, empty by default and visible only when its theme role enables it.',
       },
-      'badge': {
-        'kind': 'slot',
-        'description': 'Supported Utility public prop; native attributes pass through separately.',
+      ticks: {
+        kind: 'slot',
+        description:
+          'Optional caller-owned decorative content, empty by default and visible only when its theme role enables it.',
       },
-      'icon': {
-        'kind': 'boolean',
-      },
-      'sparkline': {
-        'kind': 'boolean',
-      },
-      'ticks': {
-        'kind': 'boolean',
-      },
-      'blockbars': {
-        'kind': 'boolean',
+      blockbars: {
+        kind: 'slot',
+        description:
+          'Optional caller-owned decorative content, empty by default and visible only when its theme role enables it.',
       },
     },
-    'parts': [
-      {
-        'name': 'root',
-      },
-      {
-        'name': 'card',
-        'when': 'when the corresponding content or subcomponent is supplied',
-      },
-      {
-        'name': 'header',
-        'when': 'when the corresponding content or subcomponent is supplied',
-      },
-      {
-        'name': 'label',
-        'when': 'when the corresponding content or subcomponent is supplied',
-      },
-      {
-        'name': 'badge',
-        'when': 'when the corresponding content or subcomponent is supplied',
-      },
-      {
-        'name': 'body',
-        'when': 'when the corresponding content or subcomponent is supplied',
-      },
-      {
-        'name': 'value',
-        'when': 'when the corresponding content or subcomponent is supplied',
-      },
-      {
-        'name': 'detail',
-        'when': 'when the corresponding content or subcomponent is supplied',
-      },
-      {
-        'name': 'sparkline',
-        'when': 'when the corresponding content or subcomponent is supplied',
-      },
-      {
-        'name': 'ticks',
-        'when': 'when the corresponding content or subcomponent is supplied',
-      },
-      {
-        'name': 'blockbars',
-        'when': 'when the corresponding content or subcomponent is supplied',
-      },
+    parts: [
+      { name: 'root' },
+      ...['card', 'header', 'body', 'label', 'value'].map((name) => ({
+        name,
+        when: 'StatsGrid.Card is supplied',
+      })),
+      ...['badge', 'detail', 'icon', 'sparkline', 'ticks', 'blockbars'].map((name) => ({
+        name,
+        when: 'the corresponding StatsGrid.Card slot is supplied',
+      })),
+      { name: 'delta', when: 'detail is supplied and delta is up or down' },
     ],
-    'attributes': {
-      'data-variant': {
-        'values': [
-          'default',
-          'hero',
-        ],
-      },
-      'data-delta': {
-        'values': [
-          'up',
-          'down',
-          'none',
-        ],
-      },
+    attributes: {
       'data-columns': {
-        'values': [
-          '2',
-          '3',
-          '4',
-        ],
+        values: ['2', '3', '4'],
+        description: 'Only emitted when an explicit column cap is supplied.',
       },
-      'data-joined': {
-        'values': [
-          'false',
-          'true',
-        ],
-      },
+      'data-joined': { values: ['false', 'true'], default: 'false' },
+      'data-variant': { values: ['default', 'hero'], default: 'default', parts: ['card'] },
+      'data-delta': { values: ['up', 'down', 'none'], default: 'none', parts: ['card'] },
     },
-    'booleans': [
-      'badge',
-      'icon',
-      'detail',
-      'sparkline',
-      'ticks',
-      'blockbars',
+    booleans: ['joined'],
+    slots: [
+      { name: 'children', part: 'root' },
+      ...['label', 'value', 'detail', 'badge', 'icon', 'sparkline', 'ticks', 'blockbars'].map((
+        name,
+      ) => ({ name, part: name })),
     ],
-    'slots': [],
-    'apg': 'noninteractive presentation',
-    'keyboard': [],
-    'tokenRoles': [
-      'destructive/text',
-      'primary/default',
-      'primary/fg',
+    apg: 'noninteractive presentation with native child controls',
+    keyboard: [{
+      key: 'Tab/Shift+Tab',
+      action:
+        'Move through caller-owned native controls in source order; the grid and cards add no tab stops.',
+    }],
+    tokenRoles: [
+      'kpi/bg-1..4',
+      'kpi/border',
+      'kpi/border-top',
+      'kpi/border-right',
+      'kpi/border-bottom',
+      'kpi/border-left',
+      'kpi/first-left',
+      'kpi/gap',
+      'kpi/pad-x',
       'radius/card',
       'space/card/padding',
-      'success/text',
       'text/fg',
       'text/muted',
+      'primary/default',
+      'primary/fg',
+      'success/text',
+      'destructive/text',
+      'deco/sparkline',
+      'deco/ticks',
+      'deco/blockbars',
     ],
-    'notes': [
-      'Native DOM attributes pass through where the implementation accepts them.',
+    notes: [
+      'Native DOM attributes pass through; owned contract markers take precedence.',
+      'Root columns/joined and Card variant/delta are independent axes. The default grid remains container-adaptive rather than viewport-driven.',
+      'Figma visibility booleans map to optional Renderable slots; empty slots render no part. Decorations are inert, aria-hidden and hidden without layout space when disabled by the theme.',
+      'The card retains ns-card styling compatibility but owns its native element; Card-owned state and size axes do not leak into this scope.',
+      'The category ledger wins: joined strips have an outer top/right/bottom rule, per-card left dividers and zero card radius.',
+      'Series, tone and deltaTone promotions belong to the owner-approved phase after the Utility canary.',
     ],
   },
 ];

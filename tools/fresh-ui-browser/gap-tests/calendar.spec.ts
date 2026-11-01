@@ -104,20 +104,14 @@ test('date-picker/modal-calendar', async ({ page }) => {
   const dialog = page.getByRole('dialog', { name: 'Delivery', exact: true });
   await expect(dialog).toBeVisible();
   await expect(dialog.locator('[data-part="day"][tabindex="0"]')).toBeFocused();
-  await dialog.getByRole('button', { name: 'Cancel', exact: true }).focus();
+  await dialog.getByRole('button', { name: 'Previous month' }).focus();
   await page.keyboard.press('Tab');
-  // Chromium may visit browser chrome at a native modal boundary (BODY sentinel).
-  // It must never focus any inert application control outside the dialog.
+  await expect(dialog.getByRole('button', { name: 'Next month' })).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(dialog.getByRole('button', { name: 'Previous month' })).toBeFocused();
+  await dialog.getByRole('button', { name: 'Cancel', exact: true }).focus();
   await expect(dialog).toHaveJSProperty('open', true);
   expect(await dialog.evaluate((element) => element.matches(':modal'))).toBe(true);
-  const atBoundary = await page.evaluate(() => document.activeElement === document.body);
-  if (atBoundary) await page.keyboard.press('Tab');
-  await expect(dialog.getByRole('button', { name: 'Previous month' })).toBeFocused();
-  await page.keyboard.press('Shift+Tab');
-  if (await page.evaluate(() => document.activeElement === document.body)) {
-    await page.keyboard.press('Shift+Tab');
-  }
-  await expect(dialog.getByRole('button', { name: 'Cancel', exact: true })).toBeFocused();
   await page.locator('#after-calendars').evaluate((element) => element.focus());
   await expect(dialog.getByRole('button', { name: 'Cancel', exact: true })).toBeFocused();
   await page.keyboard.press('Escape');
@@ -144,6 +138,29 @@ test('date-picker/modal-calendar', async ({ page }) => {
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: 'Disabled delivery: Choose a date' }))
     .toBeDisabled();
+});
+
+test('date-picker/native-browser-chrome-boundary', async ({ page }) => {
+  const trigger = page.getByRole('button', { name: 'Delivery: Choose a date', exact: true });
+  await trigger.focus();
+  await page.keyboard.press('Enter');
+  const dialog = page.getByRole('dialog', { name: 'Delivery', exact: true });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('[data-part="day"][tabindex="0"]')).toBeFocused();
+  await dialog.getByRole('button', { name: 'Cancel', exact: true }).focus();
+  await page.keyboard.press('Tab');
+  // Chromium may visit browser chrome at a native modal boundary (BODY sentinel).
+  // It must never focus any inert application control outside the dialog.
+  await expect(dialog).toHaveJSProperty('open', true);
+  expect(await dialog.evaluate((element) => element.matches(':modal'))).toBe(true);
+  const atBoundary = await page.evaluate(() => document.activeElement === document.body);
+  if (atBoundary) await page.keyboard.press('Tab');
+  await expect(dialog.getByRole('button', { name: 'Previous month' })).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  if (await page.evaluate(() => document.activeElement === document.body)) {
+    await page.keyboard.press('Shift+Tab');
+  }
+  await expect(dialog.getByRole('button', { name: 'Cancel', exact: true })).toBeFocused();
 });
 
 test('date-picker/range-and-modal-accessibility', async ({ page }, info) => {

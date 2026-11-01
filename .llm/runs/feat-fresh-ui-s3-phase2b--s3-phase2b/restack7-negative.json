@@ -1,0 +1,124 @@
+{
+  "verdict": "EXPECTED_FAILURES_REPRODUCED",
+  "firstFullBrowser": {
+    "passed": 156,
+    "failed": 1,
+    "notRun": 498,
+    "failure": "floating mobile sidebar inset"
+  },
+  "focusedStats": {
+    "passed": 2,
+    "failed": 1,
+    "notRun": 3,
+    "failure": "joined card logical seam"
+  },
+  "measuredSelection": {
+    "schemes": 2,
+    "selectedRowsMissingBackground": 2
+  },
+  "measuredSharedTracks": {
+    "wideWidths": 1,
+    "misalignedTables": 1
+  },
+  "evaluatorFailureStreak": 0,
+  "prototypeFixture": {
+    "failed": 3,
+    "cause": "new action fixture used the data argument as its context",
+    "correction": "read the existing second context argument; assertions unchanged",
+    "contractNegativeVerdict": "NOT_YET_RUN"
+  },
+  "correctedTableControls": {
+    "passed": 0,
+    "failed": 3,
+    "pageErrors": 0,
+    "failures": [
+      "selected background",
+      "intrinsic header/body track alignment",
+      "fractional-width full status span"
+    ]
+  },
+  "collapsedShell": {
+    "failed": 1,
+    "failure": "native summary visual text overridden to 11px",
+    "selectedIconCenterOffsetPx": 10
+  },
+  "rtlShell": {
+    "initialNewAssertionFailed": 1,
+    "cause": "new exact-name locator omitted the expanded visible count",
+    "correctedName": "Overview 12",
+    "viewportAssertionRetained": true,
+    "legacyTransformControl": {
+      "verdict": "PASS",
+      "removedRules": 1,
+      "positiveCases": 1,
+      "negativeCases": 1
+    }
+  },
+  "minContentPrototype": {
+    "passed": 1,
+    "failed": 1,
+    "notRun": 18,
+    "failure": "row background did not expand with fixed/intrinsic overflow tracks"
+  },
+  "focusedAfterMaxContent": {
+    "passed": 20,
+    "failed": 0
+  },
+  "firstPostFixChrome": {
+    "passed": 158,
+    "failed": 1,
+    "notRun": 508,
+    "failure": "new RTL exact-name fixture locator"
+  },
+  "firefoxTraceFailure": {
+    "passed": 29,
+    "failed": 1,
+    "notRun": 274,
+    "isolatedRepeatFailed": 1,
+    "repeatNotRun": 4,
+    "cause": "automatic trace snapshot grants activation between Escapes"
+  },
+  "tracePlacementPrototype": {
+    "verdict": "COLLECTION_FAILED",
+    "executedCases": 0,
+    "cause": "Playwright rejects worker-scoped trace options in nested describe",
+    "assertionsChanged": 0
+  },
+  "nativeFocusedFinal": {
+    "verdict": "PASS",
+    "passed": 36,
+    "failed": 0,
+    "retried": 0,
+    "flaky": 0,
+    "engines": 3,
+    "schemes": 2,
+    "widths": 2
+  },
+  "webkitSelectionTiming": {
+    "passed": 175,
+    "failed": 1,
+    "notRun": 144,
+    "failure": "follow-up center click observed the existing noncollapsed range during WebKit click dispatch",
+    "nativeClickDetail": 1,
+    "selectionAfterDispatch": "collapsed",
+    "productionSelectionGuardChanged": false
+  },
+  "webkitNativeQueryPrecision": {
+    "passed": 180,
+    "failed": 1,
+    "notRun": 139,
+    "failure": "new geometry case assumed wide at a fractional width native WebKit evaluates as narrow",
+    "independentNativeControls": 21,
+    "bothOrNeitherQueryModes": 0,
+    "productionDefectEstablished": false
+  },
+  "newFixtureNativeButtonContrast": {
+    "passed": 32,
+    "failed": 1,
+    "notRun": 3,
+    "failure": "unstyled fixture buttons use native white-on-gray controls in dark WebKit",
+    "contrast": 1.81,
+    "expectedMinimum": 4.5,
+    "axeAllowancesAdded": 0
+  }
+}

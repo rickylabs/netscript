@@ -16,6 +16,8 @@ export const desktop_1: readonly ComponentContract[] = [
           'windows',
           'linux',
         ],
+        'description':
+          'Presentation snapshot only. Omitted actions: macos close/hide/reload; windows/linux hide/reload/close; omitted platform reload/hide/close. Explicit actions preserve caller order.',
       },
       'state': {
         'kind': 'enum',
@@ -23,11 +25,16 @@ export const desktop_1: readonly ComponentContract[] = [
           'focused',
           'blurred',
           'disabled',
+          'hover',
+          'unfocused',
         ],
+        'description':
+          'Emitted verbatim; blurred/unfocused share visuals without disabling actions. disabled prop or state disables all native buttons.',
       },
       'title': {
         'kind': 'text',
-        'description': 'Supported Utility public prop; native attributes pass through separately.',
+        'description': 'Window title; retains caller render-content support.',
+        'required': true,
       },
       'actions': {
         'kind': 'collection',
@@ -40,6 +47,10 @@ export const desktop_1: readonly ComponentContract[] = [
       'disabled': {
         'kind': 'boolean',
         'description': 'Supported Utility public prop; native attributes pass through separately.',
+      },
+      'leading': {
+        'kind': 'slot',
+        'description': 'Optional caller content before title.',
       },
     },
     'parts': [
@@ -77,6 +88,8 @@ export const desktop_1: readonly ComponentContract[] = [
           'focused',
           'blurred',
           'disabled',
+          'hover',
+          'unfocused',
         ],
         'description':
           'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes. Utility retains these existing runtime values on the listed parts; canonical Figma values remain unchanged.',
@@ -89,11 +102,43 @@ export const desktop_1: readonly ComponentContract[] = [
           'action',
         ],
       },
+      'data-action': {
+        'values': [
+          'show',
+          'hide',
+          'focus',
+          'reload',
+          'close',
+        ],
+        'parts': [
+          'action',
+        ],
+        'description':
+          'Public styling operation identity. Legacy data-desktop-action is a private callback payload.',
+      },
     },
     'booleans': [],
-    'slots': [],
+    'slots': [
+      {
+        'name': 'title',
+        'part': 'title',
+      },
+      {
+        'name': 'leading',
+        'part': 'leading',
+      },
+    ],
     'apg': 'noninteractive presentation',
-    'keyboard': [],
+    'keyboard': [
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Visit enabled native window operation buttons in DOM order',
+      },
+      {
+        'key': 'Enter/Space',
+        'action': 'Activate focused native window operation exactly once',
+      },
+    ],
     'tokenRoles': [
       'border/subtle',
       'destructive/default',
@@ -103,6 +148,8 @@ export const desktop_1: readonly ComponentContract[] = [
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
       'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
+      'The frame remains presentational; only native child buttons are interactive. No native action runs on render or focus.',
+      'hover/unfocused are additive ledger states. Published focused/blurred/disabled and legacy active/enabled remain.',
     ],
   },
   {
@@ -120,6 +167,8 @@ export const desktop_1: readonly ComponentContract[] = [
           'submenu',
           'separator',
         ],
+        'description':
+          'Optional declaration-kind presentation snapshot; never filters or rewrites items.',
       },
       'source': {
         'kind': 'enum',
@@ -127,6 +176,7 @@ export const desktop_1: readonly ComponentContract[] = [
           'tray',
           'application-menu',
         ],
+        'required': true,
       },
       'state': {
         'kind': 'enum',
@@ -135,9 +185,64 @@ export const desktop_1: readonly ComponentContract[] = [
           'hover',
           'disabled',
         ],
+        'description':
+          'Optional verbatim snapshot; omission retains active/enabled compatibility. disabled prop or state disables actions.',
       },
       'accelerator': {
         'kind': 'boolean',
+        'default': true,
+        'description':
+          'Show caller shortcut labels without executing shortcuts or rewriting declarations.',
+      },
+      'items': {
+        'kind': 'collection',
+        'description':
+          'Required ordered recursive declarations; stable action IDs are callback payloads.',
+        'required': true,
+      },
+      'onAction': {
+        'kind': 'callback',
+        'description': 'Receives only the explicitly activated enabled action ID.',
+      },
+      'disabled': {
+        'kind': 'boolean',
+        'description': 'Disable summary and all action declarations.',
+        'default': false,
+      },
+      'Item.type': {
+        'kind': 'enum',
+        'description': 'Declaration discriminator; no checkbox kind is invented.',
+        'values': [
+          'action',
+          'role',
+          'submenu',
+          'separator',
+        ],
+      },
+      'Item.id': {
+        'kind': 'text',
+        'description': 'Stable action payload; duplicate IDs preserve separate DOM traversal.',
+      },
+      'Item.label': {
+        'kind': 'text',
+        'description': 'Action or expanded submenu label.',
+      },
+      'Item.accelerator': {
+        'kind': 'text',
+        'description': 'Optional action shortcut label.',
+      },
+      'Item.enabled': {
+        'kind': 'boolean',
+        'description': 'False disables an individual action.',
+        'default': true,
+      },
+      'Item.role': {
+        'kind': 'text',
+        'description': 'Native OS role; read-only disabled browser preview.',
+      },
+      'Item.items': {
+        'kind': 'collection',
+        'description': 'Expanded submenu declarations with labelled group ownership.',
       },
     },
     'parts': [
@@ -197,6 +302,13 @@ export const desktop_1: readonly ComponentContract[] = [
           'submenu',
           'separator',
         ],
+        'parts': [
+          'root',
+          'action-item',
+          'role-item',
+          'submenu',
+          'separator',
+        ],
       },
       'data-source': {
         'values': [
@@ -240,6 +352,15 @@ export const desktop_1: readonly ComponentContract[] = [
         'key': 'Escape',
         'action': 'Dismiss menu',
       },
+      {
+        'key': 'Enter/Space on summary',
+        'action':
+          'Toggle native disclosure; enabled actions remain native Tab stops before hydration',
+      },
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Leave naturally and close after focus enters then leaves this hydrated menu',
+      },
     ],
     'tokenRoles': [
       'text/muted',
@@ -248,6 +369,9 @@ export const desktop_1: readonly ComponentContract[] = [
       'Native DOM attributes pass through where the implementation accepts them.',
       'Utility compatibility anatomy is included for existing shipped helpers; it does not implement a design gap.',
       'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
+      'Initially-open native details preserves every enabled action in SSR/no-script Tab order. Arrow roving, Escape and Tab-to-close require a caller island. No mount focus.',
+      'Submenus are expanded labelled groups; OS roles are disabled read-only menuitem previews. Native host outcomes remain separate.',
+      'Legacy data-action-id is a private callback payload; no CSS reads it.',
     ],
   },
   {

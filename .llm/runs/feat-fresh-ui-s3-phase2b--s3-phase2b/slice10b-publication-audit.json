@@ -1,0 +1,11 @@
+{
+  "verdict": "ACCEPTED_EXISTING_FAILURE",
+  "issue": 2531,
+  "rawExitCode": 1,
+  "fullExportDiagnostics": 124,
+  "typeScriptBaseline": 123,
+  "typeScriptCurrent": 123,
+  "newDiagnostics": 0,
+  "removedDiagnostics": 0,
+  "jsonLimitation": 1
+}

@@ -7,7 +7,7 @@ export const ai_5: readonly ComponentContract[] = [
     'specId': 'I6',
     'category': 'AI',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'step': {
         'kind': 'enum',
@@ -16,9 +16,11 @@ export const ai_5: readonly ComponentContract[] = [
           'freeform',
           'complete',
         ],
+        'default': 'question',
       },
       'title': {
         'kind': 'slot',
+        'required': true,
       },
       'description': {
         'kind': 'slot',
@@ -26,73 +28,111 @@ export const ai_5: readonly ComponentContract[] = [
       'error': {
         'kind': 'slot',
       },
-      'children': {
+      'progress': {
         'kind': 'slot',
       },
       'actions': {
         'kind': 'slot',
       },
+      'children': {
+        'kind': 'slot',
+      },
+      'options': {
+        'kind': 'collection',
+        'description': 'Unique nonempty value, label, optional decorative shortcut and disabled.',
+      },
       'multiple': {
         'kind': 'boolean',
+        'default': false,
+      },
+      'name': {
+        'kind': 'text',
+        'default': 'answer',
+        'description': 'Native answer control name scoped per form.',
+      },
+      'disabled': {
+        'kind': 'boolean',
+        'default': false,
+      },
+      'value': {
+        'kind': 'collection',
+        'description': 'Controlled readonly accepted choice values; single uses first only.',
+      },
+      'defaultValue': {
+        'kind': 'collection',
+        'description': 'Initial uncontrolled values, default empty.',
+      },
+      'onValueChange': {
+        'kind': 'callback',
+      },
+      'text': {
+        'kind': 'text',
+        'description': 'Controlled accepted freeform text.',
+      },
+      'defaultText': {
+        'kind': 'text',
+        'default': '',
+      },
+      'onTextChange': {
+        'kind': 'callback',
+      },
+      'placeholder': {
+        'kind': 'text',
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
-      },
-      {
-        'name': 'progress',
-        'planned': true,
       },
       {
         'name': 'item',
-        'planned': true,
       },
       {
         'name': 'title',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+      },
+      {
+        'name': 'progress',
+        'when': 'when corresponding content or answer control is supplied',
       },
       {
         'name': 'description',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when corresponding content or answer control is supplied',
       },
       {
         'name': 'choices',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when corresponding content or answer control is supplied',
       },
       {
         'name': 'choice',
-        'planned': true,
+        'when': 'when corresponding content or answer control is supplied',
       },
       {
         'name': 'shortcut',
-        'planned': true,
+        'when': 'when corresponding content or answer control is supplied',
       },
       {
         'name': 'label',
-        'planned': true,
+        'when': 'when corresponding content or answer control is supplied',
       },
       {
         'name': 'indicator',
-        'planned': true,
+        'when': 'when corresponding content or answer control is supplied',
       },
       {
         'name': 'input',
-        'planned': true,
+        'when': 'when corresponding content or answer control is supplied',
       },
       {
         'name': 'error',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when corresponding content or answer control is supplied',
       },
       {
         'name': 'actions',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when corresponding content or answer control is supplied',
+      },
+      {
+        'name': 'content',
+        'when': 'when corresponding content or answer control is supplied',
       },
     ],
     'attributes': {
@@ -102,10 +142,37 @@ export const ai_5: readonly ComponentContract[] = [
           'freeform',
           'complete',
         ],
+        'default': 'question',
+      },
+      'data-multiple': {
+        'values': [
+          'false',
+          'true',
+        ],
+        'parts': [
+          'choices',
+          'choice',
+        ],
+        'default': 'false',
+      },
+      'data-state': {
+        'values': [
+          'rest',
+          'hover',
+          'focus',
+          'selected',
+          'disabled',
+        ],
+        'parts': [
+          'choice',
+        ],
+        'description':
+          'Accepted checked/disabled state; transient hover/focus use native pseudo-classes.',
       },
     },
     'booleans': [
       'multiple',
+      'disabled',
     ],
     'slots': [
       {
@@ -121,12 +188,16 @@ export const ai_5: readonly ComponentContract[] = [
         'part': 'error',
       },
       {
-        'name': 'children',
-        'part': 'choices',
+        'name': 'progress',
+        'part': 'progress',
       },
       {
         'name': 'actions',
         'part': 'actions',
+      },
+      {
+        'name': 'children',
+        'part': 'content',
       },
     ],
     'apg': 'native form, radio and checkbox controls',
@@ -137,15 +208,16 @@ export const ai_5: readonly ComponentContract[] = [
       },
       {
         'key': 'Arrow keys',
-        'action': 'Move between radio choices',
+        'action': 'Move within native radio groups',
       },
       {
         'key': 'Space',
-        'action': 'Select the focused radio or checkbox',
+        'action': 'Select a focused native radio or checkbox',
       },
       {
         'key': 'Enter',
-        'action': 'Submit the current form',
+        'action':
+          'Activate a focused submit button; textarea Enter retains native newline behavior',
       },
     ],
     'tokenRoles': [
@@ -159,6 +231,9 @@ export const ai_5: readonly ComponentContract[] = [
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
       'ledger-ai selects with primary/stroke, not primary/default; rendering never calls an AI/backend service.',
+      'One real form; never nest inside another form. Caller owns native onSubmit/FormData, progression, validation messages and action button types.',
+      'Controlled proposals restore all owned radio/checkbox siblings and textarea before callbacks. Native reset then a guarded microtask restores accepted controlled/initial uncontrolled state only; other supplied native fields keep platform behavior.',
+      'Actions are outside the disabled answer fieldset. Shortcut text is decorative, not an installed hotkey. Complete renders no answer inputs or hidden persisted values.',
     ],
   },
   {
@@ -166,7 +241,7 @@ export const ai_5: readonly ComponentContract[] = [
     'specId': 'I7',
     'category': 'AI',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'state': {
         'kind': 'enum',
@@ -177,6 +252,7 @@ export const ai_5: readonly ComponentContract[] = [
           'error',
           'done',
         ],
+        'default': 'idle',
       },
       'size': {
         'kind': 'enum',
@@ -185,6 +261,7 @@ export const ai_5: readonly ComponentContract[] = [
           'sm',
           'xs',
         ],
+        'default': 'default',
       },
       'orientation': {
         'kind': 'enum',
@@ -192,9 +269,11 @@ export const ai_5: readonly ComponentContract[] = [
           'horizontal',
           'vertical',
         ],
+        'default': 'horizontal',
       },
       'title': {
         'kind': 'slot',
+        'required': true,
       },
       'media': {
         'kind': 'slot',
@@ -205,35 +284,49 @@ export const ai_5: readonly ComponentContract[] = [
       'actions': {
         'kind': 'slot',
       },
+      'stateLabel': {
+        'kind': 'text',
+        'description':
+          'Localizable static non-idle state text, default Uploading/Processing/Error/Done; never a live region.',
+      },
+      'progress': {
+        'kind': 'slot',
+        'description': 'Optional caller-owned progress content; omitted at xs horizontal.',
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
-      },
-      {
-        'name': 'media',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
       },
       {
         'name': 'content',
-        'planned': true,
       },
       {
         'name': 'title',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+      },
+      {
+        'name': 'media',
+        'when': 'when corresponding content/state is supplied',
       },
       {
         'name': 'description',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when corresponding content/state is supplied',
       },
       {
         'name': 'actions',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when corresponding content/state is supplied',
+      },
+      {
+        'name': 'progress',
+        'when': 'when corresponding content/state is supplied',
+      },
+      {
+        'name': 'state-label',
+        'when': 'when corresponding content/state is supplied',
+      },
+      {
+        'name': 'state-icon',
+        'when': 'when corresponding content/state is supplied',
       },
     ],
     'attributes': {
@@ -245,6 +338,7 @@ export const ai_5: readonly ComponentContract[] = [
           'error',
           'done',
         ],
+        'default': 'idle',
       },
       'data-size': {
         'values': [
@@ -252,12 +346,14 @@ export const ai_5: readonly ComponentContract[] = [
           'sm',
           'xs',
         ],
+        'default': 'default',
       },
       'data-orientation': {
         'values': [
           'horizontal',
           'vertical',
         ],
+        'default': 'horizontal',
       },
     },
     'booleans': [],
@@ -277,6 +373,10 @@ export const ai_5: readonly ComponentContract[] = [
       {
         'name': 'actions',
         'part': 'actions',
+      },
+      {
+        'name': 'progress',
+        'part': 'progress',
       },
     ],
     'apg': 'native action controls in a noninteractive attachment surface',
@@ -302,6 +402,8 @@ export const ai_5: readonly ComponentContract[] = [
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
       'ledger-ai media sizes40/32/24; xs horizontal omits description and uses trailing state glyph.',
+      'Every non-idle state has visually hidden static text at all sizes; glyphs are decorative. xs horizontal visually hides description but retains it in the accessibility tree.',
+      'Native child actions remain independent; no upload, fetch, timer, remove/retry behavior or automatic live region. Media and alt text are caller-owned.',
     ],
   },
 ];

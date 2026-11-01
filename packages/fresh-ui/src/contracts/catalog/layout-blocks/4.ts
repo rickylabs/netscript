@@ -7,7 +7,7 @@ export const layout_blocks_4: readonly ComponentContract[] = [
     'specId': 'L9',
     'category': 'Layout & blocks',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'orientation': {
         'kind': 'enum',
@@ -16,34 +16,34 @@ export const layout_blocks_4: readonly ComponentContract[] = [
           'horizontal',
           'both',
         ],
+        'default': 'vertical',
       },
       'children': {
         'kind': 'slot',
+      },
+      'label': {
+        'kind': 'text',
+        'required': true,
+        'description': 'Accessible name of the native viewport',
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'viewport',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
       },
       {
         'name': 'scrollbar',
-        'planned': true,
         'representation': 'native',
       },
       {
         'name': 'thumb',
-        'planned': true,
         'representation': 'native',
       },
       {
         'name': 'corner',
-        'planned': true,
         'representation': 'native',
       },
     ],
@@ -54,6 +54,7 @@ export const layout_blocks_4: readonly ComponentContract[] = [
           'horizontal',
           'both',
         ],
+        'default': 'vertical',
       },
     },
     'booleans': [],
@@ -80,6 +81,7 @@ export const layout_blocks_4: readonly ComponentContract[] = [
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
       'ledger-layout adds a bordered radius/card frame; scrollbar anatomy is native and must not require fake scrollbar elements.',
+      'The viewport is always tabbable for stable server rendering; scrollbar geometry and hover sizing follow native platform limits.',
     ],
   },
   {
@@ -87,14 +89,16 @@ export const layout_blocks_4: readonly ComponentContract[] = [
     'specId': 'L10',
     'category': 'Layout & blocks',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
+      'endLabel': { 'kind': 'text', 'default': 'Secondary panel' },
       'direction': {
         'kind': 'enum',
         'values': [
           'horizontal',
           'vertical',
         ],
+        'default': 'horizontal',
       },
       'startContent': {
         'kind': 'slot',
@@ -104,29 +108,60 @@ export const layout_blocks_4: readonly ComponentContract[] = [
       },
       'grip': {
         'kind': 'boolean',
+        'default': true,
+      },
+      'label': {
+        'kind': 'text',
+        'required': true,
+        'description': 'Shared primary-panel and separator accessible name',
+      },
+      'labelledBy': {
+        'kind': 'text',
+      },
+      'size': {
+        'kind': 'number',
+      },
+      'defaultSize': {
+        'kind': 'number',
+        'description': 'Initial pixels:280 horizontal or160 vertical',
+      },
+      'onSizeChange': {
+        'kind': 'callback',
+        'description': 'User pixel proposal; viewport clamps do not invoke it',
+      },
+      'minSize': {
+        'kind': 'number',
+        'default': 80,
+      },
+      'maxSize': {
+        'kind': 'number',
+        'description': 'Unbounded by default; never serialized as Infinity',
+      },
+      'endMinSize': {
+        'kind': 'number',
+        'default': 80,
+      },
+      'step': {
+        'kind': 'number',
+        'default': 10,
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'panel-group',
-        'planned': true,
       },
       {
         'name': 'panel',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
       },
       {
         'name': 'handle',
-        'planned': true,
       },
       {
         'name': 'grip',
-        'planned': true,
+        'when': 'grip is enabled',
       },
     ],
     'attributes': {
@@ -135,6 +170,7 @@ export const layout_blocks_4: readonly ComponentContract[] = [
           'horizontal',
           'vertical',
         ],
+        'default': 'horizontal',
       },
     },
     'booleans': [
@@ -171,6 +207,7 @@ export const layout_blocks_4: readonly ComponentContract[] = [
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
       'ledger-layout: 10px grip glyph; fixed default start panel size 280 horizontal or 160 vertical instead of 50/50.',
+      'Both scrollable panels are named and always tabbable, preserving keyboard access to text-only overflow. Resize-only APG subset: no Enter collapse or F6 mode. Hydrate in a Fresh island; until positive measurement, handle is decorative/unfocusable and omits separator role and value attributes. Controlled viewport clamping is geometry-only; next interaction proposes from displayed size/current bounds.',
     ],
   },
   {
@@ -178,7 +215,7 @@ export const layout_blocks_4: readonly ComponentContract[] = [
     'specId': 'L11',
     'category': 'Layout & blocks',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'ratio': {
         'kind': 'enum',
@@ -188,6 +225,7 @@ export const layout_blocks_4: readonly ComponentContract[] = [
           '1:1',
           '21:9',
         ],
+        'default': '16:9',
       },
       'children': {
         'kind': 'slot',
@@ -196,12 +234,9 @@ export const layout_blocks_4: readonly ComponentContract[] = [
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'media',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
       },
     ],
     'attributes': {
@@ -212,6 +247,7 @@ export const layout_blocks_4: readonly ComponentContract[] = [
           '1:1',
           '21:9',
         ],
+        'default': '16:9',
       },
     },
     'booleans': [],
@@ -236,14 +272,34 @@ export const layout_blocks_4: readonly ComponentContract[] = [
     'specId': 'L12',
     'category': 'Layout & blocks',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
+      'as': {
+        'kind': 'enum',
+        'values': [
+          'div',
+          'section',
+          'main',
+          'article',
+          'aside',
+          'nav',
+          'header',
+          'footer',
+          'form',
+          'span',
+        ],
+      },
+      'boundaryRef': {
+        'kind': 'callback',
+        'description': 'Native boundary ref; accepts a Preact ref callback or ref object',
+      },
       'dir': {
         'kind': 'enum',
         'values': [
           'ltr',
           'rtl',
         ],
+        'default': 'ltr',
       },
       'children': {
         'kind': 'slot',
@@ -252,8 +308,7 @@ export const layout_blocks_4: readonly ComponentContract[] = [
     'parts': [
       {
         'name': 'root',
-        'planned': true,
-        'representation': 'context',
+        'representation': 'element',
       },
     ],
     'attributes': {
@@ -262,6 +317,7 @@ export const layout_blocks_4: readonly ComponentContract[] = [
           'ltr',
           'rtl',
         ],
+        'default': 'ltr',
       },
     },
     'booleans': [],
@@ -279,6 +335,7 @@ export const layout_blocks_4: readonly ComponentContract[] = [
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
       'No Figma set: direction context has no additional visual wrapper; native dir on the application boundary supplies mirroring.',
+      'DirectionProvider aliases Direction: as renders the caller-selected native boundary with native props/boundaryRef, supporting precompiled JSX; otherwise clone one unscoped native HTML VNode preserving key/ref and existing props. Direction owns dir/markers. Reject unsupported as tags, scoped boundary props and invalid clone children. No extra wrapper or global mutation.',
     ],
   },
 ];
