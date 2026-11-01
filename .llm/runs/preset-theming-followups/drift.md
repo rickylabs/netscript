@@ -6,3 +6,5 @@
 - Bare Zod catalog mapping added at root for tools imports; both maintained locks receive only the matching workspace dependency metadata. Deno rejects catalog: as a literal source import. Native lock:update completed.
 - Full scaffold.runtime attempted with cleanup: UNPROVEN, exit 1 at Aspire doctor and Docker cleanup because Docker daemon is unavailable. Read-only leak check run; no resources mutated. Public report retains verdict/counts only.
 - Write scope extends to `.llm/tools/gates/catalog.ts` for the uploaded CLI quality receipt, plus root lock metadata required by catalog mapping.
+
+- Generated-carrier order refined by live guard: export-corpus refuses dirty generated package sources too. Commit agent docs/publish carriers first, then regenerate export corpus from that clean head. Aspire manifest needs one derived inventory row for the new baseline file that mentions Aspire paths; refresh with canonical generator.

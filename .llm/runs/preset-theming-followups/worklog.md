@@ -34,3 +34,9 @@ The separate read-only Claude reviewer found B1: configured registry URLs still 
 Independent repaired slice review: PASS (`slice-review.md`), reviewer independently ran 8 targeted tests. B1/N1 resolved. CI contract tests: 12 passed. Release preflight, docs links/accuracy, docs build and all four site checks pass. CLI JSR audit exits 0 with pre-existing doctrine warnings, no failures. No new/deepened architecture debt. N3 needs no production mutation: real subprocess fixture negatives plus complete real-tree coverage test the ratchet without modifying legacy files under the ongoing CLI run.
 
 Reconcile: same draft PR #2559, Refs #2516 and Refs #2556 only, no labels or closing keywords. No duplicate PR or owner scope change. Source slice is ready for commit; generated carriers and final gates follow. All public run paths are repo-relative; assignment excluded.
+
+## Documentation carrier slice
+
+Source slice committed/pushed as 008685f6 and posted on draft PR #2559. gen:agent-docs-prose, gen:assets-barrel and gen:publish-assets completed successfully. check:agent-docs-prose and check:publish-assets PASS. New linked upgrade page is present in the generated docs corpus. Canonical Aspire inventory refresh adds exactly one row for the new CLI baseline; version parity now PASS. Root lint/fmt receipts and emitted-samples receipt PASS; publish:dry-run PASS. Other static checks pass (desktop native fixture, streams types, child health docs, scaffold versions, emitted JSR specifiers, Aspire ports, Figma names, review threads).
+
+Reconcile: no source fixes after independent slice PASS. Same PR/issue references and no new owner comments requiring changes. Export-corpus guard requires these generated package files committed first; no dirty-generation bypass used. Next: corpus generation, final carrier checks, whole-CLI result and final same-session evaluator.
