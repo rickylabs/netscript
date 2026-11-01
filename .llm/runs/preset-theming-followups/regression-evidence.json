@@ -1,0 +1,88 @@
+[
+  {
+    "evidence": "red",
+    "summary": {
+      "passed": 0,
+      "failed": 2,
+      "ignored": 0,
+      "totalResults": 2,
+      "uniqueFailures": 2
+    },
+    "exitCode": 1
+  },
+  {
+    "evidence": "targeted",
+    "summary": {
+      "passed": 44,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 44,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  {
+    "evidence": "config-diagnostics-red",
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "exitCode": 1
+  },
+  {
+    "evidence": "config-diagnostics-green",
+    "summary": {
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 8,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  {
+    "evidence": "ci-contracts",
+    "summary": {
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 12,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0
+  },
+  {
+    "evidence": "scoped-check",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "exitCode": 0
+  },
+  {
+    "evidence": "ratchet-lint",
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "exitCode": 0
+  },
+  {
+    "evidence": "ratchet-fmt",
+    "summary": {
+      "filesSelected": 4,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "exitCode": 0
+  }
+]

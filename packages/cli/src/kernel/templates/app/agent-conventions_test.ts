@@ -110,3 +110,11 @@ function serviceInput(): AppConventionsInput {
     serviceName: 'users',
   };
 }
+
+Deno.test('app get_doc slugs are copyable code spans without sentence punctuation', () => {
+  const agents = buildAppAgentsMarkdown(serviceInput());
+  for (const slug of ['web-layer/how-to/theme-your-app', 'web-layer/how-to/customize-fresh-ui']) {
+    assertStringIncludes(agents, `slug \`${slug}\`.`);
+    assert(!agents.includes(`slug ${slug}.`));
+  }
+});

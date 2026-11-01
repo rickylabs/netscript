@@ -1,0 +1,110 @@
+[
+  {
+    "task": "check:desktop-native-fixture",
+    "command": [
+      "deno",
+      "task",
+      "check:desktop-native-fixture"
+    ],
+    "exitCode": 0,
+    "durationMs": 227,
+    "outputSha256": "0dbf52174939b18aec1b71fbcdf7bf53e941c358d2adbae4b1754530b2875db7"
+  },
+  {
+    "task": "check:streams-types",
+    "command": [
+      "deno",
+      "task",
+      "check:streams-types"
+    ],
+    "exitCode": 0,
+    "durationMs": 1835,
+    "outputSha256": "915d230ac44d3ff4f415291c770f07068a9e3c58754844f893a5307d7d48276b"
+  },
+  {
+    "task": "check:child-health-docs",
+    "command": [
+      "deno",
+      "task",
+      "check:child-health-docs"
+    ],
+    "exitCode": 0,
+    "durationMs": 507,
+    "outputSha256": "909a685718892217c4a249df425daf83f09c30566ff470d75caae096aac1607b"
+  },
+  {
+    "task": "check:scaffold-versions",
+    "command": [
+      "deno",
+      "task",
+      "check:scaffold-versions"
+    ],
+    "exitCode": 0,
+    "durationMs": 153,
+    "outputSha256": "fc6002e02660ff75ce5419f73e8554dc11442395121a07a4f1abbc200bd590d7"
+  },
+  {
+    "task": "check:aspire-version-parity",
+    "command": [
+      "deno",
+      "task",
+      "check:aspire-version-parity"
+    ],
+    "exitCode": 0,
+    "durationMs": 497,
+    "outputSha256": "2c220b5982295c8c521a8e1665512f80c4b36445b944daef0a9eb73c6cfb3e15",
+    "initialExitCode": 1,
+    "repair": "Canonical manifest regeneration adds the CLI baseline inventory row.",
+    "initialOutputSha256": "16275ffe4435a81f3b81d37eac9a32ef4acb0caa821fff4bdb85207138bd23a7"
+  },
+  {
+    "task": "check:netscript-jsr-specifiers",
+    "command": [
+      "deno",
+      "task",
+      "check:netscript-jsr-specifiers"
+    ],
+    "exitCode": 0,
+    "durationMs": 3767,
+    "outputSha256": "d0cd4ab7c268f1342a1dcc0ec166c05cce39cc93d642b7423b24f9f27ef2e71c"
+  },
+  {
+    "task": "check:aspire-host-ports",
+    "command": [
+      "deno",
+      "task",
+      "check:aspire-host-ports"
+    ],
+    "exitCode": 0,
+    "durationMs": 573,
+    "outputSha256": "0191ccdbb519267fd84a0858155a3e1b943f5ebad6f26e8152f42851e6eb321b"
+  },
+  {
+    "task": "check:figma-names",
+    "command": [
+      "deno",
+      "task",
+      "check:figma-names"
+    ],
+    "exitCode": 0,
+    "durationMs": 583,
+    "outputSha256": "75af4b0ad2d78b52e0e5bbdb20481e66c98e1b4e164dce8cde86ad657a6ff9c7"
+  },
+  {
+    "task": "check:review-threads",
+    "command": [
+      "deno",
+      "task",
+      "check:review-threads",
+      "--",
+      "--repo",
+      "rickylabs/netscript",
+      "--pr",
+      "2559",
+      "--pretty"
+    ],
+    "exitCode": 0,
+    "durationMs": 516,
+    "outputSha256": "13d930d2cdaf945c33b56b9f17a31c2c9df9e8a38de991e72037dcfd8afef7de"
+  }
+]

@@ -476,6 +476,9 @@ Deno.test('top-level pages are linked in the scaffold navigation and render insi
   assert(themeGuidance);
   assertStringIncludes(themeGuidance, 'netscript ui:apply --preset <id>');
   assertStringIncludes(themeGuidance, 'netscript tokens build');
+  assertStringIncludes(themeGuidance, '"override": "tokens/semantic.tokens.json"');
+  assertStringIncludes(themeGuidance, 'tokens.config.json');
+  assertStringIncludes(themeGuidance, '`web-layer/how-to/theme-your-app`');
   assert(!result.nextSteps.some((step) => step.includes('Restyle app-wide through')));
 });
 

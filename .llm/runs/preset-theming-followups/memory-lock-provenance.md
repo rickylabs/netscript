@@ -1,0 +1,3 @@
+# better-auth lock provenance
+
+The Figma PR #2504 (851d1ce9) changed three better-auth peer IDs in the private Fresh UI lock without changing versions or integrity hashes. They are the Deno 2.9.6+ peer-flattening form, match the maintained root lock, and should remain on Deno 2.9.7. Reverting would restore stale IDs (documented runtime-resolution risk). This run adds only npm:zod@^4.6.5 to root/private workspace.dependencies for the plugin's shared catalog import. Native `deno task --cwd packages/fresh-ui lock:update` synchronizes the metadata and checks all 276 files; no package graph changes.
