@@ -82,3 +82,23 @@ Broader quality:gate and existing figma:ci both PASS through allowlisted durable
 Independent same-session substantive slice review: PASS in slice-review-pass.md. It re-ran all four structured gates and confirmed every blocking/advisory repair against real data. Supervisor signs off this slice after that independent PASS. The earlier 9-file/8-test entry is historical; the final verdict covers 10 files/12 tests.
 
 Reconcile: existing draft #2576 remains the single PR for #2568; source-parent and S3 boundaries unchanged. No labels, external issue closure, source contract/token changes or lock churn. Slice2 will colocate native port/import/export in src/native to keep the source folder bounded.
+
+## Slice 2 — complete candidate for IMPL-EVAL
+
+Implemented native preflight/import/export, isolated page ownership, actual variant/property/anatomy/alias inspection, rollback and repeated-import identity. Added maintained HTML Code Connect templates with scoped attributes, exact registry/source headers, complete receipt/hash/node coverage checks and nonpublishable fixture preview names. Added generator/verify/inventory/connect commands, output validation/refusal/rollback, separate plugin main+iframe/build, contributor guide and dedicated allowlisted CI workflow.
+
+Native sandbox compatibility uses synchronous projections of existing carriers and an iframe digest port; source schemas/contracts/values remain unchanged. Browser UI handles downloads and native WebCrypto; no second resolver/hash and no new dependency. Unknown native bindings, malformed digest responses, missing fonts, cancelled calls, malformed messages and creation/reparent failures are tested.
+
+Final candidate gate `figma-component-library` PASS via repository run-gate runner: check/lint/fmt process all 26 TypeScript files; 25 tests pass, 0 fail/ignored; tools quality scan has zero allowances/findings; separate native/browser build passes. The domain report preserves wrapper counts and explicitly says fullInventoryReady=false, exposing the prose source defect. Root release preflight, docs accuracy and gate-runner tests also pass; broader quality:gate/existing figma:ci already passed on unchanged owned source surfaces. Full scaffold.runtime UNPROVEN from the single failed environment-preflight attempt, not waived into a runtime PASS.
+
+Current code-owned inventory: 52 entries / 2,046 variants; 51-item non-prose subset has 1,958 variants and remains partial. No claim that mocks or the isolated VM prove editor/MCP/publication. S3 PRs #2488/#2538 remain open at last read; reconcile actual inventory after they land before all-S5 acceptance. #2418/#2412 stay open. No labels or unowned-resource mutation.
+
+Exact reviewed candidate file hashes are in reviewed-files.json. Independent same-session final IMPL-EVAL pending; no slice2 source commit before its PASS.
+
+## Final IMPL-EVAL — PASS / supervisor sign-off
+
+Same independent read-only Claude evaluator returned PASS in evaluate.md. Observed model matches the owner-selected native Opus5.5 route. It independently reran the complete dedicated gate (26/26 files, tests25 PASS, quality/build PASS), root gate tests76 PASS and release preflight. It also imported/exported the full51-item non-prose subset through the stateful fake host, verified identical receipts and zero repeated-import mutations, and generated53 preview files outside the publisher glob. These remain fixture/compatibility proofs, not live editor evidence.
+
+All32 product/workflow/gate file hashes match reviewed-files.json after evaluator exit; no product content changed during review. Supervisor signs off the exact reviewed candidate for the source commit. The earlier first-slice PASS remains intact. Native cancellation-adapter behavior, iframe message-source compatibility and FLOAT inspection bindings require live host confirmation under the existing parents; none is claimed proven by mocks.
+
+Reconcile: both S3 PRs still OPEN at live recheck. PR2576 is the single existing PR and remains Refs-only with no labels; its milestone is the issue's Frontend Contribution theme. No parent closure or unowned resources changed. Final-head hosted checks and final report remain pending before READY.

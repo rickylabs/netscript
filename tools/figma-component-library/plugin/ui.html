@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>NetScript component library</title>
+<style>
+  body{font:13px system-ui;margin:20px;color:var(--figma-color-text,#222);background:var(--figma-color-bg,#fff)}
+  label{display:block;margin:12px 0}input,button{font:inherit;padding:8px}input[type=text]{display:block;box-sizing:border-box;width:100%;margin-top:5px}
+  button{margin:5px 5px 5px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere}a{display:block;margin:8px 0}
+</style>
+<h2>Code-owned component library</h2>
+<p>Creates structural contract specimens on a separate page. Import variables with the token plugin first. Existing designed components are preserved.</p>
+<label>Figma file key <input id="file-key" type="text" autocomplete="off"></label>
+<label>Registry items (comma separated; empty requests the full inventory)<input id="items" type="text" placeholder="button,input"></label>
+<label>Or load a generated library.json <input id="library" type="file" accept=".json,application/json"></label>
+<button id="generate">Generate document</button><button id="import">Import to editor</button><button id="export">Inspect and export</button>
+<button id="connect" disabled>Download Code Connect files</button>
+<pre id="status" role="status">Loading code-owned sources…</pre><div id="downloads"></div>
+<!-- SCRIPT -->
+</html>

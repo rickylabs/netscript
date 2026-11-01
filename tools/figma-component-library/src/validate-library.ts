@@ -35,8 +35,20 @@ export function validateLibrary(input: unknown, sources: LibraryInput): LibraryB
 }
 
 /** Content address ties native receipts to the complete contract, coverage and binding document. */
-export async function libraryHash(bundle: LibraryBundle): Promise<string> {
-  const bytes = new TextEncoder().encode(serializeLibrary(bundle));
+export type LibraryDigest = (text: string) => Promise<string>;
+
+async function webDigest(text: string): Promise<string> {
+  const bytes = new TextEncoder().encode(text);
   const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
   return [...digest].map((v) => v.toString(16).padStart(2, '0')).join('');
+}
+
+/** Native Figma uses its iframe's WebCrypto through an injected digest port. */
+export async function libraryHash(
+  bundle: LibraryBundle,
+  digest: LibraryDigest = webDigest,
+): Promise<string> {
+  const hash = await digest(serializeLibrary(bundle));
+  if (!/^[0-9a-f]{64}$/.test(hash)) throw new Error('Invalid library digest response');
+  return hash;
 }

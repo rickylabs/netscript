@@ -1,0 +1,10 @@
+{
+  "name": "NetScript component library",
+  "id": "netscript-figma-component-library",
+  "api": "1.0.0",
+  "main": "main.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": { "allowedDomains": ["none"] }
+}
