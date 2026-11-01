@@ -1,11 +1,23 @@
-# Resume
+# Completed implementation — Cockpit handoff
 
-#2579 is implemented and independently slice-reviewed (SLICE_REVIEW_PASS); see slice-review.md. Default four-engine database model and memory sample now provide 40 rich seeded rows. Contracts narrow statuses, amounts and currency; list sorts/filters/paginates and counts consistently. References are server-generated on client writes; seed upserts preserve edits. Emitted app server lib offers complete overview loading and pure typed projections with UTC period/delta/series/status/latest semantics. Pages only add fields/status presentation and retain list controls.
+PR #2583 implements #2579. It remains draft, uses Refs #2579 and has no labels. Cockpit owns merging. The final assignment report queues READY after current-head confirmation. Do not add a closing keyword, mark ready-for-review, merge, rebase or force-push.
 
-219 focused tests pass; root type check passed 4,140 files, generated SQLite/memory checks passed 133/125, emitted memory application test passed. Fourteen check:* tasks passed; assets-barrel requires the carrier commit first. Live SQLite migrations, Prisma/Zod generation, 40-row seed and rerun idempotence pass. Live Chromium 153 DOM assertion and records-desktop.png prove reference, owner, status and amount in cells. Live typed-client projection proof passes (20/20 records by period, 60 buckets, six status groups, latest five). Carriers regenerated prose → export corpus → assets → publish.
+## Source and outcome
 
-Draft PR #2583 with Refs #2579/no labels. Mandatory final IMPL-EVAL and CI Docker scaffold.runtime remain outstanding. CI must be manually dispatched on the branch because ordinary draft/no-label PR events skip jobs. Preserve the same private evaluator continuation; public artifacts contain no session identifiers/absolute paths. Never rebase or force-push; merge main if required. Cockpit merges. Final visible GitHub report uses .divybot-final-report.md handoff.
+The evaluated implementation head is 2b1db077b01eb0c1f06b51d336280c0438f22866. The final commit changes only this scoped run's evidence/context; resolve the delivery head from Git or the final PR comment. Source outside .llm/runs is identical to that implementation.
 
-CI repair: Pages compile fixture now materializes sample-records.ts and modelName; generated domain test narrows the sort union. Both fixes have independent SLICE_REVIEW_PASS. Local docs:snippets 36-fence check and scaffold.service 8/8 pass; SQLite 133-file check is green on current canonical output. Next push supersedes 4689292 failures; trigger a new manual e2e-cli run for Docker proof.
+Default models/contracts/clients now carry unique references, owners, six portable statuses, signed integer minor-unit amounts/currency, and timestamps. Forty deterministic rows span sixty UTC days; upserts preserve edits/IDs. Fresh databases insert oldest first for the generic ID-descending list. Memory uses the same sample source. Server projections expose adjacent 30-day metrics/deltas, 60 daily buckets, per-currency amounts/averages, status counts and latest records. Complete overview reads fail closed; absent/empty/unauthorized/unavailable remain distinct. Existing layouts/CSS are retained.
 
-Latest runtime repair: both CI runtime lanes stopped at generated.quality-negative after 42 passes because baseline example ternaries violated Deno 2.9.7 lint. Named configuration bindings fix the templates; chronological seed insertion keeps the latest representative row on the generic first page. Independent SLICE_REVIEW_PASS, 219 tests, generated lint 139 files and fresh SQLite ordering proof all pass. Final evaluator previously returned SOURCE_REVIEW_PASS/EVIDENCE_PENDING, not a terminal verdict. Full runtime rerun at the next head remains required.
+## Proof
+
+- Deno 2.9.7; 219 focused tests. Four-engine model/contract generation tests; actual live SQLite and CI PostgreSQL/SQLite.
+- All fifteen root check:* tasks, complete carrier chain, root check (4,140 files), lint/fmt and quality/architecture PASS.
+- Live seeded records and projections; Chromium 153 cell assertions and records-desktop.png. Real generated SQLite/memory checks (133/125 files), emitted memory test, docs compile and standalone scaffold.service pass.
+- CI 41327413127 SUCCESS: PostgreSQL 122/122, SQLite 115/115, no failures/skips in either suite, static/native jobs successful. Pages 41327353410 SUCCESS.
+- Independent read-only Claude Opus 5.5 high IMPL-EVAL PASS; see evaluate.md and gate-evidence.md. Same evaluator re-steered throughout; model usage verified; no public session identifiers.
+
+## Repairs and limits
+
+Independent reviews repaired duplicate SQL Server sort keys, pagination control loss, client-writable references and raw status labels. CI repairs materialized a missing docs seed module, narrowed an emitted test union, and removed literal-boolean ternaries from emitted example routes without changing lint rules or layouts. All are documented in drift.md/slice-review.md. No live MySQL/MSSQL database run was claimed. The optional stale dogfood helper remains outside this change.
+
+All four owned proof processes were stopped and foreign/unknown resources left untouched. No new architecture debt. Raw logs, CI report downloads and evaluator continuation metadata stay in private project run output; public artifacts use repository-relative paths only. The dated lesson and small memory notes retain extension and gate recipes. No requested source work remains.
