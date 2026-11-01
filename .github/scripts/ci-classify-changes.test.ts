@@ -605,7 +605,7 @@ Deno.test('all docs browser inputs still select the Pages browser gate', () => {
   }
 });
 
-Deno.test('Pages browser consumes classification and reproduces rendered content before tests', async () => {
+Deno.test('Pages browser consumes classification and reproduces every output byte before tests', async () => {
   const pages = await Deno.readTextFile('.github/workflows/pages.yml');
   const browser = workflowJob(pages, 'utility-browser') ?? '';
   assertEquals(browser.includes('needs: classify'), true);
@@ -615,7 +615,9 @@ Deno.test('Pages browser consumes classification and reproduces rendered content
     ),
     true,
   );
-  assertEquals(browser.includes('check-reproducible.ts --allow-pagefind-metadata'), true);
+  assertEquals(browser.includes('deno task --cwd docs/site test:pagefind'), true);
+  assertEquals(browser.includes('tools/docs-site/check-reproducible.ts\n'), true);
+  assertEquals(pages.includes('--allow-pagefind-metadata'), false);
   const classifier = workflowJob(pages, 'classify') ?? '';
   assertEquals(classifier.includes('CLASSIFY_PUSH_DIFF:'), true);
   assertEquals(classifier.includes('github.event.before'), true);

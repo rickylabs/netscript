@@ -1,0 +1,18 @@
+{
+  "head": "5e77d73e1ffcb4176978e875ba66940ab4726806",
+  "runtime": "Deno 2.9.7",
+  "command": "deno run --allow-read --allow-run --allow-env tools/docs-site/check-reproducible.ts",
+  "exitCode": 0,
+  "result": {
+    "outcome": "PASS",
+    "scope": "all-output",
+    "files": 1116,
+    "html": 316,
+    "search": 311,
+    "twins": 262,
+    "nonBlockingDifferences": [],
+    "changedNonHtml": []
+  },
+  "rawLogSha256": "37d561527be042e888105d4bddfea8c307fc9d365102bfd50055afa2ff18875c",
+  "policy": "Bounded CI invocation and checker mode remained present at this head. Remove them only after this proof."
+}
