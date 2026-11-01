@@ -54,8 +54,16 @@ Deno.test('alert aliases preserve destructive semantics and unknown types fail c
   }
   assertEquals(CALLOUT_TYPES.danger.markdown, 'CAUTION');
   assertEquals(CALLOUT_TYPES.caution.markdown, 'CAUTION');
+  assertEquals(CALLOUT_TYPES.error.markdown, 'CAUTION');
   assertThrows(() => calloutType('unknown'), Error, 'Unsupported callout type');
   assertThrows(() => calloutType('dangre'), Error, 'Unsupported callout type');
+});
+
+Deno.test('every callout exports a GitHub-supported alert marker', () => {
+  const supported = new Set(['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']);
+  for (const [name, definition] of Object.entries(CALLOUT_TYPES)) {
+    assert(supported.has(definition.markdown), `${name}: ${definition.markdown}`);
+  }
 });
 
 Deno.test('alert meaning has distinct icon names and shapes except caution and danger', () => {

@@ -51,12 +51,15 @@ layer, and read-only freshness covers both. Other properties must consume semant
 check follows aliases in both schemes and permits only logo and explicit error contexts.
 
 Normal tests prove rejection of hex, named/function colours, custom aliases and misplaced red.
-To see the real gate go red, run either control below (expected exit: non-zero):
+To see the real gate go red, run one of these controls (expected exit: non-zero):
 
 ```sh
 DOCS_UI_NEGATIVE_CONTROL=raw-colour npm test -- --config docs.playwright.config.ts --project light-1280 --grep 'style policy: authored'
 DOCS_UI_NEGATIVE_CONTROL=red-role npm test -- --config docs.playwright.config.ts --project light-1280 --grep 'style policy: authored'
+DOCS_UI_NEGATIVE_CONTROL=red-token npm test -- --config docs.playwright.config.ts --project light-1280 --grep 'style policy: authored'
 ```
+
+The `red-token` control adds a red primary token and an unapproved exemption entry. The policy must still report red outside an error state.
 
 Pages CI preserves the existing docs gates, adds this browser gate, and uploads screenshots,
 axe/keyboard reports, traces and a durable command receipt even on failure. A real Design system

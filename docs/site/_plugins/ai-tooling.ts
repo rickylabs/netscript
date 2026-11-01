@@ -253,14 +253,14 @@ function blockMd(node: ChildNode, origin: URL): string {
       const content = body
         ? (hasBlockChild(body) ? childBlocks(body, origin) : inlineChildren(body, origin)).trim()
         : '';
-      // A Markdown alert is written back as authored: `[!TYPE]`, an optional `**title**`
-      // paragraph, then the body.
+      // Keep authored titles/body, but normalize legacy aliases to supported GitHub markers.
       const marker = el.getAttribute(ALERT_ATTRIBUTE);
       if (el.classList.contains('ns-callout') && kind && label && body && marker) {
         const title = inlineChildren(label, origin).trim();
+        const canonicalMarker = CALLOUT_TYPES[calloutType(marker)].markdown;
         const head = title && title !== CALLOUT_TYPES[calloutType(kind)].label
-          ? `[!${marker}]\n**${title}**\n`
-          : `[!${marker}]`;
+          ? `[!${canonicalMarker}]\n**${title}**\n`
+          : `[!${canonicalMarker}]`;
         return quoteMd(`${head}\n${content}`);
       }
       if (el.classList.contains('ns-callout') && kind && label && body) {
