@@ -637,3 +637,45 @@ or controls. Supply meaningful alternative text or diagram labels yourself.
 intrinsic ratio and shrinks for narrow containers. No placeholder, cropping,
 fetching or extra tab stop is introduced. Captions and native child controls
 remain part of the figure's ordinary semantics and keyboard order.
+
+### Docs composition: RuledGrid and Hero
+
+Install `ruled-grid` / `hero` through `ui:add` and include their generated CSS.
+`RuledGrid` accepts string `columns='2'|'3'|'4'` (default `'3'`) and
+`variant='ruled'|'feature'` (default `'ruled'`). Its `Cell` member has optional
+`eyebrow`, `icon`, `title`, `children` (description) and `action` slots. Cells use
+the Docs-card anatomy from the ledger; they add no click handler, link role or
+tab stop. Supply native links/buttons in title/action/content. A supplied heading
+owns its own document rank. Ruled cells have logical inline-end and bottom rules;
+feature cards have separate top hairlines and a 32px gap.
+
+`Hero` is a native section with required `title`, optional `eyebrow`, `children`
+(lede), `actions`, `aside` and `paths`. The string `headingLevel='1'..'6'` defaults
+to `'1'` and changes heading rank only. `paths` renders inside the aside after its
+other content; supply actual FilePathChip/CodeBlock/Figure components at the
+caller. Hero imports no other layer-2 component. `layout='split'|'centered'`
+defaults to `'split'`. Both blocks work as server-rendered markup without their
+own island; caller-owned interactive children may need an island.
+
+Automatic layout measures the block's own inline size, including inside a docs
+Shell content column. Named container queries style one necessary inner part
+(`grid` or `layout`). The complementary ranges include fractional widths:
+
+| Container width | RuledGrid actual columns | Automatic split Hero |
+| --- | --- | --- |
+| `<=767px` | 1 for every request | One column; gap 32, inline padding 20, title role |
+| `>767px` and `<=1100px` | 2 for every request | Fluid 1.5:1 tracks, gap 40, display role |
+| `>1100px` | Requested 2, 3 or 4 | Fluid 17:9 tracks, gap 80, maximum width 1120 |
+
+At 1120px the wide Hero tracks are 680/360. Centered desktop layout stacks the
+aside below centered copy; mobile copy aligns to the inline start. Optional
+`breakpoint='desktop'|'mobile'` forces a reference presentation and owns
+`data-breakpoint`; omission leaves the attribute absent and uses the container.
+Forced desktop still has fluid minimum-zero tracks. Native controls retain the
+same DOM and order at every width. Long text wraps; no JavaScript breakpoint,
+observer, duplicated branch or token-value change is involved.
+
+Toc/AnchorNav passive observation covers ordinary document scrolling and nested
+non-body scroll containers. A caller that makes `body` a separate scrolling box
+with fixed html/body height currently receives viewport measurements; that
+composition is not covered by the section-observation guarantees.

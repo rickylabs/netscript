@@ -1,3 +1,4 @@
+import { docsCompositionFixtures, docsCompositionKeyboard } from './utility-docs-composition.tsx';
 import { docsNavigationFixtures, docsNavigationKeyboard } from './utility-docs-navigation.tsx';
 import { docsStructureFixtures, docsStructureKeyboard } from './utility-docs-structure.tsx';
 import { aiInteractionFixtures, aiInteractionKeyboard } from './utility-ai-interaction.tsx';
@@ -56,6 +57,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...aiInteractionFixtures,
     ...docsStructureFixtures,
     ...docsNavigationFixtures,
+    ...docsCompositionFixtures,
     proseFixture,
   ],
   keyboard: [
@@ -80,6 +82,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...aiInteractionKeyboard,
     ...docsStructureKeyboard,
     ...docsNavigationKeyboard,
+    ...docsCompositionKeyboard,
     ...proseKeyboard,
   ],
 }];

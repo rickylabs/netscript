@@ -1,3 +1,4 @@
+import { DocsCompositionExamples } from './gap-docs-composition-fixture.tsx';
 import {
   ClippedDocsComposition,
   DocsNavigationExamples,
@@ -94,7 +95,18 @@ function Actions() {
     </main>
   );
 }
-if (location.pathname === '/docs-navigation-inset-static') {
+if (location.pathname === '/docs-composition-shell') {
+  hydrate(<DocsCompositionExamples embedded />, document.getElementById('composition-island')!);
+} else if (location.pathname === '/docs-composition-static') {
+  // This static route intentionally retains its useful server-rendered native controls.
+} else if (location.pathname === '/docs-composition') {
+  render(
+    <main>
+      <DocsCompositionExamples />
+    </main>,
+    document.body,
+  );
+} else if (location.pathname === '/docs-navigation-inset-static') {
   hydrate(<InsetDesktopContents />, document.getElementById('inset-desktop-island')!);
   hydrate(<InsetMobileContents />, document.getElementById('inset-mobile-island')!);
   hydrate(<InsetSections />, document.getElementById('inset-sections-island')!);

@@ -32,3 +32,9 @@ Next11b1 is the seven-item slice11b1-checkpoint.md; design review is pending
 before source edits. Declared component/registry/browser surface covers its
 shared copied section-navigation support helper and caller-only Shell Toc
 composition. Later11b2/Desktop/12/13 remain required, no READY.
+
+Current Docs11b2 runs on publishedf1889578 after terminal11b1. Seven-item
+checkpoint plus same designround2PASS authorize nativeRuledGrid/Hero and
+necessaryinnercontainerqueryparts, canonicalcatalog/projections/consumer/
+browserfiles.23source/carrierpaths; source/evidence reviews stillrequired.
+Desktopactualsix audit11b3 and12/13 remainmandatory, noREADY.

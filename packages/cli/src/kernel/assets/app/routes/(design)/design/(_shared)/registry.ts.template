@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 131,
+  'total': 133,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -869,6 +869,19 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 2,
     'description': 'Native horizontal section navigation and passive current tracking.',
   },
+  {
+    'name': 'ruled-grid',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Responsive private Docs cards with native caller controls and logical rules.',
+  },
+  {
+    'name': 'hero',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'CSS-responsive document introduction with native actions and caller-owned aside.',
+  },
 ];
 
 export const registryCollections: readonly RegistryCatalogCollection[] = [
@@ -1006,6 +1019,8 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
       'figure',
       'toc',
       'anchor-nav',
+      'ruled-grid',
+      'hero',
     ],
   },
   {

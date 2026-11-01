@@ -38,6 +38,8 @@ export const POST_V1_COMPONENTS: readonly string[] = [
   'figure',
   'toc',
   'anchor-nav',
+  'ruled-grid',
+  'hero',
 ];
 
 /** Non-component support items added after the frozen v1 baseline. */
