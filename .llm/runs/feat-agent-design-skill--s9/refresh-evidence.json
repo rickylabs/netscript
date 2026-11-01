@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-01",
+  "phase": "reviewed source at 9088440bef7a8ddb5f5d5ed350818ebedb293197",
+  "baselineHead": "1b8cfeb80973c4333ee6cb19e01cc5de24d76bc6",
+  "integratedMain": "6a1d84a6e",
+  "deno": "2.9.7",
+  "rootChecks": [
+    {
+      "task": "check:desktop-native-fixture",
+      "exitCode": 0
+    },
+    {
+      "task": "check:emitted-samples",
+      "exitCode": 0
+    },
+    {
+      "task": "check:streams-types",
+      "exitCode": 0
+    },
+    {
+      "task": "check:child-health-docs",
+      "exitCode": 0
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "exitCode": 0
+    },
+    {
+      "task": "check:assets-barrel",
+      "exitCode": 0
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0
+    },
+    {
+      "task": "check:scaffold-versions",
+      "exitCode": 0
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "exitCode": 0
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "exitCode": 0
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "exitCode": 0
+    },
+    {
+      "task": "check:figma-names",
+      "exitCode": 0
+    },
+    {
+      "task": "check:review-threads",
+      "exitCode": 0
+    },
+    {
+      "task": "check:design-skill",
+      "exitCode": 0
+    }
+  ],
+  "tests": {
+    "command": "deno run --frozen -A .llm/tools/run-deno-test.ts -- --frozen --unstable-kv -A .llm/tools/docs/generate-design-skill_test.ts packages/cli/src/public/features/agent packages/cli/src/public/features/init/init-agent-integration_test.ts packages/cli/src/public/adapters/agent",
+    "passed": 121,
+    "failed": 0,
+    "ignored": 0,
+    "exitCode": 0
+  },
+  "structuredScopes": {
+    "filesSelected": 4,
+    "filesProcessed": 4,
+    "droppedFiles": 0,
+    "checkExit": 0,
+    "lintExit": 0,
+    "fmtExit": 0
+  },
+  "nativeHosts": [
+    {
+      "host": "vscode",
+      "firstExit": 0,
+      "secondExit": 0,
+      "idempotent": true,
+      "currentGuidance": true,
+      "skillSha256": "a016908319fa763173841cbc3b9c890e4a1b4a291bc31869d263720ec303874c",
+      "canonicalReference": true
+    },
+    {
+      "host": "claude",
+      "firstExit": 0,
+      "secondExit": 0,
+      "idempotent": true,
+      "currentGuidance": true,
+      "skillSha256": "a016908319fa763173841cbc3b9c890e4a1b4a291bc31869d263720ec303874c",
+      "canonicalReference": true
+    },
+    {
+      "host": "opencode",
+      "firstExit": 0,
+      "secondExit": 0,
+      "idempotent": true,
+      "currentGuidance": true,
+      "skillSha256": "a016908319fa763173841cbc3b9c890e4a1b4a291bc31869d263720ec303874c",
+      "canonicalReference": true
+    }
+  ],
+  "runtime": {
+    "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+    "status": "UNPROVEN",
+    "exitCode": 1,
+    "failedGates": [
+      "preflight.aspire",
+      "cleanup.aspire-stop"
+    ],
+    "reason": "Docker daemon inaccessible; runtime not started. Cleanup Docker inspection unavailable."
+  },
+  "quality": "PASS",
+  "docsAccuracy": "PASS",
+  "releasePreflight": "PASS",
+  "jsrAudit": "PASS",
+  "sourceHashes": {
+    ".llm/tools/docs/generate-design-skill.ts": "c1ab224e84e6fcbf85c989d18363e1dd45730cd8893863e2a550f627ade699bf",
+    ".llm/tools/docs/generate-design-skill_test.ts": "03615fbe0e7e22f15bde41e4caed4b8a5ae26de560f6ccb5816911f3347ca40e",
+    "deno.json": "024792ae84049f71d310ec81dde6e9f8aac8102190e9d80ccc682237e1244fe6",
+    "packages/cli/src/kernel/assets/agent/guidance.md.template": "13128442a21dba0125d3ba54783d758961f85c8ef30227bb2430b47e6be93fe1",
+    "packages/cli/src/kernel/assets/embedded.generated.ts": "2555b0fb3dfcdf10243c911658ae6fb3c268bb279925bb915a2d3f771ddb8210",
+    "packages/cli/src/kernel/assets/skills.generated.ts": "817b105adea673a59405a4380af096ff3565b5dabe36a92f70a06611454e65ed",
+    "packages/cli/src/public/features/agent/init/init-agent_test.ts": "c609bbe081463a5d553b6efd5369ad993a44c1e4220d8d6111d05b4f586e46eb",
+    "packages/cli/src/public/features/init/init-agent-integration_test.ts": "74ded4edc883e8d76828696a0e47f715d797464ca019030ea063ce7bc2a42850",
+    "skills/manifest.json": "f95eaa7787fe53811e7e4b137a68d57b52c227297fa0faf744fa447ba455afc5",
+    "skills/netscript-design/SKILL.md": "a016908319fa763173841cbc3b9c890e4a1b4a291bc31869d263720ec303874c",
+    "skills/netscript-design/references/GUIDELINES.md": "9f02cb226c3b914c3fb9d31ec738da8749691bf9bebefca4ed9fc5bc4be3416f",
+    "skills/netscript/SKILL.md": "4cbfc6b6d45c87055523174a2dffb89ba1a29fbfe5b9f80bcf50916f5eb0c23e"
+  },
+  "publishDryRun": {
+    "command": "deno task --cwd packages/cli publish:dry-run",
+    "exitCode": 0
+  },
+  "sourceCommit": "9088440bef7a8ddb5f5d5ed350818ebedb293197",
+  "independentEvaluation": {
+    "verdict": "PASS",
+    "round": 2,
+    "model": "claude-opus-5-5",
+    "effort": "high",
+    "artifact": "evaluate-refresh.md",
+    "sameSessionAsRound1": true
+  }
+}

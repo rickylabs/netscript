@@ -1,0 +1,54 @@
+{
+  "files": [
+    "data-table.spec.ts",
+    "stats-grid.spec.ts",
+    "shell.spec.ts",
+    "native-close.spec.ts",
+    "desktop-controls.spec.ts",
+    "docs-navigation.spec.ts",
+    "docs-composition.spec.ts",
+    "docs-structure.spec.ts",
+    "code-block.spec.ts",
+    "fidelity.spec.ts",
+    "display-motion.spec.ts",
+    "ai.spec.ts",
+    "ai-interaction.spec.ts"
+  ],
+  "engines": [
+    "firefox",
+    "webkit"
+  ],
+  "schemes": [
+    "light",
+    "dark"
+  ],
+  "widths": [
+    390,
+    1280
+  ],
+  "workers": 2,
+  "excludedModality": "@touch runs in maintained Chromium touch project",
+  "codeBlockScope": [
+    "per-file-language",
+    "explicit-content"
+  ],
+  "fidelityScope": "all, including automatic syntax contextual roles",
+  "clipboardScope": "native Chromium clipboard permission cases stay in fresh full Chromium",
+  "testCountsByFile": {
+    "data-table.spec.ts": 192,
+    "stats-grid.spec.ts": 48,
+    "shell.spec.ts": 72,
+    "native-close.spec.ts": 24,
+    "desktop-controls.spec.ts": 48,
+    "docs-navigation.spec.ts": 128,
+    "docs-composition.spec.ts": 56,
+    "docs-structure.spec.ts": 64,
+    "code-block.spec.ts": 16,
+    "fidelity.spec.ts": 24,
+    "display-motion.spec.ts": 32,
+    "ai.spec.ts": 72,
+    "ai-interaction.spec.ts": 128
+  },
+  "selectedCases": 904,
+  "historicalSelectedCasesBeforeReaderRegression": 896
+}

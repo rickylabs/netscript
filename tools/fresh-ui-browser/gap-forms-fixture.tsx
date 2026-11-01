@@ -1,3 +1,4 @@
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { useState } from 'preact/hooks';
 import { RadioGroup } from '../../packages/fresh-ui/registry/components/ui/radio-group.tsx';
 import { InputGroup } from '../../packages/fresh-ui/registry/components/ui/input-group.tsx';
@@ -26,7 +27,7 @@ export function Forms() {
         }}
       >
         <RadioGroup name='plan' legend='Plan' options={options} defaultValue='free' required />
-        <button type='submit'>Submit radio</button>
+        <Button type='submit'>Submit radio</Button>
         <output aria-label='Submitted plan'>{submitted}</output>
       </form>
       <RadioGroup
@@ -41,7 +42,7 @@ export function Forms() {
         aria-label='Search field'
         align='inline-end'
         control={<input aria-label='Site search' type='text' />}
-        addon={<button type='button' onClick={() => setSearches(searches + 1)}>Run search</button>}
+        addon={<Button type='button' onClick={() => setSearches(searches + 1)}>Run search</Button>}
       />
       <output aria-label='Search count'>{searches}</output>
       <InputGroup state='disabled' control={<input aria-label='Disabled search' />} />
@@ -53,7 +54,7 @@ export function Forms() {
         }}
       >
         <InputOTP label='Verification code' name='otp' length={6} groups={2} required />
-        <button type='submit'>Verify code</button>
+        <Button type='submit'>Verify code</Button>
         <output aria-label='Submitted code'>{submitted}</output>
       </form>
       <InputOTP label='Fixed code' length={4} value='12' onValueChange={setOtpRequest} />

@@ -1422,3 +1422,239 @@ quality/arch/preflight/accuracy/exports/site/docs140/root/CLI/currentheadnative
 publish0slow and exact123+1doc-debt attribution remain required.5MBcap must
 not change; if it fails stop. Fourcarriers/currentheadquality/pub only AFTER
 all generator/browser jobs close, avoiding the parent's corrected race.
+
+
+# Latest owner budget/readiness decision — final full-scope caps
+
+> COORDINATOR: Owner decision (Eric, relayed 11-01): keep the global component-CSS budget and raise it for the gap components. 1. First apply the #2558 consolidation pattern (native nesting under the single Utility scope) to every new component to minimise size. 2. Then measure the final full-scope raw and gzip sizes and set the caps to measured + about 2% headroom, with a one-line reason at each constant: gap components from #2488 (owner decision 2026-11-01). 3. Do not weaken the check logic; keep the red-then-green proof that the budget still rejects bloat. Then finish the remaining scope, merge origin/main normally (no rebase, no force-push), and post READY with CI green or policy-skipped. Do not wait for an answer.
+
+This explicitly supersedes the earlier preserved4019/473headroom formula for
+final readiness. After remaining Desktop and harness work, consolidate every
+applicable repeated Utility scope, measure ALL final non-theme component CSS,
+and set each cap to ceil(final measured bytes ×1.02). Each raw/gzip constant
+gets the one-line reason: gap components from #2488 (owner decision 2026-11-01).
+Keep the global inventory, source/carrier equality, compression, both assertions
+and5MBcap unchanged. Re-run red controls, exact restore and final positive gate.
+The current merge's339588/45224limits are intermediate evidence under the
+previous owner grant, not a claim about final2%headroom. Do not mutate them
+while current frozen browser gates run. No future-scope credit or arbitrary
+buffer, no skip or assertion weakening, no new theme predicate where there is
+no repeated scope to factor.
+
+Final READY may use green or explicitly policy-skipped CI at the exact final
+head, as the latest owner instruction states. Failed/pending checks are not
+acceptable, and full remaining scope still must be delivered. No rebase or
+force-push; use normal merges and plain pushes. No final report/READY now.
+
+
+# MessageScroller reader-frame fix — design before production change
+
+The broader child merge gate found a real native input race, not a CSS rule
+change. The896-case FF/WK run stops at450PASS/1FAIL/1interrupted/444notrun:
+WebKit390light's second nativeHome remains at the end. Read-only12native-cycle
+diagnostics reproduce11PASS/1FAIL with correct viewport focus, fixed geometry,
+a1pixel native step then a jump back. Transparent forwarding of real scrollTo
+records the component's own queued measure(true) pulling end-1 back to end.
+
+A corrected, mode-verified private script-response prototype tests actual native
+wheel(-1), Home/End and LatestEnter+Space/refocusHome in3engines×2schemes×2widths.
+Original code fails8cases(Chromium/WebKit), passes4Firefox; the small reader-frame
+candidate passes all12. Both branches load verified bodies at the actual
+fixture.js route; no native scroll/key behavior is mocked. The earlier probe
+used the wrong JS route and did not apply its candidate; it is preserved as a
+precondition failure, not passing/disproving evidence. A previous held-pin idea
+was not shipped because it would change endThreshold behavior unnecessarily.
+
+1. Public contract: input-only frames must observe native scrolling and must
+   never pull it back to the end. Observer-only growth/resize frames still follow
+   only an already-pinned reader. Props/parts/attributes/values, finite threshold
+   behavior, native key map, focus, latest action and SSR stay unchanged. No new
+   contract field, token, CSS, dependency, listener, port or backend behavior.
+2. Vocabulary: readerIntent remains the existing flag consumed by measurement.
+   A readerFrame flag separately records that the queued animation frame has
+   received user input, even if an early scroll event clears readerIntent. Any
+   such coalesced frame is measurement-only; observer-only frames may follow.
+3. Ports: existing native wheel/key/scroll events, existing rAF, ResizeObserver,
+   MutationObserver and explicit latest action. Never prevent default, replace
+   the native scroll controller, add a fixed delay, retry or browser-specific
+   production branch. Keep cleanup and one pending frame per instance unchanged.
+4. Constants: no new magic values. Existing endThreshold(default1)and key set
+   remain byte-identical. Add one effect-local boolean; noteIntent marks it;
+   rAF consumes it into the already-existing measure(follow)argument and clears
+   it. The pinned.current=!down assignment and every threshold comparison stay
+   unchanged. This avoids the rejected sticky-unpin/previous-position redesign.
+5. Ordered changes/gates, fewer than30files:
+   - SAME selected design review first; current full791Chromium/866package/
+     140docs/67CLI all closedPASS on original frozen source. The cross failure
+     is preserved and not called green. Record this intentional runtime exception
+     to the earlier non-CSS byte-identity assumption before changing production.
+   - Add a real native one-pixel wheel regression to existing ai-interaction
+     browser spec, before product edits. Fully expose the viewport, use trusted
+     wheel(-1)and existing scroll-event quiescence helper, require an actual
+     movement away within the SAME1pxthreshold and data-scrollable=up. Retain
+     all existing nativeHome/End/latest/focus tests. No event mock, timeout
+     increase, sleep, retry, weaker assertion or test exclusion. Observe RED in
+     current unmodified Chromium/WebKit first; Firefox may already pass because
+     its event ordering differs. Then add readerFrame handling to MessageScroller
+     plus one README sentence and regenerate source/assets/build canonically.
+   - Refresh scoped product/browser wrappers and focused native AI checks across
+     all3engines/bothschemes/3901280, then refreeze and run fresh FULLpackage,
+     full maintainedChromium(now795 with added4cases), affectedFFWK(now904)
+     and docs140, broaderquality/arch, preflight/accuracy/exports/site/CLI/root,
+     exact123TS+1JSONdoc-debt attribution. The old all-pass frozen runs become
+     historical source evidence after this runtime/test change.
+   - Latest Eric/Cockpit budget policy is measured+about2%, not old4019/473.
+     Current104component CSS is335569raw/44751gzip, unchanged by this runtime
+     fix. Use literal ceil(measured×1.02):342281raw/45647gzip for this snapshot,
+     each field with the exact dated2488ownerreason. Keep every byte/equality/
+     gzip/assertion/5MBlogic. Add REAL authored+carrier CSS comment bloat controls
+     that independently exceed raw and gzip limits; configured gate must reject,
+     then restore exact source/carrier hashes and pass. No self-adjusting cap at
+     runtime. Remeasure again after remainingDesktop/harness source is complete
+     for final full-scope2%caps; do not label this interim snapshot final READY.
+   - SAME source review, merge source commit, all4carriers/sixcommands, generated
+     delta/current-head quality/nativepublish0slow after ALL generators/browsers
+     close, SAME evidence review, privacy/a907ancestor assertion/plainpush2538.
+6. Deferred: no other scroll controller redesign, new gesture state machine,
+   scrollend dependency or altered pinning/threshold policy. No style extension
+   implementation in this correction. FourDesktop audits, productionx/all-style
+   harness and finalwholephase runtime/eval/exact-headCI still required. The
+   latest owner accepts greenORpolicy-skippedCI, never failed/pending. No early
+   READY/final report, PR merge, release, label or19promotions.
+7. Contributor path: existing MessageScroller section in packages/fresh-ui/README.md,
+   MessageScroller implementation and its native ai-interaction browser cases.
+   Private prototypes/raw failures stay private; public notes use counts/portable
+   paths only. This change restores the already-documented native input ownership.
+
+
+SAME reader-frame/latest-owner-policy PLAN1PASS,0blockers/newloopfailure0,
+before any product edit. Bind actual trusted-wheel position and unchanged1px
+threshold/state, REDfirstChrome/WebKit; flag only set bynoteIntent and cleared
+onframe/cleanup; all old nativecases retained. Actualsource+carrierraw/gzipbloat
+mustrejectonlyintendedkind, exactrestorepositive. Alignparent2%beforeREADY.
+All source gates refrozen/fresh795/904/866/140etc after fix. Latestowner allows
+explicitpolicy-skippedCIat exacthead, never failed/pending; remaining scope intact.
+
+
+Actual maintained regression RED on original product:8failed(4Chromium+
+4WebKit),4Firefoxpass,0skip/flaky,rawexit1. All failures are actual first-pixel
+position clamped to end, not a weaker attribute-only probe. Product remained
+byte-exact with the saved original until this result. Then readerFrame handling
+and cleanup plus the README clarification were applied; pinned=!down,threshold
+math,key/listener/DOM/CSS remain unchanged. Canonical assets regenerated.
+Latest owner2%caps for the current104-componentCSSsnapshot are342281/45647,
+each field has the exact dated reason. These will be remeasured after remaining
+scope, and guard logic/5MBcap stay unchanged. Current proof status remains
+pending; earlier866/791/140/67runs are now historical. Failed896cross preserved.
+
+
+## Reader fix: regression and actual-bloat controls
+
+Native regression red8/green12,0retry/flaky/skip. Source/browser wrappers pass.
+Real authored CSS and regenerated carriers reject raw-only343610/44954 and
+gzip-only339110/48375; exact hashes restored, positive size gate0. Owner2%caps
+342281/45647 are snapshot-only pending remaining scope. Focused all3engine AI
+running; fresh full suite follows. Earlier frozen runs stay historical.
+
+
+## Consuming fixture button correction
+
+Focused AI all3engine run terminal168PASS/1FAIL/23notrun,0flaky/retry; dark
+WebKit native caller buttons contrast1.81. SAME scoped PLAN1PASS before
+mechanical17plainbutton tag replacements with already imported shippedButton.
+Native type/handlers/labels/position unchanged; strict axe unchanged; no package
+CSS/API/token/globalreset/allowance/skip. New full192focused run next, then all
+bound fresh full gates. This fixture is an explicit non-CSS preservation
+exception; old focused run stays failed. Failurestreak0.
+
+
+Complete corrected-fixture focused AI192PASS,0failed/skip/flaky/retry. Native
+wheel12green is refreshed within this fullmatrix. Frozen711readset exact, authored
+CSS90byte-exact from parity/bloatproof. Fresh fullpackage866/maintainedChrome795/
+completeaffectedFFWK904/docs140 now running; no source commit/review yet.
+
+
+Fresh corrected-source dedicated docs140PASS,0failed/skip/flaky/retry. Full
+maintainedChromium795/affectedFFWK904 and package866 remain running; frozen711
+sourcebookend0differences. No source review/commit until terminal results.
+
+
+## Complete consuming caller-control paint correction
+
+PreviousfullChrome795/package866/docs140PASS, completeFFWK888PASS16FAIL,0skip/
+flaky/retry. Everycrossfailure is nativecallerbuttondarkWebKitcontrast. SAME
+PLAN1PASS precedes18fixture/84tag replacements+12imports/11headlesspaint sites/
+2localreadonlytokenpairs. Four ordinary unnamed sentinel wrappers preserve
+existing strict rootscreenshotselectors; no spec/assertion change. Mechanical
+proof0othersemantic edits; all18wrappers check/lint/fmt0/0dropped.
+Fresh1280case all3engine focusedunion now running. Refreeze711, only18fixtures
+changed; other693/597product/90CSS/957site files exact. Reuse approved uninvolved
+gates only with readsetproof; refreshroot/quality and full795Chrome904FFWK after
+focused terminalPASS. All original remaining Desktop12/13scope stillmandatory.
+
+
+Complete callerfocused1280 TERMINAL1252PASS28FAIL,0skip/flaky/retry; allcaller
+contrast resolved. NewunsupportedOTPpermission setup, Chromium-specificnative
+browserchrome assertions andWebKitNavigationTabexit are investigated separately.
+Nativeclipboard6PASS realAPI/paste/submitwithoutgrants/mocks. Privatecopiedspec
+prototype52PASS4FAIL(WebKitNavigation), no maintainedtest edit or speculative
+productfix. IsolatednativeDialogreference independently reproducesengine-specific
+browserchrome behavior; see primary Playwright39268. SAMEdesign before anyfix.
+
+
+## Native correction candidate proven before source
+
+Privatecombined56PASS0skip/flaky/retry with all3originalnativecases, exactnew
+boundaryblocks inChromium, noAPI mocks. NavigationCSS-only pointer ownership
+prototype restores unchanged click/Tabtestall3; noasyncfocusoutfixneeded. Native
+clipboard6PASSwithoutpermissiongrants. ActualmaintainedCSS/specsedits waitforSAME
+platformPLAN1. Expandednativebrowserchrome limitation is independently reproduced
+by isolatedplainnativeDialog and consistent with [Playwright39268](https://github.com/microsoft/playwright/issues/39268).
+No product keyboardmap/prop/part change or maintainedtestskip proposed.
+
+
+## Native platform source implemented after SAME PLAN1PASS
+
+One scopedNavigationMenu pointer rule,14oldrulesbyte/CSSOM-identical inall3,
+89otherCSSfileshash-identical; newrule specificity0,3,1, exactownparts/foreign
+controlunaffected andsummaryhoverpaintunchanged. MaintainedNavigation.specbyte
+exact; old4WebKitRED nowreal-source12GREEN within56nativePASSall3/0skip/flaky/
+retry/no injectedCSS. OTPgrantremoved, realpasteassertsunchanged. Twoexactmodal
+browserchromeblocks movedonce; originalcasesall3gaininteriorTab/ShiftTab. Babel
+assertionmultiset0lost,+10asserts. MaintainedChromeassertsnewboundarycases; private
+FFWKexpansiondoesnotselectthem,bare-nativeportlimitationexplicitlyreviewed.
+Canonicalassets/prose0; fresh90CSS335788raw44819gzip,2%caps342504/45716,datedreasons
+ateachfield. Realbloatraw-only343829/45015,gzip-only339329/48435eachrejectonlyitskind;
+exactsource/carrierrestoreandpositive4resultsPASS. Scopedwrappersall0/0dropped.
+Fresh711sourcefrozen; complete1288focusedunion running. ALLbroadergatesrefresh
+becauseCSSchanged; old866/795/140/67arehistorical,noreadsetreuse. NoearlyREADY.
+
+
+Complete real-source1288focusedPASS inall3engines/2schemes/3901280,0failed/skip/
+flaky/retry. All711sourcefrozenexact. Freshpackage866/docs140/CLI67/quality/broad/
+root/exactdoclint nowrunning, thenfull803Chrome904FFWK. Sourcecommit/SAMEreviews
+stillpending; allremainingDesktop12/13mandatory. NoREADY.
+
+
+Freshcurrent-source866package/140docs/67CLI PASS, quality/architecture/preflight/
+accuracy/exports/10otherrootchecks0. Exactdoclint124RAWdebt2531:123TS+JSON1,0new/
+removed. Site260HTML/135registryartifacts,3locksunchanged. Full803Chrome/904FFWK
+running withfrozen711source+9buildexact. Source/SAMEreview/commit stillpending.
+
+Native mechanism clarification for source review: activeElement is SUMMARY after
+pointer activation; Tab remains stuck there in baseline WebKit. The independent
+plan verdict's phrase that it never receives focus overstates the trace. The
+controlled pointer-only CSS comparison proves restoration of the unchanged Tab
+path without claiming an internal focus-cursor cause. Review evidence is retained
+verbatim with this appended clarification; no production or test change follows.
+
+## Merge10 final source gates terminal
+
+Full maintained Chromium803 and complete affected Firefox/WebKit904 PASS on
+frozen711source/9compiled artifacts, zero failures/skips/flaky/retries. Expanded
+focused1288/package866/docs140/CLI67 and all applicable root gates pass except
+exact inherited #2531 raw doc-lint debt. Three locks match main; both PR review
+thread gates have zero unanswered threads. SAME source review is next before the
+normal merge source commit. Remaining Desktop/harness/final acceptance mandatory.
+
+Same independent child SOURCE review round1 PASS, zero blockers, failure streak0. Normal merge source commit now authorized; committed-head carriers, quality/native publication and SAME evidence review precede publication. Remaining whole scope unchanged.

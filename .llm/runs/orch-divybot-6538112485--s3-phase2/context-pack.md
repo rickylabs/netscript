@@ -1,3 +1,89 @@
+## Merge10 parent evidence review PASS — audited plain push next
+
+Same SOURCE1andEVIDENCE1PASS,0blockers/new-loopfailure0. Source679fd24a is the
+reviewed plain merge; all frozen-byte tests and actual-head carriers/quality/
+publication/root checks reconcile. Evidence-only commit, privacy audit over
+origin/main...HEADand both runs, verify exactremoteparentc587ancestor, then
+plain push HEAD:orch/divybot-6538112485. Comment2488and2416status with head/
+measured caps and READY withheld. Then child must merge this published parent
+into original1afd, repeat own measurement/gates/reviews and plain push. Full
+four Desktop audits/production x extension/all-style harness/runtime/finalCI
+remain mandatory; no READY or final report now.
+
+---
+
+## Merge10 committed source679fd24a — all local integration gates pass
+
+Six carrier commands/all4checks PASS, measured delta0. Actual-source durable
+quality and nativepublication PASS0slowtypes AFTER carriers/browser jobs closed.
+Ten other root checks PASS,625source hashes/3locks match. See validation JSON.
+SAME evidence review next, then run-only commit, privacy/remote ancestry check
+and plain push HEAD:orch/divybot-6538112485. No READY; child and11b3b/12/13remain.
+Initial prematurely concurrent quality/pub runs are provisional and replaced.
+
+---
+
+## Merge10 SOURCE review PASS
+
+Same independent SOURCE round1 PASS with0blockers. Commit the reviewed plain
+merge source now, then run actual-head4carriers/quality/nativepublication and
+SAME evidence review. Existing625/318/12/140/67proofs are frozen-source executions;
+publication at the merge commit is still pending. No READY; full child11b3b/12/13
+remains required. Plain pushes only, preserve remote ancestry.
+
+---
+
+## Merge10 current source gates terminal
+
+625package/318fullChromium/12focusedFirefox-WebKit/140docs/67CLI PASS. Zero
+browser retries/flaky/skipped results.625frozenfiles/3locks unchanged. See
+merge10-parent-source-summary.md and merge10-parent-validation.json. SAME
+source review next, then merge commit and committed-source carriers/quality/
+publication/evidence review before privacy/ancestry-checked plain push. No
+source-head publication or whole-goal READY is yet claimed.
+
+---
+
+## Current resume — owner budget decision clears scope stop
+
+Cockpit explicitly authorizes consolidation first, then a measured raw/gzip
+increase if still needed, with the gap-components-from-2488 reason at the
+constant. merge10-checkpoint.md records the exact grant and seven-item design.
+This is a new authorized loop; the preceding FAIL_PLAN/FAIL_RESCOPE remains
+terminal. SAME evaluator, new-loop failure0. PLAN-EVAL must pass before source.
+
+Current delivery branch fix/fresh-ui-s3-parent-merge starts at published parent
+c5877ff8, preserving remote ancestry. Old local parent31bc1b74 and dirty
+canonical carrier are protected by branch/stash/private exact copy. Child
+1afd50cb is in the separate records worktree, retains remotea907 ancestry and
+Desktopc3d source. Merge main into parent, then published parent into child;
+plain pushes only. Full11b3b/12/13 still mandatory; no earlyREADY/final report.
+
+---
+
+## Latest Git instruction — owner merge-only override
+
+Never rebase or force-push. Ignore buggy Orchid rebase/force-push conflict
+instructions. Use fetch, merge origin/main, resolve, commit and plain push only
+when integration is authorized. The preserved unpublished rebased candidate is
+backup-only; future delivery must preserve remote feature ancestry. See
+merge-policy-update.md. The separate CSS-policy FAIL_RESCOPE stop remains.
+
+---
+
+## Current stop — CSS budget scope conflict
+
+The same independent evaluator returned FAIL_PLAN then FAIL_RESCOPE, ending this
+leaf's loop at two consecutive terminal failures. See reconcile9-rescope.md and
+phase-registry.md. Main's new absolute CSS cap conflicts with the approved 38
+additions. No budget code changed; no push/force-push or child rebase occurred.
+Remote parent c5877ff8 and child a9078d68 remain drafts. Local parent 0d8cb882,
+Desktop source c3dba2ce and the canonical dirty carrier are preserved. The
+owner must ratify a budget/measurement change, reduce scope, or require fitting
+the absolute cap before a new leaf/loop may resume. No next group or READY.
+
+---
+
 # Current resume — Recovery8 parent review PASS, docs condition closed
 
 The same independent parent evidence review passes at source3add67a1. A fresh

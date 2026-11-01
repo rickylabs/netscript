@@ -1,3 +1,4 @@
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { useState } from 'preact/hooks';
 import { Calendar } from '../../packages/fresh-ui/registry/components/ui/calendar.tsx';
 import { DatePicker } from '../../packages/fresh-ui/registry/components/ui/date-picker.tsx';
@@ -65,7 +66,7 @@ export function Calendars() {
         }}
       >
         <DatePicker label='Delivery' name='delivery' defaultMonth='2024-02-01' />
-        <button type='submit'>Submit date</button>
+        <Button type='submit'>Submit date</Button>
       </form>
       <output aria-label='Submitted date'>{submitted}</output>
       <DatePicker label='Trip' mode='range' defaultMonth='2024-02-01' />
@@ -83,7 +84,7 @@ export function Calendars() {
       />
       <output aria-label='Requested picker open'>{openRequest}</output>
       <output aria-label='Requested picker date'>{dateRequest.join('/')}</output>
-      <button type='button' id='after-calendars'>After dates</button>
+      <Button type='button' id='after-calendars'>After dates</Button>
     </section>
   );
 }

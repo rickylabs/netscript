@@ -1,3 +1,4 @@
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { useState } from 'preact/hooks';
 import { Resizable } from '../../packages/fresh-ui/registry/components/ui/resizable.tsx';
 import { Direction } from '../../packages/fresh-ui/registry/components/ui/direction.tsx';
@@ -21,7 +22,7 @@ export function Resizables() {
         <Resizable
           label='Horizontal contents'
           style={{ width: 'min(560px, 100%)', height: 240 }}
-          startContent={<button type='button'>Open horizontal chapter</button>}
+          startContent={<Button type='button'>Open horizontal chapter</Button>}
           endContent={<a href='#horizontal-chapter'>Read horizontal chapter</a>}
         />
       </section>
@@ -30,7 +31,7 @@ export function Resizables() {
           label='Vertical contents'
           direction='vertical'
           style={{ width: 'min(360px, 100%)', height: 320 }}
-          startContent={<button type='button'>Open vertical chapter</button>}
+          startContent={<Button type='button'>Open vertical chapter</Button>}
           endContent={<a href='#vertical-chapter'>Read vertical chapter</a>}
         />
       </section>
@@ -56,7 +57,7 @@ export function Resizables() {
         />
       </section>
       <section id='resize-controlled' aria-label='Controlled resizing'>
-        <button type='button' onClick={() => setAccept((v) => !v)}>Accept controlled sizes</button>
+        <Button type='button' onClick={() => setAccept((v) => !v)}>Accept controlled sizes</Button>
         <Resizable
           label='Controlled contents'
           size={size}
@@ -73,8 +74,8 @@ export function Resizables() {
         <output aria-label='Last resize proposal'>{lastProposal}</output>
       </section>
       <section id='resize-geometry' aria-label='Container resize'>
-        <button type='button' onClick={() => setWidth(120)}>Shrink resize container</button>
-        <button type='button' onClick={() => setWidth(560)}>Restore resize container</button>
+        <Button type='button' onClick={() => setWidth(120)}>Shrink resize container</Button>
+        <Button type='button' onClick={() => setWidth(560)}>Restore resize container</Button>
         <div style={{ width, maxWidth: '100%' }}>
           <Resizable
             label='Adaptive contents'
@@ -88,15 +89,15 @@ export function Resizables() {
         <output aria-label='Geometry resize proposals'>{geometryProposals}</output>
       </section>
       <section id='resize-lifecycle' aria-label='Resize lifecycle'>
-        <button type='button' onClick={() => setMounted(true)}>Mount resize example</button>
-        <button type='button' onClick={() => setMounted(false)}>Remove resize example</button>
-        <button
+        <Button type='button' onClick={() => setMounted(true)}>Mount resize example</Button>
+        <Button type='button' onClick={() => setMounted(false)}>Remove resize example</Button>
+        <Button
           type='button'
           onClick={() =>
             setLifecycleDirection((v) => v === 'horizontal' ? 'vertical' : 'horizontal')}
         >
           Switch resize direction
-        </button>
+        </Button>
         {mounted && (
           <Resizable
             label='Removable contents'

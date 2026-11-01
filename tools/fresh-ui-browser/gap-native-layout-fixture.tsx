@@ -1,3 +1,4 @@
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { useState } from 'preact/hooks';
 import { ScrollArea } from '../../packages/fresh-ui/registry/components/ui/scroll-area.tsx';
 import { AspectRatio } from '../../packages/fresh-ui/registry/components/ui/aspect-ratio.tsx';
@@ -17,7 +18,7 @@ export function NativeLayouts() {
           id={`native-scroll-${orientation}`}
           aria-label={`${orientation} scroll example`}
         >
-          <button type='button' class='before-scroll'>Before {orientation}</button>
+          <Button type='button' class='before-scroll'>Before {orientation}</Button>
           <ScrollArea
             label={`${orientation} activity`}
             orientation={orientation}
@@ -36,7 +37,7 @@ export function NativeLayouts() {
               )}
             </div>
           </ScrollArea>
-          <button type='button' class='after-scroll'>After {orientation}</button>
+          <Button type='button' class='after-scroll'>After {orientation}</Button>
         </section>
       ))}
       <section id='native-scroll-rtl' aria-label='Local RTL scroll example'>
@@ -55,9 +56,9 @@ export function NativeLayouts() {
       <section id='native-ratios' aria-label='Aspect ratio examples'>
         {(['16:9', '4:3', '1:1', '21:9'] as const).map((ratio) => (
           <div key={ratio} style={{ width: 'min(336px, 100%)', marginBlock: 16 }}>
-            <button type='button' class='before-ratio'>Before {ratio}</button>
+            <Button type='button' class='before-ratio'>Before {ratio}</Button>
             <AspectRatio ratio={ratio}>
-              <button
+              <Button
                 type='button'
                 onClick={() =>
                   setPlays((n) =>
@@ -65,9 +66,9 @@ export function NativeLayouts() {
                   )}
               >
                 Play {ratio}
-              </button>
+              </Button>
             </AspectRatio>
-            <button type='button' class='after-ratio'>After {ratio}</button>
+            <Button type='button' class='after-ratio'>After {ratio}</Button>
           </div>
         ))}
         <output aria-label='Media plays'>{plays}</output>

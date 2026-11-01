@@ -1,0 +1,295 @@
+{
+  "date": "2026-11-01",
+  "runtime": "Deno 2.9.7",
+  "sourceHead": "d096ad665b166208c2ee19782ea8caaed738b797",
+  "mainBaseline": "6a1d84a6e04c0d39df3926528e0380e267316aee",
+  "maintainedSourceDiffFromMain": [],
+  "evidenceKind": "Public summaries of native command output and private durable receipts; these are not replacement receipts.",
+  "carrierGeneration": [
+    {
+      "task": "gen:agent-docs-prose",
+      "exitCode": 0,
+      "durationSeconds": 21.57
+    },
+    {
+      "task": "gen:mcp-export-corpus",
+      "exitCode": 0,
+      "durationSeconds": 16.74
+    },
+    {
+      "task": "gen:assets-barrel",
+      "exitCode": 0,
+      "durationSeconds": 2.03
+    },
+    {
+      "task": "gen:publish-assets",
+      "exitCode": 0,
+      "durationSeconds": 0.53
+    }
+  ],
+  "allRootCheckTasks": [
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0,
+      "durationSeconds": 17.25
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "exitCode": 0,
+      "durationSeconds": 0.52
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "exitCode": 0,
+      "durationSeconds": 0.72
+    },
+    {
+      "task": "check:assets-barrel",
+      "exitCode": 0,
+      "durationSeconds": 3.04
+    },
+    {
+      "task": "check:child-health-docs",
+      "exitCode": 0,
+      "durationSeconds": 0.64
+    },
+    {
+      "task": "check:desktop-native-fixture",
+      "exitCode": 0,
+      "durationSeconds": 0.27
+    },
+    {
+      "task": "check:emitted-samples",
+      "exitCode": 0,
+      "durationSeconds": 10.89
+    },
+    {
+      "task": "check:figma-names",
+      "exitCode": 0,
+      "durationSeconds": 0.79
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "exitCode": 0,
+      "durationSeconds": 10.55
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "exitCode": 0,
+      "durationSeconds": 3.39
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0,
+      "durationSeconds": 0.95
+    },
+    {
+      "task": "check:review-threads",
+      "exitCode": 0,
+      "durationSeconds": 0.59
+    },
+    {
+      "task": "check:scaffold-versions",
+      "exitCode": 0,
+      "durationSeconds": 0.32
+    },
+    {
+      "task": "check:streams-types",
+      "exitCode": 0,
+      "durationSeconds": 2.42
+    }
+  ],
+  "structuredTests": {
+    "classifierPages": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 72,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 72,
+        "uniqueFailures": 0
+      }
+    },
+    "docsTooling": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 16,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 16,
+        "uniqueFailures": 0
+      }
+    },
+    "siteFixtures": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 37,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 37,
+        "uniqueFailures": 0
+      }
+    }
+  },
+  "structuredWrappers": [
+    {
+      "name": "docs-tools-check",
+      "exitCode": 0
+    },
+    {
+      "name": "docs-tools-lint",
+      "exitCode": 0
+    },
+    {
+      "name": "docs-tools-fmt",
+      "exitCode": 0
+    },
+    {
+      "name": "browser-check",
+      "exitCode": 0
+    },
+    {
+      "name": "browser-lint",
+      "exitCode": 0
+    },
+    {
+      "name": "browser-fmt",
+      "exitCode": 0
+    }
+  ],
+  "docsGates": {
+    "siteBuildAndRenderedOutput": {
+      "exitCode": 0,
+      "htmlPages": 260,
+      "registryArtifacts": 93
+    },
+    "docsLinks": {
+      "exitCode": 0,
+      "documents": 105,
+      "brokenLinks": 0,
+      "brokenAnchors": 0
+    },
+    "docsAccuracy": {
+      "exitCode": 0
+    },
+    "docsSnippets": {
+      "exitCode": 0
+    },
+    "siteLinks": {
+      "exitCode": 0,
+      "links": 25552,
+      "pages": 260
+    },
+    "siteCaveats": {
+      "exitCode": 0,
+      "markers": 13,
+      "pages": 11
+    },
+    "tokenFreshness": {
+      "exitCode": 0
+    }
+  },
+  "reproducibility": {
+    "strict": {
+      "exitCode": 1,
+      "disposition": "Known #2453 filter/meta/entry entropy only; diagnostic, not delivered as fixed."
+    },
+    "workflowPolicy": {
+      "exitCode": 0,
+      "outcome": "PASS",
+      "scope": "all-output-with-reported-pagefind-metadata",
+      "files": 917,
+      "html": 260,
+      "search": 253,
+      "twins": 208,
+      "nonBlockingDifferences": [
+        "pagefind/filter/en_70194cb.pf_filter",
+        "pagefind/filter/en_d123805.pf_filter",
+        "pagefind/pagefind-entry.json",
+        "pagefind/pagefind.en_4e92f8c7fc.pf_meta",
+        "pagefind/pagefind.en_fc83d2e8fb.pf_meta"
+      ],
+      "changedNonHtml": [
+        "pagefind/filter/en_70194cb.pf_filter",
+        "pagefind/filter/en_d123805.pf_filter",
+        "pagefind/pagefind-entry.json",
+        "pagefind/pagefind.en_4e92f8c7fc.pf_meta",
+        "pagefind/pagefind.en_fc83d2e8fb.pf_meta"
+      ]
+    }
+  },
+  "policySkips": {
+    "scaffoldRuntime": "ci:skip-e2e on docs-run-only delta; no runtime PASS claimed.",
+    "scaffoldStatic": "ci:skip-scaffold on docs-run-only delta."
+  },
+  "browser": {
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "d096ad665b166208c2ee19782ea8caaed738b797",
+    "durationMs": 152097,
+    "passed": 140,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "projects": 4,
+    "axeAudits": 36,
+    "seriousOrCriticalViolations": 0,
+    "projectNames": [
+      "light-390",
+      "light-1280",
+      "dark-390",
+      "dark-1280"
+    ]
+  },
+  "independentFinalEvaluation": {
+    "outcome": "PASS",
+    "sourceHead": "d096ad665b166208c2ee19782ea8caaed738b797",
+    "requestedModel": "claude-opus-5-5",
+    "observedModel": [
+      "claude-opus-5-5"
+    ],
+    "requestedEffort": "high",
+    "sessionPolicy": "Same separate read-only Anthropic evaluator resumed from integration review.",
+    "scope": "Source and evidence review; final push, ready transition and current-head remote CI are delivery steps still pending.",
+    "evidence": "evaluate-refresh.md"
+  },
+  "lockChanges": [],
+  "additionalNativeGates": {
+    "quality-gate": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "d096ad665b166208c2ee19782ea8caaed738b797",
+      "durationMs": 23623
+    },
+    "exports-drift": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "d096ad665b166208c2ee19782ea8caaed738b797",
+      "durationMs": 7850
+    },
+    "check": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "d096ad665b166208c2ee19782ea8caaed738b797",
+      "durationMs": 253707,
+      "files": 4131,
+      "batches": 35
+    }
+  },
+  "initialRemoteChecks": {
+    "headSha": "d096ad665b166208c2ee19782ea8caaed738b797",
+    "result": "PASS",
+    "checks": 19,
+    "currentFailures": 0,
+    "disposition": "Current checks skipped by workflow policy while PR is draft; ready transition remains required."
+  },
+  "maintainedSourceTrees": {
+    "docs/site": "87bb06a206e79f07805b08b76a0728e6542bab9f",
+    "tools/docs-site": "81869aada64eef37fd746cd37d6d63b9f7791afd",
+    "tools/fresh-ui-browser": "d3471cd7c026224e4445f19c325d64f38cf6152f",
+    ".github/scripts": "5471c5c2705d66129573fb190fb476b939129b24",
+    ".github/workflows": "64d65b23216ae00e7513ad926f5ba82d0fc9ea2d",
+    "packages": "1b63d943d0f58b8b66ec8cd891f1369074a336cb",
+    "plugins": "e8b7c27dc7a931afed212428d43900a5695aba2a"
+  }
+}

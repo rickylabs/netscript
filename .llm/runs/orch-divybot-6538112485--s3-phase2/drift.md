@@ -93,3 +93,28 @@ internals remain the previously documented platform boundary.
 
 
 Recovery6: latest main7feb24c7 advanced after the completed shell slice. Owner-authorized parent rebase replayed47commits; four generated-carrier conflicts resolved by regeneration from maintained source. All611FreshUI/browser files excluding the inherited private lock are byte-identical to037d048b; topic lock delta against main is zero. New main lock/tooling/runtime/docs changes retained. Full package and quality gates running; source carriers regenerated before integration source commit. Same evaluator review and audited leased push required. Child2cd89188 will be restacked only after the new parent is verified. NoREADY/current-headruntime claim.
+
+
+## Significant scope drift — latest-main CSS guard
+
+Main #2558 adds a fixed combined-CSS limit based on the 66-component baseline,
+while this assignment adds 38 components. Actual parent 281179raw/36011gzip
+fails the configured220000/27000 gate. Two same-evaluator terminal failures
+(FAIL_PLAN, FAIL_RESCOPE) end the loop. No guard edit or waiver was introduced.
+See reconcile9-rescope.md for measured baselines and the four owner decisions.
+Stop is required by the supplied leaf profile, not an inferred approval rule.
+
+
+## Owner override — merge-only Git workflow
+
+Cockpit prohibits all future rebases and force-pushes. Earlier workflow steps
+are historical. Preserve remote ancestry through merge commits and ordinary
+pushes, after the distinct CSS-policy scope decision permits resumption.
+
+
+## Owner-authorized policy resolution and new integration loop
+
+Cockpit selects measured cap growth only after native nesting, with one-line
+2488gap reason and all checks retained. This supersedes the unresolved policy
+choice in reconcile9-rescope.md, not its historical measurements/verdicts.
+Use merge10-checkpoint.md; preserve published ancestry and never force-push.

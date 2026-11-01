@@ -38,37 +38,39 @@
   padding: var(--ns-component-card-padding);
 }
 
-/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='card'][data-part='root'][data-variant='default'] {
-  background: var(--ns-card-bg);
-  border-color: var(--ns-card-border);
-  border-width: var(--ns-card-border-top) var(--ns-card-border-side) var(--ns-card-border-bottom);
-  box-shadow: none;
-}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) {
+  /* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+  & [data-scope='card'][data-part='root'][data-variant='default'] {
+    background: var(--ns-card-bg);
+    border-color: var(--ns-card-border);
+    border-width: var(--ns-card-border-top) var(--ns-card-border-side) var(--ns-card-border-bottom);
+    box-shadow: none;
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='card'][data-part='root'][data-interactive='true']:hover {
-  border-color: var(--ns-border-strong);
-  box-shadow: none;
-}
+  & [data-scope='card'][data-part='root'][data-interactive='true']:hover {
+    border-color: var(--ns-border-strong);
+    box-shadow: none;
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='card'][data-part='root']:focus-visible {
-  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
-  outline-offset: var(--ns-focus-ring-offset);
-}
+  & [data-scope='card'][data-part='root']:focus-visible {
+    outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+    outline-offset: var(--ns-focus-ring-offset);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='card'][data-part='header'] {
-  border-bottom: none;
-}
+  & [data-scope='card'][data-part='header'] {
+    border-bottom: none;
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='card'][data-part='footer'] {
-  background: var(--ns-card-footer);
-  border-color: var(--ns-border-subtle);
-}
+  & [data-scope='card'][data-part='footer'] {
+    background: var(--ns-card-footer);
+    border-color: var(--ns-border-subtle);
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='card'] {
-    transition: none;
-    animation: none;
+  @media (prefers-reduced-motion: reduce) {
+    & [data-scope='card'] {
+      transition: none;
+      animation: none;
+    }
   }
 }
 

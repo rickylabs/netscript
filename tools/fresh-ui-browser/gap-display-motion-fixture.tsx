@@ -1,3 +1,4 @@
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { useState } from 'preact/hooks';
 import { Chart } from '../../packages/fresh-ui/registry/components/ui/chart.tsx';
 import { Carousel } from '../../packages/fresh-ui/registry/components/ui/carousel.tsx';
@@ -63,7 +64,7 @@ export function DisplayMotion() {
           onIndexChange={() => setChanges((previous) => previous + 1)}
         />
         <output aria-label='Project slide changes'>{changes}</output>
-        <button type='button' onClick={() => setCount(1)}>Keep first project only</button>
+        <Button type='button' onClick={() => setCount(1)}>Keep first project only</Button>
       </section>
       <section aria-label='Vertical carousel' id='carousel-vertical'>
         <Carousel

@@ -1,0 +1,42 @@
+{
+  "mechanical": {
+    "files": 18,
+    "tagSites": 84,
+    "importLines": 12,
+    "headlessPaintSites": 11,
+    "localReadOnlyPaintConstants": 2,
+    "sentinelWrappersForExistingStrictSelectors": 4,
+    "otherSemanticEdits": 0,
+    "canonicalFormattingOnly": true,
+    "controllerTypeHandlerLabelNativeFormBehaviorUnchanged": true
+  },
+  "readsetReuse": {
+    "originalFrozenFiles": 711,
+    "onlyChangedBrowserFixtures": 18,
+    "unchangedFiles": 693,
+    "unchangedProductFiles": 597,
+    "unchangedCssFiles": 90,
+    "unchangedSiteFiles": 957,
+    "siteNewestWritePredatesReusedDocsRun": true,
+    "packageTestImportsBrowserFixtures": 0,
+    "package866": true,
+    "docs140": true,
+    "cli67": true,
+    "preflightAccuracyExportsDoclint": true,
+    "cssParityAndRealBloat": true,
+    "rootAndQualityMustRefresh": true
+  },
+  "historicalFullRunBeforeThisCorrection": {
+    "packagePass": 866,
+    "chromiumPass": 795,
+    "docsPass": 140,
+    "cross": {
+      "passed": 888,
+      "failed": 16,
+      "skipped": 0,
+      "flaky": 0,
+      "retries": 0
+    }
+  },
+  "focusedPendingCases": 1280
+}

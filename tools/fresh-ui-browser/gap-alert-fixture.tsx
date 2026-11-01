@@ -9,7 +9,7 @@ export function Alerts() {
   return (
     <section aria-label='Alert components'>
       <h2>Alert components</h2>
-      <button type='button' id='before-alert'>Before alerts</button>
+      <Button type='button' id='before-alert'>Before alerts</Button>
       <div id='alert-dismiss'>
         <Alert
           title='Review changes'
@@ -28,7 +28,7 @@ export function Alerts() {
           }
         />
       </div>
-      <button type='button' id='after-alert'>After alerts</button>
+      <Button type='button' id='after-alert'>After alerts</Button>
       <output aria-label='Alert requests'>{requests}</output>
       <output aria-label='Alert actions'>{actions}</output>
       <div id='alert-controlled'>
@@ -41,15 +41,15 @@ export function Alerts() {
           onOpenChange={() => setRequests((n) => n + 1)}
         />
       </div>
-      <button type='button' id='toggle-alert' onClick={() => setOpen(!open)}>
+      <Button type='button' id='toggle-alert' onClick={() => setOpen(!open)}>
         Toggle controlled notice
-      </button>
+      </Button>
       <div id='alert-hidden'>
         <Alert
           defaultOpen={false}
           close
           title='Initially hidden'
-          action={<button type='button'>Hidden action</button>}
+          action={<Button type='button'>Hidden action</Button>}
         />
       </div>
       <div id='alert-localized'>

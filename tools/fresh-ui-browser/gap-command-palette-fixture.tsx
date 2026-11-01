@@ -65,7 +65,7 @@ export function CommandPalettes() {
   return (
     <section aria-label='Command palette components'>
       <h2>Command palette components</h2>
-      <button type='button' id='open-commands' onClick={() => setOpen(true)}>Open commands</button>
+      <Button type='button' id='open-commands' onClick={() => setOpen(true)}>Open commands</Button>
       <output aria-label='Command selections'>{selections}</output>
       <output aria-label='Command close requests'>{closeRequests}</output>
       <output aria-label='Command query'>{query}</output>
@@ -93,9 +93,9 @@ export function CommandPalettes() {
           ],
         }]}
       />
-      <button type='button' id='open-fixed-commands' onClick={() => setFixedOpen(true)}>
+      <Button type='button' id='open-fixed-commands' onClick={() => setFixedOpen(true)}>
         Open fixed commands
-      </button>
+      </Button>
       <output aria-label='Fixed command requests'>{fixedRequests}</output>
       <CommandPalette
         open={fixedOpen}
@@ -110,9 +110,9 @@ export function CommandPalettes() {
             onSelect: () => setSelections((n) => n + 1),
           }],
         }]}
-        filters={<button type='button'>Fixed filter</button>}
+        filters={<Button type='button'>Fixed filter</Button>}
       />
-      <button type='button' id='before-inline-command'>Before inline command</button>
+      <Button type='button' id='before-inline-command'>Before inline command</Button>
       <div id='command-inline'>
         <CommandPalette
           scrim={false}
@@ -137,12 +137,12 @@ export function CommandPalettes() {
           }
         />
       </div>
-      <button type='button' id='after-inline-command'>After inline command</button>
+      <Button type='button' id='after-inline-command'>After inline command</Button>
       <output aria-label='Inline command selection'>{inlineActions}</output>
       <output aria-label='Inline command count'>{inlineCount}</output>
-      <button type='button' id='command-loading' onClick={() => setLoading(!loading)}>
+      <Button type='button' id='command-loading' onClick={() => setLoading(!loading)}>
         Toggle command loading
-      </button>
+      </Button>
     </section>
   );
 }

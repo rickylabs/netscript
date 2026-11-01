@@ -1,7 +1,15 @@
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { useRef, useState } from 'preact/hooks';
 import { Dialog, Sheet } from '../../packages/fresh-ui/interactive.ts';
 
 /** Public native Dialog controls used by shell composition; no custom Escape handler. */
+
+/** Caller paint keeps headless native controls legible without adding data axes. */
+const CALLER_BUTTON_STYLE = Object.freeze({
+  background: 'var(--ns-primary)',
+  color: 'var(--ns-primary-fg)',
+});
+
 function ModalOwnership({ kind }: { kind: 'dialog' | 'sheet' }) {
   const Modal = kind === 'dialog' ? Dialog : Sheet;
   const [open, setOpen] = useState(false);
@@ -33,12 +41,12 @@ function ModalOwnership({ kind }: { kind: 'dialog' | 'sheet' }) {
           if (next || accept) setOpen(next);
         }}
       >
-        <Modal.Trigger>Open controlled navigation</Modal.Trigger>
+        <Modal.Trigger style={CALLER_BUTTON_STYLE}>Open controlled navigation</Modal.Trigger>
         <Modal.Content style={{ background: 'var(--ns-card)', color: 'var(--ns-fg)' }}>
           <Modal.Title>Controlled navigation sample</Modal.Title>
           <Modal.Description>The parent decides whether closing is accepted.</Modal.Description>
-          <button type='button' onClick={() => setAccept(true)}>Allow navigation close</button>
-          <Modal.Close>Close controlled navigation</Modal.Close>
+          <Button type='button' onClick={() => setAccept(true)}>Allow navigation close</Button>
+          <Modal.Close style={CALLER_BUTTON_STYLE}>Close controlled navigation</Modal.Close>
         </Modal.Content>
       </Modal.Root>
       <output aria-label='Requested navigation dialog state'>{requested}</output>
@@ -46,25 +54,25 @@ function ModalOwnership({ kind }: { kind: 'dialog' | 'sheet' }) {
         {JSON.stringify(acceptedReasons.current)}
       </output>
       <Modal.Root>
-        <Modal.Trigger>Open uncontrolled navigation</Modal.Trigger>
+        <Modal.Trigger style={CALLER_BUTTON_STYLE}>Open uncontrolled navigation</Modal.Trigger>
         <Modal.Content style={{ background: 'var(--ns-card)', color: 'var(--ns-fg)' }}>
           <Modal.Title>Uncontrolled navigation sample</Modal.Title>
           <Modal.Description>Escape closes this ordinary native modal.</Modal.Description>
           <a href='#destination'>Destination</a>
-          <Modal.Close>Close uncontrolled navigation</Modal.Close>
+          <Modal.Close style={CALLER_BUTTON_STYLE}>Close uncontrolled navigation</Modal.Close>
         </Modal.Content>
       </Modal.Root>
       <Modal.Root closeOnEscape={false}>
-        <Modal.Trigger>Open Escape-disabled navigation</Modal.Trigger>
+        <Modal.Trigger style={CALLER_BUTTON_STYLE}>Open Escape-disabled navigation</Modal.Trigger>
         <Modal.Content style={{ background: 'var(--ns-card)', color: 'var(--ns-fg)' }}>
           <Modal.Title>Escape-disabled navigation sample</Modal.Title>
           <Modal.Description>The close button remains available.</Modal.Description>
-          <Modal.Close>Close Escape-disabled navigation</Modal.Close>
+          <Modal.Close style={CALLER_BUTTON_STYLE}>Close Escape-disabled navigation</Modal.Close>
         </Modal.Content>
       </Modal.Root>
-      <button type='button' onClick={() => setRevision((n) => n + 1)}>
+      <Button type='button' onClick={() => setRevision((n) => n + 1)}>
         Render accepted navigation state again
-      </button>
+      </Button>
       <output aria-label='Accepted navigation revision'>{revision}</output>
       <Modal.Root
         open={forcedOpen}
@@ -79,7 +87,7 @@ function ModalOwnership({ kind }: { kind: 'dialog' | 'sheet' }) {
           if (next) setForcedOpen(true);
         }}
       >
-        <Modal.Trigger>Open platform-close navigation</Modal.Trigger>
+        <Modal.Trigger style={CALLER_BUTTON_STYLE}>Open platform-close navigation</Modal.Trigger>
         <Modal.Content
           style={{ background: 'var(--ns-card)', color: 'var(--ns-fg)' }}
           onCancel={(event) => {
@@ -96,7 +104,7 @@ function ModalOwnership({ kind }: { kind: 'dialog' | 'sheet' }) {
           <Modal.Description>
             The consumer veto applies only to cancelable requests.
           </Modal.Description>
-          <Modal.Close>Close platform-close navigation</Modal.Close>
+          <Modal.Close style={CALLER_BUTTON_STYLE}>Close platform-close navigation</Modal.Close>
         </Modal.Content>
       </Modal.Root>
       <output ref={reasonsOutput} aria-label='Platform navigation close reasons'>

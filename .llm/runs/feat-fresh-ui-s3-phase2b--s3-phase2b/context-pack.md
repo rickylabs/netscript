@@ -1,3 +1,191 @@
+## Merge10 SOURCE review round1 PASS
+
+Same independent SOURCE review PASS, zero blockers, authorized-loop failure0.
+Normal merge source commit next, then six carriers/actual-head quality/native
+publication/SAME evidence review/public audit/a907 ancestry/plain push2538.
+All remaining Desktop/harness/final scope still required. No READY.
+
+---
+
+## Current resume — all merge10 source gates PASS; SAME source review next
+
+Both full browser gates are terminal: maintained Chromium803 and affected
+Firefox/WebKit904 PASS, zero failed/skipped/flaky/retried. Expanded focused1288,
+package866, docs140, CLI67 and scoped wrappers PASS. Quality/architecture,
+preflight, docs accuracy, exports and ten other root checks PASS. Full doc-lint
+remains accepted #2531 debt: raw1, exact123TS+1JSON, zero new/removed findings.
+Frozen711source and9compiled artifacts match exactly; three locks match main.
+Both PR thread gates have zero threads/unanswered. All browser and generation
+jobs are closed. See merge10-native-final-source-summary.md and validation JSON.
+
+SAME source review BEFORE actual normal merge commit (current c8218a99 plus
+published parent2be80639/main0af8). Then six canonical carrier commands, inspect
+delta, actual-head quality receipt/native publication after all jobs closed,
+SAME evidence review, public audit, a907 ancestry and plain push to child2538.
+No rebase/force-push. Current global CSS335788/44819; literal2%caps342504/45716,
+exact dated reasons and real raw-only/gzip-only bloat/restore/positive proven.
+Parent own2%alignment still required before READY. All four Desktop11b3b,
+production declared x12a/all-style12b and whole-phase runtime/final13 remain
+mandatory. No early READY/final report, merge, labels or19promotions. Raw private.
+
+---
+
+## Current resume — native source implemented; complete1288focused live
+
+SAME native-platform PLAN1PASS (failure0), then one scopedNavCSSpointerrule and
+forms/calendar/overlays3speccorrections implemented. Navigation.spec BYTEEXACT.
+Realmaintainedsource56PASS all3/0skip/flaky/retry/noCSSinjection; existingNavcase
+old4WKRED now12GREEN. NativeCSSall3proof14oldNavrules unchanged+1specificity0,3,1
+rule, ownparts only/foreigncontrolauto/summaryhoverpaintunchanged;89otherCSSsame.
+BabelAST assertionmultiset186→196,0lost;2boundaryblocks movedexactlyonce. Original
+modalcasesall3retainallbehavior+interiorTabShiftTab; newboundarycasesmaintained
+Chromium, privateFFWKdoesnotselectonlythosebrowserchromeporttests, explicitly
+classifiedbySAME. No test.skip/nokeymap/metadata/APIchange. OTPgrantremoved only;
+realClipboardwrite/paste/FormDataassertionsunchanged.
+
+Canonicalassets+prose/site260+135PASS, allscopedwrappers0/0dropped. Freshglobal90CSS
+335788raw/44819gzip; literal2%caps342504/45716, exactdatedreasonseach. REALbloat
+raw-only343829/45015 andgzip-only339329/48435 eachfailonlyitskind; exactsource/
+carrierrestore andpositive4PASS. Privatefrozen711source/9compiled artifacts set.
+COMPLETE1288expandedfocused currentlylive unifiedsession46216, privateprefix
+merge10-native-platform-focused. Lastprogress260PASS0FAIL; revalidatehandle/log.
+No otherjobs live; allNativeprobes/generation/bloat/56/CSSproof closed.
+
+After1288terminalPASS followSAMEbindings: fresh866package140docs67CLI/quality/root/
+preflightaccuracyexports/site/exact123TS+1JSONdoclint, thenFULL803maintainedChrome
+andcomplete904affectedFFWK. Prepared private merge10-native-final-* runners/configs;
+source/buildfrozenJSON sameprefix. No readsetreuse becauseproductCSSchanged.
+ThenSAMEsourceBEFOREsourcecommit (currentc8218a99 stillUNCOMMITTEDnormalmerge
+parent2be), fourcarriers/sixcommands/actualheadquality+nativepublicationafterALL
+browser/gensclose, SAMEevidence/privacy+a907ancestry/plainpush2538. NEVERrebase/
+forcepush. Parentown2%alignment+ALL4Desktop11b3b/productionx12a/allstyle12b/final13
+mandatory. NoearlyREADY/finalreport/PRmerge/labels/19promotions. Rawprivate.
+
+---
+
+## Current resume — native candidate proven; SAME platform PLAN1 pending
+
+Read merge10-native-platform-checkpoint.md FIRST. No maintainedNativeCSS or spec
+edits yet. SAME separate evaluator current new-loopfailure0; its platformPLAN1 is
+running. Private candidate56PASS0skip/flaky/retry on all3schemes/widths, with actual
+CSS injection onlyprototype (noAPI mocks), while maintainedsource711 staysfrozen.
+
+Cause/proposal now concrete: NavigationMenu noninteractive summary label/chevron
+pointerhits trap WebKitclick→Tab; CSSpointer-events:none makes native summary own
+activation and restores exact unchangedNavigation.spec all3. Keyboardactivation
+also passes. Explicitfocus/state readiness/oneRAFdidNOTfix; focusout/close works
+whencontentfocused. NoJScontroller/prodkeyboard change. AddONEgenericbaseCSSrule
+andcomment, preserveeveryoldCSSrule; nativeNavigationtestMUSTremainbyteexact.
+Clipboardrealprobe6PASS write/paste/submitwithoutgrants: removeonlyoneunneeded
+forms.spec grantPermissionsline, keepallnativeasserts.
+Modalteststwo browserchrome boundaryblocks areChromium-specificautomationport
+observations; isolatedplainnativeDialogreproducesFFstuckfocus/WKextraDIALOGstop
+(consistentprimaryPlaywright39268). MOVEexactblocksintotwoNEWmaintainedcases,
+keepalloriginalassertionsandaddinteriorTabShiftTab inoriginalmodalcasesforall3.
+ExplicitSAMEclassificationofnewboundarycasesChrome-only inPRIVATEexpandedmatrix
+requested; no test.skip/no maintainedexclusion/noassertionrelaxation. Maintained
+fullChrome becomes803, affectedFFWK904same, expandedall3focus1288. Privatecandidate
+files native-test-setup-pointer-prototype/{forms,calendar,overlays}.spec.ts show
+exact testproposal. DoNOTcopyprivateNavigationprototypeCSSinjectionintomaintained
+spec: maintainedNavigation.spec unchanged, actualsourceCSSwillfixit.
+
+AfterPLANPASS: actualCSS+3speccorrections,genassets/prose beforeanybrowserjobs,
+measurefullCSS+2%literalcaps/datedreason,REALraw/gzipbloatredrestoregreen. ProductCSS
+changedsoALL866package140docs67CLI/preflightaccuracyexports/site/doclint/root/
+qualityrefresh, no oldreadsetreuse. Realnative56green(noinjection)thencomplete1288
+focused,thenfresh803fullChrome904FFWK. NewNavCSS1intentionalrule;89filesunchanged,
+oldNavrules/specificitiesunchanged+newrule0,2,1checkedall3. SAMEsourceBEFOREmerge
+commit, actualheadcarriers/quality/pubafterALLjobsclosed/SAMEevidence,privacy+
+a907ancestry/plainpush2538. Primaryc821mergeparent2be stillUNCOMMITTED. Never
+rebase/forcepush. ALL4Desktop11b3b/productionx12a/allstyle12b/final13 andparentown2%
+alignmentremainmandatory. NoearlyREADY/finalreport. Rawprivate/publicportable.
+
+---
+
+## Current resume — complete caller paint; native platform diagnostics before edits
+
+Primarychildc8218a99 remains in UNCOMMITTED normal merge of publishedparent2be;
+remotechilda907 preserved. NEVER rebase/forcepush. SAME authorizedloopfailure0.
+ReaderFrame fix+17AIInteractionButtoncorrection and actual CSS bloat proof done.
+Then866package/795fullChrome/140docs PASS; complete904FFWK888PASS16FAIL,0skip/flaky/
+retry. All16native callercontrast failures on darkWebKit bothwidths. SAME complete
+callerpaint PLAN1PASS before18fixture/84plain tags+12imports/11headlesspaint sites/
+2readonlytokenpairs. Four unnamed div wrappers preserve generic DocsPrimitive
+root screenshot selectors perbinding2. Tests were unchanged. Mechanicalproof0other
+edits, all18wrappers0/0dropped, freshquality/root10checks0. Product597/CSS90/site957
+unchanged from reused866/140/67 and CSSparity/bloat; readsetproofwritten.
+
+Complete1280all3focusedunion TERMINAL1252PASS28FAIL,0skip/flaky/retry. ALLcontrast
+is resolved. Expanded older nativecases expose unsupportedOTPclipboard grants,
+Chromium-specific browserchrome Tab assertions(DatePicker/AlertDialog), and
+WebKitNavigationMenuTabexit. Isolated actualnative dialog references reproduce
+FFstuck-at-end and WKadditionalDIALOGstop; matches upstreamPlaywright39268.
+Changing privateFFfocusmanagerprefdoesnotfix; no maintainedpref change. Actual
+nativeClipboardprobe6cases(all3×postkeyboard/trustedbutton)write/paste/submitPASS
+WITHOUTpermissiongrants/mocks. Private copied-spec prototype removes onlyOTPgrant,
+moves exact browserchrome boundaryblocks to newChromium-only cases, retainsall
+other assertions;52PASS4FAIL remainingWebKitNavigation. NOmaintainedtest edit yet.
+Navigationexplicitconcepts.focus prototype doesNOTfix. CurrentprivateNavfocus
+trace probe running on owned4239server, finallyterminatedbyownPython. Needinspect
+cause before nextsevenitem/SAMEdesign approval. No speculativeproductfix.
+
+Next: finishNavdiagnosis; propose exact testsetup fixes/unchangedassertions and
+native-platform boundary disposition to SAME evaluator BEFOREmaintainededits. If
+actualNavproductbug requiresfix, freshallproductgates/carriers/site are mandatory;
+otherwise approvedreadsetreuseof866/140/67 allowed. AfterfocusedterminalPASS run
+fresh FULLmaintainedChrome(count795+newboundarycasesifapproved) and affectedFFWK904,
+SAME source review BEFORE mergecommit, actual-head carriers/quality/nativepub/SAME
+evidence, audit+a907ancestry/plainpush2538. Parent2%alignment and ALL4Desktop11b3b,
+productiondeclaredx12a/allstyle12b/finalruntimeIMPLexactCI13 remainmandatory.
+NoearlyREADY/finalreport/merge/labels. Raw private; public portablecounts/verdicts.
+
+---
+
+## Current resume — fixture correction frozen; focused AI running
+
+Readerfix/SAMEPLAN1PASS and real CSS bloat proof complete; first broad focused
+AIrun fails168/1/23on caller barebutton contrast in darkWebKit. SAME fixture
+PLAN1PASS before mechanical17tag replacements with existing shippedButton;
+native types/handlers/labels/position retained, strict axe unchanged. Fixture
+wrappers0all/0dropped. Private corrected-fixture192focusedrun currently running.
+Frozen711readset differs from historical snapshot ONLY6intentional paths;
+all90CSS byte-exact, prior all3engine CSS/specificity parity+realbloatproof valid.
+Refrozen broad CLI67/quality/arch/preflight/accuracy/export pass; doclint remains
+exact inherited123TS+1JSON accepted2531. No new product API/CSS/token/allowances.
+
+After focused192PASS, launch fresh FULLpackage866+maintainedChrome795 and complete
+FFWK904 (no maxfailure stop), docs140, finishroot/doclintbookends and SAMEsource
+review before mergecommit. Canonicalcarriers/actualheadqualitypub/SAMEevidence/
+privacy/a907ancestry/plainpush2538 follow. Merge of parent2be into childc821 remains
+uncommitted, allmain0af8included. No rebase/forcepush. Parent2%alignment plus ALL
+remaining4Desktop11b3b/productionx12a/allstyle12b/finalruntimeevalCI13 mandatory.
+No earlyREADY/finalreport. Failurestreak0. Raw logs/receipts private.
+
+---
+
+## Current resume — reader fix and real budget controls complete
+
+Normal merge of published parent2be80639 into childc8218a99 is in progress;
+no source commit until SAME source review. Minimal readerFrame fix approved by
+SAME PLAN1PASS preserves pin/threshold semantics. Maintained native wheel test
+is RED8Chromium/WebKit+PASS4Firefox before the edit and GREEN12after, with0retry/
+flaky/skip. Source and browser wrappers PASS. Real authored CSS+canonical carrier
+bloat controls fail raw-only343610/44954 and gzip-only339110/48375; exact source/
+carrier hashes restored, positive publish-size gate0. Current90CSS payload
+335569raw/44751gzip, literal2%caps342281/45647 with dated owner reasons. All3engine
+ordered CSS/specificity parity remains exact. Focused AI all3engines running.
+
+Next: fresh full package866/Chromium795/affectedFFWK904/docs140, broad CLI/root/
+quality/publication/exact doclint, SAME source/evidence, audited ancestry/plain
+push2538. Old passing866/791/140/67 and failedcross450/1/1/444 are historical.
+Parent2488 must also receive its own measured2%caps+realbloatproof beforeREADY.
+Still ALL fourDesktop11b3b, production declaredx12a/allstyle12b and finalruntime/
+IMPL/exactCIgreenORpolicy-skipped13 remain. No earlyREADY/finalreport. No rebase/
+forcepush. Failurestreak0. Raw receipts/logs/captures private; public only portable
+paths/verdicts/counts. Unknown-owner core and foreign resources untouched.
+
+---
+
 ## Current resume — owner policy resolved; child merge10 design
 
 Parent2be80639 is published, plain merge source679fd24a on main0af8, SAME

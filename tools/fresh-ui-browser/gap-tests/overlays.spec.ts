@@ -16,15 +16,9 @@ test('alert-dialog/native-confirmation', async ({ page }, info) => {
   await expect(cancel).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(action).toBeFocused();
-  await page.keyboard.press('Tab');
-  if (await page.evaluate(() => document.activeElement === document.body)) {
-    await page.keyboard.press('Tab');
-  }
-  await expect(dialog.getByRole('button', { name: 'Peek owner', exact: true })).toBeFocused();
   await page.keyboard.press('Shift+Tab');
-  if (await page.evaluate(() => document.activeElement === document.body)) {
-    await page.keyboard.press('Shift+Tab');
-  }
+  await expect(cancel).toBeFocused();
+  await page.keyboard.press('Tab');
   await expect(action).toBeFocused();
   await page.locator('#after-context').evaluate((element) => element.focus());
   await expect(action).toBeFocused();
@@ -49,6 +43,27 @@ test('alert-dialog/native-confirmation', async ({ page }, info) => {
   await expect(page.getByLabel('Confirmed changes')).toHaveText('1');
 });
 
+test('alert-dialog/native-browser-chrome-boundary', async ({ page }) => {
+  const trigger = page.getByRole('button', { name: 'Review deletion', exact: true });
+  await trigger.focus();
+  await page.keyboard.press('Enter');
+  const dialog = page.getByRole('alertdialog', { name: 'Delete project?', exact: true });
+  const cancel = dialog.getByRole('button', { name: 'Cancel', exact: true }),
+    action = dialog.getByRole('button', { name: 'Delete project', exact: true });
+  await expect(cancel).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(action).toBeFocused();
+  await page.keyboard.press('Tab');
+  if (await page.evaluate(() => document.activeElement === document.body)) {
+    await page.keyboard.press('Tab');
+  }
+  await expect(dialog.getByRole('button', { name: 'Peek owner', exact: true })).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  if (await page.evaluate(() => document.activeElement === document.body)) {
+    await page.keyboard.press('Shift+Tab');
+  }
+  await expect(action).toBeFocused();
+});
 test('alert-dialog/controlled-pending-and-nested-preview', async ({ page }) => {
   await page.getByRole('button', { name: 'Review pending change', exact: true }).click();
   const pending = page.getByRole('alertdialog', { name: 'Pending change', exact: true });

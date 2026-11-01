@@ -544,7 +544,8 @@ The named native viewport supports normal Arrow/Page/Home/End scrolling and chil
 Tab order. Its data-scrollable value is measured none/up/down/both, never a prop.
 SSR reports none until geometry is available. First mount follows the end when
 followEnd is true (the default); later text, content and size changes follow only
-while already pinned. Scrolling away preserves the reader's position. Turning
+while already pinned. Input frames measure the native position without scrolling
+back to the end. Scrolling away preserves the reader's position. Turning
 followEnd on later does not force an unpinned reader to move. endThreshold is a
 finite nonnegative pixel tolerance, default 1. scrollLabel localizes "Scroll to
 latest". That native action keeps focus after reaching the end; when pinned and

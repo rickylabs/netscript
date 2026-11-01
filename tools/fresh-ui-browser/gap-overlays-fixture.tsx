@@ -1,3 +1,4 @@
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { useState } from 'preact/hooks';
 import { AlertDialog } from '../../packages/fresh-ui/registry/components/ui/alert-dialog.tsx';
 import { HoverCard } from '../../packages/fresh-ui/registry/components/ui/hover-card.tsx';
@@ -54,7 +55,7 @@ export function Overlays() {
       <output aria-label='Confirmed changes'>{actions}</output>
       <output aria-label='Canceled changes'>{cancels}</output>
       <output aria-label='Requested alert open'>{request}</output>
-      <button type='button' id='before-hover'>Before preview</button>
+      <Button type='button' id='before-hover'>Before preview</Button>
       <HoverCard
         triggerLabel='Preview NetScript'
         title='NetScript team'
@@ -65,8 +66,8 @@ export function Overlays() {
         }
         meta='Joined December 2021'
       />
-      <button type='button' id='after-hover'>After preview</button>
-      <button type='button' id='before-context'>Before context</button>
+      <Button type='button' id='after-hover'>After preview</Button>
+      <Button type='button' id='before-context'>Before context</Button>
       <ContextMenu
         label='Order context'
         items={[
@@ -104,7 +105,7 @@ export function Overlays() {
       >
         Right-click order
       </ContextMenu>
-      <button type='button' id='after-context'>After context</button>
+      <Button type='button' id='after-context'>After context</Button>
       <ContextMenu label='Disabled context' disabled items={[{ id: 'none', label: 'Never opens' }]}>
         Disabled context area
       </ContextMenu>

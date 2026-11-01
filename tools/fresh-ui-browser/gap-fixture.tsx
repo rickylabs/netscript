@@ -77,7 +77,7 @@ function Actions() {
           <Toggle key={size} variant='outline' size={size} selected>{size}</Toggle>
         ))}
       </section>
-      <button type='button' id='after'>After components</button>
+      <Button type='button' id='after'>After components</Button>
       <Forms />
       <Calendars />
       <Navigation />

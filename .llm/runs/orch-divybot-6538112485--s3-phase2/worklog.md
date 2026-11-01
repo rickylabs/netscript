@@ -677,3 +677,252 @@ equality, public added-line/run audits, remote426c5d09verification and exact
 force-with-lease push. Child replay has its own gates/review/fresh dedicated
 docs suite before its audited exact-lease push and comment. All11b/12/13
 remains active; no partial READY.
+
+Reconcile9 begins after remote main advanced to0af8fd9e. Child Desktop source
+review PASS/c3dba2ce is preserved locally. Parentc5877ff8/childa9078d68 remotes
+unchanged. Seven-item checkpointreconcile9-checkpoint.md precedes integration.
+Backups preserve both old trees. New CSS nesting is semantically identical to
+old main, with original specificity retained; measure new payload constraints
+honestly. No budget waiver or new product scope. Rebase parent then child,
+fresh gates/SAME review and audited exact-lease pushes before11b3b.
+
+
+## Current stop — CSS budget scope conflict
+
+The same independent evaluator returned FAIL_PLAN then FAIL_RESCOPE, ending this
+leaf's loop at two consecutive terminal failures. See reconcile9-rescope.md and
+phase-registry.md. Main's new absolute CSS cap conflicts with the approved 38
+additions. No budget code changed; no push/force-push or child rebase occurred.
+Remote parent c5877ff8 and child a9078d68 remain drafts. Local parent 0d8cb882,
+Desktop source c3dba2ce and the canonical dirty carrier are preserved. The
+owner must ratify a budget/measurement change, reduce scope, or require fitting
+the absolute cap before a new leaf/loop may resume. No next group or READY.
+
+
+
+# Owner update — merge-only integration
+
+The latest Cockpit owner instruction supersedes all earlier rebase/force-push
+steps in this run. Never rebase or force-push from now on, including after an
+Orchid merge-conflict notification; that notification is a known harness #775
+bug. Future authorized conflict resolution uses fetch, merge origin/main,
+manual conflict resolution, a merge commit and a plain push.
+
+The unpublished rebased candidate remains preserved as reference/backup only.
+It must not be force-pushed or treated as a deliverable lineage. An eventual
+integration must retain the current remote feature branch's ancestry, preserve
+all reviewed feature work and run fresh integrated gates and independent review.
+The child likewise must retain its existing published ancestry when combining
+an updated parent. No history rewrite is authorized.
+
+The new Git workflow instruction does not choose a CSS budget policy. The
+FAIL_PLAN / FAIL_RESCOPE stop and two-failure limit still apply. Fresh reads of
+#2416 and both PR conversations show no later budget decision. Remote parent,
+child and main remain c5877ff8, a9078d68 and 0af8fd9e. No new product work, merge,
+push, evaluation attempt or READY claim ran during this constraint update.
+
+
+# Owner-authorized merge integration — new review loop
+
+The preceding loop ended at FAIL_PLAN / FAIL_RESCOPE and remains terminal.
+Cockpit now explicitly authorizes the missing policy decision: consolidate first,
+then raise raw/gzip caps only by measured growth if needed, with the exact gap
+reason beside the constant. This opens a new authorized integration loop; it is
+not a third attempt to approve the rejected inventory-credit proposal. Keep the
+SAME separate evaluator; no new reviewer/session. New-loop failure count: 0.
+
+## Exact owner decision
+
+> COORDINATOR (Cockpit): main now has PR 2558 (6a6a82e15): Utility CSS consolidated under one scope with native nesting, plus raw and gzip size budgets in packages/fresh-ui/tests/publish-size.test.ts (gzip headroom only 473 bytes). When you merge origin/main (plain merge, never rebase or force-push), your new components will likely break that budget. Fix order: (1) apply the 2558 consolidation pattern to your new components' Utility selectors (native nesting under the single scope); (2) only if it still does not fit, raise the raw and gzip limits by the measured amount with a one-line reason at the constant: gap components from #2488. Never weaken or skip the check. Then post READY with the head sha on #2416.
+
+1. Public surface: preserve all approved component props, parts, variant values,
+   keys, callbacks, CSS selector/declaration meaning and current main changes.
+   No token value, dependency/version/lock, native SDK, runtime or API change.
+   The only gate-policy change allowed is a measured raw/gzip cap increase after
+   consolidation. The full component/extension/runtime objective remains intact.
+2. Vocabulary: a merge commit retains published remote ancestry. The old
+   unpublished rebased candidate is backup-only. Native nesting factors an
+   identical existing selector into a single scope while preserving specificity,
+   ordered rules and media order. Do not add a new theme predicate to unscoped
+   base component rules or replace the root with zero-specificity where().
+3. Ports: raw Git fetch/merge/plain push; current canonical registry and carrier
+   generators; native CompressionStream and the existing size test; browser
+   ordered CSSOM comparison plus real fixtures and configured structured gates.
+   Existing same read-only Opus5.5 high evaluator remains the review port.
+4. Constants: retain original main caps220000raw/27000gzip until a consolidated
+   candidate is actually measured. Main0af8 payload215981raw/26527gzip leaves
+   4019/473headroom. If a kind still fails, add only its measured total CSS growth
+   over that baseline to its original cap, preserving that existing headroom,
+   with a one-line reason at the constant: gap components from #2488. Do not add
+   arbitrary headroom, credits, skips, exclusions or flags. If a kind fits, keep
+   that kind's original limit. The original five-MB gate stays unchanged.
+5. Ordered commits and gates:
+   - Start parent delivery from actual remotec5877ff8 on a new local integration
+     branch. Preserve the old local parent31bc1b74 and carrier stash/private
+     exact copy; leave unknown native diagnostics untouched. Carry all stop and
+     owner-policy records into the integration run before changing source.
+   - SAME PLAN-EVAL first. Then plain merge origin/main0af8. Resolve only known
+     maintained syntax overlap by preserving both main consolidation and our
+     reviewed feature behavior; regenerate derived conflicts from source. Prove
+     main-only/non-CSS preservation and3locks. Never push a rewritten lineage.
+   - Consolidate repeated existing Utility-root selectors, including reviewed
+     CodeBlock edits. Inspect every added component CSS. Where its existing
+     class scope is factorizable, use native nesting without changing selector
+     meaning; keep BEM siblings/global rules/media order independent. Record
+     files with no repeated Utility root as already not duplicating that scope.
+     Ordered CSSOM must match the reviewed pre-merge parent for all74CSSfiles;
+     actual Utility/legacy browser acceptance must remain intact.
+   - Generate assets and execute the real unchanged size gate at old caps after
+     nesting. Only an observed overrun triggers the authorized measured increase.
+     Run the final gate, independent raw/gzip overrun negative controls and
+     source/carrier inventory equality; restore exact hashes and positive gate.
+   - Fresh integrated parent package, source wrappers, broader quality/arch,
+     browser/docs, preflight/accuracy/exports, all4carriers and native publication
+     at actual source HEAD; SAME source/evidence review, public audit, assert
+     remote ancestry and plain push HEAD to existing PR2488 branch. Comment.
+   - Child original lineage1afd50cb already contains remotea907 and reviewed
+     Desktopc3d. Merge the published parent into it, never rebase; preserve its
+     17 added identities,6Desktop API contracts and existing owner x policy.
+     Apply the same consolidation/measure-first policy to the full child and
+     repeat applicable fresh integrated gates/SAME review/audit/plain push2538.
+6. Deferred: integration does not complete11b3b(the four remaining Desktop
+   audits),12a/12b(production declared x extensions and every-style base/extension/
+   keyboard harness),or13(whole-phase runtime/final review/exact-head greenCI).
+   Resume those only after this integration is terminal. No READY or canonical
+   final report until the entire assignment is implemented and verified. Owner's
+   later19promotions remain after Utility canary. No merge/tag/release by us.
+7. Contributor path:packages/fresh-ui/README.md and existing publish-size.test.ts
+   explain maintained surface and actual byte gate; this checkpoint records the
+   owner policy and integration preservation. No new abstraction or credit list
+   in test code. All raw transports/receipts remain private; public audit reports
+   verdict/counts only, with portable paths and no session IDs/thumbprints.
+
+
+## Binding plan-review refinements before source
+
+Same independent merge PLAN-EVAL round1 PASS, new-loop failure0. Nest ONLY under
+main's exact single compound Utility root; do not introduce class-root nesting
+or a parent selector list. Existing added files with no repeated Utility root
+need no such factoring; enumerate them. Compare absolute ordered selectors AND
+computed specificity, plus declarations/media conditions and real browser output.
+Child must measure at parent caps first, increasing failing kinds only by its
+additional measured growth; preserve existing headroom. Original-cap and raw/gzip
+overrun negatives remain required without introducing credit logic. The owner
+READY instruction is acknowledged: integration status is posted after each push,
+but READY remains withheld until11b3b/12/13and required exact-head checks pass.
+
+
+## Merge10 parent candidate — consolidation and measured budget proven
+
+Same plan PASS permits the plain-merge candidate on main0af8. Maintained
+main-only/parent non-CSS preservation has0unintended differences; all3locks
+remain unchanged. CodeBlock's22Utilityprefixes become1exactcompoundroot.
+Added22CSS files already contain0duplicatedUtilityroot; imposing a new theme
+predicate or nesting under a selector list would change semantics, so neither
+is done. Main's Avatar/Badge separated scopes retain intervening legacy rules.
+Browser expands74CSSfiles/1589orderedrules with0differences. Browser compiler
+compares1567specificities, including480nestedrules, with0differences. A selector-
+list specificity negative control detects the expected maximum-specificity drift.
+
+Actual configured gate at unchanged220000/27000limits fails on consolidated
+278763raw/35877gzip. Native main baseline is215981/26527, so measured growth is
+62782/9350. Owner-authorized caps282782/36350preserve4019/473headroom exactly.
+One-line constant reason names gap components from #2488; both byte checks,
+all authored/shipped CSS, exact source/carrier equality and5MBcap are retained.
+Independent one-byte raw and gzip overruns each fail only their own kind; exact
+candidate restored and positive configured gate exits0. No credit abstraction,
+new headroom, exclusion, skip or flag. See merge10-parent-validation.json.
+
+Source wrappers, durable working-tree quality/architecture, preflight, docs
+accuracy/exports and67CLItests pass. Focused12Firefox/WebKit CodeBlock cases
+pass. Doclint remains raw124accepted2531:123TSidentities+1JSON,0new/removed.
+Source625files are frozen. Full package/318Chromium/fresh140docs are live;
+no passing whole-source evidence set or source/evidence sign-off is claimed yet.
+The READY instruction is seen; full11b3b/12/13and required exact-head greenCI
+remain mandatory before READY. Both PR bodies disclose the resumed policy.
+
+
+# Merge10 parent source candidate
+
+The owner-authorized merge loop has independent PLAN-EVAL PASS. Delivery starts
+at remote parentc5877ff8, with a plain merge of main0af8fd9e in progress. The
+previous unpublished rebased candidate remains backup-only. No history rewrite.
+
+The maintained CSS conflict was CodeBlock: retain the reviewed syntax/tab/diff/
+clipboard surface and factor its22identicalUtilityprefixes into one exact main
+compound root. Derived registry conflict was canonically regenerated. Main's
+other maintained changes remain intact. All74CSSfiles expand to1589ordered
+rules with0selector/declaration/media differences. Browser compiler compares
+1567specificities, including480nestedrules, with0differences; wrong-list maximum
+specificity is caught by a negative control. None of22addedCSSfiles repeats the
+long Utility theme root; no new theme predicate or class-root nesting is added.
+Separated upstream Badge/Avatar scopes preserve intervening legacy rules.
+
+The unchanged old-cap gate actually fails on consolidated278763raw/35877gzip.
+Main baseline215981/26527 gives measured growth62782/9350. Only then, per the
+explicit owner decision, caps become282782/36350, retaining4019/473headroom.
+The one-line reason beside the constant says gap components from #2488. Only
+the comment and constant change: byte inventory/equality, gzip algorithm, both
+assertions, file exclusions and the5MBcap are byte-identical. Independent1-byte
+raw/gzip negatives each reject only their own kind; exact restore and positive
+gate pass. No credit logic, skip, waiver, token value or dependency change.
+
+Current frozen-source executions pass625package/318fullChromium/12focused
+Firefox-WebKit/140dedicateddocs/67CLIcases. All browser results are first-attempt,
+zero flaky/skipped/retry results, with no new axe allowances. Scoped source
+check/lint/fmt, broader durable working-tree quality/architecture, preflight,
+docs accuracy/exports and fresh site/prose generation pass. Doc-lint remains
+raw124accepted2531, exact123TS+1JSON/0newremoved, not called green. Both PR
+thread gates pass with0unanswered.625frozenfiles and3locks still match.
+
+See merge10-parent-validation.json for exact counts/timings/captures. The same
+independent SOURCE review is next. After PASS, make the merge source commit,
+regenerate/check all four carriers from that actual head, refresh durable
+quality and native publication with0slowtypes, obtain SAME evidence review,
+audit public data and remote ancestry, and plain push to PR2488. No source-head
+publication/carrier evidence is yet claimed before that sequence.
+
+The child must then merge the published parent, measure against its caps and
+repeat its own current-source gates/reviews before plain push. Four remaining
+Desktop audits, production declared x extensions and the all-style harness,
+whole-phase runtime/final review/exact-head greenCI remain mandatory. The owner
+READY instruction is seen; no READY or final report before full acceptance.
+
+
+Merge10 same independent SOURCE round1 PASS,0blockers,new-loopfailure0.
+Reviewed625source bytes remain frozen. Make the plain merge source commit,
+then actual-head carriers/delta/quality/publication and SAME evidence review
+before audit/ancestry/plain push. The old scope-stop is resolved by explicit
+owner policy; no final READY, child or whole-goal completion is claimed.
+
+
+## Merge10 committed-source closure — evidence review next
+
+Reviewed source is plain merge679fd24a(two parents), preserving publishedc587
+ancestry and main0af8. All six post-source canonical commands pass; all4carrier
+checks pass with measured generated delta0and raw tracked tree clean. Ten other
+configured root checks pass, including main's new design-skill check; both PR
+thread gates already pass0unanswered.625source files and3locks still match.
+
+Final durable quality/architecture receipt matches actual source679fd24a and
+passes AFTER all carrier generation closed. Native publication also passes at
+that head, after all browsers and generators closed, with actualSuccess and
+0slow-type diagnostics/noallowance. The banner checking for slow types is not
+miscounted as a diagnostic. Initial quality/publication were launched before
+carrier generation finished; those executions are provisional only and are
+superseded by these fresh sequential after-carrier verdicts, not silently reused.
+
+SAME evidence review next, then evidence-only commit and mandatory public audit,
+actual remote ancestry assertion and PLAIN push to the existing parent branch.
+No rebase/force-push. Integration status must acknowledge the READY instruction
+while withholding READY until remaining full-goal work and exact-head greenCI.
+Child merge integration is required before11b3b/12/13; full scope unchanged.
+
+
+Merge10 SAME committed-source evidence review round1 PASS,0blockers,
+new-loopfailure0. Source679fd24aand all current source/carrier/quality/native
+publication/root checks reconcile. This run-only commit follows approval;
+repeat full privacy audit and exact remote-parent ancestor check before plain
+push. Next child must MERGE the published parent into original1afdlineage.
+No next product unit until child integration terminal. Full11b3b/12/13active;
+READY withheld until full scope and exact-head required greenCI are proven.

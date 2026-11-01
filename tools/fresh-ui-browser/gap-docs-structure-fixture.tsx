@@ -1,3 +1,4 @@
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { useState } from 'preact/hooks';
 import { FilePathChip } from '../../packages/fresh-ui/registry/components/ui/file-path-chip.tsx';
 import { AttributeChip } from '../../packages/fresh-ui/registry/components/ui/attribute-chip.tsx';
@@ -53,17 +54,17 @@ function PathExamples() {
   const [mounted, setMounted] = useState(true);
   return (
     <section id='path-native' aria-label='Copyable path'>
-      <button type='button' data-before-path>Before path</button>
+      <Button type='button' data-before-path>Before path</Button>
       {mounted && <FilePathChip path={path} copy={copy} />}
-      <button type='button' data-after-path>After path</button>
-      <button
+      <Button type='button' data-after-path>After path</Button>
+      <Button
         type='button'
         onClick={() => setPath(path === initialPath ? 'src/next.tsx' : initialPath)}
       >
         Change path
-      </button>
-      <button type='button' onClick={() => setCopy(!copy)}>Toggle copy</button>
-      <button type='button' onClick={() => setMounted(!mounted)}>Toggle path mount</button>
+      </Button>
+      <Button type='button' onClick={() => setCopy(!copy)}>Toggle copy</Button>
+      <Button type='button' onClick={() => setMounted(!mounted)}>Toggle path mount</Button>
       <FilePathChip path='src/read-only.tsx' copy={false} />
     </section>
   );
@@ -77,19 +78,19 @@ export function DocsStructureExamples() {
       <h1>Docs structure examples</h1>
       <PathExamples />
       <section id='attribute-variants' aria-label='Attribute examples'>
-        <button type='button' data-before-attributes>Before attributes</button>
+        <Button type='button' data-before-attributes>Before attributes</Button>
         <AttributeChip name='data-variant' value='outline' size='md' />
         <AttributeChip name='data-variant' value='outline' size='sm' />
         {[0, false, null, '', '"<script>alert(1)</script>\n'].map((value, i) => (
           <AttributeChip key={i} name={'data-example-' + i} value={value} />
         ))}
         <AttributeChip name={'long-attribute-'.repeat(8)} value={'unbroken-value-'.repeat(15)} />
-        <button type='button' data-after-attributes>After attributes</button>
+        <Button type='button' data-after-attributes>After attributes</Button>
       </section>
       <section id='tree-variants' aria-label='File lists'>
-        <button type='button' data-before-tree>Before file tree</button>
+        <Button type='button' data-before-tree>Before file tree</Button>
         <FileTree label='Scaffold files' items={items} />
-        <button type='button' data-after-tree>After file tree</button>
+        <Button type='button' data-after-tree>After file tree</Button>
         <FileTree
           label='Hidden annotations'
           items={items.slice(0, 8)}
@@ -98,7 +99,7 @@ export function DocsStructureExamples() {
         />
       </section>
       <section id='figure-variants' aria-label='Figure examples'>
-        <button type='button' data-before-figures>Before figures</button>
+        <Button type='button' data-before-figures>Before figures</Button>
         {(['prose', 'wide'] as const).flatMap((width) =>
           (['image', 'diagram'] as const).map((media) => (
             <Figure
@@ -109,9 +110,9 @@ export function DocsStructureExamples() {
                 <>
                   <span>{width + ' ' + media + ' architecture'}</span>{' '}
                   <a href={'#figure-' + width + media}>Read diagram</a>
-                  <button type='button' onClick={() => setActions((n) => n + 1)}>
+                  <Button type='button' onClick={() => setActions((n) => n + 1)}>
                     Inspect {width + ' ' + media}
-                  </button>
+                  </Button>
                 </>
               }
             >
@@ -139,7 +140,7 @@ export function DocsStructureExamples() {
             </Figure>
           ))
         )}
-        <button type='button' data-after-figures>After figures</button>
+        <Button type='button' data-after-figures>After figures</Button>
         <output aria-label='Figure inspections'>{actions}</output>
       </section>
       <div id='source-details'>Source details</div>

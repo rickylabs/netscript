@@ -18,6 +18,7 @@ async function fixture(
     docsCalls: () => number;
   }) => Promise<void>,
   environment: AgentEnvironment = {},
+  realPreset = false,
 ): Promise<void> {
   const parent = await Deno.makeTempDir();
   const root = join(parent, 'agent-project');
@@ -32,11 +33,13 @@ async function fixture(
   const command = () =>
     createInitCommand({
       ...dependencies,
-      preparePreset: () =>
-        Promise.resolve(async (input) => {
-          assert(await new DenoAgentInitFileSystem().exists(join(root, 'deno.json')));
-          presets.push(input);
-        }),
+      preparePreset: realPreset
+        ? dependencies.preparePreset
+        : () =>
+          Promise.resolve(async (input) => {
+            assert(await new DenoAgentInitFileSystem().exists(join(root, 'deno.json')));
+            presets.push(input);
+          }),
       // Keep the real scaffold writers and installer; do not launch external processes.
       initContext: {
         ...dependencies.initContext,
@@ -130,6 +133,31 @@ Deno.test('init integration: explicit host overrides invoking environment', asyn
     assert(await new DenoAgentInitFileSystem().exists(join(root, 'opencode.json')));
     assertEquals(await new DenoAgentInitFileSystem().exists(join(root, '.mcp.json')), false);
   }, { CLAUDECODE: '1' });
+});
+
+Deno.test('S9 workspace guidance locates registry-owned theme pairs inside the selected app', async () => {
+  await fixture(
+    async ({ root, parse }) => {
+      await parse(['--host', 'vscode', '--app-name', 'dashboard', '--preset', 'studio-utility']);
+      const fs = new DenoAgentInitFileSystem();
+      const skill = await Deno.readTextFile(join(root, '.agents/skills/netscript-design/SKILL.md'));
+      assertStringIncludes(skill, 'select `apps/<app>/`');
+      assertEquals(skill.includes('](../fresh-ui-theme-'), false);
+      for (const file of ['DESIGN.md', 'SKILL.md']) {
+        const appPath = `.agents/skills/fresh-ui-theme-studio-utility/${file}`;
+        assertStringIncludes(skill, `\`${appPath}\``);
+        assertEquals(await fs.exists(join(root, appPath)), false);
+        assertEquals(
+          await Deno.readTextFile(join(root, 'apps/dashboard', appPath)),
+          await Deno.readTextFile(
+            new URL(`../../../../../../docs/design-system/themes/studio/${file}`, import.meta.url),
+          ),
+        );
+      }
+    },
+    {},
+    true,
+  );
 });
 
 Deno.test('init integration: no-agent writes no agent files even with with-docs', async () => {

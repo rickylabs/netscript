@@ -68,6 +68,8 @@ function MessageScrollerRoot({
     if (!view || !body) return;
     let frame: number | undefined;
     let readerIntent = false;
+    // An early native scroll may consume intent before the queued input frame.
+    let readerFrame = false;
     let measuredScrollHeight = view.scrollHeight;
     let measuredClientHeight = view.clientHeight;
     const measure = (follow: boolean) => {
@@ -86,7 +88,9 @@ function MessageScrollerRoot({
       if (frame !== undefined) return;
       frame = requestAnimationFrame(() => {
         frame = undefined;
-        measure(true);
+        const follow = !readerFrame;
+        readerFrame = false;
+        measure(follow);
       });
     };
     const scroll = () => {
@@ -101,6 +105,7 @@ function MessageScrollerRoot({
     };
     const noteIntent = () => {
       readerIntent = true;
+      readerFrame = true;
       schedule();
     };
     const keyIntent = (event: KeyboardEvent) => {
@@ -129,6 +134,7 @@ function MessageScrollerRoot({
     const mutation = new MutationObserver(schedule);
     mutation.observe(body, { childList: true, subtree: true, characterData: true });
     return () => {
+      readerFrame = false;
       refresh.current = undefined;
       view.removeEventListener('scroll', scroll);
       for (const type of ['wheel', 'pointerdown', 'touchstart']) {

@@ -1,0 +1,69 @@
+# Worklog
+
+## Design
+
+- Public surface: stable static HTML and accessible named anchors, a single CSS request, unchanged component APIs, precise Pages browser scheduling.
+- Vocabulary: rendered inputs, push diff, stable instance namespace, heading permalink.
+- Ports: existing Lume 2.5.4/Lightning CSS APIs, DOM, pinned highlighter, Git rename-aware diff, pure CI classifier, native carrier commands.
+- Constants: page URL and local DOM index supply instance identity; nav lane identity and explicit push-diff opt-in replace positional/event assumptions.
+- Commit slices: rendering/reader fixes, then CI precision and final evidence; each slice updates this run and pushes its gates/review on the new PR.
+- Deferred scope: token source merge belongs to #2450 after S1/new Figma export; other epic cells retain their owners and dependencies.
+- Contributor path: tools/docs-site/README.md.
+
+Parent S8 evaluator override carried verbatim: “Run PLAN-EVAL before implementing and IMPL-EVAL after, both with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only.” Routing inspected via agentic:matrix --tier feature --json; public artifacts retain model/role only, no private identifiers.
+
+Research: #2451 has no linked PR/comments. S1 is actively owned by PR #2435. S2–S7 depend on that chain. The directly scoped S8 review follow-up is available. No implementation yet; PLAN-EVAL pending.
+
+PLAN-EVAL initial FAIL_PLAN identified bundled-token provenance and full-output determinism gaps. Corrected plan keeps exact generated declaration provenance while retaining full maintained checks and strengthens comparison to every output file. No implementation started.
+
+Corrected independent PLAN-EVAL PASS before source edits. Slice1 implemented deterministic per-page IDs before both consumers, bundle provenance checks and negative controls, heading labels, stable lane identity, dotenv plaintext, stack margin repair and historical drift qualification. Validation pending.
+
+Slice1 complete: independent source review PASS after the recorded FAIL_FIX and reverted dependency experiment. Candidate browser52/0/0,24axe reports with0serious/critical;6focused tests; structured tooling8/site2/browser2 checks;23970links/251pages. Accepted reproducibility compares806files and protects HTML/twins/fragments/assets; reports only the known Pagefind metadata variation. Real raw-custom control exits1 through the normal policy command. Seven-line native Lightning CSS lock closure retained, all other dependency entries unchanged.
+
+Reconcile1: source scope remains #2451. Token authority stays assigned to #2450. The discovered upstream Pagefind variation is a separate sibling task; no Pagefind upgrade is retained. CI slice remains pending.
+
+Slice2 complete:71classifier/workflow tests PASS after intended68/3RED; structured2-file types/lint/fmt PASS; native CLI probes prove opted-in push needs_pages=false and default push=true. Separate source review PASS. Browser/deploy conditions retain fail-toward-running behavior and the rendered reproducibility check is now in CI.
+
+Reconcile2: new PR2452 remains draft for carrier integration/final IMPL. Current main has advanced with #2449; include it normally before native generation. Independent source reviews accept both slices. No protected theme-source edits.
+
+Integration: normally merged main d6dfab0 (#2449 theme framing). Protected canonical design sources match main exactly. Ran gen:agent-docs-prose, gen:mcp-export-corpus --allow-dirty, gen:assets-barrel, gen:publish-assets in order, all exit0. The native write option covers only staged generated carriers; package/plugin implementation input is unchanged. Restored incidental nested lock churn; retain the previously reviewed seven-line Lightning CSS closure. Root quality:gate, including architecture, exits0 with existing warnings.
+
+Canonical local e2e:cli exits1 at preflight.aspire; Docker is also unavailable. No runtime PASS is claimed. Hosted canonical workflow will qualify that gate. Full source/browser evidence remains separate from this environment limitation.
+
+Final source IMPL-EVAL PASS at f8db7ee. Post-integration browser52/0/0 and24axe audits with0serious/critical; reproducibility,23970links and15caveats pass. Four freshness receipts exit0 at f8db7ee. All source findings are fixed or explicitly assigned to2450. Upstream metadata is sibling2453. Hosted CLI40690612382 and PR Pages CI remain pending; not waived. Final evidence-only commit does not change source or carriers.
+
+## Refresh design — 2026-11-01
+
+1. Public surface: preserve current main's docs content, Studio Utility theme, renderers, language support and theming docs while retaining only review follow-ups still missing.
+2. Domain vocabulary: current-main disposition (already fixed, retained, deferred), normal merge, strict reproducibility, READY handoff.
+3. Ports: existing Lume/Pagefind APIs, pure change classifier, repository generators/check tasks, browser suite, independent Claude evaluator.
+4. Constants: retain existing stable identity and navigation constants; no new token authority or model routing literals in maintained code.
+5. Commit slices: bootstrap refresh evidence; integrate origin/main and reconcile all #2451 findings (docs/site, tools/docs-site, browser tests, classifier/Pages, native carriers); include #2453 only if a bounded upstream-supported fix is proven; final native gates and independent review evidence. Each source slice updates this worklog and context pack.
+6. Deferred scope: unrelated framework implementation and token consolidation remain owned by their current issues. Do not duplicate fixes already on main. No PR merge or publication; Cockpit owns merging.
+7. Contributor path: tools/docs-site/README.md.
+
+Owner routing override (verbatim): “IMPL-EVAL: `claude -p --model claude-opus-5-5 --effort high`, read-only.” Owner process override (verbatim): “Post READY on #2451 once every required check is green **or skipped by workflow policy**. Include the head. STOP at READY; Cockpit merges.” Specific operator instructions require Refs links and normal push, superseding generic closing-keyword and replacement-branch boilerplate.
+
+PLAN-EVAL: N/A for this refresh: the existing independently approved plan and owner-provided acceptance fix the contract. Routine conflict resolution, removing superseded changes and generated freshness do not introduce a new architecture/public contract. A material Pagefind redesign would remain deferred to #2453.
+
+Initial reconcile: PR #2452 remains open at b0d5a16 with conflicts. There is no orchid-triage comment. The PR itself is the explicitly assigned work, so reuse it. Main already has Lightning CSS, deterministic identity passes and named heading permalinks; these must be preserved from main rather than reintroduced. Exact post-merge dispositions and gate evidence follow. Deno 2.9.7 is installed; RTK is unavailable.
+
+Current-main audit completed in research.md: all ten findings already incorporated or explicitly owned by #2450. Seven conflicts resolved to preserve main; every maintained source matches origin/main. Strict reproducibility still fails only for Pagefind filter/entry/meta. The existing policy mode passes: 917 paths, 260 HTML, 208 twins, 253 search outputs. #2453 remains deferred, with no claimed fix or dependency churn.
+
+Pre-sign-off validation: docs-site build/rendered-output, docs:links, docs:accuracy and docs:snippets exit0. Structured classifier/Pages tests 72/0/0, tools tests 16/0/0, site fixtures 37/0/0. All six exact workflow-scoped docs-tools/browser check/lint/fmt wrappers pass. Independent read-only supervisor review in progress; native carrier chain, all root checks and full browser remain pending. PR returned to draft/status:impl with explicit ci:skip-e2e and ci:skip-scaffold for the resulting docs-run-only delta; its body now uses Refs #2451.
+
+Integration slice review PASS in slice-review-refresh.md, separate read-only Anthropic session. It substantively checked all ten source contracts; it did not independently execute git because only Read/Glob/Grep were exposed. Supervisor verified `git diff --name-only origin/main`: only this run differs. Conflict files: .github/workflows/pages.yml, docs/site/_config.ts, docs/site/_data.ts, tools/docs-site/README.md, tools/docs-site/navigation_test.ts, tools/docs-site/style-policy.ts, tools/fresh-ui-browser/docs-tests/docs.spec.ts; each keeps current main's implementation. Old evaluate.md is explicitly marked historical, and context-pack.md now leads with the refresh. Built-site links and caveats and token freshness also pass. Normal merge sign-off follows; source is unchanged from main.
+
+Reconcile refresh slice: no new inbox PR or duplicated implementation; existing PR #2452 retained and its body now has Refs #2451. #2450/#2453 remain open ownership scopes. Cockpit owns the eventual merge and issue disposition. No source or carrier gate is waived by the independent source PASS; final gates remain pending.
+
+Normal merge d096ad665 has parents 740cb1fa8 and main 6a1d84a; normally pushed to fix/docs-review-followups. Native generation completed in required order (prose, MCP export corpus, assets barrel, publish assets), all exit0 with no tracked changes. Fresh exports-drift and broad quality:gate (including dependency/architecture checks) receipts PASS at d096ad665, with existing doctrine warnings only. The tree remains clean outside this run. All root check:* gates are running before the full browser/final evaluation handoff.
+
+All 14 root check:* tasks PASS under Deno 2.9.7: agent-docs-prose, aspire-host-ports, aspire-version-parity, assets-barrel, child-health-docs, desktop-native-fixture, emitted-samples, figma-names, mcp-export-corpus, netscript-jsr-specifiers, publish-assets, review-threads (PR2452 arguments), scaffold-versions and streams-types. No tracked carrier or lock changed. Gate summaries are in gate-evidence-refresh.json; original receipts and logs stay private. The full docs browser matrix runs against this same maintained source; no site builders are run concurrently with it.
+
+Full browser receipt PASS at source head d096ad665: 140 expected results, zero unexpected, skipped or flaky, four scheme/viewport projects, about 151 seconds. Required screenshot, keyboard, search, style-negative, geometry and accessibility contracts remain intact. Broad root check is an additional check still running; final same-session IMPL-EVAL follows its completion. Draft-only remote check snapshot has no current failures, but is not treated as proof of the ready-for-review check set. A close-gate diagnostic correctly reports the three unfinished PR DoD boxes and no closing issue references; refresh them only when their claims are true.
+
+Additional broad root `deno task check` receipt PASS/exit0 at d096ad665 after the full structured package/plugin source sweep. All selected and additional local gates are now terminal green, except the explicitly diagnostic strict Pagefind reproduction left with #2453. No source or lock mutation. Final independent IMPL-EVAL is reviewing this current evidence; after its verdict, prepare an evidence-only sign-off and reconcile current remote policy checks. Final PR DoD measures source/review acceptance; READY publication follows those checks and remains an explicit delivery step.
+
+Fresh final IMPL-EVAL PASS in evaluate-refresh.md, same separate read-only Anthropic session, requested/observed claude-opus-5-5 with high effort requested. Reviewer inspected original receipts and the browser report, including root check 4131 files/35 batches/zero failures, and reverified all ten contracts. Shell was denied in the resumed evaluator session, so source-tree equality is explicitly supervisor-attested rather than falsely claimed independently reproduced. No blockers. The reviewer correctly excludes final push, ready transition, remote CI and READY publication from its source verdict. Bookkeeping suggestions are reconciled: root check PASS/current context, final evaluation result recorded, historical HTML-only wording clarified, PR body prepared for truthful completion. No source changed after review.
+
+Final reconcile before evidence sign-off: existing PR/branch retained, no replacement or fan-out work; #2453 remains separate and #2450 keeps its explicit ownership disposition. Native carrier freshness and lock equality remain green without generated churn. The sign-off commit contains only this run and the declared dated lesson. Refresh the PR body and phase comment, make it ready, then verify actual current-head required checks green or policy-skipped before queuing READY for Cockpit. No merge/issue-close action is authorized for this worker.

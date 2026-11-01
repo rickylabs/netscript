@@ -12,3 +12,8 @@
 .ns-navigation-menu [data-part='title'] { font-size: var(--ns-text-strong); font-weight: var(--ns-weight-strong); }
 .ns-navigation-menu [data-part='description'] { color: var(--ns-muted-fg); font-size: var(--ns-text-small); }
 .ns-navigation-menu [data-part='indicator'] { display: none; }
+
+/* Keep pointer activation on the native summary so Tab enters its disclosure. */
+.ns-navigation-menu summary > [data-scope='navigation-menu']:is([data-part='label'], [data-part='chevron']) {
+  pointer-events: none;
+}

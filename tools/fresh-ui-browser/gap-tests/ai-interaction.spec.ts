@@ -35,6 +35,27 @@ test.beforeEach(async ({ page }, info) => {
 });
 test.afterEach(() => expect(errors).toEqual([]));
 
+/** Fractional device pixels must not turn an input frame into an end-follow request. */
+const SCROLL_PIXEL_TOLERANCE = 0.01;
+const DEFAULT_END_THRESHOLD = 1;
+
+test('message-scroller/input-frame-preserves-first-pixel-native-scroll', async ({ page }) => {
+  const root = page.locator('#primary-scroller');
+  const view = root.getByRole('region', { name: 'Conversation', exact: true });
+  await expect(root).toHaveAttribute('data-scrollable', 'up');
+  await view.scrollIntoViewIfNeeded();
+  await expect(view).toBeInViewport({ ratio: 1 });
+  await view.hover();
+  await page.mouse.wheel(0, -DEFAULT_END_THRESHOLD);
+  await settleNativeScroll(view);
+  const remaining = await view.evaluate((node) =>
+    node.scrollHeight - node.clientHeight - node.scrollTop
+  );
+  expect(remaining).toBeGreaterThan(0);
+  expect(remaining).toBeLessThanOrEqual(DEFAULT_END_THRESHOLD + SCROLL_PIXEL_TOLERANCE);
+  await expect(root).toHaveAttribute('data-scrollable', 'up');
+});
+
 test('message-scroller/native-pinned-scroll', async ({ page }) => {
   const root = page.locator('#primary-scroller');
   const view = root.getByRole('region', { name: 'Conversation', exact: true });

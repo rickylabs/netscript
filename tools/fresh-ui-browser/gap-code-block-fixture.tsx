@@ -1,3 +1,4 @@
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { useState } from 'preact/hooks';
 import {
   CodeBlock,
@@ -197,12 +198,12 @@ function AutomaticCodeExamples() {
     <>
       <section id='code-automatic' aria-label='Automatic syntax behavior'>
         <CodeBlock aria-label='Automatic source' tabs={files} lineNumbers onCopied={setCopied} />
-        <button type='button' onClick={() => setExtra(!extra)}>
+        <Button type='button' onClick={() => setExtra(!extra)}>
           {extra ? 'Remove extra language file' : 'Add extra language file'}
-        </button>
-        <button type='button' onClick={() => setKnown(!known)}>
+        </Button>
+        <Button type='button' onClick={() => setKnown(!known)}>
           Toggle JSON language recognition
-        </button>
+        </Button>
         <output aria-label='Automatic transfer'>{copied}</output>
         <CodeBlock
           aria-label='Explicit source'

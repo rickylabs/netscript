@@ -1,3 +1,4 @@
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { IconButton } from '../../packages/fresh-ui/registry/components/ui/icon-button.tsx';
 import { Progress } from '../../packages/fresh-ui/registry/components/ui/progress.tsx';
 import { useState } from 'preact/hooks';
@@ -20,18 +21,18 @@ function NativeActions() {
   return (
     <>
       <section id='marker-native' aria-label='Marker keyboard'>
-        <button type='button' data-before-marker>Before marker</button>
+        <Button type='button' data-before-marker>Before marker</Button>
         <Marker variant='separator' icon={<Icon name='info' size={14} />}>
-          <button type='button' onClick={() => setMarkers(markers + 1)}>
+          <Button type='button' onClick={() => setMarkers(markers + 1)}>
             Inspect event
-          </button>
+          </Button>
           <a href='#event'>Read event</a>
         </Marker>
-        <button type='button' data-after-marker>After marker</button>
+        <Button type='button' data-after-marker>After marker</Button>
         <output aria-label='Marker actions'>{markers}</output>
       </section>
       <section id='attachment-native' aria-label='Attachment keyboard'>
-        <button type='button' data-before-attachment>Before attachment</button>
+        <Button type='button' data-before-attachment>Before attachment</Button>
         <Attachment
           title='report.pdf'
           state={state}
@@ -40,20 +41,20 @@ function NativeActions() {
           media={<Icon name='file-text' size={14} />}
           actions={
             <>
-              <button type='button' onClick={() => setActions(actions + 1)}>
+              <Button type='button' onClick={() => setActions(actions + 1)}>
                 Retry report
-              </button>
+              </Button>
               <a href='#report'>Read report</a>
             </>
           }
         />
-        <button type='button' data-after-attachment>After attachment</button>
-        <button
+        <Button type='button' data-after-attachment>After attachment</Button>
+        <Button
           type='button'
           onClick={() => setState(states[(states.indexOf(state) + 1) % states.length])}
         >
           Advance attachment state
-        </button>
+        </Button>
         <output aria-label='Attachment actions'>{actions}</output>
       </section>
     </>
@@ -67,7 +68,7 @@ function Disclosure() {
   const [renders, setRenders] = useState(0);
   return (
     <section id='trace-native' aria-label='Trace keyboard'>
-      <button type='button' data-before-trace>Before trace</button>
+      <Button type='button' data-before-trace>Before trace</Button>
       <Trace title='Agent trace' status='running' duration='4 steps' style={{ maxWidth: 480 }}>
         <Trace.Line
           title='Static step'
@@ -75,7 +76,7 @@ function Disclosure() {
           status='done'
           connector={false}
         >
-          <button type='button'>Inspect static step</button>
+          <Button type='button'>Inspect static step</Button>
         </Trace.Line>
         <Trace.Line
           title='Search docs'
@@ -85,7 +86,7 @@ function Disclosure() {
           collapsible
           defaultOpen
         >
-          <button type='button'>Inspect sources</button>
+          <Button type='button'>Inspect sources</Button>
           <a href='#sources'>Read sources</a>
         </Trace.Line>
         <Trace.Line
@@ -99,10 +100,10 @@ function Disclosure() {
             if (accept) setOpen(next);
           }}
         >
-          <button type='button'>Controlled action</button>
+          <Button type='button'>Controlled action</Button>
         </Trace.Line>
       </Trace>
-      <button type='button' data-after-trace>After trace</button>
+      <Button type='button' data-after-trace>After trace</Button>
       <label>
         <input
           type='checkbox'
@@ -110,9 +111,9 @@ function Disclosure() {
           onChange={(e) => setAccept(e.currentTarget.checked)}
         />Accept disclosure changes
       </label>
-      <button type='button' onClick={() => setRenders(renders + 1)}>
+      <Button type='button' onClick={() => setRenders(renders + 1)}>
         Rerender unchanged disclosure
-      </button>
+      </Button>
       <output aria-label='Disclosure proposals'>{proposals}</output>
       <output aria-label='Parent renders'>{renders}</output>
     </section>

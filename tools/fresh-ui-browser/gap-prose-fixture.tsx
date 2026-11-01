@@ -1,12 +1,13 @@
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { copiedProseHtml } from './test-results/prose-fixture.ts';
 
 export function ProseExamples() {
   return (
     <section aria-label='Prose components'>
       <h2>Prose components</h2>
-      <button type='button' id='before-prose'>Before prose</button>
+      <Button type='button' id='before-prose'>Before prose</Button>
       <div id='prose-installed' dangerouslySetInnerHTML={{ __html: copiedProseHtml }} />
-      <button type='button' id='after-prose'>After prose</button>
+      <Button type='button' id='after-prose'>After prose</Button>
       <div id='prose-host' class='ns-markdown'>
         <h2 id='prose-target'>
           Host heading<a

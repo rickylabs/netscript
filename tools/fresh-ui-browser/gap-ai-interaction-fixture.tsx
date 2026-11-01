@@ -20,12 +20,12 @@ function Scrollers() {
   return (
     <section id='scroller-examples' aria-label='Message scroller examples'>
       <div>
-        <button type='button' onClick={() => setCount(count + 1)}>Append message</button>
-        <button type='button' onClick={() => setCount(1)}>Use one message</button>
-        <button type='button' onClick={() => setHeight(height === 320 ? 220 : 320)}>
+        <Button type='button' onClick={() => setCount(count + 1)}>Append message</Button>
+        <Button type='button' onClick={() => setCount(1)}>Use one message</Button>
+        <Button type='button' onClick={() => setHeight(height === 320 ? 220 : 320)}>
           Resize viewport
-        </button>
-        <button type='button' onClick={() => setShow(!show)}>Mount message viewport</button>
+        </Button>
+        <Button type='button' onClick={() => setShow(!show)}>Mount message viewport</Button>
         <label>
           <input
             type='checkbox'
@@ -107,9 +107,9 @@ function ControlledAnswers() {
           onChange={(e) => setPreventReset(e.currentTarget.checked)}
         />Prevent native reset
       </label>
-      <button type='button' onClick={() => setRevision(revision + 1)}>
+      <Button type='button' onClick={() => setRevision(revision + 1)}>
         Rerender unchanged answers
-      </button>
+      </Button>
       <Questionnaire
         title='Controlled storage'
         options={choices}
@@ -121,7 +121,7 @@ function ControlledAnswers() {
         onReset={(e) => {
           if (preventReset) e.preventDefault();
         }}
-        actions={<button type='reset'>Reset controlled storage</button>}
+        actions={<Button type='reset'>Reset controlled storage</Button>}
       >
         <label>
           Other native field<input name='extra' defaultValue='Initial extra' />
@@ -136,7 +136,7 @@ function ControlledAnswers() {
           setMultipleProposals((n) => n + 1);
           if (accept) setMultipleValue(next);
         }}
-        actions={<button type='reset'>Reset controlled multiple storage</button>}
+        actions={<Button type='reset'>Reset controlled multiple storage</Button>}
       />
       <Questionnaire
         title='Controlled notes'
@@ -146,7 +146,7 @@ function ControlledAnswers() {
           setTextProposals((n) => n + 1);
           if (accept) setText(next);
         }}
-        actions={<button type='reset'>Reset controlled notes</button>}
+        actions={<Button type='reset'>Reset controlled notes</Button>}
       />
       <output aria-label='Choice proposals'>{proposals}</output>
       <output aria-label='Multiple proposals'>{multipleProposals}</output>
@@ -161,17 +161,17 @@ function NativeAnswerFields() {
   const [defaultsChanged, setDefaultsChanged] = useState(false);
   return (
     <section id='native-answers' aria-label='Native form examples'>
-      <button type='button' onClick={() => setDefaultsChanged(true)}>
+      <Button type='button' onClick={() => setDefaultsChanged(true)}>
         Change later default props
-      </button>
+      </Button>
       <Questionnaire
         title='Native storage'
         options={choices}
         defaultValue={[defaultsChanged ? 'sqlite' : 'postgres']}
         actions={
           <>
-            <button type='reset'>Reset native storage</button>
-            <button type='submit'>Submit native storage</button>
+            <Button type='reset'>Reset native storage</Button>
+            <Button type='submit'>Submit native storage</Button>
           </>
         }
         onSubmit={(e) => {
@@ -190,8 +190,8 @@ function NativeAnswerFields() {
         defaultValue={['postgres']}
         actions={
           <>
-            <button type='reset'>Reset multiple storage</button>
-            <button type='submit'>Submit multiple storage</button>
+            <Button type='reset'>Reset multiple storage</Button>
+            <Button type='submit'>Submit multiple storage</Button>
           </>
         }
         onSubmit={(e) => {
@@ -206,8 +206,8 @@ function NativeAnswerFields() {
         placeholder='Describe your project'
         actions={
           <>
-            <button type='reset'>Reset native notes</button>
-            <button type='submit'>Submit native notes</button>
+            <Button type='reset'>Reset native notes</Button>
+            <Button type='submit'>Submit native notes</Button>
           </>
         }
         onSubmit={(e) => {
@@ -220,7 +220,7 @@ function NativeAnswerFields() {
         options={choices}
         disabled
         defaultValue={['postgres']}
-        actions={<button type='button'>Edit disabled answers</button>}
+        actions={<Button type='button'>Edit disabled answers</Button>}
       />
       <output aria-label='Native form data'>{submitted}</output>
     </section>
@@ -231,7 +231,7 @@ function NativeAnswers() {
   const [show, setShow] = useState(true);
   return (
     <div>
-      <button type='button' onClick={() => setShow(!show)}>Mount native answer forms</button>
+      <Button type='button' onClick={() => setShow(!show)}>Mount native answer forms</Button>
       {show && <NativeAnswerFields />}
     </div>
   );

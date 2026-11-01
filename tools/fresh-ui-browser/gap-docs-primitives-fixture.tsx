@@ -11,7 +11,7 @@ export function DocsPrimitives() {
     <>
       <h2>Docs primitive components</h2>
       <section id='docs-labels' aria-label='Label examples'>
-        <button type='button' id='before-doc-labels'>Before labels</button>
+        <Button type='button' id='before-doc-labels'>Before labels</Button>
         <div id='docs-label-display'>
           <Label id='doc-email-label' for='doc-email' variant='eyebrow' state='invalid' required>
             Email address
@@ -30,10 +30,12 @@ export function DocsPrimitives() {
           <Label for='doc-locked' state='disabled'>Locked field</Label>
           <Input id='doc-locked' disabled />
         </div>
-        <button type='button' id='after-doc-labels'>After labels</button>
+        <Button type='button' id='after-doc-labels'>After labels</Button>
       </section>
       <section id='docs-card' aria-label='Rule card example'>
-        <button type='button' id='before-doc-card'>Before card</button>
+        <div>
+          <Button type='button' id='before-doc-card'>Before card</Button>
+        </div>
         <Card variant='rule' size='sm' interactive>
           <Card.Header>
             <Card.Title>Ship your first order</Card.Title>
@@ -68,14 +70,18 @@ export function DocsPrimitives() {
         </Card>
       </section>
       <section id='docs-pager' aria-label='Pager example'>
-        <button type='button' id='before-doc-pager'>Before pager</button>
+        <div>
+          <Button type='button' id='before-doc-pager'>Before pager</Button>
+        </div>
         <Pagination variant='pager' aria-label='Docs chapters'>
           <Pagination.Previous href='#previous-topic'>Telemetry and logging</Pagination.Previous>
           <Pagination.Next href='#next-topic'>Authentication</Pagination.Next>
         </Pagination>
       </section>
       <section id='docs-pages' aria-label='Numbered pagination example'>
-        <button type='button' id='before-doc-pages'>Before page keys</button>
+        <div>
+          <Button type='button' id='before-doc-pages'>Before page keys</Button>
+        </div>
         <Pagination aria-label='Order pages'>
           <Pagination.Meta>Showing 1–20 of 80 orders</Pagination.Meta>
           <Pagination.Actions>
@@ -102,7 +108,9 @@ export function DocsPrimitives() {
             </Pagination.Link>
           </Pagination.Actions>
         </Pagination>
-        <button type='button' id='after-doc-pages'>After page keys</button>
+        <div>
+          <Button type='button' id='after-doc-pages'>After page keys</Button>
+        </div>
         <output aria-label='Disabled page callbacks'>{disabledClicks}</output>
       </section>
     </>

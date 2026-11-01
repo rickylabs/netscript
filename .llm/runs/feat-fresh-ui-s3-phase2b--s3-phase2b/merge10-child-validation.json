@@ -1,0 +1,439 @@
+{
+  "state": "same-source-review-pass-before-merge-source-commit",
+  "parent": "2be80639",
+  "main": "0af8fd9e",
+  "originalChild": "1afd50cb",
+  "mergeOnly": true,
+  "desktopDisposition": {
+    "windowPreviouslyReplacedUtilityBlocks": 11,
+    "trayPreviouslyReplacedUtilityBlocks": 12,
+    "postBaseSemanticAdditions": 0,
+    "reviewedCssByteExact": true
+  },
+  "nonCss": {
+    "beforeSnapshotIdentical": 591,
+    "enumeratedParentChangedFiles": [
+      "deno.json",
+      "packages/fresh-ui/tests/publish-size.test.ts"
+    ],
+    "unintendedDifferences": 0,
+    "mainOnlyCliDocsDifferences": 0,
+    "unchangedLocks": 3
+  },
+  "negativeControls": {
+    "raw": {
+      "bytes": {
+        "raw": 343829,
+        "gzip": 45015
+      },
+      "exitCode": 1,
+      "onlyExpectedBudgetFails": true,
+      "canonicalGeneration": true
+    },
+    "gzip": {
+      "bytes": {
+        "raw": 339329,
+        "gzip": 48435
+      },
+      "exitCode": 1,
+      "onlyExpectedBudgetFails": true,
+      "canonicalGeneration": true
+    },
+    "restored": {
+      "bytes": {
+        "raw": 335788,
+        "gzip": 44819
+      },
+      "exactHashes": true,
+      "positiveExitCode": 0
+    }
+  },
+  "pending": [
+    "merge-source-commit",
+    "actual-head-carriers-quality-native-publication",
+    "same-evidence-review",
+    "privacy-ancestry-plain-push"
+  ],
+  "sourceWrappers": {
+    "check": 0,
+    "lint": 0,
+    "fmt": 0
+  },
+  "qualityGate": 0,
+  "preflight": 0,
+  "docsAccuracy": 0,
+  "exports": 0,
+  "siteProseGeneration": 0,
+  "docLint": {
+    "rawExitCode": 1,
+    "typescript": 123,
+    "json": 1,
+    "new": 0,
+    "removed": 0,
+    "acceptedDebt": 2531
+  },
+  "crossSelection": {
+    "files": [
+      "data-table.spec.ts",
+      "stats-grid.spec.ts",
+      "shell.spec.ts",
+      "native-close.spec.ts",
+      "desktop-controls.spec.ts",
+      "docs-navigation.spec.ts",
+      "docs-composition.spec.ts",
+      "docs-structure.spec.ts",
+      "code-block.spec.ts",
+      "fidelity.spec.ts",
+      "display-motion.spec.ts",
+      "ai.spec.ts",
+      "ai-interaction.spec.ts"
+    ],
+    "cases": 904,
+    "workers": 2,
+    "firstAttemptRequired": true
+  },
+  "historicalOriginalFrozenSource": {
+    "packagePass": 866,
+    "fullChromiumPass": 791,
+    "docsPass": 140,
+    "cliPass": 67,
+    "crossFailed": {
+      "passed": 450,
+      "failed": 1,
+      "interrupted": 1,
+      "notRun": 444,
+      "exitCode": 1
+    }
+  },
+  "readerFix": {
+    "designReview": "PASS",
+    "minimalReaderFrameFlag": true,
+    "pinningAndThresholdLogicUnchanged": true,
+    "nativeRegressionBeforeFix": {
+      "failedChromium": 4,
+      "failedWebKit": 4,
+      "passedFirefox": 4,
+      "skipped": 0,
+      "flaky": 0
+    },
+    "nativeRegressionAfterFix": {
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "retries": 0,
+      "fromFreshCompleteFocusedAi": true
+    }
+  },
+  "budgetPolicy": {
+    "measuredBytes": {
+      "raw": 335788,
+      "gzip": 44819
+    },
+    "files": 90,
+    "caps": {
+      "raw": 342504,
+      "gzip": 45716
+    },
+    "headroomBytes": {
+      "raw": 6716,
+      "gzip": 897
+    },
+    "reason": "gap components from #2488 (owner decision 2026-11-01)",
+    "sourceCarrierEquality": true
+  },
+  "intentionalNonCssExceptions": [
+    "packages/fresh-ui/registry/components/ui/message-scroller.tsx",
+    "packages/fresh-ui/README.md",
+    "packages/fresh-ui/registry.generated.ts",
+    "packages/fresh-ui/tests/publish-size.test.ts",
+    "tools/fresh-ui-browser/gap-tests/ai-interaction.spec.ts",
+    "tools/fresh-ui-browser/gap-ai-interaction-fixture.tsx",
+    "tools/fresh-ui-browser/gap-ai-fixture.tsx",
+    "tools/fresh-ui-browser/gap-alert-fixture.tsx",
+    "tools/fresh-ui-browser/gap-calendar-fixture.tsx",
+    "tools/fresh-ui-browser/gap-code-block-fixture.tsx",
+    "tools/fresh-ui-browser/gap-command-palette-fixture.tsx",
+    "tools/fresh-ui-browser/gap-dialog-ownership-fixture.tsx",
+    "tools/fresh-ui-browser/gap-display-basics-fixture.tsx",
+    "tools/fresh-ui-browser/gap-display-motion-fixture.tsx",
+    "tools/fresh-ui-browser/gap-docs-primitives-fixture.tsx",
+    "tools/fresh-ui-browser/gap-docs-structure-fixture.tsx",
+    "tools/fresh-ui-browser/gap-fixture.tsx",
+    "tools/fresh-ui-browser/gap-forms-fixture.tsx",
+    "tools/fresh-ui-browser/gap-native-layout-fixture.tsx",
+    "tools/fresh-ui-browser/gap-navigation-fixture.tsx",
+    "tools/fresh-ui-browser/gap-overlays-fixture.tsx",
+    "tools/fresh-ui-browser/gap-page-header-fixture.tsx",
+    "tools/fresh-ui-browser/gap-prose-fixture.tsx",
+    "tools/fresh-ui-browser/gap-resizable-fixture.tsx"
+  ],
+  "historicalFocusedAiFailed": {
+    "passed": 168,
+    "failed": 1,
+    "notRun": 23,
+    "flaky": 0,
+    "retries": 0,
+    "cause": "Caller plain buttons native dark WebKit contrast"
+  },
+  "focusedAi": {
+    "passed": 192,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "retries": 0
+  },
+  "correctedFrozenReadset": {
+    "files": 711,
+    "intentionalNonCssDifferences": 6,
+    "cssDifferences": 0
+  },
+  "docsBrowser": {
+    "passed": 140,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "retries": 0
+  },
+  "historicalCorrectedAiOnlyFullRun": {
+    "package": 866,
+    "chromium": 795,
+    "docs": 140,
+    "crossPassed": 888,
+    "crossFailed": 16,
+    "crossSkipped": 0,
+    "crossFlaky": 0,
+    "crossRetries": 0
+  },
+  "callerControlCorrection": {
+    "files": 18,
+    "tagSites": 84,
+    "importLines": 12,
+    "headlessPaintSites": 11,
+    "localReadOnlyPaintConstants": 2,
+    "sentinelWrappersForExistingStrictSelectors": 4,
+    "otherSemanticEdits": 0,
+    "canonicalFormattingOnly": true,
+    "controllerTypeHandlerLabelNativeFormBehaviorUnchanged": true
+  },
+  "focusedCallerControlCases": 1280,
+  "callerControlFocusedFirstRun": {
+    "passed": 1252,
+    "failed": 28,
+    "skipped": 0,
+    "flaky": 0,
+    "retries": 0,
+    "rawExitCode": 1,
+    "causes": [
+      "unsupported OTP clipboard permission grant in Firefox/WebKit",
+      "Chromium-specific native browser-chrome boundary assertions in DatePicker/AlertDialog",
+      "WebKit NavigationMenu focus exit under investigation"
+    ]
+  },
+  "nativeClipboardProbe": {
+    "cases": 6,
+    "engines": 3,
+    "writePasteSubmitAllPass": true,
+    "mocks": 0,
+    "permissionGrants": 0
+  },
+  "nativeSetupPrivatePrototype": {
+    "passed": 52,
+    "failed": 4,
+    "skipped": 0,
+    "flaky": 0,
+    "rawExitCode": 1,
+    "remaining": "WebKit NavigationMenu focus exit"
+  },
+  "nativePlatform": {
+    "plan": "PASS",
+    "cssException": {
+      "unchangedFiles": 89,
+      "addedRules": 1,
+      "originalNavigationRulesUnchanged": 14,
+      "specificity": [
+        0,
+        3,
+        1
+      ],
+      "engines": 3
+    },
+    "realMaintainedSourceNativeCases": {
+      "passed": 56,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "retries": 0,
+      "casesByEngine": {
+        "chromium": 24,
+        "firefox": 16,
+        "webkit": 16
+      },
+      "scope": "48 shared cases across all three engines plus eight Chromium browser-chrome boundary cases"
+    },
+    "assertionLosses": 0,
+    "newInteriorAndNativeAssertions": 10,
+    "newBoundaryCases": 2,
+    "maintainedChromiumOnlyBrowserChromeProof": true,
+    "originalModalScenariosAllThreeEngines": true,
+    "navigationSpecByteExact": true
+  },
+  "focusedNativeFinal": {
+    "passed": 1288,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "retries": 0,
+    "casesByEngine": {
+      "chromium": 440,
+      "firefox": 424,
+      "webkit": 424
+    }
+  },
+  "historicalConsolidationParityBeforePointerFix": [
+    {
+      "engine": "chromium",
+      "files": 90,
+      "orderedRules": 1945,
+      "specificityComparisons": 1921,
+      "nestedSpecificityComparisons": 465,
+      "differences": 0,
+      "nativeWrongListNegativeControl": true,
+      "nativeRootSpecificityProbe": true
+    },
+    {
+      "engine": "firefox",
+      "files": 90,
+      "orderedRules": 1947,
+      "specificityComparisons": 1923,
+      "nestedSpecificityComparisons": 465,
+      "differences": 0,
+      "nativeWrongListNegativeControl": true,
+      "nativeRootSpecificityProbe": true
+    },
+    {
+      "engine": "webkit",
+      "files": 90,
+      "orderedRules": 1945,
+      "specificityComparisons": 1921,
+      "nestedSpecificityComparisons": 465,
+      "differences": 0,
+      "nativeWrongListNegativeControl": true,
+      "nativeRootSpecificityProbe": true
+    }
+  ],
+  "historicalConsolidationBudgetBeforePointerFix": {
+    "parentBytes": {
+      "raw": 278763,
+      "gzip": 35877
+    },
+    "consolidatedChildBytes": {
+      "raw": 335569,
+      "gzip": 44751
+    },
+    "additionalGrowth": {
+      "raw": 56806,
+      "gzip": 8874
+    },
+    "previousCaps": {
+      "raw": 282782,
+      "gzip": 36350
+    },
+    "cumulativeGrowthOverMain": {
+      "raw": 119588,
+      "gzip": 18224
+    },
+    "reason": "gap components from #2488 (owner decision 2026-11-01)",
+    "oldConfiguredGateExit": 1,
+    "fiveMbGatePassedAtOldCaps": true,
+    "previousInterimCaps": {
+      "raw": 339588,
+      "gzip": 45224
+    },
+    "caps": {
+      "raw": 342281,
+      "gzip": 45647
+    }
+  },
+  "currentCss": {
+    "files": 90,
+    "unchangedFromConsolidation": 89,
+    "navigationOriginalRulesUnchanged": 14,
+    "approvedAddedRules": 1,
+    "addedRuleSpecificity": [
+      0,
+      3,
+      1
+    ],
+    "enginesChecked": 3,
+    "sourceCarrierEquality": true
+  },
+  "freshBroadNativeSource": {
+    "package": {
+      "passed": 866,
+      "failed": 0,
+      "ignored": 0
+    },
+    "docsBrowser": {
+      "passed": 140,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "retries": 0
+    },
+    "cli": {
+      "passed": 67,
+      "failed": 0,
+      "ignored": 0
+    },
+    "qualityArchitecture": 0,
+    "preflight": 0,
+    "docsAccuracy": 0,
+    "exports": 0,
+    "otherRootChecks": 10,
+    "otherRootChecksAllZero": true,
+    "docLint": {
+      "rawExitCode": 1,
+      "typescript": 123,
+      "json": 1,
+      "new": 0,
+      "removed": 0,
+      "acceptedDebt": 2531
+    },
+    "siteBuildHtmlPages": 260,
+    "registryArtifacts": 135,
+    "locksUnchanged": 3,
+    "maintainedChromium": {
+      "passed": 803,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "retries": 0,
+      "exitCode": 0
+    },
+    "affectedFirefoxWebKit": {
+      "passed": 904,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "retries": 0,
+      "exitCode": 0
+    }
+  },
+  "finalFrozenReadset": {
+    "sourceFiles": 711,
+    "compiledFixtureArtifacts": 9,
+    "mismatches": 0
+  },
+  "reviewThreads": {
+    "pullRequests": 2,
+    "threads": 0,
+    "unanswered": 0
+  },
+  "sourceReview": {
+    "verdict": "PASS",
+    "round": 1,
+    "blockers": 0,
+    "failureStreak": 0
+  }
+}

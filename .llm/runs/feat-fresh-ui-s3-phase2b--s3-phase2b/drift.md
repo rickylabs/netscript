@@ -148,3 +148,58 @@ then-measured-cap decision. No budget waiver, scope removal or history rewrite.
 Fresh integration proof may be scoped by exhaustive CSS semantic parity and
 unchanged controller bytes; SAME design review selects sufficiency before code.
 Full final browser/runtime/evaluation/CI acceptance remains required later.
+
+
+## Desktop merge disposition — reviewed replacements retained
+
+All11oldWindowand12oldTray Utility blocks are enumerated in
+merge10-child-desktop-utility-disposition.md. They were already absent/replaced
+in reviewedc3d; both full CSS files still matchc3dand1afdexactly. Parent2be's
+entire old Utility lists match mergebasec587including ordered declarations/media:
+0post-base new semantic rules. Thus no old overrides are reintroduced, and no
+new parent semantic addition is silently dropped. DataTable/StatsGrid/layouts
+retain reviewed child rules while factoring repeated exact Utility roots only
+within contiguous segments, preserving intervening legacy/container rules.
+
+
+## Latest owner overrides final headroom/readiness policy
+
+Eric/Cockpit now chooses final measured global raw/gzip ×1.02 ceiling with the
+dated2488reason at each constant. Earlier fixed4019/473headroom remains truthful
+intermediate merge history only. Final CI may be green or policy-skipped at
+exact head; failed/pending is not accepted. Guard logic/5MBcap remain intact.
+
+
+## Runtime defect found by the broader three-engine merge gate
+
+The earlier no-controller-change assumption is explicitly amended for ONLY
+MessageScroller's input rAF ownership, an existing documented native-key
+contract. See merge10-reader-frame-checkpoint.md. No CSS/dependency/API changes.
+Original791/866/140passing runs remain historical after any implementation edit;
+896cross failure is preserved. New prospective native-wheel regression and
+complete fresh gates are required, not a narrower or skipped acceptance.
+
+
+### Merge10: caller fixture contrast exception
+
+Focused AI all3engine run terminal168PASS/1FAIL/23notrun,0flaky/retry; dark
+WebKit native caller buttons contrast1.81. SAME scoped PLAN1PASS before
+mechanical17plainbutton tag replacements with already imported shippedButton.
+Native type/handlers/labels/position unchanged; strict axe unchanged; no package
+CSS/API/token/globalreset/allowance/skip. New full192focused run next, then all
+bound fresh full gates. This fixture is an explicit non-CSS preservation
+exception; old focused run stays failed. Failurestreak0.
+
+
+## Complete consuming caller-control paint correction
+
+PreviousfullChrome795/package866/docs140PASS, completeFFWK888PASS16FAIL,0skip/
+flaky/retry. Everycrossfailure is nativecallerbuttondarkWebKitcontrast. SAME
+PLAN1PASS precedes18fixture/84tag replacements+12imports/11headlesspaint sites/
+2localreadonlytokenpairs. Four ordinary unnamed sentinel wrappers preserve
+existing strict rootscreenshotselectors; no spec/assertion change. Mechanical
+proof0othersemantic edits; all18wrappers check/lint/fmt0/0dropped.
+Fresh1280case all3engine focusedunion now running. Refreeze711, only18fixtures
+changed; other693/597product/90CSS/957site files exact. Reuse approved uninvolved
+gates only with readsetproof; refreshroot/quality and full795Chrome904FFWK after
+focused terminalPASS. All original remaining Desktop12/13scope stillmandatory.
