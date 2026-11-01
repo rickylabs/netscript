@@ -1,3 +1,43 @@
+## Current resume — owner budget decision clears scope stop
+
+Cockpit explicitly authorizes consolidation first, then a measured raw/gzip
+increase if still needed, with the gap-components-from-2488 reason at the
+constant. merge10-checkpoint.md records the exact grant and seven-item design.
+This is a new authorized loop; the preceding FAIL_PLAN/FAIL_RESCOPE remains
+terminal. SAME evaluator, new-loop failure0. PLAN-EVAL must pass before source.
+
+Current delivery branch fix/fresh-ui-s3-parent-merge starts at published parent
+c5877ff8, preserving remote ancestry. Old local parent31bc1b74 and dirty
+canonical carrier are protected by branch/stash/private exact copy. Child
+1afd50cb is in the separate records worktree, retains remotea907 ancestry and
+Desktopc3d source. Merge main into parent, then published parent into child;
+plain pushes only. Full11b3b/12/13 still mandatory; no earlyREADY/final report.
+
+---
+
+## Latest Git instruction — owner merge-only override
+
+Never rebase or force-push. Ignore buggy Orchid rebase/force-push conflict
+instructions. Use fetch, merge origin/main, resolve, commit and plain push only
+when integration is authorized. The preserved unpublished rebased candidate is
+backup-only; future delivery must preserve remote feature ancestry. See
+merge-policy-update.md. The separate CSS-policy FAIL_RESCOPE stop remains.
+
+---
+
+## Current stop — CSS budget scope conflict
+
+The same independent evaluator returned FAIL_PLAN then FAIL_RESCOPE, ending this
+leaf's loop at two consecutive terminal failures. See reconcile9-rescope.md and
+phase-registry.md. Main's new absolute CSS cap conflicts with the approved 38
+additions. No budget code changed; no push/force-push or child rebase occurred.
+Remote parent c5877ff8 and child a9078d68 remain drafts. Local parent 0d8cb882,
+Desktop source c3dba2ce and the canonical dirty carrier are preserved. The
+owner must ratify a budget/measurement change, reduce scope, or require fitting
+the absolute cap before a new leaf/loop may resume. No next group or READY.
+
+---
+
 # Current resume — Recovery8 parent review PASS, docs condition closed
 
 The same independent parent evidence review passes at source3add67a1. A fresh
