@@ -1,3 +1,95 @@
+## Current — Docs11b1 source round2 PASS; committed proofs next
+
+Same source review passed,0blockers/failurestreak0. Read source-review-round2
+and validation. Frozen26source/7build fresh786/739/200/140 gates pass.
+Next source commit,4carriers/current-head quality/pub/SAMEevidence/audit/lease
+push and PR reconciliation before next unit. Body-as-separate-scroller is a
+disclosed non-blocking limitation. RuledGrid/Hero/Desktop/12/13 remain required;
+no READY. Earlier notes below historical.
+
+## Current — required scrollport fix complete; SAME source round2 pending
+
+Read slice11b1-source-review-round1.md, updated source-summary/validation and
+worklog. Failure streak1; source round2 must PASS or end leaf/escalate, no third
+new evaluator/reset. Nothing committed/pushed. Same26source paths,7build hashes
+unchanged after all fresh786package/739Chromium/200FFWK/140docs executions pass,
+0retry/flaky/skipped. Source11/browser6 wrappers0drop; quality/publication0slow/
+preflight/accuracy/exports/site260+registry133 pass. Doc-lint raw124accepted2531,
+123TS+1JSON0new/removed. Prior786/731/184/140 proof is historical.
+
+Actual-overflow scrollport selection, all-ancestor RO/MO rediscovery and actual
+pin-line visibility close the sole blocker. Six intended reds across3engines
+and24 focused cases cover real SSR docs/inset Shell with3nav islands plus plain
+clipping, pure native ancestor resize(noattribute/scrollstimulus), content changes,
+window crossing/end and existing real nested/pixel/percent behavior.
+
+On source PASS: explicit source/run commit, canonical all4carriers6commands,
+actual committed-head quality/publication, SAME evidence review, audit/leased
+push/PR comment/reconcile before next unit. Remaining full assignment still
+RuledGrid/Hero/Desktop/12/13; no READY/final. Parentc587/main6a1 current.
+
+Earlier status notes below are historical.
+
+## Current — Docs11b1 source round1 FAIL_FIX; scrollport correction required
+
+Read slice11b1-source-review-round1.md. Sole blocker: non-scrolling clipping
+wrappers are mistaken for scrollports, including actual inset SidebarShell.
+Same evaluator failure streak1; next terminal source round must PASS or end
+the leaf/escalate, no third/fresh evaluator/artificial reset. No commit/push.
+All previous786/731/184/140 executions are historical before the required fix.
+Implement exact red-first compositions/dynamic overflow rediscovery, fresh full
+gates and same source round2. Everything else in the unit was reviewed sound.
+Full remaining RuledGrid/Hero/Desktop/12/13 is still mandatory; no READY.
+
+## Current — Docs11b1 local gates complete, independent source review pending
+
+Branchfeat/fresh-ui-s3-phase2b at3e88d487 has an uncommitted26-path native docs
+navigation unit. Read slice11b1-source-summary.md, slice11b1-validation.json and
+slice11b1-checkpoint.md with its two design verdicts. Same PLAN round2 passed,
+failure streak0; no source verdict or commit/push yet.
+
+Current frozen code/build: full786package,731Chromium,184affected Firefox/WebKit
+and140docs browser PASS,0retry/flaky/skipped; captures404/88/128private. Source11
+and browser6 wrappers0drop. Working quality/publication0slowtypes/preflight/
+accuracy/exports/site260+registry133 pass. Doc-lint is raw1/124 accepted2531,
+exact123TS+1JSON0new/removed. Runtime and required final-head CI remain unproven.
+
+Toc/AnchorNav plus original Shell caller composition are implemented,102/104
+shipped and15/17 missing identities delivered. Fixes have real red-first native
+controls: nested ownership, valid font role/all role resolution, native percent
+offsets, null/current-ID-labelled text. No token values/pins/locks changed.
+Independent source review must pass, then source commit/run notes, canonical
+carriers/current-head quality/publication, SAME evidence review, public audit,
+explicit-stage push/PR comment/reconcile before starting the next unit.
+
+Remaining complete assignment: RuledGrid/Hero, actual six-component Desktop
+audit, production declared x extensions, every-style base/extension/browser
+harness, whole-phase runtime/IMPL/exact-green-CI. No READY or final publication.
+Both existing PRs remain drafts. Owner uses Refs2416 only, no labels or merge.
+
+Earlier notes below are historical; current authority is this heading.
+
+## Current — Docs11b1 implementation; final local gates pending
+
+Read slice11b1-checkpoint.md and its two design verdicts. SAME round2 PASS with
+Anchor observe/state binding condition implemented; evaluator failure streak0.
+Toc/AnchorNav+real caller Shell Toc are implemented on3e88d487 worktree, not
+committed/pushed.26 source/carrier paths, two remaining unshipped identities
+(RuledGrid/Hero), Desktop audit and whole style harness/final gates still required.
+Nine focused SSR/catalog tests and source/browser wrappers pass; corrected docs
+browser52 cases ran before the final fixture-only geometry/lint correction.
+Current final browser52/full package pending; source review not requested yet.
+Working quality/publication/preflight/accuracy/exports pass; doc-lint124 accepted
+existing2531 unchanged. No READY. All earlier active-job notes below historical.
+
+## Current next unit — Docs11b1 design review pending
+
+Recovery8 is terminal/pushed: parent c5877ff8; this branch3e88d487.
+Read slice11b1-checkpoint.md for all seven design items. SAME independent
+read-only design review is pending; no navigation product source written yet.
+Toc/AnchorNav+caller Shell composition next, then RuledGrid/Hero/Desktop,
+extensions/all-style harness and full final gates. No partial READY.
+
 # Current resume — Restack8 child evidence PASS
 
 The same independent evaluator passed the child's own replay/evidence at759fb34d,

@@ -24,3 +24,11 @@ no unrelated runtime work is authorized by this addition.
 src/runtime/_internal/native-dialog.ts: both modal hooks share the native sync
 policy, so cancelability and next-render reconciliation must stay coherent. This
 is the existing controlled/open contract, with no new API or generic engine.
+
+
+Current recovery8 is terminal: parent PR2488 at c5877ff8, child PR2538 at
+3e88d487, main6a1d84a6. All preceding live-job notes above are historical.
+Next11b1 is the seven-item slice11b1-checkpoint.md; design review is pending
+before source edits. Declared component/registry/browser surface covers its
+shared copied section-navigation support helper and caller-only Shell Toc
+composition. Later11b2/Desktop/12/13 remain required, no READY.

@@ -158,7 +158,7 @@ export const docs_kit_2: readonly ComponentContract[] = [
     'specId': 'X4',
     'category': 'Docs kit',
     'priority': 'P2',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'breakpoint': {
         'kind': 'enum',
@@ -166,63 +166,98 @@ export const docs_kit_2: readonly ComponentContract[] = [
           'desktop',
           'mobile',
         ],
+        'description':
+          'Forced view or responsive island measurement. Unforced server-only output stays desktop.',
       },
-      'level': {
+      'label': {
+        'kind': 'text',
+        'default': 'On this page',
+      },
+      'children': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'links': {
+        'kind': 'slot',
+      },
+      'currentId': {
+        'kind': 'text',
+        'description':
+          'Controlled accepted section ID; explicit null means no current. Refusal never changes the marker.',
+      },
+      'defaultCurrentId': {
+        'kind': 'text',
+        'default': null,
+        'description':
+          'Initial uncontrolled ID; SSR never reads location. A valid initial hash proposes after hydration.',
+      },
+      'onCurrentChange': {
+        'kind': 'callback',
+        'description':
+          'Distinct native hash or optional scroll proposals; reason hash|scroll. Never writes URL or moves focus.',
+      },
+      'observe': {
+        'kind': 'boolean',
+        'default': false,
+        'description':
+          'Optional passive section tracking in the caller-owned island; respects native scroll padding and heading scroll margins.',
+      },
+      'Item.href': {
+        'kind': 'text',
+        'required': true,
+      },
+      'Item.children': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'Item.level': {
         'kind': 'enum',
         'values': [
           '2',
           '3',
         ],
+        'default': '2',
       },
-      'state': {
+      'Item.state': {
         'kind': 'enum',
         'values': [
           'rest',
           'hover',
-          'current',
         ],
-      },
-      'children': {
-        'kind': 'slot',
-      },
-      'links': {
-        'kind': 'slot',
+        'default': 'rest',
+        'description':
+          'Forced preview only; accepted root selection derives current and wins. Live hover is native CSS.',
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'eyebrow',
-        'planned': true,
       },
       {
         'name': 'rail',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
       },
       {
         'name': 'item',
-        'planned': true,
+        'when': 'when Item children are supplied',
       },
       {
         'name': 'links',
-        'planned': true,
-        'when': 'when corresponding content is supplied',
+        'when': 'when footer links are supplied',
       },
       {
         'name': 'current',
-        'planned': true,
+        'when': 'in the mobile native disclosure summary',
       },
       {
         'name': 'marker',
-        'planned': true,
+        'when': 'when a link is the accepted current or its text is shown in the mobile summary',
       },
       {
         'name': 'chevron-down',
-        'planned': true,
+        'when': 'in the mobile summary',
       },
     ],
     'attributes': {
@@ -231,12 +266,17 @@ export const docs_kit_2: readonly ComponentContract[] = [
           'desktop',
           'mobile',
         ],
+        'default': 'desktop',
       },
       'data-level': {
         'values': [
           '2',
           '3',
         ],
+        'parts': [
+          'item',
+        ],
+        'default': '2',
       },
       'data-state': {
         'values': [
@@ -244,6 +284,12 @@ export const docs_kit_2: readonly ComponentContract[] = [
           'hover',
           'current',
         ],
+        'parts': [
+          'item',
+        ],
+        'default': 'rest',
+        'description':
+          'Derived current overrides forced rest/hover preview; actual live hover/focus stays CSS.',
       },
     },
     'booleans': [],
@@ -255,6 +301,10 @@ export const docs_kit_2: readonly ComponentContract[] = [
       {
         'name': 'links',
         'part': 'links',
+      },
+      {
+        'name': 'Item.children',
+        'part': 'item',
       },
     ],
     'apg': 'native navigation links and disclosure',
@@ -281,6 +331,9 @@ export const docs_kit_2: readonly ComponentContract[] = [
     'notes': [
       'Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.',
       'ledger-desktop-docs mobile starts closed; open is native disclosure state, not a variant. Toc item13/20.',
+      'Unshipped placeholder root level/state normalized to Item.level/Item.state; all settled data values and native keys remain. Current is root-owned, never an Item input.',
+      'One native responsive branch; automatic island measurement uses767px, unforced SSR remains desktop. Forced mobile native details starts closed and its open state persists across current updates.',
+      'Native pass-through is preserved; scope/part/level/state/aria-current are owned. Hash/scroll proposals are deduplicated and controlled refusal preserves accepted state. No tab roles, scroll commands or live region.',
     ],
   },
 ];

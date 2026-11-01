@@ -185,6 +185,62 @@ three-tier source and extension guide is [tokens/README.md](tokens/README.md).
 
 ## Component contracts
 
+### Document section navigation
+
+`ui:add toc` and `ui:add anchor-nav` install native navigation links and their
+shared copied section-tracking support. Import from your copied components:
+
+```tsx
+import { Toc } from '@/components/ui/toc.tsx';
+import { AnchorNav } from '@/components/ui/anchor-nav.tsx';
+
+<Toc breakpoint='desktop' defaultCurrentId='installation'>
+  <Toc.Item href='#installation'>Installation</Toc.Item>
+  <Toc.Item href='#configuration' level='3'>Configuration</Toc.Item>
+</Toc>;
+<AnchorNav observe>
+  <AnchorNav.Link href='#installation'>Installation</AnchorNav.Link>
+  <AnchorNav.Link href='#configuration'>Configuration</AnchorNav.Link>
+</AnchorNav>;
+```
+
+The root owns `currentId` (string or null), `defaultCurrentId` and optional
+`onCurrentChange(id, {reason: 'hash' | 'scroll'})`. Defined `currentId`, including
+null, is controlled. Refusing a proposal preserves the accepted marker. Equal
+accepted values and repeated unchanged refused candidates produce no callback.
+SSR reads only those props. After hydration a valid decoded initial hash is
+proposed once; empty, malformed, foreign and missing targets are ignored. Links
+keep native Enter/hash/scroll behavior; the components never rewrite the URL or
+move focus when a current proposal arrives. `observe` defaults to false and adds
+passive current tracking for actual linked targets in window or nested scrolling,
+respecting native scroll padding and heading scroll margins. At the scroll end,
+the last partly visible linked heading can become current.
+
+Toc accepts `label` (default On this page), `children`, optional `links` footer,
+and optional `breakpoint='desktop' | 'mobile'`. Item accepts native anchor props,
+required href/content, `level='2' | '3'` and preview `state='rest' | 'hover'`.
+Accepted current always wins over preview state; live hover/focus remains CSS.
+Mobile uses an initially closed, uncontrolled native details/summary. Its open
+state survives current updates. Without a forced breakpoint, SSR stays desktop;
+inside a caller-owned Fresh island, hydration selects mobile at767px and below.
+Only one content branch exists. A resize replacing a focused branch moves focus
+to its corresponding desktop link or mobile summary. Other focus stays put.
+For server-only/no-JS layouts, explicitly compose forced mobile/desktop views.
+An unforced server-only Toc remains a static, working desktop rail at narrow widths.
+
+AnchorNav accepts native nav props, `label` (default Sections) and native Link
+children. With `observe` enabled, actual pinned/later-section geometry owns
+`data-state`. Its types forbid a simultaneous `state` preview prop; JavaScript
+cannot override measured state either. With observation disabled, optional
+`state='rest' | 'scrolled'` defaults to rest. The caller owns sticky top/scroll
+padding through ordinary styles. Overflowing anchors remain native scrollable
+links, with no tab roles or arrow-key selection.
+
+Both require a caller-owned island for hooks, observers or callbacks. Native
+attributes pass through, while scope/part/state/level and aria-current are owned.
+Compose Toc through SidebarShell's existing `railContent` and `mobileRailContent`
+slots at the caller; use distinct link IDs when explicitly authoring both views.
+
 Import types and the JSON serializer from `@netscript/fresh-ui/contracts`. This pure-data
 subpath describes props, anatomy, data attributes, slots, APG patterns, keyboard maps and token
 roles shared by styles. It performs no IO. See [the contributor guide](src/contracts/README.md)

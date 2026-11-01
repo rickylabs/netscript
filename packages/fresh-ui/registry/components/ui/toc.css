@@ -1,0 +1,22 @@
+.ns-toc { box-sizing: border-box; inline-size: 240px; max-inline-size: 100%; min-inline-size: 0; color: var(--ns-muted-fg); font-family: var(--ns-font-sans); font-size: var(--ns-text-small); line-height: 20px; }
+.ns-toc__eyebrow, .ns-toc__summary > [data-part='eyebrow'] { font-family: var(--ns-font-mono); font-size: var(--ns-text-caption); line-height: 20px; text-transform: uppercase; }
+.ns-toc__eyebrow { margin-block-end: 20px; }
+.ns-toc__rail { border-inline-start: 1px solid var(--ns-border-subtle); }
+.ns-toc__item { position: relative; display: block; box-sizing: border-box; min-inline-size: 0; padding: 5px 0; padding-inline-start: 15px; color: inherit; text-decoration: none; overflow-wrap: anywhere; }
+.ns-toc__item[data-level='3'] { padding-inline-start: 24px; }
+.ns-toc__item:is(:hover,[data-state='hover'],[data-state='current']) { color: var(--ns-fg); }
+.ns-toc__item[data-state='current'] { font-weight: var(--ns-weight-label); }
+.ns-toc [data-part='marker'] { flex: none; display: inline-block; inline-size: 6px; block-size: 6px; background: var(--ns-studio-signal-marker,var(--ns-fg)); }
+.ns-toc__item > [data-part='marker'] { position: absolute; inset-inline-start: -3px; inset-block-start: 12px; }
+.ns-toc__links { display: grid; gap: 8px; margin-block-start: 28px; overflow-wrap: anywhere; }
+.ns-toc__links a { color: var(--ns-fg); text-decoration-color: var(--ns-studio-signal-underline,var(--ns-fg)); text-underline-offset: 3px; }
+.ns-toc :is(a,summary,button):focus-visible { outline: 2px solid var(--ns-ring); outline-offset: 2px; }
+.ns-toc[data-breakpoint='mobile'] { inline-size: 100%; background: var(--ns-bg); }
+.ns-toc__summary { display: flex; align-items: center; box-sizing: border-box; min-block-size: 48px; gap: 14px; padding: 0 20px; border-block-end: 1px solid var(--ns-border-subtle); cursor: pointer; list-style: none; }
+.ns-toc__summary::-webkit-details-marker { display: none; }
+.ns-toc__summary > [data-part='eyebrow'] { flex: none; }
+.ns-toc__current { display: flex; align-items: center; gap: 8px; min-inline-size: 0; margin-inline-start: auto; color: var(--ns-fg); }
+.ns-toc__current > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ns-toc__summary > [data-part='chevron-down'] { display: inline-flex; flex: none; }
+.ns-toc details > .ns-toc__rail { margin: 16px 20px; }
+.ns-toc details > .ns-toc__links { margin: 28px 20px 16px; }

@@ -1,3 +1,10 @@
+import {
+  ClippedDocsComposition,
+  DocsNavigationExamples,
+  InsetDesktopContents,
+  InsetMobileContents,
+  InsetSections,
+} from './gap-docs-navigation-fixture.tsx';
 import { DocsStructureExamples } from './gap-docs-structure-fixture.tsx';
 import { AIInteractionExamples } from './gap-ai-interaction-fixture.tsx';
 import { AIExamples } from './gap-ai-fixture.tsx';
@@ -87,10 +94,18 @@ function Actions() {
     </main>
   );
 }
-if (location.pathname === '/shell-static') {
+if (location.pathname === '/docs-navigation-inset-static') {
+  hydrate(<InsetDesktopContents />, document.getElementById('inset-desktop-island')!);
+  hydrate(<InsetMobileContents />, document.getElementById('inset-mobile-island')!);
+  hydrate(<InsetSections />, document.getElementById('inset-sections-island')!);
+} else if (location.pathname === '/docs-navigation-composition') {
+  render(<ClippedDocsComposition />, document.body);
+} else if (location.pathname === '/shell-static') {
   hydrate(<SidebarToggle />, document.getElementById('standalone-toggle')!);
 } else if (location.pathname === '/ai-interaction-static') {
   hydrate(<AIInteractionExamples />, document.body);
+} else if (location.pathname === '/docs-navigation') {
+  render(<DocsNavigationExamples />, document.body);
 } else if (location.pathname === '/docs-structure') {
   render(<DocsStructureExamples />, document.body);
 } else if (location.pathname === '/ai-interaction') {

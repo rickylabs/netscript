@@ -110,6 +110,8 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
           'attribute-chip',
           'file-tree',
           'figure',
+          'toc',
+          'anchor-nav',
         ].includes(name)
       ) {
         assertEquals(
@@ -127,6 +129,10 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
         );
       }
     }
+    assertEquals(
+      await Deno.readTextFile(join(root, 'lib/section-navigation.ts')),
+      await Deno.readTextFile(join(repo, 'packages/fresh-ui/registry/lib/section-navigation.ts')),
+    );
     await run(root, [
       'check',
       '--unstable-kv',
@@ -167,7 +173,11 @@ import { FilePathChip } from './components/ui/file-path-chip.tsx';
 import { AttributeChip } from './components/ui/attribute-chip.tsx';
 import { FileTree } from './components/ui/file-tree.tsx';
 import { Figure } from './components/ui/figure.tsx';
+import { Toc } from './components/ui/toc.tsx';
+import { AnchorNav } from './components/ui/anchor-nav.tsx';
 console.log(JSON.stringify({
+  toc: render(<Toc breakpoint='mobile' currentId='install' links={<a href='#top'>Back to top</a>}><Toc.Item href='#install' level='3'>Installation</Toc.Item></Toc>),
+  'anchor-nav': render(<AnchorNav state='scrolled' currentId='install'><AnchorNav.Link href='#install'>Installation</AnchorNav.Link></AnchorNav>),
   'file-path-chip': render(<FilePathChip path='src/routes/index.tsx' />),
   'attribute-chip': render(<AttributeChip name='data-variant' value='outline' />),
   'file-tree': render(<FileTree items={[{id:'src',type:'folder',name:'src',ownership:'owned',children:[{id:'page',type:'file',name:<a href='#page'>index.tsx</a>,ownership:'generated',comment:'# generated route'}]}]} />),
@@ -212,6 +222,8 @@ console.log(JSON.stringify({
       'attribute-chip',
       'file-tree',
       'figure',
+      'toc',
+      'anchor-nav',
     ];
     assertEquals(Object.keys(rendered).sort(), renderedNames.sort());
     for (const name of renderedNames) {

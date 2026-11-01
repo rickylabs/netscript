@@ -696,3 +696,117 @@ to0forbidden paths/session identifiers/thumbprints, verify exact remotes
 childd0d8and parentc587, force-push the child with its exact lease, verify the
 new remote and update2538body/comment Refs2416only. Then continue all11b/12/13;
 this merge recovery does not complete or replace the assignment.
+
+
+## Docs11b1 design checkpoint
+
+All seven items: see slice11b1-checkpoint.md. Toc/AnchorNav and original Shell
+composition are the next complete unit, after terminal restack8. SAME independent
+plan evaluation required before source edits; no product code written yet.
+
+Docs11b1 round1 FAIL_PLAN: forced hover was unreachable plus four precision
+gaps. Selected preview-only Item.state rest|hover with root current precedence;
+locked SSR/island/hash/null precedence, discriminated Anchor observe/state,
+owned attributes and end-of-scroll. No source written. SAME round2 required;
+failure streak1, a second consecutive terminal failure ends the leaf.
+
+Docs11b1 SAME round2 PASS, failure streak0. Binding Anchor discriminant/runtime/
+SSR/type-negative/pinned-browser condition added explicitly to checkpoint. Source
+implementation may now start; no READY and later required scope remains.
+
+## Docs11b1 implementation and native corrections in progress
+
+Toc and AnchorNav source/canonical metadata/registry/installed-copy coverage are
+implemented, with caller-composed real Toc in Shell rail slots.26 source/carrier
+paths currently; no token values, dependency pins or lock changes. Source is not
+committed/reviewed yet. Whole assignment is still active, no READY.
+
+Actual nested-Toc keypress regression first failed because the outer root read
+inner links. The shared helper now discovers and labels only links owned by the
+nearest native/semantic navigation root. Added decoded/malformed fragment and
+observed unmount cases. Earlier interrupted broad runs are not PASS evidence.
+A narrow Firefox geometry assertion saw44.000061px for an exact44px CSS bar;
+retain exact CSS height and apply1/64px DOM tolerance to44/48 in every engine.
+The sole JSX fixture literal lint finding is corrected. Browser check/lint/fmt
+cover all six files with zero dropped files; package source wrappers cover11.
+Working quality/architecture, native publication0slowtypes, preflight, docs
+accuracy and export drift pass. Full export doc-lint remains raw1/124 accepted
+existing2531 diagnostics: exact123TS baseline plus1JSON, zero new/removed.
+Final package/browser runs are pending; no source evaluator verdict requested.
+
+Actual native review found two more corrected baseline-policy defects before
+source review: new navigation CSS referenced undefined font-body instead of the
+existing font-sans role; and passive tracking interpreted10% scroll padding as
+10px. Each has a checked-in real-browser red regression with native preconditions.
+Use the existing font-sans role, assert actual font family and every used semantic
+CSS role resolves, and resolve computed percentage padding against the actual
+scrollport block extent. No token values or dependency changes. Native window
+and nested percentage navigation now passes with settled accepted markers.
+The focused24-case matrix across all3engines/both schemes/widths passes; source11
+and browser6 check/lint/fmt pass. Source26/build6 frozen; final full package,
+Chromium731, affected Firefox/WebKit184 and fresh dedicated docs140 are running.
+Earlier completed786/176 proofs precede these corrections and remain historical.
+Current working quality/publication/preflight/accuracy/exports/docs260 pass; raw
+doc-lint124 remains accepted existing2531, not a green gate. Source evaluator
+has not been requested; failure streak0 after the design PASS. No READY.
+
+## Docs11b1 local gate closure — SAME source review pending
+
+Current frozen26source/6build artifacts have zero differences. Full786package,
+731Chromium including touch,184affected Firefox/WebKit and140dedicated docs
+browser cases pass,0failed/skipped/retries/flaky. Captures404/88/128 stay private.
+Source11/browser6 wrappers pass0drop; quality/architecture/publication0slowtypes,
+preflight/accuracy/exports and fresh260HTML/133registry build pass. Raw doc-lint
+remains124accepted2531, exact123TS+1JSON0new/removed, never called green.
+Native null/previous-ID label state is now guarded by the measured accepted ID,
+closing the actual red null-current regression. All earlier failed/interrupted
+executions are historical. See slice11b1-source-summary.md and validation.json.
+SAME independent source review is now requested before any source commit.
+
+The dated unit lesson is2026-11-01-docs-navigation-lessons.md. Latest main fetch
+remains6a1d84a6, so both recovered bases remain current; no extra rebase is needed.
+Public current-head/run audit again reports zero forbidden paths or identifiers;
+repeat on the committed source/evidence immediately before pushing.
+
+Docs11b1 source round1 FAIL_FIX: sole material blocker is scrollport detection
+choosing non-scrolling hidden/overflow-x wrappers, including the shipped inset
+Shell. Everything else was reviewed sound. Failure streak1; a second consecutive
+terminal failure ends this leaf, no third round or new evaluator. All previous
+786/731/184/140 executions now remain historical before the required fix.
+Required red-first compositions: actual docs+inset SidebarShell with observed
+Toc/AnchorNav and a non-scrolling overflow-x:hidden wrapper; LTR/RTL390/1280,
+window crossing/offsets/end and true pinning, dynamic scrollable/non-scrollable
+container transitions. Select only overflow-y not visible/clip plus actual block
+overflow>1px; reevaluate target and nav scrollports through observer rediscovery,
+with no new API/DOM/layout writes/engine branch. Fresh full gates and the SAME
+source round2 must follow; no commit or push yet.
+
+## Required scrollport correction — fresh gate closure, source round2 pending
+
+Six intended red compositions reproduced wrong current in all3engines. Actual
+overflow selection and all-ancestor RO/MO rediscovery now pass24 focused cases,
+including zero-attribute/zero-scroll native resize stimuli, content changes,
+window crossings/end, actual pinning, both schemes/widths/LTR/RTL. New real
+static inset Shell is independently hydrated only at its3 nav islands; its
+actual clipping styles are tested at both widths without fake CSS. Source26 and
+canonical build7 hashes remain unchanged through all fresh gates:786package,
+739fullChromium including touch,200affected FF/WK and140docs PASS,0retry/flaky/
+skipped. Source11/browser6 wrappers0drop, quality/preflight/accuracy/exports/
+publication0slowtypes/site260+registry133 pass. Doc-lint staysraw124accepted2531,
+exact123TS+1JSON0new/removed. Prior786/731/184/140 runs remain historical.
+SAME source round2 is requested now; failure streak1, no third attempt.
+
+## Docs11b1 source round2 PASS
+
+The same separate read-only Opus5.5 high evaluator verified the actual-overflow
+scrollport fix, all-ancestor rediscovery, real Shell/clipping regressions and
+fresh786/739/200/140 gates with0blockers. Failure streak resets to0.
+Source26/build7 remain byte-identical to frozen evidence. Next: source commit,
+canonical carriers, actual-head quality/publication and same evidence review,
+then privacy audit/exact lease/push/PR reconciliation. No READY.
+
+Non-blocking limitation retained explicitly: a caller making body a separate
+scroll container with fixed html/body height is currently measured as viewport.
+Ordinary document scrolling and nested non-body scrollers are proven; this
+unusual body-scroller composition is not claimed covered. No source edit or
+new proof is inferred from this disclosure.

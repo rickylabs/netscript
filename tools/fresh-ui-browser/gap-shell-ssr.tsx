@@ -1,3 +1,4 @@
+import { StaticDocsNavigation, StaticInsetDocs } from './gap-docs-navigation-fixture.tsx';
 import { AIInteractionExamples } from './gap-ai-interaction-fixture.tsx';
 import { AIExamples } from './gap-ai-fixture.tsx';
 import { render } from 'preact-render-to-string';
@@ -9,3 +10,7 @@ await Deno.writeTextFile('test-results/gap-shell.html', render(<StaticShell />))
 await Deno.writeTextFile('test-results/gap-ai.html', render(<AIExamples />));
 
 await Deno.writeTextFile('test-results/gap-ai-interaction.html', render(<AIInteractionExamples />));
+
+await Deno.writeTextFile('test-results/gap-docs-navigation.html', render(<StaticDocsNavigation />));
+
+await Deno.writeTextFile('test-results/gap-docs-inset.html', render(<StaticInsetDocs />));

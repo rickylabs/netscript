@@ -1783,7 +1783,7 @@
     },
     {
       "name": "layout-objects",
-      "description": "Theme-independent CSS layout objects \u2014 Shell, Stack, Cluster, Grid, Switcher, Cover, Sidebar, Section, Split, Toolbar, ScrollRegion, ContentRail, and the dashboard scaffold \u2014 consuming only semantic spacing and color tokens.",
+      "description": "Theme-independent CSS layout objects — Shell, Stack, Cluster, Grid, Switcher, Cover, Sidebar, Section, Split, Toolbar, ScrollRegion, ContentRail, and the dashboard scaffold — consuming only semantic spacing and color tokens.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2259,7 +2259,7 @@
     },
     {
       "name": "avatar",
-      "description": "Identity chip for a person or agent \u2014 initials or image with size, presence, and agent variants.",
+      "description": "Identity chip for a person or agent — initials or image with size, presence, and agent variants.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2298,7 +2298,7 @@
     },
     {
       "name": "citation-chip",
-      "description": "Inline per-claim source marker [n] that pairs with a sources list \u2014 the grounded-agent citation UX.",
+      "description": "Inline per-claim source marker [n] that pairs with a sources list — the grounded-agent citation UX.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2460,7 +2460,7 @@
     },
     {
       "name": "chart-block",
-      "description": "Inline token-driven metric chart \u2014 horizontal bars or a vertical column chart with y-axis ticks and data-tone intents.",
+      "description": "Inline token-driven metric chart — horizontal bars or a vertical column chart with y-axis ticks and data-tone intents.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2499,7 +2499,7 @@
     },
     {
       "name": "donut",
-      "description": "Token-driven donut/pie chart \u2014 SVG arc segments with a center total and legend; segment colors from data-tone or a semantic-token cycle.",
+      "description": "Token-driven donut/pie chart — SVG arc segments with a center total and legend; segment colors from data-tone or a semantic-token cycle.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2622,7 +2622,7 @@
     },
     {
       "name": "markdown",
-      "description": "Sanitized GFM + math + syntax-highlighted renderer for streamed assistant output \u2014 direct unified/rehype-react rendering through the Preact JSX runtime with remark-gfm/remark-math/remarkCitations, rehype-katex/rehype-highlight, and a MANDATORY rehype-sanitize content pass.",
+      "description": "Sanitized GFM + math + syntax-highlighted renderer for streamed assistant output — direct unified/rehype-react rendering through the Preact JSX runtime with remark-gfm/remark-math/remarkCitations, rehype-katex/rehype-highlight, and a MANDATORY rehype-sanitize content pass.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed",
@@ -2685,7 +2685,7 @@
     },
     {
       "name": "command-palette",
-      "description": "Modal \u2318K command palette \u2014 the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts.",
+      "description": "Modal ⌘K command palette — the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed",
@@ -2730,7 +2730,7 @@
     },
     {
       "name": "search",
-      "description": "Compact nav search affordance \u2014 a button styled as an input with a \u2318K hint that opens the command palette.",
+      "description": "Compact nav search affordance — a button styled as an input with a ⌘K hint that opens the command palette.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -2770,7 +2770,7 @@
     },
     {
       "name": "dropzone",
-      "description": "File-drop affordance \u2014 a dashed drop target (label/hint/icon) that wraps a native file input; drag-over via data-active.",
+      "description": "File-drop affordance — a dashed drop target (label/hint/icon) that wraps a native file input; drag-over via data-active.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -3874,7 +3874,7 @@
     },
     {
       "name": "mcp-ui-widget",
-      "description": "Themed sandboxed MCP ui:// widget frame \u2014 an allow-scripts-only iframe keyed on the active theme so theme changes force a full remount.",
+      "description": "Themed sandboxed MCP ui:// widget frame — an allow-scripts-only iframe keyed on the active theme so theme changes force a full remount.",
       "author": "NetScript",
       "registryDependencies": [
         "theme-seed"
@@ -4057,7 +4057,10 @@
           "file-path-chip": "file-path-chip",
           "attribute-chip": "attribute-chip",
           "file-tree": "file-tree",
-          "figure": "figure"
+          "figure": "figure",
+          "section-navigation": "section-navigation",
+          "toc": "toc",
+          "anchor-nav": "anchor-nav"
         }
       }
     },
@@ -5978,6 +5981,114 @@
           ]
         }
       }
+    },
+    {
+      "name": "section-navigation",
+      "description": "Private copied native fragment/current and passive section geometry policy.",
+      "type": "registry:lib",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/lib/section-navigation.ts",
+          "type": "registry:lib",
+          "target": "@lib/section-navigation.ts"
+        }
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "lib",
+          "layer": 3,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "docs",
+            "support"
+          ]
+        }
+      }
+    },
+    {
+      "name": "toc",
+      "type": "registry:component",
+      "description": "Native document outline and mobile disclosure.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/toc.tsx",
+          "type": "registry:component",
+          "target": "@ui/toc.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/toc.css",
+          "type": "registry:file",
+          "target": "@assets/ui/toc.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "section-navigation"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "docs",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/toc.css';"
+            }
+          ]
+        }
+      },
+      "dependencies": [
+        "jsr:@netscript/fresh-ui@0.0.8"
+      ]
+    },
+    {
+      "name": "anchor-nav",
+      "type": "registry:component",
+      "description": "Native horizontal section navigation and passive current tracking.",
+      "author": "NetScript",
+      "files": [
+        {
+          "path": "packages/fresh-ui/registry/components/ui/anchor-nav.tsx",
+          "type": "registry:component",
+          "target": "@ui/anchor-nav.tsx"
+        },
+        {
+          "path": "packages/fresh-ui/registry/components/ui/anchor-nav.css",
+          "type": "registry:file",
+          "target": "@assets/ui/anchor-nav.css"
+        }
+      ],
+      "registryDependencies": [
+        "theme-seed",
+        "cn",
+        "section-navigation"
+      ],
+      "meta": {
+        "netscript": {
+          "kind": "component",
+          "layer": 2,
+          "copyOwnership": "app-owned-after-copy",
+          "tags": [
+            "docs",
+            "keyboard",
+            "contract"
+          ],
+          "css": [
+            {
+              "layer": "components",
+              "content": "@import './ui/anchor-nav.css';"
+            }
+          ]
+        }
+      }
     }
   ],
   "meta": {
@@ -6125,7 +6236,9 @@
           "file-path-chip",
           "attribute-chip",
           "file-tree",
-          "figure"
+          "figure",
+          "toc",
+          "anchor-nav"
         ]
       },
       {

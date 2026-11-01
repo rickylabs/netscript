@@ -1,0 +1,153 @@
+{
+  "status": "SOURCE_ROUND2_PASS_COMMIT_PROOFS_PENDING",
+  "baselineHead": "3e88d48774722987d039250b099aafeade5a6971",
+  "workingTree": true,
+  "sourceFiles": 26,
+  "canonicalBuildArtifacts": 7,
+  "frozenSourceBuildDifferences": 0,
+  "inventory": 104,
+  "shipped": 102,
+  "phase2bMissingDelivered": 15,
+  "phase2bMissingTotal": 17,
+  "fullPackage": {
+    "verdict": "PASS",
+    "passed": 786,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 786,
+    "uniqueFailures": 0,
+    "exitCode": 0,
+    "durationMs": 369971
+  },
+  "browsers": {
+    "full-chromium": {
+      "verdict": "PASS",
+      "exitCode": 0,
+      "passed": 739,
+      "retries": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "captures": 404
+    },
+    "cross": {
+      "verdict": "PASS",
+      "exitCode": 0,
+      "passed": 200,
+      "retries": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "captures": 88
+    },
+    "docs-browser": {
+      "verdict": "PASS",
+      "exitCode": 0,
+      "passed": 140,
+      "retries": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "captures": 128
+    }
+  },
+  "wrappers": {
+    "source-check": {
+      "verdict": "PASS",
+      "selected": 11,
+      "dropped": 0
+    },
+    "source-lint": {
+      "verdict": "PASS",
+      "selected": 11,
+      "dropped": 0
+    },
+    "source-fmt": {
+      "verdict": "PASS",
+      "selected": 11,
+      "dropped": 0
+    },
+    "browser-fixture-check": {
+      "verdict": "PASS",
+      "selected": 5,
+      "dropped": 0
+    },
+    "browser-spec-check": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    },
+    "browser-lint": {
+      "verdict": "PASS",
+      "selected": 6,
+      "dropped": 0
+    },
+    "browser-fmt": {
+      "verdict": "PASS",
+      "selected": 6,
+      "dropped": 0
+    }
+  },
+  "qualityArchitecture": "PASS",
+  "preflight": "PASS",
+  "docsAccuracy": "PASS",
+  "exportsDrift": "PASS",
+  "nativePublication": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "slowTypes": 0
+  },
+  "docsBuild": {
+    "verdict": "PASS",
+    "htmlFiles": 260,
+    "registryArtifacts": 133,
+    "existingDocumentedSyntaxAllowances": 4
+  },
+  "docLint": {
+    "verdict": "FAIL_ACCEPTED_EXISTING_DEBT",
+    "issue": 2531,
+    "rawExitCode": 1,
+    "diagnostics": 124,
+    "typeScript": 123,
+    "jsonLimitations": 1,
+    "new": 0,
+    "removed": 0
+  },
+  "scrollportRedControls": {
+    "verdict": "EXPECTED_FAIL",
+    "cases": 6,
+    "engines": 3,
+    "exitCode": 1,
+    "intendedFailures": 6
+  },
+  "scrollportFocused": {
+    "verdict": "PASS",
+    "chromium": 8,
+    "firefoxWebkit": 16,
+    "schemes": 2,
+    "widths": [
+      390,
+      1280
+    ],
+    "directions": [
+      "ltr",
+      "rtl"
+    ],
+    "resizeStimulusAttributeMutations": 0,
+    "resizeStimulusScrollEvents": 0
+  },
+  "newAxeAllowances": 0,
+  "pageConsoleErrors": 0,
+  "sourceReview": {
+    "round1": "FAIL_FIX",
+    "round2": "PASS",
+    "failureStreak": 0
+  },
+  "runtimeAndExactRequiredCI": "UNPROVEN",
+  "remaining": [
+    "RuledGrid",
+    "Hero",
+    "six-component Desktop audit",
+    "production declared x extensions",
+    "all-style base/extension/browser harness",
+    "whole-phase gates and final independent evaluation"
+  ],
+  "ready": false
+}

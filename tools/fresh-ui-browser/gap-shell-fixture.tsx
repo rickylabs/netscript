@@ -1,3 +1,4 @@
+import { Toc } from '../../packages/fresh-ui/registry/components/ui/toc.tsx';
 import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { MessageScroller } from '../../packages/fresh-ui/registry/components/ui/message-scroller.tsx';
 import { useRef, useState } from 'preact/hooks';
@@ -131,12 +132,15 @@ export function ShellExamples() {
             : <span>Workspace</span>}
           topbarEnd={<Button type='button' variant='ghost' size='sm'>Account</Button>}
           rail={layout === 'docs'}
-          railContent={<a href='#section'>On this page: installation</a>}
+          railContent={
+            <Toc breakpoint='desktop' currentId='section'>
+              <Toc.Item href='#section'>Installation</Toc.Item>
+            </Toc>
+          }
           mobileRailContent={
-            <details>
-              <summary>On this page</summary>
-              <a href='#section'>Installation</a>
-            </details>
+            <Toc breakpoint='mobile' currentId='section'>
+              <Toc.Item href='#section'>Installation</Toc.Item>
+            </Toc>
           }
           session={<h1>Support conversation</h1>}
           composer={

@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 128,
+  'total': 131,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -851,6 +851,24 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 2,
     'description': 'Native figure, caller media and optional semantic caption.',
   },
+  {
+    'name': 'section-navigation',
+    'kind': 'lib',
+    'layer': 3,
+    'description': 'Private copied native fragment/current and passive section geometry policy.',
+  },
+  {
+    'name': 'toc',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native document outline and mobile disclosure.',
+  },
+  {
+    'name': 'anchor-nav',
+    'kind': 'component',
+    'layer': 2,
+    'description': 'Native horizontal section navigation and passive current tracking.',
+  },
 ];
 
 export const registryCollections: readonly RegistryCatalogCollection[] = [
@@ -986,6 +1004,8 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
       'attribute-chip',
       'file-tree',
       'figure',
+      'toc',
+      'anchor-nav',
     ],
   },
   {

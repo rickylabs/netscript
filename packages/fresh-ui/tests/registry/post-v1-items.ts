@@ -36,6 +36,8 @@ export const POST_V1_COMPONENTS: readonly string[] = [
   'attribute-chip',
   'file-tree',
   'figure',
+  'toc',
+  'anchor-nav',
 ];
 
 /** Non-component support items added after the frozen v1 baseline. */
@@ -43,6 +45,7 @@ export const POST_V1_SUPPORT: readonly string[] = [
   'calendar-date',
   'menu-items',
   'sidebar-support',
+  'section-navigation',
 ];
 
 /** Existing copies missing only their actual package runtime dependency. */
