@@ -104,3 +104,13 @@ Deno2.9.7:79focusedtests,232regressions,11renderer/goldenchecks and28finalparity
 ### S6 supervisor sign-off and reconcile
 
 Independent source PASS and fresh independent visual PASS: all78images inspected (10Figma,68actual); everypagegroup/allfourvariants meetsdensity/craftbar, minima8.0–8.5. Requiredowneritems1–4 arecomplete; owneritems5/6remainin#2587. No unresolvedsource/visualfindings. Latestorigin/main remainsa182c37alreadymergednormally. Finalsourcehashesmatchpolish/reviewed-source.json; allrequiredlocalgatespass. OwnedAppHoststopped, zero provenrun-owned survivors;24unknown-ownerentriesleftuntouched. Commit/pushS6normally, thenrequirefullnew-headcore+runtimeCIbeforeNEWREADY.
+
+## S7 — readiness fixture contract correction
+
+New-head core CI reports one failing test in shard6 (1,485 passed): the readiness-splice test inventories repeated lexical names and expected only `endpoint` and `vite`. S6 adds `entry` inside a separate background-discovery loop. Its compile fixture also needs the new BackgroundProcessors config field. All product code and the independent visual verdict remain unchanged.
+
+Checkpoint: (1) public surface is unchanged; (2) vocabulary is an intentional loop-local binding, not a duplicate declaration in one scope; (3) the test still compiles actual generated/spliced helper source against the SDK double; (4) no new constants; (5) one test-only slice updates the inventory and config double, then runs readiness/generator tests, scoped wrappers and independent source review; (6) no additional scope or gate relaxation; (7) contributor entry is prepare-readiness-fixture_test.ts. Push normally and require CI on the new head before READY.
+
+### S7 supervisor sign-off and reconcile
+
+The same independent source reviewer approved the test-only correction. All 58 focused readiness/generator/CORS tests and scoped check/lint/fmt passed. The actual generated-module compile check and all collision/marker negative controls remain intact. All S6 product/visual hashes still match. Both S6 PostgreSQL and SQLite full runtime jobs have now passed, along with all other core lanes; the single test-6 fixture mismatch alone caused the aggregate failure. No additional finding remains. Commit and push S7 normally, then require new-head CI before NEW READY.

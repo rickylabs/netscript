@@ -1,0 +1,58 @@
+{
+  "reason": "CI shard6 readiness fixture inventory/config double had not followed the new background discovery loop",
+  "sourceBaseline": "b0ab3550a82cdd11835a9d2805fc7f937c92b05e",
+  "productAndVisualSourceChanged": false,
+  "tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 58,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 58,
+      "uniqueFailures": 0
+    }
+  },
+  "check": {
+    "selection": {
+      "filesSelected": 1,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    }
+  },
+  "lint": {
+    "selection": {
+      "filesSelected": 1,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    }
+  },
+  "fmt": {
+    "summary": {
+      "filesSelected": 1,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    }
+  },
+  "review": "PASS",
+  "s6Runtime": {
+    "head": "b0ab3550a82cdd11835a9d2805fc7f937c92b05e",
+    "conclusion": "success",
+    "url": "https://github.com/rickylabs/netscript/actions/runs/41355586976",
+    "postgres": "success",
+    "sqlite": "success"
+  }
+}
