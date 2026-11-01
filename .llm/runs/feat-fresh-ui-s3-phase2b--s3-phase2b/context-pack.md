@@ -1,3 +1,29 @@
+# Current resume — committed-source evidence PASS
+
+Reviewed source19d6d1d7and all four canonical carriers reconcile with0generated
+changes. Durable quality/architecture and native member publication pass at
+actual19d6d1d7,0slow types. The same independent evidence review passes;
+failure streak0. Fourteen committed files match the frozen tested source.
+The normal-environment full765package,675Chromium,336affectedFirefox-WebKit,
+72focused and24WebKit axe executions retain their precise pre-commit labels.
+
+One untracked native diagnostic remains outside all35publishable package roots,
+with0external include patterns and0tracked diagnostics. Its unknown owner was
+informed; the artifact is left untouched and excluded from staging/publication.
+Future owned browser processes have core dumps disabled. Public audit still
+precedes every push.24token presets are distinct from1registered Utility source
+style, verified through the actual native catalog.
+
+Next: bookkeeping evidence commit, freshly confirm main6a1d84a6, then approved
+parent rebase and child replay. Each receives its own maintained-source/config/
+map/three-lock byte comparison, main-source preservation, canonical generators,
+own-head quality/publication/docs260/preflight/accuracy/export/affectedCLI+
+installed-consumer gates and SAME evidence review before its audited exact-lease
+push. No feature starts before terminal restack/comment. Full11b/12/13scope
+remains required; no READY or final report.
+
+---
+
 # Current resume — source review round2 PASS
 
 The same independent evaluator passed the complete fourteen-file correction,

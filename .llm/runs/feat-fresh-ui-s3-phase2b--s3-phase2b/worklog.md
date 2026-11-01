@@ -627,3 +627,31 @@ follow, then the same evidence review, approved latest-base parent/child
 reconciliation, own-head proofs/reviews and audited exact-lease pushes. No
 READY, new feature, label, closing keyword, merge or early future promotion.
 The complete11b/12/13assignment remains active after restack.
+
+
+### Committed-source gates at19d6d1d7
+
+Reviewed source19d6d1d7contains the fourteen frozen files exactly, with0byte
+differences. All four canonical carrier checks pass after all generators ran;
+actual generated delta0 and tracked working-tree delta0. Durable quality/
+architecture and native member publication both pass at actual19d6d1d7, with
+0slow types and no slow-type allowance. The765/675/336render executions are
+pre-commit working-tree proofs whose committed source bytes match exactly,
+not newly reported executions after the commit. Same committed-source evidence
+review follows before any rebase/push. The approved docs-only base and every
+remaining11b/12/13unit stay required.
+
+
+### Committed-source evidence PASS
+
+The same independent evaluator passed committed-source evidence at19d6d1d7,
+with0blockers and failure streak0. Carrier delta0 and actual-head quality/native
+publication are confirmed. Its native diagnostic condition was checked through
+the repo's actual publishable-member discovery:35members,0containing roots,
+0outside include patterns and0tracked diagnostics. The unknown owner was
+informed; the artifact stays untouched and excluded. Explicit path staging only.
+Native catalog verification also confirms24token presets and only Utility as a
+registered source style. Latest main was fetched and remains6a1d84a6. The
+bookkeeping commit precedes the approved bounded parent/child rebase and their
+own source equality/gates/reviews/audited exact-lease pushes. Full11b/12/13
+remains active after recovery.

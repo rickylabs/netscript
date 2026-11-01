@@ -1,0 +1,77 @@
+{
+  "status": "COMMITTED_SOURCE_EVIDENCE_REVIEW_PASS",
+  "sourceHead": "19d6d1d79b485ebe49bf2791bee16c3e4aa45b23",
+  "reviewedSourceFiles": 14,
+  "committedFrozenSourceDifferences": 0,
+  "generatedChangedFiles": 0,
+  "trackedWorkingTreeDifferences": 0,
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "qualityArchitecture": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "gitHead": "19d6d1d79b485ebe49bf2791bee16c3e4aa45b23"
+  },
+  "nativePublication": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "slowTypes": 0,
+    "gitHead": "19d6d1d79b485ebe49bf2791bee16c3e4aa45b23"
+  },
+  "renderProof": {
+    "package": 765,
+    "chromium": 675,
+    "affectedFirefoxWebkit": 336,
+    "focused": 72,
+    "axeBearingWebkit": 24,
+    "execution": "Reviewed pre-commit working tree; committed bytes identical",
+    "retries": 0,
+    "flaky": 0,
+    "newAxeAllowances": 0
+  },
+  "sourceReview": "ROUND2_PASS",
+  "failureStreak": 0,
+  "runtimeAndExactRequiredCI": "UNPROVEN",
+  "remaining": "Approved latest-base parent/child recovery, then full11b/12/13",
+  "evidenceReview": "PASS",
+  "untrackedNativeDiagnostic": {
+    "count": 1,
+    "tracked": 0,
+    "publishableMembersChecked": 35,
+    "containingPackageRoots": 0,
+    "externalPublishIncludes": 0,
+    "ownerInformed": true,
+    "unknownOwnerLeftUntouched": true,
+    "futureOwnedCoreDumpsDisabled": true
+  },
+  "tokenPresetScope": {
+    "tokenPresets": 24,
+    "registeredSourceStyles": [
+      "Utility"
+    ]
+  }
+}
