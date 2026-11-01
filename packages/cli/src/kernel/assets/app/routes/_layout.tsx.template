@@ -1,60 +1,26 @@
-/// <reference types="vite/client" />
 import { Partial } from 'fresh/runtime';
 import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';
-import { Badge, Button } from '@app/components/ui/mod.ts';
-import { appNavigation, isCurrentNavigation, rendersAppChrome } from '@app/navigation.ts';
+import SidebarToggle from '@app/islands/ui/SidebarToggle.tsx';
+import WorkspaceCommands from '@app/islands/WorkspaceCommands.tsx';
+import { Breadcrumb, SidebarShell } from '@app/components/ui/mod.ts';
+import { visibleNavigation, isCurrentNavigation, rendersAppChrome } from '@app/navigation.ts';
 import { appRoutes } from '@app/router.ts';
+import { appTheme } from '@app/lib/theme.ts';
 import { define } from '@app/utils.ts';
 
-/**
- * App chrome for every page: the top bar with the `appNavigation` links from `navigation.ts`.
- * Pages under `chromelessRoutePrefixes` (such as `/design`, which has its own sidebar shell)
- * render without it. Both branches keep the `page` partial so client navigation swaps the whole
- * frame.
- */
+/** One shared shell for every workspace page; full-screen references and sign-in opt out. */
 export default define.layout(function RootLayout({ Component, url }) {
-  if (!rendersAppChrome(url.pathname)) {
-    return (
-      <Partial name='page'>
-        <Component />
-      </Partial>
-    );
-  }
-
-  return (
-    <Partial name='page'>
-      <header class='ns-topbar' data-part='root' data-scope='top-bar'>
-        <div class='ns-cluster ns-cluster--sm'>
-          <a
-            href={appRoutes.home.href()}
-            f-client-nav
-            class='ns-topbar__brand'
-            data-part='brand'
-            data-scope='top-bar'
-          >
-            {{name}}
-          </a>
-          <Badge variant='muted'>{{appName}}</Badge>
-        </div>
-        <nav class='ns-cluster ns-cluster--sm' aria-label='Primary'>
-          {appNavigation.filter((item) =>
-            !item.developmentOnly || import.meta.env.MODE === 'development'
-          ).map((item) => (
-            <Button
-              key={item.href}
-              type='link'
-              href={item.href}
-              variant='ghost'
-              size='sm'
-              aria-current={isCurrentNavigation(item, url.pathname) ? 'page' : undefined}
-            >
-              {item.label}
-            </Button>
-          ))}
-          <ThemeToggle />
-        </nav>
-      </header>
-      <Component />
-    </Partial>
-  );
+  if (!rendersAppChrome(url.pathname)) return <Partial name='page'><Component /></Partial>;
+  const navigation = visibleNavigation();
+  const current = navigation.find((item) => isCurrentNavigation(item, url.pathname))?.label ?? 'Overview';
+  return <Partial name='page'><SidebarShell pathname={url.pathname} contentId='workspace-content'
+    navigation={[
+      { label: 'Workspace', items: navigation.slice(0, 4).map((item) => ({ ...item, matchPrefix: item.match === 'prefix', isActive: (pathname: string) => isCurrentNavigation(item, pathname) || (item.label === 'Overview' && pathname === '/') })) },
+      { label: 'Resources', items: navigation.slice(4).map((item) => ({ ...item, matchPrefix: item.match === 'prefix' })) },
+    ]}
+    brand={<a class='workspace-brand' href={appRoutes.home.href()}><span class='workspace-mark' aria-hidden='true'>N</span>{{name}}</a>}
+    topbarStart={<><SidebarToggle /><Breadcrumb items={[{ label: '{{name}}', href: appRoutes.home.href() }, { label: current }]} /></>}
+    topbarEnd={<><WorkspaceCommands navigation={navigation} /><ThemeToggle /></>}
+    footer={<div class='ns-dashboard__sidebar-env'><span>{appTheme().label}</span></div>}
+  ><Component /></SidebarShell></Partial>;
 });

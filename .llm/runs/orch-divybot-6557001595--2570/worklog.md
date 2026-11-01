@@ -36,3 +36,43 @@ Design checkpoint pending research; no implementation begun.
 
 Reconcile: source and live issue match the assignment. Owner's specific Refs-only,
 no-label, READY process takes precedence over generic dispatcher close/ready boilerplate.
+
+PLAN-EVAL round 1 FAIL_PLAN: six blockers corrected in plan.md B1–B6. No product
+implementation occurred. Real baseline no-db scaffold generated and served;
+Chromium returned its home heading and captured baseline-home-light.png.
+
+PLAN-EVAL round 2: PASS. B1–B6 closed by independent Claude Opus 5.5 review.
+Implementation begins only now. The explicit corrections section is authoritative.
+
+## S1 — shell and absent states
+
+Implemented shared overview, records routes, settings, sign-in and command palette
+using the existing registry components. Theme and route counts derive from actual
+metadata. Removed fake rows and no-service CRUD marketing. Preserved canonical
+service examples and development runtime links.
+
+Independent slice review round 1 FAIL_FIX: configuration failures leaked into page
+500s. Fixed with server-only logging and a safe unavailable projection for all five
+capabilities. New behavioral fixture covers missing file, invalid JSON and schema.
+Round 2 PASS; S2 remains explicitly unassessed. Wrapper evidence after that fix:
+11 tests, generated app 47 files, scoped lint/format 5 files. Quality gate and CSS
+budgets pass. No package contract or shared component changes.
+
+Browser debugging: regenerating a live app left old Vite processes serving stale
+Fresh island URLs. Stopped only exact-app-owned processes and restarted after
+regeneration. Native combobox consumed first Escape; app global shortcut now owns
+palette dismissal and restores focus. Full visual/variant evaluation remains S3.
+
+Reconcile: no dependency or lock changes. The existing gap-component PR remains a
+merge dependency; this slice composes main's supported components.
+
+S1 final browser receipt: PASS, 16 page/width/scheme cases plus preference save,
+reload, keyboard opening/dismissal and focus return. The shortcut keeps an immediate
+open ref to handle Escape in the same frame as opening (before effects re-run).
+This is actual browser proof, not inferred from the code review. Scoped check and
+11 tests rerun after the final template change. CSS totals in s1-css-installed.json.
+
+S1 terminal independent review: PASS (s1-terminal-review.md), including the immediate
+shortcut state and actual browser receipt. Sign-off commit follows that review.
+Browser dependency: `npm ci --ignore-scripts` in tools/fresh-ui-browser supplies
+Playwright; Chromium uses the existing host browser libraries.

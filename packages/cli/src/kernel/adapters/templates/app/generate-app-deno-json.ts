@@ -46,6 +46,7 @@ export interface AppDenoJsonOptions {
 export function generateAppDenoJson(options: AppDenoJsonOptions): string {
   const resolvedImports = options.importMode === 'jsr' && options.jsrResolver
     ? options.jsrResolver.resolveImports([
+      SCAFFOLD_PACKAGES.NETSCRIPT_CONFIG,
       SCAFFOLD_PACKAGES.NETSCRIPT_FRESH,
       SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_DEFER_ISLAND,
       SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_BUILDERS,
@@ -66,6 +67,7 @@ export function generateAppDenoJson(options: AppDenoJsonOptions): string {
     [`@${options.projectName}/contracts`]: '../../contracts/mod.ts',
   };
   const directNetScriptImports = {
+    [SCAFFOLD_PACKAGES.NETSCRIPT_CONFIG]: resolvedImports[SCAFFOLD_PACKAGES.NETSCRIPT_CONFIG],
     [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH]: resolvedImports[SCAFFOLD_PACKAGES.NETSCRIPT_FRESH],
     [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_DEFER_ISLAND]: resolvedImports[
       SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_DEFER_ISLAND

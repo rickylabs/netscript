@@ -24,3 +24,10 @@
 
 No duplication of #2488 component implementations; no showcase plumbing (#2571).
 Any additional surface must be declared as drift before editing.
+
+Registration surface clarification: `kernel/assets/manifest.ts`,
+`kernel/adapters/templates/scaffold-template-assets.ts`, and init's UI registry
+item selection are authorized for new page assets/CommandPalette dependencies.
+Known post-install clients may expose installed-unwired state; such a remaining
+required state prevents full acceptance/READY. No post-init reconciler rewrites
+are planned; request-time projection is the locked mechanism.

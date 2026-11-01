@@ -1,0 +1,16 @@
+import { Button, PageHeader } from '@app/components/ui/mod.ts';
+import { RecordTable } from '../(_components)/record-table.tsx';
+import type { ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
+import { loadScaffoldRecords } from '@app/lib/scaffold-records.ts';
+import { appRoutes } from '@app/router.ts';
+import { definePage } from '@app/utils.ts';
+
+export const recordsPage = definePage().withRoute(appRoutes.records)
+  .withMeta(() => ({ title: '{{name}} — Records' }))
+  .withLayer('records', ({ records }: { readonly records: ScaffoldRecords }) => <div class='workspace-page'>
+    <PageHeader class='workspace-heading'><PageHeader.Layout><PageHeader.Main><PageHeader.Intro><h1>Records</h1><p>Browse the records in your workspace.</p></PageHeader.Intro></PageHeader.Main><PageHeader.Actions><Button type='link' href={appRoutes.dashboard.href()} variant='outline'>Overview</Button></PageHeader.Actions></PageHeader.Layout></PageHeader>
+    <section class='workspace-section'><header class='workspace-section-heading'><h2>All records</h2></header><RecordTable records={records} /></section>
+  </div>, { loader: async (ctx) => ({ records: await loadScaffoldRecords(ctx.req) }) })
+  .withLayout((slots) => slots.records()).build();
+export const { default: page } = recordsPage;
+export { page as default };

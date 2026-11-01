@@ -1,51 +1,12 @@
-import HomeView from './(_components)/home-view.tsx';
+import View from './(_components)/home-view.tsx';
+import { loadScaffoldRecords } from '@app/lib/scaffold-records.ts';
+import { readScaffoldCapabilities } from '@app/lib/scaffold-capabilities.ts';
 import { appRoutes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
 
-export const homePage = definePage()
-  .withRoute(appRoutes.home)
-  .withMeta(() => ({
-    title: '{{name}} — {{appName}}',
-    description: 'NetScript starter scaffold with app-owned fresh-ui pages.',
-  }))
-  .withLayer('home', HomeView, () => ({
-    projectName: '{{name}}',
-    appName: '{{appName}}',
-    designHref: appRoutes.design.href(),
-    compositionHref: appRoutes.designComposition.href(),
-    routes: [
-      {
-        title: 'Dashboard',
-        href: appRoutes.dashboard.href(),
-        description: 'Operational overview built from registry stats, tables, panels, and alerts.',
-        cta: 'Open dashboard',
-        badge: 'app',
-      },
-      {
-        title: '{{modelName}} CRUD',
-        href: appRoutes.crudExample.href(),
-        description: 'Live {{modelName}} records backed by the {{serviceName}} service contract and Prisma.',
-        cta: 'Open {{modelName}} CRUD',
-        badge: 'example',
-      },
-      {
-        title: 'Design reference',
-        href: appRoutes.design.href(),
-        description: 'Living index for the scaffolded tokens, components, and composition rules.',
-        cta: 'Open design',
-        badge: 'design',
-      },
-      {
-        title: 'Examples',
-        href: appRoutes.examples.href(),
-        description: 'Index of generated workflow examples and integration placeholders.',
-        cta: 'Open examples',
-        badge: 'routes',
-      },
-    ],
-  }))
-  .withLayout((slots) => slots.home())
-  .build();
-
+export const homePage = definePage().withRoute(appRoutes.home)
+  .withMeta(() => ({ title: '{{name}} — Overview' }))
+  .withLayer('home', View, { loader: async (ctx) => ({ records: await loadScaffoldRecords(ctx.req), capabilities: await readScaffoldCapabilities() }) })
+  .withLayout((slots) => slots.home()).build();
 export const { default: page } = homePage;
 export { page as default };

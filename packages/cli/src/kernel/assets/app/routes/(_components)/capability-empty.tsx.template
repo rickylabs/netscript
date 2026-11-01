@@ -1,0 +1,12 @@
+import { EmptyState } from '@app/components/ui/mod.ts';
+import type { ScaffoldCapability } from '@app/lib/scaffold-contract.ts';
+
+/** Designed absence with a copyable, executable next step. */
+export function CapabilityEmpty({ capability }: { readonly capability: ScaffoldCapability }) {
+  return (
+    <EmptyState class='workspace-empty' heading={capability.label}>
+      <p>{capability.description}</p>
+      {capability.command && <code class='workspace-command'>{capability.command}</code>}
+    </EmptyState>
+  );
+}

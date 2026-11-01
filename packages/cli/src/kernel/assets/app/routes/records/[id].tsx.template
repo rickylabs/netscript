@@ -1,0 +1,16 @@
+import { Button, EmptyState, PageHeader } from '@app/components/ui/mod.ts';
+import type { ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
+import { loadScaffoldRecords } from '@app/lib/scaffold-records.ts';
+import { appRoutes } from '@app/router.ts';
+import { definePage } from '@app/utils.ts';
+
+export const recordPage = definePage().withRoute(appRoutes.record)
+  .withMeta(() => ({ title: '{{name}} — Record details' }))
+  .withLayer('record', ({ records }: { readonly records: ScaffoldRecords }) => <div class='workspace-page'>
+    <PageHeader class='workspace-heading'><PageHeader.Main><PageHeader.Intro><h1>Record details</h1><p>Details from your connected service.</p></PageHeader.Intro></PageHeader.Main></PageHeader>
+    <EmptyState class='workspace-empty' heading='No record connected'><p>{records.message}</p>{records.command && <code class='workspace-command'>{records.command}</code>}</EmptyState>
+    <Button type='link' href={appRoutes.records.href()} variant='outline'>Back to records</Button>
+  </div>, { loader: async (ctx) => ({ records: await loadScaffoldRecords(ctx.req) }) })
+  .withLayout((slots) => slots.record()).build();
+export const { default: page } = recordPage;
+export { page as default };
