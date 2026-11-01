@@ -1,0 +1,9 @@
+{
+  "packages/cli/e2e/src/application/gates/scaffold/runtime/probe-northwind.ts": "a8aec322a3bae0d5de2c35e4e7771913d08e5a0e613afeaf28f6604b63991de8",
+  "packages/cli/src/kernel/assets/northwind/crud.ts.template": "56ef1dda91eb6ebff379e5b220c046e7ab003b07fe1040f85625e36743f87a50",
+  "packages/cli/src/kernel/assets/northwind/record-table.tsx.template": "4bb8fec990877d81c7e7a3aedb82283108bcc0a295ea8912251d0cae3825cf14",
+  "packages/cli/src/kernel/assets/northwind/scaffold-records.ts.template": "70f01aa0c0d96fd7c85741357624dbbdc092f634527388f66a915638af18aabe",
+  "packages/cli/src/kernel/assets/northwind/schema.prisma.template": "d041fd8a35462aecca1498131c72a260e12e355927cd175d6c5d8332f974fa32",
+  "packages/cli/src/kernel/assets/northwind/seed.ts.template": "13d3bd3c8b214993cd032b8edcc371a0cb13022a3249106f2bac970f03c78cc1",
+  "packages/cli/src/kernel/assets/northwind/workspace.css.template": "4278a2a032681676fa0c635ed9de3cabcc621f8122add02fe9f76e3a5606828a"
+}

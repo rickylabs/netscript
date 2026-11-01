@@ -163,6 +163,21 @@ Deno.test('capability read contains missing/invalid configuration errors on the 
       assertEquals(JSON.stringify(capabilities).includes('invalid-secret-content'), false);
     }
     assertEquals(errors.length, 3);
+    await Deno.writeTextFile(
+      `${root}/appsettings.json`,
+      JSON.stringify({ NetScript: { Services: { 'team-members': { Enabled: true } } } }),
+    );
+    for (const state of ['ready', 'empty', 'unavailable'] as const) {
+      const records = { state, rows: [], message: `Live read: ${state}` };
+      const capabilities = await module.readScaffoldCapabilities(
+        new Request('http://app/'),
+        records,
+      );
+      const service = capabilities.find((entry: { id: string }) => entry.id === 'service');
+      assertEquals(service.state, state);
+      assertEquals(service.description, records.message);
+      assertEquals(service.command, undefined);
+    }
   } finally {
     console.error = originalError;
     await Deno.remove(root, { recursive: true });

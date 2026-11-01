@@ -12,6 +12,8 @@ const APP_TEMPLATE_URLS: TemplateUrlMap = {
   appScaffoldRecords: TEMPLATE_KEYS.appScaffoldRecords,
   appScaffoldServiceContext: TEMPLATE_KEYS.appScaffoldServiceContext,
   appScaffoldRecordsMemory: TEMPLATE_KEYS.appScaffoldRecordsMemory,
+  northwindRecordTable: TEMPLATE_KEYS.northwindRecordTable,
+  northwindWorkspaceCss: TEMPLATE_KEYS.northwindWorkspaceCss,
   appScaffoldRecordsDatabase: TEMPLATE_KEYS.appScaffoldRecordsDatabase,
   appScaffoldRecordsNorthwind: TEMPLATE_KEYS.appScaffoldRecordsNorthwind,
   appCapabilityEmpty: TEMPLATE_KEYS.appCapabilityEmpty,

@@ -78,6 +78,8 @@ export const TEMPLATE_KEYS = {
   aspireHelpersInstallationSecret: 'generated/aspire/helpers/installation-secret.ts.template',
   aspireHelpersRunTool: 'aspire/helpers/run-tool.ts.template',
   databaseConnectionHelpers: 'database/connection-helpers.ts.template',
+  northwindRecordTable: 'northwind/record-table.tsx.template',
+  northwindWorkspaceCss: 'northwind/workspace.css.template',
   northwindSchema: 'northwind/schema.prisma.template',
   northwindCrud: 'northwind/crud.ts.template',
   northwindSeed: 'northwind/seed.ts.template',

@@ -1,0 +1,201 @@
+{
+  "source": "Native isolated Aspire with real SQLite seed and generated orders service",
+  "results": [
+    {
+      "page": "dashboard",
+      "path": "/",
+      "theme": "light",
+      "viewport": "desktop",
+      "status": 200,
+      "liveFields": true,
+      "overflow": false,
+      "rowHeights": [
+        48,
+        48,
+        48,
+        48,
+        48
+      ],
+      "errors": [],
+      "screenshot": ".llm/runs/showcase-2571/screens/round2/dashboard-light-desktop.png"
+    },
+    {
+      "page": "records",
+      "path": "/records",
+      "theme": "light",
+      "viewport": "desktop",
+      "status": 200,
+      "liveFields": true,
+      "overflow": false,
+      "rowHeights": [
+        48,
+        48,
+        48,
+        48,
+        48,
+        48
+      ],
+      "errors": [],
+      "screenshot": ".llm/runs/showcase-2571/screens/round2/records-light-desktop.png"
+    },
+    {
+      "page": "detail",
+      "path": "/records/6",
+      "theme": "light",
+      "viewport": "desktop",
+      "status": 200,
+      "liveFields": true,
+      "overflow": false,
+      "rowHeights": [],
+      "errors": [],
+      "screenshot": ".llm/runs/showcase-2571/screens/round2/detail-light-desktop.png"
+    },
+    {
+      "page": "dashboard",
+      "path": "/",
+      "theme": "light",
+      "viewport": "mobile",
+      "status": 200,
+      "liveFields": true,
+      "overflow": false,
+      "rowHeights": [
+        130,
+        131,
+        131,
+        131,
+        130
+      ],
+      "errors": [],
+      "screenshot": ".llm/runs/showcase-2571/screens/round2/dashboard-light-mobile.png"
+    },
+    {
+      "page": "records",
+      "path": "/records",
+      "theme": "light",
+      "viewport": "mobile",
+      "status": 200,
+      "liveFields": true,
+      "overflow": false,
+      "rowHeights": [
+        130,
+        131,
+        131,
+        131,
+        131,
+        130
+      ],
+      "errors": [],
+      "screenshot": ".llm/runs/showcase-2571/screens/round2/records-light-mobile.png"
+    },
+    {
+      "page": "detail",
+      "path": "/records/6",
+      "theme": "light",
+      "viewport": "mobile",
+      "status": 200,
+      "liveFields": true,
+      "overflow": false,
+      "rowHeights": [],
+      "errors": [],
+      "screenshot": ".llm/runs/showcase-2571/screens/round2/detail-light-mobile.png"
+    },
+    {
+      "page": "dashboard",
+      "path": "/",
+      "theme": "dark",
+      "viewport": "desktop",
+      "status": 200,
+      "liveFields": true,
+      "overflow": false,
+      "rowHeights": [
+        48,
+        48,
+        48,
+        48,
+        48
+      ],
+      "errors": [],
+      "screenshot": ".llm/runs/showcase-2571/screens/round2/dashboard-dark-desktop.png"
+    },
+    {
+      "page": "records",
+      "path": "/records",
+      "theme": "dark",
+      "viewport": "desktop",
+      "status": 200,
+      "liveFields": true,
+      "overflow": false,
+      "rowHeights": [
+        48,
+        48,
+        48,
+        48,
+        48,
+        48
+      ],
+      "errors": [],
+      "screenshot": ".llm/runs/showcase-2571/screens/round2/records-dark-desktop.png"
+    },
+    {
+      "page": "detail",
+      "path": "/records/6",
+      "theme": "dark",
+      "viewport": "desktop",
+      "status": 200,
+      "liveFields": true,
+      "overflow": false,
+      "rowHeights": [],
+      "errors": [],
+      "screenshot": ".llm/runs/showcase-2571/screens/round2/detail-dark-desktop.png"
+    },
+    {
+      "page": "dashboard",
+      "path": "/",
+      "theme": "dark",
+      "viewport": "mobile",
+      "status": 200,
+      "liveFields": true,
+      "overflow": false,
+      "rowHeights": [
+        130,
+        131,
+        131,
+        131,
+        130
+      ],
+      "errors": [],
+      "screenshot": ".llm/runs/showcase-2571/screens/round2/dashboard-dark-mobile.png"
+    },
+    {
+      "page": "records",
+      "path": "/records",
+      "theme": "dark",
+      "viewport": "mobile",
+      "status": 200,
+      "liveFields": true,
+      "overflow": false,
+      "rowHeights": [
+        130,
+        131,
+        131,
+        131,
+        131,
+        130
+      ],
+      "errors": [],
+      "screenshot": ".llm/runs/showcase-2571/screens/round2/records-dark-mobile.png"
+    },
+    {
+      "page": "detail",
+      "path": "/records/6",
+      "theme": "dark",
+      "viewport": "mobile",
+      "status": 200,
+      "liveFields": true,
+      "overflow": false,
+      "rowHeights": [],
+      "errors": [],
+      "screenshot": ".llm/runs/showcase-2571/screens/round2/detail-dark-mobile.png"
+    }
+  ]
+}

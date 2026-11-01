@@ -371,6 +371,7 @@ packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fix
 packages/cli/e2e/src/application/gates/scaffold/runtime/owned-container-log.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/prepare-readiness-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/probe-background-children.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/probe-northwind.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/probe-plugin-resource.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/resource-state-stream.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/runtime-scripts.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -779,6 +780,7 @@ packages/cli/src/public/infra/permissions/plugin-scaffold-permissions_test.ts	cl
 packages/cli/src/public/infra/permissions/plugin-scaffold-permissions.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/tests/authored-browser-topology_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/tests/fixtures/northwind/default-scaffold.json	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/tests/fixtures/northwind/README.md	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/config/mod.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts
 packages/config/src/domain/config-root-types.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts
 packages/config/src/domain/config-section-types.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts

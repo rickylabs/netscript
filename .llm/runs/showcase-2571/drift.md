@@ -16,3 +16,12 @@ preview-created directories, but readDir delegated to absent on-disk paths. Serv
 auth discovery therefore crashed for a new dry-run project. Extend readDir to merge
 recorded children with existing entries; this is required for the preset's write-free
 preview contract. Add focused coverage; normal on-disk scaffold output stays unchanged.
+
+S2 visual round1 FAIL: dense domain data made the generic table too tall on mobile,
+and raw detail timestamps reduced scanability. The approved plan allowed a column
+variant when needed for Figma fidelity. Add Northwind-only table/CSS assets through
+existing asset selection, reusing ResponsiveTable rather than copying its runtime.
+Desktop columns expose order/customer/country/total/status/date; compact mobile rows
+remove repeated labels. Detail uses concise UTC timestamps. Default-init snapshots
+must still pass. No shared registry CSS or component contract changes; measure the
+preset-only CSS addition and retain all shared budgets.

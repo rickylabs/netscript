@@ -11,3 +11,10 @@ Public evidence repo-relative only. Private launch identity stays outside this r
 Next: second plan review, then S1 source and focused tests, S2 runtime/visual/gates.
 
 S1 implementation PASS; 177 broader tests plus28 review-condition tests pass. Source ready for sign-off. S2 remains runtime assertion, seed preservation/generated Postgres evidence, visual audit and final carriers. Real SQLite Aspire is running only at .llm/tmp/showcase-2571/northwind/aspire/apphost.mts; stop this exact AppHost after evidence. No foreign resources owned.
+
+S2 final independent IMPL-EVAL PASS (s2-impl-eval.md), Astra round2 PASS >=8 everycase.
+Native SQLite proof and service-down controls PASS; generated checks SQLite182/PG183
+PASS. Full scaffold.runtime UNPROVEN due absentDocker, Postgres runtime UNPROVEN.
+The owned Northwind AppHost was stopped successfully; aspire ps confirms absent.
+Next: sign-off S2 commit, run assets-barrel on committed carrier, push/readiness and
+tracker acceptance updates. Do not close2571; remainingfullshowcase stays there.

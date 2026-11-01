@@ -418,7 +418,7 @@ netscript db seed
 ```
 
 Use the app URL shown in the Aspire dashboard. Overview and Records read the generated
-`orders` service; selecting a record shows its customer, country, status and USD total.
+`orders` service in a compact order table; selecting a record shows its customer, country, status and USD total.
 The six representative demo orders live in the database. Repeating `db seed` preserves
 existing orders and edits. The generated service exposes ordinary unauthenticated CRUD
 for local exploration; configure authentication before using it with private data.

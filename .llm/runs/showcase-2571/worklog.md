@@ -34,3 +34,26 @@ none/SQLite orders, hashing every emitted file with temp paths normalized. The f
 README carries exact reconstruction and explicit opt-in update commands.
 
 S1 sign-off reconciliation: source matches approved bounded plan;28 review-condition tests PASS including existing dry-run suite and direct-kernel negative. All14 check:* tasks other than assets-barrel PASS; assets-barrel must run after its generated output is committed. No lock changes.
+
+S2 runtime: real SQLite generate/seed and182-file generated check PASS. Postgres
+real code generation with fixture URL and183-file check PASS, runtime UNPROVEN.
+Seed twice plus edit/reseed preserves count6 and held status. Focused runtime probe
+PASS while running; after stopping orders unavailable PASS and ready FAIL(exit1);
+restart/wait/recovered ready PASS. Browser12 cases PASS, no errors/overflow.
+
+Visual round1 FAIL, retained. Implemented the approved contingency of a Northwind-only
+column/CSS composition; no default output or shared component CSS changes. Final
+screens reduce desktop rows to48px and mobile rows to130px; timestamps concise UTC.
+Round2 independent visual review pending. Shared CSS budgets and17 S2 tests PASS.
+Full scaffold.runtime attempted but blocked by absent Docker; UNPROVEN, not waived
+as parent showcase completion. Final S2 independent code review and carriers pending.
+
+Visual round2 PASS, all12 fidelity/quality scores >=8. Final local quality:gate, docs:accuracy, release:preflight and14 non-assets check:* tasks PASS. Default CSS prefix SHA matches the pre-edit snapshot; Northwind-only CSS adds1825 raw/338 gzip bytes (see css-size.json). No shared budget increase. S2 final independent review requested.
+
+S2 final independent IMPL-EVAL PASS. Reviewed source and native runtime evidence
+satisfy child2580; parent2571 remains open. Reconciliation: scoped source matches
+plan plus documented visual contingency, no lock/sharedCSS changes, required local
+gates PASS except assets-barrel awaiting committed carrier. Owned AppHost stopped,
+confirmed absent in aspire ps; other resources untouched. Public runtime provenance
+and source hashes added. Commit/push and mark ready after assets verification;
+remote CI remains the merge gate, not a reason to idle the pipeline.

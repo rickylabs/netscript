@@ -1,0 +1,13 @@
+{
+  "default": {
+    "raw": 6668,
+    "gzip": 1585,
+    "sha256": "14eaa3f789801be38b348f6f1395cec2fc6e2060ed017340255d09b4a0338c52"
+  },
+  "northwind": {
+    "raw": 8493,
+    "gzip": 1923
+  },
+  "baselineMatchesSnapshot": true,
+  "sharedBudgetChanges": false
+}

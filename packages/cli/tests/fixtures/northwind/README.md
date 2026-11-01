@@ -22,3 +22,16 @@ UPDATE_NORTHWIND_BASELINE=1 deno run --allow-read --allow-write --allow-run .llm
 ```
 
 Normal tests never update this fixture. Do not update it to hide an unintended change.
+
+After generating and seeding a local-source Northwind project, the focused runtime
+probe discovers the app through Aspire and asserts visible order fields in Overview,
+Records and the selected detail page:
+
+```sh
+deno run -A packages/cli/e2e/src/application/gates/scaffold/runtime/probe-northwind.ts <project-root> <app-name> <apphost-path>
+```
+
+Stop the owned `orders` resource through Aspire, then run the same command with a final
+`unavailable` argument. The normal ready probe must fail while the service is down;
+the unavailable control must pass. Restart the resource afterward. This focused native
+proof does not replace the full `scaffold.runtime` suite or public release E2E.
