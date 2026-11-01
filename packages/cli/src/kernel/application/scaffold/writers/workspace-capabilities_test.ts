@@ -144,7 +144,13 @@ Deno.test('memory detail pagination distinguishes found, missing and exhausted l
     id: 26,
     name: 'Actual record',
     summary: 'From typed fixture',
-    status: 'active',
+    status: 'paid',
+    reference: 'REC-26',
+    ownerName: 'Test Owner',
+    ownerEmail: 'test@example.com',
+    amount: 12500,
+    currency: 'USD',
+    updatedAt: '2026-01-01T00:00:00Z',
     createdAt: '2026-01-01T00:00:00Z',
   };
   const calls: number[] = [];

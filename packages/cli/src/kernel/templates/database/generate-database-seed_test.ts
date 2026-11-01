@@ -11,13 +11,13 @@ import { generateDatabaseSeed } from './generate-database-seed.ts';
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 describe('generateDatabaseSeed', () => {
-  it('generates a typed idempotent representative row for a known model', () => {
+  it('generates a typed idempotent representative records for a known model', () => {
     const output = generateDatabaseSeed({ modelName: 'Product' });
 
-    assertStringIncludes(output, 'const existing = await client.product.findFirst(');
-    assertStringIncludes(output, 'await client.product.create({');
-    assertStringIncludes(output, "name: 'Seed Product'");
-    assertStringIncludes(output, "console.log('✅ Seeded representative Product row.');");
+    assertStringIncludes(output, 'await client.product.upsert(');
+    assertStringIncludes(output, 'where: { reference: row.reference }');
+    assertStringIncludes(output, "'Seed Product'");
+    assertStringIncludes(output, 'update: {}');
     assertEquals(output.includes('$queryRaw'), false);
   });
 

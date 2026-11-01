@@ -96,11 +96,17 @@ export const define = createDefine();`,
         );
         await useLocalWorkspaceImports(resolve(root), repoRoot);
         await write(
+          `${prefix}sample-records.ts`,
+          renderTemplateAssetSync(TEMPLATE_KEYS.serviceSampleRecords, { modelName: 'User' }),
+        );
+        await write(
           `${prefix}database.ts`,
-          `const user = { id: 1, name: 'Demo' };
+          `import { createSampleRecords } from './sample-records.ts';
+import type { listQuery } from './domain/user.ts';
+const user = { ...createSampleRecords()[0], id: 1 };
 const client = { user: {
-  findMany: (_query: { skip: number; take: number; orderBy: Record<string, string> }) => Promise.resolve([user]),
-  count: () => Promise.resolve(1),
+  findMany: (_query: ReturnType<typeof listQuery>) => Promise.resolve([user]),
+  count: (_query: { where: { status?: string } }) => Promise.resolve(1),
   findUnique: (_query: { where: { id: number } }) => Promise.resolve(user),
   create: (_query: { data: { name: string } }) => Promise.resolve(user),
   update: (_query: { where: { id: number }; data: { name?: string } }) => Promise.resolve(user),

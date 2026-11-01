@@ -6,6 +6,7 @@ const SERVICE_VARS = {
   projectName: 'my-app',
   serviceName: 'users',
   entityName: 'users',
+  modelName: 'User',
   servicePort: '3001',
 };
 
@@ -15,6 +16,7 @@ export async function materializeServiceScaffoldSupport(pageRoot: string): Promi
     ['contracts/versions/v1/users.contract.ts', TEMPLATE_KEYS.serviceContractMemory],
     ['services/users/src/application/users.ts', TEMPLATE_KEYS.serviceApplicationEntityMemory],
     ['services/users/src/domain/users.ts', TEMPLATE_KEYS.serviceDomainEntityMemory],
+    ['services/users/src/adapters/sample-records.ts', TEMPLATE_KEYS.serviceSampleRecords],
     [
       'services/users/src/adapters/memory-users-repository.ts',
       TEMPLATE_KEYS.serviceMemoryRepository,

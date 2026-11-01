@@ -13,6 +13,7 @@
   "memory": [
     "deno.json",
     "src/adapters/memory-team-members-repository.ts",
+    "src/adapters/sample-records.ts",
     "src/application/team-members.ts",
     "src/application/team-members_test.ts",
     "src/domain/team-members.ts",

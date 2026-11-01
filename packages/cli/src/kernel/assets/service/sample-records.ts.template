@@ -1,0 +1,31 @@
+const SAMPLE_RECORD_COUNT = 40;
+const SAMPLE_WINDOW_DAYS = 60;
+const FIRST_REFERENCE = 10482;
+const DAY_MS = 86400000;
+
+/** Deterministic sample rows relative to a UTC seed day; amounts are signed minor units. */
+export function createSampleRecords(anchor: Date = new Date()) {
+  const statuses = ['paid', 'awaiting_payment', 'shipped', 'pending', 'refunded', 'cancelled'] as const;
+  const owners = [
+    ['Maya Rossi', 'maya.rossi@example.com'],
+    ['Jonas Weber', 'jonas.weber@example.com'],
+    ['Aiko Tanaka', 'aiko.tanaka@example.com'],
+    ['Lucas Martin', 'lucas.martin@example.com'],
+    ['Priya Shah', 'priya.shah@example.com'],
+  ] as const;
+  const names = ['Launch checklist', 'Integration review', 'Workspace setup', 'Quarterly review', 'Support follow-up', 'Delivery preparation', 'Platform onboarding', 'Account review'] as const;
+  const day = Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth(), anchor.getUTCDate());
+  return Array.from({ length: SAMPLE_RECORD_COUNT }, (_, index) => {
+    const [ownerName, ownerEmail] = owners[index % owners.length]!;
+    const status = statuses[index % statuses.length]!;
+    const createdAt = new Date(day - Math.floor(index * (SAMPLE_WINDOW_DAYS - 1) / (SAMPLE_RECORD_COUNT - 1)) * DAY_MS).toISOString();
+    const value = 8990 + (index * 13751) % 180000;
+    return {
+      reference: `REC-${FIRST_REFERENCE - index}`,
+      name: index === 0 ? 'Seed {{modelName}}' : `${names[index % names.length]} ${index + 1}`,
+      ownerName, ownerEmail, status,
+      amount: status === 'refunded' ? -value : status === 'cancelled' ? 0 : value,
+      currency: 'USD', createdAt, updatedAt: createdAt,
+    };
+  });
+}

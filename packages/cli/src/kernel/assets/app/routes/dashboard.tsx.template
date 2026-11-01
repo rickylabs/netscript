@@ -1,4 +1,5 @@
 import View from './(_components)/dashboard-view.tsx';
+import { loadScaffoldOverview } from '@app/lib/scaffold-overview.ts';
 import { loadScaffoldRecords } from '@app/lib/scaffold-records.ts';
 import { readScaffoldCapabilities } from '@app/lib/scaffold-capabilities.ts';
 import { appRoutes } from '@app/router.ts';
@@ -6,7 +7,7 @@ import { definePage } from '@app/utils.ts';
 
 export const dashboardPage = definePage().withRoute(appRoutes.dashboard)
   .withMeta(() => ({ title: '{{name}} — Overview' }))
-  .withLayer('dashboard', View, { loader: async (ctx) => { const records = await loadScaffoldRecords(ctx.req); return { records, capabilities: await readScaffoldCapabilities(ctx.req, records) }; } })
+  .withLayer('dashboard', View, { loader: async (ctx) => { const records = await loadScaffoldRecords(ctx.req); return { records, overview: await loadScaffoldOverview(ctx.req), capabilities: await readScaffoldCapabilities(ctx.req, records) }; } })
   .withLayout((slots) => slots.dashboard()).build();
 export const { default: page } = dashboardPage;
 export { page as default };

@@ -6,13 +6,16 @@ import { generatedPageCount } from '@app/navigation.ts';
 import { CapabilityEmpty } from './capability-empty.tsx';
 import { RecordTable } from './record-table.tsx';
 
+import type { ScaffoldOverview } from '@app/lib/scaffold-projections.ts';
+
 interface DashboardProps {
+  readonly overview: ScaffoldOverview;
   readonly records: ScaffoldRecords;
   readonly capabilities: readonly ScaffoldCapability[];
 }
 
 /** Utility overview composed from generated routes and live capability results. */
-export default function DashboardView({ records, capabilities }: DashboardProps) {
+export default function DashboardView({ records, overview, capabilities }: DashboardProps) {
   const activity = capabilities.find((item) => item.id === 'streams')!;
   return <div class='workspace-page'>
     <PageHeader class='workspace-heading'><PageHeader.Layout><PageHeader.Main><PageHeader.Intro>
@@ -33,7 +36,7 @@ export default function DashboardView({ records, capabilities }: DashboardProps)
     </StatsGrid>
     <div class='workspace-overview-grid'>
       <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Recent records</h2><p>The latest records from your connected service.</p></div><a href={appRoutes.records.href()}>View all records <span aria-hidden='true'>→</span></a></header>
-        <RecordTable records={{ ...records, rows: records.rows.slice(0, 5) }} />
+        <RecordTable records={{ ...records, rows: overview.state === 'ready' || overview.state === 'empty' ? overview.latest : records.rows.slice(0, 5) }} />
       </section>
       <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Activity</h2><p>Updates from your workspace.</p></div></header><CapabilityEmpty capability={activity} /></section>
     </div>

@@ -3,6 +3,8 @@ export const TEMPLATE_KEYS = {
   appScaffoldContract: 'app/lib/scaffold-contract.ts.template',
   appScaffoldCapabilities: 'app/lib/scaffold-capabilities.ts.template',
   appScaffoldPluginCapabilities: 'app/lib/scaffold-plugin-capabilities.ts.template',
+  appScaffoldProjections: 'app/lib/scaffold-projections.ts.template',
+  appScaffoldOverview: 'app/lib/scaffold-overview.ts.template',
   appScaffoldRecords: 'app/lib/scaffold-records.ts.template',
   appScaffoldServiceContext: 'app/lib/scaffold-service-context.ts.template',
   appScaffoldRecordsMemory: 'app/lib/scaffold-records.memory.ts.template',
@@ -83,6 +85,7 @@ export const TEMPLATE_KEYS = {
   databaseScriptsGenerateZod: 'database/scripts/generate-zod.ts.template',
   databaseScriptsMigrate: 'database/scripts/migrate.ts.template',
   databaseScriptsPatchPrismaClient: 'database/scripts/patch-prisma-client.ts.template',
+  serviceSampleRecords: 'service/sample-records.ts.template',
   databaseSeed: 'database/seed.ts.template',
   databaseZodGeneratorConfig: 'database/zod-generator.config.json.template',
   generatedAspireHelpersGenerateDbCliMode1:
