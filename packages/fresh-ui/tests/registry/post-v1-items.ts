@@ -62,6 +62,8 @@ export const LEGACY_RUNTIME_DEPENDENCY_REPAIRS = [
 /** Explicit new copied dependencies for audited existing components. */
 export const LEGACY_REGISTRY_DEPENDENCY_REPAIRS: Readonly<Record<string, readonly string[]>> = {
   'command-palette': ['kbd', 'spinner'],
+  'desktop-window-chrome': ['cn'],
+  'desktop-tray-menu': ['cn'],
   'sidebar-shell': ['sidebar-support'],
   'sidebar-toggle': ['sidebar-support'],
 };
@@ -72,6 +74,8 @@ export const FRESH_UI_RUNTIME_DEPENDENCY: string =
 
 /** Updated baseline copies also receive real consumer install/type-check coverage. */
 export const AUDITED_BASELINE_COMPONENTS: readonly string[] = [
+  'desktop-window-chrome',
+  'desktop-tray-menu',
   'data-table',
   'stats-grid',
   'sidebar-shell',

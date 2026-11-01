@@ -1,3 +1,4 @@
+import { DesktopControlsExamples } from './gap-desktop-controls-fixture.tsx';
 import { DocsCompositionExamples } from './gap-docs-composition-fixture.tsx';
 import {
   ClippedDocsComposition,
@@ -97,6 +98,10 @@ function Actions() {
 }
 if (location.pathname === '/docs-composition-shell') {
   hydrate(<DocsCompositionExamples embedded />, document.getElementById('composition-island')!);
+} else if (location.pathname === '/desktop-controls') {
+  hydrate(<DesktopControlsExamples />, document.getElementById('app')!);
+} else if (location.pathname === '/desktop-controls-static') {
+  // Preserve native SSR disclosure and every enabled action Tab stop.
 } else if (location.pathname === '/docs-composition-static') {
   // This static route intentionally retains its useful server-rendered native controls.
 } else if (location.pathname === '/docs-composition') {

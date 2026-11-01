@@ -96,3 +96,28 @@ This is not an AA waiver: current-scope source/browser axe must be zero, with
 strict explicit selected-rest/hover controls and no additional allowance. The
 label-only prototype's caller failure and the final red-first native regression
 are preserved as negative proof. Final-source gates are still pending.
+
+## Desktop audit implementation slicing
+
+The complete existing six-component audit is partitioned into chrome/menu
+controls11b3a and dialog/notification/update/conditional rendering11b3b to
+respect the maintained-source budget. All scope/gates remain; no owner rescope
+or acceptance waiver is inferred. Published main contracts constrain repairs.
+
+Desktop11b3a full package found a Phase1 modifier-class violation; first-row
+hover now uses the already-declared action data-state instead. The existing
+Desktop authority-chain test now explicitly permits only the declared canonical
+L1 cn helper while rejecting other local copy-source imports; hooked Tray SSR
+is invoked through JSX. This necessary baseline test adds one maintained path,
+keeping the final source unit at23. No acceptance waiver or next-unit work.
+
+Desktop11b3a full-gate drift: native-tab fixture destination startup coupling.
+The real server now has a small destination route, and the native-tab test
+asserts its content. No DataGrid product change or keyboard/API waiver. See the
+checkpoint evidence/amendment written before the test-only edit.24paths total.
+
+Main advanced during11b3a gates to0af8fd9e, including Utility CSS consolidation
+and size budgets. A stack rebase/reconciliation is now required before push.
+This is upstream integration work within the existing assignment, not dropped
+Desktop/harness scope or an acceptance waiver. Current frozen source review
+does not certify the new base.

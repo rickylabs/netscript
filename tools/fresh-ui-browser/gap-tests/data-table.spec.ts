@@ -236,6 +236,8 @@ for (const kind of ['modified', 'middle']) {
       });}
     const tab = await opened;
     await expect(tab).toHaveURL(/destination=linked/);
+    await expect(tab.getByRole('heading', { name: 'Linked session destination', exact: true }))
+      .toBeVisible();
     await tab.close();
     await expect(page).toHaveURL(original);
     await expect(page.getByLabel('Rows opened', { exact: true })).toHaveText('0');
@@ -528,6 +530,8 @@ test('data-table/modified-native-target-restored-and-root-observes-once', async 
     await body.click({ modifiers: [modifier] });
     const tab = await newPage;
     await expect(tab).toHaveURL(/destination=linked/);
+    await expect(tab.getByRole('heading', { name: 'Linked session destination', exact: true }))
+      .toBeVisible();
     await tab.close();
     expect(await link.getAttribute('target')).toBe(target);
     await expect(page).toHaveURL(original);

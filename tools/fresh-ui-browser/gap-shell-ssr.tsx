@@ -1,3 +1,4 @@
+import { DesktopControlsExamples } from './gap-desktop-controls-fixture.tsx';
 import {
   DocsCompositionExamples,
   StaticDocsCompositionShell,
@@ -30,4 +31,9 @@ await Deno.writeTextFile(
 await Deno.writeTextFile(
   'test-results/gap-docs-composition-shell.html',
   render(<StaticDocsCompositionShell />),
+);
+
+await Deno.writeTextFile(
+  'test-results/gap-desktop-controls.html',
+  render(<DesktopControlsExamples />),
 );

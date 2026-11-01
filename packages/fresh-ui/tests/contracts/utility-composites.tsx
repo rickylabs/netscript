@@ -8,8 +8,6 @@ import { ResponsiveTable } from '../../registry/components/ui/responsive-table.t
 import { DataTable } from '../../registry/components/ui/data-table.tsx';
 import { Message } from '../../registry/components/ui/message.tsx';
 import { CommandPalette } from '../../registry/components/ui/command-palette.tsx';
-import { DesktopWindowChrome } from '../../registry/components/ui/desktop-window-chrome.tsx';
-import { DesktopTrayMenu } from '../../registry/components/ui/desktop-tray-menu.tsx';
 import { DesktopDialog } from '../../registry/components/ui/desktop-dialog.tsx';
 import { DesktopNotification } from '../../registry/components/ui/desktop-notification.tsx';
 import { DesktopUpdatePrompt } from '../../registry/components/ui/desktop-update-prompt.tsx';
@@ -359,31 +357,6 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
       />
     ),
     parts: ['backdrop', 'content', 'input', 'list', 'group', 'item'],
-  },
-  {
-    component: 'window-chrome',
-    props: [],
-    scenario: 'actions',
-    render: () => <DesktopWindowChrome title='Window' leading='Logo' />,
-    parts: ['leading', 'identity', 'title', 'actions', 'action'],
-    attributes: ['data-state'],
-  },
-  {
-    component: 'tray-menu',
-    props: [],
-    scenario: 'declarations',
-    render: () => (
-      <DesktopTrayMenu
-        source='tray'
-        items={[{ type: 'action', id: 'open', label: 'Open' }, { type: 'separator' }, {
-          type: 'submenu',
-          label: 'Edit',
-          items: [{ type: 'role', role: 'copy' }],
-        }]}
-      />
-    ),
-    parts: ['items', 'action', 'separator', 'submenu'],
-    attributes: ['data-source'],
   },
   {
     component: 'desktop-dialog',

@@ -1,3 +1,4 @@
+import { desktopControlFixtures, desktopControlKeyboard } from './utility-desktop-controls.tsx';
 import { docsCompositionFixtures, docsCompositionKeyboard } from './utility-docs-composition.tsx';
 import { docsNavigationFixtures, docsNavigationKeyboard } from './utility-docs-navigation.tsx';
 import { docsStructureFixtures, docsStructureKeyboard } from './utility-docs-structure.tsx';
@@ -58,6 +59,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...docsStructureFixtures,
     ...docsNavigationFixtures,
     ...docsCompositionFixtures,
+    ...desktopControlFixtures,
     proseFixture,
   ],
   keyboard: [
@@ -83,6 +85,7 @@ export const contractStyleProviders: readonly ContractStyleProvider[] = [{
     ...docsStructureKeyboard,
     ...docsNavigationKeyboard,
     ...docsCompositionKeyboard,
+    ...desktopControlKeyboard,
     ...proseKeyboard,
   ],
 }];

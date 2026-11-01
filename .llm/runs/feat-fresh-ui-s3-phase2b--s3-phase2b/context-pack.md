@@ -1,3 +1,72 @@
+## Current barrier — Desktop controls source PASS, stack reconciliation next
+
+Same independent source round1 PASS:26frozen source paths/10build artifacts,
+0blockers/streak0. Current working tree is reviewed on a9078d68 against parent
+c5877ff8. Local863package/791fullChromium/72FFWK/140docs/200native/20wheel/
+28focused pass; fresh native publication0slowtypes; source11/browser4+4/8
+wrappers pass0drops; all3locks unchanged. Final reference captures viewed.
+These are old-base executions and do not establish acceptance on new main.
+
+Remote main advanced to0af8fd9e (docs2452, CSS2558, design-guidance2456). CSS
+uses equivalent native nesting, not new shared files; all46CSS paths are
+modified existing files. Preserve specificity and ordered rule semantics.
+New CSS budgets220000raw/27000gzip need an honest feature-growth reconciliation;
+no waiver or unreviewed budget change. Preserve the reviewed source in a commit,
+then rebase parent and child, regenerate carriers, run fresh integrated gates
+and SAME review before any push. Child remotea9078d68/parentremotec5877ff8 remain
+unchanged. Source no longer mutable until that source commit.
+
+Still required:11b3b remaining four Desktop components;12production declared-x/
+all-style harness;13runtime/SAMEfinalIMPL/exact required green CI. No READY,
+final report, labels, closing keyword, merge or early nineteen promotions.
+Unknown-owner diagnostic and foreign resources remain untouched.
+
+## Current Desktop controls11b3a — source frozen, gates running
+
+Previous unit terminala9078d68, sourcefa28a645. Same evaluator design round1
+PASS with binding SSR/no-script Tab and fixed platform-order conditions accepted.
+23maintained/10build paths frozen; all3locks unchanged. Source11 and browser4+1/
+5wrappers, focused16package/24Chrome, final48affectedFirefox/WebKit and actual
+140docs PASS;0flaky/skipped/retry/newaxeallowances. Final source reference captures
+viewed at wide light and narrow dark WebKit, compared with the actual Utility
+reference. Full860expected package and791expectedChrome are running. Native
+publication is pending until browsers finish after its trace-copy race; current
+raw1 is unproven. Freshquality/architecture/broad/site260HTML135registry PASS;
+existing2531doclint remains exact123TS+JSON1,0new/removed. Both review-thread gates
+PASS0unanswered. Source review not requested yet; failure streak0.
+
+No product edits now unless a gate/review blocker requires them. Next: finish
+all gates, native publication, SAMEsource1; then source commit/carriers/actualHEAD
+quality/publication/SAMEevidence/audited exact-lease push/PR2538comment/reconcile.
+Only then11b3b remaining4Desktop components,12production-x/allstyle and13whole-
+phase/runtime/finalIMPL/exactrequiredCI. All mandatory; no READY/final report yet.
+Raw logs/captures remain private. Unknown-owner diagnostic remains untouched.
+
+## Current — Desktop11b3a design review pending, before product code
+
+Read slice11b3a-checkpoint.md. PreviousDocs11b2 terminala9078d68. Same evaluator
+failurestreak0. Controls implement published platform/state/type/accelerator
+fields and actual tray keyboard while preserving legacy callbacks/defaults and
+all published names/values/parts/keys. Shared canonical additions are explicit;
+no per-style base mutation/private-axis exemption/native OS proof. Six audit
+components split into complete11b3a controls and11b3b lifecycle/intents units.
+No product Desktop edits yet. Full12/13 remain mandatory; no READY.
+Earlier notes below historical.
+
+## Current — Docs11b2 terminal/pushed; actual Desktop11b3 design next
+
+Head a9078d68 local/remote verified; sourcefa28a645 and same source/evidence
+reviews PASS, zero blockers/streak0. PR2538 body/comment6555004499 updated.
+Final audit54,363added lines plus both runs has zero forbidden values. Full
+801package/767Chromium/256affectedFFWK/140docs+84focused proof, frozen23/9
+unchanged; committed quality/pub0slow and six carrier commands0/delta0.
+Next actual six-component Desktop audit, from its own seven-item checkpoint
+and same independent design review before code. Published Desktop contracts
+exist on main; preserve base props/enums/parts/keyboard and compatibility
+values, resolve actual-source/API/ARIA mismatches explicitly. Production
+extensions/all-style12 and whole-phase13 remain mandatory. No READY.
+Earlier notes below historical.
+
 ## Current — Docs11b2 evidence PASS; audited publication next
 
 Source fa28a645, same source/evidence PASS, zero blockers/failurestreak0.

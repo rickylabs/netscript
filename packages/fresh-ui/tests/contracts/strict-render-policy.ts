@@ -17,6 +17,8 @@ export const STRICT_NEW_COMPONENTS: readonly string[] = [
   'anchor-nav',
   'ruled-grid',
   'hero',
+  'window-chrome',
+  'tray-menu',
 ];
 
 /** A deliberately reviewed private binding; public axes must always use canonical validation. */
@@ -28,4 +30,17 @@ export interface PrivateDataBinding {
 }
 
 /** Existing private bindings will be classified here in the all-style slice, never inferred. */
-export const privateDataBindings: readonly PrivateDataBinding[] = [];
+export const privateDataBindings: readonly PrivateDataBinding[] = [
+  {
+    component: 'window-chrome',
+    part: 'action',
+    attribute: 'data-desktop-action',
+    purpose: 'Legacy native operation callback payload; never read by CSS.',
+  },
+  {
+    component: 'tray-menu',
+    part: 'action',
+    attribute: 'data-action-id',
+    purpose: 'Caller stable command callback payload; never read by CSS.',
+  },
+];

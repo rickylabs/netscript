@@ -679,3 +679,57 @@ Toc/AnchorNav passive observation covers ordinary document scrolling and nested
 non-body scroll containers. A caller that makes `body` a separate scrolling box
 with fixed html/body height currently receives viewport measurements; that
 composition is not covered by the section-observation guarantees.
+
+
+### Desktop controls and host ownership
+
+`DesktopWindowChrome` renders native buttons and calls `onAction` only when the
+user activates one. Its five operation payloads remain `show`, `hide`, `focus`,
+`reload`, and `close`; reload always uses a reload glyph. `leading` and `title`
+accept caller content. The host supplies optional `platform` and `state`
+snapshots; neither triggers native operations or detects the OS.
+
+| Omitted `actions` | Default DOM / callback order |
+| --- | --- |
+| Omitted platform | reload, hide, close |
+| macos | close, hide, reload |
+| windows | hide, reload, close |
+| linux | hide, reload, close |
+
+Explicit `actions` arrays preserve order, including an empty array. The supplied
+`focused`, `blurred`, `hover`, `unfocused`, or `disabled` state is emitted verbatim.
+`blurred` and `unfocused` share visual treatment. Either `disabled` prop or state
+disables the native buttons; unfocused controls remain usable. Omitted state
+preserves legacy root `active` and action `enabled` markers. Utility chrome is
+40px high and follows its container width, containing long identity content; macOS lights use existing semantic colors and a truthful reload glyph,
+Windows captions are46px wide, and Linux controls are24px square.
+
+`DesktopTrayMenu` takes ordered `items`, `source`, and optional `onAction`. The
+four declaration kinds stay action, role, submenu, separator. `type` is an
+optional root presentation snapshot; it never filters items. `accelerator=false`
+hides shortcut labels without rewriting declarations or executing shortcuts.
+`state` accepts rest/hover/disabled, preserving active/enabled when omitted.
+Disabled actions are native disabled buttons. OS role entries are read-only
+disabled browser previews; expanded submenus form labelled groups. Only an
+explicit enabled action activation emits its ID. Duplicate IDs remain separate
+DOM controls and preserve their callback payloads.
+
+The menu uses initially-open native `details`: **all enabled actions retain the
+native Tab order in SSR and before hydration**, including with JavaScript off.
+Hydrate it inside a caller island to enable arrow-key roving, Escape dismissal
+and focus return, and Tab-to-close after focus actually enters and leaves that
+menu. No focus is taken on mount. Summary Enter/Space toggles natively; hydrated
+ArrowDown/Up opens and focuses first/last enabled action, then wraps through the
+menu. Enter/Space activates exactly once. Escape returns to that menu's summary;
+Tab leaves naturally. Action activation keeps the preview open. A dismissed menu
+stays dismissed through unrelated parent/item updates. No global listeners or
+native bridge effects are installed.
+
+Install the controls with `ui:add desktop-window-chrome` or `ui:add desktop-tray-menu`.
+Each includes its CSS, theme seed and canonical class helper. Canonical Desktop
+contracts and actual source/browser fixtures are shared by all styles. Private
+`data-desktop-action` and `data-action-id` carry callback payloads only; public
+platform/state/source/type/action axes remain contract-checked. These DOM tests
+do not prove native OS effects (#859). The separate Dialog, Notification,
+UpdatePrompt and DesktopOnly audit and the all-style extension harness remain
+required in this phase.

@@ -23,19 +23,29 @@ export default defineConfig({
     timezoneId: 'UTC',
     trace: 'retain-on-failure',
   },
+  // Native tab/window actions use the full Chromium headless implementation.
   projects: [
     ...['light', 'dark'].flatMap((colorScheme) =>
       [390, 1280].map((width) => ({
         name: `${colorScheme}-${width}`,
         grepInvert: /@touch/,
-        use: { colorScheme: colorScheme as 'light' | 'dark', viewport: { width, height: 900 } },
+        use: {
+          channel: 'chromium',
+          colorScheme: colorScheme as 'light' | 'dark',
+          viewport: { width, height: 900 },
+        },
       }))
     ),
     {
       name: 'touch-light-390',
       testMatch: ['**/overlays.spec.ts', '**/display-motion.spec.ts', '**/resizable.spec.ts'],
       grep: /@touch/,
-      use: { hasTouch: true, colorScheme: 'light', viewport: { width: 390, height: 900 } },
+      use: {
+        channel: 'chromium',
+        hasTouch: true,
+        colorScheme: 'light',
+        viewport: { width: 390, height: 900 },
+      },
     },
   ],
   webServer: {

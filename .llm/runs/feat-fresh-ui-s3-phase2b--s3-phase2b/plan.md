@@ -219,3 +219,14 @@ All decisions that affect current implementation are locked above. Exact local
 prop/type details for each native unit are written contract-first in its slice
 checkpoint and independently reviewed; no unresolved choice permits silently
 adding a backend, a second identity or a new dependency.
+
+
+## Desktop audit slicing detail
+
+The existing six-component audit remains required. To keep complete functional
+units within the source budget,11b3a handles window chrome and tray controls;
+11b3b handles dialog, notification, update and conditional rendering. Each has
+its own seven-item checkpoint, same independent design/source/evidence review,
+source/carrier/gate publication and reconcile before the next begins. No scope
+is removed, no base item is silently renamed/deleted, and no new waiver is
+introduced. The owner19promotions remain after Utility canary.

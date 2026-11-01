@@ -3645,7 +3645,8 @@
       "description": "Declarative tray and application-menu preview that emits stable action IDs.",
       "author": "NetScript",
       "registryDependencies": [
-        "theme-seed"
+        "theme-seed",
+        "cn"
       ],
       "type": "registry:component",
       "files": [
@@ -3763,7 +3764,8 @@
       "description": "Accessible title-bar actions limited to documented Deno Desktop window operations.",
       "author": "NetScript",
       "registryDependencies": [
-        "theme-seed"
+        "theme-seed",
+        "cn"
       ],
       "type": "registry:component",
       "files": [

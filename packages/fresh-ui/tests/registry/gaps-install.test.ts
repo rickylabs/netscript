@@ -114,6 +114,8 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
           'anchor-nav',
           'ruled-grid',
           'hero',
+          'desktop-window-chrome',
+          'desktop-tray-menu',
         ].includes(name)
       ) {
         assertEquals(
@@ -179,7 +181,11 @@ import { Toc } from './components/ui/toc.tsx';
 import { AnchorNav } from './components/ui/anchor-nav.tsx';
 import { RuledGrid } from './components/ui/ruled-grid.tsx';
 import { Hero } from './components/ui/hero.tsx';
+import { DesktopWindowChrome } from './components/ui/desktop-window-chrome.tsx';
+import { DesktopTrayMenu } from './components/ui/desktop-tray-menu.tsx';
 console.log(JSON.stringify({
+  'window-chrome': render(<DesktopWindowChrome platform='macos' state='hover' title='Installed window' leading='App' actions={['show','hide','focus','reload','close']} />),
+  'tray-menu': render(<DesktopTrayMenu source='tray' type='submenu' state='hover' items={[{type:'action',id:'open',label:'Open',accelerator:'Ctrl+O'},{type:'separator'},{type:'submenu',label:'Edit',items:[{type:'role',role:'copy'}]}]} />),
   'ruled-grid': render(<RuledGrid columns='4' variant='feature'><RuledGrid.Cell title={<a href='#native'>Native</a>} icon='CLI' eyebrow='CONTRACT' action={<button type='button'>Run</button>}>Boundary</RuledGrid.Cell></RuledGrid>),
   hero: render(<Hero title='Boundary' headingLevel='2' layout='centered' breakpoint='mobile' actions={<button type='button'>Start</button>} aside={<pre>deno task start</pre>} paths={<a href='#owned'>Owned files</a>}>Carry it through the stack.</Hero>),
   toc: render(<Toc breakpoint='mobile' currentId='install' links={<a href='#top'>Back to top</a>}><Toc.Item href='#install' level='3'>Installation</Toc.Item></Toc>),
@@ -214,7 +220,13 @@ console.log(JSON.stringify({
       await run(root, ['run', '--node-modules-dir=auto', 'render-audited.tsx']),
     );
     const renderedNames = [
-      ...AUDITED_BASELINE_COMPONENTS,
+      ...AUDITED_BASELINE_COMPONENTS.map((name) =>
+        name === 'desktop-window-chrome'
+          ? 'window-chrome'
+          : name === 'desktop-tray-menu'
+          ? 'tray-menu'
+          : name
+      ),
       'scroll-area',
       'aspect-ratio',
       'direction',
