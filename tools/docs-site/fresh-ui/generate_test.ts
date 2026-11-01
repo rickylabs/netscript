@@ -19,6 +19,7 @@ const page: ComponentPage = {
 };
 const catalog: ComponentCatalog = {
   inputHash: 'current',
+  componentCssSources: [],
   components: [page],
   presets: [{
     id: 'studio-utility',

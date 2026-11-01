@@ -1,5 +1,94 @@
 import { expect, test } from '@playwright/test';
 import type { ComponentCatalog } from '../../docs-site/fresh-ui/catalog.ts';
+import { readdir, readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { analyzeStylePolicy } from '../../docs-site/style-policy.ts';
+
+const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
+const SITE = resolve(REPO, 'docs/site/_site/assets/fresh-ui');
+
+test(
+  'isolated preview CSS matches canonical registry sources and keeps its authored style policy',
+  async ({ page }, info) => {
+    test.skip(
+      info.project.name !== 'light-1280',
+      'Static asset fidelity and both-scheme token declarations need one complete census.',
+    );
+    const registry: { items: { files?: { path: string }[] }[] } = JSON.parse(
+      await readFile(resolve(REPO, 'packages/fresh-ui/registry.json'), 'utf8'),
+    );
+    const tokens: { presets: Record<string, unknown> } = JSON.parse(
+      await readFile(resolve(REPO, 'packages/fresh-ui/registry/theme/tokens.json'), 'utf8'),
+    );
+    const componentSources = [
+      ...new Set(
+        registry.items.flatMap((item) => item.files ?? []).filter((file) =>
+          file.path.endsWith('.css') && !file.path.includes('/theme/')
+        ).map((file) => file.path),
+      ),
+    ].sort();
+    const expected: Record<string, string[]> = {
+      'components.css': componentSources,
+      'docs.css': ['tools/docs-site/fresh-ui/styles.css'],
+      'preview.css': ['tools/docs-site/fresh-ui/preview.css'],
+    };
+    for (const id of Object.keys(tokens.presets)) {
+      expected['presets/' + id + '.css'] = [
+        'packages/fresh-ui/registry/theme/presets/' + id + '.css',
+      ];
+    }
+    const manifest: { path: string; sources: string[]; sourceSha256: string; sha256: string }[] =
+      JSON.parse(await readFile(resolve(SITE, 'css-manifest.json'), 'utf8'));
+    const files = (await readdir(SITE, { recursive: true })).map((path) =>
+      path.replaceAll('\\', '/')
+    ).filter((path) => path.endsWith('.css')).sort();
+    expect(files).toEqual(Object.keys(expected).sort());
+    expect(manifest.map((asset) => asset.path).sort()).toEqual(files);
+    const hash = (value: string) => createHash('sha256').update(value).digest('hex');
+    for (const asset of manifest) {
+      const sources = expected[asset.path];
+      if (!sources) throw new Error('Unexpected isolated stylesheet: ' + asset.path);
+      expect(asset.sources).toEqual(sources);
+      const source = (await Promise.all(sources.map((path) =>
+        readFile(resolve(REPO, path), 'utf8')
+      ))).join(
+        '\n',
+      );
+      expect(hash(source), asset.path + ' canonical source').toBe(asset.sourceSha256);
+      expect(
+        hash(await readFile(resolve(SITE, asset.path), 'utf8')),
+        asset.path + ' published bytes',
+      ).toBe(asset.sha256);
+    }
+    await page.goto('assets/fresh-ui/preview/?component=button&theme=studio-utility');
+    const layer = {
+      path: 'registry/theme/presets/studio-utility.css',
+      kind: 'css' as const,
+      tokenLayer: true,
+      source: await readFile(
+        resolve(REPO, 'packages/fresh-ui/registry/theme/presets/studio-utility.css'),
+        'utf8',
+      ),
+    };
+    const authored = {
+      path: 'tools/docs-site/fresh-ui/preview.css',
+      kind: 'css' as const,
+      source: await readFile(resolve(REPO, 'tools/docs-site/fresh-ui/preview.css'), 'utf8'),
+    };
+    expect(await page.evaluate(analyzeStylePolicy, [layer, authored])).toEqual([]);
+    for (
+      const [source, kind] of [['.control {color:red}', 'raw-colour'], [
+        '.control {color:var(--ns-destructive)}',
+        'red-outside-state',
+      ]] as const
+    ) {
+      const findings = await page.evaluate(analyzeStylePolicy, [layer, { ...authored, source }]);
+      expect(findings.some((finding) => finding.kind === kind)).toBe(true);
+    }
+  },
+);
 
 for (
   const path of [

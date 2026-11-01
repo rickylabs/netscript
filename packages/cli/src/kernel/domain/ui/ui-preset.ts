@@ -1,15 +1,22 @@
 import { z } from 'zod';
 
+/** Portable setup-time choices encoded by ui:preset and consumed by ui:init/ui:apply. */
+export interface UiPreset {
+  version: 1;
+  theme?: string;
+  style?: string;
+  font?: string;
+  iconLibrary?: string;
+}
+
 /** Versioned preset identifiers remain independent of token source and semantic overrides. */
-export const UiPresetSchema = z.object({
+export const UiPresetSchema: z.ZodType<UiPreset> = z.object({
   version: z.literal(1),
   theme: z.string().min(1).optional(),
   style: z.string().min(1).optional(),
   font: z.string().min(1).optional(),
   iconLibrary: z.string().min(1).optional(),
 }).strict();
-/** Portable setup-time choices encoded by ui:preset and consumed by ui:init/ui:apply. */
-export type UiPreset = z.infer<typeof UiPresetSchema>;
 /** Prefix distinguishes encoded payloads from plain token preset ids. */
 export const UI_PRESET_PREFIX = 'ns1_';
 /** Public builder URL; this helper constructs a link without fetching a site or executing code. */

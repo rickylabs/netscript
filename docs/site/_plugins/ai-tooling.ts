@@ -152,12 +152,23 @@ function markdownTwinUrl(url: string): string {
 function absoluteUrl(href: string, origin: URL): string {
   const trimmed = href.trim();
   if (!trimmed || trimmed.startsWith('#')) return trimmed;
-  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return trimmed; // has a scheme
+  const hasScheme = /^[a-z][a-z0-9+.-]*:/i.test(trimmed);
+  if (hasScheme && !trimmed.startsWith(origin.origin + '/')) return trimmed;
   try {
-    // Component `url` filters already include the project base; preserve it once.
-    if (trimmed.startsWith(origin.pathname)) return new URL(trimmed, origin.origin).href;
+    const base = origin.pathname.replace(/\/$/, '');
+    const prefixed = base !== '' && (trimmed === base || trimmed.startsWith(base + '/'));
     const path = trimmed.startsWith('/') ? trimmed.slice(1) : trimmed;
-    return new URL(path, origin).href;
+    const url = hasScheme
+      ? new URL(trimmed)
+      : prefixed
+      ? new URL(trimmed, origin.origin)
+      : new URL(path, origin);
+    // xref/url rendering and an earlier base_path pass may both have prefixed a link.
+    // Canonicalization stays idempotent for source, built and absolute same-origin URLs.
+    while (base && (url.pathname === base + base || url.pathname.startsWith(base + base + '/'))) {
+      url.pathname = url.pathname.slice(base.length);
+    }
+    return url.href;
   } catch {
     return trimmed;
   }
@@ -239,6 +250,9 @@ function blockMd(node: ChildNode, origin: URL): string {
       const kind = el.getAttribute('data-variant');
       const label = el.querySelector('.ns-callout__label');
       const body = el.querySelector('.ns-callout__body');
+      const content = body
+        ? (hasBlockChild(body) ? childBlocks(body, origin) : inlineChildren(body, origin)).trim()
+        : '';
       // A Markdown alert is written back as authored: `[!TYPE]`, an optional `**title**`
       // paragraph, then the body.
       const marker = el.getAttribute(ALERT_ATTRIBUTE);
@@ -247,13 +261,13 @@ function blockMd(node: ChildNode, origin: URL): string {
         const head = title && title !== CALLOUT_TYPES[calloutType(kind)].label
           ? `[!${marker}]\n**${title}**\n`
           : `[!${marker}]`;
-        return quoteMd(`${head}\n${childBlocks(body, origin)}`);
+        return quoteMd(`${head}\n${content}`);
       }
       if (el.classList.contains('ns-callout') && kind && label && body) {
         return quoteMd(
           `[!${CALLOUT_TYPES[calloutType(kind)].markdown}]\n${
             inlineChildren(label, origin).trim()
-          }\n\n${childBlocks(body, origin)}`,
+          }\n\n${content}`,
         );
       }
       return quoteMd(childBlocks(el, origin));

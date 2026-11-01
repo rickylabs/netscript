@@ -39,6 +39,7 @@ export interface PresetChoice {
 /** Rebuilt on every site build; the freshness gate verifies its complete input digest. */
 export interface ComponentCatalog {
   readonly inputHash: string;
+  readonly componentCssSources: readonly string[];
   readonly components: readonly ComponentPage[];
   readonly presets: readonly PresetChoice[];
 }

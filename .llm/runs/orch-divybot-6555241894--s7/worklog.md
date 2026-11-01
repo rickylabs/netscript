@@ -38,3 +38,9 @@ Reconcile: source baseline remains origin/main 6a1d84a6e04c0d39df3926528e0380e26
 ## Requested main integration
 
 Fetched and normally merged origin/main 0af8fd9e7904ee2c848d0a4213c7853edec3ad21 after owner merge-conflict activity. Preserve both root task additions: docs:components:check and main’s design-skill generation/check tasks. Main contributes 142 changed paths; retained its source and run evidence. In-progress slice 2 is safely stashed for reapplication after this integration commit. Canonical carriers and combined-tree checks follow. No rebase or force push.
+
+## Slice 2 complete
+
+Independent same-reviewer round 1 FAIL_FIX identified ambiguous component vocabulary hijacking framework queries. Removed the bare-verb shortcut and added its three exact negative cases. Round 2 PASS and substantive sign-off; both reviews retained. Component plus all four locked guidance suites: 36 PASS. Full browser/style: 158 passed, 6 census-only skips, no unexpected/flaky cases. Every current root check:* task PASS, including main’s design-skill gate and all four carriers. See slice-2-evidence.md.
+
+Reconcile: c9da6e55de7fbeba8d9afa1c7a5e4930c74190ca merges origin/main 0af8fd9e7904ee2c848d0a4213c7853edec3ad21 normally; in-progress work restored cleanly and carriers regenerated on the combined tree. Backup stash is already restored. No conflicts remain; preserve both root task additions. Push integration and approved slice together normally, then proceed to actual CLI proof and final gates/evaluation.

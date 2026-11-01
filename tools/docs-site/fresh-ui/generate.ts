@@ -1,4 +1,3 @@
-import { walk } from '@std/fs/walk';
 import { dirname, fromFileUrl, join, relative, toFileUrl } from '@std/path';
 import { componentContracts } from '../../../packages/fresh-ui/contracts.ts';
 import { TOKEN_PRESETS } from '../../../packages/fresh-ui/src/tokens/domain/token-presets.ts';
@@ -7,8 +6,8 @@ import { componentExample } from './examples.ts';
 import type { ComponentCatalog, ComponentPage, PresetChoice } from './catalog.ts';
 import { implementationProps, record, typeText } from './read-props.ts';
 
-export const ROOT = fromFileUrl(new URL('../../../', import.meta.url));
-export const OUTPUT = join(ROOT, '.llm/tmp/fresh-ui-docs');
+export const ROOT: string = fromFileUrl(new URL('../../../', import.meta.url));
+export const OUTPUT: string = join(ROOT, '.llm/tmp/fresh-ui-docs');
 const REGISTRY = 'packages/fresh-ui/registry';
 
 export interface RegistryItem {
@@ -31,13 +30,17 @@ export function documentedItems(items: readonly RegistryItem[]): RegistryItem[] 
 /** Hash the entire declared input surface, so a stale build cannot certify changed sources. */
 export async function inputHash(): Promise<string> {
   const paths: string[] = [
+    'deno.json',
+    'docs/site/deno.json',
+    'docs/site/design-system/components.page.ts',
+    'docs/site/_plugins/escape-html.ts',
     'packages/fresh-ui/registry.json',
     'packages/fresh-ui/src/tokens/domain/token-presets.ts',
     'packages/cli/src/kernel/domain/ui/ui-preset.ts',
   ];
   for (const root of [REGISTRY, 'packages/fresh-ui/src/contracts', 'tools/docs-site/fresh-ui']) {
-    for await (const file of walk(join(ROOT, root), { includeDirs: false })) {
-      paths.push(relative(ROOT, file.path).replaceAll('\\', '/'));
+    for await (const file of sourceFiles(join(ROOT, root))) {
+      paths.push(relative(ROOT, file).replaceAll('\\', '/'));
     }
   }
   const content = await Promise.all(
@@ -65,12 +68,21 @@ function exportName(item: RegistryItem, source: string): string {
     item.name.split('-').map((part) => part[0].toUpperCase() + part.slice(1)).join('');
 }
 
+/** Enumerate build inputs with the platform filesystem API; no new workspace dependency. */
+async function* sourceFiles(root: string): AsyncGenerator<string> {
+  for await (const entry of Deno.readDir(root)) {
+    const path = join(root, entry.name);
+    if (entry.isDirectory) yield* sourceFiles(path);
+    else if (entry.isFile) yield path;
+  }
+}
+
 async function prepareSources(items: readonly RegistryItem[]): Promise<string> {
-  for await (const file of walk(join(ROOT, REGISTRY), { includeDirs: false })) {
-    const target = join(OUTPUT, 'source', relative(join(ROOT, REGISTRY), file.path))
+  for await (const file of sourceFiles(join(ROOT, REGISTRY))) {
+    const target = join(OUTPUT, 'source', relative(join(ROOT, REGISTRY), file))
       .replace(/\.template$/, '');
     await Deno.mkdir(dirname(target), { recursive: true });
-    await Deno.copyFile(file.path, target);
+    await Deno.copyFile(file, target);
   }
   const root = JSON.parse(await Deno.readTextFile(join(ROOT, 'deno.json')));
   const site = JSON.parse(await Deno.readTextFile(join(ROOT, 'docs/site/deno.json')));
@@ -98,9 +110,10 @@ async function prepareSources(items: readonly RegistryItem[]): Promise<string> {
   }
   // Import-map package keys need explicit subpaths for copied consumer sources.
   for await (
-    const file of walk(join(OUTPUT, 'source'), { includeDirs: false, exts: ['.ts', '.tsx'] })
+    const file of sourceFiles(join(OUTPUT, 'source'))
   ) {
-    const source = await Deno.readTextFile(file.path);
+    if (!/\.tsx?$/.test(file)) continue;
+    const source = await Deno.readTextFile(file);
     for (const match of source.matchAll(/from\s+['"]([^.'"][^'"]*)['"]/g)) {
       if (imports[match[1]]) continue;
       const base = Object.keys(imports).filter((key) => match[1].startsWith(`${key}/`))
@@ -237,7 +250,17 @@ export async function generate(): Promise<ComponentCatalog> {
       cssTokens: [...new Set([...css.matchAll(/var\((--ns-[\w-]+)/g)].map((m) => m[1]))].sort(),
     });
   }
-  const catalog = { inputHash: await inputHash(), components, presets: await presetChoices() };
+  const cssPaths = new Set(items.flatMap((item) =>
+    (item.files ?? [])
+      .filter((file) => file.path.endsWith('.css') && !file.path.includes('/theme/'))
+      .map((file) => file.path)
+  ));
+  const catalog = {
+    inputHash: await inputHash(),
+    componentCssSources: [...cssPaths].sort(),
+    components,
+    presets: await presetChoices(),
+  };
   await Deno.writeTextFile(join(OUTPUT, 'catalog.json'), JSON.stringify(catalog));
   const exampleModule = `${imports.join('\n')}\nimport { useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
@@ -295,11 +318,6 @@ import { examples } from './examples.tsx'; start(examples);`;
     join(OUTPUT, 'builder.js'),
     fromFileUrl(new URL('./builder.ts', import.meta.url)),
   ]);
-  const cssPaths = new Set(items.flatMap((item) =>
-    (item.files ?? [])
-      .filter((file) => file.path.endsWith('.css') && !file.path.includes('/theme/'))
-      .map((file) => file.path)
-  ));
   await Deno.writeTextFile(
     join(OUTPUT, 'components.css'),
     (await Promise.all([...cssPaths].sort().map((path) => Deno.readTextFile(join(ROOT, path)))))
