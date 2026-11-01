@@ -11,7 +11,7 @@ export const CALLOUT_TYPES = {
   warning: { label: 'Warning', tone: 'warning', icon: 'triangle-alert', markdown: 'WARNING' },
   caution: { label: 'Caution', tone: 'destructive', icon: 'octagon-alert', markdown: 'CAUTION' },
   danger: { label: 'Danger', tone: 'destructive', icon: 'octagon-alert', markdown: 'CAUTION' },
-  error: { label: 'Error', tone: 'destructive', icon: 'circle-x', markdown: 'ERROR' },
+  error: { label: 'Error', tone: 'destructive', icon: 'circle-x', markdown: 'CAUTION' },
 } as const;
 
 export type CalloutType = keyof typeof CALLOUT_TYPES;

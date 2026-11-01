@@ -193,6 +193,31 @@ const ALERTS: ReadonlyArray<[string, CalloutType]> = [
   ['ERROR', 'error'],
 ];
 
+Deno.test('legacy destructive aliases export CAUTION through both authoring paths', async () => {
+  for (const kind of ['danger', 'error']) {
+    for (const title of [undefined, 'Before deleting data']) {
+      const marker = kind.toUpperCase();
+      const heading = title ? `> **${title}**\n>\n` : '';
+      const alert = site().render(`> [!${marker}]\n${heading}> Retain a backup.\n`);
+      const component = await renderComponent('callout', {
+        type: kind,
+        title,
+        content: '<p>Retain a backup.</p>',
+      });
+      for (const html of [alert, component]) {
+        const callout = article(html).querySelector('aside.ns-callout')!;
+        strictEqual(callout.getAttribute('data-variant'), kind);
+        strictEqual(callout.getAttribute('data-tone'), 'destructive');
+        const markdown = twin(html);
+        ok(markdown.startsWith('> [!CAUTION]\n'), markdown);
+        ok(!markdown.includes(`[!${marker}]`), markdown);
+        ok(markdown.includes('Retain a backup.'), markdown);
+        if (title) ok(markdown.includes(title), markdown);
+      }
+    }
+  }
+});
+
 Deno.test('each alert type renders the callout markup', () => {
   for (const [marker, kind] of ALERTS) {
     const warnings: string[] = [];
@@ -364,7 +389,7 @@ Deno.test('ordinary blockquotes are untouched and do not warn', () => {
   strictEqual(warnings.length, 0);
 });
 
-Deno.test('the Markdown twin writes alerts back as authored', () => {
+Deno.test('the Markdown twin preserves content while normalizing legacy alert markers', () => {
   const source = [
     '> [!NOTE]',
     '> Read `deno.json` first.',
@@ -376,7 +401,7 @@ Deno.test('the Markdown twin writes alerts back as authored', () => {
     '>',
     '> - back up first',
   ].join('\n');
-  strictEqual(twin(site().render(`${source}\n`)), `${source}\n`);
+  strictEqual(twin(site().render(`${source}\n`)), `${source.replace('[!DANGER]', '[!CAUTION]')}\n`);
 });
 
 Deno.test('actual Vento xrefs and already-prefixed URLs keep exactly one deployment base in twins', async () => {
