@@ -31,3 +31,27 @@ unresolved architecture decisions. Mandatory independent IMPL-EVAL remains selec
   automatic issue closure, workflow/label changes, and any real `--apply` invocation.
 
 Contributor entrypoint: `.llm/tools/validation/mirror-acceptance-evidence.ts`.
+
+## Coordinator repair round (review at 83f0b63)
+
+PLAN-EVAL: N/A; coordinator fixed the repair contract. Implement one scoped repair
+slice S3 after red tests for every finding, then independently re-evaluate with the
+same read-only Opus lane.
+
+- Add a post-merge policy module defining repository identity and issue-reference
+  checks, leaving shared parser and existing CI semantics unchanged.
+- Require an explicit target repository, canonical PR base/URL and issue metadata
+  consistent with it. Require an issue reference from PR body or paginated commit
+  messages; comments alone do not establish association. Support Refs, Closes and
+  Part of with local, qualified and GitHub-URL references. Name missing-reference
+  and cross-repository failures. Inspect selected evidence ownership before SHA checks.
+- Paginate issue provenance comments in the new mode. Retry comment posting at most
+  twice, checking for an existing marker before each attempt. A final failure must
+  retain the updated issue/snapshot and explicitly report partial success.
+- Preserve legacy CI comment/read/write/failure behavior and dry-run default for
+  post-merge mode. Existing CI tests remain mandatory.
+- Gates: repair controls red against current head, full focused suite green, structured
+  source check/lint/fmt, relevant policy checks, read-only live dry-runs, independent
+  Opus review, required CI green or workflow-skipped, final READY file handoff.
+- Files: original mirror and test, new policy module, and this run's artifacts. No
+  parser grammar change, real apply, labels, rebases, force pushes, or merges of PR.

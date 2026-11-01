@@ -79,3 +79,71 @@ the specified acceptance contract and remain deferred.
 - No runtime resources were started; ownership ambiguity/leak cleanup does not apply.
 - Remaining delivery is GitHub metadata only: push normally, mark ready, inspect the
   current required checks, then queue the final READY report for Cockpit. No merge.
+
+## Repair S3 design checkpoint
+
+Coordinator requested repairs for exact-head review comment
+https://github.com/rickylabs/netscript/pull/2564#issuecomment-6556142159.
+
+1. Public surface: named refusal for absent body/commit association and mismatched
+   repository; explicit partial-state reporting after a successful checkbox PATCH.
+2. Vocabulary: canonical repository, associated issue reference, provenance marker,
+   confirmed comment, partial write.
+3. Ports: MirrorClient adds paginated PR commit messages; repo metadata comes from
+   normal issue/PR REST responses; comments retain the existing pagination flag.
+4. Constants: named policy errors and bounded provenance attempts.
+5. Commit slice S3: three validation files and run artifacts; red controls, focused
+   tests, scoped wrappers, policy checks, independent review and CI prove the repair.
+6. Deferred: shared parser grammar redesign and real issue/evidence mutations.
+7. Contributor entry: mirror-acceptance-evidence.ts routes to the post-merge policy.
+
+PLAN-EVAL N/A: fixed owner/coordinator contract, no unresolved architecture choices.
+Owner/coordinator authorizes: “IMPL-EVAL with Opus read-only, then READY on #2562 with
+the head once CI is green or policy-skipped.” Keep the same evaluation session.
+Previous READY/evaluation at 83f0b63 is superseded until this repair is verified.
+
+## S3 implementation and local gates
+
+- Reproduced all repair findings before edits: 11 red controls failed, 2 positive
+  controls passed. Full red details are retained privately.
+- Added a separate red pagination control at commit 251; corrected the adapter to
+  cursor-paginate the PR's own GraphQL commit connection.
+- Current focused wrapper: 68 passed, 0 failed, exit 0. Source check/lint/fmt each
+  cover three files and pass. Policy checks and release preflight pass.
+- Re-ran all three live dry-runs without apply; same safe data refusals. Exact output
+  is in repair-real-data-dry-runs.md. Live GraphQL adapter read three commits from
+  merged PR #2558, confirming the production read query works.
+- Provenance failures retry after checking all comment pages; exhaustion preserves
+  the confirmed PATCH/snapshot and returns post-merge-provenance-incomplete.
+- Fresh issue ownership is checked again immediately before PATCH. Fork head repos
+  are permitted because PR ownership comes from the base repository.
+- Independent Opus repair evaluation pending; PR is draft to supersede old READY.
+
+## S3 independent review and bounded follow-ups
+
+- Same-session Opus repair review: PASS for all three coordinator requirements,
+  independently ran 68 tests.
+- Widened named evidence ownership checks to Actions/blob/compare/root GitHub URLs.
+  Existing foreign-link control failed before the change, then passed. Same-session
+  follow-up PASS independently verified the delta.
+- Added red controls for root URLs followed by text/Markdown delimiters and for
+  non-repository GitHub upload/org/advisory routes; corrected boundary recognition
+  and excluded those site routes from ownership inference. Final focused suite:
+  69 passed. Scoped check/lint/fmt remain green for three files.
+- Final same-session read-only Opus verdict pending. No source changes after that
+  final review will be committed without renewed evaluation.
+
+## S3 final sign-off and reconciliation
+
+- Final same-session Opus verdict: PASS. Independently ran 69 tests; source check
+  and format independently clean. Final reviewed hashes are in repair-evaluate.md.
+- All scoped wrapper gates pass on those files. The source will be committed unchanged.
+- Repeated the three live dry-runs on the final reviewed source; same safe refusals
+  with zero writes, recorded in repair-real-data-dry-runs.md.
+- origin/main advanced on unrelated source; no validation-tool commits overlap the
+  repair and GitHub reports the PR mergeable. No conflict integration is needed.
+- Declared scope matches the delta; no locks, shared parser, workflow or generated
+  source changed. Public run paths are repository-relative. No runtime resources
+  were started. No architectural debt introduced.
+- Remaining delivery: normal commit/push, mark ready, verify fresh-head required
+  checks, then canonical READY report-file handoff. Cockpit owns merge.

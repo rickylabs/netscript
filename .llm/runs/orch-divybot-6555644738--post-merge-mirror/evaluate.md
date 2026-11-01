@@ -35,3 +35,9 @@ The change is limited to SHA-citation detection, it works as you described, and 
 With 4-character tokens allowed after a label, ordinary words made only of a–f letters can now be read as SHAs. For example, "commit added" would be checked as the SHA `added`. The lookup would fail and the run would refuse, so the risk is an unnecessary refusal, never a wrong tick.
 
 **Verdict: PASS**
+
+## Coordinator repair supersession
+
+The original result above applies to 83f0b63. The coordinator added association,
+repository and provenance-delivery requirements after that review. The active
+repair verdict and new source hashes are in `repair-evaluate.md`.

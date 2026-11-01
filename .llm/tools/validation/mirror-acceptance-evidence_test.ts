@@ -1,5 +1,6 @@
-import { assertEquals, assertStringIncludes, assertThrows } from 'jsr:@std/assert@1';
+import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from 'jsr:@std/assert@1';
 import type { AcceptanceEvidence } from './acceptance-evidence.ts';
+import { validateEvidenceRepositories } from './post-merge-acceptance-policy.ts';
 import {
   closingMirrorIssues,
   formatMirrorReport,
@@ -48,6 +49,7 @@ Deno.test('mirror retries once from a live body after a mid-air edit', async () 
     getIssue: (number) =>
       Promise.resolve({ number, title: 'race', body, updated_at: updatedAt, labels: [] }),
     getPullRequest: () => Promise.reject(new Error('unused')),
+    getPullRequestCommits: () => Promise.reject(new Error('unused in CI')),
     isCommitOnMain: () => Promise.reject(new Error('unused in CI')),
     getComments: () => Promise.resolve([]),
     updateIssue: (_number, nextBody) => {
@@ -100,6 +102,7 @@ function dryRunClient(prBody: string, issueBody: string): MirrorClient & { updat
         pull_request: {},
       }),
     getComments: () => Promise.resolve([]),
+    getPullRequestCommits: () => Promise.reject(new Error('unused in CI')),
     isCommitOnMain: () => Promise.reject(new Error('unused in CI')),
     updateIssue: () => {
       client.updates++;
@@ -190,6 +193,7 @@ entries:
   assertEquals(client.updates, 0);
 });
 
+const TARGET_REPO = 'owner/repo';
 const TARGET_ISSUE = 2524;
 const SOURCE_PR = 2558;
 const MERGED_SHA = '6a6a82e15';
@@ -218,11 +222,14 @@ function postMergeClient() {
     labels: [] as string[],
     head: { sha: SQUASHED_HEAD },
     merged: true,
+    html_url: 'https://github.com/owner/repo/pull/2558',
+    base: { repo: { full_name: TARGET_REPO } },
   };
   const comments = [{
     html_url: 'https://github.com/owner/repo/pull/2558#issuecomment-1',
     body: evidenceBlock(TARGET_ISSUE, CHECKBOX_TEXT, `Merged as ${MERGED_SHA}; CI run 41287999781`),
   }];
+  const commits = [{ commit: { message: 'unrelated implementation change' } }];
   const updates: Array<{ number: number; body: string }> = [];
   const posts: Array<{ number: number; body: string }> = [];
   const checkedShas: string[] = [];
@@ -233,11 +240,14 @@ function postMergeClient() {
       return Promise.resolve({
         number,
         title: 'acceptance target',
+        repository_url: 'https://api.github.com/repos/owner/repo',
+        html_url: 'https://github.com/owner/repo/issues/2524',
         body,
         updated_at: '2026-11-01T10:01:00Z',
       });
     },
     getPullRequest: () => Promise.resolve(pr),
+    getPullRequestCommits: () => Promise.resolve(commits),
     getComments: (number: number) =>
       Promise.resolve(
         number === SOURCE_PR ? comments : posts.map(
@@ -258,7 +268,7 @@ function postMergeClient() {
       return Promise.resolve();
     },
   };
-  return { client, pr, comments, updates, posts, checkedShas, fetchedIssues };
+  return { client, pr, comments, commits, updates, posts, checkedShas, fetchedIssues };
 }
 
 Deno.test('post-merge CLI defaults to dry-run and requires explicit apply', () => {
@@ -276,6 +286,7 @@ Deno.test('post-merge CLI defaults to dry-run and requires explicit apply', () =
 Deno.test('post-merge reads comment evidence for a Refs-only unlabeled PR without writing by default', async () => {
   const fixture = postMergeClient();
   const report = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     issue: TARGET_ISSUE,
   });
@@ -292,6 +303,7 @@ Deno.test('post-merge selects body evidence and ignores another issue in comment
   fixture.pr.body += '\n' + evidenceBlock(TARGET_ISSUE, CHECKBOX_TEXT, `Commit ${MERGED_SHA}`);
   fixture.comments[0].body = evidenceBlock(9999, 'unrelated box', `Commit ${SQUASHED_HEAD}`);
   const report = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     issue: TARGET_ISSUE,
   });
@@ -305,6 +317,7 @@ Deno.test('post-merge refuses an unmerged PR even with apply and matching eviden
   const fixture = postMergeClient();
   fixture.pr.merged = false;
   const report = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     issue: TARGET_ISSUE,
     apply: true,
@@ -323,6 +336,7 @@ Deno.test('post-merge refuses every unreachable citation including a squash head
     `Merged as ${MERGED_SHA} from head ${SQUASHED_HEAD}`,
   );
   const report = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     issue: TARGET_ISSUE,
     apply: true,
@@ -342,6 +356,7 @@ Deno.test('post-merge rejects a box text mismatch through the shared mapping val
     `Commit ${MERGED_SHA}`,
   );
   const report = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     issue: TARGET_ISSUE,
     apply: true,
@@ -354,7 +369,7 @@ Deno.test('post-merge rejects a box text mismatch through the shared mapping val
 
 Deno.test('post-merge apply uses existing checkbox and provenance format and is idempotent', async () => {
   const fixture = postMergeClient();
-  const options = { pr: SOURCE_PR, issue: TARGET_ISSUE, apply: true };
+  const options = { repo: TARGET_REPO, pr: SOURCE_PR, issue: TARGET_ISSUE, apply: true };
   const report = await runAcceptanceEvidenceMirror(fixture.client, options);
   assertEquals(report.ok, true);
   assertEquals(report.dryRun, false);
@@ -389,6 +404,7 @@ Deno.test('CI mode still requires the live label and closing references and writ
   fixture.comments[0].body = evidenceBlock(TARGET_ISSUE, CHECKBOX_TEXT, `Head ${SQUASHED_HEAD}`);
   fixture.pr.body = `Closes #${TARGET_ISSUE}`;
   const skipped = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     dryRun: false,
   });
@@ -402,6 +418,7 @@ Deno.test('CI mode still requires the live label and closing references and writ
   fixture.pr.labels.push('status:ready-merge');
   fixture.pr.body = `Refs #${TARGET_ISSUE}`;
   const refsOnly = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     dryRun: false,
   });
@@ -409,6 +426,7 @@ Deno.test('CI mode still requires the live label and closing references and writ
   assertEquals(fixture.updates, []);
   fixture.pr.body = `Closes #${TARGET_ISSUE}`;
   const applied = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     dryRun: false,
   });
@@ -460,6 +478,7 @@ Deno.test('post-merge combines selected body and comment entries', async () => {
   };
   fixture.pr.body += '\n' + evidenceBlock(TARGET_ISSUE, secondText, `Commit ${MERGED_SHA}`);
   const report = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     issue: TARGET_ISSUE,
   });
@@ -472,6 +491,7 @@ Deno.test('post-merge combines selected body and comment entries', async () => {
 Deno.test('post-merge dryRun false alone cannot opt into writes', async () => {
   const fixture = postMergeClient();
   const report = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     issue: TARGET_ISSUE,
     dryRun: false,
@@ -486,6 +506,7 @@ Deno.test('post-merge rejects missing selected structured evidence even for chec
   const fixture = postMergeClient();
   fixture.comments[0].body = evidenceBlock(9999, 'other issue', `Commit ${MERGED_SHA}`);
   const report = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     issue: TARGET_ISSUE,
     apply: true,
@@ -505,6 +526,7 @@ Deno.test('post-merge validates citations for already checked boxes', async () =
   };
   fixture.comments[0].body = evidenceBlock(TARGET_ISSUE, CHECKBOX_TEXT, `Commit ${SQUASHED_HEAD}`);
   const report = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     issue: TARGET_ISSUE,
     apply: true,
@@ -529,6 +551,7 @@ Deno.test('post-merge commit citations include URLs, full hashes and numeric lab
     ].join(' '),
   );
   const report = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     issue: TARGET_ISSUE,
     apply: true,
@@ -552,6 +575,7 @@ Deno.test('post-merge fails closed when ancestry lookup is unavailable', async (
   const fixture = postMergeClient();
   fixture.client.isCommitOnMain = () => Promise.reject(new Error('GitHub API 404'));
   const report = await runAcceptanceEvidenceMirror(fixture.client, {
+    repo: TARGET_REPO,
     pr: SOURCE_PR,
     issue: TARGET_ISSUE,
     apply: true,
@@ -563,4 +587,389 @@ Deno.test('post-merge fails closed when ancestry lookup is unavailable', async (
   );
   assertEquals(fixture.updates, []);
   assertEquals(fixture.posts, []);
+});
+
+Deno.test('repair: refuses unrelated merged PR even when a comment supplies matching evidence', async () => {
+  const f = postMergeClient();
+  f.pr.body = 'Unrelated merged change';
+  const report = await runAcceptanceEvidenceMirror(f.client, {
+    repo: TARGET_REPO,
+    pr: SOURCE_PR,
+    issue: TARGET_ISSUE,
+    apply: true,
+  });
+  assertEquals(report.ok, false);
+  assertStringIncludes(report.errors.join('\n'), 'post-merge-issue-not-referenced');
+  assertEquals(report.changed, []);
+  assertEquals(f.updates, []);
+  assertEquals(f.posts, []);
+});
+
+Deno.test('repair: accepts Refs, Closes and Part of in the PR body', async () => {
+  for (
+    const reference of [
+      'Refs #2524',
+      'Closes owner/repo#2524',
+      'Part of https://github.com/owner/repo/issues/2524',
+    ]
+  ) {
+    const f = postMergeClient();
+    f.pr.body = reference;
+    const report = await runAcceptanceEvidenceMirror(f.client, {
+      repo: TARGET_REPO,
+      pr: SOURCE_PR,
+      issue: TARGET_ISSUE,
+    });
+    assertEquals(report.ok, true, reference);
+    assertEquals(report.dryRun, true);
+    assertEquals(f.updates, []);
+    assertEquals(f.posts, []);
+  }
+});
+
+Deno.test('repair: a commit reference associates a PR whose body has no reference', async () => {
+  const f = postMergeClient();
+  f.pr.body = 'Implementation summary';
+  f.commits[0].commit.message = 'Implement change\n\nRefs #2524';
+  const report = await runAcceptanceEvidenceMirror(f.client, {
+    repo: TARGET_REPO,
+    pr: SOURCE_PR,
+    issue: TARGET_ISSUE,
+  });
+  assertEquals(report.ok, true);
+  assertEquals(report.changed, [TARGET_ISSUE]);
+  assertEquals(f.updates, []);
+});
+
+Deno.test('repair: another issue number and a reference inside evidence do not associate the PR', async () => {
+  const f = postMergeClient();
+  f.pr.body = 'Refs #25240\n' +
+    evidenceBlock(TARGET_ISSUE, CHECKBOX_TEXT, `Refs #2524, merged as ${MERGED_SHA}`);
+  f.comments.length = 0;
+  const report = await runAcceptanceEvidenceMirror(f.client, {
+    repo: TARGET_REPO,
+    pr: SOURCE_PR,
+    issue: TARGET_ISSUE,
+    apply: true,
+  });
+  assertEquals(report.ok, false);
+  assertStringIncludes(report.errors.join('\n'), 'post-merge-issue-not-referenced');
+  assertEquals(f.updates, []);
+  assertEquals(f.posts, []);
+});
+
+Deno.test('repair: qualified foreign body or commit references get a named repository refusal', async () => {
+  for (const source of ['body', 'commit']) {
+    const f = postMergeClient();
+    f.pr.body = source === 'body' ? 'Refs other/repo#2524' : 'Summary';
+    if (source === 'commit') {
+      f.commits[0].commit.message = 'Part of https://github.com/other/repo/issues/2524';
+    }
+    const report = await runAcceptanceEvidenceMirror(f.client, {
+      repo: TARGET_REPO,
+      pr: SOURCE_PR,
+      issue: TARGET_ISSUE,
+      apply: true,
+    });
+    assertEquals(report.ok, false, source);
+    assertStringIncludes(report.errors.join('\n'), 'post-merge-repository-mismatch');
+    assertEquals(f.updates, []);
+    assertEquals(f.posts, []);
+  }
+});
+
+Deno.test('repair: PR base repository must match --repo', async () => {
+  const f = postMergeClient();
+  f.pr.base.repo.full_name = 'other/repo';
+  const report = await runAcceptanceEvidenceMirror(f.client, {
+    repo: TARGET_REPO,
+    pr: SOURCE_PR,
+    issue: TARGET_ISSUE,
+    apply: true,
+  });
+  assertEquals(report.ok, false);
+  assertStringIncludes(report.errors.join('\n'), 'post-merge-repository-mismatch');
+  assertEquals(f.updates, []);
+  assertEquals(f.posts, []);
+});
+
+Deno.test('repair: issue repository must match --repo', async () => {
+  const f = postMergeClient();
+  const getIssue = f.client.getIssue;
+  f.client.getIssue = async (number) => ({
+    ...await getIssue(number),
+    repository_url: 'https://api.github.com/repos/other/repo',
+  });
+  const report = await runAcceptanceEvidenceMirror(f.client, {
+    repo: TARGET_REPO,
+    pr: SOURCE_PR,
+    issue: TARGET_ISSUE,
+    apply: true,
+  });
+  assertEquals(report.ok, false);
+  assertStringIncludes(report.errors.join('\n'), 'post-merge-repository-mismatch');
+  assertEquals(f.updates, []);
+  assertEquals(f.posts, []);
+});
+
+Deno.test('repair: foreign evidence repository metadata or qualified issue is refused by name', async () => {
+  for (const identity of ['issue: other/repo#2524', 'repo: other/repo\nissue: 2524']) {
+    const f = postMergeClient();
+    f.comments[0].body = evidenceBlock(TARGET_ISSUE, CHECKBOX_TEXT, `Commit ${MERGED_SHA}`).replace(
+      'issue: 2524',
+      identity,
+    );
+    const report = await runAcceptanceEvidenceMirror(f.client, {
+      repo: TARGET_REPO,
+      pr: SOURCE_PR,
+      issue: TARGET_ISSUE,
+      apply: true,
+    });
+    assertEquals(report.ok, false);
+    assertStringIncludes(report.errors.join('\n'), 'post-merge-repository-mismatch');
+    assertEquals(f.updates, []);
+    assertEquals(f.posts, []);
+  }
+});
+
+Deno.test('repair: selected evidence citing a foreign repository gets a named refusal', async () => {
+  const f = postMergeClient();
+  f.comments[0].body = evidenceBlock(
+    TARGET_ISSUE,
+    CHECKBOX_TEXT,
+    `https://github.com/other/repo/commit/${MERGED_SHA}`,
+  );
+  const report = await runAcceptanceEvidenceMirror(f.client, {
+    repo: TARGET_REPO,
+    pr: SOURCE_PR,
+    issue: TARGET_ISSUE,
+    apply: true,
+  });
+  assertEquals(report.ok, false);
+  assertStringIncludes(report.errors.join('\n'), 'post-merge-repository-mismatch');
+  assertEquals(f.checkedShas, []);
+  assertEquals(f.updates, []);
+  assertEquals(f.posts, []);
+});
+
+Deno.test('repair: provenance lookup paginates issue comments before posting', async () => {
+  const f = postMergeClient();
+  const getComments = f.client.getComments;
+  f.client.getComments = (number, allPages = false) =>
+    number === SOURCE_PR ? getComments(number) : Promise.resolve(
+      allPages
+        ? [{ html_url: '', body: '<!-- acceptance-evidence-mirror:pr=2558;issue=2524 -->' }]
+        : [],
+    );
+  const report = await runAcceptanceEvidenceMirror(f.client, {
+    repo: TARGET_REPO,
+    pr: SOURCE_PR,
+    issue: TARGET_ISSUE,
+    apply: true,
+  });
+  assertEquals(report.ok, true);
+  assertEquals(f.updates.length, 1);
+  assertEquals(f.posts, []);
+});
+
+Deno.test('repair: retries a failed provenance POST after one successful checkbox PATCH', async () => {
+  const f = postMergeClient();
+  const post = f.client.postComment;
+  let attempts = 0;
+  f.client.postComment = (number, body) =>
+    ++attempts === 1 ? Promise.reject(new Error('temporary comment failure')) : post(number, body);
+  const report = await runAcceptanceEvidenceMirror(f.client, {
+    repo: TARGET_REPO,
+    pr: SOURCE_PR,
+    issue: TARGET_ISSUE,
+    apply: true,
+  });
+  assertEquals(report.ok, true);
+  assertEquals(attempts, 2);
+  assertEquals(f.updates.length, 1);
+  assertEquals(f.posts.length, 1);
+});
+
+Deno.test('repair: checks for a delivered marker before retrying an ambiguous POST', async () => {
+  const f = postMergeClient();
+  const post = f.client.postComment;
+  let attempts = 0;
+  f.client.postComment = async (number, body) => {
+    attempts++;
+    await post(number, body);
+    throw new Error('connection lost after delivery');
+  };
+  const report = await runAcceptanceEvidenceMirror(f.client, {
+    repo: TARGET_REPO,
+    pr: SOURCE_PR,
+    issue: TARGET_ISSUE,
+    apply: true,
+  });
+  assertEquals(report.ok, true);
+  assertEquals(attempts, 1);
+  assertEquals(f.updates.length, 1);
+  assertEquals(f.posts.length, 1);
+});
+
+Deno.test('repair: exhausted provenance POST reports the successful PATCH as partial state', async () => {
+  const f = postMergeClient();
+  let attempts = 0;
+  f.client.postComment = () => {
+    attempts++;
+    return Promise.reject(new Error('comment service unavailable'));
+  };
+  const report = await runAcceptanceEvidenceMirror(f.client, {
+    repo: TARGET_REPO,
+    pr: SOURCE_PR,
+    issue: TARGET_ISSUE,
+    apply: true,
+  });
+  assertEquals(report.ok, false);
+  assertEquals(attempts, 2);
+  assertEquals(report.changed, [TARGET_ISSUE]);
+  assertEquals(report.issues.length, 1);
+  assertStringIncludes(report.errors.join('\n'), 'post-merge-provenance-incomplete');
+  assertStringIncludes(report.errors.join('\n'), 'checkboxes were updated');
+  assertStringIncludes(formatMirrorReport(report), 'partial:');
+  assertEquals(f.updates.length, 1);
+  assertEquals(f.posts, []);
+});
+
+Deno.test('repair: qualified foreign evidence citations are refused before SHA lookup', async () => {
+  for (
+    const proof of [
+      'other/repo#2524',
+      'https://github.com/other/repo/actions/runs/12345678',
+      `https://github.com/other/repo/blob/${MERGED_SHA}/proof.md`,
+      `https://github.com/other/repo/compare/${MERGED_SHA}...main`,
+      'https://github.com/other/repo',
+      'Verified https://github.com/other/repo on main',
+      '[proof](https://github.com/other/repo)',
+      `other/repo@${MERGED_SHA}`,
+      `https://api.github.com/repos/other/repo/commits/${MERGED_SHA}`,
+    ]
+  ) {
+    const f = postMergeClient();
+    f.comments[0].body = evidenceBlock(TARGET_ISSUE, CHECKBOX_TEXT, proof);
+    const report = await runAcceptanceEvidenceMirror(f.client, {
+      repo: TARGET_REPO,
+      pr: SOURCE_PR,
+      issue: TARGET_ISSUE,
+      apply: true,
+    });
+    assertEquals(report.ok, false);
+    assertStringIncludes(report.errors.join('\n'), 'post-merge-repository-mismatch');
+    assertEquals(f.checkedShas, []);
+    assertEquals(f.updates, []);
+    assertEquals(f.posts, []);
+  }
+});
+
+Deno.test('repair: fresh issue ownership is revalidated immediately before PATCH', async () => {
+  const f = postMergeClient();
+  const getIssue = f.client.getIssue;
+  let reads = 0;
+  f.client.getIssue = async (number) => ({
+    ...await getIssue(number),
+    repository_url: ++reads === 1
+      ? 'https://api.github.com/repos/owner/repo'
+      : 'https://api.github.com/repos/other/repo',
+  });
+  const report = await runAcceptanceEvidenceMirror(f.client, {
+    repo: TARGET_REPO,
+    pr: SOURCE_PR,
+    issue: TARGET_ISSUE,
+    apply: true,
+  });
+  assertEquals(report.ok, false);
+  assertStringIncludes(report.errors.join('\n'), 'post-merge-repository-mismatch');
+  assertEquals(f.updates, []);
+  assertEquals(f.posts, []);
+});
+
+Deno.test('repair: CI keeps its original behavior without post-merge identity or retry policy', async () => {
+  const f = postMergeClient();
+  f.pr.labels.push('status:ready-merge');
+  f.pr.body = 'Closes #2524';
+  f.pr.base.repo.full_name = 'other/repo';
+  let attempts = 0;
+  f.client.getPullRequestCommits = () => Promise.reject(new Error('CI must not inspect commits'));
+  f.client.postComment = () => {
+    attempts++;
+    return Promise.reject(new Error('original CI comment failure'));
+  };
+  await assertRejects(
+    () => runAcceptanceEvidenceMirror(f.client, { pr: SOURCE_PR, dryRun: false }),
+    Error,
+    'original CI comment failure',
+  );
+  assertEquals(f.updates.length, 1);
+  assertEquals(attempts, 1);
+});
+
+Deno.test('repair: case-insensitive target ownership permits a fork head repository', async () => {
+  const f = postMergeClient();
+  f.client.getPullRequest = () =>
+    Promise.resolve({
+      ...f.pr,
+      head: { ...f.pr.head, repo: { full_name: 'contributor/fork' } },
+    });
+  const report = await runAcceptanceEvidenceMirror(f.client, {
+    repo: 'OWNER/REPO',
+    pr: SOURCE_PR,
+    issue: TARGET_ISSUE,
+  });
+  assertEquals(report.ok, true);
+  assertEquals(report.dryRun, true);
+  assertEquals(f.updates, []);
+});
+
+Deno.test('repair: association can read a PR commit after the REST 250-commit limit', async () => {
+  let pages = 0;
+  const client = new GitHubClient(TARGET_REPO, 'unused', (input, init) => {
+    assertEquals(String(input), 'https://api.github.com/graphql');
+    const request = JSON.parse(String(init?.body));
+    assertEquals(request.variables.owner, 'owner');
+    assertEquals(request.variables.name, 'repo');
+    assertEquals(request.variables.number, SOURCE_PR);
+    assertEquals(request.variables.pageSize, 100);
+    assertEquals(request.variables.cursor, pages === 0 ? null : `cursor-${pages}`);
+    pages++;
+    const nodes = Array.from({ length: pages < 3 ? 100 : 51 }, (_, index) => ({
+      commit: { message: pages === 3 && index === 50 ? 'Refs #2524' : 'implementation' },
+    }));
+    return Promise.resolve(Response.json({
+      data: {
+        repository: {
+          pullRequest: {
+            commits: {
+              nodes,
+              pageInfo: { hasNextPage: pages < 3, endCursor: `cursor-${pages}` },
+            },
+          },
+        },
+      },
+    }));
+  });
+  const commits = await client.getPullRequestCommits(SOURCE_PR);
+  assertEquals(commits.length, 251);
+  assertEquals(commits[250].commit.message, 'Refs #2524');
+  assertEquals(pages, 3);
+});
+
+Deno.test('repair: repository policy does not mistake GitHub uploads or site routes for repositories', () => {
+  for (
+    const url of [
+      'https://github.com/user-attachments/assets/7ee9c3ed-0000-0000-0000-000000000000',
+      'https://github.com/orgs/example/discussions/1',
+      'https://github.com/advisories/GHSA-example',
+    ]
+  ) {
+    validateEvidenceRepositories([{
+      issue: TARGET_ISSUE,
+      text: CHECKBOX_TEXT,
+      evidence: url,
+      legacy: false,
+    }], TARGET_REPO);
+  }
 });

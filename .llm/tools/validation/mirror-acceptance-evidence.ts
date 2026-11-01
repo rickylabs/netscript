@@ -10,8 +10,17 @@ import {
   parseAcceptanceEvidence,
   validateEvidenceMapping,
 } from './acceptance-evidence.ts';
+import {
+  postMergeRepository,
+  type PullRequestCommit,
+  type RepositoryIdentity,
+  validateEvidenceBlockRepositories,
+  validateEvidenceRepositories,
+  validateIssueAssociation,
+  validateRepositoryIdentity,
+} from './post-merge-acceptance-policy.ts';
 
-interface Issue {
+interface Issue extends RepositoryIdentity {
   number: number;
   title: string;
   body: string | null;
@@ -27,9 +36,24 @@ interface Comment {
   body: string | null;
 }
 
+interface CommitQueryResponse {
+  errors?: Array<{ message: string }>;
+  data?: {
+    repository?: {
+      pullRequest?: {
+        commits: {
+          nodes: PullRequestCommit[];
+          pageInfo: { hasNextPage: boolean; endCursor: string | null };
+        };
+      };
+    };
+  };
+}
+
 export interface MirrorClient {
   getIssue(number: number): Promise<Issue>;
   getPullRequest(number: number): Promise<Issue>;
+  getPullRequestCommits(number: number): Promise<PullRequestCommit[]>;
   getComments(number: number, allPages?: boolean): Promise<Comment[]>;
   isCommitOnMain(sha: string): Promise<boolean>;
   updateIssue(number: number, body: string): Promise<void>;
@@ -45,6 +69,8 @@ interface MirrorIssueResult {
 
 export interface MirrorOptions {
   pr: number;
+  /** Repository against which post-merge identities and references must resolve. */
+  repo?: string;
   /** Explicit post-merge target; absent for the existing label-gated CI mode. */
   issue?: number;
   dryRun?: boolean;
@@ -59,12 +85,35 @@ export interface MirrorRunContext {
 const READY_LABEL = 'status:ready-merge';
 const MAX_MIRROR_ATTEMPTS = 2;
 const MAIN_BRANCH = 'main';
-const COMMENTS_PAGE_SIZE = 100;
+const GITHUB_PAGE_SIZE = 100;
+const MAX_PROVENANCE_ATTEMPTS = 2;
+const PR_COMMIT_QUERY =
+  `query MirrorCommits($owner: String!, $name: String!, $number: Int!, $cursor: String, $pageSize: Int!) {
+  repository(owner: $owner, name: $name) {
+    pullRequest(number: $number) {
+      commits(first: $pageSize, after: $cursor) {
+        nodes { commit { message } }
+        pageInfo { hasNextPage endCursor }
+      }
+    }
+  }
+}`;
 const SHA_PATTERN = /\b[0-9a-f]{4,40}\b/gi;
 const EXPLICIT_SHA_PREFIX =
   /(?:\b(?:sha(?:-?1)?|commit|head|merged\s+as)\s*[:=]?\s*`?|\/commits?\/)$/i;
 
 type ClosingReferenceClassification = 'issue' | 'pull request' | 'lookup failed';
+
+/** Preserves the confirmed PATCH when the subsequent provenance comment cannot be confirmed. */
+class ProvenanceCommentError extends Error {
+  constructor(issue: number, cause: unknown) {
+    super(
+      `post-merge-provenance-incomplete: Issue #${issue} checkboxes were updated, but the provenance comment could not be confirmed after ${MAX_PROVENANCE_ATTEMPTS} attempts; reconcile the issue comments and publish provenance for this snapshot. ${
+        cause instanceof Error ? cause.message : String(cause)
+      }`,
+    );
+  }
+}
 
 /** Explains how to refresh the CI-owned mirror after the ready label is applied. */
 export function readyLabelRepairNotice(): string {
@@ -169,6 +218,7 @@ export async function runAcceptanceEvidenceMirror(
 
   const warnings = [...classified.notices];
   const snapshots: IssueSnapshot[] = [];
+  const results: Array<MirrorIssueResult & { issue: number }> = [];
   try {
     if (postMerge && pr.merged !== true) {
       throw new AcceptanceEvidenceValidationError([
@@ -180,9 +230,23 @@ export async function runAcceptanceEvidenceMirror(
         '--apply and --dry-run are mutually exclusive.',
       ]);
     }
+    const repo = postMerge ? postMergeRepository(options.repo) : undefined;
+    if (repo !== undefined && options.issue !== undefined) {
+      validateRepositoryIdentity(repo, pr, `PR #${options.pr}`);
+      await validateIssueAssociation(
+        repo,
+        options.issue,
+        options.pr,
+        pr.body ?? '',
+        () => client.getPullRequestCommits(options.pr),
+      );
+    }
     const comments = await client.getComments(options.pr, postMerge);
-    const parsed = [pr.body ?? '', ...comments.map((comment) => comment.body ?? '')]
-      .map(parseAcceptanceEvidence);
+    const markdown = [pr.body ?? '', ...comments.map((comment) => comment.body ?? '')];
+    if (repo !== undefined && options.issue !== undefined) {
+      for (const body of markdown) validateEvidenceBlockRepositories(body, repo, options.issue);
+    }
+    const parsed = markdown.map(parseAcceptanceEvidence);
     const entries = parsed.flatMap((result) => result.entries);
     const evidence = postMerge ? entries.filter((entry) => entry.issue === options.issue) : entries;
     warnings.push(...parsed.flatMap((result) => result.warnings));
@@ -191,10 +255,12 @@ export async function runAcceptanceEvidenceMirror(
         `PR #${options.pr}: no acceptance-evidence entries for issue #${options.issue} in its body or comments.`,
       ]);
     }
+    if (repo !== undefined) validateEvidenceRepositories(evidence, repo);
     // Validate the complete live mapping before the first mutation. A bad later issue must not
     // leave an earlier closing issue partially mirrored.
     for (const issueNumber of issueNumbers) {
       const issue = await client.getIssue(issueNumber);
+      if (repo !== undefined) validateRepositoryIdentity(repo, issue, `Issue #${issueNumber}`);
       snapshots.push(await issueSnapshot(issue));
       validateEvidenceMapping(
         issueNumber,
@@ -203,12 +269,11 @@ export async function runAcceptanceEvidenceMirror(
       );
     }
     if (postMerge) await validateMainAncestry(client, evidence);
-    const results: Array<MirrorIssueResult & { issue: number }> = [];
     for (const issueNumber of issueNumbers) {
-      const result = await mirrorIssue(client, issueNumber, evidence, dryRun);
+      const result = await mirrorIssue(client, issueNumber, evidence, dryRun, repo);
       results.push({ issue: issueNumber, ...result });
       if (result.changed && !dryRun) {
-        await postProvenanceCommentOnce(client, options.pr, issueNumber, result);
+        await postProvenanceCommentOnce(client, options.pr, issueNumber, result, postMerge);
       }
       if (result.notice) warnings.push(result.notice);
     }
@@ -224,6 +289,18 @@ export async function runAcceptanceEvidenceMirror(
       errors: [],
     };
   } catch (error) {
+    if (postMerge && error instanceof ProvenanceCommentError) {
+      return {
+        ok: false,
+        dryRun,
+        changed: results.filter((item) => item.changed).map((item) => item.issue),
+        headSha,
+        evaluatedAt,
+        issues: results.map((item) => item.snapshot),
+        warnings: [...new Set(warnings)],
+        errors: [error.message],
+      };
+    }
     if (!(error instanceof AcceptanceEvidenceValidationError)) throw error;
     return {
       ok: false,
@@ -278,9 +355,11 @@ export async function mirrorIssue(
   issueNumber: number,
   evidence: AcceptanceEvidence[],
   dryRun: boolean,
+  repo?: string,
 ): Promise<MirrorIssueResult> {
   for (let attempt = 1; attempt <= MAX_MIRROR_ATTEMPTS; attempt++) {
     const issue = await client.getIssue(issueNumber);
+    if (repo !== undefined) validateRepositoryIdentity(repo, issue, `Issue #${issueNumber}`);
     const beforeHash = await bodySha256(issue.body ?? '');
     const boxes = acceptanceCheckboxes(issue.body ?? '');
     const mapping = validateEvidenceMapping(issueNumber, boxes, evidence);
@@ -321,21 +400,29 @@ async function postProvenanceCommentOnce(
   pr: number,
   issue: number,
   result: MirrorIssueResult,
+  postMerge = false,
 ): Promise<void> {
   const marker = `<!-- acceptance-evidence-mirror:pr=${pr};issue=${issue} -->`;
-  const comments = await client.getComments(issue);
-  if (comments.some((comment) => comment.body?.includes(marker))) return;
-  await client.postComment(
-    issue,
-    [
-      marker,
-      `Acceptance evidence mirrored from #${pr}.`,
-      '',
-      ...result.evidence.map((line) => `- ${line}`),
-      '',
-      `Provenance: updatedAt=${result.snapshot.updatedAt}; bodySha256=${result.snapshot.bodySha256}`,
-    ].join('\n'),
-  );
+  const body = [
+    marker,
+    `Acceptance evidence mirrored from #${pr}.`,
+    '',
+    ...result.evidence.map((line) => `- ${line}`),
+    '',
+    `Provenance: updatedAt=${result.snapshot.updatedAt}; bodySha256=${result.snapshot.bodySha256}`,
+  ].join('\n');
+  for (let attempt = 1;; attempt++) {
+    try {
+      // Read every page in the post-merge path, including before an ambiguous POST retry.
+      const comments = await client.getComments(issue, postMerge);
+      if (comments.some((comment) => comment.body?.includes(marker))) return;
+      await client.postComment(issue, body);
+      return;
+    } catch (error) {
+      if (!postMerge) throw error;
+      if (attempt >= MAX_PROVENANCE_ATTEMPTS) throw new ProvenanceCommentError(issue, error);
+    }
+  }
 }
 
 function evidenceLines(
@@ -384,6 +471,13 @@ export function formatMirrorReport(report: MirrorReport): string {
   return [
     `acceptance-mirror ${mode}: ${outcome}`,
     `provenance: head=${report.headSha} evaluated=${report.evaluatedAt}`,
+    ...(!report.ok && report.changed.length
+      ? [
+        `partial: acceptance boxes updated for ${
+          report.changed.map((issue) => `#${issue}`).join(', ')
+        }`,
+      ]
+      : []),
     ...report.issues.map((issue) =>
       `snapshot: #${issue.number} updated=${issue.updatedAt} bodySha256=${issue.bodySha256}`
     ),
@@ -438,17 +532,50 @@ export class GitHubClient implements MirrorClient {
   getPullRequest(number: number): Promise<Issue> {
     return this.request<Issue>('GET', `/pulls/${number}`);
   }
-  async getComments(number: number, allPages = false): Promise<Comment[]> {
+  async getPullRequestCommits(number: number): Promise<PullRequestCommit[]> {
+    const [owner, name] = this.repo.split('/');
+    const commits: PullRequestCommit[] = [];
+    let cursor: string | null = null;
+    // GraphQL retains PR membership beyond the REST PR-commits endpoint's 250 limit.
+    for (;;) {
+      const response: CommitQueryResponse = await this.request<CommitQueryResponse>(
+        'POST',
+        '/graphql',
+        {
+          query: PR_COMMIT_QUERY,
+          variables: { owner, name, number, cursor, pageSize: GITHUB_PAGE_SIZE },
+        },
+      );
+      const connection = response.data?.repository?.pullRequest?.commits;
+      if (response.errors?.length || !connection) {
+        throw new Error(
+          `Unable to read PR #${number} commits: ${
+            response.errors?.map((error) => error.message).join('; ') || 'missing commit connection'
+          }`,
+        );
+      }
+      commits.push(...connection.nodes);
+      if (!connection.pageInfo.hasNextPage) return commits;
+      if (!connection.pageInfo.endCursor || connection.pageInfo.endCursor === cursor) {
+        throw new Error(`Unable to paginate PR #${number} commits: cursor did not advance.`);
+      }
+      cursor = connection.pageInfo.endCursor;
+    }
+  }
+  getComments(number: number, allPages = false): Promise<Comment[]> {
     const path = `/issues/${number}/comments`;
     if (!allPages) return this.request<Comment[]>('GET', path);
-    const comments: Comment[] = [];
+    return this.paginate<Comment>(path);
+  }
+  private async paginate<T>(path: string): Promise<T[]> {
+    const items: T[] = [];
     for (let page = 1;; page++) {
-      const batch = await this.request<Comment[]>(
+      const batch = await this.request<T[]>(
         'GET',
-        `${path}?per_page=${COMMENTS_PAGE_SIZE}&page=${page}`,
+        `${path}?per_page=${GITHUB_PAGE_SIZE}&page=${page}`,
       );
-      comments.push(...batch);
-      if (batch.length < COMMENTS_PAGE_SIZE) return comments;
+      items.push(...batch);
+      if (batch.length < GITHUB_PAGE_SIZE) return items;
     }
   }
   async isCommitOnMain(sha: string): Promise<boolean> {
@@ -465,7 +592,10 @@ export class GitHubClient implements MirrorClient {
     await this.request<Comment>('POST', `/issues/${number}/comments`, { body });
   }
   private async request<T>(method: string, path: string, body?: unknown): Promise<T> {
-    const response = await this.fetcher(`https://api.github.com/repos/${this.repo}${path}`, {
+    const url = path === '/graphql'
+      ? 'https://api.github.com/graphql'
+      : `https://api.github.com/repos/${this.repo}${path}`;
+    const response = await this.fetcher(url, {
       method,
       headers: {
         accept: 'application/vnd.github+json',

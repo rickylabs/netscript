@@ -12,3 +12,8 @@ run's gate table, independent evaluation and exact live dry-run outputs. No real
 issue mutations were made; existing evidence/data must be reconciled before apply.
 
 No architecture debt or dependency changes. Cockpit owns merge.
+
+Coordinator repair also requires body/commit association and repository ownership
+before writes, paginates provenance reads, and reports failed provenance delivery
+as partial state after bounded retries. See repair-summary.md and repair-evaluate.md
+in the run for the repair contract and independent evidence.

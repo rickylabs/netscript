@@ -15,6 +15,7 @@
 
 - `.llm/tools/validation/mirror-acceptance-evidence.ts`
 - `.llm/tools/validation/mirror-acceptance-evidence_test.ts`
+- `.llm/tools/validation/post-merge-acceptance-policy.ts`
 - `.llm/runs/orch-divybot-6555644738--post-merge-mirror/**`
 - `.llm/2026-11-01-post-merge-acceptance-mirror.md`
 - Private project run evidence and handoff memory (outside the Git index).
