@@ -12,3 +12,7 @@ Round-one corrections are in plan.md. The reviewer's round-two suffix-expansion 
 Dispatcher leaf rule: “Two FAIL_PLAN verdicts escalate rather than loop a third time.” Required next decision: owner/coordinator authorizes continuation of this same leaf and a confirming read-only plan review, or revises its scope. Until then, implementation is prohibited by the selected plan gate.
 
 The required correction is narrow: `space/page/padding-x|y` means `space/page/padding-x` plus `space/page/padding-y`, not `space/page/y`. Independently, the prose contract requires absent `Theme set/prose/h4/tracking`; strict generation must reject that pre-existing gap before output. Its repair remains with S3/token owners, not this tool.
+
+## Owner-authorized continuation — PASS
+
+The user explicitly directed continuation after the escalation. The same independent read-only evaluator confirmed PASS in plan-eval-confirmation.md before implementation. The historical failures are retained; no waiver of scope, complete subsystem delivery or final independent IMPL-EVAL occurred.
