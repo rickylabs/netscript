@@ -56,13 +56,25 @@ import { z } from 'zod';
 
 export const ${modelName}Schema = z.object({
   id: z.number().int(),
+  reference: z.string(),
   name: z.string(),
+  ownerName: z.string(),
+  ownerEmail: z.string(),
+  status: z.string(),
+  amount: z.number().int(),
+  currency: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
 
 export const ${modelName}CreateInput = z.object({
   name: z.string(),
+  reference: z.string().optional(),
+  ownerName: z.string().optional(),
+  ownerEmail: z.string().optional(),
+  status: z.string().optional(),
+  amount: z.number().int().optional(),
+  currency: z.string().optional(),
 });
 
 export const ${modelName}UpdateInput = ${modelName}CreateInput.partial();

@@ -19,7 +19,12 @@ const EXPECTED_REFERENCES = [
     markers: ['href="/design"', 'href="/design/composition"'],
     seededRecord: 'Seed User',
   },
-  { path: '/records', markers: ['Records'], seededRecord: 'Seed User' },
+  {
+    path: '/records',
+    markers: ['Records'],
+    seededRecord: 'Seed User',
+    seededFields: ['REC-10482', 'Maya Rossi', 'maya.rossi@example.com', 'Paid', '$89.90'],
+  },
   { path: '/design/composition', markers: ['Composition', 'L0'] },
   {
     path: '/examples/users',
@@ -48,7 +53,11 @@ Deno.test('reference probe renders init and generated resources at desktop and m
       if (!expectation) throw new Error(`unexpected URL: ${url}`);
       return Promise.resolve(
         `<html>${expectation.markers.join(' ')}${
-          expectation.seededRecord ? '<table><tr><td>Seed User</td></tr></table>' : ''
+          expectation.seededRecord
+            ? `<table><tr><td>Seed User</td>${
+              (expectation.seededFields ?? []).map((value) => `<td>${value}</td>`).join('')
+            }</tr></table>`
+            : ''
         }</html>`,
       );
     },
@@ -121,9 +130,30 @@ Deno.test('seeded app proof rejects unavailable panels, empty successful shells 
       );
     }
     assertReferenceDom(
-      `<html>${expectation.markers.join(' ')}<dl><dd><span>Seed User</span></dd></dl></html>`,
+      `<html>${expectation.markers.join(' ')}<dl><dd><span>Seed User</span></dd>${
+        (expectation.seededFields ?? []).map((value) => `<dd>${value}</dd>`).join('')
+      }</dl></html>`,
       expectation,
       REFERENCE_VIEWPORTS[0],
+    );
+  }
+});
+
+Deno.test('rich records proof requires each field in cells and rejects script-only or missing values', () => {
+  const expectation = REFERENCE_EXPECTATIONS.find((entry) => entry.path === '/records')!;
+  const values = [expectation.seededRecord!, ...expectation.seededFields!];
+  for (const missing of expectation.seededFields!) {
+    const cells = values.filter((value) => value !== missing).map((value) => `<td>${value}</td>`)
+      .join('');
+    assertThrows(
+      () =>
+        assertReferenceDom(
+          `<h1>Records ${missing}</h1><table><tr>${cells}</tr></table><script>${missing}</script>`,
+          expectation,
+          REFERENCE_VIEWPORTS[0],
+        ),
+      Error,
+      missing,
     );
   }
 });

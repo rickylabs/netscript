@@ -14,6 +14,8 @@ export interface ReferenceExpectation {
   readonly markers: readonly string[];
   /** Seeded data must appear in rendered cells/fields, not only hydration scripts. */
   readonly seededRecord?: string;
+  /** Every value must occur in a visible table/detail cell, not a script or heading. */
+  readonly seededFields?: readonly string[];
 }
 
 export interface ProbeAppReferenceOptions {
@@ -37,6 +39,7 @@ export const REFERENCE_EXPECTATIONS: readonly ReferenceExpectation[] = [
     path: '/records',
     markers: ['Records'],
     seededRecord: 'Seed User',
+    seededFields: ['REC-10482', 'Maya Rossi', 'maya.rossi@example.com', 'Paid', '$89.90'],
   },
   {
     path: '/design/composition',
@@ -62,12 +65,12 @@ export function assertReferenceDom(
   if (expectation.seededRecord) {
     const markup = dom.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
     const fields = [...markup.matchAll(/<(td|dd)\b[^>]*>([\s\S]*?)<\/\1>/gi)];
-    if (
-      !fields.some((field) => field[2].replace(/<[^>]*>/g, '').includes(expectation.seededRecord!))
-    ) {
-      throw new Error(
-        `${viewport.name} reference probe ${expectation.path} did not render seeded record ${expectation.seededRecord}`,
-      );
+    for (const value of [expectation.seededRecord, ...(expectation.seededFields ?? [])]) {
+      if (!fields.some((field) => field[2].replace(/<[^>]*>/g, '').includes(value))) {
+        throw new Error(
+          `${viewport.name} reference probe ${expectation.path} did not render seeded record field ${value}`,
+        );
+      }
     }
   }
   for (const marker of expectation.markers) {

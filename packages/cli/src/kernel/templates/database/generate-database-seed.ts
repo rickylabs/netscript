@@ -24,33 +24,24 @@ export function generateDatabaseSeed(options: DatabaseSeedOptions): string {
   }
 
   const delegateName = toCamelCase(modelName);
-  const seedName = escapeSingleQuoted(`Seed ${modelName}`);
   const body = `  const client = await db.getClient();
-
   try {
-    const existing = await client.${delegateName}.findFirst({
-      select: { id: true },
-    });
-    if (!existing) {
-      await client.${delegateName}.create({
-        data: {
-          name: '${seedName}',
-        },
+    // Insert oldest first so the generic CRUD page's ID-descending default also shows recent data.
+    for (const row of createSampleRecords().toReversed()) {
+      await client.${delegateName}.upsert({
+        where: { reference: row.reference },
+        create: { ...row, createdAt: new Date(row.createdAt), updatedAt: new Date(row.updatedAt) },
+        update: {},
       });
-      console.log('✅ Seeded representative ${modelName} row.');
-    } else {
-      console.log('ℹ️ ${modelName} rows already exist; seed left them unchanged.');
     }
+    console.log('✅ Seeded 40 representative ${modelName} records (existing references preserved).');
   } finally {
     await db.disconnect();
   }`;
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.databaseSeed, {
-    __slot0__: "import { db } from '../mod.ts';",
+    __slot0__: "import { db } from '../mod.ts';\n\n" +
+      renderTemplateAssetSync(TEMPLATE_KEYS.serviceSampleRecords, { modelName }),
     __slot1__: body,
   });
-}
-
-function escapeSingleQuoted(value: string): string {
-  return value.replaceAll('\\', '\\\\').replaceAll("'", "\\'");
 }

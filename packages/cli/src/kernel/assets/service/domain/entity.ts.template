@@ -1,19 +1,23 @@
+import type { {{serviceName | pascalCase}}{{modelName}}V1 as Entity } from '@{{projectName}}/contracts';
+
 /** Pure {{modelName}} list policy; no persistence or transport dependencies. */
 export interface ListInput {
   readonly page: number;
   readonly limit: number;
   readonly sortBy?: string;
+  readonly status?: Entity['status'];
   readonly sortOrder: 'asc' | 'desc';
 }
 
-const SORTABLE_FIELDS = new Set(['id', 'name', 'createdAt', 'updatedAt']);
+const SORTABLE_FIELDS = new Set(['id', 'reference', 'name', 'ownerName', 'status', 'amount', 'currency', 'createdAt', 'updatedAt']);
 
 export function listQuery(input: ListInput) {
   const field = input.sortBy && SORTABLE_FIELDS.has(input.sortBy) ? input.sortBy : 'id';
   return {
     skip: (input.page - 1) * input.limit,
     take: input.limit,
-    orderBy: { [field]: input.sortOrder },
+    orderBy: field === 'id' ? [{ id: input.sortOrder }] : [{ [field]: input.sortOrder }, { id: input.sortOrder }],
+    where: input.status ? { status: input.status } : {},
   };
 }
 

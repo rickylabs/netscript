@@ -1,6 +1,6 @@
 // Server-only typed adapter for the generated memory service.
 import { {{serviceName | camelCase}}Contract as contract, {{serviceName | camelCase}}Name as serviceName, {{serviceName | camelCase}}RouterName as routerName } from '{{serviceQueryModule}}';
-import type { ScaffoldRecord, ScaffoldRecordDetail, ScaffoldRecords } from './scaffold-contract.ts';
+import { scaffoldStatuses, scaffoldRecordQuery, type ScaffoldRecord, type ScaffoldRecordDetail, type ScaffoldRecords } from './scaffold-contract.ts';
 import { scaffoldReadFailure, scaffoldServiceClient } from './scaffold-service-context.ts';
 
 const PAGE_SIZE = 25;
@@ -9,19 +9,19 @@ type Client = Awaited<ReturnType<typeof clientFor>>['client'];
 type Row = Awaited<ReturnType<Client['list']>>['items'][number];
 const clientFor = (request: Request) => scaffoldServiceClient(contract, serviceName, routerName, request);
 function project(row: Row): ScaffoldRecord {
-  return { id: String(row.id), name: row.name, description: row.summary, status: row.status, createdAt: row.createdAt,
-    fields: [{ label: 'ID', value: String(row.id) }, { label: 'Name', value: row.name }, { label: 'Summary', value: row.summary }, { label: 'Status', value: row.status }, { label: 'Created', value: row.createdAt }] };
+  return { id: String(row.id), name: row.name, description: row.summary, reference: row.reference, ownerName: row.ownerName, ownerEmail: row.ownerEmail, status: row.status, amount: row.amount, currency: row.currency, createdAt: new Date(row.createdAt).toISOString(), updatedAt: new Date(row.updatedAt).toISOString(),
+    fields: [{ label: 'Reference', value: row.reference }, { label: 'Name', value: row.name }, { label: 'Owner', value: row.ownerName }, { label: 'Email', value: row.ownerEmail }, { label: 'Status', value: scaffoldStatuses[row.status].label }, { label: 'Amount (minor units)', value: String(row.amount) }, { label: 'Currency', value: row.currency }, { label: 'Created', value: new Date(row.createdAt).toISOString() }, { label: 'Updated', value: new Date(row.updatedAt).toISOString() }] };
 }
 
 /** Paginated records come exclusively from the generated typed list procedure. */
 export async function loadScaffoldRecords(request: Request): Promise<ScaffoldRecords> {
   try {
     const { client, context } = await clientFor(request);
-    const rawPage = Number(new URL(request.url).searchParams.get('page') ?? 1);
-    const page = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1;
-    const result = await client.list({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }, { context });
+    const query = scaffoldRecordQuery(request);
+    const { page } = query;
+    const result = await client.list({ ...query, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }, { context });
     return { state: result.items.length ? 'ready' : 'empty', rows: result.items.map(project), total: result.total,
-      page, hasNext: result.hasMore, message: result.total ? 'Records from {{serviceName}}.' : 'Your service has no records yet.' };
+      page, query: { sortBy: query.sortBy, sortOrder: query.sortOrder, ...(query.status ? { status: query.status } : {}) }, hasNext: result.hasMore, message: result.total ? 'Records from {{serviceName}}.' : query.status ? 'No records match this status.' : 'Your service has no records yet.' };
   } catch (error) { return scaffoldReadFailure(error); }
 }
 

@@ -1,0 +1,29 @@
+// Server-only complete read. Table pagination and filters never narrow overview totals.
+import { loadScaffoldRecords } from './scaffold-records.ts';
+import type { ScaffoldRecord } from './scaffold-contract.ts';
+import { projectScaffoldOverview, type ScaffoldOverview } from './scaffold-projections.ts';
+
+const MAX_OVERVIEW_PAGES = 100;
+
+/** Load all records through the credential-aware typed adapter, or return an explicit failure. */
+export async function loadScaffoldOverview(request: Request, options: { readonly now?: Date; readonly latestLimit?: number } = {}): Promise<ScaffoldOverview> {
+  const url = new URL(request.url);
+  url.search = '';
+  const rows: ScaffoldRecord[] = [];
+  const ids = new Set<string>();
+  let expectedTotal: number | undefined;
+  for (let page = 1; page <= MAX_OVERVIEW_PAGES; page++) {
+    url.searchParams.set('page', String(page));
+    const result = await loadScaffoldRecords(new Request(url, { headers: request.headers, signal: request.signal }));
+    if (result.state !== 'ready' && result.state !== 'empty') return projectScaffoldOverview(result, options);
+    expectedTotal ??= result.total;
+    if (expectedTotal !== result.total || result.rows.some((row) => ids.has(row.id))) break;
+    for (const row of result.rows) { rows.push(row); ids.add(row.id); }
+    if (!result.hasNext) {
+      if (rows.length !== expectedTotal) break;
+      return projectScaffoldOverview({ ...result, state: rows.length ? 'ready' : 'empty', rows }, options);
+    }
+    if (result.rows.length === 0) break;
+  }
+  return { state: 'unavailable', message: 'The complete record summary could not be read. Try again or narrow the service data.' };
+}

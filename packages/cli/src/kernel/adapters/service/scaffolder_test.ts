@@ -51,7 +51,7 @@ Deno.test('ServiceScaffolder creates a contract-bound service workspace', async 
     force: false,
   });
 
-  assertEquals(result.scaffoldResult.filesCreated.length, 9);
+  assertEquals(result.scaffoldResult.filesCreated.length, 10);
   assertEquals(result.scaffoldResult.directoriesCreated.length, 6);
   assertEquals(result.configEntry.Port, undefined);
   assertEquals(result.configEntry.HostPort, undefined);
@@ -160,6 +160,7 @@ Deno.test('ServiceScaffolder writes canonical content for every generated servic
     '/project/services/payments/src/domain/payments.ts',
     '/project/services/payments/src/application/payments.ts',
     '/project/services/payments/src/adapters/memory-payments-repository.ts',
+    '/project/services/payments/src/adapters/sample-records.ts',
     '/project/services/payments/src/application/payments_test.ts',
   ]);
   assertEquals(

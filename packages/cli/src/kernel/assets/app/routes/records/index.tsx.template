@@ -1,6 +1,6 @@
 import { Button, PageHeader } from '@app/components/ui/mod.ts';
 import { RecordTable } from '../(_components)/record-table.tsx';
-import type { ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
+import { scaffoldPageHref, type ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
 import { loadScaffoldRecords } from '@app/lib/scaffold-records.ts';
 import { appRoutes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
@@ -11,9 +11,9 @@ export const recordsPage = definePage().withRoute(appRoutes.records)
     <PageHeader class='workspace-heading'><PageHeader.Layout><PageHeader.Main><PageHeader.Intro><h1>Records</h1><p>Browse the records in your workspace.</p></PageHeader.Intro></PageHeader.Main><PageHeader.Actions><Button type='link' href={appRoutes.dashboard.href()} variant='outline'>Overview</Button>{ {{hasService}} && <Button type='link' href={appRoutes.examples.href() + '/{{serviceName}}'}>Open service page</Button>}</PageHeader.Actions></PageHeader.Layout></PageHeader>
     <section class='workspace-section'><header class='workspace-section-heading'><h2>All records</h2></header><RecordTable records={records} /></section>
     {records.page !== undefined && <nav class='workspace-pagination' aria-label='Record pages'>
-      {records.page > 1 && <Button type='link' variant='outline' href={appRoutes.records.href() + '?page=' + (records.page - 1)}>Previous</Button>}
+      {records.page > 1 && <Button type='link' variant='outline' href={scaffoldPageHref(appRoutes.records.href(), records, records.page - 1)}>Previous</Button>}
       <span>Page {records.page}</span>
-      {records.hasNext && <Button type='link' variant='outline' href={appRoutes.records.href() + '?page=' + (records.page + 1)}>Next</Button>}
+      {records.hasNext && <Button type='link' variant='outline' href={scaffoldPageHref(appRoutes.records.href(), records, records.page + 1)}>Next</Button>}
     </nav>}
   </div>, { loader: async (ctx) => ({ records: await loadScaffoldRecords(ctx.req) }) })
   .withLayout((slots) => slots.records()).build();
