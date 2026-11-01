@@ -1,3 +1,44 @@
+# Current resume — Restack8 child evidence PASS
+
+The same independent evaluator passed the child's own replay/evidence at759fb34d,
+with0blockers and failure streak0. All691paths equal both19d6source/6e0aevidence;
+main22and all3locks match; all fourteen correction files retain their frozen
+bytes. All own-head gates, including24CLI/installed cases and140fresh dedicated
+docs browser cases, pass. Earlier765/675/336and72/24component proofs remain
+predecessor executions on identical source, never new current-head executions.
+
+This explicit-path evidence commit precedes repeated equality/privacy checks,
+remote childd0d8and parentc587verification, exact-lease child push, remote-head
+verification and PR2538body/comment updates. Then the actual assignment resumes:
+11bToc/AnchorNav/RuledGrid/Hero/Desktop audit/originalShellToc,12production
+declared x-extensions and all-style harness,13whole-phase/runtime/IMPL-EVAL/
+exact required CI. No partial READY or final report.
+
+---
+
+# Current resume — Restack8 child own-head gates PASS
+
+Current child759fb34dreplays reviewed19d6source/6e0aevidence onto published
+parentc5877ff8/main6a1d84a6. All691Fresh UI/browser/config/map paths and3locks
+match BOTH old child heads, main22maintained paths are exact, and all fourteen
+reviewed correction files match their frozen bytes. One derived publication
+carrier was canonically regenerated;0maintained conflicts.
+
+Own-head quality/native publication0slow types,4carrier checks withdelta0,
+260-page build, preflight/accuracy/export,24CLI/installed tests and140fresh
+dedicated docs browser cases pass. Component765/675/336plus72/24proofs remain
+reviewed predecessor executions on identical bytes, never new759executions.
+Doc-lint124remains accepted#2531through unchanged source. Same child evidence
+review is next before explicit-path bookkeeping, repeated equality/public
+audits, exact remote-d0d8lease verification/push and2538comment.
+
+Full11b/12/13below remains required after terminal restack. No READY or final
+report. Earlier diagnostic wording refers to notifying the task owner; the
+diagnostic owner remains unknown. The untracked artifact is outside every
+publishable root, untouched and excluded; future owned browser dumps disabled.
+
+---
+
 # Current resume — committed-source evidence PASS
 
 Reviewed source19d6d1d7and all four canonical carriers reconcile with0generated

@@ -655,3 +655,44 @@ registered source style. Latest main was fetched and remains6a1d84a6. The
 bookkeeping commit precedes the approved bounded parent/child rebase and their
 own source equality/gates/reviews/audited exact-lease pushes. Full11b/12/13
 remains active after recovery.
+
+
+## Restack8 child — own-head proof and fresh docs acceptance
+
+Replayed child6e0a/source19d6onto published parentc587/main6a1d84a6at759fb34d.
+Only one generated publication conflict occurred and was canonically rebuilt.
+All691Fresh UI/browser/config/map paths equal BOTH reviewed child heads; all
+3locks match and all22maintained main paths are exact. No new source/API/token/
+version/keyboard behavior. Fourteen correction files still match frozen hashes.
+
+All4canonical carrier checks pass with measured delta0. Actual759durable
+quality/architecture and native publication pass,0slow types; preflight/docs
+accuracy/export pass;260HTML pages and24structured CLI/installed tests pass.
+Fresh dedicated docs.playwright.config.ts passes140cases in light/dark390/
+1280,0retry/flaky/new allowances, with128private captures. This is distinct
+from the component gap matrix. Earlier765/675/336and72/24component gates
+remain predecessor executions on identical bytes, not new759executions.
+Doc-lint remains accepted raw124/exact123TS+1JSON/0new.
+
+Same child review follows before explicit-path evidence commit, repeated source
+equality and public audits, remote-d0d8verification/exact-lease push and2538
+comment. Task owner was informed about the untracked native diagnostic; its
+actual owner is unknown and it remains untouched/outside published roots.
+Full11b/12/13continues after restack; no partial READY or final report.
+
+
+### Restack8 child review PASS — terminal recovery push next
+
+The same independent child evidence review passes with0blockers/failure streak0.
+It confirms691-path equality against both reviewed heads, main22/three-lock/
+frozen14preservation, canonical-only conflict resolution, own-head quality/
+publication/carriers/docs260/24CLI-installed gates and140fresh dedicated docs
+cases. The765/675/336and72/24component evidence is correctly predecessor-only.
+Doc-lint remains accepted#2531and runtime/exactCI remains UNPROVEN.
+
+Explicit public paths only are staged in this bookkeeping commit. Repeat all
+source/main/lock/frozen proofs afterward, audit added lines plus public runs
+to0forbidden paths/session identifiers/thumbprints, verify exact remotes
+childd0d8and parentc587, force-push the child with its exact lease, verify the
+new remote and update2538body/comment Refs2416only. Then continue all11b/12/13;
+this merge recovery does not complete or replace the assignment.

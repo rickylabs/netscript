@@ -64,9 +64,10 @@
     "publishableMembersChecked": 35,
     "containingPackageRoots": 0,
     "externalPublishIncludes": 0,
-    "ownerInformed": true,
     "unknownOwnerLeftUntouched": true,
-    "futureOwnedCoreDumpsDisabled": true
+    "futureOwnedCoreDumpsDisabled": true,
+    "taskOwnerInformed": true,
+    "diagnosticOwner": "unknown"
   },
   "tokenPresetScope": {
     "tokenPresets": 24,
