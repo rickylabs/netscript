@@ -42,9 +42,14 @@ export function DataTableExamples() {
                           onInput={(event) => setMemo(event.currentTarget.value)}
                         />
                       </label>
-                      <button type='button' onClick={() => setCellActions((n) => n + 1)}>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        onClick={() => setCellActions((n) => n + 1)}
+                      >
                         Cell action
-                      </button>
+                      </Button>
                       <a href='#custom-cell'>Custom cell link</a>
                     </span>
                   )
@@ -75,7 +80,14 @@ export function DataTableExamples() {
           selectedIds={selected}
           onSelectionChange={setSelected}
           renderRowActions={() => (
-            <button type='button' onClick={() => setActions((n) => n + 1)}>Row action</button>
+            <Button
+              type='button'
+              variant='outline'
+              size='sm'
+              onClick={() => setActions((n) => n + 1)}
+            >
+              Row action
+            </Button>
           )}
         />
         <output aria-label='Rows opened'>{opened}</output>
@@ -84,6 +96,8 @@ export function DataTableExamples() {
         <output aria-label='Observed grid clicks'>{observedClicks}</output>
       </section>
       <OrdersTable />
+      <SharedTrackExamples />
+      <FluidTrackExample />
       <section id='table-zero-columns' aria-label='Zero-column grid'>
         <h2>Action-only data</h2>
         <DataGrid
@@ -103,6 +117,42 @@ export function DataTableExamples() {
 }
 
 type Order = { id: string; customer: string; status: 'Paid' | 'Pending'; total: string };
+
+/** Fluid tracks must wrap long caller text instead of inheriting a max-content floor. */
+function FluidTrackExample() {
+  const description = 'A detailed activity record remains readable inside its fluid column. '
+    .repeat(8);
+  const email = 'customer.with.a.long.address.and.additional.routing.context.'.repeat(4) +
+    '@example.test';
+  return (
+    <section id='table-fluid-tracks'>
+      <h2>Wrapping fluid columns</h2>
+      <div class='fluid-track-container'>
+        <DataGrid
+          label='Wrapping fluid columns'
+          columns={[
+            {
+              key: 'description',
+              header: 'Description',
+              render: (row) => <span class='fluid-long-text'>{row.description}</span>,
+            },
+            {
+              key: 'email',
+              header: 'Email',
+              width: '2fr',
+              render: (row) => <span class='fluid-long-text'>{row.email}</span>,
+            },
+          ]}
+          rows={[
+            { id: 'first', data: { description, email } },
+            { id: 'second', data: { description: description + 'A second record.', email } },
+          ]}
+        />
+      </div>
+    </section>
+  );
+}
+
 const orders: readonly Order[] = [
   { id: 'SO-10482', customer: 'Maya Rossi', status: 'Paid', total: '$1,284.00' },
   { id: 'SO-10481', customer: 'Jonas Weber', status: 'Pending', total: '$12,640.00' },
@@ -340,6 +390,69 @@ function OrdersTable() {
       <output aria-label='Orders opened'>{opened}</output>
       <output aria-label='Order action count'>{actionCount}</output>
       <output aria-label='Order export count'>{exports}</output>
+    </section>
+  );
+}
+
+/** Intrinsic and fixed tracks exercise the same native table in every real engine. */
+function SharedTrackExamples() {
+  return (
+    <section id='table-track-examples' aria-label='Shared column geometry'>
+      <h2>Shared column geometry</h2>
+      {[
+        { name: 'plain', selection: false, actions: false, fixed: false },
+        { name: 'selection', selection: true, actions: false, fixed: false },
+        { name: 'actions', selection: false, actions: true, fixed: false },
+        { name: 'both', selection: true, actions: true, fixed: false },
+        { name: 'overflow', selection: true, actions: true, fixed: true },
+      ].map((example) => (
+        <div key={example.name} data-track-case={example.name}>
+          <DataGrid
+            label={'Tracks ' + example.name}
+            columns={[
+              {
+                key: 'name',
+                header: <Button type='button' variant='ghost' size='sm'>Sort name</Button>,
+                width: example.fixed ? '420px' : 'minmax(0, 2fr)',
+              },
+              {
+                key: 'detail',
+                header: 'Detail',
+                width: example.fixed ? '380px' : 'minmax(0, 1fr)',
+              },
+            ]}
+            rows={[
+              { id: 'short', data: { name: 'Short', detail: 'One' }, selected: true },
+              { id: 'long', data: { name: 'Longer', detail: 'Two' } },
+            ]}
+            selectedIds={example.selection ? new Set(['short']) : undefined}
+            onSelectionChange={example.selection ? () => {} : undefined}
+            renderRowActions={example.actions
+              ? (_data, { row }) => (
+                <Button type='button' variant='outline' size='sm'>
+                  {row.id === 'short' ? 'Edit' : 'Inspect the complete activity record'}
+                </Button>
+              )
+              : undefined}
+          />
+        </div>
+      ))}
+      {(['loading', 'empty'] as const).map((state) => (
+        <div key={state} data-track-state={state}>
+          <DataGrid
+            label={'Tracks ' + state}
+            columns={[{ key: 'name', header: 'Name', width: '420px' }, {
+              key: 'detail',
+              header: 'Detail',
+              width: '380px',
+            }]}
+            rows={[]}
+            state={state}
+            loading={<span role='status'>Loading shared tracks</span>}
+            empty={<span>No shared rows</span>}
+          />
+        </div>
+      ))}
     </section>
   );
 }

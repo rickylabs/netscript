@@ -1325,3 +1325,28 @@ summary.ns-dashboard__nav-group-label {
   height: calc(100% - 16px);
   min-height: calc(100% - 16px);
 }
+
+/* The native navigation modal owns its inset; generic Dialog padding is content layout. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dialog'][data-part='content'].ns-dashboard__drawer {
+  padding: 0;
+  border: 0;
+}
+
+/* Collapsed navigation keeps native names while its glyphs share one center. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) .ns-dashboard__sidebar[data-collapsible='icon'] summary[data-scope='sidebar'][data-part='nav-group-label'] {
+  font-size: 0;
+}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) .ns-dashboard__sidebar[data-collapsible='icon'] [data-scope='sidebar'][data-part='nav-item']:is([aria-current='page'], [data-state='selected'])::before {
+  position: absolute;
+  inset-inline-start: var(--ns-space-1);
+  inset-block-start: 50%;
+  margin: 0;
+  transform: translateY(-50%);
+}
+
+/* This sidebar is physically owned by a native modal, not the legacy translated rail. */
+@media (max-width: 1024px) {
+  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) .ns-dashboard__sidebar[data-scope='sidebar'][data-part='root']:dir(rtl) {
+    transform: none;
+  }
+}

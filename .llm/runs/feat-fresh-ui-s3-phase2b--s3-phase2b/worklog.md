@@ -467,3 +467,163 @@ and quality/native publication reconcile, actual generated delta0,28sourcefiles.
 Evidence-only commit records the sign-off, then mandatory zero public audit
 precedes normal push/comment. Recovery7 parent latest-main rebase and child
 restack are next, before remaining11b/12/13 product implementation. No READY.
+
+
+## Restack7 integration in progress
+
+Parent426c5d09 is pushed on mainf4aa307b. Child replay completed at707e08db;
+remote child d0d8d922 remains unchanged. See restack7-checkpoint.md. Fresh full
+package/browser results are pending, with strict native layout/selection checks.
+No READY; remaining11b/12/13 scope stays required.
+
+## Restack7 native observation refinement
+
+Both same independent trace design reviews PASS; failure streak0. The initially
+approved nested worker-option placement failed collection with0executed cases.
+The reviewed correction moves exactly three original native-close cases into
+native-close.spec.ts with file-level non-activating tracing. Original test
+bodies are verified equal apart from indentation/formatting, and the per-kind
+beforeEach is exact. Every original assertion and title remains; sibling tests
+retain default tracing. Focused36all-engine cases precede full667Chromium and
+explicit320targetedFirefox/WebKit cases. No stopped/collection run is green.
+Final package765PASS remains valid: only browser specs changed afterward.
+The corrected RTL exact accessible-name locator and scoped-removal geometry
+control are recorded honestly in restack7-negative.json. No product native policy
+change, retries, engine branch, synthetic event or forced-close fallback.
+
+
+Restack7 native file-placement design PASS; focused36actual Chromium/Firefox/
+WebKit native-close cases PASS,0failed/retry/flaky. Exact old test bodies and
+per-kind beforeEach are retained. Current scope wrappers4spec checks and5browser
+lint/fmt files PASS0drop. Full667Chrome and explicit320FFWK matrices follow.
+Current fullpackage765PASS; no product source changed since that suite.
+
+
+## Restack7 visual and selected-surface follow-up
+
+The native inset rail fixes measured WebKit dynamic subgrid placement and passes
+48focused cases plus real PNG/negative controls. Fresh package765 andChromium667
+pass. The cross run fails171/1/148 on light selected-hover labels at4.44contrast;
+explicit hover reproduces this in all engines. Complete trees are preserved
+privately. No Source sign-off/commit or child push yet. The separate selected-
+surface/Button ownership checkpoint precedes further edits. Remaining11b/12/13
+is unchanged; no READY, no new waiver, no token-value change.
+
+
+## Restack7 final selected-surface source gates
+
+Same independent selected-surface/Button ownership design PASS. The new explicit-
+hover test was proven red on unchanged source before the own-label role mix and
+three caller outline variants were applied. Existing #2450 is open and owns the
+role/surface follow-up; README and drift record the boundary, not an AA waiver.
+Final source is frozen. Focused60, WebKit axe24, fullpackage765, Chromium671 and
+Firefox/WebKit328 all pass, with0retries/flaky/axe allowances and540private
+captures. Final-source rail negatives fail at their intended assertions.
+Working quality/architecture, native publication0slowtypes, preflight, accuracy
+and export drift pass. Doclint remains123exact unchanged TypeScript diagnostics
+plus one JSON limitation under accepted #2531,0new/removed. Source review and
+commit are next; committed-head carriers/quality/publication/evidence and the
+approved latest-base reconciliation precede the leased pushes. No next feature
+unit, READY, merge or final publication yet.
+
+
+## Restack7 source review round1 — fluid-track correction
+
+Independent review returned FAIL_FIX for the whole-table max-content minimum.
+Failure streak1; a second consecutive terminal failure ends the leaf. The new
+long-text default/fr regression failed at its intended no-overflow assertion
+after native-wide and grid preconditions passed. The private288-measurement
+native probe isolated the earlier fixed-overflow background failure: min-content
+on the table alone permits its intrinsic action cell to shrink beneath its
+button; a max-content minimum only on action cells preserves the fixed tracks,
+button containment and full row coverage. All72candidate controls aligned;
+all18fluid controls fit, and all72long spans wrapped. The rejected viewport
+floor experiment is not source.
+
+The source correction uses that native table/action minimum pair. The existing
+fixed420/380scroll assertions now also check every row box covers the actual
+table scroll width, selected background/rule and native control containment.
+No existing assertion, narrow branch, API, token or engine policy was removed.
+Canonical assets and gap build completed with exit0. Fourteen source files and
+the canonical fixture build are frozen for fresh focused72,24WebKit axe,765
+package,675Chromium and336Firefox/WebKit gates. Prior765/671/328runs are
+historical. Current wrappers pass with0dropped; quality/preflight/accuracy/
+export drift/native publish pass. Raw doc-lint remains124 under#2531:123
+TypeScript diagnostics match the baseline exactly,0new/removed, plus1JSON.
+Same substantive source review round2 follows terminal fresh gates. No source
+commit, next feature, READY or final publication yet.
+
+
+### Fluid vertical containment found before source review round2
+
+Actual native captures found a second manifestation of wrapping: WebKit's
+automatic subgrid group rows could be shorter than their wrapped cells. The
+horizontal focused72and24WebKit axe pass had missed vertical containment. The
+full package/browser runs were deliberately interrupted; none is a final verdict.
+Only positively verified run-owned process/server groups were stopped. The
+read-only resource report's foreign and unknown entries were left untouched.
+
+Every long-text line is now asserted inside both its cell and row in both axes.
+The actual WebKit regression failed at this intended vertical assertion before
+the CSS change. Native probes216measurements compared unchanged, row-height and
+group-track candidates across three engines, both directions, three widths and
+four fixture types. Explicit max-content implicit row tracks on the wide header/
+body groups pass all72candidate controls:0cell/text spill,0misalignment and0fluid
+overflow. The existing minimum row-height token remains in force; the alternative
+that removed it was rejected. No JS measurement, engine condition or API/token
+change is used. Six final-source native captures fit in both axes; the WebKit RTL
+capture was inspected. Canonical generation/build exit0. Fresh gates restart on
+the same fourteen-file source boundary. Same source-review failure streak1; no
+round2 verdict has been requested or reset. All remaining11b/12/13scope persists.
+
+
+### Package environment correction during the frozen full run
+
+The first full package invocation finished763passed/2failed. The runner had
+incorrectly passed the native browser library environment to this non-browser
+suite. The token embedding permission control reports a denied formatter spawn
+with that library override; the registry embedding test uses the same restricted
+formatter command. Those test permissions stay intact. The complete765suite is
+rerunning in its normal ambient environment, with no source/test changes or
+waivers. The failed raw result is retained privately; browser gates continue
+unchanged on the same frozen source. This is an execution-environment correction,
+not a terminal evaluator verdict or an artificial failure-streak reset.
+
+
+### Final fluid source gates terminal before source review round2
+
+All765package tests pass in the normal ambient environment, raw exit0. Final
+full Chromium675and affected Firefox/WebKit336pass with0failures/retries/flaky
+results/new axe allowances, including all four affected files in both schemes
+and widths. Final72focused/24WebKit axe/7wrapper selections and all working
+broad/publication gates pass with0drop and0slow types. Source14and canonical
+build5 hashes match throughout. Evidence:380Chromium/160cross-engine/6fluid
+private captures; corrected samples from all engines inspected. Both rail
+negatives fail at208against tolerance1. Doc-lint remains accepted raw124,
+exact123TS+1JSON,0new/removed. No earlier or interrupted run is substituted.
+
+The original orchestration process cached its earlier package failure and
+therefore ended aggregate exit1 after recording both browser exits0. The
+corrected complete package command independently ends0; actual wrapper JSON
+and actual browser exits/logs compose the final evidence. Frozen equality was
+verified before archiving the terminal Chromium result tree. The gate-summary
+assembler verifies each command, counts, native negatives and wrappers before
+recording this set. Source review round2 now returns to the same evaluator,
+with the source review failure streak still1 until its terminal verdict.
+
+
+## Restack7 source review round2 PASS — source sign-off
+
+The same independent read-only evaluator reviewed the complete fourteen-file
+combined correction and passed it with no new blockers. The fluid floor and
+content-sized group rows resolve round1; failure streak0. The reviewer accepted
+the stronger two-dimensional regression, fixed-overflow/background coverage,
+retained native/query/selection/axe assertions and the fresh frozen765/675/336
+evidence, including the disclosed package-environment correction.
+
+This sign-off authorizes the source commit with this run context. Actual-source
+carrier regeneration/delta inspection and own-head quality/publication must
+follow, then the same evidence review, approved latest-base parent/child
+reconciliation, own-head proofs/reviews and audited exact-lease pushes. No
+READY, new feature, label, closing keyword, merge or early future promotion.
+The complete11b/12/13assignment remains active after restack.

@@ -240,7 +240,7 @@
   background: var(--ns-table-hover);
 }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row'][aria-selected='true'] {
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row']:is([aria-selected='true'], [data-state='selected']) {
   background: var(--ns-selected);
 }
 
@@ -279,12 +279,21 @@
   padding-block: var(--ns-space-2);
   border-top: none;
 }
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row'][aria-selected='true'] {
-  border-inline-start: var(--ns-space-0-5) solid var(--ns-marker);
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row']:is([aria-selected='true'], [data-state='selected']) {
+  position: relative;
+  /* Inset paint keeps generated boxes out of native subgrid row placement. */
+  box-shadow: inset var(--ns-space-0-5) 0 0 var(--ns-marker);
 }
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row'][aria-selected='true']:hover {
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row']:is([aria-selected='true'], [data-state='selected']):dir(rtl) {
+  box-shadow: inset calc(-1 * var(--ns-space-0-5)) 0 0 var(--ns-marker);
+}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row']:is([aria-selected='true'], [data-state='selected']):hover {
   background: color-mix(in srgb, var(--ns-fg) calc(var(--ns-state-hover-opacity) * 1%),
     var(--ns-selected));
+}
+/* Small owned labels need contextual ink on the selected surface and its hover tint. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row']:is([aria-selected='true'], [data-state='selected']) > .ns-data-grid__cell > .ns-data-grid__cell-label {
+  color: color-mix(in srgb, var(--ns-muted-fg) 80%, var(--ns-fg));
 }
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='header-cell'] {
   text-transform: uppercase;
@@ -303,4 +312,40 @@
 :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='header'] {
   flex-direction: row;
   align-items: center;
+}
+
+/* One wide table grid sizes intrinsic tracks once; narrow rows keep their
+   existing stacked layout. Older engines retain the per-row fallback. */
+@supports (grid-template-columns: subgrid) {
+  @container ns-data-grid (width > 640px) {
+    .ns-data-grid__table {
+      display: grid;
+      min-width: min-content;
+      column-gap: var(--ns-inline-gap, var(--ns-space-3));
+    }
+    /* Only intrinsic actions set a content floor; fluid data tracks can wrap. */
+    .ns-data-grid__actions {
+      min-width: max-content;
+    }
+    .ns-data-grid__head,
+    .ns-data-grid__body {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+      /* Wrapped cell content sets each row's height, above its existing role minimum. */
+      grid-auto-rows: max-content;
+    }
+    .ns-data-grid__row,
+    .ns-data-grid__status-row {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid !important;
+    }
+    .ns-data-grid__status {
+      grid-column: 1 / -1;
+    }
+    :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='data-table'][data-part='row'].ns-data-grid__status-row {
+      padding: 0;
+    }
+  }
 }

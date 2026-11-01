@@ -1,0 +1,25 @@
+{
+  "verdict": "HISTORICAL_ONLY_REPLACED_BY_FRESH_FINAL_MATRICES",
+  "preRunSnapshotPaths": 647,
+  "productionAndFixtureChanges": 0,
+  "changedExistingSpecs": 3,
+  "newNativeCaseModule": 1,
+  "onlyDataTableChangeAfterFullChromium": "one physical selection-clear precondition insertion",
+  "originalDataTableLinesAndOrderPreserved": true,
+  "fileHooksAndOtherCaseBodiesUnchanged": true,
+  "browserBuildChanged": false,
+  "fullChromiumLabel": "predecessor spec, identical rendered source",
+  "changedCaseFinalProof": {
+    "passed": 12,
+    "failed": 0,
+    "retries": 0,
+    "flaky": 0
+  },
+  "finalPhase13FullMatrixStillRequired": true,
+  "fixtureControlPaintChangedAfterThisProof": true,
+  "currentReadinessProof": false,
+  "requiredFreshGates": {
+    "chromium": 667,
+    "firefoxWebkit": 320
+  }
+}

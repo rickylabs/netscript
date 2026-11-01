@@ -191,3 +191,14 @@
   line-height: var(--ns-leading-small);
   letter-spacing: var(--ns-tracking-small);
 }
+
+/* Joined metrics retain their single clipped frame under Utility role bindings. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='stats-grid'][data-part='root'][data-joined='true'] {
+  gap: 0;
+}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='stats-grid'][data-part='root'][data-joined='true'] > [data-part='card'] {
+  border: 0;
+  border-inline-start: var(--ns-border-width) solid var(--ns-kpi-border);
+  border-radius: 0;
+  box-shadow: 0 calc(-1 * var(--ns-border-width)) 0 0 var(--ns-kpi-border);
+}

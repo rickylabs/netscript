@@ -142,6 +142,10 @@ declare const setSelectedIds: (next: ReadonlySet<string>) => void;
 />;
 ```
 
+On Utility's hovered selected rows, the global muted foreground can fall below AA. DataGrid
+adjusts its own column labels for that surface. Text and controls supplied by callers should use
+foreground roles there, such as an outline Button or ActionMenu.
+
 ## API at a glance
 
 | Entry            | What it gives you                                                                                |
@@ -379,7 +383,8 @@ restored after activation. Shift, Alt and combined-modifier body clicks are not 
 visible native link for those operations. Body clicks are delegated activations; direct controls
 retain raw native event semantics. Middle-click and the native link
 context menu are available directly on the visible row-link arrow; auxiliary body clicks are not
-forwarded. Native text selection stays available. Control/Meta body clicks on `onSelect` rows activate their
+forwarded. Native text selection stays available. In WebKit, a click that dismisses an active selection\ncan finish without activating the row; a subsequent click activates it.
+Control/Meta body clicks on `onSelect` rows activate their
 button normally. Selection and action cells retain their existing click-propagation isolation; other
 independent controls keep their native behavior. The serialized `aria-checked` hint remains for
 compatibility and updates with the same accepted render as the authoritative native checked and

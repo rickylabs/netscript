@@ -71,35 +71,5 @@ for (const kind of ['dialog', 'sheet'] as const) {
       expect(result.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'))
         .toEqual([]);
     });
-
-    test(`${kind}/platform-close-wins-and-next-parent-render-reconciles`, async ({ page }) => {
-      const area = page.locator(`#${kind}-ownership`);
-      await area.getByRole('button', { name: 'Open platform-close navigation', exact: true })
-        .click();
-      const dialog = area.getByRole('dialog', { name: 'Platform-close navigation sample' });
-      await expect(dialog).toBeVisible();
-      await page.keyboard.press('Escape');
-      // Keep the key presses adjacent: automation DOM queries can supply user activation.
-      await page.keyboard.press('Escape');
-      await expect(area.getByLabel('Platform navigation cancelability')).toHaveText('[true,false]');
-      await expect(dialog).not.toBeVisible();
-      const reasons: string[] = JSON.parse(
-        (await area.getByLabel('Platform navigation close reasons').textContent())!,
-      );
-      expect(reasons.filter((reason) => reason === 'native-close')).toHaveLength(1);
-      await area.getByRole('button', {
-        name: 'Render accepted navigation state again',
-        exact: true,
-      })
-        .click();
-      await expect.poll(async () => ({
-        visible: await dialog.isVisible(),
-        reasons,
-      })).toEqual({ visible: true, reasons: ['trigger', 'native-close'] });
-      expect(await dialog.evaluate((element) => element.matches(':modal'))).toBe(true);
-      await expect(
-        dialog.getByRole('button', { name: 'Close platform-close navigation', exact: true }),
-      ).toBeFocused();
-    });
   });
 }

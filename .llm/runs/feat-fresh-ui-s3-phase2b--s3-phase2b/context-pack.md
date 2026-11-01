@@ -1,4 +1,128 @@
+# Current resume — source review round2 PASS
+
+The same independent evaluator passed the complete fourteen-file correction,
+including both fluid wrapping and vertical containment, and found no new blockers.
+Failure streak0. The full765package/675Chromium/336affectedFirefox-WebKit and
+72focused/24WebKit axe gates pass on frozen source/build; all prior failed,
+interrupted and predecessor runs retain their distinct historical status.
+
+The reviewed source and run context now form the source commit. Next are the
+actual committed-source four carriers, actual-head quality/native publication,
+and the SAME evidence review before any push. Then the approved docs-only
+parent/child rebase with each head's own source equality/gates/reviews, public
+audits and exact-lease pushes. No next feature before terminal restack/comment.
+
+ALL remaining11b,12and13scope below is still required. No READY or final report.
+
+---
+
+# Current resume — fluid correction awaiting source review round2
+
+Full assignment remains active. No READY. Parent2488remote426c5d09, child2538
+remote d0d8d922, local707e08db with fourteen uncommitted source/carrier files.
+Latest main6a1d84a6 is fetched; the approved docs-only parent/child rebase follows
+source review/commit and committed-source evidence, never a blind conflict pick.
+
+Source review round1 returned FAIL_FIX: whole-table max-content blocked fluid
+wrapping. Failure streak1; the same source review round2 must resolve it or the
+leaf stops and escalates. No round2 verdict has been requested. Native corrected
+sizing uses table min-content, intrinsic actions max-content and content-sized
+implicit rows on wide header/body groups. Existing minimum row-height role is
+retained. Actual red controls cover horizontal overflow and WebKit vertical text
+overlap. All72candidate native sizing controls have no spill/misalignment.
+
+Final strengthened focused72and24WebKit axe cases pass, with0retries/flaky/new
+allowances. Source3/fixture3/spec4 checks and browser lint/fmt7 pass with0drop.
+Both final rail mutants fail at208against fixed tolerance1. Final quality,
+preflight/accuracy/export drift/native publish pass; doc-lint remains accepted
+#2531raw124/exact123TypeScript+1JSON/0new. The fresh full765package,675Chromium
+and336affectedFirefox-WebKit gates now pass on frozen final source/build.
+The complete765rerun uses the normal ambient environment; the earlier763/2
+permission-control failure from an incorrectly inherited browser library
+override is retained, with no source/test/permission waiver.
+Earlier671/328and pre-row-track runs are historical; interrupted runs have no
+final verdict. Six corrected native captures fit in both axes and samples from
+all three engines were inspected. No source edits while these gates run.
+
+Public privacy audit caught the resource reporter's automatic raw Markdown and
+replaced it with verdict/counts only; details are private. Both added lines and
+public runs now have0forbidden paths/session identifiers/thumbprints. Repeat
+immediately before every push. Foreign/unproven resources remain untouched.
+
+Next: SAME source review round2, reviewed source commit,
+all four canonical carriers with actual delta inspection and own-head quality/
+publication, SAME evidence review, approved latest-base parent/child comparisons
+and per-head gates/reviews, exact-lease audited pushes and PR updates. Then ALL
+remaining11bToc/AnchorNav/RuledGrid/Hero/Desktop audit/originalShellToc,12declared
+x-extensions/all-style base+extension+browser coverage, and13whole-phase/runtime/
+IMPL-EVAL/exact-head required CI. Nothing partial satisfies full completion.
+Only Utility is registered; presets and nineteen later promotions stay separate.
+
+---
+
 # Resume S3 phase2b
+
+## Current checkpoint: source review FAIL_FIX round1; fluid correction in progress
+
+Full assignment remains active; no commit/push/READY. Same evaluator found one
+material blocker: whole-table min-width:max-content prevents fluid columns from
+wrapping in wide containers. Failure streak1; a second consecutive terminal
+failure ends this leaf. Read restack7-source-review-round1.md and
+restack7-fluid-checkpoint.md first. Fix only within the existing fourteen-file
+scope, with red-first wrapping at641/900/actual1280content width, both directions,
+and keep fixed/intrinsic overflow background/rule coverage and every old assertion.
+
+A new long-text fluid fixture and one regression have been added to the existing
+fixture/spec, before any production CSS change. The negative build is in progress.
+Prototype min-content table sizing and a minimum floor only for non-shrinkable
+intrinsic actions if needed; diagnose coverage instead of restoring max-content.
+No framework JS measurement, API/token/engine branch, new evaluator or artificial
+failure-streak reset. Fresh focused72/axe24/package765/Chromium675/cross336 and all
+wrappers/broad/publication/doclint attribution precede the SAME source review.
+Prior passing765/671/328 and other proof is now historical as source changes.
+
+The preceding state and unchanged mandatory remainder follow for context:
+
+## Current checkpoint: final restack7 gates pass; source review pending
+
+Full assignment remains active; no READY. Branch feat/fresh-ui-s3-phase2b is
+locally rebased onto parent426c5d09 at707e08db, with fourteen focused integration
+source/carrier files still uncommitted. Remote child remains d0d8d922. Read
+restack7-source-summary.md and restack7-validation.json for the authoritative
+scope, source hashes and current proof; raw logs/receipts/images remain private.
+
+Same independent design reviews pass for the combined integration, native
+procedures, query reference, inset rail and selected-surface ownership. Actual
+red-first regressions fail before each correction. Final focused60, axe-bearing
+WebKit24, package765, Chromium671 and Firefox/WebKit328 pass on frozen source,
+with0retries/flaky/axe allowances and540private captures. Final rail negatives
+reject missing and opposite-edge paint. Wrappers have0drop; working broader
+quality/publication0slowtypes/preflight/accuracy/export pass. Doclint remains
+accepted #2531 red:124total,123unchanged TypeScript plus one JSON limitation,
+0new/removed. The disclosed selected-surface role follow-up belongs to open
+#2450; no token value or contrast-exclusion change. Dated lesson is recorded.
+
+NEXT: same substantive SOURCE review, source commit with run records, all four
+committed-source carriers and actual-head quality/publication/evidence review.
+Then apply the separately approved latest-main6a1d84a6 docs-only addendum: parent
+rebase and own gates/evidence/audited lease426c, child replay and own gates/
+evidence/audited lease d0d8. Preserve maintained main text and verify all reviewed
+Fresh UI/browser/config/lock bytes after each rebase before reusing render gates
+as predecessor executions. Stop unexpected maintained/semantic conflicts for
+substantive review. No source edit while a gate or review depends on frozen bytes.
+
+Inventory104identities/100shipped/4pending. Remaining11b: Toc,AnchorNav,RuledGrid,
+Hero, Desktop audit and original Shell Toc integration;12: production declared-x
+metadata and all-style base/extension/browser harness;13: whole-phase/runtime/
+final independent IMPL-EVAL and exact-head required CI. Only Utility is a source
+style; presets remain separate. A style may add only registry-declared x-prefixed
+attributes/optional slots/style-scoped blocks, never change/remove base items.
+The later nineteen promotions follow the Utility canary. Refs #2416 only, no
+labels/closing keywords/merge. Cockpit owns merging. Public added lines and both
+run directories must have zero forbidden host paths, session identifiers or
+thumbprints; leak-check output is verdict/counts only before every push.
+
+## Historical sequence below
 
 Read supervisor.md, plan.md, worklog.md, drift.md here and the predecessor phase2a evaluate-phase2a.md. Baseline31cc758, branchfeat/fresh-ui-s3-phase2b; parentPR2488. Full assignment remains active.17unshipped identities: Layout4,AI5,Docs8; Desktop6 audit; PageShell/responsiveTopBar/docs-chat geometry plus baselineShell/StatsGrid/DataTableaudit; additive style-contract harness. Only Utility is a registered source style; token presets are separate. Owner x-extension rule is binding.
 
@@ -431,3 +555,28 @@ and quality/native publication reconcile, actual generated delta0,28sourcefiles.
 Evidence-only commit records the sign-off, then mandatory zero public audit
 precedes normal push/comment. Recovery7 parent latest-main rebase and child
 restack are next, before remaining11b/12/13 product implementation. No READY.
+
+
+## Restack7 integration in progress
+
+Parent426c5d09 is pushed on mainf4aa307b. Child replay completed at707e08db;
+remote child d0d8d922 remains unchanged. See restack7-checkpoint.md. Fresh full
+package/browser results are pending, with strict native layout/selection checks.
+No READY; remaining11b/12/13 scope stays required.
+
+Restack7 design refinement PASS precedes the combined native grid/joined metrics/
+modal integration fixes. Existing full package first pass765PASS; fresh complete
+post-fix package/browser matrices are running. Focused20Chromium passes preceded
+the measured collapsed/RTL Sidebar refinements; those retain native names/keys and
+now have explicit geometry/viewport assertions. Current broader quality/architecture,
+preflight/docs accuracy/export drift/site259 and native member publication PASS.
+Current full doc-lint remains raw124, accepted2531, exact123 TypeScript identities
+unchanged plus one JSON limitation. No new/removed diagnostics, never greenwashed.
+Same independent source review is still pending final browser/three-engine proof.
+
+
+Restack7 native file-placement design PASS; focused36actual Chromium/Firefox/
+WebKit native-close cases PASS,0failed/retry/flaky. Exact old test bodies and
+per-kind beforeEach are retained. Current scope wrappers4spec checks and5browser
+lint/fmt files PASS0drop. Full667Chrome and explicit320FFWK matrices follow.
+Current fullpackage765PASS; no product source changed since that suite.

@@ -1,0 +1,47 @@
+{
+  "negative": {
+    "exitCode": 1,
+    "nativeWidePrecondition": "PASS",
+    "failedAssertion": "fluid root scrollWidth <= clientWidth"
+  },
+  "prototype": {
+    "nativeMeasurements": 288,
+    "candidateMeasurements": 72,
+    "candidateFluidMeasurements": 18,
+    "candidateMisaligned": 0,
+    "candidateFluidOverflow": 0,
+    "candidateUnwrappedSpans": 0,
+    "engines": [
+      "chromium",
+      "firefox",
+      "webkit"
+    ],
+    "unmodifiedBaseline": {
+      "nativeFluidMeasurements": 18,
+      "withHorizontalOverflow": 18,
+      "unwrappedSpans": 72,
+      "engines": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ]
+    }
+  },
+  "scope": "Private native sizing probe; final source gates pending. Source review failure streak 1.",
+  "verticalContainment": {
+    "discovery": "Actual WebKit capture showed text overlapping the next row despite horizontal geometry passing",
+    "negative": {
+      "exitCode": 1,
+      "failedAssertion": "Every long-text line remains inside its row within 0.75px",
+      "nativeWideAndHorizontalChecks": "PASS"
+    },
+    "prototypeMeasurements": 216,
+    "candidateMeasurements": 72,
+    "candidateCellSpill": 0,
+    "candidateTextSpill": 0,
+    "candidateMisaligned": 0,
+    "candidateFluidOverflow": 0,
+    "correction": "Wide header/body groups use content-sized implicit rows; existing minimum row-height role is retained",
+    "interruptedFullRuns": "HISTORICAL_INTERRUPTED_NO_FINAL_VERDICT"
+  }
+}

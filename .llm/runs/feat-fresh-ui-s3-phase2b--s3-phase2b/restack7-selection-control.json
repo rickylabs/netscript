@@ -1,0 +1,12 @@
+{
+  "verdict": "PASS",
+  "passed": 12,
+  "failed": 0,
+  "engines": 3,
+  "schemes": 2,
+  "widths": 2,
+  "selectedWordPreserved": true,
+  "selectionClearedByPhysicalHeadingClick": true,
+  "firstActivation": 1,
+  "subsequentActivation": 2
+}

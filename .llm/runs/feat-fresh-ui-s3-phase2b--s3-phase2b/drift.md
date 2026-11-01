@@ -75,3 +75,24 @@ Recovery6 stacked integration: parent71d8df6f on main7feb24c7 is independently v
 
 
 9c-b2 nativepointerproof:ControlOrMeta primarybodyclick opensnativeTab, but forwardedauxclick fails browserdefaultnavigation becauseitissynthetic. Applytheindependentreviewerexplicitfallback:stopforwardingauxiliarybodyclicks, showactualnativeactivationarrow, middle-click/contextmenuonthatvisiblelinkremainnative. No customnavigationengine/windowopen; plain/modifiedprimarybodyclick/textselection/nativekeys preserved. READMErecordscompatibilitydetail. This is an implementation refinement withinapprovedpointerreview, not a test waiver.
+
+
+## 2026-11-01 — Utility muted foreground on selected-hover surfaces
+
+Owner: Fresh UI theming. Tracked follow-up: Refs #2450, which remains open for
+role contrast and exclusion burn-down. The existing issue owns theme values;
+this slice does not alter tokens or add a contrast exclusion.
+
+Actual native row hover in all three engines measures4.44contrast for the global
+muted foreground on Utility's selected-hover background, below4.5. DataGrid
+compensates only its own column labels through existing-role contextual ink.
+The fixture host chooses the existing outline Button variant for its body actions;
+Button and foreign-widget paint remain outside DataGrid's ownership. The README
+discloses the caller's surface responsibility. The cost of the remaining theme
+follow-up is auditing the role/surface pairing at the source, including tinted
+host surfaces; global muted text is not certified over arbitrary selected tints.
+
+This is not an AA waiver: current-scope source/browser axe must be zero, with
+strict explicit selected-rest/hover controls and no additional allowance. The
+label-only prototype's caller failure and the final red-first native regression
+are preserved as negative proof. Final-source gates are still pending.

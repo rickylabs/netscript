@@ -89,6 +89,7 @@ Deno.test('DataGrid uses native table rows and independent native actions with n
 
 Deno.test('DataGrid retains cell rendering, widths and treatments for linked and ordinary rows', () => {
   const grid = DataGrid(props());
+  assertEquals(part(grid, 'table')[0].props.style, part(grid, 'row')[1].props.style);
   assertEquals(part(grid, 'row')[1].props.style, {
     gridTemplateColumns: '2fr 8rem minmax(0, 1fr)',
   });

@@ -175,6 +175,8 @@ export function DataGrid<T>(
       'aria-describedby': props['aria-describedby'],
       'aria-busy': state === 'loading' ? 'true' : undefined,
       class: 'ns-data-grid__table',
+      // Wide containers share these tracks through native CSS subgrid.
+      style: gridStyle,
       'data-part': 'table',
       'data-scope': 'data-table',
     },

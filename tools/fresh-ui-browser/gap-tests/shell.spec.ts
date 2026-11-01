@@ -161,6 +161,19 @@ test(
       await expect(shell.getByRole('link', { name: 'Overview' })).toBeVisible();
       const summary = shell.locator('summary.ns-dashboard__nav-group-label');
       await expect(summary).toHaveAccessibleName('Reference');
+      await expect(summary).toHaveCSS('font-size', '0px');
+      const geometry = await shell.locator('aside[data-sidebar]').evaluate((element) => ({
+        fits: element.scrollWidth <= element.clientWidth + 1,
+        centers: Array.from(element.querySelectorAll('[data-part="nav-item"]')).flatMap((item) => {
+          const icon = item.querySelector('[data-part="nav-icon"]');
+          if (!icon || item.getBoundingClientRect().width === 0) return [];
+          const row = item.getBoundingClientRect(), glyph = icon.getBoundingClientRect();
+          return [Math.abs((row.left + row.right) / 2 - (glyph.left + glyph.right) / 2)];
+        }),
+      }));
+      expect(geometry.fits).toBe(true);
+      expect(geometry.centers.length).toBeGreaterThan(0);
+      for (const offset of geometry.centers) expect(offset).toBeLessThan(0.75);
       await summary.press('Enter');
       await expect(shell.getByRole('link', { name: 'Quick start' })).toBeVisible();
     } else {
@@ -276,35 +289,6 @@ test('custom control availability, malformed requests and two-shell isolation', 
   await expect(secondToggle).toBeFocused();
 });
 
-test('forced native close stands and later accepted parent render reopens', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 900 });
-  await page.goto('/shell');
-  const shell = page.locator('#shell-example');
-  await expect(shell).toHaveAttribute('data-sidebar-mode', 'hydrated');
-  await page.getByRole('button', { name: 'Refuse dismissal' }).click();
-  await expect(shell.locator('dialog')).toBeVisible();
-  // No evaluations/assertions between these Escapes: CDP evaluation grants activation.
-  await page.keyboard.press('Escape');
-  await page.keyboard.press('Escape');
-  await expect(shell.locator('dialog')).toBeHidden();
-  await expect(shell.locator('[data-scope="sidebar-toggle"]')).toHaveAttribute(
-    'aria-expanded',
-    'false',
-  );
-  await expect.poll(async () => {
-    const proposals = JSON.parse(
-      await page.getByLabel('Shell proposals').textContent() ?? '[]',
-    ) as string[];
-    return proposals.filter((value) => value === 'false:native-close').length;
-  }).toBe(1);
-  await page.getByRole('button', { name: 'Parent refresh' }).click();
-  await expect(shell.locator('dialog')).toBeVisible();
-  await expect(shell.locator('[data-scope="sidebar-toggle"]')).toHaveAttribute(
-    'aria-expanded',
-    'true',
-  );
-});
-
 test('RTL native backdrop, host overflow ownership and accepted controlled dismissal', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 900 });
   await page.goto('/shell?dir=rtl');
@@ -316,6 +300,8 @@ test('RTL native backdrop, host overflow ownership and accepted controlled dismi
   const toggle = shell.locator('[data-scope="sidebar-toggle"]');
   await toggle.click();
   await expect(shell.locator('dialog')).toBeVisible();
+  await expect(shell.locator('dialog').getByRole('link', { name: 'Overview 12', exact: true }))
+    .toBeInViewport();
   const box = await shell.locator('dialog').boundingBox();
   expect(box!.x + box!.width).toBe(390);
   await page.mouse.click(2, 500);

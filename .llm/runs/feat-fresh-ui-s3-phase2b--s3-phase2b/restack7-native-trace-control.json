@@ -1,0 +1,56 @@
+[
+  {
+    "browser": "chromium",
+    "snapshots": true,
+    "open": false,
+    "cancelable": [
+      true,
+      false
+    ]
+  },
+  {
+    "browser": "chromium",
+    "snapshots": false,
+    "open": false,
+    "cancelable": [
+      true,
+      false
+    ]
+  },
+  {
+    "browser": "firefox",
+    "snapshots": true,
+    "open": true,
+    "cancelable": [
+      true,
+      true
+    ]
+  },
+  {
+    "browser": "firefox",
+    "snapshots": false,
+    "open": false,
+    "cancelable": [
+      true,
+      false
+    ]
+  },
+  {
+    "browser": "webkit",
+    "snapshots": true,
+    "open": false,
+    "cancelable": [
+      true,
+      false
+    ]
+  },
+  {
+    "browser": "webkit",
+    "snapshots": false,
+    "open": false,
+    "cancelable": [
+      true,
+      false
+    ]
+  }
+]

@@ -1,3 +1,4 @@
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { MessageScroller } from '../../packages/fresh-ui/registry/components/ui/message-scroller.tsx';
 import { useRef, useState } from 'preact/hooks';
 import { SidebarShell } from '../../packages/fresh-ui/registry/components/ui/sidebar-shell.tsx';
@@ -117,7 +118,7 @@ export function ShellExamples() {
           brandBadge={<span>Acme</span>}
           sidebar={sidebar}
           sidebarVariant={variant}
-          footer={<button type='button'>Workspace settings</button>}
+          footer={<Button type='button' variant='ghost' size='sm'>Workspace settings</Button>}
           topbarBrand={<a href='#docs-home'>NetScript docs</a>}
           topbarStart={custom
             ? (
@@ -128,7 +129,7 @@ export function ShellExamples() {
               />
             )
             : <span>Workspace</span>}
-          topbarEnd={<button type='button'>Account</button>}
+          topbarEnd={<Button type='button' variant='ghost' size='sm'>Account</Button>}
           rail={layout === 'docs'}
           railContent={<a href='#section'>On this page: installation</a>}
           mobileRailContent={
@@ -148,7 +149,7 @@ export function ShellExamples() {
               <label>
                 Message<input name='message' />
               </label>
-              <button type='submit'>Send</button>
+              <Button type='submit' variant='ghost' size='sm'>Send</Button>
             </form>
           }
           sidebarOpen={controlled ? open : undefined}

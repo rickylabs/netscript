@@ -1,0 +1,536 @@
+{
+  "status": "SOURCE_REVIEW_ROUND2_PASS_COMMITTED_SOURCE_EVIDENCE_PENDING",
+  "sourceFiles": 14,
+  "base": "f4aa307b5340bd3de8029c11778a38bbca451ba1",
+  "parent": "426c5d095320f2e55e68f03aa1bb8ea525c6e135",
+  "tests": {
+    "fullFreshUi": {
+      "exitCode": 0,
+      "passed": 765,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 765,
+      "uniqueFailures": 0,
+      "verdict": "HISTORICAL_BEFORE_DYNAMIC_SELECTION_MARKER_CORRECTION"
+    },
+    "layoutRuntime": {
+      "passed": 13,
+      "failed": 0
+    }
+  },
+  "wrappers": {
+    "source-check": {
+      "verdict": "PASS",
+      "selected": 3,
+      "dropped": 0
+    },
+    "source-lint": {
+      "verdict": "PASS",
+      "selected": 3,
+      "dropped": 0
+    },
+    "source-fmt": {
+      "verdict": "PASS",
+      "selected": 3,
+      "dropped": 0
+    },
+    "browser-fixture-check": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    },
+    "browser-spec-check": {
+      "verdict": "PASS",
+      "selected": 4,
+      "dropped": 0
+    },
+    "browser-lint": {
+      "verdict": "PASS",
+      "selected": 5,
+      "dropped": 0
+    },
+    "browser-fmt": {
+      "verdict": "PASS",
+      "selected": 5,
+      "dropped": 0
+    }
+  },
+  "browser": {
+    "nativeFocused": {
+      "verdict": "PASS",
+      "passed": 36,
+      "failed": 0,
+      "retries": 0,
+      "flaky": 0,
+      "engines": 3,
+      "schemes": 2,
+      "widths": 2
+    },
+    "fullChromium": {
+      "verdict": "HISTORICAL_BEFORE_DYNAMIC_SELECTION_MARKER_CORRECTION",
+      "passed": 667,
+      "failed": 0,
+      "retries": 0,
+      "flaky": 0,
+      "exitCode": 0,
+      "captures": 380,
+      "uncoveredDynamicWideSelectionBug": true
+    },
+    "targetedFirefoxWebKit": {
+      "verdict": "HISTORICAL_BEFORE_DYNAMIC_SELECTION_MARKER_CORRECTION",
+      "exitCode": 0,
+      "passed": 320,
+      "failed": 0,
+      "didNotRun": 0,
+      "flaky": 0,
+      "retries": 0,
+      "captures": 160,
+      "engines": [
+        "Firefox",
+        "WebKit"
+      ],
+      "schemes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        390,
+        1280
+      ],
+      "axeAllowances": 0,
+      "frozenSourceUnchanged": true,
+      "buildUnchanged": true
+    },
+    "queryAndSelectionFocusedFinal": {
+      "verdict": "PASS",
+      "passed": 36,
+      "failed": 0,
+      "retries": 0,
+      "flaky": 0,
+      "engines": 3,
+      "schemes": 2,
+      "widths": 2,
+      "axeAllowances": 0
+    },
+    "callerControlsFinal": {
+      "status": "PASSED_ASSERTIONS_BUT_VISUAL_DYNAMIC_SELECTION_BUG_FOUND",
+      "mechanicalFixtureScope": "PASS",
+      "frameworkChanges": 0,
+      "assertionChanges": 0,
+      "axeScopeChanges": 0,
+      "axeBearingWebkit": {
+        "verdict": "PASS",
+        "exitCode": 0,
+        "passed": 20,
+        "failed": 0,
+        "retries": 0,
+        "flaky": 0,
+        "axeAllowances": 0
+      }
+    },
+    "failedCrossPredecessor": {
+      "verdict": "FAILED_BEFORE_COMPLETE_CALLER_CONTROL_CORRECTION",
+      "passed": 251,
+      "failed": 1,
+      "didNotRun": 68,
+      "exitCode": 1,
+      "failure": "Actual dark WebKit contrast on existing Keyboard caller buttons",
+      "files": [
+        "data-table.spec.ts",
+        "stats-grid.spec.ts",
+        "shell.spec.ts",
+        "native-close.spec.ts"
+      ]
+    }
+  },
+  "qualityArchitecture": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "workingTree": true
+  },
+  "preflight": "PASS",
+  "docsAccuracy": "PASS",
+  "docsExportsDrift": "PASS",
+  "docsSiteBuild": {
+    "verdict": "PASS",
+    "pages": 259
+  },
+  "nativePublication": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "slowTypes": 0,
+    "workingTree": true
+  },
+  "docLint": {
+    "verdict": "FAIL_ACCEPTED_EXISTING_DEBT",
+    "issue": 2531,
+    "fullRawExitCode": 1,
+    "diagnostics": 124,
+    "typeScriptDiagnostics": 123,
+    "jsonExportLimitations": 1,
+    "new": 0,
+    "removed": 0
+  },
+  "preservation": {
+    "parentPathsWithoutChildChangesChecked": 6175,
+    "unexpectedParentDifferences": 0,
+    "rootFreshUiDocsLockTopicDelta": 0
+  },
+  "reviewThreads": {
+    "verdict": "PASS",
+    "unanswered": 0
+  },
+  "sourceReview": {
+    "round1": "FAIL_FIX",
+    "round2": "PASS",
+    "consecutiveTerminalFailures": 0
+  },
+  "committedSourceCarriers": "PENDING_AFTER_SOURCE_COMMIT",
+  "privacyAudit": "PENDING_BEFORE_PUSH",
+  "runtimeAndCurrentRequiredCI": "UNPROVEN",
+  "selectionSpecWrappers": {
+    "check": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    },
+    "lint": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    },
+    "fmt": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    }
+  },
+  "finalFixtureWrappers": {
+    "check": {
+      "verdict": "PASS",
+      "selected": 3,
+      "dropped": 0
+    },
+    "spec-check": {
+      "verdict": "PASS",
+      "selected": 4,
+      "dropped": 0
+    },
+    "lint": {
+      "verdict": "PASS",
+      "selected": 7,
+      "dropped": 0
+    },
+    "fmt": {
+      "verdict": "PASS",
+      "selected": 7,
+      "dropped": 0
+    }
+  },
+  "markerCorrection": {
+    "status": "CONTRAST_FOLLOWUP_REQUIRED_NO_SOURCE_CHANGE_YET",
+    "sourceFiles": 14,
+    "focusedCases": {
+      "verdict": "PASS",
+      "exitCode": 0,
+      "passed": 48,
+      "failed": 0,
+      "retries": 0,
+      "flaky": 0,
+      "engines": 3,
+      "schemes": 2,
+      "widths": 2,
+      "axeAllowances": 0
+    },
+    "paintNegatives": {
+      "missingRail": "EXPECTED_FAILURE",
+      "oppositeEdge": "EXPECTED_FAILURE",
+      "tolerance": 1
+    },
+    "packageFull": {
+      "verdict": "PASS",
+      "exitCode": 0,
+      "passed": 765,
+      "failed": 0,
+      "ignored": 0,
+      "durationMs": 386348
+    },
+    "chromiumFull": "RUNNING",
+    "crossFull": {
+      "verdict": "FAIL",
+      "exitCode": 1,
+      "passed": 171,
+      "failed": 1,
+      "didNotRun": 148,
+      "failure": "Actual light WebKit narrow selected-row label hover contrast4.44 below4.5"
+    }
+  },
+  "selectedSurfaceFinal": {
+    "status": "HISTORICAL_BEFORE_FLUID_CORRECTION",
+    "sourceFiles": 14,
+    "focused": {
+      "verdict": "PASS",
+      "passed": 60,
+      "failed": 0,
+      "retries": 0,
+      "flaky": 0,
+      "engines": 3,
+      "schemes": 2,
+      "widths": 2,
+      "axeAllowances": 0
+    },
+    "axeBearingWebkit": {
+      "verdict": "PASS",
+      "passed": 24,
+      "failed": 0,
+      "retries": 0,
+      "flaky": 0,
+      "schemes": 2,
+      "widths": 2,
+      "axeAllowances": 0
+    },
+    "railNegatives": {
+      "missingRail": "EXPECTED_FAILURE",
+      "oppositeEdge": "EXPECTED_FAILURE",
+      "fixedTolerance": 1,
+      "finalSource": true
+    },
+    "fullPackage": {
+      "verdict": "PASS",
+      "passed": 765,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 765,
+      "uniqueFailures": 0,
+      "exitCode": 0
+    },
+    "fullChromium": {
+      "verdict": "PASS",
+      "passed": 671,
+      "failed": 0,
+      "retries": 0,
+      "flaky": 0,
+      "exitCode": 0,
+      "captures": 380
+    },
+    "fullFirefoxWebkit": {
+      "verdict": "PASS",
+      "passed": 328,
+      "failed": 0,
+      "retries": 0,
+      "flaky": 0,
+      "exitCode": 0,
+      "captures": 160
+    },
+    "roleSurfaceFollowup": {
+      "issue": 2450,
+      "state": "OPEN",
+      "owner": "Fresh UI theming",
+      "noNewExclusion": true,
+      "noTokenValueChanges": true
+    },
+    "qualityArchitecture": {
+      "verdict": "PASS",
+      "exitCode": 0,
+      "workingTree": true
+    },
+    "nativePublication": {
+      "verdict": "PASS",
+      "exitCode": 0,
+      "slowTypes": 0,
+      "workingTree": true
+    },
+    "preflight": "PASS",
+    "docsAccuracy": "PASS",
+    "docsExportsDrift": "PASS",
+    "doclint": {
+      "verdict": "FAIL_ACCEPTED_EXISTING_DEBT",
+      "issue": 2531,
+      "fullRawExitCode": 1,
+      "diagnostics": 124,
+      "typeScriptDiagnostics": 123,
+      "jsonExportLimitations": 1,
+      "new": 0,
+      "removed": 0
+    },
+    "sourceAndBuildUnchanged": true
+  },
+  "fluidCorrection": {
+    "status": "VERTICAL_CONTAINMENT_CORRECTED_FRESH_GATES_PENDING",
+    "sourceFiles": 14,
+    "focused": {
+      "required": 72
+    },
+    "axeBearingWebkit": {
+      "required": 24
+    },
+    "fullPackage": {
+      "required": 765
+    },
+    "fullChromium": {
+      "required": 675
+    },
+    "fullFirefoxWebkit": {
+      "required": 336
+    },
+    "railNegatives": {
+      "missingRail": "EXPECTED_FAILURE",
+      "oppositeEdge": "EXPECTED_FAILURE",
+      "channelDifference": 208,
+      "fixedTolerance": 1
+    },
+    "wrappers": {
+      "source": 3,
+      "fixtures": 3,
+      "specs": 4,
+      "browserLintFmt": 7,
+      "dropped": 0,
+      "verdict": "PASS"
+    },
+    "workingQualityArchitecture": "PASS",
+    "preflight": "PASS",
+    "docsAccuracy": "PASS",
+    "docsExportsDrift": "PASS",
+    "nativePublication": {
+      "verdict": "PASS",
+      "exitCode": 0,
+      "slowTypes": 0
+    },
+    "verticalNativeProbe": {
+      "measurements": 216,
+      "candidateMeasurements": 72,
+      "cellSpill": 0,
+      "textSpill": 0,
+      "misaligned": 0,
+      "fluidOverflow": 0
+    },
+    "earlierBroadRuns": "INTERRUPTED_AFTER_VISUAL_VERTICAL_OVERFLOW_NO_FINAL_VERDICT"
+  },
+  "fluidCorrectionFinal": {
+    "status": "FINAL_SOURCE_LOCAL_GATES_PASS_SAME_SOURCE_REVIEW_ROUND2_PENDING",
+    "sourceFiles": 14,
+    "frozenSourceAndBuildUnchanged": true,
+    "localHead": "707e08dbaa641112e5f09a3131bcc07f34aa3e97",
+    "workingTree": true,
+    "focused": {
+      "verdict": "PASS",
+      "passed": 72,
+      "exitCode": 0
+    },
+    "axeBearingWebkit": {
+      "verdict": "PASS",
+      "passed": 24,
+      "exitCode": 0
+    },
+    "fullPackage": {
+      "passed": 765,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 765,
+      "uniqueFailures": 0,
+      "exitCode": 0,
+      "durationMs": 398259
+    },
+    "fullChromium": {
+      "verdict": "PASS",
+      "passed": 675,
+      "exitCode": 0,
+      "captures": 380
+    },
+    "affectedFirefoxWebkit": {
+      "verdict": "PASS",
+      "passed": 336,
+      "exitCode": 0,
+      "captures": 160,
+      "files": [
+        "data-table.spec.ts",
+        "stats-grid.spec.ts",
+        "shell.spec.ts",
+        "native-close.spec.ts"
+      ]
+    },
+    "retries": 0,
+    "flaky": 0,
+    "axeAllowances": 0,
+    "pageConsoleErrors": 0,
+    "fluidManualCaptures": 6,
+    "verticalAndHorizontalContainment": "PASS",
+    "railNegatives": {
+      "missing": {
+        "exitCode": 1,
+        "intendedPixelFailure": true,
+        "channelDifference": 208,
+        "tolerance": 1
+      },
+      "opposite": {
+        "exitCode": 1,
+        "intendedPixelFailure": true,
+        "channelDifference": 208,
+        "tolerance": 1
+      }
+    },
+    "wrappers": {
+      "source-check": {
+        "verdict": "PASS",
+        "selected": 3,
+        "dropped": 0
+      },
+      "source-lint": {
+        "verdict": "PASS",
+        "selected": 3,
+        "dropped": 0
+      },
+      "source-fmt": {
+        "verdict": "PASS",
+        "selected": 3,
+        "dropped": 0
+      },
+      "fixture-check": {
+        "verdict": "PASS",
+        "selected": 3,
+        "dropped": 0
+      },
+      "spec-check": {
+        "verdict": "PASS",
+        "selected": 4,
+        "dropped": 0
+      },
+      "browser-lint": {
+        "verdict": "PASS",
+        "selected": 7,
+        "dropped": 0
+      },
+      "browser-fmt": {
+        "verdict": "PASS",
+        "selected": 7,
+        "dropped": 0
+      }
+    },
+    "qualityArchitecture": "PASS",
+    "preflight": "PASS",
+    "docsAccuracy": "PASS",
+    "docsExportsDrift": "PASS",
+    "nativePublication": {
+      "verdict": "PASS",
+      "exitCode": 0,
+      "slowTypes": 0,
+      "workingTree": true
+    },
+    "docLint": {
+      "verdict": "FAIL_ACCEPTED_EXISTING_DEBT",
+      "issue": 2531,
+      "diagnostics": 124,
+      "typeScriptDiagnostics": 123,
+      "jsonLimitations": 1,
+      "new": 0,
+      "removed": 0
+    },
+    "sourceReview": {
+      "round1": "FAIL_FIX",
+      "round2": "PASS",
+      "consecutiveTerminalFailures": 0
+    },
+    "runtimeAndExactRequiredCI": "UNPROVEN",
+    "allEarlierFullRuns": "HISTORICAL_OR_INTERRUPTED"
+  }
+}

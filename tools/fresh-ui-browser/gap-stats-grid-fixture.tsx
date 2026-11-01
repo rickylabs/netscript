@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks';
 import { Icon } from '../../packages/fresh-ui/primitives.tsx';
 import { StatsGrid } from '../../packages/fresh-ui/registry/components/ui/stats-grid.tsx';
+import { Button } from '../../packages/fresh-ui/registry/components/ui/button.tsx';
 import { Badge } from '../../packages/fresh-ui/registry/components/ui/badge.tsx';
 
 /** Real StatsGrid source and caller-owned content; no imitation layout or data engine. */
@@ -101,18 +102,20 @@ export function StatsGrids() {
       </section>
       <section id='stats-native'>
         <h2>Caller controls and decorative content</h2>
-        <button type='button' data-before-stats>Before metrics</button>
+        <Button type='button' variant='ghost' size='sm' data-before-stats>Before metrics</Button>
         <StatsGrid>
           <StatsGrid.Card
             label='Actions'
             value='42'
             badge={
-              <button
+              <Button
                 type='button'
+                variant='ghost'
+                size='sm'
                 onClick={() => setActions((n) => n + 1)}
               >
                 Inspect metrics
-              </button>
+              </Button>
             }
             detail={<a href='#metrics-details'>Read metric details</a>}
             sparkline={<button type='button'>Hidden sparkline control</button>}
@@ -121,7 +124,7 @@ export function StatsGrids() {
             icon={<button type='button'>Decorative icon control</button>}
           />
         </StatsGrid>
-        <button type='button' data-after-stats>After metrics</button>
+        <Button type='button' variant='ghost' size='sm' data-after-stats>After metrics</Button>
         <output aria-label='Metric actions'>{actions}</output>
       </section>
       <section id='stats-container' style={{ maxWidth: 330 }}>
