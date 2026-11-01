@@ -19,6 +19,9 @@ export interface PluginInstallRequest {
   /** Plugin workspace and config key. */
   readonly pluginName: string;
 
+  /** Enabled web application to link; omitted links eligible web applications. */
+  readonly app?: string;
+
   /** Optional service port override. */
   readonly port?: number;
 
@@ -70,6 +73,8 @@ export interface PluginInstallRequest {
 
 /** Planned plugin installation with workspace metadata resolved. */
 export interface PluginInstallPlan extends Omit<PluginInstallRequest, 'kind'> {
+  /** Enabled web application keys resolved before any installation writes. */
+  readonly appReferences: readonly string[];
   /** Plugin kind identifier. */
   readonly kind: PluginKind;
 

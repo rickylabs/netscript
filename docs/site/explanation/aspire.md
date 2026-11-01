@@ -429,6 +429,11 @@ The default path has three more trade-offs:
   this?" in one repo.
 - **Docker is a hard dependency of the happy path.** Without a Docker daemon the default workflow
   does not start; that is when `--no-aspire` plus your own infrastructure earns its place.
+- **Remote Docker daemons are unsupported.** `plugin doctor` exits with an error when the daemon
+  is remote: published loopback ports belong to the daemon host, while the AppHost probes its own
+  localhost. Use a local daemon or run the AppHost on the Docker host. Aspire's
+  [`AppHost:ContainerHostname`](https://github.com/microsoft/aspire/blob/v13.5.3/src/Aspire.Hosting/Dcp/DcpExecutor.cs)
+  controls container-to-host discovery, not access to remote loopback-published ports.
 - **The wiring is implicit.** The two-pass reference resolution is invisible at authoring time, so
   inspect the generated environment variables and the resource graph when you debug service
   discovery.

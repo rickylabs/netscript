@@ -11,6 +11,7 @@
 ## Permitted write surface
 
 - `.llm/runs/orch-divybot-6560114709--plugin-app-delivery/**`
+- `.llm/harness/debt/arch-debt.md` (bounded existing install-size/cardinality increase)
 - `packages/cli/src/**` (plugin install/doctor, settings, generated scaffold carriers)
 - `packages/cli/e2e/**` (runtime overview assertion)
 - `packages/aspire/**` (reference contracts and tests)

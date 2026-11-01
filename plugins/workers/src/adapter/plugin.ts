@@ -3,6 +3,7 @@
  * @module
  */
 
+import { fromFileUrl } from '@std/path';
 import {
   type DoctorCheckSpec,
   type InstallStarterResource,
@@ -65,8 +66,22 @@ export const workersStarterResources: readonly InstallStarterResource[] = [
   { scaffolder: runtimeGlueScaffolder, input: DEFAULT_RUNTIME_GLUE_INPUT },
 ];
 
-const GENERATE_WORKERS_REGISTRY =
-  `deno run -A jsr:@netscript/plugin-workers@${PLUGIN_PACKAGE_VERSION}/cli compile-registry`;
+/** Prefer project-local CLI exports; a package version is only a published-workspace fallback. */
+async function registryRemediation(context: PluginCommandContext): Promise<string> {
+  const candidates: string[] = [];
+  const sourceCli = new URL('../../../../packages/cli/bin/netscript-dev.ts', import.meta.url);
+  if (sourceCli.protocol === 'file:') candidates.push(fromFileUrl(sourceCli));
+  candidates.push('packages/cli/bin/netscript-dev.ts', 'packages/cli/bin/netscript.ts');
+  for (const entrypoint of candidates) {
+    if (await context.fileSystem.exists(entrypoint)) {
+      const quote = (path: string): string => JSON.stringify(path.replaceAll('\\', '/'));
+      return `deno run -A ${quote(entrypoint)} generate plugins --project-root ${
+        quote(context.workspaceRoot)
+      }`;
+    }
+  }
+  return `deno run -A jsr:@netscript/plugin-workers@${PLUGIN_PACKAGE_VERSION}/cli compile-registry`;
+}
 
 async function readWorkersRegistry(context: PluginCommandContext): Promise<string | undefined> {
   if (!await context.fileSystem.exists(WORKERS_JOB_REGISTRY_PATH)) return undefined;
@@ -81,7 +96,7 @@ const workersRegistryChecks: readonly DoctorCheckSpec[] = [{
       name: 'generated job registry exists',
       ok: source !== undefined,
       message: source === undefined
-        ? `Missing ${WORKERS_JOB_REGISTRY_PATH}. Run: ${GENERATE_WORKERS_REGISTRY}`
+        ? `Missing ${WORKERS_JOB_REGISTRY_PATH}. Run: ${await registryRemediation(context)}`
         : WORKERS_JOB_REGISTRY_PATH,
     };
   },
@@ -104,7 +119,7 @@ const workersRegistryChecks: readonly DoctorCheckSpec[] = [{
         ? 'Generated job definitions are present.'
         : isEmptyWorkersRegistry(source)
         ? 'Empty job registry; the processors can start idle with zero definitions.'
-        : `Job registry is incomplete. Run: ${GENERATE_WORKERS_REGISTRY}`,
+        : `Job registry is incomplete. Run: ${await registryRemediation(context)}`,
     };
   },
 }, {
@@ -128,7 +143,9 @@ const workersRegistryChecks: readonly DoctorCheckSpec[] = [{
       ok: loadable,
       message: loadable
         ? `${declared} declared job(s) are present in handler and definition maps.`
-        : `Registry is incomplete for worker processors. Run: ${GENERATE_WORKERS_REGISTRY}`,
+        : `Registry is incomplete for worker processors. Run: ${await registryRemediation(
+          context,
+        )}`,
     };
   },
 }];

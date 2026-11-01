@@ -13,7 +13,8 @@ Archetypes: CLI/tooling (6), Aspire integration (2), workers plugin (5).
 - The generated AppHost reads current app reference arrays at execution time and injects
   plugin endpoints through the same server/Vite discovery variables as service endpoints.
 - Installation runs the existing manifest-driven registry generator after plugin registration.
-  Workers `/cli` remains importable and becomes executable through its existing composition.
+  Workers `/cli` remains importable and executable through its existing composition; root `cli.ts`
+  remains the distinct callable adapter.
   Doctor recommends the project-local CLI where available, otherwise the installed package version.
 - Remote Docker is explicitly rejected by doctor when published container endpoints are unreachable
   from the AppHost. Verify upstream configuration before claiming a container-host override solves it.

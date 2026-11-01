@@ -28,3 +28,68 @@ focused commands and structured gate wrappers. Consulted existing project memory
 carrier ordering, CLI scope exclusions and remote-Docker history.
 
 Reconcile: issue remains open; scoped draft PR pending bootstrap commit.
+
+## Delivery validation
+
+- Documented local-source workers and streams installs add `workers-api` and `streams` to the
+  selected app and produce the worker registry immediately. The install regression also verifies
+  `--app`, unknown/disabled/non-web consumers, headless planning, dry-run preservation, subsequent
+  reconciliation and in-process AI without a dangling API reference.
+- Expanded structured test run: 809 passed, zero failures. Follow-up consumer regression: six
+  passed, zero failures, including the added dry-run and in-process AI assertions.
+- All 15 root `check:*` tasks passed on Deno 2.9.7, including the four generated carrier checks.
+- `quality:gate`, `release:preflight`, `docs:accuracy`, scoped lint and JSR audits passed.
+  JSR audits report existing slow-type/cardinality warnings; no new public package export.
+- The first full type-check found the new producer field missing in the composition dependency
+  shape. Fixed that type and started a fresh structured full check plus targeted composition check.
+- Generated carriers refreshed using the native tasks. Export corpus writer's documented
+  `--allow-dirty` option was used before review; the subsequent check passed.
+- Runtime acceptance extends `behavior.app-home` in `scaffold.runtime`: the actual HTML must contain
+  workers and streams panels with state `ready`. Negative controls reject unlinked/unavailable/
+  empty/absent states and markers split across elements. Existing missing-registry controls now
+  remove their test-owned outputs explicitly before doctor, because install creates them.
+
+Reconcile: PR #2582 remains draft; no labels or closing keywords; implementation is staged for
+independent review. No lockfile changes. Docker runtime CI is still unproven pending dispatch.
+
+- Fresh full structured type-check passed: 4,142 source files, 35 batches, zero findings.
+  Targeted composition check also passed. Repeated quality:gate has a durable PASS receipt.
+- Bounded existing install size/cardinality increase is recorded as
+  CLI-PLUGIN-INSTALL-DELIVERY-SIZE in the architecture debt registry.
+- Local `deno task e2e:cli run scaffold.plugins --cleanup --format pretty`: 18 passed, zero
+  failures or skips. This narrower gate does not certify Docker runtime behavior.
+- Read-only leak check found 34 processes with unproven ownership and no run-started resident
+  runtime. All were left untouched. Docker inspection is unavailable; absence of containers
+  remains unproven. Public leak-report.md carries only the verdict, with raw evidence kept private.
+
+## Independent evaluation repair
+
+Round 1: FAIL_FIX. The reviewer identified update losing persisted app scope and inadequate
+workers-specific proof of local doctor remediation. Both are repaired before the same-session
+recheck:
+
+- App consumer selection now reads installed metadata during planning, before a scaffolder can
+  overwrite it. Explicit --app wins; existing installed scope (including an empty list) wins over
+  new package defaults and automatic web-app selection. Staged update regressions prove the scope
+  survives even when the scaffolder overwrites its manifest.
+- Doctor prefers the real CLI adjacent to its file-backed source package and includes an explicit
+  project root. A fresh-project regression removes its generated worker registry, verifies the
+  workers-specific doctor line chooses the real local CLI, and executes the corresponding repair.
+  Copied local CLI candidates and installed-version JSR fallback remain supported.
+- The missing-registry E2E control once again requires the workers-specific check/message, so an
+  unrelated generic registry-drift message cannot satisfy it.
+- Repair regressions: 26 passed, zero failures. Repeated scaffold.plugins: 18 passed, zero failures.
+  Release preflight passes. The generated export corpus remains identical after source changes.
+
+Reconcile: source remains on the same assigned branch; origin/main is unchanged at the baseline.
+No labels, rebase, force push, runtime-resource mutation, or lockfile changes.
+
+## Reviewed implementation sign-off
+
+Separate Claude Opus 5.5 review, requested and observed at high effort, returned PASS on round 2;
+see evaluate.md. No further implementation edits followed that verdict.
+
+Final local proof: 825 focused tests passed; all 4,142 files passed the structured type-check;
+quality:gate, scoped lint/format, release preflight and repeated static scaffold suite passed.
+All generated documentation/scaffold carrier checks are included in the final check-task sweep.
+The runtime overview proof still awaits the one-pass Docker CI workflow; no runtime PASS is claimed.
