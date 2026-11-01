@@ -1,0 +1,64 @@
+{
+  "failureHead": "a09a9a28ee0e3c666caf72d1393e2836ea08eef7",
+  "ciRun": 41322488630,
+  "failedJob": 124895629839,
+  "aggregateJob": 124899286737,
+  "ciFailure": "Only test-3 failed; all other core check/test shards succeeded. Aggregate check-test failed because test-3 did.",
+  "cause": "Existing design-system bridge ignored the reviewed site lock; fresh lockless resolution rejects newly released exact Pagefind1.6.0 under default24-hour age policy.",
+  "fix": "Use --frozen in the affected renderer bridge and its documented command. No dependency-age override or app source change.",
+  "reports": {
+    "cold-renderer-before": {
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "sha256": "550649be7dce3e638571f444f2d22e38511a89932fc5ae089e3d84eb596a4259"
+    },
+    "cold-renderer-after": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "sha256": "8f3f01b41c51c94f00403d81f395241f96c58c9e86063ef19d6c5c876e31e990"
+    },
+    "renderer-fixture-fixed": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 13,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 13,
+        "uniqueFailures": 0
+      },
+      "sha256": "cbdf778c14359bebeadade8c6b7d06a74a65c739b61fd44594d44486255b032e"
+    },
+    "renderer-related-tests": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 95,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 95,
+        "uniqueFailures": 0
+      },
+      "sha256": "bbbed884bd46c2e5e9d98900c82c458be9a04d93509204f8f2337705e09d9901"
+    }
+  },
+  "ciReportSha256": "b4992a9770923c30d361cf53a6b3fc68cfc6d87bc82deb26dda11dc39fe31a1a",
+  "workingTreeStrict": {
+    "outcome": "PASS",
+    "files": 1116,
+    "differences": [],
+    "browserManifestDifferences": [],
+    "rawLogSha256": "10f3dc8ac7716ae32c77b08330ebc953c52ded4768fe7eaf1833f48f5d445203"
+  },
+  "review": "Separate-family read-only slice and follow-up IMPL PASS; independent old/new cold-cache reproduction, lock equality and all1116output hashes verified."
+}

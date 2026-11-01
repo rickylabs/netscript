@@ -33,3 +33,7 @@ No unresolved design choices. Delete the bounded CLI mode entirely; no separate 
 ## Deferred
 
 No S8 UI/layout/token edits; no #2450 consolidation, #2574/#2573 duplication, registry work, binary transforms or upstream source fork. Upstream #1395 native fix remains upstream; stable API ingestion order is sufficient for this site.
+
+## CI follow-up slice4 — frozen renderer fixture
+
+Contract: every test that imports the fully configured docs site must consume its reviewed lock, so fresh CI cannot re-resolve a qualified exact pin outside that lock. Change only `docs/site/_plugins/design-system_test.ts` child --no-lock to --frozen and the equivalent command in its contributor README. Keep unaffected fixtures and dependency-age policy unchanged. Gate: retain test-3 structured failure, reproduce the old bridge under an empty DENO_DIR, run the corrected bridge through the structured test wrapper under another empty cache with lock hashes unchanged, scoped check/lint/fmt, strict all-output equality and same-session independent read-only slice review. Re-prove exact final head after sign-off; existing complete browser result can carry only when every output hash remains identical. Then verify current required CI and publish READY. PLAN-EVAL N/A for this bounded repair: the existing qualified-pin contract and concrete CI report resolve the decision; no API/architecture choice changes. Mandatory independent IMPL review still applies.
