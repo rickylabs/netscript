@@ -66,3 +66,9 @@ Close: dated lesson and several specific memory notes retained. No accepted debt
 ## Main reconciliation after final attestation
 
 A final fetch found main4cb0298 (#2572) had just merged. Normal merge initiated from787f211 with no conflicts, before any READY packet. Imported source includes Fresh UI assets used by docs previews; no own Pagefind/CI changes conflict. Commit this run reconciliation in the normal merge commit, then repeat strict every-output proof and complete browser/quality/native carrier checks, with same-session independent final verification. Old787f211 phase evidence is valid only for its historical head. Local Docker limitation unchanged.
+
+## Post-main-merge acceptance
+
+At merge4ccaa4a containing main4cb0298: strict all-output PASS1116/zero differences, raw log hash committed in gate-evidence-merged.json. Complete Utility browser PASS158/6existing census skips/0failed/0flaky,72axe reports/zero serious-critical.94tooling/workflow/bridge and39source fixtures PASS; root quality/architecture and all4native carrier freshness gates PASS with exact merge-head receipts. Generated sources and locks remain clean relative to main.
+
+Only6generated assets differ from pre-merge browser output (catalog, compiled CSS/manifest/preview JS and2registry JSON outputs), all explained by upstream command-palette changes. No search/HTML/twin output difference from pre-merge source. Full browser was rerun rather than carrying a stale output result. Commit this final reconciliation evidence only, repeat strict at its exact head and compare every output against the merge-browser manifest, then same-session independent read-only final revalidation published to PR. No further evidence commit is needed after that final attestation. Hosted readiness stays separate.

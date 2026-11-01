@@ -1,3 +1,5 @@
+> Supervisor integration note: this retained evaluator report covers b756ee6 before main advanced. Main4cb0298 was subsequently merged normally at4ccaa4a. All merged-source native/browser gates pass in gate-evidence-merged.json. The same independent evaluator revalidates the final evidence-only head in the latest PR2575 IMPL-EVAL phase comment; that comment is the current-head verdict. The report below is preserved unchanged as historical evidence.
+
 # IMPL-EVAL: #2453 native Pagefind reproducibility
 
 **Verdict: PASS.** The scoped feature is complete, with the limitations below disclosed. This is the local IMPL verdict at `b756ee6`, not hosted readiness. Merge remains with the cockpit.
