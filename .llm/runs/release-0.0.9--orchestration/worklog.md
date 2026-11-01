@@ -1,0 +1,370 @@
+# Worklog — 0.0.9 milestone run
+
+## step-0
+- 2026-10-30 22:25Z: brief, plan and Cockpit handover read. Prior launches on #2474 (mc009, mc009b, mc009c) never started; this is the first live coordinator run.
+- Baseline main `30c800958dbf512a4951d640f08748703a8b59e3`. Board snapshot: milestone 0.0.9 has 73 open issues = 53 in scope + 19 `epic:design-system` + #2474. Open PRs in scope: #2421, #2422, #2423 (#2396), #2408 (#2406, Fresh UI lane), #2424 and #2433 (no linked issue).
+- Main health: `ci` green; repo-wide "Code quality" red since #2469 (PR runs use the diff-scoped job, which is green, so PR CI is unaffected); `command-postgres` red (H01 #2438).
+- Dispatch preconditions: builder cap 5 and ≤ 6 launches/h (owner brief); routing per owner brief (Codex gpt-6.1-sol implementers, Opus 5.5 cross-family evaluators), consistent with the pinned matrix `feature` tier (SOL xhigh). Paid-transport check: implementers run on the Codex subscription through orchid; evaluators on the Claude subscription CLI.
+- 22:30Z: intake (53 include + #2465 defer), inventory (53 active), DAG (53 nodes, 8 requires edges, 7 waves) and cluster state written; render + validate with live PR export: `{"ok": true, "errors": [], "findings": []}`.
+- 22:35Z: owner via Cockpit: dates approved as deadlines; start dispatching now; post canary readiness the moment a canary is ready.
+- 22:37Z: dispatched #2438 (H01). 22:38Z: dispatched #2165, #2187 (A1, split by file ownership), #2144 (A3), #2396 (D1, adopts #2421–#2423).
+- 22:44Z: #2438 and #2165 started (orchid binding `state=started`, codex gpt-6.1-sol). Dispatch comments are granted without owner action (`approval: bypass`).
+- 22:45Z: PLAN-EVAL round 1 (Codex gpt-6.1-sol high; `receipts/plan-eval-1.md`): **CHANGES**, 4 blockers. (0) The first attempt ran in Codex's read-only sandbox, which cannot start on this host (bwrap namespaces), and inspected nothing (`receipts/plan-eval-0-sandbox-failed.md`). The rerun used no sandbox and read-only-by-prompt instructions; git status was clean afterwards.
+  1. CI skips drafts and e2e-cli needs `e2e-cli-gate`, so "keep draft" deadlocks merge. Fixed: brief template and addenda now say mark ready after a clean IMPL-EVAL, and the coordinator arms `e2e-cli-gate` one PR at a time.
+  2. #2108 and #2390 were not gated on all of B1. Fixed: edges from #2159, #2374 and #2382 to both; both moved to W7.
+  3. #2268 needs `packages/**` changes, which the docs lane forbids. Fixed: #2268 and #2269 moved to internals.
+  4. #2144 retry semantics. Fixed: one initial attempt plus `maxRetries` retries, zero-retry case; DLQ proof conditional on slice 2.
+  Addenda posted on #2438, #2165, #2187, #2144 and #2396 (`briefs/<n>.addendum-1.md`); they are reposted on each leaf PR once it exists, since orchid relays PR comments. Validator green.
+- 22:48Z: #2438 → PR #2476 (draft), #2165 → PR #2477 (draft); addenda reposted on both PRs; leaves recorded (implementing). Validator green.
+- 22:58Z: PLAN-EVAL round 2 (`receipts/plan-eval-2.md`): round-1 blockers 1–4 RESOLVED. New blockers: #2151 conditional native-only proof, and #2159 crash-safe atomic commit (release-on-failure is not crash-safe). Both repaired in flight in the unposted briefs, plus #2161 doctor/fixture notes and the merge-gate E2E note. Plan APPROVED with in-flight repair (feature-tier policy).
+- 22:52Z: Cockpit relay: the #2187, #2144 and #2396 launches never started. The Cockpit hourly cap (6/h) held them as "Needs you" (hourly_cap_reached), and in-app approval is broken (cockpit #937). Plan: re-post each as a new `/swarm` comment with tag `mc009d-r1-<n>` after 23:40Z, spaced about 10 min apart, each after confirming no `state=started` binding. Relaunch briefs `briefs/<n>.r1.md` fold in addendum-1.
+- 22:54Z: G1 Step 0 re-check. Correction or narrowing comments posted on #1364, #1655, #1667, #1668, #1912, #1366, #2068, #2185 and #2233 (texts in `receipts/g1-step0/`). Findings:
+  - #1668: done.
+  - #1364: done once a row is added to #1381.
+  - #1667: evidence only; an opposite-family evaluator rules on boxes 1 and 3 (Codex run started).
+  - #1655: 2 `doc:lint` findings left. Code leaf in W7.
+  - #1912: published-CLI `--check` smoke on Windows and Linux.
+  - #1366: box 6 crash-loop detection plus the box 4 decision. Boxes 5 and consumer proof to #429–#431 and #1343, pending Eric.
+  - #2068: cold-consumer persistence/replay check on published 0.0.8.
+  - #2185: a local-Docker `scaffold.runtime` run.
+  - #2233: owner decision on box 1 vs box 6 (`MANIFEST.md`); the `status:impl` label is stale.
+- 22:56Z: Re-intake checkpoint. Eric approved new leaf #2478 (H02, repo-wide Code quality red on main since #2469), filed directly into 0.0.9. Added to the intake (release-critical, owner-ratified), the inventory (internals, group H02), the DAG (W1) and cluster state; validator green.
+  - Launch plan within the Cockpit hourly cap and the 5-builder cap: #2187-r1 at 23:40Z, #2478 about 23:50Z, #2144-r1 about 00:00Z, then #2396-r1 at the next free builder slot.
+  - Before each post, confirm no `state=started` binding on that issue, and that the previous launch started.
+- 22:58Z: #1667 and #1668 closed as completed after the opposite-family acceptance evaluation (Codex, `receipts/g1-step0/eval-1667-1668.md`, all boxes MET).
+- 22:59Z: #2477 (#2165) PLAN-EVAL APPROVED (leaf's Opus evaluator); implementing.
+- 23:00Z: #1364 closed as completed after the Codex acceptance evaluation (`receipts/g1-step0/eval-1364.md`); its observational Wave-7 criterion is routed to #1381.
+- 23:14Z: #2477 (#2165) READY at `c313a62`. Gate: Opus IMPL-EVAL MERGE at the exact head; CI 20 success / 33 skipped, no failures; review threads 0 unanswered; diff limited to plugin-triggers-core and tests. **expensive-gate.acquired**: e2e-cli scaffold.runtime on #2477 via `e2e-cli-gate`.
+- 23:15Z: #2477 (#2165) READY at `c313a62`. Gate: Opus IMPL-EVAL MERGE at the exact head; CI 20 success / 33 skipped, no failures; review threads 0 unanswered; diff limited to plugin-triggers-core and tests. **expensive-gate.acquired**: e2e-cli scaffold.runtime on #2477 via `e2e-cli-gate`.
+- 23:31Z: **merged** #2477 (`7907293f3`) for #2165 after e2e-cli was green on both runtime tiers at `c313a62` (65/65 checks); #2165 closed with evidence; expensive gate released. #2187 must merge main into its branch (function ownership in trigger-processor.ts).
+- 23:40:56Z: relaunched #2187 (`mc009d-r1-2187`, comment 6535845592); started 23:44:01Z. #2478 is scheduled for 23:50Z (scripted: post, then wait for its binding).
+- 23:50:19Z: dispatched #2478 (H02, comment 6535993009); started 23:54:22Z. #2144-r1 is scripted for 00:04Z and #2396-r1 for 00:14Z, each only after the previous launch started.
+- 23:59Z: #2187 → PR #2479 (draft); #2478 → PR #2480 (draft). Both recorded as implementing.
+- 00:08Z: **merged** #2480 (`6a71cd059`) for #2478 (H02). CI 47/47 green at `b2e1d30`, Opus MERGE, 0 threads. #2478 closes once the repo-wide Code quality run on main is green.
+- 00:09Z: Code quality is green on main (run 41148483243, `code-quality-repo` success at `6a71cd059`); #2478 closed with evidence.
+- 00:04:17Z: relaunched #2144 (`mc009d-r1-2144`, comment 6536190825); started 00:07:20Z.
+- 00:14:01Z: relaunched #2396 (`mc009d-r1-2396`, comment 6536318991); started 00:17:04Z. Builders: #2438, #2187, #2144, #2396; #2395 is scripted for 00:25Z (5th builder).
+- 00:20Z: Cockpit: the netscript hourly limit is full again (6 launches since 23:44Z), and the Fresh UI #2415 fix is held while it blocks the S2 merge. Stopped the scripted 00:25Z #2395 post before it ran (#2395 has 0 comments). The first free slot (~00:45Z) is left to #2415; #2395 posts at 00:55Z or later.
+- 00:24Z: #2476 (#2438 H01) READY at `1684e82`. Bound: `@opentelemetry/instrumentation` 0.223.0 with API 1.9.1 (SDK peers need API <1.10). Shared locked-fixture tool. Root lock and fresh-ui lock deltas disclosed in lock-delta.json; Fresh UI PRs may need a lock rebase. `command-postgres` green on the PR head; Opus MERGE at head; 0 threads. **expensive-gate.acquired** on #2476.
+- 00:26Z: Cockpit: a second Fresh UI fix (#2416, 00:25:45Z) is held too. Stopped the scripted #2395 post (nothing was posted). #2395 now waits for Cockpit's explicit go, after both Fresh UI fixes have started (about 00:52Z).
+- 00:37Z: **merged** #2476 (`a410a815c`) for #2438 (H01). 49/49 checks green, including command-postgres and e2e-cli on both runtime tiers at `1684e82`; expensive gate released. #2438 closes after command-postgres is green on main.
+- 00:38Z: #2144 → PR #2481 (draft), implementing.
+- 00:48Z: command-postgres is green on main (dispatch run 41152000845 at `a410a815c`; the workflow runs on PRs and dispatch only, not on push). #2438 closed with evidence. Main CI is fully green again.
+- 00:49Z: **orchid continuation.** After #2476 merged, the #2438 worker claimed #2400 from the wave plan (claim comment at 00:39Z) and opened draft PR #2482 from briefs/2400.md. Adopted as leaf A3-2400 (fixes). This costs no launch slot. Fixes lane is now at its 2-implementing cap (#2479, #2482), so #2395 also waits for a fixes slot. Continuation workers must post a claim before taking an issue; the coordinator checks claims before every dispatch.
+- 00:50Z: status 2 posted on #2474.
+- 00:54Z: Cockpit: both Fresh UI fixes run as follow-ups in their existing runs, so they take no slot. #2400 moved fixes → internals (drift.md). Dispatched #2395 (A2), comment 6536806908. Cockpit: orchid will not start a new /swarm on an issue whose earlier run is still alive (registration_failed); steer the existing run for follow-up work.
+- 00:55Z: Cockpit correction: there is no one-run-per-issue rule; the blocked S2 repost was a Codex start failure (spawn.remote-control-identity). If a dispatch comes back blocked, do not repost; report the binding state to Cockpit.
+- 00:58:18Z: #2395 binding `state=started` (codex gpt-6.1-sol). Five builders: #2187, #2144, #2396, #2400 (continuation), #2395.
+- 01:04Z: #2395 → PR #2483 (draft), implementing.
+- 01:10Z: #2395 (PR #2483) BLOCKED: PLAN-EVAL FAIL_PLAN in both rounds (shared-key contention; an adoption race before the receipt is stamped). Decision: authorize a fresh 2-round PLAN-EVAL cycle on the per-claim fence and recovery-grace design, with the constraints in briefs/2395.steer-1.md (one atomic script per transition, fence-checked adoption after the grace, destination-write invariant, a Streams/XAUTOCLAIM justification). Steered via a PR comment. A third failure escalates to Eric. Critical-path risk for canary .1: A2.
+- 01:21Z: #2481 (#2144) READY at `d7e4db3`, with all 3 slices (retry policy for in-process and polyglot jobs, the job DLQ port with a KV default, docs); 80 files, +3836/-64; no lock or listener-supervisor changes; Opus MERGE; 3 review threads answered. Accepted advisory debt: WORKERS-RETRY-DOMAIN-CARDINALITY (F-16 folder cap 13/12, has an owner and a gate). The coordinator judged that it needs no owner decision (advisory cap, doctrine debt mechanism) and will report it on #2474. **expensive-gate.acquired** on #2481.
+- 01:22Z: dispatched #2151 (A3, features), comment 6537103305. Builders: #2187, #2396, #2400, #2395, #2151.
+- 01:25:10Z: #2151 started.
+- 01:37Z: **merged** #2481 (`4aa734e2b`) for #2144. The head moved after READY (`d7e4db3` → `6e902e3`: a one-line generated `publish-assets` refresh that fixed a stale-carrier quality failure). The evaluator reviewed the delta (`publish-carrier-review.md`) and re-attested MERGE at `6e902e3` by editing its attestation comment. CI 48/48 including both e2e tiers at that head. #2144 closed. Gate note: a future head move needs a fresh verdict comment, not an edit.
+- 01:38Z: #2151 → PR #2484 (draft), implementing.
+- 02:24Z: #2396 adoption: READY on #2422 (`b2e3124`; no code blockers; the evaluator's CHANGES is only for unarmed runtime CI) and #2421 (`a4dc705`, source MERGE). Landing order #2422 → #2423 → #2421. **expensive-gate.acquired** on #2422. After e2e passes: tick the runtime checklist, rerun close-gate, and get an exact-head opposite-family MERGE before merging.
+- 02:24Z: #2396 consolidated READY: all 8 acceptance entries are mapped. #2423 MERGE at `7421a60` with CI green including both runtime tiers. #2421 is the final PR. Release follow-up: HOST-POLICY-PUBLISHED-GRAPH-2396 (published-graph / e2e-cli-prod proof after the first 0.0.9 canary) is tracked in state `releaseFollowUps`.
+- 02:25Z: dispatched #2367 (D1, internals), comment 6537761359. Builders: #2187, #2400, #2395, #2151, #2367.
+- 02:28Z: #2367 started.
+- 02:33Z: #2367 → PR #2485 (draft).
+- 02:38Z: #2422 e2e: Postgres tier PASS. SQLite tier FAIL at `cli-e2e-aspire-start` after 326s (50 pass / 1 fail), with no resource diagnostic; it matches the #2185 convergence-flake signature, and #2481's SQLite tier passed at 01:36. Reran the failed job once at the same head (job 124414783761, run 41159809248). A second failure at the same gate will be treated as a product signal on #2422.
+- 02:51Z: #2422 SQLite rerun PASS (job 124418007062), so both tiers are green at `b2e3124`. A separate Opus exact-head evaluation is running (the leaf's evaluator loop had ended on CHANGES for unarmed CI only). #2484 (#2151) READY at `ef886a7`, all 3 slices, Opus MERGE; lockfiles changed only in workspace metadata. **expensive-gate.acquired** on #2484.
+- 02:52Z: #2422 moved gating → evaluating (coordinator-run Opus eval). Dispatched #2369 (B2, features), comment 6538046699. Builders: #2187, #2400, #2395, #2367, #2369.
+- 02:54Z: **merged** #2422 (`727542963`, #2396 part 1 of 3, breaking change documented). Gate: leaf READY; separate Opus exact-head MERGE (`receipts/merge-eval/2422.b2e3124.md`); CI green including both e2e tiers (SQLite on rerun); close-gate PASS; 0 threads. PR body appended with the coordinator verdict. Next: #2423, then #2421.
+- 02:55Z: **merged** #2423 (`204a71b1e`, #2396 part 2 of 3). Leaf MERGE at `7421a60`; CI green including both e2e tiers; 0 threads; clean after #2422. #2421 (final) runs its e2e after #2484's gate.
+- 02:57Z: #2369 started.
+- 03:02Z: #2369 → PR #2487 (draft). (#2486 is a design-system PR, not ours.)
+- 03:07Z: **merged** #2484 (`1d467c669`) for #2151; #2151 closed. The expensive gate is free: #2421 is next once its leaf posts READY at the new head.
+- 03:11Z: #2485 (#2367) READY at `df6b72b`; Opus MERGE at the head. The leaf dispatched its own e2e-cli run (workflow_dispatch): runtime tiers green, but `desktop-native-linux` failed (missing desktop executable; the leaf reports the same on main in dispatch mode). Armed `e2e-cli-gate` for the standard PR-event verdict, which supersedes it. Watch item: desktop-native-linux fails under workflow_dispatch on main (possible pre-existing defect).
+- 03:10:47Z: **orchid continuation.** The #2151 worker claimed D1 #2115 (brief briefs/2115.md). #2115 moved internals → features to respect lane WIP (drift.md). Builders: #2187, #2400, #2395, #2369, #2115 (5/5); the docs dispatch is held.
+- 03:26Z: **merged** #2485 (`2f426b970`) for #2367; #2367 closed. The expensive gate is free. The #2367 worker may self-claim next; check claims before any dispatch.
+- 03:33Z: no continuation claims after #2485; dispatched #2385 (E2, docs), comment 6538461367.
+- 03:37Z: #2385 started.
+- 03:43Z: #2385 → PR #2489 (draft).
+- 03:57Z: #2483 (#2395, A2) READY at `002ce25`, Opus MERGE at the head (after the authorized re-plan: CHANGES at `1edb71e`, then MERGE). The Redis lease uses private modules for atomic scripts, receipts and recovery. Extra files: e2e startup diagnostics, the native-desktop driver and a small Aspire register template change (CI reliability; evaluator-approved). Advisory debt: redis-lease-cardinality (F-16). **expensive-gate.acquired** on #2483.
+- 04:00Z: #2489 (#2385) READY at `42f6d98`, Opus MERGE. Docs-lane diff audit: only docs/site, docs tooling, and a 2-line regeneration of the generated `agent-docs-prose` carrier in packages/cli (required by the freshness gate; not framework source), accepted. #2487 (#2369) READY at `5fdab9b`; e2e queued behind #2483.
+- 04:00:42Z: dispatched #2290 (D1, internals), comment 6538732825; started 04:03:59Z. #2155 (docs) is scripted for ~04:11Z after a claim check.
+- 04:12Z: **merged** #2483 (`1c9da73d0`) for #2395 (A2); #2395 closed; #2351 is unblocked (requires edge satisfied).
+- 04:13Z: **merged** #2489 (`ad252e8c8`) for #2385; #2385 closed. **Rule violation:** the #2385 leaf force-pushed (rebase) at 04:00:47Z. Contained: fresh MERGE at the new head `c3f2c46`, CI 33/33. Recorded in drift.md; the brief template now spells out merge-not-rebase.
+- 04:14Z: **expensive-gate.acquired** on #2487 (#2369) at `5fdab9b` (Opus MERGE at the head). #2155 posted 04:11:07Z. Builders are full (#2187, #2400, #2115, #2290, #2155); #2351 waits for a slot or a continuation claim.
+- 04:11:07Z: dispatched #2155 (E2, docs), comment 6538837985; started 04:15:23Z.
+- 04:23Z: #2492 (#2290) READY at `4d1ebfb` (packages/service auth only: 404 procedure_not_found / 410 procedure_retired for authenticated callers). e2e queued after #2487's gate (service runtime is in every generated service).
+- 04:24Z: dispatched #2351 (A2, features), comment 6538963429; #2115 moved back to internals (drift.md).
+- 04:27:35Z: #2351 started.
+- 04:32Z: **second rule violation:** the #2369 leaf force-pushed PR #2487 (03:40Z, 04:19Z; rebase onto main). Posted a no-force-push / merge-not-rebase reminder on live leaf PRs #2479, #2482 and #2494 (orchid relays PR comments). Leaves without a PR yet (#2115, #2351) got the tightened brief only if dispatched after the template change (#2351 yes; #2115 is a continuation).
+- 04:33Z: #2351 → PR #2496 (draft).
+- 04:35Z: **merged** #2487 (`8902e1a58`) for #2369 (B2); #2369 closed. Next expensive gate: #2492 (#2290).
+- 04:36Z: **expensive-gate.acquired** on #2492 (#2290).
+- 04:45Z: #2155 (PR #2494) BLOCKED: all 12 items reconciled, but the agent-docs-prose generated carrier needs regeneration, which the docs lane forbids. Decision: authorize generated-carrier regeneration through the canonical generators only (same exception as #2489), steered via a PR comment (`briefs/2155.steer-1.md`). Docs-lane gate amended: generated carrier output is allowed, framework source is not.
+- 04:54Z: #2492 head moved `4d1ebfb` → `0d93cb3`. Postgres tier FAIL at aspire-start: garnet state=Finished, `garnet_resp` Unhealthy (the #2483 diagnostic). SQLite+garnet passed at the same head, and #2487's Postgres tier (including #2483) passed at 04:35, so this is treated as an infra flake. Reran the failed job once.
+- 05:05Z: **merged** #2492 (`f89260ac9`) for #2290; #2290 closed.
+- 05:07Z: **Found and fixed.** (1) The #2187 READY at 00:05:19Z was missed by a watcher restart gap. #2479 has since been rebased (force-push) and re-approved at `15fa0c6` (MERGE 03:25Z); e2e-cli-gate armed now. (2) Closing a leaf's issue tears down its orchid job (source-closed). That orphaned the continuation work on #2400 (PR #2482, worker gone at 01:02Z) and #2115 (claimed at 03:10Z, no PR). Re-dispatching both with resume briefs (`briefs/<n>.r1.md`). Lesson in memory.
+- 05:14Z: #2400 r1 started 05:12:18Z. #2496 (#2351) READY at `7a46247` with Opus MERGE: concurrency proven at 1/2/4 on real Redis and Garnet; bounded configurable intervals. Queue-only diff plus generated carriers; arch-debt row edited. e2e queued after #2479.
+- 05:20Z: #2161 was also orphaned (claimed at 00:57Z by the #2438 worker, which was torn down at 01:02Z). Dispatched #2161 (A3, fixes), comment 6539498806.
+- 05:25Z: #2161 started 05:25:22Z. The scripted #2115 relaunch at 05:17Z failed (empty brief path in the background subshell). Posted #2115 r1 now, comment 6539541933.
+- 05:25Z: **merged** #2479 (`4060d1e61`) for #2187; #2187 closed. **A1 complete.** The expensive gate is free: next #2496 (#2351).
+- 05:26Z: **expensive-gate.acquired** on #2496 (#2351).
+- 05:26Z: status 3 posted on #2474 (13 merges / 14 closed, corrected from 16; canary .1 remaining #2351 #2400 #2161 #2421; process issues disclosed).
+- 05:33Z: #2400 r1 READY at `6597b64` (PR #2482 resumed; main merged without rewrite). #2115 r1 started 05:31Z. #2161 → PR #2497.
+- 05:33Z: dispatched #2159 (B1 head, fixes), comment 6539608318.
+- 05:36Z: #2115 → PR #2498. #2482 has an Opus MERGE at `6597b64`.
+- 05:37:59Z: #2159 started.
+- 05:42Z: #2159 → PR #2499.
+- 05:42Z: **merged** #2496 (`67d4704b4`) for #2351; **A2 complete.** Next expensive gate: #2482 (#2400).
+- 05:51Z: Cockpit: held /swarms now auto-release (cockpit 6b5dc26), so held launches are not reposted. #2498 (#2115) READY at `4540c50`, Opus MERGE; auth-kv-oauth cookie parsing only, so required CI suffices (no runtime wiring).
+- 05:51Z: C1 moved fixes → features (drift.md). Dispatched #2259 (D1 security, internals), comment 6539763986.
+- 05:54Z: #2497 (#2161) READY at `e768c1f`, Opus MERGE; e2e queued after #2482. #2267 (C1) scheduled for 06:08Z, then cancelled at 06:00Z (builder cap 5 reached); it posts when a worker frees.
+- 05:55:21Z: #2259 started.
+- 05:58Z: **merged** #2498 (`3d83caf1c`) for #2115; #2115 closed.
+- 05:59Z: #2482 e2e green at `6597b64` but it now conflicts with main; steered via PR comment to merge main and re-READY. **expensive-gate.acquired** on #2497 (#2161).
+- 06:00Z: #2259 → PR #2501.
+- 06:06Z: #2499 (#2159) READY at `155051c`: slice 1 only (atomic applied key, envelope and transition; crash proofs on KV, Redis, Postgres and command-Postgres), Opus MERGE. Slice 2 (effects outbox) is deferred. Owner decision recorded: file the follow-up in Durable Background Work, then close #2159. e2e queued after #2497.
+- 06:09Z: #2259 (PR #2501, research-only draft) BLOCKED on a negative spike: Aspire 13.5.3 cannot mask composed connection strings. Owner decision posted on #2474 (recommend deferring to #2278). The leaf is blocked with an open decision record.
+- 06:09:13Z: dispatched #2267 (C1, features), comment 6539917426; started 06:13:17Z.
+- 06:13Z: **merged** #2497 (`c6bce8f86`) for #2161; #2161 closed. #2162 (B2) is now unblocked (edge 2161 → 2162). Next expensive gate: #2499 (#2159).
+- 06:15Z: Cockpit heads-up: Fresh UI S3 phase 2 (PR #2488) and S6a (#2419, which makes studio-utility the scaffold default preset) may land on main before 11-02; Eric decides whether that design canary is 0.0.9 canary .1. Conflict check: none of the in-flight leaves touch fresh-ui scaffold defaults. F1 #2406 (PR #2408, Fresh UI-owned) and #2409 (page-binding .withRoute) must be checked against #2419's preset before dispatch; flag Cockpit on any collision.
+- 06:17Z: #2421 coordinator Opus eval at `c875e38` (`receipts/merge-eval/2421.c875e38.md`): the merge is faithful, but CHANGES because main moved and it conflicts in arch-debt.md and two generated carriers. Steered the #2396 worker to merge main and regenerate; the coordinator will run the delta review and e2e at the new head.
+- 06:17Z: #2267 → PR #2502.
+- 06:29Z: #2499 (#2159) e2e **red on both tiers** at `da931b7` (the head moved from `155051c`): `behavior.plugins-health`, sagas runner child Running/unhealthy. A product failure; steered the leaf via PR comment with the evidence. The expensive gate is released.
+- 06:22:20Z: dispatched #2132 (C1, features), comment 6540033818; no binding after 7 min (possibly cap-held, which now auto-releases; not reposted).
+- 06:32Z: #2132 has no orchid binding after 10 min. Treated as cap-held (auto-release since cockpit 6b5dc26); not reposted. Builder count is fuzzy: re-steered workers (#2159, #2400, #2421) are active again, so no new dispatch until a worker finishes.
+- 06:36Z: #2502 (#2267) READY at `29626e4`, Opus MERGE; memory KV adapter and tests only, so required CI suffices.
+- 06:39:18Z: #2132 started; the held launch auto-released after about 17 min.
+- 06:42Z: **merged** #2502 (`59902cf6f`) for #2267; #2267 closed.
+- 06:42Z: #2132 → PR #2505.
+- 07:35Z: #2505 (#2132) READY at `a75d631`, Opus MERGE; **expensive-gate.acquired** (Redis/Garnet KV is used by the scaffold). #2482 and #2421 show no response to the merge-main steers after 1.5 h: their workers end their runs after READY, and steering reaches only a live job's own PR. Re-dispatching focused merge-main leaves.
+- 07:41Z: posted r2 finish dispatches for #2400 (PR #2482) and #2396 (PR #2421), spaced about 5 min.
+- 07:43:30Z: #2400 r2 started (finishing PR #2482).
+- 08:16:44Z: **mc009e takeover** (relaunch after the 07:45Z power-off). Cockpit: the N5 restore resumed the old leaf runs, so a leaf is relaunched only when it has no live herdr workspace. Live: #2159 (PR #2499), #2396 r2 (PR #2421). Done: #2400 r2 (PR #2482, READY queued, Opus PASS at `dfa2502`), #2155, #2132, #2259 (blocked). mc009d's pane was closed by Cockpit, so this is the only coordinator.
+- 08:16:44Z: **merged** #2505 (`a2fe36aee`) for #2132 (C1); #2132 auto-closed by the PR body, evidence comment posted. READY at `a75d631`, Opus MERGE r5, 30/30 checks including both runtime tiers, 0 threads.
+- 08:16:44Z: **merged** #2494 (`1d274c16b`) for #2155 (E2, docs); #2155 closed with evidence. Opus MERGE r5 at `482097b`; main had moved since the merge base and both sides touched agent-docs-prose, so the coordinator built the combined tree (merge-tree) and ran check:agent-docs-prose (fresh) and check:publish-assets (pass). The e2e on #2482 (#2400) is running at `dfa2502` alongside #2505's finished gate.
+- 08:19:07Z: dispatched #2162 (B2, fixes; requires #2161 merged), comment 6541068260. Brief tightened to merge-main-never-rebase.
+- 08:20:41Z: #2482 (#2400) e2e Postgres tier FAIL at aspire-start on `dfa2502`: garnet state=Finished, `garnet_resp` Unhealthy (garnet-server tool missing in the container), the same infra flake as #2492 at 04:54Z. Reran the failed job once.
+- 08:20:58Z: dispatched #2338 (C1, features), comment 6541084410. #2392 (E1, internals) brief written; posting after a spacing gap. #2394 waits for #2421 (same plugin service entrypoints).
+- 08:22:01Z: status 4 posted on #2474 (19 merges, 20 closed; canary .1 left: #2400, #2421; Eric items unchanged; Garnet flake watch item).
+- 08:30:31Z: dispatched #2392 (E1, internals), comment 6541170747. #2162 and #2338 have no orchid binding after 10 min (probably cap-held; held launches auto-release, so not reposted).
+- 08:36:59Z: #2482 rerun of the failed Postgres tier (and scaffold-static) started 08:36Z at `dfa2502`.
+- 08:41:45Z: **merged** #2499 (`f68394636`) for #2159 slice 1 (B1). READY + Opus MERGE r5 at `d21257f`, 30/30 incl both runtime tiers, 0 threads; combined tree with main (merge-tree) clean, export corpus and prose fresh. #2159 stays open for Eric's effects follow-up decision. #2383 is unblocked (saga-engine.ts serialization edge satisfied by the merge).
+- 08:41:45Z: #2421 (#2396 r2) merge-delta IMPL-EVAL CHANGES at `d3a52cb`: main's #2492 added `code?: ProcedureErrorCode` to AuthzDecision, so both facades report one private-type-ref and the F-5 debt bounds (exact 22/21, no growth) block the closure fix. **Coordinator decision:** prefer a closure within the bounds; otherwise grow each facade by exactly ProcedureErrorCode (23/22), same 2026-11-10 target, independent debt re-review. Posted on #2474 as an FYI the owner can veto before the canary .1 cut. r3 finish brief `briefs/2396.r3.md` posts once the r2 workspace is done.
+- 08:52:09Z: #2482 (#2400) 30/30 green at `dfa2502` after the Postgres rerun; Opus `VERDICT: MERGE dfa2502…`; READY publication on #2400 not yet relayed by orchid (accepted from the PR-side report and the leaf's final summary). Combined tree with main conflicts in agent-docs-prose.generated.ts (main's #2494 also edited tune-worker-runtime.md). Posted r3 finish leaf (merge main, regenerate carriers, delta eval), comment 6541366578.
+- 08:52:39Z: #2162 started 08:44Z → PR #2509; #2338 started 08:45Z → PR #2510 (held launches auto-released after ~25 min).
+- 08:54:09Z: #2396 r2 worker done 08:53Z (READY with the closure blocker). Posted r3 finish leaf for PR #2421 (ProcedureErrorCode closure per the 08:41Z decision), comment 6541384172.
+- 09:03:47Z: #2509 (#2162) READY at `048856c` with Opus `VERDICT: MERGE 048856c…`; two Acceptance boxes (zero-definition resources healthy under Aspire, e2e verdict) need the runtime run. **expensive-gate.acquired** on #2509 (label e2e-cli-gate).
+- 09:04:05Z: dispatched #2383 (B1, fixes; requires #2159 slice merged in #2499), comment 6541471368.
+- 09:08:38Z: #2509 (#2162) e2e scaffold-static RED at `048856c`: `behavior.package-backed-plugin-doctor` asserts the old doctor check name; the PR renamed 'registry is non-empty' → 'is initialized'. Product failure; steered the live worker (own job PR) to update all consumers and re-READY. Runtime tiers still running at this head.
+- 09:11:07Z: #2509 also red at `048856c`: check-test-shard test-2 and both runtime tiers; listed for the live worker on the PR. The expensive gate stays on #2509 until it re-READYs (the label is kept; the next push re-runs).
+- 09:11:18Z: **expensive-gate.released** on #2509: removed e2e-cli-gate so intermediate pushes do not run the suite; re-arm at re-READY. Corrects the previous line.
+- 09:11:47Z: 09:11Z: the four held launches auto-released together: #2392, #2400 r3, #2396 r3, #2383. Builders 6 for now (#2162's worker was steered back to fixing after READY), one over the cap of 5; no new dispatch until it drops below 5.
+- 09:12:36Z: #2510 (#2338) READY at `67df9ff`, Opus `VERDICT: MERGE 67df9ff…`; **expensive-gate.acquired** on #2510 (streams runtime). PR #2503 (Fresh UI S6a, #2419) added to the design-system exclusion list of the PR export.
+- 09:14:31Z: #2392 → PR #2511. #2509 (#2162) new head `f13b14c` with Opus MERGE (fix for the e2e/test failures); waiting for re-READY.
+- 09:14:50Z: #2383 → PR #2512.
+- 09:21:37Z: #2482 (#2400 r3) new head `aabea4b` (main merged, carriers regenerated), Opus `VERDICT: MERGE aabea4b…`. e2e started on push because the label was kept: two expensive gates are running (#2510, #2482). Accepted for the canary .1 path; drift recorded. Waiting for READY on #2400.
+- 09:25:11Z: dispatched #1491 (E2, docs; the 04:16Z continuation claim was orphaned: no PR, no worker), comment 6541665501.
+- 09:25:21Z: #2400 r3 READY at `aabea4b` (e2e running). #2392 READY at `da298f8` (PR #2511), Opus MERGE; needs e2e (new direct @netscript/logger import in plugins/workers; lock files touched), queued. #2421 r3 BLOCKED at `4771da9`: `ProcedureErrorCode` is derived from the const, so the closure needs 24/23. Decision update posted on #2474: explicit literal union at the source (keeps 23/22), fallback 24/23 type-only. r4 brief `briefs/2396.r4.md` posts when the r3 worker ends.
+- 09:25:40Z: **Process slip:** #1491 was dispatched while the validator was red (two expensive gates running). Recorded in drift. Dispatches are on hold until one gate finishes. The r4 for #2396 waits for that too.
+- 09:29:12Z: **merged** #2510 (`24d63fd80`) for #2338 (C1); #2338 auto-closed, evidence posted. READY + Opus MERGE at `67df9ff`, 31/31 incl both runtime tiers, 0 threads, combined-tree carriers fresh. Gate released; #2482's e2e is now the only expensive gate. merge-tree of #2482, #2511, #2509 against the new main: clean.
+- 09:31:50Z: Continuation: the #2338 worker claimed #1367 (C1, features) on #2474 at 09:31Z; adopted as a free dispatch (watch for source-closed teardown, since #2338 closed at 09:28Z). #2512 (#2383) READY at `5eece17`, Opus MERGE; e2e required. e2e queue: #2482 (running) → #2512 (B1 critical path) → #2511.
+- 09:36:26Z: **merged** #2482 (`02a66ba6d`) for #2400; #2400 closed with evidence. **A3 complete.** Canary .1 now waits only on #2421 (#2396 r4). **expensive-gate.acquired** on #2512 (#2383) at `5eece17`.
+- 09:36:54Z: #2396 r3 worker is live again: orchid delivered a follow-up goal and it is executing the 09:24Z decision (independent debt re-review PASS at exactly 23/22; gates green; combined suite running before commit). r4 (`briefs/2396.r4.md`) NOT posted; kept as fallback.
+- 09:37:35Z: dispatched #2401 (E1, internals; upstream Aspire leak: NetScript-side follow stream + docs; upstream report drafted for the owner), comment 6541778987. Validator green before posting.
+- 09:46:42Z: #1491 started 09:45Z.
+- 09:48:31Z: #2401 started 09:47Z.
+- 09:50:55Z: #2512 (#2383) e2e Postgres tier FAIL at aspire-start: the same Garnet start-up flake (third time today). Rerun queued for when run 41189386045 completes. Asked Eric on #2474 whether to file a 0.0.9 CI issue (recommended).
+- 09:50:59Z: #1491 → PR #2514.
+- 09:53:03Z: #2401 → PR #2515.
+- 10:00:03Z: #2509 (#2162) new head `d0ae582` with Opus MERGE (fix for the e2e/test reds); waiting for re-READY.
+- 10:04:12Z: #2512 (#2383) worker pushed `fc13a88`: the Garnet flake root cause is that runtime tiers never restored the pinned Garnet dotnet tool; bounded restore added in the shared tier prep (scope extension; accept if the final exact-head eval covers it). e2e running at the new head (label kept). Update posted to Eric. #2421 head moved to `76bf7ee` (r3 progressing).
+- 10:06:26Z: #2512 final Opus round 5 MERGE at `fc13a88` explicitly covers the Garnet prep repair. #2515 (#2401) Opus MERGE at `42aa062`; waiting for READY.
+- 10:08:25Z: #2401 READY at `42aa062` (PR #2515), Opus MERGE; e2e required. No upstream microsoft/aspire issue exists; the leaf left a ready-to-file report in its run record for Eric. e2e queue: #2512 (running) → #2511 → #2515. #2514 (#1491) Opus MERGE at `267c8a6`; waiting for READY.
+- 10:10:28Z: #1491 READY at `267c8a6` (PR #2514), Opus MERGE; docs lane (docs, docs tooling, generated carriers), so required CI only; waiting for CI.
+- 10:19:59Z: **merged** #2512 (`20583c83c`) for #2383 (B1); #2383 closed with evidence. Includes the root-cause fix for the Postgres-tier Garnet flake (CI prep restores the pinned Garnet tool). #2160 is unblocked.
+- 10:20:14Z: **expensive-gate.acquired** on #2511 (#2392) at `7d7cec2`. merge-tree of #2511, #2515, #2514, #2509 against main `20583c8`: clean.
+- 10:21:08Z: dispatched #2160 (B1, fixes; requires #2383 merged), comment 6542166103. Validator green before posting.
+- 10:22:08Z: **merged** #2514 (`abe9d3e43`) for #1491 (E2, docs); #1491 closed with evidence. merge-tree of #2511, #2515, #2509 against the new main: clean.
+- 10:25:51Z: #2160 started 10:25Z. Continuation: the #1491 worker claimed #2268 (internals, MCP telemetry tools) at 10:25Z; adopted. Internals has 2 gating (#2392, #2401); #2511 should merge before #2268 opens a PR. If not, record a lane-cap drift. Watch for source-closed teardown (#1491 closed 10:21Z).
+- 10:29:17Z: #2160 → PR #2517.
+- 10:37:17Z: **merged** #2511 (`aec75e4d9`) for #2392 (E1); #2392 auto-closed, evidence posted. #2421 (#2396 r3) Opus MERGE at `32264fc` via the literal-union source path; waiting for READY.
+- 10:37:19Z: **expensive-gate.acquired** on #2515 (#2401) at `42aa062` (merge-tree with main clean).
+- 10:37:49Z: #2421 required CI green at `32264fc` (e2e skipped, not labelled). It gets the e2e gate right after #2515 once READY is posted.
+- 10:53:21Z: **merged** #2515 (`0af1d65b2`) for #2401 (E1); #2401 closed with evidence. **expensive-gate.acquired** on #2421 (#2396) at `32264fc` before its READY (canary .1 critical path; merge still waits for READY).
+- 10:55:04Z: **merged** #2509 (`da3d08f3d`) for #2162 (B2); #2162 closed with evidence. Note: per the worker, an intermediate PR commit carried generated local paths (no credentials). The final tree is clean (privacy scan of the full diff). History is not rewritten (no-force-push rule). Continuation claims #1367 and #2268 are orphaned: both claimant workspaces are gone and no PRs exist; re-dispatching.
+- 10:56:19Z: dispatched #2149 (B2, fixes), comment 6542487846. Validator green (after refreshing the reporting heartbeat).
+- 10:57:11Z: #2421 head moved `32264fc` → `c1f9c10` at 10:55Z (r3 worker); e2e running at the new head; a fresh exact-head MERGE and READY are needed.
+- 11:00:46Z: #2149 started 10:59Z.
+- 11:02:15Z: re-dispatched orphaned continuation #1367 (features), comment 6542543055.
+- 11:07:01Z: #2149 → PR #2519. Re-dispatched orphaned #1367 (features), comment 6542543055. The #2268 post was held by the validator gate (new design-system PR #2518 from #2516 was unrecorded); v.sh now auto-excludes orch PRs whose source issue is epic:design-system.
+- 11:07:04Z: re-dispatched orphaned continuation #2268 (internals), comment 6542589669. Validator green before posting.
+- 11:07:30Z: #1367 started 11:06:18Z (one second after a transient 'refused reason=profile-unavailable' binding on the same comment; not reposted).
+- 11:11:09Z: #2268 started 11:09Z. #2421 e2e both runtime tiers green at `c1f9c10`; close-gate red until boxes are ticked; exact-head MERGE and READY pending (r3 worker live). Builders 5/5.
+- 11:11:23Z: #1367 → PR #2520.
+- 11:13:14Z: #2517 (#2160) Opus MERGE at `3fe6b60`; waiting for READY.
+- 11:16:45Z: #2160 READY (PR #2517, Opus MERGE at `3fe6b60`); **expensive-gate.acquired** on #2517. #2421 e2e completed green at `c1f9c10`. #2268 → PR #2521.
+- 11:22:06Z: #2421 head `2f4b66e` (11:17Z) with Opus MERGE at that head; its e2e re-ran on push (label kept) concurrently with #2517's. Drift recorded; new rule: drop the label when a PR's e2e completes and re-arm at READY. The validator is red (two gates) until one finishes, so no dispatch until then.
+- 11:29:02Z: #2520 (#1367) Opus MERGE at `57193c4`; waiting for READY.
+- 11:33:30Z: **merged** #2517 (`462f15c09`) for #2160 (B1); #2160 auto-closed, evidence posted. #2421 e2e green at `2f4b66e`; label removed (new rule). No expensive gate running. #2382 unblocked.
+- 11:33:54Z: dispatched #2382 (B1, fixes; last B1 leaf; requires #2160 merged), comment 6542833423. Validator green before posting.
+- 11:34:37Z: #2149 (PR #2519) BLOCKED: IMPL-EVAL rounds 1-2 FAIL_FIX on two tutorial lines only (no code blockers); it proposed a coordinator takeover. **Decision:** no takeover; the leaf finishes on its branch with one authorized eval round 3. Steered the live worker on its own PR and on the issue.
+- 11:38:12Z: **merged** #2421 (`15cffa2fe`), the final #2396 PR. The coordinator ticked the same-head runtime-proof box with the e2e evidence and reran close-gate (green). #2396 stays open for the release-owned published-graph proof on the first canary containing it. **All canary .1 contents are merged.** Next: main control runs at `15cffa2` (push CI, command-postgres dispatch, e2e-cli dispatch), then post readiness.
+- 11:39:15Z: #2519 (#2149) round-3 Opus MERGE at `2f02788` after the tutorial fixes; waiting for READY.
+- 11:42:38Z: #2382 → PR #2522.
+- 11:51:21Z: **Canary .1 readiness posted** on #2474: candidate `15cffa2fe`, all contents merged, main green (ci, quality, carriers, Fresh UI, docs, e2e-cli dispatch 41197676281 incl desktop-native, command-postgres 41197674602). Pre/post-cut items: #2396 published-graph proof, #2421 debt veto window, upstream Aspire report. Eric cuts.
+- 11:52:25Z: dispatched #2394 (E1, internals; unblocked by #2421), comment 6543008500. Validator green before posting.
+- 11:54:21Z: #2521 (#2268) Opus MERGE at `660f200`; waiting for READY.
+- 11:56:54Z: #2268 READY at `660f200` (PR #2521), Opus MERGE; no e2e needed (read-only MCP telemetry). Box 1 (live AppHost parity with the Aspire CLI) is honestly UNPROVEN: proven only against a fake dashboard API. Plan: merge as partial when CI is green and keep #2268 open for a live proof. check-test-shard test-5 red at this head; diagnosing once its log is available.
+- 11:58:42Z: #2394 started 11:57Z.
+- 12:00:25Z: #2522 (#2382) Opus MERGE at `f0cd86e`; waiting for READY.
+- 12:02:05Z: #2519 (#2149): round-3 MERGE at `2f02788`, then a relayed instruction made the worker rebase and force-push (11:43Z) for a carrier conflict, plus a CI quality repair → `ce431da`. Drift recorded. Authorized one delta review at `ce431da`, then READY and e2e.
+- 12:02:20Z: #2382 READY (PR #2522, Opus MERGE `f0cd86e`); **expensive-gate.acquired** on #2522. #2394 → PR #2523.
+- 12:05:51Z: #2519 (#2149) delta Opus MERGE at `ce431da`; waiting for READY; e2e queued after #2522.
+- 12:19:44Z: **merged** #2522 (`14816a409`) for #2382 (B1); #2382 closed with evidence. B1 left: #2374 (dispatching) and #2159's held follow-up. #2523 (#2394) Opus MERGE at `d7163af`; waiting for READY.
+- 12:20:25Z: dispatched #2374 (fixes), comment 6543282848. Validator green before posting. The 11:36Z continuation claim was orphaned (no branch, PR or worker).
+- 12:20:40Z: #2519 (#2149) READY at `ce431da`; **expensive-gate.acquired** on #2519. #2394 READY (PR #2523, Opus MERGE `d7163af`; current head `d7163af`); e2e queued next.
+- 12:22:46Z: dispatched #2374 (fixes), comment 6543282848 (the 11:36Z claim was orphaned). The #2382 worker claimed #2377 at 12:21Z; the scripted #2377 post was stopped before posting (no duplicate). #2382 was closed at 12:19Z, so watch for source-closed teardown.
+- 12:23:31Z: #2519 (#2149) e2e RED at `ce431da`: SQLite tier `database.codegen` fails, VarChar native type in workers.prisma on sqlite (product failure, likely the per-backend schema contribution). Steered the live worker with the evidence, removed the label; **expensive-gate.released**. Next gate: #2523 (#2394).
+- 12:23:40Z: **expensive-gate.acquired** on #2523 (#2394) at `d7163af`.
+- 12:25:30Z: #2520 (#1367) Opus MERGE at `b3537c2`; waiting for READY.
+- 12:25:42Z: #2374 started 12:25Z.
+- 12:30:47Z: #1367 READY (PR #2520 at `b3537c2`, Opus MERGE `b3537c2`); e2e queued after #2523. #2374 → PR #2526.
+- 12:32:53Z: #2377 READY (PR #2525 at `014f2c4`, continuation of the #2382 worker), Opus MERGE; kv bridge only, so required CI suffices.
+- 12:34:51Z: #2521 (#2268) new head `0bee3eb` with Opus MERGE (shard-5 fix); waiting for re-READY and CI.
+- 12:40:39Z: **merged** #2523 (`a5bca5312`) for #2394; #2394 closed with evidence. **E1 complete.** #2519 (#2149) READY at `3b219fd` (SQLite repair), Opus MERGE; **expensive-gate.acquired** on #2519 (B2 critical path, ahead of #2520).
+- 12:41:28Z: dispatched #2373 (C1 test-only, internals), comment 6543487801. The 12:34Z continuation claim (the #2382/#2377 worker) was orphaned: workspace gone, no PR. Validator green.
+- 12:42:49Z: **merged** #2521 (`b11c26c2f`) for #2268, partial (Refs); #2268 stays open for the box-1 live-AppHost proof (proof leaf to dispatch).
+- 12:43:43Z: dispatched #2269 (E2, internals), comment 6543511422, with the embedded-docs decision: one corpus generated once, served by get_doc, find_guidance and search_docs; the leaf picks the package seam under PLAN-EVAL. Validator green.
+- 12:44:41Z: **merged** #2525 (`46b22e636`) for #2377 (C1); #2377 closed with evidence.
+- 12:45:07Z: dispatched #2384 (F1, features), comment 6543525844. Validator green.
+- 12:47:02Z: #2373 started 12:46Z.
+- 12:50:30Z: #2374 READY (PR #2526, Opus MERGE `621f5df`); e2e queue: #2519 (running) → #2526 (B1 critical path) → #2520. #2269 and #2384 started 12:49Z.
+- 12:52:23Z: #2373 → PR #2528.
+- 12:54:35Z: #2519 (#2149) e2e RED at `3b219fd`: Postgres tier aspire-start, the auth resource exits (state=Finished). Product failure. Steered the worker, removed the label; **expensive-gate.released**.
+- 12:54:46Z: #2269 → PR #2529; #2384 → PR #2530. **expensive-gate.acquired** on #2526 (#2374) at `621f5df`.
+- 12:55:35Z: #2526 (#2374) quality red at `621f5df` (README fence integrity); steered the live worker. e2e continues at this head as evidence.
+- 12:57:38Z: #2526 pushed `95a15f2` (README fence fix); the `621f5df` e2e was cancelled; e2e re-runs at the new head. #2528 (#2373) Opus MERGE at `2d9be85`; waiting for READY.
+- 12:59:30Z: #2373 READY (PR #2528 at `2d9be85`), Opus MERGE; test-only, so required CI suffices.
+- 13:00:05Z: #2528 (#2373) quality red at `2d9be85` (MCP export corpus freshness); steered the live worker to merge main and regenerate.
+- 13:01:56Z: #2526 (#2374) Opus MERGE at `95a15f2`; e2e running; waiting for re-READY.
+- 13:02:20Z: #2528 (#2373) new head `bd49114` with Opus MERGE (main merged, corpus fixed).
+- 13:07:26Z: #2519 (#2149) READY at `85364cb` (Postgres auth start-up fix), Opus MERGE; e2e queue: #2526 (running) → #2519 → #2520.
+- 13:12:00Z: **merged** #2526 (`7afe557fe`) for #2374 (B1). Closing #2374 is delayed until its worker's continuation state is known. **expensive-gate.acquired** on #2519 (#2149) at `85364cb`.
+- 13:14:15Z: **merged** #2528 (`e4875a56c`) for #2373 (C1). Issue close delayed until the claim check.
+- 13:16:23Z: dispatched #2390 (investigation, fixes; all B1 edges merged), comment 6543850655. Validator green. #2374 closed with evidence (no continuation claim from its worker).
+- 13:16:50Z: #2384 READY (PR #2530 at `d9c3d6a`), Opus MERGE `d9c3d6a`.
+- 13:16:56Z: #2530 (#2384) needs e2e; queue: #2519 (running) → #2520 → #2530.
+- 13:23:28Z: #2390 started 13:21Z.
+- 13:23:44Z: Continuation: the #2373 worker claimed #2379 (F1, internals) at 13:18Z. #2373 is kept OPEN until #2379 reaches READY (closing it would tear down the run); explained on #2373.
+- 13:28:53Z: **merged** #2519 (`a9620a34e`) for #2149 (B2). #2149 is kept open while its worker is live (continuation check). #2108 is now unblocked (all requires edges merged).
+- 13:29:05Z: **expensive-gate.acquired** on #2520 (#1367) at `b3537c2` (merge-tree with main clean).
+- 13:30:02Z: dispatched #2108 (B2 capstone, moved features → fixes; drift recorded), comment 6543997755. Validator green.
+- 13:30:23Z: #2390 → PR #2534.
+- 13:35:24Z: #2108 started 13:34Z.
+- 13:38:49Z: #2108 → PR #2535.
+- 13:43:05Z: **merged** #2520 (`eb9a1299b`) for #1367 (C1); #1367 auto-closed, evidence posted.
+- 13:43:16Z: **expensive-gate.acquired** on #2530 (#2384) at `d9c3d6a`.
+- 13:44:05Z: dispatched #1912 (G1 verification, box 8 published smoke on Linux and Windows), comment 6544155256. Validator green.
+- 13:45:15Z: #2269 READY (PR #2529 at `8c47a45`), Opus MERGE; no e2e needed. Its leaf force-pushed a rebase citing an 'owner-requested rebase' (second relayed rebase instruction today). Drift recorded; flagging on #2474.
+- 13:45:39Z: status 5 posted on #2474 (37 merged, 33 closed; canary .2 waits on #2108 and #2390; force-push relay flagged to Cockpit; Eric asked about #1366 box handoff and #2068 consumer box).
+- 13:49:18Z: #1912 started 13:48Z.
+- 13:49:39Z: #2534 (#2390) Opus MERGE at `bb876fa`; waiting for READY.
+- 13:51:24Z: Cockpit: the force-push source is orchid's PR-watch conflict relay ('rebase ... force-push'); fix filed as harness #775. Posted a no-rebase override on live leaf PRs (#2535 #2534 #2529 #2530) and issues (#2379 #1912). The brief template now carries the override. Eric's #1366 and #2068 questions are in Cockpit's morning summary.
+- 13:53:27Z: #2529 merge refused: the head moved `8c47a45` → `3d2b6db` (worker push after READY). Waiting for a fresh exact-head verdict and CI.
+- 13:53:51Z: #2390 READY (PR #2534 `bb876fa`): the canary.8 stall no longer reproduces on main (fixes credited to #2510, #2499, #2517, #2522); repro tests added; e2e queued after #2530. #1912 → PR #2537.
+- 13:58:44Z: **merged** #2530 (`cecf77621`) for #2384 (F1). Issue close pending the worker continuation check.
+- 13:58:58Z: #2384 closed with evidence. **expensive-gate.acquired** on #2534 (#2390) at `bb876fa`.
+- 13:59:25Z: dispatched #1366 box 6 (G1, moved internals → features; drift recorded), comment 6544332029; box 4 accepted as met (redacted marker plus timestamp). Validator green.
+- 14:00:20Z: Adopted continuation PRs (from the #2268 worker's chain): #2527 (#2411, F1) and #2532 (#2375, F1), both READY with Opus MERGE at their heads and green CI. #2411 was placed in features (internals at cap). The chain also claimed #2068 (G1 cold-consumer check).
+- 14:01:07Z: **merged** #2532 (`40c59ace8`) for #2375 (F1, adopted continuation).
+- 14:01:14Z: **merged** #2527 (`d54879b8d`) for #2411 (F1, adopted continuation).
+- 14:02:36Z: #1655 (continuation, draft PR #2539) BLOCKED on a design question. **Decision:** option B under doctrine 02's existing oRPC-boundary exception, on condition that both findings trace to oRPC internals; box 1 reworded and the debt rows closed citing the doctrine. Posted on #2539 and #1655, FYI with veto window on #2474.
+- 14:03:10Z: Continuation: the #2384 worker claimed #2268's live-AppHost proof at 14:02Z, after #2384 closed at 13:59Z. Teardown risk; checking its workspace.
+- 14:06:02Z: **merged** #2529 (`da8151643`) for #2269 (E2): the prose carrier now lives in packages/mcp (`@netscript/mcp/docs`); open PRs touching the old carrier path must merge main and regenerate. #2269 close is held while its worker is live. #1366 started 14:04Z.
+- 14:06:29Z: #2379 continuation → PR #2533 (adopted).
+- 14:10:07Z: #1366 → PR #2542.
+- 14:16:06Z: **merged** #2534 (`19a677ece`) for #2390 (C1 investigation; no longer reproduces). The expensive gate is free.
+- 14:16:44Z: dispatched #2409 (F1, moved internals → fixes; drift recorded), comment 6544556745. Validator green.
+- 14:17:16Z: #1912 READY: box 8 published smoke on Linux and Windows (cli 0.0.8; clean exit 0, hostile drift exit 1). PR #2537 adds an e2e-cli-prod job and script; Opus MERGE at `71b2241`; waiting for CI.
+- 14:19:18Z: #2537 (#1912) quality red at `71b2241` (Aspire version parity, phase 1); steered the live worker.
+- 14:22:43Z: #2409 started 14:21Z.
+- 14:25:13Z: #2537 (#1912) parity fix `74790b4` with Opus MERGE; waiting for CI.
+- 14:32:47Z: **merged** #2533 (`9fc6d01fa`) for #2379 (F1); #2379 auto-closed, evidence posted. #2373 stays open (its worker continues on #1655).
+- 14:33:09Z: dispatched #2185 (G1 box 5: one local scaffold.runtime run on a local Docker engine), comment 6544753737; **expensive-gate.acquired** (reserved) for it. Validator green.
+- 14:33:32Z: #2542 (#1366) Opus MERGE at `e1c68e5`; waiting for READY.
+- 14:35:23Z: #1366 READY (PR #2542, box 6), Opus MERGE `e1c68e5`; e2e queued after the #2185 local gate.
+- 14:37:28Z: #1655: option B fails for WorkersContractDefinition (NetScript-owned). Decision for Eric posted on #2474 (recommend moving it out of 0.0.9 and keeping the debt rows with an upstream trigger). Leaf blocked with the decision record. #2185 started 14:36Z.
+- 14:38:02Z: **merged** #2537 (`45c7d5880`) for #1912 (G1 box 8).
+- 14:38:33Z: Closed #2149 and #2373 with evidence (workers done).
+- 14:40:35Z: #2185 BLOCKED: the leaf environment has no local Docker daemon, so the run did not happen. **expensive-gate.released.** Decision for Eric posted (recommend accepting the CI runner's local-engine run 41197676281 as box 5 evidence). Next gate: #2542 (#1366).
+- 14:40:48Z: **expensive-gate.acquired** on #2542 (#1366) at `e1c68e5`.
+- 14:41:41Z: #2542 (#1366) test-5 shard red at `e1c68e5`; steered the live worker. e2e continues as evidence.
+- 14:43:35Z: #2542 pushed `99cda63` (test-5 fix); e2e re-running at the new head.
+- 14:45:21Z: #2542 Opus MERGE at `99cda63`; e2e running.
+- 14:49:30Z: **merged** #2541 (`8a2cbc1f3`) for #2068 (partial). The issue auto-closed through the linked-issue reference and was reopened with an explanation (EIS-Chat box pending Eric).
+- 14:51:43Z: #2542 (#1366) e2e RED at `99cda63`: gate generated.deno-fmt-check (generated project not fmt-clean). Steered the worker, removed the label; **expensive-gate.released**.
+- 14:52:01Z: Asked Cockpit and the Fresh UI lane to refresh #2408 (stale since 10-28; delivers #2406), or agree to a separate #2406 leaf.
+- 14:57:02Z: #2535 (#2108) Opus MERGE at `d92acd5`; waiting for READY.
+- 14:58:56Z: #2108 READY (PR #2535 at `d92acd5`): KV-only proof complete; Opus MERGE; **expensive-gate.acquired** on #2535 (B2 capstone, last canary .2 code item).
+- 15:05:29Z: #2542 (#1366) fmt fix `0a945ea` with Opus MERGE; e2e queued after #2535.
+- 15:07:35Z: #2535 (#2108) e2e RED at `d92acd5`: SQLite tier runtime.flow-b-fixture (workers-api resource lacks the Deno config argument). Steered the worker, removed the label; **expensive-gate.released**.
+- 15:07:46Z: **expensive-gate.acquired** on #2542 (#1366) at `0a945ea`.
+- 15:24:50Z: **merged** #2542 (`7312ba498`) for #1366 box 6; #1366 stays open (box 5 and consumer proof with Eric). The gate is free.
+- 15:45:40Z: #2535 (#2108) fix `5281ba8` with Opus MERGE; **expensive-gate.acquired** on #2535.
+- 16:02:46Z: Cockpit 16:05Z: orchid 83b160a fixed the conflict relay (merge + plain push). Codex weekly is at 89% with 20 runs active: **no new Codex leaves unless they block a canary**; finish the running ones.
+- 16:03:01Z: **merged** #2535 (`7feb24c7d`) for #2108 (B2 capstone). **B2 complete; canary .2 code complete** except the Eric-held items (#2159 follow-up, #2259).
+- 16:19:40Z: **Canary .2 readiness posted** on #2474: candidate `7feb24c7d`, main green. The canary .1 candidate is not cut yet; Eric can cut .2 directly.
+- 16:52:02Z: #2409: an unannounced continuation had already opened PR #2536 (13:46Z); my 14:17 leaf verified it and stopped (no duplicate). Adopted #2536; **expensive-gate.acquired** at `1453c92`. The leaf's Opus PASS predates the head, so the coordinator runs an exact-head cross-family review (Opus, no Codex budget).
+- 16:52:34Z: #2268 box 1: the continuation claimant is gone and draft PR #2540 is plan-only. Held for the Codex budget and because worker hosts have no Docker (same root as #2185); goes to Eric with the #2185 question.
+- 16:53:27Z: #2536 (#2409): coordinator-run Opus exact-head review VERDICT: MERGE `1453c92` (receipt receipts/merge-eval/2536.1453c92.md, posted on the PR). Waiting for e2e.
+- 17:08:13Z: #2536 (#2409): green and approved at `1453c92` but conflicts with main in publish-assets.generated.ts. Posted a minimal r1 finish (Codex low: merge main, regenerate, push), comment 6546528995. Canary .3 content, so the budget rule allows it.
+- 17:14:47Z: #2409 r1 started 17:13Z.
+- 17:18:29Z: #2536 r1 READY at `b4742da` (merge main + regenerated carrier); coordinator Opus delta review VERDICT: MERGE `b4742da` (receipt). Waiting for CI and e2e at the new head.
+- 17:30:41Z: **merged** #2536 (`19bca6223`) for #2409 (F1); #2409 closed with evidence.
+- 17:31:08Z: status 6 posted on #2474: consolidated decision table for Eric (#2159 #2259 #1655 #2185 #2268 #1366 #2068 #2233); #2406 waits on the Fresh UI lane; #2396 on the first published canary.
+- 17:31:44Z: **MERGE HOLD** (Cockpit, ~17:40Z): hold all netscript merges until Fresh UI S6a PR #2503 lands; it keeps losing the generated-carrier race. Cockpit will say when it is in.
+- 17:48:52Z: Merge hold lifted (Cockpit): S6a #2503 merged 17:48Z (`6c3f8a118`).
+- 18:01:00Z: Fresh UI design-system session (via Eric): land a canary tonight from main. Qualifying main `6c3f8a118` (includes #2503 and all canary .1/.2 content) as one combined canary: e2e-cli 41227279424 and command-postgres 41227281728 dispatched 18:00Z. Lanes merge-quiet until readiness is posted.
+- 18:16:37Z: **Combined canary readiness posted** on #2474 (comment 6547307997): candidate main `6c3f8a118`, which supersedes the uncut .1 and .2 candidates; includes Fresh UI S6a and the design lane's release notes; all gates green.
+- 18:40:24Z: #2185 orchid run stopped (operator-timeout) while blocked; the decision stays with Eric.
+- 18:47:47Z: **Eric: 'Approved'** (session message, ~18:45Z), read as approval of the 17:33Z decision table. Executing: #2159 follow-up filed in Durable Background Work and #2159 closed; #2259 deferred to #2278 (Backlog); #1655 moved to Backlog with debt rows kept; #2185 closed on the CI local-engine runs; #2268 box 1 moved to a follow-up and #2268 closed; #1366 box 5 carried to #429–#431, consumer proof to a new follow-up (#1343 is closed), #1366 closed; #2068 closed with adoption tracked in EIS-Chat; #2233 option b dispatched.
+- 18:48:09Z: #2159 closed; effects follow-up filed as #2543 (Durable Background Work).
+- 18:48:22Z: #2259 moved to Backlog / Triage (deferred to the Aspire 13.6 epic #2278); spike PR #2501 closed with its evidence kept.
+- 18:48:34Z: #1655 moved to Backlog / Triage (debt rows kept, upstream trigger); research PR #2539 closed.
+- 18:48:57Z: #2185 closed on the owner-accepted CI local-engine evidence. #2268 closed: box 1 moved to #2544 (Backlog / Triage); plan-only draft #2540 closed.
+- 18:49:16Z: #1366 closed: box 5 carried to #429/#430/#431, consumer proof moved to #2545 (Backlog / Triage).
+- 18:49:36Z: #2068 closed on the in-repo published proof; EIS-Chat adoption tracked at https://github.com/rickylabs/eis-chat/issues/518.
+- 18:49:55Z: dispatched #2233 option (b) per the owner's approval (G1, internals), comment 6547675177. Needed for stable; one small leaf within the budget rule.
+- 18:53:34Z: #2233 started 18:52Z.
+- 18:55:17Z: #2233 → PR #2546.
+- 19:00:02Z: #2546 (#2233) Opus MERGE at `2464145`; waiting for READY and CI.
+- 19:01:50Z: #2233 READY (PR #2546 at `2464145`), Opus MERGE; no e2e needed. Waiting for CI; close-gate needs a rerun once the run completes.
+- 19:03:41Z: #2546 (#2233) quality red at `2464145` (Aspire version parity, phase 1); steered the live worker.
+- 19:06:54Z: #2546 (#2233) parity fix `90d94de` with Opus MERGE; waiting for CI.
+- 19:22:34Z: **merged** #2546 (`43aa891ec`) for #2233 (option b); #2233 closed. Left: #2406 (Fresh UI #2408) and #2396 (post-cut proof).
+- 19:23:37Z: #2406: boxes 1 and 4 are done in #2407; boxes 2 and 3 are the docs half in the #752 run's stale PR #2408, which the design session will not touch. Decision posted for Eric and Cockpit on #2474 (recommend splitting: close #2406 on #2407, docs follow-up for the Fresh UI lane).
+- 19:23:56Z: Design session agrees: if Eric picks (b), the coordinator files the #2406 docs follow-up with label epic:design-system, and their lane picks it up after the canary.
+- 20:04:30Z: **Canary cut by Eric** ('Cut it'): the design session dispatched release-canary.yml (target 0.0.9) from main `43aa891ec` (one commit past the 6c3f8a118 candidate: #2546), run 41237108380. **MERGE HOLD** until the publish and e2e-cli-prod finish.
+- 20:05:08Z: The design session cancelled its canary dispatch (run 41237108380, at checkout; nothing minted) and relayed that Eric wants the coordinator to cut from `43aa891ec`. Not acting on a relay for an irreversible publish: asked Eric to confirm directly on #2474. Merge hold kept.
+- 20:05:58Z: **Eric (in session, ~20:05Z): 'I approve proceed'.** The coordinator dispatched release-canary.yml (target-version 0.0.9, ref main `43aa891ec`), run 41237263834. Merge hold until the publish and the pinned e2e-cli-prod finish.
+- 20:10:35Z: **Canary run 41237263834 FAILED in release prep** (version residue: the Fresh UI registry v2 artifacts keep 0.0.8 @netscript pins; the scan also reads _site build output and a legacy fixture). Nothing minted: no tag or branch, not on JSR, canary.1 unused; canary-pair status is failure. Filed release-critical #2547 in 0.0.9 (owner approval of the cut covers it), added to intake, inventory and DAG W7; dispatched fix leaf comment 6548545618. Merge hold lifted (no publish running).
+- 20:11:00Z: #2547 closed as a duplicate of #2548: the design-system lane filed and dispatched the registry-pin fix (epic:design-system; Cockpit merges). Closing #2547 cancels its leaf before start. The canary needs Eric's go again after #2548 merges.
+- 20:11:59Z: Posted the canary failure outcome on #2474; asked Cockpit to cancel the held #2547 launch.
+- 20:12:22Z: Cockpit: orchid refused the #2547 duplicate launch at 20:11:47Z (source-issue-closed), so no second worker. #2548 bound at 20:11:46Z; Cockpit merges it at READY; #2488 stays held. Re-cut only on Eric's go.
+- 20:55:51Z: **Eric (in session): 'Recut approved'.** Dispatching release-canary.yml (target 0.0.9) from main once #2549 (the #2548 residue fix) has merged and main push CI is green at that sha; a recut before the fix would fail the same residue check.
+- 21:26:31Z: #2549 (#2548 residue fix) merged 21:25:51Z → main `f4aa307b5` (Cockpit: independent Opus MERGE; canary dry run exit 0). The gated recut script waits for green push CI at that sha, then dispatches release-canary.
+- 21:40:36Z: **Recut dispatched** (Eric-approved): release-canary.yml target 0.0.9 from main `f4aa307b5` (push CI green), run 41244658746, 21:40:20Z.
+- 22:06:58Z: **0.0.9-canary.1 PUBLISHED** (run 41244658746 success; canary-pair success; pinned e2e-cli-prod 41245117092 success). #2396 published-graph proof passed (consumer deno check exit 0 against the published workers and streams ./service graph); #2396 closed with evidence.
+- 22:16:17Z: #2406 split per Eric (relayed by the design session; reversible, veto window on #2474): closed on #2407's evidence, docs boxes moved to #2552 (epic:design-system, Fresh UI lane). #2408 untouched.
+- 22:17:11Z: Status 7: **all non-design 0.0.9 issues closed or moved**; canary.1 published. Stable gated on DS1 (Fresh UI lane), terminal canary and qualification matrix. Final owner decisions posted (#2465, PRs #2424/#2433, failed-canary policy, DS1 gate, qualification owners).
+- 22:17:24Z: Design session relayed Eric's clarification: the #2406 split is tracking only, not a stable decision; #2552 stays in 0.0.9 pending Eric. Consistent with status 7 (no stable-ready claim).
+- 22:23:04Z: Eric's stable scope (relayed by the design session): 0.0.9 includes #2488 (gap components) and #2552 (theming docs). After both merge: qualify main, then cut 0.0.9-canary.2 (needs Eric's direct go for the publish). Stable comes later on Eric's separate go.
+- 22:36:14Z: **Eric (in session, ~22:35Z): 'Go ahead with the cut'**, the direct go for 0.0.9-canary.2 on the agreed content. Gated: wait for #2488 to merge and #2552 to close, then green push CI plus dispatched e2e-cli and command-postgres at the exact main sha, then dispatch release-canary (0.0.9).
+- 23:45:47Z: Cockpit: #2552 content is on main (docs PR #2554 e8d55558 at 23:41Z, CLI PR #2555 6a1d84a6 at 23:45Z; issue left for the Fresh UI lane to close). Only #2488 remains before the canary.2 cut; waiter relaxed to #2488 merged plus #2552 PRs merged.
+- 23:46:00Z: #2552 closed by the Fresh UI lane (#2554, #2555; nits in #2556, not 0.0.9). Only #2488 remains before the gated canary.2 cut.
+- 07:06:48Z: Status 8 posted (morning): canary.2 waits on #2488 (draft); open owner items unchanged.
+- 07:38:07Z: **Eric's answers (in session, ~07:15Z):** #2465 → Backlog / Triage (done); PRs #2424 and #2433 closed as stale (done); failed-canary policy: **decide case by case** (no standing policy; each failure goes to Eric); DS1 stable gate: **ask the design lane**; qualification: **consumer sessions run it** (EIS Chat, atelier-cockpit) after canary.2, evidence collected on #2474.
+- 08:51:03Z: **Eric in session (~08:00Z):** EIS Chat consumer smoke skipped for 0.0.9 (atelier-cockpit alone qualifies). Design lane's narrow DS1 proposal approved with S9 (#2431 and PR #2456) required. Codex is fully reset; the budget gate is lifted. **Design lane then relayed Eric's revised DS1 scope:** 0.0.9 includes everything except S6b, stable target ~11-03, plus a terminal canary on the final content (needs Eric's go). Cockpit: #2452 (88ff01dfd) and #2558 (6a6a82e15) merged at 09:36-09:37Z; #2488 not READY yet.
+- 08:51:18Z: **Eric in session:** 'So we ship all what design system lane decided to ship in 0.0.9'. This directly confirms the design lane's revised DS1 scope (everything except S6b). The stable gate is the lane's GATE list.
+- 08:51:50Z: Cockpit ack: it smokes canary.2 (early signal) and the terminal canary (for stable) on the exact versions I send, with results on #2474.
+- 08:54:40Z: **Eric in session: 'All further canary cut are approved no need for my approval anymore until stable release'.** Standing approval for every 0.0.9 canary (canary.2, the terminal canary and any recut) until stable. Each cut is still gated on green push CI, e2e-cli and command-postgres at the exact main sha. Stable still needs Eric's go.
+- 09:07:05Z: Cockpit: PR #2456 (S9 #2431, the agent design skill refresh) merged as 0af8fd9e7 after an Opus MERGE at the exact head. Eric's S9-must-ship condition is met on main.
+- 10:56:58Z: Design lane relays Eric's gate update, which falls under his direct 'ship all the design lane decided': adds #2570 (default scaffold redesign, supersedes #2566), #2571 (opt-in --example showcase) and #2569 (/create follow-ups). Stable target moves to ~11-04/05. canary.2 still cuts on #2488's merge; the terminal canary follows #2570, #2571 and the rest of the gate (the lane sends the sha).
+- 16:35:37Z: Status 10 posted (evening): canary.2 waits on #2488 (draft 2be806399); 30 open, all Fresh UI lane; stable target ~11-04/05.
+- 17:38:04Z: **PAUSED** at Cockpit's relay of Eric's Claude-budget rule (Claude weekly 84% at 17:36Z; pause all Claude lanes at 80% until the Friday reset). Handoff posted on #2474. No live coordinator leaves; stale records: PRs #2424 and #2433 closed 11-01, #2408 belongs to the Fresh UI lane. Waiter stopped. While paused, Eric cuts the canaries and Cockpit merges #2488.

@@ -1,0 +1,21 @@
+1. **Round-1 blocker 1 — RESOLVED.** The [CI flow in plan.md](/home/agent/projects/orchid/worktrees/issue-6534794312/.llm/runs/release-0.0.9--orchestration/plan.md:37), all seven pending briefs, and all five wave-1 addenda now permit promotion from draft so CI can run. The coordinator owns the serialized `e2e-cli-gate` opt-in. The [#2396 addendum](/home/agent/projects/orchid/worktrees/issue-6534794312/.llm/runs/release-0.0.9--orchestration/briefs/2396.addendum-1.md:5) explicitly withdraws the instruction to convert #2422/#2423 back to draft.
+
+2. **Round-1 blocker 2 — RESOLVED.** The DAG retains #2162/#2149 → #2108 and adds #2159, #2374, and #2382 as prerequisites for both #2108 and #2390. Together with the existing serial chain through #2383/#2160, these cover all five B1 issues. Both qualification leaves now occupy W7, consistently with [plan.md](/home/agent/projects/orchid/worktrees/issue-6534794312/.llm/runs/release-0.0.9--orchestration/plan.md:22).
+
+3. **Round-1 blocker 3 — RESOLVED.** #2268 and #2269 are assigned to **internals** consistently across the plan, inventory, DAG, and cluster state. Their package-code changes can therefore pass the lane’s merge gate. The embedded-corpus decision for #2269 remains an explicit prerequisite to dispatch.
+
+4. **Round-1 blocker 4 — RESOLVED.** The overriding [#2144 addendum](/home/agent/projects/orchid/worktrees/issue-6534794312/.llm/runs/release-0.0.9--orchestration/briefs/2144.addendum-1.md:5) specifies one initial attempt plus at most `maxRetries` retries, requires the zero-retry case, makes DLQ proof conditional on shipping slice 2, and requires remaining acceptance to be recorded for retry-only delivery.
+
+**New BLOCKER items**
+
+1. **#2151 — optional native-only delivery still has mandatory native-only proof.** The [brief permits stopping after slice 2](/home/agent/projects/orchid/worktrees/issue-6534794312/.llm/runs/release-0.0.9--orchestration/briefs/2151.md:28), but [unconditionally requires `strategy: 'native'` failure proof](/home/agent/projects/orchid/worktrees/issue-6534794312/.llm/runs/release-0.0.9--orchestration/briefs/2151.md:34). Current main has no selectable native-only strategy, so the permitted partial delivery cannot satisfy that proof demand. **Fix:** make this proof conditional on slice 3 shipping. For recovery/health-only delivery, explicitly record the native-only acceptance as outstanding, keep the issue open, and identify the follow-up scope. Alternatively, require all three slices and remove the partial-delivery option.
+
+2. **#2159 — releasing a reservation on failure is not a crash-safe alternative to atomic persistence.** [Slice 1](/home/agent/projects/orchid/worktrees/issue-6534794312/.llm/runs/release-0.0.9--orchestration/briefs/2159.md:25) permits either atomic persistence or releasing the reservation on failure. A process killed after `recordApplied` cannot execute cleanup; its persisted key still suppresses redelivery. That alternative preserves the crash window described by the issue and contradicts the brief’s fault/restart objective. **Fix:** remove the release-only alternative. Require a crash-safe commit of the applied marker, envelope, and transition on the default KV path, using an explicit store capability. Require a persisted-KV process-crash proof that prevents cleanup from running and verifies successful redelivery without duplicate committed transitions. Keep effect-dispatch recovery conditional on slice 2.
+
+**NON-BLOCKING notes**
+
+- The #2151 ownership split is workable alongside running #2165/#2187: watch supervision and `onError` wiring are distinct from key resolution, event construction, and completed-TTL policy. Preserve those function boundaries when merging main.
+- For #2161, explicitly include **“plugin doctor names the excluded/skipped modules”** in the proof list; it is part of the issue’s acceptance. Include valid definitions in the fixture so this proof does not accidentally depend on #2162’s empty-registry support.
+- Distinguish the request to arm runtime E2E from final merge readiness: a READY handoff may report E2E pending, but merge still requires the actual successful runtime verdict at the evaluated head.
+
+VERDICT: CHANGES
