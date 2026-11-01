@@ -93,6 +93,16 @@ known upstream Pagefind entry/filter/meta serialization variation separately; HT
 anchor fragments and all other assets remain byte-identical. Search behavior is verified by the
 real browser Pagefind tests. The metadata issue remains #2453; token-source consolidation stays #2450.
 
+Native reproducibility uses the released [Pagefind 1.6.0 correction](https://github.com/Pagefind/pagefind/pull/1124).
+`docs/site/deno.json` redirects Lume 2.5.4's exact `npm:pagefind@1.3.0` import to 1.6.0;
+the site lock pins the package and platform binaries. The ordinary Lume task uses `--frozen`.
+`docs/site/_plugins/pagefind.ts` orders the shared Lume page list by URL before registering the
+existing indexer, so native page numbers also remain stable across filesystem traversal orders
+([upstream #1395](https://github.com/Pagefind/pagefind/issues/1395)). The native output is emitted unchanged.
+Extend that integration in one place and run `deno task --cwd docs/site test:pagefind`: it compares
+every output byte for ordered and shuffled pages through the real Lume processors, and verifies
+that an unsorted negative control differs. Keep the strict two-build and complete browser gates.
+
 The public callout and code galleries live under `docs/site/design-system/docs-kit/`, linked from the Design system navigation and indexed in that search lane. API badge mappings follow the Utility spec in `docs/design-system/themes/studio/DESIGN.md`; `api-kinds_test.ts` fixes that contract independently of the browser paint checks.
 
 Callouts have one sentence-case type label (Note, Tip, Important, Warning, Caution) or an explicit custom title replacing it. The label uses Host Grotesk Medium at the callout body size; its tone also paints the icon. A line-height-sized icon box aligns with the first line, and the body shares the label's left edge. The accessible name retains the type and custom title. Markdown twins preserve a typed alert marker, label and body exactly once, including the legacy Error alias. Extend the default/custom gallery and its geometry/twin assertions together.

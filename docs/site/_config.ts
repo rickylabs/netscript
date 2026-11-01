@@ -3,7 +3,7 @@ import lume from 'lume/mod.ts';
 import basePath from 'lume/plugins/base_path.ts';
 import nav from 'lume/plugins/nav.ts';
 import redirects from 'lume/plugins/redirects.ts';
-import pagefind from 'lume/plugins/pagefind.ts';
+import pagefind from './_plugins/pagefind.ts';
 import codeHighlight from 'lume/plugins/code_highlight.ts';
 import lightningCss from 'lume/plugins/lightningcss.ts';
 import anchor from 'markdown-it-anchor';
@@ -382,7 +382,7 @@ site.addEventListener('afterRender', () => {
 });
 
 // Index only final deterministic identities; twins below see the same document.
-site.use(pagefind({ ui: false }));
+site.use(pagefind());
 
 // MUST run last: rewrite every root-relative href/src to the /netscript/ base (TD-1).
 site.use(basePath());
