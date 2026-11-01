@@ -1,5 +1,5 @@
 {
-  "status": "SOURCE_ROUND1_PASS_COMMITTED_PROOFS_PENDING",
+  "status": "COMMITTED_SOURCE_EVIDENCE_PASS",
   "baselineHead": "f1889578720858e42448f5069b412db1dd8f1ef7",
   "workingTree": true,
   "sourceCarrierPaths": 23,
@@ -187,5 +187,7 @@
       "dropped": 0
     }
   },
-  "failureStreak": 0
+  "failureStreak": 0,
+  "sourceHead": "fa28a6454f17dd43c0d191cf441136ba7c5cb0d3",
+  "committedSourceEvidenceReview": "PASS"
 }

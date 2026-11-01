@@ -1,3 +1,34 @@
+## Current — Docs11b2 evidence PASS; audited publication next
+
+Source fa28a645, same source/evidence PASS, zero blockers/failurestreak0.
+All four carriers reconcile (six commands0, actualdelta0), actual-head quality
+and publication pass with zero slowtypes. Frozen23source/9build and three
+locks exact; 801/767/256/140+84focused are precommit executions on identical
+bytes, with captures420/120/128. Next run-only evidence commit, repeated public
+audit and remote f188/parentc587/main6a1 checks, exact lease push/verify, PR2538
+comment and reconcile. Then Desktop11b3 checkpoint before code. Full12/13 still
+mandatory; no READY. Earlier notes below historical.
+
+## Current — Docs11b2 committed-source gates PASS; SAME evidence review pending
+
+Source fa28a645, same source round1 PASS. All six carrier commands pass with
+measured delta0; actual-head durable quality/native publication pass,0slowtypes.
+Frozen23source/9build exact from801/767/256/140+84focused precommit runs.
+Same evidence review precedes run-only commit/audit/exact remote f188 lease
+push/PR2538 comment/reconcile, then actualDesktop11b3. Full12/13 stillrequired.
+No READY. Earlier notes below historical.
+
+## Current — Docs11b2 source committed; committed-head proofs running
+
+Source fa28a645 follows same source round1 PASS. Four canonical carriers, six
+commands all0; actual generated delta0. Frozen23source/9build unchanged from
+801/767/256/140 and84focused precommit executions. Actual-head quality/native
+pub running next; SAME evidence review must precede run-only evidence commit,
+public audit/exact f188 lease push/PR2538 comment/reconcile. Full Desktop11b3/
+production extension/all-style12/final13 remain mandatory; no READY.
+
+Earlier notes below historical.
+
 ## Current — Docs11b2 source round1 PASS; committed-source closure next
 
 Same source round1 PASS, zero blockers/failurestreak0. Read source verdict,

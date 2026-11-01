@@ -1025,3 +1025,24 @@ ledger typography literals may migrate to matching existing text roles in later
 style work; the decorative arrow retains the ledger LTR glyph in both directions
 (native control labels convey the action); headingLevel is the documented typed
 string enum, while invalid untyped JavaScript input has no runtime fallback.
+
+## Docs11b2 committed-source carrier closure
+
+Source fa28a645 is committed. All four canonical carriers reconcile through
+six successful generation/check commands; the inspected generated tracked
+delta is zero. Actual committed-head quality and native publication run next,
+then the same evidence review before an audited exact-lease push. Full local
+component/browser executions are pre-commit runs on unchanged frozen bytes;
+no new execution is inferred from the commit.
+
+Committed-source fa28a645 durable quality PASS: recorded and actual gitHead
+match. Native member publication exits0 with Success Dry run complete and zero
+slow types, with no slow-types allowance. All23 source and nine build hashes
+still match the tested bytes. Same evidence review is next; no product edit
+since source review. Remaining Desktop/12/13 is required, no READY.
+
+Same committed-source evidence review PASS, zero blockers/failure streak0.
+Only owned run records are staged for this evidence commit. Frozen files,
+locks, public paths and exact remotes are checked before the leased push.
+The complete Desktop audit, production extension/all-style harness and final
+phase remain required; this unit does not establish READY.
