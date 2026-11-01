@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "description": "Repo-relative summary of original private runner receipts; this summary is not a raw runner receipt. Source qualified at the reviewed merge head; following evidence checkpoint changes run metadata only.",
+  "sourceCommit": "9088440bef7a8ddb5f5d5ed350818ebedb293197",
+  "deno": "2.9.7",
+  "rootChecks": [
+    {
+      "task": "check:desktop-native-fixture",
+      "exitCode": 0
+    },
+    {
+      "task": "check:emitted-samples",
+      "exitCode": 0
+    },
+    {
+      "task": "check:streams-types",
+      "exitCode": 0
+    },
+    {
+      "task": "check:child-health-docs",
+      "exitCode": 0
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "exitCode": 0
+    },
+    {
+      "task": "check:assets-barrel",
+      "exitCode": 0
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0
+    },
+    {
+      "task": "check:scaffold-versions",
+      "exitCode": 0
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "exitCode": 0
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "exitCode": 0
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "exitCode": 0
+    },
+    {
+      "task": "check:figma-names",
+      "exitCode": 0
+    },
+    {
+      "task": "check:review-threads",
+      "exitCode": 0
+    },
+    {
+      "task": "check:design-skill",
+      "exitCode": 0
+    }
+  ],
+  "runnerReceiptSummaries": [
+    {
+      "gateId": "scaffold-versions",
+      "invocationId": "s9-refresh-check-scaffold-versions-final",
+      "gitHead": "9088440bef7a8ddb5f5d5ed350818ebedb293197",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 162,
+      "requestHash": "6d380fb78a1eed9176bfa2c1a003bec3e46d0ec0efa0c6b95bb869133cb15527",
+      "originalReceiptSha256": "cd3c40db6588fcf235dd03e5e4eb1921ac0d7452171df73242fb9c17cd1e90a9",
+      "stdoutSha256": "57d70ebe8f93a6717289223723c905decbbd964e87e37f5201e7dad01d3df6ca",
+      "stderrSha256": "f855f476910400ef885eee1df95989c57b78744da5cdbf7fd959db288decc517"
+    },
+    {
+      "gateId": "mcp-export-corpus",
+      "invocationId": "s9-refresh-check-mcp-export-corpus-final",
+      "gitHead": "9088440bef7a8ddb5f5d5ed350818ebedb293197",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 13776,
+      "requestHash": "31dd546bca30351093ff85fecc705e3fa65826c3e98ad334ab52ec6c0d938c8e",
+      "originalReceiptSha256": "a97de818b6511dabfceb0fe2ddacb096dbc637ce00982af94b7ea908d68506a9",
+      "stdoutSha256": "85af3ab887c8fa7ee0bfcccc79ed668b6efbb2783141797bb3b6d0f7aea13cb3",
+      "stderrSha256": "bb580eff463cfaf5dab19bd77fe1a02b60387837eefea2b91f07a60a6cb25650"
+    },
+    {
+      "gateId": "agent-docs-prose",
+      "invocationId": "s9-refresh-check-agent-docs-prose-final",
+      "gitHead": "9088440bef7a8ddb5f5d5ed350818ebedb293197",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 20117,
+      "requestHash": "2df9c188fc9b55a9ffc0883f7effc83c5a2116ab1296f164fa4a4617a2a1bc4e",
+      "originalReceiptSha256": "dfed27bebb6d08665af8fbfa387fe04eee282ad311afdb9bfe2567aeb2f2ffb5",
+      "stdoutSha256": "c1d77ef60b02f1a01a1575deccc622e5fa40148a3b1e1196a04d2afd54f3c40d",
+      "stderrSha256": "acf27c64799509a52f538f06aa2ef75742cfc9cf572978d4af18964eb89fec84"
+    },
+    {
+      "gateId": "assets-barrel",
+      "invocationId": "s9-refresh-check-assets-barrel-final",
+      "gitHead": "9088440bef7a8ddb5f5d5ed350818ebedb293197",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 4216,
+      "requestHash": "d3a93a2d27e99eeba78001ca5c5233a14719ca6ee12a52896dd47670c454c9ca",
+      "originalReceiptSha256": "b8d5cfe58f753bc6a0eb6aef8a1a6510406a3ef739c14ce856f3c09dbb27a4a7",
+      "stdoutSha256": "1a401b58ff52a7ed118d5bb6fc762284bf0608845b3403ed1257256957fbf52a",
+      "stderrSha256": "3a9ece0a19934a0d3919f79f813692ba047e2419212d978f2d2770897bb4fa2b"
+    },
+    {
+      "gateId": "emitted-samples",
+      "invocationId": "s9-refresh-check-emitted-samples-final",
+      "gitHead": "9088440bef7a8ddb5f5d5ed350818ebedb293197",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 12073,
+      "requestHash": "cb3e763c11da2a7cb34b9b35acc08907caf0bf37b0ebfaafd101ce71fced975e",
+      "originalReceiptSha256": "791d91ce3074ce2ca6cbb0f87864e8434eedf536cd490282cfd6d792f95f4475",
+      "stdoutSha256": "d3004ac9a69e35d543eb9fb16481313b5894aac26b6d581382f65d1945e305e4",
+      "stderrSha256": "82a9e68b7ed3da53155a6119c67e4beac65eec865ee80bbdbc57993e2c765c73"
+    },
+    {
+      "gateId": "netscript-jsr-specifiers",
+      "invocationId": "s9-refresh-check-netscript-jsr-specifiers-final",
+      "gitHead": "9088440bef7a8ddb5f5d5ed350818ebedb293197",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 3422,
+      "requestHash": "076cc3320cbdf47c11beaac41b739887d69bfc0eaaa903799fa17afae476baf9",
+      "originalReceiptSha256": "0cec6164617fa1d6cc1cf74a34f2bb226099d4cdfb69d435aa8f17d517b7b7cb",
+      "stdoutSha256": "cffbcd7745e20999150aa5be7ca3796d2af910225a2c9f6036ed8622311d49d0",
+      "stderrSha256": "0ac10bb765a1a865f033f09e07fbad36112e9f2695f27a0c1a3bad2bdaef70fa"
+    },
+    {
+      "gateId": "publish-assets",
+      "invocationId": "s9-refresh-check-publish-assets-final",
+      "gitHead": "9088440bef7a8ddb5f5d5ed350818ebedb293197",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 707,
+      "requestHash": "184efa6597ae3f5e3bdfcafb9ced1bbeba5b5341f3f023fd2f552b3210c6d05c",
+      "originalReceiptSha256": "7cba87462b44291d3c3178deb0273567a9f053a2140556f9a6a2833e6ba06b0a",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "70bc4b06374ff6f561f02b223ee735b7bf25bb21e4a9811a8183d6279a83735b"
+    },
+    {
+      "gateId": "aspire-version-parity",
+      "invocationId": "s9-refresh-check-aspire-version-parity-final",
+      "gitHead": "9088440bef7a8ddb5f5d5ed350818ebedb293197",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 661,
+      "requestHash": "28724a4c2a7c540271bcc0516ed24667287e495e91f21722933796cea098a89b",
+      "originalReceiptSha256": "69c2ae85306de1d0738ae6d022e8909e08ad0f6efcc52917a4177f8b1519119c",
+      "stdoutSha256": "67b08aee2993c431432a0fd6df371cc0f3a62351a1b557af3951e0daa62fda9e",
+      "stderrSha256": "6558b4359ae7930d3e92d269c2cadd4d7fc4ec81cb81a78dbcc29b3a2b8d772b"
+    },
+    {
+      "gateId": "quality-gate",
+      "invocationId": "s9-refresh-quality-final",
+      "gitHead": "9088440bef7a8ddb5f5d5ed350818ebedb293197",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 22898,
+      "requestHash": "6238245fc4d2d8a7ac00091ac9851765abea9abd24368ad20101bd5dfe2b7acc",
+      "originalReceiptSha256": "734f33f0beb403ace5f7c22ae4ec1305f6c42926078f0a9d35f8e7a9ad527f56",
+      "stdoutSha256": "c32e958487011d4f6e7892fcd20c64e0517b5bfa6e2cf24b019013864b8ff563",
+      "stderrSha256": "aa1b69f42357fc79a7b067e33f574f4a2bb5865a4ca3f33c078ebcff0e55391a"
+    },
+    {
+      "gateId": "docs-accuracy",
+      "invocationId": "s9-refresh-docs-final",
+      "gitHead": "9088440bef7a8ddb5f5d5ed350818ebedb293197",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 8675,
+      "requestHash": "a329cdd63468eeac2c38b3e1f18ed166f2c106dc9c0242e196676a48423bf7b3",
+      "originalReceiptSha256": "1f5efe56968fd9230940a80c1892dcb329954a322b96601491f2f1ad84af5644",
+      "stdoutSha256": "51406a426090ea744d91b9553ad6156317bf81163f23215c847e88bc30e4f51e",
+      "stderrSha256": "b99f2bd553696ea6522afb6a2a84126543f759f1aa8b2d154f14cbf7c7451e98"
+    }
+  ],
+  "runtime": "UNPROVEN: Docker daemon inaccessible; attempted canonical one-pass command exited 1 before scaffold/runtime startup."
+}

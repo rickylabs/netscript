@@ -124,3 +124,20 @@ commit combines prior feature head and unchanged main 6a1d84a6e; final-head chec
 follow sign-off. Native all-host smoke re-run after repair: first/repeat exits 0,
 exact installed skill SHA-256 a016908319fa763173841cbc3b9c890e4a1b4a291bc31869d263720ec303874c,
 references exact and all second-run files identical.
+
+## Committed source qualification
+
+Reviewed normal merge head `9088440bef7a8ddb5f5d5ed350818ebedb293197` pushed
+to the existing PR branch. Main `6a1d84a6e` is the second parent; PR is MERGEABLE.
+All 15 root check:* tasks PASS at this committed head; durable final-head
+quality:gate and docs:accuracy receipts PASS/exit 0, with their actual gitHead
+matching the source commit. `refresh-source-gates.json` is a repo-relative
+summary with original receipt/output hashes; raw native receipts remain private
+because their cwd/argv contain absolute machine paths. Source tree clean and
+identical to reviewed hashes.
+
+PR IMPL and IMPL-EVAL PASS comments posted with the exact reviewed source. This
+checkpoint adds run evidence only. Required workflows resume on ready_for_review;
+remote CI remains pending, not claimed green. Runtime remains UNPROVEN under
+the explicit operator allowance. Final post-checkpoint receipts will be cited in
+the PR report without another metadata-only commit. Cockpit owns merge.
