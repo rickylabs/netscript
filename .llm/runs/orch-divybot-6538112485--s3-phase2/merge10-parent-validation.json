@@ -1,5 +1,5 @@
 {
-  "state": "source-gates-pass-awaiting-independent-review",
+  "state": "evidence-review-pass-awaiting-audited-plain-push",
   "main": "0af8fd9e",
   "remoteParent": "c5877ff8",
   "mergeOnly": true,
@@ -85,10 +85,6 @@
     "acceptedDebt": 2531
   },
   "pending": [
-    "source-review",
-    "source-commit",
-    "committed-source-carriers-quality-publication",
-    "evidence-review",
     "privacy-ancestry-plain-push",
     "child-merge-integration"
   ],
@@ -147,5 +143,59 @@
   "frozenSource": {
     "files": 625,
     "differences": 0
+  },
+  "sourceHead": "679fd24ac8e217af662210c95a5a0b3c1178b0db",
+  "sourceReview": {
+    "verdict": "PASS",
+    "round": 1,
+    "blockers": 0
+  },
+  "carriers": {
+    "commands": {
+      "gen:mcp-export-corpus": 0,
+      "gen:publish-assets": 0,
+      "check:agent-docs-prose": 0,
+      "check:mcp-export-corpus": 0,
+      "check:assets-barrel": 0,
+      "check:publish-assets": 0
+    },
+    "checks": 4,
+    "measuredGeneratedDelta": 0
+  },
+  "committedQuality": {
+    "head": "679fd24ac8e217af662210c95a5a0b3c1178b0db",
+    "exitCode": 0,
+    "verdict": "PASS",
+    "afterCarriersClosed": true
+  },
+  "nativePublication": {
+    "head": "679fd24ac8e217af662210c95a5a0b3c1178b0db",
+    "exitCode": 0,
+    "success": true,
+    "slowTypeDiagnostics": 0,
+    "allowSlowTypes": false,
+    "afterCarriersClosed": true,
+    "afterBrowserJobsClosed": true
+  },
+  "otherRootChecks": {
+    "check:desktop-native-fixture": 0,
+    "check:emitted-samples": 0,
+    "check:streams-types": 0,
+    "check:child-health-docs": 0,
+    "check:scaffold-versions": 0,
+    "check:aspire-version-parity": 0,
+    "check:netscript-jsr-specifiers": 0,
+    "check:aspire-host-ports": 0,
+    "check:figma-names": 0,
+    "check:design-skill": 0
+  },
+  "provisionalEarlyChecks": {
+    "usedAsFinalEvidence": false,
+    "replacedByAfterCarrierRuns": true
+  },
+  "evidenceReview": {
+    "verdict": "PASS",
+    "round": 1,
+    "blockers": 0
   }
 }
