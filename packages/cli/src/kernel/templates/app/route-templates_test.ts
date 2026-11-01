@@ -93,7 +93,9 @@ async function importNavigationTemplate(): Promise<NavigationModule> {
       join(dir, 'router.ts'),
       `export const appRoutes = { home: ${route('/')}, dashboard: ${route('/dashboard')}, ` +
         `examples: ${route('/examples')}, health: ${route('/health')}, ` +
-        `design: ${route('/design')} };\n`,
+        `design: ${route('/design')}, records: ${route('/records')}, ` +
+        `settings: ${route('/settings')}, signIn: ${route('/sign-in')} };\n` +
+        `export const routePatterns = {};\n`,
     );
     const modulePath = join(dir, 'navigation.ts');
     await Deno.writeTextFile(
@@ -177,22 +179,13 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'export const appRouter = {');
   });
 
-  it('CRUD links resolve to the generated /examples/crud route', async () => {
+  it('CRUD reference remains routed but the overview does not advertise an unrelated mutation', async () => {
     const adapter = makeAdapter();
     const router = await adapter.render(appRouterTemplate, SAMPLE_APP_VARS);
     const home = await adapter.render(appIndexRouteTemplate, SAMPLE_APP_VARS);
-    const examples = await adapter.render(
-      appExamplesIndexRouteTemplate,
-      SAMPLE_APP_VARS,
-    );
-    const targets = directAppRouteTargets(router);
-
-    assert(
-      targets.get('crudExample') === 'routes.examples.crud.$route',
-      'appRoutes.crudExample must target the generated CRUD route',
-    );
-    assertStringIncludes(home, 'href: appRoutes.crudExample.href()');
-    assertStringIncludes(examples, 'href: appRoutes.crudExample.href()');
+    assertEquals(directAppRouteTargets(router).get('crudExample'), 'routes.examples.crud.$route');
+    assert(!home.includes('appRoutes.crudExample.href()'));
+    assertStringIncludes(home, 'loadScaffoldRecords(ctx.req)');
   });
 
   it('dynamic order route is registered, aliased, and linked from examples', async () => {
@@ -215,7 +208,7 @@ describe('app route template rendering', () => {
     );
     assertStringIncludes(
       examples,
-      "appRoutes.order.href({ path: { id: 'order-42' } })",
+      "appRoutes.order.href({ path: { id: 'route-reference' } })",
     );
   });
 
@@ -260,68 +253,38 @@ describe('app route template rendering', () => {
     assertStringIncludes(appShell, "<link rel='icon' href='data:,' />");
   });
 
-  it('index route keeps the builder in index.tsx and the view in a child component', async () => {
+  it('home and dashboard share the real capability overview with request-scoped loaders', async () => {
     const adapter = makeAdapter();
-    const route = await adapter.render(appIndexRouteTemplate, SAMPLE_APP_VARS);
-    const view = await adapter.render(appHomeViewTemplate, SAMPLE_APP_VARS);
-    assertStringIncludes(
-      route,
-      "import HomeView from './(_components)/home-view.tsx';",
-    );
-    assertStringIncludes(route, "import { appRoutes } from '@app/router.ts';");
-    assertStringIncludes(route, "import { definePage } from '@app/utils.ts';");
-    assertStringIncludes(route, 'export const homePage = definePage()');
-    assertStringIncludes(route, '.withRoute(appRoutes.home)');
-    assertStringIncludes(route, '.withMeta(() => ({');
-    assertStringIncludes(route, 'href: appRoutes.dashboard.href()');
-    assertStringIncludes(route, 'href: appRoutes.crudExample.href()');
-    assertStringIncludes(route, 'href: appRoutes.examples.href()');
-    assertStringIncludes(route, 'designHref: appRoutes.design.href()');
-    assertStringIncludes(
-      route,
-      'compositionHref: appRoutes.designComposition.href()',
-    );
-    assertStringIncludes(route, 'href: appRoutes.design.href()');
-    assertStringIncludes(route, '.build();');
-    assertStringIncludes(route, 'export { page as default };');
-    assertStringIncludes(view, 'interface HomeViewProps {');
-    assertStringIncludes(
-      view,
-      'import { Badge, Button, Card, PageHeader, StatsGrid }',
-    );
-    assertStringIncludes(
-      view,
-      'A generated NetScript workspace with app-owned UI copies',
-    );
-    assertStringIncludes(view, 'href={designHref}');
-    assertStringIncludes(view, 'href={compositionHref}');
-  });
-
-  it('dashboard route keeps operations data in a registry-only child view', async () => {
-    const adapter = makeAdapter();
-    const route = await adapter.render(
-      appDashboardRouteTemplate,
-      SAMPLE_APP_VARS,
-    );
-    const view = await adapter.render(
-      appDashboardViewTemplate,
-      SAMPLE_APP_VARS,
-    );
-    assertStringIncludes(
-      route,
-      "import DashboardView from './(_components)/dashboard-view.tsx';",
-    );
-    assertStringIncludes(route, "import { appRoutes } from '@app/router.ts';");
-    assertStringIncludes(route, '.withRoute(appRoutes.dashboard)');
-    assertStringIncludes(route, ".withLayer('dashboard', DashboardView");
-    assertStringIncludes(route, "name: 'api-gateway'");
-    assertStringIncludes(route, '.build();');
-    assertStringIncludes(view, 'interface DashboardViewProps {');
-    assertStringIncludes(view, 'StatsGrid');
-    assertStringIncludes(view, 'ResponsiveTable');
-    assertStringIncludes(view, 'Deployment readiness');
-    assert(!view.includes("class='flex"));
-    assert(!view.includes("class='grid"));
+    for (
+      const [template, layer, routeName] of [
+        [appIndexRouteTemplate, 'home', 'home'],
+        [appDashboardRouteTemplate, 'dashboard', 'dashboard'],
+      ] as const
+    ) {
+      const route = await adapter.render(template, SAMPLE_APP_VARS);
+      assertStringIncludes(route, `.withRoute(appRoutes.${routeName})`);
+      assertStringIncludes(route, `.withLayer('${layer}', View`);
+      assertStringIncludes(route, 'loadScaffoldRecords(ctx.req)');
+      assertStringIncludes(route, 'readScaffoldCapabilities(ctx.req, records)');
+      assertStringIncludes(route, 'export { page as default };');
+      assert(!route.includes("name: 'api-gateway'"));
+    }
+    assertStringIncludes(appHomeViewTemplate, "export { default } from './dashboard-view.tsx';");
+    const view = await adapter.render(appDashboardViewTemplate, SAMPLE_APP_VARS);
+    for (
+      const fragment of [
+        'StatsGrid',
+        'RecordTable',
+        'CapabilityEmpty',
+        'generatedPageCount()',
+        'appTheme().label',
+        "import.meta.env.MODE === 'development'",
+        'href={appRoutes.design.href()}',
+        'href={appRoutes.designComposition.href()}',
+      ]
+    ) assertStringIncludes(view, fragment);
+    assert(!view.includes('Acme Robotics'));
+    assert(!view.includes('Deployment readiness'));
   });
 
   it('health route keeps the builder in health.tsx and the probe payload in shared helpers', async () => {
@@ -379,57 +342,53 @@ describe('app route template rendering', () => {
     );
   });
 
-  it('layout template renders the chrome on every page unless a prefix opts out', async () => {
-    const adapter = makeAdapter();
-    const output = await adapter.render(appLayoutTemplate, SAMPLE_APP_VARS);
-    assertStringIncludes(output, "import { Partial } from 'fresh/runtime';");
-    assertStringIncludes(
-      output,
-      "import { appNavigation, isCurrentNavigation, rendersAppChrome } from '@app/navigation.ts';",
-    );
-    assertStringIncludes(output, 'export default define.layout(');
-    assertStringIncludes(output, 'if (!rendersAppChrome(url.pathname)) {');
-    assertStringIncludes(output, 'appNavigation.filter((item) =>');
-    assertStringIncludes(output, "!item.developmentOnly || import.meta.env.MODE === 'development'");
-    assertStringIncludes(output, ').map((item) => (');
-    assertStringIncludes(
-      output,
-      "aria-current={isCurrentNavigation(item, url.pathname) ? 'page' : undefined}",
-    );
-    assertStringIncludes(output, "<nav class='ns-cluster ns-cluster--sm' aria-label='Primary'>");
-    assertStringIncludes(output, '<ThemeToggle />');
-    assertStringIncludes(output, 'test-project');
-    // Both the chrome and the chromeless branch keep the `page` partial for client navigation.
+  it('layout composes shared chrome and preserves both partial boundaries', async () => {
+    const output = await makeAdapter().render(appLayoutTemplate, SAMPLE_APP_VARS);
+    for (
+      const fragment of [
+        "import { Partial } from 'fresh/runtime';",
+        'visibleNavigation',
+        'if (!rendersAppChrome(url.pathname)) {',
+        'const navigation = visibleNavigation();',
+        '<SidebarShell',
+        '<ThemeToggle />',
+        '<WorkspaceCommands',
+        'test-project',
+        'isCurrentNavigation(item, pathname)',
+      ]
+    ) assertStringIncludes(output, fragment);
     assertEquals(output.split("<Partial name='page'>").length - 1, 2);
-    // Regression (#2406): the chrome used to render only for an allowlist of scaffold routes.
-    assert(!output.includes('showScaffoldChrome'), 'layout must not allowlist chrome routes');
-    assert(!output.includes('url.pathname === homeHref'), 'layout must not hardcode routes');
+    assert(!output.includes('showScaffoldChrome'));
+    assert(!output.includes('url.pathname === homeHref'));
   });
 
-  it('navigation template links every scaffold route and opts only /design out of the chrome', async () => {
+  it('navigation links generated workspace routes and makes sign-in and design chromeless', async () => {
     const router = await makeAdapter().render(appRouterTemplate, SAMPLE_APP_VARS);
     const appRouteKeys = new Set(directAppRouteTargets(router).keys());
     const linkedKeys = [...appNavigationTemplate.matchAll(/href: appRoutes\.(\w+)\.href\(\)/g)]
       .map((match) => match[1]);
-    assertEquals(linkedKeys, ['home', 'dashboard', 'examples', 'health', 'design']);
+    assertEquals(linkedKeys, [
+      'dashboard',
+      'records',
+      'settings',
+      'signIn',
+      'examples',
+      'health',
+      'design',
+    ]);
     for (const key of linkedKeys) assert(appRouteKeys.has(key), `appRoutes.${key} must exist`);
-    assertStringIncludes(
-      appNavigationTemplate,
-      'export const chromelessRoutePrefixes: readonly string[] = [appRoutes.design.href()];',
-    );
-
     const navigation = await importNavigationTemplate();
-    assert(navigation.rendersAppChrome('/'));
-    assert(navigation.rendersAppChrome('/notes'), 'pages added later get the chrome');
-    assert(navigation.rendersAppChrome('/health'));
-    assert(navigation.rendersAppChrome('/designer'), 'prefixes match whole segments');
-    assert(!navigation.rendersAppChrome('/design'));
-    assert(!navigation.rendersAppChrome('/design/tokens'));
+    for (const path of ['/', '/notes', '/health', '/designer', '/sign-in-later']) {
+      assert(navigation.rendersAppChrome(path), path);
+    }
+    for (const path of ['/design', '/design/tokens', '/sign-in']) {
+      assert(!navigation.rendersAppChrome(path), path);
+    }
     const byLabel = new Map(navigation.appNavigation.map((item) => [item.label, item]));
     assert(navigation.isCurrentNavigation(byLabel.get('Examples')!, '/examples/crud'));
-    assert(navigation.isCurrentNavigation(byLabel.get('Home')!, '/'));
-    assert(!navigation.isCurrentNavigation(byLabel.get('Home')!, '/notes'));
-    assert(!navigation.isCurrentNavigation(byLabel.get('Dashboard')!, '/dashboard/settings'));
+    assert(navigation.isCurrentNavigation(byLabel.get('Records')!, '/records/1'));
+    assert(navigation.isCurrentNavigation(byLabel.get('Overview')!, '/dashboard'));
+    assert(!navigation.isCurrentNavigation(byLabel.get('Overview')!, '/dashboard/settings'));
   });
 
   it('design route templates use NetScript page builders and scoped route files', async () => {
@@ -568,23 +527,23 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, '.withRoute(appRoutes.examples)');
     assertStringIncludes(
       route,
-      'canonicalHref: appRoutes.serviceExample.href()',
+      'canonicalHref: true ? appRoutes.serviceExample.href() : undefined',
     );
     assertStringIncludes(route, 'href: appRoutes.serviceExample.href()');
-    assertStringIncludes(route, "title: 'TeamMember resource flow'");
-    assertStringIncludes(route, 'href: appRoutes.crudExample.href()');
-    assertStringIncludes(route, "title: 'TeamMember CRUD'");
+    assertStringIncludes(route, "title: 'team-members resource'");
+    assert(!route.includes('href: appRoutes.crudExample.href()'));
+    assert(!route.includes("title: 'TeamMember CRUD'"));
     assertStringIncludes(
       route,
-      "description: 'Live TeamMember list, create, update, and delete flow backed by team-members.'",
+      "description: 'Your generated typed service flow.'",
     );
-    assertStringIncludes(route, '/examples/telemetry');
+    assertStringIncludes(route, 'appRoutes.telemetryExample.href()');
     assertStringIncludes(route, '.build();');
     assertStringIncludes(route, 'export { page as default };');
     assertStringIncludes(view, 'interface ExamplesViewProps {');
     assertStringIncludes(view, 'ResponsiveTable');
     assertStringIncludes(view, 'href={canonicalHref}');
-    assertStringIncludes(view, 'Open canonical TeamMember flow');
+    assertStringIncludes(view, 'Open team-members flow');
   });
 
   it('static directory-pattern route uses registry form, table, and detail blocks', async () => {
@@ -609,10 +568,11 @@ describe('app route template rendering', () => {
     );
     assertStringIncludes(
       route,
-      "description: 'Static registry-block composition demo with app-owned fresh-ui components.'",
+      "description: 'Empty table reference. Open Records for connected service data.'",
     );
     assertStringIncludes(route, ".withLayer('crud', CrudExampleView");
-    assertStringIncludes(route, "name: 'Acme Robotics'");
+    assertStringIncludes(route, 'records: [] as const');
+    assert(!route.includes("name: 'Acme Robotics'"));
     assertStringIncludes(view, "<Badge variant='primary'>Pattern</Badge>");
     assertStringIncludes(view, '<h1>Directory pattern</h1>');
     assertStringIncludes(

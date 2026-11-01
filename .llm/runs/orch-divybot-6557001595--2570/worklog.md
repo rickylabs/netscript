@@ -230,3 +230,24 @@ review. This is a review transition, not READY declaration or merge authorizatio
 Keep labels empty. Commit this supplemental policy evidence, then transition the
 PR to review so required CI executes on that exact head. Cockpit retains merge.
 Do not dispatch optional full runtime merely to defeat a documented cost policy.
+
+## S5 CI repair — plan accepted
+
+CI full shards exposed five test modules omitted from the original local inventory.
+Canonicalize layout/navigation templates, retain route behavior assertions for the
+approved Utility redesign, and include the missing tests. Public init/resource rerun
+revealed a real pagination-input provenance loss. Independent S5 PLAN-EVAL passed
+with C1–C5: loader-only flat queryInput metadata, sorted keys, complete byte-for-byte
+re-render proof before recovery, old CLI fail-safe compatibility docs, no reconcile
+or force changes. All five conditions adopted. Explicit input retains precedence.
+No browser appearance change: canonical layout/navigation output equivalence recorded
+for five project names. Close-gate live metadata corrected without weakening checks.
+S5 local validation and independent implementation evaluation in progress.
+
+S5 sign-off: independent read-only Claude Opus5.5 high code PASS; its only remaining
+condition (expanded suite green) is now satisfied: 387 passed, 0 failed, 0 ignored
+across 51 files. Structured source wrappers pass, quality/release/docs and 14 root
+carrier checks pass. Assets freshness follows the sign-off commit. Reconcile: no
+source changes since code review except a stale example button label assertion;
+focused and full reruns pass. #2488 still open, PR mergeable, no labels or locks
+changed. Commit and normal push authorized. READY remains gated on fresh remote CI.

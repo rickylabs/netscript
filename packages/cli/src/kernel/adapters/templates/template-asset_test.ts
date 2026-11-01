@@ -1,4 +1,4 @@
-import { assertEquals, assertFalse, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assertEquals, assertFalse, assertMatch, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { fromFileUrl, join } from '@std/path';
 import { EMBEDDED_TEMPLATE_CONTENT } from '../../assets/embedded.generated.ts';
 import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
@@ -62,7 +62,7 @@ Deno.test('app and service templates emit lint-clean generated contracts', () =>
 
   // The document owns navigation; the shared shell must preserve its partial boundary.
   assertStringIncludes(app, '<body f-client-nav={!previewStylesheet}>');
-  assertStringIncludes(layout, "<Partial name='page'><SidebarShell");
+  assertMatch(layout, /<Partial name='page'>\s*<SidebarShell\b/);
   assertFalse(layout.includes('f-client-nav={true}'));
   assertStringIncludes(telemetry, 'key={span.spanId}');
   assertStringIncludes(telemetry, 'key={trace.traceId}');

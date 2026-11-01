@@ -69,3 +69,18 @@ prevents READY; draft retained. No next implementation slice or self-certificati
 Supplemental same-session policy review distinguishes runtime cost-policy skip
 (valid) from draft-skipped requiredCI (unproven). Initial draft delivery fulfilled;
 review transition authorized to execute requiredCI. No labels or merge.
+
+S5 CI repair authorizes canonical formatting of app layout/navigation templates,
+manifest expectation correction in kernel/templates/app/generators-config_test.ts,
+whitespace-independent shell assertion in template-asset_test.ts, embedded carrier,
+and expanded focused test evidence. No behavior/UI redesign; independent review
+before sign-off. Formatting equivalence must prove previous visual output retained.
+
+S5 extends to existing route/navigation template test fixtures and public init
+resource regeneration regression. Diagnose the conflict before choosing a fix;
+retain idempotence and authored-file conflict protection. No test suppression.
+
+S5 supervisor sign-off: independent implementation PASS plus final 387-test green
+suite satisfies the review condition. Reviewed scope is 14 source/test/doc/carrier
+files. No ownership/reconcile weakening, no visual behavior change, no lock churn.
+Approve this repair slice for commit and normal push; remote CI remains pending.

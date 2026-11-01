@@ -1,4 +1,4 @@
-import { routePatterns, appRoutes } from '@app/router.ts';
+import { appRoutes, routePatterns } from '@app/router.ts';
 
 /** How a top-bar link decides that it marks the current page. */
 export type NavigationMatch = 'exact' | 'prefix';
@@ -33,7 +33,10 @@ export const appNavigation: readonly NavigationItem[] = [
  * Route prefixes whose pages render their own chrome instead of the app top bar. `/design` ships
  * its own sidebar shell; add a prefix for a full-screen page such as a sign-in screen.
  */
-export const chromelessRoutePrefixes: readonly string[] = [appRoutes.design.href(), appRoutes.signIn.href()];
+export const chromelessRoutePrefixes: readonly string[] = [
+  appRoutes.design.href(),
+  appRoutes.signIn.href(),
+];
 
 function isUnderPrefix(pathname: string, prefix: string): boolean {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
@@ -51,16 +54,20 @@ export function rendersAppChrome(pathname: string): boolean {
 
 /** Navigation and command results exclude references unavailable in production. */
 export function visibleNavigation(): readonly NavigationItem[] {
-  return appNavigation.filter((item) => !item.developmentOnly || import.meta.env.MODE === 'development');
+  return appNavigation.filter((item) =>
+    !item.developmentOnly || import.meta.env.MODE === 'development'
+  );
 }
 
 /** Count actual page patterns, including nested pages, with the same development filter as navigation. */
 export function generatedPageCount(): number {
-  const walk = (node: object): number => Object.entries(node).reduce((count, [key, value]) => {
-    if (key === '$route' && typeof value === 'string') {
-      return count + (value.startsWith('/design') && import.meta.env.MODE !== 'development' ? 0 : 1);
-    }
-    return count + (value && typeof value === 'object' ? walk(value) : 0);
-  }, 0);
+  const walk = (node: object): number =>
+    Object.entries(node).reduce((count, [key, value]) => {
+      if (key === '$route' && typeof value === 'string') {
+        return count +
+          (value.startsWith('/design') && import.meta.env.MODE !== 'development' ? 0 : 1);
+      }
+      return count + (value && typeof value === 'object' ? walk(value) : 0);
+    }, 0);
   return walk(routePatterns);
 }

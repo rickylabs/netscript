@@ -1,65 +1,46 @@
 # Resume scaffold redesign #2570
 
-Draft PR2572, branch orch/divybot-6557001595. All implementation slices complete and
-independently reviewed; no merge/readiness claim. Baseline0af8fd9e. Commits:
-ee051a9 plan; c2c85fb S1; d5f0c9a S2;7d9fd6a S3; final S4 sign-off commit follows.
+PR #2572, branch orch/divybot-6557001595. Pushed head 1acff81; S5 CI repairs are
+signed off: independent implementation PASS and 387/387 tests across 51 files.
+The next commit contains the repair; push it normally and verify fresh CI.
+Read s5-repair-plan.md, s5-plan-review.md and s5-impl-eval.md first.
 
-## Final state
+S1–S4 implemented Utility shell/dashboard/records/settings/sign-in/palette and actual
+generated capability readers. Independent Claude code PASS and independent Astra
+visual PASS (96 screenshots, every page >=8 fidelity/quality). Browser 72 cases and
+12 interaction sets passed. CSS budgets unchanged. #2488 remains open; no component
+fork or showcase plumbing. Never rebase or force-push; merge main if needed.
 
-Independent Claude Opus5.5 high IMPL-EVAL code PASS (impl-eval.md), no blocking code
-findings. Independent read-only Astra visual round2 PASS after one corrected failure:
-every page/state>=8 fidelity AND quality; all96 images viewed. Browser72 cases,
-12 interactionsets,0pageerrors. Three native generated fixtures: no-db,no-db with
-memory service,sqlite/Aspire scaffold with canonical auth/workers/streams/AI plugins.
-No fixture source patches. Empty/service/plugin plus DB/post-init checks pass.
+## S5 CI repair
 
-Deno2.9.7:302/302 tests across43files;all15root check:*;release:preflight;
-docs:accuracy;quality:gate;publish:dry-run PASS. Structured scoped check/lint/fmt
-PASS19files plus isolated template test correction. Full carrier regeneration no
-newdiff. CSS budgets unchanged; measured totals in s3-css-installed.json.
+Current remote CI 41309455869 failed test shards 3–6 plus the close-gate. Fresh UI,
+docs, code quality, core typecheck/browser and shards 1–2 passed. Close-gate metadata
+was corrected live and its checker passes; a new source push will rerun CI. Do not
+claim READY from the old failed run.
 
-## What prevents readiness
+Template layout/navigation formatting is canonical with identical emitted output.
+Tests now assert actual Utility routes/imports/capability content. The real public
+init-then-generate conflict is fixed through optional loader queryInput provenance
+with exact complete re-render proof before adoption. Explicit resolver input wins;
+edited, unowned, mismatched-client/procedure files retain conflicts. No reconcile
+policy change. Plan review C1–C5 adopted. Expanded inventory includes 51 files.
 
-Exact `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` exited1:
-preflight.aspire and cleanup.aspire-stop failed because Docker daemon unavailable.
-Runtime and container cleanup UNPROVEN, not a policy skip. Workers/streams real
-ready-path integration remains unproved beyond typed tests; plugin browser correctly
-shows unavailable, AI no-samples empty. Keep draft and do NOT post READY until required
-runtime is green or an explicit workflow policy skips it. Cockpit alone merges.
+## Readiness policy
 
-FreshUI full-export doclint124diagnostics in unchanged files;CLI doclintclean.
-No claim of all-package documentation clean. Baseline attribution is file comparison,
-not a separate baseline run. See s4-jsr-audit.md. Foreign Aspire resources untouched;
-8 owned preview/service processes stopped with exact cwd/argv proof. No owned preview
-remains; Docker resources could not be enumerated. See leak-report.md.
+Runtime command was attempted and remains UNPROVEN (.NET SDK missing and Docker
+unavailable). Independent readiness-policy-review.md confirms the existing non-opt-in
+workflow policy permits that lane to skip. Review transition was authorized after
+completed local gates. Required remote CI must pass before READY; Cockpit merges.
+No labels. Refs #2570/#2566 per highest-priority operator process.
 
-## Scope and follow-up
+## Remaining work
 
-#2488 remainsOPEN and PR2572 mergeable at final review. If2488 lands before merge,
-merge origin/main, reconcile the existing sharedpalette, regenerate and reverify;
-never rebase/forcepush. No componentfork or #2571 showcase plumbing. The newly fixed
-palette uses its existing callbackAPI, adds filtering/keyboarddispatch/visibleclose.
+Commit/push the signed-off S5 repair, run assets-barrel freshness on that commit,
+and address any new CI failures. Final READY report goes only through the
+ignored .divybot-final-report.tmp → .divybot-final-report.md handoff, with exact head.
+Do not commit assignment or handoff files. No session identifiers/absolute paths in
+public evidence. Do not add old untracked raw log files to commits.
 
-Accepted CLI-SCAFFOLD-WORKERS-CONTRACT-DEPENDENCY is in canonical debtledger: every
-app resolves workerscontract; releasepin/parity tests mitigate, optionaltypedadapter
-needed before independentmajor upgrades. Other low/nonblocking review observations
-are retained in impl-eval.md (probeoverfetch,soft404,footerARIA,navlabels,dateguard).
-
-## Resuming
-
-Read s4-verification.md, impl-eval.md, plan.md B1–B6, drift.md. Canonical service
-examples/orderreference and devdesignlinks are preserved. Contributorentrypoint:
-packages/cli/src/kernel/assets/app/README.md. Full evidence is this run directory.
-Public paths are repo-relative, no sessionids. Raw identities/logs remain private.
-The final assignment report is queued only through untracked .divybot-final-report.md;
-its existence does not prove publication. Refs2570/2566,no labels,owner process applies.
-
-## Superseding readiness update
-
-Read readiness-policy-review.md: same independent evaluator confirms runtime's
-non-opt-in workflow policy is valid despite UNPROVEN runtime. Previous blanket
-"no policy skip" conclusion is withdrawn. Required ci.yml checks are merely draft
-skipped. Transition to review is now authorized by the assignment's completed-local-
-tests instruction; initial draft delivery is fulfilled. No READY until required
-CI green; no labels,no merge. See s4-workflow-policy-state.json and fresh prerequisite
-receipt. Source unchanged since independently reviewed sign-off.
+Accepted debt CLI-SCAFFOLD-WORKERS-CONTRACT-DEPENDENCY is in the canonical ledger.
+Foreign Aspire resources remain untouched; owned preview/service processes stopped.
+Container cleanup is unproved because Docker cannot be inspected.

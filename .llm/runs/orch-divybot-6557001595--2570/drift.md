@@ -75,3 +75,13 @@ The full CLI suite found one obsolete layout assertion (301 pass/1 fail):
 f-client-nav on the old custom shell. Document _app already owns conditional
 client navigation, while the new SidebarShell is inside Partial. Replace the
 old class-adjacency assertion with both actual contracts; no emitted source change.
+
+## S5 — full CI found omitted template test coverage
+
+Test-shard4 reports web-scaffold_test.ts canonical formatting failures for layout
+and navigation. Test-shard6 reports generators-config_test.ts stale first8imports
+assertion after capability imports were added. The prior43-file local suite omitted
+these modules;302PASS was true but insufficient coverage. Expand inventory to cover
+web-page scaffolding and app template generators. Preserve canonical-source tests;
+fix emitted source formatting, do not relax them. A separate template assertion
+must tolerate canonical whitespace while preserving Partial/SidebarShell nesting.

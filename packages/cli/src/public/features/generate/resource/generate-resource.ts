@@ -6,6 +6,7 @@ import { reconcileResourceSlice } from '../../../../kernel/application/resource-
 import { reconcileState } from '../../../../kernel/application/resource-slice/reconcile/reconcile-state.ts';
 import { renderResourceSlice } from '../../../../kernel/application/resource-slice/render-resource-slice.ts';
 import {
+  type NormalizedResourceSliceInput,
   normalizeResourceSliceInput,
   parseOwnedResourceSliceLeaf,
   RESOURCE_SLICE_VARIANTS,
@@ -131,18 +132,22 @@ async function executeGenerateResource(
     client,
     procedure,
   });
-  const priorVariants = await readPriorVariants(
+  const prior = await readPriorState(
     appRoot,
-    selected.resource,
+    selected,
     planResourceSlice(normalizeResourceSliceInput({
       ...selected,
       variants: RESOURCE_SLICE_VARIANTS.filter((variant) => variant !== 'core'),
     })).leaves,
-    dependencies.fs,
+    dependencies,
   );
   const input = normalizeResourceSliceInput({
     ...selected,
-    variants: [...request.variants, ...priorVariants],
+    variants: [...request.variants, ...prior.variants],
+    procedure: {
+      ...procedure,
+      initialInput: procedure.initialInput ?? prior.queryInput,
+    },
   });
   const plan = planResourceSlice(input);
   const leaves = await renderResourceSlice(
@@ -186,23 +191,52 @@ async function executeGenerateResource(
   };
 }
 
-async function readPriorVariants(
+/** Recover input only when the complete canonical loader still matches its provenance. */
+async function readPriorState(
   appRoot: string,
-  resource: string,
+  selected: NormalizedResourceSliceInput,
   leaves: readonly ResourceSlicePlannedLeaf[],
-  fs: FileSystemPort,
-): Promise<readonly ResourceSliceOptionalVariant[]> {
+  dependencies: GenerateResourceDependencies,
+): Promise<{
+  variants: readonly ResourceSliceOptionalVariant[];
+  queryInput?: SelectedResourceProcedure['initialInput'];
+}> {
+  const { fs } = dependencies;
   const variants = new Set<ResourceSliceOptionalVariant>();
+  let queryInput: SelectedResourceProcedure['initialInput'];
   for (const leaf of leaves) {
     const path = join(appRoot, leaf.path);
     if (!await fs.exists(path)) continue;
-    const metadata = parseOwnedResourceSliceLeaf(await fs.readFile(path));
-    if (!metadata || metadata.resource !== resource || metadata.role !== leaf.role) continue;
+    const content = await fs.readFile(path);
+    const metadata = parseOwnedResourceSliceLeaf(content);
+    if (!metadata || metadata.resource !== selected.resource || metadata.role !== leaf.role) {
+      continue;
+    }
     for (const option of metadata.options) {
       if (option !== 'core') variants.add(option);
     }
+    if (
+      leaf.role !== 'loaders' || selected.procedure.initialInput !== undefined ||
+      metadata.queryInput === undefined
+    ) continue;
+    const proofPlan = planResourceSlice(normalizeResourceSliceInput({
+      ...selected,
+      variants: metadata.options.filter((option) => option !== 'core'),
+      procedure: { ...selected.procedure, initialInput: metadata.queryInput },
+    }));
+    const proof = await renderResourceSlice(
+      {
+        ...proofPlan,
+        leaves: proofPlan.leaves.filter((candidate) => candidate.role === 'loaders'),
+      },
+      dependencies.templates,
+      dependencies.templateRenderer,
+    );
+    if (proof.some((candidate) => candidate.path === leaf.path && candidate.content === content)) {
+      queryInput = metadata.queryInput;
+    }
   }
-  return [...variants].sort();
+  return { variants: [...variants].sort(), queryInput };
 }
 
 async function transformSharedSources(

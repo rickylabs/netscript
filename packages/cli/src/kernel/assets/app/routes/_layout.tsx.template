@@ -3,7 +3,7 @@ import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';
 import SidebarToggle from '@app/islands/ui/SidebarToggle.tsx';
 import WorkspaceCommands from '@app/islands/WorkspaceCommands.tsx';
 import { Breadcrumb, SidebarShell } from '@app/components/ui/mod.ts';
-import { visibleNavigation, isCurrentNavigation, rendersAppChrome } from '@app/navigation.ts';
+import { isCurrentNavigation, rendersAppChrome, visibleNavigation } from '@app/navigation.ts';
 import { appRoutes } from '@app/router.ts';
 import { appTheme } from '@app/lib/theme.ts';
 import { define } from '@app/utils.ts';
@@ -18,22 +18,88 @@ const navIcons: Readonly<Record<string, string>> = {
   Design: 'M3 3h18v18H3z M3 9h18 M9 9v12',
 };
 function navIcon(label: string) {
-  return <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d={navIcons[label] ?? navIcons.Records} /></svg>;
+  return (
+    <svg
+      width='16'
+      height='16'
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      stroke-width='1.5'
+      stroke-linecap='round'
+      stroke-linejoin='round'
+      aria-hidden='true'
+    >
+      <path d={navIcons[label] ?? navIcons.Records} />
+    </svg>
+  );
 }
 
 /** One shared shell for every workspace page; full-screen references and sign-in opt out. */
 export default define.layout(function RootLayout({ Component, url }) {
-  if (!rendersAppChrome(url.pathname)) return <Partial name='page'><Component /></Partial>;
+  if (!rendersAppChrome(url.pathname)) {
+    return (
+      <Partial name='page'>
+        <Component />
+      </Partial>
+    );
+  }
   const navigation = visibleNavigation();
-  const current = navigation.find((item) => isCurrentNavigation(item, url.pathname))?.label ?? 'Overview';
-  return <Partial name='page'><SidebarShell pathname={url.pathname} contentId='workspace-content'
-    navigation={[
-      { label: 'Workspace', items: navigation.slice(0, 4).map((item) => ({ ...item, icon: navIcon(item.label), matchPrefix: item.match === 'prefix', isActive: (pathname: string) => isCurrentNavigation(item, pathname) || (item.label === 'Overview' && pathname === '/') })) },
-      { label: 'Resources', items: navigation.slice(4).map((item) => ({ ...item, icon: navIcon(item.label), matchPrefix: item.match === 'prefix' })) },
-    ]}
-    brand={<a class='workspace-brand' href={appRoutes.home.href()}><span class='workspace-mark' aria-hidden='true'>N</span>{{name}}</a>}
-    topbarStart={<><SidebarToggle /><Breadcrumb items={[{ label: '{{name}}', href: appRoutes.home.href() }, { label: current }]} /></>}
-    topbarEnd={<><WorkspaceCommands navigation={navigation} /><ThemeToggle /></>}
-    footer={<div class='ns-dashboard__sidebar-env'><span>{appTheme().label}</span></div>}
-  ><Component /></SidebarShell></Partial>;
+  const current = navigation.find((item) => isCurrentNavigation(item, url.pathname))?.label ??
+    'Overview';
+  return (
+    <Partial name='page'>
+      <SidebarShell
+        pathname={url.pathname}
+        contentId='workspace-content'
+        navigation={[
+          {
+            label: 'Workspace',
+            items: navigation.slice(0, 4).map((item) => ({
+              ...item,
+              icon: navIcon(item.label),
+              matchPrefix: item.match === 'prefix',
+              isActive: (pathname: string) =>
+                isCurrentNavigation(item, pathname) ||
+                (item.label === 'Overview' && pathname === '/'),
+            })),
+          },
+          {
+            label: 'Resources',
+            items: navigation.slice(4).map((item) => ({
+              ...item,
+              icon: navIcon(item.label),
+              matchPrefix: item.match === 'prefix',
+            })),
+          },
+        ]}
+        brand={
+          <a class='workspace-brand' href={appRoutes.home.href()}>
+            <span class='workspace-mark' aria-hidden='true'>N</span>{{name}}
+          </a>
+        }
+        topbarStart={
+          <>
+            <SidebarToggle />
+            <Breadcrumb
+              items={[{ label: '{{name}}', href: appRoutes.home.href() }, { label: current }]}
+            />
+          </>
+        }
+        topbarEnd={
+          <>
+            <WorkspaceCommands navigation={navigation} />
+            <ThemeToggle />
+          </>
+        }
+        footer={
+          <div class='ns-dashboard__sidebar-env'>
+            <span>{appTheme().label}</span>
+          </div>
+        }
+      >
+        <Component />
+      </SidebarShell>
+    </Partial>
+  );
 });
