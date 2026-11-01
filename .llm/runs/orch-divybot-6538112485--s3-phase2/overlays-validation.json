@@ -1,0 +1,51 @@
+{
+  "base": "3d83caf1ca50695a0064529113ea00eab52426dd",
+  "slice": "Overlays",
+  "shippedComponents": 82,
+  "inventoryComponents": 104,
+  "nativeRegistryItems": 110,
+  "focusedTests": {
+    "passed": 192,
+    "failed": 0
+  },
+  "currentBaseBrowserTests": {
+    "passed": 137,
+    "failed": 0,
+    "projects": [
+      "light-390",
+      "light-1280",
+      "dark-390",
+      "dark-1280",
+      "touch-light-390"
+    ]
+  },
+  "sourceAndBrowserWrappers": "PASS",
+  "qualityAndArchitecture": "PASS",
+  "independentCorrectiveReview": "PASS",
+  "reviewedRestoredSourceEquality": {
+    "files": 11,
+    "status": "PASS"
+  },
+  "docsExportsDrift": "PASS",
+  "proseBuild": "PASS",
+  "baselineFullPackageTests": {
+    "passed": 372,
+    "failed": 0,
+    "scope": "rebased source before Overlays"
+  },
+  "historicalOverlayFullPackageTests": {
+    "passed": 378,
+    "failed": 0,
+    "scope": "before touch correction and latest base; not final-head proof"
+  },
+  "finalPhaseGates": "PENDING",
+  "phaseReady": false,
+  "publicationPreflight": "PASS",
+  "docsAccuracy": "PASS",
+  "carrierFreshness": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  }
+}

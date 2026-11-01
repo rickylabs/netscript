@@ -1,0 +1,115 @@
+{
+  "fullExportDocLint": {
+    "exitCode": 1,
+    "totalDiagnostics": 124,
+    "typescriptDiagnostics": 123,
+    "jsonDataExportLimitation": 1,
+    "typescriptDiagnosticFilesByteIdenticalToMain": false,
+    "files": [
+      {
+        "path": "packages/fresh-ui/src/runtime/combobox/combobox.types.ts",
+        "diagnostics": 33,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/popover/Popover.tsx",
+        "diagnostics": 11,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/popover/popover.types.ts",
+        "diagnostics": 10,
+        "byteIdenticalToMain": false
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/dialog/Dialog.tsx",
+        "diagnostics": 7,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/drawer/Drawer.tsx",
+        "diagnostics": 7,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/sheet/Sheet.tsx",
+        "diagnostics": 7,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/tooltip/Tooltip.tsx",
+        "diagnostics": 7,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/accordion/Accordion.tsx",
+        "diagnostics": 6,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/dialog/dialog.types.ts",
+        "diagnostics": 6,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/sheet/sheet.types.ts",
+        "diagnostics": 6,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/tooltip/tooltip.types.ts",
+        "diagnostics": 6,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/accordion/accordion.types.ts",
+        "diagnostics": 5,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/tabs/Tabs.tsx",
+        "diagnostics": 5,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/tabs/tabs.types.ts",
+        "diagnostics": 4,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/src/runtime/combobox/Combobox.tsx",
+        "diagnostics": 3,
+        "byteIdenticalToMain": true
+      },
+      {
+        "path": "packages/fresh-ui/contracts.json",
+        "diagnostics": 1,
+        "byteIdenticalToMain": null
+      }
+    ],
+    "attribution": "123 measured TypeScript baseline diagnostics plus one existing JSON data-export JSDoc limitation; no new diagnostic count.",
+    "changedDiagnosticSource": "popover.types.ts adds only the documented optional focusOnOpen field; other14 TypeScript diagnostic source files are byte-identical to main.",
+    "interactiveDiagnosticIdentityComparison": {
+      "baseline": 123,
+      "current": 123,
+      "new": 0,
+      "removed": 0,
+      "comparison": "Exact diagnostic kind, message and repo-relative source path; source line offsets excluded."
+    }
+  },
+  "jsrMetadataAudit": {
+    "exitCode": 1,
+    "blocker": "Existing JSON data export cannot carry a JSDoc module tag",
+    "otherFindings": "Existing vocabulary/cardinality warnings; no new suppression"
+  },
+  "nativeMemberPublishDryRun": {
+    "exitCode": 0,
+    "slowTypeWarnings": 0,
+    "isRuntimePublishProof": false
+  },
+  "ready": false,
+  "followUpIssue": 2531,
+  "owner": "Fresh UI package maintainers",
+  "target": "Before next stable Fresh UI design-system publication",
+  "independentFinalDisposition": "PASS phase2a review accepts existing unchanged debt as recorded; no raw failed gate relabeled green"
+}

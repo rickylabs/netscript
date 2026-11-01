@@ -7,39 +7,42 @@ export const navigation_3: readonly ComponentContract[] = [
     'specId': 'N7',
     'category': 'Navigation',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
-      'state': {
-        'kind': 'enum',
-        'values': [
-          'rest',
-          'hover',
-          'focus',
-          'open',
-          'disabled',
-        ],
+      'label': {
+        'kind': 'text',
+        'required': true,
+      },
+      'menus': {
+        'kind': 'collection',
+        'required': true,
+      },
+      'value': {
+        'kind': 'text',
+      },
+      'defaultValue': {
+        'kind': 'text',
+      },
+      'onValueChange': {
+        'kind': 'callback',
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'trigger',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'content',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
       },
     ],
     'attributes': {
@@ -53,6 +56,13 @@ export const navigation_3: readonly ComponentContract[] = [
         ],
         'description':
           'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+        'parts': [
+          'trigger',
+          'content',
+        ],
+        'compatibilityValues': [
+          'closed',
+        ],
       },
     },
     'booleans': [],
@@ -71,6 +81,26 @@ export const navigation_3: readonly ComponentContract[] = [
         'key': 'Escape',
         'action': 'Close menu',
       },
+      {
+        'key': 'Home/End',
+        'action': 'Move to first/last enabled trigger or menu item.',
+      },
+      {
+        'key': 'Enter/Space',
+        'action': 'Open a menu, activate actions or change caller-owned checkbox/radio state.',
+      },
+      {
+        'key': 'ArrowRight/ArrowLeft in submenu',
+        'action': 'Open/close nested menu, respecting direction.',
+      },
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Close the menu and leave through the roving trigger.',
+      },
+      {
+        'key': 'Printable character',
+        'action': 'Find the next matching menu item.',
+      },
     ],
     'tokenRoles': [
       'border/default',
@@ -79,7 +109,9 @@ export const navigation_3: readonly ComponentContract[] = [
       'surface/hover',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Roving native application menu triggers delegate popovers and collection keys to public ActionMenu; source must hydrate in an island.',
+      'Menu records contain app callbacks and controlled choice state. Nested menu items use private copied menu-items support, not a second public component identity.',
+      'Trigger/content preserve runtime open/closed; disabled/hover/focus are native properties and CSS. value/null controls the open menu.',
     ],
   },
   {
@@ -87,7 +119,7 @@ export const navigation_3: readonly ComponentContract[] = [
     'specId': 'N8',
     'category': 'Navigation',
     'priority': 'P0',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'size': {
         'kind': 'enum',
@@ -100,7 +132,6 @@ export const navigation_3: readonly ComponentContract[] = [
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
     ],
     'attributes': {
@@ -119,7 +150,7 @@ export const navigation_3: readonly ComponentContract[] = [
       'deco/marker',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Decorative aria-hidden square; parent owns aria-current. No focus stop. Existing Studio marker token with foreground fallback; no token changes.',
     ],
   },
   {
@@ -127,17 +158,8 @@ export const navigation_3: readonly ComponentContract[] = [
     'specId': 'N9',
     'category': 'Navigation',
     'priority': 'P2',
-    'shipped': false,
+    'shipped': true,
     'props': {
-      'status': {
-        'kind': 'enum',
-        'values': [
-          'complete',
-          'current',
-          'upcoming',
-          'error',
-        ],
-      },
       'orientation': {
         'kind': 'enum',
         'values': [
@@ -151,36 +173,40 @@ export const navigation_3: readonly ComponentContract[] = [
       'connector': {
         'kind': 'boolean',
       },
+      'steps': {
+        'kind': 'collection',
+        'required': true,
+        'description':
+          'Unique IDs, titles, descriptions, status and optional native href. At most one current step.',
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'indicator',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'body',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'title',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'description',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'connector',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
+      },
+      {
+        'name': 'step',
+        'when': 'one per supplied step',
       },
     ],
     'attributes': {
@@ -190,6 +216,9 @@ export const navigation_3: readonly ComponentContract[] = [
           'current',
           'upcoming',
           'error',
+        ],
+        'parts': [
+          'step',
         ],
       },
       'data-orientation': {
@@ -215,7 +244,7 @@ export const navigation_3: readonly ComponentContract[] = [
       'topbar/rule',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Ordered list presentation; status belongs to each step record. Native links are optional, no composite key manager. Current step owns aria-current=step and every status has readable text.',
     ],
   },
 ];

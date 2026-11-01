@@ -1,0 +1,55 @@
+{
+  "slice": "7c2c Utility Prose G17",
+  "focusedTests": {
+    "passed": 454,
+    "failed": 0
+  },
+  "browserTests": {
+    "passed": 16,
+    "failed": 0,
+    "widths": [
+      390,
+      1280
+    ],
+    "schemes": [
+      "light",
+      "dark"
+    ],
+    "strictAxeSeriousOrCritical": 0
+  },
+  "sourceWrappers": "PASS;3 files",
+  "browserWrappers": "PASS;build scripts, fixture and spec; no dropped files",
+  "qualityAndArchitecture": "PASS",
+  "publicationPreflight": "PASS",
+  "docsAccuracyAndExportDrift": "PASS",
+  "docsBuild": {
+    "status": "PASS",
+    "htmlPages": 253
+  },
+  "installedRenderer": "PASS;actual ui:add copy supplies browser HTML",
+  "nativeHostMarkup": "Separate heading-anchor/kbd/lede examples; never attributed to sanitized Markdown",
+  "markerMeasurement": {
+    "fixture": "prose-installed-light-390.png",
+    "darkPixelWidth": 4,
+    "darkPixelHeight": 4,
+    "crossEnvironmentPixelIdentityClaimed": false
+  },
+  "proseMeasure": 544,
+  "wideMeasure": 720,
+  "independentInitialReview": "PASS",
+  "compatibilityCorrection": "Published X1 phantom props/axes removed with explicit note in typed/JSON contract and drift",
+  "tokenValuesChanged": false,
+  "rootLocksChanged": false,
+  "newPackageFamilies": false,
+  "sanitizerChanged": false,
+  "phaseReady": false,
+  "fullGoalComplete": false,
+  "independentFinalSourceAndEvidenceReview": "PASS",
+  "sourceHead": "a1d6d4b76fe4c340e6521240acd19c907d81c6d2",
+  "cleanSourceCarriers": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "base": "3d83caf1ca50695a0064529113ea00eab52426dd",
+  "focusedTests": {
+    "passed": 135,
+    "failed": 0
+  },
+  "browserTests": {
+    "passed": 112,
+    "failed": 0
+  },
+  "qualityGate": "PASS",
+  "sourceCheck": "PASS",
+  "sourceLint": "PASS",
+  "sourceFormat": "PASS",
+  "docsExportsDrift": "PASS",
+  "docsAccuracy": "PASS",
+  "docsBuild": {
+    "status": "PASS",
+    "htmlPages": 253
+  },
+  "publicationPreflight": "PASS",
+  "independentIntegrationReview": "PASS",
+  "publicAddedLinePathAudit": {
+    "forbiddenRootHits": 0,
+    "finalHeadRepeatRequired": true
+  },
+  "phaseReady": false,
+  "carrierFreshness": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  },
+  "broaderPackageTests": "RUNNING"
+}

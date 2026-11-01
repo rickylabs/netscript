@@ -30,3 +30,7 @@ Implemented real KPI deltas, currency-separated totals, daily chart/status donut
 Evidence: Deno 2.9.7 structured tests 61/61; scoped check/lint/fmt 11 files; emitted app/service check 125 files; quality:gate passed. Live seeded SQLite: Overview, Records, detail at 1440/390 in light/dark, 12 captures; search/selection/CSV each combination, no browser errors or page overflow. These are S1 checks, not final plugin or visual acceptance. Private screenshots/logs remain outside public source. Independent Astra S1 source supervisor PASS in s1-review.md; all five earlier findings repaired. Supervisor authorizes the S1 signoff commit.
 
 Reconcile: S1 satisfies the first slice on current branch. S2 owns plugin state/progress/events, live-example/health redesign and Settings/sign-in/commands polish; S3 owns complete carriers, CI runtime, final independent code/visual review. No READY claim.
+
+## Base reconciliation — 2026-11-01
+
+Owner requested the latest main merge. Merged a182c37 (Fresh UI core contracts/gaps #2488) normally. The sole conflict was embedded.generated.ts; regenerated from the combined source with gen:assets-barrel, preserving both sources. S1 regression wrapper rerun. S2 will consume the now-merged richer command-palette API.

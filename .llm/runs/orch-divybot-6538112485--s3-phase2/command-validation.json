@@ -1,0 +1,60 @@
+{
+  "slice": "7c3a CommandPalette audit",
+  "focusedTests": {
+    "passed": 471,
+    "failed": 0
+  },
+  "browserTests": {
+    "passed": 32,
+    "failed": 0,
+    "widths": [
+      390,
+      1280
+    ],
+    "schemes": [
+      "light",
+      "dark"
+    ],
+    "strictAxeSeriousOrCritical": 0
+  },
+  "legacyRegressionControls": {
+    "verdict": "PASS",
+    "failedAgainstOriginalAsExpected": 2
+  },
+  "portabilityControl": "PASS;RegExp.escape absent and A.B(C) matches literal a.b(c) without page errors",
+  "sourceWrappers": "PASS;12 files",
+  "browserWrappers": "PASS;fixture/spec, zero drops",
+  "qualityAndArchitecture": "PASS",
+  "publicPrimitivesDocLint": "PASS",
+  "publicationPreflight": "PASS",
+  "docsAccuracyAndExportDrift": "PASS",
+  "docsBuild": {
+    "status": "PASS",
+    "htmlPages": 253
+  },
+  "installedSourceRendering": "PASS;actual CommandPalette copy rendered against O10",
+  "publishedIconVocabulary": "PASS;25 names match Z1 typed/JSON contract",
+  "legacyCopiedDependencyRepairs": {
+    "command-palette": [
+      "kbd",
+      "spinner"
+    ]
+  },
+  "independentInitialReview": "FAIL_FIX; portable RegExp.escape fallback implemented",
+  "independentCorrectiveReview": "PASS",
+  "sanitizerOrUnsafeHtmlAdded": false,
+  "tokenValuesChanged": false,
+  "rootLocksChanged": false,
+  "newPackageFamilies": false,
+  "frozenFixtureChanged": false,
+  "phaseReady": false,
+  "fullGoalComplete": false,
+  "independentSourceAndEvidenceSignOff": "PASS",
+  "sourceHead": "d985633317cda1a8090db1157f3f2a4ddbc91327",
+  "cleanSourceCarriers": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  }
+}

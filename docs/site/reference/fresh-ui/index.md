@@ -264,7 +264,8 @@ assistive technology hears how many files were accepted or rejected.
 ## Interactive namespaces and contracts
 
 Exported from `@netscript/fresh-ui/interactive`. Each is a compound namespace bundling a root
-component with its structural subcomponents. The namespace, props, event, and shared structural
+component with its structural subcomponents. Popover.Root accepts `focusOnOpen={false}` for informational previews that preserve trigger focus.
+The namespace, props, event, and shared structural
 contracts in this section are also public exports.
 
 | Symbol | Kind | Signature | Description |
@@ -281,8 +282,13 @@ contracts in this section are also public exports.
 
 ### Action menu and combobox behavior
 
-`ActionMenu` exposes item intents through `ACTION_MENU_ITEM_INTENTS` and reports why its open state
-changed with `ActionMenuOpenChangeReason`. `Combobox` exposes its controlled filtering seam through
+`ActionMenu` exposes item intents through `ACTION_MENU_ITEM_INTENTS` and semantic roles through
+`ACTION_MENU_ITEM_ROLES` / `ActionMenuItemRole`: `menuitem`, `menuitemcheckbox`, and `menuitemradio`.
+Checkable items receive caller-owned `aria-checked`; `closeOnSelect={false}` keeps the menu open
+for repeated adjustments. `ActionMenuContentProps.initialFocus` selects first or last entry,
+supporting application-menu ArrowDown/ArrowUp. Escape and explicit close restore trigger focus;
+outside dismissal preserves the destination focus. `ActionMenuOpenChangeReason` reports why the
+open state changed. `Combobox` exposes its controlled filtering seam through
 `UseComboboxOptions` and `UseComboboxReturn`; its compound namespace includes input, content, item,
 and empty-state parts.
 
@@ -291,7 +297,7 @@ and empty-state parts.
 | Symbol | Kind | Family | Description |
 | --- | --- | --- | --- |
 | `AccordionNamespace` / `AccordionRootProps` / `AccordionItemProps` / `AccordionItemTriggerProps` / `AccordionItemContentProps` / `AccordionItemIndicatorProps` | type alias | Accordion | Public compound namespace and root/item contracts. |
-| `ACTION_MENU_ITEM_INTENTS` / `ActionMenuNamespace` / `ActionMenuRootProps` / `ActionMenuTriggerProps` / `ActionMenuContentProps` / `ActionMenuItemProps` / `ActionMenuSeparatorProps` / `ActionMenuItemIntent` / `ActionMenuOpenChangeReason` | const / interface / type alias | Action menu | Public namespace, part props, supported intents, and open-state reason. |
+| `ACTION_MENU_ITEM_INTENTS` / `ACTION_MENU_ITEM_ROLES` / `ActionMenuNamespace` / `ActionMenuRootProps` / `ActionMenuTriggerProps` / `ActionMenuContentProps` / `ActionMenuItemProps` / `ActionMenuSeparatorProps` / `ActionMenuItemIntent` / `ActionMenuItemRole` / `ActionMenuOpenChangeReason` | const / interface / type alias | Action menu | Public namespace, part props, supported intents and roles, and open-state reason. |
 | `ComboboxNamespace` / `ComboboxRootProps` / `ComboboxInputProps` / `ComboboxContentProps` / `ComboboxItemProps` / `ComboboxEmptyProps` / `UseComboboxOptions` / `UseComboboxReturn` | type alias / interface | Combobox | Public namespace, part props, and controlled filtering contracts. |
 | `DialogNamespace` / `DialogRootProps` / `DialogTriggerProps` / `DialogContentProps` / `DialogTitleProps` / `DialogDescriptionProps` / `DialogCloseProps` | type alias | Dialog | Public namespace and structural-part props. |
 | `DrawerNamespace` / `DrawerRootProps` / `DrawerTriggerProps` / `DrawerContentProps` / `DrawerTitleProps` / `DrawerDescriptionProps` / `DrawerCloseProps` | type alias / reference | Drawer | Public namespace and structural-part props. |
@@ -432,7 +438,17 @@ export function PerformanceWidget() {
 }
 ```
 
+## Data display registry components
+
+`ui:add item kbd collapsible` installs three copy-source components. `Item` composes native content and action slots (`title`, `description`, `media`, `actions`, `header`, `footer`) with `variant` and `size`; its wrapper adds no focus target, and `Item.Group separators` adds row dividers. `Kbd` renders native key notation, and `Kbd.Group` joins keys with decorative separators (`separator={false}` omits them). Neither handles shortcuts. `Collapsible` composes native details/summary with `label`, `children`, `open`/`defaultOpen`, `onOpenChange` and `disabled`. Enter/Space toggles the summary; controlled callers may refuse the requested state, and disabled summaries leave the tab order. State refusal and disabled activation blocking apply after hydration; before hydration, summaries retain native disclosure behavior.
+
+`ui:add chart carousel` installs Cartesian charts and a manual scroll-snap carousel. Chart accepts `title`, optional `description`, a one-to-three `series` collection and `data` rows (`label`, matching finite numeric `values`). `type` is area/line; `orientation` lays out the legend; `indicator` styles hover swatches; `state` supports rest/hover/loading/empty. Its SVG has an accessible title/description, and a native details/table disclosure exposes exact source values. Carousel accepts `label`, `slides` (`label`, `content`), `orientation`, `controls`, `dots`, `counter`, `defaultIndex` and `onIndexChange`. Native scrolling, snap points and ResizeObserver keep slides aligned. Boundary controls use guarded `aria-disabled` to preserve focus; inactive slide content becomes inert after hydration. Visible square dots keep the handoff’s 8px geometry within 24px pointer targets.
+
+Chart uses an explicit `locale` (`en-US` by default) for consistent server/client number formatting. When native carousel scrolling moves away from a focused slide link, focus moves to the existing scroll viewport before that slide becomes inert; previous/next/dot focus stays on its native control.
+
 ## Embedded registry
+
+Items that import package-owned runtime subpaths declare the matching Fresh UI package dependency, so `ui:add` contributes its root import mapping in a clean Deno project.
 
 Exported from `@netscript/fresh-ui/registry`. It embeds the copy-source manifest and file contents
 used by the Fresh UI installer, so consumers can inspect the manifest without reading package files
