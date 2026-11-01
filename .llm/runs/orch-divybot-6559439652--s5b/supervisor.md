@@ -19,3 +19,5 @@ Loop bound: feature policy and dispatcher two-consecutive-terminal-failure stop.
 - Assignment final-report handoff files (Git-excluded).
 
 Read existing registry/contracts/tokens/plugin conversion APIs only. S3, #2559 token/preset/plugin entry files, #2574 guidance, #2573 S7 and #2453 remain outside this write surface. No labels, host paths or session IDs in public artifacts. Normal pushes only; cockpit owns merge.
+
+CI follow-up scope extension: `.llm/tools/release/release-canary-workflow_test.ts` may add the new dedicated workflow to the exhaustive workflow-name inventory. No production or concurrency-policy changes.

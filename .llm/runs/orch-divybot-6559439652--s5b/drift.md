@@ -18,3 +18,5 @@
 - Authorized write surface includes one .llm/tools/gates/catalog.ts entry for the dedicated component-library CI. This makes its standalone workflow produce native durable gate receipts without changing root tasks or existing token-plugin CI.
 
 - Hosted quality at e776763 failed Aspire manifest freshness. The canonical manifest indexes tracked paths mentioning Aspire, including dated lesson notes; run/temp exclusions remain intact. The new dated lesson must join that generated inventory. Add only its generator-derived row, with no scan-policy/version changes. User directed addressing the current CI failure.
+
+CI test-4 follow-up: the dedicated workflow also requires an entry in the release workflow test's exhaustive filename inventory. This one-line test expectation was absent from the original write surface; the owner's explicit CI-fix instruction authorizes this focused extension. Keep all existing concurrency-policy expectations.
