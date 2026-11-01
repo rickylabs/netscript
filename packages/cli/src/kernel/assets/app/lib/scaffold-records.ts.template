@@ -1,0 +1,14 @@
+// Server-only loader. Init selects a typed service adapter when one is generated.
+import { readScaffoldCapabilities } from './scaffold-capabilities.ts';
+import type { ScaffoldRecords, ScaffoldRecordDetail } from './scaffold-contract.ts';
+
+/** Resolve the no-service state without importing a nonexistent contract. */
+export async function loadScaffoldRecords(request: Request): Promise<ScaffoldRecords> {
+  const capability = (await readScaffoldCapabilities(request)).find((item) => item.id === 'service')!;
+  return { state: capability.state, rows: [], message: capability.description, command: capability.command };
+}
+
+/** No-service details use the same capability state without attempting a record read. */
+export async function loadScaffoldRecord(request: Request, _id: string): Promise<ScaffoldRecordDetail> {
+  return await loadScaffoldRecords(request);
+}

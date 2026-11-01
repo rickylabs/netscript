@@ -1,0 +1,1 @@
+{"schemaVersion":1,"command":["deno","test","--reporter=tap","--allow-all","--unstable-kv","--frozen","packages/cli/src/kernel/templates/app/route-templates_test.ts"],"cwd":"<cwd>","exitCode":0,"durationMs":2762,"summary":{"passed":22,"failed":0,"ignored":0,"totalResults":22,"uniqueFailures":0},"failures":[]}

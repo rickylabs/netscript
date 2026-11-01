@@ -1,0 +1,36 @@
+{
+  "gateId": "docs-accuracy",
+  "invocationId": "scaffold-2570-s6-docs-accuracy",
+  "argv": [
+    "deno",
+    "task",
+    "docs:accuracy"
+  ],
+  "cwd": ".",
+  "gitHead": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+  "actualGitHead": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "local-scaffold-2570-s6",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "51541aa8bcf1c46c83c55436e59b5a36bbb63a0375110f11cced228e6d8e99f0",
+  "lifecycleId": "local-scaffold-2570-s6:scaffold-2570-s6-docs-accuracy:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-11-01T14:03:43.597Z",
+  "startedAt": "2026-11-01T14:03:43.600Z",
+  "finishedAt": "2026-11-01T14:03:51.546Z",
+  "durationMs": 7946,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 334,
+    "sha256": "51406a426090ea744d91b9553ad6156317bf81163f23215c847e88bc30e4f51e",
+    "tail": "docs accuracy: PASS (4 saga pages checked for stale claims, live Aspire scaffold pins, 215 published source pages, 211 shipped corpus files, one query dialect exception page, 4 cache-first loader pages, mutation-map columns, 111/111 root/direct public commands from 176 recursive paths, 2 valid @netscript/fresh root imports checked)\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 134,
+    "sha256": "b99f2bd553696ea6522afb6a2a84126543f759f1aa8b2d154f14cbf7c7451e98",
+    "tail": "Task docs:accuracy deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/check-accuracy-and-discoverability.ts\n",
+    "truncated": false
+  }
+}

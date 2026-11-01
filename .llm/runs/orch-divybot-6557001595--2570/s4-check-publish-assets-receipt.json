@@ -1,0 +1,36 @@
+{
+  "gateId": "publish-assets",
+  "invocationId": "scaffold-2570-s4-check-publish-assets",
+  "argv": [
+    "deno",
+    "task",
+    "check:publish-assets"
+  ],
+  "cwd": ".",
+  "gitHead": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+  "actualGitHead": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "local-scaffold-2570",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "0dece8491fb70171c60ad5939cc4f5b4b05fd6096b3c5d83b14914eff43374e7",
+  "lifecycleId": "local-scaffold-2570:scaffold-2570-s4-check-publish-assets:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-11-01T12:48:35.551Z",
+  "startedAt": "2026-11-01T12:48:35.553Z",
+  "finishedAt": "2026-11-01T12:48:36.026Z",
+  "durationMs": 473,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 198,
+    "sha256": "70bc4b06374ff6f561f02b223ee735b7bf25bb21e4a9811a8183d6279a83735b",
+    "tail": "Task check:publish-assets deno task gen:publish-assets --check\nTask gen:publish-assets deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-publish-assets.ts '--check'\n",
+    "truncated": false
+  }
+}

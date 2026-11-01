@@ -36,8 +36,12 @@ export class PrismaClient {
 
   async $disconnect(): Promise<void> {}
 
+  async $queryRaw(..._args: unknown[]): Promise<unknown> {
+    throw new Error('Prisma client is not generated. Run netscript db generate before using this service.');
+  }
+
   async $queryRawUnsafe(_query: string): Promise<unknown> {
-    return undefined;
+    throw new Error('Prisma client is not generated. Run netscript db generate before using this service.');
   }
 }
 

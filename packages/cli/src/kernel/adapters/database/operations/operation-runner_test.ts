@@ -1,6 +1,6 @@
 /** @module infra/database/operation-runner_test */
 
-import { join } from '@std/path';
+import { join, resolve } from '@std/path';
 import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { FakeTime } from 'jsr:@std/testing@^1/time';
@@ -135,14 +135,10 @@ function completedResource(exitCode = 0): CommandOutput {
 
 function runner(
   executor: FakeAspireExecutor,
-  options: {
-    readonly writeOperationRequest?: (path: string, env: Record<string, string>) => Promise<void>;
-    readonly registerSignalAbort?: (abort: () => void) => () => void;
-    readonly timeoutMs?: number;
-    readonly removeOperationRequest?: (path: string) => Promise<void>;
-  } = {},
+  options: NonNullable<ConstructorParameters<typeof DbOperationRunner>[0]> = {},
 ): DbOperationRunner {
   return new DbOperationRunner({
+    ...options,
     executor,
     lifecycleLock: new FakeLock(),
     pollIntervalMs: 0,
@@ -240,6 +236,12 @@ describe('DbOperationRunner', () => {
     ]);
 
     assertEquals(await runner(executor).execute(request('migrate')), 0);
+    assertEquals(
+      executor.outputCalls.some((call) =>
+        call.args[0] === 'describe' || call.args[2] === 'restart'
+      ),
+      false,
+    );
     assertEquals(executor.outputCalls.map((call) => call.args[0]), ['ps', 'wait', 'resource']);
     assertEquals(executor.outputCalls[0].args, [
       'ps',
@@ -284,6 +286,12 @@ describe('DbOperationRunner', () => {
     ]);
 
     assertEquals(await runner(executor).execute(request('seed')), 0);
+    assertEquals(
+      executor.outputCalls.some((call) =>
+        call.args[0] === 'describe' || call.args[2] === 'restart'
+      ),
+      false,
+    );
     assertEquals(executor.outputCalls.map((call) => call.args[0]), [
       'ps',
       'start',
@@ -313,6 +321,12 @@ describe('DbOperationRunner', () => {
     ]);
 
     assertEquals(await runner(executor).execute(request('seed')), 0);
+    assertEquals(
+      executor.outputCalls.some((call) =>
+        call.args[0] === 'describe' || call.args[2] === 'restart'
+      ),
+      false,
+    );
     assertEquals(executor.outputCalls[1].args[0], 'start');
     assertEquals(executor.outputCalls.at(-1)?.args[0], 'stop');
   });
@@ -428,4 +442,84 @@ describe('DbOperationRunner', () => {
     assertEquals(executor.spawnCalls[0].args[0], 'run');
     assertEquals(executor.spawnCalls[0].args.includes(APPHOST), true);
   });
+});
+
+Deno.test('resident generate refreshes declared consumers only after successful completion', async () => {
+  for (const code of [0, 7]) {
+    const executor = new FakeAspireExecutor([
+      running(),
+      output(),
+      output(),
+      completedResource(code),
+      output(),
+      output(),
+      ...(code === 0
+        ? [
+          output(
+            0,
+            JSON.stringify({
+              resources: [{ displayName: 'orders', resourceType: 'Executable', state: 'Running' }],
+            }),
+          ),
+          output(),
+          output(),
+        ]
+        : []),
+    ]);
+    let reads = 0;
+    assertEquals(
+      await runner(executor, {
+        realPath: (path) => Promise.resolve(resolve(path)),
+        fs: {
+          readFile: (path) => {
+            reads++;
+            return Promise.resolve(JSON.stringify(
+              path.endsWith('appsettings.json')
+                ? {
+                  NetScript: {
+                    PrimaryDatabase: 'postgres',
+                    Databases: { postgres: {} },
+                    Services: { orders: {} },
+                  },
+                }
+                : { imports: { '@database': '../../database/mod.ts' } },
+            ));
+          },
+        },
+      }).execute(request('generate')),
+      code,
+    );
+    const restarted = executor.outputCalls.filter((call) => call.args[2] === 'restart');
+    assertEquals(restarted.length, code === 0 ? 1 : 0);
+    assertEquals(
+      restarted[0]?.args.slice(0, 3),
+      code === 0 ? ['resource', 'orders', 'restart'] : undefined,
+    );
+    assertEquals(reads > 0, code === 0);
+    assertEquals(executor.outputCalls.some((call) => call.args[0] === 'stop'), false);
+  }
+});
+
+Deno.test('standalone generate never refreshes service consumers', async () => {
+  const executor = new FakeAspireExecutor([
+    output(0, '[]'),
+    output(),
+    output(),
+    output(),
+    completedResource(),
+    output(),
+    output(),
+    output(),
+  ]);
+  assertEquals(
+    await runner(executor, {
+      fs: {
+        readFile: () => {
+          throw new Error('unexpected consumer discovery');
+        },
+      },
+    }).execute(request('generate')),
+    0,
+  );
+  assertEquals(executor.outputCalls.some((call) => call.args[2] === 'restart'), false);
 });

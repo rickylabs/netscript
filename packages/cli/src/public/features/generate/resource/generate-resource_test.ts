@@ -146,3 +146,84 @@ function routeKeyPath(route: string): [string, ...string[]] {
   if (!first) throw new Error('Expected a normalized route.');
   return [first, ...rest, '$route'];
 }
+
+Deno.test('resource rerun preserves proven initial input in dry-run and apply', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(`${APP_ROOT}/router.ts`, ROUTER);
+  const dependencies = await createDependencies(fs);
+  const request = {
+    resource: 'orders',
+    procedure: 'list',
+    variants: [] as const,
+    dryRun: false,
+    force: false,
+  };
+  await generateResource(request, {
+    ...dependencies,
+    resolveProcedure: async (input) => ({
+      ...await dependencies.resolveProcedure(input),
+      initialInput: { offset: 0, limit: 25 },
+    }),
+  });
+  const path = 'routes/orders/(_shared)/orders-loaders.ts';
+  const original = await fs.readFile(`${APP_ROOT}/${path}`);
+  for (const dryRun of [true, false]) {
+    const result = await generateResource({ ...request, dryRun }, dependencies);
+    assertEquals(result.exitCode, 0);
+    assertEquals(result.report.find((entry) => entry.path === path), {
+      path,
+      action: 'skip',
+      classification: 'exact',
+    });
+    assertEquals(await fs.readFile(`${APP_ROOT}/${path}`), original);
+  }
+});
+
+Deno.test('resource rerun refuses edited, unowned or mismatched initial input provenance', async () => {
+  for (const scenario of ['marker', 'body', 'unowned', 'procedure', 'client', 'explicit']) {
+    const fs = new MemoryFileSystemAdapter();
+    await fs.writeFile(`${APP_ROOT}/router.ts`, ROUTER);
+    const dependencies = await createDependencies(fs);
+    const request = {
+      resource: 'orders',
+      procedure: 'list',
+      variants: [] as const,
+      dryRun: false,
+      force: false,
+    };
+    await generateResource(request, {
+      ...dependencies,
+      resolveProcedure: async (input) => ({
+        ...await dependencies.resolveProcedure(input),
+        initialInput: { limit: 25, offset: 0 },
+      }),
+    });
+    const path = 'routes/orders/(_shared)/orders-loaders.ts';
+    const original = await fs.readFile(`${APP_ROOT}/${path}`);
+    const edited = scenario === 'marker'
+      ? original.replace('"limit":25', '"limit":50')
+      : scenario === 'body'
+      ? original + '// authored edit\n'
+      : scenario === 'unowned'
+      ? original.slice(original.indexOf('\n') + 1)
+      : original;
+    await fs.writeFile(`${APP_ROOT}/${path}`, edited);
+    const result = await generateResource({
+      ...request,
+      procedure: scenario === 'procedure' ? 'search' : 'list',
+    }, {
+      ...dependencies,
+      resolveClient: async (...args) => ({
+        ...await dependencies.resolveClient(...args),
+        ...(scenario === 'client' ? { moduleSpecifier: '@app/lib/other.ts' } : {}),
+      }),
+      resolveProcedure: async (input) => ({
+        ...await dependencies.resolveProcedure(input),
+        ...(scenario === 'explicit' ? { initialInput: { limit: 100, offset: 0 } } : {}),
+      }),
+    });
+    assertEquals(result.exitCode, 1, scenario);
+    assertEquals(result.conflicts.includes(path), true, scenario);
+    assertEquals(await fs.readFile(`${APP_ROOT}/${path}`), edited, scenario);
+  }
+});

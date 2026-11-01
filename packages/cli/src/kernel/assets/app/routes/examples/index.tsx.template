@@ -2,47 +2,17 @@ import ExamplesView from './(_components)/examples-view.tsx';
 import { appRoutes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
 
-export const examplesPage = definePage()
-  .withRoute(appRoutes.examples)
-  .withMeta(() => ({
-    title: '{{name}} — examples',
-    description: 'Registry-only scaffold example pages.',
-  }))
+export const examplesPage = definePage().withRoute(appRoutes.examples)
+  .withMeta(() => ({ title: '{{name}} — Examples', description: 'Reference routes generated for this application.' }))
   .withLayer('examples', ExamplesView, () => ({
-    canonicalHref: appRoutes.serviceExample.href(),
+    canonicalHref: {{hasService}} ? appRoutes.serviceExample.href() : undefined,
     examples: [
-      {
-        title: 'Dynamic order route',
-        href: appRoutes.order.href({ path: { id: 'order-42' } }),
-        description: 'Typed dynamic path binding and bound-reference href generation.',
-        status: 'Ready',
-        owner: 'app',
-      },
-      {
-        title: '{{modelName}} resource flow',
-        href: appRoutes.serviceExample.href(),
-        description: 'Canonical contract, resource, layer, managed-form, and optimistic-mutation flow.',
-        status: 'Canonical',
-        owner: 'app',
-      },
-      {
-        title: '{{modelName}} CRUD',
-        href: appRoutes.crudExample.href(),
-        description: 'Live {{modelName}} list, create, update, and delete flow backed by {{serviceName}}.',
-        status: 'Ready',
-        owner: 'app',
-      },
-      {
-        title: 'Telemetry trace example',
-        href: '/examples/telemetry',
-        description: 'Reserved trace walkthrough for service, database, and frontend spans.',
-        status: 'Placeholder',
-        owner: 'platform',
-      },
+      { title: 'Typed route reference', href: appRoutes.order.href({ path: { id: 'route-reference' } }), description: 'A dynamic route parameter, not a business record.', status: 'Reference', owner: 'app' },
+      ...({{hasService}} ? [
+        { title: '{{serviceName}} resource', href: appRoutes.serviceExample.href(), description: 'Your generated typed service flow.', status: 'Generated', owner: 'app' },
+        { title: 'Telemetry', href: appRoutes.telemetryExample.href(), description: 'Trace your running services.', status: 'Generated', owner: 'app' },
+      ] : []),
     ],
-  }))
-  .withLayout((slots) => slots.examples())
-  .build();
-
+  })).withLayout((slots) => slots.examples()).build();
 export const { default: page } = examplesPage;
 export { page as default };

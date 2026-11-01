@@ -62,3 +62,7 @@ Mandatory independent IMPL-EVAL **PASS** at b756ee6 in the same read-only Anthro
 This evidence-only sign-off commits evaluate.md and compact exact-source-head gate hashes. Product surface stays identical to b756ee6. Final head must be rebound by strict two-build comparison plus byte-for-byte equality to the browser-tested1116-file manifest, and a short same-session read-only attestation published as a PR phase comment. This avoids committing an ever-moving self-referential attestation. Current-head hosted checks are assessed after that; do not infer all-green from pr-checks exit0 when any row is pending.
 
 Close: dated lesson and several specific memory notes retained. No accepted debt or independent remainder to fan out. Owner owns issue disposition, run cleanup and merge. Original strict failure and first plan failure preserved.
+
+## Main reconciliation after final attestation
+
+A final fetch found main4cb0298 (#2572) had just merged. Normal merge initiated from787f211 with no conflicts, before any READY packet. Imported source includes Fresh UI assets used by docs previews; no own Pagefind/CI changes conflict. Commit this run reconciliation in the normal merge commit, then repeat strict every-output proof and complete browser/quality/native carrier checks, with same-session independent final verification. Old787f211 phase evidence is valid only for its historical head. Local Docker limitation unchanged.

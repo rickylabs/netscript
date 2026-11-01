@@ -1,0 +1,16 @@
+{
+  "ownedAppHosts": [
+    {
+      "apphost": ".llm/tmp/scaffold-2570/s6-aspire/shop/aspire/apphost.mts",
+      "operation": "aspire stop --apphost <exact fixture>",
+      "exitCode": 0
+    },
+    {
+      "apphost": ".llm/tmp/scaffold-2570/s6-healthy/shop/aspire/apphost.mts",
+      "operation": "aspire stop --apphost <exact fixture>",
+      "exitCode": 0
+    }
+  ],
+  "foreignAppHosts": "untouched",
+  "containers": "cache disabled in these SQLite fixtures; Docker unavailable for global enumeration"
+}

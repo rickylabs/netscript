@@ -1,0 +1,17 @@
+{
+  "utility-baseline": {
+    "files": 43,
+    "rawBytes": 168907,
+    "gzipBytes": 20722
+  },
+  "utility-empty": {
+    "files": 44,
+    "rawBytes": 174861,
+    "gzipBytes": 21465
+  },
+  "pageComposition": {
+    "rawBytes": 5792,
+    "gzipBytes": 1464
+  },
+  "budgetChange": "none; shared component CSS unchanged"
+}

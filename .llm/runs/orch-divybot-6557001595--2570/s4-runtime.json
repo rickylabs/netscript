@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "deno",
+    "task",
+    "e2e:cli",
+    "run",
+    "scaffold.runtime",
+    "--cleanup",
+    "--format",
+    "pretty"
+  ],
+  "exitCode": 1,
+  "durationSeconds": 5.3,
+  "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466"
+}

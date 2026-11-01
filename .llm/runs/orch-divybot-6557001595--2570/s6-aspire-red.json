@@ -1,0 +1,35 @@
+{
+  "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+  "cache": "disabled by public --cache false",
+  "order": "init; Aspire start; db init; db generate; db seed; page reads",
+  "results": [
+    {
+      "resource": "orders",
+      "path": "/health",
+      "status": 200,
+      "seededRow": false,
+      "unavailable": false
+    },
+    {
+      "resource": "shop-web",
+      "path": "/records",
+      "status": 200,
+      "seededRow": false,
+      "unavailable": true
+    },
+    {
+      "resource": "shop-web",
+      "path": "/examples/orders",
+      "status": 500,
+      "seededRow": false,
+      "unavailable": false
+    },
+    {
+      "resource": "shop-web",
+      "path": "/",
+      "status": 200,
+      "seededRow": false,
+      "unavailable": true
+    }
+  ]
+}

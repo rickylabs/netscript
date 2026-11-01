@@ -492,6 +492,8 @@ packages/cli/src/kernel/adapters/database/operations/operation-runner_test.ts	cl
 packages/cli/src/kernel/adapters/database/operations/operation-runner-helpers_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operations/operation-runner-helpers.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operations/operation-runner.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operations/refresh-generated-client-consumers_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operations/refresh-generated-client-consumers.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operations/select-operation-executor_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operations/select-operation-executor.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operations/workspace-task-runner_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
@@ -552,6 +554,7 @@ packages/cli/src/kernel/assets/agent-docs.generated.ts	generated:barrel	derived	
 packages/cli/src/kernel/assets/agent-tools.generated.ts	generated:barrel	derived	deno task gen:assets-barrel; gate check:assets-barrel
 packages/cli/src/kernel/assets/agent/guidance.md.template	template:other	S11	prose/link check only (S11 wording); no version literal
 packages/cli/src/kernel/assets/app/main.ts.template	template:other	S11	prose/link check only (S11 wording); no version literal
+packages/cli/src/kernel/assets/app/README.md	template:other	S11	prose/link check only (S11 wording); no version literal
 packages/cli/src/kernel/assets/app/routes/_app.tsx.template	template:other	S11	prose/link check only (S11 wording); no version literal
 packages/cli/src/kernel/assets/app/routes/(design)/design/(_components)/components-view.tsx.template	template:other	S11	prose/link check only (S11 wording); no version literal
 packages/cli/src/kernel/assets/app/routes/examples/telemetry/(_components)/telemetry-view.tsx.template	template:example	S13	dashboard-port assumption (ASPIRE_DASHBOARD_PORT ?? 18888) decision

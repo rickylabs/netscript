@@ -10,6 +10,7 @@
  */
 
 import type { VNode } from 'preact';
+import { useEffect, useState } from 'preact/hooks';
 import { cn } from '../../lib/cn.ts';
 import { Combobox } from '@netscript/fresh-ui/interactive';
 import { Dialog } from '@netscript/fresh-ui/interactive';
@@ -72,6 +73,17 @@ export function CommandPalette(
     class: className,
   }: CommandPaletteProps,
 ): VNode {
+  const [query, setQuery] = useState('');
+  useEffect(() => {
+    if (!open) setQuery('');
+  }, [open]);
+  const search = query.trim().toLocaleLowerCase();
+  const visibleGroups = groups.map((group) => ({
+    ...group,
+    items: group.items.filter((item) =>
+      `${item.label} ${item.hash ?? ''}`.toLocaleLowerCase().includes(search)
+    ),
+  })).filter((group) => group.items.length > 0);
   const select = (item: CommandItem) => {
     item.onSelect?.();
     onOpenChange?.(false);
@@ -85,7 +97,16 @@ export function CommandPalette(
         data-scope='command-palette'
         aria-label='Command palette'
       >
-        <Combobox.Root onValueChange={() => {}} defaultOpen>
+        <Combobox.Root
+          key={open ? 'open' : 'closed'}
+          inputValue={query}
+          onInputValueChange={setQuery}
+          onValueChange={(value) => {
+            const item = groups.flatMap((group) => group.items).find((item) => item.id === value);
+            if (item) select(item);
+          }}
+          defaultOpen
+        >
           <div class={cn('ns-cmdk', className)} data-part='root' data-scope='command-palette'>
             <div data-part='content' data-scope='command-palette' style={{ display: 'contents' }}>
               <div class='ns-cmdk__input-row' data-part='input-row' data-scope='command-palette'>
@@ -95,7 +116,18 @@ export function CommandPalette(
                   data-scope='command-palette'
                   aria-hidden='true'
                 >
-                  ⌕
+                  <svg
+                    width='16'
+                    height='16'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='currentColor'
+                    stroke-width='1.75'
+                    aria-hidden='true'
+                  >
+                    <circle cx='10.5' cy='10.5' r='6.5' />
+                    <path d='m16 16 5 5' />
+                  </svg>
                 </span>
                 <Combobox.Input
                   class='ns-cmdk__input'
@@ -103,13 +135,17 @@ export function CommandPalette(
                   data-scope='command-palette'
                   placeholder={placeholder}
                 />
+                <Dialog.Close class='ns-cmdk__close' aria-label='Close command palette'>
+                  <span class='ns-cmdk__close-key'>esc</span>
+                  <span class='ns-cmdk__close-label'>Close</span>
+                </Dialog.Close>
               </div>
               <Combobox.Content
                 class='ns-cmdk__list'
                 data-part='list'
                 data-scope='command-palette'
               >
-                {groups.map((group) => (
+                {visibleGroups.map((group) => (
                   <div
                     key={group.id}
                     class='ns-cmdk__group'
@@ -135,7 +171,6 @@ export function CommandPalette(
                         class='ns-cmdk__item'
                         data-part='item'
                         data-scope='command-palette'
-                        onClick={() => select(item)}
                       >
                         {item.icon
                           ? (
@@ -182,14 +217,27 @@ export function CommandPalette(
                     ))}
                   </div>
                 ))}
-                <Combobox.Empty
-                  class='ns-cmdk__empty'
-                  data-part='empty'
-                  data-scope='command-palette'
-                >
-                  {emptyLabel}
-                </Combobox.Empty>
+                {visibleGroups.length === 0 && (
+                  <Combobox.Empty
+                    class='ns-cmdk__empty'
+                    data-part='empty'
+                    data-scope='command-palette'
+                  >
+                    {emptyLabel}
+                  </Combobox.Empty>
+                )}
               </Combobox.Content>
+              <footer class='ns-cmdk__footer' aria-label='Command keyboard help'>
+                <span>
+                  <kbd>↑↓</kbd> to navigate
+                </span>
+                <span>
+                  <kbd>↵</kbd> to open
+                </span>
+                <span>
+                  <kbd>esc</kbd> to close
+                </span>
+              </footer>
             </div>
           </div>
         </Combobox.Root>

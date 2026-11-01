@@ -1,3 +1,7 @@
+# Current reconciliation — read first
+
+Main advanced during final handoff:4cb0298 (#2572 Utility scaffold redesign) after the previously verified787f211 head. Normal merge is in progress/committed with this reconciliation note, no conflicts. Fresh UI command-palette inputs changed on main, so repeat complete strict/browser/quality/native carrier gates and same-session independent merged-head attestation before reporting readiness. No authored edits to sibling scaffold/palette code; root lock remains unchanged. Existing final phase comment787f211 is historical, not the merge-head verdict.
+
 # Resume from here
 
 Scoped #2453 implementation complete; PR2575, Refs-only/no labels, cockpit owns merge. Original main1e4e58f strict Pagefind1.3.0 failure retained. Exact1.6.0 released native fix + stable Lume shared input order + frozen site resolution. No output postprocessing or S8/token/layout/registry changes. Root lock unchanged.

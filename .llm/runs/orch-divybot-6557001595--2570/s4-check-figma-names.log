@@ -1,0 +1,2 @@
+Task check:figma-names deno run --allow-read --allow-env=NODE_ENV tools/figma-plugin/check-names.ts
+Figma names: PASS; pinned variables=2189 portable items=1
