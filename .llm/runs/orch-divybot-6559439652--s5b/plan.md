@@ -54,3 +54,7 @@ Structured scoped check/test/lint/fmt; generation round trip and coverage/malfor
 ## Deferred scope / debt
 
 #2418/#2412 retain S3-dependent inventory reconciliation, native editor/MCP and publication acceptance. #2559 owns token/preset/plugin surface; #2574 guidance; #2573 S7; #2453 separate dispatch; S6 owns visual restyling. No new architectural debt planned. Dedicated standalone workflow is intentional to keep the existing plugin/quality entry untouched. It is an explicit additional readiness condition: READY waits for its `figma-component-library` check as well as required checks. CLI entrypoints use `deno run`; root deno.json is unchanged. S6 is #2419.
+
+## Native/build and evidence refinement
+
+Native modules include preflight.ts beside the port/import/export. Build reads the existing registry carrier in Deno and emits a synchronous projection for sandbox bundling; hashing crosses an injected iframe digest port using standard WebCrypto. A VM compatibility test omits browser globals and executes actual bundled operations, still never claiming editor evidence. Dedicated CI uses one new allowlisted command in .llm/tools/gates/catalog.ts and its own workflow/child report so durable verdicts use the repository runner. Root deno.json and existing plugin/quality entry remain untouched.

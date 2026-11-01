@@ -14,6 +14,7 @@ Loop bound: feature policy and dispatcher two-consecutive-terminal-failure stop.
 - `.llm/runs/orch-divybot-6559439652--s5b/**`: tracked harness and memory artifacts.
 - `.llm/2026-11-01-s5b-component-library.md`: dated lesson note.
 - `.github/workflows/figma-component-library.yml`: dedicated tool checks.
+- `.llm/tools/gates/catalog.ts`: add one allowlisted component-library CI command for durable receipts.
 - Assignment final-report handoff files (Git-excluded).
 
 Read existing registry/contracts/tokens/plugin conversion APIs only. S3, #2559 token/preset/plugin entry files, #2574 guidance, #2573 S7 and #2453 remain outside this write surface. No labels, host paths or session IDs in public artifacts. Normal pushes only; cockpit owns merge.

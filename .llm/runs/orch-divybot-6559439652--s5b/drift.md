@@ -12,3 +12,7 @@
 - Slice review required explicit root anatomy and one contract per logical registry item. Added complete registry/style membership rejection and tests so a missing style-map entry cannot silently reduce generated coverage. Planned default values now lead the native variant order.
 
 - Native side-effect modules will live in src/native/ (port, import, export), rather than adding three more flat source entries. Same planned concern/scope, bounded folder cardinality.
+
+- Native runtime requires a build-time synchronous carrier projection and iframe digest port: compressed workspace carriers/browser WebCrypto are not assumed in the Figma sandbox. The same pinned schemas/data and standard WebCrypto are reused; no package, token source or dependency edits. A VM compatibility test explicitly omits browser globals; it is not live editor proof.
+
+- Authorized write surface includes one .llm/tools/gates/catalog.ts entry for the dedicated component-library CI. This makes its standalone workflow produce native durable gate receipts without changing root tasks or existing token-plugin CI.
