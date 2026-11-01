@@ -50,3 +50,7 @@ This session ran as `claude-opus-5-5` (Anthropic), separate from the OpenAI gene
 ## CI test-1 repair continuation
 
 Updated terminal IMPL-EVAL: PASS. The only subsequent code change preserves the root catalog in the isolated release recovery test fixture. Independent reviewer reran the complete module: 8 passed, 0 failed/ignored. Original permissions and negative content-verdict assertions unchanged. Full continuation: ci-repair-review.md. All original product/CLI/carrier/lock bytes remain unchanged, so the canonical CLI and other local evidence remains applicable. Required hosted checks must pass on the new pushed head before READY.
+
+## Post-main integration
+
+Terminal post-main IMPL-EVAL: PASS at 2807316b (evaluate-postmerge.md). All 15 current root checks, 79 focused integration tests and complete hosted matrix pass; supplemental clean merged local CLI completed 2947/2947 with zero failures/ignores. Synthetic CI checkout tree equals the local merge tree. No source/carrier/lock changes after these proofs; only final run evidence updated.

@@ -1,0 +1,3 @@
+# CI receipts use GitHub synthetic PR merge commits
+
+A hosted command receipt can have a different Git SHA from the workflow headSha because actions/checkout tests GitHub's synthetic PR merge ref. Tie the run to the requested PR head via the Actions run metadata, then compare Git tree hashes through the Git commit API if source equivalence needs proof. For this run, the hosted checkout and local normal-merge head have identical Git trees (ci-tree-proof.json). Never relabel a receipt's recorded head by hand. Keep raw artifacts outside the public run and publish sanitized metadata plus original hashes.

@@ -1,0 +1,188 @@
+[
+  {
+    "task": "check:desktop-native-fixture",
+    "command": [
+      "deno",
+      "task",
+      "check:desktop-native-fixture"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 186,
+    "outputSha256": "0dbf52174939b18aec1b71fbcdf7bf53e941c358d2adbae4b1754530b2875db7"
+  },
+  {
+    "task": "check:emitted-samples",
+    "command": [
+      "deno",
+      "task",
+      "check:emitted-samples"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 10324,
+    "outputSha256": "b2bb3e2366b356723ebd747248e737ae03ef36f7d2ff1a780de13dfeed94fa08"
+  },
+  {
+    "task": "check:streams-types",
+    "command": [
+      "deno",
+      "task",
+      "check:streams-types"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 229,
+    "outputSha256": "f201c08e77ca5fa2f60c942a9a2d739c5c63b2064389ea4b567604515d02b73b"
+  },
+  {
+    "task": "check:child-health-docs",
+    "command": [
+      "deno",
+      "task",
+      "check:child-health-docs"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 494,
+    "outputSha256": "909a685718892217c4a249df425daf83f09c30566ff470d75caae096aac1607b"
+  },
+  {
+    "task": "check:mcp-export-corpus",
+    "command": [
+      "deno",
+      "task",
+      "check:mcp-export-corpus"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 10450,
+    "outputSha256": "0ccdc627722a1740f8887c16850ca1c544eceb4f9306227f4364b6a473fd566f"
+  },
+  {
+    "task": "check:assets-barrel",
+    "command": [
+      "deno",
+      "task",
+      "check:assets-barrel"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 3094,
+    "outputSha256": "e0bcf04e8c663ed3e180cf790468bc83c306c70987bf1da5ae15a9a873f64dde"
+  },
+  {
+    "task": "check:agent-docs-prose",
+    "command": [
+      "deno",
+      "task",
+      "check:agent-docs-prose"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 18066,
+    "outputSha256": "77c899fd8ddb6ac219f391728664942da6fb4909a129d4f768108a17b61a9b8f"
+  },
+  {
+    "task": "check:publish-assets",
+    "command": [
+      "deno",
+      "task",
+      "check:publish-assets"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 553,
+    "outputSha256": "70bc4b06374ff6f561f02b223ee735b7bf25bb21e4a9811a8183d6279a83735b"
+  },
+  {
+    "task": "check:scaffold-versions",
+    "command": [
+      "deno",
+      "task",
+      "check:scaffold-versions"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 205,
+    "outputSha256": "fc6002e02660ff75ce5419f73e8554dc11442395121a07a4f1abbc200bd590d7"
+  },
+  {
+    "task": "check:aspire-version-parity",
+    "command": [
+      "deno",
+      "task",
+      "check:aspire-version-parity"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 403,
+    "outputSha256": "2c220b5982295c8c521a8e1665512f80c4b36445b944daef0a9eb73c6cfb3e15"
+  },
+  {
+    "task": "check:netscript-jsr-specifiers",
+    "command": [
+      "deno",
+      "task",
+      "check:netscript-jsr-specifiers"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 2347,
+    "outputSha256": "d0cd4ab7c268f1342a1dcc0ec166c05cce39cc93d642b7423b24f9f27ef2e71c"
+  },
+  {
+    "task": "check:aspire-host-ports",
+    "command": [
+      "deno",
+      "task",
+      "check:aspire-host-ports"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 379,
+    "outputSha256": "0191ccdbb519267fd84a0858155a3e1b943f5ebad6f26e8152f42851e6eb321b"
+  },
+  {
+    "task": "check:figma-names",
+    "command": [
+      "deno",
+      "task",
+      "check:figma-names"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 455,
+    "outputSha256": "75af4b0ad2d78b52e0e5bbdb20481e66c98e1b4e164dce8cde86ad657a6ff9c7"
+  },
+  {
+    "task": "check:review-threads",
+    "command": [
+      "deno",
+      "task",
+      "check:review-threads",
+      "--",
+      "--repo",
+      "rickylabs/netscript",
+      "--pr",
+      "2559",
+      "--pretty"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 562,
+    "outputSha256": "13d930d2cdaf945c33b56b9f17a31c2c9df9e8a38de991e72037dcfd8afef7de"
+  },
+  {
+    "task": "check:design-skill",
+    "command": [
+      "deno",
+      "task",
+      "check:design-skill"
+    ],
+    "head": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "exitCode": 0,
+    "durationMs": 121,
+    "outputSha256": "4286c2a065f2db3d23c510a02f10c85dffa7e12b6c3c0c59b4ff4580bf675f5e"
+  }
+]

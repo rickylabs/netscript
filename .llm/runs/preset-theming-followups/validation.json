@@ -1,19 +1,19 @@
 {
   "denoVersion": "2.9.7",
-  "canonicalSourceHead": "5e50ad8ce6df82f6fc1b1f01af04d8bde038d593",
+  "canonicalSourceHead": "2807316bf058b28ae3a055f2206af4bf97e55074",
   "wholeCli": {
     "summary": {
-      "passed": 2944,
+      "passed": 2947,
       "failed": 0,
       "ignored": 0,
-      "totalResults": 2944,
+      "totalResults": 2947,
       "uniqueFailures": 0
     },
     "exitCode": 0,
-    "durationMs": 1173811,
-    "sourceAndCarriersHeldFixed": true,
-    "environment": "Executable project-owned TMPDIR; working cached Chromium via private wrapper; browser libraries scoped only to that wrapper.",
-    "rawReportSha256": "0885b1c9b2707c3a7235119cf4b23b08c5a0119c676d342a2955aa48ee452c79"
+    "durationMs": 1452949,
+    "sourceCarriersAndPublicRunHeldFixed": true,
+    "environment": "Executable project-owned TMPDIR and private Chromium wrapper; browser libraries scoped only to that wrapper.",
+    "rawReportSha256": "7fb6debcb6535ffea4e59243cf8a02689c753504e031fc5c5dd24be704b93c3a"
   },
   "focusedRepairs": {
     "conventionsCarrierAndRealBrowser": {
@@ -84,6 +84,10 @@
     },
     {
       "task": "check:review-threads",
+      "outcome": "PASS"
+    },
+    {
+      "task": "check:design-skill",
       "outcome": "PASS"
     }
   ],
@@ -173,5 +177,61 @@
     "reviewThreads": "PASS",
     "terminalEvaluation": "PASS",
     "productCliCarrierAndLockBytesUnchanged": true
+  },
+  "priorCanonicalSourceHead": "5e50ad8ce6df82f6fc1b1f01af04d8bde038d593",
+  "priorWholeCli": {
+    "summary": {
+      "passed": 2944,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 2944,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0,
+    "durationMs": 1173811,
+    "sourceAndCarriersHeldFixed": true,
+    "environment": "Executable project-owned TMPDIR; working cached Chromium via private wrapper; browser libraries scoped only to that wrapper.",
+    "rawReportSha256": "0885b1c9b2707c3a7235119cf4b23b08c5a0119c676d342a2955aa48ee452c79"
+  },
+  "mainIntegration": {
+    "mainHead": "0af8fd9e7904ee2c848d0a4213c7853edec3ad21",
+    "mergeHead": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "resolution": "Union of independent task additions in deno.json.",
+    "focusedTests": {
+      "passed": 79,
+      "failed": 0,
+      "ignored": 0
+    },
+    "carrierDelta": false,
+    "lockDelta": false,
+    "terminalEvaluation": "PASS"
+  },
+  "hostedMerged": {
+    "runId": 41292890519,
+    "headSha": "2807316bf058b28ae3a055f2206af4bf97e55074",
+    "conclusion": "success",
+    "url": "https://github.com/rickylabs/netscript/actions/runs/41292890519",
+    "tests": {
+      "passed": 9113,
+      "failed": 0,
+      "ignored": 63
+    },
+    "required": [
+      {
+        "name": "deps-report",
+        "conclusion": "skipped",
+        "url": "https://github.com/rickylabs/netscript/actions/runs/41292890519/job/124807623105"
+      },
+      {
+        "name": "quality",
+        "conclusion": "success",
+        "url": "https://github.com/rickylabs/netscript/actions/runs/41292890519/job/124807772295"
+      },
+      {
+        "name": "check-test",
+        "conclusion": "success",
+        "url": "https://github.com/rickylabs/netscript/actions/runs/41292890519/job/124810481474"
+      }
+    ]
   }
 }
