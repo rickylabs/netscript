@@ -138,3 +138,13 @@ Stop is required by the supplied leaf profile, not an inferred approval rule.
 Cockpit prohibits all future rebases and force-pushes. Earlier workflow steps
 are historical. Preserve remote ancestry through merge commits and ordinary
 pushes, after the distinct CSS-policy scope decision permits resumption.
+
+
+## Owner policy resolves historical scope stop
+
+Parent merge10 independently passes and is plain-pushed2be. Child integration
+now follows its own seven-item checkpoint under the explicit owner consolidation-
+then-measured-cap decision. No budget waiver, scope removal or history rewrite.
+Fresh integration proof may be scoped by exhaustive CSS semantic parity and
+unchanged controller bytes; SAME design review selects sufficiency before code.
+Full final browser/runtime/evaluation/CI acceptance remains required later.

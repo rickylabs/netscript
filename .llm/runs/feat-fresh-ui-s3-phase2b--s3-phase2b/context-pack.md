@@ -1,3 +1,17 @@
+## Current resume — owner policy resolved; child merge10 design
+
+Parent2be80639 is published, plain merge source679fd24a on main0af8, SAME
+source/evidence PASS. New owner instruction clears the old CSS-policy stop:
+consolidate first, then measured failing-kind cap growth only, guard intact.
+merge10-child-checkpoint.md records seven items before source. SAME design
+review next, new authorized loop failure0. Child1afd retains remotea907 and
+Desktopc3d source. Never rebase/force-push. No child source change/merge yet.
+All original remaining fourDesktop/productionx/all-style/finalruntime/CI scope
+still applies; no READY now. Primary warm worktree hosts the child branch;
+the separate records worktree is clean detached, preserving all notes/backups.
+
+---
+
 ## Latest Git instruction — owner merge-only override
 
 Never rebase or force-push. Ignore buggy Orchid rebase/force-push conflict
