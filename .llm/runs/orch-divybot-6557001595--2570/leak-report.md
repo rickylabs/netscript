@@ -1,9 +1,14 @@
-# Resource ownership report
+# Resource ownership — final pass
 
-Read-only leak-check completed. Docker is unavailable through the configured socket.
-The reporter found 26 process/AppHost entries outside this run's ownership.
-They were left untouched. Raw host-specific diagnostic output is retained privately
-in this project's run evidence; it is not published into the repo.
+Read-only maint:leak-check ran 2026-11-01T12:49:00Z. Aspire and process probes
+succeeded; Docker containers/volumes/networks could not be inspected because the
+daemon is unavailable.24 survivors were unproven: one foreign project AppHost,
+its related processes, and the reporter probe. No foreign/unknown resource mutated.
+No run-owned Aspire resource was reported. The full runtime suite stopped at
+preflight.aspire before scaffold creation; cleanup.aspire-stop also failed because
+Docker inspection was unavailable. Runtime and container cleanup remain UNPROVEN.
 
-Owned generated Vite processes are identified by exact generated-app cwd and the
-executable basename. Only these processes were stopped before regeneration.
+The run's known browser preview processes were separately stopped using exact
+process cwd containment in its generated fixture root and Deno preview/server argv.
+See s4-owned-preview-cleanup.json. Raw system paths remain in private evidence;
+this public summary obeys the assignment's repository-relative-path requirement.

@@ -68,3 +68,10 @@ remain in the existing shared palette: native Dialog.Close with visible Esc/Clos
 keyboard-help footer,16px SVG search and highlighted-row rule. No prop changes.
 Capture a real ArrowDown active state and prove visible-close behavior. Reuse the
 same Astra reviewer for round2; a second terminal visual failure ends the loop.
+
+## S4 template assertion alignment
+
+The full CLI suite found one obsolete layout assertion (301 pass/1 fail):
+f-client-nav on the old custom shell. Document _app already owns conditional
+client navigation, while the new SidebarShell is inside Partial. Replace the
+old class-adjacency assertion with both actual contracts; no emitted source change.

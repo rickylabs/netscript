@@ -62,3 +62,6 @@ Capture a real ArrowDown active state and prove visible-close behavior. Reuse th
 same Astra reviewer for round2; a second terminal visual failure ends the loop.
 
 S3 terminal: independent code and visual PASS, accepted for sign-off.
+
+Final independent IMPL-EVAL codePASS accepted for S4 sign-off. RuntimeUNPROVEN
+prevents READY; draft retained. No next implementation slice or self-certification.

@@ -188,3 +188,28 @@ Independent Claude code PASS and Astra round2 visual PASS. All96 refreshed image
 meet >=8 fidelity/quality; browser72 cases/12 interaction sets passed. Previous
 command-palette failure resolved. Reconciled current source, emitted CSS and both
 carriers with the reviewed evidence. Supervisor sign-off accepts S3; S4 may start.
+
+## S4 final verification
+
+Deno2.9.7: all15 root check:* tasks PASS,release:preflight/docs:accuracy/quality:gate/
+publish:dry-run PASS. Full publish regeneration no diff. Structured scoped check,
+lint,fmt PASS19files plus corrected template test. Complete43-file suite now302PASS;
+first run301PASS/1 obsolete shell assertion, corrected actual document and Partial
+contract. CSS budget remains unchanged and green; independent visual PASS unchanged.
+
+Full exact scaffold.runtime command ran and failed preflight.aspire and cleanup
+because Docker is unavailable. Runtime and container cleanup UNPROVEN, not skipped.
+FreshUI full-export doclint124 diagnostics in unchanged files; CLI doclint clean.
+Foreign Aspire left untouched, run-owned previews stopped. Final separate Claude
+IMPL-EVAL running. No READY; keep draft while required runtime remains unproven.
+
+## Final independent sign-off and reconciliation
+
+Fresh separate Claude Opus5.5 high read-only IMPL-EVAL: code PASS, no blocking
+findings. It inspected the full source inventory,actual CLI/auth/plugin contracts,
+all final receipts and acceptance gaps. Supervisor accepts implementation sign-off,
+including the template assertion fix, with runtime explicitly UNPROVEN. No READY.
+Only test/evidence files changed since S3 visual/current-carrier acceptance; final
+302-test run includes the fix. No source/lock churn after review. PR remains draft.
+The remaining work is one dependent runtime verification on a working Docker host,
+not independent product scope to fan out. #2488 stillOPEN; merge/reverify if it lands.

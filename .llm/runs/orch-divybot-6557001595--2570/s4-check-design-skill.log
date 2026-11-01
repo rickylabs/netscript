@@ -1,0 +1,2 @@
+Task check:design-skill deno run --no-lock --allow-read .llm/tools/docs/generate-design-skill.ts --check
+{"outcome":"PASS","files":["skills/netscript-design/SKILL.md","skills/netscript-design/references/GUIDELINES.md"],"themes":11,"presets":24,"guidelinesSha256":"9f02cb226c3b914c3fb9d31ec738da8749691bf9bebefca4ed9fc5bc4be3416f"}

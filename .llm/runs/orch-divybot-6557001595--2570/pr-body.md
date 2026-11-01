@@ -1,40 +1,44 @@
 ## Summary
 
-Replace the default scaffold's placeholder pages with the Figma Utility dashboard, records, settings, sign-in and command-palette compositions. Features must use generated capabilities or show designed empty states with the exact add command.
+The generated app now uses the Figma Studio Utility dashboard, records/detail, settings, sign-in and command-palette layouts. Pages read actual generated routes, theme, typed service data and enabled auth/workers/streams/AI capabilities. Missing features show designed empty states with valid CLI add commands; unavailable backends remain errors. Settings save real browser appearance preferences. Post-init service creation connects only an unchanged scaffold-owned records placeholder.
 
-**Implementation in progress.** PLAN-EVAL passed. S1 shell and S2 typed capability wiring are implemented and independently reviewed. Visual evaluation and full gates remain; do not merge.
+The shared command palette now filters results, dispatches keyboard selection and exposes visible dismissal and keyboard help. Existing canonical service examples remain the mutation surface. No showcase data or new provider/workload plumbing is added.
+
+**Draft — runtime acceptance UNPROVEN.** Independent visual review passed all96 screenshots. Independent Claude Opus5.5 high implementation review passed with no blocking code findings. The required runtime command could not pass Aspire/Docker preflight; no policy skip is claimed.
 
 ## Scope
 
-- CLI scaffold templates; Archetype 6 with frontend scope.
-- Refs #2570
-- Refs #2566
-- Reuses current main components; will adopt #2488 when merged. Showcase plumbing belongs to #2571.
+Refs #2570
+Refs #2566
+
+Reuses current main components; #2488 remains open. Showcase plumbing belongs to #2571.
 
 ## Slices
 
-- [x] Research, screen mapping, design checkpoint and plan.
-- [x] Shell and absent-capability pages.
-- [x] Live service, auth and plugin capability wiring.
-- [ ] Desktop/mobile, light/dark renders and independent visual audit.
-- [ ] Generated carriers, required checks and independent implementation evaluation.
+- [x] Plan and independent PLAN-EVAL.
+- [x] Shared shell and absent-capability pages.
+- [x] Typed live capability wiring and post-init connection.
+- [x] Desktop/mobile, light/dark renders and independent visual acceptance.
+- [ ] Final independent implementation evaluation and required runtime acceptance.
 
 ## Validation
 
-Deno 2.9.7: 90 focused tests, generated memory/database/plugin apps plus post-init app check (101 files), scoped lint/format, quality gate and CSS budget test pass. Browser matrix passes 16 no-service page/width/scheme cases plus settings persistence and palette dismissal/focus return. Live service and plugin browser receipts pass; broader required gates and independent visual/final implementation evaluations remain unproven.
+Deno2.9.7:302 tests pass across43 files, including #2566 regressions. All15 root `check:*` tasks, `release:preflight`, `docs:accuracy`, `quality:gate`, and `publish:dry-run` pass. Structured source/generated-app check/lint/fmt pass. CSS budgets remain unchanged and pass.
 
-## Harness
+Browser proof covers72 page cases,12 interaction sets and96 captures across no-db/service/plugin variants, desktop/mobile and light/dark. Separate read-only Astra review scores every page at least8/10 fidelity and quality.
 
-Run: `.llm/runs/orch-divybot-6557001595--2570/`. Plan, research, slice reviews, browser proof and scoped gate evidence are retained here. Public artifacts use repository-relative paths and omit session identifiers.
+The exact `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` exited1 at Aspire preflight and cleanup because Docker was unavailable. Runtime and container cleanup are **UNPROVEN**. CLI documentation lint passes; FreshUI reports124 diagnostics in unchanged baseline files, documented in the audit.
+
+Evidence: `.llm/runs/orch-divybot-6557001595--2570/s4-verification.md`, `visual-review.md`, `s3-browser.json`, and their linked receipts. Public evidence uses repository-relative paths and no session identifiers.
 
 ## Drift / Debt
 
-Accepted debt CLI-SCAFFOLD-WORKERS-CONTRACT-DEPENDENCY: no-workers apps resolve a workers contract; version parity is tested, with an optional-adapter closure gate in the debt ledger. The owner-specified routing and Refs-only/no-label process override generic dispatcher defaults. #2488 is still open.
+Accepted CLI-SCAFFOLD-WORKERS-CONTRACT-DEPENDENCY: no-workers apps resolve the workers typed contract. Shared release resolution and a version-parity regression mitigate skew; the debt ledger requires an optional adapter before independent plugin major upgrades. The owner-requested draft/Refs-only/no-label process overrides generic dispatcher defaults.
 
 ## Definition of Done
 
-- [ ] All requested pages derive content from actual generated capabilities.
-- [ ] No static placeholder business rows or misleading capability claims.
-- [ ] Independent visual fidelity and quality scores >=8/10 on every page.
-- [ ] Required checks pass or have documented workflow-policy skips; runtime result is explicit.
-- [ ] Independent IMPL-EVAL passes.
+- [x] Requested pages derive content from actual generated capabilities.
+- [x] No static placeholder business rows or misleading capability claims.
+- [x] Independent visual fidelity and quality scores >=8/10 on every page.
+- [ ] Required checks green or explicitly skipped by workflow policy; runtime remains UNPROVEN.
+- [x] Independent IMPL-EVAL passes.

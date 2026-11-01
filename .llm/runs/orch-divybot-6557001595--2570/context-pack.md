@@ -1,35 +1,55 @@
 # Resume scaffold redesign #2570
 
-Draft PR #2572, branch orch/divybot-6557001595. PLAN-EVAL passed round 2.
-S1 passed independent review and is committed/pushed as c2c85fb.
-S2 passed independent re-review (s2-terminal-review.md). Sign-off commit includes
-typed live readers and safe post-init connection. S3 may now begin. Read worklog.
+Draft PR2572, branch orch/divybot-6557001595. All implementation slices complete and
+independently reviewed; no merge/readiness claim. Baseline0af8fd9e. Commits:
+ee051a9 plan; c2c85fb S1; d5f0c9a S2;7d9fd6a S3; final S4 sign-off commit follows.
 
-S2 adds memory/database typed record adapters and bounded memory detail lookup;
-optional request-local auth client discovery; metadata-based plugin identity,
-workers list, validated streams readiness and in-process AI model projection.
-Resource-slice initialInput fixes canonical memory list calls without altering
-service contracts. Actual CLI diagnostic grammar corrections are in drift.md.
+## Final state
 
-Gates: 90 focused scaffold/resource/service-add tests; memory/DB app check 63 files each,
-plugin app check 50 files; 17 source files check/lint/fmt; quality gate passes.
-Browser evidence proves actual service records/detail/missing ID and generated
-signin form. After native config set enables plugin references, unavailable
-runtimes and empty no-samples AI are displayed truthfully. These are slice proofs,
-not final visual or merge acceptance.
+Independent Claude Opus5.5 high IMPL-EVAL code PASS (impl-eval.md), no blocking code
+findings. Independent read-only Astra visual round2 PASS after one corrected failure:
+every page/state>=8 fidelity AND quality; all96 images viewed. Browser72 cases,
+12 interactionsets,0pageerrors. Three native generated fixtures: no-db,no-db with
+memory service,sqlite/Aspire scaffold with canonical auth/workers/streams/AI plugins.
+No fixture source patches. Empty/service/plugin plus DB/post-init checks pass.
 
-S3 terminal PASS: independent Claude code sign-off and Astra visual round2 PASS.
-All 96 images reviewed; every page/state minimum fidelity and quality >=8/10.
-Clean review-* fixtures pass72 browser cases/12 interactions,0 page errors.
-Source/carrier hashes and actual emitted CSS agree. S4 final gates now authorized.
-Read visual-review.md and s3-code-terminal-review.md. Final independent IMPL-EVAL
-still required; no READY until required checks green or policy-skipped.
+Deno2.9.7:302/302 tests across43files;all15root check:*;release:preflight;
+docs:accuracy;quality:gate;publish:dry-run PASS. Structured scoped check/lint/fmt
+PASS19files plus isolated template test correction. Full carrier regeneration no
+newdiff. CSS budgets unchanged; measured totals in s3-css-installed.json.
 
-Read plan.md B1–B6 plus drift.md. Preserve canonical service examples, reference
-order route and development design links. Current #2488 remains OPEN; merge main
-when it lands. Do not duplicate gap components or implement showcase #2571.
+## What prevents readiness
 
-Owner mandates Claude Opus 5.5 high read-only evaluations and separate Astra visual
-review. Public artifacts are repo-relative and omit session ids. Raw logs require
-normalization before publication. Final report uses untracked
-.divybot-final-report.md handoff. Keep PR draft, Refs-only, no labels.
+Exact `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` exited1:
+preflight.aspire and cleanup.aspire-stop failed because Docker daemon unavailable.
+Runtime and container cleanup UNPROVEN, not a policy skip. Workers/streams real
+ready-path integration remains unproved beyond typed tests; plugin browser correctly
+shows unavailable, AI no-samples empty. Keep draft and do NOT post READY until required
+runtime is green or an explicit workflow policy skips it. Cockpit alone merges.
+
+FreshUI full-export doclint124diagnostics in unchanged files;CLI doclintclean.
+No claim of all-package documentation clean. Baseline attribution is file comparison,
+not a separate baseline run. See s4-jsr-audit.md. Foreign Aspire resources untouched;
+8 owned preview/service processes stopped with exact cwd/argv proof. No owned preview
+remains; Docker resources could not be enumerated. See leak-report.md.
+
+## Scope and follow-up
+
+#2488 remainsOPEN and PR2572 mergeable at final review. If2488 lands before merge,
+merge origin/main, reconcile the existing sharedpalette, regenerate and reverify;
+never rebase/forcepush. No componentfork or #2571 showcase plumbing. The newly fixed
+palette uses its existing callbackAPI, adds filtering/keyboarddispatch/visibleclose.
+
+Accepted CLI-SCAFFOLD-WORKERS-CONTRACT-DEPENDENCY is in canonical debtledger: every
+app resolves workerscontract; releasepin/parity tests mitigate, optionaltypedadapter
+needed before independentmajor upgrades. Other low/nonblocking review observations
+are retained in impl-eval.md (probeoverfetch,soft404,footerARIA,navlabels,dateguard).
+
+## Resuming
+
+Read s4-verification.md, impl-eval.md, plan.md B1–B6, drift.md. Canonical service
+examples/orderreference and devdesignlinks are preserved. Contributorentrypoint:
+packages/cli/src/kernel/assets/app/README.md. Full evidence is this run directory.
+Public paths are repo-relative, no sessionids. Raw identities/logs remain private.
+The final assignment report is queued only through untracked .divybot-final-report.md;
+its existence does not prove publication. Refs2570/2566,no labels,owner process applies.

@@ -1,0 +1,74 @@
+[
+  {
+    "path": "packages/fresh-ui/src/runtime/combobox/combobox.types.ts",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/popover/Popover.tsx",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/popover/popover.types.ts",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/dialog/Dialog.tsx",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/drawer/Drawer.tsx",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/sheet/Sheet.tsx",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/tooltip/Tooltip.tsx",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/accordion/Accordion.tsx",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/dialog/dialog.types.ts",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/sheet/sheet.types.ts",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/tooltip/tooltip.types.ts",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/accordion/accordion.types.ts",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/tabs/Tabs.tsx",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/tabs/tabs.types.ts",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/src/runtime/combobox/Combobox.tsx",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/contracts.json",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/token-config.ts",
+    "unchangedFromBaseline": true
+  },
+  {
+    "path": "packages/fresh-ui/deno.json",
+    "unchangedFromBaseline": true
+  }
+]
