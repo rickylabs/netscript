@@ -172,11 +172,12 @@ describe('generateAppDenoJson', () => {
       'update',
     ]);
     assertEquals(config.exclude, ['**/_fresh/*']);
-    assertEquals(Object.keys(config.imports).slice(0, 11), [
+    assertEquals(Object.keys(config.imports).slice(0, 12), [
       '@app/',
       '@my-project/contracts',
       '@netscript/sdk/discovery',
       '@netscript/plugin-workers-core/contracts/v1',
+      '@netscript/plugin-streams-core',
       '@netscript/config',
       '@netscript/fresh',
       '@netscript/fresh/defer/island',

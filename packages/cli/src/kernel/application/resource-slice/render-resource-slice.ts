@@ -41,20 +41,34 @@ const TEMPLATE_ASSET_NAMES: Readonly<
   '(_islands)/ResourceStream.tsx': 'streamIslandTemplate',
 };
 
+/** Currency conversion is opt-in for a known service contract. */
+export interface ResourceResultPresentation {
+  readonly amountUnit?: 'minor' | 'major';
+}
+
 /** Render every planned leaf and attach canonical reconciliation provenance. */
 export async function renderResourceSlice(
   plan: ResourceSlicePlan,
   templates: ResourceSliceTemplateAssets,
   templateRenderer: TemplatePort,
+  presentation: ResourceResultPresentation = {},
 ): Promise<readonly ResourceSliceCandidateLeaf[]> {
   const candidates: ResourceSliceCandidateLeaf[] = [];
   for (const leaf of plan.leaves) {
-    const content = await renderOwnedLeaf(plan, leaf, leaf.options, templates, templateRenderer);
+    const content = await renderOwnedLeaf(
+      plan,
+      leaf,
+      leaf.options,
+      templates,
+      templateRenderer,
+      presentation,
+    );
     const previousCanonicalContents = await renderPreviousCanonicalContents(
       plan,
       leaf,
       templates,
       templateRenderer,
+      presentation,
     );
     candidates.push({
       path: leaf.path,
@@ -73,11 +87,14 @@ async function renderPreviousCanonicalContents(
   leaf: ResourceSlicePlannedLeaf,
   templates: ResourceSliceTemplateAssets,
   templateRenderer: TemplatePort,
+  presentation: ResourceResultPresentation = {},
 ): Promise<readonly string[]> {
   if (leaf.role !== 'page' && leaf.role !== 'view') return [];
   const previous: string[] = [];
   for (const options of strictOptionSubsets(leaf.options)) {
-    previous.push(await renderOwnedLeaf(plan, leaf, options, templates, templateRenderer));
+    previous.push(
+      await renderOwnedLeaf(plan, leaf, options, templates, templateRenderer, presentation),
+    );
   }
   return previous;
 }
@@ -88,9 +105,13 @@ async function renderOwnedLeaf(
   options: readonly ResourceSliceVariant[],
   templates: ResourceSliceTemplateAssets,
   templateRenderer: TemplatePort,
+  presentation: ResourceResultPresentation = {},
 ): Promise<string> {
   const template = templateFor(templates, leaf.template);
-  const body = await templateRenderer.render(template, renderVariables(plan, options));
+  const body = await templateRenderer.render(
+    template,
+    renderVariables(plan, options, presentation),
+  );
   return await markOwnedResourceSliceLeaf({
     resource: plan.input.resource,
     role: leaf.role,
@@ -115,12 +136,18 @@ function isResourceSliceTemplateName(name: string): name is ResourceSliceTemplat
 function renderVariables(
   plan: ResourceSlicePlan,
   options: readonly ResourceSliceVariant[],
+  presentation: ResourceResultPresentation,
 ): Record<string, string> {
   const { input } = plan;
   const partialName = `${input.resource}-summary`;
   const partialRoute = `/partials/${input.routeSegments.join('/')}/summary`;
   return {
-    queryResultReturn: QUERY_RESULT_SUCCESS_RETURN,
+    queryResultReturn: presentation.amountUnit
+      ? QUERY_RESULT_SUCCESS_RETURN.replace(
+        'value={query.data}',
+        `value={query.data} amountUnit='${presentation.amountUnit}'`,
+      )
+      : QUERY_RESULT_SUCCESS_RETURN,
     queryResultTemplate: QUERY_RESULT_TEMPLATE.trim(),
     resource: input.resource,
     resourceCamelCase: input.resourceCamelCase,

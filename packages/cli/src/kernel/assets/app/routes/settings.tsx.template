@@ -1,12 +1,13 @@
 import SettingsForm from '@app/islands/SettingsForm.tsx';
 import { appTheme } from '@app/lib/theme.ts';
+import { loadScaffoldRecords } from '@app/lib/scaffold-records.ts';
 import { readScaffoldCapabilities } from '@app/lib/scaffold-capabilities.ts';
 import { appRoutes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
 
 export const settingsPage = definePage().withRoute(appRoutes.settings)
   .withMeta(() => ({ title: '{{name}} — Settings' }))
-  .withLayer('settings', SettingsForm, { loader: async () => ({ projectName: '{{name}}', appName: '{{appName}}', theme: appTheme().label, auth: (await readScaffoldCapabilities()).find((item) => item.id === 'auth')! }) })
+  .withLayer('settings', SettingsForm, { loader: async (ctx) => { const capabilities = await readScaffoldCapabilities(ctx.req, await loadScaffoldRecords(ctx.req)); return { projectName: '{{name}}', appName: '{{appName}}', theme: appTheme().label, capabilities, auth: capabilities.find((item) => item.id === 'auth')! }; } })
   .withLayout((slots) => slots.settings()).build();
 export const { default: page } = settingsPage;
 export { page as default };

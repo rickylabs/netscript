@@ -44,6 +44,7 @@ export const SCAFFOLD_PACKAGES = {
   NETSCRIPT_PLUGIN_TRIGGERS_CORE_RUNTIME: '@netscript/plugin-triggers-core/runtime',
   NETSCRIPT_PRISMA_ADAPTER_MYSQL: '@netscript/prisma-adapter-mysql',
   NETSCRIPT_SDK_DISCOVERY: '@netscript/sdk/discovery',
+  NETSCRIPT_STREAMS_CORE: '@netscript/plugin-streams-core',
   NETSCRIPT_WORKERS_CONTRACTS: '@netscript/plugin-workers-core/contracts/v1',
   NETSCRIPT_SDK_CLIENT: '@netscript/sdk/client',
   NETSCRIPT_SDK_QUERY: '@netscript/sdk/query',

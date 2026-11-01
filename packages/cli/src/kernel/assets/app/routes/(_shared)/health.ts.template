@@ -1,31 +1,157 @@
-const startedAt = Date.now();
+import { findWorkspaceRoot } from '@netscript/config';
+import { getServiceUrl } from '@netscript/sdk/discovery';
+import { join } from 'node:path';
+import { z } from 'zod';
+import { readScaffoldPluginIdentities } from '../../lib/scaffold-capabilities.ts';
 
+const startedAt = Date.now();
+const PROBE_TIMEOUT_MS = 3000;
+const healthyResponseSchema = z.object({
+  status: z.enum(['healthy', 'ready', 'ok']).optional(),
+  state: z.string().optional(),
+  ready: z.boolean().optional(),
+  checks: z.array(z.object({ healthy: z.boolean() }).passthrough()).optional(),
+}).refine((value) =>
+  (value.status !== undefined || value.state === 'ready' || value.ready === true) &&
+  value.ready !== false && (value.state === undefined || value.state === 'ready') &&
+  (value.checks?.every((check) => check.healthy) ?? true)
+);
+const backgroundReadinessSchema = z.object({
+  state: z.literal('ready'),
+  registryReady: z.literal(true),
+  dependencyReady: z.literal(true),
+});
+const streamReadinessSchema = z.object({ ready: z.literal(true) });
+const resourceSchema = z.object({ Enabled: z.boolean().optional() });
+const settingsSchema = z.object({
+  NetScript: z.object({
+    Services: z.record(z.string(), resourceSchema).default({}),
+    Plugins: z.record(z.string(), resourceSchema).default({}),
+    BackgroundProcessors: z.record(z.string(), resourceSchema).default({}),
+  }),
+});
+export interface HealthResource {
+  readonly name: string;
+  readonly kind: 'Web' | 'Service' | 'Plugin' | 'Background' | 'Configuration';
+  readonly state: 'healthy' | 'unavailable' | 'unauthorized' | 'disabled' | 'unwired';
+  readonly latencyMs?: number;
+}
 export interface HealthPayload {
-  readonly status: 'healthy';
+  readonly status: 'healthy' | 'degraded';
   readonly app: string;
   readonly version: string;
   readonly timestamp: string;
   readonly uptime: number;
+  readonly resources: readonly HealthResource[];
 }
-
 export interface HealthRouteData {
   readonly payload: HealthPayload;
 }
 
-export function buildPayload(appName: string = '{{appName}}'): HealthPayload {
+/** Safe names, state and timing only; discovery URLs and diagnostics remain server-side. */
+async function probe(
+  name: string,
+  kind: HealthResource['kind'],
+  enabled: boolean,
+  request?: Request,
+  streams = false,
+): Promise<HealthResource> {
+  if (!enabled) return { name, kind, state: 'disabled' };
+  let baseUrl: string;
+  try {
+    baseUrl = getServiceUrl(name);
+  } catch {
+    return { name, kind, state: 'unwired' };
+  }
+  const start = performance.now();
+  try {
+    const signal = request
+      ? AbortSignal.any([request.signal, AbortSignal.timeout(PROBE_TIMEOUT_MS)])
+      : AbortSignal.timeout(PROBE_TIMEOUT_MS);
+    const response = await fetch(
+      new URL(streams ? '/health/ready' : '/health', baseUrl),
+      {
+        signal,
+        headers: { accept: 'application/json' },
+        redirect: 'error',
+      },
+    );
+    let state: HealthResource['state'] = response.status === 401 || response.status === 403
+      ? 'unauthorized'
+      : response.ok
+      ? 'healthy'
+      : 'unavailable';
+    if (state === 'healthy') {
+      const schema = streams
+        ? streamReadinessSchema
+        : kind === 'Background'
+        ? backgroundReadinessSchema
+        : healthyResponseSchema;
+      state = schema.safeParse(await response.json()).success ? 'healthy' : 'unavailable';
+    } else await response.body?.cancel();
+    return { name, kind, state, latencyMs: Math.round((performance.now() - start) * 10) / 10 };
+  } catch {
+    return {
+      name,
+      kind,
+      state: 'unavailable',
+      latencyMs: Math.round((performance.now() - start) * 10) / 10,
+    };
+  }
+}
+
+/** The web route stays a liveness probe even when a dependency is degraded. */
+export async function buildPayload(
+  appName: string = '{{appName}}',
+  request?: Request,
+): Promise<HealthPayload> {
+  const start = performance.now();
+  let resources: HealthResource[];
+  try {
+    const root = await findWorkspaceRoot(Deno.cwd());
+    const settings = settingsSchema.parse(
+      JSON.parse(await Deno.readTextFile(join(root, 'appsettings.json'))),
+    );
+    const streamsName = (await readScaffoldPluginIdentities(root)).get('streams')?.name;
+    resources = await Promise.all(
+      ([['Service', settings.NetScript.Services], ['Plugin', settings.NetScript.Plugins], [
+        'Background',
+        settings.NetScript.BackgroundProcessors,
+      ]] as const)
+        .flatMap(([kind, entries]) =>
+          Object.entries(entries).map(([name, entry]) =>
+            probe(
+              name,
+              kind,
+              entry.Enabled !== false,
+              request,
+              kind === 'Plugin' && name === streamsName,
+            )
+          )
+        ),
+    );
+  } catch {
+    resources = [{ name: 'Workspace configuration', kind: 'Configuration', state: 'unavailable' }];
+  }
+  resources.unshift({
+    name: appName,
+    kind: 'Web',
+    state: 'healthy',
+    latencyMs: Math.round((performance.now() - start) * 10) / 10,
+  });
   return {
-    status: 'healthy',
+    status: resources.every((item) => item.state === 'healthy' || item.state === 'disabled')
+      ? 'healthy'
+      : 'degraded',
     app: appName,
     version: '0.0.0',
     timestamp: new Date().toISOString(),
     uptime: Math.floor((Date.now() - startedAt) / 1000),
+    resources,
   };
 }
 
 export function toHealthRouteData(value: unknown): HealthRouteData | undefined {
-  if (typeof value !== 'object' || value === null || !('payload' in value)) {
-    return undefined;
-  }
-
+  if (typeof value !== 'object' || value === null || !('payload' in value)) return undefined;
   return value as HealthRouteData;
 }

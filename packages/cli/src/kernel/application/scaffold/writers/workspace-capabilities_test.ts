@@ -209,7 +209,7 @@ Deno.test('service failures distinguish access denial and never expose raw error
 
 Deno.test('plugin projections read real result shapes and reject false stream readiness', async () => {
   const contextUrl = moduleUrl(
-    `let jobs: unknown[] = []; let options: unknown; export function readOptions() { return options; } export function setJobs(next: unknown[]) { jobs = next; } export const scaffoldServiceClient = async (...args: unknown[]) => { options = args[4]; return {client: {listJobs: async () => ({jobs,total:jobs.length})},context:{}}; };`,
+    `let jobs: unknown[] = []; let options: unknown; export function readOptions() { return options; } export function setJobs(next: unknown[]) { jobs = next; } export const scaffoldServiceClient = async (...args: unknown[]) => { options = args[4]; return {client: {listJobs: async () => ({jobs,total:jobs.length}), listExecutions: async () => ({executions:[{status:'running',progressPercent:37,progressMessage:'Processing records',triggeredAt:'2026-11-01T00:00:00Z'}]})},context:{}}; };`,
   );
   const context = await import(contextUrl);
   const source = renderTemplate(
@@ -237,13 +237,140 @@ Deno.test('plugin projections read real result shapes and reject false stream re
   context.setJobs([{ id: 'job-one', name: 'Configured job' }]);
   const workers = await module.probeScaffoldPlugin('workers', 'queue-api');
   assertEquals(workers.state, 'ready');
-  assertEquals(workers.items, [{ label: 'Configured job', detail: 'job-one' }]);
+  assertEquals(workers.items, [{
+    label: 'Configured job',
+    detail: 'Processing records',
+    state: 'running',
+    progress: 37,
+    timestamp: '2026-11-01T00:00:00Z',
+  }]);
   const originalFetch = globalThis.fetch;
   const originalError = console.error;
   console.error = () => {};
   try {
-    globalThis.fetch = () => Promise.resolve(Response.json({ ready: true }));
-    assertEquals((await module.probeScaffoldPlugin('streams', 'events')).state, 'ready');
+    globalThis.fetch = (input) =>
+      Promise.resolve(
+        Response.json(
+          String(input).includes('/health/ready') ? { ready: true } : [{
+            type: 'execution',
+            key: 'real-event',
+            headers: { operation: 'upsert' },
+            value: {
+              jobId: 'job-one',
+              status: 'running',
+              progressMessage: 'Processing records',
+              triggeredAt: '2026-11-01T00:00:00Z',
+            },
+          }],
+          { headers: { 'Stream-Next-Offset': 'opaque-1', 'Stream-Up-To-Date': 'true' } },
+        ),
+      );
+    const streams = await module.probeScaffoldPlugin('streams', 'events');
+    assertEquals(streams.state, 'ready');
+    assertEquals(streams.items[0], {
+      label: 'job-one',
+      detail: 'Processing records',
+      state: 'running',
+      timestamp: '2026-11-01T00:00:00Z',
+    });
+    const offsets: string[] = [];
+    globalThis.fetch = (input, init) => {
+      if (String(input).includes('/health/ready')) {
+        return Promise.resolve(Response.json({ ready: true }));
+      }
+      assertEquals(new Headers(init?.headers).has('Authorization'), false);
+      offsets.push(new URL(String(input)).searchParams.get('offset')!);
+      return Promise.resolve(
+        Response.json([], { headers: { 'Stream-Next-Offset': `batch-${offsets.length}` } }),
+      );
+    };
+    const catchingUp = await module.probeScaffoldPlugin('streams', 'events');
+    assertEquals(offsets, ['opaque-1', 'batch-1', 'batch-2']);
+    assertStringIncludes(catchingUp.description, 'Catching up');
+    let headRead = false;
+    globalThis.fetch = (input, init) => {
+      if (String(input).includes('/health/ready')) {
+        return Promise.resolve(Response.json({ ready: true }));
+      }
+      if (init?.method === 'HEAD') {
+        headRead = true;
+        return Promise.resolve(
+          new Response(null, { headers: { 'Stream-Next-Offset': 'current-head' } }),
+        );
+      }
+      return Promise.resolve(
+        Response.json([{
+          type: 'execution',
+          key: 'large',
+          headers: { operation: 'upsert' },
+          value: { progressMessage: 'x'.repeat(1024 * 1024) },
+        }], { headers: { 'Stream-Next-Offset': 'huge-batch', 'Stream-Up-To-Date': 'true' } }),
+      );
+    };
+    const bounded = await module.probeScaffoldPlugin('streams', 'events');
+    assertEquals(bounded.state, 'empty');
+    assertEquals(headRead, true);
+    assertStringIncludes(bounded.description, 'preview budget');
+    globalThis.fetch = (input) => {
+      if (String(input).includes('/health/ready')) {
+        return Promise.resolve(Response.json({ ready: true }));
+      }
+      assertEquals(new URL(String(input)).searchParams.get('offset'), 'current-head');
+      return Promise.resolve(
+        Response.json([{
+          type: 'execution',
+          key: 'new-event',
+          headers: { operation: 'upsert' },
+          value: { jobId: 'new-job', status: 'completed' },
+        }], { headers: { 'Stream-Next-Offset': 'after-head', 'Stream-Up-To-Date': 'true' } }),
+      );
+    };
+    const resumed = await module.probeScaffoldPlugin('streams', 'events');
+    assertEquals(resumed.items[0].label, 'new-job');
+    assertEquals(resumed.items.length, 1);
+    assertStringIncludes(resumed.description, 'skipped earlier history');
+    for (const status of [400, 410]) {
+      const resetOffsets: string[] = [];
+      globalThis.fetch = (input) => {
+        if (String(input).includes('/health/ready')) {
+          return Promise.resolve(Response.json({ ready: true }));
+        }
+        const offset = new URL(String(input)).searchParams.get('offset')!;
+        resetOffsets.push(offset);
+        return Promise.resolve(
+          offset === '-1'
+            ? Response.json([{
+              type: 'execution',
+              key: 'after-reset',
+              headers: { operation: 'upsert' },
+              value: { jobId: 'recovered-job' },
+            }], {
+              headers: { 'Stream-Next-Offset': 'recovered-head', 'Stream-Up-To-Date': 'true' },
+            })
+            : new Response(null, { status }),
+        );
+      };
+      const recovered = await module.probeScaffoldPlugin('streams', 'events');
+      assertEquals(resetOffsets.length, 2);
+      assertEquals(resetOffsets[1], '-1');
+      assertEquals(recovered.state, 'ready');
+      assertEquals(recovered.items.length, 1);
+      assertEquals(recovered.items[0].label, 'recovered-job');
+    }
+    for (const status of [401, 403]) {
+      let calls = 0;
+      globalThis.fetch = (input) => {
+        if (String(input).includes('/health/ready')) {
+          return Promise.resolve(Response.json({ ready: true }));
+        }
+        calls++;
+        return Promise.resolve(new Response(null, { status }));
+      };
+      const denied = await module.probeScaffoldPlugin('streams', 'events');
+      assertEquals(denied.state, 'unauthorized');
+      assertEquals(denied.items, undefined);
+      assertEquals(calls, 1);
+    }
     globalThis.fetch = () => Promise.resolve(Response.json({ ready: false }));
     assertEquals((await module.probeScaffoldPlugin('streams', 'events')).state, 'unavailable');
     globalThis.fetch = () => Promise.resolve(new Response(null, { status: 401 }));

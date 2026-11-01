@@ -5,7 +5,7 @@ export type CapabilityState = 'absent' | 'installed-unwired' | 'ready' | 'empty'
 export interface ScaffoldCapability {
   readonly id: string;
   readonly label: string;
-  readonly items?: readonly { readonly label: string; readonly detail: string }[];
+  readonly items?: readonly { readonly label: string; readonly detail: string; readonly state?: string; readonly progress?: number | null; readonly timestamp?: string }[];
   readonly state: CapabilityState;
   readonly description: string;
   readonly command?: string;

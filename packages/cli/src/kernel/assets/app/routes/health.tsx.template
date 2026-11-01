@@ -18,11 +18,16 @@ export const healthPage = definePage()
     title: '{{name}} — health',
     description: 'Liveness route for the {{appName}} app.',
   }))
-  .withLayer('panel', HealthView, (ctx) => toHealthRouteData(ctx.data) ?? { payload: buildPayload() })
+  .withLayer(
+    'panel',
+    HealthView,
+    async (ctx) =>
+      toHealthRouteData(ctx.data) ?? { payload: await buildPayload('{{appName}}', ctx.req) },
+  )
   .withLayout((slots) => slots.panel())
-  .withHandler('GET', (ctx) => {
+  .withHandler('GET', async (ctx) => {
     const accept = ctx.req.headers.get('accept') ?? '';
-    const payload = buildPayload('{{appName}}');
+    const payload = await buildPayload('{{appName}}', ctx.req);
 
     if (accept.includes('application/json') && !accept.includes('text/html')) {
       return Response.json(payload);

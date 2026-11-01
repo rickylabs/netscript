@@ -7,6 +7,8 @@ type Props = NonNullable<
 >;
 
 export function {{resourcePascalCase}}Summary({ initialData, cachedAt }: Props) {
+  const payload: unknown = initialData;
+  const rows = Array.isArray(payload) ? payload : payload && typeof payload === 'object' && 'data' in payload && Array.isArray(payload.data) ? payload.data : payload && typeof payload === 'object' && 'items' in payload && Array.isArray(payload.items) ? payload.items : [];
   return (
     <section id='{{resource}}-summary'>
       <Card>
@@ -17,7 +19,7 @@ export function {{resourcePascalCase}}Summary({ initialData, cachedAt }: Props) 
           </Card.Description>
         </Card.Header>
         <Card.Body>
-          <pre class='overflow-x-auto text-sm'>{JSON.stringify(initialData, null, 2)}</pre>
+          <dl class='workspace-details'><div><dt>Loaded records</dt><dd>{rows.length}</dd></div><div><dt>Last loaded</dt><dd><time dateTime={new Date(cachedAt).toISOString()}>{new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(cachedAt))}</time></dd></div></dl>
         </Card.Body>
       </Card>
     </section>

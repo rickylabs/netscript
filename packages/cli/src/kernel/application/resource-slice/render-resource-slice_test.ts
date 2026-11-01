@@ -21,14 +21,14 @@ import {
 const GOLDEN_HASHES: Readonly<
   Record<string, readonly (readonly [path: string, hash: string])[]>
 > = {
-  core: [
+  'core': [
     [
       'routes/orders/(_components)/orders-view.tsx',
-      '89ae9aaf4a405c9101a4bec0c9128be7fcc1e7ce9379c3ebee2e64df6908fb9d',
+      'a091e188501b253420dcc687825e32c731f8ee751b9e82cfa8b9342eb26a6b19',
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      '7123b8424b72a7f9b01c18e28e819ac85071fcee5d6ba7bbc5bc660694f29662',
+      'b1e112019b91c4fd06a9c9768b3829e79bd58f55c7a45fef7e14103d2bd0b7ae',
     ],
     [
       'routes/orders/(_shared)/orders-loaders.ts',
@@ -36,26 +36,29 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/index.layout.tsx',
-      '4d3ccaa189cc2f0a6217bbc165ee109783381ad9414b919146c9fb7a7e8807f7',
+      '53ae2769f588c0751ab8f456d863d11f781e6accfe40c3098f375c902d2b19c3',
     ],
     [
       'routes/orders/index.route.ts',
       'ff526aecef3989a21b3208411e403d9313396a8878048bd1ca5076366d3841da',
     ],
-    ['routes/orders/index.tsx', '48e41fc9a953602ef74707c9bf3209c0f29b3a7ba43c681ac85668f59d462046'],
+    [
+      'routes/orders/index.tsx',
+      '48e41fc9a953602ef74707c9bf3209c0f29b3a7ba43c681ac85668f59d462046',
+    ],
   ],
-  form: [
+  'form': [
     [
       'routes/orders/(_components)/orders-form.tsx',
-      '3ce6ef63661e150a67dcd177ea286d96c84d450a9804fb26fdf0563f3957939a',
+      '8d2c8a430164f3828356480473b7433f5b2559989c7205e73a46edaa04d00172',
     ],
     [
       'routes/orders/(_components)/orders-view.tsx',
-      'f137733beb145210bab895430c03e09c20aa63f4d929dae819c4c2b570125869',
+      'c477cda3bc236ee9084d458eccb011ab2268f80581afb873881d657664a6d339',
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      '7123b8424b72a7f9b01c18e28e819ac85071fcee5d6ba7bbc5bc660694f29662',
+      'b1e112019b91c4fd06a9c9768b3829e79bd58f55c7a45fef7e14103d2bd0b7ae',
     ],
     [
       'routes/orders/(_lib)/orders-form.ts',
@@ -67,26 +70,29 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/index.layout.tsx',
-      '4d3ccaa189cc2f0a6217bbc165ee109783381ad9414b919146c9fb7a7e8807f7',
+      '53ae2769f588c0751ab8f456d863d11f781e6accfe40c3098f375c902d2b19c3',
     ],
     [
       'routes/orders/index.route.ts',
       'ff526aecef3989a21b3208411e403d9313396a8878048bd1ca5076366d3841da',
     ],
-    ['routes/orders/index.tsx', '35ac7bbf7e9cb9f466dc9d9ef15132200e656aa1f932ac795f51cdd6f877c9fe'],
+    [
+      'routes/orders/index.tsx',
+      '35ac7bbf7e9cb9f466dc9d9ef15132200e656aa1f932ac795f51cdd6f877c9fe',
+    ],
   ],
-  partial: [
+  'partial': [
     [
       'routes/orders/(_components)/orders-summary.tsx',
-      '5d47391d7c87d4681f5627124630f0e1100e00f437d04dd80611d3b679b12607',
+      'caad505bfb715c0db22132d31a8c2f18064fe4d87b34b52f32a8cad8829bc58c',
     ],
     [
       'routes/orders/(_components)/orders-view.tsx',
-      'd8f5696f921c2e2868a74d491a3d71355a0c430402fb218e26db585346010769',
+      'f60fe89f51ea8b220975cd23c8e8143fb2c9ee32116ce20b056d5b7475db86e8',
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      '7123b8424b72a7f9b01c18e28e819ac85071fcee5d6ba7bbc5bc660694f29662',
+      'b1e112019b91c4fd06a9c9768b3829e79bd58f55c7a45fef7e14103d2bd0b7ae',
     ],
     [
       'routes/orders/(_shared)/orders-loaders.ts',
@@ -94,26 +100,29 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/index.layout.tsx',
-      '4d3ccaa189cc2f0a6217bbc165ee109783381ad9414b919146c9fb7a7e8807f7',
+      '53ae2769f588c0751ab8f456d863d11f781e6accfe40c3098f375c902d2b19c3',
     ],
     [
       'routes/orders/index.route.ts',
       'ff526aecef3989a21b3208411e403d9313396a8878048bd1ca5076366d3841da',
     ],
-    ['routes/orders/index.tsx', '6b0cbc09cc929354ce11149d8b86f1f7c55e688149bf5cc3ea24ea3c548a5a22'],
+    [
+      'routes/orders/index.tsx',
+      '6b0cbc09cc929354ce11149d8b86f1f7c55e688149bf5cc3ea24ea3c548a5a22',
+    ],
     [
       'routes/partials/orders/summary.tsx',
       '445ff503385fb04f245191f53bfd05b98f4d53ac0e632b7b82e05b0f0480a9fb',
     ],
   ],
-  stream: [
+  'stream': [
     [
       'routes/orders/(_components)/orders-view.tsx',
-      'a996a8c40f85f57371b7c5258ddfacfd784ecfc3714f761df3dc30bf3450fe80',
+      'b66f12548bae7a2fea061da2f77b2e8c86f65973ae4892f9a4298aab38920505',
     ],
     [
       'routes/orders/(_islands)/OrdersIsland.tsx',
-      '7123b8424b72a7f9b01c18e28e819ac85071fcee5d6ba7bbc5bc660694f29662',
+      'b1e112019b91c4fd06a9c9768b3829e79bd58f55c7a45fef7e14103d2bd0b7ae',
     ],
     [
       'routes/orders/(_islands)/OrdersStream.tsx',
@@ -125,13 +134,16 @@ const GOLDEN_HASHES: Readonly<
     ],
     [
       'routes/orders/index.layout.tsx',
-      '4d3ccaa189cc2f0a6217bbc165ee109783381ad9414b919146c9fb7a7e8807f7',
+      '53ae2769f588c0751ab8f456d863d11f781e6accfe40c3098f375c902d2b19c3',
     ],
     [
       'routes/orders/index.route.ts',
       'ff526aecef3989a21b3208411e403d9313396a8878048bd1ca5076366d3841da',
     ],
-    ['routes/orders/index.tsx', 'da1fe76700682106c97d8085fae9d29e7bfb20eedfb62fdfbc7405a3465ee745'],
+    [
+      'routes/orders/index.tsx',
+      'da1fe76700682106c97d8085fae9d29e7bfb20eedfb62fdfbc7405a3465ee745',
+    ],
   ],
 };
 

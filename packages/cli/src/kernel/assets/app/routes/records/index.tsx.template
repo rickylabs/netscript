@@ -8,7 +8,7 @@ import { definePage } from '@app/utils.ts';
 function RecordsView({ records, locale }: { readonly records: ScaffoldRecords; readonly locale?: string }) {
   const page = records.page ?? 1;
   return <div class='workspace-page'>
-    <PageHeader class='workspace-heading'><PageHeader.Layout><PageHeader.Main><PageHeader.Intro><h1>Records</h1><p>Owners, amounts and status across your workspace.</p></PageHeader.Intro></PageHeader.Main><PageHeader.Actions><Button type='link' href={appRoutes.dashboard.href()} variant='outline'>Overview</Button>{ {{hasService}} && <Button type='link' href={appRoutes.serviceExample.href()}>Create record</Button>}</PageHeader.Actions></PageHeader.Layout></PageHeader>
+    <PageHeader class='workspace-heading'><PageHeader.Layout><PageHeader.Main><PageHeader.Intro><h1>Records</h1><p>Owners, amounts and status across your workspace.</p></PageHeader.Intro></PageHeader.Main><PageHeader.Actions><Button type='link' href={appRoutes.dashboard.href()} variant='outline'>Overview</Button>{ {{hasService}} && <Button type='link' href={appRoutes.serviceExample.href()}>Open service ↗</Button>}</PageHeader.Actions></PageHeader.Layout></PageHeader>
     <section class='workspace-section'><header class='workspace-section-heading'><h2>All records {records.total !== undefined && <span class='workspace-count'>{records.total}</span>}</h2></header>
       <FilterForm action={appRoutes.records.href()} method='get' f-client-nav={false} class='workspace-filters'><FilterForm.Body>
         <label class='workspace-filter-search'><span class='workspace-sr-only'>Search records</span><Input type='search' name='search' value={records.query?.search ?? ''} placeholder='Search by reference, name or owner' /></label>
@@ -29,6 +29,14 @@ function RecordsView({ records, locale }: { readonly records: ScaffoldRecords; r
 export const recordsPage = definePage().withRoute(appRoutes.records)
   .withMeta(() => ({ title: '{{name}} — Records' }))
   .withLayer('records', RecordsView, { loader: async (ctx) => ({ records: await loadScaffoldRecords(ctx.req), locale: scaffoldLocale(ctx.req) }) })
-  .withLayout((slots) => slots.records()).build();
-export const { default: page } = recordsPage;
+  .withLayout((slots) => slots.records())
+  .withHandler('GET', async (ctx) => {
+    const accept = ctx.req.headers.get('accept') ?? '';
+    if (accept.includes('application/json') && !accept.includes('text/html')) {
+      const records = await loadScaffoldRecords(ctx.req);
+      return Response.json({ state: records.state, rows: records.rows.slice(0, 5), total: records.total, message: records.message }, { headers: { 'cache-control': 'private, no-store', vary: 'Accept' } });
+    }
+    return { data: {} };
+  }).build();
+export const { handler, default: page } = recordsPage;
 export { page as default };

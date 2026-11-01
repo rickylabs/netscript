@@ -34,3 +34,19 @@ Reconcile: S1 satisfies the first slice on current branch. S2 owns plugin state/
 ## Base reconciliation — 2026-11-01
 
 Owner requested the latest main merge. Merged a182c37 (Fresh UI core contracts/gaps #2488) normally. The sole conflict was embedded.generated.ts; regenerated from the combined source with gen:assets-barrel, preserving both sources. S1 regression wrapper rerun. S2 will consume the now-merged richer command-palette API.
+
+## S2 progress — 2026-11-01
+
+Implemented bounded reads of typed worker executions and the documented durable workers topic, real progress/state and stream events, measured resource health with false-readiness rejection, designed live service table/managed form/summary, real record results in the command palette, and capability-derived Settings/sign-in panels. Corrected public streams ambient types to merge with Vite. No record mutation is implied by the generic note form.
+
+Current local evidence: 81 focused tests; emitted app/service 126 files; scoped check/lint/fmt; quality:gate; shipped CSS/publish-size 4 tests. Browser matrix passed all eight routes plus command palette in light/dark at 1440px/390px: seeded values, real job/stream data, lowercase reference search, selection/CSV, empty/out-of-range pages, settings save and command results/Escape. The public s2-browser-evidence.json records each check. These are preview checks; independent source signoff is pending and final Figma score/IMPL-EVAL/full CI gate remain S3.
+
+S2 source review round 1: FAIL_FIX for readiness, generic field retention/units, and bounded stream history. Implemented strict background readiness and streams ready endpoint, explicit monetary presentation with raw fallback, all fields preserved, and bounded cursor snapshots with honest catch-up/history-budget copy. Streams preview reads anonymously and never elevates with a service secret; protected topics remain unauthorized. This matches the authored public streams entrypoint while preserving private deployments. Regression and same-session review pending.
+
+S2 review round 2 found structured values in rich mapped fields and rejected cursor recovery. Rich eligibility now requires supported optional field types; otherwise the complete generic table renders nested values. Numeric pagination metadata alone is consumed. Saved cursors reset once on protocol 400/410, preserving bounded reads and access-denial behavior. Added nested-field and populated→reset→recovered regression cases.
+
+## S2 — terminal PASS, 2026-11-01
+
+Same independent Astra supervisor returned terminal PASS after the two correction rounds; see s2-review.md and preserved earlier findings. Final focused wrapper: 86/86 tests; scoped check/lint/fmt 16 source files; emitted app/service 126 files; quality:gate raw exit 0; CSS/publish-size 4/4; review-threads PASS (0 threads). Live seeded service/workers/streams preview passed eight routes plus command palette at 1440/390, light/dark, with search/select/export/settings/palette interactions. Background discovery absent from the app is honestly Not linked, distinct from worker execution status/progress. Behavior-only final edge-case fixes are regression-tested; S3 will regenerate the fixture for final captures. Supervisor authorizes S2 signoff.
+
+Reconcile: S2 completes the planned page/plugin changes against merged main a182c37. No dependency version or lock changes. S3 remains all carriers, full root/check:* validation, fresh seeded captures, independent final IMPL/visual review, and CI runtime. READY is not claimed.
