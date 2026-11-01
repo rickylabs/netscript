@@ -358,3 +358,4 @@
 - 22:36:14Z: **Eric (in session, ~22:35Z): 'Go ahead with the cut'**, the direct go for 0.0.9-canary.2 on the agreed content. Gated: wait for #2488 to merge and #2552 to close, then green push CI plus dispatched e2e-cli and command-postgres at the exact main sha, then dispatch release-canary (0.0.9).
 - 23:45:47Z: Cockpit: #2552 content is on main (docs PR #2554 e8d55558 at 23:41Z, CLI PR #2555 6a1d84a6 at 23:45Z; issue left for the Fresh UI lane to close). Only #2488 remains before the canary.2 cut; waiter relaxed to #2488 merged plus #2552 PRs merged.
 - 23:46:00Z: #2552 closed by the Fresh UI lane (#2554, #2555; nits in #2556, not 0.0.9). Only #2488 remains before the gated canary.2 cut.
+- 07:06:48Z: Status 8 posted (morning): canary.2 waits on #2488 (draft); open owner items unchanged.

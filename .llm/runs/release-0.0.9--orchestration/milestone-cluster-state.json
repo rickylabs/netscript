@@ -1833,10 +1833,10 @@
   ],
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-10-31T22:17:10Z",
-    "nextReportDueAt": "2026-10-31T23:17:10Z",
+    "lastReportAt": "2026-11-01T07:06:48Z",
+    "nextReportDueAt": "2026-11-01T08:06:48Z",
     "lastReportRef": "https://github.com/rickylabs/netscript/issues/2474",
-    "headline": "non-design scope complete; stable gated on DS1, terminal canary, qualification",
+    "headline": "status 8: canary.2 waits on #2488",
     "currentMainSha": "f4aa307b5340bd3de8029c11778a38bbca451ba1",
     "canary": {
       "target": "0.0.9-canary.1",
@@ -2023,7 +2023,7 @@
     "contentSha": null,
     "evidence": []
   },
-  "updatedAt": "2026-10-31T22:17:10Z",
+  "updatedAt": "2026-11-01T07:06:48Z",
   "dispatches": [
     {
       "issue": 2438,
