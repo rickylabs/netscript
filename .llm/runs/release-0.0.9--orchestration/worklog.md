@@ -359,3 +359,4 @@
 - 23:45:47Z: Cockpit: #2552 content is on main (docs PR #2554 e8d55558 at 23:41Z, CLI PR #2555 6a1d84a6 at 23:45Z; issue left for the Fresh UI lane to close). Only #2488 remains before the canary.2 cut; waiter relaxed to #2488 merged plus #2552 PRs merged.
 - 23:46:00Z: #2552 closed by the Fresh UI lane (#2554, #2555; nits in #2556, not 0.0.9). Only #2488 remains before the gated canary.2 cut.
 - 07:06:48Z: Status 8 posted (morning): canary.2 waits on #2488 (draft); open owner items unchanged.
+- 07:38:07Z: **Eric's answers (in session, ~07:15Z):** #2465 → Backlog / Triage (done); PRs #2424 and #2433 closed as stale (done); failed-canary policy: **decide case by case** (no standing policy; each failure goes to Eric); DS1 stable gate: **ask the design lane**; qualification: **consumer sessions run it** (EIS Chat, atelier-cockpit) after canary.2, evidence collected on #2474.
