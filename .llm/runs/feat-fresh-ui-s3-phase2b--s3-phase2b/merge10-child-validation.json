@@ -1,5 +1,5 @@
 {
-  "state": "same-source-review-pass-before-merge-source-commit",
+  "state": "source-and-evidence-reviewed-before-audited-plain-push",
   "parent": "2be80639",
   "main": "0af8fd9e",
   "originalChild": "1afd50cb",
@@ -49,9 +49,6 @@
     }
   },
   "pending": [
-    "merge-source-commit",
-    "actual-head-carriers-quality-native-publication",
-    "same-evidence-review",
     "privacy-ancestry-plain-push"
   ],
   "sourceWrappers": {
@@ -431,6 +428,67 @@
     "unanswered": 0
   },
   "sourceReview": {
+    "verdict": "PASS",
+    "round": 1,
+    "blockers": 0,
+    "failureStreak": 0
+  },
+  "sourceHead": "b94a2382bf60a3ca2b456a696458510c2d49f919",
+  "committedSourceEvidence": {
+    "sourceHead": "b94a2382bf60a3ca2b456a696458510c2d49f919",
+    "parents": [
+      "c8218a991a7286c6c8a4a32b96a4b299a7e1e8a0",
+      "2be806399f5b85919b9d2246fe4bd7d6d6a67c15"
+    ],
+    "sourceReview": "PASS",
+    "carriers": {
+      "gen:mcp-export-corpus": {
+        "exitCode": 0,
+        "verdict": "PASS"
+      },
+      "gen:publish-assets": {
+        "exitCode": 0,
+        "verdict": "PASS"
+      },
+      "check:agent-docs-prose": {
+        "exitCode": 0,
+        "verdict": "PASS"
+      },
+      "check:mcp-export-corpus": {
+        "exitCode": 0,
+        "verdict": "PASS"
+      },
+      "check:assets-barrel": {
+        "exitCode": 0,
+        "verdict": "PASS"
+      },
+      "check:publish-assets": {
+        "exitCode": 0,
+        "verdict": "PASS"
+      }
+    },
+    "generatedTrackedDelta": 0,
+    "quality": {
+      "gitHead": "b94a2382bf60a3ca2b456a696458510c2d49f919",
+      "actualGitHead": "b94a2382bf60a3ca2b456a696458510c2d49f919",
+      "exitCode": 0
+    },
+    "nativePublication": {
+      "exitCode": 0,
+      "success": true,
+      "slowTypeDiagnostics": 0,
+      "allowSlowTypes": false,
+      "afterAllBrowserAndGenerationJobsClosed": true
+    },
+    "frozen": {
+      "sourceFiles": 711,
+      "compiledArtifacts": 9,
+      "mismatches": 0
+    },
+    "locksUnchanged": 3,
+    "fullGoalComplete": false
+  },
+  "evidenceReview": {
     "verdict": "PASS",
     "round": 1,
     "blockers": 0,

@@ -1,0 +1,54 @@
+{
+  "sourceHead": "b94a2382bf60a3ca2b456a696458510c2d49f919",
+  "parents": [
+    "c8218a991a7286c6c8a4a32b96a4b299a7e1e8a0",
+    "2be806399f5b85919b9d2246fe4bd7d6d6a67c15"
+  ],
+  "sourceReview": "PASS",
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "generatedTrackedDelta": 0,
+  "quality": {
+    "gitHead": "b94a2382bf60a3ca2b456a696458510c2d49f919",
+    "actualGitHead": "b94a2382bf60a3ca2b456a696458510c2d49f919",
+    "exitCode": 0
+  },
+  "nativePublication": {
+    "exitCode": 0,
+    "success": true,
+    "slowTypeDiagnostics": 0,
+    "allowSlowTypes": false,
+    "afterAllBrowserAndGenerationJobsClosed": true
+  },
+  "frozen": {
+    "sourceFiles": 711,
+    "compiledArtifacts": 9,
+    "mismatches": 0
+  },
+  "locksUnchanged": 3,
+  "fullGoalComplete": false
+}
