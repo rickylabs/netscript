@@ -1,0 +1,20 @@
+{
+  "docs/site/design-system/components.page.ts": "193f947133473639db491435621c719ef2f1f0eeb92dc8416ad1bcbbf806f30e",
+  "packages/fresh-ui/tests/publish-size.test.ts": "e26cc46a5f3104ba5294864f441685191e6a345078094c49a690714c2d4300ef",
+  "packages/mcp/src/domain/docs/component-guidance.ts": "88ac88de845da3188079649cd26dbe716f3ebafb22bfa28c8612ee0db1e2cd0c",
+  "packages/mcp/src/domain/docs/guidance-index.ts": "a329d97cced7077217660a05e970a02dedc9409355359017ed19114dc5a058ac",
+  "packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts": "16f68566c2e07bcf253d5b69f6e7026d84d1024f057df7bfa1dab4cf3f04a7ad",
+  "packages/mcp/src/publish-assets.generated.ts": "9198f13a797c997dbbd5fbd5c8360d51b35bf794cb84018eebe64b404ce3b389",
+  "packages/mcp/tests/component-guidance_test.ts": "ab5694269c365ad29942d7848d73575c13bf24aa3c1745762cd41d4ea0adeb75",
+  "tools/docs-site/fresh-ui/README.md": "2eb137d6108624c327f0b0be841ec1f95c8373e4825cb3f496d5052def3ba430",
+  "tools/docs-site/fresh-ui/builder.ts": "3a430728efeafaed39ad74ca45ef6fd40ff7b9f514cf857438be2569ce704c16",
+  "tools/docs-site/fresh-ui/catalog.ts": "7c2192602c9b3b9e91a62c629e480e738495048b8fbd47fc37d44986486dd4e4",
+  "tools/docs-site/fresh-ui/check.ts": "4681b95eff29794348cea0f31a1c969a5fd5aa0a684368be09639e8b5846dc15",
+  "tools/docs-site/fresh-ui/generate.ts": "1dcf59b0fe1d61280a365ed583695c39cb8a976d24a1f99355799255ecbaa816",
+  "tools/docs-site/fresh-ui/generate_test.ts": "f17cd473b9d7cd09bbd32e5d2da16baca9c5c6c220dbdb431b23488b06856093",
+  "tools/docs-site/fresh-ui/preview.tsx": "2cfd9690e157361907829bac62e59f576389799589536cff2e5f8cc2b5da5879",
+  "tools/docs-site/fresh-ui/render.ts": "25c834e60838317ca905b76949d68e4c13da408ed4a07f969d49834c95c6c72d",
+  "tools/fresh-ui-browser/docs-tests/components.spec.ts": "f2003a23083c5bd0effa3ae8515bc215824759df5154568b9212d2029720fc36",
+  "tools/docs-site/fresh-ui/preset.ts": "233a5a2484f4561f087c446719975b04ecb4c33ee17465a4504d60de4c44973c",
+  "tools/docs-site/fresh-ui/payload-budgets.ts": "787bb74020620605f22e12f7bbbea07f996ca3bbe3f2b08106099e7970ef3996"
+}

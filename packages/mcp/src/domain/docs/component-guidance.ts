@@ -9,19 +9,34 @@ export function componentGuidance(
   intent: string,
   hasWorkflowConcept: boolean,
 ): GuidanceResult | undefined {
-  const explicit = /fresh\s*ui|\bcomponents?\b|\bprops?\b|\bkeyboard\b|\bshortcuts?\b|ui:add/i.test(
-    intent,
-  );
-  if (hasWorkflowConcept && !explicit) return undefined;
-  if (!explicit) return undefined;
   const query = words(intent);
   const candidates = new Map<string, { alias: string; sections: IndexedGuidanceSection[] }>();
   for (const section of sections) {
-    const name = section.slug.replace(/^pages\//, '').match(/^design-system\/components\/([^/]+)$/)
-      ?.[1];
+    const name = componentPageName(section.slug);
     if (!name) continue;
     const aliases = [name.replaceAll('-', ' '), name.replaceAll('-', ''), section.title];
-    const alias = aliases.filter((value) => query.includes(words(value)))
+    const alias = aliases.filter((value) => {
+      if (!query.includes(words(value))) return false;
+      const identity = words(value).trim();
+      const apiName = section.title.split(/\s+/)[0]!;
+      const apiIdentity = /[a-z][A-Z]/.test(apiName) && intent.includes(apiName);
+      const exactIdentity = query === words(value);
+      // Spaced aliases can also describe ordinary tasks ("data table in Postgres").
+      // Require nearby UI context; sentence-leading capitalisation is not an API signal.
+      const context = new RegExp(
+        `(?:fresh ui |ui add )${identity}\\b|\\b${identity} (?:component|props?|keyboard|shortcuts?)\\b|(?:component|props? (?:of|for)|keyboard (?:of|for)) (?:the )?${identity}\\b`,
+      ).test(query);
+      if (hasWorkflowConcept && !context && !apiIdentity && !exactIdentity) return false;
+      const registryIdentity = name.includes('-') &&
+        intent.toLowerCase().includes(name);
+      const visualAction = new RegExp(`(?:theme|render) (?:the |a |an )?${identity} $`)
+        .test(query);
+      const namedUse = apiName !== apiName.toLowerCase() &&
+        intent.trim().replace(/[?!.]+$/, '').endsWith(apiName) &&
+        new RegExp(`(?:use|install|add) (?:the )?${identity} $`).test(query);
+      return exactIdentity || apiIdentity || context || registryIdentity || visualAction ||
+        namedUse;
+    })
       .sort((a, b) => b.length - a.length)[0];
     if (!alias) continue;
     const previous = candidates.get(section.slug);
@@ -59,4 +74,9 @@ export function componentGuidance(
 
 function words(value: string): string {
   return ' ' + value.toLocaleLowerCase().replace(/[^\p{Letter}\p{Number}]+/gu, ' ').trim() + ' ';
+}
+
+/** Recognize the generated reference namespace independently of optional corpus slug prefixes. */
+export function componentPageName(slug: string): string | undefined {
+  return slug.replace(/^pages\//, '').match(/^design-system\/components\/([^/]+)$/)?.[1];
 }

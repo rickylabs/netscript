@@ -1,9 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Response as BrowserResponse, test } from '@playwright/test';
 import type { ComponentCatalog } from '../../docs-site/fresh-ui/catalog.ts';
 import { readdir, readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gzipSync } from 'node:zlib';
+import { PAYLOAD_BUDGETS } from '../../docs-site/fresh-ui/payload-budgets.ts';
 import { analyzeStylePolicy } from '../../docs-site/style-policy.ts';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -256,3 +258,81 @@ test(
     expect(errors).toEqual([]);
   },
 );
+
+test('builder initial requests obey payload budgets and defer the catalog, codec and unrelated previews', async ({ page }) => {
+  const responses = new Map<string, BrowserResponse>();
+  const requests: string[] = [];
+  const failures: string[] = [];
+  page.on('request', (request) => requests.push(request.url()));
+  page.on('response', (response) => {
+    if (response.status() >= 400) failures.push(response.url());
+    if (response.url().endsWith('.js') || response.url().endsWith('.json')) {
+      responses.set(response.url(), response);
+    }
+  });
+  await page.goto('create/');
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-builder-ready',
+    'true',
+  );
+  await expect(page.frameLocator('[data-component-preview]').locator('html'))
+    .toHaveAttribute(
+      'data-preview-ready',
+      'workspace',
+    );
+  await page.waitForLoadState('networkidle');
+  expect(failures).toEqual([]);
+  expect(requests.some((url) => /\/catalog\.json(?:$|\?)/.test(url))).toBe(
+    false,
+  );
+  expect(
+    requests.some((url) => /\/(?:preset|code-block|markdown|message)-[^/]+\.js$/.test(url)),
+  )
+    .toBe(false);
+  const measured = async (kind: 'builderJavaScript' | 'builderPresets') => {
+    const assets = await Promise.all(
+      [...responses].filter(([url]) =>
+        kind === 'builderJavaScript' ? url.endsWith('.js') : url.endsWith('/presets.json')
+      ).map(([, response]) => response.body()),
+    );
+    expect(assets.length).toBeGreaterThan(0);
+    const bytes = assets.reduce(
+      (sum, asset) => ({
+        raw: sum.raw + asset.byteLength,
+        gzip: sum.gzip + gzipSync(asset).byteLength,
+      }),
+      { raw: 0, gzip: 0 },
+    );
+    expect(bytes.raw, kind + ' raw').toBeLessThanOrEqual(
+      PAYLOAD_BUDGETS[kind].raw,
+    );
+    expect(bytes.gzip, kind + ' gzip').toBeLessThanOrEqual(
+      PAYLOAD_BUDGETS[kind].gzip,
+    );
+  };
+  await measured('builderJavaScript');
+  await measured('builderPresets');
+  // The normal shared-link entry must stay small as well as a fresh /create navigation.
+  await expect(page).toHaveURL(/[?&]preset=ns1_/);
+  responses.clear();
+  requests.length = 0;
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-builder-ready', 'true');
+  await expect(page.frameLocator('[data-component-preview]').locator('html')).toHaveAttribute(
+    'data-preview-ready',
+    'workspace',
+  );
+  await page.waitForLoadState('networkidle');
+  expect(requests.some((url) => /\/preset-[^/]+\.js$/.test(url))).toBe(false);
+  await measured('builderJavaScript');
+  await measured('builderPresets');
+  await page.locator('input[name="preset"]').fill('studio-cloud');
+  await page.getByRole('button', { name: 'Apply preset code' }).click();
+  await expect(page.locator('[data-preset-choice]')).toHaveValue(
+    'studio-cloud',
+  );
+  expect(requests.some((url) => /\/preset-[^/]+\.js$/.test(url))).toBe(true);
+  expect(requests.some((url) => /\/catalog\.json(?:$|\?)/.test(url))).toBe(
+    false,
+  );
+});
