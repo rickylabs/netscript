@@ -70,5 +70,71 @@
     }
   ],
   "localCliRuntime": "UNPROVEN: Aspire doctor and Docker daemon probes failed; foreign resources untouched",
-  "independentReview": "PASS, same reviewer final round3; independent58 focused tests and45 routing probes"
+  "independentReview": "PASS, same reviewer final round3; independent58 focused tests and45 routing probes",
+  "carrierFreshness": {
+    "agent-docs-prose": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "head": "d01a61ecce29b1480a3a7038f5a35d8c1f1f632e",
+      "argv": [
+        "deno",
+        "task",
+        "check:agent-docs-prose"
+      ]
+    },
+    "mcp-export-corpus": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "head": "d01a61ecce29b1480a3a7038f5a35d8c1f1f632e",
+      "argv": [
+        "deno",
+        "task",
+        "check:mcp-export-corpus"
+      ]
+    },
+    "publish-assets": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "head": "d01a61ecce29b1480a3a7038f5a35d8c1f1f632e",
+      "argv": [
+        "deno",
+        "task",
+        "check:publish-assets"
+      ]
+    },
+    "assets-barrel": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "head": "d01a61ecce29b1480a3a7038f5a35d8c1f1f632e",
+      "argv": [
+        "deno",
+        "task",
+        "check:assets-barrel"
+      ]
+    }
+  },
+  "reviewedSourceFilesVerified": 18,
+  "reproducibility": {
+    "outcome": "PASS",
+    "scope": "all-output-with-reported-pagefind-metadata",
+    "files": 1196,
+    "html": 316,
+    "search": 310,
+    "twins": 262,
+    "nonBlockingDifferences": [
+      "pagefind/filter/en_16d5a58.pf_filter",
+      "pagefind/filter/en_5526748.pf_filter",
+      "pagefind/pagefind-entry.json",
+      "pagefind/pagefind.en_233f017ed2.pf_meta",
+      "pagefind/pagefind.en_441e45ea29.pf_meta"
+    ],
+    "changedNonHtml": [
+      "pagefind/filter/en_16d5a58.pf_filter",
+      "pagefind/filter/en_5526748.pf_filter",
+      "pagefind/pagefind-entry.json",
+      "pagefind/pagefind.en_233f017ed2.pf_meta",
+      "pagefind/pagefind.en_441e45ea29.pf_meta"
+    ]
+  },
+  "aspireSurfaceManifestExitCode": 0
 }

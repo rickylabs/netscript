@@ -45,3 +45,11 @@ Round 2: PASS and independent slice-supervisor sign-off. Reviewer independently 
 ## Implementation sign-off
 
 Final same-reviewer round3: PASS, with separate slice-supervisor sign-off. All blocking and nonblocking findings fixed; independent 58-test routing/generator pass and45 routing probes. Implementer final source:248 MCP/generator PASS and22 browser PASS/6 existing skips; scoped check/lint/fmt PASS. Source hashes captured in `reviewed-source-sha256.json`. Implementation commit carries the reviewed code, generated carriers, worklog and context. Next: four postcommit carrier freshness checks, normal push, exact-head CI policy verification. No READY claim yet.
+
+## Postcommit carrier and delivery reconciliation
+
+All four durable command receipts on implementation head `d01a61ecce29b1480a3a7038f5a35d8c1f1f632e` are PASS/exit0: `check:agent-docs-prose`, `check:mcp-export-corpus`, `check:assets-barrel`, `check:publish-assets`. Together with the 11 previously passed checks, every root `check:*` task has passed. The shared Aspire surface manifest generator also exited0 without changes.
+
+Two-build site reproducibility PASS across1,196 files/316 HTML pages/262 Markdown twins; only the existing workflow-allowed Pagefind metadata files varied. Browser chunks and page output are stable. All reviewed source hashes still match; no lockfile churn or source changes after final independent sign-off.
+
+Draft PR #2573 matches issue milestone0.0.9 and retains no labels. Required core CI checks on the implementation push were explicitly policy-skipped for draft PRs (`ci.yml` excludes drafts); Pages build passed and its browser job was running. These skips are not executed runtime proof. Reconcile the final evidence head immediately after push before publishing READY through the excluded atomic report. Cockpit owns merge; no rebase/force push/merge.
