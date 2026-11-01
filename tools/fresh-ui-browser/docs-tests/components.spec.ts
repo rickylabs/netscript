@@ -115,6 +115,10 @@ for (
     await expect(
       page.locator('nav[aria-label="Documentation lanes"] [aria-current="page"]'),
     ).toHaveText('Design system');
+    await expect(page.locator('.docs-edit a')).toHaveAttribute(
+      'href',
+      'https://github.com/rickylabs/netscript/edit/main/docs/site/design-system/components.page.ts',
+    );
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
@@ -182,23 +186,73 @@ test('builder shares the CLI code and imports a preset without inventing axes', 
   await page.getByRole('button', { name: 'Apply preset code' }).click();
   await expect(page.locator('[data-builder-status]')).toContainText('Invalid UI preset code');
   await expect(page.locator('[data-preset-choice]')).toHaveValue('studio-cloud');
+  await page.locator('input[name="preset"]').fill('ns2_e30');
+  await page.getByRole('button', { name: 'Apply preset code' }).click();
+  await expect(page.locator('[data-builder-status]')).toHaveText('Unsupported UI preset version');
+  await expect(page.locator('[data-preset-choice]')).toHaveValue('studio-cloud');
+  await page.goto('create/?preset=' + 'x'.repeat(5_000));
+  await expect(page.locator('[data-builder-status]')).toContainText('exceeds 4096 characters');
+  await expect(page.locator('[data-preset-choice]')).toHaveValue('studio-utility');
 });
 
-test('every generated registry preview mounts actual components', async ({ page }, info) => {
-  test.skip(
-    info.project.name !== 'light-1280',
-    'One complete census; the representative browser matrix runs in all projects.',
-  );
-  const catalog = await (await page.request.get('assets/fresh-ui/catalog.json')).json();
-  const errors: string[] = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  for (const component of catalog.components) {
-    await page.goto(
-      `assets/fresh-ui/preview/?component=${component.name}&theme=studio-utility&scheme=light`,
+test(
+  'every generated registry preview mounts actual components without third-party requests',
+  async ({
+    page,
+    context,
+    baseURL,
+  }, info) => {
+    test.skip(
+      info.project.name !== 'light-1280',
+      'One complete census; the representative browser matrix runs in all projects.',
     );
-    await expect(page.locator('html')).toHaveAttribute('data-preview-ready', component.name);
-    await expect(page.getByText('Loading Fresh UI preview…')).toHaveCount(0);
-    await expect(page.locator('#preview > *')).not.toHaveCount(0);
-  }
-  expect(errors).toEqual([]);
-});
+    test.setTimeout(180_000);
+    const origin = new URL(baseURL!).origin;
+    const external = new Set<string>();
+    await context.route(/^https?:\/\//, async (route) => {
+      if (new URL(route.request().url()).origin !== origin) {
+        external.add(route.request().url());
+        await route.abort();
+      } else await route.continue();
+    });
+    const catalog: ComponentCatalog = await (await page.request.get('assets/fresh-ui/catalog.json'))
+      .json();
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    await page.goto('create/');
+    await expect(page.frameLocator('[data-component-preview]').locator('html')).toHaveAttribute(
+      'data-preview-ready',
+      'workspace',
+    );
+    expect([...external]).toEqual([]);
+    for (const preset of catalog.presets) {
+      await page.locator('[data-preset-choice]').selectOption(preset.id);
+      const root = page.frameLocator('[data-component-preview]').locator('html');
+      await expect(root).toHaveAttribute('data-preset', preset.id);
+      await expect(root).toHaveAttribute('data-preview-ready', 'workspace');
+      expect([...external], preset.id).toEqual([]);
+    }
+    for (const component of catalog.components) {
+      await page.goto(
+        `assets/fresh-ui/preview/?component=${component.name}&theme=studio-utility&scheme=light`,
+      );
+      await expect(page.locator('html')).toHaveAttribute('data-preview-ready', component.name);
+      await expect(page.getByText('Loading Fresh UI preview…')).toHaveCount(0);
+      await expect(page.locator('#preview > *')).not.toHaveCount(0);
+      expect([...external], component.name).toEqual([]);
+    }
+    for (
+      const path of [
+        'create/',
+        'design-system/components/',
+        ...catalog.components.map((c) => 'design-system/components/' + c.name + '/'),
+      ]
+    ) {
+      const html = await (await page.request.get(path)).text();
+      expect(html, path).toContain(
+        'href="https://github.com/rickylabs/netscript/edit/main/docs/site/design-system/components.page.ts"',
+      );
+    }
+    expect(errors).toEqual([]);
+  },
+);

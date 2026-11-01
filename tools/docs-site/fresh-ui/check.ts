@@ -1,4 +1,5 @@
-import { COMPONENT_ROOT, type ComponentCatalog, DOC_PAGE_BYTES } from './catalog.ts';
+import { COMPONENT_ROOT, type ComponentCatalog } from './catalog.ts';
+import { DOC_CONTENT_BUDGET } from '../../../packages/mcp/src/domain/docs/doc-retrieval-contract.ts';
 import { documentedItems, inputHash, OUTPUT, registryItems, ROOT } from './generate.ts';
 import { join } from '@std/path';
 
@@ -56,9 +57,9 @@ export async function checkGeneratedSite(): Promise<
     }
     const bytes = new TextEncoder().encode(markdown).byteLength;
     maximumPageBytes = Math.max(maximumPageBytes, bytes);
-    if (bytes > DOC_PAGE_BYTES) {
+    if (bytes > DOC_CONTENT_BUDGET) {
       throw new Error(
-        `${name}: agent twin ${bytes} exceeds ${DOC_PAGE_BYTES} bytes; split auxiliary reference details.`,
+        `${name}: agent twin ${bytes} exceeds ${DOC_CONTENT_BUDGET} bytes; split auxiliary reference details.`,
       );
     }
     if (!markdown.includes(`netscript ui:add ${name}`)) {

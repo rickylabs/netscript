@@ -32,7 +32,6 @@ export interface PresetChoice {
   readonly accent: string;
   readonly density: string;
   readonly sourceDensity?: string;
-  readonly fonts: readonly string[];
   readonly values: Readonly<Record<string, string>>;
 }
 
@@ -49,4 +48,3 @@ export const COMPONENT_STYLES = [{ id: 'style-utility', label: 'Utility' }] as c
 export const COMPONENT_ROOT = '/design-system/components/';
 export const PREVIEW_ROOT = '/assets/fresh-ui/';
 export const DEFAULT_PRESET = 'studio-utility';
-export const DOC_PAGE_BYTES = 12_288;

@@ -1,5 +1,3 @@
-# Resource hygiene verdict
+# Resource hygiene after coordinator repair
 
-Read-only reporter exit 0. **UNPROVEN environment inventory**: Docker, volume and network probes unavailable. Owned survivors: 0. Foreign survivors: 0 classified. Unknown/unproven ownership survivors: 24. All foreign/unknown resources left untouched. Three positively identified owned proof server/Vite processes stopped after capture.
-
-Only verdict/counts are published, as explicitly required by the assignment. Raw report remains private.
+UNPROVEN environment inventory. Read-only reporter exit 0. Survivor ownership counts: {'unproven': 27}. Owned proof processes stopped by positive path/command ownership. Foreign/unknown resources untouched. Docker/volume/network probes unavailable. Public output contains verdict/counts only; raw inventory is private.

@@ -13,6 +13,7 @@ export interface ReferencePage {
   layout: string;
   content: string;
   order: number;
+  edit_source: string;
 }
 
 const e = escapeHtml;
@@ -114,6 +115,7 @@ export function referencePages(catalog: ComponentCatalog): ReferencePage[] {
     title: 'Components',
     layout: 'layouts/base.vto',
     order: 3,
+    edit_source: '/design-system/components.page.ts',
     content:
       `<h1>Components</h1><p>Live Fresh UI references generated from the registry, implementation types and S3 contracts. <a href="/create/">Build a theme</a> to preview a complete workspace.</p><ul class="ns-component-index">` +
       catalog.components.map((page) =>
@@ -126,6 +128,7 @@ export function referencePages(catalog: ComponentCatalog): ReferencePage[] {
       title: page.symbol,
       layout: 'layouts/base.vto',
       order: 0,
+      edit_source: '/design-system/components.page.ts',
       content: componentContent(page, catalog),
     });
   }
@@ -145,6 +148,7 @@ export function builderPage(catalog: ComponentCatalog): ReferencePage {
     title: 'Theme builder',
     layout: 'layouts/base.vto',
     order: 2,
+    edit_source: '/design-system/components.page.ts',
     content: assets +
       '<h1>Build your theme</h1><p>Choose a starting point. See it on real Fresh UI components, then take the same preset into your app.</p>' +
       '<div class="ns-builder"><div class="ns-builder__controls">' +
@@ -153,6 +157,7 @@ export function builderPage(catalog: ComponentCatalog): ReferencePage {
       '<label>Component style<select aria-describedby="style-help" disabled><option>Utility</option></select></label>' +
       '<label>Preview scheme<select data-preview-scheme disabled><option value="system">Follow docs</option><option value="light">Light</option><option value="dark">Dark</option></select></label></div>' +
       '<p id="style-help">Utility is the available component style. Each theme preset supplies its accent, geometry, fonts, density and menu treatment.</p>' +
+      '<p>Preview fonts available on this site are self-hosted. Other declared font families use their platform fallback stacks.</p>' +
       '<dl class="ns-builder__values">' +
       ['accent', 'radius', 'fonts', 'density', 'icons', 'menu'].map((key) =>
         `<dt>${key[0].toUpperCase() + key.slice(1)}</dt><dd data-effective="${key}">${

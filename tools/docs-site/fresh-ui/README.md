@@ -19,12 +19,13 @@ deno task docs:components:check
 ```
 
 It compares the input digest, registry census, HTML/Markdown presence, and actual UTF-8 page sizes
-against MCP's 12,288-byte limit. The generated catalog and bundles are build artifacts, not a
+against MCP's imported `DOC_CONTENT_BUDGET` (12,288 bytes). The generated catalog and bundles are build artifacts, not a
 second maintained component inventory. Tests include changed-input and added-component controls.
 
 The builder imports the CLI's existing `ns1_` codec. The 24 fixed presets determine accent,
-geometry, fonts, density and menu values; scheme is independent. Font assets come from the
-shipped font manifest. `COMPONENT_STYLES` is the extension seam; Utility is the sole shipped
+geometry, fonts, density and menu values; scheme is independent. Previews use the docs site's
+self-hosted fonts and the preset's declared platform fallback stacks for other families. They never
+inject runtime font-provider links. `COMPONENT_STYLES` is the extension seam; Utility is the sole shipped
 anatomy. Add another style only with its real registry implementation. Native desktop and MCP
 host actions are represented by explicit browser examples, with their host boundary documented.
 

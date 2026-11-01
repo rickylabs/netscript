@@ -54,3 +54,15 @@ Actual built builder code copied into successful local-source CLI init, then unm
 Mandatory independent read-only IMPL-EVAL: **PASS**, implementation accepted with no blockers; runtime and environment inventory remain explicitly UNPROVEN. Full substantive result in impl-eval.md. Proof/evidence-only final slice; no product code changed after reviewed cf1a8f8. Final native review-thread gate PASS, zero threads/unanswered.
 
 Reconcile: fetched origin/main again; it remains 0af8fd9e7904ee2c848d0a4213c7853edec3ad21 and is an ancestor of current source head. PR is mergeable, and source Pages/Utility CI is green. Commit/push this independently signed-off final slice normally, transition ready for review, then require exact-head checks before canonical READY handoff. Cockpit merges. No new accepted architecture debt.
+
+## Coordinator review repair slice
+
+Coordinator Opus review at 49fb038 is CHANGES, source https://github.com/rickylabs/netscript/pull/2560#issuecomment-6556696698. This supersedes prior READY acceptance until repaired. Blocking repairs: remove runtime font-provider injection (keep existing self-hosted docs fonts and declared platform fallback stacks), prove no third-party requests across builder presets and registry previews; bound decoder input before URL/base64/JSON allocation and expose named oversized/malformed/version errors with boundary tests and a removed-guard negative control. Cheap repairs: real generator edit-source override, one MCP retrieval budget constant, explicit remaining independent-picker scope in drift and issue handoff. Add codec domain test to owned scope before editing. Archetype 6 remains; domain uses native parsing/errors and no IO or new package dependency. No public package exports change.
+
+Reconcile before repair: origin/main remains 0af8fd9, ancestor already normally merged. Preserve coordinator-applied runtime labels; do not add/remove labels. Reuse the same independent read-only evaluator for the correction sign-off.
+
+## Coordinator repairs accepted locally
+
+Same separate read-only Opus5.5high reviewer: PASS, both blockers and all three cheap requested items fixed, no new blockers (review-repairs-eval.md). Earlier coordinator CHANGES remains the correction trigger; this acceptance applies to the current repair diff. All15root checks PASS, full158browser PASS/6census skips, all45current codec/generator/locked guidance tests PASS,41existing preset/init tests including new cases PASS, broadquality PASS and docs/release/scoped checks PASS. Actual fresh init raw0 and refreshed token/render assertions PASS; see review-cli-proof.md. Independent picker remaining scope posted on#2420. No product changes after sign-off.
+
+Final repair reconcile: origin/main re-fetched unchanged at0af8fd9 (ancestor of49fb038). Exact Pages tooling tests21PASS; current site links/caveats PASS; public artifact hygiene scan clear; assignment and report excluded. Commit/push the approved repair source plus this run update as one slice. Final CI and coordinator runtime must be green/policy-skipped before the new canonical READY handoff.

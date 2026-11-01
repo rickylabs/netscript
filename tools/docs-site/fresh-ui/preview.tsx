@@ -18,17 +18,12 @@ export async function start(examples: Readonly<Record<string, ComponentType>>): 
     });
   }
   Object.assign(document.documentElement.dataset, {
+    preset: preset.id,
     theme: preset.language,
     flavor: preset.flavor ?? '',
     density: preset.density.toLowerCase(),
     scheme: query.get('scheme') === 'dark' ? 'dark' : 'light',
   });
-  for (const href of preset.fonts) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.append(link);
-  }
   const name = query.get('component') ?? 'workspace';
   const mount = document.querySelector<HTMLElement>('#preview')!;
   mount.replaceChildren();

@@ -3,7 +3,7 @@ import { documentedItems } from './generate.ts';
 import { assertCatalogFresh } from './check.ts';
 import { implementationProps, typeText } from './read-props.ts';
 import { supportedPreset } from './builder.ts';
-import { referencePages } from './render.ts';
+import { builderPage, referencePages } from './render.ts';
 import { encodeUiPreset } from '../../../packages/cli/src/kernel/domain/ui/ui-preset.ts';
 import type { ComponentCatalog, ComponentPage } from './catalog.ts';
 
@@ -28,7 +28,6 @@ const catalog: ComponentCatalog = {
     flavor: 'utility',
     accent: 'Ink',
     density: 'Compact',
-    fonts: [],
     values: {},
   }],
 };
@@ -46,6 +45,14 @@ Deno.test('new registry items generate pages without a maintained page list', ()
       p.content.includes('netscript ui:add new-control')
     ),
   );
+});
+
+Deno.test('generated pages link editing to their real generator source', async () => {
+  for (const page of [builderPage(catalog), ...referencePages(catalog)]) {
+    assertEquals(page.edit_source, '/design-system/components.page.ts');
+    const source = new URL('../../../docs/site' + page.edit_source, import.meta.url);
+    assert((await Deno.stat(source)).isFile);
+  }
 });
 
 Deno.test('freshness rejects a changed source digest and a newly added registry item', () => {

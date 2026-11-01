@@ -37,6 +37,7 @@ export async function inputHash(): Promise<string> {
     'packages/fresh-ui/registry.json',
     'packages/fresh-ui/src/tokens/domain/token-presets.ts',
     'packages/cli/src/kernel/domain/ui/ui-preset.ts',
+    'packages/mcp/src/domain/docs/doc-retrieval-contract.ts',
   ];
   for (const root of [REGISTRY, 'packages/fresh-ui/src/contracts', 'tools/docs-site/fresh-ui']) {
     for await (const file of sourceFiles(join(ROOT, root))) {
@@ -146,7 +147,6 @@ async function prepareSources(items: readonly RegistryItem[]): Promise<string> {
 
 async function presetChoices(): Promise<PresetChoice[]> {
   const manifest = JSON.parse(await Deno.readTextFile(join(ROOT, REGISTRY, 'theme/tokens.json')));
-  const fonts = JSON.parse(await Deno.readTextFile(join(ROOT, REGISTRY, 'theme/fonts.json')));
   return TOKEN_PRESETS.map((preset) => ({
     id: preset.id,
     code: encodeUiPreset({ version: 1, theme: preset.id, style: 'style-utility' }),
@@ -155,7 +155,6 @@ async function presetChoices(): Promise<PresetChoice[]> {
     accent: preset.accentMode,
     density: preset.density,
     sourceDensity: preset.sourceDensity,
-    fonts: fonts.imports[preset.id],
     values: manifest.presets[preset.id].schemes.light,
   }));
 }
