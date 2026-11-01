@@ -1,0 +1,21 @@
+import { Badge, Button, EmptyState, ResponsiveTable, type ResponsiveTableColumn } from '@app/components/ui/mod.ts';
+import { appRoutes } from '@app/router.ts';
+import type { ScaffoldRecord, ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
+
+const columns: readonly ResponsiveTableColumn<ScaffoldRecord>[] = [
+  { key: 'id', label: 'Record', priority: 'primary', cell: (row) => <a class='workspace-record-link' href={appRoutes.record.href({ path: { id: row.id } })}>{row.id}</a> },
+  { key: 'name', label: 'Name', cell: (row) => <div><strong>{row.name}</strong><span class='workspace-record-description'>{row.description}</span></div> },
+  { key: 'status', label: 'Status', cell: (row) => row.status ? <Badge variant='muted'>{row.status}</Badge> : <span aria-label='Not provided'>—</span> },
+  { key: 'created', label: 'Created', align: 'end', cell: (row) => row.createdAt ? new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(row.createdAt)) : '—' },
+];
+
+/** The same table serves dashboard and records; empty/error states retain its column structure. */
+export function RecordTable({ records }: { readonly records: ScaffoldRecords }) {
+  return <ResponsiveTable caption='Records' columns={columns} rows={records.rows} getRowKey={(row) => row.id}
+    emptyState={<EmptyState class='workspace-empty' heading={records.state === 'unavailable' ? 'Records unavailable' : records.state === 'unauthorized' ? 'Sign in to view records' : 'Your records will appear here'}>
+      <p>{records.message}</p>
+      {records.command && <code class='workspace-command'>{records.command}</code>}
+      {records.state === 'unauthorized' && <Button type='link' href={appRoutes.signIn.href()}>Sign in</Button>}
+    </EmptyState>}
+    summary={<span>{records.total === undefined ? 'No connected data' : `${records.total} records`}</span>} />;
+}

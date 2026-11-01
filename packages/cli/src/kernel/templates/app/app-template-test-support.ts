@@ -12,6 +12,7 @@ export const SAMPLE_APP_VARS = {
   name: 'test-project',
   appName: 'dashboard',
   appPort: '8010',
+  hasService: 'true',
   serviceName: 'team-members',
   modelName: 'TeamMember',
   serviceResourceRouteAlias: 'teamMembers: generatedRoutes.examples.teamMembers.$route,\n  ',

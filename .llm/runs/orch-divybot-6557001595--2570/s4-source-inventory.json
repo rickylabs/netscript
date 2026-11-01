@@ -1,0 +1,21 @@
+[
+  "packages/cli/src/kernel/adapters/scaffold/import-resolver.ts",
+  "packages/cli/src/kernel/adapters/service/client-scaffolder.ts",
+  "packages/cli/src/kernel/adapters/service/client-scaffolder_test.ts",
+  "packages/cli/src/kernel/adapters/templates/app/generate-app-deno-json.ts",
+  "packages/cli/src/kernel/adapters/templates/scaffold-template-assets.ts",
+  "packages/cli/src/kernel/application/resource-slice/render-resource-slice.ts",
+  "packages/cli/src/kernel/application/resource-slice/resource-slice-contract.ts",
+  "packages/cli/src/kernel/application/scaffold/writers/workspace-capabilities_test.ts",
+  "packages/cli/src/kernel/application/scaffold/writers/workspace-pages_test.ts",
+  "packages/cli/src/kernel/application/scaffold/writers/write-app-files.ts",
+  "packages/cli/src/kernel/application/scaffold/writers/write-example-service-app-files.ts",
+  "packages/cli/src/kernel/application/scaffold/writers/write-example-service-app-files_test.ts",
+  "packages/cli/src/kernel/assets/manifest.ts",
+  "packages/cli/src/kernel/constants/scaffold/scaffold-packages.ts",
+  "packages/cli/src/maintainer/adapters/local-import-resolver.ts",
+  "packages/cli/src/public/adapters/jsr-import-resolver.ts",
+  "packages/cli/src/public/features/services/add/add-service.ts",
+  "packages/fresh-ui/registry/components/ui/command-palette.tsx",
+  "packages/fresh-ui/tests/registry/components/ui/command-palette.test.tsx"
+]

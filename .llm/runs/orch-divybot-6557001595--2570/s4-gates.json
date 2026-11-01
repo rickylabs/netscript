@@ -1,0 +1,376 @@
+[
+  {
+    "task": "check:desktop-native-fixture",
+    "argv": [
+      "deno",
+      "task",
+      "check:desktop-native-fixture"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 0.17,
+    "log": "s4-check-desktop-native-fixture.log",
+    "durableReceipt": false
+  },
+  {
+    "task": "check:emitted-samples",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "emitted-samples",
+      "--id",
+      "scaffold-2570-s4-check-emitted-samples",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570/check-emitted-samples.json",
+      "--runner",
+      "local-scaffold-2570",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 6.88,
+    "log": "s4-check-emitted-samples.log",
+    "durableReceipt": true
+  },
+  {
+    "task": "check:streams-types",
+    "argv": [
+      "deno",
+      "task",
+      "check:streams-types"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 1.07,
+    "log": "s4-check-streams-types.log",
+    "durableReceipt": false
+  },
+  {
+    "task": "check:child-health-docs",
+    "argv": [
+      "deno",
+      "task",
+      "check:child-health-docs"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 0.37,
+    "log": "s4-check-child-health-docs.log",
+    "durableReceipt": false
+  },
+  {
+    "task": "check:mcp-export-corpus",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "mcp-export-corpus",
+      "--id",
+      "scaffold-2570-s4-check-mcp-export-corpus",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570/check-mcp-export-corpus.json",
+      "--runner",
+      "local-scaffold-2570",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 9.44,
+    "log": "s4-check-mcp-export-corpus.log",
+    "durableReceipt": true
+  },
+  {
+    "task": "check:assets-barrel",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "assets-barrel",
+      "--id",
+      "scaffold-2570-s4-check-assets-barrel",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570/check-assets-barrel.json",
+      "--runner",
+      "local-scaffold-2570",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 3.12,
+    "log": "s4-check-assets-barrel.log",
+    "durableReceipt": true
+  },
+  {
+    "task": "check:agent-docs-prose",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "agent-docs-prose",
+      "--id",
+      "scaffold-2570-s4-check-agent-docs-prose",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570/check-agent-docs-prose.json",
+      "--runner",
+      "local-scaffold-2570",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 13.6,
+    "log": "s4-check-agent-docs-prose.log",
+    "durableReceipt": true
+  },
+  {
+    "task": "check:publish-assets",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "publish-assets",
+      "--id",
+      "scaffold-2570-s4-check-publish-assets",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570/check-publish-assets.json",
+      "--runner",
+      "local-scaffold-2570",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 0.57,
+    "log": "s4-check-publish-assets.log",
+    "durableReceipt": true
+  },
+  {
+    "task": "check:scaffold-versions",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "scaffold-versions",
+      "--id",
+      "scaffold-2570-s4-check-scaffold-versions",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570/check-scaffold-versions.json",
+      "--runner",
+      "local-scaffold-2570",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 0.22,
+    "log": "s4-check-scaffold-versions.log",
+    "durableReceipt": true
+  },
+  {
+    "task": "check:aspire-version-parity",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "aspire-version-parity",
+      "--id",
+      "scaffold-2570-s4-check-aspire-version-parity",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570/check-aspire-version-parity.json",
+      "--runner",
+      "local-scaffold-2570",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 0.42,
+    "log": "s4-check-aspire-version-parity.log",
+    "durableReceipt": true
+  },
+  {
+    "task": "check:netscript-jsr-specifiers",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "netscript-jsr-specifiers",
+      "--id",
+      "scaffold-2570-s4-check-netscript-jsr-specifiers",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570/check-netscript-jsr-specifiers.json",
+      "--runner",
+      "local-scaffold-2570",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 2.07,
+    "log": "s4-check-netscript-jsr-specifiers.log",
+    "durableReceipt": true
+  },
+  {
+    "task": "check:aspire-host-ports",
+    "argv": [
+      "deno",
+      "task",
+      "check:aspire-host-ports"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 0.32,
+    "log": "s4-check-aspire-host-ports.log",
+    "durableReceipt": false
+  },
+  {
+    "task": "check:figma-names",
+    "argv": [
+      "deno",
+      "task",
+      "check:figma-names"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 0.67,
+    "log": "s4-check-figma-names.log",
+    "durableReceipt": false
+  },
+  {
+    "task": "check:review-threads",
+    "argv": [
+      "deno",
+      "task",
+      "check:review-threads",
+      "--",
+      "--repo",
+      "rickylabs/netscript",
+      "--pr",
+      "2572",
+      "--pretty"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 0.52,
+    "log": "s4-check-review-threads.log",
+    "durableReceipt": false
+  },
+  {
+    "task": "check:design-skill",
+    "argv": [
+      "deno",
+      "task",
+      "check:design-skill"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 0.12,
+    "log": "s4-check-design-skill.log",
+    "durableReceipt": false
+  },
+  {
+    "task": "release:preflight",
+    "argv": [
+      "deno",
+      "task",
+      "release:preflight"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 1.62,
+    "log": "s4-release-preflight.log",
+    "durableReceipt": false
+  },
+  {
+    "task": "docs:accuracy",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "docs-accuracy",
+      "--id",
+      "scaffold-2570-s4-docs-accuracy",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570/docs-accuracy.json",
+      "--runner",
+      "local-scaffold-2570",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 5.84,
+    "log": "s4-docs-accuracy.log",
+    "durableReceipt": true
+  },
+  {
+    "task": "quality:gate",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "quality-gate",
+      "--id",
+      "scaffold-2570-s4-quality-gate",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570/quality-gate.json",
+      "--runner",
+      "local-scaffold-2570",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 13.04,
+    "log": "s4-quality-gate.log",
+    "durableReceipt": true
+  },
+  {
+    "task": "publish:dry-run",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "publish-dry-run",
+      "--id",
+      "scaffold-2570-s4-publish-dry-run",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570/publish-dry-run.json",
+      "--runner",
+      "local-scaffold-2570",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+    "exitCode": 0,
+    "durationSeconds": 39.96,
+    "log": "s4-publish-dry-run.log",
+    "durableReceipt": true
+  }
+]

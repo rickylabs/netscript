@@ -1,0 +1,36 @@
+{
+  "gateId": "mcp-export-corpus",
+  "invocationId": "scaffold-2570-s6-check-mcp-export-corpus",
+  "argv": [
+    "deno",
+    "task",
+    "check:mcp-export-corpus"
+  ],
+  "cwd": ".",
+  "gitHead": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+  "actualGitHead": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "local-scaffold-2570-s6",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "6c0c371afb064984ef84a01d51fb1139f5bab9b9e13181b60fd29657d82944a6",
+  "lifecycleId": "local-scaffold-2570-s6:scaffold-2570-s6-check-mcp-export-corpus:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-11-01T14:03:03.067Z",
+  "startedAt": "2026-11-01T14:03:03.070Z",
+  "finishedAt": "2026-11-01T14:03:14.351Z",
+  "durationMs": 11281,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 232,
+    "sha256": "85af3ab887c8fa7ee0bfcccc79ed668b6efbb2783141797bb3b6d0f7aea13cb3",
+    "tail": "{\"schemaVersion\":1,\"frameworkVersion\":\"0.0.8\",\"sha256\":\"4b9d0121927b9a587fe4c75fb555f68dcc1f33b5dd8c1072a39081bc9a193ed8\",\"uncompressedBytes\":2649134,\"compressedBytes\":405516,\"packageCount\":35,\"subpathCount\":307,\"symbolCount\":9110}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 148,
+    "sha256": "bb580eff463cfaf5dab19bd77fe1a02b60387837eefea2b91f07a60a6cb25650",
+    "tail": "Task check:mcp-export-corpus deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/generate-export-surface-corpus.ts --check\n",
+    "truncated": false
+  }
+}

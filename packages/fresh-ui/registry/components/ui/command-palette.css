@@ -1,7 +1,7 @@
 .ns-cmdk__backdrop {
   width: min(40rem, calc(100vw - var(--ns-space-8)));
   max-width: 100%;
-  margin: 0 auto;
+  margin: min(6rem, 10vh) auto 0;
   padding: 0;
   border: none;
   background: transparent;
@@ -77,6 +77,43 @@
 
 .ns-cmdk__input:focus {
   outline: none;
+}
+
+.ns-cmdk__close {
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  min-height: 28px;
+  padding: 2px 6px;
+  border: 1px solid var(--ns-border);
+  background: var(--ns-bg);
+  color: var(--ns-muted-fg);
+  font: 11px var(--ns-font-mono);
+  cursor: pointer;
+}
+.ns-cmdk__close-label { display: none; }
+.ns-cmdk__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--ns-border);
+  background: var(--ns-muted);
+  color: var(--ns-muted-fg);
+  font-size: 11px;
+}
+.ns-cmdk__footer kbd {
+  padding: 2px 4px;
+  border: 1px solid var(--ns-border);
+  background: var(--ns-bg);
+  font: inherit;
+}
+.ns-cmdk__item { border-inline-start: 2px solid transparent; }
+.ns-cmdk__item[data-highlighted='true'] { border-inline-start-color: var(--ns-fg); }
+@media (max-width: 640px) {
+  .ns-cmdk__close { min-width: 44px; min-height: 36px; }
+  .ns-cmdk__close-key { display: none; }
+  .ns-cmdk__close-label { display: inline; }
 }
 
 .ns-cmdk__list {

@@ -1,0 +1,76 @@
+import { createHash } from 'node:crypto';
+import { chromium } from '../../../tools/fresh-ui-browser/node_modules/playwright-core/index.mjs';
+import assert from 'node:assert/strict';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+const run='.llm/runs/orch-divybot-6557001595--2570';
+const css=await readFile('packages/cli/src/kernel/assets/app/assets/workspace.css.template');
+const cssEmission=JSON.parse(await readFile(`${run}/s3-css-emission.json`,'utf8'));
+const cssEvidence={sourceSha256:createHash('sha256').update(css).digest('hex'),sourceBytes:css.length,canonicalSha256:cssEmission.canonicalSha256,canonicalBytes:cssEmission.canonicalBytes};
+const paletteCssEvidence=JSON.parse(await readFile(`${run}/s3-palette-css-emission.json`,'utf8'));
+const shots=`${run}/screens`;await mkdir(shots,{recursive:true});
+const browser=await chromium.launch({headless:true});
+const cases=[],interactions=[],errors=[];
+const variants=JSON.parse(process.argv[2]);
+for(const [variant,base] of Object.entries(variants)) {
+ for(const width of [1440,390]) for(const scheme of ['light','dark']) {
+  const page=await browser.newPage({viewport:{width,height:900},colorScheme:scheme});
+  page.on('pageerror',error=>errors.push({variant,width,scheme,message:error.message}));
+  await page.addInitScript(s=>localStorage.setItem('ns-theme',s),scheme);
+  for(const [name,route] of [['dashboard','/'],['dashboard-alias','/dashboard'],['records','/records'],['detail','/records/1'],['settings','/settings'],['sign-in','/sign-in']]) {
+   const response=await page.goto(new URL(route,base).href,{waitUntil:'networkidle'});
+   assert.equal(response.status(),200,`${variant} ${route}`);
+   assert.equal(await page.locator('h1').count(),1,`${variant} ${route} heading`);
+   if(route!=='/sign-in') assert.equal(await page.locator('.ns-dashboard').first().evaluate(el=>getComputedStyle(el).display),'grid','shared layout styles loaded');
+   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`${variant} ${route} overflow ${width}`);
+   assert.equal(await page.locator('html').getAttribute('data-scheme'),scheme);
+   assert.equal(await page.locator('html').getAttribute('data-theme'),'studio');
+   assert.equal(await page.locator('html').getAttribute('data-flavor'),'utility');
+   const file=`${shots}/${variant}-${name}-${width}-${scheme}.png`;
+   await page.screenshot({path:file,fullPage:true,animations:'disabled'});
+   const item={variant,route,width,scheme,status:response.status(),screenshot:file};
+   if(route==='/') item.renderedText=await page.locator('body').innerText();
+   if(variant==='service'&&route==='/records') assert((await page.locator('body').innerText()).includes('Launch checklist'));
+   if(variant==='plugins'&&route==='/sign-in') assert.equal(await page.locator('form[action="/auth/signin"]').count(),1);
+   cases.push(item);
+   console.log(JSON.stringify({variant,route,width,scheme}));
+  }
+  await page.goto(new URL('/settings',base).href,{waitUntil:'networkidle'});
+  await page.locator('select#appearance').selectOption(scheme==='dark'?'light':'dark');
+  await page.getByRole('button',{name:'Discard',exact:true}).click();
+  assert.equal(await page.locator('select#appearance').inputValue(),scheme);
+  await page.locator('select#appearance').selectOption(scheme);
+  await page.getByRole('button',{name:'Save changes',exact:true}).click();
+  await page.getByText('Appearance saved for this browser.').waitFor();
+  await page.screenshot({path:`${shots}/${variant}-settings-saved-${width}-${scheme}.png`,fullPage:true,animations:'disabled'});
+  await page.reload({waitUntil:'networkidle'});
+  assert.equal(await page.locator('select#appearance').inputValue(),scheme);
+  await page.goto(new URL('/',base).href,{waitUntil:'networkidle'});
+  await page.keyboard.press('Control+k');await page.getByRole('dialog').waitFor();
+  await page.getByRole('dialog').getByRole('combobox').focus();
+  await page.keyboard.press('ArrowDown');
+  await page.locator('[data-scope="command-palette"][data-part="item"][data-highlighted="true"]').waitFor();
+  await page.screenshot({path:`${shots}/${variant}-command-${width}-${scheme}.png`,fullPage:false,animations:'disabled'});
+  await page.getByRole('dialog').getByRole('combobox').fill('no-such-command-2570');
+  await page.getByText('No matching commands',{exact:true}).waitFor();
+  assert.equal(await page.getByRole('option').count(),0);
+  await page.getByRole('dialog').getByRole('combobox').fill('Records');
+  await page.getByRole('option').filter({hasText:'Records'}).waitFor();await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
+  await page.waitForURL('**/records');
+  await page.waitForLoadState('networkidle');
+  await page.keyboard.press('Control+k');await page.getByRole('dialog').waitFor();
+  await page.getByRole('dialog').getByRole('combobox').fill('Settings');
+  await page.getByRole('option').filter({hasText:'Settings'}).click();
+  await page.waitForURL('**/settings');await page.waitForLoadState('networkidle');
+  await page.keyboard.press('Control+k');await page.getByRole('dialog').waitFor();await page.keyboard.press('Escape');
+  await page.getByRole('dialog').waitFor({state:'hidden'});
+  assert(await page.getByRole('button',{name:'Search pages',exact:true}).evaluate(el=>el===document.activeElement));
+  await page.keyboard.press('Control+k');await page.getByRole('dialog').waitFor();
+  await page.getByRole('button',{name:'Close command palette',exact:true}).click();
+  await page.getByRole('dialog').waitFor({state:'hidden'});
+  interactions.push({variant,width,scheme,saveReloadDiscard:true,keyboardSelect:true,pointerSelect:true,escapeFocusReturn:true,visibleClose:true});
+  await page.close();
+ }
+}
+await browser.close();assert.deepEqual(errors,[]);
+await writeFile(`${run}/s3-browser.json`,JSON.stringify({outcome:'PASS',cases,interactions,errors,cssEvidence,paletteCssEvidence},null,2));
+console.log(JSON.stringify({outcome:'PASS',cases:cases.length,interactions:interactions.length}));

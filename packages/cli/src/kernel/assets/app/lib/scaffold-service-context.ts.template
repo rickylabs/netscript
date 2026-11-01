@@ -1,0 +1,27 @@
+// Server-only optional BFF discovery: no missing import in a no-auth workspace.
+import { createServiceClient, type ContractLike, type ServiceClient, type ServiceClientContext } from '@netscript/sdk/client';
+
+type BrowserAuth = {
+  createBrowserSessionClient: <T extends ContractLike>(contract: T, name: string, routerName: string) => ServiceClient<T, ServiceClientContext & { accessToken?: string }>;
+  browserSessionContext(request: Request): { accessToken?: string; signal: AbortSignal };
+};
+const authModules = import.meta.glob<BrowserAuth>('../../../auth/bff.ts');
+
+/** Choose the existing credential-aware BFF client when installed, per request. */
+export async function scaffoldServiceClient<T extends ContractLike>(contract: T, name: string, routerName: string, request?: Request) {
+  const loadAuth = Object.values(authModules)[0];
+  const signal = request ? AbortSignal.any([request.signal, AbortSignal.timeout(3000)]) : AbortSignal.timeout(3000);
+  if (loadAuth && request) {
+    const auth = await loadAuth();
+    return { client: auth.createBrowserSessionClient(contract, name, routerName), context: { ...auth.browserSessionContext(request), signal } };
+  }
+  return { client: createServiceClient({ contract, serviceName: name, routerName }), context: { signal } };
+}
+
+/** Only stable error categories cross the server/view boundary. */
+export function scaffoldReadFailure(error: unknown) {
+  const status = error && typeof error === 'object' && 'status' in error ? error.status : undefined;
+  const state = status === 401 || status === 403 ? 'unauthorized' as const : 'unavailable' as const;
+  console.error('Workspace service read failed', error);
+  return { state, rows: [], message: state === 'unauthorized' ? 'Sign in to access these records.' : 'The service is unavailable. Check that it is running and try again.' };
+}

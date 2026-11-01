@@ -1,0 +1,24 @@
+{
+  "outcome": "PASS",
+  "command": "gen:assets-barrel then decoded carrier comparison",
+  "results": [
+    {
+      "source": "packages/fresh-ui/registry/components/ui/command-palette.tsx",
+      "bytes": 8532,
+      "sha256": "2b7cc19e40402851d710685ba2de0deb3ea2c46078344fba6a7f7398874a566b",
+      "match": true
+    },
+    {
+      "source": "packages/fresh-ui/registry/components/ui/command-palette.css",
+      "bytes": 6940,
+      "sha256": "d45b56f36088bbfb13fc7bb3ac3c2600c3aff71a78eb329d0b2275ec39ad68e0",
+      "match": true
+    },
+    {
+      "source": "packages/cli/src/kernel/assets/app/assets/workspace.css.template",
+      "bytes": 6230,
+      "sha256": "95f9aa0496d5b9260cff68793b032695c91c7e346dd39e16f740e3f2479aa5b7",
+      "match": true
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "gateId": "scaffold-versions",
+  "invocationId": "scaffold-2570-s6-check-scaffold-versions",
+  "argv": [
+    "deno",
+    "task",
+    "check:scaffold-versions"
+  ],
+  "cwd": ".",
+  "gitHead": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+  "actualGitHead": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "local-scaffold-2570-s6",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "73301f46e990f39cd0a1ef1d02dabb6df5c0f704e9f5287ab78bf593f0170916",
+  "lifecycleId": "local-scaffold-2570-s6:scaffold-2570-s6-check-scaffold-versions:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-11-01T14:03:35.739Z",
+  "startedAt": "2026-11-01T14:03:35.741Z",
+  "finishedAt": "2026-11-01T14:03:35.879Z",
+  "durationMs": 138,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 66,
+    "sha256": "57d70ebe8f93a6717289223723c905decbbd964e87e37f5201e7dad01d3df6ca",
+    "tail": "E-12 OK — 12 scaffold pin(s) are stable (no prerelease suffix).\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 96,
+    "sha256": "f855f476910400ef885eee1df95989c57b78744da5cdbf7fd959db288decc517",
+    "tail": "Task check:scaffold-versions deno run .llm/tools/validation/check-scaffold-versions.ts --pretty\n",
+    "truncated": false
+  }
+}

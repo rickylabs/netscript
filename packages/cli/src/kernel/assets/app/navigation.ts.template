@@ -1,4 +1,4 @@
-import { appRoutes } from '@app/router.ts';
+import { appRoutes, routePatterns } from '@app/router.ts';
 
 /** How a top-bar link decides that it marks the current page. */
 export type NavigationMatch = 'exact' | 'prefix';
@@ -20,8 +20,10 @@ export interface NavigationItem {
  * link it. `netscript ui:add page <path>` appends top-level pages for you.
  */
 export const appNavigation: readonly NavigationItem[] = [
-  { href: appRoutes.home.href(), label: 'Home', match: 'exact' },
-  { href: appRoutes.dashboard.href(), label: 'Dashboard', match: 'exact' },
+  { href: appRoutes.dashboard.href(), label: 'Overview', match: 'exact' },
+  { href: appRoutes.records.href(), label: 'Records', match: 'prefix' },
+  { href: appRoutes.settings.href(), label: 'Settings', match: 'exact' },
+  { href: appRoutes.signIn.href(), label: 'Sign in', match: 'exact' },
   { href: appRoutes.examples.href(), label: 'Examples', match: 'prefix' },
   { href: appRoutes.health.href(), label: 'Health', match: 'exact' },
   { href: appRoutes.design.href(), label: 'Design', match: 'prefix', developmentOnly: true },
@@ -31,7 +33,10 @@ export const appNavigation: readonly NavigationItem[] = [
  * Route prefixes whose pages render their own chrome instead of the app top bar. `/design` ships
  * its own sidebar shell; add a prefix for a full-screen page such as a sign-in screen.
  */
-export const chromelessRoutePrefixes: readonly string[] = [appRoutes.design.href()];
+export const chromelessRoutePrefixes: readonly string[] = [
+  appRoutes.design.href(),
+  appRoutes.signIn.href(),
+];
 
 function isUnderPrefix(pathname: string, prefix: string): boolean {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
@@ -45,4 +50,24 @@ export function isCurrentNavigation(item: NavigationItem, pathname: string): boo
 /** Whether the page at `pathname` renders inside the app top bar. */
 export function rendersAppChrome(pathname: string): boolean {
   return !chromelessRoutePrefixes.some((prefix) => isUnderPrefix(pathname, prefix));
+}
+
+/** Navigation and command results exclude references unavailable in production. */
+export function visibleNavigation(): readonly NavigationItem[] {
+  return appNavigation.filter((item) =>
+    !item.developmentOnly || import.meta.env.MODE === 'development'
+  );
+}
+
+/** Count actual page patterns, including nested pages, with the same development filter as navigation. */
+export function generatedPageCount(): number {
+  const walk = (node: object): number =>
+    Object.entries(node).reduce((count, [key, value]) => {
+      if (key === '$route' && typeof value === 'string') {
+        return count +
+          (value.startsWith('/design') && import.meta.env.MODE !== 'development' ? 0 : 1);
+      }
+      return count + (value && typeof value === 'object' ? walk(value) : 0);
+    }, 0);
+  return walk(routePatterns);
 }

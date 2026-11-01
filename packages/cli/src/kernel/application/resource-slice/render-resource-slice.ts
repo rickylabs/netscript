@@ -95,6 +95,9 @@ async function renderOwnedLeaf(
     resource: plan.input.resource,
     role: leaf.role,
     options,
+    ...(leaf.role === 'loaders' && plan.input.procedure.initialInput !== undefined
+      ? { queryInput: plan.input.procedure.initialInput }
+      : {}),
   }, body);
 }
 
@@ -128,6 +131,13 @@ function renderVariables(
     clientModuleSpecifier: input.client.moduleSpecifier,
     queryFactoryName: input.client.queryFactoryName,
     queryFactory: plan.query.factory,
+    procedureInput: JSON.stringify(
+      Object.fromEntries(
+        Object.entries(input.procedure.initialInput ?? {}).sort(([left], [right]) =>
+          left < right ? -1 : left > right ? 1 : 0
+        ),
+      ),
+    ),
     partialName,
     partialRoute,
     pageOptionImports: pageOptionImports(input.resource, input.resourcePascalCase, options),
