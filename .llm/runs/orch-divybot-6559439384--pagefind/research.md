@@ -13,3 +13,7 @@ The release is within Deno's dependency age window. Qualification uses an explic
 Surface: docs build integration/tooling/workflow, no packages/plugins or public package APIs. Doctrine archetype and JSR audit: N/A. Docs scope overlay applies. No changes to S8 layouts/token authorities/registry or #2574/#2573.
 
 Native release probe (three fresh processes, three small HTML pages with three lane values): first/second ingestion produced identical hashes for all 18 output files. Reversing ingestion changed filter/index/meta/entry bytes, independently confirming #1395 still applies in 1.6.0 and justifying stable URL ordering before indexing.
+
+Lume `core/processors.ts` creates `filtered = pages.filter(...)` separately for every processor. Sorting only a processor's filtered argument would be ineffective. Sort the underlying second `allPages` argument immediately before the native Pagefind processor; the next filtered list inherits canonical URL order.
+
+Deno 2.9.7 import-map qualification: a separate process importing `npm:pagefind@1.3.0`, remapped to `npm:pagefind@1.6.0`, emits entry JSON with version 1.6.0. This verifies remapping of the exact transitive specifier rather than assuming bare-import alias behavior.

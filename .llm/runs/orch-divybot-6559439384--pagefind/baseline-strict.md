@@ -11,3 +11,5 @@ Non-reproducible site: pagefind/filter/en_a165e82.pf_filter, pagefind/filter/en_
 ```
 
 Both native builds completed; final fresh-ui output checks passed (52 components, 24 presets). No permissive mode was used and this failed evidence must remain after correction.
+
+Before any implementation edit, retained the full baseline output hash manifest: 1113 files (316 HTML, 262 Markdown twins, 308 search outputs). Manifest SHA-256 `1b9c73c117d3ab5ec6d053ec12f99d9526f078e5fa8f89ee0b317ce058c04f6f`. Use it to compare every non-search output after the integration change.
