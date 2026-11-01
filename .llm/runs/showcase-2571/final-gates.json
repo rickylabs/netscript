@@ -66,5 +66,11 @@
   {
     "task": "check:design-skill",
     "exitCode": 0
+  },
+  {
+    "task": "check:assets-barrel",
+    "exitCode": 0,
+    "gitHead": "4d5a35a",
+    "note": "Executed after the S2 generated carrier commit."
   }
 ]

@@ -57,3 +57,5 @@ gates PASS except assets-barrel awaiting committed carrier. Owned AppHost stoppe
 confirmed absent in aspire ps; other resources untouched. Public runtime provenance
 and source hashes added. Commit/push and mark ready after assets verification;
 remote CI remains the merge gate, not a reason to idle the pipeline.
+
+S2 sign-off commit4d5a35a. check:assets-barrel PASS on the committed carrier; all15 check:* tasks PASS, plus quality:gate/docs:accuracy/release:preflight. This follow-up commit is evidence only. Ready for review; required remote CI starts on ready transition and is not claimed green. Fullruntime remainsUNPROVEN.

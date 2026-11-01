@@ -18,3 +18,5 @@ PASS. Full scaffold.runtime UNPROVEN due absentDocker, Postgres runtime UNPROVEN
 The owned Northwind AppHost was stopped successfully; aspire ps confirms absent.
 Next: sign-off S2 commit, run assets-barrel on committed carrier, push/readiness and
 tracker acceptance updates. Do not close2571; remainingfullshowcase stays there.
+
+S2 signed off4d5a35a; assets-barrel PASS. Evidence-only final commit follows. Local scope complete and independently reviewed; mark PR2577 ready, close only2580 on merge, preserve2571/2581. RemoteCI pending ready transition; do not idle/poll.
