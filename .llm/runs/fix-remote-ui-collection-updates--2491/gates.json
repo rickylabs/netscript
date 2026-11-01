@@ -1,0 +1,53 @@
+{
+  "deno": "2.9.7",
+  "quality": {
+    "outcome": "PASS",
+    "exitCode": 0,
+    "durationMs": 35504,
+    "requestHash": "4369e1dca763561aee25fd6fc993e204fb00268c0abefdef60042416923ea162"
+  },
+  "publish": {
+    "outcome": "PASS",
+    "command": "deno task --cwd packages/cli publish:dry-run"
+  },
+  "runtime": {
+    "outcome": "UNPROVEN",
+    "exitCode": 1,
+    "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+    "reason": "Docker unavailable at Aspire doctor; container cleanup UNPROVEN"
+  },
+  "ui-suite": {
+    "outcome": "PASS",
+    "exitCode": 0,
+    "passed": 50,
+    "failed": 0,
+    "ignored": 0,
+    "report": "ui-tests.json"
+  },
+  "carrier-checks": {
+    "outcome": "PASS",
+    "count": 15,
+    "report": "check-tasks.json",
+    "generatedSourceDiff": false
+  },
+  "implementation-evaluation": {
+    "outcome": "PASS",
+    "rounds": 2,
+    "report": "evaluate.md",
+    "independentVendor": "Anthropic",
+    "requestedModel": "claude-opus-5-5",
+    "observedModel": "claude-opus-5-5",
+    "requestedEffort": "high",
+    "independentTests": 19
+  },
+  "resource-hygiene": {
+    "outcome": "UNPROVEN",
+    "unprovenOwnershipEntries": 25,
+    "mutations": 0
+  },
+  "tracked-manifest": {
+    "outcome": "PASS",
+    "exitCode": 0,
+    "note": "Actual Aspire version parity passed after staging new source files"
+  }
+}
