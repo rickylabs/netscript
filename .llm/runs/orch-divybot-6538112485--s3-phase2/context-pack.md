@@ -1,3 +1,24 @@
+## Merge10 SOURCE review PASS
+
+Same independent SOURCE round1 PASS with0blockers. Commit the reviewed plain
+merge source now, then run actual-head4carriers/quality/nativepublication and
+SAME evidence review. Existing625/318/12/140/67proofs are frozen-source executions;
+publication at the merge commit is still pending. No READY; full child11b3b/12/13
+remains required. Plain pushes only, preserve remote ancestry.
+
+---
+
+## Merge10 current source gates terminal
+
+625package/318fullChromium/12focusedFirefox-WebKit/140docs/67CLI PASS. Zero
+browser retries/flaky/skipped results.625frozenfiles/3locks unchanged. See
+merge10-parent-source-summary.md and merge10-parent-validation.json. SAME
+source review next, then merge commit and committed-source carriers/quality/
+publication/evidence review before privacy/ancestry-checked plain push. No
+source-head publication or whole-goal READY is yet claimed.
+
+---
+
 ## Current resume — owner budget decision clears scope stop
 
 Cockpit explicitly authorizes consolidation first, then a measured raw/gzip

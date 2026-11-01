@@ -1,0 +1,63 @@
+{
+  "slice": 1,
+  "browser": {
+    "passed": 52,
+    "failed": 0,
+    "skipped": 0,
+    "axeReports": 24,
+    "seriousCritical": 0,
+    "chipGapsPx": [
+      8,
+      8,
+      8
+    ]
+  },
+  "reproducibility": {
+    "outcome": "PASS",
+    "scope": "all-output-with-reported-pagefind-metadata",
+    "files": 806,
+    "html": 251,
+    "search": 250,
+    "twins": 202,
+    "nonBlockingDifferences": [
+      "pagefind/filter/en_32355cb.pf_filter",
+      "pagefind/filter/en_957e155.pf_filter",
+      "pagefind/pagefind-entry.json",
+      "pagefind/pagefind.en_66b115b74e.pf_meta",
+      "pagefind/pagefind.en_d1a781a1a3.pf_meta"
+    ],
+    "changedNonHtml": [
+      "pagefind/filter/en_32355cb.pf_filter",
+      "pagefind/filter/en_957e155.pf_filter",
+      "pagefind/pagefind-entry.json",
+      "pagefind/pagefind.en_66b115b74e.pf_meta",
+      "pagefind/pagefind.en_d1a781a1a3.pf_meta"
+    ]
+  },
+  "sourceWrappers": {
+    "toolingFiles": 8,
+    "siteFiles": 2,
+    "browserFiles": 2,
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "format": "PASS"
+  },
+  "focusedTests": {
+    "passed": 6,
+    "failed": 0
+  },
+  "links": {
+    "pages": 251,
+    "resolved": 23970
+  },
+  "negativeControl": {
+    "rawCustom": "expected exit 1; actual normal policy rejects the injected custom paint"
+  },
+  "independentSourceReview": "PASS after recorded FAIL_FIX and reverted Pagefind trial",
+  "lockDelta": {
+    "addedSpecifier": "npm:lightningcss-wasm@1.29.2",
+    "addedPackage": "lightningcss-wasm@1.29.2",
+    "addedPinnedLumeModuleHashes": 3,
+    "existingEntriesChanged": 0
+  }
+}

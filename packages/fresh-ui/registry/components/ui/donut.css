@@ -91,105 +91,107 @@
   }
 }
 
-/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='center'] {
-  font-family: var(--ns-font-kpi);
-  font-size: var(--ns-text-lg);
-  font-weight: var(--ns-weight-kpi-sm);
-  line-height: var(--ns-leading-normal);
-  letter-spacing: var(--ns-tracking-kpi-sm);
-}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) {
+  /* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+  & [data-scope='donut'][data-part='center'] {
+    font-family: var(--ns-font-kpi);
+    font-size: var(--ns-text-lg);
+    font-weight: var(--ns-weight-kpi-sm);
+    line-height: var(--ns-leading-normal);
+    letter-spacing: var(--ns-tracking-kpi-sm);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='row'] {
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-small);
-  font-weight: var(--ns-weight-small);
-  line-height: var(--ns-leading-small);
-  letter-spacing: var(--ns-tracking-small);
-}
+  & [data-scope='donut'][data-part='row'] {
+    font-family: var(--ns-font-sans);
+    font-size: var(--ns-text-small);
+    font-weight: var(--ns-weight-small);
+    line-height: var(--ns-leading-small);
+    letter-spacing: var(--ns-tracking-small);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='swatch'] {
-  width: var(--ns-space-2);
-  height: var(--ns-space-2);
-  border-radius: var(--ns-radius-control);
-}
+  & [data-scope='donut'][data-part='swatch'] {
+    width: var(--ns-space-2);
+    height: var(--ns-space-2);
+    border-radius: var(--ns-radius-control);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='ring'] {
-  stroke: var(--ns-chart-1);
-}
+  & [data-scope='donut'][data-part='ring'] {
+    stroke: var(--ns-chart-1);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='ring'][data-tone='success'] {
-  stroke: var(--ns-success);
-}
+  & [data-scope='donut'][data-part='ring'][data-tone='success'] {
+    stroke: var(--ns-success);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='ring'][data-tone='warning'] {
-  stroke: var(--ns-warning);
-}
+  & [data-scope='donut'][data-part='ring'][data-tone='warning'] {
+    stroke: var(--ns-warning);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='ring'][data-tone='destructive'] {
-  stroke: var(--ns-destructive);
-}
+  & [data-scope='donut'][data-part='ring'][data-tone='destructive'] {
+    stroke: var(--ns-destructive);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='ring'][data-tone='secondary'] {
-  stroke: var(--ns-secondary-text);
-}
+  & [data-scope='donut'][data-part='ring'][data-tone='secondary'] {
+    stroke: var(--ns-secondary-text);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='ring'][data-series='1'] {
-  stroke: var(--ns-chart-1);
-}
+  & [data-scope='donut'][data-part='ring'][data-series='1'] {
+    stroke: var(--ns-chart-1);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='ring'][data-series='2'] {
-  stroke: var(--ns-chart-2);
-}
+  & [data-scope='donut'][data-part='ring'][data-series='2'] {
+    stroke: var(--ns-chart-2);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='ring'][data-series='3'] {
-  stroke: var(--ns-chart-3);
-}
+  & [data-scope='donut'][data-part='ring'][data-series='3'] {
+    stroke: var(--ns-chart-3);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='ring'][data-series='4'] {
-  stroke: var(--ns-chart-4);
-}
+  & [data-scope='donut'][data-part='ring'][data-series='4'] {
+    stroke: var(--ns-chart-4);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='ring'][data-series='5'] {
-  stroke: var(--ns-chart-5);
-}
+  & [data-scope='donut'][data-part='ring'][data-series='5'] {
+    stroke: var(--ns-chart-5);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='swatch'] {
-  background: var(--ns-chart-1);
-}
+  & [data-scope='donut'][data-part='swatch'] {
+    background: var(--ns-chart-1);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='swatch'][data-tone='success'] {
-  background: var(--ns-success);
-}
+  & [data-scope='donut'][data-part='swatch'][data-tone='success'] {
+    background: var(--ns-success);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='swatch'][data-tone='warning'] {
-  background: var(--ns-warning);
-}
+  & [data-scope='donut'][data-part='swatch'][data-tone='warning'] {
+    background: var(--ns-warning);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='swatch'][data-tone='destructive'] {
-  background: var(--ns-destructive);
-}
+  & [data-scope='donut'][data-part='swatch'][data-tone='destructive'] {
+    background: var(--ns-destructive);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='swatch'][data-tone='secondary'] {
-  background: var(--ns-secondary-text);
-}
+  & [data-scope='donut'][data-part='swatch'][data-tone='secondary'] {
+    background: var(--ns-secondary-text);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='swatch'][data-series='1'] {
-  background: var(--ns-chart-1);
-}
+  & [data-scope='donut'][data-part='swatch'][data-series='1'] {
+    background: var(--ns-chart-1);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='swatch'][data-series='2'] {
-  background: var(--ns-chart-2);
-}
+  & [data-scope='donut'][data-part='swatch'][data-series='2'] {
+    background: var(--ns-chart-2);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='swatch'][data-series='3'] {
-  background: var(--ns-chart-3);
-}
+  & [data-scope='donut'][data-part='swatch'][data-series='3'] {
+    background: var(--ns-chart-3);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='swatch'][data-series='4'] {
-  background: var(--ns-chart-4);
-}
+  & [data-scope='donut'][data-part='swatch'][data-series='4'] {
+    background: var(--ns-chart-4);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='donut'][data-part='swatch'][data-series='5'] {
-  background: var(--ns-chart-5);
+  & [data-scope='donut'][data-part='swatch'][data-series='5'] {
+    background: var(--ns-chart-5);
+  }
 }

@@ -43,56 +43,58 @@
   border-color: var(--ns-destructive);
 }
 
-/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='switch'][data-part='track'] {
-  width: var(--ns-size-switch-width);
-  height: var(--ns-size-switch-height);
-  padding-inline: 0;
-  border-radius: var(--ns-radius-full);
-  border-width: var(--ns-border-width);
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='switch'][data-part='thumb'] {
-  width: var(--ns-size-switch-thumb);
-  height: var(--ns-size-switch-thumb);
-  background: var(--ns-card);
-  box-shadow: none;
-  margin-inline-start: calc((var(--ns-size-switch-height) - var(--ns-size-switch-thumb)) / 2 -
-    var(--ns-border-width));
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) input[data-scope='switch']:checked + [data-part='track'] [data-part='thumb'] {
-  transform: translateX(calc(var(--ns-size-switch-width) - var(--ns-size-switch-height)));
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) input[data-scope='switch']:checked + [data-part='track']:dir(rtl) [data-part='thumb'] {
-  transform: translateX(calc(var(--ns-size-switch-height) - var(--ns-size-switch-width)));
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='switch'] {
-    transition: none;
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) {
+  /* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+  & [data-scope='switch'][data-part='track'] {
+    width: var(--ns-size-switch-width);
+    height: var(--ns-size-switch-height);
+    padding-inline: 0;
+    border-radius: var(--ns-radius-full);
+    border-width: var(--ns-border-width);
   }
-}
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='switch'][data-part='root']:where(:hover):not([data-disabled='true']) [data-part='track'] {
-  border-color: var(--ns-border-control);
-}
+  & [data-scope='switch'][data-part='thumb'] {
+    width: var(--ns-size-switch-thumb);
+    height: var(--ns-size-switch-thumb);
+    background: var(--ns-card);
+    box-shadow: none;
+    margin-inline-start: calc((var(--ns-size-switch-height) - var(--ns-size-switch-thumb)) / 2 -
+      var(--ns-border-width));
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='switch'][data-part='root'][data-invalid='true'] [data-part='track'] {
-  border-color: var(--ns-destructive);
-}
+  & input[data-scope='switch']:checked + [data-part='track'] [data-part='thumb'] {
+    transform: translateX(calc(var(--ns-size-switch-width) - var(--ns-size-switch-height)));
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) input[data-scope='switch']:checked + [data-part='track'] [data-part='thumb'] {
-  background: var(--ns-switch-thumb);
-}
+  & input[data-scope='switch']:checked + [data-part='track']:dir(rtl) [data-part='thumb'] {
+    transform: translateX(calc(var(--ns-size-switch-height) - var(--ns-size-switch-width)));
+  }
 
-/* The locked off state is a visible control-grey track in both schemes. */
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='switch'][data-part='track'] {
-  background: var(--ns-input-border);
-}
+  @media (prefers-reduced-motion: reduce) {
+    & [data-scope='switch'] {
+      transition: none;
+    }
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) input[data-scope='switch']:checked + [data-part='track'] {
-  background: var(--ns-primary);
-  border-color: var(--ns-primary);
+  & [data-scope='switch'][data-part='root']:where(:hover):not([data-disabled='true']) [data-part='track'] {
+    border-color: var(--ns-border-control);
+  }
+
+  & [data-scope='switch'][data-part='root'][data-invalid='true'] [data-part='track'] {
+    border-color: var(--ns-destructive);
+  }
+
+  & input[data-scope='switch']:checked + [data-part='track'] [data-part='thumb'] {
+    background: var(--ns-switch-thumb);
+  }
+
+  /* The locked off state is a visible control-grey track in both schemes. */
+  & [data-scope='switch'][data-part='track'] {
+    background: var(--ns-input-border);
+  }
+
+  & input[data-scope='switch']:checked + [data-part='track'] {
+    background: var(--ns-primary);
+    border-color: var(--ns-primary);
+  }
 }

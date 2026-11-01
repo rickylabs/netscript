@@ -1,0 +1,88 @@
+{
+  "sourceHead": "1729a8de054c2f0a1209baa3c4fdcc5f707ef35f",
+  "nativeFreshness": {
+    "prose": 0,
+    "corpus": 0,
+    "assetsBarrel": 0,
+    "publishAssets": 0,
+    "qualityGate": 0
+  },
+  "hostedCli": {
+    "run": 40698354972,
+    "postgres": {
+      "passed": 120,
+      "failed": 0,
+      "skipped": 0
+    },
+    "sqlite": {
+      "passed": 113,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "independentSourceReview": "PASS",
+  "focusedTests": {
+    "passed": 46,
+    "failed": 0,
+    "skipped": 0
+  },
+  "nativeCliInstall": {
+    "first": 0,
+    "repeat": 0,
+    "idempotent": true,
+    "themePairs": 11,
+    "canonicalReferenceEqual": true
+  },
+  "driftControl": {
+    "exit": 1,
+    "intendedFinding": true,
+    "noOutputRepair": true,
+    "sourceRestored": true,
+    "positiveCheckExit": 0
+  },
+  "mcpBytesBefore": 283387,
+  "mcpBytesAfter": 283387,
+  "mcpBudget": 294912,
+  "dependencyLockChanges": false,
+  "publicationPerformed": false,
+  "manualWorkflowLimitation": "Optional native desktop exception-boundary job failed separately; no overall workflow-green claim.",
+  "nativeAllHostCli": [
+    {
+      "host": "claude",
+      "firstExit": 0,
+      "repeatExit": 0,
+      "canonicalReference": true,
+      "discoverable": true,
+      "idempotent": true
+    },
+    {
+      "host": "vscode",
+      "firstExit": 0,
+      "repeatExit": 0,
+      "canonicalReference": true,
+      "discoverable": true,
+      "idempotent": true
+    },
+    {
+      "host": "opencode",
+      "firstExit": 0,
+      "repeatExit": 0,
+      "canonicalReference": true,
+      "discoverable": true,
+      "idempotent": true
+    }
+  ],
+  "dogfoodBaselineLimitation": [
+    {
+      "tree": "baseline",
+      "exit": 1,
+      "finding": "missing legacy .claude/skills/aspire-init/SKILL.md"
+    },
+    {
+      "tree": "s9",
+      "exit": 1,
+      "finding": "missing legacy .claude/skills/aspire-init/SKILL.md"
+    }
+  ],
+  "integratedMain": "49eeb9f"
+}
