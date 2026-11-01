@@ -1,3 +1,15 @@
+## Ship2488 final carrier checkpoint complete
+
+Source169557e1 is published via normalpush, includes latestmain4cb. All6canonical
+commands/all4carriersPASS. ExpectedMCPpublish-assetsgenerateddelta committednext
+with run-only evidence. Focused349+32nativeCmd andrealraw/gzipbloatrestorepositive
+PASS. Final audit/plainpush thenmark2488ready+postREADYexacthead; coordinator
+reviews cross-family/mergesongreenCI. No further implementation/gates. Remaining
+Desktop/xextensions/allstyle scope moved2584 andchild2538; primaryhalfeditsstashed.
+Ownerlatestship-now overrides earlierfull-child-beforeparentREADY condition.
+
+---
+
 ## Ship-now override — PR2488 readiness, remainder #2584
 
 Read ship2488-owner-decision.md. Eric/Cockpit stopped new scope and explicitly

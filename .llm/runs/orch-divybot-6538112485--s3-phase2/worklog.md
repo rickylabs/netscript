@@ -930,3 +930,13 @@ READY withheld until full scope and exact-head required greenCI are proven.
 ## Owner ship-now scope and focused verification
 
 Eric/Cockpit directs immediate2488readiness; unfinishedDesktop/harness moved to2584. Normalmain4cb merge conflicts resolved, required new-main docs preview integration repaired. Focused349tests/32nativeCmd pass, prose/build passes, dated2%fullCSScaps+independentrealbloatrestorepositive proven. Three locks unchanged. Coordinator takes final cross-family review/greenCImerge; no broad gates started. Sourcecommit/carriers/publicaudit/plainpush/READY next.
+
+## Ship2488 committed-source carriers complete
+
+Source169557e1 normally merged latestmain4cb and plain-pushed, preserving2be
+ancestry. All six canonical generation/freshness commands PASS, all4carriers.
+Only post-source generated delta is expectedMCPpublish-assets, included in final
+carrier/evidence commit. Public added lines+both ownruns auditPASS, absolute-path/
+session/thumbprintcounts0. No new broad gates/evaluator started. Next plainpush
+finalhead, mark2488ready and postREADY for coordinator cross-family/greenCImerge.
+All unfinished scope tracked2584; no Desktop lifecycle implementation in2488.

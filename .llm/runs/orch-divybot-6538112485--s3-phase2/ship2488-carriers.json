@@ -1,0 +1,41 @@
+{
+  "sourceHead": "169557e102ae88206588b03a635928d7c1663a1e",
+  "commands": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "allFourCarriersPass": true,
+  "generatedDelta": [
+    "packages/mcp/src/publish-assets.generated.ts"
+  ],
+  "publicPrivacy": {
+    "verdict": "PASS",
+    "absolutePaths": 0,
+    "sessionIdentifiers": 0,
+    "thumbprints": 0
+  },
+  "followUp": 2584,
+  "ownerCoordinatorReviewAndGreenCiMerge": true
+}
