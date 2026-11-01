@@ -11,8 +11,8 @@ const RICH_EXAMPLES: Readonly<Record<string, string>> = {
     '<C addon="Order" control={<Input aria-label="Order reference" placeholder="SO–10480" />} />',
   'input-otp': '<C label="Verification code" />',
   'slider': '<C label="Discount" />',
-  'calendar': '<C aria-label="Delivery date" defaultMonth="2026-11" />',
-  'date-picker': '<C label="Delivery date" defaultMonth="2026-11" />',
+  'calendar': '<C aria-label="Delivery date" defaultMonth="2026-11-01" />',
+  'date-picker': '<C label="Delivery date" defaultMonth="2026-11-01" />',
   'location-marker': '<span>Current section <C /></span>',
   'navigation-menu':
     '<C label="Order navigation" items={[{id:"orders",label:"Orders",href:"#orders"}]} />',

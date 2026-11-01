@@ -1,3 +1,15 @@
+## Docs CI integration repair — no feature scope
+
+Both requestedblockers fixed atb7663d35; full60local+hosteddesignbrowser/FreshUI/
+Codequality/metadata/mainCI PASS. RemainingPagesdocs153PASS5FAIL6existingproject
+skips:4oldtwoEscape expectations and1Calendarpreview invalid month-onlydate.
+Narrowfixes: Calendar/DatePickerdefaultMonth2026-11-01; docsassertsingleEscape+
+openerfocusreturn. Productcontroller/keymap andaxeunchanged. Prose+publishassets
+regenerated; fulllocal164docsmatrixrunning. Commit/plainpush/carriers thenexacthead
+hostedgreen beforeREADY. No2584nits/Desktop/allstylework. Previousfailedlogsprivate.
+
+---
+
 ## Current two-blocker review repair before READY
 
 CoordinatorCHANGES6561745158 on4c4b1364. Twofixes only: CodeBlockcode scope/part

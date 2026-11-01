@@ -958,3 +958,14 @@ pre-existing fixture's broadspanquery. Narrow onlysyntaxSpans toactual upstream
 hljsclass spans, keepeverymaintainedtest/assertion/callcount/escaping/clipboard/
 injectioncheck unchanged. No baselineedit orproductionbehaviorworkaround. Final
 complete60matrix runs on committedsource next; READY waitsgreenhosteddesign+CI.
+
+## Hosted docs integration blockers after requested fixes green
+
+Atb7663d35 mainCI/Codequality/metadata/FreshUIquality/designbrowser allPASS; Pages
+Utilitydocs153PASS5FAIL6existingprojectskips. Fourtimeouts are oldtwoEscape
+expectations after firstEscapealreadyclosedtheauditedpalette; oneallpreview
+mountfailure is newCalendar exampleusingmonth-onlydefaultMonth. Narrowrepair:
+fullISOdate inCalendar/DatePickerexamples, singleEscape+strongerfocusreturn
+assertion inexistingdocs scenario. No productcontroller/keymap/axechange. These
+are current-head CIblockers, not expansion into2584nits. Focuseddocscomponents
+proof/regeneration/plainpush/greenexactCI next.

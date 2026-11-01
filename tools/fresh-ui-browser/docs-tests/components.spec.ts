@@ -130,9 +130,9 @@ for (
       await frame.getByRole('button', { name: 'Open commands' }).click();
       await expect(frame.getByRole('dialog')).toBeVisible();
       await frame.getByRole('combobox').press('Escape');
-      // The first Escape dismisses the inner combobox; the second dismisses the dialog.
-      await frame.getByRole('combobox').press('Escape');
+      // The shared CommandPalette contract dismisses its modal with one Escape.
       await expect(frame.getByRole('dialog')).not.toBeVisible();
+      await expect(frame.getByRole('button', { name: 'Open commands' })).toBeFocused();
     }
     expect(errors).toEqual([]);
     await page.screenshot({ path: info.outputPath('reference.png'), fullPage: true });
