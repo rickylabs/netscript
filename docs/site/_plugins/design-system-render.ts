@@ -15,6 +15,8 @@ import {
   valueRows,
 } from './design-system.ts';
 import type { MarkdownRenderer } from './design-system-markdown.ts';
+import { escapeHtml } from './escape-html.ts';
+export { escapeHtml } from './escape-html.ts';
 
 export interface DesignPage {
   url: string;
@@ -33,13 +35,6 @@ const GROUP_LABELS: Record<string, string> = {
   spacing: 'Spacing',
   components: 'Component recipes',
 };
-
-export function escapeHtml(value: string): string {
-  return value.replace(/[&<>"']/g, (character) => {
-    return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character] ??
-      character;
-  });
-}
 
 /** Rewrite source-relative links after Markdown rendering, including reference-style links. */
 export function sourceLinks(html: string, sourcePath: string): string {
@@ -68,6 +63,8 @@ function sectionNav(themes: Theme[], current: string): string {
     [`${DESIGN_ROOT}guidelines/`, 'Guidelines'],
     [`${DESIGN_ROOT}token-contract/`, 'Token contract'],
     [`${DESIGN_ROOT}docs-kit/`, 'Docs kit'],
+    ['/create/', 'Theme builder'],
+    [`${DESIGN_ROOT}components/`, 'Components'],
     [`${DESIGN_ROOT}create-your-own-theme/`, 'Create your own theme'],
     ...themes.map((theme) => [themeUrl(theme.id), theme.name]),
   ];

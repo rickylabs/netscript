@@ -1,0 +1,19 @@
+{
+  "preset": "studio-cloud",
+  "schemes": {
+    "light": 1180,
+    "dark": 1180
+  },
+  "metadata": {
+    "version": 2,
+    "id": "studio-cloud",
+    "language": "studio",
+    "flavor": "cloud",
+    "density": "comfortable",
+    "sourceDensity": "Comfortable"
+  },
+  "cssSha256": "e18a6151c3a10cc90aa2b2a415577100813982c1bf181057b2dd65fc621ff941",
+  "canonicalCssExact": true,
+  "selectedResolvedTokensExact": true,
+  "docsFontPolicy": "existing self-hosted fonts and declared platform fallback stacks; no remote font-provider links"
+}
