@@ -1,0 +1,14 @@
+{
+  "command": "npm test (tools/fresh-ui-browser)",
+  "deno": "2.9.7",
+  "browser": "Chromium 153 / Playwright 1.63.0",
+  "stats": {
+    "startTime": "2026-11-01T08:01:51.486Z",
+    "duration": 178873.387,
+    "expected": 60,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "output": "private generated-scaffold browser evidence; no snapshots rebaselined"
+}

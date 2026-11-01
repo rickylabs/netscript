@@ -217,104 +217,106 @@
   }
 }
 
-/* Studio Utility: role bindings for the shipped contract. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) {
+  /* Studio Utility: role bindings for the shipped contract. */
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='message'][data-part='root'] {
-  gap: var(--ns-stack-gap);
-}
+  & [data-scope='message'][data-part='root'] {
+    gap: var(--ns-stack-gap);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='message'][data-part='author'] {
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-small);
-  line-height: var(--ns-leading-small);
-  font-weight: var(--ns-weight-strong);
-  letter-spacing: var(--ns-tracking-small);
-}
+  & [data-scope='message'][data-part='author'] {
+    font-family: var(--ns-font-sans);
+    font-size: var(--ns-text-small);
+    line-height: var(--ns-leading-small);
+    font-weight: var(--ns-weight-strong);
+    letter-spacing: var(--ns-tracking-small);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='message'][data-part='model'],
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='message'][data-part='time'] {
-  font-family: var(--ns-font-mono);
-  font-size: var(--ns-text-caption);
-  line-height: var(--ns-leading-caption);
-  font-weight: var(--ns-weight-caption);
-  letter-spacing: var(--ns-tracking-caption);
-}
+  & [data-scope='message'][data-part='model'],
+  & [data-scope='message'][data-part='time'] {
+    font-family: var(--ns-font-mono);
+    font-size: var(--ns-text-caption);
+    line-height: var(--ns-leading-caption);
+    font-weight: var(--ns-weight-caption);
+    letter-spacing: var(--ns-tracking-caption);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='message'][data-part='body'] {
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-body);
-  line-height: var(--ns-leading-body);
-  font-weight: var(--ns-weight-body);
-  letter-spacing: var(--ns-tracking-body);
-}
+  & [data-scope='message'][data-part='body'] {
+    font-family: var(--ns-font-sans);
+    font-size: var(--ns-text-body);
+    line-height: var(--ns-leading-body);
+    font-weight: var(--ns-weight-body);
+    letter-spacing: var(--ns-tracking-body);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='message'][data-part='root'][data-role='user'] [data-scope='message'][data-part='body'] {
-  border-radius: var(--ns-radius-card);
-  padding: var(--ns-space-2) var(--ns-control-padding-x);
-  background: var(--ns-primary);
-  color: var(--ns-primary-fg);
-}
+  & [data-scope='message'][data-part='root'][data-role='user'] [data-scope='message'][data-part='body'] {
+    border-radius: var(--ns-radius-card);
+    padding: var(--ns-space-2) var(--ns-control-padding-x);
+    background: var(--ns-primary);
+    color: var(--ns-primary-fg);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='message'][data-part='root'][data-role='system'] [data-scope='message'][data-part='body'] {
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-small);
-  line-height: var(--ns-leading-small);
-  font-weight: var(--ns-weight-small);
-  letter-spacing: var(--ns-tracking-small);
-  color: var(--ns-muted-fg);
-}
+  & [data-scope='message'][data-part='root'][data-role='system'] [data-scope='message'][data-part='body'] {
+    font-family: var(--ns-font-sans);
+    font-size: var(--ns-text-small);
+    line-height: var(--ns-leading-small);
+    font-weight: var(--ns-weight-small);
+    letter-spacing: var(--ns-tracking-small);
+    color: var(--ns-muted-fg);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='msg-action'][data-part='root'] {
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-body);
-  line-height: var(--ns-leading-body);
-  font-weight: var(--ns-weight-body);
-  letter-spacing: var(--ns-tracking-body);
-  min-height: var(--ns-control-height-sm);
-  padding-inline: var(--ns-control-padding-x-sm);
-  border-radius: var(--ns-radius-control);
-  box-shadow: none;
-  transform: none;
-  color: var(--ns-fg);
-}
+  & [data-scope='msg-action'][data-part='root'] {
+    font-family: var(--ns-font-sans);
+    font-size: var(--ns-text-body);
+    line-height: var(--ns-leading-body);
+    font-weight: var(--ns-weight-body);
+    letter-spacing: var(--ns-tracking-body);
+    min-height: var(--ns-control-height-sm);
+    padding-inline: var(--ns-control-padding-x-sm);
+    border-radius: var(--ns-radius-control);
+    box-shadow: none;
+    transform: none;
+    color: var(--ns-fg);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='msg-action'][data-part='root']:hover:not(:disabled) {
-  background: var(--ns-muted);
-  box-shadow: none;
-  transform: none;
-  opacity: 1;
-}
+  & [data-scope='msg-action'][data-part='root']:hover:not(:disabled) {
+    background: var(--ns-muted);
+    box-shadow: none;
+    transform: none;
+    opacity: 1;
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='msg-action'][data-part='root']:active:not(:disabled) {
-  background: var(--ns-selected);
-}
+  & [data-scope='msg-action'][data-part='root']:active:not(:disabled) {
+    background: var(--ns-selected);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='msg-action'][data-part='root']:focus-visible {
-  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
-  outline-offset: var(--ns-focus-ring-offset);
-}
+  & [data-scope='msg-action'][data-part='root']:focus-visible {
+    outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+    outline-offset: var(--ns-focus-ring-offset);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='msg-action'][data-part='root']:disabled {
-  opacity: calc(var(--ns-state-disabled-opacity) / 100);
-  cursor: not-allowed;
-}
+  & [data-scope='msg-action'][data-part='root']:disabled {
+    opacity: calc(var(--ns-state-disabled-opacity) / 100);
+    cursor: not-allowed;
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='pill'][data-part='root'] {
-  border-radius: var(--ns-radius-control);
-}
+  & [data-scope='pill'][data-part='root'] {
+    border-radius: var(--ns-radius-control);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='pill'][data-part='root']:focus-visible {
-  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
-  outline-offset: var(--ns-focus-ring-offset);
-}
+  & [data-scope='pill'][data-part='root']:focus-visible {
+    outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+    outline-offset: var(--ns-focus-ring-offset);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='message'][data-part='root'] .ns-inline-code {
-  border-radius: var(--ns-radius-control);
-}
+  & [data-scope='message'][data-part='root'] .ns-inline-code {
+    border-radius: var(--ns-radius-control);
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='message'] {
-    transition: none;
-    animation: none;
+  @media (prefers-reduced-motion: reduce) {
+    & [data-scope='message'] {
+      transition: none;
+      animation: none;
+    }
   }
 }

@@ -1,0 +1,25 @@
+{
+  "source": {
+    "mode": "command",
+    "cwd": "./packages/fresh-ui",
+    "exitCode": 0
+  },
+  "selection": {
+    "filesSelected": 276,
+    "batches": 2,
+    "failedBatches": 0
+  },
+  "coverage": {
+    "filesSelected": 276,
+    "filesProcessed": 276,
+    "droppedFiles": [],
+    "refusals": []
+  },
+  "summary": {
+    "totalOccurrences": 0,
+    "uniqueOccurrences": 0,
+    "uniqueRules": 0,
+    "uniquePaths": 0
+  },
+  "groups": []
+}
