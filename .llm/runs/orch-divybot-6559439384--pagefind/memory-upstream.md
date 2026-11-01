@@ -11,3 +11,5 @@ Native `deno install --lockfile-only` adds the new graph but retains obsolete lo
 Post-change deps:latest reads actual site import map and confirms1.6.0 stable. deps:why's native child returns no graph for the npm package here, despite source usage and successful runtime indexing; do not interpret that incomplete wrapper output as a dead import. The native generated entry explicitly reports1.6.0 and the reviewed site lock contains no1.3.0 nodes.
 
 Baseline non-search comparison:804 outputs byte-identical; catalog.json differs only in the existing inputHash over docs/site/deno.json. Reconstructing the previous config fingerprint exactly reproduces baseline catalog SHA-256. Final same-source strict proof still compares every byte with no special cases.
+
+A new empty DENO_DIR + copied exact site manifest/lock + `deno ci` succeeds without age bypass and leaves copied lock byte-identical. Deno2.9.7 ci does not accept a redundant --frozen flag; ci is inherently frozen. This validates fresh-runner consumption of the qualified newly released pin.

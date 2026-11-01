@@ -34,3 +34,17 @@ Working tree atop ed7d08a: native strict two-build **PASS**,1116 files/316 HTML/
 One workflow test invocation omitted fixture write permission (71 pass/1 capability error); final corrected command includes --allow-write. This is an invocation issue, no source adjustment. The optional high audit reports the same pre-existing advisory IDs as baseline. CLI E2E attempted exactly once and fails at Aspire preflight/cleanup without Docker; not runtime proof. Raw transport receipts stay local to honor privacy. See gate-evidence-integration.json for compact hashes/results.
 
 Full Utility browser gate with isolated runtime libs **PASS**:158 passed,6 existing conditional skips,0 failed,0 flaky, all4 scheme/viewport projects; no accessibility allowances added. Receipt captures raw exit0 and fresh child report. Initial launch-only failure preserved privately. Refetched main remains baseline1e4e58f. Slice2 is now gated and independently reviewed; sign-off commit follows.
+
+## Immutable implementation-head proof
+
+Strict checker PASS at committed head `5e77d73e1ffcb4176978e875ba66940ab4726806`, all1116 files, zero differences and no allowances. Worktree was clean and main1e4e58f remained an ancestor. Proof and raw log hash in exact-implementation-proof.json. Only after this result did slice3 start deleting bounded CI/tool behavior.
+
+## Slice3 strict CI policy
+
+After immutable5e77d73 proof: removed bounded mode from checker/workflow/README, wired real shuffled native regression into Pages CI, updated existing classifier test to require strict command and reject allowance. Workflow contracts72/0/0, scoped2-file check/lint/fmt PASS. Obsolete bypass argument negative control exits nonzero before build. Separate read-only slice3 content review running; final exact-head strict/browser/native quality evidence and formal IMPL remain pending.
+
+Fresh-cache native `deno ci` with copied exact site manifest/lock succeeds without minimum-age bypass and preserves lock bytes. `deno ci` is inherently frozen on2.9.7; an additional --frozen flag is not accepted. No system/cache deletion, root lock untouched.
+
+Slice3 independent content review **PASS**. Adopted its nonblocking README suggestion: link retained evidence through durable PR2575 rather than a removable run path. All4native carrier freshness gates PASS (agent-docs-prose, MCP export corpus, assets barrel, publish assets); no generated source or root-lock churn. PR thread gate PASS0threads. Commit slice3 with this worklog/context and dated lesson, then run exact-head strict/browser/quality/fixtures/workflow gates and formal IMPL evaluation.
+
+Reconcile3: main remains1e4e58f; no competing2453 implementation, related token/layout issues remain out of scope. Draft PR2575 carries Refs-only/no labels per explicit owner policy; no merge/close action. Original failed proof and first plan failure retained.

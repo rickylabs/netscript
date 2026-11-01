@@ -88,10 +88,11 @@ The style gate accepts bundled token definitions only when their selector, prope
 exactly match the separately verified token layer; authored custom colours still fail.
 
 `deno run --allow-read --allow-run --allow-env tools/docs-site/check-reproducible.ts` builds twice
-and compares every output. The default is strict. `--allow-pagefind-metadata` reports only the
-known upstream Pagefind entry/filter/meta serialization variation separately; HTML, Markdown twins,
-anchor fragments and all other assets remain byte-identical. Search behavior is verified by the
-real browser Pagefind tests. The metadata issue remains #2453; token-source consolidation stays #2450.
+and compares every output byte, including Pagefind entry/filter/meta files, HTML, Markdown twins,
+anchor fragments and all other assets. Any changed, added or missing file fails the gate; there are
+no metadata allowances. Pages CI runs this strict check and the real browser Pagefind tests.
+The original #2453 failure and immutable implementation-head proof are retained in
+[PR #2575](https://github.com/rickylabs/netscript/pull/2575). Token-source consolidation stays #2450.
 
 Native reproducibility uses the released [Pagefind 1.6.0 correction](https://github.com/Pagefind/pagefind/pull/1124).
 `docs/site/deno.json` redirects Lume 2.5.4's exact `npm:pagefind@1.3.0` import to 1.6.0;

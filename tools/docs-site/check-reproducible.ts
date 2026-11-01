@@ -15,8 +15,7 @@ async function snapshot(root: URL, prefix = ''): Promise<Map<string, string>> {
 }
 
 if (import.meta.main) {
-  const allowPagefindMetadata = Deno.args.includes('--allow-pagefind-metadata');
-  if (Deno.args.some((arg) => arg !== '--allow-pagefind-metadata')) {
+  if (Deno.args.length) {
     throw new Error('Unknown argument');
   }
   const cwd = new URL('../../docs/site/', import.meta.url);
@@ -35,23 +34,16 @@ if (import.meta.main) {
   const second = await build();
   const paths = [...new Set([...first.keys(), ...second.keys()])].sort();
   const changed = paths.filter((path) => first.get(path) !== second.get(path));
-  // These upstream serialization files vary even with identical HTML/fragments in Pagefind 1.3.
-  const metadata = (path: string) =>
-    path === 'pagefind/pagefind-entry.json' ||
-    /^pagefind\/filter\/[^/]+\.pf_filter$/.test(path) ||
-    /^pagefind\/pagefind\.[^/]+\.pf_meta$/.test(path);
-  const blocking = changed.filter((path) => !allowPagefindMetadata || !metadata(path));
-  if (!paths.some((path) => path.endsWith('.html')) || blocking.length) {
+  if (!paths.some((path) => path.endsWith('.html')) || changed.length) {
     throw new Error(`Non-reproducible site: ${changed.join(', ') || 'empty output'}`);
   }
   console.log(JSON.stringify({
     outcome: 'PASS',
-    scope: allowPagefindMetadata ? 'all-output-with-reported-pagefind-metadata' : 'all-output',
+    scope: 'all-output',
     files: paths.length,
     html: paths.filter((path) => path.endsWith('.html')).length,
     search: paths.filter((path) => path.startsWith('pagefind/')).length,
     twins: paths.filter((path) => path.endsWith('.md')).length,
-    nonBlockingDifferences: changed.filter((path) => allowPagefindMetadata && metadata(path)),
-    changedNonHtml: changed.filter((path) => !path.endsWith('.html')),
+    differences: changed,
   }));
 }
