@@ -3,6 +3,7 @@ import {
   CALLOUT_TYPES,
   calloutType,
 } from '../../../tools/docs-site/callout-types.ts';
+import { escapeHtml } from './escape-html.ts';
 
 /**
  * The docs site's callout markup, shared by `comp.callout` (through the `calloutHtml` filter)
@@ -20,7 +21,11 @@ const ICON_ATTRIBUTES = 'width="18" height="18" viewBox="0 0 24 24" fill="none" 
 
 /** Turn backtick spans into inline code; other author HTML passes through, as before. */
 export function inlineCode(value: string): string {
-  return value.replace(/`([^`]+)`/g, '<code>$1</code>');
+  return value.replace(
+    /<code\b[^>]*>[\s\S]*?<\/code>|`([^`]+)`/g,
+    (original, text?: string) =>
+      text === undefined ? original : '<code>' + escapeHtml(text) + '</code>',
+  );
 }
 
 function escapeAttribute(value: string): string {
@@ -61,5 +66,5 @@ export function renderCallout(
 ): string {
   const label = title ? inlineCode(String(title)) : undefined;
   return calloutOpenHtml(type, label, alert ? String(alert) : undefined) +
-    String(content ?? '') + CALLOUT_CLOSE_HTML;
+    inlineCode(String(content ?? '')) + CALLOUT_CLOSE_HTML;
 }

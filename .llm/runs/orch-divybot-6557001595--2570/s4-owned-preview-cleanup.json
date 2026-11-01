@@ -1,0 +1,85 @@
+[
+  {
+    "pid": 2876813,
+    "cwd": ".llm/tmp/scaffold-2570/review-empty/apps/portal",
+    "argv": [
+      "deno",
+      "task",
+      "dev"
+    ]
+  },
+  {
+    "pid": 2876815,
+    "cwd": ".llm/tmp/scaffold-2570/review-service/apps/portal",
+    "argv": [
+      "deno",
+      "task",
+      "dev"
+    ]
+  },
+  {
+    "pid": 2876816,
+    "cwd": ".llm/tmp/scaffold-2570/review-plugins/apps/portal",
+    "argv": [
+      "deno",
+      "task",
+      "dev"
+    ]
+  },
+  {
+    "pid": 2877628,
+    "cwd": ".llm/tmp/scaffold-2570/review-service/apps/portal",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      "npm:vite",
+      "--configLoader",
+      "native"
+    ]
+  },
+  {
+    "pid": 2877633,
+    "cwd": ".llm/tmp/scaffold-2570/review-empty/apps/portal",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      "npm:vite",
+      "--configLoader",
+      "native"
+    ]
+  },
+  {
+    "pid": 2877704,
+    "cwd": ".llm/tmp/scaffold-2570/review-plugins/apps/portal",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      "npm:vite",
+      "--configLoader",
+      "native"
+    ]
+  },
+  {
+    "pid": 2876814,
+    "cwd": ".llm/tmp/scaffold-2570/review-service/services/members",
+    "argv": [
+      "deno",
+      "task",
+      "start"
+    ]
+  },
+  {
+    "pid": 2877075,
+    "cwd": ".llm/tmp/scaffold-2570/review-service/services/members",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      "--unstable-no-legacy-abort",
+      "src/main.ts"
+    ]
+  }
+]

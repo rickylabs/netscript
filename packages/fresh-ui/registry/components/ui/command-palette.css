@@ -3,7 +3,7 @@
   inline-size: min(40rem, calc(100vw - var(--ns-space-8)));
   max-inline-size: 100%;
   max-block-size: calc(100dvh - var(--ns-space-8));
-  margin: var(--ns-space-24) auto auto;
+  margin: min(var(--ns-space-24), 10vh) auto auto;
   padding: 0;
   border: 0;
   background: transparent;
@@ -95,6 +95,27 @@
   padding-inline: var(--ns-space-4);
   border-block-end: var(--ns-border-width) solid var(--ns-border-subtle);
 }
+.ns-cmdk__close {
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  min-height: 28px;
+  padding: 2px 6px;
+  border: 1px solid var(--ns-border);
+  background: var(--ns-bg);
+  color: var(--ns-muted-fg);
+  font: 11px var(--ns-font-mono);
+  cursor: pointer;
+}
+.ns-cmdk__close-label { display: none; }
+.ns-cmdk__item { border-inline-start: 2px solid transparent; }
+.ns-cmdk__item[data-highlighted='true'] { border-inline-start-color: var(--ns-fg); }
+@media (max-width: 640px) {
+  .ns-cmdk__close { min-width: 44px; min-height: 36px; }
+  .ns-cmdk__close-key { display: none; }
+  .ns-cmdk__close-label { display: inline; }
+}
+
 .ns-cmdk__list {
   flex: 1;
   min-block-size: 0;

@@ -57,3 +57,16 @@ Deno.test('CommandPalette renders native dialog and combobox accessibility bound
     ]
   ) assert(html.includes(attribute), attribute);
 });
+
+Deno.test('CommandPalette preserves scaffold dismiss and keyboard-help behavior', () => {
+  const html = render(<CommandPalette open groups={GROUPS} />);
+  assert(html.includes('Close command palette'), 'visible dismiss control');
+  assert(html.includes('Command keyboard help'), 'keyboard instructions');
+  assert(!html.includes('No matching commands'), 'populated palette has no empty message');
+  const inline = render(<CommandPalette scrim={false} groups={GROUPS} footer={false} />);
+  assert(
+    !inline.includes('Close command palette'),
+    'inline composition has no modal close controller',
+  );
+  assert(!inline.includes('Command keyboard help'), 'explicit caller footer refusal is preserved');
+});

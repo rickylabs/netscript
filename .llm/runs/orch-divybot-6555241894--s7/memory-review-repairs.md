@@ -1,0 +1,9 @@
+# Coordinator review repair recipes — 2026-11-01
+
+Docs preview fonts must stay on-origin. The shell already provides styles/fonts.css with self-hosted Host Grotesk and Fragment Mono; other preset families use declared platform fallbacks. Do not inject registry/theme/fonts.json provider URLs into a preview. A Playwright context route over HTTP(S) can record+abort every foreign-origin attempt, then assert the recorded set is empty. Existing old bundles make a real negative control: this test failed on both Google Fonts requests. Include all24preset selections and all52registry previews. data-preset on the iframe root avoids accepting readiness from the previous selection.
+
+Bound decodeUiPreset before constructing URL or allocating base64/JSON. Native URL/fromBase64/fatal TextDecoder/JSON/Zod errors become UiPresetMalformedError; preserve UnsupportedUiPresetVersionError explicitly. UiPresetTooLargeError is thrown before the try. Also bound encoder/share URL outputs so helpers never produce unusable codes. A valid1MB JSON/base64 payload plus removed-input-guard mutation demonstrates the cap test catches actual acceptance, not just malformed input.
+
+Do not import the runtime CLI codec into the Node Playwright harness just for a constant: its Deno catalog zod import is not a Node dependency there. Use an explicit oversized browser fixture and keep the actual cap boundary/error-class tests in the native Deno domain suite. Structured browser check uses docs.deno.json, not root isolatedDeclarations.
+
+Lume generator sourcePath inserts [index] into generated page paths. Return explicit edit_source pointing to the real .page.ts and let the base layout prefer it. Check all generated edit links against that real source. The generator byte gate imports DOC_CONTENT_BUDGET from MCP directly; add its module to inputHash so changing the authoritative budget invalidates stale builds.

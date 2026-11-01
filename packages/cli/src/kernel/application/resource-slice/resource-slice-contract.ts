@@ -36,6 +36,8 @@ export interface SelectedResourceClient {
 export interface SelectedResourceProcedure {
   readonly path: readonly [string, ...string[]];
   readonly kind: 'query';
+  /** Initial arguments for a known typed procedure, serialized as data in the loader. */
+  readonly initialInput?: Readonly<Record<string, string | number | boolean | null>>;
 }
 
 export interface RequiredResourceState {
@@ -75,6 +77,8 @@ export interface OwnedResourceSliceLeafMetadata {
   readonly role: ResourceSliceLeafRole;
   readonly options: readonly ResourceSliceVariant[];
   readonly bodySha256: string;
+  /** Canonical initial query arguments, present only on generated loader leaves. */
+  readonly queryInput?: Readonly<Record<string, string | number | boolean | null>>;
 }
 
 export interface ResourceSlicePlannedLeaf {
@@ -247,6 +251,9 @@ export async function markOwnedResourceSliceLeaf(
     role: metadata.role,
     options,
     bodySha256: await sha256ResourceSliceBody(body),
+    ...(metadata.queryInput !== undefined
+      ? { queryInput: normalizeQueryInput(metadata.queryInput, metadata.role) }
+      : {}),
   };
   return `${RESOURCE_SLICE_MARKER_PREFIX}${JSON.stringify(marker)}\n${body}`;
 }
@@ -267,7 +274,7 @@ export function parseOwnedResourceSliceLeaf(
     return undefined;
   }
   if (!isRecord(value)) return undefined;
-  const { schema, resource, role, options, bodySha256 } = value;
+  const { schema, resource, role, options, bodySha256, queryInput } = value;
   if (
     schema !== RESOURCE_SLICE_MARKER_SCHEMA || typeof resource !== 'string' ||
     typeof role !== 'string' || !isLeafRole(role) || !Array.isArray(options) ||
@@ -276,8 +283,10 @@ export function parseOwnedResourceSliceLeaf(
   ) return undefined;
 
   let normalized: readonly ResourceSliceVariant[];
+  let normalizedInput: OwnedResourceSliceLeafMetadata['queryInput'];
   try {
     normalized = normalizeMarkerOptions(options);
+    if (queryInput !== undefined) normalizedInput = normalizeQueryInput(queryInput, role);
   } catch {
     return undefined;
   }
@@ -287,6 +296,7 @@ export function parseOwnedResourceSliceLeaf(
     role,
     options: normalized,
     bodySha256,
+    ...(normalizedInput !== undefined ? { queryInput: normalizedInput } : {}),
   };
   return line === `${RESOURCE_SLICE_MARKER_PREFIX}${JSON.stringify(metadata)}`
     ? metadata
@@ -369,4 +379,28 @@ function isVariant(value: string): value is ResourceSliceVariant {
 
 function isLeafRole(value: string): value is ResourceSliceLeafRole {
   return RESOURCE_SLICE_LEAF_ROLES.some((role) => role === value);
+}
+
+/** Validate and sort persisted arguments without inferring any service-specific defaults. */
+function normalizeQueryInput(
+  value: unknown,
+  role: ResourceSliceLeafRole,
+): NonNullable<OwnedResourceSliceLeafMetadata['queryInput']> {
+  if (role !== 'loaders' || !isRecord(value)) {
+    throw new Error('Query input is a flat primitive record on loader leaves only.');
+  }
+  const entries = Object.entries(value).sort(([left], [right]) =>
+    left < right ? -1 : left > right ? 1 : 0
+  );
+  const result: Record<string, string | number | boolean | null> = Object.create(null);
+  for (const [key, entry] of entries) {
+    if (
+      entry !== null && typeof entry !== 'string' && typeof entry !== 'boolean' &&
+      !(typeof entry === 'number' && Number.isFinite(entry))
+    ) {
+      throw new Error('Query input values must be finite JSON primitives.');
+    }
+    result[key] = entry;
+  }
+  return result;
 }

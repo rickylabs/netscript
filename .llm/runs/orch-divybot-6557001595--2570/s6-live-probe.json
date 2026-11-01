@@ -1,0 +1,89 @@
+{
+  "assertion": "production assertReferenceDom used by scaffold.runtime",
+  "results": [
+    {
+      "path": "/",
+      "theme": "light",
+      "viewport": "desktop",
+      "oldRuntime": "FAIL_EXPECTED",
+      "fixedRuntime": "PASS"
+    },
+    {
+      "path": "/",
+      "theme": "light",
+      "viewport": "mobile",
+      "oldRuntime": "FAIL_EXPECTED",
+      "fixedRuntime": "PASS"
+    },
+    {
+      "path": "/",
+      "theme": "dark",
+      "viewport": "desktop",
+      "oldRuntime": "FAIL_EXPECTED",
+      "fixedRuntime": "PASS"
+    },
+    {
+      "path": "/",
+      "theme": "dark",
+      "viewport": "mobile",
+      "oldRuntime": "FAIL_EXPECTED",
+      "fixedRuntime": "PASS"
+    },
+    {
+      "path": "/records",
+      "theme": "light",
+      "viewport": "desktop",
+      "oldRuntime": "FAIL_EXPECTED",
+      "fixedRuntime": "PASS"
+    },
+    {
+      "path": "/records",
+      "theme": "light",
+      "viewport": "mobile",
+      "oldRuntime": "FAIL_EXPECTED",
+      "fixedRuntime": "PASS"
+    },
+    {
+      "path": "/records",
+      "theme": "dark",
+      "viewport": "desktop",
+      "oldRuntime": "FAIL_EXPECTED",
+      "fixedRuntime": "PASS"
+    },
+    {
+      "path": "/records",
+      "theme": "dark",
+      "viewport": "mobile",
+      "oldRuntime": "FAIL_EXPECTED",
+      "fixedRuntime": "PASS"
+    },
+    {
+      "path": "/examples/orders",
+      "theme": "light",
+      "viewport": "desktop",
+      "oldRuntime": "FAIL_EXPECTED",
+      "fixedRuntime": "PASS"
+    },
+    {
+      "path": "/examples/orders",
+      "theme": "light",
+      "viewport": "mobile",
+      "oldRuntime": "FAIL_EXPECTED",
+      "fixedRuntime": "PASS"
+    },
+    {
+      "path": "/examples/orders",
+      "theme": "dark",
+      "viewport": "desktop",
+      "oldRuntime": "FAIL_EXPECTED",
+      "fixedRuntime": "PASS"
+    },
+    {
+      "path": "/examples/orders",
+      "theme": "dark",
+      "viewport": "mobile",
+      "oldRuntime": "FAIL_EXPECTED",
+      "fixedRuntime": "PASS"
+    }
+  ]
+}

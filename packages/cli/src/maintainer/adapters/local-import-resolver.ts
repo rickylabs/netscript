@@ -4,6 +4,9 @@ import { SCAFFOLD_PACKAGES } from '../../kernel/constants/scaffold/scaffold-pack
 import type { LocalImportResolverPort } from '../ports/local-import-resolver-port.ts';
 
 const PACKAGE_TO_LOCAL_PATH: Readonly<Record<string, string>> = {
+  [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_DISCOVERY]: 'packages/sdk/src/discovery/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_CONTRACTS]:
+    'packages/plugin-workers-core/src/contracts/v1/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_CONFIG]: 'packages/config/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_SERVICE]: 'packages/service/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN]: 'packages/plugin/mod.ts',

@@ -144,6 +144,22 @@ export function CommandPalette({
   );
   const content = loading ? 'loading' : visibleGroups.length ? 'results' : 'empty';
 
+  // Preserve the scaffold's keyboard help while allowing caller-owned footer content.
+  const keyboardHelp = footer === undefined
+    ? (
+      <>
+        <span>
+          <kbd>↑↓</kbd> to navigate
+        </span>
+        <span>
+          <kbd>↵</kbd> to open
+        </span>
+        <span>
+          <kbd>esc</kbd> to close
+        </span>
+      </>
+    )
+    : footer;
   const panel = (
     <Combobox.Root
       value=''
@@ -198,6 +214,12 @@ export function CommandPalette({
             <span data-part='kbd' data-scope='command-palette'>
               <Kbd size='sm'>Esc</Kbd>
             </span>
+            {scrim && (
+              <Dialog.Close class='ns-cmdk__close' aria-label='Close command palette'>
+                <span class='ns-cmdk__close-key'>esc</span>
+                <span class='ns-cmdk__close-label'>Close</span>
+              </Dialog.Close>
+            )}
           </div>
           {filters != null && filters !== false && (
             <div class='ns-cmdk__filters' data-part='filters' data-scope='command-palette'>
@@ -361,9 +383,14 @@ export function CommandPalette({
               <span>{loading ? loadingLabel : emptyLabel}</span>
             </div>
           )}
-          {footer != null && footer !== false && (
-            <div class='ns-cmdk__footer' data-part='footer' data-scope='command-palette'>
-              {footer}
+          {keyboardHelp != null && keyboardHelp !== false && (
+            <div
+              class='ns-cmdk__footer'
+              data-part='footer'
+              data-scope='command-palette'
+              aria-label='Command keyboard help'
+            >
+              {keyboardHelp}
             </div>
           )}
         </div>

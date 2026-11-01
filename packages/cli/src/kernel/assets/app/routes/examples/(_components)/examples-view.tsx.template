@@ -17,7 +17,7 @@ interface ExampleCard {
 }
 
 interface ExamplesViewProps {
-  readonly canonicalHref: string;
+  readonly canonicalHref?: string;
   readonly examples: readonly ExampleCard[];
 }
 
@@ -52,22 +52,21 @@ const columns: readonly ResponsiveTableColumn<ExampleCard>[] = [
 
 export default function ExamplesView({ canonicalHref, examples }: ExamplesViewProps) {
   return (
-    <main class='ns-shell ns-section ns-stack ns-stack--lg'>
+    <div class='workspace-page'>
       <PageHeader>
         <PageHeader.Main>
           <PageHeader.Badges>
             <Badge variant='primary'>Examples</Badge>
-            <Badge variant='muted'>registry-only pages</Badge>
+            <Badge variant='muted'>reference</Badge>
           </PageHeader.Badges>
           <PageHeader.Intro>
             <h1>Examples</h1>
             <p class='ns-lede'>
-              Reference app workflows built from copied fresh-ui components. Start with the live
-              {{modelName}} service flow, then adapt the patterns for your own routes.
+              Reference routes included in this application. Open Records to work with connected data.
             </p>
           </PageHeader.Intro>
           <PageHeader.Actions>
-            <Button type='link' href={canonicalHref}>Open canonical {{modelName}} flow</Button>
+            {canonicalHref && <Button type='link' href={canonicalHref}>Open {{serviceName}} flow</Button>}
           </PageHeader.Actions>
         </PageHeader.Main>
       </PageHeader>
@@ -75,7 +74,7 @@ export default function ExamplesView({ canonicalHref, examples }: ExamplesViewPr
       <Card>
         <Card.Header>
           <Card.Title>Example routes</Card.Title>
-          <Card.Description>Generated workflows and integration placeholders.</Card.Description>
+          <Card.Description>Only routes created in this application.</Card.Description>
         </Card.Header>
         <Card.Body>
           <ResponsiveTable
@@ -92,6 +91,6 @@ export default function ExamplesView({ canonicalHref, examples }: ExamplesViewPr
           />
         </Card.Body>
       </Card>
-    </main>
+    </div>
   );
 }

@@ -1,3 +1,18 @@
+## Ship-now override — PR2488 readiness, remainder #2584
+
+Read ship2488-owner-decision.md. Eric/Cockpit stopped new scope and explicitly
+requires2488READY now forcanary.2; coordinator reviews cross-family/merges greenCI.
+Current parent normalmerge latestmain4cb; no unfinished Desktop code. Childhalf
+contracts/doc edits stashed privately. Follow-up2584 carries remainingDesktop/
+productionx/allstyle/final scope, Refs2416. No closure/labels/newscope/forcepush.
+Focused349tests+32nativeCmdPASS, docs/prose337HTML/116registryartifacts PASS.
+Global74CSS279404/35995; dated2%caps284993/36715, realraw/gzipbloat redrestoregreen.
+Sourcecommit then required canonical carriers/freshness/audit/plainpush/ready.
+Do not resume Desktop implementation or broad evaluation gates under this ship
+instruction. Primary child published32497232; local53220135 is planning only.
+
+---
+
 ## Merge10 parent evidence review PASS — audited plain push next
 
 Same SOURCE1andEVIDENCE1PASS,0blockers/new-loopfailure0. Source679fd24a is the

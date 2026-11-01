@@ -1,0 +1,122 @@
+[
+  {
+    "scheme": "light",
+    "tokenCount": 1180,
+    "tokenDifferences": [],
+    "previewStyles": {
+      "backgroundColor": [
+        13,
+        116,
+        206,
+        255
+      ],
+      "color": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "borderRadius": "10px",
+      "borderColor": [
+        13,
+        116,
+        206,
+        255
+      ],
+      "fontFamily": "Figtree, system-ui, sans-serif",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "height": "36px",
+      "paddingLeft": "14px",
+      "paddingRight": "14px"
+    },
+    "appStyles": {
+      "backgroundColor": [
+        13,
+        116,
+        206,
+        255
+      ],
+      "color": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "borderRadius": "10px",
+      "borderColor": [
+        13,
+        116,
+        206,
+        255
+      ],
+      "fontFamily": "Figtree, system-ui, sans-serif",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "height": "36px",
+      "paddingLeft": "14px",
+      "paddingRight": "14px"
+    },
+    "errors": []
+  },
+  {
+    "scheme": "dark",
+    "tokenCount": 1180,
+    "tokenDifferences": [],
+    "previewStyles": {
+      "backgroundColor": [
+        0,
+        144,
+        255,
+        255
+      ],
+      "color": [
+        17,
+        17,
+        19,
+        255
+      ],
+      "borderRadius": "10px",
+      "borderColor": [
+        0,
+        144,
+        255,
+        255
+      ],
+      "fontFamily": "Figtree, system-ui, sans-serif",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "height": "36px",
+      "paddingLeft": "14px",
+      "paddingRight": "14px"
+    },
+    "appStyles": {
+      "backgroundColor": [
+        0,
+        144,
+        255,
+        255
+      ],
+      "color": [
+        17,
+        17,
+        19,
+        255
+      ],
+      "borderRadius": "10px",
+      "borderColor": [
+        0,
+        144,
+        255,
+        255
+      ],
+      "fontFamily": "Figtree, system-ui, sans-serif",
+      "fontSize": "12px",
+      "fontWeight": "500",
+      "height": "36px",
+      "paddingLeft": "14px",
+      "paddingRight": "14px"
+    },
+    "errors": []
+  }
+]

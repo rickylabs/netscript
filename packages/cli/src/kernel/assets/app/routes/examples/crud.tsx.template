@@ -1,37 +1,17 @@
 import CrudExampleView from './(_components)/crud-view.tsx';
-import { routes } from '@app/router.ts';
+import { appRoutes, routes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
 
 export const crudExamplePage = definePage()
   .withRoute(routes.examples.crud.$route)
   .withMeta(() => ({
     title: '{{name}} — directory pattern demo',
-    description: 'Static registry-block composition demo with app-owned fresh-ui components.',
+    description: 'Empty table reference. Open Records for connected service data.',
   }))
   .withLayer('crud', CrudExampleView, () => ({
-    records: [
-      {
-        name: 'Acme Robotics',
-        plan: 'Enterprise',
-        owner: 'Maya Chen',
-        status: 'Active',
-        updated: '4m ago',
-      },
-      {
-        name: 'Northstar Labs',
-        plan: 'Scale',
-        owner: 'Jon Bell',
-        status: 'Review',
-        updated: '18m ago',
-      },
-      {
-        name: 'Harbor Health',
-        plan: 'Starter',
-        owner: 'Priya Rao',
-        status: 'Paused',
-        updated: '2h ago',
-      },
-    ] as const,
+    records: [] as const,
+    serviceHref: {{hasService}} ? appRoutes.serviceExample.href() : undefined,
+    recordsHref: appRoutes.records.href(),
   }))
   .withLayout((slots) => slots.crud())
   .build();

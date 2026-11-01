@@ -14,11 +14,17 @@ const EXPECTED_VIEWPORTS = [
 ] as const;
 
 const EXPECTED_REFERENCES = [
-  { path: '/', markers: ['href="/design"', 'href="/design/composition"'] },
+  {
+    path: '/',
+    markers: ['href="/design"', 'href="/design/composition"'],
+    seededRecord: 'Seed User',
+  },
+  { path: '/records', markers: ['Records'], seededRecord: 'Seed User' },
   { path: '/design/composition', markers: ['Composition', 'L0'] },
   {
     path: '/examples/users',
     markers: ['Users', 'Cache-first query', 'Managed form', 'Deferred summary'],
+    seededRecord: 'Seed User',
   },
   {
     path: '/people',
@@ -40,7 +46,11 @@ Deno.test('reference probe renders init and generated resources at desktop and m
       observed.push(`${viewport.name}:${new URL(url).pathname}${new URL(url).search}`);
       const expectation = REFERENCE_EXPECTATIONS.find((candidate) => url.endsWith(candidate.path));
       if (!expectation) throw new Error(`unexpected URL: ${url}`);
-      return Promise.resolve(`<html>${expectation.markers.join(' ')}</html>`);
+      return Promise.resolve(
+        `<html>${expectation.markers.join(' ')}${
+          expectation.seededRecord ? '<table><tr><td>Seed User</td></tr></table>' : ''
+        }</html>`,
+      );
     },
     log: () => {},
   });
@@ -87,5 +97,33 @@ Deno.test('reference browser lookup honors the shared explicit override without 
   } finally {
     if (previous === undefined) Deno.env.delete('NETSCRIPT_E2E_BROWSER_EXECUTABLE');
     else Deno.env.set('NETSCRIPT_E2E_BROWSER_EXECUTABLE', previous);
+  }
+});
+
+Deno.test('seeded app proof rejects unavailable panels, empty successful shells and hydration-only data', () => {
+  for (const expectation of REFERENCE_EXPECTATIONS.filter((entry) => entry.seededRecord)) {
+    for (
+      const panel of [
+        '<p>Records unavailable</p>',
+        '<table></table>',
+        '<script>const rows = [{ name: "Seed User" }]</script>',
+      ]
+    ) {
+      assertThrows(
+        () =>
+          assertReferenceDom(
+            `<html>${expectation.markers.join(' ')}${panel}</html>`,
+            expectation,
+            REFERENCE_VIEWPORTS[0],
+          ),
+        Error,
+        'did not render seeded record',
+      );
+    }
+    assertReferenceDom(
+      `<html>${expectation.markers.join(' ')}<dl><dd><span>Seed User</span></dd></dl></html>`,
+      expectation,
+      REFERENCE_VIEWPORTS[0],
+    );
   }
 });

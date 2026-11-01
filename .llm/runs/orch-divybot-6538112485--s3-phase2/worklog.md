@@ -926,3 +926,7 @@ repeat full privacy audit and exact remote-parent ancestor check before plain
 push. Next child must MERGE the published parent into original1afdlineage.
 No next product unit until child integration terminal. Full11b3b/12/13active;
 READY withheld until full scope and exact-head required greenCI are proven.
+
+## Owner ship-now scope and focused verification
+
+Eric/Cockpit directs immediate2488readiness; unfinishedDesktop/harness moved to2584. Normalmain4cb merge conflicts resolved, required new-main docs preview integration repaired. Focused349tests/32nativeCmd pass, prose/build passes, dated2%fullCSScaps+independentrealbloatrestorepositive proven. Three locks unchanged. Coordinator takes final cross-family review/greenCImerge; no broad gates started. Sourcecommit/carriers/publicaudit/plainpush/READY next.

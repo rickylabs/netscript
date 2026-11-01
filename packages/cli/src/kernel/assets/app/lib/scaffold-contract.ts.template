@@ -1,0 +1,51 @@
+/** State displayed by a capability; installation alone never proves readiness. */
+export type CapabilityState = 'absent' | 'installed-unwired' | 'ready' | 'empty' | 'unauthorized' | 'unavailable';
+
+/** Safe capability metadata passed from server loaders to page views. */
+export interface ScaffoldCapability {
+  readonly id: string;
+  readonly label: string;
+  readonly items?: readonly { readonly label: string; readonly detail: string }[];
+  readonly state: CapabilityState;
+  readonly description: string;
+  readonly command?: string;
+}
+
+/** A presentation record projected from a typed service result. */
+export interface ScaffoldRecord {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly status?: string;
+  readonly createdAt?: string;
+  readonly fields: readonly { readonly label: string; readonly value: string }[];
+}
+
+/** A successful empty result is distinct from a failed or missing service. */
+export interface ScaffoldRecords {
+  readonly state: CapabilityState;
+  readonly rows: readonly ScaffoldRecord[];
+  readonly total?: number;
+  readonly page?: number;
+  readonly hasNext?: boolean;
+  readonly message: string;
+  readonly command?: string;
+}
+
+/** Commands use the installed CLI's actual grammar. */
+export const capabilityCommands = {
+  service: 'netscript service add --name {{serviceName}} --with-client',
+  auth: 'netscript plugin install auth --name auth',
+  workers: 'netscript plugin install workers --name workers',
+  streams: 'netscript plugin install streams --name streams',
+  ai: 'netscript plugin install ai --name ai',
+} as const;
+
+/** A missing detail is distinct from an absent service or an unavailable lookup. */
+export interface ScaffoldRecordDetail {
+  readonly state: CapabilityState;
+  readonly record?: ScaffoldRecord;
+  readonly notFound?: boolean;
+  readonly message: string;
+  readonly command?: string;
+}

@@ -1,9 +1,11 @@
+import { readTemplateAssetSync } from '../templates/template-asset.ts';
+import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
 import { assertEquals, assertFalse, assertStringIncludes } from '@std/assert';
 import { Scaffolder } from '../scaffold/scaffolder.ts';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { StringTemplateAdapter } from '../scaffold/template-adapter.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
-import { ServiceClientScaffolder } from './client-scaffolder.ts';
+import { connectScaffoldRecords, ServiceClientScaffolder } from './client-scaffolder.ts';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 
 const formatter: GeneratedSourceFormatterPort = {
@@ -66,4 +68,29 @@ Deno.test('generated service client carries a banner naming the generators that 
   assertStringIncludes(banner, '`netscript ui add`');
   assertStringIncludes(banner, '`netscript generate resource`');
   assertStringIncludes(banner, 'deleting it disables those generators.');
+});
+
+Deno.test('service add connects only the exact scaffold-owned records placeholder', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const client = '/app/apps/portal/lib/members.ts';
+  const path = '/app/apps/portal/lib/scaffold-records.ts';
+  assertEquals(await connectScaffoldRecords(client, 'members', fs, formatter), undefined);
+  const placeholder = await formatter.formatContent(
+    path,
+    readTemplateAssetSync(TEMPLATE_KEYS.appScaffoldRecords),
+  );
+  await fs.writeFile(path, placeholder + '// authored customization\n');
+  assertEquals(await connectScaffoldRecords(client, 'members', fs, formatter), undefined);
+  assertStringIncludes(await fs.readFile(path), 'authored customization');
+  await fs.writeFile(path, placeholder);
+  assertEquals(await connectScaffoldRecords(client, 'members', fs, formatter), path);
+  const connected = await fs.readFile(path);
+  assertStringIncludes(connected, "from './members.ts'");
+  assertStringIncludes(connected, 'membersContract as contract');
+  assertStringIncludes(connected, 'client.list');
+  assertEquals(
+    await connectScaffoldRecords('/app/apps/portal/lib/second.ts', 'second', fs, formatter),
+    undefined,
+  );
+  assertEquals(await fs.readFile(path), connected);
 });
