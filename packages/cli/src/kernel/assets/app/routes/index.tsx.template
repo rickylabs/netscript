@@ -6,7 +6,7 @@ import { definePage } from '@app/utils.ts';
 
 export const homePage = definePage().withRoute(appRoutes.home)
   .withMeta(() => ({ title: '{{name}} — Overview' }))
-  .withLayer('home', View, { loader: async (ctx) => ({ records: await loadScaffoldRecords(ctx.req), capabilities: await readScaffoldCapabilities() }) })
+  .withLayer('home', View, { loader: async (ctx) => { const records = await loadScaffoldRecords(ctx.req); return { records, capabilities: await readScaffoldCapabilities(ctx.req, records) }; } })
   .withLayout((slots) => slots.home()).build();
 export const { default: page } = homePage;
 export { page as default };

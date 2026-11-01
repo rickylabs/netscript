@@ -2,7 +2,11 @@
 export const TEMPLATE_KEYS = {
   appScaffoldContract: 'app/lib/scaffold-contract.ts.template',
   appScaffoldCapabilities: 'app/lib/scaffold-capabilities.ts.template',
+  appScaffoldPluginCapabilities: 'app/lib/scaffold-plugin-capabilities.ts.template',
   appScaffoldRecords: 'app/lib/scaffold-records.ts.template',
+  appScaffoldServiceContext: 'app/lib/scaffold-service-context.ts.template',
+  appScaffoldRecordsMemory: 'app/lib/scaffold-records.memory.ts.template',
+  appScaffoldRecordsDatabase: 'app/lib/scaffold-records.database.ts.template',
   appCapabilityEmpty: 'app/routes/(_components)/capability-empty.tsx.template',
   appRecordTable: 'app/routes/(_components)/record-table.tsx.template',
   appRecordsRoute: 'app/routes/records/index.tsx.template',

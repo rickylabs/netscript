@@ -8,7 +8,11 @@ type TemplateUrlMap = Readonly<Record<string, TemplateKey>>;
 const APP_TEMPLATE_URLS: TemplateUrlMap = {
   appScaffoldContract: TEMPLATE_KEYS.appScaffoldContract,
   appScaffoldCapabilities: TEMPLATE_KEYS.appScaffoldCapabilities,
+  appScaffoldPluginCapabilities: TEMPLATE_KEYS.appScaffoldPluginCapabilities,
   appScaffoldRecords: TEMPLATE_KEYS.appScaffoldRecords,
+  appScaffoldServiceContext: TEMPLATE_KEYS.appScaffoldServiceContext,
+  appScaffoldRecordsMemory: TEMPLATE_KEYS.appScaffoldRecordsMemory,
+  appScaffoldRecordsDatabase: TEMPLATE_KEYS.appScaffoldRecordsDatabase,
   appCapabilityEmpty: TEMPLATE_KEYS.appCapabilityEmpty,
   appRecordTable: TEMPLATE_KEYS.appRecordTable,
   appRecordsRoute: TEMPLATE_KEYS.appRecordsRoute,

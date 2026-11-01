@@ -6,7 +6,7 @@ import { definePage } from '@app/utils.ts';
 
 export const dashboardPage = definePage().withRoute(appRoutes.dashboard)
   .withMeta(() => ({ title: '{{name}} — Overview' }))
-  .withLayer('dashboard', View, { loader: async (ctx) => ({ records: await loadScaffoldRecords(ctx.req), capabilities: await readScaffoldCapabilities() }) })
+  .withLayer('dashboard', View, { loader: async (ctx) => { const records = await loadScaffoldRecords(ctx.req); return { records, capabilities: await readScaffoldCapabilities(ctx.req, records) }; } })
   .withLayout((slots) => slots.dashboard()).build();
 export const { default: page } = dashboardPage;
 export { page as default };

@@ -1,15 +1,33 @@
 # Resume scaffold redesign #2570
 
 Draft PR #2572, branch orch/divybot-6557001595. PLAN-EVAL passed round 2.
-S1 shell/empty states implemented; independent S1 review passed after config-error
-containment. See s1-review-round-2.md and s1-*.json for scope and evidence.
-S2 live typed services, metadata plugin discovery and record details is next.
-S3 visual review and S4 full gates are not complete. Never claim READY from S1.
+S1 passed independent review and is committed/pushed as c2c85fb.
+S2 passed independent re-review (s2-terminal-review.md). Sign-off commit includes
+typed live readers and safe post-init connection. S3 may now begin. Read worklog.
 
-Read plan.md corrections B1–B6 as binding decisions; they map all acceptance.
-The canonical service examples and development design links must survive runtime.
-README in packages/cli/src/kernel/assets/app is the extension path.
+S2 adds memory/database typed record adapters and bounded memory detail lookup;
+optional request-local auth client discovery; metadata-based plugin identity,
+workers list, validated streams readiness and in-process AI model projection.
+Resource-slice initialInput fixes canonical memory list calls without altering
+service contracts. Actual CLI diagnostic grammar corrections are in drift.md.
+
+Gates: 90 focused scaffold/resource/service-add tests; memory/DB app check 63 files each,
+plugin app check 50 files; 17 source files check/lint/fmt; quality gate passes.
+Browser evidence proves actual service records/detail/missing ID and generated
+signin form. After native config set enables plugin references, unavailable
+runtimes and empty no-samples AI are displayed truthfully. These are slice proofs,
+not final visual or merge acceptance.
+
+S3: refine visuals, capture all routes/variants/schemes/widths and keyboard selection,
+independent Astra review >=8 fidelity and quality per page. S4: full carrier chain,
+all check:* tasks, CLI/template tests, release/docs gates, JSR and full runtime
+(or explicit UNPROVEN), plus independent final IMPL-EVAL. No READY yet.
+
+Read plan.md B1–B6 plus drift.md. Preserve canonical service examples, reference
+order route and development design links. Current #2488 remains OPEN; merge main
+when it lands. Do not duplicate gap components or implement showcase #2571.
 
 Owner mandates Claude Opus 5.5 high read-only evaluations and separate Astra visual
-review. Public artifacts are repo-relative and omit session ids. Final report uses
-the untracked .divybot-final-report.md handoff. Keep PR draft, Refs-only, no labels.
+review. Public artifacts are repo-relative and omit session ids. Raw logs require
+normalization before publication. Final report uses untracked
+.divybot-final-report.md handoff. Keep PR draft, Refs-only, no labels.

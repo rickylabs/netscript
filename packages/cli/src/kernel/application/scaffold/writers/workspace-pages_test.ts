@@ -1,3 +1,5 @@
+import { JsrImportResolver } from '../../../../public/adapters/jsr-import-resolver.ts';
+import { generateAppDenoJson } from '../../../adapters/templates/app/generate-app-deno-json.ts';
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { renderTemplate } from '../../../adapters/scaffold/template-adapter.ts';
 import { readTemplateAssetSync } from '../../../adapters/templates/template-asset.ts';
@@ -61,7 +63,7 @@ Deno.test('workspace templates render custom names and never leave template vari
 Deno.test('no-service scaffold loader has no missing contract imports or static business records', () => {
   const loader = readTemplateAssetSync(TEMPLATE_KEYS.appScaffoldRecords);
   assertEquals(loader.includes('/contracts'), false);
-  assertStringIncludes(loader, 'readScaffoldCapabilities()');
+  assertStringIncludes(loader, 'readScaffoldCapabilities(');
   assertStringIncludes(loader, 'rows: []');
   const crud = readTemplateAssetSync(TEMPLATE_KEYS.appRoutesExamplesCrud);
   assertStringIncludes(crud, 'records: []');
@@ -116,6 +118,10 @@ Deno.test('capability read contains missing/invalid configuration errors on the 
       "import { findWorkspaceRoot } from '@netscript/config';",
       `const findWorkspaceRoot = () => Promise.resolve(${JSON.stringify(root)});`,
     )
+    .replace(
+      "import { probeScaffoldPlugin } from './scaffold-plugin-capabilities.ts';",
+      "const probeScaffoldPlugin = async () => ({state: 'ready' as const, description: 'ready'});",
+    )
     .replace("'./scaffold-contract.ts'", JSON.stringify(contractUrl))
     .replace("'zod'", JSON.stringify(import.meta.resolve('zod')));
   const module = await import(`data:application/typescript,${encodeURIComponent(source)}`);
@@ -149,4 +155,30 @@ Deno.test('capability read contains missing/invalid configuration errors on the 
     console.error = originalError;
     await Deno.remove(root, { recursive: true });
   }
+});
+
+Deno.test('scaffold worker reader and official plugin share the release-pinned contract version', async () => {
+  const core = JSON.parse(
+    await Deno.readTextFile(
+      new URL('../../../../../../plugin-workers-core/deno.json', import.meta.url),
+    ),
+  );
+  const plugin = JSON.parse(
+    await Deno.readTextFile(
+      new URL('../../../../../../../plugins/workers/scaffold.plugin.json', import.meta.url),
+    ),
+  );
+  const app = JSON.parse(
+    generateAppDenoJson({
+      projectName: 'fixture',
+      appName: 'portal',
+      importMode: 'jsr',
+      jsrResolver: new JsrImportResolver(),
+    }),
+  );
+  assertEquals(core.version, plugin.version);
+  assertEquals(
+    app.imports[`${core.name}/contracts/v1`],
+    `jsr:${core.name}@${core.version}/contracts/v1`,
+  );
 });

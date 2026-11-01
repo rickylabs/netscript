@@ -31,3 +31,14 @@ item selection are authorized for new page assets/CommandPalette dependencies.
 Known post-install clients may expose installed-unwired state; such a remaining
 required state prevents full acceptance/READY. No post-init reconciler rewrites
 are planned; request-time projection is the locked mechanism.
+
+S2 registration extension: scaffold package constants and local/JSR import resolver
+may add direct SDK discovery and workers contract subpaths required by generated
+server capability loaders. This changes app dependencies, not plugin contracts.
+
+S2 debt resolution authorizes an additive entry in .llm/harness/debt/arch-debt.md.
+The existing service-add flow may connect a newly generated memory client to an
+exactly unchanged scaffold records placeholder; authored files remain untouched.
+This completes B2's safe template-owned client selection, not arbitrary inspection.
+
+S2 correction extends the declared resolver surface to public/adapters/jsr-import-resolver.ts and maintainer/adapters/local-import-resolver.ts: public service-add fixture exposed missing direct-import entries. Both use existing release constants; version parity now exercises the actual public resolver.

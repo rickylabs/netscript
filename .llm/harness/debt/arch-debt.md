@@ -3220,3 +3220,22 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Split install orchestration below 500 lines and feature folders to at most 12 immediate
   children while preserving plugin install/dispatch/mutator tests, auth backend consumer proofs,
   package publish dry-run and the coordinator's full `scaffold.runtime` verdict.
+
+## packages/cli — CLI-SCAFFOLD-WORKERS-CONTRACT-DEPENDENCY
+
+- **Reason:** The generated workspace's server-only capability reader imports the precise workers
+  contract even when the workers runtime is absent. This preserves typed listJobs calls without
+  inventing a structural replacement contract or changing plugin-owned source.
+- **Cost:** No-workers apps resolve/type-check the workers contract package. Independently updating
+  an installed plugin can produce version skew between that contract and its runtime service.
+- **Mitigation:** Official CLI app and plugin generation share the release-pinned resolver. The
+  scaffold regression asserts the app's contract import matches the shipped plugin and core
+  manifest version. Runtime read errors are unavailable states, never empty success.
+- **Owner:** CLI scaffold maintainers.
+- **Target:** Before supporting independent workers plugin major-version upgrades in scaffold apps.
+- **Linked plan:** `.llm/runs/orch-divybot-6557001595--2570/plan.md`, issue #2570.
+- **Created:** 2026-11-01
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Generate an optional typed app adapter from installed-plugin metadata; prove no-workers
+  apps have no workers dependency and plugin install/update/remove keeps the adapter version aligned,
+  while preserving the typed workers read and live/empty/unauthorized/unavailable tests.

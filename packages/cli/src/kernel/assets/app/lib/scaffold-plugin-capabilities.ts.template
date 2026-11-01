@@ -1,0 +1,46 @@
+// Server-only live reads. No provider credentials or runtime config reach the page.
+import { getServiceUrl } from '@netscript/sdk/discovery';
+import { workersContract } from '@netscript/plugin-workers-core/contracts/v1';
+import { z } from 'zod';
+import type { ScaffoldCapability } from './scaffold-contract.ts';
+import { scaffoldServiceClient } from './scaffold-service-context.ts';
+
+type Projection = Omit<ScaffoldCapability, 'id' | 'label'>;
+type AiModels = { readonly AI_MODELS: Readonly<Record<string, string>> };
+type AiRuntime = { chatModel?: () => Promise<unknown> };
+const aiModels = import.meta.glob<AiModels>('../../../ai/models.ts');
+const aiRuntimes = import.meta.glob<AiRuntime>('../../../ai/ai.ts');
+const readinessSchema = z.object({ ready: z.literal(true) });
+
+/** Read only installed capabilities, using existing contracts and service discovery. */
+export async function probeScaffoldPlugin(id: 'workers' | 'streams' | 'ai', name: string, request?: Request): Promise<Projection> {
+  try {
+    if (id === 'workers') {
+      const { client, context } = await scaffoldServiceClient(workersContract, name, 'workers', request);
+      const result = await client.listJobs({ limit: 5, offset: 0 }, { context });
+      return { state: result.jobs.length ? 'ready' : 'empty', description: `${result.total} registered jobs.`, items: result.jobs.map((job) => ({ label: job.name, detail: job.id })), command: result.total ? undefined : 'netscript plugin info @netscript/plugin-workers' };
+    }
+    if (id === 'streams') {
+      const signal = request ? AbortSignal.any([request.signal, AbortSignal.timeout(3000)]) : AbortSignal.timeout(3000);
+      const response = await fetch(new URL('/health/ready', getServiceUrl(name)), { signal });
+      if (!response.ok) { await response.body?.cancel(); return { state: response.status === 401 || response.status === 403 ? 'unauthorized' : 'unavailable', description: 'The stream service could not be read.', command: 'netscript plugin doctor' }; }
+      readinessSchema.parse(await response.json());
+      return { state: 'ready', description: 'Stream service ready. Connect a topic to display its activity.', command: 'netscript plugin info @netscript/plugin-streams' };
+    }
+    const loadModels = Object.values(aiModels)[0];
+    const loadRuntime = Object.values(aiRuntimes)[0];
+    if (!loadModels || !loadRuntime) return { state: 'installed-unwired', description: 'The app-owned AI modules are not connected.', command: 'netscript plugin doctor' };
+    const models = z.record(z.string(), z.string()).parse((await loadModels()).AI_MODELS);
+    const items = Object.entries(models).map(([label, detail]) => ({ label, detail }));
+    if (!items.length) return { state: 'empty', description: 'No models configured.', command: 'netscript plugin info @netscript/plugin-ai' };
+    const runtime = await loadRuntime();
+    if (!runtime.chatModel) return { state: 'empty', description: 'Model references configured. No chat runtime is connected.', items, command: 'netscript plugin info @netscript/plugin-ai' };
+    // Resolves an existing provider handle; it never generates tokens or provisions a model.
+    await runtime.chatModel();
+    return { state: 'ready', description: 'Configured models. Provider access is checked when you make a request.', items, command: 'netscript plugin info @netscript/plugin-ai' };
+  } catch (error) {
+    const status = error && typeof error === 'object' && 'status' in error ? error.status : undefined;
+    console.error('Workspace plugin read failed', error);
+    return { state: status === 401 || status === 403 ? 'unauthorized' : 'unavailable', description: id === 'ai' ? 'AI configuration is unavailable. Check the configured provider and credentials.' : 'The service is unavailable. Start it and try again.', command: 'netscript plugin doctor' };
+  }
+}

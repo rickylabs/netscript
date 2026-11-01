@@ -17,3 +17,31 @@ and `kernel/assets/manifest.ts` to registration scope. No e2e probe changes plan
 S1 inventory: 29 owning source/test/documentation files plus the embedded carrier.
 This meets the target for the owning slice; carrier regenerated in the same commit
 so the CLI's emitted scaffold matches the template source. No unrelated source.
+
+S2 research correction: current AI plugin is in-process. Its configured model
+registry and existing app chat flow replace the plan's assumed remote models read.
+Use the shipped composition root; do not introduce a gateway or showcase plumbing.
+
+S2 adds SDK discovery and workers contract import-map entries to keep local-source
+and public JSR scaffolds equivalent. No package versions change. These are server
+read dependencies; optional auth and AI app modules remain glob-discovered.
+
+Generated memory-service type checking exposed an existing canonical resource
+example defect: its shared list input was `{}` while the contract requires limit
+and offset. Extend the resource-slice procedure selection with optional primitive
+initial arguments; init supplies the memory pagination input. Keep the canonical
+leaves and their runtime markers, and leave service contracts unchanged. This is
+necessary for the requested with-service scaffold gate, not showcase plumbing.
+
+CLI grammar correction to B2: `plugin doctor` takes no positional name; its
+`--resource` option labels diagnostic evidence, not plugin selection. All rendered
+diagnostic commands now use `netscript plugin doctor`. The plan review accepted a
+named form that the actual parser rejects; the parser is authoritative.
+
+S2 review FAIL_DEBT resolved by explicitly accepting
+CLI-SCAFFOLD-WORKERS-CONTRACT-DEPENDENCY with cost, mitigation, owner, target and
+closing gate in the canonical ledger and plan. Version-parity test is required.
+B2's optional safe post-install connection is implemented for newly generated
+memory clients only, guarded by exact formatted-placeholder equality.
+
+S2 correction extends the declared resolver surface to public/adapters/jsr-import-resolver.ts and maintainer/adapters/local-import-resolver.ts: public service-add fixture exposed missing direct-import entries. Both use existing release constants; version parity now exercises the actual public resolver.

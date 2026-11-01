@@ -1,16 +1,20 @@
-import { Button, EmptyState, PageHeader } from '@app/components/ui/mod.ts';
-import type { ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
-import { loadScaffoldRecords } from '@app/lib/scaffold-records.ts';
+import { Badge, Button, EmptyState, PageHeader } from '@app/components/ui/mod.ts';
+import type { ScaffoldRecordDetail } from '@app/lib/scaffold-contract.ts';
+import { loadScaffoldRecord } from '@app/lib/scaffold-records.ts';
 import { appRoutes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
 
 export const recordPage = definePage().withRoute(appRoutes.record)
   .withMeta(() => ({ title: '{{name}} — Record details' }))
-  .withLayer('record', ({ records }: { readonly records: ScaffoldRecords }) => <div class='workspace-page'>
-    <PageHeader class='workspace-heading'><PageHeader.Main><PageHeader.Intro><h1>Record details</h1><p>Details from your connected service.</p></PageHeader.Intro></PageHeader.Main></PageHeader>
-    <EmptyState class='workspace-empty' heading='No record connected'><p>{records.message}</p>{records.command && <code class='workspace-command'>{records.command}</code>}</EmptyState>
-    <Button type='link' href={appRoutes.records.href()} variant='outline'>Back to records</Button>
-  </div>, { loader: async (ctx) => ({ records: await loadScaffoldRecords(ctx.req) }) })
+  .withLayer('record', ({ detail }: { readonly detail: ScaffoldRecordDetail }) => <div class='workspace-page'>
+    <PageHeader class='workspace-heading'><PageHeader.Layout><PageHeader.Main><PageHeader.Intro><h1>{detail.record?.name ?? (detail.notFound ? 'Record not found' : 'Record details')}</h1><p>{detail.record?.description || detail.message}</p></PageHeader.Intro></PageHeader.Main><PageHeader.Actions><Button type='link' href={appRoutes.records.href()} variant='outline'>Back to records</Button></PageHeader.Actions></PageHeader.Layout></PageHeader>
+    {detail.record ? <section class='workspace-section'><header class='workspace-section-heading'><h2>Record information</h2>{detail.record.status && <Badge variant='muted'>{detail.record.status}</Badge>}</header>
+      <dl class='workspace-details'>{detail.record.fields.map((field) => <div key={field.label}><dt>{field.label}</dt><dd>{field.value}</dd></div>)}</dl>
+    </section> : <EmptyState class='workspace-empty' heading={detail.notFound ? 'This record could not be found' : detail.state === 'unauthorized' ? 'Sign in to view this record' : detail.state === 'unavailable' ? 'Record unavailable' : 'No record connected'}><p>{detail.message}</p>{detail.command && <code class='workspace-command'>{detail.command}</code>}{detail.state === 'unauthorized' && <Button type='link' href={appRoutes.signIn.href()}>Sign in</Button>}</EmptyState>}
+  </div>, { loader: async (ctx) => {
+    const detail = await loadScaffoldRecord(ctx.req, ctx.path.id);
+    return { detail };
+  } })
   .withLayout((slots) => slots.record()).build();
 export const { default: page } = recordPage;
 export { page as default };

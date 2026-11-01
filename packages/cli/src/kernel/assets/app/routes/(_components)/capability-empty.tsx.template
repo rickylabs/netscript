@@ -1,8 +1,14 @@
-import { EmptyState } from '@app/components/ui/mod.ts';
+import { Badge, EmptyState } from '@app/components/ui/mod.ts';
 import type { ScaffoldCapability } from '@app/lib/scaffold-contract.ts';
 
 /** Designed absence with a copyable, executable next step. */
 export function CapabilityEmpty({ capability }: { readonly capability: ScaffoldCapability }) {
+  if (capability.state === 'ready' || capability.state === 'empty') return <div class='workspace-live-capability'>
+    <header class='workspace-section-heading'><h3>{capability.label}</h3><Badge variant='muted'>{capability.state === 'ready' ? 'Connected' : 'No entries'}</Badge></header>
+    <p>{capability.description}</p>
+    {capability.items && <dl class='workspace-details'>{capability.items.map((item) => <div key={item.label}><dt>{item.label}</dt><dd>{item.detail}</dd></div>)}</dl>}
+    {capability.command && <code class='workspace-command'>{capability.command}</code>}
+  </div>;
   return (
     <EmptyState class='workspace-empty' heading={capability.label}>
       <p>{capability.description}</p>

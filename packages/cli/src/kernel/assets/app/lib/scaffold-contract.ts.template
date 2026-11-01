@@ -5,6 +5,7 @@ export type CapabilityState = 'absent' | 'installed-unwired' | 'ready' | 'empty'
 export interface ScaffoldCapability {
   readonly id: string;
   readonly label: string;
+  readonly items?: readonly { readonly label: string; readonly detail: string }[];
   readonly state: CapabilityState;
   readonly description: string;
   readonly command?: string;
@@ -25,6 +26,8 @@ export interface ScaffoldRecords {
   readonly state: CapabilityState;
   readonly rows: readonly ScaffoldRecord[];
   readonly total?: number;
+  readonly page?: number;
+  readonly hasNext?: boolean;
   readonly message: string;
   readonly command?: string;
 }
@@ -37,3 +40,12 @@ export const capabilityCommands = {
   streams: 'netscript plugin install streams --name streams',
   ai: 'netscript plugin install ai --name ai',
 } as const;
+
+/** A missing detail is distinct from an absent service or an unavailable lookup. */
+export interface ScaffoldRecordDetail {
+  readonly state: CapabilityState;
+  readonly record?: ScaffoldRecord;
+  readonly notFound?: boolean;
+  readonly message: string;
+  readonly command?: string;
+}

@@ -128,6 +128,7 @@ function renderVariables(
     clientModuleSpecifier: input.client.moduleSpecifier,
     queryFactoryName: input.client.queryFactoryName,
     queryFactory: plan.query.factory,
+    procedureInput: JSON.stringify(input.procedure.initialInput ?? {}),
     partialName,
     partialRoute,
     pageOptionImports: pageOptionImports(input.resource, input.resourcePascalCase, options),

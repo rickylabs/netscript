@@ -2,50 +2,70 @@
 import { findWorkspaceRoot } from '@netscript/config';
 import { join } from 'node:path';
 import { z } from 'zod';
-import { capabilityCommands, type ScaffoldCapability } from './scaffold-contract.ts';
+import { capabilityCommands, type ScaffoldCapability, type ScaffoldRecords } from './scaffold-contract.ts';
+import { probeScaffoldPlugin } from './scaffold-plugin-capabilities.ts';
 
-const resourceSchema = z.object({ Enabled: z.boolean().optional() });
+const resourceSchema = z.object({ Enabled: z.boolean().optional(), PluginReferences: z.array(z.string()).optional() });
 const settingsSchema = z.object({ NetScript: z.object({
   Services: z.record(z.string(), resourceSchema).default({}),
   Plugins: z.record(z.string(), resourceSchema).default({}),
-}).default({ Services: {}, Plugins: {} }) });
+  Apps: z.record(z.string(), resourceSchema).default({}),
+}).default({ Services: {}, Plugins: {}, Apps: {} }) });
+const linkingSchema = z.object({ canonicalName: z.string(), resourceConfigKey: z.string(), consumers: z.object({ apps: z.array(z.string()).default([]) }).optional() });
+const manifestSchema = z.object({ linking: linkingSchema.optional(), officialSource: z.object({ canonicalName: z.string(), serviceConfigKey: z.string().optional() }).optional() });
+const labels = { service: 'Records', auth: 'Sign-in', workers: 'Background work', streams: 'Activity', ai: 'AI' } as const;
+const descriptions = { auth: 'Connect an identity provider to sign in.', workers: 'Run jobs outside the request.', streams: 'Follow changes as they happen.', ai: 'Connect models and tools to your workspace.' } as const;
 
-/** Read only the safe topology projection on each request, including post-init installs. */
-export async function readScaffoldCapabilities(): Promise<readonly ScaffoldCapability[]> {
-  try {
-  const root = await findWorkspaceRoot(Deno.cwd());
-  const settings = settingsSchema.parse(JSON.parse(await Deno.readTextFile(join(root, 'appsettings.json'))));
-  const services = Object.entries(settings.NetScript.Services).filter(([, entry]) => entry.Enabled !== false);
-  const service = services.find(([name]) => name === '{{serviceName}}') ?? services[0];
-  const capabilities: ScaffoldCapability[] = [{
-    id: 'service', label: 'Records', state: service ? 'installed-unwired' : 'absent',
-    description: service ? `Connect the ${service[0]} typed client to a resource page.` : 'Add a service to start working with records.',
-    command: service
-      ? `netscript generate resource ${service[0]} --app {{appName}} --client ${service[0]} --procedure list`
-      : capabilityCommands.service,
-  }];
-  for (const id of ['auth', 'workers', 'streams', 'ai'] as const) {
-    const enabled = settings.NetScript.Plugins[id]?.Enabled !== false && settings.NetScript.Plugins[id] !== undefined;
-    let authRoute = false;
-    if (id === 'auth' && enabled) {
-      try { authRoute = (await Deno.stat(join(root, 'apps', '{{appName}}', 'routes/auth/[action].ts'))).isFile; }
-      catch (error) { if (!(error instanceof Deno.errors.NotFound)) throw error; }
-    }
-    capabilities.push({
-      id, label: { auth: 'Sign-in', workers: 'Background work', streams: 'Activity', ai: 'AI' }[id],
-      state: authRoute ? 'ready' : enabled ? 'installed-unwired' : 'absent',
-      description: authRoute ? 'Continue with your configured identity provider.'
-        : enabled ? 'Installed. Connect its supported client to this workspace.'
-        : { auth: 'Connect an identity provider to sign in.', workers: 'Run jobs outside the request.', streams: 'Follow changes as they happen.', ai: 'Connect models and tools to your workspace.' }[id],
-      command: authRoute ? undefined : enabled ? 'netscript plugin doctor' : capabilityCommands[id],
-    });
+/** Read the persisted install identity; directory names alone never identify plugins. */
+async function installedPlugins(root: string) {
+  const installed = new Map<string, { name: string; apps: readonly string[] }>();
+  for (const parent of [root, join(root, 'plugins')]) {
+    try {
+      for await (const entry of Deno.readDir(parent)) {
+        if (!entry.isDirectory || entry.name.startsWith('.')) continue;
+        try {
+          const manifest = manifestSchema.parse(JSON.parse(await Deno.readTextFile(join(parent, entry.name, 'scaffold.plugin.json'))));
+          const identity = manifest.linking ?? (manifest.officialSource ? { canonicalName: manifest.officialSource.canonicalName, resourceConfigKey: manifest.officialSource.serviceConfigKey ?? entry.name } : undefined);
+          if (identity) installed.set(identity.canonicalName, { name: identity.resourceConfigKey, apps: manifest.linking?.consumers?.apps ?? [] });
+        } catch (error) { if (!(error instanceof Deno.errors.NotFound)) throw error; }
+      }
+    } catch (error) { if (!(error instanceof Deno.errors.NotFound)) throw error; }
   }
-  return capabilities;
+  return installed;
+}
+
+/** Project current topology, including post-init installs, then read supported live surfaces. */
+export async function readScaffoldCapabilities(request?: Request, records?: ScaffoldRecords): Promise<readonly ScaffoldCapability[]> {
+  try {
+    const root = await findWorkspaceRoot(Deno.cwd());
+    const settings = settingsSchema.parse(JSON.parse(await Deno.readTextFile(join(root, 'appsettings.json'))));
+    const services = Object.entries(settings.NetScript.Services).filter(([, entry]) => entry.Enabled !== false);
+    const service = services.find(([name]) => name === '{{serviceName}}') ?? services[0];
+    const capabilities: ScaffoldCapability[] = [{
+      id: 'service', label: labels.service, state: records?.state ?? (service ? 'installed-unwired' : 'absent'),
+      description: records?.message ?? (service ? `Connect the ${service[0]} typed client to a resource page.` : 'Add a service to start working with records.'),
+      command: records ? records.command : service ? `netscript generate resource ${service[0]} --app {{appName}} --client ${service[0]} --procedure list` : capabilityCommands.service,
+    }];
+    const installed = await installedPlugins(root);
+    const appRefs = settings.NetScript.Apps['{{appName}}']?.PluginReferences;
+    const plugins = await Promise.all((['auth', 'workers', 'streams', 'ai'] as const).map(async (id): Promise<ScaffoldCapability> => {
+      const identity = installed.get(id);
+      const resource = identity ? settings.NetScript.Plugins[identity.name] : undefined;
+      const scoped = identity && (!identity.apps.length || identity.apps.includes('{{appName}}')) && (id === 'ai' || appRefs?.includes(identity.name) || appRefs?.includes(id));
+      if (!identity || resource?.Enabled === false) return { id, label: labels[id], state: 'absent', description: resource?.Enabled === false ? 'This capability is disabled in the workspace configuration.' : descriptions[id], command: resource?.Enabled === false ? 'netscript plugin doctor' : capabilityCommands[id] };
+      if (identity && !scoped) return { id, label: labels[id], state: 'installed-unwired', description: 'Installed, but not linked to this application.', command: 'netscript plugin doctor' };
+      if (id === 'auth') {
+        let authRoute = false;
+        try { authRoute = (await Deno.stat(join(Deno.cwd(), 'routes/auth/[action].ts'))).isFile; }
+        catch (error) { if (!(error instanceof Deno.errors.NotFound)) throw error; }
+        return { id, label: labels[id], state: authRoute && resource ? 'ready' : 'installed-unwired', description: authRoute && resource ? 'Continue with your configured identity provider.' : 'The authentication route is not connected to this app.', command: authRoute && resource ? undefined : 'netscript plugin doctor' };
+      }
+      if (!resource && id !== 'ai') return { id, label: labels[id], state: 'installed-unwired', description: 'Installed, but its runtime resource is not configured.', command: 'netscript plugin doctor' };
+      return { id, label: labels[id], ...await probeScaffoldPlugin(id, identity.name, request) };
+    }));
+    return [...capabilities, ...plugins];
   } catch (error) {
     console.error('Workspace capability read failed', error);
-    return (['service', 'auth', 'workers', 'streams', 'ai'] as const).map((id) => ({
-      id, label: { service: 'Records', auth: 'Sign-in', workers: 'Background work', streams: 'Activity', ai: 'AI' }[id],
-      state: 'unavailable', description: 'Workspace configuration is unavailable. Try again after checking the server configuration.',
-    }));
+    return (['service', 'auth', 'workers', 'streams', 'ai'] as const).map((id) => ({ id, label: labels[id], state: 'unavailable', description: 'Workspace configuration is unavailable. Try again after checking the server configuration.' }));
   }
 }

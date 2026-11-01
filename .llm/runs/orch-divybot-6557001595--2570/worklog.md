@@ -76,3 +76,58 @@ S1 terminal independent review: PASS (s1-terminal-review.md), including the imme
 shortcut state and actual browser receipt. Sign-off commit follows that review.
 Browser dependency: `npm ci --ignore-scripts` in tools/fresh-ui-browser supplies
 Playwright; Chromium uses the existing host browser libraries.
+
+## S2 — live capability wiring (review pending)
+
+Memory and database adapters call generated typed clients and project whitelisted
+record fields. Memory detail uses bounded pagination; missing, exhausted,
+unauthorized and unavailable are distinct. Optional BFF discovery attaches each
+request's own credential context without serializing it. No-service has no missing
+contract import. Post-init service presence is detected as installed-unwired,
+pointing to the existing resource generator (the approved B2 boundary).
+
+Plugin discovery reads scaffold.plugin.json identity/resource linking, honors app
+consumers and enabled references, and resolves auth route presence relative to the
+actual app cwd. Workers use typed listJobs, streams use discovery and a validated
+readiness response, AI reads app-owned configuration and the existing runtime when
+present. No-samples AI has no chatModel export and is intentionally empty, not
+falsely healthy. Missing providers are unavailable and diagnostics are safe.
+
+Validation so far: 77 tests in scaffold/resource suites; generated memory and DB
+apps each check 63 files, plugin app 50 files; scoped source wrappers and quality
+gate pass. Actual memory-service browser shows fetched list/detail and missing-ID
+states. Plugin install succeeds with Aspire scaffold enabled; --no-aspire installs
+can stop at helper regeneration after writing files, so use an Aspire-enabled
+fixture. Aliased local-path installs also fail in the pre-existing registration
+path; canonical names succeed. No product workaround for those installer issues.
+
+The plugin fixture received the latest emitted capability templates before startup,
+retaining its installer-owned config and optional modules. Final S3/S4 proof will
+regenerate the complete final scaffold. No shared components or service contracts
+changed. Canonical memory resource input defect and actual CLI grammar corrections
+are recorded in drift.md. Review is not final IMPL-EVAL.
+
+S2 plugin browser follow-up: after adding references using the supported config
+set command, the page detects them on the next request. The read probes report
+unavailable services and empty no-samples AI. See s2-plugins-referenced-browser.json.
+S2 source inventory is 25 owning files plus the generated embedded carrier.
+
+S2 correction extends the declared resolver surface to public/adapters/jsr-import-resolver.ts and maintainer/adapters/local-import-resolver.ts: public service-add fixture exposed missing direct-import entries. Both use existing release constants; version parity now exercises the actual public resolver.
+
+S2 review correction: accepted CLI-SCAFFOLD-WORKERS-CONTRACT-DEPENDENCY with cost,
+mitigation and closure gate in the canonical ledger and plan. Version test now uses
+the real public resolver. The broader service-add suite exposed missing mappings
+in that resolver; corrected both public and maintainer maps. 90 focused tests pass.
+A fresh --db none Aspire-enabled project followed by service add --name members
+--with-client connects the exact untouched loader to ./members.ts; generated app
+check passes. Unit coverage preserves edited, missing and already-connected loaders.
+Capability metadata now uses live adapter results, missing app refs stay unlinked,
+and disabled takes priority over unlinked. These close review findings 1, 2 and 8.
+Remaining nonblocking observations 3–7 remain tracked for final evaluation; current
+server errors remain safe, AI never invokes a generation operation, and missing
+records render correctly but retain HTTP200. Do not claim full acceptance yet.
+
+S2 terminal re-review PASS. Sign-off accepts documented workers dependency debt.
+Reconcile: 30 owning TypeScript/template files plus generated carrier and debt/run
+artifacts; five-file correction expansion was necessary for public resolver and
+safe post-init connection. deno.lock unchanged; #2488 remains open. S3 starts next.

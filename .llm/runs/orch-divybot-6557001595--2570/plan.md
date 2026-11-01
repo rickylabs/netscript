@@ -190,3 +190,18 @@ Open-decision sweep: all six review blockers are decided above. #2488 migration 
 safe to defer until merge. Additional live plugin adapter details must conform to
 this fixed projection; an inability to satisfy a required capability is incomplete
 acceptance and blocks READY, never permission to invent a contract.
+
+## S2 accepted dependency debt
+
+Independent S2 review selected FAIL_DEBT for the unconditional workers contract
+import. Accept CLI-SCAFFOLD-WORKERS-CONTRACT-DEPENDENCY in the canonical debt ledger:
+no-workers apps resolve/type-check that package; independent plugin upgrades may
+skew its runtime version. Both official generation paths share the release-pinned
+resolver, covered by an app/core/plugin version-parity regression. Close before
+supporting independent major upgrades by generating an optional typed adapter from
+installed metadata, without weakening the contract. No fake success is accepted.
+
+S2 also completes B2 for a newly added generated memory client: replace the records
+placeholder only when its entire formatted contents exactly match the scaffold
+source. Authored loaders and already-connected loaders are preserved. This is the
+safe template-owned path contemplated by B2; arbitrary clients are not inspected.

@@ -36,6 +36,8 @@ export interface SelectedResourceClient {
 export interface SelectedResourceProcedure {
   readonly path: readonly [string, ...string[]];
   readonly kind: 'query';
+  /** Initial arguments for a known typed procedure, serialized as data in the loader. */
+  readonly initialInput?: Readonly<Record<string, string | number | boolean | null>>;
 }
 
 export interface RequiredResourceState {

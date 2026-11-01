@@ -45,6 +45,8 @@ export async function writeNormalizedAppFiles(
     appPort: String(appPort),
     serviceName: plan.service?.name ?? SCAFFOLD_DEFAULTS.SERVICE_NAME,
     modelName: options.modelName,
+    serviceStorage: options.dbEngine,
+    serviceQueryModule: `../routes/examples/${plan.service?.name}/(_lib)/service-query.ts`,
     hasService: String(options.includeExampleService),
     serviceResourceRouteAlias: options.includeExampleService && options.serviceName
       ? `${toCamelCase(options.serviceName)}: generatedRoutes.examples.${
@@ -400,7 +402,16 @@ export async function writeNormalizedAppFiles(
   const workspacePages = [
     ['lib/scaffold-contract.ts', appAssets.appScaffoldContract],
     ['lib/scaffold-capabilities.ts', appAssets.appScaffoldCapabilities],
-    ['lib/scaffold-records.ts', appAssets.appScaffoldRecords],
+    ['lib/scaffold-plugin-capabilities.ts', appAssets.appScaffoldPluginCapabilities],
+    ['lib/scaffold-service-context.ts', appAssets.appScaffoldServiceContext],
+    [
+      'lib/scaffold-records.ts',
+      options.includeExampleService
+        ? options.dbEngine === 'none'
+          ? appAssets.appScaffoldRecordsMemory
+          : appAssets.appScaffoldRecordsDatabase
+        : appAssets.appScaffoldRecords,
+    ],
     ['routes/(_components)/capability-empty.tsx', appAssets.appCapabilityEmpty],
     ['routes/(_components)/record-table.tsx', appAssets.appRecordTable],
     ['routes/records/index.tsx', appAssets.appRecordsRoute],

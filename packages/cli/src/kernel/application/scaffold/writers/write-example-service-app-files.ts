@@ -44,7 +44,13 @@ export function planExampleServiceResourceSlice(
       moduleSpecifier: `@app/routes/examples/${serviceName}/(_lib)/service-query.ts`,
       queryFactoryName: `${toCamelCase(serviceName)}Queries`,
     },
-    procedure: { path: ['list'], kind: 'query' },
+    procedure: {
+      path: ['list'],
+      kind: 'query',
+      ...(appTemplateVars.serviceStorage === 'none'
+        ? { initialInput: { limit: 25, offset: 0 } }
+        : {}),
+    },
   }));
 }
 
