@@ -6,6 +6,8 @@ The public `componentContracts` catalog has 87 contracts; 66 are shipped. `fresh
 
 The embedded Figma collections carry code-owned names/types/modes/WEB syntax and Figma-owned values. Existing `assertFigmaTokenNames` validates them. Bind through Scheme, Theme set and Density; never directly to Theme or Theme B. Token shorthand in the catalog must expand deterministically and reject nonexistent expansions. No component values, props or anatomy may be copied into a parallel authoring spec.
 
-Official Figma documentation confirms HTML `figma.connect`, `figma.enum` and `html` tagged templates; native sets use `combineAsVariants`. No Figma connector/editor exists in this session: live execution stays UNPROVEN.
+Official Figma documentation now deprecates HTML parser `figma.connect`; use `.figma.ts` templates, the virtual `figma` module, `selectedInstance.getEnum` and `figma.code`; native sets use `combineAsVariants`. No Figma connector/editor exists in this session: live execution stays UNPROVEN.
 
 Repository root wrappers exclude tools; this unit needs explicit structured check/test/lint/fmt wrappers and a dedicated CI workflow. Existing `tools/figma-plugin` remains untouched. This is repository tooling shaped by Archetype 6 concerns; no published package, CLI command, dependency or scaffold changes. JSR audit/publish gates are N/A for the new tool.
+
+Plan review found missing Theme set/prose/h4/tracking in the complete shorthand expansion. Current full generation must reject it before effects. Explicit item selection enables valid subsets; full acceptance remains deferred.
