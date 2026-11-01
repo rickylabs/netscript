@@ -25,3 +25,9 @@ round 2 is next; Docker runtime CI remains pending.
 Round 2 independent IMPL-EVAL: PASS (evaluate.md). Final focused suite: 825 passed. Final full
 structured check and quality:gate: PASS. All 18 static scaffold gates passed. Commit and push this
 reviewed slice, dispatch full Docker CI, then reconcile actual check results before READY.
+
+CI repair slice: uploaded reports from the first full CI exposed stale tests in shards 3–6 and
+baseline literal boolean ternaries in example-route templates. The fixtures and generation are
+fixed. The same evaluator passed this repair (evaluate-ci-repair.md); 109 combined regressions,
+full check, quality:gate, all 15 check:* tasks and service/no-service generated lint pass. The next
+push must re-run full Docker CI. Close-gate remains pending its explicit proof checkbox.

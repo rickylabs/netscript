@@ -29,3 +29,17 @@
 
 Docker scaffold.runtime is pending CI dispatch. This table records local pre-commit evidence;
 CI at the pushed head remains the final check surface. Raw logs and receipts are not public run artifacts.
+
+## CI repair verification
+
+| Gate | Result |
+| --- | --- |
+| Combined CI repair regressions | PASS: 109 tests |
+| Full structured check | PASS |
+| quality:gate and scoped style | PASS |
+| All root check:* tasks and carriers | PASS: 15 tasks |
+| Generated full-project lint | PASS: with and without a service |
+| Same-session independent CI repair review | PASS |
+
+The first Docker run stopped at generated lint after 42 passing gates in both tiers. It proves
+no runtime readiness. Its replacement run at the repair head is pending.

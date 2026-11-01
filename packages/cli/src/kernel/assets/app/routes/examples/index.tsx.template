@@ -5,13 +5,10 @@ import { definePage } from '@app/utils.ts';
 export const examplesPage = definePage().withRoute(appRoutes.examples)
   .withMeta(() => ({ title: '{{name}} — Examples', description: 'Reference routes generated for this application.' }))
   .withLayer('examples', ExamplesView, () => ({
-    canonicalHref: {{hasService}} ? appRoutes.serviceExample.href() : undefined,
+    canonicalHref: {{serviceExampleHref}},
     examples: [
       { title: 'Typed route reference', href: appRoutes.order.href({ path: { id: 'route-reference' } }), description: 'A dynamic route parameter, not a business record.', status: 'Reference', owner: 'app' },
-      ...({{hasService}} ? [
-        { title: '{{serviceName}} resource', href: appRoutes.serviceExample.href(), description: 'Your generated typed service flow.', status: 'Generated', owner: 'app' },
-        { title: 'Telemetry', href: appRoutes.telemetryExample.href(), description: 'Trace your running services.', status: 'Generated', owner: 'app' },
-      ] : []),
+      {{serviceExampleEntries}}
     ],
   })).withLayout((slots) => slots.examples()).build();
 export const { default: page } = examplesPage;

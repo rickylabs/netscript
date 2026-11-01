@@ -86,10 +86,41 @@ No labels, rebase, force push, runtime-resource mutation, or lockfile changes.
 
 ## Reviewed implementation sign-off
 
-Separate Claude Opus 5.5 review, requested and observed at high effort, returned PASS on round 2;
+Separate Claude Opus 5.5 review using the requested high effort returned PASS on round 2;
 see evaluate.md. No further implementation edits followed that verdict.
 
 Final local proof: 825 focused tests passed; all 4,142 files passed the structured type-check;
 quality:gate, scoped lint/format, release preflight and repeated static scaffold suite passed.
 All generated documentation/scaffold carrier checks are included in the final check-task sweep.
 The runtime overview proof still awaits the one-pass Docker CI workflow; no runtime PASS is claimed.
+
+## CI repair slice
+
+At implementation commit da43b74, CI quality and full type-check passed. Four test shards exposed
+stale generated-output expectations. Each failure was read from its structured uploaded report:
+
+- test-3: webhook adoption used the negative doctor fixture as a read-only query. Prepare the
+  missing-registry state once, then compare read-only doctor results before/after adoption.
+- test-4: auth helper assertions expected a literal endpoint string and the app probe argv omitted
+  the new workers/streams assertions. Keep the persisted auth edge and assert live-loop injection.
+- test-5: assert the new explicit remote Docker wording and supply the workers-specific missing
+  registry output in the suite-runner recording executor.
+- test-6: a global regex treated valid nested-loop endpoint/vite locals as duplicate bindings.
+  Record those legal repeated names while preserving the actual generated-module type-check;
+  add the existing app reference fields to that fixture's SDK/config declaration.
+
+Both Docker runtime tiers failed generated.quality-negative after 42 passing gates because the
+baseline templates emitted literal true/false ternaries. The writer now selects hrefs and card
+entries at generation time. New real scaffolds with and without a service pass example-route lint.
+The runtime proof remains unproven until a complete one-pass CI run succeeds.
+
+Individual repaired regression groups passed: webhook adoption 4, auth/probe 51, template/Docker/
+runner 48, and readiness splice 6. Full combined regression and structured check are running;
+quality:gate passed after these changes. No lockfile changes or gate suppressions.
+
+CI repair sign-off: the same independent reviewer returned PASS and explicitly classified the
+changed expectations as stale, with meaningful checks preserved (evaluate-ci-repair.md).
+Combined repair regressions: 109 passed. Full structured check and quality:gate passed. All 15
+root check:* tasks passed again, including the four carriers. Generated full-project lint passed
+with and without a service. No source changes followed this sign-off. Commit/push and re-dispatch
+the full Docker runtime workflow at the new head; previous runtime attempts remain failed.

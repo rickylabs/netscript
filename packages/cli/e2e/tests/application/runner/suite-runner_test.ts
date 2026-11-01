@@ -118,7 +118,7 @@ Deno.test('suite runner skips cleanup phase when cleanup is disabled', async () 
           ? [
             '.netscript/generated/plugin-workers/job-registry.ts',
             '.netscript/generated/plugin-sagas/sagas.registry.ts',
-            'deno run -A jsr:@netscript/plugin-workers@',
+            'generated job registry exists\tMissing .netscript/generated/plugin-workers/job-registry.ts. Run:',
             'deno run -A jsr:@netscript/plugin-sagas@',
           ].join('\n')
           : request.command.some((arg) => arg.endsWith('/probe-generated-auth-batch.ts'))
