@@ -1,0 +1,21 @@
+{
+  "baseline": "6a6a82e15f2de2cd820cef9b879ce263aa7cb06f",
+  "files": {
+    ".github/scripts/ci-classify-changes.test.ts": "e81ea6e1212362110f1fe6d4e05051f1d5a960721cb5d5bc813b8a0b630a1260",
+    ".github/scripts/ci-classify-changes.ts": "11416840ffedc411b9dd89a23fc27ee2e926f577e8a0ee66ec791d678a07f064",
+    ".github/workflows/fresh-ui-quality.yml": "46739dc0eec795b6ba226e372d477f9bbf020b750a16eef2f31ead0cfe952f00",
+    ".llm/tools/css/README.md": "f10791d921fce369232882caa54b0fc8bafede325526d47fa12abf5ab24a1cac",
+    ".llm/tools/css/check-component-css-parity.mjs": "2214861005c5c21a3a3dfa86748c417cf282e0d3d7a77aa5d5270999cf71aa1a",
+    ".llm/tools/css/compare-css-rules.browser.mjs": "8ec3c0dd21a092dedc78ce64ec4ef017ef42eb0f0d22bd24f3ae542cf14cb109",
+    ".llm/tools/css/compare-css-rules.mjs": "e56b191f988121a159a8fe02c8ba8c158c1220a700a47171a39e0cfeb20d5312",
+    ".llm/tools/css/css-budget-location_test.ts": "b8bceab399af28659d33ed50c0db748d873186fa1fa13ee16f80919ad207cc20",
+    ".llm/tools/css/fixtures/utility-2558.json.gz": "d75c4d0f8f9913e38b7c8d2962d721fe56debbd380fd251fcab0ee28442e5ad8",
+    ".llm/tools/css/fixtures/utility-2558.manifest.json": "46efd890e44ac1610407267fa50bbcbf6abe997d0788c8bcbc64ad83d4d6b85d",
+    ".llm/tools/gates/catalog.ts": "4e81e620f483a61915b6a1e90d8dce377aa9f2328c09a17a72ce50c231ca303a",
+    ".llm/tools/validation/fresh-ui-quality_test.ts": "8bf32241ff149c7b9e3509bc1c7c6ee7ab6bbc98812c2a50e9d1bfc14aa94755",
+    "deno.json": "f4a8869e658d00d7bc0462e63b0ec6a25a4d75d6562220a63ec27315c9fd794e",
+    "packages/fresh-ui/README.md": "21550b864fa1ec301dfa9a00b8cf420c0b1f925bdf7033ccaab394c49035ba2a",
+    "packages/fresh-ui/tests/publish-size.test.ts": "e49d1212c02e644b6352e3d565c58eabb904d6f37535ecee606fa3e90f642c64",
+    "tools/fresh-ui-browser/variant-parity.ts": "5ba1cdc54874eb6489a70aea4218df2e0f825c63c87fde15f3db09dc171f1aa5"
+  }
+}

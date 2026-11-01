@@ -291,6 +291,9 @@ export function classifyPath(
         /\/package(?:-lock)?\.json$/.test(path),
     };
   }
+  if (path.startsWith('.llm/tools/css/')) {
+    return { ...NONE, freshUi: true, deno: hasExtension(path, CODE_EXTENSIONS) };
+  }
   if (path.startsWith('tools/design-sync/')) {
     return { ...NONE, deno: hasExtension(path, CODE_EXTENSIONS) };
   }

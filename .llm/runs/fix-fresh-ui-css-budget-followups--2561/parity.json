@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "issue": 2524,
+    "pullRequest": 2558,
+    "beforeCommit": "6a1d84a6e04c0d39df3926528e0380e267316aee",
+    "afterCommit": "5f837c0aab0b5479b9bd81571066f83b9d25b3c8",
+    "fixtureCount": 265
+  },
+  "baselineSha256": "d75c4d0f8f9913e38b7c8d2962d721fe56debbd380fd251fcab0ee28442e5ad8",
+  "baselineInputsMatch": true,
+  "inputs": {
+    "beforeHtml": "4e85bee890a889b4c27f3f70caae0f47b68f364d3892ae3b29fb86e9477761d2",
+    "afterHtml": "4e85bee890a889b4c27f3f70caae0f47b68f364d3892ae3b29fb86e9477761d2",
+    "beforeCss": "7500d8230c6a693478a9428dab284b9a7ea4132871cd7378e6ef6f32ddbf6a56",
+    "afterCss": "1a479e86f5f99350461180f8c01617b32e194475529c5d21140275f2b8ca08c2",
+    "utilityTokens": "af97c15f44dd6ae5018da2225dcbca7dd1de1026b91b83d23984255e786f1d8e"
+  },
+  "browser": "153.0.8010.12",
+  "files": 52,
+  "rules": 1161,
+  "ruleDifferences": 0,
+  "specimens": 265,
+  "styleComparisons": 2388000,
+  "visualOk": true,
+  "ok": true
+}

@@ -1,0 +1,71 @@
+{
+  "deno": "2.9.7",
+  "sourceManifest": "source-hashes.json",
+  "note": "Summaries of original command receipts retained privately; not byte-identical receipts. Structured wrapper reports are adjacent.",
+  "gates": {
+    "quality": {
+      "gateId": "quality-gate",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 23473,
+      "requestHash": "f4faa3fff4b4a8cc0d3ddbac81604a68211a28c09ef37310c85c9110c08083a0"
+    },
+    "css-tests": {
+      "gateId": "fresh-ui-css-tests",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 5592,
+      "requestHash": "01bc848da423761922810de048a74da751ee5e036caa7781b2729dbff14b677a"
+    },
+    "css-parity": {
+      "gateId": "fresh-ui-css-parity",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 63474,
+      "requestHash": "dfc954f9257b7c9560cbf11a9e273edff93b4755d289284c485a92bf5244818e"
+    },
+    "resource-hygiene": {
+      "outcome": "UNPROVEN",
+      "unprovenOwnershipEntries": 24,
+      "mutations": 0,
+      "note": "Read-only report; Docker unavailable; resources with unproven ownership left untouched."
+    },
+    "runtime": {
+      "outcome": "UNPROVEN",
+      "exitCode": 1,
+      "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+      "note": "Aspire preflight and container cleanup cannot connect to Docker; no runtime started."
+    },
+    "release-preflight": {
+      "outcome": "PASS",
+      "exitCode": 0
+    },
+    "jsr-audit": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "note": "Native publish dry-run passes; inherited vocabulary/cardinality and Checking-for-slow-types banner warnings remain."
+    },
+    "canonical-generators": {
+      "outcome": "PASS",
+      "commands": [
+        "gen:agent-docs-prose",
+        "gen:mcp-export-corpus --allow-dirty",
+        "gen:assets-barrel",
+        "gen:publish-assets"
+      ],
+      "note": "All four completed and all14 root freshness/check tasks passed; no generated carrier diff."
+    },
+    "implementation-evaluation": {
+      "outcome": "PASS",
+      "rounds": 2,
+      "report": "evaluate.md",
+      "requestedModel": "claude-opus-5-5",
+      "observedModel": "claude-opus-5-5",
+      "requestedEffort": "high",
+      "independentVendor": "Anthropic"
+    },
+    "remote-checks": {
+      "outcome": "PENDING"
+    }
+  }
+}
