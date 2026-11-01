@@ -152,5 +152,26 @@
     "outcome": "UNPROVEN",
     "exitCode": 1,
     "reason": "Docker unavailable; Aspire doctor and cleanup preflight failed. No unknown resources mutated."
+  },
+  "ciRepair": {
+    "failedRun": 41291048614,
+    "failedJob": "check-test-shard (test-1)",
+    "scope": "Isolated release recovery fixture now preserves catalog with root imports; all original behavioral assertions unchanged.",
+    "localModule": {
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0
+    },
+    "independentModule": {
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0
+    },
+    "lint": "PASS, 1/1 file",
+    "fmt": "PASS, 1/1 file",
+    "aspireParity": "PASS",
+    "reviewThreads": "PASS",
+    "terminalEvaluation": "PASS",
+    "productCliCarrierAndLockBytesUnchanged": true
   }
 }

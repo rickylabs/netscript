@@ -12,12 +12,13 @@ Archetype 6 CLI/tooling and existing token adapters. Refs #2516 and Refs #2556. 
 - [x] Scoped source/docs/CI fixes and independent repaired slice review — `008685f6`
 - [x] Generated docs/publish carriers and Aspire inventory — `f3c84f73`
 - [x] Terminal independent evaluation and handoff evidence
+- [x] CI test-1 compatibility repair: preserve catalog in isolated release-recovery fixture
 
 ## Validation
 
 Deno 2.9.7. **Whole CLI suite: 2,944 passed, 0 failed, 0 ignored**, run from clean committed source head `5e50ad8c` with source/carriers held fixed and native prerequisites supplied. Earlier exploratory failures are retained as superseded evidence. Focused repairs: 5 passed (native conventions/carrier/real browser and negative controls), native fixtures: 47 passed, CI contracts: 12 passed. Red/green regressions recorded.
 
-All 14 root `check:*` tasks and four site checks pass. Release preflight, docs links/accuracy/snippets, docs build, repository-wide type check, root lint/fmt, CLI quality ratchet, fresh Figma CI, quality:gate, CLI JSR audit and package publish dry-run pass. Independent repaired slice and integration-test reviews PASS; **terminal same-session IMPL-EVAL: PASS** at source head `5e50ad8c`.
+All 14 root `check:*` tasks and four site checks pass. Release preflight, docs links/accuracy/snippets, docs build, repository-wide type check, root lint/fmt, CLI quality ratchet, fresh Figma CI, quality:gate, CLI JSR audit and package publish dry-run pass. Independent repaired slice and integration-test reviews PASS; **terminal same-session IMPL-EVAL: PASS** at source head `5e50ad8c`. A subsequent test-only CI fixture repair also received independent PASS: the release recovery fixture now copies the root catalog with imports; its full module passes 8/8 locally and independently, with the original permission/content-verdict assertions unchanged. Product/CLI/carrier/lock bytes are identical to the canonical local proofs.
 
 Full `scaffold.runtime --cleanup` attempted once: UNPROVEN, exit 1 at Aspire doctor/Docker cleanup because Docker is unavailable. Read-only leak reporter: 25 unproven survivors, none mutated.
 

@@ -1,6 +1,6 @@
 # Resume
 
-PR #2559: https://github.com/rickylabs/netscript/pull/2559. Branch `orch/divybot-6555223992`; milestone 0.0.9 (inherited from #2516), no labels. All assigned #2516/#2556 source and guidance follow-ups are complete in one PR. Product source 008685f6, docs/publish carriers f3c84f73, test/lesson/manifest repair 5e50ad8c. Final commit changes run evidence only.
+PR #2559: https://github.com/rickylabs/netscript/pull/2559. Branch `orch/divybot-6555223992`; milestone 0.0.9 (inherited from #2516), no labels. All assigned #2516/#2556 source and guidance follow-ups are complete in one PR. Product source 008685f6, docs/publish carriers f3c84f73, test/lesson/manifest repair 5e50ad8c. A subsequent test-only CI repair preserves catalog with imports in the isolated release workflow recovery fixture. Product/CLI/carrier/lock bytes remain unchanged.
 
 Canonical whole CLI on clean fixed source head 5e50ad8ce6df82f6fc1b1f01af04d8bde038d593: 2944 passed, 0 failed/ignored, exit 0. Source/carriers remained fixed. Native prerequisites supplied through executable project-owned TMPDIR and private Chromium wrapper. Fresh Figma CI PASS at same head, including 13 tests and check/lint/fmt coverage 15/15 each. Earlier exploratory failures remain recorded and superseded; they are not pass claims.
 
@@ -9,3 +9,8 @@ All 14 root check:* tasks and four site checks pass on Deno 2.9.7. Repository ty
 Independent same-session read-only Claude Opus 5.5 terminal IMPL-EVAL: PASS (evaluate.md), after repaired slice and integration reviews. High effort requested, not independently attested. No source/carrier changes after review. Public evidence repo-relative with no session IDs. Assignment never staged. Full scaffold.runtime attempted once in one pass with cleanup: UNPROVEN because Docker/Aspire preflight unavailable. Leak reporter exit 0, 25 unproven survivors, none mutated.
 
 PR readiness, exact-final-head required hosted checks and canonical READY publication occur after this evidence-only commit; use the PR checks/issue report for their latest state. READY must include the exact final head and green required contexts (policy skips allowed, including deps-report). Canonical report is handed off through the assignment's excluded final-report file. Stop at READY; Cockpit alone merges. Refs #2516 and Refs #2556 only. Never rebase, force-push, label or merge this PR.
+
+
+## Latest CI repair
+
+CI run 41291048614 passed quality, type-check and browser, but test-1 found one incomplete root import-map fixture. The release recovery test omitted catalog while copying root imports. Focused red reproduced the hosted error; fixed full module passed 8/8 locally and 8/8 in the same independent read-only evaluator session. Terminal continuation PASS, ci-repair-review.md. Original permission and negative content-verdict assertions unchanged. Scope is one release test plus run notes. New exact-head CI after normal push must pass before READY; PR remains ready for review. No product/CLI/carrier/lock changes, no need to repeat unchanged canonical CLI suite. Do not merge.
