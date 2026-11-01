@@ -33,3 +33,11 @@ Reconcile: draft #2583 remains open with Refs #2579; no labels and no closing ke
 Independent re-review returned **SLICE_REVIEW_PASS** after inspecting all four repairs; see slice-review.md. Current focused suite: 219/219. Scoped lint and format processed all 14 selected files with zero exclusions and zero findings. The live generated projection was also exercised through the real typed client against seeded SQLite rows: current/previous counts 20/20, 60 daily buckets, six status counts totaling 40 and five latest references. The screenshot and browser DOM assertion prove rich cells, not script-only content.
 
 Implementation slice sign-off is backed by the independent supervisor review. Next: commit/push the implementation and canonical carriers, check carrier freshness at committed HEAD, run CI scaffold.runtime through manual dispatch (draft/no-label policy), and re-steer the same evaluator for final IMPL-EVAL.
+
+## CI repair slice
+
+The Pages build on 4689292 failed documentation snippet compilation because the generated memory repository's sample-records dependency was missing from the docs fixture. The manually dispatched scaffold-static job also found TS2339 in the new generated domain test. Repaired the fixture with the canonical sample template and narrowed the test sort entry before reading amount. No gate/checker/exemption changed.
+
+Proof after repair: docs:snippets PASS (36 compiled fences, 49 in tier 1); scaffold.service PASS (8/8 gates including two-service client reconciliation and generated workspace check); real SQLite generated check PASS (133 files). Same independent Claude reviewer returned SLICE_REVIEW_PASS for this repair.
+
+Reconcile: current-head failures are understood and repaired locally; push normally, rerun current-head CI runtime, and do not claim READY until those jobs are green or policy-skipped.

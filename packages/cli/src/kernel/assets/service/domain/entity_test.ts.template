@@ -14,7 +14,8 @@ Deno.test('{{modelName}} list policy bounds the page and rejects unknown sort fi
 
 Deno.test('{{modelName}} list policy preserves status and uses one id tiebreaker for amount sorting', () => {
   const query = listQuery({ page: 1, limit: 10, sortBy: 'amount', sortOrder: 'asc', status: 'paid' });
-  if (query.orderBy.length !== 2 || query.orderBy[0].amount !== 'asc' || query.orderBy[1].id !== 'asc' || query.where.status !== 'paid') {
+  const primary = query.orderBy[0];
+  if (query.orderBy.length !== 2 || !('amount' in primary) || primary.amount !== 'asc' || query.orderBy[1].id !== 'asc' || query.where.status !== 'paid') {
     throw new Error('Unexpected status filter or deterministic sort');
   }
 });

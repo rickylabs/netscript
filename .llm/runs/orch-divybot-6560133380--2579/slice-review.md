@@ -42,3 +42,34 @@ I re-read the changed and untracked files under `packages/cli/` and the run's dr
 - **SQL Server:** no live mssql run yet. The duplicate-sort fix is proven by query-shape tests only, not by a real SQL Server database.
 
 Leave both for the final IMPL-EVAL, along with the carrier, assets-barrel and CI `scaffold.runtime` receipts at the committed head.
+
+
+# CI repair slice
+
+**SLICE_REVIEW_PASS**
+
+I read the uncommitted diff against HEAD `4689292`, which touches four files: the docs support tool, the generated domain test template, the embedded template carrier and `drift.md`. I did not run the compile fixture or `scaffold-static` again, so I'm relying on your statement that those two CI failures account for the red build.
+
+## 1. Docs service fixture (`.llm/tools/docs/service-scaffold-support.ts`)
+
+- **New file emitted.** The fixture now writes `services/users/src/adapters/sample-records.ts` from the canonical template (`TEMPLATE_KEYS.serviceSampleRecords`) using the same template renderer. That is the file the memory repository template imports (`./sample-records.ts`, alongside it in `adapters/`), so the missing-module error goes away. The order of the module list doesn't matter, because every file is written before anything is compiled.
+- **`modelName: 'User'` added.** The sample template's only variable is `{{modelName}}`, and the docs fixture would otherwise have rendered a blank seed name. With `'User'` the first record is "Seed User", matching the seeded value the runtime probe expects. Adding the variable leaves the other rendered templates unchanged: the memory contract, application, domain, repository and health router never reference `{{modelName}}`.
+- **Scope.** No checker, fence exemption or skip list was changed. The wider write scope (this file under `.llm/tools/`) is recorded in `drift.md`, and `.llm/tools/` generators were already within the allowed write surface listed in `supervisor.md`.
+
+## 2. Generated domain test (`service/domain/entity_test.ts.template`)
+
+- **The TS2339 error.** `orderBy` is an array literal built from either `{ id }` or a computed-key `{ [field]: order }`. The computed key widens to an index-signature object, so each element's type is a union of the two shapes. Reading `.amount` on that union fails because the `{ id }` shape has no `amount` property, which is exactly the error `scaffold-static` reported.
+- **The fix.** `'amount' in primary` narrows the union before `primary.amount` is read, so the read type-checks.
+- **The test still bites.** The narrowing is a runtime check as well as a type guard: if the first sort entry isn't keyed by `amount`, the test throws. The other conditions are unchanged: two `orderBy` entries, `amount` ascending, `id` ascending as tiebreaker, and the `status` filter preserved. The `.length` and `orderBy[1].id` reads type-check against both shapes.
+- **Strict array indexing.** Generated projects don't enable `noUncheckedIndexedAccess`, so `primary` can't be `undefined` as far as the type-checker is concerned.
+
+## 3. Embedded carrier
+
+- `embedded.generated.ts` changes only that template's entry (`template_113`), and it contains the `'amount' in primary` text. That is consistent with a canonical regeneration from the updated template.
+- The new sample template was already embedded at HEAD, so nothing else in the carrier needed to change.
+
+## Remaining for final IMPL-EVAL (not blocking this slice)
+
+- A green CI run at the new commit for the documentation compile build and `scaffold-static`.
+- The post-commit assets-barrel check.
+- The CI `scaffold.runtime` receipt.
