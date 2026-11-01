@@ -1,0 +1,3 @@
+# Resume
+
+Implement #2579 on this branch. See plan.md and worklog.md for the locked field contract and projection semantics. Current phase: bootstrap complete, implementation next. No duplicate PR found. Deno 2.9.7 available, RTK absent. Public artifacts must contain only repo-relative paths and no session identifiers. Private logs stay outside the repo in the project run area. Owner mandates separate read-only Claude Opus 5.5 high evaluation, draft PR with Refs #2579/no labels, full check:* and carrier proof, live seeded records page and CI scaffold.runtime. Do not rebase/force push or merge. Final canonical GitHub report is handed off through .divybot-final-report.md.
