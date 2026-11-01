@@ -3239,3 +3239,20 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Generate an optional typed app adapter from installed-plugin metadata; prove no-workers
   apps have no workers dependency and plugin install/update/remove keeps the adapter version aligned,
   while preserving the typed workers read and live/empty/unauthorized/unavailable tests.
+
+## packages/cli plugin install — AP-1 / F-16 (bounded delivery extension)
+
+- **ID:** CLI-PLUGIN-INSTALL-DELIVERY-SIZE
+- **Reason:** Restoring installed-plugin app delivery adds persisted consumer metadata and a call
+  to the existing registry producer inside the existing install orchestration. Its file grows from
+  759 to 819 lines; a focused app-selection policy and its test increase the install directory's
+  immediate child count from 18 to 20. Both advisory caps were already exceeded. A full install
+  pipeline decomposition would broaden this lifecycle bugfix beyond the restored contract.
+- **Owner:** CLI tooling maintainers.
+- **Target:** Next plugin-install orchestration decomposition in the Runtime Automation theme.
+- **Linked plan:** `.llm/runs/orch-divybot-6560114709--plugin-app-delivery/plan.md` (#2578).
+- **Created:** 2026-11-01
+- **Status:** open
+- **Gate:** F-1 / F-16: install orchestration under 500 lines and at most 12 immediate children,
+  preserving the installed app-link, dry-run, registry and third-party regression tests.
+- **Cost:** Larger existing feature scan surface; no new runtime dependency, dispatcher or service.

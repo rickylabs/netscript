@@ -16,7 +16,7 @@ const readinessSchema = z.object({ ready: z.literal(true) });
 export async function probeScaffoldPlugin(id: 'workers' | 'streams' | 'ai', name: string, request?: Request): Promise<Projection> {
   try {
     if (id === 'workers') {
-      const { client, context } = await scaffoldServiceClient(workersContract, name, 'workers', request);
+      const { client, context } = await scaffoldServiceClient(workersContract, name, 'workers', request, { unmarked: 'optional' });
       const result = await client.listJobs({ limit: 5, offset: 0 }, { context });
       return { state: result.jobs.length ? 'ready' : 'empty', description: `${result.total} registered jobs.`, items: result.jobs.map((job) => ({ label: job.name, detail: job.id })), command: result.total ? undefined : 'netscript plugin info @netscript/plugin-workers' };
     }

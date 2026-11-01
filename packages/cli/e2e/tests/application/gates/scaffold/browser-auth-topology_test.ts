@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertStringIncludes } from '@std/assert';
+import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { resolve, toFileUrl } from '@std/path';
 import { MemoryKvAdapter } from '@netscript/kv';
 import { createService } from '@netscript/service';
@@ -6,7 +6,7 @@ import { createAuthServiceAuthenticator } from '@netscript/plugin-auth-core/auth
 import { baseContract } from '@netscript/contracts';
 import { implement } from '@orpc/server';
 import { z } from 'zod';
-import type { ServiceClient } from '@netscript/sdk/client';
+import type { ContractLike, ServiceClient } from '@netscript/sdk/client';
 import {
   createKvOAuthTestRegistry,
   serveAuthTestService,
@@ -25,12 +25,13 @@ interface GeneratedBff {
   browserSessionContext(
     request: Request,
   ): { accessToken?: string; signal: AbortSignal };
-  createBrowserSessionClient(
-    serviceContract: typeof contract,
+  createBrowserSessionClient<T extends ContractLike>(
+    serviceContract: T,
     name: string,
     router: string,
+    options?: { readonly unmarked?: 'optional' | 'required' },
   ): ServiceClient<
-    typeof contract,
+    T,
     { accessToken?: string; signal?: AbortSignal }
   >;
 }
@@ -214,6 +215,77 @@ Deno.test('generated BFF session distinguishes rejected credentials from an auth
     assertEquals((await bff.handleBrowserAuth(request(), 'session')).status, 503);
   } finally {
     await server.shutdown();
+    Deno.env.delete(envKey);
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('generated BFF public plugin reads accept anonymous calls while guarded defaults remain required', async () => {
+  const publicContract = {
+    read: baseContract.route({ method: 'GET', path: '/read' }).output(
+      z.object({ accepted: z.boolean() }),
+    ),
+  };
+  const router = implement(publicContract);
+  const name = `public-plugin-${crypto.randomUUID()}`;
+  let requests = 0;
+  let credential: string | undefined;
+  const service = await createService({
+    v1: {
+      public: {
+        read: router.read.handler(() => {
+          requests++;
+          return { accepted: true };
+        }),
+      },
+    },
+  }, { name })
+    .use(async (ctx, next) => {
+      credential = ctx.req.header('authorization');
+      await next();
+    })
+    .withRPC({ traceContext: false }).serve({ port: 0 });
+  await Deno.mkdir('.llm/tmp', { recursive: true });
+  const root = await Deno.makeTempDir({ dir: '.llm/tmp', prefix: 'bff-public-plugin-' });
+  const envKey = `services__${name}__http__0`;
+  Deno.env.set(envKey, `http://127.0.0.1:${service.addr.port}`);
+  try {
+    const path = `${root}/bff.ts`;
+    await Deno.writeTextFile(
+      path,
+      renderTemplateAssetSync(TEMPLATE_KEYS.authBff, {
+        authServiceName: JSON.stringify(name),
+      }),
+    );
+    const bff: GeneratedBff = await import(toFileUrl(resolve(path)).href);
+    const anonymous = bff.browserSessionContext(new Request('https://app.example.test/'));
+    const guardedDefault = bff.createBrowserSessionClient(publicContract, name, 'public');
+    await assertRejects(
+      () => guardedDefault.read(undefined, { context: anonymous }),
+      Error,
+      'SDK_PREPARATION_FAILED',
+    );
+    assertEquals(requests, 0);
+    const publicClient = bff.createBrowserSessionClient(publicContract, name, 'public', {
+      unmarked: 'optional',
+    });
+    assertEquals(await publicClient.read(undefined, { context: anonymous }), { accepted: true });
+    assertEquals(credential, undefined);
+    assertEquals(await publicClient.read(undefined, { context: { accessToken: 'test-session' } }), {
+      accepted: true,
+    });
+    assertEquals(credential, 'Bearer test-session');
+    const explicitRequired = bff.createBrowserSessionClient(contract, name, 'public', {
+      unmarked: 'optional',
+    });
+    await assertRejects(
+      () => explicitRequired.read(undefined, { context: anonymous }),
+      Error,
+      'SDK_PREPARATION_FAILED',
+    );
+    assertEquals(requests, 2, 'Required metadata must fail before the public fixture is called');
+  } finally {
+    await service.stop();
     Deno.env.delete(envKey);
     await Deno.remove(root, { recursive: true });
   }

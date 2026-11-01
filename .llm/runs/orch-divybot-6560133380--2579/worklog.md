@@ -125,3 +125,29 @@ Same separate Opus 5.5 high evaluator returned SLICE_REVIEW_PASS and IMPL_EVAL_P
 (static review); it confirmed all auth/REST/RPC assertions remain and the canonical sample
 row satisfies the runtime schema. No production or carrier change. Normal commit/push and
 fresh complete ready-mode CI follow; no manual merge or premature READY.
+
+## Main merge requested by owner
+
+Owner steering: fetch and merge latest main, resolve conflicts, push normally. Fetched
+4a2dae3 (PR #2582). Conflict diff confirms all four maintained conflicts concern two
+equivalent solutions to optional example links and literal-condition lint. Main's
+scaffold-time placeholders supersede our named runtime boolean. Preserve that main
+implementation and tests, plus every unrelated auto-merged change and our rich-record
+source/fixture work. Rebuild the conflicted carrier from canonical merged templates.
+Record the source change in drift.md and obtain same-session independent review before
+the merge sign-off commit. Validate merged source and dispatch fresh full runtime CI;
+the earlier source-identity shortcut no longer proves this merged delivery. READY waits.
+
+Merged working-tree validation: 231/231 focused tests, zero ignored/failures. This includes
+the original scaffold/service/database/contract/projection/route coverage and all follow-up
+auth, missing-record and no-Aspire lifecycle modules. Scoped check/lint/fmt process every
+selected resolved test and writer file without findings/drops. quality:gate passes with
+the existing architecture warnings. Canonical prose/export-corpus/assets/publish generation
+all exited zero. The four maintained conflict resolutions are byte-identical to main;
+no conflict markers or unrelated generator churn remain. Independent review is pending.
+
+Same separate native Opus 5.5 high reviewer returned SLICE_REVIEW_PASS for the merge.
+It verified all four resolved files equal main, the writer preserves both projection entries
+and new optional-link variables, the carrier contains both sides, and all five fixture fixes
+survive. Static review; local execution is generator-owned. Commit the merge normally and
+run fresh current-head root check:* and full CI runtime before final IMPL-EVAL/READY.

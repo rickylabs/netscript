@@ -13,6 +13,9 @@ export const SAMPLE_APP_VARS = {
   appName: 'dashboard',
   appPort: '8010',
   hasService: 'true',
+  serviceExampleHref: 'appRoutes.serviceExample.href()',
+  serviceExampleEntries:
+    "{ title: 'team-members resource', href: appRoutes.serviceExample.href(), description: 'Your generated typed service flow.', status: 'Generated', owner: 'app' }, { title: 'Telemetry', href: appRoutes.telemetryExample.href(), description: 'Trace your running services.', status: 'Generated', owner: 'app' },",
   serviceName: 'team-members',
   modelName: 'TeamMember',
   serviceResourceRouteAlias: 'teamMembers: generatedRoutes.examples.teamMembers.$route,\n  ',

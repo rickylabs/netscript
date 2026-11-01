@@ -1,4 +1,14 @@
-# Completed implementation — Cockpit handoff
+# Main integration — fresh CI required
+
+Latest owner steering requires a normal merge of main. The working tree merges 48905de
+with main 4a2dae3 (PR #2582); conflicts are resolved, and the four maintained conflict files
+exactly match main's scaffold-time optional-link implementation. Rich models, contracts,
+seed, projections and five CI fixture repairs are retained. Canonical carrier chain passed.
+Merged focused tests: 231/231, zero ignored/failures; scoped check/lint/fmt and quality/arch
+pass. Same-session independent merge review returned SLICE_REVIEW_PASS before sign-off. After normal push, run
+all root check:* tasks and fresh full runtime CI in parallel with ordinary ready-mode CI.
+Do not reuse old source-identity runtime proof as the merged-head verdict. READY is pending
+those new results. Cockpit owns merging; do not merge the PR manually.
 
 PR #2583 implements #2579, uses Refs #2579 and has no labels. Cockpit owns merging. After the original READY handoff, the owner explicitly authorized marking the PR ready. It is now ready for review. Do not add a closing keyword, merge manually, rebase or force-push.
 

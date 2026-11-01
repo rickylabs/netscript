@@ -74,7 +74,8 @@ export async function reconcilePluginReferences(
       setPluginReferences(backgroundEntry, [...backgroundReferences].sort());
     }
 
-    if (installedKeys.has(declaration.resourceConfigKey)) {
+    // Discovery edges require an API resource; in-process plugins only retain consumer metadata.
+    if (pluginEntry) {
       addConsumerReference(services, declaration.consumers.services, declaration.resourceConfigKey);
       addConsumerReference(apps, declaration.consumers.apps, declaration.resourceConfigKey);
     }

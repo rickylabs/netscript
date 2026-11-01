@@ -32,6 +32,7 @@ export function createPluginInstallCommand(
     .description('Install a plugin workspace and register it with Aspire')
     .arguments('<kind:string>')
     .option('--name <name:string>', 'Plugin name (kebab-case)')
+    .option('--app <name:string>', 'Link an enabled web app (defaults to all enabled web apps)')
     .option('--port <port:number>', 'Plugin port override')
     .option('--service-refs <refs:string>', 'Comma-separated service references')
     .option('--plugin-refs <refs:string>', 'Comma-separated plugin references')
@@ -64,6 +65,7 @@ export function createPluginInstallCommand(
       const result = await installPlugin({
         kind,
         pluginName,
+        app: options.app,
         port: options.port,
         serviceReferences: parseList(options.serviceRefs),
         pluginReferences: parseList(options.pluginRefs),

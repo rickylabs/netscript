@@ -220,12 +220,12 @@ Deno.test('browser conformance detects a generated SDK call that omits bearer fo
       withGeneratedBrowserFixture(
         (fixture) => withBrowser((browser) => signIn(browser, fixture)),
         (source) => {
-          const contribution = 'contributions: [bearer] as const,';
+          const contribution = "contributions: [bearer(options.unmarked ?? 'required')] as const,";
           assertStringIncludes(source, contribution);
           // Keep the auth session read intact; remove only the guarded client's contribution.
           return source.replace(
             contribution,
-            'contributions: name === serviceName ? [bearer] as const : [],',
+            "contributions: name === serviceName ? [bearer(options.unmarked ?? 'required')] as const : [],",
           );
         },
       ),

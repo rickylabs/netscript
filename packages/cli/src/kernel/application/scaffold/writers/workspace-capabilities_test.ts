@@ -209,7 +209,7 @@ Deno.test('service failures distinguish access denial and never expose raw error
 
 Deno.test('plugin projections read real result shapes and reject false stream readiness', async () => {
   const contextUrl = moduleUrl(
-    `let jobs: unknown[] = []; export function setJobs(next: unknown[]) { jobs = next; } export const scaffoldServiceClient = async () => ({client: {listJobs: async () => ({jobs,total:jobs.length})},context:{}});`,
+    `let jobs: unknown[] = []; let options: unknown; export function readOptions() { return options; } export function setJobs(next: unknown[]) { jobs = next; } export const scaffoldServiceClient = async (...args: unknown[]) => { options = args[4]; return {client: {listJobs: async () => ({jobs,total:jobs.length})},context:{}}; };`,
   );
   const context = await import(contextUrl);
   const source = renderTemplate(
@@ -233,6 +233,7 @@ Deno.test('plugin projections read real result shapes and reject false stream re
     .replace("import.meta.glob<AiRuntime>('../../../ai/ai.ts')", '{runtime: async () => ({})}');
   const module = await import(moduleUrl(source));
   assertEquals((await module.probeScaffoldPlugin('workers', 'queue-api')).state, 'empty');
+  assertEquals(context.readOptions(), { unmarked: 'optional' });
   context.setJobs([{ id: 'job-one', name: 'Configured job' }]);
   const workers = await module.probeScaffoldPlugin('workers', 'queue-api');
   assertEquals(workers.state, 'ready');
@@ -254,4 +255,34 @@ Deno.test('plugin projections read real result shapes and reject false stream re
     globalThis.fetch = originalFetch;
     console.error = originalError;
   }
+});
+
+Deno.test('service context forwards an explicit public-plugin fallback without changing guarded defaults', async () => {
+  const authUrl = moduleUrl(`
+let options: unknown;
+export const readOptions = () => options;
+export const createBrowserSessionClient = (_contract: unknown, _name: string, _router: string, next: unknown) => { options = next; return {}; };
+export const browserSessionContext = (request: Request) => ({ signal: request.signal });
+`);
+  const source = renderTemplate(
+    readTemplateAssetSync(TEMPLATE_KEYS.appScaffoldServiceContext),
+    variables,
+  )
+    .replace(
+      /^import .* from '@netscript\/sdk\/client';/m,
+      'const createServiceClient = () => ({});',
+    )
+    .replace(
+      "import.meta.glob<BrowserAuth>('../../../auth/bff.ts')",
+      `{ auth: () => import(${JSON.stringify(authUrl)}) }`,
+    );
+  const module = await import(moduleUrl(source));
+  const auth = await import(authUrl);
+  const request = new Request('https://app.example.test/');
+  await module.scaffoldServiceClient({}, 'workers-api', 'workers', request, {
+    unmarked: 'optional',
+  });
+  assertEquals(auth.readOptions(), { unmarked: 'optional' });
+  await module.scaffoldServiceClient({}, 'users', 'users', request);
+  assertEquals(auth.readOptions(), {});
 });

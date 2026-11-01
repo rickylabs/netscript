@@ -1,5 +1,16 @@
 # IMPL-EVAL #2579: PASS
 
+## Main integration review — final runtime revalidation required
+
+For the owner-requested merge of main 4a2dae3 into delivery 48905de, the same independent
+Opus 5.5 high session returned SLICE_REVIEW_PASS. It verified the four maintained conflict
+files exactly equal main, the auto-merged writer preserves the projection entries and new
+optional-route variables, the regenerated carrier includes both sides, and all five fixture
+repairs remain. Merged structured tests pass 231/231; scoped check/lint/fmt and quality/arch
+pass. Review was static. This production merge supersedes the earlier unchanged-source
+runtime shortcut: final IMPL-EVAL and READY require fresh complete core/Pages/Fresh UI and
+manual PostgreSQL/SQLite runtime CI at the merged head, plus current carrier checks.
+
 ## Ready-mode CI follow-up review
 
 Second follow-up: after core run 41331736013 exposed the remaining auth-policy database

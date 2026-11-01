@@ -12,6 +12,8 @@ const variables = {
   serviceName: 'team-members',
   modelName: 'TeamMember',
   hasService: 'false',
+  serviceExampleHref: 'undefined',
+  serviceExampleEntries: '',
   serviceResourceRouteAlias: '',
   serviceExampleRouteReference: 'routes.examples.$route',
 };
@@ -69,12 +71,14 @@ Deno.test('no-service scaffold loader has no missing contract imports or static 
   assertStringIncludes(crud, 'records: []');
   assertEquals(crud.includes('Acme Robotics'), false);
   for (const hasService of ['false', 'true']) {
-    const route = renderTemplate(crud, { ...variables, hasService });
+    const serviceExampleHref = hasService === 'true'
+      ? 'appRoutes.serviceExample.href()'
+      : 'undefined';
+    const route = renderTemplate(crud, { ...variables, hasService, serviceExampleHref });
     assertStringIncludes(
       route,
-      'serviceHref: HAS_EXAMPLE_SERVICE ? appRoutes.serviceExample.href() : undefined',
+      `serviceHref: ${serviceExampleHref}`,
     );
-    assertStringIncludes(route, `const HAS_EXAMPLE_SERVICE = ${hasService};`);
     assertStringIncludes(route, 'recordsHref: appRoutes.records.href()');
   }
   const crudView = readTemplateAssetSync(TEMPLATE_KEYS.appRoutesExamplesComponentsCrudView);
@@ -85,8 +89,9 @@ Deno.test('no-service scaffold loader has no missing contract imports or static 
     readTemplateAssetSync(TEMPLATE_KEYS.appRoutesExamplesIndex),
     variables,
   );
-  assertStringIncludes(examples, 'const HAS_EXAMPLE_SERVICE = false;');
-  assertStringIncludes(examples, 'canonicalHref: HAS_EXAMPLE_SERVICE ?');
+  assertStringIncludes(examples, 'canonicalHref: undefined');
+  assertEquals(examples.includes('true ?'), false);
+  assertEquals(examples.includes('false ?'), false);
   assertEquals(examples.includes('Placeholder'), false);
 });
 

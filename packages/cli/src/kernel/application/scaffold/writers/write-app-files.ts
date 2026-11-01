@@ -48,6 +48,13 @@ export async function writeNormalizedAppFiles(
     serviceStorage: options.dbEngine,
     serviceQueryModule: `../routes/examples/${plan.service?.name}/(_lib)/service-query.ts`,
     hasService: String(Boolean(options.includeExampleService && options.serviceName)),
+    serviceExampleHref: options.includeExampleService && options.serviceName
+      ? 'appRoutes.serviceExample.href()'
+      : 'undefined',
+    serviceExampleEntries: options.includeExampleService && options.serviceName
+      ? `{ title: '${options.serviceName} resource', href: appRoutes.serviceExample.href(), description: 'Your generated typed service flow.', status: 'Generated', owner: 'app' },
+        { title: 'Telemetry', href: appRoutes.telemetryExample.href(), description: 'Trace your running services.', status: 'Generated', owner: 'app' },`
+      : '',
     serviceResourceRouteAlias: options.includeExampleService && options.serviceName
       ? `${toCamelCase(options.serviceName)}: generatedRoutes.examples.${
         toCamelCase(options.serviceName)

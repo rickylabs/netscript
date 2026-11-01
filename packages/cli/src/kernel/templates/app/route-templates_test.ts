@@ -527,7 +527,7 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, '.withRoute(appRoutes.examples)');
     assertStringIncludes(
       route,
-      'canonicalHref: HAS_EXAMPLE_SERVICE ? appRoutes.serviceExample.href() : undefined',
+      'canonicalHref: appRoutes.serviceExample.href()',
     );
     assertStringIncludes(route, 'href: appRoutes.serviceExample.href()');
     assertStringIncludes(route, "title: 'team-members resource'");

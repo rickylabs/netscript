@@ -3,6 +3,7 @@ import type { PluginInstallRequest } from '../../../domain/plugin-install-plan.t
 /** Parsed options accepted by the public `plugin install` command. */
 export interface InstallPluginCommandInput {
   readonly name?: string;
+  readonly app?: string;
   readonly port?: number;
   readonly serviceRefs?: string;
   readonly pluginRefs?: string;

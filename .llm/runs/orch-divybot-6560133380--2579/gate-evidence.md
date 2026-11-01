@@ -82,3 +82,11 @@ Those remaining fixtures are now repaired without production changes. Both compl
 targeted modules pass locally (6/6, no ignored tests); scoped check/lint/fmt process all
 selected files, and the same independent static evaluator returned both PASS verdicts.
 Fresh ready-mode CI must prove the next head before the report is published.
+
+Owner-requested main merge: 48905de + main 4a2dae3. Canonical carrier chain regenerated
+successfully. Merged structured tests: 231 passed, zero failed/ignored. Scoped check/lint/fmt
+process the resolved tests and merged writer without findings/drops. quality:gate passes
+with existing warnings. Same-session independent SLICE_REVIEW_PASS confirms conflict
+resolutions preserve both branches. All current-head check:* tasks, core/Pages/Fresh UI CI
+and a fresh full manual PostgreSQL/SQLite runtime run are required after the merge commit.
+Previous unchanged-source runtime evidence is historical, not a verdict for the new merge.
