@@ -135,49 +135,9 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       buildHealthProbeBlock(lines, id, entry);
     }
 
-    // --- desktop type: server-side discovery only ---
-    if (type === 'desktop') {
-      const serviceRefs = entry.ServiceReferences ?? [];
-      const pluginRefs = entry.PluginReferences ?? [];
-
-      if (serviceRefs.length > 0 || pluginRefs.length > 0) {
-        lines.push(``);
-        lines.push(`    // Server-side service-discovery injection`);
-      }
-
-      for (const ref of serviceRefs) {
-        lines.push(`    {`);
-        lines.push(
-          `      const endpoint = await getResourceEndpoint(_services.get(${
-            JSON.stringify(ref)
-          }), 'http');`,
-        );
-        lines.push(`      if (endpoint) {`);
-        lines.push(
-          `        await ${id}.withEnvironment(${
-            JSON.stringify(`services__${ref}__http__0`)
-          }, endpoint);`,
-        );
-        lines.push(`      }`);
-        lines.push(`    }`);
-      }
-
-      for (const ref of pluginRefs) {
-        lines.push(`    {`);
-        lines.push(
-          `      const endpoint = await getResourceEndpoint(_plugins.get(${
-            JSON.stringify(ref)
-          }), 'http');`,
-        );
-        lines.push(`      if (endpoint) {`);
-        lines.push(
-          `        await ${id}.withEnvironment(${
-            JSON.stringify(`services__${ref}__http__0`)
-          }, endpoint);`,
-        );
-        lines.push(`      }`);
-        lines.push(`    }`);
-      }
+    // Read references at AppHost execution time so settings edits take effect on restart.
+    if (type === 'desktop' || type === 'app') {
+      appendDiscoveryReferences(lines, id, name, type === 'app');
     }
 
     // --- Common: KV cache dependency ---
@@ -187,63 +147,10 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       lines.push(`    await _withCacheReference(${id}, _infrastructure.primaryCacheWiring);`);
     }
 
-    // --- app type: VITE injection ---
-    if (type === 'app') {
-      const serviceRefs = entry.ServiceReferences ?? [];
-      const pluginRefs = entry.PluginReferences ?? [];
-
-      if (serviceRefs.length > 0 || pluginRefs.length > 0) {
-        lines.push(``);
-        lines.push(`    // VITE service-discovery injection`);
-      }
-
-      for (const ref of serviceRefs) {
-        lines.push(`    {`);
-        lines.push(`      const vite = buildViteEnvVarName(${JSON.stringify(ref)});`);
-        lines.push(
-          `      const endpoint = await getResourceEndpoint(_services.get(${
-            JSON.stringify(ref)
-          }), 'http');`,
-        );
-        lines.push(`      if (endpoint) {`);
-        lines.push(`        await ${id}.withEnvironment(vite.full, endpoint);`);
-        lines.push(`        await ${id}.withEnvironment(vite.shorthand, endpoint);`);
-        lines.push(
-          `        await ${id}.withEnvironment(${
-            JSON.stringify(`services__${ref}__http__0`)
-          }, endpoint);`,
-        );
-        lines.push(`      }`);
-        lines.push(`    }`);
-      }
-
-      for (const ref of pluginRefs) {
-        lines.push(`    {`);
-        lines.push(`      const vite = buildViteEnvVarName(${JSON.stringify(ref)});`);
-        lines.push(
-          `      const endpoint = await getResourceEndpoint(_plugins.get(${
-            JSON.stringify(ref)
-          }), 'http');`,
-        );
-        lines.push(`      if (endpoint) {`);
-        lines.push(`        await ${id}.withEnvironment(vite.full, endpoint);`);
-        lines.push(`        await ${id}.withEnvironment(vite.shorthand, endpoint);`);
-        lines.push(
-          `        await ${id}.withEnvironment(${
-            JSON.stringify(`services__${ref}__http__0`)
-          }, endpoint);`,
-        );
-        lines.push(`      }`);
-        lines.push(`    }`);
-      }
-
-      // Prebuild TODO comment
-      if (entry.Prebuild) {
-        lines.push(``);
-        lines.push(
-          `    // TODO: Configured prebuild requires bridge NuGet — see ts-apphost-bridge-nuget.md`,
-        );
-      }
+    if (type === 'app' && entry.Prebuild) {
+      lines.push(
+        `    // TODO: Configured prebuild requires bridge NuGet — see ts-apphost-bridge-nuget.md`,
+      );
     }
 
     // --- tauri type: remote app reference ---
@@ -426,4 +333,27 @@ function buildTaskBlock(
       JSON.stringify(name)
     }, 'deno', ${id}_workdir, ['task', ${JSON.stringify(taskName)}]);`,
   );
+}
+
+/** Both reference kinds share endpoint resolution and the established discovery variables. */
+function appendDiscoveryReferences(lines: string[], id: string, name: string, vite: boolean): void {
+  lines.push(`    // ${vite ? 'VITE' : 'Server-side'} service-discovery injection`);
+  for (
+    const [field, resources] of [
+      ['ServiceReferences', '_services'],
+      ['PluginReferences', '_plugins'],
+    ] as const
+  ) {
+    lines.push(`    for (const ref of config.Apps[${JSON.stringify(name)}]?.${field} ?? []) {`);
+    lines.push(`      const endpoint = await getResourceEndpoint(${resources}.get(ref), 'http');`);
+    lines.push(`      if (endpoint) {`);
+    if (vite) {
+      lines.push(`        const vite = buildViteEnvVarName(ref);`);
+      lines.push(`        await ${id}.withEnvironment(vite.full, endpoint);`);
+      lines.push(`        await ${id}.withEnvironment(vite.shorthand, endpoint);`);
+    }
+    lines.push('        await ' + id + '.withEnvironment(`services__${ref}__http__0`, endpoint);');
+    lines.push(`      }`);
+    lines.push(`    }`);
+  }
 }

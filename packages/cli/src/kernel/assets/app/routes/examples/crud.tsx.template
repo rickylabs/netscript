@@ -10,7 +10,7 @@ export const crudExamplePage = definePage()
   }))
   .withLayer('crud', CrudExampleView, () => ({
     records: [] as const,
-    serviceHref: {{hasService}} ? appRoutes.serviceExample.href() : undefined,
+    serviceHref: {{serviceExampleHref}},
     recordsHref: appRoutes.records.href(),
   }))
   .withLayout((slots) => slots.crud())

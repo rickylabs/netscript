@@ -26,6 +26,7 @@ export function createLocalPluginCommand(
         resolveProjectRoot: dependencies.resolveProjectRoot,
         sourceRootStartDir,
         installPluginDependencies: {
+          generateRegistries: dependencies.pluginInstallDependencies.generateRegistries,
           fs: dependencies.fs,
           scaffolder: dependencies.scaffolder,
           templateAdapter: dependencies.templateAdapter,

@@ -1,3 +1,5 @@
+import { createInstalledRuntimeRegistryGenerator } from '../../generate/plugins/installed-runtime-registry-generator.ts';
+import type { GenerateInstalledPluginRegistries } from '../../generate/plugins/generate-installed-plugin-registries.ts';
 import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import {
   parsePluginManifest,
@@ -84,6 +86,9 @@ export interface ResolvedPluginBeforePlanning {
 /** Dependencies used by the public install-plugin flow. */
 export interface InstallPluginDependencies
   extends RenderPluginDependencies, PluginOwnedScaffoldDependencies {
+  /** Installed manifest-driven registry producer; tests may inject a recording producer. */
+  readonly generateRegistries?: GenerateInstalledPluginRegistries;
+
   /** Plugin kind registry. */
   readonly registry?: PluginKindRegistry;
 
@@ -150,6 +155,7 @@ export async function installPlugin(
     : { ...capabilityRequest, kind: resolvedPlugin.planningKind };
   const plan = await planPluginInstall(planningRequest, {
     fs: dependencies.fs,
+    appConsumers: resolvedPlugin?.descriptor.manifest.linking?.consumers.apps,
     registry,
   });
   const pluginOwned = resolvedPlugin === undefined || dependencies.processRunner === undefined
@@ -260,7 +266,9 @@ export async function installPlugin(
   await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs, {
     managedFilesBefore,
     rootDenoJsonBefore,
+    plugin: rendered.plugin,
   });
+  await compileInstalledPluginRegistries(plan.projectRoot, resolvedPlugin, dependencies);
   await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
   const { written: browserAuthFiles, report: browserAuthReport } = await reconcileBrowserAuth(
     plan.projectRoot,
@@ -310,6 +318,7 @@ export async function persistPluginMetadata(
   installState: {
     readonly managedFilesBefore?: Readonly<Record<string, string | null>>;
     readonly rootDenoJsonBefore?: string;
+    readonly plugin?: PluginScaffoldResult;
   } = {},
 ): Promise<void> {
   const doctorEntrypoint = resolvedPlugin.descriptor.manifest.officialSource?.doctorEntrypoint ??
@@ -326,6 +335,29 @@ export async function persistPluginMetadata(
   const officialSource = resolvedPlugin.descriptor.manifest.officialSource;
   const metadata = {
     ...resolvedPlugin.descriptor.manifest,
+    ...(installState.plugin
+      ? {
+        linking: {
+          canonicalName: resolvedPlugin.descriptor.manifest.linking?.canonicalName ??
+            resolvedPlugin.descriptor.manifest.officialSource?.canonicalName ?? plan.pluginName,
+          resourceConfigKey: installState.plugin.serviceConfigKey ?? installState.plugin.configKey,
+          ...(plan.provider.category === 'background-processor'
+            ? { backgroundConfigKey: installState.plugin.configKey }
+            : {}),
+          dependencies: resolvedPlugin.descriptor.manifest.linking?.dependencies ??
+            officialSource?.dependencies ?? [],
+          pluginReferences: mergeUniqueReferences(
+            resolvedPlugin.descriptor.manifest.linking?.pluginReferences ??
+              officialSource?.pluginReferences ?? [],
+            plan.pluginReferences,
+          ),
+          consumers: {
+            ...resolvedPlugin.descriptor.manifest.linking?.consumers,
+            apps: plan.appReferences,
+          },
+        },
+      }
+      : {}),
     netscriptInstall: {
       managedFilesBefore: installState.managedFilesBefore,
       managedFilesAfter: await readManagedInstallFiles(plan.projectRoot, fs),
@@ -756,4 +788,32 @@ function parseInfrastructureDependencies(
     parsed.push(value);
   }
   return parsed;
+}
+
+/** Compile declared installed registries after workspace imports and manifests are available. */
+export async function compileInstalledPluginRegistries(
+  projectRoot: string,
+  resolvedPlugin: ResolvedPluginBeforePlanning | undefined,
+  dependencies: {
+    readonly fs: FileSystemPort;
+    readonly processRunner?: ProcessPort;
+    readonly generateRegistries?: GenerateInstalledPluginRegistries;
+  },
+): Promise<void> {
+  if (!resolvedPlugin) return;
+  const declaresRuntime = resolvedPlugin.source.kind === 'local-path'
+    ? await dependencies.fs.exists(join(resolvedPlugin.source.path, 'scaffold.runtime.json'))
+    : Object.keys(resolvedPlugin.descriptor.versionMetadata.files).some((path) =>
+      path.replace(/^\//, '') === 'scaffold.runtime.json'
+    );
+  if (!declaresRuntime) return;
+  const generate = dependencies.generateRegistries ??
+    (dependencies.processRunner
+      ? createInstalledRuntimeRegistryGenerator({
+        fs: dependencies.fs,
+        process: dependencies.processRunner,
+        fetchManifest: (url) => fetch(url, { headers: { Accept: 'application/json' } }),
+      })
+      : undefined);
+  await generate?.({ projectRoot, dryRun: false });
 }

@@ -399,7 +399,7 @@ export function createRuntimeBehaviorGates(
     ),
     commandGate(
       GATE.BEHAVIOR_APP_HOME,
-      'Generated app serves its home page',
+      'Generated overview reports workers and streams ready',
       GATE_PHASE.BEHAVIOR,
       (context) => [
         'deno',
@@ -417,6 +417,8 @@ export function createRuntimeBehaviorGates(
         context.project.projectRoot,
         generatedAppName(context),
         context.project.appHost,
+        'workers',
+        'streams',
       ],
       undefined,
       'capture',
