@@ -1403,3 +1403,22 @@ remains historical. Never rebase or force-push. This checkpoint precedes source.
 7. Contributor path:packages/fresh-ui/README.md, contracts/registry declarations,
    existing publish-size.test.ts and this checkpoint. Raw logs/receipts/captures
    remain private; public artifacts use portable paths and verdict/counts only.
+
+
+## Binding design conditions — recorded before the merge
+
+SAME child PLAN1PASS, new authorized loop failure0. Fresh FULL maintained
+Chromium including touch/native-tab/wheel once is mandatory, with0retries/flaky/
+new allowances. All90CSSfiles require exhaustive ordered rule AND computed
+specificity parity in Chromium, Firefox and WebKit, each with wrong-list negative.
+The affected FF/WK set is the union: data-table, stats-grid, shell, native-close,
+Desktop window/tray, Docs navigation/composition and CodeBlock/fidelity; both
+schemes at390/1280, LTR/RTL inside cases, exact files/counts listed publicly.
+Enumerate all old main Desktop Utility blocks absent/replaced in reviewedc3d;
+no main post-base semantic rule may be silently dropped. Every productTS,
+controller,fixture,config,lock matches1afdexcept enumerated parent/main-only
+changes; main-onlyCLI/docs match main exactly. Fullpackage, scoped wrappers,
+quality/arch/preflight/accuracy/exports/site/docs140/root/CLI/currentheadnative
+publish0slow and exact123+1doc-debt attribution remain required.5MBcap must
+not change; if it fails stop. Fourcarriers/currentheadquality/pub only AFTER
+all generator/browser jobs close, avoiding the parent's corrected race.
