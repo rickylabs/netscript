@@ -1,3 +1,14 @@
+## Current two-blocker review repair before READY
+
+CoordinatorCHANGES6561745158 on4c4b1364. Twofixes only: CodeBlockcode scope/part
+restored;21newgallerykindbadgesmuted(existingbaselineunchanged). Normalmain4a2dae37
+mergeinprogress; onlyMCPcarrierconflictresolved/regenerated.343focusedPASS,assets/
+prosePASS. Ownedgalleryscaffold `.llm/tmp/review2488/scaffold/fresh-ui-browser`
+created; theme-previews thenmaintained60casebrowsermatrix. Postsourcecarriers/
+audit/plainpush/exactheadhosteddesign+CIgreen, thenREADY. Nits2584. NoDesktopscope.
+
+---
+
 ## Ship2488 final carrier checkpoint complete
 
 Source169557e1 is published via normalpush, includes latestmain4cb. All6canonical

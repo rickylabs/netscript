@@ -110,7 +110,10 @@ function isGeneratedModule(value: unknown): value is GeneratedModule {
 }
 
 /** Executes emitted code with recording resources and checks its SDK-facing types. */
-export async function registerWorkspace(config: NetScriptConfig) {
+export async function registerWorkspace(
+  config: NetScriptConfig,
+  generatedConfig: NetScriptConfig = config,
+) {
   const root = await Deno.makeTempDir({ prefix: 'netscript-cors-' });
   const services = new Map(
     Object.keys(config.Services).map((
@@ -143,7 +146,7 @@ export async function registerWorkspace(config: NetScriptConfig) {
     await Deno.writeTextFile(
       path,
       generateRegisterApps({
-        apps: config.Apps,
+        apps: generatedConfig.Apps,
         version: config.Version,
         denoDefaults: config.Defaults.Deno,
       }),

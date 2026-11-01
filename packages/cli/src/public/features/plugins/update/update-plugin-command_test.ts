@@ -564,3 +564,34 @@ Deno.test('plugin update renders browser-auth findings after staged commit witho
     await Deno.remove(fixture.root, { recursive: true });
   }
 });
+
+for (const apps of [['web'], []]) {
+  Deno.test(`plugin update preserves installed app consumers ${JSON.stringify(apps)} before scaffold overwrites metadata`, async () => {
+    const fixture = await createFixture(new RegistryEmitter(), 'workers', {
+      'workers/plugin.ts': 'export const NETSCRIPT_CONTRIBUTION_BUILDERS = [] as const;',
+      'workers/scaffold.plugin.json': '{}',
+    });
+    try {
+      const path = join(fixture.root, 'appsettings.json');
+      const settings = JSON.parse(await Deno.readTextFile(path));
+      settings.NetScript.Apps = { web: { Type: 'app' }, admin: { Type: 'app' } };
+      await Deno.writeTextFile(path, JSON.stringify(settings));
+      await Deno.writeTextFile(
+        join(fixture.root, 'workers/scaffold.plugin.json'),
+        JSON.stringify({
+          linking: { consumers: { apps } },
+        }),
+      );
+      await fixture.command.parse(['workers']);
+      const current = JSON.parse(await Deno.readTextFile(path)).NetScript;
+      assertEquals(current.Apps.web.PluginReferences, apps.length ? ['workers-api'] : undefined);
+      assertEquals(current.Apps.admin.PluginReferences, undefined);
+      const manifest = JSON.parse(
+        await Deno.readTextFile(join(fixture.root, 'workers/scaffold.plugin.json')),
+      );
+      assertEquals(manifest.linking.consumers.apps, apps);
+    } finally {
+      await Deno.remove(fixture.root, { recursive: true });
+    }
+  });
+}

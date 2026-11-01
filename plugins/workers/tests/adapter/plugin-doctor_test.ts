@@ -113,3 +113,24 @@ for (
     assertEquals(report.checks.every((check) => check.ok), ok);
   });
 }
+
+Deno.test('workers doctor remediation uses the project CLI in a local-source workspace', async () => {
+  const report = await runDoctorCommand({
+    plugin: workersAdapterPlugin,
+    context: {
+      workspaceRoot: '/workspace',
+      options: {},
+      config: { WORKERS_API_URL: 'configured' },
+      dryRun: true,
+      fileSystem: {
+        exists: (path) => Promise.resolve(path === 'packages/cli/bin/netscript-dev.ts'),
+        readText: () => Promise.reject(new Error('unexpected read')),
+        writeText: () => Promise.reject(new Error('read only')),
+      },
+    },
+  });
+  assertStringIncludes(
+    report.checks.find((check) => check.name.includes('exists'))?.message ?? '',
+    'deno run -A "packages/cli/bin/netscript-dev.ts" generate plugins --project-root "/workspace"',
+  );
+});

@@ -30,6 +30,8 @@ const MAX_DIAGNOSTIC_CHARS = 24_000;
 const MAX_DIAGNOSTIC_LINES = 300;
 
 export interface ProbeAppHomeOptions {
+  /** Capabilities that the actual overview must report ready. */
+  readonly readyCapabilities?: readonly string[];
   readonly attempts?: number;
   readonly retryDelayMs?: number;
   readonly fetchUrl?: typeof fetch;
@@ -171,6 +173,7 @@ export async function probeAppHome(
         const contentType = response.headers.get('content-type') ?? '';
         const body = await response.text();
         if (response.ok && contentType.includes('text/html') && body.includes('<html')) {
+          assertReadyCapabilities(body, options.readyCapabilities ?? []);
           log(`app home page rendered at ${url}: HTTP ${response.status} (${body.length} bytes)`);
           return;
         }
@@ -192,8 +195,24 @@ export async function probeAppHome(
     `app home page did not render after ${attempts} attempts; last resolved candidates: ` +
       `${lastUrls.join(', ')}\n` +
       [...lastFailure].map(([url, reason]) => `  ${url} -> ${reason}`).join('\n') +
-      `\n\nLast ${appName} resource logs:\n${resourceLogs}`,
+      `\n\nLast ${appName} resource logs:\n${resourceLogs}\n\nFinal probe failures:\n` +
+      [...lastFailure].map(([url, reason]) => `  ${url} -> ${reason}`).join('\n'),
   );
+}
+
+/** Match readiness on one rendered element, preventing unrelated panel text from passing. */
+export function assertReadyCapabilities(body: string, capabilities: readonly string[]): void {
+  const elements = body.match(/<[a-z][^>]*>/gi) ?? [];
+  for (const capability of capabilities) {
+    if (
+      !elements.some((element) =>
+        element.includes(`data-capability="${capability}"`) &&
+        element.includes('data-capability-state="ready"')
+      )
+    ) {
+      throw new Error(`Overview capability ${capability} is not ready.`);
+    }
+  }
 }
 
 if (import.meta.main) {
@@ -202,5 +221,5 @@ if (import.meta.main) {
   const appHost = Deno.args[2];
   if (!projectRoot) throw new Error('project root argument is required');
   if (!appName) throw new Error('app name argument is required');
-  await probeAppHome(projectRoot, appName, appHost);
+  await probeAppHome(projectRoot, appName, appHost, { readyCapabilities: Deno.args.slice(3) });
 }

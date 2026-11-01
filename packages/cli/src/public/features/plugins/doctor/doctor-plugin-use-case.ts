@@ -421,7 +421,7 @@ function unavailableBindings(cause: string): PublishedBindingsObservation {
 
 const TOPOLOGY_STATUS: Readonly<Record<DockerTopologyVerdict, PluginDoctorCheckStatus>> = {
   local: 'healthy',
-  mismatch: 'warning',
+  mismatch: 'error',
   inconclusive: 'warning',
 };
 

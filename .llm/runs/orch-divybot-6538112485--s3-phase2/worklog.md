@@ -940,3 +940,11 @@ carrier/evidence commit. Public added lines+both ownruns auditPASS, absolute-pat
 session/thumbprintcounts0. No new broad gates/evaluator started. Next plainpush
 finalhead, mark2488ready and postREADY for coordinator cross-family/greenCImerge.
 All unfinished scope tracked2584; no Desktop lifecycle implementation in2488.
+
+## Coordinator CHANGES two-blocker repair
+
+Review6561745158 at4c4b1364: restoreCodeBlockcodebindings andfix21newgalleryBadge
+contrast withoutbaselinechanges. Bothscopedfixesapplied; normalmain4a2dae37merged,
+MCPcarrierconflictregenerated. Fresh343focusedPASS; assets/prosePASS; ownedreal
+gallerymaintainedbrowser evidence follows. Five nits recordedon2584, no scope
+expansion. READY waitsactualdesignbrowser andexactheadCIgreen.

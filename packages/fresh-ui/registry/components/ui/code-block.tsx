@@ -267,7 +267,7 @@ function CodeBlockRoot({
     display: readonly CodeLineData[] | undefined,
     syntaxLanguage = lang,
   ) => (
-    <pre><code><CodeRows rows={display ?? rowsFromText(source)} language={syntaxLanguage} variant={defaultLine} lineNumbers={lineNumbers} /></code></pre>
+    <pre><code data-scope='code-block' data-part='code'><CodeRows rows={display ?? rowsFromText(source)} language={syntaxLanguage} variant={defaultLine} lineNumbers={lineNumbers} /></code></pre>
   );
   const fileTabs = tabbed
     ? (
