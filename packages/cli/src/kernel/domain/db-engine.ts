@@ -68,6 +68,8 @@ export interface DatabaseScaffoldOptions {
   readonly engine: DbEngine;
   /** Config key under `NetScript.Databases`; defaults to the engine name. */
   readonly configKey?: string;
+  /** Init-only domain content; omitted by ordinary db add. */
+  readonly preset?: 'northwind';
   /** Prisma domain model name to emit in the base schema. */
   readonly modelName?: string;
   /** Import mode for generated package imports. */

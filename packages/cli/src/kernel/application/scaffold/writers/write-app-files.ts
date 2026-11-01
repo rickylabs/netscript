@@ -1,3 +1,4 @@
+import { NORTHWIND_PRESET } from '../../../domain/scaffold/northwind-preset.ts';
 import { UI_DEFAULT_THEME } from '../../../domain/ui/ui-config.ts';
 import { join } from '@std/path';
 import { toCamelCase } from '@std/text';
@@ -406,7 +407,9 @@ export async function writeNormalizedAppFiles(
     ['lib/scaffold-service-context.ts', appAssets.appScaffoldServiceContext],
     [
       'lib/scaffold-records.ts',
-      options.includeExampleService
+      options.from === NORTHWIND_PRESET
+        ? appAssets.appScaffoldRecordsNorthwind
+        : options.includeExampleService
         ? options.dbEngine === 'none'
           ? appAssets.appScaffoldRecordsMemory
           : appAssets.appScaffoldRecordsDatabase

@@ -1,0 +1,24 @@
+/** Representative Northwind demo orders, persisted through the normal database facade. */
+import { db } from '../mod.ts';
+
+const orders = [
+  { name: 'NW-10248', customerName: 'Vins et alcools Chevalier', shipCountry: 'France', status: 'pending', totalCents: 44000 },
+  { name: 'NW-10249', customerName: 'Toms Spezialitäten', shipCountry: 'Germany', status: 'pending', totalCents: 186340 },
+  { name: 'NW-10250', customerName: 'Hanari Carnes', shipCountry: 'Brazil', status: 'pending', totalCents: 155266 },
+  { name: 'NW-10251', customerName: 'Victuailles en stock', shipCountry: 'France', status: 'pending', totalCents: 65406 },
+  { name: 'NW-10252', customerName: 'Suprêmes délices', shipCountry: 'Belgium', status: 'pending', totalCents: 359790 },
+  { name: 'NW-10253', customerName: 'Hanari Carnes', shipCountry: 'Brazil', status: 'pending', totalCents: 144480 },
+] as const;
+
+if (import.meta.main) {
+  const client = await db.getClient();
+  try {
+    for (const order of orders) {
+      // Stable references make repeat seeding safe without overwriting user edits.
+      await client.order.upsert({ where: { name: order.name }, create: order, update: {} });
+    }
+    console.log('Northwind demo orders are ready. Existing orders were left unchanged.');
+  } finally {
+    await db.disconnect();
+  }
+}

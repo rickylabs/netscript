@@ -1,0 +1,1 @@
+{"command":"deno fmt","cwd":"<repo>","mode":"write","summary":{"filesSelected":18,"batches":1,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":18,"filesProcessed":18,"droppedFiles":[],"refusals":[]},"findings":[]}

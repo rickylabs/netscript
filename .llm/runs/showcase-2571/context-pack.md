@@ -1,14 +1,13 @@
-# Resume #2571
+# Resume
 
-Owner requested continuation after #2572 merged. Selected unclaimed #2571 from
-#2412; other live tracker lanes retain their owners. Baseline4cb0298d, branch
-feat/showcase-scaffold. PLAN-EVAL pending before source edits. Plan defines five
-sequential slices for opt-in init, persisted orders, background lifecycle,
-auth/durable AI/MCP, and full proof/docs. Read plan.md and supervisor.md.
+PR #2577, branch feat/showcase-scaffold, baseline main 4cb0298d7b7020930f1e6b05ca827c8330802d4e.
+Plan bootstrap commit 68d3c762513c3d1ec035e8cccea49f9b05467dd2. No product edits yet.
 
-Prior memory: PATH git filters output; use /usr/bin/git for exact data. CLI lint/fmt
-is excluded by root config; use scoped config and wrappers with coverage checks.
-Use Deno2.9.7. Do not commit root lock churn from Fresh init. Actual isolated Aspire
-SQLite works with --cache false despite doctor/.NET shim failure; full Docker
-runtime remains unproven locally. Browser host library path and raw logs remain
-private. No hard-coded URLs; resolve Aspire logical resources.
+Current leaf #2580 is the Northwind orders foundation using --from northwind. Full #2571
+remains open. Independent #2581 owns plugins/ai MCP service-discovery configuration.
+Read revised plan.md and plan-eval.md. First review FAIL_PLAN, next review must address
+all findings; two consecutive terminal failures stop. Same independent evaluator session.
+Public evidence repo-relative only. Private launch identity stays outside this run dir.
+Next: second plan review, then S1 source and focused tests, S2 runtime/visual/gates.
+
+S1 implementation PASS; 177 broader tests plus28 review-condition tests pass. Source ready for sign-off. S2 remains runtime assertion, seed preservation/generated Postgres evidence, visual audit and final carriers. Real SQLite Aspire is running only at .llm/tmp/showcase-2571/northwind/aspire/apphost.mts; stop this exact AppHost after evidence. No foreign resources owned.

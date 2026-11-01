@@ -1,3 +1,4 @@
+import { applyInitPreset } from '../../../kernel/domain/scaffold/northwind-preset.ts';
 import type { PreparedInitPreset } from '../../../kernel/application/ui/v2/presets/apply-init-preset.ts';
 import { resolve } from '@std/path';
 
@@ -89,6 +90,7 @@ export async function orchestrateMaintainerInit(
   request: MaintainerInitRequest,
   dependencies: MaintainerInitDependencies,
 ): Promise<MaintainerInitResult> {
+  request = applyInitPreset(request);
   const probeDir = request.path ? resolve(dependencies.cwd(), request.path) : dependencies.cwd();
   const sourceRoot = await dependencies.detectMonorepoRoot(probeDir);
 

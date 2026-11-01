@@ -13,6 +13,7 @@ const APP_TEMPLATE_URLS: TemplateUrlMap = {
   appScaffoldServiceContext: TEMPLATE_KEYS.appScaffoldServiceContext,
   appScaffoldRecordsMemory: TEMPLATE_KEYS.appScaffoldRecordsMemory,
   appScaffoldRecordsDatabase: TEMPLATE_KEYS.appScaffoldRecordsDatabase,
+  appScaffoldRecordsNorthwind: TEMPLATE_KEYS.appScaffoldRecordsNorthwind,
   appCapabilityEmpty: TEMPLATE_KEYS.appCapabilityEmpty,
   appRecordTable: TEMPLATE_KEYS.appRecordTable,
   appRecordsRoute: TEMPLATE_KEYS.appRecordsRoute,

@@ -4,6 +4,7 @@
  * Adapter-backed scaffolder for complete `database/<engine>/` workspaces.
  */
 
+import { NORTHWIND_PRESET } from '../../domain/scaffold/northwind-preset.ts';
 import { join } from '@std/path';
 import { normalize as normalizePosix } from '@std/path/posix';
 
@@ -125,6 +126,7 @@ export class DatabaseScaffolder {
    * @returns Created/skipped files plus resolved database identity.
    */
   async scaffold(options: DatabaseScaffoldOptions): Promise<DatabaseScaffoldResult> {
+    const northwind = options.preset === NORTHWIND_PRESET;
     const start = performance.now();
     const provider = this.registry.get(options.engine);
     const configKey = options.configKey ?? provider.engine;
@@ -201,7 +203,10 @@ export class DatabaseScaffolder {
     );
     await write(
       join(schemaDir, 'schema.prisma'),
-      renderTemplateAssetSync(TEMPLATE_KEYS.databaseSchema, templateVars),
+      renderTemplateAssetSync(
+        northwind ? TEMPLATE_KEYS.northwindSchema : TEMPLATE_KEYS.databaseSchema,
+        templateVars,
+      ),
     );
     await write(
       join(generatedDir, provider.capabilities.clientEntrypoint),
@@ -210,12 +215,16 @@ export class DatabaseScaffolder {
     if (provider.capabilities.hasZodGeneration) {
       await write(
         join(generatedZodDir, 'crud.ts'),
-        generatePlaceholderCrudZod(templateVars.modelName),
+        northwind
+          ? renderTemplateAssetSync(TEMPLATE_KEYS.northwindCrud, templateVars)
+          : generatePlaceholderCrudZod(templateVars.modelName),
       );
     }
     await write(
       join(scriptsDir, 'seed.ts'),
-      generateDatabaseSeed({ modelName: templateVars.modelName }),
+      northwind
+        ? renderTemplateAssetSync(TEMPLATE_KEYS.northwindSeed, templateVars)
+        : generateDatabaseSeed({ modelName: templateVars.modelName }),
     );
     await write(
       join(scriptsDir, 'fix-zod-imports.ts'),

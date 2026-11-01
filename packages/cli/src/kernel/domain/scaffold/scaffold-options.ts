@@ -93,6 +93,9 @@ export interface ValidatedInitOptions extends
       | 'noAspire'
     >
   > {
+  /** Selected built-in domain preset, absent for ordinary init. */
+  readonly from?: 'northwind';
+
   /** Validated application name. */
   readonly appName: string;
 

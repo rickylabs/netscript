@@ -400,3 +400,42 @@ checks feed normal command output. To extend candidate selection or ownership
 rules, start at `src/kernel/adapters/plugin/browser-auth-reconciler.ts` and its
 colocated preservation tests; reporting scenarios live in
 `tests/browser-auth-reporting_test.ts`.
+
+### Northwind orders example
+
+Opt in to a small persisted commerce dataset using the domain preset selector:
+
+```sh
+netscript init shop --from northwind --app-name shop-web --ci
+cd shop
+cd aspire
+aspire restore
+cd ..
+deno task aspire:start
+netscript db init --name init
+netscript db generate
+netscript db seed
+```
+
+Use the app URL shown in the Aspire dashboard. Overview and Records read the generated
+`orders` service; selecting a record shows its customer, country, status and USD total.
+The six representative demo orders live in the database. Repeating `db seed` preserves
+existing orders and edits. The generated service exposes ordinary unauthenticated CRUD
+for local exploration; configure authentication before using it with private data.
+
+The preset defaults to SQLite and no shared cache. `--db postgres` selects Postgres;
+project/app names remain customizable. It reserves the `orders` service and `Order`
+model, requires Aspire, and cannot be combined with `--preset`, `--db none`, or
+`--service false`. `--dry-run --json` reports the plan without creating the project.
+Ordinary `init` remains unchanged. Contributors use the equivalent
+`deno run -A packages/cli/bin/netscript-dev.ts init shop --from northwind --ci`
+from a checkout to copy local framework sources.
+
+This orders example is the data foundation for the full showcase tracked in #2571.
+It does not install background workflows, auth providers, or durable AI chat. Those
+capabilities retain their designed add/configure states until installed and connected.
+
+Template-maintainer guidance: start at
+[`northwind-preset.ts`](src/kernel/domain/scaffold/northwind-preset.ts) for the supported
+choices, then `src/kernel/assets/northwind/` for schema, seed and typed projection.
+Database code generation replaces the initial Zod placeholder with the real schema.

@@ -1,104 +1,128 @@
-# Northwind showcase implementation plan
+# Northwind orders foundation — revised plan
 
 ## Public surface
 
-`netscript init <name> --example showcase` and maintainer parity produce an opt-in
-Northwind commerce workspace. Default init is byte-for-byte unaffected apart from
-help/API additions. Keep project/app names customizable; reserve orders/Order for
-the showcase's shared typed contract. Default showcase storage is SQLite; support
-Postgres where existing plugin installers support it. Reject contradictory explicit
-options before writing (db none, no service/Aspire, conflicting service/model names).
-Dry-run reports the selected example and planned capabilities without invoking
-plugin installers, network mutations or writing generated projects.
+This PR now resolves child #2580, not the entire showcase #2571. The owner explicitly
+requested the next tracker subtask or sibling fan-out. Independent MCP discovery is
+filed as #2581 (plugins/ai); the coupled full-showcase remainder stays on #2571.
 
-The showcase reuses the merged Utility shell, Overview, Records/detail, Settings,
-Sign-in and command palette. Add an app-owned durable chat route using shipped UI
-components; never duplicate pending #2488 components. Keep the design reference.
+Use the existing `netscript init <name> --from northwind` and maintainer equivalent.
+Do not introduce `--example showcase` before that complete recipe exists. `--from`
+selects domain content; `--preset` selects visual tokens. The first built-in domain
+preset is northwind. Reject combining it with --preset for this first supported
+recipe, before preset fetches or writes. Unknown --from values report supported names.
 
-## Vocabulary and contracts
+Northwind defaults to SQLite, orders/Order, service enabled and cache disabled; allow
+Postgres, custom project/app names and an explicit cache choice. Reject none/mysql/mssql,
+--no-aspire, --service false and conflicting service/model names before I/O. Interactive
+init does not offer Northwind implicitly; explicit --from fills database/service/model
+before prompts, and only the remaining unrelated questions are asked. Normal init's
+prompts, file set and contents stay unchanged.
 
-Showcase is a closed scaffold example identifier, not a new plugin system or theme
-preset. Northwind orders are persisted Prisma rows with stable order reference/name,
-customer/company, shipping country, status and integer total cents. Seed through
-normal db seed with deterministic idempotent records; never inject display-only rows.
-The existing generated orders contract/client is authoritative. Showcase workflow
-state is persisted by existing worker/saga/trigger/stream APIs, not app memory.
+## Vocabulary / contracts
 
-The order lifecycle demonstrates requested -> payment recorded -> fulfillment ->
-shipped with meaningful failure/compensation paths. Payments/shipping are local
-commerce simulation steps clearly named as such, not claims of external billing.
-A signed webhook or schedule starts the workflow; the app invokes typed procedures,
-queries actual execution state and subscribes to real activity. No browser credential
-cross-origin topology, hard-coded host ports, curl, ad-hoc polling of fabricated state,
-or background work inside the Fresh request server.
+Archetype 6 CLI/Tooling, existing init composition. Northwind is a closed domain preset,
+not a plugin installer or runtime. Order fields: id Int autoincrement; name String unique
+(stable order reference); customerName String; shipCountry String; status String default
+pending; totalCents Int; createdAt/updatedAt dates. Fixed representative seed records are
+explicit demo data persisted through Prisma, never presentation-only rows. Upsert by
+unique name with update:{} preserves user edits and row count on repeat seeding.
 
-Auth uses the shipped BFF/session topology. AI uses the shipped durable chat runtime,
-thread persistence and MCP tool integration over orders. Provider credentials and
-secrets remain caller configuration; no committed secrets or invented provider
-responses. Unconfigured providers get an actionable designed state; tests may use
-an explicit deterministic provider fixture, with that evidence distinguished from
-an external provider invocation.
+The generated typed orders contract uses the real Prisma/Zod schema. Its current
+unauthenticated CRUD is explicitly a local demo; no auth installation/security claim.
+The parent integration must protect the contract via a supported template input and
+service auth configuration when auth is added, never text-replace generated TS.
 
-## Ports and composition
+## Ports, placement and effects (B1–B3)
 
-Reuse InitPipelineContext, ScaffolderPort, FileSystemPort, TemplatePort and ProcessPort.
-Use existing public/plugin installer and generator entry points; prefer injected
-use-case callbacks over nested CLI invocation where the command composition already
-owns them. Preserve maintainer local-source versus public JSR resolution. Compose
-a closed ordered showcase recipe after base files/packages exist, before final
-format/summary/agent handoff. Fail on installer/generator failure; never report a
-partial recipe successful. Keep effects visible in InitResult and JSON output.
+No post-init recipe runner or plugin effects in this leaf. Normalize scaffold choices
+before public prompts and before maintainer orchestration, with the same pure resolver
+also protecting direct shared-kernel init. Keep explicit false distinct from omission.
+The validated preset flows into DatabaseScaffolder and app writer. DatabaseScaffolder
+selects the Northwind schema, placeholder Zod and seed assets instead of the generic
+ones in its existing write calls, under the existing overwrite/skip policy. There is
+no overwrite-after-generation phase and no string rewriting of emitted TypeScript.
+The typed records adapter uses the existing generated client and same-origin SSR loader.
 
-No plugin runtime changes are planned. If existing APIs cannot express a required
-flow, record the concrete gap before broadening framework scope. Use canonical
-schema/contract generation and app routes, never string-rewrite generated TS APIs.
+Existing ScaffolderPort, FileSystemPort and TemplatePort perform all writes; ProcessPort
+retains Fresh scaffold/format/git effects. No new port/dependency graph is required.
+All Northwind content exists before runInitPipeline's formatter/git commit and before
+executeInit's single JSON output. InitResult phase/file counts include it naturally;
+JSON project adds `from` only when selected; plugins remains truthfully empty. Maintainer
+package sync remains afterward and cannot omit SQLite packages: normalize dbEngine
+before passing its request to syncPackages. No installer is called during dry-run.
+
+Database preparation remains explicit existing `db init`, `db generate`, `db seed`
+commands in next steps; init never claims a running/seeded project. Existing errors exit
+nonzero without success JSON. No new multi-step mutation recipe is introduced. The
+future parent recipe must separately solve completed/failed-step JSON and deferred
+finalization across public/maintainer package-sync, plugin and preset effects.
 
 ## Constants and contributor path
 
-One closed `ScaffoldExample` identifier and named showcase defaults; no parallel
-volatile version/model catalogs. Contributor entry: the showcase recipe module
-under CLI scaffold application, linked from packages/cli/README.md. Assets live in
-one showcase namespace and use the existing embedded-template carrier. Existing
-plugin APIs retain their own constants, registration and generation ownership.
+One named NORTHWIND_PRESET identifier and defaults in domain/scaffold, plus the existing
+PresetRegistry entry. No duplicated version/model catalogs. Contributor entry is
+`packages/cli/src/kernel/domain/scaffold/northwind-preset.ts`, linked from CLI README.
+Northwind assets use the embedded-template carrier and dedicated keys.
 
-## Sequential commit slices
+## Commit slices
 
-1. S1: example option/validation and recipe contract; public/maintainer/dry-run/JSON
-   parity, no-default-regression tests. Under30 source files.
-2. S2: persisted commerce schema/seed, generated orders contract/client and reusable
-   Utility pages. Generated typecheck plus actual SQLite seeded list/detail proof.
-3. S3: existing workers/sagas/triggers/streams installed and wired to order lifecycle,
-   actual status/activity projection, durable/negative behavior tests. No runtime
-   implementation duplication; under30 source files.
-4. S4: auth BFF and durable AI/MCP orders tools, UI using shipped components,
-   provider-missing/error/authorization tests. Under30 source files.
-5. S5: dedicated showcase runtime acceptance, independent Figma visual matrix,
-   concise Explore the showcase guide, full carrier/quality/docs/release checks.
+S1 (under 30 source files plus generated carriers): shared preset contract/resolver;
+public/maintainer selection; database schema/placeholder/idempotent seed; typed records
+adapter and fixture-aware docs. Existing page markup/CSS is reused. Tests cover parser
+parity, explicit false, option conflicts, interactive behavior, dry-run and JSON, full
+ordinary scaffold file-set/content hash baseline, schema/seed contracts and writes.
+Source paths: CLI domain/scaffold + db-engine; application registries/scaffold/writers
+and JSON renderer; database adapter; init commands; new Northwind assets and carriers.
 
-Every slice records worklog/context and receives independent implementation review
-before sign-off. One draft PR opens with the plan commit. No forced pushes.
+S2: real generated DB migration/codegen/seed twice and workspace typecheck; focused
+runtime assertion through a running orders service and page rendering, failure control;
+independent visual/review evidence and final docs. Reuse existing runtime regression
+seams and native SQLite/Aspire support. No broad plugin/showcase suite is claimed here.
+Every slice updates worklog/context and gets independent review before sign-off commit.
 
-## Gates
+## Validation / visual reference
 
-Structured check/lint/fmt and meaningful CLI/scaffold tests per slice, generated
-workspace typecheck, quality/architecture, release:preflight, docs:accuracy, all
-root check:* carriers under Deno2.9.7. Preserve CSS budgets. Exact scaffold.runtime
-attempt plus a showcase-specific runtime proof that checks real rows, workflow
-completion/activity, auth/session and chat/MCP behavior. Local Docker preflight is
-known unavailable; distinguish focused native Aspire evidence, test provider evidence,
-and full runtime UNPROVEN. Seek Docker-capable CI for the full showcase proof.
+Capture the ordinary init golden file manifest with content hashes before source edits;
+exclude only nondeterministic timing/output, not emitted files. Test both no-service and
+SQLite service paths against it. Test public/maintainer with shared resolver and generated
+phase assertions; confirm real maintainer init JSON emits once and dry-run writes nothing.
+After real db generate, typecheck generated workspaces through the declared wrapper.
+Seed twice, mutate a seeded row, seed again and assert row count/user edit preserved.
+Render list and detail using real seeded Order rows through the running typed service;
+assert name, customer, country, status and total; service-down control must show unavailable.
+Native Aspire evidence is distinct from full Docker scaffold.runtime (attempt or UNPROVEN).
+Public published-package runtime proof belongs to release E2E; this run proves local source.
 
-Independent PLAN-EVAL and IMPL-EVAL: owner-approved Claude Opus5.5 high, read-only,
-separate session/vendor, reused across rounds. Independent Astra visual comparison
-for every changed page light/dark desktop/mobile, each >=8 fidelity and quality.
-Two consecutive terminal review failures stop the loop for an owner decision.
+Figma references: existing Utility dashboard and orders light/dark, at desktop/mobile.
+Detail has no dedicated locked frame: judge existing Utility shell/table/card typography,
+spacing, navigation and responsive behavior against orders/dashboard. No new chat/lifecycle
+page is in this leaf. Independent Astra score >=8 fidelity and quality for changed views.
+Scoped structured check/lint/fmt, CLI tests, docs:accuracy, release:preflight, all check:*
+carriers and architecture as configured. CLI source explicitly included despite root excludes.
+No CSS budget change. Independent Claude Opus5.5 high PLAN-EVAL/IMPL-EVAL reused session;
+one FAIL_PLAN so far, two consecutive terminal failures stop and escalate.
 
-## Deferred scope and parallelism
+## Deferred scope and B4–B7 decisions
 
-No new payment/shipping integrations, full Northwind dataset import, plugin runtime
-redesign, theme engine changes, component gap duplication, or default-init examples.
-The shared orders schema, recipe ordering and runtime harness couple the feature;
-keep sequential slices rather than manufacture dependent sibling issues. Other
-unfinished #2412 units already have active owners and remain parallel externally.
-Parent #2571 stays open until every acceptance item is evidenced; do not close the
-epic #2412. No unsupported acceptance checkboxes.
+Parent #2571 remains open. Runtime MCP choice is an app-owned server over the typed orders
+client (option B4-b), with Aspire discovery client support independently owned by #2581.
+This follows the owner's instruction to choose and proceed; no acceptance weakening to
+plain AI tools. App server/authentication remains part of parent integration.
+
+Parent composition must use installPlugin with its full dependencies in public mode and
+installLocalPlugin after package sync in maintainer mode; db operations and generate
+plugins/resource through existing use cases; plugin-owned ai add/mcp add and auth
+backend/provider commands through the existing subprocess dispatcher. Dry-run cannot call
+installPlugin even with dryRun, since it fetches/starts plugin processes.
+
+Parent durable AI requires app-owned replacement files with explicit conflict policy,
+auth-derived user/thread identities, authorize gate, connected thread store, same-origin
+stream proxy and streams installed before AI. Activity also needs a same-origin stream
+surface; do not mistake chat proxy for a generic activity proxy. OAuth and AI provider
+fixtures are labeled separately from real external-provider proof. Background plugins
+and auth require Garnet/KV Auto (Docker or dotnet); SQLite does not remove that dependency.
+The full showcase runtime stays UNPROVEN until a Docker-capable suite actually passes.
+That future suite belongs in cli-surface/expensive-runtime and preserves scaffold.runtime;
+Aspire logical names and installer-declared references are mandatory. No parent acceptance
+checkbox is marked by this foundation PR. Full Explore the showcase docs follow assembly.

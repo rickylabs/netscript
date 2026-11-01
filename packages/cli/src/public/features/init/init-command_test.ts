@@ -11,7 +11,7 @@ const noopPrompt: PromptPort = {
   select: (_message, options) => Promise.resolve(options[0]),
 };
 
-Deno.test('init --from reports the empty Wave 6 preset registry', async () => {
+Deno.test('init --from reports supported presets for an unknown selector', async () => {
   const command = createInitCommand({
     initAgent: () => Promise.reject(new Error('agent init must not run')),
     initContext: {} as never,
@@ -22,7 +22,7 @@ Deno.test('init --from reports the empty Wave 6 preset registry', async () => {
   await assertRejects(
     () => command.parse(['--from', 'api-only']),
     Error,
-    'no presets registered',
+    'Available: northwind',
   );
 });
 
