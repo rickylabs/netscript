@@ -23,8 +23,11 @@ Deno.test('#2566: home uses shared generated overview without fabricated CRUD or
   const dashboard = readTemplateAssetSync(TEMPLATE_KEYS.appRoutesComponentsDashboardView);
   const navigation = readTemplateAssetSync(TEMPLATE_KEYS.appNavigation);
   assertStringIncludes(home, "from './dashboard-view.tsx'");
-  assertStringIncludes(dashboard, 'appTheme().label');
-  assertStringIncludes(dashboard, 'generatedPageCount()');
+  assertStringIncludes(dashboard, 'data.totals.records.current');
+  assertStringIncludes(dashboard, 'ChartBlock');
+  assertStringIncludes(dashboard, 'Donut');
+  assertEquals(dashboard.includes('generatedPageCount()'), false);
+  assertEquals(dashboard.includes('appTheme().label'), false);
   assertStringIncludes(navigation, 'walk(routePatterns)');
   assertStringIncludes(navigation, "import.meta.env.MODE !== 'development'");
   for (

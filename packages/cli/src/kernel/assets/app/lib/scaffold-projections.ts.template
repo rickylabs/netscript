@@ -41,6 +41,8 @@ interface OverviewData {
   /** All loaded records, including those outside the comparison windows. */
   readonly statusCounts: readonly { readonly status: ScaffoldStatus; readonly count: number }[];
   readonly latest: readonly ScaffoldRecord[];
+  /** Most recently changed records, selected from the complete dataset. */
+  readonly changes: readonly ScaffoldRecord[];
 }
 /** Failed/absent reads have no numeric payload, so they cannot masquerade as zero activity. */
 export type ScaffoldOverview =
@@ -90,6 +92,7 @@ export function projectScaffoldOverview(records: ScaffoldRecords, options: { rea
       return { date: new Date(from).toISOString().slice(0, 10), count: rows.length, amounts: currencies.map((currency) => ({ currency, amount: sum(rows, currency) })) };
     }),
     statusCounts: (Object.keys(scaffoldStatuses) as ScaffoldStatus[]).map((status) => ({ status, count: records.rows.filter((row) => row.status === status).length })),
+    changes: [...records.rows].sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt) || a.reference.localeCompare(b.reference)).slice(0, latestLimit),
     latest: [...records.rows].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt) || a.reference.localeCompare(b.reference)).slice(0, latestLimit),
   };
 }

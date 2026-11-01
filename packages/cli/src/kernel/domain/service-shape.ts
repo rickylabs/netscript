@@ -5,6 +5,7 @@
 import type { ServiceEntry } from '@netscript/aspire/types';
 import type { ScaffoldResult } from './core-types.ts';
 import type { PackageSourceMode } from './scaffold/scaffold-options.ts';
+import type { DbEngine } from './db-engine.ts';
 
 export type { ScaffoldResult } from './core-types.ts';
 export type { PackageSourceMode } from './scaffold/scaffold-options.ts';
@@ -46,6 +47,8 @@ export interface ServiceScaffoldOptions {
   readonly modelName?: string;
   /** Whether the service should use the database-backed CRUD templates. */
   readonly hasDatabase?: boolean;
+  /** Database engine used for provider-specific text matching. */
+  readonly dbEngine?: DbEngine;
   /** Optional peer services to expose through Aspire service discovery. */
   readonly serviceReferences?: readonly string[];
   /** Whether existing files should be overwritten. */

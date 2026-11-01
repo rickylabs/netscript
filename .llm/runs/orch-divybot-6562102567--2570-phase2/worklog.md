@@ -22,3 +22,11 @@ Design checkpoint pending focused inspection; no product edits yet.
 7. Contributor path: `packages/cli/src/kernel/assets/app/lib/scaffold-projections.ts.template` defines the overview data; template registry/writer maps each new asset to generated output.
 
 PLAN-EVAL N/A per plan's risk selection. No product edits before this checkpoint.
+
+## S1 — terminal PASS, 2026-11-01
+
+Implemented real KPI deltas, currency-separated totals, daily chart/status donut, rich native tables with page selection/CSV export, server search/status/sort/pagination, localized detail and actual timestamp timeline. Activity selects latest updates across the complete dataset. Extended typed service search before pagination, including PostgreSQL insensitive matching.
+
+Evidence: Deno 2.9.7 structured tests 61/61; scoped check/lint/fmt 11 files; emitted app/service check 125 files; quality:gate passed. Live seeded SQLite: Overview, Records, detail at 1440/390 in light/dark, 12 captures; search/selection/CSV each combination, no browser errors or page overflow. These are S1 checks, not final plugin or visual acceptance. Private screenshots/logs remain outside public source. Independent Astra S1 source supervisor PASS in s1-review.md; all five earlier findings repaired. Supervisor authorizes the S1 signoff commit.
+
+Reconcile: S1 satisfies the first slice on current branch. S2 owns plugin state/progress/events, live-example/health redesign and Settings/sign-in/commands polish; S3 owns complete carriers, CI runtime, final independent code/visual review. No READY claim.

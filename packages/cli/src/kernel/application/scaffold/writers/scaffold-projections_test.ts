@@ -280,6 +280,17 @@ Deno.test('both storage adapters forward status, sort and pagination and project
       new Request('https://app.example/records?status=paid'),
     );
     assertEquals(empty.state, 'empty');
-    assertEquals(empty.message, 'No records match this status.');
+    assertEquals(empty.message, 'No records match your filters.');
   }
+});
+
+Deno.test('activity selects latest changes before limiting, independently of record creation', () => {
+  const older = { ...row(1, '2026-09-01T00:00:00Z'), updatedAt: '2026-11-01T20:00:00Z' };
+  const newer = row(2, '2026-11-01T00:00:00Z');
+  const result = project({ state: 'ready', rows: [older, newer], total: 2, message: 'live' }, {
+    now,
+    latestLimit: 1,
+  });
+  assertEquals(result.latest[0].id, '2');
+  assertEquals(result.changes[0].id, '1');
 });

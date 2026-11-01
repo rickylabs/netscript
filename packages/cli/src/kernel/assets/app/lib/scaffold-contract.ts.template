@@ -45,6 +45,7 @@ export interface ScaffoldRecords {
   readonly rows: readonly ScaffoldRecord[];
   readonly total?: number;
   readonly page?: number;
+  readonly pageSize?: number;
   readonly hasNext?: boolean;
   /** Serialized list controls, preserved when navigating to another page. */
   readonly query?: Readonly<Record<string, string>>;
@@ -79,10 +80,42 @@ export function scaffoldRecordQuery(request: Request) {
   const rawPage = Number(params.get('page') ?? 1);
   const sortBy = scaffoldSortFields.find((field) => field === params.get('sortBy')) ?? 'createdAt';
   const status = (Object.keys(scaffoldStatuses) as ScaffoldStatus[]).find((value) => value === params.get('status'));
-  return { page: Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1, sortBy, sortOrder: params.get('sortOrder') === 'asc' ? 'asc' as const : 'desc' as const, ...(status ? { status } : {}) };
+  const search = (params.get('search') ?? '').trim().slice(0, 200);
+  return { ...(search ? { search } : {}), page: Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1, sortBy, sortOrder: params.get('sortOrder') === 'asc' ? 'asc' as const : 'desc' as const, ...(status ? { status } : {}) };
 }
 
 /** Preserve the active server query when navigating the records table. */
 export function scaffoldPageHref(base: string, records: ScaffoldRecords, page: number): string {
   return base + '?' + new URLSearchParams({ ...records.query, page: String(page) });
+}
+
+/** Negotiate the user's language without trusting malformed Accept-Language input. */
+export function scaffoldLocale(request: Request): string | undefined {
+  for (const part of (request.headers.get('accept-language') ?? '').split(',')) {
+    const language = part.trim().split(';')[0];
+    try { if (language && Intl.DateTimeFormat.supportedLocalesOf([language]).length) return language; } catch { /* Ignore invalid language tags. */ }
+  }
+  return undefined;
+}
+
+/** Format signed minor units using the currency's actual decimal precision. */
+export function scaffoldAmount(amount: number, currency: string, locale?: string): string {
+  const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency });
+  return formatter.format(amount / 10 ** (formatter.resolvedOptions().maximumFractionDigits ?? 2));
+}
+
+/** Dates are presented in the user's locale; invalid data never crashes a page. */
+export function scaffoldDate(value: string, locale?: string, time = false): string {
+  const date = new Date(value);
+  return Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', ...(time ? { timeStyle: 'short' as const } : {}), timeZone: 'UTC' }).format(date) : '—';
+}
+
+/** Owners without profile photos use their real name's initials. */
+export function scaffoldInitials(name: string): string {
+  return name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => [...part][0]).join('').toLocaleUpperCase();
+}
+
+/** Counts use the actual singular form for one record. */
+export function scaffoldRecordCount(count: number, locale?: string): string {
+  return `${new Intl.NumberFormat(locale).format(count)} ${count === 1 ? 'record' : 'records'}`;
 }
