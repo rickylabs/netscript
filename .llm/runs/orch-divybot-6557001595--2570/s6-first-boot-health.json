@@ -1,0 +1,54 @@
+{
+  "beforeGeneration": {
+    "status": 503,
+    "healthStatus": "Unhealthy",
+    "body": {
+      "status": "unhealthy",
+      "timestamp": "2026-11-01T13:55:46.257Z",
+      "checks": [
+        {
+          "name": "database",
+          "healthy": false,
+          "message": "Prisma client is not generated. Run netscript db generate before using this service.",
+          "latency": 0
+        }
+      ],
+      "version": "1.0.0"
+    }
+  },
+  "afterGeneration": [
+    {
+      "resource": "orders",
+      "path": "/health",
+      "status": 200,
+      "seededRow": false,
+      "healthStatus": "Healthy"
+    },
+    {
+      "resource": "shop-web",
+      "path": "/records",
+      "status": 200,
+      "seededRow": true,
+      "healthStatus": "Unhealthy"
+    },
+    {
+      "resource": "shop-web",
+      "path": "/examples/orders",
+      "status": 200,
+      "seededRow": true,
+      "healthStatus": "Unhealthy"
+    },
+    {
+      "resource": "shop-web",
+      "path": "/",
+      "status": 200,
+      "seededRow": true,
+      "healthStatus": "Unhealthy"
+    }
+  ],
+  "followupHealth": {
+    "orders": "Healthy",
+    "shop-web": "Healthy",
+    "source": "Aspire wait shop-web healthy returned0; exact scoped describe confirms both Running/Healthy"
+  }
+}

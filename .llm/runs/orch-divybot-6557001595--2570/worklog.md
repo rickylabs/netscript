@@ -251,3 +251,50 @@ carrier checks pass. Assets freshness follows the sign-off commit. Reconcile: no
 source changes since code review except a stale example button label assertion;
 focused and full reruns pass. #2488 still open, PR mergeable, no labels or locks
 changed. Commit and normal push authorized. READY remains gated on fresh remote CI.
+
+## S6 design checkpoint
+
+Public surface, vocabulary, ports, constants/contract, commit slice, deferred scope
+and contributor path are in s6-plan.md. Actual red runtime reproduction is in
+s6-runtime-diagnosis.md. Independent diagnosis consultation running; submit final
+plan to the same evaluator before implementation. Runtime blocker supersedes the
+prior policy-only readiness interpretation. PR returned to draft at 1694559.
+
+S6 PLAN-EVAL PASS with C1–C7. Implementation follows all seven conditions: logical
+Executable/Running exact matches, canonical dependency paths/no symlink escapes,
+per-command refresh set, sequential restart+health wait, actual health failure
+before generation, negative seeded-row controls, honest full-runtime UNPROVEN.
+No speculative lifecycle changes before the plan gate.
+
+## S6 runtime repair validation and review
+
+Reproduced coordinator startup order on the previous head in real isolated Aspire
+with SQLite and cache disabled through the public init option. /health200 falsely
+reported success while Overview/Records were unavailable and /examples/orders500.
+The route existed; the resident service held the init placeholder PrismaClient.
+
+Implemented honest placeholder database health, project-scoped post-generate refresh
+of exact running declared consumers, conditional typed CRUD link, and seeded-row
+assertions in scaffold.runtime. New adapter's deadline and caller cancellation are
+bounded; no AppHost restart or memory-service reset. No-service detection matches
+route emission. Existing authored loaders remain preserved.
+
+S6 live proof: same red fixture recovers through public db generate alone. A fresh
+fixture is /health503/Unhealthy before generation and Healthy afterward. Browser20
+cases at two widths/two themes show real seeded cells and0 page errors. Production
+runtime assertion rejects old captured HTML and accepts12 repaired DOM cases.
+All three required populated pages respond200. See s6-runtime-summary.md.
+
+Expanded55-file suite416PASS; final touched runner/writer/init followup30PASS.
+Structured source check/lint/fmt11filesPASS. Quality, release preflight, docs accuracy,
+publish dry-run and all carrier checks pass except assets-barrel's expected dirty
+carrier diff, to rerun after sign-off commit. Aspire surface manifest regenerated
+for new database adapters and README; parity rerunPASS. No CSS changes or budget
+increase. Full runtime attempted again, remains UNPROVEN at host preflight/Docker.
+
+Independent same-session S6 IMPL-EVAL codePASS. Evidence requests F1-F3 fulfilled,
+minor F4/F5 fixed and validated, F6 residuals recorded. Final evidence reconciliation
+and live-state visual supplement requested before sign-off. Remote checks on S5 head
+all green/policy-skipped; new S6 head requires fresh checks before READY.
+
+S6 terminal local review: independent Claude final PASS, F1-F6 resolved/recorded. Independent Astra live supplement PASS all12 Utility captures >=8 fidelity/quality. Reviewer N1 CI-order wording corrected: CI pre-generates, then refreshes after start; only focused isolated proof covers placeholder-first boot. Prior readiness-policy-review.md still governs non-opt-in runtime skip; full runtime is truthfully UNPROVEN, not PASS. Sign-off approved locally; postcommit carrier and fresh remote checks remain.

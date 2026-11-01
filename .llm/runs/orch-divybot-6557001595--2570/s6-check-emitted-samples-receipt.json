@@ -1,0 +1,36 @@
+{
+  "gateId": "emitted-samples",
+  "invocationId": "scaffold-2570-s6-check-emitted-samples",
+  "argv": [
+    "deno",
+    "task",
+    "check:emitted-samples"
+  ],
+  "cwd": ".",
+  "gitHead": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+  "actualGitHead": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "local-scaffold-2570-s6",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "cecc438a8984f04d0402a1c74d8f963652c945d647107b91e3328e656e50d1dc",
+  "lifecycleId": "local-scaffold-2570-s6:scaffold-2570-s6-check-emitted-samples:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-11-01T14:02:52.408Z",
+  "startedAt": "2026-11-01T14:02:52.411Z",
+  "finishedAt": "2026-11-01T14:03:02.209Z",
+  "durationMs": 9799,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 62,
+    "sha256": "d3004ac9a69e35d543eb9fb16481313b5894aac26b6d581382f65d1945e305e4",
+    "tail": "Checked 48 emitted TypeScript samples from 38 artifact paths.\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 3659,
+    "sha256": "4aaadad64d90f96c3586b6371295134d0c5f48c15c3e3aec3ba0cfd6a192e71a",
+    "tail": "Task check:emitted-samples deno run --allow-read --allow-write --allow-run .llm/tools/validation/check-emitted-samples.ts\nCheck <temporary-gate-workspace>/ai/agents/assistant.ts\nCheck <temporary-gate-workspace>/ai/ai.ts\nCheck <temporary-gate-workspace>/ai/mcp/registry.ts\nCheck <temporary-gate-workspace>/ai/mod.ts\nCheck <temporary-gate-workspace>/ai/models.ts\nCheck <temporary-gate-workspace>/ai/plugin.ts\nCheck <temporary-gate-workspace>/ai/routes/chat-stream.ts\nCheck <temporary-gate-workspace>/ai/routes/chat.tsx\nCheck <temporary-gate-workspace>/ai/thread-store.ts\nCheck <temporary-gate-workspace>/ai/tools/echo.ts\nCheck <temporary-gate-workspace>/auth/mod.ts\nCheck <temporary-gate-workspace>/auth/plugin.ts\nCheck <temporary-gate-workspace>/auth/sdk-client.ts\nCheck <temporary-gate-workspace>/islands/InvoicesStream.tsx\nCheck <temporary-gate-workspace>/routes/api/streams/invoices/seed.ts\nCheck <temporary-gate-workspace>/sagas/mod.ts\nCheck <temporary-gate-workspace>/sagas/plugin.ts\nCheck <temporary-gate-workspace>/sagas/runtime.ts\nCheck <temporary-gate-workspace>/sagas/user-registration-saga.ts\nCheck <temporary-gate-workspace>/sagas/user-registration.config.ts\nCheck <temporary-gate-workspace>/streams/invoices-db.ts\nCheck <temporary-gate-workspace>/streams/invoices-producer.ts\nCheck <temporary-gate-workspace>/streams/invoices-schema.ts\nCheck <temporary-gate-workspace>/streams/mod.ts\nCheck <temporary-gate-workspace>/streams/notifications-stream.ts\nCheck <temporary-gate-workspace>/streams/plugin.ts\nCheck <temporary-gate-workspace>/triggers/daily-maintenance.ts\nCheck <temporary-gate-workspace>/triggers/generic-inbound-webhook.ts\nCheck <temporary-gate-workspace>/triggers/incoming-file-watch.ts\nCheck <temporary-gate-workspace>/triggers/mod.ts\nCheck <temporary-gate-workspace>/triggers/plugin.ts\nCheck <temporary-gate-workspace>/triggers/runtime.ts\nCheck <temporary-gate-workspace>/workers/jobs/health-check.ts\nCheck <temporary-gate-workspace>/workers/mod.ts\nCheck <temporary-gate-workspace>/workers/plugin.ts\nCheck <temporary-gate-workspace>/workers/runtime.ts\nCheck <temporary-gate-workspace>/workers/tasks/validate-payload.ts\nCheck <temporary-gate-workspace>/workers/workflows/daily-maintenance.ts\n",
+    "truncated": false
+  }
+}

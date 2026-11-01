@@ -47,7 +47,7 @@ export async function writeNormalizedAppFiles(
     modelName: options.modelName,
     serviceStorage: options.dbEngine,
     serviceQueryModule: `../routes/examples/${plan.service?.name}/(_lib)/service-query.ts`,
-    hasService: String(options.includeExampleService),
+    hasService: String(Boolean(options.includeExampleService && options.serviceName)),
     serviceResourceRouteAlias: options.includeExampleService && options.serviceName
       ? `${toCamelCase(options.serviceName)}: generatedRoutes.examples.${
         toCamelCase(options.serviceName)

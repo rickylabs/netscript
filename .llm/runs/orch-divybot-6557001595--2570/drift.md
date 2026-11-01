@@ -85,3 +85,16 @@ these modules;302PASS was true but insufficient coverage. Expand inventory to co
 web-page scaffolding and app template generators. Preserve canonical-source tests;
 fix emitted source formatting, do not relax them. A separate template assertion
 must tolerate canonical whitespace while preserving Partial/SidebarShell nesting.
+
+S6: coordinator live verification invalidates the previous readiness assumption for
+service-backed data. A healthy service plus seeded DB still renders unavailable.
+The actual runtime wiring and canonical route require regression-first repair.
+Runtime remains blocked even if the non-opt-in workflow policy skips E2E.
+
+S6 accepted residuals from PLAN-EVAL: Starting services are not restarted; custom
+services without a matching @database import are excluded; HealthCheckPath:false
+waits prove process state only. No change to plugin watch/default lifecycle policy.
+The actual isolated cache-free Aspire fixture reproduces all three runtime failures
+and provides focused evidence; the full plugin/Docker runtime suite remains distinct.
+
+S6 review residual: Starting or absent resources are skipped; deno.jsonc-only/custom consumers without the generated @database import are not refreshed. Existing service example deferred JSON has mobile horizontal overflow; the five Utility archetype pages remain within the viewport. Full runtime remains UNPROVEN locally.

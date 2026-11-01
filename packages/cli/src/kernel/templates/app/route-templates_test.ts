@@ -560,7 +560,7 @@ describe('app route template rendering', () => {
       route,
       "import CrudExampleView from './(_components)/crud-view.tsx';",
     );
-    assertStringIncludes(route, "import { routes } from '@app/router.ts';");
+    assertStringIncludes(route, "import { appRoutes, routes } from '@app/router.ts';");
     assertStringIncludes(route, '.withRoute(routes.examples.crud.$route)');
     assertStringIncludes(
       route,
@@ -577,7 +577,7 @@ describe('app route template rendering', () => {
     assertStringIncludes(view, '<h1>Directory pattern</h1>');
     assertStringIncludes(
       view,
-      'The live service-backed CRUD route is generated under /examples/team-members.',
+      'href={serviceHref}',
     );
     assertStringIncludes(view, 'FilterForm');
     assertStringIncludes(view, 'ResponsiveTable');

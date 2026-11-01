@@ -1,5 +1,5 @@
 import CrudExampleView from './(_components)/crud-view.tsx';
-import { routes } from '@app/router.ts';
+import { appRoutes, routes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
 
 export const crudExamplePage = definePage()
@@ -10,6 +10,8 @@ export const crudExamplePage = definePage()
   }))
   .withLayer('crud', CrudExampleView, () => ({
     records: [] as const,
+    serviceHref: {{hasService}} ? appRoutes.serviceExample.href() : undefined,
+    recordsHref: appRoutes.records.href(),
   }))
   .withLayout((slots) => slots.crud())
   .build();

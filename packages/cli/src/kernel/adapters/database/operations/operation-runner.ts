@@ -8,6 +8,9 @@ import {
  */
 
 import { join } from '@std/path';
+import { DenoFileSystem } from '../../runtime/file-system/deno-file-system.ts';
+import type { FileSystemPort } from '../../../ports/file-system-port.ts';
+import { refreshGeneratedClientConsumers } from './refresh-generated-client-consumers.ts';
 
 import { SCAFFOLD_DIRS } from '../../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../../constants/scaffold/scaffold-files.ts';
@@ -39,6 +42,8 @@ const DEFAULT_POLL_INTERVAL_MS = 1_000;
 const WAIT_TIMEOUT_EXIT_CODES: ReadonlySet<number> = new Set([17, 18]);
 
 interface DbOperationRunnerOptions {
+  readonly fs?: Pick<FileSystemPort, 'readFile'>;
+  readonly realPath?: (path: string) => Promise<string>;
   readonly executor?: AspireCommandExecutor;
   readonly lifecycleLock?: AppHostLifecycleLock;
   readonly pollIntervalMs?: number;
@@ -51,6 +56,8 @@ interface DbOperationRunnerOptions {
 
 /** Executes database operations through a resident AppHost or a scoped standalone host. */
 export class DbOperationRunner implements DbOperationExecutor {
+  private readonly fs: Pick<FileSystemPort, 'readFile'>;
+  private readonly realPath: (path: string) => Promise<string>;
   private readonly executor: AspireCommandExecutor;
   private readonly lifecycleLock: AppHostLifecycleLock;
   private readonly pollIntervalMs: number;
@@ -64,6 +71,8 @@ export class DbOperationRunner implements DbOperationExecutor {
   private readonly registerSignalAbort: (abort: () => void) => () => void;
 
   constructor(options: DbOperationRunnerOptions = {}) {
+    this.fs = options.fs ?? new DenoFileSystem();
+    this.realPath = options.realPath ?? Deno.realPath;
     this.executor = options.executor ?? new DenoAspireCommandExecutor();
     this.lifecycleLock = options.lifecycleLock ?? new FileAppHostLifecycleLock();
     this.pollIntervalMs = options.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS;
@@ -92,14 +101,16 @@ export class DbOperationRunner implements DbOperationExecutor {
       return await this.executeOne(request, databases[0]);
     }
 
+    const refreshed = new Set<string>();
     const controller = new AbortController();
     const unregisterSignals = this.registerSignalAbort(() => controller.abort());
     try {
       for (const database of databases) {
-        const code = await this.executeOne(request, database, controller.signal);
+        const code = await this.executeOne(request, database, controller.signal, refreshed);
         if (code !== 0) return code;
       }
     } finally {
+      if (refreshed.size) outputText(`Database consumers refreshed: ${[...refreshed].join(', ')}.`);
       unregisterSignals();
     }
 
@@ -110,6 +121,7 @@ export class DbOperationRunner implements DbOperationExecutor {
     request: DbOperationRequest,
     database: DiscoveredDatabase,
     signal?: AbortSignal,
+    refreshed = new Set<string>(),
   ): Promise<number> {
     const aspireDir = join(request.projectRoot, SCAFFOLD_DIRS.ASPIRE_TS);
     const apphostPath = join(aspireDir, SCAFFOLD_FILES.APPHOST_MTS);
@@ -133,7 +145,7 @@ export class DbOperationRunner implements DbOperationExecutor {
     try {
       const runningAppHost = await this.findProjectAppHost(apphostPath, aspireDir, signal);
       if (runningAppHost) {
-        return await this.executeOnAppHost(
+        const code = await this.executeOnAppHost(
           request,
           database.configKey,
           apphostPath,
@@ -141,6 +153,21 @@ export class DbOperationRunner implements DbOperationExecutor {
           env,
           signal,
         );
+        if (code === 0 && request.operation === 'generate') {
+          await refreshGeneratedClientConsumers({
+            projectRoot: request.projectRoot,
+            database,
+            apphostPath,
+            aspireDir,
+            executor: this.executor,
+            fs: this.fs,
+            realPath: this.realPath,
+            timeoutMs: this.timeoutMs,
+            signal,
+            refreshed,
+          });
+        }
+        return code;
       }
       return await this.executeStandalone(
         request,

@@ -25,3 +25,18 @@ the CLI consumes embedded strings, not these source files directly.
 For browser proof, stop a generated Vite process before regenerating its project.
 Restart it afterward and read its actual Local URL. Replacing a live generated
 project can leave Fresh island module URLs stale even though server rendering works.
+
+Database-backed pages require the generated Prisma client, migrations and seed/data.
+Init's temporary client reports database health as unavailable until `netscript db
+generate` replaces it. When that command uses a resident Aspire AppHost, the database
+operation runner refreshes only running services whose declared `@database` import
+points to the selected database facade, then waits for health. Memory services and
+other AppHosts are unaffected. See
+`kernel/adapters/database/operations/refresh-generated-client-consumers.ts` under
+the CLI source for that contract. Services still Starting, custom services without
+that import and no-Aspire processes need an explicit restart after generation;
+`HealthCheckPath: false` provides process readiness only.
+
+The scaffold runtime app-reference probe requires the seeded row in rendered data
+cells on Overview, Records and the canonical service example. Shell headings or
+hydration scripts alone do not prove the app reaches its database.

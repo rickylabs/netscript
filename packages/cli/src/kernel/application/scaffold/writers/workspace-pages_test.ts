@@ -68,6 +68,18 @@ Deno.test('no-service scaffold loader has no missing contract imports or static 
   const crud = readTemplateAssetSync(TEMPLATE_KEYS.appRoutesExamplesCrud);
   assertStringIncludes(crud, 'records: []');
   assertEquals(crud.includes('Acme Robotics'), false);
+  for (const hasService of ['false', 'true']) {
+    const route = renderTemplate(crud, { ...variables, hasService });
+    assertStringIncludes(
+      route,
+      `serviceHref: ${hasService} ? appRoutes.serviceExample.href() : undefined`,
+    );
+    assertStringIncludes(route, 'recordsHref: appRoutes.records.href()');
+  }
+  const crudView = readTemplateAssetSync(TEMPLATE_KEYS.appRoutesExamplesComponentsCrudView);
+  assertEquals(crudView.includes('/examples/'), false);
+  assertStringIncludes(crudView, 'href={serviceHref}');
+  assertStringIncludes(crudView, 'Open Records to connect a service.');
   const examples = renderTemplate(
     readTemplateAssetSync(TEMPLATE_KEYS.appRoutesExamplesIndex),
     variables,

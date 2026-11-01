@@ -3,7 +3,7 @@ import { checkGeneratedFiles } from '../../../../../../.llm/tools/testing/check-
  * @module infra/database/scaffolder_test
  */
 
-import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { join } from 'jsr:@std/path@^1';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 
@@ -33,6 +33,14 @@ describe('DatabaseScaffolder', () => {
       modelName: 'Product',
       importMode: 'jsr',
     });
+
+    const placeholder = await fs.readFile(
+      '/project/database/mysql/schema/.generated/client.server.ts',
+    );
+    const module = await import(`data:application/typescript,${encodeURIComponent(placeholder)}`);
+    const client = new module.PrismaClient();
+    await assertRejects(() => client.$queryRaw`SELECT 1`, Error, 'netscript db generate');
+    await assertRejects(() => client.$queryRawUnsafe('SELECT 1'), Error, 'netscript db generate');
 
     const generateZod = await fs.readFile('/project/database/mysql/scripts/generate-zod.ts');
     const fixZodImports = await fs.readFile('/project/database/mysql/scripts/fix-zod-imports.ts');

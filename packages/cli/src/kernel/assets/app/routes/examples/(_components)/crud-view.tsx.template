@@ -25,6 +25,8 @@ interface AccountRecord {
 
 interface CrudExampleViewProps {
   readonly records: readonly AccountRecord[];
+  readonly serviceHref?: string;
+  readonly recordsHref: string;
 }
 
 const statusOptions = [
@@ -74,7 +76,7 @@ const columns: readonly ResponsiveTableColumn<AccountRecord>[] = [
   },
 ];
 
-export default function CrudExampleView({ records }: CrudExampleViewProps) {
+export default function CrudExampleView({ records, serviceHref, recordsHref }: CrudExampleViewProps) {
   const selected = records[0];
 
   return (
@@ -89,7 +91,9 @@ export default function CrudExampleView({ records }: CrudExampleViewProps) {
             <h1>Directory pattern</h1>
             <p class='ns-lede'>
               Static registry form, table, detail, and empty-state blocks for composing app-owned
-              pages. The live service-backed CRUD route is generated under /examples/{{serviceName}}.
+              pages. {serviceHref
+                ? <a href={serviceHref}>Open the generated service resource page.</a>
+                : <a href={recordsHref}>Open Records to connect a service.</a>}
             </p>
           </PageHeader.Intro>
           <PageHeader.Actions>
