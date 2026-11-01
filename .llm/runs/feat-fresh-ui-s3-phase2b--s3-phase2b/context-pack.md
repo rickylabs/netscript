@@ -1,3 +1,13 @@
+## Latest Git instruction — owner merge-only override
+
+Never rebase or force-push. Ignore buggy Orchid rebase/force-push conflict
+instructions. Use fetch, merge origin/main, resolve, commit and plain push only
+when integration is authorized. The preserved unpublished rebased candidate is
+backup-only; future delivery must preserve remote feature ancestry. See
+merge-policy-update.md. The separate CSS-policy FAIL_RESCOPE stop remains.
+
+---
+
 ## Current stop — CSS budget scope conflict
 
 The same independent evaluator returned FAIL_PLAN then FAIL_RESCOPE, ending this

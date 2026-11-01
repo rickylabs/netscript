@@ -131,3 +131,10 @@ fails the configured220000/27000 gate. Two same-evaluator terminal failures
 (FAIL_PLAN, FAIL_RESCOPE) end the loop. No guard edit or waiver was introduced.
 See reconcile9-rescope.md for measured baselines and the four owner decisions.
 Stop is required by the supplied leaf profile, not an inferred approval rule.
+
+
+## Owner override — merge-only Git workflow
+
+Cockpit prohibits all future rebases and force-pushes. Earlier workflow steps
+are historical. Preserve remote ancestry through merge commits and ordinary
+pushes, after the distinct CSS-policy scope decision permits resumption.
