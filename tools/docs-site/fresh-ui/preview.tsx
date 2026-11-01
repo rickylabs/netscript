@@ -1,9 +1,9 @@
 import { type ComponentChildren, type ComponentType, h, render } from 'preact';
-import { type ComponentCatalog, DEFAULT_PRESET } from './catalog.ts';
+import { DEFAULT_PRESET, type PresetCatalog } from './catalog.ts';
 
 /** Mount actual copy-mode registry components inside a CSS-isolated static document. */
 export async function start(examples: Readonly<Record<string, ComponentType>>): Promise<void> {
-  const catalog: ComponentCatalog = await (await fetch(new URL('./catalog.json', import.meta.url)))
+  const catalog: PresetCatalog = await (await fetch(new URL('../presets.json', import.meta.url)))
     .json();
   const query = new URL(location.href).searchParams;
   const preset = catalog.presets.find((p) => p.id === query.get('theme')) ??

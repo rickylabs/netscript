@@ -3,7 +3,13 @@ import { componentContracts } from '../../../packages/fresh-ui/contracts.ts';
 import { TOKEN_PRESETS } from '../../../packages/fresh-ui/src/tokens/domain/token-presets.ts';
 import { encodeUiPreset } from '../../../packages/cli/src/kernel/domain/ui/ui-preset.ts';
 import { componentExample } from './examples.ts';
-import type { ComponentCatalog, ComponentPage, PresetChoice } from './catalog.ts';
+import {
+  type ComponentCatalog,
+  type ComponentPage,
+  presetCatalog,
+  type PresetChoice,
+  WORKSPACE_COMPONENTS,
+} from './catalog.ts';
 import { implementationProps, record, typeText } from './read-props.ts';
 
 export const ROOT: string = fromFileUrl(new URL('../../../', import.meta.url));
@@ -261,20 +267,45 @@ export async function generate(): Promise<ComponentCatalog> {
     presets: await presetChoices(),
   };
   await Deno.writeTextFile(join(OUTPUT, 'catalog.json'), JSON.stringify(catalog));
-  const exampleModule = `${imports.join('\n')}\nimport { useState } from 'preact/hooks';
+  await Deno.writeTextFile(join(OUTPUT, 'presets.json'), JSON.stringify(presetCatalog(catalog)));
+  const examplesDir = join(OUTPUT, 'examples');
+  await Deno.mkdir(examplesDir, { recursive: true });
+  for (const page of components) {
+    const usedImports = components.flatMap((candidate, index) =>
+      new RegExp(`<${candidate.symbol}(?:[.\\s/>])`).test(page.example) ? [imports[index]] : []
+    );
+    await Deno.writeTextFile(
+      join(examplesDir, page.name + '.tsx'),
+      `${usedImports.join('\n')}
+import { useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
-export const examples: Record<string, () => ComponentChildren> = {\n${
-    components.map((page) =>
-      `${JSON.stringify(page.name)}: () => { const [value, setValue] = useState('standard');
+export const examples: Record<string, () => ComponentChildren> = {
+  ${JSON.stringify(page.name)}: () => { const [value, setValue] = useState('standard');
     const [open, setOpen] = useState(false); const [notice, report] = useState('');
-    return <><div class="demo-example">${page.example}</div><p role="status">{notice}</p></>; }`
-    ).join(',\n')
-  }\n};\n`;
-  await Deno.writeTextFile(join(OUTPUT, 'examples.tsx'), exampleModule);
+    return <><div class="demo-example">${page.example}</div><p role="status">{notice}</p></>; }
+};`,
+    );
+  }
+  await Deno.writeTextFile(
+    join(examplesDir, 'workspace.tsx'),
+    WORKSPACE_COMPONENTS.map((name, index) =>
+      `import { examples as e${index} } from './${name}.tsx';`
+    ).join('\n') + '\nexport const examples = {' +
+      WORKSPACE_COMPONENTS.map((_, index) => `...e${index}`).join(',') + '};\n',
+  );
   const entry = `import { start } from ${
     JSON.stringify(new URL('./preview.tsx', import.meta.url).href)
   };
-import { examples } from './examples.tsx'; start(examples);`;
+const loaders = {
+${
+    [...components.map((page) => page.name), 'workspace'].map((name) =>
+      `${JSON.stringify(name)}: () => import('./examples/${name}.tsx')`
+    ).join(',\n')
+  }
+};
+const name = new URL(location.href).searchParams.get('component') ?? 'workspace';
+if (!Object.hasOwn(loaders, name)) throw new Error('Unknown component preview: ' + name);
+await start((await loaders[name as keyof typeof loaders]()).examples);`;
   await Deno.writeTextFile(join(OUTPUT, 'preview.tsx'), entry);
   await run([
     'run',
@@ -283,7 +314,7 @@ import { examples } from './examples.tsx'; start(examples);`;
     '--allow-run',
     join(ROOT, '.llm/tools/run-deno-check.ts'),
     '--file',
-    join(OUTPUT, 'examples.tsx'),
+    join(OUTPUT, 'preview.tsx'),
     '--file',
     fromFileUrl(new URL('./preview.tsx', import.meta.url)),
     '--deno-arg',
@@ -291,32 +322,41 @@ import { examples } from './examples.tsx'; start(examples);`;
     '--deno-arg',
     `--import-map=${config}`,
   ]);
-  await run([
-    'bundle',
-    '--config',
-    config,
-    '--import-map',
-    config,
-    '--platform',
-    'browser',
-    '--minify',
-    '--output',
-    join(OUTPUT, 'preview.js'),
-    join(OUTPUT, 'preview.tsx'),
-  ]);
-  await run([
-    'bundle',
-    '--config',
-    config,
-    '--import-map',
-    config,
-    '--platform',
-    'browser',
-    '--minify',
-    '--output',
-    join(OUTPUT, 'builder.js'),
-    fromFileUrl(new URL('./builder.ts', import.meta.url)),
-  ]);
+  await Deno.writeTextFile(
+    join(OUTPUT, 'builder.ts'),
+    `import ${JSON.stringify(new URL('./builder.ts', import.meta.url).href)};`,
+  );
+  // A fresh output directory prevents retired chunk files from entering the published inventory.
+  const bundleDir = await Deno.makeTempDir({ prefix: 'fresh-ui-docs-' });
+  try {
+    await run([
+      'bundle',
+      '--config',
+      config,
+      '--import-map',
+      config,
+      '--platform',
+      'browser',
+      '--minify',
+      '--code-splitting',
+      '--outdir',
+      bundleDir,
+      join(OUTPUT, 'preview.tsx'),
+      join(OUTPUT, 'builder.ts'),
+    ]);
+    const files: string[] = [];
+    await Deno.mkdir(join(OUTPUT, 'js'), { recursive: true });
+    for await (const file of sourceFiles(bundleDir)) {
+      const name = relative(bundleDir, file).replaceAll('\\', '/');
+      if (!name.endsWith('.js')) throw new Error('Unexpected browser bundle: ' + name);
+      files.push(name);
+      await Deno.mkdir(dirname(join(OUTPUT, 'js', name)), { recursive: true });
+      await Deno.copyFile(file, join(OUTPUT, 'js', name));
+    }
+    await Deno.writeTextFile(join(OUTPUT, 'bundle-files.json'), JSON.stringify(files.sort()));
+  } finally {
+    await Deno.remove(bundleDir, { recursive: true });
+  }
   await Deno.writeTextFile(
     join(OUTPUT, 'components.css'),
     (await Promise.all([...cssPaths].sort().map((path) => Deno.readTextFile(join(ROOT, path)))))

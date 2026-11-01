@@ -1,13 +1,14 @@
 import { assert, assertEquals } from '@std/assert';
 import { walk } from 'jsr:@std/fs@1';
 import { fromFileUrl, relative } from '@std/path';
+import { PAYLOAD_BUDGETS } from '../../../tools/docs-site/fresh-ui/payload-budgets.ts';
 import { FRESH_UI_REGISTRY_CONTENT } from '../registry.generated.ts';
 
 // Budget the actual uncompressed publish file set, not a directory approximation or tar size.
 const PUBLISH_BUDGET_BYTES = 5_000_000;
 
 // Budget the CSS an app copies, excluding theme tokens; keep both limits below #2503's payload.
-const COMPONENT_CSS_BUDGET = { raw: 220_000, gzip: 27_000 } as const;
+const COMPONENT_CSS_BUDGET = PAYLOAD_BUDGETS.componentCss;
 
 Deno.test('shipped component CSS stays within raw and gzip budgets', async (t) => {
   const root = new URL('../', import.meta.url);
