@@ -48,3 +48,17 @@ Fresh-cache native `deno ci` with copied exact site manifest/lock succeeds witho
 Slice3 independent content review **PASS**. Adopted its nonblocking README suggestion: link retained evidence through durable PR2575 rather than a removable run path. All4native carrier freshness gates PASS (agent-docs-prose, MCP export corpus, assets barrel, publish assets); no generated source or root-lock churn. PR thread gate PASS0threads. Commit slice3 with this worklog/context and dated lesson, then run exact-head strict/browser/quality/fixtures/workflow gates and formal IMPL evaluation.
 
 Reconcile3: main remains1e4e58f; no competing2453 implementation, related token/layout issues remain out of scope. Draft PR2575 carries Refs-only/no labels per explicit owner policy; no merge/close action. Original failed proof and first plan failure retained.
+
+## Strict-CI source-head gates
+
+At b756ee6: strict all-output PASS1116/differences[]; complete browser PASS158/6existing census skips/0failed/0flaky,72axe reports/zero serious-critical; quality:gate PASS;94combined tooling/workflow/bridge tests and39source fixtures PASS; all4native carrier freshness receipts PASS. Root lock/generated source unchanged. Exact receipt heads/hashes in gate-evidence-strict-ci.json; raw receipts private. Final independent IMPL evaluation running in the same read-only Opus5.5/high session. Its observed model matches requested model in every transport.
+
+Actual classifier selects all impacts because its contract test changed. Hosted core/scaffold/Fresh lanes are currently draft-policy skipped, Pages build succeeds and browser runs; no runtime pass inferred. Repo pr-checks can return PASS with pending jobs, so readiness requires inspecting all current rows.
+
+## Final scoped evaluation
+
+Mandatory independent IMPL-EVAL **PASS** at b756ee6 in the same read-only Anthropic Opus5.5/high session. Evaluator independently checked receipt hashes/heads and full browser results; reran native shuffle, root bridge,70classifier tests and obsolete-flag rejection, with locks unchanged. No implementation findings. CLI runtime remains unproven without Docker and hosted readiness is separate. Close-gate PASS with Refs-only/no closing issues; thread gate PASS0threads.
+
+This evidence-only sign-off commits evaluate.md and compact exact-source-head gate hashes. Product surface stays identical to b756ee6. Final head must be rebound by strict two-build comparison plus byte-for-byte equality to the browser-tested1116-file manifest, and a short same-session read-only attestation published as a PR phase comment. This avoids committing an ever-moving self-referential attestation. Current-head hosted checks are assessed after that; do not infer all-green from pr-checks exit0 when any row is pending.
+
+Close: dated lesson and several specific memory notes retained. No accepted debt or independent remainder to fan out. Owner owns issue disposition, run cleanup and merge. Original strict failure and first plan failure preserved.
