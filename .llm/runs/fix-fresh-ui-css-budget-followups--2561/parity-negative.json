@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "issue": 2524,
+    "pullRequest": 2558,
+    "beforeCommit": "6a1d84a6e04c0d39df3926528e0380e267316aee",
+    "afterCommit": "5f837c0aab0b5479b9bd81571066f83b9d25b3c8",
+    "fixtureCount": 265
+  },
+  "baselineSha256": "d75c4d0f8f9913e38b7c8d2962d721fe56debbd380fd251fcab0ee28442e5ad8",
+  "browser": "153.0.8010.12",
+  "files": 52,
+  "rules": 1161,
+  "ruleDifferences": 1,
+  "specimens": 265,
+  "styleComparisons": 2388000,
+  "visualOk": false,
+  "ok": false
+}

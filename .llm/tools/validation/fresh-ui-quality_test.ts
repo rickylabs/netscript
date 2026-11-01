@@ -80,6 +80,7 @@ Deno.test('Fresh UI workflow trigger paths cover every private-lock input on bot
     'plugins/*/deno.jsonc',
     'deno.lock',
     'tools/fresh-ui-browser/**',
+    '.llm/tools/css/**',
     'packages/fresh/**',
     'packages/cli/src/kernel/assets/app/**',
     'packages/cli/src/kernel/assets/embedded.generated.ts',
@@ -149,6 +150,8 @@ Deno.test('Fresh UI CI preserves quality gates and captures the real gallery mat
       'fresh-ui-token-build',
       'fresh-ui-tokens',
       'fresh-ui-browser',
+      'fresh-ui-css-tests',
+      'fresh-ui-css-parity',
     ]
   ) {
     assertStringIncludes(workflow, `--gate ${gate} `);

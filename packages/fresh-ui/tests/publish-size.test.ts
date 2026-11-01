@@ -6,8 +6,10 @@ import { FRESH_UI_REGISTRY_CONTENT } from '../registry.generated.ts';
 // Budget the actual uncompressed publish file set, not a directory approximation or tar size.
 const PUBLISH_BUDGET_BYTES = 5_000_000;
 
-// Budget the CSS an app copies, excluding theme tokens; keep both limits below #2503's payload.
-const COMPONENT_CSS_BUDGET = { raw: 220_000, gzip: 27_000 } as const;
+// Fixed growth policy (#2561): retain the 220 KB raw ceiling; a planned 1.5 KB gzip
+// allowance above #2558's measured 26,527 bytes rounds to 28 KB. Never scale with file
+// count. A later raise needs an issue, before/after byte costs and browser parity evidence.
+const COMPONENT_CSS_BUDGET = { raw: 220_000, gzip: 28_000 } as const;
 
 Deno.test('shipped component CSS stays within raw and gzip budgets', async (t) => {
   const root = new URL('../', import.meta.url);
@@ -16,10 +18,10 @@ Deno.test('shipped component CSS stays within raw and gzip budgets', async (t) =
     const entry of walk(new URL('registry/', root), {
       exts: ['.css'],
       includeDirs: false,
-      skip: [/[/\\]theme(?:[/\\]|$)/],
     })
   ) {
-    sources.push(relative(fromFileUrl(root), entry.path).replaceAll('\\', '/'));
+    const path = relative(fromFileUrl(root), entry.path).replaceAll('\\', '/');
+    if (!path.startsWith('registry/theme/')) sources.push(path);
   }
   const shipped = Object.keys(FRESH_UI_REGISTRY_CONTENT)
     .filter((path) => path.endsWith('.css') && !path.startsWith('registry/theme/'))
@@ -50,7 +52,10 @@ Deno.test('shipped component CSS stays within raw and gzip budgets', async (t) =
     await t.step(kind, () => {
       assert(
         bytes[kind] <= COMPONENT_CSS_BUDGET[kind],
-        `Component CSS ${kind} payload ${bytes[kind]} exceeds ${COMPONENT_CSS_BUDGET[kind]} bytes`,
+        `Component CSS ${kind} payload ${bytes[kind]} exceeds ${
+          COMPONENT_CSS_BUDGET[kind]
+        } bytes; ` +
+          'review the fixed growth policy at COMPONENT_CSS_BUDGET before raising it',
       );
     });
   }

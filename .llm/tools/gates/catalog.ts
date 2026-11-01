@@ -105,6 +105,8 @@ export const GATE_CATALOG = {
   'fresh-ui-token-quality': ['deno', 'task', 'tokens:validate'],
   'fresh-ui-tokens': ['deno', 'task', 'tokens:check'],
   'fresh-ui-browser': ['npm', 'test'],
+  'fresh-ui-css-tests': ['deno', 'task', 'css:test'],
+  'fresh-ui-css-parity': ['deno', 'task', 'css:parity'],
   'fresh-ui-browser-contract': [
     'deno',
     'run',

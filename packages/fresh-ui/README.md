@@ -39,10 +39,10 @@ tokens; the components never know.
   returns an inert browser-safe lifecycle everywhere else.
 
 `CodeBlock` highlights recognized `lang` names and aliases (such as `ts`, `javascript`, and `json`)
-with the common highlight.js language set. Unknown or omitted languages remain plain text. Source
-is escaped before syntax spans are added, and the copy payload remains the original source. The
-copied component keeps clipboard handling in the app's island. Studio Utility binds the syntax
-classes to its light/dark `code/syntax/*` roles.
+with the common highlight.js language set. Unknown or omitted languages remain plain text. Source is
+escaped before syntax spans are added, and the copy payload remains the original source. The copied
+component keeps clipboard handling in the app's island. Studio Utility binds the syntax classes to
+its light/dark `code/syntax/*` roles.
 
 ## Architecture
 
@@ -152,7 +152,7 @@ declare const setSelectedIds: (next: ReadonlySet<string>) => void;
 | `./ai/render-ui` | `RenderUiSurface`, `renderUiPayload` — the safe generative-UI renderer                           |
 | `./desktop`      | `createDesktopChrome` — menus, tray, dialogs, notifications, window actions                      |
 | `./registry`     | The registry manifest and content map the CLI copies from                                        |
-| `./tokens`       | DTCG sources, preset metadata and the IO-free Style Dictionary builder for tooling                |
+| `./tokens`       | DTCG sources, preset metadata and the IO-free Style Dictionary builder for tooling               |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/fresh-ui@<version>`](https://jsr.io/@netscript/fresh-ui/doc).
@@ -174,17 +174,26 @@ const build = await buildTokens({
 console.log(build.files['tokens.css']);
 ```
 
-All 24 presets, both schemes and both requested density contexts build through
-Style Dictionary. Presets fix their own geometry. Studio Utility is the default for new applications; NS One remains a legacy preset;
-Studio Utility is available as `theme-studio-utility` in the registry. The
-three-tier source and extension guide is [tokens/README.md](tokens/README.md).
+All 24 presets, both schemes and both requested density contexts build through Style Dictionary.
+Presets fix their own geometry. Studio Utility is the default for new applications; NS One remains a
+legacy preset; Studio Utility is available as `theme-studio-utility` in the registry. The three-tier
+source and extension guide is [tokens/README.md](tokens/README.md).
+
+## CSS validation
+
+Maintainer component CSS budgets are fixed at 220,000 raw bytes and 28,000 gzip bytes, measured with
+Deno 2.9.7. The gzip ceiling includes the planned #2561 growth allowance above #2558's 26,527-byte
+payload; adding files never increases either ceiling automatically. Any later increase needs a
+tracked issue, before/after byte costs and browser parity evidence. The package test also verifies
+that authored and shipped non-theme CSS match exactly. See the
+[CSS validation guide](../../.llm/tools/css/README.md) for reproducible replay inputs.
 
 ## Component contracts
 
-Import types and the JSON serializer from `@netscript/fresh-ui/contracts`. This pure-data
-subpath describes props, anatomy, data attributes, slots, APG patterns, keyboard maps and token
-roles shared by styles. It performs no IO. See [the contributor guide](src/contracts/README.md)
-for native, pseudo-element and planned-part representations.
+Import types and the JSON serializer from `@netscript/fresh-ui/contracts`. This pure-data subpath
+describes props, anatomy, data attributes, slots, APG patterns, keyboard maps and token roles shared
+by styles. It performs no IO. See [the contributor guide](src/contracts/README.md) for native,
+pseudo-element and planned-part representations.
 
 ## Docs
 
@@ -206,10 +215,10 @@ browser. Registry copy commands (`netscript ui:*`) require the NetScript CLI.
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
 
-Token build metadata is available from `@netscript/fresh-ui/token-config` without
-loading Style Dictionary or the source corpus. See [token contribution and output
-budgets](tokens/README.md). Design preview styles are opt-in through
-`netscript ui:add theme-previews` or `netscript tokens build --previews`.
+Token build metadata is available from `@netscript/fresh-ui/token-config` without loading Style
+Dictionary or the source corpus. See [token contribution and output budgets](tokens/README.md).
+Design preview styles are opt-in through `netscript ui:add theme-previews` or
+`netscript tokens build --previews`.
 
 The catalog is available as `componentContracts` from `./contracts`, or as a JSON module:
 
@@ -222,6 +231,6 @@ console.log(serializeComponentContracts(componentContracts));
 console.log(catalog.schemaVersion);
 ```
 
-Phase 1 includes 66 shipped inventory entries and 21 design-only contracts from the six built
-Figma categories. `shipped: false`, planned values and native/pseudo parts distinguish specified
-anatomy from a rendering implementation. It does not add gap components or token values.
+Phase 1 includes 66 shipped inventory entries and 21 design-only contracts from the six built Figma
+categories. `shipped: false`, planned values and native/pseudo parts distinguish specified anatomy
+from a rendering implementation. It does not add gap components or token values.

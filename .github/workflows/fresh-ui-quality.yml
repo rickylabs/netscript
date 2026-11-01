@@ -16,6 +16,7 @@ on:
       - 'plugins/*/deno.jsonc'
       - 'deno.lock'
       - 'tools/fresh-ui-browser/**'
+      - '.llm/tools/css/**'
       - 'packages/fresh/**'
       - 'packages/cli/src/kernel/assets/app/**'
       - 'packages/cli/src/kernel/assets/embedded.generated.ts'
@@ -43,6 +44,7 @@ on:
       - 'plugins/*/deno.jsonc'
       - 'deno.lock'
       - 'tools/fresh-ui-browser/**'
+      - '.llm/tools/css/**'
       - 'packages/fresh/**'
       - 'packages/cli/src/kernel/assets/app/**'
       - 'packages/cli/src/kernel/assets/embedded.generated.ts'
@@ -267,6 +269,19 @@ jobs:
         if: env.RUN == 'true'
         working-directory: tools/fresh-ui-browser
         run: npx playwright install --with-deps chromium
+      - name: CSS budget and rule comparator regressions
+        if: env.RUN == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate fresh-ui-css-tests --id fresh-ui-css-tests
+          --output .llm/tmp/gate-receipts/fresh-ui-browser/css-tests.receipt.json
+      - name: Reproduce Utility CSS parity from committed inputs
+        if: env.RUN == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate fresh-ui-css-parity --id fresh-ui-css-parity
+          --output .llm/tmp/gate-receipts/fresh-ui-browser/css-parity.receipt.json
+          --child-report .llm/tmp/css-parity/parity.json -- --output .llm/tmp/css-parity
       - name: Generate local-source gallery app
         if: env.RUN == 'true'
         run: >-
@@ -304,5 +319,6 @@ jobs:
             tools/fresh-ui-browser/test-results/
             tools/fresh-ui-browser/playwright-report/
             .llm/tmp/gate-receipts/fresh-ui-browser/
+            .llm/tmp/css-parity/
           if-no-files-found: error
           retention-days: 30
