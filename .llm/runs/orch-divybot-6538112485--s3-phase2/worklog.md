@@ -948,3 +948,13 @@ contrast withoutbaselinechanges. Bothscopedfixesapplied; normalmain4a2dae37merge
 MCPcarrierconflictregenerated. Fresh343focusedPASS; assets/prosePASS; ownedreal
 gallerymaintainedbrowser evidence follows. Five nits recordedon2584, no scope
 expansion. READY waitsactualdesignbrowser andexactheadCIgreen.
+
+## Two-blocker browser reconciliation
+
+First maintaineddesignmatrix56PASS4FAIL: all20route/axe cases pass with exact
+existing baseline; only4CodeBlock casesfail syntaxSpans0vs3 because structural
+line/sign/text parts now use spans. Restored nativecodebindings expose the
+pre-existing fixture's broadspanquery. Narrow onlysyntaxSpans toactual upstream
+hljsclass spans, keepeverymaintainedtest/assertion/callcount/escaping/clipboard/
+injectioncheck unchanged. No baselineedit orproductionbehaviorworkaround. Final
+complete60matrix runs on committedsource next; READY waitsgreenhosteddesign+CI.

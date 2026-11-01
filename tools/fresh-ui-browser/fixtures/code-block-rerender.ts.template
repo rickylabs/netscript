@@ -40,7 +40,10 @@ export function exerciseCodeBlock() {
       code: container.querySelector('code[data-scope="code-block"]')?.textContent,
       clipboard: container.querySelector('[data-clipboard]')?.getAttribute('data-clipboard'),
       filename: container.querySelector('[data-part="name"][data-scope="code-block"]')?.textContent,
-      syntaxSpans: container.querySelectorAll('code[data-scope="code-block"] span').length,
+      // Structural line/sign/text parts also use spans; count only parser syntax.
+      syntaxSpans: container.querySelectorAll(
+        'code[data-scope="code-block"] span[class*="hljs-"]',
+      ).length,
       injectedElements: container.querySelectorAll('code script, code img').length,
     });
   };
