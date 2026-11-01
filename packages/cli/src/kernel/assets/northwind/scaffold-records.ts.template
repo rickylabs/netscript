@@ -1,0 +1,40 @@
+// Server-only typed adapter for the generated database CRUD service.
+import { {{serviceName | camelCase}}Contract as contract, {{serviceName | camelCase}}Name as serviceName, {{serviceName | camelCase}}RouterName as routerName } from '{{serviceQueryModule}}';
+import type { ScaffoldRecord, ScaffoldRecordDetail, ScaffoldRecords } from './scaffold-contract.ts';
+import { scaffoldReadFailure, scaffoldServiceClient } from './scaffold-service-context.ts';
+
+const PAGE_SIZE = 25;
+type Client = Awaited<ReturnType<typeof clientFor>>['client'];
+type Row = Awaited<ReturnType<Client['getById']>>;
+const clientFor = (request: Request) => scaffoldServiceClient(contract, serviceName, routerName, request);
+const money = (cents: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
+const timestamp = (date: Date) => new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' }).format(date) + ' UTC';
+function project(row: Row): ScaffoldRecord {
+  return { id: String(row.id), name: row.name, description: `${row.customerName} · ${row.shipCountry} · ${money(row.totalCents)}`, status: row.status, createdAt: String(row.createdAt),
+    fields: [{ label: 'ID', value: String(row.id) }, { label: 'Name', value: row.name }, { label: 'Customer', value: row.customerName }, { label: 'Country', value: row.shipCountry }, { label: 'Status', value: row.status }, { label: 'Total (USD)', value: money(row.totalCents) }, { label: 'Created', value: timestamp(row.createdAt) }, { label: 'Updated', value: timestamp(row.updatedAt) }] };
+}
+
+/** Read the existing CRUD list; mutations stay on the generated service resource page. */
+export async function loadScaffoldRecords(request: Request): Promise<ScaffoldRecords> {
+  try {
+    const { client, context } = await clientFor(request);
+    const rawPage = Number(new URL(request.url).searchParams.get('page') ?? 1);
+    const page = Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+    const result = await client.list({ page, limit: PAGE_SIZE, sortBy: 'createdAt', sortOrder: 'desc' }, { context });
+    return { state: result.data.length ? 'ready' : 'empty', rows: result.data.map(project), total: result.pagination.total,
+      page, hasNext: result.pagination.hasNext, message: result.pagination.total ? 'Records from {{serviceName}}.' : 'No records yet. Create the first one on your service page.' };
+  } catch (error) { return scaffoldReadFailure(error); }
+}
+
+/** Read one record through the generated getById procedure. */
+export async function loadScaffoldRecord(request: Request, id: string): Promise<ScaffoldRecordDetail> {
+  if (!/^[1-9]\d*$/.test(id) || !Number.isSafeInteger(Number(id))) return { state: 'empty', notFound: true, message: 'Record not found.' };
+  try {
+    const { client, context } = await clientFor(request);
+    const row = await client.getById({ id: Number(id) }, { context });
+    return { state: 'ready', record: project(row), message: 'Record from {{serviceName}}.' };
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && error.status === 404) return { state: 'empty', notFound: true, message: 'Record not found.' };
+    return scaffoldReadFailure(error);
+  }
+}

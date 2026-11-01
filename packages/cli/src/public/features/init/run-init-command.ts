@@ -18,7 +18,7 @@ import {
 import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../kernel/application/registries/template-registry.ts';
 import { executeInit } from '../../../kernel/application/scaffold/orchestrate-init.ts';
-import { PresetRegistry } from '../../../kernel/application/registries/preset-registry.ts';
+import { applyInitPreset } from '../../../kernel/domain/scaffold/northwind-preset.ts';
 import type { PromptPort } from '../../../kernel/ports/prompt-port.ts';
 import type { ProjectNameResolver } from '../../presentation/support.ts';
 import type { InitCommandInput } from './init-input.ts';
@@ -81,13 +81,24 @@ export async function runInitCommand(
   const host = agentHost(options.host);
   await DEFAULT_TEMPLATE_REGISTRY.hydrate();
   if (options.from !== undefined) {
-    const presets = new PresetRegistry();
-    if (presets.entries().length === 0) {
-      throw new Error('no presets registered');
-    }
-    if (presets.get(options.from) === undefined) {
-      throw new Error(`preset "${options.from}" is not registered`);
-    }
+    const choices = applyInitPreset({
+      from: options.from,
+      preset: options.preset,
+      dbEngine: dbEngine(options.db),
+      includeExampleService: options.service,
+      serviceName: options.serviceName,
+      modelName: options.modelName,
+      noAspire: options.aspire === false,
+      cache: options.cache,
+    });
+    options = {
+      ...options,
+      db: choices.dbEngine,
+      service: choices.includeExampleService,
+      serviceName: choices.serviceName,
+      modelName: choices.modelName,
+      cache: choices.cache,
+    };
   }
   const nonInteractiveOptions = options.nonInteractive === true
     ? { ...options, ci: true }

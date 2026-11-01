@@ -1,0 +1,21 @@
+// Init placeholder, replaced by netscript db generate from the Prisma schema.
+import { z } from 'zod';
+
+export const OrderSchema = z.object({
+  id: z.number().int(),
+  name: z.string(),
+  customerName: z.string(),
+  shipCountry: z.string(),
+  status: z.string(),
+  totalCents: z.number().int(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+export const OrderCreateInput = z.object({
+  name: z.string(),
+  customerName: z.string(),
+  shipCountry: z.string(),
+  status: z.string().optional(),
+  totalCents: z.number().int(),
+});
+export const OrderUpdateInput = OrderCreateInput.partial();

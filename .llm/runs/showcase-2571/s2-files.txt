@@ -1,0 +1,13 @@
+.llm/tools/validation/fixtures/aspire-surface-manifest.tsv
+packages/cli/README.md
+packages/cli/e2e/src/application/gates/scaffold/runtime/probe-northwind.ts
+packages/cli/e2e/src/application/gates/scaffold/runtime/probe-northwind_test.ts
+packages/cli/src/kernel/adapters/templates/scaffold-template-assets.ts
+packages/cli/src/kernel/application/scaffold/writers/workspace-pages_test.ts
+packages/cli/src/kernel/application/scaffold/writers/write-app-files.ts
+packages/cli/src/kernel/assets/embedded.generated.ts
+packages/cli/src/kernel/assets/manifest.ts
+packages/cli/src/kernel/assets/northwind/record-table.tsx.template
+packages/cli/src/kernel/assets/northwind/scaffold-records.ts.template
+packages/cli/src/kernel/assets/northwind/workspace.css.template
+packages/cli/tests/fixtures/northwind/README.md

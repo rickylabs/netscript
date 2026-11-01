@@ -1,3 +1,4 @@
+import { NORTHWIND_PRESET } from '../../../domain/scaffold/northwind-preset.ts';
 import { UI_DEFAULT_THEME } from '../../../domain/ui/ui-config.ts';
 import { join } from '@std/path';
 import { toCamelCase } from '@std/text';
@@ -406,21 +407,31 @@ export async function writeNormalizedAppFiles(
     ['lib/scaffold-service-context.ts', appAssets.appScaffoldServiceContext],
     [
       'lib/scaffold-records.ts',
-      options.includeExampleService
+      options.from === NORTHWIND_PRESET
+        ? appAssets.appScaffoldRecordsNorthwind
+        : options.includeExampleService
         ? options.dbEngine === 'none'
           ? appAssets.appScaffoldRecordsMemory
           : appAssets.appScaffoldRecordsDatabase
         : appAssets.appScaffoldRecords,
     ],
     ['routes/(_components)/capability-empty.tsx', appAssets.appCapabilityEmpty],
-    ['routes/(_components)/record-table.tsx', appAssets.appRecordTable],
+    [
+      'routes/(_components)/record-table.tsx',
+      options.from === NORTHWIND_PRESET ? appAssets.northwindRecordTable : appAssets.appRecordTable,
+    ],
     ['routes/records/index.tsx', appAssets.appRecordsRoute],
     ['routes/records/[id].tsx', appAssets.appRecordRoute],
     ['routes/settings.tsx', appAssets.appSettingsRoute],
     ['routes/sign-in.tsx', appAssets.appSignInRoute],
     ['islands/SettingsForm.tsx', appAssets.appSettingsForm],
     ['islands/WorkspaceCommands.tsx', appAssets.appWorkspaceCommands],
-    ['assets/workspace.css', appAssets.appWorkspaceCss],
+    [
+      'assets/workspace.css',
+      options.from === NORTHWIND_PRESET
+        ? `${appAssets.appWorkspaceCss}\n${appAssets.northwindWorkspaceCss}`
+        : appAssets.appWorkspaceCss,
+    ],
   ] as const;
   for (const [path, template] of workspacePages) {
     await write(

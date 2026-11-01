@@ -1,0 +1,26 @@
+**VISUAL-EVAL: FAIL** for Northwind data foundation **#2580 / PR #2577**. I inspected all twelve screenshots and all four Utility references using native `view_image`. Several fidelity or quality scores fall below the required **8/10**; scores are not averaged to determine PASS.
+
+The Utility typography, neutral palettes, thin dividers, square controls, desktop navigation, and heading hierarchy are consistently recognizable. The main shortcomings are table density, excessive mobile record height, and unrefined detail timestamps.
+
+Scores reflect the data-foundation scope: six orders, customer/country/amount descriptions, pending statuses, and designed missing states are accepted. Missing full-showcase functionality is not a deduction.
+
+All screenshot links below use repo-relative paths.
+
+| Page | Theme | Viewport | Fidelity /10 | Quality /10 | Screenshot | Concrete findings |
+|---|---|---|---:|---:|---|---|
+| Overview | Light | Desktop | 8 | 8 | [dashboard-light-desktop.png](.llm/runs/showcase-2571/screens/round1/dashboard-light-desktop.png) | Strong match in shell, title, metric rules, and table/activity split. Extra table title band, enclosing border, and taller rows weaken the reference’s compact composition. |
+| Overview | Dark | Desktop | 8 | 8 | [dashboard-dark-desktop.png](.llm/runs/showcase-2571/screens/round1/dashboard-dark-desktop.png) | Charcoal surfaces and text hierarchy track the reference well. Table occupies substantially more vertical space; missing-state cards remain visually orderly. |
+| Overview | Light | Mobile | 7.5 | 7.5 | [dashboard-light-mobile.png](.llm/runs/showcase-2571/screens/round1/dashboard-light-mobile.png) | Two-column metrics adapt cleanly. Repeated four-field record blocks create a very long page and push Activity far below the overview content. |
+| Overview | Dark | Mobile | 7.5 | 7.5 | [dashboard-dark-mobile.png](.llm/runs/showcase-2571/screens/round1/dashboard-dark-mobile.png) | Theme and section hierarchy remain coherent. Tall record blocks and a narrow value column lose the reference’s compact scanning rhythm. |
+| Records | Light | Desktop | 7.5 | 8 | [records-light-desktop.png](.llm/runs/showcase-2571/screens/round1/records-light-desktop.png) | Six readable rows with clear order/description hierarchy. Roughly 69px rows versus the reference’s roughly 44px rows, plus an extra title band, materially change table density. |
+| Records | Dark | Desktop | 7.5 | 8 | [records-dark-desktop.png](.llm/runs/showcase-2571/screens/round1/records-dark-desktop.png) | Restrained pending badges and aligned columns are clean. Broad column gaps, heavier order names, and taller rows dilute the reference’s tighter table composition. |
+| Records | Light | Mobile | 7.5 | 7.5 | [records-light-mobile.png](.llm/runs/showcase-2571/screens/round1/records-light-mobile.png) | All six records are visible in the full capture. Each consumes about 200–225px; repeated labels reserve substantial width, causing awkward description and amount wrapping. |
+| Records | Dark | Mobile | 7.5 | 7.5 | [records-dark-mobile.png](.llm/runs/showcase-2571/screens/round1/records-dark-mobile.png) | Consistent separators and readable primary text. The same oversized blocks impede comparison; the final description wraps its separator onto the amount line. |
+| Detail | Light | Desktop | 8 | 8 | [detail-light-desktop.png](.llm/runs/showcase-2571/screens/round1/detail-light-desktop.png) | Clear title, summary, status, and aligned ruled fields form a credible Utility adaptation. Wide label/value separation and verbose timestamps reduce polish. |
+| Detail | Dark | Desktop | 8 | 8 | [detail-dark-desktop.png](.llm/runs/showcase-2571/screens/round1/detail-dark-desktop.png) | Consistent dark palette and restrained field hierarchy. Large blank space before the fields and raw date strings are the main weaknesses. |
+| Detail | Light | Mobile | 8 | 7.5 | [detail-light-mobile.png](.llm/runs/showcase-2571/screens/round1/detail-light-mobile.png) | Header, back action, badge, and field alignment fit cleanly. Created/Updated each become three-line timezone-heavy strings, dominating otherwise concise content. |
+| Detail | Dark | Mobile | 8 | 7.5 | [detail-dark-mobile.png](.llm/runs/showcase-2571/screens/round1/detail-dark-mobile.png) | Shared Utility styling survives the narrow layout. Repeated long timestamps and the large section-to-fields gap weaken vertical rhythm. |
+
+**Reference limit:** Detail and mobile have no dedicated Figma frames. Their fidelity scores assess adaptation of shared Utility typography, spacing, navigation, and card/table composition. The orders references show an open drawer over a dimmed table; I did not treat that overlay as the normal records-page palette or require a drawer for this scope.
+
+The screenshots show populated list descriptions and detail fields, with pending statuses throughout. HTTP 200 responses, service provenance, absence of page errors, and programmatic overflow checks remain **supplied runtime evidence**, not independently verified here. This is a read-only visual verdict; it does not certify implementation or attribute these visual shortcomings to the typed projection change.

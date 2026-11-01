@@ -371,6 +371,7 @@ packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fix
 packages/cli/e2e/src/application/gates/scaffold/runtime/owned-container-log.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/prepare-readiness-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/probe-background-children.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/probe-northwind.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/probe-plugin-resource.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/resource-state-stream.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/runtime-scripts.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -605,6 +606,7 @@ packages/cli/src/kernel/domain/docker-topology.ts	cli:other	S4	grep-verified in 
 packages/cli/src/kernel/domain/infrastructure-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/plugin-kind.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/resolved-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/domain/scaffold/northwind-preset.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/scaffold/scaffold-options.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/scaffold/scaffold-plan.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/service-manifest.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -734,6 +736,7 @@ packages/cli/src/public/features/init/init-command_test.ts	cli:other	S4	grep-ver
 packages/cli/src/public/features/init/init-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/init/init-input.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/init/init-preset-safety_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/init/northwind-preset_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/init/run-init-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-config-security_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -776,6 +779,8 @@ packages/cli/src/public/features/ui/apply/url-theme-command_test.ts	cli:other	S4
 packages/cli/src/public/infra/permissions/plugin-scaffold-permissions_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/infra/permissions/plugin-scaffold-permissions.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/tests/authored-browser-topology_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/tests/fixtures/northwind/default-scaffold.json	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/tests/fixtures/northwind/README.md	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/config/mod.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts
 packages/config/src/domain/config-root-types.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts
 packages/config/src/domain/config-section-types.ts	config-schema	S4	AspireConfigSchema default → ./aspire/apphost.mts

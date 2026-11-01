@@ -1,0 +1,32 @@
+[
+  {
+    "step": "stop",
+    "exitCode": 0,
+    "expectedExitCode": 0
+  },
+  {
+    "step": "down-probe",
+    "exitCode": 0,
+    "expectedExitCode": 0
+  },
+  {
+    "step": "negative-ready-probe",
+    "exitCode": 1,
+    "expectedExitCode": 1
+  },
+  {
+    "step": "start",
+    "exitCode": 0,
+    "expectedExitCode": 0
+  },
+  {
+    "step": "wait",
+    "exitCode": 0,
+    "expectedExitCode": 0
+  },
+  {
+    "step": "recovered-probe",
+    "exitCode": 0,
+    "expectedExitCode": 0
+  }
+]

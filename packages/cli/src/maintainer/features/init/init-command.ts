@@ -7,7 +7,7 @@ import {
   type MaintainerInitDependencies,
   orchestrateMaintainerInit,
 } from './orchestrate-maintainer-init.ts';
-import { PresetRegistry } from '../../../kernel/application/registries/preset-registry.ts';
+import { applyInitPreset } from '../../../kernel/domain/scaffold/northwind-preset.ts';
 
 const DB_ENGINE_CHOICES: readonly DbEngineChoice[] = [
   'postgres',
@@ -55,7 +55,7 @@ export function createMaintainerInitCommand(
     .arguments('<name:string>')
     .option('--app-name <name:string>', 'Frontend application name (kebab-case)')
     .option('--db <engine:string>', `Database engine (${DB_ENGINE_CHOICES.join(' | ')})`)
-    .option('--service [enabled:boolean]', 'Scaffold an example oRPC service', { default: false })
+    .option('--service [enabled:boolean]', 'Scaffold an example oRPC service')
     .option('--service-name <name:string>', 'Example service name')
     .option('--model-name <name:string>', 'Prisma model name for the scaffolded CRUD surface')
     .option('--service-port <port:number>', 'Example service port')
@@ -73,39 +73,33 @@ export function createMaintainerInitCommand(
     .option('--from <preset:string>', 'Apply a named scaffold preset')
     .option('--preset <code:string>', 'UI preset code, theme/preset JSON URL, or token preset id')
     .action(async (options, name: string): Promise<void> => {
-      if (options.from !== undefined) {
-        const presets = new PresetRegistry();
-        if (presets.entries().length === 0) {
-          throw new Error('no presets registered');
-        }
-        if (presets.get(options.from) === undefined) {
-          throw new Error(`preset "${options.from}" is not registered`);
-        }
-      }
-      const includeService = options.service === true ||
+      const includeService = options.service === false ? false : options.service === true ||
         options.serviceName !== undefined ||
-        options.servicePort !== undefined;
-      const result = await orchestrateMaintainerInit({
-        name,
-        appName: options.appName,
-        path: options.path,
-        editor: parseEditor(options.editor),
-        force: options.force ?? false,
-        ci: options.ci === true || options.nonInteractive === true,
-        yes: options.yes ?? false,
-        dryRun: options.dryRun ?? false,
-        json: options.json ?? false,
-        from: options.from,
-        preset: options.preset,
-        noGit: options.git === false,
-        noAspire: options.aspire === false,
-        dbEngine: parseDbEngine(options.db),
-        cache: options.cache,
-        includeExampleService: includeService,
-        serviceName: options.serviceName,
-        modelName: options.modelName,
-        servicePort: options.servicePort,
-      }, dependencies.initDependencies);
+        options.servicePort !== undefined || undefined;
+      const result = await orchestrateMaintainerInit(
+        applyInitPreset({
+          name,
+          appName: options.appName,
+          path: options.path,
+          editor: parseEditor(options.editor),
+          force: options.force ?? false,
+          ci: options.ci === true || options.nonInteractive === true,
+          yes: options.yes ?? false,
+          dryRun: options.dryRun ?? false,
+          json: options.json ?? false,
+          from: options.from,
+          preset: options.preset,
+          noGit: options.git === false,
+          noAspire: options.aspire === false,
+          dbEngine: parseDbEngine(options.db),
+          cache: options.cache,
+          includeExampleService: includeService,
+          serviceName: options.serviceName,
+          modelName: options.modelName,
+          servicePort: options.servicePort,
+        }),
+        dependencies.initDependencies,
+      );
 
       if (options.json === true) return;
       print(`Maintainer scaffold root: ${result.init.targetPath}`);

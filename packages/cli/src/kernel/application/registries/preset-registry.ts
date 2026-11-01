@@ -1,3 +1,4 @@
+import { NORTHWIND_PRESET } from '../../domain/scaffold/northwind-preset.ts';
 import { Registry } from '../abstracts/registry.ts';
 
 /** A named init preset made of scaffold-time choices. */
@@ -8,10 +9,13 @@ export interface InitPreset {
   readonly label: string;
 }
 
-/** Registry of init presets; empty until presets are registered. */
+/** Descriptive preset catalog; registration does not extend the closed init executor. */
 export class PresetRegistry extends Registry<string, InitPreset> {
   override readonly id = 'init-presets';
-  readonly #presets = new Map<string, InitPreset>();
+  readonly #presets = new Map<string, InitPreset>([[NORTHWIND_PRESET, {
+    id: NORTHWIND_PRESET,
+    label: 'Northwind orders',
+  }]]);
 
   override register(key: string, value: InitPreset): void {
     this.#presets.set(key, value);

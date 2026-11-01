@@ -28,6 +28,7 @@ export function renderInitJson(
       dryRun: result.dryRun,
       importMode: options.importMode,
       database: options.dbEngine,
+      ...(options.from ? { from: options.from } : {}),
     },
     totals: {
       filesCreated: result.totalFilesCreated,

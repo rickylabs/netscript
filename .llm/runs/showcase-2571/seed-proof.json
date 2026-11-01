@@ -1,0 +1,41 @@
+[
+  {
+    "stage": "baseline",
+    "count": 6,
+    "references": [
+      "NW-10248",
+      "NW-10249",
+      "NW-10250",
+      "NW-10251",
+      "NW-10252",
+      "NW-10253"
+    ],
+    "firstStatus": "pending"
+  },
+  {
+    "stage": "mutate",
+    "count": 6,
+    "references": [
+      "NW-10248",
+      "NW-10249",
+      "NW-10250",
+      "NW-10251",
+      "NW-10252",
+      "NW-10253"
+    ],
+    "firstStatus": "pending"
+  },
+  {
+    "stage": "verify",
+    "count": 6,
+    "references": [
+      "NW-10248",
+      "NW-10249",
+      "NW-10250",
+      "NW-10251",
+      "NW-10252",
+      "NW-10253"
+    ],
+    "firstStatus": "held"
+  }
+]

@@ -11,6 +11,7 @@
  * phases can patch files created earlier in the same dry-run.
  */
 
+import { basename, dirname, normalize } from '@std/path';
 import type { DirEntry, DryRunOperation, FileInfo, WalkEntry } from '../../domain/core-types.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 
@@ -143,16 +144,34 @@ export class DryRunFileSystemAdapter implements FileSystemPort {
   /**
    * List directory entries.
    *
-   * Delegates to the inner adapter. Dry-run recorded entries are not
-   * synthesised because `readDir` is primarily used for template walking
-   * which reads from the source (not output) tree.
+   * Merge recorded children with existing entries so later phases can discover
+   * resources in a directory that only exists in the preview.
    *
    * @param path - Absolute path to the directory.
    * @returns Array of directory entries.
    * @throws If the path is not a directory in the inner adapter.
    */
   async readDir(path: string): Promise<DirEntry[]> {
-    return await this.#inner.readDir(path);
+    const directory = normalize(path);
+    const existing = await this.#inner.exists(path)
+      ? await this.#inner.readDir(path)
+      : this.operations.some((op) => normalize(op.path) === directory && op.type === 'mkdir')
+      ? []
+      : await this.#inner.readDir(path);
+    const entries = new Map(existing.map((entry) => [entry.name, entry]));
+    for (const op of this.operations) {
+      const target = normalize(op.path);
+      if (target === directory && op.type === 'remove') entries.clear();
+      if (dirname(target) !== directory) continue;
+      const name = basename(target);
+      if (op.type === 'remove') entries.delete(name);
+      else {entries.set(name, {
+          name,
+          isFile: op.type !== 'mkdir',
+          isDirectory: op.type === 'mkdir',
+        });}
+    }
+    return [...entries.values()].sort((left, right) => left.name.localeCompare(right.name));
   }
 
   /**

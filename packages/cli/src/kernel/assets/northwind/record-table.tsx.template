@@ -1,0 +1,24 @@
+import { Badge, Button, EmptyState, ResponsiveTable, type ResponsiveTableColumn } from '@app/components/ui/mod.ts';
+import { appRoutes } from '@app/router.ts';
+import type { ScaffoldRecord, ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
+
+const field = (row: ScaffoldRecord, label: string) => row.fields.find((item) => item.label === label)?.value ?? '—';
+const columns: readonly ResponsiveTableColumn<ScaffoldRecord>[] = [
+  { key: 'order', label: 'Order', class: 'northwind-order', cell: (row) => <a class='workspace-record-link' href={appRoutes.record.href({ path: { id: row.id } })}>{row.name}</a> },
+  { key: 'customer', label: 'Customer', class: 'northwind-customer', cell: (row) => field(row, 'Customer') },
+  { key: 'country', label: 'Country', class: 'northwind-country', headerClass: 'northwind-country', cell: (row) => field(row, 'Country') },
+  { key: 'total', label: 'Total (USD)', class: 'northwind-total', align: 'end', cell: (row) => field(row, 'Total (USD)') },
+  { key: 'status', label: 'Status', class: 'northwind-status', cell: (row) => <Badge variant='muted'>{row.status}</Badge> },
+  { key: 'created', label: 'Created', class: 'northwind-created', headerClass: 'northwind-created', align: 'end', cell: (row) => row.createdAt ? new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(row.createdAt)) : '—' },
+];
+
+/** Dense orders on desktop and compact order summaries on mobile, using the shipped table. */
+export function RecordTable({ records }: { readonly records: ScaffoldRecords }) {
+  return <ResponsiveTable class='northwind-table' aria-label='Orders' columns={columns} rows={records.rows} getRowKey={(row) => row.id}
+    emptyState={<EmptyState class='workspace-empty' heading={records.state === 'unavailable' ? 'Records unavailable' : records.state === 'unauthorized' ? 'Sign in to view records' : 'Your records will appear here'}>
+      <p>{records.message}</p>
+      {records.command && <code class='workspace-command'>{records.command}</code>}
+      {records.state === 'unauthorized' && <Button type='link' href={appRoutes.signIn.href()}>Sign in</Button>}
+    </EmptyState>}
+    summary={<span>{records.total === undefined ? 'No connected data' : `${records.total} records`}</span>} />;
+}

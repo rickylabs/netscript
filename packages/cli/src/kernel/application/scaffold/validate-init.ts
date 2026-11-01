@@ -1,3 +1,4 @@
+import { applyInitPreset, NORTHWIND_PRESET } from '../../domain/scaffold/northwind-preset.ts';
 import { basename, resolve } from '@std/path';
 import { USER_PORT_RANGE } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
@@ -32,6 +33,7 @@ export async function validateOptions(
   context: InitPipelineContext,
   options: InitOptions,
 ): Promise<ValidatedInitOptions> {
+  options = applyInitPreset(options);
   // 1. Name format
   if (!SCAFFOLD_VALIDATION.NAME_PATTERN.test(options.name)) {
     throw new ScaffoldValidationError(
@@ -146,6 +148,7 @@ export async function validateOptions(
 
   return {
     name: options.name,
+    ...(options.from === NORTHWIND_PRESET ? { from: NORTHWIND_PRESET } : {}),
     appName,
     targetPath,
     importMode: options.importMode,
