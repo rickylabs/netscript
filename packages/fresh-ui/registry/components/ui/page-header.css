@@ -1,5 +1,4 @@
-/* PageHeader block styles (structure for the seams; the shell rhythm of
-   .ns-page-header itself lives in layouts.css). */
+/* PageHeader includes its copied-component rhythm and preserves the legacy layout seams. */
 
 .ns-page-header__layout {
   display: grid;
@@ -51,5 +50,77 @@
 
   & [data-scope='page-header'][data-part='layout'] {
     gap: var(--ns-section-gap);
+  }
+}
+
+/* Complete copied-component rhythm; no dependency on an application stylesheet. */
+.ns-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-4);
+  padding-block: var(--ns-space-6) var(--ns-section-gap);
+  min-inline-size: 0;
+  color: var(--ns-fg);
+}
+.ns-page-header__heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-3);
+}
+.ns-page-header__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-2);
+}
+.ns-page-header__title,
+.ns-page-header__eyebrow,
+.ns-page-header__description {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.ns-page-header .ns-page-header__title {
+  font-family: var(--ns-font-heading, var(--ns-font-sans));
+  font-size: var(--ns-text-title, var(--ns-text-4xl));
+  font-weight: var(--ns-weight-title, 600);
+  line-height: var(--ns-leading-title, var(--ns-leading-tight));
+  letter-spacing: var(--ns-tracking-title, var(--ns-tracking-tight));
+}
+.ns-page-header__eyebrow {
+  font-family: var(--ns-font-eyebrow, var(--ns-font-mono));
+  font-size: var(--ns-text-label, var(--ns-label-size));
+  line-height: var(--ns-leading-label, var(--ns-leading-caption));
+  letter-spacing: var(--ns-tracking-label, var(--ns-label-tracking));
+  text-transform: uppercase;
+  color: var(--ns-muted-fg);
+}
+.ns-page-header__description {
+  font-size: var(--ns-text-body, var(--ns-text-base));
+  line-height: var(--ns-leading-body, var(--ns-leading-normal));
+  color: var(--ns-muted-fg);
+  max-inline-size: var(--ns-prose-measure, 62ch);
+}
+.ns-page-header__actions,
+.ns-page-header__status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--ns-space-2);
+}
+.ns-page-header__status {
+  font-size: var(--ns-text-small, var(--ns-text-sm));
+  line-height: var(--ns-leading-small, 1.4);
+  color: var(--ns-muted-fg);
+}
+.ns-page-header__tabs {
+  min-inline-size: 0;
+}
+@media (min-width: 40rem) {
+  .ns-page-header__heading {
+    flex-direction: row;
+    align-items: end;
+    justify-content: space-between;
+  }
+  .ns-page-header__heading > .ns-page-header__actions {
+    flex-shrink: 0;
   }
 }

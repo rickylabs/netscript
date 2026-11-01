@@ -7,7 +7,7 @@ export const overlays_3: readonly ComponentContract[] = [
     'specId': 'O7',
     'category': 'Overlays',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'placement': {
         'kind': 'enum',
@@ -18,49 +18,75 @@ export const overlays_3: readonly ComponentContract[] = [
           'left',
         ],
       },
-      'state': {
-        'kind': 'enum',
-        'values': [
-          'rest',
-          'open',
-        ],
+      'open': {
+        'kind': 'boolean',
+      },
+      'defaultOpen': {
+        'kind': 'boolean',
+      },
+      'onOpenChange': {
+        'kind': 'callback',
+      },
+      'disabled': {
+        'kind': 'boolean',
+      },
+      'triggerLabel': {
+        'kind': 'text',
+        'required': true,
+      },
+      'title': {
+        'kind': 'text',
+        'required': true,
+      },
+      'description': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'avatar': {
+        'kind': 'slot',
+        'required': false,
+      },
+      'meta': {
+        'kind': 'slot',
+        'required': false,
+      },
+      'closeDelay': {
+        'kind': 'number',
+        'default': 150,
+        'description': 'Pointer transfer grace in milliseconds; focused content stays open.',
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'trigger',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'content',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'title',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'description',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'meta',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
+      },
+      {
+        'name': 'avatar',
       },
     ],
     'attributes': {
@@ -71,6 +97,11 @@ export const overlays_3: readonly ComponentContract[] = [
           'bottom',
           'left',
         ],
+        'parts': [
+          'root',
+          'trigger',
+          'content',
+        ],
       },
       'data-state': {
         'values': [
@@ -79,22 +110,53 @@ export const overlays_3: readonly ComponentContract[] = [
         ],
         'description':
           'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+        'parts': [
+          'root',
+          'trigger',
+          'content',
+        ],
+        'compatibilityValues': [
+          'closed',
+        ],
       },
     },
     'booleans': [],
-    'slots': [],
+    'slots': [
+      {
+        'name': 'description',
+        'part': 'description',
+      },
+      {
+        'name': 'avatar',
+        'part': 'avatar',
+      },
+      {
+        'name': 'meta',
+        'part': 'meta',
+      },
+    ],
     'apg': 'https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/',
     'keyboard': [
       {
         'key': 'Enter/Space',
         'action': 'Toggle disclosure',
       },
+      {
+        'key': 'Escape',
+        'action': 'Close only the open preview and return trigger focus.',
+      },
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Native focus navigation; preview never traps focus or steals it on entry.',
+      },
     ],
     'tokenRoles': [
       'text/muted',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Public Popover with focusOnOpen=false; hover/focus preview and native disclosure button preserve trigger focus.',
+      'Mouse hover previews; clicking an already-hovered trigger closes it. Touch/pen use activation-only toggle and pointer-induced focus does not open separately. Pointer transfer grace allows selecting/using preview content. Native focus exit/outside dismissal closes; no backend profile lookup.',
+      'Runtime trigger/content retain open/closed; root uses rest/open.',
     ],
   },
   {
@@ -104,6 +166,15 @@ export const overlays_3: readonly ComponentContract[] = [
     'priority': 'P0',
     'shipped': true,
     'props': {
+      'initialFocus': {
+        'kind': 'enum',
+        'values': [
+          'first',
+          'last',
+        ],
+        'default': 'first',
+        'description': 'ActionMenu.Content entry edge for ArrowDown/ArrowUp.',
+      },
       'open': {
         'kind': 'enum',
         'values': [
@@ -154,6 +225,21 @@ export const overlays_3: readonly ComponentContract[] = [
       },
       'checked': {
         'kind': 'boolean',
+      },
+      'role': {
+        'kind': 'enum',
+        'values': [
+          'menuitem',
+          'menuitemcheckbox',
+          'menuitemradio',
+        ],
+        'description':
+          'ActionMenu.Item semantic role; choice state supplied with native aria-checked.',
+      },
+      'closeOnSelect': {
+        'kind': 'boolean',
+        'default': true,
+        'description': 'ActionMenu.Item may stay open for repeated choice adjustments.',
       },
     },
     'parts': [
@@ -302,6 +388,7 @@ export const overlays_3: readonly ComponentContract[] = [
       'Dropdown menu is the contract name; ActionMenu is the compatible runtime API.',
       'Utility ActionMenu delegates all parts to the popover scope so existing app-owned floating.css retains positioning and visibility behavior.',
       'Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.',
+      'Item traversal includes checkable roles and typeahead, excludes nested menus, and respects native disabled. Outside dismissal preserves its focus destination.',
     ],
   },
   {
@@ -309,36 +396,49 @@ export const overlays_3: readonly ComponentContract[] = [
     'specId': 'O9',
     'category': 'Overlays',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'open': {
-        'kind': 'enum',
-        'values': [
-          'false',
-          'true',
-        ],
+        'kind': 'boolean',
+      },
+      'defaultOpen': {
+        'kind': 'boolean',
+      },
+      'onOpenChange': {
+        'kind': 'callback',
+      },
+      'disabled': {
+        'kind': 'boolean',
+      },
+      'label': {
+        'kind': 'text',
+        'required': true,
+      },
+      'items': {
+        'kind': 'collection',
+        'required': true,
+      },
+      'children': {
+        'kind': 'slot',
+        'required': true,
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'trigger',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'content',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
       },
     ],
     'attributes': {
@@ -348,9 +448,24 @@ export const overlays_3: readonly ComponentContract[] = [
           'true',
         ],
       },
+      'data-state': {
+        'values': [
+          'open',
+          'closed',
+        ],
+        'parts': [
+          'content',
+        ],
+        'description': 'Native menu runtime visibility.',
+      },
     },
     'booleans': [],
-    'slots': [],
+    'slots': [
+      {
+        'name': 'children',
+        'part': 'trigger',
+      },
+    ],
     'apg': 'https://www.w3.org/WAI/ARIA/apg/patterns/menu/',
     'keyboard': [
       {
@@ -365,13 +480,27 @@ export const overlays_3: readonly ComponentContract[] = [
         'key': 'Escape',
         'action': 'Dismiss menu',
       },
+      {
+        'key': 'Shift+F10/ContextMenu',
+        'action': 'Open at the focused context region.',
+      },
+      {
+        'key': 'Home/End/printable character',
+        'action': 'Traverse current menu using shared ActionMenu behavior.',
+      },
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Close and leave through the native focusable region.',
+      },
     ],
     'tokenRoles': [
       'surface/card',
       'text/fg',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Focusable native group region supports pointer contextmenu and Shift+F10/ContextMenu invocation; rich content can retain its own native semantics.',
+      'Shared ActionMenu content owns menu keys and choices/submenus; native top layer plus fixed client coordinates provide pointer placement and viewport clamping.',
+      'Explicit Escape/action restores context-region focus; outside dismissal keeps its destination. Browser-forced native dismissal remains platform-owned.',
     ],
   },
 ];

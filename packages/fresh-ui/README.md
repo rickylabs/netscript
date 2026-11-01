@@ -222,6 +222,76 @@ console.log(serializeComponentContracts(componentContracts));
 console.log(catalog.schemaVersion);
 ```
 
-Phase 1 includes 66 shipped inventory entries and 21 design-only contracts from the six built
-Figma categories. `shipped: false`, planned values and native/pseudo parts distinguish specified
-anatomy from a rendering implementation. It does not add gap components or token values.
+The catalog covers all 104 Figma inventory identities. `shipped: false`, planned values and
+native/pseudo parts distinguish specified anatomy from a rendering implementation. Phase 2
+adds registry components with real render and browser keyboard coverage; it preserves token values.
+
+The `actions` collection includes ButtonGroup, Toggle and ToggleGroup. The `forms-core`
+collection includes RadioGroup, InputGroup, InputOTP, Slider, Calendar and DatePicker.
+Install individual items with `netscript ui:add calendar` or `netscript ui:add date-picker`.
+Hydrate interactive controls inside a Fresh island.
+
+Calendar accepts ordered ISO date strings through `value`/`defaultValue`, plus
+`mode='single' | 'range'`, `months={1 | 2}`, `caption='label' | 'dropdown'`,
+`min`/`max`, `isDateDisabled`, `weekStartsOn` and `onValueChange`. Its `today`
+default is UTC; supply the user's local ISO day when local-day highlighting is needed.
+Arrow keys browse enabled dates, Home/End move within the week, PageUp/PageDown
+move months (Shift moves years), and Enter/Space select.
+
+DatePicker adds a required `label`, optional form `name`, and independently controlled
+`open`/`onOpenChange`. Its native modal Dialog supports Escape/Cancel and returns focus
+to the trigger. Selection requests respect controlled values; ordinary closing requests respect
+controlled open state. Browser-forced dismissal (such as repeated Escape) remains
+native behavior; apps should normally accept native close requests. Reopening starts on the selected month. A named hidden input
+submits the ISO date, or range endpoints joined by `/`.
+
+The `navigation` collection adds NavigationMenu, Menubar, LocationMarker and Stepper.
+NavigationMenu uses native exclusive details disclosures and ordinary site links.
+Menubar accepts menu records with actions, controlled checkbox/radio choices,
+labels, separators and nested submenu records. It delegates native popovers to
+ActionMenu; arrow keys, Home/End, typeahead, Escape and Tab follow the application
+menu pattern. Hydrate it in an island; application callbacks and choice state
+belong to the app. `value`/`onValueChange` may control the open menu ID (`null` closes).
+
+ActionMenu.Item supports `role='menuitemcheckbox' | 'menuitemradio'`, native
+`aria-checked`, and `closeOnSelect={false}` for repeated choice adjustments.
+ActionMenu.Content supports `initialFocus='first' | 'last'`. Outside dismissal
+keeps the destination focus; explicit Escape/close actions return to the trigger.
+Stepper is an ordered list with per-step status and optional native links, and
+LocationMarker is decorative. Neither adds a composite keyboard manager.
+
+The `overlays` collection adds AlertDialog, HoverCard and ContextMenu. AlertDialog
+requires trigger/title/description/action labels and delegates modal focus to
+Dialog; Cancel is the initial focus target and outside clicks do not dismiss.
+Application callbacks, pending state and controlled open state remain caller-owned.
+HoverCard opens on hover, focus or button activation without moving focus, and
+keeps content usable across pointer transfer. Touch/pen use activation-only toggles;
+mouse hover previews and a subsequent click closes the preview. Its description/meta/avatar are
+content slots. ContextMenu accepts ordinary region content plus menu records,
+opens at pointer coordinates or with Shift+F10/ContextMenu, and shares the
+action/choice/submenu behavior of Menubar. Hydrate these controls in islands.
+
+AlertDialog's Utility destructive action uses the canonical destructive fill and
+foreground roles. Its scoped hover binds destructive/hover rather than the generic
+legacy Button's raw red ramp. The existing text/card inversion is removed; shared
+token values remain owned by the token workstream and are unchanged here.
+
+Data display additions: `ui:add item kbd collapsible` copies presentation rows, native keyboard notation and native details disclosures. Item retains native child links/actions; Kbd adds no focus targets; after hydration, Collapsible supports controlled open refusal and blocks disabled summary activation. Before hydration, its summary retains native disclosure behavior.
+
+`ui:add chart carousel` adds token-driven Cartesian series and a manual native scroll-snap carousel. Chart accepts one to three labeled `series` and `data` rows with matching finite numeric `values`; its native data disclosure exposes exact values to keyboard and assistive technology. Hover is supplemental. Carousel supports horizontal/vertical orientation, inside/outside controls, dots, counter and a clamped `defaultIndex`; it has no autoplay. Boundary controls retain focus with guarded `aria-disabled`, and inactive slide content becomes inert after hydration.
+
+Chart uses an explicit `locale` (`en-US` by default) for consistent server/client number formatting. When native carousel scrolling moves away from a focused slide link, focus moves to the existing scroll viewport before that slide becomes inert; previous/next/dot focus stays on its native control.
+
+`ui:add code-block` copies single-file, tabbed and diff code surfaces. Hydrate the component in an island for file selection and clipboard feedback. `tabs` contains uniquely keyed `{ value, label, code?, filename?, lang?, lines? }` files; `value`/`defaultValue` and `onValueChange` control selection. Horizontal arrows follow the document direction; Home/End select the first/last file. Code itself retains left-to-right native horizontal scrolling. `header={false}` hides optional metadata/copy chrome while retaining essential file tabs.
+
+`lineNumbers`, `footer`, `footerContent`, `scrollbar`, `size` and `tone` customize the surface. Diff `lines` carry raw `text`, optional `number` and `variant` (`default`, `added`, `removed`, `highlighted`); visible plus/minus signs supplement color. Raw text is escaped. Recognized lang names/aliases use deterministic highlight.js common output, preserving multiline syntax across display rows; each file uses its own language, and unknown names remain plain. Explicit row content overrides automatic highlighting. Diff rows share one displayed source, so removed and added lines can share lexical state; use explicit row content when old and new syntax need independent interpretation. Trusted syntax content can use `CodeBlock.Token` with existing keyword/function/type/string/number/comment/punctuation roles. Clipboard writes use the exact `code` when supplied, otherwise resulting row text excluding removals. `onCopied(source)` and `onCopyError(error)` report actual outcomes; native `onCopy` remains a DOM clipboard event. A pending copy cannot mark a newly selected file copied. The optional `state` prop is a controlled visual snapshot. Published phase-one variant/header aliases remain supported.
+
+Syntax colors use existing code roles directly on `code/bg`. Tinted diff/highlight rows use a contextual 80% syntax / 20% text-foreground mix to retain each syntax hue with readable small-text contrast. All seven syntax roles are measured against all four row surfaces in the real Utility browser matrix; diff signs remain explicit. No shared token values change.
+
+Legacy `header="tabs"` without a file collection renders the filename/copy header (`data-header="title"`); only explicit `variant="tabbed"` requires a nonempty file collection. The contract retains the legacy alias list alongside its boolean chrome control.
+
+`Label variant='eyebrow'` uses the existing Utility metadata typography. `optional`/`optionalText` add a hint; `required` takes precedence. `srOnly` keeps the native accessible name without a visible label. `state='disabled' | 'invalid'` styles the label; set disabled/invalid semantics on the associated input itself. Native `for`/`htmlFor` association and scope overrides remain available.
+
+`Card variant='rule' size='sm'` provides the docs surface with a top border, no resting fill/radius/shadow and compact sections. Existing Header/Title/Description/Body/Footer composition remains, with optional `Card.Action`. Section visibility follows composition. `interactive` enables hover/focus-within styling; the card adds no aggregate tab stop or click handler. Native child actions retain their behavior; `state` can supply a visual snapshot.
+
+`Pagination variant='pager'` composes `Pagination.Previous` and `Pagination.Next` with native `href` destinations and automatic previous/next relations. Numbered pagination retains Meta/Actions and adds Link/current/disabled plus decorative Ellipsis. Disabled destinations have no href or tab stop and block activation callbacks. Horizontal arrows mirror with document direction; narrow layouts stack document tiles. The existing Icon primitive also supports arrow-left/right, sourced from [Lucide](https://lucide.dev/icons/arrow-left) with its Lucide/Feather notices retained in source.

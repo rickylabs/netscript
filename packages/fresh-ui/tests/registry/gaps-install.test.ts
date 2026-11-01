@@ -1,0 +1,154 @@
+import {
+  AUDITED_BASELINE_COMPONENTS,
+  FRESH_UI_RUNTIME_DEPENDENCY,
+  POST_V1_COMPONENTS,
+} from './post-v1-items.ts';
+import { freshUiRegistryManifest } from '../../registry.manifest.ts';
+import { componentContracts } from '../../contracts.ts';
+import { renderViolations } from '../contracts/contract-render.ts';
+import { assertEquals, assertStringIncludes } from '@std/assert';
+import { fromFileUrl, join, toFileUrl } from '@std/path';
+
+const repo = fromFileUrl(new URL('../../../../', import.meta.url));
+
+Deno.test('Phase-two registry gaps preserve installed source and consumer APIs', async () => {
+  const names = freshUiRegistryManifest.items.filter((item) =>
+    item.kind === 'component' && item.tags.includes('contract')
+  ).map((item) => item.name);
+  assertEquals(
+    [...names].sort(),
+    [...POST_V1_COMPONENTS].sort(),
+    'Every reviewed gap must be exercised; an empty projection cannot pass.',
+  );
+  const installedNames = [...names, ...AUDITED_BASELINE_COMPONENTS];
+  const root = await Deno.makeTempDir({ prefix: 'fresh-ui-gaps-' });
+  const run = async (cwd: string, args: string[]) => {
+    const result = await new Deno.Command(Deno.execPath(), {
+      cwd,
+      args,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
+    return new TextDecoder().decode(result.stdout);
+  };
+  try {
+    await Deno.writeTextFile(
+      join(root, 'deno.json'),
+      JSON.stringify({
+        catalog: JSON.parse(await Deno.readTextFile(join(repo, 'deno.json'))).catalog,
+        name: '@netscript/actions-contract-test',
+        version: '0.0.0',
+        imports: {
+          preact: 'npm:preact@^10.29.2',
+          '@preact/signals': 'npm:@preact/signals@2.11.3',
+        },
+        compilerOptions: {
+          jsx: 'precompile',
+          jsxImportSource: 'preact',
+          lib: ['dom', 'dom.iterable', 'deno.ns'],
+        },
+      }),
+    );
+    const install = (name: string) =>
+      run(repo, [
+        'run',
+        '-A',
+        '--frozen',
+        join(repo, 'packages/cli/bin/netscript-dev.ts'),
+        'ui:add',
+        name,
+        '--project-root',
+        root,
+        '--registry-root',
+        join(repo, 'packages/fresh-ui'),
+        '--force',
+      ]);
+    // Prove CodeBlock alone contributes its parser before Markdown can mask a missing dependency.
+    await install('code-block');
+    const codeConfig = JSON.parse(await Deno.readTextFile(join(root, 'deno.json')));
+    assertEquals(codeConfig.imports['highlight.js'], 'npm:highlight.js@^11');
+    assertEquals(codeConfig.imports['@netscript/fresh-ui'], FRESH_UI_RUNTIME_DEPENDENCY);
+    for (const name of installedNames) await install(name);
+    const installedConfig = JSON.parse(await Deno.readTextFile(join(root, 'deno.json')));
+    assertEquals(
+      installedConfig.imports['@netscript/fresh-ui'],
+      FRESH_UI_RUNTIME_DEPENDENCY,
+      'The installer must contribute its runtime package mapping; local subpath aliases cannot prove that.',
+    );
+    // Compile the unreleased local API only after proving the production root mapping was installed.
+    installedConfig.imports['@netscript/fresh-ui/interactive'] =
+      toFileUrl(join(repo, 'packages/fresh-ui/interactive.ts')).href;
+    installedConfig.imports['@netscript/fresh-ui/primitives'] =
+      toFileUrl(join(repo, 'packages/fresh-ui/primitives.tsx')).href;
+    await Deno.writeTextFile(join(root, 'deno.json'), JSON.stringify(installedConfig));
+    for (const name of installedNames) {
+      const installed = await Deno.readTextFile(join(root, 'components/ui', name + '.tsx'));
+      const source = await Deno.readTextFile(
+        join(repo, 'packages/fresh-ui/registry/components/ui', name + '.tsx'),
+      );
+      // The copy installer relocates only the canonical lib/ui imports.
+      assertEquals(installed.replaceAll('@/lib/cn.ts', '../../lib/cn.ts'), source);
+      if (name === 'code-block') {
+        assertEquals(
+          await Deno.readTextFile(join(root, 'assets/ui/code-block.css')),
+          await Deno.readTextFile(
+            join(repo, 'packages/fresh-ui/registry/components/ui/code-block.css'),
+          ),
+        );
+      }
+      if (names.includes(name)) assertStringIncludes(installed, `data-scope='${name}'`);
+    }
+    await run(root, [
+      'check',
+      '--unstable-kv',
+      ...installedNames.map((name) => `components/ui/${name}.tsx`),
+    ]);
+    await run(root, [
+      'lint',
+      '--rules-include=jsx-curly-braces',
+      ...installedNames.map((name) => `components/ui/${name}.tsx`),
+    ]);
+    // Audited baseline components preserve overridable scopes; verify actual installed rendering.
+    await Deno.writeTextFile(
+      join(root, 'render-audited.ts'),
+      `
+import { h } from 'preact';
+import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { CodeBlock } from './components/ui/code-block.tsx';
+import { Label } from './components/ui/label.tsx';
+import { Card } from './components/ui/card.tsx';
+import { Pagination } from './components/ui/pagination.tsx';
+import { Alert } from './components/ui/alert.tsx';
+import { CommandPalette } from './components/ui/command-palette.tsx';
+import { PageHeader } from './components/ui/page-header.tsx';
+console.log(JSON.stringify({
+  'page-header': render(h(PageHeader, { title: 'Overview', eyebrow: 'Commerce', description: 'Recent orders', variant: 'with-status', status: 'Operational', actions: h('button', {children: 'Create order'}) })),
+  'command-palette': render(h(CommandPalette, { scrim: false, groups: [{id: 'docs', label: 'Docs', items: [{id: 'start', label: 'Start', type: 'page', excerpt: 'Read the guide', shortcut: 'Enter'}]}] })),
+  'code-block': render(h(CodeBlock, { tabs: [{ value: 'source', label: 'Source', code: 'x' }] })),
+  label: render(h(Label, { children: 'Email', variant: 'eyebrow', optional: true })),
+  card: render(h(Card, { children: 'Card', variant: 'rule', size: 'sm' })),
+  alert: render(h(Alert, { variant: 'important', emphasis: 'strong', close: true, title: 'Important', description: 'Review settings' })),
+  pagination: render(h(Pagination, { variant: 'pager', children: h(Pagination.Next, { href: '#next', children: 'Next document' }) })),
+}));
+`,
+    );
+    const rendered: Record<string, string> = JSON.parse(
+      await run(root, ['run', '--node-modules-dir=auto', 'render-audited.ts']),
+    );
+    assertEquals(Object.keys(rendered).sort(), [...AUDITED_BASELINE_COMPONENTS].sort());
+    for (const name of AUDITED_BASELINE_COMPONENTS) {
+      const contract = componentContracts.components.find((contract) => contract.name === name)!;
+      assertEquals(
+        renderViolations(contract, {
+          component: name,
+          scenario: 'installed-audited-baseline',
+          props: [],
+        }, rendered[name]),
+        [],
+      );
+    }
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

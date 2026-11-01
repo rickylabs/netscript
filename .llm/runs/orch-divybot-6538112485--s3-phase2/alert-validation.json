@@ -1,0 +1,55 @@
+{
+  "slice": "7c2b Alert important strong and accessible labels",
+  "focusedTests": {
+    "passed": 454,
+    "failed": 0
+  },
+  "browserTests": {
+    "passed": 16,
+    "failed": 0,
+    "widths": [
+      390,
+      1280
+    ],
+    "schemes": [
+      "light",
+      "dark"
+    ],
+    "strictAxeSeriousOrCritical": 0
+  },
+  "sourceWrappers": "PASS;9 files check/lint/fmt, zero drops",
+  "browserWrappers": "PASS;fixture and browser spec, zero drops",
+  "qualityAndArchitecture": "PASS",
+  "publicPrimitivesDocLint": "PASS",
+  "docsBuild": {
+    "status": "PASS",
+    "htmlPages": 253
+  },
+  "publicationPreflight": "PASS",
+  "docsAccuracy": "PASS",
+  "docsExportsDrift": "PASS",
+  "installedSourceRendering": "PASS with native temporary node_modules mode",
+  "runtimeDependencyRepairs": [
+    "alert",
+    "command-palette",
+    "code-block",
+    "pagination"
+  ],
+  "publishedIconVocabulary": "PASS;23 names exactly match typed/JSON contract",
+  "independentInitialReview": "FAIL_FIX; corrected default tone labels",
+  "independentCorrectiveReview": "PASS",
+  "tokenValuesChanged": false,
+  "rootLocksChanged": false,
+  "frozenFixtureChanged": false,
+  "newPackageFamilies": false,
+  "phaseReady": false,
+  "fullGoalComplete": false,
+  "independentEvidenceSignOff": "PASS",
+  "sourceHead": "086e2ede501d05583fa926d11213cc38b8101d91",
+  "cleanSourceCarriers": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  }
+}

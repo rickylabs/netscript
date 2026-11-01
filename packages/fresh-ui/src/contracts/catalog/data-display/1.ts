@@ -262,20 +262,15 @@ export const data_display_1: readonly ComponentContract[] = [
           'focus',
           'selected',
         ],
+        'description':
+          'Visual snapshot; native hover/focus-within styles are enabled by interactive.',
       },
-      'header': {
+      'interactive': {
         'kind': 'boolean',
+        'description':
+          'Enables presentation states without adding a container tab stop or click handler.',
       },
-      'description': {
-        'kind': 'boolean',
-      },
-      'action': {
-        'kind': 'slot',
-      },
-      'footer': {
-        'kind': 'boolean',
-      },
-      'body': {
+      'children': {
         'kind': 'slot',
       },
     },
@@ -319,16 +314,10 @@ export const data_display_1: readonly ComponentContract[] = [
           'default',
           'rule',
         ],
-        'plannedValues': [
-          'rule',
-        ],
       },
       'data-size': {
         'values': [
           'md',
-          'sm',
-        ],
-        'plannedValues': [
           'sm',
         ],
       },
@@ -344,23 +333,45 @@ export const data_display_1: readonly ComponentContract[] = [
       },
     },
     'booleans': [
-      'header',
-      'description',
-      'action',
-      'footer',
+      'interactive',
     ],
     'slots': [
       {
-        'name': 'body',
+        'name': 'children',
+        'part': 'root',
+      },
+      {
+        'name': 'Header.children',
+        'part': 'header',
+      },
+      {
+        'name': 'Title.children',
+        'part': 'title',
+      },
+      {
+        'name': 'Description.children',
+        'part': 'description',
+      },
+      {
+        'name': 'Action.children',
+        'part': 'action',
+      },
+      {
+        'name': 'Body.children',
         'part': 'body',
       },
       {
-        'name': 'action',
-        'part': 'action',
+        'name': 'Footer.children',
+        'part': 'footer',
       },
     ],
     'apg': 'noninteractive presentation',
-    'keyboard': [],
+    'keyboard': [
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Focus native child actions; the card container adds no keyboard target',
+      },
+    ],
     'tokenRoles': [
       'border/control',
       'border/strong',
@@ -375,6 +386,7 @@ export const data_display_1: readonly ComponentContract[] = [
     ],
     'notes': [
       'Native DOM attributes pass through where the implementation accepts them.',
+      'Header/body/footer presence comes from namespace composition, not phantom boolean root props. Rule has only a top border, with no resting fill/radius/shadow.',
     ],
   },
 ];

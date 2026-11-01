@@ -1,0 +1,2 @@
+.ns-location-marker { display: inline-block; flex: none; inline-size: var(--ns-space-1-5); block-size: var(--ns-space-1-5); background: var(--ns-studio-signal-marker, var(--ns-fg)); border-radius: 0; }
+.ns-location-marker[data-size='sm'] { inline-size: var(--ns-space-1); block-size: var(--ns-space-1); }

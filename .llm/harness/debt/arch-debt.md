@@ -3220,6 +3220,16 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Split install orchestration below 500 lines and feature folders to at most 12 immediate
   children while preserving plugin install/dispatch/mutator tests, auth backend consumer proofs,
   package publish dry-run and the coordinator's full `scaffold.runtime` verdict.
+## packages/fresh-ui — inherited export documentation and JSON data audit (fresh-ui-doc-export-baseline-2531)
+
+- **Reason:** The full-export structured doc-lint gate reports124 diagnostics:96 private-type references and27 missing JSDoc in TypeScript, plus1 JSON data-export JSDoc limitation. All123 TypeScript diagnostic kind/message/repo-relative path identities match the measured baseline, with0new/0removed. Native member publish dry-run passes with0slow-type warnings. The static metadata audit's JSON module-tag finding remains a raw failure, not a green gate.
+- **Owner:** Fresh UI package maintainers, epic #2412; follow-up #2531.
+- **Target:** Before the next stable Fresh UI design-system publication; theme milestone Frontend Contribution.
+- **Status:** Open, DEBT_ACCEPTED as an unchanged baseline by the independent phase2a IMPL-EVAL at4c4f41e; see evaluate-phase2a.md. No new diagnostic allowance or source suppression is introduced.
+- **Linked evidence:** `.llm/runs/orch-divybot-6538112485--s3-phase2/phase2a-publication-audit.json`, `page-header-evidence-signoff.md` and `fidelity-review.md`; PR #2488.
+- **Cost:** Raw documentation/metadata gates remain failed and generated API docs retain incomplete/private type references; data-only JSON cannot embed a JSDoc comment. This is not a runtime or static-publish failure.
+- **Closing gate:** Zero missing-JSDoc/private-type-reference diagnostics across every TypeScript export without suppression/API removal; preserve valid lossless documented contracts.json and explicitly test JSON-data classification/upstream limitations; pass native member publish dry-run and all consumer/contract tests. Do not close this debt merely because a component PR is green.
+
 
 ## packages/cli — CLI-SCAFFOLD-WORKERS-CONTRACT-DEPENDENCY
 

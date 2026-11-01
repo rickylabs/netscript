@@ -1,0 +1,85 @@
+{
+  "reviewUnit": "S3 phase2a",
+  "sourceCommit": "0d399a1",
+  "latestEvidenceHeadBeforeFinalReview": "4a5a219c9fa4e5a7fd864fd379801fa109125ed8",
+  "base": "15cffa2fee5b6d543ecae2981a3563b1b74ca789",
+  "inventory": {
+    "contracts": 104,
+    "shippedComponents": 87,
+    "newComponents": 21,
+    "remainingPhase2bComponents": 17,
+    "registryItems": 115
+  },
+  "fullPackage": {
+    "passed": 608,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 608,
+    "uniqueFailures": 0,
+    "exitCode": 0
+  },
+  "fullBrowser": {
+    "passed": 302,
+    "failed": 0,
+    "strictAxeAllowancesAdded": false,
+    "actualTouchCasesIncluded": true,
+    "sourceStyle": "Utility"
+  },
+  "scopedAndBroaderGates": "All source/browser wrappers and quality/architecture passed per slice; final contextual fidelity records current source",
+  "publicationDryRun": {
+    "exitCode": 0,
+    "slowTypeWarnings": 0,
+    "runtimePublishProof": false
+  },
+  "preflightDocsAccuracyAndExportDrift": "PASS",
+  "docsBuild": {
+    "htmlPages": 259,
+    "verdict": "PASS"
+  },
+  "carriers": "All four committed-source freshness checks PASS at source0d399a1; later commits change evidence only",
+  "documentationBaseline": {
+    "rawGateVerdict": "FAIL",
+    "typeScriptDiagnostics": 123,
+    "jsonDataExportLimitation": 1,
+    "newTypeScriptDiagnosticIdentities": 0,
+    "removedTypeScriptDiagnosticIdentities": 0,
+    "followUpIssue": 2531,
+    "owner": "Fresh UI package maintainers",
+    "target": "Before next stable Fresh UI design-system publication",
+    "finalReviewDisposition": "Existing unchanged debt accepted as recorded; raw failed gate remains disclosed and follow-up2531 stays open"
+  },
+  "runtime": {
+    "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+    "attempts": 1,
+    "exitCode": 1,
+    "verdict": "UNPROVEN",
+    "passed": 1,
+    "failed": 2,
+    "skipped": 0,
+    "failedGates": [
+      "preflight.aspire",
+      "cleanup.aspire-stop"
+    ],
+    "environment": "Aspire doctor failed; Docker daemon unavailable",
+    "runtimeBehaviorStarted": false,
+    "cleanupInspection": "UNPROVEN",
+    "manualForeignOrUnknownResourceMutation": false,
+    "observedHead": "f866c2fe77dc48004b2af4e39978472a8328e903",
+    "reviewedSourceCommit": "0d399a1b89262f0c2c1a6e4850010b0f8b7d4311",
+    "reviewedSourceWasUncommittedDuringRun": true
+  },
+  "reviewThreads": {
+    "verdict": "PASS",
+    "threads": 0,
+    "unanswered": 0
+  },
+  "independentPhase2aImplementationEvaluation": {
+    "verdict": "PASS",
+    "reviewedHead": "4c4f41e52e9bf35d943dc85e06ac323842940993",
+    "report": "evaluate-phase2a.md",
+    "scope": "Phase2a source/evidence only; runtime and exact-head CI still block READY"
+  },
+  "requiredRemoteChecksAtFinalHead": "Pending;draft-skipped checks do not count as green",
+  "phase2aReady": false,
+  "fullGoalComplete": false
+}

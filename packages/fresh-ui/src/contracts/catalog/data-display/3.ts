@@ -7,7 +7,7 @@ export const data_display_3: readonly ComponentContract[] = [
     'specId': 'D7',
     'category': 'Data display',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'size': {
         'kind': 'enum',
@@ -23,22 +23,18 @@ export const data_display_3: readonly ComponentContract[] = [
           'inverse',
         ],
       },
+      'children': {
+        'kind': 'slot',
+        'required': true,
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'label',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
-      },
-      {
-        'name': 'focus-ring',
-        'representation': 'pseudo',
-        'when': 'matching CSS interaction or variant',
-        'planned': true,
       },
     ],
     'attributes': {
@@ -57,7 +53,7 @@ export const data_display_3: readonly ComponentContract[] = [
     },
     'booleans': [],
     'slots': [],
-    'apg': 'noninteractive presentation',
+    'apg': 'native kbd notation; no keyboard interaction',
     'keyboard': [],
     'tokenRoles': [
       'border/default',
@@ -69,7 +65,7 @@ export const data_display_3: readonly ComponentContract[] = [
       'text/muted',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Native kbd notation is noninteractive; Kbd.Group joins keys with decorative plus separators.',
     ],
   },
   {
@@ -79,14 +75,42 @@ export const data_display_3: readonly ComponentContract[] = [
     'priority': 'P1',
     'shipped': true,
     'props': {
+      'code': {
+        'kind': 'text',
+        'description':
+          'Raw clipboard source; absent text derives from display rows excluding removals.',
+      },
+      'filename': {
+        'kind': 'text',
+      },
+      'lang': {
+        'kind': 'text',
+      },
+      'tabs': {
+        'kind': 'collection',
+      },
+      'lines': {
+        'kind': 'collection',
+      },
       'variant': {
         'kind': 'enum',
         'values': [
+          'single',
+          'tabbed',
+          'diff',
           'default',
           'destructive',
           'added',
           'removed',
           'highlighted',
+        ],
+        'description': 'Ledger modes plus published phase1 aliases.',
+      },
+      'tone': {
+        'kind': 'enum',
+        'values': [
+          'default',
+          'destructive',
         ],
       },
       'size': {
@@ -97,12 +121,39 @@ export const data_display_3: readonly ComponentContract[] = [
         ],
       },
       'header': {
-        'kind': 'enum',
-        'values': [
-          'none',
-          'title',
-          'tabs',
-        ],
+        'kind': 'boolean',
+        'values': ['none', 'title', 'tabs'],
+        'default': true,
+        'description':
+          'Boolean chrome control with legacy none/title/tabs aliases; tabs without files falls back to title. Essential file tabs remain when chrome is hidden.',
+      },
+      'copy': {
+        'kind': 'boolean',
+        'default': true,
+      },
+      'lineNumbers': {
+        'kind': 'boolean',
+        'default': false,
+      },
+      'footer': {
+        'kind': 'boolean',
+        'default': false,
+      },
+      'footerContent': {
+        'kind': 'slot',
+      },
+      'scrollbar': {
+        'kind': 'boolean',
+        'default': true,
+      },
+      'value': {
+        'kind': 'text',
+      },
+      'defaultValue': {
+        'kind': 'text',
+      },
+      'onValueChange': {
+        'kind': 'callback',
       },
       'state': {
         'kind': 'enum',
@@ -111,29 +162,11 @@ export const data_display_3: readonly ComponentContract[] = [
           'copied',
         ],
       },
-      'code': {
-        'kind': 'text',
-        'description': 'Supported Utility public prop; native attributes pass through separately.',
+      'onCopied': {
+        'kind': 'callback',
       },
-      'filename': {
-        'kind': 'text',
-        'description': 'Supported Utility public prop; native attributes pass through separately.',
-      },
-      'lang': {
-        'kind': 'text',
-        'description': 'Supported Utility public prop; native attributes pass through separately.',
-      },
-      'copy': {
-        'kind': 'boolean',
-      },
-      'lineNumbers': {
-        'kind': 'boolean',
-      },
-      'footer': {
-        'kind': 'boolean',
-      },
-      'scrollbar': {
-        'kind': 'boolean',
+      'onCopyError': {
+        'kind': 'callback',
       },
     },
     'parts': [
@@ -142,78 +175,113 @@ export const data_display_3: readonly ComponentContract[] = [
       },
       {
         'name': 'head',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'header enabled',
       },
       {
         'name': 'name',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'filename supplied outside tabbed mode',
       },
       {
         'name': 'lang',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'header and lang supplied',
       },
       {
         'name': 'tabs',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'tabbed mode',
+      },
+      {
+        'name': 'tab',
+        'when': 'tabbed mode',
       },
       {
         'name': 'copy',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'header and copy enabled',
       },
       {
         'name': 'content',
       },
       {
         'name': 'line',
-        'when': 'when the corresponding content or subcomponent is supplied',
       },
       {
         'name': 'line-number',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'lineNumbers enabled',
+      },
+      {
+        'name': 'sign',
       },
       {
         'name': 'code',
       },
       {
+        'name': 'syntax',
+        'when': 'caller supplies Token content',
+      },
+      {
+        'name': 'marker',
+        'representation': 'pseudo',
+        'when': 'highlighted row',
+      },
+      {
         'name': 'scrollbar',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
+        'when': 'overflow and scrollbar enabled',
       },
       {
         'name': 'thumb',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'representation': 'native',
+        'when': 'overflow and scrollbar enabled',
+      },
+      {
+        'name': 'copy-tooltip',
+        'representation': 'native',
+        'when': 'browser shows the copy button title',
       },
       {
         'name': 'footer',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'footer enabled',
+      },
+      {
+        'name': 'added-count',
+        'when': 'diff header enabled',
+      },
+      {
+        'name': 'removed-count',
+        'when': 'diff header enabled',
+      },
+      {
+        'name': 'status',
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
-        'when': 'matching CSS interaction or variant',
+        'when': 'native focus-visible',
       },
     ],
     'attributes': {
       'data-variant': {
         'values': [
+          'single',
+          'tabbed',
+          'diff',
+        ],
+        'compatibilityValues': [
           'default',
           'destructive',
           'added',
           'removed',
           'highlighted',
         ],
-        'plannedValues': [
+      },
+      'data-tone': {
+        'values': [
+          'default',
           'destructive',
-          'added',
-          'removed',
-          'highlighted',
         ],
       },
       'data-size': {
         'values': [
           'md',
-          'sm',
-        ],
-        'plannedValues': [
           'sm',
         ],
       },
@@ -223,35 +291,83 @@ export const data_display_3: readonly ComponentContract[] = [
           'title',
           'tabs',
         ],
-        'plannedValues': [
-          'tabs',
-        ],
       },
       'data-state': {
         'values': [
           'rest',
           'copied',
         ],
-        'description':
-          'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+        'parts': [
+          'root',
+        ],
+      },
+      'data-scrollbar': {
+        'values': [
+          'true',
+          'false',
+        ],
+      },
+      'data-line-variant': {
+        'values': [
+          'default',
+          'added',
+          'removed',
+          'highlighted',
+        ],
+        'parts': [
+          'line',
+        ],
+      },
+      'data-syntax': {
+        'values': [
+          'keyword',
+          'function',
+          'type',
+          'string',
+          'number',
+          'comment',
+          'punctuation',
+        ],
+        'parts': [
+          'syntax',
+        ],
       },
     },
     'booleans': [
+      'header',
       'copy',
       'lineNumbers',
       'footer',
       'scrollbar',
     ],
-    'slots': [],
-    'apg': 'native buttons and links',
+    'slots': [
+      {
+        'name': 'footerContent',
+        'part': 'footer',
+      },
+      {
+        'name': 'lines',
+        'part': 'line',
+      },
+    ],
+    'apg': 'Tabs APG with native buttons, code and horizontal overflow regions',
     'keyboard': [
       {
         'key': 'Tab/Shift+Tab',
-        'action': 'Move between native controls',
+        'action': 'Move between native tabs, copy control and code scroll region',
       },
       {
         'key': 'Enter/Space',
-        'action': 'Activate focused button; links use Enter',
+        'action': 'Activate the focused tab or copy button',
+      },
+      {
+        'key': 'ArrowLeft/ArrowRight',
+        'action':
+          'Navigate horizontal file tabs, respecting direction; code scroll regions retain native arrows',
+      },
+      {
+        'key': 'Home/End',
+        'action': 'Select first/last file tab',
       },
     ],
     'tokenRoles': [
@@ -268,9 +384,19 @@ export const data_display_3: readonly ComponentContract[] = [
       'surface/surface',
       'text/fg',
       'text/muted',
+      'code/bg',
+      'code/syntax/*',
+      'scrollbar/thumb',
+      'font/mono',
+      'type/code/*',
     ],
     'notes': [
-      'Native DOM attributes pass through where the implementation accepts them.',
+      'Ledger modes single/tabbed/diff and tone replace the old design-only vocabulary; published default/destructive/added/removed/highlighted aliases remain supported.',
+      'Legacy header none/title/tabs aliases remain; header=tabs without files renders a title header. Header=false removes file chrome/copy but never removes essential tab controls.',
+      'Native horizontal scrollbar/thumb and native copy title tooltip are platform internals, not fabricated layout parts.',
+      'Recognized languages use escaped highlight.js common output with whole-source multiline scopes; unknown languages remain escaped text. Explicit Token/row content takes precedence and is never interpreted as highlighter HTML.',
+      'Syntax roles apply directly on code/bg. Tinted diff/highlight rows retain each syntax hue with a contextual 80% syntax/20% text foreground mix; no shared token value changes.',
+      'Clipboard result callbacks are separate from native onCopy. Actual status ignores stale file/text requests; controlled state may render a chosen visual snapshot.',
     ],
   },
   {
@@ -278,8 +404,13 @@ export const data_display_3: readonly ComponentContract[] = [
     'specId': 'D9',
     'category': 'Data display',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
+      'locale': {
+        'kind': 'text',
+        'default': 'en-US',
+        'description': 'Explicit number locale shared by server and client.',
+      },
       'type': {
         'kind': 'enum',
         'values': [
@@ -288,12 +419,9 @@ export const data_display_3: readonly ComponentContract[] = [
         ],
       },
       'series': {
-        'kind': 'enum',
-        'values': [
-          '1',
-          '2',
-          '3',
-        ],
+        'kind': 'collection',
+        'required': true,
+        'description': 'One to three labeled series; data-series is derived from their count.',
       },
       'orientation': {
         'kind': 'enum',
@@ -310,91 +438,119 @@ export const data_display_3: readonly ComponentContract[] = [
           'dashed',
         ],
       },
+      'data': {
+        'kind': 'collection',
+        'required': true,
+      },
+      'title': {
+        'kind': 'text',
+        'required': true,
+      },
+      'description': {
+        'kind': 'text',
+      },
+      'state': {
+        'kind': 'enum',
+        'values': [
+          'rest',
+          'hover',
+          'loading',
+          'empty',
+        ],
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'header',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'title',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'description',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'plot',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'grid',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'axis-x',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'axis-y',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'series-1',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'series-2',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'series-3',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'cursor',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'legend',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'tooltip',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'swatch',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'label',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'value',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
+      },
+      {
+        'name': 'skeleton',
+        'when': 'loading',
+      },
+      {
+        'name': 'empty',
+        'when': 'empty',
+      },
+      {
+        'name': 'data',
+      },
+      {
+        'name': 'data-trigger',
+      },
+      {
+        'name': 'table',
+      },
+      {
+        'name': 'line',
+        'when': 'plot present',
+      },
+      {
+        'name': 'area',
+        'when': 'type area and plot present',
       },
     ],
     'attributes': {
@@ -424,11 +580,28 @@ export const data_display_3: readonly ComponentContract[] = [
           'dashed',
         ],
       },
+      'data-state': {
+        'values': [
+          'rest',
+          'hover',
+          'loading',
+          'empty',
+        ],
+      },
     },
     'booleans': [],
     'slots': [],
-    'apg': 'noninteractive presentation',
-    'keyboard': [],
+    'apg': 'native figure and SVG image with labeled series plus native data disclosure/table',
+    'keyboard': [
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Focus the native data disclosure; chart graphics add no focus targets',
+      },
+      {
+        'key': 'Enter/Space',
+        'action': 'Toggle the source data table',
+      },
+    ],
     'tokenRoles': [
       'SF:deco/sparkline',
       'SF:deco/ticks',
@@ -442,7 +615,9 @@ export const data_display_3: readonly ComponentContract[] = [
       'warning/default',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Exact data values remain available through a native disclosure/table; hover is supplemental, never the only data access.',
+      'Series count derives from1–3 labeled input series. Each datum has a label and matching finite numeric values. Legend orientation does not rotate the Cartesian plot.',
+      'Existing chart/1..3 roles follow the latest per-theme chart palette ledger. No token values change.',
     ],
   },
 ];
