@@ -25,3 +25,10 @@
   endpoint text, probe argv, global duplicate-name detection across nested scopes, fake doctor
   output and webhook adoption's use of a now-mutating negative-control gate. These are updated
   without weakening runtime/type-check/isolation assertions, subject to same-session review.
+
+- Second Docker attempt passed 99 SQLite gates and 106 PostgreSQL gates, including backend/child
+  readiness, but failed the actual overview readiness assertion. The auth-enabled suite sends its
+  public workers read through a BFF whose unmarked-procedure fallback requires a bearer. A focused
+  SDK composition reproduces SDK_PREPARATION_FAILED for that contract without a cookie. The plan
+  now permits an explicit optional fallback for the public plugin read, retaining required defaults,
+  explicit procedure metadata and every backend authentication policy.

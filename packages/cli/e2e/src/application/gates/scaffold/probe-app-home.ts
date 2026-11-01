@@ -195,7 +195,8 @@ export async function probeAppHome(
     `app home page did not render after ${attempts} attempts; last resolved candidates: ` +
       `${lastUrls.join(', ')}\n` +
       [...lastFailure].map(([url, reason]) => `  ${url} -> ${reason}`).join('\n') +
-      `\n\nLast ${appName} resource logs:\n${resourceLogs}`,
+      `\n\nLast ${appName} resource logs:\n${resourceLogs}\n\nFinal probe failures:\n` +
+      [...lastFailure].map(([url, reason]) => `  ${url} -> ${reason}`).join('\n'),
   );
 }
 

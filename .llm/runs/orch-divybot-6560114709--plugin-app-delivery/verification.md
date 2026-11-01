@@ -43,3 +43,9 @@ CI at the pushed head remains the final check surface. Raw logs and receipts are
 
 The first Docker run stopped at generated lint after 42 passing gates in both tiers. It proves
 no runtime readiness. Its replacement run at the repair head is pending.
+
+
+Runtime auth repair: full check (4,142 files, 35 batches), quality gate, all 15 root `check:*`
+tasks, scoped source lint/format, release preflight, 36 focused auth/projection/probe tests and
+3 real Chromium conformance tests pass. `scaffold.plugins --cleanup --format pretty` again passed
+all 18 gates. Round 4 independent evaluation passed. No Docker runtime pass is claimed here.

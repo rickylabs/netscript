@@ -124,3 +124,30 @@ Combined repair regressions: 109 passed. Full structured check and quality:gate 
 root check:* tasks passed again, including the four carriers. Generated full-project lint passed
 with and without a service. No source changes followed this sign-off. Commit/push and re-dispatch
 the full Docker runtime workflow at the new head; previous runtime attempts remain failed.
+
+
+## Runtime auth repair
+
+The second full Docker CI proved both tiers reach `behavior.app-home`: PostgreSQL passed 106 prior
+steps and SQLite passed 99. Backend health, durable plugin behavior and browser auth had passed.
+The new overview assertion found workers unavailable. A local real-client reproduction showed
+`workersContract.listJobs` has no auth metadata while the generated auth BFF requires credentials
+for every unmarked procedure. The anonymous overview failed SDK preparation before transport.
+
+The plan and drift contract now permit a per-client optional unmarked policy for public reads.
+Only the workers projection selects it; the BFF default and explicit required metadata remain
+required, and session credentials still forward. Real generated-BFF RPC tests cover all four
+cases. The browser negative mutation tracks the bearer factory while retaining its guarded-call
+failure assertion. The probe repeats its failure summary after resource logs for durable CI tails.
+
+Validation so far: 36 focused tests, full 4,142-file/35-batch type check, quality gate, scoped source
+lint/format and release preflight pass. The runtime result remains unproven until the next full CI.
+
+
+Round 4 independent implementation evaluation: PASS (`evaluate-runtime-auth.md`). All 15 root
+`check:*` tasks passed again, including four carrier checks and review-thread gate. Real Chromium
+conformance passed all three tests, including Secure-cookie and missing-bearer negative controls.
+A local browser-library inheritance issue was isolated to a private executable wrapper; no source
+permissions or test assertions were relaxed. Full Docker runtime must be dispatched on this fix.
+
+Static scaffold suite also passed all 18 gates. The repair is reconciled against a1122b1 with no dependency or lock changes; commit the reviewed slice and run full Docker CI.

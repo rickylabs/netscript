@@ -31,3 +31,17 @@ baseline literal boolean ternaries in example-route templates. The fixtures and 
 fixed. The same evaluator passed this repair (evaluate-ci-repair.md); 109 combined regressions,
 full check, quality:gate, all 15 check:* tasks and service/no-service generated lint pass. The next
 push must re-run full Docker CI. Close-gate remains pending its explicit proof checkbox.
+
+
+Runtime auth repair: core required CI is green except close-gate's deliberately unchecked runtime
+proof. Both manual runtime tiers reached and failed the workers overview assertion. The auth BFF's
+required unmarked fallback rejects anonymous public workers reads before transport. A per-client
+optional fallback now fixes workers only; guarded defaults and explicit required metadata are
+preserved. 36 regressions, full check and quality pass. Same-session round 4 review, browser
+conformance, all check tasks and static scaffold gates are next. No READY until full Docker runtime
+and required checks pass on the reviewed head.
+
+
+Round 4 review PASS; all 15 check tasks and real browser conformance (3/3) pass. Commit and push
+the auth repair, dispatch full Docker runtime at that head, and reconcile close-gate only after
+actual worker/stream readiness proof. Review-thread gate has no unanswered current threads.

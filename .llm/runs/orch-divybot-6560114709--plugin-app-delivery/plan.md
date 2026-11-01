@@ -40,3 +40,14 @@ No dependency upgrades, UI redesign, authentication bypass, release or merge is 
 PLAN-EVAL: N/A. This restores an existing persisted reference contract using existing reconciliation,
 endpoint discovery and registry producer interfaces; no new public abstraction or routing choice.
 Independent implementation evaluation is mandatory.
+
+## Runtime-discovered client policy correction
+
+The full suite also installs auth. Its BFF defaults unmarked procedures to required authentication,
+while the workers service's existing public read contract is unmarked. Preserve that guarded default
+and all explicit procedure authentication metadata. Add an optional per-client `unmarked` policy to
+the generated BFF factory; the overview workers read opts into `optional`, forwarding a credential
+when one exists and allowing the backend's public policy to answer anonymous reads. Server auth
+policy is unchanged. Prove default/explicit required calls still fail without credentials and a
+public read works through the actual rendered BFF. This is required to deliver the runtime overview
+proof in the auth-enabled full scaffold; it does not redesign authentication.
