@@ -58,3 +58,18 @@ The read-only resource report found 24 unknown/foreign entries and left all unto
 ## Source identity for the final evidence commit
 
 The evaluated implementation is `2b1db077b01eb0c1f06b51d336280c0438f22866`. Its CLI tree is `151783017e9e384673f9564bcd04442488e36a81`; the docs support fixture blob is `8683f31376afddd44dc2a7038797a205550de57f`. The final evidence commit must change only this scoped run directory. Compare all other tracked paths against this implementation head before READY. Independent final evaluation is recorded in evaluate.md and the PR phase comment.
+## Ready-mode CI repair evidence
+
+Original evaluation at 2b1db07 and evidence delivery c688757 predate core CI: draft policy
+skipped those tests. Owner-authorized readiness triggered run 41330651017. Its test-1
+reported 840 pass / 1 fail (stale synchronous callback regex); test-4 reported 1,479 pass /
+1 fail / 20 ignored (removed archived status in a generated missing-record fixture).
+Both are repaired in tests, with no runtime, contract, carrier or gate-policy changes.
+
+Local Deno 2.9.7 structured reports: three template tests pass after a reproduced 2-pass /
+1-fail red; combined real memory/SQLite Prisma generation and template tests pass 5/5.
+Sample/projection semantic tests pass 14/14, including explicit ascending/descending ID
+ties and a descending page boundary. Scoped type check, lint and format process all three
+changed test files with zero findings and no dropped selections. Review threads: 0/0.
+Same-session independent SLICE_REVIEW_PASS and IMPL_EVAL_PASS are recorded in evaluate.md.
+The new head's ready-mode CI is pending; READY is withheld until it is green.

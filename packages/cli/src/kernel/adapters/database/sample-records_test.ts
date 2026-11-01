@@ -173,6 +173,10 @@ for (const engine of ['postgres', 'mysql', 'sqlite', 'mssql'] as const) {
         orderBy: [{ amount: 'asc' }, { id: 'asc' }],
       },
     );
+    assertEquals(
+      domain.listQuery({ page: 1, limit: 10, sortBy: 'status', sortOrder: 'desc' }).orderBy,
+      [{ status: 'desc' }, { id: 'desc' }],
+    );
   });
 }
 
@@ -191,6 +195,14 @@ Deno.test('memory sample supports status filtering and stable sorting before pag
   assert(first.items.every((row: { status: string }) => row.status === 'paid'));
   assert(first.items[0].amount <= first.items[1].amount);
   assert(first.items[1].amount <= second.items[0].amount);
+  // Equal status values exercise ID ties in both directions and across a page boundary.
+  const tiedQuery = { ...query, limit: 40, sortBy: 'status' };
+  const ascending = await repository.list(tiedQuery);
+  const descending = await repository.list({ ...tiedQuery, sortOrder: 'desc' });
+  assertEquals(ascending.items.map((row: { id: number }) => row.id), [1, 7, 13, 19, 25, 31, 37]);
+  assertEquals(descending.items.map((row: { id: number }) => row.id), [37, 31, 25, 19, 13, 7, 1]);
+  const tiedPage = await repository.list({ ...tiedQuery, sortOrder: 'desc', offset: 2, limit: 2 });
+  assertEquals(tiedPage.items.map((row: { id: number }) => row.id), [25, 19]);
   const copy = await repository.updateStatus(first.items[0].id, 'refunded', 'Refunded');
   assertEquals(copy.status, 'refunded');
   assertEquals(first.items[0].status, 'paid');

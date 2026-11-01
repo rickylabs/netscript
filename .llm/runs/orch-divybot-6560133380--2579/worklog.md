@@ -2,7 +2,7 @@
 
 ## Authority
 
-Owner grant: “IMPL-EVAL: `claude -p --model claude-opus-5-5 --effort high`, read-only.” Rationale: requested independent implementation evaluation for #2579. This overrides the feature implementation_evaluation matrix cell; OpenAI generator and Anthropic reviewer remain separate. Owner also requires draft PR, Refs #2579, no labels/session ids, repo-relative public paths, merge main without rebase/force push, and STOP at READY.
+Owner grant: “IMPL-EVAL: `claude -p --model claude-opus-5-5 --effort high`, read-only.” Rationale: requested independent implementation evaluation for #2579. This overrides the feature implementation_evaluation matrix cell; OpenAI generator and Anthropic reviewer remain separate. Owner also requires draft PR, Refs #2579, no labels/session ids, repo-relative public paths, merge main without rebase/force push, and STOP at READY. Later owner steering explicitly authorized marking ready and waiting for repaired core CI.
 
 PLAN-EVAL: N/A for the bounded generated sample expansion described in plan.md; no framework architecture or unresolved trade-off requires a separate plan evaluation.
 
@@ -59,3 +59,44 @@ Full CI run 41327413127: SUCCESS. PostgreSQL 122 passed / 0 failed / 0 skipped; 
 Local proof processes were stopped by exact generated-project working-directory match; proof ports closed. The read-only resource report left all 24 unknown/foreign entries untouched. No local Docker resource was started. Optional dogfood helper baseline drift remains documented, with no new architecture debt.
 
 Reconcile: origin/main remains 4cb0298; no conflict, rebase or force push. Draft #2583 uses Refs #2579 and no labels. All requested source work and proof are complete. This final slice commits only this scoped run's evidence/context; final-head source equality and workflow-policy currency are confirmed before queuing READY through the assignment report file. Cockpit owns merging; no further feature work remains.
+
+## Ready-for-review CI follow-up
+
+The owner explicitly authorized marking PR #2583 ready after the original handoff. That
+transition ran the core test shards previously skipped by draft policy. At delivery head
+c688757, run 41330651017 test-1 passed 840 tests and failed the static repository-template
+assertion for two synchronous callbacks. The generated adapter intentionally uses async
+callbacks to parse the resolved Prisma rows through the entity schema. The missing-record
+and unrelated-error handling remains unchanged. Reproduced locally: two pass, one fails.
+
+Follow-up slice: adjust only the callback-syntax assertion to accept synchronous or async
+callbacks, preserving the requirement for two missingAsNull calls and all P2025/rethrow
+assertions. No public surface, runtime implementation, contract, or carrier changes.
+Gate: the structured targeted E2E test runner, scoped check/lint/fmt, independent read-only
+review using the existing evaluator session, and current-head core CI after a normal push.
+Keep the PR ready as authorized; do not rebase, force-push, or merge it manually.
+
+The same ready-triggered workflow's test-4 passed 1,479 tests and failed one generated
+memory-service proof. Its missing-record fixture still supplies status 'archived', removed
+by the intentional six-status contract. Use valid status 'cancelled' in both the direct
+application and RPC calls so the existing 404 assertions execute against a valid request.
+Retain all type-check, quickstart, Prisma and missing-record assertions. Include both
+generated-service variants in focused validation and the same independent review.
+
+Coordinator review also raised a nonblocking memory/Prisma tie-order concern. Inspection
+shows direction multiplies the complete memory comparison, including a.id - b.id, so IDs
+already follow the requested direction. Add regression assertions to the existing semantic
+sample test: same-status memory rows sort IDs ascending and descending, including a page
+boundary, and every database domain orders equal-status rows by ID descending. No runtime
+change is necessary. The separate evaluator passed the two fixture fixes; re-steer that same
+session to review these additional semantic assertions before committing.
+
+Follow-up verification: Deno 2.9.7 structured test reports show 5/5 focused E2E tests
+(including real memory and SQLite Prisma projects), plus 14/14 sample/projection tests.
+Scoped check/lint/fmt cover all three changed tests with no dropped selections or findings.
+Review-thread gate passes with zero threads. Same separate Opus 5.5 high evaluator returned
+SLICE_REVIEW_PASS and IMPL_EVAL_PASS for both fixture fixes, then the complete slice with
+tie assertions. The evaluator reviewed statically; this slice's execution is generator-owned.
+Production source and carriers remain unchanged. Commit and normal push follow; new-head
+ready-mode CI and a new READY report are pending. Do not treat the old draft skips as proof
+of those newly activated tests.

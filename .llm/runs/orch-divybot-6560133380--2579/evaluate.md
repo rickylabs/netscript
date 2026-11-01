@@ -1,5 +1,19 @@
 # IMPL-EVAL #2579: PASS
 
+## Ready-mode CI follow-up review
+
+The same separate native Claude Opus 5.5 high evaluator returned SLICE_REVIEW_PASS and
+IMPL_EVAL_PASS for the post-c688757 test-only repairs, then re-reviewed the complete slice
+including tie-order regression assertions with the same verdicts. Model usage attests
+claude-opus-5-5. This follow-up review was static: tool permission prevented evaluator-owned
+execution. Generator-owned structured runs passed 5/5 focused E2E and 14/14 sample/projection
+tests, plus all scoped check/lint/fmt checks. The evaluator confirmed the async-wrapper and
+valid-status fixture fixes preserve coverage. It also confirmed memory ID ties already follow
+sort direction, with the new ascending/descending/page-boundary assertions preserving it.
+Production source and generated carriers are unchanged from the prior implementation PASS.
+Every current-head ready-mode CI check must still finish green or be policy-skipped before
+the new READY report. The original runtime proof remains valid for unchanged production.
+
 Implementation head `2b1db077b01eb0c1f06b51d336280c0438f22866`, draft PR #2583. All required static, carrier, test, live and CI runtime results are proven at this head. No unrecorded doctrine violation or debt delta. The plan's scope is complete.
 
 Below is an evaluate.md-style report you can commit.

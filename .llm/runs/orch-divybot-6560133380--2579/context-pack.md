@@ -1,10 +1,27 @@
 # Completed implementation — Cockpit handoff
 
-PR #2583 implements #2579. It remains draft, uses Refs #2579 and has no labels. Cockpit owns merging. The final assignment report queues READY after current-head confirmation. Do not add a closing keyword, mark ready-for-review, merge, rebase or force-push.
+PR #2583 implements #2579, uses Refs #2579 and has no labels. Cockpit owns merging. After the original READY handoff, the owner explicitly authorized marking the PR ready. It is now ready for review. Do not add a closing keyword, merge manually, rebase or force-push.
+
+Ready-for-review core CI exposed one stale static test in
+packages/cli/e2e/tests/application/gates/generated-router-template_test.ts: it counts only
+synchronous missingAsNull callbacks, whereas the evaluated adapter uses async callbacks
+to schema-parse resolved Prisma rows. Follow-up work updates that syntax assertion while
+preserving its call count, P2025 and rethrow requirements. No runtime source changes.
+Test-4 also found the generated missing-record fixture still used removed status 'archived'.
+Both fixture calls now use valid status 'cancelled', retaining the application's null result
+and RPC NOT_FOUND/404 checks. Validate both memory and Prisma generated-service variants.
 
 ## Source and outcome
 
-The evaluated implementation head is 2b1db077b01eb0c1f06b51d336280c0438f22866. The final commit changes only this scoped run's evidence/context; resolve the delivery head from Git or the final PR comment. Source outside .llm/runs is identical to that implementation.
+The evaluated implementation head is 2b1db077b01eb0c1f06b51d336280c0438f22866. Original delivery c688757 changed only this scoped run's evidence/context. The ready-mode follow-up changes three test files and run notes; production source and generated carriers remain identical. Resolve the current delivery head from Git or the latest PR comment.
+
+Follow-up local validation under Deno 2.9.7: 5/5 focused E2E tests, including real memory
+and SQLite Prisma generated-service checks; 14/14 sample/projection semantic tests including
+both tie directions and a page boundary. Scoped check/lint/fmt processed all three changed
+tests with no findings or dropped selections. Review-thread gate: zero unanswered threads.
+The same independent Opus 5.5 high evaluator returned SLICE_REVIEW_PASS and IMPL_EVAL_PASS
+for the final test-only slice (static review; local execution results are generator-owned).
+Remote CI at the new commit remains required before publishing the new READY handoff.
 
 Default models/contracts/clients now carry unique references, owners, six portable statuses, signed integer minor-unit amounts/currency, and timestamps. Forty deterministic rows span sixty UTC days; upserts preserve edits/IDs. Fresh databases insert oldest first for the generic ID-descending list. Memory uses the same sample source. Server projections expose adjacent 30-day metrics/deltas, 60 daily buckets, per-currency amounts/averages, status counts and latest records. Complete overview reads fail closed; absent/empty/unauthorized/unavailable remain distinct. Existing layouts/CSS are retained.
 
