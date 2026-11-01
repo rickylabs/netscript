@@ -45,3 +45,26 @@ B2's optional safe post-install connection is implemented for newly generated
 memory clients only, guarded by exact formatted-placeholder equality.
 
 S2 correction extends the declared resolver surface to public/adapters/jsr-import-resolver.ts and maintainer/adapters/local-import-resolver.ts: public service-add fixture exposed missing direct-import entries. Both use existing release constants; version parity now exercises the actual public resolver.
+
+S3 browser probe: Ctrl+K, type Settings, ArrowDown, Enter leaves URL unchanged and
+dialog open. Existing shared CommandPalette has a no-op onValueChange, with only
+pointer onClick dispatch. Fix the shared callback seam and remove duplicate pointer
+dispatch; validate both in the generated app. This is a small existing-component
+bug fix needed for the approved keyboard acceptance, not a copied gap component.
+
+S3 shared CommandPalette correction also covers caller-owned filtering, conditional
+empty rendering, reset on reopen and top offset in its existing CSS. L1 Combobox
+explicitly leaves filtering to callers; this block previously omitted that work.
+No API expansion. CSS budget measurement includes the changed offset bytes.
+
+S3 code review PASS. Final browser refresh already completed after mobile CSS;
+its receipt now records the verified source/emission SHA256 and byte count. The
+carrier generator is silent on success; S4 will retain explicit decoded-byte
+comparison and command receipts. Reconcile palette selection/filter/reset behavior
+with #2488 when merged, keeping equivalent upstream fixes if already present.
+
+S3 visual round1 FAIL: all page classes pass except command (7/7.5). Corrections
+remain in the existing shared palette: native Dialog.Close with visible Esc/Close,
+keyboard-help footer,16px SVG search and highlighted-row rule. No prop changes.
+Capture a real ArrowDown active state and prove visible-close behavior. Reuse the
+same Astra reviewer for round2; a second terminal visual failure ends the loop.

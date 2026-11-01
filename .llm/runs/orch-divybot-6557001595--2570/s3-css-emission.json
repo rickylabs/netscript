@@ -1,0 +1,25 @@
+{
+  "source": "packages/cli/src/kernel/assets/app/assets/workspace.css.template",
+  "sourceSha256": "95f9aa0496d5b9260cff68793b032695c91c7e346dd39e16f740e3f2479aa5b7",
+  "sourceBytes": 6230,
+  "canonicalization": "deno fmt --ext css - (same source formatter as init)",
+  "canonicalSha256": "14eaa3f789801be38b348f6f1395cec2fc6e2060ed017340255d09b4a0338c52",
+  "canonicalBytes": 6668,
+  "emitted": {
+    "review-empty": {
+      "path": ".llm/tmp/scaffold-2570/review-empty/apps/portal/assets/workspace.css",
+      "sha256": "14eaa3f789801be38b348f6f1395cec2fc6e2060ed017340255d09b4a0338c52",
+      "bytes": 6668
+    },
+    "review-service": {
+      "path": ".llm/tmp/scaffold-2570/review-service/apps/portal/assets/workspace.css",
+      "sha256": "14eaa3f789801be38b348f6f1395cec2fc6e2060ed017340255d09b4a0338c52",
+      "bytes": 6668
+    },
+    "review-plugins": {
+      "path": ".llm/tmp/scaffold-2570/review-plugins/apps/portal/assets/workspace.css",
+      "sha256": "14eaa3f789801be38b348f6f1395cec2fc6e2060ed017340255d09b4a0338c52",
+      "bytes": 6668
+    }
+  }
+}

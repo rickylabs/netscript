@@ -131,3 +131,60 @@ S2 terminal re-review PASS. Sign-off accepts documented workers dependency debt.
 Reconcile: 30 owning TypeScript/template files plus generated carrier and debt/run
 artifacts; five-file correction expansion was necessary for public resolver and
 safe post-init connection. deno.lock unchanged; #2488 remains open. S3 starts next.
+
+## S3 — visual refinement (in progress)
+
+Matched Utility header rhythm, right-aligned actions and restrained text statistics;
+added app-owned navigation glyphs through SidebarShell's existing icon slot. Fixed
+existing CommandPalette keyboard dispatch, query filtering, conditional empty state
+and reopen reset. Its CSS top offset is the only shared CSS change; budgets stay
+unchanged. Existing component tests now render through Preact, covering its hooks.
+
+Final proof uses clean workspace-empty/workspace-service/workspace-plugins generated
+from current carriers, with custom portal app and members service. Plugins installed
+through the actual CLI, and references set through config set. Previous final-* UI
+update fixtures are debugging evidence only (see memory-command-palette.md).
+The browser matrix asserts Studio Utility identity as well as scheme and overflow.
+
+Final S3 matrix PASS:72 routes × variant/width/scheme cases and12 interaction sets.
+This rerun includes the final mobile CSS. Clean fixture screenshots also prove
+strict Studio Utility identity, auth form presence and fetched service rows. The
+CSS-only final patch is copied from the exact template bytes; SHA256 per fixture
+is recorded in s3-css-emission.json. No component or runtime source was hand-edited
+in those fixtures. Independent Astra visual review is running separately.
+
+S3 code review PASS. Final browser refresh already completed after mobile CSS;
+its receipt now records the verified source/emission SHA256 and byte count. The
+carrier generator is silent on success; S4 will retain explicit decoded-byte
+comparison and command receipts. Reconcile palette selection/filter/reset behavior
+with #2488 when merged, keeping equivalent upstream fixes if already present.
+
+S3 visual round1 FAIL: all page classes pass except command (7/7.5). Corrections
+remain in the existing shared palette: native Dialog.Close with visible Esc/Close,
+keyboard-help footer,16px SVG search and highlighted-row rule. No prop changes.
+Capture a real ArrowDown active state and prove visible-close behavior. Reuse the
+same Astra reviewer for round2; a second terminal visual failure ends the loop.
+
+Palette correction native ui:add changed managed imports in debug workspace-*
+fixtures. Discarded those captures; final visual round2 uses freshly initialized
+review-empty/review-service/review-plugins, then actual plugin installation and
+config linking. No per-file source patching or registry update in these fixtures.
+The corrected palette is included by init's regenerated embedded carrier.
+
+Final review-* CSS emission is produced entirely by init, including its standard
+Deno formatter. s3-css-emission.json records both raw-template and canonical-output
+hashes/byte counts; all three actual files equal the canonical source. The browser
+receipt records both identities. Palette copied bytes match the decoded registry
+carrier (s3-carrier-comparison.json). Final page assertions now also require the
+shared SidebarShell grid CSS to be loaded, guarding against the debug update issue.
+
+PR metadata reconcile: issue2570 is assigned milestone0.0.9, so PR2572 now follows
+that same agreed release. Labels remain empty per the owner override. Draft is
+mergeable at d5f0c9a; no rebase or force push used.
+
+## S3 terminal sign-off
+
+Independent Claude code PASS and Astra round2 visual PASS. All96 refreshed images
+meet >=8 fidelity/quality; browser72 cases/12 interaction sets passed. Previous
+command-palette failure resolved. Reconciled current source, emitted CSS and both
+carriers with the reviewed evidence. Supervisor sign-off accepts S3; S4 may start.

@@ -18,10 +18,12 @@ signin form. After native config set enables plugin references, unavailable
 runtimes and empty no-samples AI are displayed truthfully. These are slice proofs,
 not final visual or merge acceptance.
 
-S3: refine visuals, capture all routes/variants/schemes/widths and keyboard selection,
-independent Astra review >=8 fidelity and quality per page. S4: full carrier chain,
-all check:* tasks, CLI/template tests, release/docs gates, JSR and full runtime
-(or explicit UNPROVEN), plus independent final IMPL-EVAL. No READY yet.
+S3 terminal PASS: independent Claude code sign-off and Astra visual round2 PASS.
+All 96 images reviewed; every page/state minimum fidelity and quality >=8/10.
+Clean review-* fixtures pass72 browser cases/12 interactions,0 page errors.
+Source/carrier hashes and actual emitted CSS agree. S4 final gates now authorized.
+Read visual-review.md and s3-code-terminal-review.md. Final independent IMPL-EVAL
+still required; no READY until required checks green or policy-skipped.
 
 Read plan.md B1–B6 plus drift.md. Preserve canonical service examples, reference
 order route and development design links. Current #2488 remains OPEN; merge main

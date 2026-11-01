@@ -1,0 +1,747 @@
+{
+  "outcome": "PASS",
+  "cases": [
+    {
+      "variant": "empty",
+      "route": "/",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-dashboard-1440-light.png",
+      "renderedText": "Skip to main content\nN\nreview-empty\nWORKSPACE\nOverview\nRecords\nSettings\nSign in\nRESOURCES\nExamples\nHealth\nDesign\nStudio Utility\nreview-empty\n/\nOverview\n\u2315\nSearch pages\u2026\nCtrl K\nOverview\n\nYour records and activity, in one place.\n\nView records\nOverview\nRecords\nSettings\nRECORDS\n\n\u2014\n\nNo connected record count\n\nPAGES\n\n14\n\nAvailable in this application\n\nWORKSPACE\n\nreview-empty\n\nportal\n\nTHEME\n\nStudio Utility\n\nLight and dark appearance\n\nRecent records\n\nThe latest records from your connected service.\n\nView all records \u2192\nRecords\nRECORD\tNAME\tSTATUS\tCREATED\n\n\nYour records will appear here\n\nAdd a service to start working with records.\n\nnetscript service add --name users --with-client\nNo connected data\nActivity\n\nUpdates from your workspace.\n\nActivity\n\nFollow changes as they happen.\n\nnetscript plugin install streams --name streams\nWorkspace capabilities\n\nAdd what your application needs.\n\nBackground work\n\nRun jobs outside the request.\n\nnetscript plugin install workers --name workers\n\nAI\n\nConnect models and tools to your workspace.\n\nnetscript plugin install ai --name ai\nDesign reference\nComposition guide"
+    },
+    {
+      "variant": "empty",
+      "route": "/dashboard",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-dashboard-alias-1440-light.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/records",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-records-1440-light.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/records/1",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-detail-1440-light.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/settings",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-settings-1440-light.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/sign-in",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-sign-in-1440-light.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-dashboard-1440-dark.png",
+      "renderedText": "Skip to main content\nN\nreview-empty\nWORKSPACE\nOverview\nRecords\nSettings\nSign in\nRESOURCES\nExamples\nHealth\nDesign\nStudio Utility\nreview-empty\n/\nOverview\n\u2315\nSearch pages\u2026\nCtrl K\nOverview\n\nYour records and activity, in one place.\n\nView records\nOverview\nRecords\nSettings\nRECORDS\n\n\u2014\n\nNo connected record count\n\nPAGES\n\n14\n\nAvailable in this application\n\nWORKSPACE\n\nreview-empty\n\nportal\n\nTHEME\n\nStudio Utility\n\nLight and dark appearance\n\nRecent records\n\nThe latest records from your connected service.\n\nView all records \u2192\nRecords\nRECORD\tNAME\tSTATUS\tCREATED\n\n\nYour records will appear here\n\nAdd a service to start working with records.\n\nnetscript service add --name users --with-client\nNo connected data\nActivity\n\nUpdates from your workspace.\n\nActivity\n\nFollow changes as they happen.\n\nnetscript plugin install streams --name streams\nWorkspace capabilities\n\nAdd what your application needs.\n\nBackground work\n\nRun jobs outside the request.\n\nnetscript plugin install workers --name workers\n\nAI\n\nConnect models and tools to your workspace.\n\nnetscript plugin install ai --name ai\nDesign reference\nComposition guide"
+    },
+    {
+      "variant": "empty",
+      "route": "/dashboard",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-dashboard-alias-1440-dark.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/records",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-records-1440-dark.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/records/1",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-detail-1440-dark.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/settings",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-settings-1440-dark.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/sign-in",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-sign-in-1440-dark.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-dashboard-390-light.png",
+      "renderedText": "Skip to main content\nN\nreview-empty\nWORKSPACE\nOverview\nRecords\nSettings\nSign in\nRESOURCES\nExamples\nHealth\nDesign\nStudio Utility\n\u2630\nreview-empty\n/\nOverview\n\u2315\nOverview\n\nYour records and activity, in one place.\n\nView records\nOverview\nRecords\nSettings\nRECORDS\n\n\u2014\n\nNo connected record count\n\nPAGES\n\n14\n\nAvailable in this application\n\nWORKSPACE\n\nreview-empty\n\nportal\n\nTHEME\n\nStudio Utility\n\nLight and dark appearance\n\nRecent records\n\nThe latest records from your connected service.\n\nView all records \u2192\nRecords\n\nYour records will appear here\n\nAdd a service to start working with records.\n\nnetscript service add --name users --with-client\nNo connected data\nActivity\n\nUpdates from your workspace.\n\nActivity\n\nFollow changes as they happen.\n\nnetscript plugin install streams --name streams\nWorkspace capabilities\n\nAdd what your application needs.\n\nBackground work\n\nRun jobs outside the request.\n\nnetscript plugin install workers --name workers\n\nAI\n\nConnect models and tools to your workspace.\n\nnetscript plugin install ai --name ai\nDesign reference\nComposition guide"
+    },
+    {
+      "variant": "empty",
+      "route": "/dashboard",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-dashboard-alias-390-light.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/records",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-records-390-light.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/records/1",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-detail-390-light.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/settings",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-settings-390-light.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/sign-in",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-sign-in-390-light.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-dashboard-390-dark.png",
+      "renderedText": "Skip to main content\nN\nreview-empty\nWORKSPACE\nOverview\nRecords\nSettings\nSign in\nRESOURCES\nExamples\nHealth\nDesign\nStudio Utility\n\u2630\nreview-empty\n/\nOverview\n\u2315\nOverview\n\nYour records and activity, in one place.\n\nView records\nOverview\nRecords\nSettings\nRECORDS\n\n\u2014\n\nNo connected record count\n\nPAGES\n\n14\n\nAvailable in this application\n\nWORKSPACE\n\nreview-empty\n\nportal\n\nTHEME\n\nStudio Utility\n\nLight and dark appearance\n\nRecent records\n\nThe latest records from your connected service.\n\nView all records \u2192\nRecords\n\nYour records will appear here\n\nAdd a service to start working with records.\n\nnetscript service add --name users --with-client\nNo connected data\nActivity\n\nUpdates from your workspace.\n\nActivity\n\nFollow changes as they happen.\n\nnetscript plugin install streams --name streams\nWorkspace capabilities\n\nAdd what your application needs.\n\nBackground work\n\nRun jobs outside the request.\n\nnetscript plugin install workers --name workers\n\nAI\n\nConnect models and tools to your workspace.\n\nnetscript plugin install ai --name ai\nDesign reference\nComposition guide"
+    },
+    {
+      "variant": "empty",
+      "route": "/dashboard",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-dashboard-alias-390-dark.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/records",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-records-390-dark.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/records/1",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-detail-390-dark.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/settings",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-settings-390-dark.png"
+    },
+    {
+      "variant": "empty",
+      "route": "/sign-in",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/empty-sign-in-390-dark.png"
+    },
+    {
+      "variant": "service",
+      "route": "/",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-dashboard-1440-light.png",
+      "renderedText": "Skip to main content\nN\nreview-service\nWORKSPACE\nOverview\nRecords\nSettings\nSign in\nRESOURCES\nExamples\nHealth\nDesign\nStudio Utility\nreview-service\n/\nOverview\n\u2315\nSearch pages\u2026\nCtrl K\nOverview\n\nYour records and activity, in one place.\n\nView records\nOverview\nRecords 3\nSettings\nRECORDS\n\n3\n\nFrom your service\n\nPAGES\n\n18\n\nAvailable in this application\n\nWORKSPACE\n\nreview-service\n\nportal\n\nTHEME\n\nStudio Utility\n\nLight and dark appearance\n\nRecent records\n\nThe latest records from your connected service.\n\nView all records \u2192\nRecords\nRECORD\tNAME\tSTATUS\tCREATED\n1\t\nLaunch checklist\nTracks the first release milestones for the scaffolded service.\n\t\nactive\n\tApr 21, 2026\n2\t\nIntegration handshake\nVerifies the frontend route can hydrate from the generated service.\n\t\ndraft\n\tApr 20, 2026\n3\t\nTelemetry follow-up\nReserved for the later rollout step that wires end-to-end tracing.\n\t\narchived\n\tApr 19, 2026\n3 records\nActivity\n\nUpdates from your workspace.\n\nActivity\n\nFollow changes as they happen.\n\nnetscript plugin install streams --name streams\nWorkspace capabilities\n\nAdd what your application needs.\n\nBackground work\n\nRun jobs outside the request.\n\nnetscript plugin install workers --name workers\n\nAI\n\nConnect models and tools to your workspace.\n\nnetscript plugin install ai --name ai\nDesign reference\nComposition guide"
+    },
+    {
+      "variant": "service",
+      "route": "/dashboard",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-dashboard-alias-1440-light.png"
+    },
+    {
+      "variant": "service",
+      "route": "/records",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-records-1440-light.png"
+    },
+    {
+      "variant": "service",
+      "route": "/records/1",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-detail-1440-light.png"
+    },
+    {
+      "variant": "service",
+      "route": "/settings",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-settings-1440-light.png"
+    },
+    {
+      "variant": "service",
+      "route": "/sign-in",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-sign-in-1440-light.png"
+    },
+    {
+      "variant": "service",
+      "route": "/",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-dashboard-1440-dark.png",
+      "renderedText": "Skip to main content\nN\nreview-service\nWORKSPACE\nOverview\nRecords\nSettings\nSign in\nRESOURCES\nExamples\nHealth\nDesign\nStudio Utility\nreview-service\n/\nOverview\n\u2315\nSearch pages\u2026\nCtrl K\nOverview\n\nYour records and activity, in one place.\n\nView records\nOverview\nRecords 3\nSettings\nRECORDS\n\n3\n\nFrom your service\n\nPAGES\n\n18\n\nAvailable in this application\n\nWORKSPACE\n\nreview-service\n\nportal\n\nTHEME\n\nStudio Utility\n\nLight and dark appearance\n\nRecent records\n\nThe latest records from your connected service.\n\nView all records \u2192\nRecords\nRECORD\tNAME\tSTATUS\tCREATED\n1\t\nLaunch checklist\nTracks the first release milestones for the scaffolded service.\n\t\nactive\n\tApr 21, 2026\n2\t\nIntegration handshake\nVerifies the frontend route can hydrate from the generated service.\n\t\ndraft\n\tApr 20, 2026\n3\t\nTelemetry follow-up\nReserved for the later rollout step that wires end-to-end tracing.\n\t\narchived\n\tApr 19, 2026\n3 records\nActivity\n\nUpdates from your workspace.\n\nActivity\n\nFollow changes as they happen.\n\nnetscript plugin install streams --name streams\nWorkspace capabilities\n\nAdd what your application needs.\n\nBackground work\n\nRun jobs outside the request.\n\nnetscript plugin install workers --name workers\n\nAI\n\nConnect models and tools to your workspace.\n\nnetscript plugin install ai --name ai\nDesign reference\nComposition guide"
+    },
+    {
+      "variant": "service",
+      "route": "/dashboard",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-dashboard-alias-1440-dark.png"
+    },
+    {
+      "variant": "service",
+      "route": "/records",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-records-1440-dark.png"
+    },
+    {
+      "variant": "service",
+      "route": "/records/1",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-detail-1440-dark.png"
+    },
+    {
+      "variant": "service",
+      "route": "/settings",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-settings-1440-dark.png"
+    },
+    {
+      "variant": "service",
+      "route": "/sign-in",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-sign-in-1440-dark.png"
+    },
+    {
+      "variant": "service",
+      "route": "/",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-dashboard-390-light.png",
+      "renderedText": "Skip to main content\nN\nreview-service\nWORKSPACE\nOverview\nRecords\nSettings\nSign in\nRESOURCES\nExamples\nHealth\nDesign\nStudio Utility\n\u2630\nreview-service\n/\nOverview\n\u2315\nOverview\n\nYour records and activity, in one place.\n\nView records\nOverview\nRecords 3\nSettings\nRECORDS\n\n3\n\nFrom your service\n\nPAGES\n\n18\n\nAvailable in this application\n\nWORKSPACE\n\nreview-service\n\nportal\n\nTHEME\n\nStudio Utility\n\nLight and dark appearance\n\nRecent records\n\nThe latest records from your connected service.\n\nView all records \u2192\nRecords\n1\nLaunch checklist\nTracks the first release milestones for the scaffolded service.\nactive\nApr 21, 2026\n2\nIntegration handshake\nVerifies the frontend route can hydrate from the generated service.\ndraft\nApr 20, 2026\n3\nTelemetry follow-up\nReserved for the later rollout step that wires end-to-end tracing.\narchived\nApr 19, 2026\n3 records\nActivity\n\nUpdates from your workspace.\n\nActivity\n\nFollow changes as they happen.\n\nnetscript plugin install streams --name streams\nWorkspace capabilities\n\nAdd what your application needs.\n\nBackground work\n\nRun jobs outside the request.\n\nnetscript plugin install workers --name workers\n\nAI\n\nConnect models and tools to your workspace.\n\nnetscript plugin install ai --name ai\nDesign reference\nComposition guide"
+    },
+    {
+      "variant": "service",
+      "route": "/dashboard",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-dashboard-alias-390-light.png"
+    },
+    {
+      "variant": "service",
+      "route": "/records",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-records-390-light.png"
+    },
+    {
+      "variant": "service",
+      "route": "/records/1",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-detail-390-light.png"
+    },
+    {
+      "variant": "service",
+      "route": "/settings",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-settings-390-light.png"
+    },
+    {
+      "variant": "service",
+      "route": "/sign-in",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-sign-in-390-light.png"
+    },
+    {
+      "variant": "service",
+      "route": "/",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-dashboard-390-dark.png",
+      "renderedText": "Skip to main content\nN\nreview-service\nWORKSPACE\nOverview\nRecords\nSettings\nSign in\nRESOURCES\nExamples\nHealth\nDesign\nStudio Utility\n\u2630\nreview-service\n/\nOverview\n\u2315\nOverview\n\nYour records and activity, in one place.\n\nView records\nOverview\nRecords 3\nSettings\nRECORDS\n\n3\n\nFrom your service\n\nPAGES\n\n18\n\nAvailable in this application\n\nWORKSPACE\n\nreview-service\n\nportal\n\nTHEME\n\nStudio Utility\n\nLight and dark appearance\n\nRecent records\n\nThe latest records from your connected service.\n\nView all records \u2192\nRecords\n1\nLaunch checklist\nTracks the first release milestones for the scaffolded service.\nactive\nApr 21, 2026\n2\nIntegration handshake\nVerifies the frontend route can hydrate from the generated service.\ndraft\nApr 20, 2026\n3\nTelemetry follow-up\nReserved for the later rollout step that wires end-to-end tracing.\narchived\nApr 19, 2026\n3 records\nActivity\n\nUpdates from your workspace.\n\nActivity\n\nFollow changes as they happen.\n\nnetscript plugin install streams --name streams\nWorkspace capabilities\n\nAdd what your application needs.\n\nBackground work\n\nRun jobs outside the request.\n\nnetscript plugin install workers --name workers\n\nAI\n\nConnect models and tools to your workspace.\n\nnetscript plugin install ai --name ai\nDesign reference\nComposition guide"
+    },
+    {
+      "variant": "service",
+      "route": "/dashboard",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-dashboard-alias-390-dark.png"
+    },
+    {
+      "variant": "service",
+      "route": "/records",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-records-390-dark.png"
+    },
+    {
+      "variant": "service",
+      "route": "/records/1",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-detail-390-dark.png"
+    },
+    {
+      "variant": "service",
+      "route": "/settings",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-settings-390-dark.png"
+    },
+    {
+      "variant": "service",
+      "route": "/sign-in",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/service-sign-in-390-dark.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-dashboard-1440-light.png",
+      "renderedText": "Skip to main content\nN\nreview-plugins\nWORKSPACE\nOverview\nRecords\nSettings\nSign in\nRESOURCES\nExamples\nHealth\nDesign\nStudio Utility\nreview-plugins\n/\nOverview\n\u2315\nSearch pages\u2026\nCtrl K\nOverview\n\nYour records and activity, in one place.\n\nView records\nOverview\nRecords\nSettings\nRECORDS\n\n\u2014\n\nNo connected record count\n\nPAGES\n\n15\n\nAvailable in this application\n\nWORKSPACE\n\nreview-plugins\n\nportal\n\nTHEME\n\nStudio Utility\n\nLight and dark appearance\n\nRecent records\n\nThe latest records from your connected service.\n\nView all records \u2192\nRecords\nRECORD\tNAME\tSTATUS\tCREATED\n\n\nYour records will appear here\n\nAdd a service to start working with records.\n\nnetscript service add --name users --with-client\nNo connected data\nActivity\n\nUpdates from your workspace.\n\nActivity\n\nThe service is unavailable. Start it and try again.\n\nnetscript plugin doctor\nWorkspace capabilities\n\nAdd what your application needs.\n\nBackground work\n\nThe service is unavailable. Start it and try again.\n\nnetscript plugin doctor\nAI\nNo entries\n\nModel references configured. No chat runtime is connected.\n\nchat\nanthropic:claude-sonnet-5-5\nfast\nanthropic:claude-haiku-4-5\nnetscript plugin info @netscript/plugin-ai\nDesign reference\nComposition guide"
+    },
+    {
+      "variant": "plugins",
+      "route": "/dashboard",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-dashboard-alias-1440-light.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/records",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-records-1440-light.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/records/1",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-detail-1440-light.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/settings",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-settings-1440-light.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/sign-in",
+      "width": 1440,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-sign-in-1440-light.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-dashboard-1440-dark.png",
+      "renderedText": "Skip to main content\nN\nreview-plugins\nWORKSPACE\nOverview\nRecords\nSettings\nSign in\nRESOURCES\nExamples\nHealth\nDesign\nStudio Utility\nreview-plugins\n/\nOverview\n\u2315\nSearch pages\u2026\nCtrl K\nOverview\n\nYour records and activity, in one place.\n\nView records\nOverview\nRecords\nSettings\nRECORDS\n\n\u2014\n\nNo connected record count\n\nPAGES\n\n15\n\nAvailable in this application\n\nWORKSPACE\n\nreview-plugins\n\nportal\n\nTHEME\n\nStudio Utility\n\nLight and dark appearance\n\nRecent records\n\nThe latest records from your connected service.\n\nView all records \u2192\nRecords\nRECORD\tNAME\tSTATUS\tCREATED\n\n\nYour records will appear here\n\nAdd a service to start working with records.\n\nnetscript service add --name users --with-client\nNo connected data\nActivity\n\nUpdates from your workspace.\n\nActivity\n\nThe service is unavailable. Start it and try again.\n\nnetscript plugin doctor\nWorkspace capabilities\n\nAdd what your application needs.\n\nBackground work\n\nThe service is unavailable. Start it and try again.\n\nnetscript plugin doctor\nAI\nNo entries\n\nModel references configured. No chat runtime is connected.\n\nchat\nanthropic:claude-sonnet-5-5\nfast\nanthropic:claude-haiku-4-5\nnetscript plugin info @netscript/plugin-ai\nDesign reference\nComposition guide"
+    },
+    {
+      "variant": "plugins",
+      "route": "/dashboard",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-dashboard-alias-1440-dark.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/records",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-records-1440-dark.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/records/1",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-detail-1440-dark.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/settings",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-settings-1440-dark.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/sign-in",
+      "width": 1440,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-sign-in-1440-dark.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-dashboard-390-light.png",
+      "renderedText": "Skip to main content\nN\nreview-plugins\nWORKSPACE\nOverview\nRecords\nSettings\nSign in\nRESOURCES\nExamples\nHealth\nDesign\nStudio Utility\n\u2630\nreview-plugins\n/\nOverview\n\u2315\nOverview\n\nYour records and activity, in one place.\n\nView records\nOverview\nRecords\nSettings\nRECORDS\n\n\u2014\n\nNo connected record count\n\nPAGES\n\n15\n\nAvailable in this application\n\nWORKSPACE\n\nreview-plugins\n\nportal\n\nTHEME\n\nStudio Utility\n\nLight and dark appearance\n\nRecent records\n\nThe latest records from your connected service.\n\nView all records \u2192\nRecords\n\nYour records will appear here\n\nAdd a service to start working with records.\n\nnetscript service add --name users --with-client\nNo connected data\nActivity\n\nUpdates from your workspace.\n\nActivity\n\nThe service is unavailable. Start it and try again.\n\nnetscript plugin doctor\nWorkspace capabilities\n\nAdd what your application needs.\n\nBackground work\n\nThe service is unavailable. Start it and try again.\n\nnetscript plugin doctor\nAI\nNo entries\n\nModel references configured. No chat runtime is connected.\n\nchat\nanthropic:claude-sonnet-5-5\nfast\nanthropic:claude-haiku-4-5\nnetscript plugin info @netscript/plugin-ai\nDesign reference\nComposition guide"
+    },
+    {
+      "variant": "plugins",
+      "route": "/dashboard",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-dashboard-alias-390-light.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/records",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-records-390-light.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/records/1",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-detail-390-light.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/settings",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-settings-390-light.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/sign-in",
+      "width": 390,
+      "scheme": "light",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-sign-in-390-light.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-dashboard-390-dark.png",
+      "renderedText": "Skip to main content\nN\nreview-plugins\nWORKSPACE\nOverview\nRecords\nSettings\nSign in\nRESOURCES\nExamples\nHealth\nDesign\nStudio Utility\n\u2630\nreview-plugins\n/\nOverview\n\u2315\nOverview\n\nYour records and activity, in one place.\n\nView records\nOverview\nRecords\nSettings\nRECORDS\n\n\u2014\n\nNo connected record count\n\nPAGES\n\n15\n\nAvailable in this application\n\nWORKSPACE\n\nreview-plugins\n\nportal\n\nTHEME\n\nStudio Utility\n\nLight and dark appearance\n\nRecent records\n\nThe latest records from your connected service.\n\nView all records \u2192\nRecords\n\nYour records will appear here\n\nAdd a service to start working with records.\n\nnetscript service add --name users --with-client\nNo connected data\nActivity\n\nUpdates from your workspace.\n\nActivity\n\nThe service is unavailable. Start it and try again.\n\nnetscript plugin doctor\nWorkspace capabilities\n\nAdd what your application needs.\n\nBackground work\n\nThe service is unavailable. Start it and try again.\n\nnetscript plugin doctor\nAI\nNo entries\n\nModel references configured. No chat runtime is connected.\n\nchat\nanthropic:claude-sonnet-5-5\nfast\nanthropic:claude-haiku-4-5\nnetscript plugin info @netscript/plugin-ai\nDesign reference\nComposition guide"
+    },
+    {
+      "variant": "plugins",
+      "route": "/dashboard",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-dashboard-alias-390-dark.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/records",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-records-390-dark.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/records/1",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-detail-390-dark.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/settings",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-settings-390-dark.png"
+    },
+    {
+      "variant": "plugins",
+      "route": "/sign-in",
+      "width": 390,
+      "scheme": "dark",
+      "status": 200,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/plugins-sign-in-390-dark.png"
+    }
+  ],
+  "interactions": [
+    {
+      "variant": "empty",
+      "width": 1440,
+      "scheme": "light",
+      "saveReloadDiscard": true,
+      "keyboardSelect": true,
+      "pointerSelect": true,
+      "escapeFocusReturn": true,
+      "visibleClose": true
+    },
+    {
+      "variant": "empty",
+      "width": 1440,
+      "scheme": "dark",
+      "saveReloadDiscard": true,
+      "keyboardSelect": true,
+      "pointerSelect": true,
+      "escapeFocusReturn": true,
+      "visibleClose": true
+    },
+    {
+      "variant": "empty",
+      "width": 390,
+      "scheme": "light",
+      "saveReloadDiscard": true,
+      "keyboardSelect": true,
+      "pointerSelect": true,
+      "escapeFocusReturn": true,
+      "visibleClose": true
+    },
+    {
+      "variant": "empty",
+      "width": 390,
+      "scheme": "dark",
+      "saveReloadDiscard": true,
+      "keyboardSelect": true,
+      "pointerSelect": true,
+      "escapeFocusReturn": true,
+      "visibleClose": true
+    },
+    {
+      "variant": "service",
+      "width": 1440,
+      "scheme": "light",
+      "saveReloadDiscard": true,
+      "keyboardSelect": true,
+      "pointerSelect": true,
+      "escapeFocusReturn": true,
+      "visibleClose": true
+    },
+    {
+      "variant": "service",
+      "width": 1440,
+      "scheme": "dark",
+      "saveReloadDiscard": true,
+      "keyboardSelect": true,
+      "pointerSelect": true,
+      "escapeFocusReturn": true,
+      "visibleClose": true
+    },
+    {
+      "variant": "service",
+      "width": 390,
+      "scheme": "light",
+      "saveReloadDiscard": true,
+      "keyboardSelect": true,
+      "pointerSelect": true,
+      "escapeFocusReturn": true,
+      "visibleClose": true
+    },
+    {
+      "variant": "service",
+      "width": 390,
+      "scheme": "dark",
+      "saveReloadDiscard": true,
+      "keyboardSelect": true,
+      "pointerSelect": true,
+      "escapeFocusReturn": true,
+      "visibleClose": true
+    },
+    {
+      "variant": "plugins",
+      "width": 1440,
+      "scheme": "light",
+      "saveReloadDiscard": true,
+      "keyboardSelect": true,
+      "pointerSelect": true,
+      "escapeFocusReturn": true,
+      "visibleClose": true
+    },
+    {
+      "variant": "plugins",
+      "width": 1440,
+      "scheme": "dark",
+      "saveReloadDiscard": true,
+      "keyboardSelect": true,
+      "pointerSelect": true,
+      "escapeFocusReturn": true,
+      "visibleClose": true
+    },
+    {
+      "variant": "plugins",
+      "width": 390,
+      "scheme": "light",
+      "saveReloadDiscard": true,
+      "keyboardSelect": true,
+      "pointerSelect": true,
+      "escapeFocusReturn": true,
+      "visibleClose": true
+    },
+    {
+      "variant": "plugins",
+      "width": 390,
+      "scheme": "dark",
+      "saveReloadDiscard": true,
+      "keyboardSelect": true,
+      "pointerSelect": true,
+      "escapeFocusReturn": true,
+      "visibleClose": true
+    }
+  ],
+  "errors": [],
+  "cssEvidence": {
+    "sourceSha256": "95f9aa0496d5b9260cff68793b032695c91c7e346dd39e16f740e3f2479aa5b7",
+    "sourceBytes": 6230,
+    "canonicalSha256": "14eaa3f789801be38b348f6f1395cec2fc6e2060ed017340255d09b4a0338c52",
+    "canonicalBytes": 6668
+  },
+  "paletteCssEvidence": {
+    "source": "packages/fresh-ui/registry/components/ui/command-palette.css",
+    "sourceSha256": "d45b56f36088bbfb13fc7bb3ac3c2600c3aff71a78eb329d0b2275ec39ad68e0",
+    "sourceBytes": 6940,
+    "canonicalSha256": "b9e733ed97a1a80452efa824352bd5ca08c21978ee899ca0cd6b8a1c032e7cc6",
+    "canonicalBytes": 6968,
+    "emitted": {
+      "review-empty": {
+        "path": ".llm/tmp/scaffold-2570/review-empty/apps/portal/assets/ui/command-palette.css",
+        "sha256": "b9e733ed97a1a80452efa824352bd5ca08c21978ee899ca0cd6b8a1c032e7cc6",
+        "bytes": 6968
+      },
+      "review-service": {
+        "path": ".llm/tmp/scaffold-2570/review-service/apps/portal/assets/ui/command-palette.css",
+        "sha256": "b9e733ed97a1a80452efa824352bd5ca08c21978ee899ca0cd6b8a1c032e7cc6",
+        "bytes": 6968
+      },
+      "review-plugins": {
+        "path": ".llm/tmp/scaffold-2570/review-plugins/apps/portal/assets/ui/command-palette.css",
+        "sha256": "b9e733ed97a1a80452efa824352bd5ca08c21978ee899ca0cd6b8a1c032e7cc6",
+        "bytes": 6968
+      }
+    },
+    "recorded": "Measured during final capture; source and emitted files unchanged throughout run."
+  }
+}

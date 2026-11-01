@@ -1,5 +1,8 @@
 /* App-owned page composition; registry components retain their shipped contracts. */
 .workspace-page { display: grid; gap: 24px; min-width: 0; }
+:root[data-theme] .workspace-heading[data-scope='page-header'][data-part='root'] { padding-block: 0; }
+.workspace-heading [data-part='intro'] { gap: 0; }
+.workspace-heading [data-part='actions'] { justify-content: flex-end; }
 .workspace-heading h1 { margin: 0; font-size: var(--ns-text-title, 46px); line-height: 1.12; font-weight: 500; letter-spacing: -0.045em; }
 .workspace-heading p, .workspace-section-heading p, .workspace-form-section > p, .workspace-auth p { color: var(--ns-muted-fg); margin: 8px 0 0; font-size: var(--ns-text-body, 14px); }
 .workspace-heading [data-part='layout'] { align-items: end; }
@@ -12,14 +15,15 @@
 .workspace-tabs a { padding: 0 8px 6px; color: var(--ns-muted-fg); white-space: nowrap; }
 .workspace-tabs a[aria-current] { color: var(--ns-fg); border-bottom: 2px solid currentColor; }
 .workspace-tabs span { margin-inline-start: 6px; font: 11px var(--ns-font-mono); }
-.workspace-stats { margin-bottom: 8px; }
-.workspace-stat-text [data-part='value'] { font-size: 26px; overflow-wrap: anywhere; }
+.workspace-stats { --ns-component-card-padding: 16px 0; }
+.workspace-stat-text { --ns-text-kpi: 26px; --ns-leading-kpi: 1.5; }
+.workspace-stat-text [data-part='value'] { overflow-wrap: anywhere; }
 .workspace-overview-grid { display: grid; grid-template-columns: minmax(0, 2.3fr) minmax(240px, 1fr); gap: 24px; }
 .workspace-section { min-width: 0; border-top: 1px solid var(--ns-border); }
 .workspace-section-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; padding: 16px 0; }
 .workspace-section-heading h2, .workspace-form-section h2, .workspace-auth h1, .workspace-auth h2 { margin: 0; font-size: 15px; font-weight: 500; letter-spacing: -0.02em; }
 .workspace-section-heading a { font-size: 13px; white-space: nowrap; color: var(--ns-muted-fg); }
-.workspace-empty { display: grid; justify-items: center; align-content: center; text-align: center; min-height: 180px; padding: 28px 16px; }
+.workspace-empty { display: grid; justify-items: center; align-content: center; text-align: center; min-height: 148px; padding: 24px 16px; }
 .workspace-empty p { color: var(--ns-muted-fg); max-width: 360px; margin: 0 auto 12px; }
 .workspace-command { display: block; width: fit-content; max-width: 100%; margin: 12px auto 0; padding: 6px 8px; border: 1px solid var(--ns-border); background: var(--ns-muted); color: var(--ns-fg); font: 11px/1.7 var(--ns-font-mono); overflow-wrap: anywhere; text-align: left; }
 .workspace-capabilities { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
@@ -37,7 +41,7 @@
 .workspace-form-section > p { margin: -10px 0 0; }
 .workspace-auth { min-height: 100vh; padding: 24px 32px; }
 .workspace-auth-top { display: flex; justify-content: space-between; align-items: center; }
-.workspace-auth-columns { max-width: 1088px; margin: 100px auto; display: grid; grid-template-columns: 384px minmax(0, 1fr); align-items: center; gap: 48px; }
+.workspace-auth-columns { max-width: 1088px; margin: 75px auto; display: grid; grid-template-columns: 400px minmax(0, 1fr); align-items: center; gap: 48px; }
 .workspace-auth-panel, .workspace-auth-setup { border-top: 1px solid var(--ns-border); padding: 20px 16px; }
 .workspace-auth-panel form { display: grid; gap: 24px; padding-block: 24px; }
 .workspace-auth-panel footer { border-top: 1px solid var(--ns-border); margin-top: 24px; padding-top: 24px; font-size: 13px; }
@@ -48,7 +52,9 @@
 .workspace-muted { color: var(--ns-muted-fg); }
 @media (max-width: 1000px) { .workspace-settings-layout { grid-template-columns: 140px minmax(0, 1fr); gap: 24px; } .workspace-overview-grid { grid-template-columns: 1fr; } }
 @media (max-width: 640px) {
-  .workspace-heading h1 { font-size: 36px; }
+  .workspace-heading { --ns-text-title: 36px; }
+  .workspace-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); --ns-kpi-gap: 16px; }
+  .workspace-stat-text { --ns-text-kpi: 20px; }
   .workspace-heading [data-part='layout'] { align-items: start; }
   .workspace-form-columns, .workspace-capabilities, .workspace-settings-layout, .workspace-auth-columns { grid-template-columns: 1fr; }
   .workspace-settings-nav { flex-direction: row; flex-wrap: wrap; }

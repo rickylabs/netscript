@@ -42,3 +42,23 @@ exactly unchanged scaffold records placeholder; authored files remain untouched.
 This completes B2's safe template-owned client selection, not arbitrary inspection.
 
 S2 correction extends the declared resolver surface to public/adapters/jsr-import-resolver.ts and maintainer/adapters/local-import-resolver.ts: public service-add fixture exposed missing direct-import entries. Both use existing release constants; version parity now exercises the actual public resolver.
+
+S3 allows a minimal correction in the existing Fresh UI CommandPalette component
+and its generated registry carrier: browser proof found keyboard Enter selects no
+command because onValueChange is a no-op. Reuse the existing callback contract;
+no new component or #2488 fork. App CSS/nav composition remains the design surface.
+
+S3 shared CommandPalette correction also covers caller-owned filtering, conditional
+empty rendering, reset on reopen and top offset in its existing CSS. L1 Combobox
+explicitly leaves filtering to callers; this block previously omitted that work.
+No API expansion. CSS budget measurement includes the changed offset bytes.
+The existing palette render tests in packages/fresh-ui/tests/registry/components/ui/
+command-palette.test.tsx are included in S3: hooks require a real Preact render.
+
+S3 visual round1 FAIL: all page classes pass except command (7/7.5). Corrections
+remain in the existing shared palette: native Dialog.Close with visible Esc/Close,
+keyboard-help footer,16px SVG search and highlighted-row rule. No prop changes.
+Capture a real ArrowDown active state and prove visible-close behavior. Reuse the
+same Astra reviewer for round2; a second terminal visual failure ends the loop.
+
+S3 terminal: independent code and visual PASS, accepted for sign-off.

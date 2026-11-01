@@ -8,6 +8,19 @@ import { appRoutes } from '@app/router.ts';
 import { appTheme } from '@app/lib/theme.ts';
 import { define } from '@app/utils.ts';
 
+const navIcons: Readonly<Record<string, string>> = {
+  Overview: 'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',
+  Records: 'M6 3h9l3 3v15H6z M9 10h6 M9 14h6 M9 18h4',
+  Settings: 'M4 6h16 M4 12h16 M4 18h16 M8 3v6 M16 9v6 M10 15v6',
+  'Sign in': 'M14 4h6v16h-6 M3 12h12 M10 7l5 5-5 5',
+  Examples: 'M8 6l-6 6 6 6 M16 6l6 6-6 6 M14 3l-4 18',
+  Health: 'M2 12h5l3-8 4 16 3-8h5',
+  Design: 'M3 3h18v18H3z M3 9h18 M9 9v12',
+};
+function navIcon(label: string) {
+  return <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d={navIcons[label] ?? navIcons.Records} /></svg>;
+}
+
 /** One shared shell for every workspace page; full-screen references and sign-in opt out. */
 export default define.layout(function RootLayout({ Component, url }) {
   if (!rendersAppChrome(url.pathname)) return <Partial name='page'><Component /></Partial>;
@@ -15,8 +28,8 @@ export default define.layout(function RootLayout({ Component, url }) {
   const current = navigation.find((item) => isCurrentNavigation(item, url.pathname))?.label ?? 'Overview';
   return <Partial name='page'><SidebarShell pathname={url.pathname} contentId='workspace-content'
     navigation={[
-      { label: 'Workspace', items: navigation.slice(0, 4).map((item) => ({ ...item, matchPrefix: item.match === 'prefix', isActive: (pathname: string) => isCurrentNavigation(item, pathname) || (item.label === 'Overview' && pathname === '/') })) },
-      { label: 'Resources', items: navigation.slice(4).map((item) => ({ ...item, matchPrefix: item.match === 'prefix' })) },
+      { label: 'Workspace', items: navigation.slice(0, 4).map((item) => ({ ...item, icon: navIcon(item.label), matchPrefix: item.match === 'prefix', isActive: (pathname: string) => isCurrentNavigation(item, pathname) || (item.label === 'Overview' && pathname === '/') })) },
+      { label: 'Resources', items: navigation.slice(4).map((item) => ({ ...item, icon: navIcon(item.label), matchPrefix: item.match === 'prefix' })) },
     ]}
     brand={<a class='workspace-brand' href={appRoutes.home.href()}><span class='workspace-mark' aria-hidden='true'>N</span>{{name}}</a>}
     topbarStart={<><SidebarToggle /><Breadcrumb items={[{ label: '{{name}}', href: appRoutes.home.href() }, { label: current }]} /></>}

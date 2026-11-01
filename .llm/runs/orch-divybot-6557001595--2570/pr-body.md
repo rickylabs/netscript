@@ -2,7 +2,7 @@
 
 Replace the default scaffold's placeholder pages with the Figma Utility dashboard, records, settings, sign-in and command-palette compositions. Features must use generated capabilities or show designed empty states with the exact add command.
 
-**Implementation in progress.** PLAN-EVAL passed. S1 shell and absent-capability pages are implemented and independently reviewed. S2 live wiring, visual evaluation and full gates remain; do not merge.
+**Implementation in progress.** PLAN-EVAL passed. S1 shell and S2 typed capability wiring are implemented and independently reviewed. Visual evaluation and full gates remain; do not merge.
 
 ## Scope
 
@@ -15,13 +15,13 @@ Replace the default scaffold's placeholder pages with the Figma Utility dashboar
 
 - [x] Research, screen mapping, design checkpoint and plan.
 - [x] Shell and absent-capability pages.
-- [ ] Live service, auth and plugin capability wiring.
+- [x] Live service, auth and plugin capability wiring.
 - [ ] Desktop/mobile, light/dark renders and independent visual audit.
 - [ ] Generated carriers, required checks and independent implementation evaluation.
 
 ## Validation
 
-Deno 2.9.7: 11 focused tests, generated app check (47 files), scoped lint/format, quality gate and CSS budget test pass. Browser matrix passes 16 no-service page/width/scheme cases plus settings persistence and palette dismissal/focus return. Broader required gates, live variants and independent visual/final implementation evaluations remain unproven.
+Deno 2.9.7: 90 focused tests, generated memory/database/plugin apps plus post-init app check (101 files), scoped lint/format, quality gate and CSS budget test pass. Browser matrix passes 16 no-service page/width/scheme cases plus settings persistence and palette dismissal/focus return. Live service and plugin browser receipts pass; broader required gates and independent visual/final implementation evaluations remain unproven.
 
 ## Harness
 
@@ -29,7 +29,7 @@ Run: `.llm/runs/orch-divybot-6557001595--2570/`. Plan, research, slice reviews, 
 
 ## Drift / Debt
 
-No new accepted debt. The owner-specified routing and Refs-only/no-label process override generic dispatcher defaults. #2488 is still open.
+Accepted debt CLI-SCAFFOLD-WORKERS-CONTRACT-DEPENDENCY: no-workers apps resolve a workers contract; version parity is tested, with an optional-adapter closure gate in the debt ledger. The owner-specified routing and Refs-only/no-label process override generic dispatcher defaults. #2488 is still open.
 
 ## Definition of Done
 
