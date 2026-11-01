@@ -252,5 +252,185 @@
     "everyVariantCraftAtLeastFigma": true,
     "imagesInspected": 78,
     "report": "visual-eval.md"
+  },
+  "ciFollowup": {
+    "sourceBase": "1c61903be762dfd17a9dae1b06e639b2dea8b72b",
+    "fixes": [
+      "Preserve explicit currency unit only after exact canonical island proof for the selected query.",
+      "Restore actual readiness attributes on populated Overview worker and stream panels."
+    ],
+    "previousCi": {
+      "core": {
+        "url": "https://github.com/rickylabs/netscript/actions/runs/41346364457",
+        "outcome": "FAIL",
+        "test2": {
+          "passed": 1939,
+          "failed": 1,
+          "ignored": 3,
+          "test": "init preset and command-shaped planner render byte-identical canonical roles"
+        },
+        "test3": {
+          "passed": 1860,
+          "failed": 1,
+          "ignored": 17,
+          "test": "public init emits resolvable app conventions with and without the example service"
+        }
+      },
+      "runtime": {
+        "url": "https://github.com/rickylabs/netscript/actions/runs/41346274532",
+        "outcome": "FAIL",
+        "postgres": {
+          "passed": 106,
+          "failed": [
+            "behavior.app-home"
+          ]
+        },
+        "sqlite": {
+          "passed": 106,
+          "failed": [
+            "behavior.app-home"
+          ]
+        }
+      }
+    },
+    "focusedTests": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 163,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 163,
+        "uniqueFailures": 0
+      }
+    },
+    "scopedCheck": {
+      "filesSelected": 7,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "scopedLint": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "scopedFmt": {
+      "filesSelected": 7,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "rootCheck": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "files": 4198,
+      "batches": 35
+    },
+    "qualityAndArchitecture": {
+      "outcome": "PASS",
+      "exitCode": 0
+    },
+    "carrierChain": [
+      {
+        "gate": "gen:agent-docs-prose",
+        "exitCode": 0
+      },
+      {
+        "gate": "gen:mcp-export-corpus",
+        "exitCode": 0
+      },
+      {
+        "gate": "gen:assets-barrel",
+        "exitCode": 0
+      },
+      {
+        "gate": "gen:publish-assets",
+        "exitCode": 0
+      }
+    ],
+    "rootCheckTasks": [
+      {
+        "gate": "check:desktop-native-fixture",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:emitted-samples",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:streams-types",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:child-health-docs",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:mcp-export-corpus",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:assets-barrel",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:agent-docs-prose",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:publish-assets",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:scaffold-versions",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:aspire-version-parity",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:netscript-jsr-specifiers",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:aspire-host-ports",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:figma-names",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:review-threads",
+        "exitCode": 0
+      },
+      {
+        "gate": "check:design-skill",
+        "exitCode": 0
+      }
+    ],
+    "liveProbe": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "readyCapabilities": [
+        "workers",
+        "streams"
+      ],
+      "httpStatus": 200,
+      "fixture": ".llm/tmp/scaffold-2570-phase2/final/acceptance"
+    },
+    "visualReconciliation": "Only ownership comments and DOM data attributes changed after visual PASS; presentation and interactions unchanged.",
+    "ciOnFollowupHead": "PENDING: rerun required core and full scaffold.runtime after push; final ignored report records exact head/results.",
+    "generatedCheck": {
+      "filesSelected": 126,
+      "batches": 2,
+      "failedBatches": 0
+    },
+    "sourceReview": {
+      "outcome": "PASS",
+      "report": "s4-review.md"
+    }
   }
 }

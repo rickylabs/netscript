@@ -1,6 +1,7 @@
 import type { ResourceSliceTemplateAssets } from '../../adapters/templates/scaffold-template-assets.ts';
 import type { TemplatePort } from '../../ports/template-port.ts';
 import type {
+  ResourceResultPresentation,
   ResourceSliceCandidateLeaf,
   ResourceSlicePlan,
   ResourceSlicePlannedLeaf,
@@ -41,10 +42,7 @@ const TEMPLATE_ASSET_NAMES: Readonly<
   '(_islands)/ResourceStream.tsx': 'streamIslandTemplate',
 };
 
-/** Currency conversion is opt-in for a known service contract. */
-export interface ResourceResultPresentation {
-  readonly amountUnit?: 'minor' | 'major';
-}
+export type { ResourceResultPresentation } from './resource-slice-contract.ts';
 
 /** Render every planned leaf and attach canonical reconciliation provenance. */
 export async function renderResourceSlice(
@@ -116,6 +114,9 @@ async function renderOwnedLeaf(
     resource: plan.input.resource,
     role: leaf.role,
     options,
+    ...(leaf.role === 'island' && presentation.amountUnit !== undefined
+      ? { amountUnit: presentation.amountUnit }
+      : {}),
     ...(leaf.role === 'loaders' && plan.input.procedure.initialInput !== undefined
       ? { queryInput: plan.input.procedure.initialInput }
       : {}),

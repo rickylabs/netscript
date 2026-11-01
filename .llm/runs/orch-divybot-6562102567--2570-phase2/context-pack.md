@@ -1,5 +1,7 @@
 # Resume
 
+S4 supersedes pending S3 CI: previous core run failed only canonical init/regenerate parity (shards2/3); previous PostgreSQL/SQLite runtime runs failed only populated Overview readiness markers (106passed each). Both corrected and independently approved in s4-review.md. Local 163tests, scoped7, generated126, root4198, quality/architecture, carrier4, all15check:* and actual live workers/streams home probe PASS. Push S4, rerun core and full runtime CI; do not hand off READY until new-head checks pass. Metadata/DOM-attribute-only follow-up preserves visual presentation.
+
 Phase 2 #2570, PR #2586, branch `orch/divybot-6562102567`. S1/S2 source slices passed. S3 has independent final source approval and visual PASS: every page group >=8/10, density/craft >=Figma in all four variants; Command 8.5. See `impl-eval.md`, `visual-eval.md`, `validation.json`, `reviewed-source.json`, and `screens/README.md`. Failed rounds remain as history.
 
 Source changes include real projections, search/sort/filter/CSV/pagination/details, bounded public stream activity, worker progress, per-resource health, capability-aware Settings/sign-in/command search, responsive structured examples and working validation-only forms. No fake data, dependency pin changes or lockfile changes. Browser matrix: eight routes plus palette, light/dark, 1440/390. Canonical fixture uses 40 seeded SQLite records and installed workers/streams; its real health-check job supplies persisted progress and stream events. Fresh init plus canonical renderer updates; no manual payload substitution.

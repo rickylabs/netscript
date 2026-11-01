@@ -207,3 +207,23 @@ Deno.test('loader query input has a canonical flat representation and rejects ot
     }, 'body\n')
   );
 });
+
+Deno.test('amount-unit provenance is canonical and restricted to result islands', async () => {
+  const content = await markOwnedResourceSliceLeaf({
+    resource: 'orders',
+    role: 'island',
+    options: ['core'],
+    amountUnit: 'minor',
+  }, 'export const value = 1;\n');
+  assertEquals(parseOwnedResourceSliceLeaf(content)?.amountUnit, 'minor');
+  assertEquals(
+    parseOwnedResourceSliceLeaf(content.replace('"role":"island"', '"role":"page"')),
+    undefined,
+  );
+  for (const value of ['"unknown"', 'null', '100', 'true']) {
+    assertEquals(
+      parseOwnedResourceSliceLeaf(content.replace('"amountUnit":"minor"', '"amountUnit":' + value)),
+      undefined,
+    );
+  }
+});

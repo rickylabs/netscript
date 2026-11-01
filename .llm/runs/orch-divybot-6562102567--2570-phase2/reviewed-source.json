@@ -22,11 +22,19 @@
     },
     {
       "path": "packages/cli/src/kernel/application/resource-slice/render-resource-slice.ts",
-      "sha256": "9d8ec6ffab7cccf427c187121b83f75e7907c9fe154bd0830e4a31adaeb8bb48"
+      "sha256": "a2239793b9d61441998f8779fd03c6e92970c79569f0a17e59acbbf0d1c9c2d0"
     },
     {
       "path": "packages/cli/src/kernel/application/resource-slice/render-resource-slice_test.ts",
       "sha256": "9d510e1bc34e6c09724dfef3730a0bb2a86555af66115498ebcb48351acac5ca"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/resource-slice/resource-slice-contract.ts",
+      "sha256": "074def09aa4adeeb522321131b3c8ee46c50f982467dc4d650a955d8cae50978"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/resource-slice/resource-slice-contract_test.ts",
+      "sha256": "84f69384b29a6c7f2d368604ecc562427d0533f30b1cf6d649a6de968feb7421"
     },
     {
       "path": "packages/cli/src/kernel/application/scaffold/workspace-init.ts",
@@ -50,11 +58,15 @@
     },
     {
       "path": "packages/cli/src/kernel/application/scaffold/writers/workspace-pages_test.ts",
-      "sha256": "7d9aed080123e7741e4df630d366c09ad91e7e06757aa155b641a9c9925d0198"
+      "sha256": "7b9c391730767329bbe06eb54dbd0d94213daeb453abf461fa431adda9e6a082"
     },
     {
       "path": "packages/cli/src/kernel/application/scaffold/writers/write-app-files.ts",
       "sha256": "06bacabf0a4d297db65cc73e52d0c89b747e7e91ec081964711b7bd1c7f85204"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/scaffold/writers/write-app-files_test.ts",
+      "sha256": "0a0e280a98d8cb6b78251fd2eac7417e0ffdc02e661141a5b006a49ff7f52b47"
     },
     {
       "path": "packages/cli/src/kernel/application/scaffold/writers/write-example-service-app-files.ts",
@@ -114,7 +126,7 @@
     },
     {
       "path": "packages/cli/src/kernel/assets/app/routes/(_components)/dashboard-view.tsx.template",
-      "sha256": "e6fc3ad1402abc753bc0282e5850a11f177c621f1f9689745f51d9f842e5f2e7"
+      "sha256": "a6766c3bb3ff3cd396c9976225ce1a168e97a44841127120230ea5f114cb1cc9"
     },
     {
       "path": "packages/cli/src/kernel/assets/app/routes/(_components)/health-view.tsx.template",
@@ -162,7 +174,7 @@
     },
     {
       "path": "packages/cli/src/kernel/assets/embedded.generated.ts",
-      "sha256": "f684c215da18f007781313c7965ec5faac1801d73e39243919d827551a9c62f1"
+      "sha256": "c10a1e35e0152ce6258077bcc3b68198b823f1bf2e9cf1afec0c2724dc656cec"
     },
     {
       "path": "packages/cli/src/kernel/assets/manifest.ts",
@@ -231,6 +243,14 @@
     {
       "path": "packages/cli/src/public/adapters/jsr-import-resolver.ts",
       "sha256": "49c04fa3e1134a663ea70f2e59954c200131bb3446eda7602043d993fdd49571"
+    },
+    {
+      "path": "packages/cli/src/public/features/generate/resource/generate-resource.ts",
+      "sha256": "7245951a0f3a1cddf44324a44139ad2086c5730d17fd1812dd1c855458f56f4f"
+    },
+    {
+      "path": "packages/cli/src/public/features/generate/resource/generate-resource_test.ts",
+      "sha256": "e3610ddfead95a9ca5b6a674fc2b28cdbd769d4b58d6facd9f27df28507e89a0"
     },
     {
       "path": "packages/plugin-streams-core/src/application/stream-browser-environment.d.ts",
