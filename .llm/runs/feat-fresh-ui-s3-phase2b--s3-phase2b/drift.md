@@ -121,3 +121,13 @@ and size budgets. A stack rebase/reconciliation is now required before push.
 This is upstream integration work within the existing assignment, not dropped
 Desktop/harness scope or an acceptance waiver. Current frozen source review
 does not certify the new base.
+
+
+## Significant scope drift — latest-main CSS guard
+
+Main #2558 adds a fixed combined-CSS limit based on the 66-component baseline,
+while this assignment adds 38 components. Actual parent 281179raw/36011gzip
+fails the configured220000/27000 gate. Two same-evaluator terminal failures
+(FAIL_PLAN, FAIL_RESCOPE) end the loop. No guard edit or waiver was introduced.
+See reconcile9-rescope.md for measured baselines and the four owner decisions.
+Stop is required by the supplied leaf profile, not an inferred approval rule.

@@ -1,3 +1,16 @@
+## Current stop — CSS budget scope conflict
+
+The same independent evaluator returned FAIL_PLAN then FAIL_RESCOPE, ending this
+leaf's loop at two consecutive terminal failures. See reconcile9-rescope.md and
+phase-registry.md. Main's new absolute CSS cap conflicts with the approved 38
+additions. No budget code changed; no push/force-push or child rebase occurred.
+Remote parent c5877ff8 and child a9078d68 remain drafts. Local parent 0d8cb882,
+Desktop source c3dba2ce and the canonical dirty carrier are preserved. The
+owner must ratify a budget/measurement change, reduce scope, or require fitting
+the absolute cap before a new leaf/loop may resume. No next group or READY.
+
+---
+
 ## Current barrier — Desktop controls source PASS, stack reconciliation next
 
 Same independent source round1 PASS:26frozen source paths/10build artifacts,
