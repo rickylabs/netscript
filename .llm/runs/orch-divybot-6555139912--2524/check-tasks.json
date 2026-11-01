@@ -1,0 +1,75 @@
+{
+  "deno": "2.9.7",
+  "results": [
+    {
+      "task": "check:desktop-native-fixture",
+      "exitCode": 0,
+      "durationMs": 200
+    },
+    {
+      "task": "check:emitted-samples",
+      "exitCode": 0,
+      "durationMs": 8490
+    },
+    {
+      "task": "check:streams-types",
+      "exitCode": 0,
+      "durationMs": 1194
+    },
+    {
+      "task": "check:child-health-docs",
+      "exitCode": 0,
+      "durationMs": 376
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "exitCode": 0,
+      "durationMs": 9526
+    },
+    {
+      "task": "check:assets-barrel",
+      "exitCode": 0,
+      "durationMs": 2721
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0,
+      "durationMs": 17083
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0,
+      "durationMs": 590
+    },
+    {
+      "task": "check:scaffold-versions",
+      "exitCode": 0,
+      "durationMs": 148
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "exitCode": 0,
+      "durationMs": 380
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "exitCode": 0,
+      "durationMs": 2884
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "exitCode": 0,
+      "durationMs": 553
+    },
+    {
+      "task": "check:figma-names",
+      "exitCode": 0,
+      "durationMs": 1191
+    },
+    {
+      "task": "check:review-threads",
+      "exitCode": 0,
+      "durationMs": 568
+    }
+  ]
+}

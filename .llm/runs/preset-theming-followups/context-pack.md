@@ -14,3 +14,8 @@ PR readiness, exact-final-head required hosted checks and canonical READY public
 ## Latest CI repair
 
 CI run 41291048614 passed quality, type-check and browser, but test-1 found one incomplete root import-map fixture. The release recovery test omitted catalog while copying root imports. Focused red reproduced the hosted error; fixed full module passed 8/8 locally and 8/8 in the same independent read-only evaluator session. Terminal continuation PASS, ci-repair-review.md. Original permission and negative content-verdict assertions unchanged. Scope is one release test plus run notes. New exact-head CI after normal push must pass before READY; PR remains ready for review. No product/CLI/carrier/lock changes, no need to repeat unchanged canonical CLI suite. Do not merge.
+
+
+## Latest main integration
+
+Owner requested normal merge after main advanced to 0af8fd9e (#2452/#2558/#2456). Sole manual conflict is deno.json task additions, resolved by retaining quality:cli plus gen:design-skill/check:design-skill and upstream asset chains. Independent merge resolution PASS; 79 focused merged-tree tests pass; full CLI lint/fmt and design freshness pass. All upstream assets, CSS, tests, skills and retained run context preserved; locks unchanged. Post-merge carrier checks now include 15 root check:* tasks. Their refresh and exact-head hosted full matrix supersede prior-head hosted results before READY. No product changes by this agent beyond the approved original scope; main integration is explicit owner steering.

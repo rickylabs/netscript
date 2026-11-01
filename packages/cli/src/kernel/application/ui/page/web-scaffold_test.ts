@@ -115,6 +115,11 @@ function assertDataScreenPlan(files: readonly PlannedFile[]): void {
   assertFalse(source.includes('JSON.stringify(query.data'));
   assertFalse(source.includes('useSignal(0)'));
   assertFalse(source.includes('queryLoaders = {}'));
+  const island = files.find((file) => file.role === 'island');
+  assert(island);
+  assertStringIncludes(island.content, QUERY_RESULT_TEMPLATE.trim());
+  assertStringIncludes(island.content, QUERY_RESULT_SUCCESS_RETURN);
+  assertEquals([...island.content.matchAll(/\bfunction QueryResult\(/g)].length, 1);
 }
 
 Deno.test('page --island auto-discovers its single client without a selector', async () => {
@@ -405,6 +410,9 @@ Deno.test('standalone islands use the route-tree convention and query mode binds
   assertStringIncludes(queryIsland, 'useIslandQuery');
   assertStringIncludes(queryIsland, '.list.queryOptions(');
   assertStringIncludes(queryIsland, '.list.clientKey(');
+  assertStringIncludes(queryIsland, QUERY_RESULT_TEMPLATE.trim());
+  assertStringIncludes(queryIsland, QUERY_RESULT_SUCCESS_RETURN);
+  assertEquals([...queryIsland.matchAll(/\bfunction QueryResult\(/g)].length, 1);
   // Regression: a runtime scaffold.runtime run against a real project caught the emitted
   // `return <QueryIsland>...</QueryIsland>;` as a single line the generated project's own
   // `deno fmt --check` then rejected. The template must always emit the multi-line JSX form
