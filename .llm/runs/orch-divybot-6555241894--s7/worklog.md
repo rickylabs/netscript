@@ -44,3 +44,13 @@ Fetched and normally merged origin/main 0af8fd9e7904ee2c848d0a4213c7853edec3ad21
 Independent same-reviewer round 1 FAIL_FIX identified ambiguous component vocabulary hijacking framework queries. Removed the bare-verb shortcut and added its three exact negative cases. Round 2 PASS and substantive sign-off; both reviews retained. Component plus all four locked guidance suites: 36 PASS. Full browser/style: 158 passed, 6 census-only skips, no unexpected/flaky cases. Every current root check:* task PASS, including main’s design-skill gate and all four carriers. See slice-2-evidence.md.
 
 Reconcile: c9da6e55de7fbeba8d9afa1c7a5e4930c74190ca merges origin/main 0af8fd9e7904ee2c848d0a4213c7853edec3ad21 normally; in-progress work restored cleanly and carriers regenerated on the combined tree. Backup stash is already restored. No conflicts remain; preserve both root task additions. Push integration and approved slice together normally, then proceed to actual CLI proof and final gates/evaluation.
+
+## Slice 3 measured proof and gates
+
+Actual built builder code copied into successful local-source CLI init, then unmodified generated Fresh app rendered in both schemes. Canonical selected token dictionaries and CSS exact; 1,180 computed properties and primary Button styles agree. See cli-proof.md and proof/. All declared local docs/release/carrier/root/scoped/quality gates PASS; exact command-level evidence in final-gates.md. One-pass runtime attempted and UNPROVEN due unavailable Docker, with failed preflight/cleanup preserved. Proof servers cleaned by positive ownership. Final independent IMPL-EVAL pending; no READY claim before it and required exact-head checks.
+
+## Slice 3 sign-off and reconcile
+
+Mandatory independent read-only IMPL-EVAL: **PASS**, implementation accepted with no blockers; runtime and environment inventory remain explicitly UNPROVEN. Full substantive result in impl-eval.md. Proof/evidence-only final slice; no product code changed after reviewed cf1a8f8. Final native review-thread gate PASS, zero threads/unanswered.
+
+Reconcile: fetched origin/main again; it remains 0af8fd9e7904ee2c848d0a4213c7853edec3ad21 and is an ancestor of current source head. PR is mergeable, and source Pages/Utility CI is green. Commit/push this independently signed-off final slice normally, transition ready for review, then require exact-head checks before canonical READY handoff. Cockpit merges. No new accepted architecture debt.
