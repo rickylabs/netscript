@@ -34,3 +34,7 @@ Independent FAIL_FIX: preview selected attributes but only loaded ns-one CSS. Re
 Independent same-reviewer round 2: PASS and explicit substantive sign-off. Prior FAIL_FIX retained in slice-1-review-round-1.md; repaired selected stylesheets proven by computed token assertions and actual red negative control. Final build/render/freshness/links, four tests, scoped source check/lint/fmt and 17 browser tests PASS. Three census-only policy skips avoid repeating the all-52 census in each matrix project; all twelve requested browser cases run. Maximum twin 5,013 bytes. Native root lock diff is one std/fs workspace metadata entry, no version/integrity change.
 
 Reconcile: source baseline remains origin/main 6a1d84a6e04c0d39df3926528e0380e267316aee; current branch bootstrap head e9d5ce54087199f1c2a058c6ab688e227c46e461. No main movement or conflicts at slice sign-off. Commit/push this approved implementation before starting slice 2.
+
+## Requested main integration
+
+Fetched and normally merged origin/main 0af8fd9e7904ee2c848d0a4213c7853edec3ad21 after owner merge-conflict activity. Preserve both root task additions: docs:components:check and main’s design-skill generation/check tasks. Main contributes 142 changed paths; retained its source and run evidence. In-progress slice 2 is safely stashed for reapplication after this integration commit. Canonical carriers and combined-tree checks follow. No rebase or force push.

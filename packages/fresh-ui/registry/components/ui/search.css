@@ -64,33 +64,35 @@
   }
 }
 
-/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='search'][data-part='root'] {
-  height: var(--ns-control-height);
-  border-radius: var(--ns-radius-input);
-  border-color: var(--ns-input-border);
-  box-shadow: none;
-  background: var(--ns-card);
-  font-size: var(--ns-text-body);
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='search'][data-part='root']:focus-visible {
-  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
-  outline-offset: var(--ns-focus-ring-offset);
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='search'][data-part='kbd'] {
-  font-family: var(--ns-font-mono);
-  border-radius: var(--ns-radius-badge);
-  font-size: var(--ns-text-caption);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='search'] {
-    transition: none;
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) {
+  /* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+  & [data-scope='search'][data-part='root'] {
+    height: var(--ns-control-height);
+    border-radius: var(--ns-radius-input);
+    border-color: var(--ns-input-border);
+    box-shadow: none;
+    background: var(--ns-card);
+    font-size: var(--ns-text-body);
   }
-}
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='search'][data-part='root']:hover {
-  border-color: var(--ns-border-control);
+  & [data-scope='search'][data-part='root']:focus-visible {
+    outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+    outline-offset: var(--ns-focus-ring-offset);
+  }
+
+  & [data-scope='search'][data-part='kbd'] {
+    font-family: var(--ns-font-mono);
+    border-radius: var(--ns-radius-badge);
+    font-size: var(--ns-text-caption);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    & [data-scope='search'] {
+      transition: none;
+    }
+  }
+
+  & [data-scope='search'][data-part='root']:hover {
+    border-color: var(--ns-border-control);
+  }
 }

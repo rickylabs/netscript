@@ -21,6 +21,7 @@ task. Use `search_docs` for literal lookup and `get_doc` for exact retrieval.
 | Aspire orchestration, resource health, logs, spans, or traces                                                                          | `aspire`                |
 | Deno runtime, type checking, permissions, or module resolution                                                                         | `deno`                  |
 | Something hangs, vanishes, or stays silent and the cause is unclear                                                                    | [`help.md`](../help.md) |
+| Theme choice, visual design, compatible on-theme UI and design self-audit                                                              | `netscript-design`      |
 
 ## CLI vs MCP
 

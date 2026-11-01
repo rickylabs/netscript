@@ -1,0 +1,25 @@
+{
+  "slice": 2,
+  "red": {
+    "passed": 68,
+    "failed": 3
+  },
+  "green": {
+    "passed": 71,
+    "failed": 0,
+    "ignored": 0
+  },
+  "structuredChecks": {
+    "files": 2,
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "format": "PASS"
+  },
+  "nativeCli": {
+    "pushOptInNeedsPages": false,
+    "defaultPushNeedsPages": true
+  },
+  "independentSourceReview": "PASS",
+  "reproducibilityCiMode": "all files compared; only explicit reported Pagefind entry/filter/meta serialization variation nonblocking",
+  "privateExecutionMetadataCommitted": false
+}

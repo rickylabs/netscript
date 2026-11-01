@@ -164,69 +164,71 @@
   background: var(--ns-secondary);
 }
 
-/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='title'] {
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-strong);
-  font-weight: var(--ns-weight-strong);
-  line-height: var(--ns-leading-strong);
-  letter-spacing: var(--ns-tracking-strong);
-}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) {
+  /* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+  & [data-scope='chart-block'][data-part='title'] {
+    font-family: var(--ns-font-sans);
+    font-size: var(--ns-text-strong);
+    font-weight: var(--ns-weight-strong);
+    line-height: var(--ns-leading-strong);
+    letter-spacing: var(--ns-tracking-strong);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='sub'],
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='label'],
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='value'],
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='val'],
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='ytick'] {
-  font-family: var(--ns-font-mono);
-  font-size: var(--ns-text-caption);
-  font-weight: var(--ns-weight-caption);
-  line-height: var(--ns-leading-caption);
-  letter-spacing: var(--ns-tracking-caption);
-}
+  & [data-scope='chart-block'][data-part='sub'],
+  & [data-scope='chart-block'][data-part='label'],
+  & [data-scope='chart-block'][data-part='value'],
+  & [data-scope='chart-block'][data-part='val'],
+  & [data-scope='chart-block'][data-part='ytick'] {
+    font-family: var(--ns-font-mono);
+    font-size: var(--ns-text-caption);
+    font-weight: var(--ns-weight-caption);
+    line-height: var(--ns-leading-caption);
+    letter-spacing: var(--ns-tracking-caption);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='track'] {
-  border-radius: var(--ns-radius-control);
-  background: var(--ns-material-track);
-}
+  & [data-scope='chart-block'][data-part='track'] {
+    border-radius: var(--ns-radius-control);
+    background: var(--ns-material-track);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='bar'] {
-  border-radius: var(--ns-radius-control);
-  background: var(--ns-chart-1);
-}
+  & [data-scope='chart-block'][data-part='bar'] {
+    border-radius: var(--ns-radius-control);
+    background: var(--ns-chart-1);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='bar'][data-tone='success'] {
-  background: var(--ns-success);
-}
+  & [data-scope='chart-block'][data-part='bar'][data-tone='success'] {
+    background: var(--ns-success);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='bar'][data-tone='warning'] {
-  background: var(--ns-warning);
-}
+  & [data-scope='chart-block'][data-part='bar'][data-tone='warning'] {
+    background: var(--ns-warning);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='bar'][data-tone='destructive'] {
-  background: var(--ns-destructive);
-}
+  & [data-scope='chart-block'][data-part='bar'][data-tone='destructive'] {
+    background: var(--ns-destructive);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='bar'][data-tone='secondary'] {
-  background: var(--ns-secondary-text);
-}
+  & [data-scope='chart-block'][data-part='bar'][data-tone='secondary'] {
+    background: var(--ns-secondary-text);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='bar'][data-series='1'] {
-  background: var(--ns-chart-1);
-}
+  & [data-scope='chart-block'][data-part='bar'][data-series='1'] {
+    background: var(--ns-chart-1);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='bar'][data-series='2'] {
-  background: var(--ns-chart-2);
-}
+  & [data-scope='chart-block'][data-part='bar'][data-series='2'] {
+    background: var(--ns-chart-2);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='bar'][data-series='3'] {
-  background: var(--ns-chart-3);
-}
+  & [data-scope='chart-block'][data-part='bar'][data-series='3'] {
+    background: var(--ns-chart-3);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='bar'][data-series='4'] {
-  background: var(--ns-chart-4);
-}
+  & [data-scope='chart-block'][data-part='bar'][data-series='4'] {
+    background: var(--ns-chart-4);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='chart-block'][data-part='bar'][data-series='5'] {
-  background: var(--ns-chart-5);
+  & [data-scope='chart-block'][data-part='bar'][data-series='5'] {
+    background: var(--ns-chart-5);
+  }
 }

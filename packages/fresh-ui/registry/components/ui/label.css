@@ -11,12 +11,14 @@
   color: var(--ns-destructive-text);
 }
 
-/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='label'][data-part='root'],
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='field'][data-part='label'] {
-  font-family: var(--ns-font-label);
-  font-size: var(--ns-text-strong);
-  line-height: var(--ns-leading-strong);
-  font-weight: var(--ns-weight-strong);
-  letter-spacing: var(--ns-tracking-strong);
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) {
+  /* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+  & [data-scope='label'][data-part='root'],
+  & [data-scope='field'][data-part='label'] {
+    font-family: var(--ns-font-label);
+    font-size: var(--ns-text-strong);
+    line-height: var(--ns-leading-strong);
+    font-weight: var(--ns-weight-strong);
+    letter-spacing: var(--ns-tracking-strong);
+  }
 }

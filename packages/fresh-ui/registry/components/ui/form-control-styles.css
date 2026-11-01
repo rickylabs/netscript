@@ -61,60 +61,62 @@
   padding-inline: var(--ns-control-padding-x);
 }
 
-/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root'] {
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-body);
-  line-height: var(--ns-leading-body);
-  font-weight: var(--ns-weight-body);
-  letter-spacing: var(--ns-tracking-body);
-  background: var(--ns-card);
-  border-color: var(--ns-input-border);
-  border-radius: var(--ns-radius-input);
-  border-width: var(--ns-border-width);
-  padding-inline: var(--ns-control-padding-x);
-}
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) {
+  /* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+  & :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root'] {
+    font-family: var(--ns-font-sans);
+    font-size: var(--ns-text-body);
+    line-height: var(--ns-leading-body);
+    font-weight: var(--ns-weight-body);
+    letter-spacing: var(--ns-tracking-body);
+    background: var(--ns-card);
+    border-color: var(--ns-input-border);
+    border-radius: var(--ns-radius-input);
+    border-width: var(--ns-border-width);
+    padding-inline: var(--ns-control-padding-x);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root']:where(:hover):not(:disabled) {
-  border-color: var(--ns-border-control);
-}
+  & :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root']:where(:hover):not(:disabled) {
+    border-color: var(--ns-border-control);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root']:focus {
-  border-color: var(--ns-input-border);
-  box-shadow: none;
-  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
-  outline-offset: var(--ns-focus-ring-offset);
-}
+  & :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root']:focus {
+    border-color: var(--ns-input-border);
+    box-shadow: none;
+    outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+    outline-offset: var(--ns-focus-ring-offset);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root'][data-invalid='true'] {
-  border-color: var(--ns-destructive);
-}
+  & :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root'][data-invalid='true'] {
+    border-color: var(--ns-destructive);
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root'][data-invalid='true']:focus {
-  border-color: var(--ns-destructive);
-  box-shadow: none;
-}
+  & :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root'][data-invalid='true']:focus {
+    border-color: var(--ns-destructive);
+    box-shadow: none;
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root']:disabled {
-  background: var(--ns-muted);
-  color: var(--ns-muted-fg);
-  border-color: var(--ns-border);
-  outline: none;
-  box-shadow: none;
-}
+  & :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root']:disabled {
+    background: var(--ns-muted);
+    color: var(--ns-muted-fg);
+    border-color: var(--ns-border);
+    outline: none;
+    box-shadow: none;
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='input'][data-part='root'] {
-  height: var(--ns-control-height);
-  padding-block: 0;
-}
+  & [data-scope='input'][data-part='root'] {
+    height: var(--ns-control-height);
+    padding-block: 0;
+  }
 
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='select'][data-part='root'] {
-  height: var(--ns-control-height);
-  padding-block: 0;
-}
+  & [data-scope='select'][data-part='root'] {
+    height: var(--ns-control-height);
+    padding-block: 0;
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root'] {
-    transition: none;
+  @media (prefers-reduced-motion: reduce) {
+    & :is([data-scope='input'], [data-scope='textarea'], [data-scope='select'])[data-part='root'] {
+      transition: none;
+    }
   }
 }
