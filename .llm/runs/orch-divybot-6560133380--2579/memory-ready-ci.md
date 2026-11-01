@@ -18,3 +18,10 @@ The memory comparator multiplies its entire primary/tie result by sort direction
 ties already match Prisma's requested direction. The semantic sample test explicitly checks
 same-status ascending IDs, descending IDs, a descending page boundary, and descending ID
 ties in all four engines' database listQuery output. No generated template change is needed.
+
+The full ready-mode core run also exposed two other fixtures: generated-browser-auth-policy
+has an obsolete fake Prisma orderBy object and count() signature, and its minimal database
+row no longer satisfies the rich output contract. Keep fixture list args tied to the emitted
+domain policy, forward a typed where into count, and return a canonical sample row.
+init-no-aspire-operable must expect the 40-record, custom-model seed success message.
+Run the full four-variant auth-policy and live no-Aspire SQLite lifecycle test modules.

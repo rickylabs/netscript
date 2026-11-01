@@ -100,3 +100,28 @@ tie assertions. The evaluator reviewed statically; this slice's execution is gen
 Production source and carriers remain unchanged. Commit and normal push follow; new-head
 ready-mode CI and a new READY report are pending. Do not treat the old draft skips as proof
 of those newly activated tests.
+
+## Remaining ready-mode fixture repairs
+
+At b0b6326, current-head test-1 and test-4 passed (841/0 and 1,480/0, respectively),
+as did check, quality, Pages and Fresh UI. Test-2 then reported two generated auth-policy
+CRUD fixture type errors: its database stub still accepts object orderBy and no count
+arguments. Test-6 reported a stale one-row seed success-message assertion. Full reports
+are retained privately; these are the remaining failures in the terminal core run.
+
+Repair slice: derive the auth fixture's findMany input from the generated domain listQuery,
+accept filtered count input, and supply its fake database row through the canonical sample
+generator so the current rich output schema can parse it. Preserve every auth/REST/RPC
+assertion and all four installation/storage variants. Update the no-Aspire lifecycle's
+seed message assertion to require 40 records and the custom ProbeReceipt model. Run both
+complete focused test modules, scoped wrappers, then the same independent read-only
+evaluator before committing. Production and carriers remain unchanged; new-head CI and
+READY are still required. Never publish the prepared report before those checks pass.
+
+Both full modules passed through the structured wrapper: 6/6, zero ignored/failures,
+including all auth install/storage variants and live SQLite no-Aspire migration, generation,
+seed and status. Scoped check/lint/fmt process both changed files with no findings/drops.
+Same separate Opus 5.5 high evaluator returned SLICE_REVIEW_PASS and IMPL_EVAL_PASS
+(static review); it confirmed all auth/REST/RPC assertions remain and the canonical sample
+row satisfies the runtime schema. No production or carrier change. Normal commit/push and
+fresh complete ready-mode CI follow; no manual merge or premature READY.

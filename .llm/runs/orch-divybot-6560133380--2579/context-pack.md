@@ -13,7 +13,7 @@ and RPC NOT_FOUND/404 checks. Validate both memory and Prisma generated-service 
 
 ## Source and outcome
 
-The evaluated implementation head is 2b1db077b01eb0c1f06b51d336280c0438f22866. Original delivery c688757 changed only this scoped run's evidence/context. The ready-mode follow-up changes three test files and run notes; production source and generated carriers remain identical. Resolve the current delivery head from Git or the latest PR comment.
+The evaluated implementation head is 2b1db077b01eb0c1f06b51d336280c0438f22866. Original delivery c688757 changed only this scoped run's evidence/context. The ready-mode follow-ups change five test files and run notes; production source and generated carriers remain identical. Resolve the current delivery head from Git or the latest PR comment.
 
 Follow-up local validation under Deno 2.9.7: 5/5 focused E2E tests, including real memory
 and SQLite Prisma generated-service checks; 14/14 sample/projection semantic tests including
@@ -22,6 +22,14 @@ tests with no findings or dropped selections. Review-thread gate: zero unanswere
 The same independent Opus 5.5 high evaluator returned SLICE_REVIEW_PASS and IMPL_EVAL_PASS
 for the final test-only slice (static review; local execution results are generator-owned).
 Remote CI at the new commit remains required before publishing the new READY handoff.
+
+Core run 41331736013 at b0b6326 passed the repaired test-1 (841/0) and test-4 (1,480/0),
+plus all other checks except test-2, test-6 and their aggregator. The remaining failures
+were stale fake Prisma query/row shapes in the four-variant auth-policy fixture and the
+old one-row seed message in the no-Aspire lifecycle. Both modules now pass locally (6/6),
+including real SQLite migration/generation/seeding, with scoped check/lint/fmt PASS.
+The same independent evaluator approved this second test-only repair slice with both PASS
+verdicts. Push normally and wait for every check at the new head before publishing READY.
 
 Default models/contracts/clients now carry unique references, owners, six portable statuses, signed integer minor-unit amounts/currency, and timestamps. Forty deterministic rows span sixty UTC days; upserts preserve edits/IDs. Fresh databases insert oldest first for the generic ID-descending list. Memory uses the same sample source. Server projections expose adjacent 30-day metrics/deltas, 60 daily buckets, per-currency amounts/averages, status counts and latest records. Complete overview reads fail closed; absent/empty/unauthorized/unavailable remain distinct. Existing layouts/CSS are retained.
 

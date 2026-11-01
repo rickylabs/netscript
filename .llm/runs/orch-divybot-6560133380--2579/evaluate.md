@@ -2,6 +2,15 @@
 
 ## Ready-mode CI follow-up review
 
+Second follow-up: after core run 41331736013 exposed the remaining auth-policy database
+stub and no-Aspire seed-text fixtures, the same separate Opus 5.5 high session returned
+SLICE_REVIEW_PASS and IMPL_EVAL_PASS for those two test-only repairs. The reviewer
+confirmed every auth/REST/RPC assertion remains, the canonical sample row satisfies the
+rich runtime schema, and the new seed-message assertion requires the 40-row custom model.
+Review was static. Generator-owned structured tests passed 6/6, including all four auth
+variants and the real SQLite no-Aspire lifecycle; scoped check/lint/fmt also passed.
+Production and carriers remain unchanged. Full CI at the next head is required before READY.
+
 The same separate native Claude Opus 5.5 high evaluator returned SLICE_REVIEW_PASS and
 IMPL_EVAL_PASS for the post-c688757 test-only repairs, then re-reviewed the complete slice
 including tie-order regression assertions with the same verdicts. Model usage attests

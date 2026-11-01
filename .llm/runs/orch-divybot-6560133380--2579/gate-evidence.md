@@ -73,3 +73,12 @@ ties and a descending page boundary. Scoped type check, lint and format process 
 changed test files with zero findings and no dropped selections. Review threads: 0/0.
 Same-session independent SLICE_REVIEW_PASS and IMPL_EVAL_PASS are recorded in evaluate.md.
 The new head's ready-mode CI is pending; READY is withheld until it is green.
+
+Core run 41331736013 at b0b6326 subsequently passed test-1 (841/0/0) and test-4
+(1,480/0/20), check, quality and the other unaffected shards, but exposed test-2's two
+auth-policy CRUD stub failures (1,798/2/5) and test-6's seed-text failure (1,578/1/4).
+Pages 41331736009 and Fresh UI 41331736197 succeeded. Counts are pass/fail/ignored.
+Those remaining fixtures are now repaired without production changes. Both complete
+targeted modules pass locally (6/6, no ignored tests); scoped check/lint/fmt process all
+selected files, and the same independent static evaluator returned both PASS verdicts.
+Fresh ready-mode CI must prove the next head before the report is published.
