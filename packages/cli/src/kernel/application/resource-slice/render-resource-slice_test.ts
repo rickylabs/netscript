@@ -13,6 +13,10 @@ import {
 } from './resource-slice-contract.ts';
 import { planResourceSlice } from './plan-resource-slice.ts';
 import { renderResourceSlice } from './render-resource-slice.ts';
+import {
+  QUERY_RESULT_SUCCESS_RETURN,
+  QUERY_RESULT_TEMPLATE,
+} from '../ui/page/query-result-template.ts';
 
 const GOLDEN_HASHES: Readonly<
   Record<string, readonly (readonly [path: string, hash: string])[]>
@@ -205,6 +209,24 @@ Deno.test('core render is neutral, cache-first, and canonically marked', async (
       /JSON\.parse\s*\(/,
     ]
   ) assertFalse(forbidden.test(source), `Unexpected generated pattern: ${forbidden}`);
+});
+
+Deno.test('resource islands share the page QueryResult body and success surface without duplication', async () => {
+  for (
+    const variants of [[], ['form'], ['partial'], ['stream'], [
+      'form',
+      'partial',
+      'stream',
+    ]] as const
+  ) {
+    const candidates = await render(variants);
+    const island = candidates.find((candidate) => candidate.role === 'island');
+    assert(island);
+    assertStringIncludes(island.content, QUERY_RESULT_TEMPLATE.trim());
+    assertStringIncludes(island.content, QUERY_RESULT_SUCCESS_RETURN);
+    assertEquals([...island.content.matchAll(/\bfunction QueryResult\(/g)].length, 1);
+    assertFalse(island.content.includes('{{queryResult'));
+  }
 });
 
 Deno.test('core and each independent option match exact content goldens', async () => {

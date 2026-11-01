@@ -28,107 +28,109 @@
   }
 }
 
-/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'][data-part='content'] {
-  border: var(--ns-border-width) solid var(--ns-border);
-  border-radius: var(--ns-radius-card);
-  background: var(--ns-surface-raised);
-  color: var(--ns-fg);
-  padding: var(--ns-card-padding);
-  box-shadow: none;
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'][data-part='title'] {
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-strong);
-  font-weight: var(--ns-weight-strong);
-  line-height: var(--ns-leading-strong);
-  letter-spacing: var(--ns-tracking-strong);
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'][data-part='description'] {
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-small);
-  font-weight: var(--ns-weight-small);
-  line-height: var(--ns-leading-small);
-  letter-spacing: var(--ns-tracking-small);
-  color: var(--ns-muted-fg);
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dialog'][data-part='content'] {
-  border: var(--ns-border-width) solid var(--ns-border);
-  border-radius: var(--ns-radius-card);
-  background: var(--ns-surface-raised);
-  color: var(--ns-fg);
-  padding: var(--ns-card-padding);
-  box-shadow: none;
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dialog'][data-part='title'] {
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-strong);
-  font-weight: var(--ns-weight-strong);
-  line-height: var(--ns-leading-strong);
-  letter-spacing: var(--ns-tracking-strong);
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dialog'][data-part='description'] {
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-small);
-  font-weight: var(--ns-weight-small);
-  line-height: var(--ns-leading-small);
-  letter-spacing: var(--ns-tracking-small);
-  color: var(--ns-muted-fg);
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='tooltip'][data-part='content'] {
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-small);
-  font-weight: var(--ns-weight-small);
-  line-height: var(--ns-leading-small);
-  letter-spacing: var(--ns-tracking-small);
-  padding: var(--ns-stack-gap) var(--ns-control-padding-x);
-  border: var(--ns-border-width) solid var(--ns-border);
-  border-radius: var(--ns-radius-card);
-  background: var(--ns-inverse);
-  color: var(--ns-inverse-fg);
-  box-shadow: none;
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'][data-part='item'] {
-  font-family: var(--ns-font-sans);
-  font-size: var(--ns-text-body);
-  font-weight: var(--ns-weight-body);
-  line-height: var(--ns-leading-body);
-  letter-spacing: var(--ns-tracking-body);
-  padding: var(--ns-space-1) var(--ns-control-padding-x);
-  border-radius: var(--ns-radius-control);
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'][data-part='item']:is(:hover,[data-highlighted]) {
-  background: var(--ns-selected);
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'][data-part='item']:focus-visible {
-  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
-  outline-offset: var(--ns-focus-ring-offset);
-}
-
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dialog'][data-part='content']::backdrop {
-  background: var(--ns-overlay);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover'],
-  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='tooltip'] {
-    transition: none;
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) {
+  /* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+  & [data-scope='popover'][data-part='content'] {
+    border: var(--ns-border-width) solid var(--ns-border);
+    border-radius: var(--ns-radius-card);
+    background: var(--ns-surface-raised);
+    color: var(--ns-fg);
+    padding: var(--ns-card-padding);
+    box-shadow: none;
   }
-}
 
-/* Native overlay controls share the locked Utility keyboard ring. */
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='dialog']:is([data-part='trigger'], [data-part='close']):focus-visible,
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='popover']:is([data-part='trigger'], [data-part='close']):focus-visible,
-:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='tooltip']:is([data-part='trigger'], [data-part='close']):focus-visible {
-  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
-  outline-offset: var(--ns-focus-ring-offset);
+  & [data-scope='popover'][data-part='title'] {
+    font-family: var(--ns-font-sans);
+    font-size: var(--ns-text-strong);
+    font-weight: var(--ns-weight-strong);
+    line-height: var(--ns-leading-strong);
+    letter-spacing: var(--ns-tracking-strong);
+  }
+
+  & [data-scope='popover'][data-part='description'] {
+    font-family: var(--ns-font-sans);
+    font-size: var(--ns-text-small);
+    font-weight: var(--ns-weight-small);
+    line-height: var(--ns-leading-small);
+    letter-spacing: var(--ns-tracking-small);
+    color: var(--ns-muted-fg);
+  }
+
+  & [data-scope='dialog'][data-part='content'] {
+    border: var(--ns-border-width) solid var(--ns-border);
+    border-radius: var(--ns-radius-card);
+    background: var(--ns-surface-raised);
+    color: var(--ns-fg);
+    padding: var(--ns-card-padding);
+    box-shadow: none;
+  }
+
+  & [data-scope='dialog'][data-part='title'] {
+    font-family: var(--ns-font-sans);
+    font-size: var(--ns-text-strong);
+    font-weight: var(--ns-weight-strong);
+    line-height: var(--ns-leading-strong);
+    letter-spacing: var(--ns-tracking-strong);
+  }
+
+  & [data-scope='dialog'][data-part='description'] {
+    font-family: var(--ns-font-sans);
+    font-size: var(--ns-text-small);
+    font-weight: var(--ns-weight-small);
+    line-height: var(--ns-leading-small);
+    letter-spacing: var(--ns-tracking-small);
+    color: var(--ns-muted-fg);
+  }
+
+  & [data-scope='tooltip'][data-part='content'] {
+    font-family: var(--ns-font-sans);
+    font-size: var(--ns-text-small);
+    font-weight: var(--ns-weight-small);
+    line-height: var(--ns-leading-small);
+    letter-spacing: var(--ns-tracking-small);
+    padding: var(--ns-stack-gap) var(--ns-control-padding-x);
+    border: var(--ns-border-width) solid var(--ns-border);
+    border-radius: var(--ns-radius-card);
+    background: var(--ns-inverse);
+    color: var(--ns-inverse-fg);
+    box-shadow: none;
+  }
+
+  & [data-scope='popover'][data-part='item'] {
+    font-family: var(--ns-font-sans);
+    font-size: var(--ns-text-body);
+    font-weight: var(--ns-weight-body);
+    line-height: var(--ns-leading-body);
+    letter-spacing: var(--ns-tracking-body);
+    padding: var(--ns-space-1) var(--ns-control-padding-x);
+    border-radius: var(--ns-radius-control);
+  }
+
+  & [data-scope='popover'][data-part='item']:is(:hover,[data-highlighted]) {
+    background: var(--ns-selected);
+  }
+
+  & [data-scope='popover'][data-part='item']:focus-visible {
+    outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+    outline-offset: var(--ns-focus-ring-offset);
+  }
+
+  & [data-scope='dialog'][data-part='content']::backdrop {
+    background: var(--ns-overlay);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    & [data-scope='popover'],
+    & [data-scope='tooltip'] {
+      transition: none;
+    }
+  }
+
+  /* Native overlay controls share the locked Utility keyboard ring. */
+  & [data-scope='dialog']:is([data-part='trigger'], [data-part='close']):focus-visible,
+  & [data-scope='popover']:is([data-part='trigger'], [data-part='close']):focus-visible,
+  & [data-scope='tooltip']:is([data-part='trigger'], [data-part='close']):focus-visible {
+    outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+    outline-offset: var(--ns-focus-ring-offset);
+  }
 }

@@ -1,0 +1,172 @@
+{
+  "deno": "2.9.7",
+  "baseline": "6a1d84a6e04c0d39df3926528e0380e267316aee",
+  "workingTreeSourceManifest": "source-hashes.json",
+  "gates": {
+    "fresh-ui-tests": {
+      "outcome": "PASS",
+      "results": 338,
+      "failed": 0,
+      "ignored": 0,
+      "report": "fresh-ui-tests.json"
+    },
+    "cli-query-tests": {
+      "outcome": "PASS",
+      "results": 25,
+      "report": "query-tests.json"
+    },
+    "fresh-ui-browser": {
+      "outcome": "PASS",
+      "tests": 60,
+      "skipped": 0,
+      "report": "browser-tests.json"
+    },
+    "utility-parity": {
+      "outcome": "PASS",
+      "fixtures": 265,
+      "comparisons": 2388000,
+      "identicalScreenshots": 4,
+      "report": "utility-parity.json"
+    },
+    "legacy-parity": {
+      "outcome": "PASS",
+      "fixtures": 265,
+      "presets": 3,
+      "schemes": 2,
+      "report": "legacy-parity.json"
+    },
+    "css-rule-contract": {
+      "outcome": "PASS",
+      "files": 52,
+      "rules": 1161,
+      "report": "rule-contract.json"
+    },
+    "size-budget": {
+      "outcome": "PASS",
+      "raw": 215981,
+      "gzip": 26527,
+      "limits": {
+        "raw": 220000,
+        "gzip": 27000
+      },
+      "report": "size-tests.json"
+    },
+    "size-negative-control": {
+      "outcome": "EXPECTED_FAIL",
+      "raw": 270183,
+      "gzip": 27152,
+      "exitCode": 1,
+      "report": "size-negative.json"
+    },
+    "query-negative-control": {
+      "outcome": "EXPECTED_FAIL",
+      "exitCode": 1,
+      "report": "query-negative.json"
+    },
+    "root-check-tasks": {
+      "outcome": "PASS",
+      "tasks": 14,
+      "report": "check-tasks.json"
+    },
+    "canonical-generators": {
+      "outcome": "PASS",
+      "commands": [
+        "deno task gen:agent-docs-prose",
+        "deno task gen:mcp-export-corpus --allow-dirty",
+        "deno task gen:assets-barrel",
+        "deno task gen:publish-assets"
+      ],
+      "note": "Source explicitly allowed dirty for reviewed in-progress generation; all freshness checks pass."
+    },
+    "package-check-lint-fmt": {
+      "outcome": "PASS",
+      "files": 276,
+      "reports": [
+        "package-check.json",
+        "package-lint.json",
+        "package-fmt.json"
+      ]
+    },
+    "scoped-check-lint-fmt": {
+      "outcome": "PASS",
+      "files": 3,
+      "reports": [
+        "scoped-check.json",
+        "scoped-lint.json",
+        "scoped-fmt.json"
+      ]
+    },
+    "css-format": {
+      "outcome": "PASS",
+      "files": 52,
+      "report": "css-fmt.json"
+    },
+    "quality-gate": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 14395,
+      "requestHash": "22d52e69cca635799d9aff2aff83fdeb270def9361872384ab318ec3fbc1ec1d",
+      "note": "Original command receipt retained privately; this is a summary, not a byte-identical receipt. Inherited warnings remain."
+    },
+    "release-preflight": {
+      "outcome": "PASS",
+      "exitCode": 0
+    },
+    "jsr-audit": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "nativePublishDryRun": true,
+      "note": "Existing vocabulary/cardinality and native Checking for slow types warning remain; no public API changes."
+    },
+    "scaffold-runtime": {
+      "outcome": "UNPROVEN",
+      "exitCode": 1,
+      "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+      "note": "Aspire doctor preflight failed; Docker daemon unavailable. Cleanup also UNPROVEN. No runtime started."
+    },
+    "leak-hygiene": {
+      "outcome": "UNPROVEN",
+      "unprovenOwnershipEntries": 25,
+      "mutations": 0,
+      "report": "leak-report.md"
+    },
+    "implementation-evaluation": {
+      "outcome": "PASS",
+      "modelRequested": "claude-opus-5-5",
+      "modelObserved": [
+        "claude-opus-5-5"
+      ],
+      "effortRequested": "high",
+      "effortObserved": "not attested",
+      "readOnly": true,
+      "independentSourceHashesVerified": 50,
+      "report": "evaluate.md"
+    },
+    "remote-required-checks": {
+      "outcome": "PENDING",
+      "note": "No final-head CI or READY claim."
+    },
+    "token-quality": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 26074,
+      "requestHash": "60d0fe33623b75f0cc70a8b4ea26c8cd4b72eaf2a03c3e9b29d112de36ac139d",
+      "note": "Summary of original receipt retained privately."
+    },
+    "token-freshness": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 20168,
+      "requestHash": "02e8ce99468f53bc6763ddbba2b50ad17eaa7df970c4f449f9cd3119bb52137d",
+      "note": "Summary of original receipt retained privately."
+    },
+    "additional-full-export-doc-lint": {
+      "outcome": "INHERITED_FINDINGS",
+      "exitCode": 1,
+      "findings": 124,
+      "unchangedFindingFiles": 16,
+      "report": "doc-lint-baseline.json",
+      "note": "Every finding source is byte-identical to baseline; no new public types or new architecture debt."
+    }
+  }
+}

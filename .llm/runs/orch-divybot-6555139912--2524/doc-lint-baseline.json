@@ -1,0 +1,94 @@
+{
+  "command": "deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui",
+  "exitCode": 1,
+  "summary": {
+    "totalPackages": 1,
+    "totalErrors": 124,
+    "totalPrivateTypeRef": 96,
+    "totalMissingJSDoc": 28,
+    "totalOther": 0
+  },
+  "classification": "Inherited diagnostic; no public types changed and every finding file is byte-identical to baseline 6a1d84a",
+  "unchangedFiles": [
+    {
+      "path": "packages/fresh-ui/src/runtime/combobox/combobox.types.ts",
+      "sha256": "a65969d3f1104a4bf176856bb9a4817e1f69f92835b2400068ef624d7e4bffbd",
+      "errors": 33
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/popover/Popover.tsx",
+      "sha256": "41a18b4303902396bd619480e30c7f63d6df3240d34fd443d61f2e604989bfbd",
+      "errors": 11
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/popover/popover.types.ts",
+      "sha256": "0a4083ed2978cc24fde4a516c5d044b1e07b39a1f5ca77e141b472b246e816b1",
+      "errors": 10
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/dialog/Dialog.tsx",
+      "sha256": "17970ed2c77e1641695db95d3620831fab4c96a0f01ba4b2c5a2d6579d259fb3",
+      "errors": 7
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/drawer/Drawer.tsx",
+      "sha256": "ada4716de3e9186d09d4499ef55d3b32bc4a9df47359ddf91f623eb5ac42796d",
+      "errors": 7
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/sheet/Sheet.tsx",
+      "sha256": "97c3de6479e3c19f59e2c81b246d56dc000cd6c6584535681db34ef24ce743e0",
+      "errors": 7
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/tooltip/Tooltip.tsx",
+      "sha256": "375574a6e21741febe26e4756a15f3e964c1eb3061664456aadf6f9dd7a09342",
+      "errors": 7
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/accordion/Accordion.tsx",
+      "sha256": "97ec1b172526a0a1a27571eb52f7e88a5ade76cd9da3d9d94b1c446568daeeea",
+      "errors": 6
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/dialog/dialog.types.ts",
+      "sha256": "9cca5c2a32ce0da0c37dd08f5768b65e1be18e3f4ecd129c0dc3e02e7139f869",
+      "errors": 6
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/sheet/sheet.types.ts",
+      "sha256": "40d8e5953ed3de81cb1503157f46cde0b5964f0105276195492eb47474f5dd77",
+      "errors": 6
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/tooltip/tooltip.types.ts",
+      "sha256": "4c99b53c95fd8ece5cdbfff0d5756d0079c6fb4bf96a85ae8313f90a13c042f2",
+      "errors": 6
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/accordion/accordion.types.ts",
+      "sha256": "2d09bae1280b1b75ecac0a0aac2b988f25b72de56406cb95eb3718e893faaf93",
+      "errors": 5
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/tabs/Tabs.tsx",
+      "sha256": "17d5ce6c28ec375d7fabfaa15a244b8322077f948a429ffc1053f496603d8956",
+      "errors": 5
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/tabs/tabs.types.ts",
+      "sha256": "9c41dd984c4b91b5c448b324ce6df9280bad2d3d4f7a22c4c4e72fc51801065f",
+      "errors": 4
+    },
+    {
+      "path": "packages/fresh-ui/src/runtime/combobox/Combobox.tsx",
+      "sha256": "62f114525f4bed9be12d219b00cb699fc8db6f4ca9b0254350499b522f87d952",
+      "errors": 3
+    },
+    {
+      "path": "packages/fresh-ui/contracts.json",
+      "sha256": "4332c015427f0fce6a1f583b1aee7cd3c1311bb3c4aef8c96b466f4d8e1a6e6a",
+      "errors": 1
+    }
+  ]
+}

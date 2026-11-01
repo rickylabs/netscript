@@ -1,0 +1,278 @@
+{
+  "files": 52,
+  "changed": 46,
+  "before": {
+    "raw": 270183,
+    "gzip": 27152
+  },
+  "after": {
+    "raw": 215981,
+    "gzip": 26527
+  },
+  "changes": [
+    {
+      "path": "packages/fresh-ui/registry/components/ui/alert-styles.css",
+      "beforeScopes": 34,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/alert.css",
+      "beforeScopes": 1,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/avatar.css",
+      "beforeScopes": 9,
+      "afterScopes": 2
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/badge.css",
+      "beforeScopes": 10,
+      "afterScopes": 2
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/button.css",
+      "beforeScopes": 26,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/card.css",
+      "beforeScopes": 6,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/chart-block.css",
+      "beforeScopes": 17,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/checkbox.css",
+      "beforeScopes": 5,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/choice-styles.css",
+      "beforeScopes": 5,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/citation-chip.css",
+      "beforeScopes": 5,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/code-block.css",
+      "beforeScopes": 21,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/command-palette.css",
+      "beforeScopes": 10,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/data-table.css",
+      "beforeScopes": 16,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/desktop-dialog.css",
+      "beforeScopes": 9,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/desktop-notification.css",
+      "beforeScopes": 10,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/desktop-tray-menu.css",
+      "beforeScopes": 12,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/desktop-update-prompt.css",
+      "beforeScopes": 11,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/desktop-window-chrome.css",
+      "beforeScopes": 11,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/detail-layout.css",
+      "beforeScopes": 1,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/donut.css",
+      "beforeScopes": 23,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/dropzone.css",
+      "beforeScopes": 5,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/empty-state.css",
+      "beforeScopes": 2,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/filter-form.css",
+      "beforeScopes": 1,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/floating.css",
+      "beforeScopes": 16,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/form-control-styles.css",
+      "beforeScopes": 9,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/form-field.css",
+      "beforeScopes": 5,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/inline-notice.css",
+      "beforeScopes": 1,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/label.css",
+      "beforeScopes": 2,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/markdown.css",
+      "beforeScopes": 19,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/message.css",
+      "beforeScopes": 16,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/model-selector.css",
+      "beforeScopes": 16,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/page-header.css",
+      "beforeScopes": 5,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/pagination.css",
+      "beforeScopes": 1,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/panel.css",
+      "beforeScopes": 7,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/progress.css",
+      "beforeScopes": 8,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/prompt-input.css",
+      "beforeScopes": 25,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/responsive-table.css",
+      "beforeScopes": 17,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/search.css",
+      "beforeScopes": 5,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/section-divider.css",
+      "beforeScopes": 3,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/separator.css",
+      "beforeScopes": 2,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/sheet.css",
+      "beforeScopes": 5,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/skeleton.css",
+      "beforeScopes": 5,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/spinner.css",
+      "beforeScopes": 2,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/stats-grid.css",
+      "beforeScopes": 5,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/surface-styles.css",
+      "beforeScopes": 9,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/switch.css",
+      "beforeScopes": 10,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/textarea.css",
+      "beforeScopes": 1,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/toast.css",
+      "beforeScopes": 34,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/components/ui/tool-call-card.css",
+      "beforeScopes": 9,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/islands/mcp-ui-widget.css",
+      "beforeScopes": 2,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/islands/theme-toggle.css",
+      "beforeScopes": 3,
+      "afterScopes": 1
+    },
+    {
+      "path": "packages/fresh-ui/registry/styles/layouts.css",
+      "beforeScopes": 36,
+      "afterScopes": 1
+    }
+  ],
+  "note": "Six single-scope files retained verbatim; final byte sizes recorded by the shipped CSS budget test.",
+  "measurement": "Deno 2.9.7 CompressionStream(gzip); sorted non-theme registry CSS, newline-separated",
+  "rawSaved": 54202,
+  "gzipSaved": 625
+}
