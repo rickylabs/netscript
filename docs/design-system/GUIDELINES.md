@@ -1,6 +1,6 @@
 # NetScript Custom Design Guidelines
 
-How to design a Fresh UI theme that matches the quality of the eleven reference themes and works
+How to design a Fresh UI theme that matches the quality of the reference themes and works
 with the NetScript framework.
 
 The guidelines have two readers:

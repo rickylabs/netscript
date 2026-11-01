@@ -1,3 +1,4 @@
+import { DESIGN_GUIDANCE } from '../../../assets/design-guidance.generated.ts';
 import { QUERY_RESULT_RETURN, QUERY_RESULT_TEMPLATE } from './query-result-template.ts';
 import { dirname, relative, resolve } from '@std/path';
 import { cleanUiPagePath } from './page-path.ts';
@@ -46,7 +47,7 @@ const GENERATED_LINE_WIDTH = 100;
 /** Where every scaffolded page gets its frame and theme; printed after `ui:add page`. */
 const PAGE_FRAME_GUIDANCE = [
   'The page renders inside the app chrome from routes/_layout.tsx; navigation.ts lists the top-bar links, and chromelessRoutePrefixes opts a route out.',
-  'Theme every page at once: switch the preset with `netscript ui:apply --preset <id>`, or alias roles and run `netscript tokens build`; see MCP get_doc web-layer/how-to/theme-your-app.',
+  `Theme every page at once: switch the preset with \`netscript ui:apply --preset <id>\`, or alias roles and run \`netscript tokens build\`; see MCP get_doc ${DESIGN_GUIDANCE.themeGuideSlug}.`,
 ] as const;
 export interface UiIslandScaffoldInput extends WriteOptions {
   readonly projectRoot: string;

@@ -1,4 +1,6 @@
 import { basename, join } from '@std/path';
+import { format, parse } from '@std/semver';
+import { DESIGN_GUIDANCE } from '../../../../kernel/assets/design-guidance.generated.ts';
 import {
   EMBEDDED_SKILL_BUNDLE_HASH,
   EMBEDDED_SKILL_FILES,
@@ -10,7 +12,10 @@ import {
   EMBEDDED_AGENT_TOOL_FILES,
   EMBEDDED_AGENT_TOOL_PATHS,
 } from '../../../../kernel/assets/agent-tools.generated.ts';
-import { netscriptJsrSpecifier } from '../../../../kernel/constants/jsr-specifiers.ts';
+import {
+  NETSCRIPT_RELEASE_VERSION,
+  netscriptJsrSpecifier,
+} from '../../../../kernel/constants/jsr-specifiers.ts';
 import { generateEditorConfigFiles } from '../../../../kernel/adapters/scaffold/editor-config.ts';
 import type { AgentDocsGenerator } from './agent-docs-generator.ts';
 import type { AgentInitFileSystem } from './agent-init-file-system.ts';
@@ -65,6 +70,8 @@ export interface InitAgentDependencies {
   readonly docsGenerator?: AgentDocsGenerator;
   /** Exact CLI specifier override used by migration fixtures. */
   readonly cliSpecifier?: string;
+  /** Invoking CLI release, overridable for stable/canary installation fixtures. */
+  readonly releaseVersion?: string;
   /** Invoking-environment snapshot used to detect the host; empty when omitted. */
   readonly environment?: AgentEnvironment;
 }
@@ -82,6 +89,10 @@ export async function initAgent(
     readonly files?: readonly string[];
   };
   await verifyBundle(bundle, skillManifest.files ?? [], 'Skill');
+  const skillFiles = materializeSkillFiles(
+    bundle.files,
+    dependencies.releaseVersion ?? NETSCRIPT_RELEASE_VERSION,
+  );
   const toolBundle = dependencies.toolBundle ?? {
     files: EMBEDDED_AGENT_TOOL_FILES,
     paths: EMBEDDED_AGENT_TOOL_PATHS,
@@ -146,9 +157,6 @@ export async function initAgent(
       changedFiles,
     );
   }
-  const skillFiles = Object.entries(bundle.files).filter(
-    ([path]) => path !== 'manifest.json',
-  );
   for (const [path, content] of skillFiles) {
     await writeChanged(
       dependencies.fs,
@@ -262,6 +270,42 @@ export async function initAgent(
     );
   }
   return { hosts, resolution, changedFiles, messages };
+}
+
+/** Verify release-link placement and prepare all skill bytes before any filesystem writes. */
+function materializeSkillFiles(
+  files: Readonly<Record<string, string>>,
+  releaseVersion: string,
+): readonly (readonly [string, string])[] {
+  const token = DESIGN_GUIDANCE.releaseRefToken;
+  const designPath = 'netscript-design/SKILL.md';
+  if (files['manifest.json']?.includes(token)) {
+    throw new Error('Unexpected release-ref token in skill: manifest.json');
+  }
+  const version = parse(releaseVersion);
+  if (version.build?.length || format(version) !== releaseVersion) {
+    throw new Error(`Design guidance requires a canonical release version: ${releaseVersion}`);
+  }
+  return Object.entries(files).filter(([path]) => path !== 'manifest.json').map(
+    ([path, content]) => {
+      if (path !== designPath) {
+        if (content.includes(token)) {
+          throw new Error(`Unexpected release-ref token in skill: ${path}`);
+        }
+        return [path, content] as const;
+      }
+      if (!content.includes(token)) {
+        throw new Error('Design skill is missing its release-ref token');
+      }
+      const rendered = content.replaceAll(token, `v${releaseVersion}`);
+      if (rendered.includes(token)) {
+        throw new Error(
+          'Design skill contains an unresolved release-ref token',
+        );
+      }
+      return [path, rendered] as const;
+    },
+  );
 }
 
 async function hasAspireWorkflowSkills(
