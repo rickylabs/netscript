@@ -1,0 +1,24 @@
+{
+  "source": {
+    "mode": "command",
+    "exitCode": 0
+  },
+  "selection": {
+    "filesSelected": 17,
+    "batches": 1,
+    "failedBatches": 0
+  },
+  "coverage": {
+    "filesSelected": 17,
+    "filesProcessed": 17,
+    "droppedFiles": [],
+    "refusals": []
+  },
+  "summary": {
+    "totalOccurrences": 0,
+    "uniqueOccurrences": 0,
+    "uniqueRules": 0,
+    "uniquePaths": 0
+  },
+  "groups": []
+}

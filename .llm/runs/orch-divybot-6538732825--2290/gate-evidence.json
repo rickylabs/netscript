@@ -1,0 +1,136 @@
+{
+  "recordedAt": "2026-10-31",
+  "results": [
+    {
+      "gate": "auth-tests",
+      "exitCode": 0,
+      "sha256": "b95cc3c32050e61933d2759c3f9e47defb4dbabde182e2f45f0797b9a82d3658",
+      "summary": {
+        "passed": 231,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 231,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "check",
+      "exitCode": 0,
+      "sha256": "9d151decc92dd3c0430665400b808301a94c3d8305f2e09f391db24a8254bb40",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "exitCodeSource": "Observed successful process exit; this wrapper report has no top-level exitCode in selection/audit mode."
+    },
+    {
+      "gate": "lint",
+      "exitCode": 0,
+      "sha256": "48a95864785e4634e877541c38ff913767609e1b53b016605eff4ae3a27da53b",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      }
+    },
+    {
+      "gate": "fmt",
+      "exitCode": 0,
+      "sha256": "75d9bbf3ec0b99181410f9f00bac609941d7c377ab50e0a633efe451ed95b0ab",
+      "summary": {
+        "filesSelected": 38,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "exitCodeSource": "Observed successful process exit; this wrapper report has no top-level exitCode in selection/audit mode."
+    },
+    {
+      "gate": "doc-tests",
+      "exitCode": 0,
+      "sha256": "3707781d64a4b30cae2bd1ef9e8416ad940690e890e78262130f34028b3f5142",
+      "summary": {
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 11,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "negative-control",
+      "exitCode": 1,
+      "sha256": "65ccd9b114768f351f187c863ed334fde5c1ea5470a7fc5def0876b94a2cb1a4",
+      "summary": {
+        "passed": 0,
+        "failed": 2,
+        "ignored": 0,
+        "totalResults": 2,
+        "uniqueFailures": 2
+      }
+    },
+    {
+      "gate": "quality.receipt",
+      "exitCode": 0,
+      "sha256": "b6227e86db93102ab28731141064a96358ba84f204ea20133487c5deaa937faa",
+      "outcome": "PASS",
+      "gateId": "quality-gate",
+      "note": "Receipt ran on the implementation working tree before its sign-off commit; not evidence of a clean committed head."
+    },
+    {
+      "gate": "jsr-audit",
+      "exitCode": 0,
+      "sha256": "9fbfaf07882a80c4ece4fffcab1cd19271f02d471cbfb77442ad2c0cf577c74a",
+      "exitCodeSource": "Observed successful process exit; this wrapper report has no top-level exitCode in selection/audit mode.",
+      "audit": {
+        "package": "@netscript/service",
+        "filesInspected": 128,
+        "entrypoints": 8,
+        "readmePresent": true,
+        "allEntrypointsHaveModuleTags": true,
+        "findings": [],
+        "publishDryRun": "separate service member gate, exit 0"
+      }
+    },
+    {
+      "gate": "service-tests",
+      "exitCode": 0,
+      "summary": {
+        "passed": 642,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 642,
+        "uniqueFailures": 0
+      },
+      "sha256": "b3b2bc8a1caffb0ea1991596036b406bc2f0aa09ecb0ea539c58f380c9c7c83a"
+    },
+    {
+      "gate": "publish-dry-run",
+      "exitCode": 0
+    },
+    {
+      "gate": "doc-lint",
+      "exitCode": 0
+    },
+    {
+      "gate": "prod-install",
+      "exitCode": 0
+    },
+    {
+      "gate": "docs-exports-drift",
+      "exitCode": 0
+    },
+    {
+      "gate": "docs-snippets",
+      "exitCode": 0
+    },
+    {
+      "gate": "docs-readme-fences",
+      "exitCode": 0
+    }
+  ]
+}

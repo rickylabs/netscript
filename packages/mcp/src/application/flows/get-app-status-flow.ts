@@ -1,3 +1,10 @@
+import type { TelemetrySnapshotPort } from '../../ports/telemetry-snapshot-port.ts';
+import { TELEMETRY_WINDOW_MS } from '../../domain/telemetry/telemetry-snapshot.ts';
+import {
+  readTelemetrySnapshot,
+  telemetryEmptyResult,
+  telemetrySnapshotError,
+} from '../telemetry/read-telemetry-snapshot.ts';
 import type { TelemetryQueryPort } from '@netscript/telemetry/query';
 import { summarizePluginHealth } from '@netscript/plugin/health';
 import type { ProjectDoctorPort } from '../../domain/project-doctor-port.ts';
@@ -7,21 +14,47 @@ import { aggregateAppStatus } from '../telemetry-aggregation.ts';
 
 /** Create the NetScript-semantic application health flow. */
 export function createGetAppStatusFlow(
-  query: TelemetryQueryPort,
+  query: TelemetryQueryPort | TelemetrySnapshotPort,
   doctor?: ProjectDoctorPort,
   projectRoot = '.',
+  now: () => number = Date.now,
 ): ToolFlow {
   return async (input) => {
     const service = readString(input, 'service');
     const limit = readNumber(input, 'limit') ?? 100;
-    const filter = { ...(service ? { serviceName: service } : {}), limit };
-    const [resources, spans, logs, checks] = await Promise.all([
-      query.queryResources(service ? { serviceName: service } : undefined),
-      query.querySpans(filter),
-      query.queryLogs(filter),
+    const untilUnixMs = now();
+    const [snapshot, checks] = await Promise.all([
+      readTelemetrySnapshot(query, {
+        sinceUnixMs: readNumber(input, 'sinceUnixMs') ?? untilUnixMs - TELEMETRY_WINDOW_MS,
+        untilUnixMs,
+        service,
+        includeHealth: true,
+        limit,
+      }),
       readRuntimeChecks(doctor, projectRoot),
     ]);
-    const telemetry = aggregateAppStatus(resources, spans, logs);
+    if (!snapshot.ok) return telemetrySnapshotError(snapshot);
+    const summary = aggregateAppStatus(
+      snapshot.resources,
+      snapshot.spans,
+      snapshot.logs,
+    );
+    const telemetry = {
+      ...summary,
+      status: snapshot.provenance.state === 'partial' && summary.status === 'pass'
+        ? 'warn' as const
+        : summary.status,
+      provenance: snapshot.provenance,
+      ...(snapshot.provenance.state === 'no_data' || snapshot.provenance.state === 'partial'
+        ? {
+          diagnostic: snapshot.provenance.state === 'partial' &&
+              (snapshot.spans.length > 0 || snapshot.logs.length > 0)
+            ? 'The dashboard returned a capped telemetry snapshot. Counts and health reflect ' +
+              'only sampled records; narrow the service/window or inspect dashboard Traces and Logs.'
+            : telemetryEmptyResult(snapshot.provenance).error.message,
+        }
+        : {}),
+    };
     if (!doctor) return { ok: true, value: telemetry };
     const health = checks.flatMap((check) => check.runtimeHealth ? [check.runtimeHealth] : [])
       .filter((report) =>

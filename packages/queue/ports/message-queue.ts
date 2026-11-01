@@ -75,6 +75,9 @@ export interface MessageContext {
    * @param options - Requeue and dead-letter metadata options.
    */
   nack(options?: NackOptions): Promise<void>;
+
+  /** Extend a live claim from now; false means ownership expired or was replaced. */
+  extendVisibility?(milliseconds?: number): Promise<boolean>;
 }
 
 /**
@@ -198,11 +201,29 @@ export interface ListenOptions {
   concurrency?: number;
 
   /**
+   * Redis idle pickup poll in integer milliseconds, 10–60000 (default 50).
+   * Overrides NETSCRIPT_REDIS_QUEUE_POLL_INTERVAL_MS; other providers ignore it.
+   */
+  pollIntervalMs?: number;
+
+  /**
+   * Redis delayed-promotion poll in integer milliseconds, 10–60000 (default 1000).
+   * Overrides NETSCRIPT_REDIS_DELAYED_POLL_INTERVAL_MS; other providers ignore it.
+   */
+  delayedPollIntervalMs?: number;
+
+  /**
    * Visibility timeout in milliseconds.
    * How long a message is hidden from other consumers while processing.
    * Provider-specific behavior.
    */
   visibilityTimeout?: number;
+
+  /** Redis delivery limit, including the first delivery; defaults to 5. */
+  maxDeliveries?: number;
+
+  /** Redis grace after lease expiry before recovery, in milliseconds; defaults to 1000. */
+  recoveryGrace?: number;
 
   /**
    * Maximum number of messages to prefetch.

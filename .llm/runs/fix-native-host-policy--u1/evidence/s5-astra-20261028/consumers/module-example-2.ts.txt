@@ -1,0 +1,6 @@
+import { startStreamsService } from '@netscript/plugin-streams/service';
+
+const running = await startStreamsService({
+  auth: { public: true, reason: 'Internal mesh; ingress authenticates upstream.' },
+});
+await running.stop();

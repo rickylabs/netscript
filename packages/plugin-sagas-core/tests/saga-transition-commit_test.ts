@@ -155,13 +155,38 @@ Deno.test('atomic saga composition refuses KV and unbound Prisma before handler 
   }
   let calls = 0;
   const kv = new KvSagaStore({ kv: new MemoryKvAdapter() });
+  const unexpectedIo = (): never => {
+    calls++;
+    throw new Error('unexpected database work');
+  };
+  assertThrows(
+    () => new PrismaSagaStore({ prisma: {} as PrismaSagaStoreClient }),
+    TypeError,
+    'applied-key',
+  );
   const prisma = new PrismaSagaStore({
-    prisma: new Proxy({} as PrismaSagaStoreClient, {
-      get() {
-        calls++;
-        throw new Error('unexpected database work');
+    prisma: {
+      sagaRuntimeCommandAppliedKey: { findUnique: unexpectedIo, createMany: unexpectedIo },
+      sagaRuntimeState: {
+        findUnique: unexpectedIo,
+        findMany: unexpectedIo,
+        create: unexpectedIo,
+        upsert: unexpectedIo,
+        updateMany: unexpectedIo,
+        deleteMany: unexpectedIo,
       },
-    }),
+      sagaRuntimeCorrelation: {
+        findUnique: unexpectedIo,
+        upsert: unexpectedIo,
+        deleteMany: unexpectedIo,
+      },
+      sagaRuntimeTransition: {
+        findMany: unexpectedIo,
+        create: unexpectedIo,
+        deleteMany: unexpectedIo,
+      },
+      $transaction: unexpectedIo,
+    },
   });
   const definition = {
     ...defineSaga('document').durableWorkerCommands().state({ count: 0 } as SagaState).on(

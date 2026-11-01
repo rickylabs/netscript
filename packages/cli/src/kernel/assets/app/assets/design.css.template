@@ -757,7 +757,7 @@
 }
 
 .ns-rules-dont > span {
-  color: var(--ns-destructive);
+  color: var(--ns-destructive-text);
 }
 
 /* Responsive + reduced motion */
@@ -806,4 +806,12 @@
   .ns-token-motion-chip:hover {
     transform: none;
   }
+}
+
+/* A specimen's caption is separate from the authored color pair being inspected. */
+:root[data-theme]:not([data-theme='ns-one']):not([data-theme='light']):not([data-theme='dark']) .ns-token-intent__hero :is(strong, code) {
+  color: var(--ns-fg);
+  background: var(--ns-bg);
+  opacity: 1;
+  padding-inline: var(--ns-space-1);
 }

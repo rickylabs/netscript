@@ -94,7 +94,7 @@ export type StartCombinedProcessOptions =
     /** Startup health monitor owned by generated glue. */
     health?: ChildHealthMonitor;
     /** Observe the runtime before awaiting its long-running listener. */
-    onStarted?: (snapshot: () => ChildHealthSnapshot) => void;
+    onStarted?: (snapshot: () => ChildHealthSnapshot | Promise<ChildHealthSnapshot>) => void;
     /** Stop worker and scheduler when the owning process shuts down. */
     signal?: AbortSignal;
   }>;
@@ -172,7 +172,10 @@ export async function startCombinedProcess(
   };
   options.signal?.addEventListener('abort', stop, { once: true });
   try {
-    options.onStarted?.(() => worker.healthStatus.childHealth);
+    options.onStarted?.(async () => {
+      const health = await worker.readHealthStatus();
+      return { ...health.childHealth, deadLetters: health.deadLetters };
+    });
     if (options.signal?.aborted) return runtimeHandle;
     await worker.start();
     return runtimeHandle;
@@ -187,6 +190,8 @@ export type {
   ChildHealthMonitor,
   ChildHealthSnapshot,
   ChildHealthState,
+  ChildRestartHistory,
+  ChildRestartHistoryPort,
 } from '@netscript/plugin/health';
 export type { GeneratedJobRegistryStatus } from '../src/runtime/generated-jobs.ts';
 export type {

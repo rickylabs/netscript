@@ -1,0 +1,130 @@
+{
+  "tests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--lock=deno.lock",
+      "--frozen",
+      "--unstable-kv",
+      "tests/contracts",
+      "tests/registry/components/ui/chart-block.test.tsx",
+      "tests/registry/components/ui/donut.test.tsx",
+      "tests/data-grid.test.tsx",
+      "tests/runtime"
+    ],
+    "cwd": "./packages/fresh-ui",
+    "exitCode": 0,
+    "durationMs": 3624,
+    "summary": {
+      "passed": 139,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 139,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "cli-tests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "packages/cli/src/kernel/application/ui/page/web-scaffold_test.ts"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "durationMs": 1189,
+    "summary": {
+      "passed": 19,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 19,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "check": {
+    "source": {
+      "mode": "selection",
+      "cwd": "."
+    },
+    "command": "deno check --unstable-kv <files>",
+    "selection": {
+      "filesSelected": 6,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "lint": {
+    "source": {
+      "mode": "command",
+      "cwd": ".",
+      "exitCode": 0
+    },
+    "selection": {
+      "filesSelected": 6,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "coverage": {
+      "filesSelected": 6,
+      "filesProcessed": 6,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "fmt": {
+    "command": "deno fmt --check",
+    "cwd": ".",
+    "mode": "check",
+    "summary": {
+      "filesSelected": 6,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "coverage": {
+      "filesSelected": 6,
+      "filesProcessed": 6,
+      "droppedFiles": [],
+      "refusals": []
+    },
+    "findings": []
+  },
+  "legacy": {
+    "fixtures": 262,
+    "schemes": 2,
+    "errors": []
+  },
+  "browser": {
+    "browser": "153.0.8010.12",
+    "fixtures": 30,
+    "measurements": 176,
+    "errors": []
+  },
+  "quality": {
+    "command": "deno task quality:gate",
+    "exitCode": 0
+  }
+}

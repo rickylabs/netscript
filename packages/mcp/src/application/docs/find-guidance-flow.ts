@@ -21,7 +21,9 @@ import {
 import type { ToolExecutionResult, ToolFlow } from '../../domain/tool-types.ts';
 
 /** Create the bounded intent-aware documentation flow. */
-export function createFindGuidanceFlow(port: Pick<DocsCorpusPort, 'findGuidance'>): ToolFlow {
+export function createFindGuidanceFlow(
+  port: Pick<DocsCorpusPort, 'findGuidance' | 'citation'>,
+): ToolFlow {
   return async (input: unknown): Promise<ToolExecutionResult> => {
     if (!isRecord(input) || typeof input.intent !== 'string') {
       return invalidInput('intent must be a non-empty string');
@@ -44,7 +46,13 @@ export function createFindGuidanceFlow(port: Pick<DocsCorpusPort, 'findGuidance'
       ? GUIDANCE_DEFAULT_RECOMMENDATIONS
       : requestedLimit as number;
     try {
-      return { ok: true, value: boundGuidanceResult(await port.findGuidance(intent), limit) };
+      return {
+        ok: true,
+        value: {
+          ...boundGuidanceResult(await port.findGuidance(intent), limit),
+          ...(port.citation ? { citation: port.citation } : {}),
+        },
+      };
     } catch (error) {
       if (error instanceof DocsCorpusUnavailableError) {
         return { ok: false, error: { code: error.code, message: error.message } };

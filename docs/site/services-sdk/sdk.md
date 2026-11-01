@@ -2,25 +2,22 @@
 layout: layouts/base.vto
 title: Typed SDK & client
 templateEngine: [vento, md]
-prev: { label: "Fresh meta-framework", href: "/web-layer/" }
-next: { label: "Polyglot tasks", href: "/background-processing/polyglot-tasks/" }
 order: 2
 ---
 
 # Typed SDK & client
 
-**Declare a contract action once and everything the caller needs — the typed method, the query
-key, the cache entry, the TanStack options — is derived from it, in one import.**
-
-The `@netscript/sdk` is the **typed client and data layer** for NetScript: it turns an
-[`@orpc/contract`](/explanation/contracts/) into a discovered, type-safe service client,
-wraps each contract action in a **cache-first query factory** (KV-backed SWR), and bridges
-those into [TanStack Query](https://tanstack.com/query) for islands. The contract object is
-the single source of truth — the *same* object the [service](/services-sdk/services/)
-implements is the one the client imports, so its input, output, and declared-error types cannot
-drift between caller and server. Transport failures and arbitrary thrown values are not declared
-contract errors; `safe()` keeps those failures on its non-defined branch.
+This page explains how `@netscript/sdk` turns a contract into a typed client, cache-first query
+factories and TanStack Query helpers, and how to call a service safely from a loader or an island.
 {{ comp.badge({ status: "pre-1.0" }) }}
+
+The SDK turns an [`@orpc/contract`](/explanation/contracts/) into a discovered, type-safe service
+client, wraps each contract action in a cache-first query factory (KV-backed stale-while-revalidate),
+and bridges those into [TanStack Query](https://tanstack.com/query) for islands. The
+[service](/services-sdk/services/) implements the same contract object the client imports, so input,
+output, and declared-error types cannot drift between caller and server. Transport failures and
+arbitrary thrown values are not declared contract errors; `safe()` keeps them on its non-defined
+branch. Subpath barrels are stable, but signatures may still change before 1.0.
 
 {{ comp.diagram({
   src: "/assets/diagrams/sdk-data-flow.svg",
@@ -30,73 +27,31 @@ contract errors; `safe()` keeps those failures on its non-defined branch.
 
 ## What it is
 
-The SDK is layered. **L1** is the typed client: `createServiceClient<Contract>()` resolves a
-service URL from [Aspire service discovery](/explanation/aspire/) and returns a callable
-object whose method input, output, and declared-error union are inferred from the contract.
-**L2** wraps each contract
-action in a query factory (`createQueryFactories`) that runs through a shared KV-backed cache
-provider and exposes `queryOptions`/`mutationOptions`/`clientKey`/`key`/`getCachedEntry` per
-action. **L3** is the `defineServices()` preset that builds clients, server query factories,
-and frontend query utils from one contract map. You consume the layer you need and can drop
-down without rewiring. See [Contracts](/explanation/contracts/) for the type-flow theory.
+The SDK has three layers, and you can use any one without the others:
 
-{{ comp callout { type: "tip", title: "Use this when" } }}
-Reach for the SDK when an app or a service needs to <strong>call a typed oRPC service</strong>
-and render its data with <strong>cache-first, server-hydrated queries</strong>. Use the bare
-<a href="/services-sdk/services/"><code>createServiceClient</code></a> for service-to-service
-RPC; add <code>createQueryFactories</code> when you want KV-backed SWR and TanStack option
-helpers; reach for <a href="/web-layer/">Fresh</a> when an island must
-hydrate that same query key on the client.
-{{ /comp }}
+- **L1, the typed client.** `createServiceClient<Contract>()` resolves a service URL through
+  [Aspire service discovery](/explanation/aspire/) and returns a callable object whose method input,
+  output, and declared-error union are inferred from the contract.
+- **L2, query factories.** `createQueryFactories` wraps each contract action in a factory that runs
+  through a shared KV-backed cache provider and exposes `queryOptions`, `mutationOptions`,
+  `clientKey`, `key` and `getCachedEntry` per action.
+- **L3, the preset.** `defineServices()` builds clients, server query factories, and frontend query
+  utils from one contract map.
 
-## Declare once, derived everywhere
+Use the bare client for service-to-service RPC. Add query factories when you want KV-backed caching
+and TanStack option helpers, and use [Fresh](/web-layer/) when an island must hydrate the same query
+key on the client.
 
-The classic data-layer tax is the [hand-rolled fetch wrapper](/web-layer/query/): a `lib/api.ts`
-full of `fetch()` calls whose request and response types are re-typed by hand from whatever the
-server currently returns. Every server change costs a second edit in the wrapper, a third in the query keys, and
-whichever one is forgotten becomes a runtime bug. For an AI agent working the codebase the tax is
-worse — each of those copies is a separate turn, and a stale one is a wrong answer the agent
-cannot see until runtime.
-
-The SDK collapses those copies into one declaration. tRPC made this move famous for TypeScript
-APIs — declare a procedure on the server and the client's types follow, "end-to-end typesafe."
-NetScript keeps that declare-once property and shifts *where* the declaration
-lives: not inside server code, but in a standalone, versioned contract package that the server,
-the client, **and** the OpenAPI/Scalar surface all import. And the derivation goes further than
-method types — from one contract action the factory derives the server KV cache key (`key()`),
-the client TanStack key (`clientKey()`), the `queryOptions`/`mutationOptions` helpers, and the
-SWR cache reads. For routes built from `baseContract`, the same derivation carries the declared
-error schemas through the client promise and `safe()`. One edit to those contract-owned types
-updates the client, the docs surface, and the query layer together; transport and arbitrary thrown
-failures remain runtime, non-defined failures rather than being promoted into that contract.
-
-This is how a production chat application built on NetScript wires its dashboard:
-the typed client is built straight off the contract type, so a route added to the contract shows
-up on the client already typed. The mechanics of each layer are below; the type-flow theory is in
-[Contracts](/explanation/contracts/).
-
-## Learn → / Do →
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Learn — Build a service + client",
-    body: "Track D walks contract → typed client → query factory → definePage layer → island, end to end.",
-    href: "/tutorials/storefront/02-catalog-service/",
-    icon: "→"
-  },
-  {
-    title: "Do — Discover a service",
-    body: "Task recipe: resolve a service URL from Aspire env and stand up a typed client for it.",
-    href: "/services-sdk/how-to/discover-services/",
-    icon: "◆"
-  }
-] }) }}
+From one contract action, the factory derives the server KV cache key (`key()`), the client TanStack
+key (`clientKey()`), the `queryOptions`/`mutationOptions` helpers, and the cache reads. For routes
+built from `baseContract`, the declared error schemas also flow through the client promise and
+`safe()`. One edit to the contract updates the client, the OpenAPI surface and the query layer
+together.
 
 ## Minimal example
 
-A single `lib/orders.ts` is the spine of the data layer: build the typed client from a
-contract, then derive a query factory from `{ contract, client }`. Every consumer — server
-loader or island — imports from here.
+A single `lib/orders.ts` holds the data layer: build the typed client from a contract, then derive a
+query factory from `{ contract, client }`. Server loaders and islands both import from it.
 
 ```ts
 // apps/playground/lib/orders.ts
@@ -129,10 +84,9 @@ Plain workspace services omit it.
 
 ## Key types first
 
-The query factory is the heart of the data layer. Each contract action becomes an
-**`ActionMethod`** carrying the full cache-first surface — keys, prefetch, cached reads, and
-TanStack option helpers. These are the methods you call from a `definePage` loader and an
-island; reading them first explains the rest of the page.
+Each contract action becomes an `ActionMethod` with the full cache-first surface: keys, prefetch,
+cached reads, and TanStack option helpers. You call these methods from a `definePage` loader and from
+an island.
 
 {{ comp.apiTable({
   caption: "ActionMethod — per-action query helpers (ordersQueries.list.*)",
@@ -150,26 +104,27 @@ island; reading them first explains the rest of the page.
 
 ## Constructing the client & factory
 
-The two L1/L2 constructors and their options. `createServiceClient` is the only call that
-touches discovery; `createQueryFactories` is pure wiring over `{ contract, client }`.
+`createServiceClient` is the only call that touches discovery; `createQueryFactories` is pure wiring
+over `{ contract, client }`.
 
 {{ comp.apiTable({
   caption: "createServiceClient<Contract>(options) — CreateServiceClientOptions",
   rows: [
     { name: "contract", type: "TContract — required", desc: "The @orpc/contract object. Drives both client typing AND HTTP method inference." },
     { name: "serviceName", type: "string — required", desc: "Service name registered in Aspire / NetScript config. Resolved to a URL via discovery (services__{name}__{protocol}__{index}; browser uses the VITE_ mirror)." },
-    { name: "routerName", type: "string?", desc: "Router-name segment for URL path construction. Required for plugin API services, omitted for plain services." },
-    { name: "protocol", type: "'http' | 'https'?", desc: "Resolved protocol for service discovery." },
-    { name: "apiPath / apiVersion", type: "string?", desc: "Base RPC path and API version segment overrides." },
-    { name: "propagateTraceContext", type: "boolean?", desc: "Auto-propagate W3C traceparent/tracestate headers on each call." },
+    { name: "routerName", type: "string?", desc: "Router-name segment for URL path construction; defaults to serviceName. Required for plugin API services, omitted for plain services." },
+    { name: "protocol", type: "'http' | 'https'?", desc: "Resolved protocol for service discovery. Defaults to 'http' (resolves the __http__ endpoint)." },
+    { name: "apiPath / apiVersion", type: "string?", desc: "Base RPC path and API version segment overrides. Default to '/api/rpc' and 'v1'; match what the service serves." },
+    { name: "propagateTraceContext", type: "boolean?", desc: "Auto-propagate W3C traceparent/tracestate headers on each call. Defaults to true." },
+    { name: "resolveServiceUrl", type: "ServiceUrlResolver?", desc: "(serviceName, protocol) => string | URL, called per request instead of discovery. Defaults to getServiceUrl. Only the origin of the result is used. See the discovery recipe for non-Aspire runtimes." },
     { name: "contributions", type: "readonly SdkClientContribution[]?", desc: "Explicit literal tuple of typed request contributions. The tuple infers required per-call context and reserves its declared headers." }
   ]
 }) }}
 
 ## Typed request contributions
 
-Contributions add typed per-call context and declare ownership of lower-case request headers. Attach
-the literal tuple to each service that needs it; contributions are explicit and are never installed
+Contributions add typed per-call context and declare ownership of lower-case request headers.
+Attach the literal tuple to each service that needs it; the SDK never installs a contribution
 automatically.
 
 This example composes an auth-shaped application contribution with the SDK's non-auth locale
@@ -281,11 +236,11 @@ Choose `responseCache: { mode: 'direct-only' }` if authenticated responses must 
 query helpers. A `partitioned` cache must use a stable, non-secret tenant/account partition. Never
 derive a partition from a credential, session id, email address, or another reversible identity.
 Contribution factories do not read ambient environment variables, cookies, or browser storage.
-Plugin manifest references only make factories discoverable—they do not activate them.
+Plugin manifest references only make factories discoverable; they do not activate them.
 
 The L3 alternative builds all three layers from one map:
 `defineServices({ orders: { contract, serviceName: 'orders' } })` returns
-`{ clients, queries, queryUtils }` — the same L2 values, just composed in one call. Import it from
+`{ clients, queries, queryUtils }`: the same L2 values, composed in one call. Import it from
 `@netscript/sdk/presets` in browser/shared modules so the graph contains only the preset and its
 package-owned type closure. The root also exports `defineServices`, but neither entry installs a
 server cache provider.
@@ -433,78 +388,26 @@ type checker, pass `safe()` a promise carrying contract error typing, such as th
 by a service-client method, rather than a bare `Promise`. For an existing typed error union,
 `isDefinedError()` narrows to the `DefinedError` members already present in that union.
 
-### Migrating to 0.0.7
-
-The typed-error channel in **0.0.7 is an intentional pre-1.0 breaking change and is not
-patch-compatible**. Existing SDK consumers should account for all of these signature changes:
-
-| Surface | Before 0.0.7 | 0.0.7 and later |
-| --- | --- | --- |
-| `SafeFailure` / `SafeResult` failure payload | The second tuple slot and object `data` property were `null`. | Both are `undefined`: `[error, undefined, isDefined, false]` and `{ error, data: undefined, ... }`. |
-| `SafeFailure` arms | `SafeFailure<TError = unknown>` was one failure arm with `isDefined: boolean`. | It is two literal-discriminated arms, `isDefined: false` and `isDefined: true`. Code that typed the property as a general `boolean` or treated failure as one undifferentiated arm must branch on the literal. |
-| Default error type | `SafeFailure` and `SafeResult` defaulted `TError` to `unknown`; `safe<TOutput>` had no `TError` parameter and returned `SafeResult<TOutput>`, inheriting that default. | `SafeFailure`, `SafeResult`, and `safe` now default `TError` to `Error`. |
-| `ServiceClientMethod` | `ServiceClientMethod<TInput, TOutput>` returned `Promise<TOutput>`. | `ServiceClientMethod<TInput, TOutput, TError = Error>` returns `Promise<TOutput> & { __error?: { type: TError } }`; the optional phantom marker lets `safe()` recover `TError`. |
-| `safe(promise)` input | Accepted `PromiseLike<TOutput>`. | Requires `Promise<TOutput> & { __error?: { type: TError } }`. A non-`Promise` thenable now fails with `TS2345`; pass `Promise.resolve(thenable)` instead. |
-| `baseContract` error codes | The error-map key space was open, so undeclared codes remained type-valid even though comparisons against them were silently false at runtime. | The key space is exactly `NOT_FOUND`, `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, or `SERVICE_UNAVAILABLE`. Comparing `error.code` with any other code is now a type error: intentional typo/undeclared-code protection and a breaking tightening. |
-| Result handling | Tuple destructuring such as `const [error, result] = await safe(...)` was the common idiom. | Branch on `result.isSuccess` first, then `result.isDefined`, as in the example above. |
-
-The tuple form has **not** been removed: every success and failure arm remains a tuple-and-object
-intersection, so destructuring still works. The discriminated form is the documented path because
-it keeps non-defined failures distinct from success and narrows contract-defined errors. For the
-payload migration, change a check such as `if (failure.data === null)` to
-`if (failure.data === undefined)`.
-
 ## Production notes
 
 {{ comp callout { type: "important", title: "/cache and /discovery are server-only" } }}
-<code>@netscript/sdk/cache</code> touches Deno KV and <code>@netscript/sdk/discovery</code>
-reads <code>services__*</code> env on the server — never import them into island/browser code.
-Browsers resolve service URLs through the <strong><code>VITE_</code>-mirrored</strong> keys
-that Aspire injects, and the query factory's cache reads happen on the server loader; the
-island receives hydrated state and a <code>clientKey()</code> for invalidation only.
+<code>@netscript/sdk/cache</code> touches Deno KV and <code>@netscript/sdk/discovery</code> reads
+<code>services__*</code> env on the server, so never import them into island or browser code.
+Browsers resolve service URLs through the <code>VITE_</code>-mirrored keys that Aspire injects. The
+query factory's cache reads happen in the server loader; the island receives hydrated state and a
+<code>clientKey()</code> for invalidation only.
 {{ /comp }}
 
-{{ comp callout { type: "warning", title: "clientKey() vs key() — don't cross the streams" } }}
+{{ comp callout { type: "warning", title: "Invalidate with clientKey(), not key()" } }}
 <code>key(props)</code> is the <strong>server</strong> KV cache key
 (<code>[resource, action, serializedInput]</code>); <code>clientKey(props?)</code> is the
 <strong>client</strong> TanStack key (prefix-matchable). Invalidate on the client with
-<code>clientKey()</code> / <code>toClientKeyPrefix(...)</code> — passing a server
-<code>key()</code> to <code>invalidateQueries</code> will silently match nothing. NetScript is in
-pre-1.0; subpath barrels are stable but signatures may still move.
+<code>clientKey()</code> or <code>toClientKeyPrefix(...)</code>. A server <code>key()</code> passed to
+<code>invalidateQueries</code> silently matches nothing.
 {{ /comp }}
 
-## Reference →
+## Next steps
 
-This hub is intentionally thin — the full generated API (client, query, query-client, cache,
-collections, discovery, streams, telemetry, ports) lives in the reference.
-
-{{ comp.xref({ key: "ref:sdk" }) }}
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Look up — @netscript/sdk reference",
-    body: "Generated API for every subpath: createServiceClient, createQueryFactories, defineServices, discovery, and the cache engine.",
-    href: "/reference/sdk/",
-    icon: "≡"
-  },
-  {
-    title: "Understand — Contracts",
-    body: "The oRPC contract → implement → handler → typed client → query → island type flow that makes drift a compile error.",
-    href: "/explanation/contracts/",
-    icon: "◎"
-  },
-  {
-    title: "Build — Services & contracts",
-    body: "The server side of the contract: defineService, the fluent builder, OpenAPI/Scalar, and the auth seam.",
-    href: "/services-sdk/services/",
-    icon: "◆"
-  },
-  {
-    title: "Render — Fresh meta-framework",
-    body: "How a definePage layer + island consume these query factories with cache-first hydration.",
-    href: "/web-layer/",
-    icon: "→"
-  }
-] }) }}
-
-{{ comp.nextPrev({ prev: { label: "Fresh meta-framework", href: "/web-layer/" }, next: { label: "Polyglot tasks", href: "/background-processing/polyglot-tasks/" } }) }}
+Resolve a service URL and call it end to end with [Discover services](/services-sdk/how-to/discover-services/).
+See also the [`@netscript/sdk` reference](/reference/sdk/),
+[Contracts](/explanation/contracts/), and [Data loading & the query cache](/web-layer/query/).

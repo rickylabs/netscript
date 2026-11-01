@@ -3,6 +3,7 @@ import {
   type DocsDocument,
   type DocsDocumentTooLargeError,
   type DocsSearchMatch,
+  docsSlugCandidates,
   type DocsSummary,
   MAX_INDEXED_DOC_LENGTH,
   normalizeDocsSlug,
@@ -69,7 +70,11 @@ export class EmbeddedDocsCorpus implements DocsCorpusPort {
   /** Retrieve an embedded document by normalized slug or alias. */
   get(slug: string): Promise<DocsDocument | undefined> {
     const normalized = normalizeDocsSlug(slug);
-    const canonicalSlug = this.#aliases.get(normalized) ?? normalized;
+    const candidate =
+      docsSlugCandidates(slug).find((key) =>
+        this.#documents.has(key) || this.#aliases.has(key) || this.#rejected.has(key)
+      ) ?? normalized;
+    const canonicalSlug = this.#aliases.get(candidate) ?? candidate;
     const rejection = this.#rejected.get(canonicalSlug);
     if (rejection) return Promise.reject(rejection);
     const document = this.#documents.get(canonicalSlug);

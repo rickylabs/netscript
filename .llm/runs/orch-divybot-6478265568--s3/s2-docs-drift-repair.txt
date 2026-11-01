@@ -1,0 +1,2 @@
+Coverage [fresh-ui]: mode=complete; reason="All seven published entrypoints are maintained as one complete reference surface."; omitted-symbol-groups=0; documented-non-export-groups=1
+Exports & Symbols drift check: PASS

@@ -5,7 +5,7 @@
 - Evaluation route is owner override, verbatim in worklog.
 - Public run identity intentionally uses repo-relative paths and omits private machine/session identifiers as explicitly requested.
 
-- PLAN-EVAL returned FAIL_PLAN twice. The process ended before implementation; PR #2439 therefore delivers a concrete plan/evaluation handoff only, not the requested revamp.
+- Historical checkpoint: PLAN-EVAL returned FAIL_PLAN twice, and work initially stopped at a plan/evaluation handoff. The owner-directed continuation below superseded that checkpoint; PR #2439 delivered the full revamp and merged at f177c38 after final independent IMPL-EVAL PASS.
 - diagrams:check baseline cannot execute because its pinned browser lacks a system shared library. No generated output, gate or dependency was modified to hide this.
 
 ## Owner-directed continuation

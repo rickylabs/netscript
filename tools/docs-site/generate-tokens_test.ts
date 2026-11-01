@@ -55,3 +55,31 @@ Deno.test('unknown CSS name collisions fail instead of shadowing a role', async 
   theme.variables.push({ ...colour, name: 'unexpected-collision', codeSyntax: 'var(--ns-fg)' });
   assertThrows(() => generateTokens(collections), Error, 'CSS token collision');
 });
+
+Deno.test('Theme set A preserves all existing declarations except the approved input border', async () => {
+  const before = await Deno.readTextFile(new URL('./fixtures/pre-s8c-tokens.css', import.meta.url));
+  const after = generateTokens(await loadCollections());
+  for (
+    const [scheme, oldBorder, newBorder] of [
+      ['light', '#838383', '#8d8d8d'],
+      ['dark', '#7b7b7b', '#6e6e6e'],
+    ]
+  ) {
+    const declarations = (source: string) => {
+      const body = source.split(`:root[data-scheme="${scheme}"] {`)[1].split('}')[0];
+      return new Map([...body.matchAll(/^ {2}(--ns-[\w-]+): (.*);$/gm)]
+        .map(([line, name]) => [name, line]));
+    };
+    const old = declarations(before);
+    const current = declarations(after);
+    assertEquals(old.size, 281, 'The compatibility fixture must cover every pre-S8c role');
+    assertEquals(old.get('--ns-input-border'), `  --ns-input-border: ${oldBorder};`);
+    assertEquals(current.get('--ns-input-border'), `  --ns-input-border: ${newBorder};`);
+    for (const [name, line] of old) {
+      if (name === '--ns-input-border') continue;
+      assertEquals(current.get(name), line, `${scheme}: existing declaration ${name} changed`);
+    }
+    assert(current.has('--ns-code-bg'));
+    assert(current.has('--ns-important-text'));
+  }
+});

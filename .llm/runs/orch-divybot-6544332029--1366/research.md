@@ -1,0 +1,9 @@
+# Research
+
+Baseline: main d54879b8d645554155c54af2f26c86d2232afda5; branch starts exactly there. Issue comments and PR search confirm the earlier delivered health work, with no duplicate box-6 PR. No orchid-triage comment is present.
+
+Consulted repository memory (listener restart budget #2482; KV validation/environment notes) before implementation. NetScript MCP find_guidance then search_docs confirms background children share the health contract through generated glue. `deno doc --filter ChildHealthMonitor` confirms the existing monitor clock seam. The monitor has bounded in-process history (3 restarts / 60 seconds, inclusive boundary) and latched recovery. OS process restarts erase it. Generated saga glue injects the transport monitor; triggers creates a separate specialized monitor. Workers has its own supervisor budget and must retain its existing glue and monitor behavior.
+
+Doctrine: package plugin is Archetype 4 Keep with this scoped runtime concern governed by Archetype 3; plugin sagas is Archetype 5 Keep, triggers Archetype 5 Refactor with inherited debt. No new debt planned. Use a consumer-owned history port, filesystem adapter, runtime policy and presentation composition; no KV dependency in plugin. Native Deno file APIs and @std/path provide the existing primitives. The generated workspace already ignores .data/.
+
+Public-surface / JSR rubric: keep existing overloads and payload shape; new documented types/adapter are exposed through the existing ./health subpath only, explicit return types, no new package dependency or export-map entry. Existing plugin slow-type carve-out remains, no expansion intended. Generated health docs derive from domain JSDoc; regenerate canonically, never hand-edit. Glue changes require publish-asset regeneration and CI scaffold.runtime proof.

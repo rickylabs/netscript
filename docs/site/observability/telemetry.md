@@ -2,29 +2,22 @@
 layout: layouts/base.vto
 title: Telemetry & logging
 templateEngine: [vento, md]
-prev: { label: "KV, queues & cron", href: "/data-persistence/kv-queues-cron/" }
-next: { label: "Fresh UI & design", href: "/web-layer/fresh-ui/" }
 order: 1
 ---
 
 # Telemetry & logging
 
-The most expensive turn in any change loop — whether the author is you or an AI agent — is the
-verification turn: *did the change actually work, across every process it touched?* NetScript
-closes that loop inside the framework. The runtimes emit real OpenTelemetry spans on their own, a
-single W3C `traceparent` groups a cross-process flow into **one distributed trace**, and a typed
-query surface reads the resulting spans back — so "did it work" is a trace you open (or query
-programmatically), not four console logs you correlate by eye.
+This page covers what NetScript traces and logs for you, the `@netscript/telemetry` surface for adding
+your own spans, and the two places to read the results: the Aspire dashboard and a typed query port.
 
-Concretely, observability is a built-in, not a bolt-on. Every service and plugin
-runtime is wired for **OpenTelemetry** — services serve their RPC handlers with
-trace-context propagation (first-party oRPC and Hono instrumentation), the worker runtime wraps
-job dispatch, execution, scheduling, subprocess hand-off, and task execution in real OTel spans,
-and structured logs flow through the framework `logger`. The viewing surface is the **Aspire
-dashboard at `https://localhost:18888`**, which collects OTLP traces, metrics, and structured
-logs from every resource in the app graph (services, plugin APIs, background processors) the
-moment you run `aspire start`. You do not stand up Jaeger, Grafana, or a log shipper to get
-started — the AppHost provisions the OTLP collector and the dashboard for you.
+Every service and plugin runtime is wired for **OpenTelemetry**. Services serve their RPC handlers
+with trace-context propagation (first-party oRPC and Hono instrumentation), the worker runtime wraps
+job dispatch, execution, scheduling, subprocess hand-off and task execution in spans, and structured
+logs flow through the framework `logger`. A single W3C `traceparent` groups a cross-process flow into
+**one distributed trace**. The Aspire dashboard collects OTLP traces, metrics and structured logs from
+every resource in the app graph as soon as you run `aspire start`; you don't stand up Jaeger, Grafana
+or a log shipper. "Did the change work?" becomes a trace you open, or query from code, instead of four
+console logs you correlate by eye.
 
 {{ comp.diagram({
   src: "/assets/diagrams/otel-traceparent.svg",
@@ -32,191 +25,140 @@ started — the AppHost provisions the OTLP collector and the dashboard for you.
   caption: "Trace-context propagation: a single traceparent (W3C) flows service → worker → subprocess → saga, so spans from every runtime join one distributed trace in Aspire."
 }) }}
 
-This page is the capability hub: what telemetry exists, how to emit it, where to view it,
-and the one place that is still a scaffold stub. For the full generated API of
-each unit, follow the reference links: the telemetry primitives live at
-[`/reference/telemetry/`](/reference/telemetry/) and the structured logger at
-[`/reference/logger/`](/reference/logger/).
+> [!IMPORTANT]
+> The dashboard and the OTLP collector come up with the orchestrator. Run
+> `cd aspire && aspire start` and open the dashboard URL it prints; until Aspire runs, there is
+> nowhere to view traces or logs.
 
-{{ comp callout { type: "important", title: "Aspire first, then telemetry" } }}
-The dashboard, the OTLP collector, and the per-resource trace/log views all come up with the
-orchestrator — they are not separate processes you start by hand. Run
-<code>cd aspire &amp;&amp; aspire start</code> <strong>before</strong> any <code>netscript db</code>
-command (Aspire provisions Postgres and Redis first), then open the dashboard URL printed in
-the console (<code>https://localhost:18888</code>, with a one-time auth token). Until Aspire is
-running there is no <code>:18888</code> surface to view traces or logs on. See
-<a href="/data-persistence/how-to/database-migration/">Database &amp; migration</a> for the full startup order.
-{{ /comp }}
+## One trace across processes
 
-## The story: one grouped trace, end to end
+A trigger fires, the scheduler dispatches, a queue hands the job to a worker, the job reports
+success, and the downstream callback never lands. In NetScript that whole flow is **one grouped
+trace**: trigger → scheduler dispatch → queue enqueue/dequeue → `job.execute` → the SDK's
+`rpc.client` callback span, all under a single trace id, because the runtimes propagate W3C trace
+context across every process boundary. You open one trace instead of tailing a console per resource.
 
-Picture the failure mode that eats an afternoon. A trigger fires, the scheduler dispatches, a
-queue hands the job to a worker, the job reports success — and the downstream callback never
-lands. With per-process logs you tail one console per resource and correlate timestamps by eye;
-an AI agent in the same position burns its turns asking you to check logs it cannot see.
+Where many producers feed one consumer, such as a fan-in into a durable-streams processor,
+`createFanInLinks` attaches **span links** from each producer trace instead of re-parenting, so the
+consumer span shows exactly which upstream flows fed it.
 
-In NetScript that whole flow is **one grouped trace**: trigger → scheduler dispatch → queue
-enqueue/dequeue → `job.execute` → the SDK's `rpc.client` callback span, all under a single trace
-id, because the runtimes propagate W3C trace context across every process boundary for you. Where
-many producers feed one consumer — a fan-in into a durable-streams processor — `createFanInLinks`
-attaches **span links** from each producer trace instead of re-parenting, so the consumer span
-shows exactly which upstream flows fed it. And this shape is not aspirational: the grouped
-cross-process trace is exercised by a non-mocked merge gate in the framework's own CI, which
-scaffolds a real project, runs the flow under Aspire, and reads the live spans back before a
-change can land.
+AI workloads use the same spine. Spans follow the upstream `gen_ai.*` semantic conventions (through
+`createGenAiAttributes` in `@netscript/telemetry/attributes`), so a traced agent turn shows the model
+call, the tool calls and the durable write it produced, step by step, on one tree.
 
-The same spine covers AI workloads. Spans follow the upstream `gen_ai.*` semantic conventions
-(via `createGenAiAttributes` in `@netscript/telemetry/attributes`), so a traced agent turn shows
-the model call, the tool calls, and the durable write it produced — step by step, on one tree.
+## Ports, adapters and attributes
 
-## What it is
+`@netscript/telemetry` carries three OpenTelemetry signals: traces, metrics (worker counts, SSE
+connection stats) and logs, all over the same OTLP export. Application and runtime code program
+against the port contracts in `@netscript/telemetry/otel`: `TracerProviderPort`, `MeterPort`,
+`PropagatorPort`, `SpanLinkPort` and `TelemetryQueryPort`. The zero-dependency default adapter,
+`OtelDenoTracerProvider`, binds to Deno's built-in OTLP exporter through `OTEL_DENO=true`. The opt-in
+`OtelSdkTracerProvider` serves apps that bring the OpenTelemetry JS SDK and also enables
+attribute-preserving span links.
 
-Telemetry in NetScript is three OpenTelemetry signals — **traces**, **metrics**, and
-**logs** — wired through one package, `@netscript/telemetry`, and one viewing surface, the
-Aspire dashboard. Traces are the headline: a request enters a service, the worker runtime
-dispatches and executes a job, a subprocess runs a polyglot task, and a saga advances — and
-because a single **W3C `traceparent`** header propagates across every one of those process
-boundaries, the whole fan-out collapses into one trace tree. Metrics (worker counts, SSE
-connection stats) and structured logs ride the same OTLP export. The framework owns transport
-(OTLP/HTTP to the collector) and viewing (the dashboard); it now owns most of emission too —
-the worker, scheduler, queue, saga, and SSE runtimes are instrumented for you. The full
-mental model — what is framework-real versus a scaffold stub — is in
-[Observability](/explanation/observability/).
-
-Under the hood, `@netscript/telemetry` is structured as **telemetry ports and adapters**:
-application and runtime code programs against port contracts (`TracerProviderPort`, `MeterPort`,
-`PropagatorPort`, `SpanLinkPort`, `TelemetryQueryPort` — the `@netscript/telemetry/otel`
-subpath), with a zero-dependency default adapter (`OtelDenoTracerProvider`, bound to Deno's
-built-in OTLP exporter via `OTEL_DENO=true`) and an opt-in OpenTelemetry-SDK adapter
-(`OtelSdkTracerProvider`) for apps that bring the JS SDK — which also unlocks
-attribute-preserving span links. Attribute names follow one convention: upstream semconv keys
-(`rpc.*`, `messaging.*`, `gen_ai.*`, `server.*`) wherever OpenTelemetry defines them, and
-NetScript-owned keys under the single proprietary root `netscript.*` — correlated spans share
-`netscript.correlation.id`. The full rule set (span naming, SpanKind, status, propagation) is the
-[telemetry convention](/reference/telemetry/convention/).
-
-## Learn → / Do →
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Do — Add OpenTelemetry",
-    body: "Task-oriented recipe: lean on the automatic job spans, add custom spans via @netscript/telemetry withChildSpan, propagate traceparent across services and subprocesses, and point the OTLP export (:4318) at the dashboard.",
-    href: "/observability/how-to/add-opentelemetry/",
-    icon: "◆"
-  },
-  {
-    title: "Understand — Observability",
-    body: "The mental model: how automatic framework spans, createJobTools(ctx) handler telemetry, console logs, health endpoints, and Aspire traces fit together.",
-    href: "/explanation/observability/",
-    icon: "◎"
-  },
-  {
-    title: "Look up — telemetry reference",
-    body: "The full generated deno doc API for @netscript/telemetry — tracer facade, context/traceparent helpers, the NetScript instrumentation helpers, and the oRPC tracing plugin.",
-    href: "/reference/telemetry/",
-    icon: "≡"
-  }
-] }) }}
+Attribute names follow one convention: upstream semconv keys (`rpc.*`, `messaging.*`, `gen_ai.*`,
+`server.*`) wherever OpenTelemetry defines them, and NetScript-owned keys under the single
+proprietary root `netscript.*`. Correlated spans share `netscript.correlation.id`. The
+[telemetry conventions](/reference/telemetry/convention/) has the full rules for span naming,
+SpanKind, status and propagation; [Observability](/explanation/observability/) separates what the
+framework emits from what is a scaffold stub.
 
 ## What you get out of the box
 
-Telemetry in NetScript spans three layers — emission (in framework runtimes and your handler
-code), transport (OTLP over HTTP to the collector), and viewing (the Aspire dashboard). The
-framework owns transport and viewing, and it now owns most of emission too: the worker runtime
-traces the entire job lifecycle automatically. The only thing you still wire by hand is custom
-spans *inside* a job handler — and even there the `@netscript/telemetry` helpers do the work.
+| Signal | What you get |
+| --- | --- |
+| Structured logging | `@netscript/logger` gives every service and plugin a level-aware structured logger. Declare it in `netscript.config.ts` (`logging: { level: 'info', format: 'text' }`); output is text or JSON and filterable in the dashboard. |
+| Traces | Service request paths propagate W3C trace context, and the worker runtime traces the job lifecycle (see the next section). |
+| OTLP export and dashboard | The generated AppHost configures an OTLP endpoint and the Aspire dashboard, so traces, metrics and logs from every resource land in one place with no collector to deploy. |
+| Browser console logs | Generated app resources call `withBrowserLogs()` (the AppHost pins `Aspire.Hosting.Browsers`). A Fresh/Vite app's browser console output, including a client-side `TypeError` an island throws, appears in that resource's **Console logs** in the dashboard, correlated with the server-side spans of the same request. |
 
-{{ comp.featureGrid({ items: [
-  {
-    title: "Structured logging",
-    body: "The @netscript/logger unit gives every service and plugin a level-aware, structured logger. Config is declared in netscript.config.ts (logging: { level: 'info', format: 'text' }) and threaded through the runtime — text or JSON, filterable in the dashboard.",
-    icon: "▤"
-  },
-  {
-    title: "OpenTelemetry traces (real)",
-    body: "Service request paths propagate W3C trace context, and the worker runtime emits real spans for job dispatch, execution, scheduling, subprocess hand-off, and task.execute. @opentelemetry/api (^1.9) is in the catalog and wired into the request and job paths so spans flow to the collector.",
-    icon: "◈"
-  },
-  {
-    title: "OTLP → Aspire dashboard",
-    body: "The generated AppHost configures an OTLP endpoint (http://localhost:4318) and the Aspire dashboard (https://localhost:18888) so traces, metrics, and logs from every resource land in one place — no collector to deploy.",
-    icon: "◎"
-  },
-  {
-    title: "Browser console logs (default)",
-    body: "Generated app resources call withBrowserLogs() automatically (the AppHost pins Aspire.Hosting.Browsers), so a Fresh/Vite app's browser console output — including a client-side error an island throws — is forwarded into the dashboard next to server logs and traces. No opt-in, nothing to wire.",
-    icon: "▷"
-  },
-  {
-    title: "Per-resource health",
-    body: "Each plugin API exposes a liveness probe — workers GET /health, sagas GET /health/live, triggers GET /health, auth GET /health/live (on their scaffold-assigned ports) — surfaced as resource state in the dashboard.",
-    icon: "✚"
-  }
-] }) }}
+## Plugin HTTP request logging
 
-{{ comp callout { type: "note", title: "Browser logs land in the dashboard too" } }}
-Because generated app resources emit <code>withBrowserLogs()</code> by default, the class of failure
-that is otherwise invisible from the server — a client-side <code>TypeError</code> a durable-streams
-island throws in the browser, say — shows up in the Aspire dashboard's <strong>Console logs</strong>
-for that app resource, correlated with the server-side spans of the same request. You do not start a
-separate browser-log collector; the AppHost wires it when it scaffolds the app.
-{{ /comp }}
+First-party plugin API services (workers, streams, auth, sagas and triggers) emit routine
+`HTTP request started` and successful `HTTP request completed` records at **Debug** by default.
+Internal service traffic is frequent; keeping these pairs below Information leaves application
+logs easier to scan. Each factory accepts optional `requestLevel` and `responseLevel` fields,
+with the same `'debug' | 'info'` values as the native `@netscript/service` logger middleware.
+Each omitted field independently defaults to `'debug'`.
+
+Pass these fields in the existing options argument to `startWorkersService(context, options)`,
+`startStreamsService(options)`, `createTriggersService(context, options)` or
+`startTriggersService(options)`. The legacy workers, auth and sagas default factories accept
+an optional second options argument after their host context. Legacy streams startup uses the
+Debug defaults; use `startStreamsService` when the host needs to configure them.
+
+```ts
+import { startStreamsService } from '@netscript/plugin-streams/service';
+
+await startStreamsService({
+  auth: { public: true, reason: 'Internal example; ingress authenticates callers' },
+  requestLevel: 'debug',
+  responseLevel: 'info',
+});
+```
+
+These options forward through `createPluginService`'s existing `logger` configuration into
+`ServiceBuilder.withLogger()`. They select record severity; the process logging threshold
+still decides which records are retained. Configure the plugin process at Debug to see its
+Debug records. The native middleware continues skipping health probe paths and logging 4xx/5xx
+responses at Warning; failures are not quieted by the new defaults. Ordinary service builder
+logging retains its Information defaults unless the caller supplies levels to `.withLogger()`.
+
+## What is traced automatically
+
+The `@netscript/telemetry` instrumentation is wired into the worker dispatcher, the executor and the
+scheduler, so every job run produces spans with attributes, durations, status and lifecycle events
+without scaffold changes.
+
+{{ comp.apiTable({
+  caption: "Automatic worker traces (emitted by the runtime — see /reference/telemetry/)",
+  rows: [
+    { name: "traceJobExecution", type: "span", desc: "Wraps each job's execution with attributes, duration, status, and job.started / job.completed / job.failed / job.exception events. Emitted by the dispatcher." },
+    { name: "recordJobProgress", type: "event", desc: "job.progress events carrying current / total / unit — the runtime records real progress as the job advances." },
+    { name: "addJobStepEvent", type: "event", desc: "job.step.* events for each step the runtime walks through." },
+    { name: "scheduler spans", type: "span", desc: "createSchedulerStartSpan / createScheduleJobSpan / startSchedulerTickSpan / recordCronJobRun — cron and schedule dispatch are traced end to end." },
+    { name: "subprocess traceparent", type: "context", desc: "The dispatcher injects W3C traceparent / tracestate into the subprocess env so out-of-process job runs continue the same trace (initJobTracing / runTracedJob / createJobSubprocessEnv)." },
+    { name: "task.execute", type: "span", desc: "The multi-runtime task executor wraps each task run in a task.execute span — polyglot and TS tasks alike show up in the trace tree." }
+  ]
+}) }}
 
 ## Enable tracing & see a span
 
-Tracing turns on from the **environment** — `@netscript/telemetry/config` resolves a
-`TelemetryConfig` from the standard `OTEL_*` variables, and the Aspire AppHost already sets
-them for you. The fastest path is to run `aspire start`, trigger any job, and the
-runtime's automatic spans show up in the dashboard with no code change. The tab below adds a
-**custom** span on top of that automatic trace.
+Tracing turns on from the **environment**: `@netscript/telemetry/config` resolves a
+`TelemetryConfig` from the standard `OTEL_*` variables, and the Aspire AppHost sets them for you. Run
+`aspire start`, trigger any job, and open **Traces** in the dashboard: you see the dispatch span, the
+execution span, progress and step events and, for subprocess or polyglot tasks, the trace continued
+across the process boundary.
 
-{{ comp callout { type: "note", title: "Local vs deployed: same instrumentation, different collector" } }}
-<strong>Locally</strong>, Aspire provisions the OTLP collector and the dashboard and injects the
-<code>OTEL_*</code> variables into every resource, so telemetry works the moment you run
-<code>aspire start</code> — nothing to configure. Note the dashboard and OTLP endpoints bind to
-<strong>ephemeral ports</strong> (the generated profile uses <code>localhost:0</code>), so use the URL
-<code>aspire start</code> prints rather than assuming <code>:18888</code>/<code>:4318</code>. Running
-<code>aspire start --isolated</code> (an upstream Aspire CLI flag) also randomizes the dashboard, OTLP,
-and resource-service ports and isolates secrets, so several apphosts can boot in parallel without
-colliding.
-<strong>Deployed</strong>, there is no Aspire and no dashboard: you point
-<code>OTEL_EXPORTER_OTLP_ENDPOINT</code> at your own collector or a hosted backend (Grafana Tempo,
-Honeycomb, Jaeger, …). The instrumentation code is identical — only the endpoint/protocol env and the
-sampler change. That single OTLP seam is the whole porting story; see <em>Production notes</em> below.
-{{ /comp }}
+> [!NOTE]
+> Locally, Aspire provisions the OTLP collector and the dashboard and injects the `OTEL_*` variables
+> into every resource. The dashboard and OTLP endpoints bind to **ephemeral ports** (the generated
+> profile uses `localhost:0`), so use the URL Aspire prints. The AppHost injects the allocated
+> collector endpoint into resources; no fixed dashboard or OTLP port is required.
 
-{{ comp.tabbedCode({ tabs: [
-  {
-    label: "1 — Turn it on (env-driven)",
-    lang: "ts",
-    code: "// netscript.config.ts — declare the structured-logging contract for the workspace.\n// Tracing itself is enabled by OTEL_* env vars (the Aspire AppHost sets these); the\n// config package reads them — there is no defineTelemetry() call to make.\nimport { defineConfig } from '@netscript/config';\n\nexport default defineConfig({\n  name: 'my-app',\n  version: '1.0.0',\n  logging: { level: 'info', format: 'text' }, // level: debug|info|warn|error\n  plugins: ['./plugins/workers/mod.ts'],\n});\n\n// Anywhere in app code you can inspect what telemetry resolved (log-safe, redacted):\nimport { describeTelemetryConfig, isTelemetryEnabled } from '@netscript/telemetry/config';\nif (isTelemetryEnabled()) console.log(describeTelemetryConfig());\n// → { enabled: true, endpoint: 'http://localhost:4318', protocol, serviceName, sampler }"
-  },
-  {
-    label: "2 — Add a custom span",
-    lang: "ts",
-    code: "// plugins/workers/jobs/health-check.ts — a real child span inside a handler.\n// The dispatcher already wraps this job in traceJobExecution automatically;\n// withChildSpan opens a child span under that parent. recordJobProgress's 3rd arg\n// is a UNIT label (e.g. 'steps'), not a free-text message.\nimport { createSuccessResult, defineJobHandler } from '@netscript/plugin-workers-core';\nimport { withChildSpan, recordJobProgress } from '@netscript/telemetry/instrumentation';\n\nconst handler = defineJobHandler(async (ctx) => {\n  recordJobProgress(1, 2, 'steps'); // → job.progress event on the trace\n\n  const envCheck = await withChildSpan('check.environment', async (span) => {\n    span.setAttribute('check.name', 'environment');\n    return { ok: true };\n  });\n\n  recordJobProgress(2, 2, 'steps');\n  return createSuccessResult({ healthy: envCheck.ok });\n});\n\nexport default Object.assign(handler, { id: 'workers-plugin-health-check' as const });"
-  }
-] }) }}
+`netscript.config.ts` declares the logging contract; there is no `defineTelemetry()` call. At runtime
+you can print what telemetry resolved:
 
-{{ comp callout { type: "tip", title: "Lowest-effort observability path" } }}
-Run <code>aspire start</code>, trigger a job, and open <code>:18888</code> → <strong>Traces</strong>.
-You will see the dispatch span, the execution span, progress and step events, and — for
-subprocess or polyglot tasks — a continued trace across the process boundary. None of that
-requires editing the scaffold. Reach for custom instrumentation only when you want spans
-<em>inside your own handler logic</em>.
-{{ /comp }}
+{{ comp.codeBlock({ lang: "ts", code: "// netscript.config.ts — declare the structured-logging contract for the workspace.\n// Tracing itself is enabled by OTEL_* env vars (the Aspire AppHost sets these); the\n// config package reads them — there is no defineTelemetry() call to make.\nimport { defineConfig } from '@netscript/config';\n\nexport default defineConfig({\n  name: 'my-app',\n  version: '1.0.0',\n  logging: { level: 'info', format: 'text' }, // level: debug|info|warn|error\n  plugins: ['./plugins/workers/mod.ts'],\n});\n\n// Anywhere in app code you can inspect what telemetry resolved (log-safe, redacted):\nimport { describeTelemetryConfig, isTelemetryEnabled } from '@netscript/telemetry/config';\nif (isTelemetryEnabled()) console.log(describeTelemetryConfig());\n// → { enabled: true, endpoint: '<allocated-otlp-url>', protocol, serviceName, sampler }" }) }}
 
-## Key types: the telemetry init/config surface
+To add a custom span inside a job handler, open a child span under the job span the dispatcher
+already created:
 
-Configuration is **read from the environment**, not constructed — `@netscript/telemetry/config`
-resolves and caches a `TelemetryConfig` from the `OTEL_*` variables. These are the confirmed
-fields and the helpers that read them.
+{{ comp.codeBlock({ lang: "ts", code: "// plugins/workers/jobs/health-check.ts — a real child span inside a handler.\n// The dispatcher already wraps this job in traceJobExecution automatically;\n// withChildSpan opens a child span under that parent. recordJobProgress's 3rd arg\n// is a UNIT label (e.g. 'steps'), not a free-text message.\nimport { createSuccessResult, defineJobHandler } from '@netscript/plugin-workers-core';\nimport { withChildSpan, recordJobProgress } from '@netscript/telemetry/instrumentation';\n\nconst handler = defineJobHandler(async (ctx) => {\n  recordJobProgress(1, 2, 'steps'); // → job.progress event on the trace\n\n  const envCheck = await withChildSpan('check.environment', async (span) => {\n    span.setAttribute('check.name', 'environment');\n    return { ok: true };\n  });\n\n  recordJobProgress(2, 2, 'steps');\n  return createSuccessResult({ healthy: envCheck.ok });\n});\n\nexport default Object.assign(handler, { id: 'workers-plugin-health-check' as const });" }) }}
+
+[Add OpenTelemetry](/observability/how-to/add-opentelemetry/#step-3-add-your-own-spans-in-a-job-handler)
+shows the same handler written with the scaffold's `createJobTools(ctx)`.
+
+## Configuration
+
+`@netscript/telemetry/config` reads configuration from the environment and caches the resolved
+`TelemetryConfig`; you don't construct it.
 
 {{ comp.apiTable({
   caption: "TelemetryConfig (@netscript/telemetry/config — resolved from OTEL_* env vars)",
   rows: [
     { name: "enabled", type: "boolean", desc: "Whether OpenTelemetry instrumentation is active (driven by OTEL_DENO / endpoint presence). Mirror it with isTelemetryEnabled()." },
-    { name: "endpoint", type: "string | undefined", desc: "OTLP exporter endpoint URL (e.g. http://localhost:4318). Read directly via getOtlpEndpoint()." },
+    { name: "endpoint", type: "string | undefined", desc: "OTLP exporter endpoint URL (e.g. the OTLP URL Aspire prints). Read directly via getOtlpEndpoint()." },
     { name: "protocol", type: "string", desc: "OTLP exporter protocol (e.g. http/protobuf), from OTEL_EXPORTER_OTLP_PROTOCOL." },
     { name: "serviceName", type: "string", desc: "Service name reported to backends, from OTEL_SERVICE_NAME (or the default). Read via getServiceName()." },
     { name: "serviceVersion", type: "string", desc: "Service version reported to backends." },
@@ -241,12 +183,11 @@ fields and the helpers that read them.
 
 ## Span & instrumentation helpers
 
-Two subpaths cover hand-written instrumentation. `@netscript/telemetry/tracer` is the
-low-level facade over `@opentelemetry/api` — get a tracer, open a span, run a callback inside
-one. `@netscript/telemetry/instrumentation` is the NetScript-domain layer the runtimes
-themselves use — job, scheduler, queue, and SSE spans with the right attributes baked in.
-The `/context` subpath holds the **`traceparent`** propagation helpers that make the
-cross-boundary trace in the diagram above possible.
+Two subpaths cover hand-written instrumentation. `@netscript/telemetry/tracer` is the low-level facade
+over `@opentelemetry/api`: get a tracer, open a span, run a callback inside one.
+`@netscript/telemetry/instrumentation` is the NetScript-domain layer the runtimes use themselves, with
+job, scheduler, queue and SSE spans that carry the right attributes. The `/context` subpath holds the
+**`traceparent`** propagation helpers behind the cross-process trace in the diagram above.
 
 {{ comp.apiTable({
   caption: "Tracer facade (@netscript/telemetry/tracer)",
@@ -285,17 +226,15 @@ cross-boundary trace in the diagram above possible.
 
 ## Service, RPC & HTTP tracing
 
-Services opt into trace propagation through **first-party instrumentation** rather than by hand
-— NetScript wraps the upstream OTel packages instead of reinventing them. The
-`@netscript/telemetry/orpc` subpath ships an oRPC **tracing plugin** (backed by the upstream
-`@orpc/otel` instrumentation) that opens a SERVER span per RPC and continues any inbound
-`traceparent`, plus an error-handling plugin that classifies failures. The
-`@netscript/telemetry/hono` subpath does the same for plain HTTP: `createHonoTracingMiddleware`
-wraps Hono's first-party `@hono/otel` middleware and layers NetScript service naming and W3C
-propagation on top — the service builder registers it outermost for you. On the service builder
-the RPC side is the `.withRPC({ traceContext: true })` toggle (see
-[Services](/services-sdk/services/)); the factories below are the underlying surface if you
-mount oRPC or Hono yourself.
+Services get trace propagation from **first-party instrumentation** that wraps the upstream OTel
+packages. The `@netscript/telemetry/orpc` subpath ships an oRPC **tracing plugin**, backed by the
+upstream `@orpc/otel` instrumentation, that opens a SERVER span per RPC and continues any inbound
+`traceparent`, plus an error-handling plugin that classifies failures. The `@netscript/telemetry/hono`
+subpath does the same for plain HTTP: `createHonoTracingMiddleware` wraps Hono's first-party
+`@hono/otel` middleware and adds NetScript service naming and W3C propagation, and the service builder
+registers it outermost for you. On the service builder, the RPC side is the
+`.withRPC({ traceContext: true })` toggle (see [Services](/services-sdk/services/)); the factories
+below are the underlying surface if you mount oRPC or Hono yourself.
 
 {{ comp.apiTable({
   caption: "oRPC + Hono tracing surface (@netscript/telemetry/orpc, @netscript/telemetry/hono)",
@@ -308,107 +247,50 @@ mount oRPC or Hono yourself.
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Database & worker tracing toggles live next door" } }}
-The Prisma query-tracing and worker-runtime tracing toggles are documented on their own hubs
-to avoid duplication. Database query spans are wired through the
-<a href="/data-persistence/database/">database</a> client; the worker runtime's automatic job
-spans are described in <a href="/background-processing/workers/">background jobs</a>. This hub
-owns the <strong>cross-cutting</strong> telemetry surface — config, the tracer facade,
-traceparent propagation, and the oRPC plugin — that those runtimes build on. See
-{{ comp.xref({ key: "cap:database", text: "Database & Prisma" }) }} for the per-query toggle.
-{{ /comp }}
-
-## What is traced automatically
-
-Before you write a single instrumentation call, the worker runtime already produces a usable
-trace tree in Aspire. The `@netscript/telemetry` instrumentation is wired into the dispatcher,
-the executor, and the scheduler, so the moment a job runs you get spans with attributes,
-durations, status, and lifecycle events — no scaffold changes required.
-
-{{ comp.apiTable({
-  caption: "Automatic worker traces (emitted by the runtime — see /reference/telemetry/)",
-  rows: [
-    { name: "traceJobExecution", type: "span", desc: "Wraps each job's execution with attributes, duration, status, and job.started / job.completed / job.failed / job.exception events. Emitted by the dispatcher." },
-    { name: "recordJobProgress", type: "event", desc: "job.progress events carrying current / total / unit — the runtime records real progress as the job advances." },
-    { name: "addJobStepEvent", type: "event", desc: "job.step.* events for each step the runtime walks through." },
-    { name: "scheduler spans", type: "span", desc: "createSchedulerStartSpan / createScheduleJobSpan / startSchedulerTickSpan / recordCronJobRun — cron and schedule dispatch are traced end to end." },
-    { name: "subprocess traceparent", type: "context", desc: "The dispatcher injects W3C traceparent / tracestate into the subprocess env so out-of-process job runs continue the same trace (initJobTracing / runTracedJob / createJobSubprocessEnv)." },
-    { name: "task.execute", type: "span", desc: "The multi-runtime task executor wraps each task run in a task.execute span — polyglot and TS tasks alike show up in the trace tree." }
-  ]
-}) }}
-
-## Instrument a handler
-
-The two tabs below show the two emission paths a developer touches: console-backed logging and
-**custom** spans inside a job handler. The scaffold's `createJobTools(ctx)` surface records events,
-progress, and child spans through the same telemetry machinery used by the runtime.
-
-{{ comp.tabbedCode({ tabs: [
-  {
-    label: "Structured logging",
-    lang: "ts",
-    code: "// netscript.config.ts — declare the logging contract for the whole workspace.\nimport { defineConfig } from '@netscript/config';\n\nexport default defineConfig({\n  name: 'my-app',\n  version: '1.0.0',\n  // level: 'debug' | 'info' | 'warn' | 'error'; format: 'text' | 'json'\n  logging: { level: 'info', format: 'text' },\n  plugins: ['./plugins/workers/mod.ts', './plugins/sagas/mod.ts'],\n});\n\n// Inside a job handler, the logger comes from the job tools (console-backed today,\n// and surfaced under the resource's Console logs view in the Aspire dashboard).\n// import { createJobTools } from './job-tools.ts';\nconst emit = (log) => {\n  log.info('user provisioned', { userId: 'u_123', source: 'scaffold' });\n  log.warn('rate limit approaching', { remaining: 4 });\n};"
-  },
-  {
-    label: "Custom spans via createJobTools",
-    lang: "ts",
-    code: "// plugins/workers/jobs/health-check.ts — real custom spans inside a handler.\n// The dispatcher wraps this job automatically; createJobTools adds detail beneath it.\nimport { createSuccessResult, createFailureResult, defineJobHandler } from '@netscript/plugin-workers-core';\nimport { createJobTools } from './job-tools.ts';\n\nconst handler = defineJobHandler(async (ctx) => {\n  const { log, progress, trace } = createJobTools(ctx);\n  log.info('Starting workers plugin health check');\n  await progress(50, 'checking environment');\n\n  const envCheck = await trace.withChildSpan('check.environment', async (span) => {\n    span.setAttribute('check.name', 'environment');\n    return { ok: true };\n  });\n\n  trace.recordProgress(2, 2, 'steps');\n  if (!envCheck.ok) return createFailureResult('environment check failed');\n  return createSuccessResult({ status: 'healthy' });\n});\n\nexport default Object.assign(handler, { id: 'workers-plugin-health-check' as const });"
-  }
-] }) }}
+Prisma query spans are covered in
+[Database & Prisma](/data-persistence/database/#query-tracing), and the worker job spans in
+[What is traced automatically](#what-is-traced-automatically).
 
 ## Endpoints & ports
 
-Telemetry has no single service of its own — it is emitted by every runtime and aggregated
-by Aspire. These are the real addresses you interact with, validated by the CLI E2E suite.
+Telemetry has no service of its own: every runtime emits it and Aspire aggregates it. These are the
+addresses you interact with.
 
 {{ comp.apiTable({
-  caption: "Observability surfaces (link to /reference/telemetry/ and /reference/logger/ for the generated APIs)",
+  caption: "Observability surfaces (link to /reference/telemetry/ and /reference/logger/ for the full APIs)",
   rows: [
-    { name: "https://localhost:18888", type: "dashboard", desc: "Aspire dashboard — traces, structured logs, metrics, and resource state for the whole app graph. Auth token printed by `aspire start`." },
-    { name: "http://localhost:4318", type: "OTLP/HTTP", desc: "OTLP ingest endpoint the AppHost configures (aspire.config.json https profile). Runtimes export spans and logs here; the dashboard reads them back. This is the seam you point at a hosted backend." },
+    { name: "the URL Aspire prints", type: "dashboard", desc: "Aspire dashboard — traces, structured logs, metrics, and resource state for the whole app graph. The generated local profile allows anonymous dashboard access." },
+    { name: "the OTLP URL Aspire prints", type: "OTLP/HTTP", desc: "OTLP ingest endpoint the AppHost configures (aspire.config.json profile). Runtimes export spans and logs here; the dashboard reads them back. This is the seam you point at a hosted backend." },
     { name: "GET /health", type: "Workers API", desc: "Workers API health probe — reported as resource health in the dashboard (on its assigned port)." },
     { name: "GET /health/live", type: "Sagas API", desc: "Sagas API liveness route (on its assigned port)." },
-    { name: "GET :8093/health", type: "liveness", desc: "Triggers API health probe (Hono service)." },
-    { name: ":8094", type: "service", desc: "Auth API (auth-api) — its request spans propagate trace context like any other service." }
+    { name: "GET /health", type: "liveness", desc: "Triggers API health probe (Hono service)." },
+    { name: "auth-api", type: "service", desc: "Auth API (auth-api) — its request spans propagate trace context like any other service." }
   ]
 }) }}
 
 ## View it in Aspire
 
-With `aspire start` up, the dashboard at `https://localhost:18888` gives you four views over the
-same telemetry stream — there is no separate tool to configure.
+With `aspire start` up, the dashboard gives you four views over the same telemetry stream:
 
 {{ comp.apiTable({
-  caption: "Aspire dashboard views (https://localhost:18888)",
+  caption: "Aspire dashboard views (the URL Aspire prints)",
   rows: [
     { name: "Resources", type: "graph", desc: "Live state of every app-graph resource: postgres, redis, workers-api, workers, sagas-api, sagas, triggers-api, triggers, auth-api. Health probes drive the status colour." },
     { name: "Console logs", type: "stream", desc: "Per-resource stdout/stderr — the framework logger's text/JSON output lands here in real time." },
     { name: "Structured logs", type: "OTLP", desc: "Structured log records exported over OTLP, filterable by resource, level, and attributes." },
-    { name: "Traces", type: "OTLP", desc: "Distributed traces collected from the OTLP endpoint (http://localhost:4318) — job dispatch/execution/scheduler/task spans and cross-service request spans as trace context propagates." }
+    { name: "Traces", type: "OTLP", desc: "Distributed traces collected from the OTLP endpoint (the OTLP URL Aspire prints) — job dispatch/execution/scheduler/task spans and cross-service request spans as trace context propagates." }
   ]
 }) }}
 
-{{ comp callout { type: "tip", title: "Use this when…" } }}
-Reach for the dashboard whenever you need to answer <strong>"what happened and where"</strong>:
-which resource is unhealthy, what a service logged for a given request, why a job failed, or how
-a call fanned out across services and subprocesses. Because Aspire wires OTLP for you, the
-lowest-effort observability path is to run <code>aspire start</code> and open
-<code>:18888</code> — no extra dependency, no collector to deploy. When you outgrow the local
-dashboard, the same OTLP export (<code>http://localhost:4318</code>) is the seam you point at a
-hosted backend.
-{{ /comp }}
-
 ## Close the loop: read the trace back in code
 
-The dashboard answers *"what happened and where"* for a human. The same telemetry has a **typed,
-in-language read side** for programs — and for an AI agent verifying its own change without a
-browser. `@netscript/telemetry/query` publishes a `TelemetryQueryPort` contract with an
-Aspire-backed reader: `createAspireTelemetryQuery(...)` (or `createTelemetryQuery(...)` for the
-port type) reads the Aspire `/api/telemetry/*` surface into package-owned read models —
-`TelemetryTrace`, `TelemetrySpan` (with its `events` and `links`), `TelemetryLog`,
-`TelemetryResource`, `TelemetryMetric`. So the verification turn becomes an assertion: fetch the
-trace by id, check that the span you expected is present with the status you expected — no console
-to tail, no screenshot to read.
+The dashboard answers *what happened and where* for a person. Programs, and AI agents verifying their
+own change without a browser, use the **typed read side**. `@netscript/telemetry/query` publishes a
+`TelemetryQueryPort` contract with an Aspire-backed reader: `createAspireTelemetryQuery(...)`, or
+`createTelemetryQuery(...)` for the port type, reads the Aspire `/api/telemetry/*` surface into
+package-owned read models: `TelemetryTrace`, `TelemetrySpan` (with its `events` and `links`),
+`TelemetryLog`, `TelemetryResource` and `TelemetryMetric`. Verification becomes an assertion: fetch
+the trace by id and check that the span you expected is present with the status you expected.
 
 {{ comp.apiTable({
   caption: "Telemetry query read side (@netscript/telemetry/query)",
@@ -420,76 +302,28 @@ to tail, no screenshot to read.
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "One comparison: reading traces back to verify a change" } }}
-Encore ships an MCP server that exposes its local traces to an AI agent, so the agent can read
-back what its change did. NetScript closes the same loop from the other side: instead of a separate
-protocol server, the trace read side is a **typed in-language port** (<code>TelemetryQueryPort</code>)
-the app — or a test, or an agent's own tool — calls directly, returning the same package-owned read
-models the runtimes emit. Same goal — let the author verify a change *from the trace*, not by eye —
-kept inside the language and the type system.
-{{ /comp }}
+Encore exposes its local traces to an AI agent through an MCP server. NetScript makes the read side a
+typed in-language port that the app, a test or an agent's own tool calls directly, and it returns the
+same package-owned read models the runtimes emit.
 
 ## Production notes
 
-{{ comp callout { type: "warning", title: "Footguns before you ship telemetry" } }}
-<p><strong>❌ Trace 100% of traffic in production.</strong> The local Aspire default samples
-everything — fine for dev, ruinous at scale.<br>
-<strong>✅ Set a ratio sampler via env.</strong> Sampling is an env decision, not a code one: set
-<code>OTEL_TRACES_SAMPLER</code> (surfaced as <code>TelemetryConfig.sampler</code>) to
-<code>traceidratio</code> with a rate. <em>Exception:</em> keep always-on sampling for low-volume
-services or a targeted debugging window.</p>
-<p><strong>❌ Fork the runtime to change telemetry backends.</strong> Editing instrumentation to
-point at Grafana/Honeycomb is churn you will re-do every upgrade.<br>
-<strong>✅ Point the exporter.</strong> The OTLP export (<code>OTEL_EXPORTER_OTLP_ENDPOINT</code>,
-default <code>http://localhost:4318</code>) is the single seam — swap endpoint/protocol via env and
-the instrumentation code does not change.</p>
-<p><strong>❌ Put unbounded values in span attributes.</strong> User ids, raw URLs, or full payloads
-in <code>span.setAttribute</code> explode index cardinality on the backend.<br>
-<strong>✅ Use stable, low-cardinality keys.</strong> Correlate to a specific record with
-<code>getTraceId()</code> in a structured log line instead of widening the span.</p>
-<p><strong>❌ Pass a message as <code>recordJobProgress</code>'s 3rd argument.</strong> Free text
-there inflates cardinality and misreads the API.<br>
-<strong>✅ Pass a stable unit label.</strong> <code>'steps'</code> / <code>'items'</code> — the
-argument is a unit, not a description.</p>
-<p><strong>❌ Treat <code>progress(percent, message)</code> as only a log line.</strong><br>
-<strong>✅ Use it for both telemetry and runtime progress delivery.</strong> It emits a
-<code>job.progress</code> event and forwards the percentage/message to the workers channel.</p>
-{{ /comp }}
+| Avoid | Do instead |
+| --- | --- |
+| Tracing 100% of traffic in production. The local Aspire default samples everything, which is fine for development and ruinous at scale. | Set a ratio sampler in the environment: `OTEL_TRACES_SAMPLER` (surfaced as `TelemetryConfig.sampler`) to `traceidratio` with a rate. Keep always-on sampling for low-volume services or a targeted debugging window. |
+| Editing instrumentation to point at Grafana or Honeycomb; you redo that churn on every upgrade. | Point the exporter. `OTEL_EXPORTER_OTLP_ENDPOINT` (injected by Aspire locally) is the single seam: change endpoint and protocol in the environment and the instrumentation code stays the same. |
+| Unbounded values such as user ids, raw URLs or full payloads in `span.setAttribute`; they explode index cardinality on the backend. | Use stable, low-cardinality keys. To correlate a specific record, log `getTraceId()` in a structured log line instead of widening the span. |
+| A message as `recordJobProgress`'s third argument; free text there inflates cardinality and misreads the API. | Pass a stable unit label such as `'steps'` or `'items'`. |
+| Treating `progress(percent, message)` as only a log line. | Use it for both telemetry and runtime progress: it emits a `job.progress` event and forwards the percentage and message to the workers channel. |
 
-## Reference
+## Next steps
 
-This hub is intentionally thin — the full generated API lives in the reference.
+Follow [Add OpenTelemetry](/observability/how-to/add-opentelemetry/) to trigger a trace, add your own
+spans and read them in the dashboard.
 
-{{ comp.xref({ key: "ref:telemetry" }) }}
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Do — Add OpenTelemetry",
-    body: "Task-oriented recipe: lean on the automatic job spans, add custom spans via @netscript/telemetry withChildSpan, propagate traceparent across services and subprocesses, and point the OTLP export (:4318) at the dashboard.",
-    href: "/observability/how-to/add-opentelemetry/",
-    icon: "◆"
-  },
-  {
-    title: "Understand — Observability",
-    body: "The mental model: how automatic framework spans, createJobTools(ctx) handler telemetry, console logs, health endpoints, and Aspire traces fit together.",
-    href: "/explanation/observability/",
-    icon: "◎"
-  },
-  {
-    title: "Look up — telemetry reference",
-    body: "The full generated deno doc API for @netscript/telemetry — tracer facade, context/traceparent helpers, the instrumentation helpers, scheduler spans, and the oRPC tracing plugin. The authority for signatures.",
-    href: "/reference/telemetry/",
-    icon: "≡"
-  },
-  {
-    title: "Look up — logger reference",
-    body: "The full generated deno doc API for @netscript/logger — log levels, formats, and the structured-logging surface declared in netscript.config.ts.",
-    href: "/reference/logger/",
-    icon: "≡"
-  }
-] }) }}
-
-{{ comp.nextPrev({
-  prev: { label: "KV, queues & cron", href: "/data-persistence/kv-queues-cron/" },
-  next: { label: "Fresh UI & design", href: "/web-layer/fresh-ui/" }
-}) }}
+- [Observability model](/explanation/observability/): how automatic framework spans, `createJobTools(ctx)`
+  handler telemetry, console logs, health endpoints and Aspire traces fit together.
+- {{ comp.xref({ key: "ref:telemetry" }) }} and [logger](/reference/logger/) references: the full
+  APIs.
+- [Telemetry conventions](/reference/telemetry/convention/): span naming, SpanKind and the
+  `netscript.*` attribute rules.

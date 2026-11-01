@@ -1,0 +1,156 @@
+import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@1';
+import { PrismaClient, type Prisma } from './.generated/client.ts';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { createPostgresCommandOutboxRelayStore, type PostgresCommandClient, type TransactionClientPort } from '@netscript/database/commands/postgres';
+import { createPrismaSagaCommandRetention, type SagaCommandRetentionCursor } from 'RETENTION_MODULE';
+const DAY = 86_400_000;
+const now = new Date('2030-02-01T00:00:00.000Z');
+const old = new Date(now.getTime()-8*DAY);
+const recent = new Date(now.getTime()-DAY);
+const hash = (n=1) => n.toString(16).padStart(64,'0');
+function test(name:string, fn:(root:PrismaClient)=>Promise<void>) {
+ Deno.test(name,async()=>{
+  const root=new PrismaClient({adapter:new PrismaPg({host:Deno.env.get('COMMAND_POSTGRES_SOCKET'),database:Deno.env.get('SAGA_COMMAND_NAMESPACE'),user:Deno.env.get('PGUSER'),port:Number(Deno.env.get('PGPORT'))})});
+  try {await root.netScriptCommandOutbox.deleteMany();await root.sagaRuntimeCommandAppliedKey.deleteMany();await root.sagaRuntimeState.deleteMany();await fn(root);}
+  finally {await root.$disconnect();}
+ });
+}
+type Hook=(sql:string,tx:Prisma.TransactionClient)=>Promise<void>;
+function bridge(root:PrismaClient,afterQuery?:Hook,beforeExecute?:Hook):TransactionClientPort<PostgresCommandClient> {
+ return {$transaction(work,options){
+  if(options?.isolationLevel==='Snapshot')throw new TypeError('PostgreSQL isolation');
+  return root.$transaction(tx=>work({
+   async $queryRawUnsafe<T>(sql:string,...values:unknown[]):Promise<T>{const value=await tx.$queryRawUnsafe<T>(sql,...values);await afterQuery?.(sql,tx);return value;},
+   async $executeRawUnsafe(sql:string,...values:unknown[]):Promise<number>{await beforeExecute?.(sql,tx);return await tx.$executeRawUnsafe(sql,...values);},
+  }),{...options,isolationLevel:options?.isolationLevel});
+ }};
+}
+const message={executionId:'e',commandName:'c',commandVersion:1,destination:'w',topic:'t',payloadJson:'{}',dedupeKey:'d',correlationId:'c',availableAt:old};
+const opts={transactionTimeoutMs:5000};
+const envelope=(status:string,at=old)=>({metadata:{status,completedAt:at.toISOString(),updatedAt:at.toISOString(),createdAt:new Date(0).toISOString()}});
+async function saga(root:PrismaClient,id:string,status='completed',at=old,sagaId='default',keyCreated=now) {
+ await root.sagaRuntimeState.create({data:{instanceId:id,sagaId,version:1,envelope:envelope(status,at)}});
+ await root.sagaRuntimeCommandAppliedKey.create({data:{instanceId:id,keyHash:hash(),createdAt:keyCreated}});
+}
+const keys=(root:PrismaClient)=>root.sagaRuntimeCommandAppliedKey.findMany({orderBy:[{instanceId:'asc'},{keyHash:'asc'}]}).then(rows=>rows.map(r=>r.instanceId));
+
+test('retention outbox ages settled rows and preserves pending and every leased delivery',async root=>{
+ await root.netScriptCommandOutbox.createMany({data:[
+ {id:'old-published',...message,publishedAt:old},{id:'old-terminal',...message,terminalAt:old},
+ {id:'recent',...message,publishedAt:recent},{id:'pending',...message},
+ {id:'leased',...message,publishedAt:old,claimToken:'live',claimUntil:new Date(now.getTime()+DAY)},
+ {id:'expired-lease',...message,terminalAt:old,claimToken:'expired',claimUntil:old},
+ {id:'boundary',...message,publishedAt:new Date(now.getTime()-7*DAY)},
+ ]});
+ const result=await createPostgresCommandOutboxRelayStore(bridge(root),opts).pruneSettled({now,limit:100});
+ assertEquals(result,{scanned:7,deleted:2});
+ assertEquals((await root.netScriptCommandOutbox.findMany({orderBy:{id:'asc'}})).map(r=>r.id),['boundary','expired-lease','leased','pending','recent']);
+});
+
+test('retention replay expiry starts at terminal completion and preserves active orphan malformed markers',async root=>{
+ for(const status of ['pending','running','compensating']) await saga(root,status,status);
+ for(const status of ['completed','failed','cancelled','compensated'])await saga(root,status,status);
+ await saga(root,'recent-completion','completed',recent,'default',new Date(0));
+ await saga(root,'fallback');
+ await root.sagaRuntimeState.update({where:{instanceId:'fallback'},data:{envelope:{metadata:{status:'failed',updatedAt:old.toISOString()}}}});
+ await saga(root,'large-json');
+ await root.$executeRawUnsafe(`UPDATE saga_runtime_state SET envelope=jsonb_set(envelope, '{state}', '{"counter":9007199254740993}'::jsonb) WHERE instance_id='large-json'`);
+ await saga(root,'invalid');
+ await root.sagaRuntimeState.update({where:{instanceId:'invalid'},data:{envelope:{metadata:{status:'completed',completedAt:'invalid',updatedAt:old.toISOString()}}}});
+ await root.sagaRuntimeCommandAppliedKey.create({data:{instanceId:'orphan',keyHash:hash(),createdAt:new Date(0)}});
+ const result=await createPrismaSagaCommandRetention(bridge(root),opts).prune({now,limit:100});
+ assertEquals(result.appliedKeys,{scanned:12,deleted:6});
+ assertEquals(await keys(root),['compensating','invalid','orphan','pending','recent-completion','running']);
+});
+
+test('retention applies per-saga group windows and the longest shared outbox window',async root=>{
+ await saga(root,'short','completed',old,'short');await saga(root,'long','completed',old,'long');
+ await saga(root,'default','completed',old,'unknown');
+ await root.netScriptCommandOutbox.create({data:{id:'shared',...message,publishedAt:old}});
+ const result=await createPrismaSagaCommandRetention(bridge(root),{...opts,completedRetentionDaysBySaga:{short:1,long:30}}).prune({now,limit:100});
+ assertEquals(result.appliedKeys.deleted,2);assertEquals(await keys(root),['long']);assertEquals(result.outbox.deleted,0);
+ const explicit=await createPrismaSagaCommandRetention(bridge(root),{...opts,outboxRetentionDays:1}).prune({now,limit:100});
+ assertEquals(explicit.outbox.deleted,1);
+});
+
+test('retention outbox rechecks state age and lease after selection',async root=>{
+ await root.netScriptCommandOutbox.createMany({data:['pending','leased','recent'].map(id=>({id,...message,publishedAt:old}))});
+ const client=bridge(root,async sql=>{
+  if(!sql.startsWith('SELECT id FROM netscript_command_outbox'))return;
+  await root.netScriptCommandOutbox.update({where:{id:'pending'},data:{publishedAt:null}});
+  await root.netScriptCommandOutbox.update({where:{id:'leased'},data:{claimToken:'new',claimUntil:new Date(now.getTime()+DAY)}});
+  await root.netScriptCommandOutbox.update({where:{id:'recent'},data:{publishedAt:recent}});
+ });
+ const result=await createPostgresCommandOutboxRelayStore(client,opts).pruneSettled({now,limit:100});
+ assertEquals(result.deleted,0);assertEquals(await root.netScriptCommandOutbox.count(),3);
+});
+
+test('retention replay rechecks fresh status completion and version after selection',async root=>{
+ for(const id of ['active','recent','version'])await saga(root,id);
+ const client=bridge(root,async sql=>{
+  if(!sql.includes('FROM (SELECT instance_id'))return;
+  await root.sagaRuntimeState.update({where:{instanceId:'active'},data:{envelope:envelope('running')}});
+  await root.sagaRuntimeState.update({where:{instanceId:'recent'},data:{envelope:envelope('completed',recent)}});
+  await root.sagaRuntimeState.update({where:{instanceId:'version'},data:{version:2}});
+ });
+ const result=await createPrismaSagaCommandRetention(client,opts).prune({now,limit:100});
+ assertEquals(result.appliedKeys.deleted,0);assertEquals(await keys(root),['active','recent','version']);
+});
+
+test('retention delete compares the locked parent envelope as well as its version',async root=>{
+ await saga(root,'changed');
+ const client=bridge(root,undefined,async(sql,tx)=>{
+  if(sql.startsWith('DELETE FROM saga_runtime_command_applied_key'))await tx.sagaRuntimeState.update({where:{instanceId:'changed'},data:{envelope:envelope('running')}});
+ });
+ const result=await createPrismaSagaCommandRetention(client,opts).prune({now,limit:100});
+ assertEquals(result.appliedKeys.deleted,0);assertEquals(await keys(root),['changed']);
+});
+
+test('retention skips locked parents and never deletes a concurrent active saga marker',async root=>{
+ await saga(root,'locked');
+ let selected!:()=>void;const ready=new Promise<void>(r=>selected=r);
+ let release!:()=>void;const done=new Promise<void>(r=>release=r);
+ const holder=root.$transaction(async tx=>{
+  await tx.$queryRawUnsafe('SELECT instance_id FROM saga_runtime_state WHERE instance_id=$1 FOR UPDATE','locked');
+  selected();await done;
+  await tx.sagaRuntimeState.update({where:{instanceId:'locked'},data:{envelope:envelope('running'),version:2}});
+ },{timeout:5000});
+ await ready;
+ try {const result=await createPrismaSagaCommandRetention(bridge(root),opts).prune({now,limit:100});assertEquals(result.appliedKeys.deleted,0);}
+ finally {release();await holder;}
+ assertEquals(await keys(root),['locked']);
+});
+
+test('retention bounds examined rows and deletion per family and resumes past retained pages',async root=>{
+ for(const id of ['a','b','c','d','e']){
+  await saga(root,id,id<'c'?'running':'completed');
+  await root.netScriptCommandOutbox.create({data:{id,...message,...(id<'c'?{}:{publishedAt:old})}});
+ }
+ // One instance with multiple keys also respects the marker budget.
+ await root.sagaRuntimeCommandAppliedKey.createMany({data:[2,3,4].map(n=>({instanceId:'e',keyHash:hash(n)}))});
+ const retention=createPrismaSagaCommandRetention(bridge(root),opts);
+ let cursor:SagaCommandRetentionCursor|undefined;let scannedKeys=0,scannedOutbox=0,deletedKeys=0,deletedOutbox=0;
+ for(let page=0;page<10;page++){
+  const result=await retention.prune({now,limit:2,cursor});
+  assert(result.appliedKeys.scanned<=2);assert(result.outbox.scanned<=2);assert(result.appliedKeys.deleted<=2);assert(result.outbox.deleted<=2);
+  scannedKeys+=result.appliedKeys.scanned;scannedOutbox+=result.outbox.scanned;deletedKeys+=result.appliedKeys.deleted;deletedOutbox+=result.outbox.deleted;
+  cursor=result.nextCursor;if(!cursor)break;
+ }
+ assertEquals(cursor,undefined);assertEquals([scannedKeys,scannedOutbox,deletedKeys,deletedOutbox],[8,5,6,3]);
+ assertEquals(await keys(root),['a','b']);
+});
+
+test('retention validates bounds clock policies and cancellation before database IO',async root=>{
+ let queries=0;const client=bridge(root,async()=>{queries++;});
+ const retention=createPrismaSagaCommandRetention(client,opts);
+ for(const limit of [0,-1,101,1.5])await assertRejects(()=>retention.prune({now,limit}),RangeError);
+ await assertRejects(()=>retention.prune({now:new Date(NaN),limit:1}),RangeError);
+ await assertRejects(()=>retention.prune({now,limit:1},AbortSignal.abort()));
+ const relay=createPostgresCommandOutboxRelayStore(client,opts);
+ await assertRejects(()=>relay.pruneSettled({now,limit:1,completedRetentionDays:0}),RangeError);
+ await assertRejects(()=>retention.prune({now,limit:1,cursor:{appliedKey:{instanceId:'x',keyHash:'bad'}}}),TypeError);
+ for(const value of [0,-1,Infinity,NaN]){
+  let failed=false;try{createPrismaSagaCommandRetention(client,{...opts,completedRetentionDays:value});}catch{failed=true;}assert(failed);
+ }
+ assertEquals(queries,0);
+});

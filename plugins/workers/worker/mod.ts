@@ -54,6 +54,7 @@ export type {
   WorkerExecutionState,
   WorkerHealthStatus,
   WorkerJobRegistry,
+  WorkerListenerFailureCause,
   WorkerOptions,
   WorkerPayloadSchema,
   WorkerTaskExecutor,
@@ -67,6 +68,8 @@ export type {
   ChildHealthMonitor,
   ChildHealthSnapshot,
   ChildHealthState,
+  ChildRestartHistory,
+  ChildRestartHistoryPort,
 } from '@netscript/plugin/health';
 
 export type {
@@ -83,3 +86,9 @@ export type {
   WorkerIdempotencyPort,
   WorkerIdempotencySource,
 } from '@netscript/plugin-workers-core/stores';
+
+export type { JobDeadLetterRecord, JobDeadLetterStorePort } from './job-dead-letters.ts';
+export { JOB_DEAD_LETTER_NAMESPACE } from './job-dead-letters.ts';
+
+export type { DeadLetterRecord, DeadLetterStorePort } from '@netscript/queue';
+export type { JobRunnerClock } from '@netscript/plugin-workers-core/runtime';

@@ -1,3 +1,4 @@
+import type { InitPresetInput } from '../../../kernel/application/ui/v2/presets/apply-init-preset.ts';
 import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { join } from '@std/path';
 import { createPublicCommandDependencies } from '../root/public-command-dependencies.ts';
@@ -13,9 +14,11 @@ async function fixture(
     parse: (args?: string[]) => Promise<void>;
     results: InitAgentResult[];
     inputs: InitAgentInput[];
+    presets: InitPresetInput[];
     docsCalls: () => number;
   }) => Promise<void>,
   environment: AgentEnvironment = {},
+  realPreset = false,
 ): Promise<void> {
   const parent = await Deno.makeTempDir();
   const root = join(parent, 'agent-project');
@@ -25,10 +28,18 @@ async function fixture(
   }).initCommandDependencies;
   const results: InitAgentResult[] = [];
   const inputs: InitAgentInput[] = [];
+  const presets: InitPresetInput[] = [];
   let docsCalls = 0;
   const command = () =>
     createInitCommand({
       ...dependencies,
+      preparePreset: realPreset
+        ? dependencies.preparePreset
+        : () =>
+          Promise.resolve(async (input) => {
+            assert(await new DenoAgentInitFileSystem().exists(join(root, 'deno.json')));
+            presets.push(input);
+          }),
       // Keep the real scaffold writers and installer; do not launch external processes.
       initContext: {
         ...dependencies.initContext,
@@ -65,6 +76,7 @@ async function fixture(
     await run({
       root,
       inputs,
+      presets,
       results,
       docsCalls: () => docsCalls,
       parse: async (args = []) => {
@@ -121,6 +133,31 @@ Deno.test('init integration: explicit host overrides invoking environment', asyn
     assert(await new DenoAgentInitFileSystem().exists(join(root, 'opencode.json')));
     assertEquals(await new DenoAgentInitFileSystem().exists(join(root, '.mcp.json')), false);
   }, { CLAUDECODE: '1' });
+});
+
+Deno.test('S9 workspace guidance locates registry-owned theme pairs inside the selected app', async () => {
+  await fixture(
+    async ({ root, parse }) => {
+      await parse(['--host', 'vscode', '--app-name', 'dashboard', '--preset', 'studio-utility']);
+      const fs = new DenoAgentInitFileSystem();
+      const skill = await Deno.readTextFile(join(root, '.agents/skills/netscript-design/SKILL.md'));
+      assertStringIncludes(skill, 'select `apps/<app>/`');
+      assertEquals(skill.includes('](../fresh-ui-theme-'), false);
+      for (const file of ['DESIGN.md', 'SKILL.md']) {
+        const appPath = `.agents/skills/fresh-ui-theme-studio-utility/${file}`;
+        assertStringIncludes(skill, `\`${appPath}\``);
+        assertEquals(await fs.exists(join(root, appPath)), false);
+        assertEquals(
+          await Deno.readTextFile(join(root, 'apps/dashboard', appPath)),
+          await Deno.readTextFile(
+            new URL(`../../../../../../docs/design-system/themes/studio/${file}`, import.meta.url),
+          ),
+        );
+      }
+    },
+    {},
+    true,
+  );
 });
 
 Deno.test('init integration: no-agent writes no agent files even with with-docs', async () => {
@@ -194,5 +231,27 @@ Deno.test('init integration: json emits one scaffold result while still installi
     assertEquals(inputs.length, 1);
     assertEquals(lines.length, 1);
     assertEquals(JSON.parse(lines[0]).project.name, 'agent-project');
+  });
+});
+
+Deno.test('init --preset forwards the URL and selected generated app after scaffold, and dry-run skips it', async () => {
+  await fixture(async ({ parse, root, presets }) => {
+    await parse([
+      '--preset',
+      'https://themes.test/studio.json',
+      '--app-name',
+      'studio',
+      '--no-agent',
+    ]);
+    assertEquals(presets, [{
+      projectRoot: root,
+      name: 'agent-project',
+      appName: 'studio',
+      preset: 'https://themes.test/studio.json',
+    }]);
+  });
+  await fixture(async ({ parse, presets }) => {
+    await parse(['--preset', 'https://themes.test/unreachable.json', '--dry-run']);
+    assertEquals(presets, []);
   });
 });

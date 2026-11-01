@@ -1,0 +1,19 @@
+{
+  "source": {
+    "mode": "selection",
+    "cwd": "./packages/fresh-ui"
+  },
+  "command": "deno check --unstable-kv --lock=deno.lock --frozen <files>",
+  "selection": {
+    "filesSelected": 266,
+    "batches": 3,
+    "failedBatches": 0
+  },
+  "summary": {
+    "totalOccurrences": 0,
+    "uniqueOccurrences": 0,
+    "uniqueCodes": 0,
+    "uniquePaths": 0
+  },
+  "groups": []
+}

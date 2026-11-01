@@ -1,22 +1,11 @@
 import type { VNode } from 'preact';
 import { Badge } from '@app/components/ui/mod.ts';
 import TokenClipboard from '../(_islands)/TokenClipboard.tsx';
-import {
-  colorRamps,
-  type DesignToken,
-  easeTokens,
-  fontTokens,
-  foundationTokens,
-  leadingTokens,
-  radiusTokens,
-  type SemanticIntent,
-  semanticIntents,
-  shadowTokens,
-  spaceTokens,
-  textTokens,
-  tokenManifestMeta,
-  trackingTokens,
-  zTokens,
+import type {
+  ColorRamp,
+  DesignToken,
+  DesignTokenModel,
+  SemanticIntent,
 } from '../(_shared)/tokens.ts';
 
 const SECTIONS = [
@@ -69,10 +58,10 @@ function SectionHeading(
   );
 }
 
-function FoundationGrid(): VNode {
+function FoundationGrid({ tokens }: { tokens: readonly DesignToken[] }): VNode {
   return (
     <div class='ns-token-grid'>
-      {foundationTokens.map((token) => (
+      {tokens.map((token) => (
         <TokenRow
           key={token.name}
           token={token}
@@ -123,10 +112,10 @@ function IntentStrip({ intent }: { intent: SemanticIntent }): VNode | null {
   );
 }
 
-function RampStrips(): VNode {
+function RampStrips({ ramps }: { ramps: readonly ColorRamp[] }): VNode {
   return (
     <div class='ns-stack ns-stack--lg'>
-      {colorRamps.map((ramp) => (
+      {ramps.map((ramp) => (
         <figure key={ramp.name} class='ns-token-ramp'>
           <figcaption class='ns-token-ramp__name'>
             {ramp.name}
@@ -154,7 +143,8 @@ function RampStrips(): VNode {
   );
 }
 
-function TypeSpecimens(): VNode {
+function TypeSpecimens({ model }: { model: DesignTokenModel }): VNode {
+  const { fontTokens, textTokens, leadingTokens, trackingTokens } = model;
   return (
     <div class='ns-stack ns-stack--lg'>
       {fontTokens.map((token) => (
@@ -217,10 +207,10 @@ function TypeSpecimens(): VNode {
   );
 }
 
-function SpaceBars(): VNode {
+function SpaceBars({ tokens }: { tokens: readonly DesignToken[] }): VNode {
   return (
     <div class='ns-token-grid'>
-      {spaceTokens.map((token) => (
+      {tokens.map((token) => (
         <TokenRow
           key={token.name}
           token={token}
@@ -238,10 +228,10 @@ function SpaceBars(): VNode {
   );
 }
 
-function RadiusTiles(): VNode {
+function RadiusTiles({ tokens }: { tokens: readonly DesignToken[] }): VNode {
   return (
     <div class='ns-token-tiles'>
-      {radiusTokens.map((token) => (
+      {tokens.map((token) => (
         <TokenRow
           key={token.name}
           token={token}
@@ -257,10 +247,10 @@ function RadiusTiles(): VNode {
   );
 }
 
-function ShadowTiles(): VNode {
+function ShadowTiles({ tokens }: { tokens: readonly DesignToken[] }): VNode {
   return (
     <div class='ns-token-tiles'>
-      {shadowTokens.map((token) => (
+      {tokens.map((token) => (
         <TokenRow
           key={token.name}
           token={token}
@@ -276,10 +266,10 @@ function ShadowTiles(): VNode {
   );
 }
 
-function MotionChips(): VNode {
+function MotionChips({ tokens }: { tokens: readonly DesignToken[] }): VNode {
   return (
     <div class='ns-token-tiles'>
-      {easeTokens.map((token) => (
+      {tokens.map((token) => (
         <TokenRow
           key={token.name}
           token={token}
@@ -297,10 +287,10 @@ function MotionChips(): VNode {
   );
 }
 
-function ZStack(): VNode {
+function ZStack({ tokens }: { tokens: readonly DesignToken[] }): VNode {
   return (
     <div class='ns-token-zstack'>
-      {zTokens.map((token, index) => (
+      {tokens.map((token, index) => (
         <button
           key={token.name}
           type='button'
@@ -317,7 +307,8 @@ function ZStack(): VNode {
   );
 }
 
-export default function DesignTokensView() {
+export default function DesignTokensView({ model }: { model: DesignTokenModel }): VNode {
+  const { tokenManifestMeta, semanticIntents, presetLabel } = model;
   return (
     <main class='ns-tokens-page'>
       <TokenClipboard />
@@ -325,7 +316,7 @@ export default function DesignTokensView() {
       <header class='ns-page-header'>
         <div class='ns-cluster ns-cluster--md'>
           <h1>Tokens</h1>
-          <Badge variant='primary'>NS One</Badge>
+          <Badge variant='primary'>{presetLabel}</Badge>
           <Badge variant='muted'>manifest v{tokenManifestMeta.version}</Badge>
         </div>
         <p class='ns-lede'>
@@ -350,9 +341,9 @@ export default function DesignTokensView() {
             <SectionHeading
               id='roles'
               title='Semantic roles'
-              lede='What components consume. Surfaces, text, and borders first; the six intents below each pair a base with its fg, hover, subtle, and border companions.'
+              lede='What components consume. Surfaces, text, and borders first; the available intents below each pair a base with its fg, hover, subtle, and border companions.'
             />
-            <FoundationGrid />
+            <FoundationGrid tokens={model.foundationTokens} />
             <div class='ns-stack ns-stack--lg'>
               {semanticIntents.map((intent) => <IntentStrip key={intent.role} intent={intent} />)}
             </div>
@@ -364,7 +355,7 @@ export default function DesignTokensView() {
               title='Primitive ramps'
               lede='Theme raw material. Semantic roles map onto these steps; components never reference a ramp directly.'
             />
-            <RampStrips />
+            <RampStrips ramps={model.colorRamps} />
           </section>
 
           <section class='ns-token-section'>
@@ -373,7 +364,7 @@ export default function DesignTokensView() {
               title='Type'
               lede='Families, scale, leading, and tracking — each rendered at its own value.'
             />
-            <TypeSpecimens />
+            <TypeSpecimens model={model} />
           </section>
 
           <section class='ns-token-section'>
@@ -382,7 +373,7 @@ export default function DesignTokensView() {
               title='Space'
               lede='The spacing scale, drawn to size.'
             />
-            <SpaceBars />
+            <SpaceBars tokens={model.spaceTokens} />
           </section>
 
           <section class='ns-token-section'>
@@ -391,7 +382,7 @@ export default function DesignTokensView() {
               title='Radius'
               lede='Corner rounding, from subtle to full pill.'
             />
-            <RadiusTiles />
+            <RadiusTiles tokens={model.radiusTokens} />
           </section>
 
           <section class='ns-token-section'>
@@ -400,7 +391,7 @@ export default function DesignTokensView() {
               title='Shadow'
               lede='Elevation steps for raised surfaces and overlays.'
             />
-            <ShadowTiles />
+            <ShadowTiles tokens={model.shadowTokens} />
           </section>
 
           <section class='ns-token-section'>
@@ -409,7 +400,7 @@ export default function DesignTokensView() {
               title='Motion'
               lede='Duration and easing pairs. Hover a chip to feel each curve.'
             />
-            <MotionChips />
+            <MotionChips tokens={model.easeTokens} />
           </section>
 
           <section class='ns-token-section'>
@@ -418,7 +409,7 @@ export default function DesignTokensView() {
               title='Z-scale'
               lede='The stacking order contract: each layer sits exactly one plate above the last.'
             />
-            <ZStack />
+            <ZStack tokens={model.zTokens} />
           </section>
         </div>
       </div>

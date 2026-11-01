@@ -1,0 +1,50 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "feedback style pass (Cupertino)",
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "date": "2026-10-31",
+  "page": "29:6",
+  "frames": {"Feedback": "567:140371", "Feedback · sets": "567:140376", "review": "568:195473 (Light 568:195474, Dark 568:196089)", "strip": "568:196674"},
+  "sets": [
+    {"name": "Cupertino/Alert", "id": "567:140377", "baseId": "450:422", "variants": 12},
+    {"name": "Cupertino/Inline notice", "id": "567:140535", "baseId": "451:56561", "variants": 6},
+    {"name": "Cupertino/Toast", "id": "567:140610", "baseId": "452:245", "variants": 6},
+    {"name": "Cupertino/Progress", "id": "567:195410", "baseId": "453:6139", "variants": 30},
+    {"name": "Cupertino/Progress circular", "id": "567:195591", "baseId": "453:6280", "variants": 30},
+    {"name": "Cupertino/Spinner", "id": "460:742", "baseId": "252:11837", "variants": 18, "note": "existing Actions set reused"},
+    {"name": "Cupertino/Skeleton", "id": "567:195702", "baseId": "454:975", "variants": 12},
+    {"name": "Cupertino/Skeleton preset", "id": "567:195715", "baseId": "454:1072", "variants": 4},
+    {"name": "Cupertino/Empty state", "id": "567:195812", "baseId": "454:2671", "variants": 18}
+  ],
+  "png": ["review/styles/cupertino/feedback.png", "review/styles/cupertino/feedback-strip.png"],
+  "swapTest": "5/5 pass (Alert title+description+action+close, Inline notice description+close, Toast title+description+progress, Progress label+value+track padding, Empty state title+secondaryAction)",
+  "anatomy": [
+    "Alert: C.content card (surface/card, 1px INSIDE material/stroke, radius/card 22, no shadow) led by the notice tile (31:192) sized to the label line: 20 tile r5 in <tone>/default with a 12 glyph in <tone>/fg (neutral text/muted tile + surface/card glyph; important primary/default + primary/fg, no important/default role); title text/fg, body text/muted; action the Plain kind. strong (derived): <tone>/subtle fill + <tone>/border rim, title <tone>/text (neutral material/track).",
+    "Inline notice: grey field well (material/track, radius/input 10, no rim) with a 16 tile r4.",
+    "Toast: C.float notification card (surface/card, material/stroke rim, radius/card, DROP_SHADOW bound to effect/shadow-overlay + shadow/overlay/y + blur; opaque, never GLASS) with the tone tile; timer a 3px material/track capsule with the tone fill, inset, theme-only timer-gap.",
+    "Progress: system bar: material/track capsule 4/6/8 with a primary/default capsule fill (secondary text/muted, status <tone>/default).",
+    "Progress circular: ring material/track, arc primary/default (status tone default), round caps.",
+    "Skeleton: redacted placeholders in material/track: r4 lines, radius/input blocks (lg radius/card), round avatars.",
+    "Skeleton preset: table = inset grouped list (material/fill-strong group r12, border/subtle separators, none under the last row); stats = C.content cards; detail/form = grouped r12 groups.",
+    "Empty state: ContentUnavailableView. border on = C.content card (no dashes); bare 32/26 glyph in text/muted (error destructive/default), no tile; prominent capsule + Plain (secondary set to ghost)."
+  ],
+  "sweep": {"swapped": 71, "detail": "Data display 1: 67 Skeleton + 4 Empty state (Cupertino/Table, Cupertino/Data table)"},
+  "defectsFixed": [
+    "Primary Button md looked disabled in light: not the component (Cupertino/Button primary md/sm/lg render solid, verified) but instance fill overrides primary/default at 20% on primary buttons (12 in Cupertino sets: md 6, sm 6; 5 in the light screens: Create order on Dashboard and Orders, Save changes, Sign in, one on Command). Root fills reset to the main component's.",
+    "Page header repeated the large title: Cupertino/Top bar title-block (large title + subtitle) is now bound to a new theme-only boolean largeTitle#569:0, default off, in all four variants; app pages keep their own page header.",
+    "Owner note 2026-10-31 (row tones, 'check the others'): Cupertino/Table rows were flattened; 5 badges re-toned from the base Table (Paid success, Awaiting payment warning, Shipped info, Paid success, Refunded neutral) and 2 in Cupertino/Data table."
+  ],
+  "alsoReset": "92 further Cupertino/Button root-fill overrides inside Cupertino sets (secondary/destructive glass capsules, all sizes; material/fill @55%, material/fill-strong @78%, material/track @24%) and 17 in the dark screens (Filter, Export, Columns, Close, Print label, Refund, Duplicate, Delete store, Back, Actions) were reset to the main's material/* fills by the same root-fill rule; before/after dark renders are visually identical.",
+  "screens": {
+    "group": "539:70148",
+    "swapped": {"Alert": 4, "Inline notice": 2, "Progress": 2, "Toast": 6},
+    "leftoverBaseFeedback": 0,
+    "reShot": ["review/screens/cupertino/dashboard-light.png", "review/screens/cupertino/dashboard-dark.png", "review/screens/cupertino/orders-light.png", "review/screens/cupertino/orders-dark.png", "review/screens/cupertino/settings-light.png", "review/screens/cupertino/settings-dark.png", "review/screens/cupertino/sign-in-light.png", "review/screens/cupertino/sign-in-dark.png", "review/screens/cupertino/command-light.png", "review/screens/cupertino/command-dark.png"],
+    "note": "all 10 changed (Feedback swaps, button fill resets, Top bar large title off); the screens builder's large-title text overrides are now hidden"
+  },
+  "ownerReview": [
+    "Cupertino subtle alerts are neutral cards with a coloured tile (the Apple notice), and the tone fill moves to the strong emphasis; Tonal and Utility use the tinted fill for subtle.",
+    "Tile glyph ink uses <tone>/fg (warning gets dark ink on amber) rather than primary/fg as the Alert dialog row says, for contrast; in Dark, primary/fg and info/fg are #111113 as the brief already notes.",
+    "The Top bar now starts empty on app desktop (toolbar only: search, Filter, Export, New Order); turn largeTitle on for a window without a page header."
+  ]
+}

@@ -1,3 +1,7 @@
+/** Saga persistence and projection backend selection.
+ * @module
+ */
+
 /** Durable saga store backend variants supported by the plugin runtime. */
 export type DurableSagaStoreBackend = 'kv' | 'prisma';
 

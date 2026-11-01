@@ -38,6 +38,7 @@ function collect(suite: Suite): void {
     if (spec.title.includes('[negative:')) {
       throw new Error('Cannot baseline deliberate negative controls');
     }
+    if (!spec.title.includes(': screenshots, axe and keyboard')) continue;
     const route = spec.title.split(': screenshots, axe and keyboard')[0];
     for (const test of spec.tests) {
       const attachment = test.results.at(-1)?.attachments.find((item) => item.name === 'axe');

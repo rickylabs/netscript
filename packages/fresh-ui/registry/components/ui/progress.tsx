@@ -22,20 +22,6 @@ export interface ProgressProps
   variant?: ProgressVariant;
 }
 
-const SIZE_CLASSES: Record<ProgressSize, string> = {
-  sm: 'ns-progress--sm',
-  md: 'ns-progress--md',
-  lg: 'ns-progress--lg',
-};
-
-const VARIANT_CLASSES: Record<ProgressVariant, string | undefined> = {
-  primary: undefined,
-  secondary: 'ns-progress--secondary',
-  success: 'ns-progress--success',
-  warning: 'ns-progress--warning',
-  destructive: 'ns-progress--destructive',
-};
-
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
@@ -62,16 +48,20 @@ export function Progress({
       aria-valuemin={0}
       aria-valuemax={safeMax}
       aria-valuenow={indeterminate ? undefined : normalizedValue}
-      class={cn(
-        'ns-progress',
-        SIZE_CLASSES[size],
-        VARIANT_CLASSES[variant],
-        indeterminate && 'ns-progress--indeterminate',
-        className,
-      )}
+      class={cn('ns-progress', className)}
+      data-size={size}
+      data-variant={variant}
+      data-state={indeterminate ? 'loading' : 'rest'}
+      data-part='root'
+      data-scope='progress'
     >
-      <span class='ns-progress__track'>
-        <span class='ns-progress__bar' style={indeterminate ? undefined : { width }} />
+      <span class='ns-progress__track' data-part='track' data-scope='progress'>
+        <span
+          class='ns-progress__bar'
+          data-part='bar'
+          data-scope='progress'
+          style={indeterminate ? undefined : { width }}
+        />
       </span>
     </div>
   );

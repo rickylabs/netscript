@@ -1,0 +1,11 @@
+{
+  "code": 0,
+  "stdout": "05:23:25.603 INF netscript·services·streams Service listening\n05:23:25.609 INF netscript·services·streams HTTP request started\n05:23:25.610 INF netscript·services·streams auth decision allow\n05:23:25.618 INF netscript·services·streams HTTP request completed\n05:23:25.621 INF netscript·services·streams HTTP request started\n05:23:25.649 INF netscript·services·streams auth decision allow\n05:23:25.650 INF netscript·services·streams HTTP request completed\n05:23:25.663 INF netscript·services·streams Service shutdown completed\n{\"observations\":{\"mode\":\"drain\",\"negative\":false,\"upstreamRead\":[200,\"s6e-drain-real-stream\"],\"actualBeforeRelease\":[\"pending\",\"pending\"],\"observedBeforeRelease\":[\"pending\",\"pending\"],\"frontRead\":[200,\"s6e-drain-real-stream\"],\"nativeStopsSettled\":2},\"authCalls\":2,\"rebinds\":[{\"phase\":\"while-auth-held\",\"port\":52632},{\"phase\":\"after-native-stop\",\"port\":55501},{\"phase\":\"after-native-stop\",\"port\":52632}]}\ns6e-streams: response, native stops and both ports settled\ns6e-streams: lifecycle assertion and cleanup settled\n",
+  "stderr": "Check $deno$stdin.ts\n[streams] Warning: Streams storage is ephemeral; events are lost on process restart.\n",
+  "pid": 30632,
+  "startedAt": "2026-10-28T05:23:24.372Z",
+  "finishedAt": "2026-10-28T05:23:25.703Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

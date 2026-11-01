@@ -1,0 +1,233 @@
+{
+  "parent": "c1f9c1090086483f18df615103f16ddb274fd64e",
+  "incomingMain": "aec75e4d947dcf7c83b9f7dd4b6444abe430f18b",
+  "incomingPaths": 23,
+  "mainSourceExceptions": [
+    "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts",
+    "plugins/workers/deno.json"
+  ],
+  "exceptionMeaning": "retained additive workers service export map and canonical prose union; all incoming runtime/locks preserved",
+  "sourceSha256": {
+    ".llm/harness/debt/arch-debt.md": "07f7b35f4c79135db0a0fc667f6192697160e91dd093dee49c742c9674ea6171",
+    "deno.lock": "f018bee10639444ab3a7d8510a06247be51122628f89b96674734d4033040a8c",
+    "docs/site/background-processing/workers.md": "d8469c153bc4e01cca41bdd2174201d746e6bc002874dbf857c61a19dd743337",
+    "docs/site/reference/service/index.md": "ddd7309944a3c72a7b22e00327a8be4b4aeb2c67883aee5681dd1a06071d8bb4",
+    "packages/cli/e2e/fixtures/desktop-native/deno.lock": "7ba96bc29871e6420292cd91b83a0b417a4ef3713576c8508c060745e267e2ce",
+    "packages/cli/src/kernel/assets/agent-docs-prose.generated.ts": "f1d67ad2776437e8cf30163fdd98b309693f2dc101ca9471ec9695d0ffdf79a0",
+    "packages/fresh-ui/deno.lock": "46fba84af57dea3404189bdb8821a6566c8262ddd05ef539ddf8c7c8142ebd02",
+    "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts": "459350b1d79d319fc2b7331306d102405d8bc6e0ebb351b8a80af61e62566a3f",
+    "packages/mcp/src/publish-assets.generated.ts": "208e780cb0ba1002c22406d9e0303512b8593153b56871d740330eb5083257ff",
+    "packages/service/README.md": "3aa9c83f11c11694ca7605e56d0d27014f91fc52e34d702d391845f7b1ebc2b7",
+    "packages/service/src/auth/types.ts": "b0f5bc3a97af6e4ee4b11f17606e065131cfc30bc258eddcc8c30f737730f68d",
+    "packages/service/src/primitives/scalar.generated.ts": "38e7fd81fe48a98fb58a73c35966987857bd26aab5f44fc478ed5d4fc84ebdf2",
+    "packages/service/tests/auth/procedure-availability_test.ts": "80f0ce4a5ba12b94ede856df87dd42195f72f2fa298aef537c2d445213d0c020",
+    "plugins/streams/services/mod.ts": "04b622895c983127531a0989c2647e1acd5b6bf3977a6e92ee957451d461f5b7",
+    "plugins/workers/deno.json": "f71334c86e11e5191f25740330aef6abfa0cf0a1c8f74ac7c853ec8af9a37f14",
+    "plugins/workers/services/mod.ts": "04d0af14c7f298da223f3e741c14be7b9d52a8b546de4cc5ffd6ce6e794cc7d2",
+    "plugins/workers/worker/job-dispatcher.ts": "fb050c6e98b1f5107492946b50eb43aa454ad5395ee0ff772a608ac87dd5d427",
+    "plugins/workers/worker/job-dispatcher_test.ts": "a11986f383933f6515bd2ce5c6e8d6015bbaf4a452bf5408eff3827bd7ee2cd4",
+    "plugins/workers/worker/job-execution.ts": "29eccd3fda5ba49cc4552bb3ae7628b88200e604dc6cb15428b68c6fa435fe78",
+    "plugins/workers/worker/job-logger.ts": "65540c13a287c50793bcab67af8cae74e615bd33a14b856f9e19d472a1b1b40a",
+    "plugins/workers/worker/worker-idempotency-events.ts": "6373c6b686e1c131c55b784a2b7af5d14ce22529917d7bf9c3ba7d0276abfbb9",
+    "resources/examples/expo-streams/deno.lock": "ff16556a4e02ed2b95fdf3e9d69662472158407a971fc2f3e9698512ec59907a"
+  },
+  "gates": [
+    {
+      "gateId": "agent-docs-prose",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 13448,
+      "requestHash": "fcfba5e0c85c2aa5405f8275d4ef797f46fb59f95508d46d30bce83c4bb2147b",
+      "evidence": "agent-docs-prose"
+    },
+    {
+      "gateId": "aspire-version-parity",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 358,
+      "requestHash": "509be1a8100eb1e221d2da061462f9ec57e63f0d79cb994451ff44dd75e29405",
+      "evidence": "aspire-version-parity"
+    },
+    {
+      "gateId": "assets-barrel",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 2208,
+      "requestHash": "1ece286d6628bcbb50b4c204a1f2a47869715a7d06c41a64f86d1d0dd8516630",
+      "evidence": "assets-barrel"
+    },
+    {
+      "gateId": "check",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 36616,
+      "requestHash": "ec9793a4f79c8a7e6e68c256f0945168df8c214b903d1448c633c6597099fb09",
+      "evidence": "check"
+    },
+    {
+      "gateId": "test",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 577182,
+      "requestHash": "4506138cd4f3add3e146e3cb787351d853650be4d3e9ddab61d1f1da221b6f55",
+      "evidence": "complete-tests"
+    },
+    {
+      "gateId": "docs-accuracy",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 6909,
+      "requestHash": "b423123e3211f7f61dc03fc06a3a18f73576e787cc5e8744a8af0dd988f71e37",
+      "evidence": "docs-accuracy"
+    },
+    {
+      "gateId": "mcp-export-corpus",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 8883,
+      "requestHash": "05602279ff8f99a0536b4902ba28f251027d6cbe4a53f5e00fa0721e7fbc1c4c",
+      "evidence": "mcp-export-corpus"
+    },
+    {
+      "gateId": "publish-assets",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 446,
+      "requestHash": "10011e079f3d2d58c39244f007f3f7e0fea0bc4d71541c8911847103e5c40aa3",
+      "evidence": "publish-assets"
+    },
+    {
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 11746,
+      "requestHash": "2a4e9ad960cf7df7eae2fd2d2a1cdda7c565be0c9a36c334812acb7f93222bb5",
+      "evidence": "publish-packages-cli"
+    },
+    {
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 4078,
+      "requestHash": "9a47949d962da61d6026a047497f2bab3d3886fb6a6d973885c66e80f326c58c",
+      "evidence": "publish-packages-mcp"
+    },
+    {
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 6023,
+      "requestHash": "74f3920e4e50aaf3d87cb2a9bf9715b72bc05bddcc7c4ab630abf7a7b3f9119c",
+      "evidence": "publish-packages-service"
+    },
+    {
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 6933,
+      "requestHash": "8a97cbf8c0b0889b04a703e0b402572aabc563e9e12a3526924a1f77b2fd71c6",
+      "evidence": "publish-plugins-streams"
+    },
+    {
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 10554,
+      "requestHash": "065478320ef8c7d2a377debb063890f309bd5f3609d1e7a3f204a9a579d6f019",
+      "evidence": "publish-plugins-workers"
+    },
+    {
+      "gateId": "quality-gate",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 15311,
+      "requestHash": "526476ca5b3cc43e07fe56ccab601045668e473e7304a3599afd2878d4ea4b6d",
+      "evidence": "quality-gate"
+    },
+    {
+      "gateId": "doc-lint",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1326,
+      "requestHash": "56e779f12cf97dbfaed66ea5f52e64c1f521e488fe0635991750879bd22ca035",
+      "evidence": "service-doc"
+    },
+    {
+      "gateId": "doc-lint",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 386,
+      "requestHash": "91e97f4ddd4d06a9b3d03bea79ecec7417244c6058770d705947ed8e2da06d7a",
+      "evidence": "streams-doc"
+    },
+    {
+      "gateId": "doc-lint",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 1287,
+      "requestHash": "b703a1e813b3a08ba376c875272fbf8779e23b4aa1fc64b513cb45ed5a20c287",
+      "evidence": "workers-doc"
+    }
+  ],
+  "completeTests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 1937,
+      "failed": 0,
+      "ignored": 25,
+      "totalResults": 1962,
+      "uniqueFailures": 0
+    },
+    "durationMs": 576971,
+    "roots": [
+      "packages/service",
+      "packages/plugin",
+      "packages/fresh",
+      "packages/fresh-ui",
+      "plugins/workers",
+      "plugins/streams",
+      "packages/plugin-workers-core/tests/runtime/job-retry-policy_test.ts",
+      "packages/sdk/tests/internal-credential-contribution_test.ts",
+      "packages/sdk/tests/client-contribution-validation_test.ts",
+      "packages/sdk/tests/client-contribution-observability_test.ts",
+      "packages/sdk/tests/integration/client-contribution-adapter_test.ts",
+      "packages/sdk/tests/discovery/env-ordering_test.ts",
+      "packages/kv/tests/list-contract_test.ts",
+      "packages/kv/tests/bridge-list_test.ts",
+      "packages/plugin-streams-core/tests/application/producer-session_test.ts",
+      ".llm/tools/docs/command-guide-example_test.ts",
+      ".llm/tools/docs/snippet-extractor_test.ts",
+      ".llm/tools/e2e/prepull-runtime-images_test.ts",
+      "packages/plugin-sagas-core/tests/runtime/saga-compensation-retry_test.ts"
+    ],
+    "environment": "Task-local executable TMPDIR; unchanged permissions/assertions/deadlines/ignores."
+  },
+  "rootCheck": {
+    "selection": {
+      "filesSelected": 4051,
+      "batches": 34,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    }
+  },
+  "sourceHashRecheck": "All22 before/after SHA256 equal",
+  "locks": "All FOUR incoming main locks exactly preserved; zero leaf lock delta versus aec75e4d.",
+  "nativeRepair": "Native code/test/facades/debt byte-identical to independently reviewed fix; exactly23/22, unchanged2026-11-10.",
+  "hostedCI": "UNPROVEN for next pushed head; coordinator owns arming/merge.",
+  "publishedConsumerGraph": "UNPROVEN; accepted first-canary release debt before stable.",
+  "rawFacadeDocLint": [
+    {
+      "path": "plugins/workers/services/mod.ts",
+      "exitCode": 0
+    },
+    {
+      "path": "plugins/streams/services/mod.ts",
+      "exitCode": 0
+    }
+  ]
+}

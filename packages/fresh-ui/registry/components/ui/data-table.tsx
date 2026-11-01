@@ -30,19 +30,42 @@ type DataTableComponent = ((props: DataTableProps) => VNode) & {
 };
 
 function DataTableRoot({ children, class: className, ...props }: DataTableProps): VNode {
-  return <Card {...props} class={cn('ns-data-table', className)}>{children}</Card>;
+  return (
+    <Card
+      {...props}
+      class={cn('ns-data-table', className)}
+      data-part='root'
+      data-scope='data-table'
+    >
+      {children}
+    </Card>
+  );
 }
 
 function DataTableHeader({ children, class: className, ...props }: DataTableSectionProps): VNode {
   return (
-    <Card.Header {...props} class={cn('ns-data-table__header', className)}>
+    <Card.Header
+      {...props}
+      class={cn('ns-data-table__header', className)}
+      data-part='header'
+      data-scope='data-table'
+    >
       {children}
     </Card.Header>
   );
 }
 
 function DataTableBody({ children, class: className, ...props }: DataTableSectionProps): VNode {
-  return <div {...props} class={cn('ns-data-table__body', className)}>{children}</div>;
+  return (
+    <div
+      {...props}
+      class={cn('ns-data-table__body', className)}
+      data-part='body'
+      data-scope='data-table'
+    >
+      {children}
+    </div>
+  );
 }
 
 function DataTableRow(
@@ -52,7 +75,13 @@ function DataTableRow(
     ? { ...(style && typeof style === 'object' ? style : null), gridTemplateColumns: cols }
     : style;
   return (
-    <div {...props} style={gridStyle} class={cn('ns-data-table__row', className)}>
+    <div
+      {...props}
+      style={gridStyle}
+      class={cn('ns-data-table__row', className)}
+      data-part='row'
+      data-scope='data-table'
+    >
       {children}
     </div>
   );
@@ -60,7 +89,12 @@ function DataTableRow(
 
 function DataTableFooter({ children, class: className, ...props }: DataTableSectionProps): VNode {
   return (
-    <div {...props} class={cn('ns-data-table__footer', className)}>
+    <div
+      {...props}
+      class={cn('ns-data-table__footer', className)}
+      data-part='footer'
+      data-scope='data-table'
+    >
       {children}
     </div>
   );

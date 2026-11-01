@@ -21,6 +21,57 @@ type GeneratedRegistryModule = Readonly<{
   registry: Map<string, unknown>;
 }>;
 
+for (const directoryPresent of [false, true]) {
+  Deno.test(`workers generates typed empty maps with ${directoryPresent ? 'an empty' : 'no'} jobs directory`, async () => {
+    await withTempProject(async (projectRoot) => {
+      await writeProjectDenoConfig(projectRoot);
+      await writeWorkersManifest(projectRoot);
+      if (directoryPresent) {
+        await Deno.mkdir(join(projectRoot, 'workers/jobs'), { recursive: true });
+      }
+      assertEquals(
+        await generateRuntimeRegistries({
+          projectRoot,
+          manifestPath: join(projectRoot, 'scaffold.runtime.json'),
+        }),
+        [REGISTRY_PATH],
+      );
+      const loaded = await importRegistry(projectRoot, 'empty');
+      assertEquals(loaded.registry.size, 0);
+      assertEquals(loaded.jobDefinitions.size, 0);
+      for (const standalone of [false, true]) {
+        if (standalone) await compileWorkersRegistry(new LocalProjectFiles(projectRoot));
+        const checked = await checkGeneratedFiles({
+          args: [
+            'check',
+            '--unstable-kv',
+            '--config',
+            join(projectRoot, 'deno.json'),
+            join(projectRoot, REGISTRY_PATH),
+          ],
+          cwd: projectRoot,
+        });
+        assertEquals(checked.code, 0, new TextDecoder().decode(checked.stderr));
+      }
+    });
+  });
+}
+
+Deno.test('workers scans plugin job directories when the local jobs directory is absent', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeProjectDenoConfig(projectRoot);
+    await writeWorkersManifest(projectRoot, true);
+    await writeTypedPluginJob(projectRoot, 'plugin-only.ts', 'plugin-only');
+    await generateRuntimeRegistries({
+      projectRoot,
+      manifestPath: join(projectRoot, 'scaffold.runtime.json'),
+    });
+    const loaded = await importRegistry(projectRoot, 'empty');
+    assertEquals([...loaded.registry.keys()], ['plugin-only']);
+    assertEquals([...loaded.jobDefinitions.keys()], ['plugin-only']);
+  });
+});
+
 Deno.test('entry generator loads real config, preserves normalized policy, and groups wholly shadow flat jobs', async () => {
   await withTempProject(async (projectRoot) => {
     await writeProjectDenoConfig(projectRoot);
@@ -522,6 +573,44 @@ createWorkersContract<GeneratedJobPayloadMap>();
     });
     assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
   });
+});
+
+Deno.test('both registry generators honor handler retry inside a group with retry fields omitted', async () => {
+  for (const compiler of [false, true]) {
+    await withTempProject(async (projectRoot) => {
+      await writeProjectDenoConfig(projectRoot);
+      await writeWorkersManifest(projectRoot);
+      await writeJob(projectRoot, 'handler-retry.ts');
+      const path = join(projectRoot, 'workers/jobs/handler-retry.ts');
+      const original = await Deno.readTextFile(path);
+      await write(
+        path,
+        original.replace(
+          'export default handler;',
+          "export default Object.assign(handler, { retry: { maxRetries: 2, delayMs: 7, backoff: 'exponential' as const, maxDelayMs: 20 } });",
+        ),
+      );
+      await write(
+        join(projectRoot, 'netscript.config.ts'),
+        `export default {
+        name: 'retry-project', databases: { config: [] },
+        workers: { groups: [{ topic: 'jobs', jobs: [{ id: 'handler-retry', name: 'Handler retry', entrypoint: './handler-retry.ts', source: 'local' }] }] },
+      };`,
+      );
+      if (compiler) await compileWorkersRegistry(new LocalProjectFiles(projectRoot));
+      else {
+        const result = await runEntryGenerator(projectRoot);
+        assertEquals(result.code, 0, result.stderr);
+      }
+      const module = await importRegistry(projectRoot, `retry-${compiler}`);
+      const definition = module.jobDefinitions.get('handler-retry');
+      assertEquals(definition?.maxRetries, 2);
+      assertEquals(definition?.retryDelay, 7);
+      assertEquals(definition?.metadata, {
+        retry: { maxRetries: 2, delayMs: 7, backoff: 'exponential', maxDelayMs: 20 },
+      });
+    });
+  }
 });
 
 function jobPolicy(id: string, entrypoint: string): Readonly<Record<string, unknown>> {

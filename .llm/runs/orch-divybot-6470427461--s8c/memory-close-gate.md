@@ -1,0 +1,3 @@
+# Close-gate with owner-forbidden labels
+
+Close-gate checks live issue acceptance boxes, including manual development links, even when a PR already has valid structured acceptance evidence. The automatic mirror is opt-in through status:ready-merge. If the owner forbids label changes, the supported manual path is to verify every box and mark the issue body with evidence, not remove closing references or weaken the checker. Use the existing acceptance-evidence helpers to validate exact box-index mapping first. A body edit needs the existing CI job rerun or a real acceptance-record commit; stale failure status does not update by itself. Native checker prints head, issue updatedAt and bodySha256 to prove currency.

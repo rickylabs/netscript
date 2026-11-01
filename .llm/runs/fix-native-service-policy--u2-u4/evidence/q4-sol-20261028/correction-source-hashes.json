@@ -1,0 +1,12 @@
+﻿[
+    {
+        "path":  "packages/service/src/primitives/body-limit.ts",
+        "lines":  152,
+        "sha256":  "cf570dcb7a4a65f19e9ee992f3c2273879f567b710990d045c5a462941cc82b1"
+    },
+    {
+        "path":  "packages/service/tests/body-limit_test.ts",
+        "lines":  322,
+        "sha256":  "c056cb621def1fa3ce4e032a60a1353eba2f3c4bcf9432647a7d9febdaa935a0"
+    }
+]

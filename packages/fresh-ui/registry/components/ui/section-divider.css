@@ -21,3 +21,21 @@
   align-self: center;
   background: var(--ns-border);
 }
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='section-divider'][data-part='root'] {
+  gap: var(--ns-inline-gap);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='section-divider'][data-part='label'] {
+  font-family: var(--ns-font-eyebrow);
+  font-size: var(--ns-text-label);
+  font-weight: var(--ns-weight-eyebrow);
+  line-height: var(--ns-leading-label);
+  letter-spacing: var(--ns-tracking-wide);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='section-divider'][data-part='line'] {
+  height: var(--ns-border-width);
+  background: var(--ns-border-subtle);
+}

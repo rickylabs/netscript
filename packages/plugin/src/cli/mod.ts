@@ -1,3 +1,8 @@
+/**
+ * Shared plugin CLI contracts, project file access and static registry generation.
+ *
+ * @module
+ */
 export type { PluginCliArgs, PluginCliCommand, PluginCliResult } from './types.ts';
 export { PluginCli } from './base/plugin-cli.ts';
 export { PluginRuntimeConfigCli } from './base/plugin-runtime-config-cli.ts';
@@ -11,6 +16,11 @@ export { LocalProjectFiles, resolveProjectRoot } from './adapters/project-files.
 export type { ProjectFileEntry, ProjectFiles } from './adapters/project-files.ts';
 export { renderRegistryModule, toRegistryImportSpecifier } from './application/registry-emitter.ts';
 export type { RegistryEmitItem, RegistryModuleSpec } from './application/registry-emitter.ts';
+export {
+  REGISTRY_IGNORE_DIRECTIVE,
+  selectRegistrySources,
+} from './application/registry-source-selection.ts';
+export type { RegistrySourceSelection } from './application/registry-source-selection.ts';
 export { normalizePluginArgv, parsePluginCliArgs } from './application/argv.ts';
 export type { NormalizedPluginArgv } from './application/argv.ts';
 export { applyScaffoldPlan } from './application/scaffold-plan.ts';

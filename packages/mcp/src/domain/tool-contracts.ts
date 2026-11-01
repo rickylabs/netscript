@@ -1,3 +1,5 @@
+import { TELEMETRY_ANALYSIS_OUTPUT_SHAPES } from './telemetry/telemetry-analysis-schemas.ts';
+import { TELEMETRY_PROVENANCE_SCHEMA } from './telemetry/telemetry-provenance-schema.ts';
 import type { PluginHealthSummary } from '@netscript/plugin/health';
 import { createToolSchema, isRecord, type ToolSchema } from './schema.ts';
 import type { ToolName } from './tool-types.ts';
@@ -27,6 +29,10 @@ const objectSchema = (
   additionalProperties: false,
 });
 const stringProperty = { type: 'string' } as const;
+const docsCitationShape = objectSchema({
+  frameworkVersion: stringProperty,
+  sha256: { type: 'string', minLength: 64, maxLength: 64 },
+}, ['frameworkVersion', 'sha256']);
 const limitProperty = { type: 'integer', minimum: 1, maximum: 100 } as const;
 const searchLimitProperty = { type: 'integer', minimum: 1, maximum: 20 } as const;
 const operationAccessValueProperty = { type: 'string', minLength: 1, maxLength: 2000 } as const;
@@ -141,8 +147,39 @@ export interface DoctorResult {
     readonly import('./doctor-check-family.ts').DoctorFamilyResult[];
 }
 
+const registryPageProperties = {
+  offset: { type: 'integer', minimum: 0, maximum: 100000 },
+  limit: { type: 'integer', minimum: 1, maximum: 20 },
+};
+const registryNameProperty = { type: 'string', minLength: 1, maxLength: 2000 } as const;
+const registryPageShape = objectSchema({
+  items: {
+    type: 'array',
+    maxItems: 20,
+    items: objectSchema({
+      name: stringProperty,
+      type: stringProperty,
+      title: stringProperty,
+      description: stringProperty,
+    }, ['name', 'type']),
+  },
+  total: { type: 'integer', minimum: 0 },
+  nextOffset: { type: 'integer', minimum: 0 },
+}, ['items', 'total']);
+
 const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
-  get_app_status: objectSchema({ service: stringProperty, limit: limitProperty }),
+  list_registry_items: objectSchema(registryPageProperties),
+  search_registry_items: objectSchema({
+    ...registryPageProperties,
+    query: { type: 'string', minLength: 1, maxLength: 500 },
+  }, ['query']),
+  view_registry_item: objectSchema({ name: registryNameProperty }, ['name']),
+  get_registry_add_command: objectSchema({ name: registryNameProperty }, ['name']),
+  get_app_status: objectSchema({
+    service: stringProperty,
+    sinceUnixMs: { type: 'number' },
+    limit: limitProperty,
+  }),
   list_runs: objectSchema({
     domain: stringProperty,
     status: stringProperty,
@@ -216,14 +253,24 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
 };
 
 const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
+  ...TELEMETRY_ANALYSIS_OUTPUT_SHAPES,
+  list_registry_items: registryPageShape,
+  search_registry_items: registryPageShape,
+  view_registry_item: objectSchema({ item: { type: 'object' } }, ['item']),
+  get_registry_add_command: objectSchema({
+    command: { const: 'netscript' },
+    args: { type: 'array', minItems: 2, maxItems: 2, items: stringProperty },
+  }, ['command', 'args']),
   get_app_status: objectSchema({
+    provenance: TELEMETRY_PROVENANCE_SCHEMA,
+    diagnostic: stringProperty,
     status: { enum: ['pass', 'warn', 'fail'] },
     counts: { type: 'object' },
     domains: { type: 'array', maxItems: 5 },
     pluginHealth: { type: 'array', maxItems: 20, items: pluginHealthShape },
     healthStatus: { enum: ['healthy', 'degraded', 'unhealthy', 'unknown'] },
     runtimeChecks: { type: 'array', maxItems: 20, items: doctorCheckShape },
-  }, ['status', 'counts', 'domains']),
+  }, ['status', 'counts', 'domains', 'provenance']),
   list_runs: objectSchema({ count: { type: 'integer' }, runs: { type: 'array', maxItems: 100 } }, [
     'count',
     'runs',
@@ -254,34 +301,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     errorMessage: stringProperty,
     traceId: stringProperty,
   }, ['found']),
-  analyze_service_performance: objectSchema({
-    service: stringProperty,
-    sinceUnixMs: { type: 'number' },
-    sampleCount: { type: 'integer' },
-    errorCount: { type: 'integer' },
-    errorRate: { type: 'number' },
-    averageDurationMs: { type: 'number' },
-    p50DurationMs: { type: 'number' },
-    p95DurationMs: { type: 'number' },
-    throughputPerMinute: { type: 'number' },
-    topOperations: { type: 'array', maxItems: 20 },
-  }, [
-    'service',
-    'sinceUnixMs',
-    'sampleCount',
-    'errorCount',
-    'errorRate',
-    'averageDurationMs',
-    'p50DurationMs',
-    'p95DurationMs',
-    'throughputPerMinute',
-    'topOperations',
-  ]),
-  analyze_db_bottlenecks: objectSchema({
-    sinceUnixMs: { type: 'number' },
-    sampleCount: { type: 'integer' },
-    operations: { type: 'array', maxItems: 20 },
-  }, ['sinceUnixMs', 'sampleCount', 'operations']),
+
   doctor: objectSchema({
     status: { enum: ['pass', 'warn', 'fail'] },
     endpoint: stringProperty,
@@ -290,6 +310,9 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     families: { type: 'array', maxItems: 4, items: doctorFamilyShape },
   }, ['status', 'endpoint', 'counts', 'checks', 'families']),
   search_docs: objectSchema({
+    citation: docsCitationShape,
+    confidence: { enum: ['low'] },
+    fallback: { type: 'string', maxLength: GUIDANCE_MAX_FALLBACK_CHARACTERS },
     count: { type: 'integer' },
     matches: {
       type: 'array',
@@ -303,6 +326,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     },
   }, ['count', 'matches']),
   list_docs: objectSchema({
+    citation: docsCitationShape,
     count: { type: 'integer' },
     corpus: objectSchema({
       kind: { enum: ['filesystem', 'embedded'] },
@@ -320,6 +344,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     },
   }, ['count', 'corpus', 'docs']),
   get_doc: objectSchema({
+    citation: docsCitationShape,
     contractVersion: { enum: [2] },
     mode: { enum: ['verbatim', 'extract', 'full'] },
     description: stringProperty,
@@ -349,6 +374,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     'contractVersion',
   ]),
   find_guidance: objectSchema({
+    citation: docsCitationShape,
     intent: { type: 'string', maxLength: GUIDANCE_MAX_INTENT_CHARACTERS },
     confidence: { enum: [...GUIDANCE_CONFIDENCE_LEVELS] },
     recommendations: {

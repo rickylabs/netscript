@@ -1,0 +1,18 @@
+{
+  "selected": "parity-external",
+  "args": [
+    "run",
+    "--frozen",
+    "--config",
+    "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+    "--allow-read",
+    "--allow-run",
+    "C:/Users/ericc/source/repos/netscript-windows-qualification-008/.llm/tools/docs/check-exports-drift.ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:23:40.416Z",
+  "ended": "2026-10-28T02:23:45.800Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/parity-external-1793154220399"
+}

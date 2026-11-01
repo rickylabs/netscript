@@ -1,0 +1,46 @@
+Check packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-async.ts
+TS2322 [ERROR]: Type '() => Promise<number>' is not assignable to type 'string | (() => MaybePromise<string>)'.
+  Type '() => Promise<number>' is not assignable to type '() => MaybePromise<string>'.
+    Type 'Promise<number>' is not assignable to type 'MaybePromise<string>'.
+      Type 'Promise<number>' is not assignable to type 'Promise<string>'.
+        Type 'number' is not assignable to type 'string'.
+const fresh: FreshHeaders = { authorization: async () => 1 };
+                              ~~~~~~~~~~~~~
+    at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-async.ts:11:31
+
+    The expected type comes from this index signature.
+      [key: string]: string | (() => MaybePromise<string>);
+      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        at file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts:155:3
+
+TS2322 [ERROR]: Type '() => Promise<number>' is not assignable to type 'string | (() => MaybePromise<string>)'.
+  Type '() => Promise<number>' is not assignable to type '() => MaybePromise<string>'.
+    Type 'Promise<number>' is not assignable to type 'MaybePromise<string>'.
+      Type 'Promise<number>' is not assignable to type 'Promise<string>'.
+        Type 'number' is not assignable to type 'string'.
+const input: InputHeaders = { authorization: async () => 1 };
+                              ~~~~~~~~~~~~~
+    at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-async.ts:12:31
+
+    The expected type comes from this index signature.
+      [key: string]: string | (() => MaybePromise<string>);
+      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        at file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts:155:3
+
+TS2322 [ERROR]: Type '() => Promise<number>' is not assignable to type 'string | (() => MaybePromise<string>)'.
+  Type '() => Promise<number>' is not assignable to type '() => MaybePromise<string>'.
+    Type 'Promise<number>' is not assignable to type 'MaybePromise<string>'.
+      Type 'Promise<number>' is not assignable to type 'Promise<string>'.
+        Type 'number' is not assignable to type 'string'.
+const workers: WorkersHeaders = { authorization: async () => 1 };
+                                  ~~~~~~~~~~~~~
+    at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-async.ts:13:35
+
+    The expected type comes from this index signature.
+      [key: string]: string | (() => MaybePromise<string>);
+      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        at file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts:155:3
+
+Found 3 errors.
+
+error: Type checking failed.

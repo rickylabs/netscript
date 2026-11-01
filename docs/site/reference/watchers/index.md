@@ -5,52 +5,24 @@ title: "@netscript/watchers"
 
 # `@netscript/watchers`
 
-Reusable file-watching primitives for NetScript: composable strategies, filters, and a
-pipeline-based `FileWatcher` for detecting file-system changes across local and network
-filesystems. This page is written against the package's public surface reported by `deno doc`.
-For the full index of packages and plugins return to the
-[reference overview](/reference/).
+File-watching primitives for NetScript: a pipeline-based `FileWatcher`, composable filters and
+failure tracking for local and network filesystems. Use `createWatcher` when a tool or service must
+react to file changes.
 
-The package exposes a single root entrypoint (`@netscript/watchers` -> `./mod.ts`). There are
-no sub-path exports. The watcher auto-selects its strategy (native OS notifications for local
-paths, polling for network paths) so most callers only need `createWatcher`; the strategy
-classes themselves are internal implementation details.
+## Sub-path exports
 
-## Exports
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/watchers` | `./mod.ts` | [Factory](#factory), [watcher](#watcher), [filters](#filters), [failure tracking](#failure-tracking) and [filesystem helpers](#filesystem-helpers). The package has no other entrypoints. |
 
-| Export | Path |
-| --- | --- |
-| `@netscript/watchers` | `./mod.ts` |
-
-```ts
-import { createWatcher } from '@netscript/watchers';
-
-const controller = new AbortController();
-const watcher = createWatcher({
-  paths: ['./incoming'],
-  patterns: ['*.csv'],
-  events: ['create'],
-  processExisting: true,
-  maxFileAge: 86400000,
-  debounceMs: 500,
-  stabilityThreshold: { checkIntervalMs: 1000, stableChecks: 3 },
-  signal: controller.signal,
-});
-
-try {
-  for await (const event of watcher.watch()) {
-    console.log(`${event.kind}: ${event.path}`);
-  }
-} finally {
-  watcher.stop();
-}
-```
+With no explicit strategy, the watcher selects native OS notifications with polling fallback for
+local paths, or polling for network paths. Set `strategy` when the choice must be explicit.
 
 ## Factory
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `createWatcher` | `function createWatcher(options: WatcherOptions): FileWatcher` | Factory function to create a `FileWatcher` with the given options. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createWatcher` | function | `function createWatcher(options: WatcherOptions): FileWatcher` | Factory function to create a `FileWatcher` with the given options. |
 
 ## Watcher
 
@@ -61,10 +33,61 @@ try {
 | | | `stop` | `stop(): void` | Stop the watcher by signaling abort. |
 | | | `running` | `get running(): boolean` | Whether the watcher is currently running. |
 
+## Strategy selection and failures
+
+| Options | Behavior |
+| --- | --- |
+| `strategy: 'native'` | Native OS notifications only. A setup or runtime failure emits an `onError` diagnostic and rejects the iterator; it never starts polling. |
+| `strategy: 'polling'` | Polling without a native attempt. |
+| `strategy: 'hybrid'` | Native first, with polling fallback for native failures other than a missing/removed root. |
+| No `strategy`, `forcePolling: true` | Polling, preserving the legacy option. |
+| No `strategy`, network path | Polling selected automatically. |
+| No `strategy`, local path | Hybrid selected automatically. |
+
+An explicit `strategy` takes precedence over `forcePolling` and network-path heuristics. Unknown
+strategy identifiers fail with `TypeError`; there is no implicit fallback for them.
+`WATCH_STRATEGIES` exports the accepted built-in values.
+
+`onReady` runs after the strategy acquires resources, independently of matching file events.
+Polling retains its consecutive-access-failure grace period during startup, but does not announce
+readiness until every root has been scanned successfully. A share that returns within that budget
+continues in the same polling session; persistent startup failures reject for supervisor recovery.
+Files present when that first successful polling scan completes establish its initial snapshot;
+changes during the startup access outage are not replayed.
+`onError` receives a `WatcherErrorEvent` containing `type: 'error'`, configured `paths`, the original
+`error`, and a `Date` timestamp. This diagnostic is separate from the `WatchEvent` stream: file
+filters and file handlers never receive an error as a file change. The original error still rejects
+`watch()`, even if the diagnostic hook throws. Cancellation completes without an error diagnostic.
+
+Removing a watched root invalidates the native subscription even when only `create` events were
+requested. That failure propagates in native and hybrid modes so a supervisor can reopen the root;
+it is not hidden by polling. A standalone watcher does not retry automatically. Create a fresh
+watcher for each session or recovery attempt, and call `stop()` to release it. File-watch triggers
+use a supervising adapter that retries with bounded backoff and exposes
+[per-trigger availability](/reference/triggers/#file-watch-health).
+
+```ts
+import { createWatcher } from '@netscript/watchers';
+
+const watcher = createWatcher({
+  paths: ['./incoming'],
+  strategy: 'native',
+  onReady: () => console.info('Native watch ready'),
+  onError: ({ error }) => console.error('Native watch failed', error),
+});
+try {
+  for await (const event of watcher.watch()) {
+    console.log(event.kind, event.path);
+  }
+} finally {
+  watcher.stop();
+}
+```
+
 ## Filters
 
 Filters consume an async iterable of events and yield only the events that pass. They run in
-configured order inside the `FileWatcher` pipeline. Each implements the `WatchFilter` contract.
+configured order inside the `FileWatcher` pipeline, and each implements the `WatchFilter` contract.
 
 | Symbol | Kind | Member | Signature | Description |
 | --- | --- | --- | --- | --- |
@@ -91,44 +114,68 @@ configured order inside the `FileWatcher` pipeline. Each implements the `WatchFi
 
 ## Filesystem helpers
 
-Low-level helpers that swallow only "missing/inaccessible" errors and re-throw the rest.
+Low-level helpers that swallow only missing or inaccessible errors and re-throw the rest.
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `safeReadFile` | `async function safeReadFile(path: string): Promise<Uint8Array<ArrayBuffer> \| null>` | Read a file's content, returning `null` when the file is missing or inaccessible. |
-| `safeStat` | `async function safeStat(path: string): Promise<FileInfo \| null>` | Stat a file, returning `null` when the file is missing or inaccessible (only `NotFound`/`PermissionDenied`). |
-| `computeContentHash` | `async function computeContentHash(filePath: string): Promise<string \| null>` | Compute a SHA-256 hex digest of a file's content, or `null` if unreadable. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `safeReadFile` | function | `async function safeReadFile(path: string): Promise<Uint8Array<ArrayBuffer> \| null>` | Read a file's content, returning `null` when the file is missing or inaccessible. |
+| `safeStat` | function | `async function safeStat(path: string): Promise<FileInfo \| null>` | Stat a file, returning `null` when the file is missing or inaccessible (only `NotFound`/`PermissionDenied`). |
+| `computeContentHash` | function | `async function computeContentHash(filePath: string): Promise<string \| null>` | Compute a SHA-256 hex digest of a file's content, or `null` if unreadable. |
 
 ## Interfaces
 
-| Symbol | Description |
-| --- | --- |
-| `WatcherOptions` | Configuration for a `FileWatcher` instance (paths, patterns, events, debounceMs, contentHash, processExisting, forcePolling, pollIntervalMs, minFileSize, maxFileAge, stabilityThreshold, signal). |
-| `WatchEvent` | A single file-system event yielded by a watcher strategy. |
-| `WatchFilter` | A filter takes an async iterable of events and yields only those that pass. |
-| `WatchStrategyHandler` | A watch strategy produces raw file-system events as an async iterable. |
-| `FileInfo` | Metadata about a watched file, built from `Deno.FileInfo`. |
-| `StabilityOptions` | Configuration for the stability filter (`checkIntervalMs`, `stableChecks`). |
-| `DedupFilterOptions` | Options for creating a `DedupFilter` (`windowMs`, default `60000`). |
-| `DebounceFilterOptions` | Options for creating a `DebounceFilter` (`debounceMs`). |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `WatcherOptions` | interface | Configuration for a `FileWatcher` instance (paths, patterns, events, debounceMs, contentHash, processExisting, strategy, forcePolling, pollIntervalMs, minFileSize, maxFileAge, stabilityThreshold, onReady, onError, signal). |
+| `WatchEvent` | interface | A single file-system event yielded by a watcher strategy. |
+| `WatcherErrorEvent` | interface | Failure diagnostic passed to `onError` before the iterator rejects. |
+| `WatchFilter` | interface | A filter takes an async iterable of events and yields only those that pass. |
+| `WatchStrategyHandler` | interface | A watch strategy produces raw file-system events as an async iterable. |
+| `FileInfo` | interface | Metadata about a watched file, built from `Deno.FileInfo`. |
+| `StabilityOptions` | interface | Configuration for the stability filter (`checkIntervalMs`, `stableChecks`). |
+| `DedupFilterOptions` | interface | Options for creating a `DedupFilter` (`windowMs`, default `60000`). |
+| `DebounceFilterOptions` | interface | Options for creating a `DebounceFilter` (`debounceMs`). |
 
 ## Type aliases
 
-| Symbol | Definition | Description |
-| --- | --- | --- |
-| `KnownEventKind` | `"create" \| "modify" \| "remove"` | Built-in file-system event kinds the watcher can detect. |
-| `EventKind` | `KnownEventKind \| (string & Record<never, never>)` | File-system event kind; new runtime kinds require doctrine review. |
-| `KnownWatchStrategy` | `"native" \| "polling" \| "hybrid"` | Built-in watch strategies for detecting file changes. |
-| `WatchStrategy` | `KnownWatchStrategy \| (string & Record<never, never>)` | Watch-strategy identifier; built-in factory values remain runtime validated. |
+| Symbol | Kind | Definition | Description |
+| --- | --- | --- | --- |
+| `KnownEventKind` | type alias | `"create" \| "modify" \| "remove"` | Built-in file-system event kinds the watcher can detect. |
+| `EventKind` | type alias | `KnownEventKind \| (string & Record<never, never>)` | File-system event kind: a built-in kind or another string. |
+| `KnownWatchStrategy` | type alias | `typeof WATCH_STRATEGIES[number]` | Built-in watch strategies for detecting file changes. |
+| `WatchStrategy` | type alias | `KnownWatchStrategy \| (string & Record<never, never>)` | Watch-strategy identifier; built-in factory values remain runtime validated. |
 
 ## Internals
 
-The concrete strategy classes (`NativeStrategy`, `PollingStrategy`, `HybridStrategy`) and their
-option interfaces (`NativeStrategyOptions`, `PollingStrategyOptions`, `HybridStrategyOptions`)
-are marked `@internal`. They are selected automatically by `FileWatcher` based on the configured
-paths and are not part of the supported public contract -- construct watchers via `createWatcher`
-or `new FileWatcher(...)` instead.
+The strategy classes (`NativeStrategy`, `PollingStrategy`, `HybridStrategy`) and their option
+interfaces (`NativeStrategyOptions`, `PollingStrategyOptions`, `HybridStrategyOptions`) are
+`@internal` and not part of the public contract. `FileWatcher` selects one from the configured
+paths; construct watchers with `createWatcher` or `new FileWatcher(...)`.
 
----
+## Examples
 
-Back to the [reference overview](/reference/).
+### Watch a directory for new CSV files
+
+```ts
+import { createWatcher } from '@netscript/watchers';
+
+const controller = new AbortController();
+const watcher = createWatcher({
+  paths: ['./incoming'],
+  patterns: ['*.csv'],
+  events: ['create'],
+  processExisting: true,
+  maxFileAge: 86400000,
+  debounceMs: 500,
+  stabilityThreshold: { checkIntervalMs: 1000, stableChecks: 3 },
+  signal: controller.signal,
+});
+
+try {
+  for await (const event of watcher.watch()) {
+    console.log(`${event.kind}: ${event.path}`);
+  }
+} finally {
+  watcher.stop();
+}
+```

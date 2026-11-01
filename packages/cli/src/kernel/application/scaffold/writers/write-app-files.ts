@@ -1,3 +1,4 @@
+import { UI_DEFAULT_THEME } from '../../../domain/ui/ui-config.ts';
 import { join } from '@std/path';
 import { toCamelCase } from '@std/text';
 import { SCAFFOLD_DEFAULTS } from '../../../constants/scaffold/scaffold-defaults.ts';
@@ -55,6 +56,7 @@ export async function writeNormalizedAppFiles(
   };
   const {
     appAppTemplate,
+    appThemeTemplate,
     appClientTemplate,
     appCrudExampleRouteTemplate,
     appCrudExampleViewTemplate,
@@ -71,6 +73,7 @@ export async function writeNormalizedAppFiles(
     appDesignMiddlewareTemplate,
     appDesignRegistryTemplate,
     appDesignTokenClipboardTemplate,
+    appDesignThemeTemplate,
     appDesignTokensLibTemplate,
     appDesignTokensRouteTemplate,
     appDesignTokensViewTemplate,
@@ -210,6 +213,7 @@ export async function writeNormalizedAppFiles(
   const uiInstall = await installUiRegistryItems({
     projectRoot: appDir,
     names: DEFAULT_UI_INIT_ITEMS,
+    theme: UI_DEFAULT_THEME,
     overwrite: true,
   }, { fs: context.fs });
   for (const copiedFile of uiInstall.copiedFiles) {
@@ -239,6 +243,8 @@ export async function writeNormalizedAppFiles(
   await write(join(uiComponentsDir, 'mod.ts'), appUiModTemplate);
   await write(join(designSharedDir, 'registry.ts'), appDesignRegistryTemplate);
   await write(join(designSharedDir, 'tokens.ts'), appDesignTokensLibTemplate);
+  await write(join(designSharedDir, 'theme.ts'), appDesignThemeTemplate);
+  await write(join(appDir, 'lib', 'theme.ts'), appThemeTemplate);
   await write(
     join(designIslandsDir, 'FloatingSurfaceDemo.tsx'),
     appDesignFloatingSurfaceDemoTemplate,

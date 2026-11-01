@@ -1,0 +1,73 @@
+{
+  "session": "a4d71fd7-efc6-4444-8141-7fa312a2977a",
+  "sameSession": true,
+  "newSession": false,
+  "requestedModel": "claude-opus-5",
+  "models": [
+    "claude-opus-5"
+  ],
+  "requestedEffort": "xhigh",
+  "observedEfforts": [],
+  "actualEffortIndependentlyAttested": false,
+  "effortResponseAbsentIsQualificationLimit": true,
+  "priorAll19ReadsComplete": true,
+  "priorCoverage": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-opus-native-impl-continuation-1-20261028/original-offline-coverage.json",
+  "priorOwnRelevantMcpCalls": [
+    {
+      "name": "mcp__netscript__search_docs",
+      "input": {
+        "query": "createNetScriptStreamDB caller-provided reader headers HeadersRecord",
+        "limit": 8
+      }
+    },
+    {
+      "name": "mcp__netscript__find_export",
+      "input": {
+        "symbol": "HeadersRecord"
+      }
+    },
+    {
+      "name": "mcp__netscript__find_export",
+      "input": {
+        "symbol": "MaybePromise"
+      }
+    },
+    {
+      "name": "mcp__netscript__get_export",
+      "input": {
+        "symbol": "createNetScriptStreamDB"
+      }
+    },
+    {
+      "name": "mcp__netscript__get_export",
+      "input": {
+        "symbol": "HeadersRecord",
+        "package": "@netscript/fresh",
+        "subpath": "./streams"
+      }
+    },
+    {
+      "name": "mcp__netscript__get_export",
+      "input": {
+        "symbol": "NetScriptStreamDBOptions",
+        "package": "@netscript/fresh",
+        "subpath": "./streams"
+      }
+    },
+    {
+      "name": "mcp__netscript__get_export",
+      "input": {
+        "symbol": "createWorkersStreamDB",
+        "package": "@netscript/plugin-workers",
+        "subpath": "./streams"
+      }
+    }
+  ],
+  "freshReadsOrMcpRequired": false,
+  "nativeTurns": 1,
+  "resultSubtype": "success",
+  "failures": [
+    "Complete canonical exact-head public verdict absent."
+  ],
+  "rootManualCompleteReportRelevanceIdentityAndVerdictRequired": true
+}

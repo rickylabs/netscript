@@ -1,0 +1,128 @@
+{
+  "previousReviewedHead": "2f02788071fd4d8088b7b9e21dfa2394d04f2bc5",
+  "integrationBase": "15cffa2fee5b6d543ecae2981a3563b1b74ca789",
+  "frameworkSourceEquivalent": true,
+  "files": [
+    {
+      "path": "packages/cli/src/kernel/adapters/plugin/appsettings-entry-builders.ts",
+      "sameBlob": true,
+      "before": "466ffed6a97718aa11b0879fd41fa06c0d4619bd",
+      "after": "466ffed6a97718aa11b0879fd41fa06c0d4619bd"
+    },
+    {
+      "path": "packages/cli/src/kernel/adapters/plugin/workspace-mutator.ts",
+      "sameBlob": true,
+      "before": "ca218cf93c92fec841b252d59db8f56a78a798b6",
+      "after": "ca218cf93c92fec841b252d59db8f56a78a798b6"
+    },
+    {
+      "path": "packages/cli/src/local/composition/auth-backend-database_test.ts",
+      "sameBlob": true,
+      "before": "74af41c2539ad1e69e9adfc2b7d05d5f92a82933",
+      "after": "74af41c2539ad1e69e9adfc2b7d05d5f92a82933"
+    },
+    {
+      "path": "packages/cli/src/local/features/plugins/install/install-local-plugin-command.ts",
+      "sameBlob": true,
+      "before": "a6eb3aa3b64ee79eb647c49c03c9e8775fa23950",
+      "after": "a6eb3aa3b64ee79eb647c49c03c9e8775fa23950"
+    },
+    {
+      "path": "packages/cli/src/local/features/plugins/install/install-local-plugin-helpers.ts",
+      "sameBlob": true,
+      "before": "639193efc8174ccad903604597868b360833610e",
+      "after": "639193efc8174ccad903604597868b360833610e"
+    },
+    {
+      "path": "packages/cli/src/local/features/plugins/install/install-local-plugin.ts",
+      "sameBlob": true,
+      "before": "2a9881a9ed4d21d66dae948738c5ddc3efa93b24",
+      "after": "2a9881a9ed4d21d66dae948738c5ddc3efa93b24"
+    },
+    {
+      "path": "packages/cli/src/public/features/plugins/auth/auth-recipe_test.ts",
+      "sameBlob": true,
+      "before": "19e13e216f1c717a5dcb6a877bd0b4fe089ae0f4",
+      "after": "19e13e216f1c717a5dcb6a877bd0b4fe089ae0f4"
+    },
+    {
+      "path": "packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb.ts",
+      "sameBlob": true,
+      "before": "d8bddbf054299e851037ed5e783e539ff7bef742",
+      "after": "d8bddbf054299e851037ed5e783e539ff7bef742"
+    },
+    {
+      "path": "packages/cli/src/public/features/plugins/install/install-plugin-command.ts",
+      "sameBlob": true,
+      "before": "dc8a5b54bc00b30b6dfb296430ed8d38844b2f21",
+      "after": "dc8a5b54bc00b30b6dfb296430ed8d38844b2f21"
+    },
+    {
+      "path": "packages/cli/src/public/features/plugins/install/install-plugin.ts",
+      "sameBlob": true,
+      "before": "d73db5ca9711dafc199e1305bf2b3296ad1b4d36",
+      "after": "d73db5ca9711dafc199e1305bf2b3296ad1b4d36"
+    },
+    {
+      "path": "packages/cli/src/public/features/plugins/install/plugin-database-requirement.ts",
+      "sameBlob": true,
+      "before": "9f94282ad033af44d6d65cea0cdeeca334f75119",
+      "after": "9f94282ad033af44d6d65cea0cdeeca334f75119"
+    },
+    {
+      "path": "packages/cli/src/public/features/plugins/install/plugin-database-requirement_test.ts",
+      "sameBlob": true,
+      "before": "1ee5613df16fba6f766db820586cc7d0f57dcd4b",
+      "after": "1ee5613df16fba6f766db820586cc7d0f57dcd4b"
+    },
+    {
+      "path": "packages/cli/src/public/features/plugins/install/plugin-schema-fragments.ts",
+      "sameBlob": true,
+      "before": "f3e3311dbbe49857dc6b896472fc102fffaeb0ea",
+      "after": "f3e3311dbbe49857dc6b896472fc102fffaeb0ea"
+    },
+    {
+      "path": "packages/plugin/src/protocol/manifest.ts",
+      "sameBlob": true,
+      "before": "36f3eeef20edcb55371a0241f19f1df5d89f1729",
+      "after": "36f3eeef20edcb55371a0241f19f1df5d89f1729"
+    },
+    {
+      "path": "packages/plugin/src/protocol/mod.ts",
+      "sameBlob": true,
+      "before": "c7db9e9c6600beeec011c53e7ae1b74922ce2543",
+      "after": "c7db9e9c6600beeec011c53e7ae1b74922ce2543"
+    },
+    {
+      "path": "packages/plugin/tests/protocol/plugin-manifest_test.ts",
+      "sameBlob": true,
+      "before": "18ca25a1e2ab0f7e7572a59811d4996845c020e8",
+      "after": "18ca25a1e2ab0f7e7572a59811d4996845c020e8"
+    },
+    {
+      "path": "plugins/auth/scaffold.ts",
+      "sameBlob": true,
+      "before": "cca35585cac52e7a05b80fccb7858781390df234",
+      "after": "cca35585cac52e7a05b80fccb7858781390df234"
+    },
+    {
+      "path": "plugins/auth/src/adapter/plugin.ts",
+      "sameBlob": true,
+      "before": "fb7b226745388feddced32ba07e32584b3c5c13c",
+      "after": "fb7b226745388feddced32ba07e32584b3c5c13c"
+    },
+    {
+      "path": "plugins/auth/src/adapter/resources/resources.test.ts",
+      "sameBlob": true,
+      "before": "914fc839e647f8dd1bff87ecea0d401be79fcf13",
+      "after": "914fc839e647f8dd1bff87ecea0d401be79fcf13"
+    },
+    {
+      "path": "plugins/auth/tests/scaffold/manifest_test.ts",
+      "sameBlob": true,
+      "before": "4c76ec638b2cafcabd0342400d983776b945881c",
+      "after": "4c76ec638b2cafcabd0342400d983776b945881c"
+    }
+  ],
+  "reviewAtNewHead": "UNPROVEN"
+}

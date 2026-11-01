@@ -1,0 +1,543 @@
+{
+  "runId": "ns-figma-library-2026-10-28",
+  "agent": "chart-palettes-builder",
+  "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+  "date": "2026-10-31",
+  "step": "Per-theme categorical chart palettes: Scheme chart/1..5 re-aliased through Theme set chart/l|d/1..5 (Theme, Theme B, Studio flavor); 17 Theme/Theme B modes x Light/Dark + 7 Studio flavors; validated with the dataviz validator; DD2 strip and Chart, Chart block, Donut reviews re-shot; Foundations · Chart palettes sheet built.",
+  "trigger": "ownerNotes 2026-11-01 coordinator decision: each theme gets its own chart palette chart/1..5 through Theme set (series collide today: Brutal 1=4, Pixel 1~4, Cupertino 1~2).",
+  "architecture": {
+    "model": "shadow/l|d/color pattern: Scheme chart/N -> Theme set chart/l|d/N -> (A) Theme chart/l|d/N | (B) Theme B chart/l|d/N; Theme mode Studio -> Studio flavor chart/l|d/N",
+    "studioFlavor": "series 1 aliases Base gray gray/l|d/12 in all 7 flavors (ink; equals marker/default under Utility); series 2-5 identical literals in all flavors",
+    "otherModes": "literal hex, or alias of a Primitive with exactly that hex (7 cells)",
+    "scopes": "[] on all 40 intermediates; Scheme chart/N scopes unchanged (SHAPE_FILL, STROKE_COLOR)",
+    "codeSyntax": "var(--ns-chart-l|d-N) on Theme/Theme B/Theme set; var(--ns-studio-chart-l|d-N) on Studio flavor; Scheme keeps var(--ns-chart-N)"
+  },
+  "variables": {
+    "created": {
+      "Studio flavor": [
+        "608:138397",
+        "608:138401",
+        "608:138405",
+        "608:138409",
+        "608:138413",
+        "608:138417",
+        "608:138421",
+        "608:138425",
+        "608:138429",
+        "608:138433"
+      ],
+      "Theme": [
+        "608:138398",
+        "608:138402",
+        "608:138406",
+        "608:138410",
+        "608:138414",
+        "608:138418",
+        "608:138422",
+        "608:138426",
+        "608:138430",
+        "608:138434"
+      ],
+      "Theme B": [
+        "608:138399",
+        "608:138403",
+        "608:138407",
+        "608:138411",
+        "608:138415",
+        "608:138419",
+        "608:138423",
+        "608:138427",
+        "608:138431",
+        "608:138435"
+      ],
+      "Theme set": [
+        "608:138400",
+        "608:138404",
+        "608:138408",
+        "608:138412",
+        "608:138416",
+        "608:138420",
+        "608:138424",
+        "608:138428",
+        "608:138432",
+        "608:138436"
+      ],
+      "order": "chart/l/1..5 then chart/d/1..5; ids carry the VariableID: prefix"
+    },
+    "primitiveAliases": [
+      "Theme/chart/l/1@Ledger -> color/indigo/l/9",
+      "Theme/chart/d/1@Ledger -> color/indigo/d/10",
+      "Theme/chart/l/1@Signal -> color/lime/l/11",
+      "Theme/chart/l/1@Tonal -> color/violet/l/11",
+      "Theme/chart/l/1@Glass -> color/blue/l/11",
+      "Theme B/chart/l/1@Cupertino -> color/blue/l/11",
+      "Theme B/chart/l/1@Terminal -> color/lime/l/11"
+    ],
+    "schemeChanged": {
+      "ids": [
+        "241:107",
+        "241:108",
+        "241:109",
+        "241:110",
+        "241:111"
+      ],
+      "before": {
+        "light": [
+          "primary/default",
+          "info/default",
+          "success/default",
+          "warning/default",
+          "destructive/default"
+        ],
+        "dark": [
+          "marker/default",
+          "info/default",
+          "success/default",
+          "warning/default",
+          "destructive/default"
+        ]
+      },
+      "after": "Light -> Theme set chart/l/N; Dark -> Theme set chart/d/N; descriptions updated"
+    }
+  },
+  "modeMap": {
+    "Theme": {
+      "Studio": "studio (via Studio flavor)",
+      "Ledger": "ledger",
+      "Filigrane": "filigrane",
+      "Signal": "terminal",
+      "Tonal": "tonal",
+      "Glass": "cupertino",
+      "Brutal": "brutal",
+      "Fluent": "fluent",
+      "Tactile": "tactile",
+      "Pixel": "pixel"
+    },
+    "Theme B": {
+      "Bloom": "bloom",
+      "Cupertino": "cupertino",
+      "Liquid": "liquid",
+      "Terminal": "terminal",
+      "macOS 27": "macos27",
+      "Apple Classic": "appleclassic",
+      "Fluent 2 Web": "fluent2"
+    }
+  },
+  "palettes": {
+    "studio": {
+      "names": [
+        "ink",
+        "blue",
+        "amber",
+        "teal",
+        "violet"
+      ],
+      "L": [
+        "INK",
+        "#3372af",
+        "#a87520",
+        "#0a9088",
+        "#7559a2"
+      ],
+      "D": [
+        "INK",
+        "#5290cf",
+        "#b88433",
+        "#28a59d",
+        "#876bb6"
+      ]
+    },
+    "ledger": {
+      "names": [
+        "indigo",
+        "teal",
+        "ochre",
+        "plum",
+        "olive"
+      ],
+      "L": [
+        "#3e63dd",
+        "#008d85",
+        "#a87520",
+        "#9b5084",
+        "#728431"
+      ],
+      "D": [
+        "#5472e4",
+        "#1fa098",
+        "#b88433",
+        "#b96ba0",
+        "#849644"
+      ]
+    },
+    "filigrane": {
+      "names": [
+        "prussian ink",
+        "ochre",
+        "viridian",
+        "violet ink",
+        "sienna"
+      ],
+      "L": [
+        "#2b5991",
+        "#a17d27",
+        "#017558",
+        "#6c4494",
+        "#9a5328"
+      ],
+      "D": [
+        "#5c8bc8",
+        "#b48f3c",
+        "#268e6e",
+        "#9970c4",
+        "#c1774c"
+      ]
+    },
+    "terminal": {
+      "names": [
+        "phosphor",
+        "blue",
+        "cyan",
+        "amber",
+        "magenta"
+      ],
+      "L": [
+        "#5c7c2f",
+        "#2e62c9",
+        "#03919d",
+        "#ae7c02",
+        "#ab3ba5"
+      ],
+      "D": [
+        "#72a305",
+        "#467de6",
+        "#17a7b4",
+        "#bc8600",
+        "#c252bb"
+      ]
+    },
+    "tonal": {
+      "names": [
+        "violet",
+        "teal",
+        "amber",
+        "rose",
+        "blue"
+      ],
+      "L": [
+        "#6550b9",
+        "#00928c",
+        "#a87520",
+        "#9e4573",
+        "#2d70b0"
+      ],
+      "D": [
+        "#927ad2",
+        "#2ba8a2",
+        "#b98535",
+        "#c66897",
+        "#4e90d2"
+      ]
+    },
+    "bloom": {
+      "names": [
+        "purple",
+        "tangerine",
+        "sky",
+        "lime",
+        "rose"
+      ],
+      "L": [
+        "#6f3e9d",
+        "#c46016",
+        "#067d9f",
+        "#678800",
+        "#af4d80"
+      ],
+      "D": [
+        "#9464c5",
+        "#d7712e",
+        "#389ec1",
+        "#7ca025",
+        "#c96598"
+      ]
+    },
+    "brutal": {
+      "names": [
+        "yellow",
+        "blue",
+        "pink",
+        "lime",
+        "purple"
+      ],
+      "L": [
+        "#b58404",
+        "#1779e1",
+        "#d83486",
+        "#659003",
+        "#7154ce"
+      ],
+      "D": [
+        "#bb8800",
+        "#207fe8",
+        "#e33f8f",
+        "#72a305",
+        "#886de9"
+      ]
+    },
+    "pixel": {
+      "names": [
+        "amber",
+        "teal",
+        "rust",
+        "blue",
+        "green"
+      ],
+      "L": [
+        "#b87501",
+        "#019096",
+        "#ae4b25",
+        "#1777b8",
+        "#58883b"
+      ],
+      "D": [
+        "#c67f09",
+        "#1aa0a7",
+        "#ba5530",
+        "#3890d2",
+        "#649447"
+      ]
+    },
+    "tactile": {
+      "names": [
+        "blue",
+        "green",
+        "violet",
+        "amber",
+        "cyan"
+      ],
+      "L": [
+        "#467ac6",
+        "#288b63",
+        "#6a569c",
+        "#9d671c",
+        "#08899f"
+      ],
+      "D": [
+        "#5c91df",
+        "#44a279",
+        "#816eb6",
+        "#bb843e",
+        "#269db5"
+      ]
+    },
+    "fluent": {
+      "names": [
+        "accent blue",
+        "pumpkin",
+        "seafoam",
+        "purple",
+        "green"
+      ],
+      "L": [
+        "#005fb8",
+        "#c15626",
+        "#019195",
+        "#7754a7",
+        "#558a28"
+      ],
+      "D": [
+        "#3086d9",
+        "#d96b3d",
+        "#26a7ac",
+        "#8a67bc",
+        "#5e9332"
+      ]
+    },
+    "fluent2": {
+      "names": [
+        "cornflower",
+        "hot pink",
+        "light green",
+        "teal",
+        "orchid"
+      ],
+      "L": [
+        "#637cef",
+        "#e3008c",
+        "#13a10e",
+        "#038387",
+        "#9373c0"
+      ],
+      "D": [
+        "#637cef",
+        "#e3008c",
+        "#13a10e",
+        "#2aa0a4",
+        "#8764b8"
+      ]
+    },
+    "cupertino": {
+      "names": [
+        "blue",
+        "green",
+        "purple",
+        "orange",
+        "teal"
+      ],
+      "L": [
+        "#0d74ce",
+        "#019437",
+        "#9b45c6",
+        "#b86b05",
+        "#008ea3"
+      ],
+      "D": [
+        "#0e79e9",
+        "#049e3c",
+        "#b55fe1",
+        "#cd7703",
+        "#0ca0b7"
+      ]
+    },
+    "liquid": {
+      "names": [
+        "blue",
+        "green",
+        "purple",
+        "orange",
+        "indigo"
+      ],
+      "L": [
+        "#0063e1",
+        "#019437",
+        "#a82eb9",
+        "#c06404",
+        "#5d57de"
+      ],
+      "D": [
+        "#0381e4",
+        "#049e3c",
+        "#c24bd3",
+        "#d67000",
+        "#7270fa"
+      ]
+    },
+    "macos27": {
+      "names": [
+        "blue",
+        "green",
+        "purple",
+        "orange",
+        "cyan"
+      ],
+      "L": [
+        "#1e6ef4",
+        "#008932",
+        "#cb30e0",
+        "#c55300",
+        "#007eae"
+      ],
+      "D": [
+        "#0091ff",
+        "#30d158",
+        "#db34f2",
+        "#ff9230",
+        "#3cd3fe"
+      ]
+    },
+    "appleclassic": {
+      "names": [
+        "blue",
+        "green",
+        "purple",
+        "orange",
+        "cyan"
+      ],
+      "L": [
+        "#007aff",
+        "#248a3d",
+        "#af52de",
+        "#c55300",
+        "#0071a4"
+      ],
+      "D": [
+        "#0a84ff",
+        "#30d158",
+        "#bf5af2",
+        "#ff9f0a",
+        "#64d2ff"
+      ]
+    }
+  },
+  "verification": {
+    "resolver": "46/46 scenario x scheme tuples (7 Studio flavors with presets, 9 Theme modes, 7 Theme B modes; Light+Dark) resolve Scheme chart/1..5 to the planned hex; 0 mismatches; temp frame zz-resolver-temp removed in the same call",
+    "validator": {
+      "runs": 145,
+      "hardFailRuns": 42,
+      "warnRuns": 0,
+      "hardFails": "Studio slot 1 ink (band + chroma, by rule; series 2-5 pass); macOS 27 + Apple Classic dark lightness band (published Apple dark green/orange/cyan); Fluent 2 Web teal chroma floor (published teal)",
+      "output": "review/chart-palettes/validator/validator-output.txt",
+      "summary": "review/chart-palettes/validator/validator-summary.json"
+    },
+    "contrast": "every series >= 3:1 on surface/bg, card/bg (composited), surface/card and theme card/base surfaces, both schemes; lowest 3.09:1 (Fluent 2 Web light, published light green #13a10e on fluent/solid/base #f3f3f3)",
+    "statusEquality": "0 series equal a status default or text tone in either scheme",
+    "pngs": [
+      "review/chart-palettes/dd2-themes-strip.png (585:174804)",
+      "review/chart-palettes/review-chart.png (583:17163)",
+      "review/chart-palettes/review-chart-block.png (583:75404)",
+      "review/chart-palettes/review-donut.png (583:75859)",
+      "review/chart-palettes/palette-sheet.png (608:375304)"
+    ],
+    "staleSeeds": "none observed; no paints re-seeded"
+  },
+  "sheet": {
+    "page": "Foundations 229:338",
+    "sectionLabel": "608:375300",
+    "sheet": "608:375304",
+    "rows": 17,
+    "nodes": 1913,
+    "layout": "y 44337 label, y 44389 sheet (2088 x 2990); draft area 234:10485 -> y 47579, 4:3 -> y 47631",
+    "bindings": "swatches, lines and bars bind Scheme chart/1..5; cells bind surface/bg + border/subtle; cards bind card/bg + card/border + Theme set radius/card; text binds text/fg|muted; fonts literal Host Grotesk / Fragment Mono (doc chrome)"
+  },
+  "copyFixes": {
+    "page": "Components · Data display 229:344",
+    "nodes": [
+      "585:174807 strip intro",
+      "583:16587 + 583:17166 Chart review header",
+      "583:75483 + 583:75862 Donut review header",
+      "585:184394 Themes · part 2 section-label Note"
+    ],
+    "why": "they described chart/2..5 as status colours / series 1 as primary / Failed as the only red"
+  },
+  "census": {
+    "page": "229:344",
+    "nodesBindingChart": {
+      "Card sets 409:222": 39,
+      "Chart sets 578:175541": 103,
+      "Chart block sets 579:16495": 54,
+      "Donut sets 579:16496": 61,
+      "Review · Chart 583:17163": 136,
+      "Review · Chart block 583:75404": 140,
+      "Review · Donut 583:75859": 114,
+      "Themes strip 585:174804": 84
+    },
+    "notCensused": "screens, theme pages, docs site and other component pages"
+  },
+  "compromises": [
+    "Studio series 1 is ink by rule: validator band + chroma FAIL on slot 1 only",
+    "macOS 27 and Apple Classic dark keep published Apple green/orange/cyan above the dark band (L 0.76-0.82)",
+    "macOS 27 dark series 1 #0091ff is dE 0.3 from info/default #0090ff (not equal; Apple blue = Radix blue 9)",
+    "Fluent 2 Web teal (published) sits just below the chroma floor (C 0.094 light / 0.0999 dark)",
+    "Faithful orders changed only where adjacent CVD failed (Swift Charts green|orange, Fluent 2 teal|hot pink)",
+    "Apple Classic light orange uses current increased-contrast #c55300 (classic #ff9500 ~2:1, classic accessible #c93400 reads red)",
+    "Brutal yellow, Pixel amber and Terminal phosphor step down to chart weight (mustard #b58404/#bb8800, amber #b87501/#c67f09, phosphor #5c7c2f/#72a305); bright identity colours stay on marker/primary"
+  ],
+  "codeFollowUps": [
+    "mirror the values table in variables-change.md into theme CSS --ns-chart-1..5 per theme and scheme",
+    "supersedes the DD2 note --ns-chart-1 dark follows --ns-marker (Utility still equals ink)",
+    "Donut/Chart fixtures name categories after statuses (Delivered, Paid, Pending, Failed): rename to neutral categories or bind status tones"
+  ],
+  "figmaCalls": "21 (1 create_session, 11 use_figma incl. 1 connection-lost and 1 script error, 9 get_screenshot)",
+  "notTouched": "state.json, git, repository"
+}

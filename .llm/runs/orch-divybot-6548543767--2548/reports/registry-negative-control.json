@@ -1,0 +1,11 @@
+{
+  "command": [
+    "deno",
+    "task",
+    "check:netscript-jsr-specifiers"
+  ],
+  "scope": "disposable bumped checkout",
+  "staleRegistryPinExitCode": 1,
+  "restoredRegistryPinExitCode": 0,
+  "finding": "packages/fresh-ui/registry.json: stale 0.0.8 pin; workspace ships 0.0.9-canary.1"
+}

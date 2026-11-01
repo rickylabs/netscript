@@ -1,14 +1,21 @@
 import { relative } from '@std/path';
 import { extractFencedBlocks, type FencedBlock } from './snippet-extractor.ts';
+import { runSnippetProcess } from './snippet-process.ts';
+import { checkCliExamples } from './cli-example-policy.ts';
 
-/** The issue-mandated Tier-1 source pages, including zero-fence index.vto. */
+/** The issue-mandated Tier-1 source pages, including command/relay guides and zero-fence index.vto. */
 export const TIER_1_PAGES = [
   'quickstart.vto',
   'index.vto',
   'services-sdk/sdk.md',
+  'services-sdk/commands.md',
+  'services-sdk/command-relay.md',
+  'services-sdk/command-operations.md',
+  'services-sdk/command-security.md',
+  'services-sdk/command-compatibility.md',
+  'orchestration-runtime/how-to/outbound-webhooks.md',
   'services-sdk/how-to/add-a-service.md',
   'web-layer/query.md',
-  'web-layer/examples.md',
   'web-layer/interactive.md',
   'web-layer/form.md',
   'web-layer/query-bridge.md',
@@ -62,14 +69,18 @@ async function isGeneratedOrIgnoredDirectory(path: string, name: string): Promis
   if (name === '_site') return true;
 
   try {
-    const result = await new Deno.Command('git', {
-      args: ['check-ignore', '--quiet', '--', path],
-      stdout: 'null',
-      stderr: 'null',
-    }).output();
+    const result = await runSnippetProcess('git', ['check-ignore', '--quiet', '--', path], {
+      cwd: Deno.cwd(),
+      source: path,
+    });
+    if (result.timedOut || result.interrupted) throw new Error(result.stderr);
     return result.code === 0;
   } catch (error) {
     if (error instanceof Deno.errors.NotFound) return false;
+    if (
+      error instanceof Error && error.cause instanceof Error &&
+      'code' in error.cause && error.cause.code === 'ENOENT'
+    ) return false;
     throw error;
   }
 }
@@ -102,7 +113,9 @@ export async function analyzeSnippetSite(
   for (const path of files) {
     const sourcePath = toSourcePath(siteRoot, path);
     try {
-      blocks.push(...extractFencedBlocks(await Deno.readTextFile(path), sourcePath));
+      const source = await Deno.readTextFile(path);
+      checkCliExamples(source, sourcePath);
+      blocks.push(...extractFencedBlocks(source, sourcePath));
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       throw new Error(generatedPathDiagnostic(sourcePath, message));

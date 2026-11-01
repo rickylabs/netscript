@@ -1,0 +1,38 @@
+﻿[
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\packages\\service\\src\\middleware\\service-cors.ts",
+        "Hash":  "BF8084A59737382AC3B9E79293D9C45FA873DC58CC70D0492E95FAB8D81245D0"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\packages\\service\\tests\\cors-response-authority_test.ts",
+        "Hash":  "E2668AE9CE623A28CAED562BED4D9C6B43AF46737857599B99BACD8653AC9BC3"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\runs\\fix-native-service-policy--u2-u4\\plan.md",
+        "Hash":  "516901BB12EF088B7B967D628C9D4C0134DAD1096C0EAA97BB2BADA5983D5058"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\runs\\fix-native-service-policy--u2-u4\\decisions.md",
+        "Hash":  "2DA4AB40CF0EEE24D1C9F2FE92FB641DC007EF46866C8128648DEE9638DDFDA6"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\runs\\fix-native-service-policy--u2-u4\\plan-eval.md",
+        "Hash":  "234A77914EC162E0A8B31A5BED7EDA3A76C009CB9307B65B5D9D8E2BCB666159"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\runs\\fix-native-service-policy--u2-u4\\plan-eval-recheck1.md",
+        "Hash":  "DCF8DAEB73961347AD9D3F18DDFCC91F12E2A4E7083AF4E2BEEFC4C52977B014"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\harness\\debt\\arch-debt.md",
+        "Hash":  "74E43F6A6C914C5AF55EDD107D9C5A06A289AE795D5B980D37AF89C0A38D7FB9"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\deno.json",
+        "Hash":  "B1FF8E07A20969535AE8BEDAFA869C8FC5A792AFE0857D1BE1FD71C785B90870"
+    },
+    {
+        "Path":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\deno.lock",
+        "Hash":  "F53F7A5D017E002582B43B886003F64D19C0EDBC137EBE74674C2E59DF4A5D32"
+    }
+]

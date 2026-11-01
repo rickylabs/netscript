@@ -327,7 +327,8 @@ describe('HelpersGeneratorPipeline', () => {
       (f) => f.path === '.helpers/register-tools.mts',
     );
     assert(regTools, 'register-tools.mts should exist');
-    assertStringIncludes(regTools!.content, '// No tools configured');
+    assertStringIncludes(regTools!.content, 'No development tools are configured.');
+    assertStringIncludes(regTools!.content, 'return Promise.resolve();');
   });
 });
 // generateHelpers convenience function

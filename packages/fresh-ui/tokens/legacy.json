@@ -1,0 +1,3098 @@
+{
+  "version": 1,
+  "generatedBy": "packages/fresh-ui/scripts/build-tokens.ts",
+  "tokens": {
+    "gray-1": {
+      "type": "color",
+      "value": "oklch(98.5% 0.006 85)",
+      "cssVar": "--ns-gray-1",
+      "path": [
+        "color",
+        "gray",
+        "1"
+      ]
+    },
+    "gray-2": {
+      "type": "color",
+      "value": "oklch(94.5% 0.006 85)",
+      "cssVar": "--ns-gray-2",
+      "path": [
+        "color",
+        "gray",
+        "2"
+      ]
+    },
+    "gray-3": {
+      "type": "color",
+      "value": "oklch(88.5% 0.006 85)",
+      "cssVar": "--ns-gray-3",
+      "path": [
+        "color",
+        "gray",
+        "3"
+      ]
+    },
+    "gray-4": {
+      "type": "color",
+      "value": "oklch(80.5% 0.006 85)",
+      "cssVar": "--ns-gray-4",
+      "path": [
+        "color",
+        "gray",
+        "4"
+      ]
+    },
+    "gray-5": {
+      "type": "color",
+      "value": "oklch(73.5% 0.006 85)",
+      "cssVar": "--ns-gray-5",
+      "path": [
+        "color",
+        "gray",
+        "5"
+      ]
+    },
+    "gray-6": {
+      "type": "color",
+      "value": "oklch(59.5% 0.006 85)",
+      "cssVar": "--ns-gray-6",
+      "path": [
+        "color",
+        "gray",
+        "6"
+      ]
+    },
+    "gray-7": {
+      "type": "color",
+      "value": "oklch(47% 0.006 85)",
+      "cssVar": "--ns-gray-7",
+      "path": [
+        "color",
+        "gray",
+        "7"
+      ]
+    },
+    "gray-8": {
+      "type": "color",
+      "value": "oklch(37% 0.006 85)",
+      "cssVar": "--ns-gray-8",
+      "path": [
+        "color",
+        "gray",
+        "8"
+      ]
+    },
+    "gray-9": {
+      "type": "color",
+      "value": "oklch(27% 0.006 85)",
+      "cssVar": "--ns-gray-9",
+      "path": [
+        "color",
+        "gray",
+        "9"
+      ]
+    },
+    "gray-10": {
+      "type": "color",
+      "value": "oklch(21.5% 0.006 85)",
+      "cssVar": "--ns-gray-10",
+      "path": [
+        "color",
+        "gray",
+        "10"
+      ]
+    },
+    "gray-11": {
+      "type": "color",
+      "value": "oklch(17.5% 0.006 85)",
+      "cssVar": "--ns-gray-11",
+      "path": [
+        "color",
+        "gray",
+        "11"
+      ]
+    },
+    "gray-12": {
+      "type": "color",
+      "value": "oklch(13.5% 0.006 85)",
+      "cssVar": "--ns-gray-12",
+      "path": [
+        "color",
+        "gray",
+        "12"
+      ]
+    },
+    "copper-1": {
+      "type": "color",
+      "value": "oklch(95.5% 0.025 52)",
+      "cssVar": "--ns-copper-1",
+      "path": [
+        "color",
+        "copper",
+        "1"
+      ]
+    },
+    "copper-2": {
+      "type": "color",
+      "value": "oklch(88.5% 0.068 52)",
+      "cssVar": "--ns-copper-2",
+      "path": [
+        "color",
+        "copper",
+        "2"
+      ]
+    },
+    "copper-3": {
+      "type": "color",
+      "value": "oklch(81.5% 0.105 52)",
+      "cssVar": "--ns-copper-3",
+      "path": [
+        "color",
+        "copper",
+        "3"
+      ]
+    },
+    "copper-4": {
+      "type": "color",
+      "value": "oklch(74.5% 0.105 52)",
+      "cssVar": "--ns-copper-4",
+      "path": [
+        "color",
+        "copper",
+        "4"
+      ]
+    },
+    "copper-5": {
+      "type": "color",
+      "value": "oklch(69.5% 0.105 52)",
+      "cssVar": "--ns-copper-5",
+      "path": [
+        "color",
+        "copper",
+        "5"
+      ]
+    },
+    "copper-6": {
+      "type": "color",
+      "value": "oklch(63.5% 0.105 52)",
+      "cssVar": "--ns-copper-6",
+      "path": [
+        "color",
+        "copper",
+        "6"
+      ]
+    },
+    "copper-7": {
+      "type": "color",
+      "value": "oklch(55.5% 0.105 52)",
+      "cssVar": "--ns-copper-7",
+      "path": [
+        "color",
+        "copper",
+        "7"
+      ]
+    },
+    "copper-8": {
+      "type": "color",
+      "value": "oklch(47% 0.105 52)",
+      "cssVar": "--ns-copper-8",
+      "path": [
+        "color",
+        "copper",
+        "8"
+      ]
+    },
+    "teal-1": {
+      "type": "color",
+      "value": "oklch(95.5% 0.065 190)",
+      "cssVar": "--ns-teal-1",
+      "path": [
+        "color",
+        "teal",
+        "1"
+      ]
+    },
+    "teal-2": {
+      "type": "color",
+      "value": "oklch(87.5% 0.082 190)",
+      "cssVar": "--ns-teal-2",
+      "path": [
+        "color",
+        "teal",
+        "2"
+      ]
+    },
+    "teal-3": {
+      "type": "color",
+      "value": "oklch(78.5% 0.082 190)",
+      "cssVar": "--ns-teal-3",
+      "path": [
+        "color",
+        "teal",
+        "3"
+      ]
+    },
+    "teal-4": {
+      "type": "color",
+      "value": "oklch(70.5% 0.082 190)",
+      "cssVar": "--ns-teal-4",
+      "path": [
+        "color",
+        "teal",
+        "4"
+      ]
+    },
+    "teal-5": {
+      "type": "color",
+      "value": "oklch(61% 0.082 190)",
+      "cssVar": "--ns-teal-5",
+      "path": [
+        "color",
+        "teal",
+        "5"
+      ]
+    },
+    "teal-6": {
+      "type": "color",
+      "value": "oklch(53.5% 0.082 190)",
+      "cssVar": "--ns-teal-6",
+      "path": [
+        "color",
+        "teal",
+        "6"
+      ]
+    },
+    "teal-7": {
+      "type": "color",
+      "value": "oklch(45.5% 0.078 190)",
+      "cssVar": "--ns-teal-7",
+      "path": [
+        "color",
+        "teal",
+        "7"
+      ]
+    },
+    "slate-1": {
+      "type": "color",
+      "value": "oklch(96.5% 0.016 255)",
+      "cssVar": "--ns-slate-1",
+      "path": [
+        "color",
+        "slate",
+        "1"
+      ]
+    },
+    "slate-2": {
+      "type": "color",
+      "value": "oklch(89.5% 0.028 255)",
+      "cssVar": "--ns-slate-2",
+      "path": [
+        "color",
+        "slate",
+        "2"
+      ]
+    },
+    "slate-3": {
+      "type": "color",
+      "value": "oklch(79% 0.028 255)",
+      "cssVar": "--ns-slate-3",
+      "path": [
+        "color",
+        "slate",
+        "3"
+      ]
+    },
+    "slate-4": {
+      "type": "color",
+      "value": "oklch(70.5% 0.028 255)",
+      "cssVar": "--ns-slate-4",
+      "path": [
+        "color",
+        "slate",
+        "4"
+      ]
+    },
+    "slate-5": {
+      "type": "color",
+      "value": "oklch(61.5% 0.028 255)",
+      "cssVar": "--ns-slate-5",
+      "path": [
+        "color",
+        "slate",
+        "5"
+      ]
+    },
+    "slate-6": {
+      "type": "color",
+      "value": "oklch(52.5% 0.028 255)",
+      "cssVar": "--ns-slate-6",
+      "path": [
+        "color",
+        "slate",
+        "6"
+      ]
+    },
+    "slate-7": {
+      "type": "color",
+      "value": "oklch(43.5% 0.028 255)",
+      "cssVar": "--ns-slate-7",
+      "path": [
+        "color",
+        "slate",
+        "7"
+      ]
+    },
+    "red-4": {
+      "type": "color",
+      "value": "oklch(70.5% 0.165 28)",
+      "cssVar": "--ns-red-4",
+      "path": [
+        "color",
+        "red",
+        "4"
+      ]
+    },
+    "red-5": {
+      "type": "color",
+      "value": "oklch(62.5% 0.165 28)",
+      "cssVar": "--ns-red-5",
+      "path": [
+        "color",
+        "red",
+        "5"
+      ]
+    },
+    "red-6": {
+      "type": "color",
+      "value": "oklch(54.5% 0.165 28)",
+      "cssVar": "--ns-red-6",
+      "path": [
+        "color",
+        "red",
+        "6"
+      ]
+    },
+    "red-7": {
+      "type": "color",
+      "value": "oklch(45.5% 0.165 28)",
+      "cssVar": "--ns-red-7",
+      "path": [
+        "color",
+        "red",
+        "7"
+      ]
+    },
+    "amber-4": {
+      "type": "color",
+      "value": "oklch(81.5% 0.13 78)",
+      "cssVar": "--ns-amber-4",
+      "path": [
+        "color",
+        "amber",
+        "4"
+      ]
+    },
+    "amber-5": {
+      "type": "color",
+      "value": "oklch(73.5% 0.13 78)",
+      "cssVar": "--ns-amber-5",
+      "path": [
+        "color",
+        "amber",
+        "5"
+      ]
+    },
+    "amber-6": {
+      "type": "color",
+      "value": "oklch(65.5% 0.13 78)",
+      "cssVar": "--ns-amber-6",
+      "path": [
+        "color",
+        "amber",
+        "6"
+      ]
+    },
+    "font-sans": {
+      "type": "fontFamily",
+      "value": "'DM Sans', 'Segoe UI', system-ui, -apple-system, sans-serif",
+      "cssVar": "--ns-font-sans",
+      "path": [
+        "font",
+        "sans"
+      ]
+    },
+    "font-mono": {
+      "type": "fontFamily",
+      "value": "'DM Mono', ui-monospace, 'Cascadia Code', 'Fira Code', monospace",
+      "cssVar": "--ns-font-mono",
+      "path": [
+        "font",
+        "mono"
+      ]
+    },
+    "text-xs": {
+      "type": "dimension",
+      "value": "0.75rem",
+      "cssVar": "--ns-text-xs",
+      "path": [
+        "text",
+        "xs"
+      ]
+    },
+    "text-sm": {
+      "type": "dimension",
+      "value": "0.875rem",
+      "cssVar": "--ns-text-sm",
+      "path": [
+        "text",
+        "sm"
+      ]
+    },
+    "text-base": {
+      "type": "dimension",
+      "value": "1rem",
+      "cssVar": "--ns-text-base",
+      "path": [
+        "text",
+        "base"
+      ]
+    },
+    "text-lg": {
+      "type": "dimension",
+      "value": "1.125rem",
+      "cssVar": "--ns-text-lg",
+      "path": [
+        "text",
+        "lg"
+      ]
+    },
+    "text-xl": {
+      "type": "dimension",
+      "value": "1.25rem",
+      "cssVar": "--ns-text-xl",
+      "path": [
+        "text",
+        "xl"
+      ]
+    },
+    "text-2xl": {
+      "type": "dimension",
+      "value": "1.5rem",
+      "cssVar": "--ns-text-2xl",
+      "path": [
+        "text",
+        "2xl"
+      ]
+    },
+    "text-3xl": {
+      "type": "dimension",
+      "value": "1.875rem",
+      "cssVar": "--ns-text-3xl",
+      "path": [
+        "text",
+        "3xl"
+      ]
+    },
+    "text-4xl": {
+      "type": "dimension",
+      "value": "2.25rem",
+      "cssVar": "--ns-text-4xl",
+      "path": [
+        "text",
+        "4xl"
+      ]
+    },
+    "text-3xs": {
+      "type": "dimension",
+      "value": "0.625rem",
+      "cssVar": "--ns-text-3xs",
+      "path": [
+        "text",
+        "3xs"
+      ]
+    },
+    "text-2xs": {
+      "type": "dimension",
+      "value": "0.6875rem",
+      "cssVar": "--ns-text-2xs",
+      "path": [
+        "text",
+        "2xs"
+      ]
+    },
+    "text-chat": {
+      "type": "dimension",
+      "value": "0.9375rem",
+      "cssVar": "--ns-text-chat",
+      "path": [
+        "text",
+        "chat"
+      ]
+    },
+    "leading-tight": {
+      "type": "number",
+      "value": "1.1",
+      "cssVar": "--ns-leading-tight",
+      "path": [
+        "leading",
+        "tight"
+      ]
+    },
+    "leading-snug": {
+      "type": "number",
+      "value": "1.3",
+      "cssVar": "--ns-leading-snug",
+      "path": [
+        "leading",
+        "snug"
+      ]
+    },
+    "leading-normal": {
+      "type": "number",
+      "value": "1.5",
+      "cssVar": "--ns-leading-normal",
+      "path": [
+        "leading",
+        "normal"
+      ]
+    },
+    "leading-relaxed": {
+      "type": "number",
+      "value": "1.7",
+      "cssVar": "--ns-leading-relaxed",
+      "path": [
+        "leading",
+        "relaxed"
+      ]
+    },
+    "tracking-tight": {
+      "type": "dimension",
+      "value": "-0.02em",
+      "cssVar": "--ns-tracking-tight",
+      "path": [
+        "tracking",
+        "tight"
+      ]
+    },
+    "tracking-normal": {
+      "type": "dimension",
+      "value": "0",
+      "cssVar": "--ns-tracking-normal",
+      "path": [
+        "tracking",
+        "normal"
+      ]
+    },
+    "tracking-wide": {
+      "type": "dimension",
+      "value": "0.12em",
+      "cssVar": "--ns-tracking-wide",
+      "path": [
+        "tracking",
+        "wide"
+      ]
+    },
+    "space-0": {
+      "type": "dimension",
+      "value": "0",
+      "cssVar": "--ns-space-0",
+      "path": [
+        "space",
+        "0"
+      ]
+    },
+    "space-1": {
+      "type": "dimension",
+      "value": "0.25rem",
+      "cssVar": "--ns-space-1",
+      "path": [
+        "space",
+        "1"
+      ]
+    },
+    "space-2": {
+      "type": "dimension",
+      "value": "0.5rem",
+      "cssVar": "--ns-space-2",
+      "path": [
+        "space",
+        "2"
+      ]
+    },
+    "space-3": {
+      "type": "dimension",
+      "value": "0.75rem",
+      "cssVar": "--ns-space-3",
+      "path": [
+        "space",
+        "3"
+      ]
+    },
+    "space-4": {
+      "type": "dimension",
+      "value": "1rem",
+      "cssVar": "--ns-space-4",
+      "path": [
+        "space",
+        "4"
+      ]
+    },
+    "space-5": {
+      "type": "dimension",
+      "value": "1.25rem",
+      "cssVar": "--ns-space-5",
+      "path": [
+        "space",
+        "5"
+      ]
+    },
+    "space-6": {
+      "type": "dimension",
+      "value": "1.5rem",
+      "cssVar": "--ns-space-6",
+      "path": [
+        "space",
+        "6"
+      ]
+    },
+    "space-7": {
+      "type": "dimension",
+      "value": "1.75rem",
+      "cssVar": "--ns-space-7",
+      "path": [
+        "space",
+        "7"
+      ]
+    },
+    "space-8": {
+      "type": "dimension",
+      "value": "2rem",
+      "cssVar": "--ns-space-8",
+      "path": [
+        "space",
+        "8"
+      ]
+    },
+    "space-9": {
+      "type": "dimension",
+      "value": "2.25rem",
+      "cssVar": "--ns-space-9",
+      "path": [
+        "space",
+        "9"
+      ]
+    },
+    "space-10": {
+      "type": "dimension",
+      "value": "2.5rem",
+      "cssVar": "--ns-space-10",
+      "path": [
+        "space",
+        "10"
+      ]
+    },
+    "space-11": {
+      "type": "dimension",
+      "value": "2.75rem",
+      "cssVar": "--ns-space-11",
+      "path": [
+        "space",
+        "11"
+      ]
+    },
+    "space-12": {
+      "type": "dimension",
+      "value": "3rem",
+      "cssVar": "--ns-space-12",
+      "path": [
+        "space",
+        "12"
+      ]
+    },
+    "space-14": {
+      "type": "dimension",
+      "value": "3.5rem",
+      "cssVar": "--ns-space-14",
+      "path": [
+        "space",
+        "14"
+      ]
+    },
+    "space-16": {
+      "type": "dimension",
+      "value": "4rem",
+      "cssVar": "--ns-space-16",
+      "path": [
+        "space",
+        "16"
+      ]
+    },
+    "space-20": {
+      "type": "dimension",
+      "value": "5rem",
+      "cssVar": "--ns-space-20",
+      "path": [
+        "space",
+        "20"
+      ]
+    },
+    "space-24": {
+      "type": "dimension",
+      "value": "6rem",
+      "cssVar": "--ns-space-24",
+      "path": [
+        "space",
+        "24"
+      ]
+    },
+    "space-px": {
+      "type": "dimension",
+      "value": "1px",
+      "cssVar": "--ns-space-px",
+      "path": [
+        "space",
+        "px"
+      ]
+    },
+    "space-0-5": {
+      "type": "dimension",
+      "value": "0.125rem",
+      "cssVar": "--ns-space-0-5",
+      "path": [
+        "space",
+        "0-5"
+      ]
+    },
+    "space-1-5": {
+      "type": "dimension",
+      "value": "0.375rem",
+      "cssVar": "--ns-space-1-5",
+      "path": [
+        "space",
+        "1-5"
+      ]
+    },
+    "space-2-5": {
+      "type": "dimension",
+      "value": "0.625rem",
+      "cssVar": "--ns-space-2-5",
+      "path": [
+        "space",
+        "2-5"
+      ]
+    },
+    "space-3-5": {
+      "type": "dimension",
+      "value": "0.875rem",
+      "cssVar": "--ns-space-3-5",
+      "path": [
+        "space",
+        "3-5"
+      ]
+    },
+    "avatar-sm": {
+      "type": "dimension",
+      "value": "1.5rem",
+      "cssVar": "--ns-avatar-sm",
+      "path": [
+        "size",
+        "avatar-sm"
+      ]
+    },
+    "avatar-md": {
+      "type": "dimension",
+      "value": "2rem",
+      "cssVar": "--ns-avatar-md",
+      "path": [
+        "size",
+        "avatar-md"
+      ]
+    },
+    "avatar-lg": {
+      "type": "dimension",
+      "value": "2.5rem",
+      "cssVar": "--ns-avatar-lg",
+      "path": [
+        "size",
+        "avatar-lg"
+      ]
+    },
+    "control-h": {
+      "type": "dimension",
+      "value": "2.25rem",
+      "cssVar": "--ns-control-h",
+      "path": [
+        "size",
+        "control-h"
+      ]
+    },
+    "control-h-sm": {
+      "type": "dimension",
+      "value": "2rem",
+      "cssVar": "--ns-control-h-sm",
+      "path": [
+        "size",
+        "control-h-sm"
+      ]
+    },
+    "app-nav": {
+      "type": "dimension",
+      "value": "17rem",
+      "cssVar": "--ns-app-nav",
+      "path": [
+        "layout",
+        "app-nav"
+      ]
+    },
+    "app-rail": {
+      "type": "dimension",
+      "value": "20rem",
+      "cssVar": "--ns-app-rail",
+      "path": [
+        "layout",
+        "app-rail"
+      ]
+    },
+    "topbar-h": {
+      "type": "dimension",
+      "value": "3.5rem",
+      "cssVar": "--ns-topbar-h",
+      "path": [
+        "layout",
+        "topbar-h"
+      ]
+    },
+    "shell-content": {
+      "type": "dimension",
+      "value": "67.5rem",
+      "cssVar": "--ns-shell-content",
+      "path": [
+        "layout",
+        "shell-content"
+      ]
+    },
+    "label-size": {
+      "type": "dimension",
+      "value": "0.6875rem",
+      "cssVar": "--ns-label-size",
+      "path": [
+        "label",
+        "size"
+      ]
+    },
+    "label-tracking": {
+      "type": "dimension",
+      "value": "0.06em",
+      "cssVar": "--ns-label-tracking",
+      "path": [
+        "label",
+        "tracking"
+      ]
+    },
+    "radius-sm": {
+      "type": "dimension",
+      "value": "4px",
+      "cssVar": "--ns-radius-sm",
+      "path": [
+        "radius",
+        "sm"
+      ]
+    },
+    "radius-md": {
+      "type": "dimension",
+      "value": "6px",
+      "cssVar": "--ns-radius-md",
+      "path": [
+        "radius",
+        "md"
+      ]
+    },
+    "radius-lg": {
+      "type": "dimension",
+      "value": "8px",
+      "cssVar": "--ns-radius-lg",
+      "path": [
+        "radius",
+        "lg"
+      ]
+    },
+    "radius-xl": {
+      "type": "dimension",
+      "value": "12px",
+      "cssVar": "--ns-radius-xl",
+      "path": [
+        "radius",
+        "xl"
+      ]
+    },
+    "radius-2xl": {
+      "type": "dimension",
+      "value": "16px",
+      "cssVar": "--ns-radius-2xl",
+      "path": [
+        "radius",
+        "2xl"
+      ]
+    },
+    "radius-full": {
+      "type": "dimension",
+      "value": "9999px",
+      "cssVar": "--ns-radius-full",
+      "path": [
+        "radius",
+        "full"
+      ]
+    },
+    "shadow-xs": {
+      "type": "string",
+      "value": "0 1px 2px rgba(0, 0, 0, 0.05)",
+      "cssVar": "--ns-shadow-xs",
+      "path": [
+        "semantic",
+        "shadow-xs"
+      ]
+    },
+    "shadow-sm": {
+      "type": "string",
+      "value": "0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)",
+      "cssVar": "--ns-shadow-sm",
+      "path": [
+        "semantic",
+        "shadow-sm"
+      ]
+    },
+    "shadow-md": {
+      "type": "string",
+      "value": "0 4px 6px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04)",
+      "cssVar": "--ns-shadow-md",
+      "path": [
+        "semantic",
+        "shadow-md"
+      ]
+    },
+    "shadow-lg": {
+      "type": "string",
+      "value": "0 10px 15px rgba(0, 0, 0, 0.06), 0 4px 6px rgba(0, 0, 0, 0.03)",
+      "cssVar": "--ns-shadow-lg",
+      "path": [
+        "semantic",
+        "shadow-lg"
+      ]
+    },
+    "shadow-xl": {
+      "type": "shadow",
+      "value": "0 20px 25px rgba(0, 0, 0, 0.15), 0 10px 10px rgba(0, 0, 0, 0.06)",
+      "cssVar": "--ns-shadow-xl",
+      "path": [
+        "shadow",
+        "xl"
+      ]
+    },
+    "ease-fast": {
+      "type": "duration",
+      "value": "100ms ease",
+      "cssVar": "--ns-ease-fast",
+      "path": [
+        "ease",
+        "fast"
+      ]
+    },
+    "ease-normal": {
+      "type": "duration",
+      "value": "150ms ease",
+      "cssVar": "--ns-ease-normal",
+      "path": [
+        "ease",
+        "normal"
+      ]
+    },
+    "ease-slow": {
+      "type": "duration",
+      "value": "250ms ease",
+      "cssVar": "--ns-ease-slow",
+      "path": [
+        "ease",
+        "slow"
+      ]
+    },
+    "ease-spring": {
+      "type": "duration",
+      "value": "300ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+      "cssVar": "--ns-ease-spring",
+      "path": [
+        "ease",
+        "spring"
+      ]
+    },
+    "z-base": {
+      "type": "number",
+      "value": "0",
+      "cssVar": "--ns-z-base",
+      "path": [
+        "z",
+        "base"
+      ]
+    },
+    "z-dropdown": {
+      "type": "number",
+      "value": "10",
+      "cssVar": "--ns-z-dropdown",
+      "path": [
+        "z",
+        "dropdown"
+      ]
+    },
+    "z-sticky": {
+      "type": "number",
+      "value": "20",
+      "cssVar": "--ns-z-sticky",
+      "path": [
+        "z",
+        "sticky"
+      ]
+    },
+    "z-overlay": {
+      "type": "number",
+      "value": "30",
+      "cssVar": "--ns-z-overlay",
+      "path": [
+        "z",
+        "overlay"
+      ]
+    },
+    "z-modal": {
+      "type": "number",
+      "value": "40",
+      "cssVar": "--ns-z-modal",
+      "path": [
+        "z",
+        "modal"
+      ]
+    },
+    "z-toast": {
+      "type": "number",
+      "value": "50",
+      "cssVar": "--ns-z-toast",
+      "path": [
+        "z",
+        "toast"
+      ]
+    },
+    "bg": {
+      "type": "color",
+      "value": "var(--ns-gray-1)",
+      "cssVar": "--ns-bg",
+      "path": [
+        "semantic",
+        "bg"
+      ]
+    },
+    "fg": {
+      "type": "color",
+      "value": "var(--ns-gray-12)",
+      "cssVar": "--ns-fg",
+      "path": [
+        "semantic",
+        "fg"
+      ]
+    },
+    "surface": {
+      "type": "color",
+      "value": "var(--ns-gray-2)",
+      "cssVar": "--ns-surface",
+      "path": [
+        "semantic",
+        "surface"
+      ]
+    },
+    "surface-raised": {
+      "type": "color",
+      "value": "#ffffff",
+      "cssVar": "--ns-surface-raised",
+      "path": [
+        "semantic",
+        "surface-raised"
+      ]
+    },
+    "overlay": {
+      "type": "color",
+      "value": "rgba(0, 0, 0, 0.4)",
+      "cssVar": "--ns-overlay",
+      "path": [
+        "semantic",
+        "overlay"
+      ]
+    },
+    "card": {
+      "type": "color",
+      "value": "#ffffff",
+      "cssVar": "--ns-card",
+      "path": [
+        "semantic",
+        "card"
+      ]
+    },
+    "card-fg": {
+      "type": "color",
+      "value": "var(--ns-gray-12)",
+      "cssVar": "--ns-card-fg",
+      "path": [
+        "semantic",
+        "card-fg"
+      ]
+    },
+    "primary": {
+      "type": "color",
+      "value": "var(--ns-copper-6)",
+      "cssVar": "--ns-primary",
+      "path": [
+        "semantic",
+        "primary"
+      ]
+    },
+    "primary-fg": {
+      "type": "color",
+      "value": "var(--ns-gray-12)",
+      "cssVar": "--ns-primary-fg",
+      "path": [
+        "semantic",
+        "primary-fg"
+      ]
+    },
+    "primary-hover": {
+      "type": "color",
+      "value": "oklch(58.5% 0.105 52)",
+      "cssVar": "--ns-primary-hover",
+      "path": [
+        "semantic",
+        "primary-hover"
+      ]
+    },
+    "primary-subtle": {
+      "type": "color",
+      "value": "rgba(200, 149, 108, 0.1)",
+      "cssVar": "--ns-primary-subtle",
+      "path": [
+        "semantic",
+        "primary-subtle"
+      ]
+    },
+    "primary-border": {
+      "type": "color",
+      "value": "rgba(200, 149, 108, 0.25)",
+      "cssVar": "--ns-primary-border",
+      "path": [
+        "semantic",
+        "primary-border"
+      ]
+    },
+    "secondary": {
+      "type": "color",
+      "value": "var(--ns-slate-5)",
+      "cssVar": "--ns-secondary",
+      "path": [
+        "semantic",
+        "secondary"
+      ]
+    },
+    "secondary-fg": {
+      "type": "color",
+      "value": "var(--ns-gray-12)",
+      "cssVar": "--ns-secondary-fg",
+      "path": [
+        "semantic",
+        "secondary-fg"
+      ]
+    },
+    "secondary-hover": {
+      "type": "color",
+      "value": "oklch(57.5% 0.028 255)",
+      "cssVar": "--ns-secondary-hover",
+      "path": [
+        "semantic",
+        "secondary-hover"
+      ]
+    },
+    "secondary-subtle": {
+      "type": "color",
+      "value": "rgba(144, 152, 166, 0.1)",
+      "cssVar": "--ns-secondary-subtle",
+      "path": [
+        "semantic",
+        "secondary-subtle"
+      ]
+    },
+    "secondary-border": {
+      "type": "color",
+      "value": "rgba(144, 152, 166, 0.2)",
+      "cssVar": "--ns-secondary-border",
+      "path": [
+        "semantic",
+        "secondary-border"
+      ]
+    },
+    "muted": {
+      "type": "color",
+      "value": "var(--ns-gray-3)",
+      "cssVar": "--ns-muted",
+      "path": [
+        "semantic",
+        "muted"
+      ]
+    },
+    "muted-fg": {
+      "type": "color",
+      "value": "var(--ns-gray-7)",
+      "cssVar": "--ns-muted-fg",
+      "path": [
+        "semantic",
+        "muted-fg"
+      ]
+    },
+    "accent": {
+      "type": "color",
+      "value": "var(--ns-copper-6)",
+      "cssVar": "--ns-accent",
+      "path": [
+        "semantic",
+        "accent"
+      ]
+    },
+    "accent-fg": {
+      "type": "color",
+      "value": "var(--ns-gray-12)",
+      "cssVar": "--ns-accent-fg",
+      "path": [
+        "semantic",
+        "accent-fg"
+      ]
+    },
+    "accent-subtle": {
+      "type": "color",
+      "value": "rgba(200, 149, 108, 0.08)",
+      "cssVar": "--ns-accent-subtle",
+      "path": [
+        "semantic",
+        "accent-subtle"
+      ]
+    },
+    "accent-border": {
+      "type": "color",
+      "value": "rgba(200, 149, 108, 0.18)",
+      "cssVar": "--ns-accent-border",
+      "path": [
+        "semantic",
+        "accent-border"
+      ]
+    },
+    "success": {
+      "type": "color",
+      "value": "var(--ns-teal-5)",
+      "cssVar": "--ns-success",
+      "path": [
+        "semantic",
+        "success"
+      ]
+    },
+    "success-fg": {
+      "type": "color",
+      "value": "var(--ns-gray-12)",
+      "cssVar": "--ns-success-fg",
+      "path": [
+        "semantic",
+        "success-fg"
+      ]
+    },
+    "success-subtle": {
+      "type": "color",
+      "value": "rgba(91, 168, 160, 0.1)",
+      "cssVar": "--ns-success-subtle",
+      "path": [
+        "semantic",
+        "success-subtle"
+      ]
+    },
+    "success-border": {
+      "type": "color",
+      "value": "rgba(91, 168, 160, 0.2)",
+      "cssVar": "--ns-success-border",
+      "path": [
+        "semantic",
+        "success-border"
+      ]
+    },
+    "warning": {
+      "type": "color",
+      "value": "var(--ns-amber-5)",
+      "cssVar": "--ns-warning",
+      "path": [
+        "semantic",
+        "warning"
+      ]
+    },
+    "warning-fg": {
+      "type": "color",
+      "value": "var(--ns-gray-12)",
+      "cssVar": "--ns-warning-fg",
+      "path": [
+        "semantic",
+        "warning-fg"
+      ]
+    },
+    "warning-subtle": {
+      "type": "color",
+      "value": "rgba(224, 174, 79, 0.1)",
+      "cssVar": "--ns-warning-subtle",
+      "path": [
+        "semantic",
+        "warning-subtle"
+      ]
+    },
+    "warning-border": {
+      "type": "color",
+      "value": "rgba(224, 174, 79, 0.2)",
+      "cssVar": "--ns-warning-border",
+      "path": [
+        "semantic",
+        "warning-border"
+      ]
+    },
+    "destructive": {
+      "type": "color",
+      "value": "oklch(58% 0.165 28)",
+      "cssVar": "--ns-destructive",
+      "path": [
+        "semantic",
+        "destructive"
+      ]
+    },
+    "destructive-fg": {
+      "type": "color",
+      "value": "#ffffff",
+      "cssVar": "--ns-destructive-fg",
+      "path": [
+        "semantic",
+        "destructive-fg"
+      ]
+    },
+    "destructive-subtle": {
+      "type": "color",
+      "value": "rgba(224, 69, 69, 0.1)",
+      "cssVar": "--ns-destructive-subtle",
+      "path": [
+        "semantic",
+        "destructive-subtle"
+      ]
+    },
+    "destructive-border": {
+      "type": "color",
+      "value": "rgba(224, 69, 69, 0.2)",
+      "cssVar": "--ns-destructive-border",
+      "path": [
+        "semantic",
+        "destructive-border"
+      ]
+    },
+    "border": {
+      "type": "color",
+      "value": "rgba(0, 0, 0, 0.08)",
+      "cssVar": "--ns-border",
+      "path": [
+        "semantic",
+        "border"
+      ]
+    },
+    "border-hover": {
+      "type": "color",
+      "value": "rgba(0, 0, 0, 0.14)",
+      "cssVar": "--ns-border-hover",
+      "path": [
+        "semantic",
+        "border-hover"
+      ]
+    },
+    "border-strong": {
+      "type": "color",
+      "value": "rgba(0, 0, 0, 0.22)",
+      "cssVar": "--ns-border-strong",
+      "path": [
+        "semantic",
+        "border-strong"
+      ]
+    },
+    "input-border": {
+      "type": "color",
+      "value": "var(--ns-gray-6)",
+      "cssVar": "--ns-input-border",
+      "path": [
+        "semantic",
+        "input-border"
+      ]
+    },
+    "ring": {
+      "type": "color",
+      "value": "var(--ns-copper-7)",
+      "cssVar": "--ns-ring",
+      "path": [
+        "semantic",
+        "ring"
+      ]
+    }
+  },
+  "themes": {
+    "dark": {
+      "shadow-xs": {
+        "type": "shadow",
+        "value": "0 1px 2px rgba(0, 0, 0, 0.18)",
+        "cssVar": "--ns-shadow-xs",
+        "path": [
+          "shadow",
+          "xs"
+        ]
+      },
+      "shadow-sm": {
+        "type": "shadow",
+        "value": "0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.1)",
+        "cssVar": "--ns-shadow-sm",
+        "path": [
+          "shadow",
+          "sm"
+        ]
+      },
+      "shadow-md": {
+        "type": "shadow",
+        "value": "0 4px 6px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08)",
+        "cssVar": "--ns-shadow-md",
+        "path": [
+          "shadow",
+          "md"
+        ]
+      },
+      "shadow-lg": {
+        "type": "shadow",
+        "value": "0 10px 15px rgba(0, 0, 0, 0.12), 0 4px 6px rgba(0, 0, 0, 0.06)",
+        "cssVar": "--ns-shadow-lg",
+        "path": [
+          "shadow",
+          "lg"
+        ]
+      },
+      "bg": {
+        "type": "color",
+        "value": "var(--ns-gray-12)",
+        "cssVar": "--ns-bg",
+        "path": [
+          "semantic",
+          "bg"
+        ]
+      },
+      "fg": {
+        "type": "color",
+        "value": "var(--ns-gray-1)",
+        "cssVar": "--ns-fg",
+        "path": [
+          "semantic",
+          "fg"
+        ]
+      },
+      "surface": {
+        "type": "color",
+        "value": "var(--ns-gray-11)",
+        "cssVar": "--ns-surface",
+        "path": [
+          "semantic",
+          "surface"
+        ]
+      },
+      "surface-raised": {
+        "type": "color",
+        "value": "var(--ns-gray-10)",
+        "cssVar": "--ns-surface-raised",
+        "path": [
+          "semantic",
+          "surface-raised"
+        ]
+      },
+      "overlay": {
+        "type": "color",
+        "value": "rgba(17, 17, 16, 0.8)",
+        "cssVar": "--ns-overlay",
+        "path": [
+          "semantic",
+          "overlay"
+        ]
+      },
+      "card": {
+        "type": "color",
+        "value": "var(--ns-gray-10)",
+        "cssVar": "--ns-card",
+        "path": [
+          "semantic",
+          "card"
+        ]
+      },
+      "card-fg": {
+        "type": "color",
+        "value": "var(--ns-gray-1)",
+        "cssVar": "--ns-card-fg",
+        "path": [
+          "semantic",
+          "card-fg"
+        ]
+      },
+      "primary-subtle": {
+        "type": "color",
+        "value": "rgba(200, 149, 108, 0.08)",
+        "cssVar": "--ns-primary-subtle",
+        "path": [
+          "semantic",
+          "primary-subtle"
+        ]
+      },
+      "primary-border": {
+        "type": "color",
+        "value": "rgba(200, 149, 108, 0.18)",
+        "cssVar": "--ns-primary-border",
+        "path": [
+          "semantic",
+          "primary-border"
+        ]
+      },
+      "secondary-subtle": {
+        "type": "color",
+        "value": "rgba(144, 152, 166, 0.07)",
+        "cssVar": "--ns-secondary-subtle",
+        "path": [
+          "semantic",
+          "secondary-subtle"
+        ]
+      },
+      "secondary-border": {
+        "type": "color",
+        "value": "rgba(144, 152, 166, 0.14)",
+        "cssVar": "--ns-secondary-border",
+        "path": [
+          "semantic",
+          "secondary-border"
+        ]
+      },
+      "muted": {
+        "type": "color",
+        "value": "var(--ns-gray-9)",
+        "cssVar": "--ns-muted",
+        "path": [
+          "semantic",
+          "muted"
+        ]
+      },
+      "muted-fg": {
+        "type": "color",
+        "value": "var(--ns-gray-5)",
+        "cssVar": "--ns-muted-fg",
+        "path": [
+          "semantic",
+          "muted-fg"
+        ]
+      },
+      "success-subtle": {
+        "type": "color",
+        "value": "rgba(91, 168, 160, 0.07)",
+        "cssVar": "--ns-success-subtle",
+        "path": [
+          "semantic",
+          "success-subtle"
+        ]
+      },
+      "success-border": {
+        "type": "color",
+        "value": "rgba(91, 168, 160, 0.15)",
+        "cssVar": "--ns-success-border",
+        "path": [
+          "semantic",
+          "success-border"
+        ]
+      },
+      "warning-subtle": {
+        "type": "color",
+        "value": "rgba(224, 174, 79, 0.08)",
+        "cssVar": "--ns-warning-subtle",
+        "path": [
+          "semantic",
+          "warning-subtle"
+        ]
+      },
+      "warning-border": {
+        "type": "color",
+        "value": "rgba(224, 174, 79, 0.16)",
+        "cssVar": "--ns-warning-border",
+        "path": [
+          "semantic",
+          "warning-border"
+        ]
+      },
+      "destructive-subtle": {
+        "type": "color",
+        "value": "rgba(224, 69, 69, 0.08)",
+        "cssVar": "--ns-destructive-subtle",
+        "path": [
+          "semantic",
+          "destructive-subtle"
+        ]
+      },
+      "destructive-border": {
+        "type": "color",
+        "value": "rgba(224, 69, 69, 0.16)",
+        "cssVar": "--ns-destructive-border",
+        "path": [
+          "semantic",
+          "destructive-border"
+        ]
+      },
+      "border": {
+        "type": "color",
+        "value": "rgba(235, 228, 210, 0.06)",
+        "cssVar": "--ns-border",
+        "path": [
+          "semantic",
+          "border"
+        ]
+      },
+      "border-hover": {
+        "type": "color",
+        "value": "rgba(235, 228, 210, 0.12)",
+        "cssVar": "--ns-border-hover",
+        "path": [
+          "semantic",
+          "border-hover"
+        ]
+      },
+      "border-strong": {
+        "type": "color",
+        "value": "rgba(235, 228, 210, 0.18)",
+        "cssVar": "--ns-border-strong",
+        "path": [
+          "semantic",
+          "border-strong"
+        ]
+      },
+      "input-border": {
+        "type": "color",
+        "value": "var(--ns-gray-6)",
+        "cssVar": "--ns-input-border",
+        "path": [
+          "semantic",
+          "input-border"
+        ]
+      }
+    }
+  },
+  "css": "/*\n * Initial token seed for @netscript/fresh-ui.\n *\n * Current state:\n *   - checked-in CSS custom properties\n *   - copied into consumer apps as owned source\n *\n * Planned direction:\n *   - Style Dictionary becomes the canonical token source\n *   - this file becomes a generated artifact\n */\n\n:root {\n  color-scheme: light;\n\n  --ns-gray-1: #fcfaf6;\n  --ns-gray-1: oklch(98.5% 0.006 85);\n  --ns-gray-2: #efece8;\n  --ns-gray-2: oklch(94.5% 0.006 85);\n  --ns-gray-3: #dbd9d5;\n  --ns-gray-3: oklch(88.5% 0.006 85);\n  --ns-gray-4: #c1bfbb;\n  --ns-gray-4: oklch(80.5% 0.006 85);\n  --ns-gray-5: #aba9a5;\n  --ns-gray-5: oklch(73.5% 0.006 85);\n  --ns-gray-6: #807e7b;\n  --ns-gray-6: oklch(59.5% 0.006 85);\n  --ns-gray-7: #5c5b57;\n  --ns-gray-7: oklch(47% 0.006 85);\n  --ns-gray-8: #413f3c;\n  --ns-gray-8: oklch(37% 0.006 85);\n  --ns-gray-9: #282623;\n  --ns-gray-9: oklch(27% 0.006 85);\n  --ns-gray-10: #1b1916;\n  --ns-gray-10: oklch(21.5% 0.006 85);\n  --ns-gray-11: #12100e;\n  --ns-gray-11: oklch(17.5% 0.006 85);\n  --ns-gray-12: #090806;\n  --ns-gray-12: oklch(13.5% 0.006 85);\n\n  --ns-copper-1: #ffece1;\n  --ns-copper-1: oklch(95.5% 0.025 52);\n  --ns-copper-2: #fecdb0;\n  --ns-copper-2: oklch(88.5% 0.068 52);\n  --ns-copper-3: #f9af82;\n  --ns-copper-3: oklch(81.5% 0.105 52);\n  --ns-copper-4: #e1996d;\n  --ns-copper-4: oklch(74.5% 0.105 52);\n  --ns-copper-5: #d08a5e;\n  --ns-copper-5: oklch(69.5% 0.105 52);\n  --ns-copper-6: #bd774c;\n  --ns-copper-6: oklch(63.5% 0.105 52);\n  --ns-copper-7: #a36034;\n  --ns-copper-7: oklch(55.5% 0.105 52);\n  --ns-copper-8: #884719;\n  --ns-copper-8: oklch(47% 0.105 52);\n\n  --ns-teal-1: #befffa;\n  --ns-teal-1: oklch(95.5% 0.065 190);\n  --ns-teal-2: #94e8e2;\n  --ns-teal-2: oklch(87.5% 0.082 190);\n  --ns-teal-3: #77cac4;\n  --ns-teal-3: oklch(78.5% 0.082 190);\n  --ns-teal-4: #5db1ab;\n  --ns-teal-4: oklch(70.5% 0.082 190);\n  --ns-teal-5: #3e938e;\n  --ns-teal-5: oklch(61% 0.082 190);\n  --ns-teal-6: #227c78;\n  --ns-teal-6: oklch(53.5% 0.082 190);\n  --ns-teal-7: #026460;\n  --ns-teal-7: oklch(45.5% 0.078 190);\n\n  --ns-slate-1: #ecf4fe;\n  --ns-slate-1: oklch(96.5% 0.016 255);\n  --ns-slate-2: #d0deef;\n  --ns-slate-2: oklch(89.5% 0.028 255);\n  --ns-slate-3: #afbccd;\n  --ns-slate-3: oklch(79% 0.028 255);\n  --ns-slate-4: #95a1b2;\n  --ns-slate-4: oklch(70.5% 0.028 255);\n  --ns-slate-5: #7a8696;\n  --ns-slate-5: oklch(61.5% 0.028 255);\n  --ns-slate-6: #606b7b;\n  --ns-slate-6: oklch(52.5% 0.028 255);\n  --ns-slate-7: #475261;\n  --ns-slate-7: oklch(43.5% 0.028 255);\n\n  --ns-red-4: #f57164;\n  --ns-red-4: oklch(70.5% 0.165 28);\n  --ns-red-5: #d9584c;\n  --ns-red-5: oklch(62.5% 0.165 28);\n  --ns-red-6: #bd3e35;\n  --ns-red-6: oklch(54.5% 0.165 28);\n  --ns-red-7: #9e1d19;\n  --ns-red-7: oklch(45.5% 0.165 28);\n\n  --ns-amber-4: #f0b758;\n  --ns-amber-4: oklch(81.5% 0.13 78);\n  --ns-amber-5: #d69e3c;\n  --ns-amber-5: oklch(73.5% 0.13 78);\n  --ns-amber-6: #bc8519;\n  --ns-amber-6: oklch(65.5% 0.13 78);\n\n  --ns-bg: var(--ns-gray-1);\n  --ns-fg: var(--ns-gray-12);\n  --ns-surface: var(--ns-gray-2);\n  --ns-surface-raised: #ffffff;\n  --ns-overlay: rgba(0, 0, 0, 0.4);\n\n  --ns-card: #ffffff;\n  --ns-card-fg: var(--ns-gray-12);\n\n  --ns-primary: var(--ns-copper-6);\n  --ns-primary-fg: var(--ns-gray-12);\n  --ns-primary-hover: oklch(58.5% 0.105 52);\n  --ns-primary-subtle: rgba(200, 149, 108, 0.1);\n  --ns-primary-border: rgba(200, 149, 108, 0.25);\n\n  --ns-secondary: var(--ns-slate-5);\n  --ns-secondary-fg: var(--ns-gray-12);\n  --ns-secondary-hover: oklch(57.5% 0.028 255);\n  --ns-secondary-subtle: rgba(144, 152, 166, 0.1);\n  --ns-secondary-border: rgba(144, 152, 166, 0.2);\n\n  --ns-muted: var(--ns-gray-3);\n  --ns-muted-fg: var(--ns-gray-7);\n\n  --ns-accent: var(--ns-copper-6);\n  --ns-accent-fg: var(--ns-gray-12);\n  --ns-accent-subtle: rgba(200, 149, 108, 0.08);\n  --ns-accent-border: rgba(200, 149, 108, 0.18);\n\n  --ns-success: var(--ns-teal-5);\n  --ns-success-fg: var(--ns-gray-12);\n  --ns-success-subtle: rgba(91, 168, 160, 0.1);\n  --ns-success-border: rgba(91, 168, 160, 0.2);\n\n  --ns-warning: var(--ns-amber-5);\n  --ns-warning-fg: var(--ns-gray-12);\n  --ns-warning-subtle: rgba(224, 174, 79, 0.1);\n  --ns-warning-border: rgba(224, 174, 79, 0.2);\n\n  --ns-destructive: oklch(58% 0.165 28);\n  --ns-destructive-fg: #ffffff;\n  --ns-destructive-subtle: rgba(224, 69, 69, 0.1);\n  --ns-destructive-border: rgba(224, 69, 69, 0.2);\n\n  --ns-border: rgba(0, 0, 0, 0.08);\n  --ns-border-hover: rgba(0, 0, 0, 0.14);\n  --ns-border-strong: rgba(0, 0, 0, 0.22);\n  --ns-input-border: var(--ns-gray-6);\n  --ns-ring: var(--ns-copper-7);\n\n  --ns-font-sans: 'DM Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;\n  --ns-font-mono: 'DM Mono', ui-monospace, 'Cascadia Code', 'Fira Code', monospace;\n\n  --ns-text-xs: 0.75rem;\n  --ns-text-sm: 0.875rem;\n  --ns-text-base: 1rem;\n  --ns-text-lg: 1.125rem;\n  --ns-text-xl: 1.25rem;\n  --ns-text-2xl: 1.5rem;\n  --ns-text-3xl: 1.875rem;\n  --ns-text-4xl: 2.25rem;\n  --ns-text-3xs: 0.625rem;\n  --ns-text-2xs: 0.6875rem;\n  --ns-text-chat: 0.9375rem;\n\n  --ns-leading-tight: 1.1;\n  --ns-leading-snug: 1.3;\n  --ns-leading-normal: 1.5;\n  --ns-leading-relaxed: 1.7;\n\n  --ns-tracking-tight: -0.02em;\n  --ns-tracking-normal: 0;\n  --ns-tracking-wide: 0.12em;\n\n  --ns-space-0: 0;\n  --ns-space-px: 1px;\n  --ns-space-0-5: 0.125rem;\n  --ns-space-1: 0.25rem;\n  --ns-space-1-5: 0.375rem;\n  --ns-space-2: 0.5rem;\n  --ns-space-3: 0.75rem;\n  --ns-space-4: 1rem;\n  --ns-space-5: 1.25rem;\n  --ns-space-6: 1.5rem;\n  --ns-space-8: 2rem;\n  --ns-space-10: 2.5rem;\n  --ns-space-12: 3rem;\n  --ns-space-16: 4rem;\n  --ns-space-20: 5rem;\n  --ns-space-2-5: 0.625rem;\n  --ns-space-3-5: 0.875rem;\n  --ns-space-7: 1.75rem;\n  --ns-space-9: 2.25rem;\n  --ns-space-11: 2.75rem;\n  --ns-space-14: 3.5rem;\n  --ns-space-24: 6rem;\n\n  --ns-avatar-sm: 1.5rem;\n  --ns-avatar-md: 2rem;\n  --ns-avatar-lg: 2.5rem;\n  --ns-control-h: 2.25rem;\n  --ns-control-h-sm: 2rem;\n\n  --ns-app-nav: 17rem;\n  --ns-app-rail: 20rem;\n  --ns-topbar-h: 3.5rem;\n  --ns-shell-content: 67.5rem;\n\n  --ns-label-size: 0.6875rem;\n  --ns-label-tracking: 0.06em;\n\n  --ns-radius-sm: 4px;\n  --ns-radius-md: 6px;\n  --ns-radius-lg: 8px;\n  --ns-radius-xl: 12px;\n  --ns-radius-2xl: 16px;\n  --ns-radius-full: 9999px;\n\n  --ns-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);\n  --ns-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);\n  --ns-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);\n  --ns-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.06), 0 4px 6px rgba(0, 0, 0, 0.03);\n  --ns-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15), 0 10px 10px rgba(0, 0, 0, 0.06);\n\n  --ns-ease-fast: 100ms ease; /* @kind other */\n  --ns-ease-normal: 150ms ease; /* @kind other */\n  --ns-ease-slow: 250ms ease; /* @kind other */\n  --ns-ease-spring: 300ms cubic-bezier(0.34, 1.56, 0.64, 1); /* @kind other */\n\n  --ns-z-base: 0;\n  --ns-z-dropdown: 10;\n  --ns-z-sticky: 20;\n  --ns-z-overlay: 30;\n  --ns-z-modal: 40;\n  --ns-z-toast: 50;\n}\n\n[data-theme='dark'] {\n  color-scheme: dark;\n\n  --ns-bg: var(--ns-gray-12);\n  --ns-fg: var(--ns-gray-1);\n  --ns-surface: var(--ns-gray-11);\n  --ns-surface-raised: var(--ns-gray-10);\n  --ns-overlay: rgba(17, 17, 16, 0.8);\n\n  --ns-card: var(--ns-gray-10);\n  --ns-card-fg: var(--ns-gray-1);\n\n  --ns-primary-subtle: rgba(200, 149, 108, 0.08);\n  --ns-primary-border: rgba(200, 149, 108, 0.18);\n  --ns-secondary-subtle: rgba(144, 152, 166, 0.07);\n  --ns-secondary-border: rgba(144, 152, 166, 0.14);\n\n  --ns-muted: var(--ns-gray-9);\n  --ns-muted-fg: var(--ns-gray-5);\n\n  --ns-success-subtle: rgba(91, 168, 160, 0.07);\n  --ns-success-border: rgba(91, 168, 160, 0.15);\n  --ns-warning-subtle: rgba(224, 174, 79, 0.08);\n  --ns-warning-border: rgba(224, 174, 79, 0.16);\n  --ns-destructive-subtle: rgba(224, 69, 69, 0.08);\n  --ns-destructive-border: rgba(224, 69, 69, 0.16);\n\n  --ns-border: rgba(235, 228, 210, 0.06);\n  --ns-border-hover: rgba(235, 228, 210, 0.12);\n  --ns-border-strong: rgba(235, 228, 210, 0.18);\n  --ns-input-border: var(--ns-gray-6);\n\n  --ns-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.18);\n  --ns-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.1);\n  --ns-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);\n  --ns-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.12), 0 4px 6px rgba(0, 0, 0, 0.06);\n}\n",
+  "primitives": {
+    "$description": "Primitive NetScript UI token source transcribed from registry/theme/tokens.css.",
+    "color": {
+      "gray": {
+        "1": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.985,
+              0.006,
+              85
+            ],
+            "hex": "#fcfaf6"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-gray-1"
+            }
+          }
+        },
+        "2": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.945,
+              0.006,
+              85
+            ],
+            "hex": "#efece8"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-gray-2"
+            }
+          }
+        },
+        "3": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.885,
+              0.006,
+              85
+            ],
+            "hex": "#dbd9d5"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-gray-3"
+            }
+          }
+        },
+        "4": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.805,
+              0.006,
+              85
+            ],
+            "hex": "#c1bfbb"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-gray-4"
+            }
+          }
+        },
+        "5": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.735,
+              0.006,
+              85
+            ],
+            "hex": "#aba9a5"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-gray-5"
+            }
+          }
+        },
+        "6": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.595,
+              0.006,
+              85
+            ],
+            "hex": "#807e7b"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-gray-6"
+            }
+          }
+        },
+        "7": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.47,
+              0.006,
+              85
+            ],
+            "hex": "#5c5b57"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-gray-7"
+            }
+          }
+        },
+        "8": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.37,
+              0.006,
+              85
+            ],
+            "hex": "#413f3c"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-gray-8"
+            }
+          }
+        },
+        "9": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.27,
+              0.006,
+              85
+            ],
+            "hex": "#282623"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-gray-9"
+            }
+          }
+        },
+        "10": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.215,
+              0.006,
+              85
+            ],
+            "hex": "#1b1916"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-gray-10"
+            }
+          }
+        },
+        "11": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.175,
+              0.006,
+              85
+            ],
+            "hex": "#12100e"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-gray-11"
+            }
+          }
+        },
+        "12": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.135,
+              0.006,
+              85
+            ],
+            "hex": "#090806"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-gray-12"
+            }
+          }
+        }
+      },
+      "copper": {
+        "1": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.955,
+              0.025,
+              52
+            ],
+            "hex": "#ffece1"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-copper-1"
+            }
+          }
+        },
+        "2": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.885,
+              0.068,
+              52
+            ],
+            "hex": "#fecdb0"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-copper-2"
+            }
+          }
+        },
+        "3": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.815,
+              0.105,
+              52
+            ],
+            "hex": "#f9af82"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-copper-3"
+            }
+          }
+        },
+        "4": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.745,
+              0.105,
+              52
+            ],
+            "hex": "#e1996d"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-copper-4"
+            }
+          }
+        },
+        "5": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.695,
+              0.105,
+              52
+            ],
+            "hex": "#d08a5e"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-copper-5"
+            }
+          }
+        },
+        "6": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.635,
+              0.105,
+              52
+            ],
+            "hex": "#bd774c"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-copper-6"
+            }
+          }
+        },
+        "7": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.555,
+              0.105,
+              52
+            ],
+            "hex": "#a36034"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-copper-7"
+            }
+          }
+        },
+        "8": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.47,
+              0.105,
+              52
+            ],
+            "hex": "#884719"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-copper-8"
+            }
+          }
+        }
+      },
+      "teal": {
+        "1": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.955,
+              0.065,
+              190
+            ],
+            "hex": "#befffa"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-teal-1"
+            }
+          }
+        },
+        "2": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.875,
+              0.082,
+              190
+            ],
+            "hex": "#94e8e2"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-teal-2"
+            }
+          }
+        },
+        "3": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.785,
+              0.082,
+              190
+            ],
+            "hex": "#77cac4"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-teal-3"
+            }
+          }
+        },
+        "4": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.705,
+              0.082,
+              190
+            ],
+            "hex": "#5db1ab"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-teal-4"
+            }
+          }
+        },
+        "5": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.61,
+              0.082,
+              190
+            ],
+            "hex": "#3e938e"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-teal-5"
+            }
+          }
+        },
+        "6": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.535,
+              0.082,
+              190
+            ],
+            "hex": "#227c78"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-teal-6"
+            }
+          }
+        },
+        "7": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.455,
+              0.078,
+              190
+            ],
+            "hex": "#026460"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-teal-7"
+            }
+          }
+        }
+      },
+      "slate": {
+        "1": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.965,
+              0.016,
+              255
+            ],
+            "hex": "#ecf4fe"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-slate-1"
+            }
+          }
+        },
+        "2": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.895,
+              0.028,
+              255
+            ],
+            "hex": "#d0deef"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-slate-2"
+            }
+          }
+        },
+        "3": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.79,
+              0.028,
+              255
+            ],
+            "hex": "#afbccd"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-slate-3"
+            }
+          }
+        },
+        "4": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.705,
+              0.028,
+              255
+            ],
+            "hex": "#95a1b2"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-slate-4"
+            }
+          }
+        },
+        "5": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.615,
+              0.028,
+              255
+            ],
+            "hex": "#7a8696"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-slate-5"
+            }
+          }
+        },
+        "6": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.525,
+              0.028,
+              255
+            ],
+            "hex": "#606b7b"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-slate-6"
+            }
+          }
+        },
+        "7": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.435,
+              0.028,
+              255
+            ],
+            "hex": "#475261"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-slate-7"
+            }
+          }
+        }
+      },
+      "red": {
+        "4": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.705,
+              0.165,
+              28
+            ],
+            "hex": "#f57164"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-red-4"
+            }
+          }
+        },
+        "5": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.625,
+              0.165,
+              28
+            ],
+            "hex": "#d9584c"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-red-5"
+            }
+          }
+        },
+        "6": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.545,
+              0.165,
+              28
+            ],
+            "hex": "#bd3e35"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-red-6"
+            }
+          }
+        },
+        "7": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.455,
+              0.165,
+              28
+            ],
+            "hex": "#9e1d19"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-red-7"
+            }
+          }
+        }
+      },
+      "amber": {
+        "4": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.815,
+              0.13,
+              78
+            ],
+            "hex": "#f0b758"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-amber-4"
+            }
+          }
+        },
+        "5": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.735,
+              0.13,
+              78
+            ],
+            "hex": "#d69e3c"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-amber-5"
+            }
+          }
+        },
+        "6": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [
+              0.655,
+              0.13,
+              78
+            ],
+            "hex": "#bc8519"
+          },
+          "$extensions": {
+            "netscript": {
+              "cssVar": "--ns-amber-6"
+            }
+          }
+        }
+      }
+    },
+    "font": {
+      "sans": {
+        "$type": "fontFamily",
+        "$value": "'DM Sans', 'Segoe UI', system-ui, -apple-system, sans-serif",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-font-sans"
+          }
+        }
+      },
+      "mono": {
+        "$type": "fontFamily",
+        "$value": "'DM Mono', ui-monospace, 'Cascadia Code', 'Fira Code', monospace",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-font-mono"
+          }
+        }
+      }
+    },
+    "text": {
+      "xs": {
+        "$type": "dimension",
+        "$value": "0.75rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-text-xs"
+          }
+        }
+      },
+      "sm": {
+        "$type": "dimension",
+        "$value": "0.875rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-text-sm"
+          }
+        }
+      },
+      "base": {
+        "$type": "dimension",
+        "$value": "1rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-text-base"
+          }
+        }
+      },
+      "lg": {
+        "$type": "dimension",
+        "$value": "1.125rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-text-lg"
+          }
+        }
+      },
+      "xl": {
+        "$type": "dimension",
+        "$value": "1.25rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-text-xl"
+          }
+        }
+      },
+      "2xl": {
+        "$type": "dimension",
+        "$value": "1.5rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-text-2xl"
+          }
+        }
+      },
+      "3xl": {
+        "$type": "dimension",
+        "$value": "1.875rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-text-3xl"
+          }
+        }
+      },
+      "4xl": {
+        "$type": "dimension",
+        "$value": "2.25rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-text-4xl"
+          }
+        }
+      },
+      "3xs": {
+        "$type": "dimension",
+        "$value": "0.625rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-text-3xs"
+          }
+        }
+      },
+      "2xs": {
+        "$type": "dimension",
+        "$value": "0.6875rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-text-2xs"
+          }
+        }
+      },
+      "chat": {
+        "$type": "dimension",
+        "$value": "0.9375rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-text-chat"
+          }
+        }
+      }
+    },
+    "leading": {
+      "tight": {
+        "$type": "number",
+        "$value": "1.1",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-leading-tight"
+          }
+        }
+      },
+      "snug": {
+        "$type": "number",
+        "$value": "1.3",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-leading-snug"
+          }
+        }
+      },
+      "normal": {
+        "$type": "number",
+        "$value": "1.5",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-leading-normal"
+          }
+        }
+      },
+      "relaxed": {
+        "$type": "number",
+        "$value": "1.7",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-leading-relaxed"
+          }
+        }
+      }
+    },
+    "tracking": {
+      "tight": {
+        "$type": "dimension",
+        "$value": "-0.02em",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-tracking-tight"
+          }
+        }
+      },
+      "normal": {
+        "$type": "dimension",
+        "$value": "0",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-tracking-normal"
+          }
+        }
+      },
+      "wide": {
+        "$type": "dimension",
+        "$value": "0.12em",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-tracking-wide"
+          }
+        }
+      }
+    },
+    "space": {
+      "0": {
+        "$type": "dimension",
+        "$value": "0",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-0"
+          }
+        }
+      },
+      "1": {
+        "$type": "dimension",
+        "$value": "0.25rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-1"
+          }
+        }
+      },
+      "2": {
+        "$type": "dimension",
+        "$value": "0.5rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-2"
+          }
+        }
+      },
+      "3": {
+        "$type": "dimension",
+        "$value": "0.75rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-3"
+          }
+        }
+      },
+      "4": {
+        "$type": "dimension",
+        "$value": "1rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-4"
+          }
+        }
+      },
+      "5": {
+        "$type": "dimension",
+        "$value": "1.25rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-5"
+          }
+        }
+      },
+      "6": {
+        "$type": "dimension",
+        "$value": "1.5rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-6"
+          }
+        }
+      },
+      "8": {
+        "$type": "dimension",
+        "$value": "2rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-8"
+          }
+        }
+      },
+      "10": {
+        "$type": "dimension",
+        "$value": "2.5rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-10"
+          }
+        }
+      },
+      "12": {
+        "$type": "dimension",
+        "$value": "3rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-12"
+          }
+        }
+      },
+      "16": {
+        "$type": "dimension",
+        "$value": "4rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-16"
+          }
+        }
+      },
+      "20": {
+        "$type": "dimension",
+        "$value": "5rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-20"
+          }
+        }
+      },
+      "px": {
+        "$type": "dimension",
+        "$value": "1px",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-px"
+          }
+        }
+      },
+      "0-5": {
+        "$type": "dimension",
+        "$value": "0.125rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-0-5"
+          }
+        }
+      },
+      "1-5": {
+        "$type": "dimension",
+        "$value": "0.375rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-1-5"
+          }
+        }
+      },
+      "2-5": {
+        "$type": "dimension",
+        "$value": "0.625rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-2-5"
+          }
+        }
+      },
+      "3-5": {
+        "$type": "dimension",
+        "$value": "0.875rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-3-5"
+          }
+        }
+      },
+      "7": {
+        "$type": "dimension",
+        "$value": "1.75rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-7"
+          }
+        }
+      },
+      "9": {
+        "$type": "dimension",
+        "$value": "2.25rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-9"
+          }
+        }
+      },
+      "11": {
+        "$type": "dimension",
+        "$value": "2.75rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-11"
+          }
+        }
+      },
+      "14": {
+        "$type": "dimension",
+        "$value": "3.5rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-14"
+          }
+        }
+      },
+      "24": {
+        "$type": "dimension",
+        "$value": "6rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-space-24"
+          }
+        }
+      }
+    },
+    "size": {
+      "avatar-sm": {
+        "$type": "dimension",
+        "$value": "1.5rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-avatar-sm"
+          }
+        }
+      },
+      "avatar-md": {
+        "$type": "dimension",
+        "$value": "2rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-avatar-md"
+          }
+        }
+      },
+      "avatar-lg": {
+        "$type": "dimension",
+        "$value": "2.5rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-avatar-lg"
+          }
+        }
+      },
+      "control-h": {
+        "$type": "dimension",
+        "$value": "2.25rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-control-h"
+          }
+        }
+      },
+      "control-h-sm": {
+        "$type": "dimension",
+        "$value": "2rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-control-h-sm"
+          }
+        }
+      }
+    },
+    "layout": {
+      "app-nav": {
+        "$type": "dimension",
+        "$value": "17rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-app-nav"
+          }
+        }
+      },
+      "app-rail": {
+        "$type": "dimension",
+        "$value": "20rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-app-rail"
+          }
+        }
+      },
+      "topbar-h": {
+        "$type": "dimension",
+        "$value": "3.5rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-topbar-h"
+          }
+        }
+      },
+      "shell-content": {
+        "$type": "dimension",
+        "$value": "67.5rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-shell-content"
+          }
+        }
+      }
+    },
+    "label": {
+      "size": {
+        "$type": "dimension",
+        "$value": "0.6875rem",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-label-size"
+          }
+        }
+      },
+      "tracking": {
+        "$type": "dimension",
+        "$value": "0.06em",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-label-tracking"
+          }
+        }
+      }
+    },
+    "radius": {
+      "sm": {
+        "$type": "dimension",
+        "$value": "4px",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-radius-sm"
+          }
+        }
+      },
+      "md": {
+        "$type": "dimension",
+        "$value": "6px",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-radius-md"
+          }
+        }
+      },
+      "lg": {
+        "$type": "dimension",
+        "$value": "8px",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-radius-lg"
+          }
+        }
+      },
+      "xl": {
+        "$type": "dimension",
+        "$value": "12px",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-radius-xl"
+          }
+        }
+      },
+      "2xl": {
+        "$type": "dimension",
+        "$value": "16px",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-radius-2xl"
+          }
+        }
+      },
+      "full": {
+        "$type": "dimension",
+        "$value": "9999px",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-radius-full"
+          }
+        }
+      }
+    },
+    "shadow": {
+      "xs": {
+        "$type": "shadow",
+        "$value": "0 1px 2px rgba(0, 0, 0, 0.18)",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-shadow-xs"
+          }
+        }
+      },
+      "sm": {
+        "$type": "shadow",
+        "$value": "0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.1)",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-shadow-sm"
+          }
+        }
+      },
+      "md": {
+        "$type": "shadow",
+        "$value": "0 4px 6px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08)",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-shadow-md"
+          }
+        }
+      },
+      "lg": {
+        "$type": "shadow",
+        "$value": "0 10px 15px rgba(0, 0, 0, 0.12), 0 4px 6px rgba(0, 0, 0, 0.06)",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-shadow-lg"
+          }
+        }
+      },
+      "xl": {
+        "$type": "shadow",
+        "$value": "0 20px 25px rgba(0, 0, 0, 0.15), 0 10px 10px rgba(0, 0, 0, 0.06)",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-shadow-xl"
+          }
+        }
+      }
+    },
+    "ease": {
+      "fast": {
+        "$type": "duration",
+        "$value": "100ms ease",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-ease-fast"
+          }
+        }
+      },
+      "normal": {
+        "$type": "duration",
+        "$value": "150ms ease",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-ease-normal"
+          }
+        }
+      },
+      "slow": {
+        "$type": "duration",
+        "$value": "250ms ease",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-ease-slow"
+          }
+        }
+      },
+      "spring": {
+        "$type": "duration",
+        "$value": "300ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-ease-spring"
+          }
+        }
+      }
+    },
+    "z": {
+      "base": {
+        "$type": "number",
+        "$value": "0",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-z-base"
+          }
+        }
+      },
+      "dropdown": {
+        "$type": "number",
+        "$value": "10",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-z-dropdown"
+          }
+        }
+      },
+      "sticky": {
+        "$type": "number",
+        "$value": "20",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-z-sticky"
+          }
+        }
+      },
+      "overlay": {
+        "$type": "number",
+        "$value": "30",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-z-overlay"
+          }
+        }
+      },
+      "modal": {
+        "$type": "number",
+        "$value": "40",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-z-modal"
+          }
+        }
+      },
+      "toast": {
+        "$type": "number",
+        "$value": "50",
+        "$extensions": {
+          "netscript": {
+            "cssVar": "--ns-z-toast"
+          }
+        }
+      }
+    }
+  },
+  "bridge": "/* Generated by `deno task tokens:build`. */\n@theme inline {\n  --color-ns-bg: var(--ns-bg);\n  --color-ns-fg: var(--ns-fg);\n  --color-ns-surface: var(--ns-surface);\n  --color-ns-surface-raised: var(--ns-surface-raised);\n  --color-ns-overlay: var(--ns-overlay);\n  --color-ns-card: var(--ns-card);\n  --color-ns-card-fg: var(--ns-card-fg);\n  --color-ns-primary: var(--ns-primary);\n  --color-ns-primary-fg: var(--ns-primary-fg);\n  --color-ns-primary-hover: var(--ns-primary-hover);\n  --color-ns-primary-subtle: var(--ns-primary-subtle);\n  --color-ns-primary-border: var(--ns-primary-border);\n  --color-ns-secondary: var(--ns-secondary);\n  --color-ns-secondary-fg: var(--ns-secondary-fg);\n  --color-ns-secondary-hover: var(--ns-secondary-hover);\n  --color-ns-secondary-subtle: var(--ns-secondary-subtle);\n  --color-ns-secondary-border: var(--ns-secondary-border);\n  --color-ns-muted: var(--ns-muted);\n  --color-ns-muted-fg: var(--ns-muted-fg);\n  --color-ns-accent: var(--ns-accent);\n  --color-ns-accent-fg: var(--ns-accent-fg);\n  --color-ns-accent-subtle: var(--ns-accent-subtle);\n  --color-ns-accent-border: var(--ns-accent-border);\n  --color-ns-success: var(--ns-success);\n  --color-ns-success-fg: var(--ns-success-fg);\n  --color-ns-success-subtle: var(--ns-success-subtle);\n  --color-ns-success-border: var(--ns-success-border);\n  --color-ns-warning: var(--ns-warning);\n  --color-ns-warning-fg: var(--ns-warning-fg);\n  --color-ns-warning-subtle: var(--ns-warning-subtle);\n  --color-ns-warning-border: var(--ns-warning-border);\n  --color-ns-destructive: var(--ns-destructive);\n  --color-ns-destructive-fg: var(--ns-destructive-fg);\n  --color-ns-destructive-subtle: var(--ns-destructive-subtle);\n  --color-ns-destructive-border: var(--ns-destructive-border);\n  --color-ns-border: var(--ns-border);\n  --color-ns-border-hover: var(--ns-border-hover);\n  --color-ns-border-strong: var(--ns-border-strong);\n  --color-ns-input-border: var(--ns-input-border);\n  --color-ns-ring: var(--ns-ring);\n  --color-ns-input: var(--ns-input-border);\n  --font-sans: var(--ns-font-sans);\n  --font-mono: var(--ns-font-mono);\n  --spacing-ns-0: var(--ns-space-0);\n  --spacing-ns-px: var(--ns-space-px);\n  --spacing-ns-0-5: var(--ns-space-0-5);\n  --spacing-ns-1: var(--ns-space-1);\n  --spacing-ns-1-5: var(--ns-space-1-5);\n  --spacing-ns-2: var(--ns-space-2);\n  --spacing-ns-3: var(--ns-space-3);\n  --spacing-ns-4: var(--ns-space-4);\n  --spacing-ns-5: var(--ns-space-5);\n  --spacing-ns-6: var(--ns-space-6);\n  --spacing-ns-8: var(--ns-space-8);\n  --spacing-ns-10: var(--ns-space-10);\n  --spacing-ns-12: var(--ns-space-12);\n  --spacing-ns-16: var(--ns-space-16);\n  --spacing-ns-20: var(--ns-space-20);\n  --spacing-ns-2-5: var(--ns-space-2-5);\n  --spacing-ns-3-5: var(--ns-space-3-5);\n  --spacing-ns-7: var(--ns-space-7);\n  --spacing-ns-9: var(--ns-space-9);\n  --spacing-ns-11: var(--ns-space-11);\n  --spacing-ns-14: var(--ns-space-14);\n  --spacing-ns-24: var(--ns-space-24);\n  --radius-xs: 2px;\n  --radius-sm: var(--ns-radius-sm);\n  --radius-md: var(--ns-radius-md);\n  --radius-lg: var(--ns-radius-lg);\n  --radius-xl: var(--ns-radius-xl);\n  --radius-2xl: var(--ns-radius-2xl);\n  --radius-ns-sm: var(--ns-radius-sm);\n  --radius-ns-md: var(--ns-radius-md);\n  --radius-ns-lg: var(--ns-radius-lg);\n  --radius-ns-xl: var(--ns-radius-xl);\n  --radius-ns-2xl: var(--ns-radius-2xl);\n  --radius-ns-full: var(--ns-radius-full);\n  --shadow-xs: var(--ns-shadow-xs);\n  --shadow-sm: var(--ns-shadow-sm);\n  --shadow-md: var(--ns-shadow-md);\n  --shadow-lg: var(--ns-shadow-lg);\n  --shadow-ns-xs: var(--ns-shadow-xs);\n  --shadow-ns-sm: var(--ns-shadow-sm);\n  --shadow-ns-md: var(--ns-shadow-md);\n  --shadow-ns-lg: var(--ns-shadow-lg);\n  --shadow-ns-xl: var(--ns-shadow-xl);\n}\n",
+  "fontImports": [
+    "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+  ]
+}

@@ -1,0 +1,1 @@
+{"command":"deno fmt --check","cwd":"C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008","mode":"check","summary":{"filesSelected":2,"batches":1,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":2,"filesProcessed":2,"droppedFiles":[],"refusals":[]},"findings":[]}

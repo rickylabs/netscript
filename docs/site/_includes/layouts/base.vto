@@ -4,6 +4,7 @@
 <html lang="en" data-theme="studio" data-flavor="utility" data-gray="neutral" data-accent="ink" data-density="compact" data-scheme="light">
   <head>
     <meta charset="utf-8" />
+    {{ if internal }}<meta name="robots" content="noindex" />{{ /if }}
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ title }} · NetScript Docs</title>
     <meta name="description" content="{{ description || 'NetScript — the Deno meta-framework for typed, observable systems.' }}" />
@@ -22,7 +23,7 @@
       })();
     </script>
   </head>
-  <body data-docs-kind="{{ kind }}">
+  <body data-docs-kind="{{ kind }}"{{ if internal }} data-pagefind-ignore="all"{{ /if }}>
     <a href="#main-content" class="ns-skip-link">Skip to main content</a>
     <header class="docs-topbar">
       <button type="button" class="ns-icon-btn docs-menu-trigger js-only" data-sidebar-toggle aria-label="Open documentation navigation" aria-controls="navigation-dialog" aria-expanded="false">
@@ -62,11 +63,14 @@
             {{ /for }}
           {{ else }}
             {{ for root of lane.roots }}
-              {{ set tree = nav.menu(root, navQuery, navSort) }}
+              {{ set tree = nav.menu(root, navQuery, lane.sort || navSort) }}
               {{ if tree && tree.data }}
-                {{ if lane.expandRoot }}
+                {{ if lane.expandRoot && root === lane.roots[0] }}
                   <a href="{{ tree.data.url |> url }}" class="ns-dashboard__nav-item"{{ if url === tree.data.url }} aria-current="page"{{ /if }}>{{ tree.data.nav_title || tree.data.title }}</a>
-                  {{ for child of tree.children }}
+                  {{ for extra of lane.items || [] }}
+                    <a href="{{ extra.href |> url }}" class="ns-dashboard__nav-item"{{ if url === extra.href }} aria-current="page"{{ /if }}>{{ extra.label }}</a>
+                  {{ /for }}
+                  {{ for child of tree.children || [] }}
                     {{ include "nav/menu-item.vto" { item: child, currentUrl: url } }}
                   {{ /for }}
                 {{ else }}
@@ -85,21 +89,20 @@
         </details>
         {{ if kind !== "home" }}
           <div class="docs-page-toolbar">
-            {{ comp.breadcrumb({ url, title }) }}
-            <a class="ns-md-link" href="{{ (url + 'index.md') |> url }}" data-pagefind-ignore><span aria-hidden="true">▤</span> View as Markdown</a>
+            {{ comp.breadcrumb({ url, title, navTitle: nav_title }) }}
+            {{ if !internal }}<a class="ns-md-link" href="{{ (url + 'index.md') |> url }}" data-pagefind-ignore><span aria-hidden="true">▤</span> View as Markdown</a>{{ /if }}
           </div>
-          <p class="ns-eyebrow docs-page-eyebrow">{{ lane.label }}{{ if lane.label === "Build" }} · {{ (nav.breadcrumb(url, navQuery, navSort)[1]?.data?.nav_title || nav.breadcrumb(url, navQuery, navSort)[1]?.data?.title || "Capabilities") }}{{ /if }}</p>
         {{ /if }}
         <nav class="docs-anchor-nav" data-reference-nav aria-label="Reference sections" hidden></nav>
         {{ if url === "/web-layer/fresh-ui/" }}<div class="docs-owned-source" data-owned-source hidden><span class="ns-eyebrow">You own</span>{{ comp.filePathChip({ path: "apps/dashboard/components/ui/" }) }}{{ comp.filePathChip({ path: "assets/tokens.css" }) }}{{ comp.filePathChip({ path: "routes/(design)/" }) }}</div>{{ /if }}
         <div class="docs-content-layout">
-          <article class="ns-prose" data-pagefind-body data-pagefind-filter="lane:{{ lane.label }}">
+          <article class="ns-prose"{{ if !internal }} data-pagefind-body data-pagefind-filter="lane:{{ lane.label }}"{{ /if }}>
             {{ content }}
           </article>
           <nav class="ns-toc" data-toc aria-label="On this page" hidden>
             <p class="ns-eyebrow">On this page</p>
             <ol class="ns-toc__list" data-toc-list></ol>
-            <div class="ns-toc__actions"><a href="{{ (url + 'index.md') |> url }}">▤ View as Markdown</a><a href="#main-content">Back to top ↑</a></div>
+            <div class="ns-toc__actions">{{ if !internal }}<a href="{{ (url + 'index.md') |> url }}">▤ View as Markdown</a>{{ /if }}<a href="#main-content">Back to top ↑</a></div>
           </nav>
         </div>
         {{ if !content.includes('<nav class="ns-nextprev"') }}{{ comp.nextPrev({ prev, next, url }) }}{{ /if }}
@@ -113,7 +116,7 @@
 
     <footer class="docs-footer">
       <div><a href="{{ '/' |> url }}" class="docs-brand"><span class="docs-logo" aria-hidden="true">N</span>NetScript</a><p>The Deno meta-framework for typed, observable systems.</p></div>
-      <nav aria-label="Getting started"><p class="ns-eyebrow">Where to go</p><a href="{{ '/quickstart/' |> url }}">Scaffold and run a workspace</a><a href="{{ '/concepts/' |> url }}">The five-layer mental model</a><a href="{{ '/why/' |> url }}">The argument, with trade-offs</a><a href="{{ '/tutorials/storefront/' |> url }}">Build a real system</a><a href="{{ '/reference/' |> url }}">Package reference</a></nav>
+      <nav aria-label="Getting started"><p class="ns-eyebrow">Where to go</p><a href="{{ '/quickstart/' |> url }}">Scaffold and run a workspace</a><a href="{{ '/explanation/' |> url }}">The five-layer mental model</a><a href="{{ '/why/' |> url }}">The argument, with trade-offs</a><a href="{{ '/tutorials/storefront/' |> url }}">Build a real system</a><a href="{{ '/reference/' |> url }}">Package reference</a></nav>
       <nav aria-label="Footer documentation lanes"><p class="ns-eyebrow">Lanes</p>{{ for item of navLanes }}<a href="{{ item.href |> url }}">{{ item.label }}</a>{{ /for }}</nav>
     </footer>
 

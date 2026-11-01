@@ -182,14 +182,14 @@ with their tracking issue.
 
 ## NetScript Mapping
 
-| Layer              | Value                                                                                                                                              |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Figma Theme mode   | `<mode>`                                                                                                                                           |
-| Base gray × accent | `<gray> × <accent>`                                                                                                                                |
-| Density            | `<mode>`                                                                                                                                           |
-| Flavor             | `<mode or n/a>`                                                                                                                                    |
-| `data-theme`       | `<id>`                                                                                                                                             |
-| Language roles     | Token-only assignment: `none`. Declared language pack: the role manifest, every `<theme>/<path>` → `--ns-<theme>-<path>` it adds (GUIDELINES §2.4) |
+| Layer              | Value                                                                                                                         |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| Figma Theme mode   | `<mode>`                                                                                                                      |
+| Base gray × accent | `<gray> × <accent>`                                                                                                           |
+| Density            | `<mode>`                                                                                                                      |
+| Flavor             | `<mode or n/a>`                                                                                                               |
+| `data-theme`       | `<id>`                                                                                                                        |
+| Language roles     | Token-only preset: `none`. Style: the role manifest, every `<theme>/<path>` → `--ns-<theme>-<path>` it adds (GUIDELINES §2.4) |
 
 - **Pending roles:** any value that has no semantic role yet (a primitive or raw value bound
   directly in Figma). For each one, give the role that will replace it and the reason, marked "role

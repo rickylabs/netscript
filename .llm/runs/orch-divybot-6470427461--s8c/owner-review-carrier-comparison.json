@@ -1,0 +1,33 @@
+{
+  "added": [
+    "pages/design-system/docs-kit/callouts/index.md",
+    "pages/design-system/docs-kit/code/index.md",
+    "pages/design-system/docs-kit/index.md"
+  ],
+  "removed": [],
+  "changed": [
+    "llms.txt",
+    "pages/design-system/create-your-own-theme/index.md",
+    "pages/design-system/guidelines/index.md",
+    "pages/design-system/index.md",
+    "pages/design-system/themes/bloom/index.md",
+    "pages/design-system/themes/brutal/index.md",
+    "pages/design-system/themes/cupertino/index.md",
+    "pages/design-system/themes/filigrane/index.md",
+    "pages/design-system/themes/fluent/index.md",
+    "pages/design-system/themes/liquid/index.md",
+    "pages/design-system/themes/pixel/index.md",
+    "pages/design-system/themes/studio/index.md",
+    "pages/design-system/themes/tactile/index.md",
+    "pages/design-system/themes/terminal/index.md",
+    "pages/design-system/themes/tonal/index.md",
+    "pages/design-system/token-contract/index.md"
+  ],
+  "contextEntriesIdentical": true,
+  "internalGalleriesAbsent": true,
+  "allRowsIntegrityVerified": true,
+  "storedRowsBefore": 204,
+  "storedRowsAfter": 207,
+  "decodedEntriesBeforeIncludingDerivedFullCorpus": 205,
+  "decodedEntriesAfterIncludingDerivedFullCorpus": 208
+}

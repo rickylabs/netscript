@@ -1,0 +1,99 @@
+{
+  "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+  "messages": [
+    {
+      "id": "msg_180921bdf001e3db9J4oNnbgys",
+      "role": "user",
+      "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd"
+    },
+    {
+      "id": "msg_180921d23001BeBvZiVwheQKCi",
+      "role": "assistant",
+      "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+      "providerID": "openrouter",
+      "modelID": "x-ai/grok-4.7",
+      "variant": "xhigh",
+      "finish": "tool-calls"
+    },
+    {
+      "id": "msg_180926eed001hKYYCd9lxTp4ys",
+      "role": "assistant",
+      "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+      "providerID": "openrouter",
+      "modelID": "x-ai/grok-4.7",
+      "variant": "xhigh",
+      "finish": "tool-calls"
+    },
+    {
+      "id": "msg_180962fa9001cB77ejzQrGmMot",
+      "role": "assistant",
+      "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+      "providerID": "openrouter",
+      "modelID": "x-ai/grok-4.7",
+      "variant": "xhigh",
+      "finish": "stop"
+    },
+    {
+      "id": "msg_180ada427001Ee4EPbLDCEex2X",
+      "role": "user",
+      "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd"
+    },
+    {
+      "id": "msg_180ada590001Y5zbDnrUJdRzz3",
+      "role": "assistant",
+      "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+      "providerID": "openrouter",
+      "modelID": "x-ai/grok-4.7",
+      "variant": "xhigh",
+      "finish": "tool-calls"
+    },
+    {
+      "id": "msg_180adf8c9001LcEI96tYXuqO1M",
+      "role": "assistant",
+      "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+      "providerID": "openrouter",
+      "modelID": "x-ai/grok-4.7",
+      "variant": "xhigh",
+      "finish": "stop"
+    }
+  ],
+  "rawExportSha256": "70a126f6f1b48f04979fe8e5f1ac55926ce946af95e2c51300b4a5364902a7a8",
+  "capture": {
+    "stdoutCapturedBytes": 2833362,
+    "stderrCapturedBytes": 50,
+    "statusAwaited": true,
+    "pipesAwaited": true,
+    "terminationRequested": false
+  },
+  "privateReasoningPersisted": false,
+  "addedMessages": [
+    {
+      "id": "msg_180ada427001Ee4EPbLDCEex2X",
+      "role": "user",
+      "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd"
+    },
+    {
+      "id": "msg_180ada590001Y5zbDnrUJdRzz3",
+      "role": "assistant",
+      "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+      "providerID": "openrouter",
+      "modelID": "x-ai/grok-4.7",
+      "variant": "xhigh",
+      "finish": "tool-calls"
+    },
+    {
+      "id": "msg_180adf8c9001LcEI96tYXuqO1M",
+      "role": "assistant",
+      "sessionID": "ses_e7f6de463ffeReuJZAVbOznsLd",
+      "providerID": "openrouter",
+      "modelID": "x-ai/grok-4.7",
+      "variant": "xhigh",
+      "finish": "stop"
+    }
+  ],
+  "priorMessages": 4,
+  "nativeStepsAppliedToContinuationOnly": 2,
+  "sameSession": true,
+  "newSession": false,
+  "requestedVariant": "xhigh; actual provider effort not independently attested"
+}

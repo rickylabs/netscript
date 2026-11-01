@@ -1,0 +1,11 @@
+{
+  "code": 1,
+  "stdout": "",
+  "stderr": "Check $deno$stdin.ts\nerror: Uncaught (in promise) NotCapable: Requires ffi access to \"C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node\", run again with the --allow-ffi flag\n  return runtimeRequire(load.resolve(dir))\n         ^\n    at Object.Module._extensions..node (node:module:5:3135)\n    at Module.load (node:module:4:1568)\n    at Module._load (node:module:1:24918)\n    at Module.require (node:module:4:1989)\n    at require (node:module:5:3530)\n    at load (file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/node-gyp-build-optional-packages/5.2.2/node-gyp-build.js:28:10)\n    at file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/lmdb/3.5.7/native.js:52:26\n",
+  "pid": 29448,
+  "startedAt": "2026-10-28T05:10:28.924Z",
+  "finishedAt": "2026-10-28T05:10:30.234Z",
+  "statusSettled": true,
+  "pipesSettled": true,
+  "stdinSettled": true
+}

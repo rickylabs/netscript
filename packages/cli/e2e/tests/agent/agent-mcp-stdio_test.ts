@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { copy } from '@std/fs';
 import { fromFileUrl, join } from '@std/path';
+import { TOOL_NAMES } from '@netscript/mcp';
 import { createPublicCommandTree } from '../../../src/public/features/root/public-command-tree.ts';
 
 interface RpcResponse {
@@ -151,6 +152,30 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
         method: 'tools/call',
         params: { name: 'search_exports', arguments: { query: 'definePage' } },
       },
+      {
+        jsonrpc: '2.0',
+        id: 8,
+        method: 'tools/call',
+        params: { name: 'list_registry_items', arguments: { limit: 1 } },
+      },
+      {
+        jsonrpc: '2.0',
+        id: 9,
+        method: 'tools/call',
+        params: { name: 'search_registry_items', arguments: { query: 'button' } },
+      },
+      {
+        jsonrpc: '2.0',
+        id: 10,
+        method: 'tools/call',
+        params: { name: 'view_registry_item', arguments: { name: 'cn' } },
+      },
+      {
+        jsonrpc: '2.0',
+        id: 11,
+        method: 'tools/call',
+        params: { name: 'get_registry_add_command', arguments: { name: 'button' } },
+      },
     ];
     const writer = child.stdin.getWriter();
     await writer.write(
@@ -175,7 +200,7 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
       'Before implementing an unfamiliar NetScript API or architecture',
     );
     const tools = responses[1].result?.tools ?? [];
-    assertEquals(tools.length, 22);
+    assertEquals(tools.map((tool) => tool.name), [...TOOL_NAMES]);
     assert(tools.some((tool) => tool.name === 'find_guidance'));
     assert(tools.some((tool) => tool.name === 'record_drift'));
 
@@ -192,8 +217,25 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
 
     const status = responses[4].result?.structuredContent;
     assert(status);
-    assert(['warn', 'fail'].includes(String(status.status)));
-    assert(Array.isArray(status.domains));
+    assertEquals(responses[4].result?.isError, true);
+    assertEquals(status.code, 'telemetry_unavailable');
+    assertStringIncludes(String(status.message), 'Dashboard telemetry could not be read');
+    const provenance = status.provenance as {
+      readonly state: string;
+      readonly sampleCount: number | null;
+      readonly logCount: number | null;
+      readonly servingRevision: string;
+      readonly window: { readonly sinceUnixMs: number; readonly untilUnixMs: number };
+    };
+    assert(provenance);
+    assertEquals(provenance.state, 'unavailable');
+    assertEquals(provenance.sampleCount, null);
+    assertEquals(provenance.logCount, null);
+    assert(provenance.servingRevision.length > 0);
+    assert(provenance.window.sinceUnixMs <= provenance.window.untilUnixMs);
+    for (const field of ['counts', 'domains', 'averageDurationMs', 'p95DurationMs']) {
+      assert(!(field in status), 'Unavailable telemetry must not expose measured statistics');
+    }
 
     const denied = responses[5].result?.structuredContent;
     assert(denied);
@@ -210,6 +252,36 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
         match.symbol === 'definePage'
       ),
     );
+
+    for (const response of responses.slice(7)) assertEquals(response.result?.isError, false);
+    const registryList = responses[7].result?.structuredContent;
+    assert(registryList);
+    assert(Number(registryList.total) > 0);
+    assert(Array.isArray(registryList.items));
+    assertEquals(registryList.items.length, 1);
+
+    const registrySearch = responses[8].result?.structuredContent;
+    assert(registrySearch);
+    assert(
+      (registrySearch.items as readonly { readonly name: string }[]).some((item) =>
+        item.name === 'button'
+      ),
+    );
+
+    const registryView = responses[9].result?.structuredContent?.item as {
+      readonly name: string;
+      readonly files: readonly { readonly content?: string }[];
+    } | undefined;
+    assert(registryView);
+    assertEquals(registryView.name, 'cn');
+    assertEquals(
+      registryView.files[0]?.content,
+      await Deno.readTextFile(join(repositoryRoot, 'packages/fresh-ui/registry/lib/cn.ts')),
+    );
+    assertEquals(responses[10].result?.structuredContent, {
+      command: 'netscript',
+      args: ['ui:add', 'button'],
+    });
   } finally {
     if (!completed) child.kill('SIGKILL');
     await Deno.remove(parent, { recursive: true });

@@ -1,0 +1,3 @@
+# Docs edits require embedded corpus refresh
+
+A change to docs/site/durable-workflows/triggers.md also changes the CLI-shipped Markdown twins. CI quality runs check:agent-docs-prose. Regenerate with `deno task gen:agent-docs-prose`, then `deno task gen:publish-assets`. Validate check:agent-docs-prose, check:mcp-export-corpus, check:assets-barrel and check:publish-assets. The assets-barrel check ends with git diff --exit-code, so its final green verdict follows committing reviewed generated outputs. Do not hand-edit compressed pages or bypass freshness. For an unfinished Actions run, gh run view --log-failed refuses logs; the completed job log is available through `gh api --allow-escape-sequences repos/rickylabs/netscript/actions/jobs/<job>/logs`.

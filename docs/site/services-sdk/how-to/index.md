@@ -1,17 +1,20 @@
 ---
 layout: layouts/base.vto
-title: Recipes
+title: Services & SDK recipes
+nav_title: Recipes
+description: Task-oriented recipes for services and the SDK, one problem each.
 templateEngine: [vento, md]
 order: 100
 ---
 
-# Services & SDK — recipes
+# Services & SDK recipes
 
-Task-oriented recipes for this area. Each one solves a single concrete problem and assumes you know
-the basics from the guides above it in the sidebar. The full cross-area catalog lives at [All how-to
-recipes]({{ "howto:index" |> xref |> url }}).
+Each recipe here solves one task with services and the typed SDK. It assumes the guides above it in
+the sidebar.
 
-- [Protect an anonymous service route](/services-sdk/how-to/protect-an-anonymous-route/) with a
-  shared client-address quota and explicit proxy trust.
-- [Call internal procedures from a service or worker](/services-sdk/how-to/call-internal-procedures/)
-  with the provisioned installation credential and a policy covering both projections.
+{{ for recipe of nav.menu(url, navQuery, navSort)?.children ?? [] -}}
+- [{{ recipe.data.title }}]({{ recipe.data.url }}){{ recipe.data.description ? ": " + recipe.data.description : "" }}
+{{ /for }}
+
+- [Host workers and streams services](/services-sdk/how-to/host-plugin-services/) with explicit
+  native authentication, CORS, listener options and lifecycle ownership.

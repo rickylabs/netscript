@@ -1,0 +1,2 @@
+Task docs:jsdoc-examples deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-jsdoc-examples.ts
+jsdoc examples: FAIL Failed to spawn 'C:\Users\ericc\source\repos\eis-chat-netscript-008-s01\.netscript\agent\toolchains\deno-2.9.7\deno.exe': Nom de fichier ou extension trop long. (os error 206)

@@ -45,7 +45,8 @@ export type ChildFatalError = Readonly<{
  *
  * `registryReady` confirms the generated definitions loaded and validated. `dependencyReady`
  * confirms startup checks succeeded and no listener failure is active. `restartCount` is cumulative
- * for this child instance. `lastFatalError` contains only a fixed redacted message and an epoch
+ * for this child instance, including prior processes when restart history is configured.
+ * `lastFatalError` contains only a fixed redacted message and an epoch
  * timestamp; the raw exception and stack never leave the process.
  *
  * @example
@@ -64,7 +65,7 @@ export type ChildHealthSnapshot = Readonly<{
   registryReady: boolean;
   /** Startup dependency checks succeeded and no listener failure is active. */
   dependencyReady: boolean;
-  /** Cumulative restart attempts for this child instance. */
+  /** Cumulative restart attempts, including persisted process replacements when configured. */
   restartCount: number;
   /** Most recent fatal incident, with secrets withheld. */
   lastFatalError: ChildFatalError | null;
@@ -75,6 +76,10 @@ export type ChildHealthSnapshot = Readonly<{
  *
  * Recovery requires a full window of uninterrupted running with registry and dependencies ready.
  * A restart or fatal failure resets that running window; a brief ready interval cannot hide a storm.
+ * The default is 3 restarts within 60 seconds, including the window boundary. Configure
+ * `ChildHealthMonitor` with its second argument's `crashLoopThreshold` option to change both values.
+ * Generated sagas and triggers retain restart history across process replacements. Healthy Deno
+ * watch reloads in the same process do not count; a reload after a fatal failure does count.
  *
  * @example
  * ```ts
@@ -84,3 +89,46 @@ export type ChildHealthSnapshot = Readonly<{
  */
 export const CHILD_CRASH_LOOP_THRESHOLD: Readonly<{ restarts: number; windowMs: number }> = Object
   .freeze({ restarts: 3, windowMs: 60_000 });
+
+/**
+ * Optional restart policy; omitted values use the documented default threshold.
+ *
+ * @example
+ * ```ts
+ * import type { ChildHealthMonitorOptions } from '@netscript/plugin/health';
+ * const options: ChildHealthMonitorOptions = {
+ *   crashLoopThreshold: { restarts: 5, windowMs: 120_000 },
+ * };
+ * ```
+ */
+export type ChildHealthMonitorOptions = Readonly<{
+  /** Positive integer restart count and positive finite window in milliseconds. */
+  crashLoopThreshold?: Readonly<{ restarts: number; windowMs: number }>;
+}>;
+
+/**
+ * Bounded restart accounting retained by one background resource between process runs.
+ *
+ * @example
+ * ```ts
+ * import type { ChildRestartHistory } from '@netscript/plugin/health';
+ * const history: ChildRestartHistory = {
+ *   active: true, failed: false, processId: 1,
+ *   restartCount: 0, restarts: [], crashLooping: false,
+ * };
+ * ```
+ */
+export type ChildRestartHistory = Readonly<{
+  /** True until a clean shutdown completes; an abrupt kill leaves it set. */
+  active: boolean;
+  /** A fatal failure counts even when Deno watch reloads within the same process. */
+  failed: boolean;
+  /** OS identity distinguishes healthy watch reloads from process replacements. */
+  processId: number;
+  /** Cumulative restart attempts, saturated at Number.MAX_SAFE_INTEGER. */
+  restartCount: number;
+  /** Recent epoch-millisecond timestamps, bounded by the configured restart threshold. */
+  restarts: readonly number[];
+  /** A restart storm remains unhealthy until a full live ready window completes. */
+  crashLooping: boolean;
+}>;

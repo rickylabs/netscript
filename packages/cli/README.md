@@ -100,7 +100,8 @@ $ netscript init my-app --db postgres --service --yes --dry-run
 | `service`     | `add`, `add-handler`, `ref`, `set`, `list`, `remove`, `generate` — service workspaces and their orchestration registration.        |
 | `db`          | `add`, `init`, `migrate`, `generate`, `seed`, `status`, `studio`, `introspect`, `reset`, `deploy` — Prisma lifecycle.              |
 | `plugin`      | `new`, `scaffold`, `install`, `remove`, `sync`, `update`, `doctor`, `list`, `info`, `ai`, `auth` — first- and third-party plugins. |
-| `ui:*`        | `ui:init`, `ui:add`, `ui:list`, `ui:update`, `ui:remove` — the Fresh UI registry (pages, islands, collections).                    |
+| `ui:*` | `ui:init`, `ui:add`, `ui:apply`, discovery, registry/preset management, `ui:build` and `ui:migrate variants` — app-owned Fresh UI copies and tokens. |
+| `tokens`      | `init`, `build`, `clean` — app-owned DTCG sources and generated Fresh UI assets, selected with `--app` or `--project-root`. |
 | `generate`    | `aspire`, `plugins`, `runtime-schemas` — regenerate derived artifacts on demand.                                                   |
 | `config`      | `inspect`, `get`, `set`, `override`, `runtime` — resolved configuration and runtime overrides.                                     |
 | `agent`       | `init`, `mcp` — install and run the agent tooling.                                                                                 |
@@ -379,3 +380,23 @@ orchestration host.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+### Browser-auth reconciliation reports
+
+Plugin install/update/remove and service add/remove preserve existing browser-auth
+helpers and routes. When a preserved file differs from the current formatted
+generator output, the command lists its project-relative path as skipped and
+divergent. `Auth.BrowserTopology: "authored"` lists the browser files it leaves to
+the app author, including paths that have not been created. Authored layouts at the
+project root or outside its generated resource directories are listed as skipped
+and not inspected. These observations are
+informational; they do not fail the command or overwrite those files. A fresh
+scaffold and a rerun whose files match the generator produce no findings.
+
+Programmatic lifecycle results expose `browserAuthReport` using the existing
+`DoctorReport` contract (`plugin: "browser-auth"`, `checks` with `name`, `ok: true`,
+and `message`). Install previews that do not reconcile omit this report. The same
+checks feed normal command output. To extend candidate selection or ownership
+rules, start at `src/kernel/adapters/plugin/browser-auth-reconciler.ts` and its
+colocated preservation tests; reporting scenarios live in
+`tests/browser-auth-reporting_test.ts`.

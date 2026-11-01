@@ -1,0 +1,27 @@
+{
+  "note": "Sanitized receipt index; original immutable receipts remain in local run evidence. Evidence-only close commit changes no tested source. Final head confirmation is in the PR phase comment.",
+  "receipts": {
+    "reproduction-receipt": {
+      "gateId": "test",
+      "invocationId": "issue2390-final-reproduction",
+      "gitHead": "3dca25d8aa585622445a77a0b86933c4c50bbc1d",
+      "actualGitHead": "3dca25d8aa585622445a77a0b86933c4c50bbc1d",
+      "requestHash": "6309cbb16e6f3d812511926fe4317257f30c24fc4ece0792c84d928ee0728ca2",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 13383,
+      "originalReceiptSha256": "ee8dd0a99b51eb1e6334ac935752a30db8f01d5f63fe9484879592c4ee1c4010"
+    },
+    "quality-receipt": {
+      "gateId": "quality-gate",
+      "invocationId": "issue2390-final-quality",
+      "gitHead": "3dca25d8aa585622445a77a0b86933c4c50bbc1d",
+      "actualGitHead": "3dca25d8aa585622445a77a0b86933c4c50bbc1d",
+      "requestHash": "dde0a15c4f792df2b1168e034ffee7c26d2704fbd5c8bd48666dd61293bdc4da",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 16238,
+      "originalReceiptSha256": "402c33057d751d3e7e45e8ae00dec0d20f7f95f5583ddf522d0039799a087ddf"
+    }
+  }
+}

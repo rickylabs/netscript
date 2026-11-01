@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "--frozen",
+    "packages/cli/src/public/features/ui/migrate/migration-preflight_test.ts"
+  ],
+  "cwd": ".",
+  "exitCode": 1,
+  "durationMs": 881,
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "ignored": 0,
+    "totalResults": 4,
+    "uniqueFailures": 3
+  },
+  "failures": [
+    {
+      "message": "AssertionError\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at file://<cwd>/packages/cli/src/public/features/ui/migrate/migration-preflight_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "spread preflight includes className, inline objects and state producers",
+          "file": "./packages/cli/src/public/features/ui/migrate/migration-preflight_test.ts",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Expected function to reject.\n    at assertRejects (https://jsr.io/@std/assert/1.0.19/rejects.ts:<line>:<column>)\n    at async file://<cwd>/packages/cli/src/public/features/ui/migrate/migration-preflight_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "spread-only legacy class props fail whole-app preflight before any writes",
+          "file": "./packages/cli/src/public/features/ui/migrate/migration-preflight_test.ts",
+          "line": 53
+        }
+      ]
+    },
+    {
+      "message": "ScaffoldValidationError: Variant migration needs a manual merge; no files written.\nmarkdown.tsx: Customized markdown.tsx, source edit 1; merge this component's variant migration manually.\n    at MigrateUiVariantsUseCase.execute (file://<cwd>/packages/cli/src/public/features/ui/migrate/migrate-ui-variants-use-case.ts:<line>:<column>)\n    at async file://<cwd>/packages/cli/src/public/features/ui/migrate/migration-preflight_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "Markdown source migration stays idempotent after canonical formatting",
+          "file": "./packages/cli/src/public/features/ui/migrate/migration-preflight_test.ts",
+          "line": 128
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "ownerComment": 6472644229,
+  "baseline": "9769d7b91457dd035aa6799fc9a08fc2920ad9c9",
+  "independentPlanEval": "FAIL_PLAN repaired once to PASS",
+  "independentImplEval": "PASS, accepted for review only",
+  "calloutContract": {
+    "visibleLabels": 1,
+    "defaultLabels": [
+      "Note",
+      "Tip",
+      "Important",
+      "Warning",
+      "Caution"
+    ],
+    "legacyAlias": "Error",
+    "customTitle": "replaces label; accessible type retained",
+    "font": "Host Grotesk",
+    "weight": 500,
+    "bodyAndLabelSizePx": 14,
+    "lineHeightAndIconBoxPx": 22,
+    "glyphPx": 18,
+    "gapPx": 8,
+    "bodyLeftEqualsLabelLeft": true,
+    "firstLineIconCentreMaximumErrorPx": 1,
+    "longCustomTitlesWrapForAllFivePrimaryTones": true,
+    "projects": [
+      "light-390",
+      "light-1280",
+      "dark-390",
+      "dark-1280"
+    ],
+    "twins": "typed marker, rendered label and body exactly once; generic asides unchanged"
+  },
+  "browser": {
+    "passed": 116,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "axeAudits": 32,
+    "seriousOrCritical": 0,
+    "receipt": {
+      "requestHash": "ce31262f40b07666061425b0f4adb2d2aadc3deec64a89aa5bf7804db0b10e0d",
+      "outcome": "PASS",
+      "durationMs": 108982,
+      "exitCode": 0
+    }
+  },
+  "nativeCarriers": {
+    "order": [
+      "gen:agent-docs-prose",
+      "gen:mcp-export-corpus --allow-dirty",
+      "gen:assets-barrel",
+      "gen:publish-assets"
+    ],
+    "dirtyReadSet": "preceding generated prose only",
+    "storedRows": 207,
+    "decodedEntriesIncludingDerivedFullCorpus": 208,
+    "changedCalloutPages": 107,
+    "otherChangedEntries": [
+      "llms.txt"
+    ],
+    "added": 0,
+    "removed": 0,
+    "contextSourcesByteIdentical": true,
+    "mcpBudget": {
+      "sourceBytes": 283750,
+      "maxBytes": 294912,
+      "count": 14
+    },
+    "proseFreshness": "PASS",
+    "mcpExportFreshness": "PASS",
+    "publishAssetsFreshness": "PASS",
+    "postCommitAssetsBarrel": "pending post-commit check"
+  },
+  "docsLockMatchesMain": true,
+  "checks": {
+    "toolTests": 12,
+    "typedCheckLintFmt": "PASS",
+    "generatedTypeCheck": "PASS",
+    "docsBuild": "PASS",
+    "links": 24219,
+    "caveatReferences": 15,
+    "exportsDrift": "PASS",
+    "snippetFences": 668,
+    "repoQuality": "PASS",
+    "reviewThreads": "PASS, zero unanswered",
+    "repro": {
+      "outcome": "PASS",
+      "html": 254,
+      "twins": 205,
+      "exception": "known upstream Pagefind metadata only; strict default retained"
+    }
+  },
+  "negativeControls": {
+    "raw-colour": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedDiagnostic": "raw-colour",
+      "diagnosticFound": true
+    },
+    "raw-custom": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedDiagnostic": "raw-colour",
+      "diagnosticFound": true
+    },
+    "red-role": {
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "expectedDiagnostic": "red-outside-state",
+      "diagnosticFound": true
+    }
+  },
+  "visualInspection": "PASS, default and wrapping custom labels inspected across both widths and schemes",
+  "hostedCurrentHead": "pending normal push; final PR body records new CI/artifact results",
+  "runtimeLimitation": "Existing Docker-unavailable local runtime and classifier-skip limitation unchanged; no merge certification"
+}

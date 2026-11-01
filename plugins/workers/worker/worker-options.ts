@@ -1,7 +1,9 @@
+import type { JobDeadLetterStorePort } from './job-dead-letters.ts';
 import type { MessageContext, MessageQueue } from '@netscript/queue';
 import type {
   JobDefinition,
   JobMessage,
+  JobRunnerClock,
   TaskDefinition,
   TaskExecutionOptions,
   TaskMessage,
@@ -96,6 +98,8 @@ export interface WorkerTaskExecutor {
 
 /** Task execution result surface consumed by the worker process. */
 export type WorkerTaskResult = Readonly<{
+  /** Runtime outcome, including terminal timeout or cancellation. */
+  status?: string;
   /** Whether the task completed successfully. */
   success: boolean;
   /** Task duration in milliseconds. */
@@ -132,6 +136,8 @@ export interface WorkerOptions {
   queueName?: string;
   /** Optional job queue; this worker owns and stops the supplied queue. */
   queue?: MessageQueue<JobMessage>;
+  /** Durable terminal job storage; defaults to a namespaced KV store. */
+  deadLetters?: JobDeadLetterStorePort;
   /** Optional task queue; this worker owns and stops the supplied queue. */
   taskQueue?: MessageQueue<TaskMessage>;
   /** Number of concurrent jobs to process. */
@@ -154,8 +160,12 @@ export interface WorkerOptions {
   workerUrl?: string;
   /** Options for in-process job handler resolution. */
   workerPoolOptions?: WorkerPoolOptions;
-  /** Maximum listener restarts before worker health degrades. */
+  /** Clock used for cancellable job retry waits. */
+  retryClock?: JobRunnerClock;
+  /** Maximum restarts per unhealthy burst (default 3); positive Infinity retries indefinitely. */
   listenerMaxRestarts?: number;
+  /** Continuous running interval that replenishes the restart budget; default 60,000 ms. */
+  listenerHealthyResetMs?: number;
   /** Initial listener restart backoff in milliseconds. */
   listenerInitialBackoffMs?: number;
   /** Maximum listener restart backoff in milliseconds. */
@@ -180,6 +190,8 @@ export interface JobExecutionContext {
 
 /** Internal result shape returned by worker job execution. */
 export interface WorkerJobResult {
+  /** Handler attempts, including the initial attempt. */
+  readonly attempts?: number;
   /** Whether execution succeeded. */
   readonly success: boolean;
   /** Process-style exit code. */
@@ -192,6 +204,9 @@ export interface WorkerJobResult {
 
 /** Context required by worker job dispatch helpers. */
 export interface WorkerDispatchContext {
+  /** Defaults to the canonical KV job store for direct dispatcher consumers. */
+  readonly deadLetters?: JobDeadLetterStorePort;
+  readonly queueName?: string;
   readonly workerId: string;
   /** Configured queue delivery concurrency, also reported on completed job spans. */
   readonly concurrency: number;
@@ -204,6 +219,8 @@ export interface WorkerDispatchContext {
   readonly jobsDir: string;
   readonly activeJobs: Map<string, JobExecutionContext>;
   readonly workerSpan: Span | null;
+  /** Clock used for cancellable job retry waits. */
+  readonly retryClock?: JobRunnerClock;
   /** Shutdown signal also inherited by executions admitted while drain begins. */
   readonly shutdownSignal?: AbortSignal;
 }
@@ -224,6 +241,7 @@ export interface WorkerQueueContext {
   setTaskQueue(queue: MessageQueue<TaskMessage> | null): void;
   reportListenerFailure(name: string, error: unknown, snapshot: WorkerListenerSnapshot): void;
   listenerMaxRestarts: number;
+  listenerHealthyResetMs: number;
   listenerInitialBackoffMs: number;
   listenerMaxBackoffMs: number;
 }

@@ -1,0 +1,205 @@
+{
+  "baseline": "7cfa593e198ade668d531d2bdafa336ff6ca5709",
+  "sources": [
+    {
+      "path": "packages/service/src/primitives/body-limit.ts",
+      "lines": 152,
+      "cap": 160,
+      "withinCap": true,
+      "sha256": "cf570dcb7a4a65f19e9ee992f3c2273879f567b710990d045c5a462941cc82b1",
+      "originalSha256": "86fd3dd5e193353dd1a916b76decc7d3f9efd5428b083f68b8d373fa2816ed2a",
+      "originalShorthandNames": [],
+      "allOriginalShorthandNamesRetained": true
+    },
+    {
+      "path": "packages/service/tests/body-limit_test.ts",
+      "lines": 319,
+      "cap": 320,
+      "withinCap": true,
+      "sha256": "8733cdf505357dc7c5ac0c6004bad0162d813dbc2cf8db218694a15e8f43a636",
+      "originalSha256": "91877ee10614193217271a0ff299c1e9aa155eaf4a6092720c058568ae171e66",
+      "originalShorthandNames": [
+        "body limit accepts a ${projection.name} body under the limit",
+        "body limit rejects an oversized ${projection.name} Content-Length body with a typed 413",
+        "body limit rejects an oversized chunked ${projection.name} body without draining it",
+        "defineService bodyLimit rejects ${projection.name} bodies over a real listener",
+        "defineService without bodyLimit keeps accepting large bodies",
+        "body limit lets bodyless requests through a deferred route it guards",
+        "body limit runs after authentication so anonymous callers get 401 first",
+        "createBodyLimitMiddleware rejects a non-positive or fractional maxBytes"
+      ],
+      "allOriginalShorthandNamesRetained": true
+    }
+  ],
+  "protected": [
+    {
+      "path": "packages/service/src/middleware/service-cors.ts",
+      "original": "bf8084a59737382ac3b9e79293d9c45fa873dc58cc70d0492e95fab8d81245d0",
+      "current": "bf8084a59737382ac3b9e79293d9c45fa873dc58cc70d0492e95fab8d81245d0",
+      "matches": true
+    },
+    {
+      "path": "packages/service/tests/cors-response-authority_test.ts",
+      "original": "e2668ae9ce623a28caed562bed4d9c6b43af46737857599b99bacd8653ac9bc3",
+      "current": "e2668ae9ce623a28caed562bed4d9c6b43af46737857599b99bacd8653ac9bc3",
+      "matches": true
+    },
+    {
+      "path": "packages/service/src/auth/options.ts",
+      "original": "6f32f887b8dea35fef1f11bf19e244c678e30fa87a4e3a2848062af7e0fa75b2",
+      "current": "6f32f887b8dea35fef1f11bf19e244c678e30fa87a4e3a2848062af7e0fa75b2",
+      "matches": true
+    },
+    {
+      "path": "packages/service/src/auth/auth-middleware.ts",
+      "original": "ae16fb44ca55d048d867bd06f669ea2895e46af51287b5c8f5cecbea9ee5cb32",
+      "current": "ae16fb44ca55d048d867bd06f669ea2895e46af51287b5c8f5cecbea9ee5cb32",
+      "matches": true
+    },
+    {
+      "path": "packages/service/src/auth/mod.ts",
+      "original": "9c384b7b34ff323e171718f1a43c65538be89105c53a510c3ed3030a19e7dab7",
+      "current": "9c384b7b34ff323e171718f1a43c65538be89105c53a510c3ed3030a19e7dab7",
+      "matches": true
+    },
+    {
+      "path": "packages/service/mod.ts",
+      "original": "19f94d3d99c5c5ce8411335cf896d33e9f0129f3c38ee5d576d254ca1b7f9e9e",
+      "current": "19f94d3d99c5c5ce8411335cf896d33e9f0129f3c38ee5d576d254ca1b7f9e9e",
+      "matches": true
+    },
+    {
+      "path": "packages/service/tests/auth/middleware_test.ts",
+      "original": "67443947ed85b05d07324e85326ce5b522168f81ed877f8ae4c7da2bd2c42a05",
+      "current": "67443947ed85b05d07324e85326ce5b522168f81ed877f8ae4c7da2bd2c42a05",
+      "matches": true
+    },
+    {
+      "path": "packages/service/tests/auth/builder-auth_test.ts",
+      "original": "09b8b83a399105716607ed1d4cb9ef1ee5f7818570cb6475f8f030bc2ef681fa",
+      "current": "09b8b83a399105716607ed1d4cb9ef1ee5f7818570cb6475f8f030bc2ef681fa",
+      "matches": true
+    },
+    {
+      "path": "packages/service/tests/auth/define-service-auth_test.ts",
+      "original": "e725e29e30f6423297af9b2a8eabac960ea2aea69b4ccff732527c8299a372f2",
+      "current": "e725e29e30f6423297af9b2a8eabac960ea2aea69b4ccff732527c8299a372f2",
+      "matches": true
+    },
+    {
+      "path": "packages/service/src/builder/service-builder-impl.ts",
+      "original": "74090bb6ec406b4f648a0e77d2ebee4e63cc202a4d4023d5d9de37103c4130b9",
+      "current": "74090bb6ec406b4f648a0e77d2ebee4e63cc202a4d4023d5d9de37103c4130b9",
+      "matches": true
+    },
+    {
+      "path": "packages/service/src/types.ts",
+      "original": "0921e0d2d013fe5a7dcdeb4839a91aa68975b8fe4a4043388b2689696ddb2f1c",
+      "current": "0921e0d2d013fe5a7dcdeb4839a91aa68975b8fe4a4043388b2689696ddb2f1c",
+      "matches": true
+    },
+    {
+      "path": "packages/service/README.md",
+      "original": "11f556ff05d88ff15b36b700a9e36e944deb2f0c13709ac31891c3430149174a",
+      "current": "11f556ff05d88ff15b36b700a9e36e944deb2f0c13709ac31891c3430149174a",
+      "matches": true
+    },
+    {
+      "path": "packages/service/CHANGELOG.md",
+      "original": "4ab70c6e658f082e1231587d04c7eb52712817d8ec726833d91bc1cc3f9d428f",
+      "current": "4ab70c6e658f082e1231587d04c7eb52712817d8ec726833d91bc1cc3f9d428f",
+      "matches": true
+    },
+    {
+      "path": "deno.json",
+      "original": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "current": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "matches": true
+    },
+    {
+      "path": "deno.lock",
+      "original": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "current": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "matches": true
+    },
+    {
+      "path": "packages/service/tests/define-service_test.ts",
+      "original": "4ce566039d75488f81eda1ef89998e2ddd2fc437a9947439b50597bde4165686",
+      "current": "4ce566039d75488f81eda1ef89998e2ddd2fc437a9947439b50597bde4165686",
+      "matches": true
+    },
+    {
+      "path": "packages/service/tests/_fixtures/legacy-abort-service.ts",
+      "original": "c827d489353f28a0627351f5a1c7687a18b22059d4b769de32b70b51a7adde40",
+      "current": "c827d489353f28a0627351f5a1c7687a18b22059d4b769de32b70b51a7adde40",
+      "matches": true
+    },
+    {
+      "path": "packages/service/tests/rate-limit-address-key_test.ts",
+      "original": "b34460a150dc9772bc59c4209c7664a246539233ab98efc3139e617b79be490e",
+      "current": "b34460a150dc9772bc59c4209c7664a246539233ab98efc3139e617b79be490e",
+      "matches": true
+    },
+    {
+      "path": ".llm/harness/debt/arch-debt.md",
+      "original": "74e43f6a6c914c5af55edd107d9c5a06a289ae795d5b980d37af89c0a38d7fb9",
+      "current": "74e43f6a6c914c5af55edd107d9c5a06a289ae795d5b980d37af89c0a38d7fb9",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-service-policy--u2-u4/plan.md",
+      "original": "516901bb12ef088b7b967d628c9d4c0134dad1096c0eaa97bb2bada5983d5058",
+      "current": "516901bb12ef088b7b967d628c9d4c0134dad1096c0eaa97bb2bada5983d5058",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-service-policy--u2-u4/decisions.md",
+      "original": "2da4ab40cf0eee24d1c9f2fe92fb641dc007ef46866c8128648dee9638ddfda6",
+      "current": "2da4ab40cf0eee24d1c9f2fe92fb641dc007ef46866c8128648dee9638ddfda6",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-service-policy--u2-u4/plan-eval.md",
+      "original": "234a77914ec162e0a8b31a5bed7eda3a76c009cb9307b65b5d9d8e2bcb666159",
+      "current": "234a77914ec162e0a8b31a5bed7eda3a76c009cb9307b65b5d9d8e2bcb666159",
+      "matches": true
+    },
+    {
+      "path": ".llm/runs/fix-native-service-policy--u2-u4/plan-eval-recheck1.md",
+      "original": "dcf8daeb73961347ad9d3f18ddfcc91f12e2a4e7083af4e2beefc4c52977b014",
+      "current": "dcf8daeb73961347ad9d3f18ddfcc91f12e2a4e7083af4e2beefc4c52977b014",
+      "matches": true
+    },
+    {
+      "path": "packages/service/src/diagnostics/database-connectivity.ts",
+      "original": "854e3c3356065560ebfb5759e1665ef0fc3ee8cecf8c75773d09f5df24147ee6",
+      "current": "854e3c3356065560ebfb5759e1665ef0fc3ee8cecf8c75773d09f5df24147ee6",
+      "matches": true
+    },
+    {
+      "path": "packages/service/tests/database-connectivity_test.ts",
+      "original": "f1f8ee2dc7fdd8ce7861edcca412f74b9724cb382bee43529d30d491bfae5f3a",
+      "current": "f1f8ee2dc7fdd8ce7861edcca412f74b9724cb382bee43529d30d491bfae5f3a",
+      "matches": true
+    },
+    {
+      "path": "packages/service/tests/legacy-abort_test.ts",
+      "original": "8781d5d9144250b5554d6e53b84d7b54f54938c5b0f685ee484082d935a56a0c",
+      "current": "8781d5d9144250b5554d6e53b84d7b54f54938c5b0f685ee484082d935a56a0c",
+      "matches": true
+    },
+    {
+      "path": "packages/plugin/tests/service/create-plugin-service-auth_test.ts",
+      "original": "24cd6d86f27e147f09d71c1afaf9b66f9a0a13fb5c694763f9ea62846db42c28",
+      "current": "24cd6d86f27e147f09d71c1afaf9b66f9a0a13fb5c694763f9ea62846db42c28",
+      "matches": true
+    }
+  ],
+  "changedOwners": [
+    "packages/service/src/primitives/body-limit.ts",
+    "packages/service/tests/body-limit_test.ts"
+  ],
+  "exactOwnerSet": true,
+  "scopeAuthoritySha256": "6676a2e4cf932d903dfba69c40a719b5e2c4317c87abf49d21b728bd08381dd0",
+  "packageJsonExists": false
+}

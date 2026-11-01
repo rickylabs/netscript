@@ -55,7 +55,16 @@ export function Select({
       {...props}
       value={value}
       defaultValue={defaultValue}
-      class={cn('ns-select', error && 'ns-select--error', className)}
+      class={cn('ns-select', className)}
+      data-invalid={error ? 'true' : undefined}
+      data-state={error ? 'invalid' : props.disabled ? 'disabled' : 'rest'}
+      data-part='root'
+      data-scope='select'
+      data-content={value !== undefined || defaultValue !== undefined ||
+          selectedValues !== undefined
+        ? 'value'
+        : 'placeholder'}
+      data-size='md'
     >
       {
         /* Keep option-level selected attributes for SSR so the initial HTML is correct

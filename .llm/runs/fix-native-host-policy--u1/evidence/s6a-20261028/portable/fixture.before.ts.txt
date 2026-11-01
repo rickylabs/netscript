@@ -1,0 +1,260 @@
+/**
+ * Bounded Windows runtime children for streams factory qualification. Native addons are trusted
+ * native code; these explicit Deno grants are test authority, not process confinement. No product
+ * import or test registration occurs here. The S4 denied-all fixture remains unchanged.
+ * @module
+ */
+import { dirname, join } from 'jsr:@std/path@^1';
+
+const CHILD_DEADLINE_MS = 30_000;
+const SETTLE_GRACE_MS = 2_000;
+const CHILD_OUTPUT_CAP = 32 * 1024;
+const ADDONS = [
+  {
+    path: '@lmdb/lmdb-win32-x64/3.5.7/node.napi.node',
+    sha256: 'c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e',
+  },
+  {
+    path: '@msgpackr-extract/msgpackr-extract-win32-x64/3.0.4/node.napi.node',
+    sha256: '6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08',
+  },
+];
+
+export interface ChildRun {
+  readonly code: number;
+  readonly stdout: string;
+  readonly stderr: string;
+}
+
+interface RuntimeOptions {
+  readonly cwd: string;
+  readonly preferredPorts: readonly number[];
+  readonly denyAllocator?: boolean;
+  readonly denyFfi?: boolean;
+}
+
+interface Sandbox extends AsyncDisposable {
+  readonly scratch: string;
+  run(source: string, options: RuntimeOptions): Promise<ChildRun>;
+}
+
+/** Uses only the configured public cache and exact running executable, never a guessed profile. */
+export async function createRuntimeSandbox(label: string): Promise<Sandbox> {
+  if (!/^[a-z-]+$/.test(label)) throw new Error('Invalid evidence label');
+  if (Deno.build.os !== 'windows' || Deno.build.arch !== 'x86_64') {
+    throw new Error('This qualification fixture requires its approved Windows x64 native addons');
+  }
+  const cache = Deno.env.get('DENO_DIR');
+  if (!cache) throw new Error('Runtime qualification requires an explicit public DENO_DIR');
+  const toolchain = dirname(Deno.execPath());
+  const npm = join(cache, 'npm');
+  const addons: { path: string; sha256: string; bytes: number }[] = [];
+  for (const addon of ADDONS) {
+    const path = join(npm, 'registry.npmjs.org', addon.path);
+    const bytes = await Deno.readFile(path);
+    const sha256 = Array.from(
+      new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)),
+      (b) => b.toString(16).padStart(2, '0'),
+    ).join('');
+    if (sha256 !== addon.sha256) throw new Error(`Native addon bytes changed: ${path}`);
+    addons.push({ path, sha256, bytes: bytes.length });
+  }
+  const evidenceRoot = Deno.env.get('NETSCRIPT_S6A_EVIDENCE_DIR');
+  const evidence = evidenceRoot === undefined ? undefined : join(evidenceRoot, label);
+  if (evidence !== undefined) await Deno.mkdir(evidence, { recursive: true });
+  const scratch = await Deno.makeTempDir({ prefix: 'streams-service-runtime-' });
+  const ownedPath = await Deno.realPath(scratch);
+  const env: Record<string, string> = { DENO_DIR: cache, NO_COLOR: '1' };
+  for (
+    const name of [
+      'HOME',
+      'USERPROFILE',
+      'APPDATA',
+      'LOCALAPPDATA',
+      'TMP',
+      'TEMP',
+      'TMPDIR',
+      'XDG_CACHE_HOME',
+      'XDG_CONFIG_HOME',
+      'XDG_DATA_HOME',
+      'XDG_STATE_HOME',
+    ]
+  ) env[name] = scratch;
+  const systemRoot = Deno.env.get('SystemRoot');
+  if (systemRoot !== undefined) env.SystemRoot = systemRoot;
+  env.PATH = [toolchain, ...(systemRoot ? [join(systemRoot, 'System32'), systemRoot] : [])].join(
+    ';',
+  );
+  env.PATHEXT = '.COM;.EXE;.BAT;.CMD';
+  let sequence = 0;
+  async function record(name: string, value: unknown): Promise<void> {
+    if (evidence !== undefined) {
+      await Deno.writeTextFile(join(evidence, name + '.json'), JSON.stringify(value, null, 2), {
+        createNew: true,
+      });
+    }
+  }
+  return {
+    scratch,
+    async run(source, options) {
+      for (const port of options.preferredPorts) {
+        if (!Number.isInteger(port) || port < 1 || port > 65535) {
+          throw new Error('Preferred upstream ports must be owned positive port numbers');
+        }
+      }
+      const net = [
+        '127.0.0.1',
+        ...(options.denyAllocator
+          ? []
+          : ['0.0.0.0:0', ...options.preferredPorts.map((port) => `0.0.0.0:${port}`)]),
+      ];
+      const args = [
+        'run',
+        '--check',
+        '--frozen',
+        '--cached-only',
+        '--ext=ts',
+        '--allow-env',
+        `--allow-net=${net.join(',')}`,
+        `--allow-read=${scratch},${npm},${toolchain}`,
+        `--allow-write=${scratch}`,
+        '--allow-sys',
+        '--deny-run',
+        options.denyFfi
+          ? '--deny-ffi'
+          : `--allow-ffi=${addons.map((addon) => addon.path).join(',')}`,
+        '-',
+      ];
+      const name = `child-${++sequence}`;
+      await record(name + '-input', {
+        args,
+        cwd: options.cwd,
+        clearEnv: true,
+        env,
+        addons,
+        source,
+      });
+      try {
+        const result = await runChild(args, options.cwd, env, source);
+        await record(name + '-result', result);
+        return result;
+      } catch (error) {
+        await record(name + '-failure', { error: describe(error) });
+        throw error;
+      }
+    },
+    async [Symbol.asyncDispose]() {
+      if (await Deno.realPath(scratch) !== ownedPath) {
+        throw new Error('Owned scratch identity changed');
+      }
+      const entries = Array.from(Deno.readDirSync(scratch), (entry) => entry.name);
+      await Deno.remove(scratch, { recursive: true });
+      await record('cleanup', { scratch, ownedPath, entries, removed: true });
+    },
+  };
+}
+
+/** Retains the actual child handle; deadline/pipe failures terminate only that owned process. */
+async function runChild(
+  args: string[],
+  cwd: string,
+  env: Record<string, string>,
+  source: string,
+): Promise<ChildRun> {
+  const child = new Deno.Command(Deno.execPath(), {
+    args,
+    cwd,
+    env,
+    clearEnv: true,
+    stdin: 'piped',
+    stdout: 'piped',
+    stderr: 'piped',
+  }).spawn();
+  const startedAt = new Date().toISOString();
+  const problems: string[] = [];
+  let exited = false;
+  const abort = (problem: string): void => {
+    problems.push(problem);
+    if (exited) return;
+    try {
+      child.kill();
+    } catch (error) {
+      problems.push(`kill failed: ${describe(error)}`);
+    }
+  };
+  const watchdog = setTimeout(() => abort(`exceeded ${CHILD_DEADLINE_MS}ms`), CHILD_DEADLINE_MS);
+  const settled = Promise.all([
+    child.status.then((status) => {
+      exited = true;
+      return status.code;
+    }),
+    readCapped(child.stdout).catch((error): string => {
+      abort(`stdout: ${describe(error)}`);
+      return '';
+    }),
+    readCapped(child.stderr).catch((error): string => {
+      abort(`stderr: ${describe(error)}`);
+      return '';
+    }),
+    writeStdin(child.stdin, source, abort),
+  ]);
+  let grace: ReturnType<typeof setTimeout> | undefined;
+  const unsettled = new Promise<undefined>((resolve) => {
+    grace = setTimeout(resolve, CHILD_DEADLINE_MS + SETTLE_GRACE_MS, undefined);
+  });
+  try {
+    const outcome = await Promise.race([settled, unsettled]);
+    if (outcome === undefined) {
+      throw new Error(
+        `Child pid ${child.pid} did not settle within ${CHILD_DEADLINE_MS + SETTLE_GRACE_MS}ms: ` +
+          problems.join('; '),
+      );
+    }
+    const [code, stdout, stderr] = outcome;
+    const result = {
+      code,
+      stdout,
+      stderr,
+      pid: child.pid,
+      startedAt,
+      finishedAt: new Date().toISOString(),
+      statusSettled: true,
+      pipesSettled: true,
+      stdinSettled: true,
+    };
+    if (problems.length > 0) {
+      throw new Error(`${problems.join('; ')}\n${JSON.stringify(result)}`);
+    }
+    return result;
+  } finally {
+    clearTimeout(watchdog);
+    clearTimeout(grace);
+  }
+}
+
+async function writeStdin(
+  stdin: WritableStream<Uint8Array>,
+  source: string,
+  abort: (problem: string) => void,
+): Promise<void> {
+  const writer = stdin.getWriter();
+  await writer.write(new TextEncoder().encode(source))
+    .catch((error) => abort(`stdin write: ${describe(error)}`));
+  await writer.close().catch((error) => abort(`stdin close: ${describe(error)}`));
+}
+
+async function readCapped(stream: ReadableStream<Uint8Array>): Promise<string> {
+  const decoder = new TextDecoder();
+  let bytes = 0;
+  let text = '';
+  for await (const chunk of stream) {
+    bytes += chunk.byteLength;
+    if (bytes > CHILD_OUTPUT_CAP) throw new Error(`exceeded ${CHILD_OUTPUT_CAP} bytes`);
+    text += decoder.decode(chunk, { stream: true });
+  }
+  return text + decoder.decode();
+}
+
+function describe(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}

@@ -81,6 +81,37 @@ for await (const events of kv.watch([['users', 'alice']])) {
 }
 ```
 
+## Ordered listing and cursor pages
+
+`list({ prefix, start, end, limit, reverse })` returns descendants of `prefix` in global key
+order. The prefix key itself is excluded. `start` is an exclusive lower bound and `end` an
+exclusive upper bound in either direction; `limit` counts entries after filtering. Advance a
+forward cursor with `start: lastEntry.key`; advance a reverse cursor with `end: lastEntry.key`.
+The kvdex bridge presents native Deno selectors, whose `start` is inclusive. It translates that
+boundary explicitly while direct `KvStore.list` calls retain the exclusive contract above.
+
+Redis has no maintained ordering index. Each output window scans the whole Redis database
+(including keys outside the selected namespace/prefix) and keeps
+only the next K distinct matching key names in a heap, then fetches those values with `MGET`.
+K is at most `REDIS_MGET_BATCH_SIZE` (default 500), or the remaining limit if smaller. A page of
+up to K live entries usually needs one full SCAN cycle, even with `limit: 1`. Missing/expired or
+malformed values do not consume the limit; listing advances past examined keys and refills.
+
+Retained candidate memory is O(K), plus one SCAN reply and one MGET reply. Redis SCAN's COUNT
+is a work hint, so it does not strictly bound an individual server reply. For N scanned names,
+selection costs O(N log K) per window. Larger or unlimited lists rescan for successive windows,
+trading O(N × ceil(examined candidates / K) × log K) work for memory independent of prefix size.
+This avoids adding an index that would need backfill and changes to writes, expiry, and atomic
+transactions. Prefix watch discovery uses a private unordered single-pass scan instead, preserving
+one SCAN cycle per baseline or poll. Neither listing nor watches promise snapshot isolation across
+concurrent writes.
+
+Existing storage-key encoding limitations remain: Redis colon-separated keys coerce all-digit
+segments to numbers and do not preserve arbitrary key-part types. Memory compares parts as
+strings, while native Deno KV has typed ordering. The shared pagination contract tests use
+round-trippable, non-numeric ASCII string parts (for example `k0001`); they do not establish
+universal typed-key parity.
+
 ## Startup consistency
 
 Use `watch(keys, { initial: true })` when a consumer needs current state followed by changes. The

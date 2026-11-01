@@ -1,0 +1,202 @@
+{
+  "scope": "Corrective validation cycle after owner continuation; fixes W2 native Deno KV rejection semantics and the inherited manual desktop CI launcher test-driver failure.",
+  "gates": [
+    {
+      "gate": "combined",
+      "rawReportSha256": "fd767cf996be331926f5408699c561d14d33e2145b62bfcc8c8801d1e08289d5",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "--unstable-kv",
+        "packages/queue/tests",
+        "packages/plugin-workers-core/src/stores/kv-worker-idempotency-store_test.ts",
+        "packages/plugin-workers-core/src/stores/kv-worker-idempotency-concurrency_test.ts",
+        "packages/plugin-workers-core/tests/runtime/job-retry-policy_test.ts",
+        "plugins/workers/worker",
+        "packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts",
+        "packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts",
+        "packages/cli/src/kernel/templates/aspire/helpers/tests/generated-helpers-compile_test.ts",
+        "packages/cli/e2e/src/adapters/native-desktop/installed-launcher_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 285,
+        "failed": 0,
+        "ignored": 2,
+        "totalResults": 287,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "native-kv-negative",
+      "rawReportSha256": "29cc89b165d72ba51b7ed3b8148f9ecd3ead6ba949f2393ce0e2a4cc4899ab4c",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "--unstable-kv",
+        "plugins/workers/worker/worker-kv-recovery_test.ts"
+      ],
+      "exitCode": 1,
+      "summary": {
+        "passed": 0,
+        "failed": 2,
+        "ignored": 0,
+        "totalResults": 2,
+        "uniqueFailures": 2
+      },
+      "expectedExitCode": 1,
+      "failingTests": [
+        "Deno KV job redelivers after a dead-letter write outage",
+        "Deno KV task interrupted by worker shutdown redelivers to a replacement"
+      ]
+    },
+    {
+      "gate": "kv-redis-compatibility",
+      "rawReportSha256": "c855ead2fe809a854cc6c1ee4900e8c517b66802011e0488d2bd195d0ee67e0f",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "--unstable-kv",
+        "plugins/workers/worker/worker-kv-recovery_test.ts",
+        "plugins/workers/worker/worker-lease-survival_test.ts",
+        "plugins/workers/worker/job-dead-letters_test.ts",
+        "plugins/workers/worker/job-retry_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 33,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 33,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "native-launcher",
+      "rawReportSha256": "970d5c3d297fc7838c638f4f14fb0130bcc4d593aea2578be27d7c9ccf448c62",
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "packages/cli/e2e/src/adapters/native-desktop/installed-launcher_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "gate": "check",
+      "rawReportSha256": "6dcf739931a6521cb4aa2c0fe87d95e4e1faaf8dd5e62c672ef701d203ef38bf",
+      "command": "deno check --unstable-kv <files>",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 106,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    {
+      "gate": "lint",
+      "rawReportSha256": "f0b71147cf68a6dee05da06a20e55b9e104ec28c985c88dacd09a37d892a1ddc",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 100,
+        "batches": 2,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 100,
+        "filesProcessed": 100,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gate": "cli-lint",
+      "rawReportSha256": "d4bce39e86ff38de7e0f6481b1142df69f0d2e2acd80bc1e7061b290a3396157",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 2,
+        "filesProcessed": 2,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gate": "worker-format",
+      "rawReportSha256": "16268d6824fb264b9df04848d30f600e231f7c6cc573b323f01419906dccaca4",
+      "command": "deno fmt",
+      "summary": {
+        "filesSelected": 33,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 33,
+        "filesProcessed": 33,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "gate": "cli-format",
+      "rawReportSha256": "aba28209059b2972f35e19732348e8038d726d4db3577b8e23755934c1225aec",
+      "command": "deno fmt",
+      "summary": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 2,
+        "filesProcessed": 2,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    }
+  ],
+  "additionalGates": {
+    "qualityArchitectureDependencies": "PASS (durable native receipt retained privately)",
+    "mcpCorpusFreshness": "PASS (durable native receipt; public signatures unchanged)",
+    "independentReview": "pending corrective-cycle review2 at exact pushed head",
+    "fullRuntimeCI": "pending new exact-head manual e2e-cli workflow"
+  },
+  "baselineDesktopFailure": "https://github.com/rickylabs/netscript/actions/runs/40539973506/job/122316042010",
+  "branchDesktopFailure": "https://github.com/rickylabs/netscript/actions/runs/41162244034/job/124422283343"
+}

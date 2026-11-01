@@ -1,0 +1,59 @@
+{
+  "name": "@netscript/plugin-streams",
+  "version": "0.0.8",
+  "description": "Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./mod.ts",
+    "./scaffold": "./scaffold.ts",
+    "./adapter-cli": "./cli.ts",
+    "./cli": "./src/cli/composition/main.ts",
+    "./e2e": "./src/e2e/mod.ts",
+    "./aspire": "./src/aspire/mod.ts",
+    "./services": "./services/src/main.ts"
+  },
+  "imports": {
+    "@netscript/aspire": "jsr:@netscript/aspire@0.0.8",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.8",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.8",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.8",
+    "@netscript/service": "jsr:@netscript/service@0.0.8",
+    "@std/net": "jsr:@std/net@^1",
+    "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
+    "hono": "jsr:@hono/hono@4.13.13",
+    "hono/cors": "jsr:@hono/hono@4.13.13/cors",
+    "zod": "catalog:"
+  },
+  "tasks": {
+    "check": "deno check --unstable-kv mod.ts scaffold.ts cli.ts src/adapter/plugin.ts src/adapter/resources/mod.ts src/cli/composition/main.ts src/cli/adapters/*.ts src/e2e/mod.ts src/e2e/probes/*.ts src/aspire/mod.ts verify-plugin.ts services/src/main.ts services/src/proxy-headers.ts services/src/proxy.ts services/src/durability.ts",
+    "dev": "deno run --allow-net --allow-env --allow-read --allow-write --allow-sys --allow-ffi --watch services/src/main.ts",
+    "start": "deno run --allow-net --allow-env --allow-read --allow-write --allow-sys --allow-ffi services/src/main.ts",
+    "streams:e2e": "deno run --allow-net --allow-env src/e2e/probes/health.ts && deno run --allow-all src/e2e/probes/publish.ts && deno run --allow-net --allow-env src/e2e/probes/subscribe.ts",
+    "test": "deno test --allow-all",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "deno.json",
+      "package.json",
+      "scaffold.plugin.json",
+      "scaffold.runtime.json",
+      "scaffold.ts",
+      "cli.ts",
+      "mod.ts",
+      "src/**/*.ts",
+      "services/**/*.ts"
+    ],
+    "exclude": [
+      "**/*_test.ts",
+      "**/*.test.ts",
+      "**/test_utils/**"
+    ]
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  }
+}

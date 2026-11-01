@@ -1,12 +1,17 @@
 ---
 layout: layouts/base.vto
-title: Recipes
+title: Durable workflows recipes
+nav_title: Recipes
+description: Task-oriented recipes for durable workflows, one problem each.
 templateEngine: [vento, md]
 order: 100
 ---
 
-# Durable workflows — recipes
+# Durable workflows recipes
 
-Task-oriented recipes for this area. Each one solves a single concrete problem and assumes you know
-the basics from the guides above it in the sidebar. The full cross-area catalog lives at
-[All how-to recipes]({{ "howto:index" |> xref |> url }}).
+Each recipe here solves one concrete problem with sagas, triggers, queues or streams. It assumes the
+guides above it in the sidebar.
+
+{{ for recipe of nav.menu(url, navQuery, navSort)?.children ?? [] -}}
+- [{{ recipe.data.title }}]({{ recipe.data.url }}){{ recipe.data.description ? ": " + recipe.data.description : "" }}
+{{ /for }}

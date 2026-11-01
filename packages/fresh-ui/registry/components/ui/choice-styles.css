@@ -5,7 +5,7 @@
   cursor: pointer;
 }
 
-.ns-choice--disabled {
+:where(.ns-choice)[data-disabled='true'] {
   cursor: not-allowed;
   opacity: 0.55;
 }
@@ -49,4 +49,32 @@
 .ns-switch:focus-visible + .ns-switch__track {
   outline: 2px solid var(--ns-ring);
   outline-offset: 2px;
+}
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='checkbox'], [data-scope='switch'])[data-part='root'][data-disabled='true'] {
+  opacity: calc(var(--ns-state-disabled-opacity) / 100);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='checkbox'], [data-scope='switch'])[data-part='label'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-body);
+  font-weight: var(--ns-weight-strong);
+  line-height: var(--ns-leading-body);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='checkbox'], [data-scope='switch'])[data-part='description'] {
+  font-size: var(--ns-text-small);
+  line-height: var(--ns-leading-small);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) input[data-part='control']:focus-visible + :is([data-part='indicator'], [data-part='track']) {
+  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+  outline-offset: var(--ns-focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) :is([data-scope='checkbox'], [data-scope='switch']) {
+    transition: none;
+  }
 }

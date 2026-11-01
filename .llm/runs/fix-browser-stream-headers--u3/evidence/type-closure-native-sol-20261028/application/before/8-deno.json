@@ -1,0 +1,79 @@
+{
+  "name": "@netscript/plugin-workers",
+  "version": "0.0.8",
+  "description": "NetScript plugin for background job scheduling, task execution, and worker API endpoints.",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./mod.ts",
+    "./adapter-cli": "./cli.ts",
+    "./aspire": "./src/aspire/mod.ts",
+    "./cli": "./src/cli/composition/main.ts",
+    "./contracts": "./contracts/v1/mod.ts",
+    "./doctor": "./doctor.ts",
+    "./jobs/health-check.ts": "./jobs/health-check.ts",
+    "./runtime": "./bin/runtime.ts",
+    "./scaffold": "./scaffold.ts",
+    "./services": "./services/src/main.ts",
+    "./streams": "./streams/mod.ts",
+    "./streams/server": "./streams/server.ts",
+    "./worker": "./worker/mod.ts"
+  },
+  "imports": {
+    "@netscript/config": "jsr:@netscript/config@0.0.8",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.8",
+    "@netscript/cron": "jsr:@netscript/cron@0.0.8",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.8",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.8",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.8",
+    "@netscript/plugin-workers-core": "jsr:@netscript/plugin-workers-core@0.0.8",
+    "@netscript/queue": "jsr:@netscript/queue@0.0.8",
+    "@netscript/service": "jsr:@netscript/service@0.0.8",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.8",
+    "@std/async": "jsr:@std/async@^1",
+    "@std/path": "jsr:@std/path@^1",
+    "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
+    "hono": "jsr:@hono/hono@4.13.13",
+    "hono/cors": "jsr:@hono/hono@4.13.13/cors",
+    "zod": "catalog:"
+  },
+  "tasks": {
+    "check": "deno check --unstable-kv mod.ts cli.ts scaffold.ts bin/runtime.ts src/adapter/plugin.ts src/adapter/resources/mod.ts src/aspire/mod.ts src/cli/composition/main.ts contracts/v1/mod.ts services/src/main.ts streams/mod.ts streams/server.ts worker/mod.ts",
+    "test": "deno test --allow-all",
+    "dev": "deno run --allow-net --allow-env --allow-read --watch services/src/main.ts",
+    "start": "deno run --allow-net --allow-env --allow-read services/src/main.ts",
+    "workers:e2e": "deno run --allow-net --allow-env src/e2e/probes/health.ts && deno run --allow-read verify-plugin.ts",
+    "test:api": "deno run --allow-net --allow-env test-api.ts",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "deno.json",
+      "package.json",
+      "scaffold.plugin.json",
+      "scaffold.runtime.json",
+      "cli.ts",
+      "doctor.ts",
+      "scaffold.ts",
+      "mod.ts",
+      "bin/**/*.ts",
+      "src/**/*.ts",
+      "contracts/**/*.ts",
+      "services/**/*.ts",
+      "streams/**/*.ts",
+      "worker/**/*.ts",
+      "jobs/**/*.ts",
+      "database/**/*.prisma"
+    ],
+    "exclude": [
+      "**/*_test.ts",
+      "**/*.test.ts",
+      "**/test_utils/**"
+    ]
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  }
+}

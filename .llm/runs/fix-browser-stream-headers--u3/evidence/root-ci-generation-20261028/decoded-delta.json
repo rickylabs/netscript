@@ -1,0 +1,76 @@
+{
+  "mcpSurfaces": 299,
+  "mcp": [
+    {
+      "key": "fresh/./streams",
+      "changed": [
+        {
+          "name": "NetScriptStreamDBOptions",
+          "before": [
+            "NetScriptStreamDBOptions",
+            "interface",
+            "interface NetScriptStreamDBOptions<TDef extends NetScriptStreamStateDefinition> { streamPath: string; baseUrl?: string; schema: NetScriptStateSchema<TDef>; createStreamDB?: NetScriptStreamDBFactory<TDef>; reconnect?: NetScriptStreamDBReconnectOptions }",
+            "Options for `createNetScriptStreamDB`."
+          ],
+          "after": [
+            "NetScriptStreamDBOptions",
+            "interface",
+            "interface NetScriptStreamDBOptions<TDef extends NetScriptStreamStateDefinition> { streamPath: string; baseUrl?: string; schema: NetScriptStateSchema<TDef>; createStreamDB?: NetScriptStreamDBFactory<TDef>; headers?: HeadersRecord; reconnect?: NetScriptStreamDBReconnectOptions }",
+            "Options for `createNetScriptStreamDB`."
+          ]
+        },
+        {
+          "name": "HeadersRecord",
+          "after": [
+            "HeadersRecord",
+            "typeAlias",
+            "type HeadersRecord = unknown",
+            "Headers record where values can be static strings or async functions.\nFollowing the @electric-sql/client pattern for dynamic headers.\n\n**Important**: Functions are called **for each request**, not once per session.\nIn live mode with long-polling, the same function may be called many times\nto fetch fresh values (e.g., refreshed auth tokens) for each poll.\n@example ```typescript\nheaders: {\n  Authorization: `Bearer ${token}`,           // Static - same for all requests\n  'X-Tenant-Id': () => getCurrentTenant(),    // Called per-request\n  'X-Auth': async () => await refreshToken()  // Called per-request (can refresh)\n}\n```"
+          ]
+        },
+        {
+          "name": "MaybePromise",
+          "after": [
+            "MaybePromise",
+            "typeAlias",
+            "type MaybePromise<T> = unknown",
+            "Type for values that can be provided immediately or resolved asynchronously."
+          ]
+        }
+      ]
+    },
+    {
+      "key": "plugin-workers/./streams",
+      "changed": [
+        {
+          "name": "HeadersRecord",
+          "after": [
+            "HeadersRecord",
+            "typeAlias",
+            "type HeadersRecord = unknown",
+            "Headers record where values can be static strings or async functions.\nFollowing the @electric-sql/client pattern for dynamic headers.\n\n**Important**: Functions are called **for each request**, not once per session.\nIn live mode with long-polling, the same function may be called many times\nto fetch fresh values (e.g., refreshed auth tokens) for each poll.\n@example ```typescript\nheaders: {\n  Authorization: `Bearer ${token}`,           // Static - same for all requests\n  'X-Tenant-Id': () => getCurrentTenant(),    // Called per-request\n  'X-Auth': async () => await refreshToken()  // Called per-request (can refresh)\n}\n```"
+          ]
+        },
+        {
+          "name": "MaybePromise",
+          "after": [
+            "MaybePromise",
+            "typeAlias",
+            "type MaybePromise<T> = unknown",
+            "Type for values that can be provided immediately or resolved asynchronously."
+          ]
+        }
+      ]
+    }
+  ],
+  "prosePages": 189,
+  "prose": [
+    {
+      "key": "pages/durable-workflows/streams/index.md",
+      "beforeBytes": 29971,
+      "afterBytes": 31006,
+      "beforeHash": "d367c036e4920e03c808913e7b7e2159e9e1d399fbba601ca2c20aa7218f5a7d",
+      "afterHash": "fbc1ff9b3adf9d5932036de183606d97aa527c9778191883a5a8d97e7d82c732"
+    }
+  ]
+}

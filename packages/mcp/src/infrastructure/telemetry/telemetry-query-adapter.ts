@@ -1,0 +1,100 @@
+import { createTelemetryQuery, type TelemetryQueryPort } from '@netscript/telemetry/query';
+import type {
+  AspirePsDashboardPort,
+  TelemetryEndpointEnvironment,
+} from '../../domain/telemetry-endpoint.ts';
+import { resolveTelemetryEndpoint } from '../../domain/telemetry-endpoint.ts';
+
+/** Infrastructure overrides used by tests and non-standard Aspire installations. */
+export interface ResolvedTelemetryQueryOptions {
+  /** Fetch implementation supplied directly instead of local certificate discovery. */
+  readonly fetch?: typeof fetch;
+  /** Directory containing trusted ASP.NET development certificate PEM files. */
+  readonly aspnetTrustDirectory?: string;
+  /** Injectable `aspire ps` reader used after configured environment inputs. */
+  readonly aspirePs?: AspirePsDashboardPort;
+}
+
+function isLoopbackHttps(endpoint: string): boolean {
+  const url = new URL(endpoint);
+  return url.protocol === 'https:' &&
+    (url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.hostname === '[::1]');
+}
+
+function defaultAspnetTrustDirectory(): string | undefined {
+  const home = Deno.env.get('HOME') ?? Deno.env.get('USERPROFILE');
+  return home ? `${home}/.aspnet/dev-certs/trust` : undefined;
+}
+
+function readAspnetDevelopmentCertificates(directory: string | undefined): readonly string[] {
+  if (!directory) {
+    return [];
+  }
+  try {
+    return [...Deno.readDirSync(directory)]
+      .filter((entry) => entry.isFile && entry.name.endsWith('.pem'))
+      .sort((left, right) => left.name.localeCompare(right.name))
+      .map((entry) => Deno.readTextFileSync(`${directory}/${entry.name}`));
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound || error instanceof Deno.errors.PermissionDenied) {
+      return [];
+    }
+    throw error;
+  }
+}
+
+/** Create a CA-verifying fetch for a loopback Aspire HTTPS dashboard when its PEM is available. */
+export function createAspireDashboardFetch(
+  endpoint: string,
+  options: ResolvedTelemetryQueryOptions,
+): typeof fetch | undefined {
+  return openAspireDashboardConnection(endpoint, options).fetch;
+}
+
+/** Open a dashboard HTTP connection whose development-certificate client has an explicit lifetime. */
+export function openAspireDashboardConnection(
+  endpoint: string,
+  options: ResolvedTelemetryQueryOptions = {},
+): { readonly fetch: typeof fetch; readonly close: () => void } {
+  if (options.fetch) {
+    return { fetch: options.fetch, close: () => {} };
+  }
+  if (!isLoopbackHttps(endpoint)) {
+    return { fetch, close: () => {} };
+  }
+
+  const certificates = readAspnetDevelopmentCertificates(
+    options.aspnetTrustDirectory ?? defaultAspnetTrustDirectory(),
+  );
+  if (certificates.length === 0) {
+    return { fetch, close: () => {} };
+  }
+
+  const client = Deno.createHttpClient({ caCerts: [...certificates] });
+  const dashboardFetch: typeof fetch = (input, init) => {
+    const request = { ...init, client } as RequestInit & { client: Deno.HttpClient };
+    return fetch(input, request);
+  };
+  return { fetch: dashboardFetch, close: () => client.close() };
+}
+
+/** Create the Aspire-backed telemetry reader for resolved endpoint inputs. */
+export function createResolvedTelemetryQuery(
+  explicit: string | undefined,
+  environment: TelemetryEndpointEnvironment,
+  options: ResolvedTelemetryQueryOptions = {},
+): TelemetryQueryPort {
+  const endpoint = resolveTelemetryEndpoint(explicit, environment, options.aspirePs).endpoint;
+  return createTelemetryQuery({
+    endpoint,
+    fetch: createAspireDashboardFetch(endpoint, options),
+  });
+}
+
+/** Read only the environment values used by telemetry endpoint discovery. */
+export function readTelemetryEndpointEnvironment(): TelemetryEndpointEnvironment {
+  return {
+    NETSCRIPT_TELEMETRY_ENDPOINT: Deno.env.get('NETSCRIPT_TELEMETRY_ENDPOINT'),
+    ASPIRE_DASHBOARD_PORT: Deno.env.get('ASPIRE_DASHBOARD_PORT'),
+  };
+}

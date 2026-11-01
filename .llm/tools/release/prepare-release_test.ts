@@ -10,7 +10,7 @@ import {
 } from './prepare-release.ts';
 
 const AGENT_DOCS_OUTPUTS = [
-  'packages/cli/src/kernel/assets/agent-docs-prose.generated.ts',
+  'packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts',
   '.llm/assets/agent-docs/provenance.json',
 ] as const;
 
@@ -91,6 +91,7 @@ Deno.test('shared release preparation stages every generator-owned output', () =
   assertEquals(PREPARED_RELEASE_GENERATED_OUTPUTS, [
     ...PUBLISH_ASSET_OUTPUTS,
     EXPORT_SURFACE_CORPUS_OUTPUT,
+    'packages/fresh-ui/src/registry/assets/registry.generated.ts',
   ]);
   const versionFiles = [
     '/repo/deno.json',
@@ -101,6 +102,7 @@ Deno.test('shared release preparation stages every generator-owned output', () =
     ...versionFiles,
     ...PUBLISH_ASSET_OUTPUTS.map((path) => `/repo/${path}`),
     `/repo/${EXPORT_SURFACE_CORPUS_OUTPUT}`,
+    '/repo/packages/fresh-ui/src/registry/assets/registry.generated.ts',
   ]);
   for (const path of AGENT_DOCS_OUTPUTS) {
     assertEquals(

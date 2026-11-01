@@ -2,8 +2,40 @@ import { dirname, join, relative, resolve } from '@std/path';
 import type { InstallLocalPluginDependencies } from './install-local-plugin.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import type { ScaffolderPort } from '../../../../kernel/ports/template-port.ts';
+import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import { generatePluginServiceContext } from '../../../../kernel/templates/plugins/plugin-generators.ts';
 import { findOfficialPluginSourceRoot } from '../../../../maintainer/maintainer-api.ts';
+
+/** Register local exports and return the package's local service entrypoint, when exported. */
+export async function ensureLocalPluginImports(
+  projectRoot: string,
+  packageRoot: string,
+  packageName: string,
+  fs: FileSystemPort,
+): Promise<string | undefined> {
+  const packageConfigPath = join(packageRoot, 'deno.json');
+  if (!await fs.exists(packageConfigPath)) return;
+  const packageConfig: { exports?: string | Readonly<Record<string, string>> } = JSON.parse(
+    await fs.readFile(packageConfigPath),
+  );
+  if (packageConfig.exports === undefined) return;
+  const exports = typeof packageConfig.exports === 'string'
+    ? [['.', packageConfig.exports]]
+    : Object.entries(packageConfig.exports);
+  const rootConfigPath = join(projectRoot, 'deno.json');
+  const rootConfig: { imports?: Record<string, string> } = JSON.parse(
+    await fs.readFile(rootConfigPath),
+  );
+  rootConfig.imports ??= {};
+  for (const [subpath, target] of exports) {
+    const specifier = subpath === '.' ? packageName : `${packageName}${subpath.slice(1)}`;
+    const path = relative(projectRoot, resolve(packageRoot, target)).replaceAll('\\', '/');
+    rootConfig.imports[specifier] = path.startsWith('.') ? path : `./${path}`;
+  }
+  await fs.writeFile(rootConfigPath, `${JSON.stringify(rootConfig, null, 2)}\n`);
+  const service = exports.find(([subpath]) => subpath === './services');
+  return service ? resolve(packageRoot, service[1]) : undefined;
+}
 
 /** Merge explicit references with default dependency references. */
 export function mergeUniqueReferences(

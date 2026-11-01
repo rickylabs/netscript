@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
 import {
   APP_DIR,
   BASE_URL,
@@ -8,6 +9,10 @@ import {
   THEMES,
   WIDTHS,
 } from './settings.ts';
+
+const prepareFixtures = fileURLToPath(new URL('./prepare-component-fixtures.ts', import.meta.url));
+// The browser harness runs on POSIX hosts; quote the script path before using the shell command.
+const quotedPrepareFixtures = "'" + prepareFixtures.replaceAll("'", "'\\''") + "'";
 
 export default defineConfig({
   testDir: './tests',
@@ -37,7 +42,9 @@ export default defineConfig({
     }))
   ),
   webServer: EXTERNAL_SERVER ? undefined : {
-    command: `deno task dev --host 127.0.0.1 --port ${new URL(BASE_URL).port} --strictPort`,
+    command: `node ${quotedPrepareFixtures} && deno task dev --host 127.0.0.1 --port ${
+      new URL(BASE_URL).port
+    } --strictPort`,
     cwd: APP_DIR,
     url: new URL(ROUTES[0], BASE_URL).href,
     timeout: 180_000,

@@ -2,158 +2,115 @@
 layout: layouts/base.vto
 title: Architecture
 templateEngine: [vento, md]
-prev: { label: "Explanation", href: "/explanation/" }
-next: { label: "Contracts & type flow", href: "/explanation/contracts/" }
 order: 1
 ---
 
-# The NetScript architecture
+# Architecture
 
-NetScript is a set of Deno-native framework packages, published on
-[JSR](https://jsr.io) and composed into a running backend by **first-party
-plugins**, orchestrated locally by **Aspire**. This essay answers one question:
-when you build an app on NetScript, what are the layers you actually work with,
-what runs where, and which way do the dependencies point?
+This page gives you the map of a NetScript app: the layers you work with, what runs where, and which
+way the dependencies point. NetScript is a set of Deno-native framework packages published on
+[JSR](https://jsr.io), composed into a running backend by **first-party plugins** and orchestrated
+locally by **Aspire**.
 
 {{ comp.diagram({ src: "/assets/diagrams/architecture-overview.svg", alt: "A NetScript workspace as four stacked layers: typed contracts at the base, packages and plugins composed on top, the host wiring plugins through generated registries, and the runtime executing services and background processors — all orchestrated by Aspire.", caption: "The four layers an app author works with: typed contracts, packages and plugins, the host that assembles them, and the runtime that executes services and background processors." }) }}
 
-Read this for orientation, not step-by-step work. The
-[tutorials]({{ comp.xref({ key: "tut:index" }) }}) and
-[how-to guides]({{ comp.xref({ key: "howto:index" }) }}) are the practical paths;
-the [glossary](/glossary/) defines every term of art; and each layer below routes
-you onward to the capability hub or reference unit that elaborates it.
+This page explains why NetScript is split the way it is. For hands-on work, use the
+[tutorials]({{ "tut:index" |> xref }}) and the guides and recipes in [Build]({{ "howto:index" |> xref }}); the
+[glossary](/glossary/) defines each term.
 
-{{ comp callout { type: "note", title: "How to read this page" } }}
-This is a <strong>mental-model</strong> page. It explains <em>why</em> NetScript
-is split the way it is. If you want exact exports, jump to a
-<a href="/reference/">reference unit</a>; if you want to ship something, start
-with a <a href="/tutorials/">tutorial</a>.
-{{ /comp }}
+## The published surface
 
-## The thesis: the published surface is the product
-
-NetScript treats publishing as the whole point. A package's `mod.ts` is not an
-implementation detail that happens to be exported — it is the contract the
-framework makes with you, the caller. The shape you see through `deno doc`, the
-JSR doc score, and the type checker is the surface everything else serves.
+A package's `mod.ts` is the contract the framework makes with you, the caller. It is not an
+implementation detail that happens to be exported. The surface you see through `deno doc`, the JSR
+doc score, and the type checker is what everything else serves.
 
 Two consequences explain most of the design decisions you will meet:
 
-1. **Types are designed before implementation.** The public types and the README
-   come first; the code that satisfies them comes second. If `deno doc <package>`
-   does not read end-to-end as a manual, the surface is considered broken,
-   regardless of how the internals work.
-2. **Simple is preferred over easy at every boundary.** Approachability comes
-   from a small, predictable surface rather than hidden magic. The common 80%
-   case is one chained call; advanced cases unfold one method deeper rather than
-   appearing as required configuration on the entry point.
+1. **Types are designed before implementation.** The public types and the README come first; the
+   code that satisfies them comes second. If `deno doc <package>` does not read end-to-end as a
+   manual, the surface is broken, however well the internals work.
+2. **Simple is preferred over easy at every boundary.** Approachability comes from a small,
+   predictable surface rather than hidden magic. The common 80% case is one chained call; advanced
+   cases sit one method deeper instead of appearing as required configuration on the entry point.
 
-The deeper rationale for this contract-first stance is the subject of
-[Contracts &amp; type flow]({{ comp.xref({ key: "explain:contracts" }) }}).
+[Contracts &amp; type flow]({{ "explain:contracts" |> xref }}) covers the rationale for this
+contract-first stance.
 
 ## Four layers, one direction of dependency
 
-The single most useful thing to hold in your head is the **direction** of the
-arrows. Every layer below depends only on the layers beneath it, and **nothing
-ever edits another boundary's code**. Build that picture once and the rest of the
-framework stops surprising you.
+Each layer depends only on the layers beneath it, and no layer edits another boundary's code. From
+the bottom up:
 
-### 1. Typed contracts — the base, with no dependencies
+### Typed contracts
 
-At the bottom sits the contract layer: schemas and types that describe what a
-service accepts and returns, with essentially no runtime and no dependencies of
-their own. A contract is a plain object built from `@orpc/contract` and zod
-schemas; the same object is imported by the service that *implements* it and by
-the client that *calls* it, so the two can never drift. Because contracts depend
-on nothing, everything above can depend on them freely.
+The contract layer holds schemas and types that describe what a service accepts and returns, with
+almost no runtime and no dependencies of its own. A contract is a plain object built from
+`@orpc/contract` and zod schemas. The service that *implements* it and the client that *calls* it
+import the same object, so the two cannot drift. Because contracts depend on nothing, every layer
+above can depend on them.
 
-This is why "change the shape" is a type error you see at compile time rather
-than a 500 you discover in production. The contract machinery —
-`@orpc/contract`, zod, and `implement()` — is the subject of
-[Contracts &amp; type flow]({{ comp.xref({ key: "explain:contracts" }) }}); the
-API reference is [`@netscript/contracts`]({{ comp.xref({ key: "ref:contracts" }) }}).
+A shape change is therefore a type error at compile time, not a 500 in production. The contract
+machinery (`@orpc/contract`, zod, and `implement()`) is the subject of
+[Contracts &amp; type flow]({{ "explain:contracts" |> xref }}); the API reference is
+[`@netscript/contracts`]({{ "ref:contracts" |> xref }}).
 
-### 2. Packages and plugins — composing the substrate
+### Packages and plugins
 
 Above the contracts sit two kinds of building block:
 
-- **Platform packages** (the `@netscript/*` kernel) know nothing about any one
-  capability. They are the shared substrate: [`config`]({{ comp.xref({ key: "ref:config" }) }}),
-  [`service`]({{ comp.xref({ key: "ref:service" }) }}),
-  [`database`]({{ comp.xref({ key: "ref:database" }) }}),
-  [`queue`]({{ comp.xref({ key: "ref:queue" }) }}),
-  [`kv`]({{ comp.xref({ key: "ref:kv" }) }}),
-  [`telemetry`]({{ comp.xref({ key: "ref:telemetry" }) }}), and the rest. A
-  package wraps one concern behind a small surface and never reaches across into
-  another package's internals.
-- **Plugins** turn that substrate into a *capability* — workers, sagas, triggers,
-  auth, streams. A plugin **composes** packages; it does not redefine them. It
-  declares its capability by registering named **contributions** (a service, a
-  background processor, a Prisma schema fragment, a stream topic) and leaves the
-  wiring to the host.
+- **Platform packages** (the `@netscript/*` kernel) know nothing about any one capability. They are
+  the shared substrate: [`config`]({{ "ref:config" |> xref }}),
+  [`service`]({{ "ref:service" |> xref }}), [`database`]({{ "ref:database" |> xref }}),
+  [`queue`]({{ "ref:queue" |> xref }}), [`kv`]({{ "ref:kv" |> xref }}),
+  [`telemetry`]({{ "ref:telemetry" |> xref }}), and the rest. A package wraps one concern behind a
+  small surface and never reaches into another package's internals.
+- **Plugins** turn that substrate into a *capability*: workers, sagas, triggers, auth, streams. A
+  plugin **composes** packages; it does not redefine them. It declares its capability by
+  registering named **contributions** (a service, a background processor, a Prisma schema fragment,
+  a stream topic) and leaves the wiring to the host.
 
-The rule that keeps this clean: a plugin depends on packages, packages depend on
-contracts, and the arrow never reverses. A workers plugin imports the contract
-types from its sibling [`@netscript/plugin-workers-core`]({{ comp.xref({ key: "ref:workers" }) }})
-package rather than inventing its own; an auth plugin composes the auth seam
-rather than embedding a provider. The mechanics — public plugin versus core
-package, manifests, contributions, and the generated registry — live in
-[The plugin system]({{ comp.xref({ key: "explain:plugin-system" }) }}).
+A plugin depends on packages, packages depend on contracts, and the arrow never reverses. A workers
+plugin imports the contract types from its sibling
+[`@netscript/plugin-workers-core`]({{ "ref:workers" |> xref }}) package rather than inventing its
+own; an auth plugin composes the auth seam rather than embedding a provider. So adding a capability
+is a manifest plus a regenerated registry, never a patch to the kernel.
+[The plugin system]({{ "explain:plugin-system" |> xref }}) covers the public plugin versus core
+package split, manifests, contributions, and the generated registry.
 
-{{ comp callout { type: "tip", title: "The key insight" } }}
-A plugin is just a unit that <strong>composes packages</strong> and
-<strong>registers contributions</strong>. It is never a patch to framework code.
-Adding a capability is a manifest plus a regenerated registry, not an edit to the
-kernel. That single rule is what lets the framework grow without the layers
-tangling.
-{{ /comp }}
+> [!NOTE]
+> Framework tooling uses the word *archetype*. It is an internal classification for the
+> framework's own quality gates. As an app author you meet it only through the shape of a
+> scaffolded plugin, and you never configure it.
 
-(You may see the word *archetype* in the doctrine and tooling. That is an
-internal classification the framework uses for its own quality gates — as an app
-author you meet it only indirectly, through the shape of a scaffolded plugin. See
-[The plugin system]({{ comp.xref({ key: "explain:plugin-system" }) }}) if you are
-curious; it is not something you configure.)
+### The host
 
-### 3. The host — assembling plugins through generated registries
+The host assembles plugins into a workspace. When you run the scaffold's generate step, NetScript
+reads the plugin list from `netscript.config.ts`, validates each plugin's contributions against
+fixed extension axes, and writes **generated registry** files that wire the contributions together.
+The host loads those registries at startup.
 
-A workspace is more than a pile of plugins; something has to *assemble* them. That
-is the host's job. When you run the scaffold's generate step, NetScript reads the
-plugin list from `netscript.config.ts`, validates each plugin's contributions
-against fixed extension axes, and writes **generated registry** files that wire
-the contributions together. The host then loads those registries at startup.
+The host *reads* plugin manifests and *generates* wiring; it never asks you to hand-edit one plugin
+to make room for another. Two enabled plugins coexist because the host merged their registrations,
+not because either was patched. Enabling a capability is a config line plus a regenerate, and the
+generated files are reproducible output you do not author by hand.
 
-The discipline here is the same as everywhere else: the host *reads* plugin
-manifests and *generates* wiring; it never asks you to hand-edit one plugin to
-make room for another. Two enabled plugins coexist because the host merged their
-registrations, not because either was patched. This is why enabling a capability
-is a config line plus a regenerate, and why the generated files are reproducible
-output you do not author by hand.
+### The runtime
 
-### 4. The runtime — executing services and background processors
+A running workspace is several single-purpose processes, each owned by a plugin, each speaking a
+contract, and all started together by Aspire. Two kinds of process run here:
 
-At the top, the host's assembled workspace *runs*. NetScript is not one process:
-it is a small constellation of single-purpose services, each owned by a plugin and
-each speaking a contract, brought up together by Aspire. Two kinds of thing
-execute here:
+- **Services** answer requests. They are [oRPC services]({{ "cap:services" |> xref }}) mounted at
+  `/api/rpc/*`, with one raw exception for webhook ingress.
+- **Background processors** do work outside the request path: the worker job runtime, the durable
+  saga runtime, schedulers, and file watchers. They own state and lifecycle, persist through a
+  store, and shut down cleanly through a `{ stop() }` handle.
 
-- **Services** answer requests. They are
-  [oRPC services]({{ comp.xref({ key: "cap:services" }) }}) mounted at
-  `/api/rpc/*` — including triggers, which serve a typed v1 oRPC contract for
-  trigger and event introspection plus management. The exception is the webhook
-  *ingress* endpoint, a raw signature-verifying route because inbound webhooks are
-  webhook-shaped, not contract-shaped.
-- **Background processors** do work outside the request path: the worker job
-  runtime, the durable saga runtime, schedulers, and file watchers. They own
-  state and lifecycle, persist through a store, and shut down cleanly through a
-  `{ stop() }` handle.
-
-The topology below is the canonical shape of a fully-loaded workspace, with every
-first-party plugin enabled.
+The topology below is a fully loaded workspace, with every first-party plugin enabled.
 
 ```text
                               ┌───────────────────────────────────┐
                               │            Aspire AppHost          │
-                              │   dashboard  https://localhost:18888│
+                              │   dashboard  the URL Aspire prints│
                               │  provisions Postgres + Redis (KV)  │
                               └───────────────┬───────────────────┘
                                               │ wires env, ports, resources
@@ -181,22 +138,20 @@ first-party plugin enabled.
    └───────────────────┘                                      └────────────────────┘
 ```
 
-Read the picture in three bands. **Aspire** sits on top as the local
-orchestrator: `cd aspire && aspire start` brings up Postgres and Redis (the default cache backend; `garnet` or `deno-kv` are selectable via `--cache-backend`) and starts
-every service *before* any `netscript db` command runs, with traces, logs, and
-health landing in the dashboard at `https://localhost:18888`. **Plugin services**
-sit in the middle, each owning exactly one service on a fixed port; your own
-scaffolded `users` service sits alongside them, speaking the same contract
-machinery. **The packages** sit underneath as the shared substrate every plugin
-composes against. See
-[Orchestration with Aspire]({{ comp.xref({ key: "explain:aspire" }) }}) for the
-control-plane detail.
+Read the picture in three bands. **Aspire** sits on top as the local orchestrator:
+`cd aspire && aspire start` brings up Postgres and Redis (the default cache backend; `garnet` or
+`deno-kv` are selectable via `--cache-backend`) and starts every service *before* any
+`netscript db` command runs. Traces, logs, and health land in the dashboard at
+`the URL Aspire prints`. **Plugin services** sit in the middle, each owning exactly one service;
+your scaffolded `users` service sits beside them and uses the same contract machinery. **The
+packages** sit underneath as the substrate every plugin composes. See
+[Orchestration with Aspire]({{ "explain:aspire" |> xref }}) for the control plane.
 
 {{ comp.apiTable({
   title: "Workspace ports and surfaces",
   columns: ["Surface", "Port", "Protocol", "Owner"],
   rows: [
-    ["Aspire dashboard", ":18888", "HTTP (UI)", "Aspire AppHost"],
+    ["Aspire dashboard", "the URL Aspire prints", "HTTP (UI)", "Aspire AppHost"],
     ["Example service (users)", "Assigned (>= 49152)", "oRPC over <code>/api/rpc/*</code>", "your service"],
     ["Workers", "Assigned (>= 49152)", "oRPC", "<code>@netscript/plugin-workers</code>"],
     ["Sagas", "Assigned (>= 49152)", "oRPC", "<code>@netscript/plugin-sagas</code>"],
@@ -206,170 +161,113 @@ control-plane detail.
   ]
 }) }}
 
-A subtlety worth fixing early: **triggers serve a typed v1 oRPC contract**, like
-every other plugin service — the exception is narrower than it looks. Only the
-webhook *ingress* endpoint (`POST /api/v1/webhooks/:triggerId`) stays a raw,
-signature-verifying route, because it verifies an HMAC over the raw request bytes
-from external senders. Service RPC is mounted at `/api/rpc/*` (not `/rpc`). Those
-two facts trip people up more than any other detail here.
+> [!IMPORTANT]
+> Triggers serve a typed v1 oRPC contract for trigger and event introspection and management, like
+> every other plugin service. Only the webhook *ingress* endpoint
+> (`POST /api/v1/webhooks/:triggerId`) stays a raw route, because it verifies an HMAC over the raw
+> request bytes from external senders. Service RPC is mounted at `/api/rpc/*`, not `/rpc`.
 
-## The pure-backend seam: a port with interchangeable adapters
+## The pure-backend seam
 
-There is one recurring pattern that, once you see it, you will recognize across
-the whole framework: the **pure-backend seam**. It is how NetScript keeps a
-capability open to several implementations without leaking any of them into the
-contract.
+One pattern recurs across the framework: the **pure-backend seam**. It keeps a capability open to
+several implementations without leaking any of them into the contract. The shape is always the
+same:
 
-The shape is always the same:
+1. A package defines a **port**: a pure interface, with no IO, that says what the capability must
+   do.
+2. **Adapter** code implements that port against a concrete technology. Adapters are *pure
+   backends*: they depend on the port, never the reverse, and add no public surface beyond the
+   factory you call.
+3. A **plugin** composes **exactly one** active adapter, selected by configuration, and exposes it
+   as a running service.
 
-1. A package defines a **port** — a pure interface, no IO — that says what the
-   capability must be able to do.
-2. **Adapter** code implements that port against a concrete technology. Adapters
-   are *pure backends*: they depend on the port, never the reverse, and add no
-   public surface of their own beyond the factory you call.
-3. A **plugin** composes **exactly one** active adapter, selected by
-   configuration, and exposes it as a running service.
+Auth is the most visible instance. A core seam defines an `AuthBackendPort`; three pure adapters
+implement it (the default interactive KV-OAuth backend, plus WorkOS and Better-Auth); and the auth
+plugin composes the one backend named by `NETSCRIPT_AUTH_BACKEND`. When a backend cannot honor a
+capability, it fails loud with a typed `AuthBackendOperationUnsupportedError` instead of silently
+doing nothing. [The auth model]({{ "explain:auth-model" |> xref }}) covers the port, the three
+backends, and the per-backend capability matrix; the guide is
+[Authentication]({{ "cap:auth" |> xref }}).
 
-Auth is the most visible instance: a core seam defines an `AuthBackendPort`, three
-pure adapters implement it (a default interactive KV-OAuth backend, plus WorkOS
-and Better-Auth), and the auth plugin composes the one backend named by
-`NETSCRIPT_AUTH_BACKEND`. A capability a given backend cannot honor fails loud
-through a typed `AuthBackendOperationUnsupportedError` rather than silently doing
-nothing. The full treatment — the port, the three backends, and the per-backend
-capability matrix — lives in
-[The auth model]({{ comp.xref({ key: "explain:auth-model" }) }}); the
-capability hub is [Authentication]({{ comp.xref({ key: "cap:auth" }) }}).
+The same shape appears elsewhere. The [`queue`](/reference/queue/) package defines one port behind
+four backends (Deno&nbsp;KV, Redis, RabbitMQ, and PostgreSQL). The
+[`database`](/reference/database/) package wraps a relational engine behind a port: Postgres is the
+recommended engine, and `mysql`, `mssql`, or `sqlite` are selected with `--db` at scaffold time.
+Durable sagas persist through a `kv` or `prisma` store.
 
-{{ comp callout { type: "tip", title: "The seam is the design, not the adapter" } }}
-You will see the same port-and-adapter shape everywhere: the
-<a href="/reference/queue/"><code>queue</code></a> defines one port behind four
-backends (Deno&nbsp;KV, Redis, RabbitMQ, and PostgreSQL), the
-<a href="/reference/database/"><code>database</code></a> wraps a relational engine
-behind a port — Postgres (the recommended engine; or <code>mysql</code> / <code>mssql</code> /
-<code>sqlite</code> via <code>--db</code> at scaffold time) — and durable sagas persist
-through a <code>kv</code> or <code>prisma</code>
-store. Auth simply makes the pattern most visible because it ships three adapters
-in the box.
-{{ /comp }}
+Swapping a backend is therefore a configuration change, not a rewrite: the contract is the port,
+and adapters are interchangeable behind it.
 
-This is why "swap the backend" is a configuration change in NetScript and not a
-rewrite: the contract is the port, and adapters are interchangeable behind it.
+## Configuration layers
 
-## Configuration records intent before runtime wiring
+NetScript keeps *authored intent* apart from the *runtime wiring* that makes a workspace run.
 
-NetScript keeps *authored intent* separate from the concrete *runtime wiring* that
-makes a workspace run. The project-level intent lives in `netscript.config.ts`,
-authored with [`defineConfig`]({{ comp.xref({ key: "ref:config" }) }}) or
-`defineConfigAsync`. That object says what the project *is* — its name, paths,
-enabled plugins, services, apps, database declarations, saga groups, trigger
-groups, and runtime-config output paths. At startup, `loadConfig` and `initConfig`
-resolve that authored form into a validated `NetScriptConfig`, and `getConfig` is
-the synchronous read path after initialization.
+| Layer | Where it lives | What it holds |
+| --- | --- | --- |
+| Project intent | `netscript.config.ts`, authored with [`defineConfig`]({{ "ref:config" |> xref }}) or `defineConfigAsync` | What the project *is*: its name, paths, enabled plugins (`./plugins/workers/mod.ts`, `./plugins/sagas/mod.ts`, and the rest), services, apps, database declarations, saga groups, trigger groups, and runtime-config output paths. |
+| Plugin contributions | `@netscript/config/merge` | Partial config fragments that merge *into* the validated project shape. They never replace project identity. |
+| Environment wiring | `appsettings.json`, the Aspire AppHost, and [`@netscript/runtime-config`]({{ "ref:runtime-config" |> xref }}) | Operational database and resource details, plus runtime overrides for topics such as jobs, sagas, triggers, features, and tasks. |
 
-The split matters because the host needs both halves: `netscript.config.ts`
-carries workspace intent such as `paths` and the plugin list
-(`./plugins/workers/mod.ts`, `./plugins/sagas/mod.ts`, and the rest), while the
-operational database and resource details are carried by `appsettings.json` and
-the Aspire AppHost. Plugin packages can contribute partial config fragments
-through `@netscript/config/merge`, but those fragments merge *into* the
-already-validated project shape rather than replacing project identity. Runtime
-overrides are a third layer exposed by
-[`@netscript/runtime-config`]({{ comp.xref({ key: "ref:runtime-config" }) }}) for
-topics such as jobs, sagas, triggers, features, and tasks.
+At startup, `loadConfig` and `initConfig` resolve the authored form into a validated
+`NetScriptConfig`; `getConfig` is the synchronous read path after initialization.
 
-Think of it as three nested layers: `netscript.config.ts` declares project intent,
-plugin config contributions extend that intent, and
-appsettings/Aspire/runtime-config materialize the environment-specific wiring.
-This is also where the capability switches live — the saga durable store
-(`NETSCRIPT_SAGA_STORE=kv|prisma`), the queue provider, and the active auth
-backend (`NETSCRIPT_AUTH_BACKEND`) are all selected here rather than in code. It
-is also why the database docs note a scaffold reality: `databases.config` can be
-empty in `netscript.config.ts` while the chosen engine — Postgres (the recommended choice), or
-`mysql` / `mssql` / `sqlite` selected with `--db` at scaffold time — is still
-provisioned by Aspire (sqlite is file-backed, so it has no Aspire container
-resource) and described in `appsettings.json`. See
-[Runtime configuration]({{ comp.xref({ key: "cap:runtime-config" }) }}).
+Capability switches live in the wiring layer, not in code: the saga durable store
+(`NETSCRIPT_SAGA_STORE=kv|prisma`), the queue provider, and the active auth backend
+(`NETSCRIPT_AUTH_BACKEND`). The same split explains a scaffold detail: `databases.config` can be
+empty in `netscript.config.ts` while Aspire provisions the chosen engine and `appsettings.json`
+describes it. Postgres is the recommended engine; `mysql`, `mssql`, or `sqlite` are selected with
+`--db` at scaffold time, and `sqlite` is file-backed, so it has no Aspire container resource. See
+[Runtime configuration]({{ "cap:runtime-config" |> xref }}).
 
-### Naming is part of the contract
+## Naming conventions
 
-Entry points follow fixed verbs, so you can predict behavior from the name alone:
+Entry points use fixed verbs, so the name tells you the behavior:
 
-- `defineX(...)` returns a frozen *definition* and does no runtime work.
-- `createX(...)` constructs a *runtime* object that owns state and IO.
-- `startX(...)` constructs *and* starts a runtime, returning a `{ stop() }` handle.
-- `useX(...)` is a hook-style accessor inside a request, render, or handler scope.
-- `withX(...)` is a builder method that returns a new builder and never mutates.
+| Pattern | Behavior |
+| --- | --- |
+| `defineX(...)` | Returns a frozen *definition* and does no runtime work. |
+| `createX(...)` | Constructs a *runtime* object that owns state and IO. |
+| `startX(...)` | Constructs *and* starts a runtime, returning a `{ stop() }` handle. |
+| `useX(...)` | A hook-style accessor inside a request, render, or handler scope. |
+| `withX(...)` | A builder method that returns a new builder and never mutates. |
 
-When a `mod.ts` would re-export more than roughly twenty symbols, the surface
-splits into **subpath exports** (for example `@netscript/logger/middleware` and
-`@netscript/logger/orpc`) to keep bundles lean and isolate adapter-specific code
-from production exports.
+When a `mod.ts` would re-export more than roughly twenty symbols, the surface splits into
+**subpath exports** (for example `@netscript/logger/middleware` and `@netscript/logger/orpc`). That
+keeps bundles lean and isolates adapter-specific code from production exports.
 
-## Durable behavior is modeled as state machines
+## Durable state machines
 
-For the background processors that own *durable* flows, NetScript models them as
-explicit state machines rather than generic event-handler ladders.
-[Durable sagas]({{ comp.xref({ key: "cap:durable-sagas" }) }}) are the clearest
-example: a saga is named phases with explicit correlation, persistence, and
-compensation, declared through a builder.
+Background processors that own *durable* flows model them as explicit state machines, not generic
+event-handler ladders. [Durable sagas]({{ "cap:durable-sagas" |> xref }}) are the clearest example:
+a saga is a set of named phases with explicit correlation, persistence, and compensation, declared
+through a builder.
 
-{{ comp.tabbedCode({
-  tabs: [
-    { label: "user-registration.saga.ts", lang: "ts", code:
-"// plugins/sagas/user-registration.saga.ts\nimport { defineSaga } from \"@netscript/plugin-sagas-core\";\n\ntype State = Readonly<{ status: string }>;\n\nconst saga = defineSaga(\"user-registration\")\n  .state<State>({ status: \"started\" })\n  .on(\"UserRegistered\", (s, _message, _context) => {\n    s.state = { status: \"welcoming\" };\n  })\n  .on(\"WelcomeEmailSent\", (s, _message, _context) => {\n    s.state = { status: \"complete\" };\n  })\n  .build();" }
-  ]
-}) }}
+{{ comp.codeBlock({ lang: "ts", code: "// plugins/sagas/user-registration.saga.ts\nimport { defineSaga } from \"@netscript/plugin-sagas-core\";\n\ntype State = Readonly<{ status: string }>;\n\nconst saga = defineSaga(\"user-registration\")\n  .state<State>({ status: \"started\" })\n  .on(\"UserRegistered\", (s, _message, _context) => {\n    s.state = { status: \"welcoming\" };\n  })\n  .on(\"WelcomeEmailSent\", (s, _message, _context) => {\n    s.state = { status: \"complete\" };\n  })\n  .build();" }) }}
 
-Failure handling is just as explicit. Handlers throw rich errors; a supervisor —
-not a scatter of defensive `try/catch` inside the handler — decides whether to
-restart or escalate, and owns the telemetry for that decision. The durable runtime
-persists through a selectable `kv` or `prisma` store. The full flow is covered in
-[The durability model]({{ comp.xref({ key: "explain:durability-model" }) }}).
+Failure handling is explicit too. Handlers throw rich errors, and a supervisor, not a scatter of
+defensive `try/catch` blocks inside the handler, decides whether to restart or escalate and owns the
+telemetry for that decision. The durable runtime persists through a selectable `kv` or `prisma`
+store. [The durability model]({{ "explain:durability-model" |> xref }}) covers the full flow.
 
-## Observability is built into the substrate
+## Built-in observability
 
-Because every plugin composes the same packages, observability is wired once and
-inherited everywhere. aspire starts an OTLP collector, and the worker job path —
-dispatch, execution, scheduler, and subprocess continuation — emits **real
-OpenTelemetry spans automatically**, so job traces appear in the Aspire dashboard
-without any handler code.
+Every plugin composes the same packages, so observability is wired once and inherited everywhere.
+Aspire starts an OTLP collector, and the worker job path (dispatch, execution, scheduler, and
+subprocess continuation) emits **OpenTelemetry spans automatically**. Job traces appear in the
+Aspire dashboard without any handler code.
 
-The scaffold <code>createJobTools(ctx)</code> surface adds handler events and child spans to that
-active job trace. Its <code>progress</code> helper emits a <code>job.progress</code> event and forwards
-the same update to the workers runtime progress channel.
+The scaffold `createJobTools(ctx)` surface adds handler events and child spans to that active job
+trace. Its `progress` helper emits a `job.progress` event and forwards the same update to the
+workers runtime progress channel. [Observability]({{ "explain:observability" |> xref }}) has the
+full picture.
 
-The full picture is in
-[Observability]({{ comp.xref({ key: "explain:observability" }) }}).
+## The publish gate
 
-## The publish gate is the architecture gate
+The publish gate is where the architecture is *enforced* rather than described. Tests act as fitness
+functions: checks that the architecture still holds. `deno publish --dry-run`, `deno doc`, the
+workspace type checks, the semantic tests, and an export and docs audit are required steps; they
+are how each boundary rule above survives contact with real code. A surface that fails them is
+broken by definition, which is why the published surface can be trusted as the product.
 
-Tests are treated as fitness functions, and the publish gate is where the
-architecture is *enforced* rather than merely described. `deno publish
---dry-run`, `deno doc`, the workspace type checks, the semantic tests, and an
-export/docs audit are not optional steps — they are the mechanism by which every
-boundary rule above survives contact with real code. A surface that does not pass
-them is broken by definition, which is precisely why the published surface can be
-trusted as the product.
-
-{{ comp callout { type: "note", title: "Alpha package pins" } }}
-Scaffold output pins exact alpha specifiers such as
-<code>jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}</code>.
-{{ /comp }}
-
-## Where to go next
-
-- **The contract machinery:** how types flow from a contract to a client in
-  [Contracts &amp; type flow]({{ comp.xref({ key: "explain:contracts" }) }}).
-- **The plugin mechanics:** public-versus-core split, manifests, and registries in
-  [The plugin system]({{ comp.xref({ key: "explain:plugin-system" }) }}).
-- **The auth seam in depth:** the port, the three backends, and the capability
-  matrix in [The auth model]({{ comp.xref({ key: "explain:auth-model" }) }}).
-- **Durable behavior:** how sagas and workers persist and recover in
-  [The durability model]({{ comp.xref({ key: "explain:durability-model" }) }}).
-- **The local control plane:** how Aspire provisions everything in
-  [Orchestration with Aspire]({{ comp.xref({ key: "explain:aspire" }) }}).
-- **Exact symbols:** open any package's [reference unit](/reference/).
-- **Hands-on:** the [tutorials]({{ comp.xref({ key: "tut:index" }) }}) and
-  [how-to guides]({{ comp.xref({ key: "howto:index" }) }}).
-
-{{ comp.nextPrev({ prev: { label: "Explanation", href: "/explanation/" }, next: { label: "Contracts & type flow", href: "/explanation/contracts/" } }) }}
+Next: [Contracts &amp; type flow]({{ "explain:contracts" |> xref }}) shows how types flow from a
+contract to a client.

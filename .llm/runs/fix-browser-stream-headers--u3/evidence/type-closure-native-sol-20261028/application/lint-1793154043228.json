@@ -1,0 +1,25 @@
+{
+  "selected": "lint",
+  "args": [
+    "run",
+    "--frozen",
+    "-A",
+    ".llm/tools/run-deno-lint.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/create-stream-db.ts",
+    "--file",
+    "packages/fresh/src/runtime/streams/mod.ts",
+    "--file",
+    "plugins/workers/streams/factory.ts",
+    "--file",
+    "plugins/workers/streams/mod.ts",
+    "--ext",
+    "ts"
+  ],
+  "code": 0,
+  "started": "2026-10-28T02:20:43.231Z",
+  "ended": "2026-10-28T02:20:44.600Z",
+  "deadlineAborted": false,
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/u3-type-closure-application-20261028/lint-1793154043228"
+}

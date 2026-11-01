@@ -1,0 +1,34 @@
+Check packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-value.ts
+TS2322 [ERROR]: Type 'number' is not assignable to type 'string | (() => MaybePromise<string>)'.
+const fresh: FreshHeaders = { authorization: 1 };
+                              ~~~~~~~~~~~~~
+    at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-value.ts:11:31
+
+    The expected type comes from this index signature.
+      [key: string]: string | (() => MaybePromise<string>);
+      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        at file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts:155:3
+
+TS2322 [ERROR]: Type 'number' is not assignable to type 'string | (() => MaybePromise<string>)'.
+const input: InputHeaders = { authorization: 1 };
+                              ~~~~~~~~~~~~~
+    at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-value.ts:12:31
+
+    The expected type comes from this index signature.
+      [key: string]: string | (() => MaybePromise<string>);
+      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        at file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts:155:3
+
+TS2322 [ERROR]: Type 'number' is not assignable to type 'string | (() => MaybePromise<string>)'.
+const workers: WorkersHeaders = { authorization: 1 };
+                                  ~~~~~~~~~~~~~
+    at file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-value.ts:13:35
+
+    The expected type comes from this index signature.
+      [key: string]: string | (() => MaybePromise<string>);
+      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        at file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts:155:3
+
+Found 3 errors.
+
+error: Type checking failed.

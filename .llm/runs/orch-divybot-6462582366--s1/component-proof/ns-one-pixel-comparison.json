@@ -1,0 +1,114 @@
+[
+  {
+    "scheme": "light",
+    "component": "button",
+    "beforeSize": [
+      730,
+      140
+    ],
+    "afterSize": [
+      730,
+      140
+    ],
+    "changedPixelRatio": 0.0,
+    "differenceBounds": null
+  },
+  {
+    "scheme": "light",
+    "component": "input",
+    "beforeSize": [
+      730,
+      190
+    ],
+    "afterSize": [
+      730,
+      190
+    ],
+    "changedPixelRatio": 0.0,
+    "differenceBounds": null
+  },
+  {
+    "scheme": "light",
+    "component": "card",
+    "beforeSize": [
+      730,
+      305
+    ],
+    "afterSize": [
+      730,
+      305
+    ],
+    "changedPixelRatio": 0.0,
+    "differenceBounds": null
+  },
+  {
+    "scheme": "light",
+    "component": "badge",
+    "beforeSize": [
+      730,
+      68
+    ],
+    "afterSize": [
+      730,
+      68
+    ],
+    "changedPixelRatio": 0.0,
+    "differenceBounds": null
+  },
+  {
+    "scheme": "dark",
+    "component": "button",
+    "beforeSize": [
+      730,
+      140
+    ],
+    "afterSize": [
+      730,
+      140
+    ],
+    "changedPixelRatio": 0.0,
+    "differenceBounds": null
+  },
+  {
+    "scheme": "dark",
+    "component": "input",
+    "beforeSize": [
+      730,
+      190
+    ],
+    "afterSize": [
+      730,
+      190
+    ],
+    "changedPixelRatio": 0.0,
+    "differenceBounds": null
+  },
+  {
+    "scheme": "dark",
+    "component": "card",
+    "beforeSize": [
+      730,
+      305
+    ],
+    "afterSize": [
+      730,
+      305
+    ],
+    "changedPixelRatio": 0.0,
+    "differenceBounds": null
+  },
+  {
+    "scheme": "dark",
+    "component": "badge",
+    "beforeSize": [
+      730,
+      68
+    ],
+    "afterSize": [
+      730,
+      68
+    ],
+    "changedPixelRatio": 0.0,
+    "differenceBounds": null
+  }
+]

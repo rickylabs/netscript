@@ -1,4 +1,5 @@
 import { assertEquals } from '@std/assert';
+import { fromFileUrl } from '@std/path';
 import { baseContract, SuccessSchema } from '@netscript/contracts';
 import { implement, os } from '@orpc/server';
 import {
@@ -120,7 +121,7 @@ Deno.test('plugin factory guards REST, RPC and raw routes independently of confi
   }
 });
 
-Deno.test('plugin factory preserves native health routes and anonymous-prefix replacement', async () => {
+Deno.test('plugin factory applies anonymous-prefix replacement to native health routes', async () => {
   const app = createPluginService(router, {
     ...config(),
     auth: { authn: { authenticator, protect: ['/'], allowAnonymous: ['/api/openapi.json'] } },
@@ -130,7 +131,7 @@ Deno.test('plugin factory preserves native health routes and anonymous-prefix re
   assertEquals(spec.status, 200);
   await spec.arrayBuffer();
   const health = await app.request('/health');
-  assertEquals(health.status, 200);
+  assertEquals(health.status, 401);
   await health.arrayBuffer();
   const privateHealth = await app.request('/health/private');
   assertEquals(privateHealth.status, 401);
@@ -175,7 +176,7 @@ Deno.test('plugin factory reports verifier failure as redacted unavailable', asy
 
 Deno.test('plugin factory rejects missing or ambiguous policy at a JavaScript caller boundary', async () => {
   const moduleUrl = new URL('../../src/service/mod.ts', import.meta.url).href;
-  const configPath = new URL('../../../../deno.json', import.meta.url).pathname;
+  const configPath = fromFileUrl(new URL('../../../../deno.json', import.meta.url));
   const source = `
     import { createPluginService } from ${JSON.stringify(moduleUrl)};
     for (const auth of [undefined, {}, { public: true }, { public: true, reason: 'test', authn: undefined }]) {
@@ -187,10 +188,17 @@ Deno.test('plugin factory rejects missing or ambiguous policy at a JavaScript ca
       throw new Error('Malformed policy was accepted');
     }
   `;
-  const result = await new Deno.Command(Deno.execPath(), {
-    args: ['eval', '--config', configPath, source],
-    stdout: 'piped',
-    stderr: 'piped',
-  }).output();
-  assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
+  const controller = new AbortController();
+  const deadline = setTimeout(() => controller.abort(), 15_000);
+  try {
+    const result = await new Deno.Command(Deno.execPath(), {
+      args: ['eval', '--config', configPath, source],
+      stdout: 'piped',
+      stderr: 'piped',
+      signal: controller.signal,
+    }).output();
+    assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
+  } finally {
+    clearTimeout(deadline);
+  }
 });

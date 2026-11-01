@@ -1,0 +1,16 @@
+diff --git a/packages/plugin-sagas-core/src/runtime/saga-engine.ts b/packages/plugin-sagas-core/src/runtime/saga-engine.ts
+index 7276cbe..7204af2 100644
+--- a/packages/plugin-sagas-core/src/runtime/saga-engine.ts
++++ b/packages/plugin-sagas-core/src/runtime/saga-engine.ts
+@@ -256,6 +256,11 @@ export class SagaEngine implements SagaBusPort {
+     if (!this.#store) return Object.freeze({ committed: true, status });
+ 
+     const version = outcome.version + 1;
++    const replayKey = `${COMPENSATION_REPLAY_NAMESPACE}:${outcome.version}`;
++    if (!definition.durableWorkerCommands) {
++      const replay = await this.#appliedKeys.recordApplied(outcome.instanceId, replayKey);
++      if (!replay.applied) return Object.freeze({ committed: false, status, version });
++    }
+     const loaded = await this.#store.load(outcome.instanceId);
+     if (!loaded) throw SagasError.sagaInstanceNotFound(outcome.instanceId);
+     const startedAt = performance.now();

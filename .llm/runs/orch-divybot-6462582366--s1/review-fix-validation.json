@@ -1,0 +1,124 @@
+{
+  "sourceHead": "ad53106e59d69cd7c3f81464d7f8103dbb18cdf0",
+  "publish": {
+    "beforeBytes": 28186585,
+    "afterBytes": 2184239,
+    "fileCount": 91,
+    "budgetBytes": 5000000,
+    "nativeDryRunExitCode": 0,
+    "budgetTestBefore": "FAIL",
+    "budgetTestAfter": "PASS"
+  },
+  "defaultCss": {
+    "bytes": 37020,
+    "gzipBytes": 4308,
+    "gzipBudgetBytes": 6000,
+    "legacyPrefix": "PASS",
+    "oldNamesAndValues": "155 CSS names unchanged; 155 manifest names with 182 light/dark value comparisons unchanged",
+    "legacyMainPrefixBytes": 8234,
+    "oldValueComparisons": 182
+  },
+  "tests": {
+    "freshUi": {
+      "passed": 217,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 217,
+      "uniqueFailures": 0,
+      "reportSha256": "5c3fa4dce89c4db364c32db0980a95da2c1fe7bc02fa5593b74e23ac519371ce"
+    },
+    "cli": {
+      "passed": 43,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 43,
+      "uniqueFailures": 0,
+      "reportSha256": "6353ac2bf26786be3013172e3e6bde27030190af96d4371726dc682115644195"
+    }
+  },
+  "gates": {
+    "quality": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "ad53106e59d69cd7c3f81464d7f8103dbb18cdf0",
+      "receiptSha256": "6af37dcac305232825db168716f6000381d2a030d7d616dd89b98607c576bb9b"
+    },
+    "assets-barrel": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "ad53106e59d69cd7c3f81464d7f8103dbb18cdf0",
+      "receiptSha256": "6b31ba4ae0e508c62f83f4ceac3713e8bd5219a20abc3d63205ea23173add0a0"
+    },
+    "agent-docs-prose": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "ad53106e59d69cd7c3f81464d7f8103dbb18cdf0",
+      "receiptSha256": "3956fadcc45e12e8c659fb57c6bbe608124059c1b942465f6b78962aadef2752"
+    },
+    "publish-assets": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "ad53106e59d69cd7c3f81464d7f8103dbb18cdf0",
+      "receiptSha256": "e444ddf452155bd5ab212a2010bce1560ab3c143db29287c87a2eae3dbdf3561"
+    },
+    "mcp-export-corpus": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "ad53106e59d69cd7c3f81464d7f8103dbb18cdf0",
+      "receiptSha256": "1916034d11049efe2c5a10e87b6766fec936f21957261460ecfa419bd5e21b56"
+    }
+  },
+  "runtime": {
+    "status": "UNPROVEN",
+    "exitCode": 1,
+    "passed": 1,
+    "failed": 2,
+    "skipped": 0,
+    "reason": "Docker daemon unavailable; Aspire doctor preflight and cleanup inspection could not complete. No runtime success claimed.",
+    "ciPostgresTier": "SKIPPED by unchanged opt-in policy",
+    "ciSqliteTier": "SKIPPED by unchanged opt-in policy"
+  },
+  "nonblockingItemsSkipped": [],
+  "generatedAppCheck": {
+    "files": 31,
+    "diagnostics": 0
+  },
+  "scopedQuality": {
+    "files": 23,
+    "checkDiagnostics": 0,
+    "lintFindings": 0,
+    "formatFindings": 0,
+    "coverage": "all selected files processed"
+  },
+  "tokenQuality": {
+    "inputs": 72,
+    "effectiveContexts": 36,
+    "outputs": 68,
+    "registeredRoles": 903,
+    "contrastUses": 4066,
+    "exactSourceExclusions": 406,
+    "unapprovedFailures": 0
+  },
+  "browser": {
+    "passed": 24,
+    "failed": 0,
+    "axeBaseline": "unchanged",
+    "outcome": "PASS",
+    "sourceHead": "ad53106e59d69cd7c3f81464d7f8103dbb18cdf0",
+    "receiptSha256": "723f7fb7a0791b08aec624136d77985cedcb5a19d1ed6684eea83d1324fdc9e3",
+    "childReportSha256": "c2a74dba03c39780b973d01e63d947cb052365a82c2aee1e201b40b89f567853"
+  },
+  "reviewThreads": {
+    "unanswered": 0
+  },
+  "implementationEvaluation": {
+    "verdict": "PASS",
+    "requestedModel": "claude-opus-5-5",
+    "observedModel": "claude-opus-5-5",
+    "requestedEffort": "high",
+    "readOnly": true,
+    "stdin": "closed",
+    "rawResultSha256": "8e96ecc1358ab072e34d0e1552bd032cfe98aa226abcf8cb1492b5972c5eb1e8",
+    "evidence": "review-fix-impl-eval.md"
+  }
+}

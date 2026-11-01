@@ -1,7 +1,66 @@
 import { delay } from 'jsr:@std/async@1/delay';
-import { join } from '@std/path';
+import { dirname, join } from '@std/path';
 import { SCAFFOLD_ASPIRE_INTEGRATIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts';
 import { SCAFFOLD_CACHE_CONTAINER_IMAGES } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-container-images.ts';
+import { SCAFFOLD_VERSIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
+
+/** Tool preparation has its own bound; runtime readiness keeps the suite's existing policy. */
+export const GARNET_TOOL_PREPARATION_TIMEOUT_MS = 120_000;
+
+/** One visible prerequisite process, injectable without starting any runtime resources. */
+export type ToolPreparationCommand = Readonly<{
+  command: 'dotnet';
+  args: readonly string[];
+  timeoutMs: number;
+  stdout: 'inherit';
+  stderr: 'inherit';
+}>;
+
+/** Restore the executable cache fallback before the AppHost's best-effort startup restore. */
+export async function restoreRuntimeGarnet(
+  directory: string,
+  run: (command: ToolPreparationCommand) => Promise<number> = runToolPreparation,
+): Promise<void> {
+  const manifest = join(directory, '.config', 'dotnet-tools.json');
+  await Deno.mkdir(dirname(manifest), { recursive: true });
+  await Deno.writeTextFile(
+    manifest,
+    JSON.stringify(
+      {
+        version: 1,
+        isRoot: true,
+        tools: {
+          'garnet-server': {
+            version: SCAFFOLD_VERSIONS.GARNET_TOOL,
+            commands: ['garnet-server'],
+          },
+        },
+      },
+      null,
+      2,
+    ) + '\n',
+  );
+  const exitCode = await run({
+    command: 'dotnet',
+    args: ['tool', 'restore', '--tool-manifest', manifest],
+    timeoutMs: GARNET_TOOL_PREPARATION_TIMEOUT_MS,
+    stdout: 'inherit',
+    stderr: 'inherit',
+  });
+  if (exitCode !== 0) {
+    throw new Error(`Pinned Garnet tool preparation failed with exit code ${exitCode}.`);
+  }
+}
+
+async function runToolPreparation(command: ToolPreparationCommand): Promise<number> {
+  const child = new Deno.Command(command.command, {
+    args: [...command.args],
+    signal: AbortSignal.timeout(command.timeoutMs),
+    stdout: command.stdout,
+    stderr: command.stderr,
+  }).spawn();
+  return (await child.status).code;
+}
 
 /** One measured pull attempt; preparation retries never retry an E2E assertion. */
 export interface ImagePullAttempt {
@@ -120,14 +179,29 @@ async function resolvePostgresImage(): Promise<string> {
   return model.image;
 }
 
-if (import.meta.main) {
-  const [tier, report = '.llm/tmp/e2e-image-pulls.json'] = Deno.args;
-  const images = await runtimeTierImages(tier);
+/** Prepare every runtime prerequisite; failure prevents the unchanged one-pass suite starting. */
+export async function prepareRuntimeTier(
+  tier: string,
+  report = '.llm/tmp/e2e-image-pulls.json',
+  options: Readonly<{
+    toolDirectory?: string;
+    runToolRestore?: (command: ToolPreparationCommand) => Promise<number>;
+    resolvePostgres?: () => Promise<string>;
+    pullImage?: (image: string) => Promise<ImagePullMeasurement>;
+  }> = {},
+): Promise<void> {
+  const images = await runtimeTierImages(tier, options.resolvePostgres);
+  const started = performance.now();
+  await restoreRuntimeGarnet(
+    options.toolDirectory ?? '.llm/tmp/e2e-garnet-tool',
+    options.runToolRestore,
+  );
+  console.info(`Garnet tool preparation: ${Math.round(performance.now() - started)}ms`);
   const measurements: ImagePullMeasurement[] = [];
   for (const image of images) {
-    const measurement = await pullRuntimeImage(image);
+    const measurement = await (options.pullImage ?? pullRuntimeImage)(image);
     measurements.push(measurement);
-    await Deno.mkdir('.llm/tmp', { recursive: true });
+    await Deno.mkdir(dirname(report), { recursive: true });
     await Deno.writeTextFile(report, `${JSON.stringify(measurements, null, 2)}\n`);
     console.info(
       `Image pull ${image}: ${measurement.durationMs}ms (${measurement.attempts.length} attempts; ` +
@@ -137,4 +211,9 @@ if (import.meta.main) {
       throw new Error(`Image pull exhausted ${IMAGE_PULL_POLICY.maxAttempts} attempts: ${image}`);
     }
   }
+}
+
+if (import.meta.main) {
+  const [tier, report] = Deno.args;
+  await prepareRuntimeTier(tier, report);
 }

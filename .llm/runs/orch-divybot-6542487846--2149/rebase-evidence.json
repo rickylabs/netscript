@@ -1,0 +1,48 @@
+{
+  "integrationBase": "15cffa2",
+  "priorReviewedHead": "2f02788071fd4d8088b7b9e21dfa2394d04f2bc5",
+  "sourceBlobEquality": {
+    "files": 20,
+    "allEqual": true
+  },
+  "tests": {
+    "passed": 27,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 27,
+    "uniqueFailures": 0
+  },
+  "check": {
+    "totalOccurrences": 0,
+    "uniqueOccurrences": 0,
+    "uniqueCodes": 0,
+    "uniquePaths": 0
+  },
+  "docsBuild": "PASS",
+  "docsAccuracy": "PASS",
+  "docsLinks": "PASS",
+  "carrierFreshness": "PASS",
+  "carrierMerge": {
+    "authRowsChanged": 11,
+    "incomingMainPagesRetained": true,
+    "unrelatedRowsChanged": false
+  },
+  "newHeadIndependentAttestation": "UNPROVEN",
+  "scaffoldRuntime": "UNPROVEN_COORDINATOR_OWNED",
+  "qualityCarrierRepair": {
+    "failedGate": "mcp-export-corpus",
+    "ciJob": "https://github.com/rickylabs/netscript/actions/runs/41198069396/job/124528298926",
+    "mainQuality": "PASS at main15cffa2",
+    "changedExportRows": [
+      "plugin .",
+      "plugin ./protocol",
+      "plugin-auth ./scaffold"
+    ],
+    "checks": {
+      "mcpExportCorpus": "PASS",
+      "assetsBarrel": "PASS",
+      "publishAssets": "PASS"
+    },
+    "authoredImplementationChanged": false
+  }
+}

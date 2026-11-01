@@ -1,0 +1,16 @@
+﻿{
+    "name":  "q4-framing-attribution-3",
+    "startedUtc":  "2026-10-28T01:33:43.4903575Z",
+    "finishedUtc":  "2026-10-28T01:33:45.0915421Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "run",
+                      "--cached-only",
+                      "--frozen",
+                      "--allow-all",
+                      ".llm/tmp/native-service-qualification-sol-20261028/q4-attribution.ts"
+                  ],
+    "exitCode":  0,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-qualification-sol-20261028\\q4-framing-attribution-3.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-qualification-sol-20261028\\q4-framing-attribution-3.stderr.log"
+}

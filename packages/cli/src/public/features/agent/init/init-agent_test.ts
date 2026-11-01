@@ -15,6 +15,7 @@ import { EMBEDDED_SKILL_FILES } from '../../../../kernel/assets/skills.generated
 import { DenoAgentInitFileSystem } from './agent-init-file-system.ts';
 import { ASPIRE_WORKFLOW_SKILLS, type AspireAgentInitializer } from './aspire-agent-initializer.ts';
 import { initAgent } from './init-agent.ts';
+import { TOOL_NAMES } from '@netscript/mcp';
 import { describeAgentInitResolution } from './hosts/agent-host-resolution.ts';
 import type { AgentDocsGenerator } from './agent-docs-generator.ts';
 
@@ -380,7 +381,7 @@ Deno.test('S-18 prior-release host stays pinned until agent init and restart exp
     assertEquals(after.mcpServers.netscript.args[6], MIGRATION_TARGET_SPECIFIER);
 
     const restartedTools = await listToolsAfterHostRestart(root);
-    assertEquals(restartedTools.length, 22);
+    assertEquals(restartedTools, [...TOOL_NAMES]);
     for (const tool of OPENAPI_TOOL_TRIAD) assert(restartedTools.includes(tool));
   } finally {
     await Deno.remove(root, { recursive: true });
@@ -652,6 +653,14 @@ Deno.test('agent init installs the complete diagnostic surface', async () => {
 });
 
 Deno.test('S9 installs discoverable design guidance and a canonical local reference for every host', async () => {
+  const { items } = JSON.parse(
+    await Deno.readTextFile(
+      new URL('../../../../../../../packages/fresh-ui/registry.json', import.meta.url),
+    ),
+  ) as { items: Array<{ name: string; type: string; meta?: { preset?: unknown } }> };
+  const presets = items.filter((item) =>
+    item.type === 'registry:theme' && item.meta?.preset !== undefined
+  ).map((item) => item.name.slice('theme-'.length));
   const guidelines = await Deno.readTextFile(
     new URL('../../../../../../../docs/design-system/GUIDELINES.md', import.meta.url),
   );
@@ -674,6 +683,17 @@ Deno.test('S9 installs discoverable design guidance and a canonical local refere
       const skill = await Deno.readTextFile(join(root, '.agents/skills/netscript-design/SKILL.md'));
       assertStringIncludes(skill, 'name: netscript-design');
       assertStringIncludes(skill, 'references/GUIDELINES.md');
+      assertStringIncludes(skill, '**Studio Utility** (`studio-utility`)');
+      assertStringIncludes(skill, 'netscript ui:apply --preset <preset-id>');
+      assertStringIncludes(skill, 'web-layer/how-to/theme-your-app/');
+      for (const id of presets) {
+        for (const file of ['DESIGN.md', 'SKILL.md']) {
+          assertStringIncludes(skill, `\`.agents/skills/fresh-ui-theme-${id}/${file}\``);
+        }
+        assertFalse(
+          await dependencies.fs.exists(join(root, `.agents/skills/fresh-ui-theme-${id}`)),
+        );
+      }
       assertEquals(
         await Deno.readTextFile(
           join(root, '.agents/skills/netscript-design/references/GUIDELINES.md'),

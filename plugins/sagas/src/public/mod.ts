@@ -45,6 +45,10 @@ const sagasManifest: PluginManifest = definePlugin(
     entrypoint: './services/src/main.ts',
   })
   .withDbSchemas([{ path: './database/sagas.prisma', engine: 'postgres' }])
+  .withMigrations([
+    { name: 'command-outbox', path: './database/command-outbox.migration.sql' },
+    { name: 'instance-status', path: './database/instance-status.migration.sql' },
+  ])
   .withContractVersions([{ version: 'v1', loader: './contracts/v1/mod.ts' }])
   .withRuntimeConfigTopics([{ name: SAGAS_PLUGIN_ID, schemaPath: './runtime/sagas.schema.json' }])
   .withAspire('./src/aspire/mod.ts')

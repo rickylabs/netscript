@@ -1,0 +1,16 @@
+{
+  "args": [
+    "check",
+    "--unstable-kv",
+    "--frozen",
+    "--config",
+    "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/deno.json",
+    "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-c1/gate-state/temp\\a6d003fd226184ad/workers-headers-number.ts"
+  ],
+  "source": "import { createWorkersStreamDB } from '@netscript/plugin-workers/streams';\ncreateWorkersStreamDB({ headers: { authorization: 1 } });\n",
+  "code": 0,
+  "stdout": "",
+  "stderr": "Warning No matching files found.\n",
+  "qualifiedNegative": false,
+  "reason": "Root excludes ignored TEMP targets; use the already-authorized owned test-directory fallback."
+}

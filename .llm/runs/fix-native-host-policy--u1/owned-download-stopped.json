@@ -1,0 +1,14 @@
+﻿{
+    "observedAt":  "2026-10-27T17:05:00.0348846Z",
+    "pid":  36676,
+    "birthUtc":  "2026-10-27T16:56:14.0145653Z",
+    "executable":  "C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "exactDownloadCommandMatched":  true,
+    "partialBytes":  90301297,
+    "expectedBytes":  217360032,
+    "transferElapsedSeconds":  524.9577783,
+    "approximateBytesPerSecond":  172016.30442057212,
+    "remainingAtObservedRateSeconds":  738.64355723715073,
+    "cause":  "Coordinator directs bounded declared fallback; task-owned transfer stopped, partial retained unexecuted",
+    "killed":  true
+}

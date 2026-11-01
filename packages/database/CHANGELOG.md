@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Refuse duplicate PostgreSQL connection-string keys, case variants and aliases, including identical
+  repeated values, with credential-safe `PostgresConnectionStringError` reason `duplicate-key`.
+  Accept libpq `verify-ca`/`verify-full` TLS mode spellings and canonicalize decimal ports.
+- Install immutable plugin SQL migration sidecars before Prisma deployment; add bounded outbox
+  `pruneSettled` with primary-key progress and delete-time eligibility checks.
+
 - Add dependency-free PostgreSQL connection-string normalization at
   `@netscript/database/connection-strings/postgres`, preserving explicit TLS modes and refusing
   unsupported settings with `PostgresConnectionStringError`.

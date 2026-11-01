@@ -1,0 +1,24 @@
+{
+  "command": [
+    "deno",
+    "task",
+    "release:canary",
+    "--",
+    "0.0.9",
+    "--dry-run"
+  ],
+  "checkout": "disposable clone outside active worktree",
+  "source": "bootstrap HEAD plus discovery, fixture and carrier-staging corrections",
+  "version": "0.0.9-canary.1",
+  "exitCode": 0,
+  "residue": "PASS",
+  "publishReadiness": "PASS",
+  "publishDryRun": "PASS",
+  "productionInstall": "PASS",
+  "generatedRegistryJsonFiles": 93,
+  "generatedFirstPartyPins": 6,
+  "staleGeneratedPins": 0,
+  "rawLogSha256": "87d1c6cc4f24076be0908f9cc8f238ac44942e001e8fdb7795c013daf38f7c60",
+  "publication": "dry-run only; no refs or publication",
+  "note": "Stable publication freshness addition is proven separately by release-tests-complete.json."
+}

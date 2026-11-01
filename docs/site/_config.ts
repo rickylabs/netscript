@@ -5,14 +5,35 @@ import nav from 'lume/plugins/nav.ts';
 import redirects from 'lume/plugins/redirects.ts';
 import pagefind from 'lume/plugins/pagefind.ts';
 import codeHighlight from 'lume/plugins/code_highlight.ts';
+import lightningCss from 'lume/plugins/lightningcss.ts';
 import anchor from 'markdown-it-anchor';
 import langBash from 'highlight.js/bash';
 import langJson from 'highlight.js/json';
 import langTypescript from 'highlight.js/typescript';
+import langPython from 'highlight.js/python';
+import langPowershell from 'highlight.js/powershell';
+import langMarkdown from 'highlight.js/markdown';
+import langIni from 'highlight.js/ini';
+import langYaml from 'highlight.js/yaml';
+import langCss from 'highlight.js/css';
+import langDiff from 'highlight.js/diff';
+import langSql from 'highlight.js/sql';
+import langXml from 'highlight.js/xml';
+import langJavascript from 'highlight.js/javascript';
+import {
+  assertCodeLanguage,
+  codeFilename,
+  LANGUAGE_LABELS,
+} from '../../tools/docs-site/code-languages.ts';
 import { resolveXref } from './_data/xref.ts';
 import { assertDiagramAssetsExist } from './_diagrams/validate.ts';
 import { aiTooling } from './_plugins/ai-tooling.ts';
+import { inlineCode, renderCallout } from './_plugins/callout.ts';
+import { fileTreeFence, renderFileTree } from './_plugins/file-tree.ts';
+import { markdownAlerts } from './_plugins/markdown-alerts.ts';
 import { getDocsLane } from './_data.ts';
+import { CALLOUT_TYPES, calloutType } from '../../tools/docs-site/callout-types.ts';
+import { apiKind, apiKindRole } from '../../tools/docs-site/api-kinds.ts';
 import { inlineUtilityDiagram } from '../../tools/docs-site/inline-diagram.ts';
 
 /**
@@ -32,6 +53,13 @@ import { inlineUtilityDiagram } from '../../tools/docs-site/inline-diagram.ts';
  *
  * Heading IDs: markdown-it-anchor adds GitHub-style slug ids to h1–h4 on every
  * page so in-page `#anchor` links (per-page TOC, Internals sections) resolve.
+ *
+ * File trees: fenced `tree` blocks render as the `fileTree` component (one renderer in
+ * `_plugins/file-tree.ts`); the Markdown twin keeps the authored ASCII as a `text` fence.
+ *
+ * Alerts: GitHub-style `> [!NOTE]` blockquotes render with the callout component's
+ * renderer (`_plugins/callout.ts`, `_plugins/markdown-alerts.ts`); the Markdown twin writes
+ * them back as alerts.
  *
  * xref (OD2): the `xref` filter + `comp.xref` resolve stable keys from
  * `_data/xref.ts` to hrefs and THROW on an unknown key, so the build is the link
@@ -57,12 +85,12 @@ const site: ReturnType<typeof lume> = lume({
   dest: '_site',
 }, {
   markdown: {
-    plugins: [[anchor, { slugify, level: [1, 2, 3, 4] }]],
+    plugins: [[anchor, { slugify, level: [1, 2, 3, 4] }], fileTreeFence, markdownAlerts],
   },
 });
 
-// Copy CSS + favicon to _site verbatim; base_path prefixes their hrefs at build.
-site.copy('styles');
+// Bundle relative CSS imports at build time; retain Lume's default targets/minification.
+site.use(lightningCss());
 site.copy('favicon.svg');
 
 // Committed static diagram SVGs (OD1) + other site assets; base_path prefixes hrefs.
@@ -77,13 +105,27 @@ site.addEventListener('beforeBuild', async () => {
 //   {{ "cap:services" |> xref }}
 site.filter('xref', (key: string) => resolveXref(key).href);
 site.filter('slugify', slugify);
+site.filter('calloutType', calloutType);
+// `comp.callout` and Markdown alerts share this renderer, so they cannot drift apart.
+site.filter('calloutHtml', renderCallout);
+site.filter('apiKind', apiKind);
+site.filter('apiKindRole', apiKindRole);
+site.filter('languageLabel', (language: string) => LANGUAGE_LABELS[language] ?? language);
+site.filter('codeFilename', codeFilename);
+// `comp.fileTree` and fenced `tree` blocks share this renderer, so they cannot drift apart.
+site.filter(
+  'fileTreeHtml',
+  (nodes: unknown, nested?: boolean) =>
+    renderFileTree(Array.isArray(nodes) ? nodes : [], { nested: Boolean(nested) }),
+);
 // Inline presentation inherits the page scheme; the original SVG remains available to twins.
 site.filter('utilityDiagram', (src: string, alt: string) => {
   if (!/^\/assets\/diagrams\/[a-z0-9-]+\.svg$/.test(src)) {
     throw new Error(`Unsupported diagram source: ${src}`);
   }
   const source = Deno.readTextFileSync(new URL(`.${src}`, import.meta.url));
-  return inlineUtilityDiagram(source, alt, `diagram-${crypto.randomUUID()}`);
+  // Page URL/local-index identity is assigned after rendering.
+  return inlineUtilityDiagram(source, alt, 'diagram');
 });
 
 // Inline-code (ic): comp string args are emitted raw and are NOT markdown-
@@ -93,7 +135,7 @@ site.filter('utilityDiagram', (src: string, alt: string) => {
 // markdown body already renders inline code. Leaves existing HTML untouched.
 site.filter(
   'ic',
-  (s: unknown) => typeof s === 'string' ? s.replace(/`([^`]+)`/g, '<code>$1</code>') : (s ?? ''),
+  (s: unknown) => typeof s === 'string' ? inlineCode(s) : (s ?? ''),
 );
 
 // Expose the resolver + raw map as global data for `comp.xref` (so the component
@@ -110,25 +152,47 @@ site.use(nav());
 // base_path so the generated pages get base-prefixed hrefs like everything else.
 site.use(redirects());
 
-// Syntax highlighting for fenced code blocks (TD-6).
+// Registration and labels are checked together; no fence silently falls back to plain text.
+const codeLanguages = {
+  bash: langBash,
+  sh: langBash,
+  shell: langBash,
+  json: langJson,
+  jsonc: langJson,
+  ts: langTypescript,
+  tsx: langTypescript,
+  typescript: langTypescript,
+  js: langJavascript,
+  javascript: langJavascript,
+  jsx: langJavascript,
+  python: langPython,
+  py: langPython,
+  powershell: langPowershell,
+  ps1: langPowershell,
+  md: langMarkdown,
+  markdown: langMarkdown,
+  dotenv: langIni,
+  yaml: langYaml,
+  yml: langYaml,
+  css: langCss,
+  diff: langDiff,
+  sql: langSql,
+  xml: langXml,
+  html: langXml,
+  text: plaintextLanguage,
+  plaintext: plaintextLanguage,
+  'no-highlight': plaintextLanguage,
+  prisma: plaintextLanguage,
+  // Markdown renders `tree` fences as the file tree component; components fall back to text.
+  tree: plaintextLanguage,
+};
+for (const language of Object.keys(LANGUAGE_LABELS)) {
+  assertCodeLanguage(language, Object.keys(codeLanguages));
+}
 site.use(codeHighlight({
-  languages: {
-    bash: langBash,
-    sh: langBash,
-    shell: langBash,
-    json: langJson,
-    ts: langTypescript,
-    tsx: langTypescript,
-    typescript: langTypescript,
-    text: plaintextLanguage,
-    plaintext: plaintextLanguage,
-    'no-highlight': plaintextLanguage,
-    prisma: plaintextLanguage,
-  },
+  languages: codeLanguages,
+  options: { cssSelector: 'pre code, .ns-api-table__type code, code.ns-api-table__type' },
 }));
-
-// Build the static index; custom and fallback UIs load only when requested.
-site.use(pagefind({ ui: false }));
 
 // These states belong in rendered HTML as well as in the browser enhancement path.
 site.addEventListener('afterRender', () => {
@@ -142,6 +206,32 @@ site.addEventListener('afterRender', () => {
       lede.parentNode.insertBefore(cue, lede.nextSibling);
     }
     const sourceUrl = String(page.data.url ?? '');
+    const identity = `page-${sourceUrl.replace(/[^a-zA-Z0-9_-]/g, '-') || 'home'}`;
+    for (
+      const [index, comparison] of [...document.querySelectorAll('[data-ns-comparison]')].entries()
+    ) {
+      const id = `nscompare-${identity}-${index}-select`;
+      const select = comparison.querySelector('select');
+      const label = comparison.querySelector('label');
+      if (select && label) {
+        select.id = id;
+        label.setAttribute('for', id);
+      }
+    }
+    // Scope by the owning page and DOM order, independent of concurrent render order.
+    for (const [index, group] of [...document.querySelectorAll('.ns-tabbed')].entries()) {
+      const id = `nstab-${identity}-${index}`;
+      for (const [tabIndex, tab] of [...group.querySelectorAll('[role="tab"]')].entries()) {
+        tab.id = `${id}-tab-${tabIndex}`;
+        tab.setAttribute('aria-controls', `${id}-panel-${tabIndex}`);
+      }
+      for (
+        const [panelIndex, panel] of [...group.querySelectorAll('[role="tabpanel"]')].entries()
+      ) {
+        panel.id = `${id}-panel-${panelIndex}`;
+        panel.setAttribute('aria-labelledby', `${id}-tab-${panelIndex}`);
+      }
+    }
     const currentUrl = site.options.location.pathname.replace(/\/$/, '') + sourceUrl;
     for (const link of document.querySelectorAll('.ns-learning-path__link')) {
       const href = link.getAttribute('href');
@@ -153,7 +243,7 @@ site.addEventListener('afterRender', () => {
     for (const tree of document.querySelectorAll('.ns-file-tree--root')) {
       if (!tree.querySelector('li')) throw new Error(`Empty file tree on ${sourceUrl}`);
     }
-    for (const figure of document.querySelectorAll('.ns-diagram')) {
+    for (const [index, figure] of [...document.querySelectorAll('.ns-diagram')].entries()) {
       const image = figure.querySelector('img');
       const svg = figure.querySelector('svg[role="img"]');
       if (
@@ -162,6 +252,124 @@ site.addEventListener('afterRender', () => {
       ) {
         throw new Error(`Diagram source or accessible name missing on ${sourceUrl}`);
       }
+      const viewport = figure.querySelector('.ns-diagram__viewport');
+      if (!viewport) throw new Error(`Diagram viewport missing on ${sourceUrl}`);
+      viewport.innerHTML = inlineUtilityDiagram(
+        svg.outerHTML,
+        image.getAttribute('alt')!,
+        `diagram-${identity}-${index}`,
+      );
+    }
+    // A custom label replaces the visible type, which remains in the accessible name.
+    for (const callout of document.querySelectorAll('.ns-callout')) {
+      const kind = callout.getAttribute('data-variant');
+      const type = CALLOUT_TYPES[calloutType(kind)].label;
+      const label = callout.querySelector('.ns-callout__label')?.textContent?.trim();
+      if (type && label) {
+        callout.setAttribute('aria-label', label === type ? type : `${type}: ${label}`);
+      }
+    }
+    // Keep package headings at display size, wrapping only at path boundaries.
+    for (const code of document.querySelectorAll('.ns-prose :is(h1,h2,h3,h4,h5,h6) code')) {
+      if (code.children.length || !code.textContent?.includes('/')) continue;
+      const parts = code.textContent.split('/');
+      code.textContent = '';
+      for (const [index, part] of parts.entries()) {
+        code.appendChild(document.createTextNode(part + (index < parts.length - 1 ? '/' : '')));
+        if (index < parts.length - 1) code.appendChild(document.createElement('wbr'));
+      }
+    }
+    // Reference Markdown tables and the component share one visible kind-tag anatomy.
+    for (const table of document.querySelectorAll('.ns-prose table')) {
+      if (table.classList.contains('ns-api-table')) continue;
+      const headings = [...table.querySelectorAll('thead th')];
+      const kindColumn = headings.findIndex((head) => head.textContent?.trim() === 'Kind');
+      if (kindColumn < 0) continue;
+      const rows = [...table.querySelectorAll('tbody tr')];
+      if (!rows.some((row) => apiKind(row.querySelectorAll('td')[kindColumn]?.textContent))) {
+        continue;
+      }
+      table.classList.add('ns-api-table');
+      table.setAttribute('data-variant', 'symbols');
+      const wrapper = document.createElement('div');
+      wrapper.className = 'ns-api-table-wrap';
+      table.parentNode!.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
+      for (const row of rows) {
+        const cells = [...row.querySelectorAll('td')];
+        for (const [index, cell] of cells.entries()) {
+          const column = headings[index]?.textContent?.trim();
+          if (column === 'Symbol' || column === 'Name') cell.classList.add('ns-api-table__name');
+          if (column === 'Signature' || column === 'Type') cell.classList.add('ns-api-table__type');
+        }
+        const cell = cells[kindColumn];
+        const label = cell?.textContent?.trim();
+        const kind = apiKind(label);
+        if (!cell || !kind) continue;
+        const tag = document.createElement('span');
+        tag.className = 'ns-api-kind';
+        tag.setAttribute('data-kind', kind);
+        tag.setAttribute('data-syntax-role', apiKindRole(kind)!);
+        const dot = document.createElement('span');
+        dot.className = 'ns-api-kind__dot';
+        dot.setAttribute('aria-hidden', 'true');
+        tag.appendChild(dot);
+        tag.appendChild(document.createTextNode(label ?? kind));
+        cell.textContent = '';
+        cell.appendChild(tag);
+      }
+    }
+    for (
+      const code of document.querySelectorAll('.ns-api-table__type code, code.ns-api-table__type')
+    ) {
+      code.classList.add('language-typescript');
+    }
+    // Frame Markdown fences at build time so labels and filenames also work without JavaScript.
+    for (const pre of document.querySelectorAll('.ns-prose pre')) {
+      const code = pre.querySelector('code');
+      if (!code) continue;
+      const language = code.className.match(/language-([\w-]+)/)?.[1] ?? 'text';
+      assertCodeLanguage(language, Object.keys(codeLanguages));
+      if (pre.closest('[data-code-block]')) continue;
+      const frame = document.createElement('div');
+      frame.className = 'ns-code-block';
+      frame.setAttribute('data-code-block', '');
+      const header = document.createElement('div');
+      header.className = 'ns-code-header';
+      header.setAttribute('data-twin-ignore', '');
+      header.setAttribute('data-pagefind-ignore', '');
+      const filename = codeFilename(code.textContent ?? '');
+      if (filename) {
+        const path = document.createElement('span');
+        path.className = 'ns-code-path';
+        path.textContent = filename;
+        path.setAttribute('title', filename);
+        header.appendChild(path);
+      }
+      const label = document.createElement('span');
+      label.className = 'ns-code-language';
+      label.textContent = LANGUAGE_LABELS[language];
+      header.appendChild(label);
+      const button = document.createElement('button');
+      button.className = 'ns-copy-btn js-only';
+      button.setAttribute('type', 'button');
+      button.setAttribute('data-code-copy', '');
+      button.setAttribute('aria-label', `Copy ${filename ?? LANGUAGE_LABELS[language]} code`);
+      button.textContent = 'Copy';
+      header.appendChild(button);
+      const body = document.createElement('div');
+      body.className = 'ns-code-body';
+      const gutter = document.createElement('div');
+      gutter.className = 'ns-code-gutter';
+      gutter.setAttribute('aria-hidden', 'true');
+      gutter.setAttribute('data-pagefind-ignore', '');
+      gutter.textContent = (code.textContent ?? '').replace(/\n$/, '').split('\n')
+        .map((_, index) => index + 1).join('\n');
+      pre.parentNode!.insertBefore(frame, pre);
+      body.appendChild(gutter);
+      body.appendChild(pre);
+      frame.appendChild(header);
+      frame.appendChild(body);
     }
     const headingIds = new Set(
       [...document.querySelectorAll('.ns-prose :is(h1,h2,h3,h4)[id]')].map((h) => h.id),
@@ -172,6 +380,9 @@ site.addEventListener('afterRender', () => {
     }
   }
 });
+
+// Index only final deterministic identities; twins below see the same document.
+site.use(pagefind({ ui: false }));
 
 // MUST run last: rewrite every root-relative href/src to the /netscript/ base (TD-1).
 site.use(basePath());
@@ -192,7 +403,7 @@ site.addEventListener('afterRender', () => {
       anchor.className = 'ns-heading-anchor';
       anchor.setAttribute('data-pagefind-ignore', '');
       anchor.setAttribute('href', `#${heading.id}`);
-      anchor.setAttribute('aria-label', 'Permalink');
+      anchor.setAttribute('aria-label', `Permalink to ${heading.textContent?.trim()}`);
       heading.appendChild(anchor);
     }
   }

@@ -98,6 +98,8 @@ export interface OpenAiCompatibleModelProviderConfig {
   readonly api?: OpenAiCompatibleApi;
   /** Display name for the provider (defaults to `"openai-compatible"`). */
   readonly name?: string;
+  /** SDK retry count; set to zero when AiRetryPolicy owns retries. Omission keeps the SDK default. */
+  readonly maxRetries?: number;
 }
 
 const DEFAULT_INPUT_MODALITIES = ['text', 'image'] as const;
@@ -133,6 +135,14 @@ export class OpenAiCompatibleModelProvider implements ModelProviderPort {
 
   /** Construct a provider bound to the given `config` (defaults to `{}`). */
   constructor(config: OpenAiCompatibleModelProviderConfig = {}) {
+    if (
+      config.maxRetries !== undefined &&
+      (!Number.isInteger(config.maxRetries) || config.maxRetries < 0)
+    ) {
+      throw new RangeError(
+        'OpenAiCompatibleModelProvider.maxRetries must be a non-negative integer.',
+      );
+    }
     this.#config = config;
   }
 
@@ -213,6 +223,7 @@ export class OpenAiCompatibleModelProvider implements ModelProviderPort {
         name: name ?? OPENAI_COMPATIBLE_PROVIDER_ID,
         baseURL,
         apiKey,
+        maxRetries: this.#config.maxRetries,
         models: models ?? [model],
         api,
       })(model);

@@ -3,11 +3,11 @@
   color: var(--ns-fg);
 }
 
-.ns-panel--muted {
+:where(.ns-panel)[data-variant='muted'] {
   background: color-mix(in srgb, var(--ns-muted) 14%, var(--ns-surface));
 }
 
-.ns-panel--raised {
+:where(.ns-panel)[data-variant='raised'] {
   background: var(--ns-surface-raised);
   box-shadow: var(--ns-shadow-xs);
 }
@@ -25,4 +25,31 @@
   padding: var(--ns-space-3) var(--ns-space-5);
   border-top: 1px solid var(--ns-border);
   background: color-mix(in srgb, var(--ns-surface) 86%, transparent);
+}
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='panel'][data-part='root'] {
+  background: var(--ns-card);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='panel'][data-part='root'][data-variant='muted'] {
+  background: var(--ns-muted);
+  border-color: var(--ns-border);
+  box-shadow: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='panel'][data-part='root'][data-variant='raised'] {
+  background: var(--ns-surface-raised);
+  border-color: var(--ns-border-subtle);
+  box-shadow: none;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='panel'][data-part='header'],
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='panel'][data-part='body'],
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='panel'][data-part='footer'] {
+  padding: var(--ns-card-padding);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='panel'][data-part='footer'] {
+  background: var(--ns-card-footer);
 }

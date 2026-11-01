@@ -15,6 +15,7 @@ import type { Renderable } from '../../lib/public-types.ts';
 export type BadgeVariant =
   | 'primary'
   | 'secondary'
+  | 'info'
   | 'success'
   | 'warning'
   | 'destructive'
@@ -26,15 +27,6 @@ interface BadgeProps extends Omit<JSX.HTMLAttributes<HTMLSpanElement>, 'class' |
   variant?: BadgeVariant;
 }
 
-const VARIANT_CLASSES: Record<BadgeVariant, string> = {
-  primary: 'ns-badge--primary',
-  secondary: 'ns-badge--secondary',
-  success: 'ns-badge--success',
-  warning: 'ns-badge--warning',
-  destructive: 'ns-badge--destructive',
-  muted: 'ns-badge--muted',
-};
-
 /**
  * Renders a compact semantic label for status, tags, and counters.
  */
@@ -42,8 +34,16 @@ export function Badge(
   { children, class: className, variant = 'secondary', ...props }: BadgeProps,
 ): VNode {
   return (
-    <span {...props} class={cn('ns-badge', VARIANT_CLASSES[variant], className)}>
-      {children}
+    <span
+      {...props}
+      class={cn('ns-badge', className)}
+      data-variant={variant}
+      data-part='root'
+      data-scope='badge'
+      data-emphasis='subtle'
+    >
+      <span class='ns-badge__dot' data-part='dot' data-scope='badge' aria-hidden='true' />
+      <span data-part='label' data-scope='badge'>{children}</span>
     </span>
   );
 }

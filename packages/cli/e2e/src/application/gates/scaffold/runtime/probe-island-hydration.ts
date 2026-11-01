@@ -1,6 +1,7 @@
 /** Headless-browser acceptance probe for generated route-local island hydration. */
 
 import { dirname } from '@std/path';
+import { islandHydrationObservationExpression } from './island-hydration-observation.ts';
 import type { IslandHydrationReceipt } from './island-receipts.ts';
 import { findBrowserExecutable, resolveProjectAppUrls } from './probe-app-reference.ts';
 
@@ -130,7 +131,7 @@ async function interactWithHeadlessChrome(url: string): Promise<IslandHydrationO
     await client.waitFor('Page.loadEventFired');
     return await waitForEvaluation<IslandHydrationObservation>(
       client,
-      islandHydrationObservationExpression(),
+      islandHydrationObservationExpression(QUERY_MODULE_PATH),
       (value) =>
         value?.freshIslandElement !== null && value?.queryClientFound === true &&
         value.listQueryFound === true,
@@ -368,23 +369,6 @@ async function waitForEvaluation<T>(
       JSON.stringify(lastValue)
     }`,
   );
-}
-
-function islandHydrationObservationExpression(): string {
-  return `(async () => {
-    const surface = document.querySelector('main output');
-    const { getIslandQueryClient } = await import(${JSON.stringify(QUERY_MODULE_PATH)});
-    const queryClient = getIslandQueryClient();
-    const queries = queryClient.getQueryCache().getAll();
-    const listQuery = queries.find((query) =>
-      Array.isArray(query.queryKey) && query.queryKey[0] === 'users' && query.queryKey[1] === 'list'
-    );
-    return {
-      queryClientFound: queryClient !== null,
-      listQueryFound: listQuery !== undefined,
-      freshIslandElement: surface?.tagName.toLowerCase() ?? null,
-    };
-  })()`;
 }
 
 interface QueryClientDiscoveryObservation {

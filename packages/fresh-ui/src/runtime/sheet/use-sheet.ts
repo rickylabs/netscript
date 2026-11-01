@@ -65,7 +65,12 @@ export function useSheet({
       ...props,
       'aria-controls': contentId,
       'aria-expanded': open,
-      'data-part': 'trigger',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'trigger',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'sheet',
       'data-state': dataState,
       onClick: composeEventHandlers(props.onClick, () => setOpen(true, 'trigger')),
       type: props.type ?? 'button',
@@ -79,7 +84,12 @@ export function useSheet({
       'aria-describedby': props['aria-describedby'] ?? descriptionId,
       'aria-labelledby': props['aria-labelledby'] ?? titleId,
       'aria-modal': modal ? 'true' : undefined,
-      'data-part': 'content',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'content',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'sheet',
       'data-side': side,
       'data-state': dataState,
       id: props.id ?? contentId,
@@ -135,7 +145,12 @@ export function useSheet({
   const getTitleProps = useCallback(
     (props: JSX.HTMLAttributes<HTMLHeadingElement> = {}): SheetTitleElementProps => ({
       ...props,
-      'data-part': 'title',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'title',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'sheet',
       id: props.id ?? titleId,
     }),
     [titleId],
@@ -144,7 +159,12 @@ export function useSheet({
   const getDescriptionProps = useCallback(
     (props: JSX.HTMLAttributes<HTMLParagraphElement> = {}): SheetDescriptionElementProps => ({
       ...props,
-      'data-part': 'description',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'description',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'sheet',
       id: props.id ?? descriptionId,
     }),
     [descriptionId],
@@ -153,7 +173,12 @@ export function useSheet({
   const getCloseProps = useCallback(
     (props: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {}): SheetCloseElementProps => ({
       ...props,
-      'data-part': 'close',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'close',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'sheet',
       onClick: composeEventHandlers(props.onClick, () => setOpen(false, 'close-button')),
       type: props.type ?? 'button',
     }),

@@ -42,12 +42,25 @@ export function Alert(
     <div
       {...props}
       role={resolvedRole}
-      class={cn('ns-alert', `ns-alert--${variant}`, className)}
+      class={cn('ns-alert', className)}
+      data-variant={variant}
+      data-part='root'
+      data-scope='alert'
     >
-      <span aria-hidden='true' class='ns-alert__icon'>{icon ?? DEFAULT_ICONS[variant]}</span>
-      <div class='ns-alert__body'>
-        {title ? <div class='ns-alert__title'>{title}</div> : null}
-        {children ? <div class='ns-alert__description'>{children}</div> : null}
+      <span aria-hidden='true' class='ns-alert__icon' data-part='icon' data-scope='alert'>
+        {icon ?? DEFAULT_ICONS[variant]}
+      </span>
+      <div class='ns-alert__body' data-part='body' data-scope='alert'>
+        {title
+          ? <div class='ns-alert__title' data-part='title' data-scope='alert'>{title}</div>
+          : null}
+        {children
+          ? (
+            <div class='ns-alert__description' data-part='description' data-scope='alert'>
+              {children}
+            </div>
+          )
+          : null}
       </div>
     </div>
   );

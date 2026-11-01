@@ -1,0 +1,28 @@
+{
+  "outcome": "PASS",
+  "startedAt": "2026-10-28T05:47:50.398Z",
+  "finishedAt": "2026-10-28T05:48:10.888Z",
+  "durationMs": 20490,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 232,
+    "sha256": "e537b7291a93a75f6eb22f8d549609670dc750d6fd5268702b76bf5c8cff7808",
+    "tail": "{\"schemaVersion\":1,\"frameworkVersion\":\"0.0.8\",\"sha256\":\"0b5bfcba686348fe5b32ad684156b4335c4dcd4c2fba51f60f1ffaa206f25981\",\"uncompressedBytes\":2571873,\"compressedBytes\":389323,\"packageCount\":35,\"subpathCount\":299,\"symbolCount\":8902}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 148,
+    "sha256": "bb580eff463cfaf5dab19bd77fe1a02b60387837eefea2b91f07a60a6cb25650",
+    "tail": "Task check:mcp-export-corpus deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/generate-export-surface-corpus.ts --check\n",
+    "truncated": false
+  },
+  "gateId": "mcp-corpus-freshness",
+  "gitHead": "5ef03198ade01515b28a22b539e6db066e18c735",
+  "args": [
+    "task",
+    "check:mcp-export-corpus"
+  ],
+  "timeoutMs": 180000,
+  "runner": "/root/service_qualification_sol",
+  "capture": "Canonical runProcess with1MiB stream tail; full bytes/hash always retained; actual truncation flag authoritative"
+}

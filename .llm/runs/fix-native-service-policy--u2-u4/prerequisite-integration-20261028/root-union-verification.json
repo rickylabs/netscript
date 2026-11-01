@@ -1,0 +1,765 @@
+{
+  "at": "2026-10-28T06:03:06.867Z",
+  "head": "5ef03198ade01515b28a22b539e6db066e18c735",
+  "bindings": 119,
+  "changedOwners": 33,
+  "changed": [
+    ".llm/harness/debt/arch-debt.md",
+    ".llm/tools/deps/check-db-alignment.ts",
+    ".llm/tools/deps/check-db-alignment_test.ts",
+    ".llm/tools/docs/check-exports-drift.ts",
+    ".llm/tools/docs/check-exports-drift_test.ts",
+    ".llm/tools/docs/jsdoc-example-compiler.ts",
+    ".llm/tools/docs/jsdoc-example-compiler_test.ts",
+    ".llm/tools/docs/jsdoc-example-policy.ts",
+    "deno.json",
+    "deno.lock",
+    "packages/fresh-ui/deno.lock",
+    "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+    "packages/plugin/tests/service/create-plugin-service-auth_test.ts",
+    "packages/service/CHANGELOG.md",
+    "packages/service/README.md",
+    "packages/service/mod.ts",
+    "packages/service/src/auth/auth-middleware.ts",
+    "packages/service/src/auth/mod.ts",
+    "packages/service/src/auth/options.ts",
+    "packages/service/src/builder/service-builder-impl.ts",
+    "packages/service/src/diagnostics/database-connectivity.ts",
+    "packages/service/src/middleware/service-cors.ts",
+    "packages/service/src/primitives/body-limit.ts",
+    "packages/service/tests/auth/builder-auth_test.ts",
+    "packages/service/tests/auth/define-service-auth_test.ts",
+    "packages/service/tests/auth/health-auth-order_test.ts",
+    "packages/service/tests/auth/middleware_test.ts",
+    "packages/service/tests/body-limit_test.ts",
+    "packages/service/tests/cors-response-authority_test.ts",
+    "packages/service/tests/database-connectivity_test.ts",
+    "packages/service/tests/legacy-abort_test.ts",
+    "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+    "plugins/auth/tests/services/unsupported-revocation-http_test.ts"
+  ],
+  "allOriginIndexHeadAndWorkingHashesMatch": true,
+  "gateFailures": [
+    {
+      "name": "docs-links",
+      "exitCode": 1
+    }
+  ],
+  "sourceAcceptance": "Exact accepted leaf union; independent integration verdict and new-head CI remain required",
+  "rows": [
+    {
+      "path": ".llm/harness/debt/arch-debt.md",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "74e43f6a6c914c5af55edd107d9c5a06a289ae795d5b980d37af89c0a38d7fb9",
+      "workingSha256": "74e43f6a6c914c5af55edd107d9c5a06a289ae795d5b980d37af89c0a38d7fb9"
+    },
+    {
+      "path": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "c22bd6298a119279c18dfc1192c6dffc7feca8bb661884d00e7cac7f7db654f0",
+      "workingSha256": "c22bd6298a119279c18dfc1192c6dffc7feca8bb661884d00e7cac7f7db654f0"
+    },
+    {
+      "path": "packages/plugin/tests/service/create-plugin-service-auth_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "24cd6d86f27e147f09d71c1afaf9b66f9a0a13fb5c694763f9ea62846db42c28",
+      "workingSha256": "24cd6d86f27e147f09d71c1afaf9b66f9a0a13fb5c694763f9ea62846db42c28"
+    },
+    {
+      "path": "packages/service/CHANGELOG.md",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "4ab70c6e658f082e1231587d04c7eb52712817d8ec726833d91bc1cc3f9d428f",
+      "workingSha256": "4ab70c6e658f082e1231587d04c7eb52712817d8ec726833d91bc1cc3f9d428f"
+    },
+    {
+      "path": "packages/service/README.md",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "11f556ff05d88ff15b36b700a9e36e944deb2f0c13709ac31891c3430149174a",
+      "workingSha256": "11f556ff05d88ff15b36b700a9e36e944deb2f0c13709ac31891c3430149174a"
+    },
+    {
+      "path": "packages/service/mod.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "19f94d3d99c5c5ce8411335cf896d33e9f0129f3c38ee5d576d254ca1b7f9e9e",
+      "workingSha256": "19f94d3d99c5c5ce8411335cf896d33e9f0129f3c38ee5d576d254ca1b7f9e9e"
+    },
+    {
+      "path": "packages/service/src/auth/auth-middleware.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "ae16fb44ca55d048d867bd06f669ea2895e46af51287b5c8f5cecbea9ee5cb32",
+      "workingSha256": "ae16fb44ca55d048d867bd06f669ea2895e46af51287b5c8f5cecbea9ee5cb32"
+    },
+    {
+      "path": "packages/service/src/auth/mod.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "9c384b7b34ff323e171718f1a43c65538be89105c53a510c3ed3030a19e7dab7",
+      "workingSha256": "9c384b7b34ff323e171718f1a43c65538be89105c53a510c3ed3030a19e7dab7"
+    },
+    {
+      "path": "packages/service/src/auth/options.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "6f32f887b8dea35fef1f11bf19e244c678e30fa87a4e3a2848062af7e0fa75b2",
+      "workingSha256": "6f32f887b8dea35fef1f11bf19e244c678e30fa87a4e3a2848062af7e0fa75b2"
+    },
+    {
+      "path": "packages/service/src/builder/service-builder-impl.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "74090bb6ec406b4f648a0e77d2ebee4e63cc202a4d4023d5d9de37103c4130b9",
+      "workingSha256": "74090bb6ec406b4f648a0e77d2ebee4e63cc202a4d4023d5d9de37103c4130b9"
+    },
+    {
+      "path": "packages/service/src/diagnostics/database-connectivity.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "854e3c3356065560ebfb5759e1665ef0fc3ee8cecf8c75773d09f5df24147ee6",
+      "workingSha256": "854e3c3356065560ebfb5759e1665ef0fc3ee8cecf8c75773d09f5df24147ee6"
+    },
+    {
+      "path": "packages/service/src/middleware/service-cors.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "bf8084a59737382ac3b9e79293d9c45fa873dc58cc70d0492e95fab8d81245d0",
+      "workingSha256": "bf8084a59737382ac3b9e79293d9c45fa873dc58cc70d0492e95fab8d81245d0"
+    },
+    {
+      "path": "packages/service/src/primitives/body-limit.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "cf570dcb7a4a65f19e9ee992f3c2273879f567b710990d045c5a462941cc82b1",
+      "workingSha256": "cf570dcb7a4a65f19e9ee992f3c2273879f567b710990d045c5a462941cc82b1"
+    },
+    {
+      "path": "packages/service/tests/auth/builder-auth_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "09b8b83a399105716607ed1d4cb9ef1ee5f7818570cb6475f8f030bc2ef681fa",
+      "workingSha256": "09b8b83a399105716607ed1d4cb9ef1ee5f7818570cb6475f8f030bc2ef681fa"
+    },
+    {
+      "path": "packages/service/tests/auth/define-service-auth_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "e725e29e30f6423297af9b2a8eabac960ea2aea69b4ccff732527c8299a372f2",
+      "workingSha256": "e725e29e30f6423297af9b2a8eabac960ea2aea69b4ccff732527c8299a372f2"
+    },
+    {
+      "path": "packages/service/tests/auth/health-auth-order_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "c785869359b8fca476db9fe94e2d4b7c188196ea34d085966453e3a57b3078bb",
+      "workingSha256": "c785869359b8fca476db9fe94e2d4b7c188196ea34d085966453e3a57b3078bb"
+    },
+    {
+      "path": "packages/service/tests/auth/middleware_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "67443947ed85b05d07324e85326ce5b522168f81ed877f8ae4c7da2bd2c42a05",
+      "workingSha256": "67443947ed85b05d07324e85326ce5b522168f81ed877f8ae4c7da2bd2c42a05"
+    },
+    {
+      "path": "packages/service/tests/body-limit_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "c056cb621def1fa3ce4e032a60a1353eba2f3c4bcf9432647a7d9febdaa935a0",
+      "workingSha256": "c056cb621def1fa3ce4e032a60a1353eba2f3c4bcf9432647a7d9febdaa935a0"
+    },
+    {
+      "path": "packages/service/tests/cors-response-authority_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "e2668ae9ce623a28caed562bed4d9c6b43af46737857599b99bacd8653ac9bc3",
+      "workingSha256": "e2668ae9ce623a28caed562bed4d9c6b43af46737857599b99bacd8653ac9bc3"
+    },
+    {
+      "path": "packages/service/tests/database-connectivity_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "f1f8ee2dc7fdd8ce7861edcca412f74b9724cb382bee43529d30d491bfae5f3a",
+      "workingSha256": "f1f8ee2dc7fdd8ce7861edcca412f74b9724cb382bee43529d30d491bfae5f3a"
+    },
+    {
+      "path": "packages/service/tests/legacy-abort_test.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "8781d5d9144250b5554d6e53b84d7b54f54938c5b0f685ee484082d935a56a0c",
+      "workingSha256": "8781d5d9144250b5554d6e53b84d7b54f54938c5b0f685ee484082d935a56a0c"
+    },
+    {
+      "path": ".llm/tools/deps/check-db-alignment.ts",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "babe9043e1296dac30e9923bbfee9d3c02f96f062c62c3ec1e90e0fdba5186b1",
+      "workingSha256": "babe9043e1296dac30e9923bbfee9d3c02f96f062c62c3ec1e90e0fdba5186b1"
+    },
+    {
+      "path": ".llm/tools/deps/check-db-alignment_test.ts",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "634c289a7f7b60d8212a227294ed096ed70dc35559732de024d6332a2bbaf96b",
+      "workingSha256": "634c289a7f7b60d8212a227294ed096ed70dc35559732de024d6332a2bbaf96b"
+    },
+    {
+      "path": "deno.json",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "7fd92d5c707a359210ad4fc9a3b2e84fb7f4db4a93b7bd9aa6754aa7e589c7ee",
+      "workingSha256": "7fd92d5c707a359210ad4fc9a3b2e84fb7f4db4a93b7bd9aa6754aa7e589c7ee"
+    },
+    {
+      "path": "deno.lock",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+      "workingSha256": "5dcfdb2db97e8dad21be5b8443f7a1ccff0bd2da85f4b85a5a1c093502472d4f"
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674",
+      "workingSha256": "62302d6ca42931e4d495e2e5a2aae83a918759d3ee06a1bba7095f9408d633f1"
+    },
+    {
+      "path": "plugins/auth/tests/services/better-auth-global-logout-http_test.ts",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "ac5aea39f538be2f8cf33ffdc244181cb725ea0752a950f11e6b6bbb30be98ac",
+      "workingSha256": "ac5aea39f538be2f8cf33ffdc244181cb725ea0752a950f11e6b6bbb30be98ac"
+    },
+    {
+      "path": "plugins/auth/tests/services/unsupported-revocation-http_test.ts",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "dc7337c186ff457bc41dc1e00ea12d81964f8e2d87a3996b6fd2a5c23fd8b871",
+      "workingSha256": "dc7337c186ff457bc41dc1e00ea12d81964f8e2d87a3996b6fd2a5c23fd8b871"
+    },
+    {
+      "path": ".llm/tools/docs/check-exports-drift.ts",
+      "origin": "728c0a52f48cc5e440df273783c2e03134b745b8",
+      "canonicalSha256": "df2c50fbaef0095b8172d33c02dadf0038bc8280b071de927aa225d9958aa269",
+      "workingSha256": "df2c50fbaef0095b8172d33c02dadf0038bc8280b071de927aa225d9958aa269"
+    },
+    {
+      "path": ".llm/tools/docs/check-exports-drift_test.ts",
+      "origin": "728c0a52f48cc5e440df273783c2e03134b745b8",
+      "canonicalSha256": "033e33dbbde1efb8fef9f5f29d4ffd9c32e3761e2247e9bcb682daaf2ccdffd1",
+      "workingSha256": "033e33dbbde1efb8fef9f5f29d4ffd9c32e3761e2247e9bcb682daaf2ccdffd1"
+    },
+    {
+      "path": ".llm/tools/docs/jsdoc-example-compiler.ts",
+      "origin": "728c0a52f48cc5e440df273783c2e03134b745b8",
+      "canonicalSha256": "cc70b2791667f698f853a81409ce482fb8eef768924623ac816f013f17715f18",
+      "workingSha256": "cc70b2791667f698f853a81409ce482fb8eef768924623ac816f013f17715f18"
+    },
+    {
+      "path": ".llm/tools/docs/jsdoc-example-compiler_test.ts",
+      "origin": "728c0a52f48cc5e440df273783c2e03134b745b8",
+      "canonicalSha256": "27bad4e2dcb444f5c7f87f3488a1393f5c0e7cf19f1ab59aec0fcba20ac46417",
+      "workingSha256": "27bad4e2dcb444f5c7f87f3488a1393f5c0e7cf19f1ab59aec0fcba20ac46417"
+    },
+    {
+      "path": ".llm/tools/docs/jsdoc-example-policy.ts",
+      "origin": "728c0a52f48cc5e440df273783c2e03134b745b8",
+      "canonicalSha256": "ec954fff331b75c023df39a84929bb0c8833bd1cab07bb9d62d859a671a4cefc",
+      "workingSha256": "ec954fff331b75c023df39a84929bb0c8833bd1cab07bb9d62d859a671a4cefc"
+    },
+    {
+      "path": ".llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--dotnet-rfc/bench/bootsharp-lcg/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "e7786a4c0cfacba76a578a82d3548b137fbfe36703ce0ba860441c100c8b3dfa",
+      "workingSha256": "e7786a4c0cfacba76a578a82d3548b137fbfe36703ce0ba860441c100c8b3dfa"
+    },
+    {
+      "path": ".llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--rust-workers-rfc/bench/parallel/wasmbuild-lcg/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "d94c243a63bce94784ca036911d363492add32165bdfe0942163111dc9c7ccec",
+      "workingSha256": "d94c243a63bce94784ca036911d363492add32165bdfe0942163111dc9c7ccec"
+    },
+    {
+      "path": ".llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--rust-workers-rfc/bench/parallel/wasmbuild-lcg/deno.lock",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "19b696407ac44fd39e8afca7f60fd3b2cf6cb49bf7447fe7a0756be1bc4f9e1b",
+      "workingSha256": "99537c6196d90ca77dbc4b5e074acb213136e2bf86cbdd8643a79749152a14c1"
+    },
+    {
+      "path": ".llm/runs/docs-rfc-runtime-versioned-automation--supervisor/evidence/current-state-probes/schema-fixture/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "61c727ccb1244b95ed768f17253f2cb5ff8fba66cbc1dc85938bd233130473e3",
+      "workingSha256": "61c727ccb1244b95ed768f17253f2cb5ff8fba66cbc1dc85938bd233130473e3"
+    },
+    {
+      "path": ".llm/runs/docs-rfc-runtime-versioned-automation--supervisor/evidence/current-state-probes/schema-fixture/deno.lock",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "7c82ccb53fe9b4ac00aadb9324fd86784f5c300726ae9ae48568a48bcdc4eec8",
+      "workingSha256": "ba1b593c2be6b5097a9a4d7c168a6c1abe9ab1df96d8fd635d9fe396735e2c93"
+    },
+    {
+      "path": ".llm/runs/plan-devtools-contribution--seed/research/sources/nuxt-devtools__packages_devtools-kit_package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "ee3efb93c3051259e3c3725a6f836affd96bd179b4841c1ad8587e2dcc6e0b3a",
+      "workingSha256": "ee3efb93c3051259e3c3725a6f836affd96bd179b4841c1ad8587e2dcc6e0b3a"
+    },
+    {
+      "path": "deno.json",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "7fd92d5c707a359210ad4fc9a3b2e84fb7f4db4a93b7bd9aa6754aa7e589c7ee",
+      "workingSha256": "7fd92d5c707a359210ad4fc9a3b2e84fb7f4db4a93b7bd9aa6754aa7e589c7ee"
+    },
+    {
+      "path": "deno.lock",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "56b8b9cd2c8bae3b9a240af14aed2b7a48368ef572f3f711bed1c70e1a40bcb1",
+      "workingSha256": "5dcfdb2db97e8dad21be5b8443f7a1ccff0bd2da85f4b85a5a1c093502472d4f"
+    },
+    {
+      "path": "docs/site/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "6ee7fa5da3d189e74af7be7d4c209b33258ef9235585d46b1fd9a31aa931fb3c",
+      "workingSha256": "6ee7fa5da3d189e74af7be7d4c209b33258ef9235585d46b1fd9a31aa931fb3c"
+    },
+    {
+      "path": "docs/site/deno.lock",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "32f9de401220c4c75c7de3d5820cd03139b0dcb9053285a7a853efbf1e2d35aa",
+      "workingSha256": "e03005b38fbb0ffdef75671067ad0c7b356ea8f04fef911c9926b16f5f21f057"
+    },
+    {
+      "path": "packages/ai/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "ff97564ea9e42cc49afb6a9da5864bd2327feb0f008a5a4254ae8baa9fb27d1e",
+      "workingSha256": "ff97564ea9e42cc49afb6a9da5864bd2327feb0f008a5a4254ae8baa9fb27d1e"
+    },
+    {
+      "path": "packages/aspire/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "1d440df9e1e152e2be68a7408a09099c5a6cb1eea12ea3d9b2f99d6eb4eadc42",
+      "workingSha256": "1d440df9e1e152e2be68a7408a09099c5a6cb1eea12ea3d9b2f99d6eb4eadc42"
+    },
+    {
+      "path": "packages/auth-better-auth/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "cd498af2acf1cb4239be4734c4e0cf24787971d7a8e273f137ff25d89b0a23c5",
+      "workingSha256": "cd498af2acf1cb4239be4734c4e0cf24787971d7a8e273f137ff25d89b0a23c5"
+    },
+    {
+      "path": "packages/auth-better-auth/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "f426a5a2072c65551661615352b106b98d6d44320df92c65438eff7b578c4550",
+      "workingSha256": "f426a5a2072c65551661615352b106b98d6d44320df92c65438eff7b578c4550"
+    },
+    {
+      "path": "packages/auth-kv-oauth/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "574608715e6564a2a1f5c4ea7deb91c2b66498da011d14988647e2e86e3a7206",
+      "workingSha256": "574608715e6564a2a1f5c4ea7deb91c2b66498da011d14988647e2e86e3a7206"
+    },
+    {
+      "path": "packages/auth-kv-oauth/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a",
+      "workingSha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a"
+    },
+    {
+      "path": "packages/auth-workos/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "0388d9fd89f61ab086c80bd20812511b25d7e8871c3c2fe437f7b9178ce5c76c",
+      "workingSha256": "0388d9fd89f61ab086c80bd20812511b25d7e8871c3c2fe437f7b9178ce5c76c"
+    },
+    {
+      "path": "packages/auth-workos/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "dec9db272dca369514253e12795a4cb5dd4d4f2acc499c86e4b0ad6de07a5442",
+      "workingSha256": "dec9db272dca369514253e12795a4cb5dd4d4f2acc499c86e4b0ad6de07a5442"
+    },
+    {
+      "path": "packages/bench/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "4401cbbca430cac110e657d4aa94a16e189e5de8eed81fd6d417f3cfc61ba347",
+      "workingSha256": "4401cbbca430cac110e657d4aa94a16e189e5de8eed81fd6d417f3cfc61ba347"
+    },
+    {
+      "path": "packages/cli/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "778cff41fa1553de8e38c622d5be3c007dd57921401c7708a7d10bb36731979b",
+      "workingSha256": "778cff41fa1553de8e38c622d5be3c007dd57921401c7708a7d10bb36731979b"
+    },
+    {
+      "path": "packages/cli/e2e/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "0fcaa84136640b9f1a4fa424f1a9f30ad42c9b9375f978496e627565a3160d95",
+      "workingSha256": "0fcaa84136640b9f1a4fa424f1a9f30ad42c9b9375f978496e627565a3160d95"
+    },
+    {
+      "path": "packages/cli/e2e/fixtures/desktop-native/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "2a13d1a769e52424ee86ed44f128c160bd9f30f649cdcb24d5d59471f91c5ba7",
+      "workingSha256": "2a13d1a769e52424ee86ed44f128c160bd9f30f649cdcb24d5d59471f91c5ba7"
+    },
+    {
+      "path": "packages/cli/e2e/fixtures/desktop-native/deno.lock",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "38e163af37ddb53492f97386243e83a9806827c0c52a3b8dd4e4c27c6a6b3f2e",
+      "workingSha256": "adc126281992b69e3dbbe0a325b2e5bcb2775358ecfb6a82465fc5fcdb943e8a"
+    },
+    {
+      "path": "packages/config/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "e455fc1d45fe2008df6f4cf31fc5e1937da9c853e4d0dfdc7dcb6dd87c1edf64",
+      "workingSha256": "e455fc1d45fe2008df6f4cf31fc5e1937da9c853e4d0dfdc7dcb6dd87c1edf64"
+    },
+    {
+      "path": "packages/contracts/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "6d770b348514841838c68432b1decbbaacdb48f16a53efaa4ed21eb6918e2718",
+      "workingSha256": "6d770b348514841838c68432b1decbbaacdb48f16a53efaa4ed21eb6918e2718"
+    },
+    {
+      "path": "packages/contracts/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "78170b8b72c058aad12e45f1c026033a6a7562bb97c9b596e6e55d527a980e9b",
+      "workingSha256": "78170b8b72c058aad12e45f1c026033a6a7562bb97c9b596e6e55d527a980e9b"
+    },
+    {
+      "path": "packages/cron/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "8095ce1848250aab5432caf017f6c3b670f526733c781234047d89c38d48b62b",
+      "workingSha256": "8095ce1848250aab5432caf017f6c3b670f526733c781234047d89c38d48b62b"
+    },
+    {
+      "path": "packages/database/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "9f4138183a0227d6ee14c7cde2672eaf7d4f7c157eba731c961122b943bf9087",
+      "workingSha256": "9f4138183a0227d6ee14c7cde2672eaf7d4f7c157eba731c961122b943bf9087"
+    },
+    {
+      "path": "packages/database/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "c49333df8fd0237914e43208899c4c0713a2a03e42c5057f4817427e5efd519a",
+      "workingSha256": "c49333df8fd0237914e43208899c4c0713a2a03e42c5057f4817427e5efd519a"
+    },
+    {
+      "path": "packages/fresh-ui/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "8858451a95ff4c56bdaa5725d6a0be74a5a5c7c9a77be6ba7436e26260bb438b",
+      "workingSha256": "8858451a95ff4c56bdaa5725d6a0be74a5a5c7c9a77be6ba7436e26260bb438b"
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "origin": "11e99987e34cebe47cd12026ba96647cbbd3cdf8",
+      "canonicalSha256": "a9faaab08ce672968c1e860b17342b1e0cb2b09520618894859a75235d228674",
+      "workingSha256": "62302d6ca42931e4d495e2e5a2aae83a918759d3ee06a1bba7095f9408d633f1"
+    },
+    {
+      "path": "packages/fresh-ui/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "244aa0a6dc7fe4b105e09a9a70453fcd1dab062317f07db34c44ca3cc94c73be",
+      "workingSha256": "244aa0a6dc7fe4b105e09a9a70453fcd1dab062317f07db34c44ca3cc94c73be"
+    },
+    {
+      "path": "packages/fresh/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "ecc1f7b2daeccc758904c123615992c0f38183ea05e604d5d53d1c9be4df0c56",
+      "workingSha256": "ecc1f7b2daeccc758904c123615992c0f38183ea05e604d5d53d1c9be4df0c56"
+    },
+    {
+      "path": "packages/fresh/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "42b09520e14b3d54de99ae694a106b0dcbd268bc4cfa29ed6b9c8ca6ce543a4a",
+      "workingSha256": "42b09520e14b3d54de99ae694a106b0dcbd268bc4cfa29ed6b9c8ca6ce543a4a"
+    },
+    {
+      "path": "packages/fresh/tests/type-fixtures/query-hydration-5.101.0-deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "086e999a4c39e3f7bc0d70e6e8159bddf644b5ed30518aa8e8c777e907619384",
+      "workingSha256": "086e999a4c39e3f7bc0d70e6e8159bddf644b5ed30518aa8e8c777e907619384"
+    },
+    {
+      "path": "packages/fresh/tests/type-fixtures/query-hydration-5.102.8-deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "3e27d29628d164b26db94ffabec55b5662621adab9449ef542ed296ef630fdcb",
+      "workingSha256": "3e27d29628d164b26db94ffabec55b5662621adab9449ef542ed296ef630fdcb"
+    },
+    {
+      "path": "packages/fresh/tests/type-fixtures/query-hydration-5.104.1-deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "5558eef4500da1276b650307d2ec0c7140abbab6ac357bc41dcd0523805a8b2c",
+      "workingSha256": "5558eef4500da1276b650307d2ec0c7140abbab6ac357bc41dcd0523805a8b2c"
+    },
+    {
+      "path": "packages/fresh/tests/type-fixtures/streamdb-consumer-deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "16a9189c140cc2c2626082a2083308a0ae4166530c922f7c8e97348acf5f616f",
+      "workingSha256": "16a9189c140cc2c2626082a2083308a0ae4166530c922f7c8e97348acf5f616f"
+    },
+    {
+      "path": "packages/kv/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "7253605e36f72b58c5fe0b1f933016bee962cc6b37f4358da461d8adaa664f73",
+      "workingSha256": "7253605e36f72b58c5fe0b1f933016bee962cc6b37f4358da461d8adaa664f73"
+    },
+    {
+      "path": "packages/kv/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "bb9ccd1176d2dfaff5829aa0b083d1585cc2de3ab27471d8e10a1a1ca3bc815d",
+      "workingSha256": "bb9ccd1176d2dfaff5829aa0b083d1585cc2de3ab27471d8e10a1a1ca3bc815d"
+    },
+    {
+      "path": "packages/logger/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "bbea9a14463d562790cb2d73c8f78d8ab07a0850d1d19cf73740574a0cf4a176",
+      "workingSha256": "bbea9a14463d562790cb2d73c8f78d8ab07a0850d1d19cf73740574a0cf4a176"
+    },
+    {
+      "path": "packages/mcp/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "6a005c2890c618a9bd6d11087476274865a9e8cd18192f7366562239e9604b5f",
+      "workingSha256": "6a005c2890c618a9bd6d11087476274865a9e8cd18192f7366562239e9604b5f"
+    },
+    {
+      "path": "packages/mcp/tests/fixtures/doctor/broken/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "6815999dbd68bd1ab5bb137b59808cb1f1a38fb3393c9133721f439c0ad37361",
+      "workingSha256": "6815999dbd68bd1ab5bb137b59808cb1f1a38fb3393c9133721f439c0ad37361"
+    },
+    {
+      "path": "packages/mcp/tests/fixtures/doctor/healthy/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "499b4217cd2fa71181d534f3b1ad8aed684ef454acce652913fd4b3e412d609f",
+      "workingSha256": "499b4217cd2fa71181d534f3b1ad8aed684ef454acce652913fd4b3e412d609f"
+    },
+    {
+      "path": "packages/plugin-ai-core/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "c762d15b83f30226578bec370e2fabbc780d916a26fca3748fe625ea6fcaeb1e",
+      "workingSha256": "c762d15b83f30226578bec370e2fabbc780d916a26fca3748fe625ea6fcaeb1e"
+    },
+    {
+      "path": "packages/plugin-ai-core/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "373e8117e98ad776231e38714d202551051b9b28fe33bf5bb99328e21db19c82",
+      "workingSha256": "373e8117e98ad776231e38714d202551051b9b28fe33bf5bb99328e21db19c82"
+    },
+    {
+      "path": "packages/plugin-auth-core/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "163aa1c2ea334525ec3f62deff57182e3d6a1ca752eb4f6f1c76ab67c4c9be43",
+      "workingSha256": "163aa1c2ea334525ec3f62deff57182e3d6a1ca752eb4f6f1c76ab67c4c9be43"
+    },
+    {
+      "path": "packages/plugin-auth-core/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "dbf8c78b4490d39c179c4da3e4a8097136f07a85bc6e2705eb9c22423b3037fa",
+      "workingSha256": "dbf8c78b4490d39c179c4da3e4a8097136f07a85bc6e2705eb9c22423b3037fa"
+    },
+    {
+      "path": "packages/plugin-sagas-core/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "35b1d5b77a08392da7e538dc52c67432085e425873c665854f60211aa821db3e",
+      "workingSha256": "35b1d5b77a08392da7e538dc52c67432085e425873c665854f60211aa821db3e"
+    },
+    {
+      "path": "packages/plugin-sagas-core/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "517e0bd8c190f5932617d8b879f951abc7d09770bc337b7e430b69b837bb268f",
+      "workingSha256": "517e0bd8c190f5932617d8b879f951abc7d09770bc337b7e430b69b837bb268f"
+    },
+    {
+      "path": "packages/plugin-streams-core/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "c2357c0cb27502a1983474cf97ff8f0ce9442aeb1d4fecb55a34f1c90eb32757",
+      "workingSha256": "c2357c0cb27502a1983474cf97ff8f0ce9442aeb1d4fecb55a34f1c90eb32757"
+    },
+    {
+      "path": "packages/plugin-streams-core/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "847cf8357caf867d847d56940ce9183a015139f936a47acb1dea917b1855247d",
+      "workingSha256": "847cf8357caf867d847d56940ce9183a015139f936a47acb1dea917b1855247d"
+    },
+    {
+      "path": "packages/plugin-streams-core/tests/type-fixtures/producer-consumer-deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "81e5340fe061b954f281d4b0d37f911d66e376e0d511a88abeb49e9801a7e3b5",
+      "workingSha256": "81e5340fe061b954f281d4b0d37f911d66e376e0d511a88abeb49e9801a7e3b5"
+    },
+    {
+      "path": "packages/plugin-triggers-core/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "a5cd22e15d458e1d58c4754bcdc1b93c75b873411f10a9b73113ef8cb63599bf",
+      "workingSha256": "a5cd22e15d458e1d58c4754bcdc1b93c75b873411f10a9b73113ef8cb63599bf"
+    },
+    {
+      "path": "packages/plugin-triggers-core/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "d475a34dfbb7047d397d81ba7aec590822856aafcb3116dd008d38d186ba1a66",
+      "workingSha256": "d475a34dfbb7047d397d81ba7aec590822856aafcb3116dd008d38d186ba1a66"
+    },
+    {
+      "path": "packages/plugin-workers-core/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "be7620df38f5d68f0630809e9e57d7dda8b578b34aa81698c4583eb0153dc934",
+      "workingSha256": "be7620df38f5d68f0630809e9e57d7dda8b578b34aa81698c4583eb0153dc934"
+    },
+    {
+      "path": "packages/plugin-workers-core/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "d475a34dfbb7047d397d81ba7aec590822856aafcb3116dd008d38d186ba1a66",
+      "workingSha256": "d475a34dfbb7047d397d81ba7aec590822856aafcb3116dd008d38d186ba1a66"
+    },
+    {
+      "path": "packages/plugin/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "ad569a7e7d3570b5a8f5bcb9b62ab77aa0fed0cc8aa517004ae7ffdd609ef247",
+      "workingSha256": "ad569a7e7d3570b5a8f5bcb9b62ab77aa0fed0cc8aa517004ae7ffdd609ef247"
+    },
+    {
+      "path": "packages/prisma-adapter-mysql/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "18c3ea278afcae571428b146b58eef5a496a89d4909e7cebef2cfe408a33e54b",
+      "workingSha256": "18c3ea278afcae571428b146b58eef5a496a89d4909e7cebef2cfe408a33e54b"
+    },
+    {
+      "path": "packages/prisma-adapter-mysql/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "f4ccc169e0e35b4e717962a203de504f5c8d644bca08b88b007a7e0d4bdf2d86",
+      "workingSha256": "f4ccc169e0e35b4e717962a203de504f5c8d644bca08b88b007a7e0d4bdf2d86"
+    },
+    {
+      "path": "packages/queue/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "d562b7e08101e37414018f40c9f7bbcc39c8a5f45f5d1170ebd547d8f191a8d8",
+      "workingSha256": "d562b7e08101e37414018f40c9f7bbcc39c8a5f45f5d1170ebd547d8f191a8d8"
+    },
+    {
+      "path": "packages/queue/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "e4e0b46a72f8ee169ccdd982949902b98f07ef9661e3b99e06492def8a5bdaca",
+      "workingSha256": "e4e0b46a72f8ee169ccdd982949902b98f07ef9661e3b99e06492def8a5bdaca"
+    },
+    {
+      "path": "packages/runtime-config/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "914bf6589706da6957e5a79134ea165a9000de867a47f177b22e0101dd7e4cbe",
+      "workingSha256": "914bf6589706da6957e5a79134ea165a9000de867a47f177b22e0101dd7e4cbe"
+    },
+    {
+      "path": "packages/sdk/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "c3ee8b9719fca2f2faeeb62422ba5596ef1ce9c2ffd7e73f2060cd2ca3f1e5cc",
+      "workingSha256": "c3ee8b9719fca2f2faeeb62422ba5596ef1ce9c2ffd7e73f2060cd2ca3f1e5cc"
+    },
+    {
+      "path": "packages/sdk/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "3ab89c4758982551c02f1430ed86832fedc81e7a0e3b8b32165d5d9ba7a6415a",
+      "workingSha256": "3ab89c4758982551c02f1430ed86832fedc81e7a0e3b8b32165d5d9ba7a6415a"
+    },
+    {
+      "path": "packages/service/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "0790c233aa397acb0c6f6613fc52ef93ce94566797e7d4e9366eb0ffe67dac70",
+      "workingSha256": "0790c233aa397acb0c6f6613fc52ef93ce94566797e7d4e9366eb0ffe67dac70"
+    },
+    {
+      "path": "packages/service/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "b68c1f8091e566601f6be579ae95a8da9a5d244535ec4989789a234b96485df1",
+      "workingSha256": "b68c1f8091e566601f6be579ae95a8da9a5d244535ec4989789a234b96485df1"
+    },
+    {
+      "path": "packages/telemetry/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "8d71f8a43aad6b53646a6cce076913faa7ba9eac76cc1a0bbe033fad925b6a5d",
+      "workingSha256": "8d71f8a43aad6b53646a6cce076913faa7ba9eac76cc1a0bbe033fad925b6a5d"
+    },
+    {
+      "path": "packages/telemetry/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "1a390489439fa337f6b08cea2f586dd4ed4e4896343b0dbbbea0bf7172302104",
+      "workingSha256": "1a390489439fa337f6b08cea2f586dd4ed4e4896343b0dbbbea0bf7172302104"
+    },
+    {
+      "path": "packages/watchers/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "af996587c28f2948125331c9d09f7840468c4073286662dcd6b6264e394b88c9",
+      "workingSha256": "af996587c28f2948125331c9d09f7840468c4073286662dcd6b6264e394b88c9"
+    },
+    {
+      "path": "plugins/ai/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "6eddd0a9352194259e65b57f6956b28b6b1b4f4ac1c2df16950ed3179ce89c85",
+      "workingSha256": "6eddd0a9352194259e65b57f6956b28b6b1b4f4ac1c2df16950ed3179ce89c85"
+    },
+    {
+      "path": "plugins/ai/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "bfb62e6eafd1bf6db3ca8fa70b6712d62d1ba3562451585ece7bdb56ffcd2f73",
+      "workingSha256": "bfb62e6eafd1bf6db3ca8fa70b6712d62d1ba3562451585ece7bdb56ffcd2f73"
+    },
+    {
+      "path": "plugins/auth/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "2070ee8bf2da1bec746923d1ffecf6db79c0eb379b66e3965fe679aad4ca64f2",
+      "workingSha256": "2070ee8bf2da1bec746923d1ffecf6db79c0eb379b66e3965fe679aad4ca64f2"
+    },
+    {
+      "path": "plugins/auth/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "204550257f9673f24fb2abb2b72944f162e43519e2097b86503cc62f6c5b7b8f",
+      "workingSha256": "204550257f9673f24fb2abb2b72944f162e43519e2097b86503cc62f6c5b7b8f"
+    },
+    {
+      "path": "plugins/sagas/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "42d994ad1cf58c24b8b5c778c8d9ddbda789a8e11165ca02903c8e81b0d2c41a",
+      "workingSha256": "42d994ad1cf58c24b8b5c778c8d9ddbda789a8e11165ca02903c8e81b0d2c41a"
+    },
+    {
+      "path": "plugins/sagas/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "2186043a64cb54803e88b62c4aa37531c856d1b0ea2c9f22a4501c876958123a",
+      "workingSha256": "2186043a64cb54803e88b62c4aa37531c856d1b0ea2c9f22a4501c876958123a"
+    },
+    {
+      "path": "plugins/streams/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "647bdf32fa2400139c20e384ec7993435e9c13d85d9c3971cd88118bfdfb8147",
+      "workingSha256": "647bdf32fa2400139c20e384ec7993435e9c13d85d9c3971cd88118bfdfb8147"
+    },
+    {
+      "path": "plugins/streams/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "a8afee82893425ddf33517e56175b3115017fabcf7e21c24c26369cf05defb36",
+      "workingSha256": "a8afee82893425ddf33517e56175b3115017fabcf7e21c24c26369cf05defb36"
+    },
+    {
+      "path": "plugins/triggers/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "987493fae18d76a2372673dee1f28699a799f117f76af335a23c9630484003ce",
+      "workingSha256": "987493fae18d76a2372673dee1f28699a799f117f76af335a23c9630484003ce"
+    },
+    {
+      "path": "plugins/triggers/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "6b165d3656c74b064375858b74b38967f695c17c6ee6b018a39ac3c55402c500",
+      "workingSha256": "6b165d3656c74b064375858b74b38967f695c17c6ee6b018a39ac3c55402c500"
+    },
+    {
+      "path": "plugins/workers/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a",
+      "workingSha256": "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a"
+    },
+    {
+      "path": "plugins/workers/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "564376c32ad1fccc5a9eb8c313b81ee3228f5d76f9a26cd42dcac23fb8d49429",
+      "workingSha256": "564376c32ad1fccc5a9eb8c313b81ee3228f5d76f9a26cd42dcac23fb8d49429"
+    },
+    {
+      "path": "resources/examples/expo-streams/deno.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "e473fdc51a2f77dc578dc6b9ec484c190615e8aff7bf9c1bca9e3c329f98a101",
+      "workingSha256": "e473fdc51a2f77dc578dc6b9ec484c190615e8aff7bf9c1bca9e3c329f98a101"
+    },
+    {
+      "path": "resources/examples/expo-streams/deno.lock",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "9296652037d05594e0e844571d560841920874d04ce69d33cef5d8b6b3cfdd16",
+      "workingSha256": "3ae6c0fe813d94b743e3d3b853157d7c76f68e4f18b97c958a7d23c800d1b81e"
+    },
+    {
+      "path": "resources/examples/expo-streams/package.json",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "aa9daff31e5e11a9b52829d81d50894720ac42c05d0b67f0b8ca93fbb33f146b",
+      "workingSha256": "aa9daff31e5e11a9b52829d81d50894720ac42c05d0b67f0b8ca93fbb33f146b"
+    },
+    {
+      "path": "packages/service/src/types.ts",
+      "origin": "e69fd9362d059334f9b35da7aa3d3e804c9ed55a",
+      "canonicalSha256": "0921e0d2d013fe5a7dcdeb4839a91aa68975b8fe4a4043388b2689696ddb2f1c",
+      "workingSha256": "0921e0d2d013fe5a7dcdeb4839a91aa68975b8fe4a4043388b2689696ddb2f1c"
+    }
+  ]
+}

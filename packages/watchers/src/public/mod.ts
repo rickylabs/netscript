@@ -10,6 +10,7 @@ export type {
   KnownEventKind,
   KnownWatchStrategy,
   StabilityOptions,
+  WatcherErrorEvent,
   WatcherOptions,
   WatchEvent,
   WatchFilter,
@@ -18,6 +19,7 @@ export type {
 } from '../types.ts';
 
 export { createWatcher, FileWatcher } from '../file-watcher.ts';
+export { WATCH_STRATEGIES } from '../types.ts';
 
 export type { NativeStrategy, NativeStrategyOptions } from '../strategies/native.ts';
 export type { PollingStrategy, PollingStrategyOptions } from '../strategies/polling.ts';

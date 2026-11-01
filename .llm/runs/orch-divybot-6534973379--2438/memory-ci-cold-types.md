@@ -1,0 +1,5 @@
+# CI cold node typings / 2026-10-31
+
+The full native provider suite passed against a warm cache but CI's cold resolver picked @types/node26.6.6 for wildcard type edges. Both maintained locks record26.6.5. Conditional npm overrides alone were insufficient in the external type graph. Providing the recorded version as a private fixture package dependency makes the full suite pass with an entirely new DENO_DIR. Do not accept the new registry version or weaken the result guard. Retain the isolated tool cache; do not delete/reload caches.
+
+Adding instrumentation and Prisma CLI grows the root catalog from38 to40. The two exact census assertions in .llm/tools/docs/snippet-compiler_test.ts must change accordingly. CI test4's structured artifact located the two failures; bounded receipt console tails omit individual failures, so download the child report artifact when needed. Close-gate's only pending box was final exact-head review/publication; complete it truthfully after that verdict, then rerun just the job.

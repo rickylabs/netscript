@@ -1,0 +1,180 @@
+/** Native streams HTTPS trust, guarded proxy bytes and owned listener cleanup. @module */
+import { assertEquals } from 'jsr:@std/assert@^1';
+import { fromFileUrl } from 'jsr:@std/path@^1';
+import { createRuntimeSandbox } from './tests/test_utils/service-runtime-fixture.ts';
+
+const PLUGIN_ROOT = fromFileUrl(new URL('../../', import.meta.url));
+const MARKER = 's6c-streams-tls: assertions and native cleanup settled';
+
+/**
+ * Public test-only TLS material (protects nothing): generated offline through the platform
+ * `CertificateRequest` API with ephemeral ECDSA P-256/SHA-256 keys; no store, openssl or
+ * dependency. CA valid 2026-10-26..2036-10-26; `127.0.0.1` IP-SAN serverAuth leaf through
+ * 2036-10-25. Provenance receipt: `.llm/tmp/u1-s3/tls/out/receipt.json` (accepted S3a bundle).
+ */
+const TLS_TEST_CA = `-----BEGIN CERTIFICATE-----
+MIIBmDCCAT6gAwIBAgIIIAysTZOxbxQwCgYIKoZIzj0EAwIwMDEuMCwGA1UEAxMl
+TmV0U2NyaXB0IFdvcmtlcnMgQ29uZm9ybWFuY2UgVGVzdCBDQTAeFw0yNjEwMjYw
+MDAwMDBaFw0zNjEwMjYwMDAwMDBaMDAxLjAsBgNVBAMTJU5ldFNjcmlwdCBXb3Jr
+ZXJzIENvbmZvcm1hbmNlIFRlc3QgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNC
+AAQU+FCHLE3tOvofkppWZpkSS2fncW2pcFwS9paD4DzwrISLnyVDK/kAowu1NR+a
+MlItTX0Rt6u+NE7LHsmycznGo0IwQDAPBgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB
+/wQEAwIBBjAdBgNVHQ4EFgQUof09+hTWofXVLCM36DuPYvpVR7kwCgYIKoZIzj0E
+AwIDSAAwRQIgWNntyzMArb+dATq7zdp1Am0r08Fc3Yc6B/B3IqOz+eUCIQDKWmTx
+1EFBptwS7IYtNeQYdJxICb8JSUDL223WioQkRg==
+-----END CERTIFICATE-----
+`;
+const TLS_TEST_LEAF_CERT = `-----BEGIN CERTIFICATE-----
+MIIBqDCCAU2gAwIBAgIQFQwzjH9/QZpPK+q55yRq5jAKBggqhkjOPQQDAjAwMS4w
+LAYDVQQDEyVOZXRTY3JpcHQgV29ya2VycyBDb25mb3JtYW5jZSBUZXN0IENBMB4X
+DTI2MTAyNjAwMDAwMFoXDTM2MTAyNTAwMDAwMFowFDESMBAGA1UEAxMJMTI3LjAu
+MC4xMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmQHiNT+b7mWh4rH7gpWwAG/i
+uR5rjMI5pTURajaaB/d9UjiUbOrudMr3x9N3kGEeOmRuZlmLUOB7w+QrA6jIq6Nl
+MGMwDAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYB
+BQUHAwEwDwYDVR0RBAgwBocEfwAAATAdBgNVHQ4EFgQUnaUqqQUIIEDTscU3l7XG
+GDwraCQwCgYIKoZIzj0EAwIDSQAwRgIhAPraaUk6bFq0BmgTdydEyHxPo1TUX4Hy
+BJo4puhAoXrWAiEAjOiRcHH4tqX47sshpUKBXDBt9TAn3H9YbSAUuJsNfJI=
+-----END CERTIFICATE-----
+`;
+const TLS_TEST_LEAF_KEY = `-----BEGIN PRIVATE KEY-----
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgMqM6ImTpxkSxqDK1
+s/C12GultII0sQ6W/zMYEpYDDJChRANCAASZAeI1P5vuZaHisfuClbAAb+K5HmuM
+wjmlNRFqNpoH931SOJRs6u50yvfH03eQYR46ZG5mWYtQ4HvD5CsDqMir
+-----END PRIVATE KEY-----
+`;
+
+Deno.test({
+  name: 'streams TLS: explicit CA trusts native front, default CA rejects, upstream bytes survive',
+  sanitizeResources: true,
+  sanitizeOps: true,
+  sanitizeExit: true,
+  async fn() {
+    await using sandbox = await createRuntimeSandbox('tls');
+    const upstream = choosePort();
+    const run = await sandbox.run(probe(sandbox.scratch, upstream), {
+      cwd: PLUGIN_ROOT,
+      preferredPorts: [upstream],
+    });
+    assertEquals(run.code, 0, `child failed\n${run.stderr}\n${run.stdout}`);
+    assertEquals(run.stdout.split(MARKER).length - 1, 1, run.stdout);
+    assertEquals(run.stdout.trimEnd().endsWith(MARKER), true, run.stdout);
+  },
+});
+
+function choosePort(): number {
+  using selection = Deno.listen({ hostname: '127.0.0.1', port: 0 });
+  return selection.addr.port;
+}
+
+/** Checked child uses the public factory; client shutdown precedes both native listener rebinds. */
+function probe(scratch: string, upstream: number): string {
+  return `import { assert, assertEquals } from 'jsr:@std/assert@^1';
+import type { AuthenticatorPort, Principal, RunningService } from '@netscript/plugin-streams/service';
+const upstream = ${upstream};
+const clients: Deno.HttpClient[] = [];
+const ports: number[] = [upstream];
+const failures: unknown[] = [];
+let running: RunningService | undefined;
+let rejection: { name: string; message: string } | undefined;
+let authCalls = 0;
+let observations: unknown;
+const principal: Principal = {
+  subject: 'fixture:tls', scopes: ['streams:read-write'], roles: ['fixture'],
+  scheme: 'custom', claims: { fixture: 'tls' },
+};
+const authenticator: AuthenticatorPort = {
+  authenticate(request) {
+    authCalls++;
+    return request.header('x-fixture-token') === 'allowed'
+      ? { ok: true, principal } : { ok: false, reason: 'missing-credential' };
+  },
+};
+function request(url: string, client: Deno.HttpClient, init: RequestInit = {}): Promise<Response> {
+  const nativeInit: RequestInit & { client: Deno.HttpClient } = { ...init, client };
+  return fetch(url, nativeInit);
+}
+async function consume(response: Response): Promise<[number, Uint8Array]> {
+  return [response.status, new Uint8Array(await response.arrayBuffer())];
+}
+try {
+  Deno.chdir(${JSON.stringify(scratch)});
+  Deno.env.set('STREAMS_INTERNAL_PORT', String(upstream));
+  Deno.env.set('PORT', 'ambient-port-must-not-win');
+  Deno.env.set('STREAMS_PORT', 'fallback-port-must-not-win');
+  const { startStreamsService } = await import('@netscript/plugin-streams/service');
+  running = await startStreamsService({
+    auth: { authn: { authenticator, protect: ['/'], allowAnonymous: ['/health'] } },
+    serve: { hostname: '127.0.0.1', port: 0, handleSignals: false,
+      tls: { cert: ${JSON.stringify(TLS_TEST_LEAF_CERT)}, key: ${
+    JSON.stringify(TLS_TEST_LEAF_KEY)
+  } } },
+  });
+  ports.push(running.addr.port);
+  assertEquals([running.addr.hostname, running.addr.transport], ['127.0.0.1', 'tcp']);
+  assert(Number.isInteger(running.addr.port) && running.addr.port > 0);
+  const path = '/v1/stream/s6c-' + crypto.randomUUID();
+  const url = \`https://127.0.0.1:\${running.addr.port}\${path}\`;
+  const trusted = Deno.createHttpClient({ caCerts: [${JSON.stringify(TLS_TEST_CA)}] });
+  clients.push(trusted);
+  const anonymous = await consume(await request(url, trusted));
+  assertEquals(anonymous[0], 401);
+  assertEquals(JSON.parse(new TextDecoder().decode(anonymous[1])),
+    { error: 'UNAUTHORIZED', message: 'missing-credential' });
+  const headers = { 'x-fixture-token': 'allowed', 'content-type': 'text/plain' };
+  const created = await consume(await request(url, trusted, {
+    method: 'PUT', headers, body: 'tls-before|',
+  }));
+  assertEquals(created[0], 201);
+  const appended = await consume(await request(url, trusted, {
+    method: 'POST', headers, body: 'tls-after',
+  }));
+  assertEquals(appended[0], 204);
+  const readUrl = url + '?offset=-1';
+  const expected = new TextEncoder().encode('tls-before|tls-after');
+  const front = await consume(await request(readUrl, trusted, { headers }));
+  assertEquals(front, [200, expected]);
+  const direct = await consume(await fetch(\`http://127.0.0.1:\${upstream}\${path}?offset=-1\`));
+  assertEquals(direct, front);
+  const beforeRejection = authCalls;
+  assertEquals(beforeRejection, 4);
+  const untrusted = Deno.createHttpClient({});
+  clients.push(untrusted);
+  let unexpected: Response | undefined;
+  try {
+    unexpected = await request(readUrl, untrusted, { headers });
+  } catch (error) {
+    assert(error instanceof TypeError, String(error));
+    assert(/certificate/i.test(error.message), error.message);
+    rejection = { name: error.name, message: error.message };
+  }
+  if (unexpected !== undefined) {
+    await unexpected.body?.cancel();
+    throw new Error('Default-CA client unexpectedly accepted test certificate');
+  }
+  assert(rejection !== undefined, 'Default-CA certificate rejection must occur');
+  assertEquals(authCalls, beforeRejection, 'TLS failure must precede raw-route authentication');
+  const afterRejection = authCalls;
+  assertEquals(await consume(await request(readUrl, trusted, { headers })), front);
+  assertEquals(authCalls, beforeRejection + 1);
+  observations = { statuses: [anonymous[0], created[0], appended[0], front[0], direct[0]],
+    expectedBytes: Array.from(expected), frontBytes: Array.from(front[1]),
+    upstreamBytes: Array.from(direct[1]), authCalls: [beforeRejection, afterRejection, authCalls] };
+} catch (error) {
+  failures.push(error);
+}
+for (const client of clients) {
+  try { client.close(); } catch (error) { failures.push(error); }
+}
+for (let call = 0; call < 2; call++) {
+  try { await running?.stop(); } catch (error) { failures.push(error); }
+}
+for (const port of ports) {
+  try { Deno.listen({ hostname: '127.0.0.1', port }).close(); }
+  catch (error) { failures.push(error); }
+}
+if (failures.length === 1) throw failures[0];
+if (failures.length > 1) throw new AggregateError(failures, failures.map(String).join('\\n'));
+console.log(JSON.stringify({ observations, rejection, reboundPorts: ports }));
+console.log('${MARKER}');
+`;
+}

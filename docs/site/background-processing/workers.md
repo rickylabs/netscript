@@ -2,133 +2,61 @@
 layout: layouts/base.vto
 title: Background jobs
 templateEngine: [vento, md]
-prev: { label: "Services & contracts", href: "/services-sdk/services/" }
-next: { label: "Durable sagas", href: "/durable-workflows/sagas/" }
 order: 1
 ---
 
 # Background jobs
 
-**One typed handler file is the whole job.** Registration, dispatch, retry, execution
-tracking, scheduling, tracing, and the HTTP trigger API all come from the worker runtime —
-so shipping a working background job (whether you write it or an AI agent does) means
-authoring a single `defineJobHandler` module, not first assembling a queue, a worker pool,
-and an inspection UI around it.
+This page shows how to write a background job, enqueue it, observe it and run it safely in
+production.
 
-A NetScript **background job** is a durable, KV-backed TypeScript handler that runs in
-the background worker process, separate from your request-serving services. You author a
-job as one `defineJobHandler(...)` callable, give it an `id`, and the runtime takes care of
-registration, dispatch, retry, execution tracking, scheduling, and an HTTP API to enqueue
-and inspect runs. It is the unit you reach for whenever work should happen *after* a request
-returns — charging a payment, sending a welcome email, processing an upload — without
-blocking the caller.
+A **background job** is a TypeScript handler that runs in the background worker process, separate
+from your request-serving services. You write one `defineJobHandler(...)` module and give it an
+`id`. The worker runtime handles registration, dispatch, retry, execution tracking, scheduling,
+tracing and an HTTP API to enqueue and inspect runs. Use a job for work that happens after a
+request returns, such as charging a payment, sending a welcome email or processing an upload.
 
 {{ comp.diagram({ src: "/assets/diagrams/queue-worker-scheduler.svg", alt: "An enqueue call (from a trigger, an HTTP POST to the workers API, or the scheduler) places a job on the durable queue; the worker runtime pulls it and runs the handler in-process with cooperative async concurrency — then writes a JobResult to the KV-backed execution store, which streams updates back over SSE.", caption: "Enqueue → durable queue → in-process job runner → result store. The scheduler fires cron-defined jobs onto the same queue; graceful shutdown drains in-flight runs before the runner stops." }) }}
 
-## The story: a screenshot becomes a diagnosis
+## When to use a job
 
-The clearest picture of what this contract buys comes from a production incident-diagnosis
-assistant built on NetScript for a legacy ERP estate. A support engineer pastes an
-alert-email screenshot into a chat channel; a background job runs a vision model over the
-image and extracts the structured fields (program, error number, table, timestamp) that
-downstream tooling needs to trace the failure.
+| Unit | Use it when |
+| --- | --- |
+| Background job | The work is TypeScript and deferrable. It must outlive the request, run on a schedule or trigger, and be retried and observed on its own. |
+| [Polyglot task](/background-processing/polyglot-tasks/) | The work must run in another runtime: Python, .NET, a shell script or a binary. It shares the job queue, retry and telemetry, and runs as a subprocess. |
+| [Durable saga](/durable-workflows/sagas/) | The work coordinates several steps over time, waits for messages or compensates on failure. Jobs and sagas compose. |
+| [Service](/services-sdk/services/) | The caller needs a synchronous request/response API. |
 
-Two properties of the job contract shaped that worker into its correct form:
+[The durability model](/explanation/durability-model/) explains how jobs and sagas divide the work.
 
-- **The payload is queue-borne, so it stays small.** The first version enqueued the raw
-  image bytes and hit Deno KV's 64&nbsp;KB enqueue limit. The fix — carry only a small
-  reference through the queue and fetch the bytes back over a typed service client inside
-  the handler — is exactly the shape the contract steers you toward: the queue moves
-  *references to work*, not blobs.
-- **Workers stay compute-only.** The app's channel database holds an exclusive OS file
-  lock, so a second process opening it crashes outright. Because a job handler receives a
-  `ctx` and returns a `JobResult` — rather than a database connection — writing results
-  back through the owning service's typed client was the natural default, not a
-  discipline the team had to invent. The single writer keeps owning its database; the
-  worker never touches it.
+## Payloads and side effects
 
-The same run is traced end to end: dispatch, execution, progress events, and the
-subprocess hop (if any) land in the [Aspire dashboard](/explanation/aspire/) without
-handler-side wiring. The rest of this page is the mechanism behind that story.
+Two rules keep a job correct. Both come from a production incident-diagnosis assistant, where a job
+runs a vision model over a pasted alert-email screenshot and extracts structured fields.
 
-## What it is
-
-A job is plain TypeScript that runs **in the worker process, not the request process**.
-The headline surface — `defineJobHandler`, `createSuccessResult`, and `createFailureResult`
-from `@netscript/plugin-workers-core` — lets you write a typed handler over a `ctx`, do the
-work, and return a structured `JobResult`. Job dispatch and execution are instrumented with
-real OpenTelemetry spans that show up in the [Aspire dashboard](/explanation/aspire/)
-automatically, so a queued run is observable end to end without wiring. Jobs currently run
-in-process inside the background worker; the same queue and scheduler also drive [polyglot tasks](/background-processing/polyglot-tasks/) when
-the work is owned by another runtime. The why-behind-the-choreography lives in
-[Durability model](/explanation/durability-model/).
-
-{{ comp callout { type: "tip", title: "Jobs vs. tasks vs. sagas vs. services" } }}
-Reach for a <strong>background job</strong> when the work is <strong>fire-and-forget or
-deferrable</strong> and written in TypeScript: it should survive the request that started
-it, run on its own schedule or trigger, and be retried and observed independently. If the
-work must run in <em>another runtime</em> (Python, .NET, a shell script, a binary), use a
-<a href="/background-processing/polyglot-tasks/">polyglot task</a> — it shares this same queue,
-retry, and telemetry machinery but spawns a subprocess. If the work <strong>coordinates
-several steps across time</strong> (waiting for messages, compensating on failure), model it
-as a <a href="/durable-workflows/sagas/">durable saga</a>; jobs and sagas compose. For a
-<em>synchronous request/response API</em>, author a
-<a href="/services-sdk/services/">service</a> instead.
-{{ /comp }}
-
-## Learn → / Do →
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Learn — ERP Sync, lesson 02",
-    body: "The tutorial rung: add the worker plugin to the running app, author an import job, and trigger it over its assigned port (allocated at scaffold time) as part of the ERP-sync narrative.",
-    href: "/tutorials/erp-sync/02-import-job/",
-    icon: "→"
-  },
-  {
-    title: "Do — Tune the worker runtime",
-    body: "Recipe: set in-process queue concurrency with WORKERS_CONCURRENCY and choose a queue provider for your deployment.",
-    href: "/background-processing/how-to/tune-worker-runtime/",
-    icon: "◆"
-  },
-  {
-    title: "Understand — Polyglot tasks",
-    body: "Run non-TypeScript work (Python, .NET, shell) on the same durable queue and scheduler as a managed subprocess.",
-    href: "/background-processing/polyglot-tasks/",
-    icon: "◎"
-  }
-] }) }}
+- **Carry references, not blobs.** The payload travels through the queue. The first version
+  enqueued the raw image and hit Deno KV's 64&nbsp;KB enqueue limit. Enqueue a small reference, then
+  fetch the bytes inside the handler through a typed service client.
+- **Respect the owning service's write boundary.** A handler receives a `ctx` and returns a
+  `JobResult`; its context does not supply a database connection. Write business records through
+  the owning service's typed client so that service stays the single writer. A worker can also
+  publish typed stream updates directly: see [worker stream writes](/durable-workflows/streams/#writes-from-a-worker-job).
+  In that app, opening the channel database from a second process crashed on its exclusive file lock.
 
 ## Minimal example
 
-Add the workers plugin to a published workspace with the public package install flow:
+Install the workers plugin in your workspace:
 
 ```bash
 netscript plugin install @netscript/plugin-workers
 ```
 
-{{ comp callout { type: "note", title: "Historical: import-map patch no longer required" } }}
-Projects scaffolded with an early published CLI (<code>--package-source jsr</code>) on
-<code>0.0.1-beta.7</code> generated a root <code>deno.json</code> whose import map omitted the
-<code>@netscript/sdk</code> and <code>@netscript/sdk/client</code> entries, requiring a manual patch
-before the background worker could load jobs. The scaffold generator now emits both entries in JSR
-mode, so no manual fix is needed on current releases.
-{{ /comp }}
+The plugin's API service listens on the port assigned at scaffold time, a stable port of 49152 or
+higher. Find it in the console output, `appsettings.json` or the Aspire dashboard.
 
-For local-source contributor work inside this monorepo, use the maintainer binary when you need
-first-party samples:
-
-```bash
-deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name workers --samples
-```
-
-That local path lands real, compiling modules you can read and trigger immediately — including
-`plugins/workers/jobs/health-check.ts` (a job handler) and
-`plugins/workers/tasks/validate-payload.ts` (a polyglot task). The plugin's API service comes up on the port assigned to it at scaffold time (stable high-range, >= 49152; discover yours in the console output, appsettings.json, or Aspire dashboard).
-
-A job handler is an async callable over a `ctx` object that returns a `JobResult`. Parse the
-payload with a Zod schema, do the work, and return `createSuccessResult(...)` or
-`createFailureResult(...)`. The job's identity is attached with `Object.assign(handler, { id })`.
+A job handler is an async function over a `ctx` that returns a `JobResult`. Parse the payload with a
+Zod schema, do the work, and return `createSuccessResult(...)` or `createFailureResult(...)`. Attach
+the job's id with `Object.assign(handler, { id })`.
 
 ```ts
 // plugins/workers/jobs/process-payment.ts
@@ -166,20 +94,19 @@ const handler = defineJobHandler(async (ctx) => {
 export default Object.assign(handler, { id: 'process-payment' });
 ```
 
-Once the workers API is up (Aspire first — see Production notes), enqueue a run by `id`:
-
-{{ comp callout { type: "note", title: "ns-workers is a shorthand you install once" } }}
-<code>ns-workers</code> is a name <em>you</em> give the workers plugin's CLI — the scaffold does
-not create it. Install it once, globally, and every <code>ns-workers</code> command on this page
-works as written:
-<pre><code class="language-bash">deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli</code></pre>
-Rather not install it? Each <code>ns-workers &lt;verb …&gt;</code> is exactly
-<code>deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> — run
-that full form instead.
-{{ /comp }}
+With Aspire and the workers API running (see [Production notes](#production-notes)), enqueue a run
+by `id` with the plugin CLI. `ns-workers` is a name you give that CLI; the scaffold does not create
+it. Install it once:
 
 ```bash
-# Enqueue through the workers API (port 8091), without hand-writing HTTP.
+deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli
+```
+
+Without the install, run each command as
+`deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli <verb …>`.
+
+```bash
+# Enqueue through the workers API (at the URL Aspire prints), without hand-writing HTTP.
 ns-workers trigger process-payment \
   --payload='{"orderId":"o_42","amountCents":4999}'
 
@@ -187,10 +114,9 @@ ns-workers trigger process-payment \
 ns-workers executions --limit=10 --json
 ```
 
-## Key types first — `JobHandlerContext` & `JobResult`
+## Handler context and result
 
-A handler is `(ctx: JobHandlerContext<TPayload>) => JobResult<TResult> | Promise<…>`. These
-two shapes are the contract you write against; read them before the option tables.
+A handler has the type `(ctx: JobHandlerContext<TPayload>) => JobResult<TResult> | Promise<…>`.
 
 {{ comp.apiTable({
   caption: "JobHandlerContext<TPayload> — the ctx passed to defineJobHandler",
@@ -210,17 +136,25 @@ two shapes are the contract you write against; read them before the option table
   rows: [
     { name: "success", type: "true | false", desc: "Discriminant. createSuccessResult sets true; createFailureResult sets false. Branch on this." },
     { name: "data", type: "TResult | undefined", desc: "The result payload, persisted on the execution record (present on success, optional on failure)." },
-    { name: "error", type: "string", desc: "Failure message — required when success is false (the first arg to createFailureResult)." }
+    { name: "error", type: "string", desc: "Failure message, required when success is false (the first argument to createFailureResult)." }
   ]
 }) }}
 
+## Delivery and idempotency
+
+Worker delivery is **at-least-once**. The runtime claims an idempotency key before running a job
+and marks it applied after success. A crash after an external effect but before that mark can run
+the effect again. Supply an `idempotencyKey` on enqueue, and use the same business-operation key in
+the downstream service or payment provider. A worker-side key alone cannot promise one charge.
+The [idempotency reference](/reference/plugin-workers-core/#idempotency) describes the applied-key
+window. Stream upserts likewise need a stable entity key when a job is retried.
+
 ## Worker runtime modes (`WORKER_RUNTIMES`)
 
-Only **in-process** job execution is implemented today. The background worker service is
-separate from the API service, but its job handlers share one isolate and event loop.
-`WORKER_RUNTIMES` / `WorkerRuntime` retain vocabulary for compatibility; they are not a
-runner selector. `web-worker` and `subprocess` job-runner modes are reserved, not implemented.
-Subprocess execution is implemented separately for polyglot tasks.
+Only in-process job execution is implemented. The background worker is a separate process from the
+API service, but its job handlers share one isolate and event loop. `WORKER_RUNTIMES` and
+`WorkerRuntime` keep this vocabulary for compatibility; they do not select a runner. Subprocess
+execution exists for polyglot tasks only.
 
 {{ comp.apiTable({
   caption: "WORKER_RUNTIMES — implemented and reserved job-runner vocabulary",
@@ -231,32 +165,14 @@ Subprocess execution is implemented separately for polyglot tasks.
   ]
 }) }}
 
-{{ comp.apiTable({
-  caption: "Deployment & scaling knobs (workers config)",
-  rows: [
-    { name: "WORKERS_CONCURRENCY", type: "env (number)", desc: "Queue concurrency in the background worker process. Aspire metadata injects it with the declared default (2); the entrypoint defaults to 1 when it is unset." },
-    { name: "concurrency", type: "number", desc: "Per-topic max concurrent workers (WorkersConfigData.concurrency / per-group scaling)." },
-    { name: "mode", type: "'combined' | 'distributed'", desc: "Per-topic deployment mode: one combined runner vs. distributed runners. Defaults to 'combined'." },
-    { name: "queueProvider", type: "'auto' | 'deno-kv' | 'redis' | 'postgres' | 'amqp'", desc: "Queue backend. 'auto' resolves a provider; see Choose a queue provider." },
-    { name: "jobsDir / tasksDir", type: "string", desc: "Directories scanned for default-exported job and task modules." }
-  ]
-}) }}
-
-{{ comp callout { type: "note", title: "Tune it without touching code" } }}
-Set <code>WORKERS_CONCURRENCY</code> to bound concurrent queue deliveries in the background
-worker process. I/O-bound handlers can overlap; synchronous CPU-bound handlers block its
-shared event loop, including queue listeners and health checks. Raising concurrency does
-not create isolates or add CPU parallelism. Use a polyglot task when work needs a subprocess.
-Resolution precedence (schema default → config file → env → override) is covered in
-<a href="/orchestration-runtime/runtime-config/">runtime configuration</a>.
-{{ /comp }}
+To size concurrency, scale topics or pick a queue provider, see
+[Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
 
 ## Enqueue from a trigger
 
-The HTTP `…/trigger` endpoint is one way in; the other is **declaratively, from a trigger
-handler**, which returns an `enqueueJob(...)` action. `enqueueJob(job, options)` comes from
-`@netscript/plugin-triggers-core` and binds an imported job definition to a payload, so an
-inbound webhook or a scheduled trigger drops work onto this same runtime.
+A trigger handler can enqueue a job by returning an `enqueueJob(...)` action. `enqueueJob(job,
+options)` from `@netscript/plugin-triggers-core` binds an imported job definition to a payload, so an
+inbound webhook or a scheduled trigger puts work on the same runtime.
 
 ```ts
 // plugins/triggers/triggers/payment-webhook.ts
@@ -282,7 +198,7 @@ export default handler;
   caption: "enqueueJob(job, options) — EnqueueJobOptions (from @netscript/plugin-triggers-core)",
   rows: [
     { name: "payload", type: "TPayload", desc: "The payload handed to the job's ctx.payload. Parse it with the job's Zod schema." },
-    { name: "idempotencyKey", type: "string", desc: "Collapses duplicate deliveries — at-most-once effect per key." },
+    { name: "idempotencyKey", type: "string", desc: "Guards duplicate deliveries within the applied-key window. Delivery remains at-least-once; external effects need downstream idempotency." },
     { name: "concurrencyKey", type: "string", desc: "Serializes runs that share a key (e.g. per-order) so they do not overlap." },
     { name: "priority", type: "number", desc: "Dispatch priority for this enqueue action." }
   ]
@@ -290,11 +206,10 @@ export default handler;
 
 ## Trigger a job from a typed client
 
-The `ns-workers trigger` command above calls the same OpenAPI route. Because the workers API is a **plugin
-service**, the same trigger is reachable with a generated typed client over the RPC route
-`/api/rpc/*` — no OpenAPI-only fallback and no transport `404`. A first-party plugin API mounts
-its router under a named segment, so the client takes a `routerName` alongside `serviceName`;
-Aspire injects the URL under `services__workers-api__http__0`.
+`ns-workers trigger` calls an OpenAPI route. Because the workers API is a plugin service, a
+generated typed client reaches the same trigger over the RPC route `/api/rpc/*`. A first-party
+plugin API mounts its router under a named segment, so the client takes a `routerName` as well as a
+`serviceName`. Aspire injects the URL as `services__workers-api__http__0`.
 
 ```ts
 // Reach the workers plugin API with a generated typed client.
@@ -328,67 +243,57 @@ const task = await workers.triggerTask({ id: 'validate-payload', payload: {} });
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Declare the plugin dependency with pluginReferences" } }}
-When a Service depends on a plugin API — the workers plugin, say — declare it in that Service's
-config section with <code>pluginReferences?: string[]</code>, a list of the plugin resource names it
-consumes (alongside the existing <code>dependsOn</code>). The Aspire helper generation wires those
-references so the Service can discover and load the user jobs the plugin API exposes at runtime, and
-so the typed client above resolves the plugin's injected URL
-(<code>services__workers-api__http__0</code>). It is the config seam behind Service→plugin-API job
-discovery.
-{{ /comp }}
+A service that calls the workers API declares the dependency in its config section with
+`pluginReferences?: string[]`, next to `dependsOn`. Aspire helper generation wires those
+references, so the service discovers the jobs the plugin API exposes and the typed client resolves
+`services__workers-api__http__0`.
 
-{{ comp callout { type: "caution", title: "The {id} path segment is authoritative" } }}
-<code>triggerJob</code> / <code>triggerTask</code> resolve the target id from
-<code>input.id</code>. On the REST route (<code>POST /jobs/{id}/trigger</code>) oRPC merges the
-<code>{id}</code> URL path segment into <code>input.id</code>, so the path is authoritative and a
-body <code>id</code> is a redundant fallback that can never disagree with it; on the RPC transport
-there is no path segment, so the <code>id</code> you pass in the input object is used directly. If
-neither resolves an id, the handler short-circuits to a typed <code>VALIDATION_ERROR</code>
-(HTTP&nbsp;422) through the centralized <code>validationFailed</code> contract helper <em>before any
-KV write</em> — it never persists an <code>undefined</code>-keyed run. Handle it as the contract's
-typed error on the client, not a generic <code>500</code>.
-{{ /comp }}
+> [!NOTE]
+> On the REST route, oRPC merges the `{id}` path segment into `input.id`, so the path wins over a
+> body `id`. Over RPC, pass `id` in the input object. With no id, the call fails with a typed
+> `VALIDATION_ERROR` (HTTP&nbsp;422) before any KV write. Handle it as the contract's typed error,
+> not as a generic `500`.
 
 ## Observe cancellation and deadlines
 
-The handler's `ctx.signal` is an executor-owned `AbortSignal`. With
-`InProcessJobRunner`, pass it to abort-aware I/O such as `fetch`, and call
-`ctx.signal.throwIfAborted()` at checkpoints in long loops. Yield between chunks so
-cancellation can be delivered. The worker owns this lifetime; it does not require
-an app or an owner session to remain open.
+`ctx.signal` is an `AbortSignal` owned by the executor. With `InProcessJobRunner`, pass it to
+abort-aware I/O such as `fetch`, call `ctx.signal.throwIfAborted()` at checkpoints in long loops,
+and yield between chunks so cancellation can arrive. The worker owns this lifetime; no app or owner
+session has to stay open.
 
-`ctx.deadlineAt` is an optional epoch-millisecond deadline. The in-process runner
-uses its clock at dispatch plus `job.timeout`, or the earlier caller-supplied
-`deadlineAt` when both exist. With neither configured, the deadline is absent.
-Use the remaining time to bound downstream work rather than starting a fresh full
-job timeout for every operation.
+`ctx.deadlineAt` is an optional deadline in epoch milliseconds. The in-process runner uses dispatch
+time plus `job.timeout`, the caller-supplied `deadlineAt`, or the earlier of the two when both
+exist. With neither configured, there is no deadline. Bound downstream work by the remaining time
+instead of starting a full job timeout for each operation.
 
-Inspect `ctx.signal.reason.name` after abort: `TimeoutError` means the deadline
-elapsed, `ShutdownError` means the runner began stopping, and `AbortError` means
-caller cancellation. The first abort cause is preserved. An abort-aware handler
-should release resources in `finally` and propagate the abort rather than report
+After an abort, `ctx.signal.reason.name` says why. The first abort cause is preserved.
+
+| `reason.name` | Cause |
+| --- | --- |
+| `TimeoutError` | The deadline elapsed. |
+| `ShutdownError` | The runner began stopping. |
+| `AbortError` | The caller cancelled. |
+
+An abort-aware handler releases resources in `finally` and propagates the abort instead of reporting
 success. See [the cancellation reference](/reference/plugin-workers-core/#job-context-cancellation)
-for the dispatch contract and [runtime tuning](/background-processing/how-to/tune-worker-runtime/#abort-cleanup-budget)
-for the cleanup budget.
+for the dispatch contract and
+[runtime tuning](/background-processing/how-to/tune-worker-runtime/#abort-cleanup-budget) for the
+cleanup budget.
 
 ### Operator cancellation limit
 
-The shipped Workers API runs router exposes inspection operations only; it has no
-operator cancel operation wired to the handler signal. A stored `cancelled`
-execution status is not evidence that a handler was aborted. For a custom host
-using `InProcessJobRunner`, supply a caller `signal` to `dispatch` and abort its
-controller to request cancellation. Do not assume that closing a UI, disconnecting
-an HTTP request, or deleting a job definition cancels a running job. This contract
-is verified for the in-process runner; it does not establish equivalent propagation
-for every isolated or external task executor.
+The Workers API runs router ships inspection operations only. No operator cancel operation reaches
+the handler signal, so a stored `cancelled` status does not prove that a handler was aborted. In a
+custom host that uses `InProcessJobRunner`, pass a caller `signal` to `dispatch` and abort its
+controller to request cancellation. Closing a UI, disconnecting an HTTP request or deleting a job
+definition does not cancel a running job. This contract is verified for the in-process runner only;
+isolated or external task executors may not propagate it the same way.
 
 ## Graceful shutdown
 
-Background runners must drain in flight work before they exit, or a redeploy loses jobs
-mid-run. The `@netscript/plugin-workers-core/shutdown` subpath provides a `ShutdownManager`
-that registers stoppable resources and stops them in priority order, with a timeout, when a
-shutdown is requested.
+A runner that exits without draining loses in-flight jobs on redeploy. `ShutdownManager`, from the
+`@netscript/plugin-workers-core/shutdown` subpath, registers stoppable resources and stops them in
+priority order, with a timeout, when shutdown starts.
 
 ```ts
 // plugins/workers/bin/with-shutdown.ts
@@ -421,14 +326,13 @@ Deno.addSignalListener('SIGTERM', async () => {
   ]
 }) }}
 
-## Workers API & where jobs come from
+## Workers API and job discovery
 
-Once Aspire is up and the schema is wired, the workers API service (on its assigned port) registers your job
-by `id` and exposes HTTP endpoints to seed, trigger, and inspect runs. These are the
-endpoints the CLI E2E suite validates live.
+With Aspire up and the schema wired, the workers API service registers your jobs by `id` and serves
+endpoints to seed, trigger and inspect runs.
 
 {{ comp.apiTable({
-  caption: "Workers API — Port Surface (allocated per project; full generated surface in the workers reference)",
+  caption: "Workers API — port allocated per project; the workers reference has the full generated surface",
   rows: [
     { name: "GET /health", type: "liveness", desc: "Health probe for the workers API service." },
     { name: "GET /api/v1/workers/jobs", type: "list", desc: "All registered job definitions (id, name, topic) discovered from the jobs directories." },
@@ -440,34 +344,50 @@ endpoints the CLI E2E suite validates live.
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Where jobs come from" } }}
-Each handler file under your jobs directory (<code>workers/jobs</code> by default,
-<code>*.ts</code>) is discovered and compiled into one generated registry at
-<code>.netscript/generated/plugin-workers/job-registry.ts</code>, keyed by the source filename —
-so <code>workers/jobs/process-payment.ts</code> registers as <code>process-payment</code>. Both
-the API service <em>and</em> the background runner load that single registry at
-startup: the API service registers the generated user job definitions <em>before it serves</em>,
-so your jobs — not just the built-in <code>workers-plugin-health-check</code> — appear in
-<code>GET /api/v1/workers/jobs</code> and resolve on trigger. Registration order decides id
-collisions: the plugin's own jobs register first, then the generated user definitions load and
-<em>skip any id already present</em>, so a user file that reuses a built-in id (such as
-<code>workers-plugin-health-check</code>) leaves the plugin job in place rather than overwriting it —
-first registration wins. Background execution runs from
-<code>plugins/workers/bin/combined.ts</code>, a <em>separate</em> process from the API service —
-the API enqueues, the runner executes. A missing generated registry is tolerated as an empty set,
-so a fresh workspace boots before you author any job. The queue concurrency is
-<code>WORKERS_CONCURRENCY</code>, which Aspire injects on the worker background process; see
-<a href="/background-processing/how-to/tune-worker-runtime/">Tune the worker runtime</a> to change it.
-{{ /comp }}
+Each `*.ts` handler file in the jobs directory (`workers/jobs` by default) compiles into one
+generated registry, `.netscript/generated/plugin-workers/job-registry.ts`, keyed by filename:
+`workers/jobs/process-payment.ts` registers as `process-payment`. The API service and the
+background runner both load this registry at startup. The API service registers the generated
+definitions before it serves, so your jobs appear in `GET /api/v1/workers/jobs` next to the built-in
+`workers-plugin-health-check` and resolve on trigger.
 
-## Observability: real job traces out of the box
+The plugin's own jobs register first, and the first registration wins: a user file that reuses a
+built-in id such as `workers-plugin-health-check` is skipped. A missing registry counts as empty, so
+a fresh workspace boots before you write a job.
 
-Job-level observability is **not** a stub. The workers runtime instruments the
-scheduler → queue → worker → subprocess path with real OpenTelemetry spans, and those traces
-appear in the [Aspire dashboard](/explanation/aspire/) automatically once Aspire is up.
+The background runner, `plugins/workers/bin/combined.ts`, is a separate process from the API
+service: the API enqueues and the runner executes. Aspire injects the runner's queue concurrency as
+`WORKERS_CONCURRENCY`; [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/)
+shows how to change it.
+
+## Lifecycle logging
+
+Routine job processing, entrypoint resolution, execution and duplicate-delivery skips emit structured
+`debug` records through `@netscript/logger` under the category `netscript.workers.runtime`. Each
+job record carries `jobId`, `jobName` (the definition's name, falling back to its id) and `workerId`.
+Task processing, successful completion and duplicate skips use the same category with `taskId` and
+`taskName`. Warnings and failures retain their warning/error console diagnostics.
+
+Configure logging **inside the worker process** to see these records. For example, call
+`await configureLogging({ level: 'debug' })` from `@netscript/logger` in your worker entrypoint before
+starting the runtime. Configuring the API service process does not configure its separate worker
+process. The built-in background entrypoint does not initialize logging itself: without host
+configuration, routine lifecycle records are silent. This change adds no separate sinks or logger
+initialization.
+
+An `info` threshold suppresses these lifecycle records; `debug` enables them. NetScript's configured
+default is `info` in production and `debug` in development, unless `NETSCRIPT_LOG_LEVEL` or
+`NETSCRIPT_DEBUG` overrides it. Apps using LogTape's `configure` can set `lowestLevel` for
+`['netscript', 'workers', 'runtime']` independently of other categories.
+
+## Tracing
+
+The workers runtime traces the scheduler → queue → worker → subprocess path with OpenTelemetry
+spans. They appear in the [Aspire dashboard](/explanation/aspire/) once Aspire is up, with no
+handler-side wiring.
 
 {{ comp.apiTable({
-  caption: "What the worker runtime traces automatically (framework layer — real today)",
+  caption: "What the worker runtime traces automatically",
   rows: [
     { name: "Job dispatch + execution", type: "span", desc: "Each enqueued run gets a span with attributes, duration, status, and job.started / job.completed / job.failed / job.exception events." },
     { name: "Step + progress events", type: "event", desc: "job.step.* and job.progress (current / total / percentage) events are emitted on real job runs." },
@@ -476,20 +396,20 @@ appear in the [Aspire dashboard](/explanation/aspire/) automatically once Aspire
   ]
 }) }}
 
-For spans you author *inside* a handler, import directly from **`@netscript/telemetry`**
-(e.g. `@netscript/telemetry/instrumentation` for `withChildSpan`). These nest correctly under
-the automatic dispatch span. See [Observability](/explanation/observability/) for the model and
+For spans inside a handler, import from `@netscript/telemetry`, for example `withChildSpan` from
+`@netscript/telemetry/instrumentation`. These spans nest under the dispatch span. The scaffold's
+`createJobTools(ctx)` helper comes from `@netscript/plugin-workers-core`: its trace helpers add
+events and child spans under the active job span, progress emits telemetry and forwards to the
+runtime channel, and the `log.*` helpers write to the console. See
+[Observability](/explanation/observability/) for the model and
 [Add OpenTelemetry](/observability/how-to/add-opentelemetry/) for the recipe.
 
 ## How it compares
 
-Trigger.dev is a managed platform for background jobs and agent workflows; Temporal is a
-durable-execution system you self-host or rent as Temporal Cloud; NetScript's worker
-runtime is a plugin that lives inside your own repository and process tree. Each model
-carries a real tradeoff — a managed platform removes operations, a replay-based cluster
-gives the strongest durability guarantees, a local-first plugin keeps everything in code
-you own. The rows below are structural facts drawn from each project's public
-documentation (as of mid-2026), not rankings.
+Trigger.dev is a managed platform for background jobs and agent workflows. Temporal is a
+durable-execution system you self-host or rent as Temporal Cloud. NetScript's worker runtime is a
+plugin inside your own repository and process tree. The rows are structural facts from each
+project's public documentation (as of mid-2026), not rankings.
 
 | | NetScript workers | Trigger.dev | Temporal |
 |---|---|---|---|
@@ -499,72 +419,32 @@ documentation (as of mid-2026), not rankings.
 | Backing stores | Pluggable queue (`deno-kv`, `redis`, `postgres`, `amqp`); Deno KV execution state; Postgres job definitions | Platform-managed | Database, Elasticsearch, server, and workers (self-hosted) |
 | Control plane | None separate — the workers API is one of your services (running on its scaffold-assigned port) | The Trigger.dev platform | The Temporal cluster |
 
-The practical consequence of the first two rows: a NetScript job handler is ordinary
-TypeScript with no replay-safety rules to learn, so code an agent writes for a service
-moves into a worker unchanged — the isolation question is deferred to the runner mode
-(the `WORKER_RUNTIMES` table above), a deployment setting rather than a handler concern.
+A NetScript job handler is ordinary TypeScript with no replay-safety rules, so code written for a
+service moves into a worker unchanged.
 
 ## Production notes
 
-{{ comp callout { type: "important", title: "Aspire first, then jobs" } }}
-The workers plugin persists job definitions to Postgres and uses Deno KV for execution state,
-so bring orchestration up before you exercise it. Step&nbsp;1 is the database service;
-step&nbsp;2 is Aspire: <code>cd aspire &amp;&amp; aspire start</code> provisions Postgres and
-Redis, then <code>netscript db init --name init</code> / <code>netscript db generate</code>
-wire the schema. Only after Aspire is up will the workers API service resolve jobs and record
-executions. See <a href="/data-persistence/how-to/database-migration/">Database &amp; migration</a>.
-{{ /comp }}
+> [!IMPORTANT]
+> **Start Aspire before you run jobs.** The workers plugin stores job definitions in Postgres and
+> execution state in Deno KV. Run `cd aspire && aspire start` to provision Postgres and Redis, then
+> `netscript db init --name init` and `netscript db generate` to wire the schema. Until then, the
+> workers API cannot resolve jobs or record executions. See
+> [Migrate the database](/data-persistence/how-to/database-migration/).
 
-{{ comp callout { type: "warning", title: "Drain on redeploy, or lose in-flight runs" } }}
-A runner that exits without draining abandons jobs mid-execution. Wire a
-<code>ShutdownManager</code> to <code>SIGTERM</code> (above), bound it with a
-<code>timeoutMs</code>, and check <code>report.timedOut</code> in your logs. Pair the drain
-with an <code>idempotencyKey</code> on enqueue so a retried delivery after a forced exit does
-not double-charge. For the full recipe see
-<a href="/background-processing/how-to/tune-worker-runtime/">Tune the worker runtime</a>.
-{{ /comp }}
+> [!WARNING]
+> **Drain on redeploy.** A runner that exits without draining abandons running jobs. Wire a
+> `ShutdownManager` to `SIGTERM` (see [Graceful shutdown](#graceful-shutdown)), bound it with
+> `timeoutMs`, and log `report.timedOut`. Add an `idempotencyKey` on enqueue so a retried delivery
+> after a forced exit is guarded, and enforce the same operation key in the payment service to
+> prevent a repeated charge across the crash window.
 
-The scaffold's <code>createJobTools(ctx)</code> helper is backed by the published
-<code>@netscript/plugin-workers-core</code> implementation. Its trace helpers add events and child
-spans beneath the active job span; progress emits telemetry and forwards to the runtime channel.
-The <code>log.*</code> helpers remain console-backed.
+## Next steps
 
-## Reference →
+Build and trigger a job inside a running app in [ERP Sync, lesson 02](/tutorials/erp-sync/02-import-job/).
 
-This hub is intentionally thin — the full generated API for `@netscript/plugin-workers`
-(`defineJobHandler`, the job/task builders, the runtime, the shutdown manager, and every
-exported type and subpath) lives in the reference.
-
-{{ comp.xref({ key: "ref:workers" }) }}
-
-{{ comp.featureGrid({ items: [
-  {
-    title: "Learn — ERP Sync, lesson 02",
-    body: "Author an import job and trigger it over its assigned port as part of the continuous ERP-sync tutorial narrative.",
-    href: "/tutorials/erp-sync/02-import-job/",
-    icon: "→"
-  },
-  {
-    title: "Do — Tune the worker runtime",
-    body: "Pick the runner mode, set WORKERS_CONCURRENCY, choose a queue provider, and wire graceful shutdown.",
-    href: "/background-processing/how-to/tune-worker-runtime/",
-    icon: "◆"
-  },
-  {
-    title: "Look up — workers reference",
-    body: "The full generated deno doc API for @netscript/plugin-workers — every exported symbol, type, and subpath.",
-    href: "/reference/workers/",
-    icon: "≡"
-  },
-  {
-    title: "Understand — Durability model",
-    body: "How jobs compose with sagas: a job publishes a message a saga consumes. The why behind the choreography.",
-    href: "/explanation/durability-model/",
-    icon: "◎"
-  }
-] }) }}
-
-{{ comp.nextPrev({
-  prev: { label: "Services & contracts", href: "/services-sdk/services/" },
-  next: { label: "Durable sagas", href: "/durable-workflows/sagas/" }
-}) }}
+- [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/): concurrency,
+  per-topic scaling, timeouts and retries.
+- [Polyglot tasks](/background-processing/polyglot-tasks/): run Python, .NET or shell steps on the
+  same queue.
+- {{ comp.xref({ key: "ref:workers", text: "workers reference" }) }}: every exported symbol, type
+  and subpath.

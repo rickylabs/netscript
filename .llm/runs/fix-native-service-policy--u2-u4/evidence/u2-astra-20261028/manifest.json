@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUtc": "2026-10-28T00:37:52.4455653Z",
+  "source": "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-policy-u2-astra-implementation-20261028",
+  "destination": "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\runs\\fix-native-service-policy--u2-u4\\evidence\\u2-astra-20261028",
+  "audit": "Scanned original run provenance and all evidence for GitHub/OpenAI credential tokens, private-key delimiters and long Authorization Bearer literals: zero candidates. Reviewed auth/header references as test fixtures or policy prose. No user credentials or cached metadata copied.",
+  "copiedCount": 58,
+  "excludedCount": 3,
+  "files": [
+    {
+      "name": "arch-check-receipt.json",
+      "bytes": 20649,
+      "sha256": "0861239eba81f5ba2ed7ac45227a9f84c42434bc8bd6be750932b9e1d55ac674",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "arch-check.log",
+      "bytes": 40908,
+      "sha256": "98177cdfb1b9656a1548b48acb34ee234c1c66307b96a696811fc9c2cf6334d6",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "baseline-consumer-failure.json",
+      "bytes": 1087,
+      "sha256": "26ed6c1e0da1c7b6f34d3f65157c9f2063f4eff0a748a8e7591212f7f5c7263f",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "baseline-consumer-failure.log",
+      "bytes": 512,
+      "sha256": "901cc1b8f876ccd0dfe36a06f3621656500ddd567fe6e54eec6ed2fac76e998e",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "baseline-final-diff-stat.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "baseline-owner-hashes.json",
+      "bytes": 1399,
+      "sha256": "2b981123c21c8a9d5a13c4e045d9a8d23f0d57ade6bf6a4e4a344b276ce39b2b",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "baseline-service-diff.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "baseline-service-failures.json",
+      "bytes": 3384,
+      "sha256": "9fa76bc4ff7acbc25b811caf941fd7f92bbad9c76794242c5a6b436ec6c17229",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "baseline-service-failures.log",
+      "bytes": 512,
+      "sha256": "051b049551e603d086c9c2b352d572642ef9c5d70f141189bedf4adf1fc791e4",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "consumer-tests.json",
+      "bytes": 1221,
+      "sha256": "f6519f5d385f520346562983af8e360f952ac729acad8a96ef284fd263b1901b",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "consumer-tests.log",
+      "bytes": 366,
+      "sha256": "80e76c765fab35f698ae391fbdbfd32057b66ab692221d5f651912770c62c89a",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "cors-index.ts",
+      "bytes": 5402,
+      "sha256": "195cba3844a8ec9759cb9e2487d10a31d4dd0447ca3ee96b94bc8157af8df062",
+      "copied": false,
+      "reason": "Public cached graph/vendor extract retained in ignored source; hash recorded here"
+    },
+    {
+      "name": "doc-lint-receipt.json",
+      "bytes": 1526,
+      "sha256": "84dbebada2c21d438f300adcc0b1ef56e73f38f2923710ca87e119483893e4eb",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "doc-lint-report.json",
+      "bytes": 1523,
+      "sha256": "725e6eace1572eef59fd26983abde70c49169e146979ef59888b905ca3b873fb",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "doc-lint.log",
+      "bytes": 2710,
+      "sha256": "18148fbad5c384366892bb2e4db426fffeca83475fb89257382d1d7dc5dbc4fd",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "doctrine-direct.log",
+      "bytes": 26116,
+      "sha256": "85a2adc660480c6c62e805f3ddb32aa5b31467814319ce59e6640e0093d5b968",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "final-state.json",
+      "bytes": 153,
+      "sha256": "33a98523651b2ce236f8cdef65d016b6b55df9e132f018dc834cb4fc3ef66e29",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "final-status.txt",
+      "bytes": 625,
+      "sha256": "68eedb50eee8d3948eaa5ddddfa21a82badb9a4ffc80b5eb4160f271a7e4ced7",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "graph.json",
+      "bytes": 671296,
+      "sha256": "342f3d342ee37b0cfba3da905af5fe8c1fa4039f1c33033fa024679fcdd1a256",
+      "copied": false,
+      "reason": "Public cached graph/vendor extract retained in ignored source; hash recorded here"
+    },
+    {
+      "name": "green-initial.json",
+      "bytes": 1234,
+      "sha256": "b955f3f355b01bfa20fe7cc22e19a6deece498a7c1831bb2cbe672c6fb13b658",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "green-initial.log",
+      "bytes": 360,
+      "sha256": "03f731ba34b46e12061cfb6325a5eb24c1cbfc7d22063c3e4c9f5ff62f43777e",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "green-regression.json",
+      "bytes": 419,
+      "sha256": "09fa15ff7243e0d06a720e83aff81cc4295aa88c9361c3d9f8c17e8e88a0f20f",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "green-regression.log",
+      "bytes": 374,
+      "sha256": "c0ec7c9a4a9acb50471883ec863b88016fddb612a097df32451b8dbb25d79788",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "handoff.md",
+      "bytes": 9742,
+      "sha256": "91383cf84265352a1649f203124f175b0c79fa41d1a4b77526ab06b525e31207",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "jsr-audit.json",
+      "bytes": 456,
+      "sha256": "09ffff4d0d8cae9b3aa3f231d2dcf54854376d06e5d23881d7657fcdf54533b0",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "new-regression-before-sanitizers.diff",
+      "bytes": 18712,
+      "sha256": "4387debfb477e749d27dc26f3c7cfc4da96caacff8be0bf4036d17e8b2ce826f",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "new-regression.diff",
+      "bytes": 18882,
+      "sha256": "3719228c37e8f767906dc4fc3f3110f59e946fd5dcefc3e596d252da82f6c3e5",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "owned-tracked.diff",
+      "bytes": 5855,
+      "sha256": "4baa863270f920ba9528ca246ee9b4f30ec938e7a78b018511bf27537e80d595",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "owning-final.json",
+      "bytes": 553,
+      "sha256": "0b06c1507240fe7f3da7325a06b3df72dc8157a1e7ca2478e954c0d0c5bf3bf1",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "owning-final.log",
+      "bytes": 366,
+      "sha256": "636dcbff3ad6a0d78921647901c39df5d0746d002f223e9c9dc56a17f2561bfa",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "owning-sanitizers.json",
+      "bytes": 553,
+      "sha256": "8e899113238291795508ea728e2dccadaaf369cfe798f08bd0daa2c08183449d",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "owning-sanitizers.log",
+      "bytes": 190,
+      "sha256": "130ccb6283e548658e5db34213e2be5c0a00fdcf103f0770a3599abddcca134c",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "owning-tests.json",
+      "bytes": 553,
+      "sha256": "a96d3be172ea0e79ad20d05ea1fea7b007aa3fce3fc5242978f16d2ff6fef0e9",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "owning-tests.log",
+      "bytes": 366,
+      "sha256": "8f70a5ab7bce6e2f39f98b740f5e73dd9238f15a56ed4cfd914ba763451534a2",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "preserved-owner-hashes.json",
+      "bytes": 1222,
+      "sha256": "ed455027860c2750bc2908d43140152e902c69f2c5080aa06723d48eb74e3176",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "publish-dry-run-receipt.json",
+      "bytes": 17587,
+      "sha256": "81cc5b7745645588d0ddfdea3aa2a9556dc057f565fb4f60206a1a4831f5c0b0",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "publish-dry-run.log",
+      "bytes": 17438,
+      "sha256": "dc64f1dff1e2920d29bcd275b51d3cfde5f9e94950256852fefb857718b3af40",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "quality-scan-receipt.json",
+      "bytes": 5786,
+      "sha256": "a3f6c0bce1ea5cdf74934ab07652f5932c462e6af0a29395ae5b1d982b338b4e",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "quality-scan.log",
+      "bytes": 11270,
+      "sha256": "fcd34c80e8f19b433796f67a75195c50f232adac4771cd98d458f562524dd8df",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "red-baseline-corrected.json",
+      "bytes": 24426,
+      "sha256": "c844dbbbaea63245c0adf78d835c0c5e881b2ec15c1f4238beae808b9c6d3844",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "red-baseline-corrected.log",
+      "bytes": 390,
+      "sha256": "e00e31d6f167b7c7347d95f4864d73ae8670d9b7d5c30da786f6b10b058a9f60",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "red-baseline.json",
+      "bytes": 31357,
+      "sha256": "decc8bd9c8d285cfb710801df10d074cd4cd5c5ad45dd2f88782c6ed692f769e",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "red-baseline.log",
+      "bytes": 370,
+      "sha256": "171ac7a063a00736784e8259df00966939d4fa3d223a5a9535b0ea0ebbea291a",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "red-initial.json",
+      "bytes": 1011,
+      "sha256": "5bfeb9246d2aa6505e1fa1458ee71fd288f787e663c2defe92c6eb3318d93a1f",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "red-initial.log",
+      "bytes": 356,
+      "sha256": "ec760d4fe7a5b4eb12c2ccbf7c7dfe719d77ab4acc86211e62d44a0b5d4980eb",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "red-u1-cache.json",
+      "bytes": 3072,
+      "sha256": "84b42a8dedc3021ccf6dd1e9c7b0d7b053340ab322b82ac967644a99acc9c579",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "red-u1-cache.log",
+      "bytes": 358,
+      "sha256": "33a77a7e3cbc3d5b552fafa4d5d22776baea1774937b9dee343eb545a2c1e497",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "service-check-final.json",
+      "bytes": 344,
+      "sha256": "0461993033fa9ecb9b813e114aa8223bb775efad87e3d56b6d21040d74446be4",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "service-check-sanitizers.log",
+      "bytes": 344,
+      "sha256": "0461993033fa9ecb9b813e114aa8223bb775efad87e3d56b6d21040d74446be4",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "service-check.json",
+      "bytes": 358,
+      "sha256": "7f36de39dbafc398af5b2e46bff8e255e8641e36cb4b18a38897dd9483ab2667",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "service-fmt-final.json",
+      "bytes": 322,
+      "sha256": "e88037bbb07f25c5638a1782346730492f1d4bfb84c9eec9ad1276c5bb341420",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "service-fmt-sanitizers.log",
+      "bytes": 322,
+      "sha256": "e88037bbb07f25c5638a1782346730492f1d4bfb84c9eec9ad1276c5bb341420",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "service-fmt.json",
+      "bytes": 322,
+      "sha256": "e88037bbb07f25c5638a1782346730492f1d4bfb84c9eec9ad1276c5bb341420",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "service-lint-final.json",
+      "bytes": 373,
+      "sha256": "7211f9643f6e57abcb51ff3c56d40c8d092ca4e650888192f739e0005ea0f578",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "service-lint-sanitizers.log",
+      "bytes": 373,
+      "sha256": "7211f9643f6e57abcb51ff3c56d40c8d092ca4e650888192f739e0005ea0f578",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "service-lint.json",
+      "bytes": 373,
+      "sha256": "7211f9643f6e57abcb51ff3c56d40c8d092ca4e650888192f739e0005ea0f578",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "service-tests.json",
+      "bytes": 2983,
+      "sha256": "9f569211ec62d1e846c1c680c909cb8e7dd711369d4e28906332c52fa7205f47",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "service-tests.log",
+      "bytes": 368,
+      "sha256": "d00906f99bbd2a5ce880e2a8e4165244994039aa5c3d0f099bca9f397e722779",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "source-hashes-before-sanitizers.json",
+      "bytes": 787,
+      "sha256": "ca5a18d647e4d04fc378b107c7a7a52c15c72897f7411f0231d36db1adf460ed",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "source-hashes.json",
+      "bytes": 787,
+      "sha256": "ce59a103850e565fde2ba8dcc11ffbaba51b38574aba895767c3ac17e9b812ce",
+      "copied": true,
+      "reason": "byte-identical evidence"
+    },
+    {
+      "name": "src-context.ts",
+      "bytes": 22750,
+      "sha256": "509fa05e4702c41d7e8621f50877161177400af32e083f54e6034d43f19d6c75",
+      "copied": false,
+      "reason": "Public cached graph/vendor extract retained in ignored source; hash recorded here"
+    }
+  ]
+}

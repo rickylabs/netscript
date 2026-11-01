@@ -1,0 +1,14 @@
+{
+  "selected": "package-check",
+  "args": [
+    "task",
+    "--cwd",
+    "plugins/workers",
+    "check"
+  ],
+  "code": 0,
+  "started": "2026-10-28T01:11:25.128Z",
+  "ended": "2026-10-28T01:11:29.488Z",
+  "originalOutputAwaited": true,
+  "prefix": ".llm/tmp/browser-stream-headers-u3-native-sol-20261028/c2/package-check-1793149885125"
+}

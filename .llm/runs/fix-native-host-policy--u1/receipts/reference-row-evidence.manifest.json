@@ -1,0 +1,111 @@
+{
+    "schemaVersion":  1,
+    "createdAt":  "2026-10-27T23:55:07.2734605Z",
+    "archive":  "reference-row-evidence.json.gz",
+    "archiveBytes":  129454,
+    "archiveSha256":  "aefcab474e0107a96809db79d977f02aac34dbfa10cc6916699e40880aa6159a",
+    "payloadSha256":  "c56f3118f45e1689b82334a4f04c85d55233e27a84dde28cb892fb79e21e9682",
+    "fileCount":  19,
+    "originalBytes":  405841,
+    "roundtripVerifiedFiles":  19,
+    "allOriginalFilesRetained":  true,
+    "priorCommittedHistoryRewritten":  false,
+    "credentialOrProfileStateIncluded":  false,
+    "files":  [
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/implement-s3-workers-reference.md",
+                      "bytes":  2034,
+                      "sha256":  "5a8cb768ddac1130e41f06abec5618201af1213887d0189a32e04df2af69b9c5"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/docs-reference-row/diff-and-protected.txt",
+                      "bytes":  2030,
+                      "sha256":  "81275e390747ec4c0d5f826fbffe664ebdfd576eb99f3ab748383c7c0ea06606"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/docs-reference-row/docs-exports-drift-raw.txt",
+                      "bytes":  4978,
+                      "sha256":  "1d8e6a27c4cdf9ae75c67a93f14b708ad0a582bdc8b3def0ee055a062d846d47"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/docs-reference-row/drift-stage-raw.txt",
+                      "bytes":  13323,
+                      "sha256":  "046844864a19c94b904486c0e37036599a8624fc3975f02ec776900e2e71d00a"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/receipts/docs-reference-row/exit-code.txt",
+                      "bytes":  45,
+                      "sha256":  "f34e3143593d0537f6ae0711553216ef9ff66fa5328dd73a5ca3a60f0f50107a"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/root-reference-row-acceptance.md",
+                      "bytes":  969,
+                      "sha256":  "2af0c96e11efd653b1c11c8ff3430da1936494572618243b2c244ed065745119"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/review/s3-reference-dispatch/dispatch-seals.json",
+                      "bytes":  1690,
+                      "sha256":  "9507e943fa73b72c0ed4d2cae6f15b727f3a8c3a698c21df48e7230534ce7c53"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/review/s3-reference-dispatch/runner.diff",
+                      "bytes":  5685,
+                      "sha256":  "1966b521d821fcc63b8380b67c0a5a8a78bea3052bc915ed100a3cc99e390ae0"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/review/s3-reference-dispatch/runner-typecheck.log",
+                      "bytes":  876,
+                      "sha256":  "6722fc73af4f049d0827ef5c2f1a77f33f0e9438f82885983a1b53cfde5474fc"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/review/s3-workers-reference-proposal.md",
+                      "bytes":  1998,
+                      "sha256":  "ab7eed0d06d9303ce2bc3f791baee903424f1f66b9e9ff1d7a735529590672a1"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/run-native-s3-workers-reference.ts",
+                      "bytes":  10968,
+                      "sha256":  "639f7495f730a8db068daf1fa78f8ed905fa4e277afd638a8c235c703ec4491c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3-reference-driver.log",
+                      "bytes":  228922,
+                      "sha256":  "b477a1fd76913bf6c96d166f268b525f00783b8c5a3f33a72995dfdb29754502"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3-workers-reference/cohort-snapshot-active-1.json",
+                      "bytes":  3804,
+                      "sha256":  "0c955f6ac994c84a0bae510a19663d17ef5c4b761d11479a69c3e82ae8d65bf8"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3-workers-reference/exit.json",
+                      "bytes":  408,
+                      "sha256":  "bdd823af97a41a02aa792a3999ad339ab5a42d792961ec6256cb6f3cf4d1b874"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3-workers-reference/identity.json",
+                      "bytes":  3087,
+                      "sha256":  "83a11af47d04a0c26422a2444d2aac8923b831ddd0f22a58e592d5f2ab3a1ce9"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3-workers-reference/native.stdout.jsonl",
+                      "bytes":  114027,
+                      "sha256":  "5b9dc3181af6c963e4c507aac7bfc9d59031d3470cf37758d82abf510f836ecd"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3-workers-reference/qualified-init.json",
+                      "bytes":  3522,
+                      "sha256":  "83aa87dd741f093f505cf258dccd6f7f08cc71d94f71fe16194d8db86ab07aea"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/runtime/s3-workers-reference/source-and-cohort-proof.json",
+                      "bytes":  6737,
+                      "sha256":  "4e498d8045ce6d783dcc31731f11a58e42147f046c29fe237ac57e9e5720d5d5"
+                  },
+                  {
+                      "path":  ".llm/tmp/u1-docs-row/drift-stage.ts",
+                      "bytes":  738,
+                      "sha256":  "e11d0b9edacf774369af5b6f5923e9ddb190c8b83fdc3e76e55f14ada48c8f58"
+                  }
+              ]
+}

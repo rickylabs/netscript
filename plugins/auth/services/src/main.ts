@@ -8,7 +8,7 @@
 import '@netscript/kv/redis';
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
-import { initializeAuthService } from './init.ts';
+import { initializeAuthService, resolveAuthServiceDatabase } from './init.ts';
 import { serveAuthService } from './auth-service-runtime.ts';
 import type { DbContext } from '@netscript/service';
 import { createAuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
@@ -32,29 +32,36 @@ type PluginServiceBootstrap = {
 /** Starts the Auth API service using host-provided infrastructure. */
 export default async function createAuthService(
   ctx: PluginServiceContext,
+  options: Readonly<{
+    /** Request-start level; defaults to debug rather than the native middleware's info. */
+    readonly requestLevel?: 'debug' | 'info';
+    /** Successful-response level; defaults to debug rather than the native middleware's info. */
+    readonly responseLevel?: 'debug' | 'info';
+  }> = {},
 ): Promise<AuthRunningService> {
   const portValue = ctx.env.PORT ?? Deno.env.get('PORT');
   if (portValue === undefined) {
     throw new Error('Auth API requires the host-provided PORT environment variable.');
   }
   const port = Number.parseInt(portValue, 10);
-  const dbClient = await ctx.db.getClient();
+  const dbClient = await resolveAuthServiceDatabase(ctx);
   const registry = await initializeAuthService(ctx, dbClient);
   const cookieName = registry.cookieName;
   const telemetry = createAuthTelemetry({
     subjectHashSalt: resolveAuditSalt(ctx),
   });
 
-  // Data-only description of the auth service. `createPluginService` applies the
-  // mandated builder chain in a fixed order — cors → logger → openapi → docs →
-  // database → use(middleware) → context → withRPC → withHealth →
-  // withServiceInfo — which is exactly the previous chain's order, so behavior
-  // is preserved. The registry is resolved above (via `initializeAuthService`)
-  // and captured by the context closure; no startup work is deferred.
+  // `createPluginService` applies the mandatory builder chain with the selected
+  // backend's optional database context. The initialized registry is captured
+  // by the context closure; no startup work is deferred.
   return await serveAuthService(ctx, registry, {
     // Only signout and operator revocation are guarded; the guard authenticates in-process
     // because the auth service cannot verify sessions by calling itself.
     auth: createAuthServiceGuard(registry),
+    logger: {
+      requestLevel: options.requestLevel ?? 'debug',
+      responseLevel: options.responseLevel ?? 'debug',
+    },
     name: 'auth',
     version: AUTH_PLUGIN_VERSION,
     port,
@@ -63,7 +70,7 @@ export default async function createAuthService(
       description: 'Unified auth service for NetScript applications',
     },
     docs: {},
-    database: { context: toDbContext(dbClient) },
+    database: dbClient === undefined ? undefined : { context: toDbContext(dbClient) },
     middleware: [withAuthRequest],
     context: () => ({ registry, telemetry, cookieName, request: currentAuthRequest() }),
     traceContext: true,

@@ -1,3 +1,4 @@
+import { QUERY_RESULT_RETURN, QUERY_RESULT_TEMPLATE } from './query-result-template.ts';
 import { dirname, relative, resolve } from '@std/path';
 import { cleanUiPagePath } from './page-path.ts';
 import { navigationLabel, planNavigationRegistration } from './app-navigation.ts';
@@ -45,7 +46,7 @@ const GENERATED_LINE_WIDTH = 100;
 /** Where every scaffolded page gets its frame and theme; printed after `ui:add page`. */
 const PAGE_FRAME_GUIDANCE = [
   'The page renders inside the app chrome from routes/_layout.tsx; navigation.ts lists the top-bar links, and chromelessRoutePrefixes opts a route out.',
-  "Restyle app-wide through the --ns-* tokens in assets/tokens.css (light on :root, dark on [data-theme='dark']); see MCP get_doc web-layer/how-to/customize-fresh-ui.",
+  'Theme every page at once: switch the preset with `netscript ui:apply --preset <id>`, or alias roles and run `netscript tokens build`; see MCP get_doc web-layer/how-to/theme-your-app.',
 ] as const;
 export interface UiIslandScaffoldInput extends WriteOptions {
   readonly projectRoot: string;
@@ -206,7 +207,7 @@ function dataIslandTemplate(
     resolve(dir, '(_islands)', `${name}Island.tsx`),
     binding.path,
   );
-  return `import type { InferDefinePageLayerLoaderProps } from '@netscript/fresh/builders';\nimport { QueryIsland, useIslandQuery } from '@netscript/fresh/query';\nimport { ${query} } from '${module}';\nimport { load${name}Data } from '../(_shared)/query-loaders.ts';\n\ntype Props = NonNullable<InferDefinePageLayerLoaderProps<typeof load${name}Data>>;\n\nfunction ${name}Data(props: Props) {\n  const query = useIslandQuery({\n    ...${query}.list.queryOptions(props.input),\n    queryKey: ${query}.list.clientKey(props.input),\n    initialData: props.initialData,\n    initialDataUpdatedAt: props.cachedAt,\n  });\n  return <pre>{JSON.stringify(query.data, null, 2)}</pre>;\n}\n\nexport default function ${name}Island(props: Props) {\n  return (\n    <QueryIsland>\n      <${name}Data {...props} />\n    </QueryIsland>\n  );\n}\n`;
+  return `import type { VNode } from 'preact';\nimport type { InferDefinePageLayerLoaderProps } from '@netscript/fresh/builders';\nimport { QueryIsland, useIslandQuery } from '@netscript/fresh/query';\nimport { ${query} } from '${module}';\nimport { load${name}Data } from '../(_shared)/query-loaders.ts';\n\ntype Props = NonNullable<InferDefinePageLayerLoaderProps<typeof load${name}Data>>;\n\nfunction ${name}Data(props: Props) {\n  const query = useIslandQuery({\n    ...${query}.list.queryOptions(props.input),\n    queryKey: ${query}.list.clientKey(props.input),\n    initialData: props.initialData,\n    initialDataUpdatedAt: props.cachedAt,\n  });\n${QUERY_RESULT_RETURN}\n}\n${QUERY_RESULT_TEMPLATE}\nexport default function ${name}Island(props: Props) {\n  return (\n    <QueryIsland>\n      <${name}Data {...props} />\n    </QueryIsland>\n  );\n}\n`;
 }
 function queryIslandTemplate(
   binding: ClientBinding,
@@ -214,12 +215,12 @@ function queryIslandTemplate(
   name: string,
 ): string {
   const query = binding.queries;
-  return `import { QueryIsland, useIslandQuery } from '@netscript/fresh/query';\nimport { ${query} } from '${
+  return `import type { VNode } from 'preact';\nimport { QueryIsland, useIslandQuery } from '@netscript/fresh/query';\nimport { ${query} } from '${
     specifier(path, binding.path)
-  }';\n\nconst input = ${binding.input};\n\nfunction ${name}Data() {\n  const query = useIslandQuery({\n    ...${query}.list.queryOptions(input),\n    queryKey: ${query}.list.clientKey(input),\n  });\n  return <pre>{JSON.stringify(query.data, null, 2)}</pre>;\n}\n\nexport default function ${name}() {\n  return (\n    <QueryIsland>\n      <${name}Data />\n    </QueryIsland>\n  );\n}\n`;
+  }';\n\nconst input = ${binding.input};\n\nfunction ${name}Data() {\n  const query = useIslandQuery({\n    ...${query}.list.queryOptions(input),\n    queryKey: ${query}.list.clientKey(input),\n  });\n${QUERY_RESULT_RETURN}\n}\n${QUERY_RESULT_TEMPLATE}\nexport default function ${name}() {\n  return (\n    <QueryIsland>\n      <${name}Data />\n    </QueryIsland>\n  );\n}\n`;
 }
 function signalTemplate(name: string): string {
-  return `import { useSignal } from '@preact/signals';\n\nexport default function ${name}() {\n  const count = useSignal(0);\n  return <button type="button" onClick={() => count.value++}>{count}</button>;\n}\n`;
+  return `import { useSignal } from '@preact/signals';\nimport { Button } from '@app/components/ui/mod.ts';\n\nexport default function ${name}() {\n  const count = useSignal(0);\n  return <Button type='button' onClick={() => count.value++}>Count: {count.value}</Button>;\n}\n`;
 }
 function specifier(from: string, target: string): string {
   const path = relative(dirname(from), target).replaceAll('\\', '/');

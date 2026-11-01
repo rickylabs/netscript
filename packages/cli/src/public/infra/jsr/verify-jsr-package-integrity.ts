@@ -1,3 +1,4 @@
+import { JsrRequestError, readJsrResource } from './read-jsr-resource.ts';
 import type { ValidatedPluginDescriptor } from '../../features/plugins/install/jsr-plugin-validator-port.ts';
 
 /** Fetcher used to read published package files for integrity verification. */
@@ -43,17 +44,23 @@ export async function verifyJsrPackageIntegrity(
 
 /** Fetch-backed package file reader for JSR package contents. */
 export class WebJsrPackageFileFetcher implements JsrPackageFileFetcher {
+  constructor(private readonly fetcher: typeof fetch = fetch) {}
+
   /** Fetch a published package file as bytes. */
   async fetchFile(url: string): Promise<Uint8Array> {
-    const response = await fetch(url, { headers: { Accept: 'application/octet-stream' } });
+    const response = await readJsrResource(
+      url,
+      { headers: { Accept: 'application/octet-stream' } },
+      this.fetcher,
+    );
     if (!response.ok) {
-      throw new Error(`JSR package file request failed with ${response.status}: ${url}`);
+      throw new JsrRequestError(url, response.attempts, response.status, { retryable: false });
     }
-    return new Uint8Array(await response.arrayBuffer());
+    return response.bytes;
   }
 }
 
-/** Fetch all published Prisma fragments below the package's `database` directory. */
+/** Fetch published Prisma fragments and migration sidecars below the package's `database` directory. */
 export async function fetchJsrPackageSchemaFragments(
   descriptor: ValidatedPluginDescriptor,
   fetcher: JsrPackageFileFetcher = new WebJsrPackageFileFetcher(),
@@ -64,7 +71,10 @@ export async function fetchJsrPackageSchemaFragments(
       path: normalizeJsrPackagePath(metadataPath),
       expected,
     }))
-    .filter(({ path }) => path.startsWith('database/') && path.endsWith('.prisma'))
+    .filter(({ path }) =>
+      path.startsWith('database/') &&
+      (path.endsWith('.prisma') || path.endsWith('.migration.sql'))
+    )
     .sort((left, right) => left.path.localeCompare(right.path));
 
   return await Promise.all(schemaFiles.map(async ({ metadataPath, path, expected }) => {

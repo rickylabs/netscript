@@ -1,0 +1,2401 @@
+{
+  "capturedAt": "2026-10-28T01:45:24.852Z",
+  "policy": "Diagnostic only; no shipping export/debt change or model launch. Own-CWD copied workspace is authoritative; cross-CWD warnings are invalid closure evidence.",
+  "cloneManifest": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/clone-manifest.json",
+  "exactCurrentAndCandidateInputsVerified": 4182,
+  "protectedInputs": [
+    {
+      "path": "deno.json",
+      "sha256": "b1ff8e07a20969535ae8bedafa869c8fc5a792afe0857d1be1fd71c785b90870",
+      "shippingCurrentCandidateIdentical": true
+    },
+    {
+      "path": "deno.lock",
+      "sha256": "f53f7a5d017e002582b43b886003f64d19c0edbc137ebe74674c2e59df4a5d32",
+      "shippingCurrentCandidateIdentical": true
+    },
+    {
+      "path": "packages/fresh/deno.json",
+      "sha256": "ecc1f7b2daeccc758904c123615992c0f38183ea05e604d5d53d1c9be4df0c56",
+      "shippingCurrentCandidateIdentical": true
+    },
+    {
+      "path": "plugins/workers/deno.json",
+      "sha256": "58af1ddcddfcb6df9b71f764aed5167cb4585ff9e027cbc7d7b056bc5b118f8a",
+      "shippingCurrentCandidateIdentical": true
+    },
+    {
+      "path": ".llm/harness/debt/arch-debt.md",
+      "sha256": "d502eafa19ffb9eab3078ca1a5ed4d3a8a7816f115f33f53f3379defdd6d0042",
+      "unchangedAccepted": true
+    }
+  ],
+  "priorEvidence": [
+    {
+      "path": "C:/Users/ericc/source/repos/eis-chat-netscript-008-reader-policy/.netscript/agent/evidence/e1-doc-closure-21e48870-40cc-4a6a-b919-206fed94e11f/report.md",
+      "sha256": "98dcfd073127727b4f2a537ff2e7640c3fbcda6ddb77894e7da0bc7c9d033f25"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/eis-chat-netscript-008-reader-policy/.netscript/agent/evidence/e1-doc-closure-21e48870-40cc-4a6a-b919-206fed94e11f/manifest.json",
+      "sha256": "43e5579fb37783f90b0b05614de029ff269127c7af0ad6d9aaf8a2d677ed5290"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/eis-chat-netscript-008-reader-policy/.netscript/agent/evidence/e1-doc-closure-21e48870-40cc-4a6a-b919-206fed94e11f/explicit-map-closure-receipt.json",
+      "sha256": "671a66087240e29c5bd9aa90e24ee6e0e4c1befd9ff213f262a733b55202d81c"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/eis-chat-netscript-008-reader-policy/.netscript/agent/evidence/e1-doc-closure-21e48870-40cc-4a6a-b919-206fed94e11f/native-declared-types.json",
+      "sha256": "b6871b36242668d2b9fcc764031daf09219b17d0f601486fbe6091cd4167ed7c"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/eis-chat-netscript-008-reader-policy/.netscript/agent/evidence/e1-doc-closure-21e48870-40cc-4a6a-b919-206fed94e11f/resolved-symbol-proof.json",
+      "sha256": "af6608e74741ad5f43f92002fce8966fc27ba155b30516d38fd02bb46fdf3916"
+    }
+  ],
+  "nativeDeclaration": {
+    "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+    "sha256": "a9cefea03e53cd4666c13a755c3acc3d490671176360d40e1a4b56759fd83ba2"
+  },
+  "lintMatrix": [
+    {
+      "owner": "fresh",
+      "counts": [
+        10,
+        12,
+        10
+      ],
+      "baselineFindingsPreserved": true,
+      "runs": [
+        {
+          "phase": "baseline",
+          "owner": "fresh",
+          "mode": "lint",
+          "context": "own",
+          "args": [
+            "doc",
+            "--lint",
+            "--frozen",
+            "--config",
+            "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/deno.json",
+            "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/packages/fresh/src/runtime/streams/mod.ts"
+          ],
+          "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline",
+          "code": 1,
+          "started": "2026-10-28T01:41:06.688Z",
+          "ended": "2026-10-28T01:41:06.966Z",
+          "deadlineAborted": false,
+          "outputAwaited": true,
+          "stdoutBytes": 0,
+          "stderrBytes": 6935,
+          "warning": false,
+          "privateRefCount": 10,
+          "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-lint-own-1793151666685",
+          "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-lint-own-1793151666685.json",
+          "sha256": "a1107b8aed1f3dabb94651d7de245d1bb2a3a7ce7beb0ce91740d00fe5f0902b",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "f144744216dc95fbd20873d373295d4ce1ea43b93773b15e342d36029a9dd3f8",
+          "findings": [
+            {
+              "publicType": "NetScriptLiveQueryFactory",
+              "privateType": "Context"
+            },
+            {
+              "publicType": "NetScriptLiveQueryFactory",
+              "privateType": "InitialQueryBuilder"
+            },
+            {
+              "publicType": "NetScriptLiveQueryFactory",
+              "privateType": "QueryBuilder"
+            },
+            {
+              "publicType": "NetScriptStateSchema",
+              "privateType": "StateSchema"
+            },
+            {
+              "publicType": "NetScriptStreamDB[\"collections\"]",
+              "privateType": "StateSchema"
+            },
+            {
+              "publicType": "NetScriptStreamDB[\"collections\"]",
+              "privateType": "StreamDB"
+            },
+            {
+              "publicType": "useLiveQuery",
+              "privateType": "Context"
+            },
+            {
+              "publicType": "useLiveQuery",
+              "privateType": "InferResultType"
+            },
+            {
+              "publicType": "useLiveSuspenseQuery",
+              "privateType": "Context"
+            },
+            {
+              "publicType": "useLiveSuspenseQuery",
+              "privateType": "InferResultType"
+            }
+          ]
+        },
+        {
+          "phase": "current",
+          "owner": "fresh",
+          "mode": "lint",
+          "context": "own",
+          "args": [
+            "doc",
+            "--lint",
+            "--frozen",
+            "--config",
+            "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/deno.json",
+            "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/packages/fresh/src/runtime/streams/mod.ts"
+          ],
+          "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current",
+          "code": 1,
+          "started": "2026-10-28T01:41:07.104Z",
+          "ended": "2026-10-28T01:41:07.322Z",
+          "deadlineAborted": false,
+          "outputAwaited": true,
+          "stdoutBytes": 0,
+          "stderrBytes": 8125,
+          "warning": false,
+          "privateRefCount": 12,
+          "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-fresh-lint-own-1793151667100",
+          "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-fresh-lint-own-1793151667100.json",
+          "sha256": "1858c3e7a6f1efff340599a248db5a4f215c166fadce9ad154a19cd8f3454e47",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "cb3fd9e8da834ab9a6087999bfa33a454760d7f206736c1825a200b0bd9a69c3",
+          "findings": [
+            {
+              "publicType": "NetScriptLiveQueryFactory",
+              "privateType": "Context"
+            },
+            {
+              "publicType": "NetScriptLiveQueryFactory",
+              "privateType": "InitialQueryBuilder"
+            },
+            {
+              "publicType": "NetScriptLiveQueryFactory",
+              "privateType": "QueryBuilder"
+            },
+            {
+              "publicType": "NetScriptStateSchema",
+              "privateType": "StateSchema"
+            },
+            {
+              "publicType": "NetScriptStreamDB[\"collections\"]",
+              "privateType": "StateSchema"
+            },
+            {
+              "publicType": "NetScriptStreamDB[\"collections\"]",
+              "privateType": "StreamDB"
+            },
+            {
+              "publicType": "NetScriptStreamDBFactoryInput[\"streamOptions\"]",
+              "privateType": "HeadersRecord"
+            },
+            {
+              "publicType": "NetScriptStreamDBOptions[\"headers\"]",
+              "privateType": "HeadersRecord"
+            },
+            {
+              "publicType": "useLiveQuery",
+              "privateType": "Context"
+            },
+            {
+              "publicType": "useLiveQuery",
+              "privateType": "InferResultType"
+            },
+            {
+              "publicType": "useLiveSuspenseQuery",
+              "privateType": "Context"
+            },
+            {
+              "publicType": "useLiveSuspenseQuery",
+              "privateType": "InferResultType"
+            }
+          ]
+        },
+        {
+          "phase": "candidate",
+          "owner": "fresh",
+          "mode": "lint",
+          "context": "own",
+          "args": [
+            "doc",
+            "--lint",
+            "--frozen",
+            "--config",
+            "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+            "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/src/runtime/streams/mod.ts"
+          ],
+          "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+          "code": 1,
+          "started": "2026-10-28T01:41:07.436Z",
+          "ended": "2026-10-28T01:41:07.647Z",
+          "deadlineAborted": false,
+          "outputAwaited": true,
+          "stdoutBytes": 0,
+          "stderrBytes": 6945,
+          "warning": false,
+          "privateRefCount": 10,
+          "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-lint-own-1793151667432",
+          "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-lint-own-1793151667432.json",
+          "sha256": "d77c154bc5d37f20e69134487705cf9ea155d512054318b40e669ed9702d1007",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "94db1ccf3a164f8a70f38983f71d010ca0d9366b4e2585668953810a854bf6e7",
+          "findings": [
+            {
+              "publicType": "NetScriptLiveQueryFactory",
+              "privateType": "Context"
+            },
+            {
+              "publicType": "NetScriptLiveQueryFactory",
+              "privateType": "InitialQueryBuilder"
+            },
+            {
+              "publicType": "NetScriptLiveQueryFactory",
+              "privateType": "QueryBuilder"
+            },
+            {
+              "publicType": "NetScriptStateSchema",
+              "privateType": "StateSchema"
+            },
+            {
+              "publicType": "NetScriptStreamDB[\"collections\"]",
+              "privateType": "StateSchema"
+            },
+            {
+              "publicType": "NetScriptStreamDB[\"collections\"]",
+              "privateType": "StreamDB"
+            },
+            {
+              "publicType": "useLiveQuery",
+              "privateType": "Context"
+            },
+            {
+              "publicType": "useLiveQuery",
+              "privateType": "InferResultType"
+            },
+            {
+              "publicType": "useLiveSuspenseQuery",
+              "privateType": "Context"
+            },
+            {
+              "publicType": "useLiveSuspenseQuery",
+              "privateType": "InferResultType"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "owner": "workers",
+      "counts": [
+        0,
+        1,
+        0
+      ],
+      "baselineFindingsPreserved": true,
+      "runs": [
+        {
+          "phase": "baseline",
+          "owner": "workers",
+          "mode": "lint",
+          "context": "own",
+          "args": [
+            "doc",
+            "--lint",
+            "--frozen",
+            "--config",
+            "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/deno.json",
+            "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/plugins/workers/streams/mod.ts"
+          ],
+          "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline",
+          "code": 0,
+          "started": "2026-10-28T01:39:57.865Z",
+          "ended": "2026-10-28T01:39:58.082Z",
+          "deadlineAborted": false,
+          "outputAwaited": true,
+          "stdoutBytes": 0,
+          "stderrBytes": 15,
+          "warning": false,
+          "privateRefCount": 0,
+          "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-workers-lint-own-1793151597862",
+          "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-workers-lint-own-1793151597862.json",
+          "sha256": "80e0cde83c7721d10366d59cfb3cb3bec0ca7162f1b85129622c3ef420f57fa4",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7",
+          "findings": []
+        },
+        {
+          "phase": "current",
+          "owner": "workers",
+          "mode": "lint",
+          "context": "own",
+          "args": [
+            "doc",
+            "--lint",
+            "--frozen",
+            "--config",
+            "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/deno.json",
+            "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/plugins/workers/streams/mod.ts"
+          ],
+          "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current",
+          "code": 1,
+          "started": "2026-10-28T01:39:58.552Z",
+          "ended": "2026-10-28T01:39:58.740Z",
+          "deadlineAborted": false,
+          "outputAwaited": true,
+          "stdoutBytes": 0,
+          "stderrBytes": 615,
+          "warning": false,
+          "privateRefCount": 1,
+          "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-workers-lint-own-1793151598549",
+          "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-workers-lint-own-1793151598549.json",
+          "sha256": "ab97652337696324ce9eefaaec150eae49cbf1b5c9e95d520040a7fba63306eb",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "a36194b3aac71f682cdfd9f3f3a2885084d3579de0035aba60b56cdc9607c4b5",
+          "findings": [
+            {
+              "publicType": "createWorkersStreamDB",
+              "privateType": "HeadersRecord"
+            }
+          ]
+        },
+        {
+          "phase": "candidate",
+          "owner": "workers",
+          "mode": "lint",
+          "context": "own",
+          "args": [
+            "doc",
+            "--lint",
+            "--frozen",
+            "--config",
+            "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+            "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/plugins/workers/streams/mod.ts"
+          ],
+          "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+          "code": 0,
+          "started": "2026-10-28T01:39:59.220Z",
+          "ended": "2026-10-28T01:39:59.413Z",
+          "deadlineAborted": false,
+          "outputAwaited": true,
+          "stdoutBytes": 0,
+          "stderrBytes": 15,
+          "warning": false,
+          "privateRefCount": 0,
+          "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-lint-own-1793151599217",
+          "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-lint-own-1793151599217.json",
+          "sha256": "9df92022992d187494830a7d2d9a690cbf0cf01ff5e455effa92cc6357d1b4e9",
+          "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSha256": "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7",
+          "findings": []
+        }
+      ]
+    }
+  ],
+  "surfaceDeltas": [
+    {
+      "owner": "fresh",
+      "baseline": 52,
+      "current": 52,
+      "candidate": 54,
+      "added": [
+        "HeadersRecord",
+        "MaybePromise"
+      ],
+      "removed": []
+    },
+    {
+      "owner": "fresh-source",
+      "baseline": 9,
+      "current": 9,
+      "candidate": 11,
+      "added": [
+        "HeadersRecord",
+        "MaybePromise"
+      ],
+      "removed": []
+    },
+    {
+      "owner": "workers",
+      "baseline": 24,
+      "current": 24,
+      "candidate": 26,
+      "added": [
+        "HeadersRecord",
+        "MaybePromise"
+      ],
+      "removed": []
+    },
+    {
+      "owner": "workers-source",
+      "baseline": 4,
+      "current": 4,
+      "candidate": 6,
+      "added": [
+        "HeadersRecord",
+        "MaybePromise"
+      ],
+      "removed": []
+    }
+  ],
+  "symbols": [
+    {
+      "phase": "baseline",
+      "owner": "fresh",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/packages/fresh/src/runtime/streams/mod.ts",
+      "symbolCount": 52,
+      "names": [
+        "BindStreamEventSourceOptionsV1",
+        "CreateNetScriptStreamEventSourceOptionsV1",
+        "NetScriptEventSourceFactoryV1",
+        "NetScriptLiveQueryFactory",
+        "NetScriptLiveQueryResult",
+        "NetScriptStateSchema",
+        "NetScriptStreamDB",
+        "NetScriptStreamDBFactory",
+        "NetScriptStreamDBFactoryInput",
+        "NetScriptStreamDBOptions",
+        "NetScriptStreamDBReconnectOptions",
+        "NetScriptStreamDBStatus",
+        "NetScriptStreamEventSourceBindingV1",
+        "NetScriptStreamStateDefinition",
+        "Operation",
+        "STREAM_SSE_CONSUMER_EVENT_NAMES_V1",
+        "STREAM_SSE_CONTRACT_V1",
+        "STREAM_SSE_PROTOCOL_VERSION_V1",
+        "STREAM_SSE_WIRE_EVENT_NAMES_V1",
+        "StreamEventSourceBindingV1",
+        "StreamEventSourceV1",
+        "StreamSchemaIssue",
+        "StreamSchemaValidationOptions",
+        "StreamSchemaValidationResult",
+        "StreamSourceEventV1",
+        "StreamSourceListenerV1",
+        "StreamSseChangeHeadersV1",
+        "StreamSseChangeV1",
+        "StreamSseConsumerEventNameV1",
+        "StreamSseConsumerEventV1",
+        "StreamSseContractV1",
+        "StreamSseControlPayloadV1",
+        "StreamSseDataPayloadV1",
+        "StreamSseErrorCodeV1",
+        "StreamSseErrorPayloadV1",
+        "StreamSseHeartbeatPayloadV1",
+        "StreamSseOffsetV1",
+        "StreamSseParseInputV1",
+        "StreamSseParseResultV1",
+        "StreamSseReductionV1",
+        "StreamSseReplayStateV1",
+        "StreamSseSchemaV1",
+        "StreamSseWireEventNameV1",
+        "StreamSseWireFrameV1",
+        "bindStreamEventSourceV1",
+        "createNetScriptStreamDB",
+        "createNetScriptStreamEventSourceV1",
+        "createStreamSseReplayStateV1",
+        "parseStreamSseEventV1",
+        "reduceStreamSseReplayStateV1",
+        "useLiveQuery",
+        "useLiveSuspenseQuery"
+      ],
+      "native": [],
+      "raw": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-json-own-1793151629183.stdout",
+      "sha256": "f9495b4457a51d917127dc6228ac5a2797fd43c522c583db951c3ea9935c8908"
+    },
+    {
+      "phase": "baseline",
+      "owner": "workers",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/plugins/workers/streams/mod.ts",
+      "symbolCount": 24,
+      "names": [
+        "CollectionDefinition",
+        "CollectionEventHelpers",
+        "CollectionWithHelpers",
+        "StateSchema",
+        "StreamCollection",
+        "StreamDBFactory",
+        "StreamSchemaDefinition",
+        "StreamSchemaIssue",
+        "StreamSchemaValidationOptions",
+        "StreamSchemaValidationResult",
+        "StreamStandardSchema",
+        "StreamStateDefinition",
+        "WorkerExecution",
+        "WorkerExecutionSchema",
+        "WorkerJob",
+        "WorkerJobSchema",
+        "WorkerStreamCollectionDefinition",
+        "WorkerStreamEntitySchema",
+        "WorkerStreamStandardSchema",
+        "WorkersStreamDB",
+        "WorkersStreamDefinition",
+        "WorkersStreamSchema",
+        "createWorkersStreamDB",
+        "workersStreamSchema"
+      ],
+      "native": [],
+      "raw": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-workers-json-own-1793151629511.stdout",
+      "sha256": "7554c11a425b525af15522221e113cf323b0b76b7f4a8e9bdb26b3ea90a89a45"
+    },
+    {
+      "phase": "current",
+      "owner": "fresh",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/packages/fresh/src/runtime/streams/mod.ts",
+      "symbolCount": 52,
+      "names": [
+        "BindStreamEventSourceOptionsV1",
+        "CreateNetScriptStreamEventSourceOptionsV1",
+        "NetScriptEventSourceFactoryV1",
+        "NetScriptLiveQueryFactory",
+        "NetScriptLiveQueryResult",
+        "NetScriptStateSchema",
+        "NetScriptStreamDB",
+        "NetScriptStreamDBFactory",
+        "NetScriptStreamDBFactoryInput",
+        "NetScriptStreamDBOptions",
+        "NetScriptStreamDBReconnectOptions",
+        "NetScriptStreamDBStatus",
+        "NetScriptStreamEventSourceBindingV1",
+        "NetScriptStreamStateDefinition",
+        "Operation",
+        "STREAM_SSE_CONSUMER_EVENT_NAMES_V1",
+        "STREAM_SSE_CONTRACT_V1",
+        "STREAM_SSE_PROTOCOL_VERSION_V1",
+        "STREAM_SSE_WIRE_EVENT_NAMES_V1",
+        "StreamEventSourceBindingV1",
+        "StreamEventSourceV1",
+        "StreamSchemaIssue",
+        "StreamSchemaValidationOptions",
+        "StreamSchemaValidationResult",
+        "StreamSourceEventV1",
+        "StreamSourceListenerV1",
+        "StreamSseChangeHeadersV1",
+        "StreamSseChangeV1",
+        "StreamSseConsumerEventNameV1",
+        "StreamSseConsumerEventV1",
+        "StreamSseContractV1",
+        "StreamSseControlPayloadV1",
+        "StreamSseDataPayloadV1",
+        "StreamSseErrorCodeV1",
+        "StreamSseErrorPayloadV1",
+        "StreamSseHeartbeatPayloadV1",
+        "StreamSseOffsetV1",
+        "StreamSseParseInputV1",
+        "StreamSseParseResultV1",
+        "StreamSseReductionV1",
+        "StreamSseReplayStateV1",
+        "StreamSseSchemaV1",
+        "StreamSseWireEventNameV1",
+        "StreamSseWireFrameV1",
+        "bindStreamEventSourceV1",
+        "createNetScriptStreamDB",
+        "createNetScriptStreamEventSourceV1",
+        "createStreamSseReplayStateV1",
+        "parseStreamSseEventV1",
+        "reduceStreamSseReplayStateV1",
+        "useLiveQuery",
+        "useLiveSuspenseQuery"
+      ],
+      "native": [],
+      "raw": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-fresh-json-own-1793151629786.stdout",
+      "sha256": "0243dffd983dc1d2078c126c7ea720ed20086961064b53428c8f1e341ae47680"
+    },
+    {
+      "phase": "current",
+      "owner": "workers",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/plugins/workers/streams/mod.ts",
+      "symbolCount": 24,
+      "names": [
+        "CollectionDefinition",
+        "CollectionEventHelpers",
+        "CollectionWithHelpers",
+        "StateSchema",
+        "StreamCollection",
+        "StreamDBFactory",
+        "StreamSchemaDefinition",
+        "StreamSchemaIssue",
+        "StreamSchemaValidationOptions",
+        "StreamSchemaValidationResult",
+        "StreamStandardSchema",
+        "StreamStateDefinition",
+        "WorkerExecution",
+        "WorkerExecutionSchema",
+        "WorkerJob",
+        "WorkerJobSchema",
+        "WorkerStreamCollectionDefinition",
+        "WorkerStreamEntitySchema",
+        "WorkerStreamStandardSchema",
+        "WorkersStreamDB",
+        "WorkersStreamDefinition",
+        "WorkersStreamSchema",
+        "createWorkersStreamDB",
+        "workersStreamSchema"
+      ],
+      "native": [],
+      "raw": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-workers-json-own-1793151630105.stdout",
+      "sha256": "5577da4853fd9eda4f9e40d3b3f2c61f8eeb38b1d07fd03be9a79fe52890bec3"
+    },
+    {
+      "phase": "candidate",
+      "owner": "fresh",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/src/runtime/streams/mod.ts",
+      "symbolCount": 54,
+      "names": [
+        "BindStreamEventSourceOptionsV1",
+        "CreateNetScriptStreamEventSourceOptionsV1",
+        "HeadersRecord",
+        "MaybePromise",
+        "NetScriptEventSourceFactoryV1",
+        "NetScriptLiveQueryFactory",
+        "NetScriptLiveQueryResult",
+        "NetScriptStateSchema",
+        "NetScriptStreamDB",
+        "NetScriptStreamDBFactory",
+        "NetScriptStreamDBFactoryInput",
+        "NetScriptStreamDBOptions",
+        "NetScriptStreamDBReconnectOptions",
+        "NetScriptStreamDBStatus",
+        "NetScriptStreamEventSourceBindingV1",
+        "NetScriptStreamStateDefinition",
+        "Operation",
+        "STREAM_SSE_CONSUMER_EVENT_NAMES_V1",
+        "STREAM_SSE_CONTRACT_V1",
+        "STREAM_SSE_PROTOCOL_VERSION_V1",
+        "STREAM_SSE_WIRE_EVENT_NAMES_V1",
+        "StreamEventSourceBindingV1",
+        "StreamEventSourceV1",
+        "StreamSchemaIssue",
+        "StreamSchemaValidationOptions",
+        "StreamSchemaValidationResult",
+        "StreamSourceEventV1",
+        "StreamSourceListenerV1",
+        "StreamSseChangeHeadersV1",
+        "StreamSseChangeV1",
+        "StreamSseConsumerEventNameV1",
+        "StreamSseConsumerEventV1",
+        "StreamSseContractV1",
+        "StreamSseControlPayloadV1",
+        "StreamSseDataPayloadV1",
+        "StreamSseErrorCodeV1",
+        "StreamSseErrorPayloadV1",
+        "StreamSseHeartbeatPayloadV1",
+        "StreamSseOffsetV1",
+        "StreamSseParseInputV1",
+        "StreamSseParseResultV1",
+        "StreamSseReductionV1",
+        "StreamSseReplayStateV1",
+        "StreamSseSchemaV1",
+        "StreamSseWireEventNameV1",
+        "StreamSseWireFrameV1",
+        "bindStreamEventSourceV1",
+        "createNetScriptStreamDB",
+        "createNetScriptStreamEventSourceV1",
+        "createStreamSseReplayStateV1",
+        "parseStreamSseEventV1",
+        "reduceStreamSseReplayStateV1",
+        "useLiveQuery",
+        "useLiveSuspenseQuery"
+      ],
+      "native": [
+        {
+          "name": "HeadersRecord",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 153,
+            "col": 0,
+            "byteIndex": 5113
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "typeLiteral",
+            "value": {
+              "indexSignatures": [
+                {
+                  "params": [
+                    {
+                      "kind": "identifier",
+                      "name": "key",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      }
+                    }
+                  ],
+                  "tsType": {
+                    "kind": "union",
+                    "value": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "kind": "parenthesized",
+                        "value": {
+                          "kind": "fnOrConstructor",
+                          "value": {
+                            "constructor": false,
+                            "tsType": {
+                              "repr": "MaybePromise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                ],
+                                "typeName": "MaybePromise",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            },
+                            "params": []
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "location": {
+                    "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                    "line": 154,
+                    "col": 2,
+                    "byteIndex": 5138
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "MaybePromise",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 135,
+            "col": 0,
+            "byteIndex": 4411
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "union",
+            "value": [
+              {
+                "repr": "T",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "T",
+                  "resolution": {
+                    "kind": "typeParam",
+                    "declaringName": "MaybePromise",
+                    "declaringKind": "typeAlias"
+                  }
+                }
+              },
+              {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "value": {
+                  "typeParams": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "raw": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-json-own-1793151630405.stdout",
+      "sha256": "506c3411f62e8b0839961e234e5e4608631fa5ee397241fdeff9e6e9877ed0a5"
+    },
+    {
+      "phase": "candidate",
+      "owner": "workers",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/plugins/workers/streams/mod.ts",
+      "symbolCount": 26,
+      "names": [
+        "CollectionDefinition",
+        "CollectionEventHelpers",
+        "CollectionWithHelpers",
+        "HeadersRecord",
+        "MaybePromise",
+        "StateSchema",
+        "StreamCollection",
+        "StreamDBFactory",
+        "StreamSchemaDefinition",
+        "StreamSchemaIssue",
+        "StreamSchemaValidationOptions",
+        "StreamSchemaValidationResult",
+        "StreamStandardSchema",
+        "StreamStateDefinition",
+        "WorkerExecution",
+        "WorkerExecutionSchema",
+        "WorkerJob",
+        "WorkerJobSchema",
+        "WorkerStreamCollectionDefinition",
+        "WorkerStreamEntitySchema",
+        "WorkerStreamStandardSchema",
+        "WorkersStreamDB",
+        "WorkersStreamDefinition",
+        "WorkersStreamSchema",
+        "createWorkersStreamDB",
+        "workersStreamSchema"
+      ],
+      "native": [
+        {
+          "name": "HeadersRecord",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 153,
+            "col": 0,
+            "byteIndex": 5113
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "typeLiteral",
+            "value": {
+              "indexSignatures": [
+                {
+                  "params": [
+                    {
+                      "kind": "identifier",
+                      "name": "key",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      }
+                    }
+                  ],
+                  "tsType": {
+                    "kind": "union",
+                    "value": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "kind": "parenthesized",
+                        "value": {
+                          "kind": "fnOrConstructor",
+                          "value": {
+                            "constructor": false,
+                            "tsType": {
+                              "repr": "MaybePromise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                ],
+                                "typeName": "MaybePromise",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            },
+                            "params": []
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "location": {
+                    "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                    "line": 154,
+                    "col": 2,
+                    "byteIndex": 5138
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "MaybePromise",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 135,
+            "col": 0,
+            "byteIndex": 4411
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "union",
+            "value": [
+              {
+                "repr": "T",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "T",
+                  "resolution": {
+                    "kind": "typeParam",
+                    "declaringName": "MaybePromise",
+                    "declaringKind": "typeAlias"
+                  }
+                }
+              },
+              {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "value": {
+                  "typeParams": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "raw": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-json-own-1793151630719.stdout",
+      "sha256": "eb37d02fede43bc562df26049d41ab7b39cc33d32d7e11adc16bc3ff5e7a8b84"
+    },
+    {
+      "phase": "candidate",
+      "owner": "fresh-source",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "symbolCount": 11,
+      "names": [
+        "HeadersRecord",
+        "MaybePromise",
+        "NetScriptStateSchema",
+        "NetScriptStreamDB",
+        "NetScriptStreamDBFactory",
+        "NetScriptStreamDBFactoryInput",
+        "NetScriptStreamDBOptions",
+        "NetScriptStreamDBReconnectOptions",
+        "NetScriptStreamDBStatus",
+        "NetScriptStreamStateDefinition",
+        "createNetScriptStreamDB"
+      ],
+      "native": [
+        {
+          "name": "HeadersRecord",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 153,
+            "col": 0,
+            "byteIndex": 5113
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "typeLiteral",
+            "value": {
+              "indexSignatures": [
+                {
+                  "params": [
+                    {
+                      "kind": "identifier",
+                      "name": "key",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      }
+                    }
+                  ],
+                  "tsType": {
+                    "kind": "union",
+                    "value": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "kind": "parenthesized",
+                        "value": {
+                          "kind": "fnOrConstructor",
+                          "value": {
+                            "constructor": false,
+                            "tsType": {
+                              "repr": "MaybePromise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                ],
+                                "typeName": "MaybePromise",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            },
+                            "params": []
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "location": {
+                    "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                    "line": 154,
+                    "col": 2,
+                    "byteIndex": 5138
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "MaybePromise",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 135,
+            "col": 0,
+            "byteIndex": 4411
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "union",
+            "value": [
+              {
+                "repr": "T",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "T",
+                  "resolution": {
+                    "kind": "typeParam",
+                    "declaringName": "MaybePromise",
+                    "declaringKind": "typeAlias"
+                  }
+                }
+              },
+              {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "value": {
+                  "typeParams": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "raw": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-source-json-own-1793151631319.stdout",
+      "sha256": "f793852deaf20e48667894289a8e5ac2512395f8399a1084ba0f9dd8b34faa5e"
+    },
+    {
+      "phase": "candidate",
+      "owner": "workers-source",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/plugins/workers/streams/factory.ts",
+      "symbolCount": 6,
+      "names": [
+        "HeadersRecord",
+        "MaybePromise",
+        "WorkerExecution",
+        "WorkerJob",
+        "WorkersStreamDB",
+        "createWorkersStreamDB"
+      ],
+      "native": [
+        {
+          "name": "HeadersRecord",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 153,
+            "col": 0,
+            "byteIndex": 5113
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "typeLiteral",
+            "value": {
+              "indexSignatures": [
+                {
+                  "params": [
+                    {
+                      "kind": "identifier",
+                      "name": "key",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      }
+                    }
+                  ],
+                  "tsType": {
+                    "kind": "union",
+                    "value": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "kind": "parenthesized",
+                        "value": {
+                          "kind": "fnOrConstructor",
+                          "value": {
+                            "constructor": false,
+                            "tsType": {
+                              "repr": "MaybePromise",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                ],
+                                "typeName": "MaybePromise",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            },
+                            "params": []
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "location": {
+                    "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+                    "line": 154,
+                    "col": 2,
+                    "byteIndex": 5138
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "MaybePromise",
+          "location": {
+            "filename": "file:///C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache/npm/registry.npmjs.org/@durable-streams/client/0.2.7/dist/index.d.ts",
+            "line": 135,
+            "col": 0,
+            "byteIndex": 4411
+          },
+          "kind": "typeAlias",
+          "shape": {
+            "kind": "union",
+            "value": [
+              {
+                "repr": "T",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "T",
+                  "resolution": {
+                    "kind": "typeParam",
+                    "declaringName": "MaybePromise",
+                    "declaringKind": "typeAlias"
+                  }
+                }
+              },
+              {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "value": {
+                  "typeParams": [
+                    {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "MaybePromise",
+                          "declaringKind": "typeAlias"
+                        }
+                      }
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "raw": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-source-json-own-1793151631952.stdout",
+      "sha256": "f9aa3fc321579c14eccd13881bdcf2dc62f156b93dfc28336e22a486baa6e76d"
+    },
+    {
+      "phase": "baseline",
+      "owner": "fresh-source",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "symbolCount": 9,
+      "names": [
+        "NetScriptStateSchema",
+        "NetScriptStreamDB",
+        "NetScriptStreamDBFactory",
+        "NetScriptStreamDBFactoryInput",
+        "NetScriptStreamDBOptions",
+        "NetScriptStreamDBReconnectOptions",
+        "NetScriptStreamDBStatus",
+        "NetScriptStreamStateDefinition",
+        "createNetScriptStreamDB"
+      ],
+      "native": [],
+      "raw": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-source-json-own-1793151764943.stdout",
+      "sha256": "00b68ff0ac2662033e3f4aebcc4129e46a186da5dfa41242159cbd440e2c30e6"
+    },
+    {
+      "phase": "baseline",
+      "owner": "workers-source",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/plugins/workers/streams/factory.ts",
+      "symbolCount": 4,
+      "names": [
+        "WorkerExecution",
+        "WorkerJob",
+        "WorkersStreamDB",
+        "createWorkersStreamDB"
+      ],
+      "native": [],
+      "raw": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-workers-source-json-own-1793151765265.stdout",
+      "sha256": "eeebf05fa1bad6ca40c59d9e956268741dbf402caa339e3bb703c9e195d3263e"
+    },
+    {
+      "phase": "current",
+      "owner": "fresh-source",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/packages/fresh/src/runtime/streams/create-stream-db.ts",
+      "symbolCount": 9,
+      "names": [
+        "NetScriptStateSchema",
+        "NetScriptStreamDB",
+        "NetScriptStreamDBFactory",
+        "NetScriptStreamDBFactoryInput",
+        "NetScriptStreamDBOptions",
+        "NetScriptStreamDBReconnectOptions",
+        "NetScriptStreamDBStatus",
+        "NetScriptStreamStateDefinition",
+        "createNetScriptStreamDB"
+      ],
+      "native": [],
+      "raw": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-fresh-source-json-own-1793151765552.stdout",
+      "sha256": "4999d57a99700dc0ee222d642843e24fd9fcf58f6a6245cef9a6a53b931bccfe"
+    },
+    {
+      "phase": "current",
+      "owner": "workers-source",
+      "url": "file:///C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/plugins/workers/streams/factory.ts",
+      "symbolCount": 4,
+      "names": [
+        "WorkerExecution",
+        "WorkerJob",
+        "WorkersStreamDB",
+        "createWorkersStreamDB"
+      ],
+      "native": [],
+      "raw": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-workers-source-json-own-1793151765884.stdout",
+      "sha256": "1abdf51f84df296aba6c296ab0ef82417d18cc6d5a610213a3dfa318ff89b2e0"
+    }
+  ],
+  "compilerProof": {
+    "results": [
+      {
+        "name": "positive",
+        "args": [
+          "check",
+          "--frozen",
+          "--unstable-kv",
+          "--config",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/tests/type-fixtures/u3-doc-closure/positive.ts"
+        ],
+        "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+        "code": 0,
+        "ts2322Count": 0,
+        "expectedErrors": 0,
+        "deadlineAborted": false,
+        "outputAwaited": true
+      },
+      {
+        "name": "numeric-value",
+        "args": [
+          "check",
+          "--frozen",
+          "--unstable-kv",
+          "--config",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-value.ts"
+        ],
+        "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+        "code": 1,
+        "ts2322Count": 3,
+        "expectedErrors": 3,
+        "deadlineAborted": false,
+        "outputAwaited": true
+      },
+      {
+        "name": "numeric-async",
+        "args": [
+          "check",
+          "--frozen",
+          "--unstable-kv",
+          "--config",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/tests/type-fixtures/u3-doc-closure/numeric-async.ts"
+        ],
+        "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+        "code": 1,
+        "ts2322Count": 3,
+        "expectedErrors": 3,
+        "deadlineAborted": false,
+        "outputAwaited": true
+      },
+      {
+        "name": "map-factory",
+        "args": [
+          "check",
+          "--frozen",
+          "--unstable-kv",
+          "--config",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+          "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/tests/type-fixtures/u3-doc-closure/map-factory.ts"
+        ],
+        "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+        "code": 1,
+        "ts2322Count": 3,
+        "expectedErrors": 3,
+        "deadlineAborted": false,
+        "outputAwaited": true
+      }
+    ],
+    "exactNativeVersion": "0.2.7",
+    "positiveIdentityAssertions": 13,
+    "negativeControls": 3,
+    "negativeSeamErrors": 9,
+    "ownedFixtureRemoved": true,
+    "sourceExecuted": false
+  },
+  "receipts": [
+    {
+      "phase": "baseline",
+      "owner": "fresh",
+      "mode": "lint",
+      "context": "own",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline",
+      "code": 1,
+      "started": "2026-10-28T01:39:57.394Z",
+      "ended": "2026-10-28T01:39:57.755Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 7207,
+      "warning": true,
+      "privateRefCount": 10,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-lint-own-1793151597376",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-lint-own-1793151597376.json",
+      "sha256": "a73c78f7318f9cb5d695b27b5e4f700365815cf1261ecbac3dcdf436148c6f23",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "761fbd4aa4f68358d5cabbb8a8999321fa9567d3d9e5105f987a47afa9404248"
+    },
+    {
+      "phase": "baseline",
+      "owner": "workers",
+      "mode": "lint",
+      "context": "own",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/plugins/workers/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline",
+      "code": 0,
+      "started": "2026-10-28T01:39:57.865Z",
+      "ended": "2026-10-28T01:39:58.082Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 15,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-workers-lint-own-1793151597862",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-workers-lint-own-1793151597862.json",
+      "sha256": "80e0cde83c7721d10366d59cfb3cb3bec0ca7162f1b85129622c3ef420f57fa4",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+    },
+    {
+      "phase": "current",
+      "owner": "fresh",
+      "mode": "lint",
+      "context": "own",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current",
+      "code": 1,
+      "started": "2026-10-28T01:39:58.186Z",
+      "ended": "2026-10-28T01:39:58.437Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 8397,
+      "warning": true,
+      "privateRefCount": 12,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-fresh-lint-own-1793151598183",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-fresh-lint-own-1793151598183.json",
+      "sha256": "ad9910c21c7c3055e2b020c82fd1dba48709a549d7e5b10783a6034c19d462dd",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "36b17a1c220feac402831c6b8096dc42ce12fac14c08bf5c8e59334b61b80257"
+    },
+    {
+      "phase": "current",
+      "owner": "workers",
+      "mode": "lint",
+      "context": "own",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/plugins/workers/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current",
+      "code": 1,
+      "started": "2026-10-28T01:39:58.552Z",
+      "ended": "2026-10-28T01:39:58.740Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 615,
+      "warning": false,
+      "privateRefCount": 1,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-workers-lint-own-1793151598549",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-workers-lint-own-1793151598549.json",
+      "sha256": "ab97652337696324ce9eefaaec150eae49cbf1b5c9e95d520040a7fba63306eb",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "a36194b3aac71f682cdfd9f3f3a2885084d3579de0035aba60b56cdc9607c4b5"
+    },
+    {
+      "phase": "candidate",
+      "owner": "fresh",
+      "mode": "lint",
+      "context": "own",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+      "code": 1,
+      "started": "2026-10-28T01:39:58.853Z",
+      "ended": "2026-10-28T01:39:59.102Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 7217,
+      "warning": true,
+      "privateRefCount": 10,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-lint-own-1793151598849",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-lint-own-1793151598849.json",
+      "sha256": "10127c2f4f6558009060850b7971a803247b5bb46c03557d259a38b6bc3dec9a",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "57f6c110e8cc8f064c662a294f0c0dcbcd8f09a1780d9e0cc88ac8fbbe94057f"
+    },
+    {
+      "phase": "candidate",
+      "owner": "workers",
+      "mode": "lint",
+      "context": "own",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/plugins/workers/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+      "code": 0,
+      "started": "2026-10-28T01:39:59.220Z",
+      "ended": "2026-10-28T01:39:59.413Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 15,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-lint-own-1793151599217",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-lint-own-1793151599217.json",
+      "sha256": "9df92022992d187494830a7d2d9a690cbf0cf01ff5e455effa92cc6357d1b4e9",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "2575a1b59e90591280fb03b5c22f783810b1dde862cd5891b5cfc9282a8f77c7"
+    },
+    {
+      "phase": "baseline",
+      "owner": "fresh",
+      "mode": "json",
+      "context": "own",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline",
+      "code": 0,
+      "started": "2026-10-28T01:40:29.186Z",
+      "ended": "2026-10-28T01:40:29.404Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 221164,
+      "stderrBytes": 0,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-json-own-1793151629183",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-json-own-1793151629183.json",
+      "sha256": "e9b72fab1927ee29cbc2777029ac3c74545761971e5f4a23114f0fd32cf545f5",
+      "stdoutSha256": "f9495b4457a51d917127dc6228ac5a2797fd43c522c583db951c3ea9935c8908",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "baseline",
+      "owner": "workers",
+      "mode": "json",
+      "context": "own",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/plugins/workers/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline",
+      "code": 0,
+      "started": "2026-10-28T01:40:29.515Z",
+      "ended": "2026-10-28T01:40:29.688Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 183010,
+      "stderrBytes": 0,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-workers-json-own-1793151629511",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-workers-json-own-1793151629511.json",
+      "sha256": "7b09d576e7e8f5bb3debed45df20cac48e68fd0205258a14daea8789da646909",
+      "stdoutSha256": "7554c11a425b525af15522221e113cf323b0b76b7f4a8e9bdb26b3ea90a89a45",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "current",
+      "owner": "fresh",
+      "mode": "json",
+      "context": "own",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current",
+      "code": 0,
+      "started": "2026-10-28T01:40:29.790Z",
+      "ended": "2026-10-28T01:40:30.004Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 222357,
+      "stderrBytes": 0,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-fresh-json-own-1793151629786",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-fresh-json-own-1793151629786.json",
+      "sha256": "04aea02cf35b4b77fa4cb4b0ae59ef4eaca4a0f8dd8fec986765a43daaef8b15",
+      "stdoutSha256": "0243dffd983dc1d2078c126c7ea720ed20086961064b53428c8f1e341ae47680",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "current",
+      "owner": "workers",
+      "mode": "json",
+      "context": "own",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/plugins/workers/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current",
+      "code": 0,
+      "started": "2026-10-28T01:40:30.108Z",
+      "ended": "2026-10-28T01:40:30.293Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 184260,
+      "stderrBytes": 0,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-workers-json-own-1793151630105",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-workers-json-own-1793151630105.json",
+      "sha256": "15121460ba7a3d2e0bfd05c40886e76791e0ff631d770e2a7af984029ccffc97",
+      "stdoutSha256": "5577da4853fd9eda4f9e40d3b3f2c61f8eeb38b1d07fd03be9a79fe52890bec3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "candidate",
+      "owner": "fresh",
+      "mode": "json",
+      "context": "own",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+      "code": 0,
+      "started": "2026-10-28T01:40:30.409Z",
+      "ended": "2026-10-28T01:40:30.623Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 229153,
+      "stderrBytes": 0,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-json-own-1793151630405",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-json-own-1793151630405.json",
+      "sha256": "d1565018cf6d2f6ddaa005b0f168f98613b421dd72ace2cbc90624e289c71838",
+      "stdoutSha256": "506c3411f62e8b0839961e234e5e4608631fa5ee397241fdeff9e6e9877ed0a5",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "candidate",
+      "owner": "workers",
+      "mode": "json",
+      "context": "own",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/plugins/workers/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+      "code": 0,
+      "started": "2026-10-28T01:40:30.722Z",
+      "ended": "2026-10-28T01:40:30.906Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 190974,
+      "stderrBytes": 0,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-json-own-1793151630719",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-json-own-1793151630719.json",
+      "sha256": "cfff017b17e9adaf238401c635a0bb6fae1bafff4744e8fb517b85f2f3a2cd3a",
+      "stdoutSha256": "eb37d02fede43bc562df26049d41ab7b39cc33d32d7e11adc16bc3ff5e7a8b84",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "candidate",
+      "owner": "fresh-source",
+      "mode": "lint",
+      "context": "own",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/src/runtime/streams/create-stream-db.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+      "code": 1,
+      "started": "2026-10-28T01:40:31.020Z",
+      "ended": "2026-10-28T01:40:31.200Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 2276,
+      "warning": false,
+      "privateRefCount": 3,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-source-lint-own-1793151631017",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-source-lint-own-1793151631017.json",
+      "sha256": "4d4f8571102e0f561b24f495f7208cac5a10cd554abf6b4896ce58d87393ed34",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "8f4be4f859e30a77b7103c494fe957cc0bad114539d9e96dfa7d62f29647e819"
+    },
+    {
+      "phase": "candidate",
+      "owner": "fresh-source",
+      "mode": "json",
+      "context": "own",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/src/runtime/streams/create-stream-db.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+      "code": 0,
+      "started": "2026-10-28T01:40:31.322Z",
+      "ended": "2026-10-28T01:40:31.513Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 57738,
+      "stderrBytes": 0,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-source-json-own-1793151631319",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-source-json-own-1793151631319.json",
+      "sha256": "3a932aa2610353b3387bc8c4f9a178a89266bf6642861289e32dac9a57846990",
+      "stdoutSha256": "f793852deaf20e48667894289a8e5ac2512395f8399a1084ba0f9dd8b34faa5e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "candidate",
+      "owner": "workers-source",
+      "mode": "lint",
+      "context": "own",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/plugins/workers/streams/factory.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+      "code": 1,
+      "started": "2026-10-28T01:40:31.634Z",
+      "ended": "2026-10-28T01:40:31.804Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 645,
+      "warning": false,
+      "privateRefCount": 1,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-source-lint-own-1793151631631",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-source-lint-own-1793151631631.json",
+      "sha256": "e9c524a3885dc9ad169ec5d9e0658b48cf25c4e607fdf48bfd2467f55fd82d7c",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e8c58cd01a624213335eb9330757bb5962f069ba1a5b11b18b8ff0c34a0e95e2"
+    },
+    {
+      "phase": "candidate",
+      "owner": "workers-source",
+      "mode": "json",
+      "context": "own",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/plugins/workers/streams/factory.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+      "code": 0,
+      "started": "2026-10-28T01:40:31.956Z",
+      "ended": "2026-10-28T01:40:32.124Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 52995,
+      "stderrBytes": 0,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-source-json-own-1793151631952",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-source-json-own-1793151631952.json",
+      "sha256": "3ad7b1e2a964f16de556b68581faca2473d06aadb965f9fb43d5b2184412939b",
+      "stdoutSha256": "f9aa3fc321579c14eccd13881bdcf2dc62f156b93dfc28336e22a486baa6e76d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "candidate",
+      "owner": "fresh",
+      "mode": "lint",
+      "context": "shipping",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+      "code": 1,
+      "started": "2026-10-28T01:40:32.241Z",
+      "ended": "2026-10-28T01:40:32.407Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 3296,
+      "warning": true,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-lint-shipping-1793151632238",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-lint-shipping-1793151632238.json",
+      "sha256": "41801db32ee77280dcc2f48e274c80c86d10d90f39bb21919179d0dd60a0cd78",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "488b902d3e9a64017ad04a5ad7c43fecea6de8039938add521974196b32764af"
+    },
+    {
+      "phase": "candidate",
+      "owner": "fresh",
+      "mode": "json",
+      "context": "shipping",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+      "code": 1,
+      "started": "2026-10-28T01:40:32.527Z",
+      "ended": "2026-10-28T01:40:32.688Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 3296,
+      "warning": true,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-json-shipping-1793151632523",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-json-shipping-1793151632523.json",
+      "sha256": "adfcfd5ee3ae08530fffba0b1f430843191de5ff5fadcd27eb46f073316939b8",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "488b902d3e9a64017ad04a5ad7c43fecea6de8039938add521974196b32764af"
+    },
+    {
+      "phase": "candidate",
+      "owner": "workers",
+      "mode": "lint",
+      "context": "shipping",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/plugins/workers/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+      "code": 0,
+      "started": "2026-10-28T01:40:32.798Z",
+      "ended": "2026-10-28T01:40:32.964Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 1157,
+      "warning": true,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-lint-shipping-1793151632795",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-lint-shipping-1793151632795.json",
+      "sha256": "25553c0ee3890fd2d7fe6465f2b5b354a8f2a96db0d024a0e63999366562889d",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "ca976a4270731b39ee0cf6a38c5ef26129af687a0d5bb6668ec164e3e19e12cd"
+    },
+    {
+      "phase": "candidate",
+      "owner": "workers",
+      "mode": "json",
+      "context": "shipping",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/plugins/workers/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+      "code": 0,
+      "started": "2026-10-28T01:40:33.074Z",
+      "ended": "2026-10-28T01:40:33.248Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 178965,
+      "stderrBytes": 1142,
+      "warning": true,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-json-shipping-1793151633071",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-json-shipping-1793151633071.json",
+      "sha256": "3b1cbd4e2125644981c813a058e34be051ecac1b6f63d62eaa532aa94b3d1522",
+      "stdoutSha256": "7b183b2f6cb7d461d131244fec064fb392f7f094b441df34b89a884f0315b597",
+      "stderrSha256": "c3aba61a4e437d9e3f3321ef405d02875ae91f2d7c7004258a9e0c8f48f1e19f"
+    },
+    {
+      "phase": "baseline",
+      "owner": "fresh",
+      "mode": "lint",
+      "context": "own",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline",
+      "code": 1,
+      "started": "2026-10-28T01:41:06.688Z",
+      "ended": "2026-10-28T01:41:06.966Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 6935,
+      "warning": false,
+      "privateRefCount": 10,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-lint-own-1793151666685",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-lint-own-1793151666685.json",
+      "sha256": "a1107b8aed1f3dabb94651d7de245d1bb2a3a7ce7beb0ce91740d00fe5f0902b",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "f144744216dc95fbd20873d373295d4ce1ea43b93773b15e342d36029a9dd3f8"
+    },
+    {
+      "phase": "current",
+      "owner": "fresh",
+      "mode": "lint",
+      "context": "own",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current",
+      "code": 1,
+      "started": "2026-10-28T01:41:07.104Z",
+      "ended": "2026-10-28T01:41:07.322Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 8125,
+      "warning": false,
+      "privateRefCount": 12,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-fresh-lint-own-1793151667100",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-fresh-lint-own-1793151667100.json",
+      "sha256": "1858c3e7a6f1efff340599a248db5a4f215c166fadce9ad154a19cd8f3454e47",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "cb3fd9e8da834ab9a6087999bfa33a454760d7f206736c1825a200b0bd9a69c3"
+    },
+    {
+      "phase": "candidate",
+      "owner": "fresh",
+      "mode": "lint",
+      "context": "own",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate",
+      "code": 1,
+      "started": "2026-10-28T01:41:07.436Z",
+      "ended": "2026-10-28T01:41:07.647Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 6945,
+      "warning": false,
+      "privateRefCount": 10,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-lint-own-1793151667432",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-lint-own-1793151667432.json",
+      "sha256": "d77c154bc5d37f20e69134487705cf9ea155d512054318b40e669ed9702d1007",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "94db1ccf3a164f8a70f38983f71d010ca0d9366b4e2585668953810a854bf6e7"
+    },
+    {
+      "phase": "candidate",
+      "owner": "fresh",
+      "mode": "lint",
+      "context": "shipping-map",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "--import-map",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+      "code": 1,
+      "started": "2026-10-28T01:41:07.764Z",
+      "ended": "2026-10-28T01:41:07.969Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 6915,
+      "warning": true,
+      "privateRefCount": 9,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-lint-shipping-map-1793151667760",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-lint-shipping-map-1793151667760.json",
+      "sha256": "f9d89b8adaaa0d1ccba7c8b2fb68241af669435822055b7f4ba8db2efdf65fd3",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "3e72d7d911f9978a7f7ac1f9bc986a9b6e081c7bca9c0794d0613aa5e95fd4fb"
+    },
+    {
+      "phase": "candidate",
+      "owner": "fresh",
+      "mode": "json",
+      "context": "shipping-map",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "--import-map",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/packages/fresh/src/runtime/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+      "code": 0,
+      "started": "2026-10-28T01:41:08.099Z",
+      "ended": "2026-10-28T01:41:08.308Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 223665,
+      "stderrBytes": 626,
+      "warning": true,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-json-shipping-map-1793151668096",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-fresh-json-shipping-map-1793151668096.json",
+      "sha256": "5da3a3f7c249bb81b903fc09ab17d1d8cb83f67fb29ddc53f42ea7a81cfb1158",
+      "stdoutSha256": "e0fe0fde010f4d297e9f47fd2a5e4aed6cadf27e9f527bc238aa868896df1c46",
+      "stderrSha256": "dad3f40a14d1814f5a42e69404ccad232458c9aef567cda0117c0ac0f32ca258"
+    },
+    {
+      "phase": "candidate",
+      "owner": "workers",
+      "mode": "lint",
+      "context": "shipping-map",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "--import-map",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/plugins/workers/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/plugins/workers/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+      "code": 0,
+      "started": "2026-10-28T01:41:08.431Z",
+      "ended": "2026-10-28T01:41:08.620Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 1157,
+      "warning": true,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-lint-shipping-map-1793151668427",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-lint-shipping-map-1793151668427.json",
+      "sha256": "cad10ba74fca1232d9608a33ab7560ca7b313f1e7198ba1c2a6ee827d23c74c0",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "ca976a4270731b39ee0cf6a38c5ef26129af687a0d5bb6668ec164e3e19e12cd"
+    },
+    {
+      "phase": "candidate",
+      "owner": "workers",
+      "mode": "json",
+      "context": "shipping-map",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/deno.json",
+        "--import-map",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/plugins/workers/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate/plugins/workers/streams/mod.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008",
+      "code": 0,
+      "started": "2026-10-28T01:41:08.733Z",
+      "ended": "2026-10-28T01:41:08.910Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 178965,
+      "stderrBytes": 1142,
+      "warning": true,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-json-shipping-map-1793151668729",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate-workers-json-shipping-map-1793151668729.json",
+      "sha256": "fb9b8b358afb06918e139c2e70ba0a93312b0498895bd5d70ccab073ea3affe0",
+      "stdoutSha256": "7b183b2f6cb7d461d131244fec064fb392f7f094b441df34b89a884f0315b597",
+      "stderrSha256": "c3aba61a4e437d9e3f3321ef405d02875ae91f2d7c7004258a9e0c8f48f1e19f"
+    },
+    {
+      "phase": "baseline",
+      "owner": "fresh-source",
+      "mode": "json",
+      "context": "own",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/packages/fresh/src/runtime/streams/create-stream-db.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline",
+      "code": 0,
+      "started": "2026-10-28T01:42:44.947Z",
+      "ended": "2026-10-28T01:42:45.155Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 49186,
+      "stderrBytes": 0,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-source-json-own-1793151764943",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-source-json-own-1793151764943.json",
+      "sha256": "8a7e47716fb2d2b7fa076114cf4ada8778d187b046133e8bdacf85f119333156",
+      "stdoutSha256": "00b68ff0ac2662033e3f4aebcc4129e46a186da5dfa41242159cbd440e2c30e6",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "baseline",
+      "owner": "workers-source",
+      "mode": "json",
+      "context": "own",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/plugins/workers/streams/factory.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline",
+      "code": 0,
+      "started": "2026-10-28T01:42:45.269Z",
+      "ended": "2026-10-28T01:42:45.445Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 44499,
+      "stderrBytes": 0,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-workers-source-json-own-1793151765265",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-workers-source-json-own-1793151765265.json",
+      "sha256": "8eafd04fb147101566bad648e31ceaf3f2a3e8c008ddc48b2506fde4734d7f19",
+      "stdoutSha256": "eeebf05fa1bad6ca40c59d9e956268741dbf402caa339e3bb703c9e195d3263e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "current",
+      "owner": "fresh-source",
+      "mode": "json",
+      "context": "own",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/packages/fresh/src/runtime/streams/create-stream-db.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current",
+      "code": 0,
+      "started": "2026-10-28T01:42:45.555Z",
+      "ended": "2026-10-28T01:42:45.766Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 50890,
+      "stderrBytes": 0,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-fresh-source-json-own-1793151765552",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-fresh-source-json-own-1793151765552.json",
+      "sha256": "4b50574d9c7815f70da14c0a3e0ed25b19411f641dc4af20b78d051552a5b532",
+      "stdoutSha256": "4999d57a99700dc0ee222d642843e24fd9fcf58f6a6245cef9a6a53b931bccfe",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "current",
+      "owner": "workers-source",
+      "mode": "json",
+      "context": "own",
+      "args": [
+        "doc",
+        "--json",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current/plugins/workers/streams/factory.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current",
+      "code": 0,
+      "started": "2026-10-28T01:42:45.887Z",
+      "ended": "2026-10-28T01:42:46.062Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 46139,
+      "stderrBytes": 0,
+      "warning": false,
+      "privateRefCount": 0,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-workers-source-json-own-1793151765884",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/current-workers-source-json-own-1793151765884.json",
+      "sha256": "2382c63ad286fff7b98c1b2200674a5fa8a79e494ead1b446b9b791e215fb963",
+      "stdoutSha256": "1abdf51f84df296aba6c296ab0ef82417d18cc6d5a610213a3dfa318ff89b2e0",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "baseline",
+      "owner": "fresh-source",
+      "mode": "lint",
+      "context": "own",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/packages/fresh/src/runtime/streams/create-stream-db.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline",
+      "code": 1,
+      "started": "2026-10-28T01:42:46.168Z",
+      "ended": "2026-10-28T01:42:46.346Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 2273,
+      "warning": false,
+      "privateRefCount": 3,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-source-lint-own-1793151766165",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-fresh-source-lint-own-1793151766165.json",
+      "sha256": "5fc49069c12ed557a4a6f1cdaaed1eb334e5a64f9c365568cde29bbd44edddac",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "d0e42d06663233b91d85c0398bae7c855e582603a85b7ab3371c142d77f17a03"
+    },
+    {
+      "phase": "baseline",
+      "owner": "workers-source",
+      "mode": "lint",
+      "context": "own",
+      "args": [
+        "doc",
+        "--lint",
+        "--frozen",
+        "--config",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/deno.json",
+        "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline/plugins/workers/streams/factory.ts"
+      ],
+      "cwd": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline",
+      "code": 1,
+      "started": "2026-10-28T01:42:46.459Z",
+      "ended": "2026-10-28T01:42:46.643Z",
+      "deadlineAborted": false,
+      "outputAwaited": true,
+      "stdoutBytes": 0,
+      "stderrBytes": 644,
+      "warning": false,
+      "privateRefCount": 1,
+      "prefix": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-workers-source-lint-own-1793151766455",
+      "receipt": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/baseline-workers-source-lint-own-1793151766455.json",
+      "sha256": "3c7e4ed6af1c284b4fb330b8ba3069b72864976cf219b02dd5171c0240debce1",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "04cc3ef13d991354024043653dcad98b4fe780fa07f8b9a694ffa8e58239f334"
+    }
+  ],
+  "diff": {
+    "path": "C:\\Users\\ericc\\source\\repos\\netscript-browser-stream-headers-008/.llm/tmp/u3-doc-closure-exact-20261028/candidate.diff",
+    "sha256": "3c7170d3ef8a271ac81f221e5e867461702c08a2338a317b0117a7ea6f1126c1",
+    "owners": 4,
+    "added": 8,
+    "removed": 2
+  },
+  "shippingTrackedTreeClean": true,
+  "qualifiedDocZeroOnlyWorkers": true,
+  "baselineTenFreshFindingsUnwaived": true
+}

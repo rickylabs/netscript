@@ -83,3 +83,33 @@ function contextWithRegistry(source: string, configKey: string) {
     },
   } as const;
 }
+
+for (
+  const [label, source, ok] of [
+    [
+      'complete empty',
+      'export const jobHandlersById = Object.freeze({});\nexport const jobDefinitionsById = Object.freeze({});\nexport const jobDefinitions = new Map(Object.entries(jobDefinitionsById));\nexport const registry = new Map();',
+      true,
+    ],
+    ['truncated', '/** Registry - AUTO-GENERATED */', false],
+    ['missing runtime map', 'export const jobDefinitionsById = Object.freeze({});', false],
+  ] as const
+) {
+  Deno.test('workers doctor checks ' + label + ' registry structure', async () => {
+    const report = await runDoctorCommand({
+      plugin: workersAdapterPlugin,
+      context: {
+        workspaceRoot: '/workspace',
+        options: {},
+        config: { WORKERS_API_URL: 'configured' },
+        dryRun: true,
+        fileSystem: {
+          exists: () => Promise.resolve(true),
+          readText: () => Promise.resolve(source),
+          writeText: () => Promise.reject(new Error('read only')),
+        },
+      },
+    });
+    assertEquals(report.checks.every((check) => check.ok), ok);
+  });
+}

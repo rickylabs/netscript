@@ -1,0 +1,7 @@
+# Root S3f scope authorization
+
+Root read the complete s3f-workers-drain-proposal.md (SHA2563ca8889522f46be5340f1802557ef1464b96c8ee4244154e5ede4faa157c855b) and verified published draft PR2421 head9f880c6a4be6e1a92bcf2cdfbb6cd70a2d1eb88b. Authorize the exact next native Astra/xhigh implementation in the same initialized worktree when a slot is available.
+
+Only append to service-lifecycle_test.ts, preserving its accepted109-line prefix byte-exact; total cap270 readable physical lines. One real auth-gated in-flight request, two actual stop promises pending before release, real response and stop completion afterward, port/KV ownership, plus the explicitly labeled already-fulfilled observation negative control. Native stop must remain real in both cases. No new public/production/helper/permission/config/lock/debt owner. Keep every sanitizer, primary failure ordering, bounded children and cleanup. If native drain fails, preserve the failure and return without an unreviewed production patch. Root acceptance remains required before committing. Ten owning tests and exact four-file/quality/protected-byte gates as proposed.
+
+Existing-agent followup uses its already successfully initialized exact worktree; this scope does not require reinitializing or rewriting installed docs again. No paid or other model fallback. Legacy and streams implementation are not included; next briefs must resolve their concrete fixture/type/compatibility authority. This authorization is not an independent IMPL verdict, readiness, merge, closure or release.

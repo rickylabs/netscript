@@ -1,0 +1,18 @@
+﻿{
+    "name":  "final-audit-v4",
+    "startedUtc":  "2026-10-28T01:41:43.4715934Z",
+    "finishedUtc":  "2026-10-28T01:41:45.7341982Z",
+    "executable":  "C:\\Users\\ericc\\source\\repos\\eis-chat-netscript-008-s01\\.netscript\\agent\\toolchains\\deno-2.9.7\\deno.exe",
+    "arguments":  [
+                      "run",
+                      "--cached-only",
+                      "--frozen",
+                      "--allow-read",
+                      "--allow-write",
+                      "--allow-run",
+                      ".llm/tmp/native-service-qualification-sol-20261028/audit.ts"
+                  ],
+    "exitCode":  0,
+    "stdout":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-qualification-sol-20261028\\final-audit-v4.stdout.log",
+    "stderr":  "C:\\Users\\ericc\\source\\repos\\netscript-native-service-policy-008\\.llm\\tmp\\native-service-qualification-sol-20261028\\final-audit-v4.stderr.log"
+}

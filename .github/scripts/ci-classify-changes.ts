@@ -48,7 +48,7 @@
  *
  * SAFETY PROPERTY (unit-tested): an unrecognised path forces EVERY output
  * true. The classifier NEVER skips because it failed to classify. Non-PR
- * events (no diff) and empty diffs also force everything.
+ * events without an explicitly supplied Pages push diff and empty diffs also force everything.
  *
  * This module is pure (`decide`) plus a thin CLI. The CLI reads small inputs
  * from env, reads the potentially large rename-aware diff from a file, and
@@ -269,8 +269,27 @@ export function classifyPath(
     // executable inputs. Their contents must not fan out into runtime lanes.
     return { ...NONE };
   }
+  if (path.startsWith('docs/site/_plan/') && hasExtension(path, DOCS_EXTENSIONS)) {
+    // Lume excludes this historical planning directory; it is not rendered content.
+    return { ...NONE, docs: true };
+  }
+  if (path.startsWith('tools/docs-site/')) {
+    const documentation = hasExtension(path, DOCS_EXTENSIONS);
+    return {
+      ...NONE,
+      deno: hasExtension(path, CODE_EXTENSIONS),
+      docs: documentation,
+      pages: !documentation,
+    };
+  }
   if (path.startsWith('tools/fresh-ui-browser/')) {
-    return { ...NONE, freshUi: true };
+    return {
+      ...NONE,
+      freshUi: true,
+      pages: path.startsWith('tools/fresh-ui-browser/docs-tests/') ||
+        /\/docs\.(?:playwright\.config\.ts|deno\.json)$/.test(path) ||
+        /\/package(?:-lock)?\.json$/.test(path),
+    };
   }
   if (path.startsWith('tools/design-sync/')) {
     return { ...NONE, deno: hasExtension(path, CODE_EXTENSIONS) };
@@ -345,6 +364,8 @@ export function isDocsOnlyPath(path: string, rootDenoConfig?: DenoConfigChange):
 export interface DecisionInput {
   /** GitHub event name (e.g. `pull_request`, `workflow_dispatch`). */
   eventName: string;
+  /** Pages may classify an explicitly computed complete push diff; other non-PR callers run fully. */
+  classifyPush?: boolean;
   /** Changed file paths (relative to repo root). */
   files: readonly string[];
   /** PR label names. */
@@ -391,9 +412,8 @@ function fullDecision(docsOnly: boolean, reason: string, sqliteReason: string): 
 }
 
 /**
- * Pure decision function. `workflow_dispatch` (and any non-PR event) always
- * runs everything because there is no diff to classify; an empty PR diff
- * does the same.
+ * Pure decision function. Non-PR events run everything unless Pages explicitly
+ * supplies a complete push diff. Empty/unavailable diffs still run everything.
  */
 export function decide(input: DecisionInput): Decision {
   const labels = new Set(input.labels);
@@ -403,7 +423,7 @@ export function decide(input: DecisionInput): Decision {
 
   // No diff to classify (manual dispatch, push, etc.) -> run everything
   // unless an explicit skip label is present. `ci:full` still wins.
-  if (input.eventName !== 'pull_request') {
+  if (input.eventName !== 'pull_request' && !(input.eventName === 'push' && input.classifyPush)) {
     if (forceFull) {
       return fullDecision(
         false,
@@ -616,10 +636,11 @@ export function sanitizeReason(reason: string): string {
 
 async function main(): Promise<void> {
   const eventName = Deno.env.get('EVENT_NAME') ?? 'pull_request';
+  const classifyPush = eventName === 'push' && Deno.env.get('CLASSIFY_PUSH_DIFF') === 'true';
   // A single Linux argv/env entry is limited to 128 KiB. Large cleanup PRs
   // can exceed that even while remaining far below GitHub's diff limits, so
   // workflows pass the rename-aware diff by file instead of one env value.
-  const nameStatusPath = eventName === 'pull_request'
+  const nameStatusPath = eventName === 'pull_request' || classifyPush
     ? Deno.env.get('CHANGED_NAME_STATUS_FILE')
     : undefined;
   const nameStatus = await readNameStatusInput(
@@ -636,6 +657,7 @@ async function main(): Promise<void> {
 
   const decision = decide({
     eventName,
+    classifyPush,
     files,
     labels,
     rootDenoConfig: {

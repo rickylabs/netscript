@@ -5,8 +5,8 @@ import { checkGeneratedFiles } from '../../../../../../../../.llm/tools/testing/
  * Compiles emitted helpers against the relevant restored Aspire 13.5.3 SDK contract.
  */
 
-import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
-import { resolve } from 'jsr:@std/path@^1';
+import { assert, assertEquals, assertStringIncludes } from '@std/assert';
+import { resolve } from '@std/path';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
 import { writeGeneratedHelperFixture } from './generated-helper-fixture.ts';
 import { EMPTY_CONFIG, MINIMAL_DATABASE } from './generators-test-support.ts';
@@ -43,6 +43,7 @@ export interface EndpointReference {
 
 export interface AspireResource {
   withEndpoint(options: { name: string; scheme: string; port?: number; targetPort?: number }): AspireResource;
+  withArgs(args: string[]): AspireResource;
   withArgsCallback(callback: (context: CommandLineArgsCallbackContext) => Promise<void>): Promise<AspireResource>;
   waitFor(resource: AspireResource): AspireResource;
   withReference(resource: AspireResource): AspireResource;
@@ -149,6 +150,7 @@ Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contr
       ...EMPTY_CONFIG,
       Databases: { main: MINIMAL_DATABASE },
       Cache: {
+        container: { Enabled: true, Engine: 'Garnet', Mode: 'Container' },
         executable: { Enabled: true, Engine: 'Garnet', Mode: 'Executable' },
         auto: { Enabled: true, Engine: 'Garnet', Mode: 'Auto', Port: 6385 },
       },
@@ -160,6 +162,7 @@ Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contr
     );
     assertStringIncludes(registerInfrastructure, 'databases.set("main", db_0)');
     assertStringIncludes(registerInfrastructure, 'withHealthCheck("main_auth")');
+    assertStringIncludes(registerInfrastructure, '.withArgs(["--lua","--lua-transaction-mode"])');
     assert(
       !registerInfrastructure.includes('connectionStringExpression()'),
       'compile-clean Container emission must not call an unsupported runtime capability',

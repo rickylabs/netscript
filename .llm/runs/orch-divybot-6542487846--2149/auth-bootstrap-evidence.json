@@ -1,0 +1,90 @@
+{
+  "contract": "Only better-auth requests host SQL and configures service database context; KV and WorkOS do not. Client selection and registry construction share the same effective configuration.",
+  "records": [
+    {
+      "name": "KV and WorkOS throwing SQL seams before fix",
+      "exitCode": 1,
+      "summary": {
+        "passed": 13,
+        "failed": 2,
+        "ignored": 0,
+        "totalResults": 15,
+        "uniqueFailures": 2
+      }
+    },
+    {
+      "name": "focused bootstrap controls after fix",
+      "exitCode": 0,
+      "summary": {
+        "passed": 15,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 15,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "name": "all auth service tests after fix",
+      "exitCode": 0,
+      "summary": {
+        "passed": 99,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 99,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "name": "scoped source check",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      }
+    },
+    {
+      "name": "scoped source lint",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      }
+    },
+    {
+      "name": "scoped source format",
+      "exitCode": 0,
+      "summary": {
+        "filesSelected": 5,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      }
+    }
+  ],
+  "qualityGate": {
+    "command": "deno task quality:gate",
+    "exitCode": 0
+  },
+  "corpusFreshness": {
+    "command": "deno task check:mcp-export-corpus",
+    "exitCode": 0
+  },
+  "failureEvidence": "https://github.com/rickylabs/netscript/actions/runs/41202168922/job/124540122768",
+  "mainPass": "https://github.com/rickylabs/netscript/actions/runs/41197676281/job/124527157448",
+  "historicalSQLite": {
+    "head": "3b219fd2f90346eaffa83935434f106a41a57e5a",
+    "job": "https://github.com/rickylabs/netscript/actions/runs/41202168922/job/124540122817",
+    "summary": {
+      "passed": 113,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "newHeadIndependentAcceptance": "UNPROVEN; coordinator explicitly authorizes one new PostgreSQL CI-repair delta evaluation: https://github.com/rickylabs/netscript/pull/2519#issuecomment-6543624351. Initial five rounds remain historical; next bounded round is6, not launched yet.",
+  "newHeadFullRuntime": "UNPROVEN; CI-only rerun required"
+}

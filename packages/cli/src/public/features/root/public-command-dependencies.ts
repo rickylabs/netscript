@@ -1,3 +1,8 @@
+import { prepareInitPreset } from '../../../kernel/application/ui/v2/presets/apply-init-preset.ts';
+import { FetchUiRegistry } from '../../../kernel/adapters/ui/fetch-ui-registry.ts';
+import type { UiRegistryDependencies } from '../../../kernel/application/ui/v2/registry-client.ts';
+import { DenoUiRegistryPaths } from '../../../kernel/adapters/ui/deno-ui-registry-paths.ts';
+import type { UiRegistryPathPort } from '../../../kernel/ports/ui-registry-port.ts';
 import { createContributionExtractor } from '../../../kernel/adapters/plugin/contribution-extractor.ts';
 import { DenoProjectStage } from '../../../kernel/adapters/runtime/file-system/deno-project-stage.ts';
 import type { ProjectStagePort } from '../../../kernel/ports/project-stage-port.ts';
@@ -31,6 +36,8 @@ import { resolveManifest } from '../../../kernel/adapters/deploy/commands/manife
 import { DenoProcess } from '../../../kernel/adapters/runtime/process/deno-process.ts';
 import { DenoGeneratedSourceFormatter } from '../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { DenoFileSystem } from '../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
+import { FreshUiTokenEngine } from '../../../kernel/adapters/tokens/fresh-ui-token-engine.ts';
+import type { TokenEnginePort } from '../../../kernel/ports/token-engine-port.ts';
 import { DryRunFileSystemAdapter } from '../../../kernel/adapters/scaffold/dry-run-fs.ts';
 import { CliffyPrompt } from '../../../kernel/adapters/runtime/prompt/cliffy-prompt.ts';
 import { Scaffolder } from '../../../kernel/adapters/scaffold/scaffolder.ts';
@@ -97,10 +104,14 @@ import type {
 
 /** Dependencies shared by public command groups. */
 export interface PublicCommandDependencies {
+  /** Physical containment guard for registry source and destination paths. */
+  readonly uiRegistryPaths: UiRegistryPathPort;
   /** Isolated project staging for validated plugin updates. */
   readonly projectStage: ProjectStagePort;
   /** Filesystem adapter used by scaffold and config flows. */
   readonly fs: DenoFileSystem;
+  /** Lazily load the public Fresh UI token builder for token commands. */
+  readonly tokenEngine: TokenEnginePort;
   /** Process adapter used by init and deployment flows. */
   readonly process: DenoProcess;
   /** Template renderer used by scaffold flows. */
@@ -124,9 +135,7 @@ export interface PublicCommandDependencies {
   /** Dependencies for public init. */
   readonly initCommandDependencies: InitCommandDependencies;
   /** Dependencies for Fresh UI registry installation commands. */
-  readonly uiInstallDependencies: {
-    readonly fs: DenoFileSystem;
-  };
+  readonly uiInstallDependencies: UiRegistryDependencies;
   /** Canonical source formatting shared by page-removal validation. */
   readonly uiPageFormatter: GeneratedSourceFormatterPort;
   /** Dependencies for DB lifecycle commands. */
@@ -319,7 +328,16 @@ export function createPublicCommandDependencies(
     generatedSourceFormatter,
   );
 
+  const uiRegistryPaths = new DenoUiRegistryPaths();
+  const tokenEngine = new FreshUiTokenEngine();
+  const uiInstallDependencies = {
+    fs,
+    transport: new FetchUiRegistry(),
+    paths: uiRegistryPaths,
+    tokenEngine,
+  };
   return {
+    uiRegistryPaths,
     fs,
     process,
     templateAdapter,
@@ -328,9 +346,11 @@ export function createPublicCommandDependencies(
     dbRegistry,
     loadConfig,
     runtimeConfigStore,
+    tokenEngine,
     resolveProjectRoot,
     resolveUiAppRoot,
     initCommandDependencies: {
+      preparePreset: (preset) => prepareInitPreset(preset, uiInstallDependencies),
       initAgent: (input) =>
         initAgent(input, {
           fs: new DenoAgentInitFileSystem(),
@@ -345,7 +365,7 @@ export function createPublicCommandDependencies(
         dryRun ? createInitContext(new DryRunFileSystemAdapter(fs)) : initContext,
     },
     uiPageFormatter: generatedSourceFormatter,
-    uiInstallDependencies: { fs },
+    uiInstallDependencies,
     dbOperationDependencies: {
       cwd: host.cwd,
     },

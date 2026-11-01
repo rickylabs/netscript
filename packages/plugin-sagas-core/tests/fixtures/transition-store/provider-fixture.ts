@@ -1,3 +1,4 @@
+import { prepareLockedFixture } from '../../../../../.llm/tools/testing/locked-fixture.ts';
 import { assertEquals } from '@std/assert';
 import { retryPrismaGenerate } from './provider-process.ts';
 
@@ -11,36 +12,14 @@ export async function runSagaProviderFixture(profile: ProviderFixtureProfile): P
   const repo = profile.repo;
 
   try {
-    const commandSchema = await Deno.readTextFile(
-      'packages/database/tests/fixtures/command-store/schema.prisma',
-    );
-    const sagaSchema = await Deno.readTextFile('plugins/sagas/database/sagas.prisma');
-    await Deno.writeTextFile(temp + '/schema.prisma', commandSchema + '\n' + sagaSchema);
-    await retryPrismaGenerate(() =>
-      new Deno.Command(Deno.execPath(), {
-        args: [
-          'run',
-          '--no-lock',
-          '-A',
-          'npm:prisma@7.10.0',
-          'generate',
-          '--schema',
-          temp + '/schema.prisma',
-        ],
-        signal: AbortSignal.timeout(120_000),
-        stdout: 'piped',
-        stderr: 'piped',
-      }).output()
-    );
-    const source = await Deno.readTextFile(profile.source);
-    await Deno.writeTextFile(
-      temp + '/postgres-conformance_test.ts',
-      source.replaceAll('REPO_URL', repo.href),
-    );
     const rootConfig = JSON.parse(await Deno.readTextFile('deno.json'));
     const imports: Record<string, string> = { ...rootConfig.imports };
-    for (const [key, version] of Object.entries(rootConfig.catalog)) {
-      imports[key] = 'npm:' + key + '@' + version;
+    const committed = JSON.parse(await Deno.readTextFile('deno.lock'));
+    // Only expose catalog roots already present in the committed graph. Unused
+    // future-wave tooling must not become a dependency of a saga provider test.
+    for (const [name, version] of Object.entries(rootConfig.catalog)) {
+      const specifier = 'npm:' + name + '@' + version;
+      if (specifier in committed.specifiers) imports[name] = specifier;
     }
     for (const parent of ['packages', 'plugins']) {
       for await (const member of Deno.readDir(parent)) {
@@ -55,12 +34,11 @@ export async function runSagaProviderFixture(profile: ProviderFixtureProfile): P
         }
         for (const [key, specifier] of Object.entries(config.imports ?? {})) {
           if (
-            typeof specifier === 'string' && !specifier.startsWith('./') &&
-            !specifier.startsWith('../')
+            typeof specifier === 'string' &&
+            (specifier.startsWith('jsr:') || (specifier.startsWith('npm:') &&
+              Object.keys(imports).some((name) => key.startsWith(name + '/'))))
           ) {
-            imports[key] = specifier === 'catalog:'
-              ? 'npm:' + key + '@' + rootConfig.catalog[key]
-              : specifier;
+            imports[key] = specifier;
           }
         }
       }
@@ -85,7 +63,9 @@ export async function runSagaProviderFixture(profile: ProviderFixtureProfile): P
         }
       }
     }
-    imports['@prisma/client'] = 'npm:@prisma/client@7.10.0';
+    imports['prisma'] = 'npm:prisma@7.10.0';
+    imports['@prisma/adapter-pg'] = 'npm:@prisma/adapter-pg@^7.10.0';
+    imports['@prisma/client'] = 'npm:@prisma/client@^7.10.0';
     await Deno.writeTextFile(
       temp + '/deno.json',
       JSON.stringify({
@@ -94,11 +74,45 @@ export async function runSagaProviderFixture(profile: ProviderFixtureProfile): P
         imports,
       }),
     );
+    let frozen = await prepareLockedFixture(temp);
+    const commandSchema = await Deno.readTextFile(
+      'packages/database/tests/fixtures/command-store/schema.prisma',
+    );
+    const sagaSchema = await Deno.readTextFile('plugins/sagas/database/sagas.prisma');
+    await Deno.writeTextFile(
+      temp + '/schema.prisma',
+      commandSchema.slice(0, commandSchema.indexOf('model NetScriptCommandOutbox {')) + '\n' +
+        sagaSchema,
+    );
+    await retryPrismaGenerate(() =>
+      new Deno.Command(Deno.execPath(), {
+        args: [
+          'run',
+          ...frozen,
+          '--config',
+          temp + '/deno.json',
+          '-A',
+          'npm:prisma@7.10.0',
+          'generate',
+          '--schema',
+          temp + '/schema.prisma',
+        ],
+        signal: AbortSignal.timeout(120_000),
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output()
+    );
+    const source = await Deno.readTextFile(profile.source);
+    await Deno.writeTextFile(
+      temp + '/postgres-conformance_test.ts',
+      source.replaceAll('REPO_URL', repo.href),
+    );
+    frozen = await prepareLockedFixture(temp, [temp + '/postgres-conformance_test.ts']);
     const filter = Deno.env.get(profile.filterEnv);
     const tested = await new Deno.Command(Deno.execPath(), {
       args: [
         'test',
-        '--no-lock',
+        ...frozen,
         '--config',
         temp + '/deno.json',
         '--unstable-kv',

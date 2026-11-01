@@ -1,23 +1,19 @@
 ---
 layout: layouts/base.vto
-title: "netscript command reference"
+title: CLI command reference
+description: Every command, subcommand and flag of the netscript binary.
 ---
 
-# `netscript` command reference
+# CLI command reference
 
-The detailed verb-and-flag companion for the published `netscript` binary (`@netscript/cli`).
-Together with the curated [CLI reference](/cli-reference/), these two pages cover every public
-command group and direct subcommand; this page concentrates the extended groups and flags while the
-curated page carries the everyday flows. For the package API surface (the embeddable helpers, not
-the command tree) see the [`@netscript/cli` package page](/reference/cli/).
-
-This page documents the **public `netscript` binary** — the CLI published as `@netscript/cli` and
-installed on your PATH — not any maintainer-only tree. Everything here is verified against
-`netscript <group> --help`. To confirm the exact spelling in your installed version, run
-`netscript --help` or `netscript <group> --help`.
+Every verb and flag of the public `netscript` binary, published as `@netscript/cli`. The
+[CLI cheat sheet](/cli-reference/) carries the everyday flows; together the two pages cover every
+public command group and direct subcommand. For the embeddable helpers rather than the command tree,
+see the [`@netscript/cli` package page](/reference/cli/).
 
 The top-level groups are `agent`, `config`, `deploy`, `init`, `contract`, `db`, `generate`,
-`marketplace`, `plugin`, `service`, and the `ui:*` commands — each has a section below.
+`marketplace`, `plugin`, `service`, `tokens`, and the `ui:*` commands. To confirm the exact spelling
+in your installed version, run `netscript --help` or `netscript <group> --help`.
 
 ## `init` — scaffold a workspace
 
@@ -47,10 +43,11 @@ The top-level groups are `agent`, `config`, `deploy`, `init`, `contract`, `db`, 
 | `--dry-run`                 | Preview the scaffold plan without writing files (default `false`).                             |
 | `--json`                    | Emit a single machine-readable JSON result (default `false`).                                  |
 | `--from <preset>`           | Apply a named scaffold preset.                                                                 |
+| `--preset <code-or-url>` | Resolve and validate a UI token preset, encoded/share preset, URL preset JSON, or URL registry theme before scaffolding, then apply it to the generated Fresh app. Dry runs do not fetch or apply it. |
 
-Project init runs the existing agent installer after scaffolding by default, using the generated
-project root. Host detection honours project markers before the invoking environment and defaults to
-Claude Code; `--host` overrides detection. The deciding source is printed in text mode. Dry runs
+Project init runs the agent installer after scaffolding by default, using the generated project
+root. Host detection honors project markers before the invoking environment and defaults to Claude
+Code; `--host` overrides detection. The deciding source is printed in text mode. Dry runs
 write no agent files, and `--json` retains its single scaffold result. Offline docs remain opt-in.
 The optional Aspire agent setup keeps its bounded timeout and reports a skip if unavailable. For an
 existing project, use `netscript agent init` to refresh integration idempotently.
@@ -73,15 +70,12 @@ existing project, use `netscript agent init` to refresh integration idempotently
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `netscript agent drift record` | Record drift after a fresh successful diagnostic pass. Flags: `--resource <name>` (**required**), `--summary <text>` (**required**), `--details <text>`. |
 
-The gate is the point. `record` appends an entry only when a diagnostic **receipt** for `--resource`
-exists, exited `0`, and is **less than 15 minutes old**; the receipt itself is embedded in the
-entry. Anything else — no receipt, a failed one, a future timestamp, or a stale one — is refused
-with a non-zero exit and a message naming how to produce a fresh receipt
-(`netscript plugin doctor --resource <name>`, or the MCP `doctor`, telemetry, API introspection, or
-`execute_command` tools). A drift note therefore cannot be written from an agent's recollection of a
-run it did not just perform.
-
-The same gate backs the MCP `record_drift` tool, so both surfaces refuse identically.
+`record` appends an entry only when a diagnostic **receipt** for `--resource` exists, exited `0`, and
+is **less than 15 minutes old**; the receipt is embedded in the entry. No receipt, a failed one, a
+future timestamp or a stale one is refused with a non-zero exit and a message naming how to produce
+a fresh receipt (`netscript plugin doctor --resource <name>`, or the MCP `doctor`, telemetry, API
+introspection, or `execute_command` tools). A drift note cannot be written from an agent's
+recollection of a run it did not just perform. The MCP `record_drift` tool uses the same gate.
 
 ## `config` — inspect and mutate configuration
 
@@ -124,7 +118,7 @@ overrides.
 ## `generate` — code generation
 
 Beyond `generate plugins` and `generate runtime-schemas` (covered in the
-[CLI reference](/cli-reference/#generate)), the group also regenerates the Aspire helper layer.
+[CLI cheat sheet](/cli-reference/#generate)), the group also regenerates the Aspire helper layer.
 
 | Command                                  | Description                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -186,12 +180,16 @@ that target in normal generation. Regeneration removes an existing inactive targ
 bytes begin with that producer's exact marker; foreign or unmarked files are preserved and continue
 to report drift. Registry paths stay within the reserved producer directories and cannot claim
 authored configuration. The host validates and formats the returned module bytes before any project
-writes. Workers, triggers, sagas and AI implement protocol 2. Auth and streams declare an empty
+writes.
+
+Workers, triggers, sagas and AI implement protocol 2. Auth and streams declare an empty
 registry surface in their runtime manifests. An immutable published version returning HTTP 404 for
 its runtime manifest also declares zero outputs, including auth and streams 0.0.7. Missing local or
 source-member manifests and other HTTP failures fail closed. Protocol-1 source-only and legacy
-generators retain normal generation support; `--check` refuses them because source paths alone
-cannot certify output bytes. The inspection child runs with read permission and denies write,
+generators keep normal generation support; `--check` refuses them because source paths alone
+cannot certify output bytes.
+
+The inspection child runs with read permission and denies write,
 subprocess, network, environment, FFI and system permissions. Imports may resolve through Deno's
 module loader. Normal generation uses the consumer's configured lock semantics and may extend its
 module graph, just as other generator invocations do. Check and protocol-2 dry-run copy the
@@ -201,17 +199,17 @@ installing packages into the consumer project. A missing lock or generator graph
 inspection failure with instructions to run `netscript generate plugins` first. Consumers must
 enable a project lock to certify registry bytes; inspection never resolves a fresh graph. Limits
 bound UTF-8 rendered bytes, source/output counts and child runtime. This check certifies generated
-bytes, not installed runtime health or every transitive import. Published-version Windows/Linux
-verification belongs to release validation.
+bytes, not installed runtime health or every transitive import.
 
-Generated registries are derived artifacts. Add or replace job modules in `workers/jobs/`, then run
-`netscript generate plugins`; do not hand-edit `.netscript/generated/**`. Removing the official
-workers samples does not disable custom-job discovery.
+> [!WARNING]
+> Generated registries are derived artifacts. Add or replace job modules in `workers/jobs/`, then run
+> `netscript generate plugins`; don't hand-edit `.netscript/generated/**`. Removing the official
+> workers samples does not disable custom-job discovery.
 
 ## `plugin` — extended verbs
 
 The common `plugin` verbs (`install`, `new`, `list`, `doctor`, `info`, `remove`) are in the
-[CLI reference](/cli-reference/#plugins). The full group also carries:
+[CLI cheat sheet](/cli-reference/#plugins). The full group also carries:
 
 | Command                                             | Description                                                                                                                       |
 | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
@@ -225,10 +223,19 @@ The common `plugin` verbs (`install`, `new`, `list`, `doctor`, `info`, `remove`)
 | `netscript plugin auth <sub>`                       | Configure auth and manage sessions (see below).                                                                                   |
 | `netscript plugin ai <verb> [...args]`              | Configure AI tools, agents, models, providers, and MCP servers. Flag: `--project-root <path>` (the only flag NetScript consumes). |
 
+For `plugin update`, pass the installed name shown by `netscript plugin list`:
+
+```sh
+netscript plugin update workers
+```
+
+The host re-pins the plugin and regenerates its registries. Package specifiers belong to the
+package-dispatch verbs (`enable`, `disable`, `setup`); `update` uses the installed name.
+
 `plugin ai` is a **pass-through**, not a command group with its own verbs. NetScript strips
 `--project-root`, then runs the installed `@netscript/plugin-ai` package's CLI in a child `deno run`
-process and forwards every remaining argument verbatim, printing its output and propagating its exit
-code. The verb vocabulary therefore belongs to that plugin's release, not to this reference; see the
+process, forwards every remaining argument verbatim, prints its output and propagates its exit code.
+The verbs belong to that plugin's release; see the
 [`@netscript/plugin-ai` reference](/reference/plugin-ai/). Invoking it with no verb is an error.
 
 ### `plugin auth` subcommands
@@ -248,7 +255,7 @@ The backends selectable here are the same ones read at runtime by `NETSCRIPT_AUT
 ## `service` — extended verbs
 
 The common `service add`, `service list`, and `service generate` verbs are in the
-[CLI reference](/cli-reference/#services-contracts). The full group also carries:
+[CLI cheat sheet](/cli-reference/#services-contracts). The full group also carries:
 
 | Command                                               | Description                                                                                                                                                                                                                                                                       |
 | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -262,7 +269,7 @@ The common `service add`, `service list`, and `service generate` verbs are in th
 ## `contract` — extended verbs
 
 The common `contract add` and `contract list` verbs are in the
-[CLI reference](/cli-reference/#services-contracts). The full group also carries:
+[CLI cheat sheet](/cli-reference/#services-contracts). The full group also carries:
 
 | Command                                                                                | Description                                                                                                                                                                                                           |
 | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -274,9 +281,8 @@ The common `contract add` and `contract list` verbs are in the
 ## `db` — extended verbs
 
 The everyday database workflow (`init`, `generate`, `migrate`, `seed`, `status`, `studio`,
-`introspect`, `reset`) is in the [CLI reference](/cli-reference/#database) — and all `db` commands
-require Aspire to be running (`cd aspire && aspire start`) unless you scaffolded a file-backed
-`sqlite` engine. The full group also carries the target-management and migration-history verbs:
+`introspect`, `reset`) is in the [CLI cheat sheet](/cli-reference/#database). The full group also
+carries the target-management and migration-history verbs:
 
 | Command                           | Description                                                                                                                                                                       |
 | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -287,10 +293,51 @@ require Aspire to be running (`cd aspire && aspire start`) unless you scaffolded
 | `netscript db validate`           | Validate database schemas. Flags: `--db <target>`, `--project-root <path>`.                                                                                                       |
 | `netscript db resolve`            | Resolve migration history state. Flags: `--db <target>`, `--project-root <path>`, `--applied <migration>` (mark as applied), `--rolled-back <migration>` (mark as rolled back).   |
 
+> [!IMPORTANT]
+> All `db` commands require Aspire to be running (`cd aspire && aspire start`) unless you
+> scaffolded a file-backed `sqlite` engine.
+
+## `tokens` — Fresh application design tokens
+
+All three commands select a Fresh app with `--app <name>` from a workspace, or an explicit
+`--project-root <path>` pointing to the app. Multiple apps require an explicit selection.
+
+| Command | Description |
+| --- | --- |
+| `netscript tokens init` | Copy the editable DTCG sources, `tokens.config.json`, and an empty semantic override. Flags: `--preset <id>` (NS One by default), `--force` (replace existing token sources and settings). |
+| `netscript tokens build` | Validate and compile five core web assets plus 24 opt-in preset stylesheets into app `assets/` (core) and `static/presets/` (previews). Flags: `--preset <id>` (override app settings), `--override <path>` (app-relative semantic alias layer applied last), `--previews` (explicitly write the 24 development preview stylesheets; default builds write only five core files). |
+| `netscript tokens clean` | Remove generated token files from `assets/` and the 24 known generated CSS files from `static/presets/`, preserving `theme-preset.json` so a non-default preset survives rebuild. Keep app CSS, settings, source documents and unrelated static files. |
+
+Build works with bundled sources before initialization and retains the app's installed registry
+preset. Initialization creates a version 1 `tokens.config.json` with `preset`, `sourceRoot`, and
+`override`. Configured source and override paths must exist and stay inside the selected app.
+The `sourceRoot` contains the single `tokens.resolver.json` and its referenced DTCG documents.
+Omitting it uses bundled sources. A configured override is mandatory; before initialization, build
+also detects the conventional `tokens/semantic.tokens.json` when present.
+
+An override may only reassign existing semantic roles to aliases of the same type. Raw values,
+primitive/component edits, unknown roles, metadata edits and reference cycles fail before any
+generated asset is replaced. For example, `tokens/semantic.tokens.json` can contain:
+
+```json
+{
+  "semantic": {
+    "radius-md": { "$type": "dimension", "$value": "{semantic.radius-lg}" }
+  }
+}
+```
+
+Run `netscript tokens build --app dashboard` after editing it. The component aliases and all
+serialized outputs inherit the final semantic choice. See the package's `tokens/README.md` for
+the source and output extension contract.
+
 ## `ui:*` — Fresh UI registry
 
-`ui:init` and `ui:add` are in the [CLI reference](/cli-reference/#fresh-ui). The full set also
-lists, updates, and removes copied registry items:
+Fresh UI copies registry source into the selected application. Use `--app <name>` for a
+workspace app or `--project-root <path>` for an explicit application directory. App settings
+live in `components.json`; `fresh-ui.lock.json` records source identity and installed content hashes.
+The page/island scaffold forms of `ui:add` remain available in the
+[CLI reference](/cli-reference/#fresh-ui).
 
 | Command                      | Description                                                                                                    |
 | ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -298,12 +345,131 @@ lists, updates, and removes copied registry items:
 | `netscript ui:update [name]` | Update unmodified Fresh UI registry files. Flag: `--project-root <path>`.                                      |
 | `netscript ui:remove <name>` | Remove a copied Fresh UI registry item. Flag: `--project-root <path>`.                                         |
 
-Because Fresh UI is copy-source, `ui:update` only touches registry files you have not modified —
-your edits are never overwritten. See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
+`ui:update` compares installed copies with their lock baselines and reports local edits. The
+following registry and preset commands complete the setup and discovery workflow:
+
+| Command | Behavior |
+| --- | --- |
+| `netscript ui:build --registry registry.json --source-root . --output public/r` | Validate local authoring and publish a static catalog plus one JSON file per item. Resolve source paths inside the declared source root. |
+| `netscript ui:init --preset <code>` | Initialize the foundation using a token preset id, encoded/share preset, or URL theme/preset JSON. |
+| `netscript ui:add <name\|@namespace/name\|url> --diff` | Show installed/local/registry differences without writing application files. Omit `--diff` to install. Install a `registry:style` item or apply a preset with a `style` field to select component sources. |
+| `netscript ui:view <reference>` | Print portable metadata and exact source files without installing. |
+| `netscript ui:search [query] --registry @acme` | Search item metadata in the built-in catalog or a configured namespace. |
+| `netscript ui:docs <reference>` | Show publisher documentation and Markdown file locations. |
+| `netscript ui:info` | Describe app UI settings, install provenance and edited copies without revealing registry header values. |
+| `netscript ui:registry` | Group for source registration and JSON schema validation. |
+| `netscript ui:registry add @acme <url>` | Register a catalog or `{name}` item URL template. Repeat `--header Name=template`; `--index <url>` sets an explicit catalog URL. |
+| `netscript ui:registry validate [reference]` | Validate local JSON, a static URL, a configured namespace, or a namespaced item against the published registry schemas. Defaults to local `registry.json`. |
+| `netscript ui:preset` | Group for offline preset decoding and shareable URL generation. |
+| `netscript ui:preset decode <code>` | Decode a versioned preset, shared URL or plain token preset id without a network request. |
+| `netscript ui:preset url [code] --theme studio-utility` | Construct a shareable URL; optional `--style`, `--font`, and `--icon-library` set those preset fields. |
+| `netscript ui:apply --preset <code> --only theme,font` | Apply selected theme/font settings through the existing token builder; preset-JSON URLs also work with `--only`; registry theme URLs apply as a whole without `--only`. Omitting `--only` applies the preset's setup choices; font-only application preserves the selected token preset. |
+
+A portable Figma theme installs in one command:
+
+```sh
+netscript ui:apply --preset https://raw.githubusercontent.com/owner/themes/main/themes/studio-utility.json
+netscript init my-app --preset https://raw.githubusercontent.com/owner/themes/main/themes/studio-utility.json --yes
+```
+
+A URL with a nonempty `?preset=` parameter remains a shared preset link and is decoded locally.
+Preset and registry URLs, including registry dependencies and `ui:add` sources, require HTTPS.
+For local development, HTTP is allowed only on loopback hosts
+`localhost`, `127.0.0.1`, and `[::1]` (with optional ports); this also applies to `init --preset`
+and `ui:apply --preset`. Other URLs fetch either strict version-1 preset JSON (its `theme` is a registered built-in
+preset ID) or a published-schema `registry:theme`/`registry:base` item. Plain and `ns1_` preset codes,
+including shared links, also require a registered built-in theme. Malformed URLs, failed HTTP
+requests, invalid JSON/schema, unknown names and unsafe file targets produce an error. Registry
+theme items apply as a whole; `--only` remains available for preset codes and preset JSON.
+
+Figma exports retain their DTCG source under `tokens/source` and select it with
+`tokens.config.json` `sourceRoot`, so later `netscript tokens build` preserves imported values.
+The S2 `fresh-ui.lock.json` records source files, generated assets and theme docs. Existing semantic
+overrides are retained and compiled; a custom source root or edited installed sources block a
+replacement before writes. A second URL theme can replace sources owned by the previous theme.
+
+After installing a URL theme, selecting a built-in preset code changes the context within the
+app's installed sources. It retains `sourceRoot` and the Figma-owned values; it does not reset
+those sources to the bundled catalog. `init --dry-run --preset` previews the scaffold and skips
+remote fetch/application. With a real init, the preset is resolved, fetched, and schema-validated
+before any scaffold files are written. Invalid URLs or schemas leave the target directory untouched.
+The validated preset is applied after scaffold creation, before agent setup. If that later application
+fails (for example on a dependency fetch or file conflict), repair it with `ui:apply --preset` in the
+generated app, then run `netscript agent init --project-root .` from the generated workspace.
+
+The [plugin contributor guide](https://github.com/rickylabs/netscript/blob/main/tools/figma-plugin/README.md)
+explains Figma import/export, token scopes, the values-only PR contract and the shared CI name check.
+
+
+An app configuration can declare a registry source and unresolved header templates:
+
+
+```json
+{
+  "version": 1,
+  "style": "style-utility",
+  "iconLibrary": "lucide",
+  "aliases": { "ui": "components/ui", "lib": "lib" },
+  "registries": {
+    "@acme": {
+      "url": "https://example.com/r/{name}.json",
+      "headers": { "Authorization": "Bearer ${ACME_REGISTRY_TOKEN}" }
+    }
+  }
+}
+```
+
+For example, register an authenticated namespace with an environment template, then inspect and
+install one item:
+
+```bash
+netscript ui:registry add @acme 'https://registry.example/r/{name}.json' \
+  --header 'Authorization=Bearer ${ACME_REGISTRY_TOKEN}' --project-root apps/dashboard
+netscript ui:view @acme/x --project-root apps/dashboard
+netscript ui:add @acme/x --diff --project-root apps/dashboard
+netscript ui:add @acme/x --project-root apps/dashboard
+```
+
+The transport resolves header templates from the environment when issuing a request. Resolved
+credentials are not written to app config or the install lock and are not included in diagnostic
+output. Registry source modules are never executed.
+
+A token-only preset application leaves component source unchanged and persists the selected token
+preset for later `netscript tokens build`. An explicitly changed style regenerates installed
+component copies from that style's registry source map. If a copied file differs from its recorded
+hash, regeneration stops and lists edited paths, including with `--force`. Utility is the built-in
+component style; additional source maps use the same shared contract. Theme items also install their `DESIGN.md` and
+`SKILL.md` under `.agents/skills/fresh-ui-theme-<preset-id>/`.
+
+See [customize Fresh UI](/web-layer/how-to/customize-fresh-ui/) and the
+[Fresh UI reference](/reference/fresh-ui/).
+
+## `ui:migrate` — migrate app-owned Fresh UI copies
+
+`netscript ui:migrate` shows the available migrations. `netscript ui:migrate variants` converts
+0.0.8 Utility component modifiers and anatomy to the shared data-attribute contract.
+
+Preview the changes before applying them:
+
+```sh
+netscript ui:migrate variants --project-root apps/dashboard --dry-run
+```
+
+Run the same command without `--dry-run` to apply, then run the app's `deno task check`.
+`--project-root <path>` accepts a workspace or Fresh app; `--app <name>` selects an app in a workspace.
+The migration preserves custom classes, base/element hooks, strings and comments. Customized
+structural edits or detected unsupported dynamic classes stop preflight before any writes and need a
+manual merge. This includes JSX spreads without a later explicit class when the file still contains
+legacy component modifiers or state classes: convert the spread's class producer to data attributes first. Indirect
+class producers imported from other files require manual review; the migration does not evaluate
+JavaScript. CSS state selectors match component classes in either order, including
+`.is-active.ns-citation`. Controlled component overrides require conversion to their public props;
+layout utility aliases remain supported. Use the matching CLI and Fresh UI release together. Dependency copies
+and registry ownership hashes remain untouched.
 
 ## `deploy` — cloud and container targets
 
-The [CLI reference](/cli-reference/#deploy) covers the Deno Deploy and OS service (Servy) paths. The
+The [CLI cheat sheet](/cli-reference/#deploy) covers the Deno Deploy and OS service (Servy) paths. The
 `deploy` group also exposes a family of routed cloud and container targets, the packaging verbs, and
 artifact-copy and log verbs.
 
@@ -341,8 +507,8 @@ The router walks a fixed candidate list — `plan`, `up`, `down`, `status`, `log
 exposes a verb it cannot perform. The two container targets advertise `status` and `logs`; the five
 cloud targets do not.
 
-Running a target group with no verb prints help, as every command group in the CLI does. That is the
-group's default action, not a sign that the target is unimplemented.
+Running a target group with no verb prints help, as every command group does; it does not mean the
+target is unimplemented.
 
 | Verb     | Description                             |
 | -------- | --------------------------------------- |
@@ -369,7 +535,7 @@ not persist new values), and `--non-interactive`.
 | `netscript deploy package-cli`             | Compile the NetScript CLI itself into a self-shippable Windows `.exe`. Flags: `-o, --output-dir <dir>` (default `./.deploy/windows`; a `scripts/` subdirectory is used), `--target <triple>` (default `x86_64-pc-windows-msvc`), `--no-bundle` (compile directly from source — larger output), `-v, --verbose`.                                                                                                                 |
 
 `package-cli` bundles before compiling by default and falls back to compiling from source if the
-bundle step fails, so `--no-bundle` is a size/behaviour trade-off rather than a repair.
+bundle step fails, so `--no-bundle` is a size/behavior trade-off rather than a repair.
 
 ### Artifact copy, logs, and upgrade
 
@@ -431,4 +597,4 @@ to 64 MiB of source characters, using one staging child and one Deno formatter. 
 outside the consumer project, including when inspection denies all writes.
 
 This command covers Aspire generation; `generate plugins --check` covers installed-plugin
-registries. Published Windows/Linux release smoke remains follow-up work under #1912.
+registries.

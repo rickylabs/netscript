@@ -5,6 +5,7 @@ export const TEMPLATE_KEYS = {
   authRoute: 'auth/route.ts.template',
   authService: 'auth/service.ts.template',
   generatedAspireEmptyRegistration: 'generated/aspire/helpers/empty-registration.ts.template',
+  generatedAspireEmptyTools: 'generated/aspire/helpers/empty-tools.ts.template',
   appClient: 'app/client.ts.template',
   appAssetsDesignCss: 'app/assets/design.css.template',
   appComponentsUiMod: 'app/components/ui/mod.ts.template',
@@ -13,6 +14,7 @@ export const TEMPLATE_KEYS = {
   appRoutesDesignIslandsTokenClipboard:
     'app/routes/(design)/design/(_islands)/TokenClipboard.tsx.template',
   appRoutesDesignSharedRegistry: 'app/routes/(design)/design/(_shared)/registry.ts.template',
+  appRoutesDesignSharedTheme: 'app/routes/(design)/design/(_shared)/theme.ts.template',
   appRoutesDesignSharedTokens: 'app/routes/(design)/design/(_shared)/tokens.ts.template',
   appRoutesExamplesServiceLibServiceQuery:
     'app/routes/examples/service/(_lib)/service-query.ts.template',
@@ -24,6 +26,7 @@ export const TEMPLATE_KEYS = {
   appRoutesComponentsHomeView: 'app/routes/(_components)/home-view.tsx.template',
   appRoutesSharedHealth: 'app/routes/(_shared)/health.ts.template',
   appRoutesApp: 'app/routes/_app.tsx.template',
+  appTheme: 'app/lib/theme.ts.template',
   appRoutesLayout: 'app/routes/_layout.tsx.template',
   appRoutesDesignComponents: 'app/routes/(design)/design/components.tsx.template',
   appRoutesDesignComponentsView:

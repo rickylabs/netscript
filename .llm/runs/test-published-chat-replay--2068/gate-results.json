@@ -1,0 +1,31 @@
+{
+  "verdict": "PASS",
+  "quality": {
+    "command": "deno task quality:gate",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "receiptSha256": "fbe0153cd4691b05e43dc396ad0d1c1271d4bcf6f0dd54e49c27f42283d5642c",
+    "scope": "Maintained framework source; explicit scoped wrappers below cover the new run tooling",
+    "warnings": "Existing doctrine warnings remain"
+  },
+  "launcherCheck": {
+    "filesSelected": 1,
+    "failedBatches": 0,
+    "findings": 0
+  },
+  "runTypeScriptLint": {
+    "filesSelected": 3,
+    "filesProcessed": 3,
+    "findings": 0,
+    "droppedFiles": []
+  },
+  "runTypeScriptFormat": {
+    "filesSelected": 3,
+    "filesProcessed": 3,
+    "findings": 0,
+    "droppedFiles": []
+  },
+  "consumerProof": "published-result.json",
+  "runtimeE2ERequired": false,
+  "reason": "Run-only published consumer verification, no framework/scaffold/runtime source change"
+}

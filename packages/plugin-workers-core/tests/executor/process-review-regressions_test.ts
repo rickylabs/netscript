@@ -2,6 +2,7 @@ import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 import { stub } from '@std/testing/mock';
 import { defineTask } from '../../src/builders/mod.ts';
 import { OutputTail } from '../../src/executor/output-tail.ts';
+import { terminated } from './process-termination.ts';
 
 Deno.test('review regression: empty and tiny output allocate only used ring capacity', () => {
   const NativeBytes = Uint8Array;
@@ -105,25 +106,6 @@ await createDefaultTaskExecutor().execute({id:'signal-task',type:'executable',en
   });
 }
 
-async function terminated(pid: number): Promise<boolean> {
-  for (let attempt = 0; attempt < 50; attempt++) {
-    try {
-      const stat = await Deno.readTextFile(`/proc/${pid}/stat`);
-      if (stat.slice(stat.lastIndexOf(')') + 2).split(' ')[0] === 'Z') return true;
-    } catch (error) {
-      // Linux can report ESRCH when a task disappears during the stat read.
-      // Deno exposes it as an Error rather than a dedicated errors class.
-      if (
-        error instanceof Deno.errors.NotFound ||
-        (error instanceof Error && error.message.startsWith('No such process (os error 3)'))
-      ) return true;
-      throw error;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 10));
-  }
-  return false;
-}
-
 for (
   const error of [
     new Deno.errors.NotFound('missing stat'),
@@ -141,7 +123,13 @@ for (
 }
 
 Deno.test('termination probe: permission and unexpected read errors propagate', async () => {
-  for (const error of [new Deno.errors.PermissionDenied('denied'), new Error('unexpected read')]) {
+  for (
+    const error of [
+      new Deno.errors.PermissionDenied('denied'),
+      new Error('unexpected read'),
+      new Error('No such process without the Linux ESRCH code'),
+    ]
+  ) {
     using _readStat = stub(Deno, 'readTextFile', () => Promise.reject(error));
     const caught = await assertRejects(() => terminated(123));
     assertEquals(caught, error);
@@ -155,4 +143,14 @@ Deno.test('termination probe: a zombie is terminated', async () => {
     () => Promise.resolve('123 (task with spaces) Z 1 123'),
   );
   assertEquals(await terminated(123), true);
+});
+
+Deno.test('termination probe: a living process is polled until it becomes a zombie', async () => {
+  let reads = 0;
+  using readStat = stub(Deno, 'readTextFile', () => {
+    reads++;
+    return Promise.resolve(`123 (task with spaces) ${reads === 1 ? 'S' : 'Z'} 1 123`);
+  });
+  assertEquals(await terminated(123), true);
+  assertEquals(readStat.calls.length, 2);
 });

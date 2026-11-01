@@ -1,0 +1,98 @@
+{
+  "sourceHead": "1582e1c9e1adcaa0a8a92900ec3b5b4b0db3e92d",
+  "sessionID": "ses_e80a72a47ffeLBfZ0Wdc7vh0h6",
+  "actualAssistantModels": [
+    "openrouter/z-ai/glm-5.3"
+  ],
+  "assistantCount": 5,
+  "finalFinish": "stop",
+  "stepsConfigured": 12,
+  "stepsObserved": 5,
+  "requestedVariant": "provider_default",
+  "independentEffortAttestation": false,
+  "actualNativeVerdict": "PASS",
+  "retainedVerbatimFile": "plan-eval.md",
+  "rootDisposition": "Root fully read actual final, own-session identity and qualified coverage; accepted PLAN PASS and authorized C1 only through canonical implementation suite.",
+  "packetReads": [
+    {
+      "input": {
+        "filePath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/normative-plan-packet.md",
+        "limit": 2000
+      },
+      "status": "completed",
+      "truncated": false
+    },
+    {
+      "input": {
+        "filePath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/semantic-source-packet.md",
+        "limit": 2000
+      },
+      "status": "completed",
+      "truncated": false
+    },
+    {
+      "input": {
+        "filePath": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/public-contract-packet.md",
+        "limit": 2000
+      },
+      "status": "completed",
+      "truncated": false
+    }
+  ],
+  "originalSourcesAndPacketSealCount": 32,
+  "postRunMismatchCount": 0,
+  "qualifications": [
+    "Provider header typo: native text says glm-ai; own export proves openrouter.",
+    "Package fmt lists tests/_fixtures, while the separately planned scoped fmt wrapper covers the new tests; no product fmt gate has run.",
+    "Direct factory spot-read1-200/212 was truncated, but complete212-line content was actually read in nontruncated semantic packet."
+  ],
+  "exportedMainCostUsd": 0.0248576654,
+  "evidence": [
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/final-verdict.utf8.md",
+      "sha256": "2d2f36ec3692cb3be6e922222da672a82a5bf1a939a213207137516ab4ab78f5"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/assistant-text.utf8.md",
+      "sha256": "98e3d61c961eeda65a49b2e61584989af5a386d0c8c0e65d6d42aebc5620cc45"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/native.stdout.jsonl",
+      "sha256": "70e5dd6d1347ce49ec76ca4f4471337a6c40d8ecf0c0353b97e12444fc5a8516"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/own-session-export.json",
+      "sha256": "f2cfd1bdcc0576d018b2a427241e81fa6993c98901391e96edcaa2ecd8bbf019"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/observed-identity.json",
+      "sha256": "f244e75de4e8e23d4313365a5e7d83dadd0101617f0cfc74981d3436ea1b945a"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/coverage.json",
+      "sha256": "f98d2114a1956f4b537f2e2f543d74a7d62caff5ba4830865365966c011b1915"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/effective-config.json",
+      "sha256": "77d243afda70036beb2323b6a7fc0fc9f921ff265e0ae98d7fcfbf2b450f3e81"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/preparation.json",
+      "sha256": "bbc012405a2ac0fd3d0235d0a043765c865bca8f7d0da3374eaea520f60b662d"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/result.json",
+      "sha256": "1ed0bfff9a0bf666ad5f33f38f4948776a1c3a54d7ceef44aa73c4636ee2bbe0"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/final-guards.json",
+      "sha256": "b29f6112df70798e37186feb443d123229281d9c16fe650dbdcbd246ad020729"
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-browser-stream-headers-008/.llm/tmp/browser-stream-headers-u3-plan-eval/mcp.jsonl",
+      "sha256": "a7a00241628a08ba5553f4adef7a7ba58afbfd1cce0de1475c5add1de8198b14"
+    }
+  ],
+  "operationalAllowanceSnapshotsExcluded": true,
+  "productTestsOrReleaseAcceptance": false
+}

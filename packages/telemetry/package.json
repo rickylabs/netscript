@@ -2,6 +2,7 @@
   "dependencies": {
     "@opentelemetry/api": "catalog:",
     "@orpc/contract": "catalog:",
-    "@orpc/otel": "catalog:"
+    "@orpc/otel": "catalog:",
+    "@opentelemetry/instrumentation": "catalog:"
   }
 }

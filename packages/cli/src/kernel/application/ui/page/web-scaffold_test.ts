@@ -12,6 +12,7 @@ import { DenoGeneratedSourceFormatter } from '../../../adapters/runtime/process/
 import { readTemplateAsset } from '../../../adapters/templates/template-asset.ts';
 import { TEMPLATE_KEYS } from '../../../assets/manifest.ts';
 import { scaffoldUiIsland, scaffoldUiPage } from './web-scaffold.ts';
+import { QUERY_RESULT_SUCCESS_RETURN, QUERY_RESULT_TEMPLATE } from './query-result-template.ts';
 
 const APP_ROOT = '/workspace/shop/apps/dashboard';
 const ROUTER_PATH = `${APP_ROOT}/router.ts`;
@@ -103,11 +104,15 @@ function assertDataScreenPlan(files: readonly PlannedFile[]): void {
       'useIslandQuery',
       'initialData: props.initialData',
       'initialDataUpdatedAt: props.cachedAt',
-      'JSON.stringify(query.data',
+      'QueryResult value={query.data}',
+      'data-query-result',
+      "role='status'",
+      "role='alert'",
     ]
   ) {
     assertStringIncludes(source, fragment);
   }
+  assertFalse(source.includes('JSON.stringify(query.data'));
   assertFalse(source.includes('useSignal(0)'));
   assertFalse(source.includes('queryLoaders = {}'));
 }
@@ -447,7 +452,7 @@ Deno.test('top-level pages are linked in the scaffold navigation and render insi
   const navigation = await fs.readFile(NAVIGATION_PATH);
   assertStringIncludes(
     navigation,
-    "  { href: appRoutes.design.href(), label: 'Design', match: 'prefix' },\n" +
+    "  { href: appRoutes.design.href(), label: 'Design', match: 'prefix', developmentOnly: true },\n" +
       "  { href: appRoutes['data-screen'].href(), label: 'Data Screen', match: 'prefix' },\n];",
   );
   const page = await fs.readFile(`${APP_ROOT}/routes/data-screen/index.tsx`);
@@ -457,7 +462,13 @@ Deno.test('top-level pages are linked in the scaffold navigation and render insi
   assertStringIncludes(page, '{slots.dataScreen()}');
   assertStringIncludes(page, ".withMeta(() => ({ title: 'Data Screen' }))");
   assert(result.nextSteps.some((step) => step.includes('routes/_layout.tsx')));
-  assert(result.nextSteps.some((step) => step.includes('assets/tokens.css')));
+  const themeGuidance = result.nextSteps.find((step) =>
+    step.includes('web-layer/how-to/theme-your-app')
+  );
+  assert(themeGuidance);
+  assertStringIncludes(themeGuidance, 'netscript ui:apply --preset <id>');
+  assertStringIncludes(themeGuidance, 'netscript tokens build');
+  assert(!result.nextSteps.some((step) => step.includes('Restyle app-wide through')));
 });
 
 Deno.test('nested pages stay out of the navigation unless --nav asks for a label', async () => {
@@ -544,5 +555,34 @@ Deno.test('generated pages and navigation entries are already in deno fmt canoni
         );
       }
     }
+  }
+});
+
+Deno.test('edited app and resource templates emit canonical generated source', async () => {
+  const formatter = new DenoGeneratedSourceFormatter(new DenoProcess());
+  const templates = [
+    'app/routes/_layout.tsx.template',
+    'app/routes/(_components)/health-view.tsx.template',
+    'resource-slice/(_islands)/ResourceIsland.tsx.template',
+  ];
+  const values: Readonly<Record<string, string>> = {
+    queryResultReturn: QUERY_RESULT_SUCCESS_RETURN,
+    queryResultTemplate: QUERY_RESULT_TEMPLATE.trim(),
+    name: 'shop',
+    appName: 'dashboard',
+    resource: 'orders',
+    resourcePascalCase: 'Orders',
+    queryFactoryName: 'ordersQueries',
+    queryFactory: 'ordersQueries.list',
+    clientModuleSpecifier: '../(_lib)/orders.ts',
+  };
+  for (const template of templates) {
+    const source = await Deno.readTextFile(new URL(`../../../assets/${template}`, import.meta.url));
+    const rendered = source.replace(/\{\{(\w+)\}\}/g, (_, name: string) => {
+      const value = values[name];
+      if (value === undefined) throw new Error(`Missing template value: ${name}`);
+      return value;
+    });
+    assertEquals(await formatter.formatContent('fixture.tsx', rendered), rendered, template);
   }
 });

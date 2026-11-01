@@ -1,3 +1,4 @@
+import type { DoctorCheck, DoctorReport } from '@netscript/plugin/adapter';
 import { dirname, join, relative, resolve } from '@std/path';
 import { type AppEntry, AppEntrySchema } from '@netscript/aspire/config';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
@@ -23,7 +24,19 @@ interface BrowserAuthFile {
   readonly path: string;
   readonly content: string;
   readonly overwrite?: boolean;
+  readonly authored?: boolean;
 }
+
+/** Written paths and informational checks from browser-auth reconciliation. */
+export interface BrowserAuthReconciliationResult {
+  /** Files actually created or updated by the existing scaffold policy. */
+  readonly written: readonly string[];
+  /** Preserved browser files; informational checks always have ok=true. */
+  readonly report: DoctorReport;
+}
+
+const BROWSER_AUTH_REPORT = 'browser-auth';
+const SKIP_REASON = { authored: 'authored topology', present: 'already present' } as const;
 
 // Only scaffold-owned reasons may be replaced; whitespace outside strings is immaterial.
 const PUBLIC_REASONS = [
@@ -70,15 +83,21 @@ export async function reconcileBrowserAuth(
   projectRoot: string,
   fs: FileSystemPort,
   formatter?: GeneratedSourceFormatterPort,
-): Promise<readonly string[]> {
+): Promise<BrowserAuthReconciliationResult> {
+  const written: string[] = [];
+  const checks: DoctorCheck[] = [];
+  const result: BrowserAuthReconciliationResult = {
+    written,
+    report: { plugin: BROWSER_AUTH_REPORT, checks },
+  };
   const auth = await readAuthServiceName(projectRoot, fs);
-  if (!auth) return [];
+  if (!auth) return result;
   const settingsPath = join(projectRoot, 'appsettings.json');
   const settings = JSON.parse(
     await fs.readFile(settingsPath),
   ) as BrowserAuthSettings;
   const config = settings.NetScript;
-  if (!config) return [];
+  if (!config) return result;
   const sessionContracts = new Map<string, string>();
   for (const service of Object.keys(config.Services ?? {})) {
     const contract = join(projectRoot, 'contracts/versions/v1', `${service}.contract.ts`);
@@ -97,32 +116,68 @@ export async function reconcileBrowserAuth(
   // Preserve the legacy helper-only flow when no browser apps are configured.
   // Task and desktop entries cannot opt an authored browser app back into scaffolding.
   const scaffoldBrowser = apps.length === 0 || scaffoldApps.length > 0;
+  if (scaffoldBrowser) {
+    // The generated BFF is root userland, so its direct cookie dependency belongs here.
+    const denoPath = join(projectRoot, 'deno.json');
+    const deno = JSON.parse(await fs.exists(denoPath) ? await fs.readFile(denoPath) : '{}') as {
+      imports?: Record<string, string>;
+    };
+    deno.imports ??= {};
+    if (deno.imports['@std/http/cookie'] === undefined) {
+      deno.imports['@std/http/cookie'] = 'jsr:@std/http@^1/cookie';
+      await fs.writeFile(denoPath, `${JSON.stringify(deno, null, 2)}\n`);
+    }
+  }
   const authServiceName = `'${auth}'`;
-  const files: BrowserAuthFile[] = scaffoldBrowser
-    ? [
-      {
-        path: join(projectRoot, 'auth/bff.ts'),
-        content: renderTemplateAssetSync(TEMPLATE_KEYS.authBff, {
-          authServiceName,
-        }),
-      },
-      {
-        path: join(projectRoot, 'auth/service.ts'),
-        content: renderTemplateAssetSync(TEMPLATE_KEYS.authService, {
-          authServiceName,
-        }),
-      },
-    ]
-    : [];
-  for (const { name, entry } of scaffoldApps) {
+  const files: BrowserAuthFile[] = [
+    {
+      path: join(projectRoot, 'auth/bff.ts'),
+      authored: !scaffoldBrowser,
+      content: renderTemplateAssetSync(TEMPLATE_KEYS.authBff, {
+        authServiceName,
+      }),
+    },
+    {
+      path: join(projectRoot, 'auth/service.ts'),
+      authored: !scaffoldBrowser,
+      content: renderTemplateAssetSync(TEMPLATE_KEYS.authService, {
+        authServiceName,
+      }),
+    },
+  ];
+  for (const { name, entry, ownership } of apps) {
+    const authored = ownership.Auth?.BrowserTopology === 'authored';
+    const resolvedRoot = resolve(projectRoot, entry.Workdir ?? `apps/${name}`);
+    const resourcePath = relative(projectRoot, resolvedRoot);
+    // Authored layouts were never constrained to generated resource directories.
+    // Report their selected routes without probing paths outside that boundary.
+    if (authored && (resourcePath === '' || resourcePath.startsWith('..'))) {
+      for (
+        const path of [
+          join(resolvedRoot, 'routes/auth/[action].ts'),
+          ...Array.from(
+            sessionContracts.keys(),
+            (service) => join(resolvedRoot, 'routes/examples', service, 'session.ts'),
+          ),
+        ]
+      ) {
+        checks.push({
+          name: relative(projectRoot, path).replaceAll('\\', '/'),
+          ok: true,
+          message: `Skipped (${SKIP_REASON.authored}); authored app layout, not inspected.`,
+        });
+      }
+      continue;
+    }
     const appRoot = workspacePath(projectRoot, entry.Workdir ?? `apps/${name}`);
     const path = appAuthRoute(projectRoot, name, entry);
     // Custom layouts are left to their author; this route is for generated Fresh apps.
-    if (!await fs.exists(join(appRoot, 'utils.ts'))) continue;
+    if (!authored && !await fs.exists(join(appRoot, 'utils.ts'))) continue;
     const bffImport = relative(dirname(path), join(projectRoot, 'auth/bff.ts'))
       .replaceAll('\\', '/');
     files.push({
       path,
+      authored,
       content: renderTemplateAssetSync(TEMPLATE_KEYS.authRoute, { bffImport }),
     });
     for (const [service, contract] of sessionContracts) {
@@ -133,6 +188,7 @@ export async function reconcileBrowserAuth(
       };
       files.push({
         path: route,
+        authored,
         content: renderTemplateAssetSync(TEMPLATE_KEYS.authServiceSessionRoute, {
           serviceName: service,
           utilsImport: importFrom(join(appRoot, 'utils.ts')),
@@ -141,6 +197,7 @@ export async function reconcileBrowserAuth(
         }),
       });
     }
+    if (authored) continue;
     entry.PluginReferences = [
       ...new Set([...(entry.PluginReferences ?? []), auth]),
     ];
@@ -193,17 +250,38 @@ export async function reconcileBrowserAuth(
       content: renderTemplateAssetSync(TEMPLATE_KEYS.authService, { authServiceName }),
     });
   }
-  const written: string[] = [];
-  for (const file of files) {
-    if (await fs.exists(file.path)) {
-      // Never replace a previously authored module or route.
-      if (!file.overwrite) continue;
-      if (await fs.readFile(file.path) === file.content) continue;
+  // The independent service policy may opt auth/service.ts back into generation.
+  const candidates = new Map(files.map((file) => [file.path, file]));
+  for (const file of candidates.values()) {
+    const present = await fs.exists(file.path);
+    // Missing authored files need no generator comparison or formatter process.
+    if (file.authored && !present) {
+      checks.push({
+        name: relative(projectRoot, file.path).replaceAll('\\', '/'),
+        ok: true,
+        message: `Skipped (${SKIP_REASON.authored}); preserved.`,
+      });
+      continue;
     }
-    await fs.createDir(dirname(file.path));
     const content = formatter
       ? await formatter.formatContent(file.path, file.content)
       : file.content;
+    const current = present ? await fs.readFile(file.path) : undefined;
+    const divergent = present && current !== content;
+    if (file.authored || (present && !file.overwrite)) {
+      // An exact generator rerun is current; only preserved differences need attention.
+      if (file.authored || divergent) {
+        checks.push({
+          name: relative(projectRoot, file.path).replaceAll('\\', '/'),
+          ok: true,
+          message: `Skipped (${file.authored ? SKIP_REASON.authored : SKIP_REASON.present}); ` +
+            (divergent ? 'divergent from current generator output; preserved.' : 'preserved.'),
+        });
+      }
+      continue;
+    }
+    if (current === content) continue;
+    await fs.createDir(dirname(file.path));
     await fs.writeFile(file.path, content);
     written.push(file.path);
   }
@@ -211,7 +289,7 @@ export async function reconcileBrowserAuth(
   if (await fs.readFile(settingsPath) !== content) {
     await fs.writeFile(settingsPath, content);
   }
-  return written;
+  return result;
 }
 
 function browserApps(apps: Record<string, BrowserAuthEntry> | undefined) {

@@ -1,0 +1,97 @@
+{
+  "context": "Implementation working tree before sign-off commit; sanitized summaries, not command receipts. Raw structured reports and lifecycle receipts retained privately.",
+  "baseline": "a410a815ce1401d533b18f2a85eb75e266de94a5",
+  "tests": {
+    "passed": 72,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 72,
+    "uniqueFailures": 0
+  },
+  "testsExitCode": 0,
+  "testArgv": [
+    "deno",
+    "task",
+    "test",
+    "--unstable-kv",
+    "--frozen",
+    "plugins/workers/worker",
+    "plugins/workers/tests/runtime",
+    "plugins/workers/tests/public"
+  ],
+  "quality": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "typecheck": {
+    "selection": {
+      "filesSelected": 124,
+      "batches": 2,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    }
+  },
+  "negativeRecovery": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 2,
+      "ignored": 0,
+      "totalResults": 2,
+      "uniqueFailures": 2
+    },
+    "failures": [
+      {
+        "message": "AssertionError: Listener exhausted its budget before recovery.\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at until (file://<cwd>/plugins/workers/worker/listener-recovery_test.ts:<line>:<column>)\n    at async fn (file://<cwd>/plugins/workers/worker/listener-recovery_test.ts:<line>:<column>)",
+        "count": 1,
+        "tests": [
+          {
+            "name": "real Redis queue recovers from repeated ACL write refusals beyond the burst budget",
+            "file": "./plugins/workers/worker/listener-recovery_test.ts",
+            "line": 81
+          }
+        ]
+      },
+      {
+        "message": "AssertionError: Listener exhausted its budget before recovery.\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at until (file://<cwd>/plugins/workers/worker/listener-recovery_test.ts:<line>:<column>)\n    at file://<cwd>/plugins/workers/worker/listener-recovery_test.ts:<line>:<column>",
+        "count": 1,
+        "tests": [
+          {
+            "name": "supervised real Deno KV writes recover repeatedly after closed-handle refusals",
+            "file": "./plugins/workers/worker/listener-recovery_test.ts",
+            "line": 21
+          }
+        ]
+      }
+    ]
+  },
+  "docLint": {
+    "baseline": {
+      "totalPackages": 1,
+      "totalErrors": 2,
+      "totalPrivateTypeRef": 2,
+      "totalMissingJSDoc": 0,
+      "totalOther": 0
+    },
+    "current": {
+      "totalPackages": 1,
+      "totalErrors": 2,
+      "totalPrivateTypeRef": 2,
+      "totalMissingJSDoc": 0,
+      "totalOther": 0
+    },
+    "finding": "Two existing private-type-ref findings in core workers contract; /worker entrypoint zero diagnostics."
+  },
+  "publish": {
+    "outcome": "PASS",
+    "scope": "member plugins/workers via catalog-materializing native wrapper"
+  },
+  "jsrAudit": "No FAIL; existing cardinality warnings and banner-based slow-type warning. Member dry-run passes.",
+  "lockChanges": false,
+  "sharedRuntimeE2E": "Coordinator-owned; not run locally."
+}

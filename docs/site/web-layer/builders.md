@@ -7,48 +7,42 @@ order: 2
 
 # Pages and the define-page builder
 
-`@netscript/fresh` exposes a fluent builder for declaring pages. You start a chain
-with `definePage()`, layer on resources, params, render layers, handlers, and
-metadata, and finish with `build()` to produce a Fresh-compatible page definition.
-The same module also defines framework-owned partial routes through `definePartial()`
-and `defineStatsPartial()`. Reach for this surface whenever you author a route module
-and want a typed pipeline rather than hand-wired loaders and handlers.
+This page covers the `definePage()` builder from `@netscript/fresh/builders`: how the chain
+carries types forward, what `build()` returns, and every method you can chain. You start with
+`definePage()`, add resources, params, render layers, handlers and metadata, and finish with
+`build()` to get a Fresh-compatible page definition. The same module defines partial routes through
+`definePartial()` and `defineStatsPartial()`.
 
-Route contracts themselves — the generated route references passed to `withRoute()` —
-live on `@netscript/fresh/route`; see [Routing and route contracts](/web-layer/route/).
-The data returned by a layer follows a separate type seam: in DB-backed products, generated model
-schemas first become a narrowed [versioned API contract](/explanation/contracts/#where-the-public-shape-begins).
-See the [`@database/zod` generation step](/data-persistence/database/#generated-schemas-feed-public-contracts)
-before wiring that contract's SDK/query result into a loader.
+Route contracts (the generated route references passed to `withRoute()`) live on
+`@netscript/fresh/route`; see [Routing and route contracts](/web-layer/route/). Layer data follows a
+separate type seam: in database-backed products, generated model schemas first become a narrowed
+[versioned API contract](/explanation/contracts/#where-the-public-shape-begins). See the
+[`@database/zod` generation step](/data-persistence/database/#generated-schemas-feed-public-contracts)
+before wiring that contract's SDK or query result into a loader.
 
 ## The builder chain
 
-`definePage<TState>()` returns a `PageRootBuilder<TState>`, the root of a typed
-fluent chain. `PageRootBuilder` extends `PageBuilder`, the public fluent page builder
-surface. Each method returns a new `PageBuilder` whose type parameters carry forward
-the accumulated state, resources, path/search schemas, layer data, and a `THasRoute`
-flag. Because every step is typed, downstream loaders, handlers, layouts, and metadata
-resolvers see the exact shapes you declared earlier in the chain.
+`definePage<TState>()` returns a `PageRootBuilder<TState>`, which extends `PageBuilder`, the public
+fluent page builder surface. Each method returns a new `PageBuilder` whose type parameters carry
+forward the accumulated state, resources, path and search schemas, layer data and a `THasRoute`
+flag. Loaders, handlers, layouts and metadata resolvers later in the chain therefore see the exact
+shapes you declared earlier.
 
-The chain ends with `build()`. When the page was bound to a route with `withRoute()`
-(setting `THasRoute` to `true`), `build()` returns a `RoutedPageDefinition`; otherwise
-it returns a `PageDefinition`. A `PageDefinition` exposes a `page` renderer and a
-`default` export-compatible renderer — both `(ctx: PageRequestContext<TState>) =>
-Promise<PageRenderable>` — plus an optional `handler` built from the handlers you
-registered.
+The chain ends with `build()`. A page bound to a route with `withRoute()` (which sets `THasRoute` to
+`true`) builds a `RoutedPageDefinition`; otherwise `build()` returns a `PageDefinition`. A
+`PageDefinition` exposes a `page` renderer and a `default` export-compatible renderer, both
+`(ctx: PageRequestContext<TState>) => Promise<PageRenderable>`, plus an optional `handler` built from
+the handlers you registered.
 
-{{ comp callout { type: "note" } }}
-`build()` is overloaded. Calling `build()` with no argument, `build(routePattern:
-string)`, or `build(options)` selects the routed or unrouted return type based on the
-arguments and the `THasRoute` flag. A page bound with `withRoute()` always builds a
-`RoutedPageDefinition`.
-{{ /comp }}
+> [!NOTE]
+> `build()` is overloaded: `build()`, `build(routePattern: string)` and `build(options)` select the
+> routed or unrouted return type from the arguments and the `THasRoute` flag. A page bound with
+> `withRoute()` always builds a `RoutedPageDefinition`.
 
 ## Building a page
 
-Here is a page declaring resources, a policy, telemetry, multiple independent render
-layers, a route-bound form, layout slots, and response shaping in a single fluent
-chain:
+This page declares a route contract, a resource, a defer policy, telemetry, a render layer with a
+partial, a route-bound form, layout slots and response shaping in one chain:
 
 ```tsx
 import { definePage } from "@netscript/fresh/builders";
@@ -94,23 +88,9 @@ const orderPage = definePage()
 export default orderPage.default;
 ```
 
-This envelope demonstrates the core page builder capabilities:
-
-- **Route typing:** `withRouteContract` applies `$route`, path, and search schemas
-  so `ctx.path` and `ctx.search` are strongly typed throughout the chain.
-- **Resource resolution:** `withResource` declares request-scoped data factories
-  accessible via `ctx.resource(key)`.
-- **Independent layers & partials:** `withLayer` declares parallel render units with
-  `partial` routes and `partialName` tags.
-- **Partial fallbacks & staleTime:** layer configs support JSX `fallback` elements,
-  `staleTime` windows, and `staleReloadMode`.
-- **Managed forms:** `withForm` wires Zod schema validation, CSRF headers, and `mutate`
-  handlers into a typed form layer.
-- **Telemetry:** `withTelemetry` configures OpenTelemetry span names and tracing.
-- **Layout slots:** `withLayout` receives a `slots` map containing callable layer renderers
-  for flexible page structuring.
-
-The smallest useful page is much shorter when you only need basic rendering:
+`withRouteContract` types `ctx.path` and `ctx.search` for the rest of the chain, `withForm` wires
+schema validation, CSRF headers and the `mutate` handler into a form layer, and `withLayout`
+receives a `slots` map of callable layer renderers. The smallest useful page is much shorter:
 
 ```ts
 import { definePage } from "@netscript/fresh/builders";
@@ -126,16 +106,15 @@ const page = definePage()
 export default page.default;
 ```
 
-Inside a loader, handler, layout, or metadata resolver, the runtime hands you a
-`PageContext`. It extends `PageRequestContext` and adds the parsed `path` and `search`
-state, already-resolved `layerData`, the `routePattern`, a typed `nav` href builder,
-the `resources` record, and a `resource(key)` accessor that resolves a single named
-resource with full typing.
+Loaders, handlers, layouts and metadata resolvers receive a `PageContext`. It extends
+`PageRequestContext` with the parsed `path` and `search` state, the resolved `layerData`, the
+`routePattern`, a typed `nav` href builder, the `resources` record, and a `resource(key)` accessor
+that reads one named resource with full typing.
 
 ## Builder methods
 
-The methods on `PageBuilder` group into resources, params, routing, render layers,
-handlers, and response shaping. Each returns a `PageBuilder` for continued chaining.
+The methods on `PageBuilder` cover resources, params, routing, render layers, handlers and response
+shaping. Each returns a `PageBuilder` for continued chaining.
 
 | Method | Purpose |
 | --- | --- |
@@ -159,101 +138,54 @@ handlers, and response shaping. Each returns a `PageBuilder` for continued chain
 | `createNav(routePattern?)` | Create typed route navigation for the page. |
 | `build(...)` | Build the `PageDefinition` or `RoutedPageDefinition`. |
 
-`withHeader` is overloaded: it accepts a single `name`/`value` pair, a `HeadersInit`
-map, or a `PageHeaderResolver` that computes headers per request.
+`withHeader` accepts a single `name`/`value` pair, a `HeadersInit` map, or a `PageHeaderResolver`
+that computes headers per request.
 
-Resources resolve sequentially, before any layer, into a store every loader shares —
-the mechanism, its ordering contract, and the dedup patterns it enables are covered in
-[Request-scoped resources](/web-layer/resources/).
-
-Layers then resolve concurrently, each into its own named region. The loader contract,
-the full layer config, slot placement with `withLayout`, and the typed layer hooks are
-covered in [Layers, layout, and slots](/web-layer/layers/).
+Resources resolve sequentially, before any layer, into a store every loader shares; see
+[Request-scoped resources](/web-layer/resources/). Layers then resolve concurrently, each into its
+own named region; see [Layers, layout, and slots](/web-layer/layers/).
 
 ### Params and route state
 
-`withPathParams`, `withSearchParams`, and the combined `withParams` apply typed
-schemas to the page. After they run, `PageContext.path` and `PageContext.search`
-carry the parsed, typed state. `withRoute` binds the page to a `PageRouteReference`,
-which exposes a typed `nav`, an `href(...)` builder, a route-bound `Link` component,
-and `parsePath` / `parseSearch` helpers (plus `safeParsePath` / `safeParseSearch`
-returning a `PageSchemaParseResult`). Data loading details are covered in
-[Data loading and the query cache](/web-layer/query/).
+`withPathParams`, `withSearchParams` and the combined `withParams` apply typed schemas to the page.
+After they run, `PageContext.path` and `PageContext.search` carry the parsed state. `withRoute` binds
+the page to a `PageRouteReference`, which exposes a typed `nav`, an `href(...)` builder, a
+route-bound `Link` component, and `parsePath` / `parseSearch` helpers (plus `safeParsePath` /
+`safeParseSearch`, which return a `PageSchemaParseResult`).
 
-#### Codegen-owned route binding
-
-With the NetScript Vite plugin enabled, the binding call itself is generated from
-the page module's path under `routes/`, so you author only the contract body. Three
-forms converge on the same generated `routes.<key>` tree:
-
-- **Form A — inline.** `withRouteContract({ pathSchema?, searchSchema? })` keeps the
-  contract body in the page module. The generator inserts
-  `$route: routePatterns.<key>.$route` as the first field and the `routePatterns`
-  import. The inline schemas drive the same `path` / `search` type-state promotion
-  as `withRoute`.
-- **Form B — sidecar.** A sibling `<page>.route.ts` owns the contract. The generator
-  inserts `.withRoute(routes.<key>.$route)` and the `routes` import.
-- **Form C — no contract.** The generator inserts a default
-  `.withRoute(routes.<key>.$route)` backed by `createRouteReference(routePattern)`.
-
-Both inline and sidecar in the same page is a build warning (inline wins, the
-sidecar is left in place). `.withRoute` and `.withRouteContract` in the same page is
-a build error. Set `pageModuleRouteBinding: false` on the Vite plugin to disable
-page-module rewriting and keep hand-written `.withRoute(...)` lines.
-
-How the `routes.<key>` accessor is derived from a file path, the exact conflict
-messages, and what a moved route file costs at compile time are covered in
-[Routing and route contracts](/web-layer/route/#the-generated-routes-tree).
+With the NetScript Vite plugin enabled, the binding call is generated from the page module's path
+under `routes/` when the page has no explicit binding. An existing `.withRoute(...)` call and its
+imports remain author-owned. Otherwise, author only the contract body: inline in `withRouteContract()`, in a sibling
+`<page>.route.ts` sidecar, or not at all. The three forms, their conflict rules and the
+`pageModuleRouteBinding: false` opt-out are covered in
+[Routing and route contracts](/web-layer/route/#three-authoring-forms-one-generated-binding).
 
 ### Defer policy and streaming
 
-`withPolicy` accepts a `PageDeferPolicyInput` or a `PageDeferPolicyProfile`. The
-profile is one of `"balanced"`, `"aggressive-first-paint"`, `"background-refresh"`,
-or `"low-bandwidth"`. A `PageDeferPolicyInput` overrides individual fields such as
-`staleTimeMs`, `prewarmOnMiss`, and `prewarmOnStale`. `withStreaming()` enables
-builder-owned HTML streaming for layers declared with `delivery: 'stream'`. See
-[Deferred and streaming UI](/web-layer/defer-streaming-ui/) for the policy model.
+`withPolicy` accepts a `PageDeferPolicyInput` or a `PageDeferPolicyProfile`. The profile is one of
+`"balanced"`, `"aggressive-first-paint"`, `"background-refresh"` or `"low-bandwidth"`. A
+`PageDeferPolicyInput` overrides individual fields such as `staleTimeMs`, `prewarmOnMiss` and
+`prewarmOnStale`. `withStreaming()` enables builder-owned HTML streaming for layers declared with
+`delivery: 'stream'`. See [Deferred and streaming UI](/web-layer/defer-streaming-ui/) for the policy
+model.
 
 ### Handlers and methods
 
-`withHandler(method, handler)` registers a method handler. `method` is a `PageMethod`,
-one of `"GET"`, `"POST"`, `"PUT"`, `"PATCH"`, `"DELETE"`, `"OPTIONS"`, or `"HEAD"`.
-`withForm` registers a route-bound form as a typed layer, wiring a layer, method
-handler, CSRF headers, and form metadata; its component receives `RuntimeFormState`
-props. Forms are covered in [Server-validated forms](/web-layer/form/).
+`withHandler(method, handler)` registers a method handler. `method` is a `PageMethod`: `"GET"`,
+`"POST"`, `"PUT"`, `"PATCH"`, `"DELETE"`, `"OPTIONS"` or `"HEAD"`. `withForm` registers a route-bound
+form as a typed layer, wiring a layer, a method handler, CSRF headers and form metadata; its
+component receives `RuntimeFormState` props. See [Server-validated forms](/web-layer/form/).
 
-Which combination of `withHandler`, `withHeader`, `withStatus`, and `withStreaming`
-produces which handler — and the three build-time errors that guard them — is covered in
-[Response shaping](/web-layer/response/), along with `withMeta` and the `build()`
-overloads.
+[Response shaping](/web-layer/response/) explains which combination of `withHandler`, `withHeader`,
+`withStatus` and `withStreaming` produces which handler, and the errors that guard them.
 
 ## Partials
 
-`definePartial()` defines a framework-owned partial route backed by an async loader,
-and `defineStatsPartial()` defines a stats-only partial backed by a context-free query
-function. Both return a `DefinedPartialRoute`, which carries a Fresh `config`, an
-optional `handler`, a `page` renderer, and a `default` export-compatible renderer.
-
-`DefinePartialOptions` requires a stable `name`, a `loader` `(ctx) => Promise<TProps>`,
-and a `component`. It also accepts an optional `errorComponent`, `errorTitle`,
-`handler`, and Fresh `config`. `DefineStatsPartialOptions` omits `loader` and instead
-requires a `query` `() => Promise<TProps>`.
-
-The error shell, the paired route reference that types the `f-partial` link, and the
-layer config that turns a region into a deferred partial are covered in
-[Partials](/web-layer/partials/).
-
-```ts
-import { definePartial } from "@netscript/fresh/builders";
-
-export const liveCount = definePartial({
-  name: "live-count",
-  loader: async (ctx) => {
-    return { total: await countActive(ctx) };
-  },
-  component: CountView,
-});
-```
+`definePartial()` defines a partial route backed by an async loader, and `defineStatsPartial()`
+defines a stats-only partial backed by a context-free query. Both return a `DefinedPartialRoute`.
+`DefinePartialOptions` requires a stable `name`, a `loader` and a `component`;
+`DefineStatsPartialOptions` replaces `loader` with a `query`. [Partials](/web-layer/partials/)
+covers both, with the error shell and the paired route reference that types the `f-partial` link.
 
 ## API summary
 
@@ -276,8 +208,8 @@ export const liveCount = definePartial({
 | `PageDeferPolicyProfile` | Named defer policy profile union. |
 | `PageRenderable` | Renderable value returned by page and partial renderers. |
 
-## Related
+## Next steps
 
-{{ comp.cardsGrid({ columns: 3, cards: [ { title: "The Fresh page model", body: "How a NetScript Fresh page is structured.", href: "/web-layer/server/" }, { title: "Request-scoped resources", body: "withResource, ordering, and cross-layer dedup.", href: "/web-layer/resources/" }, { title: "Layers, layout, and slots", body: "withLayer, withLayout, and the loader contract.", href: "/web-layer/layers/" }, { title: "Routing and route contracts", body: "Generated route references for withRoute().", href: "/web-layer/route/" }, { title: "Data loading and the query cache", body: "Resolve resources and cache data.", href: "/web-layer/query/" }, { title: "Server-validated forms", body: "withForm and RuntimeFormState.", href: "/web-layer/form/" }, { title: "Response shaping", body: "withMeta, withHeader, withStatus, and build().", href: "/web-layer/response/" }, { title: "Deferred and streaming UI", body: "withPolicy, withStreaming, and defer profiles.", href: "/web-layer/defer-streaming-ui/" }, { title: "Live dashboard tutorial", body: "Build a page end to end.", href: "/tutorials/live-dashboard/" } ] }) }}
-
-See the [Web Layer overview](/web-layer/) for the full pillar map.
+Continue with [Request-scoped resources](/web-layer/resources/), the first thing a built page
+resolves at runtime. See also [Layers, layout, and slots](/web-layer/layers/) and
+[Response shaping](/web-layer/response/).

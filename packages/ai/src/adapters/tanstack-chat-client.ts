@@ -37,6 +37,7 @@ import type {
 } from '@tanstack/ai';
 
 import type { ContentPart, MessageContent } from '../contracts/content.ts';
+import { AiRateLimitError } from '../contracts/errors.ts';
 import type { GenerationOptions } from '../contracts/generation.ts';
 import type { ToolCall, ToolDescriptor, ToolParameters } from '../contracts/tool.ts';
 import type { Usage } from '../contracts/usage.ts';
@@ -48,6 +49,13 @@ import type {
   ChatClientRequest,
   ChatFinishReason,
 } from '../ports/chat-client.ts';
+
+// Keep known busy codes closed: quota exhaustion and unknown symbols are not transient.
+const BUSY_PROVIDER_STATUSES = new Map<string, number>([
+  ['429', 429],
+  ['503', 503],
+  ['rate_limit_exceeded', 429],
+]);
 
 /** Build the provider SDK adapter for one call's connection values. */
 export type ChatAdapterResolver = (
@@ -324,7 +332,20 @@ function translateChunk(
       };
     }
     case EventType.RUN_ERROR: {
-      return { type: 'error', message: chunk.message, cause: chunk.code };
+      const status = chunk.code === undefined ? undefined : BUSY_PROVIDER_STATUSES.get(chunk.code);
+      const retryAfterMs = chunk.metadata?.tanstack?.retryAfterMs ?? chunk.retryAfterMs;
+      return {
+        type: 'error',
+        message: chunk.message,
+        cause: status === undefined ? chunk.code : new AiRateLimitError(chunk.message, {
+          status,
+          cause: chunk.code,
+          retryAfterMs: typeof retryAfterMs === 'number' && Number.isFinite(retryAfterMs) &&
+              retryAfterMs >= 0
+            ? retryAfterMs
+            : undefined,
+        }),
+      };
     }
     default: {
       return null;

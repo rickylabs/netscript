@@ -1,0 +1,44 @@
+const root='C:/Users/ericc/source/repos/netscript-native-host-policy-008';
+const out=root+'/.llm/tmp/native-host-policy-u1-s6e-astra-20261028',gates=out+'/gates';
+const read=async(path:string)=>JSON.parse(await Deno.readTextFile(path));
+const sha=async(bytes:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),v=>v.toString(16).padStart(2,'0')).join('');
+const hash=async(path:string)=>await sha(await Deno.readFile(path));
+const baseline=await read(out+'/protected-bindings.json');
+const sourcePath='plugins/streams/services/src/service-lifecycle_test.ts';
+const source=await Deno.readFile(root+'/'+sourcePath),content=new TextDecoder().decode(source);
+const prefix={...baseline.prefix,actual:await sha(source.slice(0,baseline.prefix.bytes))};
+const protectedRows=[];
+for(const row of baseline.rows){const actual=await hash(root+'/'+row.path);protectedRows.push({...row,actual,matches:actual===row.expected});}
+await Deno.writeFile(out+'/source.final.ts',source,{createNew:true});
+const diff=await new Deno.Command('git',{args:['diff','--',sourcePath],cwd:root,stdout:'piped',stderr:'piped'}).output();
+if(!diff.success||diff.stderr.length||!diff.stdout.length)throw new Error('Source append diff failed');
+await Deno.writeFile(out+'/source.diff',diff.stdout,{createNew:true});
+async function absent(path:string){try{await Deno.stat(path);return false;}catch(error){if(error instanceof Deno.errors.NotFound)return true;throw error;}}
+const children=[],cleanup=[],native=[],observations=[];
+const expected=['c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e','6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08'];
+const profile=await read(gates+'/cleanup.json');cleanup.push({...profile,absentVerified:await absent(profile.profile)});
+for(const dir of Deno.readDirSync(gates+'/children')){
+ if(!dir.isDirectory)throw new Error('Unexpected evidence entry');
+ const label=dir.name,folder=gates+'/children/'+label,row=await read(folder+'/cleanup.json');cleanup.push({label,...row,absentVerified:await absent(row.scratch)});
+ for(const name of ['cache-info','discovery-result','child-1-result']){
+  const path=folder+'/'+name+'.json',result=await read(path);
+  children.push({label,name,...result,stdoutBytes:new TextEncoder().encode(result.stdout).length,stderrBytes:new TextEncoder().encode(result.stderr).length});
+  if(name==='discovery-result')for(const[index,addon]of JSON.parse(result.stdout).entries())native.push({label,path:addon.path,bytes:addon.bytes,sha256:addon.sha256,matches:addon.sha256===expected[index]});
+  if(/^(abort|drain)-/.test(label)&&name==='child-1-result'){
+   const line=result.stdout.split('\n').find(line=>line.startsWith('{"observations":'));
+   if(!line)throw new Error('Missing native lifecycle evidence');
+   observations.push({label,code:result.code,pid:result.pid,startedAt:result.startedAt,finishedAt:result.finishedAt,sha256:await hash(path),evidence:JSON.parse(line),nativeErrors:result.stderr.match(/^error: .*$/gm)??[],cleanupMarkers:result.stdout.split('s6e-streams: response, native stops and both ports settled').length-1,successMarkers:result.stdout.split('s6e-streams: lifecycle assertion and cleanup settled').length-1});
+  }
+ }
+}
+const git=await new Deno.Command('git',{args:['diff','--name-only'],cwd:root,stdout:'piped',stderr:'piped'}).output();
+const staged=await new Deno.Command('git',{args:['diff','--cached','--name-only'],cwd:root,stdout:'piped',stderr:'piped'}).output();
+const owner={path:sourcePath,bytes:source.length,lines:content.trimEnd().split('\n').length,cap:430,sha256:await sha(source)};
+const result={head:baseline.head,owner,prefix,originalProtectedCount:116,checkpointProtectedCount:148,protectedCount:protectedRows.length,protectedMatched:protectedRows.filter(v=>v.matches).length,protectedRows,children,cleanup,native,observations,trackedDiff:new TextDecoder().decode(git.stdout),stagedDiff:new TextDecoder().decode(staged.stdout),tests:await read(gates+'/tests.report.json'),types:await read(gates+'/types.report.json'),lint:await read(gates+'/lint.report.json'),fmt:await read(gates+'/fmt.report.json'),quality:await read(gates+'/quality-new.stdout.log'),sourceDiffSha256:await hash(out+'/source.diff')};
+await Deno.writeTextFile(out+'/source-proof.json',JSON.stringify(result,null,2)+'\n',{createNew:true});
+const reports=[];for(const name of ['execution.json','tests.report.json','types.report.json','lint.report.json','fmt.report.json','quality-new.stdout.log'])reports.push({path:gates+'/'+name,sha256:await hash(gates+'/'+name)});
+await Deno.writeTextFile(out+'/gate-hashes.json',JSON.stringify({reports,owner,prefix,sourceProofSha256:await hash(out+'/source-proof.json')},null,2),{createNew:true});
+if(result.protectedCount!==264||result.protectedMatched!==264||prefix.actual!==prefix.sha256||owner.lines>owner.cap||result.trackedDiff.trim()!==sourcePath||result.stagedDiff||cleanup.length!==13||cleanup.some(v=>!v.absentVerified)||native.length!==24||native.some(v=>!v.matches)||children.length!==36||children.some(v=>!v.statusSettled||!v.pipesSettled||!v.stdinSettled||v.stdoutBytes>32768||v.stderrBytes>32768))throw new Error('Source/cleanup/protected proof failed');
+for(const row of observations){const negative=/omitted|negative/.test(row.label);const expectedError=row.label.startsWith('abort')?'ABORT_DID_NOT_RELEASE':'DRAIN_COMPLETED_BEFORE_RELEASE';if(row.code!==(negative?1:0)||row.cleanupMarkers!==1||row.successMarkers!==(negative?0:1)||JSON.stringify(row.nativeErrors)!==JSON.stringify(negative?['error: Uncaught (in promise) Error: '+expectedError]:[]))throw new Error('Exact lifecycle control outcome differs');}
+if(observations.length!==4)throw new Error('Missing lifecycle row');
+console.log(JSON.stringify({owner,prefix,protectedMatched:result.protectedMatched,children:children.length,cleanups:cleanup.length,nativeMatches:native.length,tests:result.tests.summary,observations,proofSha256:await hash(out+'/source-proof.json')}));

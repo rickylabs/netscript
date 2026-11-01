@@ -1,0 +1,51 @@
+{
+  "baseline": "46b22e63608eb4ba067145445b523536d6e48aa9",
+  "sourceFile": "packages/cli/src/kernel/templates/aspire/helpers/tests/aspire-compat-health-checks_test.ts",
+  "sourceSha256": "9bebe60f76194b631a55131d1d05c867950c671871cba6d359c75ef938d9a730",
+  "combinedCommand": "deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/src packages/cli/tests packages/database/tests",
+  "combined": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 2473,
+      "failed": 0,
+      "ignored": 4,
+      "totalResults": 2477,
+      "uniqueFailures": 0
+    },
+    "durationMs": 795595,
+    "tempEnvironment": "task-owned executable TMPDIR"
+  },
+  "firstAttempt": {
+    "summary": {
+      "passed": 2464,
+      "failed": 9,
+      "ignored": 4,
+      "totalResults": 2477,
+      "uniqueFailures": 7
+    },
+    "failures": "nine unrelated executable-fixture failures from default noexec temp mount; no source changes made to repair environment"
+  },
+  "environmentRerun": {
+    "passed": 12,
+    "failed": 0
+  },
+  "lock": {
+    "beforeSha256": "884935552df175250e4c77148eafbb6e2952f76665731afd1199954f6174c99a",
+    "afterSha256": "884935552df175250e4c77148eafbb6e2952f76665731afd1199954f6174c99a",
+    "gitDiffQuiet": true,
+    "restoredAfterRun": false
+  },
+  "focusedFrozen": {
+    "passed": 23,
+    "failed": 0
+  },
+  "structuredCheckLintFmt": "PASS one owned TypeScript file with explicit CLI style config",
+  "qualityGate": "PASS",
+  "sourceReview": "independent Opus5.5/high PASS; reran23 frozen tests, verified lock and cleanup",
+  "e2eCliRequired": false,
+  "jsrPublishability": "N/A test-only diff; shipped surface/config/assets unchanged",
+  "aspireStatic": {
+    "manifestFresh": true,
+    "optionalPhase2": "two identical pre-existing tooling-document literal findings, reproduced with unchanged test source; not claimed green"
+  }
+}

@@ -1,0 +1,406 @@
+{
+    "schemaVersion":  1,
+    "createdAt":  "2026-10-28T00:44:10.5634332Z",
+    "archive":  "s3e-evidence.json.gz",
+    "archiveBytes":  66474,
+    "archiveSha256":  "19dd71343b2d925f3aec935a1fabda03ae456bc23726e575382d135dc36a5aad",
+    "payloadSha256":  "16509401d4cedab6a3bd82a426b42cad62a17bf944e15d5dcd5d89d6294552b3",
+    "fileCount":  78,
+    "originalBytes":  185009,
+    "roundtripVerifiedFiles":  78,
+    "allOriginalFilesRetained":  true,
+    "priorCommittedHistoryRewritten":  false,
+    "credentialOrProfileStateIncluded":  false,
+    "files":  [
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/root-s3e-source-acceptance.md",
+                      "bytes":  1801,
+                      "sha256":  "0d7c1ac487fd2d79ee05d22b10a47e78f7bc83313c70215a3a093a946c67282e"
+                  },
+                  {
+                      "path":  ".llm/runs/fix-native-host-policy--u1/s3e-workers-abort-proposal.md",
+                      "bytes":  7208,
+                      "sha256":  "f0f28247f89e3f1048a770393758fa578811f02f3d052a1f8f53e580316efe8f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-implementation/review/pre-astra-s3e-init-20261028.log",
+                      "bytes":  1700,
+                      "sha256":  "4527e8cd602b1a653195828cba3241f72f2fc21925564791277d7836928e28d7"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/archive-evidence.ps1",
+                      "bytes":  4783,
+                      "sha256":  "b9de5a93100212c8507c50c520701bc8c9bade52c9bc6dc0e838e55976136f88"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/baseline-hashes.json",
+                      "bytes":  3768,
+                      "sha256":  "a0485e6173ef3b20e566ae6bddc941e38651dedc59c03ea55746cecd9f383662"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/baseline-status.txt",
+                      "bytes":  1052,
+                      "sha256":  "9ffcf660118f20957519e5ad9d860e3ec77aacfce77aaad1d7293a0d58da2e9c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/cleanup.json",
+                      "bytes":  225,
+                      "sha256":  "ecd2058000478c92ecf173f794c3620285cc9a0423e2e65a14e25d6b362fd810"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/execution.json",
+                      "bytes":  7360,
+                      "sha256":  "a96f8d1ce3ddb91b4dd26266ce4c2e3e621284f5e32d2bdda5afc72c44fe2467"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/cleanup.json",
+                      "bytes":  231,
+                      "sha256":  "f228f310d302557f861b4da765eaa349a6b9a7830d1574e5671d60f9a3d9d5fd"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/execution.json",
+                      "bytes":  7500,
+                      "sha256":  "261c1adc7e3065f374ae6260401e9c8e384f1e65a0dd0aa8db127988ad587066"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/fmt.report.json",
+                      "bytes":  309,
+                      "sha256":  "0b669e1fcad0dfe4e6f765f41a3cfa7cab7aaa9155f45b6b6d92a81abdcd8cd3"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/fmt.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/fmt.stdout.log",
+                      "bytes":  239,
+                      "sha256":  "ea69480d0f7883ff50fe22f7df6ffd48cf643837483809c75ab6ef9dfb3bed0a"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/lifecycle-raw.stderr.log",
+                      "bytes":  61,
+                      "sha256":  "f43d17d34fd6243b4a861c46e4bfdf78fda90b7c16a0493bce9a166348966826"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/lifecycle-raw.stdout.log",
+                      "bytes":  10815,
+                      "sha256":  "69d9b555c83c97da9f916874d26d65d393e0769024d5ada4238c6cae2b7f3c9a"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/lint.report.json",
+                      "bytes":  360,
+                      "sha256":  "a8de82c15ed82d900bd4a266da0ce6d66e1eba2f4a10adccdd52efde115accdd"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/lint.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/lint.stdout.log",
+                      "bytes":  234,
+                      "sha256":  "8d67d67efe8435c8200165dc06e32fedbac48ad4a2b0596280d653a1b5776e7a"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/quality.execution.json",
+                      "bytes":  440,
+                      "sha256":  "81ad46bb3531d5c9bc30069e2e6878e2ee26b5333d486a96a67a8fec63e079d6"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/quality.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/quality.stdout.json",
+                      "bytes":  348,
+                      "sha256":  "2bfa299e5bf12cf876cc4d6a6556182d3691548b11aa3f8aeb17a687e70a1d2c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/service-lifecycle_test.ts.candidate",
+                      "bytes":  4758,
+                      "sha256":  "c416cf59fc7570746a9b92b5d88da3eab265b6f6f5a469cf21bcc2731646145b"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/signal-omitted.stderr.log",
+                      "bytes":  4157,
+                      "sha256":  "2f8398bc2cc21b27e1cbccf1287643d8160857423171cf956585267a0c3b7304"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/signal-omitted.stdout.log",
+                      "bytes":  1074,
+                      "sha256":  "4d570952af6886d2fe649f2fc1bad5fc3acc12d6960c52684503ba45ad99d9bd"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/signal-present.stderr.log",
+                      "bytes":  3766,
+                      "sha256":  "489506e2f554d63d6d1fcdd3ce9ef2d0f23b994a055a20121bfe340a34ca9b7f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/signal-present.stdout.log",
+                      "bytes":  1123,
+                      "sha256":  "3ae44f385aa72add50087246ba0ff5c9293f54c28e5a8426011f02470e5d497b"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/tests.report.json",
+                      "bytes":  469,
+                      "sha256":  "4cb40bca525ce7626bc3c1f5cc9fd081410310e90574f00074c900b93a9b10a1"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/tests.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/tests.stdout.log",
+                      "bytes":  230,
+                      "sha256":  "c11fb65a549f3de46359fdf8245824537f7ae1fcff8944f40c0e95c7de34ce14"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/types.report.json",
+                      "bytes":  335,
+                      "sha256":  "381255a53054ef04cb43fc4f52159a81b6313a326bd7fd784f90d9c16930a64f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/types.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/final/types.stdout.log",
+                      "bytes":  235,
+                      "sha256":  "d0828768a0983baa00f7e629451dccb681ad097e5cb1bbc6883e5daa8bbb1695"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/fmt.stderr.log",
+                      "bytes":  706,
+                      "sha256":  "feb186fdca1bb48c83d3ac00406737d4fdf42b9d75dded5f37821d4d98d8666b"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/fmt.stdout.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/head.txt",
+                      "bytes":  42,
+                      "sha256":  "7d14b9655d4cf9657ef88617b2319188ef5b45011281f07545c1ea0e56599d65"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/lifecycle-raw.stderr.log",
+                      "bytes":  80,
+                      "sha256":  "4979dbed91d2fd3a8b0c995843d3a24d9e33cd4c85c8c9be1e71c963f93f878b"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/lifecycle-raw.stdout.log",
+                      "bytes":  17000,
+                      "sha256":  "0875ce56f08a9222220d97b834b4e4d778c14552bb5c84dc24162c79c9555115"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/lint.stderr.log",
+                      "bytes":  712,
+                      "sha256":  "af9d70df919de984afa0d30facf0fb742134fdd665eecc79545fb0cbd9713bc5"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/lint.stdout.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/mcp-doc-search.json",
+                      "bytes":  768,
+                      "sha256":  "a9559e5f09c9e9a5e9f5be7945a84c11ec56ef4eb19dd003eb2897a5c232b41c"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/prove-source.ts",
+                      "bytes":  5867,
+                      "sha256":  "a2ca108715063693b79acae5b12883d0669abbf433702274071462de59e60db3"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/retry/cleanup.json",
+                      "bytes":  231,
+                      "sha256":  "adc8198a12d4682abcd1c3447ec8e74faf37a7a4f1d5bde453c16206700fa54d"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/retry/execution.json",
+                      "bytes":  7462,
+                      "sha256":  "64a66f243ce4a95e78605b4aa2fdb5c724b0d8069ae0b13f635fda88d62c6aab"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/retry/fmt.stderr.log",
+                      "bytes":  706,
+                      "sha256":  "feb186fdca1bb48c83d3ac00406737d4fdf42b9d75dded5f37821d4d98d8666b"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/retry/fmt.stdout.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/retry/lifecycle-raw.stderr.log",
+                      "bytes":  61,
+                      "sha256":  "f43d17d34fd6243b4a861c46e4bfdf78fda90b7c16a0493bce9a166348966826"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/retry/lifecycle-raw.stdout.log",
+                      "bytes":  10815,
+                      "sha256":  "ed81babfc841e95d89da9415ec24166638f93aa520bf80c41f18ddcff47fc336"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/retry/lint.stderr.log",
+                      "bytes":  712,
+                      "sha256":  "af9d70df919de984afa0d30facf0fb742134fdd665eecc79545fb0cbd9713bc5"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/retry/lint.stdout.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/retry/tests.report.json",
+                      "bytes":  469,
+                      "sha256":  "5cf7b389b5b48542ad4452388d13d09ac9b1d70a502af604ab5e5e88841a7a97"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/retry/tests.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/retry/tests.stdout.log",
+                      "bytes":  230,
+                      "sha256":  "7ca35f2308494e7fd31474d9d97a5ebc9ff7f3297d21a18e444afaa55d9130b6"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/retry/types.stderr.log",
+                      "bytes":  582,
+                      "sha256":  "171705aa9aac7f3098b1a8cb12a9b647ef20e91e5e11f9ed08e7f35ddefef6c6"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/retry/types.stdout.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/run-gates.final.ts",
+                      "bytes":  3821,
+                      "sha256":  "9eff115be2ae22c259d1bfa7f6617bb1d878377c65c5954119595d55a20768e8"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/run-gates.first-attempt.ts",
+                      "bytes":  3769,
+                      "sha256":  "d9b4556bb230776e93d4510ffd1a80bf091298d8d875b7f915091713e3a5f7e4"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/run-gates.retry.ts",
+                      "bytes":  3787,
+                      "sha256":  "f91de58870b59c589326f1c32bc970ef564daaeb8a010e3ec8d792003cb05a15"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/run-gates.static.ts",
+                      "bytes":  3771,
+                      "sha256":  "9847f793ebbc8eea56e3e93d9178f55e11885b4154003e21fac7297132020018"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/run-gates.ts",
+                      "bytes":  3787,
+                      "sha256":  "f91de58870b59c589326f1c32bc970ef564daaeb8a010e3ec8d792003cb05a15"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/service-conformance_test.ts.before",
+                      "bytes":  21432,
+                      "sha256":  "035d29dc4957e6d69ef368b0828e7b7fb42b1446428ea1ee147ee11f31eddc64"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/service-test-fixture.ts.before",
+                      "bytes":  8551,
+                      "sha256":  "6f8c0bc3d59ae4c8847097e8f124664238cde352dc0d7bf2a563dcb48d1408d2"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/source-proof.json",
+                      "bytes":  10184,
+                      "sha256":  "425cff235d74ef3cc701cb7bce1f2a9a796294c3a12e89c1b715a30efb87c548"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/static-final/cleanup.json",
+                      "bytes":  238,
+                      "sha256":  "08b339e6a9ae4a2bcb48807b088ce6afc9e547185f7f9e725aa3c57857f19bf6"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/static-final/execution.json",
+                      "bytes":  5928,
+                      "sha256":  "442992d426befee8175c09133c45c4c7c7e16d5c3515f129e4cd62367254c6aa"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/static-final/fmt.report.json",
+                      "bytes":  549,
+                      "sha256":  "d45d7cc1c737af22b6322fdf246301c46e5ac83557135344d959aa2762c72ab6"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/static-final/fmt.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/static-final/fmt.stdout.log",
+                      "bytes":  246,
+                      "sha256":  "423b772aaf6b3f613c1f87c44ea0441c6b663f4e76cb24ae647864a72818da38"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/static-final/lint.report.json",
+                      "bytes":  656,
+                      "sha256":  "979baab94c9a3f15c7a53235c803c024b959dfa17e7927153385610e1290d975"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/static-final/lint.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/static-final/lint.stdout.log",
+                      "bytes":  241,
+                      "sha256":  "d58a50c2af0a5bc5d81900528a97d77cd731914e5ee0ee41d5b82441c3bb7dc7"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/static-final/types.report.json",
+                      "bytes":  335,
+                      "sha256":  "381255a53054ef04cb43fc4f52159a81b6313a326bd7fd784f90d9c16930a64f"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/static-final/types.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/static-final/types.stdout.log",
+                      "bytes":  242,
+                      "sha256":  "be21fc4fcc3f8cbea167afe15c9cf3cf2bbac3ae8c0f394f5d57fe0a6525e764"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/tests.report.json",
+                      "bytes":  5642,
+                      "sha256":  "d2ae4c88ef3bfee4a954f3f07c209e3d7a2d3d7543ee5157af1425d7cfdd5531"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/tests.stderr.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/tests.stdout.log",
+                      "bytes":  224,
+                      "sha256":  "9c0066edddaa05e25f11a510cfd924cdbbdd0bf4c48a53c2f1c983b02514aeae"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/types.stderr.log",
+                      "bytes":  582,
+                      "sha256":  "171705aa9aac7f3098b1a8cb12a9b647ef20e91e5e11f9ed08e7f35ddefef6c6"
+                  },
+                  {
+                      "path":  ".llm/tmp/native-host-policy-u1-s3e-astra-20261028/types.stdout.log",
+                      "bytes":  0,
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  }
+              ]
+}

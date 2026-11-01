@@ -1,0 +1,11 @@
+﻿{
+  "version": 1,
+  "denoVersion": "2.9.7",
+  "denoDir": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache",
+  "modulesCache": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\remote",
+  "npmCache": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\npm",
+  "typescriptCache": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\gen",
+  "registryCache": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\registries",
+  "originStorage": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\location_data",
+  "webCacheStorage": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-preflight/cache\\location_data\\web_cache"
+}

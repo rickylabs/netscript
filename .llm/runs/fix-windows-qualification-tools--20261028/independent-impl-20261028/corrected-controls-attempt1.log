@@ -1,0 +1,7 @@
+Check .llm/tmp/windows-db-impl-review-20261028/corrected-guards_control_test.ts
+running 3 tests from ./.llm/tmp/windows-db-impl-review-20261028/corrected-guards_control_test.ts
+public allowlist omits private unknown and extra fields ... ok (7ms)
+public capture enforces UTF-8 bytes and refuses malformed input ... ok (10ms)
+one inference spawn and error cleanup await native status and both pipes ... ok (27ms)
+
+ok | 3 passed | 0 failed (52ms)

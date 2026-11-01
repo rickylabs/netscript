@@ -21,7 +21,12 @@ const EVENTS = [
   { displayName: 'workers', state: 'Running', healthStatus: 'Healthy' },
 ];
 
-async function failureFixture(mode: 'capture' | 'refresh', hang = false) {
+async function failureFixture(
+  mode: 'capture' | 'refresh',
+  hang = false,
+  terminal = false,
+  logsFail = false,
+) {
   await Deno.mkdir('.llm/tmp', { recursive: true });
   const root = await Deno.makeTempDir({ dir: '.llm/tmp', prefix: 'startup-diagnostics-' });
   const absolute = resolve(root);
@@ -52,7 +57,24 @@ async function failureFixture(mode: 'capture' | 'refresh', hang = false) {
       `#!/usr/bin/env -S deno run --allow-write\n
 await Deno.writeTextFile('calls.jsonl', JSON.stringify(Deno.args) + '\\n', { append: true });
 if (Deno.args[0] === 'start') { console.error('injected start failure'); Deno.exit(1); }
-const events = ${JSON.stringify(EVENTS)};
+if (Deno.args[0] === 'logs') {
+  ${
+        logsFail
+          ? "console.error('injected log failure'); Deno.exit(1);"
+          : "console.log('injected Garnet Lua startup error'); Deno.exit(0);"
+      }
+}
+const events = ${
+        JSON.stringify(
+          terminal
+            ? EVENTS.map((e) =>
+              e.displayName === 'garnet'
+                ? { ...e, state: 'Finished', healthStatus: 'Unhealthy' }
+                : e
+            )
+            : EVENTS,
+        )
+      };
 if (Deno.args.includes('--follow')) {
   for (const event of events) console.log(JSON.stringify(event));
   ${hang ? 'setInterval(() => {}, 1000);' : ''}
@@ -132,6 +154,23 @@ Deno.test('injected aspire-start failure takes one attribution snapshot and neve
   assertAttribution(result.stderr);
   assertEquals(result.calls.map((args) => args[0]), ['start', 'describe']);
   assert(!result.calls[1].includes('--follow'), 'failure attribution must be one bounded snapshot');
+});
+
+Deno.test('finished startup resource retains its console error without retrying startup', async () => {
+  const result = await failureFixture('refresh', false, true);
+  assertEquals(result.code, 1);
+  assertStringIncludes(result.stderr, 'garnet: state=Finished');
+  assertStringIncludes(result.stderr, 'injected Garnet Lua startup error');
+  assertEquals(result.calls.map((args) => args[0]), ['describe', 'logs']);
+  assertEquals(result.calls[1].slice(0, 4), ['logs', 'garnet', '-n', '80']);
+});
+
+Deno.test('unavailable terminal console preserves the original convergence failure', async () => {
+  const result = await failureFixture('refresh', false, true, true);
+  assertEquals(result.code, 1);
+  assertStringIncludes(result.stderr, 'did not converge');
+  assertStringIncludes(result.stderr, 'garnet console unavailable');
+  assertEquals(result.calls.map((args) => args[0]), ['describe', 'logs']);
 });
 
 Deno.test('injected listener follower failure includes the last state and health in its top-level error', async () => {

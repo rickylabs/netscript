@@ -1,0 +1,323 @@
+{
+ "runId": "ns-figma-library-2026-10-28",
+ "agent": "late-categories style builder \u00b7 Brutal pass B",
+ "date": "2026-10-31",
+ "fileKey": "pGRLnkPPRZJZy74evNcQBr",
+ "theme": "brutal",
+ "page": "33:8",
+ "parent": "Style components 465:55033 (Theme Brutal 14:2, Theme set A, Density Comfortable, Scheme Light)",
+ "status": "Layout & blocks, Desktop, Docs kit done; showcase screens next",
+ "categories": {
+  "Layout & blocks": {
+   "frame": "608:241215",
+   "sectionLabel": "608:241216",
+   "sets": "608:241220",
+   "review": "608:440178",
+   "strip": "608:446262",
+   "setIds": [
+    {
+     "name": "Brutal/App shell",
+     "id": "608:241722",
+     "baseId": "581:54792",
+     "variants": 9
+    },
+    {
+     "name": "Brutal/Page header",
+     "id": "608:242220",
+     "baseId": "578:177012",
+     "variants": 6
+    },
+    {
+     "name": "Brutal/Stats grid",
+     "id": "608:242979",
+     "baseId": "578:176521",
+     "variants": 6
+    },
+    {
+     "name": "Brutal/Detail layout",
+     "id": "608:243123",
+     "baseId": "580:1207",
+     "variants": 4
+    },
+    {
+     "name": "Brutal/Filter form",
+     "id": "608:243527",
+     "baseId": "580:989",
+     "variants": 2
+    },
+    {
+     "name": "Brutal/.Filter form body",
+     "id": "608:243532",
+     "baseId": "580:696",
+     "variants": 2,
+     "private": true
+    },
+    {
+     "name": "Brutal/Panel",
+     "id": "608:243590",
+     "baseId": "577:178427",
+     "variants": 3
+    },
+    {
+     "name": "Brutal/Separator",
+     "id": "608:243618",
+     "baseId": "577:178354",
+     "variants": 6
+    },
+    {
+     "name": "Brutal/Section divider",
+     "id": "608:243625",
+     "baseId": "577:178371",
+     "variants": 2
+    },
+    {
+     "name": "Brutal/Scrollbar",
+     "id": "608:243636",
+     "baseId": "578:85858",
+     "variants": 4
+    },
+    {
+     "name": "Brutal/Scroll area",
+     "id": "608:243650",
+     "baseId": "578:85880",
+     "variants": 3
+    },
+    {
+     "name": "Brutal/Resizable handle",
+     "id": "608:243669",
+     "baseId": "578:85923",
+     "variants": 6
+    },
+    {
+     "name": "Brutal/Resizable",
+     "id": "608:243700",
+     "baseId": "578:85948",
+     "variants": 2
+    },
+    {
+     "name": "Brutal/Aspect ratio",
+     "id": "608:243716",
+     "baseId": "578:85840",
+     "variants": 4
+    }
+   ],
+   "notCloned": [
+    "L12 Direction (doc-only)",
+    ".Page content (private, not nested by a public set; the review and the desktop-app screen swap its nested instances instead)"
+   ],
+   "nestedSwaps": "105 nested base instances -> Brutal sets (Sidebar, Top bar, Button, Badge, Field, Select, Date picker, Card, Stat card, Tabs list, Breadcrumb, Section divider, Panel, Sheet, Scrollbar, Resizable handle, .Focus ring); 0 unmapped",
+   "anatomy": {
+    "App shell": "cream surface/bg canvas; Brutal/Sidebar + Brutal/Top bar (76 with 2px ink rule; body set to FILL so the taller bar fits 900); rail 2px ink rule; tablet/mobile sheet = Brutal/Sidebar with Slab L over surface/overlay at 60%",
+    "Page header": "eyebrow and mono status indicator in B.label (Space Mono Bold uppercase); status dot = 10px block/green sticker with 2px ink; Brutal/Button md outline + primary; Brutal/Tabs list line (yellow block selected)",
+    "Stats grid": "Brutal/Stat card block tiles yellow, blue, pink, green by position (instance fill overrides), Slab L each, gap 20; joined = one B.panel (2px ink all sides, r12, Slab L, clips) with 2px ink left dividers, tiles square and slabless",
+    "Panel": "default B.panel (surface/card, 2px ink, r12, Slab L); raised B.float (surface/raised, Slab L); muted flat surface/muted + 2px ink; title B.heading 18/24; 2px ink header rule; footer band surface/bg under 2px ink; meta B.label",
+    "Separator": "subtle = 1.5px dashed [6,4] ink vector 'dash' (fill off); default 2px ink; strong 4px ink",
+    "Section divider": "theme-only 'deco-tick' 10px yellow sticker (2px ink, r2) + B.label text/fg + 2px ink rule (centred at y 7)",
+    "Scrollbar": "rest 8px ink pill thumb; hover 10px block/yellow thumb with 2px ink",
+    "Scroll area / Resizable": "2px ink frame, r12, Slab L",
+    "Resizable handle": "2px ink line in every state; grip surface/card pill + 2px ink; hover Slab S; focus 4/4 border/ring slab; focus-ring part hidden",
+    "Aspect ratio": "media in a 2px ink r12 frame with Slab M"
+   },
+   "swapTest": "7/7 pass (plain swapComponent, Light; Dark row is a clone): Panel muted (title, footer, description off), Section divider center (label), Page header default/mobile (title, eyebrow, eyebrowText, actions off), Stats grid 2 joined (nested KPI label text), Resizable vertical (nested handle state=hover), Scroll area horizontal, Filter form stacked (nested card title)",
+   "png": [
+    "review/styles/brutal/layout.png",
+    "review/styles/brutal/layout-strip.png"
+   ],
+   "fixes": [
+    "Brutal/.Filter form body inline: actions frame was a fixed 134 and clipped the wider Brutal Reset button; actions now HUG and the three fields FILL",
+    "Set grids re-laid out after restyle (variants grew): Brutal/Stats grid, Brutal/Detail layout"
+   ],
+   "deviations": [
+    "Scrim: the mobile/tablet sidebar backdrop binds surface/overlay at 60% paint opacity (base 40%), per the late-pass rule; Brutal's surface/overlay already carries alpha, so the effective scrim is lighter than a 60% black.",
+    "Separator strong is a 4px literal (2 x border/width); the width/height binding was removed on the strong variants only.",
+    "Panel muted is flat (no slab); Brutal draws no muted panel."
+   ]
+  },
+  "Desktop": {
+   "frame": "609:109747",
+   "sectionLabel": "609:109748",
+   "sets": "609:109752",
+   "review": "609:249134",
+   "strip": "609:250290",
+   "setIds": [
+    {
+     "name": "Brutal/Window chrome",
+     "id": "609:109909",
+     "baseId": "593:105839",
+     "variants": 12
+    },
+    {
+     "name": "Brutal/Tray menu",
+     "id": "609:110756",
+     "baseId": "593:308054",
+     "variants": 4
+    },
+    {
+     "name": "Brutal/Desktop dialog",
+     "id": "609:110949",
+     "baseId": "593:309348",
+     "variants": 6
+    },
+    {
+     "name": "Brutal/Desktop notification",
+     "id": "609:111160",
+     "baseId": "593:403674",
+     "variants": 10
+    },
+    {
+     "name": "Brutal/Update prompt",
+     "id": "609:111396",
+     "baseId": "593:404332",
+     "variants": 5
+    }
+   ],
+   "notCloned": [
+    "K6 Desktop only (doc-only)"
+   ],
+   "nestedSwaps": "65 nested base instances -> Brutal (Menu content, Input, Button / sm, Icon button / xs, Spinner, Progress); 0 unmapped",
+   "anatomy": {
+    "Window chrome": "sticker window: block/yellow title bar (focused, hover), surface/card (unfocused), surface/muted (disabled); r12 top corners; 2px ink bottom rule; title B.label; app icon = ink tile (r4) with ink/fg N; macOS lights = block/pink, yellow, green stickers with 2px ink (unfocused empty card stickers); Windows caption keys joined by 2px ink left rules, close hover = block/pink; Linux = Brutal/Icon button / xs (Ink kind with Slab S)",
+    "Tray menu": "Brutal/Menu content (B.float, Slab L, B.dash separators, Brutal/Kbd accelerators)",
+    "Desktop dialog": "B.float (surface/raised, 2px ink, r12, Slab L; disabled flat), title B.heading, Brutal/Input, Brutal/Button / sm; alert adds theme-only 'media' = 40px ink disc with alert-circle in ink/fg (the Brutal Alert dialog media)",
+    "Desktop notification": "follows Brutal/Toast: B.float, Slab L, face never tinted; 32px block disc per tone (info blue, success green, warning yellow, destructive pink) with block/ink-text glyph; neutral = yellow logo tile r8 with Slab S; meta B.label; disabled flat surface/muted + border/default",
+    "Update prompt": "follows Brutal/Toast: B.float, Slab L, never tinted; 24px sticker disc (available yellow, ready green, manual blue, error pink); downloading keeps Brutal/Spinner + Brutal/Progress"
+   },
+   "swapTest": "6/6 pass (plain swapComponent): Window chrome windows/hover (title, appIcon off), Window chrome macos/unfocused (title), Desktop notification warning (meta off, action on, title text), Desktop dialog prompt (title, nested Button label), Update prompt manual (title), Tray menu application-menu (nested menu text)",
+   "png": [
+    "review/styles/brutal/desktop.png",
+    "review/styles/brutal/desktop-strip.png"
+   ],
+   "fixes": [
+    "Set grids re-laid out after restyle: Brutal/Desktop dialog, Brutal/Update prompt"
+   ],
+   "deviations": [
+    "Update prompt manual and error faces are not tinted (base: info and destructive subtle faces); the tone moves to the disc, as Brutal/Toast does. The error title is text/fg; pink is the only destructive signal.",
+    "macOS lights use block/pink, yellow and green (not the destructive/warning/success roles): red stays reserved for destructive.",
+    "Window chrome title uses B.label (Space Mono Bold uppercase), not T.strong-sm."
+   ]
+  },
+  "Docs kit": {
+   "frame": "609:880776",
+   "sectionLabel": "609:880777",
+   "sets": "609:880781",
+   "review": "609:965733",
+   "strip": "609:966674",
+   "setIds": [
+    {
+     "name": "Brutal/Prose heading",
+     "id": "609:880782",
+     "baseId": "594:426154",
+     "variants": 4
+    },
+    {
+     "name": "Brutal/Prose block",
+     "id": "609:880803",
+     "baseId": "594:426190",
+     "variants": 6
+    },
+    {
+     "name": "Brutal/Prose inline",
+     "id": "609:880841",
+     "baseId": "594:426215",
+     "variants": 10
+    },
+    {
+     "name": "Brutal/File path chip",
+     "id": "609:880866",
+     "baseId": "595:187010",
+     "variants": 4
+    },
+    {
+     "name": "Brutal/Attribute chip",
+     "id": "609:880884",
+     "baseId": "595:187227",
+     "variants": 2
+    },
+    {
+     "name": "Brutal/Toc item",
+     "id": "609:880891",
+     "baseId": "595:187344",
+     "variants": 6
+    },
+    {
+     "name": "Brutal/Toc",
+     "id": "609:880906",
+     "baseId": "595:187386",
+     "variants": 2
+    },
+    {
+     "name": "Brutal/File tree row",
+     "id": "609:880935",
+     "baseId": "599:493",
+     "variants": 8
+    },
+    {
+     "name": "Brutal/File tree",
+     "id": "609:881006",
+     "baseId": "599:524",
+     "variants": 0,
+     "note": "single component"
+    },
+    {
+     "name": "Brutal/Figure",
+     "id": "609:881024",
+     "baseId": "599:1203",
+     "variants": 4
+    },
+    {
+     "name": "Brutal/Anchor nav",
+     "id": "609:881186",
+     "baseId": "599:1567",
+     "variants": 2
+    },
+    {
+     "name": "Brutal/.Docs card",
+     "id": "609:881201",
+     "baseId": "600:291572",
+     "variants": 4,
+     "private": true
+    },
+    {
+     "name": "Brutal/Ruled grid",
+     "id": "609:881408",
+     "baseId": "600:291846",
+     "variants": 6
+    },
+    {
+     "name": "Brutal/Hero",
+     "id": "609:881835",
+     "baseId": "600:292319",
+     "variants": 4
+    }
+   ],
+   "nestedSwaps": "104 nested base instances -> Brutal (Location marker, Kbd, .Focus ring, Tab / horizontal, Button / md, File path chip, Toc item, File tree row, .Docs card); unmapped by design: Code block x4 (+32 Code line) because Brutal pass A (Code block) has not run",
+   "anatomy": {
+    "Prose heading": "Space Grotesk via prose/*, heading text bound to type/heading/style (Bold); eyebrow B.label; h1/h2 carry a theme-only 'deco-rule' yellow sticker pill (80x10 / 56x8, 2px ink)",
+    "Prose block": "blockquote = yellow sticker note (block/yellow, 2px ink, r12, Slab S, block/ink-text; the base 'rule' hidden); ul bullets = 8px yellow sticker squares (Brutal/Location marker override); ol numerals B.label; hr = theme-only 'dash' frame, 1.5px dashed [6,4] ink (base 'rule' hidden)",
+    "Prose inline": "link underline ink (1px rest, 2px hover); code chip surface/muted r4; kbd Brutal/Kbd",
+    "File path chip": "pill sticker surface/card + 2px ink; hover Slab S; focus 4/4 ring slab; copied = block/green + ink check",
+    "Attribute chip": "pill sticker surface/card + 2px ink; value bold",
+    "Toc item / Toc": "2px ink rail; current = yellow nav block (2px ink, r6, bold block/ink-text), marker hidden; hover surface/hover; eyebrow and links B.label; mobile bar 2px ink rule",
+    "File tree row / File tree": "ownership tag = pill sticker (owned yellow, guidance blue, generated muted + border/default, none card) with B.label; folder names bold; tree = B.panel (card, 2px ink, r12, Slab L)",
+    "Figure": "media 2px ink r12 + Slab M; diagram nodes = block stickers yellow/blue/green/pink (r8, Slab S, B.label), arrows Space Mono Bold",
+    "Anchor nav": "2px ink bottom rule; anchors overridden to Brutal/Tab / horizontal variant=line (selected = yellow block); scrolled = surface/card + Slab M",
+    ".Docs card / Ruled grid": "feature = B.panel sticker (Slab M, hover Slab L, padding 20); ruled = cell with yellow icon sticker, hover surface/hover; ruled grid = one B.panel (2px ink, r12, Slab L, clips) with 2px ink cell rules (last-row bottom rule removed so the frame edge is single)",
+    "Hero": "title bound bold; eyebrows B.label; Brutal/Button md; aside = B.panel (Slab L, padding 16) widened 360 -> 392 with the split gap 80 -> 48 so the root stays 1120"
+   },
+   "swapTest": "8/8 pass (plain swapComponent): Prose heading h2 (anchor, eyebrow, heading text), File path chip hover (path, copy off), Attribute chip md (name, value), Toc item 3/current (label), File tree row folder/generated (name, comment off), Figure prose/image (caption off), .Docs card ruled (title), Ruled grid 2/feature (nested card title)",
+   "png": [
+    "review/styles/brutal/docs-kit.png",
+    "review/styles/brutal/docs-kit-strip.png"
+   ],
+   "fixes": [
+    "Prose heading text and Hero display title rendered Space Grotesk Regular under Brutal; fontStyle now bound to type/heading/style (Bold)",
+    "Set grids re-laid out after restyle: Brutal/Prose block, Brutal/Hero"
+   ],
+   "deviations": [
+    "Callouts and code: the Code block inside Brutal/Hero stays the base Code block (Brutal pass A has not built Brutal/Code block); swap it when pass A lands.",
+    "Hero desktop split: aside 392 (base 360) and gap 48 (base 80) so the B.panel padding fits the code block and path chips without changing the 1120 root.",
+    "Anchor nav uses the Brutal line tabs (variant override on the nested anchors), not the base default boxed tabs."
+   ]
+  }
+ }
+}

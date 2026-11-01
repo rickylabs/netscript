@@ -1,5 +1,6 @@
 import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
-import { assert, assertEquals } from '@std/assert';
+import { assert, assertEquals, assertStringIncludes } from '@std/assert';
+import { writeInstalledAuthFixture } from '../../../../../tests/installed-auth-fixture.ts';
 import { dirname, fromFileUrl, join, resolve } from '@std/path';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
@@ -29,7 +30,7 @@ Deno.test('plugin install completion prints an explicitly pinned host port', asy
   assertEquals(installed, 'Installed stream plugin "streams" on port 61234.');
 });
 
-async function runStreamsInstall(hostPort?: number): Promise<string[]> {
+async function runStreamsInstall(hostPort?: number, browserTopology?: string): Promise<string[]> {
   const projectRoot = await Deno.makeTempDir();
   const fs = new DenoFileSystem();
   const templateAdapter = new StringTemplateAdapter(fs);
@@ -56,6 +57,18 @@ async function runStreamsInstall(hostPort?: number): Promise<string[]> {
       join(projectRoot, 'netscript.config.ts'),
       "export default { name: 'fixture-app', databases: { config: [] }, plugins: [] };\n",
     );
+
+    if (browserTopology) {
+      const settingsPath = join(projectRoot, 'appsettings.json');
+      const settings = JSON.parse(await fs.readFile(settingsPath));
+      settings.NetScript.Apps = {
+        web: { Type: 'app', Auth: { BrowserTopology: browserTopology } },
+      };
+      await fs.writeFile(settingsPath, JSON.stringify(settings));
+      await writeInstalledAuthFixture(fs, projectRoot);
+      await fs.writeFile(join(projectRoot, 'apps/web/utils.ts'), '');
+      await fs.writeFile(join(projectRoot, 'auth/bff.ts'), '// preserved browser helper\n');
+    }
 
     const args = [
       'stream',
@@ -87,8 +100,25 @@ async function runStreamsInstall(hostPort?: number): Promise<string[]> {
       },
     }).parse(args);
 
+    if (browserTopology) {
+      assertEquals(
+        await fs.readFile(join(projectRoot, 'auth/bff.ts')),
+        '// preserved browser helper\n',
+      );
+    }
     return messages;
   } finally {
     await Deno.remove(projectRoot, { recursive: true });
   }
+}
+
+for (const topology of ['authored', 'scaffold']) {
+  Deno.test(`plugin install prints informational browser-auth preservation for ${topology} topology`, async () => {
+    const messages = await runStreamsInstall(undefined, topology);
+    const line = messages.find((message) => message.startsWith('browser-auth: auth/bff.ts:'));
+    assert(line);
+    assertStringIncludes(line, topology === 'authored' ? 'authored topology' : 'already present');
+    assertStringIncludes(line, 'divergent');
+    assert(messages.some((message) => message.startsWith('Installed ')));
+  });
 }

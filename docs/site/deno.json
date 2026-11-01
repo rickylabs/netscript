@@ -1,23 +1,34 @@
 {
   "tasks": {
     "lume": "echo \"import 'lume/cli.ts'\" | deno run --unstable-temporal -A -",
-    "build": "deno task check:source-format && deno task lume && deno task check:rendered-output",
+    "build": "deno task check:source-format && deno task lume && deno task build:registry && deno task check:rendered-output",
     "check:source-format": "deno run --no-lock --allow-read _plugins/check-source-format.ts .",
     "check:rendered-output": "deno run --no-lock --allow-read _plugins/check-rendered-output.ts _site/index.html",
-    "test:source-format": "deno test --no-lock --allow-read --allow-write _plugins/check-source-format_test.ts",
+    "test:source-format": "deno test --no-lock --allow-read --allow-write _plugins/check-source-format_test.ts _plugins/file-tree_test.ts _plugins/markdown-render-fixture.ts _plugins/scenario-picker-fixture.ts",
     "check:links": "deno run --allow-read ../../.llm/tools/docs/check-internal-links.ts _site",
     "check:caveats": "deno run --allow-read ../../.llm/tools/docs/check-caveat-refs.ts .",
     "verify": "deno task build && deno task check:links && deno task check:caveats",
     "serve": "deno task lume -- -s",
     "diagrams:render": "deno run -A _diagrams/render.ts",
-    "diagrams:check": "deno run -A _diagrams/render.ts --check"
+    "diagrams:check": "deno run -A _diagrams/render.ts --check",
+    "build:registry": "deno run --frozen --unstable-kv -A --config ../../deno.json ../../packages/cli/bin/netscript-dev.ts ui:build --registry ../../packages/fresh-ui/registry.json --source-root ../.. --output _site/r"
   },
   "imports": {
     "lume/": "https://deno.land/x/lume@v2.5.4/",
     "markdown-it-anchor": "npm:markdown-it-anchor@9.2.0",
     "highlight.js/bash": "npm:highlight.js@11.11.1/lib/languages/bash",
     "highlight.js/json": "npm:highlight.js@11.11.1/lib/languages/json",
-    "highlight.js/typescript": "npm:highlight.js@11.11.1/lib/languages/typescript"
+    "highlight.js/typescript": "npm:highlight.js@11.11.1/lib/languages/typescript",
+    "highlight.js/python": "npm:highlight.js@11.11.1/lib/languages/python",
+    "highlight.js/powershell": "npm:highlight.js@11.11.1/lib/languages/powershell",
+    "highlight.js/markdown": "npm:highlight.js@11.11.1/lib/languages/markdown",
+    "highlight.js/ini": "npm:highlight.js@11.11.1/lib/languages/ini",
+    "highlight.js/yaml": "npm:highlight.js@11.11.1/lib/languages/yaml",
+    "highlight.js/css": "npm:highlight.js@11.11.1/lib/languages/css",
+    "highlight.js/diff": "npm:highlight.js@11.11.1/lib/languages/diff",
+    "highlight.js/sql": "npm:highlight.js@11.11.1/lib/languages/sql",
+    "highlight.js/xml": "npm:highlight.js@11.11.1/lib/languages/xml",
+    "highlight.js/javascript": "npm:highlight.js@11.11.1/lib/languages/javascript"
   },
   "fmt": {
     "useTabs": false,
@@ -41,7 +52,9 @@
     ]
   },
   "compilerOptions": {
-    "types": ["lume/types.ts"],
+    "types": [
+      "lume/types.ts"
+    ],
     "jsx": "react-jsx",
     "jsxImportSource": "npm:react@18.3.1"
   }

@@ -1,0 +1,94 @@
+# Worklog
+
+## Design
+
+1. Public surface: published docs accurately describe worker delivery, saga messaging/projections/compensation, trigger actions/retry and stream producers.
+2. Domain vocabulary: accepted write versus delivered write; at-least-once delivery; applied-key window; packaged entrypoint versus generated runtime wrapper; one scheduler owner. No new framework terms.
+3. Ports: existing saga bus/store, worker idempotency port, stream producer lifecycle/receipt and trigger definition policy. No new runtime dependency.
+4. Constants: use existing exported reconnect/buffer defaults and canonical WORKERS_CONCURRENCY. Recipe identifiers are named constants where reused.
+5. Commit slices: S0 evidence/draft; S1 complete twelve-item docs reconciliation plus gates; S2 final evidence/handoff. Exact files and proving gates are in plan.md.
+6. Deferred: all packages/plugins implementation, generated carriers outside assigned paths, releases and merge.
+7. Contributor path: research.md maps every finding to canonical docs and source; streams.md is the extension entry for worker producer usage.
+
+## Owner evaluation override
+
+Verbatim: “Run PLAN-EVAL before implementing and IMPL-EVAL after, both in a separate session with claude -p --model claude-opus-5-5 --effort high, read-only, stdin closed, blockers only.”
+
+Rationale: owner-selected independent Anthropic evaluator for this OpenAI implementation. Feature matrix queried first; owner override changes evaluator cells only.
+
+## Intake
+
+- Baseline equals fetched origin/main; no prior local changes.
+- Original issue body and all comments read. No acceptance boxes exist; all twelve numbered findings are the acceptance surface.
+- Related merged PRs are partial; no duplicate full audit found.
+- MCP find_guidance then search_docs completed before code research.
+- Memory consulted; RTK unavailable, use direct commands.
+- Highest-priority operator directive selects reference-only PR body and coordinator-owned labels/milestone; generic closing-footer and automatic-label advice does not apply.
+- PLAN-EVAL pending. Implementation has not started.
+
+PLAN-EVAL round 1: FAIL_PLAN, retry-export/discovery design needs explicit constraints. Plan updated before implementation; second review reuses the same independent evaluator. Baseline docs verify, snippets and accuracy passed, and prose carrier freshness was true.
+
+PLAN-EVAL round 2: PASS before S1 edits; same separate read-only evaluator. Exact report in plan-eval.md; prior report retained in plan-eval-r1.md.
+
+## S1 implementation in progress
+
+Corrected public delivery, producer lifecycle, runtime entrypoint and policy wording. The worker lesson now contains a schema-first `defineJobHandler(schema, handler)` and awaits the write receipt. Shared producers are not stopped per job. Retry example keeps base private, exports one frozen full-policy definition, and documents static discovery limitations. No packages/plugins changed.
+
+S1 local gates passed: docs verify (253 pages, 23,829 links), docs:snippets (26 Tier-1 checks), focused workflow example compile, docs:accuracy, 33 existing runtime truth tests, scoped TS check/lint/fmt and diff whitespace. Baseline negative control fails as expected. Final per-item table is acceptance.md; detailed results are gate-results.md.
+
+Freshness remains non-green: generated package prose carrier is stale after docs changes. Scope prohibits its update, so no package carrier changes are made and no CI-green claim is made. Independent slice review is next, before S1 sign-off commit.
+
+Independent S1 slice review: docs PASS; all twelve source checks and worker/retry recipe constraints approved. Report: slice-review.md. Evaluator requested a publish-assets measurement; allowlisted check:publish-assets returns PASS against the current (old) corpus. Full allowlisted agent-docs-prose returns FAIL due to the stale CLI prose carrier. No package files changed.
+
+Final source-tracing clarification: the job scaffolder emits a metadata comment and handler, not a separate job config file; tutorial now explicitly preserves that comment. Retry attempts are described per connection/delivery phase. These prose clarifications will be included in the final exact-head review.
+
+Reconcile before S1: latest fetched main is b0b8f3f7282d073d92d64acdee522ea34bba4c5c; its sole new commit affects Figma variable exports, with no overlap in this audit.
+
+## S1 terminal
+
+- Commit: bed17028beb9096dc08cac05e3a44d0deb5c3faa. Pushed; direct ls-remote confirms identical remote SHA.
+- Independent docs review PASS before the source commit. Coordinator supervisor sign-off/merge remains outside this implementer lane.
+- Per-slice PR comment posted with scope, commit and gate evidence.
+- No package/plugin/lock/assignment files changed.
+
+## S2 evidence handoff
+
+Dated lesson and evaluate.md prepared. Final evaluation authority will be the independent PR phase comment naming the exact final pushed head, avoiding a self-invalidating verdict commit. Required CI freshness remains unproven/red until the coordinator updates the prohibited generated package carrier. No new architectural debt introduced; trigger builder retry parity is an existing API gap, documented for follow-up.
+
+Review threads gate: PASS, zero current/unanswered threads at the source-slice checkpoint. No AppHost, database, container or scaffold E2E was launched. No unclear resource ownership or cleanup needed.
+
+Reconcile S2: source docs and test remain byte-identical to S1. Only scoped run artifacts change in this slice.
+
+## S2 follow-up — maintained docs scan manifest
+
+Before freezing the final head, check:aspire-version-parity identified a stale manifest after restoring the worker chapter. Regenerated with the existing aspire-surface-manifest.ts generator: exactly one row added for docs/site/tutorials/eis-chat/03-deliver-worker.md. Recheck PASS (manifestFresh true, 0 failures, missing []). This permitted docs-tooling metadata change expands scanning to the restored page; no rule or exclusion changed. Final independent review will include this deterministic follow-up.
+
+The source remained unchanged while exact-head exploratory final gates at 1fb5f71 passed docs accuracy, 34 focused tests and normal snippets. The full agent-docs-prose gate still failed at that head, confirming the recorded package-carrier prerequisite. CI close-gate also reflects the unchecked prerequisite, not missing issue acceptance (there are no issue checkboxes).
+
+## S3 — coordinator-authorized generated carrier integration
+
+The coordinator authorized generated-only package updates in PR comment 6539166396. Exact authorization and limits are preserved in supervisor.md. The prior scope blocker is resolved; no package file will be hand-edited. Use canonical gen:agent-docs-prose, check:publish-assets and check:assets-barrel, regenerating only reported stale outputs. Record each changed file and its generator for READY. No branch rebase, force push, label, milestone or merge.
+
+The externally prepared two-file preview demonstrated freshness and MCP byte-budget headroom, but it is not applied: the coordinator requires canonical generator tasks on the assigned branch.
+
+S3 generated exactly two package files through the canonical tasks: CLI prose carrier via gen:agent-docs-prose; MCP publish assets via gen:publish-assets. Both are byte-identical to the external canonical preview. Authoritative after-generation agent-docs-prose and publish-assets checks pass, as do scoped generated-file check and quality:gate. assets-barrel generation changes no other file; its final diff check awaits the committed tree. Generator commands and hashes are recorded in generated-carriers.json. No other package/plugin/lock changes.
+
+The prior final CHANGES at 7bc4f21 is preserved as historical evidence. The coordinator explicitly requested another exact-head review after this generated-only integration; it will use the same independent evaluator.
+
+## Current-main integration
+
+The pushed generated head b902c3d passed clean-tree assets-barrel, prose, publish-assets and MCP export-corpus checks. Main then advanced to 8902e1a (command outbox schema and bounded saga retention), making the shared CLI prose carrier conflict. Followed coordinator no-rebase/no-force-push policy: normal merge of origin/main. Exactly one conflict, packages/cli/src/kernel/assets/agent-docs-prose.generated.ts. Use incoming main's generated corpus as the preservation baseline, then regenerate canonically from the merged docs; no hand editing generated rows. The saga reference auto-merges both the docs corrections and incoming retention reference. No authored framework conflict.
+
+Main merge resolution: incoming reference additions are retained; the diff to new main in the saga reference is exactly this audit's two message-boundary corrections. Canonical prose/publish generation completes the sole generated conflict. Package/plugin diff relative to origin/main is limited to the two authorized generated carriers; no authored framework change or lock delta. The merge commit includes this evidence and is pushed normally. Re-run clean-tree gates and the focused source regressions on the merged head.
+
+## Follow-up integration after READY
+
+The previous head c37a625 had 41 focused tests, all four freshness checks, full CI and hosted close-gate green, and same-session round3 MERGE. Current main then advanced to 4060d1e61da0a8324e77ed351b05a343d746a188 (service procedure availability and file-watch change identity), causing a new generated prose conflict. Integrated by normal merge under the coordinator's explicit no-rebase/no-force-push directive. Exactly one conflict: CLI prose carrier. Took incoming main's generated corpus as preservation baseline and ran canonical gen:agent-docs-prose and gen:publish-assets.
+
+The triggers guide auto-merge retains both the incoming18-line file-watch identity/deduplication explanation and this audit's retry guidance. Reference/service and workspace authz docs are exact incoming main. No authored package/plugin source or lock delta to the new main; only the two approved generated carriers differ. Review round4 is required at the new exact pushed head. Revalidate focused source/corpus tests and freshness, then complete the review and close-gate without another source commit.
+
+## Redis-concurrency main integration after round4 READY
+
+The previous pushed head b9aa6cd12a27963528c6a3d94fad0960149a7b1c passed51 selected tests, all required freshness/docs gates, current-head CI and hosted close-gate; same-session round4 returned MERGE. Main then advanced to 67d4704b406935a38e69c3b08989b64dd1a16b82 (#2496 Redis listener concurrency), creating another generated prose-carrier conflict. Normal merge follows the coordinator directive. Incoming main worker-tuning polling/concurrency/drain guidance auto-merges unchanged with this audit process-layout section. All incoming queue implementation, tests and export-corpus output are exact main.
+
+Exactly one conflict, CLI prose carrier: preserve incoming corpus then canonically run gen:agent-docs-prose and gen:publish-assets. Only the two authorized generated package outputs may differ from main; no authored package/plugin/lock delta. Final same-session evaluation will be round5 of5 at the exact pushed head after current-head proof. No new commit after that review. Any later main integration would require coordinator direction on the exhausted evaluation budget.

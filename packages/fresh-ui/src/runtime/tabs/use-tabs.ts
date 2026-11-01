@@ -93,7 +93,12 @@ export function useTabs({
     (props: JSX.HTMLAttributes<HTMLDivElement> = {}): TabsRootElementProps => ({
       ...props,
       'data-orientation': orientation,
-      'data-part': 'root',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'root',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'tabs',
       'data-value': selectedValue || undefined,
       id: props.id ?? rootId,
     }),
@@ -105,7 +110,12 @@ export function useTabs({
       ...props,
       'aria-orientation': orientation,
       'data-orientation': orientation,
-      'data-part': 'list',
+      'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+        ? props['data-part']
+        : 'list',
+      'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+        ? props['data-scope']
+        : 'tabs',
       role: props.role ?? 'tablist',
     }),
     [orientation],
@@ -125,7 +135,12 @@ export function useTabs({
         'aria-controls': panelId,
         'aria-selected': selected,
         'data-orientation': orientation,
-        'data-part': 'trigger',
+        'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+          ? props['data-part']
+          : 'trigger',
+        'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+          ? props['data-scope']
+          : 'tabs',
         'data-selected': selected ? 'true' : 'false',
         'data-state': getTabsDataState(selected),
         id: props.id ?? triggerId,
@@ -181,7 +196,12 @@ export function useTabs({
         ...props,
         'aria-labelledby': triggerId,
         'data-orientation': orientation,
-        'data-part': 'content',
+        'data-part': 'data-part' in props && typeof props['data-part'] === 'string'
+          ? props['data-part']
+          : 'content',
+        'data-scope': 'data-scope' in props && typeof props['data-scope'] === 'string'
+          ? props['data-scope']
+          : 'tabs',
         'data-selected': selected ? 'true' : 'false',
         'data-state': getTabsDataState(selected),
         hidden: selected ? undefined : true,

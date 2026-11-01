@@ -3,7 +3,7 @@ import {
   readAgentDocsPages,
   renderAgentDocsPages,
 } from '../docs/agent-docs-page-carrier.ts';
-import { agentDocsFullCorpus } from '../../../packages/cli/src/kernel/assets/agent-docs-transport.ts';
+import { agentDocsFullCorpus } from '../../../packages/mcp/docs.ts';
 import {
   assertEquals,
   assertNotEquals,
@@ -200,7 +200,7 @@ async function createRenderedCanaryPairFixture(
       join(literal, PAIR_PROVENANCE_PATH),
       JSON.stringify(await testAgentDocsProvenance(previousVersion, initialCompressed)),
     );
-    await Deno.mkdir(join(root, 'packages/cli/src/kernel/assets'), { recursive: true });
+    await Deno.mkdir(join(root, 'packages/mcp/src/infrastructure/docs'), { recursive: true });
     await Deno.copyFile(prosePath, join(root, PAIR_PROSE_PATH));
     await Deno.writeTextFile(
       join(literal, 'packages', 'cli', 'deno.json'),
@@ -475,7 +475,36 @@ Deno.test('generated release freshness checks semantic prose before downstream a
     'deno task check:agent-docs-prose',
     'deno task gen:publish-assets --check',
     'deno task check:mcp-export-corpus',
+    'deno task --cwd packages/fresh-ui registry:embed:check',
     'deno run --no-lock --allow-read --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts --check',
+  ]);
+});
+
+Deno.test('generated release freshness rejects a stale registry before checking its downstream barrel', async () => {
+  const calls: string[] = [];
+  await assertRejects(
+    () =>
+      assertPreparedReleaseGeneratedOutputsFresh('/repo', {
+        trackedStatus: () => Promise.resolve(''),
+        runDeno: (_root, args) => {
+          const command = `deno ${args.join(' ')}`;
+          calls.push(command);
+          if (args.includes('registry:embed:check')) {
+            return Promise.reject(
+              new Error(`${command} did not reproduce the generated release outputs`),
+            );
+          }
+          return Promise.resolve();
+        },
+      }),
+    Error,
+    'did not reproduce the generated release outputs',
+  );
+  assertEquals(calls, [
+    'deno task check:agent-docs-prose',
+    'deno task gen:publish-assets --check',
+    'deno task check:mcp-export-corpus',
+    'deno task --cwd packages/fresh-ui registry:embed:check',
   ]);
 });
 

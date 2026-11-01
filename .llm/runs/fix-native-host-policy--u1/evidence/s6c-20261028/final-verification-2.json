@@ -1,0 +1,295 @@
+{
+  "childResults": 30,
+  "settled": 30,
+  "cleanupPaths": 12,
+  "cleanupAbsent": 12,
+  "cleanup": [
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6c-astra-20261028/gates\\owned-profile-4e7067c8cdba706c",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6c-astra-20261028\\gates\\owned-profile-4e7067c8cdba706c\\streams-service-runtime-9eb7e101eb7f2aa0",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6c-astra-20261028\\gates\\owned-profile-4e7067c8cdba706c\\streams-service-runtime-c287d2621ff5e9f6",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6c-astra-20261028\\gates\\owned-profile-4e7067c8cdba706c\\streams-service-runtime-2b5c20e2e128f650",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6c-astra-20261028\\gates\\owned-profile-4e7067c8cdba706c\\streams-service-runtime-f068132445301503",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6c-astra-20261028\\gates\\owned-profile-4e7067c8cdba706c\\streams-service-runtime-f3183c2a86067096",
+      "absent": true
+    },
+    {
+      "path": "C:/Users/ericc/source/repos/netscript-native-host-policy-008/.llm/tmp/native-host-policy-u1-s6c-astra-20261028/gates-2\\owned-profile-df225604ae385ffe",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6c-astra-20261028\\gates-2\\owned-profile-df225604ae385ffe\\streams-service-runtime-2a66eeee8e471d41",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6c-astra-20261028\\gates-2\\owned-profile-df225604ae385ffe\\streams-service-runtime-5a7122728dddac1c",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6c-astra-20261028\\gates-2\\owned-profile-df225604ae385ffe\\streams-service-runtime-a338d88089136ad7",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6c-astra-20261028\\gates-2\\owned-profile-df225604ae385ffe\\streams-service-runtime-166605ee271990aa",
+      "absent": true
+    },
+    {
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-u1-s6c-astra-20261028\\gates-2\\owned-profile-df225604ae385ffe\\streams-service-runtime-7c94196a52118db9",
+      "absent": true
+    }
+  ],
+  "nativeComparisons": 20,
+  "nativeMatches": 20,
+  "native": [
+    {
+      "label": "approved",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node",
+      "bytes": 912896,
+      "sha256": "c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e",
+      "matches": true
+    },
+    {
+      "label": "approved",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+      "bytes": 112640,
+      "sha256": "6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08",
+      "matches": true
+    },
+    {
+      "label": "allocator-denied",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node",
+      "bytes": 912896,
+      "sha256": "c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e",
+      "matches": true
+    },
+    {
+      "label": "allocator-denied",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+      "bytes": 112640,
+      "sha256": "6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08",
+      "matches": true
+    },
+    {
+      "label": "ffi-denied",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node",
+      "bytes": 912896,
+      "sha256": "c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e",
+      "matches": true
+    },
+    {
+      "label": "ffi-denied",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+      "bytes": 112640,
+      "sha256": "6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08",
+      "matches": true
+    },
+    {
+      "label": "http",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node",
+      "bytes": 912896,
+      "sha256": "c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e",
+      "matches": true
+    },
+    {
+      "label": "http",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+      "bytes": 112640,
+      "sha256": "6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08",
+      "matches": true
+    },
+    {
+      "label": "tls",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node",
+      "bytes": 912896,
+      "sha256": "c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e",
+      "matches": true
+    },
+    {
+      "label": "tls",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+      "bytes": 112640,
+      "sha256": "6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08",
+      "matches": true
+    },
+    {
+      "label": "approved",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node",
+      "bytes": 912896,
+      "sha256": "c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e",
+      "matches": true
+    },
+    {
+      "label": "approved",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+      "bytes": 112640,
+      "sha256": "6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08",
+      "matches": true
+    },
+    {
+      "label": "allocator-denied",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node",
+      "bytes": 912896,
+      "sha256": "c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e",
+      "matches": true
+    },
+    {
+      "label": "allocator-denied",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+      "bytes": 112640,
+      "sha256": "6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08",
+      "matches": true
+    },
+    {
+      "label": "ffi-denied",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node",
+      "bytes": 912896,
+      "sha256": "c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e",
+      "matches": true
+    },
+    {
+      "label": "ffi-denied",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+      "bytes": 112640,
+      "sha256": "6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08",
+      "matches": true
+    },
+    {
+      "label": "http",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node",
+      "bytes": 912896,
+      "sha256": "c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e",
+      "matches": true
+    },
+    {
+      "label": "http",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+      "bytes": 112640,
+      "sha256": "6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08",
+      "matches": true
+    },
+    {
+      "label": "tls",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@lmdb\\lmdb-win32-x64\\3.5.7\\node.napi.node",
+      "bytes": 912896,
+      "sha256": "c4935003ae448fd7580d9b6dd0410ea8eb29172c65ef8adbebe18ced8275df4e",
+      "matches": true
+    },
+    {
+      "label": "tls",
+      "path": "C:\\Users\\ericc\\source\\repos\\netscript-native-host-policy-008\\.llm\\tmp\\native-host-policy-preflight\\cache\\npm\\registry.npmjs.org\\@msgpackr-extract\\msgpackr-extract-win32-x64\\3.0.4\\node.napi.node",
+      "bytes": 112640,
+      "sha256": "6958541c624784dfcebfc4f3c360c57f71cfeedd0530c2393845061729081a08",
+      "matches": true
+    }
+  ],
+  "tls": {
+    "observations": {
+      "statuses": [
+        401,
+        201,
+        204,
+        200,
+        200
+      ],
+      "expectedBytes": [
+        116,
+        108,
+        115,
+        45,
+        98,
+        101,
+        102,
+        111,
+        114,
+        101,
+        124,
+        116,
+        108,
+        115,
+        45,
+        97,
+        102,
+        116,
+        101,
+        114
+      ],
+      "frontBytes": [
+        116,
+        108,
+        115,
+        45,
+        98,
+        101,
+        102,
+        111,
+        114,
+        101,
+        124,
+        116,
+        108,
+        115,
+        45,
+        97,
+        102,
+        116,
+        101,
+        114
+      ],
+      "upstreamBytes": [
+        116,
+        108,
+        115,
+        45,
+        98,
+        101,
+        102,
+        111,
+        114,
+        101,
+        124,
+        116,
+        108,
+        115,
+        45,
+        97,
+        102,
+        116,
+        101,
+        114
+      ],
+      "authCalls": [
+        4,
+        4,
+        5
+      ]
+    },
+    "rejection": {
+      "name": "TypeError",
+      "message": "fetch failed",
+      "cause": {
+        "name": "Error",
+        "message": "error sending request for url (https://127.0.0.1:53088/v1/stream/s6c-dffe293f-15bd-4748-8ac5-a661c26ce247?offset=-1): client error (Connect): invalid peer certificate: UnknownIssuer"
+      }
+    },
+    "reboundPorts": [
+      54157,
+      53088
+    ]
+  },
+  "priorAuditFailure": "final-verification.json preserves a PowerShell ConvertFrom-Json nested-array count error (10 instead of20 comparisons); no test/source rerun followed"
+}

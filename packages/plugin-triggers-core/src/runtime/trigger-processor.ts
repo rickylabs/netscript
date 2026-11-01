@@ -59,6 +59,8 @@ type ConcurrencySlot = Readonly<{
 }>;
 
 const RESERVED_KINDS = new Set<TriggerKnownKind>(['queue', 'stream', 'manual']);
+// File observations may repeat unchanged metadata after a handler finishes.
+const DEFAULT_FILE_WATCH_DEDUP_TTL_MS = 0;
 
 /** Trigger processor with idempotency, retry, concurrency, DLQ, and circuit breaker handling. */
 export class TriggerProcessor implements TriggerProcessorPort {
@@ -118,6 +120,11 @@ export class TriggerProcessor implements TriggerProcessorPort {
     event: TriggerEvent,
     definition: RunnableTriggerDefinition,
   ): Promise<TriggerProcessResult> {
+    const definitionKey = definition.deduplication?.key?.(event);
+    if (definitionKey !== undefined) {
+      // Pass the same resolved caller policy to the claim, handler and downstream actions.
+      event = { ...event, idempotencyKey: definitionKey };
+    }
     await this.#eventSubscription?.publish({
       type: 'trigger:started',
       timestamp: this.#now().toISOString(),
@@ -293,7 +300,10 @@ function defaultCircuitBreakerSpec(): Required<NonNullable<TriggerDefinition['ci
 }
 
 function resolveDedupTtl(definition: RunnableTriggerDefinition): number {
-  return definition.deduplication?.ttlMs ?? DEFAULT_TRIGGER_IDEMPOTENCY_TTL_MS;
+  return definition.deduplication?.ttlMs ??
+    (definition.kind === 'file-watch'
+      ? DEFAULT_FILE_WATCH_DEDUP_TTL_MS
+      : DEFAULT_TRIGGER_IDEMPOTENCY_TTL_MS);
 }
 
 function isRetryable(error: unknown, nonRetryableErrors: readonly string[] = []): boolean {

@@ -1,0 +1,2 @@
+{"diagnostic":"chunked-reader-cleanup-asserted","projection":"RPC","acquiredReaders":1,"rawBodyLocked":true}
+{"diagnostic":"chunked-reader-cleanup-asserted","projection":"OpenAPI","acquiredReaders":1,"rawBodyLocked":true}

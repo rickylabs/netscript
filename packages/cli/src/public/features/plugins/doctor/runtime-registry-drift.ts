@@ -46,6 +46,9 @@ export async function checkRuntimeRegistryDrift(
     const declaredDescription = generatorSelected ? 'generator-selected' : 'manifest-declared';
     const title = generatorSelected ? GENERATOR_CHECK_TITLE : CHECK_TITLE;
     const evidenceBoundary = generatorSelected ? GENERATOR_EVIDENCE_BOUNDARY : EVIDENCE_BOUNDARY;
+    const exclusions = registry.excludedSourceFiles?.length
+      ? ` Explicitly excluded registry modules: ${registry.excludedSourceFiles.join(', ')}.`
+      : '';
     const expected = new Set(
       (registry.sourceFiles ?? []).map(normalizeProjectPath),
     );
@@ -73,7 +76,7 @@ export async function checkRuntimeRegistryDrift(
         id: `${CHECK_PREFIX}:${registryPath}`,
         title,
         status: 'error' as const,
-        message: `${registryPath}: ${details} ${REMEDIATION}`,
+        message: `${registryPath}: ${details}${exclusions} ${REMEDIATION}`,
       };
     }
 
@@ -83,9 +86,10 @@ export async function checkRuntimeRegistryDrift(
     return {
       id: `${CHECK_PREFIX}:${registryPath}`,
       title,
-      status: 'healthy' as const,
-      message:
-        `Verified ${registryPath} against ${files.length} ${declaredDescription} ${noun}${evidence}. ${evidenceBoundary}`,
+      status: files.length === 0 ? 'warning' as const : 'healthy' as const,
+      message: files.length === 0
+        ? `${registryPath}: Empty registry; the installed plugin has zero definitions and can start idle.${exclusions} ${evidenceBoundary}`
+        : `Verified ${registryPath} against ${files.length} ${declaredDescription} ${noun}${evidence}.${exclusions} ${evidenceBoundary}`,
     };
   }));
 }

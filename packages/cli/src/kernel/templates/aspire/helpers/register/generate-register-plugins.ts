@@ -27,7 +27,10 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 import { withDatabasePermissions } from './database-permissions.ts';
 import { renderHttpEndpointCall } from './render-http-endpoint.ts';
-import { renderDeclaredEnvironmentLines } from './resolve-resource-environment.ts';
+import {
+  partitionDeclaredEnvironment,
+  renderDeclaredEnvironmentLines,
+} from './resolve-resource-environment.ts';
 import {
   renderRegistrationPreamble,
   resolveRegistrationPreambleNeeds,
@@ -99,6 +102,24 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       `    const bootstrapModule = new URL('../../services/_shared/plugin-service-context.ts', import.meta.url).href;`,
     );
 
+    const directories = entry.DataDirectories ?? {};
+    const { refused } = partitionDeclaredEnvironment({ Environment: directories });
+    if (refused.length > 0) {
+      throw new Error(
+        `DataDirectories cannot bind reserved environment keys: ${refused.join(', ')}`,
+      );
+    }
+    if (Object.keys(directories).length > 0) {
+      lines.push(
+        `    const dataDirectories: Record<string, string> = ${JSON.stringify(directories)};`,
+      );
+      lines.push(`    for (const [key, path] of Object.entries(dataDirectories)) {`);
+      lines.push(`      const absolutePath = resolve(workdir, path);`);
+      lines.push(`      mkdirSync(absolutePath, { recursive: true });`);
+      lines.push(`      dataDirectories[key] = absolutePath;`);
+      lines.push(`    }`);
+    }
+
     // Register via addExecutable with HTTP endpoint
     lines.push(
       `    const resource = builder.addExecutable(${
@@ -126,6 +147,11 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     // Declared environment — same resolver, same shape, same precedence as
     // service resources (see resolve-resource-environment.ts).
     lines.push(...renderDeclaredEnvironmentLines(entry));
+    if (Object.keys(directories).length > 0) {
+      lines.push(`    for (const [key, path] of Object.entries(dataDirectories)) {`);
+      lines.push(`      await resource.withEnvironment(key, path);`);
+      lines.push(`    }`);
+    }
     if (isTriggersApiResource(name, entrypoint)) {
       lines.push(
         `    const triggerRegistryModule = new URL('../../.netscript/generated/plugin-triggers/triggers.registry.ts', import.meta.url).href;`,
@@ -298,6 +324,11 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
   );
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterPlugins1, {
+    dataDirectoryImports: entries.some(([, entry]) =>
+        Object.keys(entry.DataDirectories ?? {}).length
+      )
+      ? "import { mkdirSync } from 'node:fs';\nimport { resolve } from 'node:path';\n"
+      : '',
     __slot0__: String(fileHeader('register-plugins.mts')),
     __slot1__: String(aspireImport),
     __slot2__: String(aspirePackage),

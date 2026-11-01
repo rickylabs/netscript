@@ -1,0 +1,8 @@
+# Doctrine readiness — streams
+  FAIL=0 WARN=5 INFO=1
+  WARN A3: README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path
+  INFO A9: docs/architecture.md missing — required when public symbols > 25
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (cli.ts:18)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (scaffold.ts:23)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src\adapter\resources\consumer\consumer.stub.ts:78)
+  WARN F-5/F-6: `export default` — JSR penalises (no auto-doc); use named exports (src\adapter\resources\stream\stream.stub.ts:84)

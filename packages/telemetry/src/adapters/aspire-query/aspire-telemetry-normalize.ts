@@ -408,45 +408,41 @@ export function unwrapData(value: unknown): unknown {
  * last and therefore win if the same key appears at both levels.
  */
 export function selectSpans(value: unknown): readonly unknown[] {
+  return selectOtlpRecords(value, 'spans');
+}
+
+/** Flatten OTLP logs with their resource attributes and primitive string bodies intact. */
+export function selectLogs(value: unknown): readonly unknown[] {
+  return selectOtlpRecords(value, 'logs');
+}
+
+function selectOtlpRecords(value: unknown, kind: 'spans' | 'logs'): readonly unknown[] {
   const source = unwrapData(value);
-  if (Array.isArray(source)) {
-    return source;
-  }
-  if (!isObject(source)) {
-    return [];
-  }
-
-  const resourceSpans = Reflect.get(source, 'resourceSpans');
-  if (!Array.isArray(resourceSpans)) {
-    return selectItems(source, ['spans', 'items']);
-  }
-
-  const spans: unknown[] = [];
-  for (const resourceEntry of resourceSpans) {
-    if (!isObject(resourceEntry)) {
-      continue;
-    }
-    const resource = readObject(resourceEntry, ['resource']);
-    const resourceAttributes = resource ? readArray(resource, ['attributes']) : [];
-    for (const scopeEntry of readArray(resourceEntry, ['scopeSpans'])) {
-      if (!isObject(scopeEntry)) {
-        continue;
-      }
-      for (const span of readArray(scopeEntry, ['spans'])) {
-        if (!isObject(span)) {
-          continue;
-        }
-        spans.push({
-          ...span,
-          attributes: [
-            ...resourceAttributes,
-            ...readArray(span, ['attributes']),
-          ],
+  if (Array.isArray(source)) return source;
+  if (!isObject(source)) return [];
+  const groups = Reflect.get(source, kind === 'spans' ? 'resourceSpans' : 'resourceLogs');
+  if (!Array.isArray(groups)) return selectItems(source, [kind, 'items']);
+  const records: unknown[] = [];
+  for (const group of groups) {
+    if (!isObject(group)) continue;
+    const resource = readObject(group, ['resource']);
+    const attributes = resource ? readArray(resource, ['attributes']) : [];
+    for (const scope of readArray(group, [kind === 'spans' ? 'scopeSpans' : 'scopeLogs'])) {
+      if (!isObject(scope)) continue;
+      for (const record of readArray(scope, [kind === 'spans' ? 'spans' : 'logRecords'])) {
+        if (!isObject(record)) continue;
+        const body = Reflect.get(record, 'body');
+        records.push({
+          ...record,
+          ...(kind === 'logs' && isObject(body)
+            ? { body: readString(body, ['stringValue']) ?? '' }
+            : {}),
+          attributes: [...attributes, ...readArray(record, ['attributes'])],
         });
       }
     }
   }
-  return spans;
+  return records;
 }
 
 /** Append query parameters shared by Aspire telemetry endpoints. */

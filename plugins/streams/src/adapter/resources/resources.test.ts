@@ -1,3 +1,4 @@
+import { prepareLockedFixture } from '../../../../../.llm/tools/testing/locked-fixture.ts';
 import { checkGeneratedFiles } from '../../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { artifactText, collectInstallArtifacts, substituteTokens } from '@netscript/plugin/adapter';
@@ -181,10 +182,11 @@ Deno.test({
           2,
         ),
       );
+      const frozen = await prepareLockedFixture(root, files.map((file) => `${root}/${file}`));
       const output = await checkGeneratedFiles({
         args: [
           'check',
-          '--no-lock',
+          ...frozen,
           '--unstable-kv',
           '--config',
           `${root}/deno.json`,

@@ -10,17 +10,17 @@
   animation: ns-spin 0.7s linear infinite;
 }
 
-.ns-spinner--sm {
+:where(.ns-spinner)[data-size='sm'] {
   width: 16px;
   height: 16px;
 }
 
-.ns-spinner--md {
+:where(.ns-spinner)[data-size='md'] {
   width: 24px;
   height: 24px;
 }
 
-.ns-spinner--lg {
+:where(.ns-spinner)[data-size='lg'] {
   width: 40px;
   height: 40px;
   border-width: 3px;
@@ -38,4 +38,13 @@
   .ns-spinner {
     animation-duration: 1.5s;
   }
+}
+
+/* Studio Utility: Figma roles over the shipped contract; legacy presets retain their rules. */
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='spinner'][data-part='root'] {
+  color: var(--ns-marker);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-state='loading'] [data-scope='spinner'][data-part='root'] {
+  color: inherit;
 }

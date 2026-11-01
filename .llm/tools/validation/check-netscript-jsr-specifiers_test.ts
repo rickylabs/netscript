@@ -60,6 +60,33 @@ async function workspaceWithSdk(source: string): Promise<string> {
   return root;
 }
 
+Deno.test('registry.json rejects a stale first-party item dependency and accepts the release pin', async () => {
+  const root = await workspaceWithSdk('');
+  try {
+    const path = `${root}/packages/fresh-ui/registry.json`;
+    for (const version of ['0.0.1-beta.10', '0.0.1-beta.11']) {
+      await Deno.writeTextFile(
+        path,
+        JSON.stringify({
+          items: [{
+            name: 'desktop-only',
+            dependencies: [`jsr:@netscript/sdk@${version}/desktop`],
+          }],
+        }),
+      );
+      const result = await scanNetscriptJsrSpecifiers(['packages'], root);
+      const stale = version === '0.0.1-beta.10';
+      assertEquals(failureCount(result), stale ? 1 : 0);
+      if (stale) {
+        assertEquals(result.staleVersions[0].path, 'packages/fresh-ui/registry.json');
+        assertEquals(result.staleVersions[0].current, '0.0.1-beta.11');
+      }
+    }
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test('a pin from a previous release fails, naming the version the workspace ships', async () => {
   const root = await workspaceWithSdk(
     `export const deps = ['jsr:@netscript/sdk@0.0.1-beta.10/desktop'];\n`,

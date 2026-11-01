@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertThrows } from '@std/assert';
 import { os } from '@orpc/server';
+import { Hono } from 'hono';
 import { z } from 'zod';
 import { createBodyLimitMiddleware, createService, defineService } from '../mod.ts';
 import { createStaticCredentialAuthenticator } from '../src/auth/static-credential-authenticator.ts';
@@ -133,11 +134,13 @@ for (const projection of PROJECTIONS) {
       port: 0,
       cors: { origin: ['https://app.example'] },
       middleware: [async (c, next) => {
+        const nativeBody = c.req.header('transfer-encoding') ? c.req.raw.body : null;
         framing.push({
           contentLength: c.req.header('content-length'),
           transferEncoding: c.req.header('transfer-encoding'),
         });
         await next();
+        if (nativeBody) assertEquals(nativeBody.locked, false);
       }],
       bodyLimit: { maxBytes: LIMIT },
     });
@@ -154,6 +157,14 @@ for (const projection of PROJECTIONS) {
       assertEquals(under.status, 200);
       await under.body?.cancel();
 
+      const streamed = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: chunkedBody(projection.encode('a'.repeat(LIMIT / 2))),
+      });
+      assertEquals(streamed.status, 200);
+      await streamed.arrayBuffer();
+
       const declared = await fetch(url, {
         method: 'POST',
         headers,
@@ -169,6 +180,7 @@ for (const projection of PROJECTIONS) {
         body: chunkedBody(projection.encode('a'.repeat(LIMIT * 2))),
       });
       assertEquals(chunked.status, 413);
+      assertEquals(chunked.headers.get('access-control-allow-origin'), 'https://app.example');
       assertEquals(await chunked.json(), PAYLOAD_TOO_LARGE);
       // The chunked request reached the service without a Content-Length header.
       assertEquals(framing.at(-1), { contentLength: undefined, transferEncoding: 'chunked' });
@@ -252,3 +264,59 @@ Deno.test('createBodyLimitMiddleware rejects a non-positive or fractional maxByt
     assertThrows(() => createBodyLimitMiddleware({ maxBytes }), RangeError);
   }
 });
+
+for (const mode of ['disconnect', 'handler-error'] as const) {
+  Deno.test({
+    name: `body limit settles its native source after ${mode} without replacing the primary error`,
+    sanitizeOps: true,
+    sanitizeResources: true,
+    sanitizeExit: true,
+    async fn() {
+      const primary = new Error('primary handler failure');
+      const ended = Promise.withResolvers<Error>();
+      let handlerEntries = 0;
+      const app = new Hono().use(createBodyLimitMiddleware({ maxBytes: LIMIT }));
+      app.onError((error) => {
+        ended.resolve(error);
+        return new Response('primary', { status: 503 });
+      });
+      app.post('/owned', async (c) => {
+        handlerEntries += 1;
+        assertEquals(await c.req.text(), 'ok');
+        throw primary;
+      });
+      const stop = new AbortController();
+      const server = Deno.serve({ hostname: '127.0.0.1', port: 0, signal: stop.signal }, app.fetch);
+      let client: Deno.TcpConn | undefined;
+      const deadline = setTimeout(() => {
+        ended.reject(new Error('native body fixture deadline'));
+        stop.abort();
+      }, 5000);
+      try {
+        if (mode === 'disconnect') {
+          client = await Deno.connect({ hostname: '127.0.0.1', port: server.addr.port });
+          await client.write(new TextEncoder().encode(
+            'POST /owned HTTP/1.1\r\nHost: localhost\r\nTransfer-Encoding: chunked\r\n\r\n2\r\nok\r\n',
+          ));
+          client.close();
+          client = undefined;
+          assert(await ended.promise !== primary);
+        } else {
+          const response = await fetch(`http://127.0.0.1:${server.addr.port}/owned`, {
+            method: 'POST',
+            body: chunkedBody('ok'),
+          });
+          assertEquals(response.status, 503);
+          assertEquals(await response.text(), 'primary');
+          assertEquals(await ended.promise, primary);
+        }
+        assertEquals(handlerEntries, mode === 'disconnect' ? 0 : 1);
+      } finally {
+        clearTimeout(deadline);
+        client?.close();
+        stop.abort();
+        await server.finished;
+      }
+    },
+  });
+}

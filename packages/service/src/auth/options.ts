@@ -20,14 +20,48 @@
 import type { InternalCallerPredicate } from './contract/contract-policy.ts';
 import type { AuthenticatorPort, AuthorizerPort, MatchAwareAuthorizerPort } from './types.ts';
 
+/**
+ * One anonymous request with an uppercase method and byte-exact absolute path.
+ *
+ * GET does not admit HEAD. Descendants, encoded spellings and slash/case variants are not
+ * admitted; query strings are ignored. OPTIONS is excluded: use `withCors()` for preflight.
+ *
+ * @example
+ * ```ts
+ * import type { AnonymousRequestMatch } from '@netscript/service/auth';
+ * const health: readonly AnonymousRequestMatch[] = [
+ *   { method: 'GET', path: '/health' },
+ *   { method: 'GET', path: '/health/live' },
+ *   { method: 'GET', path: '/health/ready' },
+ *   { method: 'HEAD', path: '/health' },
+ *   { method: 'HEAD', path: '/health/live' },
+ *   { method: 'HEAD', path: '/health/ready' },
+ * ];
+ * ```
+ */
+export type AnonymousRequestMatch = Exclude<AnonymousRule, string>;
+
+/** A legacy path prefix or one exact anonymous request. */
+export type AnonymousRule = NonNullable<AuthnOptions['allowAnonymous']>[number];
+
 /** Authentication middleware options for `withAuthn()` and `defineService({ auth })`. */
 export interface AuthnOptions {
   /** Authenticator implementation. */
   readonly authenticator: AuthenticatorPort;
   /** Path prefixes the auth stage guards. Defaults to `["/api"]`. */
   readonly protect?: readonly string[];
-  /** Path prefixes always left public even under a guarded prefix. Defaults to `["/health"]`. */
-  readonly allowAnonymous?: readonly string[];
+  /**
+   * Requests left public by both auth stages. Strings are method-blind path prefixes; objects
+   * match one exact method/path. Omitted or empty retains the `/health` prefix default; a
+   * nonempty list replaces it. Invalid objects throw TypeError when middleware is constructed,
+   * before requests or listeners. Matched contract access declarations take precedence.
+   */
+  readonly allowAnonymous?: readonly (string | {
+    /** Exact request method; bodyless probes require an explicit HEAD entry. */
+    readonly method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+    /** Absolute path without encoding, parameters, wildcards, query or fragment. */
+    readonly path: string;
+  })[];
 }
 
 /** Authorization middleware options for `withAuthz()` and `defineService({ auth })`. */
@@ -64,6 +98,14 @@ export interface ContractAuthorizerOptions {
   readonly fallback?: MatchAwareAuthorizerPort;
   /** Raw routes mounted beside the contract router; any other unmatched route stays denied. */
   readonly rawRoutes?: readonly ContractAuthorizerRawRoute[];
+  /**
+   * Exact mounted absolute paths that return 410 `procedure_retired` after authentication.
+   * Applies to every method, even outside `protect` or inside `allowAnonymous`. Active contract
+   * procedures, internal guards and declared raw routes take precedence. Declare REST, RPC and
+   * alias paths separately. No parameters, prefixes, encoding, query, fragment or trailing slash.
+   * Invalid or duplicate declarations throw during authorizer construction.
+   */
+  readonly retiredPaths?: readonly string[];
   /**
    * Decides which principals satisfy `access.audience: 'internal'`. Defaults to
    * `isInternalServicePrincipal`, which accepts only internal-credential principals.

@@ -125,6 +125,18 @@ export function createRuntimeBehaviorGates(
         }),
     ),
     commandGate(
+      GATE.BEHAVIOR_STREAMS_STORAGE_RESTART,
+      'AppHost-provisioned streams replay producer documents after resource restart',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-all',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/verify-streams-storage-restart.ts`,
+        context.project.appHost,
+      ],
+    ),
+    commandGate(
       GATE.BEHAVIOR_DB_STATUS_PRESERVES_APPHOST,
       'DB status preserves resident AppHost identity',
       GATE_PHASE.BEHAVIOR,

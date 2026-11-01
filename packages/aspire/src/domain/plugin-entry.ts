@@ -10,6 +10,8 @@ export interface DenoServiceSpec {
   readonly permissions: readonly string[];
   /** Environment variables supplied to the service. */
   readonly env?: Record<string, string>;
+  /** AppHost-provisioned paths keyed by environment variable, relative to workdir. */
+  readonly dataDirectories?: Readonly<Record<string, string>>;
 }
 
 /** Deno background process spec consumed by AspireBuilder. */

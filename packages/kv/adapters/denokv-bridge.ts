@@ -9,9 +9,14 @@
  * @module
  */
 
-import { generateVersionstamp, keyToString } from '../application/keys.ts';
+import {
+  compareKeys,
+  generateVersionstamp,
+  keyHasPrefix,
+  keyToString,
+} from '../application/keys.ts';
 import type { WatchableKv } from '../types/watchable-kv.ts';
-import type { AtomicCheck, KvKey, KvListOptions, WatchEvent } from '../types/common.ts';
+import type { AtomicCheck, KvEntry, KvKey, KvListOptions, WatchEvent } from '../types/common.ts';
 import type { AtomicMutation } from '../types/kv-store.ts';
 
 // ---------------------------------------------------------------------------
@@ -408,9 +413,8 @@ export class WatchableKvBridge {
    * ### Strategy
    *
    * - Wraps `WatchableKv.list()` in a streaming async generator.
-   * - For `reverse: true` queries, collects all matching entries and sorts
-   *   them in reverse lexicographic key order (Redis SCAN has no ordering).
-   * - For forward queries, streams entries directly.
+   * - Restores native inclusive start around the exclusive `KvStore` range.
+   * - Streams the adapter's global order in either direction.
    * - The `.cursor` property is updated as iteration progresses.
    */
   list<T = unknown>(
@@ -437,11 +441,8 @@ export class WatchableKvBridge {
     if (start) kvListOpts.start = start as KvKey;
     if (end) kvListOpts.end = end as KvKey;
 
-    // The underlying RedisKvAdapter.list() now handles reverse queries
-    // correctly via a two-phase approach (SCAN all keys → global reverse
-    // sort → MGET only the tail), so we can safely pass `limit` through
-    // for both forward and reverse queries. For cursor-based pagination
-    // we still omit limit since the cursor filter may skip entries.
+    // The adapter orders both directions. Omit its limit for cursor resumption,
+    // since the cursor filter may skip entries before yielding a result.
     if (limit && !cursor) {
       kvListOpts.limit = limit;
     }
@@ -449,17 +450,29 @@ export class WatchableKvBridge {
     // State shared between the generator and the iterator wrapper
     let currentCursor = cursor ?? '';
 
+    /** Native selectors include start; KvStore excludes it. Merge that one entry in key order. */
+    async function* entries(): AsyncGenerator<KvEntry<T>> {
+      const withinPrefix = start && (!prefix ||
+        (start.length > prefix.length && keyHasPrefix(start as KvKey, prefix as KvKey)));
+      const withinEnd = start && (!end || compareKeys(start as KvKey, end as KvKey) < 0);
+      if (!reverse && withinPrefix && withinEnd) {
+        const first = await bridge.#kv.get<T>(start as KvKey);
+        if (first) yield first;
+      }
+      yield* bridge.#kv.list<T>(kvListOpts);
+      if (reverse && withinPrefix && withinEnd) {
+        const last = await bridge.#kv.get<T>(start as KvKey);
+        if (last) yield last;
+      }
+    }
+
     async function* generate(): AsyncGenerator<DenoKvEntryMaybe<T>> {
       let count = 0;
 
       if (reverse) {
-        // The adapter now returns globally-sorted reverse results (via
-        // two-phase SCAN-all-keys → reverse sort → MGET-tail), so we
-        // can stream entries directly without collecting and re-sorting.
-        //
         // When a cursor is active, entries at or after the cursor are
         // skipped (reverse iteration moves toward smaller keys).
-        for await (const entry of bridge.#kv.list<T>(kvListOpts)) {
+        for await (const entry of entries()) {
           if (limit && count >= limit) break;
 
           const mapped: DenoKvEntryMaybe<T> = {
@@ -478,10 +491,11 @@ export class WatchableKvBridge {
           currentCursor = JSON.stringify(entry.key);
           yield mapped;
           count++;
+          if (limit && count >= limit) return;
         }
       } else {
         // Forward streaming — yield entries as they come
-        for await (const entry of bridge.#kv.list<T>(kvListOpts)) {
+        for await (const entry of entries()) {
           if (limit && count >= limit) break;
 
           const keyStr = JSON.stringify(entry.key);
@@ -498,6 +512,7 @@ export class WatchableKvBridge {
           currentCursor = keyStr;
           yield mapped;
           count++;
+          if (limit && count >= limit) return;
         }
       }
     }
@@ -554,6 +569,13 @@ export class WatchableKvBridge {
    * versionstamps and publication order never determine write order. Batches
    * whose stored state is unchanged do not produce a frame.
    *
+   * Wrapped adapters may return a plain iterable without readiness and ignore
+   * `initial`. If their first batch has no initial events, one full `getMany`
+   * (or per-key reads when unavailable) seeds the frame before reconciliation.
+   * This fallback observes current storage, not an acknowledged snapshot boundary;
+   * a silent source produces no initial frame until its first batch arrives.
+   * Later batches read only their affected keys and retain the other entries.
+   *
    * kvdex's `createWatcher` reads from this stream via `.getReader()`.
    */
   watch<T = unknown>(
@@ -569,6 +591,7 @@ export class WatchableKvBridge {
     const state = new Map<string, DenoKvEntryMaybe<T>>();
     // Keep delete stamps separately: kvdex's absent entry must expose null.
     const versions = new Map<string, string>();
+    let initialized = false;
     let ended = false;
 
     return new ReadableStream<DenoKvEntryMaybe<T>[]>({
@@ -585,6 +608,28 @@ export class WatchableKvBridge {
               return;
             }
             let changed = false;
+            if (!initialized) {
+              initialized = true;
+              if (!events.some((event) => event.initial)) {
+                const entries = kv.getMany
+                  ? await kv.getMany<T>(keys)
+                  : await Promise.all(keys.map((key) => kv.get<T>(key)));
+                if (ended) return;
+                for (let index = 0; index < keys.length; index++) {
+                  const key = keys[index];
+                  const entry = entries[index];
+                  const keyString = keyToString(key);
+                  state.set(keyString, {
+                    key,
+                    value: entry ? entry.value : null,
+                    versionstamp: entry?.versionstamp ?? null,
+                  } as DenoKvEntryMaybe<T>);
+                  if (entry?.versionstamp != null) versions.set(keyString, entry.versionstamp);
+                }
+                // Even absent or unchanged keys constitute the initial full frame.
+                changed = true;
+              }
+            }
             const affected = new Map<string, WatchEvent<T>>();
             for (const event of events) {
               const key = keyToString(event.key);

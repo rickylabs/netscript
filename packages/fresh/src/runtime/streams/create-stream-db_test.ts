@@ -4,12 +4,11 @@ import { workersStreamSchema } from '../../../../plugin-workers-core/src/streams
 import { createQueryCollection } from '../../../../sdk/src/collections/create-query-collection.ts';
 import { createNetScriptQueryClient } from '../../../../sdk/src/query-client/query-client-factory.ts';
 import { DurableStream } from '@durable-streams/client';
-import { fromFileUrl } from '@std/path';
-import { TextLineStream } from 'jsr:@std/streams@^1/text-line-stream';
 import { createStateSchema } from '@durable-streams/state';
 import { createStreamDB } from '@durable-streams/state/db';
 import { z } from 'zod';
 import { createNetScriptStreamDB, type NetScriptStreamDBFactoryInput } from './create-stream-db.ts';
+import { startReferenceServer } from '../../../tests/_fixtures/stream-db-test-runtime.ts';
 
 const stateDefinition = {
   events: {
@@ -57,78 +56,6 @@ async function eventually(predicate: () => boolean): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 10));
   }
   assert(predicate(), 'StreamDB did not reach the expected state within the recovery window.');
-}
-
-async function startReferenceServer(dataDir: string, port = 0) {
-  const fixture = new URL('../../../tests/_fixtures/stream-db-server.ts', import.meta.url);
-  const config = new URL('../../../../../deno.json', import.meta.url);
-  const child = new Deno.Command(Deno.execPath(), {
-    args: [
-      'run',
-      '--allow-all',
-      '--config',
-      fromFileUrl(config),
-      fromFileUrl(fixture),
-      JSON.stringify({
-        dataDir,
-        port,
-      }),
-    ],
-    stdout: 'piped',
-    stderr: 'piped',
-  }).spawn();
-  let stderr = '';
-  const errors = child.stderr.pipeTo(
-    new WritableStream<Uint8Array>({
-      write(bytes) {
-        stderr += new TextDecoder().decode(bytes);
-      },
-    }),
-  );
-  let resolveReady!: (url: string) => void;
-  let rejectReady!: (error: Error) => void;
-  const ready = new Promise<string>((resolve, reject) => {
-    resolveReady = resolve;
-    rejectReady = reject;
-  });
-  const output = (async () => {
-    for await (
-      const line of child.stdout.pipeThrough(new TextDecoderStream()).pipeThrough(
-        new TextLineStream(),
-      )
-    ) {
-      if (!line.startsWith('{')) continue;
-      const message = JSON.parse(line);
-      if (typeof message.ready === 'string') resolveReady(message.ready);
-    }
-    rejectReady(new Error(`Reference server exited before readiness: ${stderr}`));
-  })();
-  try {
-    return {
-      url: await Promise.race([
-        ready,
-        new Promise<never>((_, reject) => {
-          const timer = setTimeout(
-            () => reject(new Error('Reference server readiness deadline exceeded.')),
-            10_000,
-          );
-          void ready.finally(() => clearTimeout(timer)).catch(() => {});
-        }),
-      ]),
-      async kill() {
-        child.kill('SIGKILL');
-        await child.status;
-        await Promise.all([output, errors]);
-      },
-    };
-  } catch (error) {
-    try {
-      child.kill('SIGKILL');
-    } catch { /* Child may already have exited. */ }
-    await child.status;
-    await Promise.all([output, errors]);
-    throw error;
-  }
 }
 
 Deno.test('createNetScriptStreamDB recovers after the persistent stream server is killed without replay', async () => {
@@ -289,14 +216,17 @@ Deno.test('createNetScriptStreamDB stop settles concurrent preloads while respon
 });
 
 Deno.test('default worker stream Collection enters the actual Fresh adapter and SDK query family', async () => {
-  const server = Deno.serve({ port: 0, onListen() {} }, () =>
-    new Response('[]', {
-      headers: {
-        'Content-Type': 'application/json',
-        'Stream-Next-Offset': '0',
-        'Stream-Up-To-Date': 'true',
-      },
-    }));
+  const server = Deno.serve(
+    { hostname: '127.0.0.1', port: 0, onListen() {} },
+    () =>
+      new Response('[]', {
+        headers: {
+          'Content-Type': 'application/json',
+          'Stream-Next-Offset': '0',
+          'Stream-Up-To-Date': 'true',
+        },
+      }),
+  );
   const baseUrl = new URL(`http://${server.addr.hostname}:${server.addr.port}`).origin;
   const db = createNetScriptStreamDB({
     baseUrl,

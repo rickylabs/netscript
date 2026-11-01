@@ -58,6 +58,7 @@
       "services/**/*.ts",
       "streams/**/*.ts",
       "database/**/*.prisma",
+      "database/**/*.migration.sql",
       "bin/**/*.ts"
     ],
     "exclude": [

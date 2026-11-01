@@ -1,13 +1,13 @@
 /**
  * Site-wide data shared by every page (Lume merges `_data.*` into page data).
  *
- * `navLanes` is the docs-v5 sidebar spine (see `_plan/10-nav-ia-redesign.md`):
- * five curated lanes — Start · Learn · Build · Reference · Concepts — rendered
- * in `_includes/layouts/base.vto`. Lane order, the Start links, and the
- * nine-pillar Build sequence are the ONLY hand-maintained nav data; everything
- * below a lane is folder-derived via the Lume nav plugin (`nav.menu()`), sorted
- * by `order` front matter with `basename` as the tiebreak and filtered by
- * `nav_hide!=true isRedirect!=true`.
+ * `navLanes` is the sidebar spine: six curated lanes (Start, Learn, Build,
+ * Reference, Concepts, Design system), rendered in `_includes/layouts/base.vto`.
+ * Lane order, the Start links, the curated Reference extras, and the Build
+ * sequence (the `/how-to/` landing, then nine areas) are the ONLY hand-maintained
+ * nav data; everything below a lane is folder-derived via the Lume nav plugin
+ * (`nav.menu()`), sorted by `order` front matter with the url as the tiebreak and
+ * filtered by `nav_hide!=true isRedirect!=true`.
  *
  * Reference URLs stay stable and are folder-derived from `reference/` — there
  * is no hand-maintained unit list anymore (the xref `ref:` keys live in
@@ -38,26 +38,29 @@ export interface NavLaneLink {
 }
 
 export interface NavLane {
+  id: 'start' | 'learn' | 'build' | 'reference' | 'concepts' | 'design-system';
   label: string;
-  /** Landing page for the top-bar lane. */
+  /** Lane landing: top-bar target and the breadcrumb lane crumb's link. */
   href: string;
   /** One-line intent gloss rendered under the lane header. */
   subtitle: string;
   kind: 'flat' | 'menu';
-  /** kind "flat": curated links rendered as-is (Start lane). */
+  /** Curated links: the whole lane when flat; rendered after the landing link when menu. */
   items?: NavLaneLink[];
   /** kind "menu": nav.menu() roots rendered as subtrees, in curated order. */
   roots?: string[];
   /**
-   * kind "menu" only: render the root as a plain link followed by its children
-   * at lane level (Learn/Reference/Concepts) instead of one collapsible branch
-   * per root (Build, where each pillar root IS the branch).
+   * kind "menu" only: the FIRST root renders as the landing link followed by its
+   * children at lane level; later roots render as one collapsible branch each.
    */
   expandRoot?: boolean;
+  /** nav.menu() sort for this lane; defaults to `navSort`. */
+  sort?: string;
 }
 
 export const navLanes: NavLane[] = [
   {
+    id: 'start',
     label: 'Start',
     href: '/quickstart/',
     subtitle: 'Get running in minutes',
@@ -65,14 +68,10 @@ export const navLanes: NavLane[] = [
     items: [
       { href: '/why/', label: 'Why NetScript' },
       { href: '/quickstart/', label: 'Quickstart' },
-      { href: '/quickstart/aspire/', label: 'Aspire quickstart' },
-      { href: '/concepts/', label: 'Core concepts' },
-      { href: '/cli-reference/', label: 'CLI reference' },
-      { href: '/glossary/', label: 'Glossary' },
-      { href: '/how-to/', label: 'All recipes' },
     ],
   },
   {
+    id: 'learn',
     label: 'Learn',
     href: '/tutorials/',
     subtitle: 'Build one thing end to end',
@@ -81,11 +80,13 @@ export const navLanes: NavLane[] = [
     expandRoot: true,
   },
   {
+    id: 'build',
     label: 'Build',
-    href: '/web-layer/',
+    href: '/how-to/',
     subtitle: 'Add a capability to your app',
     kind: 'menu',
     roots: [
+      '/how-to/',
       '/web-layer/',
       '/services-sdk/',
       '/background-processing/',
@@ -98,14 +99,21 @@ export const navLanes: NavLane[] = [
     ],
   },
   {
+    id: 'reference',
     label: 'Reference',
     href: '/reference/',
     subtitle: 'Every published symbol',
     kind: 'menu',
     roots: ['/reference/'],
     expandRoot: true,
+    sort: 'order title',
+    items: [
+      { href: '/cli-reference/', label: 'CLI cheat sheet' },
+      { href: '/glossary/', label: 'Glossary' },
+    ],
   },
   {
+    id: 'concepts',
     label: 'Concepts',
     href: '/explanation/',
     subtitle: 'How and why it works',
@@ -114,6 +122,7 @@ export const navLanes: NavLane[] = [
     expandRoot: true,
   },
   {
+    id: 'design-system',
     label: 'Design system',
     href: '/design-system/',
     subtitle: 'One design grammar, every surface',
@@ -125,11 +134,13 @@ export const navLanes: NavLane[] = [
 
 /** Choose one lane from the source URL, before the base-path plugin rewrites links. */
 export function getDocsLane(url: string): NavLane {
-  if (url === '/cli-reference/') return navLanes[3];
   return navLanes.find((lane) => lane.roots?.some((root) => url.startsWith(root))) ??
     navLanes.find((lane) => lane.items?.some((item) => url.startsWith(item.href))) ??
-    navLanes[0];
+    navLanes.find((lane) => lane.id === 'start')!;
 }
+
+/** Sections whose pager is derived from the sidebar order, scoped to the root. */
+export const pagerRoots: string[] = ['/reference/', '/explanation/', '/comparisons/'];
 
 /** nav.menu()/nav.breadcrumb() query — one definition so templates agree. */
 export const navQuery = 'nav_hide!=true isRedirect!=true';

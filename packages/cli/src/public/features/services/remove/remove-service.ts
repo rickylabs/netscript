@@ -1,3 +1,4 @@
+import type { DoctorReport } from '@netscript/plugin/adapter';
 import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import { join } from '@std/path';
@@ -37,6 +38,8 @@ export interface RemoveServiceResult {
   readonly serviceDir: string;
   readonly removedContracts: readonly string[];
   readonly helperFiles: readonly string[];
+  /** Informational browser-auth preservation checks. */
+  readonly browserAuthReport: DoctorReport;
 }
 
 /** Remove service files, config, workspace membership, and paired contracts. */
@@ -86,7 +89,7 @@ export async function removeService(
   }
 
   await reconcilePluginReferences(request.projectRoot, dependencies.fs);
-  const browserAuthFiles = await reconcileBrowserAuth(
+  const { written: browserAuthFiles, report: browserAuthReport } = await reconcileBrowserAuth(
     request.projectRoot,
     dependencies.fs,
     dependencies.formatter,
@@ -100,5 +103,5 @@ export async function removeService(
     { formatter: dependencies.formatter },
   );
   const helperFiles = [...browserAuthFiles, ...aspireFiles];
-  return { serviceDir, removedContracts, helperFiles };
+  return { serviceDir, removedContracts, helperFiles, browserAuthReport };
 }

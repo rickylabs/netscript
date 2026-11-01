@@ -5,114 +5,27 @@ title: "@netscript/aspire"
 
 # `@netscript/aspire`
 
-SDK-neutral Aspire diagnostics, config parsing, contribution ports, and TypeScript AppHost
-generation for NetScript plugin packages. This page is written against the package's public
-surface reported by `deno doc`. For the full index of packages and plugins return to the
-[reference overview](/reference/).
+SDK-neutral Aspire diagnostics, config parsing, contribution ports and TypeScript AppHost
+generation for NetScript plugin packages. Use it to compose an AppHost from `appsettings.json`, to
+write a plugin's Aspire contribution, or to test that contribution in memory.
 
-> **Generated AppHost runtime behavior.** The TypeScript AppHost this package generates emits
-> **ephemeral ports** (`0`) for the dashboard, OTLP, and resource-service endpoints, so
-> `aspire start --isolated` (an upstream Aspire CLI flag) configures randomized ports and isolated
-> user secrets (the host ports of container resources, however, are not guaranteed unique across
-> isolated starts without explicit port configuration). The scaffold always pins the
-> `Aspire.Hosting.Browsers` package, and generated frontend **app** resources unconditionally
-> configure `withBrowserLogs()`, forwarding browser console output into the Aspire dashboard.
->
-> **13.5 AppHost configuration contracts:**
->
-> - **Listener-readiness health checks (`addHealthCheck` / `withHealthCheck`):** backing-infrastructure
->   contracts define credential-free listener-readiness probes — a TCP socket connect for
->   Postgres/MySQL/MSSQL, and a RESP `PING` → `+PONG` exchange for Redis/Garnet over `node:net` with a
->   2000 ms timeout. Container PostgreSQL also gets a `<name>_auth` credential check (see
->   [Credential readiness](#credential-readiness-postgresql)).
-> - **Typed resource commands (`CommandOptions.Arguments`):** `<db>-cli` resources define typed
->   command shapes — `migrate` (with `--timeout <seconds>`), `seed`, and `reset` (guarded by
->   `--confirm true`) — in the generated TypeScript AppHost definitions.
-> - **MCP tool exposure control (`excludeFromMcp`):** `<db>-cli` helper executables invoke
->   `excludeFromMcp()` so they are omitted from the Aspire MCP server's tool surface.
+## Sub-path exports
 
-The root entrypoint (`@netscript/aspire`) exposes the diagnostic contract only. Composition,
-config, schema, type, adapter, and testing APIs live on typed sub-path exports:
-
-- [`@netscript/aspire/config`](#sub-path-exports) — `appsettings.json` parsing, Zod schemas, and entry interfaces.
-- [`@netscript/aspire/schema`](#sub-path-exports) — JSON Schema generation from the Zod config schema.
-- [`@netscript/aspire/types`](#sub-path-exports) — inferred config types and known-name extractors.
-- [`@netscript/aspire/constants`](#sub-path-exports) — config keys, sections, and runtime defaults.
-- [`@netscript/aspire/application`](#sub-path-exports) — AppHost composition, the contribution registry, and resolver helpers.
-- [`@netscript/aspire/adapters`](#sub-path-exports) — the SDK-neutral TypeScript builder adapter.
-- [`@netscript/aspire/testing`](#sub-path-exports) — in-memory builder, contribution base class, and test fixtures.
-- [`@netscript/aspire/public`](#sub-path-exports) — production aggregate re-exporting all public surfaces.
-
-## Generated Garnet version
-
-The CLI scaffold pins both the `ghcr.io/microsoft/garnet:2.2.1` container and the Docker-less
-`garnet-server` dotnet tool to Garnet **2.2.1**. The shared cache-image definition derives its tag
-from `SCAFFOLD_VERSIONS.GARNET_TOOL`; generator tests enforce the same default in `Container`,
-`Executable`, and both branches of `Auto` mode. Explicit `ImageTag` and `ToolVersion` configuration
-can override those defaults independently.
-
-NetScript registers Garnet through the generic `builder.addContainer(...)` and
-`builder.addExecutable(...)` paths. It does not call Aspire's `AddGarnet`, whose default image tag
-is **1.0** in `Aspire.Hosting.Garnet 13.5.3`. That package remains in the generated Aspire package
-list, but its default does not select NetScript's image. When upgrading Aspire or changing the
-registration path, preserve the shared version pin and verify both runtime arms with the RESP
-readiness check at their published endpoints.
-
-## Readiness contract
-
-`healthStatus` for backing infrastructure answers one question: **is this resource reachable at the
-endpoint its consumers will use?** The listener-readiness probe is a bounded TCP connect (or a RESP
-`PING`) to the resource's *published* endpoint, so `Healthy` means "something accepted a connection
-there", and `Unhealthy` means "nothing did, within the timeout".
-
-**A container log is not the readiness authority.** A database announcing
-`database system is ready to accept connections` is reporting that its own process finished starting,
-observed *inside* the container's network namespace. That is a different question, and the two can
-disagree legitimately: a published port that is not yet mapped, or that resolves somewhere nothing is
-listening, makes the log true while the probe is false. Aspire's DCP binds published ports to the
-Docker host's loopback rather than `0.0.0.0`, so a database that is ready in-container can be
-unreachable from another namespace while its log says otherwise.
-
-So, stated as the inverse of the rule that `Healthy` is not proof of a working resource:
-
-> **`Unhealthy` is not disproof that the database is up — it is proof it is not reachable where you
-> will connect.**
-
-**What consumers must wait on.** Wait on the health check, not on log text: `aspire wait <resource>`
-blocks on the evaluated health state, and `aspire describe --format Json` exposes `healthReports` per
-resource. Scraping a container log for a readiness phrase will report success before the endpoint is
-usable, which is the failure this contract exists to prevent. Treat `healthReports: {}` — no check
-registered — as *unknown* rather than healthy.
-
-### Credential readiness (PostgreSQL)
-
-A listener accepts the socket before the server accepts a login, so `<name>_listener` cannot tell
-a wrong password from a ready database. For each container PostgreSQL resource the generated
-helper therefore registers a second check, `<name>_auth`, beside the listener check. Each
-evaluation makes one authenticated `SELECT 1` through the [`pg`](https://node-postgres.com/)
-client, bounded at 2000 ms. The scaffold adds `pg` to the AppHost's `package.json`, and
-mutation-flow regeneration (`netscript service generate`, database changes, and plugin and service
-mutations) adds it to an existing AppHost that lacks it, keeping project-owned entries. Plain
-`netscript generate aspire` and `--check` leave this project-owned manifest unchanged; use
-`netscript service generate` to repair a legacy AppHost's missing runtime dependencies.
-
-- **Healthy** reads `postgres credentials accepted on <host>:<port>`.
-- **Unhealthy** reads `postgres credential check failed: <class> <code> at <host>:<port> after <n> ms`,
-  with `data` holding only `class`, `code`, `host`, `port` and `elapsedMs`. The `class` is derived
-  from SQLSTATE and socket codes only: `auth` (`28P01` wrong password, `28000` unknown role),
-  `database` (`3D000`), `starting` (`57P03`), `server`, `listener`, `timeout` or `client` (no `pg`
-  installed).
-- **No credential bytes.** The check never reports the password, the role or any server or driver
-  message text. It takes the same in-memory value as the resource's secret password parameter,
-  so the generated helper contains no literal credential.
-
-Aspire's PostgreSQL integration also attaches its own `<name>_check` (an Npgsql `SELECT 1`), whose
-description is the driver's raw message. `<name>_auth` is the classified, credential-free signal to
-build on. MySQL and SQL Server have listener readiness only for now.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/aspire` | `./mod.ts` | [Diagnostic contract](#diagnostics-root-export) (`inspectAspire`). |
+| `@netscript/aspire/config` | `./config.ts` | [`appsettings.json` parsing, Zod schemas, and entry interfaces](#config-parsing-netscriptaspireconfig). |
+| `@netscript/aspire/schema` | `./schema.ts` | [JSON Schema generation](#schema-generation-netscriptaspireschema) from the Zod config schema. |
+| `@netscript/aspire/types` | `./types.ts` | [Inferred config types and known-name extractors](#config-types-netscriptaspiretypes). |
+| `@netscript/aspire/constants` | `./constants.ts` | [Config keys, sections, and runtime defaults](#constants-netscriptaspireconstants). |
+| `@netscript/aspire/application` | `./src/application/mod.ts` | [AppHost composition, contribution registry, and resolvers](#composition-netscriptaspireapplication). |
+| `@netscript/aspire/adapters` | `./src/adapters/mod.ts` | [SDK-neutral TypeScript builder adapter](#adapters-netscriptaspireadapters). |
+| `@netscript/aspire/testing` | `./src/testing/mod.ts` | [In-memory builder, contribution base class, and fixtures](#testing-netscriptaspiretesting). |
+| `@netscript/aspire/public` | `./src/public/mod.ts` | [Production aggregate](#production-aggregate-netscriptaspirepublic) plus domain contracts and the runtime lifecycle port not published through separate sub-paths. |
 
 ## Diagnostics (root export)
 
-The root `@netscript/aspire` entrypoint exposes the diagnostic contract.
+The root entrypoint exposes only the diagnostic contract.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -131,61 +44,61 @@ Parses and validates `appsettings.json` against the Zod schema.
 
 ### Config interfaces
 
-| Symbol | Description |
-| --- | --- |
-| `AppSettings` | Top-level `appsettings.json` structure. |
-| `NetScriptConfig` | Root NetScript configuration section. |
-| `BaseEntry` | Common fields shared by resource entries. |
-| `ReferenceEntry` | Reference fields for resources that depend on services or plugins. |
-| `ServiceEntry` | Backend service resource entry. |
-| `PluginEntry` | Plugin service resource entry. |
-| `DatabaseEntry` | Database resource entry. |
-| `CacheEntry` | Cache resource entry. |
-| `BackgroundProcessorEntry` | Background processor resource entry. |
-| `AppEntry` | Frontend, desktop, or task application entry. |
-| `ToolEntry` | Development tool entry. |
-| `DefaultsConfig` | Defaults section wrapper. |
-| `DenoDefaults` | Global Deno runtime defaults. |
-| `LoggingConfig` | ASP.NET Core logging configuration. |
-| `OtelConfig` | OpenTelemetry endpoint configuration. |
-| `ParseOptions` | Options for controlling parser behavior. |
-| `ParseResult` | Result of parsing `appsettings.json`. |
-| `AspireSchema` | Public parser contract exposed by Aspire schema constants. |
-| `AspireSafeParseSuccess` | Successful result from `AspireSchema.safeParse`. |
-| `AspireSafeParseFailure` | Failed result from `AspireSchema.safeParse`. |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `AppSettings` | type alias | Top-level `appsettings.json` structure. |
+| `NetScriptConfig` | type alias | Root NetScript configuration section. |
+| `BaseEntry` | interface | Common fields shared by resource entries. |
+| `ReferenceEntry` | interface | Reference fields for resources that depend on services or plugins. |
+| `ServiceEntry` | type alias | Backend service resource entry. |
+| `PluginEntry` | type alias | Plugin service resource entry. |
+| `DatabaseEntry` | type alias | Database resource entry. |
+| `CacheEntry` | type alias | Cache resource entry. |
+| `BackgroundProcessorEntry` | type alias | Background processor resource entry. |
+| `AppEntry` | type alias | Frontend, desktop, or task application entry. |
+| `ToolEntry` | type alias | Development tool entry. |
+| `DefaultsConfig` | interface | Defaults section wrapper. |
+| `DenoDefaults` | type alias | Global Deno runtime defaults. |
+| `LoggingConfig` | interface | ASP.NET Core logging configuration. |
+| `OtelConfig` | type alias | OpenTelemetry endpoint configuration. |
+| `ParseOptions` | interface | Options for controlling parser behavior. |
+| `ParseResult` | interface | Result of parsing `appsettings.json`. |
+| `AspireSchema` | interface | Public parser contract exposed by Aspire schema constants. |
+| `AspireSafeParseSuccess` | interface | Successful result from `AspireSchema.safeParse`. |
+| `AspireSafeParseFailure` | interface | Failed result from `AspireSchema.safeParse`. |
 
 ### Config type aliases
 
-| Symbol | Description |
-| --- | --- |
-| `AppType` | Application entry variants supported by the AppHost config. |
-| `CacheEngine` | Cache engine variants supported by Aspire hosting integrations. |
-| `DatabaseEngine` | Database engine variants supported by Aspire hosting integrations. |
-| `ResourceMode` | Resource provisioning mode for managed resources. |
-| `AspireSafeParseResult` | Result from `AspireSchema.safeParse`. |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `AppType` | type alias | Application entry variants supported by the AppHost config. |
+| `CacheEngine` | type alias | Cache engine variants supported by Aspire hosting integrations. |
+| `DatabaseEngine` | type alias | Database engine variants supported by Aspire hosting integrations. |
+| `ResourceMode` | type alias | Resource provisioning mode for managed resources. |
+| `AspireSafeParseResult` | type alias | Result from `AspireSchema.safeParse`. |
 
 ### Config Zod schemas
 
-These exported Zod schema values back the config contract above.
+The Zod schema values behind the config contract.
 
-| Symbol | Description |
-| --- | --- |
-| `AppSettingsSchema` | Top-level `appsettings.json` schema. |
-| `NetScriptConfigSchema` | Root NetScript configuration schema. |
-| `ServiceEntrySchema` | Service entry schema. |
-| `PluginEntrySchema` | Plugin entry schema. |
-| `DatabaseEntrySchema` | Database entry schema. |
-| `CacheEntrySchema` | Cache entry schema. |
-| `BackgroundProcessorEntrySchema` | Background processor entry schema. |
-| `AppEntrySchema` | Application entry schema. |
-| `ToolEntrySchema` | Development tool entry schema. |
-| `DefaultsSchema` | Defaults section schema. |
-| `DenoDefaultsSchema` | Global Deno runtime defaults schema. |
-| `OtelConfigSchema` | OpenTelemetry endpoint configuration schema. |
-| `AppTypeSchema` | Application type schema. |
-| `CacheEngineSchema` | Cache engine schema. |
-| `DatabaseEngineSchema` | Database engine schema. |
-| `ResourceModeSchema` | Resource provisioning mode schema. |
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `AppSettingsSchema` | const | Top-level `appsettings.json` schema. |
+| `NetScriptConfigSchema` | const | Root NetScript configuration schema. |
+| `ServiceEntrySchema` | const | Service entry schema. |
+| `PluginEntrySchema` | const | Plugin entry schema. |
+| `DatabaseEntrySchema` | const | Database entry schema. |
+| `CacheEntrySchema` | const | Cache entry schema. |
+| `BackgroundProcessorEntrySchema` | const | Background processor entry schema. |
+| `AppEntrySchema` | const | Application entry schema. |
+| `ToolEntrySchema` | const | Development tool entry schema. |
+| `DefaultsSchema` | const | Defaults section schema. |
+| `DenoDefaultsSchema` | const | Global Deno runtime defaults schema. |
+| `OtelConfigSchema` | const | OpenTelemetry endpoint configuration schema. |
+| `AppTypeSchema` | const | Application type schema. |
+| `CacheEngineSchema` | const | Cache engine schema. |
+| `DatabaseEngineSchema` | const | Database engine schema. |
+| `ResourceModeSchema` | const | Resource provisioning mode schema. |
 
 ## Schema generation (`@netscript/aspire/schema`)
 
@@ -292,8 +205,8 @@ The SDK-neutral TypeScript builder adapter used to compose an AppHost.
 
 ## Testing (`@netscript/aspire/testing`)
 
-In-memory builder, the plugin contribution base class, and deterministic fixtures for plugin
-authors writing Aspire composition tests.
+In-memory builder, the plugin contribution base class, and deterministic fixtures for testing a
+plugin's Aspire composition.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -314,14 +227,12 @@ authors writing Aspire composition tests.
 
 ## Production aggregate (`@netscript/aspire/public`)
 
-The production aggregate entrypoint combines the package's public config, schema, types, constants,
-application composition, adapters, diagnostics, and testing surfaces in a single import path. It
-also exposes domain errors and contracts plus the runtime lifecycle port that have no separate
-published sub-path. Use `@netscript/aspire/public` when an application or plugin prefers a unified
-import over individual sub-path specifiers, while reserving the root `@netscript/aspire` entrypoint
-exclusively for diagnostics (`inspectAspire`).
+One import path for the public config, schema, types, constants, application composition, adapters,
+diagnostics and testing surfaces, plus the domain errors, contracts and runtime lifecycle port that
+have no separate sub-path. Use it when you prefer one import over individual sub-paths; the root
+entrypoint stays reserved for diagnostics (`inspectAspire`).
 
-The following symbols are published exclusively through `@netscript/aspire/public`.
+These symbols are published only through `@netscript/aspire/public`:
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -330,23 +241,126 @@ The following symbols are published exclusively through `@netscript/aspire/publi
 | `AspireRuntime` | interface | — | Lifecycle port (`start`, `stop`, and `status`) implemented by adapters that control an Aspire AppHost runtime. |
 | `ReferenceSpec` | interface | — | Resource relationship contract carrying the source, target, and whether startup waits for the target. |
 
-## Sub-path exports
+## Generated AppHost
 
-The following entrypoints are published alongside the root export. Each is documented against its
-own `deno doc` surface in the sections above.
+The TypeScript AppHost this package generates emits **ephemeral ports** (`0`) for the dashboard,
+OTLP and resource-service endpoints, so `aspire start --isolated` (an upstream Aspire CLI flag)
+configures randomized ports and isolated user secrets.
 
-| Export | Entrypoint | Purpose |
-| --- | --- | --- |
-| `@netscript/aspire` | `./mod.ts` | Diagnostic contract (`inspectAspire`). |
-| `@netscript/aspire/config` | `./config.ts` | `appsettings.json` parsing, Zod schemas, and entry interfaces. |
-| `@netscript/aspire/schema` | `./schema.ts` | JSON Schema generation from the Zod config schema. |
-| `@netscript/aspire/types` | `./types.ts` | Inferred config types and known-name extractors. |
-| `@netscript/aspire/constants` | `./constants.ts` | Config keys, sections, and runtime defaults. |
-| `@netscript/aspire/application` | `./src/application/mod.ts` | AppHost composition, contribution registry, and resolvers. |
-| `@netscript/aspire/adapters` | `./src/adapters/mod.ts` | SDK-neutral TypeScript builder adapter. |
-| `@netscript/aspire/testing` | `./src/testing/mod.ts` | In-memory builder, contribution base class, and fixtures. |
-| `@netscript/aspire/public` | `./src/public/mod.ts` | Production aggregate plus domain contracts and the runtime lifecycle port not published through separate sub-paths. |
+> [!NOTE]
+> The host ports of container resources are not guaranteed unique across isolated starts without
+> explicit port configuration.
 
----
+The scaffold always pins the `Aspire.Hosting.Browsers` package, and generated frontend **app**
+resources always configure `withBrowserLogs()`, forwarding browser console output into the Aspire
+dashboard.
 
-Back to the [reference overview](/reference/).
+### Aspire 13.5 configuration contracts
+
+| Contract | Generated behavior |
+| --- | --- |
+| Listener-readiness health checks (`addHealthCheck` / `withHealthCheck`) | Backing-infrastructure contracts define credential-free listener-readiness probes: a TCP socket connect for Postgres/MySQL/MSSQL, and a RESP `PING` → `+PONG` exchange for Redis/Garnet over `node:net` with a 2000 ms timeout. Container PostgreSQL also gets a `<name>_auth` [credential check](#credential-readiness-postgresql). |
+| Typed resource commands (`CommandOptions.Arguments`) | `<db>-cli` resources define typed command shapes in the generated TypeScript AppHost: `migrate` (with `--timeout <seconds>`), `seed`, and `reset` (guarded by `--confirm true`). |
+| MCP tool exposure control (`excludeFromMcp`) | `<db>-cli` helper executables call `excludeFromMcp()`, so they are omitted from the Aspire MCP server's tool surface. |
+
+## Generated Garnet version
+
+The CLI scaffold pins both the `ghcr.io/microsoft/garnet:2.2.1` container and the Docker-less
+`garnet-server` dotnet tool to Garnet **2.2.1**. The shared cache-image definition derives its tag
+from `SCAFFOLD_VERSIONS.GARNET_TOOL`, and the same default applies in `Container`, `Executable`, and
+both branches of `Auto` mode. Explicit `ImageTag` and `ToolVersion` configuration override those
+defaults independently.
+
+NetScript registers Garnet through the generic `builder.addContainer(...)` and
+`builder.addExecutable(...)` paths. It does not call Aspire's `AddGarnet`, whose default image tag
+is **1.0** in `Aspire.Hosting.Garnet 13.5.3`. That package remains in the generated Aspire package
+list, but its default does not select NetScript's image.
+
+## Readiness contract
+
+`healthStatus` for backing infrastructure answers one question: **is this resource reachable at the
+endpoint its consumers will use?** The listener-readiness probe is a bounded TCP connect (or a RESP
+`PING`) to the resource's *published* endpoint, so `Healthy` means "something accepted a connection
+there", and `Unhealthy` means "nothing did, within the timeout".
+
+**A container log is not the readiness authority.** A database announcing
+`database system is ready to accept connections` is reporting that its own process finished starting,
+observed *inside* the container's network namespace. That is a different question, and the two can
+disagree legitimately: a published port that is not yet mapped, or that resolves somewhere nothing is
+listening, makes the log true while the probe is false. Aspire's DCP binds published ports to the
+Docker host's loopback rather than `0.0.0.0`, so a database that is ready in-container can be
+unreachable from another namespace while its log says otherwise.
+
+> [!IMPORTANT]
+> `Healthy` is not proof of a working resource, and `Unhealthy` is not disproof that the database is
+> up: it is proof the database is not reachable where you will connect.
+
+### What to wait on
+
+Wait on the health check, not on log text: `aspire wait <resource>` blocks on the evaluated health
+state, and `aspire describe --format Json` exposes `healthReports` per resource. Scraping a container
+log for a readiness phrase reports success before the endpoint is usable, which is the failure this
+contract prevents. Treat `healthReports: {}` (no check registered) as *unknown*, not healthy.
+
+### Credential readiness (PostgreSQL)
+
+A listener accepts the socket before the server accepts a login, so `<name>_listener` cannot tell a
+wrong password from a ready database. For each container PostgreSQL resource the generated helper
+registers a second check, `<name>_auth`, beside the listener check. Each
+evaluation makes one authenticated `SELECT 1` through the [`pg`](https://node-postgres.com/)
+client, bounded at 2000 ms. The scaffold adds `pg` to the AppHost's `package.json`, and
+mutation-flow regeneration (`netscript service generate`, database changes, and plugin and service
+mutations) adds it to an existing AppHost that lacks it, keeping project-owned entries. Plain
+`netscript generate aspire` and `--check` leave this project-owned manifest unchanged; use
+`netscript service generate` to repair a legacy AppHost's missing runtime dependencies.
+
+- **Healthy** reads `postgres credentials accepted on <host>:<port>`.
+- **Unhealthy** reads `postgres credential check failed: <class> <code> at <host>:<port> after <n> ms`,
+  with `data` holding only `class`, `code`, `host`, `port` and `elapsedMs`. The `class` is derived
+  from SQLSTATE and socket codes only: `auth` (`28P01` wrong password, `28000` unknown role),
+  `database` (`3D000`), `starting` (`57P03`), `server`, `listener`, `timeout` or `client` (no `pg`
+  installed).
+- **No credential bytes.** The check never reports the password, the role or any server or driver
+  message text. It takes the same in-memory value as the resource's secret password parameter,
+  so the generated helper contains no literal credential.
+
+Aspire's PostgreSQL integration also attaches its own `<name>_check` (an Npgsql `SELECT 1`), whose
+description is the driver's raw message. `<name>_auth` is the classified, credential-free signal to
+build on. MySQL and SQL Server have listener readiness only.
+
+## Aspire 13.5.3 CLI polling and server memory
+
+Periodic Aspire CLI snapshots can grow a long-running AppHost server's heap. In the pinned
+13.5.3 implementation, [`ResourceNotificationService.WatchAsync`](https://github.com/microsoft/aspire/blob/v13.5.3/src/Aspire.Hosting/ApplicationModel/ResourceNotificationService.cs)
+subscribes an unbounded resource-event channel, then yields initial snapshots **before** entering
+its cleanup `try/finally`. A dashboard health wait that matches an initial snapshot disposes the
+iterator before that cleanup is active. The handler remains subscribed and retains later events.
+Short-lived `ps`, `describe`, and healthy-resource `wait` connections were observed to leave about
+two subscriptions each.
+
+The [NetScript investigation](https://github.com/rickylabs/netscript/issues/2401) reports a
+16-resource TypeScript AppHost reaching **14.3 GB RSS after 45.6 hours** when `ps` and `describe`
+ran once per minute. Growth at the end was 0.67 GB/hour versus a 0.31 GB/hour average; these are
+measurements from that investigation, not a NetScript benchmark or a fresh measurement of this
+mitigation. Both subscriber count and retained events grow over time, producing approximately
+quadratic accumulation. This leak is in the AppHost server, rather than the dashboard UI process.
+
+NetScript's database compatibility watcher uses one owned
+`aspire describe <resource> --follow --format Json` stream for the operation instead of repeatedly
+launching snapshot commands. It consumes the initial snapshot before starting the executable,
+then requires a fresh nonterminal transition before accepting a terminal state and exit code.
+The operation deadline and cancellation close and reap the follower. It fails on a broken stream
+instead of reconnecting or falling back to polling. One-shot discovery, diagnostic commands, and
+bounded readiness waits can still make CLI connections; the mitigation bounds command growth and
+does **not** repair the upstream leak.
+
+Generated health probes check their HTTP or protocol listener directly; they do not invoke the
+Aspire CLI on each health interval. For an external long-running supervisor, keep one follow stream
+per AppHost process, consume its NDJSON updates, and dispose it when that process exits. Resolve
+process identity once when attaching instead of adding periodic `aspire ps` calls. Restarting the
+AppHost server releases its leaked subscriptions; stopping only the dashboard does not address the
+retained server heap.
+
+No matching upstream issue was located in the 2026-10-31 search. The verified source above is the
+upstream cause; a [ready-to-file report](https://github.com/rickylabs/netscript/blob/881e8dda6aba17f58d35d8d975da9d475cbc6eea/.llm/runs/orch-divybot-6541778987--2401/upstream-report.md)
+is retained for the owner to submit. NetScript 0.0.9 keeps Aspire 13.5.3 pinned.

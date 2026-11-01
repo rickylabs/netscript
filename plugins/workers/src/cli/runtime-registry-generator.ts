@@ -2,6 +2,7 @@ import type { RenderedRuntimeRegistry } from './command-types.ts';
 import { exists } from 'jsr:@std/fs@^1';
 import { basename, dirname, join, relative } from 'jsr:@std/path@^1';
 import { toCamelCase } from 'jsr:@std/text@^1';
+import { LocalProjectFiles, selectRegistrySources } from '@netscript/plugin/cli';
 import type { JobConfig, WorkersConfigData } from '@netscript/plugin-workers-core/config';
 import { resolveConfiguredJobPolicies } from './configured-job-policies.ts';
 
@@ -102,31 +103,30 @@ export async function renderRuntimeRegistries(
   for (const rawTarget of manifest.runtimeRegistries ?? []) {
     const target = applyProfile(rawTarget, options.profile);
     const targetDir = join(options.projectRoot, target.dir);
-    const hasConfiguredJobs = target.kind === 'workers-job' && options.workers &&
-      (options.workers.jobs.length > 0 ||
-        options.workers.groups.some((group) => group.jobs.length));
     const targetDirExists = await exists(targetDir, { isDirectory: true });
+    const excludedSourceFiles: string[] = [];
     const files = targetDirExists
       ? await discoverRegistryFiles(options.projectRoot, targetDir, {
         fileSuffixes: target.fileSuffixes,
         include: target.include,
         includeWhenPresent: target.includeWhenPresent,
         exclude: target.exclude,
-      })
+      }, excludedSourceFiles)
       : [];
     const registryPath = target.registryPath ?? `${target.dir}/_registry.ts`;
-    if ((!targetDirExists || files.length === 0) && !hasConfiguredJobs) {
-      rendered.push({ registryPath, sourceFiles: [], content: null });
-      continue;
-    }
     const registry = await generateRuntimeRegistry(
       options.projectRoot,
       target,
       join(options.projectRoot, registryPath),
       files,
       options.workers,
+      excludedSourceFiles,
     );
-    rendered.push({ registryPath, ...registry });
+    rendered.push({
+      registryPath,
+      ...registry,
+      ...(excludedSourceFiles.length ? { excludedSourceFiles } : {}),
+    });
   }
   return rendered;
 }
@@ -153,6 +153,7 @@ async function discoverRegistryFiles(
     readonly includeWhenPresent?: readonly ConditionalRuntimeInclude[];
     readonly exclude: readonly string[];
   },
+  excludedSourceFiles: string[],
 ): Promise<string[]> {
   const include = await resolveRuntimeIncludes(projectRoot, options);
   const files: string[] = [];
@@ -167,7 +168,12 @@ async function discoverRegistryFiles(
       files.push(entry.name);
     }
   }
-  return files.sort();
+  const selection = await selectRegistrySources(
+    new LocalProjectFiles(projectRoot),
+    files.sort().map((file) => relative(projectRoot, join(dir, file)).replaceAll('\\', '/')),
+  );
+  excludedSourceFiles.push(...selection.excludedSourceFiles);
+  return selection.sourceFiles.map((path) => basename(path));
 }
 
 async function resolveRuntimeIncludes(
@@ -197,6 +203,7 @@ async function generateRuntimeRegistry(
   registryPath: string,
   files: readonly string[],
   workers: WorkersConfigData | undefined,
+  excludedSourceFiles: string[],
 ): Promise<{ readonly content: string; readonly sourceFiles: readonly string[] }> {
   const lines = createRegistryHeader(target);
   const registryDir = relative(projectRoot, dirname(registryPath)).replaceAll('\\', '/');
@@ -208,7 +215,13 @@ async function generateRuntimeRegistry(
     );
   });
 
-  const pluginEntries = await appendPluginImports(projectRoot, target, registryDir, lines);
+  const pluginEntries = await appendPluginImports(
+    projectRoot,
+    target,
+    registryDir,
+    lines,
+    excludedSourceFiles,
+  );
   const configuredPolicies = target.kind === 'workers-job' && workers
     ? resolveConfiguredJobPolicies(projectRoot, [
       ...files.map((file) => ({ path: `${target.dir}/${file}`, source: 'local' as const })),
@@ -270,7 +283,7 @@ function createRegistryHeader(target: RuntimeRegistryTarget): string[] {
     ' */',
     '',
     target.kind === 'workers-job'
-      ? `import type { JobPayloadMap, JobPayloadSchema, RegisterJobInput, StaticJobRegistry } from '${target.typeImport.from}';`
+      ? `import { jobRetryRegistration } from '${target.typeImport.from}';\nimport type { JobPayloadMap, JobPayloadSchema, RegisterJobInput, StaticJobRegistry } from '${target.typeImport.from}';`
       : `import type { ${target.typeImport.name} } from '${target.typeImport.from}';`,
     '',
   ];
@@ -281,6 +294,7 @@ async function appendPluginImports(
   target: RuntimeRegistryTarget,
   registryDir: string,
   lines: string[],
+  excludedSourceFiles: string[],
 ): Promise<PluginEntry[]> {
   const pluginEntries: PluginEntry[] = [];
   for (const pluginDir of target.pluginDirs ?? []) {
@@ -292,7 +306,7 @@ async function appendPluginImports(
     const pluginFiles = await discoverRegistryFiles(projectRoot, dir, {
       fileSuffixes: target.fileSuffixes,
       exclude: pluginDir.exclude ?? [],
-    });
+    }, excludedSourceFiles);
     if (pluginFiles.length === 0) {
       continue;
     }
@@ -451,23 +465,43 @@ function appendJobDefinitions(entries: readonly GeneratedJobEntry[], lines: stri
   lines.push(
     '});',
     '',
-    'const jobDefinitionEntries: readonly [string, RegisterJobInput][] = Object.entries(jobDefinitionsById)',
+    'const jobDefinitionEntries: readonly [string, RegisterJobInput][] = Object.entries<RegisterJobInput>(jobDefinitionsById)',
     '  .map(([id, definition]) => [id, toRegisterJobInput(definition)]);',
     '',
     'export const jobDefinitions: ReadonlyMap<string, RegisterJobInput> = new Map(jobDefinitionEntries);',
     'export const definitions: ReadonlyMap<string, RegisterJobInput> = jobDefinitions;',
     '',
-    'function createConfiguredJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(policy: RegisterJobInput & { readonly id: TId }, entrypoint: string, source: "local" | "plugin", handler: THandler, pluginId?: string): GeneratedJobDefinition<TId, THandler> {\n  return {\n    ...policy,\n    entrypoint,\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n    handler,\n    payloadSchema: handler.payloadSchema,\n  };\n}',
+    ...(entries.some((entry) => entry.policy)
+      ? [
+        'function createConfiguredJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(policy: RegisterJobInput & { readonly id: TId }, entrypoint: string, source: "local" | "plugin", handler: THandler, pluginId?: string): GeneratedJobDefinition<TId, THandler> {\n  return {\n    ...policy,\n    ...jobRetryRegistration(policy, handler),\n    entrypoint,\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n    handler,\n    payloadSchema: handler.payloadSchema,\n  };\n}',
+      ]
+      : []),
     '',
-    'function createLocalJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, entrypoint: string, handler: THandler): GeneratedJobDefinition<TId, THandler> {\n  return createJobDefinition(id, entrypoint, "local", handler);\n}',
+    ...(entries.some((entry) => entry.source === 'local' && !entry.policy)
+      ? [
+        'function createLocalJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, entrypoint: string, handler: THandler): GeneratedJobDefinition<TId, THandler> {\n  return createJobDefinition(id, entrypoint, "local", handler);\n}',
+      ]
+      : []),
     '',
-    'function createPluginJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, pluginId: string, entrypoint: string, handler: THandler): GeneratedJobDefinition<TId, THandler> {\n  return createJobDefinition(id, entrypoint, "plugin", handler, pluginId);\n}',
+    ...(entries.some((entry) => entry.source === 'plugin' && !entry.policy)
+      ? [
+        'function createPluginJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, pluginId: string, entrypoint: string, handler: THandler): GeneratedJobDefinition<TId, THandler> {\n  return createJobDefinition(id, entrypoint, "plugin", handler, pluginId);\n}',
+      ]
+      : []),
     '',
-    'function createJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, entrypoint: string, source: "local" | "plugin", handler: THandler, pluginId?: string): GeneratedJobDefinition<TId, THandler> {\n  return {\n    id,\n    name: toJobName(id),\n    entrypoint,\n    topic: "default",\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n    timezone: "UTC",\n    timeout: 300000,\n    maxRetries: 3,\n    retryDelay: 1000,\n    maxConcurrency: 1,\n    priority: 50,\n    enabled: true,\n    persist: true,\n    tags: source === "plugin" ? ["plugin", pluginId ?? "unknown"] : [],\n    handler,\n    payloadSchema: handler.payloadSchema,\n  };\n}',
+    ...(entries.some((entry) => !entry.policy)
+      ? [
+        'function createJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(id: TId, entrypoint: string, source: "local" | "plugin", handler: THandler, pluginId?: string): GeneratedJobDefinition<TId, THandler> {\n  return {\n    id,\n    name: toJobName(id),\n    entrypoint,\n    topic: "default",\n    source,\n    ...(pluginId ? { pluginId } : {}),\n    executionType: "deno",\n    timezone: "UTC",\n    timeout: 300000,\n    maxRetries: 3,\n    retryDelay: 1000,\n    ...jobRetryRegistration({}, handler),\n    maxConcurrency: 1,\n    priority: 50,\n    enabled: true,\n    persist: true,\n    tags: source === "plugin" ? ["plugin", pluginId ?? "unknown"] : [],\n    handler,\n    payloadSchema: handler.payloadSchema,\n  };\n}',
+      ]
+      : []),
     '',
     'function toRegisterJobInput(definition: RegisterJobInput): RegisterJobInput {\n  const { handler: _handler, payloadSchema: _payloadSchema, ...registration } = definition;\n  return registration;\n}',
     '',
-    'function toJobName(id: string): string {\n  return id.split("-").filter(Boolean).map((part) =>\n    `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`\n  ).join(" ");\n}',
+    ...(entries.some((entry) => !entry.policy)
+      ? [
+        'function toJobName(id: string): string {\n  return id.split("-").filter(Boolean).map((part) =>\n    `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`\n  ).join(" ");\n}',
+      ]
+      : []),
     '',
   );
   if (entries.some((entry) => entry.source === 'plugin' && entry.policy)) {
@@ -479,7 +513,11 @@ function appendJobDefinitions(entries: readonly GeneratedJobEntry[], lines: stri
   lines.push(
     'type ResolvedJobHandler<TModule> =\n  TModule extends { readonly default: infer TDefault }\n    ? TDefault extends SchemaBackedJobHandler ? TDefault : never\n    : TModule extends { readonly handler: infer THandler }\n      ? THandler extends SchemaBackedJobHandler ? THandler : never\n      : never;',
     '',
-    'function resolveJobHandler<TModule extends Record<string, unknown>>(module: TModule, path: string): ResolvedJobHandler<TModule> {\n  const candidate = module.default ?? module.handler;\n  if (typeof candidate !== "function" || !("payloadSchema" in candidate)) {\n    throw new Error(`Worker job module ${path} must export a schema-backed handler as default or handler.`);\n  }\n  return candidate as ResolvedJobHandler<TModule>;\n}',
+    ...(entries.length > 0
+      ? [
+        'function resolveJobHandler<TModule extends Record<string, unknown>>(module: TModule, path: string): ResolvedJobHandler<TModule> {\n  const candidate = module.default ?? module.handler;\n  if (typeof candidate !== "function" || !("payloadSchema" in candidate)) {\n    throw new Error(`Worker job module ${path} must export a schema-backed handler as default or handler.`);\n  }\n  return candidate as ResolvedJobHandler<TModule>;\n}',
+      ]
+      : []),
     '',
   );
 }

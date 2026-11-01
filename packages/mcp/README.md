@@ -4,7 +4,7 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The Model Context Protocol server for NetScript: 22 token-bounded tools for app health, correlated
+**The Model Context Protocol server for NetScript: 26 token-bounded tools for app health, correlated
 execution debugging, framework telemetry, CLI diagnostics, intent-aware documentation guidance, and
 first-party export discovery over stdio.**
 
@@ -24,7 +24,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ## Why agents like it
 
-- **22 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
+- **26 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
   characters per string) before it reaches the model; the analytics tools never return raw spans at
   all.
 - **Framework-semantic trace intelligence** — tools classify telemetry into `worker`, `saga`,
@@ -49,7 +49,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ```mermaid
 flowchart LR
-    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>22 tools · bounded results"]
+    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>26 tools · bounded results"]
     S --> T["Telemetry endpoint<br/>(OTLP read model)"]
     S --> D["Docs corpus<br/>(public Markdown)"]
     S --> E["Export corpus<br/>(pinned deno doc JSON)"]
@@ -165,9 +165,52 @@ The generated `.mcp.json` runs the server for this project — equivalent to:
 > `{"count": 1, "matches": [{"slug": "pages/observability/telemetry", "title": "Telemetry", "snippet": "…", "score": 35}]}`,
 > then `get_doc` with the winning slug to read just the section it needs.
 
-When telemetry is unreachable, nothing crashes: `get_app_status` and the doctor's telemetry checks
-report a structured `warn`/`fail` status, the list and analytics tools return their ordinary empty
-results, and `get_run` returns a structured `run_not_found` error the agent can reason about.
+## Telemetry binding and sample evidence
+
+The three status/performance tools bind to the server's project, selected with
+`netscript agent mcp --project-root <project-root>`. On each call they select that project's exact
+`aspire/apphost.mts` from `aspire ps`, then read the supported dashboard telemetry API. Start that
+AppHost before requesting telemetry. Discovery runs once per call, so a later start or restart is
+seen without restarting MCP.
+
+Explicit dashboard configuration takes precedence: `--endpoint` (or the composition's `endpoint`),
+then `NETSCRIPT_TELEMETRY_ENDPOINT`, then `ASPIRE_DASHBOARD_PORT`. The port variable is an explicit
+HTTP dashboard override. Use a full endpoint for HTTPS. An endpoint may contain a dashboard login
+URL; its token is exchanged privately for an API key using Aspire's supported authentication API.
+Invalid overrides fail instead of selecting another dashboard. These three tools have no
+conventional dashboard fallback.
+
+Every response carries `provenance`: the requested inclusive `window`, selected span
+`sampleCount`, optional `logCount`, `servingRevision` (the serving MCP package version), and any
+observed `serviceRevisions` from `service.version`. A deployment commit is reported only if the
+service emitted it. The span `totalCount`, `returnedCount`, acquisition `observedRange`, `limit`
+and `sourceTruncated` describe the bounded snapshot before local window filtering. Resource
+counts describe the dashboard's telemetry emitter inventory; plugin runtime health is separate.
+
+`provenance.state` distinguishes `ready`, `no_data`, `partial`, `unbound` and `unavailable`.
+A wrong project returns `telemetry_unbound` with a project/AppHost selection hint. Query,
+authentication and malformed-response failures return `telemetry_unavailable`. An unknown or
+ambiguous service filter returns `telemetry_unknown_service`, with a service/replica-name hint.
+Failure sample counts are `null`; these errors contain no latency statistics. Successful empty
+performance windows return `telemetry_no_data`, and an empty capped selection returns
+`telemetry_partial`. Incomplete service spans return `telemetry_no_completed_samples`.
+App status retains plugin health with a warning and diagnostic for empty or partial telemetry.
+
+Performance statistics use completed spans: the top-level analysis `sampleCount` counts completed
+service spans or DB/KV operations, while `provenance.sampleCount` counts all spans selected in the
+window. A partial snapshot remains partial even when it contains samples. The default window is
+15 minutes; `sinceUnixMs` can widen it. Status's `limit` caps each source read (default 100);
+analysis reads at most 1,000 spans and its `limit` bounds the returned operation list.
+
+Native metrics and histogram streams are **visible only in the dashboard Metrics view** through
+this integration. The [supported dashboard read API](https://aspire.dev/dashboard/apis/) exposes
+resources, spans, traces and logs. The latency percentiles above are calculated from sampled spans;
+they are not queries of native histogram buckets. The capability is reported as
+`nativeMetrics: "dashboard_only"`.
+
+Credentials, dashboard URLs, configuration values and raw transport errors remain inside the
+adapter. To extend acquisition, start at `src/ports/telemetry-snapshot-port.ts`; explicit query-port
+flow injections retain their existing contract and identify their evidence as `injected_query`.
 
 ## Tool catalog
 
@@ -409,7 +452,7 @@ The full flag reference, policy table, and composition options are on the docs s
 
 ## Docs
 
-- **MCP reference — the 22-tool field overview, policy, and exports**:
+- **MCP reference — the 26-tool field overview, policy, and exports**:
   [rickylabs.github.io/netscript/reference/mcp/](https://rickylabs.github.io/netscript/reference/mcp/)
 - **Agent tooling — install, flags, troubleshooting, CLI × skills × MCP**:
   [rickylabs.github.io/netscript/capabilities/agent-tooling/](https://rickylabs.github.io/netscript/capabilities/agent-tooling/)
@@ -428,3 +471,28 @@ values, credentials, or secrets.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## UI registry discovery
+
+`list_registry_items` returns item metadata with `limit` (at most 20) and `offset`;
+`search_registry_items` adds a required `query`. Both return `items`, `total` and an optional
+`nextOffset`. `view_registry_item` accepts `name` and returns a portable item with copy bytes.
+The standalone server uses the embedded Fresh UI registry without a network request.
+Hosts can inject `McpCliOptions.uiRegistryCatalog` for a selected app's registries.
+
+`get_registry_add_command` accepts a name, `@namespace/name`, or HTTP(S) item URL and returns
+`{command: "netscript", args: ["ui:add", name]}`. It does not execute the command. Pass the
+arguments directly to a process API after reviewing the installation; never join them into shell text.
+
+Registry metadata uses the server's normal output bounds. Views preserve exact file contents and
+fail with `tool_result_too_large` when the complete JSON-RPC response exceeds 64 KiB. Use
+`netscript ui:view <name>` for larger items.
+
+### Shared release documentation
+
+`@netscript/mcp/docs` exposes the complete generated Markdown page corpus and its verified
+`decodeAgentDocsPages` decoder. The CLI installs these same pages for offline documentation.
+`get_doc` accepts slugs with or without `pages/` and a trailing `/index`; release tool results
+include a `citation` with the exact `frameworkVersion` and corpus `sha256`. An empty literal
+`search_docs` result explicitly reports low confidence and no documented seam, directing API
+queries to `find_export` or `search_exports`.

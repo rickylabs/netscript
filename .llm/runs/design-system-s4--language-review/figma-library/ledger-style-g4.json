@@ -1,0 +1,1038 @@
+{
+ "group": "G4",
+ "themes": [
+  "pixel",
+  "brutal"
+ ],
+ "file": "pGRLnkPPRZJZy74evNcQBr",
+ "pixel": {
+  "page": "64:443",
+  "styleComponents": "460:29935",
+  "categories": {
+   "Actions": {
+    "frame": "460:29936",
+    "sectionLabel": "460:29937",
+    "setsContainer": "460:29941",
+    "glyphFrame": "460:29942",
+    "glyphs": {
+     "home": "460:29943",
+     "box": "460:29945",
+     "user": "460:29947",
+     "tag": "460:29949",
+     "chart": "460:29951",
+     "search": "460:29953",
+     "bell": "460:29955",
+     "plus": "460:29957",
+     "check": "460:29959",
+     "arrow-up": "460:29961",
+     "arrow-down": "460:29963",
+     "chevron-down": "460:29965",
+     "more-horizontal": "460:29967",
+     "alert-triangle": "460:29969",
+     "download": "460:29971",
+     "filter": "460:29973",
+     "x": "460:29975",
+     "arrow-right": "460:29977",
+     "chevron-up": "460:29979",
+     "chevron-right": "460:29981",
+     "chevron-left": "460:29983",
+     "arrow-left": "460:29985",
+     "minus": "460:29987",
+     "arrow-up-down": "460:29989",
+     "calendar": "460:29991",
+     "upload": "460:29993",
+     "panel-left": "460:29995",
+     "menu": "460:29997",
+     "moon": "460:29999",
+     "sun": "460:30001",
+     "hash": "460:30003",
+     "corner-down-left": "460:30005",
+     "external-link": "460:30007",
+     "grip-vertical": "460:30009",
+     "alert-circle": "460:30011",
+     "bot": "460:30013",
+     "circle": "460:30015",
+     "trash": "461:133843",
+     "copy": "461:133845",
+     "resize": "461:167945",
+     "slash": "463:71001",
+     "file-text": "463:71003",
+     "identicon": "463:311701"
+    },
+    "sets": [
+     {
+      "name": "Pixel/.Focus ring",
+      "id": "460:30017",
+      "baseId": "252:11805",
+      "variants": 0
+     },
+     {
+      "name": "Pixel/.Focus ring / notch 2",
+      "id": "460:30046",
+      "baseId": "252:11805",
+      "variants": 0,
+      "note": "theme-only helper for 2px-notch controls"
+     },
+     {
+      "name": "Pixel/.State layer",
+      "id": "460:32722",
+      "baseId": "252:11806",
+      "variants": 0
+     },
+     {
+      "name": "Pixel/Spinner",
+      "id": "460:32723",
+      "baseId": "252:11837",
+      "variants": 18
+     },
+     {
+      "name": "Pixel/Icon",
+      "id": "460:32850",
+      "baseId": "252:11798",
+      "variants": 3
+     },
+     {
+      "name": "Pixel/Button / md",
+      "id": "460:49381",
+      "baseId": "253:372",
+      "variants": 30,
+      "addedProps": [
+       "hero"
+      ]
+     },
+     {
+      "name": "Pixel/Button / lg",
+      "id": "461:64018",
+      "baseId": "254:721",
+      "variants": 30,
+      "addedProps": [
+       "hero"
+      ]
+     },
+     {
+      "name": "Pixel/Button / sm",
+      "id": "461:65321",
+      "baseId": "254:371",
+      "variants": 30,
+      "addedProps": [
+       "hero"
+      ]
+     },
+     {
+      "name": "Pixel/Button / xs",
+      "id": "461:66316",
+      "baseId": "254:1071",
+      "variants": 30,
+      "addedProps": [
+       "hero"
+      ]
+     },
+     {
+      "name": "Pixel/Icon button / md",
+      "id": "461:74911",
+      "baseId": "255:262",
+      "variants": 25
+     },
+     {
+      "name": "Pixel/Icon button / lg",
+      "id": "461:76006",
+      "baseId": "255:740",
+      "variants": 25
+     },
+     {
+      "name": "Pixel/Icon button / sm",
+      "id": "461:77101",
+      "baseId": "255:501",
+      "variants": 25
+     },
+     {
+      "name": "Pixel/Icon button / xs",
+      "id": "461:77928",
+      "baseId": "255:979",
+      "variants": 25
+     },
+     {
+      "name": "Pixel/Toggle / md",
+      "id": "461:80514",
+      "baseId": "256:281",
+      "variants": 16
+     },
+     {
+      "name": "Pixel/Toggle / sm",
+      "id": "461:81055",
+      "baseId": "256:437",
+      "variants": 16
+     },
+     {
+      "name": "Pixel/Toggle / lg",
+      "id": "461:81596",
+      "baseId": "256:593",
+      "variants": 16
+     },
+     {
+      "name": "Pixel/Icon toggle / md",
+      "id": "461:82298",
+      "baseId": "276:8291",
+      "variants": 16
+     },
+     {
+      "name": "Pixel/Icon toggle / sm",
+      "id": "461:82807",
+      "baseId": "276:8431",
+      "variants": 16
+     },
+     {
+      "name": "Pixel/Icon toggle / lg",
+      "id": "461:83316",
+      "baseId": "276:8571",
+      "variants": 16
+     },
+     {
+      "name": "Pixel/.Action bar / actions",
+      "id": "461:94034",
+      "baseId": "258:544",
+      "variants": 0
+     },
+     {
+      "name": "Pixel/Button group",
+      "id": "461:94108",
+      "baseId": "257:839",
+      "variants": 6
+     },
+     {
+      "name": "Pixel/Toggle group",
+      "id": "461:94881",
+      "baseId": "257:528",
+      "variants": 12
+     },
+     {
+      "name": "Pixel/Action bar",
+      "id": "461:95630",
+      "baseId": "258:663",
+      "variants": 2
+     },
+     {
+      "name": "Pixel/Theme toggle",
+      "id": "461:95857",
+      "baseId": "258:742",
+      "variants": 6
+     }
+    ],
+    "strip": "461:144267",
+    "review": "461:147422",
+    "png": [
+     "review/styles/pixel/actions.png",
+     "review/styles/pixel/actions-strip.png"
+    ],
+    "swapTest": "PASS (6 cases x Light/Dark: label text + booleans survive; un-overridden glyph swaps take the Pixel glyph defaults by design)",
+    "status": "done",
+    "deviations": [
+     "Lip drawn as rectangles inside a 'face' frame (kit 65:459 geometry) instead of a DROP_SHADOW effect; same pixels",
+     "INSTANCE_SWAP glyph defaults point to Pixel/Icon/* (base defaults are Lucide)",
+     "Theme-only parts: face, highlight (hero), link-arrow (link variant), band-bar (Action bar inline)",
+     "Pixel/.Focus ring / notch 2 added as a second private helper for 2px-notch controls",
+     "Toggle sizes derived: sm 28, md 32, lg 40 (face + 2px lip); notch 2/2/4",
+     "Extra glyphs drawn: circle (Icon default), trash, copy"
+    ]
+   },
+   "Forms": {
+    "frame": "461:167939",
+    "setsContainer": "461:167944",
+    "sets": [
+     {
+      "name": "Pixel/Label",
+      "id": "461:167947",
+      "baseId": "278:45",
+      "variants": 6
+     },
+     {
+      "name": "Pixel/Input",
+      "id": "461:167972",
+      "baseId": "279:312",
+      "variants": 24,
+      "addedParts": [
+       "face",
+       "cursor",
+       "alert"
+      ]
+     },
+     {
+      "name": "Pixel/Textarea",
+      "id": "461:169025",
+      "baseId": "280:597",
+      "variants": 12,
+      "addedParts": [
+       "face",
+       "cursor",
+       "alert"
+      ]
+     },
+     {
+      "name": "Pixel/Select",
+      "id": "461:169648",
+      "baseId": "281:1023",
+      "variants": 24,
+      "addedParts": [
+       "face",
+       "alert"
+      ]
+     },
+     {
+      "name": "Pixel/Select content",
+      "id": "462:118802",
+      "baseId": "281:826",
+      "variants": 0,
+      "pending": "rows -> Pixel/Menu item (Overlays sweep)"
+     },
+     {
+      "name": "Pixel/Checkbox",
+      "id": "462:76172",
+      "baseId": "283:1470",
+      "variants": 15,
+      "addedParts": [
+       "face",
+       "bar"
+      ]
+     },
+     {
+      "name": "Pixel/Radio",
+      "id": "462:76720",
+      "baseId": "284:1828",
+      "variants": 10,
+      "note": "indicator ellipse -> 8x8 rectangle, same name"
+     },
+     {
+      "name": "Pixel/Radio group",
+      "id": "462:77211",
+      "baseId": "284:1885",
+      "variants": 2
+     },
+     {
+      "name": "Pixel/Switch",
+      "id": "462:77546",
+      "baseId": "285:2329",
+      "variants": 20,
+      "note": "thumb ellipse -> notched square frame, same name; marks mark-o / mark-i"
+     },
+     {
+      "name": "Pixel/Field",
+      "id": "462:97189",
+      "baseId": "287:2656",
+      "variants": 6
+     },
+     {
+      "name": "Pixel/Field set",
+      "id": "462:97716",
+      "baseId": "287:2743",
+      "variants": 2
+     },
+     {
+      "name": "Pixel/Input group",
+      "id": "462:98024",
+      "baseId": "297:3861",
+      "variants": 16
+     },
+     {
+      "name": "Pixel/OTP slot",
+      "id": "462:100384",
+      "baseId": "301:4385",
+      "variants": 12
+     },
+     {
+      "name": "Pixel/Input OTP",
+      "id": "462:100931",
+      "baseId": "301:4490",
+      "variants": 4
+     },
+     {
+      "name": "Pixel/Slider",
+      "id": "462:101936",
+      "baseId": "303:5022",
+      "variants": 16
+     },
+     {
+      "name": "Pixel/Combobox",
+      "id": "462:119277",
+      "baseId": "305:5623",
+      "variants": 10,
+      "pending": "chips -> Pixel/Badge (Data display sweep); list rows -> Pixel/Menu item"
+     },
+     {
+      "name": "Pixel/Calendar day",
+      "id": "462:120480",
+      "baseId": "307:6154",
+      "variants": 30
+     },
+     {
+      "name": "Pixel/Calendar",
+      "id": "462:121327",
+      "baseId": "309:8620",
+      "variants": 8
+     },
+     {
+      "name": "Pixel/Date picker",
+      "id": "462:136603",
+      "baseId": "313:14889",
+      "variants": 10,
+      "pending": "popover -> Pixel/Popover if nested (Overlays sweep)"
+     },
+     {
+      "name": "Pixel/Search",
+      "id": "462:118808",
+      "baseId": "316:16426",
+      "variants": 8,
+      "pending": "kbd -> Pixel/Kbd (Data display sweep)"
+     },
+     {
+      "name": "Pixel/Dropzone",
+      "id": "462:141178",
+      "baseId": "319:16832",
+      "variants": 7,
+      "addedParts": [
+       "face",
+       "pixel-progress"
+      ]
+     }
+    ],
+    "strip": "462:152141",
+    "review": "462:156764",
+    "png": [
+     "review/styles/pixel/forms.png",
+     "review/styles/pixel/forms-strip.png"
+    ],
+    "swapTest": "PASS (6 cases x Light/Dark)",
+    "status": "done",
+    "deviations": [
+     "Switch Off edge uses control/ink (brief) where kit 65:567 uses border/input; On keeps the ink edge per the brief's 162:8708 check",
+     "Field focus ring reuses Pixel/.Focus ring with its gap layers hidden (staircase corner, kit draws a 4x4 corner block)",
+     "Textarea focus cursor sits at the end of the first text line (text FILL + 8x18 block)",
+     "Slider control 24 tall so the 16x20 thumb key + 2px lip fits; well inset by 2px padding",
+     "P.data role = font/data + type/small size/line + type/mono/style",
+     "Dropzone hover edge control/ink (derived)"
+    ]
+   },
+   "Navigation": {
+    "frame": "463:71005",
+    "setsContainer": "463:71010",
+    "sets": [
+     {
+      "name": "Pixel/Location marker",
+      "id": "463:71011",
+      "baseId": "337:22",
+      "variants": 2
+     },
+     {
+      "name": "Pixel/Breadcrumb item",
+      "id": "463:71019",
+      "baseId": "338:92",
+      "variants": 9
+     },
+     {
+      "name": "Pixel/Breadcrumb",
+      "id": "463:71161",
+      "baseId": "338:161",
+      "variants": 2
+     },
+     {
+      "name": "Pixel/Page key",
+      "id": "463:71404",
+      "baseId": "339:270",
+      "variants": 20
+     },
+     {
+      "name": "Pixel/Pager tile",
+      "id": "463:72805",
+      "baseId": "339:319",
+      "variants": 6
+     },
+     {
+      "name": "Pixel/Pagination",
+      "id": "463:73034",
+      "baseId": "339:379",
+      "variants": 2
+     },
+     {
+      "name": "Pixel/Tab / horizontal",
+      "id": "463:73382",
+      "baseId": "342:402",
+      "variants": 24,
+      "pending": "count -> Pixel/Badge plain (Data display sweep)"
+     },
+     {
+      "name": "Pixel/Tab / vertical",
+      "id": "463:74122",
+      "baseId": "342:599",
+      "variants": 24,
+      "pending": "count -> Pixel/Badge plain"
+     },
+     {
+      "name": "Pixel/Tabs list",
+      "id": "463:74862",
+      "baseId": "343:424",
+      "variants": 6
+     },
+     {
+      "name": "Pixel/Tabs",
+      "id": "463:76059",
+      "baseId": "343:489",
+      "variants": 2
+     },
+     {
+      "name": "Pixel/Nav item",
+      "id": "463:161250",
+      "baseId": "345:601",
+      "variants": 20,
+      "pending": "count -> Pixel/Badge plain"
+     },
+     {
+      "name": "Pixel/Nav group",
+      "id": "463:161857",
+      "baseId": "346:611",
+      "variants": 6
+     },
+     {
+      "name": "Pixel/Sidebar",
+      "id": "463:164262",
+      "baseId": "347:994",
+      "variants": 6,
+      "pending": "footer avatar -> Pixel/Avatar"
+     },
+     {
+      "name": "Pixel/Top bar",
+      "id": "463:170075",
+      "baseId": "351:1349",
+      "variants": 4,
+      "addedParts": [
+       "band-stripe"
+      ],
+      "pending": "avatar -> Pixel/Avatar identicon; search kbd -> Pixel/Kbd"
+     },
+     {
+      "name": "Pixel/.Brand logo",
+      "id": "463:162849",
+      "baseId": "344:410",
+      "variants": 0,
+      "note": "banded N copied from 66:433 'Mark \u2014 pixel N (banded)'"
+     },
+     {
+      "name": "Pixel/Nav menu item",
+      "id": "463:162892",
+      "baseId": "349:1036",
+      "variants": 10
+     },
+     {
+      "name": "Pixel/.Nav menu link",
+      "id": "463:163192",
+      "baseId": "348:1108",
+      "variants": 3
+     },
+     {
+      "name": "Pixel/Navigation menu",
+      "id": "463:163277",
+      "baseId": "349:1132",
+      "variants": 2
+     },
+     {
+      "name": "Pixel/Menubar trigger",
+      "id": "463:163782",
+      "baseId": "349:1153",
+      "variants": 5
+     },
+     {
+      "name": "Pixel/Menubar",
+      "id": "463:163917",
+      "baseId": "349:1236",
+      "variants": 2,
+      "pending": "menus -> Pixel/Menu content (Overlays sweep)"
+     },
+     {
+      "name": "Pixel/Step",
+      "id": "463:169806",
+      "baseId": "352:1355",
+      "variants": 8,
+      "addedParts": [
+       "face",
+       "band-lower"
+      ]
+     },
+     {
+      "name": "Pixel/Stepper",
+      "id": "463:169914",
+      "baseId": "352:1424",
+      "variants": 2
+     },
+     {
+      "name": "Pixel/Sidebar toggle",
+      "id": "463:162608",
+      "baseId": "344:462",
+      "variants": 4
+     }
+    ],
+    "strip": "463:177086",
+    "review": "463:180549",
+    "png": [
+     "review/styles/pixel/navigation.png",
+     "review/styles/pixel/navigation-strip.png"
+    ],
+    "swapTest": "PASS (6 cases x Light/Dark)",
+    "status": "done",
+    "deviations": [
+     "Breadcrumb separator is a pixel slash glyph instance (Pixel/Icon/slash) instead of a '/' text node, so the part keeps its instance type",
+     "Nav and tab band indicators use two bands (3, 5); selected-row style bars use all five",
+     "Nav item 32 tall; Menubar trigger 28",
+     "Page key prev/next nested Pixel/Button / sm secondary with labels 'Prev'/'Next', icons off"
+    ]
+   },
+   "Overlays": {
+    "frame": "463:226257",
+    "setsContainer": "463:226262",
+    "sets": [
+     {
+      "name": "Pixel/Menu item",
+      "id": "463:226263",
+      "baseId": "371:587",
+      "variants": 30,
+      "note": "dot ellipse -> 8x8 rectangle; band-bar on highlighted",
+      "pending": "shortcut -> Pixel/Kbd sm"
+     },
+     {
+      "name": "Pixel/Menu label",
+      "id": "463:226804",
+      "baseId": "373:35",
+      "variants": 0
+     },
+     {
+      "name": "Pixel/Menu separator",
+      "id": "463:226807",
+      "baseId": "373:38",
+      "variants": 0
+     },
+     {
+      "name": "Pixel/Menu group",
+      "id": "463:226809",
+      "baseId": "373:248",
+      "variants": 3
+     },
+     {
+      "name": "Pixel/Menu content",
+      "id": "463:227189",
+      "baseId": "373:256",
+      "variants": 0
+     },
+     {
+      "name": "Pixel/Dropdown menu",
+      "id": "463:227522",
+      "baseId": "374:382",
+      "variants": 2
+     },
+     {
+      "name": "Pixel/Context menu",
+      "id": "463:228150",
+      "baseId": "374:653",
+      "variants": 2
+     },
+     {
+      "name": "Pixel/Dialog",
+      "id": "463:239387",
+      "baseId": "378:743",
+      "variants": 6
+     },
+     {
+      "name": "Pixel/Alert dialog",
+      "id": "463:240830",
+      "baseId": "378:880",
+      "variants": 4
+     },
+     {
+      "name": "Pixel/Sheet",
+      "id": "463:241665",
+      "baseId": "379:1004",
+      "variants": 8
+     },
+     {
+      "name": "Pixel/Drawer",
+      "id": "463:243468",
+      "baseId": "379:1150",
+      "variants": 4
+     },
+     {
+      "name": "Pixel/Popover",
+      "id": "463:228725",
+      "baseId": "381:937",
+      "variants": 4,
+      "addedParts": [
+       "pixel-arrow"
+      ]
+     },
+     {
+      "name": "Pixel/Tooltip",
+      "id": "463:228556",
+      "baseId": "381:1030",
+      "variants": 12,
+      "addedParts": [
+       "face",
+       "pixel-arrow"
+      ],
+      "pending": "kbd -> Pixel/Kbd inverse"
+     },
+     {
+      "name": "Pixel/Hover card",
+      "id": "463:228976",
+      "baseId": "381:1093",
+      "variants": 4,
+      "pending": "avatar -> Pixel/Avatar md"
+     },
+     {
+      "name": "Pixel/Command item",
+      "id": "463:244215",
+      "baseId": "382:1015",
+      "variants": 9,
+      "pending": "shortcut -> Pixel/Kbd"
+     },
+     {
+      "name": "Pixel/Command palette",
+      "id": "463:244421",
+      "baseId": "383:1355",
+      "variants": 6,
+      "pending": "kbd ESC -> Pixel/Kbd"
+     }
+    ],
+    "sweep": "Menu item/content swapped into Pixel/Select content, Pixel/Combobox, Pixel/Menubar (open)",
+    "strip": "463:248339",
+    "review": "463:252967",
+    "png": [
+     "review/styles/pixel/overlays.png",
+     "review/styles/pixel/overlays-strip.png"
+    ],
+    "swapTest": "PASS (6 cases x Light/Dark)",
+    "status": "done",
+    "deviations": [
+     "Sheet/Drawer exposed corners drawn square (not stepped): the crafted panels are square",
+     "Dialog and Command palette frames: 2px frame/ink stepped edge (4px notch) + surface/raised face drawn in a theme-only face layer",
+     "Command item kind tones: page info, section neutral, action warning (derived)",
+     "Command palette filter lanes are frames in the base, so the selected lane is drawn as a raised amber key (not a Pixel/Tab instance)",
+     "Date picker popover in the base is a frame, styled as a P.panel (no Pixel/Popover swap possible)"
+    ]
+   },
+   "Data display 1": {
+    "frame": "463:311703",
+    "setsContainer": "463:311708",
+    "sets": [
+     {
+      "name": "Pixel/Kbd",
+      "id": "463:311709",
+      "baseId": "403:28",
+      "variants": 4
+     },
+     {
+      "name": "Pixel/Kbd group",
+      "id": "463:311734",
+      "baseId": "403:96",
+      "variants": 8
+     },
+     {
+      "name": "Pixel/Badge",
+      "id": "463:311895",
+      "baseId": "405:180",
+      "variants": 20
+     },
+     {
+      "name": "Pixel/Badge / kind",
+      "id": "463:312071",
+      "baseId": "405:211",
+      "variants": 10
+     },
+     {
+      "name": "Pixel/Avatar presence",
+      "id": "463:312152",
+      "baseId": "406:43",
+      "variants": 3
+     },
+     {
+      "name": "Pixel/Avatar",
+      "id": "463:312156",
+      "baseId": "406:95",
+      "variants": 12
+     },
+     {
+      "name": "Pixel/Avatar group",
+      "id": "463:312214",
+      "baseId": "406:150",
+      "variants": 3
+     },
+     {
+      "name": "Pixel/Item",
+      "id": "464:194441",
+      "baseId": "408:792",
+      "variants": 27
+     },
+     {
+      "name": "Pixel/Item group",
+      "id": "464:196840",
+      "baseId": "408:996",
+      "variants": 2
+     },
+     {
+      "name": "Pixel/.Item icon tile",
+      "id": "463:312305",
+      "baseId": "408:82",
+      "variants": 0
+     },
+     {
+      "name": "Pixel/.Item image",
+      "id": "463:312309",
+      "baseId": "408:85",
+      "variants": 0
+     },
+     {
+      "name": "Pixel/Card",
+      "id": "464:197446",
+      "baseId": "409:951",
+      "variants": 16,
+      "addedProps": [
+       "headerRule"
+      ],
+      "addedParts": [
+       "header-rule",
+       "band-bar"
+      ]
+     },
+     {
+      "name": "Pixel/Stat card",
+      "id": "464:200743",
+      "baseId": "409:1270",
+      "variants": 6,
+      "addedParts": [
+       "divider",
+       "blockbars",
+       "band-bar"
+      ]
+     },
+     {
+      "name": "Pixel/Table header cell",
+      "id": "464:255235",
+      "baseId": "410:546",
+      "variants": 27
+     },
+     {
+      "name": "Pixel/Table cell",
+      "id": "464:256019",
+      "baseId": "410:383",
+      "variants": 27
+     },
+     {
+      "name": "Pixel/Table row",
+      "id": "464:256442",
+      "baseId": "412:1187",
+      "variants": 20,
+      "note": "selection-bar rect -> 4px five-band frame, same name"
+     },
+     {
+      "name": "Pixel/Table",
+      "id": "464:259719",
+      "baseId": "413:1367",
+      "variants": 6
+     },
+     {
+      "name": "Pixel/Data table",
+      "id": "464:261915",
+      "baseId": "416:4605",
+      "variants": 10
+     }
+    ],
+    "sweep": "Kbd -> Pixel/Kbd in Search, Tooltip, Menu item, Command item, Command palette; Badge -> Pixel/Badge in Tab/Nav counts and Combobox chips; Avatar -> Pixel/Avatar in Hover card, Top bar, Sidebar (155 swaps)",
+    "strip": "464:341314",
+    "review": "464:347597",
+    "png": [
+     "review/styles/pixel/data-display-1.png",
+     "review/styles/pixel/data-display-1-strip.png"
+    ],
+    "swapTest": "PASS (6 cases x Light/Dark)",
+    "status": "done",
+    "deviations": [
+     "Identicon is one Pixel/Icon/identicon glyph (drawn on the 2px grid, not copied per-person from 66:433)",
+     "Stat card block heights are a fixed illustrative pattern (11 muted columns + banded 12th)",
+     "Data table toolbar Toggle group shows the base labels (Table / Board) on the Pixel segmented row; a third item repeats 'Board' (base override carried, check)",
+     "Some Data table avatar rows still show tinted initials (JW, LS) instead of the identicon: nested override precedence; flagged"
+    ],
+    "fixes": [
+     "Composite nested content (labels, tones, checked states) restored from the base by index-qualified path after resetOverrides; Data table by owner-order matching"
+    ]
+   }
+  },
+  "status": "all 5 categories built (101 base sets + helpers); see per-category deviations"
+ },
+ "brutal": {
+  "page": "33:8",
+  "styleComponents": "465:55033",
+  "status": "Actions done; Forms, Navigation, Overlays, Data display 1 not started",
+  "kitRenames": {
+   "33:24": "Brutal/Specimen kit/Button",
+   "33:48": "Brutal/Specimen kit/Input",
+   "33:53": "Brutal/Specimen kit/Checkbox",
+   "33:58": "Brutal/Specimen kit/Switch",
+   "33:69": "Brutal/Specimen kit/Sticker",
+   "33:76": "Brutal/Specimen kit/Tab"
+  },
+  "categories": {
+   "Actions": {
+    "frame": "465:55034",
+    "setsContainer": "465:55039",
+    "sets": [
+     {
+      "name": "Brutal/.Focus ring",
+      "id": "465:55040",
+      "baseId": "252:11805",
+      "variants": 0
+     },
+     {
+      "name": "Brutal/.State layer",
+      "id": "465:55041",
+      "baseId": "252:11806",
+      "variants": 0
+     },
+     {
+      "name": "Brutal/Icon",
+      "id": "465:55042",
+      "baseId": "252:11798",
+      "variants": 3
+     },
+     {
+      "name": "Brutal/Spinner",
+      "id": "465:55049",
+      "baseId": "252:11837",
+      "variants": 18
+     },
+     {
+      "name": "Brutal/Button / md",
+      "id": "465:90782",
+      "baseId": "253:372",
+      "variants": 30
+     },
+     {
+      "name": "Brutal/Button / lg",
+      "id": "465:91003",
+      "baseId": "254:721",
+      "variants": 30
+     },
+     {
+      "name": "Brutal/Button / sm",
+      "id": "465:91224",
+      "baseId": "254:371",
+      "variants": 30
+     },
+     {
+      "name": "Brutal/Button / xs",
+      "id": "465:91445",
+      "baseId": "254:1071",
+      "variants": 30
+     },
+     {
+      "name": "Brutal/Icon button / md",
+      "id": "465:91666",
+      "baseId": "255:262",
+      "variants": 25
+     },
+     {
+      "name": "Brutal/Icon button / lg",
+      "id": "465:91842",
+      "baseId": "255:740",
+      "variants": 25
+     },
+     {
+      "name": "Brutal/Icon button / sm",
+      "id": "465:92018",
+      "baseId": "255:501",
+      "variants": 25
+     },
+     {
+      "name": "Brutal/Icon button / xs",
+      "id": "465:92194",
+      "baseId": "255:979",
+      "variants": 25
+     },
+     {
+      "name": "Brutal/Toggle / md",
+      "id": "465:95571",
+      "baseId": "256:281",
+      "variants": 16
+     },
+     {
+      "name": "Brutal/Toggle / sm",
+      "id": "465:95700",
+      "baseId": "256:437",
+      "variants": 16
+     },
+     {
+      "name": "Brutal/Toggle / lg",
+      "id": "465:95829",
+      "baseId": "256:593",
+      "variants": 16
+     },
+     {
+      "name": "Brutal/Icon toggle / md",
+      "id": "465:95958",
+      "baseId": "276:8291",
+      "variants": 16
+     },
+     {
+      "name": "Brutal/Icon toggle / sm",
+      "id": "465:96055",
+      "baseId": "276:8431",
+      "variants": 16
+     },
+     {
+      "name": "Brutal/Icon toggle / lg",
+      "id": "465:96152",
+      "baseId": "276:8571",
+      "variants": 16
+     },
+     {
+      "name": "Brutal/.Action bar / actions",
+      "id": "465:96249",
+      "baseId": "258:544",
+      "variants": 0
+     },
+     {
+      "name": "Brutal/Button group",
+      "id": "465:96312",
+      "baseId": "257:839",
+      "variants": 6
+     },
+     {
+      "name": "Brutal/Toggle group",
+      "id": "465:96793",
+      "baseId": "257:528",
+      "variants": 12
+     },
+     {
+      "name": "Brutal/Action bar",
+      "id": "465:97529",
+      "baseId": "258:663",
+      "variants": 2
+     },
+     {
+      "name": "Brutal/Theme toggle",
+      "id": "465:97642",
+      "baseId": "258:742",
+      "variants": 6
+     }
+    ],
+    "strip": "465:99075",
+    "review": "465:100877",
+    "png": [
+     "review/styles/brutal/actions.png",
+     "review/styles/brutal/actions-strip.png"
+    ],
+    "swapTest": "PASS (6 cases x Light/Dark)",
+    "status": "done",
+    "deviations": [
+     "Button, toggle and icon-button outlines bind border/control (black Light, #7c7b74 Dark) per the coordinator decision, not border/ink",
+     "B.button fontStyle binds type/label-strong/style (Bold): Brutal type/strong/style resolves Medium after the T1 revert (crafted frames bind it)",
+     "Button group text part outline border/control",
+     "Action bar floating/inline override the nested action labels and icons to ink/fg / block/ink-text"
+    ]
+   }
+  }
+ }
+}

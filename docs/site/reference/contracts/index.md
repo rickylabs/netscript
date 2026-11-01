@@ -5,21 +5,20 @@ title: "@netscript/contracts"
 
 # `@netscript/contracts`
 
-Contract vocabulary shared across NetScript package and plugin boundaries: the oRPC base
-contract, common error data, pagination schemas, result types, and schema helper factories.
-Because a contract's input schema is enforced at the transport boundary, a service handler never
-hand-parses or validates `req.json()` — a request that doesn't match the schema is rejected before
-your code runs, and the same contract types the client that calls it. This page is written against
-the package's public surface reported by `deno doc`. For the full index of packages and plugins
-return to the [reference overview](/reference/).
+Contract vocabulary shared across NetScript packages and plugins: the oRPC base contract, common
+error data, pagination schemas, result types and schema helper factories. A contract's input schema
+is enforced at the transport boundary, so a handler never parses `req.json()` itself: a request
+that doesn't match is rejected before your code runs, and the same contract types the client.
 
-The root entrypoint (`@netscript/contracts`) carries the core contract primitives. Four
-sub-path exports add higher-level builders:
+## Sub-path exports
 
-- [`@netscript/contracts/commands`](#command-contracts) — opt-in command error contracts.
-- [`@netscript/contracts/crud`](#sub-path-exports) — CRUD contract generators.
-- [`@netscript/contracts/query`](#sub-path-exports) — query, filter, and pagination helpers.
-- [`@netscript/contracts/transform`](#sub-path-exports) — typed transformer factories.
+| Export | Entrypoint | Purpose |
+| --- | --- | --- |
+| `@netscript/contracts` | `./mod.ts` | Core surface: [base contract](#base-contract), [schema helpers](#schema-helper-factories), [errors](#errors), [pagination schemas](#pagination-schemas) and types. |
+| `@netscript/contracts/commands` | `./commands.ts` | [Opt-in command transport errors](#command-contracts). |
+| `@netscript/contracts/crud` | `./crud.ts` | [CRUD contract generators](#netscriptcontractscrud). |
+| `@netscript/contracts/query` | `./query.ts` | [Query, filter, and pagination helpers](#netscriptcontractsquery). |
+| `@netscript/contracts/transform` | `./transform.ts` | [Typed transformer factories](#netscriptcontractstransform). |
 
 ## Base contract
 
@@ -38,7 +37,7 @@ sub-path exports add higher-level builders:
 ### Procedure access metadata
 
 `NetScriptProcedureMeta.access` is the single access-policy vocabulary. Attach it to the procedure
-with `.meta()`; do not create a second policy object keyed by a router name or URL.
+with `.meta()`; don't create a second policy object keyed by a router name or URL.
 
 ```ts
 import { baseContract } from '@netscript/contracts';
@@ -67,27 +66,27 @@ export const readOrder = baseContract
 | `access.authorization.roles` | Optional readonly role requirements. |
 
 The metadata is contract-local, so it follows the procedure when the router key is renamed. The
-renamed SDK method retains the metadata, while a reference to the old SDK key fails to type-check.
-This is rename continuity; it does not require a second key-indexed policy map.
+renamed SDK method keeps the metadata, and a reference to the old SDK key fails to type-check.
+Runtime enforcement is a separate opt-in through `@netscript/service`.
 
-Runtime enforcement is separately opt-in through `@netscript/service`. The vocabulary declares
-`'optional'` for future support, but `createContractAuthorizer()` currently rejects it during
-construction with the stable
-`[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` error.
+> [!WARNING]
+> The vocabulary includes `'optional'`, but `createContractAuthorizer()` rejects it during
+> construction with the stable
+> `[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` error.
 
 ## Schema helper factories
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `boundedString` | `function boundedString(options: BoundedStringSchemaOptions): ContractStringSchema` | Creates a bounded string schema. |
-| `positiveInt` | `function positiveInt(options: IntegerSchemaOptions): ContractNumberSchema` | Creates a positive integer schema with NetScript's default integer cap. |
-| `nonNegativeInt` | `function nonNegativeInt(options: IntegerSchemaOptions): ContractNumberSchema` | Creates a non-negative integer schema with NetScript's default integer cap. |
-| `positiveNumber` | `function positiveNumber(options: StringSchemaOptions): ContractNumberSchema` | Creates a positive decimal-number schema. |
-| `nonNegativeNumber` | `function nonNegativeNumber(options: StringSchemaOptions): ContractNumberSchema` | Creates a non-negative decimal-number schema. |
-| `paginationLimit` | `function paginationLimit(options: DefaultedIntegerSchemaOptions): ContractNumberSchema` | Creates a defaulted pagination-limit schema. |
-| `paginationOffset` | `function paginationOffset(options: DefaultedIntegerSchemaOptions): ContractNumberSchema` | Creates a defaulted pagination-offset schema. |
-| `stringToInt` | `function stringToInt(outputSchema: ContractDefaultableSchema<number>): ContractSchema<number>` | Coerces an integer string into a number and validates it with `outputSchema`. |
-| `stringToNumber` | `function stringToNumber(outputSchema: ContractDefaultableSchema<number>): ContractSchema<number>` | Coerces a numeric string into a number and validates it with `outputSchema`. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `boundedString` | function | `function boundedString(options: BoundedStringSchemaOptions): ContractStringSchema` | Creates a bounded string schema. |
+| `positiveInt` | function | `function positiveInt(options: IntegerSchemaOptions): ContractNumberSchema` | Creates a positive integer schema with NetScript's default integer cap. |
+| `nonNegativeInt` | function | `function nonNegativeInt(options: IntegerSchemaOptions): ContractNumberSchema` | Creates a non-negative integer schema with NetScript's default integer cap. |
+| `positiveNumber` | function | `function positiveNumber(options: StringSchemaOptions): ContractNumberSchema` | Creates a positive decimal-number schema. |
+| `nonNegativeNumber` | function | `function nonNegativeNumber(options: StringSchemaOptions): ContractNumberSchema` | Creates a non-negative decimal-number schema. |
+| `paginationLimit` | function | `function paginationLimit(options: DefaultedIntegerSchemaOptions): ContractNumberSchema` | Creates a defaulted pagination-limit schema. |
+| `paginationOffset` | function | `function paginationOffset(options: DefaultedIntegerSchemaOptions): ContractNumberSchema` | Creates a defaulted pagination-offset schema. |
+| `stringToInt` | function | `function stringToInt(outputSchema: ContractDefaultableSchema<number>): ContractSchema<number>` | Coerces an integer string into a number and validates it with `outputSchema`. |
+| `stringToNumber` | function | `function stringToNumber(outputSchema: ContractDefaultableSchema<number>): ContractSchema<number>` | Coerces a numeric string into a number and validates it with `outputSchema`. |
 
 ## Errors
 
@@ -109,93 +108,80 @@ construction with the stable
 
 ## Pagination schemas
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `OffsetPaginationQuerySchema` | `const OffsetPaginationQuerySchema: ContractObjectSchema<OffsetPaginationQuery>` | Offset pagination schema for URL query parameters. |
-| `OffsetPaginationInputSchema` | `const OffsetPaginationInputSchema: ContractObjectSchema<OffsetPaginationInput>` | Offset pagination schema for request bodies. |
-| `OffsetPaginationMetaSchema` | `const OffsetPaginationMetaSchema: ContractObjectSchema<OffsetPaginationMeta>` | Offset pagination metadata schema for responses. |
-| `CursorPaginationQuerySchema` | `const CursorPaginationQuerySchema: ContractObjectSchema<CursorPaginationQuery>` | Cursor pagination schema for URL query parameters. |
-| `CursorPaginationInputSchema` | `const CursorPaginationInputSchema: ContractObjectSchema<CursorPaginationInput>` | Cursor pagination schema for request bodies. |
-| `CursorPaginationMetaSchema` | `const CursorPaginationMetaSchema: ContractObjectSchema<CursorPaginationMeta>` | Cursor pagination metadata schema for responses. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `OffsetPaginationQuerySchema` | const | `const OffsetPaginationQuerySchema: ContractObjectSchema<OffsetPaginationQuery>` | Offset pagination schema for URL query parameters. |
+| `OffsetPaginationInputSchema` | const | `const OffsetPaginationInputSchema: ContractObjectSchema<OffsetPaginationInput>` | Offset pagination schema for request bodies. |
+| `OffsetPaginationMetaSchema` | const | `const OffsetPaginationMetaSchema: ContractObjectSchema<OffsetPaginationMeta>` | Offset pagination metadata schema for responses. |
+| `CursorPaginationQuerySchema` | const | `const CursorPaginationQuerySchema: ContractObjectSchema<CursorPaginationQuery>` | Cursor pagination schema for URL query parameters. |
+| `CursorPaginationInputSchema` | const | `const CursorPaginationInputSchema: ContractObjectSchema<CursorPaginationInput>` | Cursor pagination schema for request bodies. |
+| `CursorPaginationMetaSchema` | const | `const CursorPaginationMetaSchema: ContractObjectSchema<CursorPaginationMeta>` | Cursor pagination metadata schema for responses. |
 
 ## Constants
 
-| Symbol | Value | Description |
-| --- | --- | --- |
-| `DEFAULT_INTEGER_MAX` | `2147483647` | Maximum integer used by contract numeric schemas. |
-| `DEFAULT_PAGINATION_LIMIT` | `10` | Default page size for contract pagination schemas. |
-| `DEFAULT_PAGINATION_LIMIT_MAX` | `1000` | Maximum page size accepted by contract pagination schemas. |
-| `DEFAULT_PAGINATION_OFFSET` | `0` | Default offset for contract offset-pagination schemas. |
+| Symbol | Kind | Value | Description |
+| --- | --- | --- | --- |
+| `DEFAULT_INTEGER_MAX` | const | `2147483647` | Maximum integer used by contract numeric schemas. |
+| `DEFAULT_PAGINATION_LIMIT` | const | `10` | Default page size for contract pagination schemas. |
+| `DEFAULT_PAGINATION_LIMIT_MAX` | const | `1000` | Maximum page size accepted by contract pagination schemas. |
+| `DEFAULT_PAGINATION_OFFSET` | const | `0` | Default offset for contract offset-pagination schemas. |
 
 ## Diagnostics
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `inspectContracts` | `function inspectContracts(target: ContractsInspectionTarget): InspectionReport` | Builds a JSON-stable inspection report for a contract primitive. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `inspectContracts` | function | `function inspectContracts(target: ContractsInspectionTarget): InspectionReport` | Builds a JSON-stable inspection report for a contract primitive. |
 
 ## Result and error types
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `Result` | `type Result<TValue, TError> = OkResult<TValue> \| ErrorResult<TError>` | Discriminated success/error result union. |
-| `OkResult` | `type OkResult<TValue> = Readonly<{ ok: true; value: TValue; }>` | Success arm of `Result`. |
-| `ErrorResult` | `type ErrorResult<TError> = Readonly<{ ok: false; error: TError; }>` | Error arm of `Result`. |
-| `SuccessResponse` | `type SuccessResponse = Readonly<{ success: boolean; message?: string; }>` | Common success response payload. |
-| `NotFoundError` | `type NotFoundError = Readonly<{ resourceType: string; resourceId: string \| number; }>` | Not-found error data. |
-| `ValidationError` | `type ValidationError = Readonly<{ formErrors: string[]; fieldErrors: Record<string, string[] \| undefined>; }>` | Validation error data. |
-| `UnauthorizedError` | `type UnauthorizedError = Readonly<{ reason?: "missing_token" \| "invalid_token" \| "expired_token"; }>` | Unauthorized error data. |
-| `ForbiddenError` | `type ForbiddenError = Readonly<{ requiredRole?: string; userRole?: string; }>` | Forbidden error data. |
-| `RateLimitError` | `type RateLimitError = Readonly<{ retryAfter: number; limit: number; }>` | Rate-limit error data. |
-| `ServiceUnavailableError` | `type ServiceUnavailableError = Readonly<{ retryAfter?: number; reason?: string; }>` | Service-unavailable error data. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `Result` | type alias | `type Result<TValue, TError> = OkResult<TValue> \| ErrorResult<TError>` | Discriminated success/error result union. |
+| `OkResult` | type alias | `type OkResult<TValue> = Readonly<{ ok: true; value: TValue; }>` | Success arm of `Result`. |
+| `ErrorResult` | type alias | `type ErrorResult<TError> = Readonly<{ ok: false; error: TError; }>` | Error arm of `Result`. |
+| `SuccessResponse` | type alias | `type SuccessResponse = Readonly<{ success: boolean; message?: string; }>` | Common success response payload. |
+| `NotFoundError` | type alias | `type NotFoundError = Readonly<{ resourceType: string; resourceId: string \| number; }>` | Not-found error data. |
+| `ValidationError` | type alias | `type ValidationError = Readonly<{ formErrors: string[]; fieldErrors: Record<string, string[] \| undefined>; }>` | Validation error data. |
+| `UnauthorizedError` | type alias | `type UnauthorizedError = Readonly<{ reason?: "missing_token" \| "invalid_token" \| "expired_token"; }>` | Unauthorized error data. |
+| `ForbiddenError` | type alias | `type ForbiddenError = Readonly<{ requiredRole?: string; userRole?: string; }>` | Forbidden error data. |
+| `RateLimitError` | type alias | `type RateLimitError = Readonly<{ retryAfter: number; limit: number; }>` | Rate-limit error data. |
+| `ServiceUnavailableError` | type alias | `type ServiceUnavailableError = Readonly<{ retryAfter?: number; reason?: string; }>` | Service-unavailable error data. |
 
 ## Schema and pagination types
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `ContractSchema` | `type ContractSchema<TOutput = unknown>` | Minimal schema contract (`parse`, `safeParse`, `optional`, `describe`). |
-| `ContractObjectSchema` | `type ContractObjectSchema<TOutput = unknown>` | Object schema contract with `extend`/`merge`. |
-| `ContractDefaultableSchema` | `type ContractDefaultableSchema<TOutput>` | Schema contract with a `default(value)` helper. |
-| `ContractNumberSchema` | `type ContractNumberSchema = ContractDefaultableSchema<number>` | Numeric schema contract. |
-| `ContractStringSchema` | `type ContractStringSchema = ContractDefaultableSchema<string>` | String schema contract. |
-| `ContractParseResult` | `type ContractParseResult<TOutput>` | Result returned by `safeParse`. |
-| `ContractSchemaInput` | `type ContractSchemaInput<T>` | Infer the accepted input value type from a Zod-compatible schema. |
-| `ContractSchemaOutput` | `type ContractSchemaOutput<T>` | Infer the parsed output value type from a Zod-compatible schema. |
-| `ContractSchemaLike` | `type ContractSchemaLike` | Cross-resolution schema constraint used at consumer-supplied boundaries. |
-| `ContractObjectSchemaLike` | `type ContractObjectSchemaLike` | Cross-resolution object-schema constraint for consumer-supplied shapes. |
-| `OffsetPaginationQuery` | `type OffsetPaginationQuery = Readonly<{ limit: number; offset: number; }>` | Offset pagination query shape. |
-| `OffsetPaginationInput` | `type OffsetPaginationInput = Readonly<{ limit: number; offset: number; }>` | Offset pagination input shape. |
-| `OffsetPaginationMeta` | `type OffsetPaginationMeta = Readonly<{ total: number; limit: number; offset: number; hasMore: boolean; }>` | Offset pagination response metadata. |
-| `CursorPaginationQuery` | `type CursorPaginationQuery = Readonly<{ limit: number; cursor?: string; }>` | Cursor pagination query shape. |
-| `CursorPaginationInput` | `type CursorPaginationInput = Readonly<{ limit: number; cursor?: string; }>` | Cursor pagination input shape. |
-| `CursorPaginationMeta` | `type CursorPaginationMeta = Readonly<{ limit: number; nextCursor: string \| null; hasMore: boolean; }>` | Cursor pagination response metadata. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `ContractSchema` | interface | `type ContractSchema<TOutput = unknown>` | Minimal schema contract (`parse`, `safeParse`, `optional`, `describe`). |
+| `ContractObjectSchema` | type alias | `type ContractObjectSchema<TOutput = unknown>` | Object schema contract with `extend`/`merge`. |
+| `ContractDefaultableSchema` | type alias | `type ContractDefaultableSchema<TOutput>` | Schema contract with a `default(value)` helper. |
+| `ContractNumberSchema` | type alias | `type ContractNumberSchema = ContractDefaultableSchema<number>` | Numeric schema contract. |
+| `ContractStringSchema` | type alias | `type ContractStringSchema = ContractDefaultableSchema<string>` | String schema contract. |
+| `ContractParseResult` | type alias | `type ContractParseResult<TOutput>` | Result returned by `safeParse`. |
+| `ContractSchemaInput` | type alias | `type ContractSchemaInput<T>` | Infer the accepted input value type from a Zod-compatible schema. |
+| `ContractSchemaOutput` | type alias | `type ContractSchemaOutput<T>` | Infer the parsed output value type from a Zod-compatible schema. |
+| `ContractSchemaLike` | type alias | `type ContractSchemaLike` | Cross-resolution schema constraint used at consumer-supplied boundaries. |
+| `ContractObjectSchemaLike` | type alias | `type ContractObjectSchemaLike` | Cross-resolution object-schema constraint for consumer-supplied shapes. |
+| `OffsetPaginationQuery` | type alias | `type OffsetPaginationQuery = Readonly<{ limit: number; offset: number; }>` | Offset pagination query shape. |
+| `OffsetPaginationInput` | type alias | `type OffsetPaginationInput = Readonly<{ limit: number; offset: number; }>` | Offset pagination input shape. |
+| `OffsetPaginationMeta` | type alias | `type OffsetPaginationMeta = Readonly<{ total: number; limit: number; offset: number; hasMore: boolean; }>` | Offset pagination response metadata. |
+| `CursorPaginationQuery` | type alias | `type CursorPaginationQuery = Readonly<{ limit: number; cursor?: string; }>` | Cursor pagination query shape. |
+| `CursorPaginationInput` | type alias | `type CursorPaginationInput = Readonly<{ limit: number; cursor?: string; }>` | Cursor pagination input shape. |
+| `CursorPaginationMeta` | type alias | `type CursorPaginationMeta = Readonly<{ limit: number; nextCursor: string \| null; hasMore: boolean; }>` | Cursor pagination response metadata. |
 
 ## Schema option types
 
-| Symbol | Signature | Description |
-| --- | --- | --- |
-| `StringSchemaOptions` | `type StringSchemaOptions = Readonly<{ description?: string; }>` | Options for string-derived schema factories. |
-| `BoundedStringSchemaOptions` | `type BoundedStringSchemaOptions = StringSchemaOptions & Readonly<{ min?: number; max: number; }>` | Options for `boundedString`. |
-| `IntegerSchemaOptions` | `type IntegerSchemaOptions = Readonly<{ min?: number; max?: number; description?: string; }>` | Options for integer schema factories. |
-| `DefaultedIntegerSchemaOptions` | `type DefaultedIntegerSchemaOptions = IntegerSchemaOptions & Readonly<{ default?: number; }>` | Options for defaulted integer factories. |
-| `NotFoundOptions` | `type NotFoundOptions = Readonly<{ errors: unknown; path?: readonly string[]; resourceId?: string \| number; message?: string; }>` | Options accepted by `notFound`. |
-| `ContractsInspectionTarget` | `type ContractsInspectionTarget = unknown` | Target accepted by `inspectContracts`. |
-| `InspectionReport` | `type InspectionReport` | JSON-stable report returned by `inspectContracts`. |
-| `InspectionStatus` | `type InspectionStatus = "ok" \| "warning" \| "error"` | Status field of `InspectionReport`. |
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `StringSchemaOptions` | type alias | `type StringSchemaOptions = Readonly<{ description?: string; }>` | Options for string-derived schema factories. |
+| `BoundedStringSchemaOptions` | type alias | `type BoundedStringSchemaOptions = StringSchemaOptions & Readonly<{ min?: number; max: number; }>` | Options for `boundedString`. |
+| `IntegerSchemaOptions` | type alias | `type IntegerSchemaOptions = Readonly<{ min?: number; max?: number; description?: string; }>` | Options for integer schema factories. |
+| `DefaultedIntegerSchemaOptions` | type alias | `type DefaultedIntegerSchemaOptions = IntegerSchemaOptions & Readonly<{ default?: number; }>` | Options for defaulted integer factories. |
+| `NotFoundOptions` | type alias | `type NotFoundOptions = Readonly<{ errors: unknown; path?: readonly string[]; resourceId?: string \| number; message?: string; }>` | Options accepted by `notFound`. |
+| `ContractsInspectionTarget` | type alias | `type ContractsInspectionTarget = unknown` | Target accepted by `inspectContracts`. |
+| `InspectionReport` | type alias | `type InspectionReport` | JSON-stable report returned by `inspectContracts`. |
+| `InspectionStatus` | type alias | `type InspectionStatus = "ok" \| "warning" \| "error"` | Status field of `InspectionReport`. |
 
-## Sub-path exports
-
-The following entrypoints are published alongside the root export. Their symbols are generated
-from their own `deno doc` surface.
-
-| Export | Entrypoint | Purpose |
-| --- | --- | --- |
-| `@netscript/contracts` | `./mod.ts` | Core contract surface (documented above). |
-| `@netscript/contracts/commands` | `./commands.ts` | Opt-in command transport errors. |
-| `@netscript/contracts/crud` | `./crud.ts` | CRUD contract generators. |
-| `@netscript/contracts/query` | `./query.ts` | Query, filter, and pagination helpers. |
-| `@netscript/contracts/transform` | `./transform.ts` | Typed transformer factories. |
-
-### `@netscript/contracts/crud`
+## `@netscript/contracts/crud`
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -213,7 +199,7 @@ from their own `deno doc` surface.
 | `CrudUpdateInput` | type alias | `type CrudUpdateInput` | Input schema shape for update operations addressed by identifier. |
 | `PartialCrudContract` | type alias | `type PartialCrudContract` | Generated CRUD contract shape when selected operations are disabled. |
 
-### `@netscript/contracts/query`
+## `@netscript/contracts/query`
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
@@ -250,16 +236,57 @@ from their own `deno doc` surface.
 | `CursorPaginatedQueryOptions` | interface | `interface CursorPaginatedQueryOptions` | Options for a cursor-paginated query. |
 | `PrismaModelDelegate` | interface | `interface PrismaModelDelegate` | Minimal Prisma delegate contract used by query helpers. |
 
-#### Pagination Executors
+The three executors apply validated pagination parameters to a Prisma query:
 
-The `@netscript/contracts/query` subpath exports three typed executors to apply validated pagination parameters to a Prisma query:
+| Executor | Input | Returns |
+| --- | --- | --- |
+| `paginatedQuery` | page, limit | Total count and pages. |
+| `offsetPaginatedQuery` | offset, limit | Total count and whether more items exist. |
+| `cursorPaginatedQuery` | cursor, limit, direction | The next cursor. |
 
-- `paginatedQuery`: Page-based pagination (page, limit) returning total count and pages.
-- `offsetPaginatedQuery`: Offset-based pagination (offset, limit) returning total count and a boolean indicating if more items exist.
-- `cursorPaginatedQuery`: Cursor-based pagination (cursor, limit, direction) returning the next cursor.
+See the [pagination examples](#examples).
 
-##### Page Pagination (page + limit)
-Shows schema, contract, validated input, typed Prisma execution, and response metadata.
+## `@netscript/contracts/transform`
+
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `createTransformer` | function | `function createTransformer<TInput, TOutput>(transform: TransformFn<TInput, TOutput>): Transformer<TInput, TOutput>` | Wraps a transform function into a composable `Transformer`. |
+| `composeTransformers` | function | `function composeTransformers(...transformers): Transformer` | Composes 2-4 transformers left-to-right into one transformer. |
+| `createPickTransformer` | function | `function createPickTransformer<T>(): PickTransformerFactory<T>` | Creates a factory producing transformers that pick keys. |
+| `createOmitTransformer` | function | `function createOmitTransformer<T>(): OmitTransformerFactory<T>` | Creates a factory producing transformers that omit keys. |
+| `Transformer` | interface | `interface Transformer<TInput, TOutput>` | A composable input-to-output transformer. |
+| `TransformFn` | type alias | `type TransformFn<TInput, TOutput> = (input: TInput) => TOutput` | The underlying transform function signature. |
+| `PickTransformerFactory` | type alias | `type PickTransformerFactory<T> = (...keys) => Transformer<T, Pick<T, K>>` | Factory returned by `createPickTransformer`. |
+| `OmitTransformerFactory` | type alias | `type OmitTransformerFactory<T> = (...keys) => Transformer<T, Omit<T, K>>` | Factory returned by `createOmitTransformer`. |
+
+## Command contracts
+
+`@netscript/contracts/commands` adds three command codes to the six base errors and keeps procedure
+metadata. Importing the root contract keeps its own error map.
+
+| Symbol                       | Kind       | Description                                         |
+| ---------------------------- | ---------- | --------------------------------------------------- |
+| `commandBaseContract`        | const      | Opt-in builder with exact base and command errors.  |
+| `CommandContractErrors`      | type alias | Nine-code error vocabulary of the opt-in builder.   |
+| `CommandContractRoute`       | type alias | Input route retaining exact errors and metadata.    |
+| `CommandContractOutputRoute` | type alias | Output route retaining exact errors and metadata.   |
+| `CommandErrorConstructors`   | type alias | Typed constructors for command transport failures.  |
+| `throwCommandContractError`  | function   | Maps three safe failures and rethrows other errors. |
+| `CommandConflictData`        | type alias | Redacted optimistic conflict data.                  |
+| `CommandConflictSchema`      | const      | Strict conflict data schema.                        |
+| `CommandContractFailure`     | type alias | Three failures supported by transport translation.  |
+| `CommandErrorMap`            | type alias | Exact command code, status, message and schema map. |
+| `commandErrorMap`            | const      | Three opt-in command error declarations.            |
+| `CommandInProgressData`      | type alias | Bounded retry information.                          |
+| `CommandInProgressSchema`    | const      | Strict in-progress data schema.                     |
+| `IdempotencyKeyReuseData`    | type alias | Redacted reused-key data.                           |
+| `IdempotencyKeyReuseSchema`  | const      | Strict reused-key data schema.                      |
+
+## Examples
+
+### Page pagination (page and limit)
+
+Schema, contract, validated input, typed Prisma execution and response metadata.
 
 ```typescript
 import { z } from 'zod';
@@ -283,8 +310,9 @@ export async function handleListUsers(input: z.infer<typeof PaginationInputSchem
 }
 ```
 
-##### Offset Pagination (offset + limit)
-Useful for infinite scrolls or simple pagination that doesn't need total pages.
+### Offset pagination (offset and limit)
+
+For infinite scroll, or pagination that doesn't need total pages.
 
 ```typescript
 import { z } from 'zod';
@@ -311,8 +339,9 @@ export async function handleListUsersOffset(input: z.infer<typeof OffsetPaginati
 }
 ```
 
-##### Cursor Pagination
-Ideal for large datasets and active feeds.
+### Cursor pagination
+
+For large datasets and active feeds.
 
 ```typescript
 import { z } from 'zod';
@@ -343,43 +372,3 @@ export async function handleListUsersCursor(input: z.infer<typeof CursorPaginati
   return { data, nextCursor, hasMore };
 }
 ```
-
-### `@netscript/contracts/transform`
-
-| Symbol | Kind | Signature | Description |
-| --- | --- | --- | --- |
-| `createTransformer` | function | `function createTransformer<TInput, TOutput>(transform: TransformFn<TInput, TOutput>): Transformer<TInput, TOutput>` | Wraps a transform function into a composable `Transformer`. |
-| `composeTransformers` | function | `function composeTransformers(...transformers): Transformer` | Composes 2-4 transformers left-to-right into one transformer. |
-| `createPickTransformer` | function | `function createPickTransformer<T>(): PickTransformerFactory<T>` | Creates a factory producing transformers that pick keys. |
-| `createOmitTransformer` | function | `function createOmitTransformer<T>(): OmitTransformerFactory<T>` | Creates a factory producing transformers that omit keys. |
-| `Transformer` | interface | `interface Transformer<TInput, TOutput>` | A composable input-to-output transformer. |
-| `TransformFn` | type alias | `type TransformFn<TInput, TOutput> = (input: TInput) => TOutput` | The underlying transform function signature. |
-| `PickTransformerFactory` | type alias | `type PickTransformerFactory<T> = (...keys) => Transformer<T, Pick<T, K>>` | Factory returned by `createPickTransformer`. |
-| `OmitTransformerFactory` | type alias | `type OmitTransformerFactory<T> = (...keys) => Transformer<T, Omit<T, K>>` | Factory returned by `createOmitTransformer`. |
-
-## Command contracts
-
-`@netscript/contracts/commands` adds three command codes to the six base errors while preserving
-procedure metadata. Importing the root contract keeps its existing error map.
-
-| Symbol                       | Kind       | Description                                         |
-| ---------------------------- | ---------- | --------------------------------------------------- |
-| `commandBaseContract`        | const      | Opt-in builder with exact base and command errors.  |
-| `CommandContractErrors`      | type alias | Nine-code error vocabulary of the opt-in builder.   |
-| `CommandContractRoute`       | type alias | Input route retaining exact errors and metadata.    |
-| `CommandContractOutputRoute` | type alias | Output route retaining exact errors and metadata.   |
-| `CommandErrorConstructors`   | type alias | Typed constructors for command transport failures.  |
-| `throwCommandContractError`  | function   | Maps three safe failures and rethrows other errors. |
-| `CommandConflictData`        | type alias | Redacted optimistic conflict data.                  |
-| `CommandConflictSchema`      | const      | Strict conflict data schema.                        |
-| `CommandContractFailure`     | type alias | Three failures supported by transport translation.  |
-| `CommandErrorMap`            | type alias | Exact command code, status, message and schema map. |
-| `commandErrorMap`            | const      | Three opt-in command error declarations.            |
-| `CommandInProgressData`      | type alias | Bounded retry information.                          |
-| `CommandInProgressSchema`    | const      | Strict in-progress data schema.                     |
-| `IdempotencyKeyReuseData`    | type alias | Redacted reused-key data.                           |
-| `IdempotencyKeyReuseSchema`  | const      | Strict reused-key data schema.                      |
-
----
-
-Back to the [reference overview](/reference/).

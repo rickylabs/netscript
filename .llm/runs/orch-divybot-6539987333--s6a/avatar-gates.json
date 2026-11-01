@@ -1,0 +1,133 @@
+{
+  "baselineHead": "5f5deb9b247c911cdad25298708d829251442796",
+  "mergedMain": "7312ba498b4400ea4e6d0a154f847d59e8f0324d",
+  "sourcePaths": 122,
+  "red": {
+    "exitCode": 1,
+    "stats": {
+      "startTime": "2026-10-31T15:30:29.101Z",
+      "duration": 8561.395999999999,
+      "expected": 4,
+      "skipped": 0,
+      "unexpected": 4,
+      "flaky": 0
+    },
+    "sha256": "bd4a5365652f91f013034192cab049542a5fdcfa2955e610ab9800977e0c93ab"
+  },
+  "green": {
+    "exitCode": 0,
+    "stats": {
+      "startTime": "2026-10-31T15:31:06.206Z",
+      "duration": 6488.054,
+      "expected": 8,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "sha256": "98555fe1abe2b3a059d84484c7ec62c9ce6c0d7efa8951eea44bf1aa41b3e31b"
+  },
+  "browser": {
+    "stats": {
+      "startTime": "2026-10-31T15:34:34.486Z",
+      "duration": 148172.834,
+      "expected": 60,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "sha256": "d4c13abba98a915008779d690b0a69dcf21d9c15843359bce032266dab3f1aa6"
+  },
+  "rootChecks": {
+    "check:desktop-native-fixture": 0,
+    "check:emitted-samples": 0,
+    "check:streams-types": 0,
+    "check:child-health-docs": 0,
+    "check:mcp-export-corpus": 0,
+    "check:assets-barrel": 0,
+    "check:agent-docs-prose": 0,
+    "check:publish-assets": 0,
+    "check:scaffold-versions": 0,
+    "check:aspire-version-parity": 0,
+    "check:netscript-jsr-specifiers": 0,
+    "check:aspire-host-ports": 0,
+    "check:figma-names": 0,
+    "check:review-threads": 0
+  },
+  "carriers": {
+    "gen:agent-docs-prose": 0,
+    "gen:mcp-export-corpus": 0,
+    "gen:assets-barrel": 0,
+    "gen:publish-assets": 0
+  },
+  "scoped": {
+    "source-check": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "browser-check": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "lint": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "fmt": {
+      "filesSelected": 3,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "installed-check": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    }
+  },
+  "gates": {
+    "quality": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "5f5deb9b247c911cdad25298708d829251442796",
+      "durationMs": 16128
+    },
+    "docs": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "5f5deb9b247c911cdad25298708d829251442796",
+      "durationMs": 7181
+    },
+    "browser": {
+      "outcome": "PASS",
+      "exitCode": 0,
+      "gitHead": "5f5deb9b247c911cdad25298708d829251442796",
+      "durationMs": 149231
+    }
+  },
+  "releasePreflightExitCode": 0,
+  "packageTests": {
+    "summary": {
+      "passed": 335,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 335,
+      "uniqueFailures": 0
+    },
+    "exitCode": 0,
+    "durationMs": 344426
+  },
+  "runtime": "Local Docker/Aspire unavailable; new exact-head full CI required before READY.",
+  "productionBuildExitCode": 0,
+  "independentReview": {
+    "verdict": "PASS",
+    "failureStreak": 0
+  }
+}

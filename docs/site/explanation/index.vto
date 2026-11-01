@@ -1,0 +1,98 @@
+---
+layout: layouts/base.vto
+title: Concepts
+nav_title: Overview
+description: The five-layer mental model, then the essays that explain each layer.
+templateEngine: [vento, md]
+oldUrl: /concepts/
+---
+
+{{ comp.hero({
+  tagline: "A NetScript app is five connected layers.",
+  subhead: "Contracts define the boundaries. Services serve them at request time, plugins extend them across processes, the web layer brings them to the browser, and the observed resource graph keeps the whole system visible.",
+  ctas: [
+    { label: "Start a workspace", href: "/quickstart/", primary: true },
+    { label: "Build the Storefront", href: "/tutorials/storefront/" }
+  ]
+}) }}
+
+<p class="ns-lede">
+This page maps the five layers of a NetScript app and the boundary problem each one solves. Read
+the sections in order, then follow each one into the detailed documentation.
+</p>
+
+## 1. Contracts
+
+A contract is the source of truth for an operation's input and output. It can describe behavior as
+well as data: `checkout.start` is as natural a boundary as a list or update operation. A service
+implements the oRPC contract, `@netscript/sdk` derives clients and query helpers from the same
+contract map, and the service runtime generates OpenAPI from the contract router. The TypeScript
+caller and the HTTP description share one definition instead of two hand-written shapes.
+
+[Contracts and type flow](/explanation/contracts/) covers the schemas and router mechanics.
+
+## 2. Services
+
+A service runs a contract at request time. `defineService()` turns a contract router into a running
+Hono and oRPC service. The preset wires in request logging, OpenAPI generation, a Scalar docs UI,
+RPC, health endpoints, and service-info metadata. SDK clients resolve service URLs lazily from
+Aspire-injected environment values, so callers don't pin a local port into application code.
+
+A service owns the request boundary. Work that must resume after the process exits belongs in a
+durable runtime, not in a longer request handler. See [Services & SDK](/services-sdk/) and
+[service discovery](/services-sdk/how-to/discover-services/).
+
+## 3. Plugins
+
+Services handle requests; plugins handle work that outlives one. The host starts empty, and plugins
+add its runtime capabilities. A plugin manifest is validated data that declares services,
+background processors, schemas, topics, configuration, and telemetry contributions. The CLI turns
+those declarations into static workspace wiring.
+
+A plugin is a packaging unit, not a runtime unit: Aspire can run a plugin's API and its background
+processors as separate resources. Workers, sagas, triggers, and streams are the durable examples.
+[The plugin-system explanation](/explanation/plugin-system/) covers the manifest and registry
+mechanics.
+
+## 4. The web layer
+
+The web layer carries the contract to the browser. `@netscript/fresh` builds on Fresh 2 and Preact.
+Typed route contracts and `definePage()` connect paths, search parameters, metadata, handlers, data
+layers, and forms. A server page can call the contract-derived SDK, hydrate TanStack Query state,
+and hand interactive work to islands. Routes that need no island ship no island JavaScript.
+
+[The web-layer overview](/web-layer/) has the complete model. The focused guides cover
+[server rendering](/web-layer/server/), [page builders](/web-layer/builders/), and
+[queries and islands](/web-layer/query/).
+
+## 5. Observability
+
+{{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "An Aspire AppHost starts Postgres, Redis, and an orders plugin's API, worker, and saga runner; the dashboard observes each resource, while the three processes share database and cache connections.", caption: "One plugin can become several observed resources. Aspire starts its API and background processors alongside their shared infrastructure." }) }}
+
+The diagram shows one plugin. At workspace scale, the generated AppHost also composes apps,
+services, plugin processors, databases, and cache resources, then injects service-discovery and
+OTLP configuration into their processes. The Aspire dashboard reads health, logs, traces, and
+metrics from that running graph. Trace context carried by SDK calls keeps client and service spans
+connected.
+
+Aspire is the default local orchestration layer, not part of every package API. Without it, the
+Deno packages still work, but resource startup, discovery values, and telemetry wiring become the
+application's responsibility. [Orchestration & runtime](/orchestration-runtime/),
+[Observability](/observability/), and [the Aspire boundary](/explanation/aspire/) cover the
+mechanics.
+
+## Go deeper
+
+Each essay explains one part of the model and why it has its shape. Read them in sidebar order: the
+architecture essay sets the vocabulary the others assume.
+
+{{ comp.featureGrid({ items: [
+  { title: "Architecture", href: "/explanation/architecture/", body: "The published-surface thesis, the layers of a workspace, the direction of their dependencies, and the publish gate that enforces them." },
+  { title: "Contracts & type flow", href: "/explanation/contracts/", body: "How an oRPC contract flows through implement() and a typed handler into a typed client, query layer, and island." },
+  { title: "Plugin system", href: "/explanation/plugin-system/", body: "How a plugin relates to its core package, what it contributes through its manifest, and how the host discovers it through generated registries." },
+  { title: "Auth model", href: "/explanation/auth-model/", body: "Core defines the AuthBackendPort, backends are pure adapters, and the plugin composes exactly one active backend." },
+  { title: "Durability model", href: "/explanation/durability-model/", body: "Sagas as explicit state machines: correlation, the kv or prisma durable store, and compensation modeled as message-handler effects." },
+  { title: "Observability model", href: "/explanation/observability/", body: "How automatic framework spans, scaffold handler telemetry, console logs, and Aspire collection fit together." },
+  { title: "Orchestration with Aspire", href: "/explanation/aspire/", body: "The generated TypeScript AppHost, the resource graph it starts, the Aspire dashboard, and the --no-aspire opt-out." },
+  { title: "How NetScript compares", href: "/comparisons/", body: "What other frameworks teach first, where NetScript's order differs, and side-by-side frontend and backend code." }
+] }) }}

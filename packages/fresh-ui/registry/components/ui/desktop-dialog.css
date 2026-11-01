@@ -52,3 +52,76 @@
     transition-duration: 0.01ms;
   }
 }
+
+/* Studio Utility: role bindings for the shipped contract. */
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='desktop-dialog'][data-part='root'] {
+  background: var(--ns-card);
+  border: var(--ns-border-width) solid var(--ns-border);
+  border-radius: var(--ns-radius-card);
+  box-shadow: none;
+  padding: var(--ns-card-padding);
+  gap: var(--ns-stack-gap);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='desktop-dialog'][data-part='copy'] strong {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-strong);
+  line-height: var(--ns-leading-strong);
+  font-weight: var(--ns-weight-strong);
+  letter-spacing: var(--ns-tracking-strong);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='desktop-dialog'][data-part='copy'] span {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-small);
+  line-height: var(--ns-leading-small);
+  font-weight: var(--ns-weight-small);
+  letter-spacing: var(--ns-tracking-small);
+  color: var(--ns-muted-fg);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='desktop-dialog'][data-part='action'] {
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-body);
+  line-height: var(--ns-leading-body);
+  font-weight: var(--ns-weight-body);
+  letter-spacing: var(--ns-tracking-body);
+  min-height: var(--ns-control-height-sm);
+  padding-inline: var(--ns-control-padding-x-sm);
+  border-radius: var(--ns-radius-control);
+  box-shadow: none;
+  transform: none;
+  background: var(--ns-primary);
+  color: var(--ns-primary-fg);
+  border: var(--ns-border-width) solid var(--ns-primary-stroke);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='desktop-dialog'][data-part='action']:hover:not(:disabled) {
+  background: var(--ns-primary-hover);
+  box-shadow: none;
+  transform: none;
+  opacity: 1;
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='desktop-dialog'][data-part='action']:active:not(:disabled) {
+  background: color-mix(in srgb, var(--ns-primary-fg) calc(var(--ns-state-pressed-opacity) * 1%),
+    var(--ns-primary-hover));
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='desktop-dialog'][data-part='action']:focus-visible {
+  outline: var(--ns-focus-ring-width) solid var(--ns-ring);
+  outline-offset: var(--ns-focus-ring-offset);
+}
+
+:root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='desktop-dialog'][data-part='action']:disabled {
+  opacity: calc(var(--ns-state-disabled-opacity) / 100);
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:is([data-theme='studio-utility'], [data-theme='studio'][data-flavor='utility'], [data-theme='studio']:not([data-flavor])) [data-scope='desktop-dialog'] {
+    transition: none;
+    animation: none;
+  }
+}

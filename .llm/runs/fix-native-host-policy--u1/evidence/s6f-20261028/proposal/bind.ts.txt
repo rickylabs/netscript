@@ -1,0 +1,18 @@
+const root='C:/Users/ericc/source/repos/netscript-native-host-policy-008';
+const out=root+'/.llm/tmp/native-host-policy-u1-s6f-proposal-20261028';
+const sha=async(b:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',b)),v=>v.toString(16).padStart(2,'0')).join('');
+const read=async(path:string)=>JSON.parse(await Deno.readTextFile(root+'/'+path));
+const prior=await read('.llm/tmp/native-host-policy-u1-s6e-astra-20261028/source-proof.json');
+const head=await read('.llm/tmp/native-host-policy-u1-s6e-checkpoint-20261028/head-audit.json');
+const bindings=new Map<string,string>();
+for(const row of prior.protectedRows)bindings.set(row.path,row.expected);
+for(const row of head.rows)bindings.set(row.path,row.sha256);
+const rows=[];for(const[path,expected]of bindings){const actual=await sha(await Deno.readFile(root+'/'+path));rows.push({path,expected,actual,matches:actual===expected});}
+const proposalPath='.llm/runs/fix-native-host-policy--u1/s6f-storage-denial-proposal.md';
+const proposalBytes=await Deno.readFile(root+'/'+proposalPath);
+const command=['run','--help'];const help=await new Deno.Command(Deno.execPath(),{args:command,stdout:'piped',stderr:'piped'}).output();
+await Deno.writeFile(out+'/deno-run-help.stdout.log',help.stdout,{createNew:true});await Deno.writeFile(out+'/deno-run-help.stderr.log',help.stderr,{createNew:true});
+const result={head:head.head,proposal:{path:proposalPath,sha256:await sha(proposalBytes),lines:new TextDecoder().decode(proposalBytes).trimEnd().split('\n').length},protectedCount:rows.length,protectedMatched:rows.filter(row=>row.matches).length,rows,help:{executable:Deno.execPath(),args:command,code:help.code,stdoutSha256:await sha(help.stdout),stderrSha256:await sha(help.stderr),documentsDenyWrite:new TextDecoder().decode(help.stdout).includes('--deny-write')}};
+await Deno.writeTextFile(out+'/proposal-bindings.json',JSON.stringify(result,null,2),{createNew:true});
+if(result.protectedMatched!==result.protectedCount||!help.success||!result.help.documentsDenyWrite)throw new Error('Proposal binding or native help failed');
+console.log(JSON.stringify({head:result.head,proposal:result.proposal,protectedMatched:result.protectedMatched,help:result.help,proofSha256:await sha(await Deno.readFile(out+'/proposal-bindings.json'))}));

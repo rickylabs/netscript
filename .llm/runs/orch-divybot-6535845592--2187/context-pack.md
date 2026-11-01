@@ -1,0 +1,9 @@
+# Context pack
+
+Issue #2187, PR #2479, branch orch/divybot-6535845592. Original implementation and shutdown/doc repairs were reviewed and green at e147deb2464bc6846a8b2cd7bedce957f72ebb58. Owner later explicitly requested rebasing and force-pushing to resolve the conflict.
+
+S3 rebases all three commits onto fixed latest main 1d467c669dc122174dcea95e39871e8145591114. Main includes #2484 recovery/callback cancellation plus preceding merged milestone work. Resolution composes async key construction with main's callback wrapper, preserves all upstream recovery tests, and keeps synthetic input streams open until stop. Both sides' runtime health/logging and shutdown-drain behavior remain. Generated prose was seeded from main and rebuilt through native generators; every upstream context/page entry is retained, only the triggers page changes and matches its rendered source.
+
+Validation: 140 tests pass, none fail, 3 Redis-only ignored. Check/lint/fmt cover 120 files with no findings. Current quality:gate is green (main fixed the old docs fixture baseline). Page integrity, MCP export corpus, publish assets and assets barrel pass. rebase-evidence.md has the mapping and output digests. The earlier reports remain historical at their named heads.
+
+The S3 synchronization record is committed before the explicitly authorized exact-lease push. Fresh CI and final independent same-conversation evaluation must bind the rewritten pushed head; their immutable results live in PR phase comments and the excluded READY handoff. Previous exact-head verdicts are historical after rewriting. Force lease is the old remote e147deb2464bc6846a8b2cd7bedce957f72ebb58; never force main or overwrite an unseen remote update. No labels/milestones/local scaffold runtime/merge/tag/release. The coordinator owns the requested e2e-cli label and verdict for lifecycle wiring. Raw environment paths and session ids stay outside public Git.

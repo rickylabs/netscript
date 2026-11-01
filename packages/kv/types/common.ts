@@ -78,15 +78,15 @@ export interface KvSetOptions {
  * Options for `KvStore.list()`.
  */
 export interface KvListOptions {
-  /** Key prefix to filter by */
+  /** Key prefix selecting descendants (the prefix key itself is excluded) */
   prefix: KvKey;
   /** Maximum number of entries to return */
   limit?: number;
-  /** Start key (exclusive) for pagination */
+  /** Exclusive lower key bound, including when reverse is true */
   start?: KvKey;
-  /** End key (exclusive) for range queries */
+  /** Exclusive upper key bound, including when reverse is true */
   end?: KvKey;
-  /** Reverse order */
+  /** Return the selected range in descending key order */
   reverse?: boolean;
   /** Consistency level */
   consistency?: 'strong' | 'eventual';

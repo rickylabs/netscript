@@ -1,0 +1,59 @@
+{
+  "ciRun": 41198401104,
+  "ciJob": 124529261090,
+  "failedHead": "660f20038e47ad1a9e038df3ffacd09ac5928d3d",
+  "failedTest": "agent mcp real CLI stdio smoke",
+  "cause": "The unreachable-endpoint smoke required the former status/domains shape instead of the new acquisition diagnostic.",
+  "before": {
+    "exitCode": 1,
+    "summary": {
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 1
+    },
+    "failures": [
+      {
+        "message": "AssertionError\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at file://<cwd>/packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts:<line>:<column>",
+        "count": 1,
+        "tests": [
+          {
+            "name": "agent mcp real CLI stdio smoke",
+            "file": "./packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts",
+            "line": 37
+          }
+        ]
+      }
+    ]
+  },
+  "after": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 0
+    }
+  },
+  "check": {
+    "filesSelected": 1,
+    "batches": 1,
+    "failedBatches": 0
+  },
+  "lint": {
+    "filesSelected": 1,
+    "filesProcessed": 1,
+    "droppedFiles": [],
+    "refusals": []
+  },
+  "format": {
+    "filesSelected": 1,
+    "batches": 1,
+    "failedBatches": 0,
+    "findings": 0,
+    "ignoredFindings": 0
+  },
+  "otherCiLanes": "All other lanes passed; check-test failed only as the test-5 aggregator."
+}

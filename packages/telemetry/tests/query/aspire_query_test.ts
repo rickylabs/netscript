@@ -207,3 +207,33 @@ Deno.test('AspireTelemetryQuery degrades to empty results when Aspire is absent'
   assertEquals(await query.queryResources(), []);
   assertEquals(await query.exportTraces(), { resourceSpans: [] });
 });
+
+Deno.test('AspireTelemetryQuery flattens OTLP logs and preserves resource identity and string body', async () => {
+  const query = new AspireTelemetryQuery({
+    fetch: () =>
+      Promise.resolve(jsonResponse({
+        data: {
+          resourceLogs: [{
+            resource: { attributes: [{ key: 'service.name', value: { stringValue: 'api' } }] },
+            scopeLogs: [{
+              logRecords: [{
+                timeUnixNano: '1790000000000000000',
+                severityText: 'ERROR',
+                body: { stringValue: 'database unavailable' },
+                attributes: [{ key: 'operation', value: { stringValue: 'query' } }],
+              }],
+            }],
+          }],
+        },
+        totalCount: 1,
+        returnedCount: 1,
+      })),
+  });
+  const logs = await query.queryLogs();
+  assertEquals(logs.length, 1);
+  assertEquals(logs[0]?.timeUnixMs, 1_790_000_000_000);
+  assertEquals(logs[0]?.attributes['service.name'], 'api');
+  assertEquals(logs[0]?.attributes.operation, 'query');
+  assertEquals(logs[0]?.body, 'database unavailable');
+  assertEquals(logs[0]?.severity, 'ERROR');
+});

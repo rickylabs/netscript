@@ -19,12 +19,26 @@ type PageHeaderComponent = ((props: PageHeaderSectionProps) => VNode) & {
 };
 
 function PageHeaderRoot({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
-  return <div {...props} class={cn('ns-page-header', className)}>{children}</div>;
+  return (
+    <div
+      {...props}
+      class={cn('ns-page-header', className)}
+      data-part='root'
+      data-scope='page-header'
+    >
+      {children}
+    </div>
+  );
 }
 
 function PageHeaderLayout({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
   return (
-    <div {...props} class={cn('ns-page-header__layout', className)}>
+    <div
+      {...props}
+      class={cn('ns-page-header__layout', className)}
+      data-part='layout'
+      data-scope='page-header'
+    >
       {children}
     </div>
   );
@@ -32,23 +46,49 @@ function PageHeaderLayout({ children, class: className, ...props }: PageHeaderSe
 
 function PageHeaderMain({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
   return (
-    <div {...props} class={cn('ns-stack ns-stack--md ns-page-header__main', className)}>
+    <div
+      {...props}
+      class={cn('ns-stack ns-page-header__main', className)}
+      data-gap='md'
+      data-part='main'
+      data-scope='page-header'
+    >
       {children}
     </div>
   );
 }
 
 function PageHeaderAside({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
-  return <div {...props} class={cn('ns-stack ns-stack--md', className)}>{children}</div>;
+  return (
+    <div
+      {...props}
+      class={cn('ns-stack', className)}
+      data-gap='md'
+      data-part='aside'
+      data-scope='page-header'
+    >
+      {children}
+    </div>
+  );
 }
 
 function PageHeaderBadges({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
-  return <div {...props} class={cn('ns-cluster', className)}>{children}</div>;
+  return (
+    <div {...props} class={cn('ns-cluster', className)} data-part='badges' data-scope='page-header'>
+      {children}
+    </div>
+  );
 }
 
 function PageHeaderIntro({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
   return (
-    <div {...props} class={cn('ns-stack ns-stack--sm ns-page-header__intro', className)}>
+    <div
+      {...props}
+      class={cn('ns-stack ns-page-header__intro', className)}
+      data-gap='sm'
+      data-part='intro'
+      data-scope='page-header'
+    >
       {children}
     </div>
   );
@@ -57,11 +97,29 @@ function PageHeaderIntro({ children, class: className, ...props }: PageHeaderSec
 function PageHeaderActions(
   { children, class: className, ...props }: PageHeaderSectionProps,
 ): VNode {
-  return <div {...props} class={cn('ns-cluster', className)}>{children}</div>;
+  return (
+    <div
+      {...props}
+      class={cn('ns-cluster', className)}
+      data-part='actions'
+      data-scope='page-header'
+    >
+      {children}
+    </div>
+  );
 }
 
 function PageHeaderStatus({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
-  return <div {...props} class={cn('ns-status-bar', className)}>{children}</div>;
+  return (
+    <div
+      {...props}
+      class={cn('ns-status-bar', className)}
+      data-part='status-bar'
+      data-scope='page-header'
+    >
+      {children}
+    </div>
+  );
 }
 
 /**

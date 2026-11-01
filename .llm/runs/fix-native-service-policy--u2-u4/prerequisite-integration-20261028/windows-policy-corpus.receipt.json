@@ -1,0 +1,44 @@
+{
+  "outcome": "PASS",
+  "startedAt": "2026-10-28T05:47:50.326Z",
+  "finishedAt": "2026-10-28T05:49:32.180Z",
+  "durationMs": 101848,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 180,
+    "sha256": "eab4d68e7087046418c3c24de8ee1bb10daa945e7a8e9bd9128937db3232029a",
+    "tail": "{\"report\":\".llm/tmp/native-service-prerequisite-integration-20261028/windows-policy-corpus.json\",\"summary\":{\"passed\":7,\"failed\":0,\"ignored\":0,\"totalResults\":7,\"uniqueFailures\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "gateId": "windows-policy-corpus",
+  "gitHead": "5ef03198ade01515b28a22b539e6db066e18c735",
+  "args": [
+    "run",
+    "--cached-only",
+    "--frozen",
+    "--allow-all",
+    ".llm/tools/run-deno-test.ts",
+    "--output",
+    ".llm/tmp/native-service-prerequisite-integration-20261028/windows-policy-corpus.json",
+    "--",
+    "--cached-only",
+    "--frozen",
+    "--check",
+    "--allow-all",
+    "--sanitize-ops",
+    "--sanitize-resources",
+    "--trace-leaks",
+    ".llm/tools/docs/jsdoc-example-policy_test.ts",
+    ".llm/tools/docs/jsdoc-example-corpus_test.ts"
+  ],
+  "timeoutMs": 300000,
+  "runner": "/root/service_qualification_sol",
+  "capture": "Canonical runProcess with1MiB stream tail; full bytes/hash always retained; actual truncation flag authoritative",
+  "childReport": ".llm/tmp/native-service-prerequisite-integration-20261028/windows-policy-corpus.json"
+}

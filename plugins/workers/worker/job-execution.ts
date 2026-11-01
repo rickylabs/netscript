@@ -1,7 +1,10 @@
+import { workerJobLogger } from './job-logger.ts';
 import {
   DEFAULT_TOPIC,
+  executeJobWithRetry,
   type JobDefinition,
   type JobMessage,
+  resolveJobRetryPolicy,
   type TaskDefinition,
   type TaskExecutionOptions,
 } from '@netscript/plugin-workers-core/runtime';
@@ -18,20 +21,26 @@ export async function executeWorkerJob(
   signal: AbortSignal,
   traceHeaders: Record<string, string>,
   correlationId?: string,
+  onAttempt?: (attempt: number) => void,
 ): Promise<WorkerJobResult> {
-  const executionType = jobDef.executionType ?? 'deno';
-  if (executionType === 'deno') {
-    return await executeDenoJob(
-      context,
-      jobDef,
-      executionId,
-      payload,
-      traceHeaders,
-      correlationId,
-      signal,
-    );
-  }
-  return await executePolyglotTask(context, jobDef, payload, signal, traceHeaders, correlationId);
+  return await executeJobWithRetry(
+    async () => {
+      const executionType = jobDef.executionType ?? 'deno';
+      return executionType === 'deno'
+        ? await executeDenoJob(
+          context,
+          jobDef,
+          executionId,
+          payload,
+          traceHeaders,
+          correlationId,
+          signal,
+        )
+        : await executePolyglotTask(context, jobDef, payload, signal, traceHeaders, correlationId);
+    },
+    resolveJobRetryPolicy(jobDef, jobDef.handler),
+    { signal, clock: context.retryClock, onAttempt },
+  );
 }
 
 async function executeDenoJob(
@@ -46,9 +55,13 @@ async function executeDenoJob(
   signal?.throwIfAborted();
   const entrypoint = resolveDenoEntrypoint(context, jobDef);
 
-  console.log(
-    `[Worker ${context.workerId}] Executing job '${jobDef.id}' via WorkerPool, entrypoint: ${entrypoint}`,
-  );
+  workerJobLogger.debug('Executing job {jobId} via WorkerPool', {
+    workerId: context.workerId,
+    jobId: jobDef.id,
+    jobName: jobDef.name ?? jobDef.id,
+    executionId,
+    entrypoint,
+  });
 
   const message: JobMessage = {
     jobId: jobDef.id,
@@ -101,15 +114,25 @@ function resolveDenoEntrypoint(
     }
   }
 
-  console.log(
-    `[Worker ${context.workerId}] Resolving entrypoint for job '${jobDef.id}': source=${jobDef.source}, entrypoint=${jobEntrypoint}, projectRoot=${projectRoot}`,
-  );
+  workerJobLogger.debug('Resolving entrypoint for job {jobId}', {
+    workerId: context.workerId,
+    jobId: jobDef.id,
+    jobName: jobDef.name ?? jobDef.id,
+    source: jobDef.source,
+    entrypoint: jobEntrypoint,
+    projectRoot,
+  });
 
   if (jobDef.source === 'plugin') {
     const entrypoint = jobEntrypoint.startsWith('./')
       ? `${projectRoot}/${jobEntrypoint.slice(2)}`
       : `${projectRoot}/${jobEntrypoint}`;
-    console.log(`[Worker ${context.workerId}] Plugin job resolved to: ${entrypoint}`);
+    workerJobLogger.debug('Plugin job {jobId} resolved', {
+      workerId: context.workerId,
+      jobId: jobDef.id,
+      jobName: jobDef.name ?? jobDef.id,
+      entrypoint,
+    });
     return toLocalModuleSpecifier(entrypoint);
   }
 
@@ -165,7 +188,7 @@ async function executePolyglotTask(
     topic: jobDef.topic ?? DEFAULT_TOPIC,
     entrypoint,
     timeout: jobDef.timeout,
-    maxRetries: jobDef.maxRetries,
+    maxRetries: 0,
     retryDelay: jobDef.retryDelay ?? 1000,
     maxConcurrency: jobDef.maxConcurrency ?? 1,
     priority: jobDef.priority,
@@ -195,6 +218,13 @@ async function executePolyglotTask(
   };
 
   const result = await context.taskExecutor.execute(taskDef, execOptions);
+  if (result.status === 'timeout') {
+    throw new DOMException(result.error ?? 'Task deadline elapsed.', 'TimeoutError');
+  }
+  if (result.status === 'cancelled') {
+    signal.throwIfAborted();
+    throw new DOMException(result.error ?? 'Task cancelled.', 'AbortError');
+  }
   let resultData = result.result ?? undefined;
   if (!result.success) {
     const diagnostics: Record<string, unknown> = { ...resultData };

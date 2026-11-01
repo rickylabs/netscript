@@ -10,7 +10,7 @@ export function FloatingSurfaceDemo({ kind }: FloatingSurfaceDemoProps) {
     return (
       <div class='ns-floating-demo'>
         <Sheet.Root side='right'>
-          <Sheet.Trigger class='ns-btn ns-btn--secondary'>Open right sheet</Sheet.Trigger>
+          <Sheet.Trigger class='ns-btn' data-variant='secondary'>Open right sheet</Sheet.Trigger>
           <Sheet.Content>
             <div class='ns-sheet__header'>
               <div>
@@ -21,7 +21,7 @@ export function FloatingSurfaceDemo({ kind }: FloatingSurfaceDemoProps) {
                   Side-docked panel styled by the sheet-styles registry item.
                 </Sheet.Description>
               </div>
-              <Sheet.Close class='ns-btn ns-btn--ghost ns-btn--sm'>Close</Sheet.Close>
+              <Sheet.Close class='ns-btn' data-variant='ghost' data-size='sm'>Close</Sheet.Close>
             </div>
             <div class='ns-sheet__body'>
               <div class='ns-gallery-stack'>
@@ -44,14 +44,14 @@ export function FloatingSurfaceDemo({ kind }: FloatingSurfaceDemoProps) {
               </div>
             </div>
             <div class='ns-sheet__footer'>
-              <Sheet.Close class='ns-btn ns-btn--primary ns-btn--sm'>Acknowledge</Sheet.Close>
-              <Sheet.Close class='ns-btn ns-btn--outline ns-btn--sm'>Dismiss</Sheet.Close>
+              <Sheet.Close class='ns-btn' data-variant='primary' data-size='sm'>Acknowledge</Sheet.Close>
+              <Sheet.Close class='ns-btn' data-variant='outline' data-size='sm'>Dismiss</Sheet.Close>
             </div>
           </Sheet.Content>
         </Sheet.Root>
 
         <Sheet.Root side='bottom'>
-          <Sheet.Trigger class='ns-btn ns-btn--outline'>Open bottom sheet</Sheet.Trigger>
+          <Sheet.Trigger class='ns-btn' data-variant='outline'>Open bottom sheet</Sheet.Trigger>
           <Sheet.Content>
             <div class='ns-sheet__header'>
               <div>
@@ -70,7 +70,7 @@ export function FloatingSurfaceDemo({ kind }: FloatingSurfaceDemoProps) {
               </p>
             </div>
             <div class='ns-sheet__footer'>
-              <Sheet.Close class='ns-btn ns-btn--secondary ns-btn--sm'>Close tray</Sheet.Close>
+              <Sheet.Close class='ns-btn' data-variant='secondary' data-size='sm'>Close tray</Sheet.Close>
             </div>
           </Sheet.Content>
         </Sheet.Root>
@@ -81,7 +81,7 @@ export function FloatingSurfaceDemo({ kind }: FloatingSurfaceDemoProps) {
   return (
     <div class='ns-floating-demo'>
       <Popover.Root placement='bottom-start'>
-        <Popover.Trigger class='ns-btn ns-btn--secondary'>Open popover</Popover.Trigger>
+        <Popover.Trigger class='ns-btn' data-variant='secondary'>Open popover</Popover.Trigger>
         <Popover.Content class='ns-floating-card'>
           <Popover.Title class='ns-floating-card__title'>Region capacity</Popover.Title>
           <Popover.Description class='ns-floating-card__body'>
@@ -89,19 +89,19 @@ export function FloatingSurfaceDemo({ kind }: FloatingSurfaceDemoProps) {
           </Popover.Description>
           <div class='ns-gallery-row'>
             <Badge variant='warning'>82%</Badge>
-            <Popover.Close class='ns-btn ns-btn--ghost ns-btn--sm'>Close</Popover.Close>
+            <Popover.Close class='ns-btn' data-variant='ghost' data-size='sm'>Close</Popover.Close>
           </div>
         </Popover.Content>
       </Popover.Root>
 
       <Tooltip.Root placement='top' openDelay={0} closeDelay={80}>
-        <Tooltip.Trigger class='ns-btn ns-btn--outline'>Hover or focus</Tooltip.Trigger>
+        <Tooltip.Trigger class='ns-btn' data-variant='outline'>Hover or focus</Tooltip.Trigger>
         <Tooltip.Content class='ns-floating-tooltip'>
           CSS anchor positioning when available, fixed fallback otherwise.
         </Tooltip.Content>
       </Tooltip.Root>
 
-      <Button type='link' href='/design/composition' variant='ghost'>
+      <Button type='link' clientNav={false} href='/design/composition' variant='ghost'>
         Composition rules
       </Button>
     </div>

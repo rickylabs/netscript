@@ -1,3 +1,8 @@
+import { MemorySagaStore as AtomicMemorySagaStore } from '../../src/testing/memory-saga-store.ts';
+import type {
+  SagaTransitionCommitRequest,
+  SagaTransitionCommitResult,
+} from '../../src/ports/saga-transition-commit-port.ts';
 import { assertEquals } from '@std/assert';
 
 import { defineSaga, sagaCompensate, sagaFail } from '../../mod.ts';
@@ -251,6 +256,25 @@ function correlatedCounterDefinition(id: string): SagaDefinition {
 }
 
 class MemorySagaStore implements SagaStorePort {
+  readonly #atomic = new AtomicMemorySagaStore();
+  readonly transitionCommitCapabilities = this.#atomic.transitionCommitCapabilities;
+  hasAppliedTransition(instanceId: SagaInstanceId, keyHash: string): Promise<boolean> {
+    return this.#atomic.hasAppliedTransition(instanceId, keyHash);
+  }
+  async commitTransition(
+    request: SagaTransitionCommitRequest,
+  ): Promise<SagaTransitionCommitResult> {
+    const result = await this.#atomic.commitTransition(request);
+    if (result.committed) {
+      this.envelopes.set(request.envelope.metadata.instanceId, request.envelope);
+      this.correlations.set(
+        `${request.correlation.sagaId}:${request.correlation.correlationKey}`,
+        request.correlation.instanceId,
+      );
+      this.transitions.push({ instanceId: request.correlation.instanceId, record: request.record });
+    }
+    return result;
+  }
   readonly id = 'memory-saga-store-test';
   readonly envelopes = new Map<SagaInstanceId, SagaStateEnvelope>();
   readonly correlations = new Map<string, SagaInstanceId>();

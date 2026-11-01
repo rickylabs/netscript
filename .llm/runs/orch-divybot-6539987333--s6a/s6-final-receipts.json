@@ -1,0 +1,47 @@
+[
+  {
+    "gateId": "assets-barrel",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "actualGitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "durationMs": 2926,
+    "requestHash": "a6da71332d1b78f3d3f74966ce40aa17449f36fefe8fc04b74fe38b26897b813"
+  },
+  {
+    "gateId": "docs-accuracy",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "actualGitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "durationMs": 7650,
+    "requestHash": "71f2da579b1d97f57ddecbe428cbb059835fbc0100175e49a6a4034490477158"
+  },
+  {
+    "gateId": "mcp-export-corpus",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "actualGitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "durationMs": 9660,
+    "requestHash": "d4cef4750bdd3d84daa3db3f9635818fe4faebb484b87145410821b1fec75058"
+  },
+  {
+    "gateId": "publish-assets",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "actualGitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "durationMs": 507,
+    "requestHash": "7d45dffe32b225a572f517174a8d7f7e4d40dc6bf7dccdf4b68a52cb2f4f6b81"
+  },
+  {
+    "gateId": "quality-gate",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "gitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "actualGitHead": "8e5e8b1c0096fc58dc932d7710f15543f7cfc615",
+    "durationMs": 17092,
+    "requestHash": "9bf437e2002793405dcc1245ddd9a089a0c856deece25b3cf9633d90ed79def5"
+  }
+]

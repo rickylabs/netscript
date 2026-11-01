@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Build a validated ingestion queue
+description: Reject malformed messages before they enter a queue and again before a consumer runs.
 templateEngine: [vento, md]
 order: 101
 oldUrl: /how-to/build-a-validated-ingestion-queue/
@@ -8,8 +9,8 @@ oldUrl: /how-to/build-a-validated-ingestion-queue/
 
 # Build a validated ingestion queue
 
-Use `createTypedQueue(name, schema, options)` when inbound messages must be checked before they
-enter the queue and again before a consumer handles them.
+This recipe builds a queue that checks each message against a Zod schema before it enters the queue
+and again before a consumer handles it. It uses `createTypedQueue(name, schema, options)`.
 
 ## Prerequisites
 
@@ -55,7 +56,7 @@ await queue.enqueue({
 
 ## Consume validated messages
 
-With `validateOnDequeue: true`, the queue parses the raw backend message before calling your
+With `validateOnDequeue: true`, the queue parses the raw backend message before it calls your
 handler. `onValidationError: 'dlq'` nacks invalid messages with `requeue: false`,
 `reason: 'validation_failed'`, and `errorCode: 'VALIDATION_ERROR'`.
 
@@ -68,27 +69,23 @@ await queue.listen(async (message, context) => {
 
 ## Provider notes
 
-- `QueueProvider.DenoKv`: good local default, no external broker.
-- `QueueProvider.Redis`: high-throughput queueing when Redis is already deployed.
-- `QueueProvider.RabbitMQ`: AMQP path for broker-centric deployments.
-- `QueueProvider.Postgres`: transactional queue over the primary database; select it explicitly.
+| Provider | Use it when |
+| --- | --- |
+| `QueueProvider.DenoKv` | You want a local default with no external broker. |
+| `QueueProvider.Redis` | Redis is already deployed and you need high-throughput queueing. |
+| `QueueProvider.RabbitMQ` | Your deployment is broker-centric and uses AMQP. |
+| `QueueProvider.Postgres` | You want a transactional queue over the primary database. Select it explicitly. |
 
 ## Failure modes
 
-- Producer validation failure: enqueue throws and no message is stored.
-- Consumer validation failure with `discard`: the message is acknowledged without handler work.
-- Consumer validation failure with `dlq`: the message is nacked without requeue for dead-letter
-  handling.
-- Consumer validation failure with `throw`: the queue throws `QueueValidationError` so the backend
-  retry policy decides the next delivery.
+| Failure | Result |
+| --- | --- |
+| Producer validation fails | `enqueue` throws and no message is stored. |
+| Consumer validation fails with `discard` | The message is acknowledged without handler work. |
+| Consumer validation fails with `dlq` | The message is nacked without requeue, for dead-letter handling. |
+| Consumer validation fails with `throw` | The queue throws `QueueValidationError`, and the backend retry policy decides the next delivery. |
 
 ## Next steps
 
-- Compare providers in [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/).
-- Use queues with KV and cron in [Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/).
-- Look up the full API in [queue reference](/reference/queue/).
-
-{{ comp.nextPrev({
-  prev: { label: "Build a server-validated form", href: "/web-layer/how-to/build-a-server-validated-form/" },
-  next: { label: "Publish a durable stream", href: "/durable-workflows/how-to/publish-a-durable-stream/" }
-}) }}
+Pick a backend with [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/).
+The full API is in the [queue reference](/reference/queue/).

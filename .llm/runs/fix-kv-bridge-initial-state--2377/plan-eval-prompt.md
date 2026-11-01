@@ -1,0 +1,4 @@
+## SKILL
+Use netscript-harness, netscript-doctrine, netscript-tools, netscript-pr. Read-only Read/Grep/Glob only, no writes/commands/delegates, stdin closed. Do not read profiles/.
+
+Independent PLAN-EVAL for issue #2377, feature tier, owner-authorized continuation of milestone leaves. Read .llm/runs/fix-kv-bridge-initial-state--2377/{supervisor,research,plan,worklog,context-pack,drift}.md and relevant bridge/watch port/tests. Acceptance: first non-initial batch seeds full state with one getMany before applying it; regression wraps initial-ignoring adapter with plain iterable, first frame contains stored entries and later frames retain other keys; JSDoc states contract. Check cancellation/errors, fallback only once, first-party snapshot no extra read, optional getMany fallback and honest semantics. Review blockers only and plan-gate checklist. End VERDICT: PASS or VERDICT: FAIL_PLAN. No product changes yet.

@@ -1,0 +1,17 @@
+Task gen:mcp-export-corpus deno run --no-lock --allow-read --allow-write --allow-env --allow-run=deno,git .llm/tools/docs/generate-export-surface-corpus.ts
+error: Uncaught (in promise) Error: MCP export-corpus generator read set is dirty:
+ M packages/cli/src/kernel/assets/agent-docs-prose.generated.ts
+ M packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template
+ M packages/cli/src/kernel/assets/embedded.generated.ts
+ M packages/fresh-ui/README.md
+ M packages/fresh-ui/deno.json
+ M packages/fresh-ui/registry.generated.ts
+ M packages/fresh-ui/registry.json
+ M packages/fresh-ui/src/registry/assets/registry.generated.ts
+ M packages/fresh-ui/tests/registry-authoring.test.ts
+?? packages/fresh-ui/scripts/sync-theme-registry.ts
+Refusing to generate from uncommitted package/plugin sources. Commit or stash them, or deliberately rerun with --allow-dirty.
+  throw new Error(
+        ^
+    at guardGeneratorWrite (file://.llm/tools/docs/generate-export-surface-corpus.ts:565:9)
+    at async file://.llm/tools/docs/generate-export-surface-corpus.ts:601:15
