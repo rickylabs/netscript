@@ -16,3 +16,5 @@
 - Native runtime requires a build-time synchronous carrier projection and iframe digest port: compressed workspace carriers/browser WebCrypto are not assumed in the Figma sandbox. The same pinned schemas/data and standard WebCrypto are reused; no package, token source or dependency edits. A VM compatibility test explicitly omits browser globals; it is not live editor proof.
 
 - Authorized write surface includes one .llm/tools/gates/catalog.ts entry for the dedicated component-library CI. This makes its standalone workflow produce native durable gate receipts without changing root tasks or existing token-plugin CI.
+
+- Hosted quality at e776763 failed Aspire manifest freshness. The canonical manifest indexes tracked paths mentioning Aspire, including dated lesson notes; run/temp exclusions remain intact. The new dated lesson must join that generated inventory. Add only its generator-derived row, with no scan-policy/version changes. User directed addressing the current CI failure.

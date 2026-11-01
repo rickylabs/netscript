@@ -58,3 +58,7 @@ Structured scoped check/test/lint/fmt; generation round trip and coverage/malfor
 ## Native/build and evidence refinement
 
 Native modules include preflight.ts beside the port/import/export. Build reads the existing registry carrier in Deno and emits a synchronous projection for sandbox bundling; hashing crosses an injected iframe digest port using standard WebCrypto. A VM compatibility test omits browser globals and executes actual bundled operations, still never claiming editor evidence. Dedicated CI uses one new allowlisted command in .llm/tools/gates/catalog.ts and its own workflow/child report so durable verdicts use the repository runner. Root deno.json and existing plugin/quality entry remain untouched.
+
+## CI repair slice
+
+3. Regenerate the existing Aspire surface manifest after the dated lesson introduced a tracked Aspire mention. Use aspire-surface-manifest.ts; preserve scanner policy, version pins and exclusions. Prove exact generated delta and configured phase1 parity, re-run relevant scope/compatibility checks and obtain same-evaluator confirmation. Files: generated TSV plus scoped run evidence/context/worklog; no component source changes. User explicitly requested fixing the current-head quality failure.

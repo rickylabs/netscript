@@ -16,6 +16,8 @@ The complete assigned tools-side subsystem is the target. Full S5/editor accepta
 | Explicit current-contract gap, no silent omission or fabricated binding | full generation rejects Theme set/prose/h4/tracking before output; all51 non-prose registry entries validate; CI fullInventoryReady=false | Proven rejection, source repair outside this unit |
 | Draft PR, Refs2568, no labels/private host paths/session IDs; cockpit merges | Existing PR2576, normal branch pushes; privacy scan and phase records | Draft open; final readiness pending |
 | Full CLI smoke attempt and resource hygiene | one scaffold.runtime attempt failed Aspire/Docker preflight; read-only leak report24 unproven entries left untouched | Runtime UNPROVEN; no foreign resource mutation |
-| Commit/push/final report handoff | slice1 committed/pushed90cadef; complete candidate awaits independent sign-off | Reviewed source ready for sign-off; final report/readiness pending |
+| Commit/push/final report handoff | slice1 committed/pushed90cadef; complete candidate awaits independent sign-off | Source e776763 committed/pushed; focused generated-manifest repair independently PASS; current-head readiness/final report pending |
 
 No completion claim is made while final evaluation, source sign-off or required readiness checks remain pending.
+
+CI follow-up: previous-head quality failed only on generated Aspire manifest freshness. The one-row canonical repair has independent PASS and30 regression tests; all32 reviewed product hashes remain unchanged. Require fresh hosted checks after its push.

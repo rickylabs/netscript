@@ -102,3 +102,19 @@ Same independent read-only Claude evaluator returned PASS in evaluate.md. Observ
 All32 product/workflow/gate file hashes match reviewed-files.json after evaluator exit; no product content changed during review. Supervisor signs off the exact reviewed candidate for the source commit. The earlier first-slice PASS remains intact. Native cancellation-adapter behavior, iframe message-source compatibility and FLOAT inspection bindings require live host confirmation under the existing parents; none is claimed proven by mocks.
 
 Reconcile: both S3 PRs still OPEN at live recheck. PR2576 is the single existing PR and remains Refs-only with no labels; its milestone is the issue's Frontend Contribution theme. No parent closure or unowned resources changed. Final-head hosted checks and final report remain pending before READY.
+
+## CI follow-up design / intake
+
+User reports quality FAILURE. Native pr-checks confirms current-fail at e776763; failed step is Aspire version parity phase1, sole failure manifest:freshness. Reproduced locally with the configured parity command. The manifest indexes paths, not content hashes: the dated lesson's new Aspire mention requires a generated archival row. No Figma source, Aspire pin or scan-policy defect is implicated.
+
+Follow-up slice3: regenerate the canonical TSV with aspire-surface-manifest.ts, inspect its exact delta, prove phase1 parity and relevant scanner regression tests, and obtain the same independent evaluator's focused confirmation before sign-off. Update context/worklog in this slice and push normally. No labels or skipped-check bypass.
+
+## CI repair candidate
+
+Canonical generator delta: exactly one archival harness-doc row for .llm/2026-11-01-s5b-component-library.md; no removals and unmatched=0. Configured phase1 parity PASS through allowlisted runner after generation. All32 previously reviewed product/workflow/gate hashes remain unchanged; source identity remains e776763. Focused same-session independent confirmation pending before repair sign-off.
+
+## CI repair sign-off / reconciliation
+
+Independent same-session read-only confirmation PASS in ci-repair-eval.md. Canonical generated manifest exactly matches buildAspireSurfaceManifest:1025 rows, unmatched0; the sole addition is the dated lesson's archival row. Configured phase1 parity PASS (manifestFresh=true, fail0, missing0); existing parity/scope/compatibility regressions30 PASS; scoped type check covers both checker/generator with0 diagnostics. No pins, policies, exclusions or product code changed. All32 reviewed implementation hashes still match source e776763. Supervisor signs off this focused repair for a normal commit/push.
+
+At source e776763, hosted dedicated component-library CI and code-quality are green; required quality failed only on the now-repaired manifest freshness. Readiness is governed by current-head hosted checks after this repair push. Repeated user CI notifications identify this same previous-head failure, not separate implementation defects. No labels or resource mutations.

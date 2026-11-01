@@ -8,3 +8,7 @@ Deno 2.9.7 rejects a direct source import `npm:zod@catalog:` with Invalid packag
 - The native sandbox need not provide crypto/TextEncoder/AbortController. NativeContext accepts the minimal cancellation shape and a digest port. plugin/main routes SHA-256 to the iframe via bounded RPC; the browser uses native WebCrypto. No second hash implementation or dependencies.
 - Embed bundled scripts into HTML with a replacement callback, never a replacement string: JavaScript dollar-replacement sequences can reinsert the placeholder or other document text. The bundle test verifies placeholder removal and runs the native entry in a VM without browser globals. This remains compatibility proof only, not editor evidence.
 - Node VM arrays/objects have different prototypes; compare serialized transport values across that boundary, not same-realm object prototypes.
+
+# CI manifest freshness
+
+Adding a dated .llm/YYYY lesson that mentions Aspire adds a tracked manifest path even though .llm/runs and .llm/tmp are excluded. Check check:aspire-version-parity after such additions; use the canonical aspire-surface-manifest.ts generator. The manifest stores path/class/owner/disposition, not content hashes. Do not change pins or exclusions to green a freshness failure.
