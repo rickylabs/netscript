@@ -40,3 +40,11 @@ that import and no-Aspire processes need an explicit restart after generation;
 The scaffold runtime app-reference probe requires the seeded row in rendered data
 cells on Overview, Records and the canonical service example. Shell headings or
 hydration scripts alone do not prove the app reaches its database.
+
+Optional AI provider modules are loaded by Deno at request time using the discovered
+workspace root. Keep provider imports out of Vite's static imports and
+`import.meta.glob` graphs: published JSR adapters contain `npm:` dependencies
+that the server runtime resolves natively. `deno task check:scaffold-provider-boundary`
+builds the emitted loader with a poison provider and tests the old glob as a
+negative control. Runtime tests also execute the built loader from a different
+output directory to verify module lookup and capability states.

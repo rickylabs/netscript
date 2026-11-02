@@ -2,6 +2,8 @@
 import { getServiceUrl } from '@netscript/sdk/discovery';
 import { workersContract } from '@netscript/plugin-workers-core/contracts/v1';
 import { z } from 'zod';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { buildStreamUrl } from '@netscript/plugin-streams-core';
 import type { ScaffoldCapability } from './scaffold-contract.ts';
 import { scaffoldServiceClient } from './scaffold-service-context.ts';
@@ -9,8 +11,14 @@ import { scaffoldServiceClient } from './scaffold-service-context.ts';
 type Projection = Omit<ScaffoldCapability, 'id' | 'label'>;
 type AiModels = { readonly AI_MODELS: Readonly<Record<string, string>> };
 type AiRuntime = { chatModel?: () => Promise<unknown> };
-const aiModels = import.meta.glob<AiModels>('../../../ai/models.ts');
-const aiRuntimes = import.meta.glob<AiRuntime>('../../../ai/ai.ts');
+/** Load optional server modules through Deno, preserving their workspace import map after Vite builds. */
+async function loadAiModule<T>(root: string, file: string): Promise<T | undefined> {
+  const path = join(root, 'ai', file);
+  try { await Deno.stat(path); }
+  catch (error) { if (error instanceof Deno.errors.NotFound) return undefined; throw error; }
+  const specifier = pathToFileURL(path).href;
+  return await import(/* @vite-ignore */ specifier);
+}
 const readinessSchema = z.object({ ready: z.literal(true) });
 // App-owned public activity topic. Protected topics stay denied: never use a service secret here.
 const ACTIVITY_STREAM_PATH = '/scaffold/{{serviceName}}/records';
@@ -108,7 +116,7 @@ async function recentActivity(url: string, signal: AbortSignal): Promise<Project
 }
 
 /** Read only installed capabilities, using existing contracts and service discovery. */
-export async function probeScaffoldPlugin(id: 'workers' | 'streams' | 'ai', name: string, request?: Request): Promise<Projection> {
+export async function probeScaffoldPlugin(id: 'workers' | 'streams' | 'ai', name: string, request?: Request, root?: string): Promise<Projection> {
   try {
     if (id === 'workers') {
       const { client, context } = await scaffoldServiceClient(workersContract, name, 'workers', request, { unmarked: 'optional' });
@@ -131,14 +139,15 @@ export async function probeScaffoldPlugin(id: 'workers' | 'streams' | 'ai', name
       readinessSchema.parse(await response.json());
       return await recentActivity(buildStreamUrl(ACTIVITY_STREAM_PATH, getServiceUrl(name)), signal);
     }
-    const loadModels = Object.values(aiModels)[0];
-    const loadRuntime = Object.values(aiRuntimes)[0];
-    if (!loadModels || !loadRuntime) return { state: 'installed-unwired', description: 'The app-owned AI modules are not connected.', command: 'netscript plugin doctor' };
-    const models = z.record(z.string(), z.string()).parse((await loadModels()).AI_MODELS);
+    if (!root) return { state: 'installed-unwired', description: 'The AI workspace is not connected.', command: 'netscript plugin doctor' };
+    const modelModule = await loadAiModule<AiModels>(root, 'models.ts');
+    if (!modelModule) return { state: 'installed-unwired', description: 'The app-owned AI modules are not connected.', command: 'netscript plugin doctor' };
+    const models = z.record(z.string(), z.string()).parse(modelModule.AI_MODELS);
     const items = Object.entries(models).map(([label, detail]) => ({ label, detail }));
     if (!items.length) return { state: 'empty', description: 'No models configured.', command: 'netscript plugin info @netscript/plugin-ai' };
-    const runtime = await loadRuntime();
-    if (!runtime.chatModel) return { state: 'empty', description: 'Model references configured. No chat runtime is connected.', items, command: 'netscript plugin info @netscript/plugin-ai' };
+    const runtime = await loadAiModule<AiRuntime>(root, 'ai.ts');
+    if (!runtime) return { state: 'installed-unwired', description: 'The app-owned AI modules are not connected.', items, command: 'netscript plugin doctor' };
+    if (typeof runtime.chatModel !== 'function') return { state: 'empty', description: 'Model references configured. No chat runtime is connected.', items, command: 'netscript plugin info @netscript/plugin-ai' };
     // Resolves an existing provider handle; it never generates tokens or provisions a model.
     await runtime.chatModel();
     return { state: 'ready', description: 'Configured models. Provider access is checked when you make a request.', items, command: 'netscript plugin info @netscript/plugin-ai' };

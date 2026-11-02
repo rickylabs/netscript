@@ -1,0 +1,12 @@
+Task check:scaffold-provider-boundary deno run --allow-read --allow-write --allow-run --allow-env --allow-ffi --allow-sys .llm/tools/fitness/check-scaffold-provider-boundary.ts '--negative-control'
+error: Uncaught (in promise) Error: [vite]: Rollup failed to resolve import "npm:@tanstack/ai@0.68.0" from "$TMPDIR/provider-fixture/ai/ai.ts".
+This is most likely unintended because it can break your application at runtime.
+If you do want to externalize this module explicitly add it to
+`build.rollupOptions.external`
+    at viteLog (file://<deno-cache>/npm/registry.npmjs.org/vite/7.2.2/dist/node/chunks/config.js:34254:57)
+    at onRollupLog (file://<deno-cache>/npm/registry.npmjs.org/vite/7.2.2/dist/node/chunks/config.js:34284:7)
+    at onLog (file://<deno-cache>/npm/registry.npmjs.org/vite/7.2.2/dist/node/chunks/config.js:34086:4)
+    at file://<deno-cache>/npm/registry.npmjs.org/rollup/4.64.3/dist/es/shared/node-entry.js:21917:32
+    at Object.logger [as onLog] (file://<deno-cache>/npm/registry.npmjs.org/rollup/4.64.3/dist/es/shared/node-entry.js:23911:9)
+    at ModuleLoader.handleInvalidResolvedId (file://<deno-cache>/npm/registry.npmjs.org/rollup/4.64.3/dist/es/shared/node-entry.js:22656:26)
+    at file://<deno-cache>/npm/registry.npmjs.org/rollup/4.64.3/dist/es/shared/node-entry.js:22614:26

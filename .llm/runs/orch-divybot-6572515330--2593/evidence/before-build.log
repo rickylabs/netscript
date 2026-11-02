@@ -1,0 +1,314 @@
+Initialize esbuild@0.25.7
+Initialize esbuild-wasm@0.25.12
+Initialize @opentelemetry/api@1.10.0
+Initialize @remix-run/node-fetch-server@0.12.0
+Initialize @prefresh/vite@2.4.12
+Initialize preact-render-to-string@6.8.2
+Initialize @babel/core@7.29.7
+Initialize @babel/preset-react@7.29.7
+Initialize @esbuild/linux-x64@0.25.7
+Initialize @prefresh/core@1.5.11
+Initialize @prefresh/babel-plugin@0.5.4
+Initialize @rollup/pluginutils@4.2.1
+Initialize @prefresh/utils@1.2.1
+Initialize @babel/parser@7.29.11
+Initialize @babel/code-frame@7.29.7
+Initialize @babel/helpers@7.29.10
+Initialize @babel/helper-module-transforms@7.29.7
+Initialize @babel/types@7.29.11
+Initialize gensync@1.0.0-beta.2
+Initialize json5@2.2.3
+Initialize @babel/helper-compilation-targets@7.29.7
+Initialize convert-source-map@2.0.0
+Initialize @babel/generator@7.29.8
+Initialize @babel/traverse@7.29.10
+Initialize semver@6.3.1
+Initialize debug@4.4.3
+Initialize @babel/template@7.29.7
+Initialize @babel/helper-plugin-utils@7.29.7
+Initialize @babel/plugin-transform-react-jsx-development@7.29.7
+Initialize @babel/plugin-transform-react-jsx@7.29.7
+Initialize @babel/plugin-transform-react-display-name@7.29.7
+Initialize @babel/plugin-transform-react-pure-annotations@7.29.7
+Initialize @babel/helper-validator-option@7.29.7
+Initialize estree-walker@2.0.2
+Initialize picomatch@2.3.2
+Initialize js-tokens@4.0.0
+Initialize @babel/helper-validator-identifier@7.29.7
+Initialize @babel/helper-module-imports@7.29.7
+Initialize @babel/helper-string-parser@7.29.11
+Initialize browserslist@4.29.5
+Initialize @babel/compat-data@7.29.7
+Initialize lru-cache@5.1.1
+Initialize jsesc@3.1.0
+Initialize @babel/helper-globals@7.29.7
+Initialize ms@2.1.3
+Initialize @babel/helper-annotate-as-pure@7.29.7
+Initialize @babel/plugin-syntax-jsx@7.29.7
+Initialize electron-to-chromium@1.5.467
+Initialize node-releases@2.0.60
+Initialize caniuse-lite@1.0.30001819
+Initialize baseline-browser-mapping@2.11.34
+Initialize update-browserslist-db@1.3.4
+Initialize yallist@3.1.1
+Initialize escalade@3.2.0
+vite v7.2.2 building client environment for production...
+transforming...
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/defer/island.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/defer/DeferIsland.tsx
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/defer/policy.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/defer/telemetry.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/internal/package-telemetry/telemetry.ts
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/desktop/mod.ts
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/desktop/adapters/bind-channel.ts
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/desktop/adapters/orpc-serialization.ts
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/desktop/application/desktop-rpc-client.ts
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/desktop/domain/constants.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/route/mod.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/route/_internal/contract-runtime.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/search-params.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/navigation/mod.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/navigation/context.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/navigation/hooks.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/navigation/link.tsx
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/interactive.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/action-menu/ActionMenu.tsx
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/action-menu/action-menu.types.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/accordion/Accordion.tsx
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/combobox/Combobox.tsx
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/dialog/Dialog.tsx
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/drawer/Drawer.tsx
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/popover/Popover.tsx
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/sheet/Sheet.tsx
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/tabs/Tabs.tsx
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/tooltip/Tooltip.tsx
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/_internal/compose-event-handlers.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/_internal/compose-refs.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/_internal/context-error.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/_internal/collection-navigation.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/popover/use-popover.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/accordion/use-accordion.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/combobox/use-combobox.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/dialog/use-dialog.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/drawer/use-drawer.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/sheet/use-sheet.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/tabs/use-tabs.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/tooltip/use-tooltip.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/_internal/platform-popover.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/_internal/use-dismissable-layer.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/_internal/use-controllable-signal.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/combobox/combobox.utils.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/_internal/native-dialog.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/runtime/tabs/tabs.utils.ts
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/primitives.tsx
+Downloading https://jsr.io/@netscript/fresh-ui/0.0.9-canary.2/src/presentation/primitives.tsx
+../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/regexes.js (74:0): A comment
+
+"/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+ * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+ * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+
+in "../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/util.js (400:0): A comment
+
+"// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+
+in "../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+✓ 317 modules transformed.
+rendering chunks...
+computing gzip size...
+_fresh/client/.vite/manifest.json                    3.91 kB │ gzip:  0.63 kB
+_fresh/client/assets/client-entry-Bo7X9jrA.css     446.21 kB │ gzip: 68.24 kB
+_fresh/client/jsxRuntime.module.mjs                  0.41 kB │ gzip:  0.29 kB
+_fresh/client/scaffold-contract.mjs                  1.22 kB │ gzip:  0.66 kB
+_fresh/client/fresh-island__SidebarToggle.mjs        1.36 kB │ gzip:  0.68 kB
+_fresh/client/shared.mjs                             1.90 kB │ gzip:  1.01 kB
+_fresh/client/fresh-island__ThemeToggle.mjs          1.90 kB │ gzip:  0.75 kB
+_fresh/client/fresh-island__Toast.mjs                2.98 kB │ gzip:  1.16 kB
+_fresh/client/fresh-island__RecordTable.mjs          3.93 kB │ gzip:  1.57 kB
+_fresh/client/fresh-island__DesktopOnly.mjs          6.12 kB │ gzip:  2.61 kB
+_fresh/client/signals.module.mjs                     7.81 kB │ gzip:  3.04 kB
+_fresh/client/fresh-island__SettingsForm.mjs         8.23 kB │ gzip:  2.80 kB
+_fresh/client/router.mjs                            10.44 kB │ gzip:  3.68 kB
+_fresh/client/stats-grid.mjs                        12.28 kB │ gzip:  2.77 kB
+_fresh/client/hooks.module.mjs                      14.21 kB │ gzip:  5.85 kB
+_fresh/client/fresh-island__island_3.mjs            17.08 kB │ gzip:  5.71 kB
+_fresh/client/fresh-island__WorkspaceCommands.mjs   17.91 kB │ gzip:  6.03 kB
+_fresh/client/client-entry.mjs                      23.45 kB │ gzip:  9.04 kB
+_fresh/client/cn.mjs                                27.89 kB │ gzip:  8.80 kB
+✓ built in 5.91s
+vite v7.2.2 building ssr environment for production...
+transforming...
+Downloading https://jsr.io/@netscript/kv/meta.json
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2_meta.json
+Downloading https://jsr.io/@netscript/logger/meta.json
+Downloading https://jsr.io/@netscript/logger/0.0.9-canary.2_meta.json
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/cache/mod.ts
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/cache/cache-query.ts
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/cache/cache-telemetry.ts
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/cache/kv-cache-store.ts
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/ports/cache-entry.ts
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/ports/query-key.ts
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/cache/cache-provider.ts
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/cache/defaults.ts
+Downloading https://jsr.io/@netscript/sdk/0.0.9-canary.2/src/cache/cache-provider-marker.ts
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2/mod.ts
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2/application/mod.ts
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2/types/mod.ts
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2/adapters/deno-kv.adapter.ts
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2/adapters/memory.adapter.ts
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2/application/shared.ts
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2/application/auto-detect.ts
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2/application/lazy-kv.ts
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2/application/keys.ts
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2/types/watchable-kv.ts
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2/application/watch-handle.ts
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2/application/errors.ts
+Downloading https://jsr.io/@netscript/kv/0.0.9-canary.2/application/atomic-combine.ts
+Downloading https://jsr.io/@netscript/logger/0.0.9-canary.2/mod.ts
+Downloading https://jsr.io/@netscript/logger/0.0.9-canary.2/creators.ts
+Downloading https://jsr.io/@netscript/logger/0.0.9-canary.2/config.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/runtime/server/mod.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/runtime/server/define-fresh-app.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/runtime/server/query-cache-invalidation.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/runtime/server/stream.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/runtime/server/stream-error-boundary.tsx
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/runtime/server/fresh-app-telemetry.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/query/cache-invalidation/mod.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/mod.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/mod.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-partial.tsx
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/types.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/builder/mod.tsx
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/diagnostics/error/ErrorDisplay.tsx
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/diagnostics/error/handler.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/runtime/context.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/builder/route-support.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/schema-adapter/entry.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/validation/csrf.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/runtime/state.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/runtime/mod.tsx
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/builder/factory.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/builder/form-support.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/builder/validators.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/diagnostics/error/extract.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/schema-adapter/mod.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/validation/errors.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/field-descriptors/mod.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/runtime/idempotency.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/defer/DeferPage.tsx
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/cache-entries/cache-entry.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/runtime/handlers.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/builders/define-page/runtime/render.tsx
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/runtime/intent.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/runtime/reply.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/runtime/telemetry.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/validation/error-normalization.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/validation/pipeline.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/diagnostics/error/classify.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/schema-adapter/standard.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/schema-adapter/zod.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/field-descriptors/collection.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/field-descriptors/constraints.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/field-descriptors/descriptor.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/runtime/collection-keys.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/schema-adapter/zod-constraints.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/schema-adapter/zod-defaults.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/schema-adapter/zod-errors.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/field-descriptors/aria-data.ts
+Downloading https://jsr.io/@netscript/fresh/0.0.9-canary.2/src/application/form/schema-adapter/zod-internals.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/contracts/v1/mod.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/contracts/v1/workers.contract.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/domain/mod.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/contracts/v1/workers.contract-definition.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/contracts/v1/workers.contract-schemas.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/domain/constants.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/domain/cron.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/domain/job-result.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/domain/job-handler.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/domain/job-definition.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/domain/job-spec.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/domain/permissions.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/domain/public-schema.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/domain/task.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/domain/workflow.ts
+Downloading https://jsr.io/@netscript/plugin-workers-core/0.0.9-canary.2/src/domain/job-retry-policy.ts
+Downloading https://jsr.io/@netscript/plugin/0.0.9-canary.2/src/contract-base/mod.ts
+Downloading https://jsr.io/@netscript/plugin/0.0.9-canary.2/src/contract-base/domain/base-errors.ts
+Downloading https://jsr.io/@netscript/plugin/0.0.9-canary.2/src/contract-base/domain/capabilities.ts
+Downloading https://jsr.io/@netscript/plugin/0.0.9-canary.2/src/contract-base/domain/base-contract.ts
+Downloading https://jsr.io/@netscript/plugin/0.0.9-canary.2/src/contract-base/domain/contract-mount.ts
+../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/regexes.js (74:0): A comment
+
+"/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+ * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+ * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+
+in "../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/util.js (400:0): A comment
+
+"// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+
+in "../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/mod.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/public/mod.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/builders/define-stream-schema.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/application/create-durable-stream.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/application/create-service-stream-producer.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/application/stream-url-resolver.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/diagnostics/inspect-stream-topic.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/domain/producer-contract-v1.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/application/administer-durable-stream.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/domain/retention-contract-v1.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/adapters/durable-stream-producer-transport.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/adapters/system-stream-producer-clock.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/adapters/system-stream-producer-random.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/application/durable-stream-producer-supervisor.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/telemetry/instrumentation.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/domain/constants.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/adapters/durable-stream-admin.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/application/durable-stream-producer-queue.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/application/durable-stream-producer-support.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/telemetry/attributes.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/package-metadata.generated.ts
+Downloading https://jsr.io/@netscript/plugin-streams-core/0.0.9-canary.2/src/telemetry/producer-metrics.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/mod.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/adapters/otel/mod.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/application/registry/mod.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/instrumentation/worker.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/diagnostics/inspect-telemetry.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/ports/mod.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/adapters/otel/otel-deno.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/adapters/otel/otel-sdk.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/adapters/otel/select-provider.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/application/registry/instrumentation-registry.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/application/registry/provider-registration.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/ports/tracer-provider-port.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/ports/provider-options.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/ports/propagator-port.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/ports/meter-port.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/ports/span-link-port.ts
+Downloading https://jsr.io/@netscript/telemetry/0.0.9-canary.2/src/ports/telemetry-query-port.ts
+Initialize @durable-streams/state@0.3.2
+Initialize @durable-streams/client@0.2.7
+Initialize @microsoft/fetch-event-source@2.0.1
+✓ 775 modules transformed.
+rendering chunks...
+_fresh/server/.vite/manifest.json                         4.40 kB
+_fresh/server/scaffold-records.mjs                        0.52 kB
+_fresh/server/_fresh-route___examples_orders_id_.mjs      0.97 kB
+_fresh/server/_fresh-route___settings.mjs                 1.06 kB
+_fresh/server/_fresh-route___index.mjs                    1.15 kB
+_fresh/server/progress.mjs                                1.16 kB
+_fresh/server/_fresh-route___dashboard.mjs                1.19 kB
+_fresh/server/_fresh-route___examples_index.mjs           2.92 kB
+_fresh/server/_fresh-route___sign_in.mjs                  3.68 kB
+_fresh/server/_fresh-route___records_id_.mjs              5.27 kB
+_fresh/server/_fresh-route___records_index.mjs            6.09 kB
+_fresh/server/_fresh-route___examples_crud.mjs            8.58 kB
+_fresh/server/_fresh-route___health.mjs                   9.34 kB
+_fresh/server/scaffold-overview.mjs                      21.05 kB
+_fresh/server/mod.mjs                                   135.56 kB
+_fresh/server/scaffold-capabilities.mjs                 142.51 kB
+_fresh/server/server-entry.mjs                        1,117.34 kB
+✓ built in 9.07s

@@ -63,7 +63,7 @@ export async function readScaffoldCapabilities(request?: Request, records?: Scaf
       if (!resource && id !== 'ai') return { id, label: labels[id], state: 'installed-unwired', description: 'Installed, but its runtime resource is not configured.', command: 'netscript plugin doctor' };
       if (id === 'streams' && !service?.[1].PluginReferences?.includes(identity.name)) return { id, label: labels[id], state: 'installed-unwired', description: 'Record activity is not linked from the record service to this stream resource.', command: 'netscript plugin doctor' };
       if (mode === 'configuration') return { id, label: labels[id], state: 'configured', description: 'Configured for this application. Open Overview or System health to check availability.' };
-      return { id, label: labels[id], ...await probeScaffoldPlugin(id, identity.name, request) };
+      return { id, label: labels[id], ...await probeScaffoldPlugin(id, identity.name, request, root) };
     }));
     return [...capabilities, ...plugins];
   } catch (error) {

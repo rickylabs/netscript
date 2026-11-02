@@ -13,3 +13,19 @@
 ## Intake and reconciliation
 
 Issue and branch checked against baseline main; no pre-existing PR. Routing queried before implementation. RTK absent. Source changes have not started. Explicit operator Refs-only instruction takes priority over generic dispatcher closing-keyword boilerplate; coordinator controls issue acceptance and merge. Owner delegates evaluator and sign-off to Cockpit; self-review is explicitly not independent certification.
+
+## Locked owner boundary (before source slice)
+
+The offending new edge is `scaffold-plugin-capabilities.ts` → Vite `import.meta.glob` of the app-owned `ai/ai.ts` → `@netscript/ai/anthropic` → provider adapter inline npm imports. The plain client build succeeds; the observed failure is SSR traversal, so the issue's initial client-graph hypothesis is corrected. Preserve the runtime readiness call through a computed file URL loaded natively by Deno with Vite's documented ignore directive. The caller already discovers the workspace root; pass it explicitly so bundled output paths never determine provider paths. No aliases, package externals, public exports, or Fresh UI changes.
+
+Pre-publish contract: real Vite production build of the emitted loader must never traverse an app-owned provider module. A fixture provider imports the exact offending inline npm specifier and fails at that edge. Restore the old glob in an isolated negative control and require rejection. Execute emitted build output with native test modules to verify readiness and optional-module handling. Contributor entry is packages/cli/src/kernel/assets/app/README.md.
+
+## S1 implementation and gates
+
+Replaced both optional AI globs with a computed native Deno import under the explicitly passed workspace root. Existing model schema validation, handle resolution and sanitized capability states remain. Regenerated CLI embedded assets with `deno task gen:assets-barrel`; no Fresh UI or lock delta.
+
+Added `check:scaffold-provider-boundary` to the required CI quality lane via the gate receipt catalog. This is an actual Vite SSR build of the shipped loader, with a JSR-style inline npm poison edge; it also executes built output and verifies six capability states. The old runtime glob is a mandatory negative control. No app Vite aliases or externals changed.
+
+Local gates: structured check/lint/fmt cover all three owned TS files (0 findings); structured generated-app check covers both rendered capability files (0 findings); focused structured tests 21/21; provider gate PASS, standalone negative control exits 1 with the original npm specifier; quality:gate exits 0 (existing warnings only). Published canary build with the two template changes exits 0, SSR module count 1076→776 and no AI runtime/model chunks. Earlier warmed baseline also exits 0: original cold CI failure remains canonical before evidence, and controlled old-glob reproduction is cache-independent. Asset freshness checks compare to committed HEAD, so run again after committing canonical output. Cockpit IMPL-EVAL and e2e-cli CI remain required; this is not self-certification.
+
+Reconcile: all source changes are within the declared surface, plus the tooling-only gate catalog entry required by durable CI receipts. Baseline remains main's canary2 source; no unrelated work integrated.
