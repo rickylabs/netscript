@@ -25,3 +25,36 @@ Baseline clean; assignment file ignored. Prior memory and issue history read. Ro
 from the matrix JSON. Local clean setup demonstrates missing service edge; DB runtime commands
 are unproven because Docker is unavailable. See research.md and memory-masked-runtime.md.
 Reconcile: no implementation yet. Specific operator Refs/draft/no-merge policy controls delivery.
+
+## S1 evidence in progress
+
+- 108 focused install, reference reconciliation and worker runtime tests pass on Deno 2.9.7.
+- Scoped check passes on 173 files. Scoped lint passes with 27/27 coverage. The format gate
+  selected two unchanged legacy test files; narrow final formatting to owned source files.
+- Actual stream reinstall with --service orders persists orders->streams; subsequent reinstall
+  without the flag preserves it. No hardcoded stream-name branch was added to the CLI host.
+- quality:gate passes with existing warnings. Independent review launched through the agentic
+  Claude print tool. Matrix primary muse_spark_1_3 launch failed before inference with
+  launcher-catalog-unavailable; declared fallback opus_5 requested at xhigh, observed claude-opus-5.
+- Owned reproduction AppHost stopped through maint:teardown. Foreign/unknown AppHosts and
+  processes were reported and left untouched. Docker remains unavailable; no runtime pass claimed.
+
+## S1 independent repair
+
+The independent Opus review returned FAIL_FIX. Repaired late optional sample failure isolation,
+startup readiness versus observer lifetime, bounded shutdown, symlink normalization, directory
+rearming and explicit service reselection. Preserve manual appsettings links by retaining the
+earlier installed service consumer set during planning. Tests now total 112 passing results.
+The walkthrough adds restore and states that its noninteractive start detaches. Same evaluator
+re-steered; S2 runtime proof remains unproven. No accepted product debt.
+
+## S1 terminal
+
+Independent same-session Opus repair review: PASS, all prior findings closed. See s1-review.md.
+112 focused test/step results pass, changed-source wrappers pass, broader quality and doctrine pass.
+The reviewer independently reran the focused tests and quality scans. Final runtime is not certified.
+The review's lint/fmt caveat concerns raw root config; our scoped invocations explicitly use an
+ignored config containing root rules without root selection exclusions. CLI coverage is verified
+with that config; do not cite raw root fmt/lint as CLI evidence. The reviewed cosmetic constant
+placement was corrected. No product behavior changed after the review.
+Reconcile: S1 matches the declared surface. Next slice is the pristine documented runtime gate.
