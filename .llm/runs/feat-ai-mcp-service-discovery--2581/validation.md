@@ -16,7 +16,8 @@ Source commit:f4b03a9. Derived documentation commit:623d911.
 | Four carrier freshness gates | PASS | Export corpus, agent prose, asset barrel, publish assets |
 | Review-thread gate | PASS | PR2590,0 threads/0 unanswered |
 | Independent IMPL-EVAL | PASS | Opus5 independently reproduced86 tests and checked source/carriers |
-| Core CI/full scaffold runtime | Pending | Required on final head before readiness handoff |
+| Aspire manifest parity | PASS after CI correction | Regenerated one newly Aspire-aware docs page;1025 checked,0 failures |
+| Core CI/full scaffold runtime | Pending at corrected head | Initial core quality caught missing manifest row; fresh exact-head proof required |
 
 The HTTP MCP fixture binds127.0.0.1 port0 and uses the real AI transport through emitted config.
 It proves tools/list, tools/call, auth header, explicit path and discovery origin. Additional controls

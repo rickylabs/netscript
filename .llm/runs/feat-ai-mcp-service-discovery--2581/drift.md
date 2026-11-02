@@ -10,3 +10,5 @@ GitHub connector search did not honor is:pr filtering; native gh PR listing veri
 - The generated consumer typecheck exposed an existing literal-tuple comparison error after adding any MCP server: length1 === 0 is TS2367. Preserve the empty-registry short circuit using a falsy length check, with the installed-consumer check proving the populated registry.
 - The top-level public AI forwarding command fetches the released plugin by design. The installed-consumer fixture invokes this checkout's real plugin CLI adapter after the real install; published forwarding proof belongs to the post-publish canary.
 - Full plugin export doc lint has16 findings (15 private type references and one scaffold finding), identical to the merged baseline. No new doc-lint findings; publication dry-run passes.
+
+- Core CI at4eaa123 caught stale Aspire surface-manifest freshness: the expanded AI plugin reference page now mentions Aspire and needs its normal doc:public-page/S11 row. Regenerated the maintained manifest with the repository tool; exactly one row added, no version/policy change or exclusion. Parity now checks1025 paths with0 failures.
