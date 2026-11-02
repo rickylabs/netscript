@@ -103,7 +103,8 @@ export const define = createDefine();`,
           `${prefix}database.ts`,
           `import { createSampleRecords } from './sample-records.ts';
 import type { listQuery } from './domain/user.ts';
-const user = { ...createSampleRecords()[0], id: 1 };
+const sample = createSampleRecords()[0];
+const user = { ...sample, id: 1, createdAt: new Date(sample.createdAt), updatedAt: new Date(sample.updatedAt) };
 const client = { user: {
   findMany: (_query: ReturnType<typeof listQuery>) => Promise.resolve([user]),
   count: (_query: { where: { status?: string } }) => Promise.resolve(1),
@@ -118,7 +119,8 @@ export const db = { getClient: () => Promise.resolve(client) };`,
         await write(
           `${prefix}schemas.ts`,
           `import { z } from 'zod';
-export const UserSchema = z.object({ id: z.number(), name: z.string() });
+// Match the generated Prisma model's timestamps, including committed activity time.
+export const UserSchema = z.object({ id: z.number(), name: z.string(), createdAt: z.date(), updatedAt: z.date() });
 export const UserCreateInput = z.object({ name: z.string() });
 export const UserUpdateInput = UserCreateInput.partial();`,
         );

@@ -86,6 +86,8 @@ export const TEMPLATE_KEYS = {
   databaseScriptsGenerateZod: 'database/scripts/generate-zod.ts.template',
   databaseScriptsMigrate: 'database/scripts/migrate.ts.template',
   databaseScriptsPatchPrismaClient: 'database/scripts/patch-prisma-client.ts.template',
+  serviceRecordActivity: 'service/domain/record-activity.ts.template',
+  serviceRecordActivityAdapter: 'service/adapters/record-activity.ts.template',
   serviceSampleRecords: 'service/sample-records.ts.template',
   databaseSeed: 'database/seed.ts.template',
   databaseZodGeneratorConfig: 'database/zod-generator.config.json.template',

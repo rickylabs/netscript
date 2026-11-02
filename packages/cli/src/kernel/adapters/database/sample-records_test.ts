@@ -19,14 +19,14 @@ const anchor = new Date('2026-11-01T15:00:00Z');
 
 Deno.test('shared sample has forty deterministic rich rows across sixty UTC days', () => {
   const rows = createSampleRecords(anchor);
-  assertEquals(rows, createSampleRecords(new Date('2026-11-01T01:00:00Z')));
+  assertEquals(rows, createSampleRecords(new Date(anchor)));
   assertEquals(rows.length, 40);
   assertEquals(new Set(rows.map((row: { reference: string }) => row.reference)).size, 40);
   assertEquals(new Set(rows.map((row: { status: string }) => row.status)).size, 6);
   assertEquals(new Set(rows.map((row: { ownerEmail: string }) => row.ownerEmail)).size, 5);
   assertEquals(rows[0].reference, 'REC-10482');
   assertEquals(rows[0].name, 'Seed Shipment');
-  assertEquals(rows[0].createdAt, '2026-11-01T20:37:00.000Z');
+  assertEquals(rows[0].createdAt, '2026-11-01T15:00:00.000Z');
   assertEquals(rows[39].createdAt, '2026-09-03T15:58:00.000Z');
   const counts = new Map<string, number>();
   for (const row of rows) {
@@ -57,7 +57,7 @@ Deno.test('emitted seed upserts every reference, preserves edits on rerun and di
     export const rows = new Map<string, {reference: string; name: string}>();
     export let disconnects = 0;
     export let fail = false;
-    export function setFail() { fail = true; }
+    export function setFail(value = true) { fail = value; }
     export const db = {
       getClient: async () => ({ shipment: { upsert: async ({where, create, update}: {where: {reference: string}; create: {reference: string; name: string}; update: object}) => {
         if (fail) throw new Error('database failure');
@@ -70,22 +70,71 @@ Deno.test('emitted seed upserts every reference, preserves edits on rerun and di
   const source = generateDatabaseSeed({ modelName: 'Shipment' }).replace(
     "'../mod.ts'",
     JSON.stringify(databaseUrl),
-  ).replace('if (import.meta.main) {', 'export async function runSeed() {');
-  const { runSeed } = await import(moduleUrl(source));
-  await runSeed();
-  assertEquals(database.rows.size, 40);
-  // Fresh auto-increment IDs preserve chronology, so the default descending CRUD page is recent.
-  const inserted = [...database.rows.values()];
-  assertEquals(inserted[0].reference, 'REC-10443');
-  assertEquals(inserted.at(-1).reference, 'REC-10482');
-  database.rows.get('REC-10482').name = 'Owner edited this';
-  await runSeed();
-  assertEquals(database.rows.size, 40);
-  assertEquals(database.rows.get('REC-10482').name, 'Owner edited this');
-  assertEquals(database.disconnects, 2);
-  database.setFail();
-  await assertRejects(runSeed, Error, 'database failure');
-  assertEquals(database.disconnects, 3);
+  ).replace("'@std/path'", JSON.stringify(import.meta.resolve('@std/path')))
+    .replace('if (import.meta.main) {', 'export async function runSeed() {');
+  const fixture = await Deno.makeTempDir();
+  const marker = new URL(`file://${fixture}/.netscript/sample-seed.json`);
+  // Keep the actual emitted location: the handoff must resolve at the workspace root.
+  const emitted = new URL(`file://${fixture}/database/sqlite/scripts/seed.ts`);
+  await Deno.mkdir(new URL('./', emitted), { recursive: true });
+  await Deno.writeTextFile(emitted, source);
+  const { runSeed } = await import(emitted.href);
+  try {
+    database.setFail();
+    await assertRejects(runSeed, Error, 'database failure');
+    await assertRejects(() => Deno.readTextFile(marker), Deno.errors.NotFound);
+    database.setFail(false);
+    // An interrupted private candidate is not a published request.
+    await Deno.mkdir(new URL('./', marker), { recursive: true });
+    await Deno.writeTextFile(new URL('sample-seed.interrupted.tmp', marker), '{');
+    const observed: string[] = [];
+    let seeding = true;
+    const reader = (async () => {
+      while (seeding) {
+        try {
+          const request = JSON.parse(await Deno.readTextFile(marker));
+          assertEquals(request.version, 1);
+          observed.push(request.seedId);
+        } catch (error) {
+          if (!(error instanceof Deno.errors.NotFound)) throw error;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1));
+      }
+    })();
+    try {
+      await Promise.all(Array.from({ length: 8 }, () => runSeed()));
+    } finally {
+      seeding = false;
+      await reader;
+    }
+    assertEquals(database.rows.size, 40);
+    const seedRequest = await Deno.readTextFile(marker);
+    assertEquals(JSON.parse(seedRequest).version, 1);
+    assert(observed.every((id) => id === JSON.parse(seedRequest).seedId));
+    // Fresh auto-increment IDs preserve chronology, so the default descending CRUD page is recent.
+    const inserted = [...database.rows.values()];
+    assertEquals(inserted[0].reference, 'REC-10443');
+    assertEquals(inserted.at(-1).reference, 'REC-10482');
+    database.rows.get('REC-10482').name = 'Owner edited this';
+    await runSeed();
+    assertEquals(database.rows.size, 40);
+    assertEquals(database.rows.get('REC-10482').name, 'Owner edited this');
+    assertEquals(database.disconnects, 10);
+    await Promise.all(Array.from({ length: 8 }, () => runSeed()));
+    assertEquals(await Deno.readTextFile(marker), seedRequest);
+    assertEquals(database.disconnects, 18);
+    database.setFail();
+    await assertRejects(runSeed, Error, 'database failure');
+    assertEquals(database.disconnects, 19);
+    assertEquals(await Deno.readTextFile(marker), seedRequest);
+    database.setFail(false);
+    await Deno.writeTextFile(marker, '{');
+    await assertRejects(runSeed, SyntaxError);
+    await Deno.writeTextFile(marker, JSON.stringify({ version: 1, seedId: 'corrupt' }));
+    await assertRejects(runSeed, Error, 'Invalid sample seed handoff');
+  } finally {
+    await Deno.remove(fixture, { recursive: true });
+  }
 });
 
 for (const engine of ['postgres', 'mysql', 'sqlite', 'mssql'] as const) {
@@ -122,6 +171,11 @@ for (const engine of ['postgres', 'mysql', 'sqlite', 'mssql'] as const) {
     assertEquals(ShipmentCreateInput.parse({ name: 'New record' }), { name: 'New record' });
     const seed = await fs.readFile(`/project/database/${engine}/scripts/seed.ts`);
     assert(seed.includes('client.shipment.upsert('));
+    const markerUrl = new URL(
+      '../../../.netscript/sample-seed.json',
+      `file:///project/database/${engine}/scripts/seed.ts`,
+    );
+    assertEquals(markerUrl.href, 'file:///project/.netscript/sample-seed.json');
     // Execute the real generated service contract with this engine's placeholder schema.
     const contractSource = renderTemplateAssetSync(TEMPLATE_KEYS.serviceContract, {
       serviceName: 'shipments',
@@ -273,4 +327,14 @@ Deno.test('memory search returns a matching total and page for lowercase referen
   assertEquals(owner.total, 8);
   assertEquals(owner.items.length, 3);
   assert(owner.items.every((row: { ownerName: string }) => row.ownerName === 'Maya Rossi'));
+});
+
+Deno.test('sample records never exceed the seed instant, including early UTC and midnight', () => {
+  for (const iso of ['2026-11-01T00:00:00Z', '2026-11-01T01:02:03Z', '2026-11-01T23:59:59Z']) {
+    const instant = new Date(iso);
+    for (const row of createSampleRecords(instant)) {
+      assert(Date.parse(row.createdAt) <= instant.getTime());
+      assertEquals(row.updatedAt, row.createdAt);
+    }
+  }
 });

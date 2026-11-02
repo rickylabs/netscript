@@ -113,6 +113,7 @@ Deno.test('streams storage fixture preserves ephemeral defaults and never precre
       join(root, 'appsettings.json'),
       JSON.stringify({
         NetScript: {
+          Services: { users: { PluginReferences: ['auth'] } },
           Plugins: {
             streams: {
               Entrypoint: 'services/main.ts',
@@ -125,6 +126,7 @@ Deno.test('streams storage fixture preserves ephemeral defaults and never precre
     );
     await prepareStreamsStorageFixture(root);
     const settings = JSON.parse(await Deno.readTextFile(join(root, 'appsettings.json')));
+    assertEquals(settings.NetScript.Services.users.PluginReferences, ['auth', 'streams']);
     assertEquals(settings.NetScript.Plugins.streams.DataDirectories, {
       STREAMS_DATA_DIR: '.netscript/data/streams',
     });

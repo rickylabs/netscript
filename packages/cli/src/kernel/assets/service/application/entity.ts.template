@@ -6,6 +6,8 @@ import type {
 } from '@{{projectName}}/contracts';
 import { type ListInput, listQuery, pagination } from '../domain/{{entityName}}.ts';
 
+import type { RecordActor, RecordActivityPublisher } from '../domain/record-activity.ts';
+
 export interface {{serviceName | pascalCase}}Repository {
   list(query: ReturnType<typeof listQuery>): Promise<{ data: Entity[]; total: number }>;
   getById(id: Entity['id']): Promise<Entity | null>;
@@ -14,15 +16,30 @@ export interface {{serviceName | pascalCase}}Repository {
   delete(id: Entity['id']): Promise<Entity | null>;
 }
 
-export function create{{serviceName | pascalCase}}Application(repository: {{serviceName | pascalCase}}Repository) {
+export function create{{serviceName | pascalCase}}Application(repository: {{serviceName | pascalCase}}Repository, activity?: RecordActivityPublisher) {
+  const publish = async (...args: Parameters<RecordActivityPublisher['record']>) => {
+    try {
+      await activity?.record(...args);
+    } catch (error) {
+      console.warn('Record activity delivery failed after a committed mutation.', error);
+    }
+  };
   return {
     async list(input: ListInput) {
       const { data, total } = await repository.list(listQuery(input));
       return { data, pagination: pagination(input, total) };
     },
     getById: (id: Entity['id']) => repository.getById(id),
-    create: (input: CreateInput) => repository.create(input),
-    update: (id: Entity['id'], input: UpdateInput) => repository.update(id, input),
+    async create(input: CreateInput, actor?: RecordActor) {
+      const record = await repository.create(input);
+      await publish('created', record, actor);
+      return record;
+    },
+    async update(id: Entity['id'], input: UpdateInput, actor?: RecordActor) {
+      const record = await repository.update(id, input);
+      if (record) await publish('updated', record, actor);
+      return record;
+    },
     delete: (id: Entity['id']) => repository.delete(id),
   };
 }

@@ -302,14 +302,16 @@ Deno.test('plugin projections read real result shapes and reject false stream re
       Promise.resolve(
         Response.json(
           String(input).includes('/health/ready') ? { ready: true } : [{
-            type: 'execution',
+            type: 'record-activity',
             key: 'real-event',
             headers: { operation: 'upsert' },
             value: {
-              jobId: 'job-one',
-              status: 'running',
-              progressMessage: 'Processing records',
-              triggeredAt: '2026-11-01T00:00:00Z',
+              id: 'real-event',
+              actor: { name: 'Maya Rossi', kind: 'authenticated' },
+              verb: 'created',
+              recordId: '42',
+              reference: 'REC-42',
+              timestamp: '2026-11-01T00:00:00Z',
             },
           }],
           { headers: { 'Stream-Next-Offset': 'opaque-1', 'Stream-Up-To-Date': 'true' } },
@@ -318,9 +320,11 @@ Deno.test('plugin projections read real result shapes and reject false stream re
     const streams = await module.probeScaffoldPlugin('streams', 'events');
     assertEquals(streams.state, 'ready');
     assertEquals(streams.items[0], {
-      label: 'job-one',
-      detail: 'Processing records',
-      state: 'running',
+      label: 'REC-42',
+      detail: 'Maya Rossi created REC-42',
+      actor: 'Maya Rossi',
+      verb: 'created',
+      recordId: '42',
       timestamp: '2026-11-01T00:00:00Z',
     });
     const offsets: string[] = [];
@@ -350,7 +354,7 @@ Deno.test('plugin projections read real result shapes and reject false stream re
       }
       return Promise.resolve(
         Response.json([{
-          type: 'execution',
+          type: 'record-activity',
           key: 'large',
           headers: { operation: 'upsert' },
           value: { progressMessage: 'x'.repeat(1024 * 1024) },
@@ -368,15 +372,22 @@ Deno.test('plugin projections read real result shapes and reject false stream re
       assertEquals(new URL(String(input)).searchParams.get('offset'), 'current-head');
       return Promise.resolve(
         Response.json([{
-          type: 'execution',
+          type: 'record-activity',
           key: 'new-event',
           headers: { operation: 'upsert' },
-          value: { jobId: 'new-job', status: 'completed' },
+          value: {
+            id: 'new-event',
+            actor: { name: 'Anonymous', kind: 'anonymous' },
+            verb: 'updated',
+            recordId: '42',
+            reference: 'REC-42',
+            timestamp: '2026-11-01T01:00:00Z',
+          },
         }], { headers: { 'Stream-Next-Offset': 'after-head', 'Stream-Up-To-Date': 'true' } }),
       );
     };
     const resumed = await module.probeScaffoldPlugin('streams', 'events');
-    assertEquals(resumed.items[0].label, 'new-job');
+    assertEquals(resumed.items[0].label, 'REC-42');
     assertEquals(resumed.items.length, 1);
     assertStringIncludes(resumed.description, 'skipped earlier history');
     for (const status of [400, 410]) {
@@ -390,10 +401,17 @@ Deno.test('plugin projections read real result shapes and reject false stream re
         return Promise.resolve(
           offset === '-1'
             ? Response.json([{
-              type: 'execution',
+              type: 'record-activity',
               key: 'after-reset',
               headers: { operation: 'upsert' },
-              value: { jobId: 'recovered-job' },
+              value: {
+                id: 'after-reset',
+                actor: { name: 'Anonymous', kind: 'anonymous' },
+                verb: 'created',
+                recordId: '43',
+                reference: 'REC-43',
+                timestamp: '2026-11-01T02:00:00Z',
+              },
             }], {
               headers: { 'Stream-Next-Offset': 'recovered-head', 'Stream-Up-To-Date': 'true' },
             })
@@ -405,7 +423,7 @@ Deno.test('plugin projections read real result shapes and reject false stream re
       assertEquals(resetOffsets[1], '-1');
       assertEquals(recovered.state, 'ready');
       assertEquals(recovered.items.length, 1);
-      assertEquals(recovered.items[0].label, 'recovered-job');
+      assertEquals(recovered.items[0].label, 'REC-43');
     }
     for (const status of [401, 403]) {
       let calls = 0;
@@ -469,5 +487,48 @@ Deno.test('settings and sign-in use configuration capabilities without loading r
     const source = renderTemplate(readTemplateAssetSync(key), variables);
     assertEquals(source.includes('loadScaffoldRecords'), false);
     assertStringIncludes(source, "readScaffoldCapabilities(ctx.req, undefined, 'configuration')");
+  }
+});
+
+Deno.test('record activity requires both app and selected service links to the same stream resource', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const app = `${root}/apps/portal`;
+    await Deno.mkdir(app, { recursive: true });
+    await Deno.mkdir(`${root}/streams`, { recursive: true });
+    await Deno.writeTextFile(
+      `${root}/streams/scaffold.plugin.json`,
+      JSON.stringify({
+        linking: {
+          canonicalName: 'streams',
+          resourceConfigKey: 'streams',
+          consumers: { apps: ['portal'] },
+        },
+      }),
+    );
+    const settings = {
+      NetScript: {
+        Services: { members: { PluginReferences: [] as string[] } },
+        Plugins: { streams: { Enabled: true } },
+        Apps: { portal: { PluginReferences: ['streams'] } },
+      },
+    };
+    const module = await capabilityFixture(root, app);
+    const read = async () => {
+      await Deno.writeTextFile(`${root}/appsettings.json`, JSON.stringify(settings));
+      return (await module.readScaffoldCapabilities())[3];
+    };
+    assertEquals((await read()).state, 'installed-unwired');
+    assertEquals(module.liveReads, 0, 'do not serve stale history when the producer is unlinked');
+    settings.NetScript.Services.members.PluginReferences = ['different-stream'];
+    assertEquals((await read()).state, 'installed-unwired');
+    settings.NetScript.Services.members.PluginReferences = ['streams'];
+    assertEquals((await read()).state, 'ready');
+    assertEquals(module.liveReads, 1);
+    settings.NetScript.Services.members.PluginReferences = [];
+    assertEquals((await read()).state, 'installed-unwired');
+    assertEquals(module.liveReads, 1, 'unlinking the producer suppresses cached stream history');
+  } finally {
+    await Deno.remove(root, { recursive: true });
   }
 });

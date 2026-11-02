@@ -16,6 +16,7 @@ export async function materializeServiceScaffoldSupport(pageRoot: string): Promi
     ['contracts/versions/v1/users.contract.ts', TEMPLATE_KEYS.serviceContractMemory],
     ['services/users/src/application/users.ts', TEMPLATE_KEYS.serviceApplicationEntityMemory],
     ['services/users/src/domain/users.ts', TEMPLATE_KEYS.serviceDomainEntityMemory],
+    ['services/users/src/domain/record-activity.ts', TEMPLATE_KEYS.serviceRecordActivity],
     ['services/users/src/adapters/sample-records.ts', TEMPLATE_KEYS.serviceSampleRecords],
     [
       'services/users/src/adapters/memory-users-repository.ts',

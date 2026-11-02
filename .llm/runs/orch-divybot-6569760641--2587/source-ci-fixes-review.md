@@ -1,0 +1,10 @@
+**PASS — source-slice follow-up.** I reviewed the supplied diff and current files and found no blocking correctness, security, lifecycle, regression, or scope issue.
+
+- **Documentation fixture:** [service-scaffold-support.ts](.llm/tools/docs/service-scaffold-support.ts) now materializes the canonical activity-port template required by the generated application. This repairs the dependency closure without substituting a weaker fixture contract.
+- **Generated database dependency:** [generate-db-deno-json.ts](packages/cli/src/kernel/templates/database/generate-db-deno-json.ts) explicitly declares the existing resolved `@std/path` dependency. The regression checks its emitted mapping for all four database engines, addressing reliance on the root import map.
+- **Runtime acceptance:** [prepare-streams-storage-fixture.ts](packages/cli/e2e/src/application/gates/scaffold/prepare-streams-storage-fixture.ts) preserves existing service references, adds the persistent streams resource without duplication, and retains the ephemeral control. [verify-live-db-endpoint.ts](packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts) adds a successful PATCH through the real service and checks the returned identity. The missing-row GET/PATCH/DELETE and OpenAPI assertions remain intact. The activity event comes from the application mutation path.
+- **Reference overflow:** The block link, ellipsis rules, and grid-cell `min-width: 0` constrain the long reference within its column. [RecordTable.tsx.template](packages/cli/src/kernel/assets/app/islands/RecordTable.tsx.template) retains the complete reference as link text and `title`; routing, selection, and CSV data are unchanged.
+
+No gate weakening is visible in this diff.
+
+The supplied receipt reports **28 passed, 0 failed, exit code 0**; the packet also reports successful compilation of **36 documentation fences**. I executed no shell commands or tests and did not independently observe the reported browser or worker-restart runs. This PASS covers the bounded source changes; separate visual approval and overall merge readiness remain outside this verdict.

@@ -305,11 +305,13 @@ Deno.test('weekly chart preserves the complete current window and identifies the
   }, { now });
   const weeks = scaffoldWeeklyCounts(overview.daily.slice(-30));
   assertEquals(weeks.length, 5);
-  assertEquals(weeks[0], { from: '2026-10-03', to: '2026-10-09', count: 1 });
-  assertEquals(weeks[4], { from: '2026-10-31', to: '2026-11-01', count: 1 });
+  assertEquals(weeks[0], { days: 7, from: '2026-10-03', to: '2026-10-09', count: 1 });
+  assertEquals(weeks[4], { days: 2, from: '2026-10-31', to: '2026-11-01', count: 1 });
   assertEquals(
     weeks.reduce((total: number, week: { count: number }) => total + week.count, 0),
     overview.totals.records.current,
   );
+  assertEquals(scaffoldWeeklyCounts(overview.daily.slice(-28)).at(-1).days, 7);
+  assertEquals(scaffoldWeeklyCounts(overview.daily.slice(-29)).at(-1).days, 1);
   assertEquals(scaffoldWeeklyCounts([]), []);
 });

@@ -13,7 +13,7 @@ import {
   PLUGIN,
   REPORT_FORMAT,
 } from '../../src/domain/extension-axes.ts';
-import type { RunOptions } from '../../src/domain/run-context.ts';
+import type { RunContext, RunOptions } from '../../src/domain/run-context.ts';
 import type { DeferredGate } from '../../src/domain/suite-definition.ts';
 import { runtimeResources } from '../../src/application/gates/scaffold/runtime-gates.ts';
 import { builtInSuites, resolveSuite } from '../../src/presentation/cli/suites/registry.ts';
@@ -569,6 +569,24 @@ Deno.test('runtime database overrides preserve service health and the Postgres g
       ])).has(gate)
     ),
   );
+});
+
+Deno.test('both runtime tiers commit record activity before requiring Overview readiness', () => {
+  for (const id of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    const gates = resolveSuite(id).gates;
+    const mutation = gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_RECORD_ACTIVITY);
+    const home = gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_HOME);
+    assertEquals(mutation >= 0 && mutation < home, true, `${id} must populate real activity`);
+    const gate = gates[mutation];
+    if (gate.kind !== 'command') throw new Error('Expected a record mutation command');
+    const command = gate.command({
+      project: { repoRoot: '/repo', appHost: '/project/aspire/apphost.mts' },
+    } as RunContext);
+    assertEquals(command.slice(-2), [
+      '/repo/packages/cli/e2e/src/application/gates/scaffold/verify-record-activity.ts',
+      '/project/aspire/apphost.mts',
+    ]);
+  }
 });
 
 Deno.test('sqlite runtime suite keeps explicit database overrides above suite defaults', () => {

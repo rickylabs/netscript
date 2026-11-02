@@ -31,7 +31,7 @@ export default function RecordTable({ records, locale, compact = false }: { read
         </tr></thead>
         <tbody>{records.rows.map((row) => <tr data-part='row' key={row.id} style={{ gridTemplateColumns: COLUMNS }} aria-selected={!compact ? selected.includes(row.id) : undefined}>
           <td>{!compact && <input type='checkbox' aria-label={`Select ${row.reference}`} checked={selected.includes(row.id)} onChange={() => setSelected(selected.includes(row.id) ? selected.filter((id) => id !== row.id) : [...selected, row.id])} />}</td>
-          <td><a class='workspace-record-link' href={appRoutes.record.href({ path: { id: row.id } })}>{row.reference}</a><span class='workspace-record-description'>{row.name}</span></td>
+          <td><a class='workspace-record-link' title={row.reference} href={appRoutes.record.href({ path: { id: row.id } })}>{row.reference}</a><span class='workspace-record-description'>{row.name}</span></td>
           <td class='workspace-owner'><span class='workspace-avatar' aria-hidden='true'>{scaffoldInitials(row.ownerName)}</span><span><strong>{row.ownerName}</strong><span class='workspace-record-description'>{row.ownerEmail}</span></span></td>
           <td><Badge variant={scaffoldStatuses[row.status].badgeVariant}>{scaffoldStatuses[row.status].label}</Badge></td>
           <td class='workspace-money'>{scaffoldAmount(row.amount, row.currency, locale)}</td>

@@ -13,13 +13,20 @@ const aiModels = import.meta.glob<AiModels>('../../../ai/models.ts');
 const aiRuntimes = import.meta.glob<AiRuntime>('../../../ai/ai.ts');
 const readinessSchema = z.object({ ready: z.literal(true) });
 // App-owned public activity topic. Protected topics stay denied: never use a service secret here.
-const ACTIVITY_STREAM_PATH = '/workers/executions';
+const ACTIVITY_STREAM_PATH = '/scaffold/{{serviceName}}/records';
 const MAX_ACTIVITY_BYTES = 1024 * 1024;
 const MAX_ACTIVITY_BATCHES = 3;
 const MAX_ACTIVITY_SOURCES = 16;
 const MAX_DISPLAY_JOBS = 5;
 const MAX_RECENT_EXECUTIONS = 50;
-const activitySchema = z.array(z.object({ type: z.string(), key: z.union([z.string(), z.number()]), headers: z.object({ operation: z.enum(['upsert', 'delete']) }), value: z.object({ name: z.string().optional(), jobId: z.string().optional(), reference: z.string().optional(), status: z.string().optional(), progressMessage: z.string().nullish(), completedAt: z.string().nullish(), startedAt: z.string().nullish(), triggeredAt: z.string().optional() }).optional() }));
+const activitySchema = z.array(z.object({
+  type: z.literal('record-activity'), key: z.string(),
+  headers: z.object({ operation: z.literal('upsert') }),
+  value: z.object({
+    id: z.string(), actor: z.object({ name: z.string(), kind: z.enum(['authenticated', 'anonymous']) }),
+    verb: z.enum(['created', 'updated']), recordId: z.string(), reference: z.string(), timestamp: z.iso.datetime(),
+  }),
+}));
 type ActivityItems = NonNullable<ScaffoldCapability['items']>;
 type ActivitySnapshot = { offset: string; items: ActivityItems; skippedHistory: boolean; pending?: Promise<Projection> };
 const activitySnapshots = new Map<string, ActivitySnapshot>();
@@ -35,7 +42,10 @@ async function activityItems(response: Response): Promise<ActivityItems> {
   finally { await reader.cancel(); reader.releaseLock(); }
   if (!text.trim()) return [];
   const events = activitySchema.parse(JSON.parse(text));
-  return events.slice(-5).reverse().map((event) => ({ label: event.value?.name ?? event.value?.jobId ?? event.value?.reference ?? String(event.key), detail: event.headers.operation === 'delete' ? 'Removed from stream' : event.value?.progressMessage ?? event.value?.status?.replaceAll('_', ' ') ?? event.type, state: event.headers.operation === 'delete' ? 'deleted' : event.value?.status, timestamp: event.value?.completedAt ?? event.value?.startedAt ?? event.value?.triggeredAt }));
+  return events.slice(-5).reverse().map(({ value }) => ({
+    label: value.reference, detail: `${value.actor.name} ${value.verb} ${value.reference}`,
+    actor: value.actor.name, verb: value.verb, recordId: value.recordId, timestamp: value.timestamp,
+  }));
 }
 
 /** Opaque cursors are committed only after a complete batch; bounded catch-up continues next read. */
@@ -47,7 +57,7 @@ async function readActivity(url: string, snapshot: ActivitySnapshot, signal: Abo
     const response = await fetch(target, { signal, redirect: 'error' });
     if (response.status === 404) {
       await response.body?.cancel(); snapshot.offset = '-1'; snapshot.items = []; snapshot.skippedHistory = false;
-      return { state: 'empty', description: 'No activity has reached the connected workers topic yet.' };
+      return { state: 'empty', description: 'No activity has reached the connected record topic yet.' };
     }
     // Durable Streams catch-up: 400 invalid offset, 410 expired history. Retry from start once.
     if ((response.status === 400 || response.status === 410) && snapshot.offset !== '-1' && !resetAttempted) {
@@ -77,7 +87,7 @@ async function readActivity(url: string, snapshot: ActivitySnapshot, signal: Abo
     snapshot.items = [...items, ...snapshot.items].slice(0, 5);
     if (caughtUp) return {
       state: snapshot.items.length ? 'ready' : 'empty', items: snapshot.items,
-      description: snapshot.skippedHistory ? 'Events observed since the preview skipped earlier history.' : 'Latest events from the workers execution stream.',
+      description: snapshot.skippedHistory ? 'Events observed since the preview skipped earlier history.' : 'Latest events from the record activity stream.',
     };
   }
   return { state: snapshot.items.length ? 'ready' : 'empty', items: snapshot.items, description: 'Catching up with stream history. Refresh to continue; these are the latest events read so far.' };

@@ -2,7 +2,9 @@
   "prisma": [
     "deno.json",
     "src/adapters/prisma-team-member-repository.ts",
+    "src/adapters/record-activity.ts",
     "src/application/team-member.ts",
+    "src/domain/record-activity.ts",
     "src/domain/team-member.ts",
     "src/domain/team-member_test.ts",
     "src/main.ts",
@@ -13,9 +15,11 @@
   "memory": [
     "deno.json",
     "src/adapters/memory-team-members-repository.ts",
+    "src/adapters/record-activity.ts",
     "src/adapters/sample-records.ts",
     "src/application/team-members.ts",
     "src/application/team-members_test.ts",
+    "src/domain/record-activity.ts",
     "src/domain/team-members.ts",
     "src/main.ts",
     "src/router.ts",
