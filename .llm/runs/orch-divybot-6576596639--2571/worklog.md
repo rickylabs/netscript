@@ -134,3 +134,8 @@ local scope and remaining gates. No final leaf IMPL-EVAL or merge claim.
 Reconcile: source merge retains the AI lane history through its initial delivery,
 with the scoped c0643b9 repair patch applied. Main advanced to59e6202; normal
 integration follows in S3. No rebasing or force push.
+
+S3 history reconcile: retained the scoped c0643b9 assistant repair commit as a
+normal merge parent. Its reviewed product diff was already applied in S2; this
+merge introduces no product changes and preserves the independently produced
+implementation history. Parent-only recursive evidence-directory repair stays.
