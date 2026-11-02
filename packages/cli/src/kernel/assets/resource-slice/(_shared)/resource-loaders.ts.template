@@ -3,7 +3,7 @@ import { dehydrateQueryClient } from '@netscript/fresh/query';
 import { createNetScriptQueryClient } from '@netscript/sdk/query-client';
 import { {{queryFactoryName}} } from '{{clientModuleSpecifier}}';
 
-export const {{resourceCamelCase}}Input = {};
+export const {{resourceCamelCase}}Input = {{procedureInput}};
 
 export async function load{{resourcePascalCase}}Resource() {
   const queryClient = createNetScriptQueryClient();

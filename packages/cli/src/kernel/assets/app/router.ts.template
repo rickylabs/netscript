@@ -24,6 +24,10 @@ export const routes = {
 export const appRoutes = {
   home: routes.$route,
   dashboard: routes.dashboard.$route,
+  records: routes.records.$route,
+  record: routes.records.$id.$route,
+  settings: routes.settings.$route,
+  signIn: routes.signIn.$route,
   health: routes.health.$route,
   examples: routes.examples.$route,
   {{serviceResourceRouteAlias}}serviceExample: {{serviceExampleRouteReference}},

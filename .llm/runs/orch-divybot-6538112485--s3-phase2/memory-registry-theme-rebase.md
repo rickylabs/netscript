@@ -1,0 +1,3 @@
+# Registry rebase after generated theme additions
+
+When main adds token presets, keep generated theme names from TOKEN_PRESETS alongside explicit POST_V1_COMPONENTS and POST_V1_SUPPORT in the frozen legacy compatibility guard. Preserve the independent generatedThemes and PREVIEW_TOKEN_FILES equality tests. The native registry schema test compares validated items structurally to authored items, and design-sync compares full sorted manifest names, so neither needs count edits per component. Regenerate derived registry/CLI/prose assets after resolving authoring conflicts. Never accept an old generated carrier in lieu of regeneration.

@@ -27,6 +27,8 @@ import type { InstallPluginInput } from '../../../../public/features/plugins/ins
 import type { JsrPluginValidatorPort } from '../../../../public/features/plugins/install/jsr-plugin-validator-port.ts';
 import type { JsrPackageFileFetcher } from '../../../../public/infra/jsr/verify-jsr-package-integrity.ts';
 import {
+  compileInstalledPluginRegistries,
+  createDryRunInstallResult,
   createPluginOwnedPluginResult,
   persistPluginMetadata,
   resolvePluginConfigDirectory,
@@ -61,6 +63,9 @@ const PLUGIN_LOCAL_BASE = '../..';
 
 /** Dependencies used by the local contributor plugin-install flow. */
 export interface InstallLocalPluginDependencies {
+  /** Manifest-driven registry producer shared with the public install flow. */
+  readonly generateRegistries?:
+    import('../../../../public/features/generate/plugins/generate-installed-plugin-registries.ts').GenerateInstalledPluginRegistries;
   /** Filesystem used for validation and workspace mutation. */
   readonly fs: FileSystemPort;
   /** Scaffold writer used by starter and DB flows. */
@@ -118,11 +123,16 @@ export async function installLocalPlugin(
     : { ...descriptorRequest, kind: resolvedPlugin.planningKind };
   const plan = await planPluginInstall(planningRequest, {
     fs: dependencies.fs,
+    appConsumers: resolvedPlugin?.descriptor.manifest.linking?.consumers.apps,
+    serviceConsumers: resolvedPlugin?.descriptor.manifest.linking?.consumers.services,
     registry,
   });
   const pluginOwned = resolvedPlugin === undefined || dependencies.processRunner === undefined
     ? undefined
     : await runPluginOwnedScaffold(plan, resolvedPlugin, descriptorRequest, dependencies);
+  if (request.dryRun === true && pluginOwned !== undefined && resolvedPlugin !== undefined) {
+    return createDryRunInstallResult(plan, resolvedPlugin.descriptor, pluginOwned);
+  }
   const pluginConfigDirectory = pluginOwned === undefined
     ? undefined
     : await resolvePluginConfigDirectory(plan, dependencies.fs);
@@ -227,9 +237,17 @@ export async function installLocalPlugin(
   );
 
   if (pluginOwned !== undefined && resolvedPlugin !== undefined) {
-    await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
+    await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs, {
+      plugin: rendered.plugin,
+    });
   }
-  await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
+  if (request.dryRun !== true) {
+    await compileInstalledPluginRegistries(plan.projectRoot, resolvedPlugin, dependencies);
+  }
+  await reconcilePluginReferences(plan.projectRoot, dependencies.fs, {
+    [rendered.plugin.serviceConfigKey ?? rendered.plugin.configKey]:
+      plan.previousServiceConsumers ?? [],
+  });
   const { written: browserAuthFiles, report: browserAuthReport } = await reconcileBrowserAuth(
     plan.projectRoot,
     dependencies.fs,

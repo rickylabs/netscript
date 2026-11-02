@@ -106,7 +106,7 @@
           </nav>
         </div>
         {{ if !content.includes('<nav class="ns-nextprev"') }}{{ comp.nextPrev({ prev, next, url }) }}{{ /if }}
-        {{ set editSourcePath = page.sourcePath }}
+        {{ set editSourcePath = edit_source || page.sourcePath }}
         {{ if kind !== "home" && editSourcePath && editSourcePath !== "(generated)" && !editSourcePath.startsWith("/reference/") }}
           <div class="docs-edit"><a href="{{ 'https://github.com/rickylabs/netscript/edit/main/docs/site' + editSourcePath }}">Edit this page ↗</a></div>
         {{ /if }}

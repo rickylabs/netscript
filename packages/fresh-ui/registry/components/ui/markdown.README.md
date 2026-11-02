@@ -98,3 +98,20 @@ only enough to keep citation chips, KaTeX MathML, and highlight.js class output 
 Designed to drop straight into a streaming assistant message: feed each mid-stream chunk to
 `<Markdown streaming>{chunk}</Markdown>` and citations wire to the `citation-chip` item with no
 app-side glue beyond the `ui:add` copy.
+
+## Prose styling and native HTML
+
+The `.ns-markdown` stylesheet is also the native prose surface for docs. It binds the existing
+Studio prose aliases for body, lede, heading and code sizes and measure, with shared type-role
+fallbacks. The completed Figma ledger's Theme-set prose twins correspond to these runtime roles;
+no new token values are introduced. Lede uses the prose measure. Native unordered lists have small
+square markers; ordered numerals use muted mono. Inline code uses a surface chip, while fenced code
+uses the existing code background and syntax roles.
+
+Pass `class='ns-lede'` to Markdown to style its first paragraph as lede. For host-authored native
+HTML, put `class='ns-markdown'` on a container and `class='ns-lede'` on an introductory paragraph.
+Native `kbd` elements receive the same keycap treatment as Kbd. Heading links with
+`class='ns-heading-anchor'` appear on hover and keyboard focus; their host must supply an ID,
+destination and accessible name. The Markdown renderer does not generate heading anchors, accept
+level/element/state/anchor props, or allow raw HTML. Those Figma axes describe native elements and
+CSS interactions. Sanitization remains mandatory and unchanged.

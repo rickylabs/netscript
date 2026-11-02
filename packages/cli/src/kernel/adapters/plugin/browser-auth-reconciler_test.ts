@@ -186,11 +186,12 @@ Deno.test('auth install and subsequent service add emit the BFF topology before 
     assertStringIncludes(await fs.readFile(billingPath), 'authenticator: browserAuthenticator');
     const config = JSON.parse(await fs.readFile(join(root, 'appsettings.json')));
     assertEquals(config.NetScript.Services.billing.PluginReferences, ['auth']);
+    assertEquals(config.NetScript.Apps.web.PluginReferences, ['auth']);
     assert(await fs.exists(join(root, 'apps/web/routes/auth/[action].ts')));
-    assertStringIncludes(
-      await fs.readFile(join(root, 'aspire/.helpers/register-apps.mts')),
-      'services__auth__http__0',
-    );
+    const appsHelper = await fs.readFile(join(root, 'aspire/.helpers/register-apps.mts'));
+    assertStringIncludes(appsHelper, "config.Apps['web']?.PluginReferences ?? []");
+    assertStringIncludes(appsHelper, "getResourceEndpoint(_plugins.get(ref), 'http')");
+    assertStringIncludes(appsHelper, 'services__${ref}__http__0');
     assertStringIncludes(
       await fs.readFile(join(root, 'aspire/.helpers/register-services.mts')),
       'extractPluginReferences(entry)',
@@ -256,10 +257,10 @@ Deno.test('helper regeneration leaves scaffold policies and authored inputs unch
     assertEquals(await Promise.all(authored.map((path) => fs.readFile(join(root, path)))), before);
     assertEquals(await fs.exists(join(root, 'apps/web/routes/auth/[action].ts')), false);
     assertEquals(await fs.exists(join(root, 'auth/service.ts')), false);
-    assertStringIncludes(
-      await fs.readFile(join(root, 'aspire/.helpers/register-apps.mts')),
-      'services__auth__http__0',
-    );
+    const appsHelper = await fs.readFile(join(root, 'aspire/.helpers/register-apps.mts'));
+    assertStringIncludes(appsHelper, "config.Apps['web']?.PluginReferences ?? []");
+    assertStringIncludes(appsHelper, "getResourceEndpoint(_plugins.get(ref), 'http')");
+    assertStringIncludes(appsHelper, 'services__${ref}__http__0');
     assertStringIncludes(
       await fs.readFile(join(root, 'aspire/.helpers/register-services.mts')),
       'extractPluginReferences(entry)',

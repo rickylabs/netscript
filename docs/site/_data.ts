@@ -129,6 +129,7 @@ export const navLanes: NavLane[] = [
     kind: 'menu',
     roots: ['/design-system/'],
     expandRoot: true,
+    items: [{ href: '/create/', label: 'Theme builder' }],
   },
 ];
 

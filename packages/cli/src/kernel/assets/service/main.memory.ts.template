@@ -6,10 +6,11 @@
 
 import { defineService } from '@netscript/service';
 {{authImports}}
+import { createRecordActivityPublisher } from './adapters/record-activity.ts';
 import { createRouter } from './router.ts';
 import { createMemory{{serviceName | pascalCase}}Repository } from './adapters/memory-{{entityName}}-repository.ts';
 
-const router = createRouter(createMemory{{serviceName | pascalCase}}Repository());
+const router = createRouter(createMemory{{serviceName | pascalCase}}Repository(), createRecordActivityPublisher());
 
 await defineService(router, {
   {{authPolicy}}

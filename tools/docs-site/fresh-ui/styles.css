@@ -1,0 +1,15 @@
+.ns-builder { display: grid; gap: var(--ns-space-4); margin-block: var(--ns-space-6); }
+.ns-builder__controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ns-space-3); }
+.ns-builder label { display: grid; gap: var(--ns-space-1); font-size: var(--ns-text-sm); }
+.ns-builder select, .ns-builder input, .ns-builder textarea { width: 100%; min-width: 0; padding: var(--ns-space-2); border: 1px solid var(--ns-input-border); background: var(--ns-bg); color: var(--ns-fg); font: inherit; border-radius: var(--ns-radius-control); }
+.ns-builder textarea { font-family: var(--ns-font-mono); overflow-wrap: anywhere; }
+.ns-builder__values { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: var(--ns-space-2) var(--ns-space-4); margin: 0; }
+.ns-builder__values dt { color: var(--ns-muted-fg); }
+.ns-builder__values dd { margin: 0; overflow-wrap: anywhere; }
+.ns-builder__actions { display: flex; flex-wrap: wrap; gap: var(--ns-space-2); align-items: center; }
+.ns-builder button { padding: var(--ns-space-2) var(--ns-space-3); border: 1px solid var(--ns-border); background: var(--ns-bg); color: var(--ns-fg); font: inherit; cursor: pointer; }
+.ns-builder :focus-visible { outline: 2px solid var(--ns-ring); outline-offset: 2px; }
+.ns-component-preview { display: block; width: 100%; min-height: 300px; border: 1px solid var(--ns-border); background: var(--ns-bg); }
+.ns-component-index { columns: 2; }
+.ns-component-index li { break-inside: avoid; }
+@media (max-width: 600px) { .ns-builder__controls { grid-template-columns: 1fr; } .ns-component-index { columns: 1; } }

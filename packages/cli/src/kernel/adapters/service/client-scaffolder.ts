@@ -1,7 +1,7 @@
-import { join } from '@std/path';
+import { basename, dirname, join } from '@std/path';
 import { toPascalCase } from '@std/text';
 import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
-import { renderTemplateAssetSync } from '../templates/template-asset.ts';
+import { readTemplateAssetSync, renderTemplateAssetSync } from '../templates/template-asset.ts';
 import type { ScaffolderPort } from '../../ports/template-port.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
@@ -107,4 +107,29 @@ export class ServiceClientScaffolder {
     if (await this.needsWrite(plan, force)) await this.write(plan);
     return plan.path;
   }
+}
+
+/** Connect only an untouched scaffold placeholder to a newly generated memory-service client. */
+export async function connectScaffoldRecords(
+  clientPath: string,
+  serviceName: string,
+  fs: FileSystemPort,
+  formatter: GeneratedSourceFormatterPort,
+): Promise<string | undefined> {
+  const path = join(dirname(clientPath), 'scaffold-records.ts');
+  if (!await fs.exists(path)) return undefined;
+  const placeholder = await formatter.formatContent(
+    path,
+    readTemplateAssetSync(TEMPLATE_KEYS.appScaffoldRecords),
+  );
+  if (await fs.readFile(path) !== placeholder) return undefined;
+  const content = await formatter.formatContent(
+    path,
+    renderTemplateAssetSync(
+      TEMPLATE_KEYS.appScaffoldRecordsMemory,
+      { serviceName, serviceQueryModule: `./${basename(clientPath)}` },
+    ),
+  );
+  await fs.writeFile(path, content);
+  return path;
 }

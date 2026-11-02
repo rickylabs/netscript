@@ -1,0 +1,177 @@
+import { useState } from 'preact/hooks';
+import { LocationMarker } from '../../packages/fresh-ui/registry/components/ui/location-marker.tsx';
+import { NavigationMenu } from '../../packages/fresh-ui/registry/components/ui/navigation-menu.tsx';
+import { Menubar } from '../../packages/fresh-ui/registry/components/ui/menubar.tsx';
+import { Stepper } from '../../packages/fresh-ui/registry/components/ui/stepper.tsx';
+import { ActionMenu, Dialog } from '../../packages/fresh-ui/interactive.ts';
+
+export function Navigation() {
+  const [action, setAction] = useState(''),
+    [sidebar, setSidebar] = useState(true),
+    [density, setDensity] = useState('compact');
+  return (
+    <section id='navigation'>
+      <h2>Navigation components</h2>
+      <NavigationMenu
+        id='site-navigation'
+        label='Site'
+        items={[
+          { id: 'build', label: 'Build', href: '#build', current: true },
+          {
+            id: 'learn',
+            label: 'Learn',
+            links: [{
+              id: 'tutorials',
+              title: 'Tutorials',
+              description: 'Build step by step',
+              href: '#tutorials',
+            }, {
+              id: 'guides',
+              title: 'Guides',
+              description: 'Task-focused help',
+              href: '#guides',
+            }],
+          },
+          {
+            id: 'concepts',
+            label: 'Concepts',
+            links: [{
+              id: 'runtime',
+              title: 'Runtime',
+              description: 'Learn the model',
+              href: '#runtime',
+            }],
+          },
+        ]}
+      />
+      <button type='button' id='before-menubar'>Before menus</button>
+      <Menubar
+        label='Application'
+        id='application-menu'
+        menus={[
+          {
+            id: 'file',
+            label: 'File',
+            items: [
+              {
+                id: 'new',
+                label: 'New tab',
+                shortcut: '⌘T',
+                onSelect: () => setAction('new'),
+              },
+              { id: 'unavailable', label: 'Unavailable', disabled: true },
+              {
+                id: 'share',
+                kind: 'submenu',
+                label: 'Share',
+                items: [{ id: 'email', label: 'Email', onSelect: () => setAction('email') }, {
+                  id: 'copy',
+                  label: 'Copy link',
+                  onSelect: () => setAction('copy'),
+                }],
+              },
+              { id: 'print', label: 'Print', shortcut: '⌘P', onSelect: () => setAction('print') },
+            ],
+          },
+          { id: 'locked', label: 'Locked', disabled: true, items: [] },
+          {
+            id: 'view',
+            label: 'View',
+            items: [
+              {
+                id: 'sidebar',
+                kind: 'checkbox',
+                label: 'Show sidebar',
+                checked: sidebar,
+                onCheckedChange: setSidebar,
+              },
+              { id: 'separator', kind: 'separator' },
+              { id: 'density', kind: 'label', label: 'Density' },
+              {
+                id: 'compact',
+                kind: 'radio',
+                label: 'Compact',
+                checked: density === 'compact',
+                onCheckedChange: () => setDensity('compact'),
+              },
+              {
+                id: 'comfortable',
+                kind: 'radio',
+                label: 'Comfortable',
+                checked: density === 'comfortable',
+                onCheckedChange: () => setDensity('comfortable'),
+              },
+            ],
+          },
+        ]}
+      />
+      <button type='button' id='after-menubar'>After menus</button>
+      <output aria-label='Menu action'>{action}</output>
+      <div id='marker-example'>
+        <button type='button'>Before marker</button>
+        <LocationMarker />
+        <button type='button'>After marker</button>
+      </div>
+      <Stepper
+        id='steps'
+        aria-label='Checkout'
+        steps={[
+          {
+            id: 'account',
+            title: 'Account',
+            status: 'complete',
+            href: '#account',
+            description: 'Email and password',
+          },
+          {
+            id: 'shipping',
+            title: 'Shipping',
+            status: 'current',
+            href: '#shipping',
+            description: 'Carrier and tracking',
+          },
+          { id: 'payment', title: 'Payment', status: 'error', description: 'Card declined' },
+          { id: 'review', title: 'Review', status: 'upcoming', description: 'Confirm order' },
+        ]}
+      />
+      <button type='button' id='after-steps'>After steps</button>
+      <Dialog.Root>
+        <Dialog.Trigger>Mobile navigation</Dialog.Trigger>
+        <Dialog.Content>
+          <Dialog.Title>Mobile navigation</Dialog.Title>
+          <Dialog.Description>Browse mobile site links.</Dialog.Description>
+          <NavigationMenu
+            label='Mobile site'
+            items={[
+              { id: 'build', label: 'Mobile build', href: '#mobile-build' },
+              {
+                id: 'learn',
+                label: 'Mobile learn',
+                links: [{
+                  id: 'guide',
+                  title: 'Mobile guide',
+                  href: '#mobile-guide',
+                  current: true,
+                }],
+              },
+            ]}
+          />
+          <Dialog.Close>Close navigation</Dialog.Close>
+        </Dialog.Content>
+      </Dialog.Root>
+      <div id='independent-menu'>
+        <ActionMenu.Root>
+          <ActionMenu.Trigger>Independent actions</ActionMenu.Trigger>
+          <ActionMenu.Content
+            aria-label='Independent actions'
+            aria-labelledby=''
+            aria-describedby=''
+          >
+            <ActionMenu.Item>Inspect</ActionMenu.Item>
+          </ActionMenu.Content>
+        </ActionMenu.Root>
+        <button type='button' id='outside-menu'>Outside action</button>
+      </div>
+    </section>
+  );
+}

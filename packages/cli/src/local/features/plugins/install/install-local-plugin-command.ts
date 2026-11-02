@@ -32,6 +32,8 @@ export function createLocalPluginInstallCommand(
     .description('Install a plugin workspace and register it with local contributor wiring')
     .arguments('<kind:string>')
     .option('--name <name:string>', 'Plugin name (kebab-case)')
+    .option('--app <name:string>', 'Link an enabled web app (defaults to all enabled web apps)')
+    .option('--service <name:string>', 'Link an enabled application service to the plugin API')
     .option('--port <port:number>', 'Plugin port override')
     .option('--service-refs <refs:string>', 'Comma-separated service references')
     .option('--plugin-refs <refs:string>', 'Comma-separated plugin references')
@@ -61,6 +63,8 @@ export function createLocalPluginInstallCommand(
       const result = await installLocalPlugin({
         kind,
         pluginName,
+        app: options.app,
+        service: options.service,
         port: options.port,
         serviceReferences: parseList(options.serviceRefs),
         pluginReferences: parseList(options.pluginRefs),

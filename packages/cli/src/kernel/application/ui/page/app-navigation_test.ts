@@ -37,8 +37,8 @@ Deno.test('add then remove restores the scaffold navigation byte for byte', () =
 Deno.test('existing links are recognized in either property or index form', () => {
   const linked = addNavigationEntry(NAVIGATION_SOURCE, 'notes', 'Notes')!;
   assertEquals(addNavigationEntry(linked, 'notes', 'Other label'), linked);
-  // `home` is already linked as `appRoutes.home`, so a page registered under that id is not doubled.
-  assertEquals(addNavigationEntry(NAVIGATION_SOURCE, 'home', 'Home'), NAVIGATION_SOURCE);
+  // `dashboard` is already linked as `appRoutes.dashboard`, so a page registered under that id is not doubled.
+  assertEquals(addNavigationEntry(NAVIGATION_SOURCE, 'dashboard', 'Overview'), NAVIGATION_SOURCE);
 });
 
 Deno.test('remove only touches the named route, including a hand-edited label', () => {

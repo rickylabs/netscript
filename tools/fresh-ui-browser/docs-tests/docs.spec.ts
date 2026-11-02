@@ -547,6 +547,10 @@ async function ownedSources(): Promise<StyleSource[]> {
   for (const file of await collectFiles(SITE)) {
     if (file.endsWith('.css')) {
       const path = relative(SITE, file).replaceAll('\\', '/');
+      // These assets run in a different document with its own tokens. The component suite
+      // verifies every published asset against its canonical source/minifier digest and
+      // applies the authored-style policy inside that isolated context.
+      if (path.startsWith('assets/fresh-ui/') && path !== 'assets/fresh-ui/docs.css') continue;
       sources.push({
         path: `_site/${path}`,
         kind: 'css',

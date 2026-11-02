@@ -38,9 +38,10 @@ import Toast from '../../registry/islands/Toast.tsx';
 import McpUiWidget from '../../registry/islands/McpUiWidget.tsx';
 
 export const basicFixtures: readonly ContractRenderFixture[] = [
-  { component: 'icon', scenario: 'glyph', render: () => <Icon name='check' /> },
+  { component: 'icon', props: ['name'], scenario: 'glyph', render: () => <Icon name='check' /> },
   {
     component: 'button',
+    props: [],
     scenario: 'default',
     render: () => <Button icon='★'>Action</Button>,
     parts: ['label', 'icon-start'],
@@ -48,6 +49,7 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'button',
+    props: [],
     scenario: 'loading',
     parts: ['spinner'],
     render: () => <Button loading>Action</Button>,
@@ -55,12 +57,14 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'button',
+    props: [],
     scenario: 'trailing link',
     render: () => <Button type='link' href='/example' icon='→' iconPosition='right'>Visit</Button>,
     parts: ['icon-end'],
   },
   {
     component: 'icon-button',
+    props: [],
     scenario: 'glyph',
     render: () => <IconButton label='Action' icon='★' />,
     parts: ['glyph'],
@@ -68,13 +72,15 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'theme-toggle',
+    props: [],
     scenario: 'default',
     render: () => <ThemeToggle />,
     attributes: ['data-state'],
   },
-  { component: 'sidebar-toggle', scenario: 'default', render: () => <SidebarToggle /> },
+  { component: 'sidebar-toggle', props: [], scenario: 'default', render: () => <SidebarToggle /> },
   {
     component: 'label',
+    props: [],
     scenario: 'required',
     render: () => <Label required>Name</Label>,
     parts: ['text'],
@@ -82,24 +88,28 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'input',
+    props: [],
     scenario: 'invalid',
     render: () => <Input error value='Ada' />,
     attributes: ['data-size', 'data-state', 'data-content'],
   },
   {
     component: 'textarea',
+    props: [],
     scenario: 'disabled',
     render: () => <Textarea disabled value='Text' />,
     attributes: ['data-state'],
   },
   {
     component: 'select',
+    props: [],
     scenario: 'options',
     render: () => <Select options={[{ value: 'one', label: 'One' }]} />,
     attributes: ['data-size', 'data-state', 'data-content'],
   },
   {
     component: 'checkbox',
+    props: [],
     scenario: 'checked',
     render: () => <Checkbox checked description='Description'>Choice</Checkbox>,
     parts: ['control', 'indicator', 'body', 'label', 'description'],
@@ -107,6 +117,7 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'switch',
+    props: [],
     scenario: 'checked',
     render: () => <Switch checked description='Description'>Choice</Switch>,
     parts: ['control', 'track', 'thumb', 'body', 'label', 'description'],
@@ -114,6 +125,7 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'field',
+    props: [],
     scenario: 'error',
     render: () => (
       <FormField label='Name' name='name' helpText='Hint' error='Required'>
@@ -125,12 +137,14 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'search',
+    props: [],
     scenario: 'shortcut',
     render: () => <Search />,
     parts: ['icon', 'label', 'kbd'],
   },
   {
     component: 'dropzone',
+    props: [],
     scenario: 'picker',
     render: () => (
       <Dropzone hint='PDF'>
@@ -140,6 +154,7 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'avatar',
+    props: [],
     scenario: 'initials',
     render: () => <Avatar name='Ada' presence='online' />,
     parts: ['initials', 'presence'],
@@ -147,18 +162,21 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'avatar',
+    props: [],
     scenario: 'image',
     render: () => <Avatar name='Ada' src='/avatar.png' />,
     parts: ['image'],
   },
   {
     component: 'avatar',
+    props: [],
     scenario: 'agent',
     render: () => <Avatar name='Agent' agent />,
     parts: ['agent-icon'],
   },
   {
     component: 'badge',
+    props: ['variant'],
     scenario: 'info',
     render: () => <Badge variant='info'>Shipped</Badge>,
     parts: ['label', 'dot'],
@@ -166,6 +184,7 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'badge',
+    props: [],
     scenario: 'status',
     render: () => <Badge variant='success'>Ready</Badge>,
     parts: ['label'],
@@ -173,6 +192,7 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'card',
+    props: [],
     scenario: 'sections',
     render: () => (
       <Card interactive>
@@ -189,17 +209,20 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'code-block',
+    props: [],
     scenario: 'code',
     render: () => <CodeBlock code='const answer = 42;' filename='example.ts' lang='ts' />,
     parts: ['content', 'code'],
   },
   {
     component: 'chart-block',
+    props: [],
     scenario: 'bar',
     render: () => <ChartBlock title='Chart' data={[{ label: 'One', value: 42 }]} />,
   },
   {
     component: 'donut',
+    props: ['data'],
     scenario: 'palette-and-error',
     render: () => (
       <Donut
@@ -213,11 +236,13 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'donut',
+    props: [],
     scenario: 'segments',
     render: () => <Donut data={[{ label: 'One', value: 42 }, { label: 'Two', value: 58 }]} />,
   },
   {
     component: 'alert',
+    props: [],
     scenario: 'notice',
     render: () => <Alert title='Notice'>Description</Alert>,
     parts: ['icon', 'body', 'title', 'description'],
@@ -225,6 +250,7 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'inline-notice',
+    props: [],
     scenario: 'notice',
     render: () => <InlineNotice title='Notice'>Description</InlineNotice>,
     parts: ['icon', 'body', 'title', 'description'],
@@ -232,6 +258,7 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'toast',
+    props: [],
     scenario: 'message',
     render: () => <Toast message='Saved' title='Notice' type='success' />,
     parts: ['panel', 'title', 'message', 'dismiss'],
@@ -239,6 +266,7 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'progress',
+    props: [],
     scenario: 'determinate',
     render: () => <Progress value={42} label='Progress' />,
     parts: ['track', 'bar'],
@@ -246,24 +274,28 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'spinner',
+    props: [],
     scenario: 'loading',
     render: () => <Spinner label='Loading' />,
     attributes: ['data-size'],
   },
   ...(['table', 'stats', 'detail', 'form'] as const).map((variant) => ({
     component: 'skeleton',
+    props: [],
     scenario: variant,
     render: () => <Skeleton variant={variant} rows={1} cards={1} columns={2} />,
     attributes: ['data-variant'],
   })),
   {
     component: 'empty-state',
+    props: [],
     scenario: 'content',
     render: () => <EmptyState heading='No records'>Add a record</EmptyState>,
     parts: ['heading', 'content'],
   },
   {
     component: 'detail-layout',
+    props: [],
     scenario: 'columns',
     render: () => (
       <DetailLayout>
@@ -275,6 +307,7 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'filter-form',
+    props: [],
     scenario: 'form',
     render: () => (
       <FilterForm>
@@ -286,6 +319,7 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'panel',
+    props: [],
     scenario: 'sections',
     render: () => (
       <Panel tone='raised'>
@@ -302,18 +336,21 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'separator',
+    props: [],
     scenario: 'vertical',
     render: () => <Separator orientation='vertical' />,
     attributes: ['data-orientation'],
   },
   {
     component: 'section-divider',
+    props: [],
     scenario: 'label',
     render: () => <SectionDivider label='Section' />,
     parts: ['label', 'line'],
   },
   {
     component: 'citation-chip',
+    props: [],
     scenario: 'active',
     render: () => <CitationChip index={1} active source='Source' />,
     parts: ['index'],
@@ -321,12 +358,14 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'tool-call-card',
+    props: [],
     scenario: 'result',
     render: () => <ToolCallCard name='lookup' status='done' args='{}' result='Ready' defaultOpen />,
     attributes: ['data-status'],
   },
   {
     component: 'model-selector',
+    props: [],
     parts: ['btn', 'label', 'menu', 'opt'],
     scenario: 'choices',
     render: () => (
@@ -339,11 +378,13 @@ export const basicFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'prompt-input',
+    props: [],
     scenario: 'composer',
     render: () => <PromptInput placeholder='Message' />,
   },
   {
     component: 'mcp-ui-widget',
+    props: [],
     scenario: 'sandbox',
     render: () => <McpUiWidget src='https://widget.example.test/widget' theme='utility' />,
   },

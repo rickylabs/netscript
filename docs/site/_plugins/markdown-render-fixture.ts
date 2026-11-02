@@ -17,6 +17,7 @@ import { articleToMarkdown } from './ai-tooling.ts';
 import { ALERT_ATTRIBUTE, inlineCode, renderCallout } from './callout.ts';
 import { fileTreeFence, renderFileTree } from './file-tree.ts';
 import { markdownAlerts } from './markdown-alerts.ts';
+import { resolveXref } from '../_data/xref.ts';
 
 const ORIGIN = new URL('https://docs.example.test/netscript/');
 const PAGE = 'guide/page.md';
@@ -69,10 +70,11 @@ async function renderComponent(name: string, data: Record<string, unknown>): Pro
   env.filters.calloutType = calloutType;
   env.filters.calloutHtml = renderCallout;
   env.filters.ic = (value: unknown) => typeof value === 'string' ? inlineCode(value) : value ?? '';
+  env.filters.url = (value: string) => ORIGIN.pathname.replace(/\/$/, '') + value;
   env.filters.fileTreeHtml = (nodes: unknown, nested?: boolean) =>
     renderFileTree(Array.isArray(nodes) ? nodes : [], { nested: Boolean(nested) });
   const source = await Deno.readTextFile(new URL(`../_components/${name}.vto`, import.meta.url));
-  return (await env.runString(source, data)).content;
+  return (await env.runString(source, { resolveXref, ...data })).content;
 }
 
 /* ------------------------------------------------------------------ */
@@ -375,4 +377,42 @@ Deno.test('the Markdown twin writes alerts back as authored', () => {
     '> - back up first',
   ].join('\n');
   strictEqual(twin(site().render(`${source}\n`)), `${source}\n`);
+});
+
+Deno.test('actual Vento xrefs and already-prefixed URLs keep exactly one deployment base in twins', async () => {
+  const html = await renderComponent('xref', { key: 'concept:quickstart' });
+  ok(html.includes('href="/netscript/quickstart/"'), html);
+  strictEqual(
+    twin(`<p>${html}</p>`),
+    '[Quickstart](https://docs.example.test/netscript/quickstart/)\n',
+  );
+  for (
+    const href of [
+      '/quickstart/',
+      '/netscript/quickstart/',
+      '/netscript/netscript/quickstart/',
+      'https://docs.example.test/netscript/netscript/quickstart/',
+    ]
+  ) {
+    strictEqual(
+      twin(`<p><a href="${href}?q=one#start">Quickstart</a></p>`),
+      '[Quickstart](https://docs.example.test/netscript/quickstart/?q=one#start)\n',
+    );
+  }
+});
+
+Deno.test('Vento callout bodies render code spans literally and preserve authored HTML', async () => {
+  const html = await renderComponent('callout', {
+    type: 'note',
+    content: 'Use `<code>` and `deno.json`. <strong>Keep this.</strong> <code>already code</code>',
+  });
+  const root = article(html);
+  strictEqual(root.querySelectorAll('.ns-callout__body code').length, 3);
+  strictEqual(root.querySelector('.ns-callout__body code')?.textContent, '<code>');
+  strictEqual(root.querySelector('strong')?.textContent, 'Keep this.');
+  const markdown = twin(html);
+  ok(markdown.includes('`<code>`'), markdown);
+  ok(markdown.includes('`deno.json`'), markdown);
+  ok(markdown.includes('`already code`'), markdown);
+  ok(!markdown.includes('<strong>'), markdown);
 });

@@ -42,7 +42,7 @@ export function sectionOf(url: string): string {
     return 'reference';
   }
   if (url.startsWith('/explanation/') || url.startsWith('/comparisons/')) return 'explanation';
-  if (url.startsWith('/design-system/')) return 'design-system';
+  if (url.startsWith('/design-system/') || url === '/create/') return 'design-system';
   if (BUILD_PREFIXES.some((prefix) => url.startsWith(prefix))) return 'capabilities';
   return 'start';
 }

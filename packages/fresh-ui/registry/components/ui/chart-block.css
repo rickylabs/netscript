@@ -232,3 +232,22 @@
     background: var(--ns-chart-5);
   }
 }
+
+/* Optional column inspection keeps dense charts quiet without losing keyboard values. */
+.ns-colchart[data-values='interactive'] .ns-colchart__val {
+  opacity: 0;
+  pointer-events: none;
+}
+.ns-colchart[data-values='interactive'] .ns-colchart__col:is(:hover, :focus-visible) .ns-colchart__val {
+  opacity: 1;
+  z-index: 1;
+  padding: var(--ns-space-1) var(--ns-space-2);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-control);
+  background: var(--ns-bg);
+}
+.ns-colchart[data-values='interactive'] .ns-colchart__col:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: 2px;
+  border-radius: var(--ns-radius-control);
+}

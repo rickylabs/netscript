@@ -9,7 +9,9 @@ import type { ValidatedInitOptions } from '../../domain/scaffold/scaffold-option
 import type { InitPipelineContext } from './context.ts';
 import { adjustLocalBase, emptyScaffoldResult, isDbEngine } from './support/helpers.ts';
 
-function contractDatabaseImports(options: ValidatedInitOptions): Record<string, string> | undefined {
+function contractDatabaseImports(
+  options: ValidatedInitOptions,
+): Record<string, string> | undefined {
   if (!isDbEngine(options.dbEngine)) {
     return undefined;
   }
@@ -107,6 +109,7 @@ export async function scaffoldServices(
     packagesAsWorkspaceMembers: context.packagesAsWorkspaceMembers(options),
     modelName: options.modelName,
     hasDatabase: isDbEngine(options.dbEngine),
+    dbEngine: isDbEngine(options.dbEngine) ? options.dbEngine : undefined,
     force: options.force,
   });
 

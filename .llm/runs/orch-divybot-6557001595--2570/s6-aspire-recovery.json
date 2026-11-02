@@ -1,0 +1,35 @@
+{
+  "baseHead": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+  "source": "S6 working tree",
+  "operation": "public db generate on same resident red fixture; no manual restart",
+  "results": [
+    {
+      "resource": "orders",
+      "path": "/health",
+      "status": 200,
+      "seededRow": false,
+      "unavailable": false
+    },
+    {
+      "resource": "shop-web",
+      "path": "/records",
+      "status": 200,
+      "seededRow": true,
+      "unavailable": false
+    },
+    {
+      "resource": "shop-web",
+      "path": "/examples/orders",
+      "status": 200,
+      "seededRow": true,
+      "unavailable": false
+    },
+    {
+      "resource": "shop-web",
+      "path": "/",
+      "status": 200,
+      "seededRow": true,
+      "unavailable": false
+    }
+  ]
+}

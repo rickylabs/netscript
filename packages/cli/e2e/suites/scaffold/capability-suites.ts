@@ -64,6 +64,8 @@ export const RUNTIME_GATES = [
   GATE.PREFLIGHT_DENO,
   GATE.PREFLIGHT_ASPIRE,
   GATE.SCAFFOLD_INIT,
+  // Static init gives the cleanup tail a valid AppHost path; no repair fixture has run.
+  GATE.BEHAVIOR_DOCUMENTED_SCAFFOLD,
   GATE.SCAFFOLD_SERVICE_CLIENT_ADD,
   GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE,
   GATE.SCAFFOLD_AGENT_INIT,
@@ -176,6 +178,7 @@ export const RUNTIME_GATES = [
   GATE.BEHAVIOR_AUTH_SIGNOUT_UNAUTHENTICATED,
   GATE.BEHAVIOR_AUTH_RPC_UNAUTHENTICATED,
   GATE.BEHAVIOR_AI_CHAT_ROUTE,
+  GATE.BEHAVIOR_RECORD_ACTIVITY,
   GATE.BEHAVIOR_APP_HOME,
   GATE.BEHAVIOR_APP_DYNAMIC_ROUTE,
   GATE.BEHAVIOR_APP_REFERENCE,
@@ -200,6 +203,8 @@ export const RUNTIME_GATES = [
 // the Postgres merge-readiness suite while the reduced-container tier exercises
 // every provider-neutral runtime behavior.
 const POSTGRES_ONLY_RUNTIME_GATES = new Set<GateId>([
+  // The executable documentation explicitly selects Postgres; do not silently rewrite its commands.
+  GATE.BEHAVIOR_DOCUMENTED_SCAFFOLD,
   GATE.DATABASE_MIGRATION_ARTIFACTS,
   GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
   GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,

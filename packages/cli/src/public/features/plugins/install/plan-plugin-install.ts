@@ -1,3 +1,7 @@
+import {
+  resolvePluginAppReferences,
+  resolvePluginServiceReferences,
+} from './plugin-app-references.ts';
 import { basename, dirname, join } from '@std/path';
 
 import { validateResourceName } from '../../../../kernel/adapters/scaffold/workspace-writer.ts';
@@ -8,7 +12,10 @@ import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-di
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
-import type { PluginInstallPlan, PluginInstallRequest } from '../../../domain/plugin-install-plan.ts';
+import type {
+  PluginInstallPlan,
+  PluginInstallRequest,
+} from '../../../domain/plugin-install-plan.ts';
 import { extractPluginSpecifiers } from '../../../../kernel/adapters/plugin/netscript-config-plugin.ts';
 
 interface ExistingPluginConfigShape {
@@ -22,6 +29,11 @@ interface ExistingPluginConfigShape {
 export interface PlanPluginInstallDependencies {
   /** Filesystem used to read project metadata. */
   readonly fs: FileSystemPort;
+
+  /** Consumer defaults declared by the resolved package manifest. */
+  readonly appConsumers?: readonly string[];
+  /** Service consumer defaults declared by the resolved package manifest. */
+  readonly serviceConsumers?: readonly string[];
 
   /** Plugin kind registry. */
   readonly registry?: PluginKindRegistry;
@@ -65,7 +77,23 @@ export async function planPluginInstall(
     ...request,
     kind,
     provider,
+    appReferences: await resolvePluginAppReferences(
+      request,
+      dependencies.fs,
+      dependencies.appConsumers,
+    ),
+    serviceConsumers: await resolvePluginServiceReferences(
+      request,
+      dependencies.fs,
+      dependencies.serviceConsumers,
+    ),
     projectName,
+    previousServiceConsumers: request.service === undefined
+      ? undefined
+      : await resolvePluginServiceReferences(
+        { ...request, service: undefined },
+        dependencies.fs,
+      ),
     dbDetection,
     sagaStoreBackend,
     configuredListenerPorts,
@@ -109,9 +137,12 @@ function resolveSagaStoreBackendOption(
 ): SagaStoreBackend | undefined {
   if (kind !== 'saga') {
     if (backend !== undefined) {
-      throw new ScaffoldValidationError('--saga-store-backend can only be used with saga plugins.', {
-        kind,
-      });
+      throw new ScaffoldValidationError(
+        '--saga-store-backend can only be used with saga plugins.',
+        {
+          kind,
+        },
+      );
     }
     return undefined;
   }

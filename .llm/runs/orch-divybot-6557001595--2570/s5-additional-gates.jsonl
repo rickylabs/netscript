@@ -1,0 +1,4 @@
+{"command": ["deno", "task", "gen:assets-barrel"], "exitCode": 0}
+{"command": ["deno", "task", "quality:gate"], "exitCode": 0}
+{"command": ["deno", "task", "release:preflight"], "exitCode": 0}
+{"command": ["deno", "task", "docs:accuracy"], "exitCode": 0}

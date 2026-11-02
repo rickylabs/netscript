@@ -1,148 +1,60 @@
-import {
-  Alert,
-  Badge,
-  Button,
-  Card,
-  InlineNotice,
-  PageHeader,
-  Panel,
-  Progress,
-  ResponsiveTable,
-  type ResponsiveTableColumn,
-  StatsGrid,
-} from '@app/components/ui/mod.ts';
+import { Badge, Button, ChartBlock, PageHeader, Progress, StatsGrid } from '@app/components/ui/mod.ts';
+import { scaffoldAmount, scaffoldDate, scaffoldInitials, scaffoldRecordCount, scaffoldStatuses, type ScaffoldCapability, type ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
+import { appRoutes } from '@app/router.ts';
+import { CapabilityEmpty } from './capability-empty.tsx';
+import { RecordTable } from './record-table.tsx';
+import { SCAFFOLD_PERIOD_DAYS, scaffoldWeeklyCounts, type ScaffoldMetric, type ScaffoldOverview } from '@app/lib/scaffold-projections.ts';
 
-interface ServiceRow {
-  readonly name: string;
-  readonly owner: string;
-  readonly region: string;
-  readonly status: 'Live' | 'Queued' | 'Paused';
-  readonly latency: string;
-  readonly updated: string;
+interface DashboardProps {
+  readonly overview: ScaffoldOverview;
+  readonly records: ScaffoldRecords;
+  readonly capabilities: readonly ScaffoldCapability[];
+  readonly locale?: string;
 }
 
-interface DashboardViewProps {
-  readonly projectName: string;
-  readonly appName: string;
-  readonly services: readonly ServiceRow[];
+/** Direction is explicit; ordinary declines are neutral, with red reserved for failures. */
+function MetricDelta({ metric, inverse = false, points = false, locale }: { metric: ScaffoldMetric; inverse?: boolean; points?: boolean; locale?: string }) {
+  const change = points ? metric.delta : metric.percentChange;
+  const tone = metric.delta > 0 && !inverse ? 'success' : 'neutral';
+  return <><span class='workspace-delta' data-tone={tone}>{change === null ? 'New' : `${metric.delta > 0 ? '↗' : metric.delta < 0 ? '↘' : '—'} ${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(Math.abs(change))}${points ? ' pts' : '%'}`}</span> <span>vs. previous {SCAFFOLD_PERIOD_DAYS} days</span></>;
 }
 
-const columns: readonly ResponsiveTableColumn<ServiceRow>[] = [
-  {
-    key: 'name',
-    label: 'Service',
-    priority: 'primary',
-    cell: (service) => service.name,
-  },
-  {
-    key: 'owner',
-    label: 'Owner',
-    cell: (service) => service.owner,
-  },
-  {
-    key: 'region',
-    label: 'Region',
-    cell: (service) => service.region,
-  },
-  {
-    key: 'status',
-    label: 'Status',
-    cell: (service) => (
-      <Badge
-        variant={service.status === 'Live'
-          ? 'success'
-          : service.status === 'Queued'
-          ? 'secondary'
-          : 'muted'}
-      >
-        {service.status}
-      </Badge>
-    ),
-  },
-  {
-    key: 'latency',
-    label: 'P95',
-    align: 'end',
-    cell: (service) => service.latency,
-  },
-  {
-    key: 'updated',
-    label: 'Updated',
-    align: 'end',
-    cell: (service) => service.updated,
-  },
-];
-
-export default function DashboardView({ projectName, appName, services }: DashboardViewProps) {
-  return (
-    <main class='ns-shell ns-section ns-stack ns-stack--lg'>
-      <PageHeader>
-        <PageHeader.Layout>
-          <PageHeader.Main>
-            <PageHeader.Badges>
-              <Badge variant='primary'>Dashboard</Badge>
-              <Badge variant='muted'>{appName}</Badge>
-            </PageHeader.Badges>
-            <PageHeader.Intro>
-              <h1>{projectName}</h1>
-              <p class='ns-lede'>
-                A registry-only operations view with summary cards, service health, and action
-                rails ready for real contracts.
-              </p>
-            </PageHeader.Intro>
-            <PageHeader.Actions>
-              <Button type='link' href='/examples/{{serviceName}}'>Review {{modelName}} CRUD</Button>
-              <Button type='link' href='/design/tokens' variant='outline'>Inspect tokens</Button>
-            </PageHeader.Actions>
-          </PageHeader.Main>
-          <PageHeader.Aside>
-            <InlineNotice title='Scaffold status'>
-              Replace these static rows with loaders that read your service contracts.
-            </InlineNotice>
-          </PageHeader.Aside>
-        </PageHeader.Layout>
-      </PageHeader>
-
-      <StatsGrid>
-        <StatsGrid.Card label='Services' value={services.length} detail='Seeded operational rows' />
-        <StatsGrid.Card label='Healthy' value='1' detail='Live service in this scaffold' badge={<Badge variant='success'>ok</Badge>} />
-        <StatsGrid.Card label='Queued' value='1' detail='Background work awaiting capacity' badge={<Badge variant='secondary'>watch</Badge>} />
-        <StatsGrid.Card label='P95 high' value='612ms' detail='Use your telemetry source here' badge={<Badge variant='warning'>trace</Badge>} />
+/** Real period totals, daily volume and current statuses share the complete service projection. */
+export default function DashboardView({ records, overview, capabilities, locale }: DashboardProps) {
+  const data = overview.state === 'ready' || overview.state === 'empty' ? overview : undefined;
+  const streams = capabilities.find((item) => item.id === 'streams');
+  const workers = capabilities.find((item) => item.id === 'workers');
+  const recent = { ...records, rows: data?.latest ?? records.rows.slice(0, 5) };
+  const weeks = data ? scaffoldWeeklyCounts(data.daily.slice(-SCAFFOLD_PERIOD_DAYS)) : [];
+  const finalDays = weeks.at(-1)?.days ?? 0;
+  const groupDescription = `7-day groups, final group ${finalDays} ${finalDays === 1 ? 'day' : 'days'}`;
+  return <div class='workspace-page'>
+    <PageHeader class='workspace-heading'><PageHeader.Layout><PageHeader.Main><PageHeader.Intro><h1>Overview</h1><p>Records, amounts and activity for the last {SCAFFOLD_PERIOD_DAYS} days.</p></PageHeader.Intro></PageHeader.Main><PageHeader.Actions>
+      <Button type='link' variant='outline' href={appRoutes.records.href() + '#record-export'}>↓ Export records</Button>{ {{hasService}} && <Button type='link' href={appRoutes.serviceExample.href()}>Open service ↗</Button>}
+    </PageHeader.Actions></PageHeader.Layout></PageHeader>
+    <nav class='workspace-tabs' aria-label='Overview sections'><a href={appRoutes.dashboard.href()} aria-current='page'>Overview</a><a href={appRoutes.records.href()}>Records {records.total !== undefined && <span>{records.total}</span>}</a><a href={appRoutes.health.href()}>System health</a></nav>
+    {data ? <>
+      <StatsGrid class='workspace-stats'>
+        {data.totals.currencies.map((entry) => <StatsGrid.Card key={entry.currency} label={`Total amount · ${entry.currency}`} value={scaffoldAmount(entry.amount.current, entry.currency, locale)} detail={<MetricDelta metric={entry.amount} locale={locale} />} />)}
+        <StatsGrid.Card label='Records' value={new Intl.NumberFormat(locale).format(data.totals.records.current)} detail={<MetricDelta metric={data.totals.records} locale={locale} />} />
+        {data.totals.currencies.map((entry) => <StatsGrid.Card key={entry.currency} label={`Average amount · ${entry.currency}`} value={scaffoldAmount(entry.averageAmount.current, entry.currency, locale)} detail={<MetricDelta metric={entry.averageAmount} locale={locale} />} />)}
+        <StatsGrid.Card label='Refund rate' value={new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(data.totals.refundRate.current) + '%'} detail={<MetricDelta metric={data.totals.refundRate} points inverse locale={locale} />} />
       </StatsGrid>
-
-      <div class='ns-grid ns-grid--2'>
-        <Card>
-          <Card.Header>
-            <Card.Title>Service health</Card.Title>
-            <Card.Description>Responsive table block with semantic mobile cells.</Card.Description>
-          </Card.Header>
-          <Card.Body>
-            <ResponsiveTable
-              caption='Service health'
-              columns={columns}
-              rows={services}
-              getRowKey={(service) => service.name}
-              summary={<span>{services.length} services tracked</span>}
-            />
-          </Card.Body>
-        </Card>
-
-        <Panel tone='muted'>
-          <Panel.Header>
-            <Panel.Title>Deployment readiness</Panel.Title>
-            <Panel.Description>Static scaffold data shaped like an operations rail.</Panel.Description>
-          </Panel.Header>
-          <Panel.Body>
-            <div class='ns-stack ns-stack--md'>
-              <Progress value={64} label='Contract coverage' />
-              <Progress value={42} label='Background jobs' variant='warning' />
-              <Alert variant='info' title='Next integration'>
-                Connect this panel to your service health endpoint or database read model.
-              </Alert>
-            </div>
-          </Panel.Body>
-        </Panel>
+      <div class='workspace-overview-grid workspace-charts'>
+        <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Records by week</h2><p>{scaffoldRecordCount(data.totals.records.current, locale)} created · {groupDescription} · UTC</p></div><Badge variant='muted'>Last {SCAFFOLD_PERIOD_DAYS} days</Badge></header>
+          <ChartBlock variant='column' valueDisplay='interactive' aria-label={`Weekly record counts for the current ${SCAFFOLD_PERIOD_DAYS}-day period; ${groupDescription}`} unit=' records' data={weeks.map((week) => ({ label: new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', timeZone: 'UTC' }).formatRange(new Date(week.from), new Date(week.to)), value: week.count, tone: 'secondary' }))} />
+        </section>
+        <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Status breakdown</h2><p>{scaffoldRecordCount(data.statusCounts.reduce((total, item) => total + item.count, 0), locale)} across all statuses</p></div></header><ChartBlock variant='bar' class='workspace-status-chart' aria-label='Record status breakdown' data={data.statusCounts.filter((item) => item.count > 0).map((item) => ({ label: scaffoldStatuses[item.status].label, value: item.count, tone: item.status === 'paid' ? 'success' : item.status === 'cancelled' ? 'secondary' : item.status === 'awaiting_payment' ? 'warning' : item.status === 'shipped' ? 'primary' : 'secondary' }))} />{data.state === 'empty' && <p class='workspace-muted'>Create your first record to see its status here.</p>}</section>
       </div>
-    </main>
-  );
+    </> : <CapabilityEmpty capability={{ id: 'overview', label: 'Record summary', state: overview.state, description: overview.message, command: 'command' in overview ? overview.command : undefined }} />}
+    <div class='workspace-overview-grid'>
+      <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Recent records</h2><p>{data ? 'The latest records across your workspace.' : 'Available records from the current page.'}</p></div><a href={appRoutes.records.href()}>View all records →</a></header><RecordTable records={recent} compact locale={locale} /></section>
+      <section class='workspace-section' data-capability={streams?.id} data-capability-state={streams?.state}><header class='workspace-section-heading'><div><h2>Activity</h2><p>{streams && streams.state !== 'absent' && streams.state !== 'installed-unwired' ? streams.description : 'Latest record changes'}</p></div></header>
+        {streams && streams.state !== 'absent' && streams.state !== 'installed-unwired' ? streams.items?.length ? <ol class='workspace-activity'>{streams.items.map((item, index) => <li key={index}><span class='workspace-avatar' aria-hidden='true'>{scaffoldInitials(item.actor ?? 'Anonymous')}</span><div><div><strong>{item.actor}</strong> {item.verb} {item.recordId ? <a href={appRoutes.record.href({ path: { id: item.recordId } })}>{item.label}</a> : item.label}</div>{item.timestamp && <time dateTime={item.timestamp}>{scaffoldDate(item.timestamp, locale, true)}</time>}</div></li>)}</ol> : <CapabilityEmpty capability={streams} /> : data?.changes.length ? <ol class='workspace-activity'>{data.changes.map((row) => <li key={row.id}><span class='workspace-avatar' aria-hidden='true'>{scaffoldInitials(row.ownerName)}</span><div><div><a href={appRoutes.record.href({ path: { id: row.id } })}><strong>{row.reference}</strong></a> {row.updatedAt === row.createdAt ? 'created' : 'updated'}</div><p>Owned by {row.ownerName} · {scaffoldStatuses[row.status].label}</p><time dateTime={row.updatedAt}>{scaffoldDate(row.updatedAt, locale, true)}</time></div></li>)}</ol> : data ? <p class='workspace-muted'>Record changes will appear after your first record is created.</p> : <CapabilityEmpty capability={{ id: 'record-changes', label: 'Record activity unavailable', state: overview.state, description: overview.message }} />}
+        {streams?.state === 'installed-unwired' && <CapabilityEmpty capability={streams} />}
+      </section>
+    </div>
+    {workers && <section class='workspace-section' data-capability={workers.id} data-capability-state={workers.state}><header class='workspace-section-heading'><div><h2>Background work</h2><p>Jobs from your connected workers.</p></div></header>{workers.items?.length ? <><p class='workspace-muted'>{workers.description}</p><div class='workspace-jobs'>{workers.items.map((job) => <article class='workspace-job' key={job.label}><div class='workspace-job-heading'><strong>{job.label}</strong><Badge variant={job.state === 'completed' ? 'success' : job.state === 'failed' ? 'destructive' : job.state === 'running' ? 'info' : 'muted'}>{job.state?.replaceAll('_', ' ') ?? 'Registered'}</Badge></div><p>{job.detail}</p>{typeof job.progress === 'number' ? <><Progress value={job.progress} label={`${job.label} progress`} variant={job.state === 'failed' ? 'destructive' : job.state === 'completed' ? 'success' : 'primary'} /><span class='workspace-job-meta'>{job.progress}% reported</span></> : <span class='workspace-job-meta'>Progress not reported</span>}{job.timestamp && <time class='workspace-job-meta' dateTime={job.timestamp}>{scaffoldDate(job.timestamp, locale, true)}</time>}</article>)}</div></> : <CapabilityEmpty capability={workers} />}</section>}
+    {import.meta.env.MODE === 'development' && <footer class='workspace-reference'><a href={appRoutes.design.href()}>Design reference</a><a href={appRoutes.designComposition.href()}>Composition guide</a></footer>}
+  </div>;
 }

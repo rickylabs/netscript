@@ -54,12 +54,15 @@ Deno.test('template asset adapter renders existing template pipes', () => {
 
 Deno.test('app and service templates emit lint-clean generated contracts', () => {
   const layout = readTemplateAssetSync(TEMPLATE_KEYS.appRoutesLayout);
+  const app = readTemplateAssetSync(TEMPLATE_KEYS.appRoutesApp);
   const telemetry = readTemplateAssetSync(
     TEMPLATE_KEYS.appRoutesExamplesTelemetryComponentsTelemetryView,
   );
   const health = readTemplateAssetSync(TEMPLATE_KEYS.serviceRoutersHealth);
 
-  assertMatch(layout, /f-client-nav\s+class=/);
+  // The document owns navigation; the shared shell must preserve its partial boundary.
+  assertStringIncludes(app, '<body f-client-nav={!previewStylesheet}>');
+  assertMatch(layout, /<Partial name='page'>\s*<SidebarShell\b/);
   assertFalse(layout.includes('f-client-nav={true}'));
   assertStringIncludes(telemetry, 'key={span.spanId}');
   assertStringIncludes(telemetry, 'key={trace.traceId}');

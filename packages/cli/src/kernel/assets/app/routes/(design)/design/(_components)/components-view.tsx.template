@@ -100,6 +100,14 @@ const KIND_BADGES: Record<RegistryItemKind, BadgeVariant> = {
   support: 'muted',
 };
 
+// Added component category labels use neutral paint that is readable in legacy previews too.
+const NEUTRAL_COMPONENT_LABELS = new Set([
+  'button-group', 'toggle', 'toggle-group', 'radio-group', 'input-group', 'input-otp',
+  'slider', 'calendar', 'date-picker', 'location-marker', 'navigation-menu', 'stepper',
+  'menubar', 'alert-dialog', 'hover-card', 'context-menu', 'item', 'kbd', 'collapsible',
+  'chart', 'carousel',
+]);
+
 /** Style seams are demonstrated by the items rendered above them. */
 const STYLE_REFS: Record<string, readonly string[]> = {
   'form-control-styles': ['input', 'textarea', 'select'],
@@ -713,7 +721,13 @@ function GalleryItem({ item }: { item: RegistryCatalogItem }): VNode {
     >
       <header class='ns-gallery-item__head'>
         <h3 class='ns-gallery-item__name'>{item.name}</h3>
-        <Badge variant={KIND_BADGES[item.kind]}>{item.kind}</Badge>
+        <Badge
+          variant={item.kind === 'component' && NEUTRAL_COMPONENT_LABELS.has(item.name)
+            ? 'muted'
+            : KIND_BADGES[item.kind]}
+        >
+          {item.kind}
+        </Badge>
         {item.layer !== null && <Badge variant='muted'>layer {item.layer}</Badge>}
         <p class='ns-gallery-item__desc'>{item.description}</p>
         <StyleRefs name={item.name} />

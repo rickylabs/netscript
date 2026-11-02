@@ -164,8 +164,9 @@ function assessEndpoint(endpoint: DockerEndpoint): DockerTopologyFinding {
         verdict: 'mismatch',
         message: `Docker daemon is remote: ${origin}. Aspire publishes container ports on ` +
           `${endpoint.daemonHost}, but the AppHost on this machine connects to them through ` +
-          'localhost, so services waiting on those containers never become ready unless a relay ' +
-          'forwards each published port to this machine.',
+          'localhost. Remote Docker is unsupported for this generated AppHost: use a local daemon ' +
+          'or run the AppHost on the Docker host. AppHost:ContainerHostname controls the reverse ' +
+          'container-to-host direction and cannot repair these loopback-published endpoints.',
       };
     case 'unknown':
       return {

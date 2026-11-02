@@ -1,0 +1,32 @@
+{
+  "slice": 1,
+  "catalogEntries": 104,
+  "shipped": 66,
+  "unshipped": 38,
+  "catalogTests": {
+    "passed": 4,
+    "failed": 0
+  },
+  "contractTests": {
+    "passed": 81,
+    "failed": 0
+  },
+  "packageTests": {
+    "passed": 300,
+    "failed": 0,
+    "ignored": 0,
+    "durationMs": 168104
+  },
+  "scoped": {
+    "check": 54,
+    "lint": 54,
+    "format": 54,
+    "findings": 0,
+    "dropped": 0
+  },
+  "qualityGate": "PASS",
+  "releasePreflight": "PASS",
+  "assetGeneration": "PASS; no source difference",
+  "independentReview": "PASS",
+  "sourceState": "Reviewed working-tree delta from bootstrap75c6cd1; receipt HEAD records bootstrap, not an immutable product verdict."
+}

@@ -1,0 +1,5 @@
+.ns-keycap { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; block-size: 20px; min-inline-size: 20px; padding-inline: 5px; border: var(--ns-border-width) solid var(--ns-border); border-radius: var(--ns-radius-badge); background: var(--ns-card); color: var(--ns-muted-fg); font-family: var(--ns-font-mono); font-size: var(--ns-text-caption); line-height: 1; vertical-align: baseline; }
+.ns-keycap[data-size='sm'] { block-size: 16px; min-inline-size: 16px; }
+.ns-keycap[data-variant='inverse'] { background: transparent; border-color: var(--ns-inverse-fg); color: var(--ns-inverse-fg); }
+.ns-keycap-group, .ns-keycap-group__key { display: inline-flex; align-items: center; gap: var(--ns-space-1); }
+.ns-keycap-group__separator { color: var(--ns-muted-fg); font-size: var(--ns-text-caption); }

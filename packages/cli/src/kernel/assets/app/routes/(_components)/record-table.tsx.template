@@ -1,0 +1,1 @@
+export { default as RecordTable } from '@app/islands/RecordTable.tsx';

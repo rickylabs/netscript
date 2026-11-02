@@ -5,19 +5,29 @@ import type {
 } from '@{{projectName}}/contracts';
 import { type ListInput, listQuery, listResult, statusSummary } from '../domain/{{entityName}}.ts';
 
+import type { RecordActor, RecordActivityPublisher } from '../domain/record-activity.ts';
+
 export interface {{serviceName | pascalCase}}Repository {
   list(query: ReturnType<typeof listQuery>): Promise<{ items: Entity[]; total: number }>;
   updateStatus(id: number, status: Entity['status'], summary: string): Promise<Entity | null>;
 }
 
-export function create{{serviceName | pascalCase}}Application(repository: {{serviceName | pascalCase}}Repository) {
+export function create{{serviceName | pascalCase}}Application(repository: {{serviceName | pascalCase}}Repository, activity?: RecordActivityPublisher) {
+  const publish = async (...args: Parameters<RecordActivityPublisher['record']>) => {
+    try {
+      await activity?.record(...args);
+    } catch (error) {
+      console.warn('Record activity delivery failed after a committed mutation.', error);
+    }
+  };
   return {
     async list(input: ListInput) {
       const { items, total } = await repository.list(listQuery(input));
       return listResult(input, items, total);
     },
-    async updateStatus(input: UpdateStatusInput) {
+    async updateStatus(input: UpdateStatusInput, actor?: RecordActor) {
       const record = await repository.updateStatus(input.id, input.status, statusSummary(input.status));
+      if (record) await publish('updated', record, actor);
       return record;
     },
   };

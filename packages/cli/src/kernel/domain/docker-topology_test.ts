@@ -74,7 +74,11 @@ Deno.test("topology reports a remote daemon's loopback bindings as a mismatch", 
     bindings: [ASPIRE_POSTGRES],
   });
   assertEquals(assessment.endpoint.verdict, 'mismatch');
-  assertStringIncludes(assessment.endpoint.message, 'never become ready');
+  assertStringIncludes(assessment.endpoint.message, 'Remote Docker is unsupported');
+  assertStringIncludes(
+    assessment.endpoint.message,
+    'AppHost:ContainerHostname controls the reverse',
+  );
   assertEquals(assessment.bindings.verdict, 'mismatch');
   assertStringIncludes(
     assessment.bindings.message,

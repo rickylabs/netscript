@@ -1,0 +1,95 @@
+{
+  "base": "f4aa307b5340bd3de8029c11778a38bbca451ba1",
+  "sourceCommit": "adc94477d9278fe38076ab544e780b0c9d8aae1d",
+  "previousReviewedEvidence": "49f3a178ea125c9e40b0cbcc3e4adc38a69ad416",
+  "uiBrowserPathsCompared": 623,
+  "identicalPaths": 620,
+  "changedPaths": [
+    "packages/fresh-ui/src/registry/README.md",
+    "packages/fresh-ui/tests/registry-authoring.test.ts",
+    "packages/fresh-ui/tests/registry/legacy-v1.json"
+  ],
+  "addedPaths": 0,
+  "renderingCodeCssTokensBrowserFixtures": "BYTE_IDENTICAL_PREDECESSOR",
+  "workspacePackageBrowserImportMapsUnchanged": true,
+  "topicLockChanges": 0,
+  "affectedTests": {
+    "exitCode": 0,
+    "passed": 63,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 63,
+    "uniqueFailures": 0
+  },
+  "wrappers": {
+    "check": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    },
+    "lint": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    },
+    "fmt": {
+      "verdict": "PASS",
+      "selected": 1,
+      "dropped": 0
+    }
+  },
+  "previousBrowserProof": {
+    "fullParent": 318,
+    "focusedChromium": 44,
+    "focusedFirefoxWebKit": 12,
+    "reuse": "VERIFIED_IDENTICAL_RENDERED_SOURCES_AND_IMPORT_MAPS_NOT_NEW_EXECUTIONS"
+  },
+  "previousFullPackage": {
+    "passed": 622,
+    "scope": "Predecessor; changed authoring test rerun within current63 affected tests"
+  },
+  "qualityArchitecture": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "sourceCommit": "adc94477d9278fe38076ab544e780b0c9d8aae1d"
+  },
+  "nativeMemberPublish": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "slowTypes": 0,
+    "sourceCommit": "adc94477d9278fe38076ab544e780b0c9d8aae1d"
+  },
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "generatedCarriersAfterRebase": [],
+  "independentLatestBaseReview": "PASS",
+  "runtime": "NEW_HEAD_UNPROVEN",
+  "requiredRemoteCI": "PENDING",
+  "ready": false,
+  "parentRemoteLease": "71d8df6fca2340f1ccc0dcce19accbb88fa44e64",
+  "childRestackRequired": "d0d8d922212c4ab71552d1f7e910f3db82cc3b9e"
+}

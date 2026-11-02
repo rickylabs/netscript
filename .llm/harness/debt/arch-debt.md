@@ -3220,3 +3220,49 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Split install orchestration below 500 lines and feature folders to at most 12 immediate
   children while preserving plugin install/dispatch/mutator tests, auth backend consumer proofs,
   package publish dry-run and the coordinator's full `scaffold.runtime` verdict.
+## packages/fresh-ui — inherited export documentation and JSON data audit (fresh-ui-doc-export-baseline-2531)
+
+- **Reason:** The full-export structured doc-lint gate reports124 diagnostics:96 private-type references and27 missing JSDoc in TypeScript, plus1 JSON data-export JSDoc limitation. All123 TypeScript diagnostic kind/message/repo-relative path identities match the measured baseline, with0new/0removed. Native member publish dry-run passes with0slow-type warnings. The static metadata audit's JSON module-tag finding remains a raw failure, not a green gate.
+- **Owner:** Fresh UI package maintainers, epic #2412; follow-up #2531.
+- **Target:** Before the next stable Fresh UI design-system publication; theme milestone Frontend Contribution.
+- **Status:** Open, DEBT_ACCEPTED as an unchanged baseline by the independent phase2a IMPL-EVAL at4c4f41e; see evaluate-phase2a.md. No new diagnostic allowance or source suppression is introduced.
+- **Linked evidence:** `.llm/runs/orch-divybot-6538112485--s3-phase2/phase2a-publication-audit.json`, `page-header-evidence-signoff.md` and `fidelity-review.md`; PR #2488.
+- **Cost:** Raw documentation/metadata gates remain failed and generated API docs retain incomplete/private type references; data-only JSON cannot embed a JSDoc comment. This is not a runtime or static-publish failure.
+- **Closing gate:** Zero missing-JSDoc/private-type-reference diagnostics across every TypeScript export without suppression/API removal; preserve valid lossless documented contracts.json and explicitly test JSON-data classification/upstream limitations; pass native member publish dry-run and all consumer/contract tests. Do not close this debt merely because a component PR is green.
+
+
+## packages/cli — CLI-SCAFFOLD-WORKERS-CONTRACT-DEPENDENCY
+
+- **Reason:** The generated workspace's server-only capability reader imports the precise workers
+  contract even when the workers runtime is absent. This preserves typed listJobs calls without
+  inventing a structural replacement contract or changing plugin-owned source.
+- **Cost:** No-workers apps resolve/type-check the workers contract package. Independently updating
+  an installed plugin can produce version skew between that contract and its runtime service.
+- **Mitigation:** Official CLI app and plugin generation share the release-pinned resolver. The
+  scaffold regression asserts the app's contract import matches the shipped plugin and core
+  manifest version. Runtime read errors are unavailable states, never empty success.
+- **Owner:** CLI scaffold maintainers.
+- **Target:** Before supporting independent workers plugin major-version upgrades in scaffold apps.
+- **Linked plan:** `.llm/runs/orch-divybot-6557001595--2570/plan.md`, issue #2570.
+- **Created:** 2026-11-01
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Generate an optional typed app adapter from installed-plugin metadata; prove no-workers
+  apps have no workers dependency and plugin install/update/remove keeps the adapter version aligned,
+  while preserving the typed workers read and live/empty/unauthorized/unavailable tests.
+
+## packages/cli plugin install — AP-1 / F-16 (bounded delivery extension)
+
+- **ID:** CLI-PLUGIN-INSTALL-DELIVERY-SIZE
+- **Reason:** Restoring installed-plugin app delivery adds persisted consumer metadata and a call
+  to the existing registry producer inside the existing install orchestration. Its file grows from
+  759 to 819 lines; a focused app-selection policy and its test increase the install directory's
+  immediate child count from 18 to 20. Both advisory caps were already exceeded. A full install
+  pipeline decomposition would broaden this lifecycle bugfix beyond the restored contract.
+- **Owner:** CLI tooling maintainers.
+- **Target:** Next plugin-install orchestration decomposition in the Runtime Automation theme.
+- **Linked plan:** `.llm/runs/orch-divybot-6560114709--plugin-app-delivery/plan.md` (#2578).
+- **Created:** 2026-11-01
+- **Status:** open
+- **Gate:** F-1 / F-16: install orchestration under 500 lines and at most 12 immediate children,
+  preserving the installed app-link, dry-run, registry and third-party regression tests.
+- **Cost:** Larger existing feature scan surface; no new runtime dependency, dispatcher or service.

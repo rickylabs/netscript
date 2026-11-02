@@ -1,0 +1,186 @@
+vite v7.2.2 building client environment for production...
+transforming...
+../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/regexes.js (74:0): A comment
+
+"/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+ * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+ * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+
+in "../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/util.js (400:0): A comment
+
+"// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+
+in "../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+✓ 318 modules transformed.
+rendering chunks...
+computing gzip size...
+_fresh/client/assets/KaTeX_Size3-Regular-CTq5MqoE.woff           4.42 kB
+_fresh/client/assets/KaTeX_Size4-Regular-Dl5lxZxV.woff2          4.93 kB
+_fresh/client/assets/KaTeX_Size2-Regular-Dy4dx90m.woff2          5.21 kB
+_fresh/client/assets/KaTeX_Size1-Regular-mCD8mA8B.woff2          5.47 kB
+_fresh/client/assets/KaTeX_Size4-Regular-BF-4gkZK.woff           5.98 kB
+_fresh/client/assets/KaTeX_Size2-Regular-oD1tc_U0.woff           6.19 kB
+_fresh/client/assets/KaTeX_Size1-Regular-C195tn64.woff           6.50 kB
+_fresh/client/assets/KaTeX_Caligraphic-Regular-Di6jR-x-.woff2    6.91 kB
+_fresh/client/assets/KaTeX_Caligraphic-Bold-Dq_IR9rO.woff2       6.91 kB
+_fresh/client/assets/KaTeX_Size3-Regular-DgpXs0kz.ttf            7.59 kB
+_fresh/client/assets/KaTeX_Caligraphic-Regular-CTRA-rTL.woff     7.66 kB
+_fresh/client/assets/KaTeX_Caligraphic-Bold-BEiXGLvX.woff        7.72 kB
+_fresh/client/assets/KaTeX_Script-Regular-D3wIWfF6.woff2         9.64 kB
+_fresh/client/assets/KaTeX_SansSerif-Regular-DDBCnlJ7.woff2     10.34 kB
+_fresh/client/assets/KaTeX_Size4-Regular-DWFBv043.ttf           10.36 kB
+_fresh/client/assets/KaTeX_Script-Regular-D5yQViql.woff         10.59 kB
+_fresh/client/assets/KaTeX_Fraktur-Regular-CTYiF6lA.woff2       11.32 kB
+_fresh/client/assets/KaTeX_Fraktur-Bold-CL6g_b3V.woff2          11.35 kB
+_fresh/client/assets/KaTeX_Size2-Regular-B7gKUWhC.ttf           11.51 kB
+_fresh/client/assets/KaTeX_SansSerif-Italic-C3H0VqGB.woff2      12.03 kB
+_fresh/client/assets/KaTeX_SansSerif-Bold-D1sUS0GD.woff2        12.22 kB
+_fresh/client/assets/KaTeX_Size1-Regular-Dbsnue_I.ttf           12.23 kB
+_fresh/client/assets/KaTeX_SansSerif-Regular-CS6fqUqJ.woff      12.32 kB
+_fresh/client/assets/KaTeX_Caligraphic-Regular-wX97UBjC.ttf     12.34 kB
+_fresh/client/assets/KaTeX_Caligraphic-Bold-ATXxdsX0.ttf        12.37 kB
+_fresh/client/assets/KaTeX_Fraktur-Regular-Dxdc4cR9.woff        13.21 kB
+_fresh/client/assets/KaTeX_Fraktur-Bold-BsDP51OF.woff           13.30 kB
+_fresh/client/assets/KaTeX_Typewriter-Regular-CO6r4hn1.woff2    13.57 kB
+_fresh/client/assets/KaTeX_SansSerif-Italic-DN2j7dab.woff       14.11 kB
+_fresh/client/assets/KaTeX_SansSerif-Bold-DbIhKOiC.woff         14.41 kB
+_fresh/client/assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff     16.03 kB
+_fresh/client/assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2       16.40 kB
+_fresh/client/assets/KaTeX_Math-Italic-t53AETM-.woff2           16.44 kB
+_fresh/client/assets/KaTeX_Script-Regular-C5JkGWo-.ttf          16.65 kB
+_fresh/client/assets/KaTeX_Main-BoldItalic-DxDJ3AOS.woff2       16.78 kB
+_fresh/client/assets/KaTeX_Main-Italic-NWA7e6Wa.woff2           16.99 kB
+_fresh/client/assets/KaTeX_Math-BoldItalic-iY-2wyZ7.woff        18.67 kB
+_fresh/client/assets/KaTeX_Math-Italic-DA0__PXp.woff            18.75 kB
+_fresh/client/assets/KaTeX_Main-BoldItalic-SpSLRI95.woff        19.41 kB
+_fresh/client/assets/KaTeX_SansSerif-Regular-BNo7hRIc.ttf       19.44 kB
+_fresh/client/assets/KaTeX_Fraktur-Regular-CB_wures.ttf         19.57 kB
+_fresh/client/assets/KaTeX_Fraktur-Bold-BdnERNNW.ttf            19.58 kB
+_fresh/client/assets/KaTeX_Main-Italic-BMLOBm91.woff            19.68 kB
+_fresh/client/assets/KaTeX_SansSerif-Italic-YYjJ1zSn.ttf        22.36 kB
+_fresh/client/assets/KaTeX_SansSerif-Bold-CFMepnvq.ttf          24.50 kB
+_fresh/client/assets/KaTeX_Main-Bold-Cx986IdX.woff2             25.32 kB
+_fresh/client/assets/KaTeX_Main-Regular-B22Nviop.woff2          26.27 kB
+_fresh/client/assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf      27.56 kB
+_fresh/client/assets/KaTeX_AMS-Regular-BQhdFMY1.woff2           28.08 kB
+_fresh/client/assets/KaTeX_Main-Bold-Jm3AIy58.woff              29.91 kB
+_fresh/client/assets/KaTeX_Main-Regular-Dr94JaBh.woff           30.77 kB
+_fresh/client/assets/KaTeX_Math-BoldItalic-B3XSjfu4.ttf         31.20 kB
+_fresh/client/assets/KaTeX_Math-Italic-flOr_0UB.ttf             31.31 kB
+_fresh/client/.vite/manifest.json                               32.53 kB │ gzip:  2.24 kB
+_fresh/client/assets/KaTeX_Main-BoldItalic-DzxPMmG6.ttf         32.97 kB
+_fresh/client/assets/KaTeX_AMS-Regular-DMm9YOAa.woff            33.52 kB
+_fresh/client/assets/KaTeX_Main-Italic-3WenGoN9.ttf             33.58 kB
+_fresh/client/assets/KaTeX_Main-Bold-waoOVXN0.ttf               51.34 kB
+_fresh/client/assets/KaTeX_Main-Regular-ypZvNtVU.ttf            53.58 kB
+_fresh/client/assets/KaTeX_AMS-Regular-DRggAlZN.ttf             63.63 kB
+_fresh/client/assets/client-entry-DjTl8iUL.css                 258.35 kB │ gzip: 38.44 kB
+_fresh/client/jsxRuntime.module.mjs                              0.41 kB │ gzip:  0.29 kB
+_fresh/client/fresh-island__McpUiWidget.mjs                      1.16 kB │ gzip:  0.65 kB
+_fresh/client/scaffold-contract.mjs                              1.22 kB │ gzip:  0.66 kB
+_fresh/client/fresh-island__SidebarToggle.mjs                    1.38 kB │ gzip:  0.69 kB
+_fresh/client/shared.mjs                                         1.89 kB │ gzip:  1.01 kB
+_fresh/client/fresh-island__ThemeToggle.mjs                      1.93 kB │ gzip:  0.76 kB
+_fresh/client/fresh-island__Toast.mjs                            3.01 kB │ gzip:  1.17 kB
+_fresh/client/hooks.module.mjs                                   3.03 kB │ gzip:  1.32 kB
+_fresh/client/fresh-island__RecordTable.mjs                      3.95 kB │ gzip:  1.58 kB
+_fresh/client/fresh-island__DesktopOnly.mjs                      6.15 kB │ gzip:  2.62 kB
+_fresh/client/signals.module.mjs                                 7.84 kB │ gzip:  3.04 kB
+_fresh/client/fresh-island__SettingsForm.mjs                     8.26 kB │ gzip:  2.81 kB
+_fresh/client/router.mjs                                        10.48 kB │ gzip:  3.69 kB
+_fresh/client/preact.module.mjs                                 11.15 kB │ gzip:  4.70 kB
+_fresh/client/stats-grid.mjs                                    12.28 kB │ gzip:  2.77 kB
+_fresh/client/fresh-island__island_3.mjs                        17.11 kB │ gzip:  5.72 kB
+_fresh/client/fresh-island__WorkspaceCommands.mjs               17.95 kB │ gzip:  6.04 kB
+_fresh/client/client-entry.mjs                                  23.48 kB │ gzip:  9.05 kB
+_fresh/client/cn.mjs                                            27.89 kB │ gzip:  8.80 kB
+✓ built in 4.53s
+vite v7.2.2 building ssr environment for production...
+transforming...
+../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/regexes.js (74:0): A comment
+
+"/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+ * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+ * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+
+in "../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/util.js (400:0): A comment
+
+"// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+
+in "../../../../../..<executable-dependencies>/node_modules/.deno/zod@4.6.7/node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+Downloading https://jsr.io/@netscript/ai/meta.json
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2_meta.json
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/mod.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/runtime/mod.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/ports/model-provider.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/ports/mod.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/application/provider-retry.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/ports/retriever.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/contracts/prompt.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/contracts/errors.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/ports/telemetry.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/ports/chat-client.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/ports/tool-registry.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/ports/embedding.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/ports/vision.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/ports/reachability.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/ports/mcp-transport.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/ports/skill-loader.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/ports/agent-loop.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/ports/memory.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/application/vector-memory.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/adapters/in-memory-vector-memory-store.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/application/backoff.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/tools.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/tools/application/builder.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/tools/adapters/in-memory-registry.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/tools/application/render-ui.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/contracts/ui.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/tools/domain/render-ui.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/anthropic.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/adapters/anthropic.adapter.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/adapters/tanstack-chat-client.ts
+Initialize @tanstack/ai-anthropic@0.21.1
+Initialize @anthropic-ai/sdk@0.97.1
+Initialize json-schema-to-ts@3.1.1
+Initialize standardwebhooks@1.1.1
+Initialize @babel/runtime@7.29.10
+Initialize ts-algebra@2.0.0
+Initialize fast-sha256@1.3.0
+Initialize @stablelib/base64@1.0.1
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/mcp.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/mcp/application/factory.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/mcp/application/pool.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/mcp/application/register-tools.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/mcp/adapters/stdio-transport.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/mcp/adapters/streamable-http-transport.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/mcp/adapters/base-transport.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/mcp/adapters/tanstack-connector.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/mcp/application/auth.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/mcp/application/backoff.ts
+Downloading https://jsr.io/@netscript/ai/0.0.9-canary.2/src/mcp/application/signal.ts
+✓ 1076 modules transformed.
+rendering chunks...
+_fresh/server/.vite/manifest.json                         5.51 kB
+_fresh/server/models.mjs                                  0.30 kB
+_fresh/server/scaffold-records.mjs                        0.52 kB
+_fresh/server/_fresh-route___examples_orders_id_.mjs      0.97 kB
+_fresh/server/_fresh-route___settings.mjs                 1.06 kB
+_fresh/server/_fresh-route___index.mjs                    1.15 kB
+_fresh/server/progress.mjs                                1.16 kB
+_fresh/server/_fresh-route___dashboard.mjs                1.19 kB
+_fresh/server/_fresh-route___examples_index.mjs           2.92 kB
+_fresh/server/_fresh-route___sign_in.mjs                  3.68 kB
+_fresh/server/_fresh-route___records_id_.mjs              5.27 kB
+_fresh/server/_fresh-route___records_index.mjs            6.09 kB
+_fresh/server/_fresh-route___examples_crud.mjs            8.58 kB
+_fresh/server/_fresh-route___health.mjs                   9.34 kB
+_fresh/server/scaffold-overview.mjs                      21.05 kB
+_fresh/server/node.mjs                                   30.47 kB
+_fresh/server/mod.mjs                                   135.56 kB
+_fresh/server/scaffold-capabilities.mjs                 142.63 kB
+_fresh/server/ai.mjs                                    844.59 kB
+_fresh/server/server-entry.mjs                        1,137.44 kB
+✓ built in 11.84s

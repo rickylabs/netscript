@@ -21,9 +21,11 @@ export { ActionMenu } from './src/runtime/action-menu/ActionMenu.tsx';
 export type { ActionMenuNamespace } from './src/runtime/action-menu/ActionMenu.tsx';
 export {
   ACTION_MENU_ITEM_INTENTS,
+  ACTION_MENU_ITEM_ROLES,
   type ActionMenuContentProps,
   type ActionMenuItemIntent,
   type ActionMenuItemProps,
+  type ActionMenuItemRole,
   type ActionMenuOpenChangeReason,
   type ActionMenuRootProps,
   type ActionMenuSeparatorProps,

@@ -1,0 +1,357 @@
+[
+  {
+    "task": "check:desktop-native-fixture",
+    "argv": [
+      "deno",
+      "task",
+      "check:desktop-native-fixture"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 0.27,
+    "durableReceipt": false
+  },
+  {
+    "task": "check:emitted-samples",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "emitted-samples",
+      "--id",
+      "scaffold-2570-s6-check-emitted-samples",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570-s6/check-emitted-samples.json",
+      "--runner",
+      "local-scaffold-2570-s6",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 9.96,
+    "durableReceipt": true
+  },
+  {
+    "task": "check:streams-types",
+    "argv": [
+      "deno",
+      "task",
+      "check:streams-types"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 0.27,
+    "durableReceipt": false
+  },
+  {
+    "task": "check:child-health-docs",
+    "argv": [
+      "deno",
+      "task",
+      "check:child-health-docs"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 0.42,
+    "durableReceipt": false
+  },
+  {
+    "task": "check:mcp-export-corpus",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "mcp-export-corpus",
+      "--id",
+      "scaffold-2570-s6-check-mcp-export-corpus",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570-s6/check-mcp-export-corpus.json",
+      "--runner",
+      "local-scaffold-2570-s6",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 11.41,
+    "durableReceipt": true
+  },
+  {
+    "task": "check:assets-barrel",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "assets-barrel",
+      "--id",
+      "scaffold-2570-s6-check-assets-barrel",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570-s6/check-assets-barrel.json",
+      "--runner",
+      "local-scaffold-2570-s6",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 1,
+    "durationSeconds": 3.53,
+    "durableReceipt": true
+  },
+  {
+    "task": "check:agent-docs-prose",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "agent-docs-prose",
+      "--id",
+      "scaffold-2570-s6-check-agent-docs-prose",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570-s6/check-agent-docs-prose.json",
+      "--runner",
+      "local-scaffold-2570-s6",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 17.04,
+    "durableReceipt": true
+  },
+  {
+    "task": "check:publish-assets",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "publish-assets",
+      "--id",
+      "scaffold-2570-s6-check-publish-assets",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570-s6/check-publish-assets.json",
+      "--runner",
+      "local-scaffold-2570-s6",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 0.72,
+    "durableReceipt": true
+  },
+  {
+    "task": "check:scaffold-versions",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "scaffold-versions",
+      "--id",
+      "scaffold-2570-s6-check-scaffold-versions",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570-s6/check-scaffold-versions.json",
+      "--runner",
+      "local-scaffold-2570-s6",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 0.27,
+    "durableReceipt": true
+  },
+  {
+    "task": "check:aspire-version-parity",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "aspire-version-parity",
+      "--id",
+      "scaffold-2570-s6-check-aspire-version-parity",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570-s6/check-aspire-version-parity.json",
+      "--runner",
+      "local-scaffold-2570-s6",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 1,
+    "durationSeconds": 0.57,
+    "durableReceipt": true
+  },
+  {
+    "task": "check:netscript-jsr-specifiers",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "netscript-jsr-specifiers",
+      "--id",
+      "scaffold-2570-s6-check-netscript-jsr-specifiers",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570-s6/check-netscript-jsr-specifiers.json",
+      "--runner",
+      "local-scaffold-2570-s6",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 2.57,
+    "durableReceipt": true
+  },
+  {
+    "task": "check:aspire-host-ports",
+    "argv": [
+      "deno",
+      "task",
+      "check:aspire-host-ports"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 0.47,
+    "durableReceipt": false
+  },
+  {
+    "task": "check:figma-names",
+    "argv": [
+      "deno",
+      "task",
+      "check:figma-names"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 0.92,
+    "durableReceipt": false
+  },
+  {
+    "task": "check:review-threads",
+    "argv": [
+      "deno",
+      "task",
+      "check:review-threads",
+      "--",
+      "--repo",
+      "rickylabs/netscript",
+      "--pr",
+      "2572",
+      "--pretty"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 0.62,
+    "durableReceipt": false
+  },
+  {
+    "task": "check:design-skill",
+    "argv": [
+      "deno",
+      "task",
+      "check:design-skill"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 0.17,
+    "durableReceipt": false
+  },
+  {
+    "task": "release:preflight",
+    "argv": [
+      "deno",
+      "task",
+      "release:preflight"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 2.27,
+    "durableReceipt": false
+  },
+  {
+    "task": "docs:accuracy",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "docs-accuracy",
+      "--id",
+      "scaffold-2570-s6-docs-accuracy",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570-s6/docs-accuracy.json",
+      "--runner",
+      "local-scaffold-2570-s6",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 8.1,
+    "durableReceipt": true
+  },
+  {
+    "task": "quality:gate",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "quality-gate",
+      "--id",
+      "scaffold-2570-s6-quality-gate",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570-s6/quality-gate.json",
+      "--runner",
+      "local-scaffold-2570-s6",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 20.15,
+    "durableReceipt": true
+  },
+  {
+    "task": "publish:dry-run",
+    "argv": [
+      "deno",
+      "run",
+      "-A",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "publish-dry-run",
+      "--id",
+      "scaffold-2570-s6-publish-dry-run",
+      "--output",
+      ".llm/tmp/gate-receipts/scaffold-2570-s6/publish-dry-run.json",
+      "--runner",
+      "local-scaffold-2570-s6",
+      "--timeout-ms",
+      "1800000"
+    ],
+    "head": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+    "exitCode": 0,
+    "durationSeconds": 58.8,
+    "durableReceipt": true
+  }
+]

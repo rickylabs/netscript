@@ -544,6 +544,14 @@ jobs:
           .llm/tools/gates/run-gate.ts --gate netscript-jsr-specifiers --id quality-jsr-specifiers
           --output .llm/tmp/gate-receipts/quality/jsr-specifiers.json
 
+      - name: Scaffold provider bundle boundary and negative control
+        if: env.RUN_DENO == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate scaffold-provider-boundary
+          --id quality-scaffold-provider-boundary
+          --output .llm/tmp/gate-receipts/quality/scaffold-provider-boundary.json
+
       - name: Scaffold version guard (no preview pins)
         if: env.RUN_DENO == 'true'
         run: >-

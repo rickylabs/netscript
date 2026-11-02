@@ -101,6 +101,7 @@ interface GeneratedModule {
     services: Map<string, RecordingResource>,
     plugins: Map<string, RecordingResource>,
     root: string,
+    background?: Map<string, RecordingResource>,
   ): Promise<Map<string, unknown>>;
 }
 
@@ -110,7 +111,10 @@ function isGeneratedModule(value: unknown): value is GeneratedModule {
 }
 
 /** Executes emitted code with recording resources and checks its SDK-facing types. */
-export async function registerWorkspace(config: NetScriptConfig) {
+export async function registerWorkspace(
+  config: NetScriptConfig,
+  generatedConfig: NetScriptConfig = config,
+) {
   const root = await Deno.makeTempDir({ prefix: 'netscript-cors-' });
   const services = new Map(
     Object.keys(config.Services).map((
@@ -123,6 +127,9 @@ export async function registerWorkspace(config: NetScriptConfig) {
     ) => [name, new RecordingResource(name)]),
   );
   const apps = new Map<string, RecordingResource>();
+  const background = new Map(
+    Object.keys(config.BackgroundProcessors).map((name) => [name, new RecordingResource(name)]),
+  );
   // Existing declarations are overridden by the workspace origin policy.
   for (const target of [...services.values(), ...plugins.values()]) {
     target.withEnvironment('NETSCRIPT_CORS_ORIGINS', 'https://stale.example');
@@ -143,7 +150,7 @@ export async function registerWorkspace(config: NetScriptConfig) {
     await Deno.writeTextFile(
       path,
       generateRegisterApps({
-        apps: config.Apps,
+        apps: generatedConfig.Apps,
         version: config.Version,
         denoDefaults: config.Defaults.Deno,
       }),
@@ -167,6 +174,7 @@ export async function registerWorkspace(config: NetScriptConfig) {
       services,
       plugins,
       root,
+      background,
     );
     return { services, plugins, apps };
   } finally {

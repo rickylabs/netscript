@@ -7,7 +7,47 @@
       "category": "Foundations",
       "priority": "P0",
       "shipped": true,
-      "props": {},
+      "props": {
+        "name": {
+          "kind": "enum",
+          "values": [
+            "alert-triangle",
+            "arrow-left",
+            "arrow-right",
+            "bell",
+            "calendar",
+            "check",
+            "chevron-down",
+            "chevron-left",
+            "chevron-right",
+            "chevron-up",
+            "circle-alert",
+            "circle-check",
+            "corner-down-left",
+            "copy",
+            "download",
+            "external-link",
+            "file-text",
+            "info",
+            "menu",
+            "minus",
+            "plus",
+            "search",
+            "settings",
+            "trash",
+            "x"
+          ],
+          "required": true
+        },
+        "size": {
+          "kind": "text",
+          "description": "CSS length or numeric SVG dimension; defaults to 1em."
+        },
+        "title": {
+          "kind": "text",
+          "description": "Optional accessible title; omitted icons are decorative."
+        }
+      },
       "parts": [
         {
           "name": "root"
@@ -404,7 +444,7 @@
       "specId": "A3",
       "category": "Actions",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "orientation": {
           "kind": "enum",
@@ -426,22 +466,26 @@
         },
         "text": {
           "kind": "boolean"
+        },
+        "children": {
+          "kind": "slot",
+          "required": true
+        },
+        "textContent": {
+          "kind": "slot"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "separator",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "text",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         }
       ],
       "attributes": {
@@ -463,7 +507,16 @@
         "separator",
         "text"
       ],
-      "slots": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "root"
+        },
+        {
+          "name": "textContent",
+          "part": "text"
+        }
+      ],
       "apg": "native buttons and links",
       "keyboard": [
         {
@@ -481,7 +534,7 @@
         "text/muted"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native CSS pseudo-classes carry transient focus/hover; data-state also supports deliberate preview renders. Native button semantics preserve form behavior."
       ]
     },
     {
@@ -489,7 +542,7 @@
       "specId": "A4",
       "category": "Actions",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "variant": {
           "kind": "enum",
@@ -507,11 +560,7 @@
           ]
         },
         "selected": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+          "kind": "boolean"
         },
         "state": {
           "kind": "enum",
@@ -530,39 +579,52 @@
         },
         "label": {
           "kind": "boolean"
+        },
+        "defaultSelected": {
+          "kind": "boolean",
+          "default": false
+        },
+        "onSelectedChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "iconStartGlyph": {
+          "kind": "slot"
+        },
+        "iconEndGlyph": {
+          "kind": "slot"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "icon-start",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "label",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "icon-end",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "state-layer",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         }
       ],
       "attributes": {
@@ -600,7 +662,20 @@
         "iconEnd",
         "label"
       ],
-      "slots": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "label"
+        },
+        {
+          "name": "iconStartGlyph",
+          "part": "icon-start"
+        },
+        {
+          "name": "iconEndGlyph",
+          "part": "icon-end"
+        }
+      ],
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/",
       "keyboard": [
         {
@@ -616,7 +691,7 @@
         "text/muted"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native CSS pseudo-classes carry transient focus/hover; data-state also supports deliberate preview renders. Native button semantics preserve form behavior."
       ]
     },
     {
@@ -624,7 +699,7 @@
       "specId": "A5",
       "category": "Actions",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "variant": {
           "kind": "enum",
@@ -654,17 +729,35 @@
             "single",
             "multiple"
           ]
+        },
+        "label": {
+          "kind": "text",
+          "required": true
+        },
+        "items": {
+          "kind": "collection",
+          "required": true
+        },
+        "value": {
+          "kind": "collection"
+        },
+        "defaultValue": {
+          "kind": "collection"
+        },
+        "onValueChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "track",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "variant=segmented"
         }
       ],
       "attributes": {
@@ -715,7 +808,7 @@
         "space/inline/gap"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native CSS pseudo-classes carry transient focus/hover; data-state also supports deliberate preview renders. Native button semantics preserve form behavior."
       ]
     },
     {
@@ -883,7 +976,8 @@
             "rest",
             "disabled",
             "invalid"
-          ]
+          ],
+          "description": "Presentation snapshot; the associated control owns disabled/invalid semantics."
         },
         "children": {
           "kind": "slot",
@@ -898,6 +992,10 @@
         },
         "optional": {
           "kind": "boolean"
+        },
+        "optionalText": {
+          "kind": "slot",
+          "description": "Optional hint content; rendered when optional is true and required is false."
         }
       },
       "parts": [
@@ -927,9 +1025,6 @@
           "values": [
             "default",
             "eyebrow"
-          ],
-          "plannedValues": [
-            "eyebrow"
           ]
         },
         "data-state": {
@@ -939,22 +1034,45 @@
             "invalid"
           ],
           "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+        },
+        "data-sr-only": {
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       },
       "booleans": [
         "required",
-        "optional"
+        "optional",
+        "srOnly"
       ],
-      "slots": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "text"
+        },
+        {
+          "name": "optionalText",
+          "part": "optional-hint"
+        }
+      ],
       "apg": "native label",
-      "keyboard": [],
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between associated controls; the label adds no focus target"
+        }
+      ],
       "tokenRoles": [
         "destructive/text",
         "text/fg",
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Required wins over optional. srOnly preserves the native accessible label and suppresses its decorative required mark."
       ]
     },
     {
@@ -1480,15 +1598,8 @@
       "specId": "F6",
       "category": "Forms",
       "priority": "P0",
-      "shipped": false,
+      "shipped": true,
       "props": {
-        "checked": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
-        },
         "state": {
           "kind": "enum",
           "values": [
@@ -1505,43 +1616,63 @@
             "horizontal",
             "vertical"
           ]
+        },
+        "name": {
+          "kind": "text",
+          "required": true
+        },
+        "legend": {
+          "kind": "slot",
+          "required": true
+        },
+        "options": {
+          "kind": "collection",
+          "required": true
+        },
+        "value": {
+          "kind": "text"
+        },
+        "defaultValue": {
+          "kind": "text"
+        },
+        "onValueChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "required": {
+          "kind": "boolean"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "control",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "indicator",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "body",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "label",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "description",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         }
       ],
       "attributes": {
@@ -1549,6 +1680,9 @@
           "values": [
             "false",
             "true"
+          ],
+          "parts": [
+            "control"
           ]
         },
         "data-state": {
@@ -1559,7 +1693,11 @@
             "disabled",
             "invalid"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "root",
+            "control"
+          ]
         },
         "data-orientation": {
           "values": [
@@ -1589,7 +1727,8 @@
         "surface/card"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native controls own keyboard/form behavior. Transient focus/hover is CSS/native; data-state also supports deliberate preview. Client visual/controlled updates require an island.",
+        "Design checked belongs to individual Radio controls; the group public API uses value/defaultValue and native name. Disabled fieldset applies to every option."
       ]
     },
     {
@@ -1882,7 +2021,7 @@
       "specId": "F9",
       "category": "Forms",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "align": {
           "kind": "enum",
@@ -1903,37 +2042,36 @@
           ]
         },
         "control": {
-          "kind": "slot"
+          "kind": "slot",
+          "required": true
         },
         "addon": {
+          "kind": "slot"
+        },
+        "text": {
           "kind": "slot"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "addon",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "control",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "text",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         }
       ],
       "attributes": {
@@ -1964,6 +2102,10 @@
         {
           "name": "addon",
           "part": "addon"
+        },
+        {
+          "name": "text",
+          "part": "text"
         }
       ],
       "apg": "native input group",
@@ -1973,7 +2115,8 @@
         "text/fg"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native controls own keyboard/form behavior. Transient focus/hover is CSS/native; data-state also supports deliberate preview. Client visual/controlled updates require an island.",
+        "For invalid state, callers supply aria-invalid and aria-describedby on the native control slot; a fieldset cannot propagate invalid semantics."
       ]
     },
     {
@@ -1981,7 +2124,7 @@
       "specId": "F10",
       "category": "Forms",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "length": {
           "kind": "enum",
@@ -1997,14 +2140,6 @@
             "2"
           ]
         },
-        "content": {
-          "kind": "enum",
-          "values": [
-            "empty",
-            "value",
-            "caret"
-          ]
-        },
         "state": {
           "kind": "enum",
           "values": [
@@ -2013,27 +2148,45 @@
             "disabled",
             "invalid"
           ]
+        },
+        "label": {
+          "kind": "text",
+          "required": true
+        },
+        "value": {
+          "kind": "text"
+        },
+        "defaultValue": {
+          "kind": "text"
+        },
+        "onValueChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "required": {
+          "kind": "boolean"
+        },
+        "name": {
+          "kind": "text"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "group",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "slot",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "separator",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         }
       ],
       "attributes": {
@@ -2054,6 +2207,9 @@
             "empty",
             "value",
             "caret"
+          ],
+          "parts": [
+            "slot"
           ]
         },
         "data-state": {
@@ -2063,13 +2219,30 @@
             "disabled",
             "invalid"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "root",
+            "slot"
+          ]
         }
       },
       "booleans": [],
       "slots": [],
       "apg": "native one-time-code input",
-      "keyboard": [],
+      "keyboard": [
+        {
+          "key": "ArrowLeft/ArrowRight/Home/End",
+          "action": "Move the native input selection"
+        },
+        {
+          "key": "Backspace/Delete",
+          "action": "Edit the native code input"
+        },
+        {
+          "key": "Paste",
+          "action": "Replace the native selection with sanitized digits"
+        }
+      ],
       "tokenRoles": [
         "border/input",
         "destructive/default",
@@ -2078,7 +2251,8 @@
         "text/fg"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native controls own keyboard/form behavior. Transient focus/hover is CSS/native; data-state also supports deliberate preview. Client visual/controlled updates require an island.",
+        "One real text input handles selection, autofill and form value; grouped slots are aria-hidden mirrors. content is slot anatomy, not a caller prop. Paste normalizes ASCII digits and preserves native selection replacement."
       ]
     },
     {
@@ -2086,7 +2260,7 @@
       "specId": "F11",
       "category": "Forms",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "orientation": {
           "kind": "enum",
@@ -2113,38 +2287,66 @@
         },
         "value": {
           "kind": "boolean"
+        },
+        "label": {
+          "kind": "text",
+          "required": true
+        },
+        "labels": {
+          "kind": "collection"
+        },
+        "name": {
+          "kind": "text"
+        },
+        "min": {
+          "kind": "number",
+          "default": 0
+        },
+        "max": {
+          "kind": "number",
+          "default": 100
+        },
+        "step": {
+          "kind": "number",
+          "default": 1
+        },
+        "values": {
+          "kind": "collection"
+        },
+        "defaultValues": {
+          "kind": "collection"
+        },
+        "onValuesChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "track",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "range",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "thumb",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "value-label",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         }
       ],
       "attributes": {
@@ -2191,7 +2393,9 @@
         "surface/card"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native controls own keyboard/form behavior. Transient focus/hover is CSS/native; data-state also supports deliberate preview. Client visual/controlled updates require an island.",
+        "value is the design value-label visibility boolean; numeric positions use values/defaultValues. One/two native range inputs keep shared min/max geometry and clamp crossing requests.",
+        "Coincident upper-half thumbs put the lower native input on top; at the lower half the upper input stays on top, so pointer users can separate endpoint thumbs."
       ]
     },
     {
@@ -2305,7 +2509,7 @@
       "specId": "F13",
       "category": "Forms",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "months": {
           "kind": "enum",
@@ -2321,67 +2525,94 @@
             "dropdown"
           ]
         },
-        "state": {
+        "mode": {
           "kind": "enum",
           "values": [
-            "rest",
-            "hover",
-            "focus",
-            "selected",
-            "disabled",
-            "today"
-          ]
+            "single",
+            "range"
+          ],
+          "default": "single"
         },
-        "range": {
+        "value": {
+          "kind": "collection",
+          "description": "Ordered ISO date strings; single has at most one and range at most two."
+        },
+        "defaultValue": {
+          "kind": "collection",
+          "description": "Ordered ISO date strings; single has at most one and range at most two."
+        },
+        "defaultMonth": {
+          "kind": "text"
+        },
+        "today": {
+          "kind": "text",
+          "description": "Defaults to the current UTC date. Pass the user-local ISO date when local-day highlighting is required."
+        },
+        "min": {
+          "kind": "text"
+        },
+        "max": {
+          "kind": "text"
+        },
+        "locale": {
+          "kind": "text"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "autoFocus": {
+          "kind": "boolean"
+        },
+        "onValueChange": {
+          "kind": "callback"
+        },
+        "isDateDisabled": {
+          "kind": "callback"
+        },
+        "weekStartsOn": {
           "kind": "enum",
           "values": [
-            "none",
-            "start",
-            "middle",
-            "end"
-          ]
+            "0",
+            "1"
+          ],
+          "default": 0
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "header",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "nav-prev",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "caption",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "nav-next",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "weekdays",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "grid",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "day"
         }
       ],
       "attributes": {
@@ -2406,7 +2637,10 @@
             "disabled",
             "today"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "day"
+          ]
         },
         "data-range": {
           "values": [
@@ -2414,6 +2648,9 @@
             "start",
             "middle",
             "end"
+          ],
+          "parts": [
+            "day"
           ]
         }
       },
@@ -2428,6 +2665,14 @@
         {
           "key": "Home/End",
           "action": "Move to first/last cell"
+        },
+        {
+          "key": "PageUp/PageDown",
+          "action": "Move one month, preserving or clamping the day; Shift moves one year."
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Select the focused enabled day."
         }
       ],
       "tokenRoles": [
@@ -2440,7 +2685,8 @@
         "text/muted"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "UTC Gregorian ISO API; native buttons and select captions. Day state/range are derived, with CSS hover/focus; no caller state simulation. Only endpoints get selected visual state; middle cells remain aria-selected with range fill.",
+        "Hydrate inside an island. Disabled/out-of-bounds dates are skipped; browsing alone never changes selection."
       ]
     },
     {
@@ -2448,7 +2694,7 @@
       "specId": "F14",
       "category": "Forms",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "mode": {
           "kind": "enum",
@@ -2462,32 +2708,79 @@
           "values": [
             "rest",
             "focus",
-            "open",
             "disabled",
             "invalid"
           ]
+        },
+        "label": {
+          "kind": "text",
+          "required": true
+        },
+        "name": {
+          "kind": "text"
+        },
+        "defaultMonth": {
+          "kind": "text"
+        },
+        "min": {
+          "kind": "text"
+        },
+        "max": {
+          "kind": "text"
+        },
+        "placeholder": {
+          "kind": "text"
+        },
+        "locale": {
+          "kind": "text"
+        },
+        "value": {
+          "kind": "collection"
+        },
+        "defaultValue": {
+          "kind": "collection"
+        },
+        "open": {
+          "kind": "boolean"
+        },
+        "defaultOpen": {
+          "kind": "boolean"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "onValueChange": {
+          "kind": "callback"
+        },
+        "onOpenChange": {
+          "kind": "callback"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "trigger",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "content",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "title"
+        },
+        {
+          "name": "description"
+        },
+        {
+          "name": "close"
         }
       ],
       "attributes": {
@@ -2505,7 +2798,15 @@
             "disabled",
             "invalid"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Root derives open from Dialog; trigger/content retain its native runtime open/closed values.",
+          "parts": [
+            "root",
+            "trigger",
+            "content"
+          ],
+          "compatibilityValues": [
+            "closed"
+          ]
         }
       },
       "booleans": [],
@@ -2526,7 +2827,9 @@
         "text/fg"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Calendar embedded in package-owned native modal Dialog; uses existing focus, Escape and return behavior.",
+        "Browser-forced dismissal can supersede a rejected close request; applications should normally accept native close requests.",
+        "ISO value collection and open state can each be controlled. A named hidden input submits dates joined by /. Open data-state is derived; hydrate in an island."
       ]
     },
     {
@@ -2819,16 +3122,17 @@
           "values": [
             "numbered",
             "pager"
-          ]
+          ],
+          "default": "numbered"
         },
         "type": {
           "kind": "enum",
           "values": [
             "page",
             "previous",
-            "next",
-            "ellipsis"
-          ]
+            "next"
+          ],
+          "description": "Link type; decorative Ellipsis is a separate namespace member."
         },
         "state": {
           "kind": "enum",
@@ -2838,7 +3142,23 @@
             "focus",
             "current",
             "disabled"
-          ]
+          ],
+          "description": "Link/tile snapshot; current/disabled also set native navigation semantics. Transient hover/focus use CSS."
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "href": {
+          "kind": "text",
+          "description": "Required on enabled Link/Previous/Next destinations."
+        },
+        "current": {
+          "kind": "boolean",
+          "description": "Link/tile only; emits aria-current=page."
+        },
+        "disabled": {
+          "kind": "boolean",
+          "description": "Link/tile only; removes href and tab stop, blocks click callbacks."
         }
       },
       "parts": [
@@ -2873,6 +3193,18 @@
           "name": "focus-ring",
           "representation": "pseudo",
           "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "key",
+          "when": "numbered Link supplied"
+        },
+        {
+          "name": "ellipsis",
+          "when": "Ellipsis supplied"
+        },
+        {
+          "name": "icon",
+          "when": "previous/next key or tile supplied"
         }
       ],
       "attributes": {
@@ -2880,14 +3212,17 @@
           "values": [
             "numbered",
             "pager"
-          ],
-          "plannedValues": [
-            "pager"
           ]
         },
         "data-type": {
           "values": [
             "page",
+            "previous",
+            "next",
+            "ellipsis"
+          ],
+          "parts": [
+            "key",
             "previous",
             "next",
             "ellipsis"
@@ -2901,20 +3236,54 @@
             "current",
             "disabled"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "key",
+            "previous",
+            "next",
+            "ellipsis"
+          ]
         }
       },
-      "booleans": [],
-      "slots": [],
+      "booleans": [
+        "current",
+        "disabled"
+      ],
+      "slots": [
+        {
+          "name": "children",
+          "part": "root"
+        },
+        {
+          "name": "Previous.children",
+          "part": "title"
+        },
+        {
+          "name": "Next.children",
+          "part": "title"
+        },
+        {
+          "name": "Meta.children",
+          "part": "meta"
+        },
+        {
+          "name": "Actions.children",
+          "part": "actions"
+        },
+        {
+          "name": "Link.children",
+          "part": "key"
+        }
+      ],
       "apg": "native navigation links",
       "keyboard": [
         {
-          "key": "Tab",
-          "action": "Focus links"
+          "key": "Tab/Shift+Tab",
+          "action": "Focus enabled native links; skip disabled and decorative keys"
         },
         {
           "key": "Enter",
-          "action": "Follow link"
+          "action": "Follow the focused enabled destination"
         }
       ],
       "tokenRoles": [
@@ -2926,7 +3295,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Meta/Actions composition remains supported. Pager tiles use native previous/next relations; document direction mirrors their decorative arrows."
       ]
     },
     {
@@ -3385,93 +3755,66 @@
       "specId": "N6",
       "category": "Navigation",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
-        "trigger": {
-          "kind": "enum",
-          "values": [
-            "link",
-            "menu"
-          ]
+        "label": {
+          "kind": "text",
+          "required": true
         },
-        "state": {
-          "kind": "enum",
-          "values": [
-            "rest",
-            "hover",
-            "focus",
-            "selected",
-            "open"
-          ]
-        },
-        "open": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+        "items": {
+          "kind": "collection",
+          "required": true,
+          "description": "Unique IDs, labels and either href or a list of navigation links; current marks the active lane."
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "list",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "item",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "marker",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "label",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "chevron",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "viewport",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "link",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "title",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "description",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "indicator",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         }
       ],
       "attributes": {
@@ -3479,6 +3822,9 @@
           "values": [
             "link",
             "menu"
+          ],
+          "parts": [
+            "item"
           ]
         },
         "data-state": {
@@ -3489,7 +3835,10 @@
             "selected",
             "open"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "item"
+          ]
         },
         "data-open": {
           "values": [
@@ -3505,6 +3854,14 @@
         {
           "key": "Enter/Space",
           "action": "Toggle disclosure"
+        },
+        {
+          "key": "Escape",
+          "action": "Close disclosure and return focus to its summary."
+        },
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Follow native link/summary order; focus exit closes disclosure."
         }
       ],
       "tokenRoles": [
@@ -3513,7 +3870,8 @@
         "text/muted"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native details/name exclusivity works before hydration; island adds Escape and focus-exit dismissal. Open/trigger/state are derived from the native disclosure and item records.",
+        "Current links, including disclosure-panel links, own aria-current=page; their decorative marker has no tab stop. Escape is handled only while a disclosure is open, preserving outer native dismissal."
       ]
     },
     {
@@ -3521,39 +3879,42 @@
       "specId": "N7",
       "category": "Navigation",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
-        "state": {
-          "kind": "enum",
-          "values": [
-            "rest",
-            "hover",
-            "focus",
-            "open",
-            "disabled"
-          ]
+        "label": {
+          "kind": "text",
+          "required": true
+        },
+        "menus": {
+          "kind": "collection",
+          "required": true
+        },
+        "value": {
+          "kind": "text"
+        },
+        "defaultValue": {
+          "kind": "text"
+        },
+        "onValueChange": {
+          "kind": "callback"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "trigger",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "content",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         }
       ],
       "attributes": {
@@ -3565,7 +3926,14 @@
             "open",
             "disabled"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "trigger",
+            "content"
+          ],
+          "compatibilityValues": [
+            "closed"
+          ]
         }
       },
       "booleans": [],
@@ -3583,6 +3951,26 @@
         {
           "key": "Escape",
           "action": "Close menu"
+        },
+        {
+          "key": "Home/End",
+          "action": "Move to first/last enabled trigger or menu item."
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Open a menu, activate actions or change caller-owned checkbox/radio state."
+        },
+        {
+          "key": "ArrowRight/ArrowLeft in submenu",
+          "action": "Open/close nested menu, respecting direction."
+        },
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Close the menu and leave through the roving trigger."
+        },
+        {
+          "key": "Printable character",
+          "action": "Find the next matching menu item."
         }
       ],
       "tokenRoles": [
@@ -3592,7 +3980,9 @@
         "surface/hover"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Roving native application menu triggers delegate popovers and collection keys to public ActionMenu; source must hydrate in an island.",
+        "Menu records contain app callbacks and controlled choice state. Nested menu items use private copied menu-items support, not a second public component identity.",
+        "Trigger/content preserve runtime open/closed; disabled/hover/focus are native properties and CSS. value/null controls the open menu."
       ]
     },
     {
@@ -3600,7 +3990,7 @@
       "specId": "N8",
       "category": "Navigation",
       "priority": "P0",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "size": {
           "kind": "enum",
@@ -3612,8 +4002,7 @@
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         }
       ],
       "attributes": {
@@ -3632,7 +4021,7 @@
         "deco/marker"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Decorative aria-hidden square; parent owns aria-current. No focus stop. Existing Studio marker token with foreground fallback; no token changes."
       ]
     },
     {
@@ -3640,17 +4029,8 @@
       "specId": "N9",
       "category": "Navigation",
       "priority": "P2",
-      "shipped": false,
+      "shipped": true,
       "props": {
-        "status": {
-          "kind": "enum",
-          "values": [
-            "complete",
-            "current",
-            "upcoming",
-            "error"
-          ]
-        },
         "orientation": {
           "kind": "enum",
           "values": [
@@ -3663,37 +4043,40 @@
         },
         "connector": {
           "kind": "boolean"
+        },
+        "steps": {
+          "kind": "collection",
+          "required": true,
+          "description": "Unique IDs, titles, descriptions, status and optional native href. At most one current step."
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "indicator",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "body",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "title",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "description",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "connector",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
+        },
+        {
+          "name": "step",
+          "when": "one per supplied step"
         }
       ],
       "attributes": {
@@ -3703,6 +4086,9 @@
             "current",
             "upcoming",
             "error"
+          ],
+          "parts": [
+            "step"
           ]
         },
         "data-orientation": {
@@ -3728,7 +4114,7 @@
         "topbar/rule"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Ordered list presentation; status belongs to each step record. Native links are optional, no composite key manager. Current step owns aria-current=step and every status has readable text."
       ]
     },
     {
@@ -3954,7 +4340,7 @@
       "specId": "O2",
       "category": "Overlays",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "variant": {
           "kind": "enum",
@@ -3970,78 +4356,112 @@
             "md"
           ]
         },
-        "state": {
-          "kind": "enum",
-          "values": [
-            "rest",
-            "open"
-          ]
-        },
         "media": {
+          "kind": "boolean"
+        },
+        "open": {
+          "kind": "boolean"
+        },
+        "defaultOpen": {
+          "kind": "boolean"
+        },
+        "onOpenChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "triggerLabel": {
+          "kind": "text",
+          "required": true
+        },
+        "actionLabel": {
+          "kind": "text",
+          "required": true
+        },
+        "cancelLabel": {
+          "kind": "text",
+          "required": false
+        },
+        "title": {
+          "kind": "slot",
+          "required": true
+        },
+        "description": {
+          "kind": "slot",
+          "required": true
+        },
+        "children": {
+          "kind": "slot",
+          "required": false
+        },
+        "mediaIcon": {
+          "kind": "slot",
+          "required": false
+        },
+        "onAction": {
+          "kind": "callback"
+        },
+        "onCancel": {
+          "kind": "callback"
+        },
+        "pending": {
           "kind": "boolean"
         }
       },
       "parts": [
         {
+          "name": "label"
+        },
+        {
+          "name": "spinner",
+          "when": "pending action"
+        },
+        {
           "name": "root",
-          "representation": "context",
-          "planned": true
+          "representation": "context"
         },
         {
           "name": "backdrop",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "native modal is open",
+          "representation": "pseudo"
         },
         {
-          "name": "content",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "name": "content"
         },
         {
-          "name": "header",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "name": "header"
         },
         {
-          "name": "title",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "name": "title"
         },
         {
-          "name": "description",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "name": "description"
         },
         {
           "name": "body",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
-          "name": "footer",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "name": "footer"
         },
         {
           "name": "media",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
-          "name": "cancel",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "name": "cancel"
         },
         {
-          "name": "action",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "name": "action"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "trigger"
         }
       ],
       "attributes": {
@@ -4049,12 +4469,18 @@
           "values": [
             "default",
             "destructive"
+          ],
+          "parts": [
+            "content"
           ]
         },
         "data-size": {
           "values": [
             "sm",
             "md"
+          ],
+          "parts": [
+            "content"
           ]
         },
         "data-state": {
@@ -4062,13 +4488,37 @@
             "rest",
             "open"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "trigger",
+            "content"
+          ],
+          "compatibilityValues": [
+            "closed"
+          ]
         }
       },
       "booleans": [
         "media"
       ],
-      "slots": [],
+      "slots": [
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "description",
+          "part": "description"
+        },
+        {
+          "name": "children",
+          "part": "body"
+        },
+        {
+          "name": "mediaIcon",
+          "part": "media"
+        }
+      ],
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/",
       "keyboard": [
         {
@@ -4085,7 +4535,10 @@
         "text/fg"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Context-only Root composes public native Dialog. Native backdrop requires no extra DOM; no close icon or outside-click dismissal.",
+        "Cancel receives initial focus. Native Escape requests cancel; pending disables only the action. App callbacks and asynchronous work remain caller-owned.",
+        "Action includes Button label/spinner parts. Canonical destructive fill/foreground roles are preserved; the scoped hover uses destructive/hover rather than the generic legacy raw red ramp. Token values remain owned by #2450.",
+        "Open/closed runtime hooks remain on trigger/content; browser-forced dismissal remains native behavior."
       ]
     },
     {
@@ -4418,6 +4871,11 @@
         },
         "close": {
           "kind": "boolean"
+        },
+        "focusOnOpen": {
+          "kind": "boolean",
+          "default": true,
+          "description": "Popover.Root may preserve trigger focus for informational previews."
         }
       },
       "parts": [
@@ -4651,7 +5109,7 @@
       "specId": "O7",
       "category": "Overlays",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "placement": {
           "kind": "enum",
@@ -4662,49 +5120,75 @@
             "left"
           ]
         },
-        "state": {
-          "kind": "enum",
-          "values": [
-            "rest",
-            "open"
-          ]
+        "open": {
+          "kind": "boolean"
+        },
+        "defaultOpen": {
+          "kind": "boolean"
+        },
+        "onOpenChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "triggerLabel": {
+          "kind": "text",
+          "required": true
+        },
+        "title": {
+          "kind": "text",
+          "required": true
+        },
+        "description": {
+          "kind": "slot",
+          "required": true
+        },
+        "avatar": {
+          "kind": "slot",
+          "required": false
+        },
+        "meta": {
+          "kind": "slot",
+          "required": false
+        },
+        "closeDelay": {
+          "kind": "number",
+          "default": 150,
+          "description": "Pointer transfer grace in milliseconds; focused content stays open."
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "trigger",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "content",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "title",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "description",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "meta",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "avatar"
         }
       ],
       "attributes": {
@@ -4714,6 +5198,11 @@
             "right",
             "bottom",
             "left"
+          ],
+          "parts": [
+            "root",
+            "trigger",
+            "content"
           ]
         },
         "data-state": {
@@ -4721,23 +5210,54 @@
             "rest",
             "open"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.",
+          "parts": [
+            "root",
+            "trigger",
+            "content"
+          ],
+          "compatibilityValues": [
+            "closed"
+          ]
         }
       },
       "booleans": [],
-      "slots": [],
+      "slots": [
+        {
+          "name": "description",
+          "part": "description"
+        },
+        {
+          "name": "avatar",
+          "part": "avatar"
+        },
+        {
+          "name": "meta",
+          "part": "meta"
+        }
+      ],
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/",
       "keyboard": [
         {
           "key": "Enter/Space",
           "action": "Toggle disclosure"
+        },
+        {
+          "key": "Escape",
+          "action": "Close only the open preview and return trigger focus."
+        },
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Native focus navigation; preview never traps focus or steals it on entry."
         }
       ],
       "tokenRoles": [
         "text/muted"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Public Popover with focusOnOpen=false; hover/focus preview and native disclosure button preserve trigger focus.",
+        "Mouse hover previews; clicking an already-hovered trigger closes it. Touch/pen use activation-only toggle and pointer-induced focus does not open separately. Pointer transfer grace allows selecting/using preview content. Native focus exit/outside dismissal closes; no backend profile lookup.",
+        "Runtime trigger/content retain open/closed; root uses rest/open."
       ]
     },
     {
@@ -4747,6 +5267,15 @@
       "priority": "P0",
       "shipped": true,
       "props": {
+        "initialFocus": {
+          "kind": "enum",
+          "values": [
+            "first",
+            "last"
+          ],
+          "default": "first",
+          "description": "ActionMenu.Content entry edge for ArrowDown/ArrowUp."
+        },
         "open": {
           "kind": "enum",
           "values": [
@@ -4797,6 +5326,20 @@
         },
         "checked": {
           "kind": "boolean"
+        },
+        "role": {
+          "kind": "enum",
+          "values": [
+            "menuitem",
+            "menuitemcheckbox",
+            "menuitemradio"
+          ],
+          "description": "ActionMenu.Item semantic role; choice state supplied with native aria-checked."
+        },
+        "closeOnSelect": {
+          "kind": "boolean",
+          "default": true,
+          "description": "ActionMenu.Item may stay open for repeated choice adjustments."
         }
       },
       "parts": [
@@ -4943,7 +5486,8 @@
         "Native DOM attributes pass through where the implementation accepts them.",
         "Dropdown menu is the contract name; ActionMenu is the compatible runtime API.",
         "Utility ActionMenu delegates all parts to the popover scope so existing app-owned floating.css retains positioning and visibility behavior.",
-        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
+        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs.",
+        "Item traversal includes checkable roles and typeahead, excludes nested menus, and respects native disabled. Outside dismissal preserves its focus destination."
       ]
     },
     {
@@ -4951,36 +5495,49 @@
       "specId": "O9",
       "category": "Overlays",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "open": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+          "kind": "boolean"
+        },
+        "defaultOpen": {
+          "kind": "boolean"
+        },
+        "onOpenChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "label": {
+          "kind": "text",
+          "required": true
+        },
+        "items": {
+          "kind": "collection",
+          "required": true
+        },
+        "children": {
+          "kind": "slot",
+          "required": true
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "trigger",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "content",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
         }
       ],
       "attributes": {
@@ -4989,10 +5546,25 @@
             "false",
             "true"
           ]
+        },
+        "data-state": {
+          "values": [
+            "open",
+            "closed"
+          ],
+          "parts": [
+            "content"
+          ],
+          "description": "Native menu runtime visibility."
         }
       },
       "booleans": [],
-      "slots": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "trigger"
+        }
+      ],
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/menu/",
       "keyboard": [
         {
@@ -5006,6 +5578,18 @@
         {
           "key": "Escape",
           "action": "Dismiss menu"
+        },
+        {
+          "key": "Shift+F10/ContextMenu",
+          "action": "Open at the focused context region."
+        },
+        {
+          "key": "Home/End/printable character",
+          "action": "Traverse current menu using shared ActionMenu behavior."
+        },
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Close and leave through the native focusable region."
         }
       ],
       "tokenRoles": [
@@ -5013,7 +5597,9 @@
         "text/fg"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Focusable native group region supports pointer contextmenu and Shift+F10/ContextMenu invocation; rich content can retain its own native semantics.",
+        "Shared ActionMenu content owns menu keys and choices/submenus; native top layer plus fixed client coordinates provide pointer placement and viewport clamping.",
+        "Explicit Escape/action restores context-region focus; outside dismissal keeps its destination. Browser-forced native dismissal remains platform-owned."
       ]
     },
     {
@@ -5023,50 +5609,115 @@
       "priority": "P1",
       "shipped": true,
       "props": {
-        "content": {
-          "kind": "enum",
-          "values": [
-            "results",
-            "empty",
-            "loading"
-          ]
+        "groups[].id": {
+          "kind": "text",
+          "required": true
         },
-        "type": {
+        "groups[].label": {
+          "kind": "text"
+        },
+        "groups[].items": {
+          "kind": "collection",
+          "required": true
+        },
+        "dialogLabel": {
+          "kind": "text",
+          "default": "Command palette"
+        },
+        "open": {
+          "kind": "boolean",
+          "description": "Controlled modal visibility; inline defaults visible unless open=false."
+        },
+        "onOpenChange": {
+          "kind": "callback",
+          "description": "Modal close request; controlled owner may refuse."
+        },
+        "groups": {
+          "kind": "collection",
+          "required": true,
+          "description": "Ordered groups with globally unique nonblank item IDs and unique nonblank group IDs."
+        },
+        "placeholder": {
+          "kind": "text",
+          "default": "Type a command or search…"
+        },
+        "emptyLabel": {
+          "kind": "text",
+          "default": "No matching commands"
+        },
+        "class": {
+          "kind": "text"
+        },
+        "loading": {
+          "kind": "boolean",
+          "default": false
+        },
+        "loadingLabel": {
+          "kind": "text",
+          "default": "Searching…"
+        },
+        "searchLabel": {
+          "kind": "text",
+          "default": "Search commands"
+        },
+        "onQueryChange": {
+          "kind": "callback",
+          "description": "Reports user query edits; network/backend integration remains caller-owned."
+        },
+        "scrim": {
+          "kind": "boolean",
+          "default": true,
+          "description": "False uses an inline combobox without modal focus capture."
+        },
+        "filters": {
+          "kind": "slot"
+        },
+        "footer": {
+          "kind": "slot"
+        },
+        "groups[].items[].type": {
           "kind": "enum",
           "values": [
             "page",
             "section",
             "action"
-          ]
+          ],
+          "default": "action"
         },
-        "state": {
-          "kind": "enum",
-          "values": [
-            "rest",
-            "selected",
-            "disabled"
-          ]
+        "groups[].items[].disabled": {
+          "kind": "boolean",
+          "default": false
         },
-        "excerpt": {
-          "kind": "boolean"
+        "groups[].items[].url": {
+          "kind": "text"
         },
-        "url": {
-          "kind": "boolean"
+        "groups[].items[].excerpt": {
+          "kind": "text",
+          "description": "Plain text, escaped by Preact; never injected HTML."
         },
-        "kind": {
-          "kind": "boolean"
+        "groups[].items[].shortcut": {
+          "kind": "text"
         },
-        "shortcut": {
-          "kind": "boolean"
+        "groups[].items[].onSelect": {
+          "kind": "callback",
+          "description": "Called once for pointer or Enter activation; caller owns navigation."
         },
-        "filters": {
-          "kind": "boolean"
+        "groups[].items[].id": {
+          "kind": "text",
+          "required": true
         },
-        "footer": {
-          "kind": "boolean"
+        "groups[].items[].label": {
+          "kind": "text",
+          "required": true
         },
-        "scrim": {
-          "kind": "boolean"
+        "groups[].items[].icon": {
+          "kind": "text"
+        },
+        "groups[].items[].hash": {
+          "kind": "text"
+        },
+        "groups[].items[].kind": {
+          "kind": "text"
         }
       },
       "parts": [
@@ -5075,84 +5726,94 @@
         },
         {
           "name": "backdrop",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "scrim=true"
         },
         {
-          "name": "content",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "name": "content"
         },
         {
-          "name": "input-row",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "name": "input-row"
         },
         {
-          "name": "search-icon",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "name": "search-icon"
         },
         {
-          "name": "input",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "name": "input"
         },
         {
-          "name": "kbd",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "name": "kbd"
         },
         {
           "name": "filters",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "filters content is supplied"
         },
         {
-          "name": "list",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "name": "list"
         },
         {
           "name": "group",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "matching group items exist and loading=false"
         },
         {
           "name": "group-label",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "matching group has a label"
         },
         {
           "name": "item",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "matching item exists and loading=false"
         },
         {
           "name": "item-icon",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "item icon supplied or type=section"
         },
         {
           "name": "item-label",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "matching item exists and loading=false"
         },
         {
           "name": "item-url",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "item url supplied"
         },
         {
           "name": "item-excerpt",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "item excerpt supplied"
         },
         {
           "name": "item-kind",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "item kind supplied"
         },
         {
           "name": "item-hash",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "item hash supplied"
         },
         {
           "name": "empty",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "no matching items and loading=false"
         },
         {
           "name": "footer",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "footer content is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
           "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "item-copy",
+          "when": "matching item exists and loading=false"
+        },
+        {
+          "name": "item-shortcut",
+          "when": "item shortcut supplied"
+        },
+        {
+          "name": "item-return",
+          "when": "matching enabled item exists; visible only while highlighted"
+        },
+        {
+          "name": "loading",
+          "when": "loading=true"
         }
       ],
       "attributes": {
@@ -5168,6 +5829,9 @@
             "page",
             "section",
             "action"
+          ],
+          "parts": [
+            "item"
           ]
         },
         "data-state": {
@@ -5189,31 +5853,50 @@
             "list",
             "item"
           ]
+        },
+        "data-scrim": {
+          "values": [
+            "true",
+            "false"
+          ],
+          "default": "true"
         }
       },
       "booleans": [
-        "excerpt",
-        "url",
-        "kind",
-        "shortcut",
-        "filters",
-        "footer",
+        "loading",
         "scrim"
       ],
-      "slots": [],
+      "slots": [
+        {
+          "name": "filters",
+          "part": "filters"
+        },
+        {
+          "name": "footer",
+          "part": "footer"
+        }
+      ],
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/",
       "keyboard": [
         {
           "key": "ArrowDown/ArrowUp",
-          "action": "Navigate options"
+          "action": "Navigate matching enabled options using the existing combobox active descendant."
+        },
+        {
+          "key": "Home/End",
+          "action": "Highlight first/last matching enabled option."
         },
         {
           "key": "Enter",
-          "action": "Select option"
+          "action": "Invoke the highlighted command once and request modal close; IME composition does not activate commands."
         },
         {
           "key": "Escape",
-          "action": "Dismiss options"
+          "action": "Request modal close once; controlled refusal preserves focus and options. Inline mode clears the query."
+        },
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Native modal focus containment or inline control traversal; options remain in the active-descendant list, not the tab order."
         }
       ],
       "tokenRoles": [
@@ -5228,8 +5911,12 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them.",
-        "Compatibility values describe already-shipped headless or Utility state hooks. They are separate from the settled canonical design vocabulary and must be retained by styles serving these public APIs."
+        "Existing root and item fields remain supported; native DOM attributes do not pass through beyond class.",
+        "Phase-one metadata correction: content/type/state describe derived output or item fields, not invented root props; excerpt/url/kind/shortcut are optional item content and filters/footer are slots.",
+        "Headless data-state compatibility values remain unchanged; data-highlighted identifies current keyboard/pointer highlight.",
+        "Local filtering matches label, url, excerpt, kind and hash text in source order; Pagefind/backend requests and navigation remain caller-owned.",
+        "Disabled options remain visible but are excluded from headless arrow registration and activation. Empty/loading feedback is outside the listbox.",
+        "Modal and inline composition share existing Dialog/Combobox; no new focus manager. Native IME editing is preserved."
       ]
     },
     {
@@ -5490,21 +6177,14 @@
             "hover",
             "focus",
             "selected"
-          ]
+          ],
+          "description": "Visual snapshot; native hover/focus-within styles are enabled by interactive."
         },
-        "header": {
-          "kind": "boolean"
+        "interactive": {
+          "kind": "boolean",
+          "description": "Enables presentation states without adding a container tab stop or click handler."
         },
-        "description": {
-          "kind": "boolean"
-        },
-        "action": {
-          "kind": "slot"
-        },
-        "footer": {
-          "kind": "boolean"
-        },
-        "body": {
+        "children": {
           "kind": "slot"
         }
       },
@@ -5547,17 +6227,11 @@
           "values": [
             "default",
             "rule"
-          ],
-          "plannedValues": [
-            "rule"
           ]
         },
         "data-size": {
           "values": [
             "md",
-            "sm"
-          ],
-          "plannedValues": [
             "sm"
           ]
         },
@@ -5572,23 +6246,45 @@
         }
       },
       "booleans": [
-        "header",
-        "description",
-        "action",
-        "footer"
+        "interactive"
       ],
       "slots": [
         {
-          "name": "body",
+          "name": "children",
+          "part": "root"
+        },
+        {
+          "name": "Header.children",
+          "part": "header"
+        },
+        {
+          "name": "Title.children",
+          "part": "title"
+        },
+        {
+          "name": "Description.children",
+          "part": "description"
+        },
+        {
+          "name": "Action.children",
+          "part": "action"
+        },
+        {
+          "name": "Body.children",
           "part": "body"
         },
         {
-          "name": "action",
-          "part": "action"
+          "name": "Footer.children",
+          "part": "footer"
         }
       ],
       "apg": "noninteractive presentation",
-      "keyboard": [],
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Focus native child actions; the card container adds no keyboard target"
+        }
+      ],
       "tokenRoles": [
         "border/control",
         "border/strong",
@@ -5602,7 +6298,8 @@
         "text/muted"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Header/body/footer presence comes from namespace composition, not phantom boolean root props. Rule has only a top border, with no resting fill/radius/shadow."
       ]
     },
     {
@@ -5958,7 +6655,7 @@
       "specId": "D6",
       "category": "Data display",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "variant": {
           "kind": "enum",
@@ -5976,70 +6673,72 @@
             "xs"
           ]
         },
-        "description": {
-          "kind": "boolean"
-        },
-        "actions": {
-          "kind": "boolean"
-        },
-        "header": {
-          "kind": "boolean"
-        },
-        "footer": {
-          "kind": "boolean"
-        },
         "chevron": {
           "kind": "boolean"
         },
         "media": {
           "kind": "slot"
+        },
+        "title": {
+          "kind": "slot",
+          "required": true
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "description": {
+          "kind": "slot"
+        },
+        "actions": {
+          "kind": "slot"
+        },
+        "header": {
+          "kind": "slot"
+        },
+        "footer": {
+          "kind": "slot"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "media",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "content",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "title",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "description",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "actions",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "header",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "footer",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "chevron",
+          "when": "when chevron is true"
         }
       ],
       "attributes": {
@@ -6059,20 +6758,45 @@
         }
       },
       "booleans": [
-        "description",
-        "actions",
-        "header",
-        "footer",
         "chevron"
       ],
       "slots": [
         {
           "name": "media",
           "part": "media"
+        },
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "description",
+          "part": "description"
+        },
+        {
+          "name": "actions",
+          "part": "actions"
+        },
+        {
+          "name": "header",
+          "part": "header"
+        },
+        {
+          "name": "footer",
+          "part": "footer"
         }
       ],
       "apg": "noninteractive presentation",
-      "keyboard": [],
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between native child controls"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Activate native child buttons; links use Enter"
+        }
+      ],
       "tokenRoles": [
         "border/default",
         "radius/badge",
@@ -6083,7 +6807,7 @@
         "text/muted"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native child controls retain their own semantics and keyboard behavior; no wrapper key manager."
       ]
     },
     {
@@ -6091,7 +6815,7 @@
       "specId": "D7",
       "category": "Data display",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "size": {
           "kind": "enum",
@@ -6106,23 +6830,19 @@
             "default",
             "inverse"
           ]
+        },
+        "children": {
+          "kind": "slot",
+          "required": true
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "label",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
-        },
-        {
-          "name": "focus-ring",
-          "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         }
       ],
       "attributes": {
@@ -6141,7 +6861,7 @@
       },
       "booleans": [],
       "slots": [],
-      "apg": "noninteractive presentation",
+      "apg": "native kbd notation; no keyboard interaction",
       "keyboard": [],
       "tokenRoles": [
         "border/default",
@@ -6153,7 +6873,7 @@
         "text/muted"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native kbd notation is noninteractive; Kbd.Group joins keys with decorative plus separators."
       ]
     },
     {
@@ -6163,14 +6883,41 @@
       "priority": "P1",
       "shipped": true,
       "props": {
+        "code": {
+          "kind": "text",
+          "description": "Raw clipboard source; absent text derives from display rows excluding removals."
+        },
+        "filename": {
+          "kind": "text"
+        },
+        "lang": {
+          "kind": "text"
+        },
+        "tabs": {
+          "kind": "collection"
+        },
+        "lines": {
+          "kind": "collection"
+        },
         "variant": {
           "kind": "enum",
           "values": [
+            "single",
+            "tabbed",
+            "diff",
             "default",
             "destructive",
             "added",
             "removed",
             "highlighted"
+          ],
+          "description": "Ledger modes plus published phase1 aliases."
+        },
+        "tone": {
+          "kind": "enum",
+          "values": [
+            "default",
+            "destructive"
           ]
         },
         "size": {
@@ -6181,12 +6928,42 @@
           ]
         },
         "header": {
-          "kind": "enum",
+          "kind": "boolean",
           "values": [
             "none",
             "title",
             "tabs"
-          ]
+          ],
+          "default": true,
+          "description": "Boolean chrome control with legacy none/title/tabs aliases; tabs without files falls back to title. Essential file tabs remain when chrome is hidden."
+        },
+        "copy": {
+          "kind": "boolean",
+          "default": true
+        },
+        "lineNumbers": {
+          "kind": "boolean",
+          "default": false
+        },
+        "footer": {
+          "kind": "boolean",
+          "default": false
+        },
+        "footerContent": {
+          "kind": "slot"
+        },
+        "scrollbar": {
+          "kind": "boolean",
+          "default": true
+        },
+        "value": {
+          "kind": "text"
+        },
+        "defaultValue": {
+          "kind": "text"
+        },
+        "onValueChange": {
+          "kind": "callback"
         },
         "state": {
           "kind": "enum",
@@ -6195,29 +6972,11 @@
             "copied"
           ]
         },
-        "code": {
-          "kind": "text",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+        "onCopied": {
+          "kind": "callback"
         },
-        "filename": {
-          "kind": "text",
-          "description": "Supported Utility public prop; native attributes pass through separately."
-        },
-        "lang": {
-          "kind": "text",
-          "description": "Supported Utility public prop; native attributes pass through separately."
-        },
-        "copy": {
-          "kind": "boolean"
-        },
-        "lineNumbers": {
-          "kind": "boolean"
-        },
-        "footer": {
-          "kind": "boolean"
-        },
-        "scrollbar": {
-          "kind": "boolean"
+        "onCopyError": {
+          "kind": "callback"
         }
       },
       "parts": [
@@ -6226,78 +6985,113 @@
         },
         {
           "name": "head",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "header enabled"
         },
         {
           "name": "name",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "filename supplied outside tabbed mode"
         },
         {
           "name": "lang",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "header and lang supplied"
         },
         {
           "name": "tabs",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "tabbed mode"
+        },
+        {
+          "name": "tab",
+          "when": "tabbed mode"
         },
         {
           "name": "copy",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "header and copy enabled"
         },
         {
           "name": "content"
         },
         {
-          "name": "line",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "name": "line"
         },
         {
           "name": "line-number",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "lineNumbers enabled"
+        },
+        {
+          "name": "sign"
         },
         {
           "name": "code"
         },
         {
+          "name": "syntax",
+          "when": "caller supplies Token content"
+        },
+        {
+          "name": "marker",
+          "representation": "pseudo",
+          "when": "highlighted row"
+        },
+        {
           "name": "scrollbar",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "representation": "native",
+          "when": "overflow and scrollbar enabled"
         },
         {
           "name": "thumb",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "representation": "native",
+          "when": "overflow and scrollbar enabled"
+        },
+        {
+          "name": "copy-tooltip",
+          "representation": "native",
+          "when": "browser shows the copy button title"
         },
         {
           "name": "footer",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "footer enabled"
+        },
+        {
+          "name": "added-count",
+          "when": "diff header enabled"
+        },
+        {
+          "name": "removed-count",
+          "when": "diff header enabled"
+        },
+        {
+          "name": "status"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant"
+          "when": "native focus-visible"
         }
       ],
       "attributes": {
         "data-variant": {
           "values": [
-            "default",
-            "destructive",
-            "added",
-            "removed",
-            "highlighted"
+            "single",
+            "tabbed",
+            "diff"
           ],
-          "plannedValues": [
+          "compatibilityValues": [
+            "default",
             "destructive",
             "added",
             "removed",
             "highlighted"
           ]
         },
+        "data-tone": {
+          "values": [
+            "default",
+            "destructive"
+          ]
+        },
         "data-size": {
           "values": [
             "md",
-            "sm"
-          ],
-          "plannedValues": [
             "sm"
           ]
         },
@@ -6306,9 +7100,6 @@
             "none",
             "title",
             "tabs"
-          ],
-          "plannedValues": [
-            "tabs"
           ]
         },
         "data-state": {
@@ -6316,25 +7107,76 @@
             "rest",
             "copied"
           ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
+          "parts": [
+            "root"
+          ]
+        },
+        "data-scrollbar": {
+          "values": [
+            "true",
+            "false"
+          ]
+        },
+        "data-line-variant": {
+          "values": [
+            "default",
+            "added",
+            "removed",
+            "highlighted"
+          ],
+          "parts": [
+            "line"
+          ]
+        },
+        "data-syntax": {
+          "values": [
+            "keyword",
+            "function",
+            "type",
+            "string",
+            "number",
+            "comment",
+            "punctuation"
+          ],
+          "parts": [
+            "syntax"
+          ]
         }
       },
       "booleans": [
+        "header",
         "copy",
         "lineNumbers",
         "footer",
         "scrollbar"
       ],
-      "slots": [],
-      "apg": "native buttons and links",
+      "slots": [
+        {
+          "name": "footerContent",
+          "part": "footer"
+        },
+        {
+          "name": "lines",
+          "part": "line"
+        }
+      ],
+      "apg": "Tabs APG with native buttons, code and horizontal overflow regions",
       "keyboard": [
         {
           "key": "Tab/Shift+Tab",
-          "action": "Move between native controls"
+          "action": "Move between native tabs, copy control and code scroll region"
         },
         {
           "key": "Enter/Space",
-          "action": "Activate focused button; links use Enter"
+          "action": "Activate the focused tab or copy button"
+        },
+        {
+          "key": "ArrowLeft/ArrowRight",
+          "action": "Navigate horizontal file tabs, respecting direction; code scroll regions retain native arrows"
+        },
+        {
+          "key": "Home/End",
+          "action": "Select first/last file tab"
         }
       ],
       "tokenRoles": [
@@ -6350,10 +7192,20 @@
         "surface/selected",
         "surface/surface",
         "text/fg",
-        "text/muted"
+        "text/muted",
+        "code/bg",
+        "code/syntax/*",
+        "scrollbar/thumb",
+        "font/mono",
+        "type/code/*"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Ledger modes single/tabbed/diff and tone replace the old design-only vocabulary; published default/destructive/added/removed/highlighted aliases remain supported.",
+        "Legacy header none/title/tabs aliases remain; header=tabs without files renders a title header. Header=false removes file chrome/copy but never removes essential tab controls.",
+        "Native horizontal scrollbar/thumb and native copy title tooltip are platform internals, not fabricated layout parts.",
+        "Recognized languages use escaped highlight.js common output with whole-source multiline scopes; unknown languages remain escaped text. Explicit Token/row content takes precedence and is never interpreted as highlighter HTML.",
+        "Syntax roles apply directly on code/bg. Tinted diff/highlight rows retain each syntax hue with a contextual 80% syntax/20% text foreground mix; no shared token value changes.",
+        "Clipboard result callbacks are separate from native onCopy. Actual status ignores stale file/text requests; controlled state may render a chosen visual snapshot."
       ]
     },
     {
@@ -6361,8 +7213,13 @@
       "specId": "D9",
       "category": "Data display",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
+        "locale": {
+          "kind": "text",
+          "default": "en-US",
+          "description": "Explicit number locale shared by server and client."
+        },
         "type": {
           "kind": "enum",
           "values": [
@@ -6371,12 +7228,9 @@
           ]
         },
         "series": {
-          "kind": "enum",
-          "values": [
-            "1",
-            "2",
-            "3"
-          ]
+          "kind": "collection",
+          "required": true,
+          "description": "One to three labeled series; data-series is derived from their count."
         },
         "orientation": {
           "kind": "enum",
@@ -6392,92 +7246,120 @@
             "line",
             "dashed"
           ]
+        },
+        "data": {
+          "kind": "collection",
+          "required": true
+        },
+        "title": {
+          "kind": "text",
+          "required": true
+        },
+        "description": {
+          "kind": "text"
+        },
+        "state": {
+          "kind": "enum",
+          "values": [
+            "rest",
+            "hover",
+            "loading",
+            "empty"
+          ]
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "header",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "title",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "description",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "plot",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "grid",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "axis-x",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "axis-y",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "series-1",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "series-2",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "series-3",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "cursor",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "legend",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "tooltip",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "swatch",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "label",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "value",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
+        },
+        {
+          "name": "skeleton",
+          "when": "loading"
+        },
+        {
+          "name": "empty",
+          "when": "empty"
+        },
+        {
+          "name": "data"
+        },
+        {
+          "name": "data-trigger"
+        },
+        {
+          "name": "table"
+        },
+        {
+          "name": "line",
+          "when": "plot present"
+        },
+        {
+          "name": "area",
+          "when": "type area and plot present"
         }
       ],
       "attributes": {
@@ -6506,12 +7388,29 @@
             "line",
             "dashed"
           ]
+        },
+        "data-state": {
+          "values": [
+            "rest",
+            "hover",
+            "loading",
+            "empty"
+          ]
         }
       },
       "booleans": [],
       "slots": [],
-      "apg": "noninteractive presentation",
-      "keyboard": [],
+      "apg": "native figure and SVG image with labeled series plus native data disclosure/table",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Focus the native data disclosure; chart graphics add no focus targets"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Toggle the source data table"
+        }
+      ],
       "tokenRoles": [
         "SF:deco/sparkline",
         "SF:deco/ticks",
@@ -6525,7 +7424,9 @@
         "warning/default"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Exact data values remain available through a native disclosure/table; hover is supplemental, never the only data access.",
+        "Series count derives from1–3 labeled input series. Each datum has a label and matching finite numeric values. Legend orientation does not rotate the Cartesian plot.",
+        "Existing chart/1..3 roles follow the latest per-theme chart palette ledger. No token values change."
       ]
     },
     {
@@ -6909,36 +7810,51 @@
       "specId": "D13",
       "category": "Data display",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "open": {
-          "kind": "enum",
-          "values": [
-            "false",
-            "true"
-          ]
+          "kind": "boolean"
+        },
+        "defaultOpen": {
+          "kind": "boolean"
+        },
+        "onOpenChange": {
+          "kind": "callback"
+        },
+        "disabled": {
+          "kind": "boolean"
+        },
+        "label": {
+          "kind": "slot",
+          "required": true
+        },
+        "children": {
+          "kind": "slot",
+          "required": true
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "trigger",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "content",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "label"
+        },
+        {
+          "name": "indicator"
         }
       ],
       "attributes": {
@@ -6947,10 +7863,25 @@
             "false",
             "true"
           ]
+        },
+        "data-state": {
+          "values": [
+            "rest",
+            "disabled"
+          ]
         }
       },
       "booleans": [],
-      "slots": [],
+      "slots": [
+        {
+          "name": "label",
+          "part": "label"
+        },
+        {
+          "name": "children",
+          "part": "content"
+        }
+      ],
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/",
       "keyboard": [
         {
@@ -6959,10 +7890,13 @@
         }
       ],
       "tokenRoles": [
-        "space/stack/gap"
+        "space/stack/gap",
+        "text/muted",
+        "radius/control",
+        "state/disabled-opacity"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native details/summary retains no-JavaScript disclosure behavior. After hydration, controlled refusal preserves open and disabled summary prevents activation. Before hydration, native disclosure remains toggleable, including aria-disabled summaries. No global listeners."
       ]
     },
     {
@@ -6970,7 +7904,7 @@
       "specId": "D14",
       "category": "Data display",
       "priority": "P1",
-      "shipped": false,
+      "shipped": true,
       "props": {
         "orientation": {
           "kind": "enum",
@@ -6988,43 +7922,70 @@
         },
         "dots": {
           "kind": "boolean"
+        },
+        "label": {
+          "kind": "text",
+          "required": true
+        },
+        "slides": {
+          "kind": "collection",
+          "required": true
+        },
+        "counter": {
+          "kind": "boolean"
+        },
+        "defaultIndex": {
+          "kind": "number",
+          "default": 0
+        },
+        "onIndexChange": {
+          "kind": "callback"
         }
       },
       "parts": [
         {
-          "name": "root",
-          "planned": true
+          "name": "root"
         },
         {
           "name": "viewport",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "slide",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "previous",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "next",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "dots",
-          "when": "when the corresponding content or subcomponent is supplied",
-          "planned": true
+          "when": "when the corresponding content or subcomponent is supplied"
         },
         {
           "name": "focus-ring",
           "representation": "pseudo",
-          "when": "matching CSS interaction or variant",
-          "planned": true
+          "when": "matching CSS interaction or variant"
+        },
+        {
+          "name": "dot",
+          "when": "dots supplied"
+        },
+        {
+          "name": "counter",
+          "when": "counter supplied"
+        },
+        {
+          "name": "pagination",
+          "when": "dots or counter supplied"
+        },
+        {
+          "name": "empty",
+          "when": "no slides"
         }
       ],
       "attributes": {
@@ -7042,9 +8003,15 @@
         }
       },
       "booleans": [
-        "dots"
+        "dots",
+        "counter"
       ],
-      "slots": [],
+      "slots": [
+        {
+          "name": "slides",
+          "part": "slide"
+        }
+      ],
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/",
       "keyboard": [
         {
@@ -7062,7 +8029,9 @@
         "text/fg"
       ],
       "notes": [
-        "Design contract only; no Utility implementation ships in this phase."
+        "Native overflow scrolling and mandatory snap points retain touch/trackpad behavior. ResizeObserver realigns the current slide without global listeners.",
+        "No autoplay. Boundary controls use guarded aria-disabled so activation never removes focus. After hydration only the current slide is interactive; before hydration native scrolling keeps all slide content available.",
+        "defaultIndex is clamped to available slides; changing slide count or orientation keeps a valid current index."
       ]
     },
     {
@@ -7079,34 +8048,62 @@
             "info",
             "success",
             "warning",
-            "destructive"
-          ]
+            "destructive",
+            "important"
+          ],
+          "default": "info"
         },
         "emphasis": {
           "kind": "enum",
           "values": [
             "subtle",
             "strong"
-          ]
+          ],
+          "default": "subtle"
         },
         "children": {
           "kind": "slot",
           "description": "Supported Utility public prop; native attributes pass through separately."
         },
         "icon": {
-          "kind": "boolean"
+          "kind": "slot",
+          "description": "Decorative glyph; omitted or true uses the tone default, false hides it."
         },
         "title": {
-          "kind": "boolean"
+          "kind": "slot",
+          "description": "Omitted uses the tone label; custom content replaces it. False/null keeps the localized tone label visually hidden for assistive technology."
         },
         "description": {
-          "kind": "boolean"
+          "kind": "slot",
+          "description": "Takes precedence over legacy children."
         },
         "action": {
-          "kind": "boolean"
+          "kind": "slot",
+          "description": "Caller-owned native link or button."
         },
         "close": {
-          "kind": "boolean"
+          "kind": "boolean",
+          "default": false
+        },
+        "closeLabel": {
+          "kind": "text",
+          "default": "Dismiss notification"
+        },
+        "open": {
+          "kind": "boolean",
+          "description": "Controlled visibility; dismissal requests may be refused."
+        },
+        "defaultOpen": {
+          "kind": "boolean",
+          "default": true
+        },
+        "onOpenChange": {
+          "kind": "callback",
+          "description": "Receives false on native dismiss activation; native onClose remains a DOM event."
+        },
+        "toneLabel": {
+          "kind": "text",
+          "description": "Localized default tone label; blank falls back to Note, Info, Success, Warning, Error or Important."
         }
       },
       "parts": [
@@ -7114,14 +8111,14 @@
           "name": "root"
         },
         {
-          "name": "icon"
+          "name": "icon",
+          "when": "unless icon is false"
         },
         {
           "name": "body"
         },
         {
-          "name": "title",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "name": "title"
         },
         {
           "name": "description",
@@ -7137,7 +8134,8 @@
         },
         {
           "name": "rule",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "emphasis is strong",
+          "representation": "pseudo"
         }
       ],
       "attributes": {
@@ -7147,43 +8145,79 @@
             "info",
             "success",
             "warning",
-            "destructive"
+            "destructive",
+            "important"
           ],
-          "plannedValues": [
-            "neutral"
-          ]
+          "default": "info"
         },
         "data-emphasis": {
           "values": [
             "subtle",
             "strong"
           ],
-          "plannedValues": [
-            "strong"
-          ]
+          "default": "subtle"
+        },
+        "data-state": {
+          "values": [
+            "open",
+            "closed"
+          ],
+          "default": "open"
         }
       },
       "booleans": [
-        "icon",
-        "title",
-        "description",
-        "action",
         "close"
       ],
-      "slots": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "description"
+        },
+        {
+          "name": "icon",
+          "part": "icon"
+        },
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "description",
+          "part": "description"
+        },
+        {
+          "name": "action",
+          "part": "actions"
+        }
+      ],
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/alert/",
-      "keyboard": [],
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Traverse supplied action controls and optional close button in native order; hidden banners are skipped."
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Activate the close button; request open=false without moving focus on mount."
+        }
+      ],
       "tokenRoles": [
         "border/default",
         "border/width",
         "destructive/border",
         "destructive/subtle",
         "destructive/text",
+        "important/border",
+        "important/subtle",
+        "important/text",
         "info/border",
         "info/subtle",
         "info/text",
         "marker/default",
         "radius/card",
+        "size/icon/md",
+        "space/card/padding",
+        "space/control/gap",
         "space/control/padding-x",
         "space/stack/gap",
         "success/border",
@@ -7197,7 +8231,11 @@
         "warning/text"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them."
+        "Native DOM attributes pass through where the implementation accepts them.",
+        "Original four tone names and default info live-region role remain compatible; warning/destructive default to alert, other tones to status.",
+        "Closed banners remain mounted with native hidden and explicit display:none; visibility is independent of caller hidden. No automatic focus management.",
+        "Strong emphasis is a CSS leading rule. Optional named content slots accept Renderable values; 0 remains valid content.",
+        "Every banner has a visible tone or custom title by default; title=false/null opts into visually hidden tone text. Title uses body size and Medium label weight."
       ]
     },
     {
@@ -7962,30 +9000,63 @@
             "default",
             "with-tabs",
             "with-status"
-          ]
+          ],
+          "default": "default"
         },
-        "breakpoint": {
-          "kind": "enum",
-          "values": [
-            "desktop",
-            "mobile"
-          ]
-        },
-        "children": {
-          "kind": "slot",
-          "description": "Supported Utility public prop; native attributes pass through separately."
+        "title": {
+          "kind": "slot"
         },
         "eyebrow": {
-          "kind": "boolean"
+          "kind": "slot"
         },
         "description": {
-          "kind": "boolean"
-        },
-        "actions": {
-          "kind": "boolean"
+          "kind": "slot"
         },
         "breadcrumb": {
-          "kind": "boolean"
+          "kind": "slot"
+        },
+        "actions": {
+          "kind": "slot"
+        },
+        "tabs": {
+          "kind": "slot"
+        },
+        "status": {
+          "kind": "slot"
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "class": {
+          "kind": "text"
+        },
+        "Layout.children": {
+          "kind": "slot",
+          "required": true
+        },
+        "Main.children": {
+          "kind": "slot",
+          "required": true
+        },
+        "Aside.children": {
+          "kind": "slot",
+          "required": true
+        },
+        "Badges.children": {
+          "kind": "slot",
+          "required": true
+        },
+        "Intro.children": {
+          "kind": "slot",
+          "required": true
+        },
+        "Actions.children": {
+          "kind": "slot",
+          "required": true
+        },
+        "Status.children": {
+          "kind": "slot",
+          "required": true
         }
       },
       "parts": [
@@ -7994,55 +9065,51 @@
         },
         {
           "name": "layout",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "Corresponding declarative content or composed section is supplied."
         },
         {
           "name": "main",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "Corresponding declarative content or composed section is supplied."
         },
         {
           "name": "intro",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "Corresponding declarative content or composed section is supplied."
         },
         {
           "name": "eyebrow",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "Corresponding declarative content or composed section is supplied."
         },
         {
           "name": "title",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "Corresponding declarative content or composed section is supplied."
         },
         {
           "name": "description",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "Corresponding declarative content or composed section is supplied."
+        },
+        {
+          "name": "breadcrumb",
+          "when": "Corresponding declarative content or composed section is supplied."
         },
         {
           "name": "actions",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "Corresponding declarative content or composed section is supplied."
         },
         {
           "name": "status-bar",
-          "when": "when the corresponding content or subcomponent is supplied"
-        },
-        {
-          "name": "status-indicator",
-          "when": "when the corresponding content or subcomponent is supplied"
-        },
-        {
-          "name": "status-sep",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "Corresponding declarative content or composed section is supplied."
         },
         {
           "name": "tabs",
-          "when": "when the corresponding content or subcomponent is supplied"
+          "when": "Corresponding declarative content or composed section is supplied."
         },
         {
           "name": "aside",
-          "when": "corresponding shipped Utility section is supplied"
+          "when": "Corresponding declarative content or composed section is supplied."
         },
         {
           "name": "badges",
-          "when": "corresponding shipped Utility section is supplied"
+          "when": "Corresponding declarative content or composed section is supplied."
         }
       ],
       "attributes": {
@@ -8051,33 +9118,94 @@
             "default",
             "with-tabs",
             "with-status"
-          ]
-        },
-        "data-breakpoint": {
-          "values": [
-            "desktop",
-            "mobile"
-          ]
+          ],
+          "default": "default"
         }
       },
-      "booleans": [
-        "eyebrow",
-        "description",
-        "actions",
-        "breadcrumb"
+      "booleans": [],
+      "slots": [
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "eyebrow",
+          "part": "eyebrow"
+        },
+        {
+          "name": "description",
+          "part": "description"
+        },
+        {
+          "name": "breadcrumb",
+          "part": "breadcrumb"
+        },
+        {
+          "name": "actions",
+          "part": "actions"
+        },
+        {
+          "name": "tabs",
+          "part": "tabs"
+        },
+        {
+          "name": "status",
+          "part": "status-bar"
+        },
+        {
+          "name": "children",
+          "part": "root"
+        },
+        {
+          "name": "Layout.children",
+          "part": "layout"
+        },
+        {
+          "name": "Main.children",
+          "part": "main"
+        },
+        {
+          "name": "Aside.children",
+          "part": "aside"
+        },
+        {
+          "name": "Badges.children",
+          "part": "badges"
+        },
+        {
+          "name": "Intro.children",
+          "part": "intro"
+        },
+        {
+          "name": "Actions.children",
+          "part": "actions"
+        },
+        {
+          "name": "Status.children",
+          "part": "status-bar"
+        }
       ],
-      "slots": [],
-      "apg": "noninteractive presentation",
-      "keyboard": [],
+      "apg": "noninteractive presentation; native heading and child-owned controls",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Only native child controls receive focus in source order."
+        }
+      ],
       "tokenRoles": [
         "space/section/gap",
         "space/stack/gap",
         "text/fg",
-        "text/muted"
+        "text/muted",
+        "type/title",
+        "type/eyebrow",
+        "type/body"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them.",
-        "Utility structural helper parts remain distinct from the single component root."
+        "Native DOM attributes pass through; title is the native h1 content rather than a root tooltip attribute.",
+        "Phase-one metadata correction: Figma boolean content switches are optional Renderable slots; breakpoint is responsive CSS, not an accepted prop or emitted attribute.",
+        "The old namespace and children composition remain supported. Variants never synthesize tabs or status content; supplied slots render in any variant.",
+        "Status indicators and separators are child-owned content, not fabricated PageHeader parts."
       ]
     },
     {
@@ -9809,43 +10937,26 @@
       "priority": "P1",
       "shipped": true,
       "props": {
-        "level": {
-          "kind": "enum",
-          "values": [
-            "h1",
-            "h2",
-            "h3",
-            "h4"
-          ]
-        },
-        "element": {
-          "kind": "enum",
-          "values": [
-            "lede",
-            "p",
-            "blockquote",
-            "ul",
-            "ol",
-            "hr",
-            "link",
-            "code",
-            "kbd",
-            "strong",
-            "em"
-          ]
-        },
-        "state": {
-          "kind": "enum",
-          "values": [
-            "rest",
-            "hover"
-          ]
-        },
-        "anchor": {
-          "kind": "boolean"
-        },
         "children": {
-          "kind": "slot"
+          "kind": "text",
+          "required": true,
+          "description": "Raw Markdown source; sanitizer is mandatory and not caller-configurable."
+        },
+        "streaming": {
+          "kind": "boolean",
+          "default": false
+        },
+        "activeCite": {
+          "kind": "number",
+          "description": "Active citation index; callback behavior belongs to the hydrated caller."
+        },
+        "onCite": {
+          "kind": "callback",
+          "description": "Reports activation of a nested native CitationChip."
+        },
+        "class": {
+          "kind": "text",
+          "description": "Wrapper classes; ns-lede opts into first-paragraph lede styling."
         }
       },
       "parts": [
@@ -9923,49 +11034,20 @@
           "when": "matching CSS interaction or variant"
         }
       ],
-      "attributes": {
-        "data-level": {
-          "values": [
-            "h1",
-            "h2",
-            "h3",
-            "h4"
-          ]
-        },
-        "data-element": {
-          "values": [
-            "lede",
-            "p",
-            "blockquote",
-            "ul",
-            "ol",
-            "hr",
-            "link",
-            "code",
-            "kbd",
-            "strong",
-            "em"
-          ]
-        },
-        "data-state": {
-          "values": [
-            "rest",
-            "hover"
-          ],
-          "description": "Transient hover, focus and pressed behavior also uses native CSS pseudo-classes."
-        }
-      },
-      "booleans": [
-        "anchor"
-      ],
-      "slots": [
-        {
-          "name": "children",
-          "part": "root"
-        }
-      ],
+      "attributes": {},
+      "booleans": [],
+      "slots": [],
       "apg": "noninteractive presentation",
-      "keyboard": [],
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Traverse native content links and nested citation controls; prose adds no composite focus manager."
+        },
+        {
+          "key": "Enter",
+          "action": "Follow native links, including host-generated heading anchors."
+        }
+      ],
       "tokenRoles": [
         "SF:prose/code/size",
         "SF:prose/h2|h3|h4/size|line|tracking",
@@ -9983,8 +11065,1641 @@
         "type/strong/style"
       ],
       "notes": [
-        "Native DOM attributes pass through where the implementation accepts them.",
-        "Sanitized Markdown inner anatomy is native semantic HTML. Styles target those semantics without forcing extra wrapper nodes."
+        "Copied Markdown accepts exactly its documented renderer props; native DOM attributes do not pass through.",
+        "Phase-one metadata correction: removed nonfunctional level, element, state and anchor root props and data-level/data-element/data-state axes. They were never accepted or emitted by the published Markdown renderer; native semantic styling remains available.",
+        "Design level/element/state axes are native semantic elements and CSS pseudo-classes, not invented root props or data attributes.",
+        "Sanitized Markdown inner anatomy is native semantic HTML. Styles target those semantics without forcing extra wrapper nodes.",
+        "The public ns-markdown stylesheet also supports host-authored lede, kbd and heading-anchor markup. The copied renderer does not generate heading IDs/anchors or allow raw HTML; those remain host-owned.",
+        "Native list markers retain list semantics and square bullets; glyph metrics remain browser/font-owned.",
+        "The handoff Theme-set prose twins correspond to existing Studio prose CSS aliases. No token values change; lede uses prose measure as the latest ledger specifies."
+      ]
+    },
+    {
+      "name": "scroll-area",
+      "specId": "L9",
+      "category": "Layout & blocks",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "orientation": {
+          "kind": "enum",
+          "values": [
+            "vertical",
+            "horizontal",
+            "both"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "viewport",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "scrollbar",
+          "planned": true,
+          "representation": "native"
+        },
+        {
+          "name": "thumb",
+          "planned": true,
+          "representation": "native"
+        },
+        {
+          "name": "corner",
+          "planned": true,
+          "representation": "native"
+        }
+      ],
+      "attributes": {
+        "data-orientation": {
+          "values": [
+            "vertical",
+            "horizontal",
+            "both"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "viewport"
+        }
+      ],
+      "apg": "native scrollable region",
+      "keyboard": [
+        {
+          "key": "Arrow keys/PageUp/PageDown/Home/End",
+          "action": "Scroll the focused native viewport"
+        }
+      ],
+      "tokenRoles": [
+        "surface/card",
+        "border/default",
+        "radius/card",
+        "space/card/padding",
+        "studio/code/scroll-thumb"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-layout adds a bordered radius/card frame; scrollbar anatomy is native and must not require fake scrollbar elements."
+      ]
+    },
+    {
+      "name": "resizable",
+      "specId": "L10",
+      "category": "Layout & blocks",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "direction": {
+          "kind": "enum",
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        "startContent": {
+          "kind": "slot"
+        },
+        "endContent": {
+          "kind": "slot"
+        },
+        "grip": {
+          "kind": "boolean"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "panel-group",
+          "planned": true
+        },
+        {
+          "name": "panel",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "handle",
+          "planned": true
+        },
+        {
+          "name": "grip",
+          "planned": true
+        }
+      ],
+      "attributes": {
+        "data-direction": {
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        }
+      },
+      "booleans": [
+        "grip"
+      ],
+      "slots": [
+        {
+          "name": "startContent",
+          "part": "panel"
+        },
+        {
+          "name": "endContent",
+          "part": "panel"
+        }
+      ],
+      "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/",
+      "keyboard": [
+        {
+          "key": "Arrow keys",
+          "action": "Resize the adjacent panel in the matching direction"
+        },
+        {
+          "key": "Home/End",
+          "action": "Resize to the minimum/maximum"
+        }
+      ],
+      "tokenRoles": [
+        "border/default",
+        "border/strong",
+        "surface/muted",
+        "radius/badge",
+        "space/card/padding"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-layout: 10px grip glyph; fixed default start panel size 280 horizontal or 160 vertical instead of 50/50."
+      ]
+    },
+    {
+      "name": "aspect-ratio",
+      "specId": "L11",
+      "category": "Layout & blocks",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "ratio": {
+          "kind": "enum",
+          "values": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "21:9"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "media",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-ratio": {
+          "values": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "21:9"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "media"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "radius/card",
+        "surface/muted"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec."
+      ]
+    },
+    {
+      "name": "direction",
+      "specId": "L12",
+      "category": "Layout & blocks",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "dir": {
+          "kind": "enum",
+          "values": [
+            "ltr",
+            "rtl"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true,
+          "representation": "context"
+        }
+      ],
+      "attributes": {
+        "data-dir": {
+          "values": [
+            "ltr",
+            "rtl"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "root"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "surface/bg"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "No Figma set: direction context has no additional visual wrapper; native dir on the application boundary supplies mirroring."
+      ]
+    },
+    {
+      "name": "message-scroller",
+      "specId": "I3",
+      "category": "AI",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "scrollable": {
+          "kind": "enum",
+          "values": [
+            "none",
+            "up",
+            "down",
+            "both"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "viewport",
+          "planned": true
+        },
+        {
+          "name": "content",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "item",
+          "planned": true
+        },
+        {
+          "name": "scroll-button",
+          "planned": true
+        },
+        {
+          "name": "edge-top",
+          "planned": true,
+          "representation": "pseudo"
+        },
+        {
+          "name": "edge-bottom",
+          "planned": true,
+          "representation": "pseudo"
+        }
+      ],
+      "attributes": {
+        "data-scrollable": {
+          "values": [
+            "none",
+            "up",
+            "down",
+            "both"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "content"
+        }
+      ],
+      "apg": "native scrollable region and button",
+      "keyboard": [
+        {
+          "key": "Arrow keys/PageUp/PageDown/Home/End",
+          "action": "Scroll the focused viewport"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Activate the scroll-to-latest button"
+        }
+      ],
+      "tokenRoles": [
+        "surface/bg",
+        "space/section/gap",
+        "border/subtle",
+        "radius/control"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-ai uses border/subtle edge rules, not gradients; scroll button keeps radius/control."
+      ]
+    },
+    {
+      "name": "marker",
+      "specId": "I4",
+      "category": "AI",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "variant": {
+          "kind": "enum",
+          "values": [
+            "default",
+            "border",
+            "separator"
+          ]
+        },
+        "icon": {
+          "kind": "slot"
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "icon",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "content",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-variant": {
+          "values": [
+            "default",
+            "border",
+            "separator"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "icon",
+          "part": "icon"
+        },
+        {
+          "name": "children",
+          "part": "content"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "text/muted",
+        "border/subtle",
+        "border/default",
+        "radius/input"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec."
+      ]
+    },
+    {
+      "name": "trace",
+      "specId": "I5",
+      "category": "AI",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "status": {
+          "kind": "enum",
+          "values": [
+            "done",
+            "running",
+            "pending",
+            "error"
+          ]
+        },
+        "open": {
+          "kind": "enum",
+          "values": [
+            "false",
+            "true"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "title": {
+          "kind": "slot"
+        },
+        "description": {
+          "kind": "slot"
+        },
+        "duration": {
+          "kind": "slot"
+        },
+        "collapsible": {
+          "kind": "boolean"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "line",
+          "planned": true
+        },
+        {
+          "name": "icon",
+          "planned": true
+        },
+        {
+          "name": "title",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "description",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "duration",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "collapsible-trigger",
+          "planned": true
+        },
+        {
+          "name": "collapsible-content",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "connector",
+          "planned": true
+        }
+      ],
+      "attributes": {
+        "data-status": {
+          "values": [
+            "done",
+            "running",
+            "pending",
+            "error"
+          ]
+        },
+        "data-open": {
+          "values": [
+            "false",
+            "true"
+          ]
+        }
+      },
+      "booleans": [
+        "collapsible"
+      ],
+      "slots": [
+        {
+          "name": "children",
+          "part": "collapsible-content"
+        },
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "description",
+          "part": "description"
+        },
+        {
+          "name": "duration",
+          "part": "duration"
+        }
+      ],
+      "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/",
+      "keyboard": [
+        {
+          "key": "Enter/Space",
+          "action": "Toggle the focused disclosure"
+        }
+      ],
+      "tokenRoles": [
+        "text/muted",
+        "success/text",
+        "destructive/text",
+        "border/subtle",
+        "space/inline/gap"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-ai adds duration and success check icon; running uses warning spinner. Status pending belongs to Trace line; the Trace aggregate draws running/done/error."
+      ]
+    },
+    {
+      "name": "questionnaire",
+      "specId": "I6",
+      "category": "AI",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "step": {
+          "kind": "enum",
+          "values": [
+            "question",
+            "freeform",
+            "complete"
+          ]
+        },
+        "title": {
+          "kind": "slot"
+        },
+        "description": {
+          "kind": "slot"
+        },
+        "error": {
+          "kind": "slot"
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "actions": {
+          "kind": "slot"
+        },
+        "multiple": {
+          "kind": "boolean"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "progress",
+          "planned": true
+        },
+        {
+          "name": "item",
+          "planned": true
+        },
+        {
+          "name": "title",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "description",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "choices",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "choice",
+          "planned": true
+        },
+        {
+          "name": "shortcut",
+          "planned": true
+        },
+        {
+          "name": "label",
+          "planned": true
+        },
+        {
+          "name": "indicator",
+          "planned": true
+        },
+        {
+          "name": "input",
+          "planned": true
+        },
+        {
+          "name": "error",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "actions",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-step": {
+          "values": [
+            "question",
+            "freeform",
+            "complete"
+          ]
+        }
+      },
+      "booleans": [
+        "multiple"
+      ],
+      "slots": [
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "description",
+          "part": "description"
+        },
+        {
+          "name": "error",
+          "part": "error"
+        },
+        {
+          "name": "children",
+          "part": "choices"
+        },
+        {
+          "name": "actions",
+          "part": "actions"
+        }
+      ],
+      "apg": "native form, radio and checkbox controls",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between native controls"
+        },
+        {
+          "key": "Arrow keys",
+          "action": "Move between radio choices"
+        },
+        {
+          "key": "Space",
+          "action": "Select the focused radio or checkbox"
+        },
+        {
+          "key": "Enter",
+          "action": "Submit the current form"
+        }
+      ],
+      "tokenRoles": [
+        "text/fg",
+        "text/muted",
+        "border/default",
+        "primary/stroke",
+        "surface/selected",
+        "destructive/text"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-ai selects with primary/stroke, not primary/default; rendering never calls an AI/backend service."
+      ]
+    },
+    {
+      "name": "attachment",
+      "specId": "I7",
+      "category": "AI",
+      "priority": "P1",
+      "shipped": false,
+      "props": {
+        "state": {
+          "kind": "enum",
+          "values": [
+            "idle",
+            "uploading",
+            "processing",
+            "error",
+            "done"
+          ]
+        },
+        "size": {
+          "kind": "enum",
+          "values": [
+            "default",
+            "sm",
+            "xs"
+          ]
+        },
+        "orientation": {
+          "kind": "enum",
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        "title": {
+          "kind": "slot"
+        },
+        "media": {
+          "kind": "slot"
+        },
+        "description": {
+          "kind": "slot"
+        },
+        "actions": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "media",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "content",
+          "planned": true
+        },
+        {
+          "name": "title",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "description",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "actions",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-state": {
+          "values": [
+            "idle",
+            "uploading",
+            "processing",
+            "error",
+            "done"
+          ]
+        },
+        "data-size": {
+          "values": [
+            "default",
+            "sm",
+            "xs"
+          ]
+        },
+        "data-orientation": {
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "media",
+          "part": "media"
+        },
+        {
+          "name": "description",
+          "part": "description"
+        },
+        {
+          "name": "actions",
+          "part": "actions"
+        }
+      ],
+      "apg": "native action controls in a noninteractive attachment surface",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between supplied native action controls"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Activate the focused action"
+        }
+      ],
+      "tokenRoles": [
+        "surface/card",
+        "surface/muted",
+        "border/default",
+        "radius/input",
+        "text/muted",
+        "destructive/border",
+        "destructive/text"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-ai media sizes40/32/24; xs horizontal omits description and uses trailing state glyph."
+      ]
+    },
+    {
+      "name": "file-path-chip",
+      "specId": "X2",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "state": {
+          "kind": "enum",
+          "values": [
+            "rest",
+            "hover",
+            "focus",
+            "copied"
+          ]
+        },
+        "path": {
+          "kind": "slot"
+        },
+        "copy": {
+          "kind": "boolean"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "path",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "copy",
+          "planned": true
+        },
+        {
+          "name": "focus-ring",
+          "planned": true,
+          "representation": "pseudo"
+        }
+      ],
+      "attributes": {
+        "data-state": {
+          "values": [
+            "rest",
+            "hover",
+            "focus",
+            "copied"
+          ]
+        }
+      },
+      "booleans": [
+        "copy"
+      ],
+      "slots": [
+        {
+          "name": "path",
+          "part": "path"
+        }
+      ],
+      "apg": "native button",
+      "keyboard": [
+        {
+          "key": "Enter/Space",
+          "action": "Copy the path from the focused copy button"
+        }
+      ],
+      "tokenRoles": [
+        "surface/surface",
+        "border/subtle",
+        "radius/badge",
+        "radius/control",
+        "font/mono",
+        "text/fg",
+        "text/muted"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs follows live padding2/5, height26, 20px copy target and size/icon/sm glyph."
+      ]
+    },
+    {
+      "name": "attribute-chip",
+      "specId": "X3",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "size": {
+          "kind": "enum",
+          "values": [
+            "sm",
+            "md"
+          ]
+        },
+        "name": {
+          "kind": "slot"
+        },
+        "value": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "name",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "value",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-size": {
+          "values": [
+            "sm",
+            "md"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "name",
+          "part": "name"
+        },
+        {
+          "name": "value",
+          "part": "value"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "surface/surface",
+        "radius/badge",
+        "font/mono",
+        "text/muted",
+        "text/fg"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs: no border, following live docs CSS."
+      ]
+    },
+    {
+      "name": "toc",
+      "specId": "X4",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "breakpoint": {
+          "kind": "enum",
+          "values": [
+            "desktop",
+            "mobile"
+          ]
+        },
+        "level": {
+          "kind": "enum",
+          "values": [
+            "2",
+            "3"
+          ]
+        },
+        "state": {
+          "kind": "enum",
+          "values": [
+            "rest",
+            "hover",
+            "current"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "links": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "eyebrow",
+          "planned": true
+        },
+        {
+          "name": "rail",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "item",
+          "planned": true
+        },
+        {
+          "name": "links",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "current",
+          "planned": true
+        },
+        {
+          "name": "marker",
+          "planned": true
+        },
+        {
+          "name": "chevron-down",
+          "planned": true
+        }
+      ],
+      "attributes": {
+        "data-breakpoint": {
+          "values": [
+            "desktop",
+            "mobile"
+          ]
+        },
+        "data-level": {
+          "values": [
+            "2",
+            "3"
+          ]
+        },
+        "data-state": {
+          "values": [
+            "rest",
+            "hover",
+            "current"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "rail"
+        },
+        {
+          "name": "links",
+          "part": "links"
+        }
+      ],
+      "apg": "native navigation links and disclosure",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between section links and the mobile disclosure"
+        },
+        {
+          "key": "Enter",
+          "action": "Follow the focused section link"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Toggle the mobile disclosure"
+        }
+      ],
+      "tokenRoles": [
+        "text/muted",
+        "text/fg",
+        "border/subtle",
+        "surface/bg"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs mobile starts closed; open is native disclosure state, not a variant. Toc item13/20."
+      ]
+    },
+    {
+      "name": "file-tree",
+      "specId": "X5",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "type": {
+          "kind": "enum",
+          "values": [
+            "folder",
+            "file"
+          ]
+        },
+        "ownership": {
+          "kind": "enum",
+          "values": [
+            "none",
+            "owned",
+            "generated",
+            "guidance"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "name": {
+          "kind": "slot"
+        },
+        "tag": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "row",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "indent",
+          "planned": true
+        },
+        {
+          "name": "icon",
+          "planned": true
+        },
+        {
+          "name": "name",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "tag",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-type": {
+          "values": [
+            "folder",
+            "file"
+          ]
+        },
+        "data-ownership": {
+          "values": [
+            "none",
+            "owned",
+            "generated",
+            "guidance"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "row"
+        },
+        {
+          "name": "name",
+          "part": "name"
+        },
+        {
+          "name": "tag",
+          "part": "tag"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "surface/bg",
+        "border/subtle",
+        "font/mono",
+        "text/fg",
+        "text/muted"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs wins: read-only list, not an ARIA tree; no chevrons/hover/selection/open state/indent guides. Rows26 high, indent20. Ownership tags support owned config, generated history and CLI-managed annotations."
+      ]
+    },
+    {
+      "name": "figure",
+      "specId": "X6",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "width": {
+          "kind": "enum",
+          "values": [
+            "prose",
+            "wide"
+          ]
+        },
+        "media": {
+          "kind": "enum",
+          "values": [
+            "image",
+            "diagram"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "caption": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "media",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "caption",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-width": {
+          "values": [
+            "prose",
+            "wide"
+          ]
+        },
+        "data-media": {
+          "values": [
+            "image",
+            "diagram"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "media"
+        },
+        {
+          "name": "caption",
+          "part": "caption"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "border/subtle",
+        "surface/surface",
+        "surface/bg",
+        "text/muted"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec."
+      ]
+    },
+    {
+      "name": "anchor-nav",
+      "specId": "X7",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "state": {
+          "kind": "enum",
+          "values": [
+            "rest",
+            "scrolled"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "anchor",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "marker",
+          "planned": true
+        }
+      ],
+      "attributes": {
+        "data-state": {
+          "values": [
+            "rest",
+            "scrolled"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "anchor"
+        }
+      ],
+      "apg": "native navigation links",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between native section links"
+        },
+        {
+          "key": "Enter",
+          "action": "Follow the focused section link"
+        }
+      ],
+      "tokenRoles": [
+        "surface/bg",
+        "topbar/rule",
+        "text/fg",
+        "marker/default"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs: scrolled changes current anchor and pinned position, without extra Utility shadow."
+      ]
+    },
+    {
+      "name": "ruled-grid",
+      "specId": "X8",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "columns": {
+          "kind": "enum",
+          "values": [
+            "2",
+            "3",
+            "4"
+          ]
+        },
+        "variant": {
+          "kind": "enum",
+          "values": [
+            "ruled",
+            "feature"
+          ]
+        },
+        "children": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "cell",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        }
+      ],
+      "attributes": {
+        "data-columns": {
+          "values": [
+            "2",
+            "3",
+            "4"
+          ]
+        },
+        "data-variant": {
+          "values": [
+            "ruled",
+            "feature"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "children",
+          "part": "cell"
+        }
+      ],
+      "apg": "noninteractive presentation",
+      "keyboard": [],
+      "tokenRoles": [
+        "border/subtle",
+        "topbar/rule",
+        "space/section/gap"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs uses private Docs card anatomy, not D3 Card; feature gap32 follows live CSS."
+      ]
+    },
+    {
+      "name": "hero",
+      "specId": "X9",
+      "category": "Docs kit",
+      "priority": "P2",
+      "shipped": false,
+      "props": {
+        "layout": {
+          "kind": "enum",
+          "values": [
+            "split",
+            "centered"
+          ]
+        },
+        "breakpoint": {
+          "kind": "enum",
+          "values": [
+            "desktop",
+            "mobile"
+          ]
+        },
+        "eyebrow": {
+          "kind": "slot"
+        },
+        "title": {
+          "kind": "slot"
+        },
+        "children": {
+          "kind": "slot"
+        },
+        "actions": {
+          "kind": "slot"
+        },
+        "aside": {
+          "kind": "slot"
+        }
+      },
+      "parts": [
+        {
+          "name": "root",
+          "planned": true
+        },
+        {
+          "name": "display",
+          "planned": true
+        },
+        {
+          "name": "eyebrow",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "title",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "lede",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "actions",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "aside",
+          "planned": true,
+          "when": "when corresponding content is supplied"
+        },
+        {
+          "name": "path-stack",
+          "planned": true
+        }
+      ],
+      "attributes": {
+        "data-layout": {
+          "values": [
+            "split",
+            "centered"
+          ]
+        },
+        "data-breakpoint": {
+          "values": [
+            "desktop",
+            "mobile"
+          ]
+        }
+      },
+      "booleans": [],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "part": "eyebrow"
+        },
+        {
+          "name": "title",
+          "part": "title"
+        },
+        {
+          "name": "children",
+          "part": "lede"
+        },
+        {
+          "name": "actions",
+          "part": "actions"
+        },
+        {
+          "name": "aside",
+          "part": "aside"
+        }
+      ],
+      "apg": "native action controls in a section",
+      "keyboard": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Move between supplied action controls"
+        },
+        {
+          "key": "Enter/Space",
+          "action": "Activate the focused action"
+        }
+      ],
+      "tokenRoles": [
+        "hero/bg",
+        "hero/pad",
+        "text/fg",
+        "text/muted",
+        "font/heading"
+      ],
+      "notes": [
+        "Source: completed Figma base library handoff (#2486); ledger takes precedence over research spec.",
+        "ledger-desktop-docs places File path chips in aside path-stack, not display. Mobile uses existing title role; centered stacks aside below display."
       ]
     }
   ]

@@ -1,0 +1,268 @@
+{
+  "files": [
+    {
+      "path": "packages/cli/e2e/src/application/gates/scaffold/runtime/probe-app-reference.ts",
+      "sha256": "d834aed12f9ebf4202643cea7493fb22d84fcf94bd387aeffa61c5618b2a943e"
+    },
+    {
+      "path": "packages/cli/e2e/tests/application/gates/probe-app-reference_test.ts",
+      "sha256": "57513109d11c13c3abcac40e525d15f641b9888086e898d0b4e5eddf892813d7"
+    },
+    {
+      "path": "packages/cli/src/kernel/adapters/database/sample-records_test.ts",
+      "sha256": "aaae6e2b5b8e775a21c62e3d6ad6f2624ae6275bd02897d2f1c427484b48078e"
+    },
+    {
+      "path": "packages/cli/src/kernel/adapters/scaffold/import-resolver.ts",
+      "sha256": "032a327a727ccb7d067fd79caeec779bbd772869e9bed3a59a641537791c3830"
+    },
+    {
+      "path": "packages/cli/src/kernel/adapters/service/scaffolder.ts",
+      "sha256": "030a05c8253a52f421bb8aba4029469d12c60605489e57cb3e91ee4103d5b1ce"
+    },
+    {
+      "path": "packages/cli/src/kernel/adapters/templates/app/generate-app-deno-json.ts",
+      "sha256": "6df55881bc5d70faf12a1f3e21d5f87e47f0dc4bab29dee66a58bf46296fbc2b"
+    },
+    {
+      "path": "packages/cli/src/kernel/adapters/templates/scaffold-template-assets.ts",
+      "sha256": "0dd2e9e0b068fe4c9a96858b25d4c026933a81ed44080e6c05e3658a96909818"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/resource-slice/render-resource-slice.ts",
+      "sha256": "a2239793b9d61441998f8779fd03c6e92970c79569f0a17e59acbbf0d1c9c2d0"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/resource-slice/render-resource-slice_test.ts",
+      "sha256": "9d510e1bc34e6c09724dfef3730a0bb2a86555af66115498ebcb48351acac5ca"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/resource-slice/resource-slice-contract.ts",
+      "sha256": "074def09aa4adeeb522321131b3c8ee46c50f982467dc4d650a955d8cae50978"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/resource-slice/resource-slice-contract_test.ts",
+      "sha256": "84f69384b29a6c7f2d368604ecc562427d0533f30b1cf6d649a6de968feb7421"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/scaffold/workspace-init.ts",
+      "sha256": "c4011b80ff41a72c2f18de8e9452b1d085df168ed767df54a52065e1ac7c17a6"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/scaffold/writers/scaffold-health_test.ts",
+      "sha256": "6973ba2281b8a7b46f37e00972546523f1fdfba74d6aba5c1f383945d4fcb40c"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/scaffold/writers/scaffold-presentation_test.ts",
+      "sha256": "e7b6f994daeed13c2be914a9595374734e6f560535de6d0cd3d4c233db0b18f4"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/scaffold/writers/scaffold-projections_test.ts",
+      "sha256": "b7ade16c0fb6eecf9f57b5ec393dbe6c90e689a7e531cde75d373bb4f72fc6f4"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/scaffold/writers/workspace-capabilities_test.ts",
+      "sha256": "19e97671be858bdc914f798c3f9ea9a900fb33cb90d3fc2c09cdc909846a604c"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/scaffold/writers/workspace-pages_test.ts",
+      "sha256": "7b9c391730767329bbe06eb54dbd0d94213daeb453abf461fa431adda9e6a082"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/scaffold/writers/write-app-files.ts",
+      "sha256": "06bacabf0a4d297db65cc73e52d0c89b747e7e91ec081964711b7bd1c7f85204"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/scaffold/writers/write-app-files_test.ts",
+      "sha256": "0a0e280a98d8cb6b78251fd2eac7417e0ffdc02e661141a5b006a49ff7f52b47"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/scaffold/writers/write-example-service-app-files.ts",
+      "sha256": "dbf446167a2e5e31cd6f60ecddba9406b440871d1117c28ff806e421bad397ff"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/ui/page/query-result-template.ts",
+      "sha256": "b2cf29ed7f38462be81f510c29b0f6239bb577bf517030a7b2dc9cb90d32da04"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/ui/page/query-result-template_test.ts",
+      "sha256": "5ff74e0cbc9dd8bec8d1ca89fdd323e4b31462e6fbe61e90ce5ce606a8ed445a"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/assets/workspace.css.template",
+      "sha256": "daf762dc505f58d90212654b606e30c439dda887a64397c0306b8fcbd420d580"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/components/ui/mod.ts.template",
+      "sha256": "878973b7f348d0c35cf6adc64525483f6d89d8bcf2bd2c1323e77c2f23b90400"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/islands/RecordTable.tsx.template",
+      "sha256": "2d71ba9d41c914d5fe762b46c5f8339bf987f4b3511e7f3d8f24c926655a6063"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/islands/SettingsForm.tsx.template",
+      "sha256": "1563a0bae507fa9067ef76b351824519d516c6399e2911b4051b8661883ceb74"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/islands/WorkspaceCommands.tsx.template",
+      "sha256": "6c59ab04de931fba21379dfe01d5b423c88d8c36e963a703ca8338695b12cff4"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/lib/scaffold-capabilities.ts.template",
+      "sha256": "e7cbf29b05a96ab39decc5c46cf56dbcdd6cb93c10018c5f6a966e175aca3044"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/lib/scaffold-contract.ts.template",
+      "sha256": "ab93780aa0a7951bf84862559366c5aad9f43305e9c0aa2962bca1bca60a8691"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/lib/scaffold-plugin-capabilities.ts.template",
+      "sha256": "cb0b89adc95a98933841b7d03ff104d05f0152130293701847263f50e274706e"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/lib/scaffold-projections.ts.template",
+      "sha256": "75314d49ae084cafd9d7de6e2fc17367451c77e2bb5594e75616a4c4c50136db"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/lib/scaffold-records.database.ts.template",
+      "sha256": "21dafd6b40a49d232831d91c1490dd559cba801e7827ceada34a7dbccad3d4d4"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/lib/scaffold-records.memory.ts.template",
+      "sha256": "81437981e435f500d20608c517474d8d1fcec540a30bd669ee17ae1eee90e5d9"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/routes/(_components)/dashboard-view.tsx.template",
+      "sha256": "a6766c3bb3ff3cd396c9976225ce1a168e97a44841127120230ea5f114cb1cc9"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/routes/(_components)/health-view.tsx.template",
+      "sha256": "7b453f76a28d550cff6be1e75bf303460f0d55ad15fde202b2e34731c9591498"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/routes/(_components)/record-table.tsx.template",
+      "sha256": "3956a000f25de927c9e8ea17ca9b6a5e416c11af5facae8e043d9c024209a2ff"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/routes/(_shared)/health.ts.template",
+      "sha256": "00da37e7fb7f540d72f149106e8cfa9276c73e6074620fc48c9afac62a6e478f"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/routes/dashboard.tsx.template",
+      "sha256": "2161d68cb40ef7f117803d00a265582228fd0c6ab1ceb2654f9fe73675d94e60"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/routes/examples/(_components)/examples-view.tsx.template",
+      "sha256": "4b48afa3cc23d51c94d245caab760b6ccb4d73560a49ae80ec563540f93102e8"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/routes/health.tsx.template",
+      "sha256": "eef35ca6ac777b9fcec946c308a9db073ff08ca68bb52aa19ea83260842f9baa"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/routes/index.tsx.template",
+      "sha256": "a07f94ba9bf51f2a664b3ece51f072c37a2ebd680d614b8b6362123ef88b76f4"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/routes/records/[id].tsx.template",
+      "sha256": "47a92546e184448f6bf6269a1020ec64a022f72ab1b8ff10024dfa187bee7d06"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/routes/records/index.tsx.template",
+      "sha256": "4e1756cc664f399cb7e1c01c51f05082e530ba3996aeda3a33bb92f096847cd7"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/routes/settings.tsx.template",
+      "sha256": "21eb399b4c59ed01d36e3d0e73dbd569290282db3c6fe4aeac440dbfa90b23be"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/routes/sign-in.tsx.template",
+      "sha256": "180c7ab8c78431ab9aa1f9e8ca154899f54ae9fe50634afeb5a25846b23feb43"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/embedded.generated.ts",
+      "sha256": "c10a1e35e0152ce6258077bcc3b68198b823f1bf2e9cf1afec0c2724dc656cec"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/manifest.ts",
+      "sha256": "cce0bd99b3aa15688ac9796a93dae9275b64a30ac25f96bd477be8c9ea23435e"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/resource-slice/(_components)/resource-form.tsx.template",
+      "sha256": "69a35aedd67c0938eff24ee9077e87cd3e6a8a76fb9f2bae9c9143e603277903"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/resource-slice/(_components)/resource-summary.tsx.template",
+      "sha256": "9e7267bc021c8b67a19ed0df5232efb35662af3b912e7a1587606be5378289b0"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/resource-slice/(_components)/resource-view.tsx.template",
+      "sha256": "ec84a0d72e66f806d629b2a450e29f90d9b6bbed6b8d5221f7583fe65e456a6c"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/resource-slice/index.layout.tsx.template",
+      "sha256": "22946454afbde2a3e1041a7b4ff52eae2174d0828a76c843fed3527f98568bb7"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/resource-slice/index.tsx.template",
+      "sha256": "a3082b62b19e19106d5b213b475341a4a16822007c8e5a5d25f577ffb15481aa"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/adapters/memory-entity-repository.ts.template",
+      "sha256": "94d02ff0e349927ed332490726362c5932a7e8bd6e21b1c3d39d892b173d9ca5"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/contract.ts.template",
+      "sha256": "94feb0d208e13a267d882c4378cd90150cc09b8bf270210fd31fe4ac3665b2cb"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/domain/entity.ts.template",
+      "sha256": "3d04f7f490296620ede600fdf5ca4284b4fc6cee2170ce398f4d4807c008ca19"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/domain/entity_test.ts.template",
+      "sha256": "981bd4e1b42bb50fff2bab13ee75a4902c5aaa514e33639cec986c002e1c35e2"
+    },
+    {
+      "path": "packages/cli/src/kernel/constants/jsr-specifiers.ts",
+      "sha256": "9bc1cac9bc4e0371748b863e51beed8660e8c5a99e3ac39f7ea700f0490ee011"
+    },
+    {
+      "path": "packages/cli/src/kernel/constants/scaffold/scaffold-packages.ts",
+      "sha256": "68eb14ae85927e0abef752087a838fd5a9bd87c062944f1c8fb3b399d5b2d053"
+    },
+    {
+      "path": "packages/cli/src/kernel/domain/service-shape.ts",
+      "sha256": "44f9ef8f37dba6090a21f66033d2ee2cba8a1b32426bd97eb9d7761adaa5053c"
+    },
+    {
+      "path": "packages/cli/src/kernel/templates/app/generators-config_test.ts",
+      "sha256": "04e1876628a8fa63fb4c61f0a2b3838e943450a60647180b086fb35dc9babb3b"
+    },
+    {
+      "path": "packages/cli/src/kernel/templates/app/route-templates_test.ts",
+      "sha256": "56fbb0174630d9f48bc910219ae1861f09456de24d3ecd2598b1ef46fae24a16"
+    },
+    {
+      "path": "packages/cli/src/maintainer/adapters/local-import-resolver.ts",
+      "sha256": "1fc4cf0a5d7142adb5b384fa41f4930b0ed7b8e586e8011034f568711b732a47"
+    },
+    {
+      "path": "packages/cli/src/public/adapters/jsr-import-resolver.ts",
+      "sha256": "49c04fa3e1134a663ea70f2e59954c200131bb3446eda7602043d993fdd49571"
+    },
+    {
+      "path": "packages/cli/src/public/features/generate/resource/generate-resource.ts",
+      "sha256": "7245951a0f3a1cddf44324a44139ad2086c5730d17fd1812dd1c855458f56f4f"
+    },
+    {
+      "path": "packages/cli/src/public/features/generate/resource/generate-resource_test.ts",
+      "sha256": "e3610ddfead95a9ca5b6a674fc2b28cdbd769d4b58d6facd9f27df28507e89a0"
+    },
+    {
+      "path": "packages/plugin-streams-core/src/application/stream-browser-environment.d.ts",
+      "sha256": "ba5bddb82779383bfc5b8cf6b07ad9215586c67801bb47e3309b67664edbf1b5"
+    }
+  ]
+}

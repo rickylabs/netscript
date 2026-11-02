@@ -8,6 +8,7 @@
  */
 
 import { resolveNetScriptImports } from '../../adapters/scaffold/import-resolver.ts';
+import { SCAFFOLD_APP_CATALOG } from '../../constants/scaffold/scaffold-app-catalog.ts';
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
 import type { PackageSourceMode } from '../../domain/scaffold/scaffold-options.ts';
 
@@ -69,6 +70,9 @@ export function generateServiceDenoJson(options: ServiceDenoJsonOptions): string
     },
     imports: {
       [`@${options.projectName}/contracts`]: contractsImport,
+      [SCAFFOLD_PACKAGES.NETSCRIPT_STREAMS_CORE]:
+        resolvedImports[SCAFFOLD_PACKAGES.NETSCRIPT_STREAMS_CORE],
+      zod: `npm:zod@${SCAFFOLD_APP_CATALOG.ZOD}`,
       ...(options.hasDatabase ? { '@database': '../../database/mod.ts' } : {}),
       [SCAFFOLD_PACKAGES.NETSCRIPT_SERVICE]: resolvedImports[SCAFFOLD_PACKAGES.NETSCRIPT_SERVICE],
       ...(options.authServiceName !== undefined

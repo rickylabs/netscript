@@ -388,8 +388,10 @@ describe('generateRegisterApps', () => {
       apps: { dashboard: fixtures.APP_WITH_REFS },
     });
     assertStringIncludes(output, '// VITE service-discovery injection');
-    assertStringIncludes(output, 'buildViteEnvVarName("users")');
-    assertStringIncludes(output, 'services__users__http__0');
+    assertStringIncludes(output, 'config.Apps["dashboard"]?.ServiceReferences ?? []');
+    assertStringIncludes(output, 'config.Apps["dashboard"]?.PluginReferences ?? []');
+    assertStringIncludes(output, 'buildViteEnvVarName(ref)');
+    assertStringIncludes(output, 'services__${ref}__http__0');
   });
 
   it('should register desktop only when explicitly enabled', () => {
@@ -444,12 +446,12 @@ describe('generateRegisterApps', () => {
     });
 
     assertStringIncludes(output, '// Server-side service-discovery injection');
-    assertStringIncludes(output, 'getResourceEndpoint(_services.get("users"), \'http\')');
-    assertStringIncludes(output, 'app_0.withEnvironment("services__users__http__0", endpoint)');
-    assertStringIncludes(output, 'getResourceEndpoint(_plugins.get("workers-api"), \'http\')');
+    assertStringIncludes(output, "getResourceEndpoint(_services.get(ref), 'http')");
+    assertStringIncludes(output, 'app_0.withEnvironment(`services__${ref}__http__0`, endpoint)');
+    assertStringIncludes(output, "getResourceEndpoint(_plugins.get(ref), 'http')");
     assertStringIncludes(
       output,
-      'app_0.withEnvironment("services__workers-api__http__0", endpoint)',
+      'app_0.withEnvironment(`services__${ref}__http__0`, endpoint)',
     );
     assert(!output.includes('buildViteEnvVarName('));
     assert(!output.includes('app_0.withHttpEndpoint('));

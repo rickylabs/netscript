@@ -338,6 +338,8 @@ Deno.test('app home gate hands the probe a project and an AppHost to resolve the
     '/workspace/app',
     'generated-web',
     '/workspace/app/aspire/apphost.mts',
+    'workers',
+    'streams',
   ]);
   assertEquals(command.some((argument) => argument.includes(String(PORT_RANGES.APP.start))), false);
 });

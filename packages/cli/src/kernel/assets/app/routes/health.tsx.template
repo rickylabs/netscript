@@ -1,14 +1,14 @@
 /**
- * `/health` route — readiness endpoint for the {{appName}} app.
+ * `/health` route — local liveness and explicit dependency status for {{appName}}.
  *
  * The Aspire AppHost probes this route to decide whether the app is healthy, and its
  * probe sends no `Accept` header — so it takes the server-rendered branch below and a
  * broken SSR pipeline shows up as `Unhealthy` rather than as a green resource that
- * returns 500 to every request. Keep SSR as the fall-through: only a caller that asks
- * for JSON and not HTML gets the payload without rendering.
+ * returns 500 to every request. No-Accept/wildcard probes never call dependencies.
+ * Explicit HTML status pages and JSON clients receive the full dependency report.
  */
 import HealthView from './(_components)/health-view.tsx';
-import { buildPayload, toHealthRouteData } from './(_shared)/health.ts';
+import { buildLivenessPayload, buildPayload, toHealthRouteData } from './(_shared)/health.ts';
 import { appRoutes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
 
@@ -18,16 +18,22 @@ export const healthPage = definePage()
     title: '{{name}} — health',
     description: 'Liveness route for the {{appName}} app.',
   }))
-  .withLayer('panel', HealthView, (ctx) => toHealthRouteData(ctx.data) ?? { payload: buildPayload() })
+  .withLayer(
+    'panel',
+    HealthView,
+    (ctx) =>
+      toHealthRouteData(ctx.data) ?? { payload: buildLivenessPayload('{{appName}}') },
+  )
   .withLayout((slots) => slots.panel())
-  .withHandler('GET', (ctx) => {
+  .withHandler('GET', async (ctx) => {
     const accept = ctx.req.headers.get('accept') ?? '';
-    const payload = buildPayload('{{appName}}');
-
     if (accept.includes('application/json') && !accept.includes('text/html')) {
-      return Response.json(payload);
+      return Response.json(await buildPayload('{{appName}}', ctx.req));
     }
 
+    const payload = accept.includes('text/html')
+      ? await buildPayload('{{appName}}', ctx.req)
+      : buildLivenessPayload('{{appName}}');
     return { data: { payload } };
   })
   .build();

@@ -163,6 +163,7 @@ export interface PublicCommandDependencies {
   };
   /** Dependencies for plugin install. */
   readonly pluginInstallDependencies: {
+    readonly generateRegistries?: GeneratePluginRegistriesCommandDependencies['generate'];
     readonly formatter: GeneratedSourceFormatterPort;
     readonly fs: DenoFileSystem;
     readonly scaffolder: Scaffolder;
@@ -382,6 +383,7 @@ export function createPublicCommandDependencies(
     },
     serviceAddDependencies,
     pluginInstallDependencies: {
+      generateRegistries: generatePluginRegistries,
       formatter: generatedSourceFormatter,
       fs,
       scaffolder,

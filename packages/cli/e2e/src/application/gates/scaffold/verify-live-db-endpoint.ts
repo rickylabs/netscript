@@ -121,8 +121,8 @@ async function verifyLiveDbEndpoint(): Promise<void> {
 
 /**
  * Verify the generated database seed and defined missing-row HTTP/OpenAPI contract.
- * This runs inside the existing live database endpoint gate so all grouped checks
- * consume the same later `scaffold.runtime` execution.
+ * The live database endpoint and shared record-activity gates use this contract;
+ * both runtime tiers commit an update before requiring populated Overview activity.
  */
 export async function verifyGeneratedCrudAcceptance(
   usersUrl: string,
@@ -166,6 +166,18 @@ export async function verifyGeneratedCrudAcceptance(
     body: JSON.stringify({ data: { name: 'Missing User' } }),
   });
   await assertDefinedNotFound(fetcher, missingUrl, 'DELETE');
+
+  // Exercise the committed mutation path before the Overview requires a populated
+  // record activity stream. Keep the seed's values and row count unchanged.
+  const updated = await fetcher(new URL(`/api/users/${representative.id}`, usersUrl), {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ data: { name: 'Seed User' } }),
+  });
+  const updatedBody = await responseJson(updated, 'representative record update');
+  if (!updated.ok || !isRecord(updatedBody) || updatedBody.id !== representative.id) {
+    throw new Error(`Representative record update failed: ${updated.status}`);
+  }
 
   return {
     representativeId: representative.id,

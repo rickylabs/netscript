@@ -148,6 +148,8 @@ export const GATE = {
   RUNTIME_HEALTH_CREDENTIAL_ACCEPTED: 'runtime.health.credential-accepted',
   RUNTIME_HEALTH_CREDENTIAL_REJECTED: 'runtime.health.credential-rejected',
   BEHAVIOR_APP_HOME: 'behavior.app-home',
+  BEHAVIOR_RECORD_ACTIVITY: 'behavior.record-activity',
+  BEHAVIOR_DOCUMENTED_SCAFFOLD: 'behavior.documented-scaffold',
   BEHAVIOR_APP_DYNAMIC_ROUTE: 'behavior.app-dynamic-route',
   BEHAVIOR_APP_REFERENCE: 'behavior.app-reference',
   BEHAVIOR_ISLAND_SERVED_SURFACE: 'behavior.island-served-surface',

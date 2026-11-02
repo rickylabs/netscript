@@ -1,0 +1,24 @@
+# Plan & Design — READY FOR REVIEW
+
+Deliver S7 phase 1 as docs/frontend work, with existing MCP tooling architecture (archetype 6). Preserve doctrine layering and current package public exports. No new dependencies, token values or accepted architecture debt.
+
+1. Generate a build catalog by enumerating every registry component/block and reading S3 contracts plus native deno doc JSON. Prepare consumer-only template imports in a build-only directory from registry metadata. Use one typed preview-example source for actual browser rendering and visible usage; common newly arriving items derive a preview from contract/prop metadata, while rich compositions use explicit examples. Coverage/freshness rejects missing output or stale metadata. Component pages include install, usage/examples, implementation props, keyboard, tokens and compatibility notes. Keep every agent twin below the MCP single-page limit, splitting auxiliary details if necessary without truncating.
+2. Generate /create/ from docs/site/design-system with a client bundle and isolated preview document. All 24 presets are selectable; Studio flavor selects a shipped preset. Utility is the only enabled component style, represented by an extension descriptor. Accent/radius/fonts/density/menu are effective preset values unless supported independently; icon library only if real registry support exists. Import existing encodeUiPreset/decodeUiPreset, support valid shared query codes, reject unsupported choices, copy code/install/apply commands. Scheme controls preview only. Preview uses actual Fresh UI components and canonical shipped theme CSS.
+3. Add generator freshness and census checks to site build; index components in Design system navigation. Existing Markdown twin pipeline generates agent pages. Feed through all four canonical carrier generators. Route component questions to the generated corpus through the existing guidance-index seam with component identities derived from corpus paths, not a second hand-maintained list. Test actual corpus and retrieval byte bounds.
+4. Repair #2410 in shared Markdown URL canonicalization and callout rendering. Test real Vento-produced xrefs, already-prefixed links, inline code and authored HTML in callouts, and serialized twins.
+
+## Commit slices and gates
+
+1. Builder and generated component pages: tools/docs-site/fresh-ui/**, docs/site/design-system/**, build/navigation integration, deno.json. Prove generator census/freshness tests, source-derived prop extraction, static build and rendered check, browser preview interactions. Update run state, independent substantive slice review, then commit/push.
+2. MCP routing and Markdown/carriers: docs/site/_plugins/**, packages/mcp/src/domain/docs/** and tests as required, canonical generated assets. Prove real rendering regressions, guidance corpus/get_doc tests, all carrier check:* tasks, quality:gate/JSR rubric for affected package boundary. Update run state, independent substantive review, commit/push.
+3. Browser/CLI evidence and reviewer repairs: owned source and run artifacts only. Browser /create and two component pages at 390/1280 in light/dark; code copied from built builder through real init, resolved token comparison and rendered page. Full declared gates, read-only independent IMPL-EVAL, reconcile current main by normal merge only.
+
+## Required gates
+
+Site build and check:rendered-output, check:links; root docs:links, docs:accuracy, docs:snippets. Carrier checks check:agent-docs-prose, check:mcp-export-corpus, check:assets-barrel, check:publish-assets and every other root check:* task. release:preflight; scoped structured check/test/lint/fmt; quality:gate and scoped JSR audit if MCP source changes. Full one-pass e2e:cli run scaffold.runtime --cleanup --format pretty (Docker unavailable => UNPROVEN). Public evidence contains verdict/counts only for leak hygiene. Exact-head required CI must be green or workflow-policy skipped before READY, including deps-report policy handling.
+
+## Risks, deferred scope and contributor path
+
+Fixed axes must remain truthful; browser tokens isolated from docs chrome; imported query input validated; templates and rich components need real examples; dynamic registry additions require page discovery plus freshness coverage. Assert UTF-8 sizes, not character counts. Generated carrier budgets may need compression/source tuning without removing docs. Separate environment failures from code verdicts. No new exports, slow types or dependency API risk: apply JSR rubric to changed MCP tooling boundary, preserve publish checks.
+
+Deferred: non-Utility styles, new resolver axes, server features, desktop/native capabilities in a web preview, release publication and merge. These exceed phase 1 or do not ship. Contributor entry: tools/docs-site/fresh-ui/README.md. No unresolved owner decision; exact fixture values and module boundaries are routine implementation choices.

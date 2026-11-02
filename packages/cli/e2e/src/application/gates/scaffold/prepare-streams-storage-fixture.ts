@@ -36,6 +36,16 @@ export async function prepareStreamsStorageFixture(projectRoot: string): Promise
     ...original,
     DataDirectories: { [STREAMS_STORAGE_ENV]: '.netscript/data/streams' },
   };
+  // The Overview consumes record events. Link the real fixture service so its
+  // later CRUD acceptance mutation publishes to this persistent stream resource.
+  const services = settings.NetScript.Services;
+  const users = isRecord(services) ? services.users : undefined;
+  if (!isRecord(users)) throw new Error('Generated project must declare the users service.');
+  const references = users.PluginReferences ?? [];
+  if (!Array.isArray(references) || !references.every((value) => typeof value === 'string')) {
+    throw new Error('Invalid users PluginReferences.');
+  }
+  users.PluginReferences = [...new Set([...references, STREAMS_STORAGE_RESOURCES.FILE])];
   await Deno.writeTextFile(path, `${JSON.stringify(settings, null, 2)}\n`);
 }
 

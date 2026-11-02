@@ -1,4 +1,5 @@
 import type { GuidanceConfidence, GuidanceResult } from './guidance-contract.ts';
+import { componentGuidance } from './component-guidance.ts';
 import type { DocsDocument } from './docs-corpus-port.ts';
 import type { GuidanceConcept } from './guidance-concepts.ts';
 import { type ResolvedGuidanceLink, resolveGuidanceLinks } from './guidance-links.ts';
@@ -106,6 +107,8 @@ export class GuidanceIndex {
   find(intent: string): GuidanceResult {
     const normalizedIntent = guidanceOneLine(intent).toLocaleLowerCase();
     const concepts = activatedGuidanceConcepts(normalizedIntent);
+    const component = componentGuidance(this.#sections, intent, concepts.length > 0);
+    if (component) return component;
     // A concept's expansion obeys the same content-term rule as the intent: stop words such as
     // `what` and `will` in a concept's vocabulary neither score nor earn a concept bonus.
     const conceptTerms: ConceptTerms = new Map(

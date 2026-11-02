@@ -51,3 +51,9 @@ Deno.test('example writer preset owns exactly the form and partial canonical lea
     true,
   );
 });
+
+Deno.test('memory example starts its typed list with required pagination arguments', () => {
+  const plan = planExampleServiceResourceSlice({ ...APP_VARS, serviceStorage: 'none' });
+  assertEquals(plan.input.procedure.initialInput, { limit: 25, offset: 0 });
+  assertEquals(planExampleServiceResourceSlice(APP_VARS).input.procedure.initialInput, undefined);
+});
