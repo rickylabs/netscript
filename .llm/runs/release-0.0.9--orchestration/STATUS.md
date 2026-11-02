@@ -1,5 +1,5 @@
 # STATUS — 0.0.9 (mc009e; one line per group; reread first after a compact)
-- **PAUSED 11-01 17:4xZ (Claude budget; until Friday reset).** Handoff on #2474. Eric cuts canaries; Cockpit merges #2488. Resume: reread this file, then the canary.2 gate in the handoff.
+- PAUSED (Claude budget). canary.3 GREEN (b3c15fa58). Terminal canary waits for PRs 2559, 2573, 2574, 2592 + the #2571 showcase PR (Cockpit relays the sha). Then "stable cut ready" and WAIT for Eric's explicit go (he asked to be asked again).
 - 0.0.9-canary.1 PUBLISHED from f4aa307b5 (22:05Z; canary-pair success; e2e-cli-prod green). #2396 closed (published-graph proof). Lanes may merge again.
 - COMBINED CANARY READY TO CUT at 6c3f8a118 (18:16Z, comment 6547307997; supersedes .1 15cffa2fe and .2 7feb24c7d; includes Fresh UI S6a) · Eric cuts
 - H01/H02/A1/A2/A3/E1 DONE (all closed)
