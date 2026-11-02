@@ -204,6 +204,7 @@ docs/site/reference/aspire/index.md	doc:aspire-dedicated	S11	version snippets mu
 docs/site/reference/cli/commands.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/config/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/mcp/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/reference/plugin-ai/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/plugin/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/prisma-adapter-mysql/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/reference/queue/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
