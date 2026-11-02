@@ -22,3 +22,8 @@ Next after S1 review: commit/push S1, then implement S2 documented-order runtime
 S1 independent repair review PASS. All 112 focused results and 14 owned-source wrapper checks pass.
 Root check/lint/fmt and carrier tasks pass on the prior baseline with scoped repaired-source checks;
 S2 must complete final-head validation. No accepted product debt. Proceed to S1 commit/push, then S2.
+
+S2 candidate implemented: behavior.documented-scaffold executes the canonical docs in three fresh
+workspaces before main-suite setup. 76 focused tests and seven-source scoped wrappers pass.
+Next: finish same-session S2 review, final carrier/check tasks, and full runtime CI at final head.
+No READY or runtime PASS may be claimed until the real CI run proves both controls and restoration.

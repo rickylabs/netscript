@@ -63,6 +63,8 @@ const INFRASTRUCTURE_GATES = [
 export const RUNTIME_GATES = [
   GATE.PREFLIGHT_DENO,
   GATE.PREFLIGHT_ASPIRE,
+  // Its own pristine workspaces run before any main-suite link or restart fixture.
+  GATE.BEHAVIOR_DOCUMENTED_SCAFFOLD,
   GATE.SCAFFOLD_INIT,
   GATE.SCAFFOLD_SERVICE_CLIENT_ADD,
   GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE,
@@ -201,6 +203,8 @@ export const RUNTIME_GATES = [
 // the Postgres merge-readiness suite while the reduced-container tier exercises
 // every provider-neutral runtime behavior.
 const POSTGRES_ONLY_RUNTIME_GATES = new Set<GateId>([
+  // The executable documentation explicitly selects Postgres; do not silently rewrite its commands.
+  GATE.BEHAVIOR_DOCUMENTED_SCAFFOLD,
   GATE.DATABASE_MIGRATION_ARTIFACTS,
   GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
   GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,

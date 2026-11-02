@@ -58,3 +58,17 @@ ignored config containing root rules without root selection exclusions. CLI cove
 with that config; do not cite raw root fmt/lint as CLI evidence. The reviewed cosmetic constant
 placement was corrected. No product behavior changed after the review.
 Reconcile: S1 matches the declared surface. Next slice is the pristine documented runtime gate.
+
+## S2 candidate
+
+Added behavior.documented-scaffold before the main suite's init and repair fixtures. It reads the
+actual documented block, executes three pristine Postgres setups, observes the resident worker
+before seed, and requires real seed-correlated work plus the committed event in both stream and
+Activity HTML. Independent negative controls disable only the handoff wire or service selection;
+the final setup restores the exact documented steps. Cleanup uses scoped repo teardown and reports
+foreign/unknown resources without changing them. SQLite keeps its existing provider-neutral gates.
+
+76 builder, registry, runner and new acceptance-contract tests PASS. Seven changed TypeScript
+files pass scoped check/lint/fmt. quality:gate PASS. S2 independent review and final-head full
+scaffold.runtime CI remain pending; this is a candidate commit, not a runtime sign-off.
+Reconcile: declared scope maintained, no hand-written carriers and no accepted product debt.

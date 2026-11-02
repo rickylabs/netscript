@@ -101,6 +101,25 @@ export function createRuntimeBehaviorGates(
 ): readonly GateDefinition[] {
   return [
     commandGate(
+      GATE.BEHAVIOR_DOCUMENTED_SCAFFOLD,
+      'Documented scaffold order completes seeded work and stream Activity with negative controls',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-all',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/verify-documented-scaffold.ts`,
+        context.project.repoRoot,
+        context.project.cliEntrypoint,
+        `${context.project.smokeRoot}/documented-scaffold`,
+      ],
+      undefined,
+      'capture',
+      'The unmodified documented steps must complete seeded work and render the actual linked Activity stream.',
+      undefined,
+      1_200_000,
+    ),
+    commandGate(
       GATE.BEHAVIOR_BACKGROUND_CHILDREN_HEALTH,
       'Background children report registry and dependency readiness',
       GATE_PHASE.BEHAVIOR,
