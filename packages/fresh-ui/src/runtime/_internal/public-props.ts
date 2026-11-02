@@ -19,8 +19,13 @@ export type FreshUiAttributeValue =
   | FreshUiStyle
   | readonly string[];
 
-/** Public pass-through DOM props shared by interactive components. */
-export type FreshUiElementProps = {
+/**
+ * Public pass-through DOM props shared by interactive components.
+ *
+ * The empty module projection retains Preact's type dependency in JSR's emitted API so its
+ * public `preact` namespace remains available. It adds no property or runtime dependency.
+ */
+export type FreshUiElementProps = Pick<typeof import('preact'), never> & {
   /** CSS class name forwarded to the rendered element. */
   class?: string;
   /** JSX-compatible CSS class name forwarded to the rendered element. */
