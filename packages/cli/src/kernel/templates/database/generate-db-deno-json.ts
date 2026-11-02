@@ -122,6 +122,7 @@ export function generateDatabaseDenoJson(
     },
     tasks,
     imports: {
+      [SCAFFOLD_PACKAGES.STD_PATH]: imports[SCAFFOLD_PACKAGES.STD_PATH],
       prisma: 'npm:prisma@^7.10.0',
       '@prisma/client': 'npm:@prisma/client@^7.10.0',
       '@prisma/instrumentation-contract': 'npm:@prisma/instrumentation-contract@^7.10.0',

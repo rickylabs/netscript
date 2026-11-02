@@ -18,30 +18,36 @@ export const {{serviceName | pascalCase}}HealthSchemaV1 = z.object({
   uptime: z.number().int().nonnegative().optional().describe('Uptime in seconds'),
 });
 
-export const {{serviceName | pascalCase}}StatusSchemaV1 = z.enum([
-  'active',
-  'draft',
-  'archived',
-]);
+export const {{serviceName | pascalCase}}StatusesV1 = ['pending', 'awaiting_payment', 'paid', 'shipped', 'refunded', 'cancelled'] as const;
+export const {{serviceName | pascalCase}}StatusSchemaV1 = z.enum({{serviceName | pascalCase}}StatusesV1);
 
 export const {{serviceName | pascalCase}}ListItemSchemaV1 = z.object({
   id: z.number().int().positive().describe('Stable identifier'),
   name: z.string().min(1).describe('Display name'),
+  reference: z.string().min(1).describe('Unique human-readable reference'),
+  ownerName: z.string().min(1),
+  ownerEmail: z.email(),
+  amount: z.number().int().min(-2147483648).max(2147483647).describe('Signed integer minor units'),
+  currency: z.string().regex(/^[A-Z]{3}$/),
+  updatedAt: z.string().datetime(),
   summary: z.string().min(1).describe('Short record summary'),
   status: {{serviceName | pascalCase}}StatusSchemaV1.describe('Record lifecycle status'),
   createdAt: z.string().datetime().describe('ISO creation timestamp'),
 });
 
 export const {{serviceName | pascalCase}}ListInputSchemaV1 = z.object({
-  limit: z.number().int().positive().describe('Number of records to return'),
+  limit: z.number().int().positive().max(100).describe('Number of records to return'),
   offset: z.number().int().nonnegative().describe('Starting offset'),
   search: z.string().min(1).optional().describe('Optional record name search'),
+  status: {{serviceName | pascalCase}}StatusSchemaV1.optional(),
+  sortBy: z.enum(['id', 'reference', 'name', 'ownerName', 'status', 'amount', 'currency', 'createdAt', 'updatedAt']).optional(),
+  sortOrder: z.enum(['asc', 'desc']).optional(),
 });
 
 export const {{serviceName | pascalCase}}ListResponseSchemaV1 = z.object({
   items: z.array({{serviceName | pascalCase}}ListItemSchemaV1).describe('Returned service records'),
   total: z.number().int().nonnegative().describe('Total matching records'),
-  limit: z.number().int().positive().describe('Requested page size'),
+  limit: z.number().int().positive().max(100).describe('Requested page size'),
   offset: z.number().int().nonnegative().describe('Requested offset'),
   hasMore: z.boolean().describe('Whether more records are available'),
 });

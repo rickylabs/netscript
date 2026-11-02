@@ -1,0 +1,11 @@
+{
+  "verdict": "PASS",
+  "counts": {
+    "regressionControls": 2,
+    "baselineBehaviorFailures": 2,
+    "keyboardExpectedActivations": 1,
+    "keyboardActualActivations": 0,
+    "filteredExpectedOptions": 1,
+    "filteredActualOptions": 2
+  }
+}

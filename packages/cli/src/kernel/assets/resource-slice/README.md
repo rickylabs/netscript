@@ -45,3 +45,10 @@ The first generated body in each selected helper directory owns one exact header
 The machine ownership marker remains line one. The directory-role header is therefore the first
 line of the generated body and line two of the complete owned leaf. Sibling optional leaves do not
 repeat it.
+
+Generated loader markers optionally retain flat primitive `queryInput` arguments. Public
+regeneration adopts them only if rendering the current selected client/procedure with those
+arguments reproduces the entire existing loader byte for byte, including its marker. Explicit
+resolver input wins. Edited or mismatched leaves retain normal conflict behavior. Keys are
+sorted for canonical serialization. Schema-1 markers without input remain unchanged; older
+CLIs reject the additional field as unowned and conflict safely rather than overwrite it.

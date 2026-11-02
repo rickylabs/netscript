@@ -1,0 +1,33 @@
+{
+  "base": "6b7f152f6ac2bbdddcd5f4eb896b3d9f8aaf2db4",
+  "sourceReview": "PASS after one compatibility-guard correction",
+  "focusedTests": {
+    "passed": 130,
+    "failed": 0
+  },
+  "browser": {
+    "passed": 60,
+    "failed": 0,
+    "seriousCritical": 0
+  },
+  "fullPackageInitial": {
+    "passed": 347,
+    "failed": 1,
+    "failure": "stale legacy design-sync count85 vs92; corrected to frozen baseline plus explicit additions"
+  },
+  "qualityGate": "PASS",
+  "docsAccuracy": "PASS111/111",
+  "releasePreflight": "PASS",
+  "carrierChecks": [
+    "prose PASS",
+    "MCP corpus PASS",
+    "assets barrel PASS",
+    "publish assets PASS"
+  ],
+  "frozenV1Snapshot": "unchanged",
+  "compatibilityProjection": "unchanged from main",
+  "reviewThreads": {
+    "unanswered": 0
+  },
+  "forcePushAuthorization": "New user merge-conflict steering; force-with-lease only"
+}

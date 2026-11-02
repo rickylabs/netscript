@@ -1,0 +1,225 @@
+{
+  "source": "Real isolated Aspire with SQLite, service started before client generation",
+  "results": [
+    {
+      "page": "dashboard",
+      "path": "/",
+      "theme": "light",
+      "viewport": "desktop",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/dashboard-light-desktop.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "records",
+      "path": "/records",
+      "theme": "light",
+      "viewport": "desktop",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/records-light-desktop.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "detail",
+      "path": "/records/1",
+      "theme": "light",
+      "viewport": "desktop",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/detail-light-desktop.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "service",
+      "path": "/examples/orders",
+      "theme": "light",
+      "viewport": "desktop",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/service-light-desktop.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "crud",
+      "path": "/examples/crud",
+      "theme": "light",
+      "viewport": "desktop",
+      "status": 200,
+      "visibleSeed": null,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/crud-light-desktop.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "dashboard",
+      "path": "/",
+      "theme": "light",
+      "viewport": "mobile",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/dashboard-light-mobile.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "records",
+      "path": "/records",
+      "theme": "light",
+      "viewport": "mobile",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/records-light-mobile.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "detail",
+      "path": "/records/1",
+      "theme": "light",
+      "viewport": "mobile",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/detail-light-mobile.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "service",
+      "path": "/examples/orders",
+      "theme": "light",
+      "viewport": "mobile",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/service-light-mobile.png",
+      "overflow": true,
+      "errors": []
+    },
+    {
+      "page": "crud",
+      "path": "/examples/crud",
+      "theme": "light",
+      "viewport": "mobile",
+      "status": 200,
+      "visibleSeed": null,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/crud-light-mobile.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "dashboard",
+      "path": "/",
+      "theme": "dark",
+      "viewport": "desktop",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/dashboard-dark-desktop.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "records",
+      "path": "/records",
+      "theme": "dark",
+      "viewport": "desktop",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/records-dark-desktop.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "detail",
+      "path": "/records/1",
+      "theme": "dark",
+      "viewport": "desktop",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/detail-dark-desktop.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "service",
+      "path": "/examples/orders",
+      "theme": "dark",
+      "viewport": "desktop",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/service-dark-desktop.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "crud",
+      "path": "/examples/crud",
+      "theme": "dark",
+      "viewport": "desktop",
+      "status": 200,
+      "visibleSeed": null,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/crud-dark-desktop.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "dashboard",
+      "path": "/",
+      "theme": "dark",
+      "viewport": "mobile",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/dashboard-dark-mobile.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "records",
+      "path": "/records",
+      "theme": "dark",
+      "viewport": "mobile",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/records-dark-mobile.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "detail",
+      "path": "/records/1",
+      "theme": "dark",
+      "viewport": "mobile",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/detail-dark-mobile.png",
+      "overflow": false,
+      "errors": []
+    },
+    {
+      "page": "service",
+      "path": "/examples/orders",
+      "theme": "dark",
+      "viewport": "mobile",
+      "status": 200,
+      "visibleSeed": true,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/service-dark-mobile.png",
+      "overflow": true,
+      "errors": []
+    },
+    {
+      "page": "crud",
+      "path": "/examples/crud",
+      "theme": "dark",
+      "viewport": "mobile",
+      "status": 200,
+      "visibleSeed": null,
+      "screenshot": ".llm/runs/orch-divybot-6557001595--2570/screens/s6-live/crud-dark-mobile.png",
+      "overflow": false,
+      "errors": []
+    }
+  ]
+}

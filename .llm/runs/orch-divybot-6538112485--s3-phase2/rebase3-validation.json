@@ -1,0 +1,56 @@
+{
+  "base": "1d274c1",
+  "rebasedSourceHead": "0d49522258ccc2607e4447bcb86ed976334bf704",
+  "conflictResolution": "regenerated root Fresh UI asset bundle from combined sources",
+  "preservedMainPaths": {
+    "tokensAndThemeOutputs": "IDENTICAL",
+    "contrastComponentCss": "IDENTICAL",
+    "axeBaseline": "IDENTICAL",
+    "floatingCss": "only reviewed phase-two popover selector extensions"
+  },
+  "focusedTests": {
+    "passed": 319,
+    "failed": 0
+  },
+  "browserTests": {
+    "passed": 170,
+    "failed": 0,
+    "projects": [
+      "light-390",
+      "light-1280",
+      "dark-390",
+      "dark-1280",
+      "touch-light-390"
+    ]
+  },
+  "qualityAndArchitecture": "PASS",
+  "publicationPreflight": "PASS",
+  "docsAccuracy": "PASS",
+  "docsExportsDrift": "PASS",
+  "docsBuild": {
+    "status": "PASS",
+    "htmlPages": 253
+  },
+  "carrierFreshness": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  },
+  "tokenValidation": {
+    "status": "PASS",
+    "presets": 24,
+    "resolverInputs": 96,
+    "effectiveContexts": 48,
+    "contrastUses": 9080,
+    "exactSourceExclusions": 0
+  },
+  "independentIntegrationReview": "PASS",
+  "existingGalleryAtRebasedHead": "NOT RUN; remote final gate remains required",
+  "publicAddedLinePathAudit": {
+    "forbiddenRootHits": 0,
+    "finalHeadRepeatRequired": true
+  },
+  "phaseReady": false,
+  "finalImplementationEvaluation": "PENDING"
+}

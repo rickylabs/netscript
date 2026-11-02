@@ -140,8 +140,11 @@ independently removable.
 
 The {{ comp.xref({ key: "howto:add-a-plugin", text: "add-a-plugin how-to" }) }} and the
 {{ comp.xref({ key: "cli:reference", text: "CLI cheat sheet" }) }} cover the sequence:
-`netscript plugin install …`, then the registry-generation step that makes the plugin visible to
-the runtime.
+`netscript plugin install …` links enabled web apps and compiles declared runtime registries.
+Use `--app <name>` to select one app. Links are stored in
+`NetScript.Apps.<name>.PluginReferences` and the installed manifest's consumer list. On AppHost
+restart, linked endpoints reach the app through existing service discovery. Run
+`netscript generate plugins` again after adding jobs or other registrable source files.
 
 ## Process isolation
 

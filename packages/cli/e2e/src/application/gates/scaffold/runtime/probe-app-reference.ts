@@ -12,6 +12,10 @@ export interface BrowserViewport {
 export interface ReferenceExpectation {
   readonly path: string;
   readonly markers: readonly string[];
+  /** Seeded data must appear in rendered cells/fields, not only hydration scripts. */
+  readonly seededRecord?: string;
+  /** Every value must occur in a visible table/detail cell, not a script or heading. */
+  readonly seededFields?: readonly string[];
 }
 
 export interface ProbeAppReferenceOptions {
@@ -29,6 +33,13 @@ export const REFERENCE_EXPECTATIONS: readonly ReferenceExpectation[] = [
   {
     path: '/',
     markers: ['href="/design"', 'href="/design/composition"'],
+    seededRecord: 'Seed User',
+  },
+  {
+    path: '/records',
+    markers: ['Records'],
+    seededRecord: 'Seed User',
+    seededFields: ['REC-10482', 'Maya Rossi', 'maya.rossi@example.com', 'Paid', '$89.90'],
   },
   {
     path: '/design/composition',
@@ -36,11 +47,12 @@ export const REFERENCE_EXPECTATIONS: readonly ReferenceExpectation[] = [
   },
   {
     path: '/examples/users',
-    markers: ['Users', 'Cache-first query', 'Managed form', 'Deferred summary'],
+    markers: ['Users', 'Service records', 'Validate a note', 'Users summary'],
+    seededRecord: 'Seed User',
   },
   {
     path: '/people',
-    markers: ['People', 'Cache-first query', 'Deferred summary'],
+    markers: ['People', 'Service records', 'People summary'],
   },
 ];
 
@@ -50,8 +62,19 @@ export function assertReferenceDom(
   expectation: ReferenceExpectation,
   viewport: BrowserViewport,
 ): void {
+  const markup = dom.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
+  if (expectation.seededRecord) {
+    const fields = [...markup.matchAll(/<(td|dd)\b[^>]*>([\s\S]*?)<\/\1>/gi)];
+    for (const value of [expectation.seededRecord, ...(expectation.seededFields ?? [])]) {
+      if (!fields.some((field) => field[2].replace(/<[^>]*>/g, '').includes(value))) {
+        throw new Error(
+          `${viewport.name} reference probe ${expectation.path} did not render seeded record field ${value}`,
+        );
+      }
+    }
+  }
   for (const marker of expectation.markers) {
-    if (!dom.includes(marker)) {
+    if (!markup.includes(marker)) {
       throw new Error(
         `${viewport.name} reference probe ${expectation.path} did not render ${marker}`,
       );

@@ -1,0 +1,27 @@
+{
+  "slice": "7c0 runtime dependency metadata",
+  "actualRuntimeUsers": 7,
+  "legacyRepairs": [
+    "command-palette"
+  ],
+  "compilerImportGraph": "deno info --json --frozen",
+  "focusedTests": {
+    "passed": 11,
+    "failed": 0
+  },
+  "sourceWrappers": "PASS",
+  "qualityAndArchitecture": "PASS",
+  "independentCorrectiveReview": "PASS",
+  "sourceUiBehavior": "unchanged",
+  "newThirdPartyPackages": false,
+  "versionBump": false,
+  "frozenLegacyFixture": "unchanged",
+  "finalPhaseGates": "PENDING",
+  "phaseReady": false,
+  "carrierFreshness": {
+    "agent-docs-prose": "PASS",
+    "mcp-export-corpus": "PASS",
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS"
+  }
+}

@@ -13,7 +13,10 @@ import type { AddServiceResult } from '../../../domain/service-add-plan.ts';
 import type { AddServiceInput } from './add-service-input.ts';
 import { planServiceAdd } from './plan-service-add.ts';
 import { renderService, type RenderServiceDependencies } from './render-service.ts';
-import type { ServiceClientScaffolder } from '../../../../kernel/adapters/service/client-scaffolder.ts';
+import {
+  connectScaffoldRecords,
+  type ServiceClientScaffolder,
+} from '../../../../kernel/adapters/service/client-scaffolder.ts';
 import {
   generateServiceClients,
   validateServiceClientContracts,
@@ -97,6 +100,15 @@ export async function addService(
   const clientPath = clientResult?.planned.find((file) => file.serviceName === plan.serviceName)
     ?.path;
 
+  const recordsPath = clientPath
+    ? await connectScaffoldRecords(
+      clientPath,
+      plan.serviceName,
+      dependencies.fs,
+      dependencies.formatter,
+    )
+    : undefined;
+
   await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
   const { written: browserAuthFiles, report: browserAuthReport } = await reconcileBrowserAuth(
     plan.projectRoot,
@@ -113,7 +125,7 @@ export async function addService(
     { formatter: dependencies.formatter },
   );
 
-  const helperFiles = [...browserAuthFiles, ...aspireFiles];
+  const helperFiles = [...browserAuthFiles, ...aspireFiles, ...(recordsPath ? [recordsPath] : [])];
 
   return {
     ...rendered,

@@ -19,6 +19,7 @@ export const runtimeGlueStub: StubSource<never> = defineStub({
     '      await startCombinedProcess({',
     '        health,',
     '        signal,',
+    "        seedHandoff: new URL('../.netscript/sample-seed.json', import.meta.url),",
     '        onStarted: (readHealth) => {',
     '          snapshot = readHealth;',
     '        },',

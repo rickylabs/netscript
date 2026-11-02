@@ -1,0 +1,11 @@
+# Generic resource presentation — 2026-11-01
+
+The live init example is built by write-example-service-app-files.ts through the same renderResourceSlice pipeline as `generate resource`. Its query result helper lives in application/ui/page/query-result-template.ts. Format the helper as emitted TSX, then escape it back into the source template string; web-scaffold tests require the emitted strings themselves to be canonical. Date values must be handled before generic objects. Rich service rows need currency minor-unit conversion; generic unknown rows still use their actual keys.
+
+For an existing generated preview, `generate resource --project-root` expects the Fresh application root (for example `.llm/tmp/scaffold-2570-phase2/showcase/apps/web`), not the workspace root. Use the original resource, route, client, form and partial options and `--force` to replace divergent generator-owned leaves. The ownership report lists changed/exact leaves; unchanged router aliases remain intact. Refresh exact-content goldens only after reviewing the resulting template change.
+
+Health remains SSR by default, including Aspire probes with no Accept header. Only explicit JSON-only requests bypass rendering. Health presentation whitelists names, kinds, states and latency; false readiness in an HTTP-200 payload is unavailable.
+
+Independent review correction: the generic renderer cannot infer monetary units from field names. The init sample passes explicit `amountUnit: minor` through ResourceResultPresentation; unknown services retain raw amounts/currencies, and malformed currency codes cannot throw. Pagination envelopes retain collection/custom fields and rich rows expose additional fields in an accessible details disclosure. Behavioral emitted-TSX tests use the existing root catalog versions without adding CLI runtime dependencies.
+
+Cursor recovery: the [Durable Streams catch-up protocol](https://github.com/durable-streams/durable-streams/blob/main/PROTOCOL.md#56-read-stream---catch-up) specifies 400 for invalid offset and 410 for discarded history. Reset a saved cursor once within the existing three-batch budget; keep 401/403 denied without retry or cached items. Native streams defaults to ephemeral memory, so its restart can outlive the app snapshot.

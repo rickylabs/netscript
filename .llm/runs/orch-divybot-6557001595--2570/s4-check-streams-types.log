@@ -1,0 +1,3 @@
+Task check:streams-types deno task --cwd packages/fresh check:streams-types
+Task check:streams-types deno check --no-lock --config ./tests/type-fixtures/streamdb-consumer-deno.json --unstable-kv ./tests/type-fixtures/streamdb-wrapper_type.ts
+Check tests/type-fixtures/streamdb-wrapper_type.ts

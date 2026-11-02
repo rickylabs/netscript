@@ -2,6 +2,39 @@ import type { PropDoc } from './catalog.ts';
 
 /** Rich examples are JSX expressions; C is replaced by the actual registry export at build time. */
 const RICH_EXAMPLES: Readonly<Record<string, string>> = {
+  'alert-dialog':
+    '<C triggerLabel="Review deletion" title="Delete order?" description="This action cannot be undone." actionLabel="Delete order" onAction={()=>report("Order deleted")} />',
+  'button-group': '<C><Button>Save</Button><Button variant="outline">Cancel</Button></C>',
+  'radio-group':
+    '<C name="shipping" legend="Shipping method" options={[{value:"standard",label:"Standard"},{value:"express",label:"Express"}]} />',
+  'input-group':
+    '<C addon="Order" control={<Input aria-label="Order reference" placeholder="SO–10480" />} />',
+  'input-otp': '<C label="Verification code" />',
+  'slider': '<C label="Discount" />',
+  'calendar': '<C aria-label="Delivery date" defaultMonth="2026-11-01" />',
+  'date-picker': '<C label="Delivery date" defaultMonth="2026-11-01" />',
+  'location-marker': '<span>Current section <C /></span>',
+  'navigation-menu':
+    '<C label="Order navigation" items={[{id:"orders",label:"Orders",href:"#orders"}]} />',
+  'stepper':
+    '<C steps={[{id:"details",title:"Order details",status:"current"},{id:"confirm",title:"Confirm order",status:"upcoming"}]} />',
+  'menubar':
+    '<C label="Order actions" menus={[{id:"file",label:"File",items:[{id:"save",label:"Save order",onSelect:()=>report("Saved")}]}]} />',
+  'hover-card':
+    '<C triggerLabel="Maya Rossi" title="Maya Rossi" description="Customer since 2024" />',
+  'context-menu':
+    '<C label="Order actions" items={[{id:"save",label:"Save order",onSelect:()=>report("Saved")}]}><Button variant="outline">Order actions</Button></C>',
+  'item': '<C title="Order SO–10480">Ready for fulfillment</C>',
+  'kbd': '<C>Ctrl+K</C>',
+  'collapsible': '<C label="Order details">Ready for fulfillment</C>',
+  'chart':
+    '<C title="Orders by week" series={[{label:"Orders"}]} data={[{label:"Week 1",values:[32]},{label:"Week 2",values:[48]}]} />',
+  'carousel':
+    '<C label="Order attachments" slides={[{label:"Invoice",content:<p>Invoice</p>},{label:"Packing slip",content:<p>Packing slip</p>}]} />',
+  'toggle': '<C aria-label="Pin order">Pin order</C>',
+  'toggle-group':
+    '<C label="Order view" items={[{value:"list",label:"List"},{value:"grid",label:"Grid"}]} />',
+
   button:
     '<div class="demo-row"><C onClick={() => report("Changes saved")}>Save changes</C><C variant="outline">Cancel</C><C disabled>Disabled</C></div>',
   'icon-button': '<C icon="+" label="Create order" onClick={() => report("Order created")} />',

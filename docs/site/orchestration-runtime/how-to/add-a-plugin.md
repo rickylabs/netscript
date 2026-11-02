@@ -70,11 +70,44 @@ Repeat with the alias of each plugin you need. The package forms also work, for 
 `netscript plugin install @netscript/plugin-workers --name workers` or an explicit `jsr:`
 specifier.
 
+### Seeded workers and stream-backed Activity
+
+This complete walkthrough installs both samples before starting Aspire. `--service users`
+persists the users service as a consumer of streams; the web app is linked by default.
+Run these commands in order from an empty parent directory. This uses Aspire's non-interactive
+start command, which detaches so the database commands run in the same terminal:
+
+<!-- documented-scaffold:start -->
+```sh
+netscript init activity-demo --db postgres --service --service-name users --app-name dashboard --ci --yes --no-git
+cd activity-demo
+netscript plugin install workers --name workers --samples
+netscript plugin install streams --name streams --samples --service users
+aspire restore --apphost aspire/apphost.mts --non-interactive --nologo
+aspire start --apphost aspire/apphost.mts --isolated --non-interactive --nologo
+netscript db init --name init
+netscript db generate
+netscript db seed
+netscript plugin doctor
+```
+<!-- documented-scaffold:end -->
+
+Open the dashboard app at the URL Aspire reports. Seeding publishes a durable handoff and the
+already-running worker executes the sample health-check once; Background work shows its real
+completion, progress and last run. No manual worker restart or job trigger is required. Reseeding
+preserves the same request identity. Edit and save a seeded record to publish real Activity:
+the feed uses the linked stream and shows the actor, change, record and time. An empty feed
+before the first record mutation is expected. `--service` selects a plugin consumer, while
+`--service-refs` selects services the plugin itself depends on.
+Reinstalling with a different `--service` moves the previously managed service link. Omitting the
+flag preserves it; links added directly to `appsettings.json` remain under your control.
+
 {{ comp apiTable {
   caption: "netscript plugin install — options",
   columns: ["Option", "What it does"],
   rows: [
     ["<code>--name &lt;name&gt;</code>", "Plugin workspace and config key, for example <code>workers</code>."],
+    ["<code>--service &lt;name&gt;</code>", "Link an enabled application service to this plugin's API; for Activity, select the record service when installing streams."],
     ["<code>--project-root &lt;path&gt;</code>", "Target a workspace other than the current directory."],
     ["<code>--port &lt;port&gt;</code>", "Override the plugin service port."],
     ["<code>--db &lt;engine&gt;</code> / <code>--no-db</code>", "Provision or target a database engine, or skip database wiring."],

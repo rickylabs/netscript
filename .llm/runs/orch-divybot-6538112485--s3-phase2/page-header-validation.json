@@ -1,0 +1,75 @@
+{
+  "base": "15cffa2fee5b6d543ecae2981a3563b1b74ca789",
+  "slice": "7c3b PageHeader and shell/archetype audit",
+  "focusedTests": {
+    "passed": 461,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 461,
+    "uniqueFailures": 0,
+    "exitCode": 0
+  },
+  "pageHeaderBrowser": {
+    "passed": 16,
+    "failed": 0,
+    "strictAxeSeriousOrCritical": 0
+  },
+  "sourceWrappers": {
+    "filesSelected": 7,
+    "check": "PASS",
+    "lint": "PASS",
+    "fmt": "PASS",
+    "droppedFiles": 0
+  },
+  "browserWrappers": {
+    "fixtureCheck": "PASS",
+    "fixtureLint": "PASS",
+    "specCheck": "PASS",
+    "specLint": "PASS",
+    "fmt": "PASS",
+    "droppedFiles": 0
+  },
+  "qualityAndArchitecture": "PASS",
+  "preflightDocsAccuracyAndExportDrift": "PASS",
+  "docsBuild": {
+    "htmlPages": 259,
+    "verdict": "PASS"
+  },
+  "fullBrowserAfterLayoutSupport": {
+    "passed": 294,
+    "failed": 0,
+    "strictAxeAllowancesAdded": false,
+    "actualTouchCasesIncluded": true
+  },
+  "independentSourceReview": "PASS;initial and finalized source/evidence sign-off",
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "captures": 20,
+  "ready": false,
+  "fullGoalComplete": false,
+  "sourceCommit": "e38e597854273bc1f47900c0305d89d6f80fd668"
+}

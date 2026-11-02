@@ -1,0 +1,65 @@
+{
+  "base": "4cb0298d7b7020930f1e6b05ca827c8330802d4e",
+  "publishedParent": "2be806399f5b85919b9d2246fe4bd7d6d6a67c15",
+  "ownerShipNow": true,
+  "focusedTests": {
+    "exitCode": 0,
+    "passed": 349,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 349,
+    "uniqueFailures": 0
+  },
+  "commandPaletteBrowser": {
+    "passed": 32,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "retries": 0
+  },
+  "css": {
+    "files": 74,
+    "raw": 279404,
+    "gzip": 35995,
+    "capRaw": 284993,
+    "capGzip": 36715
+  },
+  "bloatControls": {
+    "raw": {
+      "bytes": {
+        "raw": 286445,
+        "gzip": 36209
+      },
+      "exitCode": 1,
+      "onlyExpectedBudgetFails": true,
+      "canonicalGeneration": true
+    },
+    "gzip": {
+      "bytes": {
+        "raw": 282045,
+        "gzip": 38724
+      },
+      "exitCode": 1,
+      "onlyExpectedBudgetFails": true,
+      "canonicalGeneration": true
+    },
+    "restored": {
+      "bytes": {
+        "raw": 279404,
+        "gzip": 35995
+      },
+      "exactHashes": true,
+      "positiveExitCode": 0
+    }
+  },
+  "proseGeneration": {
+    "exitCode": 0,
+    "html": 337,
+    "registryArtifacts": 116,
+    "componentDocs": 73,
+    "presets": 24
+  },
+  "locksUnchanged": 3,
+  "unfinishedScopeIssue": 2584,
+  "coordinatorOwnsReviewAndMerge": true
+}

@@ -1,0 +1,2 @@
+Task check:desktop-native-fixture deno run --allow-all packages/cli/e2e/src/adapters/native-desktop/fixture-contract-driver.ts --repo-root . --check-only
+desktop fixture import map satisfies 15 reachable SDK modules; 0 unmapped specifiers.

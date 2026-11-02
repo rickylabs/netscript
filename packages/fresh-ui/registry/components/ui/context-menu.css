@@ -1,0 +1,4 @@
+.ns-context-menu__trigger { display: grid; place-items: center; min-block-size: calc(var(--ns-space-16) * 2); padding: var(--ns-space-4); border: var(--ns-border-width) dashed var(--ns-border); color: var(--ns-muted-fg); font-size: var(--ns-text-small); cursor: context-menu; }
+.ns-context-menu__trigger:focus-visible { outline: 2px solid var(--ns-ring); outline-offset: 2px; }
+.ns-context-menu__trigger[aria-disabled='true'] { opacity: 0.38; cursor: default; }
+.ns-context-menu__content { inset: var(--ns-floating-fallback-inset); max-block-size: 100vh; overflow: auto; }

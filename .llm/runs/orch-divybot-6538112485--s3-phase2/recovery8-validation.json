@@ -1,0 +1,124 @@
+{
+  "status": "PARENT_REVIEW_PASS_DOCS_CONDITION_CLOSED",
+  "sourceHead": "3add67a199da951312e6ad9afa7ce790481ac232",
+  "base": "6a1d84a6e04c0d39df3926528e0380e267316aee",
+  "previousParent": "426c5d095320f2e55e68f03aa1bb8ea525c6e135",
+  "preservation": {
+    "before": "426c5d095320f2e55e68f03aa1bb8ea525c6e135",
+    "after": "3add67a199da951312e6ad9afa7ce790481ac232",
+    "selectedPaths": 627,
+    "sourceConfigMapDifferences": 0,
+    "mainChangedPaths": 25,
+    "mainMaintainedPaths": 22,
+    "mainMaintainedDifferences": 0,
+    "lockPaths": 3,
+    "lockDifferences": 0,
+    "verdict": "PASS"
+  },
+  "conflicts": {
+    "maintained": 0,
+    "generated": 1,
+    "resolution": "Canonical publication/assets generators"
+  },
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "generatedDelta": 0,
+  "qualityArchitecture": {
+    "verdict": "PASS",
+    "gitHead": "3add67a199da951312e6ad9afa7ce790481ac232",
+    "exitCode": 0
+  },
+  "nativePublication": {
+    "verdict": "PASS",
+    "gitHead": "3add67a199da951312e6ad9afa7ce790481ac232",
+    "exitCode": 0,
+    "slowTypes": 0
+  },
+  "preflight": "PASS",
+  "docsAccuracy": "PASS",
+  "docsExportsDrift": "PASS",
+  "docsBuild": {
+    "verdict": "PASS",
+    "htmlFiles": 260
+  },
+  "cliAndInstalledConsumer": {
+    "passed": 24,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 24,
+    "uniqueFailures": 0,
+    "exitCode": 0,
+    "files": [
+      "packages/cli/src/kernel/application/ui/page/web-scaffold_test.ts",
+      "packages/cli/src/kernel/templates/app/agent-conventions_test.ts",
+      "packages/fresh-ui/tests/registry/gaps-install.test.ts"
+    ]
+  },
+  "predecessorEvidence": {
+    "label": "Prior parent executions only; rendering/source/config/map bytes unchanged",
+    "package": 622,
+    "releasePinAffectedControls": 63,
+    "chromium": 318,
+    "focusedCodeBlockFidelity": 44,
+    "focusedFirefoxWebkit": 12,
+    "notChildExecutions": true
+  },
+  "docLint": {
+    "status": "ACCEPTED_EXISTING_DEBT",
+    "issue": 2531,
+    "diagnostics": 124,
+    "typeScript": 123,
+    "jsonLimitation": 1,
+    "new": 0,
+    "removed": 0,
+    "label": "Unchanged-source predecessor attribution"
+  },
+  "runtimeAndExactRequiredCI": "UNPROVEN",
+  "coreDiagnostic": {
+    "untracked": 1,
+    "containingPublishableRoots": 0,
+    "unknownOwnerLeftUntouched": true,
+    "taskOwnerInformed": true
+  },
+  "remaining": "Parent review/audit/exact-lease push; child replay and own gates/review/push; full11b/12/13",
+  "evidenceReview": "PASS",
+  "docsBrowser": {
+    "suite": "docs.playwright.config.ts",
+    "earlierLocalComponentRequiredSuite": "gap.playwright.config.ts",
+    "separateExistingDocsBrowserCISurface": true,
+    "freshExecutionHere": true,
+    "sourceHead": "3add67a199da951312e6ad9afa7ce790481ac232",
+    "exitCode": 0,
+    "passed": 140,
+    "failed": 0,
+    "ignored": 0,
+    "flaky": 0,
+    "retries": 0,
+    "newAxeAllowances": 0,
+    "captures": 128
+  }
+}

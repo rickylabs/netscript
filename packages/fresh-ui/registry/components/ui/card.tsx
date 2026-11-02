@@ -18,6 +18,10 @@ interface CardSectionProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'cla
 
 interface CardProps extends CardSectionProps {
   interactive?: boolean;
+  variant?: 'default' | 'rule';
+  size?: 'md' | 'sm';
+  /** Visual snapshot; native child controls remain the keyboard targets. */
+  state?: 'rest' | 'hover' | 'focus' | 'selected';
 }
 
 interface CardTextProps
@@ -31,20 +35,45 @@ type CardComponent = ((props: CardProps) => VNode) & {
   Header: (props: CardSectionProps) => VNode;
   Title: (props: CardTextProps) => VNode;
   Description: (props: CardTextProps) => VNode;
+  Action: (props: CardSectionProps) => VNode;
   Body: (props: CardSectionProps) => VNode;
   Footer: (props: CardSectionProps) => VNode;
 };
 
-function CardRoot({ children, class: className, interactive = false, ...props }: CardProps): VNode {
+function CardRoot(
+  {
+    children,
+    class: className,
+    interactive = false,
+    variant = 'default',
+    size = 'md',
+    state = 'rest',
+    ...props
+  }: CardProps,
+): VNode {
   return (
     <div
       {...props}
       class={cn('ns-card', className)}
       data-interactive={interactive ? ('true') : undefined}
-      data-variant='default'
-      data-size='md'
-      data-state='rest'
+      data-variant={variant}
+      data-size={size}
+      data-state={state}
       data-part={props['data-part'] ?? 'root'}
+      data-scope={props['data-scope'] ?? 'card'}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** Optional native action content; the card adds no click or keyboard handler. */
+function CardAction({ children, class: className, ...props }: CardSectionProps): VNode {
+  return (
+    <div
+      {...props}
+      class={cn('ns-card__action', className)}
+      data-part='action'
       data-scope={props['data-scope'] ?? 'card'}
     >
       {children}
@@ -124,6 +153,7 @@ export const Card: CardComponent = Object.assign(CardRoot, {
   Header: CardHeader,
   Title: CardTitle,
   Description: CardDescription,
+  Action: CardAction,
   Body: CardBody,
   Footer: CardFooter,
 });

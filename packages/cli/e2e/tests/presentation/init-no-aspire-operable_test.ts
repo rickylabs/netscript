@@ -195,7 +195,7 @@ Deno.test({
       );
       const [migrate, , seed, status] = outputs;
       assertStringIncludes(migrate, 'Applied migrations');
-      assertStringIncludes(seed, 'Seeded representative ProbeReceipt row');
+      assertStringIncludes(seed, 'Seeded 40 representative ProbeReceipt records');
       assertStringIncludes(status, 'Database schema is up to date!');
     } finally {
       await Deno.remove(targetPath, { recursive: true }).catch(() => {});

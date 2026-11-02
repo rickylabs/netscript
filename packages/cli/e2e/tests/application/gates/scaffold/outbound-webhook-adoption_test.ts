@@ -14,6 +14,7 @@ import type {
 } from '../../../../src/domain/gate-definition.ts';
 import type { RunContext } from '../../../../src/domain/run-context.ts';
 import { resolveSuite } from '../../../../src/presentation/cli/suites/registry.ts';
+import { cli } from '../../../../src/application/gates/scaffold/gate-factory.ts';
 
 Deno.test('webhook adoption preserves project files and doctor state in any registry order', async (t) => {
   const repoRoot = fromFileUrl(new URL('../../../../../../../', import.meta.url));
@@ -35,7 +36,14 @@ Deno.test('webhook adoption preserves project files and doctor state in any regi
       appHost: join(projectRoot, 'aspire/apphost.mts'),
     },
   };
-  const doctor = asCommand(createBehaviorPluginUnhealthyGates()[0]);
+  const missingRegistryDoctor = asCommand(createBehaviorPluginUnhealthyGates()[0]);
+  // The negative-control gate removes install-created registries. State comparisons use
+  // read-only doctor invocations so checking an initialized project cannot destroy it.
+  const doctor = {
+    ...missingRegistryDoctor,
+    command: (context: RunContext) =>
+      cli(context, 'plugin', 'doctor', '--project-root', context.project.projectRoot),
+  };
   // Run every adoption gate so the regression also detects a separate mutating generator.
   const adoption = createPluginContractGates()
     .filter((gate) => gate.id.endsWith('.outbound-webhook')).map(asCommand);
@@ -50,6 +58,8 @@ Deno.test('webhook adoption preserves project files and doctor state in any regi
     await t.step(
       'missing registries and repeat executions retain both remediation commands',
       async () => {
+        const prepared = await execute(missingRegistryDoctor, context);
+        assertEquals(prepared.code, 1);
         const before = await execute(doctor, context);
         assertEquals(before.code, 1);
         for (const required of doctor.stdoutIncludes ?? []) {

@@ -116,12 +116,12 @@ import { createMemoryTeamMembersRepository } from '../adapters/memory-team-membe
 import { createTeamMembersV1 } from './v1.ts';
 Deno.test('missing memory record maps to typed NOT_FOUND with status 404', async () => {
   const application = createTeamMembersApplication(createMemoryTeamMembersRepository());
-  if (await application.updateStatus({ id: 999, status: 'archived' }) !== null) {
+  if (await application.updateStatus({ id: 999, status: 'cancelled' }) !== null) {
     throw new Error('Application must preserve repository absence');
   }
   const router = createTeamMembersV1(application);
   try {
-    await call(router.updateStatus, { id: 999, status: 'archived' });
+    await call(router.updateStatus, { id: 999, status: 'cancelled' });
   } catch (error) {
     if (error instanceof ORPCError && error.code === 'NOT_FOUND' && error.status === 404 &&
       error.data.resourceId === 999) return;

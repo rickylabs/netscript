@@ -295,93 +295,67 @@ export const navigation_2: readonly ComponentContract[] = [
     'specId': 'N6',
     'category': 'Navigation',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
-      'trigger': {
-        'kind': 'enum',
-        'values': [
-          'link',
-          'menu',
-        ],
+      'label': {
+        'kind': 'text',
+        'required': true,
       },
-      'state': {
-        'kind': 'enum',
-        'values': [
-          'rest',
-          'hover',
-          'focus',
-          'selected',
-          'open',
-        ],
-      },
-      'open': {
-        'kind': 'enum',
-        'values': [
-          'false',
-          'true',
-        ],
+      'items': {
+        'kind': 'collection',
+        'required': true,
+        'description':
+          'Unique IDs, labels and either href or a list of navigation links; current marks the active lane.',
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'list',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'item',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'marker',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'label',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'chevron',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'viewport',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'link',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'title',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'description',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'indicator',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
       },
     ],
     'attributes': {
@@ -389,6 +363,9 @@ export const navigation_2: readonly ComponentContract[] = [
         'values': [
           'link',
           'menu',
+        ],
+        'parts': [
+          'item',
         ],
       },
       'data-state': {
@@ -401,6 +378,9 @@ export const navigation_2: readonly ComponentContract[] = [
         ],
         'description':
           'Transient hover, focus and pressed behavior also uses native CSS pseudo-classes.',
+        'parts': [
+          'item',
+        ],
       },
       'data-open': {
         'values': [
@@ -417,6 +397,14 @@ export const navigation_2: readonly ComponentContract[] = [
         'key': 'Enter/Space',
         'action': 'Toggle disclosure',
       },
+      {
+        'key': 'Escape',
+        'action': 'Close disclosure and return focus to its summary.',
+      },
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Follow native link/summary order; focus exit closes disclosure.',
+      },
     ],
     'tokenRoles': [
       'radius/control',
@@ -424,7 +412,8 @@ export const navigation_2: readonly ComponentContract[] = [
       'text/muted',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Native details/name exclusivity works before hydration; island adds Escape and focus-exit dismissal. Open/trigger/state are derived from the native disclosure and item records.',
+      'Current links, including disclosure-panel links, own aria-current=page; their decorative marker has no tab stop. Escape is handled only while a disclosure is open, preserving outer native dismissal.',
     ],
   },
 ];

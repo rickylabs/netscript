@@ -1,0 +1,12 @@
+{
+  "source": "captured public CLI execution on same resident red fixture",
+  "command": "deno run -A packages/cli/bin/netscript-dev.ts db generate --project-root .llm/tmp/scaffold-2570/s6-aspire/shop --db sqlite",
+  "exitCode": 0,
+  "refreshOutput": [
+    "Refreshing generated database client in orders...",
+    "Refreshed generated database client in orders; resource is healthy.",
+    "Database consumers refreshed: orders."
+  ],
+  "appHostRestarted": false,
+  "manualResourceRestart": false
+}

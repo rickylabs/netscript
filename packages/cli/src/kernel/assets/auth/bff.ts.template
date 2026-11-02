@@ -12,24 +12,25 @@ import { createBearerSdkClientContribution } from '@netscript/plugin-auth-core/s
 
 const serviceName = {{authServiceName}};
 const cookieName = Deno.env.get('NETSCRIPT_AUTH_COOKIE_NAME') ?? '__Host-ns_session';
-const bearer = createBearerSdkClientContribution<{ accessToken?: string }>({
+const bearer = (unmarked: 'optional' | 'required') => createBearerSdkClientContribution<{ accessToken?: string }>({
   context: { accessToken: 'optional' },
   resolveCredential: ({ context }) => context.accessToken,
   responseCache: { mode: 'direct-only' },
-  unmarked: 'required',
+  unmarked,
 });
 
-/** Explicit SDK client for server-side calls to a guarded service. */
+/** Guarded calls stay required; public plugin reads may opt into optional unmarked credentials. */
 export function createBrowserSessionClient<T extends ContractLike>(
   contract: T,
   name: string,
   routerName: string,
+  options: { readonly unmarked?: 'optional' | 'required' } = {},
 ): ServiceClient<T, ServiceClientContext & { accessToken?: string }> {
   return createServiceClient({
     contract,
     serviceName: name,
     routerName,
-    contributions: [bearer] as const,
+    contributions: [bearer(options.unmarked ?? 'required')] as const,
   });
 }
 

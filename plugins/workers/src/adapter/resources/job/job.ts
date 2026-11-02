@@ -11,12 +11,13 @@ import {
   textArtifact,
 } from '@netscript/plugin/adapter';
 import { exportStem, fileStem, type JobInput, parseJobInput } from '../input.ts';
+import { sampleHealthCheckStub } from './sample-health-check.stub.ts';
 import { jobStub } from './job.stub.ts';
 import { webhookDeliveryStub } from './webhook-delivery.stub.ts';
 import { renderWorkerResourceMetadata } from '../resource-metadata.ts';
 
 /** Canonical starter job input emitted during workers install. */
-export const DEFAULT_JOB_INPUT: JobInput = { id: 'health-check' };
+export const DEFAULT_JOB_INPUT: JobInput = { id: 'health-check', tags: ['scaffold-sample'] };
 
 /** Unified workers job item scaffolder used by install and add job. */
 export const jobScaffolder: ItemScaffolder<JobInput> = {
@@ -42,10 +43,15 @@ export const jobScaffolder: ItemScaffolder<JobInput> = {
             JOB_EXPORT: `${exportStem(input.id)}Job`,
             JOB_FILE: fileStem(input.id),
           })
-          : substituteTokens(jobStub, {
-            JOB_ID: input.id,
-            JOB_EXPORT: `${exportStem(input.id)}Job`,
-          })),
+          : substituteTokens(
+            input.id === DEFAULT_JOB_INPUT.id && input.tags?.includes('scaffold-sample')
+              ? sampleHealthCheckStub
+              : jobStub,
+            {
+              JOB_ID: input.id,
+              JOB_EXPORT: `${exportStem(input.id)}Job`,
+            },
+          )),
       ),
     ];
   },

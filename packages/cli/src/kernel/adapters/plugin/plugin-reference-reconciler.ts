@@ -24,6 +24,7 @@ interface ReferenceEntry {
 export async function reconcilePluginReferences(
   projectRoot: string,
   fs: FileSystemPort,
+  previousServiceConsumers: Readonly<Record<string, readonly string[]>> = {},
 ): Promise<void> {
   const appsettingsPath = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
   if (!await fs.exists(appsettingsPath)) return;
@@ -74,7 +75,20 @@ export async function reconcilePluginReferences(
       setPluginReferences(backgroundEntry, [...backgroundReferences].sort());
     }
 
-    if (installedKeys.has(declaration.resourceConfigKey)) {
+    // Discovery edges require an API resource; in-process plugins only retain consumer metadata.
+    if (pluginEntry) {
+      // Revoke only earlier CLI-managed edges; appsettings-owned links remain intact.
+      for (const consumer of previousServiceConsumers[declaration.resourceConfigKey] ?? []) {
+        const service = services[consumer];
+        if (service && !declaration.consumers.services.includes(consumer)) {
+          setPluginReferences(
+            service,
+            (service.PluginReferences ?? []).filter((reference) =>
+              reference !== declaration.resourceConfigKey
+            ),
+          );
+        }
+      }
       addConsumerReference(services, declaration.consumers.services, declaration.resourceConfigKey);
       addConsumerReference(apps, declaration.consumers.apps, declaration.resourceConfigKey);
     }

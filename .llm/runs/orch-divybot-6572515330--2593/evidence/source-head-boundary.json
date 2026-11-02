@@ -1,0 +1,19 @@
+{
+  "gateId": "scaffold-provider-boundary",
+  "invocationId": "issue-2593-s1-boundary",
+  "argv": [
+    "deno",
+    "task",
+    "check:scaffold-provider-boundary"
+  ],
+  "gitHead": "c9e5e759ea0b1d713ab91283cd1e4639cc5ad6a5",
+  "actualGitHead": "c9e5e759ea0b1d713ab91283cd1e4639cc5ad6a5",
+  "outcome": "PASS",
+  "exitCode": 0,
+  "startedAt": "2026-11-02T08:46:59.186Z",
+  "finishedAt": "2026-11-02T08:46:59.559Z",
+  "durationMs": 373,
+  "stdoutSha256": "50d294da83d2139aa97572b3bdf75de93bc8d5cf71bcf170fe5246bf200af0d8",
+  "stdout": "{\"gate\":\"scaffold-provider-boundary\",\"ok\":true,\"productionBuild\":\"PASS\",\"builtRuntime\":\"PASS (6 capability states)\",\"negativeControl\":\"REJECTED\",\"providerSpecifier\":\"npm:@tanstack/ai@0.68.0\"}\n",
+  "note": "Public projection of the durable local receipt; runtime execution identity and private cwd omitted."
+}

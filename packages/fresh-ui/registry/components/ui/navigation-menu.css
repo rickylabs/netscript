@@ -1,0 +1,14 @@
+.ns-navigation-menu { position: relative; }
+.ns-navigation-menu [data-part='list'] { display: flex; flex-wrap: wrap; gap: var(--ns-space-1); margin: 0; padding: 0; list-style: none; }
+.ns-navigation-menu [data-part='item'] { display: inline-flex; align-items: center; gap: var(--ns-control-gap); min-block-size: var(--ns-control-height-sm); padding-inline: var(--ns-control-padding-x); border-radius: var(--ns-radius-control); color: var(--ns-muted-fg); font-size: var(--ns-text-body); text-decoration: none; cursor: pointer; list-style: none; }
+.ns-navigation-menu summary::-webkit-details-marker { display: none; }
+.ns-navigation-menu [data-state='selected'] { color: var(--ns-fg); font-weight: var(--ns-weight-strong); }
+.ns-navigation-menu [data-part='item']:hover, .ns-navigation-menu details[open] > summary { background: var(--ns-hover); color: var(--ns-fg); }
+.ns-navigation-menu :is(a,summary):focus-visible { outline: 2px solid var(--ns-ring); outline-offset: 2px; }
+.ns-navigation-menu details[open] [data-part='chevron'] { transform: rotate(180deg); }
+.ns-navigation-menu [data-part='viewport'] { position: absolute; inset-inline-start: 0; z-index: var(--ns-z-dropdown); display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); inline-size: min(100%,calc(var(--ns-space-16) * 8)); padding: var(--ns-space-1); gap: var(--ns-space-1); background: var(--ns-card); border: var(--ns-border-width) solid var(--ns-border); border-radius: var(--ns-radius-card); box-shadow: var(--ns-shadow-md); }
+.ns-navigation-menu [data-part='link'] { display: grid; gap: var(--ns-space-1); padding: var(--ns-space-2); border-radius: var(--ns-radius-control); color: var(--ns-fg); text-decoration: none; }
+.ns-navigation-menu [data-part='link']:hover { background: var(--ns-hover); }
+.ns-navigation-menu [data-part='title'] { font-size: var(--ns-text-strong); font-weight: var(--ns-weight-strong); }
+.ns-navigation-menu [data-part='description'] { color: var(--ns-muted-fg); font-size: var(--ns-text-small); }
+.ns-navigation-menu [data-part='indicator'] { display: none; }

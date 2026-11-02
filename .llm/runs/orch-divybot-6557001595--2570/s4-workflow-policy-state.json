@@ -1,0 +1,277 @@
+{
+  "headRefOid": "5842e3008151981432cb9b10caac97a35e6e6ab5",
+  "isDraft": true,
+  "labels": [],
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:15Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972688/job/124855204129",
+      "name": "code-quality",
+      "startedAt": "2026-11-01T12:58:24Z",
+      "status": "COMPLETED",
+      "workflowName": "Code quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:15Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972728/job/124855174271",
+      "name": "classify Fresh UI changes",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "Fresh UI package quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:11Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308966877/job/124855157954",
+      "name": "authorize",
+      "startedAt": "2026-11-01T12:58:12Z",
+      "status": "COMPLETED",
+      "workflowName": "OpenHands Agent"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:15Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972677/job/124855174599",
+      "name": "close-gate",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "ci"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:15Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972670/job/124855174596",
+      "name": "classify changes",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "e2e-cli"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:15Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972713/job/124855206186",
+      "name": "breaking-migration",
+      "startedAt": "2026-11-01T12:58:24Z",
+      "status": "COMPLETED",
+      "workflowName": "pr-metadata-gates"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:40Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41309003175/job/124855303377",
+      "name": "breaking-migration",
+      "startedAt": "2026-11-01T12:58:50Z",
+      "status": "COMPLETED",
+      "workflowName": "pr-metadata-gates"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:15Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972703/job/124855174638",
+      "name": "classify changes",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "public-surface-diff"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:56Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972707/job/124855173416",
+      "name": "classify docs-site changes",
+      "startedAt": "2026-11-01T12:58:18Z",
+      "status": "COMPLETED",
+      "workflowName": "Deploy docs site to Pages"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:15Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972688/job/124855174192",
+      "name": "code-quality-repo",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "Code quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:16Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972728/job/124855174872",
+      "name": "fresh-ui-quality",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "Fresh UI package quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:11Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308966877/job/124855190569",
+      "name": "agent",
+      "startedAt": "2026-11-01T12:58:20Z",
+      "status": "COMPLETED",
+      "workflowName": "OpenHands Agent"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:15Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972677/job/124855174137",
+      "name": "classify changes",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "ci"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:16Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972670/job/124855175107",
+      "name": "scaffold-static (deno-only)",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "e2e-cli"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:15Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972703/job/124855174891",
+      "name": "surface-diff",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "public-surface-diff"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:59:58Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972707/job/124855326647",
+      "name": "build",
+      "startedAt": "2026-11-01T12:58:59Z",
+      "status": "COMPLETED",
+      "workflowName": "Deploy docs site to Pages"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972707/job/124855326677",
+      "name": "Utility docs browser and style policy",
+      "startedAt": "2026-11-01T12:58:59Z",
+      "status": "IN_PROGRESS",
+      "workflowName": "Deploy docs site to Pages"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:16Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972728/job/124855174856",
+      "name": "Fresh UI design browser evidence",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "Fresh UI package quality"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:15Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972677/job/124855174660",
+      "name": "deps-report",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "ci"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:16Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972670/job/124855207091",
+      "name": "scaffold-runtime (aspire + docker + postgres)",
+      "startedAt": "2026-11-01T12:58:24Z",
+      "status": "COMPLETED",
+      "workflowName": "e2e-cli"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:16Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972677/job/124855201053",
+      "name": "check-test-shard (${{ matrix.lane }})",
+      "startedAt": "2026-11-01T12:58:23Z",
+      "status": "COMPLETED",
+      "workflowName": "ci"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:16Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972670/job/124855213215",
+      "name": "scaffold-runtime-sqlite (aspire + sqlite + garnet)",
+      "startedAt": "2026-11-01T12:58:26Z",
+      "status": "COMPLETED",
+      "workflowName": "e2e-cli"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:16Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972677/job/124855174551",
+      "name": "quality",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "ci"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:16Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972670/job/124855195296",
+      "name": "desktop-native-linux (deb + signed updater)",
+      "startedAt": "2026-11-01T12:58:21Z",
+      "status": "COMPLETED",
+      "workflowName": "e2e-cli"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:16Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972677/job/124855174925",
+      "name": "check-test",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "ci"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:16Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972670/job/124855175354",
+      "name": "scaffold CI lane visibility",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "e2e-cli"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-01T12:58:16Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/rickylabs/netscript/actions/runs/41308972677/job/124855175169",
+      "name": "core CI lane visibility",
+      "startedAt": "2026-11-01T12:58:16Z",
+      "status": "COMPLETED",
+      "workflowName": "ci"
+    }
+  ]
+}

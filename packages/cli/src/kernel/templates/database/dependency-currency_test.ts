@@ -10,6 +10,7 @@ Deno.test('database scaffolds keep every Prisma executable and adapter on the qu
       projectName: 'currency-test',
       importMode: 'jsr',
     })) as { imports: Record<string, string>; tasks: Record<string, string> };
+    assertEquals(config.imports['@std/path'], 'jsr:@std/path@^1.0.0');
     for (const name of ['prisma', '@prisma/client', '@prisma/instrumentation-contract']) {
       assertEquals(config.imports[name], `npm:${name}@^7.10.0`, `${engine}: ${name}`);
     }

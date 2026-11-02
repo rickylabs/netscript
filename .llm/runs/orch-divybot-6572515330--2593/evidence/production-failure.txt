@@ -1,0 +1,5 @@
+Source: https://github.com/rickylabs/netscript/actions/runs/41411401619
+Gate: scaffold.design-production-exclusion
+Client production build completed; Vite SSR production build failed.
+[vite]: Rollup failed to resolve import "npm:@tanstack/ai@0.68.0" from "https://jsr.io/@netscript/ai/0.0.9-canary.2/src/adapters/anthropic.adapter.ts".
+Exit code: 1.

@@ -1,6 +1,6 @@
 import { createContext } from 'preact';
 import type { ComponentChildren, JSX, VNode } from 'preact';
-import { useContext, useEffect, useRef } from 'preact/hooks';
+import { useContext, useLayoutEffect, useRef } from 'preact/hooks';
 import { composeEventHandlers } from '../_internal/compose-event-handlers.ts';
 import { composeRefs } from '../_internal/compose-refs.ts';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
@@ -67,8 +67,12 @@ export function ActionMenuTrigger(
 }
 
 function enabledItems(element: HTMLElement): HTMLButtonElement[] {
-  return [...element.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')].filter(
-    (item) => item.getAttribute('aria-disabled') !== 'true',
+  return [...element.querySelectorAll<HTMLButtonElement>(
+    '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]',
+  )].filter(
+    (item) =>
+      item.closest('[role="menu"]') === element &&
+      item.getAttribute('aria-disabled') !== 'true' && !item.disabled,
   );
 }
 
@@ -76,7 +80,20 @@ function enabledItems(element: HTMLElement): HTMLButtonElement[] {
 export function navigateActionMenu(event: KeyboardEvent, menu: HTMLElement): boolean {
   const items = enabledItems(menu);
   const currentIndex = items.findIndex((item) => item === event.target);
-  const nextIndex = getNextCollectionIndex(event.key, currentIndex, items.length, 'vertical');
+  let nextIndex = getNextCollectionIndex(event.key, currentIndex, items.length, 'vertical');
+  if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+    const query = event.key.toLocaleLowerCase();
+    for (let offset = 1; offset <= items.length; offset++) {
+      const index = (currentIndex + offset) % items.length;
+      if (
+        (items[index].getAttribute('aria-label') ?? items[index].textContent)?.trim()
+          .toLocaleLowerCase().startsWith(query)
+      ) {
+        nextIndex = index;
+        break;
+      }
+    }
+  }
   if (nextIndex === currentIndex || nextIndex < 0) return false;
   event.preventDefault();
   items[nextIndex]?.focus();
@@ -94,14 +111,24 @@ export function activateActionMenuItem(
 
 /** Renders the positioned menu surface and owns collection keyboard navigation. */
 export function ActionMenuContent(
-  { children, onKeyDown, ...props }: ActionMenuContentProps,
+  { children, onKeyDown, initialFocus = 'first', ...props }: ActionMenuContentProps,
 ): VNode {
   const menu = useActionMenuContext('ActionMenu.Content');
   const contentRef = useRef<HTMLDivElement | null>(null);
   const contentProps = props as JSX.HTMLAttributes<HTMLDivElement>;
-  useEffect(() => {
-    if (menu.open) enabledItems(contentRef.current as HTMLElement)[0]?.focus();
-  }, [menu.open]);
+  useLayoutEffect(() => {
+    if (menu.open && contentRef.current) {
+      const items = enabledItems(contentRef.current);
+      const target = initialFocus === 'last' ? items.at(-1) : items[0];
+      // If promotion runs after this child effect, native autofocus enters the same item.
+      for (const item of items) item.autofocus = item === target;
+      target?.focus();
+      return () => {
+        for (const item of items) item.autofocus = false;
+      };
+    }
+    return undefined;
+  }, [menu.open, initialFocus]);
   return (
     <div
       {...menu.getContentProps({
@@ -110,6 +137,15 @@ export function ActionMenuContent(
         onClick: composeEventHandlers(props.onClick, (event) => event.stopPropagation()),
         onKeyDown: composeEventHandlers(onKeyDown, (event) =>
           navigateActionMenu(event as KeyboardEvent, event.currentTarget as HTMLElement)),
+        onToggle: composeEventHandlers(props.onToggle, (event) => {
+          if (
+            event.currentTarget instanceof HTMLElement &&
+            event.currentTarget.matches(':popover-open')
+          ) {
+            const items = enabledItems(event.currentTarget);
+            (initialFocus === 'last' ? items.at(-1) : items[0])?.focus();
+          }
+        }),
         ref: composeRefs(contentRef),
         role: 'menu',
       })}
@@ -126,6 +162,8 @@ export function ActionMenuItem(
     disabled,
     intent = 'default',
     loading = false,
+    role = 'menuitem',
+    closeOnSelect = true,
     onClick,
     ...props
   }: ActionMenuItemProps,
@@ -142,10 +180,12 @@ export function ActionMenuItem(
       data-loading={loading ? '' : undefined}
       disabled={unavailable}
       onClick={composeEventHandlers(onClick, (event) =>
-        activateActionMenuItem(event, () => menu.setOpen(false, 'close-button')))}
+        activateActionMenuItem(event, () => {
+          if (closeOnSelect) menu.setOpen(false, 'close-button');
+        }))}
       data-part='item'
       data-scope={ACTION_MENU_SCOPE}
-      role='menuitem'
+      role={role}
       tabIndex={props.tabIndex ?? -1}
       type={props.type ?? 'button'}
     >

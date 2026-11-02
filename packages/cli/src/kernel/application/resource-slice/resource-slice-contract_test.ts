@@ -169,3 +169,61 @@ Deno.test('requires LF-terminated generated bodies', async () => {
     'must be unique',
   );
 });
+
+Deno.test('loader query input has a canonical flat representation and rejects other roles', async () => {
+  const content = await markOwnedResourceSliceLeaf({
+    resource: 'orders',
+    role: 'loaders',
+    options: ['core'],
+    queryInput: { offset: 0, limit: 25, filter: null, active: true, search: '' },
+  }, 'export const input = {};\n');
+  assertEquals(Object.keys(parseOwnedResourceSliceLeaf(content)?.queryInput ?? {}), [
+    'active',
+    'filter',
+    'limit',
+    'offset',
+    'search',
+  ]);
+  assertEquals(
+    parseOwnedResourceSliceLeaf(content.replace('"role":"loaders"', '"role":"page"')),
+    undefined,
+  );
+  assertEquals(
+    parseOwnedResourceSliceLeaf(content.replace('"limit":25,"offset":0', '"offset":0,"limit":25')),
+    undefined,
+  );
+  for (const invalid of ['[]', '{}', '1e999']) {
+    assertEquals(
+      parseOwnedResourceSliceLeaf(content.replace('"limit":25', `"limit":${invalid}`)),
+      undefined,
+    );
+  }
+  await assertRejects(() =>
+    markOwnedResourceSliceLeaf({
+      resource: 'orders',
+      role: 'page',
+      options: ['core'],
+      queryInput: {},
+    }, 'body\n')
+  );
+});
+
+Deno.test('amount-unit provenance is canonical and restricted to result islands', async () => {
+  const content = await markOwnedResourceSliceLeaf({
+    resource: 'orders',
+    role: 'island',
+    options: ['core'],
+    amountUnit: 'minor',
+  }, 'export const value = 1;\n');
+  assertEquals(parseOwnedResourceSliceLeaf(content)?.amountUnit, 'minor');
+  assertEquals(
+    parseOwnedResourceSliceLeaf(content.replace('"role":"island"', '"role":"page"')),
+    undefined,
+  );
+  for (const value of ['"unknown"', 'null', '100', 'true']) {
+    assertEquals(
+      parseOwnedResourceSliceLeaf(content.replace('"amountUnit":"minor"', '"amountUnit":' + value)),
+      undefined,
+    );
+  }
+});

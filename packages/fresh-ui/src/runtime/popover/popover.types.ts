@@ -36,6 +36,8 @@ export interface PopoverOpenChangeDetails {
 }
 
 export interface UsePopoverOptions {
+  /** Preserve trigger focus for informational hover previews when false. Defaults to true. */
+  focusOnOpen?: boolean;
   closeOnEscape?: boolean;
   closeOnInteractOutside?: boolean;
   defaultOpen?: boolean;

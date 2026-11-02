@@ -45,6 +45,16 @@ export async function writeNormalizedAppFiles(
     appPort: String(appPort),
     serviceName: plan.service?.name ?? SCAFFOLD_DEFAULTS.SERVICE_NAME,
     modelName: options.modelName,
+    serviceStorage: options.dbEngine,
+    serviceQueryModule: `../routes/examples/${plan.service?.name}/(_lib)/service-query.ts`,
+    hasService: String(Boolean(options.includeExampleService && options.serviceName)),
+    serviceExampleHref: options.includeExampleService && options.serviceName
+      ? 'appRoutes.serviceExample.href()'
+      : 'undefined',
+    serviceExampleEntries: options.includeExampleService && options.serviceName
+      ? `{ title: '${options.serviceName} resource', href: appRoutes.serviceExample.href(), description: 'Your generated typed service flow.', status: 'Generated', owner: 'app' },
+        { title: 'Telemetry', href: appRoutes.telemetryExample.href(), description: 'Trace your running services.', status: 'Generated', owner: 'app' },`
+      : '',
     serviceResourceRouteAlias: options.includeExampleService && options.serviceName
       ? `${toCamelCase(options.serviceName)}: generatedRoutes.examples.${
         toCamelCase(options.serviceName)
@@ -54,6 +64,7 @@ export async function writeNormalizedAppFiles(
       ? `routes.examples.${toCamelCase(options.serviceName)}.$route`
       : 'routes.examples.$route',
   };
+  const appAssets = await loadAppScaffoldTemplateAssets();
   const {
     appAppTemplate,
     appThemeTemplate,
@@ -91,7 +102,7 @@ export async function writeNormalizedAppFiles(
     appRouterTemplate,
     appUiModTemplate,
     appUtilsTemplate,
-  } = await loadAppScaffoldTemplateAssets();
+  } = appAssets;
 
   const write = async (targetPath: string, content: string) => {
     if (await context.scaffolder.writeFile(targetPath, content, overwrite)) {
@@ -212,7 +223,7 @@ export async function writeNormalizedAppFiles(
   );
   const uiInstall = await installUiRegistryItems({
     projectRoot: appDir,
-    names: DEFAULT_UI_INIT_ITEMS,
+    names: [...DEFAULT_UI_INIT_ITEMS, 'command-palette', 'chart-block', 'donut'],
     theme: UI_DEFAULT_THEME,
     overwrite: true,
   }, { fs: context.fs });
@@ -393,6 +404,39 @@ export async function writeNormalizedAppFiles(
       telemetryExampleComponentsDir,
       telemetryExampleSharedDir,
     });
+  }
+  // Utility page assets share the canonical template registry and renderer.
+  const workspacePages = [
+    ['islands/RecordTable.tsx', appAssets.appRecordTableIsland],
+    ['lib/scaffold-contract.ts', appAssets.appScaffoldContract],
+    ['lib/scaffold-projections.ts', appAssets.appScaffoldProjections],
+    ['lib/scaffold-overview.ts', appAssets.appScaffoldOverview],
+    ['lib/scaffold-capabilities.ts', appAssets.appScaffoldCapabilities],
+    ['lib/scaffold-plugin-capabilities.ts', appAssets.appScaffoldPluginCapabilities],
+    ['lib/scaffold-service-context.ts', appAssets.appScaffoldServiceContext],
+    [
+      'lib/scaffold-records.ts',
+      options.includeExampleService
+        ? options.dbEngine === 'none'
+          ? appAssets.appScaffoldRecordsMemory
+          : appAssets.appScaffoldRecordsDatabase
+        : appAssets.appScaffoldRecords,
+    ],
+    ['routes/(_components)/capability-empty.tsx', appAssets.appCapabilityEmpty],
+    ['routes/(_components)/record-table.tsx', appAssets.appRecordTable],
+    ['routes/records/index.tsx', appAssets.appRecordsRoute],
+    ['routes/records/[id].tsx', appAssets.appRecordRoute],
+    ['routes/settings.tsx', appAssets.appSettingsRoute],
+    ['routes/sign-in.tsx', appAssets.appSignInRoute],
+    ['islands/SettingsForm.tsx', appAssets.appSettingsForm],
+    ['islands/WorkspaceCommands.tsx', appAssets.appWorkspaceCommands],
+    ['assets/workspace.css', appAssets.appWorkspaceCss],
+  ] as const;
+  for (const [path, template] of workspacePages) {
+    await write(
+      join(appDir, path),
+      await context.templateAdapter.render(template, appTemplateVars),
+    );
   }
   if (!options.dryRun) {
     const { writeFreshRouteManifestSync } = await import(

@@ -55,12 +55,14 @@ const message = () => (
 export const compositeFixtures: readonly ContractRenderFixture[] = [
   {
     component: 'breadcrumb',
+    props: [],
     scenario: 'trail',
     render: () => <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Current' }]} />,
     parts: ['item', 'link', 'current', 'separator'],
   },
   {
     component: 'pagination',
+    props: [],
     scenario: 'actions',
     render: () => (
       <Pagination>
@@ -70,9 +72,16 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
     ),
     parts: ['meta', 'actions'],
   },
-  { component: 'app-shell', scenario: 'dashboard', render: shell, parts: ['main', 'content'] },
+  {
+    component: 'app-shell',
+    props: [],
+    scenario: 'dashboard',
+    render: shell,
+    parts: ['main', 'content'],
+  },
   {
     component: 'sidebar',
+    props: [],
     scenario: 'navigation',
     render: shell,
     parts: [
@@ -85,9 +94,16 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
       'sidebar-footer',
     ],
   },
-  { component: 'top-bar', scenario: 'slots', render: shell, parts: ['topbar-start', 'topbar-end'] },
+  {
+    component: 'top-bar',
+    props: [],
+    scenario: 'slots',
+    render: shell,
+    parts: ['topbar-start', 'topbar-end'],
+  },
   {
     component: 'page-header',
+    props: [],
     scenario: 'sections',
     render: () => (
       <PageHeader>
@@ -107,6 +123,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'stats-grid',
+    props: [],
     scenario: 'metric',
     render: () => (
       <StatsGrid>
@@ -117,6 +134,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'table',
+    props: [],
     scenario: 'rows',
     render: () => (
       <ResponsiveTable
@@ -131,6 +149,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'data-table',
+    props: [],
     scenario: 'sections',
     render: () => (
       <DataTable>
@@ -143,17 +162,25 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
     ),
     parts: ['header', 'body', 'row', 'footer'],
   },
-  { component: 'data-table', scenario: 'selection grid', render: grid },
-  { component: 'action-bar', scenario: 'grid selection', render: grid, scope: 'action-bar' },
+  { component: 'data-table', props: [], scenario: 'selection grid', render: grid },
+  {
+    component: 'action-bar',
+    props: [],
+    scenario: 'grid selection',
+    render: grid,
+    scope: 'action-bar',
+  },
   {
     component: 'message',
+    props: [],
     scenario: 'user',
     render: message,
     parts: ['main', 'body', 'text', 'actions'],
   },
-  { component: 'bubble', scenario: 'user message', render: message },
+  { component: 'bubble', props: [], scenario: 'user message', render: message },
   {
     component: 'accordion',
+    props: [],
     scenario: 'expanded',
     render: () => (
       <Accordion.Root defaultValue={['one']}>
@@ -168,6 +195,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'tabs',
+    props: [],
     scenario: 'selected',
     render: () => (
       <Tabs.Root defaultValue='one'>
@@ -183,6 +211,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'combobox',
+    props: [],
     scenario: 'open',
     render: () => (
       <Combobox.Root defaultOpen>
@@ -198,6 +227,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'dialog',
+    props: [],
     scenario: 'open',
     render: () => (
       <Dialog.Root defaultOpen>
@@ -214,6 +244,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'sheet',
+    props: [],
     scenario: 'open',
     render: () => (
       <Sheet.Root defaultOpen>
@@ -230,6 +261,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'drawer',
+    props: [],
     scope: 'dialog',
     scenario: 'open',
     render: () => (
@@ -247,6 +279,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'popover',
+    props: [],
     scenario: 'open',
     render: () => (
       <Popover.Root defaultOpen>
@@ -277,6 +310,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'tooltip',
+    props: [],
     scenario: 'open',
     render: () => (
       <Tooltip.Root defaultOpen>
@@ -295,6 +329,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'dropdown-menu',
+    props: [],
     scenario: 'open',
     scope: 'popover',
     render: () => (
@@ -311,6 +346,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'command-palette',
+    props: [],
     scenario: 'results',
     render: () => (
       <CommandPalette
@@ -326,6 +362,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'window-chrome',
+    props: [],
     scenario: 'actions',
     render: () => <DesktopWindowChrome title='Window' leading='Logo' />,
     parts: ['leading', 'identity', 'title', 'actions', 'action'],
@@ -333,6 +370,7 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'tray-menu',
+    props: [],
     scenario: 'declarations',
     render: () => (
       <DesktopTrayMenu
@@ -349,12 +387,14 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'desktop-dialog',
+    props: [],
     scenario: 'intents',
     render: () => <DesktopDialog message='Continue?' />,
     attributes: ['data-state'],
   },
   {
     component: 'desktop-notification',
+    props: [],
     scenario: 'preview',
     render: () => <DesktopNotification notification={{ title: 'Complete', body: 'Ready' }} />,
     parts: ['title', 'body', 'action'],
@@ -362,12 +402,14 @@ export const compositeFixtures: readonly ContractRenderFixture[] = [
   },
   {
     component: 'update-prompt',
+    props: [],
     scenario: 'automatic',
     render: () => <DesktopUpdatePrompt event={{ applyMode: 'automatic', version: '1.0.0' }} />,
     attributes: ['data-state'],
   },
   {
     component: 'desktop-only',
+    props: [],
     scenario: 'browser fallback',
     render: () => <DesktopOnly fallback='Browser'>Desktop</DesktopOnly>,
     contextOnly: true,
