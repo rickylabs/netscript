@@ -126,6 +126,53 @@ the full surface:
 | `TranscribeInputSchema` / `TranscribeResponseSchema` | const | Zod schemas for the transcription route IO. |
 | `AiContract` / `AiContractV1` / `AiRouter` | type alias | Contract and router types derived from the contract. |
 
+## MCP servers through service discovery
+
+Add an app-owned MCP server by its Aspire resource name:
+
+```sh
+netscript plugin ai mcp add orders --service=orders-mcp --path=/mcp --auth=ORDERS_MCP_TOKEN
+```
+
+This creates `ai/mcp/orders.ts` and updates `ai/mcp/registry.ts`. The generated configuration uses
+`getServiceUrl` from `@netscript/sdk/discovery` and joins the MCP path with Web `URL`. The endpoint
+is resolved when the configuration module loads in the app process, so generation needs no running
+server. Configure discovery before importing the registry. For this example, the default endpoint
+comes from `services__orders-mcp__http__0`; a missing value throws an error naming the service and
+expected variable. There is no fallback port.
+
+Make the consuming app reference the MCP server resource in your Aspire AppHost so that Aspire
+injects its endpoint. Your app owns that server, its tools and authorization. `--auth` names an
+environment variable containing the Authorization header value (include `Bearer ` if the server
+expects bearer authentication); the generated source stores the variable name, not the token. The plugin's scaffold `--mcp` option emits the skill-loader tool and does not create
+this app-data MCP server.
+
+| Option | Service mode behavior |
+| --- | --- |
+| `--service=<name>` | Logical Aspire resource name, using letters, digits and hyphens; starts with a letter. |
+| `--path=/mcp` | Defaults to `/mcp`; a root-relative path replaces any path in the discovered base URL. |
+| `--protocol=http` | `http` by default; `https` selects `services__<name>__https__0`. |
+| `--auth=<ENV>` | Optional existing HTTP token configuration; the value becomes the Authorization header. |
+
+Exactly one of `--service`, `--url` or `--stdio` is required. Empty or valueless flags, invalid
+protocols and ambiguous transport selections fail before changing the server file or registry.
+`--path` and `--protocol` require service mode. Paths cannot contain an origin, query, fragment,
+dot segments, whitespace or encoded separators.
+
+Fixed URLs and stdio commands remain available:
+
+```sh
+netscript plugin ai mcp add docs --url=https://docs.example.test/mcp --auth=DOCS_MCP_TOKEN
+netscript plugin ai mcp add local --stdio=mcp-local-server
+netscript plugin ai mcp list
+```
+
+New JSR installs receive the SDK alias through the CLI's plugin import wiring. For an existing
+JSR project installed before service mode was added, add the SDK to the root import map before
+loading the new config: run `deno add jsr:@netscript/sdk@<version>` from the project root, replacing
+`<version>` with the exact NetScript version already used by the project. Local-source projects
+resolve the copied SDK workspace member and must not add a published SDK pin.
+
 ## Install and variants
 
 Install the plugin into a scaffolded NetScript app. Its `officialSource.canonicalName` is `ai`, so
@@ -147,11 +194,12 @@ The plugin defines three install shapes:
 | --- | --- | --- |
 | _default_ | Emit the six in-process starter files under `ai/`. | Wired. |
 | `--persist-threads` | Also scaffold `ai/thread-store.ts` (a `Deno.Kv`-backed thread store). | Available as the `thread-store` adapter resource; not a public install flag. |
-| `--mcp` | Scaffold MCP / skill-loader wiring. | Not implemented. |
+| `--mcp` | Scaffold the skill-loader tool. | Separate from MCP server client configuration above. |
 
 > [!WARNING]
 > `netscript plugin install` does not forward plugin-specific install flags, so `--persist-threads`
-> is not a wired CLI flag, and `--mcp` is not implemented. Get the thread store from the adapter
+> is not a wired CLI flag. The scaffold protocol's `--mcp` option emits only the skill-loader tool.
+> Get the thread store from the adapter
 > resource layer (`threadStoreResource`) as described in [add-only resources](#add-only-resources).
 
 The thread-store scaffolder is an add-only adapter resource rather than part of the default install

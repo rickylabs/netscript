@@ -8,7 +8,8 @@
   and vendor families required; route availability will be recorded before evaluation.
 - Archetype5 plugin, with CLI/tooling and integration concerns inside the existing plugin.
 - Allowed product scope: plugins/ai/ MCP configuration, plugin CLI/resource generator/runtime,
-  focused docs/site AI MCP documentation if required, and existing derived documentation carriers.
+  focused docs/site AI MCP documentation, existing CLI plugin workspace-mutator import map
+  and its tests (mode-aware dependency wiring, not init/scaffold assets), and derived doc carriers.
 - No CLI init/scaffold assets, Northwind files, app-data MCP server, or sibling run edits.
 - Public run scope: .llm/runs/feat-ai-mcp-service-discovery--2581/.
 - Plan evaluation and implementation evaluation required. No new dependency is anticipated.

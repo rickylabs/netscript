@@ -23,3 +23,22 @@ Research and independent plan review precede implementation.
 
 Plan evaluation is explicitly required by #2581. GLM plan route has no proven allowance
 (Go HTTP401; other providers lack usage snapshot); native Fable5.1 is the declared fallback.
+
+## S0 draft and baseline
+
+- Draft PR #2590 opened at3986437; milestone0.0.9 and feature/plugin/in-progress taxonomy.
+- Native Fable5.1/low independent PLAN-EVAL is running through the repository Claude launcher. GLM primary transports failed availability preflight (Go401, others lack required usage snapshot); no paid-provider guard was bypassed.
+- Baseline: existing plugin AI command tests4/4 and core MCP tests20/20 PASS. A first command targeted the MCP source directory, which contains no tests; the corrected core command targeted packages/ai/tests/mcp_test.ts.
+
+## PLAN-EVAL PASS
+
+Independent Fable5.1/low review passed iteration2 after replacing namespace pin with mode-aware CLI import wiring. Baseline quality:gate PASS (exit0). Implement service union/validation first, then CLI/emission/tests/docs. Older JSR installs receive a documented SDK alias migration.
+
+## S1 implementation and local proof
+
+- Added service-reference generator union, CLI flag validation and SDK runtime discovery URL emission. Preserved URL/stdio and existing auth header semantics.
+- Added SDK alias to the existing JSR-only CLI plugin import map. Both-mode completeness guard now includes an emitted service server; local-source no-pin control includes SDK.
+- New real HTTP MCP fixture lists/calls a tool on an allocated port through the emitted module. Includes auth, custom/default paths, HTTPS selection and missing discovery. Invalid/ambiguous CLI controls prove no writes to new or populated projects.
+- All AI plugin, core MCP and CLI workspace-mutator tests:86 PASS,0 FAIL. Plugin scoped check PASS; selected44 TypeScript files lint/format PASS. Generated installed consumer typechecks its populated registry.
+- quality:gate and docs:accuracy PASS. Plugin publication dry-run PASS. Full export doc lint16 findings exactly matches baseline; no new findings.
+- Implementation reviewer primary Muse transports unavailable (Go401 and OpenRouter missing required usage snapshot); declared native Opus5/xhigh fallback will review in a separate session.
