@@ -100,3 +100,21 @@ successful disposable workspaces are removed. Main static init precedes the isol
 which still precedes all plugin/link/runtime repair fixtures. Nested control failures retain causes.
 191 focused results and all 21 owned-source check/lint/fmt gates pass. Same-session repair review
 and the new exact-head runtime CI are pending. Final quality/check evidence will bind the next head.
+
+## S2 independent sign-off and local gate completion
+
+Same-session cross-family repair review PASS; full report in s2-review.md. The reviewer traced
+the public route, actual persisted result shape, environment merge and cleanup contracts, and
+independently ran 106 focused tests and scoped validation. Reasoning effort is requested xhigh,
+not independently attestable. Both source slices now have substantive independent sign-off.
+
+At reviewed source head `41fb51d1bcf48094b57265c87020654725ed2784`: all 15 root check tasks PASS,
+four carrier generation tasks complete without drift, quality:gate durable receipt PASS, and
+CLI/workers JSR audits PASS with existing warnings. The 191 focused results and 21-file scoped
+checks remain current; no production source changed after them. The canonical cleanup proves exact
+AppHost stop and no owned container survivors; it does not inventory all operating-system processes.
+
+Reconcile: declared write surface respected. This sign-off commit only records the independent
+review and local evidence. Final-head one-pass CI, full remote-check completion and same-session
+evidence review remain mandatory. Their final receipts belong on the PR and ignored final report
+so the accepted source head stays fixed. No merge, issue closure or accepted product debt.

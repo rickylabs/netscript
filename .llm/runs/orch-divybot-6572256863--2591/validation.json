@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-11-02T09:38:10.281002+00:00",
-  "scope": "Repaired source candidate; exact-head final runtime proof remains required",
+  "recordedAt": "2026-11-02T09:48:55.197972+00:00",
+  "scope": "Independent source review PASS; final-head live runtime acceptance remains required",
   "denoVersion": "2.9.7",
   "sourceHashes": {
     ".llm/tools/validation/fixtures/aspire-surface-manifest.tsv": "43536d51c8e80b7c7a3d7f2d077a5eeb6ce66a68429450297775bdb375ca2ee1",
@@ -110,5 +110,107 @@
     "Bounded read-side projection convergence",
     "Explicit Aspire startup budget",
     "Generated Aspire surface inventory refresh"
-  ]
+  ],
+  "checkTasks": [
+    {
+      "task": "check:desktop-native-fixture",
+      "exitCode": 0,
+      "durationMs": 150
+    },
+    {
+      "task": "check:emitted-samples",
+      "exitCode": 0,
+      "durationMs": 5416
+    },
+    {
+      "task": "check:streams-types",
+      "exitCode": 0,
+      "durationMs": 183
+    },
+    {
+      "task": "check:child-health-docs",
+      "exitCode": 0,
+      "durationMs": 296
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "exitCode": 0,
+      "durationMs": 7610
+    },
+    {
+      "task": "check:assets-barrel",
+      "exitCode": 0,
+      "durationMs": 2418
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0,
+      "durationMs": 14927
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0,
+      "durationMs": 436
+    },
+    {
+      "task": "check:scaffold-versions",
+      "exitCode": 0,
+      "durationMs": 104
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "exitCode": 0,
+      "durationMs": 246
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "exitCode": 0,
+      "durationMs": 1769
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "exitCode": 0,
+      "durationMs": 253
+    },
+    {
+      "task": "check:figma-names",
+      "exitCode": 0,
+      "durationMs": 570
+    },
+    {
+      "task": "check:review-threads",
+      "exitCode": 0,
+      "durationMs": 502
+    },
+    {
+      "task": "check:design-skill",
+      "exitCode": 0,
+      "durationMs": 102
+    }
+  ],
+  "qualityGate": {
+    "gateId": "quality-gate",
+    "gitHead": "41fb51d1bcf48094b57265c87020654725ed2784",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "durationMs": 13802,
+    "requestHash": "ea46f8883f3889ca95f69a9367b62984a4abb9fab1e0497d19f753172cd2b46f"
+  },
+  "carrierChain": {
+    "tasks": [
+      "gen:agent-docs-prose",
+      "gen:mcp-export-corpus",
+      "gen:assets-barrel",
+      "gen:publish-assets"
+    ],
+    "result": "PASS; owning check tasks pass and no generated drift"
+  },
+  "independentReview": {
+    "verdict": "PASS",
+    "model": "claude-opus-5",
+    "effortRequested": "xhigh",
+    "effortAttestation": "not available",
+    "scope": "S1 and S2 source/slice; final live CI evidence still required",
+    "report": "s2-review.md"
+  }
 }
