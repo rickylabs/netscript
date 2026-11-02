@@ -96,6 +96,9 @@ export interface ValidatedInitOptions extends
   /** Validated application name. */
   readonly appName: string;
 
+  /** Explicit opt-in recipe; absent for the unchanged default scaffold. */
+  readonly from?: string;
+
   /** Absolute path to the target directory. */
   readonly targetPath: string;
 

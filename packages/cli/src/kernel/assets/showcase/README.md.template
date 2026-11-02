@@ -1,0 +1,58 @@
+# Northwind commerce
+
+Northwind is an opt-in NetScript showcase. It uses the same Utility pages,
+typed services and background plugins as an ordinary generated application.
+The sample contains 40 orders, five customers, eight products and 80 line items.
+Money is stored in integer minor units; totals come from the saved line items.
+
+## Start the showcase
+
+Install Deno 2.9.7, the pinned Aspire CLI and Docker, then run:
+
+```sh
+netscript init northwind --from showcase --ci --yes
+cd northwind
+deno task showcase:setup
+deno task aspire:start
+```
+
+The setup task installs streams, workers, sagas and triggers using the supported
+plugin commands, copies the app-owned commerce resources, generates registries,
+and initializes, generates and seeds the database. No manual linking or source
+edits are required. SQLite is the default; `--db postgres` selects PostgreSQL.
+The first PostgreSQL database lifecycle is provisioned through Aspire by the CLI.
+Existing related orders are preserved on reseed.
+
+Open the web app URL shown by Aspire. Overview shows saved orders, revenue,
+status charts and activity. Orders supports search, status filters, sorting and
+CSV export. Customers and Products read the same live database through oRPC.
+
+## Follow an order
+
+1. Open Orders, then an order that is pending, awaiting payment or paid.
+2. Select **Fulfil order**. Refresh the order to see durable worker progress.
+3. The order saga records **Order**, **Payment** and **Shipping** steps. Its
+   payment is a demonstration transition, with no external charge.
+4. Return to Overview. The stream activity includes the committed status changes.
+5. The order detail also provides **Send delivery webhook**, which uses the
+   registered webhook trigger to enqueue the same fulfilment job.
+
+The webhook is deliberately public sample ingress for local development. Replace
+its the sample `memory` verifier with your verifier before exposing it outside your demo.
+Sign in shows the normal authentication connection surface. Connect an identity
+provider through the supported auth plugin command when you need protected access.
+The Assistant page explains provider connection when no model is configured.
+
+## Extend the application
+
+Start here. `contracts/commerce.contract.ts` owns customer/product/line schemas;
+`services/orders/src/commerce.ts` implements live reads. The standard orders
+contract and repository remain under `contracts/versions/v1/` and
+`services/orders/src/`. `database/{{dbEngine}}/scripts/seed-commerce.ts` owns the
+catalogue; the ordinary sample seed owns the dated order backbone.
+
+`workers/jobs/fulfil-order.ts`, `sagas/order-fulfilment/order-saga.ts` and
+`triggers/order-webhook.ts` are the background extension points. The shared
+Utility views remain under `apps/{{appName}}/routes/(_components)/`; the additive
+order workflow view is `order-workflow.tsx`. All plugin runtime code belongs to
+the installed packages. `showcase/resources/` retains the original recipe sources.

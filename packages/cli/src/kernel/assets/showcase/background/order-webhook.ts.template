@@ -1,0 +1,13 @@
+import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';
+import type { JobDefinition } from '@netscript/plugin-workers-core';
+import { z } from 'zod';
+
+const fulfilment = { id: 'fulfil-order' as JobDefinition<'fulfil-order'>['id'], name: 'Fulfil order', topic: 'default' } satisfies JobDefinition<'fulfil-order'>;
+
+/** The local demonstration webhook enqueues the same durable fulfilment job as the order page. */
+export const orderWebhook = defineWebhook((event) => {
+  const payload = z.object({ orderId: z.number().int().positive() }).parse(event.payload.body);
+  return Promise.resolve([enqueueJob(fulfilment, { payload, priority: 50 })]);
+}, { id: 'order-fulfilment', path: '/api/v1/webhooks/order-fulfilment', verifier: 'memory',
+  description: 'Demo webhook: accepts an orderId and starts fulfilment.', tags: ['northwind', 'orders'] });
+export default orderWebhook;

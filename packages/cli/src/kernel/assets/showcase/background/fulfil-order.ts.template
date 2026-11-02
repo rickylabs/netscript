@@ -1,0 +1,68 @@
+// netscript-workers-resource: {"kind":"job","id":"fulfil-order","enabled":true,"entrypoint":"workers/jobs/fulfil-order.ts","topic":"default","maxRetries":3,"timeout":60000,"tags":["northwind","fulfilment"]}
+import { createSuccessResult, defineJobHandler } from '@netscript/plugin-workers-core';
+import { sagasContract } from '@netscript/plugin-sagas-core/contracts/v1';
+import { createServiceClient } from '@netscript/sdk/client';
+import { OrdersContractV1 } from '../../contracts/versions/v1/orders.contract.ts';
+import { z } from 'zod';
+
+const payload = z.object({ orderId: z.number().int().positive() });
+
+type RpcOptions = { context: { signal: AbortSignal } };
+/** The real RPC collaborators are replaceable for cancellation tests. */
+export interface FulfilmentPorts {
+  orders: {
+    getById(input: { id: number }, options: RpcOptions): Promise<{ id: number; reference: string; status: string }>;
+    update(input: { id: number; data: { status: 'paid' | 'shipped' | 'awaiting_payment' } }, options: RpcOptions): Promise<unknown>;
+  };
+  sagas: {
+    publish(input: { type: string; payload: { orderId: number }; correlationId: string; idempotencyKey: string }, options: RpcOptions): Promise<{ published: boolean }>;
+    getInstance(input: { sagaName: string; correlationId: string }, options: RpcOptions): Promise<{ status: string }>;
+  };
+}
+
+
+/** Durable fulfilment validates the persisted order before starting its payment/shipping saga. */
+export function createFulfilOrderJob(ports: FulfilmentPorts = {
+  orders: createServiceClient({ contract: OrdersContractV1, serviceName: 'orders', routerName: 'orders' }),
+  sagas: createServiceClient({ contract: sagasContract, serviceName: 'sagas-api', routerName: 'sagas' }),
+}) {
+ return defineJobHandler(payload, async (context) => {
+  const { orders, sagas } = ports;
+  const rpcOptions = { context: { signal: context.signal } };
+  const order = await orders.getById({ id: context.payload.orderId }, rpcOptions);
+  if (order.status === 'cancelled' || order.status === 'refunded') throw new Error('Cancelled or refunded orders cannot be fulfilled.');
+  if (order.status === 'shipped') {
+    await context.reportProgress?.(100, `${order.reference} is already shipped`);
+    return createSuccessResult({ orderId: order.id, reference: order.reference });
+  }
+  await context.reportProgress?.(25, `Picking items for ${order.reference}`);
+  context.signal.throwIfAborted();
+  await orders.update({ id: order.id, data: { status: order.status === 'paid' ? 'paid' : 'awaiting_payment' } }, rpcOptions);
+  await context.reportProgress?.(65, `Items packed for ${order.reference}`);
+  context.signal.throwIfAborted();
+  const result = await sagas.publish({ type: 'order.placed', payload: { orderId: order.id }, correlationId: `order-${order.id}`, idempotencyKey: `northwind-order-${order.id}` }, rpcOptions);
+  if (!result.published) throw new Error('The order saga was not accepted.');
+  // The pure saga owns durable transition state; the worker applies the resulting order writes.
+  const signal = AbortSignal.any([context.signal, AbortSignal.timeout(30000)]);
+  for (;;) {
+    signal.throwIfAborted();
+    const instance = await sagas.getInstance({ sagaName: 'order-fulfilment', correlationId: `order-${order.id}` }, { context: { signal } }).catch((error: unknown) => {
+      if (error && typeof error === 'object' && 'status' in error && error.status === 404) return undefined;
+      throw error;
+    });
+    if (instance?.status === 'completed') break;
+    if (instance?.status === 'failed') throw new Error('The order journey failed.');
+    await new Promise<void>((resolve) => setTimeout(resolve, 250));
+  }
+  context.signal.throwIfAborted();
+  await orders.update({ id: order.id, data: { status: 'paid' } }, rpcOptions);
+  await context.reportProgress?.(85, `Payment confirmed for ${order.reference}`);
+  context.signal.throwIfAborted();
+  await orders.update({ id: order.id, data: { status: 'shipped' } }, rpcOptions);
+  await context.reportProgress?.(100, `Shipped to customer for ${order.reference}`);
+  return createSuccessResult({ orderId: order.id, reference: order.reference, correlationId: `order-${order.id}` });
+ });
+}
+
+export const fulfilOrderJob = createFulfilOrderJob();
+export default fulfilOrderJob;

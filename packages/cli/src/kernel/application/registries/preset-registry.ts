@@ -1,4 +1,5 @@
 import { Registry } from '../abstracts/registry.ts';
+import { SHOWCASE_PRESET } from '../../domain/scaffold/showcase-preset.ts';
 
 /** A named init preset made of scaffold-time choices. */
 export interface InitPreset {
@@ -8,10 +9,15 @@ export interface InitPreset {
   readonly label: string;
 }
 
-/** Registry of init presets; empty until presets are registered. */
+/** Registry of explicit, opt-in scaffold recipes. */
 export class PresetRegistry extends Registry<string, InitPreset> {
   override readonly id = 'init-presets';
   readonly #presets = new Map<string, InitPreset>();
+
+  constructor() {
+    super();
+    this.register(SHOWCASE_PRESET, { id: SHOWCASE_PRESET, label: 'Northwind commerce showcase' });
+  }
 
   override register(key: string, value: InitPreset): void {
     this.#presets.set(key, value);

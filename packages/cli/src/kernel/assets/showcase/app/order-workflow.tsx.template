@@ -1,0 +1,26 @@
+import { Badge, Button, Progress } from '@app/components/ui/mod.ts';
+import { scaffoldAmount, scaffoldDate } from '@app/lib/scaffold-contract.ts';
+import type { OrderWorkflowData } from '@app/lib/northwind.ts';
+
+/** Genuine line items, durable worker progress and saga step state extend the shared detail page. */
+export function OrderWorkflow({ data, orderId, status }: { data: OrderWorkflowData; orderId: string; status: string }) {
+  if (!data || data.state !== 'ready') return <section class='workspace-section'><h2>Fulfilment</h2><p>The order workflow is unavailable. Start the background services and refresh.</p></section>;
+  const execution = data.execution;
+  const instance = data.instance;
+  return <>
+    <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Order items</h2><p>{data.customer?.company} · {data.customer?.country}</p></div><Badge variant='muted'>Online store</Badge></header>
+      <div class='northwind-table-scroll'><table class='northwind-table'><thead><tr><th>Product</th><th>Quantity</th><th>Price</th><th>Total</th></tr></thead><tbody>{data.lines.map((line) => <tr key={line.id}><td><strong>{line.name}</strong><span class='workspace-record-description'>{line.sku}</span></td><td>{line.quantity}</td><td>{scaffoldAmount(line.unitPrice, 'USD')}</td><td>{scaffoldAmount(line.total, 'USD')}</td></tr>)}</tbody></table></div>
+      {data.customer && <p class='workspace-muted'>Shipping to {data.customer.name} · {data.customer.address}</p>}
+    </section>
+    <section class='workspace-section' data-northwind-worker={execution?.status ?? 'idle'}><header class='workspace-section-heading'><div><h2>Fulfilment</h2><p>Pick, pack and hand off to payment and shipping.</p></div><Badge variant={execution?.status === 'completed' ? 'success' : 'muted'}>{execution?.status ?? 'Not started'}</Badge></header>
+      {execution && <><Progress value={execution.progressPercent ?? 0} max={100} label='Order fulfilment progress' /><p>{execution.progressMessage ?? 'Waiting for the next worker update.'}</p><p class='workspace-muted'>Started {scaffoldDate(execution.startedAt ?? execution.triggeredAt, undefined, true)}</p></>}
+      <div class='northwind-actions'><form method='post' action={`/orders/${orderId}/fulfil`}><Button type='submit' disabled={status === 'cancelled' || status === 'refunded' || status === 'shipped'}>Fulfil order</Button></form><form method='post' action={`/orders/${orderId}/webhook`}><Button type='submit' variant='outline' disabled={status === 'cancelled' || status === 'refunded' || status === 'shipped'}>Send delivery webhook</Button></form><Button type='link' variant='ghost' href={`/orders/${orderId}`}>Refresh progress ↻</Button></div>
+    </section>
+    <section class='workspace-section' data-northwind-saga={instance?.status ?? 'idle'}><header class='workspace-section-heading'><div><h2>Order journey</h2><p>Demonstration payment · no external charge.</p></div><Badge variant={instance?.status === 'completed' ? 'success' : 'muted'}>{instance?.status ?? 'Not started'}</Badge></header>
+      <ol class='workspace-timeline'>{[['order', 'Order accepted'], ['payment', 'Payment confirmed'], ['shipping', 'Shipped to customer']].map(([key, label]) => {
+        const time = instance?.state[key!];
+        return <li key={key}><span class='workspace-timeline-dot' /><div><strong>{label}</strong>{typeof time === 'string' ? <time dateTime={time}>{scaffoldDate(time, undefined, true)}</time> : <p>Waiting</p>}</div></li>;
+      })}</ol>
+    </section>
+  </>;
+}

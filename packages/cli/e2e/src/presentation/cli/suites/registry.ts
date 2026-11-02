@@ -12,6 +12,7 @@ import { createTrueUserlandInstallSuite } from '../../../../suites/scaffold/true
 import { createQuickstartWalkSuite } from '../../../../suites/quickstart/quickstart-walk-suite.ts';
 import { createReadmeQuickstartSuite } from '../../../../suites/quickstart/readme-quickstart-suite.ts';
 import { QUICKSTART, QUICKSTART_TITLE } from '../../../domain/cli-surface.ts';
+import { createShowcaseSuite } from '../../../../suites/scaffold/showcase-suite.ts';
 
 /** Built-in suite descriptor. */
 export interface BuiltInSuite {
@@ -30,6 +31,7 @@ const scaffoldBuiltInSuites: readonly BuiltInSuite[] = scaffoldCapabilitySuites.
 
 /** Registry of built-in suites. */
 export const builtInSuites: readonly BuiltInSuite[] = [
+  { id: SCAFFOLD.SHOWCASE, title: SCAFFOLD_TITLE.SHOWCASE, create: createShowcaseSuite },
   ...scaffoldBuiltInSuites,
   {
     id: SCAFFOLD.USERLAND_INSTALL,

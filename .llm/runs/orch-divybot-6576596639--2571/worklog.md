@@ -35,3 +35,19 @@ implementation evaluation and visual review remain required.
 Bootstrap: issue and comments read; open partial PR #2577 verified; no full
 showcase implementation exists. Matrix resolved at feature tier. Memory consulted.
 All implementation and acceptance gates pending.
+
+## S1 terminal — source PASS
+
+Implemented opt-in composition, commerce schema/seed/contract, ordinary plugin
+setup, durable fulfilment and T1 saga, webhook action and stream activity. The
+canonical default scaffold is byte-identical in 197-file and 178-file controls.
+Focused regression wrapper: 43 tests passed. Root structured check: 4210 files,
+36 batches, zero failures. Quality/architecture gate passed.
+
+The six-gate documented showcase recipe passed. Baseline rejected `--from
+showcase`; a missing terminal shipping write also caused the walkthrough to fail,
+and restoration passed. Read-only Sol supervisor source signoff: source-review-s1.md.
+No merge-readiness claim: AI, final packed build, all root checks, CI and Astra
+review remain pending. Reconcile: baseline #2594 is retained; default templates
+are composed through the opt-in adapter. Plugin resource API names and explicit
+saga correlation lessons are recorded alongside this worklog.

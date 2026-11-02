@@ -1,0 +1,7 @@
+import { fulfilOrder } from '@app/lib/northwind.ts';
+import { define } from '@app/utils.ts';
+
+/** Only same-origin POST requests may enqueue demonstration work. */
+export const handler = define.handlers({
+  POST: (ctx) => fulfilOrder(ctx.req, ctx.params.id, {{webhook}}),
+});

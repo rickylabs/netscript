@@ -12,6 +12,7 @@ import type { ScaffoldResult } from '../../domain/core-types.ts';
 import type { InitPipelineContext } from './context.ts';
 import { validateOptions } from './validate-init.ts';
 import { runInitPipeline } from './init-pipeline.ts';
+import { SHOWCASE_PRESET } from '../../domain/scaffold/showcase-preset.ts';
 import { renderInitJson } from '../output/renderers/init-json-renderer.ts';
 
 /** Execute the public init use case. */
@@ -41,7 +42,11 @@ export async function executeInit(
   return result;
 }
 
-function createInitResult(phases: readonly ScaffoldResult[], durationMs: number, validated: ValidatedInitOptions): InitResult {
+function createInitResult(
+  phases: readonly ScaffoldResult[],
+  durationMs: number,
+  validated: ValidatedInitOptions,
+): InitResult {
   return {
     name: validated.name,
     targetPath: validated.targetPath,
@@ -96,6 +101,9 @@ function databaseEnvVar(dbEngine: ValidatedInitOptions['dbEngine']): string {
 }
 
 export function initNextSteps(options: ValidatedInitOptions): string[] {
+  if (options.from === SHOWCASE_PRESET) {
+    return [`cd ${options.name}`, 'deno task showcase:setup', 'deno task aspire:start'];
+  }
   const steps: string[] = [`cd ${options.name}`];
   const dbCommand = options.importMode === 'local'
     ? 'deno run -A packages/cli/bin/netscript-dev.ts db'
@@ -105,7 +113,9 @@ export function initNextSteps(options: ValidatedInitOptions): string[] {
     steps.push('cd aspire  # TS AppHost lives here, isolated from the Deno workspace');
     steps.push('aspire restore  # download TypeScript AppHost SDK modules (run once)');
     steps.push('cd ..');
-    steps.push('deno task aspire:start  # 300s cold-start budget; override ASPIRE_CLI_START_TIMEOUT if needed');
+    steps.push(
+      'deno task aspire:start  # 300s cold-start budget; override ASPIRE_CLI_START_TIMEOUT if needed',
+    );
     if (options.dbEngine !== 'none') {
       addDatabaseSteps(steps, dbCommand);
     }
@@ -139,7 +149,9 @@ export function initNextSteps(options: ValidatedInitOptions): string[] {
   }
   if (options.dbEngine !== 'none' && !options.noAspire) {
     steps.push(
-      `# ${engineLabel(options.dbEngine)} provisioned by Aspire (see "Databases" in appsettings.json)`,
+      `# ${
+        engineLabel(options.dbEngine)
+      } provisioned by Aspire (see "Databases" in appsettings.json)`,
     );
   }
   return steps;

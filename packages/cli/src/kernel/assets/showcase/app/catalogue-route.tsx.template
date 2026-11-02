@@ -1,0 +1,11 @@
+import { Catalogue } from './(_components)/catalogue.tsx';
+import { loadCatalogue } from '@app/lib/northwind.ts';
+import { routes } from '@app/router.ts';
+import { definePage } from '@app/utils.ts';
+
+export const cataloguePage = definePage().withRoute(routes.{{catalogueKind}}.$route)
+  .withMeta(() => ({ title: 'Northwind — {{catalogueTitle}}' }))
+  .withLayer('catalogue', Catalogue, { loader: async (ctx) => ({ data: await loadCatalogue(ctx.req), kind: '{{catalogueKind}}' as const }) })
+  .withLayout((slots) => slots.catalogue()).build();
+export const { default: page } = cataloguePage;
+export { page as default };

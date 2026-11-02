@@ -1,0 +1,56 @@
+import { createServiceClient } from '@netscript/sdk/client';
+import { workersContract } from '@netscript/plugin-workers-core/contracts/v1';
+import { sagasContract } from '@netscript/plugin-sagas-core/contracts/v1';
+import { commerceContract } from '../../../contracts/commerce.contract.ts';
+import { getServiceUrl } from '@netscript/sdk/discovery';
+
+const context = (request: Request) => ({ signal: AbortSignal.any([request.signal, AbortSignal.timeout(5000)]) });
+const commerce = () => createServiceClient({ contract: commerceContract, serviceName: 'orders', routerName: 'commerce' });
+const workers = () => createServiceClient({ contract: workersContract, serviceName: 'workers-api', routerName: 'workers' });
+const sagas = () => createServiceClient({ contract: sagasContract, serviceName: 'sagas-api', routerName: 'sagas' });
+
+/** Read customer/product catalogues from the same persisted commerce service. */
+export async function loadCatalogue(request: Request) {
+  try {
+    const options = { context: context(request) };
+    const [customers, products] = await Promise.all([commerce().customers(undefined, options), commerce().products(undefined, options)]);
+    return { state: 'ready' as const, customers, products };
+  } catch (error) {
+    console.error('Northwind catalogue unavailable', error);
+    return { state: 'unavailable' as const, customers: [], products: [] };
+  }
+}
+
+/** Project real plugin state without pretending an unstarted workflow is complete. */
+export async function loadOrderWorkflow(request: Request, value: string) {
+  const id = Number(value);
+  if (!Number.isSafeInteger(id) || id <= 0) return undefined;
+  const options = { context: context(request) };
+  try {
+    const [order, executions, instance] = await Promise.all([
+      commerce().orderLines({ id }, options),
+      workers().batchQueryExecutions({ jobId: 'fulfil-order', limit: 1000 }, options),
+      sagas().getInstance({ sagaName: 'order-fulfilment', correlationId: `order-${id}` }, options).catch((error: unknown) => {
+        if (error && typeof error === 'object' && 'status' in error && error.status === 404) return undefined;
+        throw error;
+      }),
+    ]);
+    const execution = executions.executions.filter((entry) => entry.payload?.orderId === id).sort((a, b) => b.triggeredAt.localeCompare(a.triggeredAt))[0];
+    return { state: 'ready' as const, ...order, execution, instance };
+  } catch (error) { console.error('Northwind workflow unavailable', error); return { state: 'unavailable' as const }; }
+}
+export type OrderWorkflowData = Awaited<ReturnType<typeof loadOrderWorkflow>>;
+
+/** Same-origin form actions cross into the existing worker or webhook entry point. */
+export async function fulfilOrder(request: Request, value: string, webhook: boolean) {
+  const origin = request.headers.get('origin');
+  if (!origin || origin !== new URL(request.url).origin) return new Response('Invalid request origin', { status: 403 });
+  const id = Number(value);
+  if (!Number.isSafeInteger(id) || id <= 0) return new Response('Invalid order', { status: 400 });
+  if (webhook) {
+    const response = await fetch(new URL('/api/v1/webhooks/order-fulfilment', getServiceUrl('triggers-api')), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ orderId: id }), signal: context(request).signal });
+    await response.body?.cancel();
+    if (!response.ok) throw new Error(`Delivery webhook failed (${response.status})`);
+  } else await workers().triggerJob({ id: 'fulfil-order', payload: { orderId: id }, correlationId: `order-${id}` }, { context: context(request) });
+  return new Response(null, { status: 303, headers: { location: `/orders/${id}` } });
+}

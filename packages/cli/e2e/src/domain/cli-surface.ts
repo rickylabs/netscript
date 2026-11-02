@@ -2,6 +2,7 @@ import type { PluginKind } from './extension-axes.ts';
 
 /** Built-in scaffold suites. */
 export const SCAFFOLD = {
+  SHOWCASE: 'scaffold.showcase',
   SERVICE: 'scaffold.service',
   CONTRACTS: 'scaffold.contracts',
   INFRASTRUCTURE: 'scaffold.infrastructure',
@@ -25,6 +26,7 @@ export const QUICKSTART_TITLE = {
 
 /** Suite ids that require exclusive access to the expensive runtime path. */
 export const EXPENSIVE_RUNTIME_SUITE_IDS = [
+  SCAFFOLD.SHOWCASE,
   SCAFFOLD.RUNTIME,
   SCAFFOLD.RUNTIME_SQLITE,
   QUICKSTART.WALK,
@@ -33,6 +35,7 @@ export const EXPENSIVE_RUNTIME_SUITE_IDS = [
 
 /** Stable titles for built-in suites. */
 export const SCAFFOLD_TITLE = {
+  SHOWCASE: 'Documented Northwind showcase walkthrough',
   SERVICE: 'Service scaffold capability smoke',
   CONTRACTS: 'Contracts scaffold capability smoke',
   INFRASTRUCTURE: 'Infrastructure scaffold capability smoke',
@@ -69,6 +72,12 @@ export const AGENT_ASPIRE_MCP_SMOKE = 'agent.aspire-mcp-smoke';
 
 /** Static gate ids used by the scaffold plugin suite. */
 export const GATE = {
+  SHOWCASE_INIT: 'showcase.init',
+  SHOWCASE_SETUP: 'showcase.setup',
+  SHOWCASE_CHECK: 'showcase.check',
+  SHOWCASE_BUILD: 'showcase.build',
+  SHOWCASE_START: 'showcase.start',
+  SHOWCASE_WALKTHROUGH: 'showcase.walkthrough',
   PREFLIGHT_DENO: 'preflight.deno',
   PREFLIGHT_ASPIRE: 'preflight.aspire',
   SCAFFOLD_INIT: 'scaffold.init',

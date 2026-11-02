@@ -1,0 +1,8 @@
+.northwind-table-scroll { overflow-x: auto; }
+.northwind-table { width: 100%; border-collapse: collapse; text-align: left; }
+.northwind-table th { padding: .75rem 1rem; font-size: .6875rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--ns-muted-fg); border-bottom: 1px solid var(--ns-border); }
+.northwind-table td { padding: 1rem; border-bottom: 1px solid var(--ns-border); vertical-align: middle; font-size: .875rem; }
+.northwind-table td:last-child, .northwind-table th:last-child { text-align: right; white-space: nowrap; }
+.northwind-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1rem; align-items: center; }
+.northwind-actions form { margin: 0; }
+@media (max-width: 640px) { .northwind-table th, .northwind-table td { padding: .75rem; } .northwind-table .workspace-owner { min-width: 13rem; } }

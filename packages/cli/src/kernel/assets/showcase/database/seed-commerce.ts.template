@@ -1,0 +1,51 @@
+import { db } from '../mod.ts';
+
+const CUSTOMERS = [
+  { name: 'Maya Rossi', email: 'maya.rossi@alpenhaus.ch', company: 'Alpenhaus', country: 'Switzerland', address: 'Bahnhofstrasse 21, 8001 Zürich' },
+  { name: 'Jonas Weber', email: 'jonas@weber-co.de', company: 'Weber & Co.', country: 'Germany', address: 'Friedrichstraße 48, 10117 Berlin' },
+  { name: 'Aiko Tanaka', email: 'aiko.tanaka@kumo.jp', company: 'Kumo', country: 'Japan', address: '2-4-1 Nihonbashi, Chuo-ku, Tokyo' },
+  { name: 'Lucas Martin', email: 'l.martin@atelier-nord.fr', company: 'Atelier Nord', country: 'France', address: '18 Rue du Faubourg Saint-Antoine, 75011 Paris' },
+  { name: 'Priya Shah', email: 'priya@shahdesign.co.uk', company: 'Shah Design', country: 'United Kingdom', address: '24 Clerkenwell Road, London EC1M 5PQ' },
+] as const;
+const PRODUCTS = [
+  { sku: 'NW-CHAIR-01', name: 'Form oak chair', category: 'Furniture', price: 24900, stock: 48 },
+  { sku: 'NW-LAMP-02', name: 'Arc desk lamp', category: 'Lighting', price: 8950, stock: 76 },
+  { sku: 'NW-THROW-03', name: 'Merino wool throw', category: 'Textiles', price: 12900, stock: 32 },
+  { sku: 'NW-MUG-04', name: 'Stoneware mug set', category: 'Tableware', price: 4500, stock: 124 },
+  { sku: 'NW-SHELF-05', name: 'Studio wall shelf', category: 'Furniture', price: 17900, stock: 21 },
+  { sku: 'NW-VASE-06', name: 'Ridge ceramic vase', category: 'Objects', price: 6500, stock: 59 },
+  { sku: 'NW-RUG-07', name: 'Woven runner', category: 'Textiles', price: 15900, stock: 18 },
+  { sku: 'NW-PENDANT-08', name: 'Halo pendant light', category: 'Lighting', price: 22900, stock: 26 },
+] as const;
+
+/** Enrich the existing forty dated sample orders with genuine commerce relations. */
+export async function seedCommerce() {
+  const client = await db.getClient();
+  try {
+    const customers = await Promise.all(CUSTOMERS.map((data) => client.customer.upsert({ where: { email: data.email }, create: data, update: {} })));
+    const products = await Promise.all(PRODUCTS.map((data) => client.product.upsert({ where: { sku: data.sku }, create: data, update: {} })));
+    const references = Array.from({ length: 40 }, (_, index) => `SO-${10482 - index}`);
+    const orders = await client.order.findMany({ where: { reference: { in: references } }, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] });
+    for (const [index, order] of orders.entries()) {
+      // Existing relationships are the idempotence boundary: preserve user edits on reseed.
+      if (order.customerId !== null) continue;
+      const customer = customers[index % customers.length]!;
+      const lines = [0, 1].map((offset) => {
+        const product = products[(index + offset * 3) % products.length]!;
+        return { productId: product.id, quantity: offset === 0 ? 1 + index % 4 : 1, unitPrice: product.price };
+      });
+      const total = lines.reduce((sum, line) => sum + line.quantity * line.unitPrice, 0);
+      await client.order.update({ where: { id: order.id }, data: {
+        reference: order.reference.replace('REC-', 'SO-'), name: `${customer.company} · Online store`,
+        ownerName: customer.name, ownerEmail: customer.email, customerId: customer.id,
+        amount: order.status === 'refunded' ? -total : order.status === 'cancelled' ? 0 : total,
+        lines: { create: lines },
+        // Keep the original sample time window for the shared dashboard projections.
+        updatedAt: order.updatedAt,
+      } });
+    }
+    console.log('Northwind ready: 40 orders, 5 customers, 8 products and 80 line items.');
+  } finally { await db.disconnect(); }
+}
+
+if (import.meta.main) await seedCommerce();

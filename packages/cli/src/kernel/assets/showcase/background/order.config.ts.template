@@ -1,0 +1,6 @@
+import { defineSagaConfig } from '@netscript/plugin-sagas-core/config';
+
+/** Register the durable Northwind order workflow through the ordinary saga registry. */
+export const orderSagaConfig = defineSagaConfig('order-fulfilment', 'sagas/order-fulfilment/order-saga.ts')
+  .name('Order fulfilment').description('Order → demonstration payment → shipping.').tags('northwind', 'orders').build();
+export default orderSagaConfig;

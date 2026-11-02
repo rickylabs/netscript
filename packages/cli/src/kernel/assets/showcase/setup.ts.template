@@ -1,0 +1,63 @@
+/** Run the complete Northwind recipe; every command is also documented in README.md. */
+const root = new URL('../', import.meta.url);
+const run = async (...args: string[]) => {
+  console.log(`\nNorthwind › netscript ${args.join(' ')}`);
+  const result = await new Deno.Command(Deno.execPath(), {
+    cwd: root, args: ['task', 'showcase:cli', ...args], stdin: 'null',
+  }).spawn().status;
+  if (!result.success) throw new Error(`Showcase setup failed (${result.code}): ${args.join(' ')}`);
+};
+
+for (const [kind, refs] of [
+  ['streams', ''], ['workers', 'streams,sagas-api'], ['sagas', 'streams'], ['triggers', 'workers-api,streams'],
+] as const) {
+  let installed = false;
+  for (const directory of [`plugins/${kind}`, kind]) {
+    try { installed ||= (await Deno.stat(new URL(`${directory}/scaffold.plugin.json`, root))).isFile; }
+    catch (error) { if (!(error instanceof Deno.errors.NotFound)) throw error; }
+  }
+  if (installed) continue;
+  const args = ['plugin', 'install', kind, '--name', kind, '--app', '{{appName}}', '--no-samples', '--no-db'];
+  if (refs) args.push('--plugin-refs', refs);
+  if (kind === 'workers' || kind === 'sagas') args.push('--service-refs', 'orders');
+  if (kind === 'sagas') args.push('--saga-store-backend', 'kv');
+  await run(...args);
+}
+
+// These are app-owned resources, installed through the ordinary manifest/registry pipeline.
+for (const [source, destination] of [
+  ['fulfil-order.ts', 'workers/jobs/fulfil-order.ts'],
+  ['order-saga.ts', 'sagas/order-fulfilment/order-saga.ts'],
+  ['order.config.ts', 'sagas/order-fulfilment/order.config.ts'],
+  ['order-webhook.ts', 'triggers/order-webhook.ts'],
+] as const) {
+  const target = new URL(destination, root);
+  await Deno.mkdir(new URL('./', target), { recursive: true });
+  try {
+    await Deno.writeTextFile(target, await Deno.readTextFile(new URL(`resources/${source}`, import.meta.url)), { createNew: true });
+  } catch (error) { if (!(error instanceof Deno.errors.AlreadyExists)) throw error; }
+}
+
+// Persist the public record-feed consumer so subsequent plugin installs retain this edge.
+for (const path of ['plugins/streams/scaffold.plugin.json', 'streams/scaffold.plugin.json']) {
+  const file = new URL(path, root);
+  let text: string;
+  try { text = await Deno.readTextFile(file); }
+  catch (error) { if (error instanceof Deno.errors.NotFound) continue; throw error; }
+  const manifest = JSON.parse(text);
+  manifest.linking ??= {};
+  manifest.linking.consumers ??= {};
+  manifest.linking.consumers.services = [...new Set([...(manifest.linking.consumers.services ?? []), 'orders'])];
+  await Deno.writeTextFile(file, JSON.stringify(manifest, null, 2) + '\n');
+}
+const settingsFile = new URL('appsettings.json', root);
+const settings = JSON.parse(await Deno.readTextFile(settingsFile));
+settings.NetScript.Services.orders.PluginReferences = [...new Set([...(settings.NetScript.Services.orders.PluginReferences ?? []), 'streams'])];
+await Deno.writeTextFile(settingsFile, JSON.stringify(settings, null, 2) + '\n');
+await run('generate', 'plugins');
+await run('generate', 'aspire');
+// Database lifecycle uses the same supported CLI and needs no hand-written connection strings.
+await run('db', 'init', '--name', 'northwind');
+await run('db', 'generate');
+await run('db', 'seed');
+console.log('\nNorthwind is ready. Run deno task aspire:start, then open the web app URL shown by Aspire.');
