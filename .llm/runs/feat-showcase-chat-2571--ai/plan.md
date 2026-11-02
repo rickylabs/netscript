@@ -11,3 +11,11 @@ One implementation commit: scoped templates, source/stub tests, harness notes. V
 Risks: unauthenticated chat (mitigation: missing/broken auth denies); shared streams (ownership records plus protected server stream access); Vite provider graph (native loader); concurrent turns (KV lease); poisoned client transcript (accept a single user text only and replay server history); credential exposure (no key or auth session IDs in props/errors/logs).
 
 PLAN-EVAL: N/A for this bounded implementation slice: owner already locks framework APIs, architecture, scope and parent review. Independent IMPL-EVAL and source sign-off remain parent responsibilities. No new accepted doctrine debt.
+
+## S2 automatic private streams (owner-authorized continuation)
+
+Only new `ai/integration/` assets, existing runtime/stream-policy templates, scoped tests and this run may change. Parent owns setup.ts, appsettings integration, manifests and app scaffold. Add a shared setup/read helper generated as `showcase/stream-secret.ts` and a caller-owned native host generated as `showcase/streams-host.ts`. A per-workspace random credential lives only in the current user's `.secrets` directory (700 / file 600); `.netscript/showcase-streams.json` carries a non-secret filename reference. Setup is idempotent and runtime refuses missing/tampered/unsafe files. No secret appears in appsettings, source or output.
+
+Host protects only the exact chat namespace through the existing native auth policy; all other first-party stream namespaces keep their existing public behavior. Native API owns loopback upstream and durable file store; host pins storage to project `.data/streams`. Existing no-key page returns before credential, auth or network initialization. BFF validation remains mandatory; no demo identity or subject header.
+
+Validation adds secret permissions/idempotence/tamper/missing-file checks, actual BFF verification, and native fresh-process host restart with private denial/authenticated IO/public-prefix acceptance. Inspect default kv-oauth and better-auth prerequisites from current implementation; document unsupported validate-only login instead of claiming credentials create a login UI. PLAN-EVAL N/A: bounded extension of the already locked implementation with no new framework API/dependency. Parent retains independent evaluation/signoff.

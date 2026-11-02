@@ -10,3 +10,10 @@
 - Existing pins: @tanstack/ai 0.68.0, @tanstack/ai-mcp 0.8.3, and @netscript/ai providers. ai-mcp/server supplies createMCPServer and the client accepts a direct server, avoiding a loopback HTTP auth hop or custom MCP runtime.
 - Registry UI offers Markdown, PromptInput, ToolCallCard. Use those with app-owned thread chrome. No fake messages or unsupported controls.
 - Host has Deno 2.9.7 but no rtk binary. Use focused shell output and structured validation wrappers; no lock/cache deletion.
+
+## S2 findings
+
+- Native `startStreamsService` accepts the existing ServiceAuthPolicy and hardcodes its store upstream to `127.0.0.1`; `STREAMS_DATA_DIR` uses the existing bounded file-backed store with restart recovery. Protecting only the chat prefix retains the existing public raw-stream behavior elsewhere.
+- Existing generated auth BFF session is GET-only. Passing original chat/MCP POST returned 404; runtime now performs an app-owned GET with the same cookie/signal, verified through the actual generated BFF and typed auth RPC test.
+- Default auth backend is kv-oauth. It requires a configured 32-byte encryption key and real OAuth/OIDC provider endpoints, credentials and app-origin BFF callback. Better-auth selects Prisma persistence but exposes no interactive flow; credentials alone do not make the generated sign-in work. Exact prerequisites are in auth-prerequisites.md.
+- An isolated native test originally resolved open oRPC ranges beyond the repository lock. The consumer fixture now derives exact npm pins from the existing repository lock and uses the native no-node_modules runtime flag. No product pin or dependency changed.

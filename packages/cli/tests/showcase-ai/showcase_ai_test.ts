@@ -7,6 +7,12 @@ Deno.test('rendered showcase AI templates: real framework transport, MCP and stu
   try {
     const scenarios = await Deno.readTextFile(new URL('./scenarios.ts.template', import.meta.url));
     await fixture.write('scenarios_test.ts', scenarios);
+    for (const file of ['secret-fixture.ts', 'integration_test.ts', 'native-host-probe.ts']) {
+      await fixture.write(
+        file,
+        await Deno.readTextFile(new URL(`./${file}.template`, import.meta.url)),
+      );
+    }
     const check = await new Deno.Command(Deno.execPath(), {
       args: [
         'run',
@@ -16,6 +22,8 @@ Deno.test('rendered showcase AI templates: real framework transport, MCP and stu
         fixture.root,
         '--root',
         'ai',
+        '--root',
+        'showcase',
         '--root',
         'apps/portal/routes',
         '--root',
@@ -35,7 +43,14 @@ Deno.test('rendered showcase AI templates: real framework transport, MCP and stu
       new TextDecoder().decode(check.stdout) + new TextDecoder().decode(check.stderr),
     );
     const evidence = Deno.env.get('SHOWCASE_AI_EVIDENCE_DIR');
-    if (evidence) await Deno.writeFile(join(evidence, 'rendered-check.json'), check.stdout);
+    const publicReport = (bytes: Uint8Array) =>
+      new TextDecoder().decode(bytes).replaceAll(fixture.root, '<generated-workspace>').replaceAll(
+        repository,
+        '.',
+      );
+    if (evidence) {
+      await Deno.writeTextFile(join(evidence, 'rendered-check.json'), publicReport(check.stdout));
+    }
     for (const gate of ['lint', 'fmt']) {
       const result = await new Deno.Command(Deno.execPath(), {
         args: [
@@ -46,6 +61,8 @@ Deno.test('rendered showcase AI templates: real framework transport, MCP and stu
           fixture.root,
           '--root',
           'ai',
+          '--root',
+          'showcase',
           '--root',
           'apps/portal/routes',
           '--root',
@@ -59,7 +76,12 @@ Deno.test('rendered showcase AI templates: real framework transport, MCP and stu
         stdout: 'piped',
         stderr: 'piped',
       }).output();
-      if (evidence) await Deno.writeFile(join(evidence, `rendered-${gate}.json`), result.stdout);
+      if (evidence) {
+        await Deno.writeTextFile(
+          join(evidence, `rendered-${gate}.json`),
+          publicReport(result.stdout),
+        );
+      }
       assertEquals(
         result.code,
         0,
@@ -78,6 +100,7 @@ Deno.test('rendered showcase AI templates: real framework transport, MCP and stu
         '--unstable-kv',
         '--no-lock',
         'scenarios_test.ts',
+        'integration_test.ts',
       ],
       cwd: repository,
       stdout: 'piped',
@@ -85,11 +108,13 @@ Deno.test('rendered showcase AI templates: real framework transport, MCP and stu
     });
     const output = await command.output();
     const report = new TextDecoder().decode(output.stdout);
-    if (evidence) await Deno.writeTextFile(join(evidence, 'rendered-tests.json'), report);
+    if (evidence) {
+      await Deno.writeTextFile(join(evidence, 'rendered-tests.json'), publicReport(output.stdout));
+    }
     assertEquals(output.code, 0, report + new TextDecoder().decode(output.stderr));
     const parsed = JSON.parse(report);
     assertEquals(parsed.summary.failed, 0);
-    assertEquals(parsed.summary.passed >= 15, true, report);
+    assertEquals(parsed.summary.passed >= 20, true, report);
   } finally {
     await fixture.close();
   }

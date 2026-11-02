@@ -6,6 +6,7 @@ import { createThreadStore } from './thread-store.ts';
 import { providerConfigured, showcaseProvider } from './provider.ts';
 import type { ChatPageData } from './contracts.ts';
 import { requirePrivateChatStreams } from './stream-policy.ts';
+import { initializeShowcaseStreamSecret } from '../../showcase/stream-secret.ts';
 
 type BrowserAuth = { handleBrowserAuth(request: Request, action: string): Promise<Response> };
 
@@ -20,7 +21,13 @@ async function authenticate(root: string, request: Request): Promise<string | un
   }
   const specifier = pathToFileURL(path).href;
   const auth: BrowserAuth = await import(/* @vite-ignore */ specifier);
-  const response = await auth.handleBrowserAuth(request, 'session');
+  // The existing BFF's session action is GET-only, including when authorizing a chat/MCP POST.
+  const sessionRequest = new Request(request.url, {
+    method: 'GET',
+    headers: request.headers,
+    signal: request.signal,
+  });
+  const response = await auth.handleBrowserAuth(sessionRequest, 'session');
   if (!response.ok) {
     await response.body?.cancel();
     throw new Error('Authentication unavailable');
@@ -32,6 +39,7 @@ async function authenticate(root: string, request: Request): Promise<string | un
     !('subject' in session) || typeof session.subject !== 'string' || !session.subject.trim()
   ) return undefined;
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(session.subject));
+  await initializeShowcaseStreamSecret(root);
   await requirePrivateChatStreams(request.signal);
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
 }

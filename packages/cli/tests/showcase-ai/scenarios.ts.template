@@ -15,6 +15,7 @@ import { NorthwindAssistant } from './apps/portal/routes/ai.tsx';
 import { implement } from '@orpc/server';
 import { RPCHandler } from '@orpc/server/fetch';
 import { OrdersContractV1 } from './contracts/versions/v1/orders.contract.ts';
+import { secretWorkspace } from './secret-fixture.ts';
 
 const order = {
   id: 12,
@@ -422,7 +423,8 @@ Deno.test('public or misconfigured upstream streams fail closed', async () => {
 
 Deno.test('native runtime uses verified BFF subject, fails closed for absent/broken auth and ignores user headers', async () => {
   const s = await sandbox();
-  const root = await Deno.makeTempDir({ prefix: 'showcase-native-auth-' });
+  const workspace = await secretWorkspace();
+  const root = workspace.root;
   const oldKey = Deno.env.get('ANTHROPIC_API_KEY');
   try {
     Deno.env.set('ANTHROPIC_API_KEY', 'stub-never-sent');
@@ -450,7 +452,7 @@ Deno.test('native runtime uses verified BFF subject, fails closed for absent/bro
     if (oldKey === undefined) Deno.env.delete('ANTHROPIC_API_KEY');
     else Deno.env.set('ANTHROPIC_API_KEY', oldKey);
     await s.close();
-    await Deno.remove(root, { recursive: true });
+    await workspace.close();
   }
 });
 

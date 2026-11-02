@@ -12,6 +12,8 @@ export const destinations: Readonly<Record<string, string>> = {
   'app/threads-route.ts.template': 'apps/portal/routes/api/showcase/chat.ts',
   'app/session-route.ts.template': 'apps/portal/routes/api/showcase/chat/[sessionId].ts',
   'app/mcp-route.ts.template': 'apps/portal/routes/api/showcase/mcp.ts',
+  'integration/stream-secret.ts.template': 'showcase/stream-secret.ts',
+  'integration/streams-host.ts.template': 'showcase/streams-host.ts',
 };
 
 /** Materialize real framework consumers without changing root imports or the root lock. */
@@ -23,7 +25,7 @@ export async function createFixture(): Promise<
     await Deno.mkdir(dirname(join(root, path)), { recursive: true });
     await Deno.writeTextFile(join(root, path), source);
   }
-  for (const folder of ['server', 'app']) {
+  for (const folder of ['server', 'app', 'integration']) {
     for await (const file of Deno.readDir(join(assets, folder))) {
       const input = `${folder}/${file.name}`;
       const target = destinations[input] ?? `ai/showcase/${file.name.replace(/\.template$/, '')}`;
@@ -32,6 +34,13 @@ export async function createFixture(): Promise<
       await write(target, source);
     }
   }
+  await write(
+    'fixtures/auth-bff.ts',
+    (await Deno.readTextFile(
+      join(repository, 'packages/cli/src/kernel/assets/auth/bff.ts.template'),
+    ))
+      .replaceAll('{{authServiceName}}', "'auth-api'"),
+  );
   const rootConfig = JSON.parse(await Deno.readTextFile(join(repository, 'deno.json')));
   const imports: Record<string, string> = { ...rootConfig.imports };
   for (const [name, version] of Object.entries(rootConfig.catalog)) {
@@ -71,6 +80,16 @@ export async function createFixture(): Promise<
       imports[`jsr:${name.replace(pkg.name, `${pkg.name}@0.0.8`)}`] = target;
     }
   }
+  const streamsRoot = join(repository, 'plugins/streams');
+  const streamsConfig = JSON.parse(await Deno.readTextFile(join(streamsRoot, 'deno.json')));
+  for (const [name, target] of Object.entries<string>(streamsConfig.imports)) {
+    if (!(name in imports) && /^(npm:|jsr:)/.test(target)) imports[name] = target;
+  }
+  imports['@netscript/plugin-streams/service'] =
+    toFileUrl(join(streamsRoot, 'services/mod.ts')).href;
+  imports['@durable-streams/server'] = `npm:@durable-streams/server@${
+    rootConfig.catalog['@durable-streams/server']
+  }`;
   const registryRoot = join(repository, 'packages/fresh-ui/registry');
   const registry = JSON.parse(
     await Deno.readTextFile(join(repository, 'packages/fresh-ui/registry.json')),
@@ -79,6 +98,16 @@ export async function createFixture(): Promise<
     for (const dependency of item.dependencies ?? []) {
       const parsed = /^npm:(@[^/]+\/[^@]+|[^@]+)@(.+)$/.exec(dependency);
       if (parsed) imports[parsed[1]] = dependency;
+    }
+  }
+  // Consumer probes reuse the repository's resolved pins rather than resolving open ranges anew.
+  const pins = JSON.parse(await Deno.readTextFile(join(repository, 'deno.lock'))).specifiers;
+  for (const [name, specifier] of Object.entries(imports)) {
+    const parsed = /^(npm:(?:@[^/]+\/)?[^@/]+)@([^/]+)(\/.*)?$/.exec(specifier);
+    if (!parsed) continue;
+    const pin = pins[`${parsed[1]}@${parsed[2]}`];
+    if (typeof pin === 'string') {
+      imports[name] = `${parsed[1]}@${pin.split('_')[0]}${parsed[3] ?? ''}`;
     }
   }
   const copied = new Set<string>();

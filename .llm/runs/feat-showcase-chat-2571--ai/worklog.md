@@ -38,3 +38,24 @@ Final repro: `SHOWCASE_AI_EVIDENCE_DIR=.llm/runs/feat-showcase-chat-2571--ai den
 ## Reconcile and handoff
 
 Reviewed the scoped files and final reports; the typed RPC probe required the routing correction recorded in drift.md. Private upstream policy is a required parent setup cell, with fail-closed runtime enforcement here. Parent receives concrete destinations, commands, imports, secrets/configuration and remaining acceptance gates in integration.md. No GitHub reconciliation was performed because the owner explicitly forbids contact/PR work for this slice. This is implementation handoff, not independent review or merge sign-off.
+
+## S2 Design: automatic private streams
+
+Two new integration templates: shared secret provisioning/initialization and native streams host. These are generated application composition, not framework APIs. Runtime loads the shared credential before its existing privacy probe; no-key short-circuit stays first. Security vocabulary: canonical workspace identity, non-secret secret-file reference, mode-checked regular credential file, private chat prefix, native persistent stream store. Existing native startStreamsService/static credential authenticator own the listener, guard and shutdown; no replacement proxy/store. Tests isolate provider/auth boundaries and prove actual native HTTP/restart behavior. One scoped implementation commit; parent setup calls the helper and selects the host Entrypoint. Default kv-oauth supports interactive login after external credentials; better-auth is validate-only and must not be advertised as equivalent turnkey sign-in.
+
+## S2 results
+
+Added only the two integration templates; modified the existing native runtime, scoped tests and run notes. The original privacy probe is retained unchanged. Setup generates 256 random credential bits in the current user's private .secrets directory, refuses unsafe links/ownership/modes, never returns/prints a value, and retains an existing valid credential across repeated setup. Only a checked basename/version lives under .netscript. The native host protects every method below the exact chat namespace, preserves public sibling/first-party prefixes, uses native loopback upstream and pins the existing file store to project .data/streams.
+
+The actual generated BFF test proves cookie-to-bearer verification on MCP/chat POST and rejects forged browser subjects. It caught and repaired the previous GET-only BFF method mismatch. No-key rendering is tested with a nonexistent workspace path: it returns connect-provider before even initializing secrets/auth. Better-auth's validate-only limitation and exact kv-oauth credentials/callback/cookie prerequisites are documented, without inventing an identity or claiming unrun external-provider acceptance.
+
+| S2 gate | Result | Evidence |
+| --- | --- | --- |
+| Emitted source check | PASS, 16 selected files | rendered-check.json |
+| Emitted lint/fmt | PASS, 17 selected/processed files, no refusals | rendered-lint.json, rendered-fmt.json |
+| Behavioral suite | PASS, 20/20, zero ignores | rendered-tests.json |
+| Native streams | PASS, two fresh processes: anonymous GET/HEAD/PUT/POST/DELETE denied; wrong credential denied; matching credential creates/appends/replays; order/workers/sagas/triggers/auth and segment-sibling streams stay public; raw and actual framework chat transcripts survive restart; loopback binding observed; no credential in stdout/stderr | Native probe within behavioral suite |
+| Source test/helper check/lint/fmt | PASS | source-check.json, source-lint.json, source-fmt.json |
+| Repository quality:gate | PASS, raw exit 0, existing warnings and 7 allowances | quality-s2.log (ordinary command log, not a gate receipt) |
+
+Consumer fixtures reuse exact existing lock resolutions rather than opportunistically resolving npm ranges. Root lock/config/dependencies are unchanged. Temporary listeners, KV handles, native hosts, workspaces and only their test-owned private secret files are cleaned up. Shared/foreign secret files are never enumerated or removed. Public notes use repo-relative paths, generated-workspace placeholders and no session IDs. Parent retains setup.ts, manifests, appsettings integration and source signoff; no PR/push/contact.

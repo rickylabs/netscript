@@ -12,6 +12,8 @@ This slice contains canonical assets only. Register/render them in the parent's 
 | `app/session-route.ts.template` | `apps/{{appName}}/routes/api/showcase/chat/[sessionId].ts` |
 | `app/mcp-route.ts.template` | `apps/{{appName}}/routes/api/showcase/mcp.ts` |
 | `app/showcase-ai.css.template` | `apps/{{appName}}/assets/showcase-ai.css` |
+| `integration/stream-secret.ts.template` | `showcase/stream-secret.ts` |
+| `integration/streams-host.ts.template` | `showcase/streams-host.ts` |
 
 Link `/ai` in showcase navigation/route registration. Preserve `/sign-in` and the existing auth routes. Import the CSS from the app's normal stylesheet entry after foundation styles.
 
@@ -31,20 +33,37 @@ Native `ai/showcase` imports must resolve through the installed workspace maps: 
 
 Auth must be fully configured through the existing plugin and `auth/bff.ts`: cookie verification goes through `handleBrowserAuth(request, 'session')` on every page/API read, send and MCP call. Missing auth gives sign-in/401; broken auth gives unavailable/503. Neither a subject header nor a shared identity is accepted. Existing secure browser cookie rules require localhost or HTTPS for sign-in. Keep the verified auth BFF and its service discovery/configuration from normal setup.
 
-**Private streams are mandatory before connected chat is enabled.** The default legacy streams host is public. In the caller-owned streams host use the existing `startStreamsService` from `@netscript/plugin-streams/service` with `auth.authn.authenticator = createStaticCredentialAuthenticator(...)` from `@netscript/service/auth`. Protect this exact prefix for every method:
+**Automatic private streams (S2):** render the two new integration files at exactly the destinations above. In the parent's generated `showcase/setup.ts`, import `provisionShowcaseStreams` from `./stream-secret.ts` and call `await provisionShowcaseStreams(root)` before starting services. It is idempotent, returns no credential, and prints nothing. No user source edits or manually shared stream secret are needed.
+
+After normal plugin installation, the parent's setup should patch only these fields on the existing streams entry, retaining its identity, ports, references and permissions:
+
+```json
+{ "NetScript": { "Plugins": { "streams": {
+  "Workdir": ".",
+  "Entrypoint": "showcase/streams-host.ts"
+} } } }
+```
+
+Retain `--allow-net`, `--allow-env`, `--allow-read`, `--allow-write`, `--allow-sys`, `--allow-ffi` on that native host; the app needs read access to its user's `.secrets` as well as its existing KV permissions. Regenerate Aspire through the parent's normal setup recipe after this override (`netscript generate aspire`). Existing pinned imports must resolve `@netscript/plugin-streams/service` and `@netscript/service/auth`; no new package/version is required. No credential-valued appsettings/environment entry or DataDirectories override is needed: the host initializes server-only `STREAMS_SECRET` and pins `STREAMS_DATA_DIR` to project `.data/streams` itself.
+
+The helper creates a cryptographically random per-canonical-workspace credential in `~/.secrets/netscript-showcase-<workspace-hash>.secret` (directory 700, regular single-link file 600). The generated `.netscript/showcase-streams.json` stores only its basename/version. Runtime checks ownership, permissions, file type, size and metadata identity; missing/unsafe/copied metadata fails closed. Setup and the app/streams processes must run as the same POSIX OS user at the same canonical workspace path. Moving a workspace requires rerunning setup; no credential is put in the repo. POSIX permissions are enforced; Windows is refused rather than silently claiming mode-600 protection.
+
+The new caller-owned host protects this exact prefix for every method through the existing service auth policy:
 
 ```text
 /v1/stream/netscript/showcase/{{projectName}}/{{appName}}/ai/chat
 ```
 
-Supply a server-only credential in that authenticator's `credentials` map and pass the same value to the app as `STREAMS_SECRET` (or `DURABLE_STREAMS_SECRET`). Set `DURABLE_STREAMS_URL` or existing streams discovery variables in the app. Do not add an anonymous rule overlapping this prefix; other activity prefixes can retain their existing policy. The app performs an anonymous GET under this prefix and fails closed unless it returns 401/403. Verify authenticated stream creation/read/write and anonymous denial against the deployed host, rather than just setting an environment variable. Keep the native upstream streams port private as well.
+All other prefixes, including public order activity and normal workers/sagas/triggers/auth streams, retain their current public behavior. The native API binds the underlying store listener to loopback; the caller exposes only its guarded front listener. Retain normal streams discovery (`DURABLE_STREAMS_URL` or existing resource references) in the app. The native chat runtime reads the same provisioned credential before the unchanged anonymous-read privacy probe. No-key page rendering returns before secret/auth/service/model initialization. The BFF session action is invoked with an app-owned GET even when authorizing chat/MCP POST, matching its actual GET-only contract.
 
-For restart durability, persist the app workspace's `.netscript/showcase-chat.kv` and configure the existing streams `STREAMS_DATA_DIR` to a persistent directory. Give the app Deno read/write/env/net permissions and unstable KV support. The store contains ownership/thread metadata and expiring turn leases; Durable Streams is the sole transcript. This baseline uses one host with persistent local KV; multiple app hosts require a shared ownership-store deployment.
+For restart durability, persist `.netscript/showcase-chat.kv`, `.data/streams`, `.netscript/showcase-streams.json` and the user's private credential file. Give the app Deno read/write/env/net permissions and unstable KV support. The store contains ownership/thread metadata and expiring turn leases; Durable Streams is the sole transcript. This baseline uses one host with persistent local KV; multiple app hosts require a shared ownership-store deployment.
 
 `ai/models.ts` must export `DEFAULT_CHAT_MODEL`. With the installed default `anthropic:*`, set `ANTHROPIC_API_KEY` (existing `ANTHROPIC_AUTH_TOKEN` / `ANTHROPIC_OAUTH_TOKEN` also work). Or select `openai-compatible:<model>` and set `OPENAI_API_KEY`, optionally `OPENAI_BASE_URL`. Restart the app after configuration changes. With no supported credential the page renders connect-provider and never invokes a model; no stub provider ships in product templates.
 
 The orders contract import is the existing `contracts/versions/v1/orders.contract.ts` / `OrdersContractV1`. **Routing correction:** the SDK already adds `apiVersion: 'v1'`, so `routerName: 'orders'` reaches the generated `v1.orders` router at `/api/rpc/v1/orders`. The brief's literal `routerName: 'v1.orders'` produces `/api/rpc/v1/v1.orders` and fails. A real RPCHandler consumer test proves the selected binding. Preserve it unless host and client change together. No customer/product/line mutation procedures are required: tools expose only bounded `list` and numeric `getById` against the live orders service, using normal `services__orders__http__0` discovery.
 
-Validation: run `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/tests/showcase-ai/showcase_ai_test.ts`. It renders real templates, checks/lints/formats emitted source with structured wrappers, renders all page states, and runs 15 scenarios with real framework chat persistence/replay, upstream MCP server/client, a real typed RPC service and scripted provider. No model key is used. Optional `SHOWCASE_AI_EVIDENCE_DIR=<directory>` saves nested structured reports.
+Default **kv-oauth** needs real OAuth/OIDC credentials, a stable 32-byte base64url KV encryption key, working KV, and the generated BFF callback registered with the provider. The generated sign-in surface remains mandatory. See [auth prerequisites](auth-prerequisites.md) for exact environment/configuration and the **better-auth limitation**: that backend validates existing sessions and does not implement the generated interactive sign-in flow. Credentials alone cannot make better-auth turnkey; use kv-oauth for this no-code-wiring showcase path.
+
+Validation: run `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/tests/showcase-ai/showcase_ai_test.ts`. It renders real templates, checks/lints/formats emitted source with structured wrappers, renders all page states, and runs 20 scenarios, including actual generated BFF cookie-to-bearer verification and two fresh native streams processes proving private denial, authenticated read/write, public prefixes, loopback upstream and durable transcript replay after restart. No model key is used. Optional `SHOWCASE_AI_EVIDENCE_DIR=<directory>` saves nested structured reports with repo-relative paths.
 
 Parent still owns asset/carrier registration, final source review/IMPL-EVAL, provider-boundary production build, browser/light/dark/mobile verification, real configured auth/provider/streams acceptance, and the canonical one-pass `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` merge gate. This slice makes no claim that those integration gates ran.
