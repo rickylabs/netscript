@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { type StreamChunk, StreamProcessor } from '@tanstack/ai/client';
 import { durableStreamConnection } from '@durable-streams/tanstack-ai-transport';
+import { stream } from '@durable-streams/client';
 import {
   createNetScriptChatConnection,
   type NetScriptChatConnection,
@@ -65,19 +66,24 @@ function Conversation({ thread, onSent }: { thread: ChatThread; onSent: () => vo
     const processor = new StreamProcessor();
     const chat = createNetScriptChatConnection({
       target: { sessionId: thread.id, baseUrl: location.origin },
-      // Function form is the complete BFF URL, not the upstream stream namespace.
+      // Native replay runs through the authenticated BFF using the existing durable transport.
       streamPath: ({ sessionId }) => `${CHAT_API}/${encodeURIComponent(sessionId)}`,
-      // The framework URL builder addresses the streams service under /v1/stream.
-      // The browser instead connects to the authenticated app BFF using the same upstream transport.
-      createConnection: ({ initialOffset }) => {
-        const transport = durableStreamConnection({
-          readUrl: `${location.origin}${CHAT_API}/${thread.id}`,
-          sendUrl: `${location.origin}${CHAT_API}/${thread.id}`,
-          initialOffset,
-          emitSnapshotOnSubscribe: false,
-        });
+      createConnection: () => {
+        const url = `${location.origin}${CHAT_API}/${thread.id}`;
+        const options = { readUrl: url, sendUrl: url, emitSnapshotOnSubscribe: false };
+        const transport = durableStreamConnection(options);
         return {
-          subscribe: transport.subscribe,
+          async *subscribe(signal) {
+            // Authenticate a finite catch-up even when the stream has no chunks. Feed native
+            // appends through the framework's replay, then resume without a gap at its offset.
+            const snapshot = await stream({ url, json: true, live: false, signal });
+            for (const chunk of await snapshot.json()) yield chunk;
+            if (signal?.aborted) return;
+            const offset = snapshot.offset;
+            if (!offset) throw new Error('Conversation catch-up did not provide a replay offset');
+            setHydrating(false);
+            yield* durableStreamConnection({ ...options, initialOffset: offset }).subscribe(signal);
+          },
           send: (messages, data, signal) => transport.send([...messages], data, signal),
         };
       },
@@ -94,7 +100,6 @@ function Conversation({ thread, onSent }: { thread: ChatThread; onSent: () => vo
           const chunk = value as StreamChunk;
           processor.processChunk(chunk);
           setParts(projectChatSnapshot(processor.getMessages()).renderParts);
-          setHydrating(false);
           if (chunk.type === 'RUN_STARTED') setBusy(true);
           if (chunk.type === 'RUN_FINISHED' || chunk.type === 'RUN_ERROR') setBusy(false);
           if (chunk.type === 'RUN_ERROR') {
@@ -105,12 +110,12 @@ function Conversation({ thread, onSent }: { thread: ChatThread; onSent: () => vo
         }
       } catch {
         if (!abort.signal.aborted) {
+          setHydrating(true);
+          setBusy(false);
           setError(
             'Conversation disconnected. Reload to reconnect, or sign in again if your session expired.',
           );
         }
-      } finally {
-        if (!abort.signal.aborted) setHydrating(false);
       }
     })();
     return () => {

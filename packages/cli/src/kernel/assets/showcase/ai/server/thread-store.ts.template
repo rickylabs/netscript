@@ -26,16 +26,17 @@ export function createThreadStore(kv: Deno.Kv) {
       return record.value?.owner === owner;
     },
     async list(owner: string): Promise<readonly ChatThread[]> {
+      // Small single-host showcase: scan O(n) owner metadata so random UUID order cannot hide
+      // conversations. A larger deployment should add a chronological index and pagination.
       const threads: ChatThread[] = [];
       for await (
-        const entry of kv.list<ChatThread>({ prefix: [...scope, 'owner', owner] }, {
-          limit: 50,
-          reverse: true,
-        })
+        const entry of kv.list<ChatThread>({ prefix: [...scope, 'owner', owner] })
       ) {
         threads.push(entry.value);
       }
-      return threads.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      return threads.sort((a, b) =>
+        b.createdAt.localeCompare(a.createdAt) || a.id.localeCompare(b.id)
+      );
     },
     async title(owner: string, id: string, text: string): Promise<void> {
       const entry = await kv.get<{ owner: string; thread: ChatThread }>(threadKey(id));

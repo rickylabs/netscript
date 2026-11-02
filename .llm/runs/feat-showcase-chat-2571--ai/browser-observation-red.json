@@ -1,0 +1,9 @@
+{
+  "passed": false,
+  "steps": [],
+  "errors": [],
+  "snapshotThenExactOffsetResume": false,
+  "failure": "page.waitForFunction: Timeout 5000ms exceeded.",
+  "composerDisabled": true,
+  "openingSavedConversation": true
+}

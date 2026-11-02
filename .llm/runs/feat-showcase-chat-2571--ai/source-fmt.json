@@ -1,1 +1,1 @@
-{"command":"deno fmt","cwd":".","mode":"write","summary":{"filesSelected":2,"batches":1,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":2,"filesProcessed":2,"droppedFiles":[],"refusals":[]},"findings":[]}
+{"command":"deno fmt --check","cwd":".","mode":"check","summary":{"filesSelected":4,"batches":1,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":4,"filesProcessed":4,"droppedFiles":[],"refusals":[]},"findings":[]}

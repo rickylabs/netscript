@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "steps": [
+    "new empty thread accepts first prompt",
+    "turn finished",
+    "first prompt and live tool result rendered",
+    "second unused thread caught up",
+    "previous thread reopened",
+    "unused thread reopened and accepts first prompt",
+    "turn finished",
+    "nonempty transcript reloaded",
+    "native messages, Markdown and tool output survive reload",
+    "origin and authentication failures remain closed"
+  ],
+  "errors": [],
+  "snapshotThenExactOffsetResume": true
+}

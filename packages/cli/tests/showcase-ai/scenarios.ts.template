@@ -17,6 +17,46 @@ import { RPCHandler } from '@orpc/server/fetch';
 import { OrdersContractV1 } from './contracts/versions/v1/orders.contract.ts';
 import { secretWorkspace } from './secret-fixture.ts';
 
+Deno.test('chronological thread access retains more than 50 random-order IDs with a stable tie break', async () => {
+  const kv = await Deno.openKv(':memory:');
+  try {
+    const threads = Array.from({ length: 62 }, (_, index) => ({
+      id: `${(99 - index).toString(16).padStart(8, '0')}-0000-4000-8000-000000000000`,
+      title: `Conversation ${index}`,
+      createdAt: new Date(Date.UTC(2026, 0, 1) + index * 1000).toISOString(),
+    }));
+    threads.push(...['00000001', '00000002'].map((prefix) => ({
+      id: `${prefix}-0000-4000-8000-000000000000`,
+      title: 'Latest timestamp tie',
+      createdAt: '2026-02-01T00:00:00.000Z',
+    })));
+    const scope = ['showcase', 'northwind', 'portal', 'chat'];
+    for (const thread of threads) {
+      await kv.set([...scope, 'owner', 'alice', thread.id], thread);
+      await kv.set([...scope, 'thread', thread.id], { owner: 'alice', thread });
+    }
+    await kv.set([...scope, 'owner', 'bob', 'foreign'], {
+      id: 'foreign',
+      title: 'Another owner',
+      createdAt: '2027-01-01T00:00:00.000Z',
+    });
+    const store = createThreadStore(kv);
+    // Both newest IDs sort below all older IDs; tied timestamps use ascending ID order.
+    const expected = [threads[62], threads[63], ...threads.slice(0, 62).reverse()];
+    const actual = await store.list('alice');
+    assertEquals(actual.length, 64, 'No conversation may disappear because of UUID scan order');
+    assertEquals(actual.map((thread) => thread.id), expected.map((thread) => thread.id));
+    assertEquals(
+      (await store.list('alice')).map((thread) => thread.id),
+      actual.map((thread) => thread.id),
+    );
+    assertEquals((await store.list('bob')).map((thread) => thread.id), ['foreign']);
+    assertEquals(await store.list('unknown'), []);
+  } finally {
+    kv.close();
+  }
+});
+
 const order = {
   id: 12,
   reference: 'NW-00012',
