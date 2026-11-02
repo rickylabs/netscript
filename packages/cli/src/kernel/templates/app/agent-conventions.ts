@@ -1,4 +1,5 @@
 import { toPascalCase } from '@std/text';
+import { DESIGN_GUIDANCE } from '../../assets/design-guidance.generated.ts';
 
 /** Inputs that determine which scaffolded web-layer examples exist. */
 export interface AppConventionsInput {
@@ -78,8 +79,8 @@ const LOOK_AND_FEEL_REFERENCES: readonly ConventionReference[] = [
 ];
 
 /** Docs slugs agents fetch with MCP `get_doc` for the theme chain and the page chrome. */
-const THEME_GUIDE_SLUG = 'web-layer/how-to/theme-your-app';
-const CUSTOMIZE_GUIDE_SLUG = 'web-layer/how-to/customize-fresh-ui';
+const THEME_GUIDE_SLUG = DESIGN_GUIDANCE.themeGuideSlug;
+const CUSTOMIZE_GUIDE_SLUG = DESIGN_GUIDANCE.customizeGuideSlug;
 
 const RESOURCE_GENERATION_GUIDANCE =
   'Before manually constructing this path, run `netscript generate resource <resource> --procedure <query> --client <service> --partial --app <app>`.';

@@ -1,0 +1,7 @@
+# Resume#2565
+
+Fresh branch fix/design-guidance-followups from main125c26f. All3issuecells are owned by this run; issue claim6558817474. Separate#2569worker exists;#2559covers#2556. Main goal: generated/checked guidance counts, headings and routes; install-time release-pinned source links; corrected old S9 test locators. Read research.md/plan.md/worklog.md for locked contract and gates. Selected PLAN-EVAL is pending, no source changes. Open draft PR after this bootstrap; no implementation before plan PASS. Independent owner-selected Opus5.5high, separate vendor/session, same evaluator across rounds. Refs#2565/no labels/no session IDs; milestone24; Cockpit merges. Source/public artifacts use repo-relative paths. Private logs live outside the checkout in the project's dated run area. Deno2.9.7; rg/RTK unavailable. Git shim placed this isolated worktree under the previous checkout's worktrees directory. Existing backup stash in the old merged branch is unrelated and already restored; never apply it here.
+
+## Implementation handoff
+
+All three #2565 cells implemented and independently PASS. Read gates.md/candidate-gates.json and evaluate.md. 81 focused tests, 8-file scoped wrappers, all15 root checks, docs/quality/CLI audit/dry-run pass. Runtime remains UNPROVEN locally due Docker. Normal main merge includes #2564; no conflicts. No dependency/lock changes, public options/exports or new architecture debt. Final immutable-head receipts and hosted current-head CI remain the readiness step.

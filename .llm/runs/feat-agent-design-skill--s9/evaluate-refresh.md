@@ -11,17 +11,17 @@ Implementation vendor family: OpenAI. Scope: current source tree versus main
 I re-read the live files and the round-2 diff against `origin/main` 6a1d84a6e. Both round-1 blockers are fixed and I found no new ones.
 
 ### Blocker 1 (the `../fresh-ui-theme-<id>/` links) is fixed
-- **Generator:** each preset row now shows the exact registry target path, `.agents/skills/fresh-ui-theme-<id>/{DESIGN,SKILL}.md`, as code text instead of a sibling link (`.llm/tools/docs/generate-design-skill.ts:80`, `:117`). The surrounding text explains the two layouts:
+- **Generator:** each preset row now shows the exact registry target path, `.agents/skills/fresh-ui-theme-<id>/{DESIGN,SKILL}.md`, as code text instead of a sibling link (`buildDesignSkill` preset-row generation in `.llm/tools/docs/generate-design-skill.ts`). The surrounding text explains the two layouts:
   - in a scaffolded workspace, select `apps/<app>/` first;
   - in a standalone Fresh app, resolve from its root;
-  - never resolve these paths relative to the shared SKILL.md (`:106-109`).
+  - never resolve these paths relative to the shared SKILL.md (`buildDesignSkill` app-relative guidance paragraph).
   
-  The published source links are kept (`:81`).
+  The published source links are kept (`buildDesignSkill` published preset links).
 - **Generated skill and carrier:** `skills/netscript-design/SKILL.md` has the new text and no sibling links, and the change has reached `packages/cli/src/kernel/assets/skills.generated.ts`.
 - **Tests:**
-  - The generator test rejects `](../fresh-ui-theme-` and checks both layout instructions (`.llm/tools/docs/generate-design-skill_test.ts:288-299`).
-  - The three-host init test checks the app-relative paths for all 24 registry presets (`packages/cli/src/public/features/agent/init/init-agent_test.ts:466-473`).
-  - The new integration test runs a real `init --preset studio-utility --app-name dashboard`, with real preset preparation, scaffold writers and installer; only process execution and Aspire are stubbed (`packages/cli/src/public/features/init/init-agent-integration_test.ts:36-47`, `:544-567`). It proves:
+  - The generator test rejects `](../fresh-ui-theme-` and checks both layout instructions (`current preset links follow registry targets without copying per-theme content` in `.llm/tools/docs/generate-design-skill_test.ts`).
+  - The three-host init test checks the app-relative paths for all 24 registry presets (`S9 installs discoverable design guidance and a canonical local reference for every host` in `packages/cli/src/public/features/agent/init/init-agent_test.ts`).
+  - The new integration test runs a real `init --preset studio-utility --app-name dashboard`, with real preset preparation, scaffold writers and installer; only process execution and Aspire are stubbed (`S9 workspace guidance locates registry-owned theme pairs inside the selected app` in `packages/cli/src/public/features/init/init-agent-integration_test.ts`). It proves:
     - the shared skill is at the workspace root;
     - no theme pair exists at the workspace root;
     - `apps/dashboard/.agents/skills/fresh-ui-theme-studio-utility/` matches `docs/design-system/themes/studio/*` byte for byte.
@@ -50,3 +50,9 @@ I re-read the live files and the round-2 diff against `origin/main` 6a1d84a6e. B
 ### Limitations, not blockers
 - **Runtime:** `scaffold.runtime` remains **UNPROVEN** (the Docker daemon is inaccessible). The operator allows that; it is not a runtime pass and not a policy skip, and the merge record should say so.
 - **Before READY:** the final-head freshness checks and quality receipts still need to run after the sign-off commit, as planned.
+
+## Citation maintenance — #2565
+
+Stale line ranges above were replaced with current symbol/test names so subsequent edits do not
+misdirect reviewers. The PASS, source hash, counts and two-output statement above describe the
+historical S9 candidate, not the later #2565 implementation (which adds generated metadata).

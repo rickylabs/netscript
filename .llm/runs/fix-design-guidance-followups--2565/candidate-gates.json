@@ -1,0 +1,184 @@
+{
+  "basis": "Staged candidate, after normal merge of main 1e4e58f; source reviewed before implementation commit. Fresh immutable-head receipts follow sign-off.",
+  "tests": [
+    {
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        ".llm/tools/docs/generate-design-skill_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 12,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 12,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "packages/cli/src/public/features/agent/init/init-agent_test.ts",
+        "packages/cli/src/public/features/init/init-agent-integration_test.ts",
+        "packages/cli/src/kernel/templates/app/agent-conventions_test.ts",
+        "packages/cli/src/kernel/application/ui/page/web-scaffold_test.ts"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 69,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 69,
+        "uniqueFailures": 0
+      }
+    }
+  ],
+  "scoped": [
+    {
+      "gate": "check",
+      "exitCode": 0
+    },
+    {
+      "gate": "lint",
+      "exitCode": 0
+    },
+    {
+      "gate": "fmt",
+      "exitCode": 0
+    }
+  ],
+  "rootChecks": [
+    {
+      "task": "check:desktop-native-fixture",
+      "exitCode": 0,
+      "seconds": 0.15
+    },
+    {
+      "task": "check:emitted-samples",
+      "exitCode": 0,
+      "seconds": 7.08
+    },
+    {
+      "task": "check:streams-types",
+      "exitCode": 0,
+      "seconds": 1.29
+    },
+    {
+      "task": "check:child-health-docs",
+      "exitCode": 0,
+      "seconds": 0.35
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "exitCode": 0,
+      "seconds": 8.78
+    },
+    {
+      "task": "check:assets-barrel",
+      "exitCode": 0,
+      "seconds": 2.52
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0,
+      "seconds": 16.14
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0,
+      "seconds": 0.48
+    },
+    {
+      "task": "check:scaffold-versions",
+      "exitCode": 0,
+      "seconds": 0.11
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "exitCode": 0,
+      "seconds": 0.29
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "exitCode": 0,
+      "seconds": 2.01
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "exitCode": 0,
+      "seconds": 0.45
+    },
+    {
+      "task": "check:figma-names",
+      "exitCode": 0,
+      "seconds": 0.83
+    },
+    {
+      "task": "check:review-threads",
+      "exitCode": 0,
+      "seconds": 0.13,
+      "args": [
+        "--repo",
+        "rickylabs/netscript",
+        "--pr",
+        "2574",
+        "--pretty"
+      ],
+      "note": "Bare invocation requires a PR; explicit current-PR invocation passed"
+    },
+    {
+      "task": "check:design-skill",
+      "exitCode": 0,
+      "seconds": 0.13
+    }
+  ],
+  "otherGates": [
+    {
+      "gate": "quality:gate",
+      "exitCode": 0
+    },
+    {
+      "gate": "docs:links",
+      "exitCode": 0
+    },
+    {
+      "gate": "docs:accuracy",
+      "exitCode": 0
+    },
+    {
+      "gate": "docs:snippets",
+      "exitCode": 0
+    },
+    {
+      "gate": "docs:contract-derivation",
+      "exitCode": 0
+    },
+    {
+      "gate": "release:preflight",
+      "exitCode": 0
+    },
+    {
+      "gate": "CLI JSR audit",
+      "exitCode": 0
+    },
+    {
+      "gate": "CLI publish --dry-run --allow-dirty",
+      "exitCode": 0
+    }
+  ],
+  "runtime": {
+    "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+    "exitCode": 1,
+    "verdict": "UNPROVEN",
+    "reason": "Docker daemon inaccessible; preflight and cleanup blocked",
+    "passed": 1,
+    "failed": 2,
+    "skipped": 0
+  }
+}

@@ -1,0 +1,28 @@
+# Plan and design — READY FOR REVIEW
+
+Deliver all#2565cells in one CLI/tooling leaf, archetype6 with docs scope. No public package export or command-option changes; no dependency updates or accepted architecture debt.
+
+## Locked decisions
+
+1. Add stable theme-guide/gallery xref keys to the existing docs manifest. Resolve the three guidance routes (theme/customize/gallery) from manifest hrefs to MCP/local-doc slugs and exactly one source among `<route>.md`, `<route>/index.md`, `<route>.page.ts`, `<route>/index.page.ts`; zero or multiple matches fail. Tests inject a fixture manifest. Theme/customize link to their tag-pinned Markdown sources; the gallery points primarily to its MCP/local-doc slug and a tag-pinned `docs/design-system/` specifications tree, not the Lume generator. No invented versioned Pages URLs or second manually maintained route-path list.
+2. Derive theme count and numbered guideline references from current canonical source. Use semantic headings and fail closed if required headings disappear or duplicate. Catalogue extraction no longer assumes section6. Remove the redundant count word from the canonical introductory sentence; preserve its exact updated bytes in the bundled reference.
+3. The generator owns a third output, `packages/cli/src/kernel/assets/design-guidance.generated.ts`, plain private data containing manifest-derived doc slugs and the exact `{{NETSCRIPT_RELEASE_REF}}` token. The generator defines the token once and emits its runtime mirror; the installer imports that mirror rather than retyping it. All three outputs are covered by read-only `check:design-skill` before asset regeneration. App conventions and page hints consume the generated slugs. A negative-control boundary test rejects any CLI source import into `docs/site/**`; generation alone reads docs implementation.
+4. Generated design skill links use the exact token above; the generated header explains install-time materialization. Agent init verifies the hash over the ORIGINAL bundle bytes, then prepares all skill content before any writes. Rewrite only `netscript-design/SKILL.md`; reject that file if its token is absent, reject the token in any other bundle file, and reject leftover tokens after substitution. Generator rejects the token in canonical GUIDELINES so the reference stays byte-exact. Validate `releaseVersion` with existing `@std/semver` parse/format: canonical round-trip, no build metadata; use `v${version}` retaining prereleases. Optional `InitAgentDependencies.releaseVersion` defaults to NETSCRIPT_RELEASE_VERSION for stable/canary install tests; no CLI option/public root export. Existing #1675 byte-for-byte test keeps exact equality for every other file and expects only the design SKILL to equal materialized source. Re-init remains idempotent. Keep MCP/local-doc slugs as the readable entry point and pinned source links as release provenance.
+5. Correct the prior S9 evaluation's stale test locators with live test names/symbols and a maintenance note, preserving historical evidence.
+
+## Slices and gates
+
+1. This research/plan bootstrap commit and draft PR. Selected PLAN-EVAL because generator/installer materialization and release-version independence cross an integrity boundary; no implementation before PASS.
+2. One cohesive implementation slice(<30expectedfiles): docs manifest/generator/metadata, release materialization, callers/tests, canonical generated carriers, requested citation correction and run evidence. Meaningful red/green tests for counts/section renumbering, manifest relocation/missing targets, stable/canary pinning, original-bundle integrity, exact GUIDELINES and installed idempotence; actual CLI agent install proof. Scoped check/lint/fmt, all root check:* tasks/four carriers, docs links/accuracy/snippets/contract derivation, release preflight, quality:gate/architecture and CLI JSR audit/dry-run. Run one-pass scaffold.runtime with cleanup for merge readiness; local Docker absence remains UNPROVEN and hosted results are separate. Independent same-session final IMPL-EVAL before sign-off; push normally and verify current-head CI.
+
+## Risk register and open decisions
+
+- Release-tag links must match repository v<version> tags, including canaries. Materialize at install time so version bumps do not break read-only generation checks. Native unit and installed-host tests cover this. Development manifests may name an unpublished release; bundled docs remain locally authoritative and future release tags are resolved by the published CLI version.
+- Slugs/anchors must not silently drift. Derive route slugs from xrefs and section numbers from source headings; fixture mutations and real corpus lookups cover both.
+- Bundle integrity must remain meaningful. Verify source bytes before materialization; preserve untouched files and canonical reference, test idempotence.
+- Concurrent#2559 edits app-guidance punctuation/hints. Preserve that work during any normal main merge and re-run relevant callers/carriers. No rebase or force push.
+- All decisions needed now are locked above. Optional future versioned Pages hosting is safe to defer; not required by this source-pinning solution.
+
+## Deferred and contributor path
+
+S7 payload/routing#2569 belongs to its separate worker. Other design-system leaves and release publication are not part of this PR. Contributor entry:.llm/tools/docs/generate-design-skill.ts and its fixture tests. Keep owner Refs-only/no-label/no-session-id policy; inherit issue milestone24. Cockpit owns merge. Continue the user-authorized tracker loop after this leaf is delivered, checking ownership before taking another.

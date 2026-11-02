@@ -307,7 +307,7 @@ export const MCP_EMBEDDED_DOCS_PROVENANCE:
       'pages/web-layer/vite/index.md',
       'pages/why/index.md',
     ],
-    sourceBytes: 3255695,
+    sourceBytes: 3255674,
     documentCount: 286,
-    sha256: '560c3a9b57115464d632d9c193bbd6a5f6a995ba4ed159f21fb00bbee55ed942',
+    sha256: 'b5f53dabfab76a3c22e9ccfe6ce4c2478d8a299ad236b16b92b170616679825d',
   };
