@@ -57,7 +57,11 @@ async function eventually<T>(
 }
 
 /** Probe the exact documented user journey using real server-rendered pages and form actions. */
-export async function probeShowcase(appHost: string, appName: string): Promise<void> {
+export async function probeShowcase(
+  appHost: string,
+  appName: string,
+  projectName: string,
+): Promise<void> {
   const urls = await resolveResourceUrlsFromAppHost(appHost, appName);
   assert(urls.length, 'Aspire did not publish the showcase app endpoint');
   const base = urls[0]!;
@@ -85,6 +89,36 @@ export async function probeShowcase(appHost: string, appName: string): Promise<v
       `${path}: saved catalogue content did not render`,
     );
   }
+  const assistant = await html(base, '/ai');
+  const credentialPresent = [
+    'ANTHROPIC_API_KEY',
+    'ANTHROPIC_AUTH_TOKEN',
+    'ANTHROPIC_OAUTH_TOKEN',
+    'OPENAI_API_KEY',
+  ]
+    .some((name) => Boolean(Deno.env.get(name)?.trim()));
+  if (!credentialPresent) {
+    assert(
+      assistant.includes('Connect your AI provider'),
+      'The no-key assistant did not render its provider connection state',
+    );
+  }
+  const streamUrls = await resolveResourceUrlsFromAppHost(appHost, 'streams');
+  assert(streamUrls.length, 'Aspire did not publish the ordinary streams resource');
+  const privateRead = await fetch(
+    new URL(
+      `/v1/stream/netscript/showcase/${projectName}/${appName}/ai/chat/anonymous-probe`,
+      streamUrls[0],
+    ),
+    {
+      signal: AbortSignal.timeout(5000),
+    },
+  );
+  await privateRead.body?.cancel();
+  assert(
+    privateRead.status === 401 || privateRead.status === 403,
+    'Private chat streams allowed an anonymous read',
+  );
   const candidates: z.infer<typeof orderRowsSchema> = [];
   for (const status of ['pending', 'awaiting_payment', 'paid']) {
     const response = await fetch(new URL(`/orders?status=${status}`, base), {
@@ -171,12 +205,16 @@ export async function probeShowcase(appHost: string, appName: string): Promise<v
       saga: ['order', 'payment', 'shipping'],
       webhook: 'executed',
       activity: 'stream-rendered',
+      assistant: credentialPresent ? 'configured-state' : 'connect-provider',
+      privateStreams: 'anonymous-denied',
     }),
   );
 }
 
 if (import.meta.main) {
-  const [appHost, appName] = Deno.args;
-  if (!appHost || !appName) throw new Error('Expected apphost path and application name');
-  await probeShowcase(appHost, appName);
+  const [appHost, appName, projectName] = Deno.args;
+  if (!appHost || !appName || !projectName) {
+    throw new Error('Expected apphost path, application name and project name');
+  }
+  await probeShowcase(appHost, appName, projectName);
 }

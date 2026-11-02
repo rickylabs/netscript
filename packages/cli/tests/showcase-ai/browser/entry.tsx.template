@@ -1,0 +1,7 @@
+import { render } from 'preact';
+import NorthwindChat from './apps/portal/islands/NorthwindChat.tsx';
+
+const response = await fetch('/api/showcase/chat', { cache: 'no-store' });
+if (!response.ok) throw new Error('Browser fixture session is required');
+const { threads } = await response.json();
+render(<NorthwindChat initialThreads={threads} />, document.getElementById('app')!);

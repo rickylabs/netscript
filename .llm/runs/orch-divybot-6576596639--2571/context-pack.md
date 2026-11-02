@@ -1,17 +1,24 @@
 # Resume Northwind showcase
 
-Issue #2571, draft PR #2595, branch `orch/divybot-6576596639`. S1 commerce
-composition is source-approved by the independent read-only Sol reviewer. Read
-plan.md, worklog.md, source-review-s1.md and the three memory notes.
+Issue #2571; draft PR #2595; branch `orch/divybot-6576596639`. S1 and S2 source
+slices are approved by the same independent read-only Sol supervisor. Astra
+visual subgate PASS: all60combinations >=8/10. Read source-review-s2.md,
+visual-evaluation.md and s2-local-evidence.json. Full source/CI leaf acceptance
+is still pending; do not infer READY from source slice approvals.
 
-The documented six-gate scaffold.showcase recipe and shipping-write mutation
-control passed. Default output remains byte-identical. Retained proof app is
-`.llm/tmp/showcase-proof/northwind-commerce`; do not clean foreign resources.
-Local Docker daemon is unavailable; local supported Garnet executable works.
-Required next: AI integration, packed build, carrier chain and every root check
-on Deno 2.9.7, scaffold.runtime in CI, final source evaluation and Astra review
-of every page/theme/390px. Public artifacts use repo-relative paths only.
+Implemented `init --from showcase`, persisted commerce and background workflow,
+private durable Assistant/MCP and canonical sign-in. Default init includes the
+agent bundle and matches all220files at an identical output path. Source21
+scenarios and mounted browser pass; baseline first-send deadlock was RED.
 
-No labels or session IDs. Refs-only draft PR, never rebase or force push.
-Stop at READY; Cockpit merges. Canonical final report uses dispatcher file
-handoff; do not post final issue comment yourself or commit dispatcher files.
+Next: integrate current origin/main59e6202 normally, regenerate carriers and
+Aspire manifest, run all root checks/CLI quality under Deno2.9.7, fresh documented
+showcase and packed build, full scaffold.runtime in CI, formal independent
+IMPL-EVAL, then final handoff. Current live proof app is
+`.llm/tmp/showcase-ready/northwind-ready`; original proof has been stopped.
+Docker daemon is unavailable locally; supported Garnet executable works.
+
+No labels/session IDs; milestone0.0.9; Refs-only draft PR. Never rebase/force
+push or merge the PR. Stop at READY; Cockpit reviews/merges. The canonical final
+report uses `.divybot-final-report.tmp` -> `.divybot-final-report.md`; do not post
+that final issue comment manually or commit dispatcher files.

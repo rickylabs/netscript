@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "baseline": "ce9a6333d7723c978acbc114219d5b5cadc3da6f",
+  "filesBefore": 220,
+  "filesAfter": 220,
+  "differentPaths": [],
+  "scope": "Public default init including generated agent bundle; both binaries used exactly the same destination path; no normalization or excluded files; --ci --yes --no-git only"
+}

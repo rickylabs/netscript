@@ -1,0 +1,120 @@
+/** Test-only composition: real generated handlers/native streams; injected auth/provider ports. */
+import { getCookies } from '@std/http/cookie';
+import { implement } from '@orpc/server';
+import { RPCHandler } from '@orpc/server/fetch';
+import { createFakeChatModelProvider } from '@netscript/ai/testing';
+import { createShowcaseChat } from './ai/showcase/chat.ts';
+import { createThreadStore } from './ai/showcase/thread-store.ts';
+import { startShowcaseStreams } from './showcase/streams-host.ts';
+import { OrdersContractV1 } from './contracts/versions/v1/orders.contract.ts';
+import { secretWorkspace } from './secret-fixture.ts';
+
+const workspace = await secretWorkspace();
+const streams = await startShowcaseStreams(workspace.root, {
+  hostname: '127.0.0.1',
+  port: 0,
+  handleSignals: false,
+});
+Deno.env.set('DURABLE_STREAMS_URL', `http://127.0.0.1:${streams.addr.port}`);
+const kv = await Deno.openKv(workspace.root + '/.netscript/browser-chat.kv');
+const token = crypto.randomUUID();
+let turns = 0;
+const order = {
+  id: 12,
+  reference: 'NW-00012',
+  name: 'Browser order',
+  ownerName: 'Alfreds',
+  ownerEmail: 'orders@example.test',
+  status: 'awaiting_payment' as const,
+  amount: 12345,
+  currency: 'USD',
+  createdAt: '2026-01-01',
+  updatedAt: '2026-01-01',
+};
+const bound = implement(OrdersContractV1);
+const orders = new RPCHandler({
+  v1: {
+    orders: {
+      getById: bound.getById.handler(() => order),
+      list: bound.list.handler(() => ({
+        data: [order],
+        pagination: { page: 1, limit: 10, total: 1, totalPages: 1, hasNext: false, hasPrev: false },
+      })),
+    },
+  },
+});
+const runtime = createShowcaseChat({
+  store: createThreadStore(kv),
+  configured: () => true,
+  authenticate: async (request) =>
+    getCookies(request.headers).browser_fixture === token
+      ? 'test:verified-browser-owner'
+      : undefined,
+  provider: async () => {
+    turns++;
+    return {
+      model: 'stub-model',
+      provider: createFakeChatModelProvider('browser-stub', [
+        [{
+          type: 'tool-call',
+          toolCall: {
+            id: crypto.randomUUID(),
+            name: 'northwind_get_order',
+            arguments: '{"id":12}',
+          },
+        }, { type: 'finish', finishReason: 'tool-calls' }],
+        [{ type: 'text', delta: 'Order **NW-00012** is awaiting payment.' }, {
+          type: 'finish',
+          finishReason: 'stop',
+        }],
+      ]),
+    };
+  },
+});
+const css = await Deno.readTextFile('./browser.css');
+const bundle = await Deno.readFile('./browser.js');
+const app = Deno.serve({ hostname: '127.0.0.1', port: 0, onListen() {} }, async (request) => {
+  const url = new URL(request.url);
+  if (url.pathname.startsWith('/api/rpc/')) {
+    const result = await orders.handle(request, { prefix: '/api/rpc' });
+    return result.response ?? new Response(null, { status: 404 });
+  }
+  // This fixture endpoint issues only an opaque HTTP-only test cookie; no subject is accepted.
+  if (url.pathname === '/__test/login') {
+    return new Response('Test session ready', {
+      headers: { 'set-cookie': `browser_fixture=${token}; HttpOnly; SameSite=Strict; Path=/` },
+    });
+  }
+  if (url.pathname === '/__test/stats') return Response.json({ turns });
+  if (url.pathname === '/api/showcase/chat') return await runtime.threads(request);
+  if (url.pathname.startsWith('/api/showcase/chat/')) {
+    return await runtime.session(request, url.pathname.split('/').at(-1)!);
+  }
+  if (url.pathname === '/browser.js') {
+    return new Response(bundle, { headers: { 'content-type': 'text/javascript' } });
+  }
+  if (url.pathname === '/favicon.ico') return new Response(null, { status: 204 });
+  if (!getCookies(request.headers).browser_fixture) {
+    return new Response('Sign in required', { status: 401 });
+  }
+  return new Response(
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Mounted Northwind chat regression</title><style>${css}</style></head><body><div id="app"></div><script type="module" src="/browser.js"></script></body></html>`,
+    { headers: { 'content-type': 'text/html', 'cache-control': 'no-store' } },
+  );
+});
+Deno.env.set('services__orders__http__0', `http://127.0.0.1:${app.addr.port}`);
+console.log(
+  'SHOWCASE_BROWSER_READY ' + JSON.stringify({ origin: `http://127.0.0.1:${app.addr.port}` }),
+);
+let stopping = false;
+Deno.addSignalListener('SIGTERM', () => {
+  if (stopping) return;
+  stopping = true;
+  void (async () => {
+    await app.shutdown();
+    kv.close();
+    await streams.stop();
+    await workspace.close();
+    Deno.exit(0);
+  })();
+});

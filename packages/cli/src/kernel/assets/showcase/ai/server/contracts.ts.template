@@ -1,0 +1,16 @@
+/** Browser-safe showcase chat contract. No provider or server imports. */
+export const CHAT_API = '/api/showcase/chat';
+export const MCP_API = '/api/showcase/mcp';
+export const CHAT_STREAM_PATH = '/showcase/{{projectName}}/{{appName}}/ai/chat';
+export const MAX_PROMPT_LENGTH = 4000;
+export const TURN_TIMEOUT_MS = 90_000;
+
+export interface ChatThread {
+  readonly id: string;
+  readonly title: string;
+  readonly createdAt: string;
+}
+
+export type ChatPageData =
+  | { readonly state: 'connect-provider' | 'sign-in' | 'unavailable' }
+  | { readonly state: 'ready'; readonly threads: readonly ChatThread[] };

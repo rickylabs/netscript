@@ -1,4 +1,7 @@
 /** Run the complete Northwind recipe; every command is also documented in README.md. */
+import { provisionShowcaseStreams } from './stream-secret.ts';
+import { fileURLToPath } from 'node:url';
+
 const root = new URL('../', import.meta.url);
 const run = async (...args: string[]) => {
   console.log(`\nNorthwind › netscript ${args.join(' ')}`);
@@ -9,7 +12,7 @@ const run = async (...args: string[]) => {
 };
 
 for (const [kind, refs] of [
-  ['streams', ''], ['workers', 'streams,sagas-api'], ['sagas', 'streams'], ['triggers', 'workers-api,streams'],
+  ['streams', ''], ['workers', 'streams,sagas-api'], ['sagas', 'streams'], ['triggers', 'workers-api,streams'], ['ai', ''], ['auth', ''],
 ] as const) {
   let installed = false;
   for (const directory of [`plugins/${kind}`, kind]) {
@@ -53,7 +56,16 @@ for (const path of ['plugins/streams/scaffold.plugin.json', 'streams/scaffold.pl
 const settingsFile = new URL('appsettings.json', root);
 const settings = JSON.parse(await Deno.readTextFile(settingsFile));
 settings.NetScript.Services.orders.PluginReferences = [...new Set([...(settings.NetScript.Services.orders.PluginReferences ?? []), 'streams'])];
+// Keep the ordinary streams resource identity and references, adding native per-prefix auth.
+settings.NetScript.Plugins.streams.InstalledFrom ??= settings.NetScript.Plugins.streams.Entrypoint;
+settings.NetScript.Plugins.streams.Workdir = '.';
+settings.NetScript.Plugins.streams.Entrypoint = './showcase/streams-host.ts';
+settings.NetScript.Plugins.streams.Permissions = [...new Set([...(settings.NetScript.Plugins.streams.Permissions ?? []), '--allow-net', '--allow-env', '--allow-read', '--allow-write', '--allow-sys', '--allow-ffi'])];
 await Deno.writeTextFile(settingsFile, JSON.stringify(settings, null, 2) + '\n');
+await provisionShowcaseStreams(fileURLToPath(root));
+for (const component of ['markdown', 'prompt-input', 'tool-call-card']) {
+  await run('ui:add', component, '--app', '{{appName}}');
+}
 await run('generate', 'plugins');
 await run('generate', 'aspire');
 // Database lifecycle uses the same supported CLI and needs no hand-written connection strings.

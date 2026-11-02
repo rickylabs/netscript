@@ -51,3 +51,86 @@ No merge-readiness claim: AI, final packed build, all root checks, CI and Astra
 review remain pending. Reconcile: baseline #2594 is retained; default templates
 are composed through the opt-in adapter. Plugin resource API names and explicit
 saga correlation lessons are recorded alongside this worklog.
+
+## S2 integration
+
+Independent AI implementation delivered canonical app-owned templates and20
+stub-backed scenarios, including native private stream denial/authorized IO,
+BFF session verification and replay after process restart. Parent now composes
+the templates and ordinary AI/auth/UI install steps in the same setup recipe.
+
+Initial Astra review inspected all36 screenshots and10references. Desktop and
+most mobile screens met8/10; customer/product/detail tables at390px failed.
+Repaired responsive labelled rows, line item geometry and shipping spacing;
+removed sticky pagination obstruction. Refreshed review remains pending.
+
+Packed production harness passed native packing of29 maintained packages and
+the actual generated client/server production build with no source vendors.
+The harness projects genuine package.json identity and compiled exports into
+Deno metadata for the unchanged closure guard. Final integrated app rerun is
+pending. Root check discovery found16tasks; only dirty carrier and surface
+manifest freshness require regeneration/commit before final verification.
+
+S2 independent source review returned FAIL_FIX: empty chat catch-up kept the
+composer disabled; UUID-limited listing could omit a newest conversation; and
+directory InstalledFrom metadata could skip its own manifest. AI repairs and a
+mounted-browser negative/positive regression are delegated to the same narrow
+implementation lane. Parent added eight directory-source variants across normal
+and caller-owned service entrypoints; baseline was RED. The adapter now checks
+the source directory itself, including workspace/local/file URL forms. It
+retains legacy entrypoint fallback when no installed identity resolves.
+
+CI now runs the documented showcase one-pass cleanup suite in the existing
+SQLite runtime job and includes its report in the existing always-uploaded
+artifact. Canonical scaffold.runtime remains a separate unchanged CI gate.
+
+The installed-source directory controls are green for all eight normal/wrapper
+variants. The existing public CLI consumer suite exposed an eager Vite import:
+clean baseline passed but integration failed its FFI-restricted children. Moved
+Vite route-manifest loading inside the selected preset emission; all53 registry
+and public permission tests now pass without changing their permissions. The
+final default197-file comparison is still byte-identical.
+
+Packed consumer graph is now closed explicitly: every first-party alias must
+point to a genuine compiled artifact or an exact JSR plugin identity. Source
+vendors and the source-root marker are absent. Integrated client/server build
+passed after that guard. No native provider runtime is bundled into Vite.
+
+Visual subgate PASS: independent Astra approved all60combinations (15views,
+light/dark,1440/390) at8/10or above. See visual-evaluation.md and browser-matrix.json.
+Reference-page repairs compose the shared destructive Alert and full-width
+DetailLayout main region. No required visual repairs remain in supplied states.
+
+AI repairs from the same implementation lane are applied as a scoped diff;
+parent reran21stub scenarios plus the mounted browser regression successfully.
+The original empty-chat source went RED with disabled composer; repaired source
+goes GREEN for first prompt, unused-thread reopen and native tool replay.
+Metadata retains all64inverse-UUID-order control threads and owner isolation.
+Accepted demo scaling constraint: O(n) owner metadata scan and one local KV host;
+a production multi-host deployment needs shared ownership/index pagination.
+
+Default-output proof now includes the generated agent bundle: all220files match
+byte for byte when both public CLI binaries use exactly the same output path.
+No path normalization or file exclusion was used. The earlier197/178controls
+also remain green.
+
+S2 repair source review closed all3implementation findings and found one new
+CI evidence-directory setup omission. A cold-path negative reproduced NotFound
+before scenarios. The test now creates its optional evidence directory
+recursively before writing. Exact CI source+browser command with previously
+nonexistent evidence/browser output paths is being verified. These are
+nonterminal per-slice source/supervisor reviews; the mandatory formal leaf
+IMPL-EVAL remains pending after integration and CI. No leaf terminal verdict
+has been issued and no merge-readiness claim is made.
+
+## S2 terminal — source PASS, visual PASS
+
+The same independent Sol source supervisor confirmed the evidence-directory
+repair and closed the S2 source slice. See source-review-s2.md. Same-session
+Astra visual subgate approved all60combinations; see visual-evaluation.md.
+Cold evidence path and mounted-browser tests pass. S2-local-evidence.json records
+local scope and remaining gates. No final leaf IMPL-EVAL or merge claim.
+
+Reconcile: source merge retains the AI lane history through its initial delivery,
+with the scoped c0643b9 repair patch applied. Main advanced to59e6202; normal
+integration follows in S3. No rebasing or force push.

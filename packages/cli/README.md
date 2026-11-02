@@ -91,6 +91,28 @@ $ netscript init my-app --db postgres --service --yes --dry-run
   [dry-run] Would create 183 files, 44 directories
 ```
 
+### Northwind showcase
+
+Opt in to a complete commerce example while keeping the ordinary `init` output unchanged:
+
+```sh
+netscript init northwind --from showcase --ci --yes
+cd northwind
+deno task showcase:setup
+deno task aspire:start
+```
+
+The setup task installs the standard plugins and UI components, generates their wiring, and seeds
+40 orders with customers, products and line items. Follow an order through worker fulfilment,
+the order/payment/shipping saga and delivery webhook, then read its committed activity stream.
+The generated `showcase/README.md` documents the recipe and extension points.
+
+The Assistant uses durable private conversations and read-only order MCP tools. Without a model
+credential it renders provider setup. Real model and OAuth/OIDC credentials are external
+prerequisites for signed-in chat; CI uses a stub provider. Private chat currently requires a POSIX
+host for credential-file permissions. SQLite uses the local Garnet fallback when Docker is absent;
+PostgreSQL requires Docker. Deno 2.9.7 and the pinned Aspire/.NET toolchain are required.
+
 ## Command map
 
 | Group         | What it owns                                                                                                                       |

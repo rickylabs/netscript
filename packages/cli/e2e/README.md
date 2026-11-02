@@ -45,6 +45,26 @@ workflow, generated type checks, Aspire runtime boot, HTTP behavior checks, OTEL
 cleanup. The narrower `scaffold.plugins` suite stops after plugin scaffold and host-diagnostic
 checks.
 
+### Northwind showcase
+
+`scaffold.showcase` follows the opt-in public recipe in one pass: init, setup, generated workspace
+check, Fresh production build, Aspire startup, seeded catalogue, fulfilment and webhook actions,
+saved shipping state, saga timestamps and rendered stream activity. It also checks the no-key
+Assistant page and anonymous denial on the private transcript prefix. The existing SQLite CI job
+runs it after `scaffold.runtime.sqlite`, with its report in the same uploaded artifact.
+
+```sh
+deno task e2e:cli run scaffold.showcase --name northwind --smoke-root .llm/tmp/showcase-gate --cleanup --format pretty
+deno run -A packages/cli/e2e/src/adapters/showcase/packed-build.ts . .llm/tmp/showcase-gate/northwind .llm/tmp/showcase-packed
+```
+
+The second command uses native Deno package tarballs, copies only the app-owned consumer files,
+maps compiled JS/data exports and exact published plugin identities, and runs the unchanged
+generated closure guard and production build. It rejects first-party import aliases that escape
+the packed/published graph. Packed `package.json` identity/exports are projected into Deno metadata;
+no source vendors or source-root marker are copied. Use a fresh output directory for each run.
+This build proof complements the live recipe; it does not replace `scaffold.runtime`.
+
 ### Browser prerequisite for `scaffold.runtime`
 
 The `behavior.app-reference` gate renders every canonical reference state in a real headless

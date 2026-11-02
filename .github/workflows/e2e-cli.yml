@@ -473,6 +473,26 @@ jobs:
         if: env.RUN == 'true'
         run: deno task e2e:cli run scaffold.runtime.sqlite --cleanup --format pretty --report .llm/tmp/e2e-report-scaffold-runtime-sqlite.json
 
+      - name: Documented Northwind showcase (one pass, with cleanup)
+        if: env.RUN == 'true'
+        run: deno task e2e:cli run scaffold.showcase --cleanup --format pretty --report .llm/tmp/e2e-report-scaffold-runtime-sqlite-showcase.json
+
+      - name: Prepare Northwind chat browser
+        if: env.RUN == 'true'
+        run: |
+          npm ci --ignore-scripts --prefix tools/fresh-ui-browser
+          cd tools/fresh-ui-browser
+          npx playwright install --with-deps chromium
+
+      - name: Stub-backed Northwind chat and mounted browser regression
+        if: env.RUN == 'true'
+        env:
+          SHOWCASE_AI_BROWSER_OUTPUT: .llm/tmp/showcase-ai-browser
+          SHOWCASE_AI_EVIDENCE_DIR: .llm/tmp/showcase-ai-browser/evidence
+        run: |
+          mkdir -p .llm/tmp/showcase-ai-browser
+          deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/tests/showcase-ai/showcase_ai_test.ts packages/cli/tests/showcase-ai/browser/showcase_ai_browser.ts > .llm/tmp/showcase-ai-browser/gate.json
+
       - name: Print failed E2E gate evidence
         if: failure() && env.RUN == 'true'
         run: deno run --allow-read .llm/tools/e2e/print-failed-report-steps.ts .llm/tmp/e2e-report-scaffold-runtime-sqlite.json
@@ -488,6 +508,7 @@ jobs:
             .llm/tmp/e2e-image-pulls.json
             .llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json
             .llm/tmp/gate-receipts/scaffold-runtime-sqlite/agent.aspire-mcp-smoke*
+            .llm/tmp/showcase-ai-browser/
           include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 30

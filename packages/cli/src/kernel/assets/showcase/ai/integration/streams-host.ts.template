@@ -1,0 +1,41 @@
+/** Caller-owned native streams host: private AI transcripts alongside public first-party activity. */
+import { join } from 'node:path';
+import { findWorkspaceRoot } from '@netscript/config';
+import { startStreamsService } from '@netscript/plugin-streams/service';
+import type { RunningService, ServeOptions } from '@netscript/service';
+import { createStaticCredentialAuthenticator } from '@netscript/service/auth';
+import { CHAT_STREAM_PATH } from '../ai/showcase/contracts.ts';
+import { initializeShowcaseStreamSecret } from './stream-secret.ts';
+
+/** Start the existing native host with the app's credential and restart-persistent store. */
+export async function startShowcaseStreams(
+  root: string,
+  serve?: ServeOptions,
+): Promise<RunningService> {
+  const workspace = await Deno.realPath(root);
+  await initializeShowcaseStreamSecret(workspace);
+  const credential = Deno.env.get('STREAMS_SECRET');
+  if (!credential) throw new Error('Showcase streams credential is unavailable');
+  Deno.env.set('STREAMS_DATA_DIR', join(workspace, '.data', 'streams'));
+  return await startStreamsService({
+    auth: {
+      authn: {
+        authenticator: createStaticCredentialAuthenticator({
+          credentials: {
+            [credential]: { subject: 'service:showcase-chat', scopes: [], roles: ['service'] },
+          },
+        }),
+        // Prefix matching respects path segments; no broad anonymous override can exempt chat.
+        protect: [`/v1/stream/netscript${CHAT_STREAM_PATH}`],
+      },
+    },
+    // The native API binds its own upstream to 127.0.0.1; only its guarded front listener is exposed.
+    serve,
+  });
+}
+
+if (import.meta.main) {
+  const root = await findWorkspaceRoot(Deno.cwd());
+  if (!root) throw new Error('Showcase streams host requires a generated workspace');
+  await startShowcaseStreams(root);
+}

@@ -320,6 +320,7 @@ packages/cli/e2e/fixtures/outbound-webhook/run-adoption.ts	e2e	S2/S3/S10	runtime
 packages/cli/e2e/mod.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/README.md	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/adapters/commands/docker-resource-cleaner.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/adapters/showcase/packed-build.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/builders/suite/suite-builder.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/builders/workspace/smoke-project-factory.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/quickstart/aspire-walk.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -389,6 +390,8 @@ packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence
 packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/service-env/verify-service-env.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/showcase/probe-showcase_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/showcase/probe-showcase.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/validate-aspire-task-traces_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/validate-aspire-task-traces.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/validate-flow-b-traces.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -412,6 +415,7 @@ packages/cli/e2e/src/presentation/cli/commands/run-command.ts	e2e	S2/S3/S10	runt
 packages/cli/e2e/suites/quickstart/quickstart-walk-suite.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/suites/quickstart/readme-quickstart-suite.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/suites/scaffold/capability-suites.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/suites/scaffold/showcase-suite.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/adapters/reporting/pretty-reporter_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/builders/runtime-auth-env_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -526,6 +530,7 @@ packages/cli/src/kernel/adapters/service/aspire-surface-inventory.ts	cli:other	S
 packages/cli/src/kernel/adapters/service/aspire-surface-renderer.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/workspace-mutator_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/service/workspace-mutator.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/adapters/showcase/scaffold-showcase.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/templates/scaffold-template-assets.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/windows/environment/env-file-content.ts	windows-env	S13	ASPIRE_DASHBOARD_PORT default decision (same as telemetry example)
 packages/cli/src/kernel/adapters/windows/environment/env-file-dashboard_test.ts	windows-env	S13	ASPIRE_DASHBOARD_PORT default decision (same as telemetry example)
@@ -577,6 +582,8 @@ packages/cli/src/kernel/assets/generated/aspire/helpers/generate-register-tools-
 packages/cli/src/kernel/assets/generated/aspire/helpers/installation-secret.ts.template	template:generator-snapshot	derived	snapshot of generator output; regenerated by whichever generator slice lands (S4/S5/S6/S8) + gen:assets-barrel
 packages/cli/src/kernel/assets/generated/workspace/netscript-config-1.ts.template	template:other	S11	prose/link check only (S11 wording); no version literal
 packages/cli/src/kernel/assets/manifest.ts	template:other	S11	prose/link check only (S11 wording); no version literal
+packages/cli/src/kernel/assets/showcase/README.md.template	template:other	S11	prose/link check only (S11 wording); no version literal
+packages/cli/src/kernel/assets/showcase/setup.ts.template	template:other	S11	prose/link check only (S11 wording); no version literal
 packages/cli/src/kernel/assets/skills.generated.ts	generated:barrel	derived	deno task gen:assets-barrel; gate check:assets-barrel
 packages/cli/src/kernel/assets/windows/env.template	template:other	S11	prose/link check only (S11 wording); no version literal
 packages/cli/src/kernel/assets/workspace/github/workflows/deploy-compose-ghcr.yml.template	template:consumer-ci	S13	pin Aspire CLI install to SCAFFOLD_VERSIONS.ASPIRE_SDK before aspire restore
@@ -607,6 +614,7 @@ packages/cli/src/kernel/domain/plugin-kind.ts	cli:other	S4	grep-verified in the 
 packages/cli/src/kernel/domain/resolved-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/scaffold/scaffold-options.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/scaffold/scaffold-plan.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/domain/scaffold/showcase-preset.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/service-manifest.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/domain/service-shape.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/templates/app/route-templates_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -735,6 +743,7 @@ packages/cli/src/public/features/init/init-command.ts	cli:other	S4	grep-verified
 packages/cli/src/public/features/init/init-input.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/init/init-preset-safety_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/init/run-init-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/init/showcase-preset_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-config-security_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-config.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected

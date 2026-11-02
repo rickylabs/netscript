@@ -81,6 +81,7 @@ export function createShowcaseSuite(overrides: Partial<RunOptions> = {}): SuiteD
           `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/showcase/probe-showcase.ts`,
           context.project.appHost,
           generatedAppName(context),
+          context.project.projectName,
         ],
       ),
       ...createCleanupGates(),

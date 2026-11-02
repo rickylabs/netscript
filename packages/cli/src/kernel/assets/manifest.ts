@@ -1,5 +1,23 @@
 /** Typed manifest for checked-in CLI template assets. */
 export const TEMPLATE_KEYS = {
+  showcaseChat: 'showcase/ai/server/chat.ts.template',
+  showcaseChatContract: 'showcase/ai/server/contracts.ts.template',
+  showcaseChatOrders: 'showcase/ai/server/orders.ts.template',
+  showcaseChatProvider: 'showcase/ai/server/provider.ts.template',
+  showcaseChatRuntime: 'showcase/ai/server/runtime.ts.template',
+  showcaseChatStreamPolicy: 'showcase/ai/server/stream-policy.ts.template',
+  showcaseChatStore: 'showcase/ai/server/thread-store.ts.template',
+  showcaseChatWire: 'showcase/ai/server/wire.ts.template',
+  showcaseChatLoader: 'showcase/ai/app/loader.ts.template',
+  showcaseChatPage: 'showcase/ai/app/page.tsx.template',
+  showcaseChatIsland: 'showcase/ai/app/NorthwindChat.tsx.template',
+  showcaseChatThreadsRoute: 'showcase/ai/app/threads-route.ts.template',
+  showcaseChatSessionRoute: 'showcase/ai/app/session-route.ts.template',
+  showcaseChatMcpRoute: 'showcase/ai/app/mcp-route.ts.template',
+  showcaseChatCss: 'showcase/ai/app/showcase-ai.css.template',
+  showcaseChatSecret: 'showcase/ai/integration/stream-secret.ts.template',
+  showcaseChatStreamsHost: 'showcase/ai/integration/streams-host.ts.template',
+
   showcaseSetup: 'showcase/setup.ts.template',
   showcaseReadme: 'showcase/README.md.template',
   showcaseSchema: 'showcase/database/commerce.prisma.template',
