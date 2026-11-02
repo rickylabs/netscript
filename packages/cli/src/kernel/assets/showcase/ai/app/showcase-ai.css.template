@@ -1,0 +1,263 @@
+.northwind-ai {
+  --ai-line: var(--ns-border);
+  --ai-muted: var(--ns-muted-fg);
+  max-width: 86rem;
+  margin-inline: auto;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  color: var(--ns-fg);
+}
+.northwind-ai__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-block-end: 2rem;
+}
+.northwind-ai h1 {
+  font-size: clamp(1.8rem, 3.4vw, 2.8rem);
+  letter-spacing: -.045em;
+  line-height: 1.12;
+  margin: .5rem 0 .85rem;
+}
+.northwind-ai h2 {
+  font-size: clamp(1.35rem, 2.3vw, 2rem);
+  letter-spacing: -.03em;
+  line-height: 1.2;
+  margin-block: .75rem;
+}
+.northwind-ai p {
+  line-height: 1.65;
+}
+.northwind-ai__header p:not(.northwind-ai__eyebrow),
+.northwind-ai__note {
+  color: var(--ai-muted);
+}
+.northwind-ai__eyebrow {
+  font-size: .68rem;
+  font-weight: 650;
+  letter-spacing: .13em;
+  color: var(--ai-muted);
+}
+.northwind-ai__label {
+  border: 1px solid var(--ai-line);
+  padding: .45rem .75rem;
+  border-radius: 2rem;
+  font-size: .75rem;
+  white-space: nowrap;
+}
+.northwind-ai__setup {
+  max-width: 42rem;
+  margin: 3rem auto;
+  padding: clamp(1.25rem, 4vw, 3rem);
+  border: 1px solid var(--ai-line);
+  border-radius: 1rem;
+  background: var(--ns-card);
+}
+.northwind-ai__mark {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: .8rem;
+  background: var(--ns-surface-raised);
+  font-size: 2rem;
+  margin-block-end: 1.5rem;
+}
+.northwind-ai__setup ol {
+  padding-inline-start: 1.2rem;
+  line-height: 1.8;
+}
+.northwind-ai code {
+  font-size: .85em;
+  overflow-wrap: anywhere;
+}
+.northwind-ai__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-block: 1.5rem;
+}
+.northwind-ai__primary,
+.northwind-ai__new {
+  display: inline-block;
+  border: 1px solid var(--ai-line);
+  border-radius: .6rem;
+  padding: .7rem 1rem;
+  background: var(--ns-surface-raised);
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.northwind-ai__examples {
+  border-top: 1px solid var(--ai-line);
+  padding-block-start: 1.25rem;
+  margin-block-start: 2rem;
+  color: var(--ai-muted);
+  font-size: .85rem;
+}
+.northwind-ai__examples p {
+  margin-block: .6rem;
+}
+.northwind-ai__workspace {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  min-height: 38rem;
+  border: 1px solid var(--ai-line);
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--ns-card);
+}
+.northwind-ai__threads {
+  padding: 1rem;
+  border-inline-end: 1px solid var(--ai-line);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.northwind-ai__new {
+  width: 100%;
+  text-align: start;
+  font-size: .85rem;
+}
+.northwind-ai__threads nav {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  max-height: 26rem;
+  overflow: auto;
+}
+.northwind-ai__threads nav button {
+  border: 0;
+  background: transparent;
+  color: var(--ai-muted);
+  padding: .7rem;
+  text-align: start;
+  border-radius: .5rem;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: inherit;
+  font-size: .85rem;
+}
+.northwind-ai__threads nav button[aria-current] {
+  background: var(--ns-surface-raised);
+  color: var(--ns-fg);
+}
+.northwind-ai__threads .northwind-ai__note {
+  font-size: .75rem;
+  margin-block-start: auto;
+}
+.northwind-ai__main {
+  min-width: 0;
+  padding: clamp(1rem, 3vw, 2rem);
+  display: flex;
+  flex-direction: column;
+}
+.northwind-ai__conversation {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 32rem;
+  gap: 1rem;
+}
+.northwind-ai__transcript {
+  max-height: 34rem;
+  min-height: 20rem;
+  overflow: auto;
+  flex: 1;
+  padding: .25rem;
+  overflow-wrap: anywhere;
+}
+.northwind-ai__welcome {
+  margin: auto;
+  max-width: 34rem;
+  padding-block: 2.5rem;
+}
+.northwind-ai__welcome p {
+  color: var(--ai-muted);
+}
+.northwind-ai__starters {
+  display: grid;
+  gap: .7rem;
+  margin-block: 1.5rem;
+}
+.northwind-ai__starters button {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  text-align: start;
+  border: 1px solid var(--ai-line);
+  border-radius: .6rem;
+  background: transparent;
+  color: inherit;
+  padding: .85rem 1rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: .85rem;
+}
+.northwind-ai__message {
+  margin-block: 1.5rem;
+}
+.northwind-ai__message[data-role='user'] {
+  background: var(--ns-surface-raised);
+  border-radius: .8rem;
+  padding: 1rem;
+  margin-inline-start: 10%;
+}
+.northwind-ai__author {
+  display: block;
+  font-size: .72rem;
+  font-weight: 650;
+  margin-block-end: .65rem;
+  color: var(--ai-muted);
+}
+.northwind-ai__working {
+  font-size: .85rem;
+  color: var(--ai-muted);
+}
+.northwind-ai__error {
+  border-inline-start: 3px solid var(--ns-destructive);
+  padding: .75rem 1rem;
+  font-size: .85rem;
+}
+.northwind-ai button:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+.northwind-ai :is(button, a):focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: 3px;
+}
+@media (max-width: 700px) {
+  .northwind-ai__header {
+    flex-direction: column;
+  }
+  .northwind-ai__workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .northwind-ai__threads {
+    border-inline-end: 0;
+    border-block-end: 1px solid var(--ai-line);
+  }
+  .northwind-ai__threads nav {
+    flex-direction: row;
+    max-width: 100%;
+  }
+  .northwind-ai__threads nav button {
+    flex-shrink: 0;
+    max-width: 13rem;
+  }
+  .northwind-ai__threads .northwind-ai__note {
+    display: none;
+  }
+  .northwind-ai__setup {
+    margin-block: 1rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .northwind-ai * {
+    scroll-behavior: auto;
+  }
+}

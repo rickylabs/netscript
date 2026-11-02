@@ -1,0 +1,296 @@
+import { useEffect, useRef, useState } from 'preact/hooks';
+import { type StreamChunk, StreamProcessor } from '@tanstack/ai/client';
+import { durableStreamConnection } from '@durable-streams/tanstack-ai-transport';
+import {
+  createNetScriptChatConnection,
+  type NetScriptChatConnection,
+  projectChatSnapshot,
+  type RenderPart,
+} from '@netscript/fresh/ai';
+import { Markdown } from '../components/ui/markdown.tsx';
+import { PromptInput } from '../components/ui/prompt-input.tsx';
+import { ToolCallCard } from '../components/ui/tool-call-card.tsx';
+import { CHAT_API, type ChatThread, MAX_PROMPT_LENGTH } from '../../../ai/showcase/contracts.ts';
+
+const starters = [
+  'Which orders are awaiting payment?',
+  'Show the latest ten orders.',
+  'Find orders for Alfreds.',
+];
+
+function TranscriptPart({ part }: { part: RenderPart }) {
+  return part.kind === 'tool'
+    ? (
+      <ToolCallCard
+        name={part.toolName ?? 'Northwind order tool'}
+        status={part.toolState === 'error'
+          ? 'error'
+          : part.toolState === 'complete'
+          ? 'done'
+          : 'running'}
+        args={part.input === undefined ? undefined : JSON.stringify(part.input, null, 2)}
+        result={part.output === undefined
+          ? undefined
+          : typeof part.output === 'string'
+          ? part.output
+          : JSON.stringify(part.output, null, 2)}
+      />
+    )
+    : (
+      <article class='northwind-ai__message' data-role={part.role}>
+        <span class='northwind-ai__author'>
+          {part.role === 'user' ? 'You' : 'Northwind assistant'}
+        </span>
+        <Markdown>{part.text ?? ''}</Markdown>
+      </article>
+    );
+}
+
+/** One connection belongs to one mounted conversation, never to a module-global user. */
+function Conversation({ thread, onSent }: { thread: ChatThread; onSent: () => void }) {
+  const connection = useRef<NetScriptChatConnection>();
+  const sending = useRef(false);
+  const active = useRef(true);
+  const sendAbort = useRef<AbortController>();
+  const [parts, setParts] = useState<readonly RenderPart[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [hydrating, setHydrating] = useState(true);
+  const [error, setError] = useState('');
+  const composer = useRef<HTMLDivElement>(null);
+  const tail = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    active.current = true;
+    const abort = new AbortController();
+    const processor = new StreamProcessor();
+    const chat = createNetScriptChatConnection({
+      target: { sessionId: thread.id, baseUrl: location.origin },
+      // Function form is the complete BFF URL, not the upstream stream namespace.
+      streamPath: ({ sessionId }) => `${CHAT_API}/${encodeURIComponent(sessionId)}`,
+      // The framework URL builder addresses the streams service under /v1/stream.
+      // The browser instead connects to the authenticated app BFF using the same upstream transport.
+      createConnection: ({ initialOffset }) => {
+        const transport = durableStreamConnection({
+          readUrl: `${location.origin}${CHAT_API}/${thread.id}`,
+          sendUrl: `${location.origin}${CHAT_API}/${thread.id}`,
+          initialOffset,
+          emitSnapshotOnSubscribe: false,
+        });
+        return {
+          subscribe: transport.subscribe,
+          send: (messages, data, signal) => transport.send([...messages], data, signal),
+        };
+      },
+    });
+    connection.current = chat;
+    void (async () => {
+      try {
+        for await (const value of chat.subscribe(abort.signal)) {
+          if (
+            !value || typeof value !== 'object' || !('type' in value) ||
+            typeof value.type !== 'string'
+          ) throw new Error('Invalid chat event');
+          // This authenticated endpoint emits the installed transport's StreamChunk protocol.
+          const chunk = value as StreamChunk;
+          processor.processChunk(chunk);
+          setParts(projectChatSnapshot(processor.getMessages()).renderParts);
+          setHydrating(false);
+          if (chunk.type === 'RUN_STARTED') setBusy(true);
+          if (chunk.type === 'RUN_FINISHED' || chunk.type === 'RUN_ERROR') setBusy(false);
+          if (chunk.type === 'RUN_ERROR') {
+            setError(
+              'The assistant could not complete this request. Check the provider connection and try again.',
+            );
+          }
+        }
+      } catch {
+        if (!abort.signal.aborted) {
+          setError(
+            'Conversation disconnected. Reload to reconnect, or sign in again if your session expired.',
+          );
+        }
+      } finally {
+        if (!abort.signal.aborted) setHydrating(false);
+      }
+    })();
+    return () => {
+      active.current = false;
+      abort.abort();
+      sendAbort.current?.abort();
+      chat.dispose();
+      connection.current = undefined;
+    };
+  }, [thread.id]);
+
+  useEffect(() => {
+    tail.current?.scrollIntoView({ block: 'nearest' });
+  }, [parts.length, busy]);
+
+  async function send(text: string): Promise<void> {
+    if (sending.current || !connection.current) return;
+    if (text.length > MAX_PROMPT_LENGTH) {
+      setError('Keep messages under 4000 characters.');
+      return;
+    }
+    sending.current = true;
+    setBusy(true);
+    setError('');
+    const abort = new AbortController();
+    sendAbort.current = abort;
+    try {
+      // Send one untrusted user text only. The server reconstructs history from the durable stream.
+      await connection.current.send([], { text }, abort.signal);
+      if (active.current) {
+        const field = composer.current?.querySelector('textarea');
+        if (field) field.value = '';
+        onSent();
+      }
+    } catch {
+      if (active.current) {
+        setError(
+          abort.signal.aborted
+            ? 'Generation stopped. Your saved conversation is still available.'
+            : 'Message not completed. A turn may already be running; check your connection and try again.',
+        );
+      }
+    } finally {
+      sending.current = false;
+      if (active.current) setBusy(false);
+    }
+  }
+
+  return (
+    <div class='northwind-ai__conversation'>
+      <div class='northwind-ai__transcript' role='log' aria-live='polite' aria-label='Conversation'>
+        {hydrating ? <p role='status'>Opening your saved conversation…</p> : null}
+        {!hydrating && parts.length === 0
+          ? (
+            <div class='northwind-ai__welcome'>
+              <h2>What would you like to know?</h2>
+              <p>Explore live orders with a source you can inspect.</p>
+              <div class='northwind-ai__starters'>
+                {starters.map((text) => (
+                  <button
+                    type='button'
+                    key={text}
+                    disabled={busy}
+                    onClick={() => void send(text)}
+                  >
+                    {text}
+                    <span aria-hidden='true'>↗</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )
+          : null}
+        {parts.map((part) => <TranscriptPart key={part.id} part={part} />)}
+        {busy ? <p class='northwind-ai__working' role='status'>Reading your request…</p> : null}
+        <div ref={tail} />
+      </div>
+      {error ? <p class='northwind-ai__error' role='alert'>{error}</p> : null}
+      <div ref={composer}>
+        <PromptInput
+          placeholder='Ask about Northwind orders…'
+          busy={busy}
+          sendDisabled={hydrating}
+          onSubmit={(text) => void send(text)}
+          onStop={sending.current ? () => sendAbort.current?.abort() : undefined}
+          submitKey='mod-enter'
+          hint='Live order data · Read-only tools · Ctrl/⌘ + Enter to send'
+        />
+      </div>
+    </div>
+  );
+}
+
+/** Private thread picker and real durable chat; every API call uses this browser's session cookie. */
+export default function NorthwindChat(
+  { initialThreads }: { initialThreads: readonly ChatThread[] },
+) {
+  const [threads, setThreads] = useState(initialThreads);
+  const [selected, setSelected] = useState<ChatThread | undefined>(initialThreads[0]);
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState('');
+  async function refresh(): Promise<void> {
+    try {
+      const response = await fetch(CHAT_API, { cache: 'no-store' });
+      if (!response.ok) throw new Error();
+      const data = await response.json() as { threads: ChatThread[] };
+      setThreads(data.threads);
+    } catch {
+      setError('Conversation list could not refresh. Your saved conversation is still available.');
+    }
+  }
+  async function create(): Promise<void> {
+    if (creating) return;
+    setCreating(true);
+    setError('');
+    try {
+      const response = await fetch(CHAT_API, { method: 'POST' });
+      if (!response.ok) throw new Error();
+      const { thread } = await response.json() as { thread: ChatThread };
+      setThreads((current) => [thread, ...current]);
+      setSelected(thread);
+    } catch {
+      setError(
+        'Could not start a conversation. Check your connection and sign-in, then try again.',
+      );
+    } finally {
+      setCreating(false);
+    }
+  }
+  return (
+    <div class='northwind-ai__workspace'>
+      <aside class='northwind-ai__threads' aria-label='Your conversations'>
+        <button
+          class='northwind-ai__new'
+          type='button'
+          disabled={creating}
+          onClick={() => void create()}
+        >
+          {creating ? 'Starting…' : '+ New conversation'}
+        </button>
+        <p class='northwind-ai__eyebrow'>YOUR CONVERSATIONS</p>
+        <nav>
+          {threads.map((thread) => (
+            <button
+              type='button'
+              key={thread.id}
+              aria-current={selected?.id === thread.id ? 'page' : undefined}
+              onClick={() => setSelected(thread)}
+            >
+              {thread.title}
+            </button>
+          ))}
+        </nav>
+        <p class='northwind-ai__note'>
+          Saved to your account.<br />Only you can reopen these conversations.
+        </p>
+      </aside>
+      <div class='northwind-ai__main'>
+        {error ? <p role='alert' class='northwind-ai__error'>{error}</p> : null}
+        {selected
+          ? <Conversation key={selected.id} thread={selected} onSent={() => void refresh()} />
+          : (
+            <div class='northwind-ai__welcome'>
+              <div class='northwind-ai__mark' aria-hidden='true'>✳</div>
+              <h2>Start with a question.</h2>
+              <p>
+                Your order assistant is connected. Start a private conversation to explore
+                Northwind.
+              </p>
+              <button
+                class='northwind-ai__primary'
+                type='button'
+                disabled={creating}
+                onClick={() => void create()}
+              >
+                Start a conversation →
+              </button>
+            </div>
+          )}
+      </div>
+    </div>
+  );
+}

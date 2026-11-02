@@ -1,0 +1,82 @@
+/** Native Deno entry; import only through the app's request-time workspace loader. */
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { createShowcaseChat } from './chat.ts';
+import { createThreadStore } from './thread-store.ts';
+import { providerConfigured, showcaseProvider } from './provider.ts';
+import type { ChatPageData } from './contracts.ts';
+import { requirePrivateChatStreams } from './stream-policy.ts';
+
+type BrowserAuth = { handleBrowserAuth(request: Request, action: string): Promise<Response> };
+
+/** Verify the existing browser cookie through its auth service on every request. */
+async function authenticate(root: string, request: Request): Promise<string | undefined> {
+  const path = join(root, 'auth', 'bff.ts');
+  try {
+    await Deno.stat(path);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return undefined;
+    throw error;
+  }
+  const specifier = pathToFileURL(path).href;
+  const auth: BrowserAuth = await import(/* @vite-ignore */ specifier);
+  const response = await auth.handleBrowserAuth(request, 'session');
+  if (!response.ok) {
+    await response.body?.cancel();
+    throw new Error('Authentication unavailable');
+  }
+  const session: unknown = await response.json();
+  if (
+    !session || typeof session !== 'object' || !('authenticated' in session) ||
+    session.authenticated !== true ||
+    !('subject' in session) || typeof session.subject !== 'string' || !session.subject.trim()
+  ) return undefined;
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(session.subject));
+  await requirePrivateChatStreams(request.signal);
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+async function chat(root: string) {
+  await Deno.mkdir(join(root, '.netscript'), { recursive: true });
+  const kv = await Deno.openKv(join(root, '.netscript', 'showcase-chat.kv'));
+  const runtime = createShowcaseChat({
+    store: createThreadStore(kv),
+    authenticate: (request) => authenticate(root, request),
+    configured: providerConfigured,
+    provider: showcaseProvider,
+  });
+  return { kv, runtime };
+}
+
+/** Page data carries no auth credentials, provider keys, subjects or workspace paths. */
+export async function readShowcaseChat(root: string, request: Request): Promise<ChatPageData> {
+  if (!providerConfigured()) return { state: 'connect-provider' };
+  try {
+    const { kv, runtime } = await chat(root);
+    using _handle = kv;
+    return await runtime.page(request);
+  } catch {
+    return { state: 'unavailable' };
+  }
+}
+
+/** Keep filesystem, auth, service and provider failures out of browser error payloads. */
+export async function handleShowcaseChat(
+  root: string,
+  request: Request,
+  action: 'threads' | 'session' | 'mcp',
+  id?: string,
+): Promise<Response> {
+  try {
+    const { kv, runtime } = await chat(root);
+    using _handle = kv;
+    return action === 'session'
+      ? await runtime.session(request, id ?? '')
+      : await runtime[action](request);
+  } catch {
+    return Response.json({
+      error:
+        'The assistant is unavailable. Check authentication, streams and provider setup, then try again.',
+    }, { status: 503, headers: { 'cache-control': 'no-store', 'vary': 'Cookie' } });
+  }
+}

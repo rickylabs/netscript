@@ -1,0 +1,50 @@
+/** Server-only workspace import boundary. The provider graph is loaded by native Deno. */
+import { findWorkspaceRoot } from '@netscript/config';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import type { ChatPageData } from '../../../ai/showcase/contracts.ts';
+
+type NativeChat = {
+  readShowcaseChat(root: string, request: Request): Promise<ChatPageData>;
+  handleShowcaseChat(
+    root: string,
+    request: Request,
+    action: 'threads' | 'session' | 'mcp',
+    id?: string,
+  ): Promise<Response>;
+};
+
+async function nativeChat(): Promise<{ runtime: NativeChat; root: string }> {
+  const root = await findWorkspaceRoot(Deno.cwd());
+  if (!root) throw new Error('Workspace unavailable');
+  const specifier = pathToFileURL(join(root, 'ai', 'showcase', 'runtime.ts')).href;
+  const runtime: NativeChat = await import(/* @vite-ignore */ specifier);
+  return { root, runtime };
+}
+
+/** Read only safe page state; setup failures render an honest unavailable state. */
+export async function readShowcaseChat(request: Request): Promise<ChatPageData> {
+  try {
+    const { root, runtime } = await nativeChat();
+    return await runtime.readShowcaseChat(root, request);
+  } catch {
+    return { state: 'unavailable' };
+  }
+}
+
+/** Dispatch API work only after Vite has handed off the current request. */
+export async function handleShowcaseChat(
+  request: Request,
+  action: 'threads' | 'session' | 'mcp',
+  id?: string,
+): Promise<Response> {
+  try {
+    const { root, runtime } = await nativeChat();
+    return await runtime.handleShowcaseChat(root, request, action, id);
+  } catch {
+    return Response.json({ error: 'The assistant is unavailable. Check the workspace setup.' }, {
+      status: 503,
+      headers: { 'cache-control': 'no-store' },
+    });
+  }
+}

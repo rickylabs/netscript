@@ -1,0 +1,40 @@
+/** Native Deno server module, loaded at request time outside Vite's graph. */
+import type { ChatModelProviderPort } from '@netscript/ai/ports';
+import { DEFAULT_CHAT_MODEL } from '../models.ts';
+
+/** Detect credentials without loading an SDK or making a model call. */
+export function providerConfigured(): boolean {
+  const provider = DEFAULT_CHAT_MODEL.split(':')[0];
+  const keys = provider === 'anthropic'
+    ? ['ANTHROPIC_AUTH_TOKEN', 'ANTHROPIC_OAUTH_TOKEN', 'ANTHROPIC_API_KEY']
+    : provider === 'openai-compatible'
+    ? ['OPENAI_API_KEY']
+    : [];
+  return keys.some((key) => Boolean(Deno.env.get(key)?.trim()));
+}
+
+/** Resolve only supported, app-configured providers; no test provider ships in the app. */
+export async function showcaseProvider(): Promise<
+  { provider: ChatModelProviderPort; model: string }
+> {
+  if (!providerConfigured()) throw new Error('Connect a provider first');
+  const separator = DEFAULT_CHAT_MODEL.indexOf(':');
+  const model = DEFAULT_CHAT_MODEL.slice(separator + 1);
+  if (separator < 1 || !model.trim()) throw new Error('Invalid default chat model');
+  if (DEFAULT_CHAT_MODEL.startsWith('anthropic:')) {
+    const { AnthropicModelProvider } = await import('@netscript/ai/anthropic');
+    return { provider: new AnthropicModelProvider({ models: [model] }), model };
+  }
+  if (DEFAULT_CHAT_MODEL.startsWith('openai-compatible:')) {
+    const { OpenAiCompatibleModelProvider } = await import('@netscript/ai/openai-compatible');
+    return {
+      provider: new OpenAiCompatibleModelProvider({
+        apiKey: Deno.env.get('OPENAI_API_KEY'),
+        baseURL: Deno.env.get('OPENAI_BASE_URL') ?? 'https://api.openai.com/v1',
+        models: [model],
+      }),
+      model,
+    };
+  }
+  throw new Error('Unsupported chat provider');
+}

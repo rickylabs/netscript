@@ -1,0 +1,80 @@
+/** Read-only, app-owned Northwind MCP tools. Service contracts remain the source of truth. */
+import { createServiceClient } from '@netscript/sdk/client';
+import { toolDefinition } from '@tanstack/ai';
+import { createMCPClient } from '@tanstack/ai-mcp';
+import { createMCPServer } from '@tanstack/ai-mcp/server';
+import { createToolRegistry, defineAiTool } from '@netscript/ai/tools';
+import { z } from 'zod';
+import { OrdersContractV1 } from '../../contracts/versions/v1/orders.contract.ts';
+
+const orders = createServiceClient<typeof OrdersContractV1>({
+  // SDK apiVersion defaults to v1. This selects the generated v1.orders router at /api/rpc/v1/orders.
+  contract: OrdersContractV1,
+  serviceName: 'orders',
+  routerName: 'orders',
+});
+export type OrdersReader = Pick<typeof orders, 'list' | 'getById'>;
+
+const listInput = z.object({
+  page: z.number().int().min(1).max(1000).default(1),
+  limit: z.number().int().min(1).max(20).default(10),
+  search: z.string().trim().max(200).optional(),
+  status: z.enum(['pending', 'awaiting_payment', 'paid', 'shipped', 'refunded', 'cancelled'])
+    .optional(),
+}).strict();
+const detailInput = z.object({ id: z.number().int().positive() }).strict();
+// The framework's tool port expects object property schemas, a narrower contract than arbitrary JSON Schema.
+const toolParameters = z.object({
+  type: z.literal('object'),
+  properties: z.record(z.string(), z.record(z.string(), z.unknown())),
+}).catchall(z.unknown());
+
+/** The same validated tools serve MCP clients and the app's agent, with request-local cancellation. */
+export async function northwindTools(signal: AbortSignal, reader: OrdersReader = orders) {
+  const list = toolDefinition({
+    name: 'northwind_list_orders',
+    description:
+      'Read one page of live Northwind orders. Filter by reference, customer or status. Amounts are integer minor units; pagination states the full count.',
+    inputSchema: listInput,
+  }).server(async (input) => {
+    signal.throwIfAborted();
+    try {
+      return await reader.list({
+        ...listInput.parse(input),
+        sortOrder: 'desc',
+        sortBy: 'createdAt',
+      }, { context: { signal } });
+    } catch {
+      throw new Error('Northwind orders are unavailable. Please try again.');
+    }
+  });
+  const detail = toolDefinition({
+    name: 'northwind_get_order',
+    description:
+      'Read one live Northwind order by its numeric ID. Never creates, modifies or deletes orders.',
+    inputSchema: detailInput,
+  }).server(async (input) => {
+    signal.throwIfAborted();
+    try {
+      return await reader.getById(detailInput.parse(input), { context: { signal } });
+    } catch {
+      throw new Error('This Northwind order could not be read. Please try again.');
+    }
+  });
+  const server = createMCPServer({
+    name: '{{projectName}}-northwind',
+    version: '1.0.0',
+    tools: [list, detail],
+    sessions: 'stateless',
+  });
+  const client = await createMCPClient({ server });
+  const registry = createToolRegistry([
+    defineAiTool(list.name).describe(list.description)
+      .parameters(toolParameters.parse(z.toJSONSchema(listInput))).input(listInput)
+      .server((input) => client.callTool('northwind_list_orders', input, { signal })),
+    defineAiTool(detail.name).describe(detail.description)
+      .parameters(toolParameters.parse(z.toJSONSchema(detailInput))).input(detailInput)
+      .server((input) => client.callTool('northwind_get_order', input, { signal })),
+  ]);
+  return { server, registry };
+}

@@ -1,0 +1,62 @@
+/** Translate the owned agent vocabulary to the existing durable transport's AG-UI events. */
+import type { AgentChunk } from '@netscript/ai/contracts';
+import { EventType, type StreamChunk } from '@tanstack/ai';
+
+/** Only public answer text and tool IO enter the transcript; provider errors stay redacted. */
+export async function* chatEvents(
+  source: AsyncIterable<AgentChunk>,
+  threadId: string,
+): AsyncIterable<StreamChunk> {
+  const runId = crypto.randomUUID();
+  let messageId = crypto.randomUUID();
+  let started = false;
+  let failed = false;
+  yield { type: EventType.RUN_STARTED, threadId, runId };
+  for await (const chunk of source) {
+    if ((chunk.type === 'text' || chunk.type === 'tool-call') && !started) {
+      yield { type: EventType.TEXT_MESSAGE_START, messageId, role: 'assistant' };
+      started = true;
+    }
+    if (chunk.type === 'text') {
+      yield { type: EventType.TEXT_MESSAGE_CONTENT, messageId, delta: chunk.delta };
+    } else if (chunk.type === 'tool-call') {
+      yield {
+        type: 'TOOL_CALL_START',
+        toolCallId: chunk.toolCall.id,
+        toolCallName: chunk.toolCall.name,
+        parentMessageId: messageId,
+      };
+      yield {
+        type: EventType.TOOL_CALL_ARGS,
+        toolCallId: chunk.toolCall.id,
+        delta: chunk.toolCall.arguments,
+      };
+      yield { type: 'TOOL_CALL_END', toolCallId: chunk.toolCall.id };
+    } else if (chunk.type === 'tool-result') {
+      yield {
+        type: EventType.TOOL_CALL_RESULT,
+        toolCallId: chunk.result.toolCallId,
+        messageId: crypto.randomUUID(),
+        role: 'tool',
+        content: chunk.result.state === 'error'
+          ? 'The order could not be read. Try again.'
+          : typeof chunk.result.content === 'string'
+          ? chunk.result.content
+          : JSON.stringify(chunk.result.content),
+      };
+    } else if (chunk.type === 'message') {
+      if (started) yield { type: EventType.TEXT_MESSAGE_END, messageId };
+      started = false;
+      messageId = crypto.randomUUID();
+    } else if (chunk.type === 'error') {
+      failed = true;
+      yield {
+        type: EventType.RUN_ERROR,
+        message:
+          'The assistant could not complete this request. Check the provider connection and try again.',
+      };
+    }
+  }
+  if (started) yield { type: EventType.TEXT_MESSAGE_END, messageId };
+  if (!failed) yield { type: EventType.RUN_FINISHED, threadId, runId };
+}

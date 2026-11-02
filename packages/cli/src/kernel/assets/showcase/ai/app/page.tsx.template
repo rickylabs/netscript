@@ -1,0 +1,92 @@
+import { Head } from 'fresh/runtime';
+import { define } from '../utils.ts';
+import { readShowcaseChat } from '../lib/showcase-ai.ts';
+import NorthwindChat from '../islands/NorthwindChat.tsx';
+import type { ChatPageData } from '../../../ai/showcase/contracts.ts';
+
+export const handler = define.handlers({
+  GET: async (ctx) => {
+    return {
+      data: await readShowcaseChat(ctx.req),
+      headers: { 'cache-control': 'no-store', 'vary': 'Cookie' },
+    };
+  },
+});
+
+/** Render explicit setup/sign-in/error states without creating a browser chat connection. */
+export function NorthwindAssistant({ data }: { data: ChatPageData }) {
+  return (
+    <section class='northwind-ai' aria-labelledby='northwind-ai-title'>
+      <Head>
+        <title>{{projectName}} — Northwind assistant</title>
+      </Head>
+      <header class='northwind-ai__header'>
+        <div>
+          <p class='northwind-ai__eyebrow'>NORTHWIND / INTELLIGENCE</p>
+          <h1 id='northwind-ai-title'>A clearer view of your orders.</h1>
+          <p>Ask a question. Follow the source. Pick up where you left off.</p>
+        </div>
+        <span class='northwind-ai__label'>Read-only order access</span>
+      </header>
+      {data.state === 'ready'
+        ? <NorthwindChat initialThreads={data.threads} />
+        : (
+          <div class='northwind-ai__setup'>
+            <div class='northwind-ai__mark' aria-hidden='true'>✳</div>
+            <p class='northwind-ai__eyebrow'>YOUR WORKSPACE, CONNECTED</p>
+            <h2>
+              {data.state === 'connect-provider'
+                ? 'Connect your AI provider'
+                : data.state === 'sign-in'
+                ? 'Your conversations belong to you'
+                : 'Your assistant is temporarily unavailable'}
+            </h2>
+            <p>
+              {data.state === 'connect-provider'
+                ? 'Turn live Northwind orders into useful answers. Connect a provider on the server to start a private conversation.'
+                : data.state === 'sign-in'
+                ? 'Sign in with your workspace account to create and revisit private conversations.'
+                : 'Check the workspace’s authentication, durable streams and provider configuration, then reload.'}
+            </p>
+            {data.state === 'connect-provider'
+              ? (
+                <>
+                  <ol>
+                    <li>
+                      Choose a model in <code>ai/models.ts</code>.
+                    </li>
+                    <li>
+                      Set its provider credential in the server environment:{' '}
+                      <code>ANTHROPIC_API_KEY</code> or <code>OPENAI_API_KEY</code>.
+                    </li>
+                    <li>Restart {{appName}} and sign in to your workspace.</li>
+                  </ol>
+                  <p class='northwind-ai__note'>
+                    Credentials stay on your server. Order tools read live data; no sample answers
+                    are generated.
+                  </p>
+                  <div class='northwind-ai__actions'>
+                    <a href='/settings'>Workspace settings</a>
+                    <a href='/sign-in'>Sign in</a>
+                  </div>
+                </>
+              )
+              : data.state === 'sign-in'
+              ? (
+                <a class='northwind-ai__primary' href='/sign-in'>
+                  Continue to sign in <span aria-hidden='true'>→</span>
+                </a>
+              )
+              : <a class='northwind-ai__primary' href='/ai'>Try again</a>}
+            <div class='northwind-ai__examples'>
+              <span>Explore when connected</span>
+              <p>“Which orders are awaiting payment?”</p>
+              <p>“Show the details for order 12.”</p>
+            </div>
+          </div>
+        )}
+    </section>
+  );
+}
+
+export default define.page<typeof handler>(({ data }) => <NorthwindAssistant data={data} />);

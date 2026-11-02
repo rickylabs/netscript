@@ -1,0 +1,61 @@
+/** Conversation metadata and concurrency only. Durable Streams owns the transcript. */
+import { type ChatThread, TURN_TIMEOUT_MS } from './contracts.ts';
+
+const scope = ['showcase', '{{projectName}}', '{{appName}}', 'chat'] as const;
+const threadKey = (id: string): Deno.KvKey => [...scope, 'thread', id];
+const ownerKey = (owner: string, id: string): Deno.KvKey => [...scope, 'owner', owner, id];
+const leaseKey = (id: string): Deno.KvKey => [...scope, 'turn', id];
+
+/** Persistent, opaque ownership registry; it never stores auth credentials. */
+export function createThreadStore(kv: Deno.Kv) {
+  return {
+    async create(owner: string): Promise<ChatThread> {
+      const thread: ChatThread = {
+        id: crypto.randomUUID(),
+        title: 'New conversation',
+        createdAt: new Date().toISOString(),
+      };
+      const result = await kv.atomic().check({ key: threadKey(thread.id), versionstamp: null })
+        .set(threadKey(thread.id), { owner, thread })
+        .set(ownerKey(owner, thread.id), thread).commit();
+      if (!result.ok) throw new Error('Conversation could not be created');
+      return thread;
+    },
+    async owns(owner: string, id: string): Promise<boolean> {
+      const record = await kv.get<{ owner: string }>(threadKey(id));
+      return record.value?.owner === owner;
+    },
+    async list(owner: string): Promise<readonly ChatThread[]> {
+      const threads: ChatThread[] = [];
+      for await (
+        const entry of kv.list<ChatThread>({ prefix: [...scope, 'owner', owner] }, {
+          limit: 50,
+          reverse: true,
+        })
+      ) {
+        threads.push(entry.value);
+      }
+      return threads.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    },
+    async title(owner: string, id: string, text: string): Promise<void> {
+      const entry = await kv.get<{ owner: string; thread: ChatThread }>(threadKey(id));
+      if (entry.value?.owner !== owner || entry.value.thread.title !== 'New conversation') return;
+      const thread = { ...entry.value.thread, title: text.replace(/\s+/g, ' ').slice(0, 72) };
+      await kv.atomic().check(entry).set(threadKey(id), { owner, thread })
+        .set(ownerKey(owner, id), thread).commit();
+    },
+    async claim(id: string): Promise<string | undefined> {
+      const key = leaseKey(id);
+      const token = crypto.randomUUID();
+      const result = await kv.atomic().check({ key, versionstamp: null })
+        .set(key, token, { expireIn: TURN_TIMEOUT_MS + 30_000 }).commit();
+      return result.ok ? token : undefined;
+    },
+    async release(id: string, token: string): Promise<void> {
+      const entry = await kv.get<string>(leaseKey(id));
+      if (entry.value === token) await kv.atomic().check(entry).delete(entry.key).commit();
+    },
+  };
+}
+
+export type ThreadStore = ReturnType<typeof createThreadStore>;
