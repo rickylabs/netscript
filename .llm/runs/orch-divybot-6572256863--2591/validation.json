@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-11-02T09:48:55.197972+00:00",
-  "scope": "Independent source review PASS; final-head live runtime acceptance remains required",
+  "recordedAt": "2026-11-02T09:59:47.581849+00:00",
+  "scope": "S3 runtime workspace-retention repair; final pushed-head CI required",
   "denoVersion": "2.9.7",
   "sourceHashes": {
     ".llm/tools/validation/fixtures/aspire-surface-manifest.tsv": "43536d51c8e80b7c7a3d7f2d077a5eeb6ce66a68429450297775bdb375ca2ee1",
     "docs/site/orchestration-runtime/how-to/add-a-plugin.md": "33e41b3cb8cd71bf9f08f79fd119ef8939380c3003d5b5fec049e353159a20da",
     "packages/cli/e2e/src/application/gates/scaffold/documented-scaffold-contract.ts": "dbda6df948c94d60575e0f9d231924dff280ba15d3ec31c3405e8c5f0c53619d",
     "packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-gates.ts": "825f93d1f20e5656d596634aef2d6789f446d109dcc6e961c438315832f7adc7",
-    "packages/cli/e2e/src/application/gates/scaffold/verify-documented-scaffold.ts": "e55ad5ebeabc0c9dcc746ca964e1dde5945f9d75e0df5c4b165ce74f3e12f995",
+    "packages/cli/e2e/src/application/gates/scaffold/verify-documented-scaffold.ts": "7e8a54b8a8d75c925bd0a89780184f5ea96056fdd2a76bef6074d29163b01759",
     "packages/cli/e2e/src/domain/cli-surface.ts": "fb8547310ec32b969853989bf8f6de601e0eea7102c46ea1125ba5eac847c0f5",
     "packages/cli/e2e/suites/scaffold/capability-suites.ts": "21f7e65fe1e44eef3f3a4483d8f013fc30546c513e9fb88a32a959b1bc08bff6",
     "packages/cli/e2e/tests/application/gates/scaffold/documented-scaffold_test.ts": "05b4e4e1c8869daea905b357a0375e4b7d495a18df74c581a12dfc34a5eaff2f",
@@ -210,7 +210,41 @@
     "model": "claude-opus-5",
     "effortRequested": "xhigh",
     "effortAttestation": "not available",
-    "scope": "S1 and S2 source/slice; final live CI evidence still required",
-    "report": "s2-review.md"
+    "scope": "S1, S2 and S3 source/slice PASS; final exact-head live evidence still required",
+    "report": "s2-review.md",
+    "reports": [
+      "s1-review.md",
+      "s2-review.md",
+      "s3-review.md"
+    ]
+  },
+  "s3Repair": {
+    "focused": {
+      "passed": 31,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 31,
+      "uniqueFailures": 0
+    },
+    "scopedFiles": 1,
+    "check": "PASS",
+    "lint": "PASS; coverage 1/1",
+    "fmt": "PASS; coverage 1/1",
+    "runtimeAttempt": {
+      "run": "https://github.com/rickylabs/netscript/actions/runs/41423746948",
+      "head": "650fb2ed00389105ebe6cb242a212c827f4c1309",
+      "outcome": "FAIL",
+      "seedControl": "PASS: missing seed handoff RED, real stream/HTML Activity PASS, resident worker preserved",
+      "cleanup": "PASS: exact AppHost stopped; no owned containers; foreign/unproven containers 0",
+      "failure": "Recursive generated workspace removal raised filesystem PermissionDenied after successful runtime cleanup",
+      "repair": "Retain generated scratch after canonical runtime cleanup; reduce success logging so all variant receipts survive bounded output"
+    },
+    "sourceReview": "PASS; s3-review.md",
+    "qualityGate": {
+      "gitHead": "650fb2ed00389105ebe6cb242a212c827f4c1309",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 13195
+    }
   }
 }

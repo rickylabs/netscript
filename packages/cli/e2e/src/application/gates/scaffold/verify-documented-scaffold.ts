@@ -187,6 +187,7 @@ async function runVariant(
   await Deno.mkdir(root, { recursive: true });
   const projectRoot = join(root, 'activity-demo');
   const appHost = join(projectRoot, 'aspire/apphost.mts');
+  console.info(`${variant}: executing the documented command block`);
   let cwd = root;
   let beforeSeedPid: number | undefined;
   let appHostStarted = false;
@@ -232,7 +233,6 @@ async function runVariant(
         beforeSeedPid = await workerPid(appHost, cwd);
       }
       if (words[0] === 'aspire' && args[0] === 'start') appHostStarted = true;
-      console.info(`${variant}: ${words.join(' ')}`);
       await command(
         words[0] === 'netscript' ? Deno.execPath() : 'aspire',
         words[0] === 'netscript'
@@ -305,7 +305,7 @@ async function runVariant(
     throw error;
   }
   if (primaryFailure) throw primaryFailure.error;
-  await Deno.remove(root, { recursive: true });
+  // Retain bind-mounted database data; runtime cleanup does not require deleting the workspace.
 }
 
 if (import.meta.main) {
@@ -324,5 +324,7 @@ if (import.meta.main) {
   for (const variant of DOCUMENTED_SCAFFOLD_VARIANTS) {
     await runVariant(repoRoot, cliEntrypoint, parent, variant, commands);
   }
-  await Deno.remove(parent);
+  console.info(
+    JSON.stringify({ documentedScaffold: 'PASS', variants: DOCUMENTED_SCAFFOLD_VARIANTS }),
+  );
 }

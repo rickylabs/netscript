@@ -29,3 +29,13 @@ Keep head fixed once accepted. Write READY with the full SHA by atomic ignored f
 handoff only; file creation queues publication, not confirmation of posting. Never commit the
 assignment or final report. Preserve draft/no-merge canary hold; Cockpit reviews and merges.
 No rebase or force push. Public artifacts use repo-relative paths. No accepted product debt.
+
+Latest steering: 650fb2e runtime CI passed the seed control/Activity/exact cleanup, then failed
+recursive scratch deletion with PermissionDenied. The S3 repair retains generated workspaces and
+reduces repeated success logs to preserve all variant receipts. See memory-runtime-workspace-retention.md.
+Final acceptance is still pending; the latest PR head and exact CI run supersede earlier candidates.
+
+S3 source review now PASS (s3-review.md). Independent rerun: 31 focused tests plus changed-file
+check/lint/fmt; broader quality also passes. The sign-off commit retains generated scratch after
+exact runtime cleanup, with all acceptance assertions unchanged. Run the final one-pass CI at
+this next pushed head and use its full SHA, never an earlier failed candidate, for READY.

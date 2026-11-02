@@ -1,0 +1,37 @@
+## IMPL-EVAL S3 (cleanup repair) — issue 2591 · **PASS** (source/slice)
+
+Same evaluator session, continuing from the S2 repair PASS. Reviewed the working tree against `650fb2e`. Source read-only; nothing committed or posted. Observed model: **`claude-opus-5`** (Opus 5); reasoning effort is not attestable from this session surface.
+
+### The diff is exactly what was described, and provably outside every assertion path
+`git diff --numstat` on `verify-documented-scaffold.ts` is **5 insertions / 3 deletions across 4 hunks**: a per-variant `console.info` added before the command loop, the per-command success `console.info` removed, `await Deno.remove(root, { recursive: true })` replaced by a comment, and `await Deno.remove(parent)` replaced by the summary line. No other `Deno.remove` of the scratch remains. The fault-control blocks, the `waitForDocumentedActivity` call, the `beforeSeedPid`/`afterSeedPid` comparison and the whole `cleanup()` path are byte-identical to `650fb2e`. Nothing in production source changed.
+
+### The CI evidence confirms the diagnosis — the deleted statement was the sole cause, and it ran after everything that matters
+I read `signoff-ci-report/e2e-report-scaffold-runtime.json` rather than taking the summary on faith. The `behavior.documented-scaffold` step (98,841 ms, `verdict: failed`, `timedOut: false`, exit 1) shows, in order:
+```
+{"variant":"skip-seed-handoff","verdict":"PASS","seed":"RED: missing handoff",
+ "activity":"7c6b82ef-86a5-465f-9fe3-e1122318bd41","residentWorkerPreserved":true}
+{"cleanup":"PASS","exactAppHostStopped":true,"foreignOrUnknownLeftAlone":0}
+```
+then `PermissionDenied: Permission denied (os error 13): remove '.../documented-8da0a05acaacf427/skip-seed-handoff'` at `verify-documented-scaffold.ts:308` — precisely the removed line. So against a live stack the seed control went RED for its typed symptom while the Activity path produced a **real** stream event id, the resident worker PID was unchanged, and the canonical exact-AppHost stop reported zero owned survivors with `foreignOrUnknownLeftAlone=0`. The failure occurred strictly *after* the variant receipt and *after* the cleanup receipt, in disposable-directory deletion only. Removing that statement cannot weaken any of it.
+
+I also confirmed the root cause independently rather than assuming it: `render-ts-apphost.ts:142` sets `DataPath: '.data/postgres'`, and `generate-register-infrastructure.ts:192-196` wires it through `.withDataBindMount(resolveDataPath(appHostDir, …))`. Postgres chowns its data directory to the container uid, so the host-side tree is not removable by the non-root test process. Retention is the correct resolution — the alternatives (privileged deletion, or a throwaway container doing `rm -rf` on the mount) would both broaden the gate's mutation scope in exactly the way `AGENTS.md` forbids ("mutation … remains scoped to positively proven resources"). Keeping the residue under `.llm/tmp/cli-e2e/…` is the sanctioned scratch location and stays outside the Aspire scan scope, quality and fmt selections, so nothing downstream is polluted.
+
+### The logging reduction is evidence-motivated, and failure diagnostics are intact
+The report's `stdoutTail` is bounded and already began mid-run at `skip-seed-handoff: netscript init …`, with the two receipts only just surviving at the end. With three variants each emitting ten command lines plus `probeAppHome` output, the earlier variants' `{"variant":…}` and `{"cleanup":…}` lines would have been pushed out of the tail. So this is a real receipt-preservation fix, not cosmetics — and the CI artifact demonstrates it. Failure diagnostics are unchanged: `command()` still throws `${executable} ${args.join(' ')} exited ${code}: <stderr tail>\n<stdout tail>`, so a failing command is still fully identified, and the new per-variant line preserves variant-level progress. The only genuine loss is live progress for a *hang*, and that is self-limiting: every command carries `AbortSignal.timeout(ceiling)` (330 s, or start-timeout + 30 s), so a hang becomes a thrown error naming the exact command well inside the 40-minute gate budget.
+
+The final summary is honest as written: `runVariant` throws on failure and the loop awaits sequentially, so reaching that line means all three variants completed.
+
+### Checks performed
+- `deno test --allow-all --unstable-kv` over `documented-scaffold_test.ts` + `suite-registry_test.ts` → **31 passed, 0 failed** (matches `s3-tests.json`).
+- `run-deno-check.ts` on the single changed file → 0 occurrences (matches `s3-check.json`).
+- `deno lint` and `deno fmt --check` with `--config .llm/tmp/2591/source-config.json` on the changed file → clean. I separately measured line lengths: lines 264 and 273 exceed 100 chars but are unbreakable template literals pre-existing from S2, and the new summary line is wrapped and within the limit — fmt's clean verdict is genuine, not a selection artefact.
+- `git diff --numstat` / hunk count to prove the assertion regions are untouched; `grep` to confirm no scratch deletion remains.
+- Traced the Postgres bind-mount generation chain and read the CI report's gate step directly.
+
+### Non-blocking recommendations
+1. **The retained residue is also undeletable by the operator.** `.data/postgres` is owned by the container uid, so a developer who runs this gate locally accumulates workspaces under `.llm/tmp/cli-e2e/documented-scaffold/` that plain `rm -rf` cannot remove, and there is no reaper. Irrelevant on an ephemeral CI runner; a papercut locally, with three full workspaces (including `node_modules`) retained per run. The one option that reduces residue without crossing the privileged-deletion line is a per-entry removal that skips the data directory — delete everything in `root` except `activity-demo/.data`, and say so in the comment. Worth doing, not worth blocking on.
+2. **The summary prints the `DOCUMENTED_SCAFFOLD_VARIANTS` constant rather than an accumulated list.** True today because of the loop shape, but it would silently lie if the loop ever became `Promise.allSettled` or gained a filter. Accumulating completed names is a one-line change that makes the claim structurally rather than incidentally honest.
+3. Consider noting the retained-workspace behaviour in the gate's `failureHint` or the e2e README, so an operator finding root-owned directories knows they are expected.
+
+### Explicitly unproven
+Live final-head runtime acceptance is **not** certified, and I do not treat run 41423746948 as overall runtime acceptance — it failed, and only `skip-seed-handoff` executed; `drop-link` and `restored` have still never run end to end. Nothing here has executed against a live stack since `650fb2e`. A fresh one-pass `scaffold.runtime` at the next final pushed head remains mandatory, and must show: all three variants completing in sequence (the specific thing this repair unblocks), `drop-link` failing only with `StreamLinkAcceptanceError` while its seed assertion passes against the by-correlation endpoint, `restored` passing both contracts, a `{"cleanup":"PASS","exactAppHostStopped":true}` receipt per variant, and the `{"documentedScaffold":"PASS"}` summary — all inside the 40-minute ceiling. The earlier 41423003834 Fresh/esbuild EPIPE stands as its own separate failed attempt; I agree no product fix is inferable from a single render failure, and later successful rendering does not retire it. Re-steer this session with the final-head evidence and I will review it as the same evaluator.

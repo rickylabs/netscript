@@ -118,3 +118,25 @@ Reconcile: declared write surface respected. This sign-off commit only records t
 review and local evidence. Final-head one-pass CI, full remote-check completion and same-session
 evidence review remain mandatory. Their final receipts belong on the PR and ignored final report
 so the accepted source head stays fixed. No merge, issue closure or accepted product debt.
+
+## S3 live cleanup repair
+
+Exact-head CI 41423746948 at 650fb2e completed the missing-seed control, real Activity and
+canonical cleanup, then hit PermissionDenied recursively deleting the disposable workspace.
+Retain owned generated scratch instead of making database bind-mount permissions part of runtime
+acceptance. No privileged deletion or foreign resource mutation. Per-command success logging was
+reduced so bounded command evidence retains all variant receipts; failures still include the exact
+command and captured diagnostics. The earlier 41423003834 Fresh/esbuild render failure remains
+a separate failed attempt; later successful rendering does not erase it.
+
+Reconcile: only the existing declared E2E runner and run evidence changed. Production source and
+carrier hashes are unchanged. Same independent evaluator must review this small cleanup repair
+before sign-off, then a new final-head one-pass CI and evidence review remain required.
+
+S3 independent same-session Opus source review PASS in s3-review.md, with independent rerun of
+31 focused tests and changed-file check/lint/fmt. Broader quality:gate PASS. The reviewer traced
+the bind-mount generation chain and confirmed all assertion and canonical cleanup paths are
+unchanged. Retained scratch costs three generated workspaces per run on a persistent machine;
+CI runners are ephemeral. This is recorded verification residue, not accepted product debt.
+Sign-off commit includes this review, source repair and resume state. Final pushed-head CI and
+same-session evidence audit remain required; publish their results in the PR and atomic report.
