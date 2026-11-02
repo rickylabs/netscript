@@ -121,8 +121,8 @@ async function verifyLiveDbEndpoint(): Promise<void> {
 
 /**
  * Verify the generated database seed and defined missing-row HTTP/OpenAPI contract.
- * This runs inside the existing live database endpoint gate so all grouped checks
- * consume the same later `scaffold.runtime` execution.
+ * The live database endpoint and shared record-activity gates use this contract;
+ * both runtime tiers commit an update before requiring populated Overview activity.
  */
 export async function verifyGeneratedCrudAcceptance(
   usersUrl: string,

@@ -105,3 +105,46 @@ Deno.test('rejecting activity publishers cannot turn committed mutations into re
     console.warn = originalWarn;
   }
 });
+
+Deno.test('activity producer identities survive retries but change after restart and terminal replacement', async () => {
+  const streamModule = moduleUrl(`
+    export const producers = [];
+    let fail = false;
+    export function failNext() { fail = true; }
+    export const defineStreamSchema = x => x;
+    export function createServiceStreamProducer(options) {
+      const producer = { closed: false, options, events: [], upsert(_type, event) {
+        this.events.push(event);
+        const status = fail ? 'rejected' : 'delivered';
+        if (fail) { this.closed = true; fail = false; }
+        return { completion: Promise.resolve({status}) };
+      }};
+      producers.push(producer); return producer;
+    }
+  `);
+  const stream = await import(streamModule);
+  const source = renderTemplateAssetSync(TEMPLATE_KEYS.serviceRecordActivityAdapter, vars)
+    .replace("'@netscript/plugin-streams-core'", JSON.stringify(streamModule))
+    .replace("'zod'", JSON.stringify(import.meta.resolve('zod')))
+    .replaceAll('Deno.env.get', '(() => "http://streams.example")');
+  const { createRecordActivityPublisher } = await import(moduleUrl(source));
+  const first = createRecordActivityPublisher();
+  const row = { id: 42, reference: 'REC-42', updatedAt: new Date('2026-11-02T01:00:00Z') };
+  await first.record('created', row);
+  await first.record('updated', row);
+  assertEquals(stream.producers.length, 1, 'one identity within the lifetime including retries');
+  stream.failNext();
+  await first.record('updated', row);
+  assertEquals(stream.producers[0].closed, true, 'terminal producer rejection closes its lifetime');
+  await first.record('updated', row);
+  const restarted = createRecordActivityPublisher();
+  await restarted.record('updated', row);
+  assertEquals(stream.producers.length, 3);
+  assertEquals(
+    new Set(stream.producers.map((p: { options: { producerId: string } }) => p.options.producerId))
+      .size,
+    3,
+  );
+  assertEquals(stream.producers[0].events[0].timestamp, row.updatedAt.toISOString());
+  assertEquals(stream.producers[0].events[0].actor, { name: 'Anonymous', kind: 'anonymous' });
+});

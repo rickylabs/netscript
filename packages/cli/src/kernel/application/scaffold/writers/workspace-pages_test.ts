@@ -28,7 +28,7 @@ Deno.test('#2566: home uses shared generated overview without fabricated CRUD or
   assertStringIncludes(home, "from './dashboard-view.tsx'");
   assertStringIncludes(dashboard, 'data.totals.records.current');
   assertStringIncludes(dashboard, 'ChartBlock');
-  assertStringIncludes(dashboard, 'Donut');
+  assertStringIncludes(dashboard, "variant='bar' class='workspace-status-chart'");
   assertEquals(dashboard.includes('generatedPageCount()'), false);
   assertEquals(dashboard.includes('appTheme().label'), false);
   assertStringIncludes(navigation, 'walk(routePatterns)');

@@ -1,0 +1,505 @@
+{
+  "deno": "2.9.7",
+  "scope": "Final reviewed working source; manifests bind receipts to content before commit.",
+  "productManifest": [
+    {
+      "path": ".llm/tools/docs/service-scaffold-support.ts",
+      "sha256": "0cad64188fb64ceb708ea4b9291ce540022598a306d391f61aa571f97e98d83a"
+    },
+    {
+      "path": "packages/cli/e2e/src/application/gates/scaffold/prepare-streams-storage-fixture.ts",
+      "sha256": "6c6a5e4751f9c38d1fc9c8c58fc11a84c0c67f9cbc5415432c4b0eb3005095cc"
+    },
+    {
+      "path": "packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-gates.ts",
+      "sha256": "7ea77232c5e22a64acf4e305a01cb5ce91d41ac1b083f1699b203db5f40bd866"
+    },
+    {
+      "path": "packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts",
+      "sha256": "4db709efa2a4f00aacc0975cf65d763be7537a07277313d20aad85adcb7b7d6b"
+    },
+    {
+      "path": "packages/cli/e2e/src/application/gates/scaffold/verify-record-activity.ts",
+      "sha256": "8cc001b86658e2a01ab506ef92e77c9d1254c536554db87604d4eef00a9eff78"
+    },
+    {
+      "path": "packages/cli/e2e/src/domain/cli-surface.ts",
+      "sha256": "7c91b08baa2dc3e2d6c3007e468402fa388ee576ed6016df9339b6ca2bfc00b2"
+    },
+    {
+      "path": "packages/cli/e2e/suites/scaffold/capability-suites.ts",
+      "sha256": "9719c8c36ef6da90dc804ef5e7abcdfa1fff44486059e63b2761f94e19cf624a"
+    },
+    {
+      "path": "packages/cli/e2e/tests/application/gates/streams-storage-restart_test.ts",
+      "sha256": "0f979c1234f953f2119d6c12f09f77df2232949f25aac685d797fb9ba8bdc9bd"
+    },
+    {
+      "path": "packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts",
+      "sha256": "f115fac0413952f4a1cb8a5fa99f02f25a07b624aa14ac2ee3cc0dfeebc21ad4"
+    },
+    {
+      "path": "packages/cli/e2e/tests/presentation/suite-registry_test.ts",
+      "sha256": "8864f07c8d182d2fddbaa8b233bca6af827d004a497215644894ff448573b1b2"
+    },
+    {
+      "path": "packages/cli/src/kernel/adapters/database/sample-records_test.ts",
+      "sha256": "823d12be953cb5a42bc1912100d1bd1eddc33065819012e2e641dcf39721e350"
+    },
+    {
+      "path": "packages/cli/src/kernel/adapters/service/record-activity_test.ts",
+      "sha256": "2248a5bcb1d6ef97114c6c6d533037cf436899c7b5b1784969b2e861d73a0b3c"
+    },
+    {
+      "path": "packages/cli/src/kernel/adapters/service/scaffolder.ts",
+      "sha256": "62d08c0c8789524bb8c5066c6985c23bd52593087e20c85386a2b85720660497"
+    },
+    {
+      "path": "packages/cli/src/kernel/adapters/service/scaffolder_test.ts",
+      "sha256": "85fad82f090f157d6693ad2babfd46da64b5ca3e375f50f49d233515ba900ff2"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/scaffold/writers/scaffold-projections_test.ts",
+      "sha256": "868c2e2ed47dad316f5fea322457790becf566df91f256c5a150df52980b65c3"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/scaffold/writers/workspace-capabilities_test.ts",
+      "sha256": "847b41937133ddf9e87a02a6a8e9ef92856e4000b73f1b1a743b6b9964b7da4e"
+    },
+    {
+      "path": "packages/cli/src/kernel/application/scaffold/writers/workspace-pages_test.ts",
+      "sha256": "1442ddb95d4e668e69d31d3bd410419bc3fb0729866247a20892f26141b54bd5"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/assets/workspace.css.template",
+      "sha256": "63dd570f0780f8230b2a73717b880a66871371e4f4accfea4469cc93cd1eed86"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/islands/RecordTable.tsx.template",
+      "sha256": "3df6787a2406b7ebcd9f9ac949d899a9f9239023d05563552b74da4d853332ab"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/lib/scaffold-capabilities.ts.template",
+      "sha256": "40d775fff0644e839c438078f09b4bd44224fd3eb3731c33625b1df0e3b395c3"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/lib/scaffold-contract.ts.template",
+      "sha256": "75ddf5d8ab4d4bcb628739f1bcfc8cdd7eb0ccd72dfacb8f2dceb38562b14513"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/lib/scaffold-plugin-capabilities.ts.template",
+      "sha256": "388e05fc8d406f9e96aa5da3cf9e2919bce26f437008d70f74b5849d88165bca"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/lib/scaffold-projections.ts.template",
+      "sha256": "ebd9be0ea1098a932716a36263dc74a83f4af73a9451d5c2af0da685a58bbeed"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/app/routes/(_components)/dashboard-view.tsx.template",
+      "sha256": "bdb258fb2dac5d306680ac307389a7c5b3ce05d794bd57b8b0b1d52a3d1d9c63"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/embedded.generated.ts",
+      "sha256": "440b8f8fc9f9789e00dac337f437b38c5a95307281a99672f306ba038cd99e4e"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/manifest.ts",
+      "sha256": "647aa8f63ebbd5cf61bfba2822008de0a9d56a5bde820b2369208ab24dace3bc"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/adapters/record-activity.ts.template",
+      "sha256": "2620ac362abd471d07ee780f10a272e4de7cc6111f222b226a48330668622a09"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/application/entity.memory.ts.template",
+      "sha256": "ca2aa2a2f1f73e90cee4f087036ed3f84aa467be511547b511c0d5f205d66dd0"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/application/entity.ts.template",
+      "sha256": "b5cbd5dc12ee0f759b20fdb24b6730fb744ddd24ba2cb85fa770854eb3801257"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/domain/record-activity.ts.template",
+      "sha256": "b1b29b7ce708b412517a8eff48f9504cab53efa60080670f56c7632c490819b1"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/main.memory.ts.template",
+      "sha256": "418b6cfe743b2f113a54a8dff65ed447d796ffa26749c81ac21167a11f0a2fd8"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/main.ts.template",
+      "sha256": "d550b7099c46c9623f9c684442625bb3492fba515dc77bdaf355de3095b40dac"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/router.ts.template",
+      "sha256": "aa50fa7395f41fa9da9ed0ea81406a91defda099d5afaa13665b597d222d06ba"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/routers/v1.memory.ts.template",
+      "sha256": "365668d9a2c7ff9e9b9f017e48580e1f399db9b9c49311ad086db3b2c864e5c9"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/routers/v1.ts.template",
+      "sha256": "75889a9cb5b5647494addb37f8492bfc99a06340b47d0cf20557c48ec108b0ee"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/sample-records.ts.template",
+      "sha256": "7bd73cceae486e045f66dc038c95334bcf364bee34e382e7ef87dd3491582d09"
+    },
+    {
+      "path": "packages/cli/src/kernel/templates/database/dependency-currency_test.ts",
+      "sha256": "74c6056799b67e5e5ff074d9bd4ad9df8453638892e8a822a8d32912fbd157e8"
+    },
+    {
+      "path": "packages/cli/src/kernel/templates/database/generate-database-seed.ts",
+      "sha256": "fbef6b124b407744545c025c3f3a3f56a42756184be91df7059f75b3e92a1a30"
+    },
+    {
+      "path": "packages/cli/src/kernel/templates/database/generate-db-deno-json.ts",
+      "sha256": "0e58d1398c1cf7d32b6768de3eec2accb47a68e8b932c2ccc72a0f139e7a16cc"
+    },
+    {
+      "path": "packages/cli/src/kernel/templates/service/generate-service-deno-json.ts",
+      "sha256": "a633e64dd71d1e0d90e4a42069d4a12403e43cbc0240ae4009033416ceffbe93"
+    },
+    {
+      "path": "plugins/workers/bin/runtime.ts",
+      "sha256": "a25d30a3965bfd9f42e7c6166358816b5afc69deea08b85be0c3e96a6fb05484"
+    },
+    {
+      "path": "plugins/workers/src/adapter/resources/glue/runtime.stub.ts",
+      "sha256": "2fa71a289d2ed131503692f497c188e3bc2278bb18ed54e207f8aa08fd24aab2"
+    },
+    {
+      "path": "plugins/workers/src/adapter/resources/job/job.ts",
+      "sha256": "85f67a93421a1f81b950e38016f4c298a34551d112a4b581438e4ab394e27837"
+    },
+    {
+      "path": "plugins/workers/src/adapter/resources/job/sample-health-check.stub.ts",
+      "sha256": "a5e9855b79951b55798427c6abe3e4cbd7fa183233db3cbe71aba036516f3d4b"
+    },
+    {
+      "path": "plugins/workers/src/runtime/seed-sample.ts",
+      "sha256": "fdff24157d8e04564612c4998b5291d6a90a0dd91a0a2ea5a253bb129e928b0d"
+    },
+    {
+      "path": "plugins/workers/tests/runtime/seed-sample_test.ts",
+      "sha256": "8f15a23794db30b0d5f40b27a163f6dc6ed07db86711a40f0f5f6c8030cc073d"
+    }
+  ],
+  "scoped": {
+    "check": {
+      "selection": {
+        "filesSelected": 28,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      }
+    },
+    "lint": {
+      "selection": {
+        "filesSelected": 28,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "coverage": {
+        "filesSelected": 28,
+        "filesProcessed": 28,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    "fmt": {
+      "summary": {
+        "filesSelected": 28,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 28,
+        "filesProcessed": 28,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    }
+  },
+  "tests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--unstable-kv",
+      "packages/cli/e2e/tests/application/builders/runtime-gates_test.ts",
+      "packages/cli/e2e/tests/application/gates/streams-storage-restart_test.ts",
+      "packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts",
+      "packages/cli/e2e/tests/presentation/suite-registry_test.ts",
+      "packages/cli/src/kernel/adapters/database/sample-records_test.ts",
+      "packages/cli/src/kernel/adapters/service/record-activity_test.ts",
+      "packages/cli/src/kernel/adapters/service/scaffolder_test.ts",
+      "packages/cli/src/kernel/application/scaffold/writers/scaffold-projections_test.ts",
+      "packages/cli/src/kernel/application/scaffold/writers/workspace-capabilities_test.ts",
+      "packages/cli/src/kernel/application/scaffold/writers/workspace-pages_test.ts",
+      "packages/cli/src/kernel/templates/database/dependency-currency_test.ts",
+      "packages/cli/src/kernel/templates/database/generate-database-seed_test.ts",
+      "packages/fresh-ui/tests/publish-size.test.ts",
+      "plugins/workers/src/adapter/resources/resources.test.ts",
+      "plugins/workers/tests/adapter/runtime-glue-format_test.ts",
+      "plugins/workers/tests/runtime/generated-jobs_test.ts",
+      "plugins/workers/tests/runtime/seed-sample_test.ts",
+      "plugins/workers/worker/job-dispatcher_test.ts"
+    ],
+    "exitCode": 0,
+    "durationMs": 12305,
+    "summary": {
+      "passed": 181,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 181,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "generatedWorkspace": {
+    "source": {
+      "mode": "selection",
+      "cwd": ".llm/tmp/scaffold-2587/final/showcase"
+    },
+    "command": "deno check --unstable-kv <files>",
+    "selection": {
+      "filesSelected": 134,
+      "batches": 2,
+      "failedBatches": 0
+    },
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "groups": []
+  },
+  "carrierGeneration": [
+    {
+      "task": "gen:agent-docs-prose",
+      "args": [],
+      "exitCode": 0,
+      "seconds": 14.71
+    },
+    {
+      "task": "gen:mcp-export-corpus",
+      "args": [
+        "--allow-dirty"
+      ],
+      "exitCode": 0,
+      "seconds": 7.7
+    },
+    {
+      "task": "gen:assets-barrel",
+      "args": [],
+      "exitCode": 0,
+      "seconds": 1.5
+    },
+    {
+      "task": "gen:publish-assets",
+      "args": [],
+      "exitCode": 0,
+      "seconds": 0.4
+    }
+  ],
+  "rootCheckTasks": [
+    {
+      "task": "check:desktop-native-fixture",
+      "exitCode": 0,
+      "seconds": 0.15
+    },
+    {
+      "task": "check:emitted-samples",
+      "exitCode": 0,
+      "seconds": 6.49
+    },
+    {
+      "task": "check:streams-types",
+      "exitCode": 0,
+      "seconds": 0.18
+    },
+    {
+      "task": "check:child-health-docs",
+      "exitCode": 0,
+      "seconds": 0.32
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "exitCode": 0,
+      "seconds": 8.02
+    },
+    {
+      "task": "check:assets-barrel",
+      "exitCode": 0,
+      "seconds": 2.72
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0,
+      "seconds": 17.34
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0,
+      "seconds": 0.48
+    },
+    {
+      "task": "check:scaffold-versions",
+      "exitCode": 0,
+      "seconds": 0.13
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "exitCode": 0,
+      "seconds": 0.28
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "exitCode": 0,
+      "seconds": 1.99
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "exitCode": 0,
+      "seconds": 0.3
+    },
+    {
+      "task": "check:figma-names",
+      "exitCode": 0,
+      "seconds": 0.72
+    },
+    {
+      "task": "check:review-threads",
+      "exitCode": 0,
+      "seconds": 0.51
+    },
+    {
+      "task": "check:design-skill",
+      "exitCode": 0,
+      "seconds": 0.12
+    }
+  ],
+  "durableGates": [
+    {
+      "gateId": "check",
+      "argv": [
+        "deno",
+        "task",
+        "check"
+      ],
+      "outcome": "PASS",
+      "startedAt": "2026-11-02T06:36:47.754Z",
+      "finishedAt": "2026-11-02T06:39:03.972Z",
+      "durationMs": 136219,
+      "exitCode": 0
+    },
+    {
+      "gateId": "quality-gate",
+      "argv": [
+        "deno",
+        "task",
+        "quality:gate"
+      ],
+      "outcome": "PASS",
+      "startedAt": "2026-11-02T06:39:04.063Z",
+      "finishedAt": "2026-11-02T06:39:17.335Z",
+      "durationMs": 13273,
+      "exitCode": 0
+    },
+    {
+      "gateId": "lint-report",
+      "argv": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-lint.ts",
+        "--root",
+        "packages",
+        "--root",
+        "plugins",
+        "--ext",
+        "ts,tsx",
+        "--exclude",
+        "^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)"
+      ],
+      "outcome": "PASS",
+      "startedAt": "2026-11-02T06:39:17.422Z",
+      "finishedAt": "2026-11-02T06:39:24.541Z",
+      "durationMs": 7119,
+      "exitCode": 0
+    },
+    {
+      "gateId": "fmt-check-report",
+      "argv": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-fmt.ts",
+        "--root",
+        "packages",
+        "--root",
+        "plugins",
+        "--ext",
+        "ts,tsx",
+        "--exclude",
+        "^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)",
+        "--ignore-line-endings"
+      ],
+      "outcome": "PASS",
+      "startedAt": "2026-11-02T06:39:24.625Z",
+      "finishedAt": "2026-11-02T06:39:26.541Z",
+      "durationMs": 1915,
+      "exitCode": 0
+    },
+    {
+      "gateId": "docs-accuracy",
+      "argv": [
+        "deno",
+        "task",
+        "docs:accuracy"
+      ],
+      "outcome": "PASS",
+      "startedAt": "2026-11-02T06:39:26.624Z",
+      "finishedAt": "2026-11-02T06:39:31.942Z",
+      "durationMs": 5318,
+      "exitCode": 0
+    },
+    {
+      "gateId": "publish-dry-run",
+      "argv": [
+        "deno",
+        "task",
+        "publish:dry-run"
+      ],
+      "outcome": "PASS",
+      "startedAt": "2026-11-02T06:39:32.031Z",
+      "finishedAt": "2026-11-02T06:40:08.317Z",
+      "durationMs": 36286,
+      "exitCode": 0
+    }
+  ],
+  "ciAuthority": "Final-head e2e-cli workflow_dispatch and PR checks; terminal links and conclusions are recorded in the PR and READY handoff."
+}

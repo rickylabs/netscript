@@ -1,0 +1,11 @@
+{
+  "aspireStopExitCode": 0,
+  "runOwnedEndpointsClosed": {
+    "orders": true,
+    "app": true,
+    "streams": true,
+    "workers-api": true,
+    "workers": true
+  },
+  "foreignResourcesMutated": false
+}

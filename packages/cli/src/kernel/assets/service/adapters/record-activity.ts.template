@@ -33,7 +33,9 @@ export function createRecordActivityPublisher(): RecordActivityPublisher | undef
           streamPath: RECORD_ACTIVITY_PATH,
           schema: recordActivitySchema,
           reconnectPolicy: ACTIVITY_RECONNECT,
-          producerId: '{{serviceName}}-record-activity',
+          // Sequence numbers restart with a new producer. A fresh lifetime identity
+          // prevents a restart/replacement from deduplicating unrelated new events.
+          producerId: '{{serviceName}}-record-activity-' + crypto.randomUUID(),
         });
         const receipt = producer.upsert('recordActivity', {
           id: crypto.randomUUID(), actor, verb, recordId: String(record.id),

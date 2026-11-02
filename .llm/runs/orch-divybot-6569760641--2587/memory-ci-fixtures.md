@@ -12,3 +12,7 @@ use `@std/path` must declare that existing resolver mapping in their database de
 Runtime Overview now consumes record activity, so its existing persistent-stream fixture
 links the users service and the existing live CRUD gate performs a successful PATCH.
 Do not replace the ready-panel assertion with empty/unavailable acceptance.
+
+SQLite deliberately excludes the Postgres live-endpoint gate. Put provider-neutral record
+mutation in `behavior.record-activity`, shared by both suites before `behavior.app-home`.
+The latter must still require populated ready panels; do not synthesize event payloads.

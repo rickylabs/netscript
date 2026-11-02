@@ -125,7 +125,7 @@
 
 }
 
-:root[data-theme] .workspace-charts [data-scope='chart-block'][data-part='root'] [data-part='bar'] { background: var(--ns-muted-fg); }
+:root[data-theme] .workspace-charts .ns-colchart [data-part='bar'] { background: var(--ns-muted-fg); }
 
 @media (max-width: 640px) { :root[data-theme] .workspace-stats [data-scope='stats-grid'][data-part='value'] { font-size: 24px; line-height: 1.3; white-space: nowrap; overflow-wrap: normal; } }
 
@@ -174,10 +174,13 @@
 .workspace-filters [data-part='actions'] { padding: 0; }
 .workspace-record-pagination { position: sticky; bottom: 0; z-index: 2; background: var(--ns-bg); border-top: 1px solid var(--ns-border); padding-block: 12px; }
 
-:root[data-theme] .workspace-status-chart [data-part='ring'][data-tone='primary'] { stroke: var(--ns-info); }
-:root[data-theme] .workspace-status-chart [data-part='swatch'][data-tone='primary'] { background: var(--ns-info); }
-:root[data-theme] .workspace-status-chart [data-part='ring'][data-tone='secondary'] { stroke: var(--ns-muted-fg); }
-:root[data-theme] .workspace-status-chart [data-part='swatch'][data-tone='secondary'] { background: var(--ns-muted-fg); }
+:root[data-theme] .workspace-status-chart [data-part='bar'][data-tone='primary'] { background: var(--ns-info); }
+:root[data-theme] .workspace-status-chart [data-part='bar'][data-tone='success'] { background: var(--ns-success); }
+:root[data-theme] .workspace-status-chart [data-part='bar'][data-tone='warning'] { background: var(--ns-warning); }
+:root[data-theme] .workspace-status-chart [data-part='bar'][data-tone='secondary'] { background: var(--ns-muted-fg); }
+.workspace-status-chart [data-part='row'] { grid-template-columns: 112px minmax(0, 1fr) auto; }
+/* Rich result tables have canonical reference, owner, status, amount, created columns. */
+.workspace-query-table[data-rich] > thead > tr > th:nth-child(4), .workspace-query-table[data-rich] > tbody > tr > td[data-field='amount'] { text-align: end; font-variant-numeric: tabular-nums; }
 .workspace-example-list { list-style: none; padding: 0; margin: 0; }
 .workspace-example-list > li { display: flex; align-items: center; gap: 16px; padding: 18px 8px; border-bottom: 1px solid var(--ns-border); }
 .workspace-example-copy { flex: 1; min-width: 0; font-size: 14px; }

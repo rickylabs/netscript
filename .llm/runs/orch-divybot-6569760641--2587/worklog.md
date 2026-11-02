@@ -57,3 +57,35 @@ accessible text/title. Independent same-session source supervisor PASS for these
 The actual seed job completed with progress100 and remained the same execution after worker
 restart. Unlinked stream fallback uses actual record changes with explicit owner attribution.
 Separate Astra visual review and fresh IMPL-EVAL remain pending. Required CI is being rerun.
+
+## S2 final evaluation and reconciliation
+
+Fresh read-only final Codex IMPL-EVAL found producer identity reuse after restart and missing
+fallback for an app-linked/service-unlinked stream. Added producer-lifetime UUIDs and a same
+resource link check, with negative controls. A service-only restart retaining stream history
+proved both updates remain visible; unlinking only the service showed actual record changes.
+The same evaluator returned PASS; see impl-eval.md. No accepted product debt.
+
+Astra visual review requested clearer status categories and numeric table alignment. Replaced
+the status donut with the shipped labelled horizontal chart and right-aligned rich-table amounts.
+All16 populated replacements plus4 Records viewport images passed independent review:
+every variant8.0–8.3 and at least Figma level; see visual-review.md and visual-dom.json.
+
+Deno2.9.7: 181 focused tests PASS, including CSS budgets; all28 changed TypeScript files
+passed scoped check/lint/fmt without dropped files; final generated workspace134files PASS.
+The full four-task carrier generation chain passed. Final root checks are being recorded.
+
+CI build failure is resolved: docs build and browser/style jobs are green at4951bf1.
+Manual runtime run41398764485 passed PostgreSQL but SQLite lacked a record mutation because
+it skips the Postgres endpoint gate. Added shared behavior.record-activity before unchanged
+Overview readiness in both tiers.71 gate tests PASS; independent follow-up review PASS in
+impl-eval-ci.md. Final full runtime CI is required after the acceptance push.
+Reconcile: origin/main still matches the original baseline; no merge conflict or rebase.
+
+Final local acceptance: all six durable gates PASS (root check4203files, quality:gate,
+root lint/fmt reports, docs:accuracy, publish:dry-run); four carrier generation tasks and
+all15root check tasks PASS. Evidence is sanitized in validation.json with product hashes.
+The source supervisor's PASS authorizes this sign-off commit. No pending local fixes.
+All owned Aspire endpoints stopped and verified closed; no foreign resource mutation.
+The final-head runtime workflow and PR checks supply remote acceptance; their terminal
+links belong in the PR phase comment and the excluded READY report handoff.

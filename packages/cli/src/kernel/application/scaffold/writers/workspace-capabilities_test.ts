@@ -489,3 +489,46 @@ Deno.test('settings and sign-in use configuration capabilities without loading r
     assertStringIncludes(source, "readScaffoldCapabilities(ctx.req, undefined, 'configuration')");
   }
 });
+
+Deno.test('record activity requires both app and selected service links to the same stream resource', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const app = `${root}/apps/portal`;
+    await Deno.mkdir(app, { recursive: true });
+    await Deno.mkdir(`${root}/streams`, { recursive: true });
+    await Deno.writeTextFile(
+      `${root}/streams/scaffold.plugin.json`,
+      JSON.stringify({
+        linking: {
+          canonicalName: 'streams',
+          resourceConfigKey: 'streams',
+          consumers: { apps: ['portal'] },
+        },
+      }),
+    );
+    const settings = {
+      NetScript: {
+        Services: { members: { PluginReferences: [] as string[] } },
+        Plugins: { streams: { Enabled: true } },
+        Apps: { portal: { PluginReferences: ['streams'] } },
+      },
+    };
+    const module = await capabilityFixture(root, app);
+    const read = async () => {
+      await Deno.writeTextFile(`${root}/appsettings.json`, JSON.stringify(settings));
+      return (await module.readScaffoldCapabilities())[3];
+    };
+    assertEquals((await read()).state, 'installed-unwired');
+    assertEquals(module.liveReads, 0, 'do not serve stale history when the producer is unlinked');
+    settings.NetScript.Services.members.PluginReferences = ['different-stream'];
+    assertEquals((await read()).state, 'installed-unwired');
+    settings.NetScript.Services.members.PluginReferences = ['streams'];
+    assertEquals((await read()).state, 'ready');
+    assertEquals(module.liveReads, 1);
+    settings.NetScript.Services.members.PluginReferences = [];
+    assertEquals((await read()).state, 'installed-unwired');
+    assertEquals(module.liveReads, 1, 'unlinking the producer suppresses cached stream history');
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

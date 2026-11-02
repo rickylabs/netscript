@@ -1,0 +1,74 @@
+{
+  "fixture": ".llm/tmp/scaffold-2587/final/showcase",
+  "database": "sqlite",
+  "installedAndLinked": [
+    "workers",
+    "streams"
+  ],
+  "recordMutations": {
+    "created": [
+      41,
+      42
+    ],
+    "updated": [
+      41,
+      42
+    ],
+    "actor": "Anonymous",
+    "reason": "Unauthenticated real service API requests; record owner is not presented as actor."
+  },
+  "serviceRestart": {
+    "serviceRestart": true,
+    "streamResourceRetained": true,
+    "beforeTimestamp": "2026-11-02T06:23:16.855Z",
+    "afterTimestamp": "2026-11-02T06:23:18.175Z",
+    "bothEventsFound": true,
+    "events": 7
+  },
+  "producerUnlinkedFallback": {
+    "appStillLinked": true,
+    "onlyServiceLinkRemoved": true,
+    "historicalEventsPresent": true,
+    "recordChangesRendered": true,
+    "ownerAttributionExplicit": true
+  },
+  "workerSeedExecution": {
+    "jobId": "health-check",
+    "source": "database-seed",
+    "status": "completed",
+    "progressPercent": 100,
+    "progressMessage": "Workspace checked",
+    "workspaceEntries": 3,
+    "completedAt": "2026-11-02T06:01:07.386Z",
+    "countBeforeRestart": 1,
+    "countAfterRestart": 1,
+    "sameExecution": true
+  },
+  "browser": {
+    "pages": [
+      "overview",
+      "records",
+      "detail",
+      "example"
+    ],
+    "widths": [
+      1440,
+      390
+    ],
+    "schemes": [
+      "light",
+      "dark"
+    ],
+    "captures": 16,
+    "httpStatus": 200,
+    "horizontalOverflow": false,
+    "pageErrors": []
+  },
+  "visualReview": "visual-review.md",
+  "screens": "screens/",
+  "limits": [
+    "The worker API classifies direct queue handoff as manual; its actual payload identifies database-seed.",
+    "The separate builtin workers-health-check job remains scheduled and may add other executions.",
+    "Consumer replay protection uses the existing worker idempotency retention; this is not an indefinite exactly-once guarantee after receipt loss."
+  ]
+}

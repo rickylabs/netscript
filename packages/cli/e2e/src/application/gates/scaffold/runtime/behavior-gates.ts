@@ -398,6 +398,20 @@ export function createRuntimeBehaviorGates(
         }),
     ),
     commandGate(
+      GATE.BEHAVIOR_RECORD_ACTIVITY,
+      'Committed record update supplies real Overview activity',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-net=127.0.0.1,localhost',
+        '--allow-read',
+        '--allow-run=aspire',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/verify-record-activity.ts`,
+        context.project.appHost,
+      ],
+    ),
+    commandGate(
       GATE.BEHAVIOR_APP_HOME,
       'Generated overview reports workers and streams ready',
       GATE_PHASE.BEHAVIOR,
