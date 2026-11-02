@@ -1,5 +1,34 @@
 # Architecture Debt Registry
 
+## packages/cli — showcase adapter and scaffold-gate cardinality (`cli-showcase-cardinality-2571`)
+
+- **ID:** `cli-showcase-cardinality-2571`.
+- **Reason:** The opt-in showcase adds one cohesive `showcase/` child to each of two
+  already-over-cap directories. Against merged main `59e6202`,
+  `packages/cli/src/kernel/adapters` grows from **18 to 19** immediate children and
+  `packages/cli/e2e/src/application/gates/scaffold` from **93 to 94**, against the
+  R-FOLD-CARD / F-16 cap of 12. Counts include both files and subdirectories.
+- **Why deferred / cost:** Grouping the established adapter families and scaffold-gate catalog
+  requires a separate navigation/import migration. This release-scoped app composition keeps its
+  emission and acceptance logic inside two bounded concern directories. The accepted cost is one
+  additional sibling in each parent, now respectively 7 and 82 above the cap; no runtime,
+  permission, layering or public-contract exception is accepted.
+- **Owner:** CLI maintainers and CLI E2E scaffold-runtime maintainers.
+- **Target:** Before adding another kernel adapter family or scaffold gate/probe family after
+  #2571, organize the affected parent into bounded role-named groups. This exception covers only
+  the two measured `showcase/` additions, not further cardinality growth.
+- **Linked plan:** `.llm/runs/orch-divybot-6576596639--2571/plan.md`; issue #2571; PR #2595;
+  `packages/cli/README.md` § "Archetype 6 v2 deviations".
+- **Created:** 2026-11-02.
+- **Status:** open, DEBT_ACCEPTED; recorded to resolve formal IMPL-EVAL finding D1.
+- **Gate:** Both parent directories contain at most 12 immediate children; public/maintainer
+  boundary, preset discovery and default-output isolation remain intact; structured check,
+  quality/architecture, focused CLI tests, documented `scaffold.showcase` and the one-pass
+  `scaffold.runtime --cleanup` remain green after the structural migration.
+- **Historical scaffold debt:** `scaffold-runtime-a8-f16-1333` remains open. Its historical
+  906-line registry is now 362 lines at showcase candidate `04149cb`; this entry does not claim
+  that old monolith still exists or close the remaining over-cap gate-directory debt.
+
 ## packages/plugin-workers-core — WORKERS-RETRY-DOMAIN-CARDINALITY (13 immediate domain children)
 
 - **Reason:** A cohesive retry-policy schema and resolver are a separate domain concern. This adds

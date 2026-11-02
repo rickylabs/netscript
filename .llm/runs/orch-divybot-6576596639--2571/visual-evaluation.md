@@ -1,110 +1,36 @@
 # Independent Astra visual evaluation
 
-Separate read-only gpt-6-astra session, owner override. Native image inspection
-of the10Figma Utility references,60live seeded-run screenshots and12viewport
-proofs. Shell access was unavailable in the enforced read-only sandbox; no
-bypass or writes were performed by the reviewer. Initial commerce calibration
-found6mobile table issues; the subsequent complete matrix found4reference-page
-issues. All were repaired and rechecked in the same session.
+Separate read-only `gpt-6-astra` session, owner override. The same reviewer
+inspected the 10 Figma Utility references and live seeded-run captures. Initial
+mobile and reference-page findings were repaired and reviewed in that session.
+No shell bypass or reviewer writes were used.
 
-**Visual subgate: PASS — all 60 combinations meet 8/10.**
+**Final visual subgate: PASS — all 60 combinations meet the 8/10 bar.**
 
-I inspected all eight refreshed screenshots using native `view_image`. The four previous failures are resolved. The other 52 scores remain unchanged from the preceding review.
+I inspected all 60 current screenshots and all 12 viewport proofs using native `view_image`. For the supplied captures attributed to candidate `04149cb48ee54101f87773c5d4cab5229bc01103`, all previously approved scores remain unchanged.
 
-| Page/view | Light 1440 | Dark 1440 | Light 390 | Dark 390 |
-|---|---:|---:|---:|---:|
-| Overview | 8.5 | 8.5 | 8.0 | 8.0 |
-| Orders | 8.5 | 8.5 | 8.0 | 8.0 |
-| Order detail | 8.0 | 8.0 | 8.0 | 8.0 |
-| Customers | 8.5 | 8.5 | 8.0 | 8.0 |
-| Products | 8.5 | 8.5 | 8.0 | 8.0 |
-| Health | 8.5 | 8.5 | 8.0 | 8.0 |
-| Settings | 8.5 | 8.5 | 8.0 | 8.0 |
-| Sign-in | 8.0 | 8.0 | 8.0 | 8.0 |
-| Assistant | 8.5 | 8.5 | 8.0 | 8.0 |
-| Examples | 8.5 | 8.5 | 8.0 | 8.0 |
-| Service example | 8.0 | 8.0 | 8.0 | 8.0 |
-| CRUD / Directory pattern | **8.0** | **8.0** | **8.0** | **8.0** |
-| Telemetry reference | **8.0** | **8.0** | **8.0** | **8.0** |
-| Typed route reference | 8.0 | 8.0 | 8.0 | 8.0 |
-| Command | 8.0 | 8.0 | 8.0 | 8.0 |
+Scores are out of 10.
 
-The refreshed combinations pass for these visible reasons:
+| View | Light 1440 | Dark 1440 | Light 390 | Dark 390 | Pixel assessment |
+|---|---:|---:|---:|---:|---|
+| Overview | 8.5 | 8.5 | 8.0 | 8.0 | Clear hierarchy; charts, activity and background work remain contained. |
+| Orders | 8.5 | 8.5 | 8.0 | 8.0 | Readable columns and mobile rows; pagination follows the final row. |
+| Order detail | 8.0 | 8.0 | 8.0 | 8.0 | Full-width product/SKU, labelled quantities and prices, adequate shipping separation. |
+| Customers | 8.5 | 8.5 | 8.0 | 8.0 | Names, emails, company, location and order counts remain fully visible. |
+| Products | 8.5 | 8.5 | 8.0 | 8.0 | Complete names/SKUs, prices, categories and stock badges in both layouts. |
+| Health | 8.5 | 8.5 | 8.0 | 8.0 | Resource names fit; degraded and unavailable states remain distinct and readable. |
+| Settings | 8.5 | 8.5 | 8.0 | 8.0 | Fields and connection cards fit; corrected “Orders” copy reads cleanly. |
+| Sign-in | 8.0 | 8.0 | 8.0 | 8.0 | Clear provider continuation and configuration summary; new application name fits. |
+| Assistant | 8.5 | 8.5 | 8.0 | 8.0 | Connect-provider state retains clear hierarchy and readable instruction wrapping. |
+| Examples | 8.5 | 8.5 | 8.0 | 8.0 | Route descriptions, metadata and Open actions remain separated and legible. |
+| Service example | 8.0 | 8.0 | 8.0 | 8.0 | Records, disclosures, note form and summary remain readable without collisions. |
+| CRUD / Directory pattern | 8.0 | 8.0 | 8.0 | 8.0 | All desktop headings and empty-state borders complete; detail panel remains below. |
+| Telemetry reference | 8.0 | 8.0 | 8.0 | 8.0 | Unavailable alert retains clear icon, heading, diagnostic detail and theme contrast. |
+| Typed route reference | 8.0 | 8.0 | 8.0 | 8.0 | Title, route parameter, explanation and navigation fit cleanly. |
+| Command | 8.0 | 8.0 | 8.0 | 8.0 | Dialog, close control and footer fit; viewport backdrop covers the visible page. |
 
-- **Directory, 1440px, both themes:** All five headings—including Updated—are fully visible. The empty-state border is complete, its message is centered, and the detail panel sits below without compressing the table.
-- **Directory, 390px, both themes:** Filters, static designation, zero-account state, and selection panel remain contained and readable. No regression from the previous mobile scores.
-- **Telemetry, 1440px, both themes:** The alert now has a distinct icon, “Traces unavailable” heading, and readable diagnostic detail. Light-theme text resolves the earlier legibility weakness; dark-theme hierarchy also improves.
-- **Telemetry, 390px, both themes:** The complete alert fits within the content gutters. Heading, icon, and diagnostic text remain clearly separated without clipping.
+The approved commerce, Directory and telemetry presentation repairs are retained. **No required visual repairs remain.**
 
-**No required visual repairs remain in the supplied states.** This screenshot-based verdict does not certify authentication, model access, telemetry integration, or chat functionality. Mandatory source **IMPL-EVAL remains pending** and is not satisfied by this visual pass.
-OpenAI Codex v0.166.0
---------
-workdir: /home/agent/projects/orchid/worktrees/showcase-visual-2571
-model: gpt-6-astra
-provider: openai
-approval: never
-sandbox: read-only
-reasoning effort: xhigh
-reasoning summaries: none
-session id: 01a19c6d-334e-7111-af77-872ceee4f0d8
---------
-user
-Continue the SAME read-only Astra visual subgate review. The full matrix's
-four remaining reference-page defects are repaired. The Directory example now
-uses a full-width main panel with the detail rail below, retaining all headings
-and the complete empty-state border. Telemetry now composes the existing
-registry Alert destructive variant, with its dark destructive text, native icon,
-clear heading and diagnostic detail. The fetch failure remains visible.
+The viewport proofs show unobscured final order rows and pagination. The desktop Orders “middle” and “bottom” files are identical within each theme, so they establish one scroll position per theme; the mobile proofs show distinct positions. Command viewport captures resolve the backdrop cutoff seen in full-page captures.
 
-Inspect the8 freshly captured reference screenshots below. Other52 images and
-viewport proofs from the previous full review are unchanged. Return the updated
-complete15-view score table and visual subgate verdict, preserving the previous
-52scores and assessing all8 refreshed combinations. Each must reach8/10.
-Do not relax the bar; do not substitute DOM metrics for pixel inspection. This
-subgate verdict does not certify authentication, model access or telemetry.
-Chat functional repairs now passed21stub scenarios plus the mounted browser
-first-send/reopen/native tool replay regression, but source IMPL-EVAL is a
-separate mandatory reviewer and remains pending. No edits, writes, external
-messages, session IDs or private absolute paths in the verdict.
-
-/home/agent/projects/orchid/worktrees/issue-6576596639/.llm/runs/orch-divybot-6576596639--2571/screens/crud-light-1440.png
-/home/agent/projects/orchid/worktrees/issue-6576596639/.llm/runs/orch-divybot-6576596639--2571/screens/crud-dark-1440.png
-/home/agent/projects/orchid/worktrees/issue-6576596639/.llm/runs/orch-divybot-6576596639--2571/screens/crud-light-390.png
-/home/agent/projects/orchid/worktrees/issue-6576596639/.llm/runs/orch-divybot-6576596639--2571/screens/crud-dark-390.png
-/home/agent/projects/orchid/worktrees/issue-6576596639/.llm/runs/orch-divybot-6576596639--2571/screens/telemetry-light-1440.png
-/home/agent/projects/orchid/worktrees/issue-6576596639/.llm/runs/orch-divybot-6576596639--2571/screens/telemetry-dark-1440.png
-/home/agent/projects/orchid/worktrees/issue-6576596639/.llm/runs/orch-divybot-6576596639--2571/screens/telemetry-light-390.png
-/home/agent/projects/orchid/worktrees/issue-6576596639/.llm/runs/orch-divybot-6576596639--2571/screens/telemetry-dark-390.png
-codex
-I’ll inspect all eight refreshed screenshots and reassess those combinations, keeping the other 52 scores unchanged. The verdict will remain limited to the visual subgate; source IMPL-EVAL is separate.
-codex
-**Visual subgate: PASS — all 60 combinations meet 8/10.**
-
-I inspected all eight refreshed screenshots using native `view_image`. The four previous failures are resolved. The other 52 scores remain unchanged from the preceding review.
-
-| Page/view | Light 1440 | Dark 1440 | Light 390 | Dark 390 |
-|---|---:|---:|---:|---:|
-| Overview | 8.5 | 8.5 | 8.0 | 8.0 |
-| Orders | 8.5 | 8.5 | 8.0 | 8.0 |
-| Order detail | 8.0 | 8.0 | 8.0 | 8.0 |
-| Customers | 8.5 | 8.5 | 8.0 | 8.0 |
-| Products | 8.5 | 8.5 | 8.0 | 8.0 |
-| Health | 8.5 | 8.5 | 8.0 | 8.0 |
-| Settings | 8.5 | 8.5 | 8.0 | 8.0 |
-| Sign-in | 8.0 | 8.0 | 8.0 | 8.0 |
-| Assistant | 8.5 | 8.5 | 8.0 | 8.0 |
-| Examples | 8.5 | 8.5 | 8.0 | 8.0 |
-| Service example | 8.0 | 8.0 | 8.0 | 8.0 |
-| CRUD / Directory pattern | **8.0** | **8.0** | **8.0** | **8.0** |
-| Telemetry reference | **8.0** | **8.0** | **8.0** | **8.0** |
-| Typed route reference | 8.0 | 8.0 | 8.0 | 8.0 |
-| Command | 8.0 | 8.0 | 8.0 | 8.0 |
-
-The refreshed combinations pass for these visible reasons:
-
-- **Directory, 1440px, both themes:** All five headings—including Updated—are fully visible. The empty-state border is complete, its message is centered, and the detail panel sits below without compressing the table.
-- **Directory, 390px, both themes:** Filters, static designation, zero-account state, and selection panel remain contained and readable. No regression from the previous mobile scores.
-- **Telemetry, 1440px, both themes:** The alert now has a distinct icon, “Traces unavailable” heading, and readable diagnostic detail. Light-theme text resolves the earlier legibility weakness; dark-theme hierarchy also improves.
-- **Telemetry, 390px, both themes:** The complete alert fits within the content gutters. Heading, icon, and diagnostic text remain clearly separated without clipping.
-
-**No required visual repairs remain in the supplied states.** This screenshot-based verdict does not certify authentication, model access, telemetry integration, or chat functionality. Mandatory source **IMPL-EVAL remains pending** and is not satisfied by this visual pass.
+This is screenshot-based visual acceptance only. It does not certify authentication, model access, telemetry integration or the reported runtime gates. Formal Sol leaf IMPL-EVAL remains separate and pending.

@@ -16,3 +16,6 @@
 - Private execution evidence lives in the project's dated run directory; generated
   applications live under the ignored `.llm/tmp/` surface.
 - Never commit `.divybot-goal.md`. Never rebase, force-push, merge the PR, or add labels.
+- Formal IMPL-EVAL D1 expands writes to `.llm/harness/debt/arch-debt.md` only
+  for measured showcase cardinality debt; matching CLI README documentation is
+  already within the declared documentation surface.

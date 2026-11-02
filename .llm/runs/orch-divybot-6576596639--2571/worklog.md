@@ -151,3 +151,57 @@ version change or local cache/lock cleanup. The prior proof AppHost is stopped.
 
 Next candidate gates are final-source root checks, fresh documented showcase and
 packed build, CI runtime and formal leaf IMPL-EVAL.
+
+## S3 gates complete — formal evaluation pending
+
+Candidate `04149cb48ee54101f87773c5d4cab5229bc01103` normally merges current main `59e6202` and retains the AI
+implementation ancestry. Carrier regeneration is reconciled. Deno 2.9.7 root
+structured check (4218 files / 36 batches), all 16 root check tasks, quality/architecture,
+CLI quality ratchet and CLI publish dry-run passed with durable receipts. Focused
+wrapper: 96 passed. Fresh documented showcase: 6/6 local steps. Packed consumer:
+29 genuine compiled packages, closed aliases and actual client/server build PASS.
+Default init versus current main: 220/220 identical files at the same output path.
+
+Actions run 41465808061 passed: full Postgres runtime 124/124, SQLite runtime
+116/116, showcase 8/8 including cleanup, 21 stub scenarios and mounted browser.
+Desktop uses the existing active #859 exception boundary; lane visibility is
+policy-skipped. Final Astra review re-inspected all 60 captures and 12 viewport
+proofs for this candidate: PASS >=8/10. Details: gate-evidence.json and
+ci-suite-evidence.json. The maintained source is frozen; only public run evidence
+will change after this candidate. Formal independent leaf IMPL-EVAL is next.
+
+Reconcile: source/visual slices were nonterminal supervisor subgates, distinct
+from mandatory formal leaf IMPL-EVAL. No formal terminal verdict has yet issued.
+The final reporter found no owned survivors; foreign resources remain untouched.
+Public review artifacts now contain verdict-only text: raw launcher metadata was
+removed after identifying an extraction error. No history was rewritten.
+
+Additional final documentation gate: `deno task doc:lint --root packages/cli`
+passed the complete three-entrypoint export map with zero private references,
+missing JSDoc or other diagnostics. No source changes were needed.
+
+## Formal IMPL-EVAL round 1 — FAIL_DEBT / D1
+
+The separate read-only Sol evaluator independently verified GitHub source,
+metadata, CI jobs and logs, and accepted the functional, runtime, consumer and
+visual evidence. The sole blocker is unrecorded F-16 parent growth: adapters
+18→19 and scaffold gates93→94. The architecture command exits green because
+these cardinality findings are warnings; it does not waive debt bookkeeping.
+Full first terminal verdict is evaluate-round-1.md; no third loop is permitted
+after two consecutive terminal failures.
+
+D1 repair records `cli-showcase-cardinality-2571` in the central debt registry
+and matching Archetype 6 README deviations. It names both measured locations,
+reason, cost (one extra sibling each), owners, next-family stop condition and
+closure gates. Earlier no-deepened-debt statements were incorrect; this section
+and the revised plan/context supersede them. The existing historical registry
+monolith has been split; its separate gate-directory debt stays open.
+
+Supervisor write scope expands only to `.llm/harness/debt/arch-debt.md` for this
+required doctrine bookkeeping. README is already in the declared documentation
+surface. No runtime or test implementation changes accompany the repair.
+
+The D1 bookkeeping candidate passes `deno task arch:check` (exit 0) and
+`git diff --check`. Complete CLI doc-lint also passed with zero diagnostics.
+Runtime source, test, workflow, lock and generated-carrier trees are unchanged
+from the CI-tested candidate; only debt/README prose and run evidence differ.

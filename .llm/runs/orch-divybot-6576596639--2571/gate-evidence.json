@@ -1,0 +1,479 @@
+{
+  "candidateHead": "04149cb48ee54101f87773c5d4cab5229bc01103",
+  "denoVersion": "2.9.7",
+  "maintainedTrees": {
+    "packages": "fcae53e7e12df20f313eca0733305f61e37be205",
+    "plugins": "69a932b52040e14abd28939e18c1258a827e5b7f",
+    ".github": "b93b11faa505bbcef1c00da97475f7c3fbb33c39",
+    "docs": "3057e82801898dfac924c0edd185d042f5873dad",
+    "deno.json": "d825215dc5f341dc93fd3a64073d0e6212da231f",
+    "deno.lock": "e7cab3e1513951964a27e498f758cf6263b6a08b",
+    ".llm/tools": "9e4528c107406a3b3c948c3dcc03abd2123a75be"
+  },
+  "carriers": [
+    {
+      "command": [
+        "deno",
+        "task",
+        "gen:agent-docs-prose"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 18.59
+    },
+    {
+      "command": [
+        "deno",
+        "task",
+        "gen:mcp-export-corpus",
+        "--allow-dirty"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 7.65
+    },
+    {
+      "command": [
+        "deno",
+        "task",
+        "gen:assets-barrel"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.4
+    },
+    {
+      "command": [
+        "deno",
+        "task",
+        "gen:publish-assets"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.39
+    },
+    {
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-run=git",
+        "--allow-write=.llm/tools/validation/fixtures",
+        ".llm/tools/validation/aspire-surface-manifest.ts"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.14
+    }
+  ],
+  "rootChecks": [
+    {
+      "task": "check:desktop-native-fixture",
+      "exitCode": 0,
+      "elapsedSeconds": 0.16
+    },
+    {
+      "task": "check:emitted-samples",
+      "exitCode": 0,
+      "elapsedSeconds": 7.2
+    },
+    {
+      "task": "check:streams-types",
+      "exitCode": 0,
+      "elapsedSeconds": 0.21
+    },
+    {
+      "task": "check:child-health-docs",
+      "exitCode": 0,
+      "elapsedSeconds": 0.35
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "exitCode": 0,
+      "elapsedSeconds": 9.0
+    },
+    {
+      "task": "check:assets-barrel",
+      "exitCode": 0,
+      "elapsedSeconds": 2.76
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0,
+      "elapsedSeconds": 19.87
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0,
+      "elapsedSeconds": 0.7
+    },
+    {
+      "task": "check:scaffold-provider-boundary",
+      "exitCode": 0,
+      "elapsedSeconds": 0.67
+    },
+    {
+      "task": "check:scaffold-versions",
+      "exitCode": 0,
+      "elapsedSeconds": 0.27
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "exitCode": 0,
+      "elapsedSeconds": 0.54
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "exitCode": 0,
+      "elapsedSeconds": 2.37
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "exitCode": 0,
+      "elapsedSeconds": 0.3
+    },
+    {
+      "task": "check:figma-names",
+      "exitCode": 0,
+      "elapsedSeconds": 0.51
+    },
+    {
+      "task": "check:review-threads",
+      "exitCode": 0,
+      "elapsedSeconds": 0.77
+    },
+    {
+      "task": "check:design-skill",
+      "exitCode": 0,
+      "elapsedSeconds": 0.13
+    }
+  ],
+  "durableReceipts": [
+    {
+      "gateId": "check",
+      "argv": [
+        "deno",
+        "task",
+        "check"
+      ],
+      "actualGitHead": "04149cb48ee54101f87773c5d4cab5229bc01103",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 164577,
+      "requestHash": "bac3d427ce7db3411951697d39ed6eb0f3379831df3a2ee26446cd84353988ed",
+      "cwd": "."
+    },
+    {
+      "gateId": "quality-gate",
+      "argv": [
+        "deno",
+        "task",
+        "quality:gate"
+      ],
+      "actualGitHead": "04149cb48ee54101f87773c5d4cab5229bc01103",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 14238,
+      "requestHash": "453a92a667d096c0325c7e19e6701c3e9e7900f6a3927ab357669a95d3198b04",
+      "cwd": "."
+    },
+    {
+      "gateId": "cli-quality",
+      "argv": [
+        "deno",
+        "task",
+        "quality:cli"
+      ],
+      "actualGitHead": "04149cb48ee54101f87773c5d4cab5229bc01103",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 716,
+      "requestHash": "39572a54a02a4932f1a0650da841d71276b23f3a17dd69e11d99406b1bf66d33",
+      "cwd": "."
+    },
+    {
+      "gateId": "publish-dry-run",
+      "argv": [
+        "deno",
+        "task",
+        "publish:dry-run"
+      ],
+      "actualGitHead": "04149cb48ee54101f87773c5d4cab5229bc01103",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 6957,
+      "requestHash": "994e7834cddc6559f66eeb416a1de4bb1e3cf70accd1f5c180a13dc72fd3eb1f",
+      "cwd": "packages/cli"
+    }
+  ],
+  "focusedTests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "packages/cli/src/public/features/generate/plugins/installed-runtime-registry-generator_test.ts",
+      "packages/cli/src/public/features/generate/plugins/plugin-check-command_test.ts",
+      "packages/cli/tests/showcase/fulfilment_test.ts",
+      "packages/cli/src/public/features/init/showcase-preset_test.ts",
+      "packages/cli/src/public/features/init/init-command_test.ts",
+      "packages/cli/src/maintainer/features/init/init-command_test.ts",
+      "packages/cli/e2e/src/application/gates/scaffold/showcase/probe-showcase_test.ts",
+      "packages/cli/e2e/tests/presentation/suite-registry_test.ts"
+    ],
+    "exitCode": 0,
+    "durationMs": 44683,
+    "summary": {
+      "passed": 96,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 96,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "packedBuild": {
+    "ok": true,
+    "command": "deno pack + generated app build",
+    "packedPackages": [
+      "@netscript/ai",
+      "@netscript/aspire",
+      "@netscript/auth-better-auth",
+      "@netscript/auth-kv-oauth",
+      "@netscript/auth-workos",
+      "@netscript/bench",
+      "@netscript/config",
+      "@netscript/contracts",
+      "@netscript/cron",
+      "@netscript/database",
+      "@netscript/fresh",
+      "@netscript/fresh-ui",
+      "@netscript/kv",
+      "@netscript/logger",
+      "@netscript/mcp",
+      "@netscript/plugin",
+      "@netscript/plugin-ai-core",
+      "@netscript/plugin-auth-core",
+      "@netscript/plugin-sagas-core",
+      "@netscript/plugin-streams-core",
+      "@netscript/plugin-triggers-core",
+      "@netscript/plugin-workers-core",
+      "@netscript/prisma-adapter-mysql",
+      "@netscript/queue",
+      "@netscript/runtime-config",
+      "@netscript/sdk",
+      "@netscript/service",
+      "@netscript/telemetry",
+      "@netscript/watchers"
+    ],
+    "packageCount": 29,
+    "copiedWorkspaceSource": false
+  },
+  "ci": {
+    "run": "https://github.com/rickylabs/netscript/actions/runs/41465808061",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 125346260435,
+        "name": "classify changes",
+        "conclusion": "success"
+      },
+      {
+        "id": 125346649292,
+        "name": "scaffold-static",
+        "conclusion": "success"
+      },
+      {
+        "id": 125346649398,
+        "name": "desktop-native-linux",
+        "conclusion": "success",
+        "note": "Existing active #859 exception boundary enforced; not unconditional native proof."
+      },
+      {
+        "id": 125346649654,
+        "name": "scaffold-runtime",
+        "conclusion": "success",
+        "stepsPassed": 124
+      },
+      {
+        "id": 125346649705,
+        "name": "scaffold-runtime-sqlite",
+        "conclusion": "success",
+        "sqliteStepsPassed": 116,
+        "showcaseStepsPassed": 8
+      },
+      {
+        "id": 125355848093,
+        "name": "scaffold CI lane visibility",
+        "conclusion": "skipped",
+        "note": "workflow policy"
+      }
+    ],
+    "chatGate": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "packages/cli/tests/showcase-ai/showcase_ai_test.ts",
+        "packages/cli/tests/showcase-ai/browser/showcase_ai_browser.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 19071,
+      "summary": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 2,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    },
+    "renderedScenarios": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--allow-all",
+        "--unstable-kv",
+        "--no-lock",
+        "scenarios_test.ts",
+        "integration_test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 7816,
+      "summary": {
+        "passed": 21,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 21,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    },
+    "browserReport": {
+      "passed": true,
+      "steps": [
+        "new empty thread accepts first prompt",
+        "turn finished",
+        "first prompt and live tool result rendered",
+        "second unused thread caught up",
+        "previous thread reopened",
+        "unused thread reopened and accepts first prompt",
+        "turn finished",
+        "nonempty transcript reloaded",
+        "native messages, Markdown and tool output survive reload",
+        "origin and authentication failures remain closed"
+      ],
+      "errors": [],
+      "snapshotThenExactOffsetResume": true
+    },
+    "workflowRun": {
+      "conclusion": "success",
+      "headSha": "04149cb48ee54101f87773c5d4cab5229bc01103",
+      "status": "completed",
+      "url": "https://github.com/rickylabs/netscript/actions/runs/41465808061",
+      "workflowName": "e2e-cli"
+    }
+  },
+  "localRuntime": {
+    "ok": true,
+    "stepsPassed": 6,
+    "projectRoot": ".llm/tmp/showcase-release/northwind-showcase",
+    "cleanup": "Owned AppHost stopped; final read-only leak check finds zero owned survivors. Local Docker probes unavailable."
+  },
+  "docLint": {
+    "command": [
+      "deno",
+      "task",
+      "doc:lint",
+      "--root",
+      "packages/cli"
+    ],
+    "report": {
+      "source": {
+        "mode": "auto",
+        "root": "packages/cli",
+        "entrypoints": [
+          "./mod.ts",
+          "./scaffolding.ts",
+          "./testing.ts"
+        ],
+        "exitCode": 0
+      },
+      "summary": {
+        "totalPackages": 1,
+        "totalErrors": 0,
+        "totalPrivateTypeRef": 0,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      },
+      "packages": [
+        {
+          "name": "@netscript/cli",
+          "dir": "packages/cli",
+          "entrypoints": [
+            {
+              "path": "./mod.ts",
+              "privateTypeRef": 0,
+              "missingJSDoc": 0,
+              "other": 0,
+              "total": 0
+            },
+            {
+              "path": "./scaffolding.ts",
+              "privateTypeRef": 0,
+              "missingJSDoc": 0,
+              "other": 0,
+              "total": 0
+            },
+            {
+              "path": "./testing.ts",
+              "privateTypeRef": 0,
+              "missingJSDoc": 0,
+              "other": 0,
+              "total": 0
+            }
+          ],
+          "files": [],
+          "combinedTotal": 0,
+          "combinedPrivateTypeRef": 0,
+          "combinedMissingJSDoc": 0,
+          "combinedOther": 0,
+          "combinedExitCode": 0,
+          "entrypointExitCodes": {
+            "./mod.ts": 0,
+            "./scaffolding.ts": 0,
+            "./testing.ts": 0
+          }
+        }
+      ]
+    }
+  },
+  "reviewThreads": {
+    "command": "deno task check:review-threads -- --repo rickylabs/netscript --pr 2595 --pretty",
+    "exitCode": 0,
+    "threads": 0,
+    "unanswered": 0
+  },
+  "runtimeTrees": {
+    "packages/cli/src": "d9919000633e4e0bd37fc336ce7906bd64d333e7",
+    "packages/cli/e2e": "c814028109d3f9decde9bde036e2cdaba19c1445",
+    "packages/cli/tests": "b48cfaf9cc0338276b2c4d20ede40df8f91b6c9e"
+  },
+  "debtRepair": {
+    "finding": "D1",
+    "entry": "cli-showcase-cardinality-2571",
+    "parents": [
+      {
+        "path": "packages/cli/src/kernel/adapters",
+        "baseline": 18,
+        "candidate": 19
+      },
+      {
+        "path": "packages/cli/e2e/src/application/gates/scaffold",
+        "baseline": 93,
+        "candidate": 94
+      }
+    ],
+    "runtimeChanged": false
+  }
+}

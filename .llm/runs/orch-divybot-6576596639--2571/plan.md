@@ -51,4 +51,6 @@ follow the owner's explicit override.
 
 Open decisions: none requiring a new framework contract. AI chat/MCP completeness
 is safe to defer only under the owner's explicit time-box allowance, with exact
-missing capability stated in the final handoff. No accepted architectural debt.
+missing capability stated in the final handoff. Accepted bounded folder-cardinality debt: `cli-showcase-cardinality-2571`,
+covering adapters18→19 and scaffold gates93→94; see the central registry and
+CLI README deviation, recorded after formal IMPL-EVAL D1.
