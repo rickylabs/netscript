@@ -216,7 +216,7 @@ Every page shares one theme and one chrome. Apply theme changes app-wide.
     referencePath(all, 'app-navigation')
   }\`: \`netscript ui:add page <path>\` links a one-segment page, \`--nav\` links a nested one, and \`--no-nav\` skips the link. Never copy a header or theme toggle into a page.
 
-Before changing the theme or the chrome, call MCP \`get_doc\` with slug ${THEME_GUIDE_SLUG}. For routes, islands, and registry components, use slug ${CUSTOMIZE_GUIDE_SLUG}.
+Before changing the theme or the chrome, call MCP \`get_doc\` with slug \`${THEME_GUIDE_SLUG}\`. For routes, islands, and registry components, use slug \`${CUSTOMIZE_GUIDE_SLUG}\`.
 `;
 }
 

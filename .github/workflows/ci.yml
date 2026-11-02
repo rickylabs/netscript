@@ -409,6 +409,13 @@ jobs:
           .llm/tools/gates/run-gate.ts --gate figma-ci --id quality-figma
           --output .llm/tmp/gate-receipts/quality/figma.json
 
+      - name: CLI lint and format ratchet
+        # CLI is excluded by root lint/fmt; check it even for quality-tool-only diffs.
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate cli-quality --id quality-cli
+          --output .llm/tmp/gate-receipts/quality/cli-quality.json
+
       - name: Record skipped quality receipt
         if: env.RUN != 'true'
         run: >-
