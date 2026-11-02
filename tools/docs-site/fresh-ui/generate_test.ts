@@ -2,10 +2,10 @@ import { assert, assertEquals, assertThrows } from '@std/assert';
 import { documentedItems } from './generate.ts';
 import { assertCatalogFresh } from './check.ts';
 import { implementationProps, typeText } from './read-props.ts';
-import { supportedPreset } from './builder.ts';
+import { supportedPreset } from './preset.ts';
 import { builderPage, referencePages } from './render.ts';
 import { encodeUiPreset } from '../../../packages/cli/src/kernel/domain/ui/ui-preset.ts';
-import type { ComponentCatalog, ComponentPage } from './catalog.ts';
+import { type ComponentCatalog, type ComponentPage, presetCatalog } from './catalog.ts';
 
 const page: ComponentPage = {
   name: 'new-control',
@@ -115,5 +115,43 @@ Deno.test('native deno doc provides actual optional props and closed union types
       }],
     }),
     '"small" | "large"',
+  );
+});
+
+Deno.test('browser metadata excludes docs and retains only displayed preset tokens', () => {
+  const runtime = presetCatalog({
+    ...catalog,
+    presets: [{
+      ...catalog.presets[0],
+      values: {
+        'font-sans': 'system-ui',
+        'radius-control': '4px',
+        'menu-style': 'solid',
+        'unused-token': 'large',
+      },
+    }],
+  });
+  assertEquals(Object.keys(runtime), ['presets']);
+  assertEquals(runtime.presets[0].values, {
+    'radius-control': '4px',
+    'font-sans': 'system-ui',
+    'menu-style': 'solid',
+  });
+});
+
+Deno.test('raw and gzip builder ceilings fail independently', async () => {
+  const { assertPayloadBudget, payloadBytes } = await import('./payload-budgets.ts');
+  const bytes = await payloadBytes([new TextEncoder().encode('builder'.repeat(100))]);
+  assert(bytes.raw > bytes.gzip);
+  assertPayloadBudget('test', bytes, bytes);
+  assertThrows(
+    () => assertPayloadBudget('test', bytes, { raw: bytes.raw - 1, gzip: bytes.gzip }),
+    Error,
+    'raw payload',
+  );
+  assertThrows(
+    () => assertPayloadBudget('test', bytes, { raw: bytes.raw, gzip: bytes.gzip - 1 }),
+    Error,
+    'gzip payload',
   );
 });

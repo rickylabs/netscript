@@ -1,5 +1,5 @@
 import type { GuidanceConfidence, GuidanceResult } from './guidance-contract.ts';
-import { componentGuidance } from './component-guidance.ts';
+import { componentGuidance, componentPageName } from './component-guidance.ts';
 import type { DocsDocument } from './docs-corpus-port.ts';
 import type { GuidanceConcept } from './guidance-concepts.ts';
 import { type ResolvedGuidanceLink, resolveGuidanceLinks } from './guidance-links.ts';
@@ -117,7 +117,9 @@ export class GuidanceIndex {
     const queryTerms = concepts.length > 0
       ? uniqueGuidanceTerms([...conceptTerms.values()].flat())
       : guidanceContentTerms(normalizedIntent);
-    const ranked = this.#sections.map((entry) =>
+    // Component references participate only when the intent names a component above.
+    // Otherwise generic terms such as search, command, link and props swamp task guidance.
+    const ranked = this.#sections.filter((entry) => !componentPageName(entry.slug)).map((entry) =>
       this.#rank(entry, normalizedIntent, queryTerms, conceptTerms)
     ).filter((entry): entry is RankedGuidanceSection => entry !== undefined);
     this.#applyLinkBoosts(ranked);

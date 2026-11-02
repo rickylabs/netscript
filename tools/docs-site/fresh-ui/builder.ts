@@ -1,26 +1,7 @@
-import {
-  decodeUiPreset,
-  encodeUiPreset,
-} from '../../../packages/cli/src/kernel/domain/ui/ui-preset.ts';
-import { COMPONENT_STYLES, type ComponentCatalog, DEFAULT_PRESET } from './catalog.ts';
-
-/** Reject choices the local CLI cannot reproduce instead of silently discarding them. */
-export function supportedPreset(input: string, catalog: ComponentCatalog): string {
-  const choice = decodeUiPreset(input);
-  if (!catalog.presets.some((preset) => preset.id === choice.theme)) {
-    throw new Error('Choose a shipped theme preset.');
-  }
-  if (choice.style && !COMPONENT_STYLES.some((style) => style.id === choice.style)) {
-    throw new Error('Only Utility component style is available.');
-  }
-  if (choice.font || choice.iconLibrary) {
-    throw new Error('This builder uses the fonts and glyphs supplied by each preset.');
-  }
-  return choice.theme!;
-}
+import { DEFAULT_PRESET, type PresetCatalog } from './catalog.ts';
 
 async function enhance(): Promise<void> {
-  const catalog: ComponentCatalog = await (await fetch(new URL('./catalog.json', import.meta.url)))
+  const catalog: PresetCatalog = await (await fetch(new URL('../presets.json', import.meta.url)))
     .json();
   const frame = document.querySelector<HTMLIFrameElement>('[data-component-preview]');
   if (!frame) return;
@@ -48,7 +29,7 @@ async function enhance(): Promise<void> {
     frame.src = url.href;
     if (theme) theme.value = selected;
     if (flavor) flavor.value = preset.flavor ?? '';
-    const encoded = encodeUiPreset({ version: 1, theme: selected, style: COMPONENT_STYLES[0].id });
+    const encoded = preset.code;
     if (code) code.value = encoded;
     const values: Record<string, string> = {
       accent: preset.accent,
@@ -76,7 +57,9 @@ async function enhance(): Promise<void> {
   const query = new URL(location.href).searchParams.get('preset');
   if (query && theme) {
     try {
-      selected = supportedPreset(query, catalog);
+      // Share links produced by this builder already have a validated build-time code.
+      selected = catalog.presets.find((preset) => preset.code === query)?.id ??
+        (await import('./preset.ts')).supportedPreset(query, catalog);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Invalid preset code.');
     }
@@ -95,11 +78,11 @@ async function enhance(): Promise<void> {
     }
   });
   scheme?.addEventListener('change', refresh);
-  form?.addEventListener('submit', (event) => {
+  form?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const input = new FormData(form).get('preset');
     try {
-      selected = supportedPreset(String(input ?? ''), catalog);
+      selected = (await import('./preset.ts')).supportedPreset(String(input ?? ''), catalog);
       refresh();
       setStatus('Preset applied.');
     } catch (error) {
