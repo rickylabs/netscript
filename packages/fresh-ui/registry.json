@@ -2344,7 +2344,7 @@
       ],
       "dependencies": [
         "npm:highlight.js@^11",
-        "jsr:@netscript/fresh-ui@0.0.8"
+        "jsr:@netscript/fresh-ui@0.0.9-canary.2"
       ],
       "type": "registry:component",
       "files": [
@@ -2725,7 +2725,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.8"
+        "jsr:@netscript/fresh-ui@0.0.9-canary.2"
       ]
     },
     {
@@ -2886,7 +2886,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.8"
+        "jsr:@netscript/fresh-ui@0.0.9-canary.2"
       ]
     },
     {
@@ -3389,7 +3389,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.8"
+        "jsr:@netscript/fresh-ui@0.0.9-canary.2"
       ]
     },
     {
@@ -3801,7 +3801,7 @@
         "theme-seed"
       ],
       "dependencies": [
-        "jsr:@netscript/sdk@0.0.8/auto-update"
+        "jsr:@netscript/sdk@0.0.9-canary.2/auto-update"
       ],
       "type": "registry:component",
       "files": [
@@ -3843,7 +3843,7 @@
         "theme-seed"
       ],
       "dependencies": [
-        "jsr:@netscript/sdk@0.0.8/desktop",
+        "jsr:@netscript/sdk@0.0.9-canary.2/desktop",
         "npm:preact@^10.29.2"
       ],
       "type": "registry:component",
@@ -3919,7 +3919,7 @@
         "card"
       ],
       "dependencies": [
-        "jsr:@netscript/ai@0.0.8",
+        "jsr:@netscript/ai@0.0.9-canary.2",
         "npm:preact@^10.29.2"
       ],
       "type": "registry:lib",
@@ -4858,7 +4858,7 @@
         "calendar"
       ],
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.8"
+        "jsr:@netscript/fresh-ui@0.0.9-canary.2"
       ]
     },
     {
@@ -5020,7 +5020,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.8"
+        "jsr:@netscript/fresh-ui@0.0.9-canary.2"
       ]
     },
     {
@@ -5065,7 +5065,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.8"
+        "jsr:@netscript/fresh-ui@0.0.9-canary.2"
       ]
     },
     {
@@ -5109,7 +5109,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.8"
+        "jsr:@netscript/fresh-ui@0.0.9-canary.2"
       ]
     },
     {
@@ -5154,7 +5154,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.8"
+        "jsr:@netscript/fresh-ui@0.0.9-canary.2"
       ]
     },
     {
@@ -5199,7 +5199,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.8"
+        "jsr:@netscript/fresh-ui@0.0.9-canary.2"
       ]
     },
     {
