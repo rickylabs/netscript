@@ -1,7 +1,7 @@
 # AI MCP discovery checkpoint
 
-Issue2581, PR2590, branch feat/ai-mcp-service-discovery. Independent PLAN-EVAL PASS after2 iterations.
-Implementation complete with86 passing scoped tests. Local lint/format/check, quality, documentation
-accuracy and publication dry-run pass. Existing doc-lint16 findings verified against baseline.
-Remaining: derived export corpus (requires committed sources), independent IMPL-EVAL, root/CI and
-full scaffold runtime at final head. Cockpit owns merge/release.
+Issue2581, PR2590, branch feat/ai-mcp-service-discovery. Independent plan and implementation
+reviews PASS. Product f4b03a9; derived documentation623d911. All86 scoped tests and local
+root/quality/docs/publication gates pass. Full plugin doc lint16 findings exactly matches baseline.
+This checkpoint changes run evidence only. Remaining: core CI and full scaffold runtime at final
+head, acceptance mirroring, READY handoff. Cockpit owns merge/release.

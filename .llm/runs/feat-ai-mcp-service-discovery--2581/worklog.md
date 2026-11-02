@@ -42,3 +42,9 @@ Independent Fable5.1/low review passed iteration2 after replacing namespace pin 
 - All AI plugin, core MCP and CLI workspace-mutator tests:86 PASS,0 FAIL. Plugin scoped check PASS; selected44 TypeScript files lint/format PASS. Generated installed consumer typechecks its populated registry.
 - quality:gate and docs:accuracy PASS. Plugin publication dry-run PASS. Full export doc lint16 findings exactly matches baseline; no new findings.
 - Implementation reviewer primary Muse transports unavailable (Go401 and OpenRouter missing required usage snapshot); declared native Opus5/xhigh fallback will review in a separate session.
+
+## IMPL-EVAL PASS and final validation
+
+Independent Opus5 review passed with no blocking findings and independently reproduced86 tests, byte-identical legacy emitter output, both-mode import behavior, runtime MCP proof and publication/architecture gates. Reviewed product commit f4b03a9 and carrier commit623d911. Root check and documentation snippets passed; all four carrier freshness gates passed. The remaining commit records evidence only, then core CI/full scaffold runtime run at that head.
+
+Issue2581 acceptance was already a markdown checklist under a plain-text label; promoted only its label to an actual Acceptance heading so the canonical close-gate sees it. Checkbox text/status unchanged pending evidence mirroring.
