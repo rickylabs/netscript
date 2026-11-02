@@ -214,6 +214,9 @@ Deno.test('generated CRUD acceptance checks seed, defined missing rows, and Open
       if (url.pathname === '/api/openapi.json') {
         return Promise.resolve(jsonResponse(openApiDocument()));
       }
+      if (url.pathname === '/api/users/1' && request.method === 'PATCH') {
+        return Promise.resolve(jsonResponse({ id: 1, name: 'Seed User' }));
+      }
       return Promise.resolve(jsonResponse({ code: 'NOT_FOUND' }, 404));
     },
   );
@@ -229,6 +232,7 @@ Deno.test('generated CRUD acceptance checks seed, defined missing rows, and Open
     { method: 'GET', url: 'http://127.0.0.1:43100/api/users/2147483647' },
     { method: 'PATCH', url: 'http://127.0.0.1:43100/api/users/2147483647' },
     { method: 'DELETE', url: 'http://127.0.0.1:43100/api/users/2147483647' },
+    { method: 'PATCH', url: 'http://127.0.0.1:43100/api/users/1' },
   ]);
 });
 

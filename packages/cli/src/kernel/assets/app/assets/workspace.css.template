@@ -29,7 +29,7 @@
 .workspace-capabilities { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 .workspace-capabilities .workspace-empty { min-height: 140px; }
 .workspace-reference { display: flex; gap: 24px; font-size: 12px; color: var(--ns-muted-fg); }
-.workspace-record-link { font-family: var(--ns-font-mono); font-size: 12px; }
+.workspace-record-link { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--ns-font-mono); font-size: 12px; }
 .workspace-record-description { display: block; color: var(--ns-muted-fg); font: 12px var(--ns-font-sans); }
 .workspace-settings-layout { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 32px; }
 .workspace-settings-nav { display: flex; flex-direction: column; gap: 16px; font-size: 14px; color: var(--ns-muted-fg); }
@@ -76,6 +76,7 @@
 .workspace-table { min-width: 650px; width: 100%; border-collapse: collapse; }
 .workspace-table tr { display: grid; }
 .workspace-table td { padding: 0; line-height: 1.35; }
+.workspace-table tr > td { min-width: 0; }
 .workspace-table th { text-align: start; font-weight: 400; }
 .workspace-records { border: 0; box-shadow: none; }
 .workspace-records [data-part='row'] { align-items: center; gap: 12px; padding: 6px 8px; border-bottom: 1px solid var(--ns-border); }

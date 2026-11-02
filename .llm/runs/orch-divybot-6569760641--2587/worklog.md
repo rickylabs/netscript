@@ -42,3 +42,18 @@ root lint/fmt, docs:accuracy, publish:dry-run and CLI public doc lint PASS.
 Live pilot demonstrated actual anonymous create/update events and a completed seeded job
 with 100% reported progress. Clean final live/visual and CI acceptance remain pending.
 No accepted debt; public report omits private machine paths and reviewer identifiers.
+
+## S2 CI and live acceptance follow-up
+
+CI found a docs snippet dependency closure gap and a consumer database import gap.
+Added the canonical activity type to snippet support and declared the existing standard path
+mapping in database workspaces. The runtime fixture now links users to the persistent stream
+and performs a real successful PATCH before the unchanged Overview ready-panel assertion.
+A long real create reference exposed compact table overlap; bounded the link and retained full
+accessible text/title. Independent same-session source supervisor PASS for these corrections.
+28 follow-up tests PASS; docs:snippets36fences PASS; clean scaffold.service8gates PASS;
+7-file scoped check/lint/fmt PASS. Final live app/service/workers134files check PASS.
+16 populated browser captures at1440/390 light/dark: HTTP200, no overflow or page errors.
+The actual seed job completed with progress100 and remained the same execution after worker
+restart. Unlinked stream fallback uses actual record changes with explicit owner attribution.
+Separate Astra visual review and fresh IMPL-EVAL remain pending. Required CI is being rerun.

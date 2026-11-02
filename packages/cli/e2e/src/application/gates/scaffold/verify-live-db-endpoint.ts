@@ -167,6 +167,18 @@ export async function verifyGeneratedCrudAcceptance(
   });
   await assertDefinedNotFound(fetcher, missingUrl, 'DELETE');
 
+  // Exercise the committed mutation path before the Overview requires a populated
+  // record activity stream. Keep the seed's values and row count unchanged.
+  const updated = await fetcher(new URL(`/api/users/${representative.id}`, usersUrl), {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ data: { name: 'Seed User' } }),
+  });
+  const updatedBody = await responseJson(updated, 'representative record update');
+  if (!updated.ok || !isRecord(updatedBody) || updatedBody.id !== representative.id) {
+    throw new Error(`Representative record update failed: ${updated.status}`);
+  }
+
   return {
     representativeId: representative.id,
     missingId: MISSING_ROW_ID,
