@@ -245,16 +245,56 @@ export async function discoverInstalledRuntimePackages(
   const plugins = asRecord(asRecord(settings.NetScript).Plugins);
   const found = new Map<string, InstalledRuntimePackage>();
   for (const raw of Object.values(plugins)) {
-    const entrypoint = asRecord(raw).Entrypoint;
+    const declaration = asRecord(raw);
+    const entrypoint = declaration.Entrypoint;
     if (typeof entrypoint !== 'string') {
       throw new Error('Installed plugin declaration is missing its entrypoint.');
     }
-    const parsed = parseJsrEntrypoint(entrypoint) ??
+    // Caller-owned service wrappers keep the installed package as their registry authority.
+    const installedFrom = declaration.InstalledFrom;
+    const installed = typeof installedFrom === 'string'
+      ? parseJsrEntrypoint(installedFrom) ??
+        await localPackageFromInstalledSource(projectRoot, installedFrom, fs)
+      : undefined;
+    const parsed = installed ?? parseJsrEntrypoint(entrypoint) ??
       await localPackageFromEntrypoint(projectRoot, entrypoint, fs);
     if (!parsed) throw new Error('Installed plugin entrypoint must be a versioned JSR specifier.');
     found.set(`${parsed.packageName}@${parsed.version}`, parsed);
   }
   return [...found.values()];
+}
+
+/** InstalledFrom identifies a package directory or module, independently of its service wrapper. */
+async function localPackageFromInstalledSource(
+  projectRoot: string,
+  source: string,
+  fs: FileSystemPort,
+): Promise<InstalledRuntimePackage | undefined> {
+  const path = source.replace(/^(?:workspace|local):/, '');
+  if (!path.trim()) return undefined;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(path) && !path.startsWith('file:') && !isAbsolute(path)) {
+    return undefined;
+  }
+  const absolute = resolve(resolveLocalImport(projectRoot, path));
+  if (await fs.exists(absolute) && (await fs.stat(absolute)).isDirectory) {
+    return await packageIdentity(absolute, fs);
+  }
+  return await localPackageFromEntrypoint(projectRoot, absolute, fs);
+}
+
+async function packageIdentity(
+  directory: string,
+  fs: FileSystemPort,
+): Promise<InstalledRuntimePackage | undefined> {
+  for (const filename of ['deno.json', 'deno.jsonc']) {
+    const path = join(directory, filename);
+    if (!await fs.exists(path)) continue;
+    const metadata = asRecord(parseJsonc(await fs.readFile(path)));
+    if (typeof metadata.name === 'string' && typeof metadata.version === 'string') {
+      return { name: metadata.name, packageName: metadata.name, version: metadata.version };
+    }
+  }
+  return undefined;
 }
 
 /** Resolve a local service to its owning package identity before manifest discovery. */
@@ -266,14 +306,8 @@ async function localPackageFromEntrypoint(
   if (!isLocalImport(entrypoint)) return undefined;
   let directory = dirname(resolveLocalImport(projectRoot, entrypoint));
   while (true) {
-    for (const filename of ['deno.json', 'deno.jsonc']) {
-      const path = join(directory, filename);
-      if (!await fs.exists(path)) continue;
-      const metadata = asRecord(parseJsonc(await fs.readFile(path)));
-      if (typeof metadata.name === 'string' && typeof metadata.version === 'string') {
-        return { name: metadata.name, packageName: metadata.name, version: metadata.version };
-      }
-    }
+    const identity = await packageIdentity(directory, fs);
+    if (identity) return identity;
     const parent = dirname(directory);
     if (parent === directory) return undefined;
     directory = parent;

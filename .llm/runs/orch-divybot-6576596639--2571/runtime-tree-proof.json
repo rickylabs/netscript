@@ -1,0 +1,15 @@
+{
+  "candidate": "350b328ee0b31ce79cec1dac1498112aca658446",
+  "ciCandidate": "04149cb48ee54101f87773c5d4cab5229bc01103",
+  "trees": {
+    "packages/cli/src": "d9919000633e4e0bd37fc336ce7906bd64d333e7",
+    "packages/cli/e2e": "c814028109d3f9decde9bde036e2cdaba19c1445",
+    "packages/cli/tests": "b48cfaf9cc0338276b2c4d20ede40df8f91b6c9e",
+    "plugins": "69a932b52040e14abd28939e18c1258a827e5b7f",
+    ".github": "b93b11faa505bbcef1c00da97475f7c3fbb33c39",
+    "docs": "3057e82801898dfac924c0edd185d042f5873dad",
+    "deno.json": "d825215dc5f341dc93fd3a64073d0e6212da231f",
+    "deno.lock": "e7cab3e1513951964a27e498f758cf6263b6a08b",
+    ".llm/tools": "9e4528c107406a3b3c948c3dcc03abd2123a75be"
+  }
+}

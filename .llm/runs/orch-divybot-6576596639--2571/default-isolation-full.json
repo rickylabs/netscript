@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "baseline": "ce9a6333d7723c978acbc114219d5b5cadc3da6f",
+  "filesBefore": 197,
+  "filesAfter": 197,
+  "differentPaths": [],
+  "scope": "Final public init with default scaffold choices; --ci --yes --no-git --no-agent only"
+}

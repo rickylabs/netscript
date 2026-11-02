@@ -1,0 +1,51 @@
+[
+  {
+    "command": [
+      "deno",
+      "task",
+      "gen:agent-docs-prose"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 18.59
+  },
+  {
+    "command": [
+      "deno",
+      "task",
+      "gen:mcp-export-corpus",
+      "--allow-dirty"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 7.65
+  },
+  {
+    "command": [
+      "deno",
+      "task",
+      "gen:assets-barrel"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 1.4
+  },
+  {
+    "command": [
+      "deno",
+      "task",
+      "gen:publish-assets"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 0.39
+  },
+  {
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run=git",
+      "--allow-write=.llm/tools/validation/fixtures",
+      ".llm/tools/validation/aspire-surface-manifest.ts"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 0.14
+  }
+]

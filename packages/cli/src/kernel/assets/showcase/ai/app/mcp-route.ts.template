@@ -1,0 +1,4 @@
+import { define } from '../../../utils.ts';
+import { handleShowcaseChat } from '../../../lib/showcase-ai.ts';
+
+export const handler = define.handlers({ POST: (ctx) => handleShowcaseChat(ctx.req, 'mcp') });

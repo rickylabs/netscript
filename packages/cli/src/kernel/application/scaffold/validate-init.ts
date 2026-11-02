@@ -7,6 +7,7 @@ import type { InitOptions, ValidatedInitOptions } from '../../domain/scaffold/sc
 import type { InitPipelineContext } from './context.ts';
 import { allocateScaffoldDefaultPort } from '../../domain/scaffold/default-port-allocation.ts';
 import { deriveDefaultAppName } from '../../domain/scaffold/app-name.ts';
+import { applyShowcasePreset } from '../../domain/scaffold/showcase-preset.ts';
 
 const PRISMA_MODEL_NAME_PATTERN = /^[A-Z][A-Za-z0-9]*$/;
 
@@ -32,6 +33,7 @@ export async function validateOptions(
   context: InitPipelineContext,
   options: InitOptions,
 ): Promise<ValidatedInitOptions> {
+  options = applyShowcasePreset(options);
   // 1. Name format
   if (!SCAFFOLD_VALIDATION.NAME_PATTERN.test(options.name)) {
     throw new ScaffoldValidationError(
@@ -146,6 +148,7 @@ export async function validateOptions(
 
   return {
     name: options.name,
+    ...(options.from ? { from: options.from } : {}),
     appName,
     targetPath,
     importMode: options.importMode,

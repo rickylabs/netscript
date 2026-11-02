@@ -1,12 +1,9 @@
-import {
-  printFailure,
-  printSuccess,
-} from '../../adapters/loggers/console-logger.ts';
+import { printFailure, printSuccess } from '../../adapters/loggers/console-logger.ts';
 import { ScaffoldError, ScaffoldGitError } from '../../domain/errors.ts';
 import type { ScaffoldResult } from '../../domain/core-types.ts';
 import type { ValidatedInitOptions } from '../../domain/scaffold/scaffold-options.ts';
 import type { InitPipelineContext } from './context.ts';
-import { scaffoldRoot, scaffoldPackagesLocal } from './plan-init.ts';
+import { scaffoldPackagesLocal, scaffoldRoot } from './plan-init.ts';
 import {
   scaffoldContracts,
   scaffoldDatabase,
@@ -17,6 +14,8 @@ import { scaffoldAspire } from './render-init.ts';
 import { scaffoldApp } from './writers/write-init.ts';
 import { formatOutput } from './support/post-scripts-init.ts';
 import { gitInit } from './support/git-init.ts';
+import { scaffoldShowcase } from '../../adapters/showcase/scaffold-showcase.ts';
+import { SHOWCASE_PRESET } from '../../domain/scaffold/showcase-preset.ts';
 
 /** Options for the init pipeline renderer side effects. */
 export interface InitPipelineRunOptions {
@@ -51,7 +50,9 @@ export async function runInitPipeline(
     }
 
     phases.push(await scaffoldDatabase(context, validated));
-    if (validated.dbEngine !== 'none') human(options.quiet, `Database workspace (${validated.dbEngine})`);
+    if (validated.dbEngine !== 'none') {
+      human(options.quiet, `Database workspace (${validated.dbEngine})`);
+    }
 
     phases.push(await scaffoldApp(context, validated));
     human(options.quiet, `Frontend app "${validated.appName}" (Fresh framework)`);
@@ -77,6 +78,11 @@ export async function runInitPipeline(
 
     phases.push(await scaffoldPlugins(context, validated));
     human(options.quiet, 'Plugins (empty registry)');
+
+    if (validated.from === SHOWCASE_PRESET) {
+      phases.push(await scaffoldShowcase(context, validated));
+      human(options.quiet, 'Northwind showcase (commerce, fulfilment and setup recipe)');
+    }
 
     if (!validated.dryRun) {
       await formatOutput(context, validated.targetPath, phases);

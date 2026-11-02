@@ -26,6 +26,7 @@ import {
 
 Deno.test('registry exposes scaffold capability suites from constants', () => {
   assertEquals(builtInSuites.map((suite) => suite.id), [
+    SCAFFOLD.SHOWCASE,
     SCAFFOLD.SERVICE,
     SCAFFOLD.CONTRACTS,
     SCAFFOLD.INFRASTRUCTURE,
@@ -299,6 +300,7 @@ Deno.test('runtime suites execute the formerly deferred #1398 OTEL gates', () =>
 
 Deno.test('every registered suite pins its exact deferred-gate set and owning issues', () => {
   const expected = {
+    [SCAFFOLD.SHOWCASE]: [],
     [SCAFFOLD.SERVICE]: [],
     [SCAFFOLD.CONTRACTS]: [],
     [SCAFFOLD.INFRASTRUCTURE]: [],
@@ -722,6 +724,7 @@ Deno.test('existing built-in suites preserve their exact resolved options', () =
     httpTimeoutMs: 30_000,
   };
   const expected = new Map<string, RunOptions>([
+    [SCAFFOLD.SHOWCASE, { ...common, database: DATABASE.SQLITE, cache: false }],
     [SCAFFOLD.SERVICE, common],
     [SCAFFOLD.CONTRACTS, common],
     [SCAFFOLD.INFRASTRUCTURE, common],

@@ -91,6 +91,28 @@ $ netscript init my-app --db postgres --service --yes --dry-run
   [dry-run] Would create 183 files, 44 directories
 ```
 
+### Northwind showcase
+
+Opt in to a complete commerce example while keeping the ordinary `init` output unchanged:
+
+```sh
+netscript init northwind --from showcase --ci --yes
+cd northwind
+deno task showcase:setup
+deno task aspire:start
+```
+
+The setup task installs the standard plugins and UI components, generates their wiring, and seeds
+40 orders with customers, products and line items. Follow an order through worker fulfilment,
+the order/payment/shipping saga and delivery webhook, then read its committed activity stream.
+The generated `showcase/README.md` documents the recipe and extension points.
+
+The Assistant uses durable private conversations and read-only order MCP tools. Without a model
+credential it renders provider setup. Real model and OAuth/OIDC credentials are external
+prerequisites for signed-in chat; CI uses a stub provider. Private chat currently requires a POSIX
+host for credential-file permissions. SQLite uses the local Garnet fallback when Docker is absent;
+PostgreSQL requires Docker. Deno 2.9.7 and the pinned Aspire/.NET toolchain are required.
+
 ## Command map
 
 | Group         | What it owns                                                                                                                       |
@@ -400,3 +422,22 @@ checks feed normal command output. To extend candidate selection or ownership
 rules, start at `src/kernel/adapters/plugin/browser-auth-reconciler.ts` and its
 colocated preservation tests; reporting scenarios live in
 `tests/browser-auth-reporting_test.ts`.
+
+## Archetype 6 v2 deviations
+
+The showcase adds one `showcase/` concern directory to each of two existing
+over-cap parents. Relative to merged main `59e6202`, `src/kernel/adapters` grows
+from 18 to 19 immediate children and `e2e/src/application/gates/scaffold` from 93
+to 94; R-FOLD-CARD / F-16 limits immediate children, including subdirectories, to
+12. The cost is one more sibling to navigate in each parent. The showcase's
+emission and runtime acceptance logic stay grouped, with no runtime, permission,
+layering or public-contract exception.
+
+CLI and CLI E2E maintainers own the bounded exception
+[`cli-showcase-cardinality-2571`](../../.llm/harness/debt/arch-debt.md#packagescli--showcase-adapter-and-scaffold-gate-cardinality-cli-showcase-cardinality-2571).
+Before adding another adapter or scaffold-gate family after #2571, organize the
+affected parent into bounded role-named groups. Closure requires both parents at
+or below 12 children, preserved default-init bytes and public/maintainer
+boundaries, and green structured, quality and runtime gates. Existing scaffold
+debt remains open; its historical oversized runtime registry has already been
+split and is 362 lines at showcase candidate `04149cb`.

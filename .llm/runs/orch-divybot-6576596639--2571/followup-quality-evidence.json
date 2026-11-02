@@ -1,0 +1,165 @@
+{
+  "failure": {
+    "job": "https://github.com/rickylabs/netscript/actions/runs/41475477622/job/125380257443",
+    "head": "f5f439746abe12900d85af624fb21a41f881ab84",
+    "step": "release:preflight",
+    "cause": "Quoted generated scaffold source classified as executable package-relative file reads."
+  },
+  "repair": "Upstream TypeScript/TSX token ranges identify inert strings/templates/regex/comments; executable interpolation and all existing guard categories remain scanned. Unclassified source retains every candidate match.",
+  "regressionTests": {
+    "passed": 23,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 23,
+    "uniqueFailures": 0
+  },
+  "releasePreflight": {
+    "exitCode": 0,
+    "categories": [
+      "text-imports",
+      "import-attributes",
+      "file-url-import-meta",
+      "self-imports"
+    ]
+  },
+  "scopedValidation": {
+    "files": 2,
+    "check": 0,
+    "lint": 0,
+    "fmt": 0,
+    "lintConfig": ".llm/tools/quality/cli-quality.deno.json"
+  },
+  "dependencies": {
+    "depsCheck": 0,
+    "frozenProdInstall": 0,
+    "criticalAudit": 0,
+    "resolvedNpmUnchanged": true,
+    "resolvedJsrUnchanged": true,
+    "workspaceInventoryUnchanged": true,
+    "newExplicitSpecifier": "npm:@babel/parser@7.29.9",
+    "sourceScope": "Internal release tool; no new root import-map entry or package runtime dependency."
+  },
+  "localQualityReplay": [
+    {
+      "gate": "figma-ci",
+      "exitCode": 0,
+      "elapsedSeconds": 7.87
+    },
+    {
+      "gate": "cli-quality",
+      "exitCode": 0,
+      "elapsedSeconds": 0.65
+    },
+    {
+      "gate": "docs-source-format",
+      "exitCode": 0,
+      "elapsedSeconds": 0.19
+    },
+    {
+      "gate": "docs-source-format-test",
+      "exitCode": 0,
+      "elapsedSeconds": 1.41
+    },
+    {
+      "gate": "prod-install",
+      "exitCode": 0,
+      "elapsedSeconds": 0.67
+    },
+    {
+      "gate": "lint-report",
+      "exitCode": 0,
+      "elapsedSeconds": 7.69
+    },
+    {
+      "gate": "fmt-check-report",
+      "exitCode": 0,
+      "elapsedSeconds": 2.84
+    },
+    {
+      "gate": "docs-tagline",
+      "exitCode": 0,
+      "elapsedSeconds": 0.25
+    },
+    {
+      "gate": "docs-accuracy",
+      "exitCode": 0,
+      "elapsedSeconds": 5.31
+    },
+    {
+      "gate": "jsdoc-example-compile",
+      "exitCode": 0,
+      "elapsedSeconds": 42.93
+    },
+    {
+      "gate": "readme-fences",
+      "exitCode": 0,
+      "elapsedSeconds": 9.15
+    },
+    {
+      "gate": "agent-docs-prose",
+      "exitCode": 0,
+      "elapsedSeconds": 15.38
+    },
+    {
+      "gate": "mcp-export-corpus",
+      "exitCode": 0,
+      "elapsedSeconds": 7.71
+    },
+    {
+      "gate": "assets-barrel",
+      "exitCode": 0,
+      "elapsedSeconds": 2.54
+    },
+    {
+      "gate": "publish-assets",
+      "exitCode": 0,
+      "elapsedSeconds": 0.52
+    },
+    {
+      "gate": "emitted-samples",
+      "exitCode": 0,
+      "elapsedSeconds": 5.48
+    },
+    {
+      "gate": "netscript-jsr-specifiers",
+      "exitCode": 0,
+      "elapsedSeconds": 1.89
+    },
+    {
+      "gate": "scaffold-provider-boundary",
+      "exitCode": 0,
+      "elapsedSeconds": 0.45
+    },
+    {
+      "gate": "scaffold-versions",
+      "exitCode": 0,
+      "elapsedSeconds": 0.19
+    },
+    {
+      "gate": "aspire-version-parity",
+      "exitCode": 0,
+      "elapsedSeconds": 0.34
+    },
+    {
+      "gate": "publish-dry-run",
+      "exitCode": 0,
+      "elapsedSeconds": 37.27
+    },
+    {
+      "gate": "ai-peer-resolution",
+      "exitCode": 0,
+      "elapsedSeconds": 10.9
+    },
+    {
+      "gate": "audit-critical",
+      "exitCode": 0,
+      "elapsedSeconds": 0.49
+    }
+  ],
+  "currency": "Local checks ran on the working repair; immutable remote CI follows the pushed commit. Full showcase source and screenshots are unchanged.",
+  "independentReview": {
+    "verdict": "PASS",
+    "evidence": "followup-source-review.md",
+    "round": 2
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "baseline": "ce9a6333d7723c978acbc114219d5b5cadc3da6f",
+  "filesBefore": 178,
+  "filesAfter": 178,
+  "differentPaths": [],
+  "scope": "public init --no-agent --no-aspire --db none; all emitted files compared byte for byte"
+}

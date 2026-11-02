@@ -1,0 +1,17 @@
+/** A private BFF cannot make a publicly readable upstream transcript private. */
+import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
+import { CHAT_STREAM_PATH } from './contracts.ts';
+
+/** Fail closed until the streams host denies anonymous reads beneath the chat prefix. */
+export async function requirePrivateChatStreams(signal: AbortSignal): Promise<void> {
+  if (!getStreamsAuth().Authorization) throw new Error('Private streams credentials are required');
+  const response = await fetch(buildStreamUrl(`${CHAT_STREAM_PATH}/privacy-probe`), {
+    method: 'GET',
+    redirect: 'error',
+    signal: AbortSignal.any([signal, AbortSignal.timeout(3000)]),
+  });
+  await response.body?.cancel();
+  if (response.status !== 401 && response.status !== 403) {
+    throw new Error('Chat stream prefix must deny anonymous reads');
+  }
+}

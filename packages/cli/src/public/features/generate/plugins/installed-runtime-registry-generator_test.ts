@@ -1,5 +1,5 @@
-import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
-import { describe, it } from 'jsr:@std/testing@^1/bdd';
+import { assertEquals, assertRejects } from '@std/assert';
+import { describe, it } from '@std/testing/bdd';
 
 import type { DirEntry, FileInfo, WalkEntry } from '../../../../kernel/domain/core-types.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
@@ -7,6 +7,116 @@ import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/proces
 import { createInstalledRuntimeRegistryGenerator } from './installed-runtime-registry-generator.ts';
 
 describe('installed runtime registry generator', () => {
+  for (const entrypoint of ['./plugins/custom/services/main.ts', './showcase/host.ts']) {
+    for (
+      const source of [
+        './plugins/custom',
+        'workspace:plugins/custom',
+        'local:./plugins/custom',
+        'file:///workspace/app/plugins/custom/',
+      ]
+    ) {
+      it(`resolves installed package directory ${source} for ${entrypoint}`, async () => {
+        const fs = new MemoryFileSystem({
+          '/workspace/app/appsettings.json': JSON.stringify({
+            NetScript: { Plugins: { custom: { Entrypoint: entrypoint, InstalledFrom: source } } },
+          }),
+          '/workspace/app/deno.json': JSON.stringify({
+            name: '@app/consumer',
+            version: '0.0.0',
+            workspace: ['./plugins/custom'],
+          }),
+          '/workspace/app/plugins/custom/deno.json': JSON.stringify({
+            name: '@acme/plugin-custom',
+            version: '1.2.3',
+          }),
+          '/workspace/app/plugins/custom/scaffold.runtime.json': JSON.stringify(
+            runtimeManifest('custom'),
+          ),
+          '/workspace/app/plugins/custom/services/main.ts': 'export {};',
+          '/workspace/app/custom/item.ts': 'export const item = {};',
+        });
+        const generate = createInstalledRuntimeRegistryGenerator({
+          fs,
+          process: new RecordingProcess(fs),
+          fetchManifest: () => {
+            throw new Error(
+              'Must resolve the declared local package, never the consumer or registry',
+            );
+          },
+        });
+        const result = await generate({ dryRun: false, projectRoot: '/workspace/app' });
+        assertEquals(result[0].plugin, '@acme/plugin-custom');
+      });
+    }
+  }
+
+  it('keeps installed package authority when an app owns the service entrypoint', async () => {
+    const fs = new MemoryFileSystem({
+      '/workspace/app/appsettings.json': JSON.stringify({
+        NetScript: {
+          Plugins: {
+            custom: {
+              Entrypoint: './showcase/host.ts',
+              InstalledFrom: 'jsr:@acme/plugin-custom@1.2.3/services',
+            },
+          },
+        },
+      }),
+      '/workspace/app/deno.json': JSON.stringify({ name: '@app/root', version: '0.0.0' }),
+      '/workspace/app/custom/item.ts': 'export const item = {};',
+    });
+    const requested: string[] = [];
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs,
+      process: new RecordingProcess(fs),
+      fetchManifest: (url) => {
+        requested.push(url);
+        return Promise.resolve(jsonResponse(runtimeManifest('custom')));
+      },
+    });
+    const result = await generate({ dryRun: false, projectRoot: '/workspace/app' });
+    assertEquals(result[0].plugin, '@acme/plugin-custom');
+    assertEquals(requested[0], 'https://jsr.io/@acme/plugin-custom/1.2.3/scaffold.runtime.json');
+  });
+
+  it('finds the local installed package behind an app-owned service wrapper', async () => {
+    const fs = new MemoryFileSystem({
+      '/workspace/app/appsettings.json': JSON.stringify({
+        NetScript: {
+          Plugins: {
+            custom: {
+              Entrypoint: './showcase/host.ts',
+              InstalledFrom: '/workspace/source/plugins/custom/services/main.ts',
+            },
+          },
+        },
+      }),
+      '/workspace/app/deno.json': JSON.stringify({
+        name: '@app/root',
+        version: '0.0.0',
+        imports: { '@acme/plugin-custom': '../source/plugins/custom/mod.ts' },
+      }),
+      '/workspace/source/plugins/custom/deno.json': JSON.stringify({
+        name: '@acme/plugin-custom',
+        version: '1.2.3',
+      }),
+      '/workspace/source/plugins/custom/scaffold.runtime.json': JSON.stringify(
+        runtimeManifest('custom'),
+      ),
+      '/workspace/app/custom/item.ts': 'export const item = {};',
+    });
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs,
+      process: new RecordingProcess(fs),
+      fetchManifest: () => {
+        throw new Error('Local package must not fall back to the registry');
+      },
+    });
+    const result = await generate({ dryRun: false, projectRoot: '/workspace/app' });
+    assertEquals(result[0].plugin, '@acme/plugin-custom');
+  });
+
   it('runs a published manifest generator under the project config and canonical target', async () => {
     const fs = new MemoryFileSystem({
       '/workspace/app/appsettings.json': appsettings(

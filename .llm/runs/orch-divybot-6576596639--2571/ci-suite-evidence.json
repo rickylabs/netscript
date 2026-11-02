@@ -1,0 +1,2509 @@
+{
+  "head": "04149cb48ee54101f87773c5d4cab5229bc01103",
+  "run": "https://github.com/rickylabs/netscript/actions/runs/41465808061",
+  "suites": [
+    {
+      "artifact": "e2e-cli-scaffold-runtime-report/e2e-report-scaffold-runtime.json",
+      "ok": true,
+      "suiteId": "scaffold.runtime",
+      "durationMs": 865254,
+      "steps": [
+        {
+          "id": "preflight.deno",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "preflight.aspire",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.init",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.documented-scaffold",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.service-client-add",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.service-client-generate",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.agent-init",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.worker",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.saga",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.trigger",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.stream",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.auth",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.ai",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.ai.mcp",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.outbound-webhook",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.ai.lifecycle",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin-list",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.ai.appsettings",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.ui-add-ai",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.ui-local-source",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.runtime-schemas",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "database.codegen",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.design-production-exclusion",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.service-client-contract",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.resource-generate",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.resource-rerun",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.ui-data-screen",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.project-boundary-dev",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.plugins-unhealthy",
+          "verdict": "passed",
+          "commandExitCodes": [
+            1
+          ],
+          "attemptExitCodes": [
+            1
+          ]
+        },
+        {
+          "id": "generated.plugins-check",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.workers-registry",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.sagas-registry",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.plugin-doctor-missing-module",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.generated-guarded-plugin",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.generated-guarded-service",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-session-authenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.service-api-unauthenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.service-api-authenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-signout-foreign-session",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.streams-storage-fixture",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.aspire-restore",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.service-env-fixture",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.quality-negative",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.deno-check",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.deno-lint",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.deno-fmt-check",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.ui-ai-check",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.ai-namespace-check",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.auth-smoke-env",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.flow-b-fixture",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.readiness-fixture",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.aspire-start",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "database.init",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "database.migration-artifacts",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "database.generate",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "database.seed",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.capture-db-allocation-first",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.aspire-restart-after-db",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.capture-db-allocation-second",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.aspire-describe",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.postgres",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.garnet",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.workers-api",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.workers",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.sagas-api",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.sagas",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.triggers-api",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.triggers",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.auth",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.streams",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.app",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "agent.aspire-mcp-smoke",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.health.credential-accepted",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.health.credential-rejected",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.health.listener-unreachable",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.typed-db-phase-b",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.db-status-preserves-apphost",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.endpoint-readiness",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.background-children-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.streams-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.streams-storage-restart",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-jobs",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-tasks",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-seed",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-trigger-health-job",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-executions",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-concurrency",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.mcp-endpoint-directory",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.service-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.service-env",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.live-db-endpoint",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.sagas-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.sagas-list",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.sagas-instances",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.triggers-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.triggers-webhook",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.triggers-events",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-cookie-jar",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-live",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-ready",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-session-unauthenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-me-unauthenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-signout-unauthenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-rpc-unauthenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.ai-chat-route",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.record-activity",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.app-home",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.app-dynamic-route",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.app-reference",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.island-served-surface",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.island-hydration",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.service-client-refetch",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.ui-render",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.mcp-widget-roundtrip",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.plugins-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.package-backed-plugin-doctor",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.otel.webhook",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.otel.stream-consumer",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.otel.traces",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.streams.producer-reconnect",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.otel.task-traces",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.resource-command",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "cleanup.aspire-stop",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        }
+      ],
+      "sha256": "4d9345cca0920a287c654b82ac5944cb207aa682379c9bf432f6481ee7fc263f"
+    },
+    {
+      "artifact": "e2e-cli-scaffold-runtime-sqlite-report/e2e-report-scaffold-runtime-sqlite.json",
+      "ok": true,
+      "suiteId": "scaffold.runtime.sqlite",
+      "durationMs": 685309,
+      "steps": [
+        {
+          "id": "preflight.deno",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "preflight.aspire",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.init",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.service-client-add",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.service-client-generate",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.agent-init",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.worker",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.saga",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.trigger",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.stream",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.auth",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.ai",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.ai.mcp",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.outbound-webhook",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.ai.lifecycle",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin-list",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.plugin.ai.appsettings",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.ui-add-ai",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.ui-local-source",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.runtime-schemas",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "database.codegen",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.design-production-exclusion",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.service-client-contract",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.resource-generate",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.resource-rerun",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "scaffold.ui-data-screen",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.project-boundary-dev",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.plugins-unhealthy",
+          "verdict": "passed",
+          "commandExitCodes": [
+            1
+          ],
+          "attemptExitCodes": [
+            1
+          ]
+        },
+        {
+          "id": "generated.plugins-check",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.workers-registry",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.sagas-registry",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.plugin-doctor-missing-module",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.generated-guarded-plugin",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.generated-guarded-service",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-session-authenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.service-api-unauthenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.service-api-authenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-signout-foreign-session",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.streams-storage-fixture",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.aspire-restore",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.service-env-fixture",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.quality-negative",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.deno-check",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.deno-lint",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.deno-fmt-check",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.ui-ai-check",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "generated.ai-namespace-check",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.auth-smoke-env",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.flow-b-fixture",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.readiness-fixture",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.aspire-start",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "database.init",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "database.generate",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "database.seed",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.aspire-restart-after-db",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.aspire-describe",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.garnet",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.workers-api",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.workers",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.sagas-api",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.sagas",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.triggers-api",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.triggers",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.auth",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.streams",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.wait.app",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "agent.aspire-mcp-smoke",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.health.listener-unreachable",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.db-status-preserves-apphost",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.endpoint-readiness",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.background-children-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.streams-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.streams-storage-restart",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-jobs",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-tasks",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-seed",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-trigger-health-job",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-executions",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.workers-concurrency",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.mcp-endpoint-directory",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.service-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.service-env",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.sagas-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.sagas-list",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.sagas-instances",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.triggers-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.triggers-webhook",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.triggers-events",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-cookie-jar",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-live",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-ready",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-session-unauthenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-me-unauthenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-signout-unauthenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.auth-rpc-unauthenticated",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.ai-chat-route",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.record-activity",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.app-home",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.app-dynamic-route",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.app-reference",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.island-served-surface",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.island-hydration",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.service-client-refetch",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.ui-render",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.mcp-widget-roundtrip",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.plugins-health",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.package-backed-plugin-doctor",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.otel.webhook",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.otel.stream-consumer",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.otel.traces",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.streams.producer-reconnect",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "behavior.otel.task-traces",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "runtime.resource-command",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "cleanup.aspire-stop",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "cleanup.docker-created-containers",
+          "verdict": "passed",
+          "commandExitCodes": [],
+          "attemptExitCodes": [
+            null
+          ]
+        }
+      ],
+      "sha256": "0c4fdd2568d6f2e6e69496859ff19bf3c344534c8a6d6c5e73e2771c0286dc83"
+    },
+    {
+      "artifact": "e2e-cli-scaffold-runtime-sqlite-report/e2e-report-scaffold-runtime-sqlite-showcase.json",
+      "ok": true,
+      "suiteId": "scaffold.showcase",
+      "durationMs": 229500,
+      "steps": [
+        {
+          "id": "showcase.init",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "showcase.setup",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "showcase.check",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "showcase.build",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "showcase.start",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "showcase.walkthrough",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "cleanup.aspire-stop",
+          "verdict": "passed",
+          "commandExitCodes": [
+            0
+          ],
+          "attemptExitCodes": [
+            0
+          ]
+        },
+        {
+          "id": "cleanup.docker-created-containers",
+          "verdict": "passed",
+          "commandExitCodes": [],
+          "attemptExitCodes": [
+            null
+          ]
+        }
+      ],
+      "sha256": "84bdcbee11351356cdc3c8e498612945540e1cda0bc0eaa92a6be8af466adb6b"
+    }
+  ]
+}

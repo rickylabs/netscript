@@ -1,0 +1,96 @@
+# Northwind commerce
+
+Northwind is an opt-in NetScript showcase. It uses the same Utility pages,
+typed services and background plugins as an ordinary generated application.
+The sample contains 40 orders, five customers, eight products and 80 line items.
+Money is stored in integer minor units; totals come from the saved line items.
+
+## Start the showcase
+
+Install Deno 2.9.7, the pinned Aspire CLI and .NET SDK. Docker is needed for
+PostgreSQL; SQLite can use the supported local Garnet fallback. Private chat
+currently requires a POSIX host and the same OS user for setup and runtime. Run:
+
+```sh
+netscript init northwind --from showcase --ci --yes
+cd northwind
+deno task showcase:setup
+deno task aspire:start
+```
+
+The setup task installs streams, workers, sagas, triggers, AI and authentication using the supported
+plugin commands, copies the app-owned commerce resources, generates registries,
+and initializes, generates and seeds the database. No manual linking or source
+edits are required. SQLite is the default; `--db postgres` selects PostgreSQL.
+The first PostgreSQL database lifecycle is provisioned through Aspire by the CLI.
+Existing related orders are preserved on reseed.
+
+Open the web app URL shown by Aspire. Overview shows saved orders, revenue,
+status charts and activity. Orders supports search, status filters, sorting and
+CSV export. Customers and Products read the same live database through oRPC.
+
+## Follow an order
+
+1. Open Orders, then an order that is pending, awaiting payment or paid.
+2. Select **Fulfil order**. Refresh the order to see durable worker progress.
+3. The order saga records **Order**, **Payment** and **Shipping** steps. Its
+   payment is a demonstration transition, with no external charge.
+4. Return to Overview. The stream activity includes the committed status changes.
+5. The order detail also provides **Send delivery webhook**, which uses the
+   registered webhook trigger to enqueue the same fulfilment job.
+
+The webhook is deliberately public sample ingress for local development. Replace
+the sample `memory` verifier with your verifier before exposing it outside your demo.
+Sign in uses the normal authentication surface. External credentials are required
+to complete a real provider login; no demo identity is supplied.
+
+## Connect the assistant
+
+Open **Assistant** (`/ai`). Without a supported model credential it shows the
+provider connection state and makes no model call. The setup task already
+installs its AI components, native server boundary, private streams host and
+per-user conversation storage. No manual source linking or shared stream key is
+needed. It stores the workspace's stream credential only in `~/.secrets` (600),
+with non-secret metadata in `.netscript/showcase-streams.json`.
+
+Use the default `anthropic:*` model in `ai/models.ts` with `ANTHROPIC_API_KEY`,
+or select `openai-compatible:<model>` with `OPENAI_API_KEY` and optionally
+`OPENAI_BASE_URL`. Keep credentials in your server environment or private secret
+manager, then restart the app. Model names are owned by the installed AI plugin.
+
+Private conversations require the default **kv-oauth** authentication backend.
+Provide a stable `NETSCRIPT_AUTH_KV_OAUTH_KEY` (base64url-encoded 32 random bytes),
+real OAuth/OIDC client credentials and endpoints, and register the web app's
+`/auth/callback` URL with your provider. Follow the installed auth plugin README
+for its provider settings and secure-cookie transport requirements. Use HTTPS
+for deployment; local HTTP development requires `localhost` and the auth service's
+explicit local transport opt-in. Configure the environment before starting
+Aspire. An installed but unconfigured identity provider is not a working login.
+The alternative better-auth backend currently validates existing sessions; it
+does not provide this generated interactive sign-in path.
+
+After signing in, create a conversation, ask which orders await payment, refresh
+and reopen it. The agent uses the read-only `northwind_list_orders` and
+`northwind_get_order` MCP tools against the actual orders service. The same tools
+are available at the authenticated, same-origin POST endpoint
+`/api/showcase/mcp`. Transcript reads, sends and MCP calls verify the existing
+browser session; the browser never chooses a subject or receives the stream
+credential. Keep `.netscript/showcase-chat.kv`, `.data/streams`, stream metadata
+and the private credential across restarts. This local ownership store supports
+one app host; use a shared ownership store for a multi-host deployment.
+
+## Extend the application
+
+Start here. `contracts/commerce.contract.ts` owns customer/product/line schemas;
+`services/orders/src/commerce.ts` implements live reads. The standard orders
+contract and repository remain under `contracts/versions/v1/` and
+`services/orders/src/`. `database/{{dbEngine}}/scripts/seed-commerce.ts` owns the
+catalogue; the ordinary sample seed owns the dated order backbone.
+
+`workers/jobs/fulfil-order.ts`, `sagas/order-fulfilment/order-saga.ts` and
+`triggers/order-webhook.ts` are the background extension points. The shared
+Utility views remain under `apps/{{appName}}/routes/(_components)/`; the additive
+order workflow view is `order-workflow.tsx`. `ai/showcase/` owns the assistant contract, tools and server composition;
+`showcase/streams-host.ts` is the app-owned private stream boundary.
+All plugin runtime code belongs to
+the installed packages. `showcase/resources/` retains the original recipe sources.

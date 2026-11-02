@@ -1,0 +1,16 @@
+import { baseContract } from '@netscript/contracts';
+import { z } from 'zod';
+
+export const customerSchema = z.object({ id: z.number().int(), name: z.string(), email: z.email(), company: z.string(), country: z.string(), address: z.string(), orderCount: z.number().int() });
+export const productSchema = z.object({ id: z.number().int(), sku: z.string(), name: z.string(), category: z.string(), price: z.number().int(), stock: z.number().int() });
+export const orderLinesSchema = z.object({
+  customer: customerSchema.omit({ orderCount: true }).nullable(),
+  lines: z.array(z.object({ id: z.number().int(), name: z.string(), sku: z.string(), quantity: z.number().int(), unitPrice: z.number().int(), total: z.number().int() })),
+});
+
+/** App-owned commerce read contract; all writes retain the existing orders service contract. */
+export const commerceContract = {
+  customers: baseContract.route({ method: 'GET', path: '/commerce/customers' }).meta({ access: { authentication: 'none' } }).output(z.array(customerSchema)),
+  products: baseContract.route({ method: 'GET', path: '/commerce/products' }).meta({ access: { authentication: 'none' } }).output(z.array(productSchema)),
+  orderLines: baseContract.route({ method: 'GET', path: '/commerce/orders/{id}/lines' }).meta({ access: { authentication: 'none' } }).input(z.object({ id: z.number().int().positive() })).output(orderLinesSchema),
+};

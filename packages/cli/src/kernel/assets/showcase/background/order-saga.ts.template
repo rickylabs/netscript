@@ -1,0 +1,29 @@
+import { defineSaga, sagaComplete, send } from '@netscript/plugin-sagas-core';
+import type { SagaCorrelationKey } from '@netscript/plugin-sagas-core/domain';
+import { z } from 'zod';
+
+type State = { status: string; order?: string; payment?: string; shipping?: string; orderId?: number };
+const payload = z.object({ orderId: z.number().int().positive() });
+
+/** T1 state and transition history record the order, payment and shipping lifecycle. */
+export const orderSaga = defineSaga('order-fulfilment').durability('t1')
+  .state<State>({ status: 'pending' })
+  .on<'order.placed', { orderId: number }>('order.placed', (saga, message, context) => {
+    const { orderId } = payload.parse(message.payload);
+    saga.state = { ...saga.state, status: 'processing', orderId, order: context.now.toISOString() };
+    return [send('order.payment', { orderId })];
+  })
+  .on<'order.payment', { orderId: number }>('order.payment', (saga, message, context) => {
+    const { orderId } = payload.parse(message.payload);
+    // A demonstration payment: no external payment processor or real charge is made.
+    saga.state = { ...saga.state, status: 'paid', payment: context.now.toISOString() };
+    return [send('order.shipping', { orderId })];
+  })
+  .on<'order.shipping', { orderId: number }>('order.shipping', (saga, message, context) => {
+    const { orderId } = payload.parse(message.payload);
+    saga.state = { ...saga.state, status: 'shipped', shipping: context.now.toISOString() };
+    return [sagaComplete({ orderId, shippedAt: context.now.toISOString() })];
+  })
+  .correlate((message) => `order-${payload.parse(message.payload).orderId}` as SagaCorrelationKey)
+  .build();
+export default orderSaga;

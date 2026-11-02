@@ -1,0 +1,66 @@
+{
+  "deno": "2.9.7",
+  "documentedShowcase": {
+    "gatesPassed": 6,
+    "gatesFailed": 0,
+    "localCleanup": "not asserted; Docker daemon unavailable"
+  },
+  "extendedWalkthrough": {
+    "gate": "showcase.walkthrough",
+    "ok": true,
+    "seededOrders": 40,
+    "catalogue": "rendered",
+    "worker": "completed",
+    "saga": [
+      "order",
+      "payment",
+      "shipping"
+    ],
+    "webhook": "executed",
+    "activity": "stream-rendered",
+    "assistant": "connect-provider",
+    "privateStreams": "anonymous-denied"
+  },
+  "defaultIsolation": {
+    "includingAgents": 220,
+    "defaultChoicesNoAgent": 197,
+    "minimal": 178,
+    "byteDifferences": 0
+  },
+  "focusedRegistryAndPermissions": {
+    "passed": 53,
+    "failed": 0
+  },
+  "sourceScenarios": {
+    "passed": 21,
+    "failed": 0
+  },
+  "mountedBrowser": {
+    "baseline": "RED: composer remains disabled on empty catch-up",
+    "repaired": "GREEN: first send, unused-thread reopen, native/tool replay, exact resume offset, auth/origin denial"
+  },
+  "coldEvidenceDirectory": {
+    "baseline": "RED: NotFound",
+    "repaired": "GREEN: optional evidence directory created recursively; exact source+browser CI command passed"
+  },
+  "packedBuild": {
+    "packedPackages": 29,
+    "client": "PASS",
+    "server": "PASS",
+    "closureGuard": "unchanged; PASS",
+    "sourceVendors": false,
+    "firstPartyAliases": "compiled artifact or exact JSR only"
+  },
+  "visual": {
+    "reviewer": "gpt-6-astra; separate read-only session",
+    "combinations": 60,
+    "minimumScore": 8,
+    "verdict": "PASS"
+  },
+  "remaining": [
+    "main integration/carrier reconciliation",
+    "all root check tasks on final source",
+    "scaffold.runtime and showcase cleanup in CI",
+    "formal independent leaf IMPL-EVAL"
+  ]
+}

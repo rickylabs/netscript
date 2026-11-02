@@ -1,0 +1,15 @@
+import { Badge, Button, EmptyState, PageHeader } from '@app/components/ui/mod.ts';
+import { scaffoldAmount, scaffoldInitials } from '@app/lib/scaffold-contract.ts';
+import { loadCatalogue } from '@app/lib/northwind.ts';
+
+type CatalogueData = Awaited<ReturnType<typeof loadCatalogue>>;
+
+/** Shared catalogue view reads live customers and products, including a useful unavailable state. */
+export function Catalogue({ data, kind }: { data: CatalogueData; kind: 'customers' | 'products' }) {
+  const customers = kind === 'customers';
+  return <div class='workspace-page'><PageHeader class='workspace-heading'><PageHeader.Layout><PageHeader.Main><PageHeader.Intro><h1>{customers ? 'Customers' : 'Products'}</h1><p>{customers ? 'The people and businesses behind every Northwind order.' : 'Thoughtful objects for everyday spaces. Your live catalogue.'}</p></PageHeader.Intro></PageHeader.Main><PageHeader.Actions><Button type='link' variant='outline' href='/orders'>View orders</Button></PageHeader.Actions></PageHeader.Layout></PageHeader>
+    {data.state !== 'ready' ? <EmptyState heading='Catalogue unavailable'><p>Start the orders service and refresh to read the saved catalogue.</p></EmptyState> : <section class='workspace-section'><header class='workspace-section-heading'><h2>{customers ? 'All customers' : 'All products'} <span class='workspace-count'>{customers ? data.customers.length : data.products.length}</span></h2><Badge variant='success'>Connected</Badge></header>
+      <div class='northwind-table-scroll northwind-catalogue'>{customers ? <table class='northwind-table'><thead><tr><th>Customer</th><th>Company</th><th>Location</th><th>Orders</th></tr></thead><tbody>{data.customers.map((customer) => <tr key={customer.id}><td><div class='workspace-owner'><span class='workspace-avatar'>{scaffoldInitials(customer.name)}</span><div><strong>{customer.name}</strong><a class='workspace-record-description' href={`mailto:${customer.email}`}>{customer.email}</a></div></div></td><td data-label='Company'>{customer.company}</td><td data-label='Location'>{customer.country}</td><td data-label='Orders'>{customer.orderCount}</td></tr>)}</tbody></table> : <table class='northwind-table'><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th></tr></thead><tbody>{data.products.map((product) => <tr key={product.id}><td><strong>{product.name}</strong><span class='workspace-record-description'>{product.sku}</span></td><td data-label='Category'>{product.category}</td><td data-label='Price'>{scaffoldAmount(product.price, 'USD')}</td><td data-label='Stock'><Badge variant={product.stock < 25 ? 'warning' : 'success'}>{product.stock} available</Badge></td></tr>)}</tbody></table>}</div>
+    </section>}
+  </div>;
+}

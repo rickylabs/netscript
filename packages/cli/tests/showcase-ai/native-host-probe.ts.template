@@ -1,0 +1,122 @@
+import { assert, assertEquals } from '@std/assert';
+import { startShowcaseStreams } from './showcase/streams-host.ts';
+import { CHAT_STREAM_PATH } from './ai/showcase/contracts.ts';
+import { resolveChatSnapshot, toNetScriptChatResponse } from '@netscript/fresh/ai';
+import { requirePrivateChatStreams } from './ai/showcase/stream-policy.ts';
+const [root, mode] = Deno.args;
+const port = Deno.listen({ hostname: '127.0.0.1', port: 0 });
+const upstreamPort = port.addr.port;
+port.close();
+Deno.env.set('STREAMS_INTERNAL_PORT', String(upstreamPort));
+const host = await startShowcaseStreams(root, {
+  hostname: '127.0.0.1',
+  port: 0,
+  handleSignals: false,
+});
+const origin = `http://127.0.0.1:${host.addr.port}`;
+Deno.env.set('DURABLE_STREAMS_URL', origin);
+const privatePath = `/v1/stream/netscript${CHAT_STREAM_PATH}/restart-proof`;
+const publicPaths = [
+  '/v1/stream/netscript/scaffold/orders/records',
+  '/v1/stream/netscript/workers/jobs',
+  '/v1/stream/netscript/sagas/instances',
+  '/v1/stream/netscript/triggers/executions',
+  '/v1/stream/netscript/auth/authSession',
+  `/v1/stream/netscript${CHAT_STREAM_PATH}-sibling/public`,
+];
+const credential = Deno.env.get('STREAMS_SECRET')!;
+const privateHeaders = { authorization: `Bearer ${credential}`, 'content-type': 'text/plain' };
+async function request(path: string, init?: RequestInit) {
+  const response = await fetch(origin + path, { ...init, signal: AbortSignal.timeout(5000) });
+  const body = await response.text();
+  return { status: response.status, body, offset: response.headers.get('stream-next-offset') };
+}
+try {
+  await requirePrivateChatStreams(new AbortController().signal);
+  for (const method of ['GET', 'HEAD', 'PUT', 'POST', 'DELETE']) {
+    assertEquals((await request(privatePath, { method })).status, 401);
+  }
+  assertEquals(
+    (await request(privatePath, { headers: { authorization: 'Bearer invalid' } })).status,
+    401,
+  );
+  if (mode === 'write') {
+    assertEquals(
+      (await request(privatePath, { method: 'PUT', headers: privateHeaders })).status,
+      201,
+    );
+    assertEquals(
+      (await request(privatePath, {
+        method: 'POST',
+        headers: privateHeaders,
+        body: 'persisted-private-chat',
+      })).status,
+      204,
+    );
+    for (const path of publicPaths) {
+      assertEquals(
+        (await request(path, { method: 'PUT', headers: { 'content-type': 'text/plain' } })).status,
+        201,
+      );
+      assertEquals(
+        (await request(path, {
+          method: 'POST',
+          body: 'public-first-party-activity',
+          headers: { 'content-type': 'text/plain' },
+        })).status,
+        204,
+      );
+    }
+    const response = await toNetScriptChatResponse({
+      target: { sessionId: 'durable-proof', baseUrl: origin },
+      streamPath: CHAT_STREAM_PATH,
+      newMessages: [{
+        id: 'user-proof',
+        role: 'user',
+        parts: [{ type: 'text', content: 'Persist this conversation' }],
+      }],
+      source: (async function* () {
+        yield { type: 'TEXT_MESSAGE_START', messageId: 'assistant-proof', role: 'assistant' };
+        yield {
+          type: 'TEXT_MESSAGE_CONTENT',
+          messageId: 'assistant-proof',
+          delta: 'A test-only provider reply',
+        };
+        yield { type: 'TEXT_MESSAGE_END', messageId: 'assistant-proof' };
+      })(),
+      mode: 'await',
+      request: new Request('https://app.test'),
+      authorize: () => true,
+    });
+    assertEquals(response.status, 200);
+    await response.body?.cancel();
+  }
+  const snapshot = await resolveChatSnapshot({
+    target: { sessionId: 'durable-proof', baseUrl: origin },
+    streamPath: CHAT_STREAM_PATH,
+  });
+  assertEquals(snapshot.messages.map((message) => message.content), [
+    'Persist this conversation',
+    'A test-only provider reply',
+  ]);
+  const chat = await request(privatePath + '?offset=-1', { headers: privateHeaders });
+  assertEquals(chat.status, 200);
+  assertEquals(chat.body, 'persisted-private-chat');
+  assert(chat.offset);
+  for (const path of publicPaths) {
+    const read = await request(path + '?offset=-1');
+    assertEquals(read.status, 200);
+    assertEquals(read.body, 'public-first-party-activity');
+  }
+  assertEquals(Deno.env.get('STREAMS_DATA_DIR'), root + '/.data/streams');
+  if (Deno.build.os === 'linux') {
+    const row = (await Deno.readTextFile('/proc/net/tcp')).split('\n').find((line) =>
+      line.trim().split(/\s+/)[1] ===
+        `0100007F:${upstreamPort.toString(16).toUpperCase().padStart(4, '0')}`
+    );
+    assert(row, 'Native upstream must listen on IPv4 loopback');
+  }
+} finally {
+  await host.stop();
+}
+console.log('SHOWCASE_NATIVE_PASS');

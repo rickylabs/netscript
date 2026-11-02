@@ -1,0 +1,24 @@
+import { implement } from '@orpc/server';
+import { db } from '@database';
+import { commerceContract } from '../../../contracts/commerce.contract.ts';
+
+const contract = implement(commerceContract);
+
+/** Database-backed commerce reads share the orders service and its connection. */
+export const commerce = {
+  customers: contract.customers.handler(async () => {
+    const client = await db.getClient();
+    const rows = await client.customer.findMany({ include: { _count: { select: { orders: true } } }, orderBy: { name: 'asc' } });
+    return rows.map(({ _count, ...customer }) => ({ ...customer, orderCount: _count.orders }));
+  }),
+  products: contract.products.handler(async () => {
+    const client = await db.getClient();
+    return await client.product.findMany({ orderBy: { name: 'asc' } });
+  }),
+  orderLines: contract.orderLines.handler(async ({ input }) => {
+    const client = await db.getClient();
+    const order = await client.order.findUnique({ where: { id: input.id }, include: { customer: true, lines: { include: { product: true } } } });
+    if (!order) return { customer: null, lines: [] };
+    return { customer: order.customer, lines: order.lines.map((line) => ({ id: line.id, name: line.product.name, sku: line.product.sku, quantity: line.quantity, unitPrice: line.unitPrice, total: line.quantity * line.unitPrice })) };
+  }),
+};

@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "baseline": "59e6202",
+  "filesBefore": 220,
+  "filesAfter": 220,
+  "differentPaths": [],
+  "scope": "Current-main public default init including generated agent bundle; identical destination; no normalization/exclusions; --ci --yes --no-git only"
+}
