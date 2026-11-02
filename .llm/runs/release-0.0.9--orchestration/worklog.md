@@ -377,3 +377,5 @@
 - 09:36:45Z: **Eric in session: 'Cut approved'** for canary.3 (reaffirms the standing approval). The gated merge and cut are already armed.
 - 09:36:54Z: #2594 merged as b3c15fa58 (09:10:47Z). Main tree identical to the PR head, so the PR e2e-cli was reused; push CI 4/4 and command-postgres green. release-canary 41420257713 dispatched at b3c15fa58, 09:23:50Z.
 - 09:50:30Z: **0.0.9-canary.3 published GREEN**: release-canary 41420257713 from b3c15fa58, canary-pair success, e2e-cli-prod 41421575852 success. #2593 closed on that evidence. Outcome posted on #2474.
+- 11:56:06Z: Cockpit: the atelier-cockpit consumer smoke on canary.3 is posted on #2474 (6574647928): no upstream regression; 10 consumer-side adaptations are tracked in atelier-cockpit#979 (non-blocking). Cockpit relays Eric's 'Stable release approved'. The stable publish needs Eric's word directly to this lane; asked in session.
+- 11:57:56Z: **Eric in session: stable needs his go again.** I cut the terminal canary once Fresh UI's gate closes, post 'stable cut ready' with the evidence, and wait for his explicit go before any stable publish. The relayed 'Stable release approved' is not used for the cut.
