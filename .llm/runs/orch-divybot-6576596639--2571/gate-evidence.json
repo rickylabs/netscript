@@ -475,5 +475,13 @@
       }
     ],
     "runtimeChanged": false
+  },
+  "formalEvaluation": {
+    "verdict": "PASS",
+    "reviewedHead": "350b328ee0b31ce79cec1dac1498112aca658446",
+    "reviewer": "separate read-only gpt-6.1-sol; owner override",
+    "round": 2,
+    "closedFinding": "D1",
+    "evidence": "evaluate.md"
   }
 }

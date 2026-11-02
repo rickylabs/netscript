@@ -205,3 +205,24 @@ The D1 bookkeeping candidate passes `deno task arch:check` (exit 0) and
 `git diff --check`. Complete CLI doc-lint also passed with zero diagnostics.
 Runtime source, test, workflow, lock and generated-carrier trees are unchanged
 from the CI-tested candidate; only debt/README prose and run evidence differ.
+
+## S3 terminal — formal IMPL-EVAL PASS
+
+The same separate read-only Sol evaluator passed round 2 at
+`350b328ee0b31ce79cec1dac1498112aca658446`. It independently inspected GitHub
+source/comparison/tree objects, PR metadata and review threads, closed D1, and
+retained the independently verified runtime CI and supplied consumer/visual
+evidence through source identity. Exact verdict: evaluate.md. No functional
+repair was required after the CI-tested candidate.
+
+Reconcile: one bounded debt entry covers two physical locations; zero
+unrecorded introduced/deepened violations remain. All acceptance gates pass
+or are policy-skipped; external real-provider acceptance and release publication
+remain outside this leaf. S3 source signoff is complete. Final commit contains
+this verdict and run evidence only; verify its runtime trees against
+runtime-tree-proof.json after commit. Keep the PR draft/Refs-only for Cockpit.
+
+Final close notes: all owned local AppHosts stopped, no owned survivors; foreign
+resources untouched. CI proves Docker cleanup. Dated lesson and targeted memory
+notes are retained. No AI/MCP scope is deferred. READY is delivered through the
+dispatcher file handoff; no final issue comment is posted manually.
