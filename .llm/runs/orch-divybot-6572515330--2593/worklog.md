@@ -29,3 +29,11 @@ Added `check:scaffold-provider-boundary` to the required CI quality lane via the
 Local gates: structured check/lint/fmt cover all three owned TS files (0 findings); structured generated-app check covers both rendered capability files (0 findings); focused structured tests 21/21; provider gate PASS, standalone negative control exits 1 with the original npm specifier; quality:gate exits 0 (existing warnings only). Published canary build with the two template changes exits 0, SSR module count 1076→776 and no AI runtime/model chunks. Earlier warmed baseline also exits 0: original cold CI failure remains canonical before evidence, and controlled old-glob reproduction is cache-independent. Asset freshness checks compare to committed HEAD, so run again after committing canonical output. Cockpit IMPL-EVAL and e2e-cli CI remain required; this is not self-certification.
 
 Reconcile: all source changes are within the declared surface, plus the tooling-only gate catalog entry required by durable CI receipts. Baseline remains main's canary2 source; no unrelated work integrated.
+
+## S2 handoff and reconciliation
+
+Source S1 committed/pushed as c9e5e759ea0b1d713ab91283cd1e4639cc5ad6a5. Its per-slice PR comment links the evidence. Committed asset freshness now passes (exit 0), the durable provider-boundary gate passes at this source head, and review-thread gate passes (0 threads, 0 unanswered). A public receipt projection omits runtime identity and private cwd. The final-head receipt will be run after this evidence-only commit and summarized on the PR, avoiding an endless commit/receipt cycle.
+
+Self-review is in self-review.md; no local blockers, no accepted architecture debt. It is not independent certification. Dated lessons and focused memory notes are retained. No source moved since S1. No local resources were started, and there are no ownership-uncertainty symptoms requiring cleanup. Temporary dependencies and caches were retained; only run-created lightweight probe fixtures were removed.
+
+Next action: mark the finished implementation ready for review so CI can run, and hand the immutable final head to the owner-assigned Cockpit lane. The e2e-cli verdict is required; the coordinator controls its label. Stop at READY without merging, tagging or publishing. CI/evaluator results will be reported as observed, never predicted.

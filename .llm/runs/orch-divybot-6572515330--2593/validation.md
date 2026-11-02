@@ -29,6 +29,6 @@ Plain no-AI build: exit 0. AI warm baseline: exit 0, 1076 SSR modules and an 844
 - Structured check runner with `--cwd` set to the published app: both rendered capability modules, 0 diagnostics.
 - Structured test runner: workspace-capabilities_test.ts, workspace-pages_test.ts, run-gate_test.ts, generate-cli-assets-barrel_test.ts; 21 passed, 0 failed/ignored.
 - `deno task quality:gate`: exit 0, existing warnings only.
-- `deno task check:assets-barrel`: pending committed-output freshness check; pre-commit diff is expected.
+- `deno task check:assets-barrel`: exit 0 at committed source head `c9e5e759ea0b1d713ab91283cd1e4639cc5ad6a5`; canonical carriers are fresh.
 
 All TS gates use repository wrappers. The full local scaffold.runtime E2E was not run, per owner instruction.
