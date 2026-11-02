@@ -52,19 +52,48 @@ async function runMcp(
   const [action, id] = args.values ?? [];
   if (action === 'list') return ok(await listAiResources(context, 'mcp'));
   if (action !== 'add' || !id) {
-    return fail('Usage: mcp add <serverId> --url=<url>|--stdio=<command> [--auth=<ENV>] | list');
+    return fail(
+      'Usage: mcp add <serverId> --url=<url>|--stdio=<command>|--service=<name> ' +
+        '[--path=/mcp] [--protocol=http|https] [--auth=<ENV>] | list',
+    );
   }
-  const url = stringFlag(args, 'url');
-  const stdio = stringFlag(args, 'stdio');
-  if ((url ? 1 : 0) + (stdio ? 1 : 0) !== 1) {
-    return fail('Exactly one of --url or --stdio is required.');
+  const flags = args.flags ?? {};
+  const selectors = ['url', 'stdio', 'service'].filter((name) => Object.hasOwn(flags, name));
+  if (selectors.length !== 1) {
+    return fail('Exactly one of --url, --stdio or --service is required.');
+  }
+  const mode = selectors[0];
+  for (const name of [mode, 'path', 'protocol', 'auth']) {
+    if (Object.hasOwn(flags, name) && !stringFlag(args, name)?.trim()) {
+      return fail(`--${name} requires a nonempty string value.`);
+    }
+  }
+  if (mode !== 'service' && ['path', 'protocol'].some((name) => Object.hasOwn(flags, name))) {
+    return fail('--path and --protocol require --service.');
+  }
+  const authEnv = stringFlag(args, 'auth');
+  if (mode === 'service') {
+    const protocol = stringFlag(args, 'protocol') ?? 'http';
+    if (protocol !== 'http' && protocol !== 'https') {
+      return fail('--protocol must be http or https.');
+    }
+    return ok(
+      await addMcpServer(context, {
+        id,
+        transport: 'service',
+        service: stringFlag(args, 'service')!,
+        path: stringFlag(args, 'path') ?? '/mcp',
+        protocol,
+        authEnv,
+      }),
+    );
   }
   return ok(
     await addMcpServer(context, {
       id,
-      transport: url ? 'streamable-http' : 'stdio',
-      target: url ?? stdio!,
-      authEnv: stringFlag(args, 'auth'),
+      transport: mode === 'url' ? 'streamable-http' : 'stdio',
+      target: stringFlag(args, mode)!,
+      authEnv,
     }),
   );
 }
