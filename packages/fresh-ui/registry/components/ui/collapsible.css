@@ -1,0 +1,7 @@
+.ns-collapsible { color: var(--ns-fg); }
+.ns-collapsible > [data-part='trigger'] { display: flex; align-items: center; justify-content: space-between; gap: var(--ns-control-gap); width: fit-content; padding: var(--ns-space-1) var(--ns-space-2); border-radius: var(--ns-radius-control); list-style: none; cursor: pointer; font-size: var(--ns-text-small); font-weight: var(--ns-weight-strong); }
+.ns-collapsible > [data-part='trigger']::-webkit-details-marker { display: none; }
+.ns-collapsible > [data-part='trigger']:hover { background: var(--ns-muted); }
+.ns-collapsible > [data-part='trigger']:focus-visible { outline: 2px solid var(--ns-ring); outline-offset: 2px; }
+.ns-collapsible[data-state='disabled'] > [data-part='trigger'] { opacity: .38; cursor: not-allowed; }
+.ns-collapsible > [data-part='content'] { padding-block-start: var(--ns-stack-gap); }

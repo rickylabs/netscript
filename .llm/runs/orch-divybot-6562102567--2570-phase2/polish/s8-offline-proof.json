@@ -1,0 +1,25 @@
+[
+  {
+    "route": "/sign-in",
+    "status": 200,
+    "elapsedMs": 11.8,
+    "configurationVisible": true
+  },
+  {
+    "route": "/settings",
+    "status": 200,
+    "elapsedMs": 12.0,
+    "configurationVisible": true
+  },
+  {
+    "request": "JSON status",
+    "orders": "unavailable",
+    "status": "degraded"
+  },
+  {
+    "request": "no-Accept liveness",
+    "status": 200,
+    "ssr": true,
+    "fullStatusRow": false
+  }
+]

@@ -1,0 +1,5 @@
+# Research
+
+Baseline includes #2582 and #2583. Existing `scaffold-projections.ts` provides complete-read period metrics, sixty UTC daily buckets, currency-separated amounts and latest/status projections. Storage adapters already accept status/sort/page; search exists in service contracts but is not forwarded by page queries. Current dashboard still displays Pages/Workspace/Theme; record list uses ResponsiveTable and text-only pagination; health exposes JSON in HTML. Registry has ChartBlock, Donut, DataTable, FilterForm, Pagination, DetailLayout, Progress and avatar primitives; compose those instead of forking them.
+
+Utility references inspected: dashboard, orders/detail, settings, sign-in and command light. Preserve thin rules, restrained semantic badges, uppercase mono labels, dense owner rows and 46px heading; add real charts without invented amounts. Dark references are part of visual gate. No new public package exports or dependency versions needed. Prior worker-contract dependency debt already recorded; no new architecture debt expected.

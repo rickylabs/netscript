@@ -1,17 +1,41 @@
-/// <reference types="vite/client" />
 import { Partial } from 'fresh/runtime';
 import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';
-import { Badge, Button } from '@app/components/ui/mod.ts';
-import { appNavigation, isCurrentNavigation, rendersAppChrome } from '@app/navigation.ts';
+import SidebarToggle from '@app/islands/ui/SidebarToggle.tsx';
+import WorkspaceCommands from '@app/islands/WorkspaceCommands.tsx';
+import { Breadcrumb, SidebarShell } from '@app/components/ui/mod.ts';
+import { isCurrentNavigation, rendersAppChrome, visibleNavigation } from '@app/navigation.ts';
 import { appRoutes } from '@app/router.ts';
+import { appTheme } from '@app/lib/theme.ts';
 import { define } from '@app/utils.ts';
 
-/**
- * App chrome for every page: the top bar with the `appNavigation` links from `navigation.ts`.
- * Pages under `chromelessRoutePrefixes` (such as `/design`, which has its own sidebar shell)
- * render without it. Both branches keep the `page` partial so client navigation swaps the whole
- * frame.
- */
+const navIcons: Readonly<Record<string, string>> = {
+  Overview: 'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',
+  Records: 'M6 3h9l3 3v15H6z M9 10h6 M9 14h6 M9 18h4',
+  Settings: 'M4 6h16 M4 12h16 M4 18h16 M8 3v6 M16 9v6 M10 15v6',
+  'Sign in': 'M14 4h6v16h-6 M3 12h12 M10 7l5 5-5 5',
+  Examples: 'M8 6l-6 6 6 6 M16 6l6 6-6 6 M14 3l-4 18',
+  Health: 'M2 12h5l3-8 4 16 3-8h5',
+  Design: 'M3 3h18v18H3z M3 9h18 M9 9v12',
+};
+function navIcon(label: string) {
+  return (
+    <svg
+      width='16'
+      height='16'
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      stroke-width='1.5'
+      stroke-linecap='round'
+      stroke-linejoin='round'
+      aria-hidden='true'
+    >
+      <path d={navIcons[label] ?? navIcons.Records} />
+    </svg>
+  );
+}
+
+/** One shared shell for every workspace page; full-screen references and sign-in opt out. */
 export default define.layout(function RootLayout({ Component, url }) {
   if (!rendersAppChrome(url.pathname)) {
     return (
@@ -20,41 +44,62 @@ export default define.layout(function RootLayout({ Component, url }) {
       </Partial>
     );
   }
-
+  const navigation = visibleNavigation();
+  const current = navigation.find((item) => isCurrentNavigation(item, url.pathname))?.label ??
+    'Overview';
   return (
     <Partial name='page'>
-      <header class='ns-topbar' data-part='root' data-scope='top-bar'>
-        <div class='ns-cluster ns-cluster--sm'>
-          <a
-            href={appRoutes.home.href()}
-            f-client-nav
-            class='ns-topbar__brand'
-            data-part='brand'
-            data-scope='top-bar'
-          >
-            {{name}}
+      <SidebarShell
+        pathname={url.pathname}
+        contentId='workspace-content'
+        navigation={[
+          {
+            label: 'Workspace',
+            items: navigation.slice(0, 4).map((item) => ({
+              ...item,
+              icon: navIcon(item.label),
+              matchPrefix: item.match === 'prefix',
+              isActive: (pathname: string) =>
+                isCurrentNavigation(item, pathname) ||
+                (item.label === 'Overview' && pathname === '/'),
+            })),
+          },
+          {
+            label: 'Resources',
+            items: navigation.slice(4).map((item) => ({
+              ...item,
+              icon: navIcon(item.label),
+              matchPrefix: item.match === 'prefix',
+            })),
+          },
+        ]}
+        brand={
+          <a class='workspace-brand' href={appRoutes.home.href()}>
+            <span class='workspace-mark' aria-hidden='true'>N</span>{{name}}
           </a>
-          <Badge variant='muted'>{{appName}}</Badge>
-        </div>
-        <nav class='ns-cluster ns-cluster--sm' aria-label='Primary'>
-          {appNavigation.filter((item) =>
-            !item.developmentOnly || import.meta.env.MODE === 'development'
-          ).map((item) => (
-            <Button
-              key={item.href}
-              type='link'
-              href={item.href}
-              variant='ghost'
-              size='sm'
-              aria-current={isCurrentNavigation(item, url.pathname) ? 'page' : undefined}
-            >
-              {item.label}
-            </Button>
-          ))}
-          <ThemeToggle />
-        </nav>
-      </header>
-      <Component />
+        }
+        topbarStart={
+          <>
+            <SidebarToggle />
+            <Breadcrumb
+              items={[{ label: '{{name}}', href: appRoutes.home.href() }, { label: current }]}
+            />
+          </>
+        }
+        topbarEnd={
+          <>
+            <WorkspaceCommands navigation={navigation} />
+            <ThemeToggle />
+          </>
+        }
+        footer={
+          <div class='ns-dashboard__sidebar-env'>
+            <span>{appTheme().label}</span>
+          </div>
+        }
+      >
+        <Component />
+      </SidebarShell>
     </Partial>
   );
 });

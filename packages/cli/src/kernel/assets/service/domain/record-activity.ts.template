@@ -1,0 +1,17 @@
+/** Actor identity comes from the request, never from a record's owner field. */
+export interface RecordActor {
+  readonly name: string;
+  readonly kind: 'authenticated' | 'anonymous';
+}
+
+/** Committed record fields needed by the optional activity publisher. */
+export interface ActivityRecord {
+  readonly id: string | number;
+  readonly reference: string;
+  readonly updatedAt: string | Date;
+}
+
+/** The example feed is best effort; publisher failures must not undo committed writes. */
+export interface RecordActivityPublisher {
+  record(verb: 'created' | 'updated', record: ActivityRecord, actor?: RecordActor): Promise<void>;
+}

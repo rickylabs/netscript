@@ -1,0 +1,3 @@
+# #2593 root-cause correction
+
+The failing canary log is SSR, not the browser phase: client build completes. New scaffold-plugin-capabilities.ts.template in the canary1→canary2 delta adds import.meta.glob of ../../../ai/ai.ts. That reaches the app-owned composition root's @netscript/ai/anthropic side-effect registration and provider SDK. Fresh UI render-ui imports AI types only and is not the owner. A no-AI scaffold is a passing control; AI must be installed for the regression. A warmed local published build can pass after npm dependency initialization, so require a provider-traversal negative control independent of cache state. Native request-time Deno loading must derive file URLs from the discovered workspace root, never bundled import.meta.url.

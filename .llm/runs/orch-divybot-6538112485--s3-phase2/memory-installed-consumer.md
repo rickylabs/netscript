@@ -1,0 +1,5 @@
+# Installed consumer rendering
+
+The phase-two installer gate compiles all new gaps plus explicit audited baseline components. It asserts the real installer’s Fresh UI root mapping before adding aliases for unreleased local runtime subpaths. Source bytes remain exact after canonical cn import relocation. Baseline Label/Card permit scope overrides, so their default scope must be checked by rendering installed modules against shared contracts rather than searching for a literal source attribute. The rendered component-key set must equal AUDITED_BASELINE_COMPONENTS so later audits cannot silently skip SSR.
+
+Use native --node-modules-dir=auto for the temporary consumer render stage. In this worker Deno’s global cache selected a missing peer-copy entry for the fresh consumer graph even though check/lint passed; auto mode materialized its own temporary node_modules and actual installed tabbed CodeBlock/Label/Card/Pagination rendered successfully. Keep the fresh dependency graph; do not pin older versions, delete locks/caches or reload. Outer repository checks remain frozen and unchanged.

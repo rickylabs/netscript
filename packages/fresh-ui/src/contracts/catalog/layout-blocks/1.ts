@@ -145,29 +145,62 @@ export const layout_blocks_1: readonly ComponentContract[] = [
           'with-tabs',
           'with-status',
         ],
+        'default': 'default',
       },
-      'breakpoint': {
-        'kind': 'enum',
-        'values': [
-          'desktop',
-          'mobile',
-        ],
+      'title': {
+        'kind': 'slot',
+      },
+      'eyebrow': {
+        'kind': 'slot',
+      },
+      'description': {
+        'kind': 'slot',
+      },
+      'breadcrumb': {
+        'kind': 'slot',
+      },
+      'actions': {
+        'kind': 'slot',
+      },
+      'tabs': {
+        'kind': 'slot',
+      },
+      'status': {
+        'kind': 'slot',
       },
       'children': {
         'kind': 'slot',
-        'description': 'Supported Utility public prop; native attributes pass through separately.',
       },
-      'eyebrow': {
-        'kind': 'boolean',
+      'class': {
+        'kind': 'text',
       },
-      'description': {
-        'kind': 'boolean',
+      'Layout.children': {
+        'kind': 'slot',
+        'required': true,
       },
-      'actions': {
-        'kind': 'boolean',
+      'Main.children': {
+        'kind': 'slot',
+        'required': true,
       },
-      'breadcrumb': {
-        'kind': 'boolean',
+      'Aside.children': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'Badges.children': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'Intro.children': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'Actions.children': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'Status.children': {
+        'kind': 'slot',
+        'required': true,
       },
     },
     'parts': [
@@ -176,55 +209,51 @@ export const layout_blocks_1: readonly ComponentContract[] = [
       },
       {
         'name': 'layout',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'Corresponding declarative content or composed section is supplied.',
       },
       {
         'name': 'main',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'Corresponding declarative content or composed section is supplied.',
       },
       {
         'name': 'intro',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'Corresponding declarative content or composed section is supplied.',
       },
       {
         'name': 'eyebrow',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'Corresponding declarative content or composed section is supplied.',
       },
       {
         'name': 'title',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'Corresponding declarative content or composed section is supplied.',
       },
       {
         'name': 'description',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'Corresponding declarative content or composed section is supplied.',
+      },
+      {
+        'name': 'breadcrumb',
+        'when': 'Corresponding declarative content or composed section is supplied.',
       },
       {
         'name': 'actions',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'Corresponding declarative content or composed section is supplied.',
       },
       {
         'name': 'status-bar',
-        'when': 'when the corresponding content or subcomponent is supplied',
-      },
-      {
-        'name': 'status-indicator',
-        'when': 'when the corresponding content or subcomponent is supplied',
-      },
-      {
-        'name': 'status-sep',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'Corresponding declarative content or composed section is supplied.',
       },
       {
         'name': 'tabs',
-        'when': 'when the corresponding content or subcomponent is supplied',
+        'when': 'Corresponding declarative content or composed section is supplied.',
       },
       {
         'name': 'aside',
-        'when': 'corresponding shipped Utility section is supplied',
+        'when': 'Corresponding declarative content or composed section is supplied.',
       },
       {
         'name': 'badges',
-        'when': 'corresponding shipped Utility section is supplied',
+        'when': 'Corresponding declarative content or composed section is supplied.',
       },
     ],
     'attributes': {
@@ -234,32 +263,93 @@ export const layout_blocks_1: readonly ComponentContract[] = [
           'with-tabs',
           'with-status',
         ],
-      },
-      'data-breakpoint': {
-        'values': [
-          'desktop',
-          'mobile',
-        ],
+        'default': 'default',
       },
     },
-    'booleans': [
-      'eyebrow',
-      'description',
-      'actions',
-      'breadcrumb',
+    'booleans': [],
+    'slots': [
+      {
+        'name': 'title',
+        'part': 'title',
+      },
+      {
+        'name': 'eyebrow',
+        'part': 'eyebrow',
+      },
+      {
+        'name': 'description',
+        'part': 'description',
+      },
+      {
+        'name': 'breadcrumb',
+        'part': 'breadcrumb',
+      },
+      {
+        'name': 'actions',
+        'part': 'actions',
+      },
+      {
+        'name': 'tabs',
+        'part': 'tabs',
+      },
+      {
+        'name': 'status',
+        'part': 'status-bar',
+      },
+      {
+        'name': 'children',
+        'part': 'root',
+      },
+      {
+        'name': 'Layout.children',
+        'part': 'layout',
+      },
+      {
+        'name': 'Main.children',
+        'part': 'main',
+      },
+      {
+        'name': 'Aside.children',
+        'part': 'aside',
+      },
+      {
+        'name': 'Badges.children',
+        'part': 'badges',
+      },
+      {
+        'name': 'Intro.children',
+        'part': 'intro',
+      },
+      {
+        'name': 'Actions.children',
+        'part': 'actions',
+      },
+      {
+        'name': 'Status.children',
+        'part': 'status-bar',
+      },
     ],
-    'slots': [],
-    'apg': 'noninteractive presentation',
-    'keyboard': [],
+    'apg': 'noninteractive presentation; native heading and child-owned controls',
+    'keyboard': [
+      {
+        'key': 'Tab/Shift+Tab',
+        'action': 'Only native child controls receive focus in source order.',
+      },
+    ],
     'tokenRoles': [
       'space/section/gap',
       'space/stack/gap',
       'text/fg',
       'text/muted',
+      'type/title',
+      'type/eyebrow',
+      'type/body',
     ],
     'notes': [
-      'Native DOM attributes pass through where the implementation accepts them.',
-      'Utility structural helper parts remain distinct from the single component root.',
+      'Native DOM attributes pass through; title is the native h1 content rather than a root tooltip attribute.',
+      'Phase-one metadata correction: Figma boolean content switches are optional Renderable slots; breakpoint is responsive CSS, not an accepted prop or emitted attribute.',
+      'The old namespace and children composition remain supported. Variants never synthesize tabs or status content; supplied slots render in any variant.',
+      'Status indicators and separators are child-owned content, not fabricated PageHeader parts.',
     ],
   },
   {

@@ -1,0 +1,50 @@
+{
+  "base": "d54879b8d645554155c54af2f26c86d2232afda5",
+  "reviewedHead": "640fd2fdf58ef5852c28892f1af08505795bd4b2",
+  "sourceComparison": {
+    "files": 612,
+    "changed": 0
+  },
+  "packageTests": {
+    "exitCode": 0,
+    "passed": 608,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 608,
+    "uniqueFailures": 0
+  },
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "qualityArchitecture": {
+    "verdict": "PASS",
+    "exitCode": 0
+  },
+  "independentIntegrationReview": "PASS",
+  "browser": "UNCHANGED_SOURCE_PREDECESSOR_302_PASS",
+  "runtime": "NEW_HEAD_UNPROVEN",
+  "requiredRemoteCI": "PENDING"
+}

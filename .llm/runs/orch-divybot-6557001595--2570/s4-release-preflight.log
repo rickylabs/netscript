@@ -1,0 +1,5 @@
+Task release:preflight deno run --allow-read .llm/tools/release/preflight-text-imports.ts
+release:preflight text-imports — PASS
+release:preflight import-attributes — PASS (0 findings)
+release:preflight file-url-import-meta — PASS (0 findings)
+release:preflight self-imports — PASS (0 findings)

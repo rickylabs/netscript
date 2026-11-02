@@ -18,8 +18,8 @@ export function {{resourcePascalCase}}Form(
     <section id='{{resource}}-form'>
       <Card>
         <Card.Header>
-          <Card.Title>Update {{resource}}</Card.Title>
-          <Card.Description>Server-validated input with app-owned controls.</Card.Description>
+          <Card.Title>Validate a note</Card.Title>
+          <Card.Description>Validate a note and receive confirmation. This example does not change a record.</Card.Description>
         </Card.Header>
         <Card.Body>
           <form {...state.formProps} f-client-nav>
@@ -36,6 +36,7 @@ export function {{resourcePascalCase}}Form(
                   error={Boolean(noteError)}
                 />
               </FormField>
+              {state.submitted && !state.hasErrors && <InlineNotice variant='success' title='Note validated' role='status'>Your note passed validation. No record was changed.</InlineNotice>}
               {state.hasErrors
                 ? (
                   <InlineNotice variant='destructive' title='Check the form' role='alert'>
@@ -43,7 +44,7 @@ export function {{resourcePascalCase}}Form(
                   </InlineNotice>
                 )
                 : null}
-              <Button type='submit'>Save note</Button>
+              <Button type='submit'>Validate note</Button>
             </div>
           </form>
         </Card.Body>

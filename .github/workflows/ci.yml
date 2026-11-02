@@ -409,6 +409,13 @@ jobs:
           .llm/tools/gates/run-gate.ts --gate figma-ci --id quality-figma
           --output .llm/tmp/gate-receipts/quality/figma.json
 
+      - name: CLI lint and format ratchet
+        # CLI is excluded by root lint/fmt; check it even for quality-tool-only diffs.
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate cli-quality --id quality-cli
+          --output .llm/tmp/gate-receipts/quality/cli-quality.json
+
       - name: Record skipped quality receipt
         if: env.RUN != 'true'
         run: >-
@@ -536,6 +543,14 @@ jobs:
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate netscript-jsr-specifiers --id quality-jsr-specifiers
           --output .llm/tmp/gate-receipts/quality/jsr-specifiers.json
+
+      - name: Scaffold provider bundle boundary and negative control
+        if: env.RUN_DENO == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate scaffold-provider-boundary
+          --id quality-scaffold-provider-boundary
+          --output .llm/tmp/gate-receipts/quality/scaffold-provider-boundary.json
 
       - name: Scaffold version guard (no preview pins)
         if: env.RUN_DENO == 'true'

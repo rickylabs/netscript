@@ -7,6 +7,10 @@ export function getNextTabsIndex(
   count: number,
   orientation: TabsOrientation,
   loop = true,
+  direction: 'ltr' | 'rtl' = 'ltr',
 ): number {
-  return getNextCollectionIndex(key, currentIndex, count, orientation, loop);
+  const mapped = orientation === 'horizontal' && direction === 'rtl'
+    ? key === 'ArrowLeft' ? 'ArrowRight' : key === 'ArrowRight' ? 'ArrowLeft' : key
+    : key;
+  return getNextCollectionIndex(mapped, currentIndex, count, orientation, loop);
 }

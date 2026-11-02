@@ -470,11 +470,18 @@ async function assertAppConventionsResolve(
   const routeFiles: Readonly<Record<string, string>> = {
     '/design/composition': 'routes/(design)/design/composition.tsx',
   };
+  // Quoted get_doc slugs resolve in the shipped docs, not in the generated app filesystem.
+  const docSlugs = new Set([...agents.matchAll(/\bslug\s+`([^`\n]+)`/g)].map((match) => match[1]));
+  for (const slug of docSlugs) {
+    const source = new URL(`../../../../../../docs/site/${slug}.md`, import.meta.url);
+    assert((await Deno.stat(source)).isFile, `Expected guide slug to resolve: ${slug}`);
+  }
   const references = [...`${agents}\n${webLayer}`.matchAll(/`([^`\n]+)`/g)]
     .map((match) => match[1])
     .filter((token) =>
-      token.startsWith('/') ||
-      (!token.includes(' ') && (token.includes('/') || token.includes('.')))
+      !docSlugs.has(token) &&
+      (token.startsWith('/') ||
+        (!token.includes(' ') && (token.includes('/') || token.includes('.'))))
     );
   const parsedPaths = [...new Set(references)].sort();
   const declaredPaths = [...new Set(appConventionsReferencedPaths(input))]

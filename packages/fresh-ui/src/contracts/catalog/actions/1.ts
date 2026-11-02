@@ -379,7 +379,7 @@ export const actions_1: readonly ComponentContract[] = [
     'specId': 'A3',
     'category': 'Actions',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'orientation': {
         'kind': 'enum',
@@ -402,21 +402,25 @@ export const actions_1: readonly ComponentContract[] = [
       'text': {
         'kind': 'boolean',
       },
+      'children': {
+        'kind': 'slot',
+        'required': true,
+      },
+      'textContent': {
+        'kind': 'slot',
+      },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'separator',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'text',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
     ],
     'attributes': {
@@ -438,7 +442,16 @@ export const actions_1: readonly ComponentContract[] = [
       'separator',
       'text',
     ],
-    'slots': [],
+    'slots': [
+      {
+        'name': 'children',
+        'part': 'root',
+      },
+      {
+        'name': 'textContent',
+        'part': 'text',
+      },
+    ],
     'apg': 'native buttons and links',
     'keyboard': [
       {
@@ -456,7 +469,7 @@ export const actions_1: readonly ComponentContract[] = [
       'text/muted',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Native CSS pseudo-classes carry transient focus/hover; data-state also supports deliberate preview renders. Native button semantics preserve form behavior.',
     ],
   },
 ];

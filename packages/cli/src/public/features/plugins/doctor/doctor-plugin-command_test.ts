@@ -1,7 +1,7 @@
-import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
-import { fromFileUrl } from "@std/path/from-file-url";
-import { join } from "@std/path";
-import { LocalProjectFiles } from "@netscript/plugin/cli";
+import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { fromFileUrl } from '@std/path/from-file-url';
+import { join } from '@std/path';
+import { LocalProjectFiles } from '@netscript/plugin/cli';
 import { defineConfig } from '@netscript/config';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
@@ -43,7 +43,7 @@ const HEALTHY_MODULE_PROCESS: ProcessPort = {
     }),
 };
 
-Deno.test("plugin doctor writes a successful evidence receipt after an actual run", async () => {
+Deno.test('plugin doctor writes a successful evidence receipt after an actual run', async () => {
   const root = await Deno.makeTempDir();
   try {
     const command = createDoctorPluginCommand({
@@ -51,9 +51,9 @@ Deno.test("plugin doctor writes a successful evidence receipt after an actual ru
       doctor: () => Promise.resolve([]),
       print: () => {},
     });
-    await command.parse(["--resource", "api"]);
-    const receipt = await new FilesystemDiagnosticEvidence(root).read("api");
-    assertEquals(receipt?.command, "netscript plugin doctor");
+    await command.parse(['--resource', 'api']);
+    const receipt = await new FilesystemDiagnosticEvidence(root).read('api');
+    assertEquals(receipt?.command, 'netscript plugin doctor');
     assertEquals(receipt?.exitStatus, 0);
   } finally {
     await Deno.remove(root, { recursive: true });
@@ -70,7 +70,10 @@ Deno.test('plugin doctor reports configured-module workdirs across first-party t
       await Deno.writeTextFile(join(pluginRoot, 'mod.ts'), 'export {};\n');
       await Deno.copyFile(
         fromFileUrl(
-          new URL(`../../../../../../../plugins/${pluginName}/scaffold.plugin.json`, import.meta.url),
+          new URL(
+            `../../../../../../../plugins/${pluginName}/scaffold.plugin.json`,
+            import.meta.url,
+          ),
         ),
         join(pluginRoot, 'scaffold.plugin.json'),
       );
@@ -108,13 +111,13 @@ Deno.test('plugin doctor reports configured-module workdirs across first-party t
   }
 });
 
-Deno.test("plugin doctor exits non-zero when generated registries are absent", async () => {
-  const projectRoot = "/workspace";
+Deno.test('plugin doctor exits non-zero when generated registries are absent', async () => {
+  const projectRoot = '/workspace';
   const fs = new MemoryFileSystemAdapter();
   await fs.createDir(`${projectRoot}/plugins/workers`);
   await fs.writeFile(`${projectRoot}/plugins/workers/mod.ts`, 'export {};\n');
   const workersRoot = fromFileUrl(
-    new URL("../../../../../../../plugins/workers/", import.meta.url),
+    new URL('../../../../../../../plugins/workers/', import.meta.url),
   );
   const output: string[] = [];
   const command = createDoctorPluginCommand({
@@ -125,53 +128,52 @@ Deno.test("plugin doctor exits non-zero when generated registries are absent", a
       doctorPlugin(input, {
         fs,
         process: HEALTHY_MODULE_PROCESS,
-        loadConfig: () =>
-          Promise.resolve({ plugins: ["./plugins/workers/mod.ts"] } as never),
+        loadConfig: () => Promise.resolve({ plugins: ['./plugins/workers/mod.ts'] } as never),
         loadRegisteredPlugins: () =>
           Promise.resolve({
             workers: {
-              name: "@netscript/plugin-workers",
+              name: '@netscript/plugin-workers',
               source: localPluginSource(
-                "./plugins/workers/mod.ts",
-                "plugins/workers",
+                './plugins/workers/mod.ts',
+                'plugins/workers',
                 workersRoot,
               ),
-              doctor: "./src/adapter/plugin.ts",
+              doctor: './src/adapter/plugin.ts',
             },
           }),
       }),
   });
 
   const error = await assertRejects(
-    () => command.parse(["--project-root", projectRoot]),
+    () => command.parse(['--project-root', projectRoot]),
     RemoteError,
   );
   assertEquals(error.exitCode, 1);
-  assertStringIncludes(output.join("\n"), "generated job registry exists");
+  assertStringIncludes(output.join('\n'), 'generated job registry exists');
   assertStringIncludes(
-    output.join("\n"),
+    output.join('\n'),
     `deno run -A jsr:@netscript/plugin-workers@${WORKERS_PACKAGE_VERSION}/cli compile-registry`,
   );
   assertStringIncludes(
-    output.at(-1) ?? "",
-    "Plugin doctor failed: @netscript/plugin-workers",
+    output.at(-1) ?? '',
+    'Plugin doctor failed: @netscript/plugin-workers',
   );
 });
 
-Deno.test("plugin doctor accepts real compile-registry workers output and exits zero", async () => {
+Deno.test('plugin doctor accepts real compile-registry workers output and exits zero', async () => {
   const generatedRoot = await Deno.makeTempDir();
   try {
-    await Deno.mkdir(join(generatedRoot, "workers/jobs"), { recursive: true });
+    await Deno.mkdir(join(generatedRoot, 'workers/jobs'), { recursive: true });
     await Deno.writeTextFile(
-      join(generatedRoot, "workers/jobs/welcome.ts"),
-      "export default () => {};\n",
+      join(generatedRoot, 'workers/jobs/welcome.ts'),
+      'export default () => {};\n',
     );
     await compileWorkersRegistry(new LocalProjectFiles(generatedRoot));
     await assertWorkersCommandPasses(
       await Deno.readTextFile(
         join(
           generatedRoot,
-          ".netscript/generated/plugin-workers/job-registry.ts",
+          '.netscript/generated/plugin-workers/job-registry.ts',
         ),
       ),
     );
@@ -180,19 +182,19 @@ Deno.test("plugin doctor accepts real compile-registry workers output and exits 
   }
 });
 
-Deno.test("plugin doctor accepts real generate plugins workers output and exits zero", async () => {
+Deno.test('plugin doctor accepts real generate plugins workers output and exits zero', async () => {
   const generatedRoot = await Deno.makeTempDir();
   try {
-    await Deno.mkdir(join(generatedRoot, "workers/jobs"), { recursive: true });
+    await Deno.mkdir(join(generatedRoot, 'workers/jobs'), { recursive: true });
     await Deno.writeTextFile(
-      join(generatedRoot, "workers/jobs/example-job.ts"),
+      join(generatedRoot, 'workers/jobs/example-job.ts'),
       'export default { id: "example-job" };\n',
     );
     await generateRuntimeRegistries({
       projectRoot: generatedRoot,
       manifestPath: fromFileUrl(
         new URL(
-          "../../../../../../../plugins/workers/scaffold.runtime.json",
+          '../../../../../../../plugins/workers/scaffold.runtime.json',
           import.meta.url,
         ),
       ),
@@ -201,7 +203,7 @@ Deno.test("plugin doctor accepts real generate plugins workers output and exits 
       await Deno.readTextFile(
         join(
           generatedRoot,
-          ".netscript/generated/plugin-workers/job-registry.ts",
+          '.netscript/generated/plugin-workers/job-registry.ts',
         ),
       ),
     );
@@ -210,12 +212,12 @@ Deno.test("plugin doctor accepts real generate plugins workers output and exits 
   }
 });
 
-Deno.test("plugin doctor accepts the real shared sagas generator output and exits zero", async () => {
+Deno.test('plugin doctor accepts the real shared sagas generator output and exits zero', async () => {
   const generatedRoot = await Deno.makeTempDir();
   try {
-    await Deno.mkdir(join(generatedRoot, "sagas"), { recursive: true });
+    await Deno.mkdir(join(generatedRoot, 'sagas'), { recursive: true });
     await Deno.writeTextFile(
-      join(generatedRoot, "sagas/checkout-saga.ts"),
+      join(generatedRoot, 'sagas/checkout-saga.ts'),
       "export default defineSaga('checkout');\n",
     );
     await generateSagaRegistry(new LocalProjectFiles(generatedRoot));
@@ -223,7 +225,7 @@ Deno.test("plugin doctor accepts the real shared sagas generator output and exit
       await Deno.readTextFile(
         join(
           generatedRoot,
-          ".netscript/generated/plugin-sagas/sagas.registry.ts",
+          '.netscript/generated/plugin-sagas/sagas.registry.ts',
         ),
       ),
     );
@@ -232,20 +234,20 @@ Deno.test("plugin doctor accepts the real shared sagas generator output and exit
   }
 });
 
-Deno.test("plugin doctor reports visible validation issues by field", async () => {
-  const reports = await doctorPlugin({ projectRoot: "/workspace" }, {
+Deno.test('plugin doctor reports visible validation issues by field', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),
     process: HEALTHY_MODULE_PROCESS,
     loadConfig: () =>
       Promise.reject({
         issues: [{
-          path: ["services", "api", "port"],
-          message: "Expected number",
+          path: ['services', 'api', 'port'],
+          message: 'Expected number',
         }],
       }),
   });
-  assertEquals(reports[0].checks[0].title, "Config field services.api.port");
-  assertStringIncludes(reports[0].checks[0].message ?? "", "Expected number");
+  assertEquals(reports[0].checks[0].title, 'Config field services.api.port');
+  assertStringIncludes(reports[0].checks[0].message ?? '', 'Expected number');
 });
 
 Deno.test('plugin doctor distinguishes an absent AppHost from unhealthy resources', async () => {
@@ -285,16 +287,17 @@ Deno.test('plugin doctor reports normally when diagnostic evidence cannot be wri
   const command = createDoctorPluginCommand({
     resolveProjectRoot: () => Promise.resolve('/read-only'),
     print: (line) => output.push(line),
-    doctor: () => Promise.resolve([{
-      pluginName: 'aspire',
-      status: 'warning',
-      checks: [{
-        id: 'apphost:inspection',
-        title: 'AppHost inspection',
+    doctor: () =>
+      Promise.resolve([{
+        pluginName: 'aspire',
         status: 'warning',
-        message: 'inspection unavailable',
-      }],
-    }]),
+        checks: [{
+          id: 'apphost:inspection',
+          title: 'AppHost inspection',
+          status: 'warning',
+          message: 'inspection unavailable',
+        }],
+      }]),
     diagnosticEvidence: () => ({
       read: () => Promise.resolve(undefined),
       write: () => Promise.reject(new Deno.errors.PermissionDenied('read-only checkout')),
@@ -315,10 +318,11 @@ Deno.test('plugin doctor reports configured resources missing from the running A
     process: HEALTHY_MODULE_PROCESS,
     loadConfig: () => Promise.resolve(configWithResources()),
     inspectAppHost: {
-      inspect: () => Promise.resolve({
-        status: 'running',
-        resources: [{ name: 'api', state: 'Running', healthStatus: 'Healthy' }],
-      }),
+      inspect: () =>
+        Promise.resolve({
+          status: 'running',
+          resources: [{ name: 'api', state: 'Running', healthStatus: 'Healthy' }],
+        }),
     },
   });
   const appHost = reports[0];
@@ -336,14 +340,15 @@ Deno.test('plugin doctor reports a running but unhealthy AppHost resource', asyn
     process: HEALTHY_MODULE_PROCESS,
     loadConfig: () => Promise.resolve(configWithResources()),
     inspectAppHost: {
-      inspect: () => Promise.resolve({
-        status: 'running',
-        resources: [
-          { name: 'api', state: 'Running', healthStatus: 'Unhealthy' },
-          { name: 'web', state: 'Running', healthStatus: 'Healthy' },
-          { name: 'main-db', state: 'Running', healthStatus: 'Healthy' },
-        ],
-      }),
+      inspect: () =>
+        Promise.resolve({
+          status: 'running',
+          resources: [
+            { name: 'api', state: 'Running', healthStatus: 'Unhealthy' },
+            { name: 'web', state: 'Running', healthStatus: 'Healthy' },
+            { name: 'main-db', state: 'Running', healthStatus: 'Healthy' },
+          ],
+        }),
     },
   });
   const check = reports[0].checks.find((candidate) => candidate.id === 'apphost:resource:api');
@@ -357,14 +362,15 @@ Deno.test('plugin doctor does not certify healthy without readiness evidence', a
     process: HEALTHY_MODULE_PROCESS,
     loadConfig: () => Promise.resolve(configWithResources()),
     inspectAppHost: {
-      inspect: () => Promise.resolve({
-        status: 'running',
-        resources: [
-          { name: 'api', state: 'Running', healthStatus: 'Healthy', healthReports: [] },
-          { name: 'web', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
-          { name: 'main-db', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
-        ],
-      }),
+      inspect: () =>
+        Promise.resolve({
+          status: 'running',
+          resources: [
+            { name: 'api', state: 'Running', healthStatus: 'Healthy', healthReports: [] },
+            { name: 'web', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
+            { name: 'main-db', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
+          ],
+        }),
     },
   });
   const check = reports[0].checks.find((candidate) => candidate.id === 'apphost:resource:api');
@@ -378,14 +384,15 @@ Deno.test('plugin doctor maps realistic database config names without inventing 
     process: HEALTHY_MODULE_PROCESS,
     loadConfig: () => Promise.resolve(configWithResources()),
     inspectAppHost: {
-      inspect: () => Promise.resolve({
-        status: 'running',
-        resources: [
-          { name: 'api', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
-          { name: 'web', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
-          { name: 'main-db', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
-        ],
-      }),
+      inspect: () =>
+        Promise.resolve({
+          status: 'running',
+          resources: [
+            { name: 'api', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
+            { name: 'web', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
+            { name: 'main-db', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
+          ],
+        }),
     },
   });
 
@@ -415,9 +422,13 @@ Deno.test("plugin doctor reports a remote daemon's loopback-published containers
       }),
   });
 
-  await command.parse(['--project-root', '/workspace']);
+  await assertRejects(
+    () => command.parse(['--project-root', '/workspace']),
+    Error,
+    'Plugin doctor failed: docker',
+  );
   const rendered = output.join('\n');
-  assertStringIncludes(rendered, 'docker\twarning\tDocker daemon endpoint\tDocker daemon is remote');
+  assertStringIncludes(rendered, 'docker\terror\tDocker daemon endpoint\tDocker daemon is remote');
   assertStringIncludes(
     rendered,
     "main-db-xkcdabcd 5432/tcp -> 127.0.0.1:55001 (daemon host's loopback)",
@@ -506,15 +517,19 @@ Deno.test('plugin doctor follows DOCKER_CONTEXT over a local DOCKER_HOST', async
     process: HEALTHY_MODULE_PROCESS,
     loadConfig: () => Promise.resolve(configWithResources()),
     inspectAppHost: runningAppHost(),
-    inspectDockerTopology: recordedDockerTopology(REMOTE_CONTEXT_JSON, ASPIRE_CONTAINERS_INSPECT_JSON, {
-      DOCKER_CONTEXT: 'remote-daemon',
-      DOCKER_HOST: 'unix:///var/run/docker.sock',
-    }),
+    inspectDockerTopology: recordedDockerTopology(
+      REMOTE_CONTEXT_JSON,
+      ASPIRE_CONTAINERS_INSPECT_JSON,
+      {
+        DOCKER_CONTEXT: 'remote-daemon',
+        DOCKER_HOST: 'unix:///var/run/docker.sock',
+      },
+    ),
   });
   const docker = reports.find((report) => report.pluginName === 'docker');
   assertEquals(docker?.checks.map((check) => [check.id, check.status]), [
-    ['docker:endpoint', 'warning'],
-    ['docker:published-bindings', 'warning'],
+    ['docker:endpoint', 'error'],
+    ['docker:published-bindings', 'error'],
   ]);
   assertStringIncludes(docker?.checks[0].message ?? '', 'from DOCKER_CONTEXT');
 });
@@ -523,66 +538,63 @@ Deno.test('plugin manifest import failures degrade to an error report', async ()
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),
     process: HEALTHY_MODULE_PROCESS,
-    loadConfig: () =>
-      Promise.resolve({ plugins: ["./plugins/broken/mod.ts"] } as never),
-    loadRegisteredPlugins: () =>
-      Promise.reject(new Error("plugin import exploded")),
+    loadConfig: () => Promise.resolve({ plugins: ['./plugins/broken/mod.ts'] } as never),
+    loadRegisteredPlugins: () => Promise.reject(new Error('plugin import exploded')),
   });
-  assertEquals(reports[0].status, "error");
+  assertEquals(reports[0].status, 'error');
   assertStringIncludes(
-    reports[0].checks[0].message ?? "",
-    "plugin import exploded",
+    reports[0].checks[0].message ?? '',
+    'plugin import exploded',
   );
 });
 
-Deno.test("one unloadable plugin doctor does not suppress a healthy plugin report", async () => {
+Deno.test('one unloadable plugin doctor does not suppress a healthy plugin report', async () => {
   const fs = new MemoryFileSystemAdapter();
-  await fs.createDir("/workspace/plugins/broken");
-  await fs.createDir("/workspace/plugins/healthy");
-  const reports = await doctorPlugin({ projectRoot: "/workspace" }, {
+  await fs.createDir('/workspace/plugins/broken');
+  await fs.createDir('/workspace/plugins/healthy');
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs,
     process: HEALTHY_MODULE_PROCESS,
-    loadConfig: () =>
-      Promise.resolve({ plugins: ["broken", "healthy"] } as never),
+    loadConfig: () => Promise.resolve({ plugins: ['broken', 'healthy'] } as never),
     loadRegisteredPlugins: () =>
       Promise.resolve({
         broken: {
-          name: "broken",
+          name: 'broken',
           source: localPluginSource(
-            "./plugins/broken/mod.ts",
-            "plugins/broken",
-            "/workspace/plugins/broken",
+            './plugins/broken/mod.ts',
+            'plugins/broken',
+            '/workspace/plugins/broken',
           ),
-          permissions: ["--allow-read"],
-          doctor: "./missing-doctor.ts",
+          permissions: ['--allow-read'],
+          doctor: './missing-doctor.ts',
         },
         healthy: {
-          name: "healthy",
+          name: 'healthy',
           source: localPluginSource(
-            "./plugins/healthy/mod.ts",
-            "plugins/healthy",
-            "/workspace/plugins/healthy",
+            './plugins/healthy/mod.ts',
+            'plugins/healthy',
+            '/workspace/plugins/healthy',
           ),
-          permissions: ["--allow-read"],
+          permissions: ['--allow-read'],
         },
       }),
   });
 
   assertEquals(reports.length, 2);
   assertEquals(
-    reports.find((report) => report.pluginName === "broken")?.status,
-    "error",
+    reports.find((report) => report.pluginName === 'broken')?.status,
+    'error',
   );
   assertEquals(
-    reports.find((report) => report.pluginName === "healthy")?.status,
-    "healthy",
+    reports.find((report) => report.pluginName === 'healthy')?.status,
+    'healthy',
   );
 });
 
 async function assertWorkersCommandPasses(
   registrySource: string,
 ): Promise<void> {
-  const projectRoot = "/workspace";
+  const projectRoot = '/workspace';
   const fs = new MemoryFileSystemAdapter();
   await fs.createDir(`${projectRoot}/plugins/workers`);
   await fs.writeFile(`${projectRoot}/plugins/workers/mod.ts`, 'export {};\n');
@@ -591,7 +603,7 @@ async function assertWorkersCommandPasses(
     registrySource,
   );
   const workersRoot = fromFileUrl(
-    new URL("../../../../../../../plugins/workers/", import.meta.url),
+    new URL('../../../../../../../plugins/workers/', import.meta.url),
   );
   const command = createDoctorPluginCommand({
     resolveProjectRoot: () => Promise.resolve(projectRoot),
@@ -601,23 +613,22 @@ async function assertWorkersCommandPasses(
       doctorPlugin(input, {
         fs,
         process: HEALTHY_MODULE_PROCESS,
-        loadConfig: () =>
-          Promise.resolve({ plugins: ["./plugins/workers/mod.ts"] } as never),
+        loadConfig: () => Promise.resolve({ plugins: ['./plugins/workers/mod.ts'] } as never),
         loadRegisteredPlugins: () =>
           Promise.resolve({
             workers: {
-              name: "@netscript/plugin-workers",
+              name: '@netscript/plugin-workers',
               source: localPluginSource(
-                "./plugins/workers/mod.ts",
-                "plugins/workers",
+                './plugins/workers/mod.ts',
+                'plugins/workers',
                 workersRoot,
               ),
-              doctor: "./src/adapter/plugin.ts",
+              doctor: './src/adapter/plugin.ts',
             },
           }),
       }),
   });
-  await command.parse(["--project-root", projectRoot]);
+  await command.parse(['--project-root', projectRoot]);
 }
 
 function configWithResources() {
@@ -680,7 +691,7 @@ class MissingAspireProcess implements ProcessPort {
 }
 
 async function assertSagaCommandPasses(registrySource: string): Promise<void> {
-  const projectRoot = "/workspace";
+  const projectRoot = '/workspace';
   const fs = new MemoryFileSystemAdapter();
   await fs.createDir(`${projectRoot}/plugins/sagas`);
   await fs.writeFile(`${projectRoot}/plugins/sagas/mod.ts`, 'export {};\n');
@@ -689,7 +700,7 @@ async function assertSagaCommandPasses(registrySource: string): Promise<void> {
     registrySource,
   );
   const sagasRoot = fromFileUrl(
-    new URL("../../../../../../../plugins/sagas/", import.meta.url),
+    new URL('../../../../../../../plugins/sagas/', import.meta.url),
   );
   const command = createDoctorPluginCommand({
     resolveProjectRoot: () => Promise.resolve(projectRoot),
@@ -699,23 +710,22 @@ async function assertSagaCommandPasses(registrySource: string): Promise<void> {
       doctorPlugin(input, {
         fs,
         process: HEALTHY_MODULE_PROCESS,
-        loadConfig: () =>
-          Promise.resolve({ plugins: ["./plugins/sagas/mod.ts"] } as never),
+        loadConfig: () => Promise.resolve({ plugins: ['./plugins/sagas/mod.ts'] } as never),
         loadRegisteredPlugins: () =>
           Promise.resolve({
             sagas: {
-              name: "@netscript/plugin-sagas",
+              name: '@netscript/plugin-sagas',
               source: localPluginSource(
-                "./plugins/sagas/mod.ts",
-                "plugins/sagas",
+                './plugins/sagas/mod.ts',
+                'plugins/sagas',
                 sagasRoot,
               ),
-              doctor: "./src/adapter/plugin.ts",
+              doctor: './src/adapter/plugin.ts',
             },
           }),
       }),
   });
-  await command.parse(["--project-root", projectRoot]);
+  await command.parse(['--project-root', projectRoot]);
 }
 
 function localPluginSource(configuredSpecifier: string, workdir: string, rootDir: string) {

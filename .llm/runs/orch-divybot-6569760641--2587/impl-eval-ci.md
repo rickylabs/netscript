@@ -1,0 +1,10 @@
+**PASS — narrow E2E correction for issue #2587 / PR #2589.**
+
+No blocking findings in the supplied changes.
+
+- **Ordering:** `BEHAVIOR_RECORD_ACTIVITY` is registered and selected immediately before `BEHAVIOR_APP_HOME`. It remains in both PostgreSQL and SQLite suites because it is outside the PostgreSQL-only exclusion set. Seeding, runtime restart, service health, and streams readiness precede it. The added registry test checks inclusion and ordering for both tiers.
+- **Permissions and lifecycle:** The command grants loopback networking, reads, and execution of `aspire`, which cover the exercised endpoint-discovery and HTTP paths. Importing `verify-live-db-endpoint.ts` does not execute its PostgreSQL allocation, telemetry, or receipt-writing routine because that routine is guarded by `import.meta.main`. The shared endpoint resolver closes its Aspire follower after discovery.
+- **Reuse safety:** The helper finds the existing `Seed User` and patches its name to the same value, preserving row count and business fields while exercising the committed update path. PostgreSQL therefore performs an additional legitimate update after its earlier CRUD gate. Repeated execution may add real activity events; it does not create duplicate records. The missing-row checks stop on an unexpected response.
+- **Acceptance integrity:** The correction supplies the missing fixture action through the real service API. It neither manufactures stream payloads nor relaxes Overview readiness. The mutation receipt establishes HTTP success; the subsequent unchanged Overview gate remains responsible for checking populated capability readiness.
+
+The supplied receipt reports **71 passed, 0 failed**. I reviewed the packet and supporting endpoint-discovery and gate-factory source; I did not execute those tests or the runtime suite. This PASS applies to the narrow source correction. The full CI rerun remains pending and required before READY. No files or comments were written.

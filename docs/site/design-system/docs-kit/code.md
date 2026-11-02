@@ -21,6 +21,27 @@ Filename blocks and tabs share a header with the language and Copy. Every exampl
 
 {{ comp.codeBlock({ filename: "services/users.contract.ts", lang: "typescript", code: filenameCode }) }}
 
+## Fresh UI source files
+
+Install the application component with `netscript ui:add code-block`. Hydrate it in a Fresh island to enable file selection and clipboard feedback:
+
+```tsx
+import { CodeBlock } from '@/components/ui/code-block.tsx';
+
+export default function SourceExample() {
+  return <CodeBlock
+    tabs={[
+      { value: 'contract', label: 'users.contract.ts', lang: 'TypeScript', code: 'export const limit = 42;' },
+      { value: 'command', label: 'check.sh', lang: 'Shell', code: 'deno task check' },
+    ]}
+    lineNumbers
+    footer
+  />;
+}
+```
+
+Arrow keys follow the page direction; Home and End select the first and last file. Tab reaches Copy and the native code scroll region. Copy writes the selected file's raw source. Diff rows accept `variant: 'added' | 'removed' | 'highlighted'`; their visible signs supplement color, and the header reports additions and deletions. Without an explicit `code`, copied diff text excludes removed rows. Plain source is escaped; trusted syntax slots can use `CodeBlock.Token` without a bundled parser. `header={false}` preserves file tabs while hiding optional header chrome.
+
 ## TypeScript
 
 ```tsx

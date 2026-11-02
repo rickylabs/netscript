@@ -37,7 +37,7 @@ const repositoryTemplate = await Deno.readTextFile(
 Deno.test('persistent repository translates only Prisma P2025 and rethrows other failures', () => {
   assertStringIncludes(repositoryTemplate, "error.code === 'P2025'");
   assertStringIncludes(repositoryTemplate, 'return null;');
-  assertEquals(repositoryTemplate.match(/missingAsNull\(\(\)/g)?.length, 2);
+  assertEquals(repositoryTemplate.match(/missingAsNull\((?:async\s+)?\(\)/g)?.length, 2);
   assertStringIncludes(repositoryTemplate, 'throw error;');
 });
 

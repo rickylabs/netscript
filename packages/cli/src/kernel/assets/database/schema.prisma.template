@@ -16,7 +16,15 @@ datasource db {
 
 model {{modelName}} {
   id        Int      @id @default(autoincrement())
+  reference String   @unique @default(cuid())
   name      String
+  ownerName String   @default("Unassigned")
+  ownerEmail String  @default("unassigned@example.com")
+  // Portable across all engines; the service contract narrows the status vocabulary.
+  status    String   @default("pending")
+  // Signed integer minor units (for example cents); refunded amounts are negative.
+  amount    Int      @default(0)
+  currency  String   @default("USD")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

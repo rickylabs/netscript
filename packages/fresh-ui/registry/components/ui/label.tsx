@@ -13,6 +13,11 @@ interface LabelProps extends Omit<JSX.LabelHTMLAttributes<HTMLLabelElement>, 'cl
   children: Renderable;
   class?: string;
   required?: boolean;
+  optional?: boolean;
+  optionalText?: Renderable;
+  variant?: 'default' | 'eyebrow';
+  /** Presentation only; the associated input owns disabled/invalid semantics. */
+  state?: 'rest' | 'disabled' | 'invalid';
   'data-part'?: string;
   'data-scope'?: string;
   srOnly?: boolean;
@@ -25,6 +30,10 @@ export function Label({
   children,
   class: className,
   required = false,
+  optional = false,
+  optionalText = '(optional)',
+  variant = 'default',
+  state = 'rest',
   srOnly = false,
   ...props
 }: LabelProps): VNode {
@@ -33,8 +42,9 @@ export function Label({
       {...props}
       class={cn(srOnly ? 'sr-only' : 'ns-label', className)}
       data-required={(required && !srOnly) ? ('true') : undefined}
-      data-variant='default'
-      data-state='rest'
+      data-variant={variant}
+      data-state={state}
+      data-sr-only={String(srOnly)}
       data-part={props['data-part'] ?? 'root'}
       data-scope={props['data-scope'] ?? 'label'}
     >
@@ -44,6 +54,9 @@ export function Label({
       >
         {children}
       </span>
+      {optional && !required && (
+        <span data-part='optional-hint' data-scope='label'>{optionalText}</span>
+      )}
     </label>
   );
 }

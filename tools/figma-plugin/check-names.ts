@@ -4,7 +4,7 @@ import {
   importFigmaTokenBundle,
 } from '../../packages/fresh-ui/src/tokens/adapters/figma/figma-round-trip.ts';
 import { validateFigmaSnapshot } from '../../packages/fresh-ui/src/tokens/domain/figma/figma-snapshot.ts';
-import { z } from 'npm:zod@^4.6.5';
+import { z } from 'zod';
 
 /** Validate pinned snapshots and portable export items using the same checker as the plugin and CLI. */
 async function main(): Promise<void> {

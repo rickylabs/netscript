@@ -1,0 +1,3 @@
+Task check:child-health-docs deno task gen:child-health-docs --check
+Task gen:child-health-docs deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/docs/generate-child-health-docs.ts '--check'
+child-health-docs PASS: exported contract and vocabulary page match

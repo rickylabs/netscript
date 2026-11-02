@@ -1,0 +1,36 @@
+{
+  "gateId": "assets-barrel",
+  "invocationId": "scaffold-2570-s4-check-assets-barrel",
+  "argv": [
+    "deno",
+    "task",
+    "check:assets-barrel"
+  ],
+  "cwd": ".",
+  "gitHead": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+  "actualGitHead": "7d9fd6a94d82d12e3accc9eca198efe66d655466",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "local-scaffold-2570",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "4d2e161be87835d4100004c0a823954b9ebcd2a5a53321caed762119f6621bad",
+  "lifecycleId": "local-scaffold-2570:scaffold-2570-s4-check-assets-barrel:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-11-01T12:48:18.834Z",
+  "startedAt": "2026-11-01T12:48:18.837Z",
+  "finishedAt": "2026-11-01T12:48:21.795Z",
+  "durationMs": 2958,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 553,
+    "sha256": "1a401b58ff52a7ed118d5bb6fc762284bf0608845b3403ed1257256957fbf52a",
+    "tail": "{\"outcome\":\"PASS\",\"files\":[\"skills/netscript-design/SKILL.md\",\"skills/netscript-design/references/GUIDELINES.md\"],\"themes\":11,\"presets\":24,\"guidelinesSha256\":\"9f02cb226c3b914c3fb9d31ec738da8749691bf9bebefca4ed9fc5bc4be3416f\"}\nRegistry JSON embeddings checked.\nToken JSON embeddings checked.\n{\"outcome\":\"PASS\",\"files\":[\"skills/netscript-design/SKILL.md\",\"skills/netscript-design/references/GUIDELINES.md\"],\"themes\":11,\"presets\":24,\"guidelinesSha256\":\"9f02cb226c3b914c3fb9d31ec738da8749691bf9bebefca4ed9fc5bc4be3416f\"}\nRegistry JSON embeddings generated.\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 1676,
+    "sha256": "3a9ece0a19934a0d3919f79f813692ba047e2419212d978f2d2770897bb4fa2b",
+    "tail": "Task check:assets-barrel deno task check:design-skill && deno task --cwd packages/fresh-ui registry:embed:check && deno task --cwd packages/fresh-ui tokens:embed:check && deno task gen:assets-barrel && git diff --exit-code -- 'packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template' packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts packages/cli/src/kernel/assets/generated/database/postgres-connection-string.ts.template packages/cli/src/kernel/assets/embedded.generated.ts packages/cli/src/kernel/assets/skills.generated.ts packages/cli/src/kernel/assets/agent-tools.generated.ts packages/cli/src/kernel/assets/agent-docs.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts\nTask check:design-skill deno run --no-lock --allow-read .llm/tools/docs/generate-design-skill.ts --check\nTask registry:embed:check deno run --lock=deno.lock --frozen --allow-read=. --allow-run=deno scripts/embed-registry-assets.ts --check\nTask tokens:embed:check deno run --lock=deno.lock --frozen --allow-read=. --allow-run=deno scripts/embed-token-assets.ts --check\nTask gen:assets-barrel deno task gen:design-skill && deno task --cwd packages/fresh-ui registry:embed && deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts\nTask gen:design-skill deno run --no-lock --allow-read --allow-write .llm/tools/docs/generate-design-skill.ts\nTask registry:embed deno run --lock=deno.lock --frozen --allow-read=. --allow-write=src/registry/assets --allow-run=deno scripts/embed-registry-assets.ts\n",
+    "truncated": false
+  }
+}

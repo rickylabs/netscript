@@ -1,4 +1,5 @@
 /** Prisma implementation of the {{modelName}} repository port. */
+import { {{serviceName | pascalCase}}{{modelName}}SchemaV1 as entitySchema } from '../../../../contracts/versions/v1/{{serviceName}}.contract.ts';
 import type { PrismaClient } from '@database';
 import type { {{serviceName | pascalCase}}Repository } from '../application/{{entityName}}.ts';
 
@@ -21,12 +22,15 @@ export function createPrisma{{serviceName | pascalCase}}Repository(database: Pri
   return {
     async list(query) {
       const args = query satisfies FindManyArgs;
-      const [data, total] = await Promise.all([delegate.findMany(args), delegate.count()]);
-      return { data, total };
+      const [data, total] = await Promise.all([delegate.findMany(args), delegate.count({ where: query.where })]);
+      return { data: data.map((row) => entitySchema.parse(row)), total };
     },
-    getById: (id) => delegate.findUnique({ where: { id } }),
-    create: (input) => delegate.create({ data: input }),
-    update: (id, input) => missingAsNull(() => delegate.update({ where: { id }, data: input })),
-    delete: (id) => missingAsNull(() => delegate.delete({ where: { id } })),
+    async getById(id) {
+      const row = await delegate.findUnique({ where: { id } });
+      return row ? entitySchema.parse(row) : null;
+    },
+    async create(input) { return entitySchema.parse(await delegate.create({ data: input })); },
+    update: (id, input) => missingAsNull(async () => entitySchema.parse(await delegate.update({ where: { id }, data: input }))),
+    delete: (id) => missingAsNull(async () => entitySchema.parse(await delegate.delete({ where: { id } }))),
   };
 }

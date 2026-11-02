@@ -1,0 +1,1 @@
+{"source":{"mode":"selection","cwd":".llm/tmp/scaffold-2570/utility-service/apps/portal"},"command":"deno check --unstable-kv <files>","selection":{"filesSelected":63,"batches":1,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}

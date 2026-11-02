@@ -1,0 +1,62 @@
+[
+  {
+    "template": "packages/cli/src/kernel/assets/app/routes/_layout.tsx.template",
+    "project": "shop",
+    "canonicalOutputsIdentical": true,
+    "sha256": "4a883b9e1ca3a290bcc752487ca81e25e01f5c0e38a7768ff0d11900210b5a4e"
+  },
+  {
+    "template": "packages/cli/src/kernel/assets/app/routes/_layout.tsx.template",
+    "project": "review-empty",
+    "canonicalOutputsIdentical": true,
+    "sha256": "f2855396bfbabdaf4b62f5d2c36988ac0541aa1aab898370e17a42a258a6f1b7"
+  },
+  {
+    "template": "packages/cli/src/kernel/assets/app/routes/_layout.tsx.template",
+    "project": "review-service",
+    "canonicalOutputsIdentical": true,
+    "sha256": "bd2da583d3c180547daaaa17794f308446d3f8d0b0efcf818ec0bc09b1fe7442"
+  },
+  {
+    "template": "packages/cli/src/kernel/assets/app/routes/_layout.tsx.template",
+    "project": "review-plugins",
+    "canonicalOutputsIdentical": true,
+    "sha256": "9bbc6c859c413f27cacbcae743b77eba5afe41636d9f88652d96d9a49a7329cc"
+  },
+  {
+    "template": "packages/cli/src/kernel/assets/app/routes/_layout.tsx.template",
+    "project": "long-workspace-name",
+    "canonicalOutputsIdentical": true,
+    "sha256": "6b5d64cb20ca9aad91d84b3b40420aeffc03b952bc96f1118073a05f80bdf80e"
+  },
+  {
+    "template": "packages/cli/src/kernel/assets/app/navigation.ts.template",
+    "project": "shop",
+    "canonicalOutputsIdentical": true,
+    "sha256": "42260a6b09211623ba170967f4d601edea4b9dda719b20cd472b2658739805a0"
+  },
+  {
+    "template": "packages/cli/src/kernel/assets/app/navigation.ts.template",
+    "project": "review-empty",
+    "canonicalOutputsIdentical": true,
+    "sha256": "42260a6b09211623ba170967f4d601edea4b9dda719b20cd472b2658739805a0"
+  },
+  {
+    "template": "packages/cli/src/kernel/assets/app/navigation.ts.template",
+    "project": "review-service",
+    "canonicalOutputsIdentical": true,
+    "sha256": "42260a6b09211623ba170967f4d601edea4b9dda719b20cd472b2658739805a0"
+  },
+  {
+    "template": "packages/cli/src/kernel/assets/app/navigation.ts.template",
+    "project": "review-plugins",
+    "canonicalOutputsIdentical": true,
+    "sha256": "42260a6b09211623ba170967f4d601edea4b9dda719b20cd472b2658739805a0"
+  },
+  {
+    "template": "packages/cli/src/kernel/assets/app/navigation.ts.template",
+    "project": "long-workspace-name",
+    "canonicalOutputsIdentical": true,
+    "sha256": "42260a6b09211623ba170967f4d601edea4b9dda719b20cd472b2658739805a0"
+  }
+]

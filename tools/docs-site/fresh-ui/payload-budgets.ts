@@ -1,6 +1,7 @@
 /** Published component CSS and initial builder assets have independent byte ceilings. */
 export const PAYLOAD_BUDGETS = {
-  componentCss: { raw: 220_000, gzip: 27_000 },
+  // Gap components from #2488 (owner decision 2026-11-01).
+  componentCss: { raw: 284_993, gzip: 36_715 },
   builderJavaScript: { raw: 120_000, gzip: 38_000 },
   builderPresets: { raw: 16_000, gzip: 4_000 },
 } as const;

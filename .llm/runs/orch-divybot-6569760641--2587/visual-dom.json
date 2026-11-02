@@ -1,0 +1,36 @@
+[
+  {
+    "width": 1440,
+    "amountAlign": "end",
+    "statusLabels": [
+      "Pending",
+      "Awaiting payment",
+      "Paid",
+      "Shipped",
+      "Refunded",
+      "Cancelled"
+    ],
+    "statusLabelsUnclipped": true,
+    "viewportCaptures": [
+      "middle",
+      "end"
+    ]
+  },
+  {
+    "width": 390,
+    "amountAlign": "end",
+    "statusLabels": [
+      "Pending",
+      "Awaiting payment",
+      "Paid",
+      "Shipped",
+      "Refunded",
+      "Cancelled"
+    ],
+    "statusLabelsUnclipped": true,
+    "viewportCaptures": [
+      "middle",
+      "end"
+    ]
+  }
+]

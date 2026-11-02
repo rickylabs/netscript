@@ -295,7 +295,7 @@ export const forms_3: readonly ComponentContract[] = [
     'specId': 'F9',
     'category': 'Forms',
     'priority': 'P1',
-    'shipped': false,
+    'shipped': true,
     'props': {
       'align': {
         'kind': 'enum',
@@ -317,36 +317,35 @@ export const forms_3: readonly ComponentContract[] = [
       },
       'control': {
         'kind': 'slot',
+        'required': true,
       },
       'addon': {
+        'kind': 'slot',
+      },
+      'text': {
         'kind': 'slot',
       },
     },
     'parts': [
       {
         'name': 'root',
-        'planned': true,
       },
       {
         'name': 'addon',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'control',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'text',
         'when': 'when the corresponding content or subcomponent is supplied',
-        'planned': true,
       },
       {
         'name': 'focus-ring',
         'representation': 'pseudo',
         'when': 'matching CSS interaction or variant',
-        'planned': true,
       },
     ],
     'attributes': {
@@ -379,6 +378,10 @@ export const forms_3: readonly ComponentContract[] = [
         'name': 'addon',
         'part': 'addon',
       },
+      {
+        'name': 'text',
+        'part': 'text',
+      },
     ],
     'apg': 'native input group',
     'keyboard': [],
@@ -387,7 +390,8 @@ export const forms_3: readonly ComponentContract[] = [
       'text/fg',
     ],
     'notes': [
-      'Design contract only; no Utility implementation ships in this phase.',
+      'Native controls own keyboard/form behavior. Transient focus/hover is CSS/native; data-state also supports deliberate preview. Client visual/controlled updates require an island.',
+      'For invalid state, callers supply aria-invalid and aria-describedby on the native control slot; a fieldset cannot propagate invalid semantics.',
     ],
   },
 ];

@@ -1,0 +1,1 @@
+{"outcome":"PASS","cases":[{"route":"/","expected":"Launch checklist"},{"route":"/records","expected":"Integration handshake"},{"route":"/records/1","expected":"Record information"},{"route":"/records/999999","expected":"Record not found"}]}

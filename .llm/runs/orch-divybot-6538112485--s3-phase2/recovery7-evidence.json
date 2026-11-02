@@ -1,0 +1,148 @@
+{
+  "base": "43aa891ec0782a646c0986b5d5546b83a5774ca0",
+  "rebasedHead": "186a3e9436ab33903aff776702a1e929109a11d0",
+  "parentLease": "71d8df6fca2340f1ccc0dcce19accbb88fa44e64",
+  "childHead": "d0d8d922212c4ab71552d1f7e910f3db82cc3b9e",
+  "replayedCommits": 50,
+  "nonOverlappingMainPaths": 258,
+  "changedNonOverlappingMainPaths": 0,
+  "topicLockChanges": 0,
+  "maintainedConflictFiles": 10,
+  "postRebaseSourceCarrierFiles": 16,
+  "tests": {
+    "fullPackage": {
+      "exitCode": 0,
+      "passed": 622,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 622,
+      "uniqueFailures": 0
+    },
+    "expandedCodeBlock": {
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "browser": {
+    "fullParent": {
+      "passed": 318,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "scope": "Utility family/flavor light/dark390/1280 plus touch, original phase2a matrix with added highlighter controls",
+      "captures": 160
+    },
+    "focusedChromium": {
+      "passed": 44,
+      "failed": 0,
+      "scope": "Existing CodeBlock/fidelity cases plus automatic multiline/raw CRLF/native clipboard, per-file language/add-remove tabs, explicit content/unknown language, expected syntax roles/context ink and AA",
+      "captures": 28
+    },
+    "additionalEngines": {
+      "passed": 12,
+      "failed": 0,
+      "scope": "Actual Firefox/WebKit light390/1280; native file/language/add-remove controls, nested syntax/explicit/unknown semantics and automatic seven-role/four-surface contrast. Not clipboard-permission or full dark/preset certification."
+    },
+    "seriousCriticalAxe": 0,
+    "newAllowances": 0,
+    "codeBlockPageConsoleErrors": 0
+  },
+  "wrappers": {
+    "source-check": {
+      "verdict": "PASS",
+      "selected": 7,
+      "dropped": 0
+    },
+    "source-lint": {
+      "verdict": "PASS",
+      "selected": 7,
+      "dropped": 0
+    },
+    "source-fmt": {
+      "verdict": "PASS",
+      "selected": 7,
+      "dropped": 0
+    },
+    "browser-fixture-check": {
+      "verdict": "PASS",
+      "selected": 2,
+      "dropped": 0
+    },
+    "browser-spec-check": {
+      "verdict": "PASS",
+      "selected": 2,
+      "dropped": 0
+    },
+    "browser-lint": {
+      "verdict": "PASS",
+      "selected": 4,
+      "dropped": 0
+    },
+    "browser-fmt": {
+      "verdict": "PASS",
+      "selected": 4,
+      "dropped": 0
+    }
+  },
+  "qualityArchitecture": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "sourceCommit": "602a5bd875fdbd42e48a09a95ee98d8d99a35266"
+  },
+  "preflight": "PASS",
+  "docsAccuracy": "PASS",
+  "docsExportsDrift": "PASS",
+  "docsSiteBuild": {
+    "verdict": "PASS",
+    "pages": 259
+  },
+  "nativeMemberPublish": {
+    "verdict": "PASS",
+    "exitCode": 0,
+    "slowTypes": 0,
+    "sourceCommit": "602a5bd875fdbd42e48a09a95ee98d8d99a35266"
+  },
+  "publicationAudit": "recovery7-publication-audit.json",
+  "independentDesignReview": "PASS",
+  "independentSourceReview": "PASS",
+  "independentEvidenceReview": "PASS",
+  "carriers": {
+    "gen:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "gen:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:agent-docs-prose": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:mcp-export-corpus": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:assets-barrel": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    },
+    "check:publish-assets": {
+      "exitCode": 0,
+      "verdict": "PASS"
+    }
+  },
+  "reviewThreads": {
+    "pr": 2488,
+    "verdict": "PASS",
+    "unanswered": 0
+  },
+  "runtime": "NEW_HEAD_UNPROVEN",
+  "requiredRemoteCI": "PENDING",
+  "ready": false,
+  "wholeAssignment": "IN_PROGRESS",
+  "remaining": "Child restack,11b Docs/Desktop,12 declared extensions/all-style,13 final",
+  "sourceCommit": "602a5bd875fdbd42e48a09a95ee98d8d99a35266",
+  "generatedCarriersAfterSource": []
+}

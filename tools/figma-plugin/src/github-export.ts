@@ -1,4 +1,4 @@
-import { z } from 'npm:zod@^4.6.5';
+import { z } from 'zod';
 import { importFigmaTokenBundle } from '../../../packages/fresh-ui/src/tokens/adapters/figma/figma-round-trip.ts';
 import { canonical } from '../../../packages/fresh-ui/src/tokens/adapters/figma/parse-figma-round-trip.ts';
 

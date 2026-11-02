@@ -1,0 +1,162 @@
+[
+  {
+    "page": "overview",
+    "route": "/",
+    "width": 1440,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/overview-light-1440.png"
+  },
+  {
+    "page": "records",
+    "route": "/records",
+    "width": 1440,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/records-light-1440.png"
+  },
+  {
+    "page": "detail",
+    "route": "/records/40",
+    "width": 1440,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/detail-light-1440.png"
+  },
+  {
+    "page": "example",
+    "route": "/examples/orders",
+    "width": 1440,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/example-light-1440.png"
+  },
+  {
+    "page": "overview",
+    "route": "/",
+    "width": 1440,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/overview-dark-1440.png"
+  },
+  {
+    "page": "records",
+    "route": "/records",
+    "width": 1440,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/records-dark-1440.png"
+  },
+  {
+    "page": "detail",
+    "route": "/records/40",
+    "width": 1440,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/detail-dark-1440.png"
+  },
+  {
+    "page": "example",
+    "route": "/examples/orders",
+    "width": 1440,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/example-dark-1440.png"
+  },
+  {
+    "page": "overview",
+    "route": "/",
+    "width": 390,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/overview-light-390.png"
+  },
+  {
+    "page": "records",
+    "route": "/records",
+    "width": 390,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/records-light-390.png"
+  },
+  {
+    "page": "detail",
+    "route": "/records/40",
+    "width": 390,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/detail-light-390.png"
+  },
+  {
+    "page": "example",
+    "route": "/examples/orders",
+    "width": 390,
+    "scheme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/example-light-390.png"
+  },
+  {
+    "page": "overview",
+    "route": "/",
+    "width": 390,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/overview-dark-390.png"
+  },
+  {
+    "page": "records",
+    "route": "/records",
+    "width": 390,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/records-dark-390.png"
+  },
+  {
+    "page": "detail",
+    "route": "/records/40",
+    "width": 390,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/detail-dark-390.png"
+  },
+  {
+    "page": "example",
+    "route": "/examples/orders",
+    "width": 390,
+    "scheme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "screenshot": "screens/example-dark-390.png"
+  }
+]

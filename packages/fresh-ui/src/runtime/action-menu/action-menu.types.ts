@@ -10,6 +10,12 @@ export const ACTION_MENU_ITEM_INTENTS = ['default', 'destructive'] as const;
 /** Visual intent applied to an ActionMenu item. */
 export type ActionMenuItemIntent = typeof ACTION_MENU_ITEM_INTENTS[number];
 
+/** Semantic menu item roles, including caller-controlled choices. */
+export const ACTION_MENU_ITEM_ROLES = ['menuitem', 'menuitemcheckbox', 'menuitemradio'] as const;
+
+/** Role of an actionable or checkable item. */
+export type ActionMenuItemRole = typeof ACTION_MENU_ITEM_ROLES[number];
+
 /** Reasons emitted when ActionMenu controlled open state changes. */
 export type ActionMenuOpenChangeReason =
   | 'trigger'
@@ -51,9 +57,13 @@ export type ActionMenuTriggerProps = FreshUiElementProps & {
 
 /** Props for the menu content surface. */
 export type ActionMenuContentProps = FreshUiElementProps & {
+  /** Entry edge used by application-menu ArrowDown/ArrowUp. Defaults to first. */
+  initialFocus?: 'first' | 'last';
   children?: FreshUiChildren;
   onClick?: FreshUiEventHandler<MouseEvent>;
   onKeyDown?: FreshUiEventHandler<KeyboardEvent>;
+  /** Observe native top-layer entry after the popover becomes focusable. */
+  onToggle?: FreshUiEventHandler<Event>;
 };
 
 /** Props for an actionable menu item. */
@@ -62,6 +72,10 @@ export type ActionMenuItemProps = FreshUiElementProps & {
   disabled?: boolean;
   intent?: ActionMenuItemIntent;
   loading?: boolean;
+  /** Semantic role; choice state remains caller-owned through aria-checked. */
+  role?: ActionMenuItemRole;
+  /** Keep a choice menu open when false. Defaults to true. */
+  closeOnSelect?: boolean;
   onClick?: FreshUiEventHandler<MouseEvent>;
   type?: 'button' | 'submit' | 'reset';
 };

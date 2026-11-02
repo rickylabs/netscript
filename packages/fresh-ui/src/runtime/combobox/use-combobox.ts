@@ -1,5 +1,5 @@
 import type { JSX } from 'preact';
-import { useCallback, useId, useRef } from 'preact/hooks';
+import { useCallback, useEffect, useId, useRef } from 'preact/hooks';
 import { composeEventHandlers } from '../_internal/compose-event-handlers.ts';
 import { composeRefs } from '../_internal/compose-refs.ts';
 import { useControllableSignal } from '../_internal/use-controllable-signal.ts';
@@ -56,6 +56,11 @@ export function useCombobox({
   const itemOrder = useRef<string[]>([]);
   const itemRefs = useRef(new Map<string, HTMLElement | null>());
 
+  // Dynamic result sets must not leave aria-activedescendant pointing at a removed option.
+  useEffect(() => {
+    if (highlighted && (!openState || !itemRefs.current.has(highlighted))) setHighlighted('');
+  });
+
   const registerItem = useCallback((itemValue: string, node: HTMLElement | null) => {
     if (node === null) {
       itemRefs.current.delete(itemValue);
@@ -70,8 +75,9 @@ export function useCombobox({
 
   const setOpen = useCallback((next: boolean) => {
     setOpenState(next);
-    if (!next) setHighlighted('');
-  }, [setHighlighted, setOpenState]);
+    // A controlled owner may refuse closing; retain its active option until it actually closes.
+    if (!next && openProp === undefined) setHighlighted('');
+  }, [openProp, setHighlighted, setOpenState]);
 
   const moveHighlight = useCallback((direction: ComboboxDirection) => {
     const order = itemOrder.current;
@@ -127,6 +133,7 @@ export function useCombobox({
       onInput: composeEventHandlers(
         props.onInput,
         (event: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+          setHighlighted('');
           setQuery(event.currentTarget.value);
           if (!openState) setOpen(true);
         },
@@ -134,6 +141,8 @@ export function useCombobox({
       onKeyDown: composeEventHandlers(
         props.onKeyDown,
         (event: JSX.TargetedKeyboardEvent<HTMLInputElement>) => {
+          // Composition keys belong to the IME, including its Enter commit.
+          if (event.isComposing) return;
           switch (event.key) {
             case 'ArrowDown':
               event.preventDefault();
@@ -214,6 +223,10 @@ export function useCombobox({
         'data-selected': selected ? 'true' : 'false',
         'data-state': selected ? 'checked' : 'unchecked',
         id: props.id ?? itemId(itemValue),
+        onMouseDown: composeEventHandlers(props.onMouseDown, (event) => {
+          // Options use the input's active descendant, not a second DOM focus target.
+          if (event.button === 0) event.preventDefault();
+        }),
         onClick: composeEventHandlers(props.onClick, () => selectValue(itemValue)),
         onPointerMove: composeEventHandlers(props.onPointerMove, () => setHighlighted(itemValue)),
         ref: composeRefs(

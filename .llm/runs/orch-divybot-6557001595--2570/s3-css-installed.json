@@ -1,0 +1,18 @@
+{
+  "pageComposition": {
+    "rawBytes": 6668,
+    "gzipBytes": 1585
+  },
+  "budgetChange": "none; shared palette CSS adds visible dismissal, keyboard guidance and active-row affordance within existing limits",
+  "utility-baseline": {
+    "files": 43,
+    "rawBytes": 168907,
+    "gzipBytes": 20908
+  },
+  "measurement": "Installed component CSS plus layouts.css; excludes tokens, design reference and page composition (reported separately).",
+  "review-empty": {
+    "files": 44,
+    "rawBytes": 175876,
+    "gzipBytes": 21828
+  }
+}

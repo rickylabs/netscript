@@ -31,7 +31,8 @@ export type NetscriptPackage =
   | 'sdk'
   | 'service'
   | 'telemetry'
-  | 'workers';
+  | 'workers'
+  | 'streams';
 
 /** Release train version sourced from the CLI package manifest. */
 export const NETSCRIPT_RELEASE_VERSION: string = CLI_PACKAGE_VERSION;
@@ -75,4 +76,5 @@ export const JSR_SPECIFIERS: Readonly<Record<NetscriptPackage, string>> = {
   service: netscriptJsrSpecifier('service'),
   telemetry: netscriptJsrSpecifier('telemetry'),
   workers: netscriptJsrSpecifier('plugin-workers-core'),
+  streams: netscriptJsrSpecifier('plugin-streams-core'),
 } as const;

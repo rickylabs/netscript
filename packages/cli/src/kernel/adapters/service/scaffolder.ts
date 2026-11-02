@@ -59,9 +59,10 @@ export class ServiceScaffolder {
     const templateVars = {
       entityName,
       serviceName: options.serviceName,
-      modelName: options.modelName ?? '',
+      modelName: options.modelName || options.serviceName,
       projectName: options.projectName,
       servicePort: String(options.servicePort),
+      searchMode: options.dbEngine === 'postgres' ? ", mode: 'insensitive' as const" : '',
       ...serviceAuthTemplate(),
     };
     await this.writeGenerated(
@@ -123,12 +124,17 @@ export class ServiceScaffolder {
         [`domain/${entityName}.ts`, TEMPLATE_KEYS.serviceDomainEntityMemory],
         [`application/${entityName}.ts`, TEMPLATE_KEYS.serviceApplicationEntityMemory],
         [`adapters/memory-${entityName}-repository.ts`, TEMPLATE_KEYS.serviceMemoryRepository],
+        ['adapters/sample-records.ts', TEMPLATE_KEYS.serviceSampleRecords],
         [`application/${entityName}_test.ts`, TEMPLATE_KEYS.serviceApplicationEntityMemoryTest],
       ];
     for (const role of ['domain', 'application', 'adapters']) {
       await this.createDir(join(srcDir, role), directoriesCreated);
     }
-    for (const [path, template] of layers) {
+    const activityLayers: readonly [string, TemplateKey][] = [
+      ['domain/record-activity.ts', TEMPLATE_KEYS.serviceRecordActivity],
+      ['adapters/record-activity.ts', TEMPLATE_KEYS.serviceRecordActivityAdapter],
+    ];
+    for (const [path, template] of [...layers, ...activityLayers]) {
       await this.writeRendered(
         template,
         join(srcDir, path),

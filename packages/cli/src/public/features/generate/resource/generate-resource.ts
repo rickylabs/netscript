@@ -6,9 +6,11 @@ import { reconcileResourceSlice } from '../../../../kernel/application/resource-
 import { reconcileState } from '../../../../kernel/application/resource-slice/reconcile/reconcile-state.ts';
 import { renderResourceSlice } from '../../../../kernel/application/resource-slice/render-resource-slice.ts';
 import {
+  type NormalizedResourceSliceInput,
   normalizeResourceSliceInput,
   parseOwnedResourceSliceLeaf,
   RESOURCE_SLICE_VARIANTS,
+  type ResourceResultPresentation,
   type ResourceSliceCandidateLeaf,
   type ResourceSliceOptionalVariant,
   type ResourceSlicePlannedLeaf,
@@ -131,24 +133,29 @@ async function executeGenerateResource(
     client,
     procedure,
   });
-  const priorVariants = await readPriorVariants(
+  const prior = await readPriorState(
     appRoot,
-    selected.resource,
+    selected,
     planResourceSlice(normalizeResourceSliceInput({
       ...selected,
       variants: RESOURCE_SLICE_VARIANTS.filter((variant) => variant !== 'core'),
     })).leaves,
-    dependencies.fs,
+    dependencies,
   );
   const input = normalizeResourceSliceInput({
     ...selected,
-    variants: [...request.variants, ...priorVariants],
+    variants: [...request.variants, ...prior.variants],
+    procedure: {
+      ...procedure,
+      initialInput: procedure.initialInput ?? prior.queryInput,
+    },
   });
   const plan = planResourceSlice(input);
   const leaves = await renderResourceSlice(
     plan,
     dependencies.templates,
     dependencies.templateRenderer,
+    prior.presentation,
   );
   const fresh = await dependencies.stage({ appRoot, leaves, route: input.route });
   const shared = await transformSharedSources(appRoot, plan, fresh, dependencies.fs);
@@ -186,23 +193,62 @@ async function executeGenerateResource(
   };
 }
 
-async function readPriorVariants(
+/** Recover settings only when their complete canonical leaf matches the selected query. */
+async function readPriorState(
   appRoot: string,
-  resource: string,
+  selected: NormalizedResourceSliceInput,
   leaves: readonly ResourceSlicePlannedLeaf[],
-  fs: FileSystemPort,
-): Promise<readonly ResourceSliceOptionalVariant[]> {
+  dependencies: GenerateResourceDependencies,
+): Promise<{
+  variants: readonly ResourceSliceOptionalVariant[];
+  queryInput?: SelectedResourceProcedure['initialInput'];
+  presentation?: ResourceResultPresentation;
+}> {
+  const { fs } = dependencies;
   const variants = new Set<ResourceSliceOptionalVariant>();
+  let queryInput: SelectedResourceProcedure['initialInput'];
+  let presentation: ResourceResultPresentation | undefined;
   for (const leaf of leaves) {
     const path = join(appRoot, leaf.path);
     if (!await fs.exists(path)) continue;
-    const metadata = parseOwnedResourceSliceLeaf(await fs.readFile(path));
-    if (!metadata || metadata.resource !== resource || metadata.role !== leaf.role) continue;
+    const content = await fs.readFile(path);
+    const metadata = parseOwnedResourceSliceLeaf(content);
+    if (!metadata || metadata.resource !== selected.resource || metadata.role !== leaf.role) {
+      continue;
+    }
     for (const option of metadata.options) {
       if (option !== 'core') variants.add(option);
     }
+    const candidateInput = leaf.role === 'loaders' && selected.procedure.initialInput === undefined
+      ? metadata.queryInput
+      : undefined;
+    const candidatePresentation = leaf.role === 'island' && metadata.amountUnit !== undefined
+      ? { amountUnit: metadata.amountUnit }
+      : undefined;
+    if (candidateInput === undefined && candidatePresentation === undefined) continue;
+    const proofPlan = planResourceSlice(normalizeResourceSliceInput({
+      ...selected,
+      variants: metadata.options.filter((option) => option !== 'core'),
+      procedure: {
+        ...selected.procedure,
+        initialInput: candidateInput ?? selected.procedure.initialInput,
+      },
+    }));
+    const proof = await renderResourceSlice(
+      {
+        ...proofPlan,
+        leaves: proofPlan.leaves.filter((candidate) => candidate.role === leaf.role),
+      },
+      dependencies.templates,
+      dependencies.templateRenderer,
+      candidatePresentation,
+    );
+    if (proof.some((candidate) => candidate.path === leaf.path && candidate.content === content)) {
+      if (candidateInput !== undefined) queryInput = candidateInput;
+      if (candidatePresentation !== undefined) presentation = candidatePresentation;
+    }
   }
-  return [...variants].sort();
+  return { variants: [...variants].sort(), queryInput, presentation };
 }
 
 async function transformSharedSources(

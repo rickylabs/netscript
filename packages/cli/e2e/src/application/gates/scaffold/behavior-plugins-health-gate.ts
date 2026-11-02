@@ -1,7 +1,7 @@
 import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { cli, commandGate } from './gate-factory.ts';
-import { resolve } from '@std/path';
+import { join, resolve } from '@std/path';
 import { NETSCRIPT_RELEASE_VERSION } from '../../../../../src/kernel/constants/jsr-specifiers.ts';
 import {
   PACKAGE_BACKED_DOCTOR_UNPUBLISHED_EXIT_CODE,
@@ -21,14 +21,25 @@ export function createBehaviorPluginUnhealthyGates(): readonly GateDefinition[] 
     phase: GATE_PHASE.BEHAVIOR,
     kind: 'command',
     critical: true,
-    command: (context) =>
-      cli(context, 'plugin', 'doctor', '--project-root', context.project.projectRoot),
+    command: (context) => [
+      'deno',
+      'eval',
+      `for (const path of Deno.args.slice(1, 3)) await Deno.remove(path);
+const result = await new Deno.Command(Deno.execPath(), { args: Deno.args.slice(3), cwd: Deno.args[0] }).output();
+await Deno.stdout.write(result.stdout);
+await Deno.stderr.write(result.stderr);
+Deno.exit(result.code);`,
+      context.project.repoRoot,
+      join(context.project.projectRoot, '.netscript/generated/plugin-workers/job-registry.ts'),
+      join(context.project.projectRoot, '.netscript/generated/plugin-sagas/sagas.registry.ts'),
+      ...cli(context, 'plugin', 'doctor', '--project-root', context.project.projectRoot).slice(1),
+    ],
     cwd: (context) => context.project.repoRoot,
     expectedExitCode: 1,
     stdoutIncludes: [
       '.netscript/generated/plugin-workers/job-registry.ts',
       '.netscript/generated/plugin-sagas/sagas.registry.ts',
-      'deno run -A jsr:@netscript/plugin-workers@',
+      'generated job registry exists\tMissing .netscript/generated/plugin-workers/job-registry.ts. Run:',
       'deno run -A jsr:@netscript/plugin-sagas@',
     ],
   }];

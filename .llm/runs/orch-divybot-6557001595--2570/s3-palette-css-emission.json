@@ -1,0 +1,24 @@
+{
+  "source": "packages/fresh-ui/registry/components/ui/command-palette.css",
+  "sourceSha256": "d45b56f36088bbfb13fc7bb3ac3c2600c3aff71a78eb329d0b2275ec39ad68e0",
+  "sourceBytes": 6940,
+  "canonicalSha256": "b9e733ed97a1a80452efa824352bd5ca08c21978ee899ca0cd6b8a1c032e7cc6",
+  "canonicalBytes": 6968,
+  "emitted": {
+    "review-empty": {
+      "path": ".llm/tmp/scaffold-2570/review-empty/apps/portal/assets/ui/command-palette.css",
+      "sha256": "b9e733ed97a1a80452efa824352bd5ca08c21978ee899ca0cd6b8a1c032e7cc6",
+      "bytes": 6968
+    },
+    "review-service": {
+      "path": ".llm/tmp/scaffold-2570/review-service/apps/portal/assets/ui/command-palette.css",
+      "sha256": "b9e733ed97a1a80452efa824352bd5ca08c21978ee899ca0cd6b8a1c032e7cc6",
+      "bytes": 6968
+    },
+    "review-plugins": {
+      "path": ".llm/tmp/scaffold-2570/review-plugins/apps/portal/assets/ui/command-palette.css",
+      "sha256": "b9e733ed97a1a80452efa824352bd5ca08c21978ee899ca0cd6b8a1c032e7cc6",
+      "bytes": 6968
+    }
+  }
+}

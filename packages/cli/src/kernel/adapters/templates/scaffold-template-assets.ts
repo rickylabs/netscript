@@ -6,6 +6,26 @@ import type { TemplatePort } from '../../ports/template-port.ts';
 type TemplateUrlMap = Readonly<Record<string, TemplateKey>>;
 
 const APP_TEMPLATE_URLS: TemplateUrlMap = {
+  appScaffoldContract: TEMPLATE_KEYS.appScaffoldContract,
+  appScaffoldCapabilities: TEMPLATE_KEYS.appScaffoldCapabilities,
+  appScaffoldPluginCapabilities: TEMPLATE_KEYS.appScaffoldPluginCapabilities,
+  appScaffoldProjections: TEMPLATE_KEYS.appScaffoldProjections,
+  appScaffoldOverview: TEMPLATE_KEYS.appScaffoldOverview,
+  appScaffoldRecords: TEMPLATE_KEYS.appScaffoldRecords,
+  appScaffoldServiceContext: TEMPLATE_KEYS.appScaffoldServiceContext,
+  appScaffoldRecordsMemory: TEMPLATE_KEYS.appScaffoldRecordsMemory,
+  appScaffoldRecordsDatabase: TEMPLATE_KEYS.appScaffoldRecordsDatabase,
+  appCapabilityEmpty: TEMPLATE_KEYS.appCapabilityEmpty,
+  appRecordTableIsland: TEMPLATE_KEYS.appRecordTableIsland,
+  appRecordTable: TEMPLATE_KEYS.appRecordTable,
+  appRecordsRoute: TEMPLATE_KEYS.appRecordsRoute,
+  appRecordRoute: TEMPLATE_KEYS.appRecordRoute,
+  appSettingsRoute: TEMPLATE_KEYS.appSettingsRoute,
+  appSignInRoute: TEMPLATE_KEYS.appSignInRoute,
+  appSettingsForm: TEMPLATE_KEYS.appSettingsForm,
+  appWorkspaceCommands: TEMPLATE_KEYS.appWorkspaceCommands,
+  appWorkspaceCss: TEMPLATE_KEYS.appWorkspaceCss,
+
   appDesignCssTemplate: TEMPLATE_KEYS.appAssetsDesignCss,
   appDesignComponentsRouteTemplate: TEMPLATE_KEYS.appRoutesDesignComponents,
   appDesignComponentsViewTemplate: TEMPLATE_KEYS.appRoutesDesignComponentsView,

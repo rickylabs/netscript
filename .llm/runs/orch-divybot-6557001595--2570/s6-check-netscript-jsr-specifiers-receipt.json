@@ -1,0 +1,36 @@
+{
+  "gateId": "netscript-jsr-specifiers",
+  "invocationId": "scaffold-2570-s6-check-netscript-jsr-specifiers",
+  "argv": [
+    "deno",
+    "task",
+    "check:netscript-jsr-specifiers"
+  ],
+  "cwd": ".",
+  "gitHead": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+  "actualGitHead": "1694559bbe827e1bf057b5be65c55a17c34cf37d",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "local-scaffold-2570-s6",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "92a6c48de067b4f64cc03fded8f8a1192555e1c08fadd4fa73ff489720320ac9",
+  "lifecycleId": "local-scaffold-2570-s6:scaffold-2570-s6-check-netscript-jsr-specifiers:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-11-01T14:03:36.581Z",
+  "startedAt": "2026-11-01T14:03:36.583Z",
+  "finishedAt": "2026-11-01T14:03:39.029Z",
+  "durationMs": 2446,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 238,
+    "sha256": "41d2d9f438fb090781c2818e453ebae772a18c10bd35fba0edc638a04b2c62a1",
+    "tail": "ALLOW JSR-NETSCRIPT-VERSION packages/cli/src/kernel/constants/scaffold/scaffold-packages.ts:29 — import-map alias key maps to an exact release target.\nNetScript JSR emitted-specifier guard: scanned=3057 allowances=1 ranges=0 failures=0\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 123,
+    "sha256": "0ac10bb765a1a865f033f09e07fbad36112e9f2695f27a0c1a3bad2bdaef70fa",
+    "tail": "Task check:netscript-jsr-specifiers deno run --allow-read .llm/tools/validation/check-netscript-jsr-specifiers.ts --pretty\n",
+    "truncated": false
+  }
+}

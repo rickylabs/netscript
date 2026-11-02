@@ -1,0 +1,54 @@
+/** Extend this adapter to publish additional committed record events. */
+import { createServiceStreamProducer, defineStreamSchema } from '@netscript/plugin-streams-core';
+import { z } from 'zod';
+import type { RecordActivityPublisher } from '../domain/record-activity.ts';
+
+const ACTIVITY_RECONNECT = { maxAttempts: 2, requestTimeoutMs: 750, initialDelayMs: 50, multiplier: 2, maxDelayMs: 100, jitterRatio: 0 };
+const RECORD_ACTIVITY_PATH = '/scaffold/{{serviceName}}/records';
+const recordActivitySchema = defineStreamSchema({
+  recordActivity: {
+    schema: z.object({
+      id: z.string(),
+      actor: z.object({ name: z.string(), kind: z.enum(['authenticated', 'anonymous']) }),
+      verb: z.enum(['created', 'updated']),
+      recordId: z.string(),
+      reference: z.string(),
+      timestamp: z.iso.datetime(),
+    }),
+    type: 'record-activity',
+    primaryKey: 'id',
+  },
+});
+
+/** An unlinked service remains fully usable without a streams process. */
+export function createRecordActivityPublisher(): RecordActivityPublisher | undefined {
+  if (!Deno.env.get('DURABLE_STREAMS_URL') && !Deno.env.get('services__streams__http__0')) return undefined;
+  // Lazy construction keeps optional stream failures out of service startup and reads.
+  let producer: ReturnType<typeof createServiceStreamProducer<typeof recordActivitySchema>> | undefined;
+  return {
+    async record(verb, record, actor = { name: 'Anonymous', kind: 'anonymous' }) {
+      try {
+        if (producer?.closed) producer = undefined;
+        producer ??= createServiceStreamProducer({
+          streamPath: RECORD_ACTIVITY_PATH,
+          schema: recordActivitySchema,
+          reconnectPolicy: ACTIVITY_RECONNECT,
+          // Sequence numbers restart with a new producer. A fresh lifetime identity
+          // prevents a restart/replacement from deduplicating unrelated new events.
+          producerId: '{{serviceName}}-record-activity-' + crypto.randomUUID(),
+        });
+        const receipt = producer.upsert('recordActivity', {
+          id: crypto.randomUUID(), actor, verb, recordId: String(record.id),
+          reference: record.reference, timestamp: new Date(record.updatedAt).toISOString(),
+        });
+        const outcome = await receipt.completion;
+        if (outcome.status !== 'delivered') {
+          console.error('Record saved, but activity delivery was not confirmed', outcome);
+        }
+      } catch (error) {
+        // The write has committed. A feed outage must not invite a duplicate create retry.
+        console.error('Record saved, but its activity event could not be published', error);
+      }
+    },
+  };
+}

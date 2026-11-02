@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-02T08:47:43.838040+00:00",
+  "scope": "S1 source snapshot, before commit; hashes bind the reviewed working tree",
+  "baseHead": "dcd095c8bb8294a67ff4275aae65c95b5bc66881",
+  "denoVersion": "2.9.7",
+  "sourceHashes": {
+    "docs/site/orchestration-runtime/how-to/add-a-plugin.md": "33e41b3cb8cd71bf9f08f79fd119ef8939380c3003d5b5fec049e353159a20da",
+    "packages/cli/src/kernel/adapters/plugin/plugin-reference-reconciler.ts": "18abe860f359cc8657ca78ac26549376289c7c6e0934648a4c8571ad8032ba82",
+    "packages/cli/src/kernel/adapters/plugin/plugin-reference-reconciler_test.ts": "7698d18e1c022b0c9aaf42f54e315d819c59c076f6d495dda6042955e683152d",
+    "packages/cli/src/local/features/plugins/install/install-local-plugin-command.ts": "94320b7070d00c4c1968c5aa3ef1019b6a814f7ff0c614946b517a286bce8be9",
+    "packages/cli/src/local/features/plugins/install/install-local-plugin.ts": "34e93d9a1dd3d8d011f76deed3182a2cd3bd84e667b335c33d03bcb07facda96",
+    "packages/cli/src/public/domain/plugin-install-plan.ts": "0bc69eff45f51cf5674b80606a50cf783b777562bf23ee4ef967fd5be8527e74",
+    "packages/cli/src/public/features/plugins/install/install-plugin-command.ts": "c01a92b7c36ceb37576de134497aa69904662c2ec8ca042a437b550b32441159",
+    "packages/cli/src/public/features/plugins/install/install-plugin-input.ts": "5466ac4cbfb436693dc54258d9517c75706fd4de1b9fe533939e7553cced7669",
+    "packages/cli/src/public/features/plugins/install/install-plugin.ts": "a39a931a83320c2363ddd59d527dc976eaf9a9089437209df71a686412bb1a4f",
+    "packages/cli/src/public/features/plugins/install/plan-plugin-install.ts": "9da750de638f71d1d9fc91aa43b94120bf8e20ee76039bbee4e63e492f9a9025",
+    "packages/cli/src/public/features/plugins/install/plugin-app-references.ts": "9772918624a9911131821f9bcafce99153df1cf69280f1d1749843d94a12d877",
+    "packages/cli/src/public/features/plugins/install/plugin-app-references_test.ts": "0a58ff4b9852c5104fc50097409899d3c1647bb6accca5e0d800052d305bd57e",
+    "packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts": "b02b55ff9428fb17a10383329ab2c68d9777d7f921994df84835738b3c474cf4",
+    "packages/mcp/src/publish-assets.generated.ts": "8d622405acf96dda5826007f2ce22d61e78263800586409f0bb2615f2f1e6e78",
+    "plugins/workers/bin/runtime.ts": "3038637fe89bc75f689e260e710a92fc7d79121984f07e7ec1937a133f0f5e18",
+    "plugins/workers/src/runtime/seed-sample.ts": "53d1256e91ea88d7b1ecb6fdc78cf033ff23f2727008c18ec4698f028f2bd677",
+    "plugins/workers/tests/runtime/seed-sample_test.ts": "7f9462dc0a2d69b1c200e401a237d1f51bf892ffb0859aeccaccfe043135db2e"
+  },
+  "focusedTests": {
+    "exitCode": 0,
+    "durationMs": 21873,
+    "summary": {
+      "passed": 112,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 112,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "scoped": {
+    "check": {
+      "selection": {
+        "filesSelected": 14,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      }
+    },
+    "lint": {
+      "selection": {
+        "filesSelected": 14,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "coverage": {
+        "filesSelected": 14,
+        "filesProcessed": 14,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    "fmt": {
+      "summary": {
+        "filesSelected": 14,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 14,
+        "filesProcessed": 14,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    }
+  },
+  "actualInstall": {
+    "initial": "orders -> streams",
+    "reinstallWithoutService": "orders -> streams retained"
+  },
+  "runtime": "UNPROVEN locally: Docker daemon unavailable; CI required",
+  "quality": {
+    "gateId": "quality-gate",
+    "invocationId": "scaffold-2591-s1-repair-quality",
+    "gitHead": "dcd095c8bb8294a67ff4275aae65c95b5bc66881",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "startedAt": "2026-11-02T08:46:21.518Z",
+    "finishedAt": "2026-11-02T08:46:34.062Z"
+  }
+}
