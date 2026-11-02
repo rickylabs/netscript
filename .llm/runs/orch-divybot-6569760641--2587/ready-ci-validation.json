@@ -1,0 +1,354 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-02T07:31:16.728122+00:00",
+  "baseHead": "1b3f45970994e8820429c41966fd67af909967db",
+  "scope": "Uncommitted reviewed core CI repair; file hashes below bind evidence to the slice committed with this artifact.",
+  "runtimeAndVisualChanges": false,
+  "denoVersion": "2.9.7",
+  "failedCoreRun": "https://github.com/rickylabs/netscript/actions/runs/41404240146",
+  "reproductionAndFix": {
+    "test-1": {
+      "reproduction": {
+        "exitCode": 1,
+        "summary": {
+          "passed": 19,
+          "failed": 3,
+          "ignored": 0,
+          "totalResults": 22,
+          "uniqueFailures": 3
+        }
+      },
+      "fixed": {
+        "exitCode": 0,
+        "summary": {
+          "passed": 34,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 34,
+          "uniqueFailures": 0
+        }
+      }
+    },
+    "test-2": {
+      "reproduction": {
+        "exitCode": 1,
+        "summary": {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0,
+          "totalResults": 1,
+          "uniqueFailures": 1
+        }
+      },
+      "fixed": {
+        "exitCode": 0,
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 2,
+          "uniqueFailures": 0
+        }
+      }
+    },
+    "test-3": {
+      "reproduction": {
+        "exitCode": 1,
+        "summary": {
+          "passed": 3,
+          "failed": 2,
+          "ignored": 0,
+          "totalResults": 5,
+          "uniqueFailures": 2
+        }
+      },
+      "fixed": {
+        "exitCode": 0,
+        "summary": {
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 5,
+          "uniqueFailures": 0
+        }
+      }
+    },
+    "test-6": {
+      "reproduction": {
+        "exitCode": 1,
+        "summary": {
+          "passed": 2,
+          "failed": 2,
+          "ignored": 0,
+          "totalResults": 4,
+          "uniqueFailures": 2
+        }
+      },
+      "fixed": {
+        "exitCode": 0,
+        "summary": {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 4,
+          "uniqueFailures": 0
+        }
+      }
+    }
+  },
+  "combinedTests": {
+    "exitCode": 0,
+    "durationMs": 40161,
+    "summary": {
+      "passed": 45,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 45,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "scopedWrappers": {
+    "test1-check": {
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      }
+    },
+    "test1-lint": {
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "coverage": {
+        "filesSelected": 1,
+        "filesProcessed": 1,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    "test1-fmt": {
+      "summary": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 1,
+        "filesProcessed": 1,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    "test6-check": {
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      }
+    },
+    "test6-lint": {
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "coverage": {
+        "filesSelected": 1,
+        "filesProcessed": 1,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    "test6-fmt": {
+      "summary": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 1,
+        "filesProcessed": 1,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    }
+  },
+  "qualityGate": {
+    "gateId": "quality-gate",
+    "invocationId": "scaffold-2587-ready-ci-quality",
+    "argv": [
+      "deno",
+      "task",
+      "quality:gate"
+    ],
+    "gitHead": "1b3f45970994e8820429c41966fd67af909967db",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "startedAt": "2026-11-02T07:21:31.400Z",
+    "finishedAt": "2026-11-02T07:21:44.793Z"
+  },
+  "carrierChain": [
+    {
+      "task": "gen:agent-docs-prose",
+      "exitCode": 0,
+      "seconds": 15.0
+    },
+    {
+      "task": "gen:mcp-export-corpus",
+      "exitCode": 0,
+      "seconds": 7.69
+    },
+    {
+      "task": "gen:assets-barrel",
+      "exitCode": 0,
+      "seconds": 1.4
+    },
+    {
+      "task": "gen:publish-assets",
+      "exitCode": 0,
+      "seconds": 0.39
+    }
+  ],
+  "rootCheckTasks": [
+    {
+      "task": "check:desktop-native-fixture",
+      "exitCode": 0,
+      "seconds": 0.15
+    },
+    {
+      "task": "check:emitted-samples",
+      "exitCode": 0,
+      "seconds": 5.33
+    },
+    {
+      "task": "check:streams-types",
+      "exitCode": 0,
+      "seconds": 0.17
+    },
+    {
+      "task": "check:child-health-docs",
+      "exitCode": 0,
+      "seconds": 0.3
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "exitCode": 0,
+      "seconds": 7.33
+    },
+    {
+      "task": "check:assets-barrel",
+      "exitCode": 0,
+      "seconds": 2.46
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0,
+      "seconds": 14.82
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0,
+      "seconds": 0.43
+    },
+    {
+      "task": "check:scaffold-versions",
+      "exitCode": 0,
+      "seconds": 0.11
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "exitCode": 0,
+      "seconds": 0.28
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "exitCode": 0,
+      "seconds": 1.86
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "exitCode": 0,
+      "seconds": 0.27
+    },
+    {
+      "task": "check:figma-names",
+      "exitCode": 0,
+      "seconds": 0.61
+    },
+    {
+      "task": "check:review-threads",
+      "exitCode": 0,
+      "seconds": 0.46
+    },
+    {
+      "task": "check:design-skill",
+      "exitCode": 0,
+      "seconds": 0.11
+    }
+  ],
+  "independentReview": "ready-ci-review.md",
+  "preservedNegativeControls": [
+    "Exact golden inventory and rerun skip counts",
+    "No persistence/pagination/sorting in routers",
+    "Verified actor context forwarded on create/update",
+    "Snapshot isolation and instance isolation on same record",
+    "Anonymous, bearer, cookie-only and insufficient-scope policy",
+    "Concurrent credential isolation and no-store",
+    "Generated missing-record NOT_FOUND"
+  ],
+  "reconcile": "origin/main remains20ba1729ba7b809d90fd4570a82893e5838da807; no merge needed; no rebase or force push.",
+  "files": [
+    {
+      "path": "packages/cli/e2e/tests/application/gates/scaffold/generated-browser-auth-policy_test.ts",
+      "sha256": "0f2449dcd276de336bd37b3b270c38e5cc583c136b06e1c70ccda00d3270378d"
+    },
+    {
+      "path": "packages/cli/src/kernel/adapters/service/fixtures/collapsed-service.json",
+      "sha256": "97517861cc2c7b6ae8493d48aec48f348d12850008a634d972f0c7ce81b787f4"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/embedded.generated.ts",
+      "sha256": "3c3c93a9f2304255b546949eaf02e30b42035575b8943f8aea4a68366844f065"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/service/application/entity.memory_test.ts.template",
+      "sha256": "f02d916912f69ca725da1e7c65b5ee34322bec57c4a87603d84fa03e1d2adfd8"
+    },
+    {
+      "path": "packages/cli/src/kernel/templates/app/route-templates_test.ts",
+      "sha256": "7c6ea9ed5d7d39919797706d7c718e8c14281208cfa334d5e912e8891987272a"
+    }
+  ],
+  "remoteAcceptance": "Pending normal push, core CI and manually dispatched full scaffold runtime at the new head; terminal links belong in PR phase comment and NEW READY issue comment."
+}

@@ -15,3 +15,9 @@ assertion was relaxed. Canonical table CSS/island now accommodates real generate
 Final evaluation added producer lifetime/link-boundary regressions and replaced the ambiguous
 status donut with the existing ChartBlock. Shared runtime gate selection must include real
 record mutation for SQLite as well as PostgreSQL. No health or visual acceptance bar relaxed.
+
+Ready-transition core CI found stale expectations outside the original focused modules.
+The repair remains inside the declared service/template/E2E surface. Scope includes the shipped
+memory application test and canonical embedded carrier; no runtime behavior change or waived
+negative control. Owner's later ready/new-comment instructions supersede original draft/handoff
+only instructions. All historical evidence is retained.

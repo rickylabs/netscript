@@ -89,3 +89,28 @@ The source supervisor's PASS authorizes this sign-off commit. No pending local f
 All owned Aspire endpoints stopped and verified closed; no foreign resource mutation.
 The final-head runtime workflow and PR checks supply remote acceptance; their terminal
 links belong in the PR phase comment and the excluded READY report handoff.
+
+
+## Ready-transition core CI repair
+
+Owner later authorized `gh pr ready 2589`; the PR is ready. Coordinator's exact direction:
+
+> PR 2589 at 1b3f459: DeepSeek cross-family review = MERGE (no blocking findings), but core CI run 41404240146 FAILED shards test-1, test-2, test-3, test-6 (check-test red). Read the failed shard reports, fix the regressions (keep negative controls), push normally (no rebase/force), wait for core CI and full scaffold runtime green at the new head, then post a NEW READY comment on issue 2587 with the full head sha and STOP. Cockpit merges; the 0.0.9 canary.2 cut waits on this.
+
+Read all four failed shard reports and reproduced each failure locally. Updated old Donut and
+plain-handler assertions for the approved chart/context design; made emitted memory instance
+isolation compare the same mutated record across repositories; added actual emitted activity
+files to exact golden inventories; made the fake Prisma schema/data use real model Date fields.
+No runtime source, authentication assertions, persistence guards, or error controls weakened.
+The memory isolation assertion now detects shared mutation instead of inspecting another row.
+Combined45tests PASS. Quality gate, scoped TS check/lint/fmt and four carrier generators PASS.
+Same independent read-only final evaluator is reviewing this slice; all root check tasks running.
+No new visual review required: product UI/rendering files are unchanged from accepted captures.
+
+Independent same-session read-only evaluator returned PASS for all four repairs with no weakened
+controls; report in ready-ci-review.md. All15root check tasks PASS, review threads0unanswered.
+ready-ci-validation.json binds45passing tests, local reproduction/fix receipts, scoped wrappers,
+quality gate, carrier chain and all five product/test files by SHA256. Supervisor reviewed the
+canonical generated change and signs off this slice. origin/main remains20ba1729; no merge needed.
+Next: normal push, core CI, manual full runtime (ordinary unlabeled PR policy skips that workflow),
+then the coordinator-requested NEW READY issue comment with the full head.

@@ -3,7 +3,8 @@ import { createMemory{{serviceName | pascalCase}}Repository } from '../adapters/
 
 Deno.test('{{serviceName}} use-cases page, search and update instance-owned records', async () => {
   const application = create{{serviceName | pascalCase}}Application(createMemory{{serviceName | pascalCase}}Repository());
-  const first = await application.list({ offset: 0, limit: 1, search: ' INTEGRATION ' });
+  const query = { offset: 0, limit: 1, search: ' INTEGRATION ' };
+  const first = await application.list(query);
   if (first.items.length !== 1 || first.total !== 5 || !first.hasMore) {
     throw new Error('Unexpected searched page');
   }
@@ -12,6 +13,9 @@ Deno.test('{{serviceName}} use-cases page, search and update instance-owned reco
     throw new Error('Repository must return snapshots');
   }
   const fresh = create{{serviceName | pascalCase}}Application(createMemory{{serviceName | pascalCase}}Repository());
-  const page = await fresh.list({ offset: 0, limit: 1 });
-  if (page.items[0].status !== 'paid' || !page.hasMore) throw new Error('Instances must be isolated');
+  // Check the mutated record in a new instance, not an unrelated newest seed row.
+  const page = await fresh.list(query);
+  if (page.items[0]?.id !== first.items[0].id || page.items[0]?.status !== first.items[0].status || !page.hasMore) {
+    throw new Error('Instances must be isolated');
+  }
 });

@@ -277,8 +277,9 @@ describe('app route template rendering', () => {
         'RecordTable',
         'CapabilityEmpty',
         'data.totals.records.current',
-        'ChartBlock',
-        'Donut',
+        "<ChartBlock variant='column' valueDisplay='interactive'",
+        "<ChartBlock variant='bar' class='workspace-status-chart'",
+        'label: scaffoldStatuses[item.status].label, value: item.count',
         "import.meta.env.MODE === 'development'",
         'href={appRoutes.design.href()}',
         'href={appRoutes.designComposition.href()}',
@@ -696,10 +697,18 @@ describe('app route template rendering', () => {
       entityName: 'team-member',
     });
     assertStringIncludes(output, 'createTeamMembersV1(application: TeamMembersApplication)');
-    for (const operation of ['list', 'create', 'update', 'delete']) {
+    for (const operation of ['list', 'delete']) {
       assertStringIncludes(output, `v1.teamMembers.${operation}.handler`);
       assertStringIncludes(output, `application.${operation}(`);
     }
+    for (const operation of ['create', 'update']) {
+      assertStringIncludes(
+        output,
+        `v1.teamMembers.$context<ServiceHandlerContext>().${operation}.handler`,
+      );
+    }
+    assertStringIncludes(output, 'application.create(input, actor(context))');
+    assertStringIncludes(output, 'application.update(input.id, input.data, actor(context))');
     assert(!output.includes('@database'));
     assert(!output.includes('context.db'));
   });
