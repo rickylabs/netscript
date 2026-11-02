@@ -23,7 +23,7 @@ const fence = (value: string, language: string): string =>
 const heading = (title: string): string =>
   `<h2 id="${title.toLowerCase().replaceAll(' ', '-')}">${title}</h2>`;
 const assets =
-  `<link rel="stylesheet" href="${PREVIEW_ROOT}docs.css"><script type="module" src="${PREVIEW_ROOT}builder.js"></script>`;
+  `<link rel="stylesheet" href="${PREVIEW_ROOT}docs.css"><script type="module" src="${PREVIEW_ROOT}js/builder.js"></script>`;
 
 function preview(name: string): string {
   return `<p><a href="${PREVIEW_ROOT}preview/?component=${
@@ -157,6 +157,8 @@ export function builderPage(catalog: ComponentCatalog): ReferencePage {
       '<label>Component style<select aria-describedby="style-help" disabled><option>Utility</option></select></label>' +
       '<label>Preview scheme<select data-preview-scheme disabled><option value="system">Follow docs</option><option value="light">Light</option><option value="dark">Dark</option></select></label></div>' +
       '<p id="style-help">Utility is the available component style. Each theme preset supplies its accent, geometry, fonts, density and menu treatment.</p>' +
+      heading('Remaining pickers') +
+      '<p>Only Utility component anatomy is implemented. Styles beyond Utility will become independent choices after S6b ships their registry implementations. Icon library and font family are not independent builder choices yet; the builder uses shipped glyphs and preset fonts. Menu style has no independent field in the current preset resolver. Accent, radius and density also follow the selected fixed preset. Add these pickers only when the resolver can reproduce them; no selection is silently discarded.</p>' +
       '<p>Preview fonts available on this site are self-hosted. Other declared font families use their platform fallback stacks.</p>' +
       '<dl class="ns-builder__values">' +
       ['accent', 'radius', 'fonts', 'density', 'icons', 'menu'].map((key) =>

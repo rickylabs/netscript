@@ -443,13 +443,19 @@ Deno.test('stable workflow recovery bypasses an immutable tag task and reaches a
     const tagConfig = JSON.parse(await Deno.readTextFile(new URL('deno.json', root))) as {
       tasks: Record<string, string>;
       imports?: Record<string, string>;
+      catalog?: Record<string, string>;
     };
     tagConfig.tasks['release:verify-canary-pair'] =
       'deno run --allow-net=api.github.com --allow-env=GH_TOKEN ' +
       '--allow-run=git --allow-read .llm/tools/release/verify-canary-pair.ts';
     await Deno.writeTextFile(
       `${fixture}/deno.json`,
-      JSON.stringify({ tasks: tagConfig.tasks, imports: tagConfig.imports }),
+      // Catalog-backed imports need their declarations even in the isolated historical-task fixture.
+      JSON.stringify({
+        tasks: tagConfig.tasks,
+        imports: tagConfig.imports,
+        catalog: tagConfig.catalog,
+      }),
     );
     const verifierModule = new URL('./verify-canary-pair.ts', import.meta.url).href;
     const releaseModule = new URL('./github-release.ts', import.meta.url).href;

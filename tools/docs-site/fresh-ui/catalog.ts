@@ -48,3 +48,32 @@ export const COMPONENT_STYLES = [{ id: 'style-utility', label: 'Utility' }] as c
 export const COMPONENT_ROOT = '/design-system/components/';
 export const PREVIEW_ROOT = '/assets/fresh-ui/';
 export const DEFAULT_PRESET = 'studio-utility';
+
+/** Browser metadata excludes component documentation and unused token values. */
+export interface PresetCatalog {
+  readonly presets: readonly PresetChoice[];
+}
+
+/** The workspace imports only these examples; other previews load on their own pages. */
+export const WORKSPACE_COMPONENTS = [
+  'stats-grid',
+  'data-table',
+  'card',
+  'checkbox',
+  'switch',
+  'alert',
+  'chart-block',
+] as const;
+
+/** Strip build-only documentation and keep only the effective values shown by the builder. */
+export function presetCatalog(catalog: ComponentCatalog): PresetCatalog {
+  return {
+    presets: catalog.presets.map((preset) => ({
+      ...preset,
+      values: Object.fromEntries(
+        ['radius-control', 'radius-md', 'font-sans', 'font-mono', 'menu-style']
+          .filter((key) => key in preset.values).map((key) => [key, preset.values[key]]),
+      ),
+    })),
+  };
+}

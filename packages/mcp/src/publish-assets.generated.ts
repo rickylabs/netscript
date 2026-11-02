@@ -292,6 +292,7 @@ export const MCP_EMBEDDED_DOCS_PROVENANCE:
       'pages/web-layer/how-to/customize-fresh-ui/index.md',
       'pages/web-layer/how-to/index.md',
       'pages/web-layer/how-to/theme-your-app/index.md',
+      'pages/web-layer/how-to/upgrade-tokens-v2/index.md',
       'pages/web-layer/index.md',
       'pages/web-layer/interactive/index.md',
       'pages/web-layer/layers/index.md',
@@ -306,7 +307,7 @@ export const MCP_EMBEDDED_DOCS_PROVENANCE:
       'pages/web-layer/vite/index.md',
       'pages/why/index.md',
     ],
-    sourceBytes: 3252338,
-    documentCount: 285,
-    sha256: '970ddf91e1ed69e0836001645ac30eb79737167b39d2ee88758342fb65019f50',
+    sourceBytes: 3255695,
+    documentCount: 286,
+    sha256: '560c3a9b57115464d632d9c193bbd6a5f6a995ba4ed159f21fb00bbee55ed942',
   };

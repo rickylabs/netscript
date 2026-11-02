@@ -1,4 +1,4 @@
-import { z } from 'npm:zod@^4.6.5';
+import { z } from 'zod';
 import type { FigmaVariablesPort } from './figma-port.ts';
 import { exportSnapshot } from './snapshot.ts';
 import { importSnapshot } from './import-snapshot.ts';

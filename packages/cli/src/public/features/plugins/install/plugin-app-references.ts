@@ -26,6 +26,39 @@ export async function resolvePluginAppReferences(
     );
   }
   if (request.app !== undefined) return [request.app];
+  return await readInstalledConsumerReferences(request, fs, 'apps') ?? declaredConsumers ?? apps;
+}
+
+/** Explicit service consumers use the same persisted linking edges as package declarations. */
+export async function resolvePluginServiceReferences(
+  request:
+    & Pick<PluginInstallRequest, 'projectRoot' | 'service'>
+    & Partial<Pick<PluginInstallRequest, 'pluginName' | 'overwrite'>>,
+  fs: FileSystemPort,
+  declaredConsumers?: readonly string[],
+): Promise<readonly string[]> {
+  const path = join(request.projectRoot, SCAFFOLD_FILES.APPSETTINGS);
+  const settings: { NetScript?: { Services?: Record<string, { Enabled?: boolean }> } } =
+    await fs.exists(path) ? JSON.parse(await fs.readFile(path)) : {};
+  if (request.service !== undefined) {
+    const service = settings.NetScript?.Services?.[request.service];
+    if (!service || service.Enabled === false) {
+      throw new ScaffoldValidationError(
+        `--service "${request.service}" must name an enabled application service in NetScript.Services.`,
+      );
+    }
+    return [request.service];
+  }
+  return await readInstalledConsumerReferences(request, fs, 'services') ?? declaredConsumers ?? [];
+}
+
+async function readInstalledConsumerReferences(
+  request:
+    & Pick<PluginInstallRequest, 'projectRoot'>
+    & Partial<Pick<PluginInstallRequest, 'pluginName' | 'overwrite'>>,
+  fs: FileSystemPort,
+  section: 'apps' | 'services',
+): Promise<readonly string[] | undefined> {
   if (request.overwrite && request.pluginName) {
     const configured = await readConfiguredPluginDirectories(request.projectRoot, fs);
     const directories = [
@@ -36,10 +69,11 @@ export async function resolvePluginAppReferences(
     for (const directory of new Set(directories)) {
       const manifestPath = join(directory, 'scaffold.plugin.json');
       if (!await fs.exists(manifestPath)) continue;
-      const manifest: { linking?: { consumers?: { apps?: unknown } } } = JSON.parse(
-        await fs.readFile(manifestPath),
-      );
-      const consumers = manifest.linking?.consumers?.apps;
+      const manifest: { linking?: { consumers?: { apps?: unknown; services?: unknown } } } = JSON
+        .parse(
+          await fs.readFile(manifestPath),
+        );
+      const consumers = manifest.linking?.consumers?.[section];
       if (
         Array.isArray(consumers) &&
         consumers.every((value): value is string => typeof value === 'string')
@@ -48,5 +82,5 @@ export async function resolvePluginAppReferences(
       }
     }
   }
-  return declaredConsumers ?? apps;
+  return undefined;
 }

@@ -139,3 +139,15 @@ S3 history reconcile: retained the scoped c0643b9 assistant repair commit as a
 normal merge parent. Its reviewed product diff was already applied in S2; this
 merge introduces no product changes and preserves the independently produced
 implementation history. Parent-only recursive evidence-directory repair stays.
+
+S3 main integration: merged59e6202 normally with no conflicts. Retained #2592
+post-seed lifecycle, #2559 preset/theming/CLI quality ratchet, and #2573 docs
+payload changes. Full carrier chain and Aspire surface manifest regenerated in
+order, all exits0. CLI lint1284files and format1156files pass with zero dropped
+files/refusals. Current-main default control includes agents:220/220identical
+bytes, same destination, no normalization/exclusions. Incoming lock diffs only
+add the root zod dependency inventory already present in origin/main; no package
+version change or local cache/lock cleanup. The prior proof AppHost is stopped.
+
+Next candidate gates are final-source root checks, fresh documented showcase and
+packed build, CI runtime and formal leaf IMPL-EVAL.

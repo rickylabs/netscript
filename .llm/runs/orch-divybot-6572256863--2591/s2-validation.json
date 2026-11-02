@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-02T09:10:52.273867+00:00",
+  "scope": "S2 source candidate; runtime acceptance pending in CI",
+  "denoVersion": "2.9.7",
+  "sourceHashes": {
+    "packages/cli/e2e/src/application/gates/scaffold/documented-scaffold-contract.ts": "233055ec1d98ecf78d08f2149e750f7a870d05bd899106192a864e818e993330",
+    "packages/cli/e2e/src/application/gates/scaffold/verify-documented-scaffold.ts": "29d21819eecbc8f47e4672a2bdee4ebe7f733643b1dfb107a352842d1c592c3b",
+    "packages/cli/e2e/tests/application/gates/scaffold/documented-scaffold_test.ts": "8cc93b21da2c99886f0daa87ea98835d1f43b6275ec4f0bd9aad0f5b18c9b027",
+    "packages/cli/e2e/src/domain/cli-surface.ts": "fb8547310ec32b969853989bf8f6de601e0eea7102c46ea1125ba5eac847c0f5",
+    "packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-gates.ts": "7a39bc1edecfdd5404a33d806b4c7e8a69434f869ea547426fb97fcefbe98d69",
+    "packages/cli/e2e/suites/scaffold/capability-suites.ts": "0a2ed87009e0d207bacf79c52c26cf48d8b84c9d8a6091636efe3e8d7554c8f6",
+    "packages/cli/e2e/tests/presentation/suite-registry_test.ts": "a3c0e2c43a103803b67c5bf9e1c86b1bb047b8c4b3b8fb2a9b263ac2c3dac08e"
+  },
+  "focusedTests": {
+    "exitCode": 0,
+    "durationMs": 1155,
+    "summary": {
+      "passed": 76,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 76,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "scoped": {
+    "check": {
+      "selection": {
+        "filesSelected": 7,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      }
+    },
+    "lint": {
+      "selection": {
+        "filesSelected": 7,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "coverage": {
+        "filesSelected": 7,
+        "filesProcessed": 7,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    "fmt": {
+      "summary": {
+        "filesSelected": 7,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 7,
+        "filesProcessed": 7,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    }
+  },
+  "quality": {
+    "gateId": "quality-gate",
+    "invocationId": "scaffold-2591-s2-quality",
+    "gitHead": "321eca9b9c53d7ac7b12e832d09b9c43c861bde7",
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "runtime": "UNPROVEN until the canonical full CI suite runs this candidate"
+}

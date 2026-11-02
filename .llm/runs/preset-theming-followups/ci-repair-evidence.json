@@ -1,0 +1,50 @@
+{
+  "failedCiRun": 41291048614,
+  "failedCiJob": "check-test-shard (test-1)",
+  "failure": "Release recovery fixture copied imports but omitted catalog.",
+  "checks": [
+    {
+      "evidence": "release-fixture-red",
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "exitCode": 1
+    },
+    {
+      "evidence": "release-fixture-green",
+      "summary": {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 8,
+        "uniqueFailures": 0
+      },
+      "exitCode": 0
+    },
+    {
+      "evidence": "release-fixture-lint",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "exitCode": 0
+    },
+    {
+      "evidence": "release-fixture-fmt",
+      "summary": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "exitCode": 0
+    }
+  ]
+}

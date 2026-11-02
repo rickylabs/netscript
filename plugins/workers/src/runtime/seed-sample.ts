@@ -1,5 +1,6 @@
 import type { JobMessage } from '@netscript/plugin-workers-core/runtime';
 import { z } from 'zod';
+import { basename, dirname, fromFileUrl, join, resolve } from '@std/path';
 
 /** Persistent request written by the scaffold seed, independent of runtime availability. */
 export const seedSampleSchema: z.ZodObject<{
@@ -54,5 +55,66 @@ export async function readSeedSampleRequest(path: URL): Promise<unknown | undefi
   } catch (error) {
     if (error instanceof Deno.errors.NotFound) return undefined;
     throw error;
+  }
+}
+
+/** Watch before reading so seeding an already-running workspace cannot lose its handoff. */
+export async function watchSeedSample(
+  path: URL,
+  ports: SeedSamplePorts,
+  signal: AbortSignal,
+  onReady: () => void = () => {},
+  reportError: (error: unknown) => void = (error) =>
+    console.error('Seed sample dispatch failed; intent remains pending.', error),
+): Promise<void> {
+  if (signal.aborted) return;
+  const markerPath = fromFileUrl(path);
+  let initial = true;
+  let rearm = true;
+  while (rearm && !signal.aborted) {
+    rearm = false;
+    await Deno.mkdir(dirname(markerPath), { recursive: true });
+    const directory = await Deno.realPath(dirname(markerPath));
+    const marker = join(directory, basename(markerPath));
+    using watcher = Deno.watchFs(directory, { recursive: false });
+    const close = () => watcher.close();
+    signal.addEventListener('abort', close, { once: true });
+    try {
+      if (signal.aborted) return;
+      if (initial) {
+        await dispatchSeedSample(ports);
+        initial = false;
+        onReady();
+      } else {
+        await dispatchPublishedSeed(ports, reportError);
+      }
+      for await (const event of watcher) {
+        if (signal.aborted) break;
+        if (
+          event.kind === 'remove' && event.paths.some((changed) => resolve(changed) === directory)
+        ) {
+          rearm = true;
+          break;
+        }
+        // Ignore private candidates and receipts; only published intent is consumable.
+        if (event.paths.some((changed) => resolve(changed) === marker)) {
+          await dispatchPublishedSeed(ports, reportError);
+        }
+      }
+    } finally {
+      signal.removeEventListener('abort', close);
+    }
+  }
+}
+
+/** Optional sample failures preserve intent without taking down a healthy processor. */
+async function dispatchPublishedSeed(
+  ports: SeedSamplePorts,
+  reportError: (error: unknown) => void,
+): Promise<void> {
+  try {
+    await dispatchSeedSample(ports);
+  } catch (error) {
+    reportError(error);
   }
 }

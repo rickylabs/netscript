@@ -33,8 +33,17 @@ export default async function* () {
     manifest.push({ path, sources, sourceSha256: await hash(bytes), sha256: await hash(compiled) });
     return { url: PREVIEW_ROOT + path, content };
   };
-  for (const file of ['catalog.json', 'builder.js', 'preview.js']) {
+  for (const file of ['catalog.json', 'presets.json']) {
     yield { url: PREVIEW_ROOT + file, content: await Deno.readTextFile(new URL(file, output)) };
+  }
+  const bundles: string[] = JSON.parse(
+    await Deno.readTextFile(new URL('bundle-files.json', output)),
+  );
+  for (const file of bundles) {
+    yield {
+      url: PREVIEW_ROOT + 'js/' + file,
+      content: await Deno.readTextFile(new URL('js/' + file, output)),
+    };
   }
   yield await css(
     'components.css',
@@ -71,6 +80,6 @@ export default async function* () {
     internal: true,
     nav_hide: true,
     content:
-      `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fresh UI live preview</title><link rel="stylesheet" href="/styles/fonts.css"><link id="preview-tokens" rel="stylesheet" href="${PREVIEW_ROOT}presets/studio-utility.css"><link rel="stylesheet" href="${PREVIEW_ROOT}components.css"><link rel="stylesheet" href="${PREVIEW_ROOT}preview.css"></head><body><main id="preview"><p>Loading Fresh UI preview…</p></main><script type="module" src="${PREVIEW_ROOT}preview.js"></script></body></html>`,
+      `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fresh UI live preview</title><link rel="stylesheet" href="/styles/fonts.css"><link id="preview-tokens" rel="stylesheet" href="${PREVIEW_ROOT}presets/studio-utility.css"><link rel="stylesheet" href="${PREVIEW_ROOT}components.css"><link rel="stylesheet" href="${PREVIEW_ROOT}preview.css"></head><body><main id="preview"><p>Loading Fresh UI preview…</p></main><script type="module" src="${PREVIEW_ROOT}js/preview.js"></script></body></html>`,
   };
 }

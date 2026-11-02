@@ -156,6 +156,7 @@ export async function installPlugin(
   const plan = await planPluginInstall(planningRequest, {
     fs: dependencies.fs,
     appConsumers: resolvedPlugin?.descriptor.manifest.linking?.consumers.apps,
+    serviceConsumers: resolvedPlugin?.descriptor.manifest.linking?.consumers.services,
     registry,
   });
   const pluginOwned = resolvedPlugin === undefined || dependencies.processRunner === undefined
@@ -269,7 +270,10 @@ export async function installPlugin(
     plugin: rendered.plugin,
   });
   await compileInstalledPluginRegistries(plan.projectRoot, resolvedPlugin, dependencies);
-  await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
+  await reconcilePluginReferences(plan.projectRoot, dependencies.fs, {
+    [rendered.plugin.serviceConfigKey ?? rendered.plugin.configKey]:
+      plan.previousServiceConsumers ?? [],
+  });
   const { written: browserAuthFiles, report: browserAuthReport } = await reconcileBrowserAuth(
     plan.projectRoot,
     dependencies.fs,
@@ -354,6 +358,7 @@ export async function persistPluginMetadata(
           consumers: {
             ...resolvedPlugin.descriptor.manifest.linking?.consumers,
             apps: plan.appReferences,
+            services: plan.serviceConsumers,
           },
         },
       }

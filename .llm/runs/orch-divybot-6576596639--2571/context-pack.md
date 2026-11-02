@@ -11,11 +11,12 @@ private durable Assistant/MCP and canonical sign-in. Default init includes the
 agent bundle and matches all220files at an identical output path. Source21
 scenarios and mounted browser pass; baseline first-send deadlock was RED.
 
-Next: integrate current origin/main59e6202 normally, regenerate carriers and
-Aspire manifest, run all root checks/CLI quality under Deno2.9.7, fresh documented
+Main59e6202 is integrated with both histories; all carriers and the Aspire
+manifest are reconciled. CLI quality passes. Next: run all root checks under
+Deno2.9.7, fresh documented
 showcase and packed build, full scaffold.runtime in CI, formal independent
-IMPL-EVAL, then final handoff. Current live proof app is
-`.llm/tmp/showcase-ready/northwind-ready`; original proof has been stopped.
+IMPL-EVAL, then final handoff. Earlier proof AppHosts are stopped. The next fresh final recipe will own its
+own generated root and resources.
 Docker daemon is unavailable locally; supported Garnet executable works.
 
 No labels/session IDs; milestone0.0.9; Refs-only draft PR. Never rebase/force

@@ -1,7 +1,8 @@
 import { COMPONENT_ROOT, type ComponentCatalog } from './catalog.ts';
 import { DOC_CONTENT_BUDGET } from '../../../packages/mcp/src/domain/docs/doc-retrieval-contract.ts';
 import { documentedItems, inputHash, OUTPUT, registryItems, ROOT } from './generate.ts';
-import { join } from '@std/path';
+import { assertPayloadBudget, PAYLOAD_BUDGETS, payloadBytes } from './payload-budgets.ts';
+import { dirname, join } from '@std/path';
 
 /** Independent freshness verdict for an existing built site, without regenerating its inputs. */
 export function assertCatalogFresh(
@@ -18,7 +19,12 @@ export function assertCatalogFresh(
 }
 
 export async function checkGeneratedSite(): Promise<
-  { components: number; presets: number; maximumPageBytes: number }
+  {
+    components: number;
+    presets: number;
+    maximumPageBytes: number;
+    builderPayload: Awaited<ReturnType<typeof checkBuilderPayload>>;
+  }
 > {
   const catalog: ComponentCatalog = JSON.parse(
     await Deno.readTextFile(join(OUTPUT, 'catalog.json')),
@@ -67,7 +73,46 @@ export async function checkGeneratedSite(): Promise<
     }
   }
   await Deno.stat(join(ROOT, 'docs/site/_site/create/index.html'));
-  return { components: expected.length, presets: catalog.presets.length, maximumPageBytes };
+  return {
+    components: expected.length,
+    presets: catalog.presets.length,
+    maximumPageBytes,
+    builderPayload: await checkBuilderPayload(),
+  };
+}
+
+/** Follow static imports from the builder, preview bootstrap and default workspace chunk. */
+export async function checkBuilderPayload(): Promise<{
+  javascript: { raw: number; gzip: number };
+  presets: { raw: number; gzip: number };
+}> {
+  const root = join(ROOT, 'docs/site/_site/assets/fresh-ui');
+  const files: string[] = JSON.parse(await Deno.readTextFile(join(OUTPUT, 'bundle-files.json')));
+  const workspace = files.find((name) => /^workspace-[^/]+\.js$/.test(name));
+  if (!workspace) throw new Error('Missing split workspace preview');
+  const seen = new Set<string>();
+  const assets: Uint8Array<ArrayBuffer>[] = [];
+  const visit = async (name: string): Promise<void> => {
+    if (seen.has(name)) return;
+    seen.add(name);
+    const bytes = await Deno.readFile(join(root, 'js', name));
+    assets.push(bytes);
+    // Bundle output uses relative ESM imports. Dynamic imports are measured when activated,
+    // except the workspace entry explicitly included above for the default preview.
+    for (
+      const match of new TextDecoder().decode(bytes).matchAll(
+        /(?:from\s*|import\s*)["'](\.[^"']+)["']/g,
+      )
+    ) {
+      await visit(join(dirname(name), match[1]));
+    }
+  };
+  for (const entry of ['builder.js', 'preview.js', workspace]) await visit(entry);
+  const javascript = await payloadBytes(assets);
+  const presets = await payloadBytes([await Deno.readFile(join(root, 'presets.json'))]);
+  assertPayloadBudget('Builder JavaScript', javascript, PAYLOAD_BUDGETS.builderJavaScript);
+  assertPayloadBudget('Builder presets', presets, PAYLOAD_BUDGETS.builderPresets);
+  return { javascript, presets };
 }
 
 if (import.meta.main) {
