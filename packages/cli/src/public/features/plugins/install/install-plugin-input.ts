@@ -4,6 +4,7 @@ import type { PluginInstallRequest } from '../../../domain/plugin-install-plan.t
 export interface InstallPluginCommandInput {
   readonly name?: string;
   readonly app?: string;
+  readonly service?: string;
   readonly port?: number;
   readonly serviceRefs?: string;
   readonly pluginRefs?: string;

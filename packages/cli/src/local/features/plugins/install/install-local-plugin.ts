@@ -124,6 +124,7 @@ export async function installLocalPlugin(
   const plan = await planPluginInstall(planningRequest, {
     fs: dependencies.fs,
     appConsumers: resolvedPlugin?.descriptor.manifest.linking?.consumers.apps,
+    serviceConsumers: resolvedPlugin?.descriptor.manifest.linking?.consumers.services,
     registry,
   });
   const pluginOwned = resolvedPlugin === undefined || dependencies.processRunner === undefined
@@ -243,7 +244,10 @@ export async function installLocalPlugin(
   if (request.dryRun !== true) {
     await compileInstalledPluginRegistries(plan.projectRoot, resolvedPlugin, dependencies);
   }
-  await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
+  await reconcilePluginReferences(plan.projectRoot, dependencies.fs, {
+    [rendered.plugin.serviceConfigKey ?? rendered.plugin.configKey]:
+      plan.previousServiceConsumers ?? [],
+  });
   const { written: browserAuthFiles, report: browserAuthReport } = await reconcileBrowserAuth(
     plan.projectRoot,
     dependencies.fs,

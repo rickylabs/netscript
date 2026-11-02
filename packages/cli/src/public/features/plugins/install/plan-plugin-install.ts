@@ -1,4 +1,7 @@
-import { resolvePluginAppReferences } from './plugin-app-references.ts';
+import {
+  resolvePluginAppReferences,
+  resolvePluginServiceReferences,
+} from './plugin-app-references.ts';
 import { basename, dirname, join } from '@std/path';
 
 import { validateResourceName } from '../../../../kernel/adapters/scaffold/workspace-writer.ts';
@@ -29,6 +32,8 @@ export interface PlanPluginInstallDependencies {
 
   /** Consumer defaults declared by the resolved package manifest. */
   readonly appConsumers?: readonly string[];
+  /** Service consumer defaults declared by the resolved package manifest. */
+  readonly serviceConsumers?: readonly string[];
 
   /** Plugin kind registry. */
   readonly registry?: PluginKindRegistry;
@@ -77,7 +82,18 @@ export async function planPluginInstall(
       dependencies.fs,
       dependencies.appConsumers,
     ),
+    serviceConsumers: await resolvePluginServiceReferences(
+      request,
+      dependencies.fs,
+      dependencies.serviceConsumers,
+    ),
     projectName,
+    previousServiceConsumers: request.service === undefined
+      ? undefined
+      : await resolvePluginServiceReferences(
+        { ...request, service: undefined },
+        dependencies.fs,
+      ),
     dbDetection,
     sagaStoreBackend,
     configuredListenerPorts,

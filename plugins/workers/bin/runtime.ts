@@ -7,8 +7,10 @@
 // Register Redis/Garnet KV adapter before createWorkersServiceRuntime() calls getKv().
 import '@netscript/kv/redis';
 import { createQueue } from '@netscript/queue';
+import { deadline } from '@std/async';
+
 import type { JobMessage } from '@netscript/plugin-workers-core/runtime';
-import { dispatchSeedSample, readSeedSampleRequest } from '../src/runtime/seed-sample.ts';
+import { readSeedSampleRequest, watchSeedSample } from '../src/runtime/seed-sample.ts';
 import { getKv } from '@netscript/kv';
 import type { ChildHealthMonitor, ChildHealthSnapshot } from '@netscript/plugin/health';
 import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
@@ -39,6 +41,8 @@ import { resolveWorkersConcurrency } from '../src/runtime/concurrency.ts';
 import { createWorkersServiceRuntime } from '../services/src/service-runtime.ts';
 import { createStreamMutationHook } from '../streams/server.ts';
 import { Scheduler, Worker } from '../worker/mod.ts';
+
+const SEED_WATCH_SHUTDOWN_MS = 2_000;
 
 /**
  * Register the project's generated jobs into a runtime, failing loudly on a partial load.
@@ -94,7 +98,7 @@ export type StartCombinedProcessOptions =
   & StartWorkerProcessOptions
   & StartSchedulerProcessOptions
   & Readonly<{
-    /** Optional app-owned seed marker consumed after job registration, before listening. */
+    /** App-owned seed marker consumed after registration, including later seed publications. */
     seedHandoff?: URL;
     /** Startup health monitor owned by generated glue. */
     health?: ChildHealthMonitor;
@@ -152,33 +156,11 @@ export async function startCombinedProcess(
   await (await getKv()).get(['netscript', 'child-health', 'workers']);
   options.health?.dependenciesReady();
   const poolRegistry = options.registry ?? generated?.registry;
-  if (options.seedHandoff) {
-    const marker = options.seedHandoff;
-    const kv = await getKv();
-    const receiptKey = (seedId: string) => ['workers', 'seed-sample', seedId];
-    await dispatchSeedSample({
-      readRequest: () => readSeedSampleRequest(marker),
-      accepted: async (seedId) => (await kv.get(receiptKey(seedId)))?.value === true,
-      remember: (seedId) => kv.set(receiptKey(seedId), true),
-      job: async (id) => {
-        const job = await runtime.jobRegistry.get(id);
-        const handler = poolRegistry?.get(id);
-        return job
-          ? {
-            enabled: job.enabled,
-            topic: job.topic,
-            sample: Boolean(handler && Reflect.get(handler, 'scaffoldSample') === true),
-          }
-          : undefined;
-      },
-      enqueue: async (message) => {
-        const queue = createQueue<JobMessage>(
-          options.queueName ?? Deno.env.get('WORKERS_QUEUE') ?? 'jobs',
-        );
-        await queue.enqueue(message);
-      },
-    });
-  }
+  const seedLifetime = new AbortController();
+  const seedSignal = options.signal
+    ? AbortSignal.any([options.signal, seedLifetime.signal])
+    : seedLifetime.signal;
+  let seedWatch: Promise<void> | undefined;
 
   const taskExecutor = createDefaultTaskExecutor();
   const scheduler = new Scheduler({
@@ -198,13 +180,50 @@ export async function startCombinedProcess(
     jobsDir: options.jobsDir ?? Deno.env.get('NETSCRIPT_JOBS_DIR') ?? './workers/jobs',
     workerPoolOptions: poolRegistry ? { registry: poolRegistry } : undefined,
   });
-  await scheduler.start();
   const runtimeHandle = Object.freeze({ scheduler, worker });
   const stop = () => {
     void Promise.all([worker.stop(), scheduler.stop()]).catch(() => options.health?.failed());
   };
   options.signal?.addEventListener('abort', stop, { once: true });
   try {
+    if (options.seedHandoff) {
+      const marker = options.seedHandoff;
+      const kv = await getKv();
+      const receiptKey = (seedId: string) => ['workers', 'seed-sample', seedId];
+      const ready = Promise.withResolvers<void>();
+      seedWatch = watchSeedSample(
+        marker,
+        {
+          readRequest: () => readSeedSampleRequest(marker),
+          accepted: async (seedId) => (await kv.get(receiptKey(seedId)))?.value === true,
+          remember: (seedId) => kv.set(receiptKey(seedId), true),
+          job: async (id) => {
+            const job = await runtime.jobRegistry.get(id);
+            const handler = poolRegistry?.get(id);
+            return job
+              ? {
+                enabled: job.enabled,
+                topic: job.topic,
+                sample: Boolean(handler && Reflect.get(handler, 'scaffoldSample') === true),
+              }
+              : undefined;
+          },
+          enqueue: async (message) => {
+            const queue = createQueue<JobMessage>(
+              options.queueName ?? Deno.env.get('WORKERS_QUEUE') ?? 'jobs',
+            );
+            await queue.enqueue(message);
+          },
+        },
+        seedSignal,
+        ready.resolve,
+      );
+      // Startup validates existing intent; later optional observer failures are reported.
+      void seedWatch.catch((error) => console.error('Seed handoff observer stopped.', error));
+      await Promise.race([ready.promise, seedWatch]);
+    }
+    if (options.signal?.aborted) return runtimeHandle;
+    await scheduler.start();
     options.onStarted?.(async () => {
       const health = await worker.readHealthStatus();
       return { ...health.childHealth, deadLetters: health.deadLetters };
@@ -213,8 +232,15 @@ export async function startCombinedProcess(
     await worker.start();
     return runtimeHandle;
   } finally {
+    seedLifetime.abort();
     options.signal?.removeEventListener('abort', stop);
     await Promise.all([worker.stop(), scheduler.stop()]);
+    if (seedWatch) {
+      await deadline(seedWatch.catch(() => {}), SEED_WATCH_SHUTDOWN_MS)
+        .catch((error) =>
+          console.error('Seed observer shutdown exceeded its drain budget.', error)
+        );
+    }
   }
 }
 

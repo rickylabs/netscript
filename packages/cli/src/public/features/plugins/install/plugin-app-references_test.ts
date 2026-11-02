@@ -1,6 +1,44 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
-import { resolvePluginAppReferences } from './plugin-app-references.ts';
+import {
+  resolvePluginAppReferences,
+  resolvePluginServiceReferences,
+} from './plugin-app-references.ts';
+
+Deno.test('service consumer selection validates before writes and preserves explicit links on reinstall', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/appsettings.json',
+    JSON.stringify({
+      NetScript: { Services: { orders: {}, off: { Enabled: false } } },
+    }),
+  );
+  const before = await fs.readFile('/project/appsettings.json');
+  const request = { projectRoot: '/project', pluginName: 'streams', overwrite: true };
+  assertEquals(await resolvePluginServiceReferences(request, fs), []);
+  assertEquals(
+    await resolvePluginServiceReferences({ ...request, service: 'orders' }, fs, ['other']),
+    ['orders'],
+  );
+  assertEquals(await resolvePluginServiceReferences({ ...request, service: 'orders' }, fs), [
+    'orders',
+  ]);
+  for (const service of ['missing', 'off']) {
+    await assertRejects(
+      () => resolvePluginServiceReferences({ ...request, service }, fs),
+      Error,
+      'must name an enabled application service',
+    );
+  }
+  await fs.writeFile(
+    '/project/streams/scaffold.plugin.json',
+    JSON.stringify({
+      linking: { consumers: { services: ['orders'] } },
+    }),
+  );
+  assertEquals(await resolvePluginServiceReferences(request, fs), ['orders']);
+  assertEquals(await fs.readFile('/project/appsettings.json'), before);
+});
 
 Deno.test('plugin app selection defaults to enabled web apps and supports an explicit app', async () => {
   const fs = new MemoryFileSystemAdapter();

@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-02T09:59:47.581849+00:00",
+  "scope": "S3 runtime workspace-retention repair; final pushed-head CI required",
+  "denoVersion": "2.9.7",
+  "sourceHashes": {
+    ".llm/tools/validation/fixtures/aspire-surface-manifest.tsv": "43536d51c8e80b7c7a3d7f2d077a5eeb6ce66a68429450297775bdb375ca2ee1",
+    "docs/site/orchestration-runtime/how-to/add-a-plugin.md": "33e41b3cb8cd71bf9f08f79fd119ef8939380c3003d5b5fec049e353159a20da",
+    "packages/cli/e2e/src/application/gates/scaffold/documented-scaffold-contract.ts": "dbda6df948c94d60575e0f9d231924dff280ba15d3ec31c3405e8c5f0c53619d",
+    "packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-gates.ts": "825f93d1f20e5656d596634aef2d6789f446d109dcc6e961c438315832f7adc7",
+    "packages/cli/e2e/src/application/gates/scaffold/verify-documented-scaffold.ts": "7e8a54b8a8d75c925bd0a89780184f5ea96056fdd2a76bef6074d29163b01759",
+    "packages/cli/e2e/src/domain/cli-surface.ts": "fb8547310ec32b969853989bf8f6de601e0eea7102c46ea1125ba5eac847c0f5",
+    "packages/cli/e2e/suites/scaffold/capability-suites.ts": "21f7e65fe1e44eef3f3a4483d8f013fc30546c513e9fb88a32a959b1bc08bff6",
+    "packages/cli/e2e/tests/application/gates/scaffold/documented-scaffold_test.ts": "05b4e4e1c8869daea905b357a0375e4b7d495a18df74c581a12dfc34a5eaff2f",
+    "packages/cli/e2e/tests/presentation/suite-registry_test.ts": "a3c0e2c43a103803b67c5bf9e1c86b1bb047b8c4b3b8fb2a9b263ac2c3dac08e",
+    "packages/cli/src/kernel/adapters/plugin/plugin-reference-reconciler.ts": "18abe860f359cc8657ca78ac26549376289c7c6e0934648a4c8571ad8032ba82",
+    "packages/cli/src/kernel/adapters/plugin/plugin-reference-reconciler_test.ts": "7698d18e1c022b0c9aaf42f54e315d819c59c076f6d495dda6042955e683152d",
+    "packages/cli/src/local/features/plugins/install/install-local-plugin-command.ts": "94320b7070d00c4c1968c5aa3ef1019b6a814f7ff0c614946b517a286bce8be9",
+    "packages/cli/src/local/features/plugins/install/install-local-plugin.ts": "34e93d9a1dd3d8d011f76deed3182a2cd3bd84e667b335c33d03bcb07facda96",
+    "packages/cli/src/public/domain/plugin-install-plan.ts": "0bc69eff45f51cf5674b80606a50cf783b777562bf23ee4ef967fd5be8527e74",
+    "packages/cli/src/public/features/plugins/install/install-plugin-command.ts": "c01a92b7c36ceb37576de134497aa69904662c2ec8ca042a437b550b32441159",
+    "packages/cli/src/public/features/plugins/install/install-plugin-input.ts": "5466ac4cbfb436693dc54258d9517c75706fd4de1b9fe533939e7553cced7669",
+    "packages/cli/src/public/features/plugins/install/install-plugin.ts": "a39a931a83320c2363ddd59d527dc976eaf9a9089437209df71a686412bb1a4f",
+    "packages/cli/src/public/features/plugins/install/plan-plugin-install.ts": "9da750de638f71d1d9fc91aa43b94120bf8e20ee76039bbee4e63e492f9a9025",
+    "packages/cli/src/public/features/plugins/install/plugin-app-references.ts": "9772918624a9911131821f9bcafce99153df1cf69280f1d1749843d94a12d877",
+    "packages/cli/src/public/features/plugins/install/plugin-app-references_test.ts": "0a58ff4b9852c5104fc50097409899d3c1647bb6accca5e0d800052d305bd57e",
+    "packages/mcp/src/infrastructure/docs/agent-docs-prose.generated.ts": "b02b55ff9428fb17a10383329ab2c68d9777d7f921994df84835738b3c474cf4",
+    "packages/mcp/src/publish-assets.generated.ts": "8d622405acf96dda5826007f2ce22d61e78263800586409f0bb2615f2f1e6e78",
+    "plugins/workers/bin/runtime.ts": "3038637fe89bc75f689e260e710a92fc7d79121984f07e7ec1937a133f0f5e18",
+    "plugins/workers/src/runtime/seed-sample.ts": "53d1256e91ea88d7b1ecb6fdc78cf033ff23f2727008c18ec4698f028f2bd677",
+    "plugins/workers/tests/runtime/seed-sample_test.ts": "7f9462dc0a2d69b1c200e401a237d1f51bf892ffb0859aeccaccfe043135db2e"
+  },
+  "focusedTests": {
+    "exitCode": 0,
+    "durationMs": 18750,
+    "summary": {
+      "passed": 191,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 191,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "scoped": {
+    "check": {
+      "selection": {
+        "filesSelected": 21,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      }
+    },
+    "lint": {
+      "selection": {
+        "filesSelected": 21,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "coverage": {
+        "filesSelected": 21,
+        "filesProcessed": 21,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    "fmt": {
+      "summary": {
+        "filesSelected": 21,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 21,
+        "filesProcessed": 21,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    }
+  },
+  "rootTypeCheck": {
+    "filesSelected": 4206,
+    "failedBatches": 0
+  },
+  "firstRuntimeAttempt": {
+    "url": "https://github.com/rickylabs/netscript/actions/runs/41418574351",
+    "head": "f82ef33dac6c915d320b0ffd99be24dcc4559263",
+    "outcome": "FAIL",
+    "documentedGateDurationMs": 189693,
+    "seedControl": "PASS: job RED, actual streamed Activity PASS, resident worker preserved",
+    "finding": "Public execution DTO omits correlationId; use correlation-filtered endpoint; canonical fixture cleanup required"
+  },
+  "finalRuntime": "UNPROVEN until the repaired exact-head CI run passes",
+  "repairs": [
+    "Public by-correlation execution endpoint and canonical DTO fixture",
+    "Canonical runtime cleanup for an exact owned AppHost",
+    "Bounded read-side projection convergence",
+    "Explicit Aspire startup budget",
+    "Generated Aspire surface inventory refresh"
+  ],
+  "checkTasks": [
+    {
+      "task": "check:desktop-native-fixture",
+      "exitCode": 0,
+      "durationMs": 150
+    },
+    {
+      "task": "check:emitted-samples",
+      "exitCode": 0,
+      "durationMs": 5416
+    },
+    {
+      "task": "check:streams-types",
+      "exitCode": 0,
+      "durationMs": 183
+    },
+    {
+      "task": "check:child-health-docs",
+      "exitCode": 0,
+      "durationMs": 296
+    },
+    {
+      "task": "check:mcp-export-corpus",
+      "exitCode": 0,
+      "durationMs": 7610
+    },
+    {
+      "task": "check:assets-barrel",
+      "exitCode": 0,
+      "durationMs": 2418
+    },
+    {
+      "task": "check:agent-docs-prose",
+      "exitCode": 0,
+      "durationMs": 14927
+    },
+    {
+      "task": "check:publish-assets",
+      "exitCode": 0,
+      "durationMs": 436
+    },
+    {
+      "task": "check:scaffold-versions",
+      "exitCode": 0,
+      "durationMs": 104
+    },
+    {
+      "task": "check:aspire-version-parity",
+      "exitCode": 0,
+      "durationMs": 246
+    },
+    {
+      "task": "check:netscript-jsr-specifiers",
+      "exitCode": 0,
+      "durationMs": 1769
+    },
+    {
+      "task": "check:aspire-host-ports",
+      "exitCode": 0,
+      "durationMs": 253
+    },
+    {
+      "task": "check:figma-names",
+      "exitCode": 0,
+      "durationMs": 570
+    },
+    {
+      "task": "check:review-threads",
+      "exitCode": 0,
+      "durationMs": 502
+    },
+    {
+      "task": "check:design-skill",
+      "exitCode": 0,
+      "durationMs": 102
+    }
+  ],
+  "qualityGate": {
+    "gateId": "quality-gate",
+    "gitHead": "41fb51d1bcf48094b57265c87020654725ed2784",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "durationMs": 13802,
+    "requestHash": "ea46f8883f3889ca95f69a9367b62984a4abb9fab1e0497d19f753172cd2b46f"
+  },
+  "carrierChain": {
+    "tasks": [
+      "gen:agent-docs-prose",
+      "gen:mcp-export-corpus",
+      "gen:assets-barrel",
+      "gen:publish-assets"
+    ],
+    "result": "PASS; owning check tasks pass and no generated drift"
+  },
+  "independentReview": {
+    "verdict": "PASS",
+    "model": "claude-opus-5",
+    "effortRequested": "xhigh",
+    "effortAttestation": "not available",
+    "scope": "S1, S2 and S3 source/slice PASS; final exact-head live evidence still required",
+    "report": "s2-review.md",
+    "reports": [
+      "s1-review.md",
+      "s2-review.md",
+      "s3-review.md"
+    ]
+  },
+  "s3Repair": {
+    "focused": {
+      "passed": 31,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 31,
+      "uniqueFailures": 0
+    },
+    "scopedFiles": 1,
+    "check": "PASS",
+    "lint": "PASS; coverage 1/1",
+    "fmt": "PASS; coverage 1/1",
+    "runtimeAttempt": {
+      "run": "https://github.com/rickylabs/netscript/actions/runs/41423746948",
+      "head": "650fb2ed00389105ebe6cb242a212c827f4c1309",
+      "outcome": "FAIL",
+      "seedControl": "PASS: missing seed handoff RED, real stream/HTML Activity PASS, resident worker preserved",
+      "cleanup": "PASS: exact AppHost stopped; no owned containers; foreign/unproven containers 0",
+      "failure": "Recursive generated workspace removal raised filesystem PermissionDenied after successful runtime cleanup",
+      "repair": "Retain generated scratch after canonical runtime cleanup; reduce success logging so all variant receipts survive bounded output"
+    },
+    "sourceReview": "PASS; s3-review.md",
+    "qualityGate": {
+      "gitHead": "650fb2ed00389105ebe6cb242a212c827f4c1309",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 13195
+    }
+  }
+}

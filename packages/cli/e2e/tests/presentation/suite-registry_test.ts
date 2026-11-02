@@ -522,6 +522,7 @@ Deno.test('runtime database overrides preserve service health and the Postgres g
   }
 
   const postgresOnly = new Set<GateId>([
+    GATE.BEHAVIOR_DOCUMENTED_SCAFFOLD,
     GATE.DATABASE_MIGRATION_ARTIFACTS,
     GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
     GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
@@ -559,6 +560,7 @@ Deno.test('runtime database overrides preserve service health and the Postgres g
     sqliteCapability.gates,
     runtimeCapability.gates.filter((gate) =>
       !(new Set<GateId>([
+        GATE.BEHAVIOR_DOCUMENTED_SCAFFOLD,
         GATE.DATABASE_MIGRATION_ARTIFACTS,
         GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
         GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,

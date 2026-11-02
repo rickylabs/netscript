@@ -2,6 +2,33 @@ import { assertEquals } from '@std/assert';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { reconcilePluginReferences } from './plugin-reference-reconciler.ts';
 
+Deno.test('explicit service reselection revokes only earlier managed consumer edges', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/appsettings.json',
+    JSON.stringify({
+      NetScript: {
+        Plugins: { 'event-relay': {}, other: {} },
+        Services: {
+          catalog: { PluginReferences: ['event-relay', 'other'] },
+          inventory: {},
+          manual: { PluginReferences: ['event-relay'] },
+        },
+      },
+    }),
+  );
+  await writeThirdPartyDeclaration(fs);
+  const path = '/project/plugins/acme-deploy-events/scaffold.plugin.json';
+  const manifest = JSON.parse(await fs.readFile(path));
+  manifest.linking.consumers.services = ['inventory'];
+  await fs.writeFile(path, JSON.stringify(manifest));
+  await reconcilePluginReferences('/project', fs, { 'event-relay': ['catalog'] });
+  const { Services } = JSON.parse(await fs.readFile('/project/appsettings.json')).NetScript;
+  assertEquals(Services.catalog.PluginReferences, ['other']);
+  assertEquals(Services.inventory.PluginReferences, ['event-relay']);
+  assertEquals(Services.manual.PluginReferences, ['event-relay']);
+});
+
 Deno.test('reconcilePluginReferences omits dangling dependencies and adds every producer edge', async () => {
   const fs = new MemoryFileSystemAdapter();
   await writeAppsettings(fs, false);
@@ -43,15 +70,21 @@ Deno.test('reconcilePluginReferences maps canonical dependencies to renamed inst
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(
     '/project/appsettings.json',
-    `${JSON.stringify({
-      NetScript: {
-        Plugins: {
-          'workers-api': { Enabled: true },
-          'durable-state': { Enabled: true },
+    `${
+      JSON.stringify(
+        {
+          NetScript: {
+            Plugins: {
+              'workers-api': { Enabled: true },
+              'durable-state': { Enabled: true },
+            },
+            BackgroundProcessors: { jobs: { Enabled: true } },
+          },
         },
-        BackgroundProcessors: { jobs: { Enabled: true } },
-      },
-    }, null, 2)}\n`,
+        null,
+        2,
+      )
+    }\n`,
   );
   await writeDeclaration(fs, 'jobs', 'workers-api', ['streams'], [], 'workers');
   await writeDeclaration(fs, 'durable-state', 'streams', [], [], 'streams');
@@ -69,18 +102,24 @@ Deno.test('reconcilePluginReferences uses configured modules and accepts service
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(
     '/project/appsettings.json',
-    `${JSON.stringify({
-      NetScript: {
-        Plugins: {
-          'workers-api': { Enabled: true },
-          'triggers-api': { Enabled: true },
+    `${
+      JSON.stringify(
+        {
+          NetScript: {
+            Plugins: {
+              'workers-api': { Enabled: true },
+              'triggers-api': { Enabled: true },
+            },
+            BackgroundProcessors: {
+              workers: { Enabled: true },
+              triggers: { Enabled: true },
+            },
+          },
         },
-        BackgroundProcessors: {
-          workers: { Enabled: true },
-          triggers: { Enabled: true },
-        },
-      },
-    }, null, 2)}\n`,
+        null,
+        2,
+      )
+    }\n`,
   );
   await fs.writeFile(
     '/project/netscript.config.ts',
@@ -112,39 +151,51 @@ Deno.test('reconcilePluginReferences wires a fixture third-party plugin to decla
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(
     '/project/appsettings.json',
-    `${JSON.stringify({
-      NetScript: {
-        Plugins: { 'event-relay': { Enabled: true } },
-        BackgroundProcessors: {},
-        Services: { catalog: { Enabled: true }, inventory: { Enabled: true } },
-        Apps: { dashboard: { Type: 'app' }, admin: { Type: 'app' } },
-      },
-    }, null, 2)}\n`,
+    `${
+      JSON.stringify(
+        {
+          NetScript: {
+            Plugins: { 'event-relay': { Enabled: true } },
+            BackgroundProcessors: {},
+            Services: { catalog: { Enabled: true }, inventory: { Enabled: true } },
+            Apps: { dashboard: { Type: 'app' }, admin: { Type: 'app' } },
+          },
+        },
+        null,
+        2,
+      )
+    }\n`,
   );
   await fs.writeFile(
     '/project/plugins/acme-deploy-events/scaffold.plugin.json',
-    `${JSON.stringify({
-      schemaVersion: 1,
-      name: '@acme/deploy-events',
-      version: '1.0.0',
-      displayName: 'Deploy events',
-      description: 'Fixture third-party plugin for declared host linking.',
-      peerDependencies: {},
-      capabilities: {
-        hasDatabaseMigrations: false,
-        hasRoutes: true,
-        hasBackgroundWorkers: false,
-      },
-      scaffolder: {
-        export: './scaffold',
-        requiredPermissions: { net: [], read: [], write: [] },
-      },
-      linking: {
-        canonicalName: 'deploy-events',
-        resourceConfigKey: 'event-relay',
-        consumers: { services: ['catalog'], apps: ['dashboard'] },
-      },
-    }, null, 2)}\n`,
+    `${
+      JSON.stringify(
+        {
+          schemaVersion: 1,
+          name: '@acme/deploy-events',
+          version: '1.0.0',
+          displayName: 'Deploy events',
+          description: 'Fixture third-party plugin for declared host linking.',
+          peerDependencies: {},
+          capabilities: {
+            hasDatabaseMigrations: false,
+            hasRoutes: true,
+            hasBackgroundWorkers: false,
+          },
+          scaffolder: {
+            export: './scaffold',
+            requiredPermissions: { net: [], read: [], write: [] },
+          },
+          linking: {
+            canonicalName: 'deploy-events',
+            resourceConfigKey: 'event-relay',
+            consumers: { services: ['catalog'], apps: ['dashboard'] },
+          },
+        },
+        null,
+        2,
+      )
+    }\n`,
   );
 
   await reconcilePluginReferences('/project', fs);
@@ -159,14 +210,20 @@ Deno.test('third-party linking converges when consumers arrive later and cleans 
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(
     '/project/appsettings.json',
-    `${JSON.stringify({
-      NetScript: {
-        Plugins: { 'event-relay': { Enabled: true } },
-        BackgroundProcessors: {},
-        Services: {},
-        Apps: {},
-      },
-    }, null, 2)}\n`,
+    `${
+      JSON.stringify(
+        {
+          NetScript: {
+            Plugins: { 'event-relay': { Enabled: true } },
+            BackgroundProcessors: {},
+            Services: {},
+            Apps: {},
+          },
+        },
+        null,
+        2,
+      )
+    }\n`,
   );
   await writeThirdPartyDeclaration(fs);
 
@@ -182,7 +239,10 @@ Deno.test('third-party linking converges when consumers arrive later and cleans 
   assertEquals(linked.Apps.dashboard.PluginReferences, ['event-relay']);
 
   delete linked.Plugins['event-relay'];
-  await fs.writeFile('/project/appsettings.json', `${JSON.stringify({ NetScript: linked }, null, 2)}\n`);
+  await fs.writeFile(
+    '/project/appsettings.json',
+    `${JSON.stringify({ NetScript: linked }, null, 2)}\n`,
+  );
   await fs.remove('/project/plugins/acme-deploy-events');
   await reconcilePluginReferences('/project', fs);
   const removed = JSON.parse(await fs.readFile('/project/appsettings.json')).NetScript;
@@ -193,28 +253,34 @@ Deno.test('third-party linking converges when consumers arrive later and cleans 
 async function writeThirdPartyDeclaration(fs: MemoryFileSystemAdapter): Promise<void> {
   await fs.writeFile(
     '/project/plugins/acme-deploy-events/scaffold.plugin.json',
-    `${JSON.stringify({
-      schemaVersion: 1,
-      name: '@acme/deploy-events',
-      version: '1.0.0',
-      displayName: 'Deploy events',
-      description: 'Fixture third-party plugin for declared host linking.',
-      peerDependencies: {},
-      capabilities: {
-        hasDatabaseMigrations: false,
-        hasRoutes: true,
-        hasBackgroundWorkers: false,
-      },
-      scaffolder: {
-        export: './scaffold',
-        requiredPermissions: { net: [], read: [], write: [] },
-      },
-      linking: {
-        canonicalName: 'deploy-events',
-        resourceConfigKey: 'event-relay',
-        consumers: { services: ['catalog'], apps: ['dashboard'] },
-      },
-    }, null, 2)}\n`,
+    `${
+      JSON.stringify(
+        {
+          schemaVersion: 1,
+          name: '@acme/deploy-events',
+          version: '1.0.0',
+          displayName: 'Deploy events',
+          description: 'Fixture third-party plugin for declared host linking.',
+          peerDependencies: {},
+          capabilities: {
+            hasDatabaseMigrations: false,
+            hasRoutes: true,
+            hasBackgroundWorkers: false,
+          },
+          scaffolder: {
+            export: './scaffold',
+            requiredPermissions: { net: [], read: [], write: [] },
+          },
+          linking: {
+            canonicalName: 'deploy-events',
+            resourceConfigKey: 'event-relay',
+            consumers: { services: ['catalog'], apps: ['dashboard'] },
+          },
+        },
+        null,
+        2,
+      )
+    }\n`,
   );
 }
 
@@ -241,16 +307,22 @@ async function writeAppsettings(
   if (includeStreams) plugins.streams = { Enabled: true };
   await fs.writeFile(
     '/project/appsettings.json',
-    `${JSON.stringify({
-      NetScript: {
-        Plugins: plugins,
-        BackgroundProcessors: existing?.BackgroundProcessors ?? {
-          workers: { Enabled: true },
-          sagas: { Enabled: true },
-          triggers: { Enabled: true },
+    `${
+      JSON.stringify(
+        {
+          NetScript: {
+            Plugins: plugins,
+            BackgroundProcessors: existing?.BackgroundProcessors ?? {
+              workers: { Enabled: true },
+              sagas: { Enabled: true },
+              triggers: { Enabled: true },
+            },
+          },
         },
-      },
-    }, null, 2)}\n`,
+        null,
+        2,
+      )
+    }\n`,
   );
 }
 
@@ -264,14 +336,20 @@ async function writeDeclaration(
 ): Promise<void> {
   await fs.writeFile(
     `/project/${canonicalName}/scaffold.plugin.json`,
-    `${JSON.stringify({
-      officialSource: {
-        canonicalName: manifestCanonicalName,
-        serviceConfigKey,
-        dependencies,
-        pluginReferences,
-      },
-    }, null, 2)}\n`,
+    `${
+      JSON.stringify(
+        {
+          officialSource: {
+            canonicalName: manifestCanonicalName,
+            serviceConfigKey,
+            dependencies,
+            pluginReferences,
+          },
+        },
+        null,
+        2,
+      )
+    }\n`,
   );
 }
 
