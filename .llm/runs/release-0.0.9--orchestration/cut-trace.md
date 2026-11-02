@@ -59,3 +59,4 @@ Captured live from `git log origin/main --first-parent` during the run. Baseline
 | 2026-10-31 20:05 | `43aa891ec` | — | — | canary 0.0.9-canary.N | **cut** on Eric's direct approval: coordinator dispatched release-canary.yml run 41237263834 |
 | 2026-10-31 21:40 | `f4aa307b5` | — | — | canary 0.0.9-canary.N | **re-cut** on Eric's approval after the #2549 fix: release-canary run 41244658746 |
 | 2026-10-31 22:05 | `f4aa307b5` | — | — | **0.0.9-canary.1 published** | run 41244658746 success; canary-pair success; e2e-cli-prod 41245117092 success; #2396 published-graph proof passed |
+| 2026-11-02T09:36:54Z | #2594 (fix #2593) | 57cff00d8 | b3c15fa58 | VERDICT MERGE (DeepSeek, Cockpit) + full CI incl. e2e-cli |
