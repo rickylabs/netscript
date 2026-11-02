@@ -1,48 +1,57 @@
-import { Button, PageHeader, StatsGrid } from '@app/components/ui/mod.ts';
-import { appTheme } from '@app/lib/theme.ts';
-import type { ScaffoldCapability, ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
+import { Badge, Button, ChartBlock, Donut, PageHeader, Progress, StatsGrid } from '@app/components/ui/mod.ts';
+import { scaffoldAmount, scaffoldDate, scaffoldInitials, scaffoldRecordCount, scaffoldStatuses, type ScaffoldCapability, type ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
 import { appRoutes } from '@app/router.ts';
-import { generatedPageCount } from '@app/navigation.ts';
 import { CapabilityEmpty } from './capability-empty.tsx';
 import { RecordTable } from './record-table.tsx';
-
-import type { ScaffoldOverview } from '@app/lib/scaffold-projections.ts';
+import { SCAFFOLD_PERIOD_DAYS, scaffoldWeeklyCounts, type ScaffoldMetric, type ScaffoldOverview } from '@app/lib/scaffold-projections.ts';
 
 interface DashboardProps {
   readonly overview: ScaffoldOverview;
   readonly records: ScaffoldRecords;
   readonly capabilities: readonly ScaffoldCapability[];
+  readonly locale?: string;
 }
 
-/** Utility overview composed from generated routes and live capability results. */
-export default function DashboardView({ records, overview, capabilities }: DashboardProps) {
-  const activity = capabilities.find((item) => item.id === 'streams')!;
+/** Direction is explicit; ordinary declines are neutral, with red reserved for failures. */
+function MetricDelta({ metric, inverse = false, points = false, locale }: { metric: ScaffoldMetric; inverse?: boolean; points?: boolean; locale?: string }) {
+  const change = points ? metric.delta : metric.percentChange;
+  const tone = metric.delta > 0 && !inverse ? 'success' : 'neutral';
+  return <><span class='workspace-delta' data-tone={tone}>{change === null ? 'New' : `${metric.delta > 0 ? '↗' : metric.delta < 0 ? '↘' : '—'} ${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(Math.abs(change))}${points ? ' pts' : '%'}`}</span> <span>vs. previous {SCAFFOLD_PERIOD_DAYS} days</span></>;
+}
+
+/** Real period totals, daily volume and current statuses share the complete service projection. */
+export default function DashboardView({ records, overview, capabilities, locale }: DashboardProps) {
+  const data = overview.state === 'ready' || overview.state === 'empty' ? overview : undefined;
+  const streams = capabilities.find((item) => item.id === 'streams');
+  const workers = capabilities.find((item) => item.id === 'workers');
+  const recent = { ...records, rows: data?.latest ?? records.rows.slice(0, 5) };
   return <div class='workspace-page'>
-    <PageHeader class='workspace-heading'><PageHeader.Layout><PageHeader.Main><PageHeader.Intro>
-      <h1>Overview</h1><p>Your records and activity, in one place.</p>
-    </PageHeader.Intro></PageHeader.Main><PageHeader.Actions>
-      <Button type='link' href={appRoutes.records.href()}>View records</Button>
+    <PageHeader class='workspace-heading'><PageHeader.Layout><PageHeader.Main><PageHeader.Intro><h1>Overview</h1><p>Records, amounts and activity for the last {SCAFFOLD_PERIOD_DAYS} days.</p></PageHeader.Intro></PageHeader.Main><PageHeader.Actions>
+      <Button type='link' variant='outline' href={appRoutes.records.href() + '#record-export'}>↓ Export records</Button>{ {{hasService}} && <Button type='link' href={appRoutes.serviceExample.href()}>Open service ↗</Button>}
     </PageHeader.Actions></PageHeader.Layout></PageHeader>
-    <nav class='workspace-tabs' aria-label='Overview sections'>
-      <a href={appRoutes.dashboard.href()} aria-current='page'>Overview</a>
-      <a href={appRoutes.records.href()}>Records {records.total !== undefined && <span>{records.total}</span>}</a>
-      <a href={appRoutes.settings.href()}>Settings</a>
-    </nav>
-    <StatsGrid class='workspace-stats'>
-      <StatsGrid.Card label='Records' value={records.total ?? '—'} detail={records.total === undefined ? 'No connected record count' : 'From your service'} />
-      <StatsGrid.Card label='Pages' value={generatedPageCount()} detail='Available in this application' />
-      <StatsGrid.Card label='Workspace' value='{{name}}' detail='{{appName}}' class='workspace-stat-text' />
-      <StatsGrid.Card label='Theme' value={appTheme().label} detail='Light and dark appearance' class='workspace-stat-text' />
-    </StatsGrid>
+    <nav class='workspace-tabs' aria-label='Overview sections'><a href={appRoutes.dashboard.href()} aria-current='page'>Overview</a><a href={appRoutes.records.href()}>Records {records.total !== undefined && <span>{records.total}</span>}</a><a href={appRoutes.health.href()}>System health</a></nav>
+    {data ? <>
+      <StatsGrid class='workspace-stats'>
+        {data.totals.currencies.map((entry) => <StatsGrid.Card key={entry.currency} label={`Total amount · ${entry.currency}`} value={scaffoldAmount(entry.amount.current, entry.currency, locale)} detail={<MetricDelta metric={entry.amount} locale={locale} />} />)}
+        <StatsGrid.Card label='Records' value={new Intl.NumberFormat(locale).format(data.totals.records.current)} detail={<MetricDelta metric={data.totals.records} locale={locale} />} />
+        {data.totals.currencies.map((entry) => <StatsGrid.Card key={entry.currency} label={`Average amount · ${entry.currency}`} value={scaffoldAmount(entry.averageAmount.current, entry.currency, locale)} detail={<MetricDelta metric={entry.averageAmount} locale={locale} />} />)}
+        <StatsGrid.Card label='Refund rate' value={new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(data.totals.refundRate.current) + '%'} detail={<MetricDelta metric={data.totals.refundRate} points inverse locale={locale} />} />
+      </StatsGrid>
+      <div class='workspace-overview-grid workspace-charts'>
+        <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Records by week</h2><p>{scaffoldRecordCount(data.totals.records.current, locale)} created · 7-day groups, final group 2 days · UTC</p></div><Badge variant='muted'>Last {SCAFFOLD_PERIOD_DAYS} days</Badge></header>
+          <ChartBlock variant='column' valueDisplay='interactive' aria-label='Weekly record counts for the current 30-day period; final group contains two days' unit=' records' data={scaffoldWeeklyCounts(data.daily.slice(-SCAFFOLD_PERIOD_DAYS)).map((week) => ({ label: new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', timeZone: 'UTC' }).formatRange(new Date(week.from), new Date(week.to)), value: week.count, tone: 'secondary' }))} />
+        </section>
+        <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Status breakdown</h2><p>All records in your workspace</p></div></header><Donut class='workspace-status-chart' total={data.statusCounts.reduce((total, item) => total + item.count, 0)} aria-label='Record status breakdown' data={data.statusCounts.filter((item) => item.count > 0).map((item) => ({ label: `${scaffoldStatuses[item.status].label} · ${item.count}`, value: item.count, tone: item.status === 'paid' ? 'success' : item.status === 'cancelled' ? 'secondary' : item.status === 'awaiting_payment' ? 'warning' : item.status === 'shipped' ? 'primary' : 'secondary' }))} />{data.state === 'empty' && <p class='workspace-muted'>Create your first record to see its status here.</p>}</section>
+      </div>
+    </> : <CapabilityEmpty capability={{ id: 'overview', label: 'Record summary', state: overview.state, description: overview.message, command: 'command' in overview ? overview.command : undefined }} />}
     <div class='workspace-overview-grid'>
-      <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Recent records</h2><p>The latest records from your connected service.</p></div><a href={appRoutes.records.href()}>View all records <span aria-hidden='true'>→</span></a></header>
-        <RecordTable records={{ ...records, rows: overview.state === 'ready' || overview.state === 'empty' ? overview.latest : records.rows.slice(0, 5) }} />
+      <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Recent records</h2><p>{data ? 'The latest records across your workspace.' : 'Available records from the current page.'}</p></div><a href={appRoutes.records.href()}>View all records →</a></header><RecordTable records={recent} compact locale={locale} /></section>
+      <section class='workspace-section' data-capability={streams?.id} data-capability-state={streams?.state}><header class='workspace-section-heading'><div><h2>Activity</h2><p>{streams && streams.state !== 'absent' && streams.state !== 'installed-unwired' ? 'Connected stream events' : 'Latest record changes'}</p></div></header>
+        {streams && streams.state !== 'absent' && streams.state !== 'installed-unwired' ? streams.items?.length ? <ol class='workspace-activity'>{streams.items.map((item, index) => <li key={index}><span class='workspace-avatar' aria-hidden='true'>↗</span><div><div class='workspace-job-heading'><strong>{item.label}</strong>{item.state && <Badge variant={item.state === 'completed' ? 'success' : item.state === 'failed' ? 'destructive' : 'muted'}>{item.state}</Badge>}</div><p>{item.detail}</p>{item.timestamp && <time dateTime={item.timestamp}>{scaffoldDate(item.timestamp, locale, true)}</time>}</div></li>)}</ol> : <CapabilityEmpty capability={streams} /> : data?.changes.length ? <ol class='workspace-activity'>{data.changes.map((row) => <li key={row.id}><span class='workspace-avatar' aria-hidden='true'>{scaffoldInitials(row.ownerName)}</span><div><a href={appRoutes.record.href({ path: { id: row.id } })}><strong>{row.ownerName}</strong> · {row.reference}</a><p>{scaffoldStatuses[row.status].label} · {scaffoldAmount(row.amount, row.currency, locale)}</p><time dateTime={row.updatedAt}>{scaffoldDate(row.updatedAt, locale, true)}</time></div></li>)}</ol> : data ? <p class='workspace-muted'>Record changes will appear after your first record is created.</p> : <CapabilityEmpty capability={{ id: 'record-changes', label: 'Record activity unavailable', state: overview.state, description: overview.message }} />}
+        {streams?.state === 'installed-unwired' && <CapabilityEmpty capability={streams} />}
       </section>
-      <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Activity</h2><p>Updates from your workspace.</p></div></header><CapabilityEmpty capability={activity} /></section>
     </div>
-    <section class='workspace-section'><header class='workspace-section-heading'><div><h2>Workspace capabilities</h2><p>Add what your application needs.</p></div></header><div class='workspace-capabilities'>
-      {capabilities.filter((item) => ['workers', 'ai'].includes(item.id)).map((capability) => <CapabilityEmpty key={capability.id} capability={capability} />)}
-    </div></section>
+    {workers && <section class='workspace-section' data-capability={workers.id} data-capability-state={workers.state}><header class='workspace-section-heading'><div><h2>Background work</h2><p>Jobs from your connected workers.</p></div></header>{workers.items?.length ? <><p class='workspace-muted'>{workers.description}</p><div class='workspace-jobs'>{workers.items.map((job) => <article class='workspace-job' key={job.label}><div class='workspace-job-heading'><strong>{job.label}</strong><Badge variant={job.state === 'completed' ? 'success' : job.state === 'failed' ? 'destructive' : job.state === 'running' ? 'info' : 'muted'}>{job.state?.replaceAll('_', ' ') ?? 'Registered'}</Badge></div><p>{job.detail}</p>{typeof job.progress === 'number' ? <><Progress value={job.progress} label={`${job.label} progress`} variant={job.state === 'failed' ? 'destructive' : job.state === 'completed' ? 'success' : 'primary'} /><span class='workspace-job-meta'>{job.progress}% reported</span></> : <span class='workspace-job-meta'>Progress not reported</span>}{job.timestamp && <time class='workspace-job-meta' dateTime={job.timestamp}>{scaffoldDate(job.timestamp, locale, true)}</time>}</article>)}</div></> : <CapabilityEmpty capability={workers} />}</section>}
     {import.meta.env.MODE === 'development' && <footer class='workspace-reference'><a href={appRoutes.design.href()}>Design reference</a><a href={appRoutes.designComposition.href()}>Composition guide</a></footer>}
   </div>;
 }

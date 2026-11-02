@@ -1,36 +1,250 @@
 /** App-owned view for unknown query payloads: semantic lists and fields, never a JSON dump. */
 export const QUERY_RESULT_TEMPLATE: string = `
-/** Replace this generic field view with your domain's columns and actions. */
-function QueryResult({ value }: { value: unknown }): VNode {
-  if (value === null || value === undefined) {
-    return <p class='text-ns-muted-fg'>No value</p>;
+function fieldLabel(value: string): string {
+  return value.replace(/([a-z])([A-Z])/g, '$1 $2').replaceAll('_', ' ');
+}
+function isFieldRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value) &&
+    !(value instanceof Date);
+}
+/** Amount units are explicit; unknown service contracts retain their raw numeric value. */
+type AmountUnit = 'minor' | 'major';
+function RichRecordValue(
+  { row, field, amountUnit }: {
+    row: Record<string, unknown>;
+    field: string;
+    amountUnit?: AmountUnit;
+  },
+): VNode {
+  if (field === 'amount' && typeof row.amount === 'number' && typeof row.currency === 'string') {
+    if (amountUnit && /^[A-Z]{3}$/.test(row.currency)) {
+      try {
+        const format = new Intl.NumberFormat(undefined, {
+          style: 'currency',
+          currency: row.currency,
+        });
+        const divisor = amountUnit === 'minor'
+          ? 10 ** (format.resolvedOptions().maximumFractionDigits ?? 2)
+          : 1;
+        return <span class='workspace-money'>{format.format(row.amount / divisor)}</span>;
+      } catch { /* Unsupported currencies retain the actual value and unit below. */ }
+    }
+    return <span class='workspace-money'>{String(row.amount)} {row.currency}</span>;
   }
-  if (Array.isArray(value)) {
-    if (value.length === 0) return <p role='status'>No records yet.</p>;
+  if (field === 'ownerName') {
     return (
-      <ol class='ns-stack ns-stack--md' aria-label='Records'>
-        {value.map((item, index) => (
-          <li key={index} class='min-w-0 border border-ns-border p-4'>
-            <QueryResult value={item} />
-          </li>
-        ))}
-      </ol>
+      <div class='workspace-owner'>
+        <span class='workspace-avatar' aria-hidden='true'>
+          {String(row.ownerName).split(/\\s+/).slice(0, 2).map((part) => part[0]).join('')}
+        </span>
+        <span>
+          {String(row.ownerName)}
+          <small class='workspace-record-description'>{String(row.ownerEmail ?? '')}</small>
+        </span>
+      </div>
     );
   }
-  if (typeof value === 'object') {
-    const fields = Object.entries(value);
-    if (fields.length === 0) return <p role='status'>No details available.</p>;
+  if (field === 'reference') {
     return (
-      <dl class='ns-stack ns-stack--sm'>
-        {fields.map(([label, field]) => (
-          <div key={label} class='min-w-0'>
-            <dt class='font-mono text-xs text-ns-muted-fg'>{label}</dt>
-            <dd class='m-0 min-w-0 [overflow-wrap:anywhere]'>
-              <QueryResult value={field} />
-            </dd>
-          </div>
+      <span class='workspace-record-link'>
+        {String(row.reference)}
+        <small class='workspace-record-description'>{String(row.name ?? '')}</small>
+      </span>
+    );
+  }
+  return <QueryResult value={row[field]} amountUnit={amountUnit} />;
+}
+/** Tables preserve the actual payload fields; dates are values rather than empty objects. */
+function QueryResult({ value, amountUnit }: { value: unknown; amountUnit?: AmountUnit }): VNode {
+  if (value === null || value === undefined) return <span class='text-ns-muted-fg'>—</span>;
+  if (value instanceof Date || (typeof value === 'string' && /^\\d{4}-\\d{2}-\\d{2}T/.test(value))) {
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isFinite(date.getTime())
+      ? (
+        <time dateTime={date.toISOString()}>
+          {new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(
+            date,
+          )}
+        </time>
+      )
+      : <span>—</span>;
+  }
+  if (Array.isArray(value)) {
+    if (!value.length) {
+      return (
+        <div class='workspace-empty' role='status'>
+          <h3>No records yet</h3>
+          <p>New records will appear here when your service returns them.</p>
+        </div>
+      );
+    }
+    if (value.every(isFieldRecord)) {
+      const rich = value.every((row) =>
+        typeof row.reference === 'string' && typeof row.ownerName === 'string' &&
+        typeof row.currency === 'string' && typeof row.amount === 'number' &&
+        (row.name === undefined || typeof row.name === 'string') &&
+        (row.ownerEmail === undefined || typeof row.ownerEmail === 'string')
+      );
+      const mappedFields = new Set([
+        'reference',
+        'name',
+        'ownerName',
+        'ownerEmail',
+        'status',
+        'amount',
+        'currency',
+        'createdAt',
+      ]);
+      const extraFields = rich
+        ? [...new Set(value.flatMap((row) => Object.keys(row)))].filter((field) =>
+          !mappedFields.has(field)
+        )
+        : [];
+      const fields = rich
+        ? ['reference', 'ownerName', 'status', 'amount', 'createdAt']
+        : [...new Set(value.flatMap((row) => Object.keys(row)))];
+      return (
+        <div class='workspace-query-scroll' role='region' aria-label='Service results' tabIndex={0}>
+          <table class='workspace-query-table' data-rich={rich ? 'true' : undefined}>
+            <thead>
+              <tr>
+                {fields.map((field) => (
+                  <th key={field} scope='col'>
+                    {field === 'ownerName' ? 'Owner' : fieldLabel(field)}
+                  </th>
+                ))}
+                {extraFields.length > 0 && <th scope='col'>Details</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {value.map((row, index) => (
+                <tr key={typeof row.id === 'string' || typeof row.id === 'number' ? row.id : index}>
+                  {fields.map((field) => (
+                    <td
+                      key={field}
+                      data-field={field}
+                      data-label={field === 'ownerName' ? 'Owner' : fieldLabel(field)}
+                    >
+                      {rich && field !== 'status'
+                        ? <RichRecordValue row={row} field={field} amountUnit={amountUnit} />
+                        : field === 'status' && typeof row[field] === 'string'
+                        ? (
+                          <span
+                            class='ns-badge'
+                            data-emphasis='subtle'
+                            data-scope='badge'
+                            data-part='root'
+                            data-variant={row[field] === 'paid' || row[field] === 'completed'
+                              ? 'success'
+                              : row[field] === 'failed'
+                              ? 'destructive'
+                              : row[field] === 'awaiting_payment'
+                              ? 'warning'
+                              : row[field] === 'shipped'
+                              ? 'info'
+                              : 'muted'}
+                          >
+                            <span
+                              class='ns-badge__dot'
+                              data-part='dot'
+                              data-scope='badge'
+                              aria-hidden='true'
+                            />
+                            <span data-part='label' data-scope='badge'>
+                              {fieldLabel(row[field]).replace(
+                                /^./,
+                                (letter) => letter.toUpperCase(),
+                              )}
+                            </span>
+                          </span>
+                        )
+                        : <QueryResult value={row[field]} amountUnit={amountUnit} />}
+                    </td>
+                  ))}
+                  {extraFields.length > 0 && (
+                    <td data-field='details' data-label='Details'>
+                      <details>
+                        <summary>More fields</summary>
+                        <QueryResult
+                          value={Object.fromEntries(
+                            extraFields.filter((field) => Object.hasOwn(row, field)).map((
+                              field,
+                            ) => [field, row[field]]),
+                          )}
+                          amountUnit={amountUnit}
+                        />
+                      </details>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    return (
+      <ul class='ns-stack ns-stack--sm'>
+        {value.map((item, index) => (
+          <li key={index}>
+            <QueryResult value={item} amountUnit={amountUnit} />
+          </li>
         ))}
-      </dl>
+      </ul>
+    );
+  }
+  if (isFieldRecord(value)) {
+    const pagination = typeof value.page === 'number' && typeof value.total === 'number' &&
+      typeof value.totalPages === 'number';
+    const fields = Object.entries(value).filter(([key]) =>
+      !pagination ||
+      !['page', 'total', 'totalPages'].includes(key) &&
+        !(key === 'limit' && typeof value.limit === 'number') &&
+        !(['hasNext', 'hasPrev'].includes(key) && typeof value[key] === 'boolean')
+    );
+    if (!fields.length && !pagination) return <p role='status'>No fields returned.</p>;
+    return (
+      <div class='workspace-query-fields'>
+        {pagination && (
+          <div class='workspace-query-pagination' role='status'>
+            <span>
+              Page {String(value.page)} of {Math.max(1, Number(value.totalPages))} ·{' '}
+              {String(value.total)} {value.total === 1 ? 'record' : 'records'}
+              {typeof value.limit === 'number' && <>· {value.limit} per page</>}
+            </span>
+            <span>
+              {value.hasNext === true
+                ? 'More records available →'
+                : value.hasNext === false
+                ? 'End of results'
+                : ''}
+              {value.hasPrev === true && ' · Earlier records available'}
+            </span>
+          </div>
+        )}
+        {fields.map(([label, field]) =>
+          Array.isArray(field)
+            ? (
+              <section key={label}>
+                {label !== 'data' && label !== 'items' && (
+                  <h3 class='workspace-query-label'>{fieldLabel(label)}</h3>
+                )}
+                <QueryResult value={field} amountUnit={amountUnit} />
+              </section>
+            )
+            : label === 'pagination' && isFieldRecord(field) && typeof field.page === 'number' &&
+                typeof field.total === 'number' && typeof field.totalPages === 'number'
+            ? <QueryResult key={label} value={field} amountUnit={amountUnit} />
+            : (
+              <dl key={label} class='workspace-query-field'>
+                <dt>{fieldLabel(label)}</dt>
+                <dd>
+                  <QueryResult value={field} amountUnit={amountUnit} />
+                </dd>
+              </dl>
+            )
+        )}
+      </div>
     );
   }
   return <span>{typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}</span>;

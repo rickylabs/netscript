@@ -62,6 +62,7 @@ export class ServiceScaffolder {
       modelName: options.modelName || options.serviceName,
       projectName: options.projectName,
       servicePort: String(options.servicePort),
+      searchMode: options.dbEngine === 'postgres' ? ", mode: 'insensitive' as const" : '',
       ...serviceAuthTemplate(),
     };
     await this.writeGenerated(

@@ -1,0 +1,22 @@
+{
+  "packages/cli/src/kernel/adapters/database/sample-records_test.ts": "38fc9c54e07772e86afd056c88ef351372cfbf550e5137051e42d7eaee9cb5db",
+  "packages/cli/src/kernel/application/resource-slice/render-resource-slice_test.ts": "34ac92b62a741692f599649681043f550b1db7ab5e319e68c52f61e8bdceab1a",
+  "packages/cli/src/kernel/application/scaffold/writers/scaffold-projections_test.ts": "209c961d87e20ef201abdc3676d9cf8802d33b2634c41834c3638af2c87544e8",
+  "packages/cli/src/kernel/application/ui/page/query-result-template.ts": "60736f07e879cbb49a1eb1dbca59e85d1500304e541af6490f4b16aa51282e5a",
+  "packages/cli/src/kernel/application/ui/page/query-result-template_test.ts": "05ac99ec75b2e3ea04414f6a502f837022c20b8e8d41aa4dc080481837797d39",
+  "packages/cli/src/kernel/assets/app/assets/workspace.css.template": "6662b4408d34c499fa58e868021ee73e703754909d6d09b8d81a64fe7f87e4a7",
+  "packages/cli/src/kernel/assets/app/lib/scaffold-contract.ts.template": "c9daaef47d853a13540cc26d87a6469122c677958306d527984503df2555ef4f",
+  "packages/cli/src/kernel/assets/app/lib/scaffold-projections.ts.template": "903e181d0c9d004153da6d095733c99ab693bd70f4842469f7796d11569d823d",
+  "packages/cli/src/kernel/assets/app/routes/(_components)/dashboard-view.tsx.template": "a89333821dc73646e4233cb11bfc93ac6ef65797e16f98bd54acd60c602014de",
+  "packages/cli/src/kernel/assets/app/routes/(_components)/health-view.tsx.template": "dc56ec40a0db28146348e27333a5db708842a754b5c8aec262a6848570c185f7",
+  "packages/cli/src/kernel/assets/app/routes/records/index.tsx.template": "7867c8facd61a127c9307686c53fe0e5bc4362870dc50fcac5fb4f0a6220b349",
+  "packages/cli/src/kernel/assets/generated/aspire/helpers/generate-index-1.ts.template": "a39d6159a43721c6bf252cf926c5c6ff40aa3381a9edf165bb72fbcb6afa50b1",
+  "packages/cli/src/kernel/assets/generated/aspire/helpers/generate-register-apps-1.ts.template": "c769a5514b7188294ab5ba2a9a8a9991a0327d28a60205d55cad8aabc90db348",
+  "packages/cli/src/kernel/assets/service/sample-records.ts.template": "7bc24064d8f7ecb2564fab25e3e4192f6edefd6af128f03258275b6f98299a42",
+  "packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-apps.ts": "d317e29bc2662553798d8fa6ddf3dd2da7d19cf38a43a46d1485142ae7dc1f69",
+  "packages/cli/src/kernel/templates/aspire/helpers/tests/workspace-cors-support.ts": "c7218205d6bcc15fce56bd36072c20f08db1bb047bdcf16aaacca79d027960ea",
+  "packages/cli/src/kernel/templates/aspire/helpers/tests/workspace-cors_test.ts": "8492daf6c528b1fe5ad8857db7082f764a31272d5c42e1a5e9c437cda9ea35e7",
+  "packages/fresh-ui/registry/components/ui/chart-block.css": "dae1abd25725cc0cfcf6554ee58dd30137de2ee650d27eb99f2c8f054ae985ed",
+  "packages/fresh-ui/registry/components/ui/chart-block.tsx": "abb358423c0586c5733b9bdefa1bc9fa2107750f91eca4bf8f48713b3b22079b",
+  "packages/fresh-ui/tests/registry/components/ui/chart-block.test.tsx": "b7ad921f2618ea3afde75e1d0ae86026467b89e83e78b37d4b4ebe0ef88f3b17"
+}

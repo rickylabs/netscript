@@ -16,6 +16,7 @@ const APP_TEMPLATE_URLS: TemplateUrlMap = {
   appScaffoldRecordsMemory: TEMPLATE_KEYS.appScaffoldRecordsMemory,
   appScaffoldRecordsDatabase: TEMPLATE_KEYS.appScaffoldRecordsDatabase,
   appCapabilityEmpty: TEMPLATE_KEYS.appCapabilityEmpty,
+  appRecordTableIsland: TEMPLATE_KEYS.appRecordTableIsland,
   appRecordTable: TEMPLATE_KEYS.appRecordTable,
   appRecordsRoute: TEMPLATE_KEYS.appRecordsRoute,
   appRecordRoute: TEMPLATE_KEYS.appRecordRoute,

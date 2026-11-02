@@ -19,3 +19,9 @@ Deno.test('{{modelName}} list policy preserves status and uses one id tiebreaker
     throw new Error('Unexpected status filter or deterministic sort');
   }
 });
+
+Deno.test('{{modelName}} search matches reference, name and owner while retaining status', () => {
+  const query = listQuery({ page: 1, limit: 10, sortOrder: 'desc', search: ' Maya ', status: 'paid' });
+  if (query.where.status !== 'paid' || query.where.OR?.length !== 4 || query.where.OR[2].ownerName?.contains !== 'Maya') throw new Error('Search must combine owner text with status before pagination');
+  if ('OR' in listQuery({ page: 1, limit: 10, sortOrder: 'desc', search: '   ' }).where) throw new Error('Blank search must not create a predicate');
+});

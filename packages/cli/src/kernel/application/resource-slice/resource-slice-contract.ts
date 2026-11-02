@@ -71,12 +71,19 @@ export interface NormalizedResourceSliceInput {
   readonly requiredState?: RequiredResourceState;
 }
 
+/** Currency conversion is opt-in for a known service contract. */
+export interface ResourceResultPresentation {
+  readonly amountUnit?: 'minor' | 'major';
+}
+
 export interface OwnedResourceSliceLeafMetadata {
   readonly schema: typeof RESOURCE_SLICE_MARKER_SCHEMA;
   readonly resource: string;
   readonly role: ResourceSliceLeafRole;
   readonly options: readonly ResourceSliceVariant[];
   readonly bodySha256: string;
+  /** Proven currency units, present only on the generated result island. */
+  readonly amountUnit?: ResourceResultPresentation['amountUnit'];
   /** Canonical initial query arguments, present only on generated loader leaves. */
   readonly queryInput?: Readonly<Record<string, string | number | boolean | null>>;
 }
@@ -254,6 +261,9 @@ export async function markOwnedResourceSliceLeaf(
     ...(metadata.queryInput !== undefined
       ? { queryInput: normalizeQueryInput(metadata.queryInput, metadata.role) }
       : {}),
+    ...(metadata.amountUnit !== undefined
+      ? { amountUnit: normalizeAmountUnit(metadata.amountUnit, metadata.role) }
+      : {}),
   };
   return `${RESOURCE_SLICE_MARKER_PREFIX}${JSON.stringify(marker)}\n${body}`;
 }
@@ -274,7 +284,7 @@ export function parseOwnedResourceSliceLeaf(
     return undefined;
   }
   if (!isRecord(value)) return undefined;
-  const { schema, resource, role, options, bodySha256, queryInput } = value;
+  const { schema, resource, role, options, bodySha256, queryInput, amountUnit } = value;
   if (
     schema !== RESOURCE_SLICE_MARKER_SCHEMA || typeof resource !== 'string' ||
     typeof role !== 'string' || !isLeafRole(role) || !Array.isArray(options) ||
@@ -284,9 +294,11 @@ export function parseOwnedResourceSliceLeaf(
 
   let normalized: readonly ResourceSliceVariant[];
   let normalizedInput: OwnedResourceSliceLeafMetadata['queryInput'];
+  let normalizedAmountUnit: ResourceResultPresentation['amountUnit'];
   try {
     normalized = normalizeMarkerOptions(options);
     if (queryInput !== undefined) normalizedInput = normalizeQueryInput(queryInput, role);
+    if (amountUnit !== undefined) normalizedAmountUnit = normalizeAmountUnit(amountUnit, role);
   } catch {
     return undefined;
   }
@@ -297,6 +309,7 @@ export function parseOwnedResourceSliceLeaf(
     options: normalized,
     bodySha256,
     ...(normalizedInput !== undefined ? { queryInput: normalizedInput } : {}),
+    ...(normalizedAmountUnit !== undefined ? { amountUnit: normalizedAmountUnit } : {}),
   };
   return line === `${RESOURCE_SLICE_MARKER_PREFIX}${JSON.stringify(metadata)}`
     ? metadata
@@ -403,4 +416,12 @@ function normalizeQueryInput(
     result[key] = entry;
   }
   return result;
+}
+
+/** Units are explicit island metadata, never inferred from field names or numeric magnitude. */
+function normalizeAmountUnit(value: unknown, role: ResourceSliceLeafRole): 'minor' | 'major' {
+  if (role !== 'island' || (value !== 'minor' && value !== 'major')) {
+    throw new Error('Amount units must be minor or major on an island leaf.');
+  }
+  return value;
 }

@@ -21,7 +21,7 @@ export async function loadScaffoldRecords(request: Request): Promise<ScaffoldRec
     const { page } = query;
     const result = await client.list({ ...query, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }, { context });
     return { state: result.items.length ? 'ready' : 'empty', rows: result.items.map(project), total: result.total,
-      page, query: { sortBy: query.sortBy, sortOrder: query.sortOrder, ...(query.status ? { status: query.status } : {}) }, hasNext: result.hasMore, message: result.total ? 'Records from {{serviceName}}.' : query.status ? 'No records match this status.' : 'Your service has no records yet.' };
+      page, pageSize: PAGE_SIZE, query: { ...(query.search ? { search: query.search } : {}), sortBy: query.sortBy, sortOrder: query.sortOrder, ...(query.status ? { status: query.status } : {}) }, hasNext: result.hasMore, message: result.total ? 'Records from {{serviceName}}.' : query.status || query.search ? 'No records match your filters.' : 'Your service has no records yet.' };
   } catch (error) { return scaffoldReadFailure(error); }
 }
 

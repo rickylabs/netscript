@@ -2,6 +2,12 @@ import { assertEquals, assertStringIncludes } from '@std/assert';
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
 import { StringTemplateAdapter } from '../../../../kernel/adapters/scaffold/template-adapter.ts';
 import { loadResourceSliceTemplateAssets } from '../../../../kernel/adapters/templates/scaffold-template-assets.ts';
+import { renderResourceSlice } from '../../../../kernel/application/resource-slice/render-resource-slice.ts';
+import { planResourceSlice } from '../../../../kernel/application/resource-slice/plan-resource-slice.ts';
+import {
+  normalizeResourceSliceInput,
+  parseOwnedResourceSliceLeaf,
+} from '../../../../kernel/application/resource-slice/resource-slice-contract.ts';
 import { generateResource, type GenerateResourceDependencies } from './generate-resource.ts';
 import { toGenerateResourceRequest } from './generate-resource-input.ts';
 
@@ -226,4 +232,104 @@ Deno.test('resource rerun refuses edited, unowned or mismatched initial input pr
     assertEquals(result.conflicts.includes(path), true, scenario);
     assertEquals(await fs.readFile(`${APP_ROOT}/${path}`), edited, scenario);
   }
+});
+
+/** Seed the same canonical island authority used by init, without a public currency assumption. */
+async function presentationFixture(amountUnit: 'minor' | 'major') {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(`${APP_ROOT}/router.ts`, ROUTER);
+  const dependencies = await createDependencies(fs);
+  const plan = planResourceSlice(normalizeResourceSliceInput({
+    resource: 'orders',
+    app: 'dashboard',
+    client: await dependencies.resolveClient(APP_ROOT, 'orders'),
+    procedure: { path: ['list'], kind: 'query' },
+  }));
+  for (
+    const leaf of await renderResourceSlice(
+      plan,
+      dependencies.templates,
+      dependencies.templateRenderer,
+      { amountUnit },
+    )
+  ) {
+    await fs.writeFile(`${APP_ROOT}/${leaf.path}`, leaf.content);
+  }
+  return {
+    fs,
+    dependencies,
+    request: {
+      resource: 'orders',
+      procedure: 'list',
+      variants: [] as const,
+      dryRun: false,
+      force: false,
+    },
+    path: 'routes/orders/(_islands)/OrdersIsland.tsx',
+  };
+}
+
+Deno.test('resource rerun preserves proven amount units in dry-run, apply and layer additions', async () => {
+  for (const unit of ['minor', 'major'] as const) {
+    const { fs, dependencies, request, path } = await presentationFixture(unit);
+    const original = await fs.readFile(`${APP_ROOT}/${path}`);
+    assertEquals(parseOwnedResourceSliceLeaf(original)?.amountUnit, unit);
+    for (const dryRun of [true, false]) {
+      const result = await generateResource(
+        { ...request, dryRun, variants: ['form'] },
+        dependencies,
+      );
+      assertEquals(result.exitCode, 0);
+      assertEquals(result.report.find((entry) => entry.path === path), {
+        path,
+        action: 'skip',
+        classification: 'exact',
+      });
+      assertEquals(await fs.readFile(`${APP_ROOT}/${path}`), original);
+    }
+  }
+});
+
+Deno.test('resource rerun refuses edited or mismatched amount-unit provenance', async () => {
+  for (const scenario of ['marker', 'body', 'unowned', 'client', 'procedure']) {
+    const { fs, dependencies, request, path } = await presentationFixture('minor');
+    const original = await fs.readFile(`${APP_ROOT}/${path}`);
+    const edited = scenario === 'marker'
+      ? original.replace('"amountUnit":"minor"', '"amountUnit":"major"')
+      : scenario === 'body'
+      ? original + '// authored edit\n'
+      : scenario === 'unowned'
+      ? original.slice(original.indexOf('\n') + 1)
+      : original;
+    await fs.writeFile(`${APP_ROOT}/${path}`, edited);
+    const result = await generateResource({
+      ...request,
+      procedure: scenario === 'procedure' ? 'search' : 'list',
+    }, {
+      ...dependencies,
+      resolveClient: async (...args) => ({
+        ...await dependencies.resolveClient(...args),
+        ...(scenario === 'client' ? { moduleSpecifier: '@app/lib/other.ts' } : {}),
+      }),
+    });
+    assertEquals(result.exitCode, 1, scenario);
+    assertEquals(result.conflicts.includes(path), true, scenario);
+    assertEquals(await fs.readFile(`${APP_ROOT}/${path}`), edited, scenario);
+  }
+});
+
+Deno.test('forcing a different client never carries the old currency interpretation', async () => {
+  const { fs, dependencies, request, path } = await presentationFixture('minor');
+  const result = await generateResource({ ...request, force: true }, {
+    ...dependencies,
+    resolveClient: async (...args) => ({
+      ...await dependencies.resolveClient(...args),
+      moduleSpecifier: '@app/lib/other.ts',
+    }),
+  });
+  assertEquals(result.exitCode, 0);
+  assertEquals(
+    parseOwnedResourceSliceLeaf(await fs.readFile(`${APP_ROOT}/${path}`))?.amountUnit,
+    undefined,
+  );
 });

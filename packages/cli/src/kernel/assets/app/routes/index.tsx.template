@@ -1,3 +1,4 @@
+import { scaffoldLocale } from '@app/lib/scaffold-contract.ts';
 import View from './(_components)/home-view.tsx';
 import { loadScaffoldOverview } from '@app/lib/scaffold-overview.ts';
 import { loadScaffoldRecords } from '@app/lib/scaffold-records.ts';
@@ -7,7 +8,7 @@ import { definePage } from '@app/utils.ts';
 
 export const homePage = definePage().withRoute(appRoutes.home)
   .withMeta(() => ({ title: '{{name}} — Overview' }))
-  .withLayer('home', View, { loader: async (ctx) => { const records = await loadScaffoldRecords(ctx.req); return { records, overview: await loadScaffoldOverview(ctx.req), capabilities: await readScaffoldCapabilities(ctx.req, records) }; } })
+  .withLayer('home', View, { loader: async (ctx) => { const records = await loadScaffoldRecords(ctx.req); return { locale: scaffoldLocale(ctx.req), records, overview: await loadScaffoldOverview(ctx.req), capabilities: await readScaffoldCapabilities(ctx.req, records) }; } })
   .withLayout((slots) => slots.home()).build();
 export const { default: page } = homePage;
 export { page as default };

@@ -26,7 +26,7 @@ async function capabilityFixture(root: string, app: string) {
     )
     .replace(
       "import { probeScaffoldPlugin } from './scaffold-plugin-capabilities.ts';",
-      "const probeScaffoldPlugin = async (_id: string, name: string) => ({state: 'ready' as const, description: name});",
+      "export let liveReads = 0; const probeScaffoldPlugin = async (_id: string, name: string) => { liveReads++; return {state: 'ready' as const, description: name}; };",
     )
     .replaceAll('Deno.cwd()', JSON.stringify(app))
     .replace("'./scaffold-contract.ts'", JSON.stringify(contract))
@@ -105,6 +105,13 @@ Deno.test('request-time topology follows service add and renamed plugin metadata
     const workers = (await module.readScaffoldCapabilities())[2];
     assertEquals(workers.state, 'ready');
     assertEquals(workers.description, 'queue-api');
+    const liveReads = module.liveReads;
+    const configured = await module.readScaffoldCapabilities(undefined, undefined, 'configuration');
+    assertEquals(configured[0].state, 'configured');
+    assertEquals(configured[2].state, 'configured');
+    assertStringIncludes(configured[2].description, 'check availability');
+    assertEquals(module.liveReads, liveReads, 'configuration pages must not call plugin services');
+
     await Deno.writeTextFile(
       `${root}/plugins/renamed/scaffold.plugin.json`,
       JSON.stringify({
@@ -209,7 +216,15 @@ Deno.test('service failures distinguish access denial and never expose raw error
 
 Deno.test('plugin projections read real result shapes and reject false stream readiness', async () => {
   const contextUrl = moduleUrl(
-    `let jobs: unknown[] = []; let options: unknown; export function readOptions() { return options; } export function setJobs(next: unknown[]) { jobs = next; } export const scaffoldServiceClient = async (...args: unknown[]) => { options = args[4]; return {client: {listJobs: async () => ({jobs,total:jobs.length})},context:{}}; };`,
+    `let jobs: unknown[] = []; let options: unknown; let executions: unknown[] = []; let total = 0;
+      export const calls: { method: string; input: unknown }[] = [];
+      export function readOptions() { return options; }
+      export function setJobs(next: unknown[]) { jobs = next; }
+      export function setExecutions(next: unknown[], count = next.length) { executions = next; total = count; }
+      export const scaffoldServiceClient = async (...args: unknown[]) => { options = args[4]; return {client: {
+        listJobs: async (input: unknown) => { calls.push({method:'jobs',input}); return {jobs,total:jobs.length}; },
+        listExecutions: async (input: unknown) => { calls.push({method:'executions',input}); return {executions,total}; }
+      },context:{}}; };`,
   );
   const context = await import(contextUrl);
   const source = renderTemplate(
@@ -234,16 +249,178 @@ Deno.test('plugin projections read real result shapes and reject false stream re
   const module = await import(moduleUrl(source));
   assertEquals((await module.probeScaffoldPlugin('workers', 'queue-api')).state, 'empty');
   assertEquals(context.readOptions(), { unmarked: 'optional' });
-  context.setJobs([{ id: 'job-one', name: 'Configured job' }]);
+  context.setJobs([{ id: 'job-one', name: 'Configured job', enabled: true }]);
+  context.setExecutions([{
+    jobId: 'job-one',
+    status: 'running',
+    progressPercent: 37,
+    progressMessage: 'Processing records',
+    triggeredAt: '2026-11-01T00:00:00Z',
+  }]);
   const workers = await module.probeScaffoldPlugin('workers', 'queue-api');
   assertEquals(workers.state, 'ready');
-  assertEquals(workers.items, [{ label: 'Configured job', detail: 'job-one' }]);
+  assertEquals(workers.items, [{
+    label: 'Configured job',
+    detail: 'Processing records',
+    state: 'running',
+    progress: 37,
+    timestamp: '2026-11-01T00:00:00Z',
+  }]);
+  context.setJobs(
+    Array.from(
+      { length: 5 },
+      (_, index) => ({ id: `job-${index}`, name: `Job ${index}`, enabled: index !== 4 }),
+    ),
+  );
+  context.setExecutions([
+    { jobId: 'job-0', status: 'completed', triggeredAt: '2026-10-30T00:00:00Z' },
+    { jobId: 'job-1', status: 'failed', triggeredAt: '2026-11-01T00:00:00Z' },
+    { jobId: 'job-0', status: 'running', progressPercent: 42, triggeredAt: '2026-11-01T00:00:00Z' },
+  ], 100);
+  context.calls.length = 0;
+  const bounded = await module.probeScaffoldPlugin('workers', 'queue-api');
+  assertEquals(context.calls, [
+    { method: 'jobs', input: { limit: 5, offset: 0 } },
+    { method: 'executions', input: { limit: 50, offset: 0 } },
+  ], 'five jobs still require only two bounded requests');
+  assertEquals(bounded.items.map((item: { state: string }) => item.state), [
+    'running',
+    'failed',
+    'unknown',
+    'unknown',
+    'disabled',
+  ]);
+  assertEquals(bounded.items[0].progress, 42);
+  assertStringIncludes(bounded.items[2].detail, 'recent history window');
+  context.setExecutions([]);
+  assertEquals((await module.probeScaffoldPlugin('workers', 'queue-api')).items[2].state, 'idle');
   const originalFetch = globalThis.fetch;
   const originalError = console.error;
   console.error = () => {};
   try {
-    globalThis.fetch = () => Promise.resolve(Response.json({ ready: true }));
-    assertEquals((await module.probeScaffoldPlugin('streams', 'events')).state, 'ready');
+    globalThis.fetch = (input) =>
+      Promise.resolve(
+        Response.json(
+          String(input).includes('/health/ready') ? { ready: true } : [{
+            type: 'execution',
+            key: 'real-event',
+            headers: { operation: 'upsert' },
+            value: {
+              jobId: 'job-one',
+              status: 'running',
+              progressMessage: 'Processing records',
+              triggeredAt: '2026-11-01T00:00:00Z',
+            },
+          }],
+          { headers: { 'Stream-Next-Offset': 'opaque-1', 'Stream-Up-To-Date': 'true' } },
+        ),
+      );
+    const streams = await module.probeScaffoldPlugin('streams', 'events');
+    assertEquals(streams.state, 'ready');
+    assertEquals(streams.items[0], {
+      label: 'job-one',
+      detail: 'Processing records',
+      state: 'running',
+      timestamp: '2026-11-01T00:00:00Z',
+    });
+    const offsets: string[] = [];
+    globalThis.fetch = (input, init) => {
+      if (String(input).includes('/health/ready')) {
+        return Promise.resolve(Response.json({ ready: true }));
+      }
+      assertEquals(new Headers(init?.headers).has('Authorization'), false);
+      offsets.push(new URL(String(input)).searchParams.get('offset')!);
+      return Promise.resolve(
+        Response.json([], { headers: { 'Stream-Next-Offset': `batch-${offsets.length}` } }),
+      );
+    };
+    const catchingUp = await module.probeScaffoldPlugin('streams', 'events');
+    assertEquals(offsets, ['opaque-1', 'batch-1', 'batch-2']);
+    assertStringIncludes(catchingUp.description, 'Catching up');
+    let headRead = false;
+    globalThis.fetch = (input, init) => {
+      if (String(input).includes('/health/ready')) {
+        return Promise.resolve(Response.json({ ready: true }));
+      }
+      if (init?.method === 'HEAD') {
+        headRead = true;
+        return Promise.resolve(
+          new Response(null, { headers: { 'Stream-Next-Offset': 'current-head' } }),
+        );
+      }
+      return Promise.resolve(
+        Response.json([{
+          type: 'execution',
+          key: 'large',
+          headers: { operation: 'upsert' },
+          value: { progressMessage: 'x'.repeat(1024 * 1024) },
+        }], { headers: { 'Stream-Next-Offset': 'huge-batch', 'Stream-Up-To-Date': 'true' } }),
+      );
+    };
+    const bounded = await module.probeScaffoldPlugin('streams', 'events');
+    assertEquals(bounded.state, 'empty');
+    assertEquals(headRead, true);
+    assertStringIncludes(bounded.description, 'preview budget');
+    globalThis.fetch = (input) => {
+      if (String(input).includes('/health/ready')) {
+        return Promise.resolve(Response.json({ ready: true }));
+      }
+      assertEquals(new URL(String(input)).searchParams.get('offset'), 'current-head');
+      return Promise.resolve(
+        Response.json([{
+          type: 'execution',
+          key: 'new-event',
+          headers: { operation: 'upsert' },
+          value: { jobId: 'new-job', status: 'completed' },
+        }], { headers: { 'Stream-Next-Offset': 'after-head', 'Stream-Up-To-Date': 'true' } }),
+      );
+    };
+    const resumed = await module.probeScaffoldPlugin('streams', 'events');
+    assertEquals(resumed.items[0].label, 'new-job');
+    assertEquals(resumed.items.length, 1);
+    assertStringIncludes(resumed.description, 'skipped earlier history');
+    for (const status of [400, 410]) {
+      const resetOffsets: string[] = [];
+      globalThis.fetch = (input) => {
+        if (String(input).includes('/health/ready')) {
+          return Promise.resolve(Response.json({ ready: true }));
+        }
+        const offset = new URL(String(input)).searchParams.get('offset')!;
+        resetOffsets.push(offset);
+        return Promise.resolve(
+          offset === '-1'
+            ? Response.json([{
+              type: 'execution',
+              key: 'after-reset',
+              headers: { operation: 'upsert' },
+              value: { jobId: 'recovered-job' },
+            }], {
+              headers: { 'Stream-Next-Offset': 'recovered-head', 'Stream-Up-To-Date': 'true' },
+            })
+            : new Response(null, { status }),
+        );
+      };
+      const recovered = await module.probeScaffoldPlugin('streams', 'events');
+      assertEquals(resetOffsets.length, 2);
+      assertEquals(resetOffsets[1], '-1');
+      assertEquals(recovered.state, 'ready');
+      assertEquals(recovered.items.length, 1);
+      assertEquals(recovered.items[0].label, 'recovered-job');
+    }
+    for (const status of [401, 403]) {
+      let calls = 0;
+      globalThis.fetch = (input) => {
+        if (String(input).includes('/health/ready')) {
+          return Promise.resolve(Response.json({ ready: true }));
+        }
+        calls++;
+        return Promise.resolve(new Response(null, { status }));
+      };
+      const denied = await module.probeScaffoldPlugin('streams', 'events');
+      assertEquals(denied.state, 'unauthorized');
+      assertEquals(denied.items, undefined);
+      assertEquals(calls, 1);
+    }
     globalThis.fetch = () => Promise.resolve(Response.json({ ready: false }));
     assertEquals((await module.probeScaffoldPlugin('streams', 'events')).state, 'unavailable');
     globalThis.fetch = () => Promise.resolve(new Response(null, { status: 401 }));
@@ -285,4 +462,12 @@ export const browserSessionContext = (request: Request) => ({ signal: request.si
   assertEquals(auth.readOptions(), { unmarked: 'optional' });
   await module.scaffoldServiceClient({}, 'users', 'users', request);
   assertEquals(auth.readOptions(), {});
+});
+
+Deno.test('settings and sign-in use configuration capabilities without loading records', () => {
+  for (const key of [TEMPLATE_KEYS.appSettingsRoute, TEMPLATE_KEYS.appSignInRoute]) {
+    const source = renderTemplate(readTemplateAssetSync(key), variables);
+    assertEquals(source.includes('loadScaffoldRecords'), false);
+    assertStringIncludes(source, "readScaffoldCapabilities(ctx.req, undefined, 'configuration')");
+  }
 });

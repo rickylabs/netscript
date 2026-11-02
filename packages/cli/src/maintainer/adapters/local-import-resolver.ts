@@ -5,6 +5,7 @@ import type { LocalImportResolverPort } from '../ports/local-import-resolver-por
 
 const PACKAGE_TO_LOCAL_PATH: Readonly<Record<string, string>> = {
   [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_DISCOVERY]: 'packages/sdk/src/discovery/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_STREAMS_CORE]: 'packages/plugin-streams-core/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_CONTRACTS]:
     'packages/plugin-workers-core/src/contracts/v1/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_CONFIG]: 'packages/config/mod.ts',

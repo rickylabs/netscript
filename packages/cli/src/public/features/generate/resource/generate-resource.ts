@@ -10,6 +10,7 @@ import {
   normalizeResourceSliceInput,
   parseOwnedResourceSliceLeaf,
   RESOURCE_SLICE_VARIANTS,
+  type ResourceResultPresentation,
   type ResourceSliceCandidateLeaf,
   type ResourceSliceOptionalVariant,
   type ResourceSlicePlannedLeaf,
@@ -154,6 +155,7 @@ async function executeGenerateResource(
     plan,
     dependencies.templates,
     dependencies.templateRenderer,
+    prior.presentation,
   );
   const fresh = await dependencies.stage({ appRoot, leaves, route: input.route });
   const shared = await transformSharedSources(appRoot, plan, fresh, dependencies.fs);
@@ -191,7 +193,7 @@ async function executeGenerateResource(
   };
 }
 
-/** Recover input only when the complete canonical loader still matches its provenance. */
+/** Recover settings only when their complete canonical leaf matches the selected query. */
 async function readPriorState(
   appRoot: string,
   selected: NormalizedResourceSliceInput,
@@ -200,10 +202,12 @@ async function readPriorState(
 ): Promise<{
   variants: readonly ResourceSliceOptionalVariant[];
   queryInput?: SelectedResourceProcedure['initialInput'];
+  presentation?: ResourceResultPresentation;
 }> {
   const { fs } = dependencies;
   const variants = new Set<ResourceSliceOptionalVariant>();
   let queryInput: SelectedResourceProcedure['initialInput'];
+  let presentation: ResourceResultPresentation | undefined;
   for (const leaf of leaves) {
     const path = join(appRoot, leaf.path);
     if (!await fs.exists(path)) continue;
@@ -215,28 +219,36 @@ async function readPriorState(
     for (const option of metadata.options) {
       if (option !== 'core') variants.add(option);
     }
-    if (
-      leaf.role !== 'loaders' || selected.procedure.initialInput !== undefined ||
-      metadata.queryInput === undefined
-    ) continue;
+    const candidateInput = leaf.role === 'loaders' && selected.procedure.initialInput === undefined
+      ? metadata.queryInput
+      : undefined;
+    const candidatePresentation = leaf.role === 'island' && metadata.amountUnit !== undefined
+      ? { amountUnit: metadata.amountUnit }
+      : undefined;
+    if (candidateInput === undefined && candidatePresentation === undefined) continue;
     const proofPlan = planResourceSlice(normalizeResourceSliceInput({
       ...selected,
       variants: metadata.options.filter((option) => option !== 'core'),
-      procedure: { ...selected.procedure, initialInput: metadata.queryInput },
+      procedure: {
+        ...selected.procedure,
+        initialInput: candidateInput ?? selected.procedure.initialInput,
+      },
     }));
     const proof = await renderResourceSlice(
       {
         ...proofPlan,
-        leaves: proofPlan.leaves.filter((candidate) => candidate.role === 'loaders'),
+        leaves: proofPlan.leaves.filter((candidate) => candidate.role === leaf.role),
       },
       dependencies.templates,
       dependencies.templateRenderer,
+      candidatePresentation,
     );
     if (proof.some((candidate) => candidate.path === leaf.path && candidate.content === content)) {
-      queryInput = metadata.queryInput;
+      if (candidateInput !== undefined) queryInput = candidateInput;
+      if (candidatePresentation !== undefined) presentation = candidatePresentation;
     }
   }
-  return { variants: [...variants].sort(), queryInput };
+  return { variants: [...variants].sort(), queryInput, presentation };
 }
 
 async function transformSharedSources(

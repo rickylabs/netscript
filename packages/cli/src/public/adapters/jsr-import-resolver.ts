@@ -8,6 +8,7 @@ import type { JsrResolverPort } from '../../kernel/ports/jsr-resolver-port.ts';
 
 const REGISTRY_SPECIFIERS: Readonly<Record<string, string>> = {
   [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_DISCOVERY]: `${JSR_SPECIFIERS.sdk}/discovery`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_STREAMS_CORE]: JSR_SPECIFIERS.streams,
   [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_CONTRACTS]: `${JSR_SPECIFIERS.workers}/contracts/v1`,
   [SCAFFOLD_PACKAGES.NETSCRIPT_CONFIG]: JSR_SPECIFIERS.config,
   [SCAFFOLD_PACKAGES.NETSCRIPT_SERVICE]: JSR_SPECIFIERS.service,

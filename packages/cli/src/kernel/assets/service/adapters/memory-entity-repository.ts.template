@@ -7,7 +7,7 @@ export function createMemory{{serviceName | pascalCase}}Repository(): {{serviceN
   const records: {{serviceName | pascalCase}}ListItemV1[] = createSampleRecords().map((row, index) => ({ ...row, id: index + 1, summary: `Workspace record owned by ${row.ownerName}.` }));
   return {
     list(query) {
-      const filtered = records.filter((record) => (!query.search || record.name.toLowerCase().includes(query.search)) && (!query.status || record.status === query.status));
+      const filtered = records.filter((record) => (!query.search || [record.reference, record.name, record.ownerName, record.ownerEmail].some((value) => value.toLowerCase().includes(query.search!))) && (!query.status || record.status === query.status));
       const direction = query.sortOrder === 'asc' ? 1 : -1;
       filtered.sort((a, b) => {
         const left = a[query.sortBy];

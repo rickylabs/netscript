@@ -85,7 +85,7 @@ Deno.test('init preset and command-shaped planner render byte-identical canonica
       APP_VARS,
       templates,
     ),
-    renderResourceSlice(commandPlan, templates, canonicalRenderer),
+    renderResourceSlice(commandPlan, templates, canonicalRenderer, { amountUnit: 'minor' }),
   ]);
 
   assertEquals(initPlan.input.variants, ['core', 'form', 'partial']);

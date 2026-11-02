@@ -67,6 +67,7 @@ export async function renderExampleServiceResourceSlice(
       context.templateAdapter,
       new DenoGeneratedSourceFormatter(context.process),
     ),
+    { amountUnit: 'minor' },
   );
 }
 

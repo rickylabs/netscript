@@ -1,12 +1,4 @@
-import {
-  Badge,
-  Button,
-  Card,
-  EmptyState,
-  PageHeader,
-  ResponsiveTable,
-  type ResponsiveTableColumn,
-} from '@app/components/ui/mod.ts';
+import { Badge, Button, EmptyState, PageHeader } from '@app/components/ui/mod.ts';
 
 interface ExampleCard {
   readonly title: string;
@@ -21,76 +13,39 @@ interface ExamplesViewProps {
   readonly examples: readonly ExampleCard[];
 }
 
-const columns: readonly ResponsiveTableColumn<ExampleCard>[] = [
-  {
-    key: 'title',
-    label: 'Example',
-    priority: 'primary',
-    cell: (example) => example.title,
-  },
-  {
-    key: 'owner',
-    label: 'Owner',
-    cell: (example) => example.owner,
-  },
-  {
-    key: 'status',
-    label: 'Status',
-    cell: (example) => <Badge variant='secondary'>{example.status}</Badge>,
-  },
-  {
-    key: 'action',
-    label: 'Action',
-    align: 'end',
-    cell: (example) => (
-      <Button type='link' href={example.href} variant='ghost' size='sm'>
-        Open
-      </Button>
-    ),
-  },
-];
-
 export default function ExamplesView({ canonicalHref, examples }: ExamplesViewProps) {
   return (
     <div class='workspace-page'>
-      <PageHeader>
-        <PageHeader.Main>
-          <PageHeader.Badges>
-            <Badge variant='primary'>Examples</Badge>
-            <Badge variant='muted'>reference</Badge>
-          </PageHeader.Badges>
-          <PageHeader.Intro>
-            <h1>Examples</h1>
-            <p class='ns-lede'>
-              Reference routes included in this application. Open Records to work with connected data.
-            </p>
-          </PageHeader.Intro>
+      <PageHeader class='workspace-heading'>
+        <PageHeader.Layout>
+          <PageHeader.Main>
+            <PageHeader.Intro>
+              <h1>Examples</h1>
+              <p>Connected workflows and reference routes in your application.</p>
+            </PageHeader.Intro>
+          </PageHeader.Main>
           <PageHeader.Actions>
-            {canonicalHref && <Button type='link' href={canonicalHref}>Open {{serviceName}} flow</Button>}
+            {canonicalHref && <Button type='link' href={canonicalHref}>Open {{serviceName}} flow ↗</Button>}
           </PageHeader.Actions>
-        </PageHeader.Main>
+        </PageHeader.Layout>
       </PageHeader>
-
-      <Card>
-        <Card.Header>
-          <Card.Title>Example routes</Card.Title>
-          <Card.Description>Only routes created in this application.</Card.Description>
-        </Card.Header>
-        <Card.Body>
-          <ResponsiveTable
-            caption='Scaffold example routes'
-            columns={columns}
-            rows={examples}
-            getRowKey={(example) => example.href}
-            emptyState={
-              <EmptyState heading='No examples configured'>
-                Add a workflow route and include it in this table.
-              </EmptyState>
-            }
-            summary={<span>{examples.length} examples available</span>}
-          />
-        </Card.Body>
-      </Card>
+      <section class='workspace-section'>
+        <header class='workspace-section-heading'>
+          <h2>Example routes <span class='workspace-count'>{examples.length}</span></h2>
+          <span class='workspace-muted'>{examples.length === 1 ? '1 route available' : `${examples.length} routes available`}</span>
+        </header>
+        {examples.length ? <ul class='workspace-example-list'>
+          {examples.map((example) => <li key={example.href}>
+            <span class='workspace-resource-icon' aria-hidden='true'>◫</span>
+            <div class='workspace-example-copy'>
+              <a href={example.href}>{example.title}</a>
+              <p>{example.description}</p>
+              <div class='workspace-example-meta'><span>{example.owner}</span><code>{example.href}</code><Badge variant='muted'>{example.status}</Badge></div>
+            </div>
+            <Button type='link' href={example.href} variant='ghost' size='sm' aria-label={`Open ${example.title}`}>Open ↗</Button>
+          </li>)}
+        </ul> : <EmptyState heading='No examples configured'>Add a workflow route to this application.</EmptyState>}
+      </section>
     </div>
   );
 }

@@ -51,7 +51,7 @@ export type {{serviceName | pascalCase}}{{modelName}}UpdateInputV1 = z.infer<
 
 const demoCrud = createCrudContract({
   resource: '{{serviceName}}',
-  filterSchema: z.object({ status: {{serviceName | pascalCase}}StatusSchemaV1.optional() }),
+  filterSchema: z.object({ search: z.string().trim().max(200).optional(), status: {{serviceName | pascalCase}}StatusSchemaV1.optional() }),
   entitySchema: {{serviceName | pascalCase}}{{modelName}}SchemaV1,
   createSchema: {{serviceName | pascalCase}}{{modelName}}CreateInputSchemaV1,
   updateSchema: {{serviceName | pascalCase}}{{modelName}}UpdateInputSchemaV1,

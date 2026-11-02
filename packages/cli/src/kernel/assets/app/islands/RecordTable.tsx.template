@@ -1,0 +1,45 @@
+import { useState } from 'preact/hooks';
+import { Badge, Button, DataTable, EmptyState } from '@app/components/ui/mod.ts';
+import { appRoutes } from '@app/router.ts';
+import { scaffoldAmount, scaffoldInitials, scaffoldPageHref, scaffoldRecordCount, scaffoldRecordsCsv, scaffoldStatuses, type ScaffoldRecord, type ScaffoldRecords } from '@app/lib/scaffold-contract.ts';
+
+const COLUMNS = '32px minmax(105px, 1fr) minmax(175px, 1.8fr) minmax(130px, 1fr) minmax(100px, 1fr) 44px';
+const headers = [{ key: 'reference', label: 'Reference' }, { key: 'ownerName', label: 'Owner' }, { key: 'status', label: 'Status' }, { key: 'amount', label: 'Amount' }] as const;
+
+/** CSV export contains only the rows loaded from the service and neutralizes spreadsheet formulas. */
+function exportRecords(rows: readonly ScaffoldRecord[]) {
+  const csv = scaffoldRecordsCsv(rows);
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  const link = document.createElement('a'); link.href = url; link.download = 'records.csv'; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/** Selection is scoped to the loaded page; sorting and filtering stay on the service. */
+export default function RecordTable({ records, locale, compact = false }: { readonly records: ScaffoldRecords; readonly locale?: string; readonly compact?: boolean }) {
+  const [selected, setSelected] = useState<readonly string[]>([]);
+  const selectedRows = records.rows.filter((row) => selected.includes(row.id));
+  const all = records.rows.length > 0 && selectedRows.length === records.rows.length;
+  const sortHref = (key: string) => scaffoldPageHref(appRoutes.records.href(), { ...records, query: { ...records.query, sortBy: key, sortOrder: records.query?.sortBy === key && records.query.sortOrder === 'asc' ? 'desc' : 'asc' } }, 1);
+  return <DataTable class='workspace-records'>
+    {!compact && records.rows.length > 0 && <DataTable.Header><div class='workspace-selection'><span aria-live='polite'>{selectedRows.length ? `${selectedRows.length} selected` : 'Select records to export'}</span><Button id='record-export' type='button' size='sm' variant='outline' onClick={() => exportRecords(selectedRows.length ? selectedRows : records.rows)}>Export {selectedRows.length ? 'selected' : 'page'}</Button>{selectedRows.length > 0 && <Button type='button' size='sm' variant='ghost' onClick={() => setSelected([])}>Clear</Button>}</div></DataTable.Header>}
+    <div class='workspace-table-scroll' role='region' aria-label='Records table' tabIndex={0}>
+      <table aria-label='Records' class='workspace-table'>
+        <thead><tr data-part='row' style={{ gridTemplateColumns: COLUMNS }} class='workspace-table-head'>
+          <th scope='col'>{!compact && <input type='checkbox' aria-label='Select all records on this page' checked={all} disabled={!records.rows.length} onChange={() => setSelected(all ? [] : records.rows.map((row) => row.id))} />}</th>
+          {headers.map(({ key, label }) => <th scope='col' key={key} aria-sort={records.query?.sortBy === key ? records.query.sortOrder === 'asc' ? 'ascending' : 'descending' : undefined}>{compact ? label : <a href={sortHref(key)}>{label} <span aria-hidden='true'>↕</span></a>}</th>)}
+          <th scope='col'><span class='workspace-sr-only'>Actions</span></th>
+        </tr></thead>
+        <tbody>{records.rows.map((row) => <tr data-part='row' key={row.id} style={{ gridTemplateColumns: COLUMNS }} aria-selected={!compact ? selected.includes(row.id) : undefined}>
+          <td>{!compact && <input type='checkbox' aria-label={`Select ${row.reference}`} checked={selected.includes(row.id)} onChange={() => setSelected(selected.includes(row.id) ? selected.filter((id) => id !== row.id) : [...selected, row.id])} />}</td>
+          <td><a class='workspace-record-link' href={appRoutes.record.href({ path: { id: row.id } })}>{row.reference}</a><span class='workspace-record-description'>{row.name}</span></td>
+          <td class='workspace-owner'><span class='workspace-avatar' aria-hidden='true'>{scaffoldInitials(row.ownerName)}</span><span><strong>{row.ownerName}</strong><span class='workspace-record-description'>{row.ownerEmail}</span></span></td>
+          <td><Badge variant={scaffoldStatuses[row.status].badgeVariant}>{scaffoldStatuses[row.status].label}</Badge></td>
+          <td class='workspace-money'>{scaffoldAmount(row.amount, row.currency, locale)}</td>
+          <td><a class='workspace-row-action' href={appRoutes.record.href({ path: { id: row.id } })} aria-label={`View ${row.reference}`}>↗</a></td>
+        </tr>)}</tbody>
+      </table>
+    </div>
+    {!records.rows.length && <EmptyState class='workspace-empty' heading={records.state === 'unavailable' ? 'Records unavailable' : records.state === 'unauthorized' ? 'Sign in to view records' : records.query?.search || records.query?.status ? 'No matching records' : 'Your records will appear here'}><p>{records.message}</p>{records.command && <code class='workspace-command'>{records.command}</code>}{records.state === 'unauthorized' && <Button type='link' href={appRoutes.signIn.href()}>Sign in</Button>}</EmptyState>}
+    {!compact && <DataTable.Footer><span>{records.total === undefined ? 'No connected data' : scaffoldRecordCount(records.total, locale)}</span></DataTable.Footer>}
+  </DataTable>;
+}
