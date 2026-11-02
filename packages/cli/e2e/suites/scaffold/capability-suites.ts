@@ -63,9 +63,9 @@ const INFRASTRUCTURE_GATES = [
 export const RUNTIME_GATES = [
   GATE.PREFLIGHT_DENO,
   GATE.PREFLIGHT_ASPIRE,
-  // Its own pristine workspaces run before any main-suite link or restart fixture.
-  GATE.BEHAVIOR_DOCUMENTED_SCAFFOLD,
   GATE.SCAFFOLD_INIT,
+  // Static init gives the cleanup tail a valid AppHost path; no repair fixture has run.
+  GATE.BEHAVIOR_DOCUMENTED_SCAFFOLD,
   GATE.SCAFFOLD_SERVICE_CLIENT_ADD,
   GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE,
   GATE.SCAFFOLD_AGENT_INIT,

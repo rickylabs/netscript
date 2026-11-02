@@ -1,29 +1,32 @@
-# Resume
+# Resume — issue 2591
 
-Issue 2591; branch `orch/divybot-6572256863`; baseline `6766130bbafbe78a9bb5870f704987cb0743c5e6`.
-See plan.md and worklog.md. S0 complete; S1 implemented and undergoing independent repair review.
+PR: https://github.com/rickylabs/netscript/pull/2592 (draft; Refs #2591). Branch:
+`orch/divybot-6572256863`. Baseline `6766130bbafbe78a9bb5870f704987cb0743c5e6`; implementation
+S1 `321eca9b9c53d7ac7b12e832d09b9c43c861bde7`; first runtime candidate
+`f82ef33dac6c915d320b0ffd99be24dcc4559263`. No merge, rebase or force push. Main remains held.
 
-Root causes: startup-only seed dispatch and app-only default stream links. Existing runtime
-suite explicitly restarts workers after seed and adds the users stream link in a storage fixture.
-Local Deno 2.9.7 works, RTK absent, Docker daemon absent. Isolated reproduction AppHost is owned
-by `.llm/tmp/2591-repro/documented-2591/aspire/apphost.mts`; leave foreign AppHosts alone.
+S1 independent Opus re-review PASS. It adds event-driven post-seed handoff observation with
+failure isolation, shutdown/rearm handling and existing idempotency. `plugin install --service`
+persists the service consumer and moves only earlier managed edges; manual links survive.
 
-Next: implement filesystem-driven handoff lifetime, explicit service consumer install option,
-document exact commands, then independent clean runtime acceptance with both negative controls.
-Separate cross-family IMPL-EVAL required. Public artifacts use repository-relative paths.
-Draft PR with Refs #2591; no closing keyword, rebase, force push or merge. READY only after
-final-head runtime CI and required check evidence. Final report through ignored file handoff.
+S2 implements behavior.documented-scaffold after static main init, before all plugin/link/runtime
+repair fixtures. It executes the actual documented block in three fresh Postgres workspaces:
+skip the handoff, drop the service link, restore. Require real seed-correlated completion and
+stream-backed Activity, with stable worker PID. Cleanup reuses the canonical runtime evidence helper.
 
-S1 focused tests: 112 PASS, including real filesystem late publication/rearm/failure controls.
-Independent review found sample failure isolation and service re-selection gaps; fixed with
-startup readiness separated from observer lifetime and revocation of only prior managed edges.
-Next after S1 review: commit/push S1, then implement S2 documented-order runtime gate with controls.
+First CI run https://github.com/rickylabs/netscript/actions/runs/41418574351 failed the new gate.
+It proves the seed control goes RED while actual Activity passes. The next variant completed a job
+but exposed a test DTO error: execution responses omit correlationId. The repair queries the public
+by-correlation route, uses the actual public schema in the fixture, preserves nested errors, retries
+transitional projection reads and gives Aspire an explicit startup budget. Generated Aspire
+inventory/parity repaired. See memory-runtime-contract.md and worklog.md.
 
-S1 independent repair review PASS. All 112 focused results and 14 owned-source wrapper checks pass.
-Root check/lint/fmt and carrier tasks pass on the prior baseline with scoped repaired-source checks;
-S2 must complete final-head validation. No accepted product debt. Proceed to S1 commit/push, then S2.
+Deno 2.9.7 local results: 191 focused test/step results and all 21 changed TypeScript scoped checks
+pass. RTK and Docker daemon unavailable locally. Four carrier generators and all check tasks ran;
+final parity inventory refresh is included. Same independent evaluator is reviewing S2 repairs.
 
-S2 candidate implemented: behavior.documented-scaffold executes the canonical docs in three fresh
-workspaces before main-suite setup. 76 focused tests and seven-source scoped wrappers pass.
-Next: finish same-session S2 review, final carrier/check tasks, and full runtime CI at final head.
-No READY or runtime PASS may be claimed until the real CI run proves both controls and restoration.
+Next: commit/push the repaired candidate, run canonical one-pass scaffold.runtime CI at that exact
+head, finish all current-head checks and independent evidence review, update PR evidence, and queue
+READY through `.divybot-final-report.md` only when every required check is green or policy-skipped.
+Keep the head fixed once green. Public run artifacts use repository-relative paths; assignment
+and final-report files stay outside Git. No accepted product debt. Cockpit owns review and merge.

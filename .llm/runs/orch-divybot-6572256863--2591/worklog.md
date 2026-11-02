@@ -72,3 +72,31 @@ foreign/unknown resources without changing them. SQLite keeps its existing provi
 files pass scoped check/lint/fmt. quality:gate PASS. S2 independent review and final-head full
 scaffold.runtime CI remain pending; this is a candidate commit, not a runtime sign-off.
 Reconcile: declared scope maintained, no hand-written carriers and no accepted product debt.
+
+## S2 repair and first live feedback
+
+First CI attempt: run 41418574351, head f82ef33dac6c915d320b0ffd99be24dcc4559263. The new gate
+ran two pristine variants in 189693ms. Disabling the seed handoff produced the expected job RED
+while real stream/HTML Activity passed. Drop-link observed a completed job, but the stronger job
+assertion incorrectly expected correlationId in the public DTO. Fixed by using the public
+correlation-filtered endpoint and a fixture parsed through the actual public response schema.
+This failed run is not final acceptance.
+
+The independent S2 review requested bounded projection convergence and explicit Aspire startup
+budgeting; both are implemented with regression tests. Replaced general teardown enumeration with
+the canonical runtime cleanup helper after CI enumerated no detached AppHosts. Main static init
+now precedes this isolated gate so its cleanup path exists; all link/restart fixtures still follow.
+The generated Aspire scan inventory was refreshed through its generator and parity passes.
+All 191 focused results and 21 owned-source scoped wrappers pass; final CI and S2 repair review
+are pending. No product runtime behavior changed in this repair, and no product debt was accepted.
+
+## S2 repaired candidate
+
+The API regression fixture now parses ExecutionRecordResponseSchema, confirming that correlationId
+is absent. The runner queries executions by the seed's correlation key through the existing
+public route and checks actual workspace work plus database-seed payload, progress and completion.
+Canonical stopAndProbe cleanup targets the known AppHost directly and asserts no owned survivors;
+successful disposable workspaces are removed. Main static init precedes the isolated scenario,
+which still precedes all plugin/link/runtime repair fixtures. Nested control failures retain causes.
+191 focused results and all 21 owned-source check/lint/fmt gates pass. Same-session repair review
+and the new exact-head runtime CI are pending. Final quality/check evidence will bind the next head.

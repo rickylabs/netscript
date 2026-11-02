@@ -34,19 +34,26 @@ const executionList = z.object({
     id: z.string(),
     jobId: z.string(),
     status: z.string(),
-    correlationId: z.string().optional(),
     progressPercent: z.number().nullable(),
     completedAt: z.string().nullable(),
     result: z.record(z.string(), z.unknown()).nullable(),
   })),
 });
 
-/** Require one completed real sample with its seed identity, work result and progress. */
-export function assertDocumentedSeedExecution(value: unknown, seedId: string): string {
-  const { executions } = executionList.parse(value);
-  const matches = executions.filter((execution) =>
-    execution.jobId === 'health-check' && execution.correlationId === `scaffold-seed:${seedId}`
+/** Use the public correlation filter: execution DTOs deliberately omit correlationId. */
+export function seedExecutionUrl(baseUrl: string, seedId: string): URL {
+  const url = new URL(
+    '/api/v1/workers/executions/by-correlation/' + encodeURIComponent('scaffold-seed:' + seedId),
+    baseUrl,
   );
+  url.searchParams.set('limit', '50');
+  return url;
+}
+
+/** Require one completed real sample from the correlation-filtered response. */
+export function assertDocumentedSeedExecution(value: unknown): string {
+  const { executions } = executionList.parse(value);
+  const matches = executions.filter((execution) => execution.jobId === 'health-check');
   if (matches.length !== 1 || matches[0].status !== 'completed') {
     throw new SeedHandoffAcceptanceError(
       'The post-seed health-check execution did not complete exactly once',
@@ -55,7 +62,9 @@ export function assertDocumentedSeedExecution(value: unknown, seedId: string): s
   const execution = matches[0];
   if (
     execution.progressPercent !== 100 || !execution.completedAt ||
-    typeof execution.result?.workspaceEntries !== 'number' || execution.result.workspaceEntries < 1
+    typeof execution.result?.workspaceEntries !== 'number' ||
+    execution.result.workspaceEntries < 1 ||
+    !z.object({ source: z.literal('database-seed') }).safeParse(execution.result?.payload).success
   ) {
     throw new Error('The seed job did not report real work, full progress and completion time');
   }
@@ -119,3 +128,43 @@ export function assertDocumentedActivity(
   }
   return event.value.id;
 }
+
+/** Read-side projection effects, separated from the single committed mutation. */
+export interface ActivityProjectionPorts {
+  readonly readHtml: () => Promise<string>;
+  readonly readEvents: () => Promise<unknown>;
+}
+
+/** Bounded application-effect observation; an explicitly unlinked topology fails immediately. */
+export async function waitForDocumentedActivity(
+  ports: ActivityProjectionPorts,
+  recordId: string | number,
+  options: {
+    readonly attempts?: number;
+    readonly delayMs?: number;
+    readonly delay?: (milliseconds: number) => Promise<void>;
+  } = {},
+): Promise<string> {
+  const attempts = options.attempts ?? ACTIVITY_PROJECTION_ATTEMPTS;
+  const delayMs = options.delayMs ?? ACTIVITY_PROJECTION_DELAY_MS;
+  const delay = options.delay ??
+    ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
+  let lastFailure: unknown;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      const html = await ports.readHtml();
+      assertLinkedActivityHtml(html);
+      return assertDocumentedActivity(await ports.readEvents(), recordId, html);
+    } catch (error) {
+      if (error instanceof StreamLinkAcceptanceError) throw error;
+      lastFailure = error;
+    }
+    if (attempt < attempts) await delay(delayMs);
+  }
+  throw new Error('The linked Activity projection did not converge within its bounded budget', {
+    cause: lastFailure,
+  });
+}
+
+const ACTIVITY_PROJECTION_ATTEMPTS = 30;
+const ACTIVITY_PROJECTION_DELAY_MS = 1_000;

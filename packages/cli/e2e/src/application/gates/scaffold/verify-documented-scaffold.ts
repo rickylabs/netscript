@@ -3,22 +3,23 @@ import { join, resolve } from '@std/path';
 import { buildStreamUrl } from '@netscript/plugin-streams-core';
 import { z } from 'zod';
 import {
-  assertDocumentedActivity,
   assertDocumentedSeedExecution,
-  assertLinkedActivityHtml,
   DOCUMENTED_SCAFFOLD_DOC,
   DOCUMENTED_SCAFFOLD_VARIANTS,
   documentedScaffoldCommands,
   type DocumentedScaffoldVariant,
+  seedExecutionUrl,
   SeedHandoffAcceptanceError,
   StreamLinkAcceptanceError,
+  waitForDocumentedActivity,
 } from './documented-scaffold-contract.ts';
 import { resolveResourceUrlsFromAppHost } from './generated-app-endpoint.ts';
 import { probeAppHome } from './probe-app-home.ts';
 import { probePluginResource } from './runtime/probe-plugin-resource.ts';
 import { verifyGeneratedCrudAcceptance } from './verify-live-db-endpoint.ts';
 
-const COMMAND_CEILING_MS = 300_000;
+const COMMAND_CEILING_MS = 330_000;
+const DEFAULT_ASPIRE_START_TIMEOUT_SECONDS = 300;
 const seedRequest = z.object({ version: z.literal(1), seedId: z.string().uuid() });
 type Outcome = { readonly passed: true; readonly id: string } | {
   readonly passed: false;
@@ -26,13 +27,20 @@ type Outcome = { readonly passed: true; readonly id: string } | {
 };
 
 async function command(executable: string, args: readonly string[], cwd: string): Promise<string> {
+  const startingAspire = executable === 'aspire' && args[0] === 'start';
+  const startTimeout = Deno.env.get('ASPIRE_CLI_START_TIMEOUT') ??
+    String(DEFAULT_ASPIRE_START_TIMEOUT_SECONDS);
+  const ceiling = startingAspire
+    ? Math.max(COMMAND_CEILING_MS, (Number(startTimeout) + 30) * 1_000)
+    : COMMAND_CEILING_MS;
   const result = await new Deno.Command(executable, {
     args: [...args],
     cwd,
     stdin: 'null',
     stdout: 'piped',
     stderr: 'piped',
-    signal: AbortSignal.timeout(COMMAND_CEILING_MS),
+    signal: AbortSignal.timeout(ceiling),
+    ...(startingAspire ? { env: { ASPIRE_CLI_START_TIMEOUT: startTimeout } } : {}),
   }).output();
   const stdout = new TextDecoder().decode(result.stdout);
   if (!result.success) {
@@ -78,10 +86,7 @@ async function seedExecution(appHost: string, projectRoot: string): Promise<stri
     throw error;
   }
   const [url] = await resolveResourceUrlsFromAppHost(appHost, 'workers-api');
-  return assertDocumentedSeedExecution(
-    await responseJson(new URL('/api/v1/workers/executions?limit=50', url)),
-    seedId,
-  );
+  return assertDocumentedSeedExecution(await responseJson(seedExecutionUrl(url, seedId)));
 }
 
 async function activity(appHost: string, projectRoot: string): Promise<string> {
@@ -89,20 +94,23 @@ async function activity(appHost: string, projectRoot: string): Promise<string> {
   const mutation = await verifyGeneratedCrudAcceptance(usersUrl);
   await probeAppHome(projectRoot, 'dashboard', appHost);
   const [appUrl] = await resolveResourceUrlsFromAppHost(appHost, 'dashboard');
-  const response = await fetch(appUrl, {
-    signal: AbortSignal.timeout(10_000),
-    headers: { accept: 'text/html' },
-  });
-  const html = await response.text();
-  if (!response.ok || !html.includes('<html')) {
-    throw new Error('The documented app failed to render');
-  }
-  assertLinkedActivityHtml(html);
   const [streamsUrl] = await resolveResourceUrlsFromAppHost(appHost, 'streams');
   const streamUrl = new URL(buildStreamUrl('/scaffold/users/records', streamsUrl));
   streamUrl.searchParams.set('offset', '-1');
-  const events = await responseJson(streamUrl);
-  return assertDocumentedActivity(events, mutation.representativeId, html);
+  return await waitForDocumentedActivity({
+    readHtml: async () => {
+      const response = await fetch(appUrl, {
+        signal: AbortSignal.timeout(10_000),
+        headers: { accept: 'text/html' },
+      });
+      const html = await response.text();
+      if (!response.ok || !html.includes('<html')) {
+        throw new Error('The documented app failed to render');
+      }
+      return html;
+    },
+    readEvents: () => responseJson(streamUrl),
+  }, mutation.representativeId);
 }
 
 async function workerPid(appHost: string, cwd: string): Promise<number> {
@@ -131,45 +139,39 @@ async function workerPid(appHost: string, cwd: string): Promise<number> {
 }
 
 async function cleanup(repoRoot: string, projectRoot: string): Promise<void> {
-  const result = await new Deno.Command(Deno.execPath(), {
-    args: [
-      'run',
-      '-A',
-      join(repoRoot, '.llm/tools/maint/teardown/teardown.ts'),
-      '--slice-dir',
-      join(projectRoot, '.netscript/e2e-cleanup'),
-      '--worktree',
-      repoRoot,
-      '--owned-root',
-      projectRoot,
-      '--apply',
-    ],
-    cwd: repoRoot,
-    stdin: 'null',
-    stdout: 'piped',
-    stderr: 'piped',
-    signal: AbortSignal.timeout(COMMAND_CEILING_MS),
-  }).output();
-  if (result.code !== 0 && result.code !== 4) {
-    throw new Error(
-      `Documented workspace cleanup failed: ${new TextDecoder().decode(result.stderr)}`,
-    );
-  }
+  const receiptPath = join(projectRoot, '.netscript/e2e-cleanup.json');
+  await command(Deno.execPath(), [
+    'run',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=aspire,docker',
+    join(repoRoot, 'packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts'),
+    join(projectRoot, 'aspire/apphost.mts'),
+    projectRoot,
+    'true',
+    receiptPath,
+  ], projectRoot);
   const receipt = z.object({
-    actionsRequired: z.array(z.string()),
-    escalated: z.array(z.unknown()),
-    stoppedAppHosts: z.array(z.string()),
-    removedContainers: z.array(z.string()),
-  }).parse(JSON.parse(new TextDecoder().decode(result.stdout)));
-  if (receipt.actionsRequired.length) {
-    throw new Error(`Documented cleanup needs action: ${receipt.actionsRequired.join('; ')}`);
+    evaluation: z.object({
+      ownedContainers: z.array(z.unknown()),
+      ownedProcesses: z.array(z.unknown()),
+      foreignContainers: z.array(z.unknown()),
+      unprovenContainers: z.array(z.unknown()),
+      foreignProcesses: z.array(z.unknown()),
+      unprovenProcesses: z.array(z.unknown()),
+    }),
+  }).parse(JSON.parse(await Deno.readTextFile(receiptPath)));
+  const observed = receipt.evaluation;
+  if (observed.ownedContainers.length || observed.ownedProcesses.length) {
+    throw new Error('The documented workspace has owned runtime survivors');
   }
   console.info(
     JSON.stringify({
       cleanup: 'PASS',
-      appHosts: receipt.stoppedAppHosts.length,
-      containers: receipt.removedContainers.length,
-      foreignOrUnknownLeftAlone: receipt.escalated.length,
+      exactAppHostStopped: true,
+      foreignOrUnknownLeftAlone: observed.foreignContainers.length +
+        observed.unprovenContainers.length +
+        observed.foreignProcesses.length + observed.unprovenProcesses.length,
     }),
   );
 }
@@ -187,6 +189,7 @@ async function runVariant(
   const appHost = join(projectRoot, 'aspire/apphost.mts');
   let cwd = root;
   let beforeSeedPid: number | undefined;
+  let appHostStarted = false;
   let primaryFailure: { readonly error: unknown } | undefined;
   try {
     for (const words of commands) {
@@ -228,6 +231,7 @@ async function runVariant(
         ], cwd);
         beforeSeedPid = await workerPid(appHost, cwd);
       }
+      if (words[0] === 'aspire' && args[0] === 'start') appHostStarted = true;
       console.info(`${variant}: ${words.join(' ')}`);
       await command(
         words[0] === 'netscript' ? Deno.execPath() : 'aspire',
@@ -235,7 +239,9 @@ async function runVariant(
           ? [
             'run',
             '-A',
-            ...(cliEntrypoint.startsWith('jsr:') ? ['--minimum-dependency-age=0'] : []),
+            ...(cliEntrypoint.startsWith('jsr:@netscript/cli@')
+              ? ['--minimum-dependency-age=0']
+              : []),
             cliEntrypoint,
             ...args,
           ]
@@ -251,16 +257,20 @@ async function runVariant(
     }
     if (variant === 'skip-seed-handoff') {
       if (seed.passed || !(seed.error instanceof SeedHandoffAcceptanceError) || !stream.passed) {
-        throw new Error(
-          `Seed control did not isolate the missing handoff: ${JSON.stringify({ seed, stream })}`,
+        throw new AggregateError(
+          [!seed.passed ? seed.error : undefined, !stream.passed ? stream.error : undefined].filter(
+            Boolean,
+          ),
+          `Seed control did not isolate the missing handoff (seed=${seed.passed}, activity=${stream.passed})`,
         );
       }
     } else if (variant === 'drop-link') {
       if (!seed.passed || stream.passed || !(stream.error instanceof StreamLinkAcceptanceError)) {
-        throw new Error(
-          `Link control did not isolate the missing stream link: ${
-            JSON.stringify({ seed, stream })
-          }`,
+        throw new AggregateError(
+          [!seed.passed ? seed.error : undefined, !stream.passed ? stream.error : undefined].filter(
+            Boolean,
+          ),
+          `Link control did not isolate the missing stream link (seed=${seed.passed}, activity=${stream.passed})`,
         );
       }
     } else if (!seed.passed || !stream.passed) {
@@ -284,7 +294,7 @@ async function runVariant(
     primaryFailure = { error };
   }
   try {
-    await cleanup(repoRoot, projectRoot);
+    if (appHostStarted) await cleanup(repoRoot, projectRoot);
   } catch (error) {
     if (primaryFailure) {
       throw new AggregateError(
@@ -295,6 +305,7 @@ async function runVariant(
     throw error;
   }
   if (primaryFailure) throw primaryFailure.error;
+  await Deno.remove(root, { recursive: true });
 }
 
 if (import.meta.main) {
@@ -313,4 +324,5 @@ if (import.meta.main) {
   for (const variant of DOCUMENTED_SCAFFOLD_VARIANTS) {
     await runVariant(repoRoot, cliEntrypoint, parent, variant, commands);
   }
+  await Deno.remove(parent);
 }

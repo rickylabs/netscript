@@ -117,7 +117,7 @@ export function createRuntimeBehaviorGates(
       'capture',
       'The unmodified documented steps must complete seeded work and render the actual linked Activity stream.',
       undefined,
-      1_200_000,
+      2_400_000,
     ),
     commandGate(
       GATE.BEHAVIOR_BACKGROUND_CHILDREN_HEALTH,
