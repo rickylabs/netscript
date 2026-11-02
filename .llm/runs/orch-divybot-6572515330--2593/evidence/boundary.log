@@ -1,0 +1,2 @@
+Task check:scaffold-provider-boundary deno run --allow-read --allow-write --allow-run --allow-env --allow-ffi --allow-sys .llm/tools/fitness/check-scaffold-provider-boundary.ts
+{"gate":"scaffold-provider-boundary","ok":true,"productionBuild":"PASS","builtRuntime":"PASS (6 capability states)","negativeControl":"REJECTED","providerSpecifier":"npm:@tanstack/ai@0.68.0"}

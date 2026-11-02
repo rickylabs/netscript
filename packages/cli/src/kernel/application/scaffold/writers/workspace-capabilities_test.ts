@@ -242,10 +242,10 @@ Deno.test('plugin projections read real result shapes and reject false stream re
     .replace("'./scaffold-service-context.ts'", JSON.stringify(contextUrl))
     .replace("'zod'", JSON.stringify(import.meta.resolve('zod')))
     .replace(
-      "import.meta.glob<AiModels>('../../../ai/models.ts')",
-      "{models: async () => ({AI_MODELS: {chat: 'configured:model'}})}",
+      "await loadAiModule<AiModels>(root, 'models.ts')",
+      "({AI_MODELS: {chat: 'configured:model'}})",
     )
-    .replace("import.meta.glob<AiRuntime>('../../../ai/ai.ts')", '{runtime: async () => ({})}');
+    .replace("await loadAiModule<AiRuntime>(root, 'ai.ts')", '({})');
   const module = await import(moduleUrl(source));
   assertEquals((await module.probeScaffoldPlugin('workers', 'queue-api')).state, 'empty');
   assertEquals(context.readOptions(), { unmarked: 'optional' });
@@ -443,7 +443,7 @@ Deno.test('plugin projections read real result shapes and reject false stream re
     assertEquals((await module.probeScaffoldPlugin('streams', 'events')).state, 'unavailable');
     globalThis.fetch = () => Promise.resolve(new Response(null, { status: 401 }));
     assertEquals((await module.probeScaffoldPlugin('streams', 'events')).state, 'unauthorized');
-    const ai = await module.probeScaffoldPlugin('ai', 'ai');
+    const ai = await module.probeScaffoldPlugin('ai', 'ai', undefined, 'fixture');
     assertEquals(ai.state, 'empty');
     assertEquals(ai.items, [{ label: 'chat', detail: 'configured:model' }]);
   } finally {

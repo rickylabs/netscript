@@ -1,0 +1,10 @@
+{
+  "publishedCli": "0.0.9-canary.2",
+  "vite": "7.2.2",
+  "afterExitCode": 0,
+  "beforeWithAiExitCode": 0,
+  "beforeWithAiSsrModules": 1076,
+  "afterSsrModules": 776,
+  "afterProviderChunks": [],
+  "scope": "No-Aspire, no-DB published scaffold with AI app-owned modules, AI UI collection and two empty generated registry stand-ins; no servers started."
+}

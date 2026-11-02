@@ -127,6 +127,7 @@
     "check:agent-docs-prose": "deno task check:child-health-docs && deno task gen:agent-docs-prose --check",
     "gen:publish-assets": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-publish-assets.ts",
     "check:publish-assets": "deno task gen:publish-assets --check",
+    "check:scaffold-provider-boundary": "deno run --allow-read --allow-write --allow-run --allow-env --allow-ffi --allow-sys .llm/tools/fitness/check-scaffold-provider-boundary.ts",
     "check:scaffold-versions": "deno run .llm/tools/validation/check-scaffold-versions.ts --pretty",
     "check:aspire-version-parity": "deno run --allow-read --allow-run=git .llm/tools/validation/check-aspire-version-parity.ts",
     "check:netscript-jsr-specifiers": "deno run --allow-read .llm/tools/validation/check-netscript-jsr-specifiers.ts --pretty",

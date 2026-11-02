@@ -1,0 +1,23 @@
+{
+  "sourceHead": "c9e5e759ea0b1d713ab91283cd1e4639cc5ad6a5",
+  "qualityGate": {
+    "command": "deno task quality:gate",
+    "exitCode": 0,
+    "notes": "Full quality scan, dependency checks and doctrine scan; existing warnings only."
+  },
+  "assetsFreshness": {
+    "command": "deno task check:assets-barrel",
+    "exitCode": 0
+  },
+  "reviewThreads": {
+    "command": "deno task check:review-threads -- --repo rickylabs/netscript --pr 2594 --pretty",
+    "exitCode": 0,
+    "threads": 0,
+    "unanswered": 0
+  },
+  "lockDelta": false,
+  "freshUiDelta": false,
+  "fullLocalRuntimeE2E": "NOT RUN: owner instruction",
+  "independentImplEval": "PENDING: Cockpit lane",
+  "e2eCliCi": "REQUIRED: coordinator owns gate label"
+}

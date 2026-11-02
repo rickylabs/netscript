@@ -176,6 +176,7 @@ export const GATE_CATALOG = {
     'packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts',
   ],
   'netscript-jsr-specifiers': ['deno', 'task', 'check:netscript-jsr-specifiers'],
+  'scaffold-provider-boundary': ['deno', 'task', 'check:scaffold-provider-boundary'],
   'scaffold-versions': ['deno', 'task', 'check:scaffold-versions'],
   'aspire-version-parity': ['deno', 'task', 'check:aspire-version-parity'],
   'publish-dry-run': ['deno', 'task', 'publish:dry-run'],
