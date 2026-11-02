@@ -1,31 +1,27 @@
-# Resume Northwind showcase — READY handoff
+# Resume Northwind showcase — CI quality follow-up
 
-Issue #2571; draft PR #2595; branch `orch/divybot-6576596639`; milestone 0.0.9.
-Implementation and required acceptance are complete. Same-session independent
-read-only Sol formal IMPL-EVAL: PASS at `350b328ee0b31ce79cec1dac1498112aca658446`.
-Read evaluate.md first, then gate-evidence.json, ci-suite-evidence.json and
-visual-evaluation.md. First formal D1 is retained in evaluate-round-1.md.
+Issue2571, PR2595, branch orch/divybot-6576596639, milestone0.0.9. The owner later
+requested readiness explicitly; PR is now ready for review. Keep Refs-only/no
+labels, push normally, never rebase or force-push. Merge automation is owner-led.
 
-CI-tested runtime source: `04149cb48ee54101f87773c5d4cab5229bc01103`.
-Actions run 41465808061 passed Postgres124/124, SQLite116/116, showcase8/8,
-and stub/browser chat. Local Deno2.9.7 carrier chain, all16root checks, root
-structured check, quality/architecture, CLI quality/doc-lint/publish, 96tests,
-220-file default isolation and 29-package production build pass. Astra approved
-all60views/themes/widths at >=8/10 and inspected12viewportproofs.
+Original showcase implementation and mandatory independent acceptance are
+complete: evaluate.md, visual-evaluation.md, gate-evidence.json and
+ci-suite-evidence.json. CI41465808061 passed real Postgres124/124,
+SQLite116/116 and showcase8/8 plus stub chat/browser. Actual credentials remain
+external prerequisites. All owned AppHosts are stopped; foreign resources left.
 
-Runtime source/test/workflow/lock/carrier objects are unchanged after CI;
-runtime-tree-proof.json records the exact objects independently verified by the
-evaluator. Later changes are debt/README prose and run evidence. Do not equate
-the whole package tree after README changes. Final signoff is run-artifacts only.
+The first non-draft quality run41475477622 failed release:preflight at f5f4397:
+quoted generated setup source was classified as executable package file IO.
+Follow-up now uses Babel token ranges. The same independent Sol reviewer approved
+the repaired source; see followup-source-review.md and followup-quality-evidence.json.
+Related tests23/23, full release preflight, scoped wrappers, dependency checks,
+frozen install and critical audit pass. Remote CI on the repair head is next.
 
-No AI/MCP scope deferred. Actual model/OAuth credentials remain external setup;
-CI uses stubs and does not claim external-provider acceptance. Private chat uses
-POSIX secret-file modes, one-host local ownership KV and O(n) metadata listing.
-Accepted debt `cli-showcase-cardinality-2571` covers adapters18→19 and scaffold
-gates93→94, with owners, cost, stop condition and closure gates. Historical
-scaffold debt stays open. All owned AppHosts stopped; see leak-report.md.
+No scaffold/runtime/workflow source changed. Parser7.29.9 already exists in the
+resolved graph; lock change is one explicit specifier. Original tools/lock tree
+identity is historical; package/JSR/npm graphs and workspace inventory are equal.
+Do not infer current CI green from older successes or draft-policy skips.
 
-Stop at READY: Cockpit reviews and merges. Keep draft, Refs-only, no labels or
-operator session identities. Never rebase/force-push/merge. Canonical issue report
-uses .divybot-final-report.tmp -> .divybot-final-report.md, excluded from Git.
-Writing it queues publication; do not claim that the comment was accepted.
+Next: push this repair, verify current CI quality and other required checks,
+update PR evidence and the canonical report file handoff with the new head.
+Do not commit .divybot-goal.md or either .divybot-final-report file.

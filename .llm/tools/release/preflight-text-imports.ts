@@ -1,3 +1,5 @@
+import { parse } from 'npm:@babel/parser@7.29.9';
+import { z } from 'zod';
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
 import { globToRegExp, join, normalize, relative } from 'jsr:@std/path@^1.0.0';
 import { discoverWorkspaceMembers, readJsonFile, type WorkspaceMember } from '../deps/workspace.ts';
@@ -73,29 +75,70 @@ export async function scanFile(path: string): Promise<PreflightFinding[]> {
 
 /** Scan source text for the narrow preflight read patterns. */
 export function scanSource(source: string, path: string): PreflightFinding[] {
-  // Blank template-literal text first: scaffolder emitters return userland
-  // source as template strings, and an import.meta-relative read inside that
-  // emitted string runs in the user's project (local file), not in the
-  // published package. Stripping keeps real code + ${...} interpolations
-  // scannable while removing false positives. (Comments + allowlist survive.)
-  const scannable = blankTemplateLiterals(source);
-  const importMetaPaths = collectImportMetaPathIdentifiers(scannable);
+  const dataRanges = sourceDataRanges(source, path);
+  const importMetaPaths = collectImportMetaPathIdentifiers(source, dataRanges);
   return [
-    ...findImportAttributes(source, path),
-    ...findIdentifierReads(scannable, path, importMetaPaths),
-    ...findInlineReads(scannable, path),
-    ...findImportMetaFileUrlConversions(scannable, path),
+    ...findImportAttributes(source, path, dataRanges),
+    ...findIdentifierReads(source, path, importMetaPaths, dataRanges),
+    ...findInlineReads(source, path, dataRanges),
+    ...findImportMetaFileUrlConversions(source, path, dataRanges),
   ];
 }
 
-function findImportAttributes(source: string, path: string): ImportAttributeFinding[] {
+interface SourceDataRange {
+  start: number;
+  end: number;
+}
+
+const sourceTokenSchema = z.object({
+  start: z.number().int().nonnegative(),
+  end: z.number().int().nonnegative(),
+  type: z.union([z.string(), z.object({ label: z.string() })]),
+});
+
+/** Let the upstream TypeScript tokenizer distinguish stored source from executable expressions. */
+function sourceDataRanges(source: string, path: string): SourceDataRange[] {
+  try {
+    const result = parse(source, {
+      sourceType: 'unambiguous',
+      plugins: path.endsWith('.tsx')
+        ? ['typescript', 'jsx', 'decorators-legacy']
+        : [['typescript', { dts: path.endsWith('.d.ts') }], 'decorators-legacy'],
+      allowAwaitOutsideFunction: true,
+      allowReturnOutsideFunction: true,
+      allowUndeclaredExports: true,
+      errorRecovery: true,
+      tokens: true,
+    });
+    const tokens = z.array(sourceTokenSchema).parse(result.tokens ?? []);
+    return tokens.filter((token) => {
+      const kind = typeof token.type === 'string' ? token.type : token.type.label;
+      return ['string', 'template', 'regexp', 'jsxText', 'CommentLine', 'CommentBlock'].includes(
+        kind,
+      );
+    }).map(({ start, end }) => ({ start, end }));
+  } catch {
+    // Unclassified syntax retains every candidate match; parser failure cannot suppress a read.
+    // Deno's separate source check owns syntax validity.
+    return [];
+  }
+}
+
+function isSourceDataAt(ranges: readonly SourceDataRange[], index: number): boolean {
+  return ranges.some((range) => index >= range.start && index < range.end);
+}
+
+function findImportAttributes(
+  source: string,
+  path: string,
+  dataRanges: readonly SourceDataRange[],
+): ImportAttributeFinding[] {
   const findings: ImportAttributeFinding[] = [];
-  const code = blankStringsAndComments(source);
   // This conditional registry guard preserves the release lineage: #138/#142 exposed the alpha.6
   // half-publish, #143 recovered with generated string constants, and beta.10 reproduced a partial
   // publish tracked upstream as https://github.com/denoland/deno/issues/35546.
-  for (const match of code.matchAll(/\bwith\s*\{\s*type\s*:/g)) {
-    if (match.index === undefined) continue;
+  for (const match of source.matchAll(/\bwith\s*\{\s*type\s*:/g)) {
+    if (match.index === undefined || isSourceDataAt(dataRanges, match.index)) continue;
     findings.push({
       check: 'import-attributes',
       path,
@@ -105,160 +148,6 @@ function findImportAttributes(source: string, path: string): ImportAttributeFind
     });
   }
   return findings;
-}
-
-/** Blank strings, comments, and template literals while preserving line numbers. */
-export function blankStringsAndComments(source: string): string {
-  const output = [...source];
-  let index = 0;
-  const blank = (position: number): void => {
-    if (output[position] !== '\n' && output[position] !== '\r') output[position] = ' ';
-  };
-  while (index < source.length) {
-    const current = source[index];
-    const next = source[index + 1];
-    if (current === '/' && next === '/') {
-      while (index < source.length && source[index] !== '\n') blank(index++);
-      continue;
-    }
-    if (current === '/' && next === '*') {
-      blank(index++);
-      blank(index++);
-      while (index < source.length) {
-        if (source[index] === '*' && source[index + 1] === '/') {
-          blank(index++);
-          blank(index++);
-          break;
-        }
-        blank(index++);
-      }
-      continue;
-    }
-    if (current === "'" || current === '"' || current === '`') {
-      const quote = current;
-      blank(index++);
-      while (index < source.length) {
-        if (source[index] === '\\') {
-          blank(index++);
-          if (index < source.length) blank(index++);
-          continue;
-        }
-        const closing = source[index] === quote;
-        blank(index++);
-        if (closing) break;
-      }
-      continue;
-    }
-    index += 1;
-  }
-  return output.join('');
-}
-
-/**
- * Replace the *text* content of template literals with spaces (newlines
- * preserved) so emitted-code strings are not scanned as runtime reads, while
- * keeping ordinary code and `${...}` interpolation code intact. Ordinary
- * string literals and comments are copied verbatim so a stray backtick inside
- * them cannot toggle template state and blank real code below.
- */
-export function blankTemplateLiterals(source: string): string {
-  const out: string[] = [];
-  // Each open template literal records the interpolation brace depth at which
-  // its text resumes; deeper braceDepth means we are inside a `${...}`.
-  const templates: Array<{ braceDepth: number }> = [];
-  let braceDepth = 0;
-  const inTemplateText = (): boolean =>
-    templates.length > 0 &&
-    braceDepth === templates[templates.length - 1].braceDepth;
-  const n = source.length;
-  let i = 0;
-  while (i < n) {
-    const c = source[i];
-    const next = source[i + 1];
-    if (inTemplateText()) {
-      if (c === '\\') {
-        out.push(' ');
-        out.push(next === '\n' ? '\n' : ' ');
-        i += 2;
-        continue;
-      }
-      if (c === '`') {
-        out.push('`');
-        templates.pop();
-        i += 1;
-        continue;
-      }
-      if (c === '$' && next === '{') {
-        out.push('$');
-        out.push('{');
-        braceDepth += 1;
-        i += 2;
-        continue;
-      }
-      out.push(c === '\n' ? '\n' : ' ');
-      i += 1;
-      continue;
-    }
-    if (c === '/' && next === '/') {
-      while (i < n && source[i] !== '\n') {
-        out.push(source[i]);
-        i += 1;
-      }
-      continue;
-    }
-    if (c === '/' && next === '*') {
-      out.push('/');
-      out.push('*');
-      i += 2;
-      while (i < n && !(source[i] === '*' && source[i + 1] === '/')) {
-        out.push(source[i]);
-        i += 1;
-      }
-      if (i < n) {
-        out.push('*');
-        out.push('/');
-        i += 2;
-      }
-      continue;
-    }
-    if (c === "'" || c === '"') {
-      out.push(c);
-      i += 1;
-      while (i < n) {
-        const d = source[i];
-        out.push(d);
-        if (d === '\\') {
-          if (i + 1 < n) out.push(source[i + 1]);
-          i += 2;
-          continue;
-        }
-        i += 1;
-        if (d === c) break;
-      }
-      continue;
-    }
-    if (c === '`') {
-      out.push('`');
-      templates.push({ braceDepth });
-      i += 1;
-      continue;
-    }
-    if (c === '{') {
-      braceDepth += 1;
-      out.push(c);
-      i += 1;
-      continue;
-    }
-    if (c === '}') {
-      if (braceDepth > 0) braceDepth -= 1;
-      out.push(c);
-      i += 1;
-      continue;
-    }
-    out.push(c);
-    i += 1;
-  }
-  return out.join('');
 }
 
 /** Discover publishable workspace source files and scan them. */
@@ -480,11 +369,15 @@ async function scanFiles(files: string[]): Promise<PreflightFinding[]> {
   return findings;
 }
 
-function collectImportMetaPathIdentifiers(source: string): Map<string, ImportMetaPath> {
+function collectImportMetaPathIdentifiers(
+  source: string,
+  dataRanges: readonly SourceDataRange[],
+): Map<string, ImportMetaPath> {
   const identifiers = new Map<string, ImportMetaPath>();
   const urlDecl =
     /\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*(?:fromFileUrl\s*\(\s*)?new\s+URL\s*\(\s*(['"`])(?:\\.|(?!\2).)*\2\s*,\s*import\.meta\.url\s*\)/g;
   for (const match of source.matchAll(urlDecl)) {
+    if (match.index !== undefined && isSourceDataAt(dataRanges, match.index)) continue;
     const identifier = match[1];
     if (!identifier || match.index === undefined) continue;
     identifiers.set(identifier, {
@@ -499,11 +392,13 @@ function findIdentifierReads(
   source: string,
   path: string,
   importMetaPaths: Map<string, ImportMetaPath>,
+  dataRanges: readonly SourceDataRange[],
 ): TextImportFinding[] {
   const findings: TextImportFinding[] = [];
   const readCall = /\bDeno\.(readTextFile|readFile)\s*\(\s*([A-Za-z_$][\w$]*)\s*\)/g;
   for (const match of source.matchAll(readCall)) {
     if (match.index === undefined) continue;
+    if (isSourceDataAt(dataRanges, match.index)) continue;
     const line = lineAt(source, match.index);
     if (hasAllowlist(source, line)) continue;
     const identifier = match[2];
@@ -524,12 +419,17 @@ function findIdentifierReads(
   return findings;
 }
 
-function findInlineReads(source: string, path: string): TextImportFinding[] {
+function findInlineReads(
+  source: string,
+  path: string,
+  dataRanges: readonly SourceDataRange[],
+): TextImportFinding[] {
   const findings: TextImportFinding[] = [];
   const inlineRead =
     /\bDeno\.(readTextFile|readFile)\s*\(\s*new\s+URL\s*\(\s*(['"`])(?:\\.|(?!\2).)*\2\s*,\s*import\.meta\.url\s*\)/g;
   for (const match of source.matchAll(inlineRead)) {
     if (match.index === undefined) continue;
+    if (isSourceDataAt(dataRanges, match.index)) continue;
     const line = lineAt(source, match.index);
     if (hasAllowlist(source, line)) continue;
     const read = readName(match[1]);
@@ -545,73 +445,17 @@ function findInlineReads(source: string, path: string): TextImportFinding[] {
   return findings;
 }
 
-/**
- * True when `index` falls inside a single- or double-quoted string literal.
- *
- * Generated assets embed tool source as *data*: `agent-tools.generated.ts` ships every
- * `.llm/tools` module as a double-quoted constant so `agent init` can write them into a
- * consumer project. The published module never executes that data, but matching it as if it
- * were syntax blocked every 0.0.4 cut (#1145).
- *
- * Template-literal text is already blanked before this check while `${...}` expressions remain
- * executable and scannable. This answers "is this offset inside a quoted string" rather than
- * blanking the source, because
- * `blankStringsAndComments` also empties the quotes inside
- * `new URL('...', import.meta.url)` — which is exactly the syntax the guard must keep
- * catching. Comments are tracked so an apostrophe in prose cannot open a phantom string and
- * silently suppress every finding after it.
- */
-function isInsideQuotedStringLiteral(source: string, index: number): boolean {
-  let quote: string | undefined;
-  let inLineComment = false;
-  let inBlockComment = false;
-  for (let i = 0; i < index; i++) {
-    const ch = source[i];
-    const next = source[i + 1];
-    if (inLineComment) {
-      if (ch === '\n') inLineComment = false;
-      continue;
-    }
-    if (inBlockComment) {
-      if (ch === '*' && next === '/') {
-        inBlockComment = false;
-        i++;
-      }
-      continue;
-    }
-    if (quote !== undefined) {
-      if (ch === '\\') {
-        i++;
-        continue;
-      }
-      if (ch === quote) quote = undefined;
-      continue;
-    }
-    if (ch === '/' && next === '/') {
-      inLineComment = true;
-      i++;
-      continue;
-    }
-    if (ch === '/' && next === '*') {
-      inBlockComment = true;
-      i++;
-      continue;
-    }
-    if (ch === "'" || ch === '"') quote = ch;
-  }
-  return quote !== undefined;
-}
-
 function findImportMetaFileUrlConversions(
   source: string,
   path: string,
+  dataRanges: readonly SourceDataRange[],
 ): FileUrlImportMetaFinding[] {
   const findings: FileUrlImportMetaFinding[] = [];
   const fileUrlConversion =
     /(?:\bdirname\s*\(\s*)?\bfromFileUrl\s*\(\s*(?:import\.meta\.url|new\s+URL\s*\(\s*(['"`])(?:\\.|(?!\1).)*\1\s*,\s*import\.meta\.url\s*\))\s*\)/g;
   for (const match of source.matchAll(fileUrlConversion)) {
     if (match.index === undefined) continue;
-    if (isInsideQuotedStringLiteral(source, match.index)) continue;
+    if (isSourceDataAt(dataRanges, match.index)) continue;
     const line = lineAt(source, match.index);
     if (hasAllowlist(source, line)) continue;
     const guardLine = nearbyFileProtocolGuardLine(source, line);

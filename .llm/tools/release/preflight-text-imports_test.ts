@@ -46,6 +46,113 @@ Deno.test('preflight ignores URL constructors and generated constants without De
   assertEquals(findings, []);
 });
 
+Deno.test('text-read checks ignore quoted emitted source and retain executable reads', () => {
+  for (const read of ['readTextFile', 'readFile']) {
+    for (
+      const expression of [
+        `await Deno.${read}(new URL('./asset.txt', import.meta.url));`,
+        `const assetUrl = new URL('./asset.txt', import.meta.url); await Deno.${read}(assetUrl);`,
+      ]
+    ) {
+      for (
+        const literal of [
+          JSON.stringify(expression),
+          `'${expression.replaceAll("'", "\\'")}'`,
+        ]
+      ) {
+        const source = `const emitted = ${literal};\n${expression}`;
+        const findings = scanSource(source, 'embedded.generated.ts');
+        assertEquals(findings.length, 1);
+        assertEquals(findings[0].check, 'text-imports');
+        assertEquals(findings[0].line, 2);
+      }
+    }
+  }
+});
+
+Deno.test('quoted URL declarations do not classify an unrelated executable read', () => {
+  const declaration = `const assetUrl = new URL('./asset.txt', import.meta.url);`;
+  const findings = scanSource(
+    [
+      `const emitted = ${JSON.stringify(declaration)};`,
+      'const assetUrl = suppliedByCaller;',
+      'await Deno.readTextFile(assetUrl);',
+    ].join('\n'),
+    'embedded-declaration.ts',
+  );
+  assertEquals(findings, []);
+});
+
+Deno.test('text-read checks retain executable template interpolations', () => {
+  const findings = scanSource(
+    'const emitted = `${await Deno.readFile(new URL("./asset.txt", import.meta.url))}`;',
+    'template-read.ts',
+  );
+  assertEquals(findings.length, 1);
+  assertEquals(findings[0].check, 'text-imports');
+});
+
+Deno.test('regex quotes cannot hide executable reads or URL declarations', () => {
+  for (const read of ['readTextFile', 'readFile']) {
+    for (const pattern of ["/'/", '/"/', '/[`\'"]/']) {
+      for (
+        const expression of [
+          `await Deno.${read}(new URL("./asset.txt", import.meta.url));`,
+          `const assetUrl = new URL("./asset.txt", import.meta.url); await Deno.${read}(assetUrl);`,
+        ]
+      ) {
+        const findings = scanSource(
+          `const pattern = ${pattern};\n${expression}`,
+          'regex-before-read.ts',
+        );
+        assertEquals(findings.length, 1);
+        assertEquals(findings[0].check, 'text-imports');
+        assertEquals(findings[0].line, 2);
+      }
+    }
+  }
+});
+
+Deno.test('division and regex literals do not turn generated source into executable syntax', () => {
+  const expression = 'await Deno.readTextFile(new URL("./asset.txt", import.meta.url));';
+  const findings = scanSource(
+    [
+      'const ratio = numerator / denominator;',
+      'const pattern = /[\'"`]/;',
+      `const emitted = ${JSON.stringify(expression)};`,
+      expression,
+    ].join('\n'),
+    'mixed-source.ts',
+  );
+  assertEquals(findings.length, 1);
+  assertEquals(findings[0].line, 4);
+});
+
+Deno.test('regex quotes also preserve the file URL and import attribute guards', () => {
+  const fileUrl = scanSource(
+    "const pattern = /'/;\nconst root = fromFileUrl(import.meta.url);",
+    'regex-before-file-url.ts',
+  );
+  assertEquals(fileUrl.length, 1);
+  assertEquals(fileUrl[0].check, 'file-url-import-meta');
+  const attribute = scanSource(
+    "const pattern = /'/;\nimport asset from './asset.txt' with { type: 'text' };",
+    'regex-before-import.ts',
+  );
+  assertEquals(attribute.length, 1);
+  assertEquals(attribute[0].check, 'import-attributes');
+});
+
+Deno.test('unclassifiable syntax does not suppress an executable read', () => {
+  const findings = scanSource(
+    'const incomplete = ;\nawait Deno.readFile(new URL("asset.txt", import.meta.url));',
+    'invalid-syntax.ts',
+  );
+  assertEquals(findings.length, 1);
+  assertEquals(findings[0].check, 'text-imports');
+  assertEquals(findings[0].line, 2);
+});
+
 Deno.test('preflight allowlist suppresses a single read line', async () => {
   const findings = await scanFile(fromFileUrl(new URL('allowlisted-read.ts', fixtureRoot)));
   assertEquals(findings, []);

@@ -226,3 +226,37 @@ Final close notes: all owned local AppHosts stopped, no owned survivors; foreign
 resources untouched. CI proves Docker cleanup. Dated lesson and targeted memory
 notes are retained. No AI/MCP scope is deferred. READY is delivered through the
 dispatcher file handoff; no final issue comment is posted manually.
+
+## Post-READY CI quality repair — source PASS
+
+Owner follow-up explicitly requested `gh pr ready 2595`; readiness was changed
+without moving head. Non-draft CI then ran quality at f5f4397 and failed its
+first release preflight: a quoted generated setup constant was scanned as
+executable import.meta-relative file IO. Job 125380257443 / run 41475477622.
+Repeated notifications name that same failure.
+
+The first quote-filter repair passed initial regressions but the same independent
+Sol source reviewer found a real read could be hidden by a quote inside a regex.
+The repaired implementation delegates TypeScript/TSX lexical ranges to Babel,
+validates the token boundary, preserves executable interpolation, and retains all
+candidate matches if classification fails. It removes the hand-written lexical
+classifiers instead of adding a generated-file exemption. Reviewer round2 PASS;
+see followup-source-review.md and the retained first finding.
+
+Write scope expands only to the internal preflight helper/test and deno.lock for
+one explicit npm parser specifier. The parser version/integrity already exists
+in the baseline npm graph; npm/JSR package maps and workspace inventory are
+unchanged. No root import-map, scaffold/runtime source or workflow changes.
+Existing source/visual acceptance remains applicable; old whole-tools/lock tree
+hashes describe the prior acceptance snapshot, not this internal-tool repair.
+
+Validation: original preflight RED, initial regressions RED, reviewer regex
+controls RED, final related wrapper 23/23 GREEN. Final release preflight,
+structured check/lint/fmt on both files, deps:check, frozen production install
+and critical audit pass. The complete 23-step local CI quality replay also
+passed before the tokenizer refinement; immutable final remote CI follows push.
+See followup-quality-evidence.json for exact scope and evidence currency.
+
+Reconcile: PR remains ready for review under the later owner instruction,
+Refs-only, no labels, milestone0.0.9. Push normally, inspect the new current CI
+runs and address any current findings. Do not claim green from superseded runs.

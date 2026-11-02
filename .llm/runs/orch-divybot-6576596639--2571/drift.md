@@ -38,3 +38,9 @@
   `cli-showcase-cardinality-2571`: kernel adapters18→19 and scaffold gates93→94.
   Central registry and CLI README now name cost, owners, target and closure
   gates. This supersedes prior no-deepened-debt claims; runtime code is unchanged.
+
+- Later owner instruction superseded the original keep-draft condition; PR2595 is
+  ready for review. Its newly active quality job exposed a release preflight
+  false positive in stored scaffold source. The internal tool repair uses the
+  existing pinned Babel parser; only one explicit lock specifier is added, with
+  resolved graphs unchanged. Independent follow-up source review is PASS.

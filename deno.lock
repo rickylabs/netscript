@@ -107,6 +107,7 @@
     "jsr:@std/uuid@^1.0.9": "1.1.2",
     "jsr:@zod/zod@4.4.3": "4.4.3",
     "npm:@babel/core@^7.28.0": "7.29.7",
+    "npm:@babel/parser@7.29.9": "7.29.9",
     "npm:@babel/preset-react@^7.27.1": "7.29.7_@babel+core@7.29.7",
     "npm:@durable-streams/client@0.2.7": "0.2.7",
     "npm:@durable-streams/client@~0.2.6": "0.2.7",
