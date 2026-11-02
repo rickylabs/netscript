@@ -34,13 +34,35 @@ export function generateDatabaseSeed(options: DatabaseSeedOptions): string {
         update: {},
       });
     }
+    // Persist intent after successful writes; workers are not registered during DB CLI mode.
+    const handoff = new URL('../../../.netscript/sample-seed.json', import.meta.url);
+    await Deno.mkdir(new URL('./', handoff), { recursive: true });
+    const pending = new URL('sample-seed.' + crypto.randomUUID() + '.tmp', handoff);
+    try {
+      await Deno.writeTextFile(pending, JSON.stringify({ version: 1, seedId: crypto.randomUUID() }), { createNew: true });
+      try {
+        // Atomic, no-clobber publication: readers see one complete winning request.
+        await Deno.link(fromFileUrl(pending), fromFileUrl(handoff));
+      } catch (error) {
+        if (!(error instanceof Deno.errors.AlreadyExists)) throw error;
+      }
+      const request = JSON.parse(await Deno.readTextFile(handoff));
+      if (request?.version !== 1 || typeof request.seedId !== 'string' ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(request.seedId)) {
+        throw new Error('Invalid sample seed handoff; inspect .netscript/sample-seed.json.');
+      }
+    } finally {
+      await Deno.remove(pending).catch((error) => {
+        if (!(error instanceof Deno.errors.NotFound)) throw error;
+      });
+    }
     console.log('✅ Seeded 40 representative ${modelName} records (existing references preserved).');
   } finally {
     await db.disconnect();
   }`;
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.databaseSeed, {
-    __slot0__: "import { db } from '../mod.ts';\n\n" +
+    __slot0__: "import { fromFileUrl } from '@std/path';\nimport { db } from '../mod.ts';\n\n" +
       renderTemplateAssetSync(TEMPLATE_KEYS.serviceSampleRecords, { modelName }),
     __slot1__: body,
   });

@@ -272,6 +272,7 @@ ${source}`,
         {
           id: 'streams',
           state: streams,
+          description: 'Latest record events read so far; catching up with stream history.',
           items: [{ label: 'Actual event', detail: 'Job started', state: 'running' }],
         },
       ],
@@ -279,6 +280,7 @@ ${source}`,
   const html = render('ready', 'ready');
   assertStringIncludes(html, 'Actual job');
   assertStringIncludes(html, 'Actual event');
+  assertStringIncludes(html, 'Latest record events read so far; catching up with stream history.');
   assertReadyCapabilities(html, ['workers', 'streams']);
   for (const state of ['absent', 'installed-unwired', 'empty', 'unavailable', 'unauthorized']) {
     assertThrows(() => assertReadyCapabilities(render(state, 'ready'), ['workers', 'streams']));

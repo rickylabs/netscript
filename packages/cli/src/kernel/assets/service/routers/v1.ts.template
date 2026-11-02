@@ -4,6 +4,13 @@ import type { ServiceHandlerContext } from '@netscript/service';
 import { v1 } from '@{{projectName}}/contracts';
 import type { {{serviceName | pascalCase}}Application } from '../application/{{entityName}}.ts';
 
+/** Only verified identity claims may name an event actor. */
+function actor(context: ServiceHandlerContext) {
+  const principal = context.principal;
+  if (!principal) return { name: 'Anonymous', kind: 'anonymous' as const };
+  return { name: typeof principal.claims.name === 'string' && principal.claims.name.trim() ? principal.claims.name : principal.subject, kind: 'authenticated' as const };
+}
+
 export function create{{serviceName | pascalCase}}V1(application: {{serviceName | pascalCase}}Application) {
   return {
     session: v1.{{serviceName | camelCase}}.$context<ServiceHandlerContext>().session
@@ -16,9 +23,9 @@ export function create{{serviceName | pascalCase}}V1(application: {{serviceName 
       }
       return record;
     }),
-    create: v1.{{serviceName | camelCase}}.create.handler(({ input }) => application.create(input)),
-    update: v1.{{serviceName | camelCase}}.update.handler(async ({ input, errors }) => {
-      const record = await application.update(input.id, input.data);
+    create: v1.{{serviceName | camelCase}}.$context<ServiceHandlerContext>().create.handler(({ input, context }) => application.create(input, actor(context))),
+    update: v1.{{serviceName | camelCase}}.$context<ServiceHandlerContext>().update.handler(async ({ input, errors, context }) => {
+      const record = await application.update(input.id, input.data, actor(context));
       if (!record) {
         notFound({ errors, resourceId: input.id, message: `{{modelName}} ${input.id} not found` });
       }

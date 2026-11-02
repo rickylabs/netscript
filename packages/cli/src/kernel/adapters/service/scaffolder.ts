@@ -130,7 +130,11 @@ export class ServiceScaffolder {
     for (const role of ['domain', 'application', 'adapters']) {
       await this.createDir(join(srcDir, role), directoriesCreated);
     }
-    for (const [path, template] of layers) {
+    const activityLayers: readonly [string, TemplateKey][] = [
+      ['domain/record-activity.ts', TEMPLATE_KEYS.serviceRecordActivity],
+      ['adapters/record-activity.ts', TEMPLATE_KEYS.serviceRecordActivityAdapter],
+    ];
+    for (const [path, template] of [...layers, ...activityLayers]) {
       await this.writeRendered(
         template,
         join(srcDir, path),

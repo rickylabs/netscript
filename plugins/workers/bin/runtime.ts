@@ -6,6 +6,9 @@
 
 // Register Redis/Garnet KV adapter before createWorkersServiceRuntime() calls getKv().
 import '@netscript/kv/redis';
+import { createQueue } from '@netscript/queue';
+import type { JobMessage } from '@netscript/plugin-workers-core/runtime';
+import { dispatchSeedSample, readSeedSampleRequest } from '../src/runtime/seed-sample.ts';
 import { getKv } from '@netscript/kv';
 import type { ChildHealthMonitor, ChildHealthSnapshot } from '@netscript/plugin/health';
 import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
@@ -91,6 +94,8 @@ export type StartCombinedProcessOptions =
   & StartWorkerProcessOptions
   & StartSchedulerProcessOptions
   & Readonly<{
+    /** Optional app-owned seed marker consumed after job registration, before listening. */
+    seedHandoff?: URL;
     /** Startup health monitor owned by generated glue. */
     health?: ChildHealthMonitor;
     /** Observe the runtime before awaiting its long-running listener. */
@@ -147,6 +152,34 @@ export async function startCombinedProcess(
   await (await getKv()).get(['netscript', 'child-health', 'workers']);
   options.health?.dependenciesReady();
   const poolRegistry = options.registry ?? generated?.registry;
+  if (options.seedHandoff) {
+    const marker = options.seedHandoff;
+    const kv = await getKv();
+    const receiptKey = (seedId: string) => ['workers', 'seed-sample', seedId];
+    await dispatchSeedSample({
+      readRequest: () => readSeedSampleRequest(marker),
+      accepted: async (seedId) => (await kv.get(receiptKey(seedId)))?.value === true,
+      remember: (seedId) => kv.set(receiptKey(seedId), true),
+      job: async (id) => {
+        const job = await runtime.jobRegistry.get(id);
+        const handler = poolRegistry?.get(id);
+        return job
+          ? {
+            enabled: job.enabled,
+            topic: job.topic,
+            sample: Boolean(handler && Reflect.get(handler, 'scaffoldSample') === true),
+          }
+          : undefined;
+      },
+      enqueue: async (message) => {
+        const queue = createQueue<JobMessage>(
+          options.queueName ?? Deno.env.get('WORKERS_QUEUE') ?? 'jobs',
+        );
+        await queue.enqueue(message);
+      },
+    });
+  }
+
   const taskExecutor = createDefaultTaskExecutor();
   const scheduler = new Scheduler({
     queueName: options.queueName ?? Deno.env.get('WORKERS_QUEUE') ?? 'jobs',

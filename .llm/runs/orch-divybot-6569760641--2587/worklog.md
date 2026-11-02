@@ -31,3 +31,14 @@ PLAN-EVAL: N/A, bounded integration using existing runtime contracts; rationale 
 
 2026-11-02 bootstrap: baseline and prior memories verified, issue/PR preflight complete.
 Deno 2.9.7 available; RTK unavailable. All required gates are pending, not yet proven.
+
+## S1 source signoff
+
+Independent read-only Codex Astra source supervisor: PASS after one FAIL_FIX round.
+Closed marker location, atomic publication/validation, application publisher containment,
+and populated stream catch-up disclosure. Added emitted-handler consumer replay coverage.
+Deno 2.9.7: 102 focused tests PASS; scoped check/lint/fmt 16 files PASS; quality:gate,
+root lint/fmt, docs:accuracy, publish:dry-run and CLI public doc lint PASS.
+Live pilot demonstrated actual anonymous create/update events and a completed seeded job
+with 100% reported progress. Clean final live/visual and CI acceptance remain pending.
+No accepted debt; public report omits private machine paths and reviewer identifiers.
