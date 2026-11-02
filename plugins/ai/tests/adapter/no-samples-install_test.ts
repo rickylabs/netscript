@@ -1,5 +1,7 @@
 import { checkGeneratedFiles } from '../../../../.llm/tools/testing/check-generated-files.ts';
 import { assertEquals } from '@std/assert';
+import { createPluginAdapter } from '@netscript/plugin/adapter';
+import { aiAdapterPlugin } from '../../src/adapter/plugin.ts';
 import { join, resolve } from '@std/path';
 import { useLocalWorkspaceImports } from '../../../../packages/cli/tests/support/local-workspace-imports.ts';
 
@@ -50,6 +52,18 @@ Deno.test({
         join(repoRoot, 'plugins', 'ai'),
       ]);
 
+      // Exercise this checkout's plugin command; the public forwarding command intentionally
+      // fetches the published release, which does not contain this change until publication.
+      const localAiCli = createPluginAdapter(aiAdapterPlugin).toCli();
+      assertEquals(
+        (await localAiCli({
+          command: 'mcp',
+          values: ['add', 'orders'],
+          flags: { workspaceRoot: projectRoot, service: 'orders-mcp', path: '/api/mcp' },
+        })).code,
+        0,
+      );
+
       for (const required of ['ai/ai.ts', 'ai/models.ts', 'ai/mcp/registry.ts']) {
         await Deno.stat(join(projectRoot, required));
       }
@@ -77,6 +91,7 @@ Deno.test({
         'ai/ai.ts',
         'ai/models.ts',
         'ai/mcp/registry.ts',
+        'ai/mcp/orders.ts',
       ];
       assertSuccess(await checkGeneratedFiles({ cwd: projectRoot, args: checkArgs }), checkArgs);
     } finally {

@@ -38,3 +38,7 @@ Feature plan evaluator GLM 5.3 could not establish allowance: OpenCode Go return
 Ollama and OpenRouter have no supplied usage snapshot. No paid inference was started or
 allowance fabricated. Use the matrix-declared Fable 5.1 native fallback, separate session.
 Implementation evaluation remains the feature route, with availability recorded before launch.
+
+## Plan review correction
+
+The proposed namespace SDK pin was rejected: static namespace imports also shadow local-source members. Use PLUGIN_KIND_SOURCE_IMPORTS.ai and extend the import-completeness and no-pin guards with the service-mode emitter. ai/deno.json stays unchanged.

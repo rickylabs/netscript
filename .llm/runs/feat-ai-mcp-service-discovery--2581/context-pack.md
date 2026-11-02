@@ -1,10 +1,7 @@
-# Resume — #2581
+# AI MCP discovery checkpoint
 
-Fresh continuation from main6766130. Existing issue2581 is unclaimed and explicitly the next
-independent #2571 sibling. Claim posted; branchfeat/ai-mcp-service-discovery. Research/plan only.
-Logical service-reference MCP client mode must preserve URL/stdio, reject ambiguity/missing
-discovery, and prove tools/list plus tools/call through a real loopback test server.
-No CLI init/scaffold assets or sibling Northwind scope. See supervisor.md for routes/scope.
-
-Research and locked plan are complete. S0 draft PR comes next, then native Fable5.1 plan
-review after unavailable GLM5.3 primary routes. No implementation before independent PASS.
+Issue2581, PR2590, branch feat/ai-mcp-service-discovery. Independent PLAN-EVAL PASS after2 iterations.
+Implementation complete with86 passing scoped tests. Local lint/format/check, quality, documentation
+accuracy and publication dry-run pass. Existing doc-lint16 findings verified against baseline.
+Remaining: derived export corpus (requires committed sources), independent IMPL-EVAL, root/CI and
+full scaffold runtime at final head. Cockpit owns merge/release.
