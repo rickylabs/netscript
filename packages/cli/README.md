@@ -170,6 +170,15 @@ package and import-map specifiers use their published manifest and do not requir
 configured package wins. Configure an explicit filesystem specifier when local-workdir behaviour is
 intended.
 
+Configured-module inspection uses a frozen scratch copy of the consumer's `deno.lock` (including a
+custom string or object `lock.path`) with the original project configuration. Explicit custom paths
+outside the project remain supported; linked input components are rejected. Prepare dependencies and
+the lock with `netscript generate plugins` before running doctor. Missing, disabled, malformed, or
+incomplete locks fail closed with preparation guidance; doctor does not resolve an unlocked
+replacement or install packages into the project. The child retains its three-second deadline and
+read/environment/network grants, denies writes and subprocesses, and its scratch lock is removed
+after the child settles, including on failure. This policy is separate from agent MCP startup below.
+
 Published manifest permissions feed the generated runtime configuration. An explicit appsettings
 permission list still wins, followed by contribution-specific permissions, plugin-wide manifest
 permissions, and finally global defaults. Doctor warns when an explicit override differs from the

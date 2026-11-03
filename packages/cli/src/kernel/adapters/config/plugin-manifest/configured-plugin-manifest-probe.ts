@@ -1,6 +1,7 @@
 import { join } from '@std/path';
 import type { ProcessPort } from '../../../ports/process-port.ts';
 import { resolvePluginImportSpecifier } from '../../../application/plugin/configured-plugin-specifier.ts';
+import { readConsumerInspectionLock } from '../../runtime/process/frozen-plugin-inspection.ts';
 import {
   CONFIGURED_PLUGIN_PROBE_SCHEMA_VERSION,
   parseResolvedConfiguredPluginManifestPayload,
@@ -33,48 +34,67 @@ export async function probeConfiguredPluginManifest(
   } = {},
 ): Promise<ConfiguredPluginManifestProbeResult> {
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  const args = [
-    'run',
-    '--no-check',
-    '--no-lock',
-    '--allow-read',
-    '--allow-env',
-    '--allow-net',
-    '--deny-write',
-    '--deny-run',
-    '--no-prompt',
-    '--minimum-dependency-age=0',
-  ];
-  const denoConfig = join(projectRoot, 'deno.json');
-  if (await fileExists(denoConfig)) args.push('--config', denoConfig);
-  args.push(
-    options.childSpecifier ?? CHILD_PROBE,
-    resolvePluginImportSpecifier(projectRoot, spec),
-  );
-
-  const result = await process.exec(options.denoCommand ?? 'deno', args, {
-    cwd: projectRoot,
-    timeoutMs,
-  });
-  if (result.timedOut) return { status: 'timeout', timeoutMs };
-
-  const payload = readProbePayload(result.stdout);
-  if (payload?.status === 'malformed-payload') return payload;
-  if (payload?.status === 'resolved' && result.code === 0) return payload;
-  if (payload?.status === 'import-failure') return payload;
-  if (payload?.status === 'missing') return payload;
-  if (payload?.status === 'ambiguous') return payload;
-  if (result.code === 0) {
+  let lockBytes: Uint8Array;
+  try {
+    lockBytes = await readConsumerInspectionLock(projectRoot);
+  } catch (error) {
     return {
-      status: 'malformed-payload',
-      message: 'Configured plugin probe returned no valid versioned payload.',
+      status: 'import-failure',
+      message: `Plugin inspection preparation failed: ${
+        error instanceof Error ? error.message : String(error)
+      } Run generate plugins to prepare the consumer lock.`,
     };
   }
-  return {
-    status: 'non-zero',
-    code: result.code,
-    message: result.stderr.trim() || result.stdout.trim() || 'no diagnostics',
-  };
+  const scratch = await Deno.makeTempDir({ prefix: 'netscript-plugin-manifest-' });
+  try {
+    const lockPath = join(scratch, 'deno.lock');
+    await Deno.writeFile(lockPath, lockBytes, { createNew: true });
+    const args = [
+      'run',
+      '--no-check',
+      `--lock=${lockPath}`,
+      '--frozen',
+      '--node-modules-dir=none',
+      '--allow-read',
+      '--allow-env',
+      '--allow-net',
+      '--deny-write',
+      '--deny-run',
+      '--no-prompt',
+    ];
+    const denoConfig = join(projectRoot, 'deno.json');
+    if (await fileExists(denoConfig)) args.push('--config', denoConfig);
+    args.push(
+      options.childSpecifier ?? CHILD_PROBE,
+      resolvePluginImportSpecifier(projectRoot, spec),
+    );
+
+    const result = await process.exec(options.denoCommand ?? 'deno', args, {
+      cwd: projectRoot,
+      timeoutMs,
+    });
+    if (result.timedOut) return { status: 'timeout', timeoutMs };
+
+    const payload = readProbePayload(result.stdout);
+    if (payload?.status === 'malformed-payload') return payload;
+    if (payload?.status === 'resolved' && result.code === 0) return payload;
+    if (payload?.status === 'import-failure') return payload;
+    if (payload?.status === 'missing') return payload;
+    if (payload?.status === 'ambiguous') return payload;
+    if (result.code === 0) {
+      return {
+        status: 'malformed-payload',
+        message: 'Configured plugin probe returned no valid versioned payload.',
+      };
+    }
+    return {
+      status: 'non-zero',
+      code: result.code,
+      message: result.stderr.trim() || result.stdout.trim() || 'no diagnostics',
+    };
+  } finally {
+    await Deno.remove(scratch, { recursive: true });
+  }
 }
 
 async function fileExists(path: string): Promise<boolean> {
