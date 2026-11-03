@@ -159,6 +159,23 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
     await fs.writeFile(join(root, 'appsettings.json'), appsettings());
     await fs.createDir(join(root, 'aspire'));
     // This is the same helper boundary called after plugin installation/reconciliation.
+    const server = Deno.serve(
+      { hostname: '127.0.0.1', port: 0, onListen() {} },
+      () => new Response('export {};\n', { headers: { 'content-type': 'application/javascript' } }),
+    );
+    try {
+      const prepared = await nativeProcess.exec(Deno.execPath(), [
+        'cache',
+        '--config',
+        join(root, 'deno.json'),
+        '--lock',
+        join(root, 'deno.lock'),
+        `http://127.0.0.1:${server.addr.port}/fixture-lock.js`,
+      ], { cwd: root, timeoutMs: 3_000, maxOutputBytes: 65_536 });
+      assertEquals(prepared.code, 0, prepared.stderr);
+    } finally {
+      await server.shutdown();
+    }
     const written = await regenerateAspireHelpersWithDependencies(
       root,
       fs,

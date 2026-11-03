@@ -173,17 +173,20 @@ Deno.test('plugin doctor warns when an explicit permission override differs from
   await withProject(async (projectRoot) => {
     await writeModule(projectRoot, `${MANIFEST_SOURCE}\nexport default manifest;\n`);
     await Deno.writeTextFile(join(projectRoot, 'extension/service.ts'), 'export {};\n');
-    await Deno.writeTextFile(join(projectRoot, 'appsettings.json'), JSON.stringify({
-      NetScript: {
-        Plugins: {
-          fixture: {
-            Entrypoint: 'extension/service.ts',
-            Workdir: '.',
-            Permissions: ['--allow-net'],
+    await Deno.writeTextFile(
+      join(projectRoot, 'appsettings.json'),
+      JSON.stringify({
+        NetScript: {
+          Plugins: {
+            fixture: {
+              Entrypoint: 'extension/service.ts',
+              Workdir: '.',
+              Permissions: ['--allow-net'],
+            },
           },
         },
-      },
-    }));
+      }),
+    );
     const reports = await runDoctor(projectRoot);
     const permission = findCheck(reports[0].checks, 'permissions');
     assertEquals(permission.status, 'warning');
@@ -196,7 +199,8 @@ Deno.test('doctor subprocess and runtime loader have manifest-resolution parity'
   const cases = [
     {
       name: 'default wins with additional named manifests',
-      source: `${MANIFEST_SOURCE}\nexport default manifest;\nexport const alternate = { ...manifest, name: '@example/plugin-alternate' };\n`,
+      source:
+        `${MANIFEST_SOURCE}\nexport default manifest;\nexport const alternate = { ...manifest, name: '@example/plugin-alternate' };\n`,
       resolves: true,
     },
     {
@@ -207,7 +211,8 @@ Deno.test('doctor subprocess and runtime loader have manifest-resolution parity'
     { name: 'no manifest', source: 'export const value = 1;\n', resolves: false },
     {
       name: 'ambiguous named manifests',
-      source: `${MANIFEST_SOURCE}\nexport { manifest };\nexport const alternate = { ...manifest, name: '@example/plugin-alternate' };\n`,
+      source:
+        `${MANIFEST_SOURCE}\nexport { manifest };\nexport const alternate = { ...manifest, name: '@example/plugin-alternate' };\n`,
       resolves: false,
     },
   ];
@@ -241,7 +246,12 @@ Deno.test('plugin doctor treats a bare package alias as package-backed despite a
     await Deno.mkdir(join(projectRoot, 'package'), { recursive: true });
     await Deno.writeTextFile(
       join(projectRoot, 'package/plugin.ts'),
-      `${MANIFEST_SOURCE.replace('contributions: {},', "permissions: ['--allow-read'],\n  contributions: {},")}
+      `${
+        MANIFEST_SOURCE.replace(
+          'contributions: {},',
+          "permissions: ['--allow-read'],\n  contributions: {},",
+        )
+      }
 export default manifest;
 `,
     );
@@ -323,13 +333,16 @@ async function writeAppsettings(
   entrypoint: string,
   workdir: string,
 ): Promise<void> {
-  await Deno.writeTextFile(join(projectRoot, 'appsettings.json'), JSON.stringify({
-    NetScript: {
-      Plugins: {
-        fixture: { Entrypoint: entrypoint, Workdir: workdir },
+  await Deno.writeTextFile(
+    join(projectRoot, 'appsettings.json'),
+    JSON.stringify({
+      NetScript: {
+        Plugins: {
+          fixture: { Entrypoint: entrypoint, Workdir: workdir },
+        },
       },
-    },
-  }));
+    }),
+  );
 }
 
 function findCheck(
@@ -388,8 +401,30 @@ async function withProject(run: (projectRoot: string) => Promise<void>): Promise
   const projectRoot = await Deno.makeTempDir();
   try {
     await Deno.writeTextFile(join(projectRoot, 'deno.json'), '{"compilerOptions":{"strict":true}}');
+    await prepareFixtureLock(projectRoot);
     await run(projectRoot);
   } finally {
     await Deno.remove(projectRoot, { recursive: true });
+  }
+}
+
+async function prepareFixtureLock(root: string): Promise<void> {
+  const server = Deno.serve(
+    { hostname: '127.0.0.1', port: 0, onListen() {} },
+    () => new Response('export {};\n', { headers: { 'content-type': 'application/javascript' } }),
+  );
+  try {
+    const result = await new DenoProcess().exec(Deno.execPath(), [
+      'cache',
+      '--config',
+      join(root, 'deno.json'),
+      '--lock',
+      join(root, 'deno.lock'),
+      `http://127.0.0.1:${server.addr.port}/fixture-lock.js`,
+    ], { cwd: root, timeoutMs: 3_000, maxOutputBytes: 65_536 });
+    assertEquals(result.code, 0, result.stderr);
+    await Deno.stat(join(root, 'deno.lock'));
+  } finally {
+    await server.shutdown();
   }
 }

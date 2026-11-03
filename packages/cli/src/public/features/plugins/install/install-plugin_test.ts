@@ -1,3 +1,4 @@
+import { discoverWorkspaceMembers } from '../../../../../../../.llm/tools/release/publish-workspace.ts';
 import { checkGeneratedFiles } from '../../../../../../../.llm/tools/testing/check-generated-files.ts';
 import { DenoGeneratedSourceFormatter } from '../../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
@@ -48,6 +49,10 @@ await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
 const PUBLISHED_PLUGIN_VERSION = '0.0.1-alpha.12';
+// Fixture trust follows exact first-party release identities; third-party age stays P1D.
+const TRUSTED_RELEASE_IDENTITIES = (await discoverWorkspaceMembers(REPO_ROOT))
+  .filter(({ name }) => name.startsWith('@netscript/'))
+  .map(({ name }) => `jsr:${name}`);
 
 function repoPath(path: string): string {
   return join(REPO_ROOT, path);
@@ -1950,7 +1955,14 @@ async function writeRealProjectFiles(projectRoot: string): Promise<void> {
   );
   await Deno.writeTextFile(
     join(projectRoot, 'deno.json'),
-    JSON.stringify({ workspace: ['apps/web'] }, null, 2) + '\n',
+    JSON.stringify(
+      {
+        workspace: ['apps/web'],
+        minimumDependencyAge: { age: 'P1D', exclude: TRUSTED_RELEASE_IDENTITIES },
+      },
+      null,
+      2,
+    ) + '\n',
   );
 }
 
@@ -2342,8 +2354,7 @@ function streamsDescriptor(): ValidatedPluginDescriptor {
       name: '@netscript/plugin-streams',
       version: '0.0.1-alpha.12',
       displayName: 'Streams (ephemeral by default)',
-      description:
-        'Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.',
+      description: 'Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.',
       peerDependencies: {
         '@netscript/plugin': '0.0.1-alpha.12',
       },
@@ -2389,8 +2400,7 @@ function streamsDescriptor(): ValidatedPluginDescriptor {
       files: { '/scaffold.plugin.json': 'sha256-good' },
     },
     details: {
-      description:
-        'Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.',
+      description: 'Ephemeral streams; restart-proven file storage via STREAMS_DATA_DIR.',
       score: 95,
     },
   };
@@ -2495,3 +2505,21 @@ for (const pluginName of ['workers', 'sagas', 'triggers'] as const) {
     }
   });
 }
+
+Deno.test('real install fixture keeps third-party age admission and exact release trust', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'netscript-install-policy-' });
+  try {
+    await writeRealProjectFiles(root);
+    const { minimumDependencyAge: policy } = JSON.parse(
+      await Deno.readTextFile(join(root, 'deno.json')),
+    );
+    assertEquals(policy.age, 'P1D');
+    assert(policy.exclude.includes('jsr:@netscript/config'));
+    assert(policy.exclude.includes('jsr:@netscript/plugin'));
+    assert(policy.exclude.every((identity: string) => !identity.includes('*')));
+    assertFalse(policy.exclude.includes('npm:zod'));
+    assertFalse(policy.exclude.includes('jsr:@std/assert'));
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
