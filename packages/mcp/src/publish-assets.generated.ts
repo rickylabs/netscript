@@ -2,7 +2,7 @@
 // Do not edit by hand. Run `deno task gen:publish-assets`.
 
 /** Version of the published MCP package. */
-export const MCP_PACKAGE_VERSION: string = '0.0.8';
+export const MCP_PACKAGE_VERSION: string = '0.0.9';
 
 /** Published MCP README embedded as the default documentation corpus. */
 const MCP_PACKAGE_README_GZIP_BASE64: string =
@@ -309,5 +309,5 @@ export const MCP_EMBEDDED_DOCS_PROVENANCE:
     ],
     sourceBytes: 3255674,
     documentCount: 286,
-    sha256: 'b5f53dabfab76a3c22e9ccfe6ce4c2478d8a299ad236b16b92b170616679825d',
+    sha256: 'fac2e9ae8649238e745dba7653ae153741b6a78ccc5a8ac767e50ff3e8f40467',
   };
