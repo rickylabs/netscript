@@ -7,6 +7,8 @@ import { generateEngineMod } from './generate-engine-mod.ts';
 import { generatePrismaConfig } from './generate-prisma-config.ts';
 import { generateDatabaseDenoJson } from './generate-db-deno-json.ts';
 import { generateDenoJson } from '../workspace/deno-json.ts';
+import cliMeta from '../../../../deno.json' with { type: 'json' };
+import { useLocalWorkspaceImports } from '../../../../tests/support/local-workspace-imports.ts';
 
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 const provider = new DbEngineRegistry().get('postgres');
@@ -93,9 +95,23 @@ export class PrismaClient {
 }
 `,
     );
+    if (mode === 'jsr') {
+      assertEquals(
+        rootConfig.imports['@netscript/config'],
+        `jsr:@netscript/config@${cliMeta.version}`,
+      );
+      const config = JSON.parse(databaseConfig);
+      assertEquals(
+        config.imports['@netscript/database'],
+        `jsr:@netscript/database@${cliMeta.version}`,
+      );
+      // Assert generated public pins before resolving the real probe from this checkout.
+      await useLocalWorkspaceImports(root, sourceRoot);
+      await useLocalWorkspaceImports(database, sourceRoot);
+    }
     await prepareLockedFixture(
       root,
-      [],
+      mode === 'jsr' ? [`${database}/prisma.config.ts`] : [],
       new URL('../../../../tests/fixtures/postgres-normalizer/deno.lock', import.meta.url),
     );
     await run(root, database);

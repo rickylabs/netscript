@@ -2,6 +2,8 @@
 import { assert, assertEquals, assertFalse, assertStringIncludes } from '@std/assert';
 import { walk } from '@std/fs';
 import { fromFileUrl, join } from '@std/path';
+import cliMeta from '../../../deno.json' with { type: 'json' };
+import { useLocalWorkspaceImports } from '../../../tests/support/local-workspace-imports.ts';
 
 const REPO = fromFileUrl(new URL('../../../../../', import.meta.url));
 const CLI = join(REPO, 'packages/cli/bin/netscript-dev.ts');
@@ -46,7 +48,14 @@ async function withProject(
       '--editor',
       'none',
     ], options);
-    await probe(join(scratch, 'auth-proof'));
+    const root = join(scratch, 'auth-proof');
+    if (options.public) {
+      const config = JSON.parse(await Deno.readTextFile(join(root, 'deno.json')));
+      assertEquals(config.imports['@netscript/config'], `jsr:@netscript/config@${cliMeta.version}`);
+      // Prove the public pin before resolving this unpublished fixture from the checkout.
+      await useLocalWorkspaceImports(root, REPO);
+    }
+    await probe(root);
   } finally {
     await Deno.remove(scratch, { recursive: true });
   }
