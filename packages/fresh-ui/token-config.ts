@@ -10,3 +10,5 @@
  */
 export { APP_TOKEN_FILES, PREVIEW_TOKEN_FILES } from './src/tokens/domain/token-output.ts';
 export { TOKEN_PRESETS } from './src/tokens/domain/token-presets.ts';
+export { TOKEN_DENSITIES } from './src/tokens/domain/token-contract.ts';
+export type { TokenDensity, TokenPreset } from './src/tokens/domain/token-contract.ts';

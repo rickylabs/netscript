@@ -1,5 +1,5 @@
 import { createContext } from 'preact';
-import type { ComponentChildren, VNode } from 'preact';
+import type { ComponentChildren } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
 import type {
@@ -23,43 +23,44 @@ function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
-function TooltipRoot({ children, ...options }: TooltipRootProps): VNode {
+function TooltipRoot({ children, ...options }: TooltipRootProps): preact.VNode {
   const tooltip = useTooltip(options);
   return <TooltipContext.Provider value={tooltip}>{children}</TooltipContext.Provider>;
 }
 
-function TooltipTrigger({ children, ...props }: TooltipTriggerProps): VNode {
+function TooltipTrigger({ children, ...props }: TooltipTriggerProps): preact.VNode {
   const tooltip = useTooltipContext('Tooltip.Trigger');
   return <button {...tooltip.getTriggerProps(props)}>{withChildren(children)}</button>;
 }
 
-function TooltipPositioner({ children, ...props }: TooltipPositionerProps): VNode {
+function TooltipPositioner({ children, ...props }: TooltipPositionerProps): preact.VNode {
   const tooltip = useTooltipContext('Tooltip.Positioner');
   return <div {...tooltip.getPositionerProps(props)}>{withChildren(children)}</div>;
 }
 
-function TooltipContent({ children, ...props }: TooltipContentProps): VNode {
+function TooltipContent({ children, ...props }: TooltipContentProps): preact.VNode {
   const tooltip = useTooltipContext('Tooltip.Content');
   return <div {...tooltip.getContentProps(props)}>{withChildren(children)}</div>;
 }
 
-function TooltipArrow({ children, ...props }: TooltipArrowProps): VNode {
+function TooltipArrow({ children, ...props }: TooltipArrowProps): preact.VNode {
   const tooltip = useTooltipContext('Tooltip.Arrow');
   return <div {...tooltip.getArrowProps(props)}>{withChildren(children)}</div>;
 }
 
-function TooltipArrowTip({ children, ...props }: TooltipArrowTipProps): VNode {
+function TooltipArrowTip({ children, ...props }: TooltipArrowTipProps): preact.VNode {
   const tooltip = useTooltipContext('Tooltip.ArrowTip');
   return <div {...tooltip.getArrowTipProps(props)}>{withChildren(children)}</div>;
 }
 
+/** Public compound tooltip parts and their exact prop/result signatures. */
 export type TooltipNamespace = Readonly<{
-  Arrow: typeof TooltipArrow;
-  ArrowTip: typeof TooltipArrowTip;
-  Content: typeof TooltipContent;
-  Positioner: typeof TooltipPositioner;
-  Root: typeof TooltipRoot;
-  Trigger: typeof TooltipTrigger;
+  Arrow: (props: TooltipArrowProps) => preact.VNode;
+  ArrowTip: (props: TooltipArrowTipProps) => preact.VNode;
+  Content: (props: TooltipContentProps) => preact.VNode;
+  Positioner: (props: TooltipPositionerProps) => preact.VNode;
+  Root: (props: TooltipRootProps) => preact.VNode;
+  Trigger: (props: TooltipTriggerProps) => preact.VNode;
 }>;
 
 /** Compound tooltip namespace with root and positioning subcomponents. */

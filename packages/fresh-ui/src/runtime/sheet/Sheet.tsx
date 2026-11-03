@@ -1,5 +1,5 @@
 import { createContext } from 'preact';
-import type { ComponentChildren, VNode } from 'preact';
+import type { ComponentChildren } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
 import type {
@@ -23,43 +23,44 @@ function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
-function SheetRoot({ children, ...options }: SheetRootProps): VNode {
+function SheetRoot({ children, ...options }: SheetRootProps): preact.VNode {
   const sheet = useSheet(options);
   return <SheetContext.Provider value={sheet}>{children}</SheetContext.Provider>;
 }
 
-function SheetTrigger({ children, ...props }: SheetTriggerProps): VNode {
+function SheetTrigger({ children, ...props }: SheetTriggerProps): preact.VNode {
   const sheet = useSheetContext('Sheet.Trigger');
   return <button {...sheet.getTriggerProps(props)}>{withChildren(children)}</button>;
 }
 
-function SheetContent({ children, ...props }: SheetContentProps): VNode {
+function SheetContent({ children, ...props }: SheetContentProps): preact.VNode {
   const sheet = useSheetContext('Sheet.Content');
   return <dialog {...sheet.getContentProps(props)}>{withChildren(children)}</dialog>;
 }
 
-function SheetTitle({ children, ...props }: SheetTitleProps): VNode {
+function SheetTitle({ children, ...props }: SheetTitleProps): preact.VNode {
   const sheet = useSheetContext('Sheet.Title');
   return <h2 {...sheet.getTitleProps(props)}>{withChildren(children)}</h2>;
 }
 
-function SheetDescription({ children, ...props }: SheetDescriptionProps): VNode {
+function SheetDescription({ children, ...props }: SheetDescriptionProps): preact.VNode {
   const sheet = useSheetContext('Sheet.Description');
   return <p {...sheet.getDescriptionProps(props)}>{withChildren(children)}</p>;
 }
 
-function SheetClose({ children, ...props }: SheetCloseProps): VNode {
+function SheetClose({ children, ...props }: SheetCloseProps): preact.VNode {
   const sheet = useSheetContext('Sheet.Close');
   return <button {...sheet.getCloseProps(props)}>{withChildren(children)}</button>;
 }
 
+/** Public compound sheet parts and their exact prop/result signatures. */
 export type SheetNamespace = Readonly<{
-  Close: typeof SheetClose;
-  Content: typeof SheetContent;
-  Description: typeof SheetDescription;
-  Root: typeof SheetRoot;
-  Title: typeof SheetTitle;
-  Trigger: typeof SheetTrigger;
+  Close: (props: SheetCloseProps) => preact.VNode;
+  Content: (props: SheetContentProps) => preact.VNode;
+  Description: (props: SheetDescriptionProps) => preact.VNode;
+  Root: (props: SheetRootProps) => preact.VNode;
+  Title: (props: SheetTitleProps) => preact.VNode;
+  Trigger: (props: SheetTriggerProps) => preact.VNode;
 }>;
 
 /** Compound Sheet namespace — side-docked inspection panel. */
