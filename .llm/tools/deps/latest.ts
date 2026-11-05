@@ -1,3 +1,5 @@
+import { coverageNotice, runSelectedProject, standaloneCoverage } from './standalone-projects.ts';
+
 /**
  * deps/latest.ts — report each workspace dependency against its registry's
  * **stable** channel (jsr `meta.json.latest` / npm `dist-tags.latest`).
@@ -68,7 +70,7 @@ function parseArgs(argv: string[]): Args {
 }
 
 /** Strip a range operator (^ ~ >= = etc.) and any subpath, return the base version token. */
-function basePinnedVersion(range: string): string {
+export function basePinnedVersion(range: string): string {
   const cleaned = range.replace(/^[\s=^~><]+/, '').trim();
   const match = cleaned.match(/^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?/);
   return match ? match[0] : cleaned;
@@ -188,7 +190,7 @@ async function collectPins(root: string): Promise<Map<string, Pin>> {
   return pins;
 }
 
-async function fetchLatestStable(registry: Registry, name: string): Promise<string> {
+export async function fetchLatestStable(registry: Registry, name: string): Promise<string> {
   if (registry === 'npm') {
     const res = await fetch(`https://registry.npmjs.org/${name}`);
     if (!res.ok) throw new Error(`npm ${res.status}`);
@@ -222,6 +224,7 @@ async function mapWithConcurrency<T, R>(
 }
 
 async function main() {
+  await runSelectedProject('latest', { basePinnedVersion, fetchLatestStable });
   const args = parseArgs(Deno.args);
   const root = Deno.cwd();
   const pins = await collectPins(root);
@@ -265,10 +268,16 @@ async function main() {
 
   const shown = args.behindOnly ? reports.filter((report) => report.behind) : reports;
   const behindCount = reports.filter((report) => report.behind).length;
-  const result = { generatedAt: new Date().toISOString(), behind: behindCount, entries: shown };
+  const result = {
+    generatedAt: new Date().toISOString(),
+    behind: behindCount,
+    entries: shown,
+    standaloneCoverage: standaloneCoverage('latest'),
+  };
 
   if (args.pretty) {
     console.log(`deps:latest — ${behindCount} behind / ${reports.length} total\n`);
+    console.log(coverageNotice('latest'));
     for (const report of shown) {
       const flag = report.error ? '?' : report.behind ? '✗' : '✓';
       const latest = report.error ? `ERR ${report.error}` : report.latestStable ?? '—';
@@ -290,6 +299,7 @@ function printHelp(): void {
       '  deno run --allow-read --allow-net .llm/tools/deps/latest.ts [flags]',
       '',
       'Flags:',
+      '  --project <dir>  select tools/fresh-ui-browser (production install unsupported)',
       '  --pretty              human-readable table instead of JSON',
       '  --behind-only         only list deps that are behind',
       '  --allow-prerelease    treat a prerelease latest as comparable',
