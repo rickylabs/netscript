@@ -1,12 +1,12 @@
 import { fileURLToPath } from 'node:url';
 
-/** Root CI discovers this bridge; the renderer fixture needs the standalone site's import map. */
+/** Run the renderer with the site's import map and reviewed lock, also from root CI. */
 Deno.test('design system renders the complete fixture and canonical corpus', async () => {
   const siteRoot = new URL('../', import.meta.url);
   const output = await new Deno.Command(Deno.execPath(), {
     args: [
       'test',
-      '--no-lock',
+      '--frozen',
       '--config',
       fileURLToPath(new URL('deno.json', siteRoot)),
       '--allow-read',
