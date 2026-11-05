@@ -1,0 +1,10 @@
+{
+  "baseline": "0af8fd9e7904ee2c848d0a4213c7853edec3ad21",
+  "files": {
+    "packages/cli/README.md": "bed743622339cd4e2c15a5257fed0cfa481b1344d16f956f0a676edb51de1393",
+    "packages/cli/src/kernel/application/ui/v2/registry-client.ts": "8c17edea638c47a2ea7807dd715376b06f912cb67dcd7fc77b760bbaed3e1939",
+    "packages/cli/src/kernel/application/ui/v2/registry-lifecycle.ts": "fcd826895c6e7537de0a4881e9cd978dcb58906cfb7b77dfbe848c0ceceea26c",
+    "packages/cli/src/kernel/application/ui/v2/tests/ui-remote-collection_test.ts": "dae4ab294cda1ac096981549ad4658ae2e89489e9e8b52711b8e2aaa7fcdb4f4",
+    "packages/cli/src/public/features/ui/protocol/protocol-command_test.ts": "2e6339146389cf35d6373361b8201be0902a3e2b42283312f54e7a511d17def2"
+  }
+}

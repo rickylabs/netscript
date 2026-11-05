@@ -41,8 +41,8 @@ export interface UiRegistryDependencies extends UiRegistryClientDependencies {
 /** One request-scoped registry client, with dependency, namespace and source caches. */
 export interface UiRegistryClient {
   catalog(namespace?: string): Promise<Registry>;
-  /** Read validated built-in collection membership without resolving item files. */
-  collections(): Promise<readonly UiRegistryCollection[]>;
+  /** Read collection membership without item files; remote names and members are qualified. */
+  collections(namespace?: string): Promise<readonly UiRegistryCollection[]>;
   item(ref: string): Promise<UiResolvedItem>;
   resolve(refs: readonly string[], theme?: string): Promise<readonly UiResolvedItem[]>;
 }
@@ -80,8 +80,15 @@ export async function createUiRegistryClient(
         registry: module.freshUiRegistryJson,
         content: module.FRESH_UI_REGISTRY_CONTENT,
       }));
-  const collections = async (): Promise<readonly UiRegistryCollection[]> =>
-    collectionsSchema.parse((await builtin()).registry.meta?.collections ?? []);
+  const collections = async (name?: string): Promise<readonly UiRegistryCollection[]> => {
+    const entries = collectionsSchema.parse((await catalog(name)).meta?.collections ?? []);
+    return name
+      ? entries.map((entry) => ({
+        name: `${name}/${entry.name}`,
+        items: entry.items.map((ref) => /^(https?:|github:|@)/.test(ref) ? ref : `${name}/${ref}`),
+      }))
+      : entries;
+  };
   const read = (url: string, headers: Readonly<Record<string, string>>): Promise<string> => {
     if (!deps.transport) throw new Error('Remote registry transport is not configured');
     const key = JSON.stringify([url, headers]);
