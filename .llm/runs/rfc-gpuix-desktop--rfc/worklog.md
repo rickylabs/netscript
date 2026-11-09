@@ -174,3 +174,25 @@ Claude in this session. Upstream single-exe packaging does not exist yet (epic #
 - **Upstream findings to file (owner decides):** plugins × SQLite migrations; AppHost does not wire
   streams into services; `deploy build` emits an empty graph; `workers.subscribe` silent on Garnet KV
   and leaks Zod internals in its snapshot; `deno desktop` leaks `DENO_SERVE_ADDRESS` to children.
+
+### Real stack on the laptop (real GPU), 2026-11-09
+
+Lane on T3 env `Yoga_Book_9i` (Codex GPT-6.1 Sol, low): fetched the portable zip over SSH (`n5-agents`),
+sha256 verified, warm-up discarded, `--bench` over eight variants (`--runs=5 --parallel=1,4`), results
+copied back (`evidence/bench-windows-realstack-yogabook9i.{json,md,log}`). Machine: LENOVO 83FF, Core
+Ultra 7 155U, Intel Graphics 32.0.101.6881, 31.6 GB, AC/Balanced, WebView2 157, four displays.
+
+| Variant | CPU 20/s (embedded) | Host CPU 20/s (real stack) | Host memory |
+| --- | --- | --- | --- |
+| GPUIX | 80.2% | 45.2% | 286 MB |
+| GPUIX-first | 36.7% | 32.3% | 285 MB |
+| WebView2 | 38.1% | 18.3% | 546 MB |
+| WebView2 + 250 ms budget | 10.0% | 15.8% | 546 MB |
+
+Reading: on a real GPU the budget halves GPUIX's CPU but cuts WebView2's more; under equal policy the
+webview is 3.7× (embedded) / 2× (host on the real stack) cheaper. The Linux container's reversal came
+from WebKitGTK software compositing. Gate 1 stays not met; it needs incremental rendering upstream.
+Graph on Windows: 18 processes (conhost per deno.exe), 1.68 GB, ~100% CPU under load, ready in
+10.9–12.8 s on a fresh profile (first run per variant 18–28 s; Linux 3 s), cause not yet attributed.
+Four GPUIX real-stack instances started in 34–40 s; four WebView2 instances never started. RFC summary,
+real-stack section, gate 1 status, drawbacks and unresolved questions updated; report republished.

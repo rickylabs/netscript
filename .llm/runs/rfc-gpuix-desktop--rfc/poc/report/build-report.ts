@@ -324,19 +324,24 @@ function realStackSection(): string {
       { name: 'NetScript graph', value: V[row.id].split!.stackActiveCpuPct, kind: 'muted' as const },
     ],
   })));
-  const table = Object.entries(V).map(([id, variant]) => {
-    const eightRun = variant.parallel.find((entry) => entry.instances === 8);
+  const tableFor = (variants: Record<string, Variant>) => Object.values(variants).map((variant) => {
+    const widest = variant.parallel.filter((entry) => entry.instances > 1).at(-1);
     const memory = variant.memoryMb.pssMedian ?? variant.memoryMb.rssMedian;
-    return `<tr><th scope="row">${esc(variant.label)}</th><td>${fmt(variant.coldStartMs.median)} ms</td><td>${fmt(memory)} MB</td><td>${variant.processCount}</td><td>${fmt(variant.idleCpuPct.median, 1)}%</td><td>${fmt(variant.activeCpuPct.median, 1)}%</td><td>${variant.split ? `${fmt(variant.split.hostActiveCpuPct, 1)}%` : '—'}</td><td>${eightRun ? `${fmt(eightRun.totalPssMb ?? eightRun.totalRssMb)} MB · ${fmt(eightRun.allReadyMs / 1000, 1)} s` : (id.endsWith('-real') ? 'not run' : '—')}</td></tr>`;
+    return `<tr><th scope="row">${esc(variant.label)}</th><td>${fmt(variant.coldStartMs.median)} ms</td><td>${fmt(memory)} MB</td><td>${variant.processCount}</td><td>${fmt(variant.idleCpuPct.median, 1)}%</td><td>${fmt(variant.activeCpuPct.median, 1)}%</td><td>${variant.split ? `${fmt(variant.split.hostActiveCpuPct, 1)}%` : '—'}</td><td>${widest ? `×${widest.instances}: ${fmt(widest.totalPssMb ?? widest.totalRssMb)} MB · ${fmt(widest.allReadyMs / 1000, 1)} s` : '—'}</td></tr>`;
   }).join('');
+  const tableHead = '<thead><tr><th>Variant</th><th>Cold start</th><th>Memory (tree)</th><th>Processes</th><th>Idle CPU</th><th>Active CPU</th><th>Host CPU (active)</th><th>Parallel</th></tr></thead>';
+  const tables = [
+    realWin ? `<h3>Windows laptop, real GPU <span class="eyebrow">working set · % of one core</span></h3><div class="scroll"><table class="data">${tableHead}<tbody>${tableFor(realWin.variants)}</tbody></table></div>` : '',
+    realBench ? `<h3>Linux container, software rendering <span class="eyebrow">PSS · % of one core</span></h3><div class="scroll"><table class="data">${tableHead}<tbody>${tableFor(realBench.variants)}</tbody></table></div>` : '',
+  ].join('');
   const size = (key: string) => realSizes[key] ? `${fmt(realSizes[key])} MB` : '—';
   return `<section aria-labelledby="realstack">
   <div class="sec-head"><span class="eyebrow">Real stack · ${where}</span><h2 id="realstack">With the real backend in the box</h2>
   <p class="prose muted">One installer, one app: the desktop process supervises the NetScript 0.0.9 workspace graph the scaffold declares in <code>appsettings.json</code>, without Aspire: Garnet (self-contained), the users service on SQLite, the workers, sagas and triggers APIs and their background processors, and the streams service. The UI talks to them through a BFF over typed NetScript SDK clients; live activity comes from the durable stream, and the load generator drives real writes and job runs.</p></div>
   <div class="kpis">
-    <div class="kpi"><span>Graph ready</span><b>${fmt((g?.split?.stackReadyMsMedian ?? 0) / 1000, 2)} s</b><span>9 processes, dependency order, offline from the bundled cache</span></div>
+    <div class="kpi"><span>Graph ready</span><b>${fmt((g?.split?.stackReadyMsMedian ?? 0) / 1000, 2)} s</b><span>9 processes, dependency order, offline from the bundled cache${realWin ? ` · Linux ${fmt((realBench?.variants['gpuix-real']?.split?.stackReadyMsMedian ?? 0) / 1000, 1)} s` : ''}</span></div>
     <div class="kpi"><span>Data on screen</span><b>${fmt((g?.coldStartMs.median ?? 0) / 1000, 2)} s</b><span>GPUIX · ${w ? `${fmt(w.coldStartMs.median / 1000, 2)} s webview` : ''}</span></div>
-    <div class="kpi"><span>Total memory</span><b>${fmt(total(g))} vs ${fmt(total(w))} MB</b><span>GPUIX · webview, graph included (PSS)</span></div>
+    <div class="kpi"><span>Total memory</span><b>${fmt(total(g))} vs ${fmt(total(w))} MB</b><span>GPUIX · webview, graph included (${realWin ? 'working set' : 'PSS'})</span></div>
     <div class="kpi"><span>Host CPU at 20 updates/s</span><b>${fmt(g?.split?.hostActiveCpuPct ?? 0)}%${n?.split ? ` → ${fmt(n.split.hostActiveCpuPct)}%` : ''}</b><span>GPUIX${n ? ' → GPUIX-first' : ''} · webview ${fmt(w?.split?.hostActiveCpuPct ?? 0)}%</span></div>
   </div>
   <div class="grid2">
@@ -344,13 +349,13 @@ function realStackSection(): string {
     <figure><img class="shot" src="${img.realRecords}" alt="Records screen in the GPUIX-first build: all 1,240 SQLite records in a native virtual list"><figcaption>Records: all 1,240 rows from SQLite in GPUIX's native virtual list.</figcaption></figure>
   </div>
   <div class="grid2">
-    <figure class="card"><h3>Where the memory is <span class="eyebrow">PSS · MB · median</span></h3>${memChart}
+    <figure class="card"><h3>Where the memory is <span class="eyebrow">${realWin ? 'working set' : 'PSS'} · MB · median</span></h3>${memChart}
       <div class="legend"><span><i class="sw s1"></i><i class="sw s4"></i><i class="sw s2"></i>desktop host</span><span><i class="sw muted-sw"></i>NetScript graph</span></div>
-      <figcaption>The backend dominates: nine Deno processes and Garnet weigh far more than the choice of renderer.</figcaption></figure>
+      <figcaption>The backend dominates: nine Deno processes and Garnet (plus a console host each on Windows) weigh far more than the choice of renderer.</figcaption></figure>
     <figure class="card"><h3>CPU under real load <span class="eyebrow">% of one core · 20 updates/s</span></h3>${cpuChart}
-      <figcaption>Every update is a real write or job run (users.update, workers.triggerJob) through SQLite, Garnet and the durable stream.</figcaption></figure>
+      <figcaption>Every update is a real write or job run (users.update, workers.triggerJob) through SQLite, Garnet and the durable stream. ${realWin ? 'On the laptop the webview host stays cheapest, with or without the budget.' : ''}</figcaption></figure>
   </div>
-  <div class="card"><h3>All variants <span class="eyebrow">same method as above</span></h3><div class="scroll"><table class="data"><thead><tr><th>Variant</th><th>Cold start</th><th>Memory (tree)</th><th>Processes</th><th>Idle CPU</th><th>Active CPU</th><th>Host CPU (active)</th><th>8 instances</th></tr></thead><tbody>${table}</tbody></table></div>
+  <div class="card">${tables}
     <p class="muted">GPUIX-first = the same app with a native virtual list for records, a live-update budget (stream changes committed at most every 250 ms) and an adaptive frame pump (8 ms while active, 50 ms when idle).</p></div>
   <div class="grid2">
     <div class="card"><h3>What ships <span class="eyebrow">installed size</span></h3><table class="data"><tbody>
@@ -506,9 +511,9 @@ pre.mermaid { background: var(--surface); border: 1px solid var(--line); padding
   <div class="answers">
     <div class="answer"><span class="q">1 · Preact through the compat layer?</span><span class="verdict v-no">No, but yes natively</span><p><code>@gpuix/react</code> sits on <code>react-reconciler</code>, which reads React's private internals at load and crashes under <code>preact/compat</code>. GPUIX's framework-neutral host layer let me write a Preact renderer instead (≈500 lines). Preact 10, signals and the full app run on it.</p></div>
     <div class="answer"><span class="q">2 · Connection to the NetScript ecosystem</span><span class="verdict v-yes">In one process</span><p>Service, typed SDK client, durable-stream consumer and KV run in the same process as the window. The webview RPC bridge disappears. Gaps: cookie sessions (bridged to bearer), auto-update adapter, packaging backend, a native component kit.</p></div>
-    <div class="answer"><span class="q">3 · Working PoC + benchmark</span><span class="verdict v-partial">Built · measured · mixed</span><p>Scaffold-style workspace app: overview, records, record detail, health, design, settings, sign-in, in light and dark. One process; ${memW ? `${pct(memG, memW)}% less memory than the WebKit webview and ${pct(memG, memC)}% less than CEF` : 'lower memory'}; on your laptop half the memory of WebView2 and many instances where WebView2 stalls. But 2.2× its CPU under frequent updates, almost all in GPUI's UI thread. With the real backend in the box (Garnet, SQLite, users, workers, sagas, triggers, streams) the backend dominates memory, and a 250 ms update budget brings GPUIX below the webview's CPU under the same budget on Linux.</p></div>
+    <div class="answer"><span class="q">3 · Working PoC + benchmark</span><span class="verdict v-partial">Built · measured · mixed</span><p>Scaffold-style workspace app: overview, records, record detail, health, design, settings, sign-in, in light and dark. One process; ${memW ? `${pct(memG, memW)}% less memory than the WebKit webview and ${pct(memG, memC)}% less than CEF` : 'lower memory'}; on your laptop half the memory of WebView2 and many instances where WebView2 stalls. But 2.2× its CPU under frequent updates, almost all in GPUI's UI thread. With the real backend in the box (Garnet, SQLite, users, workers, sagas, triggers, streams) the backend dominates memory. A 250 ms update budget halves GPUIX's CPU on your laptop, but WebView2 benefits even more, so the webview stays 2–3.7× cheaper under the same policy.</p></div>
     <div class="answer"><span class="q">4 · Installable for your laptop</span><span class="verdict v-yes">Windows · macOS · Linux</span><p>NSIS installer and portable zip for Windows x64 and a Linux tarball, both shipping the real NetScript stack and supervising it; an ad-hoc-signed app for Apple Silicon (embedded service). Each includes <code>--bench</code> to rerun every variant on your real GPU.</p></div>
-    <div class="answer"><span class="q">5 · RFC</span><span class="verdict v-partial">Incubate, gated</span><p>Gate 1 (real-GPU CPU) is not met yet; the GPUIX-first variant is the candidate fix, pending the laptop rerun. An opt-in native desktop track (<code>rfcs/0000-gpuix-native-desktop-renderer.md</code>). The Deno Desktop webview stays the default until the real-GPU benchmark, upstream maturity, accessibility and packaging gates pass.</p></div>
+    <div class="answer"><span class="q">5 · RFC</span><span class="verdict v-partial">Incubate, gated</span><p>Gate 1 (real-GPU CPU) is not met, also with the GPUIX-first variant: it needs incremental rendering upstream in GPUIX. An opt-in native desktop track (<code>rfcs/0000-gpuix-native-desktop-renderer.md</code>). The Deno Desktop webview stays the default until the real-GPU benchmark, upstream maturity, accessibility and packaging gates pass.</p></div>
     <div class="answer"><span class="q">+ · Fresh on GPUIX?</span><span class="verdict v-neutral">2.x no · 3.x later</span><p>Unchanged Fresh pages can't run on GPUIX: GPUIX has no CSS engine. Fresh 2 has no renderer seam. Fresh 3 does (<code>renderPage(inner)</code>), so a native render target is a credible future plugin; the PoC's router already uses its route-module shape.</p></div>
   </div>
 </section>
@@ -655,7 +660,7 @@ ${realStackSection()}
   <div class="sec-head"><span class="eyebrow">Decision</span><h2 id="rfc">RFC: incubate behind four gates</h2></div>
   <p class="prose">The RFC proposes an opt-in native desktop track. It ships as a Preact renderer package, a fresh-ui native collection, the bearer credential path, an auto-update adapter and a packaging backend. The Deno Desktop webview remains the default until all four gates pass:</p>
   <div class="answers">
-    <div class="answer"><span class="q">Gate 1 · not met yet</span><p>A real-GPU benchmark on Windows and macOS laptops shows active CPU at or below the webview, and confirms the memory and scaling gains. On the Windows laptop, memory and scaling hold; CPU under load is 81% against 37%. On Linux, a 250 ms update budget drops GPUIX to 46% against 70% for the webview with the same budget.</p></div>
+    <div class="answer"><span class="q">Gate 1 · not met yet</span><p>A real-GPU benchmark on Windows and macOS laptops shows active CPU at or below the webview, and confirms the memory and scaling gains. On the Windows laptop, memory and scaling hold; CPU under load is 81% against 37%. With a 250 ms update budget on both hosts: 37% against 10% on the laptop (46% against 70% on Linux, where the webview composites in software).</p></div>
     <div class="answer"><span class="q">Gate 2</span><p>A GPUIX release ships clipboard and notifications, and the project agrees an upgrade policy: exact pins, plus vendoring or forking if upstream stalls.</p></div>
     <div class="answer"><span class="q">Gate 3</span><p>Accessibility meets an agreed bar: keyboard navigation and screen-reader smoke tests on macOS and Windows.</p></div>
     <div class="answer"><span class="q">Gate 4</span><p>Packaging reaches parity: signing, notarization, installers and auto-update.</p></div>

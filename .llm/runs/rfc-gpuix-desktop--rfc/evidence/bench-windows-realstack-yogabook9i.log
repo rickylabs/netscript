@@ -1,0 +1,122 @@
+NetScript desktop benchmark · windows-x86_64 · 14 CPUs
+Comparing with C:\Users\chaut\Downloads\NetScript-GPUIX-PoC-realstack\NetScript\webview\NetScript-Webview.exe
+Variants: gpuix, gpuix-native, webview, webview-budget, gpuix-real, gpuix-native-real, webview-real, webview-budget-real (real NetScript stack found)
+Windows will open and close repeatedly for a few minutes. Do not use the machine meanwhile.
+
+
+== GPUIX + Preact (this build)
+  cold 1/5: ready 1131 ms · rss 263 MB · idle 3% · 1 proc
+  cold 2/5: ready 934 ms · rss 264 MB · idle 3.9% · 1 proc
+  cold 3/5: ready 1149 ms · rss 264 MB · idle 2.7% · 1 proc
+  cold 4/5: ready 961 ms · rss 263 MB · idle 4.1% · 1 proc
+  cold 5/5: ready 850 ms · rss 264 MB · idle 5.9% · 1 proc
+  active 1/3: cpu 80.2% · rss 288 MB
+  active 2/3: cpu 83% · rss 286 MB
+  active 3/3: cpu 79.7% · rss 289 MB
+  parallel x1: all ready 1138 ms · total rss 264 MB
+  parallel x4: all ready 2028 ms · total rss 1055 MB
+
+== GPUIX-first + Preact
+  cold 1/5: ready 1450 ms · rss 264 MB · idle 4.2% · 1 proc
+  cold 2/5: ready 922 ms · rss 263 MB · idle 2.8% · 1 proc
+  cold 3/5: ready 904 ms · rss 263 MB · idle 3.1% · 1 proc
+  cold 4/5: ready 842 ms · rss 264 MB · idle 4.5% · 1 proc
+  cold 5/5: ready 872 ms · rss 264 MB · idle 2.2% · 1 proc
+  active 1/3: cpu 36.7% · rss 288 MB
+  active 2/3: cpu 32.3% · rss 288 MB
+  active 3/3: cpu 37.3% · rss 283 MB
+  parallel x1: all ready 939 ms · total rss 263 MB
+  parallel x4: all ready 1364 ms · total rss 1055 MB
+
+== Deno Desktop webview (same app)
+  cold 1/5: ready 1931 ms · rss 534 MB · idle 0.2% · 7 proc
+  cold 2/5: ready 1061 ms · rss 495 MB · idle 1.3% · 7 proc
+  cold 3/5: ready 969 ms · rss 493 MB · idle 0.3% · 7 proc
+  cold 4/5: ready 1018 ms · rss 507 MB · idle 0.5% · 7 proc
+  cold 5/5: ready 1018 ms · rss 502 MB · idle 0.5% · 7 proc
+  active 1/3: cpu 40.9% · rss 578 MB
+  active 2/3: cpu 36.6% · rss 584 MB
+  active 3/3: cpu 38.1% · rss 582 MB
+  parallel x1: all ready 1066 ms · total rss 505 MB
+  parallel x4: FAILED Error: webview x4 ready timed out after 90000 ms
+
+== Deno Desktop webview · 250 ms budget
+  cold 1/5: ready 1012 ms · rss 506 MB · idle 0.9% · 7 proc
+  cold 2/5: ready 969 ms · rss 504 MB · idle 0.5% · 7 proc
+  cold 3/5: ready 971 ms · rss 504 MB · idle 0.5% · 7 proc
+  cold 4/5: ready 986 ms · rss 504 MB · idle 0.8% · 7 proc
+  cold 5/5: ready 973 ms · rss 504 MB · idle 0.3% · 7 proc
+  active 1/3: cpu 10% · rss 558 MB
+  active 2/3: cpu 8.8% · rss 558 MB
+  active 3/3: cpu 11.6% · rss 560 MB
+  parallel x1: all ready 975 ms · total rss 506 MB
+  parallel x4: FAILED Error: webview-budget x4 ready timed out after 90000 ms
+
+== GPUIX + Preact · real stack
+  cold 1/5: ready 18756 ms · rss 1967 MB · idle 12% · 19 proc
+  cold 2/5: ready 13768 ms · rss 1963 MB · idle 15.2% · 19 proc
+  cold 3/5: ready 14048 ms · rss 1967 MB · idle 12.2% · 19 proc
+  cold 4/5: ready 13551 ms · rss 1967 MB · idle 11.7% · 19 proc
+  cold 5/5: ready 16702 ms · rss 1968 MB · idle 12.3% · 19 proc
+  active 1/3: cpu 141.1% (host 44.8% · stack 96.3%) · rss 2191 MB
+  active 2/3: cpu 172.8% (host 51.7% · stack 121.1%) · rss 2169 MB
+  active 3/3: cpu 150% (host 45.2% · stack 104.8%) · rss 2153 MB
+  parallel x1: all ready 13729 ms · total rss 1972 MB
+  parallel x4: all ready 40119 ms · total rss 6250 MB
+
+== GPUIX-first · real stack
+  cold 1/5: ready 28397 ms · rss 1968 MB · idle 13.1% · 19 proc
+  cold 2/5: ready 11635 ms · rss 1968 MB · idle 16.3% · 19 proc
+  cold 3/5: ready 11672 ms · rss 1968 MB · idle 18.6% · 19 proc
+  cold 4/5: ready 12582 ms · rss 1968 MB · idle 13.8% · 19 proc
+  cold 5/5: ready 12156 ms · rss 1969 MB · idle 16.7% · 19 proc
+  active 1/3: cpu 121.2% (host 29.4% · stack 91.9%) · rss 2178 MB
+  active 2/3: cpu 130.5% (host 34.4% · stack 96.1%) · rss 2167 MB
+  active 3/3: cpu 122.3% (host 32.3% · stack 90%) · rss 2140 MB
+  parallel x1: all ready 14468 ms · total rss 1963 MB
+  parallel x4: all ready 33941 ms · total rss 6017 MB
+
+== Deno Desktop webview · real stack
+  cold 1/5: ready 27800 ms · rss 2319 MB · idle 14.1% · 29 proc
+  cold 2/5: ready 14889 ms · rss 2229 MB · idle 8.8% · 25 proc
+  cold 3/5: ready 12827 ms · rss 2212 MB · idle 11.6% · 25 proc
+  cold 4/5: ready 13734 ms · rss 2624 MB · idle 11.4% · 31 proc
+  cold 5/5: ready 12609 ms · rss 2224 MB · idle 10.3% · 25 proc
+  active 1/3: cpu 111.4% (host 18.3% · stack 93.1%) · rss 2481 MB
+  active 2/3: cpu 112.3% (host 21.9% · stack 90.5%) · rss 2472 MB
+  active 3/3: cpu 105.9% (host 16.7% · stack 89.2%) · rss 2494 MB
+  parallel x1: all ready 14582 ms · total rss 2239 MB
+  parallel x4: FAILED Error: webview-real x4 ready timed out after 240000 ms
+
+== Deno Desktop webview · 250 ms budget · real stack
+  cold 1/5: ready 28279 ms · rss 2234 MB · idle 12.5% · 25 proc
+  cold 2/5: ready 13849 ms · rss 2233 MB · idle 10.3% · 25 proc
+  cold 3/5: ready 13680 ms · rss 2230 MB · idle 7% · 25 proc
+  cold 4/5: ready 13658 ms · rss 2229 MB · idle 10.2% · 25 proc
+  cold 5/5: ready 14312 ms · rss 2227 MB · idle 10.8% · 25 proc
+  active 1/3: cpu 106.6% (host 15.2% · stack 91.4%) · rss 2452 MB
+  active 2/3: cpu 121.2% (host 15.8% · stack 105.5%) · rss 2564 MB
+  active 3/3: cpu 122.8% (host 16.6% · stack 106.3%) · rss 2457 MB
+  parallel x1: all ready 15805 ms · total rss 2229 MB
+  parallel x4: FAILED Error: webview-budget-real x4 ready timed out after 240000 ms
+
+| Host | Cold start (median) | Memory (tree) | Processes | Idle CPU | Active CPU | 8 instances (total) |
+| --- | --- | --- | --- | --- | --- | --- |
+| GPUIX + Preact (this build) | 961 ms | 264 MB RSS | 1 | 3.9% | 80.2% | did not start |
+| GPUIX-first + Preact | 904 ms | 264 MB RSS | 1 | 3.1% | 36.7% | did not start |
+| Deno Desktop webview (same app) | 1018 ms | 502 MB RSS | 7 | 0.5% | 38.1% | did not start |
+| Deno Desktop webview · 250 ms budget | 973 ms | 504 MB RSS | 7 | 0.5% | 10% | did not start |
+| GPUIX + Preact · real stack | 14048 ms | 1967 MB RSS | 19 | 12.2% | 150% | did not start |
+| GPUIX-first · real stack | 12156 ms | 1968 MB RSS | 19 | 16.3% | 122.3% | did not start |
+| Deno Desktop webview · real stack | 13734 ms | 2229 MB RSS | 25 | 11.4% | 111.4% | did not start |
+| Deno Desktop webview · 250 ms budget · real stack | 13849 ms | 2230 MB RSS | 25 | 10.3% | 121.2% | did not start |
+
+| Real stack | Graph ready | Host memory | Graph memory | Host CPU idle / active | Graph CPU idle / active |
+| --- | --- | --- | --- | --- | --- |
+| GPUIX + Preact · real stack | 12285 ms | 286 MB | 1676 MB (18 proc) | 4.5% / 45.2% | 7.8% / 104.8% |
+| GPUIX-first · real stack | 10884 ms | 285 MB | 1679 MB (18 proc) | 6.3% / 32.3% | 9.4% / 91.9% |
+| Deno Desktop webview · real stack | 12567 ms | 546 MB | 1676 MB (18 proc) | 1.3% / 18.3% | 10.2% / 90.5% |
+| Deno Desktop webview · 250 ms budget · real stack | 12825 ms | 546 MB | 1680 MB (18 proc) | 1.6% / 15.8% | 8.9% / 105.5% |
+
+Report: C:\Users\chaut\netscript-bench-windows-2026-11-09T22-17-12-522Z.json
+        C:\Users\chaut\netscript-bench-windows-2026-11-09T22-17-12-522Z.md

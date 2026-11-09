@@ -1,0 +1,928 @@
+{
+  "environment": {
+    "date": "2026-11-09T22:17:12.526Z",
+    "os": "windows-x86_64",
+    "osRelease": "10.0.26300",
+    "cpus": 14,
+    "loadavg": null,
+    "memoryTotalMb": 32373,
+    "method": "cold = spawn→data-backed frame painted, fresh profile; memory = process tree 3 s after ready; idle/active CPU = tree CPU time over a window, % of one core",
+    "machine": {
+      "displays": 4,
+      "power": {
+        "powerLineStatus": "Online",
+        "batteryStatus": [
+          2
+        ],
+        "activePlan": "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)"
+      },
+      "windows": "Microsoft Windows 11 Home build 26300",
+      "webview2": "157.0.4341.42",
+      "gpus": [
+        {
+          "Name": "DisplayLink USB Device",
+          "DriverVersion": "12.1.2591.0"
+        },
+        {
+          "Name": "DisplayLink USB Device",
+          "DriverVersion": "12.1.2591.0"
+        },
+        {
+          "Name": "Intel(R) Graphics",
+          "DriverVersion": "32.0.101.6881"
+        }
+      ],
+      "name": "LENOVO 83FF",
+      "ramGb": 31.61,
+      "cpu": [
+        "Intel(R) Core(TM) Ultra 7 155U"
+      ]
+    }
+  },
+  "variants": {
+    "gpuix": {
+      "label": "GPUIX + Preact (this build)",
+      "coldStartMs": {
+        "median": 961,
+        "min": 850,
+        "max": 1149,
+        "samples": [
+          1131,
+          934,
+          1149,
+          961,
+          850
+        ]
+      },
+      "memoryMb": {
+        "rssMedian": 264,
+        "pssMedian": null
+      },
+      "processCount": 1,
+      "processes": [
+        {
+          "name": "NetScript.exe",
+          "rssMb": 264
+        }
+      ],
+      "idleCpuPct": {
+        "median": 3.9,
+        "samples": [
+          3,
+          3.9,
+          2.7,
+          4.1,
+          5.9
+        ]
+      },
+      "activeCpuPct": {
+        "median": 80.2,
+        "samples": [
+          80.2,
+          83,
+          79.7
+        ],
+        "rssMedianMb": 288
+      },
+      "parallel": [
+        {
+          "instances": 1,
+          "allReadyMs": 1138,
+          "totalRssMb": 264,
+          "totalPssMb": null,
+          "rssPerInstanceMb": 264
+        },
+        {
+          "instances": 4,
+          "allReadyMs": 2028,
+          "totalRssMb": 1055,
+          "totalPssMb": null,
+          "rssPerInstanceMb": 264
+        }
+      ]
+    },
+    "gpuix-native": {
+      "label": "GPUIX-first + Preact",
+      "coldStartMs": {
+        "median": 904,
+        "min": 842,
+        "max": 1450,
+        "samples": [
+          1450,
+          922,
+          904,
+          842,
+          872
+        ]
+      },
+      "memoryMb": {
+        "rssMedian": 264,
+        "pssMedian": null
+      },
+      "processCount": 1,
+      "processes": [
+        {
+          "name": "NetScript.exe",
+          "rssMb": 264
+        }
+      ],
+      "idleCpuPct": {
+        "median": 3.1,
+        "samples": [
+          4.2,
+          2.8,
+          3.1,
+          4.5,
+          2.2
+        ]
+      },
+      "activeCpuPct": {
+        "median": 36.7,
+        "samples": [
+          36.7,
+          32.3,
+          37.3
+        ],
+        "rssMedianMb": 288
+      },
+      "parallel": [
+        {
+          "instances": 1,
+          "allReadyMs": 939,
+          "totalRssMb": 263,
+          "totalPssMb": null,
+          "rssPerInstanceMb": 263
+        },
+        {
+          "instances": 4,
+          "allReadyMs": 1364,
+          "totalRssMb": 1055,
+          "totalPssMb": null,
+          "rssPerInstanceMb": 264
+        }
+      ]
+    },
+    "webview": {
+      "label": "Deno Desktop webview (same app)",
+      "coldStartMs": {
+        "median": 1018,
+        "min": 969,
+        "max": 1931,
+        "samples": [
+          1931,
+          1061,
+          969,
+          1018,
+          1018
+        ]
+      },
+      "memoryMb": {
+        "rssMedian": 502,
+        "pssMedian": null
+      },
+      "processCount": 7,
+      "processes": [
+        {
+          "name": "NetScript-Webview.exe",
+          "rssMb": 110
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 121
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 124
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 38
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 19
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 79
+        }
+      ],
+      "idleCpuPct": {
+        "median": 0.5,
+        "samples": [
+          0.2,
+          1.3,
+          0.3,
+          0.5,
+          0.5
+        ]
+      },
+      "activeCpuPct": {
+        "median": 38.1,
+        "samples": [
+          40.9,
+          36.6,
+          38.1
+        ],
+        "rssMedianMb": 582
+      },
+      "parallel": [
+        {
+          "instances": 1,
+          "allReadyMs": 1066,
+          "totalRssMb": 505,
+          "totalPssMb": null,
+          "rssPerInstanceMb": 505
+        }
+      ]
+    },
+    "webview-budget": {
+      "label": "Deno Desktop webview · 250 ms budget",
+      "coldStartMs": {
+        "median": 973,
+        "min": 969,
+        "max": 1012,
+        "samples": [
+          1012,
+          969,
+          971,
+          986,
+          973
+        ]
+      },
+      "memoryMb": {
+        "rssMedian": 504,
+        "pssMedian": null
+      },
+      "processCount": 7,
+      "processes": [
+        {
+          "name": "NetScript-Webview.exe",
+          "rssMb": 109
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 123
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 125
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 39
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 19
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 79
+        }
+      ],
+      "idleCpuPct": {
+        "median": 0.5,
+        "samples": [
+          0.9,
+          0.5,
+          0.5,
+          0.8,
+          0.3
+        ]
+      },
+      "activeCpuPct": {
+        "median": 10,
+        "samples": [
+          10,
+          8.8,
+          11.6
+        ],
+        "rssMedianMb": 558
+      },
+      "parallel": [
+        {
+          "instances": 1,
+          "allReadyMs": 975,
+          "totalRssMb": 506,
+          "totalPssMb": null,
+          "rssPerInstanceMb": 506
+        }
+      ]
+    },
+    "gpuix-real": {
+      "label": "GPUIX + Preact · real stack",
+      "coldStartMs": {
+        "median": 14048,
+        "min": 13551,
+        "max": 18756,
+        "samples": [
+          18756,
+          13768,
+          14048,
+          13551,
+          16702
+        ]
+      },
+      "memoryMb": {
+        "rssMedian": 1967,
+        "pssMedian": null
+      },
+      "processCount": 19,
+      "processes": [
+        {
+          "name": "NetScript.exe",
+          "rssMb": 286
+        },
+        {
+          "name": "GarnetServer.exe",
+          "rssMb": 78
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 121
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 227
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 11
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 208
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 235
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 203
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 161
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 154
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 201
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        }
+      ],
+      "idleCpuPct": {
+        "median": 12.2,
+        "samples": [
+          12,
+          15.2,
+          12.2,
+          11.7,
+          12.3
+        ]
+      },
+      "activeCpuPct": {
+        "median": 150,
+        "samples": [
+          141.1,
+          172.8,
+          150
+        ],
+        "rssMedianMb": 2169
+      },
+      "parallel": [
+        {
+          "instances": 1,
+          "allReadyMs": 13729,
+          "totalRssMb": 1972,
+          "totalPssMb": null,
+          "rssPerInstanceMb": 1972
+        },
+        {
+          "instances": 4,
+          "allReadyMs": 40119,
+          "totalRssMb": 6250,
+          "totalPssMb": null,
+          "rssPerInstanceMb": 1563
+        }
+      ],
+      "split": {
+        "stackReadyMsMedian": 12285,
+        "hostMemoryMb": 286,
+        "stackMemoryMb": 1676,
+        "stackProcesses": 18,
+        "hostIdleCpuPct": 4.5,
+        "stackIdleCpuPct": 7.8,
+        "hostActiveCpuPct": 45.2,
+        "stackActiveCpuPct": 104.8
+      }
+    },
+    "gpuix-native-real": {
+      "label": "GPUIX-first · real stack",
+      "coldStartMs": {
+        "median": 12156,
+        "min": 11635,
+        "max": 28397,
+        "samples": [
+          28397,
+          11635,
+          11672,
+          12582,
+          12156
+        ]
+      },
+      "memoryMb": {
+        "rssMedian": 1968,
+        "pssMedian": null
+      },
+      "processCount": 19,
+      "processes": [
+        {
+          "name": "NetScript.exe",
+          "rssMb": 285
+        },
+        {
+          "name": "GarnetServer.exe",
+          "rssMb": 76
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 121
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 209
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 227
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 235
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 204
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 160
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 155
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 11
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 202
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        }
+      ],
+      "idleCpuPct": {
+        "median": 16.3,
+        "samples": [
+          13.1,
+          16.3,
+          18.6,
+          13.8,
+          16.7
+        ]
+      },
+      "activeCpuPct": {
+        "median": 122.3,
+        "samples": [
+          121.2,
+          130.5,
+          122.3
+        ],
+        "rssMedianMb": 2167
+      },
+      "parallel": [
+        {
+          "instances": 1,
+          "allReadyMs": 14468,
+          "totalRssMb": 1963,
+          "totalPssMb": null,
+          "rssPerInstanceMb": 1963
+        },
+        {
+          "instances": 4,
+          "allReadyMs": 33941,
+          "totalRssMb": 6017,
+          "totalPssMb": null,
+          "rssPerInstanceMb": 1504
+        }
+      ],
+      "split": {
+        "stackReadyMsMedian": 10884,
+        "hostMemoryMb": 285,
+        "stackMemoryMb": 1679,
+        "stackProcesses": 18,
+        "hostIdleCpuPct": 6.3,
+        "stackIdleCpuPct": 9.4,
+        "hostActiveCpuPct": 32.3,
+        "stackActiveCpuPct": 91.9
+      }
+    },
+    "webview-real": {
+      "label": "Deno Desktop webview · real stack",
+      "coldStartMs": {
+        "median": 13734,
+        "min": 12609,
+        "max": 27800,
+        "samples": [
+          27800,
+          14889,
+          12827,
+          13734,
+          12609
+        ]
+      },
+      "memoryMb": {
+        "rssMedian": 2229,
+        "pssMedian": null
+      },
+      "processCount": 25,
+      "processes": [
+        {
+          "name": "NetScript-Webview.exe",
+          "rssMb": 121
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 125
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 149
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 39
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 19
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 79
+        },
+        {
+          "name": "GarnetServer.exe",
+          "rssMb": 76
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 121
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 206
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 228
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 235
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 204
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 160
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 202
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 154
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        }
+      ],
+      "idleCpuPct": {
+        "median": 11.4,
+        "samples": [
+          14.1,
+          8.8,
+          11.6,
+          11.4,
+          10.3
+        ]
+      },
+      "activeCpuPct": {
+        "median": 111.4,
+        "samples": [
+          111.4,
+          112.3,
+          105.9
+        ],
+        "rssMedianMb": 2481
+      },
+      "parallel": [
+        {
+          "instances": 1,
+          "allReadyMs": 14582,
+          "totalRssMb": 2239,
+          "totalPssMb": null,
+          "rssPerInstanceMb": 2239
+        }
+      ],
+      "split": {
+        "stackReadyMsMedian": 12567,
+        "hostMemoryMb": 546,
+        "stackMemoryMb": 1676,
+        "stackProcesses": 18,
+        "hostIdleCpuPct": 1.3,
+        "stackIdleCpuPct": 10.2,
+        "hostActiveCpuPct": 18.3,
+        "stackActiveCpuPct": 90.5
+      }
+    },
+    "webview-budget-real": {
+      "label": "Deno Desktop webview · 250 ms budget · real stack",
+      "coldStartMs": {
+        "median": 13849,
+        "min": 13658,
+        "max": 28279,
+        "samples": [
+          28279,
+          13849,
+          13680,
+          13658,
+          14312
+        ]
+      },
+      "memoryMb": {
+        "rssMedian": 2230,
+        "pssMedian": null
+      },
+      "processCount": 25,
+      "processes": [
+        {
+          "name": "NetScript-Webview.exe",
+          "rssMb": 120
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 125
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 149
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 39
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 19
+        },
+        {
+          "name": "msedgewebview2.exe",
+          "rssMb": 79
+        },
+        {
+          "name": "GarnetServer.exe",
+          "rssMb": 76
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 121
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 228
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 207
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 239
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 204
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 159
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 202
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        },
+        {
+          "name": "deno.exe",
+          "rssMb": 154
+        },
+        {
+          "name": "conhost.exe",
+          "rssMb": 10
+        }
+      ],
+      "idleCpuPct": {
+        "median": 10.3,
+        "samples": [
+          12.5,
+          10.3,
+          7,
+          10.2,
+          10.8
+        ]
+      },
+      "activeCpuPct": {
+        "median": 121.2,
+        "samples": [
+          106.6,
+          121.2,
+          122.8
+        ],
+        "rssMedianMb": 2457
+      },
+      "parallel": [
+        {
+          "instances": 1,
+          "allReadyMs": 15805,
+          "totalRssMb": 2229,
+          "totalPssMb": null,
+          "rssPerInstanceMb": 2229
+        }
+      ],
+      "split": {
+        "stackReadyMsMedian": 12825,
+        "hostMemoryMb": 546,
+        "stackMemoryMb": 1680,
+        "stackProcesses": 18,
+        "hostIdleCpuPct": 1.6,
+        "stackIdleCpuPct": 8.9,
+        "hostActiveCpuPct": 15.8,
+        "stackActiveCpuPct": 105.5
+      }
+    }
+  }
+}
