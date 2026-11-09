@@ -34,26 +34,43 @@ open(f"{d}/icon.ico", "wb").write(struct.pack("<HHH", 0, 1, len(sizes)) + entrie
 PY
 png2icns "$ICON_DIR/icon.icns" "$ICON_DIR/icon-512.png" "$ICON_DIR/icon-256.png" "$ICON_DIR/icon-128.png" >/dev/null
 
-COMMON_EXCLUDES=(--exclude "$NATIVE_PKG/wasm" --exclude "$NATIVE_PKG/browser.mjs")
+COMMON_EXCLUDES=(--exclude "$ROOT/$NATIVE_PKG/wasm" --exclude "$ROOT/$NATIVE_PKG/browser.mjs")
+PLATFORMS=(linux-x64-gnu win32-x64-msvc win32-arm64-msvc darwin-arm64)
+
+# `deno compile --target` installs the target's optional @gpuix/native-<triple> into node_modules,
+# and every later build embeds the whole npm resolution (symlink targets included; --exclude does
+# not apply). So: restore node_modules for the host, prune what a target must not carry, then build
+# with --node-modules-dir=manual so nothing is reinstalled.
+restore_modules() { deno install --quiet --node-modules-dir=auto >/dev/null; }
+prune_natives() { # <triple to keep | none> [--with-loader]
+  for other in "${PLATFORMS[@]}"; do
+    [[ "$other" == "$1" ]] && continue
+    rm -rf "node_modules/.deno/@gpuix+native-$other@0.11.0" "$NATIVE_PKG/../native-$other"
+  done
+  if [[ "${2:-}" == "--with-loader" ]]; then rm -rf "node_modules/.deno/@gpuix+native@0.11.0" node_modules/@gpuix; fi
+  return 0
+}
 
 compile() { # <deno-target> <native-triple> <output> [extra deno flags...]
   local target="$1" triple="$2" output="$3"; shift 3
   local staged=""
+  restore_modules
+  if [[ "$triple" == "linux-x64-gnu" ]]; then prune_natives linux-x64-gnu; else prune_natives none; fi
   if [[ "$triple" != "linux-x64-gnu" ]]; then
     staged="$NATIVE_PKG/gpuix-native.$triple.node"
     cp "$NATIVES/$triple/package/gpuix-native.$triple.node" "$staged"
   fi
   local excludes=("${COMMON_EXCLUDES[@]}")
-  [[ "$triple" != "linux-x64-gnu" ]] && excludes+=(--exclude "node_modules/.deno/@gpuix+native-linux-x64-gnu@0.11.0")
-  deno compile -A --quiet --target "$target" --include assets/fonts "${excludes[@]}" "$@" --output "$output" app/main.tsx
+  deno compile -A --quiet --node-modules-dir=manual --target "$target" --include assets/fonts "${excludes[@]}" "$@" --output "$output" app/main.tsx
   [[ -n "$staged" ]] && rm -f "$staged"
   return 0
 }
 
 webview() { # <deno-target> <output>: same app as HTML in the OS webview (benchmark baseline)
-  # The webview host never loads GPUIX: keep its addon out so sizes compare fairly.
-  deno desktop -A --quiet --backend webview --target "$1" --include dist/renderer.js --include assets/fonts \
-    --exclude "$NATIVE_PKG" --exclude "node_modules/.deno/@gpuix+native-linux-x64-gnu@0.11.0" -o "$2" app/main.webview.ts
+  # The webview host never loads GPUIX: prune it entirely so sizes compare fairly.
+  restore_modules && prune_natives none --with-loader
+  deno desktop -A --quiet --node-modules-dir=manual --backend webview --target "$1" --include dist/renderer.js \
+    --include assets/fonts -o "$2" app/main.webview.ts
 }
 
 readme() { # <os>
@@ -156,4 +173,5 @@ EOF
     *) echo "unknown target $target" >&2; exit 2 ;;
   esac
 done
+restore_modules
 ls -la "$OUT"

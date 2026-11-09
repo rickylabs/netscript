@@ -32,3 +32,24 @@
 4. Webview + CEF baselines from the same tree; benchmark runner (container + in-app).
 5. Installables (Linux tar.gz, Windows NSIS + portable zip, macOS app zip) + verification.
 6. RFC `rfcs/0000-gpuix-native-desktop-renderer.md`, HTML report, draft PR, PLAN-EVAL.
+
+## Risk register
+
+| Risk | Likelihood / impact | Mitigation in this run | Residual (owner decision) |
+| --- | --- | --- | --- |
+| Software rendering misrepresents CPU | High / high | Per-thread breakdown separates rasterizer threads; caveat on every surface | Real-GPU `--bench` (gate 1) |
+| Shared host noise (load 4–7) | Medium / medium | 5 cold + 3 active runs, medians, two full runs that agree | Laptop rerun |
+| GPUIX API churn (0.11.0 vs `main`) | High / medium | Exact pins, feature detection | Upgrade policy (gate 2) |
+| Cross-built Windows/macOS binaries untested on hardware | Medium / high | Linux run, macOS signature verification, Windows to DirectX init under Wine | Owner laptop test |
+| Packaging embeds foreign platform binaries | Found / medium | Per-target prune + `--node-modules-dir=manual` | Packager backend design |
+
+## Unresolved questions: deferral classification
+
+| Question | Classification | Why |
+| --- | --- | --- |
+| Bun vs Deno as production host | Safe to defer | Renderer is runtime-agnostic (proven on 3 runtimes); only the packager default changes. |
+| `deno compile` vs `cargo-packager` | Safe to defer | Same `netscript deploy desktop --renderer gpuix` surface either way. |
+| Depth of owning a GPUI fork | Safe to defer | Gated by decision gate 2. |
+| Primitives as the default web component layer | Safe to defer | Explicitly future scope. |
+| Real-GPU active CPU | Must resolve before "recommended" | It is decision gate 1; incubation can start without it. |
+

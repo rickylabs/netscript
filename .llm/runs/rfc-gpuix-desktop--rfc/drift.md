@@ -10,3 +10,7 @@
 | D6 | 2026-11-09 | SDK reserves the `cookie` header; `createService().withRPC()` default path ≠ SDK default. | Bearer bridge + `buildServiceRpcPath()` in the PoC; both recorded as papercuts in the RFC. |
 | D7 | 2026-11-09 | Branch created as `rfc/gpuix-desktop-renderer`; PR skill requires `<type>/<slug>`. | Renamed to `docs/rfc-gpuix-native-desktop` before the first push. |
 | D8 | 2026-11-09 | Owner follow-ups mid-run: Fresh 2.x vs 3.x analysis; complete HTML report. | Both added (research.md § Fresh, PoC router spike; report published as a private Artifact). |
+| D9 | 2026-11-09 | Packaging embedded other platforms' GPUIX addons after the first cross-target build (PLAN-EVAL F1). | Per-target prune + `--node-modules-dir=manual`; sizes re-measured like for like. |
+| D10 | 2026-11-09 | Harness says re-steer the same evaluator session for cycle 2; the T3 orchestrator requires every re-check to be a new `delegate_task`. | Cycle 2 is a new GLM 5.3 session whose brief carries the cycle-1 verdict, findings and dispositions verbatim. |
+| D11 | 2026-11-09 | A removal inside a `bash -c` container script was refused by the shell safety check. | Avoided deletion: CEF sizing from a GPUIX-free copy of the app; concurrency probe stops instances by PID. |
+

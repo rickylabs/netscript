@@ -46,5 +46,21 @@
 
 ## Evaluation
 
-PLAN-EVAL: pending (separate session, non-Anthropic family; route from
-`deno task agentic:matrix --tier feature --plan-evaluator`).
+PLAN-EVAL route: `deno task agentic:matrix --tier feature --plan-evaluator` → GLM 5.3 (provider
+default); fallback Fable 5.1 skipped (same family as the Anthropic generator). Launched 2026-11-09 via
+T3 `delegate_task` as `opencode-go/glm-5.3` (fleet launch 0 of `glm_5_3`), separate session, write
+scope `plan-eval.md` only. Draft PR #2603, tracking issue #2602.
+
+### PLAN-EVAL cycle 1 — GLM 5.3 — `FAIL_PLAN` (3 blocking, 5 non-blocking)
+
+| Finding | Disposition |
+| --- | --- |
+| F1 install size 181 MB unreproducible | **Fixed.** Root cause: `deno compile --target` installs the target's `@gpuix/native-<triple>` into `node_modules`, and later builds embed the whole npm resolution (symlink targets included; `--exclude` ignored). `scripts/package.sh` now restores, prunes foreign platform packages and builds with `--node-modules-dir=manual`. Like-for-like Linux sizes with provenance in `evidence/install-sizes.json`: GPUIX 185, webview 112, CEF 470 MiB (the webview baseline is the smallest; RFC Drawbacks now say so). Downloads shrank to 57–94 MB. Linux tarball app, webview baseline and in-app `--bench` re-verified; Windows/macOS binaries embed only their own addon. |
+| F2 CEF "~10 s" claim lacked an artifact | **Fixed.** `poc/bench/cef-concurrency.sh` → `evidence/cef-concurrent-start.log` (3 pairs: second page ≈10 s twice, never ready once; four at once: two never ready). Footnote rewritten to match. |
+| F3 jsr-audit undispositioned | **Fixed.** Disposition: **N/A for this PR** (docs + run evidence; no package published). RFC § Reference-level now names the future package's constraints: JSR package over an exact-pinned npm native addon, Deno needs `nodeModulesDir` + `--allow-ffi`, per-target pruning in the packager; jsr-audit applies at implementation. |
+| F4 non-raster attribution | **Fixed.** Footnotes ²/³: values come from the separate thread run; CEF marked n/a (compositor threads not separable). Report sentence matches. |
+| F5 load average | **Fixed.** Caveat in RFC table note and report method text. |
+| F6 milestone vocabulary | **Kept.** Milestones are themed since 2026-10-27 (#2442); only the next release is numbered. The RFC README example predates that rule; "Enterprise Deployment & Desktop" is the themed milestone that owns desktop. |
+| F7 plan risk register / deferral classes | **Fixed.** `plan.md` § Risk register and § deferral classification. |
+| F8 precision | **Fixed.** `useNative` (PoC `useGpuix`), ≈2.8k stars, "JS + host main-thread bucket 4%". |
+

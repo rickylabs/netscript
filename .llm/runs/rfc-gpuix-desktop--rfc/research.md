@@ -15,7 +15,7 @@ PoC under `poc/`.
   `@netscript/fresh-ui/desktop` chrome, `@netscript/sdk/auto-update` (wraps `Deno.autoUpdate`), and
   `netscript deploy desktop package|release` (wraps `deno desktop` formats). Every one of these
   depends on Deno-only desktop surfaces — the most exposed part of the stack under the EOL.
-- **GPUIX** (`remorses/gpuix`, Apache-2.0, created 2026-01-29, `0.11.0` on 2026-10-20, ≈2.9k stars,
+- **GPUIX** (`remorses/gpuix`, Apache-2.0, created 2026-01-29, `0.11.0` on 2026-10-20, ≈2.8k stars,
   ≈85 % of commits by one maintainer): React and Solid bindings for a pinned fork of Zed's GPUI.
   A Rust retained element tree receives batched JSON mutations (`applyBatch`) over Node-API; JS
   pumps GPUI with `renderer.tick()` (display-link wake on macOS, 8 ms timer elsewhere). Metal /

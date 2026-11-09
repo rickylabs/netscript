@@ -95,30 +95,42 @@ Two papercuts surfaced and should be fixed independently of this RFC:
 
 <!-- bench-table:start -->
 
-| Host                            | Cold start (median, range) | Memory / instance (PSS) | Processes | Idle CPU | Active CPU (non-raster) | 8 instances (total PSS) | Install |
-| ------------------------------- | -------------------------- | ----------------------- | --------- | -------- | ----------------------- | ----------------------- | ------- |
-| GPUIX + Preact (`deno compile`) | 949 ms (916–1457)          | 282 MB                  | 1         | 1.8%     | 204.7% (61%)            | 1,443 MB                | 181 MB  |
-| GPUIX + Preact (`deno run`)     | 792 ms (773–834)           | 247 MB                  | 1         | 1.6%     | 200.4%                  | 1,531 MB                | —       |
-| Deno Desktop · WebKitGTK        | 831 ms (744–998)           | 402 MB                  | 3         | 36.9%    | 114.3% (20%)            | 2,237 MB                | 177 MB  |
-| Deno Desktop · CEF              | 697 ms (662–1259)          | 412 MB                  | 8         | 0.1%     | 14.8% (15%)             | did not start¹          | 537 MB  |
+| Host                            | Cold start (median, range) | Memory / instance (PSS) | Processes | Idle CPU | Active CPU (non-raster) | 8 instances (total PSS) | Install⁴ |
+| ------------------------------- | -------------------------- | ----------------------- | --------- | -------- | ----------------------- | ----------------------- | -------- |
+| GPUIX + Preact (`deno compile`) | 949 ms (916–1457)          | 282 MB                  | 1         | 1.8%     | 204.7% (≈61%²)          | 1,443 MB                | 185 MB   |
+| GPUIX + Preact (`deno run`)     | 792 ms (773–834)           | 247 MB                  | 1         | 1.6%     | 200.4%                  | 1,531 MB                | —        |
+| Deno Desktop · WebKitGTK        | 831 ms (744–998)           | 402 MB                  | 3         | 36.9%    | 114.3% (≈20%²)          | 2,237 MB                | 112 MB   |
+| Deno Desktop · CEF              | 697 ms (662–1259)          | 412 MB                  | 8         | 0.1%     | 14.8% (n/a³)            | did not start¹          | 470 MB   |
 
 Linux x86_64, 16 CPUs, Xvfb + Mesa lavapipe, 5 cold runs and 3 active runs per host; active load is
-20 events/s. "Non-raster" removes software-rasterizer threads (lavapipe/llvmpipe), which a GPU takes
-over. Raw data: `.llm/runs/rfc-gpuix-desktop--rfc/evidence/bench-linux-software.json` and
+20 events/s. The host is shared: its load average was 4–7 during the runs (recorded in the JSON), so
+medians of repeated runs limit that noise rather than remove it. Raw data:
+`.llm/runs/rfc-gpuix-desktop--rfc/evidence/bench-linux-software.json` and
 `threads-linux-software.json`.
 
-¹ Concurrent launches of the same CEF app stalled at startup here: with two at once, one page waited
-about 10 s, and four or eight missed the 90 s ready budget.
+² "Non-raster" removes software-rasterizer threads (lavapipe/llvmpipe), which a GPU takes over. It
+comes from a separate per-thread run of 10 s (totals 205% and 112%), not from the medians beside it.
+
+³ CEF's compositing runs on its own viz and compositor threads, which thread names do not separate
+from other work, so its 15% total already includes its rendering.
+
+⁴ Linux builds as shipped, each carrying only its own host and platform binaries
+(`evidence/install-sizes.json`). GPUIX is 133 MB on Windows and 123 MB on macOS, where the addon is
+23–24 MB instead of 50 MB.
+
+¹ Concurrent launches of the same CEF app stall at startup here. In three trials of two simultaneous
+launches, the second page waited about 10 s twice and never became ready once (120 s budget); with
+four, two never became ready (`evidence/cef-concurrent-start.log`). The cause was not isolated.
 
 **What the numbers say.** GPUIX uses one process, about 30% less memory per instance than either web
 host, and roughly 35% less total memory with eight instances open than WebKitGTK. Its idle CPU is
 low (the 8 ms frame pump). Under load, rasterization dominates on lavapipe (144 of 205%). Even
-without it, GPUIX spent about 61% against about 20% (WebKitGTK) and 15% (CEF). Almost all of that is
-GPUI's UI thread (layout, scene rebuild, and here software presentation); app JavaScript was 4%.
-GPUI redraws the whole window on change, while Chromium repaints damaged regions. This is the main
-open risk, and gate 1 exists to settle it on real GPUs. Cold start is the one metric where the
-compiled GPUIX build is slowest (949 ms against 831 and 697 ms); `deno compile` adds about 150 ms
-over `deno run`.
+without it, GPUIX spent about 61%, against about 20% for WebKitGTK and 15% in total (rendering
+included) for CEF. Almost all of GPUIX's share is GPUI's UI thread (layout, scene rebuild, and here
+software presentation); the JavaScript and host main-thread bucket was 4%. GPUI redraws the whole
+window on change, while Chromium repaints damaged regions. This is the main open risk, and gate 1
+exists to settle it on real GPUs. Cold start is the one metric where the compiled GPUIX build is
+slowest (949 ms against 831 and 697 ms); `deno compile` adds about 150 ms over `deno run`.
 
 <!-- bench-table:end -->
 
@@ -165,17 +177,32 @@ contribution, because there is no browser cookie jar.
 
 ## Reference-level explanation
 
-| Proposed surface            | Placement / archetype                                               | Content                                                                                                                                                                                                                                                         |
-| --------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@netscript/desktop-native` | New package, Archetype 2 (integration)                              | Preact host renderer over `@gpuix/native/host` (from the PoC adapter), `render`/`createRoot`/`useNative`, the `NativeHost` port (fetch + credentials, settings over `@netscript/kv`, native capabilities with feature detection), exact-pinned `@gpuix/native`. |
-| fresh-ui native collection  | `@netscript/fresh-ui` registry collection                           | Primitives that render to GPUIX or DOM from token data; the CSS-to-style translation stays in the DOM branch. Tokens are emitted as values as well as CSS variables.                                                                                            |
-| Native credentials          | `@netscript/plugin-auth-core/sdk` (RFC 0001 bearer factory)         | Adopt the existing bearer contribution for native hosts; better-auth bearer plugin server-side. No new SDK surface.                                                                                                                                             |
-| Auto-update adapter         | `@netscript/sdk/auto-update`                                        | A `NativeAutoUpdate` implementation for non-`deno desktop` hosts (NetScript release server and GitHub Releases; ed25519 verification reused).                                                                                                                   |
-| Packaging backend           | `netscript deploy desktop package --renderer gpuix` (Archetype 6/7) | `deno compile` per target with the platform addon staged, then app/dmg, NSIS/MSI, AppImage/deb bundling (PoC: `scripts/package.sh`). `cargo-packager` is the alternative to evaluate.                                                                           |
-| Service seams               | `@netscript/service`                                                | Align the builder's default RPC path with the SDK, and document the reserved headers.                                                                                                                                                                           |
+| Proposed surface            | Placement / archetype                                               | Content                                                                                                                                                                                                                                                                                |
+| --------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@netscript/desktop-native` | New package, Archetype 2 (integration)                              | Preact host renderer over `@gpuix/native/host` (from the PoC adapter), `render`/`createRoot`/`useNative` (the PoC's `useGpuix`), the `NativeHost` port (fetch + credentials, settings over `@netscript/kv`, native capabilities with feature detection), exact-pinned `@gpuix/native`. |
+| fresh-ui native collection  | `@netscript/fresh-ui` registry collection                           | Primitives that render to GPUIX or DOM from token data; the CSS-to-style translation stays in the DOM branch. Tokens are emitted as values as well as CSS variables.                                                                                                                   |
+| Native credentials          | `@netscript/plugin-auth-core/sdk` (RFC 0001 bearer factory)         | Adopt the existing bearer contribution for native hosts; better-auth bearer plugin server-side. No new SDK surface.                                                                                                                                                                    |
+| Auto-update adapter         | `@netscript/sdk/auto-update`                                        | A `NativeAutoUpdate` implementation for non-`deno desktop` hosts (NetScript release server and GitHub Releases; ed25519 verification reused).                                                                                                                                          |
+| Packaging backend           | `netscript deploy desktop package --renderer gpuix` (Archetype 6/7) | `deno compile` per target with the platform addon staged, then app/dmg, NSIS/MSI, AppImage/deb bundling (PoC: `scripts/package.sh`). `cargo-packager` is the alternative to evaluate.                                                                                                  |
+| Service seams               | `@netscript/service`                                                | Align the builder's default RPC path with the SDK, and document the reserved headers.                                                                                                                                                                                                  |
 
 The embedded service keeps the runtime choice local: on Deno it uses `Deno.serve` and Deno KV, and
 it migrates with the rest of NetScript. The renderer package must not import Deno-only APIs.
+
+**Publishing and consumer constraints.** `@netscript/desktop-native` would be a JSR package that
+depends on an exact-pinned npm package (`@gpuix/native`), whose per-platform binaries arrive as
+optional npm dependencies. JSR carries no native code, and upstream types are re-exported through
+package-owned structural types, as `@netscript/service` already does for Hono and oRPC, so the JSR
+surface stays plain TypeScript. These constraints follow:
+
+- On Deno, consumers need a local `node_modules` (`nodeModulesDir: "auto"`) and FFI permission
+  (`--allow-ffi`), because Deno loads Node-API addons only from a `node_modules` directory. On Bun
+  and Node it is an ordinary npm dependency.
+- `deno compile --target` installs the target platform's binary into `node_modules`, and every later
+  build embeds the whole npm resolution (`--exclude` does not remove it). The packaging backend must
+  therefore prune the other platforms' binaries before each target build. The PoC's
+  `scripts/package.sh` does this.
+- The jsr-audit gate applies when the package is implemented. This RFC publishes nothing.
 
 ## Drawbacks
 
@@ -191,8 +218,9 @@ it migrates with the rest of NetScript. The renderer package must not import Den
   over AccessKit. There is no tray, and 0.11.0 has no clipboard or notifications.
 - **Software-rendering cost.** VMs, RDP and CI without a GPU pay full-frame rasterization on every
   update (see the active-CPU result).
-- **Binary size.** About 181 MB on Linux (`deno compile` plus a 23–52 MB addon per platform),
-  against 177 MB for the webview build and 537 MB for CEF.
+- **Binary size.** GPUIX is larger than the webview build: 185 MB on Linux (the Deno runtime plus a
+  50 MB addon; 133 MB on Windows, 123 MB on macOS) against 112 MB for the webview build, and smaller
+  than CEF at 470 MB. Downloads with both hosts are 57–94 MB.
 
 ## Rationale and alternatives
 

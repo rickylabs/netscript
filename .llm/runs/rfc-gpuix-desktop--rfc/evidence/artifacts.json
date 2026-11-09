@@ -2,29 +2,29 @@
   {
     "name": "NetScript-GPUIX-PoC-0.1.0-windows-x64-setup.exe",
     "os": "Windows x64 \u00b7 installer",
-    "sizeMb": 97,
-    "sha256": "bc44177eecd5bc50b0c1dd26c88f8efb8e347203d466312ab5172e20bf3f7384",
+    "sizeMb": 57,
+    "sha256": "8e5c078cad4e614ec6ca62fe29e8745f6fe8e276b2ff774239f54600c8e879ec",
     "where": "Per-user install: NetScript, the webview baseline and \u201cRun benchmark\u201d in the Start menu."
   },
   {
     "name": "NetScript-GPUIX-PoC-0.1.0-windows-x64-portable.zip",
     "os": "Windows x64 \u00b7 portable",
-    "sizeMb": 144,
-    "sha256": "89e221eef2efcb0a42b2852ffa30bc62538166deacc9d684365c43b18f98c429",
+    "sizeMb": 85,
+    "sha256": "cacab0afcbe5aa0ab2ed0344ae8a5729afaff7f8f99b55658ba97c4b22b55551",
     "where": "Unzip and run NetScript.exe; webview\\NetScript-Webview.exe is the baseline; bench.cmd runs the benchmark."
   },
   {
     "name": "NetScript-GPUIX-PoC-0.1.0-macos-arm64.zip",
     "os": "macOS Apple Silicon",
-    "sizeMb": 140,
-    "sha256": "a1718bad7c469367e4351533cab20b01d24a1e35ee95a800f34aa70f0a20ff1b",
+    "sizeMb": 80,
+    "sha256": "f1eeed1bc5f109fdaee451278f3f70b7205ce48f696d8c23c17f5cbc4399b411",
     "where": "NetScript.app and NetScript Webview.app (ad-hoc signed) + bench.command."
   },
   {
     "name": "NetScript-GPUIX-PoC-0.1.0-linux-x64.tar.gz",
     "os": "Linux x64",
-    "sizeMb": 146,
-    "sha256": "9fe05c9592233d70db01b0f3a0449fca205cad62301a18bede514d362ad5ab1f",
+    "sizeMb": 94,
+    "sha256": "52d7a1b9b08123f0ea114953b466f624e1ce3f5bec6a9280a9638629d2c7dbf3",
     "where": "netscript + webview/ baseline + bench.sh; needs glibc 2.39 and Vulkan."
   }
 ]
