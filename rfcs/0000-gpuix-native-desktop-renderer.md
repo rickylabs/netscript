@@ -4,8 +4,8 @@ title: Native GPU desktop renderer (GPUIX + Preact) for NetScript desktop apps
 status: Draft
 authors: ['@rickylabs']
 created: 2026-11-09
-tracking-issue: <to be opened with the draft PR>
-target-milestone: Backlog / Triage
+tracking-issue: https://github.com/rickylabs/netscript/issues/2602
+target-milestone: Enterprise Deployment & Desktop
 ---
 
 # Native GPU desktop renderer (GPUIX + Preact) for NetScript desktop apps
