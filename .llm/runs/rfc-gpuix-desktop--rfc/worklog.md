@@ -123,3 +123,18 @@ smaller than 2×) and multi-instance favour GPUIX; **gate 1 as written fails** (
 webview on a real GPU), and idle CPU is ~10× (GPUIX's 8 ms timer pump on Windows/Linux). Follow-up
 probe `poc/bench/windows-probe.ps1` (pinned `a0744700`) dispatched to the laptop: launch types for
 both hosts + per-thread GPUIX CPU (overview vs settings vs idle) + WebView2 per-process CPU.
+
+### Gate 1 follow-up probe (laptop) — CPU attribution and launch types
+
+`evidence/probe-windows-yogabook9i.json` (script `poc/bench/windows-probe.ps1` @ `a0744700`, sha256
+verified on the laptop, ran clean, no edits). GPUIX at 20 events/s: overview 94.7% total (GPUI UI
+thread `gpuix-ui` 88.1%, JS main 3.3%), settings 8.9% (UI 3.0%, JS 3.4%), idle 6.9%. WebView2 at
+20/s: 27.0% (renderer 15.2%, GPU process 6.9%, host 2.3%). Conclusion: app JavaScript ≈3% on both
+hosts; GPUIX's cost is GPUI per-frame work on large changing visible trees. Windows launch types
+are noisy (outliers 7–13 s; WebView2 relaunch erratic) and recorded as indicative.
+
+Post-PASS update: the RFC gained the "Real GPU: Windows laptop" section, gate 1 status (not met,
+with a path to passing), the CPU drawback, a summary sentence and one unresolved question. This
+adds measured evidence the owner requested; no proposed surface, gate definition or archetype
+changed. PLAN-EVAL rounds for the feature tier are exhausted, so a re-review is the owner's call.
+Report republished (v3).

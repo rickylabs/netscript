@@ -129,3 +129,14 @@ arm64 binary and addon carry valid ad-hoc signatures (0/48 648 page-hash mismatc
 `__SUI` injection); Windows `.exe` under Wine boots Deno, extracts the app, loads the Windows addon
 and reaches `gpui_windows` — failing only at DirectX renderer creation (no D3D11 in Wine), i.e.
 verified to the GPU boundary. Artifacts: `~/projects/netscript/artifacts/gpuix-poc/` (+ SHA256SUMS).
+
+## Real GPU (owner laptop) — decision gate 1
+
+Windows 11, Core Ultra 7 155U, Intel Graphics, AC/Balanced (`evidence/bench-windows-yogabook9i.json`,
+`evidence/probe-windows-yogabook9i.json`). GPUIX vs WebView2, same app: memory 267 vs 532 MB
+working set (1 vs 7 processes); 8 instances 2.1 GB vs WebView2 failing to start 4 or 8; idle CPU
+4.8% vs 0.5%; CPU at 20 updates/s 81% vs 37%. Attribution: app JavaScript ≈3% on both; GPUI's UI
+thread 88% on the busy overview vs 3% on the quiet settings screen. Gate 1 is not met; the cost is
+upstream per-frame rendering work, addressable by update budgeting, virtualization, incremental
+rendering and an event-driven frame pump (RFC § Decision gates).
+

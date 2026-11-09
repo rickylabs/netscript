@@ -14,8 +14,9 @@
 
 Research, PoC, two benchmark runs, thread breakdown, installables (Linux/Windows/macOS, each with a
 webview baseline and `--bench`), HTML report and RFC draft are complete. PLAN-EVAL: cycle 1
-FAIL_PLAN (F1–F8 addressed), cycle 2 PASS. The RFC awaits owner disposition; the owner's real-GPU
-laptop benchmark is decision gate 1.
+FAIL_PLAN (F1–F8 addressed), cycle 2 PASS. Gate 1 measured on the owner's Windows laptop: memory and
+multi-instance gains hold, CPU under load does not (81% vs 37%; GPUI UI thread). The RFC awaits owner
+disposition.
 
 ## Completed
 
@@ -29,7 +30,7 @@ laptop benchmark is decision gate 1.
 ## Next Steps
 
 1. Owner reviews PR #2603 and decides the RFC disposition (discussion → FCP).
-2. Owner runs `--bench` on Windows/macOS laptops; append results to `evidence/` and rebuild the report.
+2. Optional: Apple Silicon `--bench`; a perf spike on update budgeting and GPUIX incremental rendering.
 3. If accepted: number the RFC, open implementation issues (desktop-native package, fresh-ui native
    collection, auto-update adapter, packager backend, service RPC-path papercut) on the Codex lane.
 

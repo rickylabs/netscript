@@ -20,8 +20,13 @@ kit that renders to either GPUIX or the DOM, two small SDK/service seams, an aut
 a packaging backend. `deno desktop` with the webview backend remains the default desktop path until
 the decision gates below pass.
 
-This RFC is backed by a working proof of concept (PoC), a benchmark, and installable builds:
-`.llm/runs/rfc-gpuix-desktop--rfc/` (research, evidence, PoC source).
+Measured on a real GPU (a Windows laptop), GPUIX uses half the memory of the webview build, runs as
+one process instead of seven, and starts many instances where the Chromium-based hosts stall. It
+also uses 2.2× the webview's CPU when the screen updates often. That cost sits in GPUI's UI thread,
+not in Preact, NetScript or the runtime, and reducing it is the first incubation work item.
+
+This RFC is backed by a working proof of concept (PoC), benchmarks on Linux and on a Windows laptop,
+and installable builds: `.llm/runs/rfc-gpuix-desktop--rfc/` (research, evidence, PoC source).
 
 ## Motivation
 
@@ -34,8 +39,10 @@ This RFC is backed by a working proof of concept (PoC), a benchmark, and install
 2. **A runtime-agnostic native option exists.** GPUIX loads through Node-API. The PoC proves the
    same Preact renderer source runs unchanged on **Deno 2.9.7, Bun 1.4.4 and Node 24**. A
    GPUIX-based desktop path survives the runtime migration; a `deno desktop`-based one does not.
-3. **Measured resource gains.** One process instead of three (WebKitGTK) or eight (CEF), about 30%
-   less memory per instance, and better parallel-instance scaling (see the benchmark below).
+3. **Measured resource gains.** One process instead of three (WebKitGTK), seven (WebView2) or eight
+   (CEF), 30–50% less memory per instance, and many concurrent instances where the Chromium-based
+   hosts stall at startup (see the benchmarks below). The measured cost is CPU under frequent
+   updates.
 4. **Simpler architecture.** In one process the window-bound oRPC transport (`bindDesktopRpcWindow`
    ↔ `createDesktopServiceClient`, MessagePort framing) disappears: the UI calls the service through
    the ordinary SDK client, or in-process.
@@ -139,8 +146,59 @@ GPUI uses Mesa lavapipe (software Vulkan), and WebKitGTK and CEF use software co
 makes **active CPU** the least representative metric. GPUI redraws the full window when anything
 changes, which is its design point on a GPU but expensive on lavapipe. The per-thread breakdown
 attributes that cost (see the table note). Memory, process count, idle CPU, parallel scaling and
-cold start are much less sensitive to the renderer. The installable's `--bench` mode reruns the same
-method on real hardware, and those results are a decision gate.
+cold start are much less sensitive to the renderer. The installable's `--bench` mode reran the same
+method on a real GPU; see the next section.
+
+### Real GPU: Windows laptop
+
+Lenovo Yoga Book 9i: Windows 11 (build 26300), Intel Core Ultra 7 155U, Intel Graphics (driver
+32.0.101.6881), 32 GB, on AC with the Balanced plan, WebView2 157. Same app, same method, run by the
+installable's `--bench` mode (`evidence/bench-windows-yogabook9i.json`).
+
+| Metric                             | GPUIX                        | WebView2 (same app)           |
+| ---------------------------------- | ---------------------------- | ----------------------------- |
+| Cold start, new profile (median)   | 1,075 ms                     | 1,000 ms (first run 3,482 ms) |
+| Memory (working set, process tree) | 267 MB, 1 process            | 532 MB, 7 processes           |
+| Idle CPU                           | 4.8%                         | 0.5%                          |
+| Active CPU, 20 updates/s           | 80.9%                        | 37.2%                         |
+| 8 instances                        | 2,143 MB, all ready in 4.3 s | 4 and 8 never started (90 s)  |
+
+Windows reports working sets, which count pages shared between WebView2's processes once per
+process, so the real memory gap is smaller than 2×.
+
+A follow-up probe (`poc/bench/windows-probe.ps1`, `evidence/probe-windows-yogabook9i.json`)
+attributed the CPU by named thread (GPUIX) and by process type (WebView2) over 10 s:
+
+| Host and screen                   | Total CPU | Where it goes                                                |
+| --------------------------------- | --------- | ------------------------------------------------------------ |
+| GPUIX · overview, 20 updates/s    | 94.7%     | GPUI UI thread 88.1%, JavaScript main thread 3.3%            |
+| GPUIX · settings, 20 updates/s    | 8.9%      | GPUI UI thread 3.0%, JavaScript main thread 3.4%             |
+| GPUIX · overview, idle            | 6.9%      | GPUI UI thread 3.1%, JavaScript 2.0%, vsync 1.7%             |
+| WebView2 · overview, 20 updates/s | 27.0%     | renderer 15.2%, GPU process 6.9%, host (Deno + service) 2.3% |
+
+Launch types, median of three (window on screen / data on screen). Linux runs one fresh container
+per sample (`evidence/first-launch-linux*.log`); Windows uses the same probe.
+
+| Launch                                 | GPUIX Linux    | Webview Linux | GPUIX Windows    | WebView2 Windows  |
+| -------------------------------------- | -------------- | ------------- | ---------------- | ----------------- |
+| First launch (no code cache, new data) | 273 / 1,179 ms | 79⁶ / 960 ms  | 792 / 1,277 ms   | 2,126 / 2,312 ms  |
+| Relaunch with existing data            | 193 / 427 ms   | 66⁶ / 749 ms  | 694 / 1,107 ms   | 3,725 / 4,249 ms⁷ |
+| New data, code cache warm              | 186 / 954 ms   | 55⁶ / 814 ms  | 1,211 / 1,794 ms | 971 / 1,277 ms    |
+
+⁶ The webview's native window maps early but stays blank until the page loads; GPUIX's first window
+already shows the app shell.
+
+⁷ WebView2 relaunches were slow and erratic in this run (3.3–13.2 s). The probe force-kills every
+instance, and individual launches on this machine (four displays, background browser) varied from
+under 1 s to 13 s, so treat Windows launch numbers as indicative.
+
+**What the real GPU changes.** The memory, process-count and multi-instance advantages hold on
+Windows. Gate 1 fails as written: under 20 updates/s GPUIX used 2.2× the webview's CPU. The probe
+locates the cost: app JavaScript (Preact, the service and the SDK) is about 3% on either host, and
+GPUI's UI thread accounts for the rest. That thread used 88% on the busy overview and 3% on the
+quiet settings screen at the same event rate, so the cost is GPUI's per-frame work when large
+visible areas keep changing. Idle CPU (5–7%) comes from GPUIX's 8 ms frame pump on Windows and
+Linux; macOS uses display-link wakes and has not been measured yet.
 
 ## Guide-level explanation
 
@@ -216,8 +274,9 @@ surface stays plain TypeScript. These constraints follow:
   or deep-link callback.
 - **Platform gaps.** No Intel macOS. Linux binaries need glibc 2.39. Accessibility is an ARIA subset
   over AccessKit. There is no tray, and 0.11.0 has no clipboard or notifications.
-- **Software-rendering cost.** VMs, RDP and CI without a GPU pay full-frame rasterization on every
-  update (see the active-CPU result).
+- **CPU under frequent updates.** On a real GPU, GPUIX used 2.2× the webview's CPU at 20 updates/s,
+  almost all on GPUI's UI thread, and 5–7% at idle on Windows from its frame pump. VMs, RDP and CI
+  without a GPU also pay software rasterization on top.
 - **Binary size.** GPUIX is larger than the webview build: 185 MB on Linux (the Deno runtime plus a
   50 MB addon; 133 MB on Windows, 123 MB on macOS) against 112 MB for the webview build, and smaller
   than CEF at 470 MB. Downloads with both hosts are 57–94 MB.
@@ -252,7 +311,12 @@ Zed (GPUI), React Native and NativeWind (non-DOM renderers, class-to-style compi
 ## Decision gates (incubating → recommended)
 
 1. A real-GPU benchmark (`NetScript --bench`) on Windows and macOS laptops shows active CPU at or
-   below the webview baseline, and that memory and parallel-instance gains hold.
+   below the webview baseline, and that memory and parallel-instance gains hold. **Status:** memory
+   and multi-instance gains hold on one Windows laptop; active CPU does not (81% against 37%). The
+   path to passing is: coalesce data-driven UI updates to a frame budget in the runtime (live feeds
+   rarely need more than 10 Hz), virtualize long lists, and upstream two GPUIX changes, namely
+   incremental rendering of unchanged subtrees and an event-driven frame pump on Windows and Linux.
+   Then re-measure on Windows and Apple Silicon.
 2. GPUIX publishes a release that includes clipboard and notifications, and the project agrees an
    upgrade policy (exact pins; vendor or fork if upstream stalls).
 3. Accessibility reaches an agreed bar: keyboard navigation and screen-reader smoke tests on macOS
@@ -265,6 +329,8 @@ Zed (GPUI), React Native and NativeWind (non-DOM renderers, class-to-style compi
   Deno until the migration?
 - `deno compile` or `cargo-packager` for packaging?
 - How far should NetScript go in owning a GPUI fork if upstream stalls?
+- Can GPUIX render unchanged subtrees incrementally, or must apps budget their update rate? This
+  decides whether gate 1 is an upstream fix or a framework convention.
 - Should the primitives collection become the default component layer for web as well?
 
 ## Future possibilities

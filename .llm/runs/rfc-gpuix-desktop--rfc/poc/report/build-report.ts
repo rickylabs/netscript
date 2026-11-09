@@ -27,6 +27,12 @@ interface Variant {
 const bench = JSON.parse(await Deno.readTextFile(`${EVIDENCE}/bench-linux-software.json`)) as { environment: Record<string, unknown>; variants: Record<string, Variant> };
 const threads = await Deno.readTextFile(`${EVIDENCE}/threads-linux-software.json`).then((text) => JSON.parse(text) as Array<{ variant: string; totalCpuPct: number; breakdown: Array<{ bucket: string; cpuPct: number }>; topThreads?: Array<{ thread: string; cpuPct: number }> }>).catch(() => []);
 const sizes = await Deno.readTextFile(`${EVIDENCE}/install-sizes.json`).then((text) => JSON.parse(text) as Record<string, number>).catch(() => ({} as Record<string, number>));
+const winBench = await Deno.readTextFile(`${EVIDENCE}/bench-windows-yogabook9i.json`).then((text) => JSON.parse(text) as { environment: Record<string, unknown> & { machine?: Record<string, unknown> }; variants: Record<string, Variant & { parallelFailures?: string[] }> }).catch(() => null);
+const winProbe = await Deno.readTextFile(`${EVIDENCE}/probe-windows-yogabook9i.json`).then((text) => JSON.parse(text) as {
+  launchSummary: Array<{ host: string; kind: string; windowMedianMs: number | null; dataMedianMs: number | null; samples: string[] }>;
+  gpuixThreads: Array<{ label: string; totalCpuPct: number; threads: Array<{ thread: string; cpuPct: number }> }>;
+  webviewProcesses: { totalCpuPct: number; processes: Array<{ process: string; cpuPct: number }> } | null;
+}).catch(() => null);
 const runtimes = await Deno.readTextFile(`${EVIDENCE}/runtime-portability.json`).then((text) => JSON.parse(text) as Array<{ runtime: string; readyMs: number; rssMb: number }>).catch(() => []);
 
 async function image(name: string): Promise<string> {
@@ -183,6 +189,103 @@ function nonRasterSentence(): string {
   return `Without rasterization, GPUIX still used about ${fmt(gs.nonRaster)}% (almost all on GPUI's UI thread: layout, scene rebuild and, here, software presentation), against ${ws ? fmt(ws.nonRaster) : '—'}% for WebKitGTK and ${cs ? fmt(cs.nonRaster) : '—'}% in total for CEF (its compositor threads can't be separated, so that includes rendering). The JavaScript and host main-thread bucket was ${fmt(gs.app)}%. This is the main open risk; the real-GPU benchmark decides it.`;
 }
 
+
+/** Stacked horizontal bars with explicit segments (ink / host colour / hatch / muted). */
+function stackedChart(rows: Array<{ label: string; slot: number; segments: Array<{ name: string; value: number; kind: 'ink' | 'host' | 'hatch' | 'muted' }> }>, unit = '%'): string {
+  const width = 640;
+  const labelW = 170;
+  const rowH = 36;
+  const plotW = width - labelW - 80;
+  const totals = rows.map((row) => row.segments.reduce((sum, seg) => sum + seg.value, 0));
+  const { max, step } = niceMax(Math.max(...totals));
+  const height = 8 + rows.length * rowH + 26;
+  const x = (value: number) => labelW + (value / max) * plotW;
+  let svg = `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="CPU by thread or process"><defs><pattern id="hatch2" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" class="hatch-bg"/><line x1="0" y1="0" x2="0" y2="6" class="hatch-line"/></pattern></defs>`;
+  for (let tick = 0; tick <= max + 1e-9; tick += step) svg += `<line class="grid" x1="${x(tick)}" x2="${x(tick)}" y1="8" y2="${height - 22}"/><text class="tick" x="${x(tick)}" y="${height - 6}" text-anchor="middle">${fmt(tick)}${unit}</text>`;
+  rows.forEach((row, index) => {
+    const y = 8 + index * rowH;
+    const by = y + 10;
+    let from = 0;
+    const tip = `${row.label}: ${fmt(totals[index], 1)}${unit} total · ` + row.segments.map((seg) => `${seg.name} ${fmt(seg.value, 1)}${unit}`).join(' · ');
+    svg += `<text class="label" x="${labelW - 10}" y="${y + rowH / 2 + 4}" text-anchor="end">${esc(row.label)}</text><g class="hit" data-tip="${esc(tip)}"><rect x="${labelW}" y="${y + 2}" width="${plotW}" height="${rowH - 4}" fill="transparent"/>`;
+    for (const seg of row.segments) {
+      if (seg.value <= 0) continue;
+      const x0 = x(from) + (from > 0 ? 2 : 0);
+      const w = Math.max(1, x(from + seg.value) - x0);
+      const cls = seg.kind === 'ink' ? 'ink-fill' : seg.kind === 'host' ? `s${row.slot}` : seg.kind === 'muted' ? 'muted-fill' : 'hatch-edge';
+      svg += `<rect class="${cls}"${seg.kind === 'hatch' ? ' fill="url(#hatch2)"' : ''} x="${x0}" y="${by}" width="${w}" height="16" rx="2"/>`;
+      from += seg.value;
+    }
+    svg += `</g><text class="value" x="${x(totals[index]) + 8}" y="${y + rowH / 2 + 4}">${fmt(totals[index])}${unit}</text>`;
+  });
+  return `${svg}</svg>`;
+}
+
+function windowsSection(): string {
+  if (!winBench) return '';
+  const g = winBench.variants.gpuix;
+  const w = winBench.variants.webview;
+  const m = winBench.environment.machine ?? {};
+  const G = { id: 'gpuix', short: 'GPUIX', slot: 1 };
+  const W = { id: 'webview2', short: 'WebView2', slot: 2 };
+  const p8 = g.parallel.find((entry) => entry.instances === 8);
+  let cpu = '';
+  if (winProbe) {
+    const thread = (label: string, name: string) => winProbe.gpuixThreads.find((row) => row.label.startsWith(label))?.threads.filter((t) => t.thread === name).reduce((sum, t) => sum + t.cpuPct, 0) ?? 0;
+    const total = (label: string) => winProbe.gpuixThreads.find((row) => row.label.startsWith(label))?.totalCpuPct ?? 0;
+    const gRow = (label: string, key: string) => {
+      const ui = thread(key, 'gpuix-ui');
+      const js = thread(key, 'main');
+      return { label, slot: 1, segments: [{ name: 'JavaScript main thread', value: js, kind: 'ink' as const }, { name: 'GPUI UI thread', value: ui, kind: 'host' as const }, { name: 'other threads', value: Math.max(0, total(key) - ui - js), kind: 'muted' as const }] };
+    };
+    const rows = [gRow('GPUIX · overview, 20/s', 'GPUIX overview, 20'), gRow('GPUIX · settings, 20/s', 'GPUIX settings'), gRow('GPUIX · overview, idle', 'GPUIX overview, idle')];
+    if (winProbe.webviewProcesses) {
+      const part = (name: string) => winProbe.webviewProcesses!.processes.filter((row) => row.process.startsWith(name)).reduce((sum, row) => sum + row.cpuPct, 0);
+      const host = part('host');
+      const renderer = part('renderer');
+      const gpu = part('gpu-process');
+      rows.push({ label: 'WebView2 · overview, 20/s', slot: 2, segments: [{ name: 'host (Deno + service)', value: host, kind: 'ink' }, { name: 'renderer (JS, layout, paint)', value: renderer, kind: 'host' }, { name: 'GPU process', value: gpu, kind: 'hatch' }, { name: 'other processes', value: Math.max(0, winProbe.webviewProcesses.totalCpuPct - host - renderer - gpu), kind: 'muted' }] });
+    }
+    const launchRow = (host: string, kind: string) => {
+      const row = winProbe.launchSummary.find((item) => item.host === host && item.kind.startsWith(kind));
+      return row ? `${fmt(row.windowMedianMs ?? 0)} / ${fmt(row.dataMedianMs ?? 0)} ms` : '—';
+    };
+    cpu = `<div class="grid2">
+      <figure class="card"><h3>Where the CPU goes <span class="eyebrow">% of one core · 10 s</span></h3>${stackedChart(rows)}
+        <div class="legend"><span><i class="sw ink-sw"></i>JavaScript / host (Preact, service, SDK)</span><span><i class="sw s1"></i><i class="sw s2"></i>GPUI UI thread / WebView2 renderer</span><span><i class="sw hatch-sw"></i>WebView2 GPU process</span><span><i class="sw muted-sw"></i>Other</span></div>
+        <figcaption>App JavaScript is about 3% on either host. GPUI's UI thread uses 88% on the busy overview and 3% on the quiet settings screen at the same event rate: the cost is GPUI's per-frame work when large visible areas keep changing.</figcaption></figure>
+      <div class="card"><h3>Launch types <span class="eyebrow">window / data on screen · median of 3</span></h3>
+        <div class="scroll"><table class="data"><thead><tr><th>Launch</th><th>GPUIX</th><th>WebView2</th></tr></thead><tbody>
+          <tr><th scope="row">First launch (no code cache)</th><td>${launchRow('gpuix', 'first')}</td><td>${launchRow('webview', 'first')}</td></tr>
+          <tr><th scope="row">Relaunch, existing data</th><td>${launchRow('gpuix', 'relaunch')}</td><td>${launchRow('webview', 'relaunch')}</td></tr>
+          <tr><th scope="row">New data, cache warm</th><td>${launchRow('gpuix', 'new profile')}</td><td>${launchRow('webview', 'new profile')}</td></tr>
+        </tbody></table></div>
+        <p class="muted">Indicative only: individual launches on this machine (four displays, background browser) ranged from under 1 s to 13 s, and WebView2 relaunches were erratic. On Linux, a normal relaunch showed data in 0.43 s (GPUIX) against 0.75 s (webview).</p></div>
+    </div>`;
+  }
+  return `<section aria-labelledby="realgpu">
+  <div class="sec-head"><span class="eyebrow">Decision gate 1 · real GPU · ${esc(String(m.name ?? 'Windows laptop').replace(/\s*\(.*\)$/, ''))}</span><h2 id="realgpu">On your laptop: memory wins, CPU under load loses</h2>
+  <p class="prose muted">${esc(String(m.windows ?? 'Windows 11'))} · ${esc(String(m.cpu ?? ''))} · ${esc(String((m.gpus as string[] | undefined)?.[0] ?? ''))} · ${esc(String(m.ramGb ?? ''))} GB · ${esc(String(m.power ?? ''))} · WebView2 ${esc(String(m.webview2 ?? ''))}. Same app and method, run by the installable's <code>--bench</code>.</p></div>
+  <div class="kpis">
+    <div class="kpi"><span>Memory (working set)</span><b>${fmt(g.memoryMb.rssMedian)} vs ${fmt(w.memoryMb.rssMedian)} MB</b><span>GPUIX · WebView2 (shared pages counted per process)</span></div>
+    <div class="kpi"><span>Processes</span><b>${g.processCount} vs ${w.processCount}</b><span>GPUIX · WebView2</span></div>
+    <div class="kpi"><span>8 instances</span><b>${p8 ? `${fmt(p8.totalRssMb)} MB` : '—'}</b><span>${p8 ? `all ready in ${fmt(p8.allReadyMs / 1000, 1)} s` : ''} · WebView2: 4 and 8 never started</span></div>
+    <div class="kpi"><span>CPU at 20 updates/s</span><b>${fmt(g.activeCpuPct.median)}% vs ${fmt(w.activeCpuPct.median)}%</b><span>Gate 1 not met · idle ${fmt(g.idleCpuPct.median, 1)}% vs ${fmt(w.idleCpuPct.median, 1)}%</span></div>
+  </div>
+  <div class="grid2">
+    <figure class="card"><h3>Memory per instance <span class="eyebrow">working set · MB</span></h3>${barChart({ id: 'wmem', unit: 'MB', rows: [{ host: G, value: g.memoryMb.rssMedian, note: '1 process' }, { host: W, value: w.memoryMb.rssMedian, note: `${w.processCount} processes` }] })}<figcaption>Windows counts pages shared between WebView2's processes once per process, so the true gap is smaller than 2×.</figcaption></figure>
+    <figure class="card"><h3>CPU, idle and under load <span class="eyebrow">% of one core · median</span></h3>${stackedChart([
+      { label: 'GPUIX · idle', slot: 1, segments: [{ name: 'idle', value: g.idleCpuPct.median, kind: 'host' }] },
+      { label: 'WebView2 · idle', slot: 2, segments: [{ name: 'idle', value: w.idleCpuPct.median, kind: 'host' }] },
+      { label: 'GPUIX · 20 updates/s', slot: 1, segments: [{ name: 'active', value: g.activeCpuPct.median, kind: 'host' }] },
+      { label: 'WebView2 · 20 updates/s', slot: 2, segments: [{ name: 'active', value: w.activeCpuPct.median, kind: 'host' }] },
+    ])}<figcaption>Cold start with new data: ${fmt(g.coldStartMs.median)} ms (GPUIX) vs ${fmt(w.coldStartMs.median)} ms (WebView2, first run ${fmt(w.coldStartMs.max)} ms).</figcaption></figure>
+  </div>
+  ${cpu}
+  <p class="note prose">Path to passing gate 1: coalesce data-driven updates to a frame budget in the runtime (live feeds rarely need more than 10 Hz), virtualize long lists, and upstream incremental rendering of unchanged subtrees plus an event-driven frame pump to GPUIX. Then re-measure on Windows and Apple Silicon.</p>
+</section>`;
+}
+
 const img = {
   gpuixLight: await image('gpuix-overview-light.webp'),
   gpuixDark: await image('gpuix-overview-dark.webp'),
@@ -275,7 +378,7 @@ figcaption { font-size: 13px; color: var(--ink-2) }
 .chart .ring { stroke: var(--bg); stroke-width: 2 }
 .chart .hatch-bg { fill: var(--raise) } .chart .hatch-line { stroke: var(--ink-3); stroke-width: 2 }
 .chart .hatch-edge { stroke: var(--ink-3); stroke-width: 1 }
-.ink-fill { fill: var(--ink) } i.sw.ink-sw { background: var(--ink) }
+.ink-fill { fill: var(--ink) } i.sw.ink-sw { background: var(--ink) } .muted-fill { fill: var(--line-strong) } i.sw.muted-sw { background: var(--line-strong) }
 .s1 { fill: var(--s1) } .s2 { fill: var(--s2) } .s3 { fill: var(--s3) } .s4 { fill: var(--s4) }
 .s1-stroke { stroke: var(--s1) } .s2-stroke { stroke: var(--s2) } .s3-stroke { stroke: var(--s3) } .s4-stroke { stroke: var(--s4) }
 i.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: -1px }
@@ -314,26 +417,28 @@ pre.mermaid { background: var(--surface); border: 1px solid var(--line); padding
   <div class="answers">
     <div class="answer"><span class="q">1 · Preact through the compat layer?</span><span class="verdict v-no">No, but yes natively</span><p><code>@gpuix/react</code> sits on <code>react-reconciler</code>, which reads React's private internals at load and crashes under <code>preact/compat</code>. GPUIX's framework-neutral host layer let me write a Preact renderer instead (≈500 lines). Preact 10, signals and the full app run on it.</p></div>
     <div class="answer"><span class="q">2 · Connection to the NetScript ecosystem</span><span class="verdict v-yes">In one process</span><p>Service, typed SDK client, durable-stream consumer and KV run in the same process as the window. The webview RPC bridge disappears. Gaps: cookie sessions (bridged to bearer), auto-update adapter, packaging backend, a native component kit.</p></div>
-    <div class="answer"><span class="q">3 · Working PoC + benchmark</span><span class="verdict v-yes">Built and measured</span><p>Scaffold-style workspace app: overview, records, record detail, health, design, settings, sign-in, in light and dark. One process; ${memW ? `${pct(memG, memW)}% less memory than the WebKit webview and ${pct(memG, memC)}% less than CEF` : 'lower memory'}; low idle CPU. Under load, GPUI's per-frame work is the open risk.</p></div>
+    <div class="answer"><span class="q">3 · Working PoC + benchmark</span><span class="verdict v-partial">Built · measured · mixed</span><p>Scaffold-style workspace app: overview, records, record detail, health, design, settings, sign-in, in light and dark. One process; ${memW ? `${pct(memG, memW)}% less memory than the WebKit webview and ${pct(memG, memC)}% less than CEF` : 'lower memory'}; on your laptop half the memory of WebView2 and many instances where WebView2 stalls. But 2.2× its CPU under frequent updates, almost all in GPUI's UI thread.</p></div>
     <div class="answer"><span class="q">4 · Installable for your laptop</span><span class="verdict v-yes">Windows · macOS · Linux</span><p>NSIS installer and portable zip for Windows x64, an ad-hoc-signed app for Apple Silicon, a tarball for Linux. Each includes <code>--bench</code> to rerun this benchmark on your real GPU.</p></div>
-    <div class="answer"><span class="q">5 · RFC</span><span class="verdict v-partial">Incubate, gated</span><p>An opt-in native desktop track (<code>rfcs/0000-gpuix-native-desktop-renderer.md</code>). The Deno Desktop webview stays the default until the real-GPU benchmark, upstream maturity, accessibility and packaging gates pass.</p></div>
+    <div class="answer"><span class="q">5 · RFC</span><span class="verdict v-partial">Incubate, gated</span><p>Gate 1 (real-GPU CPU) is not met yet. An opt-in native desktop track (<code>rfcs/0000-gpuix-native-desktop-renderer.md</code>). The Deno Desktop webview stays the default until the real-GPU benchmark, upstream maturity, accessibility and packaging gates pass.</p></div>
     <div class="answer"><span class="q">+ · Fresh on GPUIX?</span><span class="verdict v-neutral">2.x no · 3.x later</span><p>Unchanged Fresh pages can't run on GPUIX: GPUIX has no CSS engine. Fresh 2 has no renderer seam. Fresh 3 does (<code>renderPage(inner)</code>), so a native render target is a credible future plugin; the PoC's router already uses its route-module shape.</p></div>
   </div>
 </section>
 
 <section aria-labelledby="headline">
-  <div class="sec-head"><span class="eyebrow">Headline numbers · Linux, software rendering</span><h2 id="headline">Same app, same service, different host</h2></div>
+  <div class="sec-head"><span class="eyebrow">Linux, software rendering</span><h2 id="headline">Same app, same service, different host</h2></div>
   <div class="kpis">
     <div class="kpi"><span>Processes per app</span><b>${g?.processCount ?? '—'} vs ${w?.processCount ?? '—'} vs ${c?.processCount ?? '—'}</b><span>GPUIX · WebKitGTK · CEF</span></div>
     <div class="kpi"><span>Memory per instance (PSS)</span><b>${fmt(memG)} MB</b><span>vs ${fmt(memW)} MB webview, ${fmt(memC)} MB CEF</span></div>
     <div class="kpi"><span>8 instances, total memory</span><b>${fmt(eight(g)?.totalPssMb ?? 0)} MB</b><span>vs ${fmt(eight(w)?.totalPssMb ?? 0)} MB webview${eight(c) ? `, ${fmt(eight(c)?.totalPssMb ?? 0)} MB CEF` : ''}</span></div>
     <div class="kpi"><span>Runtimes that run the UI</span><b>3</b><span>Deno 2.9 · Bun 1.4 · Node 24, unchanged source</span></div>
   </div>
-  <p class="note prose">There is no GPU on the build host. Every host here renders in software: GPUI through Mesa lavapipe, WebKitGTK and CEF through software compositing. That mostly affects <b>active CPU</b>, because GPUI redraws the whole window on each change (cheap on a GPU, expensive on a CPU). Memory, process count, idle CPU and cold start are far less sensitive. The installable's <code>--bench</code> mode settles active CPU on real hardware.</p>
+  <p class="note prose">There is no GPU on the build host. Every host here renders in software: GPUI through Mesa lavapipe, WebKitGTK and CEF through software compositing. That mostly affects <b>active CPU</b>. The real-GPU section below shows that GPUIX's higher CPU under load is not a software-rendering artifact: it persists on a laptop GPU.</p>
 </section>
 
+${windowsSection()}
+
 <section aria-labelledby="bench">
-  <div class="sec-head"><span class="eyebrow">Benchmark · ${esc(String(env.os ?? 'linux-x86_64'))} · ${esc(String(env.cpus ?? ''))} CPUs · 5 cold runs, 3 active runs per host</span><h2 id="bench">Measurements</h2>
+  <div class="sec-head"><span class="eyebrow">Linux benchmark (software rendering) · ${esc(String(env.os ?? 'linux-x86_64'))} · ${esc(String(env.cpus ?? ''))} CPUs · 5 cold runs, 3 active runs per host</span><h2 id="bench">Measurements</h2>
   <p class="prose muted">Method: spawn → first data-backed frame painted, fresh profile each run; memory is summed over the whole process tree 3 s after ready (PSS splits shared pages fairly); idle CPU is measured over 10 s with no activity, active CPU over 10 s with the simulated workers pushing 20 events/s (live feed, job progress, throttled aggregate refetch). The host is shared (load average 4–7 during the runs), so medians limit that noise rather than remove it. Hover a mark for details.</p></div>
   <div class="legend">${hosts.map((host) => `<span><i class="sw s${host.slot}"></i>${esc(v(host.id).label)}</span>`).join('')}</div>
   <div class="grid2">
@@ -459,7 +564,7 @@ pre.mermaid { background: var(--surface); border: 1px solid var(--line); padding
   <div class="sec-head"><span class="eyebrow">Decision</span><h2 id="rfc">RFC: incubate behind four gates</h2></div>
   <p class="prose">The RFC proposes an opt-in native desktop track. It ships as a Preact renderer package, a fresh-ui native collection, the bearer credential path, an auto-update adapter and a packaging backend. The Deno Desktop webview remains the default until all four gates pass:</p>
   <div class="answers">
-    <div class="answer"><span class="q">Gate 1</span><p>A real-GPU benchmark on Windows and macOS laptops shows active CPU at or below the webview, and confirms the memory and scaling gains.</p></div>
+    <div class="answer"><span class="q">Gate 1 · not met yet</span><p>A real-GPU benchmark on Windows and macOS laptops shows active CPU at or below the webview, and confirms the memory and scaling gains. On the Windows laptop, memory and scaling hold; CPU under load is 81% against 37%.</p></div>
     <div class="answer"><span class="q">Gate 2</span><p>A GPUIX release ships clipboard and notifications, and the project agrees an upgrade policy: exact pins, plus vendoring or forking if upstream stalls.</p></div>
     <div class="answer"><span class="q">Gate 3</span><p>Accessibility meets an agreed bar: keyboard navigation and screen-reader smoke tests on macOS and Windows.</p></div>
     <div class="answer"><span class="q">Gate 4</span><p>Packaging reaches parity: signing, notarization, installers and auto-update.</p></div>
