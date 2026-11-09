@@ -7,11 +7,11 @@
 import { oc } from '@orpc/contract';
 import { z } from 'zod';
 
-export const RECORD_STATUSES = ['draft', 'awaiting_payment', 'paid', 'shipped', 'refunded', 'cancelled'] as const;
+export const RECORD_STATUSES = ['pending', 'awaiting_payment', 'paid', 'shipped', 'refunded', 'cancelled'] as const;
 export type RecordStatus = (typeof RECORD_STATUSES)[number];
 
 export const STATUS_LABEL: Record<RecordStatus, string> = {
-  draft: 'Draft',
+  pending: 'Pending',
   awaiting_payment: 'Awaiting payment',
   paid: 'Paid',
   shipped: 'Shipped',
@@ -25,7 +25,7 @@ export const RecordSchema = z.object({
   ownerName: z.string(),
   status: z.enum(RECORD_STATUSES),
   amount: z.number(),
-  currency: z.enum(['CHF', 'EUR']),
+  currency: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -85,14 +85,14 @@ export const workspaceContract = {
     list: oc.route({ method: 'GET' })
       .input(z.object({
         page: z.number().int().min(1),
-        pageSize: z.number().int().min(1).max(500),
+        pageSize: z.number().int().min(1).max(5000),
         query: z.string().optional(),
         status: z.enum(RECORD_STATUSES).optional(),
       }))
       .output(PageSchema),
     get: oc.route({ method: 'GET' }).input(z.object({ id: z.string() })).output(RecordSchema),
     setStatus: oc.input(z.object({ id: z.string(), status: z.enum(RECORD_STATUSES) })).output(RecordSchema),
-    create: oc.input(z.object({ ownerName: z.string().min(1), amount: z.number().positive(), currency: z.enum(['CHF', 'EUR']) }))
+    create: oc.input(z.object({ ownerName: z.string().min(1), amount: z.number().positive(), currency: z.string().regex(/^[A-Z]{3}$/) }))
       .output(RecordSchema),
   },
   jobs: {

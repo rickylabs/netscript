@@ -17,6 +17,10 @@ Deno KV in one process. The same component tree also renders as HTML for the web
 | `bench/` | Bench image, container runner, cross-platform probe, benchmark runner, thread breakdown |
 | `scripts/package.sh` | Installables for Linux, Windows (NSIS + zip) and macOS (app zip) |
 | `report/build-report.ts` | Builds the HTML evaluation report from `../evidence/` |
+| `realstack/` | The real NetScript graph supervised by the app: `graph.ts` (topology from the workspace's `appsettings.json`), `supervisor.ts` (ports, readiness, ordered shutdown, per-instance workspace), `clients.ts` + `backend.ts` (typed SDK clients, BFF backend over users/workers/streams), `host.ts` (bundled-resource layout), `seed.ts`, `probe.ts` |
+| `scripts/stack-bundle.sh` | Offline stack folder per target: Deno 2.9.7, warmed `DENO_DIR`, self-contained Garnet, workspace, seed DB |
+| `scripts/lean-compile.sh` | Bundle-then-compile helpers (`deno bundle`, GPUIX-only `node_modules`) |
+| `bench/stack-starts.ts` | Sequential and concurrent graph starts with per-node readiness (stall/race diagnosis) |
 | `tests/integration_test.ts` | Headless client path: auth bridge, typed RPC, stream delivery, KV persistence |
 
 ## Run
@@ -37,3 +41,24 @@ scripts/package.sh build/dist linux-x64 windows-x64 macos-arm64          # insid
 
 Demo sign-in: any email, password `netscript`. `NETSCRIPT_BENCH=1` signs in automatically and prints
 `NETSCRIPT_READY` once the data-backed frame is on screen.
+
+## Real stack
+
+`NETSCRIPT_STACK=real` (default in packages that ship `stack/`) makes the app supervise the
+scaffolded NetScript 0.0.9 workspace graph instead of the simulated store: self-contained Garnet,
+the users service on SQLite, the workers, sagas and triggers APIs and processors, and streams.
+The embedded service becomes a BFF backed by typed SDK clients (`realstack/backend.ts`).
+`NETSCRIPT_UI=native` (or `--ui=native`) selects the GPUIX-first variant: native `<virtual-list>`
+for records, a 250 ms live-update budget, and an adaptive frame pump. `NETSCRIPT_LIVE_BUDGET_MS`
+sets the budget on either host.
+
+```bash
+# once: scaffold + patch the workspace (see ../worklog.md), link it, seed, bundle
+ln -s <workspace> realstack/workspace
+deno run -A realstack/seed.ts realstack/workspace/database/sqlite/workspace.db realstack/seed/workspace.db
+dotnet publish <garnet v2.2.1>/main/GarnetServer/GarnetServer.csproj -c Release -f net10.0 -r <rid> --self-contained -o build/garnet-sc/<rid>
+scripts/stack-bundle.sh linux-x64          # and win-x64
+bench/ctr.sh "$PWD" bash scripts/build-bench-linux.sh
+bench/ctr.sh "$PWD" deno run -A bench/bench.ts --out=../evidence/bench-linux-realstack.json \
+  --variants=gpuix-real,gpuix-native-real,webview-real,webview-budget-real
+```

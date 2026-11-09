@@ -20,6 +20,8 @@ export interface NativeCapabilities {
 
 export interface RuntimeInfo {
   readonly renderer: string;
+  /** `native`: GPUIX-first variant (virtualized lists, live-update budget, adaptive frame pump). */
+  readonly ui?: 'portable' | 'native';
   readonly runtime: string;
   readonly platform: string;
   memoryMb(): number | null;

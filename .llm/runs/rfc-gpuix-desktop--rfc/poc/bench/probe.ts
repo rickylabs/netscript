@@ -14,7 +14,44 @@ export interface TreeSample {
   readonly pssMb: number | null;
   /** Cumulative CPU seconds (user + kernel) over the tree. */
   readonly cpuSeconds: number;
-  readonly processes: ReadonlyArray<{ pid: number; name: string; rssMb: number }>;
+  readonly processes: ReadonlyArray<{ pid: number; ppid: number; name: string; rssMb: number; pssMb: number | null; cpuSeconds: number }>;
+}
+
+export interface TreePart {
+  readonly rssMb: number;
+  readonly pssMb: number | null;
+  readonly cpuSeconds: number;
+  readonly count: number;
+}
+
+/**
+ * Split a tree sample into the desktop host (UI, BFF, renderer helpers) and
+ * the supervised NetScript graph (each stack pid and its descendants).
+ */
+export function splitTree(sample: TreeSample, stackRoots: readonly number[]): { host: TreePart; stack: TreePart } {
+  const children = new Map<number, number[]>();
+  for (const process of sample.processes) {
+    const list = children.get(process.ppid) ?? [];
+    list.push(process.pid);
+    children.set(process.ppid, list);
+  }
+  const stack = new Set<number>();
+  const walk = (pid: number) => {
+    if (stack.has(pid)) return;
+    stack.add(pid);
+    for (const child of children.get(pid) ?? []) walk(child);
+  };
+  for (const root of stackRoots) walk(root);
+  const part = (inStack: boolean): TreePart => {
+    const members = sample.processes.filter((process) => stack.has(process.pid) === inStack);
+    return {
+      rssMb: members.reduce((sum, process) => sum + process.rssMb, 0),
+      pssMb: members.every((process) => process.pssMb !== null) ? members.reduce((sum, process) => sum + (process.pssMb ?? 0), 0) : null,
+      cpuSeconds: members.reduce((sum, process) => sum + process.cpuSeconds, 0),
+      count: members.length,
+    };
+  };
+  return { host: part(false), stack: part(true) };
 }
 
 interface Row {
@@ -105,7 +142,14 @@ export async function sampleTree(root: number): Promise<TreeSample> {
     rssMb: members.reduce((sum, row) => sum + row.rssKb, 0) / 1024,
     pssMb: pss,
     cpuSeconds: members.reduce((sum, row) => sum + row.cpuSeconds, 0),
-    processes: members.map((row) => ({ pid: row.pid, name: row.name, rssMb: Math.round(row.rssKb / 1024) })),
+    processes: members.map((row) => ({
+      pid: row.pid,
+      ppid: row.ppid,
+      name: row.name,
+      rssMb: Math.round(row.rssKb / 1024),
+      pssMb: row.pssKb === null ? null : Math.round(row.pssKb / 1024),
+      cpuSeconds: row.cpuSeconds,
+    })),
   };
 }
 

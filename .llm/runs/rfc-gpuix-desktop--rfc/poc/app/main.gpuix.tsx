@@ -5,7 +5,11 @@
  *
  * Bench/smoke environment:
  *   NETSCRIPT_BENCH=1            sign in automatically, print NETSCRIPT_READY
- *   NETSCRIPT_BENCH_RATE=<n>     simulated worker events per second
+ *   NETSCRIPT_BENCH_RATE=<n>     background events per second (simulated, or real load)
+ *   NETSCRIPT_UI=native          GPUIX-first variant: native virtual lists, live-update budget
+ *                                (≤4 stream commits/s), adaptive frame pump (8 ms active, 50 ms idle)
+ *   NETSCRIPT_STACK=real         supervise the real NetScript graph (Garnet, SQLite, users,
+ *                                workers, sagas, triggers, streams) instead of the simulated store
  */
 import { render } from 'gpuix-preact';
 import { GpuixRenderer } from '@gpuix/native';
@@ -13,9 +17,10 @@ import { DenoKvAdapter } from '@netscript/kv';
 import { setPlatform } from './ui/primitives.ts';
 import { type HostServices, installHost } from './client/host.ts';
 import { App, boot } from './app.tsx';
-import { showToast } from './client/state.ts';
+import { setLiveBudget, showToast } from './client/state.ts';
 import { SESSION_COOKIE } from './contract.ts';
-import { startWorkspaceService } from './service/service.ts';
+import { type RunningWorkspaceService, startWorkspaceService } from './service/service.ts';
+import type { RealStackHandle } from '../realstack/host.ts';
 
 const started = performance.now();
 const args = new Map(Deno.args.map((arg) => {
@@ -39,6 +44,34 @@ function appDataDir(): string {
 
 const dataDir = appDataDir();
 await Deno.mkdir(dataDir, { recursive: true });
+// Packaged real-stack builds ship `stack/` next to the executable and use it by default.
+const bundledStack = (() => {
+  try {
+    return Deno.statSync(`${Deno.execPath().replace(/[\\/][^\\/]+$/, '')}/stack/workspace`).isDirectory;
+  } catch {
+    return false;
+  }
+})();
+const stackMode = args.get('stack') ?? Deno.env.get('NETSCRIPT_STACK') ?? (bundledStack ? 'real' : 'embedded');
+const uiMode = (args.get('ui') ?? Deno.env.get('NETSCRIPT_UI')) === 'native' ? 'native' : 'portable';
+// GPUIX-first commits stream changes at most every 250 ms; NETSCRIPT_LIVE_BUDGET_MS overrides either mode.
+setLiveBudget(Number(Deno.env.get('NETSCRIPT_LIVE_BUDGET_MS') ?? (uiMode === 'native' ? 250 : 0)));
+let realStack: RealStackHandle | undefined;
+let service: RunningWorkspaceService | null = null;
+let shuttingDown = false;
+async function shutdown(code = 0): Promise<never> {
+  if (!shuttingDown) {
+    shuttingDown = true;
+    // Bounded: the BFF's graceful shutdown would wait on the UI's open SSE connection.
+    const bounded = (work: Promise<unknown> | undefined, ms: number) =>
+      Promise.race([work?.catch(() => {}), new Promise((resolve) => setTimeout(resolve, ms))]);
+    await Promise.all([bounded(service?.stop(), 500), bounded(realStack?.stop(), 4_000)]);
+  }
+  Deno.exit(code);
+}
+for (const signal of (Deno.build.os === 'windows' ? ['SIGINT', 'SIGBREAK'] : ['SIGINT', 'SIGTERM']) as Deno.Signal[]) {
+  Deno.addSignalListener(signal, () => void shutdown(0));
+}
 
 // 1. Window first: the shell paints while the service boots.
 setPlatform('gpuix');
@@ -50,6 +83,8 @@ const app = render(<App />, {
   height: 860,
   minWidth: 960,
   minHeight: 600,
+  onClose: () => void shutdown(0),
+  ...(uiMode === 'native' ? { framePump: 'adaptive' as const, idleFrameMs: 50 } : {}),
 });
 const renderer = app.renderer as GpuixRenderer;
 
@@ -62,11 +97,22 @@ for (const file of ['Inter-Regular.otf', 'Inter-Medium.otf', 'Inter-SemiBold.otf
   }
 }
 
-// 2. Embedded NetScript service on loopback, unless pointed at a remote one.
+// 2. Embedded NetScript service (the desktop BFF) on loopback, unless pointed at a remote one.
+//    With NETSCRIPT_STACK=real the process first supervises the whole NetScript graph.
 const remote = args.get('service-url');
-const service = remote ? null : await startWorkspaceService({
+let diagnosticsFor = (_stack: RealStackHandle): (() => Promise<unknown>) | undefined => undefined;
+if (stackMode === 'real' && !remote) {
+  const { startRealStack, stackDiagnostics } = await import('../realstack/host.ts');
+  diagnosticsFor = (stack) => () => stackDiagnostics(stack.graph);
+  realStack = await startRealStack({
+    dataDir: `${dataDir}/stack`,
+    onEvent: bench ? undefined : (event) => console.error(`[stack ${String(event.at).padStart(5)} ms] ${event.node} ${event.state}`),
+  });
+}
+service = remote ? null : await startWorkspaceService({
   kvPath: `${dataDir}/service.kv`,
   eventsPerSecond: Number(Deno.env.get('NETSCRIPT_BENCH_RATE') ?? 0.5),
+  ...(realStack ? { backend: realStack.backend, diagnostics: diagnosticsFor(realStack) } : {}),
 });
 const baseUrl = remote ?? service!.url;
 
@@ -149,7 +195,8 @@ const host: HostServices = {
     },
   },
   runtime: {
-    renderer: 'GPUIX 0.11 · Preact',
+    renderer: `GPUIX 0.11 · Preact${uiMode === 'native' ? ' · GPUIX-first' : ''}${realStack ? ' · real stack' : ''}`,
+    ui: uiMode,
     runtime: `Deno ${Deno.version.deno}`,
     platform: `${Deno.build.os}-${Deno.build.arch}`,
     memoryMb: () => Deno.memoryUsage().rss / 1_048_576,
@@ -158,7 +205,14 @@ const host: HostServices = {
     // The data-backed tree was committed; report after the next painted frames.
     setTimeout(() => {
       const ms = performance.now() - started;
-      console.log(`NETSCRIPT_READY ${JSON.stringify({ host: 'gpuix-deno', readyMs: Math.round(ms), rssMb: Math.round(Deno.memoryUsage().rss / 1_048_576) })}`);
+      console.log(`NETSCRIPT_READY ${JSON.stringify({
+        host: 'gpuix-deno',
+        ui: uiMode,
+        stack: realStack ? 'real' : 'embedded',
+        readyMs: Math.round(ms),
+        rssMb: Math.round(Deno.memoryUsage().rss / 1_048_576),
+        ...(realStack ? { stackReadyMs: realStack.graph.readyMs, stackPids: realStack.graph.pids() } : {}),
+      })}`);
     }, 24);
   },
 };

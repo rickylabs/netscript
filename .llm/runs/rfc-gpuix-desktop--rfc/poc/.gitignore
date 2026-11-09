@@ -6,3 +6,5 @@ build/
 assets/fonts/*.otf
 assets/fonts/*.ttf
 core
+realstack/workspace
+realstack/seed

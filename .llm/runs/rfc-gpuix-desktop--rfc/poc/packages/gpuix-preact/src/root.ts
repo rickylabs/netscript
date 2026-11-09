@@ -84,10 +84,14 @@ export interface GpuixPreactRoot {
 }
 
 /** Root-level window event handlers (keyboard shortcuts, tab navigation). */
-export type RootOptions = RootEventHandlers;
+export type RootOptions = RootEventHandlers & {
+  /** Called after each batch of mutations is handed to the renderer. */
+  onFlush?: () => void;
+};
 
 /** Bind a Preact tree to an already-initialized renderer. */
-export function createRoot(renderer: NativeRenderer, handlers: RootOptions = {}): GpuixPreactRoot {
+export function createRoot(renderer: NativeRenderer, options: RootOptions = {}): GpuixPreactRoot {
+  const { onFlush, ...handlers } = options;
   installCommitHook();
   const state = createRendererState(renderer);
   const eventHandlers: EventHandlerMap = new Map();
@@ -104,6 +108,7 @@ export function createRoot(renderer: NativeRenderer, handlers: RootOptions = {})
     }
     dirtyStyles.clear();
     mutations.flushMutations();
+    onFlush?.();
   };
 
   const scope: HostScope = {
@@ -169,6 +174,14 @@ export interface RenderOptions extends WindowOptions, RootOptions {
   onClose?: () => void;
   /** Fixed frame pump interval; default lets GPUIX pick (display-link on macOS, 8 ms polling elsewhere). */
   frameMs?: number;
+  /**
+   * `adaptive`: pump at `frameMs` (8 ms) while something happens (a commit or an input event in
+   * the last `activeWindowMs`), at `idleFrameMs` otherwise. Trades first-input latency after idle
+   * (≤ idleFrameMs) for idle CPU on platforms where GPUIX polls (Windows, Linux).
+   */
+  framePump?: 'fixed' | 'adaptive';
+  idleFrameMs?: number;
+  activeWindowMs?: number;
   onError?: (error: unknown) => void;
 }
 
@@ -190,6 +203,9 @@ export function render(children: ComponentChildren, opts: RenderOptions = {}): G
     renderer: injected,
     onClose,
     frameMs,
+    framePump = 'fixed',
+    idleFrameMs = 50,
+    activeWindowMs = 400,
     onError = (error: unknown) => console.error('[gpuix-preact]', error),
     onKeyDown,
     onKeyUp,
@@ -199,12 +215,14 @@ export function render(children: ComponentChildren, opts: RenderOptions = {}): G
     onEvent,
     ...windowOptions
   } = opts;
+  const pump = new FramePump();
   let renderer: NativeRenderer;
   if (injected) {
     renderer = injected;
   } else {
     let native!: GpuixRenderer;
     native = new GpuixRenderer((error: Error | null, event: EventPayload) => {
+      pump.poke();
       if (error) return onError(error);
       try {
         createRendererState(native).dispatch(event);
@@ -216,6 +234,7 @@ export function render(children: ComponentChildren, opts: RenderOptions = {}): G
     renderer = native;
   }
   const root = createRoot(renderer, {
+    onFlush: () => pump.poke(),
     onKeyDown,
     onKeyUp,
     onSelectionChange,
@@ -224,14 +243,15 @@ export function render(children: ComponentChildren, opts: RenderOptions = {}): G
     onEvent,
   });
   root.render(children);
-  const loop = injected ? { stop() {} } : startFrameLoop(renderer as GpuixRenderer, {
-    frameMs,
-    onError,
-    onTerminated: () => {
-      if (onClose) onClose();
-      else exitProcess(0);
-    },
-  });
+  const terminate = () => {
+    if (onClose) onClose();
+    else exitProcess(0);
+  };
+  const loop = injected
+    ? { stop() {} }
+    : framePump === 'adaptive'
+    ? startAdaptiveLoop(renderer as GpuixRenderer, pump, { activeMs: frameMs ?? 8, idleMs: idleFrameMs, activeWindowMs, onError, onTerminated: terminate })
+    : startFrameLoop(renderer as GpuixRenderer, { frameMs, onError, onTerminated: terminate });
   return {
     root,
     renderer,
@@ -240,6 +260,60 @@ export function render(children: ComponentChildren, opts: RenderOptions = {}): G
       root.unmount();
     },
   };
+}
+
+/** Activity tracker shared by the event callback, the commit flush and the adaptive loop. */
+class FramePump {
+  lastActivity = performance.now();
+  wake: (() => void) | undefined;
+  poke(): void {
+    this.lastActivity = performance.now();
+    this.wake?.();
+  }
+}
+
+/** Frame loop that backs off to `idleMs` when nothing has happened for `activeWindowMs`. */
+function startAdaptiveLoop(
+  renderer: GpuixRenderer,
+  pump: FramePump,
+  options: { activeMs: number; idleMs: number; activeWindowMs: number; onError: (error: unknown) => void; onTerminated: () => void },
+): { stop(): void } {
+  if (!renderer.requiresTick()) return { stop() {} };
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let idle = false;
+  let stopped = false;
+  const stop = () => {
+    stopped = true;
+    pump.wake = undefined;
+    if (timer !== undefined) clearTimeout(timer);
+  };
+  const loop = () => {
+    if (stopped) return;
+    timer = undefined;
+    const started = performance.now();
+    let running = true;
+    try {
+      running = renderer.tick();
+    } catch (error) {
+      options.onError(error);
+    }
+    if (running === false) {
+      stop();
+      options.onTerminated();
+      return;
+    }
+    idle = performance.now() - pump.lastActivity > options.activeWindowMs;
+    timer = setTimeout(loop, idle ? options.idleMs : Math.max(0, options.activeMs - (performance.now() - started)));
+  };
+  // A commit while idle must not wait for the slow tick.
+  pump.wake = () => {
+    if (!idle || stopped) return;
+    idle = false;
+    if (timer !== undefined) clearTimeout(timer);
+    timer = setTimeout(loop, 0);
+  };
+  loop();
+  return { stop };
 }
 
 function exitProcess(code: number): void {

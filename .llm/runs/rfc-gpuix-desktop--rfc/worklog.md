@@ -138,3 +138,39 @@ with a path to passing), the CPU drawback, a summary sentence and one unresolved
 adds measured evidence the owner requested; no proposed surface, gate definition or archetype
 changed. PLAN-EVAL rounds for the feature tier are exhausted, so a re-review is the owner's call.
 Report republished (v3).
+
+### Real stack + GPUIX-first (owner follow-up, 2026-11-09)
+
+Owner asked for a benchmark against a real stack (Garnet KV, SQLite, sagas, streams, jobs) shipped as
+one artifact, and for a GPUIX-first UI. Chosen route (owner): minimal singleton in the PoC, built by
+Claude in this session. Upstream single-exe packaging does not exist yet (epic #830).
+
+- **Workspace.** Scaffolded with the JSR CLI 0.0.9 (`.llm/tmp/realstack/workspace`, gitignored):
+  users service, workers/sagas/triggers/streams, SQLite, Garnet executable. Plugin schemas patched to
+  migrate on SQLite (D14). Aspire run captured the exact launch graph
+  (`evidence/realstack-aspire-runtime-graph.json`).
+- **Supervisor** (`poc/realstack/`): graph from `appsettings.json`; reserved loopback ports; readiness
+  (`/health` 200, Garnet `PING`); dependency-ordered parallel start; two-phase bounded shutdown;
+  per-instance workspace copy (D20); `DENO_SERVE_ADDRESS` neutralized for `deno desktop` (D18).
+- **Data path.** The embedded service is the desktop BFF; `realstack/backend.ts` reads and writes
+  through typed SDK clients: users CRUD (SQLite), overview aggregated in the BFF, activity from the
+  durable stream `/scaffold/users/records` (long-poll), jobs from `workers-api` (polled, D19). Load =
+  `workers.triggerJob` per tick + `users.update` every third tick.
+- **Bundle** (`scripts/stack-bundle.sh`): Deno 2.9.7, warmed `DENO_DIR` (`--cached-only` at runtime),
+  self-contained Garnet 2.2.1 (D16), workspace, seeded DB (1,240 records). Linux 790 MB, Windows
+  ~860 MB unpacked; the npm cache dominates.
+- **Lean compile** (owner pointer, D17): `deno bundle` then compile from a GPUIX-only folder:
+  GPUIX 172 MB, webview 90 MB.
+- **GPUIX-first** (`NETSCRIPT_UI=native`): native `<virtual-list>` for records (all matches),
+  250 ms live-update budget, adaptive frame pump in `gpuix-preact` (8 ms active / 50 ms idle).
+- **Benchmarks** (`evidence/bench-linux-realstack.json`, three passes merged; Linux container,
+  software rendering). At 20 updates/s: GPUIX 204%, GPUIX + budget 45.6%, GPUIX-first 46%, webview
+  111%, webview + budget 70%. Real stack, host process only: GPUIX 73.8%, GPUIX-first 42.8%, webview
+  77.9%, webview + budget 68.2%; graph ≈35% on every host. Memory: graph 1.37 GB (9 processes);
+  host 299 MB (GPUIX) vs 418 MB (webview). Idle host CPU: 2.5–3.7% vs 33–37%. 8 real-stack
+  instances: GPUIX 15.3 s / 12.2 GB, webview 25.5 s / 13.0 GB. Reading: the budget is the lever and
+  helps GPUIX far more than the webview (GPUI redraws the window per commit; the browser compositor
+  invalidates partially). With equal policy GPUIX is ~35% below the webview on this machine.
+- **Upstream findings to file (owner decides):** plugins × SQLite migrations; AppHost does not wire
+  streams into services; `deploy build` emits an empty graph; `workers.subscribe` silent on Garnet KV
+  and leaks Zod internals in its snapshot; `deno desktop` leaks `DENO_SERVE_ADDRESS` to children.

@@ -128,9 +128,11 @@ export async function loadWorkspace(): Promise<void> {
 }
 
 export async function loadRecords(): Promise<void> {
+  // The GPUIX-first variant loads every match into a native virtual list instead of paging.
+  const native = host().runtime.ui === 'native';
   records.value = await api().records.list({
-    page: recordsPage.value,
-    pageSize: 50,
+    page: native ? 1 : recordsPage.value,
+    pageSize: native ? 5000 : 50,
     query: recordsQuery.value || undefined,
     status: recordsStatus.value,
   });
@@ -182,6 +184,29 @@ function throttle(kind: 'overview' | 'records'): void {
   }
 }
 
+// ---- live-update budget ----------------------------------------------------------
+// GPUI redraws the window for every committed change, so frame cost scales with commits per
+// second. With a budget, stream changes are buffered and committed together at most once per
+// `liveBudgetMs` (user-initiated updates stay immediate). 0 = commit every message.
+let liveBudgetMs = 0;
+let pendingChanges: StreamChange[] = [];
+let budgetTimer: ReturnType<typeof setTimeout> | undefined;
+
+export function setLiveBudget(ms: number): void {
+  liveBudgetMs = Math.max(0, ms);
+}
+
+function receiveChanges(changes: readonly StreamChange[]): void {
+  if (liveBudgetMs === 0) return applyChanges(changes);
+  pendingChanges.push(...changes);
+  budgetTimer ??= setTimeout(() => {
+    budgetTimer = undefined;
+    const batchChanges = pendingChanges;
+    pendingChanges = [];
+    applyChanges(batchChanges);
+  }, liveBudgetMs);
+}
+
 function applyChanges(changes: readonly StreamChange[]): void {
   let nextActivity: ActivityEntry[] | undefined;
   let nextJobs: Job[] | undefined;
@@ -216,7 +241,7 @@ export function connectActivity(): void {
   streamState.value = 'connecting';
   // Replay the last few entries, then follow live.
   subscription = followActivity(host(), {
-    onChanges: applyChanges,
+    onChanges: receiveChanges,
     onState: (state) => {
       if (streamState.value !== state) streamState.value = state;
     },

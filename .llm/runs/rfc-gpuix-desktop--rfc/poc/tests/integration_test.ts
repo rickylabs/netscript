@@ -76,7 +76,7 @@ Deno.test('desktop client path: auth bridge, typed RPC, durable stream', async (
     await service.stop();
     const restarted = await startWorkspaceService({ kvPath: `${dir}/service.kv`, eventsPerSecond: 0 });
     try {
-      assertEquals(restarted.store.get(target.id)?.status, 'shipped');
+      assertEquals((await restarted.backend.get(target.id))?.status, 'shipped');
     } finally {
       await restarted.stop();
     }

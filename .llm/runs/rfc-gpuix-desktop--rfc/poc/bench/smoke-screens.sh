@@ -5,7 +5,7 @@ set -uo pipefail
 OUT="$1"; SUFFIX="$2"
 deno run -A app/main.gpuix.tsx --profile=/tmp/prof-$SUFFIX > /tmp/smoke.log 2>&1 &
 APP=$!
-for i in $(seq 1 80); do grep -q NETSCRIPT_READY /tmp/smoke.log && break; sleep 0.25; done
+for i in $(seq 1 ${READY_TRIES:-80}); do grep -q NETSCRIPT_READY /tmp/smoke.log && break; sleep 0.25; done
 sleep 2
 WIN=$(xdotool search --name "NetScript" | head -1)
 eval "$(xdotool getwindowgeometry --shell "$WIN")"   # X Y WIDTH HEIGHT

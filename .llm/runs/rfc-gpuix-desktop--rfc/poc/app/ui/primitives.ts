@@ -282,6 +282,15 @@ export function Progress({ value, tone = 'ink' }: { value: number; tone?: 'ink' 
 }
 
 /** Vertical scroller. GPUIX paints a native thumb when `scrollbarColor` is set. */
+/**
+ * Long lists. GPUIX: the native `<virtual-list>` (rows are built and painted only near the
+ * viewport). DOM: a plain scroll box.
+ */
+export function VirtualList({ itemHeight, overdraw = 8, style = {}, children }: { itemHeight: number; overdraw?: number; style?: Style; children?: ComponentChildren }): JSX.Element {
+  if (platform === 'gpuix') return h('virtual-list', { estimatedItemHeight: itemHeight, overdraw, style: { ...col, ...style } }, children);
+  return h(Scroll, { style }, children);
+}
+
 export function Scroll({ style = {}, children }: { style?: Style; children?: ComponentChildren }): JSX.Element {
   const t = tokens();
   return h(Box, { style: { ...col, overflowY: 'scroll', minHeight: 0, flexGrow: 1, scrollbarColor: t.borderStrong, ...style } }, children);

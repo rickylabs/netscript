@@ -7,9 +7,10 @@ import { render } from 'preact';
 import { setPlatform } from '../ui/primitives.ts';
 import { type HostServices, installHost } from '../client/host.ts';
 import { App, boot } from '../app.tsx';
+import { setLiveBudget } from '../client/state.ts';
 
 // Config is injected by the host page (Deno Desktop's window always loads `/`).
-const injected = (globalThis as { __NS__?: { bench?: boolean; backend?: string; scheme?: string } }).__NS__ ?? {};
+const injected = (globalThis as { __NS__?: { bench?: boolean; backend?: string; scheme?: string; stack?: string; liveBudgetMs?: number } }).__NS__ ?? {};
 const params = new URLSearchParams(location.search);
 const backend = injected.backend ?? params.get('backend') ?? 'webview';
 const benchMode = injected.bench === true || params.get('bench') === '1';
@@ -32,7 +33,7 @@ const host: HostServices = {
   },
   native: null,
   runtime: {
-    renderer: `${backend === 'cef' ? 'CEF' : 'OS webview'} · Preact`,
+    renderer: `${backend === 'cef' ? 'CEF' : 'OS webview'} · Preact${injected.stack === 'real' ? ' · real stack' : ''}`,
     runtime: 'Deno Desktop',
     platform: navigator.platform,
     memoryMb: () => {
@@ -52,6 +53,7 @@ const host: HostServices = {
 
 setPlatform('dom');
 installHost(host);
+if (injected.liveBudgetMs) setLiveBudget(injected.liveBudgetMs);
 render(<App />, document.getElementById('app')!);
 await boot({
   ...(benchMode ? { autoSignIn: { email: 'bench@netscript.dev', password: 'netscript' } } : {}),

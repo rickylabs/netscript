@@ -34,20 +34,27 @@ open(f"{d}/icon.ico", "wb").write(struct.pack("<HHH", 0, 1, len(sizes)) + entrie
 PY
 png2icns "$ICON_DIR/icon.icns" "$ICON_DIR/icon-512.png" "$ICON_DIR/icon-256.png" "$ICON_DIR/icon-128.png" >/dev/null
 
-COMMON_EXCLUDES=(--exclude "$ROOT/$NATIVE_PKG/wasm" --exclude "$ROOT/$NATIVE_PKG/browser.mjs")
 PLATFORMS=(linux-x64-gnu win32-x64-msvc win32-arm64-msvc darwin-arm64)
 
+# Lean compile (scripts/lean-compile.sh): bundle first, then compile the bundle from a folder whose
+# node_modules holds only the GPUIX addon. Compiling the project directly embeds its whole npm
+# resolution (915 MB once the NetScript plugin contracts are imported).
+source scripts/lean-compile.sh
+LEAN="$BUILD/lean-gpuix"; LEAN_WV="$BUILD/lean-webview"
+deno install --quiet --node-modules-dir=auto >/dev/null
+deno bundle --quiet --platform browser --minify --output dist/renderer.js app/web/renderer.tsx
+lean_gpuix "$LEAN"
+lean_webview "$LEAN_WV"
+
 # `deno compile --target` installs the target's optional @gpuix/native-<triple> into node_modules,
-# and every later build embeds the whole npm resolution (symlink targets included; --exclude does
-# not apply). So: restore node_modules for the host, prune what a target must not carry, then build
-# with --node-modules-dir=manual so nothing is reinstalled.
-restore_modules() { deno install --quiet --node-modules-dir=auto >/dev/null; }
-prune_natives() { # <triple to keep | none> [--with-loader]
+# and every later build embeds it (symlink targets included; --exclude does not apply). So: restore
+# the lean node_modules, prune what a target must not carry, build with --node-modules-dir=manual.
+restore_modules() { (cd "$LEAN" && deno install --quiet --node-modules-dir=auto >/dev/null); }
+prune_natives() { # <triple to keep | none>
   for other in "${PLATFORMS[@]}"; do
     [[ "$other" == "$1" ]] && continue
-    rm -rf "node_modules/.deno/@gpuix+native-$other@0.11.0" "$NATIVE_PKG/../native-$other"
+    rm -rf "$LEAN/node_modules/.deno/@gpuix+native-$other@0.11.0" "$LEAN/$NATIVE_REL/../native-$other"
   done
-  if [[ "${2:-}" == "--with-loader" ]]; then rm -rf "node_modules/.deno/@gpuix+native@0.11.0" node_modules/@gpuix; fi
   return 0
 }
 
@@ -57,20 +64,22 @@ compile() { # <deno-target> <native-triple> <output> [extra deno flags...]
   restore_modules
   if [[ "$triple" == "linux-x64-gnu" ]]; then prune_natives linux-x64-gnu; else prune_natives none; fi
   if [[ "$triple" != "linux-x64-gnu" ]]; then
-    staged="$NATIVE_PKG/gpuix-native.$triple.node"
+    staged="$LEAN/$NATIVE_REL/gpuix-native.$triple.node"
     cp "$NATIVES/$triple/package/gpuix-native.$triple.node" "$staged"
   fi
-  local excludes=("${COMMON_EXCLUDES[@]}")
-  deno compile -A --quiet --node-modules-dir=manual --target "$target" --include assets/fonts "${excludes[@]}" "$@" --output "$output" app/main.tsx
+  (cd "$LEAN" && deno compile -A --quiet --no-check --node-modules-dir=manual --target "$target" --include assets/fonts \
+    "${LEAN_EXCLUDES[@]}" "$@" --output "$output" dist/app.js)
   [[ -n "$staged" ]] && rm -f "$staged"
   return 0
 }
 
 webview() { # <deno-target> <output>: same app as HTML in the OS webview (benchmark baseline)
-  # The webview host never loads GPUIX: prune it entirely so sizes compare fairly.
-  restore_modules && prune_natives none --with-loader
-  deno desktop -A --quiet --node-modules-dir=manual --backend webview --target "$1" --include dist/renderer.js \
-    --include assets/fonts -o "$2" app/main.webview.ts
+  (cd "$LEAN_WV" && deno desktop -A --quiet --no-check --backend webview --target "$1" --include dist/renderer.js \
+    --include assets/fonts -o "$2" dist/app.js)
+}
+
+stack() { # <stack-target> <stage>: the real NetScript graph (scripts/stack-bundle.sh) next to the app
+  if [[ -d "build/stack-$1" ]]; then cp -a "build/stack-$1" "$2/stack"; else echo "   (no build/stack-$1: embedded-only package)"; fi
 }
 
 readme() { # <os>
@@ -80,30 +89,34 @@ NetScript desktop PoC (GPUIX + Preact) — $1
 
 A NetScript workspace app rendered natively by GPUI (Zed's GPU UI framework)
 through GPUIX, with Preact as the component framework and Deno as the runtime.
-The window, service, typed SDK client, durable stream and KV all run in ONE
-process; there is no webview.
+
+Real backend in the box (Linux and Windows packages)
+  The "stack" folder holds a real NetScript 0.0.9 workspace and everything to
+  run it offline: a Deno runtime, the dependency cache, self-contained Garnet
+  and a seeded SQLite database. The app starts and supervises it (users service
+  on SQLite, workers, sagas, triggers and streams, Garnet) and stops it on
+  exit. System health shows the nine processes, their ports and memory.
+  First launch after install takes a few seconds longer (code caches).
+
+Variants
+  NetScript                 GPUIX, real stack (default)
+  NetScript --ui=native     GPUIX-first: native virtual list, live-update
+                            budget (250 ms), adaptive frame pump
+  NetScript --stack=embedded  in-process demo service instead of the stack
+  webview/                  the same app as HTML in the OS webview (today's
+                            NetScript desktop architecture), real stack too
 
 Sign in with any email and the password: netscript
 
-What to try
-  - Overview: stats, weekly chart, status breakdown, live activity + jobs
-    (durable stream, simulated workers).
-  - Records: search, status filters, paging; open a record and change its
-    status (typed oRPC mutation, persisted in Deno KV, broadcast on the stream).
-  - Settings: dark mode (persisted), notifications, export folder picker.
-  - System health: service probe, stream state, process memory, GPUI frame stats.
-
-Webview baseline
-  The same app rendered as HTML in the OS webview through Deno Desktop (what
-  NetScript desktop apps use today) is included next to the native app, so you
-  can compare both by eye and by numbers.
-
 Benchmark on this machine (real GPU)
-  Run the "bench" script next to the app. It launches both hosts repeatedly
-  (about 5 minutes; don't use the machine meanwhile) and writes
-  netscript-bench-*.json and .md to your home folder.
+  Run the "bench" script next to the app. It launches every variant repeatedly
+  (GPUIX, GPUIX-first, webview, each embedded and on the real stack; about
+  30 minutes; don't use the machine meanwhile) and writes netscript-bench-*.json
+  and .md to your home folder. Pick variants with
+  --variants=gpuix-real,gpuix-native-real,webview-real,webview-budget-real
 
-Data: app data folder "NetScript GPUIX PoC" (Deno KV files). Delete it to reset.
+Data: app data folder "NetScript GPUIX PoC" (Deno KV files, stack data and
+logs under stack/). Delete it to reset.
 EOF
 }
 
@@ -115,6 +128,7 @@ for target in "${TARGETS[@]}"; do
       compile x86_64-unknown-linux-gnu linux-x64-gnu "$STAGE/netscript"
       rm -rf "$BUILD/linux-x64/netscript-webview"; webview x86_64-unknown-linux-gnu "$BUILD/linux-x64/netscript-webview"
       mkdir -p "$STAGE/webview" && cp -a "$BUILD/linux-x64/netscript-webview/." "$STAGE/webview/"
+      stack linux-x64 "$STAGE"
       cp "$ICON_DIR/icon-256.png" "$STAGE/netscript.png"
       cat > "$STAGE/netscript.desktop" <<EOF
 [Desktop Entry]
@@ -133,6 +147,7 @@ EOF
       compile x86_64-pc-windows-msvc win32-x64-msvc "$STAGE/NetScript.exe" --no-terminal --icon "$ICON_DIR/icon.ico"
       rm -rf "$BUILD/windows-x64/NetScript-Webview"; webview x86_64-pc-windows-msvc "$BUILD/windows-x64/NetScript-Webview"
       mkdir -p "$STAGE/webview" && cp -a "$BUILD/windows-x64/NetScript-Webview/." "$STAGE/webview/"
+      stack win-x64 "$STAGE"
       readme "Windows x64 (DirectX 11)" | sed 's/$/\r/' > "$STAGE/README.txt"
       printf '@echo off\r\necho Running NetScript desktop benchmark (several minutes)...\r\n"%%~dp0NetScript.exe" --bench %%* > "%%TEMP%%\\netscript-bench.txt" 2>&1\r\ntype "%%TEMP%%\\netscript-bench.txt"\r\npause\r\n' > "$STAGE/bench.cmd"
       (cd "$BUILD/windows-x64" && rm -f "$OUT/NetScript-GPUIX-PoC-$VERSION-windows-x64-portable.zip" && zip -qr "$OUT/NetScript-GPUIX-PoC-$VERSION-windows-x64-portable.zip" NetScript)

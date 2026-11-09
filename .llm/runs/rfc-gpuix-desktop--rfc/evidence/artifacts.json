@@ -1,30 +1,30 @@
 [
   {
     "name": "NetScript-GPUIX-PoC-0.1.0-windows-x64-setup.exe",
-    "os": "Windows x64 \u00b7 installer",
-    "sizeMb": 57,
-    "sha256": "8e5c078cad4e614ec6ca62fe29e8745f6fe8e276b2ff774239f54600c8e879ec",
-    "where": "Per-user install: NetScript, the webview baseline and \u201cRun benchmark\u201d in the Start menu."
+    "os": "Windows x64 \u00b7 installer \u00b7 real stack",
+    "sizeMb": 205,
+    "sha256": "69ccbd473a1d9f67a90fb0d8575737c7512c3ad56b0a83152fd70c49a3fe64b7",
+    "where": "~/projects/netscript/artifacts/gpuix-poc/realstack/"
   },
   {
     "name": "NetScript-GPUIX-PoC-0.1.0-windows-x64-portable.zip",
-    "os": "Windows x64 \u00b7 portable",
-    "sizeMb": 85,
-    "sha256": "cacab0afcbe5aa0ab2ed0344ae8a5729afaff7f8f99b55658ba97c4b22b55551",
-    "where": "Unzip and run NetScript.exe; webview\\NetScript-Webview.exe is the baseline; bench.cmd runs the benchmark."
-  },
-  {
-    "name": "NetScript-GPUIX-PoC-0.1.0-macos-arm64.zip",
-    "os": "macOS Apple Silicon",
-    "sizeMb": 80,
-    "sha256": "f1eeed1bc5f109fdaee451278f3f70b7205ce48f696d8c23c17f5cbc4399b411",
-    "where": "NetScript.app and NetScript Webview.app (ad-hoc signed) + bench.command."
+    "os": "Windows x64 \u00b7 portable \u00b7 real stack",
+    "sizeMb": 355,
+    "sha256": "d2aa8696734ba468b47626b61f32c942c42910387a9a981ed58a4e45e66005e1",
+    "where": "~/projects/netscript/artifacts/gpuix-poc/realstack/"
   },
   {
     "name": "NetScript-GPUIX-PoC-0.1.0-linux-x64.tar.gz",
-    "os": "Linux x64",
-    "sizeMb": 94,
-    "sha256": "52d7a1b9b08123f0ea114953b466f624e1ce3f5bec6a9280a9638629d2c7dbf3",
-    "where": "netscript + webview/ baseline + bench.sh; needs glibc 2.39 and Vulkan."
+    "os": "Linux x64 \u00b7 real stack",
+    "sizeMb": 330,
+    "sha256": "e9da2238d4bfc52acf02cf9da0675c3dbf3468ace1a64c167e16587939c5c952",
+    "where": "~/projects/netscript/artifacts/gpuix-poc/realstack/"
+  },
+  {
+    "name": "NetScript-GPUIX-PoC-0.1.0-macos-arm64.zip",
+    "os": "macOS Apple Silicon \u00b7 embedded service",
+    "sizeMb": 70,
+    "sha256": "54a49b84645dd98d4f308f7a54243d6c33ce1beb9c4587ddf96a5d7faddd4577",
+    "where": "~/projects/netscript/artifacts/gpuix-poc/realstack/"
   }
 ]

@@ -2,7 +2,7 @@
 import type { JSX } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import { RECORD_STATUSES, type RecordStatus, STATUS_LABEL } from '../contract.ts';
-import { Badge, Box, Button, col, row, Spacer, Text, TextInput } from '../ui/primitives.ts';
+import { Badge, Box, Button, col, row, Spacer, Text, TextInput, VirtualList } from '../ui/primitives.ts';
 import { RADIUS, tokens } from '../ui/theme.ts';
 import { formatAmount, formatInt, statusTone } from '../ui/format.ts';
 import {
@@ -43,6 +43,7 @@ export function RecordsPage({ navigate }: { navigate: (href: string) => void }):
     return () => setRecordsVisible(false);
   }, []);
   const page = records.value;
+  const native = host().runtime.ui === 'native';
   const pages = page ? Math.max(1, Math.ceil(page.total / page.pageSize)) : 1;
   const filter = (status: RecordStatus | undefined) => {
     recordsStatus.value = status;
@@ -94,14 +95,23 @@ export function RecordsPage({ navigate }: { navigate: (href: string) => void }):
           <Box style={{ ...col, width: 104, alignItems: 'flex-end' }}><Text size='xs' tone='muted' mono>AMOUNT</Text></Box>
           <Box style={{ ...col, width: 76, alignItems: 'flex-end' }}><Text size='xs' tone='muted' mono>UPDATED</Text></Box>
         </Box>
-        {page?.rows.map((record) => <RecordRow key={record.id} record={record} onOpen={(target) => navigate(`/records/${target.id}`)} />)}
+        {native
+          ? (
+            <VirtualList itemHeight={38} style={{ height: 560 }}>
+              {page?.rows.map((record) => <RecordRow key={record.id} record={record} onOpen={(target) => navigate(`/records/${target.id}`)} />)}
+            </VirtualList>
+          )
+          : page?.rows.map((record) => <RecordRow key={record.id} record={record} onOpen={(target) => navigate(`/records/${target.id}`)} />)}
       </Box>
-      <Box style={{ ...row, gap: 8 }}>
-        <Text size='sm' tone='muted' mono>Page {page?.page ?? 1} / {pages}</Text>
-        <Spacer />
-        <Button label='← Previous' disabled={(page?.page ?? 1) <= 1} onPress={() => { recordsPage.value -= 1; void loadRecords(); }} />
-        <Button label='Next →' disabled={(page?.page ?? 1) >= pages} onPress={() => { recordsPage.value += 1; void loadRecords(); }} testId='next-page' />
-      </Box>
+      {native ? <Text size='xs' tone='subtle'>All {formatInt(page?.total ?? 0)} matches in a native virtual list: only rows near the viewport are built and painted.</Text> : null}
+      {native ? null : (
+        <Box style={{ ...row, gap: 8 }}>
+          <Text size='sm' tone='muted' mono>Page {page?.page ?? 1} / {pages}</Text>
+          <Spacer />
+          <Button label='← Previous' disabled={(page?.page ?? 1) <= 1} onPress={() => { recordsPage.value -= 1; void loadRecords(); }} />
+          <Button label='Next →' disabled={(page?.page ?? 1) >= pages} onPress={() => { recordsPage.value += 1; void loadRecords(); }} testId='next-page' />
+        </Box>
+      )}
     </>
   );
 }

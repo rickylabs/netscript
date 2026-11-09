@@ -65,7 +65,8 @@ export function RecordRow({ record, onOpen, compact = false }: { record: Workspa
   const t = tokens();
   return (
     <Box
-      style={{ ...row, gap: 12, height: compact ? 34 : 38, paddingLeft: 8, paddingRight: 8, borderBottomWidth: 1, borderColor: t.border, cursor: onOpen ? 'pointer' : 'default' }}
+      // Explicit width: rows inside a native <virtual-list> are laid out at their content width otherwise.
+      style={{ ...row, width: '100%', flexShrink: 0, gap: 12, height: compact ? 34 : 38, paddingLeft: 8, paddingRight: 8, borderBottomWidth: 1, borderColor: t.border, cursor: onOpen ? 'pointer' : 'default' }}
       hover={onOpen ? { backgroundColor: t.hover } : undefined}
       onClick={onOpen ? () => onOpen(record) : undefined}
       testId={`record-${record.id}`}

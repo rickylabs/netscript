@@ -102,10 +102,55 @@ interface HealthReport {
   [key: string]: unknown;
 }
 
+interface StackReport {
+  readyMs: number;
+  hostRssMb: number | null;
+  totalRssMb: number | null;
+  processes: number | null;
+  nodes: Array<{ name: string; kind: string; port: number; pid?: number; state: string; spawnedAt?: number; readyAt?: number; rssMb: number | null }>;
+}
+
+/** The supervised NetScript graph (real-stack builds): an in-app, Aspire-dashboard-sized view. */
+function StackSection({ stack }: { stack: StackReport }): JSX.Element {
+  const header = { size: 'xs' as const, tone: 'muted' as const, mono: true };
+  const cell = (width: number, child: JSX.Element, end = false) => (
+    <Box style={{ width, flexShrink: 0, ...(end ? { alignItems: 'flex-end' } : {}) }}>{child}</Box>
+  );
+  return (
+    <Section
+      title='NetScript graph'
+      description={`Supervised by this process · ready in ${(stack.readyMs / 1000).toFixed(2)} s · ${stack.processes ?? '?'} processes · ${stack.totalRssMb?.toFixed(0) ?? '?'} MB resident in total`}
+    >
+      <Box style={{ ...row, gap: 8 }}>
+        {cell(130, <Text {...header}>NODE</Text>)}
+        {cell(96, <Text {...header}>KIND</Text>)}
+        {cell(84, <Text {...header}>STATE</Text>)}
+        {cell(64, <Text {...header}>PORT</Text>, true)}
+        {cell(72, <Text {...header}>PID</Text>, true)}
+        {cell(84, <Text {...header}>READY</Text>, true)}
+        {cell(84, <Text {...header}>MEMORY</Text>, true)}
+      </Box>
+      {stack.nodes.map((node) => (
+        <Box key={node.name} style={{ ...row, gap: 8 }}>
+          {cell(130, <Text size='sm' mono>{node.name}</Text>)}
+          {cell(96, <Text size='sm' tone='muted'>{node.kind}</Text>)}
+          {cell(84, <Badge label={node.state} tone={node.state === 'ready' ? 'success' : 'warning'} />)}
+          {cell(64, <Text size='sm' mono>{String(node.port)}</Text>, true)}
+          {cell(72, <Text size='sm' mono tone='muted'>{String(node.pid ?? '—')}</Text>, true)}
+          {cell(84, <Text size='sm' mono>{node.readyAt !== undefined && node.spawnedAt !== undefined ? `${node.readyAt - node.spawnedAt} ms` : '—'}</Text>, true)}
+          {cell(84, <Text size='sm' mono>{node.rssMb === null ? '—' : `${node.rssMb.toFixed(0)} MB`}</Text>, true)}
+        </Box>
+      ))}
+      <Text size='xs' tone='subtle'>Desktop host (UI, BFF, SDK clients): {stack.hostRssMb?.toFixed(0) ?? '?'} MB resident.</Text>
+    </Section>
+  );
+}
+
 export function HealthPage(): JSX.Element {
   const t = tokens();
   const [health, setHealth] = useState<HealthReport | null>(null);
   const [latency, setLatency] = useState<number | null>(null);
+  const [stack, setStack] = useState<StackReport | null>(null);
   const [, setTick] = useState(0);
   useEffect(() => {
     let alive = true;
@@ -120,6 +165,13 @@ export function HealthPage(): JSX.Element {
         }
       } catch (error) {
         if (alive) setHealth({ status: 'unreachable', error: String(error) });
+      }
+      try {
+        const response = await host().fetch(`${host().baseUrl}/__stack`);
+        if (response.ok && alive) setStack(await response.json() as StackReport);
+        else await response.body?.cancel();
+      } catch {
+        // Not a real-stack build.
       }
       if (alive) setTick((value) => value + 1);
     };
@@ -152,6 +204,7 @@ export function HealthPage(): JSX.Element {
           {memory !== null ? <Progress value={(memory / 512) * 100} /> : null}
         </Section>
       </Box>
+      {stack ? <StackSection stack={stack} /> : null}
       {frames
         ? (
           <Section title='Frame stats' description='GPUI debug overlay counters'>
@@ -209,7 +262,7 @@ export function DesignPage(): JSX.Element {
             <Badge label='awaiting' tone='warning' />
             <Badge label='shipped' tone='info' />
             <Badge label='error' tone='danger' />
-            <Badge label='draft' />
+            <Badge label='pending' />
           </Box>
           <Progress value={62} />
         </Section>

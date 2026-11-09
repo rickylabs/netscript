@@ -33,10 +33,11 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-function seedRecords(count: number, now: number): WorkspaceRecord[] {
+/** Deterministic seed shared by the simulated store and the real-stack SQLite seed. */
+export function seedRecords(count: number, now: number): WorkspaceRecord[] {
   const random = mulberry32(42);
   const weights: Array<[RecordStatus, number]> = [
-    ['paid', 0.38], ['shipped', 0.24], ['awaiting_payment', 0.16], ['draft', 0.1], ['refunded', 0.05], ['cancelled', 0.07],
+    ['paid', 0.38], ['shipped', 0.24], ['awaiting_payment', 0.16], ['pending', 0.1], ['refunded', 0.05], ['cancelled', 0.07],
   ];
   const records: WorkspaceRecord[] = [];
   for (let index = 0; index < count; index++) {
@@ -129,46 +130,50 @@ export class WorkspaceStore {
   }
 
   overview(periodDays: number): Overview {
-    const now = Date.now();
-    const start = now - periodDays * DAY;
-    const previousStart = start - periodDays * DAY;
-    const current = this.#records.filter((record) => Date.parse(record.createdAt) >= start);
-    const previous = this.#records.filter((record) => {
-      const at = Date.parse(record.createdAt);
-      return at >= previousStart && at < start;
-    });
-    const refunds = (rows: WorkspaceRecord[]) =>
-      rows.length === 0 ? 0 : (rows.filter((row) => row.status === 'refunded').length / rows.length) * 100;
-    const currencies = (['CHF', 'EUR'] as const).map((currency) => {
-      const sum = (rows: WorkspaceRecord[]) => rows.filter((row) => row.currency === currency).reduce((total, row) => total + row.amount, 0);
-      const count = (rows: WorkspaceRecord[]) => rows.filter((row) => row.currency === currency).length || 1;
-      return {
-        currency,
-        amount: metric(Math.round(sum(current)), Math.round(sum(previous))),
-        averageAmount: metric(Math.round(sum(current) / count(current)), Math.round(sum(previous) / count(previous))),
-      };
-    });
-    const weekly: Overview['weekly'] = [];
-    for (let week = 0; week < Math.ceil(periodDays / 7); week++) {
-      const from = start + week * 7 * DAY;
-      const to = Math.min(from + 7 * DAY, now);
-      const count = current.filter((record) => {
-        const at = Date.parse(record.createdAt);
-        return at >= from && at < to;
-      }).length;
-      const label = new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(from));
-      weekly.push({ label, count });
-    }
-    return {
-      periodDays,
-      totals: {
-        records: metric(current.length, previous.length),
-        refundRate: metric(Math.round(refunds(current) * 10) / 10, Math.round(refunds(previous) * 10) / 10),
-        currencies,
-      },
-      weekly,
-      statusCounts: RECORD_STATUSES.map((status) => ({ status, count: current.filter((record) => record.status === status).length })),
-      latest: this.#records.slice(0, 6),
-    };
+    return computeOverview(this.#records, periodDays, Date.now());
   }
+}
+
+/** Overview aggregation over records sorted by `updatedAt` (newest first). */
+export function computeOverview(records: readonly WorkspaceRecord[], periodDays: number, now: number): Overview {
+  const start = now - periodDays * DAY;
+  const previousStart = start - periodDays * DAY;
+  const current = records.filter((record) => Date.parse(record.createdAt) >= start);
+  const previous = records.filter((record) => {
+    const at = Date.parse(record.createdAt);
+    return at >= previousStart && at < start;
+  });
+  const refunds = (rows: WorkspaceRecord[]) =>
+    rows.length === 0 ? 0 : (rows.filter((row) => row.status === 'refunded').length / rows.length) * 100;
+  const currencies = (['CHF', 'EUR'] as const).map((currency) => {
+    const sum = (rows: WorkspaceRecord[]) => rows.filter((row) => row.currency === currency).reduce((total, row) => total + row.amount, 0);
+    const count = (rows: WorkspaceRecord[]) => rows.filter((row) => row.currency === currency).length || 1;
+    return {
+      currency,
+      amount: metric(Math.round(sum(current)), Math.round(sum(previous))),
+      averageAmount: metric(Math.round(sum(current) / count(current)), Math.round(sum(previous) / count(previous))),
+    };
+  });
+  const weekly: Overview['weekly'] = [];
+  for (let week = 0; week < Math.ceil(periodDays / 7); week++) {
+    const from = start + week * 7 * DAY;
+    const to = Math.min(from + 7 * DAY, now);
+    const count = current.filter((record) => {
+      const at = Date.parse(record.createdAt);
+      return at >= from && at < to;
+    }).length;
+    const label = new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(from));
+    weekly.push({ label, count });
+  }
+  return {
+    periodDays,
+    totals: {
+      records: metric(current.length, previous.length),
+      refundRate: metric(Math.round(refunds(current) * 10) / 10, Math.round(refunds(previous) * 10) / 10),
+      currencies,
+    },
+    weekly,
+    statusCounts: RECORD_STATUSES.map((status) => ({ status, count: current.filter((record) => record.status === status).length })),
+    latest: records.slice(0, 6),
+  };
 }

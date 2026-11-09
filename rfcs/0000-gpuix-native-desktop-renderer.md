@@ -25,6 +25,11 @@ one process instead of seven, and starts many instances where the Chromium-based
 also uses 2.2× the webview's CPU when the screen updates often. That cost sits in GPUI's UI thread,
 not in Preact, NetScript or the runtime, and reducing it is the first incubation work item.
 
+With the real NetScript backend shipped in the same installer and supervised by the app, the backend
+dominates the footprint (1.37 GB across nine processes), and a 250 ms live-update budget cuts
+GPUIX's CPU by more than four times, to about 35% below the webview under the same budget on Linux.
+Gate 1 now hinges on confirming that on real GPUs.
+
 This RFC is backed by a working proof of concept (PoC), benchmarks on Linux and on a Windows laptop,
 and installable builds: `.llm/runs/rfc-gpuix-desktop--rfc/` (research, evidence, PoC source).
 
@@ -200,6 +205,54 @@ quiet settings screen at the same event rate, so the cost is GPUI's per-frame wo
 visible areas keep changing. Idle CPU (5–7%) comes from GPUIX's 8 ms frame pump on Windows and
 Linux; macOS uses display-link wakes and has not been measured yet.
 
+### Real stack: the backend in the box
+
+The numbers above use an in-process service with simulated workers. A second PoC build ships the
+real NetScript graph in the same installer and lets the app supervise it, without Aspire: the
+scaffolded 0.0.9 workspace (users service on SQLite, workers, sagas, triggers and streams, Garnet).
+The app starts the nine processes in dependency order on loopback ports, waits for their health
+endpoints, projects discovery (`services__<name>__http__0`) and stops them on exit. Its embedded
+service becomes a BFF over typed SDK clients; activity comes from the durable stream and job state
+from `workers-api`. The load generator issues real writes and job runs (`users.update`,
+`workers.triggerJob`). Everything runs offline from a bundled Deno runtime, a warmed `DENO_DIR` and
+a self-contained Garnet (`poc/realstack/`, `poc/scripts/stack-bundle.sh`).
+
+A **GPUIX-first** variant of the same app adds three changes: a native `<virtual-list>` for long
+lists, a live-update budget (stream changes committed at most every 250 ms) and an adaptive frame
+pump (8 ms while active, 50 ms when idle). The budget is renderer-agnostic, so the webview was also
+measured with it.
+
+Linux container, software rendering, medians (`evidence/bench-linux-realstack.json`):
+
+| Variant                 | CPU at 20 updates/s | Host CPU (real stack) | Host idle CPU | Host memory |
+| ----------------------- | ------------------- | --------------------- | ------------- | ----------- |
+| GPUIX                   | 204%                | 73.8%                 | 3.7%          | 299 MB      |
+| GPUIX + 250 ms budget   | 45.6%               | —                     | 1.7%⁸         | 280 MB⁸     |
+| GPUIX-first             | 46.0%               | 42.8%                 | 2.5%          | 301 MB      |
+| Webview (WebKitGTK)     | 111%                | 77.9%                 | 36.5%         | 418 MB      |
+| Webview + 250 ms budget | 70.0%               | 68.2%                 | 33.2%         | 417 MB      |
+
+⁸ Embedded build (no real stack).
+
+"CPU at 20 updates/s" is the embedded build; "Host" columns split the real-stack process tree into
+the desktop host (UI, BFF and renderer processes) and the supervised graph. The graph itself costs
+the same on every host: 1.37 GB across nine processes, about 35% CPU under this load and 7% idle,
+and it is ready 2.7–3.0 s after launch (data on screen at 3.5–3.8 s). Eight real-stack instances
+start in 15.3 s with GPUIX and 25.5 s with the webview (12.2 and 13.0 GB).
+
+**What the real stack changes.** The backend, not the renderer, dominates a full NetScript desktop
+app's footprint: the renderer choice moves memory by about 120 MB out of 1.7 GB. The update budget
+is the CPU lever, and it helps GPUIX far more than the webview, because GPUI redraws the window for
+every commit while the browser compositor invalidates only what changed. With the same budget, GPUIX
+used about 35% less host CPU than the webview here. Whether that holds on a real GPU decides gate 1;
+the laptop rerun is pending.
+
+Upstream findings from this work: the 0.0.9 workers, sagas and triggers schemas do not migrate on
+SQLite; the AppHost wires no plugin references into services, so the scaffold's record-activity
+publisher never gets the streams URL; `workers.subscribe` on a Garnet KV sends only its initial
+snapshots; `netscript deploy build` emitted an empty graph; and processes started by a
+`deno desktop` app inherit `DENO_SERVE_ADDRESS` and bind the window's port.
+
 ## Guide-level explanation
 
 A desktop app opts in with one entry point and keeps its contracts, service and SDK code:
@@ -277,9 +330,11 @@ surface stays plain TypeScript. These constraints follow:
 - **CPU under frequent updates.** On a real GPU, GPUIX used 2.2× the webview's CPU at 20 updates/s,
   almost all on GPUI's UI thread, and 5–7% at idle on Windows from its frame pump. VMs, RDP and CI
   without a GPU also pay software rasterization on top.
-- **Binary size.** GPUIX is larger than the webview build: 185 MB on Linux (the Deno runtime plus a
-  50 MB addon; 133 MB on Windows, 123 MB on macOS) against 112 MB for the webview build, and smaller
-  than CEF at 470 MB. Downloads with both hosts are 57–94 MB.
+- **Binary size.** GPUIX is larger than the webview build: 172 MB on Linux (the Deno runtime plus a
+  50 MB addon) against 90 MB for the webview build, and smaller than CEF at 470 MB. Both require
+  bundling before compiling: `deno compile` embeds the project's whole npm resolution, which reached
+  915 MB once the plugin contracts were imported. Shipping the real backend adds a Deno runtime, a
+  dependency cache and Garnet (about 0.8 GB unpacked, mostly the npm cache).
 
 ## Rationale and alternatives
 
@@ -316,7 +371,10 @@ Zed (GPUI), React Native and NativeWind (non-DOM renderers, class-to-style compi
    path to passing is: coalesce data-driven UI updates to a frame budget in the runtime (live feeds
    rarely need more than 10 Hz), virtualize long lists, and upstream two GPUIX changes, namely
    incremental rendering of unchanged subtrees and an event-driven frame pump on Windows and Linux.
-   Then re-measure on Windows and Apple Silicon.
+   Then re-measure on Windows and Apple Silicon. The PoC's GPUIX-first variant implements the first
+   two plus an adaptive pump in the host renderer; on Linux it brings GPUIX below the webview under
+   the same budget (46% against 70%; with the real stack 43% against 68% host CPU). The real-GPU
+   rerun decides the gate.
 2. GPUIX publishes a release that includes clipboard and notifications, and the project agrees an
    upgrade policy (exact pins; vendor or fork if upstream stalls).
 3. Accessibility reaches an agreed bar: keyboard navigation and screen-reader smoke tests on macOS
@@ -332,6 +390,11 @@ Zed (GPUI), React Native and NativeWind (non-DOM renderers, class-to-style compi
 - Can GPUIX render unchanged subtrees incrementally, or must apps budget their update rate? This
   decides whether gate 1 is an upstream fix or a framework convention.
 - Should the primitives collection become the default component layer for web as well?
+- Should the live-update budget be a framework default (SDK stream consumer or signals layer) for
+  every host, given that it also lowers the webview's CPU?
+- How should a desktop app ship its backend: a supervised graph of processes as in the PoC, the
+  single-executable packaging tracked by epic #830, or each node bundled with `deno bundle` and run
+  by one shared runtime (which would drop most of the dependency cache)?
 
 ## Future possibilities
 

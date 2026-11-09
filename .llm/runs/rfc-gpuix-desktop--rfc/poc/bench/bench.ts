@@ -2,7 +2,7 @@
  * Container benchmark CLI (Linux, Xvfb + lavapipe). Same method as the
  * installable's `--bench` mode: see bench/runner.ts.
  *
- *   deno run -A bench/bench.ts --out=<json> [--runs=5] [--variants=gpuix,gpuix-run,webview,cef] [--parallel=1,4,8]
+ *   deno run -A bench/bench.ts --out=<json> [--runs=5] [--variants=gpuix,gpuix-run,webview,cef,gpuix-real,webview-real] [--parallel=1,4,8]
  */
 import { type BenchVariant, runBench, summarize } from './runner.ts';
 
@@ -12,11 +12,24 @@ const args = new Map(Deno.args.map((arg) => {
 }));
 const out = args.get('out') ?? 'bench-results.json';
 
+const REAL = { NETSCRIPT_STACK: 'real', NETSCRIPT_STACK_DIR: `${Deno.cwd()}/build/stack-linux-x64` };
+const EMBEDDED = { NETSCRIPT_STACK: 'embedded' };
 const ALL: BenchVariant[] = [
-  { id: 'gpuix', label: 'GPUIX + Preact · deno compile', command: 'build/linux-x64/netscript-gpuix' },
+  { id: 'gpuix', label: 'GPUIX + Preact · deno compile', command: 'build/linux-x64/netscript-gpuix', env: EMBEDDED },
   { id: 'gpuix-run', label: 'GPUIX + Preact · deno run (cached)', command: 'deno', args: ['run', '-A', '--cached-only', 'app/main.tsx'] },
-  { id: 'webview', label: 'Deno Desktop · WebKitGTK webview', command: 'build/netscript-webview/netscript-webview', profileViaEnv: true },
+  { id: 'webview', label: 'Deno Desktop · WebKitGTK webview', command: 'build/netscript-webview/netscript-webview', profileViaEnv: true, env: EMBEDDED },
   { id: 'cef', label: 'Deno Desktop · CEF (Chromium)', command: 'build/netscript-cef/netscript-cef', profileViaEnv: true },
+  // Real NetScript graph (Garnet, SQLite, users, workers, sagas, triggers, streams) supervised by the app.
+  { id: 'gpuix-real', label: 'GPUIX + Preact · real stack', command: 'build/linux-x64/netscript-gpuix', env: REAL },
+  { id: 'webview-real', label: 'Deno Desktop · WebKitGTK · real stack', command: 'build/netscript-webview/netscript-webview', profileViaEnv: true, env: REAL },
+  // GPUIX-first variant: native virtual lists, live-update budget, adaptive frame pump.
+  { id: 'gpuix-native', label: 'GPUIX-first + Preact', command: 'build/linux-x64/netscript-gpuix', env: { ...EMBEDDED, NETSCRIPT_UI: 'native' } },
+  { id: 'gpuix-native-real', label: 'GPUIX-first · real stack', command: 'build/linux-x64/netscript-gpuix', env: { ...REAL, NETSCRIPT_UI: 'native' } },
+  // Controls: the budget alone on GPUIX (no adaptive pump), and on the webview
+  { id: 'gpuix-budget', label: 'GPUIX + Preact · 250 ms budget only', command: 'build/linux-x64/netscript-gpuix', env: { ...EMBEDDED, NETSCRIPT_LIVE_BUDGET_MS: '250' } },
+  // Control: the webview with the same 250 ms live-update budget (the renderer-agnostic part of GPUIX-first).
+  { id: 'webview-budget', label: 'Deno Desktop · WebKitGTK · 250 ms budget', command: 'build/netscript-webview/netscript-webview', profileViaEnv: true, env: { ...EMBEDDED, NETSCRIPT_LIVE_BUDGET_MS: '250' } },
+  { id: 'webview-budget-real', label: 'Deno Desktop · WebKitGTK · 250 ms budget · real stack', command: 'build/netscript-webview/netscript-webview', profileViaEnv: true, env: { ...REAL, NETSCRIPT_LIVE_BUDGET_MS: '250' } },
 ];
 const wanted = (args.get('variants') ?? 'gpuix,webview,cef').split(',');
 const variants = ALL.filter((variant) => wanted.includes(variant.id));
