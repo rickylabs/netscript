@@ -64,3 +64,14 @@ scope `plan-eval.md` only. Draft PR #2603, tracking issue #2602.
 | F7 plan risk register / deferral classes | **Fixed.** `plan.md` § Risk register and § deferral classification. |
 | F8 precision | **Fixed.** `useNative` (PoC `useGpuix`), ≈2.8k stars, "JS + host main-thread bucket 4%". |
 
+### PLAN-EVAL cycle 2 — GLM 5.3 (`ollama-cloud/glm-5.3`) — `PASS`
+
+First attempt on `opencode-go/glm-5.3` died on the OpenCode Go usage limit before doing any work
+(drift D12); the identical brief was relaunched on the next fleet transport for the same model.
+Verdict appended to `plan-eval.md` § Cycle 2: F1–F8 RESOLVED. In-flight repairs, both reviewed by
+the supervisor and accepted: RFC Rationale "Electron / CEF … 537 MB" → "470 MB" (stale pre-pruning
+size), and a blank line that detached drift row D12 from its table. Observations N2 (CEF log host
+label reads `webview-deno-desktop` because `NETSCRIPT_BACKEND` defaults to webview) and N3 (≤1 MiB
+rounding) need no change. IMPL-EVAL: N/A for this RFC PR (docs and evidence only); implementation of
+any accepted surface carries its own IMPL-EVAL on the Codex lane.
+

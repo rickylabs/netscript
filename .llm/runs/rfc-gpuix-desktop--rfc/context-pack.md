@@ -6,15 +6,16 @@
 | -------------- | -------------------------------------------------------------------- |
 | Run ID         | `rfc-gpuix-desktop--rfc`                                             |
 | Branch         | `docs/rfc-gpuix-native-desktop`                                      |
-| Current phase  | `plan-eval`                                                          |
+| Current phase  | `owner review` (PLAN-EVAL PASS, cycle 2)                             |
 | Archetype      | RFC describes 2 (integration) + 6/7 (CLI/deploy) + SDK/service seams |
 | Scope overlays | `SCOPE-docs`                                                         |
 
 ## Current State
 
 Research, PoC, two benchmark runs, thread breakdown, installables (Linux/Windows/macOS, each with a
-webview baseline and `--bench`), HTML report and RFC draft are complete. PLAN-EVAL (GLM 5.3,
-separate session) is the next step; the owner's real-GPU laptop benchmark is decision gate 1.
+webview baseline and `--bench`), HTML report and RFC draft are complete. PLAN-EVAL: cycle 1
+FAIL_PLAN (F1–F8 addressed), cycle 2 PASS. The RFC awaits owner disposition; the owner's real-GPU
+laptop benchmark is decision gate 1.
 
 ## Completed
 
@@ -27,7 +28,7 @@ separate session) is the next step; the owner's real-GPU laptop benchmark is dec
 
 ## Next Steps
 
-1. PLAN-EVAL by GLM 5.3 (`opencode-go/glm-5.3`); fix findings; record verdict in `plan-eval.md`.
+1. Owner reviews PR #2603 and decides the RFC disposition (discussion → FCP).
 2. Owner runs `--bench` on Windows/macOS laptops; append results to `evidence/` and rebuild the report.
 3. If accepted: number the RFC, open implementation issues (desktop-native package, fresh-ui native
    collection, auto-update adapter, packager backend, service RPC-path papercut) on the Codex lane.

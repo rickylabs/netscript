@@ -226,7 +226,7 @@ surface stays plain TypeScript. These constraints follow:
 
 - **Keep `deno desktop` only:** best feature coverage today, but tied to the Deno EOL. Retained as
   the default during incubation.
-- **Electron / CEF:** Chromium per app (8 processes, 537 MB here); Node-hosted, with a heavy
+- **Electron / CEF:** Chromium per app (8 processes, 470 MB here); Node-hosted, with a heavy
   footprint.
 - **Tauri / Electrobun:** the webview stays, the UI stays in a separate process with IPC, and Tauri
   adds a Rust shell.
