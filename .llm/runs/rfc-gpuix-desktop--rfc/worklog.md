@@ -75,3 +75,31 @@ label reads `webview-deno-desktop` because `NETSCRIPT_BACKEND` defaults to webvi
 rounding) need no change. IMPL-EVAL: N/A for this RFC PR (docs and evidence only); implementation of
 any accepted surface carries its own IMPL-EVAL on the Codex lane.
 
+
+### Decision gate 1 — real-GPU laptop benchmark (launched 2026-11-09)
+
+Owner downloaded and extracted the Windows build on the linked T3 environment `Yoga_Book_9i`
+(`415f93b9-8779-4bc9-972f-7dc7059b090f`). Laptop lane launched via T3 `delegate_task` (remote child
+thread `mcp:launch:dde17c42…`), Codex GPT-6.1 Sol @ low (simple tier: execution only, nothing it
+produces is evaluated as authored content). Brief: locate build + checksum, record hardware (CPU,
+GPU/driver, RAM, AC/battery, power plan, WebView2, background load), smoke launch, then
+`NetScript.exe --bench` (5 cold / 3 active / ×1,4,8 per host) and return the raw report JSON.
+
+### Launch types (owner question, 2026-11-09): first launch vs relaunch
+
+Owner tried the Windows exe and found the launch very fast; the benchmark's "cold start" always used
+a fresh profile. New probe `poc/bench/first-launch.sh` (one fresh container per block: empty `/tmp`,
+so no deno-compile code cache) → `evidence/first-launch-linux.log` (GPUIX, 5 containers) and
+`evidence/first-launch-linux-webview.log` (webview, 3 containers). Medians, Linux + lavapipe:
+
+| Launch | GPUIX window | GPUIX data on screen | Webview window (blank) | Webview data on screen |
+| --- | --- | --- | --- | --- |
+| First launch after install | 273 ms | 1.18 s | 79 ms | 0.96 s |
+| Later launch, new profile (= benchmark "cold start") | 186 ms | 0.95 s | 55 ms | 0.81 s |
+| Normal relaunch, existing profile | 193 ms | 0.43 s | 66 ms | 0.75 s |
+
+Reading: the ~0.5 s between a new and an existing profile is first-run work (creating the two Deno KV
+databases, demo sign-in, persisting the session). A normal relaunch shows data ~40% sooner than the
+webview build; GPUIX's first window already shows the app shell, the webview's is blank until the page
+loads. The first-launch extra is the V8 code cache (`/tmp/deno-compile-netscript.cache`, written
+once). To fold into the RFC/report together with the laptop results.

@@ -1,0 +1,19 @@
+# Same probe, Deno Desktop webview baseline (shipped Linux build, 2026-11-09T18:21:31Z). Window = native window mapped (content may still be blank).
+== fresh container 1
+first: window 641 ms · data-backed frame 1965 ms
+after first launch, /tmp contains:
+  512	/tmp/deno-compile-netscript-webview.cache
+warm-fresh-profile: window 55 ms · data-backed frame 795 ms
+warm-same-profile: window 66 ms · data-backed frame 764 ms
+== fresh container 2
+first: window 79 ms · data-backed frame 827 ms
+after first launch, /tmp contains:
+  512	/tmp/deno-compile-netscript-webview.cache
+warm-fresh-profile: window 52 ms · data-backed frame 1172 ms
+warm-same-profile: window 55 ms · data-backed frame 749 ms
+== fresh container 3
+first: window 78 ms · data-backed frame 960 ms
+after first launch, /tmp contains:
+  3.7M	/tmp/deno-compile-netscript-webview.cache
+warm-fresh-profile: window 72 ms · data-backed frame 814 ms
+warm-same-profile: window 67 ms · data-backed frame 737 ms

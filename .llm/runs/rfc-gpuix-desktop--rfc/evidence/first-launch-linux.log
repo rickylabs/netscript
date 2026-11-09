@@ -1,0 +1,31 @@
+# First launch vs warm launch — shipped Linux binary (2026-11-09T18:20:37Z), one fresh container per block (empty /tmp, new app profile). Xvfb + lavapipe.
+== fresh container 1
+first: window 292 ms · data-backed frame 1129 ms
+after first launch, /tmp contains:
+  512	/tmp/deno-compile-netscript.cache
+warm-fresh-profile: window 186 ms · data-backed frame 1814 ms
+warm-same-profile: window 184 ms · data-backed frame 416 ms
+== fresh container 2
+first: window 261 ms · data-backed frame 1252 ms
+after first launch, /tmp contains:
+  512	/tmp/deno-compile-netscript.cache
+warm-fresh-profile: window 188 ms · data-backed frame 954 ms
+warm-same-profile: window 183 ms · data-backed frame 417 ms
+== fresh container 3
+first: window 260 ms · data-backed frame 1167 ms
+after first launch, /tmp contains:
+  512	/tmp/deno-compile-netscript.cache
+warm-fresh-profile: window 185 ms · data-backed frame 914 ms
+warm-same-profile: window 193 ms · data-backed frame 427 ms
+== fresh container 4
+first: window 273 ms · data-backed frame 1179 ms
+after first launch, /tmp contains:
+  512	/tmp/deno-compile-netscript.cache
+warm-fresh-profile: window 196 ms · data-backed frame 1087 ms
+warm-same-profile: window 202 ms · data-backed frame 443 ms
+== fresh container 5
+first: window 283 ms · data-backed frame 2103 ms
+after first launch, /tmp contains:
+  3.9M	/tmp/deno-compile-netscript.cache
+warm-fresh-profile: window 186 ms · data-backed frame 924 ms
+warm-same-profile: window 200 ms · data-backed frame 436 ms
