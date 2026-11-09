@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------------------------------------- |
 | Run ID         | `rfc-gpuix-desktop--rfc`                                             |
 | Branch         | `docs/rfc-gpuix-native-desktop`                                      |
-| Current phase  | `owner review` (PLAN-EVAL PASS, cycle 2)                             |
+| Current phase  | `owner review` + real-stack follow-up (laptop rerun pending)         |
 | Archetype      | RFC describes 2 (integration) + 6/7 (CLI/deploy) + SDK/service seams |
 | Scope overlays | `SCOPE-docs`                                                         |
 
@@ -17,6 +17,16 @@ webview baseline and `--bench`), HTML report and RFC draft are complete. PLAN-EV
 FAIL_PLAN (F1–F8 addressed), cycle 2 PASS. Gate 1 measured on the owner's Windows laptop: memory and
 multi-instance gains hold, CPU under load does not (81% vs 37%; GPUI UI thread). The RFC awaits owner
 disposition.
+
+## Real-stack follow-up (2026-11-09)
+
+The app can supervise the scaffolded 0.0.9 workspace graph (Garnet, SQLite users, workers, sagas,
+triggers, streams) from an offline bundle; GPUIX-first variant; bundle-then-compile packaging;
+Linux real-stack benchmarks (`evidence/bench-linux-realstack.json`); installers with the stack in
+`~/projects/netscript/artifacts/gpuix-poc/realstack/`. See worklog "Real stack + GPUIX-first" and
+drift D13–D20. Next: laptop `--bench` on the new Windows installer (variants `gpuix-real`,
+`gpuix-native-real`, `webview-real`, `webview-budget-real`, plus embedded `gpuix-native`,
+`webview-budget`), then RFC/report update with real-GPU numbers.
 
 ## Completed
 
