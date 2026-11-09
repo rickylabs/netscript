@@ -1,0 +1,244 @@
+[
+  {
+    "variant": "gpuix",
+    "rate": 20,
+    "windowMs": 10000,
+    "totalCpuPct": 205,
+    "breakdown": [
+      {
+        "bucket": "software rasterizer (lavapipe/llvmpipe)",
+        "cpuPct": 144.1
+      },
+      {
+        "bucket": "other: gpuix-ui",
+        "cpuPct": 55.4
+      },
+      {
+        "bucket": "host main thread (JS + platform loop)",
+        "cpuPct": 4.2
+      },
+      {
+        "bucket": "V8 helper threads",
+        "cpuPct": 1.1
+      },
+      {
+        "bucket": "other: sw",
+        "cpuPct": 0.2
+      }
+    ],
+    "topThreads": [
+      {
+        "thread": "netscript-gpuix › llvmpipe",
+        "cpuPct": 144.1
+      },
+      {
+        "thread": "netscript-gpuix › gpuix-ui",
+        "cpuPct": 55.4
+      },
+      {
+        "thread": "netscript-gpuix › netscript-gpuix",
+        "cpuPct": 4.2
+      },
+      {
+        "thread": "netscript-gpuix › V8 DefaultWorke",
+        "cpuPct": 1.1
+      },
+      {
+        "thread": "netscript-gpuix › sw",
+        "cpuPct": 0.2
+      }
+    ]
+  },
+  {
+    "variant": "webview",
+    "rate": 20,
+    "windowMs": 10000,
+    "totalCpuPct": 111.9,
+    "breakdown": [
+      {
+        "bucket": "software rasterizer (lavapipe/llvmpipe)",
+        "cpuPct": 91.6
+      },
+      {
+        "bucket": "web content process: webkitwebproces",
+        "cpuPct": 7.4
+      },
+      {
+        "bucket": "host main thread (JS + platform loop)",
+        "cpuPct": 3.6
+      },
+      {
+        "bucket": "web content process: eadedcompositor",
+        "cpuPct": 3.2
+      },
+      {
+        "bucket": "web content process: skiagpuworker",
+        "cpuPct": 1.8
+      },
+      {
+        "bucket": "web content process: jitworker",
+        "cpuPct": 1.5
+      },
+      {
+        "bucket": "web content process: receivequeue",
+        "cpuPct": 0.9
+      },
+      {
+        "bucket": "other: receivequeue",
+        "cpuPct": 0.7
+      },
+      {
+        "bucket": "web network process",
+        "cpuPct": 0.7
+      },
+      {
+        "bucket": "other: sw",
+        "cpuPct": 0.2
+      },
+      {
+        "bucket": "V8 helper threads",
+        "cpuPct": 0.1
+      },
+      {
+        "bucket": "other: vblankmonitor",
+        "cpuPct": 0.1
+      },
+      {
+        "bucket": "web content process: heaphelper",
+        "cpuPct": 0.1
+      }
+    ],
+    "topThreads": [
+      {
+        "thread": "WebKitWebProces › llvmpipe",
+        "cpuPct": 91.6
+      },
+      {
+        "thread": "WebKitWebProces › WebKitWebProces",
+        "cpuPct": 7.4
+      },
+      {
+        "thread": "netscript-webvi › netscript-webvi",
+        "cpuPct": 3.6
+      },
+      {
+        "thread": "WebKitWebProces › eadedCompositor",
+        "cpuPct": 3.2
+      },
+      {
+        "thread": "WebKitWebProces › SkiaGPUWorker",
+        "cpuPct": 1.8
+      },
+      {
+        "thread": "WebKitWebProces › JITWorker",
+        "cpuPct": 1.5
+      },
+      {
+        "thread": "WebKitWebProces › ReceiveQueue",
+        "cpuPct": 0.9
+      },
+      {
+        "thread": "netscript-webvi › ReceiveQueue",
+        "cpuPct": 0.7
+      },
+      {
+        "thread": "WebKitNetworkPr › WebKitNetworkPr",
+        "cpuPct": 0.5
+      },
+      {
+        "thread": "netscript-webvi › sw",
+        "cpuPct": 0.2
+      },
+      {
+        "thread": "netscript-webvi › V8 DefaultWorke",
+        "cpuPct": 0.1
+      },
+      {
+        "thread": "netscript-webvi › VBlankMonitor",
+        "cpuPct": 0.1
+      },
+      {
+        "thread": "WebKitNetworkPr › background",
+        "cpuPct": 0.1
+      },
+      {
+        "thread": "WebKitNetworkPr › ReceiveQueue",
+        "cpuPct": 0.1
+      }
+    ]
+  },
+  {
+    "variant": "cef",
+    "rate": 20,
+    "windowMs": 10000,
+    "totalCpuPct": 15,
+    "breakdown": [
+      {
+        "bucket": "host main thread (JS + platform loop)",
+        "cpuPct": 7.8
+      },
+      {
+        "bucket": "other: threadpoolforeg",
+        "cpuPct": 2.1
+      },
+      {
+        "bucket": "other: vizcompositorth",
+        "cpuPct": 1.8
+      },
+      {
+        "bucket": "other: compositor",
+        "cpuPct": 1.6
+      },
+      {
+        "bucket": "other: chrome_childiot",
+        "cpuPct": 1
+      },
+      {
+        "bucket": "other: chrome_iothread",
+        "cpuPct": 0.3
+      },
+      {
+        "bucket": "V8 helper threads",
+        "cpuPct": 0.2
+      },
+      {
+        "bucket": "other: sw",
+        "cpuPct": 0.2
+      }
+    ],
+    "topThreads": [
+      {
+        "thread": "netscript-cef › netscript-cef",
+        "cpuPct": 7.8
+      },
+      {
+        "thread": "netscript-cef › ThreadPoolForeg",
+        "cpuPct": 2.1
+      },
+      {
+        "thread": "netscript-cef › VizCompositorTh",
+        "cpuPct": 1.8
+      },
+      {
+        "thread": "netscript-cef › Compositor",
+        "cpuPct": 1.6
+      },
+      {
+        "thread": "netscript-cef › Chrome_ChildIOT",
+        "cpuPct": 1
+      },
+      {
+        "thread": "netscript-cef › Chrome_IOThread",
+        "cpuPct": 0.3
+      },
+      {
+        "thread": "netscript-cef › V8 DefaultWorke",
+        "cpuPct": 0.2
+      },
+      {
+        "thread": "netscript-cef › sw",
+        "cpuPct": 0.2
+      }
+    ]
+  }
+]

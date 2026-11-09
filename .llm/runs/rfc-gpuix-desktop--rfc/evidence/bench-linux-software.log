@@ -1,0 +1,63 @@
+ 16:14:11 up 9 days,  8:19,  0 user,  load average: 6.63, 4.54, 4.04
+Warning: config file file:///home/agent/projects/netscript/worktrees/rfc-gpuix-desktop/.llm/runs/rfc-gpuix-desktop--rfc/poc/deno.json is not a member of the workspace at file:///home/agent/projects/netscript/worktrees/rfc-gpuix-desktop/. Ignoring the parent workspace config.
+
+== GPUIX + Preact · deno compile
+  cold 1/5: ready 1197 ms · rss 298 MB · pss 282 MB · idle 1.8% · 1 proc
+  cold 2/5: ready 943 ms · rss 297 MB · pss 281 MB · idle 1.8% · 1 proc
+  cold 3/5: ready 949 ms · rss 297 MB · pss 282 MB · idle 1.7% · 1 proc
+  cold 4/5: ready 916 ms · rss 299 MB · pss 283 MB · idle 1.8% · 1 proc
+  cold 5/5: ready 1457 ms · rss 298 MB · pss 282 MB · idle 1.8% · 1 proc
+  active 1/3: cpu 203.1% · rss 337 MB
+  active 2/3: cpu 206.3% · rss 337 MB
+  active 3/3: cpu 204.7% · rss 335 MB
+  parallel x1: all ready 947 ms · total rss 298 MB · total pss 283 MB
+  parallel x4: all ready 1169 ms · total rss 1190 MB · total pss 782 MB
+  parallel x8: all ready 1348 ms · total rss 2381 MB · total pss 1443 MB
+
+== GPUIX + Preact · deno run (cached)
+  cold 1/5: ready 812 ms · rss 275 MB · pss 247 MB · idle 1.6% · 1 proc
+  cold 2/5: ready 792 ms · rss 275 MB · pss 247 MB · idle 1.6% · 1 proc
+  cold 3/5: ready 786 ms · rss 275 MB · pss 247 MB · idle 1.7% · 1 proc
+  cold 4/5: ready 834 ms · rss 274 MB · pss 246 MB · idle 1.6% · 1 proc
+  cold 5/5: ready 773 ms · rss 275 MB · pss 247 MB · idle 1.6% · 1 proc
+  active 1/3: cpu 198.7% · rss 304 MB
+  active 2/3: cpu 209% · rss 303 MB
+  active 3/3: cpu 200.4% · rss 304 MB
+  parallel x1: all ready 764 ms · total rss 275 MB · total pss 247 MB
+  parallel x4: all ready 1030 ms · total rss 1076 MB · total pss 804 MB
+  parallel x8: all ready 1492 ms · total rss 2140 MB · total pss 1531 MB
+
+== Deno Desktop · WebKitGTK webview
+  cold 1/5: ready 894 ms · rss 518 MB · pss 406 MB · idle 35.3% · 3 proc
+  cold 2/5: ready 750 ms · rss 514 MB · pss 402 MB · idle 36.9% · 3 proc
+  cold 3/5: ready 744 ms · rss 514 MB · pss 402 MB · idle 38.6% · 3 proc
+  cold 4/5: ready 998 ms · rss 513 MB · pss 402 MB · idle 38% · 3 proc
+  cold 5/5: ready 831 ms · rss 512 MB · pss 400 MB · idle 36.1% · 3 proc
+  active 1/3: cpu 115.9% · rss 554 MB
+  active 2/3: cpu 114.3% · rss 553 MB
+  active 3/3: cpu 113.5% · rss 555 MB
+  parallel x1: all ready 765 ms · total rss 513 MB · total pss 402 MB
+  parallel x4: all ready 986 ms · total rss 2027 MB · total pss 1197 MB
+  parallel x8: all ready 1874 ms · total rss 4020 MB · total pss 2237 MB
+
+== Deno Desktop · CEF (Chromium)
+  cold 1/5: ready 1259 ms · rss 796 MB · pss 419 MB · idle 0.2% · 8 proc
+  cold 2/5: ready 945 ms · rss 785 MB · pss 412 MB · idle 0.1% · 8 proc
+  cold 3/5: ready 662 ms · rss 785 MB · pss 412 MB · idle 0% · 8 proc
+  cold 4/5: ready 684 ms · rss 784 MB · pss 412 MB · idle 0% · 8 proc
+  cold 5/5: ready 697 ms · rss 787 MB · pss 413 MB · idle 0.1% · 8 proc
+  active 1/3: cpu 14.8% · rss 817 MB
+  active 2/3: cpu 15% · rss 812 MB
+  active 3/3: cpu 14.3% · rss 811 MB
+  parallel x1: all ready 734 ms · total rss 785 MB · total pss 411 MB
+  parallel x4: FAILED Error: cef x4 ready timed out after 90000 ms
+  parallel x8: FAILED Error: cef x8 ready timed out after 90000 ms
+
+| Host | Cold start (median) | Memory (tree) | Processes | Idle CPU | Active CPU | 8 instances (total) |
+| --- | --- | --- | --- | --- | --- | --- |
+| GPUIX + Preact · deno compile | 949 ms | 282 MB PSS (298 RSS) | 1 | 1.8% | 204.7% | 1443 MB · ready 1348 ms |
+| GPUIX + Preact · deno run (cached) | 792 ms | 247 MB PSS (275 RSS) | 1 | 1.6% | 200.4% | 1531 MB · ready 1492 ms |
+| Deno Desktop · WebKitGTK webview | 831 ms | 402 MB PSS (514 RSS) | 3 | 36.9% | 114.3% | 2237 MB · ready 1874 ms |
+| Deno Desktop · CEF (Chromium) | 697 ms | 412 MB PSS (785 RSS) | 8 | 0.1% | 14.8% | 411 MB · ready 734 ms |
+
+wrote /home/agent/projects/netscript/worktrees/rfc-gpuix-desktop/.llm/runs/rfc-gpuix-desktop--rfc/poc/../evidence/bench-linux-software.json

@@ -1,0 +1,39 @@
+ 15:53:27 up 9 days,  7:59,  0 user,  load average: 4.47, 3.67, 3.48
+Warning: config file file:///home/agent/projects/netscript/worktrees/rfc-gpuix-desktop/.llm/runs/rfc-gpuix-desktop--rfc/poc/deno.json is not a member of the workspace at file:///home/agent/projects/netscript/worktrees/rfc-gpuix-desktop/. Ignoring the parent workspace config.
+
+== GPUIX + Preact (deno compile)
+  run 1: ready 1223 ms, pss 281 MB, idle 1.7%
+  run 2: ready 893 ms, pss 280 MB, idle 1.6%
+  run 3: ready 1502 ms, pss 281 MB, idle 2%
+  run 4: ready 956 ms, pss 280 MB, idle 1.9%
+  run 5: ready 945 ms, pss 280 MB, idle 1.6%
+  active 1: cpu 205.7%, pss 318 MB
+  active 2: cpu 204.1%, pss 319 MB
+  active 3: cpu 206.2%, pss 323 MB
+  parallel 1: all ready 1381 ms, total pss 281 MB
+  parallel 4: all ready 1114 ms, total pss 782 MB
+  parallel 8: all ready 1446 ms, total pss 1442 MB
+
+== Deno Desktop · WebKitGTK webview
+  run 1: ready 864 ms, pss 405 MB, idle 35.8%
+  run 2: ready 755 ms, pss 398 MB, idle 36.5%
+  run 3: ready 785 ms, pss 398 MB, idle 33.2%
+  run 4: ready 753 ms, pss 400 MB, idle 37.5%
+  run 5: ready 850 ms, pss 396 MB, idle 36.7%
+  active 1: cpu 114.1%, pss 446 MB
+  active 2: cpu 117.8%, pss 431 MB
+  active 3: cpu 110.7%, pss 442 MB
+  parallel 1: all ready 791 ms, total pss 401 MB
+  parallel 4: all ready 1011 ms, total pss 1215 MB
+  parallel 8: all ready 1853 ms, total pss 2282 MB
+
+== Deno Desktop · CEF (Chromium)
+  run 1: ready 825 ms, pss 414 MB, idle 0.2%
+  run 2: ready 659 ms, pss 409 MB, idle 0.2%
+  run 3: ready 686 ms, pss 408 MB, idle 0.1%
+  run 4: ready 698 ms, pss 409 MB, idle 0.3%
+  run 5: ready 1245 ms, pss 409 MB, idle 0.1%
+  active 1: cpu 14.5%, pss 439 MB
+  active 2: cpu 14.9%, pss 440 MB
+  active 3: cpu 14%, pss 440 MB
+  parallel 1: all ready 695 ms, total pss 410 MB
