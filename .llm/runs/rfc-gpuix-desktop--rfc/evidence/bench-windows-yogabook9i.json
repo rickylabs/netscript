@@ -1,0 +1,60 @@
+{
+  "environment": {
+    "date": "2026-11-09T18:12:48.499Z",
+    "os": "windows-x86_64",
+    "osRelease": "10.0.26300",
+    "cpus": 14,
+    "loadavg": null,
+    "memoryTotalMb": 32373,
+    "method": "cold = spawn→data-backed frame painted, fresh profile; memory = process tree 3 s after ready; idle/active CPU = tree CPU time over a window, % of one core",
+    "machine": {
+      "name": "Lenovo Yoga Book 9i (owner laptop, T3 environment Yoga_Book_9i)",
+      "windows": "Windows 11 Home 10.0.26300",
+      "cpu": "Intel Core Ultra 7 155U, 12 cores / 14 threads",
+      "ramGb": 32,
+      "gpus": ["Intel(R) Graphics, driver 32.0.101.6881", "2 × DisplayLink USB Device, driver 12.1.2591.0"],
+      "displays": "4 (2 × 1920×1200 internal, 2 × 2560×1440 DisplayLink)",
+      "power": "AC, battery 100%, Balanced plan",
+      "webview2": "157.0.4341.42",
+      "cpuLoadBeforeRunPct": [6.9, 11.3, 13.6],
+      "build": "NetScript-GPUIX-PoC-0.1.0-windows-x64-portable.zip sha256 cacab0af… (current pruned build)"
+    }
+  },
+  "variants": {
+    "gpuix": {
+      "label": "GPUIX + Preact (this build)",
+      "coldStartMs": { "median": 1075, "min": 895, "max": 1097, "samples": [1080, 1097, 1056, 895, 1075] },
+      "memoryMb": { "rssMedian": 267, "pssMedian": null },
+      "processCount": 1,
+      "processes": [{ "name": "NetScript.exe", "rssMb": 267 }],
+      "idleCpuPct": { "median": 4.8, "samples": [4.4, 5.5, 4.8, 4.8, 6.6] },
+      "activeCpuPct": { "median": 80.9, "samples": [78.3, 80.9, 105.8], "rssMedianMb": 299 },
+      "parallel": [
+        { "instances": 1, "allReadyMs": 1923, "totalRssMb": 265, "totalPssMb": null, "rssPerInstanceMb": 265 },
+        { "instances": 4, "allReadyMs": 2480, "totalRssMb": 1065, "totalPssMb": null, "rssPerInstanceMb": 266 },
+        { "instances": 8, "allReadyMs": 4321, "totalRssMb": 2143, "totalPssMb": null, "rssPerInstanceMb": 268 }
+      ]
+    },
+    "webview": {
+      "label": "Deno Desktop webview (same app)",
+      "coldStartMs": { "median": 1000, "min": 987, "max": 3482, "samples": [3482, 987, 996, 1229, 1000] },
+      "memoryMb": { "rssMedian": 532, "pssMedian": null },
+      "processCount": 7,
+      "processes": [
+        { "name": "NetScript-Webview.exe", "rssMb": 119 },
+        { "name": "msedgewebview2.exe", "rssMb": 128 },
+        { "name": "msedgewebview2.exe", "rssMb": 13 },
+        { "name": "msedgewebview2.exe", "rssMb": 129 },
+        { "name": "msedgewebview2.exe", "rssMb": 41 },
+        { "name": "msedgewebview2.exe", "rssMb": 22 },
+        { "name": "msedgewebview2.exe", "rssMb": 82 }
+      ],
+      "idleCpuPct": { "median": 0.5, "samples": [0.5, 0.5, 0.5, 0.3, 0.5] },
+      "activeCpuPct": { "median": 37.2, "samples": [37.2, 31.7, 39.5], "rssMedianMb": 608 },
+      "parallel": [
+        { "instances": 1, "allReadyMs": 1054, "totalRssMb": 539, "totalPssMb": null, "rssPerInstanceMb": 539 }
+      ],
+      "parallelFailures": ["x4: ready timed out after 90000 ms", "x8: ready timed out after 90000 ms"]
+    }
+  }
+}
