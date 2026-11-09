@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------------------------------------- |
 | Run ID         | `rfc-gpuix-desktop--rfc`                                             |
 | Branch         | `docs/rfc-gpuix-native-desktop`                                      |
-| Current phase  | `owner review` + real-stack follow-up (laptop rerun pending)         |
+| Current phase  | `owner review` (real-stack follow-up complete, laptop measured)      |
 | Archetype      | RFC describes 2 (integration) + 6/7 (CLI/deploy) + SDK/service seams |
 | Scope overlays | `SCOPE-docs`                                                         |
 
@@ -24,9 +24,9 @@ The app can supervise the scaffolded 0.0.9 workspace graph (Garnet, SQLite users
 triggers, streams) from an offline bundle; GPUIX-first variant; bundle-then-compile packaging;
 Linux real-stack benchmarks (`evidence/bench-linux-realstack.json`); installers with the stack in
 `~/projects/netscript/artifacts/gpuix-poc/realstack/`. See worklog "Real stack + GPUIX-first" and
-drift D13–D20. Next: laptop `--bench` on the new Windows installer (variants `gpuix-real`,
-`gpuix-native-real`, `webview-real`, `webview-budget-real`, plus embedded `gpuix-native`,
-`webview-budget`), then RFC/report update with real-GPU numbers.
+drift D13–D20. Laptop real-GPU run done (`evidence/bench-windows-realstack-yogabook9i.json`): under the
+same 250 ms budget WebView2 stays 2–3.7× cheaper than GPUIX, so gate 1 stays not met and needs
+upstream incremental rendering. Open: why the graph takes 11–13 s to start on Windows (3 s Linux).
 
 ## Completed
 
