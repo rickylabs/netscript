@@ -103,3 +103,23 @@ databases, demo sign-in, persisting the session). A normal relaunch shows data ~
 webview build; GPUIX's first window already shows the app shell, the webview's is blank until the page
 loads. The first-launch extra is the V8 code cache (`/tmp/deno-compile-netscript.cache`, written
 once). To fold into the RFC/report together with the laptop results.
+
+### Gate 1 — laptop results (Yoga Book 9i, Win 11, Core Ultra 7 155U + Intel Graphics, AC/Balanced)
+
+`evidence/bench-windows-yogabook9i.json` (build sha256 `cacab0af…` = current pruned build; the lane
+brief carried the superseded hashes). Smoke: GPUIX renders on the real GPU (DirectX 11), window
+"NetScript — Overview", ready 808 ms.
+
+| Metric | GPUIX | WebView2 (same app) |
+| --- | --- | --- |
+| Cold start, new profile (median) | 1,075 ms | 1,000 ms (first run 3,482 ms) |
+| Memory (working set, tree) | 267 MB, 1 process | 532 MB, 7 processes |
+| Idle CPU | 4.8% | 0.5% |
+| Active CPU, 20 events/s | 80.9% | 37.2% |
+| 8 instances | 2,143 MB, all ready 4.3 s | x4 and x8 timed out (90 s) |
+
+Reading: memory (−50% working set; RSS double-counts WebView2's shared pages, so the true gap is
+smaller than 2×) and multi-instance favour GPUIX; **gate 1 as written fails** (active CPU 2.2× the
+webview on a real GPU), and idle CPU is ~10× (GPUIX's 8 ms timer pump on Windows/Linux). Follow-up
+probe `poc/bench/windows-probe.ps1` (pinned `a0744700`) dispatched to the laptop: launch types for
+both hosts + per-thread GPUIX CPU (overview vs settings vs idle) + WebView2 per-process CPU.
