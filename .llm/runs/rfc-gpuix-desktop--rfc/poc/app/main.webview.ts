@@ -96,4 +96,17 @@ const BrowserWindow = Reflect.get(Deno, 'BrowserWindow') as
 if (BrowserWindow) {
   const window = new BrowserWindow({ title: 'NetScript', width: 1320, height: 860 });
   window.setSize(1320, 860);
+  // Extra windows (NETSCRIPT_WINDOWS=N): each is another page (own JS context, stream and bindings)
+  // on this process's origin. navigate() needs an absolute URL.
+  const windowCount = Math.max(1, Number(Deno.env.get('NETSCRIPT_WINDOWS') ?? 1));
+  for (let index = 2; index <= windowCount; index++) {
+    const t = performance.now();
+    const extra = new BrowserWindow({ title: `NetScript (${index})`, width: 1100, height: 720 }) as unknown as {
+      navigate(url: string): void;
+      setPosition?(x: number, y: number): void;
+    };
+    extra.setPosition?.(40 * index, 40 * index);
+    extra.navigate(`${service.url}/?window=${index}`);
+    console.log(`NETSCRIPT_WINDOW ${JSON.stringify({ index, openMs: Math.round(performance.now() - t), sinceStartMs: Math.round(performance.now() - started) })}`);
+  }
 }

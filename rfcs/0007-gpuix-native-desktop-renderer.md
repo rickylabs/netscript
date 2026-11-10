@@ -1,7 +1,7 @@
 ---
-rfc: 0000
+rfc: 0007
 title: Native GPU desktop renderer (GPUIX + Preact) for NetScript desktop apps
-status: Draft
+status: Accepted
 authors: ['@rickylabs']
 created: 2026-11-09
 tracking-issue: https://github.com/rickylabs/netscript/issues/2602
@@ -29,7 +29,8 @@ With the real NetScript backend shipped in the same installer and supervised by 
 dominates the footprint (1.4–1.7 GB across nine processes). A 250 ms live-update budget halves
 GPUIX's CPU on the laptop, but it cuts the webview's even more: with the same budget the webview
 stays 2–3.7× cheaper on a real GPU. Reaching gate 1 needs incremental rendering in GPUIX, not only
-an app-side update policy.
+an app-side update policy. Multi-window works on both hosts; GPUIX windows share one process and its
+state, at about 60 MB per extra window against 170 MB for a webview window.
 
 This RFC is backed by a working proof of concept (PoC), benchmarks on Linux and on a Windows laptop,
 and installable builds: `.llm/runs/rfc-gpuix-desktop--rfc/` (research, evidence, PoC source).
@@ -263,16 +264,93 @@ WebView2's (38% to 10%), so under the same policy the webview stays 3.7× cheape
 cheaper as a host process on the real stack. The Linux container had pointed the other way (GPUIX
 46% against 70%) because WebKitGTK composites in software there; on a real GPU the browser's
 damage-tracked compositing wins. GPUI still redraws the window for every committed change, which is
-what incremental rendering upstream has to fix. The Windows start time of the graph (11–13 s against
-3 s on Linux) is a separate problem for any "backend in the box" desktop app, whatever the renderer,
-and is not yet attributed (candidates: Defender scanning the per-instance workspace copy and the
-dependency cache, nine console processes, per-profile transpilation).
+what incremental rendering upstream has to fix. The Windows start time of the graph (12–16 s warm,
+136 s on the first launch after install, against 3 s on Linux) is a separate problem for any
+"backend in the box" desktop app, whatever the renderer; see "Windows start time of a supervised
+backend" below.
 
-Upstream findings from this work: the 0.0.9 workers, sagas and triggers schemas do not migrate on
-SQLite; the AppHost wires no plugin references into services, so the scaffold's record-activity
-publisher never gets the streams URL; `workers.subscribe` on a Garnet KV sends only its initial
-snapshots; `netscript deploy build` emitted an empty graph; and processes started by a
-`deno desktop` app inherit `DENO_SERVE_ADDRESS` and bind the window's port.
+### Multi-window
+
+Both hosts open several windows from one app. With GPUIX each window is another renderer in the same
+process: it mounts the same component tree against the same signals, SDK client and stream, so state
+is shared directly and nothing is bound per window (extra windows opened in 64–71 ms).
+`deno desktop` creates windows with `new Deno.BrowserWindow()`; each is a separate page with its own
+JavaScript context, stream connection and `bind()` RPC binding, and `navigate()` needs an absolute
+URL.
+
+Linux container, software rendering, embedded service, medians
+(`evidence/bench-linux-multiwindow.json`):
+
+| Windows | GPUIX memory (PSS) | Webview memory (PSS) | GPUIX idle CPU | Webview idle CPU | GPUIX CPU, 20/s | Webview CPU, 20/s |
+| ------- | ------------------ | -------------------- | -------------- | ---------------- | --------------- | ----------------- |
+| 1       | 281 MB             | 409 MB, 3 processes  | 1.6%           | 34.3%            | 204%            | 116%              |
+| 2       | 343 MB             | 579 MB, 4 processes  | 1.9%           | 63.9%            | 356%            | 197%              |
+| 3       | 402 MB             | 744 MB, 5 processes  | 2.2%           | 85.4%            | 485%            | 263%              |
+
+An extra window costs about 60 MB with GPUIX against about 170 MB and one more renderer process with
+the webview. Under a constant 20 updates/s without a budget every GPUIX window redraws on each
+commit, so CPU grows by about 140% per window here (software rendering inflates both CPU columns;
+the laptop numbers above are the reference for CPU). Shared in-process state is the multi-window
+advantage that matters for apps with bindings: a second GPUIX window needs no RPC binding, stream or
+session of its own.
+
+Upstream findings from this work, filed with reproductions:
+
+- #2605: the 0.0.9 workers, sagas and triggers Prisma fragments are PostgreSQL-only, so `db init` on
+  SQLite fails with 87 validation errors; the scaffolded `db:validate` misses them and the failure
+  is reported as a headless-terminal problem.
+- #2604: `workers.subscribe` never streams execution events: it watches the legacy kvdex prefix
+  while executions are stored under `['workers', 'executions']` (any KV backend).
+- #2606: `netscript deploy build` reads `dotnet/AppHost/appsettings.json`, compiles no service,
+  writes PostgreSQL settings for a SQLite workspace and reports success.
+- #2607: processes started by a `deno desktop` app inherit `DENO_SERVE_ADDRESS` and bind the
+  window's port.
+- #2608: on Windows every stop of a background processor counts as a crash, so `sagas` and
+  `triggers` report `crash-looping` for 60 s after quick relaunches.
+- #2609: the Windows start-time profile below.
+
+Linking a service to streams needs `plugin install streams --service <name>` (documented since
+#2592); the PoC scaffold had omitted the flag.
+
+### Windows start time of a supervised backend
+
+`poc/bench/windows-stack-start.ps1` on the laptop, Defender real-time protection on
+(`evidence/windows-stack-start-yogabook9i.json`):
+
+| Launch                     | Graph ready | Dominated by                                                                                                                     |
+| -------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| First launch after install | 135.9 s     | first-run scans: first `deno.exe` run 5.0 s (later 0.02 s), first Garnet start 4.4 s (later 1.0 s), 374-file profile copy 12.4 s |
+| New profile, caches warm   | 14.3–16.1 s | each Deno node 1.6–5.7 s to healthy (Linux 0.3–1.8 s) along a four-level dependency chain                                        |
+| Relaunch, same profile     | 12.3–13.1 s | the same: the per-profile copy and transpilation are not the cost                                                                |
+| Relaunch outlier           | 71.9 s      | `sagas` and `triggers` held in `crash-looping` for 60 s (#2608)                                                                  |
+
+Each Deno process resolves its module graph from a 41,165-file dependency cache, which on-access
+scanning makes expensive on Windows; the graph also runs a `conhost.exe` per console child.
+
+### Shipping the backend: what a desktop package needs
+
+The PoC and eis-chat (which ships its NetScript backend in one MSI today) converge on these rules
+for a desktop app that carries its own backend:
+
+1. **Bundle, then compile or run.** `deno compile` embeds the project's npm resolution; bundle each
+   process first and keep only true natives external. Bundling each backend node the same way also
+   replaces thousands of module reads per start with one file.
+2. **Strip `DENO_*` from children** (#2607) and give each child explicit data-path variables.
+3. **Per-user state only.** Run every child in a per-user data directory (its own workspace copy
+   when the runtime resolves files from its working directory); the install directory stays
+   read-only.
+4. **Owned ports.** Pick loopback ports outside the OS ephemeral ranges, hold them until the child
+   binds, and confirm the listener belongs to the child before declaring it ready.
+5. **Start by dependency level, in parallel**, and gate the UI on readiness rather than serializing.
+6. **Stop gracefully and reap reliably.** Windows has no graceful signal for console children
+   (#2608); add a stop request, and put a Job Object (or equivalent) around the tree for crashes.
+7. **No console hosts.** Start children without a console window, or compile them as GUI-subsystem
+   binaries.
+8. **Self-contained third-party servers.** Garnet's release binaries need an installed .NET runtime;
+   ship a self-contained publish.
+9. **Quiet by default.** Telemetry export and debug logging only when diagnosing.
+10. **Measure the three starts** (first launch after install, new profile, relaunch) on Windows with
+    Defender on, and show progress while the first one pays the scans.
 
 ## Guide-level explanation
 
@@ -416,8 +494,8 @@ Zed (GPUI), React Native and NativeWind (non-DOM renderers, class-to-style compi
 - Should the primitives collection become the default component layer for web as well?
 - Should the live-update budget be a framework default (SDK stream consumer or signals layer) for
   every host? It cut WebView2's CPU from 38% to 10% on the laptop.
-- Why does the supervised graph take 11–13 s to start on Windows against 3 s on Linux, and does a
-  relaunch with an existing profile avoid most of it?
+- How far do per-node bundling, a flatter start order and fewer processes bring the Windows start of
+  a supervised backend down (#2609)?
 - How should a desktop app ship its backend: a supervised graph of processes as in the PoC, the
   single-executable packaging tracked by epic #830, or each node bundled with `deno bundle` and run
   by one shared runtime (which would drop most of the dependency cache)?

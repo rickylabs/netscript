@@ -36,6 +36,7 @@ const winProbe = await Deno.readTextFile(`${EVIDENCE}/probe-windows-yogabook9i.j
 }).catch(() => null);
 const realBench = await Deno.readTextFile(`${EVIDENCE}/bench-linux-realstack.json`).then((text) => JSON.parse(text) as { environment: Record<string, unknown>; variants: Record<string, Variant> }).catch(() => null);
 const realWin = await Deno.readTextFile(`${EVIDENCE}/bench-windows-realstack-yogabook9i.json`).then((text) => JSON.parse(text) as { environment: Record<string, unknown> & { machine?: Record<string, unknown> }; variants: Record<string, Variant> }).catch(() => null);
+const multiWindow = await Deno.readTextFile(`${EVIDENCE}/bench-linux-multiwindow.json`).then((text) => JSON.parse(text) as { variants: Record<string, Variant> }).catch(() => null);
 const realSizes = await Deno.readTextFile(`${EVIDENCE}/realstack-sizes.json`).then((text) => JSON.parse(text) as Record<string, number>).catch(() => ({} as Record<string, number>));
 const runtimes = await Deno.readTextFile(`${EVIDENCE}/runtime-portability.json`).then((text) => JSON.parse(text) as Array<{ runtime: string; readyMs: number; rssMb: number }>).catch(() => []);
 
@@ -366,14 +367,34 @@ function realStackSection(): string {
       <tr><th scope="row">Garnet, self-contained</th><td>${size('garnet')}</td></tr>
       <tr><th scope="row">Workspace + seed database</th><td>${size('workspace')}</td></tr>
     </tbody></table><p class="muted">Bundling before compiling took the GPUIX binary from 915 MB to 172 MB. The dependency cache is the next target: bundling each graph node the same way would drop most of it.</p></div>
-    <div class="card"><h3>Found on the way <span class="eyebrow">upstream findings</span></h3><ul class="prose">
-      <li>0.0.9 workers, sagas and triggers schemas don't migrate on SQLite (Postgres native types, scalar lists, Postgres-only SQL).</li>
-      <li>The AppHost gives services no plugin references, so the scaffold's record-activity publisher never gets the streams URL.</li>
-      <li><code>workers.subscribe</code> on a Garnet KV sends its initial snapshots only, no live execution events.</li>
-      <li>Children of <code>deno desktop</code> inherit <code>DENO_SERVE_ADDRESS</code> and bind the window's port.</li>
-      <li>Garnet's release archives need a .NET 10 runtime; a self-contained publish is required to ship it.</li>
+    <div class="card"><h3>Found on the way <span class="eyebrow">filed upstream</span></h3><ul class="prose">
+      <li>#2605: the 0.0.9 workers, sagas and triggers schemas are PostgreSQL-only; <code>db init</code> on SQLite fails with 87 errors.</li>
+      <li>#2604: <code>workers.subscribe</code> watches a legacy key prefix, so no live execution event ever arrives (any KV backend).</li>
+      <li>#2606: <code>deploy build</code> reads <code>dotnet/AppHost/appsettings.json</code>, compiles nothing and reports success.</li>
+      <li>#2607: children of <code>deno desktop</code> inherit <code>DENO_SERVE_ADDRESS</code> and bind the window's port.</li>
+      <li>#2608: on Windows every stop counts as a crash; sagas and triggers stall 60 s after quick relaunches.</li>
+      <li>#2609: Windows start time: 136 s on the first launch after install, 12–16 s warm.</li>
+      <li>Garnet's release binaries need an installed .NET runtime; a self-contained publish is required to ship it.</li>
     </ul></div>
   </div>
+</section>`;
+}
+
+/** Several windows from one app: GPUIX renderers in one process vs webview pages. */
+function multiWindowSection(): string {
+  if (!multiWindow) return '';
+  const V = multiWindow.variants;
+  const row = (n: number) => {
+    const g = V[n === 1 ? 'gpuix' : `gpuix-w${n}`];
+    const w = V[n === 1 ? 'webview' : `webview-w${n}`];
+    if (!g || !w) return '';
+    return `<tr><th scope="row">${n}</th><td>${fmt(g.memoryMb.pssMedian ?? g.memoryMb.rssMedian)} MB</td><td>${fmt(w.memoryMb.pssMedian ?? w.memoryMb.rssMedian)} MB · ${w.processCount} proc</td><td>${fmt(g.idleCpuPct.median, 1)}%</td><td>${fmt(w.idleCpuPct.median, 1)}%</td><td>${fmt(g.activeCpuPct.median)}%</td><td>${fmt(w.activeCpuPct.median)}%</td></tr>`;
+  };
+  return `<section aria-labelledby="multiwindow">
+  <div class="sec-head"><span class="eyebrow">Multi-window · Linux, software rendering</span><h2 id="multiwindow">Several windows, one app</h2>
+  <p class="prose muted">Both hosts open extra windows. A GPUIX window is another renderer in the same process: same signals, SDK client and stream, nothing bound per window (opened in 64–71 ms). A <code>deno desktop</code> window is another page with its own JavaScript, stream and <code>bind()</code> RPC binding; <code>navigate()</code> needs an absolute URL.</p></div>
+  <div class="card"><div class="scroll"><table class="data"><thead><tr><th>Windows</th><th>GPUIX memory</th><th>Webview memory</th><th>GPUIX idle</th><th>Webview idle</th><th>GPUIX 20/s</th><th>Webview 20/s</th></tr></thead><tbody>${row(1)}${row(2)}${row(3)}</tbody></table></div>
+  <p class="muted">About 60 MB per extra GPUIX window against 170 MB and a renderer process per webview window. Without an update budget every GPUIX window redraws on each commit, so CPU grows by about 140% per window under constant updates (software rendering inflates both CPU columns).</p></div>
 </section>`;
 }
 
@@ -513,7 +534,7 @@ pre.mermaid { background: var(--surface); border: 1px solid var(--line); padding
     <div class="answer"><span class="q">2 · Connection to the NetScript ecosystem</span><span class="verdict v-yes">In one process</span><p>Service, typed SDK client, durable-stream consumer and KV run in the same process as the window. The webview RPC bridge disappears. Gaps: cookie sessions (bridged to bearer), auto-update adapter, packaging backend, a native component kit.</p></div>
     <div class="answer"><span class="q">3 · Working PoC + benchmark</span><span class="verdict v-partial">Built · measured · mixed</span><p>Scaffold-style workspace app: overview, records, record detail, health, design, settings, sign-in, in light and dark. One process; ${memW ? `${pct(memG, memW)}% less memory than the WebKit webview and ${pct(memG, memC)}% less than CEF` : 'lower memory'}; on your laptop half the memory of WebView2 and many instances where WebView2 stalls. But 2.2× its CPU under frequent updates, almost all in GPUI's UI thread. With the real backend in the box (Garnet, SQLite, users, workers, sagas, triggers, streams) the backend dominates memory. A 250 ms update budget halves GPUIX's CPU on your laptop, but WebView2 benefits even more, so the webview stays 2–3.7× cheaper under the same policy.</p></div>
     <div class="answer"><span class="q">4 · Installable for your laptop</span><span class="verdict v-yes">Windows · macOS · Linux</span><p>NSIS installer and portable zip for Windows x64 and a Linux tarball, both shipping the real NetScript stack and supervising it; an ad-hoc-signed app for Apple Silicon (embedded service). Each includes <code>--bench</code> to rerun every variant on your real GPU.</p></div>
-    <div class="answer"><span class="q">5 · RFC</span><span class="verdict v-partial">Incubate, gated</span><p>Gate 1 (real-GPU CPU) is not met, also with the GPUIX-first variant: it needs incremental rendering upstream in GPUIX. An opt-in native desktop track (<code>rfcs/0000-gpuix-native-desktop-renderer.md</code>). The Deno Desktop webview stays the default until the real-GPU benchmark, upstream maturity, accessibility and packaging gates pass.</p></div>
+    <div class="answer"><span class="q">5 · RFC</span><span class="verdict v-partial">Incubate, gated</span><p>Gate 1 (real-GPU CPU) is not met, also with the GPUIX-first variant: it needs incremental rendering upstream in GPUIX. An opt-in native desktop track (<code>rfcs/0007-gpuix-native-desktop-renderer.md</code>). The Deno Desktop webview stays the default until the real-GPU benchmark, upstream maturity, accessibility and packaging gates pass.</p></div>
     <div class="answer"><span class="q">+ · Fresh on GPUIX?</span><span class="verdict v-neutral">2.x no · 3.x later</span><p>Unchanged Fresh pages can't run on GPUIX: GPUIX has no CSS engine. Fresh 2 has no renderer seam. Fresh 3 does (<code>renderPage(inner)</code>), so a native render target is a credible future plugin; the PoC's router already uses its route-module shape.</p></div>
   </div>
 </section>
@@ -532,6 +553,8 @@ pre.mermaid { background: var(--surface); border: 1px solid var(--line); padding
 ${windowsSection()}
 
 ${realStackSection()}
+
+${multiWindowSection()}
 
 <section aria-labelledby="bench">
   <div class="sec-head"><span class="eyebrow">Linux benchmark (software rendering) · ${esc(String(env.os ?? 'linux-x86_64'))} · ${esc(String(env.cpus ?? ''))} CPUs · 5 cold runs, 3 active runs per host</span><h2 id="bench">Measurements</h2>

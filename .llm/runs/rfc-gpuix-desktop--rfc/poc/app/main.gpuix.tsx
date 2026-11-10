@@ -213,10 +213,32 @@ const host: HostServices = {
         rssMb: Math.round(Deno.memoryUsage().rss / 1_048_576),
         ...(realStack ? { stackReadyMs: realStack.graph.readyMs, stackPids: realStack.graph.pids() } : {}),
       })}`);
+      if (windowCount > 1) openExtraWindows();
     }, 24);
   },
 };
 installHost(host);
+
+// Extra windows (NETSCRIPT_WINDOWS=N): same process, same signals, SDK client and stream — each
+// window is just another GPUIX renderer mounting the app tree.
+const windowCount = Math.max(1, Number(Deno.env.get('NETSCRIPT_WINDOWS') ?? 1));
+function openExtraWindows(): void {
+  for (let index = 2; index <= windowCount; index++) {
+    const t = performance.now();
+    render(<App />, {
+      title: `NetScript (${index})`,
+      appName: 'NetScript',
+      appId: 'dev.netscript.gpuix-poc',
+      width: 1100,
+      height: 720,
+      minWidth: 800,
+      minHeight: 500,
+      onClose: () => {},
+      ...(uiMode === 'native' ? { framePump: 'adaptive' as const, idleFrameMs: 50 } : {}),
+    });
+    console.log(`NETSCRIPT_WINDOW ${JSON.stringify({ index, openMs: Math.round(performance.now() - t), sinceStartMs: Math.round(performance.now() - started) })}`);
+  }
+}
 
 const forcedScheme = Deno.env.get('NETSCRIPT_SCHEME');
 await boot({

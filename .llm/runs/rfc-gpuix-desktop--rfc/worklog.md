@@ -196,3 +196,34 @@ Graph on Windows: 18 processes (conhost per deno.exe), 1.68 GB, ~100% CPU under 
 10.9–12.8 s on a fresh profile (first run per variant 18–28 s; Linux 3 s), cause not yet attributed.
 Four GPUIX real-stack instances started in 34–40 s; four WebView2 instances never started. RFC summary,
 real-stack section, gate 1 status, drawbacks and unresolved questions updated; report republished.
+
+### Owner acceptance and follow-ups (2026-11-10)
+
+Owner: "the RFC is fine to ship", plus a multi-window test, upstream issues with repros, the Windows
+start-time chase and an eis-chat review.
+
+- **Upstream issues filed** (repros on this branch): #2604 workers subscribe watches the legacy kvdex
+  prefix (`poc/bench/garnet-watch-repro.ts`: 46 watch messages on `kv:__watch__`, 0 kvdex keys, no
+  `execution.*` events); #2605 PostgreSQL-only plugin schemas, 87 Prisma errors on SQLite
+  (`poc/repro/sqlite-plugins.sh`); #2606 `deploy build` reads `dotnet/AppHost/appsettings.json`; #2607
+  `DENO_SERVE_ADDRESS` inheritance; #2608 Windows crash-loop stall after relaunches; #2609 Windows start
+  time. Not filed: streams service linking (by design since #2592, `--service <name>`). Corrections: D21,
+  D22.
+- **Windows start time** (`evidence/windows-stack-start-yogabook9i.json`): 135.9 s on the first launch
+  after install (Defender first-run scans: deno.exe 5.0 s, Garnet 4.4 s, profile copy 12.4 s), 14–16 s on
+  a new profile, 12–13 s on relaunch; per Deno node 1.6–5.7 s; one relaunch 71.9 s from the crash-loop
+  window (CHILD_CRASH_LOOP_THRESHOLD 3 restarts / 60 s; Windows kills count as restarts). The first probe
+  run stopped unrelated processes on the laptop (Ollama, a cmd.exe) via a parent-PID walk; the script now
+  checks creation time and executable path, and the owner was told.
+- **Garnet runtime**: the release `GarnetServer.exe` (1.1.10 and 2.2.1) is a framework-dependent
+  single-file apphost (no static runtime markers); the Linux binary prints "You must install .NET".
+- **Multi-window** (`evidence/bench-linux-multiwindow.json`): both hosts work. GPUIX extra windows share
+  the process (64–71 ms to open, +60 MB each); webview windows are pages with their own context,
+  stream and binding (+170 MB and a process each). CPU per extra window under constant updates: GPUIX
+  +140%, webview +75% (software rendering).
+- **eis-chat review** (`~/projects/eis-chat/runs/2026-11-10-desktop-packaging-review/review.md`): already
+  bundles before compiling, strips `DENO_*`, uses LocalAppData and a Job Object; gaps: fixed ports with
+  ownerless readiness, unmeasured serial start, telemetry always on, six runtimes, and Garnet 1.1.10 that
+  probably needs an installed .NET despite the docs.
+- **RFC accepted**: numbered `rfcs/0007-gpuix-native-desktop-renderer.md`, status Accepted; sections
+  added for multi-window, the Windows start time and "Shipping the backend".

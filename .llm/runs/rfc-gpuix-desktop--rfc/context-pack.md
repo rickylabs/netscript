@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------------------------------------- |
 | Run ID         | `rfc-gpuix-desktop--rfc`                                             |
 | Branch         | `docs/rfc-gpuix-native-desktop`                                      |
-| Current phase  | `owner review` (real-stack follow-up complete, laptop measured)      |
+| Current phase  | `accepted` — RFC 0007, merge of PR #2603                              |
 | Archetype      | RFC describes 2 (integration) + 6/7 (CLI/deploy) + SDK/service seams |
 | Scope overlays | `SCOPE-docs`                                                         |
 
@@ -34,7 +34,7 @@ upstream incremental rendering. Open: why the graph takes 11–13 s to start on 
 - Q2: integration map (`research.md`); papercuts: SDK `cookie` reservation, RPC path default mismatch.
 - Q3: PoC app + integration test; bench `evidence/bench-linux-software.json`, threads breakdown.
 - Q4: installables `~/projects/netscript/artifacts/gpuix-poc/` + `SHA256SUMS`; Linux in-app bench verified.
-- Q5: `rfcs/0000-gpuix-native-desktop-renderer.md`.
+- Q5: `rfcs/0007-gpuix-native-desktop-renderer.md`.
 - Follow-ups: Fresh 2/3 analysis; HTML report (private Artifact `https://claude.ai/artifact/8YpspJ3ZbE1mhpLf4ayFQH`, local copy in artifacts dir).
 
 ## Next Steps

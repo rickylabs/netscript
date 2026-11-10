@@ -56,12 +56,20 @@ for ($i = 0; $i -lt 3; $i++) {
 }
 $result.primitives.garnetReadyMs = $garnetTimes
 
-function Get-Tree([int]$RootId) {
-  $all = Get-CimInstance Win32_Process | Select-Object ProcessId, ParentProcessId, Name, WorkingSetSize
+# Owned identity only: Windows reuses PIDs, so a parent-id walk alone can adopt unrelated processes
+# whose (dead) parent id was reused. Keep a process only if it started after the app and its
+# executable lives under the app folder, or it is a conhost.exe attached to one of those.
+function Get-Tree([int]$RootId, [datetime]$Since) {
+  $all = Get-CimInstance Win32_Process | Select-Object ProcessId, ParentProcessId, Name, WorkingSetSize, CreationDate, ExecutablePath
   $ids = [Collections.Generic.HashSet[int]]::new(); [void]$ids.Add($RootId)
   do {
     $added = $false
-    foreach ($p in $all) { if ($ids.Contains([int]$p.ParentProcessId) -and $ids.Add([int]$p.ProcessId)) { $added = $true } }
+    foreach ($p in $all) {
+      if ($ids.Contains([int]$p.ParentProcessId) -and $p.CreationDate -ge $Since -and -not $ids.Contains([int]$p.ProcessId)) {
+        $owned = ($p.ExecutablePath -and $p.ExecutablePath.StartsWith($App, [StringComparison]::OrdinalIgnoreCase)) -or $p.Name -eq 'conhost.exe'
+        if ($owned) { [void]$ids.Add([int]$p.ProcessId); $added = $true }
+      }
+    }
   } while ($added)
   return @($all | Where-Object { $ids.Contains([int]$_.ProcessId) })
 }
@@ -71,6 +79,7 @@ function Start-Once([string]$ProfileDir, [string]$Kind) {
   Remove-Item $log, "$log.err" -ErrorAction SilentlyContinue
   $env:NETSCRIPT_BENCH = '1'
   $env:NETSCRIPT_STACK = 'real'
+  $since = (Get-Date).AddSeconds(-1)
   $sw = [Diagnostics.Stopwatch]::StartNew()
   $p = Start-Process $exe -ArgumentList "--profile=$ProfileDir" -RedirectStandardOutput $log -RedirectStandardError "$log.err" -PassThru
   $ready = $null
@@ -83,7 +92,7 @@ function Start-Once([string]$ProfileDir, [string]$Kind) {
   }
   $wallMs = [math]::Round($sw.Elapsed.TotalMilliseconds)
   Start-Sleep -Seconds 3
-  $tree = Get-Tree $p.Id
+  $tree = Get-Tree $p.Id $since
   $supervisor = $null
   $supFile = Join-Path $ProfileDir 'stack\logs\supervisor.json'
   if (Test-Path $supFile) { $supervisor = Get-Content $supFile -Raw | ConvertFrom-Json }
@@ -94,9 +103,13 @@ function Start-Once([string]$ProfileDir, [string]$Kind) {
   $exited = $p.WaitForExit(15000)
   $closeMs = [math]::Round($closeSw.Elapsed.TotalMilliseconds)
   Start-Sleep -Seconds 2
-  $leftIds = @($tree | ForEach-Object { $_.ProcessId })
-  $left = @(Get-Process -Id $leftIds -ErrorAction SilentlyContinue | Select-Object Id, ProcessName)
-  foreach ($l in $left) { Stop-Process -Id $l.Id -Force -ErrorAction SilentlyContinue }
+  # Re-check identity before reporting or stopping anything: same PID and same creation time.
+  $left = @()
+  foreach ($t in $tree) {
+    $now = Get-CimInstance Win32_Process -Filter "ProcessId = $($t.ProcessId)" -ErrorAction SilentlyContinue
+    if ($now -and $now.CreationDate -eq $t.CreationDate) { $left += [pscustomobject]@{ Id = $t.ProcessId; ProcessName = $t.Name } }
+  }
+  foreach ($l in $left) { if ($l.ProcessName -ne 'conhost.exe') { Stop-Process -Id $l.Id -Force -ErrorAction SilentlyContinue } }
   if (-not $exited) { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue }
 
   return [ordered]@{

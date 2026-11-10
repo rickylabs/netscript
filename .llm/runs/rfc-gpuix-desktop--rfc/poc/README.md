@@ -1,6 +1,6 @@
 # GPUIX desktop PoC
 
-Evidence for `rfcs/0000-gpuix-native-desktop-renderer.md`. A NetScript workspace app (overview,
+Evidence for `rfcs/0007-gpuix-native-desktop-renderer.md`. A NetScript workspace app (overview,
 records, record detail, health, design, settings, sign-in) rendered natively by GPUI through GPUIX,
 with Preact, an embedded `@netscript/service`, the typed SDK client, a durable activity stream and
 Deno KV in one process. The same component tree also renders as HTML for the webview baselines.

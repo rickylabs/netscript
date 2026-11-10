@@ -25,6 +25,11 @@ const ALL: BenchVariant[] = [
   // GPUIX-first variant: native virtual lists, live-update budget, adaptive frame pump.
   { id: 'gpuix-native', label: 'GPUIX-first + Preact', command: 'build/linux-x64/netscript-gpuix', env: { ...EMBEDDED, NETSCRIPT_UI: 'native' } },
   { id: 'gpuix-native-real', label: 'GPUIX-first · real stack', command: 'build/linux-x64/netscript-gpuix', env: { ...REAL, NETSCRIPT_UI: 'native' } },
+  // Multi-window: extra windows in the same app (GPUIX: same process and heap; webview: extra pages).
+  { id: 'gpuix-w2', label: 'GPUIX · 2 windows', command: 'build/linux-x64/netscript-gpuix', env: { ...EMBEDDED, NETSCRIPT_WINDOWS: '2' } },
+  { id: 'gpuix-w3', label: 'GPUIX · 3 windows', command: 'build/linux-x64/netscript-gpuix', env: { ...EMBEDDED, NETSCRIPT_WINDOWS: '3' } },
+  { id: 'webview-w2', label: 'Deno Desktop · WebKitGTK · 2 windows', command: 'build/netscript-webview/netscript-webview', profileViaEnv: true, env: { ...EMBEDDED, NETSCRIPT_WINDOWS: '2' } },
+  { id: 'webview-w3', label: 'Deno Desktop · WebKitGTK · 3 windows', command: 'build/netscript-webview/netscript-webview', profileViaEnv: true, env: { ...EMBEDDED, NETSCRIPT_WINDOWS: '3' } },
   // Controls: the budget alone on GPUIX (no adaptive pump), and on the webview
   { id: 'gpuix-budget', label: 'GPUIX + Preact · 250 ms budget only', command: 'build/linux-x64/netscript-gpuix', env: { ...EMBEDDED, NETSCRIPT_LIVE_BUDGET_MS: '250' } },
   // Control: the webview with the same 250 ms live-update budget (the renderer-agnostic part of GPUIX-first).

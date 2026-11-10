@@ -20,7 +20,7 @@ exec docker run --rm --name "$NAME" --label owner=gpuix-eval $CPUS \
   -v "$ROOT:$ROOT" -w "$WORKDIR" \
   -e HOME="$HOME_DIR" -e DENO_DIR="$HOME_DIR/deno" -e BUN_INSTALL_CACHE_DIR="$HOME_DIR/bun-cache" \
   -e npm_config_cache="$HOME_DIR/npm-cache" -e NO_COLOR=1 -e NETSCRIPT_BENCH -e NETSCRIPT_BENCH_RATE -e NETSCRIPT_BENCH_PROFILE -e NETSCRIPT_SCHEME -e NETSCRIPT_PATH \
-  -e NETSCRIPT_STACK -e NETSCRIPT_STACK_DIR -e NETSCRIPT_STACK_ONLINE -e READY_TRIES -e NETSCRIPT_UI -e NETSCRIPT_LIVE_BUDGET_MS \
+  -e NETSCRIPT_STACK -e NETSCRIPT_STACK_DIR -e NETSCRIPT_STACK_ONLINE -e READY_TRIES -e NETSCRIPT_UI -e NETSCRIPT_LIVE_BUDGET_MS -e NETSCRIPT_WINDOWS \
   gpuix-eval-bench:1 bash -c '
     mkdir -p /tmp/xdg && chmod 700 /tmp/xdg
     Xvfb :99 -screen 0 1440x900x24 -nolisten tcp >/tmp/xvfb.log 2>&1 &
