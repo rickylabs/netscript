@@ -71,10 +71,10 @@ export interface RunningGraph {
  * Reserve an unused loopback port, unique within this graph, and keep it bound until the node
  * spawns (narrows the window in which another instance can take it).
  *
- * - Explicit random ports, not `port: 0`: inside `deno desktop`, port-0 listeners are taken over by
- *   the window's auto-binding, so every node would receive the same port.
  * - 20000–31999: below the ephemeral ranges of Linux (32768+) and Windows (49152+), so outgoing
- *   connections of other processes cannot occupy a chosen port.
+ *   connections of other processes cannot occupy a chosen port, and a held listener narrows the
+ *   window in which another instance can take it. (The `AddrInUse` seen under `deno desktop` came
+ *   from the inherited `DENO_SERVE_ADDRESS`, cleared in graph.ts, not from port-0 allocation.)
  */
 function reservePort(taken: Set<number>): { port: number; listener: Deno.Listener } {
   for (let attempt = 0; attempt < 500; attempt++) {

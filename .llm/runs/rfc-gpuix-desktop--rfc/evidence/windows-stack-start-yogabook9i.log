@@ -1,0 +1,7 @@
+wrote C:\Users\chaut\Downloads\NetScript-GPUIX-PoC-realstack\stack-start.json
+fresh-profile  ready 148847 ms  graph 135880 ms  first spawn at 12438 ms  slowest: workers-api 78661 ms, streams 25369 ms, users 24881 ms  procs 24  close 1280 ms leftover 5
+fresh-profile  ready  18300 ms  graph  16119 ms  first spawn at  1443 ms  slowest: triggers-api 5743 ms, workers-api 4701 ms, workers 4566 ms  procs 19  close 1053 ms leftover 0
+fresh-profile  ready  16255 ms  graph  14270 ms  first spawn at   664 ms  slowest: triggers-api 5208 ms, workers 4261 ms, sagas-api 4198 ms  procs 19  close 1156 ms leftover 0
+relaunch       ready  14382 ms  graph  13091 ms  first spawn at    10 ms  slowest: sagas-api 4728 ms, workers 4110 ms, triggers 3631 ms  procs 19  close 1042 ms leftover 0
+relaunch       ready  14232 ms  graph  12289 ms  first spawn at    11 ms  slowest: triggers-api 3856 ms, workers 3365 ms, workers-api 3126 ms  procs 19  close 1022 ms leftover 0
+relaunch       ready  73384 ms  graph  71918 ms  first spawn at    11 ms  slowest: sagas 62258 ms, triggers 61780 ms, workers-api 3744 ms  procs 19  close 1262 ms leftover 0
