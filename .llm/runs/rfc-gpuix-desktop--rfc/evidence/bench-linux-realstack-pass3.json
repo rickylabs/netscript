@@ -1,0 +1,243 @@
+{
+  "environment": {
+    "date": "2026-11-09T21:09:54.409Z",
+    "os": "linux-x86_64",
+    "osRelease": "6.18.34+",
+    "cpus": 16,
+    "loadavg": [
+      4.6435546875,
+      6.04052734375,
+      6.14306640625
+    ],
+    "memoryTotalMb": 94296,
+    "method": "cold = spawn→data-backed frame painted, fresh profile; memory = process tree 3 s after ready; idle/active CPU = tree CPU time over a window, % of one core",
+    "renderer": "Xvfb 1440x900x24 + Mesa lavapipe (software Vulkan); WebKitGTK/CEF software compositing",
+    "note": "No GPU here: CPU numbers include software rasterization for every host. Run `NetScript --bench` on real hardware."
+  },
+  "variants": {
+    "gpuix-budget": {
+      "label": "GPUIX + Preact · 250 ms budget only",
+      "coldStartMs": {
+        "median": 950,
+        "min": 896,
+        "max": 1525,
+        "samples": [
+          1525,
+          896,
+          950,
+          1011,
+          939
+        ]
+      },
+      "memoryMb": {
+        "rssMedian": 295,
+        "pssMedian": 280
+      },
+      "processCount": 1,
+      "processes": [
+        {
+          "name": "netscript-gpuix",
+          "rssMb": 296
+        }
+      ],
+      "idleCpuPct": {
+        "median": 1.7,
+        "samples": [
+          1.8,
+          1.7,
+          1.8,
+          1.5,
+          1.7
+        ]
+      },
+      "activeCpuPct": {
+        "median": 45.6,
+        "samples": [
+          45.6,
+          43.8,
+          47
+        ],
+        "rssMedianMb": 320
+      },
+      "parallel": [
+        {
+          "instances": 1,
+          "allReadyMs": 868,
+          "totalRssMb": 296,
+          "totalPssMb": 280,
+          "rssPerInstanceMb": 296
+        }
+      ]
+    },
+    "webview-budget": {
+      "label": "Deno Desktop · WebKitGTK · 250 ms budget",
+      "coldStartMs": {
+        "median": 833,
+        "min": 774,
+        "max": 2411,
+        "samples": [
+          2411,
+          833,
+          1124,
+          774,
+          791
+        ]
+      },
+      "memoryMb": {
+        "rssMedian": 515,
+        "pssMedian": 406
+      },
+      "processCount": 3,
+      "processes": [
+        {
+          "name": "netscript-webvi",
+          "rssMb": 199
+        },
+        {
+          "name": "WebKitNetworkPr",
+          "rssMb": 41
+        },
+        {
+          "name": "WebKitWebProces",
+          "rssMb": 274
+        }
+      ],
+      "idleCpuPct": {
+        "median": 36.5,
+        "samples": [
+          34.9,
+          34,
+          36.5,
+          36.6,
+          37.1
+        ]
+      },
+      "activeCpuPct": {
+        "median": 70,
+        "samples": [
+          68.2,
+          74.5,
+          70
+        ],
+        "rssMedianMb": 539
+      },
+      "parallel": [
+        {
+          "instances": 1,
+          "allReadyMs": 863,
+          "totalRssMb": 516,
+          "totalPssMb": 408,
+          "rssPerInstanceMb": 516
+        }
+      ]
+    },
+    "webview-budget-real": {
+      "label": "Deno Desktop · WebKitGTK · 250 ms budget · real stack",
+      "coldStartMs": {
+        "median": 3492,
+        "min": 3389,
+        "max": 3678,
+        "samples": [
+          3399,
+          3492,
+          3678,
+          3389,
+          3522
+        ]
+      },
+      "memoryMb": {
+        "rssMedian": 2119,
+        "pssMedian": 1787
+      },
+      "processCount": 12,
+      "processes": [
+        {
+          "name": "netscript-webvi",
+          "rssMb": 213
+        },
+        {
+          "name": "WebKitNetworkPr",
+          "rssMb": 41
+        },
+        {
+          "name": "GarnetServer",
+          "rssMb": 77
+        },
+        {
+          "name": "deno",
+          "rssMb": 110
+        },
+        {
+          "name": "deno",
+          "rssMb": 244
+        },
+        {
+          "name": "deno",
+          "rssMb": 209
+        },
+        {
+          "name": "deno",
+          "rssMb": 211
+        },
+        {
+          "name": "deno",
+          "rssMb": 186
+        },
+        {
+          "name": "deno",
+          "rssMb": 177
+        },
+        {
+          "name": "deno",
+          "rssMb": 171
+        },
+        {
+          "name": "deno",
+          "rssMb": 205
+        },
+        {
+          "name": "WebKitWebProces",
+          "rssMb": 277
+        }
+      ],
+      "idleCpuPct": {
+        "median": 39.8,
+        "samples": [
+          39.8,
+          37.2,
+          40.2,
+          39.1,
+          44.3
+        ]
+      },
+      "activeCpuPct": {
+        "median": 100.7,
+        "samples": [
+          103.1,
+          100.7,
+          100.2
+        ],
+        "rssMedianMb": 2284
+      },
+      "parallel": [
+        {
+          "instances": 1,
+          "allReadyMs": 3454,
+          "totalRssMb": 2121,
+          "totalPssMb": 1781,
+          "rssPerInstanceMb": 2121
+        }
+      ],
+      "split": {
+        "stackReadyMsMedian": 2660,
+        "hostMemoryMb": 417,
+        "stackMemoryMb": 1367,
+        "stackProcesses": 9,
+        "hostIdleCpuPct": 33.2,
+        "stackIdleCpuPct": 6.3,
+        "hostActiveCpuPct": 68.2,
+        "stackActiveCpuPct": 33.4
+      }
+    }
+  }
+}

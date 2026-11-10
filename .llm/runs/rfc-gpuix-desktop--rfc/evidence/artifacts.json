@@ -1,0 +1,30 @@
+[
+  {
+    "name": "NetScript-GPUIX-PoC-0.1.0-windows-x64-setup.exe",
+    "os": "Windows x64 \u00b7 installer \u00b7 real stack",
+    "sizeMb": 205,
+    "sha256": "69ccbd473a1d9f67a90fb0d8575737c7512c3ad56b0a83152fd70c49a3fe64b7",
+    "where": "~/projects/netscript/artifacts/gpuix-poc/realstack/"
+  },
+  {
+    "name": "NetScript-GPUIX-PoC-0.1.0-windows-x64-portable.zip",
+    "os": "Windows x64 \u00b7 portable \u00b7 real stack",
+    "sizeMb": 355,
+    "sha256": "d2aa8696734ba468b47626b61f32c942c42910387a9a981ed58a4e45e66005e1",
+    "where": "~/projects/netscript/artifacts/gpuix-poc/realstack/"
+  },
+  {
+    "name": "NetScript-GPUIX-PoC-0.1.0-linux-x64.tar.gz",
+    "os": "Linux x64 \u00b7 real stack",
+    "sizeMb": 330,
+    "sha256": "e9da2238d4bfc52acf02cf9da0675c3dbf3468ace1a64c167e16587939c5c952",
+    "where": "~/projects/netscript/artifacts/gpuix-poc/realstack/"
+  },
+  {
+    "name": "NetScript-GPUIX-PoC-0.1.0-macos-arm64.zip",
+    "os": "macOS Apple Silicon \u00b7 embedded service",
+    "sizeMb": 70,
+    "sha256": "54a49b84645dd98d4f308f7a54243d6c33ce1beb9c4587ddf96a5d7faddd4577",
+    "where": "~/projects/netscript/artifacts/gpuix-poc/realstack/"
+  }
+]

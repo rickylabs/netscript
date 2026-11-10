@@ -1,0 +1,801 @@
+{
+  "date": "2026-11-10T06:58:15.7934495+01:00",
+  "app": "C:\\Users\\chaut\\Downloads\\NetScript-GPUIX-PoC-realstack\\NetScript",
+  "defender": {
+    "realTime": true,
+    "onAccess": true,
+    "behavior": true,
+    "antivirusEnabled": true
+  },
+  "primitives": {
+    "denoVersionMs": [
+      4962.0,
+      24.0,
+      27.0,
+      26.0,
+      22.0
+    ],
+    "denoEvalMs": [
+      669.0,
+      66.0,
+      63.0
+    ],
+    "denoDirFiles": 41165,
+    "workspaceFiles": 374,
+    "garnetReadyMs": [
+      4407.0,
+      1067.0,
+      1043.0
+    ]
+  },
+  "runs": [
+    {
+      "kind": "fresh-profile",
+      "profile": "C:\\Users\\chaut\\AppData\\Local\\Temp\\ns-start-a256fb4d\\fresh-0",
+      "wallToReadyMs": 148847.0,
+      "ready": {
+        "host": "gpuix-deno",
+        "ui": "portable",
+        "stack": "real",
+        "readyMs": 137161,
+        "rssMb": 322,
+        "stackReadyMs": 135880,
+        "stackPids": [
+          36748,
+          47672,
+          41244,
+          13512,
+          17712,
+          20716,
+          26708,
+          39096,
+          42572
+        ]
+      },
+      "supervisor": {
+        "readyMs": 135880,
+        "nodes": [
+          {
+            "name": "garnet",
+            "port": 28415,
+            "pid": 36748,
+            "spawnedAt": 12438,
+            "readyAt": 14679
+          },
+          {
+            "name": "sagas-api",
+            "port": 30773,
+            "pid": 47672,
+            "spawnedAt": 116486,
+            "readyAt": 132532
+          },
+          {
+            "name": "streams",
+            "port": 29583,
+            "pid": 41244,
+            "spawnedAt": 12455,
+            "readyAt": 37824
+          },
+          {
+            "name": "triggers-api",
+            "port": 26693,
+            "pid": 13512,
+            "spawnedAt": 116513,
+            "readyAt": 129706
+          },
+          {
+            "name": "workers-api",
+            "port": 30971,
+            "pid": 17712,
+            "spawnedAt": 37824,
+            "readyAt": 116485
+          },
+          {
+            "name": "sagas",
+            "port": 22507,
+            "pid": 20716,
+            "spawnedAt": 132532,
+            "readyAt": 135880
+          },
+          {
+            "name": "triggers",
+            "port": 31403,
+            "pid": 26708,
+            "spawnedAt": 129706,
+            "readyAt": 133318
+          },
+          {
+            "name": "workers",
+            "port": 23441,
+            "pid": 39096,
+            "spawnedAt": 116586,
+            "readyAt": 126750
+          },
+          {
+            "name": "users",
+            "port": 25847,
+            "pid": 42572,
+            "spawnedAt": 37837,
+            "readyAt": 62718
+          }
+        ]
+      },
+      "processes": {
+        "total": 24,
+        "byName": [
+          {
+            "name": "cmd.exe",
+            "count": 1,
+            "workingSetMb": 6.0
+          },
+          {
+            "name": "conhost.exe",
+            "count": 11,
+            "workingSetMb": 113.0
+          },
+          {
+            "name": "deno.exe",
+            "count": 8,
+            "workingSetMb": 1462.0
+          },
+          {
+            "name": "GarnetServer.exe",
+            "count": 1,
+            "workingSetMb": 81.0
+          },
+          {
+            "name": "NetScript.exe",
+            "count": 1,
+            "workingSetMb": 328.0
+          },
+          {
+            "name": "ollama app.exe",
+            "count": 1,
+            "workingSetMb": 86.0
+          },
+          {
+            "name": "ollama.exe",
+            "count": 1,
+            "workingSetMb": 30.0
+          }
+        ]
+      },
+      "gracefulClose": {
+        "exitedWithin15s": true,
+        "closeMs": 1280.0,
+        "leftover": [
+          {
+            "Id": 16020,
+            "ProcessName": "cmd"
+          },
+          {
+            "Id": 19316,
+            "ProcessName": "conhost"
+          },
+          {
+            "Id": 37804,
+            "ProcessName": "conhost"
+          },
+          {
+            "Id": 39732,
+            "ProcessName": "ollama"
+          },
+          {
+            "Id": 30760,
+            "ProcessName": "ollama app"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "fresh-profile",
+      "profile": "C:\\Users\\chaut\\AppData\\Local\\Temp\\ns-start-a256fb4d\\fresh-1",
+      "wallToReadyMs": 18300.0,
+      "ready": {
+        "host": "gpuix-deno",
+        "ui": "portable",
+        "stack": "real",
+        "readyMs": 17805,
+        "rssMb": 280,
+        "stackReadyMs": 16119,
+        "stackPids": [
+          42720,
+          21592,
+          35172,
+          28916,
+          44276,
+          42300,
+          42812,
+          14744,
+          11820
+        ]
+      },
+      "supervisor": {
+        "readyMs": 16119,
+        "nodes": [
+          {
+            "name": "garnet",
+            "port": 31893,
+            "pid": 42720,
+            "spawnedAt": 1443,
+            "readyAt": 3038
+          },
+          {
+            "name": "sagas-api",
+            "port": 20498,
+            "pid": 21592,
+            "spawnedAt": 8284,
+            "readyAt": 12635
+          },
+          {
+            "name": "streams",
+            "port": 20759,
+            "pid": 35172,
+            "spawnedAt": 1459,
+            "readyAt": 3583
+          },
+          {
+            "name": "triggers-api",
+            "port": 22317,
+            "pid": 28916,
+            "spawnedAt": 8297,
+            "readyAt": 14040
+          },
+          {
+            "name": "workers-api",
+            "port": 20040,
+            "pid": 44276,
+            "spawnedAt": 3583,
+            "readyAt": 8284
+          },
+          {
+            "name": "sagas",
+            "port": 24872,
+            "pid": 42300,
+            "spawnedAt": 12635,
+            "readyAt": 15242
+          },
+          {
+            "name": "triggers",
+            "port": 23138,
+            "pid": 42812,
+            "spawnedAt": 14040,
+            "readyAt": 16119
+          },
+          {
+            "name": "workers",
+            "port": 29317,
+            "pid": 14744,
+            "spawnedAt": 8306,
+            "readyAt": 12872
+          },
+          {
+            "name": "users",
+            "port": 26503,
+            "pid": 11820,
+            "spawnedAt": 3602,
+            "readyAt": 8034
+          }
+        ]
+      },
+      "processes": {
+        "total": 19,
+        "byName": [
+          {
+            "name": "conhost.exe",
+            "count": 9,
+            "workingSetMb": 94.0
+          },
+          {
+            "name": "deno.exe",
+            "count": 8,
+            "workingSetMb": 1522.0
+          },
+          {
+            "name": "GarnetServer.exe",
+            "count": 1,
+            "workingSetMb": 77.0
+          },
+          {
+            "name": "NetScript.exe",
+            "count": 1,
+            "workingSetMb": 287.0
+          }
+        ]
+      },
+      "gracefulClose": {
+        "exitedWithin15s": true,
+        "closeMs": 1053.0,
+        "leftover": []
+      }
+    },
+    {
+      "kind": "fresh-profile",
+      "profile": "C:\\Users\\chaut\\AppData\\Local\\Temp\\ns-start-a256fb4d\\fresh-2",
+      "wallToReadyMs": 16255.0,
+      "ready": {
+        "host": "gpuix-deno",
+        "ui": "portable",
+        "stack": "real",
+        "readyMs": 15703,
+        "rssMb": 279,
+        "stackReadyMs": 14270,
+        "stackPids": [
+          26820,
+          17200,
+          38332,
+          18604,
+          36748,
+          22192,
+          28624,
+          38304,
+          45556
+        ]
+      },
+      "supervisor": {
+        "readyMs": 14270,
+        "nodes": [
+          {
+            "name": "garnet",
+            "port": 23840,
+            "pid": 26820,
+            "spawnedAt": 664,
+            "readyAt": 2276
+          },
+          {
+            "name": "sagas-api",
+            "port": 26445,
+            "pid": 17200,
+            "spawnedAt": 6443,
+            "readyAt": 10641
+          },
+          {
+            "name": "streams",
+            "port": 27403,
+            "pid": 38332,
+            "spawnedAt": 677,
+            "readyAt": 2820
+          },
+          {
+            "name": "triggers-api",
+            "port": 20726,
+            "pid": 18604,
+            "spawnedAt": 6453,
+            "readyAt": 11661
+          },
+          {
+            "name": "workers-api",
+            "port": 21034,
+            "pid": 36748,
+            "spawnedAt": 2820,
+            "readyAt": 6443
+          },
+          {
+            "name": "sagas",
+            "port": 22803,
+            "pid": 22192,
+            "spawnedAt": 10641,
+            "readyAt": 13235
+          },
+          {
+            "name": "triggers",
+            "port": 22711,
+            "pid": 28624,
+            "spawnedAt": 11661,
+            "readyAt": 14270
+          },
+          {
+            "name": "workers",
+            "port": 24467,
+            "pid": 38304,
+            "spawnedAt": 6464,
+            "readyAt": 10725
+          },
+          {
+            "name": "users",
+            "port": 31727,
+            "pid": 45556,
+            "spawnedAt": 2838,
+            "readyAt": 6191
+          }
+        ]
+      },
+      "processes": {
+        "total": 19,
+        "byName": [
+          {
+            "name": "conhost.exe",
+            "count": 9,
+            "workingSetMb": 94.0
+          },
+          {
+            "name": "deno.exe",
+            "count": 8,
+            "workingSetMb": 1521.0
+          },
+          {
+            "name": "GarnetServer.exe",
+            "count": 1,
+            "workingSetMb": 71.0
+          },
+          {
+            "name": "NetScript.exe",
+            "count": 1,
+            "workingSetMb": 287.0
+          }
+        ]
+      },
+      "gracefulClose": {
+        "exitedWithin15s": true,
+        "closeMs": 1156.0,
+        "leftover": []
+      }
+    },
+    {
+      "kind": "relaunch",
+      "profile": "C:\\Users\\chaut\\AppData\\Local\\Temp\\ns-start-a256fb4d\\fresh-0",
+      "wallToReadyMs": 14382.0,
+      "ready": {
+        "host": "gpuix-deno",
+        "ui": "portable",
+        "stack": "real",
+        "readyMs": 13951,
+        "rssMb": 283,
+        "stackReadyMs": 13091,
+        "stackPids": [
+          25504,
+          27000,
+          28320,
+          20000,
+          41132,
+          6344,
+          37048,
+          44764,
+          42148
+        ]
+      },
+      "supervisor": {
+        "readyMs": 13091,
+        "nodes": [
+          {
+            "name": "garnet",
+            "port": 24420,
+            "pid": 25504,
+            "spawnedAt": 10,
+            "readyAt": 1606
+          },
+          {
+            "name": "sagas-api",
+            "port": 27998,
+            "pid": 27000,
+            "spawnedAt": 5763,
+            "readyAt": 10491
+          },
+          {
+            "name": "streams",
+            "port": 29792,
+            "pid": 28320,
+            "spawnedAt": 23,
+            "readyAt": 2135
+          },
+          {
+            "name": "triggers-api",
+            "port": 26186,
+            "pid": 20000,
+            "spawnedAt": 5778,
+            "readyAt": 8473
+          },
+          {
+            "name": "workers-api",
+            "port": 30695,
+            "pid": 41132,
+            "spawnedAt": 2135,
+            "readyAt": 5763
+          },
+          {
+            "name": "sagas",
+            "port": 23921,
+            "pid": 6344,
+            "spawnedAt": 10491,
+            "readyAt": 13091
+          },
+          {
+            "name": "triggers",
+            "port": 30025,
+            "pid": 37048,
+            "spawnedAt": 8473,
+            "readyAt": 12104
+          },
+          {
+            "name": "workers",
+            "port": 22728,
+            "pid": 44764,
+            "spawnedAt": 5790,
+            "readyAt": 9900
+          },
+          {
+            "name": "users",
+            "port": 26853,
+            "pid": 42148,
+            "spawnedAt": 2147,
+            "readyAt": 4523
+          }
+        ]
+      },
+      "processes": {
+        "total": 19,
+        "byName": [
+          {
+            "name": "conhost.exe",
+            "count": 9,
+            "workingSetMb": 94.0
+          },
+          {
+            "name": "deno.exe",
+            "count": 8,
+            "workingSetMb": 1517.0
+          },
+          {
+            "name": "GarnetServer.exe",
+            "count": 1,
+            "workingSetMb": 77.0
+          },
+          {
+            "name": "NetScript.exe",
+            "count": 1,
+            "workingSetMb": 282.0
+          }
+        ]
+      },
+      "gracefulClose": {
+        "exitedWithin15s": true,
+        "closeMs": 1042.0,
+        "leftover": []
+      }
+    },
+    {
+      "kind": "relaunch",
+      "profile": "C:\\Users\\chaut\\AppData\\Local\\Temp\\ns-start-a256fb4d\\fresh-0",
+      "wallToReadyMs": 14232.0,
+      "ready": {
+        "host": "gpuix-deno",
+        "ui": "portable",
+        "stack": "real",
+        "readyMs": 13182,
+        "rssMb": 284,
+        "stackReadyMs": 12289,
+        "stackPids": [
+          20332,
+          21592,
+          36336,
+          37720,
+          23488,
+          22260,
+          9176,
+          38516,
+          1992
+        ]
+      },
+      "supervisor": {
+        "readyMs": 12289,
+        "nodes": [
+          {
+            "name": "garnet",
+            "port": 26283,
+            "pid": 20332,
+            "spawnedAt": 11,
+            "readyAt": 2170
+          },
+          {
+            "name": "sagas-api",
+            "port": 21073,
+            "pid": 21592,
+            "spawnedAt": 5304,
+            "readyAt": 8166
+          },
+          {
+            "name": "streams",
+            "port": 31271,
+            "pid": 36336,
+            "spawnedAt": 60,
+            "readyAt": 2178
+          },
+          {
+            "name": "triggers-api",
+            "port": 23796,
+            "pid": 37720,
+            "spawnedAt": 5320,
+            "readyAt": 9176
+          },
+          {
+            "name": "workers-api",
+            "port": 22999,
+            "pid": 23488,
+            "spawnedAt": 2178,
+            "readyAt": 5304
+          },
+          {
+            "name": "sagas",
+            "port": 26209,
+            "pid": 22260,
+            "spawnedAt": 8166,
+            "readyAt": 11180
+          },
+          {
+            "name": "triggers",
+            "port": 26175,
+            "pid": 9176,
+            "spawnedAt": 9176,
+            "readyAt": 12289
+          },
+          {
+            "name": "workers",
+            "port": 31143,
+            "pid": 38516,
+            "spawnedAt": 5339,
+            "readyAt": 8704
+          },
+          {
+            "name": "users",
+            "port": 26920,
+            "pid": 1992,
+            "spawnedAt": 2188,
+            "readyAt": 4425
+          }
+        ]
+      },
+      "processes": {
+        "total": 19,
+        "byName": [
+          {
+            "name": "conhost.exe",
+            "count": 9,
+            "workingSetMb": 94.0
+          },
+          {
+            "name": "deno.exe",
+            "count": 8,
+            "workingSetMb": 1514.0
+          },
+          {
+            "name": "GarnetServer.exe",
+            "count": 1,
+            "workingSetMb": 77.0
+          },
+          {
+            "name": "NetScript.exe",
+            "count": 1,
+            "workingSetMb": 282.0
+          }
+        ]
+      },
+      "gracefulClose": {
+        "exitedWithin15s": true,
+        "closeMs": 1022.0,
+        "leftover": []
+      }
+    },
+    {
+      "kind": "relaunch",
+      "profile": "C:\\Users\\chaut\\AppData\\Local\\Temp\\ns-start-a256fb4d\\fresh-0",
+      "wallToReadyMs": 73384.0,
+      "ready": {
+        "host": "gpuix-deno",
+        "ui": "portable",
+        "stack": "real",
+        "readyMs": 72905,
+        "rssMb": 272,
+        "stackReadyMs": 71918,
+        "stackPids": [
+          33696,
+          45864,
+          7444,
+          8780,
+          44804,
+          16980,
+          25288,
+          9144,
+          5016
+        ]
+      },
+      "supervisor": {
+        "readyMs": 71918,
+        "nodes": [
+          {
+            "name": "garnet",
+            "port": 24780,
+            "pid": 33696,
+            "spawnedAt": 11,
+            "readyAt": 1630
+          },
+          {
+            "name": "sagas-api",
+            "port": 31219,
+            "pid": 45864,
+            "spawnedAt": 6433,
+            "readyAt": 9138
+          },
+          {
+            "name": "streams",
+            "port": 20408,
+            "pid": 7444,
+            "spawnedAt": 30,
+            "readyAt": 2689
+          },
+          {
+            "name": "triggers-api",
+            "port": 25410,
+            "pid": 8780,
+            "spawnedAt": 6453,
+            "readyAt": 10138
+          },
+          {
+            "name": "workers-api",
+            "port": 30540,
+            "pid": 44804,
+            "spawnedAt": 2689,
+            "readyAt": 6433
+          },
+          {
+            "name": "sagas",
+            "port": 31274,
+            "pid": 16980,
+            "spawnedAt": 9138,
+            "readyAt": 71396
+          },
+          {
+            "name": "triggers",
+            "port": 25031,
+            "pid": 25288,
+            "spawnedAt": 10138,
+            "readyAt": 71918
+          },
+          {
+            "name": "workers",
+            "port": 21344,
+            "pid": 9144,
+            "spawnedAt": 6483,
+            "readyAt": 9396
+          },
+          {
+            "name": "users",
+            "port": 24697,
+            "pid": 5016,
+            "spawnedAt": 2750,
+            "readyAt": 5140
+          }
+        ]
+      },
+      "processes": {
+        "total": 19,
+        "byName": [
+          {
+            "name": "conhost.exe",
+            "count": 9,
+            "workingSetMb": 94.0
+          },
+          {
+            "name": "deno.exe",
+            "count": 8,
+            "workingSetMb": 1318.0
+          },
+          {
+            "name": "GarnetServer.exe",
+            "count": 1,
+            "workingSetMb": 72.0
+          },
+          {
+            "name": "NetScript.exe",
+            "count": 1,
+            "workingSetMb": 274.0
+          }
+        ]
+      },
+      "gracefulClose": {
+        "exitedWithin15s": true,
+        "closeMs": 1262.0,
+        "leftover": []
+      }
+    }
+  ]
+}

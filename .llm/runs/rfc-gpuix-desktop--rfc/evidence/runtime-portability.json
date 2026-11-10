@@ -1,0 +1,17 @@
+[
+  {
+    "runtime": "Deno 2.9.7",
+    "readyMs": 154,
+    "rssMb": 160
+  },
+  {
+    "runtime": "Bun 1.4.4",
+    "readyMs": 142,
+    "rssMb": 140
+  },
+  {
+    "runtime": "Node 24.20.0",
+    "readyMs": 126,
+    "rssMb": 187
+  }
+]

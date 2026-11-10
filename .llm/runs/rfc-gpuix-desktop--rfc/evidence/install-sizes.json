@@ -1,0 +1,12 @@
+{
+  "gpuix": 185,
+  "webview": 112,
+  "cef": 470,
+  "_provenance": {
+    "method": "Linux builds as shipped: each carries only its own host and platform binaries (packaging prunes foreign @gpuix/native-* packages; webview/CEF carry no GPUIX).",
+    "gpuix": "poc/scripts/package.sh linux-x64 \u2192 NetScript/netscript",
+    "webview": "poc/scripts/package.sh linux-x64 \u2192 NetScript/webview/ (launcher + .so)",
+    "cef": "deno desktop --backend cef from a copy of app/ whose import map has no GPUIX entries",
+    "note": "The benchmarked binaries were built before pruning existed (GPUIX 200 MiB, webview 177 MiB, CEF 537 MiB embedded unused npm payload); payload size does not change resident memory measurably."
+  }
+}

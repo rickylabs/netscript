@@ -1,0 +1,507 @@
+---
+rfc: 0007
+title: Native GPU desktop renderer (GPUIX + Preact) for NetScript desktop apps
+status: Accepted
+authors: ['@rickylabs']
+created: 2026-11-09
+tracking-issue: https://github.com/rickylabs/netscript/issues/2602
+target-milestone: Enterprise Deployment & Desktop
+---
+
+# Native GPU desktop renderer (GPUIX + Preact) for NetScript desktop apps
+
+## Summary
+
+Add an **opt-in, incubating native desktop track** in which a NetScript app renders its Preact
+component tree directly to the GPU through [GPUIX](https://gpuix.dev) (React/Solid bindings for
+Zed's GPUI), with the NetScript service, typed SDK client, durable streams and KV running **in the
+same process** — no webview. The track ships as a Preact host renderer, a token-driven primitives
+kit that renders to either GPUIX or the DOM, two small SDK/service seams, an auto-update adapter and
+a packaging backend. `deno desktop` with the webview backend remains the default desktop path until
+the decision gates below pass.
+
+Measured on a real GPU (a Windows laptop), GPUIX uses half the memory of the webview build, runs as
+one process instead of seven, and starts many instances where the Chromium-based hosts stall. It
+also uses 2.2× the webview's CPU when the screen updates often. That cost sits in GPUI's UI thread,
+not in Preact, NetScript or the runtime, and reducing it is the first incubation work item.
+
+With the real NetScript backend shipped in the same installer and supervised by the app, the backend
+dominates the footprint (1.4–1.7 GB across nine processes). A 250 ms live-update budget halves
+GPUIX's CPU on the laptop, but it cuts the webview's even more: with the same budget the webview
+stays 2–3.7× cheaper on a real GPU. Reaching gate 1 needs incremental rendering in GPUIX, not only
+an app-side update policy. Multi-window works on both hosts; GPUIX windows share one process and its
+state, at about 60 MB per extra window against 170 MB for a webview window.
+
+This RFC is backed by a working proof of concept (PoC), benchmarks on Linux and on a Windows laptop,
+and installable builds: `.llm/runs/rfc-gpuix-desktop--rfc/` (research, evidence, PoC source).
+
+## Motivation
+
+1. **Deno runtime end of life.** Deno's team joined Cloudflare (2026-10-09) and runtime development
+   ends about a year later. NetScript keeps Deno for now and prepares a gradual migration. The
+   desktop offering is the most exposed part of the stack: `deno desktop`, `Deno.BrowserWindow`,
+   `Deno.autoUpdate` and the laufey webview/CEF backends are Deno-only surfaces with no drop-in
+   replacement, and every NetScript desktop package wraps them (`@netscript/fresh/desktop`,
+   `@netscript/sdk/desktop`, `@netscript/sdk/auto-update`, `netscript deploy desktop`).
+2. **A runtime-agnostic native option exists.** GPUIX loads through Node-API. The PoC proves the
+   same Preact renderer source runs unchanged on **Deno 2.9.7, Bun 1.4.4 and Node 24**. A
+   GPUIX-based desktop path survives the runtime migration; a `deno desktop`-based one does not.
+3. **Measured resource gains.** One process instead of three (WebKitGTK), seven (WebView2) or eight
+   (CEF), 30–50% less memory per instance, and many concurrent instances where the Chromium-based
+   hosts stall at startup (see the benchmarks below). The measured cost is CPU under frequent
+   updates.
+4. **Simpler architecture.** In one process the window-bound oRPC transport (`bindDesktopRpcWindow`
+   ↔ `createDesktopServiceClient`, MessagePort framing) disappears: the UI calls the service through
+   the ordinary SDK client, or in-process.
+
+Cost of not doing this: when Deno development stops, NetScript desktop apps either freeze on an
+unmaintained desktop runtime or need an unplanned rewrite.
+
+## Findings that shape the design
+
+### Preact: not through compat, yes as a native host
+
+`@gpuix/react` is built on `react-reconciler@0.33`, which reads React's private shared internals at
+module load. With `react` aliased to `preact/compat` it throws before the first render
+(`TypeError: … ReactSharedInternals.S`). A compat layer cannot provide React's fiber engine.
+
+GPUIX also exposes a framework-neutral host layer (`@gpuix/native/host`: batched mutation queue,
+renderer state, event registry), which its Solid adapter uses. The PoC's `gpuix-preact` (about 500
+lines) is a small DOM facade that Preact diffs against, translated into that mutation protocol and
+flushed once per Preact commit. Preact 10 and `@preact/signals` work unchanged, and the Preact 11
+path (`ownerDocument`) is supported. The full PoC app renders through it on Linux (light and dark,
+six screens, real input).
+
+### Integration with the NetScript ecosystem
+
+| Surface                                              | Result                                                                                                                   |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `@netscript/service`                                 | Embedded via `createService().withAuthn().withRPC().withHealth().build()` on loopback.                                   |
+| `@netscript/sdk/client`                              | Typed oRPC client, `resolveServiceUrl` injection; same code targets a remote service.                                    |
+| `@netscript/sdk/streams/consumer`                    | The DOM-free fetch consumer from the Expo work drives the live feed, with offset resume.                                 |
+| `@netscript/kv`                                      | Settings, cookie jar and persisted mutations (verified across restart).                                                  |
+| Cookie sessions                                      | The SDK reserves the `cookie` header (correct for browsers). Native hosts bridge the session to `Authorization: Bearer`. |
+| `@netscript/sdk/auto-update`                         | Wraps `Deno.autoUpdate`, which is absent outside `deno desktop`; needs an adapter at its `NativeAutoUpdate` port.        |
+| `@netscript/fresh-ui`                                | Token presets are data and port; CSS components do not.                                                                  |
+| `netscript deploy desktop`                           | Wraps `deno desktop` formats; needs a packaging backend.                                                                 |
+| `@netscript/fresh/desktop`, `@netscript/sdk/desktop` | Unnecessary for this host.                                                                                               |
+
+Two papercuts surfaced and should be fixed independently of this RFC:
+
+- `createService().withRPC()` defaults to `/api/rpc`, but `createServiceClient()` calls
+  `/api/rpc/v1/<routerName>`. The PoC uses `buildServiceRpcPath({ routerName })`.
+- The SDK's reserved-header list is undocumented at the contribution API; a `cookie` contribution
+  fails only at construction with `SDK_CONTRIBUTION_INVALID`.
+
+### Fresh
+
+- **Unchanged Fresh pages cannot run on GPUIX** (2.x or 3.x). Hydration is not the obstacle; CSS is.
+  GPUIX styles are inline objects (Taffy flexbox, limited grid, px numbers) with no selectors,
+  cascade, custom properties or media queries.
+- **Fresh 2.x** renders inline in `ctx.render()` with `renderToString`, so there is no renderer
+  seam. A native target would require a fork.
+- **Fresh 3.x** (alpha, runtime-agnostic through Vite + Nitro) has a clean seam: route modules fold
+  handler data, page and layouts into one VNode before `renderPage()`. A native target would replace
+  only that call. The PoC's in-process router already uses the Fresh 3 route-module shape
+  (middleware → handler `{ data }` → page in a layout).
+
+## Benchmark
+
+<!-- bench-table:start -->
+
+| Host                            | Cold start (median, range) | Memory / instance (PSS) | Processes | Idle CPU | Active CPU (non-raster) | 8 instances (total PSS) | Install⁴ |
+| ------------------------------- | -------------------------- | ----------------------- | --------- | -------- | ----------------------- | ----------------------- | -------- |
+| GPUIX + Preact (`deno compile`) | 949 ms (916–1457)          | 282 MB                  | 1         | 1.8%     | 204.7% (≈61%²)          | 1,443 MB                | 185 MB   |
+| GPUIX + Preact (`deno run`)     | 792 ms (773–834)           | 247 MB                  | 1         | 1.6%     | 200.4%                  | 1,531 MB                | —        |
+| Deno Desktop · WebKitGTK        | 831 ms (744–998)           | 402 MB                  | 3         | 36.9%    | 114.3% (≈20%²)          | 2,237 MB                | 112 MB   |
+| Deno Desktop · CEF              | 697 ms (662–1259)          | 412 MB                  | 8         | 0.1%     | 14.8% (n/a³)            | did not start¹          | 470 MB   |
+
+Linux x86_64, 16 CPUs, Xvfb + Mesa lavapipe, 5 cold runs and 3 active runs per host; active load is
+20 events/s. The host is shared: its load average was 4–7 during the runs (recorded in the JSON), so
+medians of repeated runs limit that noise rather than remove it. Raw data:
+`.llm/runs/rfc-gpuix-desktop--rfc/evidence/bench-linux-software.json` and
+`threads-linux-software.json`.
+
+² "Non-raster" removes software-rasterizer threads (lavapipe/llvmpipe), which a GPU takes over. It
+comes from a separate per-thread run of 10 s (totals 205% and 112%), not from the medians beside it.
+
+³ CEF's compositing runs on its own viz and compositor threads, which thread names do not separate
+from other work, so its 15% total already includes its rendering.
+
+⁴ Linux builds as shipped, each carrying only its own host and platform binaries
+(`evidence/install-sizes.json`). GPUIX is 133 MB on Windows and 123 MB on macOS, where the addon is
+23–24 MB instead of 50 MB.
+
+¹ Concurrent launches of the same CEF app stall at startup here. In three trials of two simultaneous
+launches, the second page waited about 10 s twice and never became ready once (120 s budget); with
+four, two never became ready (`evidence/cef-concurrent-start.log`). The cause was not isolated.
+
+**What the numbers say.** GPUIX uses one process, about 30% less memory per instance than either web
+host, and roughly 35% less total memory with eight instances open than WebKitGTK. Its idle CPU is
+low (the 8 ms frame pump). Under load, rasterization dominates on lavapipe (144 of 205%). Even
+without it, GPUIX spent about 61%, against about 20% for WebKitGTK and 15% in total (rendering
+included) for CEF. Almost all of GPUIX's share is GPUI's UI thread (layout, scene rebuild, and here
+software presentation); the JavaScript and host main-thread bucket was 4%. GPUI redraws the whole
+window on change, while Chromium repaints damaged regions. This is the main open risk, and gate 1
+exists to settle it on real GPUs. Cold start is the one metric where the compiled GPUIX build is
+slowest (949 ms against 831 and 697 ms); `deno compile` adds about 150 ms over `deno run`.
+
+<!-- bench-table:end -->
+
+**Reading the numbers.** The container has no GPU. Every host runs on Xvfb with software rendering:
+GPUI uses Mesa lavapipe (software Vulkan), and WebKitGTK and CEF use software compositing. That
+makes **active CPU** the least representative metric. GPUI redraws the full window when anything
+changes, which is its design point on a GPU but expensive on lavapipe. The per-thread breakdown
+attributes that cost (see the table note). Memory, process count, idle CPU, parallel scaling and
+cold start are much less sensitive to the renderer. The installable's `--bench` mode reran the same
+method on a real GPU; see the next section.
+
+### Real GPU: Windows laptop
+
+Lenovo Yoga Book 9i: Windows 11 (build 26300), Intel Core Ultra 7 155U, Intel Graphics (driver
+32.0.101.6881), 32 GB, on AC with the Balanced plan, WebView2 157. Same app, same method, run by the
+installable's `--bench` mode (`evidence/bench-windows-yogabook9i.json`).
+
+| Metric                             | GPUIX                        | WebView2 (same app)           |
+| ---------------------------------- | ---------------------------- | ----------------------------- |
+| Cold start, new profile (median)   | 1,075 ms                     | 1,000 ms (first run 3,482 ms) |
+| Memory (working set, process tree) | 267 MB, 1 process            | 532 MB, 7 processes           |
+| Idle CPU                           | 4.8%                         | 0.5%                          |
+| Active CPU, 20 updates/s           | 80.9%                        | 37.2%                         |
+| 8 instances                        | 2,143 MB, all ready in 4.3 s | 4 and 8 never started (90 s)  |
+
+Windows reports working sets, which count pages shared between WebView2's processes once per
+process, so the real memory gap is smaller than 2×.
+
+A follow-up probe (`poc/bench/windows-probe.ps1`, `evidence/probe-windows-yogabook9i.json`)
+attributed the CPU by named thread (GPUIX) and by process type (WebView2) over 10 s:
+
+| Host and screen                   | Total CPU | Where it goes                                                |
+| --------------------------------- | --------- | ------------------------------------------------------------ |
+| GPUIX · overview, 20 updates/s    | 94.7%     | GPUI UI thread 88.1%, JavaScript main thread 3.3%            |
+| GPUIX · settings, 20 updates/s    | 8.9%      | GPUI UI thread 3.0%, JavaScript main thread 3.4%             |
+| GPUIX · overview, idle            | 6.9%      | GPUI UI thread 3.1%, JavaScript 2.0%, vsync 1.7%             |
+| WebView2 · overview, 20 updates/s | 27.0%     | renderer 15.2%, GPU process 6.9%, host (Deno + service) 2.3% |
+
+Launch types, median of three (window on screen / data on screen). Linux runs one fresh container
+per sample (`evidence/first-launch-linux*.log`); Windows uses the same probe.
+
+| Launch                                 | GPUIX Linux    | Webview Linux | GPUIX Windows    | WebView2 Windows  |
+| -------------------------------------- | -------------- | ------------- | ---------------- | ----------------- |
+| First launch (no code cache, new data) | 273 / 1,179 ms | 79⁶ / 960 ms  | 792 / 1,277 ms   | 2,126 / 2,312 ms  |
+| Relaunch with existing data            | 193 / 427 ms   | 66⁶ / 749 ms  | 694 / 1,107 ms   | 3,725 / 4,249 ms⁷ |
+| New data, code cache warm              | 186 / 954 ms   | 55⁶ / 814 ms  | 1,211 / 1,794 ms | 971 / 1,277 ms    |
+
+⁶ The webview's native window maps early but stays blank until the page loads; GPUIX's first window
+already shows the app shell.
+
+⁷ WebView2 relaunches were slow and erratic in this run (3.3–13.2 s). The probe force-kills every
+instance, and individual launches on this machine (four displays, background browser) varied from
+under 1 s to 13 s, so treat Windows launch numbers as indicative.
+
+**What the real GPU changes.** The memory, process-count and multi-instance advantages hold on
+Windows. Gate 1 fails as written: under 20 updates/s GPUIX used 2.2× the webview's CPU. The probe
+locates the cost: app JavaScript (Preact, the service and the SDK) is about 3% on either host, and
+GPUI's UI thread accounts for the rest. That thread used 88% on the busy overview and 3% on the
+quiet settings screen at the same event rate, so the cost is GPUI's per-frame work when large
+visible areas keep changing. Idle CPU (5–7%) comes from GPUIX's 8 ms frame pump on Windows and
+Linux; macOS uses display-link wakes and has not been measured yet.
+
+### Real stack: the backend in the box
+
+The numbers above use an in-process service with simulated workers. A second PoC build ships the
+real NetScript graph in the same installer and lets the app supervise it, without Aspire: the
+scaffolded 0.0.9 workspace (users service on SQLite, workers, sagas, triggers and streams, Garnet).
+The app starts the nine processes in dependency order on loopback ports, waits for their health
+endpoints, projects discovery (`services__<name>__http__0`) and stops them on exit. Its embedded
+service becomes a BFF over typed SDK clients; activity comes from the durable stream and job state
+from `workers-api`. The load generator issues real writes and job runs (`users.update`,
+`workers.triggerJob`). Everything runs offline from a bundled Deno runtime, a warmed `DENO_DIR` and
+a self-contained Garnet (`poc/realstack/`, `poc/scripts/stack-bundle.sh`).
+
+A **GPUIX-first** variant of the same app adds three changes: a native `<virtual-list>` for long
+lists, a live-update budget (stream changes committed at most every 250 ms) and an adaptive frame
+pump (8 ms while active, 50 ms when idle). The budget is renderer-agnostic, so the webview was also
+measured with it.
+
+Linux container, software rendering, medians (`evidence/bench-linux-realstack.json`):
+
+| Variant                 | CPU at 20 updates/s | Host CPU (real stack) | Host idle CPU | Host memory |
+| ----------------------- | ------------------- | --------------------- | ------------- | ----------- |
+| GPUIX                   | 204%                | 73.8%                 | 3.7%          | 299 MB      |
+| GPUIX + 250 ms budget   | 45.6%               | —                     | 1.7%⁸         | 280 MB⁸     |
+| GPUIX-first             | 46.0%               | 42.8%                 | 2.5%          | 301 MB      |
+| Webview (WebKitGTK)     | 111%                | 77.9%                 | 36.5%         | 418 MB      |
+| Webview + 250 ms budget | 70.0%               | 68.2%                 | 33.2%         | 417 MB      |
+
+⁸ Embedded build (no real stack).
+
+"CPU at 20 updates/s" is the embedded build; "Host" columns split the real-stack process tree into
+the desktop host (UI, BFF and renderer processes) and the supervised graph. The graph itself costs
+the same on every host: 1.37 GB across nine processes, about 35% CPU under this load and 7% idle,
+and it is ready 2.7–3.0 s after launch (data on screen at 3.5–3.8 s). Eight real-stack instances
+start in 15.3 s with GPUIX and 25.5 s with the webview (12.2 and 13.0 GB).
+
+On the Windows laptop (same machine as above, AC, Balanced; the installable's `--bench`,
+`evidence/bench-windows-realstack-yogabook9i.json`), working set, medians:
+
+| Variant                  | CPU at 20 updates/s | Host CPU (real stack) | Host idle CPU | Host memory |
+| ------------------------ | ------------------- | --------------------- | ------------- | ----------- |
+| GPUIX                    | 80.2%               | 45.2%                 | 4.5%          | 286 MB      |
+| GPUIX-first              | 36.7%               | 32.3%                 | 6.3%          | 285 MB      |
+| WebView2                 | 38.1%               | 18.3%                 | 1.3%          | 546 MB      |
+| WebView2 + 250 ms budget | 10.0%               | 15.8%                 | 1.6%          | 546 MB      |
+
+On Windows the graph is 18 processes (each `deno.exe` gets a `conhost.exe`) and 1.68 GB; it uses
+about 100% CPU under the load (35% on Linux) and is ready 10.9–12.8 s after launch on a fresh
+profile, with data on screen at 12–14 s (first run of each variant 18–28 s). Four GPUIX instances on
+the real stack started in 34–40 s; four WebView2 instances never started, embedded or not.
+
+**What the real stack changes.** The backend, not the renderer, dominates a full NetScript desktop
+app's footprint: the renderer choice moves memory by 120–260 MB out of 1.7–2.2 GB. The update budget
+is necessary but not sufficient. It halves GPUIX's CPU on the laptop (80% to 37%), yet it also cuts
+WebView2's (38% to 10%), so under the same policy the webview stays 3.7× cheaper embedded and 2×
+cheaper as a host process on the real stack. The Linux container had pointed the other way (GPUIX
+46% against 70%) because WebKitGTK composites in software there; on a real GPU the browser's
+damage-tracked compositing wins. GPUI still redraws the window for every committed change, which is
+what incremental rendering upstream has to fix. The Windows start time of the graph (12–16 s warm,
+136 s on the first launch after install, against 3 s on Linux) is a separate problem for any
+"backend in the box" desktop app, whatever the renderer; see "Windows start time of a supervised
+backend" below.
+
+### Multi-window
+
+Both hosts open several windows from one app. With GPUIX each window is another renderer in the same
+process: it mounts the same component tree against the same signals, SDK client and stream, so state
+is shared directly and nothing is bound per window (extra windows opened in 64–71 ms).
+`deno desktop` creates windows with `new Deno.BrowserWindow()`; each is a separate page with its own
+JavaScript context, stream connection and `bind()` RPC binding, and `navigate()` needs an absolute
+URL.
+
+Linux container, software rendering, embedded service, medians
+(`evidence/bench-linux-multiwindow.json`):
+
+| Windows | GPUIX memory (PSS) | Webview memory (PSS) | GPUIX idle CPU | Webview idle CPU | GPUIX CPU, 20/s | Webview CPU, 20/s |
+| ------- | ------------------ | -------------------- | -------------- | ---------------- | --------------- | ----------------- |
+| 1       | 281 MB             | 409 MB, 3 processes  | 1.6%           | 34.3%            | 204%            | 116%              |
+| 2       | 343 MB             | 579 MB, 4 processes  | 1.9%           | 63.9%            | 356%            | 197%              |
+| 3       | 402 MB             | 744 MB, 5 processes  | 2.2%           | 85.4%            | 485%            | 263%              |
+
+An extra window costs about 60 MB with GPUIX against about 170 MB and one more renderer process with
+the webview. Under a constant 20 updates/s without a budget every GPUIX window redraws on each
+commit, so CPU grows by about 140% per window here (software rendering inflates both CPU columns;
+the laptop numbers above are the reference for CPU). Shared in-process state is the multi-window
+advantage that matters for apps with bindings: a second GPUIX window needs no RPC binding, stream or
+session of its own.
+
+Upstream findings from this work, filed with reproductions:
+
+- #2605: the 0.0.9 workers, sagas and triggers Prisma fragments are PostgreSQL-only, so `db init` on
+  SQLite fails with 87 validation errors; the scaffolded `db:validate` misses them and the failure
+  is reported as a headless-terminal problem.
+- #2604: `workers.subscribe` never streams execution events: it watches the legacy kvdex prefix
+  while executions are stored under `['workers', 'executions']` (any KV backend).
+- #2606: `netscript deploy build` reads `dotnet/AppHost/appsettings.json`, compiles no service,
+  writes PostgreSQL settings for a SQLite workspace and reports success.
+- #2607: processes started by a `deno desktop` app inherit `DENO_SERVE_ADDRESS` and bind the
+  window's port.
+- #2608: on Windows every stop of a background processor counts as a crash, so `sagas` and
+  `triggers` report `crash-looping` for 60 s after quick relaunches.
+- #2609: the Windows start-time profile below.
+
+Linking a service to streams needs `plugin install streams --service <name>` (documented since
+#2592); the PoC scaffold had omitted the flag.
+
+### Windows start time of a supervised backend
+
+`poc/bench/windows-stack-start.ps1` on the laptop, Defender real-time protection on
+(`evidence/windows-stack-start-yogabook9i.json`):
+
+| Launch                     | Graph ready | Dominated by                                                                                                                     |
+| -------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| First launch after install | 135.9 s     | first-run scans: first `deno.exe` run 5.0 s (later 0.02 s), first Garnet start 4.4 s (later 1.0 s), 374-file profile copy 12.4 s |
+| New profile, caches warm   | 14.3–16.1 s | each Deno node 1.6–5.7 s to healthy (Linux 0.3–1.8 s) along a four-level dependency chain                                        |
+| Relaunch, same profile     | 12.3–13.1 s | the same: the per-profile copy and transpilation are not the cost                                                                |
+| Relaunch outlier           | 71.9 s      | `sagas` and `triggers` held in `crash-looping` for 60 s (#2608)                                                                  |
+
+Each Deno process resolves its module graph from a 41,165-file dependency cache, which on-access
+scanning makes expensive on Windows; the graph also runs a `conhost.exe` per console child.
+
+### Shipping the backend: what a desktop package needs
+
+The PoC and eis-chat (which ships its NetScript backend in one MSI today) converge on these rules
+for a desktop app that carries its own backend:
+
+1. **Bundle, then compile or run.** `deno compile` embeds the project's npm resolution; bundle each
+   process first and keep only true natives external. Bundling each backend node the same way also
+   replaces thousands of module reads per start with one file.
+2. **Strip `DENO_*` from children** (#2607) and give each child explicit data-path variables.
+3. **Per-user state only.** Run every child in a per-user data directory (its own workspace copy
+   when the runtime resolves files from its working directory); the install directory stays
+   read-only.
+4. **Owned ports.** Pick loopback ports outside the OS ephemeral ranges, hold them until the child
+   binds, and confirm the listener belongs to the child before declaring it ready.
+5. **Start by dependency level, in parallel**, and gate the UI on readiness rather than serializing.
+6. **Stop gracefully and reap reliably.** Windows has no graceful signal for console children
+   (#2608); add a stop request, and put a Job Object (or equivalent) around the tree for crashes.
+7. **No console hosts.** Start children without a console window, or compile them as GUI-subsystem
+   binaries.
+8. **Self-contained third-party servers.** Garnet's release binaries need an installed .NET runtime;
+   ship a self-contained publish.
+9. **Quiet by default.** Telemetry export and debug logging only when diagnosing.
+10. **Measure the three starts** (first launch after install, new profile, relaunch) on Windows with
+    Defender on, and show progress while the first one pays the scans.
+
+## Guide-level explanation
+
+A desktop app opts in with one entry point and keeps its contracts, service and SDK code:
+
+```tsx
+// desktop/main.tsx
+import { render } from '@netscript/desktop-native';
+import { createNativeHost } from '@netscript/desktop-native/host';
+import { startWorkspaceService } from '../services/workspace/embedded.ts';
+import { App } from '../ui/app.tsx';
+
+const host = await createNativeHost({ appId: 'dev.acme.studio' }); // data dir, KV, credentials
+const service = await startWorkspaceService({ kvPath: host.dataPath('service.kv') });
+render(<App host={host.connect(service.url)} />, {
+  title: 'Acme Studio',
+  width: 1320,
+  height: 860,
+});
+```
+
+Views use the shared primitives (`Box`, `Text`, `Button`, `TextInput`, `Badge`, `Progress`,
+`Scroll`) from a fresh-ui native collection. The same tree renders to GPUIX natively and to the DOM
+in a browser or webview, so a team can keep one component layer for web and desktop:
+
+```bash
+netscript ui:add native --app studio           # primitives + token data
+netscript deploy desktop package --renderer gpuix --target all
+```
+
+Data access is unchanged: `createServiceClient` for typed calls, `createFetchStreamEventSourceV1`
+for durable streams, `@netscript/kv` for local state. The host supplies credentials as a bearer
+contribution, because there is no browser cookie jar.
+
+## Reference-level explanation
+
+| Proposed surface            | Placement / archetype                                               | Content                                                                                                                                                                                                                                                                                |
+| --------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@netscript/desktop-native` | New package, Archetype 2 (integration)                              | Preact host renderer over `@gpuix/native/host` (from the PoC adapter), `render`/`createRoot`/`useNative` (the PoC's `useGpuix`), the `NativeHost` port (fetch + credentials, settings over `@netscript/kv`, native capabilities with feature detection), exact-pinned `@gpuix/native`. |
+| fresh-ui native collection  | `@netscript/fresh-ui` registry collection                           | Primitives that render to GPUIX or DOM from token data; the CSS-to-style translation stays in the DOM branch. Tokens are emitted as values as well as CSS variables.                                                                                                                   |
+| Native credentials          | `@netscript/plugin-auth-core/sdk` (RFC 0001 bearer factory)         | Adopt the existing bearer contribution for native hosts; better-auth bearer plugin server-side. No new SDK surface.                                                                                                                                                                    |
+| Auto-update adapter         | `@netscript/sdk/auto-update`                                        | A `NativeAutoUpdate` implementation for non-`deno desktop` hosts (NetScript release server and GitHub Releases; ed25519 verification reused).                                                                                                                                          |
+| Packaging backend           | `netscript deploy desktop package --renderer gpuix` (Archetype 6/7) | `deno compile` per target with the platform addon staged, then app/dmg, NSIS/MSI, AppImage/deb bundling (PoC: `scripts/package.sh`). `cargo-packager` is the alternative to evaluate.                                                                                                  |
+| Service seams               | `@netscript/service`                                                | Align the builder's default RPC path with the SDK, and document the reserved headers.                                                                                                                                                                                                  |
+
+The embedded service keeps the runtime choice local: on Deno it uses `Deno.serve` and Deno KV, and
+it migrates with the rest of NetScript. The renderer package must not import Deno-only APIs.
+
+**Publishing and consumer constraints.** `@netscript/desktop-native` would be a JSR package that
+depends on an exact-pinned npm package (`@gpuix/native`), whose per-platform binaries arrive as
+optional npm dependencies. JSR carries no native code, and upstream types are re-exported through
+package-owned structural types, as `@netscript/service` already does for Hono and oRPC, so the JSR
+surface stays plain TypeScript. These constraints follow:
+
+- On Deno, consumers need a local `node_modules` (`nodeModulesDir: "auto"`) and FFI permission
+  (`--allow-ffi`), because Deno loads Node-API addons only from a `node_modules` directory. On Bun
+  and Node it is an ordinary npm dependency.
+- `deno compile --target` installs the target platform's binary into `node_modules`, and every later
+  build embeds the whole npm resolution (`--exclude` does not remove it). The packaging backend must
+  therefore prune the other platforms' binaries before each target build. The PoC's
+  `scripts/package.sh` does this.
+- The jsr-audit gate applies when the package is implemented. This RFC publishes nothing.
+
+## Drawbacks
+
+- **Upstream maturity.** GPUIX is pre-1.0 (0.11.0, about nine months old) with a single principal
+  maintainer, and it renders through a pinned GPUI fork. The PoC hit API drift between the release
+  and `main` (`isUniversalProp`, event naming, clipboard, notifications).
+- **Views must be rewritten.** There is no HTML or CSS, so fresh-ui components and third-party DOM
+  widgets don't carry over, and GPUI has no inline text formatting. Logic, state, contracts and data
+  access carry over.
+- **No embedded web content.** OAuth and documentation pages need the system browser plus a loopback
+  or deep-link callback.
+- **Platform gaps.** No Intel macOS. Linux binaries need glibc 2.39. Accessibility is an ARIA subset
+  over AccessKit. There is no tray, and 0.11.0 has no clipboard or notifications.
+- **CPU under frequent updates.** On a real GPU, GPUIX used 2.2× the webview's CPU at 20 updates/s,
+  almost all on GPUI's UI thread, and 5–7% at idle on Windows from its frame pump. VMs, RDP and CI
+  without a GPU also pay software rasterization on top.
+- **Binary size.** GPUIX is larger than the webview build: 172 MB on Linux (the Deno runtime plus a
+  50 MB addon) against 90 MB for the webview build, and smaller than CEF at 470 MB. Both require
+  bundling before compiling: `deno compile` embeds the project's whole npm resolution, which reached
+  915 MB once the plugin contracts were imported. Shipping the real backend adds a Deno runtime, a
+  dependency cache and Garnet (about 0.8 GB unpacked, mostly the npm cache), and on Windows its
+  first start per profile takes 11–13 s.
+
+## Rationale and alternatives
+
+- **Keep `deno desktop` only:** best feature coverage today, but tied to the Deno EOL. Retained as
+  the default during incubation.
+- **Electron / CEF:** Chromium per app (8 processes, 470 MB here); Node-hosted, with a heavy
+  footprint.
+- **Tauri / Electrobun:** the webview stays, the UI stays in a separate process with IPC, and Tauri
+  adds a Rust shell.
+- **`preact/compat` + `@gpuix/react`:** impossible (React internals). **`@gpuix/solid`:** a
+  different component model from the rest of NetScript.
+- **Blitz (HTML/CSS on the GPU):** would keep Fresh markup, but it is a browser-engine project at an
+  earlier stage.
+- **Fresh 3 native render target:** desirable later, but blocked on Fresh 3 stability; listed under
+  future possibilities.
+
+## Breaking changes and migration
+
+None: the track is additive and opt-in. Apps that adopt it move their views onto the primitives
+collection, replace window-bound RPC with direct SDK calls, and switch desktop credentials to the
+bearer contribution.
+
+## Prior art
+
+Zed (GPUI), React Native and NativeWind (non-DOM renderers, class-to-style compilation), Hyperview
+(server-driven native UI), NetScript's Expo work (#2100: the DOM-free stream consumer) and RFC 0001
+(typed SDK client contributions).
+
+## Decision gates (incubating → recommended)
+
+1. A real-GPU benchmark (`NetScript --bench`) on Windows and macOS laptops shows active CPU at or
+   below the webview baseline, and that memory and parallel-instance gains hold. **Status:** memory
+   and multi-instance gains hold on one Windows laptop; active CPU does not (81% against 37%). The
+   path to passing is: coalesce data-driven UI updates to a frame budget in the runtime (live feeds
+   rarely need more than 10 Hz), virtualize long lists, and upstream two GPUIX changes, namely
+   incremental rendering of unchanged subtrees and an event-driven frame pump on Windows and Linux.
+   Then re-measure on Windows and Apple Silicon. The PoC's GPUIX-first variant implements the first
+   two plus an adaptive pump in the host renderer; on Linux it brings GPUIX below the webview under
+   the same budget (46% against 70%), but not on the Windows laptop: there the budget takes GPUIX
+   from 80% to 37% and WebView2 from 38% to 10% (host CPU on the real stack: 32% against 16%). Gate
+   1 therefore depends on upstream incremental rendering in GPUI(X); the update budget becomes a
+   recommended convention for every host.
+2. GPUIX publishes a release that includes clipboard and notifications, and the project agrees an
+   upgrade policy (exact pins; vendor or fork if upstream stalls).
+3. Accessibility reaches an agreed bar: keyboard navigation and screen-reader smoke tests on macOS
+   and Windows.
+4. The packaging backend reaches parity for signing and notarization, plus auto-update.
+
+## Unresolved questions
+
+- Should production native apps host on Bun (GPUIX's primary runtime, `bun build --compile`) or on
+  Deno until the migration?
+- `deno compile` or `cargo-packager` for packaging?
+- How far should NetScript go in owning a GPUI fork if upstream stalls?
+- Can GPUIX render unchanged subtrees incrementally, or must apps budget their update rate? This
+  decides whether gate 1 is an upstream fix or a framework convention.
+- Should the primitives collection become the default component layer for web as well?
+- Should the live-update budget be a framework default (SDK stream consumer or signals layer) for
+  every host? It cut WebView2's CPU from 38% to 10% on the laptop.
+- How far do per-node bundling, a flatter start order and fewer processes bring the Windows start of
+  a supervised backend down (#2609)?
+- How should a desktop app ship its backend: a supervised graph of processes as in the PoC, the
+  single-executable packaging tracked by epic #830, or each node bundled with `deno bundle` and run
+  by one shared runtime (which would drop most of the dependency cache)?
+
+## Future possibilities
+
+A Fresh 3 native render target (route modules rendered in-process), multi-window hosts, the GPUIX
+browser (WebGPU) and terminal targets for the same primitives, and Rust custom elements
+(`register_custom_element`) for charts or canvases.

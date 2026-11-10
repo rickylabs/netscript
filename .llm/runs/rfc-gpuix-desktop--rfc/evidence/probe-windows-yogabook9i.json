@@ -1,0 +1,298 @@
+{
+  "date": "2026-11-09T18:28:52.7097514Z",
+  "appDir": "C:\\Users\\chaut\\Downloads\\NetScript-GPUIX-PoC-0.1.0-windows-x64-portable\\NetScript",
+  "cacheEntriesCleared": [
+    "deno-compile-NetScript.exe.cache",
+    "deno-compile-NetScript-Webview.exe.cache"
+  ],
+  "launchSummary": [
+    {
+      "host": "gpuix",
+      "kind": "first-launch (code cache cleared, new profile)",
+      "windowMedianMs": 792,
+      "dataMedianMs": 1277,
+      "samples": [
+        "window=792 data=1277",
+        "window=765 data=1266",
+        "window=1132 data=1579"
+      ]
+    },
+    {
+      "host": "gpuix",
+      "kind": "relaunch (existing profile)",
+      "windowMedianMs": 694,
+      "dataMedianMs": 1107,
+      "samples": [
+        "window=664 data=1107",
+        "window=694 data=1082",
+        "window=1117 data=1857"
+      ]
+    },
+    {
+      "host": "gpuix",
+      "kind": "new profile (code cache warm)",
+      "windowMedianMs": 1211,
+      "dataMedianMs": 1794,
+      "samples": [
+        "window=925 data=1335",
+        "window=7268 data=7773",
+        "window=1211 data=1794"
+      ]
+    },
+    {
+      "host": "webview",
+      "kind": "first-launch (code cache cleared, new profile)",
+      "windowMedianMs": 2126,
+      "dataMedianMs": 2312,
+      "samples": [
+        "window=2126 data=2312",
+        "window=1031 data=1249",
+        "window=6618 data=6826"
+      ]
+    },
+    {
+      "host": "webview",
+      "kind": "relaunch (existing profile)",
+      "windowMedianMs": 3725,
+      "dataMedianMs": 4249,
+      "samples": [
+        "window=13196 data=13354",
+        "window=3725 data=4249",
+        "window=3335 data=3462"
+      ]
+    },
+    {
+      "host": "webview",
+      "kind": "new profile (code cache warm)",
+      "windowMedianMs": 971,
+      "dataMedianMs": 1277,
+      "samples": [
+        "window=852 data=1002",
+        "window=8994 data=9369",
+        "window=971 data=1277"
+      ]
+    }
+  ],
+  "launches": [
+    {
+      "host": "gpuix",
+      "kind": "first-launch (code cache cleared, new profile)",
+      "windowMs": 792,
+      "dataMs": 1277
+    },
+    {
+      "host": "gpuix",
+      "kind": "relaunch (existing profile)",
+      "windowMs": 664,
+      "dataMs": 1107
+    },
+    {
+      "host": "gpuix",
+      "kind": "new profile (code cache warm)",
+      "windowMs": 925,
+      "dataMs": 1335
+    },
+    {
+      "host": "webview",
+      "kind": "first-launch (code cache cleared, new profile)",
+      "windowMs": 2126,
+      "dataMs": 2312
+    },
+    {
+      "host": "webview",
+      "kind": "relaunch (existing profile)",
+      "windowMs": 13196,
+      "dataMs": 13354
+    },
+    {
+      "host": "webview",
+      "kind": "new profile (code cache warm)",
+      "windowMs": 852,
+      "dataMs": 1002
+    },
+    {
+      "host": "gpuix",
+      "kind": "first-launch (code cache cleared, new profile)",
+      "windowMs": 765,
+      "dataMs": 1266
+    },
+    {
+      "host": "gpuix",
+      "kind": "relaunch (existing profile)",
+      "windowMs": 694,
+      "dataMs": 1082
+    },
+    {
+      "host": "gpuix",
+      "kind": "new profile (code cache warm)",
+      "windowMs": 7268,
+      "dataMs": 7773
+    },
+    {
+      "host": "webview",
+      "kind": "first-launch (code cache cleared, new profile)",
+      "windowMs": 1031,
+      "dataMs": 1249
+    },
+    {
+      "host": "webview",
+      "kind": "relaunch (existing profile)",
+      "windowMs": 3725,
+      "dataMs": 4249
+    },
+    {
+      "host": "webview",
+      "kind": "new profile (code cache warm)",
+      "windowMs": 8994,
+      "dataMs": 9369
+    },
+    {
+      "host": "gpuix",
+      "kind": "first-launch (code cache cleared, new profile)",
+      "windowMs": 1132,
+      "dataMs": 1579
+    },
+    {
+      "host": "gpuix",
+      "kind": "relaunch (existing profile)",
+      "windowMs": 1117,
+      "dataMs": 1857
+    },
+    {
+      "host": "gpuix",
+      "kind": "new profile (code cache warm)",
+      "windowMs": 1211,
+      "dataMs": 1794
+    },
+    {
+      "host": "webview",
+      "kind": "first-launch (code cache cleared, new profile)",
+      "windowMs": 6618,
+      "dataMs": 6826
+    },
+    {
+      "host": "webview",
+      "kind": "relaunch (existing profile)",
+      "windowMs": 3335,
+      "dataMs": 3462
+    },
+    {
+      "host": "webview",
+      "kind": "new profile (code cache warm)",
+      "windowMs": 971,
+      "dataMs": 1277
+    }
+  ],
+  "gpuixThreads": [
+    {
+      "label": "GPUIX overview, 20 events/s",
+      "rate": 20,
+      "path": "/overview",
+      "totalCpuPct": 94.7,
+      "threads": [
+        {
+          "thread": "gpuix-ui",
+          "cpuPct": 88.1
+        },
+        {
+          "thread": "main",
+          "cpuPct": 3.3
+        },
+        {
+          "thread": "(unnamed)",
+          "cpuPct": 2
+        },
+        {
+          "thread": "VSyncProvider",
+          "cpuPct": 0.8
+        },
+        {
+          "thread": "sw",
+          "cpuPct": 0.3
+        }
+      ]
+    },
+    {
+      "label": "GPUIX settings (small tree), 20 events/s",
+      "rate": 20,
+      "path": "/settings",
+      "totalCpuPct": 8.9,
+      "threads": [
+        {
+          "thread": "main",
+          "cpuPct": 3.4
+        },
+        {
+          "thread": "gpuix-ui",
+          "cpuPct": 3
+        },
+        {
+          "thread": "(unnamed)",
+          "cpuPct": 1.1
+        },
+        {
+          "thread": "VSyncProvider",
+          "cpuPct": 0.9
+        },
+        {
+          "thread": "sw",
+          "cpuPct": 0.5
+        }
+      ]
+    },
+    {
+      "label": "GPUIX overview, idle",
+      "rate": 0,
+      "path": "/overview",
+      "totalCpuPct": 6.9,
+      "threads": [
+        {
+          "thread": "gpuix-ui",
+          "cpuPct": 3.1
+        },
+        {
+          "thread": "main",
+          "cpuPct": 2
+        },
+        {
+          "thread": "VSyncProvider",
+          "cpuPct": 1.7
+        }
+      ]
+    }
+  ],
+  "webviewProcesses": {
+    "rate": 20,
+    "totalCpuPct": 27,
+    "processes": [
+      {
+        "process": "renderer",
+        "cpuPct": 15.2
+      },
+      {
+        "process": "gpu-process",
+        "cpuPct": 6.9
+      },
+      {
+        "process": "host (Deno + service)",
+        "cpuPct": 2.3
+      },
+      {
+        "process": "utility (network.mojom.NetworkService)",
+        "cpuPct": 1.4
+      },
+      {
+        "process": "browser",
+        "cpuPct": 1.2
+      },
+      {
+        "process": "crashpad-handler",
+        "cpuPct": 0
+      },
+      {
+        "process": "utility (storage.mojom.StorageService)",
+        "cpuPct": 0
+      }
+    ]
+  }
+}

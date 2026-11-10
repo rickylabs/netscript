@@ -1,0 +1,14 @@
+== pair-1: 2 instances launched together
+instance 1: NETSCRIPT_READY {"host":"webview-deno-desktop","readyMs":10616,"pageMs":10020,"rssMb":276}
+instance 2: NETSCRIPT_READY {"host":"webview-deno-desktop","readyMs":734,"pageMs":139,"rssMb":277}
+== pair-2: 2 instances launched together
+instance 1: NETSCRIPT_READY {"host":"webview-deno-desktop","readyMs":400,"pageMs":143,"rssMb":269}
+instance 2: NETSCRIPT_READY {"host":"webview-deno-desktop","readyMs":10276,"pageMs":10019,"rssMb":269}
+== pair-3: 2 instances launched together
+instance 1: NETSCRIPT_READY {"host":"webview-deno-desktop","readyMs":411,"pageMs":155,"rssMb":268}
+instance 2: not ready after 120 s
+== four: 4 instances launched together
+instance 1: NETSCRIPT_READY {"host":"webview-deno-desktop","readyMs":681,"pageMs":155,"rssMb":269}
+instance 2: NETSCRIPT_READY {"host":"webview-deno-desktop","readyMs":443,"pageMs":184,"rssMb":269}
+instance 3: not ready after 120 s
+instance 4: not ready after 120 s

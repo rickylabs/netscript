@@ -1,0 +1,23 @@
+{
+  "target": "linux-x64",
+  "unit": "MiB, installed (apparent size)",
+  "gpuix": 165,
+  "webview": 87,
+  "deno": 92,
+  "denoDir": 583,
+  "garnet": 117,
+  "workspace": 3,
+  "total": 1043,
+  "tarGzMb": 330,
+  "windows": {
+    "gpuix": 113,
+    "webview": 86,
+    "deno": 93,
+    "denoDir": 656,
+    "garnet": 106,
+    "workspace": 2,
+    "installedTotal": 1055,
+    "setupMb": 205,
+    "portableZipMb": 355
+  }
+}

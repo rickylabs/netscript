@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+*.log
+# Fonts are fetched (scripts/fetch-fonts.sh); only their licences are tracked.
+assets/fonts/*.otf
+assets/fonts/*.ttf
+core
+realstack/workspace
+realstack/seed
