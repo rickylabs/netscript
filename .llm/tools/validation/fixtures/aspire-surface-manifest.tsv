@@ -1033,6 +1033,7 @@ rfcs/0002-runtime-versioned-automation.md	archival:rfc	archival	exempt — RFC b
 rfcs/0004-deterministic-first-hybrid-mcp-doc-retrieval.md	archival:rfc	archival	exempt — RFC body; dated addenda only
 rfcs/0005-devtools-contribution.md	archival:rfc	archival	exempt — RFC body; dated addenda only
 rfcs/0006-database-architecture.md	archival:rfc	archival	exempt — RFC body; dated addenda only
+rfcs/0007-gpuix-native-desktop-renderer.md	archival:rfc	archival	exempt — RFC body; dated addenda only
 skills/aspire/SKILL.md	skill:shipped	S9	receipt-cited 13.5.3 text; embedded via gen:assets-barrel; parity phase 2 enforce
 skills/help.md	skill:shipped	S9	receipt-cited 13.5.3 text; embedded via gen:assets-barrel; parity phase 2 enforce
 skills/manifest.json	skill:shipped	S9	receipt-cited 13.5.3 text; embedded via gen:assets-barrel; parity phase 2 enforce

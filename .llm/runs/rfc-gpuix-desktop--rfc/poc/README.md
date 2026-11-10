@@ -21,7 +21,7 @@ Deno KV in one process. The same component tree also renders as HTML for the web
 | `scripts/stack-bundle.sh` | Offline stack folder per target: Deno 2.9.7, warmed `DENO_DIR`, self-contained Garnet, workspace, seed DB |
 | `scripts/lean-compile.sh` | Bundle-then-compile helpers (`deno bundle`, GPUIX-only `node_modules`) |
 | `bench/stack-starts.ts` | Sequential and concurrent graph starts with per-node readiness (stall/race diagnosis) |
-| `tests/integration_test.ts` | Headless client path: auth bridge, typed RPC, stream delivery, KV persistence |
+| `tests/integration.poc.ts` | Headless client path (named outside the repo test pattern so CI shards skip it; run it explicitly): auth bridge, typed RPC, stream delivery, KV persistence |
 
 ## Run
 
@@ -31,7 +31,7 @@ The published Linux GPUIX binary needs glibc 2.39; on older hosts use the bench 
 ```bash
 scripts/fetch-fonts.sh                                  # once, as root in the bench image
 deno task gpuix                                          # native app (deno run)
-deno test -A tests/integration_test.ts                  # headless integration test
+deno test -A tests/integration.poc.ts                  # headless integration test
 deno bundle --platform browser --minify --output dist/renderer.js app/web/renderer.tsx
 deno desktop -A --backend webview --include dist/renderer.js --include assets/fonts \
   -o build/netscript-webview app/main.webview.ts          # webview baseline
