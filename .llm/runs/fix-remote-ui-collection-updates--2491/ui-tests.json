@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "--frozen",
+    "packages/cli/src/kernel/application/ui/v2/tests",
+    "packages/cli/src/public/features/ui/protocol/protocol-command_test.ts"
+  ],
+  "cwd": ".",
+  "exitCode": 0,
+  "durationMs": 256705,
+  "summary": {
+    "passed": 50,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 50,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}

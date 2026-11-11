@@ -80,6 +80,12 @@ Deno.test('native registry CLI installs namespaced sources with env auth, diffs 
           name: 'acme',
           homepage: 'https://example.com',
           items: [payload('x'), payload('helper')],
+          meta: {
+            collections: [
+              { name: 'fixture-group', items: ['x', 'not-installed'] },
+              { name: 'empty-group', items: [] },
+            ],
+          },
         }
         : payload(name),
     );
@@ -116,7 +122,7 @@ Deno.test('native registry CLI installs namespaced sources with env auth, diffs 
     );
     if (expectedSuccess) assertEquals(result.code, 0, stderr);
     else assert(result.code !== 0, 'Negative control must fail');
-    return stdout;
+    return expectedSuccess ? stdout : stdout + stderr;
   };
   const snapshot = async () => {
     const files: Record<string, string> = {};
@@ -169,8 +175,19 @@ Deno.test('native registry CLI installs namespaced sources with env auth, diffs 
     await run('ui:update', ['@acme/x']);
     assertEquals(await fs.readFile(target), original + '// local edit\n');
     await fs.writeFile(target, original);
-    await run('ui:update', ['@acme/x']);
+    await run('ui:update', ['@acme/fixture-group']);
     assertStringIncludes(await fs.readFile(target), 'helper + 2');
+    assertEquals(requested.includes('not-installed'), false);
+    const beforeInvalidCollection = await snapshot();
+    assertStringIncludes(
+      await run('ui:update', ['@acme/unknown-group'], false),
+      'no remote collection matches',
+    );
+    assertStringIncludes(
+      await run('ui:update', ['@acme/empty-group'], false),
+      'has no installed items',
+    );
+    assertEquals(await snapshot(), beforeInvalidCollection);
     const upstream = await fs.readFile(target);
     const page = join(root, 'page.ts');
     const pageCode = "import { x } from './client/widgets/x.ts';\nexport const page: number = x;\n";

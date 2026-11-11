@@ -19,13 +19,34 @@ export async function updateUiRegistry(
 ): Promise<{ readonly updated: readonly string[]; readonly drifted: readonly string[] }> {
   const lock = await readUiLock(root, deps.fs);
   const installed = new Set(Object.keys(lock?.items ?? {}));
-  if (lock && installed.size && names.some((name) => !installed.has(name))) {
-    const client = await createUiRegistryClient(await readUiConfig(root, deps.fs), deps);
-    for (const collection of await client.collections()) {
-      if (
-        collection.items.length > 0 &&
-        collection.items.every((name) => Object.hasOwn(lock.items, name))
-      ) installed.add(collection.name);
+  const remoteMembers = new Map<string, readonly string[]>();
+  if (lock && names.some((name) => !installed.has(name))) {
+    const config = await readUiConfig(root, deps.fs);
+    const client = await createUiRegistryClient(config, deps);
+    if (installed.size) {
+      for (const collection of await client.collections()) {
+        if (
+          collection.items.length > 0 &&
+          collection.items.every((name) => Object.hasOwn(lock.items, name))
+        ) installed.add(collection.name);
+      }
+    }
+    for (const name of names) {
+      if (installed.has(name) || !name.startsWith('@')) continue;
+      const namespace = name.split('/')[0];
+      if (!Object.hasOwn(config.registries, namespace)) continue;
+      const collection = (await client.collections(namespace)).find((entry) => entry.name === name);
+      if (!collection) {
+        throw new Error(
+          `Registry item '${name}' is not installed and no remote collection matches. Use ui:add first.`,
+        );
+      }
+      const members = collection.items.filter((ref) => Object.hasOwn(lock.items, ref));
+      if (!members.length) {
+        throw new Error(`Registry collection '${name}' has no installed items. Use ui:add first.`);
+      }
+      remoteMembers.set(name, members);
+      installed.add(name);
     }
   }
   if (!lock && names.length) {
@@ -41,7 +62,9 @@ export async function updateUiRegistry(
     }
   }
   if (!lock) return await updateUiRegistryItems(root, names, deps.fs);
-  const selected = names.length ? names : Object.keys(lock.items);
+  const selected = names.length
+    ? [...new Set(names.flatMap((name) => remoteMembers.get(name) ?? [name]))]
+    : Object.keys(lock.items);
   if (!selected.length) return { updated: [], drifted: [] };
   const result = await installUiRegistry({
     root,

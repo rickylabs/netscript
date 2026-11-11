@@ -133,6 +133,12 @@ PostgreSQL requires Docker. Deno 2.9.7 and the pinned Aspire/.NET toolchain are 
 `netscript <group> --help` prints the live tree for any group; it is generated from the same command
 definitions this package exports, so it never drifts from the binary you installed.
 
+`ui:update @acme/<collection>` reads that namespace's registry catalog and updates the
+collection members already recorded in the app's lockfile. It preserves locally edited copies
+and leaves uninstalled members uninstalled. An unknown collection or one with no installed
+members produces a diagnostic before writing files. A directly named installed item updates
+without requiring a catalog request.
+
 ### Regenerate service clients
 
 `netscript service generate` reconciles every manifest service into the generator-owned module
