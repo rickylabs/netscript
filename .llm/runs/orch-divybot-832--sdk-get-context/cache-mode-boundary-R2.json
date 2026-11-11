@@ -1,0 +1,18 @@
+{
+  "kind": "Native Request constructor control on Deno 2.9.7; no network",
+  "requestCache": "only-if-cached",
+  "cases": [
+    {
+      "mode": "omitted",
+      "constructed": false,
+      "errorType": "TypeError"
+    },
+    {
+      "mode": "same-origin",
+      "constructed": true,
+      "observedCache": "only-if-cached",
+      "observedMode": "same-origin"
+    }
+  ],
+  "limit": "No real Fetch, auth response caching or browser cache acceptance; required-auth explicit precedence remains a planned implementation matrix."
+}
