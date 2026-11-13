@@ -69,7 +69,9 @@ async function snapshot(root: string) {
     for await (const entry of Deno.readDir(directory)) {
       const path = join(directory, entry.name);
       if (entry.isDirectory) await visit(path);
-      else files[path.slice(root.length + 1)] = [...await Deno.readFile(path)];
+      else {files[path.slice(root.length + 1).replaceAll('\\', '/')] = [
+          ...await Deno.readFile(path),
+        ];}
     }
   }
   await visit(root);
@@ -141,7 +143,17 @@ for (
       assertStringIncludes(check?.summary ?? '', `${plugins.length} installed producer(s)`);
       assertEquals(check?.fix, undefined);
       assertEquals(await snapshot(root), before);
-      await generate(root);
+      // These sources intentionally exercise static inspection, not executable config loading.
+      // Normal generation requires a valid authored config; restore the static probe input after it.
+      await Deno.writeTextFile(
+        join(root, 'netscript.config.ts'),
+        "export default { name: 'inventory-fixture', databases: { config: [] }, plugins: [] };\n",
+      );
+      try {
+        await generate(root);
+      } finally {
+        await Deno.writeTextFile(join(root, 'netscript.config.ts'), source);
+      }
       assertEquals(await inspect(root, executor), check);
       assertEquals(await snapshot(root), before);
     });
