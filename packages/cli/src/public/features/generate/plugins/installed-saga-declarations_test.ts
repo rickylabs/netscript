@@ -72,12 +72,16 @@ export default defineAgentActionSaga();
 Deno.test('installed root-config saga declaration outside scan roots is authoritative for doctor', async () => {
   await installedProject({
     'netscript.config.ts':
-      "throw new Error('static only');\nexport const entry = defineSagaConfig('agent-action', './plugins/sagas/agent-action.ts').build();",
+      "export default {name: 'saga-fixture', databases: {config: []}};\nconst defineSagaConfig = (..._args) => ({build: () => ({})});\nexport const entry = defineSagaConfig('agent-action', './plugins/sagas/agent-action.ts').build();",
     'plugins/sagas/agent-action.ts': `export default {
       id: 'agent-action', durability: 't1', initialState: {}, handledMessageTypes: [], handlers: new Map(),
     };`,
   }, async (projectRoot) => {
     await generate({ dryRun: false, projectRoot });
+    await write(
+      join(projectRoot, 'netscript.config.ts'),
+      "throw new Error('static only');\nexport const entry = defineSagaConfig('agent-action', './plugins/sagas/agent-action.ts').build();",
+    );
     const registries = await generate({ dryRun: true, projectRoot });
     assertEquals(registries[0].sourceFiles, ['plugins/sagas/agent-action.ts']);
     const checks = await checkRuntimeRegistryDrift({ fs, projectRoot, registries });
@@ -134,6 +138,7 @@ async function installedProject(
         catalog: config.catalog,
         imports: {
           ...config.imports,
+          '@netscript/config': toFileUrl(join(REPOSITORY_ROOT, 'packages/config/mod.ts')).href,
           '@netscript/plugin/cli':
             toFileUrl(join(REPOSITORY_ROOT, 'packages/plugin/src/cli/mod.ts')).href,
           '@netscript/plugin-sagas/runtime':

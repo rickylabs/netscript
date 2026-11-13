@@ -142,6 +142,7 @@ Deno.test('auth install and subsequent service add emit the BFF topology before 
       templateAdapter: templates,
       formatter,
       processRunner,
+      generateRegistries: () => Promise.resolve([]),
       workspaceMutator: new PluginWorkspaceMutator(fs),
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
     });
