@@ -1,0 +1,3 @@
+# Cold npm dependency inspection
+
+npm11.21.1 and12.1.0 both return {} exit0 from npm outdated --package-lock-only --json with no node_modules, even with native-generated axe-core4.10.3 lock. Never use that output to claim lock freshness. Selected repo deps:outdated uses existing deps:latest stable resolver against actual direct locked versions, explicitly mode locked-stable. Native npm ls <pkg> --all --package-lock-only --json gives correct nested provenance; npm audit --package-lock-only --include=dev --ignore-scripts --json --audit-level=low covers dev graph without install. Keep exact tool versions, command args and key native metadata in public run evidence; full machine logs stay outside source tree.

@@ -1,0 +1,161 @@
+{
+  "task": 2461,
+  "focusedTests": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      ".llm/tools/deps/standalone-projects_test.ts",
+      ".llm/tools/deps/prod-install_test.ts",
+      ".llm/tools/validation/fresh-ui-quality_test.ts",
+      ".github/scripts/ci-shard-workflow.test.ts",
+      ".github/scripts/ci-classify-changes.test.ts"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "durationMs": 2827,
+    "summary": {
+      "passed": 93,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 93,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "scoped": {
+    "check": {
+      "source": {
+        "mode": "selection",
+        "cwd": "."
+      },
+      "command": "deno check --unstable-kv <files>",
+      "selection": {
+        "filesSelected": 9,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "groups": []
+    },
+    "lint": {
+      "source": {
+        "mode": "command",
+        "cwd": ".",
+        "exitCode": 0
+      },
+      "selection": {
+        "filesSelected": 9,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 9,
+        "filesProcessed": 9,
+        "droppedFiles": [],
+        "refusals": []
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "groups": []
+    },
+    "fmt": {
+      "command": "deno fmt --check",
+      "cwd": ".",
+      "mode": "check",
+      "summary": {
+        "filesSelected": 9,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 9,
+        "filesProcessed": 9,
+        "droppedFiles": [],
+        "refusals": []
+      },
+      "findings": []
+    }
+  },
+  "quality": {
+    "outcome": "PASS",
+    "exitCode": 0
+  },
+  "canonicalManifest": {
+    "rows": 1024,
+    "unmatched": 0,
+    "freshness": "PASS",
+    "enforcementClass": "ci:workflow",
+    "owner": "S1"
+  },
+  "gates": {
+    "assets-barrel": "PASS",
+    "publish-assets": "PASS",
+    "aspire-version-parity": "PASS",
+    "release:preflight": "PASS"
+  },
+  "preservedHashes": {
+    "tools/fresh-ui-browser/package.json": true,
+    "tools/fresh-ui-browser/package-lock.json": true,
+    "deno.lock": true,
+    "packages/fresh-ui/deno.lock": true
+  },
+  "shippedByteIdentical": {
+    ".llm/tools/deps/outdated.ts": true,
+    ".llm/tools/deps/why.ts": true,
+    ".llm/tools/consumer-tools.json": true,
+    "packages/cli/src/kernel/assets/agent-tools.generated.ts": true
+  },
+  "workflowControls": {
+    "legacyContractRemoval": "old assertions accepted removed gate",
+    "newNegativeControlsRejected": 17,
+    "includes": "removal, wrong gate, comment/name only, continue-on-error step/job, condition missing/false, shell bypass, cwd, install/matrix ordering, job relocation, receipt/report paths, job-level false condition"
+  },
+  "scaffoldRuntime": {
+    "outcome": "UNPROVEN",
+    "exitCode": 1,
+    "reason": "Aspire doctor and Docker unavailable; no scaffold AppHost started"
+  },
+  "resources": "foreign and unknown processes left untouched; full read-only report retained outside source tree",
+  "isolatedModuleCache": {
+    "schemaVersion": 1,
+    "command": [
+      "deno",
+      "test",
+      "--reporter=tap",
+      "--allow-all",
+      "--filter",
+      "CLI census works",
+      ".llm/tools/deps/standalone-projects_test.ts"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "durationMs": 2411,
+    "summary": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 0
+    },
+    "failures": []
+  },
+  "reviewRepairs": {
+    "F1": "Test statically imports census/prod-install graphs; fresh isolated module cache CLI test passes",
+    "F2": "advisoriesFound follows audit threshold exit; totalAdvisories preserves all severities; low-at-high negative control passes",
+    "F3": "Default census CLI test asserts five standalone dependencies, inclusion and preserved workspace count keys"
+  }
+}
