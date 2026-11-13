@@ -1,13 +1,18 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertThrows } from '@std/assert';
 import type { InferContractRouterInputs } from '@orpc/contract';
 import type {
   ExecutionRecordResponse,
   JobTriggerInput,
   JobTriggerOutput,
+  TaskTriggerInput,
 } from '../../src/contracts/v1/mod.ts';
 import { createWorkersContract, workersContractV1 } from '../../src/contracts/v1/mod.ts';
 import type { ExecutionRecord } from '../../src/state/mod.ts';
 import type { TriggerType } from '../../src/domain/constants.ts';
+import {
+  JobTriggerInputZodSchema,
+  TaskTriggerInputZodSchema,
+} from '../../src/contracts/v1/workers.contract-schemas.ts';
 
 // ============================================================================
 // Type-level soundness assertions for the precise workers contract.
@@ -33,6 +38,11 @@ const _badTriggerId: JobTriggerInput = {
   // @ts-expect-error - `id` must be a string
   id: 123,
 };
+
+// @ts-expect-error - a merged job input needs a target for both RPC and REST
+const _missingJobId: JobTriggerInput = {};
+// @ts-expect-error - a merged task input needs a target for both RPC and REST
+const _missingTaskId: TaskTriggerInput = {};
 
 type ApplicationJobPayloads = Readonly<{
   'embed-document': Readonly<{ documentId: string; text: string }>;
@@ -104,4 +114,11 @@ Deno.test('workers contract exposes a precise, non-loosened type surface', () =>
   assertEquals(_validTriggeredBy, 'manual');
   assertEquals(_badTriggeredBy as unknown, 'totally-made-up');
   assertEquals(_badStatus as unknown, 'in-progress');
+});
+
+Deno.test('workers trigger schemas require merged target ids', () => {
+  assertThrows(() => JobTriggerInputZodSchema.parse(_missingJobId));
+  assertThrows(() => TaskTriggerInputZodSchema.parse(_missingTaskId));
+  assertEquals(JobTriggerInputZodSchema.parse({ id: 'job-1' }).id, 'job-1');
+  assertEquals(TaskTriggerInputZodSchema.parse({ id: 'task-1' }).id, 'task-1');
 });

@@ -41,8 +41,8 @@ export type JobTriggerOutput = Readonly<{ jobId: string; triggered: boolean }>;
 
 /** Input accepted by the trigger-task procedure. */
 export type TaskTriggerInput = Readonly<{
-  /** Task id, resolved from the `{id}` path segment; optional in the body. */
-  id?: string;
+  /** Required merged input id; REST obtains it from `{id}`, not the request body. */
+  id: string;
   payload?: Record<string, unknown>;
   priority?: number;
   delay?: number;
