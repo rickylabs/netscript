@@ -1,5 +1,5 @@
 import { createContext } from 'preact';
-import type { ComponentChildren, JSX, VNode } from 'preact';
+import type { ComponentChildren, JSX } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
 import type {
@@ -28,7 +28,7 @@ function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
-function AccordionRoot({ children, ...options }: AccordionRootProps): VNode {
+function AccordionRoot({ children, ...options }: AccordionRootProps): preact.VNode {
   const accordion = useAccordion(options);
   return (
     <AccordionContext.Provider value={accordion}>
@@ -37,7 +37,7 @@ function AccordionRoot({ children, ...options }: AccordionRootProps): VNode {
   );
 }
 
-function AccordionItem({ children, disabled, value, ...props }: AccordionItemProps): VNode {
+function AccordionItem({ children, disabled, value, ...props }: AccordionItemProps): preact.VNode {
   const accordion = useAccordionContext('Accordion.Item');
   const item = { disabled, value };
 
@@ -50,7 +50,7 @@ function AccordionItem({ children, disabled, value, ...props }: AccordionItemPro
   );
 }
 
-function AccordionItemTrigger({ children, ...props }: AccordionItemTriggerProps): VNode {
+function AccordionItemTrigger({ children, ...props }: AccordionItemTriggerProps): preact.VNode {
   const accordion = useAccordionContext('Accordion.ItemTrigger');
   const item = useAccordionItemContext('Accordion.ItemTrigger');
   const triggerProps = accordion.getItemTriggerProps(item, props);
@@ -70,24 +70,25 @@ function AccordionItemTrigger({ children, ...props }: AccordionItemTriggerProps)
   );
 }
 
-function AccordionItemIndicator({ children, ...props }: AccordionItemIndicatorProps): VNode {
+function AccordionItemIndicator({ children, ...props }: AccordionItemIndicatorProps): preact.VNode {
   const accordion = useAccordionContext('Accordion.ItemIndicator');
   const item = useAccordionItemContext('Accordion.ItemIndicator');
   return <div {...accordion.getItemIndicatorProps(item, props)}>{withChildren(children)}</div>;
 }
 
-function AccordionItemContent({ children, ...props }: AccordionItemContentProps): VNode {
+function AccordionItemContent({ children, ...props }: AccordionItemContentProps): preact.VNode {
   const accordion = useAccordionContext('Accordion.ItemContent');
   const item = useAccordionItemContext('Accordion.ItemContent');
   return <div {...accordion.getItemContentProps(item, props)}>{withChildren(children)}</div>;
 }
 
+/** Public compound accordion parts and their exact prop/result signatures. */
 export type AccordionNamespace = Readonly<{
-  Item: typeof AccordionItem;
-  ItemContent: typeof AccordionItemContent;
-  ItemIndicator: typeof AccordionItemIndicator;
-  ItemTrigger: typeof AccordionItemTrigger;
-  Root: typeof AccordionRoot;
+  Item: (props: AccordionItemProps) => preact.VNode;
+  ItemContent: (props: AccordionItemContentProps) => preact.VNode;
+  ItemIndicator: (props: AccordionItemIndicatorProps) => preact.VNode;
+  ItemTrigger: (props: AccordionItemTriggerProps) => preact.VNode;
+  Root: (props: AccordionRootProps) => preact.VNode;
 }>;
 
 /** Compound accordion namespace with root and item subcomponents. */

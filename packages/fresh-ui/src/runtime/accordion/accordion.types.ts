@@ -1,17 +1,25 @@
-import type { JSX } from 'preact';
 import type { MachineDataAttributes } from '../_internal/dom-types.ts';
 import type { FreshUiChildren } from '../_internal/public-props.ts';
 
-export type AccordionRootElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
-export type AccordionItemElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
+/** DOM attributes returned for the accordion root part. */
+export type AccordionRootElementProps =
+  & preact.JSX.HTMLAttributes<HTMLDivElement>
+  & MachineDataAttributes;
+/** DOM attributes returned for the accordion item part. */
+export type AccordionItemElementProps =
+  & preact.JSX.HTMLAttributes<HTMLDivElement>
+  & MachineDataAttributes;
+/** DOM attributes returned for the accordion item trigger part. */
 export type AccordionItemTriggerElementProps =
-  & JSX.HTMLAttributes<HTMLElement>
+  & preact.JSX.HTMLAttributes<HTMLElement>
   & MachineDataAttributes;
+/** DOM attributes returned for the accordion item indicator part. */
 export type AccordionItemIndicatorElementProps =
-  & JSX.HTMLAttributes<HTMLDivElement>
+  & preact.JSX.HTMLAttributes<HTMLDivElement>
   & MachineDataAttributes;
+/** DOM attributes returned for the accordion item content part. */
 export type AccordionItemContentElementProps =
-  & JSX.HTMLAttributes<HTMLDivElement>
+  & preact.JSX.HTMLAttributes<HTMLDivElement>
   & MachineDataAttributes;
 
 export type AccordionOrientation = 'horizontal' | 'vertical';
@@ -35,15 +43,25 @@ export interface AccordionFocusChangeDetails {
   value: string | null;
 }
 
+/** Controlled and initial state for the accordion hook. */
 export interface UseAccordionOptions {
+  /** Whether the final expanded accordion item may be collapsed. */
   collapsible?: boolean;
+  /** Initial selection when value is uncontrolled. */
   defaultValue?: string[];
+  /** Disables interaction for this component. */
   disabled?: boolean;
+  /** Stable base identifier for accessible part relationships. */
   id?: string;
+  /** Whether more than one accordion item may be expanded. */
   multiple?: boolean;
+  /** Receives the newly focused accordion item value. */
   onFocusChange?: (details: { value: string | null }) => void;
+  /** Receives selection changes requested by user interaction. */
   onValueChange?: (details: { value: string[] }) => void;
+  /** Sets the axis used for layout and keyboard navigation. */
   orientation?: 'horizontal' | 'vertical';
+  /** Controlled selected item value or values. */
   value?: string[];
 }
 
@@ -51,22 +69,22 @@ export interface UseAccordionReturn {
   focusedValue: string | null;
   getItemContentProps: (
     item: AccordionItemOptions,
-    props?: JSX.HTMLAttributes<HTMLDivElement>,
+    props?: preact.JSX.HTMLAttributes<HTMLDivElement>,
   ) => AccordionItemContentElementProps;
   getItemIndicatorProps: (
     item: AccordionItemOptions,
-    props?: JSX.HTMLAttributes<HTMLDivElement>,
+    props?: preact.JSX.HTMLAttributes<HTMLDivElement>,
   ) => AccordionItemIndicatorElementProps;
   getItemProps: (
     item: AccordionItemOptions,
-    props?: JSX.HTMLAttributes<HTMLDivElement>,
+    props?: preact.JSX.HTMLAttributes<HTMLDivElement>,
   ) => AccordionItemElementProps;
   getItemState: (item: AccordionItemOptions) => AccordionItemState;
   getItemTriggerProps: (
     item: AccordionItemOptions,
-    props?: JSX.HTMLAttributes<HTMLElement>,
+    props?: preact.JSX.HTMLAttributes<HTMLElement>,
   ) => AccordionItemTriggerElementProps;
-  getRootProps: (props?: JSX.HTMLAttributes<HTMLDivElement>) => AccordionRootElementProps;
+  getRootProps: (props?: preact.JSX.HTMLAttributes<HTMLDivElement>) => AccordionRootElementProps;
   orientation: AccordionOrientation;
   value: string[];
 }

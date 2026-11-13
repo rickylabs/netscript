@@ -1,4 +1,3 @@
-import type { JSX } from 'preact';
 import type { MachineDataAttributes } from '../_internal/dom-types.ts';
 import type { FreshUiChildren } from '../_internal/public-props.ts';
 
@@ -6,22 +5,29 @@ import type { FreshUiChildren } from '../_internal/public-props.ts';
 // Element-level prop types (returned by hook getters)
 // ---------------------------------------------------------------------------
 
+/** DOM attributes returned for the sheet trigger part. */
 export type SheetTriggerElementProps =
-  & JSX.ButtonHTMLAttributes<HTMLButtonElement>
+  & preact.JSX.ButtonHTMLAttributes<HTMLButtonElement>
   & MachineDataAttributes;
+/** DOM attributes returned for the sheet content part. */
 export type SheetContentElementProps =
-  & JSX.HTMLAttributes<HTMLDialogElement>
+  & preact.JSX.HTMLAttributes<HTMLDialogElement>
   & MachineDataAttributes
   & {
     'data-side'?: SheetSide;
     open?: boolean;
   };
-export type SheetTitleElementProps = JSX.HTMLAttributes<HTMLHeadingElement> & MachineDataAttributes;
-export type SheetDescriptionElementProps =
-  & JSX.HTMLAttributes<HTMLParagraphElement>
+/** DOM attributes returned for the sheet title part. */
+export type SheetTitleElementProps =
+  & preact.JSX.HTMLAttributes<HTMLHeadingElement>
   & MachineDataAttributes;
+/** DOM attributes returned for the sheet description part. */
+export type SheetDescriptionElementProps =
+  & preact.JSX.HTMLAttributes<HTMLParagraphElement>
+  & MachineDataAttributes;
+/** DOM attributes returned for the sheet close part. */
 export type SheetCloseElementProps =
-  & JSX.ButtonHTMLAttributes<HTMLButtonElement>
+  & preact.JSX.ButtonHTMLAttributes<HTMLButtonElement>
   & MachineDataAttributes;
 
 // ---------------------------------------------------------------------------
@@ -31,6 +37,7 @@ export type SheetCloseElementProps =
 /** Sheet positioning — CSS handles responsive switching. */
 export type SheetSide = 'right' | 'bottom';
 
+/** Causes reported when a sheet requests an open-state transition. */
 export type SheetOpenChangeReason =
   | 'trigger'
   | 'close-button'
@@ -39,7 +46,9 @@ export type SheetOpenChangeReason =
   | 'native-close'
   | 'programmatic';
 
+/** Metadata describing a sheet open-state transition. */
 export interface SheetOpenChangeDetails {
+  /** Interaction or application request that caused the transition. */
   reason: SheetOpenChangeReason;
 }
 
@@ -47,27 +56,39 @@ export interface SheetOpenChangeDetails {
 // Hook options and return
 // ---------------------------------------------------------------------------
 
+/** Controlled and initial state for the sheet hook. */
 export interface UseSheetOptions {
   /** Which edge to dock. Default: `'right'`. */
   side?: SheetSide;
+  /** Whether Escape dismisses an open surface. */
   closeOnEscape?: boolean;
+  /** Whether outside pointer or focus interaction dismisses the surface. */
   closeOnInteractOutside?: boolean;
+  /** Initial open state when open is uncontrolled. */
   defaultOpen?: boolean;
+  /** Stable base identifier for accessible part relationships. */
   id?: string;
+  /** Whether the surface traps focus and makes surrounding content inert. */
   modal?: boolean;
+  /** Receives open-state changes and their transition details. */
   onOpenChange?: (open: boolean, details: SheetOpenChangeDetails) => void;
+  /** Controlled open state. */
   open?: boolean;
 }
 
 export interface UseSheetReturn {
-  getCloseProps: (props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => SheetCloseElementProps;
-  getContentProps: (props?: JSX.HTMLAttributes<HTMLDialogElement>) => SheetContentElementProps;
+  getCloseProps: (
+    props?: preact.JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+  ) => SheetCloseElementProps;
+  getContentProps: (
+    props?: preact.JSX.HTMLAttributes<HTMLDialogElement>,
+  ) => SheetContentElementProps;
   getDescriptionProps: (
-    props?: JSX.HTMLAttributes<HTMLParagraphElement>,
+    props?: preact.JSX.HTMLAttributes<HTMLParagraphElement>,
   ) => SheetDescriptionElementProps;
-  getTitleProps: (props?: JSX.HTMLAttributes<HTMLHeadingElement>) => SheetTitleElementProps;
+  getTitleProps: (props?: preact.JSX.HTMLAttributes<HTMLHeadingElement>) => SheetTitleElementProps;
   getTriggerProps: (
-    props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+    props?: preact.JSX.ButtonHTMLAttributes<HTMLButtonElement>,
   ) => SheetTriggerElementProps;
   ids: {
     content: string;
