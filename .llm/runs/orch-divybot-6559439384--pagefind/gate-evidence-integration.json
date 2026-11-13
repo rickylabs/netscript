@@ -1,0 +1,206 @@
+{
+  "docs-check": {
+    "exitCode": 0,
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 26,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "reportSha256": "e48ba53829697fc918518ccc9bad8adc6d754f8b13907a3b8fa5ad4b0b7031a2"
+  },
+  "docs-lint": {
+    "exitCode": 0,
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 26,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "reportSha256": "7749cc0b7f443df67a50e7a1d9d24f9f922cce01d2289a6eaa6e339acb01aea3"
+  },
+  "docs-fmt": {
+    "exitCode": 0,
+    "summary": {
+      "filesSelected": 26,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "selection": null,
+    "reportSha256": "96d901fc0f76c40ec239146956f5f498e34fc45a82afb71624f13e08504494cb"
+  },
+  "browser-check": {
+    "exitCode": 0,
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 4,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "reportSha256": "5f2f7edc4ef214c8a3d19cdfc1573d74aed285cd0b10cea66ffde83b78b0f5a7"
+  },
+  "browser-lint": {
+    "exitCode": 0,
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 4,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "reportSha256": "99d63958cb55af3675719ba94a32fd18b14fa4939842ecb0872584ef6f4205a9"
+  },
+  "browser-fmt": {
+    "exitCode": 0,
+    "summary": {
+      "filesSelected": 4,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "selection": null,
+    "reportSha256": "70e7c87f4e27f9e623aa863d0523ad8ce19d0a6868f43b610c18caf9e7fcfa41"
+  },
+  "site-check": {
+    "exitCode": 0,
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueCodes": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 4,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "reportSha256": "743703b91df82a5a9ff591360bf1e418eb2cd066900aff39e833c0a11426ab93"
+  },
+  "site-lint": {
+    "exitCode": 0,
+    "summary": {
+      "totalOccurrences": 0,
+      "uniqueOccurrences": 0,
+      "uniqueRules": 0,
+      "uniquePaths": 0
+    },
+    "selection": {
+      "filesSelected": 3,
+      "batches": 1,
+      "failedBatches": 0
+    },
+    "reportSha256": "c3f174176c663eaa1a78b19a2765830387e58b6c50ee7500df8ff6c026fd94f8"
+  },
+  "site-fmt": {
+    "exitCode": 0,
+    "summary": {
+      "filesSelected": 3,
+      "batches": 1,
+      "failedBatches": 0,
+      "findings": 0,
+      "ignoredFindings": 0
+    },
+    "selection": null,
+    "reportSha256": "b2ee971c73b900f61a10bbdbd910cd87b4992a4641c0df277821c247bb64ccd5"
+  },
+  "docs-tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 22,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 22,
+      "uniqueFailures": 0
+    },
+    "selection": null,
+    "reportSha256": "b1d5f6ed4b8a738723975e8188bc171df516bff8e38d1c9e037745caa66c1913"
+  },
+  "site-source-tests": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 39,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 39,
+      "uniqueFailures": 0
+    },
+    "selection": null,
+    "reportSha256": "6fde66547dfa3566d36ebe1cfd765087651abba143bc1089b8d248982167501e"
+  },
+  "ingestion-test": {
+    "exitCode": 0,
+    "summary": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 1,
+      "uniqueFailures": 0
+    },
+    "selection": null,
+    "reportSha256": "b1cbcf5e0dfa2b0f7aae515e485da018a298b4c929e717dc9e2f610fc6b317de"
+  },
+  "native-strict-two-build": {
+    "exitCode": 0,
+    "scope": "all-output",
+    "files": 1116,
+    "html": 316,
+    "search": 311,
+    "twins": 262,
+    "differences": [],
+    "sourceState": "slice2 uncommitted atop ed7d08a; immutable-head proof pending"
+  },
+  "quality-gate": {
+    "exitCode": 0,
+    "receiptSha256": "7a1abcacdbb9668a34b235705d4d95bb6b36e992768368954cbb2463c1426dbd",
+    "note": "exploratory working-tree receipt; immutable final-head proof pending"
+  },
+  "cli-runtime-attempt": {
+    "exitCode": 1,
+    "passed": 1,
+    "failed": 2,
+    "skipped": 0,
+    "failures": [
+      "preflight.aspire",
+      "cleanup.aspire-stop"
+    ],
+    "environment": "Docker daemon unavailable; no scaffold runtime proof"
+  },
+  "high-audit": {
+    "exitCode": 1,
+    "baselineAdvisoryIDsUnchanged": true,
+    "critical": 0,
+    "high": 6,
+    "totalAllSeverities": 10,
+    "changedPagefindAdvisories": 0
+  },
+  "utility-browser": {
+    "exitCode": 0,
+    "passed": 158,
+    "skipped": 6,
+    "failed": 0,
+    "flaky": 0,
+    "note": "full four-project suite; existing conditional skips only; working-tree source reviewed in slice-review-native.md"
+  }
+}

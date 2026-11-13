@@ -88,10 +88,21 @@ The style gate accepts bundled token definitions only when their selector, prope
 exactly match the separately verified token layer; authored custom colours still fail.
 
 `deno run --allow-read --allow-run --allow-env tools/docs-site/check-reproducible.ts` builds twice
-and compares every output. The default is strict. `--allow-pagefind-metadata` reports only the
-known upstream Pagefind entry/filter/meta serialization variation separately; HTML, Markdown twins,
-anchor fragments and all other assets remain byte-identical. Search behavior is verified by the
-real browser Pagefind tests. The metadata issue remains #2453; token-source consolidation stays #2450.
+and compares every output byte, including Pagefind entry/filter/meta files, HTML, Markdown twins,
+anchor fragments and all other assets. Any changed, added or missing file fails the gate; there are
+no metadata allowances. Pages CI runs this strict check and the real browser Pagefind tests.
+The original #2453 failure and immutable implementation-head proof are retained in
+[PR #2575](https://github.com/rickylabs/netscript/pull/2575). Token-source consolidation stays #2450.
+
+Native reproducibility uses the released [Pagefind 1.6.0 correction](https://github.com/Pagefind/pagefind/pull/1124).
+`docs/site/deno.json` redirects Lume 2.5.4's exact `npm:pagefind@1.3.0` import to 1.6.0;
+the site lock pins the package and platform binaries. The ordinary Lume task uses `--frozen`.
+`docs/site/_plugins/pagefind.ts` orders the shared Lume page list by URL before registering the
+existing indexer, so native page numbers also remain stable across filesystem traversal orders
+([upstream #1395](https://github.com/Pagefind/pagefind/issues/1395)). The native output is emitted unchanged.
+Extend that integration in one place and run `deno task --cwd docs/site test:pagefind`: it compares
+every output byte for ordered and shuffled pages through the real Lume processors, and verifies
+that an unsorted negative control differs. Keep the strict two-build and complete browser gates.
 
 The public callout and code galleries live under `docs/site/design-system/docs-kit/`, linked from the Design system navigation and indexed in that search lane. API badge mappings follow the Utility spec in `docs/design-system/themes/studio/DESIGN.md`; `api-kinds_test.ts` fixes that contract independently of the browser paint checks.
 
