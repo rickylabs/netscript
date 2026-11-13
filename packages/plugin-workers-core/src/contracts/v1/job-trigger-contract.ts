@@ -9,8 +9,8 @@ export type JobTriggerInput<
   TPayloads extends JobPayloadRegistry = JobPayloadRegistry,
 > = string extends keyof TPayloads ? Readonly<
     {
-      /** Job id, resolved from the `{id}` path segment; optional in the broad service input. */
-      id?: string;
+      /** Required merged input id; REST obtains it from `{id}`, not the request body. */
+      id: string;
       payload?: JobPayloadRecord;
       priority?: number;
       delay?: number;
