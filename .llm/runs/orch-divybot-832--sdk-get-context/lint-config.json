@@ -1,0 +1,15 @@
+{
+  "lint": {
+    "exclude": [],
+    "rules": {
+      "tags": [
+        "recommended",
+        "jsr"
+      ],
+      "include": [
+        "no-process-global",
+        "no-node-globals"
+      ]
+    }
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "gate": "LEAK-S0-R2",
+  "kind": "publication-content-scan-not-runtime-resource-check",
+  "baselineCommit": "e3b5ff75ba65ee15347504896df38262332d4755",
+  "candidate": "STAGED",
+  "scanSelfControls": {
+    "negativeCategories": 5,
+    "innocuousControl": true
+  },
+  "categories": [
+    "secret",
+    "operator-path",
+    "network-address",
+    "session-identity",
+    "usage"
+  ],
+  "safeDocumentationHosts": [
+    "github.com",
+    "jsr.io",
+    "orpc.dev",
+    "registry.npmjs.org",
+    "example.invalid",
+    "example.com"
+  ],
+  "patchSha256": "c0b1bb8f3b1c9b15621378d8a37d39b7ea48b26a8afd10a69d0856b96df6ce8e",
+  "files": [
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/.gitignore",
+      "sha256": "ab5e83533909c3f1a33fc10507b90e24a3a5ad763964a6c5050e9309afca03d2"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/api-path-controls-R2_test.ts",
+      "sha256": "d858b7953904a092ba3d22143fcc5f267e3f23427bbc382993f98c4ffaed940d"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/api-path-evidence-R2.json",
+      "sha256": "162446704ad784e53c1d3fa9f8769ffec3c49fc89ecc2cad70d3271a03b42e66"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/cache-mode-boundary-R2.json",
+      "sha256": "ef17f8fa67ddd788c2fcca15a1625eb8b399c988324b61bac3aab91fe3daabf9"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/context-pack-R2.md",
+      "sha256": "b885d8d6e10ad0064a989f1e7e1fb8d7ac323b9e4170b758c9ecdc8bac909a05"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/context-pack.md",
+      "sha256": "48e8ef7f5f7b6323c3957e15cb00c779d324ec516cef461b4174c90e9408a074"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/dispositions-R2.md",
+      "sha256": "f9212386cb56163d180f170c906847e2d1ecac6cfd33e29ca985a3d58b0a2d12"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/drift-R2.md",
+      "sha256": "78fed60ac7e2b7394ab06e2ee58012d93c6f76e92ac04e4fda4e866c9a32b9fd"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/drift.md",
+      "sha256": "5a8ecdd0473f0bf35727c789b2a813301419beb5c3aabcd8bf643e647f12ba65"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/get-context.repro_test.ts",
+      "sha256": "533181a9ce8544384f095402efddc5118038d6158dea40a49bd00f77f2941564"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/immutable-manifest.json",
+      "sha256": "4bbcc375d4bec9bf015c2608fbae3c72b5988460d8a2a7d1a577e6698b855cb0"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/lesson-2026-11-11.md",
+      "sha256": "02290586741c6f0d5b13b23929b18b57fb0f930869464f44ab05c7ffa84f021d"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/lint-config.json",
+      "sha256": "045f2f7f88a6a340863a3b5838abb2556d42528b004cfe7a1709265961d3ff50"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/mutation-protocol-R2.md",
+      "sha256": "1e39e583d51e51d6e978e4a62bf4d450434692ec84c63f8b0bf743f09d1dc255"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/plan-R1-verdict.md",
+      "sha256": "731003f7a6101fa00b594d6578f6232533ac68b2b775427e977bc7a4521d3cb1"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/plan-R2.md",
+      "sha256": "d71172463c9539a62a8c34ae04c546df9a689cf28b35d968ea35095093b9b58e"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/plan.md",
+      "sha256": "e304244b92f998582dbae88eeacb5d51a252adfcf7e07480a60c2a1c047e4ada"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/r1-preservation-R2.json",
+      "sha256": "cb0424601599ea4cad90ceae70befb612db4ed8c232bf4fec6aca4c0a47b1cde"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/red-evidence.json",
+      "sha256": "dacaf16e61556c0e6870f69ec5ac4bd999952e9299b839df8e234b37046aefbc"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/research-R2.md",
+      "sha256": "a02346c345db596033fcea8820e46cd312497844e4dfd7cfa723620afefb688e"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/research.md",
+      "sha256": "ec0dc21db96f612626bfe55b6948b62b10639dea3dd14ff357f66723c1ef30bb"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/scan-leaks-R2.ts",
+      "sha256": "970a5f3511e5ba02100a61617269d92cd339c6fd6c631b586fa222d576d6538c"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/scoped-validation-R2.json",
+      "sha256": "d9a31a6ef4224e9aeb4813aaac39863eb6d3eaecaab523a21e8e895754422edf"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/scoped-validation.json",
+      "sha256": "b1b8bc673ecfe722f2fd574b669816469feecdaf5dfc19c93b8ebace6f73dfdf"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/source-baseline.json",
+      "sha256": "a6099a8b93211fbf5bb3f2520ae72a04e8931451a435e7743c7952527f1f0adf"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/supervisor-R2.md",
+      "sha256": "0f37bc6028ffa80719f483df0d477af9071ff1cbc63da717557018adb11173a1"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/supervisor.md",
+      "sha256": "c3503bb366067d04bd16d933638cb035c41d8cd5fe58f5a2e99becc9293555c4"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/upstream-comparison-R2.json",
+      "sha256": "95dc3b2eabf87228a57cbc02ef1b7735e71a8f42e13d5ef29308ff2385db9816"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/worklog-R2.md",
+      "sha256": "da54977c204baf2575babbdbc81aff475ea8b094d7f828c55388e01798106739"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/worklog.md",
+      "sha256": "651ff15edfe1f644aa40c2f00ba8a1f2674e56a48ee92ee3d654d2d425644a92"
+    }
+  ],
+  "findings": [],
+  "exclusions": [
+    ".llm/runs/orch-divybot-832--sdk-get-context/LEAK-S0-R2.json"
+  ],
+  "limitation": "Pattern scan plus manual review required; no secret-store, network or runtime access.",
+  "outcome": "PASS"
+}

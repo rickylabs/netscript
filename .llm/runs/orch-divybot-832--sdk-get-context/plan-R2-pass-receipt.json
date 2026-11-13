@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "kind": "Publication-safe independent-plan-verdict intake, not a new evaluator verdict",
+  "originalIndependentVerdictSha256": "0c76011c98c1268009f16266b0df8a10e4f4423eba60cda7d280f53c03f53c32",
+  "verdict": "PASS exact R2 plan",
+  "reviewedHead": "f78014899dbbc6df80c59a18e7821966d79fbe61",
+  "reviewedTree": "a633b029ed59196fbe2ca35666b0f65766d15adb",
+  "planSha256": "d71172463c9539a62a8c34ae04c546df9a689cf28b35d968ea35095093b9b58e",
+  "manifestSha256": "5c3b762af1f5047bad1a96ce3650b09801688d452794f53ef917c8c848e79114",
+  "normalizedSummary": {
+    "path": ".llm/runs/orch-divybot-832--sdk-get-context/plan-R2-pass.md",
+    "sha256": "000a997ddeff348cc6366bbb195fc10b0c111f8ef5f7e62fef09c17ab71f9cd7"
+  },
+  "priorIndependentPlanFailures": 1,
+  "evaluationCountReset": false,
+  "explicitParentProductContinuation": false,
+  "productCompletion": "unproven",
+  "privacy": "Original launch identifiers and operational location are omitted. The exact original artifact digest and all load-bearing reviewed identities are retained. No sealed file is modified."
+}

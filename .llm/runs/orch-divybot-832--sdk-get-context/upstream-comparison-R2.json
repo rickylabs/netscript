@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "kind": "Read-only released-package source/declaration comparison, not a runtime cohort qualification",
+  "versions": [
+    "1.15.5",
+    "1.16.1"
+  ],
+  "inspectionCommands": [
+    "deno info --no-config --no-lock --json npm:@orpc/client@1.15.5/plugins",
+    "deno info --no-config --no-lock --json npm:@orpc/client@1.16.1/plugins"
+  ],
+  "comparisons": [
+    {
+      "extraction": {
+        "startInclusive": "class DedupeRequestsPlugin",
+        "endExclusive": "class ClientRetryPluginInvalid"
+      },
+      "versions": [
+        {
+          "package": "@orpc/client",
+          "version": "1.15.5",
+          "packageRelativePath": "dist/plugins/index.mjs",
+          "fileSha256": "171833e5ee7a4df3233ceb0e6c43f7ded5fddc6160f1d2a882bf64d7e8096e67",
+          "excerptSha256": "4674690fef68340d2b74a3487d0d1cfc3342c3d310c6174d7030826d05d00fdb",
+          "publicExport": "./plugins",
+          "packageManifestSha256": "e6e9de59c0624b24e04efceddf60e03649dd2f58abc7ac6bd337c979b1353a5f"
+        },
+        {
+          "package": "@orpc/client",
+          "version": "1.16.1",
+          "packageRelativePath": "dist/plugins/index.mjs",
+          "fileSha256": "94f8f71bb2b4bbe99adc55589597b5165a0916b077c2bf0093cf0fae04cf7810",
+          "excerptSha256": "4674690fef68340d2b74a3487d0d1cfc3342c3d310c6174d7030826d05d00fdb",
+          "publicExport": "./plugins",
+          "packageManifestSha256": "93b1ddce9d3c58b43aa3d9547f864b9d587de361e60634f6e6d10f7b1f2d98d8"
+        }
+      ],
+      "excerptsByteIdentical": true,
+      "relevantUnifiedDiff": []
+    },
+    {
+      "extraction": {
+        "startInclusive": "interface DedupeRequestsPluginGroup",
+        "endExclusive": "declare class DedupeRequestsPlugin"
+      },
+      "versions": [
+        {
+          "package": "@orpc/client",
+          "version": "1.15.5",
+          "packageRelativePath": "dist/plugins/index.d.mts",
+          "fileSha256": "b57cedcb83cf455a7c94c4421ae4ec51baf3bb6d19b4c43a7eb9d1007cd3767f",
+          "excerptSha256": "eced6711be0810c2f169c6b5c3cf0243ffa389f351d83e25e06b8692f70d6dc5",
+          "publicExport": "./plugins",
+          "packageManifestSha256": "e6e9de59c0624b24e04efceddf60e03649dd2f58abc7ac6bd337c979b1353a5f"
+        },
+        {
+          "package": "@orpc/client",
+          "version": "1.16.1",
+          "packageRelativePath": "dist/plugins/index.d.mts",
+          "fileSha256": "b57cedcb83cf455a7c94c4421ae4ec51baf3bb6d19b4c43a7eb9d1007cd3767f",
+          "excerptSha256": "eced6711be0810c2f169c6b5c3cf0243ffa389f351d83e25e06b8692f70d6dc5",
+          "publicExport": "./plugins",
+          "packageManifestSha256": "93b1ddce9d3c58b43aa3d9547f864b9d587de361e60634f6e6d10f7b1f2d98d8"
+        }
+      ],
+      "excerptsByteIdentical": true,
+      "relevantUnifiedDiff": []
+    },
+    {
+      "extraction": {
+        "startInclusive": "class LinkFetchClient",
+        "endExclusive": "class RPCLink"
+      },
+      "versions": [
+        {
+          "package": "@orpc/client",
+          "version": "1.15.5",
+          "packageRelativePath": "dist/adapters/fetch/index.mjs",
+          "fileSha256": "132b39c81c021a9dda6a2d515816d19bff22e7d188ae3f49818cd0cb5e8b1d25",
+          "excerptSha256": "be56c122068051c7ceb01f0fb0cf51d6f58a6d989271dde4ecbff6cb129bd97e",
+          "publicExport": "./fetch",
+          "packageManifestSha256": "e6e9de59c0624b24e04efceddf60e03649dd2f58abc7ac6bd337c979b1353a5f"
+        },
+        {
+          "package": "@orpc/client",
+          "version": "1.16.1",
+          "packageRelativePath": "dist/adapters/fetch/index.mjs",
+          "fileSha256": "07d42021cf685fe645e14d893cb9899a1af135e502dad620b5bd7a1e120001f1",
+          "excerptSha256": "be56c122068051c7ceb01f0fb0cf51d6f58a6d989271dde4ecbff6cb129bd97e",
+          "publicExport": "./fetch",
+          "packageManifestSha256": "93b1ddce9d3c58b43aa3d9547f864b9d587de361e60634f6e6d10f7b1f2d98d8"
+        }
+      ],
+      "excerptsByteIdentical": true,
+      "relevantUnifiedDiff": []
+    },
+    {
+      "extraction": {
+        "startInclusive": "function toBatchAbortSignal",
+        "endExclusive": "function toBatchRequest"
+      },
+      "versions": [
+        {
+          "package": "@orpc/standard-server",
+          "version": "1.15.5",
+          "packageRelativePath": "dist/batch/index.mjs",
+          "fileSha256": "13a13723a8b388c4142883ea4ddcd945bf3555249d093184b523ec8e4ac593d6",
+          "excerptSha256": "c3d4777b26c19fc6dd47fe35118ad965776747720bc5e72186ddb3d4899e7c16",
+          "publicExport": "./batch",
+          "packageManifestSha256": "9990f119adf89595bb15633f635444db215b31bd72a813943b00764de9005be1"
+        },
+        {
+          "package": "@orpc/standard-server",
+          "version": "1.16.1",
+          "packageRelativePath": "dist/batch/index.mjs",
+          "fileSha256": "13a13723a8b388c4142883ea4ddcd945bf3555249d093184b523ec8e4ac593d6",
+          "excerptSha256": "c3d4777b26c19fc6dd47fe35118ad965776747720bc5e72186ddb3d4899e7c16",
+          "publicExport": "./batch",
+          "packageManifestSha256": "709960e3117f8961993e8666ebabc2f3e803b30d1154055899b9e68d1653d21b"
+        }
+      ],
+      "excerptsByteIdentical": true,
+      "relevantUnifiedDiff": []
+    }
+  ],
+  "rawInfoDigests": {
+    "1.15.5": "5f741990c8ea71fdfdd8020ba48ef5f11f9a61e416181c8085df2113283c1f43",
+    "1.16.1": "0596e4863c97f67eb08c985a55d4f9a3ca71dbc81fe395e344e70a3ec3c55dba"
+  },
+  "findings": [
+    "Dedupe plugin implementation excerpt byte-identical: static group.context replacement remains.",
+    "Public dedupe group/filter declaration excerpt byte-identical.",
+    "Fetch client implementation excerpt byte-identical: signal remains on the constructed Request.",
+    "Batch abort aggregation excerpt byte-identical: any unsignalled peer disables combined abort; otherwise all inputs must abort."
+  ],
+  "limits": [
+    "Actual SDK behavioral tests use the unchanged repository lock at oRPC1.15.5.",
+    "No source/runtime substitution, fake pin, package change or complete-version parity claim.",
+    "Exact published framework cohort and unchanged consumer regression still require owner/parent qualification."
+  ]
+}

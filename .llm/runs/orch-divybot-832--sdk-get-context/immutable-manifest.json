@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Immutable S0 plan/evidence checkpoint; not PLAN PASS or product acceptance",
+  "sourceIssue": "rickylabs/netscript#2610",
+  "assignmentIssue": "rickylabs/harness#832",
+  "phase": "PLAN_REVIEW_REQUIRED",
+  "baselineHead": "12c981104c1d13812d7119798911a0937e74348c",
+  "plan": {
+    "path": ".llm/runs/orch-divybot-832--sdk-get-context/plan.md",
+    "sha256": "e304244b92f998582dbae88eeacb5d51a252adfcf7e07480a60c2a1c047e4ada"
+  },
+  "files": [
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/.gitignore",
+      "sha256": "ab5e83533909c3f1a33fc10507b90e24a3a5ad763964a6c5050e9309afca03d2"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/context-pack.md",
+      "sha256": "48e8ef7f5f7b6323c3957e15cb00c779d324ec516cef461b4174c90e9408a074"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/drift.md",
+      "sha256": "5a8ecdd0473f0bf35727c789b2a813301419beb5c3aabcd8bf643e647f12ba65"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/get-context.repro_test.ts",
+      "sha256": "533181a9ce8544384f095402efddc5118038d6158dea40a49bd00f77f2941564"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/lesson-2026-11-11.md",
+      "sha256": "02290586741c6f0d5b13b23929b18b57fb0f930869464f44ab05c7ffa84f021d"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/lint-config.json",
+      "sha256": "045f2f7f88a6a340863a3b5838abb2556d42528b004cfe7a1709265961d3ff50"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/plan.md",
+      "sha256": "e304244b92f998582dbae88eeacb5d51a252adfcf7e07480a60c2a1c047e4ada"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/red-evidence.json",
+      "sha256": "dacaf16e61556c0e6870f69ec5ac4bd999952e9299b839df8e234b37046aefbc"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/research.md",
+      "sha256": "ec0dc21db96f612626bfe55b6948b62b10639dea3dd14ff357f66723c1ef30bb"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/scoped-validation.json",
+      "sha256": "b1b8bc673ecfe722f2fd574b669816469feecdaf5dfc19c93b8ebace6f73dfdf"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/source-baseline.json",
+      "sha256": "a6099a8b93211fbf5bb3f2520ae72a04e8931451a435e7743c7952527f1f0adf"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/supervisor.md",
+      "sha256": "c3503bb366067d04bd16d933638cb035c41d8cd5fe58f5a2e99becc9293555c4"
+    },
+    {
+      "path": ".llm/runs/orch-divybot-832--sdk-get-context/worklog.md",
+      "sha256": "651ff15edfe1f644aa40c2f00ba8a1f2674e56a48ee92ee3d654d2d425644a92"
+    }
+  ],
+  "protectedSources": [
+    {
+      "path": "packages/sdk/src/internal/transport-policy.ts",
+      "gitBlob": "7cebae8c0f027941118858e66f70e38e0cf22890",
+      "sha256": "57fbc9ee6973f407b0c861576c5c68220af53093f2140a80caac50a98bbf1099"
+    },
+    {
+      "path": "packages/sdk/src/client/http-client-link.ts",
+      "gitBlob": "8c8935b6e68f53704c0fcc018344d0e23603bfd0",
+      "sha256": "fe81ed1dd83175da0ca9c06603f535ba14238bcc188ce7e2a39817efe4af4d73"
+    },
+    {
+      "path": "packages/sdk/src/internal/client-contributions/stable-v1-adapter.ts",
+      "gitBlob": "265bbc2eb45a9fa6a81df55aa3fff50ce56c4678",
+      "sha256": "f99cb9fea9b1d6d0d1df7dac7c3f91c264e6a68bcc54d06d74a3e2e2bb9bb7c6"
+    },
+    {
+      "path": "packages/sdk/src/ports/service-client.ts",
+      "gitBlob": "ed76fe780a5c8d765c8aa393877c2beb3a6508f1",
+      "sha256": "b9f7724e707fe206ea086472943fe37c9ce5b81e1cc3ca5f2d305386c8589cb1"
+    },
+    {
+      "path": "packages/sdk/deno.json",
+      "gitBlob": "acfead3fd9bf889f3f11ecb2f0d7e3c30d0e12c1",
+      "sha256": "0c1fb48b21713d862bbc67640f7aacb0596ccd4a738992e85081b16546c08a35"
+    },
+    {
+      "path": "packages/plugin-auth-core/src/sdk/bearer-contribution.ts",
+      "gitBlob": "c167db3165beaea93d35c3c1c6515b55877b8878",
+      "sha256": "a0b463dbddaeb00cab5f664a5f86fe6c795dc8cf7db776cc71d08967ea4d0179"
+    },
+    {
+      "path": "deno.json",
+      "gitBlob": "54dc15e43f7d74b7cad6b6a60a970931173a4d1c",
+      "sha256": "e6ebfc7617d02128ad664abe0602c2c202ad89fbc04adad6ec0905cb96d76156"
+    },
+    {
+      "path": "deno.lock",
+      "gitBlob": "269b1f4414e1e49821314784ee47d9496112142c",
+      "sha256": "ebc398353ec0382a108603a235b9dea480439debd619ed2d872d9156dbcb4be9"
+    }
+  ],
+  "unproven": [
+    "independent exact-plan PASS",
+    "explicit parent product continuation",
+    "product implementation and restored GREEN",
+    "exact-head independent IMPL-EVAL",
+    "runtime/production gates",
+    "current-head CI",
+    "published framework cohort and unchanged consumer regression"
+  ],
+  "verification": "Hash files as exact bytes. Manifest does not include itself. Future revisions require a new manifest/hash and parent review; never reinterpret this checkpoint as implementation approval."
+}
