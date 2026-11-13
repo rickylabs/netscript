@@ -23,6 +23,7 @@ import {
 } from './plugin-registry-renderer.ts';
 import { frozenPluginInspection } from '../../../../kernel/adapters/runtime/process/frozen-plugin-inspection.ts';
 import { removeInactivePluginRegistries } from './plugin-registry-writer.ts';
+import { prepareConfiguredPluginGraphs } from './configured-plugin-graph-preparation.ts';
 import type {
   GeneratedPluginRegistry,
   GenerateInstalledPluginRegistries,
@@ -145,6 +146,7 @@ export function createInstalledRuntimeRegistryGenerator(
         await dependencies.fs.writeFile(join(input.projectRoot, file.path), file.content);
       }
       for (const write of legacy) await write();
+      await prepareConfiguredPluginGraphs(input.projectRoot, dependencies.fs, dependencies.process);
     }
 
     return generated;
