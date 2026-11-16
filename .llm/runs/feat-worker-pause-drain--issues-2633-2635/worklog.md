@@ -71,3 +71,10 @@ Structured full Worker suite plus core cause tests:113pass/0fail/0ignored, inclu
 Scoped161-file formatter, check and lint wrappers:0findings. Plugin doc-lint combined2 and every entrypoint match measured baseline, including runtime2/worker0/services0. New lifecycle type is an identity export for runtime public closure. release:preflight fourPASS; docs:accuracyPASS. Four exact owned backend containers remain retained for subsequent slices. Configuration/default standalone runner changes and S6 documentation remain pending; no acceptance completion claim yet.
 
 S4 quality:gate (quality scan + architecture fitness) exit0; no new doctrine exemption. Worker476lines, focused abort fixture272lines; legacy dispatch test reduced by241lines.
+
+
+## S5 red contract and real runtime oracle
+
+Before changing configuration/runtime forwarding, committed schema default/validation cases and isolated real-runtime subprocess cases. Executable final fixture uses a real project config module, dynamic user handler, native Deno KV queues, KV registry/execution state and both startWorkerProcess/startCombinedProcess. No static pool registry or mocked runner. An owned HTTP acknowledgement sink satisfies the unrelated execution mutation publisher. Handler requires1.25s post-deadline cleanup; the terminal state must remain timeout even when cleanup returns success. Authored50ms versus1800ms and explicit overrides both directions test actual reachability/precedence. Child processes and their temporary project/KV paths are owned and removed; no container started.
+
+Final red report:4pass/6fail/0ignored. Both schema tests fail; all four short-grace cases observe cleanup awaited despite requested50ms, proving neither authored nor explicit grace reaches the runtime. Four long-grace controls pass under S4's new Worker-derived default. Initial fixture failures (missing unrelated streams reference and a project-relative dynamic entrypoint mistake) are excluded from product evidence, repaired before this oracle. The original committed core config/default>1s tests still cover the two main regressions.
