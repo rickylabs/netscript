@@ -66,3 +66,59 @@ All nine acceptance boxes (#2633 boxes 1–4, #2635 boxes 1–5) are mapped to c
 - No resources were launched for this evaluation; this run's research backends and volumes were cleaned by proven identity per leak-report.md. Raw reproduction reports and diagnostics remain private to the operator; only repo-relative public evidence is used here.
 
 PR https://github.com/rickylabs/netscript/pull/2645, head 89effd610f04deba89f08149f5d36ed822c6eb27, checks and reviews: required CI policy-skipped (draft, command-postgres green), no reviews yet.
+
+---
+
+# Follow-up PLAN-EVAL — intake drain ownership addendum (cycle 2)
+
+- Follow-up evaluator session: independent GLM 5.3 provider-default (OpenCode) session, opened 2026-11-16, verdict 2026-11-17, fresh per T3 (not the generator or any prior evaluator session)
+- Run: feat-worker-pause-drain--issues-2633-2635
+- Scope: ONLY the added ownership contract in `plan-intake-drain-addendum.md` plus continued original-plan acceptance/gate coverage; the still-in-progress implementation (S2/S3a context evidence) is not being approved or rejected here, and no implementation PASS or ready state is claimed
+- Evaluated head: `014730e1ca4e155fe1059054dc46d4d1dd75603d` on feat/worker-pause-drain; the original Plan-Gate PASS above at `89effd610` is preserved unchanged
+- Route attestation: live matrix lookup (feature tier, plan evaluator) confirms primary `glm_5_3/provider_default`, fallback `fable_5_1/low`; requested pinned primary observed exactly in this fresh session, options{}; fallback unused, no substitution. Generator: Codex gpt-6.1-sol/xhigh (OpenAI vendor family), separate session and separate vendor family. Feature tier, cycle 2 of 2.
+
+## Addendum scope verification (load-bearing claims reverified in tree at the exact head)
+
+- `packages/queue/adapters/_redis-listener.ts` — `stop()` arms `drainTimer` at `policy.drainTimeout`; expiry aborts the settlement/receipt controller, closes leases and resolves `expired`; `run()`'s finally races callback settlement (`allSettled`) against `expired`, so the listener generation ends at the visibility-derived timeout even with a held callback. `redisListenerPolicy` (`_redis-lease-state.ts`) derives `drainTimeout` from `options?.visibilityTimeout ?? 30_000`. Addendum claim confirmed in source.
+- `packages/queue/adapters/kv-polling.adapter.ts` — `listen()`'s finally wait is bounded by the constructor `visibilityTimeout` with 100 ms poll steps, then resolves with active processing possibly remaining. Addendum claim confirmed; the excluded 200 ms probe is legitimately near-cadence and the 500 ms case settles it.
+- Independent re-run of the committed `packages/queue/tests/listener-drain-owner_test.ts` KV polling half at the exact head (in-memory KV only; the lane's retained backend containers untouched by this review): default-bounded-drain control green, owner case red at exactly the pause-barrier assertion. Matches the lane's recorded six-case result: 3 owner-option reds (KV polling, Redis, Garnet), 3 ordinary-default controls green, 0 ignored, one unique assertion. The proposed option passes through a variable against the old public contract and is ignored there, as claimed.
+- Worker boundary: the already-approved S2 core drain primitive enforces one monotonic total budget (`started + budget.totalMs` with work/settlement slices) and rejects `TimeoutError` on hung close/cleanup; the three forwarding call sites for jobs/tasks/triggers exist (`worker.ts` job listen, `queue-consumer.ts` task and trigger listens), so S4 forwarding and the unchanged-total claims are meetable exactly as locked.
+- Omission-behavior safety: `ListenOptions` currently has no `drainTimeoutMs` field; no native adaptation, Worker lifecycle/config, runner-default or AMQP changes exist at this head — the mandatory stop before implementing the rework-forcing public option is honored.
+- Provider exemption rationale verified: Postgres joins callbacks inline in its listen loop, Deno KV `stop()` awaits the listener completion, memory joins per its committed S3a contracts; the planned AMQP native-channel design has no independent cutoff. No new behavior is needed there, and AMQP stays decoupled as its own subsequent slice.
+- Implementation-lane S2/S3a gate numbers (Redis/Garnet/Postgres 28/28, budget/PG 8/8, S3a handback/fence/adjacent suites, doc-lint baseline unchanged) are recorded by the lane and used as context only; not re-run and not approved by this verdict.
+
+## Checklist results (8 boxes scoped to the addendum)
+
+| Plan-Gate item (addendum scope)           | Result | Evidence / location |
+| ----------------------------------------- | ------ | ------------------- |
+| Research present and current              | PASS   | Addendum documents the discovery with a live six-case reproduction at the exact head (3 red owner cases / 3 green default controls / 0 ignored), honest 200 ms near-cadence probe exclusion, and the extended-2 s lease oracle separating listener drain from claim expiry; the committed red test is in-tree executable evidence, reverified independently this session |
+| Decisions locked                          | PASS   | Addendum "Locked additional contract": field home (`ListenOptions.drainTimeoutMs` in queue ports), provider scope (Redis/Garnet + KV polling), value domain (finite positive safe integers through 2,147,483,647 or +Infinity; NaN/zero/negative/fractional/excessive rejected before listener allocation), omission semantics, Infinity delegated to a bounded outer owner, Redis "do not arm the post-intake timer" policy, KV polling finally-wait budget, visibility/drain separation, pause-raced committed claim stays an ordinary charged requeue, draining handback stays shutdown-only |
+| Open-decision sweep                       | PASS   | Addendum states no open design decision; evaluator-run sweep found none rework-forcing: explicit-Infinity direct consumers opt in knowingly (default finite unchanged), non-scoped adapters ignore the field per the existing provider-specific-field convention, the worker total/stop math is untouched, and config stays forwarding-only |
+| Commit slices                             | PASS   | S3b additional group ≤10 files (4 named source files + the committed owner test + existing Redis listener policy/lease tests, verified to exist + up to 3 run docs), contract-first; AMQP as its own subsequent <30 slice; S4 proofs added to the already-named worker/listener test group (<30); S6 +1 docs file (<30); S7 unchanged; all slices remain <30 and name proofs plus proving gates |
+| Risk register                             | PASS   | Default-unbounded-stop risk pinned by 3 negative controls plus retained native stop/reclaim regressions; visibility-conflation risk pinned by explicit JSDoc, policy separation and the extended-live-lease oracle; worker forwarding pinned by explicit forwarding plus noncooperative-budget tests; same-name hazard now settled below; no new dependency/lock/command/root surface |
+| Gate set selected                         | PASS   | Original Archetype 3 + overlays gate set unchanged; the addendum only adds scoped proofs (6/6 owner/default controls, invalid-values-allocate-no-resources, retained default finite stop/expiry/claim/outage regressions, S4 forwarding/long-pause/stop-bound proofs, S6 docs) and states no gate weakened or replaced — verified against S1–S7 |
+| Deferred scope explicit                  | PASS   | Addendum enumerates its non-changes (no Streams, no saga transport, no generic pause/transport abstraction, no lease/visibility semantics change, no new exclusivity guarantee, AMQP decoupled); original deferred list from plan.md stands |
+| jsr-audit surface scan                    | PASS   | One optional primitive numeric field through the existing queue ports interface follows the existing provider-specific-field pattern (JSDoc, others ignore); no new exports/subpaths/dependencies/slow types; S3b/S7 doc-lint zero-new-diagnostics against the exact per-entrypoint baseline plus publish dry-run/audit and consumer gates retained |
+
+## Acceptance coverage
+
+9/9 remains. #2633 boxes 1–4 and #2635 boxes 1–5 keep the approved mapping from plan.md "Acceptance evidence to produce"; the addendum adds evidence obligations inside #2635 box1 (pause keeps admitted job/task/trigger work alive beyond the former native cutoffs) and box2 (drain success and stop stay within the worker total) without altering any acceptance box.
+
+## Repairs settled in place (cycle 2 authorization)
+
+1. Addendum risk paragraph now requires the Listener field's JSDoc and the S6 docs to cross-reference the per-listener post-intake cutoff against the already approved, same-named Worker-total stop option (unchanged 25 s total). Wording only, settled in place rather than bounced back; recorded in `drift.md`. No product/tests or design change.
+
+## Findings
+
+None blocking. The six-case control design, the honest near-cadence probe exclusion, and the separation of listener drain from claim expiry (2 s extended lease with a re-checked usable heartbeat) were verified and stand as sound future-contract evidence. The committed red owner cases must not be recorded as false greens — the addendum already commits to exactly that, and S3b must prove 6/6 green once the contract lands.
+
+## Notes
+
+- Feature tier cycle 2/2, narrow implementation-discovery checkpoint after the cycle-1 PASS. On this PASS the generator may begin S3b under the approved slice/gate set. The three positively owned implementation backend containers retained by the lane were not touched, launched or cleaned by this review; no resources were used beyond an in-memory KV re-run.
+- Raw red reports and diagnostics remain private to the operator; only repo-relative public evidence is used here. PR remains draft with `status:plan-eval`; new owner-option tests and original Worker/config reds are intentionally pending, so no ready transition, merge or publication is implied, and final independent IMPL-EVAL plus S7 gates remain required.
+
+## Verdict
+
+`PASS` (follow-up; the added ownership contract and continued acceptance/gate coverage are approved; not an implementation approval)
+
+PR https://github.com/rickylabs/netscript/pull/2645, head 014730e1ca4e155fe1059054dc46d4d1dd75603d, checks and reviews: required CI policy-skipped (draft skip labels; command-postgres green), no reviews yet.

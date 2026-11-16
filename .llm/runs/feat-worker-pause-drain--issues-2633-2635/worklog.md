@@ -39,3 +39,8 @@ Gates:9/9local handback/count controls;9/9duplicate/terminal/late-context guards
 ## Pause-barrier discovery and scoped plan follow-up
 
 Running listener-drain-owner_test.ts reveals Redis/Garnet and KV polling resolve their listener after a native visibility-based wait even while the callback remains active.500msheld callback vs50msnative limit:3proposed-owner cases red,3ordinary-default controls green,0ignored. The initial200ms polling observation was near the100ms cadence and is excluded. This would invalidate a long pause barrier despite independent execution signals. Added plan-intake-drain-addendum.md locks an explicit optional listener drain owner budget (Infinity only under the Worker's separately bounded25s total), default finite behavior unchanged. No added-option implementation before independent PLAN-EVAL follow-up. No AMQP or Worker lifecycle implementation yet.
+
+
+## Listener ownership addendum approved
+
+[Fresh GLM5.3/provider-default PLAN-EVAL PASS](https://github.com/rickylabs/netscript/pull/2645#issuecomment-6931962078) approves the added optional listener drain ownership contract at014730e1c. Independent KV polling default control green / owner case red, source-verified native Redis timeout, core worker25s total boundary and all three forwarding sites;8/8Plan-Gate,9/9continued acceptance. Evaluator settled one wording repair: docs/JSDoc distinguish per-listener post-intake cutoff from same-named Worker total stop option. No implementation waiver or gate reduction. Retain verdict; implement S3b contract/native adapters next. Corrected the verdict's final-line head transcription to the exact evaluated head already stated in its metadata.

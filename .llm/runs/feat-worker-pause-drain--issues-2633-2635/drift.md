@@ -10,3 +10,6 @@ Plan-evaluator corrections: actual docs path tune-worker-runtime.md, not a direc
 
 
 S3a stays within approved adapter scope. Its handback storage-failure test exposed an unjoined callback rejection; red fault test precedes the error-propagation fix, which keeps the original processing entry durable and fails the listener. Native listener post-intake expiry can resolve a pause generation before handlers finish;3real/scaled owner cases red with3default controls green. That rework-forcing contract discovery is stopped at a separate plan checkpoint, with exact proposal/files/gates in plan-intake-drain-addendum.md. No new-option implementation yet.
+
+
+Follow-up PLAN-EVAL cycle2 settlement: addendum risk text now pins the shared name with the already approved Worker-total stop option (Listener JSDoc/S6 docs must cross-reference the per-listener post-intake cutoff against the unchanged25s Worker total). Wording only, settled in place under the cycle2 authorization; no product/tests or design change. Original Plan-Gate PASS history preserved; follow-up verdict PASS appended to plan-eval.md at014730e1.
