@@ -14,7 +14,9 @@ for (const hangs of [false, true]) {
           `
           import '@netscript/kv/redis';
           import { getKv, closeKv } from '@netscript/kv';
-          import { runChildHealthProcess } from '@netscript/plugin/health';
+          import { runChildHealthProcess } from ${
+            JSON.stringify(new URL('./run-child-health-process.ts', import.meta.url).href)
+          };
           await runChildHealthProcess(async (health, signal) => {
             await (await getKv({ provider: 'redis', redisUrl: Deno.env.get('NETSCRIPT_TEST_REDIS_URL'), skipServiceDiscovery: true })).get(['shutdown-probe']);
             health.registryLoaded(); health.dependenciesReady(); health.running();

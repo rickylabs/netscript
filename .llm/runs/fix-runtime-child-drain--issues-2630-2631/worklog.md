@@ -53,3 +53,9 @@ Added optional, idempotent owner disposal to PluginServiceContext without resolv
 
 Generated-owner tests first failed 2/37 with missing disposal against the old embedded template. After canonical gen:assets-barrel, the suite passes 37/37, including all three installed runtime artifacts, acquired/unused generated DB cases, lazy owner disposal and a real signal proving exactly one disconnect. Structured changed-source check passes (14 files); non-CLI lint/fmt passes with no findings. CLI files require the repository's explicit CLI quality config because the root config excludes them; separate wrappers validate them. No lock changes or new dependencies.
 Reconcile: #2630/#2631 acceptance implementation is progressing; generated runtime smoke, documentation/assets and independent IMPL-EVAL remain. No foreign resources are running for this slice.
+
+## S3b public behavior documentation
+
+Documented child loopback/hostname overrides, total and reserved cleanup budgets, explicit exit codes 0/1/2, manual/external embedding semantics, host database ownership override and OTel standalone signal behavior. Expanded the generated child-health page from the public option/function JSDoc, so its operational text stays source-derived. Public prose contains no run/evaluator/finding identities.
+
+Docs:accuracy passes. Release:preflight initially detected package self-imports inside the new subprocess test strings; tests now resolve their local source module explicitly, and preflight passes. Child seam tests still pass 4/4. This is a test import correction, not a gate exclusion. Source remains within approved runtime scope. Documentation generator carriers are refreshed after committing the read set, then the full one-pass runtime smoke runs.

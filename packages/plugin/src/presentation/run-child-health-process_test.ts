@@ -129,7 +129,9 @@ for (const hostname of [undefined, '0.0.0.0']) {
         args: [
           'eval',
           `
-        import { runChildHealthProcess } from '@netscript/plugin/health';
+        import { runChildHealthProcess } from ${
+            JSON.stringify(new URL('./run-child-health-process.ts', import.meta.url).href)
+          };
         const serve = Deno.serve;
         let address;
         Deno.serve = (...args) => { const server = serve(...args); address = server.addr; return server; };
