@@ -18,6 +18,7 @@ type MemoryQueueItem<T> = {
   readonly headers: Record<string, string>;
   deliveryCount: number;
   settled: boolean;
+  receipt?: symbol;
 };
 
 /**
@@ -243,19 +244,14 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
     handler: (message: T, context: MessageContext) => Promise<void>,
   ): Promise<void> {
     item.deliveryCount++;
+    item.receipt = Symbol();
     const context = this.createContext(item);
 
     try {
       await handler(item.message, context);
-      const wasRequeued = this.isPending(item);
-      if (!item.settled && !wasRequeued) {
-        item.settled = true;
-      }
+      await context.ack();
     } catch (error) {
-      const wasRequeued = this.isPending(item);
-      if (!item.settled && !wasRequeued) {
-        this.requeue(item);
-      }
+      await context.nack({ requeue: true });
       throw error;
     }
   }
@@ -264,35 +260,49 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
    * Build the message context passed to memory queue handlers.
    */
   private createContext(item: MemoryQueueItem<T>): MessageContext {
+    const receipt = item.receipt;
+    let settlement: Promise<void> | undefined;
+    const settle = (operation: () => Promise<void>): Promise<void> => {
+      if (settlement) return settlement;
+      if (item.receipt !== receipt || item.settled) return Promise.resolve();
+      return settlement = operation().catch((error: unknown) => {
+        settlement = undefined;
+        throw error;
+      });
+    };
     return {
       messageId: item.id,
       deliveryCount: item.deliveryCount,
       enqueuedAt: item.enqueuedAt,
       headers: item.headers,
-      ack: () => {
-        item.settled = true;
-        return Promise.resolve();
-      },
-      nack: async (options = {}) => {
-        item.settled = true;
-        if (options.requeue ?? true) {
-          this.requeue(item);
-        }
-        if (!(options.requeue ?? true)) {
-          await this.deadLetterStore.append(toDeadLetterRecord(
-            {
-              messageId: item.id,
-              queueName: 'memory',
-              payload: item.message,
-              headers: item.headers,
-              deliveryCount: item.deliveryCount,
-              enqueuedAt: item.enqueuedAt,
-            },
-            options.reason ?? 'nack_without_requeue',
-            options,
-          ));
-        }
-      },
+      ack: () =>
+        settle(() => {
+          item.settled = true;
+          return Promise.resolve();
+        }),
+      nack: (options = {}) =>
+        settle(async () => {
+          if (options.requeue ?? true) {
+            if (options.preserveDeliveryCount) {
+              item.deliveryCount = Math.max(0, item.deliveryCount - 1);
+            }
+            this.requeue(item);
+          } else {
+            await this.deadLetterStore.append(toDeadLetterRecord(
+              {
+                messageId: item.id,
+                queueName: 'memory',
+                payload: item.message,
+                headers: item.headers,
+                deliveryCount: item.deliveryCount,
+                enqueuedAt: item.enqueuedAt,
+              },
+              options.reason ?? 'nack_without_requeue',
+              options,
+            ));
+            item.settled = true;
+          }
+        }),
     };
   }
 

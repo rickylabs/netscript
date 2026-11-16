@@ -57,3 +57,8 @@ Archetype3 all F1-F19 plus integration/plugin overlays. Structured scoped source
 ## Open decisions / deferred scope
 
 No must-resolve design choice remains. Exact private fixture/test filenames may change without altering contracts (safe to defer). Crash/outage recovery before a counted handback can be committed remains provider-limited and explicitly documented; ordinary handler failures must count on all adapters. General queue transaction/outbox redesign, broad Postgres/DenoKV transport changes, process lifecycle fixes owned by PR2641, saga SSE2637, all saga transports/Streams, dependency bumps and unrelated architecture migration are deferred. Any discovered contract/budget/fencing divergence is recorded and evaluated before implementing that change.
+
+
+## Required implementation-discovery checkpoint
+
+S3a reproduced a native listener timeout that invalidates long-lived pause barriers. See plan-intake-drain-addendum.md for the proposed provider-specific ListenOptions.drainTimeoutMs ownership contract,3red/3default-control cases and unchanged Worker total. That added contract remains unimplemented until independent feature PLAN-EVAL follow-up. Original S3 is split into portable KV/memory handback (S3a), listener owner policy, then original AMQP work; each group<30files and all final gates retained.

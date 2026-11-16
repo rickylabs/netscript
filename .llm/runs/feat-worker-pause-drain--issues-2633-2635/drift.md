@@ -7,3 +7,6 @@ Research corrections: task callbacks do not use activeJobs, so drain waits per-l
 
 
 Plan-evaluator corrections: actual docs path tune-worker-runtime.md, not a directory index; exact generated carriers named. A committed claim racing pause is an ordinary charged requeue; draining handback preserves the attempt. The latter follows the already locked shutdown-only opt-in and is pinned by an S4 race test.
+
+
+S3a stays within approved adapter scope. Its handback storage-failure test exposed an unjoined callback rejection; red fault test precedes the error-propagation fix, which keeps the original processing entry durable and fails the listener. Native listener post-intake expiry can resolve a pause generation before handlers finish;3real/scaled owner cases red with3default controls green. That rework-forcing contract discovery is stopped at a separate plan checkpoint, with exact proposal/files/gates in plan-intake-drain-addendum.md. No new-option implementation yet.

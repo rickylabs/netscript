@@ -337,8 +337,16 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
       new Date(envelope.enqueuedAt),
       envelope.headers,
       envelope.deliveryCount + 1,
+      envelope,
     );
-    await handler(payload, context);
+    try {
+      await handler(payload, context);
+      await context.ack();
+    } catch {
+      // Publish the counted retry before native acknowledgement; failed persistence
+      // still throws to the native queue so the original delivery is retained.
+      await context.nack({ requeue: true });
+    }
   }
 
   /**
@@ -350,31 +358,52 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     enqueuedAt: Date,
     headers: Record<string, string>,
     deliveryCount: number,
+    envelope?: MessageEnvelope<unknown>,
   ): MessageContext {
+    let settlement: Promise<void> | undefined;
+    const settle = (operation: () => Promise<void>): Promise<void> => {
+      return settlement ??= operation().catch((error: unknown) => {
+        settlement = undefined;
+        throw error;
+      });
+    };
     return createMessageContext(
       messageId,
       enqueuedAt,
       headers,
       deliveryCount,
-      async () => {},
-      async (options: NackOptions = {}) => {
-        if (options.requeue ?? true) {
-          return;
-        }
-        const store = await this.ensureDeadLetterStore();
-        await store.append(toDeadLetterRecord(
-          {
-            messageId,
-            queueName: this.queueName,
-            payload,
-            headers,
-            deliveryCount,
-            enqueuedAt,
-          },
-          options.reason ?? 'nack_without_requeue',
-          options,
-        ));
-      },
+      () => settle(() => Promise.resolve()),
+      (options: NackOptions = {}) =>
+        settle(async () => {
+          if (options.requeue ?? true) {
+            const addressed = envelope ?? {
+              ...createEnvelope(payload, { headers }, this.queueName),
+              messageId,
+              enqueuedAt: enqueuedAt.toISOString(),
+            };
+            const dispatcher = await this.ensureDispatcher();
+            await dispatcher.enqueue({
+              ...addressed,
+              deliveryCount: options.preserveDeliveryCount
+                ? Math.max(0, deliveryCount - 1)
+                : deliveryCount,
+            });
+            return;
+          }
+          const store = await this.ensureDeadLetterStore();
+          await store.append(toDeadLetterRecord(
+            {
+              messageId,
+              queueName: this.queueName,
+              payload,
+              headers,
+              deliveryCount,
+              enqueuedAt,
+            },
+            options.reason ?? 'nack_without_requeue',
+            options,
+          ));
+        }),
     );
   }
 }
