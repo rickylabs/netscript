@@ -12,3 +12,11 @@ S1-S4 and gates are enumerated in plan.md. PLAN-EVAL selected: runtime exit sema
 - Current base confirmed after fetch.
 - Deno KV alone exits without explicit close; real Redis subprocess regressions are being run before product modification.
 - rtk/rg unavailable; commands run directly as node. No operator environment values retained.
+
+## Baseline reproduction
+
+The first probe could not connect because the Docker daemon is in a different network namespace; that harness failure is not counted as a reproduction. Fixed endpoint discovery and made the watchdog tolerate an already-exited child. No product code changed.
+
+With the isolated Redis endpoint reachable, both child cases (clean and hung drain) reach PROBE_READY, receive SIGTERM and fail the 5 s subprocess watchdog: structured tests exit 1, 0 pass / 2 fail. Both service cases likewise reach readiness and fail the 5 s exit watchdog: 0 pass / 2 fail. The retained concrete handle is the ioredis primary connection opened through getKv(). Deno KV alone was a negative control and exited normally. Child cleanup callbacks are deliberately ignored by current main, producing the expected red baseline.
+
+Teardown preview planned no mutations; unrelated resources were left alone. Owned Redis cleanup uses exact creation identity plus run label and repository bind-mount verification.
