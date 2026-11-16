@@ -29,3 +29,5 @@ Production correction: catch only cookie parser SyntaxError; unrelated errors st
 
 Raw operator paths were not retained. Targeted tests assert rendered GET status/cookie/body and POST form results without starting a server.
 Reconcile: issue remains open; no new comments at implementation start. Draft PR #2640 targets main with milestone 0.0.10. Independent evaluation remains required; this is an implementation commit, not supervisor sign-off.
+
+Independent IMPL-EVAL PASS: https://github.com/rickylabs/netscript/pull/2640#issuecomment-6922841910. Evaluator independently reproduced 10 failures before the reader change and 20/20 focused plus 315/315 Fresh source tests after it. Full doc-lint diagnostic distribution matches the base exactly. Refreshed the one-line public reference summary as requested. Source implementation is unchanged since evaluation. CI path policy will run scaffold/static/runtime and Fresh browser tiers after ready_for_review despite local CLI E2E being outside this parser fix's gate selection.

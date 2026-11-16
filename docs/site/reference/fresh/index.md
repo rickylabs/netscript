@@ -373,7 +373,7 @@ Managed forms: CSRF, intents, progressive enhancement, pagination, and Standard 
 | `getSubmissionHiddenInputProps` | function | `getSubmissionHiddenInputProps(submissionId: string)` | Return the hidden input props for carrying an idempotent submission id. |
 | `normalizeFormValues` | function | `normalizeFormValues(rawValues: Record): Partial` | Normalize raw form values by converting empty strings to `undefined`. |
 | `parseFormIntent` | function | `parseFormIntent(rawValues: Record)` | Parse an encoded form intent from raw posted values. |
-| `readCsrfToken` | function | `readCsrfToken(request: Request)` | Read the current CSRF token from a request cookie header. |
+| `readCsrfToken` | function | `readCsrfToken(request: Request)` | Read the current CSRF token, treating malformed cookies as a missing token. |
 | `resolveFormState` | function | `resolveFormState(data: unknown, _): FormState` | Resolve form state from route handler data. |
 | `resolvePagination` | function | `resolvePagination(searchParams: URLSearchParams, defaultLimit: number): PaginationInput` | Resolve pagination input from URLSearchParams. |
 | `setCsrfCookie` | function | `setCsrfCookie(headers: Headers, token: string, requestUrl?: URL): void` | Set the CSRF cookie on response headers. |
