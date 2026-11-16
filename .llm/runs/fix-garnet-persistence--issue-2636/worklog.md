@@ -14,3 +14,19 @@ Static controls: all three no-DataPath cases pass; Container/Executable/Auto Dat
 Two fixture problems were corrected before counting runtime evidence: a direct ioredis import was not declared in CLI (replaced by native Deno TCP for PING/SAVE; queue uses its own existing dependency), and Docker reallocated the dynamic published port on restart (re-read after start). Those bootstrap failures are excluded. Checkpoint control independently exposed pinned native4K alignment failure matching upstream2239; it is also excluded from proof of the missing-AOF finding. Durable policy includes supported FileStream plus storage-tier per the confirmed upstream workaround, with common log/checkpoint directory. No version change.
 
 Each runtime test verifies immutable container/volume IDs and unique ownership labels before cleanup. Post-run Docker scans show no test-owned containers or volumes. All other resources are untouched. Raw server logs are not retained in public run evidence.
+
+
+## Generator implementation and live recovery
+
+Added one native durable flag set shared by container and executable generation; DataPath selects AOF/recovery, immediate flush acknowledgement, FileStream and storage-tier. Both paths use one log/checkpoint directory. Executable now imports/uses the existing resolveDataPath helper; no-path output keeps existing Lua/endpoint behavior.
+
+Combined generator and persistence suite33/33 pass, including both real owned-container AOF-only and checkpoint-plus-AOF-tail restart/delivery cases. Both jobs are delivered and acknowledged after hard restart. This also verifies the pinned device configuration workaround. Structured changed-file check/lint pass. Public CLI/guide docs describe durable/ephemeral modes and latency, native checkpoints, retained directory and external-server ownership. No dependencies or lock changes.
+
+Formatting decision: the edited generator already uses semicolon-free style on main. Preserved that style through a temporary formatter config identical to CLI quality except fmt.semiColons:false; the structured formatter passes on both base and repaired generator. New test uses canonical CLI quality format and passes. This avoids a425-line unrelated formatting diff; the functional generator diff is43lines. No repository formatting policy changed.
+
+
+## Package gates
+
+quality:gate, release:preflight and docs:accuracy pass. CLI JSR audit/dry-run passes with25 existing doctrine/slow-type warnings; CLI doc lint is zero on both baseline and head. Structured check/lint and both style-scoped format checks pass. No lock churn. An additional private whole-output comparison could not load the detached baseline import graph because its workspace alias was unavailable; excluded as a fixture failure, with no assertion about byte-identical output. The three no-path regressions and25 adjacent generator tests remain the unchanged-behavior evidence.
+
+Ownership teardown preview reports zero run-owned cleanup commands. Foreign/unknown resources are left untouched.

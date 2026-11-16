@@ -33,6 +33,18 @@ const CACHE_DEFAULT_PORT = 6379
 /** Queue receipts require atomic Lua in every managed Garnet launch mode. */
 const GARNET_LEASE_ARGS = ['--lua', '--lua-transaction-mode'] as const
 
+/** DataPath opts into recoverable writes and portable checkpoint/device alignment. */
+const GARNET_PERSISTENCE_ARGS = [
+  '--aof',
+  '--recover',
+  '--aof-commit-freq',
+  '0',
+  '--aof-commit-wait',
+  '--storage-tier',
+  '--device-type',
+  'FileStream',
+] as const
+
 /** Deno KV Connect container image (shared KV over HTTP). */
 const DENOKV_CONTAINER = {
   image: 'ghcr.io/denoland/denokv',
@@ -396,8 +408,7 @@ function usesResolvedDataPath(
     ((entry.Mode ?? 'Container') === 'Container' && entry.DataPath !== undefined)
   ) || cacheEntries.some(([, entry]) =>
     entry.DataPath !== undefined &&
-    !['External', 'Local'].includes(entry.Mode ?? 'Container') &&
-    !(entry.Engine === 'Garnet' && entry.Mode === 'Executable')
+    !['External', 'Local'].includes(entry.Mode ?? 'Container')
   )
 }
 
@@ -474,6 +485,13 @@ function garnetExecutableSetup(
   lines.push(
     `  const ${id}_workdir = ensureGarnetToolManifest(appHostDir, ${JSON.stringify(version)});`,
   )
+  if (entry.DataPath) {
+    lines.push(
+      `  const ${id}_dataPath = resolveDataPath(appHostDir, ${JSON.stringify(entry.DataPath)}, ${
+        JSON.stringify(name)
+      });`,
+    )
+  }
   lines.push(
     `  const ${id} = await builder.addExecutable(${
       JSON.stringify(name)
@@ -487,8 +505,15 @@ function garnetExecutableSetup(
   lines.push(`    const args = await context.args();`)
   lines.push(`    await args.add('--port');`)
   lines.push(`    await args.add(${id}_tcpEndpoint.property(EndpointProperty.TargetPort));`)
-  for (const arg of GARNET_LEASE_ARGS) {
+  const args = [...GARNET_LEASE_ARGS, ...(entry.DataPath ? GARNET_PERSISTENCE_ARGS : [])]
+  for (const arg of args) {
     lines.push(`    await args.add(${JSON.stringify(arg)});`)
+  }
+  if (entry.DataPath) {
+    for (const flag of ['--logdir', '--checkpointdir']) {
+      lines.push(`    await args.add(${JSON.stringify(flag)});`)
+      lines.push(`    await args.add(${id}_dataPath);`)
+    }
   }
   lines.push(`  });`)
   lines.push(
@@ -529,7 +554,17 @@ function redisGarnetContainerSetup(
   )
   lines.push(`    .withEndpoint(${cacheEndpointOptions(entry.Port)})`)
   if (entry.Engine === 'Garnet') {
-    lines.push(`    .withArgs(${JSON.stringify(GARNET_LEASE_ARGS)})`)
+    const args = entry.DataPath
+      ? [
+        ...GARNET_LEASE_ARGS,
+        ...GARNET_PERSISTENCE_ARGS,
+        '--logdir',
+        '/data',
+        '--checkpointdir',
+        '/data',
+      ]
+      : GARNET_LEASE_ARGS
+    lines.push(`    .withArgs(${JSON.stringify(args)})`)
   }
   if (entry.DataPath) {
     lines.push(
