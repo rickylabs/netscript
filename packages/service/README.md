@@ -154,13 +154,12 @@ replaces that default; matched contract access declarations still take precedenc
 entries throw `TypeError` when middleware is constructed, before requests or a listener. `OPTIONS`
 is not an exact anonymous method; configure `withCors()` for native preflight handling.
 
-Health is now installed during `build()`, after authentication and body limits. Middleware
-registered with `use()` also runs before health, even when added after `withHealth()`. A custom
-nonempty legacy list excluding `/health` previously let health GET/HEAD return 200 by registration
-order; a rejecting authenticator now returns 401. Add `'/health'` to retain the prefix capability,
-or use the six exact entries above. Omitted, empty and `['/health']` lists preserve public health.
-Configure health checks before `build()`; health checks snapshot when installed, while readiness
-checks retain their live array.
+Health is now installed during `build()`, after authentication and body limits.
+Middleware registered with `use()` also runs before health, even when added after `withHealth()`. A custom nonempty legacy list excluding `/health`
+previously let health GET/HEAD return 200 by registration order; a rejecting authenticator now
+returns 401. Add `'/health'` to retain the prefix capability, or use the six exact entries above.
+Omitted, empty and `['/health']` lists preserve public health. Configure health checks before
+`build()`; health checks snapshot when installed, while readiness checks retain their live array.
 
 ## CORS migration (breaking in 0.0.8)
 
@@ -236,6 +235,7 @@ work-drain hook hangs. When a callback already disposes the database, set
 process-owned shared resources. For multiple embedded runtimes, use `handleSignals: false` and one
 host-owned signal handler, or `exitOnSignal: false` to retain process ownership. Register any
 host-owned manual-stop teardown explicitly.
+
 
 Compose every in-process runtime behind one bounded shutdown handle without replacing its own drain:
 
@@ -353,7 +353,8 @@ is raised while the contract is traversed, not on the first request.
 
 A raw route added with `.route(method, path, handler)` under the guarded prefix matches no
 procedure, so an authenticated caller receives 404 `procedure_not_found` with message
-`authz.no-contract-procedure` until it is declared. Declare it with `rawRoutes`:
+`authz.no-contract-procedure` until it is declared. Declare it with
+`rawRoutes`:
 
 ```ts
 import { createContractAuthorizer } from '@netscript/service/auth';
@@ -374,9 +375,9 @@ that overlaps the REST or RPC projection.
 
 ### Unknown and retired procedures
 
-With `createContractAuthorizer()`, an authenticated request under a guarded prefix that matches no
-served procedure returns HTTP 404 with a stable machine-readable `code`. Apps can declare removed
-endpoints through `retiredPaths` to return HTTP 410 instead:
+With `createContractAuthorizer()`, an authenticated request under a guarded prefix that matches
+no served procedure returns HTTP 404 with a stable machine-readable `code`. Apps can declare
+removed endpoints through `retiredPaths` to return HTTP 410 instead:
 
 ```ts
 import { createContractAuthorizer, PROCEDURE_ERROR_CODES } from '@netscript/service/auth';
@@ -390,33 +391,33 @@ const authorizer = createContractAuthorizer(OrdersContractV1, {
 const upgradeCode = PROCEDURE_ERROR_CODES.RETIRED; // 'procedure_retired'
 ```
 
-| Authenticated request                           | HTTP status | JSON body                                                                                           |
-| ----------------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------- |
-| Unknown guarded procedure                       | 404         | `{ "error": "NOT_FOUND", "message": "authz.no-contract-procedure", "code": "procedure_not_found" }` |
-| Declared retired path                           | 410         | `{ "error": "GONE", "message": "authz.procedure-retired", "code": "procedure_retired" }`            |
-| Existing procedure with insufficient permission | 403         | Existing `{ "error": "FORBIDDEN", "message": "authz.missing-scope:…" }` shape                       |
+| Authenticated request | HTTP status | JSON body |
+| --- | --- | --- |
+| Unknown guarded procedure | 404 | `{ "error": "NOT_FOUND", "message": "authz.no-contract-procedure", "code": "procedure_not_found" }` |
+| Declared retired path | 410 | `{ "error": "GONE", "message": "authz.procedure-retired", "code": "procedure_retired" }` |
+| Existing procedure with insufficient permission | 403 | Existing `{ "error": "FORBIDDEN", "message": "authz.missing-scope:…" }` shape |
 
 Missing or invalid credentials still receive the existing 401 `UNAUTHORIZED` response, with no
 procedure code. Availability is disclosed only after authentication. Retired declarations require
 authentication even outside `protect` and inside `allowAnonymous`; they never bypass authentication.
-Existing public contract procedures remain public. Existing procedures, internal audience guards and
-declared raw routes take precedence over retired declarations, so retirement cannot mask a
+Existing public contract procedures remain public. Existing procedures, internal audience guards
+and declared raw routes take precedence over retired declarations, so retirement cannot mask a
 permission check. Fallback authorizers cannot revive missing or retired procedures.
 
 Each declaration is a canonical, case-sensitive, mounted absolute path, matched for every method.
 Query strings are ignored. Trailing slashes, encoded spellings, siblings and descendants do not
 match. Parameters, wildcards, percent encoding, dot segments, repeated separators, backslashes,
-whitespace, query/fragment syntax and duplicates are rejected during construction. Declare REST, RPC
-and alias paths separately. For a parameterized removed route, undeclared concrete paths still get
-404 under guarded coverage; parameterized retirement is not supported. Undeclared paths outside
+whitespace, query/fragment syntax and duplicates are rejected during construction. Declare REST,
+RPC and alias paths separately. For a parameterized removed route, undeclared concrete paths still
+get 404 under guarded coverage; parameterized retirement is not supported. Undeclared paths outside
 protected coverage retain their existing behavior.
 
-HTTP clients can branch on the JSON `code`: `procedure_retired` is the application's signal to show
-“client too old” or request an upgrade; `procedure_not_found` means no procedure is served at that
-guarded path. These pre-dispatch middleware errors are not contract-defined oRPC errors; clients
-reading raw HTTP responses should inspect the JSON code rather than parse `message`.
-`PROCEDURE_ERROR_CODES` and the `ProcedureErrorCode` union are exported from both the package root
-and `@netscript/service/auth`. `AuthzDecision.code` carries the optional typed failure, and
+HTTP clients can branch on the JSON `code`: `procedure_retired` is the application's signal to
+show “client too old” or request an upgrade; `procedure_not_found` means no procedure is served at
+that guarded path. These pre-dispatch middleware errors are not contract-defined oRPC errors;
+clients reading raw HTTP responses should inspect the JSON code rather than parse `message`.
+`PROCEDURE_ERROR_CODES` and the `ProcedureErrorCode` union are exported from both the package
+root and `@netscript/service/auth`. `AuthzDecision.code` carries the optional typed failure, and
 `ProcedurePolicyResolution.retired` marks a matched retired declaration for the shared auth stages.
 Overlay authorizers never set that marker and retain their existing fallback behavior.
 

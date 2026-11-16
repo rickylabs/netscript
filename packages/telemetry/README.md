@@ -84,12 +84,12 @@ console.log(total, snapshot?.name, snapshot?.attributes['netscript.job.source'])
 ```
 
 Incoming queue messages and trigger deliveries follow their own `traceparent` and `tracestate`.
-Without a valid carrier, each delivery starts a fresh trace instead of inheriting the shared
-worker's active span. `extractContext` and `resolveParentContextFromHeaders` apply this rule; nested
-local operations use the active context so their spans stay beneath the current job.
+Without a valid carrier, each delivery starts a fresh trace instead of inheriting the shared worker's
+active span. `extractContext` and `resolveParentContextFromHeaders` apply this rule; nested local
+operations use the active context so their spans stay beneath the current job.
 
-To continue a job execution's trace inside a spawned job subprocess, extract the propagated context
-at the start of the job script:
+To continue a job execution's trace inside a spawned job subprocess, extract the propagated context at
+the start of the job script:
 
 ```typescript
 import { initJobTracing } from '@netscript/telemetry';
@@ -144,8 +144,8 @@ One logical operation uses one INTERNAL span. `cache.lookup`, `cache.write`, `ca
 `write_through` distinguishes propagation/promotion; `inflight_joined` identifies a trace that
 awaited work owned elsewhere; and `topology_complete=false` makes missing provider evidence visible.
 For an unowned provider, a successful operation has `topology_complete=false` with no `outcome`;
-`outcome=error` appears only when the operation throws. Stale background completion may use one
-captured-context `cache.write` follow-up span.
+`outcome=error` appears only when the operation throws.
+Stale background completion may use one captured-context `cache.write` follow-up span.
 
 ## Public surface
 
@@ -198,8 +198,8 @@ JSR with cryptographically verified provenance.
 
 ### Privacy-first command tracing
 
-Import `createOtelCommandTelemetryPort` from `@netscript/telemetry/commands` and pass the result as
-the executor's `telemetry` option. Supply the static command definitions at construction:
+Import `createOtelCommandTelemetryPort` from `@netscript/telemetry/commands` and pass the
+result as the executor's `telemetry` option. Supply the static command definitions at construction:
 
 ```ts
 import { createOtelCommandTelemetryPort } from '@netscript/telemetry/commands';
@@ -208,13 +208,13 @@ const telemetry = createOtelCommandTelemetryPort({
 });
 ```
 
-The adapter copies 1–1024 unique name/version pairs. Names follow command definition syntax and are
-at most 120 characters; versions are positive safe integers. `CommandSpanNames`,
+The adapter copies 1–1024 unique name/version pairs. Names follow command definition syntax and
+are at most 120 characters; versions are positive safe integers. `CommandSpanNames`,
 `CommandAttributes`, `commandStartAttributes`, and `commandResultAttributes` are exported by
-`@netscript/telemetry/attributes`. Closed provider/isolation/outcome/idempotency/failure
-vocabularies are validated at runtime. Audit/outbox counts range from zero to 64 and appear only for
-applied or replayed completions. Malformed observations and throwing telemetry observers preserve
-operation result/error identity and never retry an operation.
+`@netscript/telemetry/attributes`. Closed provider/isolation/outcome/idempotency/failure vocabularies
+are validated at runtime. Audit/outbox counts range from zero to 64 and appear only for applied or
+replayed completions. Malformed observations and throwing telemetry observers preserve operation
+result/error identity and never retry an operation.
 
 `command.execute` is INTERNAL beneath the active request. `traceRelay` records the fixed INTERNAL
 `command.outbox.relay` lifecycle; `tracePublish` records PRODUCER `command.outbox.publish` and makes
@@ -222,16 +222,16 @@ that span active for the existing W3C propagation helpers. The consumer owns its
 span or a deferred/batch root span linked to the publication. These wrappers perform no relay or
 queue work.
 
-Command spans expose only the eight RFC command attributes plus optional stable `error.type`. There
-are no exception events, error messages/stacks, metric instruments, or arbitrary attribute spreads.
-Raw actors, scope, keys/digests, hashes, row identities, payloads/responses, version tokens,
+Command spans expose only the eight RFC command attributes plus optional stable `error.type`.
+There are no exception events, error messages/stacks, metric instruments, or arbitrary attribute
+spreads. Raw actors, scope, keys/digests, hashes, row identities, payloads/responses, version tokens,
 correlation IDs, and topic/destination strings are excluded. Configured static definition versions
 are distinct from private optimistic version tokens.
 
 This deliberate RFC 0003 ownership decision is stricter than neighboring messaging and saga
 conventions. Existing `netscript.correlation.id` and `netscript.idempotency.key` remain owned by
-those domains. Their presence does not authorize command emission; command traces join through span
-context. Command policy also overrides the general correlation-floor and exception-recording
+those domains. Their presence does not authorize command emission; command traces join through
+span context. Command policy also overrides the general correlation-floor and exception-recording
 checklist for this domain. No additional permissions are needed by the adapter; the selected
 exporter retains its own documented requirements.
 
