@@ -12,3 +12,5 @@
 - S2 touched 18 files including its scrubbed resource evidence, still below 30. S3a expands to at most 22 to include the ownership refinement and tests.
 
 - S3b source-derived child-health documentation requires updating its existing generator symbol list; it now includes the public process options/function. Subprocess self-imports are corrected to local module URLs to satisfy release:preflight. This adds three scoped files to the prose slice and remains below 30.
+
+- Baseline-only doc/JSR findings were measured rather than assumed: plugin doc-lint 18 and telemetry 7 match base distribution exactly; plugin module-tag audit fails on three untouched entrypoints. Service doc-lint is clean. No unrelated publishability repair is folded into runtime lifecycle work.
