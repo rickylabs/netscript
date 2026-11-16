@@ -35,3 +35,9 @@ Independent IMPL-EVAL PASS: https://github.com/rickylabs/netscript/pull/2640#iss
 ## CI corpus follow-up
 
 Required CI quality failed because the reference wording changed the shipped prose corpus. Ran the canonical gen:agent-docs-prose with the repository-pinned Deno 2.9.7, then gen:assets-barrel. Only the prose carrier changed. Decoded before/after comparison proves the only changed page is pages/reference/fresh/index.md and its derived llms-full.txt. Freshness check reports fresh=true, stalePaths=[]; release:preflight passes. No lock changes. The shell default Deno 2.9.5 cannot build this docs pipeline due to CLI option parsing; subsequent generation uses mise exec deno@2.9.7. Implementation source remains unchanged since independent PASS.
+
+## CI export-corpus follow-up
+
+The next required quality run exposed the second generated consumer of the updated JSDoc: MCP export-surface corpus freshness. Ran canonical gen:mcp-export-corpus under Deno 2.9.7. Only the pre-existing generated export-corpus carrier changed; no product behavior, type, lock or command changes. The canonical freshness check is rerun before pushing. These generated documentation carriers are necessary parts of the same CSRF documentation correction.
+
+Export-corpus check: exit 0. Row comparison proves exactly one changed surface: fresh ./form; no added or removed surfaces.
