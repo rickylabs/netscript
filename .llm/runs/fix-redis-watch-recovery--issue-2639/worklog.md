@@ -17,3 +17,8 @@ Short-gap oracle also fails on unchanged main: native MULTI kills exactly one re
 ## Independent Plan-Gate
 
 Separate-session GLM5.3/provider-default PLAN-EVAL [PASS](https://github.com/rickylabs/netscript/pull/2644#issuecomment-6927438505), all8boxes; observed OpenCode Go route matches requested primary and differs from OpenAI generator family. No repairs required. Acceptance3/3 covered by genuine baseline regressions. Implementation watch-points retained in plan-eval.md: preserve typed failures through release, fence stale generations, snapshot bookkeeping, prefix lifecycle, owner-file size and retries throughout the30-second budget. S2 may begin; no production implementation yet.
+
+
+## S2 contract first
+
+Expose the existing KvError/KvConnectionError/KvClosedError identities from root and Redis entrypoints, with public module/class/constructor documentation. Regression test imports KvConnectionError from the published Redis entrypoint. No recovery implementation yet. Structured package check59files passes, doc lint zero, changed error-class lint/format pass. Native lifecycle tests remain intentionally red until the next implementation slice.

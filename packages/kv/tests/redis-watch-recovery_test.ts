@@ -2,8 +2,7 @@ import { assert, assertEquals, assertRejects } from '@std/assert';
 import { deadline, retry } from '@std/async';
 import { stub } from '@std/testing/mock';
 import { Redis } from 'ioredis';
-import { RedisKvAdapter } from '../redis.ts';
-import { KvConnectionError } from '../application/errors.ts';
+import { KvConnectionError, RedisKvAdapter } from '../redis.ts';
 import { encodeStoredValue } from '../adapters/redis/codec.ts';
 import { keyToRedisKey } from '../adapters/redis/serialization.ts';
 
