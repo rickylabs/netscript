@@ -1,0 +1,3 @@
+# Context pack
+
+Combined issues2633+2635, branch feat/worker-pause-drain from fresh main b0eb07957. Bootstrap research only; source untouched. Need reproduce all required behavior before repair, lock named worker/intake/execution lifecycles and queue refund contract, feature PLAN-EVAL before production. Core runner default1s, Worker.stop immediately aborts jobs before its later30s wait, Worker.start lifetime tied to listener completion. Queue API context has deliveryCount/nack; exact backend inventory/config forwarding next. Full CLI smoke at end for generated runtime wiring. No stacks/Streams/saga transports/merge/publication.

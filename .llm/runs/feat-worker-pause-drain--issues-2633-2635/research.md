@@ -1,0 +1,7 @@
+# Research
+
+Both issues read in full. All nine acceptance boxes are the contract. Repository guidance/doctrine/runtime/CLI skills apply. Public Worker docs expose start/cancel/stop but no pause/resume. Current stop aborts its shared controller and all active executions immediately, then calls workerPool.shutdown and listener.stop before the existing30second waitForActiveJobs. That later wait cannot provide the requested graceful work interval. Start currently awaits the job-listener completion, so intentionally pausing listeners must not accidentally end the worker's process-owned start lifetime.
+
+Core README confirms runner abortGracePeriodMs default1000milliseconds. Standard config/runtime forwarding needs research. Queue public MessageContext exposes deliveryCount/ack/nack/extendVisibility; ListenOptions.signal stops listening and concurrency bounds admission. Published providers Redis/RabbitMQ/DenoKV/Postgres plus memory/KV-polling implementations need an exact accounting inventory before locking shutdown refund behavior. No running reproduction claimed yet.
+
+MCP guidance points to tune-worker-runtime and direct retry/DLQ docs; public API inspected with deno doc, then focused Worker source. Main unchanged. Next inspect queue adapter settlement and worker contexts/pool/supervisor/config, write failing functional oracles, then lock the feature plan. No source implementation before selected Plan-Gate PASS.
