@@ -10,3 +10,22 @@ PLAN-EVAL: N/A — bounded parser error correction; acceptance specifies all beh
 ## Evidence
 
 Bootstrap complete; reproduction and implementation pending. Tests will be written and run before the reader changes.
+
+## Implementation evidence
+
+Production correction: catch only cookie parser SyntaxError; unrelated errors still propagate. No public type, export or dependency changes.
+
+| Gate | Result |
+| --- | --- |
+| Structured focused tests before reader change | exit 1; 10 pass, 10 fail with Cookie parser SyntaxError (unit, GET and both POST modes) |
+| Same tests after reader change | exit 0; 20 pass, 0 fail |
+| Structured check (3 files; wrapper defaults to --unstable-kv) | exit 0, no diagnostics |
+| Structured lint / fmt (same 3 files) | exit 0 / exit 0 |
+| quality:gate (quality:scan + arch:check including deps:check) | exit 0 |
+| release:preflight | exit 0 |
+| docs:accuracy | exit 0 |
+| JSR audit / dry-run | exit 0; existing AI directory cardinality warning and banner-only slow-type warning |
+| Full export-map doc:lint | exit 1; 47 diagnostics in unchanged builder/query/route/AI/streams surfaces; form entrypoint has zero |
+
+Raw operator paths were not retained. Targeted tests assert rendered GET status/cookie/body and POST form results without starting a server.
+Reconcile: issue remains open; no new comments at implementation start. Draft PR #2640 targets main with milestone 0.0.10. Independent evaluation remains required; this is an implementation commit, not supervisor sign-off.
