@@ -21,6 +21,13 @@ export interface NackOptions {
   requeue?: boolean;
 
   /**
+   * Return a controlled-shutdown delivery without charging this attempt. Effective
+   * only when requeue is true; defaults to false. Refunds this live claim once,
+   * preserving identity and metadata. Ordinary failures and expired claims count.
+   */
+  preserveDeliveryCount?: boolean;
+
+  /**
    * Terminal failure reason to store when `requeue` is false.
    */
   reason?: DeadLetterReason;

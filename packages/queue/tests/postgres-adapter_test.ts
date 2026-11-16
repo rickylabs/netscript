@@ -79,6 +79,7 @@ class FakePostgresClient implements PostgresQueueClient {
           payload: row.payload,
           headers: row.headers,
           delivery_count: row.deliveryCount,
+          locked_by: row.lockedBy,
           enqueued_at: row.enqueuedAt,
         } as unknown as Row],
       });

@@ -120,7 +120,8 @@ if op == 'nack' or op == 'reclaim' then
     local error = terminal(request.deadLetter)
     if error then return error end
   else
-    local error = insert(KEYS[2], record.envelope)
+    local bytes = op == 'nack' and request.requeueEnvelope or record.envelope
+    local error = insert(KEYS[2], bytes)
     if error then return error end
     if op == 'reclaim' then redis.call('HINCRBY', KEYS[7], 'reclaimed', 1) end
   end

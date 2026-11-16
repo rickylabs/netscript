@@ -19,3 +19,12 @@ Core owns named idle/running/paused/draining/stopped lifecycle, monotonic dispos
 ## Independent Plan-Gate PASS
 
 [GLM5.3/provider-default independent PLAN-EVAL PASS](https://github.com/rickylabs/netscript/pull/2645#issuecomment-6931112123) at89effd610:8/8Plan-Gate,9/9acceptance coverage, no production edits, separate session/family confirmed. Retain verdict. Correct S6 documentation path to tune-worker-runtime.md and name generated carriers; pin committed claims racing pause to ordinary charged requeue (preservation is draining/shutdown only), with an S4 race oracle. These are evaluator bookkeeping/advisory repairs, no architectural re-plan. S2 may begin.
+
+
+## S2 core contract and receipt settlement
+
+Public contracts first: core ./shutdown named lifecycle/monotonic disposable clock/default total25s/default grace5s/resolver and fixed work-abort-settlement primitive; queue NackOptions.preserveDeliveryCount defaultsfalse, requeue-only. Redis/Garnet handback encodes the refunded envelope in the existing atomic fenced receipt transition, bypassing limit exhaustion only on that explicit live handback; expiry recovery remains charged. Postgres generates an opaque per-claim locked_by receipt, atomically refunds/unlocks within the live fence, guards ack/release and once-only settlement. Simplified existing envelope/DLQ plumbing reduces touched Postgres581->568lines. No new schema/dependency/command/Streams.
+
+Independent implementation-lane slice review: diff follows approved boundaries; no orphaned timers, root/barrel mirror, hidden lifecycle registry or generic transport abstraction. The ordinary default nack stays charged. Core tests assert19s work plus5s cleanup plus1s settlement share one monotonic25s deadline and clear timers. Native tests prove repeated8handbacks, max-limit bypass, terminal preservation ignored, duplicate/stale/expired contexts cannot refund/remove newer receipts. Closed Redis contexts legitimately reject AbortError; the test pins that safe outcome and unchanged newer claim rather than requiring reopening.
+
+Validation: structured live Redis/Garnet/Postgres suite28pass/0fail/0ignored (shutdown requeue + refund races + existing Redis lease cases); budget/Postgres adjacent8pass/0fail; scoped check/lint/fmt0; core shutdown doclint0; release:preflight fourPASS and docs:accuracyPASS. Original config/runner/Worker reds remain pending S4/S5, other adapter reds pending S3. Three positively owned backend containers retained for following slices, immutable IDs/mounts privately recorded; foreign resources untouched.
