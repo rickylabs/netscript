@@ -17,3 +17,6 @@
 
 - The required runtime smoke was repeated only after diagnosing a concrete environment failure: container loopback endpoints were in the Docker daemon's namespace. A temporary, owned-only port bridge supplies local reachability without changing generated output or weakening gates. Native PostgreSQL readiness passed through it.
 - S4 includes two pre-existing test expectation updates: manual-stop host DB ownership and Deno-watch's explicit-exit diagnostic. Both retain their behavioral assertions; the slice remains below 30 files.
+
+- S4 hostname decision is now resolved after IMPL-EVAL F2: generated workers/sagas/triggers forward NETSCRIPT_CHILD_HEALTH_HOSTNAME as the existing native hostname option. Unset retains loopback, including generated Aspire host executables. Containers explicitly request 0.0.0.0. No generic HOSTNAME fallback and no new service hostname behavior. All three generated artifacts have a native bind plus non-loopback HTTP regression.
+- Cycle one IMPL-EVAL FAIL_FIX is preserved. F1 waits on supported-runner runtime evidence; the hostname repair requires a new final-head CI run and a new evaluator session under T3 re-check policy.

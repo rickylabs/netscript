@@ -181,7 +181,10 @@ point, then run the generated-process regressions in `tests/health/generated-cra
 Generated workers, triggers, and sagas glue starts the health listener before bootstrap. The
 listener binds `127.0.0.1` by default. `PORT` selects the port; without it, the operating system
 assigns an ephemeral port. Pass `ChildHealthProcessOptions.hostname: '0.0.0.0'` when container
-health checks must reach the listener from another network namespace.
+health checks must reach the listener from another network namespace. Generated workers, sagas and
+triggers forward `NETSCRIPT_CHILD_HEALTH_HOSTNAME` to that option, so a container launch can set it
+to `0.0.0.0` without editing generated glue. Leave it unset for loopback probes, including the
+generated Aspire executable launches.
 
 On a stop signal, `runChildHealthProcess` gives work 30 seconds to drain and reserves five more
 seconds for `onShutdown` resource callbacks and the health listener. `drainTimeoutMs` bounds the

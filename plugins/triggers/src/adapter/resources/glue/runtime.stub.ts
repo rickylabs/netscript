@@ -28,6 +28,7 @@ export const runtimeGlueStub: StubSource<never> = defineStub({
     '    () => health.snapshot(),',
     '    {',
     '      health,',
+    "      hostname: Deno.env.get('NETSCRIPT_CHILD_HEALTH_HOSTNAME'),",
     "      restartHistoryPath: '.data/child-health/triggers.json',",
     '      onShutdown: [closeKv, disposeHostResources],',
     '    },',

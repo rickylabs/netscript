@@ -96,11 +96,13 @@ console.log(CHILD_CRASH_LOOP_THRESHOLD.restarts); // 3
 
 Process health composition, including optional single-owner restart history.
 
-The listener binds 127.0.0.1 by default; hostname overrides the bind address. Shutdown allows 35
-seconds total by default: 30 seconds for work, with five seconds reserved for resource cleanup and
-the health listener. Cleanup callbacks run even when work times out. Fatal health remains visible
-for one second before this budget starts. Exit codes are 0 for a clean drain, 1 for failure and 2
-for any shutdown deadline. Set exitOnShutdown to false when a host owns termination.
+The listener binds 127.0.0.1 by default; hostname overrides the bind address. Generated workers,
+sagas and triggers pass NETSCRIPT_CHILD_HEALTH_HOSTNAME to this option so container launches can
+widen the bind without editing glue. Shutdown allows 35 seconds total by default: 30 seconds for
+work, with five seconds reserved for resource cleanup and the health listener. Cleanup callbacks run
+even when work times out. Fatal health remains visible for one second before this budget starts.
+Exit codes are 0 for a clean drain, 1 for failure and 2 for any shutdown deadline. Set
+exitOnShutdown to false when a host owns termination.
 
 Example:
 

@@ -83,3 +83,14 @@ Corrected full scaffold.runtime exited 1 at plugin doctor: the maintained Docker
 Final quality:gate exits 0 after both expectation updates. Baseline-only diagnostics remain disclosed above.
 
 Resource reconciliation: teardown preview with an absolute worktree root planned one owned diagnostic PostgreSQL container removal. Apply removed that one container and no AppHosts/processes; exit 4 reports 40 foreign/unknown entries left untouched. Docker identity scans afterward found zero containers with owned-root mounts and zero uniquely labelled temporary bridge containers. The script's best-effort cleanup encountered a proxy already removed by Aspire; the error is retained, with the zero-survivor scan supplying final cleanup evidence.
+
+
+## IMPL-EVAL cycle one and hostname delivery repair
+
+Independent Muse Spark 1.3 xhigh evaluation returned FAIL_FIX: no complete supported runtime verdict yet (F1), and generated glue did not deliver the native hostname override (F2). Implementation lifecycle logic otherwise matched the accepted plan. Full verdict preserved in evaluate.md and https://github.com/rickylabs/netscript/pull/2641#issuecomment-6925186816.
+
+Resolved the deferred S4 hostname decision with a dedicated generated-launch environment variable: workers/sagas/triggers pass NETSCRIPT_CHILD_HEALTH_HOSTNAME to the existing native hostname option. Unset preserves loopback. Custom API callers still set the explicit option; no shared-library environment fallback or generic HOSTNAME convention was added. Aspire's generated children run as host executables and retain loopback probes; containers can explicitly widen their listener.
+
+Added generated-hostname subprocess tests executing all three emitted entrypoints and probing native HTTP through a non-loopback IPv4 interface for the widened case. At base b0eb07957: 3 pass/3 fail (defaults incorrectly bind all interfaces). At pre-repair PR source: 3 pass/3 fail (environment override ignored, non-loopback connection refused). After forwarding: 6/6 pass. Combined with installed-artifact tests: 31/31 pass. The preload observes the native bound address and HTTP response before database/job bootstrap; it does not replace application handlers. All subprocesses exit and temporary fixtures are removed. One initial probe also checked an unrelated bootstrap state; corrected that oracle to verify bind/HTTP reachability only before counting the genuine red result.
+
+Hostname repair gates: structured changed-file check/lint/fmt pass with zero diagnostics/findings; release:preflight and docs:accuracy pass. Source-derived child health page regenerated.

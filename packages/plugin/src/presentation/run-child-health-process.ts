@@ -8,6 +8,8 @@ import { FileChildRestartHistory } from '../adapters/file-child-restart-history.
  * Process health composition, including optional single-owner restart history.
  *
  * The listener binds 127.0.0.1 by default; hostname overrides the bind address.
+ * Generated workers, sagas and triggers pass NETSCRIPT_CHILD_HEALTH_HOSTNAME to
+ * this option so container launches can widen the bind without editing glue.
  * Shutdown allows 35 seconds total by default: 30 seconds for work, with five
  * seconds reserved for resource cleanup and the health listener. Cleanup callbacks
  * run even when work times out. Fatal health remains visible for one second before

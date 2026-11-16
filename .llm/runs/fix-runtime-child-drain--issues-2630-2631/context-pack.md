@@ -13,3 +13,6 @@ Local one-pass scaffold.runtime was attempted twice. First stopped at PostgreSQL
 All temporary bridges and the exact diagnostic AppHost are stopped. Teardown preview/apply removed one positively attributed diagnostic PostgreSQL container; zero containers remain with this worktree's mounts or the bridge ownership label. Foreign/unknown resources remain untouched; raw ownership receipts are outside the public run.
 
 Next: dispatch supported CI runtime on this branch, independent feature-tier IMPL-EVAL (pinned Muse Spark 1.3 xhigh, separate vendor family/session), address findings, then truthful issue evidence/closing keywords, ready-for-review transition and required head checks/thread gate. Do not watch PRs from this delegated lane.
+
+
+IMPL-EVAL cycle one FAIL_FIX (evaluate.md): F1 full supported-runner runtime verdict pending; F2 generated hostname delivery missing. F2 repaired by forwarding NETSCRIPT_CHILD_HEALTH_HOSTNAME from all three generated launchers to the native option. Regression: base 3/6 fails on defaults; pre-repair PR 3/6 fails on ignored override; repaired 6/6 pass with real native bind and non-loopback HTTP. Combined installed artifact suite31/31. New source/docs/carriers must be pushed, then supported CI run at final head and cycle-two independent evaluation.
