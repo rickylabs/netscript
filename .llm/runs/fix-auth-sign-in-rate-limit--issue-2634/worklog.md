@@ -23,3 +23,10 @@ Initial focused suite13/13 pass. Extended core/service/provider suite69/69 pass,
 Full doc-lint baseline comparison confirmed: core3 and plugin12 private-type references match base b0eb07957 in summary, entrypoints, per-file diagnostic counts and entrypoint exits after repository-relative path normalization. Changed config entrypoint has no new finding. Initial raw path comparison differed only because the checkouts have different roots.
 
 Canonical agent-docs/site build, MCP export corpus, CLI assets and publish assets refresh complete. Export and publish freshness checks pass. Export generator allowed dirty only for the regenerated prose carrier, with every handwritten source/docs input already committed. No CLI asset diff and no lock changes. Final implementation is ready for independent straightforward IMPL-EVAL; 69-test and validation evidence remains above.
+
+
+## Independent evaluation
+
+IMPL-EVAL PASS at86ffff9a61bf784840f3a744404c7cf960c14816: https://github.com/rickylabs/netscript/pull/2642#issuecomment-6926024823. Requested/observed glm_5_3_flash/provider_default, no variant override, independent session/vendor family; no fallback. Evaluator independently ran schema10/10, provider6/6, core54/54 and adjacent root control8/8, and verified the native scoped import-map oracle, defaults, validation and forwarding. Scoped/static/docs/freshness gates passed, with documented baseline findings. No blocking findings. Its initial full-suite cwd fixture failures were disproved by the root control, not counted as product failures.
+
+All four issue acceptance boxes are checked with linked evidence. Review-thread gate0/0. Before readiness, draft head checks are3SUCCESS/24SKIPPED by workflow policy. This follow-up commits only evaluator/run evidence; production/tests/docs/generated consumers equal the evaluated tree. Ready transition will schedule required CI; final readiness is reported only after current-head checks and thread gate are verified again. No merge/auto-merge/ready-merge label or publication.
