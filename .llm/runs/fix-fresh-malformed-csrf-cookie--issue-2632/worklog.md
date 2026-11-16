@@ -31,3 +31,7 @@ Raw operator paths were not retained. Targeted tests assert rendered GET status/
 Reconcile: issue remains open; no new comments at implementation start. Draft PR #2640 targets main with milestone 0.0.10. Independent evaluation remains required; this is an implementation commit, not supervisor sign-off.
 
 Independent IMPL-EVAL PASS: https://github.com/rickylabs/netscript/pull/2640#issuecomment-6922841910. Evaluator independently reproduced 10 failures before the reader change and 20/20 focused plus 315/315 Fresh source tests after it. Full doc-lint diagnostic distribution matches the base exactly. Refreshed the one-line public reference summary as requested. Source implementation is unchanged since evaluation. CI path policy will run scaffold/static/runtime and Fresh browser tiers after ready_for_review despite local CLI E2E being outside this parser fix's gate selection.
+
+## CI corpus follow-up
+
+Required CI quality failed because the reference wording changed the shipped prose corpus. Ran the canonical gen:agent-docs-prose with the repository-pinned Deno 2.9.7, then gen:assets-barrel. Only the prose carrier changed. Decoded before/after comparison proves the only changed page is pages/reference/fresh/index.md and its derived llms-full.txt. Freshness check reports fresh=true, stalePaths=[]; release:preflight passes. No lock changes. The shell default Deno 2.9.5 cannot build this docs pipeline due to CLI option parsing; subsequent generation uses mise exec deno@2.9.7. Implementation source remains unchanged since independent PASS.
