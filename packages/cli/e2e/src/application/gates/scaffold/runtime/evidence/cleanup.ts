@@ -254,9 +254,11 @@ export async function inspectAllContainers(
     const inspection = await run('docker', ['inspect', id]);
     if (inspection.code !== 0) {
       const failure = inspection.stderr || inspection.stdout;
-      const wasRemoved = failure.split(/\r?\n/).some((line) =>
-        line.trim().endsWith(`No such object: ${id}`)
-      );
+      const lines = failure.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+      const wasRemoved = lines.length > 0 && lines.every((line) => {
+        const match = /^(?:error:\s*)?no such object:\s*(\S+)$/i.exec(line);
+        return match?.[1] === id;
+      });
       if (wasRemoved) {
         vanishedContainerIds.push(id);
         continue;

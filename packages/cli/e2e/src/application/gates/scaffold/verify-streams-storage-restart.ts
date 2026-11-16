@@ -3,7 +3,11 @@ import { assertEquals } from '@std/assert';
 import { defineStreamSchema, DurableStreamProducer } from '@netscript/plugin-streams-core';
 import { z } from 'zod';
 import { resolveResourceUrlsFromAppHost } from './generated-app-endpoint.ts';
-import { watchResourceUpdates } from './runtime/resource-state-stream.ts';
+import {
+  parseResourceUpdateLine,
+  type ResourceUpdateSubscription,
+  watchResourceUpdates,
+} from './runtime/resource-state-stream.ts';
 import { STREAMS_STORAGE_RESOURCES } from './prepare-streams-storage-fixture.ts';
 
 /** External effects exercised by the generated-project restart gate. */
@@ -102,19 +106,193 @@ async function restartStreams(appHost: string): Promise<void> {
   }
 }
 
+const MAX_READINESS_SNAPSHOT_BYTES = 65_536;
+const RESOURCE_STATES = new Set([
+  'NotStarted',
+  'Starting',
+  'Waiting',
+  'Running',
+  'Stopping',
+  'Stopped',
+  'Finished',
+  'Exited',
+  'FailedToStart',
+  'Building',
+  'Hidden',
+  'Unknown',
+]);
+const TERMINAL_STATES = new Set(['Finished', 'Exited', 'FailedToStart']);
+
+function healthCategory(value: unknown): 'Healthy' | 'Unhealthy' | 'Degraded' | 'Unknown' {
+  return value === 'Healthy' || value === 'Unhealthy' || value === 'Degraded' ? value : 'Unknown';
+}
+
+/** Project only categorical lifecycle evidence; never retain raw resource diagnostics. */
+function readinessSummary(resource: Readonly<Record<string, unknown>>) {
+  const healthReports = { Healthy: 0, Unhealthy: 0, Degraded: 0, Unknown: 0 };
+  if (isRecord(resource.healthReports)) {
+    for (const report of Object.values(resource.healthReports)) {
+      healthReports[healthCategory(isRecord(report) ? report.status : undefined)]++;
+    }
+  }
+  return {
+    state: typeof resource.state === 'string' && RESOURCE_STATES.has(resource.state)
+      ? resource.state
+      : 'Unknown',
+    healthStatus: healthCategory(resource.healthStatus),
+    ...(typeof resource.exitCode === 'number' && Number.isSafeInteger(resource.exitCode)
+      ? { exitCode: resource.exitCode }
+      : {}),
+    healthReports,
+  };
+}
+
+function observationFailure(error: unknown): string {
+  const message = error instanceof Error ? error.message : '';
+  if (message.startsWith('Timed out after ')) return 'timeout';
+  if (message.startsWith('Unrecognized Aspire resource update line')) return 'invalid-update';
+  if (message.startsWith('Aspire resource follower for ')) return 'observer-ended';
+  return 'observer-failed';
+}
+
+/** Initial readiness stays event-authoritative; one failure snapshot adds evidence only. */
+export async function waitForStreamsStorageReady(
+  appHost: string,
+  resource: typeof STREAMS_STORAGE_RESOURCES[keyof typeof STREAMS_STORAGE_RESOURCES],
+  watch: typeof watchResourceUpdates = watchResourceUpdates,
+  readSnapshot: (appHost: string, resource: string) => Promise<string> = readReadinessSnapshot,
+  ceilingMs = 120_000,
+): Promise<void> {
+  if (!Object.values(STREAMS_STORAGE_RESOURCES).includes(resource)) {
+    throw new Error('Unsupported streams readiness resource');
+  }
+  let subscription: ResourceUpdateSubscription | undefined;
+  let updates = 0;
+  let last: ReturnType<typeof readinessSummary> | null = null;
+  let ready = false;
+  let reason = 'observer-failed';
+  let observer = 'not-started';
+  try {
+    subscription = await watch(appHost, resource);
+    await subscription.waitFor((update) => {
+      updates++;
+      last = readinessSummary(update.resource);
+      if (TERMINAL_STATES.has(last.state)) {
+        reason = 'terminal-state';
+        return true;
+      }
+      ready = update.resource.state === 'Running' && update.resource.healthStatus === 'Healthy';
+      return ready;
+    }, ceilingMs);
+  } catch (error) {
+    reason = observationFailure(error);
+  } finally {
+    if (subscription) {
+      try {
+        await subscription.close(ready);
+        observer = 'closed';
+      } catch {
+        observer = 'close-failed';
+      }
+    }
+  }
+  if (ready && observer === 'closed') return;
+  const snapshot = ready ? null : await failureSnapshot(appHost, resource, readSnapshot);
+  throw new Error(`Streams readiness failed: ${
+    JSON.stringify({
+      resource,
+      reason: ready ? 'close-failed' : reason,
+      updates,
+      last,
+      observer,
+      snapshot,
+    })
+  }`);
+}
+
+async function failureSnapshot(
+  appHost: string,
+  resource: string,
+  read: (appHost: string, resource: string) => Promise<string>,
+) {
+  try {
+    const raw = await read(appHost, resource);
+    if (new TextEncoder().encode(raw).byteLength > MAX_READINESS_SNAPSHOT_BYTES) {
+      throw new Error('Readiness snapshot exceeds byte bound');
+    }
+    return readinessSummary(parseResourceUpdateLine(raw, resource).resource);
+  } catch {
+    return { outcome: 'unavailable' };
+  }
+}
+
+async function readReadinessSnapshot(appHost: string, resource: string): Promise<string> {
+  const child = new Deno.Command('aspire', {
+    args: [
+      'describe',
+      resource,
+      '--format',
+      'Json',
+      '--apphost',
+      appHost,
+      '--non-interactive',
+      '--nologo',
+    ],
+    signal: AbortSignal.timeout(10_000),
+    stdin: 'null',
+    stdout: 'piped',
+    stderr: 'null',
+  }).spawn();
+  const reader = child.stdout.getReader();
+  const bytes = new Uint8Array(MAX_READINESS_SNAPSHOT_BYTES + 1);
+  let length = 0;
+  let settled = false;
+  let cleanupFailed = false;
+  let raw = '';
+  try {
+    while (length < bytes.length) {
+      const next = await reader.read();
+      if (next.done) break;
+      const part = next.value.subarray(0, bytes.length - length);
+      bytes.set(part, length);
+      length += part.length;
+    }
+    if (length > MAX_READINESS_SNAPSHOT_BYTES) {
+      throw new Error('Readiness snapshot exceeds byte bound');
+    }
+    const status = await child.status;
+    settled = true;
+    if (!status.success) throw new Error('Readiness snapshot command failed');
+    raw = new TextDecoder('utf-8', { fatal: true }).decode(bytes.subarray(0, length));
+  } finally {
+    if (!settled) {
+      try {
+        child.kill('SIGKILL');
+      } catch (error) {
+        if (!(error instanceof Deno.errors.NotFound)) cleanupFailed = true;
+      }
+    }
+    try {
+      await reader.cancel();
+    } catch {
+      cleanupFailed = true;
+    } finally {
+      reader.releaseLock();
+    }
+    try {
+      await child.status;
+    } catch {
+      cleanupFailed = true;
+    }
+  }
+  if (cleanupFailed) throw new Error('Readiness snapshot cleanup failed');
+  return raw;
+}
+
 async function main(appHost: string): Promise<void> {
   const urls = new Map<string, string>();
   for (const resource of Object.values(STREAMS_STORAGE_RESOURCES)) {
-    const readiness = await watchResourceUpdates(appHost, resource);
-    try {
-      await readiness.waitFor(
-        (update) =>
-          update.resource.state === 'Running' && update.resource.healthStatus === 'Healthy',
-        120_000,
-      );
-    } finally {
-      await readiness.close();
-    }
+    await waitForStreamsStorageReady(appHost, resource);
     const [url] = await resolveResourceUrlsFromAppHost(appHost, resource);
     if (!url) throw new Error(`No allocated endpoint for ${resource}`);
     urls.set(resource, url);
