@@ -7,6 +7,7 @@ Deno.test('AuthConfigSchema applies backend and session defaults', () => {
   assertEquals(parsed.backend, 'default');
   assertEquals(parsed.session.cookieName, '__Host-netscript-auth');
   assertEquals(parsed.providers, []);
+  assertEquals('rateLimit' in parsed, false);
 });
 
 Deno.test('AuthSessionPolicySchema validates cookie policy knobs', () => {

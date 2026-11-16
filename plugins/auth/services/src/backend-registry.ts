@@ -20,7 +20,7 @@ import {
   type WorkosSessionRefreshResult,
 } from '@netscript/auth-workos';
 import { getKv, MemoryKvAdapter, type WatchableKv } from '@netscript/kv';
-import { AuthConfigSchema } from '@netscript/plugin-auth-core/config';
+import { AuthConfigSchema, type AuthRateLimitConfig } from '@netscript/plugin-auth-core/config';
 import {
   AuthBackendNotFoundError,
   type AuthBackendPort,
@@ -43,11 +43,15 @@ export type AuthServiceAppsettings = Readonly<{
     backend?: string;
     audit?: { salt?: string };
     environment?: Readonly<Record<string, string>>;
+    /** Native endpoint quotas; lower-case appsettings take precedence. */
+    rateLimit?: AuthRateLimitConfig;
   };
   Auth?: {
     Backend?: string;
     Audit?: { Salt?: string };
     Environment?: Readonly<Record<string, string>>;
+    /** Native endpoint quotas for the capitalized appsettings group. */
+    RateLimit?: AuthRateLimitConfig;
   };
 }>;
 
@@ -247,11 +251,17 @@ async function createActiveBackend(
     });
   }
 
+  const { rateLimit } = AuthConfigSchema.parse({
+    rateLimit: options.appsettings?.auth?.rateLimit ?? options.appsettings?.Auth?.RateLimit,
+  });
   return createBetterAuthBackend({
     auth: createNetscriptBetterAuth({
       prisma: options.dbClient ?? {},
       provider: betterAuthPrismaProvider(env.DB_PROVIDER),
       secret: requiredEnv(env, 'BETTER_AUTH_SECRET'),
+      ...(rateLimit === undefined ? {} : {
+        betterAuthOptions: { rateLimit: { customRules: rateLimit.customRules } },
+      }),
     }),
     sessionTokenSecret: requiredEnv(env, 'BETTER_AUTH_SECRET'),
     providers: [{ id: 'better-auth', displayName: 'better-auth' }],

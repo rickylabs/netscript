@@ -1,16 +1,22 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 import { fromFileUrl, toFileUrl } from '@std/path';
+import { createAuthServiceBackendRegistry } from '../../services/src/backend-registry.ts';
 
 const CONFIG = fromFileUrl(new URL('../../../../deno.json', import.meta.url));
 const PROVIDER = new URL('../../../../packages/auth-better-auth/mod.ts', import.meta.url).href;
 const REGISTRY = new URL('../../services/src/backend-registry.ts', import.meta.url).href;
 
-for (const style of ['absent', 'lower', 'upper'] as const) {
-  Deno.test(`auth plugin production sign-in rate rule uses ${style} configuration`, async () => {
+for (const style of ['absent', 'lower', 'upper', 'both', 'development'] as const) {
+  Deno.test(`auth plugin sign-in rate rule uses ${style} configuration`, async () => {
     const root = await Deno.makeTempDir();
     const wrapper = `${root}/provider.ts`;
     const customRules = { '/sign-in/*': { window: 60, max: 1 } };
-    const appsettings = style === 'lower'
+    const appsettings = style === 'both'
+      ? {
+        auth: { rateLimit: { customRules } },
+        Auth: { RateLimit: { customRules: { '/sign-in/*': { window: 60, max: 5 } } } },
+      }
+      : style === 'lower' || style === 'development'
       ? { auth: { rateLimit: { customRules } } }
       : style === 'upper'
       ? { Auth: { RateLimit: { customRules } } }
@@ -55,7 +61,9 @@ await createAuthServiceBackendRegistry({
 });
 if (!provider.auth) throw new Error('The import-map wrapper did not observe provider construction.');
 const statuses = [];
-for (let attempt = 0; attempt < ${style === 'absent' ? 4 : 2}; attempt++) {
+for (let attempt = 0; attempt < ${
+            style === 'absent' || style === 'development' ? 4 : 2
+          }; attempt++) {
   const response = await provider.auth.handler(new Request('http://localhost:3000/api/auth/sign-in/email', {
     method: 'POST',
     headers: { 'content-type': 'application/json', origin: 'http://localhost:3000', 'x-forwarded-for': '192.0.2.15' },
@@ -68,8 +76,8 @@ console.log('RATE_PROBE:' + JSON.stringify({ statuses, rateLimit: provider.recei
 Deno.exit(0);`,
         ],
         env: {
-          NODE_ENV: 'production',
-          DENO_ENV: 'production',
+          NODE_ENV: style === 'development' ? 'development' : 'production',
+          DENO_ENV: style === 'development' ? 'development' : 'production',
           BETTER_AUTH_URL: 'http://localhost:3000',
         },
         stdout: 'piped',
@@ -87,7 +95,11 @@ Deno.exit(0);`,
           line.startsWith('RATE_PROBE:')
         );
         assertEquals(JSON.parse(line?.slice('RATE_PROBE:'.length) ?? 'null'), {
-          statuses: style === 'absent' ? [400, 400, 400, 429] : [400, 429],
+          statuses: style === 'absent'
+            ? [400, 400, 400, 429]
+            : style === 'development'
+            ? [400, 400, 400, 400]
+            : [400, 429],
           ...(style === 'absent' ? {} : { rateLimit: { customRules } }),
         });
       } finally {
@@ -98,3 +110,13 @@ Deno.exit(0);`,
     }
   });
 }
+
+Deno.test('auth plugin validates configured provider quotas before construction', async () => {
+  await assertRejects(() =>
+    createAuthServiceBackendRegistry({
+      env: { NETSCRIPT_AUTH_BACKEND: 'better-auth', BETTER_AUTH_SECRET: 'test-secret' },
+      appsettings: {
+        auth: { rateLimit: { customRules: { '/sign-in/*': { window: 0, max: 1 } } } },
+      },
+    }), Error);
+});
