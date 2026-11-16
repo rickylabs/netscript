@@ -116,6 +116,21 @@ before dispatching the next immutable number. Do not treat the 1000-attempt ceil
 consume. Changed-package-only canaries would alter coordinated publication semantics and remain a
 separate design decision.
 
+**Batching correction (owner policy, 2026-11-16):** do not publish a new canary after each merged
+PR or individually repaired gate. Batch related framework changes and all known release-blocking
+fixes into one candidate; exercise the combined candidate through source, packed/public-CLI and
+representative consumer checks before dispatching its coordinated publication. Record the included
+changes, validation results and remaining blockers at the release checkpoint. A merged PR or green
+publish-readiness result alone is not a reason to mint another version. No fixed PR-count or time
+threshold is implied; cadence follows candidate readiness, with any urgent exception explicitly
+owner-directed.
+
+Use existing immutable canaries for additional diagnostic and consumer checks where applicable,
+without republishing or changing their original failed qualification records. Distinguish fixes to
+the qualification harness from changes to published package bytes; a harness-only correction does
+not by itself justify publishing all packages again or grant a green official canary pair. Preserve
+the mandatory production E2E and Stable publication gates.
+
 After the release content is ready and before creating the stable release:
 
 1. Dispatch `.github/workflows/release-canary.yml` with the target stable version. The workflow runs
