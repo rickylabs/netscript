@@ -30,3 +30,8 @@ Formatting decision: the edited generator already uses semicolon-free style on m
 quality:gate, release:preflight and docs:accuracy pass. CLI JSR audit/dry-run passes with25 existing doctrine/slow-type warnings; CLI doc lint is zero on both baseline and head. Structured check/lint and both style-scoped format checks pass. No lock churn. An additional private whole-output comparison could not load the detached baseline import graph because its workspace alias was unavailable; excluded as a fixture failure, with no assertion about byte-identical output. The three no-path regressions and25 adjacent generator tests remain the unchanged-behavior evidence.
 
 Ownership teardown preview reports zero run-owned cleanup commands. Foreign/unknown resources are left untouched.
+
+
+## Generated consumers
+
+Canonical prose, MCP export corpus, CLI asset barrel and publish assets refreshed in dependency order. Only prose carrier was dirty when --allow-dirty was used for export generation; warning reviewed. Corpus and publish freshness pass. Only the prose and MCP publish carriers change; template/barrel and symbol corpus remain current. Next one final full runtime smoke with cleanup, then independent evaluation.
