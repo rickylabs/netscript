@@ -97,6 +97,7 @@ async function runStreamsInstall(hostPort?: number, browserTopology?: string): P
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
         regenerateHelpers: () => Promise.resolve([]),
+        generateRegistries: () => Promise.resolve([]),
       },
     }).parse(args);
 

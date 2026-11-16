@@ -1,7 +1,7 @@
 import { netscriptJsrSpecifier } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { assert, assertEquals, assertMatch } from '@std/assert';
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from '@std/path';
-import { walk } from '@std/fs';
+import { expandGlob, walk } from '@std/fs';
 import schema from '../../../../../assets/schema/plugin-generated-surface.v1.json' with {
   type: 'json',
 };
@@ -9,11 +9,102 @@ import publishedManifestFree from '../../../../../e2e/fixtures/plugin-manifest-f
   type: 'json',
 };
 import type { PluginSurfaceReport } from '../../../../kernel/domain/plugin-generated-surface.ts';
+import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
+import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
+import { createInstalledRuntimeRegistryGenerator } from './installed-runtime-registry-generator.ts';
+import { probeConfiguredPluginManifest } from '../../../../kernel/adapters/config/plugin-manifest/configured-plugin-manifest-probe.ts';
 
 const REPO = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
 const CLI = Deno.env.get('NETSCRIPT_PLUGIN_CHECK_CLI') ??
   join(REPO, 'packages/cli/bin/netscript.ts');
 const OUTPUT = '.netscript/generated/plugin-triggers/triggers.registry.ts';
+
+Deno.test('normal generation prepares real published manifest graph with authored lock paths', async () => {
+  const workspace = JSON.parse(await Deno.readTextFile(join(REPO, 'deno.json')));
+  const exclude: string[] = [];
+  for (const member of workspace.workspace) {
+    for await (const entry of expandGlob(`${member}/deno.json`, { root: REPO })) {
+      const pkg = JSON.parse(await Deno.readTextFile(entry.path));
+      if (pkg.name?.startsWith('@netscript/')) exclude.push(`jsr:${pkg.name}`);
+    }
+  }
+  for (const lock of [undefined, 'locks/consumer.lock', { path: 'locks/object.lock' }]) {
+    const root = await Deno.makeTempDir({ prefix: 'plugin-graph-' });
+    try {
+      const version = '0.0.10-canary.1';
+      await write(
+        root,
+        'deno.json',
+        JSON.stringify({
+          lock,
+          nodeModulesDir: 'none',
+          minimumDependencyAge: { age: 'P1D', exclude },
+          imports: {
+            '@netscript/config': `jsr:@netscript/config@${version}`,
+            '@netscript/plugin-workers': `jsr:@netscript/plugin-workers@${version}`,
+            '@netscript/plugin-streams': `jsr:@netscript/plugin-streams@${version}`,
+          },
+        }),
+      );
+      await write(root, 'appsettings.json', '{}');
+      await write(
+        root,
+        'netscript.config.ts',
+        "export default {name: 'graph-fixture', databases: {config: []}, plugins: ['@netscript/plugin-workers']};",
+      );
+      await write(
+        root,
+        'services.ts',
+        `import 'jsr:@netscript/cli@${version}';\nimport '@netscript/plugin-workers/services';\nimport '@netscript/plugin-streams/services';`,
+      );
+      const seeded = await new Deno.Command(Deno.execPath(), {
+        args: ['cache', '--config', join(root, 'deno.json'), join(root, 'services.ts')],
+        cwd: root,
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+      assertEquals(seeded.code, 0, new TextDecoder().decode(seeded.stderr));
+      const process = new DenoProcess();
+      const red = await probeConfiguredPluginManifest(root, '@netscript/plugin-workers', process, {
+        timeoutMs: 30_000,
+      });
+      assertEquals(red.status, 'import-failure', JSON.stringify(red));
+      const generate = createInstalledRuntimeRegistryGenerator({
+        fs: new DenoFileSystem(),
+        process,
+        fetchManifest: (url) => fetch(url),
+      });
+      await generate({ projectRoot: root, dryRun: false });
+      const before = await snapshot(root);
+      const green = await probeConfiguredPluginManifest(
+        root,
+        '@netscript/plugin-workers',
+        process,
+        { timeoutMs: 30_000 },
+      );
+      assertEquals(green.status, 'resolved', JSON.stringify(green));
+      assertEquals(await snapshot(root), before);
+      await generate({ projectRoot: root, dryRun: false });
+      assertEquals(await snapshot(root), before);
+      const report = await inspect(root);
+      assertEquals(report.status, 'current', JSON.stringify(report));
+      assertEquals(await snapshot(root), before);
+      await write(
+        root,
+        'throwing.ts',
+        "throw new Error('plugin must not execute during caching');",
+      );
+      await write(
+        root,
+        'netscript.config.ts',
+        "export default {name: 'graph-fixture', databases: {config: []}, plugins: ['./throwing.ts']};",
+      );
+      await generate({ projectRoot: root, dryRun: false });
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  }
+});
 
 async function command(root: string, check = true) {
   return await new Deno.Command(Deno.execPath(), {

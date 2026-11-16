@@ -1,5 +1,6 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
+import { join, toFileUrl } from '@std/path';
 
 import type { DirEntry, FileInfo, WalkEntry } from '../../../../kernel/domain/core-types.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
@@ -528,6 +529,106 @@ describe('installed runtime registry generator', () => {
     assertEquals(fetchCalls, 1);
   });
 });
+
+Deno.test('normal generation prepares configured module graphs; dry-run never evaluates config', async () => {
+  const root = Deno.cwd();
+  const fs = new MemoryFileSystem({
+    [join(root, 'appsettings.json')]: '{}',
+    [join(root, 'deno.json')]: '{}',
+    [join(root, 'netscript.config.ts')]: 'export default {};',
+  });
+  const calls: string[][] = [];
+  const process: ProcessPort = {
+    exec(_command, args) {
+      calls.push([...args]);
+      return Promise.resolve({
+        code: 0,
+        stderr: '',
+        stdout: args[0] === 'cache' ? '' : JSON.stringify({ plugins: ['./plugin.ts'] }),
+      });
+    },
+  };
+  const generate = createInstalledRuntimeRegistryGenerator({
+    fs,
+    process,
+    fetchManifest: () => Promise.resolve(jsonResponse({})),
+  });
+  await generate({ projectRoot: root, dryRun: true });
+  assertEquals(calls, []);
+  await generate({ projectRoot: root, dryRun: false });
+  assertEquals(calls.length, 2);
+  assertEquals(calls[1][0], 'cache');
+  assertEquals(calls[1].includes('--'), false);
+  assertEquals(calls[1].at(-1), toFileUrl(join(root, 'plugin.ts')).href);
+});
+
+for (const filename of ['netscript.config.ts', 'netscript.config.js', 'netscript.config.mjs']) {
+  Deno.test(`graph preparation handles ${filename}, aliases, empty lists and failures`, async () => {
+    const root = Deno.cwd();
+    const fs = new MemoryFileSystem({
+      [join(root, filename)]: '',
+      [join(root, 'deno.json')]: '{}',
+      [join(root, 'appsettings.json')]: '{}',
+    });
+    for (
+      const scenario of [
+        'alias',
+        'empty',
+        'invalid',
+        'config-timeout',
+        'resolve-timeout',
+        'cache-timeout',
+        'cache-error',
+        'malformed',
+      ]
+    ) {
+      const stages: string[] = [];
+      const process: ProcessPort = {
+        exec(_command, args, options) {
+          const stage = args[0] === 'cache' ? 'cache' : args.at(-1) === '-' ? 'resolve' : 'config';
+          stages.push(stage);
+          assertEquals(options?.timeoutMs, stage === 'cache' ? 60_000 : 30_000);
+          assertEquals(options?.maxOutputBytes, 1024 * 1024);
+          if (scenario === `${stage}-timeout`) {
+            return Promise.resolve({ code: 0, timedOut: true, stdout: '{}', stderr: '' });
+          }
+          if (scenario === 'cache-error' && stage === 'cache') {
+            return Promise.resolve({ code: 1, stdout: '', stderr: 'cache failed' });
+          }
+          return Promise.resolve({
+            code: 0,
+            stderr: '',
+            stdout: stage === 'config'
+              ? JSON.stringify({
+                plugins: scenario === 'empty'
+                  ? []
+                  : scenario === 'invalid'
+                  ? ['--reload']
+                  : ['alias/subpath'],
+              })
+              : scenario === 'malformed'
+              ? 'null'
+              : '["jsr:@fixture/plugin@1.0.0/subpath"]',
+          });
+        },
+      };
+      const generate = createInstalledRuntimeRegistryGenerator({
+        fs,
+        process,
+        fetchManifest: () => Promise.resolve(jsonResponse({})),
+      });
+      if (scenario === 'alias' || scenario === 'empty') {
+        await generate({ projectRoot: root, dryRun: false });
+        assertEquals(stages, scenario === 'empty' ? ['config'] : ['config', 'resolve', 'cache']);
+      } else {
+        await assertRejects(() => generate({ projectRoot: root, dryRun: false }));
+        if (scenario === 'invalid' || scenario === 'config-timeout') {
+          assertEquals(stages, ['config']);
+        }
+      }
+    }
+  });
+}
 
 function appsettings(name: string, entrypoint: string): string {
   return JSON.stringify({ NetScript: { Plugins: { [name]: { Entrypoint: entrypoint } } } });

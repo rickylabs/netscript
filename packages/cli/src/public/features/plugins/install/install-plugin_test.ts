@@ -41,6 +41,7 @@ import { importEntryForDependency } from '../../../../kernel/application/ui/regi
 import { loadRegisteredPlugins } from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { loadConfig } from '@netscript/config';
 import { useLocalWorkspaceImports } from '../../../../../tests/support/local-workspace-imports.ts';
+import { createInstalledRuntimeRegistryGenerator } from '../../generate/plugins/installed-runtime-registry-generator.ts';
 
 // This flow renders plugin/workspace files via sync template generators, which
 // require a previously-awaited registry hydration. The test drives the flow
@@ -952,10 +953,15 @@ describe('public install plugin flow', () => {
     const workersRoot = repoPath('plugins/workers');
     try {
       await writeRealProjectFiles(projectRoot);
+      await Deno.writeTextFile(
+        join(projectRoot, 'netscript.config.ts'),
+        "export default { name: 'install-order', databases: {config: []}, plugins: [] };\n",
+      );
       const fs = new DenoFileSystem();
       const templateAdapter = new StringTemplateAdapter(fs);
       const scaffolder = new Scaffolder(templateAdapter, fs);
       const registry = new PluginKindRegistry();
+      let prepared = false;
 
       const result = await installPlugin({
         kind: 'workers',
@@ -977,8 +983,28 @@ describe('public install plugin flow', () => {
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
         regenerateHelpers: () => Promise.resolve([]),
+        generateRegistries: async (input) => {
+          assertEquals(input, { projectRoot, dryRun: false });
+          const config = JSON.parse(await fs.readFile(join(projectRoot, 'deno.json')));
+          assert(config.imports['@netscript/plugin-workers']);
+          assert(Array.isArray(config.workspace));
+          assertStringIncludes(await fs.readFile(join(projectRoot, 'appsettings.json')), 'workers');
+          assertStringIncludes(
+            await fs.readFile(join(projectRoot, 'netscript.config.ts')),
+            './workers/plugin.ts',
+          );
+          await useLocalWorkspaceImports(projectRoot, REPO_ROOT);
+          const output = await createInstalledRuntimeRegistryGenerator({
+            fs,
+            process: new DenoProcess(),
+            fetchManifest: (url) => fetch(url),
+          })(input);
+          prepared = true;
+          return output;
+        },
       });
 
+      assert(prepared);
       assertEquals(result.pluginOwnedScaffold?.status, 'applied');
       assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, false);
       assertStringIncludes(

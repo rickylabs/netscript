@@ -267,6 +267,8 @@ Deno.test('public plugin install then bare-name remove restores owned state and 
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: process,
         regenerateHelpers: () => Promise.resolve([]),
+        // This round-trip owns removal; the registry sentinel is authored explicitly below.
+        generateRegistries: () => Promise.resolve([]),
       },
     }).parse([
       'stream',
