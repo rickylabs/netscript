@@ -214,6 +214,9 @@ export interface ServeOptions {
   /** Owned resource cleanup hooks, run on process-owned signals even when work drain times out. */
   onCleanup?: readonly ShutdownHook[];
 
+  /** Set false when onCleanup already owns database disposal; defaults to true. */
+  disposeDatabaseOnSignal?: boolean;
+
   /** Exit 0 clean, 1 failed, 2 timed out after a signal. False leaves ownership to the host. */
   exitOnSignal?: boolean;
 

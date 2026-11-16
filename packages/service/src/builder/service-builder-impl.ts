@@ -629,7 +629,9 @@ export class ServiceBuilderImpl<
       this.config.port ?? 3000,
       options,
       this.shutdownHooks,
-      [() => disconnectServiceDatabases(this.databaseResources)],
+      options?.disposeDatabaseOnSignal === false
+        ? []
+        : [() => disconnectServiceDatabases(this.databaseResources)],
     );
   }
 }

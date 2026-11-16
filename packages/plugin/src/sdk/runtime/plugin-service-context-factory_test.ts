@@ -134,3 +134,29 @@ function createTestKv(): object {
     },
   };
 }
+
+Deno.test('owner disposal is idempotent and does not resolve unused KV or database clients', async () => {
+  let resolved = 0;
+  let disposed = 0;
+  const context = await createPluginServiceContext('cleanup-owner', {
+    getDatabaseClient: () => {
+      resolved++;
+      return Promise.resolve({});
+    },
+    getKv: () => {
+      resolved++;
+      return Promise.resolve(createTestKv());
+    },
+    dispose: () => {
+      disposed++;
+      return Promise.resolve();
+    },
+  });
+  assert(context.dispose);
+  const first = context.dispose();
+  const second = context.dispose();
+  assertStrictEquals(first, second);
+  await first;
+  assertEquals(resolved, 0);
+  assertEquals(disposed, 1);
+});

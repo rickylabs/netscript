@@ -46,3 +46,10 @@ Added explicit child shutdown ownership, loopback hostname override, monotonic t
 
 Resource teardown preview remained read-only. Owned Redis was removed after exact identity, run-label and bind-mount proof; no foreign or unknown-owner resources changed. S2 adds explicit exitOnSignal:false to two existing embedded signal tests; their hook/listener assertions are retained. Plan file groups updated to 17 (<30) to include these necessary test adaptations and post-contract cleanup tests.
 Reconcile: PR remains a draft, status progresses to implementation, source for excluded saga transports is unchanged. S3 composition/docs and the one-pass runtime smoke remain pending; no supervisor sign-off is claimed.
+
+## S3a generated resource ownership
+
+Added optional, idempotent owner disposal to PluginServiceContext without resolving unused adapters. Generated host bootstrap tracks only acquired Prisma identities; its callback attempts every disconnect once. Workers/sagas/auth service composition invokes it in reserved signal cleanup; workers/sagas/triggers child glue calls singleton closeKv and the generated host callback. Saga DB acquisitions are covered through their existing host resolver. Native embedded hosts retain ownership on manual stop. Explicit host DB disposal disables duplicate automatic raw-builder disposal.
+
+Generated-owner tests first failed 2/37 with missing disposal against the old embedded template. After canonical gen:assets-barrel, the suite passes 37/37, including all three installed runtime artifacts, acquired/unused generated DB cases, lazy owner disposal and a real signal proving exactly one disconnect. Structured changed-source check passes (14 files); non-CLI lint/fmt passes with no findings. CLI files require the repository's explicit CLI quality config because the root config excludes them; separate wrappers validate them. No lock changes or new dependencies.
+Reconcile: #2630/#2631 acceptance implementation is progressing; generated runtime smoke, documentation/assets and independent IMPL-EVAL remain. No foreign resources are running for this slice.
