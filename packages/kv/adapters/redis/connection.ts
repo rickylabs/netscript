@@ -63,6 +63,7 @@ export class RedisConnectionManager {
   private clientPromise: Promise<Redis> | null = null;
   private subscriberPromise: Promise<Redis> | null = null;
   private closed = false;
+  private readonly closing = new AbortController();
 
   /**
    * @param url     - Redis connection URL.
@@ -108,6 +109,9 @@ export class RedisConnectionManager {
         }
         this.client = client;
         return client;
+      }).catch((error: unknown) => {
+        this.clientPromise = null;
+        throw error;
       });
     }
 
@@ -122,23 +126,36 @@ export class RedisConnectionManager {
    * A separate ioredis instance is required because Redis pub/sub locks the
    * connection into subscribe mode.
    *
+   * @param signal - Cancel pending connection/retry work.
    * @returns Connected Redis subscriber client.
    */
-  async ensureSubscriber(): Promise<Redis> {
+  async ensureSubscriber(signal?: AbortSignal): Promise<Redis> {
     if (this.closed) {
       throw new KvClosedError('RedisKvAdapter is closed.');
+    }
+    signal?.throwIfAborted();
+    if (this.subscriber?.status === 'end') {
+      this.subscriber = null;
+      this.subscriberPromise = null;
     }
     if (this.subscriber) {
       return this.subscriber;
     }
 
+    const connectionSignal = signal
+      ? AbortSignal.any([signal, this.closing.signal])
+      : this.closing.signal;
     this.subscriberPromise ??= retry(
-      () => this.connectSubscriberOnce(),
-      RETRY_OPTIONS,
+      () => this.connectSubscriberOnce(connectionSignal),
+      { ...RETRY_OPTIONS, signal: connectionSignal },
     ).then(async (subscriber) => {
       if (this.closed) {
         await subscriber.quit();
         throw new KvClosedError('RedisKvAdapter is closed.');
+      }
+      if (connectionSignal.aborted) {
+        subscriber.disconnect();
+        throw connectionSignal.reason;
       }
       this.subscriber = subscriber;
       return subscriber;
@@ -162,14 +179,17 @@ export class RedisConnectionManager {
     }
 
     this.closed = true;
+    this.closing.abort(new KvClosedError('RedisKvAdapter is closed.'));
 
     if (this.subscriber) {
-      await this.subscriber.quit();
+      if (this.subscriber.status === 'ready') await this.subscriber.quit();
+      else this.subscriber.disconnect();
       this.subscriber = null;
     }
 
     if (this.client) {
-      await this.client.quit();
+      if (this.client.status === 'ready') await this.client.quit();
+      else this.client.disconnect();
       this.client = null;
     }
   }
@@ -248,16 +268,47 @@ export class RedisConnectionManager {
    * @returns Connected Redis subscriber.
    * @throws {KvConnectionError} When the connection attempt fails.
    */
-  private async connectSubscriberOnce(): Promise<Redis> {
-    const subscriber = new Redis(this.url, this.createRedisOptions());
+  private async connectSubscriberOnce(signal: AbortSignal): Promise<Redis> {
+    signal.throwIfAborted();
+    const subscriber = new Redis(this.url, {
+      ...this.createRedisOptions(),
+      // The lease owner restores only channels that still have consumers, then
+      // rereads their state after acknowledgement. Stale commands cannot replay.
+      autoResubscribe: false,
+      autoResendUnfulfilledCommands: false,
+    });
 
     try {
       await new Promise<void>((resolve, reject) => {
-        subscriber.once('ready', () => resolve());
-        subscriber.once('error', (error: Error) => reject(error));
+        const cleanup = (): void => {
+          subscriber.off('ready', onReady);
+          subscriber.off('error', onError);
+          signal.removeEventListener('abort', onAbort);
+        };
+        const onReady = (): void => {
+          cleanup();
+          resolve();
+        };
+        const onError = (error: Error): void => {
+          cleanup();
+          reject(error);
+        };
+        const onAbort = (): void => {
+          // A native connection may already be ready while its acknowledgement
+          // is in flight. Send QUIT once, then guarantee the socket is closed.
+          if (subscriber.status === 'ready') void subscriber.quit().catch(() => {});
+          subscriber.disconnect();
+          cleanup();
+          reject(signal.reason);
+        };
+        subscriber.once('ready', onReady);
+        subscriber.once('error', onError);
+        signal.addEventListener('abort', onAbort, { once: true });
+        if (signal.aborted) onAbort();
       });
     } catch (error: unknown) {
       subscriber.disconnect();
+      if (signal.aborted) throw signal.reason;
       throw new KvConnectionError(
         `Failed to connect RedisKvAdapter subscriber to ${maskRedisUrl(this.url)}: ${
           toErrorMessage(error)

@@ -45,3 +45,5 @@ S3 (14files maximum): six run artifacts, independent evaluate.md, generated pros
 ## Open decisions
 
 None. Bounds are30seconds plus the preceding native reconnect window; no public retry option in this fix. Recovery snapshots may repeat values, matching at-least-once state observation. Initial ready remains one-time startup acknowledgement. In-flight watch close fails with KvClosedError, caller abort completes normally. Prefix discovery is unchanged, but shared lease recovery/failure must preserve its lifecycle. Native Redis-only test commands are diagnostic CLIENT/MULTI/SET, never Streams. Production recovery only requires ordinary SUBSCRIBE and existing reads.
+
+Implementation refinement under approved F-1 watch-point: fixed-key behavior moves to focused adapters/redis/watch-fixed-keys.ts, reducing the existing adapter below its baseline size. S2 therefore touches at most18files, still below30. No public abstraction added. Drift records finite native retry bound and tighter disconnect-based deadline.
