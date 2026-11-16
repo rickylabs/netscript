@@ -51,3 +51,10 @@ Running listener-drain-owner_test.ts reveals Redis/Garnet and KV polling resolve
 Approved optional ListenOptions.drainTimeoutMs separates Redis/KV-polling post-intake waiting from worker total stop. Omission preserves native visibility-based finite behavior. Positive Infinity leaves admitted callbacks/receipts alive for an outer bounded owner; no Infinity timer is scheduled. Invalid finite/nonfinite values rejected before allocation. Listener JSDoc explicitly cross-references WorkerOptions.drainTimeoutMs, whose total remains finite25s by default. No visibility/claim/reclaim/Lua change.
 
 Previously red owner/default controls now6/6green on real Redis/Garnet and KV polling; combined with existing native lease suite16pass/0fail/1pre-existingCI-only ignore. Policy validation/no-allocation1/1green; scoped check/lint/fmt0, release:preflight/docs:accuracyPASS. AMQP work is independent and follows in its own commit; Worker forwarding is S4.
+
+
+## Original S3 AMQP handback
+
+The pinned provider's non-native async path double-acknowledged; replace consumption with existing upstream amqplib basic.cancel/prefetch and one per-receipt settlement boundary. Configure the existing Fedify enqueue path with the actual queue name and native retry. Preserve/count the same envelope on an owned confirm publisher and await broker confirmation before old ack. Native error/cancel/close callbacks are owned, retained contexts cannot publish through a closed receipt, and stop closes the owned connection even after listen already completed. No new dependency or fake provider seam.
+
+Real backend handback suite23/23 executes all seven backend variants (Redis/Garnet/Postgres/AMQP/DenoKV/KVpoll/memory),8shutdown restarts, explicit and actual thrown failures plus native DLQ tests,0ignored. After channel-edge cleanup strengthening, focused AMQP/policy5/5green. Scoped check/lint/fmt0, new private method JSDoc supplied; queue combined doclint1/exact per-entrypoint baseline unchanged, no newdiagnostics. Preflight/accuracyPASS. Four owned implementation backends now retained, each immutable ID and mount recorded privately; no foreign cleanup. Worker integration follows S4.
