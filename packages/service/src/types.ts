@@ -211,8 +211,12 @@ export interface ServeOptions {
   /** Reserved process cleanup budget within drainTimeoutMs; defaults to min(5_000, one fifth). */
   cleanupTimeoutMs?: number;
 
-  /** Owned resource cleanup hooks, run on process-owned signals even when work drain times out. */
-  onCleanup?: readonly ShutdownHook[];
+  /**
+   * Owned resource disposers, run on process-owned signals even when work drain times out.
+   * These zero-argument callbacks always run in the signal cleanup phase; use onShutdown
+   * for work hooks that need a shutdown reason.
+   */
+  onCleanup?: readonly (() => Promise<void> | void)[];
 
   /** Set false when onCleanup already owns database disposal; defaults to true. */
   disposeDatabaseOnSignal?: boolean;

@@ -25,3 +25,8 @@
 ## Native supported-runner restart evidence
 
 Full S4 gate remains unresolved at a native web-resource restart. To stop discarding the only decisive diagnostic, minimally include native exit code plus stderr/stdout fallback in the existing CLI refresh error, with two red-before/green-after tests. No retry/bypass/resource-target changes, no new command/API. This is bounded S4 failure diagnosis within the required full-runtime gate, not a new lifecycle design. Two CLI files plus run evidence, below30files. No new local smoke attempt on the unsupported Docker host.
+
+
+## Ready-transition public type closure repair
+
+Current CI shard1 receipt (workflow43960706867, job133627460342) reports786pass/1fail/9ignored: the existing workers non-contract doc-lint test exposes ServeOptions.onCleanup reaching private ShutdownHook through the worker facade. Reproduced that existing test locally red before fixing. Cleanup is always the process-owned signal disposal phase and needs no reason argument: narrow the new onCleanup contract to zero-argument disposers, leaving reason-aware work hooks on onShutdown. This avoids increasing the separately bounded workers/streams native type closure debt. No executable control flow, generated launch or budget changes. Existing worker public contract suite plus service resource ownership tests7/7green; scoped type check/lint/fmt0; release:preflight/docs:accuracyPASS. Supported full smoke and independent cycle2 remain behavior evidence because the delta is type/JSDoc only. Refresh generated documentation carriers before final head CI confirmation.
