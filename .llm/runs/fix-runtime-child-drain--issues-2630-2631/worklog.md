@@ -76,3 +76,10 @@ First full scaffold.runtime attempt exited 1 before changed runtime roles: prefl
 The broader service/plugin tests exposed two legacy expectations: manual defineService.stop must preserve the host database under the approved contract; Deno watch reports explicit exit 1 as "Process finished with exit code 1" rather than "Process failed". Updated those assertions while retaining database usability/explicit owner disposal and watch failure/restart-history assertions. Targeted format/lint pass. No production behavior changed in this follow-up.
 
 Broader package regression suite after the expectation updates: structured service/plugin tests exit 0, 820 passed / 0 failed / 4 ignored (824 results). Both updated test files pass structured format and lint with zero findings.
+
+
+Corrected full scaffold.runtime exited 1 at plugin doctor: the maintained Docker topology contract explicitly rejects remote Docker for generated AppHosts. Native describe proved PostgreSQL, Redis, Garnet, users, workers API and workers healthy through the temporary bridge. This is partial runtime evidence, not a full smoke PASS. The temporary bridge also attached to the owned Aspire network and caused persistent-network cleanup to fail; the bridge is stopped and its residual ownership is audited separately before final cleanup. Further full local reruns are not useful on this unsupported topology; the supported CI runner must supply the complete runtime verdict. No doctor or test guard is disabled.
+
+Final quality:gate exits 0 after both expectation updates. Baseline-only diagnostics remain disclosed above.
+
+Resource reconciliation: teardown preview with an absolute worktree root planned one owned diagnostic PostgreSQL container removal. Apply removed that one container and no AppHosts/processes; exit 4 reports 40 foreign/unknown entries left untouched. Docker identity scans afterward found zero containers with owned-root mounts and zero uniquely labelled temporary bridge containers. The script's best-effort cleanup encountered a proxy already removed by Aspire; the error is retained, with the zero-survivor scan supplying final cleanup evidence.
