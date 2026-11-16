@@ -102,11 +102,19 @@ export class DbOperationRunner implements DbOperationExecutor {
     }
 
     const refreshed = new Set<string>();
+    const generatedDatabases: DiscoveredDatabase[] = [];
     const controller = new AbortController();
     const unregisterSignals = this.registerSignalAbort(() => controller.abort());
     try {
-      for (const database of databases) {
-        const code = await this.executeOne(request, database, controller.signal, refreshed);
+      for (const [index, database] of databases.entries()) {
+        const code = await this.executeOne(
+          request,
+          database,
+          controller.signal,
+          refreshed,
+          generatedDatabases,
+          index === databases.length - 1,
+        );
         if (code !== 0) return code;
       }
     } finally {
@@ -122,6 +130,8 @@ export class DbOperationRunner implements DbOperationExecutor {
     database: DiscoveredDatabase,
     signal?: AbortSignal,
     refreshed = new Set<string>(),
+    generatedDatabases: DiscoveredDatabase[] = [],
+    isLastDatabase = true,
   ): Promise<number> {
     const aspireDir = join(request.projectRoot, SCAFFOLD_DIRS.ASPIRE_TS);
     const apphostPath = join(aspireDir, SCAFFOLD_FILES.APPHOST_MTS);
@@ -154,18 +164,22 @@ export class DbOperationRunner implements DbOperationExecutor {
           signal,
         );
         if (code === 0 && request.operation === 'generate') {
-          await refreshGeneratedClientConsumers({
-            projectRoot: request.projectRoot,
-            database,
-            apphostPath,
-            aspireDir,
-            executor: this.executor,
-            fs: this.fs,
-            realPath: this.realPath,
-            timeoutMs: this.timeoutMs,
-            signal,
-            refreshed,
-          });
+          generatedDatabases.push(database);
+          if (isLastDatabase) {
+            await refreshGeneratedClientConsumers({
+              projectRoot: request.projectRoot,
+              database,
+              databases: generatedDatabases,
+              apphostPath,
+              aspireDir,
+              executor: this.executor,
+              fs: this.fs,
+              realPath: this.realPath,
+              timeoutMs: this.timeoutMs,
+              signal,
+              refreshed,
+            });
+          }
         }
         return code;
       }

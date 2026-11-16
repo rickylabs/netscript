@@ -38,8 +38,8 @@ class FakeAspireExecutor {
   ): AsyncGenerator<string, void> {
     this.streamCalls.push({ args: [...args], options });
     try {
-      yield resourceLine('Finished', 99);
-      yield resourceLine('Running');
+      yield resourceLine('Finished', 99, args[1]);
+      yield resourceLine('Running', undefined, args[1]);
       const result = await this.outputForStream(options);
       yield result.stdout;
     } finally {
@@ -73,9 +73,9 @@ class FakeAspireExecutor {
   }
 }
 
-function resourceLine(state: string, exitCode?: number): string {
+function resourceLine(state: string, exitCode?: number, name = 'postgres-cli'): string {
   return JSON.stringify({
-    displayName: 'postgres-cli',
+    displayName: name,
     resourceType: 'Executable',
     state,
     exitCode,
@@ -118,13 +118,13 @@ function running(path = APPHOST): CommandOutput {
   return output(0, JSON.stringify([{ appHostPath: path, appHostPid: 42 }]));
 }
 
-function completedResource(exitCode = 0): CommandOutput {
+function completedResource(exitCode = 0, name = 'postgres-cli'): CommandOutput {
   return output(
     0,
     JSON.stringify([{
       appHostPath: APPHOST,
       resources: [{
-        displayName: 'postgres-cli',
+        displayName: name,
         resourceType: 'Executable',
         state: 'Finished',
         exitCode,
@@ -140,7 +140,7 @@ function runner(
   return new DbOperationRunner({
     ...options,
     executor,
-    lifecycleLock: new FakeLock(),
+    lifecycleLock: options.lifecycleLock ?? new FakeLock(),
     pollIntervalMs: 0,
     timeoutMs: options.timeoutMs ?? 60_000,
     sleep: async () => {},
@@ -522,4 +522,163 @@ Deno.test('standalone generate never refreshes service consumers', async () => {
     0,
   );
   assertEquals(executor.outputCalls.some((call) => call.args[2] === 'restart'), false);
+});
+
+Deno.test('multi-database generate refreshes once after the complete batch under the final lease', async () => {
+  for (const modes of [[true, true], [false, true], [true, false], [false, false]]) {
+    for (const finalCode of [0, 7]) {
+      const outputs: OutputStep[] = [];
+      const events: string[] = [];
+      const databases: DiscoveredDatabase[] = [
+        { ...DATABASE, configKey: 'sqlite', engine: 'sqlite', workspaceDir: 'database/sqlite' },
+        DATABASE,
+      ];
+      for (const [index, db] of databases.entries()) {
+        if (modes[index]) outputs.push(running());
+        else outputs.push(output(0, '[]'), output());
+        outputs.push(
+          output(),
+          output(),
+          () => {
+            events.push(`generated:${db.configKey}`);
+            return Promise.resolve(
+              completedResource(index === 1 ? finalCode : 0, `${db.configKey}-cli`),
+            );
+          },
+          output(),
+          output(),
+        );
+        if (!modes[index]) outputs.push(output());
+      }
+      const expected = modes[1] && finalCode === 0
+        ? (modes[0] ? ['direct', 'orders', 'dashboard'] : ['direct', 'dashboard'])
+        : [];
+      if (expected.length) {
+        outputs.push(() => {
+          assertEquals(events.filter((e) => e.startsWith('generated:')), [
+            'generated:sqlite',
+            'generated:postgres',
+          ]);
+          assertEquals(events.at(-1), 'generated:postgres');
+          return Promise.resolve(output(
+            0,
+            JSON.stringify({
+              resources: expected.map((displayName) => ({
+                displayName,
+                resourceType: 'Executable',
+                state: 'Running',
+              })),
+            }),
+          ));
+        }, ...expected.flatMap(() => [output(), output()]));
+      }
+      const executor = new FakeAspireExecutor(outputs);
+      let held = false;
+      let acquisitions = 0;
+      const lifecycleLock: AppHostLifecycleLock = {
+        acquire: () => {
+          assertEquals(held, false);
+          held = true;
+          acquisitions++;
+          return Promise.resolve({
+            release: () => {
+              held = false;
+              return Promise.resolve();
+            },
+          });
+        },
+      };
+      const originalOutput = executor.output.bind(executor);
+      executor.output = (args, options) => {
+        if (args[0] === 'describe' || args[2] === 'restart') assertEquals(held, true);
+        return originalOutput(args, options);
+      };
+      const code = await runner(executor, {
+        lifecycleLock,
+        realPath: (path) => Promise.resolve(resolve(path)),
+        fs: {
+          readFile: (path) =>
+            Promise.resolve(JSON.stringify(
+              path.endsWith('appsettings.json')
+                ? {
+                  NetScript: {
+                    PrimaryDatabase: 'sqlite',
+                    Databases: { sqlite: {}, postgres: {} },
+                    Services: { orders: {}, direct: {} },
+                    Apps: { dashboard: { ServiceReferences: ['orders', 'direct'] } },
+                  },
+                }
+                : {
+                  imports: {
+                    '@database': path.replaceAll('\\', '/').includes('/direct/')
+                      ? '../../database/postgres/mod.ts'
+                      : '../../database/mod.ts',
+                  },
+                },
+            )),
+        },
+      }).execute({ ...request('generate'), target: { kind: 'all', databases } });
+      assertEquals(code, finalCode);
+      assertEquals(
+        executor.outputCalls.filter((c) => c.args[2] === 'restart').map((c) => c.args[1]),
+        expected,
+      );
+      assertEquals(acquisitions, 2);
+      assertEquals(held, false);
+      assertEquals(outputs.length, 0);
+    }
+  }
+});
+
+Deno.test('resident non-generation operations never inspect or refresh consumers', async () => {
+  for (const operation of ['seed', 'migrate', 'init'] as const) {
+    const outputs = operation === 'init'
+      ? [running(), output(), output(), completedResource(), output(), output()]
+      : [running(), output(), output()];
+    const executor = new FakeAspireExecutor(outputs);
+    assertEquals(
+      await runner(executor, {
+        fs: {
+          readFile: () => {
+            throw new Error('unexpected consumer inspection');
+          },
+        },
+      }).execute(request(operation)),
+      0,
+    );
+    assertEquals(
+      executor.outputCalls.some((c) => c.args[0] === 'describe' || c.args[2] === 'restart'),
+      false,
+    );
+  }
+});
+
+Deno.test('a failed first database never generates later targets or refreshes consumers', async () => {
+  const executor = new FakeAspireExecutor([
+    running(),
+    output(),
+    output(),
+    completedResource(7),
+    output(),
+    output(),
+  ]);
+  const databases: DiscoveredDatabase[] = [DATABASE, {
+    ...DATABASE,
+    configKey: 'sqlite',
+    engine: 'sqlite',
+  }];
+  const code = await runner(executor, {
+    fs: {
+      readFile: () => {
+        throw new Error('unexpected consumer inspection');
+      },
+    },
+  })
+    .execute({ ...request('generate'), target: { kind: 'all', databases } });
+  assertEquals(code, 7);
+  assertEquals(executor.streamCalls.length, 1);
+  assertEquals(
+    executor.outputCalls.some((c) => c.args[0] === 'describe' || c.args[2] === 'restart'),
+    false,
+  );
 });
