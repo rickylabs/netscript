@@ -14,3 +14,6 @@
 - S3b source-derived child-health documentation requires updating its existing generator symbol list; it now includes the public process options/function. Subprocess self-imports are corrected to local module URLs to satisfy release:preflight. This adds three scoped files to the prose slice and remains below 30.
 
 - Baseline-only doc/JSR findings were measured rather than assumed: plugin doc-lint 18 and telemetry 7 match base distribution exactly; plugin module-tag audit fails on three untouched entrypoints. Service doc-lint is clean. No unrelated publishability repair is folded into runtime lifecycle work.
+
+- The required runtime smoke was repeated only after diagnosing a concrete environment failure: container loopback endpoints were in the Docker daemon's namespace. A temporary, owned-only port bridge supplies local reachability without changing generated output or weakening gates. Native PostgreSQL readiness passed through it.
+- S4 includes two pre-existing test expectation updates: manual-stop host DB ownership and Deno-watch's explicit-exit diagnostic. Both retain their behavioral assertions; the slice remains below 30 files.

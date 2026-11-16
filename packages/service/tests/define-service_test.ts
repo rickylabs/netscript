@@ -41,17 +41,20 @@ function restoreEnv(name: string, value: string | undefined): void {
   Deno.env.set(name, value);
 }
 
-Deno.test('defineService disconnects a capable database client on stop', async () => {
+Deno.test('defineService leaves database cleanup to the host on manual stop', async () => {
   await withReachableDatabaseEndpoint(async () => {
     let queryCount = 0;
     let disconnectCount = 0;
+    let disconnected = false;
     const db = {
       $queryRaw(_query: TemplateStringsArray): Promise<unknown> {
+        if (disconnected) throw new Error('Host database was closed prematurely');
         queryCount += 1;
         return Promise.resolve(1);
       },
       $disconnect(): Promise<void> {
         disconnectCount += 1;
+        disconnected = true;
         return Promise.resolve();
       },
     };
@@ -66,6 +69,10 @@ Deno.test('defineService disconnects a capable database client on stop', async (
     await running.stop();
 
     assertEquals(queryCount, 1);
+    assertEquals(disconnectCount, 0);
+    assertEquals(await db.$queryRaw`SELECT 1`, 1);
+    assertEquals(queryCount, 2);
+    await db.$disconnect();
     assertEquals(disconnectCount, 1);
   });
 });

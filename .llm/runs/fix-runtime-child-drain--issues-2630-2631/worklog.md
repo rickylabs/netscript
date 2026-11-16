@@ -67,3 +67,12 @@ Canonical agent prose/site generation passes. Refreshed MCP export-surface corpu
 Final quality:gate, docs:accuracy and release:preflight pass. Service full export-map doc lint passes with zero diagnostics. Plugin doc lint has 18 pre-existing private-type diagnostics; telemetry has 7 (6 private-type, 1 missing JSDoc). Measured the identical command and per-entrypoint/file distributions at base b0eb07957 in a detached baseline checkout. Changed plugin health/SDK entrypoints are clean. JSR audits: service, telemetry and CLI exit 0 (existing warnings); plugin dry-run succeeds but audit exits 1 for three pre-existing missing @module tags in untouched abstracts/config/testing entrypoints. Git diff of those three entrypoints against the base is empty. These unrelated baseline findings are not hidden or fixed in this runtime slice.
 
 Next: one full scaffold.runtime smoke with cleanup, resource ownership audit, final independent IMPL-EVAL and head checks. #2632 is ready for review separately at head deb6b21cfcfc6b9d94e7291eb21def7072b4539b with required checks PASS/SKIPPED and no unanswered threads.
+
+
+## S4 runtime validation follow-up
+
+First full scaffold.runtime attempt exited 1 before changed runtime roles: preflight.deno, preflight.aspire, scaffold.init and cleanup.aspire-stop passed; behavior.documented-scaffold timed out waiting for PostgreSQL readiness. Native diagnostics showed PostgreSQL accepting connections but local health checks unable to reach the remote Docker namespace. An owned-only temporary bridge made the native readiness check pass without product changes; the diagnostic AppHost was stopped. The corrected one-pass smoke is running.
+
+The broader service/plugin tests exposed two legacy expectations: manual defineService.stop must preserve the host database under the approved contract; Deno watch reports explicit exit 1 as "Process finished with exit code 1" rather than "Process failed". Updated those assertions while retaining database usability/explicit owner disposal and watch failure/restart-history assertions. Targeted format/lint pass. No production behavior changed in this follow-up.
+
+Broader package regression suite after the expectation updates: structured service/plugin tests exit 0, 820 passed / 0 failed / 4 ignored (824 results). Both updated test files pass structured format and lint with zero findings.
