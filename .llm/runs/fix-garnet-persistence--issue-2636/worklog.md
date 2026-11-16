@@ -35,3 +35,13 @@ Ownership teardown preview reports zero run-owned cleanup commands. Foreign/unkn
 ## Generated consumers
 
 Canonical prose, MCP export corpus, CLI asset barrel and publish assets refreshed in dependency order. Only prose carrier was dirty when --allow-dirty was used for export generation; warning reviewed. Corpus and publish freshness pass. Only the prose and MCP publish carriers change; template/barrel and symbol corpus remain current. Next one final full runtime smoke with cleanup, then independent evaluation.
+
+
+## Final full runtime attempt
+
+Final full scaffold.runtime one-pass local command exits1: documented-scaffold Postgres never becomes healthy within300seconds. Cleanup gate passes. This shell had no local Docker socket; the known remote daemon is reachable, but this host does not satisfy the generated AppHost's local-Docker contract. No guard or product behavior changed; no full local pass claimed. Follow-up read-only leak/teardown reports zero run-owned cleanup commands, foreign resources untouched. Final supported-runner workflow [43940698080](https://github.com/rickylabs/netscript/actions/runs/43940698080) at3ab21381d is still running; desktop/static lanes already pass. Independent final evaluation awaits the complete runtime verdict.
+
+
+## Supported final runtime verdict
+
+[Workflow43940698080](https://github.com/rickylabs/netscript/actions/runs/43940698080) completes SUCCESS at source head3ab21381d. [Postgres full runtime](https://github.com/rickylabs/netscript/actions/runs/43940698080/job/133557631938) and [SQLite full runtime](https://github.com/rickylabs/netscript/actions/runs/43940698080/job/133557632129) both succeed, alongside scaffold-static and desktop-native packaging. No guard bypass or substituted gate. Local partial evidence remains recorded honestly. All four issue acceptance boxes have linked red/green runtime/generator/docs evidence in the IMPL comment. Follow-up commit records evidence only; no product/test/doc change after this green source head. Independent final IMPL-EVAL next, then ready transition and current required head checks/review-thread gate.
