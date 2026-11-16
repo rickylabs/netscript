@@ -12,3 +12,8 @@ Bootstrap only. No production changes or reproduction claimed. Next write/run ge
 Structured real Redis tests:0passed/2failed. Both reach subscriber end after the native retry window. Recovery case restarts the actual server and confirms PING, but iterator times out rather than reporting lost state. Terminal case times out after35seconds rather than throwing KvConnectionError. No product code changed. Test fixture uses a stable container endpoint while controlling its Redis server and removes only the exact owned labelled container. Short-gap test added next using native transactional kill+write, with no timing or publication dependency.
 
 Short-gap oracle also fails on unchanged main: native MULTI kills exactly one real pub/sub connection then SETs the envelope before any resubscription; the next batch times out. This proves reconnect state loss without a mocked backend or a publication race. Total baseline: three distinct failing runtime regressions, no bootstrap failure. Final resource label scan empty.
+
+
+## Independent Plan-Gate
+
+Separate-session GLM5.3/provider-default PLAN-EVAL [PASS](https://github.com/rickylabs/netscript/pull/2644#issuecomment-6927438505), all8boxes; observed OpenCode Go route matches requested primary and differs from OpenAI generator family. No repairs required. Acceptance3/3 covered by genuine baseline regressions. Implementation watch-points retained in plan-eval.md: preserve typed failures through release, fence stale generations, snapshot bookkeeping, prefix lifecycle, owner-file size and retries throughout the30-second budget. S2 may begin; no production implementation yet.
