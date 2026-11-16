@@ -41,3 +41,5 @@ Required CI quality failed because the reference wording changed the shipped pro
 The next required quality run exposed the second generated consumer of the updated JSDoc: MCP export-surface corpus freshness. Ran canonical gen:mcp-export-corpus under Deno 2.9.7. Only the pre-existing generated export-corpus carrier changed; no product behavior, type, lock or command changes. The canonical freshness check is rerun before pushing. These generated documentation carriers are necessary parts of the same CSRF documentation correction.
 
 Export-corpus check: exit 0. Row comparison proves exactly one changed surface: fresh ./form; no added or removed surfaces.
+
+Required CI then identified the publish-assets wrapper containing the refreshed MCP corpora. Ran gen:publish-assets and check:publish-assets on Deno 2.9.7; both pass. Only packages/mcp/src/publish-assets.generated.ts changed (two embedded documentation carriers). This completes the generator dependency chain; implementation source remains unchanged.
