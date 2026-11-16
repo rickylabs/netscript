@@ -123,4 +123,56 @@ consistent with the no-unsupported-timer decision and upstream #2239 alignment w
 | Field     | Value |
 | --------- | ----- |
 | Verdict   | PASS |
-| Rationale | Approved scope fully delivered: DataPath now selects native AOF/recovery, immediate flush acknowledgement, FileStream + storage-tier device configuration, and a shared log/checkpoint directory on every managed Garnet launch arm (Container, Executable, both Auto branches), while no-path launches are byte-identical to the prior Lua/endpoint argv (three no-path controls). Independently verified: 33/33 combined suite including both hard-restart delivery oracles, scoped typecheck, quality:gate, doc lint, JSR dry-run + audit (25 pre-existing warnings), release preflight, docs accuracy, formatter style preservation on changed files, pinned-binary flag existence, zero test-owned Docker residue, no transport/dependency/lock changes, and the supported-runner full smoke SUCCESS at the identical source head. No unrecorded doctrine violations; debt delta zero. Docs accurately describe both durability modes, latency tradeoff, native on-demand checkpoints, and directory retention. |
+| Rationale | Cycle 2 re-verification below preserves this cycle 1 PASS. Approved scope fully delivered: DataPath now selects native AOF/recovery, immediate flush acknowledgement, FileStream + storage-tier device configuration, and a shared log/checkpoint directory on every managed Garnet launch arm (Container, Executable, both Auto branches), while no-path launches are byte-identical to the prior Lua/endpoint argv (three no-path controls). Independently verified: 33/33 combined suite including both hard-restart delivery oracles, scoped typecheck, quality:gate, doc lint, JSR dry-run + audit (25 pre-existing warnings), release preflight, docs accuracy, formatter style preservation on changed files, pinned-binary flag existence, zero test-owned Docker residue, no transport/dependency/lock changes, and the supported-runner full smoke SUCCESS at the identical source head. No unrecorded doctrine violations; debt delta zero. Docs accurately describe both durability modes, latency tradeoff, native on-demand checkpoints, and directory retention. |
+
+---
+
+# Cycle 2 (delta re-evaluation)
+
+## Metadata
+
+| Field          | Value |
+| -------------- | ----- |
+| Evaluated head | `7cbcfbd3a17e1ddd715c464d589705084ccdf3f6` (branch `fix/garnet-persistence`, worktree clean; base unchanged `origin/main` `b0eb079575968e843b781579673c9fe2ae250e07`) |
+| Delta basis    | `cf901366b` (head that retained the cycle 1 verdict) → `7cbcfbd3a` |
+| Route          | Independent fresh evaluator session, `glm_5_3_flash/provider_default` (primary straightforward implementation-evaluation row, no fallback); generator Codex `gpt-6.1-sol/xhigh` (OpenAI family) — different vendor family, different session. Cycle 1 verdict at `1e16cc31d` (comment 6927774411) remains retained. |
+
+## Delta Scope (independently verified)
+
+`git diff 1e16cc31d..HEAD --name-status`: exactly two source files plus run artifacts —
+`generate-register-infrastructure.ts`, `garnet-persistence_test.ts`, and 4 run-dir files.
+No `deno.lock`, dependency, saga-transport, Streams, or doc changes. No tests skipped
+(suite reports `ignored:0`).
+
+| Delta claim | Independent verification | Result |
+| ----------- | ------------------------ | ------ |
+| Generator change is formatter-only (canonical `.llm/tools/quality/cli-quality.deno.json`) | Evaluator extracted the `cf901366b` generator, ran `deno fmt --config .llm/tools/quality/cli-quality.deno.json` on it, byte-compared to current HEAD: identical (646 → 646 lines, 198 reflowed) | PASS |
+| No launch/flags/API change | Byte-identity to the previously evaluated generator proves semantic equivalence of the durable flag composition, no-path argv, and every launch arm | PASS |
+| Test readiness is deterministic | `ready()` retry changed from jittered `minTimeout:20/maxTimeout:50` to `maxAttempts:200, minTimeout:100, maxTimeout:100, jitter:0` (bounded 20 s), applied to the pre-existing readiness loop | PASS |
+| Failure reports phase | New `phase` variable: `initial readiness` → `restart readiness` → `recovered delivery`, included in the failure diagnostic; informational only | PASS |
+| Delivery oracle unchanged | Enqueue (`checkpoint`, `aof-tail`), `getHealth().ready==2`, `kill --signal KILL`, `docker start`, port re-read, post-restart `ready()`, exact `delivered == ['checkpoint','aof-tail']`, ack per message, `ready==0` — all unchanged; 5-second delivery deadline unchanged | PASS |
+| Readiness strengthening does not hide data loss | The repeated failure was connection-refused at PING readiness before any delivery assertion (bootstrap/fixture phase). Data loss after restart manifests as a successful PING with zero delivered jobs; the unchanged exact-delivery assertion and 5 s deadline still catch that. A longer readiness wait cannot mask it | PASS |
+
+## Cycle 2 Gates
+
+| Gate | Command / evidence | Result |
+| ---- | ------------------ | ------ |
+| Combined generator + persistence suite (evaluator's own live run) | `DOCKER_HOST=<remote daemon> NETSCRIPT_TEST_GARNET_DOCKER=1 deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --unstable-kv …garnet-persistence_test.ts …generate-register-infrastructure_test.ts` (via pinned Deno 2.9.7, structured wrapper) | PASS — exit 0, `passed:33 failed:0 ignored:0`, both real hard-restart delivery oracles executed |
+| Test resource hygiene | Evaluator post-run daemon scan: zero containers/volumes bearing the `netscript.test-owner` label; foreign resources untouched | PASS |
+| Required `quality` (quality:cli) at current head | CI job 133586872245 (run 43949084683) on head `7cbcfbd3a` — pass | PASS |
+| Other required checks at current head | Several check-test shards pending (run still in progress); `deps-report` skipping per policy; close-gate failing solely on the PR body's intentionally unchecked final DoD box (local `check-close-gate.ts --pretty` reproduced: only that box, issue #2636 snapshot clean) | PASS (expected pre-verdict posture; final current-head verification is the generator's post-PASS responsibility) |
+
+## Cycle 2 Findings
+
+| Severity | Finding | Action |
+| -------- | ------- | ------ |
+| none blocking | — | — |
+| low (informational) | CLI-wide sibling legacy formatting outside the owned generator remains (unchanged from cycle 1; untouched by this delta) | none |
+| low (informational) | Required CI run 43949084683 still in progress (shards pending); close-gate red is solely the pending final DoD box awaiting this verdict | generator post-PASS bookkeeping |
+
+## Cycle 2 Verdict
+
+| Field     | Value |
+| --------- | ----- |
+| Verdict   | PASS |
+| Rationale | The only source delta since the cycle 1 PASS is the required canonical formatting of the owned generator (independently proven byte-identical to the canonical formatter output of the evaluated source — no launch/flag/API change) and a strictly stronger test fixture (deterministic 20-second readiness with phase diagnostics; all durability assertions unchanged). Cycle 1's retained verdict stays valid; the delta is verified green with a fresh independent 33/33 live suite run and zero test-owned residue. Required quality:cli is green at the current head. No blocking findings; the close-gate/DoD/current-head bookkeeping is explicitly post-evaluation and out of this verdict's scope. |
