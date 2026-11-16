@@ -61,11 +61,18 @@ expired deadline prevents handler invocation. Timeout and grace values must be f
 nonnegative; an explicit deadline must be finite epoch milliseconds.
 
 `InProcessJobRunner.stop()` stops admission, aborts active handlers immediately and waits for
-cleanup. `abortGracePeriodMs` defaults to 1000 milliseconds. After that grace the runtime stops
-waiting and rejects the dispatch; a handler cannot turn cancellation into successful completion.
-This runner executes JavaScript in process, so it cannot physically terminate a handler that ignores
-the signal, and CPU-blocking code can delay timers. Deadlines, grace timers and parent listeners are
-disposed when dispatch settles. Late calls to `reportProgress` reject after abort.
+cleanup. `abortGracePeriodMs` defaults to **5,000 milliseconds**, derived from the plugin Worker's
+25-second total stop budget (19 seconds work, 5 seconds abort cleanup, 1 second settlement), below
+the queue's default 30-second listener drain. Standalone runner stop aborts immediately; the plugin
+Worker first stops intake and waits for admitted work. Project workers configuration exposes
+`drainTimeoutMs` and `abortGracePeriodMs`, and standard/generated startup forwards them to the
+actual runner. An explicit startup override wins over project configuration, then defaults apply.
+The core `./shutdown` subpath owns the shared budget resolver and monotonic drain contract. After
+that grace the runtime stops waiting and rejects the dispatch; a handler cannot turn cancellation
+into successful completion. This runner executes JavaScript in process, so it cannot physically
+terminate a handler that ignores the signal, and CPU-blocking code can delay timers. Deadlines,
+grace timers and parent listeners are disposed when dispatch settles. Late calls to `reportProgress`
+reject after abort.
 
 Once a release contains this executor-driven signal and deadline, EIS's `createJobAbortScope`
 deadline/parent-signal workaround can be removed for job handlers. Source qualification alone does

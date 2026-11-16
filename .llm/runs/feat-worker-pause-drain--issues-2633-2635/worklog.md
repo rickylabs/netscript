@@ -87,3 +87,8 @@ WorkersConfigData and authoring/schema contracts expose validated total drain/gr
 Structured contract+runner+real runtime suite12/12green,0ignored: eight real subprocess cases cover both startup paths, authored50/1800ms and explicit precedence both directions with1.25s cleanup. Every terminal state remains timeout, never false success. Full workers core112pass/0fail/1pre-existingignore. Full core/plugin source/test check0; scoped lint0; canonical source/test fmt174files0. Core combined doclint2/plugin2 and all per-entrypoint distributions match measured baseline, config/shutdown0. release:preflight fourPASS and docs:accuracyPASS. Initial red fixture prerequisite failures excluded as recorded above.
 
 S5 quality:gate exit0 (no new doctrine exemption or dependency/lock change).
+
+
+## S6: public semantics and options
+
+Updated the actual tune-worker-runtime.md guide and worker/core/queue READMEs. Documents pause/resume generation joins, healthy paused lifetime, terminal bounded stop,25s=19+5+1 arithmetic and duration validation/precedence, project/generated startup forwarding and standalone5s grace, parent headroom, shutdown-first-cause delivery preservation versus ordinary failures/pause races, at-least-once provider outage limitations and the distinction between listener post-intake wait and Worker total. Public docs contain product concepts only. Preserved unrelated Markdown formatting rather than expanding scope. docs:accuracyPASS. Manual docs committed before refreshing generated prose/export/asset consumers.

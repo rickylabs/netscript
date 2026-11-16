@@ -92,6 +92,24 @@ stop consumption or lease recovery. External stores must honor the port's idempo
 contract. Use the built-in Redis store as the default rather than as an external mirror, since its
 append operation does not deduplicate repeated writes. Health exposes pending outbox records.
 
+### Controlled shutdown handback
+
+`context.nack({ requeue: true, preserveDeliveryCount: true })` returns the current live delivery
+without consuming its attempt. The option defaults to false and is ignored for `requeue: false`.
+Redis/Garnet, Postgres, KV polling, native Deno KV, AMQP and memory preserve message identity,
+payload and headers; the next delivery sees the same count. This explicit handback bypasses the
+failure limit/backoff for that delivery only. Ordinary nacks, thrown handler failures and expired
+receipt recovery retain their counting policy. First-party Workers use preservation only for
+controlled shutdown; ordinary pause races and failures remain charged.
+
+Receipt-based adapters fence stale/duplicate settlements. KV polling uses atomic checks when the
+provided KV supports them; without atomic support its existing fallback is single-consumer,
+best-effort publish-before-delete. Native Deno KV and AMQP republish the addressed envelope before
+acknowledging its old delivery; AMQP waits for broker confirmation. If that persistence fails, the
+original delivery stays on its native recovery path. Crash/outage recovery before the new metadata
+is committed follows the provider's native retry behavior; it cannot promise exactly-once effects or
+exact attempt metadata across an uncertain outcome. Keep handlers idempotent.
+
 ### Upgrading existing Redis and Garnet queues
 
 Existing ready lists, delayed entries, and dead-letter records retain their format. Recovery also
@@ -208,13 +226,17 @@ See [Tune the worker runtime](https://rickylabs.github.io/netscript/background-p
 
 Abort stops admission. A claim already committed still reaches its handler; in-flight handlers and
 fenced acknowledgements drain for up to `visibilityTimeout` (default 30000 ms), starting at abort,
-stop or listener failure. `stop()` awaits that same drain before disconnecting. Claims left when
-the budget expires remain durable for reclaim, and the old contexts cannot acknowledge or renew.
-Calling and awaiting `stop()` inside its own handler consumes the drain budget and leaves that
-handler's claim for recovery. Signal cancellation to the host instead when the handler should
-finish and acknowledge normally. Handlers must respect their application's cancellation signal;
-the drain cannot terminate JavaScript or undo effects. First-party workers retain their existing
-per-delivery renewal and cancellation policy.
+stop or listener failure. Redis and KV polling accept `ListenOptions.drainTimeoutMs` to override
+this post-intake callback wait: a positive integer through 2,147,483,647 ms or `Infinity` when an
+outer owner enforces a deadline. Omission keeps the visibility-derived default. This listener option
+differs from the same-named Worker option, which bounds its entire stop. Worker uses `Infinity` for
+listeners so pause retains live receipts and its finite Worker budget owns stop. `stop()` awaits
+that same drain before disconnecting. Claims left when the budget expires remain durable for
+reclaim, and the old contexts cannot acknowledge or renew. Calling and awaiting `stop()` inside its
+own handler consumes the drain budget and leaves that handler's claim for recovery. Signal
+cancellation to the host instead when the handler should finish and acknowledge normally. Handlers
+must respect their application's cancellation signal; the drain cannot terminate JavaScript or undo
+effects. First-party workers retain their existing per-delivery renewal and cancellation policy.
 
 ## Compatibility
 

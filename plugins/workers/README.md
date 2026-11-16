@@ -101,19 +101,59 @@ flowchart LR
     W --> S["Durable streams<br/>executions · jobs"]
 ```
 
-## Job cancellation
+## Pause, drain and cancellation
 
-Job handlers receive an executor-owned `signal` and optional epoch-millisecond `deadlineAt` through
-the Deno job path. `Worker.cancel(executionId)` requests local cancellation of an active execution;
-it returns false for an absent or already-cancelled execution. `Worker.stop()` aborts jobs at drain
-start and waits for listener and runner cleanup. Timeout records `timeout`; shutdown and explicit
-cancel record `cancelled`, release the delivery claim and never record a false successful result.
+`worker.pause()` stops intake for jobs, tasks and queue triggers while admitted work keeps running
+and renewing its leases. `worker.resume()` resumes intake after that listener generation has joined
+its admitted work, so overlapping calls cannot exceed concurrency. Pause keeps `worker.start()`
+pending and reports a healthy `paused` lifecycle through `worker.healthStatus.lifecycle` and
+`worker.isPaused`. Repeated pause/resume calls are harmless. A claim already committed when pause
+arrives can be returned without executing its handler; that ordinary requeue still counts.
 
-`workerPoolOptions.abortGracePeriodMs` defaults to 1000 milliseconds and bounds the wait for handler
-cleanup. An in-process handler that ignores cancellation may continue running; CPU-blocking work can
-delay timers. Forward `context.signal` to cancellable operations. Task-executor cancellation is a
-separate path. Optional `queue` and `taskQueue` dependencies use the existing `MessageQueue` ports;
-this worker owns and stops supplied queues as it does the defaults.
+`await worker.stop()` stops intake and gives admitted work time to finish normally and acknowledge.
+It then aborts leftovers, waits for cleanup, and closes its queues within one total `drainTimeoutMs`
+budget. The default is **25,000 ms: 19 s work, 5 s abort cleanup, 1 s settlement**.
+`abortGracePeriodMs` defaults to `min(5_000, Math.floor(drainTimeoutMs / 5))`; shorter totals also
+reserve `min(1_000, max(1, floor(total / 25)))` milliseconds for settlement. Total must be an
+integer from 1 to 2,147,483,647; grace must be an integer from zero to total. A hung handler,
+storage call or queue close can make stop reject `TimeoutError` within this total. Stop is
+idempotent and terminal for that Worker instance; create a new Worker to start again.
+
+Set both durations in the project's workers section, including generated workers:
+
+```ts
+import { defineWorkers } from '@netscript/plugin-workers-core/config';
+
+export const workers = defineWorkers({
+  drainTimeoutMs: 25_000,
+  abortGracePeriodMs: 5_000,
+});
+```
+
+`startWorkerProcess` and `startCombinedProcess` accept explicit duration overrides, otherwise use
+validated project workers configuration, otherwise the same defaults. Direct `new Worker(...)`
+accepts the same options. Its top-level grace overrides the legacy
+`workerPoolOptions.abortGracePeriodMs`; pool-only customization remains supported. Keep the parent
+process drain at least five seconds longer than the Worker total; raise the parent budget too when
+raising this total. Redis/KV-polling listener `drainTimeoutMs` has a different scope: it bounds
+callback waiting after intake stops. Worker gives those listeners an infinite wait and owns their
+finite total itself, keeping receipts valid through pause and handback.
+
+Jobs returned because their **first cancellation cause is controlled shutdown** retain their current
+delivery count. Repeated clean restarts therefore do not exhaust `maxDeliveries` for healthy jobs.
+Ordinary handler failure requeues still count. An earlier failure, deadline, operator cancellation
+or lease loss cannot become a free retry merely because shutdown happens later. Delivery remains at
+least once: uncertain acknowledgement or persistence can replay an effect, so use idempotent effects
+and stable message/domain keys.
+
+Deno handlers receive an executor-owned `signal` and optional epoch-millisecond `deadlineAt`.
+`Worker.cancel(executionId)` immediately requests cancellation of a local active execution and
+returns false for absent or already-cancelled work. Timeout records `timeout`; shutdown and explicit
+cancel record `cancelled`, release the claim and cannot record success after abort. The standalone
+`InProcessJobRunner` also defaults to five seconds of abort cleanup. Cancellation is cooperative;
+in-process JavaScript and CPU-blocking work cannot be physically terminated by the runner. Forward
+`context.signal` to cancellable operations. This Worker owns and stops supplied `queue` and
+`taskQueue` ports as it does defaults.
 
 ## Job retries and dead letters
 
