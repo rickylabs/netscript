@@ -1,0 +1,3 @@
+# Context pack
+
+Issue2636, branch fix/garnet-persistence from fresh origin/main b0eb07957. Bootstrap first, draft PR opens immediately. Add red tests before generator changes. DataPath enables AOF/recovery plus commit-freq0/commit-wait, log and checkpoints under bound /data or resolved executable path. No-path unchanged. Pinned2.2.1 lacks newer checkpoint-freq; use native on-demand checkpoint semantics. Runtime oracle must enqueue real jobs and prove checkpoint+AOF-tail recovery across container restart using emitted argv. Full scaffold.runtime required at end plus separate straightforward evaluator. No Streams, saga transports, dependencies/locks or unrelated lifecycle changes.

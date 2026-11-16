@@ -1,0 +1,7 @@
+# Research
+
+Issue2636 read in full. Current generator passes only Lua/transaction flags to Garnet containers and dotnet executables. Container DataPath is bound at /data but no logging/recovery flags reference it; Executable ignores DataPath. Auto includes both native launch arms and can fall back from Redis/DenoKv to Garnet. usesResolvedDataPath currently excludes the Garnet Executable arm.
+
+Verified upstream primary configuration documentation: https://microsoft.github.io/garnet/docs/getting-started/configuration . Verified exact pinned ghcr.io/microsoft/garnet:2.2.1 --help in an owned auto-removed container: AOF/recover are disabled by default; logdir/checkpointdir accepted; aof-commit-freq0 commits per operation, aof-commit-wait delays acknowledgement until log flush. This pinned binary does not expose the newer checkpoint-freq option; do not add unsupported automatic-checkpoint scheduling.
+
+Queue RedisAdapter is a Redis-compatible list/lease implementation and supports Garnet without Streams. Runtime oracle will consume generated container argv and use the real queue adapter across an owned container restart. No queue source change needed. Read AGENTS, doctrine, harness and netscript-cli/tools/pr/deno-toolchain skills and existing generator/cache readiness/queue tests.
