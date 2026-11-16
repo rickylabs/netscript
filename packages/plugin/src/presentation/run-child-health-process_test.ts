@@ -34,7 +34,7 @@ Deno.test('child health HTTP transport awaits asynchronous durable snapshot read
     await Promise.resolve();
     assert(monitor);
     return { ...monitor.snapshot(), deadLetters: { available: true, depth: 7 } };
-  });
+  }, { exitOnShutdown: false });
   void running.catch(() => undefined);
   try {
     const addr = await listening.promise;
@@ -79,7 +79,7 @@ Deno.test('fatal child failure drains even when a health snapshot never settles'
   }, () => {
     reading.resolve();
     return blockedSnapshot.promise;
-  });
+  }, { exitOnShutdown: false });
   void running.catch(() => undefined);
   let request: Promise<Response> | undefined;
   try {

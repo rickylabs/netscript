@@ -19,6 +19,7 @@
  */
 
 import { createServiceLogger } from '@netscript/logger';
+import { closeKv } from '@netscript/kv';
 import type {
   RunningService,
   RunningServiceAddress,
@@ -87,6 +88,7 @@ export function startServiceListener(
   defaultPort: number,
   options?: ServeOptions,
   shutdownHooks: readonly ShutdownHook[] = [],
+  processCleanupHooks: readonly ShutdownHook[] = [],
 ): RunningService {
   const serviceLogger = createServiceLogger(serviceName);
   const port = options?.port ?? defaultPort;
@@ -137,6 +139,12 @@ export function startServiceListener(
     },
     hooks: shutdownHooks,
     drainTimeoutMs: options?.drainTimeoutMs,
+    cleanupTimeoutMs: options?.cleanupTimeoutMs,
+    cleanups: options?.exitOnSignal === false ? [] : [
+      ...processCleanupHooks,
+      ...(options?.onCleanup ?? []),
+      () => closeKv(),
+    ],
   });
 
   const stopWithReport = async (
@@ -152,9 +160,13 @@ export function startServiceListener(
 
   const stopAndLog = async (reason: 'manual' | 'signal', signal?: Deno.Signal): Promise<void> => {
     const report = await stopWithReport(reason, signal);
-    if (shutdownLogged) return;
-    shutdownLogged = true;
-    logShutdownReport(serviceLogger, serviceName, report);
+    if (!shutdownLogged) {
+      shutdownLogged = true;
+      logShutdownReport(serviceLogger, serviceName, report);
+    }
+    if (reason === 'signal' && options?.exitOnSignal !== false) {
+      Deno.exit(report.timedOut ? 2 : report.hooks.some((hook) => !hook.ok) ? 1 : 0);
+    }
   };
 
   if (options?.signal?.aborted) {
@@ -184,6 +196,7 @@ export function startServiceListener(
             signal,
             error,
           });
+          if (options?.exitOnSignal !== false) Deno.exit(1);
         });
       };
       Deno.addSignalListener(signal, handler);

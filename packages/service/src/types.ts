@@ -202,8 +202,20 @@ export interface ServeOptions {
   /** External signal that stops the listener when aborted. */
   signal?: AbortSignal;
 
-  /** Max time to wait for in-flight requests and shutdown hooks. Defaults to `30_000`. */
+  /**
+   * Total shutdown budget. Defaults to 30_000 ms; process-owned signal shutdown
+   * reserves min(5_000, one fifth) for resource cleanup (25 s work + 5 s cleanup).
+   */
   drainTimeoutMs?: number;
+
+  /** Reserved process cleanup budget within drainTimeoutMs; defaults to min(5_000, one fifth). */
+  cleanupTimeoutMs?: number;
+
+  /** Owned resource cleanup hooks, run on process-owned signals even when work drain times out. */
+  onCleanup?: readonly ShutdownHook[];
+
+  /** Exit 0 clean, 1 failed, 2 timed out after a signal. False leaves ownership to the host. */
+  exitOnSignal?: boolean;
 
   /** Install SIGINT/SIGTERM or SIGBREAK handlers. Defaults to `true`. */
   handleSignals?: boolean;

@@ -1,3 +1,3 @@
 # Resource inspection
 
-Ran the repository teardown preview without --apply. No commands were planned and no foreign or unknown-owner resource was mutated. The reporter found unrelated resources; their operator identities and paths are omitted under the public-repository restriction. The lane owns its Redis test container through the creation receipt, exact container identity, run label and repository bind mount; cleanup verifies those proofs immediately before removal.
+Teardown preview was read-only and planned no mutations. Foreign and unknown-owner resources were reviewed and left alone; operator identities and unrelated paths are omitted under the public-repository restriction. The lane Redis test container is removed only after verifying its exact creation identity, run label and repository bind mount. No test subprocess or container remains after S2 validation.

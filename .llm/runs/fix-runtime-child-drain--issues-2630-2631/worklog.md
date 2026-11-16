@@ -29,3 +29,20 @@ Evaluator accepted reproduction and coverage but returned FAIL_PLAN for five und
 
 PLAN-EVAL cycle two PASS: https://github.com/rickylabs/netscript/pull/2641#issuecomment-6923762411. All five requested plan repairs accepted; no product implementation preceded approval. New focused regression run at unchanged main source: 9 pass, 2 fail. Child default bind reports 0.0.0.0 instead of 127.0.0.1; OTel exits 0 before the composing runtime's drain/exit 7. Real Redis subprocess baseline already records four watchdog failures. Signal subprocess cases explicitly skip Windows (SIGTERM-specific acceptance).
 S1 commits the red oracles and accepted plan; S2 will make these regressions pass. Tests requiring new cleanup contracts are added after those contracts exist. No resources remain from reproduction.
+
+## S2 core lifecycle implementation
+
+Added explicit child shutdown ownership, loopback hostname override, monotonic total work/cleanup deadlines, and exit codes 0/1/2. Service signal paths reserve cleanup within the total deadline, call singleton-aware closeKv(), disconnect every registered raw-builder DB identity once, and terminate explicitly. Manual stop/external abort and exitOnSignal:false leave process-owned resources to their host. Cleanup invokes all registered resource callbacks even if work or another cleanup hangs. OTel's bounded signal shutdown no longer exits the process.
+
+| Gate | Result |
+| --- | --- |
+| Real Redis child/service clean and timeout subprocess tests | exit 0, 4/4 pass; formerly four watchdog failures |
+| Child bind/fatal snapshot, service coordinator, OTel focused tests | exit 0, 15/15 pass |
+| Expanded cleanup/coordinator tests | exit 0, 8/8 pass |
+| Existing listener/builder/runtime embedding tests | exit 0, 34/34 pass |
+| Structured targeted type-check | exit 0, no diagnostics |
+| Structured lint / format | exit 0 / exit 0 after correcting require-await in test stubs |
+| quality:gate (quality:scan + arch:check) | exit 0 |
+
+Resource teardown preview remained read-only. Owned Redis was removed after exact identity, run-label and bind-mount proof; no foreign or unknown-owner resources changed. S2 adds explicit exitOnSignal:false to two existing embedded signal tests; their hook/listener assertions are retained. Plan file groups updated to 17 (<30) to include these necessary test adaptations and post-contract cleanup tests.
+Reconcile: PR remains a draft, status progresses to implementation, source for excluded saga transports is unchanged. S3 composition/docs and the one-pass runtime smoke remain pending; no supervisor sign-off is claimed.
