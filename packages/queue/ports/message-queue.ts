@@ -196,6 +196,14 @@ export interface EnqueueOptions {
  */
 export interface ListenOptions {
   /**
+   * Redis/KV-polling wait for admitted callbacks after intake cancellation.
+   * Defaults to the backend visibility timeout; positive Infinity delegates the
+   * wait to an outer owner. This is separate from WorkerOptions.drainTimeoutMs,
+   * which bounds the whole worker stop; workers retain that total deadline.
+   */
+  drainTimeoutMs?: number;
+
+  /**
    * Number of messages to process concurrently.
    * Default: 1 (sequential processing)
    *

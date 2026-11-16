@@ -542,6 +542,16 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
       );
     }
 
+    const drainTimeout = options?.drainTimeoutMs ?? this.visibilityTimeout;
+    if (
+      drainTimeout !== Infinity &&
+      (!Number.isSafeInteger(drainTimeout) || drainTimeout < 1 || drainTimeout > 2_147_483_647)
+    ) {
+      throw new QueueError(
+        'drainTimeoutMs must be a positive integer through 2147483647 or Infinity.',
+        QueueErrorCode.CONFIGURATION_ERROR,
+      );
+    }
     this.running = true;
     const controller = new AbortController();
     this.abortController = controller;
@@ -615,7 +625,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
       clearInterval(recoveryInterval);
 
       // Wait for active processing to complete (with timeout)
-      const timeout = this.visibilityTimeout;
+      const timeout = drainTimeout;
       const startTime = Date.now();
 
       while (activeProcessing.size > 0 && Date.now() - startTime < timeout) {

@@ -44,3 +44,10 @@ Running listener-drain-owner_test.ts reveals Redis/Garnet and KV polling resolve
 ## Listener ownership addendum approved
 
 [Fresh GLM5.3/provider-default PLAN-EVAL PASS](https://github.com/rickylabs/netscript/pull/2645#issuecomment-6931962078) approves the added optional listener drain ownership contract at014730e1c. Independent KV polling default control green / owner case red, source-verified native Redis timeout, core worker25s total boundary and all three forwarding sites;8/8Plan-Gate,9/9continued acceptance. Evaluator settled one wording repair: docs/JSDoc distinguish per-listener post-intake cutoff from same-named Worker total stop option. No implementation waiver or gate reduction. Retain verdict; implement S3b contract/native adapters next. Corrected the verdict's final-line head transcription to the exact evaluated head already stated in its metadata.
+
+
+## S3b listener drain ownership
+
+Approved optional ListenOptions.drainTimeoutMs separates Redis/KV-polling post-intake waiting from worker total stop. Omission preserves native visibility-based finite behavior. Positive Infinity leaves admitted callbacks/receipts alive for an outer bounded owner; no Infinity timer is scheduled. Invalid finite/nonfinite values rejected before allocation. Listener JSDoc explicitly cross-references WorkerOptions.drainTimeoutMs, whose total remains finite25s by default. No visibility/claim/reclaim/Lua change.
+
+Previously red owner/default controls now6/6green on real Redis/Garnet and KV polling; combined with existing native lease suite16pass/0fail/1pre-existingCI-only ignore. Policy validation/no-allocation1/1green; scoped check/lint/fmt0, release:preflight/docs:accuracyPASS. AMQP work is independent and follows in its own commit; Worker forwarding is S4.
