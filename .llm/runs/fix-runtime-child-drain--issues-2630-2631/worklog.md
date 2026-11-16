@@ -20,3 +20,7 @@ The first probe could not connect because the Docker daemon is in a different ne
 With the isolated Redis endpoint reachable, both child cases (clean and hung drain) reach PROBE_READY, receive SIGTERM and fail the 5 s subprocess watchdog: structured tests exit 1, 0 pass / 2 fail. Both service cases likewise reach readiness and fail the 5 s exit watchdog: 0 pass / 2 fail. The retained concrete handle is the ioredis primary connection opened through getKv(). Deno KV alone was a negative control and exited normally. Child cleanup callbacks are deliberately ignored by current main, producing the expected red baseline.
 
 Teardown preview planned no mutations; unrelated resources were left alone. Owned Redis cleanup uses exact creation identity plus run label and repository bind-mount verification.
+
+## PLAN-EVAL cycle-one repairs
+
+Evaluator accepted reproduction and coverage but returned FAIL_PLAN for five underspecified decisions. Plan now explicitly locks Deno.exit on clean and failed process-owned paths; Prisma dedup/disposal in raw withDatabase, inherited by presets; closeKv() rather than lazy context KV close(); bounded OTel flush without process termination and documented standalone behavior; and per-slice file groups (all below 30 files). Service's default 30 s total includes 25 s work and 5 s reserved cleanup; manual stop/external abort remain embeddable. No production code has changed. Cycle-two PLAN-EVAL is required before implementation.
