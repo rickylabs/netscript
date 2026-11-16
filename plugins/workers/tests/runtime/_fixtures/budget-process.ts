@@ -26,7 +26,13 @@ const definitions = new Map<string, RegisterJobInput>([['cleanup', {
   maxRetries: 0,
 }]]);
 const controller = new AbortController();
-const options = { definitions, jobsDir: Deno.cwd(), queueName: 'budget-jobs', concurrency: 1, ...budget };
+const options = {
+  definitions,
+  jobsDir: Deno.cwd(),
+  queueName: 'budget-jobs',
+  concurrency: 1,
+  ...budget,
+};
 const running = mode === 'combined'
   ? startCombinedProcess({ ...options, signal: controller.signal })
   : startWorkerProcess(options);

@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import {
+  DEFAULT_WORKER_DRAIN_TIMEOUT_MS,
+  resolveWorkerDrainBudget,
+} from '../shutdown/worker-lifecycle.ts';
 import { type JobConfig, JobConfigZodSchema } from './job-config.ts';
 import type { ConfigSchema } from './config-schema.ts';
 
@@ -45,6 +49,10 @@ export interface WorkersConfigData {
   readonly queueName: string;
   /** Default worker concurrency. */
   readonly concurrency: number;
+  /** Total worker stop budget, including abort cleanup and settlement; defaults to 25,000 ms. */
+  readonly drainTimeoutMs: number;
+  /** Cleanup after abort; defaults to min(5,000, floor(drainTimeoutMs/5)) within the total. */
+  readonly abortGracePeriodMs: number;
   /** Legacy flat job definitions. */
   readonly jobs: JobConfig[];
   /** Topic-scoped worker groups. */
@@ -104,15 +112,30 @@ const WorkersConfigObjectSchema = z.object({
   queueProvider: QueueProviderZodSchema,
   queueName: z.string().default('jobs'),
   concurrency: z.number().default(2),
+  drainTimeoutMs: z.number().int().min(1).max(2_147_483_647).default(
+    DEFAULT_WORKER_DRAIN_TIMEOUT_MS,
+  ),
+  abortGracePeriodMs: z.number().int().min(0).max(2_147_483_647).optional(),
   jobs: z.array(JobConfigZodSchema).default([]),
   groups: z.array(WorkerGroupZodSchema).default([]),
   enabled: z.boolean().default(true),
+}).superRefine((config, context) => {
+  if (
+    config.abortGracePeriodMs !== undefined && config.abortGracePeriodMs > config.drainTimeoutMs
+  ) {
+    context.addIssue({
+      code: 'custom',
+      path: ['abortGracePeriodMs'],
+      message: 'Abort grace must fit within the total drain budget.',
+    });
+  }
 });
 
 const WorkersConfigZodSchema: z.ZodType<WorkersConfigData | undefined> = WorkersConfigObjectSchema
   .transform(
     (config: z.output<typeof WorkersConfigObjectSchema>) => ({
       ...config,
+      abortGracePeriodMs: resolveWorkerDrainBudget(config).abortGracePeriodMs,
       groups: config.groups.map((group: WorkerGroupData) => ({
         ...group,
         jobs: group.jobs.map((job: JobConfig) => ({
