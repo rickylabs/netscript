@@ -96,3 +96,20 @@ Added generated-hostname subprocess tests executing all three emitted entrypoint
 Hostname repair gates: structured changed-file check/lint/fmt pass with zero diagnostics/findings; release:preflight and docs:accuracy pass. Source-derived child health page regenerated.
 
 Hostname repair consumer refresh: canonical agent-docs prose/site build, export corpus (documented --allow-dirty for the sole regenerated prose carrier), CLI assets and publish assets completed. Export and publish freshness checks pass. No lock changes or additional CLI embedded diff. Final-head supported runtime CI is requested after this consumer commit.
+
+
+## Supported runtime CI failure and targeted cleanup control
+
+Supported-runner head a142ac632 dispatch https://github.com/rickylabs/netscript/actions/runs/43929577301 passed the documented skip-seed-handoff behavior control with resident worker preserved, then failed in native Aspire persistent-resource cleanup (one persistent resource reported failed). Post-stop owned-survivor assertion did not fail; terminal native stop exit remained nonzero, so the gate correctly stayed red. This is not counted as a runtime PASS.
+
+A targeted native cleanup control on the already-generated owned diagnostic AppHost reproduced the same normal-stop plus forced exact-AppHost-stop sequence without a port bridge: both native commands exit0, no owned containers in the final probe. Teardown preview preceded it and all commands target the exact owned AppHost. This does not reproduce the CI cleanup error and does not justify weakening cleanup assertions or forcing a product change. Requested one failed-job re-run with native workflow debug logging at the same head to obtain a terminal verdict and more diagnostics if it recurs. No full local scaffold.runtime repeated.
+
+
+## Supported-runner baseline comparison
+
+Unchanged main comparison [43936107382](https://github.com/rickylabs/netscript/actions/runs/43936107382) passes the Postgres runtime suite but fails SQLite at the same database.generate web-resource restart as the candidate's Postgres retry. Both generate the client and refresh the users consumer before native Aspire resource restart returns nonzero. The candidate's SQLite suite passes. This establishes that the restart symptom also occurs without the lifecycle changes; no unrelated product change or weakened gate is justified. Cleanup passes on both comparison runs. One additional failed-job run at unchanged final candidate head is justified by this crossed baseline result; a complete supported Postgres verdict remains mandatory.
+
+
+## S4 native restart diagnostic control
+
+Supported candidate Postgres run continues to fail database.generate at web-resource restart after55passing gates; cleanup passes. Main SQLite comparison reproduces the same symptom, while main/Garnet Postgres passes. No product cause is inferred from this crossed evidence. The refresh command discards the native restart exit code/stdout/stderr, preventing diagnosis. Add two genuine red tests on the unchanged-main CLI error path (stderr and stdout fallback); both fail because the native detail is lost. Minimal repair preserves Aspire exit code and diagnostic, retaining the scoped manual remedy. Full adjacent refresh suite14/14 passes, scoped typecheck/quality:cli/release:preflight/docs:accuracy pass. This changes failure observability only; lifecycle/drain contract and runtime gates intact. One new supported final-head smoke is required to obtain the decisive native error or a complete pass; no blind rerun or weakened gate.

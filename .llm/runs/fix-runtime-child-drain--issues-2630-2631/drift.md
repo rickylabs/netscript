@@ -20,3 +20,8 @@
 
 - S4 hostname decision is now resolved after IMPL-EVAL F2: generated workers/sagas/triggers forward NETSCRIPT_CHILD_HEALTH_HOSTNAME as the existing native hostname option. Unset retains loopback, including generated Aspire host executables. Containers explicitly request 0.0.0.0. No generic HOSTNAME fallback and no new service hostname behavior. All three generated artifacts have a native bind plus non-loopback HTTP regression.
 - Cycle one IMPL-EVAL FAIL_FIX is preserved. F1 waits on supported-runner runtime evidence; the hostname repair requires a new final-head CI run and a new evaluator session under T3 re-check policy.
+
+
+## Native supported-runner restart evidence
+
+Full S4 gate remains unresolved at a native web-resource restart. To stop discarding the only decisive diagnostic, minimally include native exit code plus stderr/stdout fallback in the existing CLI refresh error, with two red-before/green-after tests. No retry/bypass/resource-target changes, no new command/API. This is bounded S4 failure diagnosis within the required full-runtime gate, not a new lifecycle design. Two CLI files plus run evidence, below30files. No new local smoke attempt on the unsupported Docker host.
