@@ -1,0 +1,3 @@
+# Implementation lane
+
+Issue #2634, milestone0.0.10, branch fix/auth-sign-in-rate-limit from freshly fetched origin/main b0eb079575968e843b781579673c9fe2ae250e07. Owner-selected generator Codex gpt-6.1-sol/xhigh. Straightforward tier: small validated JSON contract and existing provider-option forwarding, no lifecycle or auth-flow redesign. PLAN-EVAL N/A: native data passthrough with locked defaults, no unresolved design decision. Mandatory IMPL-EVAL from live matrix: glm_5_3_flash/provider_default, fallback deepseek_v4_pro/provider_default, independent session/vendor family. No other implementation subagents.
