@@ -41,3 +41,8 @@ After committing manual source/docs, generated agent prose, MCP export corpus, C
 ## Final per-lease cancellation regression
 
 Self-review found that returning a watch from a yielded batch while its recovery reread was paused could leave the shared recovery awaiting that released observer. Added a genuine failing test against the implemented S2 head, then gave each observer a cancellable lifetime. Returning one lease now detaches its pending reread without blocking a sibling or a new lease, including callers without their own AbortSignal. Focused red->green verified. Final full KV suite251passed/0failed/2existingignored with all7new real-server cases enabled. Structured61file check/lint/fmt and quality:gate pass. Two existing skips are the CI-only unreachable-backend test and the old externally supplied-container integration test; new acceptance cases do not skip. All exact-owned containers removed. Public contract/docs and generated symbol shape unchanged; verify freshness after the private cancellation correction.
+
+
+## Final evaluation handoff
+
+After the private per-lease correction, corpus/publish freshness, release:preflight, docs:accuracy and doc lint0 recheck pass. Review-thread gate0/0. Read-only leak report/teardown preview show zero owned cleanup commands; foreign resources left untouched. All3issue acceptance boxes now checked with linked final IMPL evidence and exact fenced acceptance mapping in the PR. Feature matrix confirms MuseSpark1.3/xhigh independent final route, fallback Opus5/xhigh unused. Final handoff commit updates run artifacts only; source remains ea85fb387 with251passing tests. No readiness/merge claim until final evaluator PASS and required head checks.
