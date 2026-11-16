@@ -119,6 +119,7 @@ for (const checkpoint of [false, true]) {
       let container: string | undefined;
       let producer: RedisAdapter<{ id: string }> | undefined;
       let consumer: RedisAdapter<{ id: string }> | undefined;
+      let phase = 'initial readiness';
       try {
         volume = await docker('volume', 'create', '--label', label);
         // A uniquely owned volume supplies the same persistent /data boundary as
@@ -143,7 +144,7 @@ for (const checkpoint of [false, true]) {
         const ready = () =>
           retry(async () => {
             assertEquals(await command(hostname, port, 'PING'), '+PONG');
-          }, { maxAttempts: 200, minTimeout: 20, maxTimeout: 50 });
+          }, { maxAttempts: 200, minTimeout: 100, maxTimeout: 100, jitter: 0 });
         await ready();
         const name = `persistence-${owner}`;
         producer = new RedisAdapter(url, name);
@@ -156,10 +157,12 @@ for (const checkpoint of [false, true]) {
         await docker('kill', '--signal', 'KILL', container);
         await producer.stop();
         await docker('start', container);
+        phase = 'restart readiness';
         const restartedBinding = (await docker('port', container, '6379/tcp')).split('\n')[0];
         port = Number(restartedBinding.slice(restartedBinding.lastIndexOf(':') + 1));
         url = `redis://${hostname}:${port}`;
         await ready();
+        phase = 'recovered delivery';
         consumer = new RedisAdapter(url, name);
         const delivered: string[] = [];
         const controller = new AbortController();
@@ -178,7 +181,12 @@ for (const checkpoint of [false, true]) {
         assertEquals((await consumer.getHealth()).ready, 0);
       } catch (cause) {
         const diagnostic = container ? await docker('logs', container) : 'container not created';
-        throw new Error(`Garnet restart probe failed. Server output: ${diagnostic}`, { cause });
+        throw new Error(
+          `Garnet restart probe failed during ${phase}. Server output: ${diagnostic}`,
+          {
+            cause,
+          },
+        );
       } finally {
         await consumer?.stop();
         await producer?.stop();
