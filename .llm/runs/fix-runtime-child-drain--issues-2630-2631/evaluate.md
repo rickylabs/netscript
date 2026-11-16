@@ -234,3 +234,55 @@ No high/medium findings remain. Both cycle-one findings are repaired and indepen
 | --- | --- |
 | Verdict | `PASS` |
 | Rationale | Approved scope complete; static/fitness gates pass with pre-existing doc/JSR baselines disclosed; runtime and consumer gates have independent plus supported-runner evidence (F1 full smoke green on identical production source, F2 generated forwarding 6/6 live plus full Aspire health 200); no unrecorded doctrine violation; docs and run artifacts sufficient for resume. Final current-head/threads Definition-of-Done intentionally awaits parent transition after this verdict. |
+
+## Cycle three — narrow ready-transition type-closure follow-up (2026-11-16)
+
+Prior cycles preserved above. Cycle two PASS at `582372c4a` remains authoritative for all unchanged
+runtime behavior. This cycle evaluates only the delta `582372c4..212a8d39`.
+
+### Metadata (cycle three)
+
+| Field | Value |
+| --- | --- |
+| Run ID | `fix-runtime-child-drain--issues-2630-2631` |
+| Target | PR 2641, issues #2630/#2631 |
+| Tier / role | `feature` / `IMPL-EVAL` |
+| Requested route | `muse_spark_1_3/xhigh` via OpenCode Go, no substitution |
+| Observed evaluator identity | `opencode-go/muse-spark-1.3-contributor` (T3 Code OpenCode harness); separate session from generator; no subagents launched |
+| Generator | Owner-selected Codex `gpt-6.1-sol/xhigh` session; different vendor family from evaluator; fallback `opus_5/xhigh` not used |
+| Matrix authority | `.llm/harness/workflow/lane-policy.md` feature row: IMPL-EVAL `Muse Spark 1.3 xhigh` primary, `Opus 5 xhigh` fallback; verified via `deno task agentic:matrix --tier feature --impl-evaluator` |
+| Branch | `fix/runtime-child-drain` |
+| Exact head evaluated | `212a8d39463b89a11551dff7e8b8f036a899e302` |
+| Delta scope | `582372c4a3f160ea6b944c1ace574ab9a5c6ba67..212a8d39463b89a11551dff7e8b8f036a899e302`: production change is `packages/service/src/types.ts` only (8 lines: `ServeOptions.onCleanup` narrowed with clarifying JSDoc); plus run-only `context-pack.md`/`drift.md`/`worklog.md` notes; `git diff d6ef1fa71..HEAD -- packages plugins docs` shows only that `types.ts` hunk |
+| Green-smoke source head | `d6ef1fa71` (workflow 43951994678 SUCCESS) remains the executable behavior evidence; production source identical except the type/JSDoc hunk; no expensive scaffold rerun per scope |
+| Date | 2026-11-16 |
+
+### Delta verification (cycle three)
+
+| Check | Result | Independent evidence |
+| --- | --- | --- |
+| Contract justification | PASS | Ready-transition shard1 (workflow 43960706867 job 133627460342, 786 pass / 1 fail / 9 ignored) exposed the existing workers non-contract doc-lint test (`plugins/workers/tests/public/type-refs_test.ts`) reaching private `ShutdownHook` through the worker `./service` facade, which re-exports `ServeOptions` as part of its 23-symbol accepted F-5 closure. Narrowing new `onCleanup` to `readonly (() => Promise<void> \| void)[]` removes the named private-type reach without adding facade exports or growing the bounded debt. `ShutdownHook` remains exported and still serves reason-aware `onShutdown` work hooks. |
+| Caller compatibility | PASS | Repo-wide `onCleanup` producers are all zero-arg: `plugins/workers/services/src/main.ts`, `plugins/sagas/services/src/main.ts`, `plugins/auth/services/src/auth-service-runtime.ts` pass `ctx.dispose` (`() => Promise<void>`), and `packages/service/tests/service-resources_test.ts` passes `() => db.$disconnect()`. Internal `service-listener.ts` spreads `options?.onCleanup` into `ShutdownHook[]` cleanups (zero-arg assignable to one-arg) and invokes via `hook({reason, signal})`, which is a runtime no-op extra arg; `service-shutdown.ts` cleanup path unchanged. No control-flow, launch, budget, or drain change. |
+| Focused tests | PASS | Structured wrapper `run-deno-test.ts -- --allow-all plugins/workers/tests/public/type-refs_test.ts packages/service/tests/service-resources_test.ts`: exit 0, 7 passed / 0 failed (matches generator 7/7) |
+| Scoped typecheck / lint / fmt | PASS | `run-deno-check.ts --root packages/service/src --ext ts,tsx`: 74 files, 0 diagnostics; `run-deno-lint.ts`: 74 files, 0 findings; `run-deno-fmt.ts`: 74 files, 0 findings; pinned `deno 2.9.7` via `mise exec deno@2.9.7` |
+| Doc lint | PASS | `run-deno-doc-lint.ts --root packages/service`: combined 0; `--root plugins/workers`: `./service` (`services/mod.ts`) and `./services` (`services/src/main.ts`) both 0 — the previously failing facade is now clean. Remaining 2 `privateTypeRef` sit in `plugin-workers-core` contracts, which the public test explicitly excludes per #1655; not new debt. |
+| Release / docs accuracy | PASS | `deno task docs:accuracy` PASS; `deno task release:preflight` text-imports / import-attributes / file-url-import-meta / self-imports all PASS; no `packages`/`plugins`/`docs` carrier diff beyond `types.ts`, so no regeneration churn |
+| Current head CI / threads / acceptance | PASS (verified) | `gh pr checks 2641`: 22 pass / 13 skipping / 0 fail (35 rows); `check:review-threads --pr 2641`: `threads=0 unanswered=0`; issues #2630 (4 boxes) and #2631 (3 boxes) all checked; PR body carries fenced `acceptance-evidence` for all 7 boxes; prior cycle-two PASS comment 6929922874, repair proof 6930509981, head report 6930661054 present |
+
+### Findings (cycle three)
+
+| Severity | Finding | Evidence | Required action |
+| --- | --- | --- | --- |
+| none | No blocking finding in this type-only delta | All narrow gates above green; no facade export added; no F-5 growth; no runtime change | None; parent may proceed with ready transition on this head |
+
+No new doctrine violation, no new `any`, no new blanket lint ignore, no layering change, and no
+host-side hardcoded coupling were introduced. The `docs/site/reference/service/index.md` and
+`packages/service/README.md` `onCleanup` prose remains accurate (cleanup attempted even when work
+drain times out); the refined JSDoc correctly directs reason-aware hooks to `onShutdown`.
+
+### Verdict (cycle three)
+
+| Field | Value |
+| --- | --- |
+| Verdict | `PASS` |
+| Rationale | Narrow, justified new-option contract fix: it closes the one CI-exposed public doc-lint diagnostic without widening the bounded worker type closure, preserves all owned-resource cleanup contracts and library integration for existing zero-arg disposers, and introduces no runtime, consumer, or type error. Cycle-two PASS remains the executable behavior authority; this delta needs no new scaffold smoke or Redis lifecycle rerun. |
