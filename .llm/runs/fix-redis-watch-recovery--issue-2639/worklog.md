@@ -36,3 +36,8 @@ Three original real baseline regressions now pass. Additional live coverage prov
 ## S3 canonical consumer assets
 
 After committing manual source/docs, generated agent prose, MCP export corpus, CLI asset barrel and publish assets in canonical order. Export generation used --allow-dirty only for the expected sole generated prose carrier, warning reviewed. Changed carriers are MCP prose, symbol corpus and publish assets; no CLI scaffold output changes. Corpus and publish freshness pass. No dependency/lock churn. All final source gates remain green; next independent feature IMPL-EVAL and current required head/review-thread gates.
+
+
+## Final per-lease cancellation regression
+
+Self-review found that returning a watch from a yielded batch while its recovery reread was paused could leave the shared recovery awaiting that released observer. Added a genuine failing test against the implemented S2 head, then gave each observer a cancellable lifetime. Returning one lease now detaches its pending reread without blocking a sibling or a new lease, including callers without their own AbortSignal. Focused red->green verified. Final full KV suite251passed/0failed/2existingignored with all7new real-server cases enabled. Structured61file check/lint/fmt and quality:gate pass. Two existing skips are the CI-only unreachable-backend test and the old externally supplied-container integration test; new acceptance cases do not skip. All exact-owned containers removed. Public contract/docs and generated symbol shape unchanged; verify freshness after the private cancellation correction.

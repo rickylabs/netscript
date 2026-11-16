@@ -374,3 +374,63 @@ Deno.test({
     }
   },
 });
+
+Deno.test({
+  name: 'Redis watch: returning a paused lease cancels its reread without delaying a sibling',
+  ignore: !enabled,
+  async fn() {
+    const redis = await server();
+    const kv = new RedisKvAdapter({ url: redis.url, namespace: `return-${crypto.randomUUID()}` });
+    const admin = new Redis(redis.url, { lazyConnect: true });
+    const a = kv.watch([['a']], { initial: true })[Symbol.asyncIterator]();
+    const controller = new AbortController();
+    const b = kv.watch([['b']], { initial: true, signal: controller.signal })
+      [Symbol.asyncIterator]();
+    const reading = Promise.withResolvers<void>();
+    const resume = Promise.withResolvers<void>();
+    let restoreGet: (() => void) | undefined;
+    let pending: Promise<unknown> | undefined;
+    try {
+      await redis.start();
+      await admin.connect();
+      await deadline(a.next(), 5_000);
+      await deadline(b.next(), 5_000);
+      const original = kv.getMany.bind(kv);
+      const get = stub(kv, 'getMany', async function <T>(keys: KvKey[]) {
+        const entries = await original<T>(keys);
+        // Model a reread that depends on the lost connection. Keep its promise
+        // unresolved while siblings recover; returning its lease must detach it.
+        if (keys[0][0] === 'a') {
+          reading.resolve();
+          await resume.promise;
+        }
+        return entries;
+      });
+      restoreGet = () => {
+        if (!get.restored) get.restore();
+      };
+      await admin.client('KILL', 'TYPE', 'pubsub');
+      await deadline(reading.promise, 5_000);
+      if (a.return) await deadline(a.return(), 500);
+      // A new lease waits for shared recovery. It must not be held behind the
+      // returned observer's indefinitely paused reread.
+      const fresh = kv.watch([['c']], { initial: true, signal: controller.signal })
+        [Symbol.asyncIterator]();
+      try {
+        pending = fresh.next();
+        pending.catch(() => {});
+        await deadline(pending, 1_000);
+      } finally {
+        controller.abort();
+        await fresh.return?.();
+      }
+    } finally {
+      restoreGet?.();
+      resume.resolve();
+      controller.abort();
+      await Promise.allSettled([pending, a.return?.(), b.return?.(), kv.close(), admin.quit()]);
+      admin.disconnect();
+      await redis.close();
+    }
+  },
+});

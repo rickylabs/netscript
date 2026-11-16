@@ -12,6 +12,7 @@ import { KvClosedError, KvConnectionError, type KvError } from '../../applicatio
 export const REDIS_WATCH_RECOVERY_TIMEOUT_MS = 30_000;
 
 interface Observer<T> {
+  readonly lifetime: AbortController;
   readonly message: (message: T) => void;
   readonly reconnect?: (signal: AbortSignal) => Promise<void>;
   readonly error?: (error: KvError) => void;
@@ -45,9 +46,14 @@ export class WatchSubscriptions<T> {
   async acquire(
     channel: string,
     listener: (message: T) => void,
-    options: Omit<Observer<T>, 'message'> = {},
+    options: Omit<Observer<T>, 'message' | 'lifetime'> = {},
   ): Promise<() => Promise<void>> {
     const lease = Symbol();
+    const observer: Observer<T> = {
+      message: listener,
+      ...options,
+      lifetime: new AbortController(),
+    };
     // Recovery needs the serialization tail for acknowledgements. Never hold
     // that tail while waiting for the recovery itself or a fresh connection.
     if (this.#phase === 'failed' && this.#channels.size === 0) {
@@ -67,12 +73,12 @@ export class WatchSubscriptions<T> {
       }
       let subscription = this.#channels.get(channel);
       if (subscription) {
-        subscription.listeners.set(lease, { message: listener, ...options });
+        subscription.listeners.set(lease, observer);
         return;
       }
       this.#bind(client);
       subscription = {
-        listeners: new Map([[lease, { message: listener, ...options }]]),
+        listeners: new Map([[lease, observer]]),
         lifetime: new AbortController(),
       };
       this.#channels.set(channel, subscription);
@@ -81,6 +87,7 @@ export class WatchSubscriptions<T> {
         await (options.signal ? abortable(subscribed, options.signal) : subscribed);
       } catch (error) {
         this.#channels.delete(channel);
+        observer.lifetime.abort(error);
         throw error instanceof KvClosedError ? error : new KvConnectionError(
           'Redis watch subscription failed.',
           { cause: error },
@@ -93,9 +100,11 @@ export class WatchSubscriptions<T> {
       if (released) return Promise.resolve();
       released = true;
       const subscription = this.#channels.get(channel);
-      if (!subscription?.listeners.delete(lease) || subscription.listeners.size > 0) {
+      if (!subscription?.listeners.delete(lease)) {
         return Promise.resolve();
       }
+      observer.lifetime.abort();
+      if (subscription.listeners.size > 0) return Promise.resolve();
       this.#channels.delete(channel);
       subscription.lifetime.abort();
       const recovering = this.#recovery !== null;
@@ -138,7 +147,10 @@ export class WatchSubscriptions<T> {
     this.#budget?.abort(this.#failure);
     this.#attempt?.abort(this.#failure);
     for (const subscription of this.#channels.values()) {
-      for (const observer of subscription.listeners.values()) observer.error?.(this.#failure);
+      for (const observer of subscription.listeners.values()) {
+        observer.error?.(this.#failure);
+        observer.lifetime.abort(this.#failure);
+      }
       subscription.lifetime.abort(this.#failure);
     }
     this.#channels.clear();
@@ -217,7 +229,19 @@ export class WatchSubscriptions<T> {
     await Promise.all(
       [...this.#channels.values()].flatMap((subscription) =>
         [...subscription.listeners.values()].map(async (observer) => {
-          if (!observer.signal?.aborted) await observer.reconnect?.(signal);
+          if (observer.signal?.aborted || observer.lifetime.signal.aborted) return;
+          const current = AbortSignal.any([
+            signal,
+            subscription.lifetime.signal,
+            observer.lifetime.signal,
+          ]);
+          try {
+            await observer.reconnect?.(current);
+          } catch (error) {
+            // Returning a lease cancels only that observer, including a reread
+            // already captured by this attempt. Live siblings still recover.
+            if (!observer.lifetime.signal.aborted && !observer.signal?.aborted) throw error;
+          }
         })
       ),
     );
