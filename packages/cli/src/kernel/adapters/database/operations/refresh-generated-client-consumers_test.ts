@@ -210,3 +210,202 @@ Deno.test('consumer refresh bounds an unresponsive Aspire command and forwards c
     await Deno.remove(f.root, { recursive: true });
   }
 });
+
+interface AppDeclaration {
+  Enabled?: boolean;
+  Type?: string;
+  Workdir?: string;
+  ServiceReferences?: string[];
+}
+
+async function configureApps(
+  f: Awaited<ReturnType<typeof fixture>>,
+  apps: Record<string, AppDeclaration>,
+) {
+  const path = join(f.root, 'appsettings.json');
+  const settings = JSON.parse(await Deno.readTextFile(path));
+  settings.NetScript.Apps = apps;
+  await Deno.writeTextFile(path, JSON.stringify(settings));
+  for (const name of Object.keys(apps)) {
+    await Deno.mkdir(join(f.root, 'apps', name), { recursive: true });
+    await Deno.writeTextFile(
+      join(f.root, 'apps', name, 'deno.json'),
+      JSON.stringify({
+        imports: {
+          '@contracts': '../../contracts/mod.ts',
+          '@netscript/fresh': '../../../framework/mod.ts',
+        },
+      }),
+    );
+    f.resources.push({
+      displayName: name,
+      name: name + '-replica',
+      resourceType: 'Executable',
+      state: 'Running',
+    });
+  }
+}
+
+function restarted(f: Awaited<ReturnType<typeof fixture>>): string[] {
+  return f.calls.filter((args) => args[2] === 'restart').map((args) => args[1]);
+}
+
+Deno.test('database-specific web apps refresh after their verified services', async () => {
+  const f = await fixture();
+  try {
+    await configureApps(f, {
+      shop: { ServiceReferences: ['orders'] },
+      admin: { ServiceReferences: ['direct'] },
+    });
+    await refreshGeneratedClientConsumers(f.options);
+    assertEquals(restarted(f), ['orders', 'shop']);
+    await refreshGeneratedClientConsumers({
+      ...f.options,
+      database: { ...f.options.database, configKey: 'postgres', workspaceDir: 'database/postgres' },
+    });
+    assertEquals(restarted(f), ['orders', 'shop', 'direct', 'admin']);
+    assertEquals(f.calls.every((args) => args.includes(f.options.apphostPath)), true);
+  } finally {
+    await Deno.remove(f.root, { recursive: true });
+  }
+});
+
+Deno.test('batch refresh orders all services before apps, deduplicates references and handles pre-refreshed services', async () => {
+  const f = await fixture();
+  try {
+    await configureApps(f, {
+      dashboard: { ServiceReferences: ['orders', 'orders', 'direct'] },
+      admin: { ServiceReferences: ['direct'] },
+    });
+    const options = {
+      ...f.options,
+      databases: [f.options.database, {
+        ...f.options.database,
+        configKey: 'postgres',
+        workspaceDir: 'database/postgres',
+      }],
+    };
+    await refreshGeneratedClientConsumers(options);
+    assertEquals(restarted(f), ['direct', 'orders', 'admin', 'dashboard']);
+    f.calls.length = 0;
+    f.options.refreshed.clear();
+    f.options.refreshed.add('orders');
+    await refreshGeneratedClientConsumers(f.options);
+    assertEquals(restarted(f), ['dashboard']);
+    f.calls.length = 0;
+    const empty = { ...options, databases: [] };
+    await refreshGeneratedClientConsumers(empty);
+    assertEquals(f.calls, []);
+  } finally {
+    await Deno.remove(f.root, { recursive: true });
+  }
+});
+
+Deno.test('app refresh excludes disabled, non-web, unrelated, stopped and unverifiable declarations', async () => {
+  const f = await fixture();
+  try {
+    await configureApps(f, {
+      disabledApp: { Enabled: false, ServiceReferences: ['orders'] },
+      task: { Type: 'task', ServiceReferences: ['orders'] },
+      tauri: { Type: 'tauri', ServiceReferences: ['orders'] },
+      desktop: { Type: 'desktop', ServiceReferences: ['orders'] },
+      unrelated: { ServiceReferences: ['memory', 'disabled', 'missing'] },
+      empty: {},
+      stoppedApp: { ServiceReferences: ['orders'] },
+      container: { ServiceReferences: ['orders'] },
+      missingApp: { ServiceReferences: ['orders'] },
+      corrupt: { ServiceReferences: ['orders'] },
+      escaped: { Workdir: '../outside', ServiceReferences: ['orders'] },
+      good: { ServiceReferences: ['orders'] },
+    });
+    f.resources.find((r) => r.displayName === 'stoppedApp')!.state = 'Finished';
+    f.resources.find((r) => r.displayName === 'container')!.resourceType = 'Container';
+    await Deno.remove(join(f.root, 'apps/missingApp/deno.json'));
+    await Deno.writeTextFile(join(f.root, 'apps/corrupt/deno.json'), '{');
+    await refreshGeneratedClientConsumers(f.options);
+    assertEquals(restarted(f), ['orders', 'good']);
+  } finally {
+    await Deno.remove(f.root, { recursive: true });
+  }
+});
+
+Deno.test('canonical app workdir and config escapes are excluded on every platform', async () => {
+  for (const suffix of ['apps/portal', 'apps/portal/deno.json']) {
+    const f = await fixture();
+    try {
+      await configureApps(f, { portal: { ServiceReferences: ['orders'] } });
+      const realPath = async (path: string) =>
+        path.replaceAll('\\', '/').endsWith(suffix)
+          ? join(f.root, '../outside')
+          : await Deno.realPath(path);
+      await refreshGeneratedClientConsumers({ ...f.options, realPath });
+      assertEquals(restarted(f), ['orders']);
+    } finally {
+      await Deno.remove(f.root, { recursive: true });
+    }
+  }
+});
+
+Deno.test('an app cannot inherit a database dependency from an escaped service', async () => {
+  const f = await fixture();
+  try {
+    await configureApps(f, { portal: { ServiceReferences: ['orders'] } });
+    const realPath = async (path: string) =>
+      path.replaceAll('\\', '/').endsWith('services/orders')
+        ? join(f.root, '../outside')
+        : await Deno.realPath(path);
+    await refreshGeneratedClientConsumers({ ...f.options, realPath });
+    assertEquals(restarted(f), []);
+  } finally {
+    await Deno.remove(f.root, { recursive: true });
+  }
+});
+
+Deno.test('config and live app identity collisions fail before any service restart', async () => {
+  for (const collision of ['live', 'service', 'plugin', 'worker', 'desktop', 'disabled-desktop']) {
+    const f = await fixture();
+    try {
+      const name = collision === 'service' ? 'orders' : 'portal';
+      await configureApps(f, { [name]: { ServiceReferences: ['orders'] } });
+      const path = join(f.root, 'appsettings.json');
+      const settings = JSON.parse(await Deno.readTextFile(path));
+      if (collision === 'live') f.resources.push({ ...f.resources.at(-1)!, name: 'duplicate' });
+      if (collision === 'plugin') settings.NetScript.Plugins = { portal: {} };
+      if (collision === 'worker') settings.NetScript.BackgroundProcessors = { portal: {} };
+      if (collision === 'desktop' || collision === 'disabled-desktop') {
+        settings.NetScript.Apps.orders = {
+          Type: 'desktop',
+          Enabled: collision === 'desktop' ? true : undefined,
+        };
+      }
+      await Deno.writeTextFile(path, JSON.stringify(settings));
+      if (collision === 'disabled-desktop') {
+        await refreshGeneratedClientConsumers(f.options);
+        assertEquals(restarted(f), ['orders', 'portal']);
+      } else {
+        await assertRejects(() => refreshGeneratedClientConsumers(f.options), Error, 'Ambiguous');
+        assertEquals(restarted(f), []);
+      }
+    } finally {
+      await Deno.remove(f.root, { recursive: true });
+    }
+  }
+});
+
+Deno.test('app restart and health failures propagate the exact scoped remedy', async () => {
+  for (const failure of ['restart', 'wait']) {
+    const f = await fixture();
+    try {
+      await configureApps(f, { portal: { ServiceReferences: ['orders'] } });
+      f.options.refreshed.add('orders');
+      f.fail(failure);
+      await assertRejects(
+        () => refreshGeneratedClientConsumers(f.options),
+        Error,
+        'aspire resource portal restart --apphost',
+      );
+    } finally {
+      await Deno.remove(f.root, { recursive: true });
+    }
+  }
+});

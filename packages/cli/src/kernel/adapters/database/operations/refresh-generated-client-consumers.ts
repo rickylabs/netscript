@@ -17,6 +17,18 @@ const settingsSchema = z.object({
         Workdir: z.string().optional(),
       }),
     ).default({}),
+    Apps: z.record(
+      z.string(),
+      z.object({
+        Enabled: z.boolean().optional(),
+        Type: z.string().optional(),
+        Workdir: z.string().optional(),
+        ServiceReferences: z.array(z.string()).default([]),
+      }),
+    ).default({}),
+    Plugins: z.record(z.string(), z.object({ Enabled: z.boolean().optional() })).default({}),
+    BackgroundProcessors: z.record(z.string(), z.object({ Enabled: z.boolean().optional() }))
+      .default({}),
   }),
 });
 const importsSchema = z.object({ imports: z.record(z.string(), z.unknown()).default({}) });
@@ -32,6 +44,7 @@ const snapshotSchema = z.object({
 export interface RefreshGeneratedClientConsumersOptions {
   readonly projectRoot: string;
   readonly database: DiscoveredDatabase;
+  readonly databases?: readonly DiscoveredDatabase[];
   readonly apphostPath: string;
   readonly aspireDir: string;
   readonly executor: AspireCommandExecutor;
@@ -119,24 +132,28 @@ async function refreshConsumers(options: RefreshGeneratedClientConsumersOptions)
 async function declaredConsumers(
   options: RefreshGeneratedClientConsumersOptions,
 ): Promise<string[]> {
+  const targetDatabases = options.databases ?? [options.database];
+  if (!targetDatabases.length) return [];
   const root = await options.realPath(options.projectRoot);
   const { NetScript: settings } = settingsSchema.parse(
     JSON.parse(await options.fs.readFile(join(root, 'appsettings.json'))),
   );
   const databases = Object.keys(settings.Databases);
   const primary = settings.PrimaryDatabase ?? (databases.length === 1 ? databases[0] : undefined);
-  const facades = [join(root, options.database.workspaceDir, 'mod.ts')];
-  if (primary === options.database.configKey) facades.push(join(root, 'database', 'mod.ts'));
-  const canonicalFacades: string[] = [];
+  const facades = targetDatabases.map((db) => join(root, db.workspaceDir, 'mod.ts'));
+  if (targetDatabases.some((db) => primary === db.configKey)) {
+    facades.push(join(root, 'database', 'mod.ts'));
+  }
+  const canonicalFacades = new Set<string>();
   for (const path of facades) {
     try {
       const canonical = await options.realPath(path);
-      if (within(root, canonical)) canonicalFacades.push(canonical);
+      if (within(root, canonical)) canonicalFacades.add(canonical);
     } catch { /* Missing facades cannot have live consumers. */ }
   }
-  const names: string[] = [];
+  const verifiedDbServices = new Set<string>();
   for (const [name, service] of Object.entries(settings.Services)) {
-    if (service.Enabled === false || options.refreshed.has(name)) continue;
+    if (service.Enabled === false) continue;
     try {
       const workdir = await options.realPath(
         resolve(root, service.Workdir ?? join('services', name)),
@@ -148,12 +165,45 @@ async function declaredConsumers(
       const databaseImport = imports['@database'];
       if (typeof databaseImport !== 'string' || !databaseImport.startsWith('.')) continue;
       const facade = await options.realPath(resolve(workdir, databaseImport));
-      if (within(root, facade) && canonicalFacades.includes(facade)) names.push(name);
+      if (within(root, facade) && canonicalFacades.has(facade)) verifiedDbServices.add(name);
     } catch {
       outputWarning(`Skipping ${name}: could not verify its declared database client dependency.`);
     }
   }
-  return names.sort();
+  const apps: string[] = [];
+  for (const [name, app] of Object.entries(settings.Apps)) {
+    if (
+      app.Enabled === false || (app.Type ?? 'app') !== 'app' || options.refreshed.has(name) ||
+      !app.ServiceReferences.some((ref) => verifiedDbServices.has(ref))
+    ) continue;
+    try {
+      const workdir = await options.realPath(resolve(root, app.Workdir ?? join('apps', name)));
+      if (!within(root, workdir)) continue;
+      const configPath = await options.realPath(join(workdir, 'deno.json'));
+      if (!within(root, configPath)) continue;
+      importsSchema.parse(JSON.parse(await options.fs.readFile(configPath)));
+      apps.push(name);
+    } catch {
+      outputWarning(`Skipping ${name}: could not verify its declared application dependency.`);
+    }
+  }
+  const enabledNames = [
+    ...Object.entries(settings.Services).filter(([, entry]) => entry.Enabled !== false),
+    ...Object.entries(settings.Apps).filter(([, entry]) =>
+      entry.Type === 'desktop' ? entry.Enabled === true : entry.Enabled !== false
+    ),
+    ...Object.entries(settings.Plugins).filter(([, entry]) => entry.Enabled !== false),
+    ...Object.entries(settings.BackgroundProcessors).filter(([, entry]) => entry.Enabled !== false),
+  ].map(([name]) => name);
+  for (const name of [...verifiedDbServices, ...apps]) {
+    if (enabledNames.filter((declared) => declared === name).length > 1) {
+      throw new Error(`Ambiguous AppHost resource identity: ${name}`);
+    }
+  }
+  return [
+    ...[...verifiedDbServices].filter((name) => !options.refreshed.has(name)).sort(),
+    ...apps.sort(),
+  ];
 }
 
 function within(root: string, path: string): boolean {
