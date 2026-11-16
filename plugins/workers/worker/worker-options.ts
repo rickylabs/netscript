@@ -1,3 +1,8 @@
+import type { ChildHealthSnapshot } from '@netscript/plugin/health';
+import type {
+  WorkerDrainOptions,
+  WorkerLifecycleState,
+} from '@netscript/plugin-workers-core/shutdown';
 import type { JobDeadLetterStorePort } from './job-dead-letters.ts';
 import type { MessageContext, MessageQueue } from '@netscript/queue';
 import type {
@@ -13,7 +18,7 @@ import type {
 import type { TracedMessageContext } from '@netscript/telemetry/instrumentation';
 import type { Span } from '@netscript/telemetry/tracer';
 import type { WorkerPool, WorkerPoolOptions } from './job-runner-pool.ts';
-import type { WorkerListenerSnapshot } from './listener-supervisor.ts';
+import type { WorkerListenerFailureCause, WorkerListenerSnapshot } from './listener-supervisor.ts';
 
 /** Structural validation schema accepted by worker queue triggers. */
 export interface WorkerPayloadSchema {
@@ -129,7 +134,7 @@ export interface QueueTriggerConfig {
 }
 
 /** Worker configuration options. */
-export interface WorkerOptions {
+export interface WorkerOptions extends WorkerDrainOptions {
   /** Worker identifier. */
   workerId: string;
   /** Queue name to consume from. */
@@ -228,6 +233,7 @@ export interface WorkerDispatchContext {
 /** Context required by queue-consumer helpers. */
 export interface WorkerQueueContext {
   readonly workerId: string;
+  readonly canConsume?: (delivery: MessageContext) => Promise<boolean>;
   readonly registry: WorkerJobRegistry;
   readonly queueTriggers: readonly QueueTriggerConfig[];
   readonly triggerQueues: MessageQueue<unknown>[];
@@ -251,4 +257,33 @@ export function resolveWorkerQueueTriggers(
   queueTriggers: readonly QueueTriggerConfig[] | undefined,
 ): readonly QueueTriggerConfig[] {
   return Object.freeze([...(queueTriggers ?? [])]);
+}
+
+/** Health snapshot for a worker runtime. */
+export interface WorkerHealthStatus {
+  /** Lifecycle of this worker instance. */
+  readonly lifecycle: WorkerLifecycleState;
+  /** Durable job dead-letter sample, populated by readHealthStatus(). */
+  readonly deadLetters?: Readonly<{ available: boolean; depth: number | null }>;
+  /** Aggregate worker health state. */
+  readonly status: 'healthy' | 'degraded';
+  /** Shared child health contract for the background health route. */
+  readonly childHealth: ChildHealthSnapshot;
+  /** Queue listener health snapshots. */
+  readonly listeners: readonly {
+    /** Listener name. */
+    readonly name: string;
+    /** Listener lifecycle status. */
+    readonly status: 'idle' | 'running' | 'paused' | 'restarting' | 'failed' | 'stopped';
+    /** Whether the listener is healthy. */
+    readonly healthy: boolean;
+    /** Cumulative restart attempts for this listener instance. */
+    readonly restartCount: number;
+    /** Restart attempts charged since the last healthy running interval. */
+    readonly restartBudgetUsed: number;
+    /** Redacted cause of the most recent failure, retained as incident history on recovery. */
+    readonly failureCause?: WorkerListenerFailureCause;
+    /** Last listener failure message. */
+    readonly lastError?: string;
+  }[];
 }

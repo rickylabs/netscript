@@ -44,8 +44,10 @@ for (const [backend, url] of leaseBackends) {
         });
         const workerOptions = {
           ...dispatch,
-          drainTimeoutMs: 100,
-          abortGracePeriodMs: 20,
+          // Redis already reserves 100 ms for disconnect callbacks after closing sockets.
+          // Keep the work window short while retaining enough total budget for that close.
+          drainTimeoutMs: 500,
+          abortGracePeriodMs: 350,
           taskQueue: new MemoryQueueAdapter<TaskMessage>(),
           queue: {
             nativeRetrial: jobs.nativeRetrial,

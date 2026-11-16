@@ -13,3 +13,6 @@ S3a stays within approved adapter scope. Its handback storage-failure test expos
 
 
 Follow-up PLAN-EVAL cycle2 settlement: addendum risk text now pins the shared name with the already approved Worker-total stop option (Listener JSDoc/S6 docs must cross-reference the per-listener post-intake cutoff against the unchanged25s Worker total). Wording only, settled in place under the cycle2 authorization; no product/tests or design change. Original Plan-Gate PASS history preserved; follow-up verdict PASS appended to plan-eval.md at014730e1.
+
+
+S4 test contract alignment: older immediate-abort fixtures now assert the work window before ShutdownError. The held progress sink permits only the documented bounded TimeoutError result in the shutdown case; cause, once-only state/cleanup and claim-release assertions are retained. Relevant lifecycle fixtures moved into their own small file, reducing the pre-existing oversized dispatch test. Redis delivery fixture uses500ms total to include the native adapter's unchanged100ms disconnect grace, retaining all accounting assertions. Core retry catch formerly replaced an observed failure with a later abort; red first-cause cases precede its narrow preservation fix. No budget or acceptance contract changed.

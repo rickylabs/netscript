@@ -1,11 +1,11 @@
-import { createQueue, type MessageContext } from '@netscript/queue';
+import { createQueue, type MessageContext, type MessageQueue } from '@netscript/queue';
 import {
   DEFAULT_TOPIC,
   type JobDefinition,
   type JobMessage,
   type TaskMessage,
 } from '@netscript/plugin-workers-core/runtime';
-import type { TracedMessageContext, TracedQueue } from '@netscript/telemetry/instrumentation';
+import type { TracedMessageContext } from '@netscript/telemetry/instrumentation';
 import type {
   QueueTriggerConfig,
   WorkerDispatchContext,
@@ -21,6 +21,7 @@ export async function startQueueTriggerListeners(
   const supervisors: WorkerListenerSupervisor[] = [];
   for (const config of context.queueTriggers) {
     const jobDef = await context.registry.get(config.jobId);
+    if (context.abortController?.signal.aborted) break;
     if (!jobDef) {
       console.warn(
         `[Worker ${context.workerId}] Queue trigger job '${config.jobId}' not found, skipping`,
@@ -32,7 +33,7 @@ export async function startQueueTriggerListeners(
       `[Worker ${context.workerId}] Setting up queue trigger: ${config.queueName} -> ${config.jobId}`,
     );
 
-    const triggerQueue = createQueue<unknown>(config.queueName) as TracedQueue<unknown>;
+    const triggerQueue = createQueue<unknown>(config.queueName);
     context.triggerQueues.push(triggerQueue);
 
     const supervisor = createListenerSupervisor(
@@ -56,6 +57,7 @@ export function startTaskQueueListener(
   const supervisor = createListenerSupervisor(queueContext, 'task:tasks', (signal) => {
     return taskQueue.listen(
       async (message, context) => {
+        if (queueContext.canConsume && !await queueContext.canConsume(context)) return;
         try {
           await processWorkerTask(dispatchContext, message, context);
         } catch (error) {
@@ -63,11 +65,10 @@ export function startTaskQueueListener(
             `[Worker ${queueContext.workerId}] Unexpected error processing task '${message.taskId}':`,
             error instanceof Error ? error.message : String(error),
           );
-          if (!context.extendVisibility) throw error;
           await context.nack({ requeue: true });
         }
       },
-      { signal },
+      { signal, drainTimeoutMs: Infinity },
     );
   });
   supervisor.start();
@@ -95,13 +96,14 @@ function createListenerSupervisor(
 
 async function listenToTriggerQueue(
   context: WorkerQueueContext,
-  queue: TracedQueue<unknown>,
+  queue: MessageQueue<unknown>,
   config: QueueTriggerConfig,
   jobDef: JobDefinition,
   signal: AbortSignal,
 ): Promise<void> {
   await queue.listen(
     async (message, queueContext) => {
+      if (context.canConsume && !await context.canConsume(queueContext)) return;
       let validatedMessage = message;
       if (config.schema) {
         try {
@@ -133,6 +135,7 @@ async function listenToTriggerQueue(
     {
       concurrency: config.concurrency ?? 1,
       signal,
+      drainTimeoutMs: Infinity,
     },
   );
 }

@@ -10,6 +10,7 @@ import { createQueue } from '@netscript/queue';
 import { deadline } from '@std/async';
 
 import type { JobMessage } from '@netscript/plugin-workers-core/runtime';
+export type { WorkerLifecycleState } from '@netscript/plugin-workers-core/shutdown';
 import { readSeedSampleRequest, watchSeedSample } from '../src/runtime/seed-sample.ts';
 import { getKv } from '@netscript/kv';
 import type { ChildHealthMonitor, ChildHealthSnapshot } from '@netscript/plugin/health';

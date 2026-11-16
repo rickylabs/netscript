@@ -2,6 +2,7 @@ import { workerJobLogger } from './job-logger.ts';
 import {
   DEFAULT_TOPIC,
   executeJobWithRetry,
+  isJobAbort,
   type JobDefinition,
   type JobMessage,
   resolveJobRetryPolicy,
@@ -22,21 +23,36 @@ export async function executeWorkerJob(
   traceHeaders: Record<string, string>,
   correlationId?: string,
   onAttempt?: (attempt: number) => void,
+  onFailedAttempt?: () => void,
 ): Promise<WorkerJobResult> {
   return await executeJobWithRetry(
     async () => {
-      const executionType = jobDef.executionType ?? 'deno';
-      return executionType === 'deno'
-        ? await executeDenoJob(
-          context,
-          jobDef,
-          executionId,
-          payload,
-          traceHeaders,
-          correlationId,
-          signal,
-        )
-        : await executePolyglotTask(context, jobDef, payload, signal, traceHeaders, correlationId);
+      try {
+        const executionType = jobDef.executionType ?? 'deno';
+        const result = executionType === 'deno'
+          ? await executeDenoJob(
+            context,
+            jobDef,
+            executionId,
+            payload,
+            traceHeaders,
+            correlationId,
+            signal,
+          )
+          : await executePolyglotTask(
+            context,
+            jobDef,
+            payload,
+            signal,
+            traceHeaders,
+            correlationId,
+          );
+        if (!result.success && !signal.aborted) onFailedAttempt?.();
+        return result;
+      } catch (error) {
+        if (!isJobAbort(error)) onFailedAttempt?.();
+        throw error;
+      }
     },
     resolveJobRetryPolicy(jobDef, jobDef.handler),
     { signal, clock: context.retryClock, onAttempt },

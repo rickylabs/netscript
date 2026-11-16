@@ -9,8 +9,13 @@ import {
  */
 
 import { ChildHealthMonitor, type ChildHealthSnapshot } from '@netscript/plugin/health';
-import { delay } from '@std/async';
-import { createQueue, type MessageQueue } from '@netscript/queue';
+import {
+  drainWorker,
+  resolveWorkerDrainBudget,
+  type WorkerDrainOptions,
+  type WorkerLifecycleState,
+} from '@netscript/plugin-workers-core/shutdown';
+import { createQueue, type MessageContext, type MessageQueue } from '@netscript/queue';
 import type { JobRunnerClock, WorkerIdempotencyPort } from '@netscript/plugin-workers-core/runtime';
 import type { JobMessage, TaskMessage } from '@netscript/plugin-workers-core/runtime';
 import { createWorkerPool, type WorkerPool } from './job-runner-pool.ts';
@@ -21,7 +26,6 @@ import type { Span } from '@netscript/telemetry/tracer';
 import { processWorkerJob } from './job-dispatcher.ts';
 import {
   resolveListenerHealthyResetMs,
-  type WorkerListenerFailureCause,
   type WorkerListenerSnapshot,
   WorkerListenerSupervisor,
 } from './listener-supervisor.ts';
@@ -33,6 +37,7 @@ import {
   resolveWorkerQueueTriggers,
   type WorkerDispatchContext,
   type WorkerExecutionState,
+  type WorkerHealthStatus,
   type WorkerJobRegistry,
   type WorkerOptions,
   type WorkerQueueContext,
@@ -46,6 +51,7 @@ export type {
   WorkerCreateExecutionOptions,
   WorkerExecutionRecord,
   WorkerExecutionState,
+  WorkerHealthStatus,
   WorkerJobRegistry,
   WorkerOptions,
   WorkerPayloadSchema,
@@ -53,33 +59,6 @@ export type {
   WorkerTaskRegistry,
   WorkerTaskResult,
 } from './worker-options.ts';
-
-/** Health snapshot for a worker runtime. */
-export interface WorkerHealthStatus {
-  /** Durable job dead-letter sample, populated by readHealthStatus(). */
-  readonly deadLetters?: Readonly<{ available: boolean; depth: number | null }>;
-  /** Aggregate worker health state. */
-  readonly status: 'healthy' | 'degraded';
-  /** Shared child health contract for the background health route. */
-  readonly childHealth: ChildHealthSnapshot;
-  /** Queue listener health snapshots. */
-  readonly listeners: readonly {
-    /** Listener name. */
-    readonly name: string;
-    /** Listener lifecycle status. */
-    readonly status: 'idle' | 'running' | 'restarting' | 'failed' | 'stopped';
-    /** Whether the listener is healthy. */
-    readonly healthy: boolean;
-    /** Cumulative restart attempts for this listener instance. */
-    readonly restartCount: number;
-    /** Restart attempts charged since the last healthy running interval. */
-    readonly restartBudgetUsed: number;
-    /** Redacted cause of the most recent failure, retained as incident history on recovery. */
-    readonly failureCause?: WorkerListenerFailureCause;
-    /** Last listener failure message. */
-    readonly lastError?: string;
-  }[];
-}
 
 /** Worker process that consumes queued jobs and tasks for one runtime instance. */
 export class Worker {
@@ -108,7 +87,9 @@ export class Worker {
   private readonly suppliedTaskQueue?: MessageQueue<TaskMessage>;
   private queue: MessageQueue<JobMessage> | null = null;
   private taskQueue: MessageQueue<TaskMessage> | null = null;
-  private running = false;
+  private lifecycle: WorkerLifecycleState = 'idle';
+  private startup: Promise<void> = Promise.resolve();
+  private readonly drainOptions: WorkerDrainOptions;
   private readonly childHealth = new ChildHealthMonitor();
   private stoppedListeners: readonly WorkerListenerSnapshot[] = [];
   private stopCompletion: Promise<void> | null = null;
@@ -117,12 +98,24 @@ export class Worker {
 
   /** Create a worker with queue, registry, execution, and task runtime dependencies. */
   constructor(options: WorkerOptions) {
+    const budget = resolveWorkerDrainBudget({
+      ...options,
+      abortGracePeriodMs: options.abortGracePeriodMs ??
+        options.workerPoolOptions?.abortGracePeriodMs,
+    });
+    this.drainOptions = {
+      drainTimeoutMs: budget.totalMs,
+      abortGracePeriodMs: budget.abortGracePeriodMs,
+      drainClock: options.drainClock,
+    };
     this.listenerHealthyResetMs = resolveListenerHealthyResetMs(options.listenerHealthyResetMs);
     this.workerId = options.workerId;
     this.queueName = options.queueName ?? 'jobs';
     this.deadLetters = options.deadLetters ?? createDefaultJobDeadLetterStore(this.queueName);
     this.suppliedQueue = options.queue;
     this.suppliedTaskQueue = options.taskQueue;
+    this.queue = options.queue ?? null;
+    this.taskQueue = options.taskQueue ?? null;
     this.concurrency = options.concurrency ?? 1;
     this.registry = options.registry;
     this.executionState = options.executionState;
@@ -139,6 +132,7 @@ export class Worker {
       poolSize: this.concurrency,
       ...options.workerPoolOptions,
       workerUrl: options.workerUrl,
+      abortGracePeriodMs: budget.abortGracePeriodMs,
     });
 
     if (isTelemetryEnabled()) {
@@ -154,9 +148,29 @@ export class Worker {
     return this.workerId;
   }
 
-  /** Whether the worker is currently consuming queues. */
+  /** Whether the runtime is alive, including paused or draining work. */
   get isRunning(): boolean {
-    return this.running;
+    return this.lifecycle === 'running' || this.lifecycle === 'paused' ||
+      this.lifecycle === 'draining';
+  }
+
+  /** Whether intake was intentionally paused. */
+  get isPaused(): boolean {
+    return this.lifecycle === 'paused';
+  }
+
+  /** Stop intake immediately; admitted jobs and tasks continue on their own signals. */
+  pause(): void {
+    if (this.lifecycle !== 'running') return;
+    this.lifecycle = 'paused';
+    for (const listener of this.listenerSupervisors) void listener.pause().catch(() => {});
+  }
+
+  /** Resume once the previous intake generation has joined its admitted work. */
+  resume(): void {
+    if (this.lifecycle !== 'paused') return;
+    this.lifecycle = 'running';
+    for (const listener of this.listenerSupervisors) listener.resume();
   }
 
   /** Number of active job executions. */
@@ -190,6 +204,7 @@ export class Worker {
     });
     return {
       status: childHealth.state === 'ready' ? 'healthy' : 'degraded',
+      lifecycle: this.lifecycle,
       childHealth,
       listeners,
     };
@@ -211,59 +226,67 @@ export class Worker {
     }
   }
 
-  /** Start queue consumption for this worker instance. */
+  /** Start this instance until stopped or its job listener exhausts recovery. */
   async start(): Promise<void> {
-    if (this.running) {
-      console.warn(`[Worker ${this.workerId}] Already running`);
-      return;
+    if (this.isRunning) return;
+    if (this.lifecycle === 'stopped') {
+      throw new Error('A stopped Worker cannot be restarted; create a replacement.');
     }
-
-    console.log(
-      `[Worker ${this.workerId}] Starting in-process job runner (queue concurrency: ${this.concurrency})...`,
-    );
-
-    this.running = true;
+    this.lifecycle = 'running';
     this.childHealth.registryLoaded();
     this.abortController = new AbortController();
-    await this.workerPool.initialize();
-
-    this.workerSpan = startWorkerSpan({
-      workerId: this.workerId,
-      queueName: this.queueName,
-      concurrency: this.concurrency,
-    });
-
-    this.queue = this.suppliedQueue ?? createQueue<JobMessage>(this.queueName);
-
-    this.listenerSupervisors.push(...await startQueueTriggerListeners(this.queueContext()));
-    this.listenerSupervisors.push(
-      startTaskQueueListener(this.queueContext(), this.dispatchContext()),
-    );
-
-    const jobListener = new WorkerListenerSupervisor({
-      name: `jobs:${this.queueName}`,
-      abortSignal: this.abortController.signal,
-      maxRestarts: this.listenerMaxRestarts,
-      healthyResetMs: this.listenerHealthyResetMs,
-      initialBackoffMs: this.listenerInitialBackoffMs,
-      maxBackoffMs: this.listenerMaxBackoffMs,
-      run: (signal) => this.listenForJobs(signal),
-      onFailure: (error, snapshot) => this.reportListenerFailure(snapshot.name, error, snapshot),
-    });
-    this.listenerSupervisors.push(jobListener);
-    jobListener.start();
-    this.childHealth.dependenciesReady();
-    this.childHealth.running();
-
+    const initialized = Promise.withResolvers<void>();
+    this.startup = initialized.promise;
+    let jobListener: WorkerListenerSupervisor | undefined;
+    let failure: { error: unknown } | undefined;
     try {
-      await jobListener.completion;
-    } finally {
-      if (jobListener.snapshot().status === 'failed') {
-        await this.stop();
-      } else {
-        this.running = false;
+      await this.workerPool.initialize();
+      if (!this.canStartListeners()) return;
+      this.workerSpan = startWorkerSpan({
+        workerId: this.workerId,
+        queueName: this.queueName,
+        concurrency: this.concurrency,
+      });
+      this.queue ??= this.suppliedQueue ?? createQueue<JobMessage>(this.queueName);
+      const triggers = await startQueueTriggerListeners(this.queueContext());
+      if (!this.canStartListeners()) {
+        await Promise.all(triggers.map((listener) => listener.stop()));
+        return;
       }
+      this.listenerSupervisors.push(...triggers);
+      this.listenerSupervisors.push(
+        startTaskQueueListener(this.queueContext(), this.dispatchContext()),
+      );
+      jobListener = new WorkerListenerSupervisor({
+        name: `jobs:${this.queueName}`,
+        abortSignal: this.abortController.signal,
+        maxRestarts: this.listenerMaxRestarts,
+        healthyResetMs: this.listenerHealthyResetMs,
+        initialBackoffMs: this.listenerInitialBackoffMs,
+        maxBackoffMs: this.listenerMaxBackoffMs,
+        run: (signal) => this.listenForJobs(signal),
+        onFailure: (error, snapshot) => this.reportListenerFailure(snapshot.name, error, snapshot),
+      });
+      this.listenerSupervisors.push(jobListener);
+      jobListener.start();
+      if (this.isPaused) {
+        for (const listener of this.listenerSupervisors) void listener.pause().catch(() => {});
+      }
+      this.childHealth.dependenciesReady();
+      this.childHealth.running();
+    } catch (error) {
+      failure = { error };
+      this.childHealth.failed();
+    } finally {
+      initialized.resolve();
     }
+    if (failure) {
+      await this.stop();
+      throw failure.error;
+    }
+    await jobListener?.completion;
+    if (jobListener?.snapshot().status === 'failed') await this.stop();
+    else if (this.stopCompletion) await this.stopCompletion;
   }
 
   /** Request cancellation of an active local execution; first cause wins. */
@@ -274,55 +297,59 @@ export class Worker {
     return true;
   }
 
-  /** Abort jobs at drain start and await listeners plus the bounded runner cleanup. */
+  /** Wait for admitted work, then cancel leftovers and settle within one total budget. */
   stop(): Promise<void> {
     if (this.stopCompletion) return this.stopCompletion;
-    if (!this.running && !this.hasRuntimeResources()) {
-      return Promise.resolve();
+    if (!this.isRunning && !this.hasRuntimeResources()) {
+      this.lifecycle = 'stopped';
+      return this.stopCompletion = Promise.resolve();
     }
+    this.lifecycle = 'draining';
     const completion = Promise.withResolvers<void>();
     this.stopCompletion = completion.promise;
     void this.drain().then(completion.resolve, completion.reject);
     return completion.promise;
   }
 
-  /** Drain once; concurrent stop callers share the same completion. */
+  /** One bounded shutdown; resource references remain owned even after a timeout. */
   private async drain(): Promise<void> {
-    console.log(`[Worker ${this.workerId}] Stopping...`);
+    let intake = Promise.resolve();
     try {
-      const shutdownReason = new DOMException('Worker shutdown began.', 'ShutdownError');
-      this.abortController?.abort(shutdownReason);
-      for (const execution of this.activeJobs.values()) {
-        execution.abortController.abort(shutdownReason);
-      }
-      await Promise.all([
-        this.workerPool.shutdown(),
-        ...this.listenerSupervisors.map((supervisor) => supervisor.stop()),
-      ]);
-      this.stoppedListeners = this.listenerSupervisors.map((supervisor) => supervisor.snapshot());
+      await drainWorker(this.drainOptions, {
+        pauseIntake: () => {
+          intake = this.startup.then(async () => {
+            await Promise.all(this.listenerSupervisors.map((listener) => listener.pause()));
+          });
+          return intake;
+        },
+        abort: () =>
+          this.abortController?.abort(new DOMException('Worker shutdown began.', 'ShutdownError')),
+        abortCompleted: async () => {
+          await Promise.all([intake, this.workerPool.shutdown()]);
+        },
+        close: async () => {
+          const listeners = [...this.listenerSupervisors];
+          const queues = new Set([...this.triggerQueues, this.queue, this.taskQueue]);
+          try {
+            await Promise.all(listeners.map((listener) => listener.stop()));
+          } finally {
+            await Promise.all([...queues].map((queue) => queue?.stop()));
+          }
+          this.stoppedListeners = listeners.map((listener) => listener.snapshot());
+        },
+      });
+    } finally {
       this.listenerSupervisors.length = 0;
+      this.triggerQueues.length = 0;
       this.childHealth.stopped();
-      await this.stopTriggerQueues();
-      await this.waitForActiveJobs();
-
-      if (this.queue) {
-        await this.queue.stop();
-        this.queue = null;
-      }
-      if (this.taskQueue) {
-        await this.taskQueue.stop();
-        this.taskQueue = null;
-      }
-
+      this.lifecycle = 'stopped';
       this.workerSpan?.setAttribute(WorkerAttributes.WORKER_ACTIVE_JOBS, 0);
       this.workerSpan?.addEvent('worker.stopped');
       this.workerSpan?.end();
       this.workerSpan = null;
       this.abortController = null;
-      this.running = false;
-      console.log(`[Worker ${this.workerId}] Stopped`);
-    } finally {
-      this.stopCompletion = null;
+      this.queue = null;
+      this.taskQueue = null;
     }
   }
 
@@ -335,6 +362,7 @@ export class Worker {
     try {
       await this.queue.listen(
         async (message, context) => {
+          if (!await this.admit(context)) return;
           try {
             await processWorkerJob(
               this.dispatchContext(),
@@ -350,7 +378,7 @@ export class Worker {
             throw error;
           }
         },
-        { signal, concurrency: this.concurrency },
+        { signal, concurrency: this.concurrency, drainTimeoutMs: Infinity },
       );
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
@@ -361,37 +389,21 @@ export class Worker {
     }
   }
 
-  /** Stop all trigger queues owned by this worker instance. */
-  private async stopTriggerQueues(): Promise<void> {
-    for (const triggerQueue of this.triggerQueues) {
-      try {
-        await triggerQueue.stop();
-      } catch (error) {
-        console.error(`[Worker ${this.workerId}] Error stopping trigger queue:`, error);
-      }
-    }
-    this.triggerQueues.length = 0;
+  /** Never admit a new execution after a pause/drain boundary. */
+  private async admit(delivery: MessageContext): Promise<boolean> {
+    if (this.lifecycle === 'running') return true;
+    await delivery.nack({
+      requeue: true,
+      ...(this.lifecycle === 'draining' || this.lifecycle === 'stopped'
+        ? { preserveDeliveryCount: true }
+        : {}),
+    });
+    return false;
   }
 
-  /** Wait for active jobs to finish, cancelling them after the shutdown timeout. */
-  private async waitForActiveJobs(): Promise<void> {
-    const timeout = 30000;
-    const startTime = Date.now();
-
-    while (this.activeJobs.size > 0) {
-      if (Date.now() - startTime > timeout) {
-        console.warn(`[Worker ${this.workerId}] Timeout waiting for jobs, forcing stop`);
-        for (const [executionId, ctx] of this.activeJobs) {
-          ctx.abortController.abort();
-          await this.executionState.complete(executionId, {
-            status: 'cancelled',
-            error: 'Worker shutdown timeout',
-          });
-        }
-        break;
-      }
-      await delay(100);
-    }
+  /** Startup continuations may not allocate listeners after stop was requested. */
+  private canStartListeners(): boolean {
+    return this.lifecycle === 'running' || this.lifecycle === 'paused';
   }
 
   /** Build the dependency context used by job dispatchers. */
@@ -422,6 +434,7 @@ export class Worker {
       registry: this.registry,
       queueTriggers: this.queueTriggers,
       triggerQueues: this.triggerQueues,
+      canConsume: (delivery) => this.admit(delivery),
       abortController: this.abortController,
       taskQueue: this.suppliedTaskQueue,
       listenerMaxRestarts: this.listenerMaxRestarts,

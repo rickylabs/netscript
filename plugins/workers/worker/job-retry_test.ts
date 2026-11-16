@@ -169,6 +169,8 @@ Deno.test('Worker KV listener replays a job after shutdown during backoff and re
   const queue = makeQueue('kv-polling', kv) as KvPollingAdapter<JobMessage>;
   const options = {
     workerId: 'shutdown-replay',
+    drainTimeoutMs: 500,
+    abortGracePeriodMs: 250,
     deadLetters: harness.deadLetters,
     queue,
     registry: harness.context.registry,
