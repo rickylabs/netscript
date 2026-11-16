@@ -1,0 +1,3 @@
+# Research resource hygiene
+
+Commands: maint:leak-check and maint:teardown preview against this run and worktree. Reporter raw output retained privately. Four active research backend containers (plus one earlier owned Garnet startup replacement) positively identified by recorded immutable IDs and matching test-owner label; all removed by exact ID after preview. Subsequent scan of that exact owner set: zero containers. All five anonymous volumes removed only after native mount events proved association with the five run-created container identities and a reference scan proved no other container used them. The earlier Garnet startup replacement was included. No owned volume remains. Foreign/unknown-owner resources untouched. No process or container pattern kill.
