@@ -113,6 +113,19 @@ prerequisites for signed-in chat; CI uses a stub provider. Private chat currentl
 host for credential-file permissions. SQLite uses the local Garnet fallback when Docker is absent;
 PostgreSQL requires Docker. Deno 2.9.7 and the pinned Aspire/.NET toolchain are required.
 
+## Managed Garnet durability
+
+Set a Garnet cache entry's `DataPath` to retain queued work across restarts. Generated Container,
+Executable and Auto launches enable AOF recovery and wait for each write's log flush before
+acknowledging it. This adds disk latency. Containers keep log and checkpoint files under the
+mounted `/data`; executables use the resolved `DataPath` for both.
+
+Without `DataPath`, managed Garnet remains ephemeral and loses its contents on restart. Durable mode
+uses the FileStream storage tier for portable checkpoint I/O. Native `SAVE`/`BGSAVE` checkpoints
+compact retained AOF history; keep the data directory when replacing a container. See
+[KV, queues & cron](https://rickylabs.github.io/netscript/data-persistence/kv-queues-cron/#managed-garnet-durability)
+for configuration.
+
 ## Command map
 
 | Group         | What it owns                                                                                                                       |

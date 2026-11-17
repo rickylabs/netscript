@@ -73,6 +73,39 @@ not a code change.
 > back to local Deno KV and cron to the in-memory adapter; your code is identical either way. See
 > [Orchestration with Aspire](/explanation/aspire/).
 
+## Managed Garnet durability
+
+`DataPath` selects persistence for a managed Garnet cache:
+
+```json
+{
+  "NetScript": {
+    "Cache": {
+      "garnet": {
+        "Enabled": true,
+        "Engine": "Garnet",
+        "Mode": "Auto",
+        "DataPath": ".data/garnet"
+      }
+    },
+    "PrimaryCache": "garnet"
+  }
+}
+```
+
+| Configuration | Durability |
+| --- | --- |
+| `DataPath` set | AOF and checkpoint files live in the configured directory; startup recovers saved data and replays the AOF. |
+| `DataPath` omitted | In-memory, ephemeral cache; queued jobs, saga state and timers are lost when the server restarts. |
+
+This applies to Container, Executable and Auto launches, including a Docker-less Garnet fallback.
+Containers mount the directory at `/data`; executables pass its resolved host path. Durable mode
+uses FileStream storage tiering so logs and checkpoint buffers share the data device's alignment.
+Each acknowledged write waits for an immediate AOF flush, trading latency for restart durability.
+Native `SAVE`/`BGSAVE` creates checkpoints and compacts the AOF; take checkpoints periodically as
+data grows. Retain the directory when replacing a container. An External cache's server owns its
+persistence configuration.
+
 ## KV
 
 Redis fixed-key watches restore subscriptions and reread current key values after a reconnect,

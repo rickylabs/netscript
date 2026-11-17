@@ -49,6 +49,12 @@ session (`activeOrganizationId`, role, roles and permissions) and the user's rol
 NetScript's authenticator onto the `Principal` scopes, roles and claims. Downstream services and
 pages can authorize on organization context with no extra wiring.
 
+Endpoint throttling uses `betterAuthOptions.rateLimit.customRules` on a host-created provider, or
+`auth.rateLimit.customRules` in plugin appsettings. The effective production sign-in default is
+three requests per ten seconds per client IP and path; a global window/max override does not replace
+that endpoint rule. [Sign-in rate limits](/identity-access/auth/#sign-in-rate-limits-with-better-auth)
+shows validated configuration, path patterns, units and storage behavior.
+
 ## Plugin prerequisites
 
 A plugin enabled through the passthrough type-checks and is mounted at the better-auth layer.

@@ -24,9 +24,14 @@ export function generateCsrfToken(): string {
   return crypto.randomUUID();
 }
 
-/** Read the current CSRF token from a request cookie header. */
+/** Read the current CSRF token, treating malformed cookies as a missing token. */
 export function readCsrfToken(request: Request): string | undefined {
-  return getCookies(request.headers)[CSRF_COOKIE_NAME];
+  try {
+    return getCookies(request.headers)[CSRF_COOKIE_NAME];
+  } catch (error) {
+    if (error instanceof SyntaxError) return undefined;
+    throw error;
+  }
 }
 
 /** Verify that the submitted token matches the cookie token. */
