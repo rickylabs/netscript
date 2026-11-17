@@ -443,3 +443,29 @@ raises `SagaEventFeedError` with reason `history-lost`; malformed or future ids 
 `invalid-cursor`. Obtain a fresh application snapshot before subscribing without the old cursor.
 Cancellation closes only the subscription, leaving the host's KV open. This observation journal
 is separate from durable saga runtime acceptance and follows the configured KV's durability.
+
+The feed requires native atomic compare-and-set and fixed-key watch support. It reads directly
+addressed slots and performs no keyspace scan or polling loop. Concurrent successful commits define
+publish order across feed instances; invocation start order is not guaranteed. A slow reader keeps
+at most 256 records locally and receives an explicit gap if it is overtaken.
+
+Import `SagaEventFeedError` from `@netscript/plugin-sagas-core/domain`. Its `reason` is
+`invalid-cursor`, `history-lost`, or retryable `unavailable`; known history bounds are returned as
+`oldestId` and `latestId`. A cursor from another epoch or a reset store is a history gap. An id
+beyond the current head is invalid. The oldest retained event's predecessor remains a valid replay
+cursor. The fixed retention count covers all events, including those filtered out by an HTTP
+subscription, and adds no TTL or background pruning. Each event follows the backend's per-value
+size limit.
+
+Only explicit CAS conflicts retry, up to 64 attempts. A failed or aborted native commit may already
+have succeeded, so append does not blindly retry it. Runtime acceptance precedes the API's event
+append; observation and saga execution are separate commits. A failed HTTP publication may therefore
+have accepted work already. Retrying with the application's idempotency key can deduplicate runtime
+work, while a separate notification can still be appended. Readers can deduplicate replayed
+notifications by their stable event id.
+
+The journal uses the versioned `['saga', 'event-feed', 'v1']` prefix. Legacy random-key history and
+per-connection numeric ids have no reconstructible global order. During upgrade, drain old API
+instances and clear saved subscription cursors; start a fresh subscription. The feed neither scans
+nor migrates the legacy prefix. Obsolete legacy keys can be removed separately through the host's
+KV maintenance path; the 257-key bound applies to the new journal only.
