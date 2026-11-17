@@ -25,18 +25,82 @@ export interface CapturedInvocation {
   readonly process?: 'aspire' | 'database_cli';
   readonly timedOut?: boolean;
   readonly reportedRestart?: { readonly resource: string; readonly exit: number };
+  /** Trusted fixture scope, never taken from command output. */
+  readonly scopedResources?: readonly string[];
+  readonly signalAtSettlement?: {
+    readonly abortRequested: boolean;
+    readonly deadlineExpired: boolean;
+  };
 }
 export interface DiagnosticRecord {
   readonly resourceKind: string | null;
   readonly resourceName: string | null;
   readonly errorCode: string | null;
+  readonly stopState?: 'requested' | 'not_terminal' | 'confirmed';
 }
+/** Names beyond the fixed vocabulary require an exact server-owned run binding. */
+export function diagnosticResourceName(
+  name: unknown,
+  scoped: readonly string[] = [],
+): string | null {
+  if (typeof name !== 'string') return null;
+  if (NAMES.has(name)) return name;
+  return scoped.length <= 16 && scoped.includes(name) && /^[a-z][a-z0-9-]{0,127}$/.test(name)
+    ? name
+    : null;
+}
+function recordTime(row: Record<string, unknown> | null): number | null {
+  const value = row?.Timestamp ?? row?.timestamp ?? row?.['@t'];
+  if (typeof value !== 'string') return null;
+  const at = Date.parse(value);
+  return Number.isFinite(at) ? at : null;
+}
+
+function withinInvocation(at: number | null, invocation: CapturedInvocation): boolean {
+  const start = Date.parse(invocation.startedAt ?? ''),
+    end = Date.parse(invocation.completedAt ?? '');
+  return at !== null && Number.isFinite(at) && Number.isFinite(start) && Number.isFinite(end) &&
+    end >= start && at >= start && at <= end;
+}
+
+/** Pinned CLI file-log prefix and closed DcpExecutor templates; no free-form message is retained. */
+function scopedStopRecord(
+  line: string,
+  scoped: readonly string[],
+  window?: CapturedInvocation,
+): DiagnosticRecord | null {
+  const prefix =
+    /^\[(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}\.\d{3})\] \[[A-Z]{3,5}\] \[(?:AppHost|DcpExecutor|Aspire\.Hosting\.Dcp\.DcpExecutor)\] (.+)$/
+      .exec(line);
+  if (!prefix) return null;
+  const at = Date.parse(prefix[1] + 'T' + prefix[2] + 'Z');
+  if (!Number.isFinite(at) || window && !withinInvocation(at, window)) return null;
+  const match =
+    /^(?:Stopping resource '([^']+)'\.\.\.|Executable '([^']+)' (was stopped\.|is still running; trying again to stop it\.\.\.))$/
+      .exec(prefix[3]);
+  if (!match) return null;
+  const physical = match[1] ?? match[2];
+  const candidates = [...NAMES, ...scoped.slice(0, 16)];
+  const logical = candidates.find((name) =>
+    diagnosticResourceName(name, scoped) !== null &&
+    (physical === name ||
+      physical.startsWith(name + '-') && /^[a-z0-9]{8}$/.test(physical.slice(name.length + 1)))
+  );
+  if (!logical) return null;
+  return {
+    resourceKind: 'executable',
+    resourceName: logical,
+    errorCode: null,
+    stopState: match[1] ? 'requested' : match[3] === 'was stopped.' ? 'confirmed' : 'not_terminal',
+  };
+}
+
 function object(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
     ? value as Record<string, unknown>
     : null;
 }
-function records(text: string) {
+function records(text: string, scoped: readonly string[] = [], window?: CapturedInvocation) {
   const result: DiagnosticRecord[] = [];
   let ignored = 0;
   for (const line of text.split(/\r?\n/)) {
@@ -45,13 +109,27 @@ function records(text: string) {
     try {
       row = object(JSON.parse(line));
     } catch { /* Free-form text never crosses this boundary. */ }
+    if (!row) {
+      const stop = scopedStopRecord(line, scoped, window);
+      if (stop && result.length < 16) {
+        result.push(stop);
+        continue;
+      }
+    }
+    if (window) {
+      const at = recordTime(row);
+      if (!withinInvocation(at, window)) {
+        ignored++;
+        continue;
+      }
+    }
     const properties = object(row?.Properties) ?? row;
     const kind = properties?.resourceKind ?? properties?.ResourceKind;
     const name = properties?.resourceName ?? properties?.ResourceName;
     const error = properties?.errorCode ?? properties?.ErrorCode;
     const value = {
       resourceKind: typeof kind === 'string' && KINDS.has(kind) ? kind : null,
-      resourceName: typeof name === 'string' && NAMES.has(name) ? name : null,
+      resourceName: diagnosticResourceName(name, scoped),
       errorCode: typeof error === 'string' && ERRORS.has(error) ? error : null,
     };
     if (Object.values(value).some((v) => v !== null) && result.length < 16) result.push(value);
@@ -65,7 +143,7 @@ async function sha(bytes: Uint8Array): Promise<string> {
   return [...new Uint8Array(await crypto.subtle.digest('SHA-256', copy))]
     .map((byte) => byte.toString(16).padStart(2, '0')).join('');
 }
-async function textEvidence(text: string) {
+async function textEvidence(text: string, scoped: readonly string[] = []) {
   const tail = text.slice(-MAX_BYTES);
   const encoded = new TextEncoder().encode(tail);
   const bytes = encoded.slice(-MAX_BYTES);
@@ -75,7 +153,7 @@ async function textEvidence(text: string) {
     readBytes: bytes.length,
     truncated,
     capturedSha256: await sha(bytes),
-    ...records(new TextDecoder().decode(bytes)),
+    ...records(new TextDecoder().decode(bytes), scoped),
   };
 }
 function logReferences(text: string): string[] {
@@ -124,11 +202,15 @@ export async function selectedInvocationLog(
 ) {
   const name = basename(path), match = CLI_LOG.exec(name);
   const start = secondStamp(invocation.startedAt), end = secondStamp(invocation.completedAt);
-  if (
-    !isAbsolute(path) || !inside(resolve(path), resolve(root)) ||
-    !(appHost ? APPHOST_LOG.test(name) : match !== null) ||
-    (!appHost && (!start || !end || match![1] < start || match![1] > end))
-  ) return { status: 'refused' as const };
+  if (!isAbsolute(path) || !inside(resolve(path), resolve(root))) {
+    return { status: 'refused' as const, reason: 'outside_log_scope' as const };
+  }
+  if (!(appHost ? APPHOST_LOG.test(name) : match !== null)) {
+    return { status: 'refused' as const, reason: 'filename_unproven' as const };
+  }
+  if (!appHost && (!start || !end || match![1] < start || match![1] > end)) {
+    return { status: 'refused' as const, reason: 'outside_invocation_window' as const };
+  }
   try {
     const before = await Deno.lstat(path);
     if (
@@ -164,7 +246,7 @@ export async function selectedInvocationLog(
         readBytes: size,
         truncated: opened.size > size,
         capturedSha256: await sha(bytes),
-        ...records(text),
+        ...records(text, invocation.scopedResources, appHost ? invocation : undefined),
         linkedAppHost: appHost
           ? []
           : logReferences(text).filter((value) => APPHOST_LOG.test(basename(value))).slice(0, 2),
@@ -216,15 +298,23 @@ export async function invocationDiagnostic(input: {
     nativeExit: invocation.process === 'database_cli' ? null : invocation.code,
     executorExit: invocation.process === 'database_cli' ? invocation.code : null,
     timedOut: invocation.timedOut ?? false,
+    signalAtSettlement: invocation.signalAtSettlement
+      ? {
+        abortRequested: invocation.signalAtSettlement.abortRequested,
+        deadlineExpired: invocation.signalAtSettlement.deadlineExpired,
+      }
+      : null,
     process: invocation.process ?? 'aspire',
-    reportedRestart: invocation.reportedRestart && NAMES.has(invocation.reportedRestart.resource) &&
+    reportedRestart: invocation.reportedRestart &&
+        diagnosticResourceName(invocation.reportedRestart.resource, invocation.scopedResources) !==
+          null &&
         Number.isInteger(invocation.reportedRestart.exit) && invocation.reportedRestart.exit >= 0 &&
         invocation.reportedRestart.exit <= 255
       ? { resource: invocation.reportedRestart.resource, exit: invocation.reportedRestart.exit }
       : null,
     targetMatches: input.targetMatches,
-    stdout: await textEvidence(invocation.stdout),
-    stderr: await textEvidence(invocation.stderr),
+    stdout: await textEvidence(invocation.stdout, invocation.scopedResources),
+    stderr: await textEvidence(invocation.stderr, invocation.scopedResources),
     log: safeLog,
     linkedState: linked.length === 0
       ? 'missing_reference'

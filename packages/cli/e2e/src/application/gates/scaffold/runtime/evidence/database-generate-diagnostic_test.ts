@@ -227,3 +227,49 @@ Deno.test('documented command keeps successful output and original native reject
   assertEquals(calls, 2);
   assertEquals(collections, 1);
 });
+
+Deno.test('database evidence binds a generated consumer name to the actual run scope', async () => {
+  const scoped: RunContext = {
+    ...context,
+    request: {
+      ...context.request,
+      options: { ...context.request.options, projectName: 'synthetic-smoke' },
+    },
+  };
+  const name = 'synthetic-smoke-web';
+  const text =
+    `Database client generated, but ${name} restart failed (Aspire exit 16).\nRun: aspire resource ${name} restart --apphost ${
+      JSON.stringify(appHost)
+    }`;
+  let reported: unknown;
+  await databaseGenerateEvidence((input) => {
+    reported = input.invocation.reportedRestart;
+    return Promise.resolve();
+  })({
+    context: scoped,
+    result: { command: ['deno'], cwd: '/repo', code: 1, stdout: '', stderr: text, timedOut: false },
+    startedAt: '2026-01-01T23:01:18.000Z',
+    completedAt: '2026-01-01T23:01:47.000Z',
+  });
+  assertEquals(reported, { resource: name, exit: 16 });
+});
+
+Deno.test('generated restart reporting refuses foreign names or another host even with an apparently valid remedy', () => {
+  const scoped = ['synthetic-smoke-web'];
+  const text = (name: string, host: string) =>
+    `Database client generated, but ${name} restart failed (Aspire exit 16).\nRun: aspire resource ${name} restart --apphost ${
+      JSON.stringify(host)
+    }`;
+  assertEquals(reportedRestartFailure(text('synthetic-smoke-web', appHost), appHost, scoped), {
+    resource: 'synthetic-smoke-web',
+    exit: 16,
+  });
+  assertEquals(
+    reportedRestartFailure(text('foreign-smoke-web', appHost), appHost, scoped),
+    undefined,
+  );
+  assertEquals(
+    reportedRestartFailure(text('synthetic-smoke-web', '/foreign/apphost.mts'), appHost, scoped),
+    undefined,
+  );
+});

@@ -103,7 +103,7 @@ export async function saveOwnedInvocationDiagnostics(input: {
         ordinal: index + 1,
         operation: kind === 'cleanup' ? 'stop' : 'restart',
         targetMatches,
-        logRoot: join(input.home, '.aspire', 'cli', 'logs'),
+        logRoot: join(input.home, '.aspire', 'logs'),
         uid: input.uid,
       }),
     );
