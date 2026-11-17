@@ -132,3 +132,10 @@ A single failed-job-only rerun at the same immutable source is justified by the 
 
 
 Final resource cleanup completed after independent evaluation: four exact native container IDs and four recorded anonymous volumes removed after native label/mount verification, maintained read-only leak/teardown preview, and a full unreferenced-volume scan. Final owner/recorded-volume scans zero; every foreign/unproven resource retained. Sanitized leak-report.md records proof; raw logs/identities remain private. Supported SQLite116/116 +showcase8/8, static/native SUCCESS; Postgres-only unchanged-source retry remains pending. No worker source change after independent PASS.
+
+
+## Supported runtime completion and ready transition
+
+Supported full one-pass workflow43984548275 attempt2 SUCCESS at unchanged product source2d7aa10448700b46cb1c2dbb4665044eafb60dfa: Postgres124/124, SQLite116/116 plus showcase8/8, static/native and cleanup assertions intact. The original failed Postgres refresh attempt remains recorded above; exactly one failed-job-only retry passed without a code change or weakened gate. Independent Muse IMPL-EVAL PASS retained, no product delta. Final exact resource scan zero owned containers/recorded volumes; foreign objects retained.
+
+PR2645 now ready for review, status:impl-eval, all9acceptance and final DoD boxes complete. Current non-draft head CI still has pending quality/check-test lanes, so overall task completion is not claimed. Close-gate and browser/command/docs/build lanes passed, other lanes skipped per workflow policy. Final required head checks and review-thread gate remain mandatory; no ready-merge or merge authorization.
