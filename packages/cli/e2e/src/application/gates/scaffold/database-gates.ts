@@ -80,8 +80,18 @@ export function createDatabaseGates(): readonly GateDefinition[] {
       GATE.DATABASE_GENERATE,
       'Generate database clients',
       GATE_PHASE.DATABASE,
-      (context) =>
-        cli(
+      (context) => [
+        'deno',
+        'run',
+        '--allow-all',
+        join(
+          context.project.repoRoot,
+          'packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/database-generate-diagnostic.ts',
+        ),
+        context.project.projectRoot,
+        context.project.appHost,
+        '--',
+        ...cli(
           context,
           'db',
           'generate',
@@ -90,6 +100,7 @@ export function createDatabaseGates(): readonly GateDefinition[] {
           '--db',
           context.request.options.database,
         ),
+      ],
     ),
     commandGate(
       GATE.DATABASE_DEPLOY,

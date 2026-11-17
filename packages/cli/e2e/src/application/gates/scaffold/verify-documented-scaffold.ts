@@ -145,6 +145,7 @@ async function cleanup(repoRoot: string, projectRoot: string): Promise<void> {
     '--allow-read',
     '--allow-write',
     '--allow-run=aspire,docker',
+    '--allow-env=HOME,USERPROFILE',
     join(repoRoot, 'packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts'),
     join(projectRoot, 'aspire/apphost.mts'),
     projectRoot,
