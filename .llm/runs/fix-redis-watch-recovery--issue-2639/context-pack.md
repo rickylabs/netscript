@@ -1,0 +1,21 @@
+# Context pack
+
+Issue2639 on fresh main b0eb07957. Draft bootstrap; product unchanged. Need actual Redis stop/restart red test because issue was code-read only. Feature tier separate PLAN-EVAL before implementation. Restore shared live subscriptions and reread keys after any acknowledged reconnect; bounded terminal typed errors, abort/close/lease cleanup. Existing errors become catchable exports. No Redis Streams or saga transports. Full CLI smoke N/A for internal KV recovery with direct real-server coverage.
+
+Two genuine baseline failures reproduced: server restart after subscriber end leaves existing watch silent; never-restarted server leaves iteration pending past35seconds instead of typed failure. Production remains main. Final plan now pins30-second recovery bound, native acknowledgement before snapshot, shared live-lease restore, cancellable generations and typed error exports. Next separate feature PLAN-EVAL before implementation.
+
+Short-gap oracle also fails on unchanged main: native MULTI kills exactly one real pub/sub connection then SETs the envelope before any resubscription; the next batch times out. This proves reconnect state loss without a mocked backend or a publication race. Total baseline: three distinct failing runtime regressions, no bootstrap failure. Final resource label scan empty.
+
+PLAN-EVAL cycle1 PASS at94a7bb380, comment6927438505, artifact plan-eval.md committed for shared context. No repairs; implementation next per approved protocol. Final independent IMPL-EVAL remains mandatory.
+
+S2 contract committed before recovery implementation: existing typed errors are named root/Redis exports with JSDoc; outage regression uses the public type. Package59file check and doc lint zero pass. Next implement approved connection/subscription/queue recovery and state rereads; existing red tests remain the oracle.
+
+S2 complete: original3real-outage regressions now green; full KV250pass/0fail/2existingignored with actual-server cases enabled. Typed failure/abort/debounce/siblings/prefix/close covered. Native recovery deadline30s from first disconnect, last cause retained, stale generation fenced. New focused watch-fixed-keys.ts reduces adapter747->704lines; S2filecount18<30 drift recorded. Static61file check/lint/fmt/quality, preflight/accuracy, doc lint0 and JSR dry-run pass. Docs describe current-state recovery/typed errors. All owned resources removed. Next commit manual inputs, generate canonical consumers/freshness, independent feature IMPL-EVAL, then current required checks/readiness. No scaffold/Aspire changes: full smoke remains N/A.
+
+S3canonical consumers refreshed: MCP prose/export corpus/publish assets change, CLIbarrel remains current; corpus/publish freshness pass. Source atbfaa29cd6 retains250pass/2existingignored actual-backend full suite and all static/package gates. New commit adds generated carriers/evidence only. Ready for independent feature IMPL-EVAL; acceptance3boxes need linked mirroring and final ready/head checks after evaluation.
+
+Latest final-source correction: per-observer lifetime cancels an in-flight reread when a yielded watch is returned without a caller AbortSignal, preserving shared recovery for siblings/new leases. Genuine local red->green test added before repair. Full KV now251pass/2existingignored (all7new real-server cases enabled), check/lint/fmt/quality pass. No public doc/signature change; corpus/publish freshness recheck after commit. Independent feature IMPL-EVAL next; mark3issue boxes with linked evidence before ready transition.
+
+All generated consumers/freshness and final source gates complete after per-lease correction. Acceptance3boxes checked/evidence linked; PRbodyCloses2639+onefencedYAML3entries; finalDoD/evalpending. Ownership preview0ownedcommands, reviewthreads0/0. Independent feature IMPL-EVAL requested MuseSpark1.3/xhigh via OpenCode Go, separate family/session, sourceea85fb387. Handoff commit is evidence only; retain draft until PASS/currentrequiredchecks.
+
+Independent feature IMPL-EVAL PASS at93bf1a6bc, comment6929229737; full251/0/2 and all10focused cases independently reproduced, source/gates/acceptance allpass. Retain evaluate.md then ready transition and final head checks/threads. Product remains sourceea85fb387; new commit run evidence only.

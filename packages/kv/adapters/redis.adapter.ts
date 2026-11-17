@@ -15,6 +15,7 @@
  */
 
 import { createWatchHandle } from '../application/watch-handle.ts';
+import { KvConnectionError, KvError } from '../application/errors.ts';
 import { createPackageLogger } from '@netscript/logger';
 import { combineAtomicValue } from '../application/atomic-combine.ts';
 import { generateVersionstamp, keyHasPrefix, keyToString } from '../application/keys.ts';
@@ -44,6 +45,7 @@ import { listEntries, scanEntries } from './redis/list-entries.ts';
 import { keyToRedisKey } from './redis/serialization.ts';
 import { WatchBatchQueue } from './redis/watch-batch-queue.ts';
 import { WatchSubscriptions } from './redis/watch-subscriptions.ts';
+import { watchFixedKeys } from './redis/watch-fixed-keys.ts';
 import {
   DEFAULT_REDIS_NAMESPACE,
   DEFAULT_REDIS_URL,
@@ -118,7 +120,7 @@ export class RedisKvAdapter implements WatchableKv {
     const options = (config.options as import('ioredis').RedisOptions | undefined) ?? {};
     this.connection = new RedisConnectionManager(url, options);
     this.subscriptions = new WatchSubscriptions(
-      () => this.connection.ensureSubscriber(),
+      (signal) => this.connection.ensureSubscriber(signal),
       (message) => this.parseWatchMessage(message),
     );
   }
@@ -440,6 +442,7 @@ export class RedisKvAdapter implements WatchableKv {
    * Close the Redis clients owned by the adapter.
    */
   async close(): Promise<void> {
+    this.subscriptions.close();
     await this.connection.close();
   }
 
@@ -467,75 +470,13 @@ export class RedisKvAdapter implements WatchableKv {
     keys: KvKey[],
     options?: WatchOptions,
   ): WatchStream<T> {
-    return createWatchHandle((ready) => this.watchKeys<T>(keys, options, ready));
-  }
-
-  /** Subscribe, acknowledge readiness, and deliver fixed-key batches. */
-  private async *watchKeys<T>(
-    keys: KvKey[],
-    options: WatchOptions | undefined,
-    ready: () => void,
-  ): AsyncIterable<WatchEvent<T>[]> {
-    if (options?.signal?.aborted) return;
-    const channel = this.getWatchChannel();
-    const previousValues = new Map<string, T | null>();
-    const knownVersions = new Map<string, string>();
-    const watchedKeys = new Set(keys.map(keyToString));
-    const queue = new WatchBatchQueue<WatchEvent<T>>();
-    const messageHandler = (data: WatchMessage): void => {
-      const keyStr = keyToString(data.key);
-      if (!watchedKeys.has(keyStr)) {
-        return;
-      }
-      const versionstamp = data.versionstamp ?? generateVersionstamp();
-      if (knownVersions.get(keyStr) === versionstamp) return;
-      knownVersions.set(keyStr, versionstamp);
-      queue.push({
-        key: data.key,
-        previousValue: previousValues.get(keyStr) ?? null,
-        timestamp: new Date(data.timestamp),
-        type: data.type,
-        value: data.value as T | null,
-        versionstamp,
-      });
-      previousValues.set(keyStr, data.value as T | null);
-    };
-    const release = await this.subscriptions.acquire(channel, messageHandler);
-    try {
-      if (options?.signal?.aborted) return;
-      ready();
-      // Messages received during these reads remain queued. A read must not
-      // overwrite the previous value already advanced by a startup message.
-      // Its first previousValue is null: the baseline may already contain that
-      // write (or a newer write), so it cannot establish the preceding value.
-      const entries = await this.getMany<T>(keys);
-      for (const [index, key] of keys.entries()) {
-        const entry = entries[index];
-        const keyStr = keyToString(key);
-        if (!knownVersions.has(keyStr)) previousValues.set(keyStr, entry?.value ?? null);
-      }
-      if (options?.initial && !options.signal?.aborted) {
-        yield keys.map((key, index) => {
-          const entry = entries[index];
-          return {
-            key,
-            timestamp: new Date(),
-            type: entry ? 'set' : 'delete',
-            value: entry?.value ?? null,
-            versionstamp: entry?.versionstamp ?? null,
-            initial: true,
-          };
-        });
-      }
-      while (!options?.signal?.aborted) {
-        const events = await queue.next(options?.debounce, options?.signal);
-        if (events.length > 0 && !options?.signal?.aborted) {
-          yield events;
-        }
-      }
-    } finally {
-      await release();
-    }
+    return createWatchHandle((ready) =>
+      watchFixedKeys<T>(keys, options, ready, {
+        channel: this.getWatchChannel(),
+        subscriptions: this.subscriptions,
+        getMany: (keys) => this.getMany<T>(keys),
+      })
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -575,7 +516,16 @@ export class RedisKvAdapter implements WatchableKv {
         versionstamp,
       });
     };
-    const release = await this.subscriptions.acquire(channel, messageHandler);
+    let release: () => Promise<void>;
+    try {
+      release = await this.subscriptions.acquire(channel, messageHandler, {
+        error: (error) => queue.fail(error),
+        signal: options?.signal,
+      });
+    } catch (error) {
+      if (options?.signal?.aborted) return;
+      throw error;
+    }
     try {
       for await (const entry of this.scanPrefix<T>(prefix)) {
         const keyStr = keyToString(entry.key);
@@ -632,6 +582,7 @@ export class RedisKvAdapter implements WatchableKv {
 
         const seenKeys = new Set<string>();
 
+        await this.subscriptions.waitForRecovery(options?.signal);
         for await (const entry of this.scanPrefix<T>(prefix)) {
           const keyStr = keyToString(entry.key);
           const versionstamp = entry.versionstamp ?? generateVersionstamp();
@@ -668,6 +619,12 @@ export class RedisKvAdapter implements WatchableKv {
         }
         nextScanAt = Date.now() + pollInterval;
       }
+    } catch (error) {
+      if (options?.signal?.aborted) return;
+      throw error instanceof KvError ? error : new KvConnectionError(
+        'Redis prefix watch failed.',
+        { cause: error },
+      );
     } finally {
       await release();
     }

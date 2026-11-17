@@ -108,6 +108,14 @@ persistence configuration.
 
 ## KV
 
+Redis fixed-key watches restore subscriptions and reread current key values after a reconnect,
+including deletes during the gap. Recovery batches can repeat values and coalesce intermediate
+changes; a watch observes state rather than retaining an event history. Recovery is bounded to
+30 seconds from disconnect, after which iteration raises the public `KvConnectionError`.
+Closing the adapter raises `KvClosedError` for active watches; aborting a watch's own signal
+completes it normally. Both error classes are exported by `@netscript/kv` and `@netscript/kv/redis`.
+Prefix-watch discovery continues to use its configured polling interval.
+
 `getKv(config?)` returns a `WatchableKv` bound to the auto-detected backend. Keys are typed tuples,
 values are fully typed, and `KvSetOptions.expireIn` (milliseconds) sets a per-key TTL on every
 adapter. Pass a `SharedKvConfig` to override provider selection on first access.

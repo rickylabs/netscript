@@ -40,5 +40,7 @@ export type {
 
 export { isWatchable } from './types/mod.ts';
 
+export { KvClosedError, KvConnectionError, KvError } from './application/errors.ts';
+
 export { DenoKvAdapter } from './adapters/deno-kv.adapter.ts';
 export { MemoryKvAdapter } from './adapters/memory.adapter.ts';
