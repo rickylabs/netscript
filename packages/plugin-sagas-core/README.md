@@ -423,15 +423,23 @@ append onto an absent head creates an epoch; later appends inherit that epoch th
 compare-and-set. Successful commits define order, and stable `epoch:sequence` ids survive API
 restarts while KV survives.
 
+Publish observations with `feed.append(event, { signal })`. A subscription uses the host's KV and
+cancellation signal; save each printed data id if you need to resume later:
+
 ```typescript
+import type { WatchableKv } from '@netscript/kv';
 import { KvSagaEventFeed } from '@netscript/plugin-sagas-core/adapters';
 
-const feed = new KvSagaEventFeed(kv); // Host-owned WatchableKv with atomic and watch support.
-await feed.append({ type: 'saga:message_received', timestamp: new Date().toISOString() });
-for await (const item of feed.subscribe({ afterId: lastEventId, signal })) {
-  if (item.type === 'event') {
-    lastEventId = item.id;
-    handleEvent(item.event);
+async function printSagaEvents(
+  kv: WatchableKv,
+  signal: AbortSignal,
+  afterId?: string,
+): Promise<void> {
+  const feed = new KvSagaEventFeed(kv);
+  for await (const item of feed.subscribe({ afterId, signal })) {
+    if (item.type === 'event') {
+      console.log(item.id, item.event);
+    }
   }
 }
 ```

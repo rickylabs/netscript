@@ -72,3 +72,12 @@ Fresh separate MuseSpark1.3/xhigh feature IMPL-EVAL PASS at3e5e6745760abac0867c5
 Maintained read-only leak-check and teardown preview followed by positive native creation-label/image/mount proof removed exactly2owned Redis/Garnet containers and2recorded unshared anonymous volumes. Re-scanned every survivor before volume removal; final owner/recorded-volume scans0, maintained post-cleanup leak-check0. All foreign/unproven objects retained; raw private logs not committed.
 
 All4acceptance boxes/body mappings complete. Draft ready transition and final required-head checks/thread gate remain the last completion steps; no merge, ready-merge or publication.
+
+
+## Required-head README fence correction
+
+Ready-head quality caught five unbound names in the new README quick-start. Maintained docs:readme-fences reproduced the failure locally:115checked/0exempt,10typeerrors in5READMEs versus the existing5errors/4README ceiling. The five old diagnostics are known consumer-owned import placeholders outside this PR; the five new ones all came from this example.
+
+Changed the example to a self-contained function with explicit host-owned WatchableKv, caller signal and optional replay id parameters; it prints the actual typed event/id. Append usage stays documented separately. No framework/API/runtime change, no gate/ratchet/exemption changed and no new delegate for this small docs correction. Native fence compilation must return to its exact baseline before refreshed consumers and push. Prior independent runtime/public-surface PASS retained.
+
+README correction validated: docs:readme-fences PASS with115checked/0exempt, exact baseline5consumer-owned import diagnostics across4otherREADMEs, no diagnostic in this README. release:preflight fourPASS and docs:accuracyPASS. No gate/ratchet/exemption change or product source change. Canonical documentation freshness and required new-head CI remain to be confirmed.
