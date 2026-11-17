@@ -270,6 +270,41 @@ rows: [
 [Session lifecycles](/identity-access/session-lifecycles/) shows the HTTP wiring for
 each backend.
 
+## Sign-in rate limits with better-auth
+
+The better-auth backend accepts `auth.rateLimit.customRules` in appsettings:
+
+```json
+{
+  "auth": {
+    "backend": "better-auth",
+    "rateLimit": {
+      "customRules": {
+        "/sign-in/*": { "window": 60, "max": 10 }
+      }
+    }
+  }
+}
+```
+
+`Auth.RateLimit` is the equivalent section when using the capitalized `Auth` group; its nested
+`customRules`, `window` and `max` keys keep the spelling shown above. If both sections exist,
+`auth.rateLimit` takes precedence. The config schema validates positive integer windows (seconds)
+and request counts, plus slash-prefixed paths or wildcard patterns. Paths are relative to
+better-auth's base path: use `/sign-in/*`, without the `/api/auth` prefix. The provider uses the
+first matching custom rule.
+
+With no section, the effective production sign-in default remains **three requests per ten seconds
+per client IP and path**. This endpoint rule takes precedence over better-auth's global `window`
+and `max`; set `customRules` to change it. The section forwards those rules without changing
+production-only enablement or the provider's default in-memory storage, which applies separately
+in each process. Requests without a trusted client IP share a bucket per path.
+
+These are better-auth's own sign-in endpoints. The unified NetScript `signin` endpoint remains
+unsupported on this backend; [session lifecycles](/identity-access/session-lifecycles/#better-auth-mounting-and-header-forwarding)
+describes mounting the provider handler. For a host-created provider, pass the same native rules
+through `createNetscriptBetterAuth({ ..., betterAuthOptions: { rateLimit: { customRules } } })`.
+
 ## How auth integrates with services
 
 The auth plugin signs users in and resolves their sessions. A NetScript service gates its own routes
