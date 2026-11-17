@@ -18,7 +18,11 @@ import type {
 import type { TracedMessageContext } from '@netscript/telemetry/instrumentation';
 import type { Span } from '@netscript/telemetry/tracer';
 import type { WorkerPool, WorkerPoolOptions } from './job-runner-pool.ts';
-import type { WorkerListenerFailureCause, WorkerListenerSnapshot } from './listener-supervisor.ts';
+import type {
+  WorkerListenerFailureCause,
+  WorkerListenerSnapshot,
+  WorkerListenerSupervisor,
+} from './listener-supervisor.ts';
 
 /** Structural validation schema accepted by worker queue triggers. */
 export interface WorkerPayloadSchema {
@@ -233,6 +237,8 @@ export interface WorkerDispatchContext {
 /** Context required by queue-consumer helpers. */
 export interface WorkerQueueContext {
   readonly workerId: string;
+  /** Transfer each newly started listener to its Worker before another initialization await. */
+  readonly onListenerStarted?: (listener: WorkerListenerSupervisor) => void;
   readonly canConsume?: (delivery: MessageContext) => Promise<boolean>;
   readonly registry: WorkerJobRegistry;
   readonly queueTriggers: readonly QueueTriggerConfig[];

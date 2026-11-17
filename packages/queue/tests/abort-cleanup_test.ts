@@ -49,24 +49,39 @@ Deno.test('amqp listener closes connection when stopped', async () => {
   queue['url'] = 'amqp://example';
   queue['queueName'] = 'jobs';
   queue['listening'] = false;
+  const cleanup: string[] = [];
   queue['connection'] = Promise.resolve({
+    on() {},
+    removeListener() {},
+    createChannel: () =>
+      Promise.resolve({
+        on() {},
+        removeListener() {},
+        assertQueue: () => Promise.resolve(),
+        prefetch: () => Promise.resolve(),
+        consume: () => Promise.resolve({ consumerTag: 'owned-consumer' }),
+        cancel: (tag: string) => {
+          cleanup.push(`cancel:${tag}`);
+          return Promise.resolve();
+        },
+        close: () => {
+          cleanup.push('channel-close');
+          return Promise.resolve();
+        },
+      }),
     close: () => {
       closed = true;
+      cleanup.push('connection-close');
       return Promise.resolve();
     },
   });
-  queue['queue'] = {
-    listen: (_handler: unknown, options: { signal: AbortSignal }) =>
-      new Promise<void>((resolve) => {
-        options.signal.addEventListener('abort', () => resolve(), { once: true });
-      }),
-  };
 
   const listening = queue.listen(async () => {});
   await nextTurn();
   await queue.stop();
   await listening;
 
+  assertEquals(cleanup, ['cancel:owned-consumer', 'channel-close', 'connection-close']);
   assertEquals(closed, true);
   assertEquals(queue['listening'], false);
 });

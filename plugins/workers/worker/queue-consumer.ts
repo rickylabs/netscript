@@ -43,6 +43,7 @@ export async function startQueueTriggerListeners(
     );
     supervisors.push(supervisor);
     supervisor.start();
+    context.onListenerStarted?.(supervisor);
   }
   return supervisors;
 }
@@ -72,6 +73,7 @@ export function startTaskQueueListener(
     );
   });
   supervisor.start();
+  queueContext.onListenerStarted?.(supervisor);
   return supervisor;
 }
 

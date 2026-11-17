@@ -215,3 +215,66 @@ Deno.test('stop during initialization is bounded and prevents late listener allo
   worker.pause();
   await assertRejects(() => worker.start(), Error, 'stopped Worker');
 });
+
+for (const beforeAllocation of [true, false]) {
+  Deno.test(`pause ${beforeAllocation ? 'before' : 'after'} trigger allocation stops intake during registry initialization`, async () => {
+    await using kv = new MemoryKvAdapter();
+    const first = Promise.withResolvers<void>();
+    const allowFirst = Promise.withResolvers<void>();
+    const second = Promise.withResolvers<void>();
+    const allowSecond = Promise.withResolvers<void>();
+    let intake: AbortSignal | undefined;
+    const context = recoveryContext(new KvWorkerIdempotencyStore({ kv }), {
+      execute: () => Promise.resolve({ success: true, duration: 1 }),
+    });
+    using _listener = stub(DenoKvAdapter.prototype, 'listen', (_handler, options) => {
+      intake = options?.signal;
+      return new Promise<void>((resolve) => {
+        if (intake?.aborted) resolve();
+        else intake?.addEventListener('abort', () => resolve(), { once: true });
+      });
+    });
+    const worker = new Worker({
+      ...context,
+      drainTimeoutMs: 500,
+      abortGracePeriodMs: 100,
+      queue: new MemoryQueueAdapter(),
+      taskQueue: new MemoryQueueAdapter(),
+      registry: {
+        get: async (id) => {
+          if (id === 'first') {
+            first.resolve();
+            await allowFirst.promise;
+          } else {
+            second.resolve();
+            await allowSecond.promise;
+          }
+          return context.registry.get(id);
+        },
+      },
+      queueTriggers: [{ queueName: 'first', jobId: 'first' }, {
+        queueName: 'second',
+        jobId: 'second',
+      }],
+    });
+    const started = worker.start();
+    try {
+      await bounded(first.promise);
+      if (beforeAllocation) worker.pause();
+      allowFirst.resolve();
+      await bounded(second.promise);
+      if (!beforeAllocation) worker.pause();
+      assert(intake);
+      assertEquals(
+        intake.aborted,
+        true,
+        'New trigger intake stayed live during the held registry lookup.',
+      );
+    } finally {
+      allowFirst.resolve();
+      allowSecond.resolve();
+      await worker.stop();
+      await started;
+    }
+  });
+}

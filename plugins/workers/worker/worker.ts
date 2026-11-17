@@ -253,10 +253,7 @@ export class Worker {
         await Promise.all(triggers.map((listener) => listener.stop()));
         return;
       }
-      this.listenerSupervisors.push(...triggers);
-      this.listenerSupervisors.push(
-        startTaskQueueListener(this.queueContext(), this.dispatchContext()),
-      );
+      startTaskQueueListener(this.queueContext(), this.dispatchContext());
       jobListener = new WorkerListenerSupervisor({
         name: `jobs:${this.queueName}`,
         abortSignal: this.abortController.signal,
@@ -435,6 +432,10 @@ export class Worker {
       queueTriggers: this.queueTriggers,
       triggerQueues: this.triggerQueues,
       canConsume: (delivery) => this.admit(delivery),
+      onListenerStarted: (listener) => {
+        this.listenerSupervisors.push(listener);
+        if (this.lifecycle !== 'running') void listener.pause().catch(() => {});
+      },
       abortController: this.abortController,
       taskQueue: this.suppliedTaskQueue,
       listenerMaxRestarts: this.listenerMaxRestarts,
