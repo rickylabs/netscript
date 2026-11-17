@@ -1,4 +1,6 @@
+import { saveOwnedInvocationDiagnostics } from './owned-invocation-diagnostic.ts';
 import { basename, dirname, isAbsolute, relative, resolve } from '@std/path';
+import { type CapturedInvocation, withInvocationEvidence } from './invocation-diagnostic.ts';
 
 export const ASPIRE_MOUNTS = 'com.microsoft.developer.usvc-dev.mountsLabel';
 export const ASPIRE_CREATOR_PID = 'com.microsoft.developer.usvc-dev.creatorProcessId';
@@ -182,64 +184,99 @@ export async function stopAndProbe(
   projectRoot: string,
   cleanup: boolean,
   receiptPath: string,
+  options: {
+    readonly runnerRoot?: string;
+    readonly run?: typeof capture;
+    readonly wait?: (ms: number) => Promise<void>;
+    readonly diagnostic?: (
+      transcripts: readonly CapturedInvocation[],
+      evaluation?: PostStopProbeEvaluation,
+    ) => Promise<void>;
+  } = {},
 ): Promise<void> {
-  const commands: (readonly string[])[] = [
-    stopCommand(appHost, false),
-    ...(cleanup ? [stopCommand(appHost, true)] : []),
-  ];
-  const transcripts = [];
-  for (const command of commands) {
-    transcripts.push(await capture(command[0] ?? 'aspire', command.slice(1)));
-  }
-  const idsOutput = await requireSuccess('docker', ['ps', '-aq']);
-  const vanishedContainerIds = new Set<string>();
-  const initialInspection = await inspectAllContainers();
-  initialInspection.vanishedContainerIds.forEach((id) => vanishedContainerIds.add(id));
-  // Container teardown is asynchronous to `aspire stop`, so a first probe can observe a container
-  // that is already on its way out. Re-probe with one forced exact-AppHost stop between attempts,
-  // bounded, retaining every observation as evidence.
-  let observedContainers = initialInspection.containers;
-  const { evaluation, attempts } = await resolveOwnedSurvivors(
-    async () => {
-      const inspection = await inspectAllContainers();
-      observedContainers = inspection.containers;
-      inspection.vanishedContainerIds.forEach((id) => vanishedContainerIds.add(id));
-      return evaluatePostStopProbe(
-        { appHost, projectRoot, containers: observedContainers, processes: [] },
-        projectRoot,
-      );
-    },
-    async () => {
-      const forced = stopCommand(appHost, true);
-      transcripts.push(await capture(forced[0] ?? 'aspire', forced.slice(1)));
-      commands.push(forced);
-    },
-    (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
-  );
-  const receipt = {
-    appHost,
-    cleanup,
-    commands,
-    transcripts,
-    docker: {
-      ids: idsOutput,
-      containers: observedContainers,
-      vanishedContainerIds: [...vanishedContainerIds],
-    },
-    survivorAttempts: attempts,
-    evaluation,
-  };
-  await Deno.mkdir(dirname(receiptPath), { recursive: true });
-  await Deno.writeTextFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
-  assertNoOwnedSurvivors(evaluation);
-  const terminalStop = transcripts.at(-1);
-  if (!terminalStop || terminalStop.code !== 0) {
-    throw new Error(
-      `Aspire stop did not complete: ${
-        terminalStop?.stderr || terminalStop?.stdout || 'no transcript'
-      }`,
+  const run = options.run ?? capture;
+  const transcripts: CapturedInvocation[] = [];
+  let finalEvaluation: PostStopProbeEvaluation | undefined;
+  await withInvocationEvidence(async () => {
+    const commands: (readonly string[])[] = [
+      stopCommand(appHost, false),
+      ...(cleanup ? [stopCommand(appHost, true)] : []),
+    ];
+    for (const command of commands) {
+      transcripts.push(await run(command[0] ?? 'aspire', command.slice(1)));
+    }
+    const idsOutput = await requireSuccess('docker', ['ps', '-aq'], run);
+    const vanishedContainerIds = new Set<string>();
+    const initialInspection = await inspectAllContainers(run);
+    initialInspection.vanishedContainerIds.forEach((id) => vanishedContainerIds.add(id));
+    // Container teardown is asynchronous to `aspire stop`, so a first probe can observe a container
+    // that is already on its way out. Re-probe with one forced exact-AppHost stop between attempts,
+    // bounded, retaining every observation as evidence.
+    let observedContainers = initialInspection.containers;
+    const { evaluation, attempts } = await resolveOwnedSurvivors(
+      async () => {
+        const inspection = await inspectAllContainers(run);
+        observedContainers = inspection.containers;
+        inspection.vanishedContainerIds.forEach((id) => vanishedContainerIds.add(id));
+        return evaluatePostStopProbe(
+          { appHost, projectRoot, containers: observedContainers, processes: [] },
+          projectRoot,
+        );
+      },
+      async () => {
+        const forced = stopCommand(appHost, true);
+        transcripts.push(await run(forced[0] ?? 'aspire', forced.slice(1)));
+        commands.push(forced);
+      },
+      options.wait ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms))),
     );
-  }
+    finalEvaluation = evaluation;
+    const receipt = {
+      appHost,
+      cleanup,
+      commands,
+      transcripts,
+      docker: {
+        ids: idsOutput,
+        containers: observedContainers,
+        vanishedContainerIds: [...vanishedContainerIds],
+      },
+      survivorAttempts: attempts,
+      evaluation,
+    };
+    await Deno.mkdir(dirname(receiptPath), { recursive: true });
+    await Deno.writeTextFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
+    assertNoOwnedSurvivors(evaluation);
+    const terminalStop = transcripts.at(-1);
+    if (!terminalStop || terminalStop.code !== 0) {
+      throw new Error(
+        `Aspire stop did not complete: ${
+          terminalStop?.stderr || terminalStop?.stdout || 'no transcript'
+        }`,
+      );
+    }
+  }, async () => {
+    if (options.diagnostic) return await options.diagnostic(transcripts, finalEvaluation);
+    const home = Deno.env.get('HOME') ?? Deno.env.get('USERPROFILE');
+    const uid = (await Deno.stat(projectRoot)).uid;
+    if (!home || uid === null) throw new Error('diagnostic_owner_unavailable');
+    await saveOwnedInvocationDiagnostics({
+      projectRoot,
+      appHost,
+      kind: 'cleanup',
+      runnerRoot: options.runnerRoot,
+      home,
+      uid,
+      transcripts,
+      survivorCounts: finalEvaluation
+        ? {
+          ownedContainers: finalEvaluation.ownedContainers.length,
+          foreignContainers: finalEvaluation.foreignContainers.length,
+          unprovenContainers: finalEvaluation.unprovenContainers.length,
+        }
+        : undefined,
+    });
+  });
 }
 
 /** Inspect every container currently known to Docker, so each probe sees the present state. */
@@ -287,13 +324,16 @@ export function stopCommand(appHost: string, force: boolean): readonly string[] 
 async function capture(
   command: string,
   args: readonly string[],
-): Promise<{ readonly code: number; readonly stdout: string; readonly stderr: string }> {
+): Promise<CapturedInvocation> {
+  const startedAt = new Date().toISOString();
   const output = await new Deno.Command(command, {
     args: [...args],
     stdout: 'piped',
     stderr: 'piped',
   }).output();
   const result = {
+    startedAt,
+    completedAt: new Date().toISOString(),
     code: output.code,
     stdout: new TextDecoder().decode(output.stdout),
     stderr: new TextDecoder().decode(output.stderr),
@@ -378,9 +418,9 @@ function record(value: unknown, label: string): Record<string, unknown> {
 }
 
 if (import.meta.main) {
-  const [appHost, projectRoot, cleanupValue, receiptPath] = Deno.args;
+  const [appHost, projectRoot, cleanupValue, receiptPath, runnerRoot] = Deno.args;
   if (!appHost || !projectRoot || !cleanupValue || !receiptPath) {
     throw new Error('cleanup requires AppHost, project root, cleanup boolean, and receipt path');
   }
-  await stopAndProbe(appHost, projectRoot, cleanupValue === 'true', receiptPath);
+  await stopAndProbe(appHost, projectRoot, cleanupValue === 'true', receiptPath, { runnerRoot });
 }

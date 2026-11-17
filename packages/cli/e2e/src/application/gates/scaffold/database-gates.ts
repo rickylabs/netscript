@@ -1,3 +1,4 @@
+import { databaseGenerateEvidence } from './runtime/evidence/database-generate-diagnostic.ts';
 import { join } from '@std/path';
 import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
@@ -76,21 +77,24 @@ export function createDatabaseGates(): readonly GateDefinition[] {
       ],
       (context) => context.project.projectRoot,
     ),
-    commandGate(
-      GATE.DATABASE_GENERATE,
-      'Generate database clients',
-      GATE_PHASE.DATABASE,
-      (context) =>
-        cli(
-          context,
-          'db',
-          'generate',
-          '--project-root',
-          context.project.projectRoot,
-          '--db',
-          context.request.options.database,
-        ),
-    ),
+    {
+      ...commandGate(
+        GATE.DATABASE_GENERATE,
+        'Generate database clients',
+        GATE_PHASE.DATABASE,
+        (context) =>
+          cli(
+            context,
+            'db',
+            'generate',
+            '--project-root',
+            context.project.projectRoot,
+            '--db',
+            context.request.options.database,
+          ),
+      ),
+      afterCommand: databaseGenerateEvidence(),
+    },
     commandGate(
       GATE.DATABASE_DEPLOY,
       'Apply pending migrations without creating one',
