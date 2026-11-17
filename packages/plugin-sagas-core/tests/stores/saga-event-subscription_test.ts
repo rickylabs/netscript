@@ -256,6 +256,40 @@ Deno.test('abort during readiness and head IO releases watch without closing sha
   }
 });
 
+Deno.test('watch failure after readiness wakes an idle reader instead of silently hanging', async () => {
+  await using kv = await storage('memory');
+  const watch = kv.watch.bind(kv);
+  const end = Promise.withResolvers<void>();
+  using ended = stub(
+    kv,
+    'watch',
+    <T>(
+      keys: Parameters<typeof kv.watch>[0],
+      options?: Parameters<typeof kv.watch>[1],
+    ): WatchStream<T> => ({
+      async *[Symbol.asyncIterator]() {
+        for await (const batch of watch<T>(keys, options)) {
+          yield batch;
+          await end.promise;
+          throw new Error('subscriber terminated');
+        }
+      },
+    }),
+  );
+  const reader = new KvSagaEventFeed(kv).subscribe();
+  try {
+    await next(reader);
+    const blocked = next(reader);
+    end.resolve();
+    const failure = await assertRejects(() => blocked, SagaEventFeedError);
+    assertEquals(failure.reason, 'unavailable');
+    assertEquals(ended.calls.length, 1);
+  } finally {
+    end.resolve();
+    await reader.return(undefined);
+  }
+});
+
 Deno.test('unsupported custom KV capabilities fail explicitly', async () => {
   await using kv = await storage('memory');
   Reflect.set(kv, 'atomic', undefined);

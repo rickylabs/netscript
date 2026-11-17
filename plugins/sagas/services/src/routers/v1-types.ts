@@ -79,6 +79,8 @@ export type SagaPublishEventWriter = (
 
 /** Options used when publishing one contract message through the saga runtime. */
 export type PublishSagaMessageOptions = Readonly<{
+  /** Request cancellation limits waiting; accepted runtime work is not rolled back. */
+  signal?: AbortSignal;
   /** Started runtime used to route the message. */
   runtime: SagaServiceRuntime;
   /** Optional event writer used by tests or alternate transports. */
