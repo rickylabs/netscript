@@ -1,3 +1,3 @@
 # Drift
 
-None. Product source unchanged at bootstrap. Proposed journal direction is not yet an approved implementation. Four issue acceptance criteria remain unchecked.
+Independent feature PLAN-EVAL PASS at224e8370, comment6934760031. No design change. Epoch wording explicitly pins first-append minting and later CAS inheritance. Closing keyword/evidence remain deferred until all acceptance is proven, per close-gate policy. Native error-frame distinctions remain mandatory tests. No product implementation preceded PASS.

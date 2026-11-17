@@ -414,3 +414,32 @@ delegate's exact guarantees.
 Scheduled and cascaded effects still dispatch after the transition commit. Recovery across a crash
 in that later window requires the separate `SagaOutboxPort` dispatcher follow-up tracked by #2159.
 This state/replay change does not claim recoverable delivery of those effects.
+
+## Ordered observation feed
+
+`KvSagaEventFeed` from `@netscript/plugin-sagas-core/adapters` provides the API's portable KV
+observation journal. It retains the latest 256 events in 256 slots plus one head key. The first
+append onto an absent head creates an epoch; later appends inherit that epoch through an atomic
+compare-and-set. Successful commits define order, and stable `epoch:sequence` ids survive API
+restarts while KV survives.
+
+```typescript
+import { KvSagaEventFeed } from '@netscript/plugin-sagas-core/adapters';
+
+const feed = new KvSagaEventFeed(kv); // Host-owned WatchableKv with atomic and watch support.
+await feed.append({ type: 'saga:message_received', timestamp: new Date().toISOString() });
+for await (const item of feed.subscribe({ afterId: lastEventId, signal })) {
+  if (item.type === 'event') {
+    lastEventId = item.id;
+    handleEvent(item.event);
+  }
+}
+```
+
+Without `afterId`, subscriptions start live after their ready barrier. With a retained id, they
+replay later events then continue live. Ready items carry no event id. Each reader has its own
+cursor; reading never removes another reader's history. Falling behind the global 256-event window
+raises `SagaEventFeedError` with reason `history-lost`; malformed or future ids raise
+`invalid-cursor`. Obtain a fresh application snapshot before subscribing without the old cursor.
+Cancellation closes only the subscription, leaving the host's KV open. This observation journal
+is separate from durable saga runtime acceptance and follows the configured KV's durability.
