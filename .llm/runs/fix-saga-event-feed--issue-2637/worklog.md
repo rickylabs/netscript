@@ -7,3 +7,8 @@ Issue2637 read in full. Fresh origin/main b0eb079575968e843b781579673c9fe2ae250e
 MCP guidance/search consulted, then native deno doc and focused current-main source. Existing subscribe assigns per-connection ids, calls watchPrefix with100ms polling and deletes events after yield; publish writes random per-event keys. Native oRPC ProcedureHandlerOptions includes lastEventId, so header resume can use the upstream seam. Existing portable KV atomic/fixed-key watch(initial:true)/ready capabilities inspected before designing a replacement.
 
 Next: genuine HTTP fanout/slow-reader/resume and idle-scan red oracles on unchanged product source; finalize retention/cursor/backend/failure decisions and per-slice file groups, then feature PLAN-EVAL. Do not edit transports or use Redis Streams. Worker implementation in PR2645 has independent PASS and no further source changes; its supported external Postgres-only rerun remains pending.
+
+
+## Red HTTP oracles on unchanged product source
+
+Structured event-feed-http_test.ts:0pass/4fail/0ignored. Fast-client control sees all six events, concurrent paused reader times out; resident sees all three, native Last-Event-ID reconnect misses consumed events; idle native KV list spy sees4calls/350ms;300HTTP200publications leave300keys. Real Hono/oRPC/nativeDenoKV and production event writer, no mocked log/watch/runner path. All readers/controllers/KV closed. Fixed only a test timer type before behavioral execution; not counted as product red. Main source still unchanged. Measured doc-lint baseline core7/plugin30 with exact per-entrypoint counts private, no new diagnostics permitted.
