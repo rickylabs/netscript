@@ -173,3 +173,35 @@ Deno.test('append abort abandons backend IO without closing host KV or retrying'
   assertEquals(closes.calls.length, 0);
   pending.reject(new Error('late native failure'));
 });
+
+for (const backend of backends.filter((name) => name === 'redis' || name === 'garnet')) {
+  Deno.test(`event feed ${backend}: independent native clients share commit order and fanout`, async () => {
+    const namespace = `saga-multi-client-${crypto.randomUUID()}`;
+    await using firstKv = await storage(backend, namespace);
+    await using secondKv = await storage(backend, namespace);
+    const first = new KvSagaEventFeed(firstKv);
+    const second = new KvSagaEventFeed(secondKv);
+    const firstReader = first.subscribe();
+    const secondReader = second.subscribe();
+    try {
+      await next(firstReader);
+      await next(secondReader);
+      const written = await Promise.all(
+        Array.from({ length: 32 }, (_, i) => (i % 2 ? first : second).append(event(i))),
+      );
+      const ordered = [...written].sort((a, b) =>
+        Number(a.id.split(':')[1]) - Number(b.id.split(':')[1])
+      );
+      assertEquals(new Set(ordered.map((entry) => entry.id)).size, 32);
+      assertEquals(new Set(ordered.map((entry) => entry.id.split(':')[0])).size, 1);
+      for (const [i, entry] of ordered.entries()) {
+        assertEquals(Number(entry.id.split(':')[1]), i + 1);
+        assertEquals(await next(firstReader), { type: 'event', ...entry });
+        assertEquals(await next(secondReader), { type: 'event', ...entry });
+      }
+    } finally {
+      await firstReader.return(undefined);
+      await secondReader.return(undefined);
+    }
+  });
+}

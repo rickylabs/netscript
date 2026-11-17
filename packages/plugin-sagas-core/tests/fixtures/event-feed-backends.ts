@@ -9,14 +9,17 @@ export const backends: readonly string[] = [
   ...(Deno.env.get('NETSCRIPT_TEST_GARNET_URL') ? ['garnet'] : []),
 ];
 
-export async function storage(backend: string): Promise<WatchableKv> {
+export async function storage(
+  backend: string,
+  namespace = `saga-feed-${crypto.randomUUID()}`,
+): Promise<WatchableKv> {
   if (backend === 'memory') return new MemoryKvAdapter();
   if (backend === 'deno-kv') return new DenoKvAdapter(await Deno.openKv(':memory:'));
   const url = Deno.env.get(
     backend === 'redis' ? 'NETSCRIPT_TEST_REDIS_URL' : 'NETSCRIPT_TEST_GARNET_URL',
   );
   if (!url) throw new Error(`Missing real ${backend} service`);
-  return new RedisKvAdapter({ url, namespace: `saga-feed-${crypto.randomUUID()}` });
+  return new RedisKvAdapter({ url, namespace });
 }
 
 export function event(ordinal: number, payload = ''): SagaSSEEvent {
