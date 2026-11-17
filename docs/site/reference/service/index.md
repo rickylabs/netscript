@@ -237,6 +237,20 @@ Generated service scaffolds leave `hostname` unset. Inside a container, a loopba
 the service unreachable through its published ports, so narrow the bind per service, where you know
 who must reach it.
 
+### Shutdown and process ownership
+
+OS-signal shutdown through `serve()` exits with `0` after a clean drain, `1` after a runtime or
+cleanup failure, and `2` after a deadline. `drainTimeoutMs` defaults to `30_000` ms total, including
+`min(5_000, drainTimeoutMs / 5)` reserved for resource cleanup. At defaults this is 25 seconds of
+work drain and five seconds of cleanup; `cleanupTimeoutMs` adjusts that reservation within the same
+total. `onCleanup` callbacks are attempted even if a work-drain hook times out.
+
+The process edge calls `closeKv()` and disconnects each already-acquired database identity
+registered by `withDatabase()` once. If an explicit host cleanup already owns the database, set
+`disposeDatabaseOnSignal: false`. Manual `stop()` and external cancellation preserve the embedding
+process and its shared resources. Use `handleSignals: false` for one host-owned signal coordinator,
+or `exitOnSignal: false` when the host owns termination and resource disposal.
+
 ## Service surface types
 
 | Symbol | Kind | Description |

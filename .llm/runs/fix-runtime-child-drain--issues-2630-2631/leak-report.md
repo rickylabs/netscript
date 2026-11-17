@@ -1,0 +1,5 @@
+# Resource inspection
+
+Two full scaffold.runtime attempts were made. First: PostgreSQL loopback reachability failed, cleanup.aspire-stop passed. Second: an owned-only temporary bridge proved PostgreSQL, Redis, Garnet and affected service/worker health, but plugin doctor explicitly rejected remote Docker. That is partial evidence, not a full smoke PASS. The bridge attachment also prevented one persistent-network cleanup, so its failure remains recorded.
+
+The bridge and exact diagnostic AppHost are stopped. Read-only leak reporting and teardown preview were repeated with the absolute worktree root, storing raw operational receipts outside the public run. Preview planned one positively attributed diagnostic PostgreSQL container removal; apply removed exactly that container and no processes/AppHosts. Exit 4 reflects 40 foreign or unknown-owner entries left untouched. Subsequent Docker identity scans found zero containers with owned-root mounts and zero uniquely labelled bridge containers. No operator paths, hostnames, ports or process identities are retained here.

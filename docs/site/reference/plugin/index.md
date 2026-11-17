@@ -473,7 +473,7 @@ default; the factory does not merge another policy into it.
 | `PluginHealthSummary` | interface | Plugin identity, declared names, per-resource states, and one canonical verdict. |
 | `ChildHealthMonitor` | class | Tracks readiness and bounded restart history with an injectable clock. |
 | `childHealthResponse` | function | Returns HTTP 200 only for ready with both readiness checks complete; otherwise 503. |
-| `runChildHealthProcess` | function | Starts health before bootstrap; fatal errors log and exit nonzero after a one-second red health grace. |
+| `runChildHealthProcess` | function | Starts loopback health before bootstrap; drains owned resources and exits 0 clean, 1 failed or 2 timed out. |
 
 Workers, triggers, and sagas runtime entrypoints also re-export the shared health types. The child
 health payload is bounded and excludes raw exception messages and stacks. Dependency readiness

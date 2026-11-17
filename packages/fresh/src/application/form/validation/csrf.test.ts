@@ -46,3 +46,12 @@ Deno.test('readCsrfToken reads the token from request cookies', () => {
 
   assertEquals(readCsrfToken(request), 'csrf-1');
 });
+
+Deno.test('readCsrfToken treats malformed Cookie headers as a missing token', () => {
+  for (const cookie of ['', '=x', 'a=1;=x', `${CSRF_COOKIE_NAME}=csrf-1;=x`]) {
+    const request = new Request('https://example.com/forms', { headers: { cookie } });
+
+    assertEquals(readCsrfToken(request), undefined, `Cookie: ${cookie}`);
+  }
+  assertEquals(readCsrfToken(new Request('https://example.com/forms')), undefined);
+});

@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert@^1';
+import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 
 import { type PublishMessageInput, PublishMessageInputSchema } from '../../contracts/v1/mod.ts';
 import { publishSagaMessage } from '../../services/src/routers/v1-handlers.ts';
@@ -88,3 +88,53 @@ class RecordingRuntime {
     return Promise.resolve(this.#result);
   }
 }
+
+Deno.test('publish cancellation before runtime acceptance prevents both runtime and event writes', async () => {
+  const controller = new AbortController();
+  controller.abort(new Error('cancel publish'));
+  let calls = 0;
+  await assertRejects(
+    () =>
+      publishSagaMessage({ type: 'probe' }, {
+        runtime: {
+          publish: () => {
+            calls++;
+            return Promise.resolve();
+          },
+        },
+        writeEvent: () => {
+          calls++;
+          return Promise.resolve();
+        },
+        signal: controller.signal,
+      }),
+    Error,
+    'cancel publish',
+  );
+  assertEquals(calls, 0);
+});
+
+Deno.test('publish cancellation abandons an injected writer after runtime acceptance', async () => {
+  const controller = new AbortController();
+  const entered = Promise.withResolvers<void>();
+  const pending = Promise.withResolvers<void>();
+  let accepted = false;
+  const operation = publishSagaMessage({ type: 'probe' }, {
+    runtime: {
+      publish: () => {
+        accepted = true;
+        return Promise.resolve();
+      },
+    },
+    writeEvent: () => {
+      entered.resolve();
+      return pending.promise;
+    },
+    signal: controller.signal,
+  });
+  await entered.promise;
+  controller.abort(new Error('stop event wait'));
+  await assertRejects(() => operation, Error, 'stop event wait');
+  assertEquals(accepted, true);
+  pending.reject(new Error('late native writer failure'));
+});

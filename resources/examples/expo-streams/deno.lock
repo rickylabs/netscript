@@ -462,7 +462,8 @@
           "jsr:@netscript/plugin-workers-core@0.0.9",
           "jsr:@netscript/service@0.0.9",
           "jsr:@netscript/telemetry@0.0.9",
-          "jsr:@std/assert@1"
+          "jsr:@std/assert@1",
+          "jsr:@std/async@1"
         ]
       },
       "jsr:@netscript/plugin-sagas@0.0.9": {

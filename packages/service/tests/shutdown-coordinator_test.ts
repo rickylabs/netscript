@@ -108,3 +108,46 @@ Deno.test('shutdown coordinator reports hook timeout without hanging', async () 
   assertEquals(report.timedOut, true);
   assertEquals(report.hooks, [{ ok: false, error: 'shutdown hook timed out' }]);
 });
+
+Deno.test('signal shutdown reserves cleanup after a hung work hook and attempts every cleanup', async () => {
+  const calls: string[] = [];
+  const coordinator = new ServiceShutdownCoordinator({
+    controller: new AbortController(),
+    shutdownServer: () => Promise.resolve(),
+    awaitServerFinished: () => Promise.resolve(),
+    hooks: [() => new Promise<void>(() => {})],
+    cleanups: [
+      () => {
+        calls.push('first');
+      },
+      () => {
+        calls.push('hung');
+        return new Promise<void>(() => {});
+      },
+      () => {
+        calls.push('failed');
+        throw new Error('cleanup failure');
+      },
+    ],
+    drainTimeoutMs: 100,
+    cleanupTimeoutMs: 50,
+  });
+  const report = await coordinator.runShutdown('signal', 'SIGTERM');
+  assertEquals(calls, ['failed', 'hung', 'first']);
+  assertEquals(report.timedOut, true);
+  assertEquals(report.hooks.filter((hook) => !hook.ok).length, 3);
+});
+
+Deno.test('manual shutdown leaves process-owned cleanup to its embedding host', async () => {
+  let cleaned = false;
+  const coordinator = new ServiceShutdownCoordinator({
+    controller: new AbortController(),
+    shutdownServer: () => Promise.resolve(),
+    awaitServerFinished: () => Promise.resolve(),
+    cleanups: [() => {
+      cleaned = true;
+    }],
+  });
+  await coordinator.runShutdown('manual');
+  assertEquals(cleaned, false);
+});

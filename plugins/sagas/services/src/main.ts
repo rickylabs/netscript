@@ -85,7 +85,7 @@ export default async function createSagasService(
     },
     context: () => ({ ...query.context, sagaRuntime: sagaPublisher }),
     onShutdown: [() => sagaPublisher.stop()],
-  }).serve();
+  }).serve({ onCleanup: ctx.dispose ? [ctx.dispose] : [], disposeDatabaseOnSignal: !ctx.dispose });
 
   queueMicrotask(async () => {
     try {

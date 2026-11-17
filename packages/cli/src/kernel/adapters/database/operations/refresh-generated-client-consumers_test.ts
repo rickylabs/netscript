@@ -409,3 +409,32 @@ Deno.test('app restart and health failures propagate the exact scoped remedy', a
     }
   }
 });
+
+for (const diagnosticStream of ['stderr', 'stdout'] as const) {
+  Deno.test(`consumer restart failure retains Aspire exit code and ${diagnosticStream}`, async () => {
+    const f = await fixture();
+    const diagnostic = 'Native restart detail: child stop exceeded its process timeout.';
+    const executor: RefreshGeneratedClientConsumersOptions['executor'] = {
+      ...f.options.executor,
+      output: (args, command) =>
+        args[2] === 'restart'
+          ? Promise.resolve({
+            code: 17,
+            stdout: diagnosticStream === 'stdout' ? diagnostic : '',
+            stderr: diagnosticStream === 'stderr' ? diagnostic : '',
+          })
+          : f.options.executor.output(args, command),
+    };
+    try {
+      const error = await assertRejects(
+        () => refreshGeneratedClientConsumers({ ...f.options, executor }),
+        Error,
+        diagnostic,
+      );
+      assertEquals(error.message.includes('exit 17'), true);
+      assertEquals(error.message.includes('aspire resource orders restart --apphost'), true);
+    } finally {
+      await Deno.remove(f.root, { recursive: true });
+    }
+  });
+}

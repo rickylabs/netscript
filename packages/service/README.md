@@ -218,6 +218,25 @@ and a real browser session round trip are follow-up scope of
 
 ## Runtime shutdown
 
+A service started through `serve()` owns its installed OS signal handlers by default. After a signal
+it drains requests and shutdown hooks, closes shared KV/Redis and the database clients registered by
+`withDatabase()`, then exits explicitly: `0` clean, `1` failed, `2` timed out. Database aliases are
+deduplicated by object identity. `defineService()` and `createPluginService()` inherit this behavior
+from the raw builder.
+
+`drainTimeoutMs` is the total shutdown budget (default `30_000` ms). Process-owned signals reserve
+`min(5_000, drainTimeoutMs / 5)` for resource cleanup, leaving 25 seconds of work drain and five
+seconds of cleanup at the defaults. `cleanupTimeoutMs` changes that reserved portion without
+extending the total. `onCleanup` supplies additional resource callbacks that are attempted even if a
+work-drain hook hangs. When a callback already disposes the database, set
+`disposeDatabaseOnSignal: false` to avoid also invoking the automatic database disposer.
+
+`running.stop()` and an external `signal` stop the listener without terminating the host or closing
+process-owned shared resources. For multiple embedded runtimes, use `handleSignals: false` and one
+host-owned signal handler, or `exitOnSignal: false` to retain process ownership. Register any
+host-owned manual-stop teardown explicitly.
+
+
 Compose every in-process runtime behind one bounded shutdown handle without replacing its own drain:
 
 ```ts

@@ -76,3 +76,41 @@ export type SagasErrorOptions = Readonly<{
   retryable?: boolean;
   cause?: unknown;
 }>;
+
+/** Why an event subscription cannot continue from its requested cursor. */
+export type SagaEventFeedFailure = 'invalid-cursor' | 'history-lost' | 'unavailable';
+
+/** Context for a failed event append or subscription. */
+export type SagaEventFeedErrorOptions = Readonly<{
+  /** Stable classification for presentation and recovery. */
+  reason: SagaEventFeedFailure;
+  /** Oldest retained event id, when history is available. */
+  oldestId?: string;
+  /** Latest committed event id, when history is available. */
+  latestId?: string;
+  /** Original backend failure, if any. */
+  cause?: unknown;
+}>;
+
+/** A cursor gap, invalid cursor, or unavailable saga observation journal. */
+export class SagaEventFeedError extends SagasError {
+  /** Stable classification; history loss requires a fresh application snapshot. */
+  readonly reason: SagaEventFeedFailure;
+  /** Oldest retained event id, when known. */
+  readonly oldestId?: string;
+  /** Latest committed event id, when known. */
+  readonly latestId?: string;
+
+  /** Create an error without conflating a replay gap with malformed input. */
+  constructor(message: string, options: SagaEventFeedErrorOptions) {
+    super(message, {
+      code: options.reason === 'unavailable' ? 'SAGA_RETRYABLE' : 'SAGA_VALIDATION_FAILED',
+      retryable: options.reason === 'unavailable',
+      cause: options.cause,
+    });
+    this.name = 'SagaEventFeedError';
+    this.reason = options.reason;
+    this.oldestId = options.oldestId;
+    this.latestId = options.latestId;
+  }
+}
