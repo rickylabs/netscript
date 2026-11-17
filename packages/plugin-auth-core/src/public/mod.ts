@@ -59,6 +59,8 @@ export type {
   AuthConfig,
   AuthConfigInput,
   AuthProviderConfig,
+  AuthRateLimitConfig,
+  AuthRateLimitRule,
   AuthSessionPolicy,
 } from '../config/mod.ts';
 export { authContract, authContractV1 } from '../contracts/v1/mod.ts';
