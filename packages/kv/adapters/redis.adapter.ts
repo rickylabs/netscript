@@ -15,7 +15,11 @@
  */
 
 import { createWatchHandle } from '../application/watch-handle.ts';
-import { KvConnectionError, KvError } from '../application/errors.ts';
+import {
+  KvAtomicCommitUnconfirmedError,
+  KvConnectionError,
+  KvError,
+} from '../application/errors.ts';
 import { createPackageLogger } from '@netscript/logger';
 import { combineAtomicValue } from '../application/atomic-combine.ts';
 import { generateVersionstamp, keyHasPrefix, keyToString } from '../application/keys.ts';
@@ -41,6 +45,7 @@ import {
   type WatchMessage,
 } from './redis/codec.ts';
 import { RedisConnectionManager } from './redis/connection.ts';
+import { assertRedisAtomicResult } from './redis/atomic-result.ts';
 import { listEntries, scanEntries } from './redis/list-entries.ts';
 import { keyToRedisKey } from './redis/serialization.ts';
 import { WatchBatchQueue } from './redis/watch-batch-queue.ts';
@@ -353,14 +358,25 @@ export class RedisKvAdapter implements WatchableKv {
       const multi = client.multi();
       const changes = this.queueMutations(multi, mutations, current, versionstamp);
 
-      if ((await multi.exec()) === null) {
+      let executed: unknown;
+      try {
+        executed = await multi.exec();
+      } catch {
+        throw new KvAtomicCommitUnconfirmedError('execution_unconfirmed');
+      }
+      if (executed === null) {
         return 'conflict';
       }
+      assertRedisAtomicResult(executed, mutations.length);
 
       await this.publishChanges(changes, versionstamp);
       return { ok: true, versionstamp };
     } catch (error: unknown) {
-      await client.unwatch();
+      try {
+        await client.unwatch();
+      } catch {
+        logger.warn('Redis atomic cleanup failed after an operation failure');
+      }
       throw error;
     }
   }
@@ -662,10 +678,8 @@ export class RedisKvAdapter implements WatchableKv {
         pipeline.publish(this.getWatchChannel(), encodeEnvelope({ ...message }));
       }
       await pipeline.exec();
-    } catch (error: unknown) {
-      logger.warn('Failed to publish Redis KV watch event', {
-        error: error instanceof Error ? error.message : String(error),
-      });
+    } catch {
+      logger.warn('Redis KV write committed but watch publication is unconfirmed');
     }
   }
 
