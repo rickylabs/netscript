@@ -185,6 +185,7 @@ export async function stopAndProbe(
   cleanup: boolean,
   receiptPath: string,
   options: {
+    readonly runnerRoot?: string;
     readonly run?: typeof capture;
     readonly wait?: (ms: number) => Promise<void>;
     readonly diagnostic?: (
@@ -263,6 +264,7 @@ export async function stopAndProbe(
       projectRoot,
       appHost,
       kind: 'cleanup',
+      runnerRoot: options.runnerRoot,
       home,
       uid,
       transcripts,
@@ -416,9 +418,9 @@ function record(value: unknown, label: string): Record<string, unknown> {
 }
 
 if (import.meta.main) {
-  const [appHost, projectRoot, cleanupValue, receiptPath] = Deno.args;
+  const [appHost, projectRoot, cleanupValue, receiptPath, runnerRoot] = Deno.args;
   if (!appHost || !projectRoot || !cleanupValue || !receiptPath) {
     throw new Error('cleanup requires AppHost, project root, cleanup boolean, and receipt path');
   }
-  await stopAndProbe(appHost, projectRoot, cleanupValue === 'true', receiptPath);
+  await stopAndProbe(appHost, projectRoot, cleanupValue === 'true', receiptPath, { runnerRoot });
 }

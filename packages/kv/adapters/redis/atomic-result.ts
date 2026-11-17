@@ -6,7 +6,8 @@ import { KvAtomicCommitUnconfirmedError } from '../../application/errors.ts';
  *
  * Null EXEC is handled by the caller as an optimistic conflict. A null detail
  * inside a successful tuple is valid; only its explicit null error slot proves
- * command success. A command failure can leave other mutations applied.
+ * command success. ioredis wraps a failed command as a one-element `[Error]`
+ * tuple. A command failure can leave other mutations applied.
  *
  * @param result - Non-null result returned by the transport.
  * @param commands - Exact number of queued Redis commands.
@@ -17,11 +18,14 @@ export function assertRedisAtomicResult(result: unknown, commands: number): void
     throw new KvAtomicCommitUnconfirmedError('malformed_result');
   }
   for (const command of result) {
-    if (!Array.isArray(command) || command.length !== 2 || command[0] === undefined) {
+    if (!Array.isArray(command) || command.length < 1 || command.length > 2) {
       throw new KvAtomicCommitUnconfirmedError('malformed_result');
     }
-    if (command[0] !== null) {
+    if (command[0] instanceof Error) {
       throw new KvAtomicCommitUnconfirmedError('command_failed');
+    }
+    if (command.length !== 2 || command[0] !== null) {
+      throw new KvAtomicCommitUnconfirmedError('malformed_result');
     }
   }
 }
