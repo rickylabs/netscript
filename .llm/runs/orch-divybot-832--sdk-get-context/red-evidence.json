@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "kind": "normalized-derivative-not-original-command-receipt",
+  "sourceIssue": "rickylabs/netscript#2610",
+  "baselineHead": "12c981104c1d13812d7119798911a0937e74348c",
+  "runner": "repository structured test wrapper through allowlisted test gate",
+  "originalReceiptSha256": "880d59f46f5fe802feaf863c85e23f13d4e5178819b1497ea520a222c90bc7f0",
+  "originalChildReportSha256": "f48311dd7bd394b86011ae0d7485f26cb6dcd324c52b0fcd8620332b387ddbee",
+  "normalization": "Omit cwd, runner/lifecycle identities, timings and stack URLs; retain actual exit, command, summary and semantic assertion messages. Original .local.json files remain excluded and unchanged.",
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "--frozen",
+    "--unstable-kv",
+    ".llm/runs/orch-divybot-832--sdk-get-context/get-context.repro_test.ts"
+  ],
+  "exitCode": 1,
+  "receiptOutcome": "FAIL",
+  "summary": {
+    "passed": 5,
+    "failed": 5,
+    "ignored": 0,
+    "totalResults": 10,
+    "uniqueFailures": 5
+  },
+  "failures": [
+    {
+      "message": "AssertionError: cancelled caller must reject without waiting for a peer",
+      "count": 1,
+      "tests": [
+        {
+          "name": "RED: aborting one caller rejects it while an unsignalled peer survives",
+          "file": ".llm/runs/orch-divybot-832--sdk-get-context/get-context.repro_test.ts",
+          "line": 224
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: SDK init.signal must exist",
+      "count": 1,
+      "tests": [
+        {
+          "name": "RED: public GET retains explicit context signal in fetch init",
+          "file": ".llm/runs/orch-divybot-832--sdk-get-context/get-context.repro_test.ts",
+          "line": 133
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal: different effective cache modes require separate fetches\n\n\n    [Diff] Actual / Expected\n\n\n-   1\n+   2\n",
+      "count": 1,
+      "tests": [
+        {
+          "name": "RED: no-store and default callers never share a cache group",
+          "file": ".llm/runs/orch-divybot-832--sdk-get-context/get-context.repro_test.ts",
+          "line": 187
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    [\n-     undefined,\n-     false,\n+     \"no-store\",\n+     true,\n    ]\n",
+      "count": 1,
+      "tests": [
+        {
+          "name": "RED: native authenticated GET retains explicit no-store and init signal",
+          "file": ".llm/runs/orch-divybot-832--sdk-get-context/get-context.repro_test.ts",
+          "line": 100
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   undefined\n+   \"no-store\"\n",
+      "count": 1,
+      "tests": [
+        {
+          "name": "RED: metadata no-store without a signal reaches fetch",
+          "file": ".llm/runs/orch-divybot-832--sdk-get-context/get-context.repro_test.ts",
+          "line": 123
+        }
+      ]
+    }
+  ],
+  "positiveControls": [
+    "identical eligible default GETs coalesce",
+    "force-cache metadata reaches fetch",
+    "different canonical bearer identities remain separate",
+    "single request abort cancels effective Request signal",
+    "elapsed deadline cancels effective Request signal"
+  ],
+  "negativeObservations": {
+    "authenticatedNoStoreInit": [
+      "undefined",
+      false
+    ],
+    "metadataNoStoreInit": "undefined",
+    "publicInitSignal": false,
+    "mixedNoStoreDefaultActualFetches": 1,
+    "mixedNoStoreDefaultExpectedFetches": 2,
+    "cancelledSubscriberRejectedBeforeUnsignalledPeerCompletes": false
+  },
+  "scope": "Final fetch boundary instrumentation only; no real network, server/app runtime, consumer execution or production qualification."
+}

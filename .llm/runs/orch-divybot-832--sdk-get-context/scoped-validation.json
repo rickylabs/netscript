@@ -1,0 +1,60 @@
+{
+  "kind": "normalized structured wrapper results",
+  "scope": ".llm/runs/orch-divybot-832--sdk-get-context/get-context.repro_test.ts",
+  "reports": {
+    "check": {
+      "originalReportSha256": "6a3fc68fe43f65c9c529207cf1aefb20ede18e875786e2a31138cbf2b8adeee5",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "lint": {
+      "originalReportSha256": "bae20cf4d671d0f2cf1ecd5ffdc39b456c6c7bf83705d4bf9b70e27828fb322a",
+      "exitCode": 0,
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 1,
+        "filesProcessed": 1,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    "fmt": {
+      "originalReportSha256": "a5be7749a6a5c3cf4ed3c7c284ddf1bf47d3351b50ea70cc1606b05e71018be1",
+      "exitCode": 0,
+      "summary": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 1,
+        "filesProcessed": 1,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    }
+  },
+  "limitation": "One-file reproducer validation only. This is not framework, architecture, runtime or implementation acceptance."
+}

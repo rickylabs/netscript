@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "defaultBranch": "main",
+  "baselineHead": "12c981104c1d13812d7119798911a0937e74348c",
+  "remoteMainAtFinalReconcile": "12c981104c1d13812d7119798911a0937e74348c",
+  "worktreeProductDiffEmpty": true,
+  "sources": [
+    {
+      "path": "packages/sdk/src/internal/transport-policy.ts",
+      "gitBlob": "7cebae8c0f027941118858e66f70e38e0cf22890",
+      "sha256": "57fbc9ee6973f407b0c861576c5c68220af53093f2140a80caac50a98bbf1099"
+    },
+    {
+      "path": "packages/sdk/src/client/http-client-link.ts",
+      "gitBlob": "8c8935b6e68f53704c0fcc018344d0e23603bfd0",
+      "sha256": "fe81ed1dd83175da0ca9c06603f535ba14238bcc188ce7e2a39817efe4af4d73"
+    },
+    {
+      "path": "packages/sdk/src/internal/client-contributions/stable-v1-adapter.ts",
+      "gitBlob": "265bbc2eb45a9fa6a81df55aa3fff50ce56c4678",
+      "sha256": "f99cb9fea9b1d6d0d1df7dac7c3f91c264e6a68bcc54d06d74a3e2e2bb9bb7c6"
+    },
+    {
+      "path": "packages/sdk/src/ports/service-client.ts",
+      "gitBlob": "ed76fe780a5c8d765c8aa393877c2beb3a6508f1",
+      "sha256": "b9f7724e707fe206ea086472943fe37c9ce5b81e1cc3ca5f2d305386c8589cb1"
+    },
+    {
+      "path": "packages/sdk/deno.json",
+      "gitBlob": "acfead3fd9bf889f3f11ecb2f0d7e3c30d0e12c1",
+      "sha256": "0c1fb48b21713d862bbc67640f7aacb0596ccd4a738992e85081b16546c08a35"
+    },
+    {
+      "path": "packages/plugin-auth-core/src/sdk/bearer-contribution.ts",
+      "gitBlob": "c167db3165beaea93d35c3c1c6515b55877b8878",
+      "sha256": "a0b463dbddaeb00cab5f664a5f86fe6c795dc8cf7db776cc71d08967ea4d0179"
+    },
+    {
+      "path": "deno.json",
+      "gitBlob": "54dc15e43f7d74b7cad6b6a60a970931173a4d1c",
+      "sha256": "e6ebfc7617d02128ad664abe0602c2c202ad89fbc04adad6ec0905cb96d76156"
+    },
+    {
+      "path": "deno.lock",
+      "gitBlob": "269b1f4414e1e49821314784ee47d9496112142c",
+      "sha256": "ebc398353ec0382a108603a235b9dea480439debd619ed2d872d9156dbcb4be9"
+    }
+  ],
+  "installedUpstream": [
+    {
+      "package": "@orpc/client",
+      "version": "1.15.5",
+      "packageRelativePath": "dist/plugins/index.mjs",
+      "sha256": "171833e5ee7a4df3233ceb0e6c43f7ded5fddc6160f1d2a882bf64d7e8096e67"
+    },
+    {
+      "package": "@orpc/client",
+      "version": "1.15.5",
+      "packageRelativePath": "dist/plugins/index.d.mts",
+      "sha256": "b57cedcb83cf455a7c94c4421ae4ec51baf3bb6d19b4c43a7eb9d1007cd3767f"
+    },
+    {
+      "package": "@orpc/client",
+      "version": "1.15.5",
+      "packageRelativePath": "dist/adapters/fetch/index.mjs",
+      "sha256": "132b39c81c021a9dda6a2d515816d19bff22e7d188ae3f49818cd0cb5e8b1d25"
+    },
+    {
+      "package": "@orpc/standard-server",
+      "version": "1.15.5",
+      "packageRelativePath": "dist/batch/index.mjs",
+      "sha256": "13a13723a8b388c4142883ea4ddcd945bf3555249d093184b523ec8e4ac593d6"
+    }
+  ],
+  "dependencyFacts": {
+    "sdk": "0.0.9",
+    "orpcManifestRange": "^1.15.5",
+    "orpcActualLocal": "1.15.5",
+    "orpcConsumerReport": "1.16.1",
+    "orpcLatestStableToolObservation": "1.16.2",
+    "latestStableIsNotFixProof": true
+  },
+  "ownership": {
+    "sourceAssignee": null,
+    "matchingPrSearch": [],
+    "openAssignmentNumbers": [
+      832
+    ],
+    "timelineRepairOwnerLinks": []
+  },
+  "releaseObservation": {
+    "latestTag": "v0.0.9",
+    "prerelease": false,
+    "publishedAt": "2026-11-03T05:09:25Z"
+  },
+  "privateRawGraphSha256": "3de1a0dd3f5ee9272d1608504afbba44be3755eee5682c702dc8570dafaad79f"
+}
