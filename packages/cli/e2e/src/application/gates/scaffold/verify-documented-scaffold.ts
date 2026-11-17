@@ -1,5 +1,6 @@
 /** Execute the documented scaffold order without the main suite's repair fixtures. @module */
 import { join, resolve } from '@std/path';
+import type { CommandSignalAtSettlement } from '../../../ports/command-executor.ts';
 import { documentedDatabaseGenerateEvidence } from './runtime/evidence/database-generate-diagnostic.ts';
 import { buildStreamUrl } from '@netscript/plugin-streams-core';
 import { z } from 'zod';
@@ -33,7 +34,12 @@ export async function documentedCommand(
   args: readonly string[],
   cwd: string,
   afterCommand?: (
-    output: { result: Deno.CommandOutput; startedAt: string; completedAt: string },
+    output: {
+      result: Deno.CommandOutput;
+      startedAt: string;
+      completedAt: string;
+      signalAtSettlement: CommandSignalAtSettlement;
+    },
   ) => Promise<void>,
   execute: (executable: string, options: Deno.CommandOptions) => Promise<Deno.CommandOutput> = (
     program,
@@ -47,18 +53,29 @@ export async function documentedCommand(
     ? Math.max(COMMAND_CEILING_MS, (Number(startTimeout) + 30) * 1_000)
     : COMMAND_CEILING_MS;
   const startedAt = new Date().toISOString();
+  const commandSignal = AbortSignal.timeout(ceiling);
   const result = await execute(executable, {
     args: [...args],
     cwd,
     stdin: 'null',
     stdout: 'piped',
     stderr: 'piped',
-    signal: AbortSignal.timeout(ceiling),
+    signal: commandSignal,
     ...(startingAspire ? { env: { ASPIRE_CLI_START_TIMEOUT: startTimeout } } : {}),
   });
+  const signalAtSettlement = {
+    abortRequested: commandSignal.aborted,
+    deadlineExpired: commandSignal.aborted && commandSignal.reason instanceof DOMException &&
+      commandSignal.reason.name === 'TimeoutError',
+  };
   if (afterCommand) {
     try {
-      await afterCommand({ result, startedAt, completedAt: new Date().toISOString() });
+      await afterCommand({
+        result,
+        startedAt,
+        completedAt: new Date().toISOString(),
+        signalAtSettlement,
+      });
     } catch {
       console.warn('Documented command diagnostic collection unavailable');
     }

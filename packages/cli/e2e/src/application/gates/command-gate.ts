@@ -77,6 +77,7 @@ export class CommandGate {
           cwd: result.cwd,
           code: result.code,
           timedOut: result.timedOut,
+          signalAtSettlement: result.signalAtSettlement ?? null,
           stdoutTail: tail(result.stdout),
           stderrTail: tail(result.stderr),
         },

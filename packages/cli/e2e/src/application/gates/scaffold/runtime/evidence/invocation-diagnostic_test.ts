@@ -21,14 +21,17 @@ const safeDetail = JSON.stringify({
 Deno.test('both output streams retain only safe details; exact linked logs are bounded and private', async () => {
   const root = await Deno.makeTempDir();
   try {
-    const home = join(root, 'home'), logs = join(home, '.aspire', 'cli', 'logs');
+    const home = join(root, 'home'), logs = join(home, '.aspire', 'logs');
     await Deno.mkdir(logs, { recursive: true });
     await Deno.mkdir(join(root, '.netscript'));
     const uid = (await Deno.stat(root)).uid;
     if (uid === null) throw new Error('fixture requires filesystem UID');
     const log = join(logs, 'cli_20260101T000001_deadbeef.log');
     const app = join(logs, 'cli_20260101T000000000_detach-child_deadbeef.log');
-    await Deno.writeTextFile(app, safeDetail);
+    await Deno.writeTextFile(
+      app,
+      JSON.stringify({ ...JSON.parse(safeDetail), Timestamp: '2026-01-01T00:00:01.000Z' }),
+    );
     await Deno.writeTextFile(log, safeDetail + '\n' + app + '\nSECRET_LOG_SENTINEL');
     const invocation = {
       ...times,
@@ -201,6 +204,143 @@ Deno.test('actual stop-and-probe retains nonzero outcome and exact command count
     );
     assertEquals(calls.filter((call) => call[0] === 'aspire').length, 1);
     assertEquals(retained, 1);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('owned restart evidence reads only the canonical command log and invocation-scoped records from its older linked host log', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const home = join(root, 'home'), logs = join(home, '.aspire', 'logs');
+    await Deno.mkdir(logs, { recursive: true });
+    await Deno.mkdir(join(root, '.netscript'));
+    const uid = (await Deno.stat(root)).uid;
+    assert(uid !== null);
+    const log = join(logs, 'cli_20260101T230130_deadbeef.log');
+    const app = join(logs, 'cli_20260101T230011987_detach-child_deadbeef.log');
+    const detail = (at: string) =>
+      JSON.stringify({
+        Timestamp: at,
+        resourceKind: 'executable',
+        resourceName: 'synthetic-smoke-web',
+        errorCode: 'in_use',
+        Config: { Env: ['SECRET_ENV_SENTINEL'] },
+      });
+    await Deno.writeTextFile(
+      app,
+      detail('2026-01-01T23:00:12.000Z') + '\n' + detail('2026-01-01T23:01:35.000Z'),
+    );
+    await Deno.writeTextFile(log, app + '\n' + detail('2026-01-01T23:01:36.000Z'));
+    const invocation = {
+      code: 1,
+      process: 'database_cli' as const,
+      timedOut: false,
+      scopedResources: ['synthetic-smoke-web'],
+      reportedRestart: { resource: 'synthetic-smoke-web', exit: 16 },
+      startedAt: '2026-01-01T23:01:18.000Z',
+      completedAt: '2026-01-01T23:01:47.000Z',
+      stdout: '',
+      stderr: log,
+    };
+    await saveOwnedInvocationDiagnostics({
+      projectRoot: root,
+      appHost: join(root, 'apphost.mts'),
+      kind: 'restart',
+      home,
+      uid,
+      transcripts: [invocation],
+    });
+    const result = JSON.parse(
+      await Deno.readTextFile(join(root, '.netscript/e2e-restart-diagnostic.json')),
+    );
+    const record = result.commands[0];
+    assertEquals(record.log.status, 'available');
+    assertEquals(record.reportedRestart, { resource: 'synthetic-smoke-web', exit: 16 });
+    assertEquals(record.nativeExit, null);
+    assertEquals(record.executorExit, 1);
+    assertEquals(record.linkedLog.status, 'available');
+    assertEquals(
+      record.linkedLog.records.length,
+      1,
+      'older host records must not become current-invocation evidence',
+    );
+    assertEquals(record.linkedLog.ignoredLines, 1);
+    assert(!JSON.stringify(result).includes('SECRET_'));
+    assert(!JSON.stringify(result).includes(home));
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('linked host evidence admits only in-window closed stop templates and preserves unknown linkage', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const uid = (await Deno.stat(root)).uid;
+    assert(uid !== null);
+    const log = join(root, 'cli_20260101T230130_deadbeef.log');
+    const app = join(root, 'cli_20260101T230011987_detach-child_deadbeef.log');
+    const line = (at: string, name: string) =>
+      `[2026-01-01 ${at}] [DBG] [DcpExecutor] Executable '${name}-abcdefgh' is still running; trying again to stop it...`;
+    await Deno.writeTextFile(log, app);
+    await Deno.writeTextFile(
+      app,
+      [
+        line('23:00:12.000', 'synthetic-smoke-web'),
+        line('23:01:35.000', 'synthetic-smoke-web'),
+        line('23:01:36.000', 'foreign-web'),
+        'SECRET_ENV_SENTINEL',
+        'Executable without a clock was stopped.',
+      ].join('\n'),
+    );
+    const invocation = {
+      code: 1,
+      stdout: '',
+      stderr: log,
+      process: 'database_cli' as const,
+      scopedResources: ['synthetic-smoke-web'],
+      startedAt: '2026-01-01T23:01:18.000Z',
+      completedAt: '2026-01-01T23:01:47.000Z',
+      timedOut: false,
+      signalAtSettlement: { abortRequested: false, deadlineExpired: false },
+    };
+    const result = await invocationDiagnostic({
+      invocation,
+      logRoot: root,
+      uid,
+      ordinal: 1,
+      operation: 'restart',
+      targetMatches: true,
+    });
+    assert(result.linkedLog && 'records' in result.linkedLog);
+    assertEquals(result.linkedLog.records, [{
+      resourceKind: 'executable',
+      resourceName: 'synthetic-smoke-web',
+      errorCode: null,
+      stopState: 'not_terminal',
+    }]);
+    assertEquals(result.signalAtSettlement, { abortRequested: false, deadlineExpired: false });
+    assertEquals(result.timedOut, false);
+    assertEquals(result.nativeExit, null);
+    assert(!JSON.stringify(result).includes('SECRET_'));
+    await Deno.writeTextFile(log, 'no proved linked host reference');
+    const unlinked = await invocationDiagnostic({
+      invocation,
+      logRoot: root,
+      uid,
+      ordinal: 1,
+      operation: 'restart',
+      targetMatches: true,
+    });
+    assertEquals(unlinked.linkedLog, null);
+    assertEquals(unlinked.linkedState, 'missing_reference');
+    const outside = await selectedInvocationLog(
+      join(root, 'cli_20260101T230010_deadbeef.log'),
+      root,
+      invocation,
+      uid,
+    );
+    assertEquals(outside, { status: 'refused', reason: 'outside_invocation_window' });
   } finally {
     await Deno.remove(root, { recursive: true });
   }
