@@ -19,6 +19,24 @@ The watch capability is the differentiator: `watch` and `watchPrefix` turn the s
 source, streaming typed change events as keys are written — the primitive NetScript's own reactive
 features build on.
 
+## Redis atomic confirmation and recovery
+
+`atomic()` confirms every queued command before returning `ok: true` or publishing watch changes. A
+null Redis `EXEC` response is an optimistic conflict and retains bounded conflict retries. A failed
+version check returns `ok: false` without executing mutations.
+
+Redis can apply other commands in a transaction even when one command fails. A rejected EXEC,
+command error, or malformed receipt throws `KvAtomicCommitUnconfirmedError`, exported from
+`@netscript/kv`. Its payload-free `reason` is `command_failed`, `malformed_result`, or
+`execution_unconfirmed`, and `possiblyApplied` is true. This is not a rollback or harmless
+contention result. Reconcile expected versions and durable identities before retrying, especially
+for non-idempotent mutations. Applications that advance source cursors need discoverable recovery
+intent before the mutation batch, since an intent written only inside that batch can also fail.
+
+An `ok: true` result confirms data mutation, not receipt of watch notifications. A later watch
+publication failure does not undo or automatically replay committed data. Work that requires durable
+delivery must use its delivery receipts and reconciliation separately from watch hints.
+
 ## Why teams use it
 
 - **One contract, interchangeable backends** — `KvStore` and `WatchableKv` give every adapter the
@@ -83,34 +101,34 @@ for await (const events of kv.watch([['users', 'alice']])) {
 
 ## Ordered listing and cursor pages
 
-`list({ prefix, start, end, limit, reverse })` returns descendants of `prefix` in global key
-order. The prefix key itself is excluded. `start` is an exclusive lower bound and `end` an
-exclusive upper bound in either direction; `limit` counts entries after filtering. Advance a
-forward cursor with `start: lastEntry.key`; advance a reverse cursor with `end: lastEntry.key`.
-The kvdex bridge presents native Deno selectors, whose `start` is inclusive. It translates that
-boundary explicitly while direct `KvStore.list` calls retain the exclusive contract above.
+`list({ prefix, start, end, limit, reverse })` returns descendants of `prefix` in global key order.
+The prefix key itself is excluded. `start` is an exclusive lower bound and `end` an exclusive upper
+bound in either direction; `limit` counts entries after filtering. Advance a forward cursor with
+`start: lastEntry.key`; advance a reverse cursor with `end: lastEntry.key`. The kvdex bridge
+presents native Deno selectors, whose `start` is inclusive. It translates that boundary explicitly
+while direct `KvStore.list` calls retain the exclusive contract above.
 
-Redis has no maintained ordering index. Each output window scans the whole Redis database
-(including keys outside the selected namespace/prefix) and keeps
-only the next K distinct matching key names in a heap, then fetches those values with `MGET`.
-K is at most `REDIS_MGET_BATCH_SIZE` (default 500), or the remaining limit if smaller. A page of
-up to K live entries usually needs one full SCAN cycle, even with `limit: 1`. Missing/expired or
-malformed values do not consume the limit; listing advances past examined keys and refills.
+Redis has no maintained ordering index. Each output window scans the whole Redis database (including
+keys outside the selected namespace/prefix) and keeps only the next K distinct matching key names in
+a heap, then fetches those values with `MGET`. K is at most `REDIS_MGET_BATCH_SIZE` (default 500),
+or the remaining limit if smaller. A page of up to K live entries usually needs one full SCAN cycle,
+even with `limit: 1`. Missing/expired or malformed values do not consume the limit; listing advances
+past examined keys and refills.
 
-Retained candidate memory is O(K), plus one SCAN reply and one MGET reply. Redis SCAN's COUNT
-is a work hint, so it does not strictly bound an individual server reply. For N scanned names,
-selection costs O(N log K) per window. Larger or unlimited lists rescan for successive windows,
-trading O(N × ceil(examined candidates / K) × log K) work for memory independent of prefix size.
-This avoids adding an index that would need backfill and changes to writes, expiry, and atomic
-transactions. Prefix watch discovery uses a private unordered single-pass scan instead, preserving
-one SCAN cycle per baseline or poll. Neither listing nor watches promise snapshot isolation across
-concurrent writes.
+Retained candidate memory is O(K), plus one SCAN reply and one MGET reply. Redis SCAN's COUNT is a
+work hint, so it does not strictly bound an individual server reply. For N scanned names, selection
+costs O(N log K) per window. Larger or unlimited lists rescan for successive windows, trading O(N ×
+ceil(examined candidates / K) × log K) work for memory independent of prefix size. This avoids
+adding an index that would need backfill and changes to writes, expiry, and atomic transactions.
+Prefix watch discovery uses a private unordered single-pass scan instead, preserving one SCAN cycle
+per baseline or poll. Neither listing nor watches promise snapshot isolation across concurrent
+writes.
 
 Existing storage-key encoding limitations remain: Redis colon-separated keys coerce all-digit
-segments to numbers and do not preserve arbitrary key-part types. Memory compares parts as
-strings, while native Deno KV has typed ordering. The shared pagination contract tests use
-round-trippable, non-numeric ASCII string parts (for example `k0001`); they do not establish
-universal typed-key parity.
+segments to numbers and do not preserve arbitrary key-part types. Memory compares parts as strings,
+while native Deno KV has typed ordering. The shared pagination contract tests use round-trippable,
+non-numeric ASCII string parts (for example `k0001`); they do not establish universal typed-key
+parity.
 
 ## Startup consistency
 
@@ -168,18 +186,18 @@ cleanly, while an actual adapter failure still rejects iteration.
 
 Fixed-key Redis watches restore live subscriptions after a lost connection, including when the
 driver has exhausted its native reconnect attempts. After Redis acknowledges each restored
-subscription, the watch rereads its keys and emits current state. Missing keys appear as
-`delete` events with null values. Recovery batches have no `initial` marker and may repeat
-unchanged values. Intermediate mutations during an outage can coalesce: this is a current-state
-watch, not a durable event log. No idle keyspace scan is added to fixed-key watches.
+subscription, the watch rereads its keys and emits current state. Missing keys appear as `delete`
+events with null values. Recovery batches have no `initial` marker and may repeat unchanged values.
+Intermediate mutations during an outage can coalesce: this is a current-state watch, not a durable
+event log. No idle keyspace scan is added to fixed-key watches.
 
-Recovery has a 30-second total budget from disconnect, including connection attempts,
-subscription acknowledgements and state rereads. A watch that cannot recover rejects iteration
-with `KvConnectionError`, preserving the cause. Import `KvError`, `KvConnectionError` or
-`KvClosedError` from `@netscript/kv` or `@netscript/kv/redis` to catch them. Closing an adapter
-rejects its active watches with `KvClosedError`; aborting a watch's own signal completes it
-normally. Releasing one watch preserves its siblings, and releasing the last watch cancels its
-pending recovery. A new watch can start a fresh recovery after failed watches have ended.
+Recovery has a 30-second total budget from disconnect, including connection attempts, subscription
+acknowledgements and state rereads. A watch that cannot recover rejects iteration with
+`KvConnectionError`, preserving the cause. Import `KvError`, `KvConnectionError` or `KvClosedError`
+from `@netscript/kv` or `@netscript/kv/redis` to catch them. Closing an adapter rejects its active
+watches with `KvClosedError`; aborting a watch's own signal completes it normally. Releasing one
+watch preserves its siblings, and releasing the last watch cancels its pending recovery. A new watch
+can start a fresh recovery after failed watches have ended.
 
 Prefix watches share subscription restoration and typed failure/close handling. Their existing
 `pollInterval` still controls discovery of keys changed without a delivered publication.

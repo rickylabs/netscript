@@ -23,3 +23,30 @@ export class KvConnectionError extends KvError {}
 
 /** An operation or active watch failed because its adapter was closed. */
 export class KvClosedError extends KvError {}
+
+/** Why a Redis transaction cannot be confirmed after EXEC was attempted. */
+export type KvAtomicCommitUnconfirmedReason =
+  | 'command_failed'
+  | 'malformed_result'
+  | 'execution_unconfirmed';
+
+/**
+ * An attempted transaction may have applied only some mutations.
+ *
+ * This is not a failed version check. Do not retry non-idempotent mutations
+ * without reconciling durable state. Command payloads and original errors are
+ * deliberately excluded from this public failure.
+ */
+export class KvAtomicCommitUnconfirmedError extends KvError {
+  /** Some or all mutations may already be durable. */
+  readonly possiblyApplied = true;
+
+  /**
+   * Create a payload-free transaction uncertainty failure.
+   *
+   * @param reason - Safe classification of the missing confirmation.
+   */
+  constructor(readonly reason: KvAtomicCommitUnconfirmedReason) {
+    super('KV atomic commit is unconfirmed; mutations may have applied.');
+  }
+}

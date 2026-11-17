@@ -139,7 +139,12 @@ export interface AtomicCheck {
  * Result returned from an atomic operation.
  */
 export interface AtomicResult {
-  /** Whether the operation was successful */
+  /**
+   * Whether every mutation was confirmed committed. This does not confirm
+   * delivery of watch notifications. Redis may instead throw a payload-free
+   * KvAtomicCommitUnconfirmedError when mutations may have partially applied;
+   * callers must reconcile rather than treating that as an ordinary false check.
+   */
   ok: boolean;
   /** New versionstamp if successful */
   versionstamp?: string;
