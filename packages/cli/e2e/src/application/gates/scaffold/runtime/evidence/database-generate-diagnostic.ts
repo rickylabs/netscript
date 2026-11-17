@@ -26,25 +26,68 @@ export function databaseGenerateEvidence(
     },
   ) => Promise<void> = save,
 ): (observation: CommandObservation) => Promise<void> {
-  return async ({ context, result, startedAt, completedAt }) => {
-    const appHost = context.project.appHost;
-    await collect({
+  return ({ context, result, startedAt, completedAt }) =>
+    collectDatabaseGenerateExecution({
       projectRoot: context.project.projectRoot,
-      appHost,
+      appHost: context.project.appHost,
       runnerRoot: context.project.repoRoot,
-      invocation: {
-        code: result.code,
-        stdout: result.stdout,
-        stderr: result.stderr,
-        startedAt,
-        completedAt,
-        process: 'database_cli',
-        timedOut: result.timedOut,
-        reportedRestart: reportedRestartFailure(result.stderr + '\n' + result.stdout, appHost),
-      },
-    });
-  };
+      result,
+      startedAt,
+      completedAt,
+    }, collect);
 }
+
+/** Evidence from a direct documented command, using the same safe owning collector. */
+export function collectDatabaseGenerateExecution(input: {
+  readonly projectRoot: string;
+  readonly appHost: string;
+  readonly runnerRoot: string;
+  readonly result: Pick<CommandObservation['result'], 'code' | 'stdout' | 'stderr' | 'timedOut'>;
+  readonly startedAt: string;
+  readonly completedAt: string;
+}, collect: Parameters<typeof databaseGenerateEvidence>[0] = save): Promise<void> {
+  return collect({
+    projectRoot: input.projectRoot,
+    appHost: input.appHost,
+    runnerRoot: input.runnerRoot,
+    invocation: {
+      ...input.result,
+      startedAt: input.startedAt,
+      completedAt: input.completedAt,
+      process: 'database_cli',
+      reportedRestart: reportedRestartFailure(
+        input.result.stderr + '\n' + input.result.stdout,
+        input.appHost,
+      ),
+    },
+  });
+}
+
+/** Select only the actual documented database-generation command, before native execution. */
+export function documentedDatabaseGenerateEvidence(
+  words: readonly string[],
+  scope: { readonly projectRoot: string; readonly appHost: string; readonly runnerRoot: string },
+  collect?: Parameters<typeof databaseGenerateEvidence>[0],
+):
+  | ((
+    output: { result: Deno.CommandOutput; startedAt: string; completedAt: string },
+  ) => Promise<void>)
+  | undefined {
+  if (words[0] !== 'netscript' || words[1] !== 'db' || words[2] !== 'generate') return undefined;
+  return ({ result, startedAt, completedAt }) =>
+    collectDatabaseGenerateExecution({
+      ...scope,
+      startedAt,
+      completedAt,
+      result: {
+        code: result.code,
+        stdout: new TextDecoder().decode(result.stdout),
+        stderr: new TextDecoder().decode(result.stderr),
+        timedOut: false,
+      },
+    }, collect);
+}
+
 async function save(
   input: {
     readonly projectRoot: string;

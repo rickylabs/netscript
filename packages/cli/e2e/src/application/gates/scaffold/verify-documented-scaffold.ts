@@ -1,5 +1,6 @@
 /** Execute the documented scaffold order without the main suite's repair fixtures. @module */
 import { join, resolve } from '@std/path';
+import { documentedDatabaseGenerateEvidence } from './runtime/evidence/database-generate-diagnostic.ts';
 import { buildStreamUrl } from '@netscript/plugin-streams-core';
 import { z } from 'zod';
 import {
@@ -26,14 +27,27 @@ type Outcome = { readonly passed: true; readonly id: string } | {
   readonly error: unknown;
 };
 
-async function command(executable: string, args: readonly string[], cwd: string): Promise<string> {
+/** Original direct native command; evidence is observed only after its output settles. */
+export async function documentedCommand(
+  executable: string,
+  args: readonly string[],
+  cwd: string,
+  afterCommand?: (
+    output: { result: Deno.CommandOutput; startedAt: string; completedAt: string },
+  ) => Promise<void>,
+  execute: (executable: string, options: Deno.CommandOptions) => Promise<Deno.CommandOutput> = (
+    program,
+    options,
+  ) => new Deno.Command(program, options).output(),
+): Promise<string> {
   const startingAspire = executable === 'aspire' && args[0] === 'start';
   const startTimeout = Deno.env.get('ASPIRE_CLI_START_TIMEOUT') ??
     String(DEFAULT_ASPIRE_START_TIMEOUT_SECONDS);
   const ceiling = startingAspire
     ? Math.max(COMMAND_CEILING_MS, (Number(startTimeout) + 30) * 1_000)
     : COMMAND_CEILING_MS;
-  const result = await new Deno.Command(executable, {
+  const startedAt = new Date().toISOString();
+  const result = await execute(executable, {
     args: [...args],
     cwd,
     stdin: 'null',
@@ -41,7 +55,14 @@ async function command(executable: string, args: readonly string[], cwd: string)
     stderr: 'piped',
     signal: AbortSignal.timeout(ceiling),
     ...(startingAspire ? { env: { ASPIRE_CLI_START_TIMEOUT: startTimeout } } : {}),
-  }).output();
+  });
+  if (afterCommand) {
+    try {
+      await afterCommand({ result, startedAt, completedAt: new Date().toISOString() });
+    } catch {
+      console.warn('Documented command diagnostic collection unavailable');
+    }
+  }
   const stdout = new TextDecoder().decode(result.stdout);
   if (!result.success) {
     throw new Error(
@@ -51,6 +72,45 @@ async function command(executable: string, args: readonly string[], cwd: string)
     );
   }
   return stdout;
+}
+
+/** The actual walkthrough call site, shared with inert command-boundary controls. */
+export function documentedScaffoldCommand(
+  words: readonly string[],
+  args: readonly string[],
+  input: {
+    cwd: string;
+    cliEntrypoint: string;
+    projectRoot: string;
+    appHost: string;
+    repoRoot: string;
+  },
+  seams: {
+    execute?: Parameters<typeof documentedCommand>[4];
+    collect?: Parameters<typeof documentedDatabaseGenerateEvidence>[2];
+  } = {},
+): Promise<string> {
+  return documentedCommand(
+    words[0] === 'netscript' ? Deno.execPath() : 'aspire',
+    words[0] === 'netscript'
+      ? [
+        'run',
+        '-A',
+        ...(input.cliEntrypoint.startsWith('jsr:@netscript/cli@')
+          ? ['--minimum-dependency-age=0']
+          : []),
+        input.cliEntrypoint,
+        ...args,
+      ]
+      : args,
+    input.cwd,
+    documentedDatabaseGenerateEvidence(words, {
+      projectRoot: input.projectRoot,
+      appHost: input.appHost,
+      runnerRoot: input.repoRoot,
+    }, seams.collect),
+    seams.execute,
+  );
 }
 
 async function responseJson(url: string | URL): Promise<unknown> {
@@ -120,7 +180,7 @@ async function workerPid(appHost: string, cwd: string): Promise<number> {
       properties: z.record(z.string(), z.unknown()),
     })),
   }).parse(JSON.parse(
-    await command('aspire', [
+    await documentedCommand('aspire', [
       'describe',
       '--apphost',
       appHost,
@@ -140,7 +200,7 @@ async function workerPid(appHost: string, cwd: string): Promise<number> {
 
 async function cleanup(repoRoot: string, projectRoot: string): Promise<void> {
   const receiptPath = join(projectRoot, '.netscript/e2e-cleanup.json');
-  await command(Deno.execPath(), [
+  await documentedCommand(Deno.execPath(), [
     'run',
     '--allow-read',
     '--allow-write',
@@ -220,7 +280,7 @@ async function runVariant(
         await Deno.writeTextFile(runtime, broken);
       }
       if (words[0] === 'netscript' && args[0] === 'db' && args[1] === 'seed') {
-        await command('aspire', [
+        await documentedCommand('aspire', [
           'wait',
           'workers',
           '--status',
@@ -235,21 +295,13 @@ async function runVariant(
         beforeSeedPid = await workerPid(appHost, cwd);
       }
       if (words[0] === 'aspire' && args[0] === 'start') appHostStarted = true;
-      await command(
-        words[0] === 'netscript' ? Deno.execPath() : 'aspire',
-        words[0] === 'netscript'
-          ? [
-            'run',
-            '-A',
-            ...(cliEntrypoint.startsWith('jsr:@netscript/cli@')
-              ? ['--minimum-dependency-age=0']
-              : []),
-            cliEntrypoint,
-            ...args,
-          ]
-          : args,
+      await documentedScaffoldCommand(words, args, {
         cwd,
-      );
+        cliEntrypoint,
+        projectRoot,
+        appHost,
+        repoRoot,
+      });
     }
     const seed = await outcome(() => seedExecution(appHost, projectRoot));
     const stream = await outcome(() => activity(appHost, projectRoot));
