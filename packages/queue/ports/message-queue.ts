@@ -21,6 +21,13 @@ export interface NackOptions {
   requeue?: boolean;
 
   /**
+   * Return a controlled-shutdown delivery without charging this attempt. Effective
+   * only when requeue is true; defaults to false. Refunds this live claim once,
+   * preserving identity and metadata. Ordinary failures and expired claims count.
+   */
+  preserveDeliveryCount?: boolean;
+
+  /**
    * Terminal failure reason to store when `requeue` is false.
    */
   reason?: DeadLetterReason;
@@ -188,6 +195,14 @@ export interface EnqueueOptions {
  * Options for listening to messages.
  */
 export interface ListenOptions {
+  /**
+   * Redis/KV-polling wait for admitted callbacks after intake cancellation.
+   * Defaults to the backend visibility timeout; positive Infinity delegates the
+   * wait to an outer owner. This is separate from WorkerOptions.drainTimeoutMs,
+   * which bounds the whole worker stop; workers retain that total deadline.
+   */
+  drainTimeoutMs?: number;
+
   /**
    * Number of messages to process concurrently.
    * Default: 1 (sequential processing)

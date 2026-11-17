@@ -27,11 +27,13 @@ export class RedisListener<T> {
     this.intake.abort();
     this.wake();
     if (!this.ready) this.closeLeases();
-    this.drainTimer = setTimeout(() => {
-      this.settlement.abort();
-      this.closeLeases();
-      this.expired.resolve();
-    }, this.policy.drainTimeout);
+    if (this.policy.drainTimeout !== Infinity) {
+      this.drainTimer = setTimeout(() => {
+        this.settlement.abort();
+        this.closeLeases();
+        this.expired.resolve();
+      }, this.policy.drainTimeout);
+    }
   };
 
   /** Admit no more than the configured number of handler-plus-settlement operations. */

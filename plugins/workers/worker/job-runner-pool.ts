@@ -14,7 +14,7 @@ export type WorkerPoolOptions = Readonly<{
   registry?: StaticJobRegistry;
   /** @deprecated Reserved for a future isolate pool; the in-process runner does not load this URL. */
   workerUrl?: string;
-  /** Cleanup wait after abort; does not physically terminate an in-process handler. */
+  /** Cleanup wait after abort; defaults to 5,000 ms within the Worker total stop budget. */
   abortGracePeriodMs?: number;
 }>;
 

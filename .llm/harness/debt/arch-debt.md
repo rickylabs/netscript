@@ -3206,7 +3206,11 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   Folding these into redis.adapter.ts would deepen its existing orchestration size and mix
   independently reviewed failure boundaries. Issue #2351 adds one private admission/drain module
   to keep the adapter below the 500-line gate while preserving independent receipt lifetimes.
-  Direct children now total 20.
+  Direct children now total 20. The #2635 pause/shutdown handback fix groups polling message/key
+  and receipt settlement into one private `_kv-polling/` concern directory (21 direct children).
+  This reduces the touched polling adapter from811 to727lines and enables CAS/fenced handback
+  without deepening its existing F-1 error. No new public export, dependency or scanner exemption.
+  The same cardinality closing gate applies; no further directory growth is accepted by analogy.
 - **Owner:** NetScript queue maintainers.
 - **Target:** Next queue adapter organization pass after the 0.0.9 recovery fix.
 - **Linked plan:** .llm/runs/orch-divybot-6536806908--2395/plan.md; issue #2395.

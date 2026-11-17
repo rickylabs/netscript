@@ -56,6 +56,7 @@ export async function processWorkerJob(
   let claim: WorkerIdempotencyClaim | undefined;
   const lease = new WorkerDeliveryLease(queueContext, context.shutdownSignal);
   let attempts = 0;
+  let attemptFailed = false;
   let writingDeadLetter = false;
   let terminalRecorded = false;
   let executionSucceeded = false;
@@ -183,6 +184,9 @@ export async function processWorkerJob(
           (attempt) => {
             attempts = attempt;
           },
+          () => {
+            attemptFailed = true;
+          },
         );
 
         addJobStepEvent('state_update', { status: result.success ? 'completed' : 'failed' });
@@ -224,8 +228,14 @@ export async function processWorkerJob(
       writingDeadLetter || terminalRecorded || executionSucceeded;
     try {
       if (requeue) {
-        if (!queueContext?.extendVisibility) throw error;
-        await queueContext.nack({ requeue: true });
+        if (!queueContext) throw error;
+        const shutdown = !attemptFailed && error === lease.signal.reason &&
+          error instanceof Error &&
+          error.name === 'ShutdownError';
+        await queueContext.nack({
+          requeue: true,
+          ...(shutdown ? { preserveDeliveryCount: true } : {}),
+        });
         return;
       }
       if (!(error instanceof Error && error.name === 'AbortError')) {
@@ -372,8 +382,13 @@ export async function processWorkerTask(
       executionSucceeded || lease.signal.aborted || (claimAttempted && !claim) ||
       (claim && !claim.claimed && !claim.alreadyApplied)
     ) {
-      if (!queueContext?.extendVisibility) throw error;
-      await queueContext.nack({ requeue: true });
+      if (!queueContext) throw error;
+      const shutdown = error === lease.signal.reason && error instanceof Error &&
+        error.name === 'ShutdownError';
+      await queueContext.nack({
+        requeue: true,
+        ...(shutdown ? { preserveDeliveryCount: true } : {}),
+      });
     }
   } finally {
     await lease.stop();

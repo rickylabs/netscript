@@ -109,6 +109,7 @@ interface PostgresMessageRow extends Record<string, unknown> {
   readonly payload: unknown;
   readonly headers: unknown;
   readonly delivery_count: number;
+  readonly locked_by: string;
   readonly enqueued_at: Date | string;
 }
 
@@ -127,7 +128,6 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
   private readonly explicitClient?: PostgresQueueClient;
   private readonly explicitDeadLetterStore?: DeadLetterStorePort<T>;
   private readonly url?: string;
-  private readonly consumerId = crypto.randomUUID();
   private client: PostgresQueueClient | null = null;
   private deadLetterStore: DeadLetterStorePort<T> | null = null;
   private schemaReady: Promise<void> | null = null;
@@ -256,7 +256,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
           continue;
         }
 
-        await this.processRow(row, handler);
+        await this.processRow(row, handler, options?.visibilityTimeout ?? this.visibilityTimeout);
       }
     } catch (error) {
       if (signal.aborted) {
@@ -392,8 +392,8 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
           FOR UPDATE SKIP LOCKED
           LIMIT 1
         )
-        RETURNING message_id, payload, headers, delivery_count, enqueued_at`,
-      [this.queueName, this.consumerId, visibilityTimeout],
+        RETURNING message_id, payload, headers, delivery_count, enqueued_at, locked_by`,
+      [this.queueName, crypto.randomUUID(), visibilityTimeout],
     );
     return result.rows[0] ?? null;
   }
@@ -402,23 +402,14 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
   private async processRow(
     row: PostgresMessageRow,
     handler: (message: T, context: MessageContext) => Promise<void>,
+    visibilityTimeout: number,
   ): Promise<void> {
-    let payload: T;
-    let headers = normalizeHeaders(row.headers);
-    let messageId = row.message_id;
-    let enqueuedAt = new Date(row.enqueued_at);
-    let deliveryCount = row.delivery_count;
-
-    const rawMessage = row.payload;
-    if (isMessageEnvelope<T>(rawMessage)) {
-      payload = rawMessage.payload;
-      headers = rawMessage.headers;
-      messageId = rawMessage.messageId;
-      enqueuedAt = new Date(rawMessage.enqueuedAt);
-      deliveryCount = row.delivery_count;
-    } else {
-      payload = rawMessage as T;
-    }
+    const envelope = isMessageEnvelope<T>(row.payload) ? row.payload : undefined;
+    const payload = envelope ? envelope.payload : row.payload as T;
+    const headers = envelope?.headers ?? normalizeHeaders(row.headers);
+    const messageId = envelope?.messageId ?? row.message_id;
+    const enqueuedAt = new Date(envelope?.enqueuedAt ?? row.enqueued_at);
+    const deliveryCount = row.delivery_count;
 
     let settled = false;
     const context = this.createContext(
@@ -429,6 +420,8 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
       headers,
       deliveryCount,
       () => settled = true,
+      row.locked_by,
+      visibilityTimeout,
     );
 
     try {
@@ -444,7 +437,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
-  /** Creates the public message context for a claimed storage row. */
+  /** Creates one settlement boundary for this claimed storage row. */
   private createContext(
     storageMessageId: string,
     messageId: string,
@@ -453,84 +446,78 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     headers: Record<string, string>,
     deliveryCount: number,
     markSettled: () => void,
+    receipt: string,
+    visibilityTimeout: number,
   ): MessageContext {
+    let settlement: Promise<void> | undefined;
+    const settle = (operation: () => Promise<void>): Promise<void> => {
+      return settlement ??= operation().then(markSettled, (error: unknown) => {
+        settlement = undefined;
+        throw error;
+      });
+    };
     return createMessageContext(
       messageId,
       enqueuedAt,
       headers,
       deliveryCount,
-      async () => {
-        await this.ack(storageMessageId);
-        markSettled();
-      },
-      async (options: NackOptions = {}) => {
-        if ((options.requeue ?? true) && deliveryCount < this.maxRetries + 1) {
-          await this.release(storageMessageId);
-        } else {
-          await this.deadLetter(
-            storageMessageId,
-            messageId,
-            payload,
-            enqueuedAt,
-            headers,
-            deliveryCount,
-            deliveryCount >= this.maxRetries + 1 ? 'max_attempts_exceeded' : options.reason,
-            options,
-          );
-          await this.ack(storageMessageId);
-        }
-        markSettled();
-      },
+      () => settle(() => this.ack(storageMessageId, receipt, visibilityTimeout)),
+      (options: NackOptions = {}) =>
+        settle(async () => {
+          const requeue = options.requeue ?? true;
+          const preserve = requeue && options.preserveDeliveryCount === true;
+          if (requeue && (preserve || deliveryCount < this.maxRetries + 1)) {
+            await this.release(
+              storageMessageId,
+              receipt,
+              deliveryCount,
+              visibilityTimeout,
+              preserve,
+            );
+          } else {
+            const store = await this.ensureDeadLetterStore();
+            await store.append(toDeadLetterRecord(
+              { messageId, queueName: this.queueName, payload, headers, deliveryCount, enqueuedAt },
+              deliveryCount >= this.maxRetries + 1
+                ? 'max_attempts_exceeded'
+                : options.reason ?? 'nack_without_requeue',
+              options,
+            ));
+            await this.ack(storageMessageId, receipt, visibilityTimeout);
+          }
+        }),
     );
   }
 
-  /** Deletes a message row after successful processing. */
-  private async ack(messageId: string): Promise<void> {
+  /** Delete only the live, unreplaced claim that produced this context. */
+  private async ack(messageId: string, receipt: string, visibilityTimeout: number): Promise<void> {
     const client = await this.ensureClient();
     await client.query(
       `DELETE FROM ${this.tableIdentifier}
-        WHERE queue_name = $1 AND message_id = $2`,
-      [this.queueName, messageId],
+        WHERE queue_name = $1 AND message_id = $2 AND locked_by = $3
+          AND locked_at > NOW() - ($4::integer * INTERVAL '1 millisecond')`,
+      [this.queueName, messageId, receipt, visibilityTimeout],
     );
   }
 
-  /** Releases a message row so another listener can claim it again. */
-  private async release(messageId: string): Promise<void> {
+  /** Refund and unlock in one fenced update; retrying the same receipt cannot refund twice. */
+  private async release(
+    messageId: string,
+    receipt: string,
+    deliveryCount: number,
+    visibilityTimeout: number,
+    preserve: boolean,
+  ): Promise<void> {
     const client = await this.ensureClient();
     await client.query(
       `UPDATE ${this.tableIdentifier}
-        SET locked_at = NULL,
-          locked_by = NULL,
-          available_at = NOW()
-        WHERE queue_name = $1 AND message_id = $2`,
-      [this.queueName, messageId],
+        SET locked_at = NULL, locked_by = NULL, available_at = NOW(),
+          delivery_count = delivery_count - CASE WHEN $5::boolean THEN 1 ELSE 0 END
+        WHERE queue_name = $1 AND message_id = $2 AND locked_by = $3
+          AND delivery_count = $4
+          AND locked_at > NOW() - ($6::integer * INTERVAL '1 millisecond')`,
+      [this.queueName, messageId, receipt, deliveryCount, preserve, visibilityTimeout],
     );
-  }
-
-  /** Records an exhausted or explicitly rejected message in the dead-letter store. */
-  private async deadLetter(
-    _storageMessageId: string,
-    messageId: string,
-    payload: T,
-    enqueuedAt: Date,
-    headers: Record<string, string>,
-    deliveryCount: number,
-    reason: NackOptions['reason'],
-    options: NackOptions,
-  ): Promise<void> {
-    const store = await this.ensureDeadLetterStore();
-    await store.append(toDeadLetterRecord(
-      {
-        messageId,
-        queueName: this.queueName,
-        payload,
-        headers,
-        deliveryCount,
-        enqueuedAt,
-      },
-      reason ?? 'nack_without_requeue',
-      options,
-    ));
   }
 }
 

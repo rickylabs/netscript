@@ -53,6 +53,8 @@ I/O-bound work, then measure throughput and memory under load.
   caption: "WorkersConfigData — top-level worker config (@netscript/plugin-workers-core/config)",
   rows: [
     { name: "concurrency", type: "number", desc: "Default queue concurrency for in-process jobs. Schema default 2; no isolate pool is allocated." },
+    { name: "drainTimeoutMs", type: "number", desc: "Whole Worker stop budget, including abort cleanup and settlement. Integer 1–2147483647 ms; default 25000 ms." },
+    { name: "abortGracePeriodMs", type: "number", desc: "Handler cleanup after abort, inside the total stop budget. Integer 0–drainTimeoutMs; default min(5000, floor(drainTimeoutMs / 5)), normally 5000 ms." },
     { name: "queueProvider", type: "'auto' | 'deno-kv' | 'redis' | 'postgres' | 'amqp'", desc: "Queue backend. 'auto' resolves one for you. Default 'auto'." },
     { name: "queueName", type: "string", desc: "Queue the runner consumes from. Default 'jobs'." },
     { name: "jobsDir / tasksDir", type: "string", desc: "Directories scanned for default-exported job and task modules. Defaults ./workers/jobs and ./workers/tasks." },
@@ -422,23 +424,70 @@ the consumer extracts it, preserving exact admission-to-pickup ancestry across c
 Use those trace/span parents to measure queue wait; native filesystem propagation before admission
 needs its own upstream correlation and cannot be inferred from nearby timestamps.
 
+## Pause intake and drain work
+
+Call `worker.pause()` on an embedded `Worker` to stop new jobs, tasks and queue-trigger intake
+without aborting admitted work or stopping its lease renewal. `worker.start()` stays pending, and
+`worker.isPaused` and `worker.healthStatus.lifecycle` expose the intentional healthy pause.
+`worker.resume()` waits for the previous listener generation to finish before claiming again,
+including when resume races a pause. Repeated calls are harmless. A claim committed just before
+pause may be returned without running the handler; this ordinary requeue still counts.
+
+`await worker.stop()` is terminal and idempotent for that instance. It pauses intake, allows work
+to finish and acknowledge, aborts leftovers, then awaits cleanup and queue settlement within one
+monotonic total budget. A replacement uses a new Worker. Pause before start or after stop and
+resume during drain or after stop are harmless no-ops.
+
+Set budgets in the project's workers configuration so generated and packaged startup use them:
+
+```ts
+import { defineWorkers } from '@netscript/plugin-workers-core/config';
+
+export const workers = defineWorkers({
+  drainTimeoutMs: 25_000,
+  abortGracePeriodMs: 5_000,
+});
+```
+
+The default total is **25 seconds: 19 seconds for work, 5 seconds for abort cleanup and 1 second
+for settlement**. Grace defaults to `min(5_000, floor(total / 5))`; settlement reserves
+`min(1_000, max(1, floor(total / 25)))` milliseconds, leaving the remainder for work. Total must be
+an integer from 1 to 2,147,483,647 ms, and grace an integer from zero to total. A hung handler,
+executor, storage call or queue close makes stop reject `TimeoutError` within the total bound.
+
+Both `startWorkerProcess` and `startCombinedProcess` load and validate the authored workers
+section before opening runtime dependencies. Explicit duration options override project config,
+then defaults apply. Direct `new Worker(...)` takes the same durations; its top-level grace wins
+over the legacy `workerPoolOptions.abortGracePeriodMs`. Keep the parent process drain budget at
+least five seconds longer than the Worker total. Raising this total also requires raising the
+parent budget, including a custom `runChildHealthProcess` host.
+
+Redis and KV polling also expose `ListenOptions.drainTimeoutMs`, a post-intake callback wait that
+defaults to visibility timeout. It accepts a finite positive integer or `Infinity` under an outer
+deadline owner. Worker passes `Infinity` to keep pause and settlement barriers alive, and enforces
+its own finite total. The two same-named options have different scopes.
+
+Shutdown handback keeps the live delivery count unchanged on every counting queue adapter;
+repeated clean restarts therefore cannot exhaust `maxDeliveries` for a healthy job. An ordinary
+handler failure still consumes an attempt. Only a first cause of controlled shutdown gets the
+preserved count: an earlier business failure, deadline, operator cancellation or lease loss cannot
+be converted into a free retry by a later stop. Delivery remains at least once. A crash or uncertain
+persistence/acknowledgement can replay effects; retain idempotent external operations.
+
 ## Abort cleanup budget
 
-`InProcessJobRunner` accepts `abortGracePeriodMs` in its constructor options, with a default of
-**1,000 ms**. After a timeout, a shutdown or a caller cancellation, the runner aborts the handler
-signal immediately and waits up to this budget for handler and progress cleanup. If cleanup does not
-settle, dispatch rejects with the abort reason. Returning success after an abort still rejects.
+`InProcessJobRunner` accepts `abortGracePeriodMs`, default **5,000 ms**, derived from the Worker
+budget above and below the default 30-second queue listener drain. An individual timeout or caller
+cancellation aborts the handler immediately; Worker shutdown first allows its work window. Once
+aborted, the runner waits up to grace for handler and progress cleanup, then rejects with the
+original abort reason. Returning success after abort still rejects. Standalone runner stop aborts
+immediately and uses that same grace.
 
-The budget bounds waiting; it cannot stop in-process JavaScript. A handler that ignores its signal
-can keep causing side effects after dispatch rejects, and a blocking synchronous loop prevents
-timers from firing. Use abort-aware I/O, yielding checkpoints and `finally` cleanup. The setting is
-not a forced termination delay for a worker or subprocess, and it is not a top-level
-`defineWorkers` field.
-
-The shutdown manager's overall timeout is a separate host drain budget; size both within your
-platform's shutdown window. See
-[JobContext cancellation](/reference/plugin-workers-core/#job-context-cancellation) for `deadlineAt`
-selection and reason names.
+Every dispatched job handler receives `context.signal` and, when configured, `context.deadlineAt`
+in epoch milliseconds. The effective deadline is the earlier of the dispatch deadline and dispatch
+time plus `job.timeout`. Forward the signal to provider requests and check it at work boundaries.
+A handler that ignores cancellation can continue after the wait ends; synchronous CPU work also
+delays timers. Use a process boundary when physical termination is required.
 
 ## Production notes
 

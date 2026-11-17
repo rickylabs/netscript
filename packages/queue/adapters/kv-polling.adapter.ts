@@ -28,7 +28,13 @@ import type {
   NackOptions,
 } from '../ports/mod.ts';
 import { QueueError, QueueErrorCode } from '../ports/mod.ts';
-import { toDeadLetterRecord } from './_envelope.ts';
+import {
+  KvPrefixes,
+  pollingPendingKey,
+  pollingProcessingKey,
+  type QueueMessage,
+} from './_kv-polling/message.ts';
+import { acknowledgePollingMessage, rejectPollingMessage } from './_kv-polling/settlement.ts';
 import { KvDeadLetterStore } from './kv-dead-letter-store.ts';
 import { cancelPendingPage } from './_pending-retention.ts';
 
@@ -47,40 +53,6 @@ export type {
   WatchPrefixOptions,
 } from '@netscript/kv';
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
-
-/**
- * Internal message structure stored in KV
- */
-interface QueueMessage<T> {
-  /** Unique message ID */
-  id: string;
-  /** Message payload */
-  payload: T;
-  /** Queue name */
-  queue: string;
-  /** When the message was enqueued */
-  enqueuedAt: string;
-  /** When the message becomes available (for delayed messages) */
-  availableAt: string;
-  /** Number of delivery attempts */
-  attempts: number;
-  /** Maximum retry attempts */
-  maxAttempts: number;
-  /** Priority (higher = more important) */
-  priority: number;
-  /** Custom headers */
-  headers: Record<string, string>;
-  /** Deduplication ID */
-  deduplicationId?: string;
-  /** When the message was claimed for processing */
-  claimedAt?: string;
-  /** Which worker claimed the message */
-  claimedBy?: string;
-  /** Visibility timeout (when the claim expires) */
-  visibilityTimeout?: string;
-  /** Originating durable identity, independent of payload/deduplication identity. */
-  retentionId?: string;
-}
 
 /**
  * Options for creating a KvPollingAdapter
@@ -153,20 +125,6 @@ export interface KvPollingAdapterOptions {
    */
   deadLetterStore?: DeadLetterStorePort;
 }
-
-/**
- * KV key prefixes for queue data
- */
-const KvPrefixes = {
-  /** Pending messages ready for processing */
-  pending: 'queue:pending',
-  /** Messages currently being processed */
-  processing: 'queue:processing',
-  /** Dead letter queue for failed messages */
-  dlq: 'queue:dlq',
-  /** Deduplication tracking */
-  dedup: 'queue:dedup',
-} as const;
 
 /**
  * KV Polling Queue Adapter
@@ -310,16 +268,14 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
    * Priority is inverted so higher priority sorts first.
    */
   private pendingKey(priority: number, timestamp: string, id: string): KvKey {
-    // Invert priority so higher priority (100) sorts before lower (0)
-    const invertedPriority = String(1000 - priority).padStart(4, '0');
-    return [KvPrefixes.pending, this.queueName, invertedPriority, timestamp, id];
+    return pollingPendingKey(this.queueName, priority, timestamp, id);
   }
 
   /**
    * Create a KV key for a processing message.
    */
   private processingKey(id: string): KvKey {
-    return [KvPrefixes.processing, this.queueName, id];
+    return pollingProcessingKey(this.queueName, id);
   }
 
   /**
@@ -429,7 +385,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
     key: KvKey,
     message: QueueMessage<T>,
     versionstamp: string | null,
-  ): Promise<boolean> {
+  ): Promise<QueueMessage<T> | null> {
     const now = new Date();
     const visibilityExpires = new Date(now.getTime() + this.visibilityTimeout);
 
@@ -438,33 +394,35 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
       attempts: message.attempts + 1,
       claimedAt: now.toISOString(),
       claimedBy: this.workerId,
+      claimReceipt: crypto.randomUUID(),
       visibilityTimeout: visibilityExpires.toISOString(),
     };
 
     // Try atomic operation if available
     if (kv.atomic) {
       const result = await kv.atomic(
-        [{ key, versionstamp }],
+        [{ key, versionstamp }, { key: this.processingKey(message.id), versionstamp: null }],
         [
           { type: 'delete', key },
           { type: 'set', key: this.processingKey(message.id), value: claimedMessage },
         ],
       );
-      return result.ok;
+      return result.ok ? claimedMessage : null;
     }
 
     // Fallback: non-atomic (less safe but works with all KV backends)
     // Check if message still exists
     const current = await kv.get<QueueMessage<T>>(key);
     if (!current || !current.value || current.versionstamp !== versionstamp) {
-      return false; // Message was claimed by another worker
+      return null; // Message was claimed by another worker
     }
 
-    // Delete from pending and add to processing
+    if (await kv.get(this.processingKey(message.id))) return null;
+    // Non-atomic stores retain their single-consumer best-effort semantics.
     await kv.delete(key);
     await kv.set(this.processingKey(message.id), claimedMessage);
 
-    return true;
+    return claimedMessage;
   }
 
   /**
@@ -488,12 +446,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
 
       if (claimed) {
         this.log(`Claimed message ${message.id}`);
-        return {
-          ...message,
-          attempts: message.attempts + 1,
-          claimedAt: now.toISOString(),
-          claimedBy: this.workerId,
-        };
+        return claimed;
       }
 
       // Another worker claimed it, try next
@@ -503,75 +456,26 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
     return null;
   }
 
-  /**
-   * Acknowledge successful message processing.
-   */
-  private async ack(messageId: string): Promise<void> {
-    const kv = await this.ensureKv();
-    await kv.delete(this.processingKey(messageId));
-    this.log(`Acked message ${messageId}`);
+  /** Settle only this live processing receipt. */
+  private async ack(message: QueueMessage<T>): Promise<void> {
+    await acknowledgePollingMessage(await this.ensureKv(), this.queueName, message);
   }
 
-  /**
-   * Negative acknowledge - return message to queue or send to DLQ.
-   */
+  /** Atomically hand back a receipt, preserving attempts only for controlled shutdown. */
   private async nack(
     message: QueueMessage<T>,
     options: NackOptions,
+    recovering = false,
   ): Promise<void> {
-    const kv = await this.ensureKv();
-    const now = new Date();
-    const requeue = options.requeue ?? true;
-
-    // Delete from processing
-    await kv.delete(this.processingKey(message.id));
-
-    if (!requeue || message.attempts >= message.maxAttempts) {
-      const store = await this.ensureDeadLetterStore();
-      const reason = message.attempts >= message.maxAttempts
-        ? 'max_attempts_exceeded'
-        : options.reason ?? 'nack_without_requeue';
-
-      await store.append(toDeadLetterRecord(
-        {
-          messageId: message.id,
-          queueName: this.queueName,
-          payload: message.payload,
-          headers: message.headers,
-          deliveryCount: message.attempts,
-          enqueuedAt: message.enqueuedAt,
-        },
-        reason,
-        options,
-      ));
-
-      this.log(`Message ${message.id} sent to DLQ after ${message.attempts} attempts`);
-    } else {
-      // Requeue with exponential backoff
-      const backoffDelay = Math.min(
-        this.retryBaseDelay * Math.pow(2, message.attempts - 1),
-        this.retryMaxDelay,
-      );
-
-      const availableAt = new Date(now.getTime() + backoffDelay);
-
-      const requeuedMessage: QueueMessage<T> = {
-        ...message,
-        availableAt: availableAt.toISOString(),
-        claimedAt: undefined,
-        claimedBy: undefined,
-        visibilityTimeout: undefined,
-      };
-
-      await kv.set(
-        this.pendingKey(message.priority, availableAt.toISOString(), message.id),
-        requeuedMessage,
-      );
-
-      this.log(
-        `Message ${message.id} requeued with ${backoffDelay}ms delay (attempt ${message.attempts})`,
-      );
-    }
+    await rejectPollingMessage(
+      await this.ensureKv(),
+      this.queueName,
+      message,
+      options,
+      { retryBaseDelay: this.retryBaseDelay, retryMaxDelay: this.retryMaxDelay },
+      () => this.ensureDeadLetterStore(),
+      recovering,
+    );
   }
 
   /**
@@ -597,7 +501,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
 
       if (message.visibilityTimeout && new Date(message.visibilityTimeout) < now) {
         this.log(`Recovering timed-out message ${message.id}`);
-        await this.nack(message, { requeue: true });
+        await this.nack(message, { requeue: true }, true);
       }
     }
     if (inspected < 100) this.recoveryStart = undefined;
@@ -607,17 +511,20 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
    * Create a message context for the handler.
    */
   private createContext(message: QueueMessage<T>): MessageContext {
+    let settlement: Promise<void> | undefined;
+    const settle = (operation: () => Promise<void>): Promise<void> => {
+      return settlement ??= operation().catch((error: unknown) => {
+        settlement = undefined;
+        throw error;
+      });
+    };
     return {
       messageId: message.id,
       deliveryCount: message.attempts,
       enqueuedAt: new Date(message.enqueuedAt),
       headers: message.headers,
-      ack: async () => {
-        await this.ack(message.id);
-      },
-      nack: async (options?: { requeue?: boolean }) => {
-        await this.nack(message, options ?? { requeue: true });
-      },
+      ack: () => settle(() => this.ack(message)),
+      nack: (options: NackOptions = {}) => settle(() => this.nack(message, options)),
     };
   }
 
@@ -635,17 +542,31 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
       );
     }
 
+    const drainTimeout = options?.drainTimeoutMs ?? this.visibilityTimeout;
+    if (
+      drainTimeout !== Infinity &&
+      (!Number.isSafeInteger(drainTimeout) || drainTimeout < 1 || drainTimeout > 2_147_483_647)
+    ) {
+      throw new QueueError(
+        'drainTimeoutMs must be a positive integer through 2147483647 or Infinity.',
+        QueueErrorCode.CONFIGURATION_ERROR,
+      );
+    }
     this.running = true;
-    this.abortController = new AbortController();
+    const controller = new AbortController();
+    this.abortController = controller;
 
     const kv = await this.ensureKv();
     const concurrency = options?.concurrency ?? 1;
-    const signal = options?.signal ?? this.abortController.signal;
+    const signal = options?.signal
+      ? AbortSignal.any([options.signal, controller.signal])
+      : controller.signal;
 
     this.log(`Starting listener with concurrency ${concurrency}`);
 
     // Track active processing
-    const activeProcessing = new Set<string>();
+    const activeProcessing = new Set<symbol>();
+    let processingFailure: { error: unknown } | undefined;
 
     // Recovery loop - run periodically to recover timed-out messages
     const recoveryInterval = setInterval(async () => {
@@ -675,7 +596,8 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
         }
 
         // Process message concurrently
-        activeProcessing.add(message.id);
+        const delivery = Symbol(message.id);
+        activeProcessing.add(delivery);
 
         (async () => {
           const context = this.createContext(message);
@@ -683,24 +605,27 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
           try {
             await handler(message.payload, context);
             // Auto-ack on success
-            await this.ack(message.id);
+            await context.ack();
           } catch (error) {
             console.error(
               `[KvPollingAdapter:${this.queueName}] Handler error for message ${message.id}:`,
               error,
             );
             // Auto-nack with requeue on error
-            await this.nack(message, { requeue: true });
+            await context.nack({ requeue: true });
           } finally {
-            activeProcessing.delete(message.id);
+            activeProcessing.delete(delivery);
           }
-        })();
+        })().catch((error: unknown) => {
+          processingFailure ??= { error };
+          controller.abort();
+        });
       }
     } finally {
       clearInterval(recoveryInterval);
 
       // Wait for active processing to complete (with timeout)
-      const timeout = this.visibilityTimeout;
+      const timeout = drainTimeout;
       const startTime = Date.now();
 
       while (activeProcessing.size > 0 && Date.now() - startTime < timeout) {
@@ -710,6 +635,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
       this.running = false;
       this.log('Listener stopped');
     }
+    if (processingFailure) throw processingFailure.error;
   }
 
   /**

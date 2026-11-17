@@ -92,3 +92,9 @@ export { JOB_DEAD_LETTER_NAMESPACE } from './job-dead-letters.ts';
 
 export type { DeadLetterRecord, DeadLetterStorePort } from '@netscript/queue';
 export type { JobRunnerClock } from '@netscript/plugin-workers-core/runtime';
+
+export type {
+  WorkerDrainClock,
+  WorkerDrainOptions,
+  WorkerLifecycleState,
+} from '@netscript/plugin-workers-core/shutdown';

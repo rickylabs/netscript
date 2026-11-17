@@ -10,6 +10,7 @@ import { AmqpMessageQueue } from '@fedify/amqp';
 // Fedify 2.4 uses this type surface; its channel operations remain supported by amqplib 2.
 // @ts-types="npm:@types/amqplib@^0.10.7"
 import { connect } from 'amqplib';
+import { Buffer } from 'node:buffer';
 import type {
   DeadLetterStorePort,
   EnqueueOptions,
@@ -23,11 +24,17 @@ import {
   createEnvelope,
   createMessageContext,
   isMessageEnvelope,
+  type MessageEnvelope,
   toDeadLetterRecord,
 } from './_envelope.ts';
 import { KvDeadLetterStore } from './kv-dead-letter-store.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+
+type AmqpConnection = Awaited<ReturnType<typeof connect>>;
+type AmqpChannel = Awaited<ReturnType<AmqpConnection['createChannel']>>;
+type ConfirmChannel = Awaited<ReturnType<AmqpConnection['createConfirmChannel']>>;
+type NativeDelivery = NonNullable<Parameters<Parameters<AmqpChannel['consume']>[1]>[0]>;
 
 /**
  * AMQP (RabbitMQ) queue adapter implementation.
@@ -38,6 +45,10 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
   private queue!: AmqpMessageQueue;
   private readonly connection: ReturnType<typeof connect>;
   private listening = false;
+  private listenerDone?: Promise<void>;
+  private stopping?: Promise<void>;
+  private publisher?: Promise<ConfirmChannel>;
+  private closed = false;
   private abortController?: AbortController;
   private deadLetterStore: DeadLetterStorePort<T> | null = null;
   private readonly explicitDeadLetterStore?: DeadLetterStorePort<T>;
@@ -59,26 +70,17 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
     explicitDeadLetterStore?: DeadLetterStorePort<T>,
   ) {
     this.explicitDeadLetterStore = explicitDeadLetterStore;
-    try {
-      this.connection = connect(url);
-      this.connection.then((connection) => {
-        this.queue = new AmqpMessageQueue(connection);
-      }).catch((error) => {
-        throw new QueueConnectionError(
-          `Failed to connect to RabbitMQ: ${
-            error instanceof Error ? error.message : String(error)
-          }`,
-          error instanceof Error ? error : undefined,
-        );
-      });
-    } catch (error) {
+    this.connection = connect(url).then((connection) => {
+      connection.on('error', () => {}); // Active operations observe their own failure boundary.
+      this.queue = new AmqpMessageQueue(connection, { queue: queueName, nativeRetrial: true });
+      return connection;
+    }, (error: unknown) => {
       throw new QueueConnectionError(
-        `Failed to initialize AMQP queue: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
+        'Failed to connect to RabbitMQ.',
         error instanceof Error ? error : undefined,
       );
-    }
+    });
+    void this.connection.catch(() => {});
   }
 
   /**
@@ -143,95 +145,187 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
-  /**
-   * Listen for AMQP messages until stopped or aborted.
-   *
-   * @param handler - Async callback invoked for each decoded message.
-   * @param options - Listener cancellation and concurrency settings.
-   */
-  async listen(
+  /** Consume with native cancellation, keeping admitted callbacks alive through intake stop. */
+  listen(
     handler: (message: T, context: MessageContext) => Promise<void>,
     options?: ListenOptions,
   ): Promise<void> {
-    if (this.listening) {
-      throw new QueueError('Queue is already listening', QueueErrorCode.CONFIGURATION_ERROR);
-    }
-
-    this.listening = true;
-    this.abortController = new AbortController();
-
-    const signal = options?.signal;
-    if (signal) {
-      signal.addEventListener('abort', () => {
-        this.abortController?.abort();
-      });
-    }
-
-    try {
-      await this.connection;
-      await this.queue.listen(async (rawMessage) => {
-        let payload: T;
-        let headers: Record<string, string> = {};
-        let messageId: string;
-        let enqueuedAt: Date;
-        let deliveryCount: number;
-
-        if (isMessageEnvelope<T>(rawMessage)) {
-          payload = rawMessage.payload;
-          headers = rawMessage.headers;
-          messageId = rawMessage.messageId;
-          enqueuedAt = new Date(rawMessage.enqueuedAt);
-          deliveryCount = rawMessage.deliveryCount + 1;
-        } else {
-          payload = rawMessage as T;
-          messageId = crypto.randomUUID();
-          enqueuedAt = new Date();
-          deliveryCount = 1;
-        }
-
-        await handler(
-          payload,
-          this.createContext(messageId, payload, enqueuedAt, headers, deliveryCount),
-        );
-      }, { signal: this.abortController.signal });
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        return;
-      }
-      throw new QueueError(
-        `Queue listener failed: ${error instanceof Error ? error.message : String(error)}`,
-        QueueErrorCode.DEQUEUE_FAILED,
-        {
-          cause: error instanceof Error ? error : undefined,
-          context: { queueName: this.queueName },
-        },
+    if (this.listening || this.closed) {
+      return Promise.reject(
+        new QueueError('Queue is not available for listening.', QueueErrorCode.CONFIGURATION_ERROR),
       );
-    } finally {
+    }
+    const concurrency = options?.concurrency ?? 1;
+    if (!Number.isSafeInteger(concurrency) || concurrency < 1) {
+      return Promise.reject(
+        new QueueError(
+          'concurrency must be a positive integer.',
+          QueueErrorCode.CONFIGURATION_ERROR,
+        ),
+      );
+    }
+    this.listening = true;
+    const controller = new AbortController();
+    this.abortController = controller;
+    const signal = options?.signal
+      ? AbortSignal.any([options.signal, controller.signal])
+      : controller.signal;
+    const done = this.consume(handler, signal, concurrency).finally(() => {
       this.listening = false;
+    });
+    this.listenerDone = done;
+    return done;
+  }
+
+  /** Stop the consumer, then close only the publisher and connection owned by this adapter. */
+  stop(): Promise<void> {
+    return this.stopping ??= (async () => {
+      this.closed = true;
+      this.abortController?.abort();
+      try {
+        await this.listenerDone;
+      } finally {
+        await (await this.connection).close();
+      }
+    })();
+  }
+
+  /** Own native consumer cancellation, callback joining, and channel failure. */
+  private async consume(
+    handler: (message: T, context: MessageContext) => Promise<void>,
+    signal: AbortSignal,
+    concurrency: number,
+  ): Promise<void> {
+    if (signal.aborted) return;
+    const connection = await this.connection;
+    const channel = await connection.createChannel();
+    const stopped = Promise.withResolvers<void>();
+    const failed = Promise.withResolvers<never>();
+    void failed.promise.catch(() => {});
+    const active = new Set<Promise<void>>();
+    let failure: { error: unknown } | undefined;
+    let closing = false;
+    let usable = true;
+    let tag: string | undefined;
+    const onAbort = () => stopped.resolve();
+    const onError = (error: unknown) => {
+      failure ??= { error };
+      usable = false;
+      failed.reject(error);
+    };
+    const onClose = () => {
+      usable = false;
+      if (!closing) onError(new QueueConnectionError('AMQP consumer closed.'));
+    };
+    channel.on('error', onError);
+    channel.on('close', onClose);
+    connection.on('close', onClose);
+    signal.addEventListener('abort', onAbort, { once: true });
+    if (signal.aborted) onAbort();
+    try {
+      await channel.assertQueue(this.queueName, { durable: true });
+      await channel.prefetch(concurrency);
+      tag = (await channel.consume(this.queueName, (message) => {
+        if (!message) {
+          if (!closing) onError(new QueueConnectionError('AMQP consumer cancelled.'));
+          return;
+        }
+        if (signal.aborted) {
+          if (usable) {
+            try {
+              channel.nack(message, false, true);
+            } catch (error) {
+              onError(error);
+            }
+          }
+          return;
+        }
+        const task = this.deliver(message, channel, () => usable, handler)
+          .catch(onError).finally(() => active.delete(task));
+        active.add(task);
+      }, { noAck: false })).consumerTag;
+      await Promise.race([stopped.promise, failed.promise]);
+    } finally {
+      closing = true;
+      try {
+        if (tag) await channel.cancel(tag).catch(() => {});
+        if (!failure) await Promise.race([Promise.allSettled([...active]), failed.promise]);
+      } finally {
+        usable = false;
+        await channel.close().catch(() => {});
+        signal.removeEventListener('abort', onAbort);
+        channel.removeListener('close', onClose);
+        connection.removeListener('close', onClose);
+      }
     }
   }
 
-  /**
-   * Stop listening and close the AMQP connection when possible.
-   */
-  async stop(): Promise<void> {
-    if (!this.listening) {
-      return;
-    }
-
-    this.abortController?.abort();
-    this.listening = false;
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
+  /** Dispatch one native receipt with exactly one terminal settlement. */
+  private async deliver(
+    message: NativeDelivery,
+    channel: AmqpChannel,
+    usable: () => boolean,
+    handler: (message: T, context: MessageContext) => Promise<void>,
+  ): Promise<void> {
+    const raw: unknown = JSON.parse(message.content.toString('utf8'));
+    const envelope = isMessageEnvelope<T>(raw) ? raw : createEnvelope(raw as T);
+    const context = this.createContext(
+      envelope.messageId,
+      envelope.payload,
+      new Date(envelope.enqueuedAt),
+      envelope.headers,
+      envelope.deliveryCount + 1,
+      {
+        ack: () => {
+          if (!usable()) throw new QueueConnectionError('AMQP receipt is no longer owned.');
+          channel.ack(message);
+          return Promise.resolve();
+        },
+        requeue: async (preserve) => {
+          if (!usable()) throw new QueueConnectionError('AMQP receipt is no longer owned.');
+          await this.publishRetry({
+            ...envelope,
+            deliveryCount: preserve ? envelope.deliveryCount : envelope.deliveryCount + 1,
+          });
+          if (!usable()) throw new QueueConnectionError('AMQP receipt is no longer owned.');
+          channel.ack(message);
+        },
+      },
+    );
     try {
-      const connection = await this.connection;
-      if (
-        connection && typeof (connection as { close?: () => Promise<void> }).close === 'function'
-      ) {
-        await (connection as { close: () => Promise<void> }).close();
-      }
+      await handler(envelope.payload, context);
+      await context.ack();
     } catch {
-      // Ignore shutdown errors.
+      try {
+        await context.nack({ requeue: true });
+      } catch (error) {
+        if (usable()) channel.nack(message, false, true);
+        else throw error;
+      }
+    }
+  }
+
+  /** Confirm the retry before acknowledging its predecessor; uncertain outcomes are at-least-once. */
+  private async publishRetry(envelope: MessageEnvelope<T>): Promise<void> {
+    if (this.closed) throw new QueueConnectionError('AMQP adapter is stopped.');
+    const pending = this.publisher ??= this.connection.then(async (connection) => {
+      const channel = await connection.createConfirmChannel();
+      channel.on('error', () => {});
+      await channel.assertQueue(this.queueName, { durable: true });
+      return channel;
+    });
+    try {
+      const channel = await pending;
+      await new Promise<void>((resolve, reject) => {
+        channel.sendToQueue(this.queueName, Buffer.from(JSON.stringify(envelope)), {
+          persistent: true,
+          contentType: 'application/json',
+        }, (error: unknown) => error ? reject(error) : resolve());
+      });
+    } catch (error) {
+      if (this.publisher === pending) this.publisher = undefined;
+      await pending.then((channel) => channel.close()).catch(() => {});
+      throw error;
     }
   }
 
@@ -244,31 +338,41 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
     enqueuedAt: Date,
     headers: Record<string, string>,
     deliveryCount: number,
+    io?: Readonly<{ ack(): Promise<void>; requeue(preserve: boolean): Promise<void> }>,
   ): MessageContext {
+    let settlement: Promise<void> | undefined;
+    const settle = (operation: () => Promise<void>): Promise<void> =>
+      settlement ??= operation().catch((error: unknown) => {
+        settlement = undefined;
+        throw error;
+      });
     return createMessageContext(
       messageId,
       enqueuedAt,
       headers,
       deliveryCount,
-      async () => {},
-      async (options: NackOptions = {}) => {
-        if (options.requeue ?? true) {
-          return;
-        }
-        const store = this.ensureDeadLetterStore();
-        await store.append(toDeadLetterRecord(
-          {
-            messageId,
-            queueName: this.queueName,
-            payload,
-            headers,
-            deliveryCount,
-            enqueuedAt,
-          },
-          options.reason ?? 'nack_without_requeue',
-          options,
-        ));
-      },
+      () => settle(() => io?.ack() ?? Promise.resolve()),
+      (options: NackOptions = {}) =>
+        settle(async () => {
+          if (options.requeue ?? true) {
+            await io?.requeue(options.preserveDeliveryCount === true);
+            return;
+          }
+          const store = this.ensureDeadLetterStore();
+          await store.append(toDeadLetterRecord(
+            {
+              messageId,
+              queueName: this.queueName,
+              payload,
+              headers,
+              deliveryCount,
+              enqueuedAt,
+            },
+            options.reason ?? 'nack_without_requeue',
+            options,
+          ));
+          await io?.ack();
+        }),
     );
   }
 }

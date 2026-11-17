@@ -8,8 +8,14 @@
 import '@netscript/kv/redis';
 import { createQueue } from '@netscript/queue';
 import { deadline } from '@std/async';
+import {
+  resolveWorkerDrainBudget,
+  type WorkerDrainBudget,
+} from '@netscript/plugin-workers-core/shutdown';
+import { loadWorkersConfig } from '../src/runtime/workers-config.ts';
 
 import type { JobMessage } from '@netscript/plugin-workers-core/runtime';
+export type { WorkerLifecycleState } from '@netscript/plugin-workers-core/shutdown';
 import { readSeedSampleRequest, watchSeedSample } from '../src/runtime/seed-sample.ts';
 import { getKv } from '@netscript/kv';
 import type { ChildHealthMonitor, ChildHealthSnapshot } from '@netscript/plugin/health';
@@ -71,6 +77,10 @@ async function registerProjectJobs(
 
 /** Options for starting only the workers job execution process. */
 export type StartWorkerProcessOptions = Readonly<{
+  /** Total stop budget, including cleanup and settlement; defaults to 25,000 ms. */
+  drainTimeoutMs?: number;
+  /** Handler abort cleanup, within the total; defaults to min(5,000, floor(total/5)). */
+  abortGracePeriodMs?: number;
   /** Number of jobs the worker may execute concurrently. */
   concurrency?: number;
   /** Project-generated static job definitions to register before processing. */
@@ -108,8 +118,18 @@ export type StartCombinedProcessOptions =
     signal?: AbortSignal;
   }>;
 
+/** Validate authored policy and explicit overrides before allocating runtime dependencies. */
+async function loadDrainBudget(options: StartWorkerProcessOptions): Promise<WorkerDrainBudget> {
+  const config = await loadWorkersConfig(Deno.env.get('NETSCRIPT_PROJECT_ROOT') ?? Deno.cwd());
+  return resolveWorkerDrainBudget({
+    drainTimeoutMs: options.drainTimeoutMs ?? config?.drainTimeoutMs,
+    abortGracePeriodMs: options.abortGracePeriodMs ?? config?.abortGracePeriodMs,
+  });
+}
+
 /** Start the plugin worker process. */
 export async function startWorkerProcess(options: StartWorkerProcessOptions = {}): Promise<Worker> {
+  const budget = await loadDrainBudget(options);
   const runtime = await createWorkersServiceRuntime();
   runtime.executionState.setMutationHook(createStreamMutationHook());
   const generated = await registerProjectJobs(runtime, options.definitions);
@@ -125,6 +145,8 @@ export async function startWorkerProcess(options: StartWorkerProcessOptions = {}
     idempotency: runtime.idempotency,
     jobsDir: options.jobsDir ?? Deno.env.get('NETSCRIPT_JOBS_DIR') ?? './workers/jobs',
     workerPoolOptions: poolRegistry ? { registry: poolRegistry } : undefined,
+    drainTimeoutMs: budget.totalMs,
+    abortGracePeriodMs: budget.abortGracePeriodMs,
   });
   await worker.start();
   return worker;
@@ -149,6 +171,7 @@ export async function startSchedulerProcess(
 export async function startCombinedProcess(
   options: StartCombinedProcessOptions = {},
 ): Promise<Readonly<{ scheduler: Scheduler; worker: Worker }>> {
+  const budget = await loadDrainBudget(options);
   const runtime = await createWorkersServiceRuntime();
   runtime.executionState.setMutationHook(createStreamMutationHook());
   const generated = await registerProjectJobs(runtime, options.definitions);
@@ -179,6 +202,8 @@ export async function startCombinedProcess(
     idempotency: runtime.idempotency,
     jobsDir: options.jobsDir ?? Deno.env.get('NETSCRIPT_JOBS_DIR') ?? './workers/jobs',
     workerPoolOptions: poolRegistry ? { registry: poolRegistry } : undefined,
+    drainTimeoutMs: budget.totalMs,
+    abortGracePeriodMs: budget.abortGracePeriodMs,
   });
   const runtimeHandle = Object.freeze({ scheduler, worker });
   const stop = () => {

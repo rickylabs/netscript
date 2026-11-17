@@ -77,8 +77,12 @@ Deno.test('KvPollingAdapter routes terminal nacks through the dead-letter store'
     deadLetterStore,
   }) as unknown as KvPollingHarness<{ id: string }>;
 
-  await queue.nack(createMessage('msg-explicit', 1, 3), { requeue: false });
-  await queue.nack(createMessage('msg-max', 3, 3), { requeue: true });
+  const explicit = createMessage('msg-explicit', 1, 3);
+  const exhausted = createMessage('msg-max', 3, 3);
+  await kv.set(['queue:processing', 'jobs', explicit.id], explicit);
+  await kv.set(['queue:processing', 'jobs', exhausted.id], exhausted);
+  await queue.nack(explicit, { requeue: false });
+  await queue.nack(exhausted, { requeue: true });
 
   assertEquals(deadLetterStore.records.map((record) => record.reason), [
     'nack_without_requeue',

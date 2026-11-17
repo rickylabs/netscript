@@ -24,8 +24,8 @@ export async function executeJobWithRetry<T extends { readonly success: boolean 
         return { ...result, attempts: attempt + 1 };
       }
     } catch (error) {
-      options.signal.throwIfAborted();
-      if (isJobAbort(error) || attempt === policy.maxRetries) throw error;
+      // A later shutdown must not rewrite an already observed failure/deadline.
+      if (options.signal.aborted || isJobAbort(error) || attempt === policy.maxRetries) throw error;
     }
     await waitForRetry(clock, jobRetryDelay(policy, attempt + 1), options.signal);
   }

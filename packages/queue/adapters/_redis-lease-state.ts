@@ -83,7 +83,10 @@ const DELAYED_POLL_INTERVAL_ENV = 'NETSCRIPT_REDIS_DELAYED_POLL_INTERVAL_MS';
 export function redisListenerPolicy(options?: ListenOptions): RedisListenerPolicy {
   return {
     concurrency: leaseDuration(options?.concurrency ?? 1, 'concurrency'),
-    drainTimeout: leaseDuration(options?.visibilityTimeout ?? 30_000, 'visibilityTimeout'),
+    drainTimeout: options?.drainTimeoutMs === Infinity ? Infinity : leaseDuration(
+      options?.drainTimeoutMs ?? options?.visibilityTimeout ?? 30_000,
+      options?.drainTimeoutMs === undefined ? 'visibilityTimeout' : 'drainTimeoutMs',
+    ),
     pollIntervalMs: pollInterval(
       options?.pollIntervalMs,
       POLL_INTERVAL_ENV,

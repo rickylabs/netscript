@@ -1,3 +1,4 @@
+import { DEFAULT_ABORT_GRACE_PERIOD_MS } from '../shutdown/worker-lifecycle.ts';
 import { WebPlatformJobRunnerClock } from '../adapters/web-platform-job-runner-clock.ts';
 import type { JobRunnerClock } from '../ports/job-runner-clock.ts';
 import { InProcessJobDispatcher, type JobDispatcherOptions } from './job-dispatcher.ts';
@@ -15,7 +16,11 @@ export type InProcessJobRunnerOptions =
     id?: string;
     /** Injectable time and disposable scheduling. */
     clock?: JobRunnerClock;
-    /** Cleanup wait after abort; bounds waiting, not physical JavaScript termination. */
+    /**
+     * Cleanup wait after any abort; defaults to 5,000 ms, one fifth of the 25,000 ms
+     * Worker total (19 s work + 5 s cleanup + 1 s settlement, below the 30 s queue drain).
+     * Bounds waiting, not physical JavaScript termination.
+     */
     abortGracePeriodMs?: number;
   }>;
 
@@ -39,7 +44,7 @@ export class InProcessJobRunner implements RuntimeWorkerPort {
     this.id = options.id ?? 'in-process-job-runner';
     this.#dispatcher = new InProcessJobDispatcher(options);
     this.#clock = options.clock ?? new WebPlatformJobRunnerClock();
-    this.#graceMs = options.abortGracePeriodMs ?? 1_000;
+    this.#graceMs = options.abortGracePeriodMs ?? DEFAULT_ABORT_GRACE_PERIOD_MS;
     validateDuration(this.#graceMs, 'abortGracePeriodMs');
   }
 

@@ -85,8 +85,9 @@ export class RedisLeases<T> {
 
   /** Settle only a still-owned, unexpired receipt. */
   async settle(lease: RedisLease<T>, options?: NackOptions, signal?: AbortSignal): Promise<void> {
+    const preserve = options?.preserveDeliveryCount === true && options.requeue !== false;
     const deadLetter = options && (!(options.requeue ?? true) ||
-        lease.envelope.deliveryCount >= lease.maxDeliveries)
+        !preserve && lease.envelope.deliveryCount >= lease.maxDeliveries)
       ? this.deadLetter(lease, options)
       : undefined;
     await this.whileAvailable(() =>
@@ -94,6 +95,12 @@ export class RedisLeases<T> {
         op: options ? 'nack' : 'ack',
         fence: lease.fence,
         deadLetter,
+        requeueEnvelope: preserve
+          ? JSON.stringify({
+            ...lease.envelope,
+            deliveryCount: Math.max(0, lease.envelope.deliveryCount - 1),
+          })
+          : undefined,
       }), signal);
     if (deadLetter) this.scheduleOutboxFlush();
   }

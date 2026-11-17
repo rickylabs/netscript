@@ -1,6 +1,6 @@
 import { ChildHealthMonitor, type ChildHealthSnapshot } from '@netscript/plugin/health';
 import { QueueError, QueueErrorCode } from '@netscript/queue';
-import { delay } from '@std/async';
+import { abortable, delay } from '@std/async';
 
 /** Credential-safe category for a listener's most recent failure. */
 export type WorkerListenerFailureCause =
@@ -24,7 +24,13 @@ export function resolveListenerHealthyResetMs(value?: number): number {
   return resolved;
 }
 
-export type WorkerListenerStatus = 'idle' | 'running' | 'restarting' | 'failed' | 'stopped';
+export type WorkerListenerStatus =
+  | 'idle'
+  | 'running'
+  | 'paused'
+  | 'restarting'
+  | 'failed'
+  | 'stopped';
 
 export interface WorkerListenerSnapshot {
   readonly name: string;
@@ -67,6 +73,12 @@ export class WorkerListenerSupervisor {
   readonly #health: ChildHealthMonitor;
   #completionResolve!: () => void;
   #started = false;
+  #paused = false;
+  #resumed = Promise.withResolvers<void>();
+  #generation?: {
+    controller: AbortController;
+    done: ReturnType<typeof Promise.withResolvers<void>>;
+  };
   #localAbort = new AbortController();
 
   readonly #run: (signal: AbortSignal) => Promise<void>;
@@ -105,15 +117,38 @@ export class WorkerListenerSupervisor {
     void this.#runLoop();
   }
 
+  /** Stop intake without ending the supervisor lifetime or cancelling admitted work. */
+  pause(): Promise<void> {
+    if (!this.#started || this.#localAbort.signal.aborted || this.#status === 'failed') {
+      return Promise.resolve();
+    }
+    this.#resetHealthyBudget();
+    if (!this.#paused) this.#resumed = Promise.withResolvers<void>();
+    this.#paused = true;
+    this.#status = 'paused';
+    this.#runningSince = undefined;
+    this.#generation?.controller.abort();
+    return this.#generation?.done.promise ?? Promise.resolve();
+  }
+
+  /** Resume after the previous listener's admitted callbacks have settled. */
+  resume(): void {
+    if (this.#localAbort.signal.aborted || this.#status === 'failed') return;
+    this.#paused = false;
+    this.#resumed.resolve();
+  }
+
   async stop(): Promise<void> {
-    if (this.#status === 'stopped') {
-      return;
+    if (!this.#started) {
+      this.#started = true;
+      this.#completionResolve();
     }
     this.#status = 'stopped';
     if (!['failed', 'crash-looping'].includes(this.#health.snapshot().state)) {
       this.#health.stopped();
     }
     this.#localAbort.abort();
+    this.#resumed.resolve();
     await this.completion;
   }
 
@@ -142,50 +177,69 @@ export class WorkerListenerSupervisor {
   }
 
   async #runLoop(): Promise<void> {
-    const signal = combineSignals(this.#localAbort.signal, this.#abortSignal);
+    const signal = this.#abortSignal
+      ? AbortSignal.any([this.#localAbort.signal, this.#abortSignal])
+      : this.#localAbort.signal;
     try {
       while (!signal.aborted) {
+        if (this.#paused) {
+          try {
+            await abortable(this.#resumed.promise, signal);
+          } catch {
+            if (signal.aborted) break;
+          }
+          if (signal.aborted) break;
+          if (this.#paused) continue;
+        }
+        const generation = {
+          controller: new AbortController(),
+          done: Promise.withResolvers<void>(),
+        };
+        void generation.done.promise.catch(() => {});
+        this.#generation = generation;
+        const attempt = AbortSignal.any([signal, generation.controller.signal]);
         this.#status = 'running';
         this.#runningSince = this.#now();
         this.#health.dependenciesReady();
         this.#health.running();
+        let failure: { error: unknown } | undefined;
         try {
-          await this.#run(signal);
-          if (signal.aborted) {
-            break;
-          }
-          throw new Error(`Listener '${this.name}' exited unexpectedly.`);
+          await this.#run(attempt);
+          if (!attempt.aborted) throw new Error(`Listener '${this.name}' exited unexpectedly.`);
         } catch (error) {
-          if (signal.aborted || isAbortError(error)) {
-            break;
+          if (!(attempt.aborted && (isAbortError(error) || error === attempt.reason))) {
+            failure = { error };
           }
-
-          this.#resetHealthyBudget();
-          this.#runningSince = undefined;
+        } finally {
+          if (failure) generation.done.reject(failure.error);
+          else generation.done.resolve();
+          if (this.#generation === generation) this.#generation = undefined;
+        }
+        if (!failure) continue;
+        this.#resetHealthyBudget();
+        this.#runningSince = undefined;
+        this.#recordError(failure.error);
+        if (signal.aborted || this.#restartBudgetUsed >= this.#maxRestarts) {
+          this.#status = 'failed';
+          this.#health.failed();
+          this.#onFailure?.(failure.error, this.snapshot());
+          return;
+        }
+        this.#restartCount = Math.min(Number.MAX_SAFE_INTEGER, this.#restartCount + 1);
+        this.#restartBudgetUsed = Math.min(Number.MAX_SAFE_INTEGER, this.#restartBudgetUsed + 1);
+        this.#health.restarting();
+        this.#status = this.#paused ? 'paused' : 'restarting';
+        this.#onFailure?.(failure.error, this.snapshot());
+        if (this.#paused) continue;
+        try {
+          await this.#sleep(this.#nextBackoffMs(), signal);
+        } catch (error) {
+          if (signal.aborted || isAbortError(error)) break;
           this.#recordError(error);
-
-          if (this.#restartBudgetUsed >= this.#maxRestarts) {
-            this.#status = 'failed';
-            this.#health.failed();
-            this.#onFailure?.(error, this.snapshot());
-            return;
-          }
-
-          this.#restartCount = Math.min(Number.MAX_SAFE_INTEGER, this.#restartCount + 1);
-          this.#restartBudgetUsed = Math.min(Number.MAX_SAFE_INTEGER, this.#restartBudgetUsed + 1);
-          this.#health.restarting();
-          this.#status = 'restarting';
+          this.#status = 'failed';
+          this.#health.failed();
           this.#onFailure?.(error, this.snapshot());
-          try {
-            await this.#sleep(this.#nextBackoffMs(), signal);
-          } catch (sleepError) {
-            if (signal.aborted || isAbortError(sleepError)) break;
-            this.#recordError(sleepError);
-            this.#status = 'failed';
-            this.#health.failed();
-            this.#onFailure?.(sleepError, this.snapshot());
-            return;
-          }
+          return;
         }
       }
       this.#status = 'stopped';
@@ -223,23 +277,6 @@ function defaultSleep(ms: number, signal: AbortSignal): Promise<void> {
 
 function isAbortError(error: unknown): boolean {
   return error instanceof Error && error.name === 'AbortError';
-}
-
-function combineSignals(first: AbortSignal, second?: AbortSignal): AbortSignal {
-  if (!second) {
-    return first;
-  }
-
-  const controller = new AbortController();
-  const abort = () => controller.abort();
-  if (first.aborted || second.aborted) {
-    controller.abort();
-    return controller.signal;
-  }
-
-  first.addEventListener('abort', abort, { once: true });
-  second.addEventListener('abort', abort, { once: true });
-  return controller.signal;
 }
 
 /** Map backend errors to fixed categories; exception text never enters public health. */

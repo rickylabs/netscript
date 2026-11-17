@@ -209,7 +209,14 @@ Deno.test('seed watcher rearms after its parent directory is removed', async () 
     await Deno.remove(directory, { recursive: true });
     const recreated = (async () => {
       for await (const event of changes) {
-        if (event.kind === 'create' && event.paths.includes(directory)) return true;
+        if (event.kind === 'create' && event.paths.includes(directory)) {
+          // The initial mkdir event may still be queued after removal; require live recreation.
+          try {
+            if ((await Deno.stat(directory)).isDirectory) return true;
+          } catch (error) {
+            if (!(error instanceof Deno.errors.NotFound)) throw error;
+          }
+        }
       }
       return false;
     })();
