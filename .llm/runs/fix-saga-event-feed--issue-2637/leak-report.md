@@ -1,3 +1,3 @@
 # Resource state
 
-No saga-feed resources started at bootstrap. Read-only repository/native API inspection only. Any later backend run must record exact creation identities/mounts privately and perform maintained leak/teardown preview plus positive owned cleanup. Foreign resources remain untouched.
+S2 owns exactly two backend containers created for this run (Redis and pinned Garnet). Private immutable identity, creation label and native mount receipts retained outside committed artifacts. They remain available for HTTP and independent evaluation. No other resources created; all foreign/unproven processes, containers, networks and volumes untouched. Final maintained preview and identity-scoped cleanup remain required. All completed in-process native KV tests close their own readers/controllers/handles.
