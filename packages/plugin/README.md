@@ -178,15 +178,30 @@ To extend storage, implement the synchronous `ChildRestartHistoryPort` and call
 termination cannot skip a pending accounting write. Read this section as the contributor entry
 point, then run the generated-process regressions in `tests/health/generated-crash-loop_test.ts`.
 
-Generated workers, triggers, and sagas glue starts the health listener before bootstrap and keeps a
-failed child observable during a one-second grace period before exiting nonzero. These processes run
-under their service identity without an app or owner session. AppHost probe generation and
-doctor/MCP aggregation consume this contract in subsequent slices of #1366.
+Generated workers, triggers, and sagas glue starts the health listener before bootstrap. The
+listener binds `127.0.0.1` by default. `PORT` selects the port; without it, the operating system
+assigns an ephemeral port. Pass `ChildHealthProcessOptions.hostname: '0.0.0.0'` when container
+health checks must reach the listener from another network namespace. Generated workers, sagas and
+triggers forward `NETSCRIPT_CHILD_HEALTH_HOSTNAME` to that option, so a container launch can set it
+to `0.0.0.0` without editing generated glue. Leave it unset for loopback probes, including the
+generated Aspire executable launches.
 
-Fatal bootstrap causes are logged to server stderr and set exit code 1. The process retains a red
-health response for one second, then closes its listener and exits; it does not require an operator
-signal. PORT selects the health listener port; without it, Deno binds an ephemeral port on its
-default interface. Rule-based AppHost port wiring and probes remain a subsequent slice of #1366.
+On a stop signal, `runChildHealthProcess` gives work 30 seconds to drain and reserves five more
+seconds for `onShutdown` resource callbacks and the health listener. `drainTimeoutMs` bounds the
+whole shutdown (default `35_000`); `cleanupTimeoutMs` reserves part of that total (default
+`min(5_000, drainTimeoutMs / 5)`). Every cleanup is attempted even if work or another cleanup hangs.
+Generated roles close the shared KV/Redis connection with `closeKv()` and dispose database clients
+actually acquired by the host bootstrap, without opening unused clients during shutdown.
+
+Exit codes are `0` for a clean drain, `1` for a fatal runtime or cleanup failure, and `2` when work
+or cleanup exceeds its deadline. Fatal bootstrap causes are logged to stderr and remain visible as
+red health for one second before shutdown begins. `exitOnShutdown: false` leaves termination to an
+embedding host: clean shutdown returns and failures reject with `PluginError`.
+
+The optional `PluginServiceContext.dispose` callback belongs to the host. The context factory
+memoizes it but never closes lazy KV or database accessors implicitly. A service signal runs that
+callback in the reserved cleanup phase. Manual service stop and external cancellation leave
+process-owned disposal to the embedding host.
 
 ## Public surface
 

@@ -120,3 +120,35 @@ Deno.test('SDK span links preserve attributes; Deno span links drop them', () =>
   assertEquals(dropped.droppedAttributesCount, 1);
   assert(dropped.context.traceId === 'a'.repeat(32));
 });
+
+Deno.test({
+  name: 'SDK signal flush leaves process termination and exit code to the runtime',
+  ignore: Deno.build.os === 'windows',
+  async fn() {
+    const child = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'eval',
+        `
+        import { createOtelSdkProvider } from ${
+          JSON.stringify(new URL('../../src/adapters/otel/mod.ts', import.meta.url).href)
+        };
+        const sdk = {
+          tracerProvider: { register() {}, async forceFlush() {}, async shutdown() {} },
+          meterProvider: { async forceFlush() {}, async shutdown() {} },
+        };
+        const provider = createOtelSdkProvider({}, async () => sdk);
+        await provider.register();
+        Deno.addSignalListener('SIGTERM', () => {
+          setTimeout(() => { console.log('OWNER_DRAINED'); Deno.exit(7); }, 100);
+        });
+        setTimeout(() => Deno.kill(Deno.pid, 'SIGTERM'), 0);
+        await new Promise(() => {});
+      `,
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(child.code, 7, new TextDecoder().decode(child.stderr));
+    assert(new TextDecoder().decode(child.stdout).includes('OWNER_DRAINED'));
+  },
+});

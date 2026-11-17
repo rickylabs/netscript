@@ -164,6 +164,26 @@ When `createLazyKv` wraps an adapter without `ready`, its promise resolves on th
 batch. A readiness rejection alone never becomes an iteration error: startup abort completes
 cleanly, while an actual adapter failure still rejects iteration.
 
+## Redis watch recovery
+
+Fixed-key Redis watches restore live subscriptions after a lost connection, including when the
+driver has exhausted its native reconnect attempts. After Redis acknowledges each restored
+subscription, the watch rereads its keys and emits current state. Missing keys appear as
+`delete` events with null values. Recovery batches have no `initial` marker and may repeat
+unchanged values. Intermediate mutations during an outage can coalesce: this is a current-state
+watch, not a durable event log. No idle keyspace scan is added to fixed-key watches.
+
+Recovery has a 30-second total budget from disconnect, including connection attempts,
+subscription acknowledgements and state rereads. A watch that cannot recover rejects iteration
+with `KvConnectionError`, preserving the cause. Import `KvError`, `KvConnectionError` or
+`KvClosedError` from `@netscript/kv` or `@netscript/kv/redis` to catch them. Closing an adapter
+rejects its active watches with `KvClosedError`; aborting a watch's own signal completes it
+normally. Releasing one watch preserves its siblings, and releasing the last watch cancels its
+pending recovery. A new watch can start a fresh recovery after failed watches have ended.
+
+Prefix watches share subscription restoration and typed failure/close handling. Their existing
+`pollInterval` still controls discovery of keys changed without a delivered publication.
+
 ## Public surface
 
 | Entry       | What it gives you                                                                                |

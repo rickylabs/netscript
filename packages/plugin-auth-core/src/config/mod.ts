@@ -33,11 +33,27 @@ export type AuthProviderConfig = Readonly<{
   metadata?: Readonly<Record<string, unknown>>;
 }>;
 
+/** Data-only endpoint quota using the provider's native window/max vocabulary. */
+export type AuthRateLimitRule = Readonly<{
+  /** Window length in seconds; must be a positive integer. */
+  window: number;
+  /** Requests allowed per client IP and path in the window; a positive integer. */
+  max: number;
+}>;
+
+/** Optional provider endpoint overrides; omission preserves provider defaults. */
+export type AuthRateLimitConfig = Readonly<{
+  /** Slash-prefixed paths or wildcard patterns relative to the provider's auth base path. */
+  customRules: Readonly<Record<string, AuthRateLimitRule>>;
+}>;
+
 /** Auth plugin configuration accepted from NetScript app settings. */
 export type AuthConfig = Readonly<{
   backend: string;
   session: AuthSessionPolicy;
   providers: readonly AuthProviderConfig[];
+  /** Endpoint quotas forwarded to better-auth without changing production enablement. */
+  rateLimit?: AuthRateLimitConfig;
 }>;
 
 /** Loose auth plugin configuration input accepted before defaults are applied. */
@@ -45,6 +61,8 @@ export type AuthConfigInput = Readonly<{
   backend?: string;
   session?: Partial<AuthSessionPolicy>;
   providers?: readonly AuthProviderConfig[];
+  /** Optional native endpoint quota overrides. */
+  rateLimit?: AuthRateLimitConfig;
 }>;
 
 const AuthSessionPolicyZodSchema = z.object({
@@ -76,10 +94,18 @@ const AuthProviderConfigZodSchema: z.ZodType<AuthProviderConfig> = z.object({
 /** Schema for one auth provider configuration entry. */
 export const AuthProviderConfigSchema: AuthSchema<AuthProviderConfig> = AuthProviderConfigZodSchema;
 
+const AuthRateLimitConfigZodSchema = z.object({
+  customRules: z.record(
+    z.string().startsWith('/'),
+    z.object({ window: z.number().int().positive(), max: z.number().int().positive() }),
+  ),
+});
+
 const AuthConfigInputZodSchema = z.object({
   backend: z.string().min(1).default('default'),
   session: z.record(z.string(), z.unknown()).optional(),
   providers: z.array(AuthProviderConfigZodSchema).default([]),
+  rateLimit: AuthRateLimitConfigZodSchema.optional(),
 });
 
 /** Schema for auth plugin configuration. */
@@ -88,4 +114,5 @@ export const AuthConfigSchema: AuthSchema<AuthConfig> = AuthConfigInputZodSchema
     backend: raw.backend,
     session: AuthSessionPolicyZodSchema.parse(raw.session ?? {}),
     providers: raw.providers,
+    ...(raw.rateLimit === undefined ? {} : { rateLimit: raw.rateLimit }),
   }));

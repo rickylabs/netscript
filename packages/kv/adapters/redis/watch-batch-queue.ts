@@ -18,6 +18,14 @@ import { delay } from '@std/async';
 export class WatchBatchQueue<T> {
   #events: T[] = [];
   #wake: (() => void) | null = null;
+  readonly #failure = new AbortController();
+
+  /** Fail pending and future requests, including a pending debounce window. */
+  fail(error: Error): void {
+    this.#failure.abort(error);
+    this.#wake?.();
+    this.#wake = null;
+  }
 
   /**
    * Queue one event and wake a waiting batch request.
@@ -25,6 +33,7 @@ export class WatchBatchQueue<T> {
    * @param event - Event to queue.
    */
   push(event: T): void {
+    if (this.#failure.signal.aborted) return;
     this.#events.push(event);
     const wake = this.#wake;
     this.#wake = null;
@@ -48,15 +57,26 @@ export class WatchBatchQueue<T> {
     signal?: AbortSignal,
     arrivalSignal: AbortSignal | undefined = signal,
   ): Promise<T[]> {
+    if (signal?.aborted) return [];
+    this.#failure.signal.throwIfAborted();
     if (this.#events.length === 0) {
       await this.#arrival(arrivalSignal);
     }
+    if (signal?.aborted) return [];
+    this.#failure.signal.throwIfAborted();
     if (debounceMs && this.#events.length > 0 && !signal?.aborted) {
-      await delay(debounceMs, { signal }).catch((error: unknown) => {
+      const debounceSignal = signal
+        ? AbortSignal.any([signal, this.#failure.signal])
+        : this.#failure.signal;
+      await delay(debounceMs, { signal: debounceSignal }).catch((error: unknown) => {
         // Aborted mid-window: the stream is ending, not failing.
-        if (!signal?.aborted) throw error;
+        if (!signal?.aborted) {
+          this.#failure.signal.throwIfAborted();
+          throw error;
+        }
       });
     }
+    if (!signal?.aborted) this.#failure.signal.throwIfAborted();
     return signal?.aborted ? [] : this.#events.splice(0);
   }
 

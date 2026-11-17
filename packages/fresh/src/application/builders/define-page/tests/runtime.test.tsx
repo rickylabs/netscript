@@ -368,3 +368,77 @@ Deno.test('definePage withForm applies collection intents before returning runti
     'Expected runtime field descriptors to expose the added row',
   );
 });
+
+for (const cookie of ['', '=x', 'a=1;=x']) {
+  Deno.test(`definePage withForm renews a malformed Cookie on GET: ${cookie}`, async () => {
+    let snapshot: RuntimeFormState<{ name?: string }> | undefined;
+    const route = definePage<{ requestId: string }>()
+      .withForm('form', () => <form />, {
+        schema: z.object({ name: z.string().optional() }),
+        mutate: () => ({ id: 1 }),
+      })
+      .withLayout((slots, { layerData }) => {
+        snapshot = layerData.form;
+        return <main>{slots.form()}</main>;
+      })
+      .build();
+    assert(route.handler?.GET, 'Expected GET handler');
+
+    const response = await route.handler.GET({
+      ...createRequestContext({
+        req: new Request('http://localhost/dashboard/users', { headers: { cookie } }),
+      }),
+      render(body: unknown, init?: ResponseInit) {
+        return new Response(renderToString(body as Parameters<typeof renderToString>[0]), init);
+      },
+    });
+
+    assert(response instanceof Response && response.status === 200, 'Expected GET to render');
+    assert(snapshot, 'Expected form state');
+    const token = snapshot.csrfInputProps.value;
+    assert(typeof token === 'string' && token.length > 0, 'Expected a fresh token');
+    assert(
+      response.headers.get('set-cookie')?.includes(`${CSRF_COOKIE_NAME}=${token}`),
+      'Expected fresh token cookie',
+    );
+    assert((await response.text()).includes('<form'), 'Expected rendered form');
+  });
+
+  for (const csrf of [true, false]) {
+    Deno.test(`definePage withForm handles malformed Cookie on POST with csrf=${csrf}: ${cookie}`, async () => {
+      let mutateCalled = false;
+      const schema = z.object({ name: z.string() });
+      const route = definePage<{ requestId: string }>()
+        .withForm('form', () => <form />, {
+          schema,
+          csrf,
+          mutate: () => {
+            mutateCalled = true;
+            return { id: 1 };
+          },
+        })
+        .build();
+      assert(route.handler?.POST, 'Expected POST handler');
+      const formData = new FormData();
+      formData.set('name', 'Ada');
+      const result = await route.handler.POST(createRequestContext({
+        req: new Request('http://localhost/dashboard/users', {
+          method: 'POST',
+          headers: { cookie },
+          body: formData,
+        }),
+      }));
+
+      assert(!(result instanceof Response), 'Expected form result');
+      const data = result.data as FormSubmissionResult<z.input<typeof schema>, { id: number }>;
+      assert(mutateCalled === !csrf, 'Expected mutation only when CSRF is disabled');
+      assert(data.status === (csrf ? 'error' : 'success'), 'Expected CSRF rejection or success');
+      if (csrf) {
+        assert(
+          data.formErrors.includes('Your form session expired. Reload the page and try again.'),
+          'Expected existing CSRF rejection message',
+        );
+      }
+    });
+  }
+}

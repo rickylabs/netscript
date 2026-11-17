@@ -18,12 +18,53 @@ type DatabaseModule = {
   };
 };
 
+type OwnedDatabaseClient = { $disconnect(): Promise<void> };
+const databaseClients = new Set<OwnedDatabaseClient>();
+let disposal: Promise<void> | undefined;
+
+function isOwnedDatabaseClient(value: unknown): value is OwnedDatabaseClient {
+  return typeof value === 'object' && value !== null &&
+    typeof Reflect.get(value, '$disconnect') === 'function';
+}
+
+/** Dispose only clients acquired by this executable's host resolvers. */
+export function disposePluginServiceContext(): Promise<void> {
+  return disposal ??= (async () => {
+    const clients = [...databaseClients];
+    databaseClients.clear();
+    const results = await Promise.allSettled([
+      ...clients.map(async (client) => await client.$disconnect()),
+    ]);
+    const failures = results.filter((result): result is PromiseRejectedResult =>
+      result.status === 'rejected'
+    );
+    if (failures.length) {
+      throw new AggregateError(
+        failures.map((result) => result.reason),
+        'Plugin resource cleanup failed.',
+      );
+    }
+  })();
+}
+
 async function getDatabaseClient(): Promise<unknown> {
+  if (disposal) throw new Error('Plugin host resources are shutting down.');
   const databaseModule = await import('../../database/mod.ts') as DatabaseModule;
   if (!databaseModule.db?.getClient) {
     throw new Error('database/mod.ts does not export a db.getClient() accessor.');
   }
-  return databaseModule.db.getClient();
+  const client = await databaseModule.db.getClient();
+  const clients = isOwnedDatabaseClient(client)
+    ? [client]
+    : typeof client === 'object' && client !== null
+    ? Object.values(client).filter(isOwnedDatabaseClient)
+    : [];
+  if (disposal) {
+    await Promise.all(clients.map(async (value) => await value.$disconnect()));
+    throw new Error('Plugin host resources shut down during database acquisition.');
+  }
+  for (const value of clients) databaseClients.add(value);
+  return client;
 }
 
 export function createPluginServiceContext(
@@ -32,5 +73,6 @@ export function createPluginServiceContext(
   return createHostPluginServiceContext(pluginName, {
     getDatabaseClient,
     getKv,
+    dispose: disposePluginServiceContext,
   });
 }

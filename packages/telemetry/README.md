@@ -234,3 +234,11 @@ those domains. Their presence does not authorize command emission; command trace
 span context. Command policy also overrides the general correlation-floor and exception-recording
 checklist for this domain. No additional permissions are needed by the adapter; the selected
 exporter retains its own documented requirements.
+
+## SDK signal ownership
+
+The opt-in `OtelSdkTracerProvider` observes SIGTERM to start bounded SDK shutdown and removes its
+signal listeners before awaiting exporters. It does not terminate the process or select an exit
+code. NetScript service and child runtimes own termination after their work and resource drains.
+Standalone SDK embedders must compose a runtime or install their own signal/exit policy; explicit
+`await provider.shutdown()` remains the reliable awaited shutdown path.

@@ -4,6 +4,8 @@ export interface PluginServiceContext {
   readonly serviceName?: string;
   /** Optional project root when supplied by the host runtime. */
   readonly projectRoot?: string;
+  /** Owner-supplied, idempotent process cleanup; never resolves unused dependencies. */
+  readonly dispose?: () => Promise<void>;
   /** Host database accessor for plugin-owned services. */
   readonly db: {
     /** Resolve the active database client. */

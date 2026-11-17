@@ -339,7 +339,7 @@ Deno.test('a loopback listener installs, runs, and removes its OS signal handler
       .onShutdown((context) => {
         contexts.push(context);
       })
-      .serve({ hostname: LOOPBACK, port: 0 });
+      .serve({ hostname: LOOPBACK, port: 0, exitOnSignal: false });
     const origin = `http://${LOOPBACK}:${running.addr.port}`;
     const platformSignals = [...shutdownSignalsForCurrentPlatform()];
 

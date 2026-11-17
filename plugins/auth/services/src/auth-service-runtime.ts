@@ -14,7 +14,7 @@ export async function serveAuthService(
 ): Promise<AuthRunningService> {
   const service = await createPluginService(router, config).onShutdown(async () => {
     await registry.background?.stop();
-  }).serve();
+  }).serve({ onCleanup: ctx.dispose ? [ctx.dispose] : [], disposeDatabaseOnSignal: !ctx.dispose });
   // Service identity owns cleanup; the supervisor retries without caller credentials.
   void registry.background?.start(createWorkosWorkerObserver(ctx.logger));
   return service;

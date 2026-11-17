@@ -76,6 +76,8 @@ the auth contract.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `AuthConfig` | type alias | Parsed auth runtime configuration. |
+| `AuthRateLimitConfig` | type alias | Optional native endpoint overrides in `rateLimit.customRules`. |
+| `AuthRateLimitRule` | type alias | Positive integer `window` in seconds and `max` requests per IP and path. |
 | `AuthBackendRegistry` | type alias | Named backend registry type. |
 | `ResolvedAuthBackendRegistry` | type alias | Resolved backend registry state. |
 | `AuthProviderDescriptor` | type alias | Provider descriptor exposed by provider registries. |

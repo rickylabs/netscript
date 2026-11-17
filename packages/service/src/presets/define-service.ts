@@ -48,10 +48,6 @@ import type {
   ServiceTlsOptions,
 } from '../types.ts';
 
-interface DisconnectCapableDatabase extends Database {
-  $disconnect(): Promise<void>;
-}
-
 interface DatabaseHealthCandidate {
   readonly name: string;
   readonly database: Database;
@@ -112,10 +108,6 @@ function isDatabase(value: unknown): value is Database {
   return typeof value === 'object' &&
     value !== null &&
     typeof (value as { $queryRaw?: unknown }).$queryRaw === 'function';
-}
-
-function isDisconnectCapableDatabase(value: Database): value is DisconnectCapableDatabase {
-  return typeof (value as { $disconnect?: unknown }).$disconnect === 'function';
 }
 
 /**
@@ -331,12 +323,6 @@ export async function defineService<T extends ServiceRouter>(
           database: healthCheckDb,
         }),
       );
-
-      if (isDisconnectCapableDatabase(healthCheckDb)) {
-        builder.onShutdown(async () => {
-          await healthCheckDb.$disconnect();
-        });
-      }
     }
   }
 

@@ -50,4 +50,5 @@ export type {
   WatchPrefixOptions,
   WatchStream,
 } from './types/mod.ts';
+export { KvClosedError, KvConnectionError, KvError } from './application/errors.ts';
 export { RedisKvAdapter, type RedisKvOptions } from './adapters/redis.adapter.ts';

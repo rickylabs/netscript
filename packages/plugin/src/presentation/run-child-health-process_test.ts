@@ -34,7 +34,7 @@ Deno.test('child health HTTP transport awaits asynchronous durable snapshot read
     await Promise.resolve();
     assert(monitor);
     return { ...monitor.snapshot(), deadLetters: { available: true, depth: 7 } };
-  });
+  }, { exitOnShutdown: false });
   void running.catch(() => undefined);
   try {
     const addr = await listening.promise;
@@ -79,7 +79,7 @@ Deno.test('fatal child failure drains even when a health snapshot never settles'
   }, () => {
     reading.resolve();
     return blockedSnapshot.promise;
-  });
+  }, { exitOnShutdown: false });
   void running.catch(() => undefined);
   let request: Promise<Response> | undefined;
   try {
@@ -118,4 +118,41 @@ async function bounded<T>(promise: Promise<T>): Promise<T> {
   } finally {
     clearTimeout(timer);
   }
+}
+
+for (const hostname of [undefined, '0.0.0.0']) {
+  Deno.test({
+    name: `child health binds ${hostname ?? 'loopback by default'}`,
+    ignore: Deno.build.os === 'windows',
+    async fn() {
+      const result = await new Deno.Command(Deno.execPath(), {
+        args: [
+          'eval',
+          `
+        import { runChildHealthProcess } from ${
+            JSON.stringify(new URL('./run-child-health-process.ts', import.meta.url).href)
+          };
+        const serve = Deno.serve;
+        let address;
+        Deno.serve = (...args) => { const server = serve(...args); address = server.addr; return server; };
+        await runChildHealthProcess(async (health, signal) => {
+          health.registryLoaded(); health.dependenciesReady(); health.running();
+          const response = await fetch('http://127.0.0.1:' + address.port + '/health');
+          console.log('HEALTH:' + response.status + ':' + (await response.json()).state);
+          console.log('BIND:' + address.hostname);
+          setTimeout(() => Deno.kill(Deno.pid, 'SIGTERM'), 0);
+          await new Promise(resolve => signal.addEventListener('abort', resolve, {once: true}));
+        }, undefined, ${JSON.stringify(hostname === undefined ? {} : { hostname })});
+      `,
+        ],
+        env: { PORT: '0' },
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+      assertEquals(result.code, 0, new TextDecoder().decode(result.stderr));
+      const stdout = new TextDecoder().decode(result.stdout);
+      assert(stdout.includes(`BIND:${hostname ?? '127.0.0.1'}`), stdout);
+      assert(stdout.includes('HEALTH:200:ready'), stdout);
+    },
+  });
 }

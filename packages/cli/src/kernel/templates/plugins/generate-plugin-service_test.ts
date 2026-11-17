@@ -91,3 +91,36 @@ Deno.test('generatePluginServiceContext emits package-resident safe imports', ()
   assertFalse(output.includes('return Promise.resolve({'));
   assertFalse(output.includes('export async function createPluginServiceContext('));
 });
+
+for (const acquire of [false, true]) {
+  Deno.test(`generated host disposal closes acquired clients once (acquire=${acquire})`, async () => {
+    const fakeDatabase = `
+      export let requests = 0;
+      export let disconnects = 0;
+      const first = { async $disconnect() { disconnects++; } };
+      const second = { async $disconnect() { disconnects++; } };
+      export const db = { async getClient() { requests++; return { first, alias: first, second }; } };
+    `;
+    const databaseUrl = `data:application/typescript,${encodeURIComponent(fakeDatabase)}`;
+    const source = generatePluginServiceContext().replace(
+      "'../../database/mod.ts'",
+      JSON.stringify(databaseUrl),
+    ) + `
+      const probe = await createPluginServiceContext('cleanup-probe');
+      const state = await import(${JSON.stringify(databaseUrl)});
+      if (state.requests !== 0) throw new Error('eager database resolution');
+      if (${acquire}) { await probe.db.getClient(); await probe.db.getClient(); }
+      if (!probe.dispose) throw new Error('missing owner disposal');
+      await probe.dispose(); await probe.dispose();
+      if (state.requests !== ${acquire ? 1 : 0} || state.disconnects !== ${acquire ? 2 : 0}) {
+        throw new Error('client acquisition or disposal was not deduplicated');
+      }
+    `;
+    const result = await new Deno.Command(Deno.execPath(), {
+      args: ['eval', '--unstable-kv', source],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assert(result.success, new TextDecoder().decode(result.stderr));
+  });
+}

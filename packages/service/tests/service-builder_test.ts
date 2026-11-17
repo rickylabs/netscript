@@ -156,7 +156,7 @@ Deno.test('onShutdown hooks run when a handled signal fires', async () => {
       .onShutdown(() => {
         hookCalls += 1;
       })
-      .serve({ port: 0 });
+      .serve({ port: 0, exitOnSignal: false });
 
     capturedHandler?.();
     await running.stop();

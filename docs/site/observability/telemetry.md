@@ -56,6 +56,13 @@ against the port contracts in `@netscript/telemetry/otel`: `TracerProviderPort`,
 `OtelSdkTracerProvider` serves apps that bring the OpenTelemetry JS SDK and also enables
 attribute-preserving span links.
 
+The opt-in `OtelSdkTracerProvider` observes SIGTERM to start bounded SDK shutdown and removes its
+signal listeners before awaiting exporters. It does not terminate the process or select an exit
+code. NetScript service and child runtimes own termination after their work and resource drains.
+Standalone SDK embedders must compose a runtime or install their own signal/exit policy; explicit
+`await provider.shutdown()` remains the reliable awaited shutdown path.
+
+
 Attribute names follow one convention: upstream semconv keys (`rpc.*`, `messaging.*`, `gen_ai.*`,
 `server.*`) wherever OpenTelemetry defines them, and NetScript-owned keys under the single
 proprietary root `netscript.*`. Correlated spans share `netscript.correlation.id`. The

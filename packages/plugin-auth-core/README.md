@@ -39,6 +39,27 @@ NetScript host.
   streams, and `createAuthTelemetry` plus `redactAuthPrincipal` emit redacted spans, keeping
   principals out of your telemetry backend.
 
+## Endpoint rate limits
+
+`AuthConfigSchema` accepts optional provider-native endpoint quotas:
+
+```ts
+import { AuthConfigSchema } from '@netscript/plugin-auth-core/config';
+
+const config = AuthConfigSchema.parse({
+  backend: 'better-auth',
+  rateLimit: { customRules: { '/sign-in/*': { window: 60, max: 10 } } },
+});
+```
+
+`window` is seconds and `max` is requests; both must be positive integers. Pattern keys start with
+`/` and are relative to the provider's auth base path. The auth plugin reads this section from
+`auth.rateLimit` or `Auth.RateLimit` appsettings and forwards it as better-auth
+`rateLimit.customRules`. Omitting it preserves provider defaults: production sign-in allows three
+requests per ten seconds per client IP and path. These endpoint rules take precedence over the
+provider's global window/max. Configuration does not enable rate limiting outside production or
+change the provider's default in-memory, per-process storage.
+
 ## Architecture
 
 ```mermaid
