@@ -202,8 +202,27 @@ export interface ServeOptions {
   /** External signal that stops the listener when aborted. */
   signal?: AbortSignal;
 
-  /** Max time to wait for in-flight requests and shutdown hooks. Defaults to `30_000`. */
+  /**
+   * Total shutdown budget. Defaults to 30_000 ms; process-owned signal shutdown
+   * reserves min(5_000, one fifth) for resource cleanup (25 s work + 5 s cleanup).
+   */
   drainTimeoutMs?: number;
+
+  /** Reserved process cleanup budget within drainTimeoutMs; defaults to min(5_000, one fifth). */
+  cleanupTimeoutMs?: number;
+
+  /**
+   * Owned resource disposers, run on process-owned signals even when work drain times out.
+   * These zero-argument callbacks always run in the signal cleanup phase; use onShutdown
+   * for work hooks that need a shutdown reason.
+   */
+  onCleanup?: readonly (() => Promise<void> | void)[];
+
+  /** Set false when onCleanup already owns database disposal; defaults to true. */
+  disposeDatabaseOnSignal?: boolean;
+
+  /** Exit 0 clean, 1 failed, 2 timed out after a signal. False leaves ownership to the host. */
+  exitOnSignal?: boolean;
 
   /** Install SIGINT/SIGTERM or SIGBREAK handlers. Defaults to `true`. */
   handleSignals?: boolean;

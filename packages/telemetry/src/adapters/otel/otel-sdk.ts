@@ -313,9 +313,17 @@ export class OtelSdkTracerProvider implements TracerProviderPort {
   };
 
   readonly #onSigterm = (): void => {
-    void this.shutdown().finally(() => {
-      Deno.exit(0);
-    });
+    // The composing runtime owns termination and the exit code after its drain.
+    // SDK shutdown removes listeners before awaiting exporters; a stalled exporter
+    // cannot retain this signal flush indefinitely.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    void Promise.race([
+      this.shutdown(),
+      new Promise<void>((resolve) => {
+        timer = setTimeout(resolve, 5_000);
+        Deno.unrefTimer(timer);
+      }),
+    ]).catch(() => undefined).finally(() => clearTimeout(timer));
   };
 
   /**

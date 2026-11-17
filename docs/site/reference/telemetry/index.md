@@ -265,3 +265,11 @@ executor. The attribute builders and closed vocabularies live in `@netscript/tel
 | `CreateOtelCommandTelemetryPortOptions` | type alias | Construction-time registrations and optional native tracer. |
 | `OtelCommandTelemetryPort` | interface | Execute, relay and publication wrappers invoking operations once. |
 | `OtelCommandTelemetrySpan` | interface | Once-only finite completion observer. |
+
+## SDK process ownership
+
+The opt-in `OtelSdkTracerProvider` observes SIGTERM to start bounded SDK shutdown and removes its
+signal listeners before awaiting exporters. It does not terminate the process or select an exit
+code. NetScript service and child runtimes own termination after their work and resource drains.
+Standalone SDK embedders must compose a runtime or install their own signal/exit policy; explicit
+`await provider.shutdown()` remains the reliable awaited shutdown path.

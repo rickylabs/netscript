@@ -243,7 +243,7 @@ for (const plugin of Object.keys(PLUGINS) as (keyof typeof PLUGINS)[]) {
           );
           assertEquals(history.processId, processId);
           if (reload === CHILD_CRASH_LOOP_THRESHOLD.restarts) break;
-          if (failing) await child.diagnostic(/Process failed/);
+          if (failing) await child.diagnostic(/Process (?:failed|finished with exit code 1)/);
           child.resetDiagnostics();
           await registry(root, failing, reload + 1);
         }

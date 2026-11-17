@@ -59,6 +59,11 @@ import type { ServiceRateLimitOptions } from '../rate-limit/middleware/options.t
 import type { ServiceBuilder, ServiceConfig } from './service-builder.ts';
 import { resolveRpcWiringPaths, type RpcWiringOptions, wireRpc } from './service-rpc.ts';
 import { startServiceListener } from './service-listener.ts';
+import {
+  disconnectServiceDatabases,
+  registerServiceDatabases,
+  type ServiceDatabaseResource,
+} from './service-resources.ts';
 
 interface DeferredRoute {
   readonly method: ServiceRouteMethod;
@@ -92,6 +97,7 @@ export class ServiceBuilderImpl<
   private shutdownHooks: ShutdownHook[] = [];
   private contextFactory: ContextFactory<TCustom> = () => ({}) as TCustom;
   private database: DbContext | null = null;
+  private readonly databaseResources = new Set<ServiceDatabaseResource>();
   private authnOptions: AuthnOptions | null = null;
   private authzOptions: AuthzOptions | null = null;
   private authInstalled = false;
@@ -169,6 +175,7 @@ export class ServiceBuilderImpl<
   ): ServiceBuilder<TRouter, TCustom> {
     // Store database reference for context injection
     this.database = db;
+    registerServiceDatabases(this.databaseResources, db);
 
     // Wire up health + readiness checks only when a $queryRaw-capable client is supplied.
     // For single-db usage pass `db` directly; for multi-db pass the primary client separately.
@@ -622,6 +629,9 @@ export class ServiceBuilderImpl<
       this.config.port ?? 3000,
       options,
       this.shutdownHooks,
+      options?.disposeDatabaseOnSignal === false
+        ? []
+        : [() => disconnectServiceDatabases(this.databaseResources)],
     );
   }
 }

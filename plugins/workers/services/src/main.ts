@@ -47,6 +47,7 @@ export default async function createWorkersService(
 ): Promise<RunningService> {
   return await startWorkersService(ctx, {
     auth: { public: true, reason: LEGACY_WORKERS_PUBLIC_REASON },
+    serve: { onCleanup: ctx.dispose ? [ctx.dispose] : [], disposeDatabaseOnSignal: !ctx.dispose },
     requestLevel: options.requestLevel,
     responseLevel: options.responseLevel,
   });

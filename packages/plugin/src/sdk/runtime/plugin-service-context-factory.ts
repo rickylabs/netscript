@@ -109,6 +109,8 @@ class LazyPluginServiceKv implements PluginServiceKv {
 export async function createPluginServiceContext(
   pluginName: string,
   resolvers: {
+    /** Dispose dependencies owned by this host; never implicitly closes lazy adapters. */
+    readonly dispose?: () => Promise<void>;
     /** Resolve the project-owned database client. */
     readonly getDatabaseClient: () => Promise<unknown>;
     /** Resolve the host-selected key-value adapter. */
@@ -120,12 +122,14 @@ export async function createPluginServiceContext(
   },
 ): Promise<PluginServiceContext> {
   const getDatabaseClient = memoizeAsyncResolver(resolvers.getDatabaseClient);
+  const dispose = resolvers.dispose ? memoizeAsyncResolver(resolvers.dispose) : undefined;
   const [appsettings, env] = await Promise.all([
     resolvers.getAppsettings?.(),
     resolvers.getEnvironment?.() ?? Promise.resolve(Deno.env.toObject()),
   ]);
 
   return {
+    ...(dispose ? { dispose } : {}),
     db: {
       getClient: getDatabaseClient,
     },

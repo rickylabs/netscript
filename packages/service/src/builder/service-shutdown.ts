@@ -23,6 +23,8 @@ interface ServiceShutdownCoordinatorOptions {
   readonly shutdownServer: () => Promise<void>;
   readonly awaitServerFinished: () => Promise<void>;
   readonly hooks?: readonly ShutdownHook[];
+  readonly cleanups?: readonly ShutdownHook[];
+  readonly cleanupTimeoutMs?: number;
   readonly drainTimeoutMs?: number;
 }
 
@@ -47,6 +49,8 @@ export class ServiceShutdownCoordinator {
   readonly #awaitServerFinished: () => Promise<void>;
   readonly #hooks: readonly ShutdownHook[];
   readonly #drainTimeoutMs: number;
+  readonly #cleanups: readonly ShutdownHook[];
+  readonly #cleanupTimeoutMs: number;
   #shutdownPromise: Promise<ShutdownReport> | undefined;
 
   constructor(options: ServiceShutdownCoordinatorOptions) {
@@ -55,6 +59,11 @@ export class ServiceShutdownCoordinator {
     this.#awaitServerFinished = options.awaitServerFinished;
     this.#hooks = [...(options.hooks ?? [])];
     this.#drainTimeoutMs = normalizeDrainTimeout(options.drainTimeoutMs);
+    this.#cleanups = [...(options.cleanups ?? [])];
+    const reserve = options.cleanupTimeoutMs ?? Math.min(5_000, this.#drainTimeoutMs / 5);
+    this.#cleanupTimeoutMs = Number.isFinite(reserve)
+      ? Math.max(0, Math.min(reserve, this.#drainTimeoutMs))
+      : Math.min(5_000, this.#drainTimeoutMs / 5);
   }
 
   /**
@@ -72,9 +81,14 @@ export class ServiceShutdownCoordinator {
     reason: ShutdownReason,
     signal?: Deno.Signal,
   ): Promise<ShutdownReport> {
-    const budget: ShutdownBudget = {
+    const cleanup = reason === 'signal' ? this.#cleanups : [];
+    const totalBudget: ShutdownBudget = {
       startedAt: performance.now(),
       timeoutMs: this.#drainTimeoutMs,
+    };
+    const budget = {
+      ...totalBudget,
+      timeoutMs: this.#drainTimeoutMs - (cleanup.length ? this.#cleanupTimeoutMs : 0),
     };
     const hooks: ShutdownHookOutcome[] = [];
     let timedOut = false;
@@ -88,6 +102,9 @@ export class ServiceShutdownCoordinator {
       budget,
     );
     timedOut = timedOut || shutdownResult.status === 'timed-out';
+    if (shutdownResult.status === 'failed') {
+      hooks.push({ ok: false, error: normalizeErrorMessage(shutdownResult.error) });
+    }
 
     if (!timedOut) {
       for (let index = this.#hooks.length - 1; index >= 0; index -= 1) {
@@ -124,13 +141,33 @@ export class ServiceShutdownCoordinator {
         budget,
       );
       timedOut = timedOut || finishedResult.status === 'timed-out';
+      if (finishedResult.status === 'failed') {
+        hooks.push({ ok: false, error: normalizeErrorMessage(finishedResult.error) });
+      }
     }
 
-    return {
-      reason,
-      timedOut,
-      hooks,
-    };
+    // Invoke all owned cleanups in reverse registration order, independently of
+    // work-drain success. A hung or failed cleanup cannot suppress another.
+    const outcomes: ShutdownHookOutcome[] = cleanup.map(() => ({
+      ok: false,
+      error: 'resource cleanup timed out',
+    }));
+    const pending = [...cleanup].reverse().map((hook, index) =>
+      Promise.resolve().then(() => hook({ reason, signal })).then(
+        () => {
+          outcomes[index] = { ok: true };
+        },
+        (error: unknown) => {
+          outcomes[index] = { ok: false, error: normalizeErrorMessage(error) };
+        },
+      )
+    );
+    if (pending.length) {
+      const result = await runWithinRemainingBudget(() => Promise.all(pending), totalBudget);
+      timedOut = timedOut || result.status === 'timed-out';
+      hooks.push(...outcomes);
+    }
+    return { reason, timedOut, hooks };
   }
 }
 

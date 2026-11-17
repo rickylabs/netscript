@@ -108,7 +108,12 @@ async function refreshConsumers(options: RefreshGeneratedClientConsumersOptions)
       commandOptions,
     );
     if (restarted.code !== 0) {
-      throw new Error(`Database client generated, but ${name} restart failed. Run: ${remedy}`);
+      const diagnostic = restarted.stderr.trim() || restarted.stdout.trim();
+      throw new Error(
+        `Database client generated, but ${name} restart failed (Aspire exit ${restarted.code}). ${
+          diagnostic ? `${diagnostic}\n` : ''
+        }Run: ${remedy}`,
+      );
     }
     options.refreshed.add(name);
     const healthy = await options.executor.output([
