@@ -232,6 +232,9 @@ export class Worker {
     if (this.lifecycle === 'stopped') {
       throw new Error('A stopped Worker cannot be restarted; create a replacement.');
     }
+    console.log(
+      `[Worker ${this.workerId}] Starting in-process job runner (queue concurrency: ${this.concurrency})...`,
+    );
     this.lifecycle = 'running';
     this.childHealth.registryLoaded();
     this.abortController = new AbortController();

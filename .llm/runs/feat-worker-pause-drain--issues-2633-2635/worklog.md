@@ -139,3 +139,10 @@ Final resource cleanup completed after independent evaluation: four exact native
 Supported full one-pass workflow43984548275 attempt2 SUCCESS at unchanged product source2d7aa10448700b46cb1c2dbb4665044eafb60dfa: Postgres124/124, SQLite116/116 plus showcase8/8, static/native and cleanup assertions intact. The original failed Postgres refresh attempt remains recorded above; exactly one failed-job-only retry passed without a code change or weakened gate. Independent Muse IMPL-EVAL PASS retained, no product delta. Final exact resource scan zero owned containers/recorded volumes; foreign objects retained.
 
 PR2645 now ready for review, status:impl-eval, all9acceptance and final DoD boxes complete. Current non-draft head CI still has pending quality/check-test lanes, so overall task completion is not claimed. Close-gate and browser/command/docs/build lanes passed, other lanes skipped per workflow policy. Final required head checks and review-thread gate remain mandatory; no ready-merge or merge authorization.
+
+
+## Required-head CI startup-log correction
+
+Ready head4ed91e2d required CI found one failure in1753pass/1fail/21existingignores: the maintained worker-runner-docs guard expects the existing in-process startup log, inadvertently omitted during lifecycle refactoring. Reproduced locally1pass/1fail before correction. Restored the exact existing startup message before running-state initialization; no branch, wait, dependency, runtime wiring or drain change. Guard retained unchanged. Prior independent behavior PASS and supported smoke remain valid for unchanged control flow; focused validation and required-head CI must pass before completion.
+
+Startup log correction gates: unchanged documentation guard plus intake/supervisor27/27green (including former1/1red), scoped source check/lint/fmt0, quality:gate0, release:preflight fourPASS and docs:accuracyPASS. One mistyped local test filename was corrected before any behavioral run; no empty run claimed green. Required-head checks rerun on the pushed correction, not inferred from local results. No new resource started.
