@@ -1,0 +1,329 @@
+{
+  "nativeNpmVersions": [
+    "12.1.0",
+    "11.21.1"
+  ],
+  "selectedWrapperCommands": [
+    {
+      "mode": "census",
+      "command": [
+        "deno",
+        "task",
+        "deps:census",
+        "--project",
+        "tools/fresh-ui-browser",
+        "--json"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "project": "tools/fresh-ui-browser",
+        "manager": "npm",
+        "scope": "direct",
+        "directDependencies": [
+          {
+            "name": "@axe-core/playwright",
+            "declared": "4.11.1",
+            "locked": "4.11.1"
+          },
+          {
+            "name": "@playwright/test",
+            "declared": "1.63.0",
+            "locked": "1.63.0"
+          },
+          {
+            "name": "@types/node",
+            "declared": "26.0.1",
+            "locked": "26.0.1"
+          },
+          {
+            "name": "axe-core",
+            "declared": "4.11.4",
+            "locked": "4.11.4"
+          },
+          {
+            "name": "playwright-core",
+            "declared": "1.63.0",
+            "locked": "1.63.0"
+          }
+        ]
+      }
+    },
+    {
+      "mode": "latest",
+      "command": [
+        "deno",
+        "task",
+        "deps:latest",
+        "--project",
+        "tools/fresh-ui-browser"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "project": "tools/fresh-ui-browser",
+        "manager": "npm",
+        "mode": "locked-stable",
+        "scope": "direct",
+        "behind": 5
+      }
+    },
+    {
+      "mode": "outdated",
+      "command": [
+        "deno",
+        "task",
+        "deps:outdated",
+        "--project",
+        "tools/fresh-ui-browser"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "project": "tools/fresh-ui-browser",
+        "manager": "npm",
+        "mode": "locked-stable",
+        "scope": "direct",
+        "behind": 5
+      }
+    },
+    {
+      "mode": "why",
+      "command": [
+        "deno",
+        "task",
+        "deps:why",
+        "--project",
+        "tools/fresh-ui-browser",
+        "playwright-core"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "project": "tools/fresh-ui-browser",
+        "scope": "resolved-graph",
+        "inventoryScope": "direct",
+        "transitivelyPresent": true
+      }
+    },
+    {
+      "mode": "audit",
+      "command": [
+        "deno",
+        "task",
+        "deps:audit",
+        "--project",
+        "tools/fresh-ui-browser",
+        "--fail-on-find"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "project": "tools/fresh-ui-browser",
+        "scope": "resolved-graph",
+        "inventoryScope": "direct",
+        "coveredPackages": 7,
+        "advisoriesFound": false,
+        "totalAdvisories": 0,
+        "metadata": {
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          },
+          "dependencies": {
+            "prod": 1,
+            "dev": 7,
+            "optional": 0,
+            "peer": 0,
+            "peerOptional": 0,
+            "total": 7
+          }
+        }
+      }
+    },
+    {
+      "mode": "prod-install",
+      "command": [
+        "deno",
+        "task",
+        "deps:prod-install",
+        "--project",
+        "tools/fresh-ui-browser"
+      ],
+      "exitCode": 2,
+      "summary": {
+        "error": "Production install unsupported for a dev-only npm tool; use deps:census --project"
+      }
+    },
+    {
+      "mode": "census-default",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        ".llm/tools/deps/census.ts",
+        "--json"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "standaloneProjects": [
+          {
+            "project": "tools/fresh-ui-browser",
+            "manager": "npm",
+            "developmentOnly": true,
+            "manifest": "tools/fresh-ui-browser/package.json",
+            "lock": "tools/fresh-ui-browser/package-lock.json",
+            "scope": "direct",
+            "dependencies": [
+              {
+                "name": "@axe-core/playwright",
+                "declared": "4.11.1",
+                "locked": "4.11.1"
+              },
+              {
+                "name": "@playwright/test",
+                "declared": "1.63.0",
+                "locked": "1.63.0"
+              },
+              {
+                "name": "@types/node",
+                "declared": "26.0.1",
+                "locked": "26.0.1"
+              },
+              {
+                "name": "axe-core",
+                "declared": "4.11.4",
+                "locked": "4.11.4"
+              },
+              {
+                "name": "playwright-core",
+                "declared": "1.63.0",
+                "locked": "1.63.0"
+              }
+            ]
+          }
+        ],
+        "standaloneCounts": {
+          "projects": 1,
+          "directDependencies": 5
+        },
+        "standaloneCoverage": [
+          {
+            "project": "tools/fresh-ui-browser",
+            "manager": "npm",
+            "included": true,
+            "inspectWith": "deno task deps:census --project tools/fresh-ui-browser"
+          }
+        ],
+        "counts": {
+          "members": 37,
+          "catalogEntries": 40,
+          "dependencyKeys": 118,
+          "dependencyUses": 860,
+          "tasks": 307
+        }
+      }
+    }
+  ],
+  "coldProject": {
+    "nodeModulesPresent": false,
+    "npm12Commands": [
+      {
+        "command": [
+          "npm",
+          "--version"
+        ],
+        "exitCode": 0,
+        "nodeModulesPresent": false
+      },
+      {
+        "command": [
+          "npm",
+          "ls",
+          "--package-lock-only",
+          "--depth=0",
+          "--json"
+        ],
+        "exitCode": 0,
+        "nodeModulesPresent": false
+      },
+      {
+        "command": [
+          "npm",
+          "outdated",
+          "--package-lock-only",
+          "--json"
+        ],
+        "exitCode": 0,
+        "nodeModulesPresent": false
+      },
+      {
+        "command": [
+          "npm",
+          "ls",
+          "playwright-core",
+          "--all",
+          "--package-lock-only",
+          "--json"
+        ],
+        "exitCode": 0,
+        "nodeModulesPresent": false
+      },
+      {
+        "command": [
+          "npm",
+          "audit",
+          "--package-lock-only",
+          "--include=dev",
+          "--ignore-scripts",
+          "--json",
+          "--audit-level=low"
+        ],
+        "exitCode": 0,
+        "nodeModulesPresent": false
+      }
+    ],
+    "npm11Commands": [
+      {
+        "command": [
+          "npm",
+          "ls",
+          "playwright-core",
+          "--all",
+          "--package-lock-only",
+          "--json"
+        ],
+        "npmVersion": "11.21.1",
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "npm",
+          "audit",
+          "--package-lock-only",
+          "--include=dev",
+          "--ignore-scripts",
+          "--json",
+          "--audit-level=low"
+        ],
+        "npmVersion": "11.21.1",
+        "exitCode": 0
+      }
+    ]
+  },
+  "coldKnownOld": {
+    "declaredAndLocked": "axe-core@4.10.3",
+    "command": [
+      "npm",
+      "outdated",
+      "--package-lock-only",
+      "--json"
+    ],
+    "versionsTested": [
+      "12.1.0",
+      "11.21.1"
+    ],
+    "exitCode": 0,
+    "output": {},
+    "conclusion": "False-clean native outdated is never used for selected freshness; existing stable resolver compares locked direct pins instead."
+  }
+}

@@ -2,6 +2,13 @@
 /**
  * Report the workspace dependency and task baseline used by dependency-shape scanners.
  */
+import {
+  coverageNotice,
+  projectInventory,
+  runSelectedProject,
+  STANDALONE_PROJECTS,
+  standaloneCoverage,
+} from './standalone-projects.ts';
 import { collectWorkspaceFacts, type DependencyUse } from './workspace.ts';
 
 interface Args {
@@ -54,12 +61,25 @@ function summarizeTasks(tasks: Awaited<ReturnType<typeof collectWorkspaceFacts>>
 }
 
 async function main(): Promise<void> {
+  await runSelectedProject('census');
   const args = parseArgs(Deno.args);
   const facts = await collectWorkspaceFacts();
   const dependencySummary = summarizeDependencies(facts.dependencies);
   const taskSummary = summarizeTasks(facts.tasks);
+  const standaloneProjects = await Promise.all(
+    STANDALONE_PROJECTS.map((project) => projectInventory(Deno.cwd(), project)),
+  );
   const result = {
     generatedAt: new Date().toISOString(),
+    standaloneProjects,
+    standaloneCounts: {
+      projects: standaloneProjects.length,
+      directDependencies: standaloneProjects.reduce(
+        (sum, project) => sum + project.dependencies.length,
+        0,
+      ),
+    },
+    standaloneCoverage: standaloneCoverage('census'),
     members: facts.members.map((member) => ({
       name: member.name,
       root: member.root,
@@ -86,6 +106,10 @@ async function main(): Promise<void> {
   console.log(
     `deps:census members=${result.counts.members} catalog=${result.counts.catalogEntries} deps=${result.counts.dependencyKeys} uses=${result.counts.dependencyUses} tasks=${result.counts.tasks}`,
   );
+  console.log(coverageNotice('census'));
+  for (const project of result.standaloneProjects) {
+    console.log(`  ${project.project}: ${project.dependencies.length} direct npm devDependencies`);
+  }
   for (const dep of dependencySummary) {
     console.log(
       `  ${dep.key} members=${dep.members.length} ranges=${dep.ranges.join(', ') || '<none>'}`,
@@ -102,6 +126,7 @@ function printHelp(): void {
       '  deno run --allow-read .llm/tools/deps/census.ts [--json]',
       '',
       'Flags:',
+      '  --project <dir>  select tools/fresh-ui-browser (production install unsupported)',
       '  --json      full JSON report instead of the one-line + per-dep summary',
       '  --help, -h  show this help',
     ].join('\n'),

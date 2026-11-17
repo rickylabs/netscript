@@ -175,3 +175,15 @@ forking its skill content.
 The previous checkout also had playground dashboard, benchmark comparison, and helper-generation
 scripts. They were not ported because they target older app surfaces or one-off investigations. Add
 new versions only when a current task needs them.
+
+
+Standalone browser npm coverage is selected with `--project tools/fresh-ui-browser` on root
+`deps:census|latest|outdated|why|audit` tasks. Root `outdated`/`why` route through internal
+`deps/standalone-deps.ts`; the shipped generic `deps/outdated.ts` and `deps/why.ts` stay unchanged.
+Selected freshness compares locked direct versions through the existing stable-channel resolver
+(`locked-stable`), because cold `npm outdated` can report false-clean results. Census reads the
+manifest/v3 lock; provenance and audit use native lock-only npm, including dev dependencies.
+Project source-pruning inference and production install are unsupported. Workspace reports expose
+excluded standalone coverage in JSON and pretty output; default census includes its inventory.
+See the canonical command map in `.agents/skills/netscript-deno-toolchain/SKILL.md` and
+`tools/fresh-ui-browser/README.md` for exit codes and exact commands.
