@@ -434,9 +434,54 @@ routes; {{ comp.xref({ key: "ref:sagas" }) }} has the full generated surface.
     { name: "GET /api/v1/sagas/sagas", type: "registry", desc: "List the saga definitions registered into KV (id, name, topic, handled message types, enabled)." },
     { name: "GET /api/v1/sagas/instances", type: "instances", desc: "List running and completed saga instances. Inspect one with /instances/{sagaName}/{correlationId}." },
     { name: "POST /api/v1/sagas/publish", type: "publish", desc: "Durably enqueue a saga message for the background runner. Returns non-2xx when enqueue fails or exceeds the publish deadline." },
-    { name: "GET /api/v1/sagas/subscribe", type: "stream (SSE)", desc: "Server-sent-events stream of saga activity (saga:started / state_changed / completed / failed / compensating), KV-watch backed." }
+    { name: "GET /api/v1/sagas/subscribe", type: "stream (SSE)", desc: "Retained API publish notifications with stable event ids and Last-Event-ID replay, backed by fixed-key KV watch." }
   ]
 }) }}
+
+## Resuming the API event feed
+
+The subscribe endpoint delivers the API's publish notifications. Its default writer emits
+`saga:message_received`; the feed does not introduce additional runtime lifecycle publishers.
+Each client has its own cursor, so a slow client does not consume another client's history.
+Successful journal commits define publish order across API instances. Each data event has a stable
+`epoch:sequence` id; treat it as an opaque cursor. The initial connected heartbeat has no id.
+
+Without `Last-Event-ID`, the subscription starts live after its readiness barrier. Reconnect with
+the last data event's id in that header to replay every later retained matching event, then follow
+new events. The backend retains the latest **256 events** in a fixed ring plus one head key, for
+**at most 257 journal keys**. There is no time-based expiry or background pruning; per-event size
+limits and durability follow the configured KV. Idle readers watch the fixed head and never scan
+the keyspace. The `sagaName` filter advances over the same global history, rather than reserving a
+separate retention window per filter.
+
+A cursor can resume from the predecessor of the oldest retained event through the latest event.
+Older cursors, a different epoch, a reset store or an overwritten required slot produce an explicit
+gap. A reader overtaken by retention receives that same error instead of silently skipping events.
+Handle the native oRPC terminal SSE error frame:
+
+| Code | Status in the error frame | Meaning and recovery |
+| --- | --- | --- |
+| `BAD_REQUEST` | 400 | Malformed cursor or a position ahead of the journal. Correct or clear the cursor. |
+| `CONFLICT` | 409 | `data.reason` is `history-lost`; known bounds are `oldestId` and `latestId`. Refresh application state, clear the old cursor and reconnect live. |
+| `SERVICE_UNAVAILABLE` | 503 | Backend/watch failure, corrupt history or exhausted write contention. Recover the backend and retry from the last received data id. |
+
+The streaming HTTP response may already be 200 when an error frame arrives. An SSE or oRPC client
+must handle that frame and close the failed iterator, in addition to handling network errors.
+Heartbeats do not replace the last data cursor. A client that has never received a data id has no
+replay position and reconnects live. Cancellation closes only that subscription; the application
+continues to own KV.
+
+Observation and runtime acceptance are separate commits. API publication first accepts runtime
+work, then appends its notification. A journal failure or request cancellation can therefore report
+failure after work was accepted. Use the application's idempotency key when retrying runtime work;
+an uncertain append/retry may still create another notification. Stable event ids let clients
+deduplicate replay across reconnects. KV persistence governs history across API restarts.
+
+The journal uses the versioned `['saga', 'event-feed', 'v1']` prefix. During upgrade, drain old API
+instances and clear saved legacy numeric cursors before subscribing again. The old random-key
+history cannot be reconstructed into publish order and is not migrated, scanned or extended by the
+new feed. Remove obsolete legacy keys separately through your host's KV maintenance path if
+needed. The 257-key bound covers the new journal, excluding those legacy keys.
 
 ## The continuous-app choreography
 

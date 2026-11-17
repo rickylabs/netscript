@@ -1,11 +1,12 @@
-import { withEventMeta } from '@orpc/server';
+import { ORPCError, withEventMeta } from '@orpc/server';
+import { abortable } from '@std/async';
+import { KvSagaEventFeed } from '@netscript/plugin-sagas-core/adapters';
 import type { PluginCapabilities } from '@netscript/plugin/contract-base';
-import type { SagaSSEEvent } from '@netscript/plugin-sagas-core/contracts/v1';
 import { getKv } from '@netscript/kv';
 import { notFound } from '@netscript/contracts';
 import { getTraceContext } from '@netscript/telemetry/context';
 import { getSagaMetadata, listSagaMetadata } from '../saga-registry.ts';
-import { SagasError } from '@netscript/plugin-sagas-core/domain';
+import { SagaEventFeedError, SagasError } from '@netscript/plugin-sagas-core/domain';
 import { router, type SagasHandlers } from './router-context.ts';
 import {
   buildSagaInstanceWhere,
@@ -156,58 +157,44 @@ export const sagasV1: SagasHandlers<SagasV1RouteKey> = {
   }),
 
   /** Publish a message to trigger saga state transitions. */
-  publish: router.publish.handler(async ({ input, context }) => {
+  publish: router.publish.handler(async ({ input, context, signal }) => {
     const traceContext = getTraceContext();
     return await publishSagaMessage(input, {
       runtime: contextSagaRuntime(context),
       traceHeaders: traceContextToHeaders(traceContext),
       timeoutMs: context.publishTimeoutMs,
+      signal,
     });
   }),
 
   /** Subscribe to real-time saga state updates over SSE. */
-  subscribe: router.subscribe.handler(async function* ({ input, signal }) {
-    const sagaNameFilter = input?.sagaName;
-    const kv = await getKv();
-    let lastHeartbeat = Date.now();
-    let eventId = 0;
-
-    yield withEventMeta(
-      {
-        type: 'heartbeat' as const,
-        timestamp: new Date().toISOString(),
-        data: { connected: true },
-      } as SagaSSEEvent,
-      { id: String(++eventId), retry: 5000 },
-    );
-
-    const eventStream = kv.watchPrefix<SagaSSEEvent>(['saga', 'events'], {
-      signal,
-      pollInterval: 100,
-    });
-
-    for await (const watchEvent of eventStream) {
-      if (signal?.aborted) break;
-      if (watchEvent.type === 'delete' || !watchEvent.value) continue;
-
-      const event = watchEvent.value;
-      if (sagaNameFilter && event.sagaName !== sagaNameFilter) continue;
-
-      yield withEventMeta(event, { id: String(++eventId), retry: 5000 });
-      await kv.delete(watchEvent.key);
-
-      const now = Date.now();
-      if (now - lastHeartbeat > 30000) {
-        yield withEventMeta(
-          {
+  subscribe: router.subscribe.handler(async function* ({ input, signal, lastEventId }) {
+    try {
+      const kv = await getKv();
+      const feed = new KvSagaEventFeed(kv);
+      for await (const item of feed.subscribe({ afterId: lastEventId, signal })) {
+        if (item.type === 'ready') {
+          yield withEventMeta({
             type: 'heartbeat' as const,
             timestamp: new Date().toISOString(),
             data: { connected: true },
-          } as SagaSSEEvent,
-          { id: String(++eventId), retry: 5000 },
-        );
-        lastHeartbeat = now;
+          }, { retry: 5000 });
+        } else if (!input?.sagaName || item.event.sagaName === input.sagaName) {
+          yield withEventMeta(item.event, { id: item.id, retry: 5000 });
+        }
       }
+    } catch (error) {
+      if (!(error instanceof SagaEventFeedError)) throw error;
+      const code = error.reason === 'invalid-cursor'
+        ? 'BAD_REQUEST'
+        : error.reason === 'history-lost'
+        ? 'CONFLICT'
+        : 'SERVICE_UNAVAILABLE';
+      throw new ORPCError(code, {
+        message: error.message,
+        cause: error,
+        data: { reason: error.reason, oldestId: error.oldestId, latestId: error.latestId },
+      });
     }
   }),
 
@@ -251,6 +238,7 @@ export async function publishSagaMessage(
     tracestate: options.traceHeaders?.tracestate,
   });
 
+  options.signal?.throwIfAborted();
   await publishWithinDeadline(
     options.runtime.publish(message, {
       idempotencyKey,
@@ -258,6 +246,7 @@ export async function publishSagaMessage(
       tracestate: message.tracestate,
     }),
     options.timeoutMs ?? DEFAULT_SAGA_PUBLISH_TIMEOUT_MS,
+    options.signal,
   );
 
   const event: SagaPublishEvent = {
@@ -266,7 +255,11 @@ export async function publishSagaMessage(
     correlationId,
     data: { messageType: type, correlationId, payload, headers: options.traceHeaders ?? {} },
   };
-  await (options.writeEvent ?? writeSagaPublishEvent)(event);
+  options.signal?.throwIfAborted();
+  const write = options.writeEvent
+    ? options.writeEvent(event)
+    : writeSagaPublishEvent(event, options.signal);
+  await (options.signal ? abortable(write, options.signal) : write);
 
   return {
     published: true,
@@ -275,7 +268,11 @@ export async function publishSagaMessage(
   };
 }
 
-async function publishWithinDeadline(publish: Promise<unknown>, timeoutMs: number): Promise<void> {
+async function publishWithinDeadline(
+  publish: Promise<unknown>,
+  timeoutMs: number,
+  signal?: AbortSignal,
+): Promise<void> {
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
     throw SagasError.validationFailed('Saga publish timeout must be a positive number.');
   }
@@ -287,7 +284,8 @@ async function publishWithinDeadline(publish: Promise<unknown>, timeoutMs: numbe
     );
   });
   try {
-    await Promise.race([publish, timeout]);
+    const pending = Promise.race([publish, timeout]);
+    await (signal ? abortable(pending, signal) : pending);
   } finally {
     if (timer !== undefined) {
       clearTimeout(timer);
@@ -302,9 +300,9 @@ function contextSagaRuntime(context: SagaServiceContext) {
   throw SagasError.validationFailed('Sagas API publish requires a started saga runtime.');
 }
 
-async function writeSagaPublishEvent(event: SagaPublishEvent): Promise<void> {
+async function writeSagaPublishEvent(event: SagaPublishEvent, signal?: AbortSignal): Promise<void> {
   const kv = await getKv();
-  await kv.set(['saga', 'events', crypto.randomUUID()], event);
+  await new KvSagaEventFeed(kv).append(event, { signal });
 }
 
 function traceContextToHeaders(

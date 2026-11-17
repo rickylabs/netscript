@@ -14,6 +14,8 @@ import {
   type BasePluginDescribeRoute,
 } from '@netscript/plugin/contract-base';
 import { SAGA_DURABILITY_TIERS, SAGA_INSTANCE_STATUSES } from '../../domain/mod.ts';
+import type { SagaSSEEvent, SagaSSEEventType } from '../../domain/saga-message.ts';
+export type { SagaSSEEvent, SagaSSEEventType } from '../../domain/saga-message.ts';
 
 /** Result returned by contract schema validation. */
 export type ContractSchemaResult<TOutput> =
@@ -181,28 +183,6 @@ export type PublishMessageResponse = Readonly<{
   correlationId?: string;
   correlationKey?: string;
   messageId?: string;
-}>;
-
-/** Server-sent event kinds emitted by the saga service. */
-export type SagaSSEEventType =
-  | 'saga:started'
-  | 'saga:message_received'
-  | 'saga:state_changed'
-  | 'saga:completed'
-  | 'saga:failed'
-  | 'saga:compensating'
-  | 'heartbeat';
-
-/** Server-sent event payload emitted by saga subscriptions. */
-export type SagaSSEEvent = Readonly<{
-  type: SagaSSEEventType;
-  timestamp: string;
-  sagaName?: string;
-  sagaId?: string;
-  instanceId?: string;
-  correlationId?: string;
-  correlationKey?: string;
-  data?: Readonly<Record<string, unknown>>;
 }>;
 
 /** Query filters accepted by the list-sagas endpoint. */

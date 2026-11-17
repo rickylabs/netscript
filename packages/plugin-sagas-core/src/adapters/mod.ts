@@ -92,3 +92,12 @@ export { createSagaBusBridge, SagaBusBridge } from './saga-bus-bridge.ts';
 export type { SagaBridgeCompensationResolver, SagaBusBridgeOptions } from './saga-bus-bridge.ts';
 
 export { WORKER_COMMAND_EFFECT_KINDS } from '../domain/mod.ts';
+
+export { KvSagaEventFeed, SAGA_EVENT_HISTORY_LIMIT } from './kv-saga-event-feed.ts';
+export type {
+  SagaEventFeedAppendOptions,
+  SagaEventFeedEntry,
+  SagaEventFeedItem,
+  SagaEventFeedSubscribeOptions,
+} from './kv-saga-event-feed.ts';
+export type { SagaSSEEvent, SagaSSEEventType } from '../domain/saga-message.ts';

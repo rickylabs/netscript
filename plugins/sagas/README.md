@@ -435,3 +435,31 @@ runtime backfill or parallel query path is added. PostgreSQL rejects non-canonic
 column values with `saga_instances_status_check`. When the core lifecycle vocabulary
 changes, ship a new immutable migration to update that constraint; never edit an
 already-installed SQL contribution.
+
+## Replaying API event notifications
+
+`GET /api/v1/sagas/subscribe` delivers API publish notifications from a KV journal. Each active
+client has its own cursor and receives matching events in successful publish-commit order. Readers
+do not consume or delete each other's history. The connected heartbeat has no id; data events carry
+stable `epoch:sequence` ids. Connections without `Last-Event-ID` start live after readiness; send the
+last data id in that header to replay later retained events and then continue live.
+
+The journal retains the latest 256 events globally, using at most 257 keys (256 event slots and a
+head), without a time-based expiry. The existing `sagaName` filter applies after advancing through
+that shared history. Idle subscriptions watch the fixed head key and do not scan the keyspace.
+A reader overtaken by retention receives a native oRPC SSE error frame with `CONFLICT` and
+`data.reason: 'history-lost'`, including history bounds when available. Fetch a fresh application
+snapshot, clear the saved cursor and reconnect. Malformed/future ids produce `BAD_REQUEST`;
+backend or corrupt-history failures produce `SERVICE_UNAVAILABLE`. Streaming headers may already
+be HTTP 200, so clients must handle the terminal error frame as well as network failures.
+
+This is an observation feed for API publications, with the existing `saga:message_received` default
+writer. It does not add runtime lifecycle publishers. Runtime acceptance and journal append are
+separate commits: a failed or cancelled response can follow successful acceptance, and an uncertain
+retry may append another notification. Use runtime idempotency keys and deduplicate replay by event
+id. History survives API restarts when the configured KV survives; retention and restart durability
+follow the KV backend. Cancellation releases the reader and leaves the host-owned KV open.
+
+Upgrade by draining old API instances and clearing legacy numeric cursors. The new versioned
+journal does not read or extend old random event keys; legacy history is not migrated. Its key bound
+excludes legacy keys, which can be removed separately through the host's KV maintenance path.

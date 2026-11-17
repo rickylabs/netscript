@@ -23,8 +23,12 @@ export type {
   SagasErrorCode,
 } from './constants.ts';
 export { DEFAULT_RETRY_POLICY } from './retry-policy.ts';
-export { SagasError } from './errors.ts';
-export type { SagasErrorOptions } from './errors.ts';
+export { SagaEventFeedError, SagasError } from './errors.ts';
+export type {
+  SagaEventFeedErrorOptions,
+  SagaEventFeedFailure,
+  SagasErrorOptions,
+} from './errors.ts';
 export type { SagaCorrelationKey, SagaId, SagaInstanceId, SagaMessageId } from './ids.ts';
 export type { RetryPolicy } from './retry-policy.ts';
 export type {
@@ -33,7 +37,12 @@ export type {
   SagaStateEnvelope,
   SagaStateMetadata,
 } from './saga-state.ts';
-export type { SagaMessage, SagaMessageType } from './saga-message.ts';
+export type {
+  SagaMessage,
+  SagaMessageType,
+  SagaSSEEvent,
+  SagaSSEEventType,
+} from './saga-message.ts';
 export type {
   CascadedMessage,
   CascadedMessageOptions,
