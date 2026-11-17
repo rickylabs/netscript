@@ -1,24 +1,28 @@
-import type { JSX } from 'preact';
 import type { MachineDataAttributes } from '../_internal/dom-types.ts';
 import type { FreshUiChildren } from '../_internal/public-props.ts';
 
+/** DOM attributes returned for the dialog trigger part. */
 export type DialogTriggerElementProps =
-  & JSX.ButtonHTMLAttributes<HTMLButtonElement>
+  & preact.JSX.ButtonHTMLAttributes<HTMLButtonElement>
   & MachineDataAttributes;
+/** DOM attributes returned for the dialog content part. */
 export type DialogContentElementProps =
-  & JSX.HTMLAttributes<HTMLDialogElement>
+  & preact.JSX.HTMLAttributes<HTMLDialogElement>
   & MachineDataAttributes
   & {
     open?: boolean;
   };
+/** DOM attributes returned for the dialog title part. */
 export type DialogTitleElementProps =
-  & JSX.HTMLAttributes<HTMLHeadingElement>
+  & preact.JSX.HTMLAttributes<HTMLHeadingElement>
   & MachineDataAttributes;
+/** DOM attributes returned for the dialog description part. */
 export type DialogDescriptionElementProps =
-  & JSX.HTMLAttributes<HTMLParagraphElement>
+  & preact.JSX.HTMLAttributes<HTMLParagraphElement>
   & MachineDataAttributes;
+/** DOM attributes returned for the dialog close part. */
 export type DialogCloseElementProps =
-  & JSX.ButtonHTMLAttributes<HTMLButtonElement>
+  & preact.JSX.ButtonHTMLAttributes<HTMLButtonElement>
   & MachineDataAttributes;
 
 export type DialogOpenChangeReason =
@@ -33,12 +37,19 @@ export interface DialogOpenChangeDetails {
   reason: DialogOpenChangeReason;
 }
 
+/** Controlled and initial state for the dialog hook. */
 export interface UseDialogOptions {
+  /** Whether Escape dismisses an open surface. */
   closeOnEscape?: boolean;
+  /** Whether outside pointer or focus interaction dismisses the surface. */
   closeOnInteractOutside?: boolean;
+  /** Initial open state when open is uncontrolled. */
   defaultOpen?: boolean;
+  /** Stable base identifier for accessible part relationships. */
   id?: string;
+  /** Whether the surface traps focus and makes surrounding content inert. */
   modal?: boolean;
+  /** Receives open-state changes and their transition details. */
   onOpenChange?: (
     open: boolean,
     details: {
@@ -51,18 +62,23 @@ export interface UseDialogOptions {
         | 'programmatic';
     },
   ) => void;
+  /** Controlled open state. */
   open?: boolean;
 }
 
 export interface UseDialogReturn {
-  getCloseProps: (props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => DialogCloseElementProps;
-  getContentProps: (props?: JSX.HTMLAttributes<HTMLDialogElement>) => DialogContentElementProps;
+  getCloseProps: (
+    props?: preact.JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+  ) => DialogCloseElementProps;
+  getContentProps: (
+    props?: preact.JSX.HTMLAttributes<HTMLDialogElement>,
+  ) => DialogContentElementProps;
   getDescriptionProps: (
-    props?: JSX.HTMLAttributes<HTMLParagraphElement>,
+    props?: preact.JSX.HTMLAttributes<HTMLParagraphElement>,
   ) => DialogDescriptionElementProps;
-  getTitleProps: (props?: JSX.HTMLAttributes<HTMLHeadingElement>) => DialogTitleElementProps;
+  getTitleProps: (props?: preact.JSX.HTMLAttributes<HTMLHeadingElement>) => DialogTitleElementProps;
   getTriggerProps: (
-    props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+    props?: preact.JSX.ButtonHTMLAttributes<HTMLButtonElement>,
   ) => DialogTriggerElementProps;
   ids: {
     content: string;

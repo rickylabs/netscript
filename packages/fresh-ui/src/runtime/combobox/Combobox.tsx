@@ -1,5 +1,5 @@
 import { createContext } from 'preact';
-import type { ComponentChildren, VNode } from 'preact';
+import type { ComponentChildren } from 'preact';
 import { useContext } from 'preact/hooks';
 import { useCombobox } from './use-combobox.ts';
 import type {
@@ -21,7 +21,7 @@ function useComboboxContext(partName: string): UseComboboxReturn {
   return context;
 }
 
-function ComboboxRoot({ children, ...options }: ComboboxRootProps): VNode {
+function ComboboxRoot({ children, ...options }: ComboboxRootProps): preact.VNode {
   const combobox = useCombobox(options);
   return (
     <ComboboxContext.Provider value={combobox}>
@@ -30,35 +30,37 @@ function ComboboxRoot({ children, ...options }: ComboboxRootProps): VNode {
   );
 }
 
-function ComboboxInput(props: ComboboxInputProps): VNode {
+function ComboboxInput(props: ComboboxInputProps): preact.VNode {
   const combobox = useComboboxContext('Combobox.Input');
   return <input {...combobox.getInputProps(props)} />;
 }
 
-function ComboboxContent({ children, ...props }: ComboboxContentProps): VNode {
+function ComboboxContent({ children, ...props }: ComboboxContentProps): preact.VNode {
   const combobox = useComboboxContext('Combobox.Content');
   return <div {...combobox.getContentProps(props)}>{children as ComponentChildren}</div>;
 }
 
-function ComboboxItem({ children, value, ...props }: ComboboxItemProps): VNode {
+function ComboboxItem({ children, value, ...props }: ComboboxItemProps): preact.VNode {
   const combobox = useComboboxContext('Combobox.Item');
   return <div {...combobox.getItemProps(value, props)}>{children as ComponentChildren}</div>;
 }
 
-function ComboboxEmpty({ children, ...props }: ComboboxEmptyProps): VNode {
+function ComboboxEmpty({ children, ...props }: ComboboxEmptyProps): preact.VNode {
   return (
     <div data-part='empty' data-scope='combobox' {...props}>{children as ComponentChildren}</div>
   );
 }
 
+/** Public compound combobox parts and their exact prop/result signatures. */
 export type ComboboxNamespace = Readonly<{
-  Root: (props: ComboboxRootProps) => VNode;
-  Input: (props: ComboboxInputProps) => VNode;
-  Content: (props: ComboboxContentProps) => VNode;
-  Item: (props: ComboboxItemProps) => VNode;
-  Empty: (props: ComboboxEmptyProps) => VNode;
+  Root: (props: ComboboxRootProps) => preact.VNode;
+  Input: (props: ComboboxInputProps) => preact.VNode;
+  Content: (props: ComboboxContentProps) => preact.VNode;
+  Item: (props: ComboboxItemProps) => preact.VNode;
+  Empty: (props: ComboboxEmptyProps) => preact.VNode;
 }>;
 
+/** Compound accessible combobox with controlled or uncontrolled selection. */
 export const Combobox: ComboboxNamespace = {
   Root: ComboboxRoot,
   Input: ComboboxInput,

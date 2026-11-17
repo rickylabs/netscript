@@ -10,11 +10,13 @@
  */
 
 import { assert } from '@std/assert';
-import type { VNode } from 'preact';
+import { cloneElement, isValidElement, toChildArray } from 'preact';
+import type { JSX, VNode } from 'preact';
 import { DataGrid } from '../mod.ts';
 import {
   Accordion,
   Combobox,
+  type ComboboxInputProps,
   Dialog,
   Drawer,
   Popover,
@@ -23,6 +25,48 @@ import {
   Tooltip,
 } from '../interactive.ts';
 import { Icon, Show, SrOnly, VisuallyHidden } from '../primitives.tsx';
+
+// Every compound member retains its original concrete VNode result.
+const vnodeFactories: readonly ((props: never) => VNode)[] = [
+  ...Object.values(Accordion),
+  ...Object.values(Combobox),
+  ...Object.values(Dialog),
+  ...Object.values(Drawer),
+  ...Object.values(Popover),
+  ...Object.values(Sheet),
+  ...Object.values(Tabs),
+  ...Object.values(Tooltip),
+];
+
+// Type-check direct call results against VNode-specific APIs without calling hooks outside render.
+function preserveVNode(factory: (props: never) => VNode, props: never): VNode {
+  const node = factory(props);
+  const started: number | undefined = node.startTime;
+  const ended: number | undefined = node.endTime;
+  const ref: VNode['ref'] = node.ref;
+  const clone: VNode = cloneElement(node, { ref });
+  assert(isValidElement(clone));
+  assert(Array.isArray(toChildArray(clone.props.children)));
+  assert(started === undefined || typeof started === 'number');
+  assert(ended === undefined || typeof ended === 'number');
+  return clone;
+}
+
+// Both assignment directions preserve the upstream input attribute and targeted-event contract.
+const inputAttributes: JSX.InputHTMLAttributes<HTMLInputElement> = {
+  'aria-label': 'Search records',
+  onInput: (event) => {
+    event.currentTarget.value.trim();
+  },
+  onKeyDown: (event) => {
+    if (event.key === 'Escape') event.currentTarget.blur();
+  },
+  ref: (element) => {
+    element?.setSelectionRange(0, 0);
+  },
+};
+const publicInputAttributes: ComboboxInputProps = inputAttributes;
+const upstreamInputAttributes: JSX.InputHTMLAttributes<HTMLInputElement> = publicInputAttributes;
 
 const accordion: VNode = (
   <Accordion.Root>
@@ -112,7 +156,7 @@ const tooltip: VNode = (
 
 const combobox: VNode = (
   <Combobox.Root defaultInputValue=''>
-    <Combobox.Input placeholder='Search…' />
+    <Combobox.Input {...upstreamInputAttributes} placeholder='Search…' />
     <Combobox.Content>
       <Combobox.Item value='one'>One</Combobox.Item>
       <Combobox.Item value='two'>Two</Combobox.Item>
@@ -154,6 +198,8 @@ const dataGrid: VNode = (
 );
 
 Deno.test('runtime namespaces construct consumer-shaped JSX trees', () => {
+  for (const factory of vnodeFactories) assert(typeof factory === 'function');
+  assert(typeof preserveVNode === 'function');
   for (
     const tree of [
       accordion,
