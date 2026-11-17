@@ -151,6 +151,7 @@ async function cleanup(repoRoot: string, projectRoot: string): Promise<void> {
     projectRoot,
     'true',
     receiptPath,
+    repoRoot,
   ], projectRoot);
   const receipt = z.object({
     evaluation: z.object({

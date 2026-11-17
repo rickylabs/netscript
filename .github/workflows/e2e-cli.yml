@@ -389,8 +389,7 @@ jobs:
             .llm/tmp/e2e-report-scaffold-runtime*.ndjson
             .llm/tmp/e2e-image-pulls.json
             .llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json
-            .llm/tmp/cli-e2e/documented-scaffold/**/.netscript/e2e-cleanup-diagnostic.json
-            .llm/tmp/cli-e2e/*/.netscript/e2e-restart-diagnostic.json
+            .llm/tmp/e2e-invocation-diagnostics/*-diagnostic.json
             .llm/tmp/gate-receipts/scaffold-runtime/agent.aspire-mcp-smoke*
           include-hidden-files: true
           if-no-files-found: ignore
@@ -509,8 +508,7 @@ jobs:
             .llm/tmp/e2e-report-scaffold-runtime-sqlite*.ndjson
             .llm/tmp/e2e-image-pulls.json
             .llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json
-            .llm/tmp/cli-e2e/documented-scaffold/**/.netscript/e2e-cleanup-diagnostic.json
-            .llm/tmp/cli-e2e/*/.netscript/e2e-restart-diagnostic.json
+            .llm/tmp/e2e-invocation-diagnostics/*-diagnostic.json
             .llm/tmp/gate-receipts/scaffold-runtime-sqlite/agent.aspire-mcp-smoke*
             .llm/tmp/showcase-ai-browser/
           include-hidden-files: true

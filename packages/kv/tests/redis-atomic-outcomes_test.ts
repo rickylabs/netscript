@@ -4,6 +4,13 @@ import { RedisKvAdapter } from '../redis.ts';
 import type { AtomicMutation } from '../types/kv-store.ts';
 
 type Reply = (commands: number, attempt: number) => unknown;
+/** ioredis5.11.1 built/utils/index.js51–68: transaction.js passes EXEC through wrapMultiResult.
+ * The pinned normalizer wraps Error as [error], and ordinary details as [null, detail].
+ * This source-proven fixture models that normalization before the actual owning adapter runs.
+ */
+function ioredisExecReplies(values: readonly unknown[]): unknown[] {
+  return values.map((item) => item instanceof Error ? [item] : [null, item]);
+}
 function fixture(
   reply: Reply,
   options: { cleanupFails?: boolean; publicationFails?: boolean } = {},
@@ -84,6 +91,27 @@ const mutations: AtomicMutation[] = [
 ];
 const success: Reply = (count) => Array.from({ length: count }, () => [null, 'OK']);
 
+Deno.test('pinned ioredis normalization keeps one-element Error tuples and null success details', () => {
+  const failure = new Error('synthetic');
+  assertEquals(ioredisExecReplies(['OK', failure, null]), [[null, 'OK'], [failure], [null, null]]);
+});
+
+Deno.test('ioredis command failure survives failed task cleanup without notification or retry', async () => {
+  const f = fixture(() => ioredisExecReplies([new Error('synthetic private detail'), 'OK', 'OK']), {
+    cleanupFails: true,
+  });
+  try {
+    const error = await assertRejects(() => f.kv.atomic([], mutations));
+    assert(error instanceof Error);
+    assertEquals(Reflect.get(error, 'reason'), 'command_failed');
+    assertEquals(Reflect.get(error, 'cause'), undefined);
+    assertEquals(f.notifications(), 0);
+    assertEquals(f.attempts(), 1);
+  } finally {
+    await f.kv.close();
+  }
+});
+
 Deno.test('Redis atomic validates all successful command tuples before notifying', async () => {
   const f = fixture((count) => Array.from({ length: count }, () => [null, null]));
   try {
@@ -125,13 +153,10 @@ Deno.test('Redis repeated null EXEC retains bounded conflict failure', async () 
 for (const failed of [0, 1, 2]) {
   Deno.test(`Redis command failure at position ${failed} is unconfirmed without retry or notification`, async () => {
     const f = fixture((count) =>
-      Array.from(
+      ioredisExecReplies(Array.from(
         { length: count },
-        (_, i) =>
-          i === failed
-            ? [new Error('synthetic command payload must remain private'), null]
-            : [null, 'OK'],
-      )
+        (_, i) => i === failed ? new Error('synthetic command payload must remain private') : 'OK',
+      ))
     );
     try {
       const error = await assertRejects(() => f.kv.atomic([], mutations));
@@ -157,6 +182,9 @@ for (
     ['long', [[null, 1], [null, 1], [null, 1], [null, 1]]],
     ['malformed tuple', [[null, 1], [null], [null, 1]]],
     ['missing error slot', [[null, 1], [undefined, 'OK'], [null, 1]]],
+    ['non-error singleton', [[null, 1], ['unexpected'], [null, 1]]],
+    ['non-error error slot', [[null, 1], ['unexpected', null], [null, 1]]],
+    ['oversized error tuple', [[null, 1], [new Error('synthetic'), null, null], [null, 1]]],
   ] as const
 ) {
   Deno.test(`Redis ${label} EXEC result cannot certify a complete commit`, async () => {

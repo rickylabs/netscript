@@ -38,6 +38,7 @@ export class CommandGate {
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       const started = performance.now();
+      const startedAt = new Date().toISOString();
       const result = await this.executor.run({
         cwd: this.definition.cwd(context),
         command: this.definition.command(context),
@@ -46,6 +47,12 @@ export class CommandGate {
         failureHint: this.definition.failureHint,
       });
       const durationMs = Math.round(performance.now() - started);
+      const completedAt = new Date().toISOString();
+      try {
+        await this.definition.afterCommand?.({ context, result, startedAt, completedAt });
+      } catch {
+        console.warn('Command diagnostic unavailable; original outcome preserved.');
+      }
       const missingOutput = (this.definition.stdoutIncludes ?? []).filter((value) =>
         !result.stdout.includes(value)
       );

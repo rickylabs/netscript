@@ -23,6 +23,7 @@ export interface CapturedInvocation {
   readonly startedAt?: string;
   readonly completedAt?: string;
   readonly process?: 'aspire' | 'database_cli';
+  readonly timedOut?: boolean;
   readonly reportedRestart?: { readonly resource: string; readonly exit: number };
 }
 export interface DiagnosticRecord {
@@ -212,7 +213,9 @@ export async function invocationDiagnostic(input: {
   return {
     ordinal: input.ordinal,
     operation: input.operation,
-    nativeExit: invocation.code,
+    nativeExit: invocation.process === 'database_cli' ? null : invocation.code,
+    executorExit: invocation.process === 'database_cli' ? invocation.code : null,
+    timedOut: invocation.timedOut ?? false,
     process: invocation.process ?? 'aspire',
     reportedRestart: invocation.reportedRestart && NAMES.has(invocation.reportedRestart.resource) &&
         Number.isInteger(invocation.reportedRestart.exit) && invocation.reportedRestart.exit >= 0 &&
