@@ -2,7 +2,7 @@
 // Do not edit by hand. Run `deno task gen:publish-assets`.
 
 /** Version of the published MCP package. */
-export const MCP_PACKAGE_VERSION: string = '0.0.9';
+export const MCP_PACKAGE_VERSION: string = '0.0.10-canary.4';
 
 /** Published MCP README embedded as the default documentation corpus. */
 const MCP_PACKAGE_README_GZIP_BASE64: string =
@@ -307,7 +307,7 @@ export const MCP_EMBEDDED_DOCS_PROVENANCE:
       'pages/web-layer/vite/index.md',
       'pages/why/index.md',
     ],
-    sourceBytes: 3270491,
+    sourceBytes: 3271241,
     documentCount: 286,
-    sha256: '6ab1f38e12ef15d43625906fd027d8bce6019f46d9424987cf73824754fd7df5',
+    sha256: '8d0ece04ada4e94368adb38fafcb8857e2c2635095e5f2df84aa89f8d51b62cb',
   };
