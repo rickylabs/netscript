@@ -120,3 +120,15 @@ Fresh matrix confirms feature IMPL-EVAL primary MuseSpark1.3/xhigh, fallback Opu
 
 
 Implementation completion comment: https://github.com/rickylabs/netscript/pull/2645#issuecomment-6933353414 . Issues2633(4/4) and2635(5/5) acceptance now checked with linked local executable proof; PR body carries separate closing lines and4+5fenced mappings. Final DoD/readiness gate remains unchecked pending independent verdict, supported runtime and final checks/cleanup. Exactly one status:impl-eval; still draft. Review-thread gate0threads/0unanswered. Current artifact head's lightweight checks were in progress/policy-skipped, not claimed green. Product remains identical to2d7aa10448700b46cb1c2dbb4665044eafb60dfa.
+
+
+## Independent implementation evaluation and external-gate triage
+
+Fresh MuseSpark1.3/xhigh independent IMPL-EVAL PASS at79f35829e679e5ff0d2c62d0a1a9a62d2f1ae03e. Evaluator reran full queue215/0/3, plugin266/0/0, core113/0/0 (its broader environment executed the formerly optional case), static/fitness/JSR/docs/consumer gates and all9acceptance. Artifact evaluate.md retained unchanged. No implementation findings; external runtime explicitly uncertified and final DoD still pending.
+
+Supported workflow43984548275 completed with static/native/SQLite runtime SUCCESS, Postgres FAILURE. Postgres failure is behavior.documented-scaffold's restored variant during db generate refreshing dashboard, after users refresh; first two documented variants and every owned cleanup assertion pass. The bounded error capture truncates native restart detail, so exact root cause remains unknown. This stage/symptom also exists on unchanged main: [baseline43936107382](https://github.com/rickylabs/netscript/actions/runs/43936107382), recorded with crossed candidate/main evidence in the runtime shutdown PR. That comparison predates this worker implementation and prevents inferring a worker regression from the refresh symptom alone. No bypass/assertion removal or speculative product fix.
+
+A single failed-job-only rerun at the same immutable source is justified by the crossed baseline evidence and completed green alternate runtime/static/native legs. It retains the full one-pass command and cleanup assertions, rather than repeating every lane. The original failed attempt remains evidence, not a PASS. Owner authorization to complete required validation already covers necessary failure diagnosis/retry; the evaluator's suggestion to request fresh permission does not override that authorization. Final supported Postgres PASS remains mandatory before readiness.
+
+
+Final resource cleanup completed after independent evaluation: four exact native container IDs and four recorded anonymous volumes removed after native label/mount verification, maintained read-only leak/teardown preview, and a full unreferenced-volume scan. Final owner/recorded-volume scans zero; every foreign/unproven resource retained. Sanitized leak-report.md records proof; raw logs/identities remain private. Supported SQLite116/116 +showcase8/8, static/native SUCCESS; Postgres-only unchanged-source retry remains pending. No worker source change after independent PASS.
