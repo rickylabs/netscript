@@ -1,0 +1,575 @@
+{
+  "schemaVersion": 1,
+  "milestone": "0.0.9",
+  "baselineMainSha": "30c800958dbf512a4951d640f08748703a8b59e3",
+  "nodes": [
+    {
+      "id": "issue:1364",
+      "kind": "issue",
+      "issueNumber": 1364,
+      "lane": "docs",
+      "title": "docs(orchestration-runtime): outbound webhook delivery has no recipe or template \u2014 triggers ship inbound ingress only, so every product hand-rolls signing, retry and dead-lettering"
+    },
+    {
+      "id": "issue:1366",
+      "kind": "issue",
+      "issueNumber": 1366,
+      "lane": "features",
+      "title": "fix(plugins): every declareHealthChecks returns only the API resource \u2014 a crash-looping background child leaves the declared health surface green"
+    },
+    {
+      "id": "issue:1367",
+      "kind": "issue",
+      "issueNumber": 1367,
+      "lane": "features",
+      "title": "fix(streams): STREAMS_DATA_DIR is set by nothing the framework generates, so \"durable streams\" is always in-memory"
+    },
+    {
+      "id": "issue:1491",
+      "kind": "issue",
+      "issueNumber": 1491,
+      "lane": "docs",
+      "title": "[command C10] Publish command and relay guides with executable examples"
+    },
+    {
+      "id": "issue:1655",
+      "kind": "issue",
+      "issueNumber": 1655,
+      "lane": "internals",
+      "title": "chore(workers): eliminate 20 private-type-ref diagnostics from the published export surface"
+    },
+    {
+      "id": "issue:1667",
+      "kind": "issue",
+      "issueNumber": 1667,
+      "lane": "internals",
+      "title": "test(queue): eliminate typed-queue DLQ timing flake"
+    },
+    {
+      "id": "issue:1668",
+      "kind": "issue",
+      "issueNumber": 1668,
+      "lane": "internals",
+      "title": "chore(mcp): export-surface corpus is stale on main and no branch can see it"
+    },
+    {
+      "id": "issue:1912",
+      "kind": "issue",
+      "issueNumber": 1912,
+      "lane": "features",
+      "title": "feat(cli): expose non-mutating plugin and Aspire generated-surface parity"
+    },
+    {
+      "id": "issue:2068",
+      "kind": "issue",
+      "issueNumber": 2068,
+      "lane": "internals",
+      "title": "fresh/ai: createNetScriptChatConnection.send narrows UIMessages to text, blocking adoption of the #1583 single-subscriber fix"
+    },
+    {
+      "id": "issue:2108",
+      "kind": "issue",
+      "issueNumber": 2108,
+      "lane": "fixes",
+      "title": "feat(plugins): a supported KV-only install for workers, sagas and triggers"
+    },
+    {
+      "id": "issue:2115",
+      "kind": "issue",
+      "issueNumber": 2115,
+      "lane": "internals",
+      "title": "auth-kv-oauth: parseCookieHeader throws on one undecodable foreign cookie and loses the whole header"
+    },
+    {
+      "id": "issue:2132",
+      "kind": "issue",
+      "issueNumber": 2132,
+      "lane": "features",
+      "title": "kv: RedisKvAdapter.list start is inclusive and pages are not globally ordered (SCAN batches sorted individually), unlike Deno KV"
+    },
+    {
+      "id": "issue:2144",
+      "kind": "issue",
+      "issueNumber": 2144,
+      "lane": "features",
+      "title": "feat(workers): per-handler retry policy with backoff, and a dead-letter queue for jobs"
+    },
+    {
+      "id": "issue:2149",
+      "kind": "issue",
+      "issueNumber": 2149,
+      "lane": "fixes",
+      "title": "fix(auth): the kv-oauth backend should not install the better-auth tables"
+    },
+    {
+      "id": "issue:2151",
+      "kind": "issue",
+      "issueNumber": 2151,
+      "lane": "features",
+      "title": "feat(watchers): a native-only strategy without silent polling fallback"
+    },
+    {
+      "id": "issue:2155",
+      "kind": "issue",
+      "issueNumber": 2155,
+      "lane": "docs",
+      "title": "docs: contradictions found while mapping a production app onto workers, sagas, triggers and streams"
+    },
+    {
+      "id": "issue:2159",
+      "kind": "issue",
+      "issueNumber": 2159,
+      "lane": "fixes",
+      "title": "fix(sagas): persist the applied key, the transition and its effects atomically, and dispatch effects recoverably"
+    },
+    {
+      "id": "issue:2160",
+      "kind": "issue",
+      "issueNumber": 2160,
+      "lane": "fixes",
+      "title": "fix(sagas): keep business state in the read model and look one instance up directly"
+    },
+    {
+      "id": "issue:2161",
+      "kind": "issue",
+      "issueNumber": 2161,
+      "lane": "fixes",
+      "title": "fix(plugins): triggers/workers registries load every *.ts in triggers/ and workers/jobs/ with no way to exclude a factory module"
+    },
+    {
+      "id": "issue:2162",
+      "kind": "issue",
+      "issueNumber": 2162,
+      "lane": "fixes",
+      "title": "fix(cli): generate plugins refuses an installed sagas plugin with an empty registry (--no-samples)"
+    },
+    {
+      "id": "issue:2165",
+      "kind": "issue",
+      "issueNumber": 2165,
+      "lane": "fixes",
+      "title": "fix(triggers): scheduled event ids restart at scheduled_1 per process, so runs are dropped as duplicates for 24 h after a restart"
+    },
+    {
+      "id": "issue:2185",
+      "kind": "issue",
+      "issueNumber": 2185,
+      "lane": "internals",
+      "title": "ci(e2e): make scaffold.runtime tiers robust to slow container image pulls and Aspire convergence on GitHub runners"
+    },
+    {
+      "id": "issue:2187",
+      "kind": "issue",
+      "issueNumber": 2187,
+      "lane": "fixes",
+      "title": "fix(triggers): file-watch events dedup by payload hash for 24 h, so a second modify of the same path is dropped"
+    },
+    {
+      "id": "issue:2233",
+      "kind": "issue",
+      "issueNumber": 2233,
+      "lane": "internals",
+      "title": "refactor(tooling): make generated carriers deterministic and line-mergeable"
+    },
+    {
+      "id": "issue:2259",
+      "kind": "issue",
+      "issueNumber": 2259,
+      "lane": "internals",
+      "title": "security(aspire): aspire describe exposes resolved database connection strings with the real password"
+    },
+    {
+      "id": "issue:2267",
+      "kind": "issue",
+      "issueNumber": 2267,
+      "lane": "features",
+      "title": "fix(kv): MemoryKvAdapter.atomic exposes partial commits between awaited mutations"
+    },
+    {
+      "id": "issue:2268",
+      "kind": "issue",
+      "issueNumber": 2268,
+      "lane": "internals",
+      "title": "fix(mcp): performance and status tools return zero samples instead of a binding error when not bound to the live AppHost"
+    },
+    {
+      "id": "issue:2269",
+      "kind": "issue",
+      "issueNumber": 2269,
+      "lane": "internals",
+      "title": "docs(mcp): get_doc misses KV, telemetry, workers and streams pages; find_guidance routes read-model intents to unrelated pages"
+    },
+    {
+      "id": "issue:2290",
+      "kind": "issue",
+      "issueNumber": 2290,
+      "lane": "internals",
+      "title": "service/auth: an unknown or retired contract procedure answers 403 no-contract-procedure; clients cannot tell a retired version from a permission denial"
+    },
+    {
+      "id": "issue:2338",
+      "kind": "issue",
+      "issueNumber": 2338,
+      "lane": "features",
+      "title": "fix(streams): stable producer IDs acknowledge new documents as duplicates after restart"
+    },
+    {
+      "id": "issue:2351",
+      "kind": "issue",
+      "issueNumber": 2351,
+      "lane": "features",
+      "title": "perf(workers): honor Redis listener concurrency and expose bounded dispatch latency"
+    },
+    {
+      "id": "issue:2367",
+      "kind": "issue",
+      "issueNumber": 2367,
+      "lane": "internals",
+      "title": "database: refuse duplicate or aliased PostgreSQL connection-string keys before normalization"
+    },
+    {
+      "id": "issue:2369",
+      "kind": "issue",
+      "issueNumber": 2369,
+      "lane": "features",
+      "title": "feat(commands): ship outbox Prisma schema and bounded saga replay/outbox retention"
+    },
+    {
+      "id": "issue:2373",
+      "kind": "issue",
+      "issueNumber": 2373,
+      "lane": "internals",
+      "title": "test(kv): Redis debounce-abort contract test uses a 150 ms wall-clock budget and flakes under load"
+    },
+    {
+      "id": "issue:2374",
+      "kind": "issue",
+      "issueNumber": 2374,
+      "lane": "fixes",
+      "title": "fix(sagas): discover explicitly declared self-composing saga modules instead of silently omitting factory exports"
+    },
+    {
+      "id": "issue:2375",
+      "kind": "issue",
+      "issueNumber": 2375,
+      "lane": "internals",
+      "title": "test(deps): the combined CLI/database suite adds npm:pg@^8.21.0 to the root lock"
+    },
+    {
+      "id": "issue:2377",
+      "kind": "issue",
+      "issueNumber": 2377,
+      "lane": "features",
+      "title": "fix(kv): WatchableKvBridge needs an initial state when the wrapped adapter ignores initial"
+    },
+    {
+      "id": "issue:2379",
+      "kind": "issue",
+      "issueNumber": 2379,
+      "lane": "internals",
+      "title": "fix(cli): retry transient JSR errors when installing plugins (a 502 fails the install)"
+    },
+    {
+      "id": "issue:2382",
+      "kind": "issue",
+      "issueNumber": 2382,
+      "lane": "fixes",
+      "title": "fix(sagas): the Prisma projection lists compensating, compensated and failed instances as running"
+    },
+    {
+      "id": "issue:2383",
+      "kind": "issue",
+      "issueNumber": 2383,
+      "lane": "fixes",
+      "title": "fix(sagas): a write failure on a non-atomic store can strand an instance in compensating"
+    },
+    {
+      "id": "issue:2384",
+      "kind": "issue",
+      "issueNumber": 2384,
+      "lane": "features",
+      "title": "feat(cli): report skipped and divergent browser-auth files during reconciliation"
+    },
+    {
+      "id": "issue:2385",
+      "kind": "issue",
+      "issueNumber": 2385,
+      "lane": "docs",
+      "title": "docs(cli): plugin update guide uses rejected package-specifier syntax"
+    },
+    {
+      "id": "issue:2390",
+      "kind": "issue",
+      "issueNumber": 2390,
+      "lane": "fixes",
+      "title": "investigate(sagas/workers): canary.8 projected atomic saga stalls after background receipt publication failure"
+    },
+    {
+      "id": "issue:2392",
+      "kind": "issue",
+      "issueNumber": 2392,
+      "lane": "internals",
+      "title": "workers: lifecycle messages bypass the structured logger and log levels"
+    },
+    {
+      "id": "issue:2394",
+      "kind": "issue",
+      "issueNumber": 2394,
+      "lane": "internals",
+      "title": "logging: plugin service entrypoints do not forward requestLevel/responseLevel"
+    },
+    {
+      "id": "issue:2395",
+      "kind": "issue",
+      "issueNumber": 2395,
+      "lane": "fixes",
+      "title": "queue: Redis adapter has no visibility timeout, stranded processing claims never return"
+    },
+    {
+      "id": "issue:2396",
+      "kind": "issue",
+      "issueNumber": 2396,
+      "lane": "features",
+      "title": "feat(plugins): expose host auth, CORS and listener options for workers/streams startup"
+    },
+    {
+      "id": "issue:2400",
+      "kind": "issue",
+      "issueNumber": 2400,
+      "lane": "internals",
+      "title": "plugin-workers: listener restart count never resets, so a transient KV outage fails listeners permanently"
+    },
+    {
+      "id": "issue:2401",
+      "kind": "issue",
+      "issueNumber": 2401,
+      "lane": "internals",
+      "title": "Aspire 13.5.3: every CLI call leaks two resource watches in the AppHost server, so CLI polling grows it without bound"
+    },
+    {
+      "id": "issue:2406",
+      "kind": "issue",
+      "issueNumber": 2406,
+      "lane": "internals",
+      "title": "web: new pages miss the scaffold nav and app-wide theme; agent guidance doesn't cover it (0.0.8)"
+    },
+    {
+      "id": "issue:2409",
+      "kind": "issue",
+      "issueNumber": 2409,
+      "lane": "fixes",
+      "title": "fresh(route): page-binding pass adds a second .withRoute to pages that already bind a route"
+    },
+    {
+      "id": "issue:2411",
+      "kind": "issue",
+      "issueNumber": 2411,
+      "lane": "internals",
+      "title": "ai: chat client drops a provider's 429/503 status and Retry-After; withRetryingChatClient never retries it"
+    },
+    {
+      "id": "issue:2438",
+      "kind": "issue",
+      "issueNumber": 2438,
+      "lane": "internals",
+      "title": "deps(telemetry): OpenTelemetry API 1.10 / instrumentation 0.300 breaks command-postgres on main"
+    },
+    {
+      "id": "issue:2478",
+      "kind": "issue",
+      "issueNumber": 2478,
+      "lane": "internals",
+      "title": "fix(docs-site): Code quality red on main since #2469 (unsafe-cast in markdown-render-fixture)"
+    }
+  ],
+  "edges": [
+    {
+      "from": "issue:2395",
+      "to": "issue:2351",
+      "kind": "requires",
+      "reason": "serialize: both change the Redis listen() loop"
+    },
+    {
+      "from": "issue:2159",
+      "to": "issue:2383",
+      "kind": "requires",
+      "reason": "serialize: plugins/sagas saga-engine.ts"
+    },
+    {
+      "from": "issue:2383",
+      "to": "issue:2160",
+      "kind": "requires",
+      "reason": "serialize: plugins/sagas saga-engine.ts and the read-model write"
+    },
+    {
+      "from": "issue:2160",
+      "to": "issue:2382",
+      "kind": "requires",
+      "reason": "serialize: read-model status semantics shared by the KV and Prisma projections"
+    },
+    {
+      "from": "issue:2162",
+      "to": "issue:2108",
+      "kind": "requires",
+      "reason": "KV-only consumer proof needs generate plugins to accept an empty sagas registry"
+    },
+    {
+      "from": "issue:2149",
+      "to": "issue:2108",
+      "kind": "requires",
+      "reason": "KV-only consumer proof needs kv-oauth to stop installing better-auth tables"
+    },
+    {
+      "from": "issue:2160",
+      "to": "issue:2390",
+      "kind": "requires",
+      "reason": "re-check the canary.8 saga stall after the B1 engine and read-model fixes"
+    },
+    {
+      "from": "issue:2383",
+      "to": "issue:2390",
+      "kind": "requires",
+      "reason": "re-check the canary.8 saga stall after compensation ordering is fixed"
+    },
+    {
+      "from": "issue:2161",
+      "to": "issue:2162",
+      "kind": "requires",
+      "reason": "serialize: installed runtime registry generator (scan/exclude rules, then empty sagas registry)"
+    },
+    {
+      "from": "issue:2382",
+      "to": "issue:2108",
+      "kind": "requires",
+      "reason": "KV-only consumer proof qualifies the finished B1 saga fixes"
+    },
+    {
+      "from": "issue:2374",
+      "to": "issue:2108",
+      "kind": "requires",
+      "reason": "KV-only consumer proof qualifies the finished B1 saga fixes"
+    },
+    {
+      "from": "issue:2159",
+      "to": "issue:2108",
+      "kind": "requires",
+      "reason": "KV-only consumer proof qualifies the finished B1 saga fixes"
+    },
+    {
+      "from": "issue:2382",
+      "to": "issue:2390",
+      "kind": "requires",
+      "reason": "re-check the canary.8 saga stall after all of B1"
+    },
+    {
+      "from": "issue:2374",
+      "to": "issue:2390",
+      "kind": "requires",
+      "reason": "re-check the canary.8 saga stall after all of B1"
+    },
+    {
+      "from": "issue:2159",
+      "to": "issue:2390",
+      "kind": "requires",
+      "reason": "re-check the canary.8 saga stall after all of B1"
+    }
+  ],
+  "waves": [
+    {
+      "index": 1,
+      "title": "W1 canary.1 core: main CI green (H01), scheduled/file-watch dedup (A1), in-process maxRetries, #2396 adoption; H02 #2478 Code quality green on main (re-intake)",
+      "nodeIds": [
+        "issue:2438",
+        "issue:2165",
+        "issue:2187",
+        "issue:2144",
+        "issue:2396",
+        "issue:2478"
+      ]
+    },
+    {
+      "index": 2,
+      "title": "W2 canary.1 rest: Redis visibility timeout, listener restart budget, watch restart, registry excludes, e2e robustness",
+      "nodeIds": [
+        "issue:2395",
+        "issue:2400",
+        "issue:2151",
+        "issue:2161",
+        "issue:2185"
+      ]
+    },
+    {
+      "index": 3,
+      "title": "W3 canary.1/.2: Redis listener concurrency (after #2395), saga applied key, empty sagas registry, kv-oauth tables, D1 rest",
+      "nodeIds": [
+        "issue:2351",
+        "issue:2159",
+        "issue:2162",
+        "issue:2149",
+        "issue:2367",
+        "issue:2115",
+        "issue:2290",
+        "issue:2259"
+      ]
+    },
+    {
+      "index": 4,
+      "title": "W4 canary.2: saga compensation, discovery, outbox schema, C1 ordering/restart, E1 logging",
+      "nodeIds": [
+        "issue:2383",
+        "issue:2374",
+        "issue:2369",
+        "issue:2267",
+        "issue:2132",
+        "issue:2338",
+        "issue:1367",
+        "issue:2377",
+        "issue:2373",
+        "issue:2392",
+        "issue:2394",
+        "issue:2401"
+      ]
+    },
+    {
+      "index": 5,
+      "title": "W5 canary.2/.3: saga read model (after #2383), E2 MCP and docs truth",
+      "nodeIds": [
+        "issue:2160",
+        "issue:2268",
+        "issue:2269",
+        "issue:2155",
+        "issue:2385",
+        "issue:1491",
+        "issue:1364"
+      ]
+    },
+    {
+      "index": 6,
+      "title": "W6 canary.3: Prisma projection (after #2160), F1 scaffold/CLI fixes",
+      "nodeIds": [
+        "issue:2382",
+        "issue:2406",
+        "issue:2409",
+        "issue:2379",
+        "issue:2375",
+        "issue:2411",
+        "issue:2384"
+      ]
+    },
+    {
+      "index": 7,
+      "title": "W7 canary.2/.3: KV-only consumer proof #2108 and #2390 re-check after all of B1; G1 0.0.8 carry-overs",
+      "nodeIds": [
+        "issue:1667",
+        "issue:1668",
+        "issue:1366",
+        "issue:1655",
+        "issue:1912",
+        "issue:2068",
+        "issue:2233",
+        "issue:2108",
+        "issue:2390"
+      ]
+    }
+  ]
+}
