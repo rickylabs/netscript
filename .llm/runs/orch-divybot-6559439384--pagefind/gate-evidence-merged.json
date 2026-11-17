@@ -1,0 +1,106 @@
+{
+  "head": "4ccaa4abe4dbbadf2647ff7a82a017b6fa3d5a4f",
+  "integratedMain": "4cb0298d7b7020930f1e6b05ca827c8330802d4e",
+  "runtime": "Deno2.9.7",
+  "strict": {
+    "exitCode": 0,
+    "result": {
+      "outcome": "PASS",
+      "scope": "all-output",
+      "files": 1116,
+      "html": 316,
+      "search": 311,
+      "twins": 262,
+      "differences": []
+    },
+    "rawLogSha256": "c24bc9477bdcba46fe0afa711f235a029047052f6005b005160318ae9d087f26"
+  },
+  "tests": {
+    "merged-tests": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 94,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 94,
+        "uniqueFailures": 0
+      }
+    },
+    "merged-source-tests": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 39,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 39,
+        "uniqueFailures": 0
+      }
+    }
+  },
+  "receipts": {
+    "merged-quality": {
+      "gitHead": "4ccaa4abe4dbbadf2647ff7a82a017b6fa3d5a4f",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 15599,
+      "sha256": "c07357e5482756bdfe71e873a1f2ae51000265cbda2fee129c529dacbd27c1e5"
+    },
+    "merged-agent-docs-prose": {
+      "gitHead": "4ccaa4abe4dbbadf2647ff7a82a017b6fa3d5a4f",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 17485,
+      "sha256": "c69cc2da15fb08c1555aba98183703a0b831c7052932fae5278297147128a4a5"
+    },
+    "merged-mcp-export-corpus": {
+      "gitHead": "4ccaa4abe4dbbadf2647ff7a82a017b6fa3d5a4f",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 12044,
+      "sha256": "449110e946f7df8e5920d93b91c6545f686c32ce5b7460415568c8e14db87057"
+    },
+    "merged-assets-barrel": {
+      "gitHead": "4ccaa4abe4dbbadf2647ff7a82a017b6fa3d5a4f",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 3337,
+      "sha256": "5ea91f5a53dc84fbfbe2eea178c853e4091abc2b5ca52b8f9442982eb95be610"
+    },
+    "merged-publish-assets": {
+      "gitHead": "4ccaa4abe4dbbadf2647ff7a82a017b6fa3d5a4f",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 549,
+      "sha256": "0f454cdd4a0dacae2f731c4e382484d4ecf987d41ef9726ba9f620516fe12718"
+    },
+    "browser-merged": {
+      "gitHead": "4ccaa4abe4dbbadf2647ff7a82a017b6fa3d5a4f",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 150460,
+      "sha256": "60d30675da6e4e039e13a4aa9cc76387f44437c892bed4b2bcee9658413cdee2"
+    }
+  },
+  "browser": {
+    "expected": 158,
+    "skipped": 6,
+    "unexpected": 0,
+    "flaky": 0,
+    "reportSha256": "4342442417ed2fb28507ed7e11ca6b3b6aea552bcd082d81a31ac65c56dd9832"
+  },
+  "browserManifestSha256": "1655b02f149d87df2d7eed1681a1e1a36746fab6b68feec1fbdd6e51291151b1",
+  "upstreamGeneratedDifferencesFromPreMerge": [
+    "assets/fresh-ui/catalog.json",
+    "assets/fresh-ui/components.css",
+    "assets/fresh-ui/css-manifest.json",
+    "assets/fresh-ui/preview.js",
+    "r/command-palette.json",
+    "r/registry.json"
+  ],
+  "cliRuntime": "Prior one-pass local attempt fails without Docker; runtime remains unproven. No skip/pass inferred.",
+  "axe": {
+    "reports": 72,
+    "serious": 0,
+    "critical": 0
+  }
+}

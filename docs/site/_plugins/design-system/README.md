@@ -28,11 +28,13 @@ work belongs inside that adapter. Source metadata comments stay invisible.
 From the repository root, run the structured test wrapper:
 
 ```sh
-deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts --cwd docs/site -- --no-lock --allow-read _plugins/design-system/renderer-fixture.ts
+deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts --cwd docs/site -- --frozen --allow-read _plugins/design-system/renderer-fixture.ts
 ```
 
 Root CI discovers `design-system_test.ts`, a bridge that runs the same fixture with the standalone
-site config (the root import map does not include Lume). The fixture uses independent fixed H2 lists: all thirteen template sections for themes and sections 1–8 for guidelines. It asserts every required section, each value group, nested values, YAML comments, source links and safe markup. `THEME_SECTIONS` and `GUIDELINE_SECTIONS` are the production contracts; a changed template must match the explicit theme contract. Missing, duplicate or misordered sections stop the build. Fenced examples cannot satisfy a required heading. Guideline cross-links derive from the configured Markdown engine’s rendered IDs and must exist in the full rendered guidelines. Its negative controls deliberately remove a prose heading, a value group and a nested
+site config (the root import map does not include Lume). Both commands use the reviewed site lock;
+lockless resolution can reject a newly qualified exact dependency under Deno's age policy.
+The fixture uses independent fixed H2 lists: all thirteen template sections for themes and sections 1–8 for guidelines. It asserts every required section, each value group, nested values, YAML comments, source links and safe markup. `THEME_SECTIONS` and `GUIDELINE_SECTIONS` are the production contracts; a changed template must match the explicit theme contract. Missing, duplicate or misordered sections stop the build. Fenced examples cannot satisfy a required heading. Guideline cross-links derive from the configured Markdown engine’s rendered IDs and must exist in the full rendered guidelines. Its negative controls deliberately remove a prose heading, a value group and a nested
 row, proving that these omissions fail. The real-corpus test verifies all eleven themes, every
 guidelines H2, 17 presets, both templates and unique complete-page anchors. Update explicit corpus
 counts when intentionally adding a language or flavor.

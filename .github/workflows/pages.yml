@@ -244,8 +244,10 @@ jobs:
           deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root tools/docs-site --ext ts --config docs/site/deno.json
           deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root tools/docs-site --ext ts
           deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-read --allow-run=deno tools/docs-site/fresh-ui/generate_test.ts tools/docs-site/generate-tokens_test.ts tools/docs-site/inline-diagram_test.ts tools/docs-site/navigation_test.ts tools/docs-site/code-languages_test.ts tools/docs-site/api-kinds_test.ts tools/docs-site/callout-types_test.ts tools/docs-site/syntax-contrast_test.ts
-      - name: Reproduce rendered docs, twins and anchor fragments before browser verification
-        run: deno run --allow-read --allow-run --allow-env tools/docs-site/check-reproducible.ts --allow-pagefind-metadata
+      - name: Verify native Pagefind output under shuffled ingestion
+        run: deno task --cwd docs/site test:pagefind
+      - name: Reproduce every docs output byte before browser verification
+        run: deno run --allow-read --allow-run --allow-env tools/docs-site/check-reproducible.ts
       - name: Install locked browser tooling
         working-directory: tools/fresh-ui-browser
         run: npm ci --ignore-scripts

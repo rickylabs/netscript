@@ -1,0 +1,104 @@
+{
+  "head": "b756ee6a971d0d705c35cf2a39ca763a265b5714",
+  "runtime": "Deno 2.9.7",
+  "strict": {
+    "outcome": "PASS",
+    "scope": "all-output",
+    "files": 1116,
+    "html": 316,
+    "search": 311,
+    "twins": 262,
+    "differences": []
+  },
+  "tests": {
+    "strict-ci-tests": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 94,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 94,
+        "uniqueFailures": 0
+      },
+      "sha256": "59082daa12c49f2eb4d9987eb1899ba1836ff9db41d67c88a32ffce6b1918746"
+    },
+    "strict-ci-source-tests": {
+      "exitCode": 0,
+      "summary": {
+        "passed": 39,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 39,
+        "uniqueFailures": 0
+      },
+      "sha256": "0b1176dabd2e5f07d1d460013f7f32f0b214fdf21ca61a853e83d914b8824a7d"
+    }
+  },
+  "receipts": {
+    "quality-strict-ci": {
+      "gateId": "quality-gate",
+      "gitHead": "b756ee6a971d0d705c35cf2a39ca763a265b5714",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 14589,
+      "sha256": "e373ff65c3c7695633ffcf10fc817bda585f5f374c398571d6022d843f41f1d5"
+    },
+    "browser-strict-ci": {
+      "gateId": "fresh-ui-browser",
+      "gitHead": "b756ee6a971d0d705c35cf2a39ca763a265b5714",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 148251,
+      "sha256": "d8b488d82a88530d4714bc4e82eb0366eeaeb59f9c20cfadd503a8305bece3b4"
+    },
+    "ci-agent-docs-prose": {
+      "gateId": "agent-docs-prose",
+      "gitHead": "b756ee6a971d0d705c35cf2a39ca763a265b5714",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 14207,
+      "sha256": "23cf7170817c7af30c93bbacecf9845e2c7cf2db9432f26095f80a1cef24d83a"
+    },
+    "ci-mcp-export-corpus": {
+      "gateId": "mcp-export-corpus",
+      "gitHead": "b756ee6a971d0d705c35cf2a39ca763a265b5714",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 8191,
+      "sha256": "93c52eeba62af72d75900089670c1125b1c09ce58486ad95ef6967af4d39cac7"
+    },
+    "ci-assets-barrel": {
+      "gateId": "assets-barrel",
+      "gitHead": "b756ee6a971d0d705c35cf2a39ca763a265b5714",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 2485,
+      "sha256": "3234c8d58ad3892285c30a23460e23e5339ddd21097ee293ae3e8c418cf78bdf"
+    },
+    "ci-publish-assets": {
+      "gateId": "publish-assets",
+      "gitHead": "b756ee6a971d0d705c35cf2a39ca763a265b5714",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "durationMs": 459,
+      "sha256": "9e3836fea474421ad04a2c8083054b597129f639b324d71dcf0e9cbb3a1fcbfa"
+    }
+  },
+  "browserStats": {
+    "expected": 158,
+    "skipped": 6,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "axe": {
+    "reports": 72,
+    "serious": 0,
+    "critical": 0
+  },
+  "browserManifestSha256": "2f564f7c6d05901fa85485713dc51f7c9bae911e446bfdb8e04e0aa88728482f",
+  "limitations": [
+    "Local scaffold.runtime attempted once, exit1: preflight.aspire and cleanup.aspire-stop without Docker; no runtime proof.",
+    "Optional high audit has identical baseline advisory IDs:6high/10total in unchanged dependencies.",
+    "Core/scaffold hosted checks are draft-policy skipped, separate from native runtime proof."
+  ]
+}
