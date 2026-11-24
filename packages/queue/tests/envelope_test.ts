@@ -1,5 +1,10 @@
-import { assert, assertEquals } from '@std/assert';
-import { createEnvelope, createMessageContext, isMessageEnvelope } from '../adapters/_envelope.ts';
+import { assert, assertEquals, assertNotEquals } from '@std/assert';
+import {
+  createEnvelope,
+  createMessageContext,
+  isMessageEnvelope,
+  toAddressedEnvelope,
+} from '../adapters/_envelope.ts';
 
 Deno.test('createEnvelope preserves payload and enqueue headers', () => {
   const envelope = createEnvelope(
@@ -50,4 +55,20 @@ Deno.test('createMessageContext exposes ack and nack callbacks', async () => {
   assertEquals(context.enqueuedAt.toISOString(), '2026-01-01T00:00:00.000Z');
   assertEquals(acked, true);
   assertEquals(requeue, false);
+});
+
+Deno.test('toAddressedEnvelope assigns deterministic identity to raw legacy payloads', () => {
+  const first = toAddressedEnvelope({ b: 2, a: [1, { z: true }] });
+  const second = toAddressedEnvelope({ a: [1, { z: true }], b: 2 });
+  const different = toAddressedEnvelope({ a: [1, { z: false }], b: 2 });
+
+  assertEquals(first.queueName, 'default');
+  assert(first.messageId.startsWith('legacy-'));
+  assertEquals(first.messageId, second.messageId);
+  assertNotEquals(first.messageId, different.messageId);
+
+  const envelope = createEnvelope({ wrapped: true }, undefined, 'jobs');
+  const addressed = toAddressedEnvelope(envelope);
+  assertEquals(addressed.messageId, envelope.messageId);
+  assertEquals(addressed.queueName, 'jobs');
 });

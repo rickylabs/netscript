@@ -313,6 +313,7 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     if (!this.explicitDeadLetterStore) {
       this.deadLetterStore = null;
     }
+    lease?.dispatcher.stopQueue(this.queueName);
     await lease?.release();
   }
 
@@ -340,17 +341,6 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     envelope: MessageEnvelope<unknown>,
     handler: (message: T, context: MessageContext) => Promise<void>,
   ): Promise<void> {
-    const dispatcher = await this.ensureDispatcher();
-    if (
-      await dispatcher.isRequeueCommitted(
-        envelope.queueName ?? this.queueName,
-        envelope.messageId,
-        envelope.requeueEpoch ?? 0,
-      )
-    ) {
-      // A previous ambiguous requeue for this exact receipt already committed atomically.
-      return;
-    }
     const payload = envelope.payload as T;
     const context = this.createContext(
       envelope.messageId,

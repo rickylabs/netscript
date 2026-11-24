@@ -19,12 +19,7 @@
 
 import { DenoKvMessageQueue } from '@fedify/denokv';
 import { type MessageEnvelope, toAddressedEnvelope, toDeadLetterRecord } from '../_envelope.ts';
-import {
-  closeQuietly,
-  createKvQueueConnection,
-  type KvDatabaseTarget,
-  type KvQueueConnection,
-} from './connection.ts';
+import { closeQuietly, type KvQueueConnection } from './connection.ts';
 import {
   type KvEnvelopeHandler,
   KvQueueRegistration,
@@ -33,8 +28,10 @@ import {
   validateKvQueueConcurrency,
 } from './routes.ts';
 import {
+  deleteKvRequeueMarker,
   isKvRequeueCommitted,
   requeueKvEnvelopeAtomically,
+  requeueMarkerKey,
   retryKnownUncommittedWrite,
 } from './write-retry.ts';
 import { KvDeadLetterStore } from '../kv-dead-letter-store.ts';
@@ -100,6 +97,8 @@ export class KvQueueDispatcher {
   readonly #policy: UnroutablePolicy;
   readonly #routes = new KvQueueRouteTable();
   readonly #pausedQueues = new Set<string>();
+  readonly #committedMarkers = new Set<string>();
+  readonly #markerCleanups = new Set<Promise<void>>();
   readonly #inFlight = new Set<Promise<void>>();
   readonly #stopping = new Set<Promise<void>>();
   #admittedDeliveries = 0;
@@ -159,19 +158,27 @@ export class KvQueueDispatcher {
     next: MessageEnvelope<unknown> & { queueName: string },
     delayMs?: number,
   ): Promise<void> {
+    const sourceEpoch = source.requeueEpoch ?? 0;
     await requeueKvEnvelopeAtomically(await this.kv(), source, next, delayMs);
+    this.#committedMarkers.add(markerToken(source.queueName, source.messageId, sourceEpoch));
   }
 
-  /**
-   * Route envelopes addressed to `queueName` to `handler` until `signal` aborts.
-   *
-   * @param queueName - Queue name to receive.
-   * @param handler - Envelope handler; a rejection leaves redelivery to Deno KV.
-   * @param signal - Ends this registration when aborted.
-   * @param concurrency - Maximum whole deliveries active simultaneously (default `1`).
-   * @returns Resolves once the registration has ended and its admitted deliveries have settled;
-   *   rejects if the shared listen loop fails.
-   */
+  /** Explicitly pause `queueName` so deliveries park at hop 0 while sibling routes stay live. */
+  pauseQueue(queueName: string): void {
+    this.#pausedQueues.add(queueName);
+  }
+
+  /** Clear explicit pause state for `queueName` without registering a listener. */
+  resumeQueue(queueName: string): void {
+    this.#pausedQueues.delete(queueName);
+  }
+
+  /** Permanently retire `queueName` (clears explicit pause so future work follows bounded reroute). */
+  stopQueue(queueName: string): void {
+    this.#pausedQueues.delete(queueName);
+  }
+
+  /** Route envelopes addressed to `queueName` to `handler` until `signal` aborts. */
   listen(
     queueName: string,
     handler: KvEnvelopeHandler,
@@ -186,13 +193,11 @@ export class KvQueueDispatcher {
     }
     const leave = () => {
       this.#routes.remove(queueName, registration);
-      if (!this.#routes.has(queueName)) {
-        this.#pausedQueues.add(queueName);
-      }
       registration.close();
       this.#wakeRoutingWaiters();
       void registration.settle()
         .then(() => this.#stopLoopWhenIdle())
+        .then(() => this.#flushMarkerCleanups())
         .then(() => resolve(), () => resolve());
     };
     const registration = new KvQueueRegistration(
@@ -221,10 +226,7 @@ export class KvQueueDispatcher {
     return promise;
   }
 
-  /**
-   * End every registration once its in-flight deliveries settle, stop listen loops this
-   * dispatcher can stop, and close connections it opened.
-   */
+  /** End registrations, stop dedicated loops, flush fence cleanups, and close owned connections. */
   async close(): Promise<void> {
     this.#pausedQueues.clear();
     const registrations = this.#routes.drain();
@@ -242,6 +244,8 @@ export class KvQueueDispatcher {
       this.#retainStop(loop);
     }
     await Promise.all([...this.#stopping]);
+    await this.#flushMarkerCleanups();
+    this.#committedMarkers.clear();
     this.#writer = null;
     if (await this.#connection.close() && this.#loop) {
       await this.#loop.done;
@@ -330,23 +334,38 @@ export class KvQueueDispatcher {
   }
 
   #dispatch(rawMessage: unknown): Promise<void> {
-    return track(this.#inFlight, this.#route(toAddressedEnvelope(rawMessage)));
+    const envelope = toAddressedEnvelope(rawMessage);
+    const sourceEpoch = envelope.requeueEpoch ?? 0;
+    const markerKey = requeueMarkerKey(envelope.queueName, envelope.messageId, sourceEpoch);
+    const token = markerToken(envelope.queueName, envelope.messageId, sourceEpoch);
+    const work = this.#route(envelope, sourceEpoch, token).then((cleanupMarker) => {
+      if (cleanupMarker) {
+        this.#scheduleMarkerCleanup(markerKey);
+      }
+    });
+    return track(this.#inFlight, work);
   }
 
-  async #route(envelope: MessageEnvelope<unknown> & { queueName: string }): Promise<void> {
-    let cancelledHandback = envelope.parkedHandback === true;
-    const deliverable = cancelledHandback ? withoutParkedHandback(envelope) : envelope;
+  async #route(
+    envelope: MessageEnvelope<unknown> & { queueName: string },
+    sourceEpoch: number,
+    token: string,
+  ): Promise<boolean> {
+    if (await this.isRequeueCommitted(envelope.queueName, envelope.messageId, sourceEpoch)) {
+      this.#committedMarkers.delete(token);
+      return true;
+    }
+    let cancelledHandback = false;
     while (true) {
-      const registration = this.#routes.next(deliverable.queueName);
+      const registration = this.#routes.next(envelope.queueName);
       if (registration) {
-        const admitted = await registration.deliver(deliverable);
+        const admitted = await registration.deliver(envelope);
         if (admitted) {
-          return;
+          return this.#committedMarkers.delete(token);
         }
         cancelledHandback = true;
         continue;
       }
-      const parked = cancelledHandback ? { ...deliverable, parkedHandback: true } : deliverable;
       if (this.#routes.isEmpty) {
         if (this.#connection.dedicatedListener) {
           while (this.#routes.isEmpty && this.#admittedDeliveries > 0) {
@@ -356,23 +375,45 @@ export class KvQueueDispatcher {
             continue;
           }
           await this.enqueue(
-            parked,
+            envelope,
             Math.min(DEDICATED_HANDBACK_DELAY_MS, this.#policy.parkDelayMs),
           );
-          return;
+          return false;
         }
-        await this.enqueue(parked, this.#policy.parkDelayMs);
-        return;
+        await this.enqueue(envelope, this.#policy.parkDelayMs);
+        return false;
       }
-      if (cancelledHandback || this.#pausedQueues.has(deliverable.queueName)) {
-        const delayMs = envelope.parkedHandback
-          ? Math.min(PAUSED_HANDBACK_PARK_DELAY_MS, this.#policy.parkDelayMs)
-          : Math.min(DEDICATED_HANDBACK_DELAY_MS, this.#policy.parkDelayMs);
-        await this.enqueue({ ...deliverable, parkedHandback: true }, delayMs);
-        return;
+      if (this.#pausedQueues.has(envelope.queueName)) {
+        await this.enqueue(
+          envelope,
+          Math.min(PAUSED_HANDBACK_PARK_DELAY_MS, this.#policy.parkDelayMs),
+        );
+        return false;
       }
-      await this.#reroute(deliverable);
-      return;
+      if (cancelledHandback) {
+        await this.enqueue(
+          envelope,
+          Math.min(DEDICATED_HANDBACK_DELAY_MS, this.#policy.parkDelayMs),
+        );
+        return false;
+      }
+      await this.#reroute(envelope);
+      return false;
+    }
+  }
+
+  #scheduleMarkerCleanup(markerKey: Deno.KvKey): void {
+    const cleanup = yieldToAcks()
+      .then(async () => {
+        await deleteKvRequeueMarker(await this.kv(), markerKey);
+      })
+      .catch(() => undefined);
+    track(this.#markerCleanups, cleanup);
+  }
+
+  async #flushMarkerCleanups(): Promise<void> {
+    while (this.#markerCleanups.size > 0) {
+      await Promise.allSettled([...this.#markerCleanups]);
     }
   }
 
@@ -397,94 +438,13 @@ export class KvQueueDispatcher {
   }
 }
 
-/** A counted claim on the dispatcher for one KV database. */
-export interface KvQueueDispatcherLease {
-  /** Dispatcher shared by every claim on the same database. */
-  readonly dispatcher: KvQueueDispatcher;
-  /** Drop the claim; the last claim closes the dispatcher. */
-  release(): Promise<void>;
-}
-
-interface DispatcherEntry {
-  readonly dispatcher: KvQueueDispatcher;
-  /** Caller-owned handles keep their entry: the loop lives as long as the caller's handle. */
-  readonly retained: boolean;
-  leases: number;
-}
-
-interface DispatcherRegistry<K> {
-  get(key: K): DispatcherEntry | undefined;
-  set(key: K, entry: DispatcherEntry): unknown;
-  delete(key: K): boolean;
-}
-
-const dispatchersByPath = new Map<string, DispatcherEntry>();
-const dispatchersByInstance = new WeakMap<Deno.Kv, DispatcherEntry>();
-
-/**
- * Claim the process-wide dispatcher for a KV database, creating it on first claim.
- *
- * Databases are identified by caller-owned instance, or by the configured path string (an
- * omitted path is Deno's default location). A dispatcher on a caller-owned handle stays
- * registered after its last claim, so a later claim reuses its loop. Any other dispatcher leaves
- * the registry when its last claim is released, before it closes, so a concurrent claim starts a
- * fresh one; an in-memory database therefore does not outlive its last claim.
- *
- * @param target - Caller-owned instance or path to open.
- * @returns Lease that must be released when the caller stops using the queue.
- */
-export function acquireKvQueueDispatcher(target: KvDatabaseTarget): KvQueueDispatcherLease {
-  return 'kv' in target
-    ? acquire(dispatchersByInstance, target.kv, target)
-    : acquire(dispatchersByPath, target.path ?? '', target);
-}
-
-function acquire<K>(
-  registry: DispatcherRegistry<K>,
-  key: K,
-  target: KvDatabaseTarget,
-): KvQueueDispatcherLease {
-  let entry = registry.get(key);
-  if (!entry) {
-    entry = {
-      dispatcher: new KvQueueDispatcher(createKvQueueConnection(target)),
-      retained: 'kv' in target,
-      leases: 0,
-    };
-    registry.set(key, entry);
-  }
-  entry.leases += 1;
-  const claimed = entry;
-  let released = false;
-  return {
-    dispatcher: claimed.dispatcher,
-    async release() {
-      if (released) {
-        return;
-      }
-      released = true;
-      claimed.leases -= 1;
-      if (claimed.leases > 0 || claimed.retained) {
-        return;
-      }
-      // Leave the registry before closing, so a concurrent claim gets a fresh dispatcher
-      // instead of one whose connections this close is about to invalidate.
-      if (registry.get(key) === claimed) {
-        registry.delete(key);
-      }
-      await claimed.dispatcher.close();
-    },
-  };
-}
+export { acquireKvQueueDispatcher, type KvQueueDispatcherLease } from './registry.ts';
 
 /** Let Deno acknowledge deliveries whose handlers just settled before their connection closes. */
 function yieldToAcks(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
-function withoutParkedHandback(
-  envelope: MessageEnvelope<unknown> & { queueName: string },
-): MessageEnvelope<unknown> & { queueName: string } {
-  const { parkedHandback: _ignored, ...clean } = envelope;
-  return clean;
+function markerToken(queueName: string, messageId: string, sourceEpoch: number): string {
+  return `${queueName}\0${messageId}\0${sourceEpoch}`;
 }

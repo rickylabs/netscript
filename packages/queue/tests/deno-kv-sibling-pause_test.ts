@@ -79,7 +79,8 @@ Deno.test('file-backed paused queue parks unadmitted delivery without dead-lette
       await firstEntered.promise;
       await delay(60);
 
-      // Pause 'paused' while msg 2 is unadmitted and 'sibling' remains registered.
+      // Explicitly pause 'paused' while msg 2 is unadmitted and 'sibling' remains registered.
+      dispatcher.pauseQueue('paused');
       pausedFirst.abort();
       releaseFirst.resolve();
       await pausedListen;
@@ -130,6 +131,135 @@ Deno.test('file-backed paused queue parks unadmitted delivery without dead-lette
       await Promise.allSettled([pausedListen, siblingListen]);
       await dispatcher.close();
       dispatcher.enqueue = baseEnqueue;
+    }
+  });
+});
+
+Deno.test('fresh enqueue for a permanently stopped queue dead-letters as unroutable while a sibling stays live', async () => {
+  await withTempKvPath(async (path) => {
+    const dispatcher = new KvQueueDispatcher(createKvQueueConnection({ path }), {
+      maxHops: 2,
+      baseDelayMs: 10,
+      maxDelayMs: 20,
+      parkDelayMs: 20,
+    });
+    const observedHops: number[] = [];
+    const baseEnqueue = dispatcher.enqueue.bind(dispatcher);
+    dispatcher.enqueue = async (envelope, delayMs) => {
+      if (envelope.queueName === 'retired' && envelope.payload === 'after-stop') {
+        observedHops.push(envelope.routingHops ?? 0);
+      }
+      await baseEnqueue(envelope, delayMs);
+    };
+
+    const siblingController = new AbortController();
+    const retiredController = new AbortController();
+    const warmed = Promise.withResolvers<void>();
+
+    const siblingListen = dispatcher.listen(
+      'sibling',
+      () => Promise.resolve(),
+      siblingController.signal,
+      1,
+    );
+    const retiredListen = dispatcher.listen(
+      'retired',
+      () => {
+        warmed.resolve();
+        return Promise.resolve();
+      },
+      retiredController.signal,
+      1,
+    );
+    const retiredDlq = new KvDeadLetterStore<unknown>({
+      queueName: 'retired',
+      denoKv: await dispatcher.kv(),
+    });
+
+    try {
+      await dispatcher.enqueue(createEnvelope('warm', undefined, 'retired'));
+      await warmed.promise;
+
+      // Permanently stop 'retired' while 'sibling' stays live.
+      retiredController.abort();
+      await retiredListen;
+
+      // A fresh message enqueued after stop must hit bounded unroutable DLQ, not park at hop 0.
+      const fresh = createEnvelope('after-stop', undefined, 'retired');
+      await dispatcher.enqueue(fresh);
+      await until(async () => await retiredDlq.depth() === 1, 2_000);
+
+      const [record] = await retiredDlq.list();
+      assertEquals(record.reason, 'unroutable');
+      assertEquals(record.messageId, fresh.messageId);
+      assertEquals(record.payload, 'after-stop');
+      assertEquals(
+        observedHops.includes(1) && observedHops.includes(2),
+        true,
+        `expected bounded routing hops [0, 1, 2], saw [${observedHops.join(', ')}]`,
+      );
+    } finally {
+      retiredController.abort();
+      siblingController.abort();
+      await Promise.allSettled([retiredListen, siblingListen]);
+      await dispatcher.close();
+      dispatcher.enqueue = baseEnqueue;
+    }
+  });
+});
+
+Deno.test('explicit pause cleared by stopQueue or dispatcher restart resumes bounded unroutable path', async () => {
+  await withTempKvPath(async (path) => {
+    const first = new KvQueueDispatcher(createKvQueueConnection({ path }), {
+      maxHops: 2,
+      baseDelayMs: 10,
+      maxDelayMs: 20,
+      parkDelayMs: 20,
+    });
+    const siblingA = new AbortController();
+    const siblingAListen = first.listen('sibling', () => Promise.resolve(), siblingA.signal, 1);
+    const parkedEnvelope = createEnvelope('parked-then-retired', undefined, 'paused-stop');
+
+    try {
+      first.pauseQueue('paused-stop');
+      await first.enqueue(parkedEnvelope);
+      await delay(80);
+      const dlqFirst = new KvDeadLetterStore<unknown>({
+        queueName: 'paused-stop',
+        denoKv: await first.kv(),
+      });
+      assertEquals(await dlqFirst.depth(), 0, 'explicitly paused queue must park before stop');
+
+      // Clearing pause with stopQueue or closing/restarting the dispatcher must never leave a
+      // persistent parking flag on the stored envelope.
+      first.stopQueue('paused-stop');
+    } finally {
+      siblingA.abort();
+      await siblingAListen;
+      await first.close();
+    }
+
+    const restarted = new KvQueueDispatcher(createKvQueueConnection({ path }), {
+      maxHops: 2,
+      baseDelayMs: 10,
+      maxDelayMs: 20,
+      parkDelayMs: 20,
+    });
+    const siblingB = new AbortController();
+    const siblingBListen = restarted.listen('sibling', () => Promise.resolve(), siblingB.signal, 1);
+    const dlqAfterRestart = new KvDeadLetterStore<unknown>({
+      queueName: 'paused-stop',
+      denoKv: await restarted.kv(),
+    });
+    try {
+      await until(async () => await dlqAfterRestart.depth() === 1, 2_000);
+      const [record] = await dlqAfterRestart.list();
+      assertEquals(record.reason, 'unroutable');
+      assertEquals(record.messageId, parkedEnvelope.messageId);
+    } finally {
+      siblingB.abort();
+      await siblingBListen;
+      await restarted.close();
     }
   });
 });

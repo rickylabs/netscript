@@ -245,9 +245,12 @@ positive safe integer through `2,147,483,647`; invalid values fail with `QueueCo
 before opening KV connections). The bound covers **whole deliveries** — handler execution plus
 `ack`/`nack` settlement — including cancellation and drain. Excess deliveries on a file-backed
 database queue behind the registration's active slots while keeping their native KV delivery
-unacknowledged. On abort, `stop()`, or pause, already-admitted deliveries drain while unadmitted
-deliveries are parked without consuming routing hops (preserving `messageId` and `deliveryCount`),
-including while sibling queue names remain active on the same database.
+unacknowledged. On abort or `stop()`, already-admitted deliveries drain while unadmitted waiters are
+handed back once at their current hop count (preserving `messageId` and `deliveryCount`) without
+persisting a cross-restart parking flag. Explicit queue pause holds work at hop `0` while sibling
+routes remain live and clears on resume, `stop()`, or dispatcher close; fresh work targeting a
+permanently stopped or unregistered queue while a sibling route stays live follows the bounded
+reroute policy and dead-letters with reason `unroutable`.
 
 Local Deno KV queue writes, atomic requeues, `KvDeadLetterStore.append`, and first-party worker
 settlement handle file-backed persistence contention according to commit certainty:
@@ -260,11 +263,16 @@ settlement handle file-backed persistence contention according to commit certain
 - **Refused compare-and-swap preconditions** (`{ ok: false }` or claim-loss errors) stay conflicts
   and are never retried as transient.
 - **Unknown commit outcomes** (including explicit non-busy SQLite codes such as `SQLITE_IOERR_WRITE`)
-  never trigger a blind replay: `DenoKvAdapter` fences requeues with an atomic marker key and reuses
-  attempted settlement outcomes across native redelivery, `KvDeadLetterStore.append` checks its
-  identity index, and first-party workers perform read-only verification of applied idempotency and
-  execution state before deciding, avoiding false dead letters and repeated external effects while
-  preserving pause, acknowledgement, and redelivery semantics.
+  never trigger a blind replay: `DenoKvAdapter` fences requeues per source epoch with a durable
+  atomic marker key (no wall-clock expiry across downtime) checked before routing — preventing
+  duplicate deliveries, spurious parking, or false `unroutable` dead letters — and deletes each
+  marker once its native source receipt is acknowledged. Raw non-envelope legacy payloads receive a
+  deterministic content-derived `legacy-<hash>` ID on `default` so native redelivery is fenced
+  (simultaneously in-flight identical raw non-envelope payloads share that derived ID until settled;
+  enqueue via the adapter envelope for independent identities). `KvDeadLetterStore.append` checks
+  its identity index, and first-party workers perform read-only verification of applied idempotency
+  and execution state before deciding, avoiding false dead letters and repeated external effects
+  while preserving pause, acknowledgement, and redelivery semantics.
 
 ## Compatibility
 
