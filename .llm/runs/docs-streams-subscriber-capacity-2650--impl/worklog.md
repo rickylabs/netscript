@@ -140,3 +140,47 @@ still-open idle topic is outside the measured workload.
 ## Drift
 
 See `drift.md`.
+
+## Phase A investigation
+
+Owner-authorized root-cause investigation of the single-topic fan-out symptom; same builder route.
+
+Use an ignored local probe with the published harness's subscriber and producer paths. Measure
+client request dispatch and response, companion ingress and upstream append stages, and reader
+committing controls. Compare independent producer and reader processes and reader Agent options
+at matched loads. This is investigation evidence for the coordinator's independent review.
+
+Phase A completed locally with repeated one-topic trials, process and connection-pool controls,
+and a separate detailed companion trace. The private probes and raw measurements are retained
+locally for independent review. This entry records the investigation handoff.
+
+## Phase B causality investigation
+
+The owner authorized matched private controls and one evidenced server-side filing. The light
+probe measured per-append SSE touch and synchronous metadata write counts and elapsed time.
+The paired original and counterfactual ran at every reader count in both process topologies.
+Both 32-reader topologies also restored the original method. The checked-in benchmark
+classes ran the inline reproducer against an unmodified companion.
+
+The 18 causal trials completed with 60 revisions each, 18,240 verified reader commits, zero
+gaps, zero reconnects, and verified shutdown and temporary store cleanup. Independent
+process placement preserved the original behavior. Skipping only the synchronous write
+for streams without a sliding TTL removed the backlog, and restoration brought it back.
+The per-append stage, retry, and source evidence is in phase-b.md. Native LMDB transaction,
+flush, filesystem I/O and scheduler waits remain unseparated.
+
+- `deno task deps:latest --filter '@durable-streams/server'` — exit 0. Stable 0.3.9 matches the pin.
+- `deno run --check -A --frozen --ext=ts -` with the inline reproducer from #2661 — exit 0.
+- GitHub issue and source searches found no existing report for the same condition. Filed
+  #2661 under 0.0.10, with a reference from #2650 and the draft docs PR.
+- Scope is the known-limitations note and sanitized run evidence. Scoped TypeScript gates
+  are N/A for this tracked Markdown-only change.
+
+### Phase B validation
+
+- Private smoke, matched-suite and report-verification commands — each exited 0.
+- `deno task docs:links` — exit 0.
+- `deno task docs:accuracy` — exit 0.
+- `deno task release:preflight` — exit 0.
+- `git diff --check` and `git diff --cached --check` — exit 0.
+- [Related issue reference on #2650](https://github.com/rickylabs/netscript/issues/2650#issuecomment-7123584626).

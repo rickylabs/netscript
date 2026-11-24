@@ -454,6 +454,10 @@ cleanly and the temporary directory was removed.
 In the 32-reader single-stream phase, the last producer acknowledgement arrived 216.1 s
 after the start of the one-minute offered-write window. The latency figures include that backlog.
 
+The [known single-topic SSE fan-out defect (#2661)](https://github.com/rickylabs/netscript/issues/2661)
+can delay append acknowledgements on the file-backed companion while it writes
+access-time metadata synchronously for waking readers.
+
 These measurements describe this workload. Replays of larger histories, bursts, more active
 streams, and browser or ingress behavior each call for measurements under those conditions.
 Last-subscriber reclamation on a still-open idle topic is outside the measured workload.

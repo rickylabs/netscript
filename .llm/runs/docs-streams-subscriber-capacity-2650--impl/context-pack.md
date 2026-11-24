@@ -10,3 +10,6 @@ measured and source-inspected claims, including the cleanup scope. The 32-reader
 trial completed delivery after a backlog, with its last write acknowledged 216.1 seconds after
 the start of the 60-second offered-write window. The two site pages and the benchmark README
 carry the corresponding caveats and usage advice.
+
+The Phase B matched controls and upstream inspection are in phase-b.md. The server-side
+defect is tracked separately in #2661.
