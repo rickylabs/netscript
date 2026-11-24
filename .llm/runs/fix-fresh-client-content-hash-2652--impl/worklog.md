@@ -78,6 +78,11 @@ Quoted verbatim from the owner's batch directive. `[…]` marks elided text that
 | 2026-11-24 | S1 | validation | Baseline carrier reproduced stale A JavaScript on build B. Corrected carrier passed with B in the same Chromium profile and hashed client URLs. Scoped and generator results below. |
 | 2026-11-24 | S1 | reconcile | #2652 is open and its Acceptance text matches the PR criteria. #2577 is open. The carrier diff contains the app Vite template alone. |
 
+| 2026-11-24 | S2 | runtime preflight | First one-pass command exited 1 at `preflight.aspire` because the worktree shell could not resolve the installed .NET SDK. `cleanup.aspire-stop` then had no AppHost to stop. The ownership reporter found zero owned resources. |
+| 2026-11-24 | S2 | runtime retry | Exposed the dedicated project's installed .NET SDK to the gate process. `aspire doctor --format Json --non-interactive --nologo` passed (0). Retried the same one-pass command at S1. |
+| 2026-11-24 | S2 | runtime result | `behavior.documented-scaffold` failed. The Postgres listener reported `ECONNREFUSED` and database init timed out after 300 seconds (`aspire wait` exit 17). Deno and Aspire preflight, scaffold init, and Aspire cleanup passed. |
+| 2026-11-24 | S2 | reconcile | The ownership reporter found no run-owned resources after cleanup. The three acceptance mappings matched the live issue using the repository validator. #2577 remains open. Draft #2655 carries the measured evidence and the open runtime gate. |
+
 ## Measured validation
 
 The focused browser command was `deno test --no-lock --unstable-kv --allow-all packages/cli/e2e/tests/application/gates/scaffold/generated-client-cache_test.ts`. The baseline product files matched `main` at `87965d800b7d61312e8612c82bdb0cb98bdf5b29`, verified with `git diff --exit-code <main> <bootstrap> -- packages` (0). The baseline exit was 1 at “changed immutable entry reused its URL.” The fixed scaffold exit was 0 (1 passed).
@@ -110,15 +115,20 @@ SHA-256 identifies the bytes independently of the URL.
 | Type check | `.llm/tools/run-deno-check.ts --file <browser test> --file <embedded carrier> --deno-arg --no-lock` with implicit `--unstable-kv` | 0 |
 | Lint | `.llm/tools/run-deno-lint.ts` on the browser test, embedded carrier and Vite template staged as TypeScript, with a temporary config stripped of root exclusions | 0 |
 | Format check | `.llm/tools/run-deno-fmt.ts` on the browser test and Vite template staged as TypeScript, with a temporary config stripped of root exclusions | 0 |
+| Scoped tests | `.llm/tools/run-deno-test.ts` on the browser regression and template tests (22 passed) | 0 |
 | Template tests | `.llm/tools/run-deno-test.ts -- --no-lock --unstable-kv --allow-all packages/cli/src/kernel/templates/app/generators-config_test.ts` (21 passed) | 0 |
 | Generation, in order | `deno task gen:agent-docs-prose`, `deno task gen:mcp-export-corpus`, `deno task gen:assets-barrel`, `deno task gen:publish-assets` | 0 each |
-| Carrier consistency | `deno task check:mcp-export-corpus`, `deno task check:assets-barrel`, `deno task check:publish-assets` | 0 each |
+| Carrier consistency | `deno task check:agent-docs-prose`, `deno task check:mcp-export-corpus`, `deno task check:assets-barrel`, `deno task check:publish-assets` | 0 each |
 | Quality | `deno task quality:scan` | 0 |
 | Architecture | `deno task arch:check` | 0 |
 | Release preflight | `deno task release:preflight` | 0 |
 | Docs accuracy | `deno task docs:accuracy` | 0 |
+| Aspire static scan | `deno task check:aspire-host-ports` | 0 |
+| Scaffold runtime | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` at `7ad9fc836c0a7904a1b80e4eb80e0788f6e601ae` with Deno 2.9.7 and the dedicated Docker and Aspire configuration. The first invocation exited 1 at Aspire preflight. After exposing the installed .NET SDK, the one-pass rerun finished with 4 passes and 1 failure at `behavior.documented-scaffold`. | 1 |
+| Ownership | `deno task maint:leak-check -- --slice-dir .llm/runs/fix-fresh-client-content-hash-2652--impl --worktree .` after the runtime rerun. All probes succeeded and zero resources belonged to the run. Unproven resources were left alone. | 0 |
+| Acceptance mapping | Repository `validateEvidenceMapping` matched all three live acceptance boxes. The mirror command in dry-run mode exited 0 at the draft's current status. | 0 |
 
-Environment notes. Deno 2.9.7. The initial full Chrome executable could not load `libcups.so.2` (browser version probe exit 127). Retried with the installed Chromium headless browser. RTK was unavailable. A read-only Deno inspection briefly added a redundant root lock entry and its own change was reverted before staging. No dependency or lock changes in the slice.
+Environment notes. Deno 2.9.7. The initial full Chrome executable could not load `libcups.so.2` (browser version probe exit 127). Retried with the installed Chromium headless browser. RTK was unavailable. A read-only Deno inspection briefly added a redundant root lock entry and its own change was reverted before staging. No dependency or lock changes in the slice. S2 records evidence only, so its product and test files match the S1 checkout used for the runtime gate.
 
 ## Decisions
 
