@@ -59,6 +59,31 @@ Deno.test('classifyKvWriteFailure separates transient SQLite busy, CAS conflict,
     classifyKvWriteFailure(new Error('dead-letter storage temporarily unavailable')),
     WRITE_FAILURE_CLASS.UNKNOWN_COMMIT_OUTCOME,
   );
+  assertEquals(
+    classifyKvWriteFailure(
+      Object.assign(new Error('database is locked'), { code: 'SQLITE_IOERR_WRITE' }),
+    ),
+    WRITE_FAILURE_CLASS.UNKNOWN_COMMIT_OUTCOME,
+    'explicit non-busy SQLite code must override lock-message fallback',
+  );
+  assertEquals(
+    classifyKvWriteFailure(new Error('SQLITE_IOERR_WRITE: database is locked')),
+    WRITE_FAILURE_CLASS.UNKNOWN_COMMIT_OUTCOME,
+  );
+  assertEquals(
+    classifyKvWriteFailure(
+      Object.assign(new Error('SQLITE_BUSY: database is locked'), { code: 'SQLITE_FULL' }),
+    ),
+    WRITE_FAILURE_CLASS.UNKNOWN_COMMIT_OUTCOME,
+  );
+  assertEquals(
+    classifyKvWriteFailure(
+      new Error('database is locked', {
+        cause: Object.assign(new Error('fsync failed'), { code: 'SQLITE_IOERR_FSYNC' }),
+      }),
+    ),
+    WRITE_FAILURE_CLASS.UNKNOWN_COMMIT_OUTCOME,
+  );
 });
 
 Deno.test('retryKnownUncommittedWrite enforces maxAttempts, maxTotalTimeMs, and equal-jitter backoff', async () => {
@@ -126,7 +151,7 @@ Deno.test('retryKnownUncommittedWrite enforces maxAttempts, maxTotalTimeMs, and 
           return Promise.reject(new Error('SQLITE_BUSY: database is locked'));
         },
         {
-          policy: { maxAttempts: 10, maxTotalTimeMs: 50, baseDelayMs: 40, maxDelayMs: 100 },
+          policy: { maxAttempts: 10, maxTotalTimeMs: 50, baseDelayMs: 10, maxDelayMs: 100 },
           now: () => elapsed,
           random: () => 1,
           sleep: (ms) => {
@@ -140,7 +165,57 @@ Deno.test('retryKnownUncommittedWrite enforces maxAttempts, maxTotalTimeMs, and 
     'SQLITE_BUSY',
   );
   assertEquals(timedAttempts, 2);
-  assertEquals(timedWaits, [20]);
+  assertEquals(timedWaits, [10]);
+
+  // Must never start a retry at or after the retry-start deadline.
+  const tightStarts: number[] = [];
+  let tightClock = 0;
+  await assertRejects(
+    () =>
+      retryKnownUncommittedWrite(
+        () => {
+          tightStarts.push(tightClock);
+          return Promise.reject(new Error('SQLITE_BUSY: database is locked'));
+        },
+        {
+          policy: { maxAttempts: 4, maxTotalTimeMs: 10, baseDelayMs: 20, maxDelayMs: 50 },
+          now: () => tightClock,
+          random: () => 1,
+          sleep: (ms) => {
+            tightClock += ms;
+            return Promise.resolve();
+          },
+        },
+      ),
+    Error,
+    'SQLITE_BUSY',
+  );
+  assertEquals(tightStarts, [0], 'retry must not start at or after the 10 ms deadline');
+
+  // Must recheck the monotonic deadline after backoff in case sleep overshoots.
+  const overshootStarts: number[] = [];
+  let overshootClock = 0;
+  await assertRejects(
+    () =>
+      retryKnownUncommittedWrite(
+        () => {
+          overshootStarts.push(overshootClock);
+          return Promise.reject(new Error('SQLITE_BUSY: database is locked'));
+        },
+        {
+          policy: { maxAttempts: 4, maxTotalTimeMs: 10, baseDelayMs: 4, maxDelayMs: 50 },
+          now: () => overshootClock,
+          random: () => 1,
+          sleep: () => {
+            overshootClock += 12;
+            return Promise.resolve();
+          },
+        },
+      ),
+    Error,
+    'SQLITE_BUSY',
+  );
+  assertEquals(overshootStarts, [0], 'post-sleep deadline recheck must stop before retry');
 });
 
 Deno.test('retryKnownUncommittedWrite stops immediately on abort, CAS conflict, and verifies unknown outcomes', async () => {

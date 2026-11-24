@@ -246,22 +246,25 @@ before opening KV connections). The bound covers **whole deliveries** — handle
 `ack`/`nack` settlement — including cancellation and drain. Excess deliveries on a file-backed
 database queue behind the registration's active slots while keeping their native KV delivery
 unacknowledged. On abort, `stop()`, or pause, already-admitted deliveries drain while unadmitted
-deliveries are handed back unchanged (preserving `messageId` and `deliveryCount`) before the
-dedicated listen loop closes.
+deliveries are parked without consuming routing hops (preserving `messageId` and `deliveryCount`),
+including while sibling queue names remain active on the same database.
 
-Local Deno KV queue writes, `KvDeadLetterStore.append`, and first-party worker settlement handle
-file-backed persistence contention according to commit certainty:
+Local Deno KV queue writes, atomic requeues, `KvDeadLetterStore.append`, and first-party worker
+settlement handle file-backed persistence contention according to commit certainty:
 
 - **Known-uncommitted SQLite lock contention** (`SQLITE_BUSY*`, `SQLITE_LOCKED*`, or locked-database
-  errors) retries within a bounded policy: up to 6 total attempts within a 2,000 ms wall-clock
-  ceiling, exponential backoff from 15 ms to 250 ms with equal jitter, and immediate cancellation
-  when aborted.
+  errors without an explicit non-busy SQLite code) retries within a bounded policy: up to 6 total
+  attempts with a 2,000 ms monotonic retry-start deadline (no retry begins at or after the deadline;
+  an already-started write completes unless the operation supports cancellation), exponential
+  backoff from 15 ms to 250 ms with equal jitter, and immediate cancellation when aborted.
 - **Refused compare-and-swap preconditions** (`{ ok: false }` or claim-loss errors) stay conflicts
   and are never retried as transient.
-- **Unknown commit outcomes** never trigger a blind replay: `KvDeadLetterStore.append` checks its
-  identity index and first-party workers verify persisted idempotency and execution state before
-  deciding, avoiding false dead letters and repeated external effects while preserving pause,
-  acknowledgement, and redelivery semantics.
+- **Unknown commit outcomes** (including explicit non-busy SQLite codes such as `SQLITE_IOERR_WRITE`)
+  never trigger a blind replay: `DenoKvAdapter` fences requeues with an atomic marker key and reuses
+  attempted settlement outcomes across native redelivery, `KvDeadLetterStore.append` checks its
+  identity index, and first-party workers perform read-only verification of applied idempotency and
+  execution state before deciding, avoiding false dead letters and repeated external effects while
+  preserving pause, acknowledgement, and redelivery semantics.
 
 ## Compatibility
 

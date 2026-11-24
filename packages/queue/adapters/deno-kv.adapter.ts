@@ -340,6 +340,17 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     envelope: MessageEnvelope<unknown>,
     handler: (message: T, context: MessageContext) => Promise<void>,
   ): Promise<void> {
+    const dispatcher = await this.ensureDispatcher();
+    if (
+      await dispatcher.isRequeueCommitted(
+        envelope.queueName ?? this.queueName,
+        envelope.messageId,
+        envelope.requeueEpoch ?? 0,
+      )
+    ) {
+      // A previous ambiguous requeue for this exact receipt already committed atomically.
+      return;
+    }
     const payload = envelope.payload as T;
     const context = this.createContext(
       envelope.messageId,
@@ -353,8 +364,8 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
       await handler(payload, context);
       await context.ack();
     } catch {
-      // Publish the counted retry before native acknowledgement; failed persistence
-      // still throws to the native queue so the original delivery is retained.
+      // Reuse any already-attempted settlement or publish one atomic requeue before native
+      // acknowledgement; an unresolved failure rejects so native recovery retains the receipt.
       await context.nack({ requeue: true });
     }
   }
@@ -372,10 +383,7 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
   ): MessageContext {
     let settlement: Promise<void> | undefined;
     const settle = (operation: () => Promise<void>): Promise<void> => {
-      return settlement ??= operation().catch((error: unknown) => {
-        settlement = undefined;
-        throw error;
-      });
+      return settlement ??= operation();
     };
     return createMessageContext(
       messageId,
@@ -386,13 +394,16 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
       (options: NackOptions = {}) =>
         settle(async () => {
           if (options.requeue ?? true) {
-            const addressed = envelope ?? {
-              ...createEnvelope(payload, { headers }, this.queueName),
-              messageId,
-              enqueuedAt: enqueuedAt.toISOString(),
-            };
+            const addressed: MessageEnvelope<unknown> & { queueName: string } = envelope
+              ? { ...envelope, queueName: envelope.queueName ?? this.queueName }
+              : {
+                ...createEnvelope(payload, { headers }, this.queueName),
+                messageId,
+                enqueuedAt: enqueuedAt.toISOString(),
+                queueName: this.queueName,
+              };
             const dispatcher = await this.ensureDispatcher();
-            await dispatcher.enqueue({
+            await dispatcher.requeue(addressed, {
               ...addressed,
               deliveryCount: options.preserveDeliveryCount
                 ? Math.max(0, deliveryCount - 1)

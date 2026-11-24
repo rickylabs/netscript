@@ -37,6 +37,10 @@ export interface MessageEnvelope<T> {
   queueName?: string;
   /** Times the envelope was re-enqueued because no listener for its queue name received it. */
   routingHops?: number;
+  /** Set when an unadmitted delivery was parked due to listener cancellation or pause. */
+  parkedHandback?: boolean;
+  /** Monotonic requeue generation used to fence ambiguous requeue commits. */
+  requeueEpoch?: number;
 }
 
 /**

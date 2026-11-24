@@ -143,6 +143,11 @@ export class KvQueueRouteTable {
     return this.#routes.size === 0;
   }
 
+  has(queueName: string): boolean {
+    const route = this.#routes.get(queueName);
+    return route !== undefined && route.registrations.length > 0;
+  }
+
   add(queueName: string, registration: KvQueueRegistration): void {
     const route = this.#routes.get(queueName);
     if (route) {

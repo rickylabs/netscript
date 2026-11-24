@@ -32,7 +32,11 @@ import {
   track,
   validateKvQueueConcurrency,
 } from './routes.ts';
-import { retryKnownUncommittedWrite } from './write-retry.ts';
+import {
+  isKvRequeueCommitted,
+  requeueKvEnvelopeAtomically,
+  retryKnownUncommittedWrite,
+} from './write-retry.ts';
 import { KvDeadLetterStore } from '../kv-dead-letter-store.ts';
 
 export type { KvDatabaseTarget } from './connection.ts';
@@ -85,6 +89,8 @@ interface KvListenLoop {
  * the envelope during `yieldToAcks()`, short enough that pause/resume picks it up promptly.
  */
 const DEDICATED_HANDBACK_DELAY_MS = 25;
+/** Bounded park delay for cancellation handbacks re-dequeued while a sibling queue stays live. */
+const PAUSED_HANDBACK_PARK_DELAY_MS = 100;
 
 /**
  * Routes one Deno KV database's queue to listeners registered by queue name.
@@ -93,6 +99,7 @@ export class KvQueueDispatcher {
   readonly #connection: KvQueueConnection;
   readonly #policy: UnroutablePolicy;
   readonly #routes = new KvQueueRouteTable();
+  readonly #pausedQueues = new Set<string>();
   readonly #inFlight = new Set<Promise<void>>();
   readonly #stopping = new Set<Promise<void>>();
   #admittedDeliveries = 0;
@@ -137,6 +144,24 @@ export class KvQueueDispatcher {
     await retryKnownUncommittedWrite(() => writer.enqueue(envelope, { delay }));
   }
 
+  /** Check whether a requeue for `(queueName, messageId, sourceEpoch)` already committed. */
+  async isRequeueCommitted(
+    queueName: string,
+    messageId: string,
+    sourceEpoch: number,
+  ): Promise<boolean> {
+    return await isKvRequeueCommitted(await this.kv(), queueName, messageId, sourceEpoch);
+  }
+
+  /** Atomically record a requeue marker and enqueue `next` in one KV transaction. */
+  async requeue(
+    source: MessageEnvelope<unknown> & { queueName: string },
+    next: MessageEnvelope<unknown> & { queueName: string },
+    delayMs?: number,
+  ): Promise<void> {
+    await requeueKvEnvelopeAtomically(await this.kv(), source, next, delayMs);
+  }
+
   /**
    * Route envelopes addressed to `queueName` to `handler` until `signal` aborts.
    *
@@ -161,6 +186,9 @@ export class KvQueueDispatcher {
     }
     const leave = () => {
       this.#routes.remove(queueName, registration);
+      if (!this.#routes.has(queueName)) {
+        this.#pausedQueues.add(queueName);
+      }
       registration.close();
       this.#wakeRoutingWaiters();
       void registration.settle()
@@ -186,6 +214,7 @@ export class KvQueueDispatcher {
       },
     );
     signal.addEventListener('abort', leave, { once: true });
+    this.#pausedQueues.delete(queueName);
     this.#routes.add(queueName, registration);
     this.#wakeRoutingWaiters();
     this.#startLoop();
@@ -197,6 +226,7 @@ export class KvQueueDispatcher {
    * dispatcher can stop, and close connections it opened.
    */
   async close(): Promise<void> {
+    this.#pausedQueues.clear();
     const registrations = this.#routes.drain();
     for (const registration of registrations) {
       registration.close();
@@ -304,19 +334,21 @@ export class KvQueueDispatcher {
   }
 
   async #route(envelope: MessageEnvelope<unknown> & { queueName: string }): Promise<void> {
+    let cancelledHandback = envelope.parkedHandback === true;
+    const deliverable = cancelledHandback ? withoutParkedHandback(envelope) : envelope;
     while (true) {
-      const registration = this.#routes.next(envelope.queueName);
+      const registration = this.#routes.next(deliverable.queueName);
       if (registration) {
-        const admitted = await registration.deliver(envelope);
+        const admitted = await registration.deliver(deliverable);
         if (admitted) {
           return;
         }
+        cancelledHandback = true;
         continue;
       }
+      const parked = cancelledHandback ? { ...deliverable, parkedHandback: true } : deliverable;
       if (this.#routes.isEmpty) {
         if (this.#connection.dedicatedListener) {
-          // Hold the native delivery open while admitted deliveries drain so either a newly
-          // registered listener receives it immediately or we publish it back once idle.
           while (this.#routes.isEmpty && this.#admittedDeliveries > 0) {
             await this.#routingChanged.promise;
           }
@@ -324,15 +356,22 @@ export class KvQueueDispatcher {
             continue;
           }
           await this.enqueue(
-            envelope,
+            parked,
             Math.min(DEDICATED_HANDBACK_DELAY_MS, this.#policy.parkDelayMs),
           );
           return;
         }
-        await this.enqueue(envelope, this.#policy.parkDelayMs);
+        await this.enqueue(parked, this.#policy.parkDelayMs);
         return;
       }
-      await this.#reroute(envelope);
+      if (cancelledHandback || this.#pausedQueues.has(deliverable.queueName)) {
+        const delayMs = envelope.parkedHandback
+          ? Math.min(PAUSED_HANDBACK_PARK_DELAY_MS, this.#policy.parkDelayMs)
+          : Math.min(DEDICATED_HANDBACK_DELAY_MS, this.#policy.parkDelayMs);
+        await this.enqueue({ ...deliverable, parkedHandback: true }, delayMs);
+        return;
+      }
+      await this.#reroute(deliverable);
       return;
     }
   }
@@ -441,4 +480,11 @@ function acquire<K>(
 /** Let Deno acknowledge deliveries whose handlers just settled before their connection closes. */
 function yieldToAcks(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+function withoutParkedHandback(
+  envelope: MessageEnvelope<unknown> & { queueName: string },
+): MessageEnvelope<unknown> & { queueName: string } {
+  const { parkedHandback: _ignored, ...clean } = envelope;
+  return clean;
 }

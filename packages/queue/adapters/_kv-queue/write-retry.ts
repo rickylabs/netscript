@@ -10,6 +10,10 @@
  */
 
 import { delay } from '@std/async/delay';
+import type { MessageEnvelope } from '../_envelope.ts';
+
+const REQUEUE_MARKER_PREFIX = 'queue:requeue';
+const REQUEUE_MARKER_TTL_MS = 24 * 60 * 60_000;
 
 /** Closed classification for failed local KV write attempts. */
 export const WRITE_FAILURE_CLASS = {
@@ -26,7 +30,11 @@ export type WriteFailureClass = typeof WRITE_FAILURE_CLASS[keyof typeof WRITE_FA
 export interface KvWriteRetryPolicy {
   /** Maximum total attempts including the initial attempt (must be >= 1). */
   readonly maxAttempts: number;
-  /** Maximum cumulative wall-clock time across all attempts and waits in milliseconds. */
+  /**
+   * Monotonic retry-start deadline in milliseconds from the initial attempt start.
+   * No retry begins at or after `start + maxTotalTimeMs`; an already-started backing
+   * write runs to completion unless the operation itself supports cancellation.
+   */
   readonly maxTotalTimeMs: number;
   /** Base exponential backoff delay before the first retry in milliseconds. */
   readonly baseDelayMs: number;
@@ -78,7 +86,9 @@ const ABORT_ERROR_NAMES = new Set([
 const CAS_CONFLICT_PATTERN =
   /\b(?:claim lost|cas\b.*\b(?:refus|conflict|fail)|atomic check(?:s)? (?:refused|failed)|versionstamp (?:mismatch|conflict))\b/i;
 const AMBIGUOUS_OR_NON_TRANSIENT_PATTERN =
-  /\b(?:ambiguous|uncertain|commit outcome|outcome unknown|after commit|SQLITE_IOERR|SQLITE_CORRUPT|SQLITE_FULL)\b/i;
+  /\b(?:ambiguous|uncertain|commit outcome|outcome unknown|after commit)\b/i;
+const SQLITE_CODE_PREFIX_PATTERN = /^SQLITE_[A-Z0-9_]+$/i;
+const SQLITE_ANY_MESSAGE_CODE_PATTERN = /\bSQLITE_[A-Z0-9_]+\b/gi;
 const SQLITE_TRANSIENT_CODE_PATTERN = /^SQLITE_(?:BUSY|LOCKED)(?:_[A-Z0-9_]+)?$/i;
 const SQLITE_TRANSIENT_MESSAGE_PATTERN =
   /\b(?:SQLITE_BUSY(?:_[A-Z0-9_]+)?|SQLITE_LOCKED(?:_[A-Z0-9_]+)?|database is locked|database table is locked|database schema is locked)\b/i;
@@ -86,9 +96,9 @@ const SQLITE_TRANSIENT_MESSAGE_PATTERN =
 /**
  * Classify a write failure into the closed commit-outcome taxonomy.
  *
- * CAS refusals, aborts, closed resources, and ambiguous/I/O failures always take
- * precedence over transient SQLite busy matching so they can never be misclassified
- * as safe-to-retry.
+ * CAS refusals, aborts, explicit non-busy SQLite codes (including extended I/O codes),
+ * closed resources, and ambiguous failures always take precedence over transient SQLite
+ * busy message matching so they can never be misclassified as safe-to-retry.
  */
 export function classifyKvWriteFailure(
   error: unknown,
@@ -121,6 +131,7 @@ export function classifyKvWriteFailure(
     if (
       item instanceof Deno.errors.BadResource ||
       name === 'KvClosedError' ||
+      hasExplicitNonBusySqliteCode(code, message) ||
       AMBIGUOUS_OR_NON_TRANSIENT_PATTERN.test(message)
     ) {
       return WRITE_FAILURE_CLASS.UNKNOWN_COMMIT_OUTCOME;
@@ -142,7 +153,8 @@ export function classifyKvWriteFailure(
 /**
  * Execute a KV write with bounded jittered retries only for known-uncommitted
  * transient SQLite busy/locked contention, and read-first verification on unknown
- * commit outcomes.
+ * commit outcomes. `policy.maxTotalTimeMs` is enforced as a monotonic retry-start
+ * deadline checked before and after backoff; no retry starts at or after the deadline.
  */
 export async function retryKnownUncommittedWrite<T>(
   operation: () => Promise<T>,
@@ -196,13 +208,30 @@ export async function retryKnownUncommittedWrite<T>(
       if (ceiling > 0) {
         const jitterFactor = Math.min(1, Math.max(0, random()));
         const jittered = Math.max(1, Math.floor(ceiling / 2 + jitterFactor * (ceiling / 2)));
-        const waitMs = Math.min(jittered, remainingMs);
-        if (waitMs > 0) {
-          await sleep(waitMs, signal);
+        if (jittered >= remainingMs) {
+          throw error;
+        }
+        await sleep(jittered, signal);
+        signal?.throwIfAborted();
+        if (now() >= deadline) {
+          throw error;
         }
       }
     }
   }
+}
+
+function hasExplicitNonBusySqliteCode(code: string | undefined, message: string): boolean {
+  if (
+    code !== undefined &&
+    SQLITE_CODE_PREFIX_PATTERN.test(code) &&
+    !SQLITE_TRANSIENT_CODE_PATTERN.test(code)
+  ) {
+    return true;
+  }
+  const tokens = message.match(SQLITE_ANY_MESSAGE_CODE_PATTERN);
+  if (!tokens) return false;
+  return tokens.some((token) => !SQLITE_TRANSIENT_CODE_PATTERN.test(token));
 }
 
 function defaultSleep(ms: number, signal?: AbortSignal): Promise<void> {
@@ -246,4 +275,63 @@ function readErrorMessage(value: unknown): string {
     if (typeof message === 'string') return message;
   }
   return String(value);
+}
+
+/** Check whether a requeue for `(queueName, messageId, sourceEpoch)` already committed. */
+export async function isKvRequeueCommitted(
+  kv: Deno.Kv,
+  queueName: string,
+  messageId: string,
+  sourceEpoch: number,
+): Promise<boolean> {
+  const entry = await kv.get([REQUEUE_MARKER_PREFIX, queueName, messageId, sourceEpoch]);
+  return entry.value !== null;
+}
+
+/**
+ * Atomically record a stable requeue marker and enqueue `next` in one KV transaction.
+ *
+ * Retries known-uncommitted SQLite busy contention within the bounded policy, treats
+ * CAS refusal (`{ ok: false }`) as an already-settled conflict without retry, and verifies
+ * the marker key read-only on unknown commit outcomes instead of blindly replaying.
+ */
+export async function requeueKvEnvelopeAtomically(
+  kv: Deno.Kv,
+  source: MessageEnvelope<unknown> & { queueName: string },
+  next: MessageEnvelope<unknown> & { queueName: string },
+  delayMs?: number,
+): Promise<void> {
+  const sourceEpoch = source.requeueEpoch ?? 0;
+  const markerKey: Deno.KvKey = [
+    REQUEUE_MARKER_PREFIX,
+    source.queueName,
+    source.messageId,
+    sourceEpoch,
+  ];
+  const nextEnvelope = { ...next, requeueEpoch: sourceEpoch + 1 };
+  const enqueueOptions = delayMs ? { delay: delayMs } : undefined;
+  await retryKnownUncommittedWrite(
+    () =>
+      kv.atomic()
+        .check({ key: markerKey, versionstamp: null })
+        .set(
+          markerKey,
+          { nextEpoch: sourceEpoch + 1, deliveryCount: nextEnvelope.deliveryCount },
+          { expireIn: REQUEUE_MARKER_TTL_MS },
+        )
+        .enqueue(nextEnvelope, enqueueOptions)
+        .commit(),
+    {
+      verifyCommitted: async () => {
+        const existing = await kv.get(markerKey);
+        if (existing.value !== null) {
+          return {
+            committed: true,
+            value: { ok: true as const, versionstamp: existing.versionstamp },
+          };
+        }
+        return { committed: false };
+      },
+    },
+  );
 }
