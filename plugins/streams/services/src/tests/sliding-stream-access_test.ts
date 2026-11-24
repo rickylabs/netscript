@@ -265,11 +265,10 @@ Deno.test('a delayed SSE renewal does not hold the append acknowledgement', () =
       assertEquals(await request(url, 'POST', { 'content-type': 'text/plain' }, 'append'), 204);
       assertEquals(metadata(store).lastAccessedAt, EPOCH + 1_100);
       assertEquals(store.get(PATH)?.lastAccessedAt, EPOCH + 1_100);
-      assertEquals(delivered, false);
-      writer.resume();
       const control = await abortable(opening, deadline());
       assert(control.value?.startsWith('event: control\n'));
       assertEquals(writer.count(), 1);
+      writer.resume();
       await reader.cancel();
     } finally {
       signal.abort();
@@ -429,7 +428,17 @@ Deno.test('shutdown reports a failed final flush and still closes the native sto
   }
 });
 
-for (const mode of ['native', 'completed', 'uncompleted', 'graceful', 'append'] as const) {
+for (
+  const mode of [
+    'native',
+    'completed',
+    'uncompleted',
+    'graceful',
+    'append',
+    'bare close',
+    'repeated bare close',
+  ] as const
+) {
   Deno.test(`sliding TTL survives recovery at the access checkpoint (${mode})`, async () => {
     const dir = await Deno.makeTempDir({ prefix: 'streams-expiry-crash-' });
     const time = clock();
@@ -473,6 +482,9 @@ for (const mode of ['native', 'completed', 'uncompleted', 'graceful', 'append'] 
           recovered.get(PATH)?.lastAccessedAt,
           EPOCH + (mode === 'uncompleted' ? 0 : 900),
         );
+        if (mode === 'bare close' || mode === 'repeated bare close') {
+          assertEquals(recovered.get(PATH)?.closed, true);
+        }
         time.at(mode === 'uncompleted' ? 1_000 : 1_899);
         assertEquals(recovered.has(PATH), mode !== 'uncompleted');
         time.at(1_900);

@@ -6,4 +6,6 @@
   and read delivery, and adds expiry, generation, fault and restart verification.
 - Successful reads are covered by a committed access on abrupt restart. Confirmed appends carry
   their access in their own transaction without awaiting read renewals.
+- S3 lets a confirmed append release already-covered readers while a reader batch is still in
+  flight. Use the final benchmark and scaffold evidence in the draft PR.
 - Use draft #2662 for the exact-head gate evidence and coordinator IMPL-EVAL.

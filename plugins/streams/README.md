@@ -100,15 +100,16 @@ compaction and archival are not provided.
 
 In file mode, sliding TTL reads renew immediately for live expiry checks. The companion releases
 a successful GET or SSE delivery only after LMDB has committed the renewal or a later access to
-that stream. This applies to SSE reads on wakeup, including heartbeat controls. If the process is
-killed after a completed read, the recovered access time has zero staleness from coalescing. A read
-still waiting for persistence when the process exits may need to be retried.
+that stream. This applies to SSE reads on wakeup, including heartbeat controls. On restart after
+a process kill on the same boot, the recovered access time for a completed read has zero staleness
+from coalescing. A read still waiting for persistence when the process exits may need to be retried.
 
 Read renewals use a 25 ms batching interval and keep one pending access per stream. An in-flight
 batch, scheduler delays and disk I/O can add to read latency. The append's own metadata
-transaction records its access time. A duplicate append that performs no data write uses its own
-metadata renewal. Append acknowledgements do not wait for the read renewal queue. HEAD and
-same-stream PUT leave the deadline as it was. Absolute expiry uses the original deadline.
+transaction records its access time. A bare close, including a repeated close, renews in the native
+close write. A duplicate append that performs no data write uses its own metadata renewal. Append
+acknowledgements do not wait for the read renewal queue. HEAD and same-stream PUT leave the deadline
+as it was. Absolute expiry uses the original deadline.
 
 Clean shutdown flushes outstanding renewals. The companion logs and retries renewal failures.
 A failed batch can fail a pending GET or end its SSE response so a client can retry. Shutdown

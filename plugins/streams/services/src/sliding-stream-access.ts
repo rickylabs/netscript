@@ -23,7 +23,6 @@ interface NativeMetadataDb {
   put(key: string | symbol, value: unknown, ...options: unknown[]): unknown;
   putSync(key: string, metadata: NativeStreamMetadata): boolean;
   transactionAsync(callback: () => void): Promise<void>;
-  readonly flushed: PromiseLike<unknown>;
 }
 
 interface Stamp {
@@ -37,6 +36,7 @@ interface Topic {
   latest: Stamp;
   submitted: Stamp;
   committed: Stamp;
+  renewed?: PromiseWithResolvers<void>;
 }
 
 interface AppendAccess {
@@ -52,7 +52,7 @@ function assertNativeDatabase(value: unknown): asserts value is NativeMetadataDb
     !value || typeof value !== 'object' ||
     !['get', 'put', 'putSync', 'transactionAsync'].every((key) =>
       typeof Reflect.get(value, key) === 'function'
-    ) || typeof Reflect.get(value, 'flushed')?.then !== 'function'
+    )
   ) throw new Error('Unsupported durable-streams storage API: missing LMDB writer');
 }
 
@@ -74,6 +74,7 @@ export class SlidingStreamAccess {
     // Native append builds a whole metadata snapshot before doing file I/O.
     // Keep access metadata current when it submits the snapshot, and give a
     // confirmed append its own renewal in that existing transaction.
+    // LMDB putSync also calls this instance's put, including bare close POSTs.
     const put = db.put.bind(db);
     db.put = (key, value, ...options) => {
       if (!this.#writingRenewal && typeof key === 'string' && key.startsWith(STREAM_PREFIX)) {
@@ -146,12 +147,16 @@ export class SlidingStreamAccess {
   forget(path: string): void {
     const key = keyFor(path);
     const topic = this.#topics.get(key);
-    if (topic) this.#dirty.delete(topic);
+    if (topic) {
+      this.#dirty.delete(topic);
+      this.#notifyRenewal(topic);
+    }
     this.#topics.delete(key);
   }
 
   /** Drop access state after the native store has cleared all stream records. */
   clear(): void {
+    for (const topic of this.#topics.values()) this.#notifyRenewal(topic);
     this.#dirty.clear();
     this.#topics.clear();
   }
@@ -174,7 +179,10 @@ export class SlidingStreamAccess {
   #topic(key: string, meta: NativeStreamMetadata): Topic {
     const existing = this.#topics.get(key);
     if (existing?.generation === meta.directoryName) return existing;
-    if (existing) this.#dirty.delete(existing);
+    if (existing) {
+      this.#dirty.delete(existing);
+      this.#notifyRenewal(existing);
+    }
     const stamp = { at: accessTime(meta), version: 0 };
     const topic = {
       key,
@@ -212,7 +220,10 @@ export class SlidingStreamAccess {
 
   #confirm(topic: Topic, stamp: Stamp): void {
     if (this.#topics.get(topic.key) !== topic) return;
-    if (stamp.version > topic.committed.version) topic.committed = stamp;
+    if (stamp.version > topic.committed.version) {
+      topic.committed = stamp;
+      this.#notifyRenewal(topic);
+    }
     if (stamp.version > topic.latest.version) topic.latest = stamp;
     if (topic.latest.version <= topic.committed.version) this.#dirty.delete(topic);
   }
@@ -221,8 +232,16 @@ export class SlidingStreamAccess {
     while (this.#topics.get(topic.key) === topic && topic.committed.version < version) {
       const write = this.#schedule();
       if (!write) throw new Error('Streams stopped before the read renewal committed');
-      await write;
+      // A later append can commit this access while the read batch is still in flight.
+      // Subscribe once per topic rather than attaching read promises to a blocked writer.
+      const renewed = topic.renewed ??= Promise.withResolvers<void>();
+      await renewed.promise;
     }
+  }
+
+  #notifyRenewal(topic: Topic): void {
+    topic.renewed?.resolve();
+    topic.renewed = undefined;
   }
 
   #schedule(): Promise<void> | undefined {
@@ -234,6 +253,10 @@ export class SlidingStreamAccess {
     void write.then(
       () => this.#afterWrite(),
       (error: unknown) => {
+        for (const topic of this.#dirty) {
+          topic.renewed?.reject(error);
+          topic.renewed = undefined;
+        }
         if (!this.#retrying) this.reportFailure(error);
         this.#afterWrite(true);
       },
@@ -259,7 +282,6 @@ export class SlidingStreamAccess {
         }
       }
     });
-    await this.#db.flushed;
     for (const [topic, stamp] of written) this.#confirm(topic, stamp);
   }
 
@@ -269,6 +291,7 @@ export class SlidingStreamAccess {
     if (meta?.directoryName !== topic.generation) {
       this.#dirty.delete(topic);
       this.#topics.delete(topic.key);
+      this.#notifyRenewal(topic);
       return;
     }
     // An append queued in this LMDB transaction may already have supplied a newer access.

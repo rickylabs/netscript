@@ -20,6 +20,7 @@ if (mode === 'native') {
   await companion.store.create(path, options);
   now += 900;
   const db = Reflect.get(companion.store, 'db') as {
+    putSync(key: string, value: unknown): boolean;
     transactionAsync(callback: () => void): Promise<void>;
   };
   const started = Promise.withResolvers<void>();
@@ -33,7 +34,32 @@ if (mode === 'native') {
     await transaction(callback);
   };
   const url = companion.base + path;
-  if (mode === 'append') {
+  if (mode === 'bare close' || mode === 'repeated bare close') {
+    const putSync = db.putSync.bind(db);
+    let synchronousWrites = 0;
+    db.putSync = (key, value) => {
+      synchronousWrites++;
+      return putSync(key, value);
+    };
+    const close = async () => {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'stream-closed': 'true' },
+        signal: AbortSignal.timeout(5_000),
+      });
+      if (response.status !== 204) throw new Error(`Bare close returned ${response.status}`);
+    };
+    const repeated = mode === 'repeated bare close';
+    if (repeated) {
+      now -= 890;
+      await close();
+      now += 890;
+    }
+    await close();
+    if (writes !== 0 || synchronousWrites !== (repeated ? 2 : 1)) {
+      throw new Error('Expected each close renewal to use its one native metadata write');
+    }
+  } else if (mode === 'append') {
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'text/plain' },
