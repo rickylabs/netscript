@@ -62,13 +62,44 @@ Quoted verbatim from the owner's directive for this lane. `[…]` marks elided o
 
 ## Design
 
-Builder records this section before creating implementation files (`workflow/run-loop.md` § 3b).
+Archetype 5 (Plugin Package), with the Service overlay. The doctrine verdict is Keep. The companion
+owns native storage composition, and the existing core producer, retention policy, and SSE replay
+contracts supply the workload and its assertions. The public service entry points and protocol
+headers retain their current shapes. No sibling declarations or permissions are needed.
+
+- Native reads and appends renew sliding TTL at the current upstream call sites. HEAD and same-stream
+  PUT never renew. The native expiry check keeps its inclusive boundary, absolute expiry and fork
+  behavior. The file adapter skips access writes for other policies.
+- Store pending access timestamps per path and native segment generation. Expiry and store reads
+  see pending renewals immediately. Flush a coalesced batch through the native async LMDB writer
+  after a 100 ms coalescing interval. An already running flush, scheduler delay, and storage time
+  can extend the durability window. Merge the timestamp monotonically into native metadata
+  updates so an append snapshot cannot undo a renewal. Compare the native generation at write time.
+- Before this change, upstream synchronously commits access metadata before returning from
+  `touchAccess`. A subsequent process restart recovers committed metadata. The plugin documents
+  orderly restart, with no power-loss guarantee. After this change, successful orderly shutdown
+  drains pending writes. A process crash can lose an uncommitted touch. A lone touch near expiry
+  can shift the recovered deadline earlier by almost one TTL. The coordinator was asked to
+  confirm the abrupt-crash trade-off while the builder continues independent work.
+- Write failures retain pending renewals for live expiry, emit diagnostics, and retry. Shutdown
+  attempts a final flush and surfaces an error if persistence still fails.
+- S1 adds an issue-owned regression fixture and a test in `plugins/streams/services/src/tests/`.
+  S2 adds the renewal compatibility adapter at `bounded-file-store.ts`, focused storage and
+  protocol tests, and the storage contract in the plugin README. S3 records the full evidence
+  in this run. Each slice keeps this log and the context pack current.
+- Start at the bounded store adapter when adjusting compatibility with the upstream pin. Extend
+  the retention tests and the companion regression before upgrading the pin. Upstream issue #420
+  tracks the supported storage extension seam. The guide follow-up belongs after the PR lands.
 
 ## Progress Log
 
 | Time | Slice | Step | Notes |
 | ---- | ----- | ---- | ----- |
 | 2026-11-24 | S0 | bootstrap | Coordinator bootstrap commit: `supervisor.md`, `worklog.md`, `drift.md`. |
+| 2026-11-24 | S0 | rechecked | Verified the bootstrap SHA and its parent matched `origin/main`. Inspected the file lists of all 24 open PRs, including paginated files for #2538. No PR touches `plugins/streams/` or `packages/plugin-streams-core/`. #2660 edits its own benchmark and guide. |
+| 2026-11-24 | S0 | researched | `deno task deps:latest --filter '@durable-streams/server'` exited 0 with 0 behind / 1 total. Upstream main `461b40267aabd644558f9b19dbb9507dd5f691cf` still calls `putSync` in `file-store.ts:661–670`. |
+| 2026-11-24 | S1 | fixture | Added the one-topic production companion workload and ordinary Deno test discovery. Scoped wrapper check, lint and format exited 0 on the three workload files. Baseline trials started from a Git archive with just the test utilities copied in. |
+| 2026-11-24 | S1 | reconcile | Issue remains open without checkbox acceptance or comments. The draft body links the issue and tracks pending gates and independent evaluation. |
 
 ## Decisions
 
