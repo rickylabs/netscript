@@ -88,6 +88,8 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
   private activeListener:
     | { readonly controller: AbortController; readonly done: Promise<void> }
     | null = null;
+  private pauseToken: symbol | null = null;
+  private stopping = false;
   private readonly queueName: string;
   private readonly path?: string;
   private readonly useShared: boolean;
@@ -261,12 +263,26 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     }
 
     const dispatcher = await this.ensureDispatcher();
+    if (this.pauseToken) {
+      dispatcher.clearPause(this.queueName, this.pauseToken);
+      this.pauseToken = null;
+    }
     const controller = new AbortController();
     const signal = options?.signal;
-    const stopListening = () => controller.abort();
+    const stopListening = () => {
+      // Aborting `options.signal` without calling `stop()` pauses intake while this adapter
+      // remains alive and leased (the path used by `Worker.pause()`). Mark paused before
+      // closing the registration so waiting deliveries park at hop 0 instead of dead-lettering
+      // while sibling queues stay live; `stop()` clears this token for permanent retirement.
+      if (!this.stopping && this.pauseToken === null) {
+        this.pauseToken = Symbol('deno-kv-pause');
+        dispatcher.markPaused(this.queueName, this.pauseToken);
+      }
+      controller.abort();
+    };
     signal?.addEventListener('abort', stopListening, { once: true });
     if (signal?.aborted) {
-      controller.abort();
+      stopListening();
     }
     const done = dispatcher.listen(
       this.queueName,
@@ -302,19 +318,27 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
    * adapter's claim on the shared database connection.
    */
   async stop(): Promise<void> {
-    const listener = this.activeListener;
-    this.activeListener = null;
-    if (listener) {
-      listener.controller.abort();
-      await listener.done.catch(() => undefined);
+    this.stopping = true;
+    try {
+      const lease = this.lease;
+      if (this.pauseToken && lease) {
+        lease.dispatcher.clearPause(this.queueName, this.pauseToken);
+      }
+      this.pauseToken = null;
+      const listener = this.activeListener;
+      this.activeListener = null;
+      if (listener) {
+        listener.controller.abort();
+        await listener.done.catch(() => undefined);
+      }
+      this.lease = null;
+      if (!this.explicitDeadLetterStore) {
+        this.deadLetterStore = null;
+      }
+      await lease?.release();
+    } finally {
+      this.stopping = false;
     }
-    const lease = this.lease;
-    this.lease = null;
-    if (!this.explicitDeadLetterStore) {
-      this.deadLetterStore = null;
-    }
-    lease?.dispatcher.stopQueue(this.queueName);
-    await lease?.release();
   }
 
   /**
@@ -393,7 +417,7 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
                 queueName: this.queueName,
               };
             const dispatcher = await this.ensureDispatcher();
-            await dispatcher.requeue(addressed, {
+            await dispatcher.enqueue({
               ...addressed,
               deliveryCount: options.preserveDeliveryCount
                 ? Math.max(0, deliveryCount - 1)

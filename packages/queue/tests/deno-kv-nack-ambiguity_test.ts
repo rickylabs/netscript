@@ -36,14 +36,10 @@ function extractEnvelope(value: unknown): MessageEnvelope<unknown> | undefined {
 
 function wrapKvForRequeueFault(
   realKv: Deno.Kv,
-  options: Readonly<{
-    mode: 'commit-then-throw' | 'throw-without-commit';
-    failFirstVerifyGet?: boolean;
-  }>,
+  mode: 'commit-then-throw' | 'throw-without-commit',
 ) {
   const enqueuedCounts: number[] = [];
   let requeueFaultsInjected = 0;
-  let verifyGetsFailed = 0;
 
   const kv = new Proxy(realKv, {
     get(target, prop, receiver) {
@@ -54,7 +50,7 @@ function wrapKvForRequeueFault(
           if (envelope) enqueuedCounts.push(envelope.deliveryCount);
           if (isRequeue && requeueFaultsInjected === 0) {
             requeueFaultsInjected += 1;
-            if (options.mode === 'commit-then-throw') {
+            if (mode === 'commit-then-throw') {
               await target.enqueue(value, enqueueOpts);
             }
             throw new Error('ambiguous write outcome: interrupted during requeue');
@@ -62,130 +58,27 @@ function wrapKvForRequeueFault(
           return await target.enqueue(value, enqueueOpts);
         };
       }
-      if (prop === 'atomic') {
-        return () => {
-          const op = target.atomic();
-          let atomicRequeueEnvelope: MessageEnvelope<unknown> | undefined;
-          const opProxy = new Proxy(op, {
-            get(opTarget, opProp, opReceiver) {
-              if (opProp === 'enqueue') {
-                return (value: unknown, enqueueOpts?: { delay?: number }) => {
-                  const envelope = extractEnvelope(value);
-                  if (envelope) {
-                    atomicRequeueEnvelope = envelope;
-                  }
-                  opTarget.enqueue(value, enqueueOpts);
-                  return opProxy;
-                };
-              }
-              if (opProp === 'commit') {
-                return async () => {
-                  if (atomicRequeueEnvelope) {
-                    enqueuedCounts.push(atomicRequeueEnvelope.deliveryCount);
-                    if (requeueFaultsInjected === 0) {
-                      requeueFaultsInjected += 1;
-                      if (options.mode === 'commit-then-throw') {
-                        await opTarget.commit();
-                      }
-                      throw new Error('ambiguous write outcome: interrupted during requeue');
-                    }
-                  }
-                  return await opTarget.commit();
-                };
-              }
-              const member = Reflect.get(opTarget, opProp, opReceiver);
-              if (typeof member === 'function') {
-                return (...args: unknown[]) => {
-                  const result = member.apply(opTarget, args);
-                  return result === opTarget ? opProxy : result;
-                };
-              }
-              return member;
-            },
-          });
-          return opProxy;
-        };
-      }
-      if (prop === 'get' && options.failFirstVerifyGet) {
-        return (key: Deno.KvKey) => {
-          if (key[0] === 'queue:requeue' && requeueFaultsInjected === 1 && verifyGetsFailed === 0) {
-            verifyGetsFailed += 1;
-            return Promise.reject(new Error('temporary read failure during verification'));
-          }
-          return target.get(key);
-        };
-      }
       const member = Reflect.get(target, prop, receiver);
       return typeof member === 'function' ? member.bind(target) : member;
     },
   });
 
-  return {
-    kv,
-    enqueuedCounts,
-    requeueFaultsInjected: () => requeueFaultsInjected,
-  };
+  return { kv, enqueuedCounts };
 }
 
-for (const failFirstVerifyGet of [false, true] as const) {
-  Deno.test(`explicit nack after ambiguous committed enqueue does not duplicate delivery (verifyReadFail=${failFirstVerifyGet})`, async () => {
-    await withTempKvPath(async (path) => {
-      const rawKv = await Deno.openKv(path);
-      const harness = wrapKvForRequeueFault(rawKv, {
-        mode: 'commit-then-throw',
-        failFirstVerifyGet,
-      });
-      const adapter = DenoKvAdapter.withKv<string>(harness.kv, `ambig-nack-${failFirstVerifyGet}`);
-      const observedDeliveries: number[] = [];
-      const controller = new AbortController();
-
-      const listening = adapter.listen(
-        async (_message, context) => {
-          observedDeliveries.push(context.deliveryCount);
-          if (context.deliveryCount === 1) {
-            await context.nack({ requeue: true });
-            return;
-          }
-          await context.ack();
-        },
-        { concurrency: 1, signal: controller.signal },
-      );
-
-      try {
-        await adapter.enqueue('work');
-        await until(() => observedDeliveries.includes(2));
-        await delay(250);
-        assertEquals(
-          harness.enqueuedCounts,
-          [0, 1],
-          'ambiguous committed nack must not replay a second counted requeue',
-        );
-        assertEquals(
-          observedDeliveries,
-          [1, 2],
-          'handler must observe [1, 2] without a duplicate delivery',
-        );
-      } finally {
-        controller.abort();
-        await listening;
-        await adapter.stop();
-        rawKv.close();
-      }
-    });
-  });
-}
-
-Deno.test('explicit nack after ambiguous uncommitted enqueue preserves original receipt without a second immediate nack', async () => {
+Deno.test('explicit nack after ambiguous committed enqueue never issues a second counted nack and retains messageId across at-least-once recovery', async () => {
   await withTempKvPath(async (path) => {
     const rawKv = await Deno.openKv(path);
-    const harness = wrapKvForRequeueFault(rawKv, { mode: 'throw-without-commit' });
-    const adapter = DenoKvAdapter.withKv<string>(harness.kv, 'ambig-uncommitted-nack');
+    const harness = wrapKvForRequeueFault(rawKv, 'commit-then-throw');
+    const adapter = DenoKvAdapter.withKv<string>(harness.kv, 'ambig-committed-nack');
     const observedDeliveries: number[] = [];
+    const observedIds = new Set<string>();
     const controller = new AbortController();
 
     const listening = adapter.listen(
       async (_message, context) => {
         observedDeliveries.push(context.deliveryCount);
+        observedIds.add(context.messageId);
         if (observedDeliveries.length === 1) {
           await context.nack({ requeue: true });
           return;
@@ -197,7 +90,48 @@ Deno.test('explicit nack after ambiguous uncommitted enqueue preserves original 
 
     try {
       await adapter.enqueue('work');
-      // First attempt's explicit nack fails uncommitted; native redelivery preserves the receipt.
+      await until(() => observedDeliveries.includes(2));
+      await delay(250);
+      assertEquals(
+        harness.enqueuedCounts,
+        [0, 1],
+        'ambiguous committed nack must never replay a second counted requeue',
+      );
+      assertEquals(observedIds.size, 1, 'enveloped retries must retain one stable messageId');
+      assertEquals(observedDeliveries.includes(2), true);
+    } finally {
+      controller.abort();
+      await listening;
+      await adapter.stop();
+      rawKv.close();
+    }
+  });
+});
+
+Deno.test('explicit nack after ambiguous uncommitted enqueue preserves original receipt without a second immediate nack', async () => {
+  await withTempKvPath(async (path) => {
+    const rawKv = await Deno.openKv(path);
+    const harness = wrapKvForRequeueFault(rawKv, 'throw-without-commit');
+    const adapter = DenoKvAdapter.withKv<string>(harness.kv, 'ambig-uncommitted-nack');
+    const observedDeliveries: number[] = [];
+    const observedIds = new Set<string>();
+    const controller = new AbortController();
+
+    const listening = adapter.listen(
+      async (_message, context) => {
+        observedDeliveries.push(context.deliveryCount);
+        observedIds.add(context.messageId);
+        if (observedDeliveries.length === 1) {
+          await context.nack({ requeue: true });
+          return;
+        }
+        await context.ack();
+      },
+      { concurrency: 1, signal: controller.signal },
+    );
+
+    try {
+      await adapter.enqueue('work');
       await until(() => observedDeliveries.length === 2, 10_000);
       await delay(150);
       assertEquals(
@@ -206,6 +140,7 @@ Deno.test('explicit nack after ambiguous uncommitted enqueue preserves original 
         'outer catch must reuse rejected settlement instead of attempting a second requeue',
       );
       assertEquals(observedDeliveries, [1, 1]);
+      assertEquals(observedIds.size, 1);
     } finally {
       controller.abort();
       await listening;

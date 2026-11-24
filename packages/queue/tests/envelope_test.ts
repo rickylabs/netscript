@@ -57,15 +57,17 @@ Deno.test('createMessageContext exposes ack and nack callbacks', async () => {
   assertEquals(requeue, false);
 });
 
-Deno.test('toAddressedEnvelope assigns deterministic identity to raw legacy payloads', () => {
+Deno.test('toAddressedEnvelope assigns distinct identities to identical raw legacy payloads while preserving v1 envelopes', () => {
   const first = toAddressedEnvelope({ b: 2, a: [1, { z: true }] });
-  const second = toAddressedEnvelope({ a: [1, { z: true }], b: 2 });
-  const different = toAddressedEnvelope({ a: [1, { z: false }], b: 2 });
+  const second = toAddressedEnvelope({ b: 2, a: [1, { z: true }] });
 
   assertEquals(first.queueName, 'default');
-  assert(first.messageId.startsWith('legacy-'));
-  assertEquals(first.messageId, second.messageId);
-  assertNotEquals(first.messageId, different.messageId);
+  assertEquals(second.queueName, 'default');
+  assertNotEquals(
+    first.messageId,
+    second.messageId,
+    'distinct raw legacy deliveries with identical payloads must never share one messageId',
+  );
 
   const envelope = createEnvelope({ wrapped: true }, undefined, 'jobs');
   const addressed = toAddressedEnvelope(envelope);

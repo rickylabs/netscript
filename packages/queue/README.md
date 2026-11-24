@@ -245,15 +245,16 @@ positive safe integer through `2,147,483,647`; invalid values fail with `QueueCo
 before opening KV connections). The bound covers **whole deliveries** — handler execution plus
 `ack`/`nack` settlement — including cancellation and drain. Excess deliveries on a file-backed
 database queue behind the registration's active slots while keeping their native KV delivery
-unacknowledged. On abort or `stop()`, already-admitted deliveries drain while unadmitted waiters are
-handed back once at their current hop count (preserving `messageId` and `deliveryCount`) without
-persisting a cross-restart parking flag. Explicit queue pause holds work at hop `0` while sibling
-routes remain live and clears on resume, `stop()`, or dispatcher close; fresh work targeting a
-permanently stopped or unregistered queue while a sibling route stays live follows the bounded
-reroute policy and dead-letters with reason `unroutable`.
+unacknowledged. Aborting `options.signal` on a live `DenoKvAdapter` (the path used by
+`Worker.pause()`) drains admitted deliveries and holds queued work for that queue at hop `0` while
+sibling routes remain live, clearing automatically on resume (`listen()`) or permanent `stop()`.
+Permanent retirement (`stop()`, `Worker.stop()`, or closing an unpaused dispatcher listener) clears
+pause state so fresh work targeting the stopped queue while a sibling stays live follows the
+bounded reroute policy and dead-letters with reason `unroutable` without leaking any cross-restart
+parking flag.
 
-Local Deno KV queue writes, atomic requeues, `KvDeadLetterStore.append`, and first-party worker
-settlement handle file-backed persistence contention according to commit certainty:
+Local Deno KV queue writes, `KvDeadLetterStore.append`, and first-party worker settlement handle
+file-backed persistence contention according to commit certainty:
 
 - **Known-uncommitted SQLite lock contention** (`SQLITE_BUSY*`, `SQLITE_LOCKED*`, or locked-database
   errors without an explicit non-busy SQLite code) retries within a bounded policy: up to 6 total
@@ -263,16 +264,31 @@ settlement handle file-backed persistence contention according to commit certain
 - **Refused compare-and-swap preconditions** (`{ ok: false }` or claim-loss errors) stay conflicts
   and are never retried as transient.
 - **Unknown commit outcomes** (including explicit non-busy SQLite codes such as `SQLITE_IOERR_WRITE`)
-  never trigger a blind replay: `DenoKvAdapter` fences requeues per source epoch with a durable
-  atomic marker key (no wall-clock expiry across downtime) checked before routing — preventing
-  duplicate deliveries, spurious parking, or false `unroutable` dead letters — and deletes each
-  marker once its native source receipt is acknowledged. Raw non-envelope legacy payloads receive a
-  deterministic content-derived `legacy-<hash>` ID on `default` so native redelivery is fenced
-  (simultaneously in-flight identical raw non-envelope payloads share that derived ID until settled;
-  enqueue via the adapter envelope for independent identities). `KvDeadLetterStore.append` checks
-  its identity index, and first-party workers perform read-only verification of applied idempotency
-  and execution state before deciding, avoiding false dead letters and repeated external effects
-  while preserving pause, acknowledgement, and redelivery semantics.
+  never trigger a blind replay:
+  - `DenoKvAdapter` and `KvQueueDispatcher` never retry an ambiguous `enqueue`, `nack({ requeue: true })`,
+    routing hop, parking write, or cancellation handback, and `DenoKvAdapter` retains any attempted
+    settlement promise so a failed explicit `nack` never triggers a second counted `nack`. Instead,
+    the callback rejects so Deno KV's native recovery retains the unacknowledged source receipt.
+    Delivery is explicitly **at least once**: if a write committed before failing or before a crash
+    prior to native acknowledgement, both the committed replacement and native source redelivery
+    can arrive (enveloped retries retain the same `messageId` so consumer idempotency deduplicates
+    them). Raw non-envelope legacy payloads always receive a fresh unique `messageId` on dequeue so
+    distinct legacy messages with identical content are never dropped; because raw legacy payloads
+    carry no transport-supplied identity, native redelivery after an ambiguous write is likewise
+    at-least-once and relies on consumer idempotency.
+  - `KvDeadLetterStore.append` verifies its identity index read-only instead of replaying writes.
+  - First-party workers verify ambiguous `markApplied` outcomes read-only inside
+    `KvWorkerIdempotencyStore` (matching the claim owner token with zero mutations) and verify
+    `executionState` transitions read-only, while keeping post-success telemetry and diagnostic
+    reporting best-effort behind the `executionSucceeded` latch so no post-success fault overwrites
+    a completed row, dead-letters, releases the claim, or triggers a counted `nack`.
+- **External-effect boundary:** Recoverable known-uncommitted local settlement contention and
+  verified ambiguous local commits execute the provider call once with zero false dead letters
+  while the worker stays alive. Local worker idempotency **cannot guarantee exactly-once external
+  effects in general**: if the process dies after an external provider succeeds and before local
+  completion becomes durable, redelivery can invoke the external provider again. End-to-end
+  single-effect execution across crashes requires a stable provider-side idempotency key or an
+  atomic transactional boundary with the downstream store.
 
 ## Compatibility
 

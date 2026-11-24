@@ -10,9 +10,6 @@
  */
 
 import { delay } from '@std/async/delay';
-import type { MessageEnvelope } from '../_envelope.ts';
-
-const REQUEUE_MARKER_PREFIX = 'queue:requeue';
 
 /** Closed classification for failed local KV write attempts. */
 export const WRITE_FAILURE_CLASS = {
@@ -274,71 +271,4 @@ function readErrorMessage(value: unknown): string {
     if (typeof message === 'string') return message;
   }
   return String(value);
-}
-
-/** Build the durable requeue fence marker key for one source delivery epoch. */
-export function requeueMarkerKey(
-  queueName: string,
-  messageId: string,
-  sourceEpoch: number,
-): Deno.KvKey {
-  return [REQUEUE_MARKER_PREFIX, queueName, messageId, sourceEpoch];
-}
-
-/** Check whether a requeue for `(queueName, messageId, sourceEpoch)` already committed. */
-export async function isKvRequeueCommitted(
-  kv: Deno.Kv,
-  queueName: string,
-  messageId: string,
-  sourceEpoch: number,
-): Promise<boolean> {
-  const entry = await kv.get(requeueMarkerKey(queueName, messageId, sourceEpoch));
-  return entry.value !== null;
-}
-
-/** Remove a requeue fence marker once its native source receipt has been acknowledged. */
-export async function deleteKvRequeueMarker(kv: Deno.Kv, markerKey: Deno.KvKey): Promise<void> {
-  await retryKnownUncommittedWrite(() => kv.delete(markerKey));
-}
-
-/**
- * Atomically record a durable requeue marker (with no wall-clock TTL) and enqueue `next`
- * in one KV transaction.
- *
- * The marker remains durable across arbitrary downtime until the native source receipt is
- * acknowledged, at which point the dispatcher deletes it. Retries known-uncommitted SQLite
- * busy contention within the bounded policy, treats CAS refusal (`{ ok: false }`) as an
- * already-settled conflict without retry, and verifies the marker key read-only on unknown
- * commit outcomes instead of blindly replaying.
- */
-export async function requeueKvEnvelopeAtomically(
-  kv: Deno.Kv,
-  source: MessageEnvelope<unknown> & { queueName: string },
-  next: MessageEnvelope<unknown> & { queueName: string },
-  delayMs?: number,
-): Promise<void> {
-  const sourceEpoch = source.requeueEpoch ?? 0;
-  const markerKey = requeueMarkerKey(source.queueName, source.messageId, sourceEpoch);
-  const nextEnvelope = { ...next, requeueEpoch: sourceEpoch + 1 };
-  const enqueueOptions = delayMs ? { delay: delayMs } : undefined;
-  await retryKnownUncommittedWrite(
-    () =>
-      kv.atomic()
-        .check({ key: markerKey, versionstamp: null })
-        .set(markerKey, { nextEpoch: sourceEpoch + 1, deliveryCount: nextEnvelope.deliveryCount })
-        .enqueue(nextEnvelope, enqueueOptions)
-        .commit(),
-    {
-      verifyCommitted: async () => {
-        const existing = await kv.get(markerKey);
-        if (existing.value !== null) {
-          return {
-            committed: true,
-            value: { ok: true as const, versionstamp: existing.versionstamp },
-          };
-        }
-        return { committed: false };
-      },
-    },
-  );
 }
