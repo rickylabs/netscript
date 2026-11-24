@@ -27,6 +27,7 @@ import {
   type KvQueueDispatcher,
   type KvQueueDispatcherLease,
 } from './_kv-queue/dispatcher.ts';
+import { validateKvQueueConcurrency } from './_kv-queue/routes.ts';
 import { KvDeadLetterStore } from './kv-dead-letter-store.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
@@ -239,6 +240,9 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
   /**
    * Listen for messages addressed to this queue name until stopped or aborted.
    *
+   * Honors `options.concurrency` (default `1`) across whole deliveries (handler
+   * execution plus `ack`/`nack`), including cancellation and drain.
+   *
    * @param handler - Async callback invoked for each message.
    * @param options - Listener concurrency and cancellation options.
    */
@@ -246,12 +250,17 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     handler: (message: T, context: MessageContext) => Promise<void>,
     options?: ListenOptions,
   ): Promise<void> {
-    const dispatcher = await this.ensureDispatcher();
+    const concurrency = validateKvQueueConcurrency(options?.concurrency);
 
     if (this.activeListener) {
       throw new QueueError('Queue is already listening', QueueErrorCode.CONFIGURATION_ERROR);
     }
 
+    if (options?.signal?.aborted) {
+      return;
+    }
+
+    const dispatcher = await this.ensureDispatcher();
     const controller = new AbortController();
     const signal = options?.signal;
     const stopListening = () => controller.abort();
@@ -263,6 +272,7 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
       this.queueName,
       (envelope) => this.deliver(envelope, handler),
       controller.signal,
+      concurrency,
     );
     const listener = { controller, done };
     this.activeListener = listener;

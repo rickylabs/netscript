@@ -25,7 +25,14 @@ import {
   type KvDatabaseTarget,
   type KvQueueConnection,
 } from './connection.ts';
-import { type KvEnvelopeHandler, KvQueueRegistration, KvQueueRouteTable, track } from './routes.ts';
+import {
+  type KvEnvelopeHandler,
+  KvQueueRegistration,
+  KvQueueRouteTable,
+  track,
+  validateKvQueueConcurrency,
+} from './routes.ts';
+import { retryKnownUncommittedWrite } from './write-retry.ts';
 import { KvDeadLetterStore } from '../kv-dead-letter-store.ts';
 
 export type { KvDatabaseTarget } from './connection.ts';
@@ -73,6 +80,13 @@ interface KvListenLoop {
 }
 
 /**
+ * Short handback delay used when a dedicated file-backed listen loop is closing
+ * after draining admitted work: long enough that the closing loop will not reclaim
+ * the envelope during `yieldToAcks()`, short enough that pause/resume picks it up promptly.
+ */
+const DEDICATED_HANDBACK_DELAY_MS = 25;
+
+/**
  * Routes one Deno KV database's queue to listeners registered by queue name.
  */
 export class KvQueueDispatcher {
@@ -81,6 +95,8 @@ export class KvQueueDispatcher {
   readonly #routes = new KvQueueRouteTable();
   readonly #inFlight = new Set<Promise<void>>();
   readonly #stopping = new Set<Promise<void>>();
+  #admittedDeliveries = 0;
+  #routingChanged = Promise.withResolvers<void>();
   #writer: { readonly kv: Deno.Kv; readonly queue: DenoKvMessageQueue } | null = null;
   #loop: KvListenLoop | null = null;
 
@@ -105,7 +121,8 @@ export class KvQueueDispatcher {
   }
 
   /**
-   * Enqueue an envelope on the database queue.
+   * Enqueue an envelope on the database queue, retrying known-uncommitted SQLite busy
+   * contention within the bounded write-retry policy.
    *
    * @param envelope - Envelope addressed to a queue name.
    * @param delayMs - Optional availability delay.
@@ -115,9 +132,9 @@ export class KvQueueDispatcher {
     if (this.#writer?.kv !== kv) {
       this.#writer = { kv, queue: new DenoKvMessageQueue(kv) };
     }
-    await this.#writer.queue.enqueue(envelope, {
-      delay: delayMs ? Temporal.Duration.from({ milliseconds: delayMs }) : undefined,
-    });
+    const writer = this.#writer.queue;
+    const delay = delayMs ? Temporal.Duration.from({ milliseconds: delayMs }) : undefined;
+    await retryKnownUncommittedWrite(() => writer.enqueue(envelope, { delay }));
   }
 
   /**
@@ -126,10 +143,17 @@ export class KvQueueDispatcher {
    * @param queueName - Queue name to receive.
    * @param handler - Envelope handler; a rejection leaves redelivery to Deno KV.
    * @param signal - Ends this registration when aborted.
-   * @returns Resolves once the registration has ended and its in-flight deliveries have settled;
+   * @param concurrency - Maximum whole deliveries active simultaneously (default `1`).
+   * @returns Resolves once the registration has ended and its admitted deliveries have settled;
    *   rejects if the shared listen loop fails.
    */
-  listen(queueName: string, handler: KvEnvelopeHandler, signal: AbortSignal): Promise<void> {
+  listen(
+    queueName: string,
+    handler: KvEnvelopeHandler,
+    signal: AbortSignal,
+    concurrency = 1,
+  ): Promise<void> {
+    const boundedConcurrency = validateKvQueueConcurrency(concurrency);
     const { promise, resolve, reject } = Promise.withResolvers<void>();
     if (signal.aborted) {
       resolve();
@@ -137,6 +161,8 @@ export class KvQueueDispatcher {
     }
     const leave = () => {
       this.#routes.remove(queueName, registration);
+      registration.close();
+      this.#wakeRoutingWaiters();
       void registration.settle()
         .then(() => this.#stopLoopWhenIdle())
         .then(() => resolve(), () => resolve());
@@ -151,9 +177,17 @@ export class KvQueueDispatcher {
         signal.removeEventListener('abort', leave);
         reject(error);
       },
+      boundedConcurrency,
+      (delta) => {
+        this.#admittedDeliveries += delta;
+        if (this.#admittedDeliveries === 0) {
+          this.#wakeRoutingWaiters();
+        }
+      },
     );
     signal.addEventListener('abort', leave, { once: true });
     this.#routes.add(queueName, registration);
+    this.#wakeRoutingWaiters();
     this.#startLoop();
     return promise;
   }
@@ -164,6 +198,10 @@ export class KvQueueDispatcher {
    */
   async close(): Promise<void> {
     const registrations = this.#routes.drain();
+    for (const registration of registrations) {
+      registration.close();
+    }
+    this.#wakeRoutingWaiters();
     await this.#settleInFlight();
     for (const registration of registrations) {
       registration.end();
@@ -245,12 +283,20 @@ export class KvQueueDispatcher {
     }
     this.#loop = null;
     for (const registration of this.#routes.drain()) {
+      registration.close();
       if (error === undefined) {
         registration.end();
       } else {
         registration.fail(error);
       }
     }
+    this.#wakeRoutingWaiters();
+  }
+
+  #wakeRoutingWaiters(): void {
+    const current = this.#routingChanged;
+    this.#routingChanged = Promise.withResolvers<void>();
+    current.resolve();
   }
 
   #dispatch(rawMessage: unknown): Promise<void> {
@@ -258,13 +304,36 @@ export class KvQueueDispatcher {
   }
 
   async #route(envelope: MessageEnvelope<unknown> & { queueName: string }): Promise<void> {
-    const registration = this.#routes.next(envelope.queueName);
-    if (registration) {
-      await registration.deliver(envelope);
-    } else if (this.#routes.isEmpty) {
-      await this.enqueue(envelope, this.#policy.parkDelayMs);
-    } else {
+    while (true) {
+      const registration = this.#routes.next(envelope.queueName);
+      if (registration) {
+        const admitted = await registration.deliver(envelope);
+        if (admitted) {
+          return;
+        }
+        continue;
+      }
+      if (this.#routes.isEmpty) {
+        if (this.#connection.dedicatedListener) {
+          // Hold the native delivery open while admitted deliveries drain so either a newly
+          // registered listener receives it immediately or we publish it back once idle.
+          while (this.#routes.isEmpty && this.#admittedDeliveries > 0) {
+            await this.#routingChanged.promise;
+          }
+          if (!this.#routes.isEmpty) {
+            continue;
+          }
+          await this.enqueue(
+            envelope,
+            Math.min(DEDICATED_HANDBACK_DELAY_MS, this.#policy.parkDelayMs),
+          );
+          return;
+        }
+        await this.enqueue(envelope, this.#policy.parkDelayMs);
+        return;
+      }
       await this.#reroute(envelope);
+      return;
     }
   }
 
