@@ -238,6 +238,31 @@ cancellation to the host instead when the handler should finish and acknowledge 
 must respect their application's cancellation signal; the drain cannot terminate JavaScript or undo
 effects. First-party workers retain their existing per-delivery renewal and cancellation policy.
 
+## Local Deno KV concurrency and transient contention
+
+`DenoKvAdapter.listen(handler, { concurrency })` honors `ListenOptions.concurrency` (default `1`,
+positive safe integer through `2,147,483,647`; invalid values fail with `QueueConfigurationError`
+before opening KV connections). The bound covers **whole deliveries** — handler execution plus
+`ack`/`nack` settlement — including cancellation and drain. Excess deliveries on a file-backed
+database queue behind the registration's active slots while keeping their native KV delivery
+unacknowledged. On abort, `stop()`, or pause, already-admitted deliveries drain while unadmitted
+deliveries are handed back unchanged (preserving `messageId` and `deliveryCount`) before the
+dedicated listen loop closes.
+
+Local Deno KV queue writes, `KvDeadLetterStore.append`, and first-party worker settlement handle
+file-backed persistence contention according to commit certainty:
+
+- **Known-uncommitted SQLite lock contention** (`SQLITE_BUSY*`, `SQLITE_LOCKED*`, or locked-database
+  errors) retries within a bounded policy: up to 6 total attempts within a 2,000 ms wall-clock
+  ceiling, exponential backoff from 15 ms to 250 ms with equal jitter, and immediate cancellation
+  when aborted.
+- **Refused compare-and-swap preconditions** (`{ ok: false }` or claim-loss errors) stay conflicts
+  and are never retried as transient.
+- **Unknown commit outcomes** never trigger a blind replay: `KvDeadLetterStore.append` checks its
+  identity index and first-party workers verify persisted idempotency and execution state before
+  deciding, avoiding false dead letters and repeated external effects while preserving pause,
+  acknowledgement, and redelivery semantics.
+
 ## Compatibility
 
 Redis delayed-message promotion is at most once across listeners sharing a delayed key. The adapter
