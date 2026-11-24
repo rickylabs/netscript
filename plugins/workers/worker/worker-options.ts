@@ -82,6 +82,10 @@ export type WorkerCompleteExecutionOptions = Readonly<{
 
 /** Execution-state surface consumed by the worker process. */
 export interface WorkerExecutionState {
+  /** Optional read-only lookup used to verify ambiguous persistence outcomes. */
+  get?(
+    executionId: string,
+  ): Promise<(WorkerExecutionRecord & { readonly status?: string }) | null>;
   /** Create an execution record. */
   create(options: WorkerCreateExecutionOptions): Promise<WorkerExecutionRecord>;
   /** Mark an execution as running. */
