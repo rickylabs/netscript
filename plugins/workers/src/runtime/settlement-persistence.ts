@@ -41,16 +41,19 @@ export {
   settleWriteWithVerification,
 } from './settlement-retry.ts';
 
+/** Internal optional read-only lookup capability supported by first-party idempotency stores. */
+interface ReadOnlyIdempotencyLookup {
+  readonly isApplied?: (key: string) => Promise<boolean>;
+}
+
 /** Inputs for settling a job or task after its handler reported success. */
 export interface SettleAppliedExecutionInput {
-  readonly idempotency: WorkerIdempotencyPort;
+  readonly idempotency: WorkerIdempotencyPort & ReadOnlyIdempotencyLookup;
   readonly executionState: WorkerExecutionState;
-  readonly claimInput: WorkerIdempotencyInput;
   readonly claim: WorkerIdempotencyClaim;
   readonly executionId: string;
   readonly completion: WorkerCompleteExecutionOptions;
   readonly signal?: AbortSignal;
-  readonly onApplied?: () => void;
 }
 
 /** Build a normalized idempotency claim input for one job or task delivery. */
@@ -72,28 +75,21 @@ export function buildWorkerClaimInput(
 }
 
 /**
- * Read-first check for whether `idempotency.markApplied` already committed.
+ * Read-only check for whether `idempotency.markApplied` already committed.
  *
- * Uses `deliveryCount: 1` so `KvWorkerIdempotencyStore` performs zero writes whenever
- * either the `applied` marker or the current `active` claim exists; if an expired key
- * is unexpectedly claimed by the probe, it is released immediately.
+ * Uses the store's optional read-only `isApplied(key)` lookup and never invokes
+ * mutating `claim()` or `release()` operations. When a backend lacks a read-only
+ * lookup, the outcome remains unconfirmed (`{ committed: false }`).
  */
 export async function verifyIdempotencyApplied(
-  idempotency: WorkerIdempotencyPort,
-  claimInput: WorkerIdempotencyInput,
+  idempotency: WorkerIdempotencyPort & ReadOnlyIdempotencyLookup,
+  key: string,
 ): Promise<SettlementCommitVerification<void>> {
-  const probe = await idempotency.claim({ ...claimInput, deliveryCount: 1 });
-  if (!probe.claimed && probe.alreadyApplied) {
-    return { committed: true, value: undefined };
+  if (typeof idempotency.isApplied !== 'function') {
+    return { committed: false };
   }
-  if (probe.claimed) {
-    try {
-      await idempotency.release(probe.key, probe.token);
-    } catch {
-      // Best-effort cleanup of a probe claim on an expired key.
-    }
-  }
-  return { committed: false };
+  const applied = await idempotency.isApplied(key);
+  return applied ? { committed: true, value: undefined } : { committed: false };
 }
 
 /**
@@ -165,7 +161,7 @@ export function settleExecutionCompletion(
 
 /**
  * Persist post-effect settlement (`markApplied` followed by `executionState.complete`)
- * using bounded transient retries and read-first verification on ambiguous outcomes.
+ * using bounded transient retries and read-only verification on ambiguous outcomes.
  */
 export async function settleAppliedExecution(
   input: SettleAppliedExecutionInput,
@@ -174,14 +170,12 @@ export async function settleAppliedExecution(
     () => input.idempotency.markApplied(input.claim.key, undefined, input.claim.token),
     {
       signal: input.signal,
-      verifyCommitted: () => verifyIdempotencyApplied(input.idempotency, input.claimInput),
+      verifyCommitted: () => verifyIdempotencyApplied(input.idempotency, input.claim.key),
     },
   );
   if (!applied.settled) {
     return applied;
   }
-
-  input.onApplied?.();
 
   return await settleExecutionCompletion(
     input.executionState,
@@ -240,16 +234,17 @@ export async function recordJobFailureBestEffort(
   }
 }
 
-/** Log a post-effect settlement persistence failure without masking its classification. */
+/** Log a post-effect settlement or telemetry error without masking its classification. */
 export function logPostEffectSettlementFailure(
   workerId: string,
   concept: 'Job' | 'Task',
   id: string,
-  failure: FailedSettlementOutcome,
+  failure: FailedSettlementOutcome | undefined,
   error: unknown,
 ): void {
+  const classification = failure?.failureClass ?? 'post_success_error';
   console.error(
-    `[Worker ${workerId}] ${concept} '${id}' settlement failed (${failure.failureClass}) after successful execution:`,
+    `[Worker ${workerId}] ${concept} '${id}' settlement failed (${classification}) after successful execution:`,
     error instanceof Error ? error.message : String(error),
   );
 }

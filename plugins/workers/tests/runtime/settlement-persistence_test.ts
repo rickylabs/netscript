@@ -1,10 +1,12 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 import { delay } from '@std/async';
 import {
   type AtomicCheck,
   type AtomicMutation,
   type AtomicResult,
   DenoKvAdapter,
+  type KvKey,
+  type KvSetOptions,
 } from '@netscript/kv';
 import { createQueue, QueueProvider } from '@netscript/queue';
 import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
@@ -19,7 +21,7 @@ import {
   verifyIdempotencyApplied,
 } from '../../src/runtime/settlement-persistence.ts';
 import { recoveryContext } from '../../worker/test_utils/redis-worker-context.ts';
-import { processWorkerTask } from '../../worker/job-dispatcher.ts';
+import { processWorkerJob, processWorkerTask } from '../../worker/job-dispatcher.ts';
 import { Worker } from '../../worker/worker.ts';
 
 async function withTempKvPath(run: (path: string) => Promise<void>): Promise<void> {
@@ -51,6 +53,25 @@ Deno.test('settleWriteWithVerification bounds attempts, total time, abort, and C
     classifySettlementWriteFailure(new Error('Worker idempotency claim lost')),
     SETTLEMENT_FAILURE_CLASS.CAS_CONFLICT,
   );
+  assertEquals(
+    classifySettlementWriteFailure(
+      Object.assign(new Error('database is locked'), { code: 'SQLITE_IOERR_WRITE' }),
+    ),
+    SETTLEMENT_FAILURE_CLASS.UNKNOWN_COMMIT_OUTCOME,
+    'explicit non-busy SQLite code must override lock-message fallback',
+  );
+  assertEquals(
+    classifySettlementWriteFailure(new Error('SQLITE_IOERR_WRITE: database is locked')),
+    SETTLEMENT_FAILURE_CLASS.UNKNOWN_COMMIT_OUTCOME,
+  );
+  assertEquals(
+    classifySettlementWriteFailure(
+      new Error('database is locked', {
+        cause: Object.assign(new Error('io error'), { code: 'SQLITE_IOERR_FSYNC' }),
+      }),
+    ),
+    SETTLEMENT_FAILURE_CLASS.UNKNOWN_COMMIT_OUTCOME,
+  );
 
   let clock = 0;
   const waits: number[] = [];
@@ -73,6 +94,47 @@ Deno.test('settleWriteWithVerification bounds attempts, total time, abort, and C
     assertEquals(exhausted.attempts, DEFAULT_SETTLEMENT_RETRY_POLICY.maxAttempts);
   }
   assertEquals(waits, [15, 30, 60, 120, 240]);
+
+  // Must never start a retry at or after the retry-start deadline, including clock overshoot.
+  const tightStarts: number[] = [];
+  let tightClock = 0;
+  const tight = await settleWriteWithVerification(
+    () => {
+      tightStarts.push(tightClock);
+      return Promise.reject(new Error('SQLITE_BUSY: database is locked'));
+    },
+    {
+      policy: { maxAttempts: 4, maxTotalTimeMs: 10, baseDelayMs: 20, maxDelayMs: 50 },
+      now: () => tightClock,
+      random: () => 1,
+      sleep: (ms) => {
+        tightClock += ms;
+        return Promise.resolve();
+      },
+    },
+  );
+  assertEquals(tight.settled, false);
+  assertEquals(tightStarts, [0], 'retry must not start at or after the 10 ms deadline');
+
+  const overshootStarts: number[] = [];
+  let overshootClock = 0;
+  const overshoot = await settleWriteWithVerification(
+    () => {
+      overshootStarts.push(overshootClock);
+      return Promise.reject(new Error('SQLITE_BUSY: database is locked'));
+    },
+    {
+      policy: { maxAttempts: 4, maxTotalTimeMs: 10, baseDelayMs: 4, maxDelayMs: 50 },
+      now: () => overshootClock,
+      random: () => 1,
+      sleep: () => {
+        overshootClock += 12;
+        return Promise.resolve();
+      },
+    },
+  );
+  assertEquals(overshoot.settled, false);
+  assertEquals(overshootStarts, [0], 'post-sleep deadline recheck must stop before retry');
 
   const cas = await settleWriteWithVerification(
     () => Promise.reject(new Error('Worker idempotency claim lost')),
@@ -101,28 +163,138 @@ Deno.test('settleWriteWithVerification bounds attempts, total time, abort, and C
   }
 });
 
-Deno.test('verifyIdempotencyApplied releases an accidental probe claim on an expired key', async () => {
-  const released: Array<{ key: string; token?: string }> = [];
-  const verified = await verifyIdempotencyApplied(
-    {
-      claim: () =>
-        Promise.resolve({
-          key: 'expired-key',
-          source: 'caller',
-          claimed: true,
-          alreadyApplied: false,
-          token: 'probe-token',
+Deno.test('idempotency commit verification performs zero mutations when marker is absent or backend lacks lookup', async () => {
+  await withTempKvPath(async (path) => {
+    const rawKv = await Deno.openKv(path);
+    try {
+      let trackMutations = false;
+      let mutationsDuringVerify = 0;
+      class MutationTrackingKv extends DenoKvAdapter {
+        override async atomic(
+          checks: AtomicCheck[],
+          mutations: AtomicMutation[],
+        ): Promise<AtomicResult> {
+          if (trackMutations) mutationsDuringVerify += 1;
+          const isApplied = mutations.some((m) =>
+            m.type === 'set' && m.key[0] === 'workers' && m.key[1] === 'idempotency' &&
+            m.key[2] === 'applied'
+          );
+          if (isApplied) {
+            // Simulate expired active marker + uncommitted ambiguous markApplied error.
+            const activeKey = mutations.find((m) => m.type === 'delete')?.key;
+            if (activeKey) await super.delete(activeKey);
+            trackMutations = true;
+            throw new Error('ambiguous write outcome');
+          }
+          return await super.atomic(checks, mutations);
+        }
+        override set(key: KvKey, value: unknown, options?: KvSetOptions): Promise<void> {
+          if (trackMutations) mutationsDuringVerify += 1;
+          return super.set(key, value, options);
+        }
+        override delete(key: KvKey): Promise<void> {
+          if (trackMutations) mutationsDuringVerify += 1;
+          return super.delete(key);
+        }
+      }
+
+      const storage = new MutationTrackingKv(rawKv);
+      const idempotency = new KvWorkerIdempotencyStore({ kv: storage });
+      const executionState = new KvExecutionState({ kv: storage, workerId: 'ro-verify' });
+      const context = {
+        ...recoveryContext(idempotency, {
+          execute: () => Promise.resolve({ success: true, duration: 1 }),
         }),
-      markApplied: () => Promise.resolve(),
-      release: (key, token) => {
-        released.push({ key, token });
-        return Promise.resolve();
-      },
-    },
-    { concept: 'job', targetId: 'j1', idempotencyKey: 'expired-key' },
-  );
-  assertEquals(verified, { committed: false });
-  assertEquals(released, [{ key: 'expired-key', token: 'probe-token' }]);
+        executionState,
+      };
+      await assertRejects(
+        () =>
+          processWorkerJob(context, {
+            jobId: 'ro-job',
+            topic: 'jobs',
+            triggeredBy: 'queue',
+            idempotencyKey: 'ro-expired-key',
+          }),
+        Error,
+        'ambiguous write outcome',
+      );
+      assertEquals(mutationsDuringVerify, 0, 'verification must never mutate KV storage');
+
+      // Backend without read-only lookup must stay unresolved with zero claim/release calls.
+      let claimCalls = 0;
+      let releaseCalls = 0;
+      const customContext = {
+        ...recoveryContext(idempotency, {
+          execute: () => Promise.resolve({ success: true, duration: 1 }),
+        }),
+        executionState,
+        idempotency: {
+          claim: () => {
+            claimCalls += 1;
+            return Promise.resolve({
+              key: 'custom-key',
+              source: 'caller' as const,
+              claimed: true,
+              alreadyApplied: false,
+              token: 'tok-1',
+            });
+          },
+          markApplied: () => Promise.reject(new Error('ambiguous write outcome')),
+          release: () => {
+            releaseCalls += 1;
+            return Promise.resolve();
+          },
+        },
+      };
+      await assertRejects(
+        () =>
+          processWorkerJob(customContext, {
+            jobId: 'custom-ro-job',
+            topic: 'jobs',
+            triggeredBy: 'queue',
+            idempotencyKey: 'custom-ro-key',
+          }),
+        Error,
+        'ambiguous write outcome',
+      );
+      assertEquals(claimCalls, 1, 'verification must not call claim()');
+      assertEquals(releaseCalls, 0, 'verification must not call release()');
+
+      // Read error during isApplied keeps outcome unresolved with zero mutations.
+      const readErrorOutcome = await settleWriteWithVerification(
+        () => Promise.reject(new Error('ambiguous write outcome')),
+        {
+          verifyCommitted: () =>
+            verifyIdempotencyApplied(
+              {
+                claim: () => {
+                  claimCalls += 1;
+                  return Promise.reject(new Error('unexpected claim'));
+                },
+                markApplied: () => Promise.resolve(),
+                release: () => {
+                  releaseCalls += 1;
+                  return Promise.reject(new Error('unexpected release'));
+                },
+                isApplied: () => Promise.reject(new Error('read failed')),
+              },
+              'k-read-err',
+            ),
+        },
+      );
+      assertEquals(readErrorOutcome.settled, false);
+      if (!readErrorOutcome.settled) {
+        assertEquals(
+          readErrorOutcome.failureClass,
+          SETTLEMENT_FAILURE_CLASS.UNKNOWN_COMMIT_OUTCOME,
+        );
+      }
+      assertEquals(claimCalls, 1);
+      assertEquals(releaseCalls, 0);
+    } finally {
+      rawKv.close();
+    }
+  });
 });
 
 Deno.test('file-backed Worker honors concurrency 1 across pause, drain, and resume without losing work', async () => {

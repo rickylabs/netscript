@@ -207,7 +207,6 @@ export async function processWorkerJob(
           const settled = await settleAppliedExecution({
             idempotency: context.idempotency,
             executionState: context.executionState,
-            claimInput,
             claim: claim!,
             executionId: executionId!,
             completion: {
@@ -217,16 +216,15 @@ export async function processWorkerJob(
               error: result.error ?? undefined,
             },
             signal: lease.signal,
-            onApplied: () =>
-              recordSharedWorkerMetrics(
-                { activeJobs: context.activeJobs.size, processedJobs: 1, failedJobs: 0 },
-                { [WorkerAttributes.WORKER_ID]: context.workerId },
-              ),
           });
           if (!settled.settled) {
             postEffectSettlementFailure = settled;
             throw settled.error;
           }
+          recordSharedWorkerMetrics(
+            { activeJobs: context.activeJobs.size, processedJobs: 1, failedJobs: 0 },
+            { [WorkerAttributes.WORKER_ID]: context.workerId },
+          );
           return result;
         }
 
@@ -251,7 +249,7 @@ export async function processWorkerJob(
       },
     );
   } catch (error) {
-    if (postEffectSettlementFailure !== undefined) {
+    if (executionSucceeded) {
       logPostEffectSettlementFailure(
         context.workerId,
         'Job',
@@ -277,7 +275,7 @@ export async function processWorkerJob(
       lease.lost ||
       context.shutdownSignal?.aborted ||
       error instanceof Error && error.name === 'ShutdownError' ||
-      writingDeadLetter || terminalRecorded || executionSucceeded;
+      writingDeadLetter || terminalRecorded;
     try {
       if (requeue) {
         await requeueOrThrow(queueContext, lease, error, attemptFailed);
@@ -401,7 +399,6 @@ export async function processWorkerTask(
       const settled = await settleAppliedExecution({
         idempotency: context.idempotency,
         executionState: context.executionState,
-        claimInput,
         claim,
         executionId,
         completion: {
@@ -435,7 +432,7 @@ export async function processWorkerTask(
     await releaseClaimWithRetry(context.idempotency, claim.key, claim.token);
     console.error(`[Worker ${context.workerId}] Task '${taskId}' failed in ${result.duration}ms`);
   } catch (error) {
-    if (postEffectSettlementFailure !== undefined) {
+    if (executionSucceeded) {
       logPostEffectSettlementFailure(
         context.workerId,
         'Task',
@@ -447,7 +444,7 @@ export async function processWorkerTask(
       return;
     }
 
-    if (claim?.claimed && !executionSucceeded) {
+    if (claim?.claimed) {
       await releaseClaimWithRetry(context.idempotency, claim.key, claim.token);
     }
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -461,7 +458,7 @@ export async function processWorkerTask(
       { status: 'failed', exitCode: 1, error: errorMessage },
     );
     if (
-      executionSucceeded || lease.signal.aborted || preEffectPersistenceFailure ||
+      lease.signal.aborted || preEffectPersistenceFailure ||
       (claimAttempted && !claim) || (claim && !claim.claimed && !claim.alreadyApplied)
     ) {
       await requeueOrThrow(queueContext, lease, error, false);

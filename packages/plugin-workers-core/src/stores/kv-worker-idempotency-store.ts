@@ -86,6 +86,11 @@ export class KvWorkerIdempotencyStore implements WorkerIdempotencyPort {
     return await this.#sequentialClaim(resolved, input);
   }
 
+  /** Return whether a completed applied marker currently exists for `key` without mutating storage. */
+  isApplied(key: string): Promise<boolean> {
+    return this.#kv.has(this.#appliedKey(key));
+  }
+
   /** Mark a claimed key as applied for the configured or supplied TTL. */
   async markApplied(
     key: string,

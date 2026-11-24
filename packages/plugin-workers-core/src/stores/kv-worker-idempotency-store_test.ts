@@ -114,6 +114,40 @@ Deno.test('newer broker delivery takes over its stranded marker and fences the f
   assertEquals(duplicate.alreadyApplied, true, 'completed markers survive broker redelivery');
 });
 
+Deno.test('KvWorkerIdempotencyStore isApplied performs a read-only lookup without mutating storage', async () => {
+  await using baseKv = new MemoryKvAdapter();
+  let mutations = 0;
+  const store = new KvWorkerIdempotencyStore({
+    kv: {
+      get: (key) => baseKv.get(key),
+      has: (key) => baseKv.has(key),
+      set: (key, value, options) => {
+        mutations += 1;
+        return baseKv.set(key, value, options);
+      },
+      delete: (key) => {
+        mutations += 1;
+        return baseKv.delete(key);
+      },
+      atomic: (checks, ops) => {
+        mutations += 1;
+        return baseKv.atomic(checks, ops);
+      },
+    },
+  });
+
+  const claim = await store.claim({ concept: 'job', targetId: 'ro-check', idempotencyKey: 'k1' });
+  const beforeLookup = mutations;
+  assertEquals(await store.isApplied(claim.key), false);
+  assertEquals(mutations, beforeLookup);
+
+  await store.markApplied(claim.key, 10_000, claim.token);
+  const afterApply = mutations;
+  assertEquals(await store.isApplied(claim.key), true);
+  assertEquals(await store.isApplied('missing-key'), false);
+  assertEquals(mutations, afterApply);
+});
+
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

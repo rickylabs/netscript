@@ -27,7 +27,11 @@ export type SettlementFailureClass =
 export interface SettlementRetryPolicy {
   /** Maximum total attempts including the initial attempt (must be >= 1). */
   readonly maxAttempts: number;
-  /** Maximum cumulative wall-clock time across attempts and waits in milliseconds. */
+  /**
+   * Monotonic retry-start deadline in milliseconds from the initial attempt start.
+   * No retry begins at or after `start + maxTotalTimeMs`; an already-started backing
+   * write runs to completion unless the operation itself supports cancellation.
+   */
   readonly maxTotalTimeMs: number;
   /** Base exponential backoff delay before the first retry in milliseconds. */
   readonly baseDelayMs: number;
@@ -99,13 +103,18 @@ const ABORT_ERROR_NAMES = new Set([
 const CAS_CONFLICT_PATTERN =
   /\b(?:claim lost|cas\b.*\b(?:refus|conflict|fail)|atomic check(?:s)? (?:refused|failed)|versionstamp (?:mismatch|conflict))\b/i;
 const AMBIGUOUS_OR_NON_TRANSIENT_PATTERN =
-  /\b(?:ambiguous|uncertain|commit outcome|outcome unknown|after commit|SQLITE_IOERR|SQLITE_CORRUPT|SQLITE_FULL)\b/i;
+  /\b(?:ambiguous|uncertain|commit outcome|outcome unknown|after commit)\b/i;
+const SQLITE_CODE_PREFIX_PATTERN = /^SQLITE_[A-Z0-9_]+$/i;
+const SQLITE_ANY_MESSAGE_CODE_PATTERN = /\bSQLITE_[A-Z0-9_]+\b/gi;
 const SQLITE_TRANSIENT_CODE_PATTERN = /^SQLITE_(?:BUSY|LOCKED)(?:_[A-Z0-9_]+)?$/i;
 const SQLITE_TRANSIENT_MESSAGE_PATTERN =
   /\b(?:SQLITE_BUSY(?:_[A-Z0-9_]+)?|SQLITE_LOCKED(?:_[A-Z0-9_]+)?|database is locked|database table is locked|database schema is locked)\b/i;
 
 /**
  * Classify a worker storage write error into the closed commit-outcome taxonomy.
+ *
+ * CAS refusals, aborts, explicit non-busy SQLite codes (including extended I/O codes),
+ * closed handles, and ambiguous failures take precedence over transient busy message matching.
  */
 export function classifySettlementWriteFailure(
   error: unknown,
@@ -138,6 +147,7 @@ export function classifySettlementWriteFailure(
     if (
       item instanceof Deno.errors.BadResource ||
       name === 'KvClosedError' ||
+      hasExplicitNonBusySqliteCode(code, message) ||
       AMBIGUOUS_OR_NON_TRANSIENT_PATTERN.test(message)
     ) {
       return SETTLEMENT_FAILURE_CLASS.UNKNOWN_COMMIT_OUTCOME;
@@ -159,6 +169,8 @@ export function classifySettlementWriteFailure(
 /**
  * Execute one worker persistence write with bounded retries only for known-uncommitted
  * SQLite busy/locked contention and read-first verification on unknown commit outcomes.
+ * `policy.maxTotalTimeMs` is enforced as a monotonic retry-start deadline checked before
+ * and after backoff; no retry begins at or after the deadline.
  */
 export async function settleWriteWithVerification<T>(
   operation: () => Promise<T>,
@@ -226,22 +238,46 @@ export async function settleWriteWithVerification<T>(
       if (ceiling > 0) {
         const jitterFactor = Math.min(1, Math.max(0, random()));
         const jittered = Math.max(1, Math.floor(ceiling / 2 + jitterFactor * (ceiling / 2)));
-        const waitMs = Math.min(jittered, remainingMs);
-        if (waitMs > 0) {
-          try {
-            await sleep(waitMs, signal);
-          } catch (sleepError) {
-            return {
-              settled: false,
-              failureClass: classifySettlementWriteFailure(sleepError, signal),
-              error: sleepError,
-              attempts,
-            };
-          }
+        if (jittered >= remainingMs) {
+          return { settled: false, failureClass, error, attempts };
+        }
+        try {
+          await sleep(jittered, signal);
+        } catch (sleepError) {
+          return {
+            settled: false,
+            failureClass: classifySettlementWriteFailure(sleepError, signal),
+            error: sleepError,
+            attempts,
+          };
+        }
+        if (signal?.aborted) {
+          return {
+            settled: false,
+            failureClass: SETTLEMENT_FAILURE_CLASS.ABORTED,
+            error: signal.reason ?? new DOMException('Aborted', 'AbortError'),
+            attempts,
+          };
+        }
+        if (now() >= deadline) {
+          return { settled: false, failureClass, error, attempts };
         }
       }
     }
   }
+}
+
+function hasExplicitNonBusySqliteCode(code: string | undefined, message: string): boolean {
+  if (
+    code !== undefined &&
+    SQLITE_CODE_PREFIX_PATTERN.test(code) &&
+    !SQLITE_TRANSIENT_CODE_PATTERN.test(code)
+  ) {
+    return true;
+  }
+  const tokens = message.match(SQLITE_ANY_MESSAGE_CODE_PATTERN);
+  if (!tokens) return false;
+  return tokens.some((token) => !SQLITE_TRANSIENT_CODE_PATTERN.test(token));
 }
 
 /**
