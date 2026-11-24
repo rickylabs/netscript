@@ -59,18 +59,52 @@ Quoted verbatim from the owner's batch directive. `[…]` marks elided text that
 
 ## Design
 
-Builder records this section before creating implementation files (`workflow/run-loop.md` § 3b).
+Design-only deliverable (`rfcs/0000-authorizing-stream-proxy.md`); no framework source files created in this run.
+
+1. **Public surface (proposed in RFC)** —
+   - `@netscript/contracts/streams`: `defineStreamEndpoint`, `buildStreamEndpointUrl`, `StreamEndpointContract`, `StreamEndpointClientAuthMode`.
+   - `@netscript/service`: `StreamProxyMount`, `StreamProxyMountContext`, `ServiceBuilder.withStreamProxy`, `DefineServiceOptions.streamProxies`, `ContractAuthorizerOptions.streamEndpoints`, `OpenAPIConfig` stream projection, pre-drain `shutdownSignal`.
+   - `@netscript/plugin/service`: `PluginServiceConfig.streamProxies`.
+   - `@netscript/plugin-streams-core/proxy`: `createNetScriptStreamProxy`, `bindStreamProxy`, `StreamProxyOptions`, `StreamProxyPolicy` hooks (`authorize`, `recheck`, `resolvePath`), `StreamProxyRevocationSource`, `StreamProxyClockPort`, shared header sanitizer.
+   - `@netscript/fresh/streams`: `proxyUrl` option on `createNetScriptStreamEventSourceV1`.
+   - `@netscript/fresh/ai`: backward-compatible `createNetScriptChatStreamProxy` reusing shared sanitization without forwarding client `Cookie` headers upstream.
+2. **Domain vocabulary** — Delivery unit (`data[]` + committing `control`), `StreamProxyAuthDecision<TGrant>`, `StreamProxyRecheckDecision`, `StreamProxyRecheckReason`, `StreamProxyCloseReason`, `StreamProxyRevocationSignal`.
+3. **Ports** — `StreamProxyClockPort` (deterministic expiry/idle timers), `StreamProxyRevocationSource<TGrant>` (cross-gateway push wake seam), `StreamProxyMount` (keeps `@netscript/service` acyclic with `@netscript/plugin-streams-core`).
+4. **Constants** — `STREAM_SSE_WIRE_EVENT_NAMES_V1` (`['data', 'control']`), reserved protocol query keys (`['offset', 'live', 'cursor']`), `STRIPPED_STREAM_PROXY_RESPONSE_HEADERS`, `StreamProxyCloseReason` union, `StreamProxyRecheckReason` union.
+5. **Commit slices (this design draft)** —
+   - `S1`: Draft `rfcs/0000-authorizing-stream-proxy.md` + run artifacts (`research.md`, `worklog.md`, `context-pack.md`); gates: internal doc-link check, closing-keyword & leak hygiene grep, baseline measurement script against `main` `87965d80`.
+6. **Deferred scope** — Implementation awaits owner RFC acceptance; `#2654` (producer-scoped connection configuration) referenced only; `docs/site/**` untouched (`#2650`); long-poll/snapshot `StreamDB` proxy mode deferred to follow-up / open question.
+7. **Contributor path** — Start from `rfcs/0000-authorizing-stream-proxy.md` § Reference-level explanation and § Acceptance tests and implementation gates.
 
 ## Progress Log
 
 | Time | Slice | Step | Notes |
 | ---- | ----- | ---- | ----- |
 | 2026-11-24 | S0 | bootstrap | Coordinator bootstrap commit: `supervisor.md`, `worklog.md`, `drift.md`. |
+| 2026-11-24 | S1 | research | Grounded baseline via `find_guidance`, `deno doc`, direct source inspection across `plugin-streams-core`, `plugins/streams`, `fresh`, `service`, `contracts`, `plugin-auth-core`, and live `deno eval` measurement against `DurableStreamTestServer` (`research.md`). |
+| 2026-11-24 | S1 | draft-rfc | Authored `rfcs/0000-authorizing-stream-proxy.md`, `research.md`, and `context-pack.md`; kept `packages/`, `plugins/`, and `docs/site/` untouched. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | -------- | ------ | ------ |
+| Place runtime proxy in `@netscript/plugin-streams-core/proxy`, contracts in `@netscript/contracts/streams`, and structural mount in `@netscript/service` | `@netscript/plugin-streams-core` already imports `@netscript/service`; structural `StreamProxyMount` prevents a circular dependency while keeping backend services free of `@netscript/fresh`. | `packages/plugin-streams-core/deno.json:18`, `packages/service/deno.json` |
+| Gate authorization atomically on `(data[], control)` delivery units | Prevents leaking unauthorized `event: data` frames and prevents advancing `streamNextOffset` when a session is revoked mid-delivery. | `issuecomment-7120816734`, `stream-sse-v1.ts:118-142` |
+| Hybrid idle expiry (`ClockPort` `expiresAtMs` + `recheckEveryMs` + optional push `revocationSource`) | Next-event-only leaks idle sockets; timer-only leaks active batches after revocation. | `08-runtime-state-failure.md:104-125`, `issuecomment-7120816734` |
+| Expose pre-drain `shutdownSignal` from `ServiceShutdownCoordinator` | `ServiceShutdownCoordinator` awaits `server.shutdown()` before running `onShutdown` hooks, so long-lived SSE routes need pre-drain abort notification. | `service-shutdown.ts:96-147` |
+| Separate sibling `defineStreamEndpoint` contract rather than embedding inside oRPC procedure map | `traverseContract` and `OpenAPIGenerator` walk every enumerable key expecting `'~orpc'` nodes, and `ContractAuthorizerRawRoute` rejects parameterized paths. | `contract-procedure-index.ts:187-205`, `contract-raw-routes.ts:12,45` |
+| Strict upstream header allowlist + cookie Fetch Metadata/Origin guard | Measured `createNetScriptChatStreamProxy` forwarding client `Cookie` upstream and `DurableStreamTestServer` emitting `access-control-allow-origin: *`. | `research.md` § 3 |
+
+## Validation
+
+| Gate | Command | Exit | Result |
+| ---- | ------- | ---- | ------ |
+| Internal doc links (RFC) | `deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --root rfcs/0000-authorizing-stream-proxy.md --pretty` | `0` | `docs=1 broken-links=0 broken-anchors=0 orphans=0` |
+| Internal doc links + doctrine anchors | `deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --root rfcs/0000-authorizing-stream-proxy.md --root docs/architecture/doctrine --pretty` | `0` | `docs=13 broken-links=0 broken-anchors=0 orphans=0` |
+| Closing-keyword hygiene | `grep -Eni '(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)[^a-zA-Z0-9\n]{0,20}(#[0-9]+|issues/[0-9]+)' rfcs/0000-authorizing-stream-proxy.md .llm/runs/plan-rfc-authorizing-stream-proxy-2146--rfc/*.md` | `1` (no matches) | Zero closing keywords |
+| Process-language scan (RFC) | `grep -Eni '\b(owner|evaluator|harness|worklog|coordinator|plan-eval|impl-eval|neon|sol|opus|codex|antigravity|t3)\b|\.llm/runs' rfcs/0000-authorizing-stream-proxy.md` | `1` (no matches) | Zero process language |
+| Private-name / leak scan | `grep -Eni` scan across `rfcs/0000-authorizing-stream-proxy.md` and run artifacts for machine paths, loopback/LAN IPs, and private consumer-app/coordinator names | `1` (no matches) | Zero leaks |
+| Current-main measurement probe | `deno eval --no-lock ...` (recorded in `research.md` § 3) | `0` | Verified chat proxy cookie forwarding, `createContractAuthorizer` param raw-route error, `createNetScriptStreamEventSourceV1` prefixing, and `DurableStreamTestServer` SSE wire framing + offset resume |
 
 ## Drift
 
