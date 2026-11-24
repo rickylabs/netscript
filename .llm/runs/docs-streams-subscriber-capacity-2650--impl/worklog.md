@@ -64,13 +64,52 @@ Quoted verbatim from the owner's batch directive. `[…]` marks elided text that
 
 ## Design
 
-Builder records this section before creating implementation files (`workflow/run-loop.md` § 3b).
+- **Entry point.** `deno run -A --frozen tools/streams-subscriber-capacity/main.ts` from the
+  repository root on Linux. The root is unpublished, `tools/` is outside workspace member
+  roots, and neither the Streams plugin nor core publish allowlist reaches it.
+- **Vocabulary.** A phase records stream and reader counts, append schedule, reader commits,
+  reconnects, delivery gaps, sampled companion resources, and cleanup. A commit is a numbered
+  change followed by its SSE control, with the opaque offset retained for reconnection.
+- **Ports.** Reuse the public Streams service factory, producer, and SSE v1 parser/reducer.
+  Use the HTTP client response version and Linux procfs for observations. A bench-process-only
+  startup wrapper captures the pinned upstream server instance once for response and waiter
+  snapshots. No service or plugin hook changes.
+- **Constants.** Reader counts 1, 8, 32; at most eight streams; one aggregate round-robin
+  append each second for 60 seconds; single stream, spread, and spread with one delayed reader.
+  Each phase has a four-minute deadline and the run has a 35-minute deadline, plus a bounded
+  cleanup window. The slow reader delays processing each SSE frame by 250 ms.
+- **S1.** Add the harness, README, and focused reader tests in
+  `tools/streams-subscriber-capacity/`. Prove compilation, lint, formatting, reader commit
+  behavior and an isolated short smoke.
+- **S2.** Run all nine phases and commit `results.json` in the run directory. Update
+  `docs/site/durable-workflows/streams.md` and the live-dashboard cache-first guide. Prove
+  the published figures against the report and run the docs and release preflight gates.
+- **Deferred scope.** Other transport, topology, traffic and authorization configurations,
+  SDK transport fixes and any Streams deployment or API changes.
+- **Contributor path.** The benchmark README gives the command and metric definitions.
+  Adjust workload constants in the entry point and inspect the independent reader and
+  companion modules when changing measurement behavior.
+
+PLAN-EVAL: N/A. The issue specifies the workload and evidence, and the bench consumes existing
+APIs without changing contracts or deployment. Independent IMPL-EVAL stays with the coordinator.
 
 ## Progress Log
 
 | Time | Slice | Step | Notes |
 | ---- | ----- | ---- | ----- |
-| 2026-11-24 | S0 | bootstrap | Coordinator bootstrap commit: `supervisor.md`, `worklog.md`, `drift.md`. |
+| 2026-11-24 | S0 | bootstrap | Verified HEAD `b9dca84d0327d45d04e32e8b7420baef9f59ba71` and its recorded main parent. Read issue #2650 with no comments. |
+| 2026-11-24 | S1 | design | Inspected Streams service, SSE contract, SDK surfaces and package publication boundaries. Invoked checkout MCP `find_guidance` plus `search_docs`; verified suggested APIs against source and `deno doc`. |
+| 2026-11-24 | S1 | verification | Scoped check, lint and format processed all five TypeScript files. Three reader regression tests passed. Both 32-reader smoke layouts completed with all deliveries and verified cleanup. See commands below. |
+| 2026-11-24 | S1 | reconcile | #2650 has three exact boxes under `Acceptance`. No issue mutation is required. The draft close mapping will use the full workload and the two documentation sections. |
+
+## Commands and exit codes
+
+- `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root tools/streams-subscriber-capacity --ext ts,tsx --pretty` — 0, five files, wrapper passes `--unstable-kv`.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root tools/streams-subscriber-capacity --ext ts,tsx --config <scratch>/lint.json --pretty` — 0, five files. Config copies `lint.rules` from root `deno.json` without its `tools/` exclusion. The first invocation using root exclusions exited 2 without processing any files.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root tools/streams-subscriber-capacity --ext ts,tsx --pretty` — 0, five files.
+- `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all tools/streams-subscriber-capacity/reader_test.ts` — 0, three passed.
+- `deno run -A --frozen tools/streams-subscriber-capacity/main.ts --smoke` — 0, two short 32-reader trials with zero gaps and reconnects. Smoke telemetry is exploratory.
+- `git diff --check` — 0.
 
 ## Decisions
 
