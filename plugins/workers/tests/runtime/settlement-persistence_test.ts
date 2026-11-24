@@ -16,6 +16,7 @@ import type { JobMessage, TaskMessage } from '@netscript/plugin-workers-core/run
 import {
   classifySettlementWriteFailure,
   DEFAULT_SETTLEMENT_RETRY_POLICY,
+  INTERNAL_APPLIED_LOOKUP_SYMBOL,
   SETTLEMENT_FAILURE_CLASS,
   settleWriteWithVerification,
   verifyIdempotencyApplied,
@@ -260,26 +261,23 @@ Deno.test('idempotency commit verification performs zero mutations when marker i
       assertEquals(claimCalls, 1, 'verification must not call claim()');
       assertEquals(releaseCalls, 0, 'verification must not call release()');
 
-      // Read error during isApplied keeps outcome unresolved with zero mutations.
+      // Read error during internal read-only lookup keeps outcome unresolved with zero mutations.
+      const readFailingStore = {
+        claim: () => {
+          claimCalls += 1;
+          return Promise.reject(new Error('unexpected claim'));
+        },
+        markApplied: () => Promise.resolve(),
+        release: () => {
+          releaseCalls += 1;
+          return Promise.reject(new Error('unexpected release'));
+        },
+        [INTERNAL_APPLIED_LOOKUP_SYMBOL]: () => Promise.reject(new Error('read failed')),
+      };
       const readErrorOutcome = await settleWriteWithVerification(
         () => Promise.reject(new Error('ambiguous write outcome')),
         {
-          verifyCommitted: () =>
-            verifyIdempotencyApplied(
-              {
-                claim: () => {
-                  claimCalls += 1;
-                  return Promise.reject(new Error('unexpected claim'));
-                },
-                markApplied: () => Promise.resolve(),
-                release: () => {
-                  releaseCalls += 1;
-                  return Promise.reject(new Error('unexpected release'));
-                },
-                isApplied: () => Promise.reject(new Error('read failed')),
-              },
-              'k-read-err',
-            ),
+          verifyCommitted: () => verifyIdempotencyApplied(readFailingStore, 'k-read-err'),
         },
       );
       assertEquals(readErrorOutcome.settled, false);

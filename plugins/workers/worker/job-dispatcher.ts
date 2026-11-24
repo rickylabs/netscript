@@ -200,7 +200,6 @@ export async function processWorkerJob(
           },
         );
 
-        addJobStepEvent('state_update', { status: result.success ? 'completed' : 'failed' });
         lease.assertOwned();
         if (result.success) {
           executionSucceeded = true;
@@ -221,12 +220,15 @@ export async function processWorkerJob(
             postEffectSettlementFailure = settled;
             throw settled.error;
           }
+          addJobStepEvent('state_update', { status: 'completed' });
           recordSharedWorkerMetrics(
             { activeJobs: context.activeJobs.size, processedJobs: 1, failedJobs: 0 },
             { [WorkerAttributes.WORKER_ID]: context.workerId },
           );
           return result;
         }
+
+        addJobStepEvent('state_update', { status: 'failed' });
 
         await deadLetter(
           result.error ?? 'Job failed after exhausting retries',
@@ -298,10 +300,14 @@ export async function processWorkerJob(
     await lease.stop();
     if (executionId) {
       context.activeJobs.delete(executionId);
-      recordSharedWorkerMetrics(
-        { activeJobs: context.activeJobs.size },
-        { [WorkerAttributes.WORKER_ID]: context.workerId },
-      );
+      try {
+        recordSharedWorkerMetrics(
+          { activeJobs: context.activeJobs.size },
+          { [WorkerAttributes.WORKER_ID]: context.workerId },
+        );
+      } catch (metricsError) {
+        logPostEffectSettlementFailure(context.workerId, 'Job', jobId, undefined, metricsError);
+      }
     }
   }
 }

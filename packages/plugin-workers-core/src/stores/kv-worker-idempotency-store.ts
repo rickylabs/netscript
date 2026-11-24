@@ -29,6 +29,7 @@ const ACTIVE_TTL_ENV = 'NETSCRIPT_WORKERS_IDEMPOTENCY_ACTIVE_TTL_MS';
 const APPLIED_TTL_ENV = 'NETSCRIPT_WORKERS_IDEMPOTENCY_APPLIED_TTL_MS';
 const DEFAULT_PREFIX: KvKey = ['workers', 'idempotency'];
 const CLAIM_ATTEMPTS = 3;
+const INTERNAL_APPLIED_LOOKUP_SYMBOL = Symbol.for('netscript.workers.idempotency.isApplied');
 
 /** Minimal durable KV shape required by worker applied-keys storage. */
 export interface WorkerIdempotencyKvStore {
@@ -75,6 +76,12 @@ export class KvWorkerIdempotencyStore implements WorkerIdempotencyPort {
     this.#appliedTtlMs = options.appliedTtlMs ?? readTtlEnv(APPLIED_TTL_ENV) ??
       DEFAULT_APPLIED_TTL_MS;
     this.#now = options.now ?? (() => new Date());
+    Object.defineProperty(this, INTERNAL_APPLIED_LOOKUP_SYMBOL, {
+      value: (key: string): Promise<boolean> => this.#kv.has(this.#appliedKey(key)),
+      enumerable: false,
+      configurable: false,
+      writable: false,
+    });
   }
 
   /** Claim the resolved applied key for a single delivery. */
@@ -84,11 +91,6 @@ export class KvWorkerIdempotencyStore implements WorkerIdempotencyPort {
       return await this.#atomicClaim(resolved, input);
     }
     return await this.#sequentialClaim(resolved, input);
-  }
-
-  /** Return whether a completed applied marker currently exists for `key` without mutating storage. */
-  isApplied(key: string): Promise<boolean> {
-    return this.#kv.has(this.#appliedKey(key));
   }
 
   /** Mark a claimed key as applied for the configured or supplied TTL. */

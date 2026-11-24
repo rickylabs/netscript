@@ -41,14 +41,21 @@ export {
   settleWriteWithVerification,
 } from './settlement-retry.ts';
 
-/** Internal optional read-only lookup capability supported by first-party idempotency stores. */
-interface ReadOnlyIdempotencyLookup {
-  readonly isApplied?: (key: string) => Promise<boolean>;
+/** Internal non-public symbol implemented by first-party idempotency stores for read-only lookup. */
+export const INTERNAL_APPLIED_LOOKUP_SYMBOL: symbol = Symbol.for(
+  'netscript.workers.idempotency.isApplied',
+);
+
+/** Internal structural port for read-only execution-state lookups without expanding public types. */
+interface ReadableExecutionState {
+  readonly get?: (
+    executionId: string,
+  ) => Promise<(WorkerExecutionRecord & { readonly status?: string }) | null>;
 }
 
 /** Inputs for settling a job or task after its handler reported success. */
 export interface SettleAppliedExecutionInput {
-  readonly idempotency: WorkerIdempotencyPort & ReadOnlyIdempotencyLookup;
+  readonly idempotency: WorkerIdempotencyPort;
   readonly executionState: WorkerExecutionState;
   readonly claim: WorkerIdempotencyClaim;
   readonly executionId: string;
@@ -77,18 +84,19 @@ export function buildWorkerClaimInput(
 /**
  * Read-only check for whether `idempotency.markApplied` already committed.
  *
- * Uses the store's optional read-only `isApplied(key)` lookup and never invokes
- * mutating `claim()` or `release()` operations. When a backend lacks a read-only
- * lookup, the outcome remains unconfirmed (`{ committed: false }`).
+ * Uses the internal read-only lookup protocol supported by first-party stores and never
+ * invokes mutating `claim()` or `release()` operations. When a backend lacks this lookup,
+ * the outcome remains unconfirmed (`{ committed: false }`).
  */
 export async function verifyIdempotencyApplied(
-  idempotency: WorkerIdempotencyPort & ReadOnlyIdempotencyLookup,
+  idempotency: WorkerIdempotencyPort,
   key: string,
 ): Promise<SettlementCommitVerification<void>> {
-  if (typeof idempotency.isApplied !== 'function') {
+  const lookup = Reflect.get(idempotency, INTERNAL_APPLIED_LOOKUP_SYMBOL);
+  if (typeof lookup !== 'function') {
     return { committed: false };
   }
-  const applied = await idempotency.isApplied(key);
+  const applied = Boolean(await lookup.call(idempotency, key));
   return applied ? { committed: true, value: undefined } : { committed: false };
 }
 
@@ -96,7 +104,7 @@ export async function verifyIdempotencyApplied(
  * Read-only check for whether an execution row already transitioned to `expectedStatus`.
  */
 export async function verifyExecutionStatus(
-  executionState: WorkerExecutionState,
+  executionState: WorkerExecutionState & ReadableExecutionState,
   executionId: string,
   expectedStatus: WorkerCompleteExecutionOptions['status'] | 'running',
 ): Promise<SettlementCommitVerification<WorkerExecutionRecord | null>> {

@@ -114,7 +114,7 @@ Deno.test('newer broker delivery takes over its stranded marker and fences the f
   assertEquals(duplicate.alreadyApplied, true, 'completed markers survive broker redelivery');
 });
 
-Deno.test('KvWorkerIdempotencyStore isApplied performs a read-only lookup without mutating storage', async () => {
+Deno.test('KvWorkerIdempotencyStore internal read-only applied lookup never mutates storage', async () => {
   await using baseKv = new MemoryKvAdapter();
   let mutations = 0;
   const store = new KvWorkerIdempotencyStore({
@@ -136,15 +136,19 @@ Deno.test('KvWorkerIdempotencyStore isApplied performs a read-only lookup withou
     },
   });
 
+  const lookup = Reflect.get(
+    store,
+    Symbol.for('netscript.workers.idempotency.isApplied'),
+  ) as (key: string) => Promise<boolean>;
   const claim = await store.claim({ concept: 'job', targetId: 'ro-check', idempotencyKey: 'k1' });
   const beforeLookup = mutations;
-  assertEquals(await store.isApplied(claim.key), false);
+  assertEquals(await lookup.call(store, claim.key), false);
   assertEquals(mutations, beforeLookup);
 
   await store.markApplied(claim.key, 10_000, claim.token);
   const afterApply = mutations;
-  assertEquals(await store.isApplied(claim.key), true);
-  assertEquals(await store.isApplied('missing-key'), false);
+  assertEquals(await lookup.call(store, claim.key), true);
+  assertEquals(await lookup.call(store, 'missing-key'), false);
   assertEquals(mutations, afterApply);
 });
 
