@@ -1,13 +1,13 @@
 # Streams subscriber capacity benchmark
 
-From the repository root on Linux with Deno and `getconf` available:
+Run this command from the repository root on Linux with Deno and `getconf` available.
 
 ```sh
 deno run -A --frozen tools/streams-subscriber-capacity/main.ts > results.json
 ```
 
-The command runs for roughly nine minutes and writes a single JSON report to stdout. Progress
-goes to stderr. Add `--smoke` for a short wiring check with a different workload. The default
+The command offers writes for nine minutes, plus setup and drain time, and writes a single JSON
+report to stdout. Progress goes to stderr. Add `--smoke` for a short wiring check with a different workload. The default
 command is the capacity measurement.
 
 The harness starts one loopback Streams companion with an ephemeral port and a fresh file-backed
@@ -41,11 +41,15 @@ memory are recorded separately.
 Startup has a 30-second deadline. Each reader has five seconds to open. Each phase has a
 four-minute deadline and the run has a 35-minute deadline, with bounded shutdown after abort.
 The write schedule records offered appends and acknowledgement times separately. The last
-acknowledgement starts a ten-second delivery grace period. After writes, the harness joins all
-client readers and closes the streams to release any remaining waits. The JSON includes the
-upstream response and waiter counts at opening, at phase cleanup, and after graceful companion
-shutdown. It also records child exit and verified temporary directory removal. A timeout,
-measurement or cleanup failure produces a nonzero exit. Delivery gaps, duplicates, or ordering
+acknowledgement starts a ten-second delivery grace period.
+
+After delivery, the harness aborts and joins the readers, then explicitly closes each durable
+stream to wake remaining upstream waits. It takes snapshots until the upstream response and
+waiter counts reach zero, then deletes the closed streams. The JSON records the counts at
+opening, after reader cancellation and explicit stream close, and after graceful companion
+shutdown. It also records child exit and verified temporary directory removal. Last-subscriber
+reclamation on a still-open idle topic is outside the measured workload. A timeout, measurement
+or cleanup failure produces a nonzero exit. Delivery gaps, duplicates, or ordering
 violations also produce a nonzero exit.
 
 These results apply to this workload on the reported machine and transport. For source context,

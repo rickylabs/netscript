@@ -8,7 +8,7 @@
 | Branch         | `docs/streams-subscriber-capacity-2650` |
 | Issue          | #2650 — implementation PR; body carries `Closes #2650` |
 | Classification | implementation |
-| Archetype      | Streams plugin documentation + repo benchmark harness (builder confirms against `.llm/harness/archetypes/`) |
+| Archetype      | Archetype 5 Streams documentation and unpublished repository tooling |
 | Scope overlays | `SCOPE-docs.md` |
 | Milestone      | `0.0.10` |
 
@@ -102,6 +102,10 @@ APIs without changing contracts or deployment. Independent IMPL-EVAL stays with 
 | 2026-11-24 | S1 | verification | Scoped check, lint and format processed all five TypeScript files. Three reader regression tests passed. Both 32-reader smoke layouts completed with all deliveries and verified cleanup. See commands below. |
 | 2026-11-24 | S1 | reconcile | #2650 has three exact boxes under `Acceptance`. No issue mutation is required. The draft close mapping will use the full workload and the two documentation sections. |
 
+| 2026-11-24 | S2 | measure | The fixed nine-phase command completed in 11 min 54 s. It recorded 3,180 committed deliveries, zero gaps, zero reconnects, and verified teardown. Copied stdout byte-for-byte to `results.json`. Independently checked the expected reader set and committing control per revision, percentiles, resource summaries, timing and teardown counters. |
+| 2026-11-24 | S2 | document | Added measured workloads and source/standards-based browser and resource limits to Streams. Added a screen wakeup and authorization decision table to the SDK cache-first guide. Recorded the exact cleanup sequence in the benchmark README. |
+| 2026-11-24 | S2 | reconcile | Kept the implementation in draft for independent review at the final head. The scoped results back all three exact #2650 acceptance boxes. |
+
 ## Commands and exit codes
 
 - `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root tools/streams-subscriber-capacity --ext ts,tsx --pretty` — 0, five files, wrapper passes `--unstable-kv`.
@@ -109,12 +113,29 @@ APIs without changing contracts or deployment. Independent IMPL-EVAL stays with 
 - `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root tools/streams-subscriber-capacity --ext ts,tsx --pretty` — 0, five files.
 - `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all tools/streams-subscriber-capacity/reader_test.ts` — 0, three passed.
 - `deno run -A --frozen tools/streams-subscriber-capacity/main.ts --smoke` — 0, two short 32-reader trials with zero gaps and reconnects. Smoke telemetry is exploratory.
+- `deno run -A --frozen tools/streams-subscriber-capacity/main.ts > .llm/tmp/streams-subscriber-capacity/full.json` — 0. Nine trials at 60 offered writes each. The 32-reader single-stream trial acknowledged its last write 216.1 s after the start of the 60 s offer window. Other results, per-delivery timings, and resource samples are in `results.json`.
+- `cmp .llm/tmp/streams-subscriber-capacity/full.json .llm/runs/docs-streams-subscriber-capacity-2650--impl/results.json` — 0. The JSON path and address scrub check and independent per-phase calculations passed.
+- `deno task docs:links` — 0, 105 documents, zero broken links or anchors.
+- `deno task docs:accuracy` — 0.
+- `deno task release:preflight` — 0, all four text-import, attribute, file URL, and self-import checks passed.
+- `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all plugins/streams/tests/docs/native-event-source-example_test.ts` — 0, the edited guide example compiled.
 - `git diff --check` — 0.
+- Scaffold runtime, quality/architecture, and JSDoc example gates are N/A. This slice is site documentation and a standalone, unpublished repository benchmark, outside scaffold generation, framework source and published JSDoc.
+
+## Cleanup measurement boundary
+
+Source-inspected in `tools/streams-subscriber-capacity/main.ts`: abort and join the readers,
+explicitly close each durable stream to wake remaining waits, snapshot until the upstream
+response and waiter counts reach zero, then delete those streams. The measured counts apply
+after reader cancellation and explicit stream close. Last-subscriber reclamation on a
+still-open idle topic is outside the measured workload.
 
 ## Decisions
 
 | Decision | Reason | Source |
 | -------- | ------ | ------ |
+
+| Source and standards evidence for browser pooling and protocol negotiation | Chromium socket pool and Firefox connection preference are browser-side evidence. RFC 9113 and RFC 9114 specify negotiation. Each benchmark reader owns an independent client as implemented in `tools/streams-subscriber-capacity/reader.ts`. | Streams Known limitations, Browser connection limits |
 
 ## Drift
 

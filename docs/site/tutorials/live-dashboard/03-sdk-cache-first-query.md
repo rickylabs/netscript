@@ -24,6 +24,22 @@ is a separate KV-only metadata read and never schedules a refresh.
   { label: "6 · Deploy", href: "/tutorials/live-dashboard/06-deploy/" }
 ] }) }}
 
+## Choose how an open screen gets fresh data
+
+| Screen needs | Mechanism | What wakes the open screen | Authorization |
+| --- | --- | --- | --- |
+| Show changes as they happen, even while the user is idle | Subscribe with a [Fresh Streams reader](/durable-workflows/streams/#caller-provided-reader-headers) and render the live collection with `useLiveQuery`. | The next committed stream update changes the live collection and rerenders the island. Dispose the reader when the island unmounts. | Authorize the stream and replay on each connection. Use a per-request reader credential resolver so reconnects use current credentials. End an open subscription when its session expires or its access is withdrawn. |
+| Refresh on a schedule when a short delay is acceptable | Use `useIslandQuery` with the [SDK query options and interval](/web-layer/query/#polling-an-island-with-refetchinterval), such as 15 seconds for a visible dashboard. Leave background polling disabled. | The interval triggers a typed read and the result updates the mounted query. A failed or suspended poll can delay the update. | Check current access on every poll. Resolve the credential at request time and clear private query state when the session or account changes. |
+| Refresh on the next read or when the user returns | Call the SDK query action, such as `ordersQueries.list(input)`, from an authorized server read. It can return a stale cached value while refreshing KV in the background. | A new read, navigation, or an explicitly configured focus refetch triggers the screen's read path. Fresh's default disables focus refetch. A KV refresh alone leaves the open screen as it was. | Authorize before reading cached data and again at the service on revalidation. Partition private cached data by non-secret access scope, or use a direct-only client when it cannot be shared safely. |
+
+The orders examples in this chapter use the public synthetic read-model from
+[chapter 2](/tutorials/live-dashboard/02-contract-to-service/). For protected procedures, use the
+[SDK's typed bearer contribution](/services-sdk/sdk/#typed-bearer-credentials) with a resolver
+that reads the current session instead of capturing a token at mount time. Browser
+`queryOptions()` calls the typed client directly, so a browser refetch reaches server-side SWR only
+when its server read invokes the callable action. `getCachedEntry()` reads KV metadata and never
+starts revalidation.
+
 ## What you will build
 
 One module, `apps/dashboard/lib/orders.ts`, that exports a typed `ordersClient` and an
