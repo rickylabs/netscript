@@ -92,6 +92,7 @@ export class KvQueueDispatcher {
   readonly #policy: UnroutablePolicy;
   readonly #routes = new KvQueueRouteTable();
   readonly #pausedQueues = new Map<string, Set<symbol>>();
+  readonly #admittedByQueue = new Map<string, number>();
   readonly #inFlight = new Set<Promise<void>>();
   readonly #stopping = new Set<Promise<void>>();
   #admittedDeliveries = 0;
@@ -153,6 +154,7 @@ export class KvQueueDispatcher {
     tokens.delete(token);
     if (tokens.size === 0) {
       this.#pausedQueues.delete(queueName);
+      this.#wakeRoutingWaiters();
     }
   }
 
@@ -168,7 +170,9 @@ export class KvQueueDispatcher {
 
   /** Permanently retire `queueName` (clears pause state so future work follows bounded reroute). */
   stopQueue(queueName: string): void {
-    this.#pausedQueues.delete(queueName);
+    if (this.#pausedQueues.delete(queueName)) {
+      this.#wakeRoutingWaiters();
+    }
   }
 
   /** Route envelopes addressed to `queueName` to `handler` until `signal` aborts. */
@@ -205,8 +209,12 @@ export class KvQueueDispatcher {
       boundedConcurrency,
       (delta) => {
         this.#admittedDeliveries += delta;
-        if (this.#admittedDeliveries === 0) {
+        const nextQueueAdmitted = (this.#admittedByQueue.get(queueName) ?? 0) + delta;
+        if (nextQueueAdmitted <= 0) {
+          this.#admittedByQueue.delete(queueName);
           this.#wakeRoutingWaiters();
+        } else {
+          this.#admittedByQueue.set(queueName, nextQueueAdmitted);
         }
       },
     );
@@ -361,6 +369,17 @@ export class KvQueueDispatcher {
         return;
       }
       if (this.#isPaused(envelope.queueName)) {
+        // Hold paused deliveries quietly while this queue's already-admitted work drains and
+        // settles on local SQLite, avoiding competing parking writes during settlement.
+        while (
+          this.#isPaused(envelope.queueName) &&
+          (this.#admittedByQueue.get(envelope.queueName) ?? 0) > 0
+        ) {
+          await this.#routingChanged.promise;
+        }
+        if (this.#routes.has(envelope.queueName) || !this.#isPaused(envelope.queueName)) {
+          continue;
+        }
         await this.enqueue(
           envelope,
           Math.min(PAUSED_HANDBACK_PARK_DELAY_MS, this.#policy.parkDelayMs),

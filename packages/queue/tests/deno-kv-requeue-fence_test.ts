@@ -1,5 +1,6 @@
 import { assertEquals } from '@std/assert';
 import { delay } from '@std/async';
+import { TracedQueue } from '@netscript/telemetry/instrumentation';
 import { DenoKvAdapter } from '../adapters/deno-kv.adapter.ts';
 import { createEnvelope, type MessageEnvelope } from '../adapters/_envelope.ts';
 import { createKvQueueConnection } from '../adapters/_kv-queue/connection.ts';
@@ -84,33 +85,41 @@ Deno.test('distinct raw legacy messages with identical content are both delivere
     const rawKv = await Deno.openKv(path);
     const probe = wrapKvForEnqueueFault(rawKv, (envelope) => envelope.deliveryCount > 0);
     const adapter = DenoKvAdapter.withKv<Readonly<{ legacy: string }>>(probe.kv, 'default');
-    const acknowledgedIds: string[] = [];
-    let firstNacked = false;
+    const initialRawAdmissions = new Set<string>();
+    const secondAdmitted = Promise.withResolvers<void>();
+    let firstHeld = false;
     const controller = new AbortController();
 
     const listening = adapter.listen(
       async (_message, context) => {
-        if (!firstNacked && context.deliveryCount === 1) {
-          firstNacked = true;
-          await context.nack({ requeue: true });
-          return;
+        if (context.deliveryCount === 1) {
+          initialRawAdmissions.add(context.messageId);
+          if (!firstHeld) {
+            firstHeld = true;
+            await context.nack({ requeue: true }).catch(() => undefined);
+            // Hold the first raw admission open until the second independent raw enqueue arrives.
+            await secondAdmitted.promise;
+            throw new Error('hold first raw source unacknowledged after ambiguous nack');
+          }
+          if (initialRawAdmissions.size >= 2) {
+            secondAdmitted.resolve();
+          }
         }
-        acknowledgedIds.push(context.messageId);
         await context.ack();
       },
-      { concurrency: 1, signal: controller.signal },
+      { concurrency: 2, signal: controller.signal },
     );
 
     try {
       await rawKv.enqueue({ legacy: 'identical' });
       await rawKv.enqueue({ legacy: 'identical' });
-      await until(() => new Set(acknowledgedIds).size >= 2, 5_000);
-      await delay(200);
+      await until(() => initialRawAdmissions.size >= 2, 5_000);
+      await delay(150);
       assertEquals(
-        new Set(acknowledgedIds).size >= 2,
+        initialRawAdmissions.size >= 2,
         true,
-        `two independent identical raw enqueues must produce distinct deliveries (saw ${
-          JSON.stringify(acknowledgedIds)
+        `two independent identical raw enqueues must produce two distinct initial raw admissions while the first source is held open (saw ${
+          JSON.stringify([...initialRawAdmissions])
         })`,
       );
       assertEquals(
@@ -124,6 +133,7 @@ Deno.test('distinct raw legacy messages with identical content are both delivere
         'no durable per-message requeue markers should exist or orphan in KV',
       );
     } finally {
+      secondAdmitted.resolve();
       controller.abort();
       await listening;
       await adapter.stop();
@@ -191,6 +201,48 @@ Deno.test('ambiguous routing re-enqueue never blindly retries and retains messag
       await Promise.allSettled([siblingListen, targetListen ?? Promise.resolve()]);
       await dispatcher.close();
       rawKv.close();
+    }
+  });
+});
+
+Deno.test('file-backed TracedQueue post-success span-end fault never triggers a counted requeue', async () => {
+  await withTempKvPath(async (path) => {
+    const adapter = new DenoKvAdapter<string>({ path, queueName: 'traced-kv-post-success' });
+    const queue = new TracedQueue(adapter, { queueName: 'traced-kv-post-success' });
+    const observedDeliveries: number[] = [];
+    let endThrowsRemaining = 1;
+    const controller = new AbortController();
+
+    const listening = queue.listen(
+      async (_message, ctx) => {
+        observedDeliveries.push(ctx.deliveryCount);
+        const originalEnd = ctx.span.end.bind(ctx.span);
+        ctx.span.end = ((endTime?: Parameters<typeof originalEnd>[0]) => {
+          if (endThrowsRemaining > 0) {
+            endThrowsRemaining -= 1;
+            throw new Error('queue.dequeue span end failed');
+          }
+          return originalEnd(endTime);
+        }) as typeof ctx.span.end;
+        await Promise.resolve();
+      },
+      { concurrency: 1, signal: controller.signal },
+    );
+
+    try {
+      await queue.enqueue('ok-work');
+      await until(() => observedDeliveries.length >= 1, 5_000);
+      await delay(250);
+      assertEquals(
+        observedDeliveries,
+        [1],
+        'post-success queue.dequeue span.end fault must not trigger a counted requeue',
+      );
+      assertEquals(endThrowsRemaining, 0);
+    } finally {
+      controller.abort();
+      await listening;
+      await queue.stop();
     }
   });
 });
