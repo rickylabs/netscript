@@ -1,4 +1,4 @@
-import { assert, assertEquals } from '@std/assert';
+import { assert, assertEquals, assertRejects } from '@std/assert';
 import { trace } from '@opentelemetry/api';
 import type { MessageQueue as PlainMessageQueue } from '@netscript/queue/ports';
 import {
@@ -73,5 +73,81 @@ Deno.test('TracedQueue delivers the active consumer span and remains a plain Mes
     );
     assert(!exported.includes('PRIVATE_PAYLOAD'));
     assert(!exported.includes('PRIVATE_HEADER'));
+  });
+});
+
+Deno.test('TracedQueue post-success span fault never rejects delivery or triggers nack while handler errors still propagate', async () => {
+  await recording(async () => {
+    let acks = 0;
+    let nacks = 0;
+    const inner: MessageQueue<string> = {
+      nativeRetrial: true,
+      enqueue: () => Promise.resolve(),
+      listen: async (handler) => {
+        const ctx: MessageContext = {
+          messageId: 'm-ok',
+          deliveryCount: 1,
+          enqueuedAt: new Date(0),
+          headers: {},
+          ack: () => {
+            acks += 1;
+            return Promise.resolve();
+          },
+          nack: () => {
+            nacks += 1;
+            return Promise.resolve();
+          },
+        };
+        try {
+          await handler('ok', ctx);
+          await ctx.ack();
+        } catch {
+          await ctx.nack({ requeue: true });
+        }
+      },
+      stop: () => Promise.resolve(),
+    };
+    const queue = new TracedQueue(inner, { queueName: 'traced-post-success' });
+
+    await queue.listen(async (_message, ctx) => {
+      ctx.span.end = () => {
+        throw new Error('queue.dequeue span end failed');
+      };
+      ctx.span.addEvent = () => {
+        throw new Error('queue.dequeue addEvent failed');
+      };
+      await Promise.resolve();
+    });
+    assertEquals(acks, 1, 'post-success span fault must still acknowledge delivery');
+    assertEquals(nacks, 0, 'post-success span fault must not trigger nack');
+
+    // Real handler failures must still reject even if span error reporting throws.
+    const failingInner: MessageQueue<string> = {
+      nativeRetrial: false,
+      enqueue: () => Promise.resolve(),
+      listen: async (handler) => {
+        await handler('bad', {
+          messageId: 'm-bad',
+          deliveryCount: 1,
+          enqueuedAt: new Date(0),
+          headers: {},
+          ack: () => Promise.resolve(),
+          nack: () => Promise.resolve(),
+        });
+      },
+      stop: () => Promise.resolve(),
+    };
+    const failingQueue = new TracedQueue(failingInner, { queueName: 'failing' });
+    await assertRejects(
+      () =>
+        failingQueue.listen((_msg, ctx) => {
+          ctx.span.setStatus = () => {
+            throw new Error('span status fault');
+          };
+          return Promise.reject(new Error('real handler boom'));
+        }),
+      Error,
+      'real handler boom',
+    );
   });
 });
