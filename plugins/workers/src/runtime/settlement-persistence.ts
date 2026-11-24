@@ -41,11 +41,6 @@ export {
   settleWriteWithVerification,
 } from './settlement-retry.ts';
 
-/** Internal non-public symbol implemented by first-party idempotency stores for read-only lookup. */
-export const INTERNAL_APPLIED_LOOKUP_SYMBOL: symbol = Symbol.for(
-  'netscript.workers.idempotency.isApplied',
-);
-
 /** Internal structural port for read-only execution-state lookups without expanding public types. */
 interface ReadableExecutionState {
   readonly get?: (
@@ -79,25 +74,6 @@ export function buildWorkerClaimInput(
     deliveryCount: queueContext?.deliveryCount,
     payload,
   };
-}
-
-/**
- * Read-only check for whether `idempotency.markApplied` already committed.
- *
- * Uses the internal read-only lookup protocol supported by first-party stores and never
- * invokes mutating `claim()` or `release()` operations. When a backend lacks this lookup,
- * the outcome remains unconfirmed (`{ committed: false }`).
- */
-export async function verifyIdempotencyApplied(
-  idempotency: WorkerIdempotencyPort,
-  key: string,
-): Promise<SettlementCommitVerification<void>> {
-  const lookup = Reflect.get(idempotency, INTERNAL_APPLIED_LOOKUP_SYMBOL);
-  if (typeof lookup !== 'function') {
-    return { committed: false };
-  }
-  const applied = Boolean(await lookup.call(idempotency, key));
-  return applied ? { committed: true, value: undefined } : { committed: false };
 }
 
 /**
@@ -176,10 +152,7 @@ export async function settleAppliedExecution(
 ): Promise<SettlementOutcome<WorkerExecutionRecord | null>> {
   const applied = await settleWriteWithVerification(
     () => input.idempotency.markApplied(input.claim.key, undefined, input.claim.token),
-    {
-      signal: input.signal,
-      verifyCommitted: () => verifyIdempotencyApplied(input.idempotency, input.claim.key),
-    },
+    { signal: input.signal },
   );
   if (!applied.settled) {
     return applied;
@@ -242,7 +215,12 @@ export async function recordJobFailureBestEffort(
   }
 }
 
-/** Log a post-effect settlement or telemetry error without masking its classification. */
+/**
+ * Best-effort reporting for post-effect settlement or diagnostic faults.
+ *
+ * Diagnostic sink failures are swallowed so reporting can never convert a settled
+ * delivery into a callback rejection or counted nack.
+ */
 export function logPostEffectSettlementFailure(
   workerId: string,
   concept: 'Job' | 'Task',
@@ -250,11 +228,16 @@ export function logPostEffectSettlementFailure(
   failure: FailedSettlementOutcome | undefined,
   error: unknown,
 ): void {
-  const classification = failure?.failureClass ?? 'post_success_error';
-  console.error(
-    `[Worker ${workerId}] ${concept} '${id}' settlement failed (${classification}) after successful execution:`,
-    error instanceof Error ? error.message : String(error),
-  );
+  try {
+    const classification = failure?.failureClass ?? 'post_success_error';
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(
+      `[Worker ${workerId}] ${concept} '${id}' settlement failed (${classification}) after successful execution:`,
+      message,
+    );
+  } catch {
+    // Secondary diagnostic sink errors must never alter a settled delivery outcome.
+  }
 }
 
 /**

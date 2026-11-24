@@ -114,42 +114,95 @@ Deno.test('newer broker delivery takes over its stranded marker and fences the f
   assertEquals(duplicate.alreadyApplied, true, 'completed markers survive broker redelivery');
 });
 
-Deno.test('KvWorkerIdempotencyStore internal read-only applied lookup never mutates storage', async () => {
+Deno.test('KvWorkerIdempotencyStore markApplied verifies ambiguous commits read-only without hidden symbols or masking CAS refusal', async () => {
   await using baseKv = new MemoryKvAdapter();
-  let mutations = 0;
+  let mode: 'normal' | 'commit-then-throw' | 'throw-uncommitted' | 'cas-refusal' = 'normal';
+  let failVerifyRead = false;
+  let mutationCount = 0;
+
   const store = new KvWorkerIdempotencyStore({
     kv: {
-      get: (key) => baseKv.get(key),
+      get: (key) => {
+        if (failVerifyRead && key[2] === 'applied') {
+          return Promise.reject(new Error('verification read failed'));
+        }
+        return baseKv.get(key);
+      },
       has: (key) => baseKv.has(key),
       set: (key, value, options) => {
-        mutations += 1;
+        mutationCount += 1;
         return baseKv.set(key, value, options);
       },
       delete: (key) => {
-        mutations += 1;
+        mutationCount += 1;
         return baseKv.delete(key);
       },
-      atomic: (checks, ops) => {
-        mutations += 1;
-        return baseKv.atomic(checks, ops);
+      atomic: async (checks, ops) => {
+        mutationCount += 1;
+        const isApply = ops.some((op) => op.type === 'set' && op.key[2] === 'applied');
+        if (isApply && mode === 'commit-then-throw') {
+          await baseKv.atomic(checks, ops);
+          throw new Error('ambiguous write outcome');
+        }
+        if (isApply && mode === 'throw-uncommitted') {
+          throw new Error('ambiguous write outcome');
+        }
+        if (isApply && mode === 'cas-refusal') {
+          return { ok: false };
+        }
+        return await baseKv.atomic(checks, ops);
       },
     },
   });
 
-  const lookup = Reflect.get(
-    store,
-    Symbol.for('netscript.workers.idempotency.isApplied'),
-  ) as (key: string) => Promise<boolean>;
-  const claim = await store.claim({ concept: 'job', targetId: 'ro-check', idempotencyKey: 'k1' });
-  const beforeLookup = mutations;
-  assertEquals(await lookup.call(store, claim.key), false);
-  assertEquals(mutations, beforeLookup);
+  // No global Symbol.for cross-package runtime protocol is attached to the store instance.
+  assertEquals(
+    Reflect.get(store, Symbol.for('netscript.workers.idempotency.isApplied')),
+    undefined,
+  );
 
-  await store.markApplied(claim.key, 10_000, claim.token);
-  const afterApply = mutations;
-  assertEquals(await lookup.call(store, claim.key), true);
-  assertEquals(await lookup.call(store, 'missing-key'), false);
-  assertEquals(mutations, afterApply);
+  // 1. Committed-then-throw resolves cleanly via read-only owner-token verification (zero extra writes).
+  const claim1 = await store.claim({ concept: 'job', targetId: 'ro-1', idempotencyKey: 'k1' });
+  const beforeApply1 = mutationCount;
+  mode = 'commit-then-throw';
+  await store.markApplied(claim1.key, 10_000, claim1.token);
+  assertEquals(mutationCount, beforeApply1 + 1);
+
+  // 2. Throw-without-commit preserves original error with zero extra writes.
+  mode = 'normal';
+  const claim2 = await store.claim({ concept: 'job', targetId: 'ro-2', idempotencyKey: 'k2' });
+  const beforeApply2 = mutationCount;
+  mode = 'throw-uncommitted';
+  await assertRejects(
+    () => store.markApplied(claim2.key, 10_000, claim2.token),
+    Error,
+    'ambiguous write outcome',
+  );
+  assertEquals(mutationCount, beforeApply2 + 1);
+
+  // 3. Read failure during verification preserves original write error with zero extra writes.
+  mode = 'normal';
+  const claim3 = await store.claim({ concept: 'job', targetId: 'ro-3', idempotencyKey: 'k3' });
+  const beforeApply3 = mutationCount;
+  mode = 'commit-then-throw';
+  failVerifyRead = true;
+  await assertRejects(
+    () => store.markApplied(claim3.key, 10_000, claim3.token),
+    Error,
+    'ambiguous write outcome',
+  );
+  assertEquals(mutationCount, beforeApply3 + 1);
+  failVerifyRead = false;
+
+  // 4. CAS refusal ({ ok: false }) always throws claim-lost conflict.
+  mode = 'normal';
+  const claim4 = await store.claim({ concept: 'job', targetId: 'ro-4', idempotencyKey: 'k4' });
+  mode = 'cas-refusal';
+  await assertRejects(
+    () => store.markApplied(claim4.key, 10_000, claim4.token),
+    Error,
+    'Worker idempotency claim lost',
+  );
 });
 
 function delay(ms: number): Promise<void> {

@@ -9,6 +9,7 @@ import {
   type KvSetOptions,
 } from '@netscript/kv';
 import { createQueue, type MessageQueue, QueueProvider } from '@netscript/queue';
+import { DenoKvAdapter as QueueDenoKvAdapter } from '@netscript/queue/adapters/deno-kv';
 import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
 import { KvExecutionState } from '@netscript/plugin-workers-core/state';
 import { KvWorkerIdempotencyStore } from '@netscript/plugin-workers-core/stores';
@@ -399,6 +400,92 @@ Deno.test('file-backed worker verifies ambiguous executionState.complete commit 
       }
     } finally {
       stateKvRaw.close();
+    }
+  });
+});
+
+Deno.test('file-backed worker executes external effect once when ambiguous queue requeue delivers duplicate at-least-once receipts', async () => {
+  await withTempKvPath(async (path) => {
+    const rawKv = await Deno.openKv(path);
+    try {
+      let injected = 0;
+      const proxiedKv = new Proxy(rawKv, {
+        get(target, prop, receiver) {
+          if (prop === 'enqueue') {
+            return async (value: unknown, options?: { delay?: number }) => {
+              const candidate = typeof value === 'object' && value !== null &&
+                  '__fedify_payload__' in value
+                ? (value as { __fedify_payload__?: unknown }).__fedify_payload__
+                : value;
+              const isRequeue = typeof candidate === 'object' && candidate !== null &&
+                'deliveryCount' in candidate &&
+                Number((candidate as { deliveryCount?: unknown }).deliveryCount) > 0;
+              if (isRequeue && injected === 0) {
+                injected += 1;
+                await target.enqueue(value, options);
+                throw new Error('ambiguous write outcome: interrupted during requeue');
+              }
+              return await target.enqueue(value, options);
+            };
+          }
+          const member = Reflect.get(target, prop, receiver);
+          return typeof member === 'function' ? member.bind(target) : member;
+        },
+      });
+
+      const storage = new DenoKvAdapter(rawKv);
+      const executionState = new KvExecutionState({ kv: storage, workerId: 'at-least-once-w' });
+      const idempotency = new KvWorkerIdempotencyStore({ kv: storage });
+      const deadLetters = new KvDeadLetterStore<JobMessage>({
+        kv: storage,
+        queueName: 'at-least-once-dlq',
+      });
+      const queue = QueueDenoKvAdapter.withKv<JobMessage>(proxiedKv, 'at-least-once-jobs');
+      let providerEffects = 0;
+      const context = {
+        ...recoveryContext(idempotency, {
+          execute: () => {
+            providerEffects += 1;
+            return Promise.resolve({ success: true, duration: 1 });
+          },
+        }),
+        executionState,
+        deadLetters,
+      };
+      const controller = new AbortController();
+      let deliveriesSeen = 0;
+      const listening = queue.listen(
+        async (message, delivery) => {
+          deliveriesSeen += 1;
+          if (deliveriesSeen === 1) {
+            await delivery.nack({ requeue: true });
+            return;
+          }
+          await processWorkerJob(context, message, delivery);
+        },
+        { concurrency: 1, signal: controller.signal },
+      );
+
+      try {
+        await queue.enqueue({
+          jobId: 'dedup-effect-job',
+          topic: 'jobs',
+          triggeredBy: 'queue',
+          idempotencyKey: 'at-least-once-k1',
+        });
+        await until(() => deliveriesSeen >= 3, 10_000);
+        await delay(150);
+        assertEquals(providerEffects, 1, 'worker idempotency must keep external effect at 1');
+        assertEquals(await deadLetters.depth(), 0);
+        assertEquals((await executionState.listByStatus('completed')).length, 1);
+        assertEquals((await executionState.listByStatus('failed')).length, 0);
+      } finally {
+        controller.abort();
+        await bounded(listening);
+        await queue.stop();
+      }
+    } finally {
+      rawKv.close();
     }
   });
 });

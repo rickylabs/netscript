@@ -242,3 +242,134 @@ Deno.test('throwing OpenTelemetry state_update span event after job success neve
     await provider.shutdown();
   }
 });
+
+Deno.test('throwing secondary diagnostic sink after post-success fault never rejects queued job or task callbacks or triggers nack', async () => {
+  await withTempKvPath(async (path) => {
+    const rawKv = await Deno.openKv(path);
+    try {
+      const storage = new DenoKvAdapter(rawKv);
+      const executionState = new KvExecutionState({ kv: storage, workerId: 'diag-sink-fault' });
+      const idempotency = new KvWorkerIdempotencyStore({ kv: storage });
+      const deadLetters = new KvDeadLetterStore<JobMessage>({
+        kv: storage,
+        queueName: 'diag-sink-dlq',
+      });
+      let releases = 0;
+      const originalRelease = idempotency.release.bind(idempotency);
+      using _releaseStub = stub(idempotency, 'release', (key: string, token?: string) => {
+        releases += 1;
+        return originalRelease(key, token);
+      });
+      let effects = 0;
+      const context = {
+        ...recoveryContext(idempotency, {
+          execute: () => {
+            effects += 1;
+            return Promise.resolve({ success: true, duration: 1 });
+          },
+        }),
+        executionState,
+        deadLetters,
+      };
+      let nacks = 0;
+      const queueContext: MessageContext = {
+        messageId: 'msg-diag-sink',
+        deliveryCount: 1,
+        enqueuedAt: new Date(),
+        headers: {},
+        ack: () => Promise.resolve(),
+        nack: () => {
+          nacks += 1;
+          return Promise.resolve();
+        },
+      };
+
+      using _consoleErrStub = stub(console, 'error', () => {
+        throw new Error('diagnostic sink failed');
+      });
+
+      // Job path: primary metrics fault + throwing secondary diagnostic sink.
+      {
+        using _processedStub = stub(getWorkerMetricInstruments().processedJobs, 'add', () => {
+          throw new Error('metrics exporter failed');
+        });
+
+        await processWorkerJob(
+          context,
+          { jobId: 'job-diag-q', topic: 'jobs', triggeredBy: 'queue', idempotencyKey: 'diag-j1' },
+          queueContext,
+        );
+        assertEquals(effects, 1);
+        assertEquals(nacks, 0);
+        assertEquals(releases, 0);
+        assertEquals(await deadLetters.depth(), 0);
+        assertEquals((await executionState.listByStatus('completed')).length, 1);
+        assertEquals((await executionState.listByStatus('failed')).length, 0);
+
+        await assertRejects(
+          () =>
+            processWorkerJob(context, {
+              jobId: 'job-diag-direct',
+              topic: 'jobs',
+              triggeredBy: 'queue',
+              idempotencyKey: 'diag-j2',
+            }),
+          Error,
+          'metrics exporter failed',
+        );
+        assertEquals(effects, 2);
+        assertEquals(releases, 0);
+        assertEquals(await deadLetters.depth(), 0);
+        assertEquals((await executionState.listByStatus('completed')).length, 2);
+        assertEquals((await executionState.listByStatus('failed')).length, 0);
+      }
+
+      // Task path: primary logger fault + throwing diagnostic sink.
+      {
+        using _logStub = stub(workerJobLogger, 'debug', (...args: unknown[]) => {
+          if (typeof args[0] === 'string' && args[0].includes('completed')) {
+            throw new Error('task logger failed');
+          }
+        });
+
+        await processWorkerTask(
+          context,
+          {
+            taskId: 'task-diag-q',
+            topic: 'tasks',
+            triggeredBy: 'queue',
+            idempotencyKey: 'diag-t1',
+          },
+          queueContext,
+        );
+        assertEquals(nacks, 0);
+        assertEquals(releases, 0);
+        assertEquals(
+          (await executionState.listByStatus('completed', { concept: 'task' })).length,
+          1,
+        );
+        assertEquals((await executionState.listByStatus('failed', { concept: 'task' })).length, 0);
+
+        await assertRejects(
+          () =>
+            processWorkerTask(context, {
+              taskId: 'task-diag-direct',
+              topic: 'tasks',
+              triggeredBy: 'queue',
+              idempotencyKey: 'diag-t2',
+            }),
+          Error,
+          'task logger failed',
+        );
+        assertEquals(releases, 0);
+        assertEquals(
+          (await executionState.listByStatus('completed', { concept: 'task' })).length,
+          2,
+        );
+        assertEquals((await executionState.listByStatus('failed', { concept: 'task' })).length, 0);
+      }
+    } finally {
+      rawKv.close();
+    }
+  });
+});
