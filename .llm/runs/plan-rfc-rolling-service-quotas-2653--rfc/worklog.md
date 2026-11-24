@@ -66,35 +66,46 @@ Design-only deliverable (`SCOPE-docs.md`; no framework source under `packages/` 
    - `@netscript/service/rate-limit`: `RATE_LIMIT_POLICY_KINDS`, `RateLimitPolicyKind`,
      `RateLimitPolicy` (`{ kind: 'fixed-window' } | { kind: 'gcra'; burst?: number }`); additive
      optional `policy?: RateLimitPolicy` on `MemoryRateLimitStoreOptions` and
-     `KvRateLimitStoreOptions`; additive optional `clockSkewMarginMs?: number` on
-     `KvRateLimitStoreOptions`; additive optional `retryAt?: number` on `RateLimitDecision` (exact
-     on quota exhaustion under unchanged state/policy; advisory on contention/capacity); policy-aware
-     JSDoc updates on `RateLimitRequest.limit/windowMs` and `ServiceRateLimitOptions.limit/windowMs`.
+     `KvRateLimitStoreOptions` (no retention option — `clockSkewMarginMs` dropped in favor of fixed
+     retention); additive optional `retryAt?: number` on `RateLimitDecision` (exact representable
+     next commit instant on quota exhaustion, or explicit `RangeError` when unrepresentable;
+     advisory backoff on contention/capacity); policy-aware JSDoc updates on
+     `RateLimitRequest.limit/windowMs` and `ServiceRateLimitOptions.limit/windowMs`.
    - `@netscript/service`: automatically inherits optional `retryAt?: number` via existing
      `RateLimitDecision` re-export; no new root exports.
-2. **Domain vocabulary**: `RateLimitPolicy`, `RateLimitPolicyKind`, `StoredGcraState` (internal),
-   `resetAt` (full quota reset; advisory horizon on contention/capacity denials), `retryAt` (exact
-   earliest eligible instant on quota denial under unchanged state and coherent policy; advisory
-   backoff on contention/capacity denials), `retryAt ?? resetAt` for `Retry-After`.
+2. **Domain vocabulary**: `RateLimitPolicy`, `RateLimitPolicyKind`, four-field `StoredGcraState`
+   (`{ v: 1, p: 'gcra', tatMs, tatRem }`, internal), `GCRA_CLOCK_SKEW_BOUND_MS = 5_000`,
+   `MAX_GCRA_TTL_MS = 31_536_000_000`, `resetAt` (full quota reset; advisory horizon on
+   contention/capacity denials), `retryAt` (exact representable next commit instant on quota denial
+   under single coherent policy and bounded skew; advisory backoff on contention/capacity denials),
+   `retryAt ?? resetAt` for `Retry-After`.
 3. **Ports**: `RateLimitStore` unchanged (`consume(request: RateLimitRequest): Promise<RateLimitDecision>`);
    consumes existing `KvStore` (`get` + `atomic`, with Redis commit confirmation conditional on
    `#2648`) with no new KV port methods.
-4. **Constants**: `RATE_LIMIT_POLICY_KINDS = ['fixed-window', 'gcra'] as const`.
+4. **Constants**: `RATE_LIMIT_POLICY_KINDS = ['fixed-window', 'gcra'] as const`; internal
+   `GCRA_CLOCK_SKEW_BOUND_MS = 5_000` ms and `MAX_GCRA_TTL_MS = 31_536_000_000` ms (365 days).
 5. **Commit slices (design draft run)**:
    - S0 (coordinator bootstrap): `supervisor.md`, `worklog.md`, `drift.md` (`db048698`).
    - S1 (round 1 draft): `rfcs/0000-rolling-service-quotas.md` + `worklog.md` measured evidence,
      design checkpoint, and link/snippet validation (`c8250ac1`).
    - S2 (round 2 revision): addresses DESIGN-EVAL round-1 accepted blockers 1–5 and all 3 advisories
-     (`rfcs/0000-rolling-service-quotas.md` + `worklog.md`).
-6. **Deferred scope**: Implementation under `packages/service/`, `#2648` Redis atomic `EXEC`
+     (`e847c4f8`).
+   - S3 (round 3 final revision): locks single coherent policy per store, fixed `5_000` ms
+     skew-bounded retention (dropping `clockSkewMarginMs`), exact next-commit representability at
+     safe-time overflow, upfront `365`-day TTL validation aligned with `DenoKvAdapter`, measured
+     strict-log Deno KV figures (`5_000`/`7_000` OK, `8_000`/`10_000` rejected), explicit
+     `## Future work`, and all round-2 advisories.
+6. **Deferred scope**: Implementation under `packages/service/`, mixed-policy rollout and shared
+   time-debt carryover, configurable physical KV retention, `#2648` Redis atomic `EXEC`
    command-error confirmation in `packages/kv/`, `#2365` device-grant dynamic monotonic polling
    cadence, post-auth `ServiceBuilder` rate-limit stage ordering, capped `sliding-log` policy,
    weighted request cost, and `RateLimit` response headers.
 7. **Contributor path**: Read `rfcs/0000-rolling-service-quotas.md` and current
    `packages/service/src/rate-limit/{domain,ports,adapters,middleware}/`; once accepted and numbered,
-   add `domain/gcra.ts`, wire `policy` (and `clockSkewMarginMs`) into both store adapters, update
-   middleware `Retry-After` to `decision.retryAt ?? decision.resetAt` and policy-dependent JSDoc,
-   and run the gating test plan (including `#2648` before certifying Redis).
+   add `domain/gcra.ts`, wire single-policy `policy` and fixed skew-bounded retention into both
+   store adapters (preserving zero-margin fixed-window TTL), update middleware `Retry-After` to
+   `decision.retryAt ?? decision.resetAt` and policy-dependent JSDoc, and run the technical
+   verification gates (including `#2648` before certifying Redis).
 
 ## Measured Evidence
 
@@ -214,6 +225,52 @@ from the proposed design (not baseline source behavior). Round-2 formula checks 
   `99` bytes (small state, 20-char versionstamp) to `140` bytes (`MAX_SAFE_INTEGER` state, 20-char
   versionstamp; `146` bytes with 26-char generated versionstamp) (**measured** against local codec).
 
+### 5. Round-3 measured Deno KV adapter bounds & derived formula verification
+
+**Measured** against local `main` (`87965d80`, Deno `2.9.7`, `Deno.openKv(':memory:')` via
+`DenoKvAdapter` at `packages/kv/adapters/deno-kv.adapter.ts:216` and `encodeStoredValue` at
+`packages/kv/adapters/redis/codec.ts`):
+
+- **Deno KV `expireIn` limits (`DenoKvAdapter.atomic`)**:
+  - Non-integers, negatives, `NaN`, `Infinity`: throw `TypeError: expireIn must be a non-negative integer`.
+  - Upper bound (against `chrono::DateTime<Utc>::MAX_DATETIME`): binary-search max accepted at test
+    time `8_208_471_366_461_230` ms; `+1` threw `TypeError: Invalid mutation: expireIn is too large: 8208471366461231`.
+  - Proposed normative ceiling `MAX_GCRA_TTL_MS = 31_536_000_000` ms (365 days): committed with
+    `ok: true` on both `DenoKvAdapter` and `MemoryKvAdapter`.
+- **Deno KV strict-log numeric timestamp array (`number[]`) value limits**:
+  - `5_000` timestamps: round-tripped (`ok: true, len: 5000`).
+  - `7_000` timestamps: round-tripped (`ok: true, len: 7000`).
+  - `8_000` timestamps: rejected (`TypeError: Value too large (max 65536 bytes)`).
+  - `10_000` timestamps: rejected (`TypeError: Value too large (max 65536 bytes)`).
+- **4-field `StoredGcraState` (`{ v: 1, p: 'gcra', tatMs, tatRem }`) Redis `encodeStoredValue` size**:
+  `90` bytes (small state, 20-char stamp) / `96` bytes (26-char stamp) up to `117` bytes
+  (`MAX_SAFE_INTEGER - 1` fields, 20-char stamp) / `123` bytes (26-char stamp).
+
+**Derived** Round-3 formula verification via `deno eval --unstable-kv` (exit code `0`):
+
+- **Overflow edge oracle through advertised `retryAt`** (`M = Number.MAX_SAFE_INTEGER`, `L = W = B = 2`):
+  - `now = M - 2`: Req 1 admits (`M - 1`), Req 2 admits (`M`), Req 3 throws
+    `RangeError: rateLimit window exceeds safe time` (no representable commit instant exists).
+  - `now = M - 3`: Req 1 admits (`M - 2`), Req 2 admits (`M - 1`), Req 3 denies
+    `{ allowed: false, resetAt: M - 1, retryAt: M - 2 }`, Req 4 at advertised `retryAt = M - 2`
+    admits cleanly (`{ allowed: true, resetAt: M }`, `expireIn = 5_002`), Req 5 at `M - 2` throws
+    `RangeError: rateLimit window exceeds safe time`.
+- **TTL-ceiling boundary**: `windowMs = 31_535_995_000, L = B = 1, now = 100` → `expireIn = 31_536_000_000`
+  (commits on `DenoKvAdapter` and `MemoryKvAdapter`); `windowMs = 31_535_995_001` throws
+  `RangeError: rateLimit retention exceeds maximum supported TTL` before KV IO.
+- **Fixed retention (`expireIn = (resetAt - now) + 5_000`)**: `limit = windowMs = 60_000, burst = 1, now = 100`
+  writes `expireIn = 5_001`; `limit = burst = 1, windowMs = 1_000, now = 100` writes `expireIn = 6_000`
+  (preventing 1 ms-lag early admission at `now = 1_099`).
+- **CAS exhaustion `lastObservedResetAt`** (`L = 3, W = 60_000, B = 3, now = 100`): absent/idle
+  returns `{ retryAt: 20_100, resetAt: 20_100 }`; persisted live after 2 admissions (`tatMs = 40_100`,
+  tentative post-write `60_100`) returns `{ retryAt: 20_100, resetAt: 40_100 }`.
+- **Upper-bound & weighted boundary witnesses**: `windowMs = 1, L = B = 3` admits at most `3` in
+  `[t, t + 1)`; weighted two-window (`L = 10, W = 1_000`) admits `10` at `Δt = 0` under both
+  predicates, `10`/`11` across `[999, 1_001]`, and `19`/`20` with late single-ms burst at
+  `1_900`/`1_901`.
+- **`burst > limit`** (`L = 1, W = 1_000, B = 5, now = 0`): 5th admit has `resetAt = 5_000, expireIn = 10_000`;
+  6th denies with `retryAt = 1_000, resetAt = 5_000`.
+
 ## Progress Log
 
 | Time | Slice | Step | Notes |
@@ -222,19 +279,20 @@ from the proposed design (not baseline source behavior). Round-2 formula checks 
 | 2026-11-24 | S1 | research | Verified branch HEAD `db048698`, read issue #2653, doctrine, skills, `packages/service/src/rate-limit/`, and `packages/kv/` adapters; queried `deno doc` and local MCP `find_guidance`; reproduced alignment example against `main` source (measured). |
 | 2026-11-24 | S1 | draft | Authored `rfcs/0000-rolling-service-quotas.md` from `rfcs/0000-template.md` and recorded design checkpoint + measured/source-inspected ledgers in `worklog.md`; opened draft PR #2656 at `c8250ac1`. |
 | 2026-11-24 | S2 | revision-r2 | Addressed DESIGN-EVAL round-1 accepted blockers 1–5 and all 3 advisories (Blocker 6 declined by coordinator — owner authorization quote and round-1 hygiene line left unaltered). Verified derived formulas, link check, and hygiene. |
+| 2026-11-24 | S3 | revision-r3 | Third and final revision per authorized round-3 scope (`#issuecomment-7122007586`) + round-2 advisories (`#issuecomment-7121965164`): single coherent policy per store (4-field state, policy-scoped key, mixed-policy rollout deferred), fixed `5_000` ms skew-bounded retention (`clockSkewMarginMs` dropped), next-commit safe-time check at `retryAt` overflow edge, `365`-day `MAX_GCRA_TTL_MS` validation aligned with measured `DenoKvAdapter` limits, measured strict-log Deno KV figures (`5_000`/`7_000` OK, `8_000`/`10_000` rejected), explicit `## Future work`, `lastObservedResetAt` definition, upper-bound/weighted-interval wording, and process-free technical gates. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | -------- | ------ | ------ |
-| Recommend GCRA (`{ kind: 'gcra', burst?: number }`) over sliding-window log and weighted two-window | O(1) stored record per key and O(1) per-key memory in standalone `MemoryRateLimitStore` for any safe-integer `limit` (no Deno KV 64 KiB cliff or memory `maxKeys` amplification), single-key CAS, 100% shift-invariant, exact rational integer parity; weighted two-window reaches `2 * limit - 1` / `2 * limit` in one rolling window plus false denials. | `rfcs/0000-rolling-service-quotas.md` § Rationale and alternatives |
+| Recommend GCRA (`{ kind: 'gcra', burst?: number }`) over sliding-window log and weighted two-window | O(1) four-field stored record per key (`90`–`123` bytes in Redis codec) and O(1) per-key memory in standalone `MemoryRateLimitStore` for any safe-integer `limit` (strict log hits Deno KV's 64 KiB cap between `7_000` and `8_000` timestamps and still incurs linear O(limit) CAS/memory overhead below that ceiling, forcing an explicit low `maxLimit` product cap); single-key CAS; 100% shift-invariant; weighted two-window reaches `2 * limit - 1` / `2 * limit` in one rolling window plus false denials. | `rfcs/0000-rolling-service-quotas.md` § Rationale and alternatives |
 | Keep `resetAt` as full quota recovery and add optional `retryAt?: number` on `RateLimitDecision`, splitting exact vs advisory denials | Preserves fixed-window `{ allowed, resetAt }` exact object shape and custom `RateLimitStore` compatibility while giving quota-exhaustion denials exact next-slot eligibility and labeling contention/capacity fallback values honestly as advisory backoff. | `rfcs/0000-rolling-service-quotas.md` § Compatible decision semantics |
 | Place `policy?: RateLimitPolicy` on store options (`MemoryRateLimitStoreOptions` / `KvRateLimitStoreOptions`) rather than `RateLimitRequest` | Keeps `RateLimitStore` port unchanged, prevents silent fallback on custom stores, prevents mixing policies on one KV prefix, and validates configuration at construction. | `rfcs/0000-rolling-service-quotas.md` § Public API and type surface |
 | Condition Redis shared-KV commit guarantees on `#2648` and require serialization-disjoint prefixes | `redis.adapter.ts:352–361` checks only `exec() === null` without inspecting per-command errors; `keyToRedisKey` joins unescaped `:` segments so tuple arity alone cannot isolate keys in Redis. | Source inspection + DESIGN-EVAL round 1 |
-| Add optional `clockSkewMarginMs` on `KvRateLimitStoreOptions` (default `0`) and state physical-retention preconditions | Relative KV TTL can expire a short-TAT record before a lagging peer's `request.now` reaches `tat`; explicit retention margin protects live TATs without altering logical expiry (`tat <= request.now * L`). | DESIGN-EVAL round 1 Blocker 2 |
-| Require coherent `(limit, windowMs, burst)` for stated envelope; define mixed-policy time-debt carryover explicitly | Rescaling `den` preserves wall-clock TAT (`<= 1/L` ms upward rounding) rather than enforcing a unified burst/rate envelope across heterogeneous callers; operators needing strict rollout isolation change key prefix. | DESIGN-EVAL round 1 Blocker 3 |
-| Check admit vs deny in `BigInt` before tentative `newTat` safe-time overflow | Prevents throwing `RangeError` on quota denials whose `tat`/`retryAt` fit in `Number.MAX_SAFE_INTEGER` (e.g. `now = MAX_SAFE_INTEGER - 2, limit = windowMs = burst = 2`). | DESIGN-EVAL round 1 Advisory 1 |
-| Enforce `expireIn = Math.max(1, resetAt - request.now) + clockSkewMarginMs` | Both `RedisKvAdapter` (`redis.adapter.ts:425`) and `MemoryKvAdapter` (`memory.adapter.ts:513`) treat `expireIn: 0` as falsy (no TTL). | Source inspection |
+| Lock one coherent rolling policy per store/prefix and defer mixed-policy rollout to `## Future work` | Removes `den` rescaling complexity and `(B - 1) * T` vs `B * T` multi-policy ambiguity; encodes `(windowMs, limit, effectiveBurst)` in bucket keys with a 4-field state; documents that prefix isolation creates independent per-namespace buckets during cutover. | Round-3 scope item 1 + DESIGN-EVAL round 2 |
+| Replace `clockSkewMarginMs` with fixed `GCRA_CLOCK_SKEW_BOUND_MS = 5_000` ms retention (`expireIn = (resetAt - now) + 5_000`) and upfront `MAX_GCRA_TTL_MS = 31_536_000_000` ms ceiling | Eliminates conflicting option semantics and emission-interval dependence (preventing both 1 ms and 1,000 ms lagging-peer early admissions while `Δ_gap < 5_000` ms); upfront `ceilDiv(B * W, L) + 5_000 <= MAX_GCRA_TTL_MS` guarantees no accepted configuration can emit a TTL rejected by `DenoKvAdapter` (`deno-kv.adapter.ts:216`), `RedisKvAdapter` (`redis.adapter.ts:425`), or `MemoryKvAdapter` (`memory.adapter.ts:513`); preserves zero-margin fixed-window TTL unchanged. | Round-3 scope items 2, 3, 5 + measured Deno KV probe |
+| Verify next-commit representability (`ceilDiv(max(tat, retryAt * L) + W, L) <= MAX_SAFE`) before returning quota-exhaustion `retryAt` | Guarantees `retryAt` is never earlier / never rounded down and is always committable cleanly under unchanged state; throws explicit `RangeError` when no representable commit instant exists (e.g., `MAX_SAFE_INTEGER - 2` Req 3), while `MAX_SAFE_INTEGER - 3` returns committable `retryAt = MAX - 2`. | Round-3 scope item 4 + DESIGN-EVAL round 2 |
+| Define `lastObservedResetAt` explicitly from the final CAS read's persisted state (never tentative post-write `newTat`) | Eliminates ambiguity between absent/idle (`retryAt`) and persisted live (`ceilDiv(storedTat, L)`) advisory fallback values on KV CAS exhaustion. | DESIGN-EVAL round 2 advisory |
 
 ## Drift
 
