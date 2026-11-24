@@ -21,4 +21,8 @@ JSR scan: `plugins/streams/deno.json` exposes both companion entry points. The c
 them and keeps their declared types and exports. Test files and `test_utils` are excluded from
 the package file list. The JSR audit and release preflight check the published implementation.
 
-The crash window and the coordinator question are recorded in `worklog.md`.
+The coordinator rejected the provisional crash window. The source-inspected `handleRead`
+touch sites precede GET completion and each SSE data/control write, including repeat wakeups.
+The existing proxy can fence those successful responses without changing their payload or the
+append response. Native `handleAppend` calls `touchAccess` after its storage call. The append
+bridge can write the access at the native metadata commit and confirm it at that touch.

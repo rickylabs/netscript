@@ -92,7 +92,7 @@ export async function startStreamsService(options: StreamsServiceOptions): Promi
     { getAvailablePort },
     { healthChecks },
     { createPluginService },
-    { createStreamsServer },
+    { createStreamsServer, waitForFileStreamRead },
     { PLUGIN_PACKAGE_VERSION },
     { createStreamsProxyHandler },
     { createStorageHealthCheck, describeStorageDurability },
@@ -128,7 +128,10 @@ export async function startStreamsService(options: StreamsServiceOptions): Promi
         clearTimeout(timeout);
       }
     });
-    const proxyHandler = createStreamsProxyHandler({ internalPort });
+    const proxyHandler = createStreamsProxyHandler({
+      internalPort,
+      waitForRead: dataDir ? (path) => waitForFileStreamRead(server, path) : undefined,
+    });
     return await createPluginService({}, {
       auth: options.auth,
       logger: {

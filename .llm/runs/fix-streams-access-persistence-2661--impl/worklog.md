@@ -70,19 +70,22 @@ headers retain their current shapes. No sibling declarations or permissions are 
 - Native reads and appends renew sliding TTL at the current upstream call sites. HEAD and same-stream
   PUT never renew. The native expiry check keeps its inclusive boundary, absolute expiry and fork
   behavior. The file adapter skips access writes for other policies.
-- Store pending access timestamps per path and native segment generation. Expiry and store reads
-  see pending renewals immediately. Flush a coalesced batch through the native async LMDB writer
-  after a 100 ms coalescing interval. An already running flush, scheduler delay, and storage time
-  can extend the durability window. Merge the timestamp monotonically into native metadata
-  updates so an append snapshot cannot undo a renewal. Compare the native generation at write time.
-- Before this change, upstream synchronously commits access metadata before returning from
-  `touchAccess`. A subsequent process restart recovers committed metadata. The plugin documents
-  orderly restart, with no power-loss guarantee. After this change, successful orderly shutdown
-  drains pending writes. A process crash can lose an uncommitted touch. A lone touch near expiry
-  can shift the recovered deadline earlier by almost one TTL. The coordinator was asked to
-  confirm the abrupt-crash trade-off while the builder continues independent work.
-- Write failures retain pending renewals for live expiry, emit diagnostics, and retry. Shutdown
-  attempts a final flush and surfaces an error if persistence still fails.
+- One pending access per path and native segment generation participates immediately in live
+  expiry. After a 25 ms batching interval, one asynchronous LMDB worker submits the latest
+  access per topic. A blocked writer holds one batch and one current access per topic.
+- Before this change, native `touchAccess` commits access inline and same-boot restart recovers
+  the committed metadata. The documented storage claim covers orderly restart. The coordinator
+  rejected allowing a completed read to lose its renewal on abrupt exit. The front proxy now
+  releases a successful GET (including 204 and 304) or an SSE chunk only after that read's
+  renewal or a later access has committed. The coalescing staleness of a completed read on
+  process restart is zero. The gate applies to the native SSE wakes that renew TTL today.
+- The native append transaction writes its access with its offset and producer state. An
+  acknowledged duplicate, which has no new append transaction, gets its own access write.
+  Neither path awaits the read queue. Native LMDB still owns storage-level contention.
+- Transaction callbacks check the native segment generation. Native metadata updates inherit
+  the current persisted access so an earlier append snapshot cannot erase a newer read.
+  A failed batch fails waiting reads, retains the live access, logs and retries it. Shutdown
+  attempts a final flush and reports failure through the native shutdown path.
 - S1 adds an issue-owned regression fixture and a test in `plugins/streams/services/src/tests/`.
   S2 adds the renewal compatibility adapter at `bounded-file-store.ts`, focused storage and
   protocol tests, and the storage contract in the plugin README. S3 records the full evidence
@@ -100,6 +103,10 @@ headers retain their current shapes. No sibling declarations or permissions are 
 | 2026-11-24 | S0 | researched | `deno task deps:latest --filter '@durable-streams/server'` exited 0 with 0 behind / 1 total. Upstream main `461b40267aabd644558f9b19dbb9507dd5f691cf` still calls `putSync` in `file-store.ts:661–670`. |
 | 2026-11-24 | S1 | fixture | Added the one-topic production companion workload and ordinary Deno test discovery. Scoped wrapper check, lint and format exited 0 on the three workload files. Baseline trials started from a Git archive with just the test utilities copied in. |
 | 2026-11-24 | S1 | reconcile | Issue remains open without checkbox acceptance or comments. The draft body links the issue and tracks pending gates and independent evaluation. |
+| 2026-11-24 | S2 | revised design | Coordinator rejected the lost-renewal crash window for completed reads. The implementation now gates read delivery at the existing front proxy and writes confirmed append access in the native append transaction. |
+| 2026-11-24 | S2 | tested | Scoped test wrapper passed 16 expiry tests, including SIGKILL after a successful sparse read or append, SIGKILL with an unfinished read, graceful shutdown, and a delayed read batch with 99 newer touches and an independent append acknowledgement. |
+| 2026-11-24 | S2 | benchmark | The driver closes its owned topic only after measurement, then drains the companion and deletes the temporary store. The startup reference used for teardown is restored before the workload starts. The existing CI discovery selected the fan-out module for test-5 and expiry module for test-6. |
+| 2026-11-24 | S2 | reconcile | Draft #2662 carries `Closes #2661`. Final-head measurements, scaffold results, and CI state are recorded in its Validation section. |
 
 ## Decisions
 

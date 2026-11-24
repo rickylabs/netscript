@@ -11,18 +11,19 @@ upgrade assertions.
    writes at one per second. Validate ordered, unique committing deliveries and require p95
    below 1,000 ms. Bound startup, the trial, and cleanup.
 2. Change the existing storage adapter. Preserve the upstream protocol and exact live expiry
-   boundary. Flush asynchronously in batches, check the generation, and protect renewals during
-   native producer-state and offset updates.
+   boundary. Batch reads asynchronously, check the generation, and gate successful reads at the
+   proxy until committed. Include confirmed appends in their native metadata transactions.
 3. Verify file-store behavior, protocol behavior, and slow/error paths. Run service-scoped check,
    lint, format and test wrappers, the doctrine and quality scans, release preflight, publish
    dry-run, and scaffold runtime. Run the one-topic regression twice per baseline and final
    implementation head.
 
-The short coalescing interval bounds the scheduling delay for an idle writer. The plan does
-not assign a fixed upper bound to a stalled scheduler or failed disk. The coordinator owns the
-decision about a possible lost renewal on abrupt process failure. Clean shutdown drains or
-reports failure. PLAN-EVAL is N/A because the issue fixes the scope, acceptance workload, and
-the compatibility seam. Independent IMPL-EVAL remains with the coordinator.
+The coordinator rejected a restart gap for completed reads. The 25 ms batching interval limits
+intentional batching delay. A read can wait for slower storage and succeeds only after a
+committed access. One in-flight batch and one latest access per dirty topic bound queued writes.
+Clean shutdown drains or reports failure. PLAN-EVAL is N/A because the issue fixes the scope,
+acceptance workload and compatibility seam, and the coordinator supplied the durability
+constraint. Independent IMPL-EVAL remains with the coordinator.
 
 Risks include stale append snapshots, delete/recreate races, LMDB write failures and changed
 upstream internals. The adapter checks its required shapes and regression tests exercise all

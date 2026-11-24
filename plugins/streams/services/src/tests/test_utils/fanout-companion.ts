@@ -4,10 +4,11 @@ import { networkInterfaces } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { abortable } from 'jsr:@std/async@1/abortable';
 import { TextLineStream } from 'jsr:@std/streams@1/text-line-stream';
+import { DurableStreamTestServer, FileBackedStreamStore } from '@durable-streams/server';
 import { startStreamsService } from '../../service.ts';
 
 const READY = 'STREAMS_FANOUT_PORT=';
-const STOP_TIMEOUT_MS = 5_000;
+const STOP_TIMEOUT_MS = 15_000;
 
 function loopbackAddress(): string {
   const address = Object.values(networkInterfaces()).flat()
@@ -66,9 +67,18 @@ export async function startFanoutCompanion(
 }
 
 async function runCompanion(hostname: string): Promise<void> {
+  // Keep a reference for teardown. Restore the startup method before accepting any workload.
+  let store: FileBackedStreamStore | undefined;
+  const start = DurableStreamTestServer.prototype.start;
+  DurableStreamTestServer.prototype.start = function () {
+    if (this.store instanceof FileBackedStreamStore) store = this.store;
+    return start.call(this);
+  };
   const service = await startStreamsService({
     auth: { public: true, reason: 'Isolated synthetic Streams fan-out regression' },
     serve: { hostname, port: 0, handleSignals: false },
+  }).finally(() => {
+    DurableStreamTestServer.prototype.start = start;
   });
   try {
     const base = `http://${hostname}:${service.addr.port}`;
@@ -77,7 +87,7 @@ async function runCompanion(hostname: string): Promise<void> {
     const storage = health.checks?.find((check: { name: string }) =>
       check.name === 'streams-storage'
     )?.storage;
-    if (!response.ok || storage?.mode !== 'file' || storage?.probe !== 'passed') {
+    if (!store || !response.ok || storage?.mode !== 'file' || storage?.probe !== 'passed') {
       throw new Error('Expected healthy file-backed Streams storage');
     }
     console.log(READY + service.addr.port);
@@ -85,7 +95,12 @@ async function runCompanion(hostname: string): Promise<void> {
       throw new Error('Expected the benchmark driver to close stdin');
     }
   } finally {
-    await service.stop();
+    try {
+      // Wake outstanding upstream SSE waiters, then drain the real service.
+      for (const path of store?.list() ?? []) store?.closeStream(path);
+    } finally {
+      await service.stop();
+    }
   }
 }
 

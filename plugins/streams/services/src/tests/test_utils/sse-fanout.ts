@@ -91,7 +91,10 @@ function startReader(url: URL, signal: AbortSignal, fail: (error: unknown) => vo
         const previous = state;
         state = reduceStreamSseReplayStateV1(previous, parsed.frame).state;
         if (parsed.frame.event === 'data') continue;
-        if (state.streamClosed) throw new Error('Unexpected terminal control');
+        if (state.streamClosed) {
+          if (commits.length !== REVISIONS) throw new Error('Premature terminal control');
+          return;
+        }
         if (!opened && parsed.frame.payload.upToDate && previous.pendingBatches.length === 0) {
           opened = true;
           opening.resolve();
@@ -143,15 +146,6 @@ function startProducer(base: string, mode: RetentionMode) {
   }
 }
 
-async function removeStream(url: string): Promise<void> {
-  const response = await fetch(url, {
-    method: 'DELETE',
-    signal: AbortSignal.timeout(CLEANUP_TIMEOUT_MS),
-  });
-  await response.body?.cancel();
-  if (!response.ok) throw new Error(`Stream cleanup returned ${response.status}`);
-}
-
 /** Exercise one retention mode and return its strict latency and delivery verdict. */
 export async function runFanoutRegression(mode: RetentionMode): Promise<RegressionResult> {
   const dataDir = await Deno.makeTempDir({ prefix: 'streams-fanout-' });
@@ -159,14 +153,12 @@ export async function runFanoutRegression(mode: RetentionMode): Promise<Regressi
   const signal = AbortSignal.any([stop.signal, AbortSignal.timeout(TRIAL_TIMEOUT_MS)]);
   let companion: Awaited<ReturnType<typeof startFanoutCompanion>> | undefined;
   let producer: ReturnType<typeof startProducer> | undefined;
-  let streamUrl: string | undefined;
   const readers: ReturnType<typeof startReader>[] = [];
   try {
     companion = await startFanoutCompanion(dataDir);
     producer = startProducer(companion.base, mode);
     await producer.waitUntilReady({ signal });
-    streamUrl = buildStreamUrl(SYNTHETIC_PATH, companion.base);
-    const sseUrl = new URL(streamUrl);
+    const sseUrl = new URL(buildStreamUrl(SYNTHETIC_PATH, companion.base));
     sseUrl.search = '?offset=-1&live=sse';
     for (let i = 0; i < READERS; i++) {
       const reader = startReader(sseUrl, signal, (error) => stop.abort(error));
@@ -192,6 +184,8 @@ export async function runFanoutRegression(mode: RetentionMode): Promise<Regressi
     const p95Ms = latencies[Math.ceil(latencies.length * 0.95) - 1];
     const commits = readers.reduce((sum, reader) => sum + reader.commits.length, 0);
     const misses = READERS * REVISIONS - commits;
+    const drainMs = performance.now() - offered.at(-1)!;
+    signal.throwIfAborted();
     return {
       result: Number.isFinite(p95Ms) && p95Ms < P95_LIMIT_MS && misses === 0 ? 'PASS' : 'FAIL',
       mode,
@@ -203,7 +197,7 @@ export async function runFanoutRegression(mode: RetentionMode): Promise<Regressi
       readerReconnects: 0,
       p95Ms,
       maxMs: latencies.at(-1)!,
-      drainMs: performance.now() - offered.at(-1)!,
+      drainMs,
     };
   } finally {
     stop.abort();
@@ -219,13 +213,11 @@ export async function runFanoutRegression(mode: RetentionMode): Promise<Regressi
         if (producer) await abortable(producer.stop(), AbortSignal.timeout(CLEANUP_TIMEOUT_MS));
       } finally {
         try {
-          if (streamUrl) await removeStream(streamUrl);
+          await companion?.stop();
         } finally {
-          try {
-            await companion?.stop();
-          } finally {
-            await Deno.remove(dataDir, { recursive: true });
-          }
+          // The only topic belongs to this companion. Removing its closed store
+          // discards both the topic metadata and segment files.
+          await Deno.remove(dataDir, { recursive: true });
         }
       }
     }
