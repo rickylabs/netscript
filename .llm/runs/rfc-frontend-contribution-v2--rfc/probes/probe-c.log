@@ -1,0 +1,12 @@
+=== Wave-0 Empirical Probe C (10 tests) ===
+PASS 1.1 [#1474 baseline]: real parsePluginManifest (.strict()) rejects unknown top-level "frontend" block (6ms)
+PASS 1.2 [#1474 evolution]: .passthrough() (schemaVersion: 1) parses cleanly while generate-time validator catches malformed frontend block (3ms)
+PASS 1.3 [#1473 containment]: rejects ../ traversal, backslashes, null bytes, absolute paths, smuggling, and symlink escapes (5ms)
+PASS 2.1 [P5 gateway]: real authContract + cronsContract compilation and internal-audience rejection (1ms)
+PASS 2.2 [P5 gateway]: deny-by-default, PrincipalPort auth (no browser Cookie/Auth leak), CSRF, redirect manual, response-header allowlist, audit log (15ms)
+PASS 2.3 [P5 gateway]: request/response body limits, timeout (504), and AbortSignal propagation (100ms)
+PASS 2.4 [P5 + RFC 0009]: real DurableStreamTestServer SSE delivery-unit fencing, mid-stream revocation, ?offset= resume, and abort propagation (66ms)
+PASS 2.5 [P5 + RFC 0009 boundary]: proves oRPC router traversal excludes stream contracts & AI proxy stays specialized (60ms)
+PASS 3.1 [eis-etl#450/#453 redaction]: deep-redacts URL userinfo, sensitive headers, and x-ns-ui:{secret:true} across PluginClientContext, SSR HTML, and island hydration props (2ms)
+PASS 3.2 [eis-etl#450/#453 negative assertions]: rejects unredacted outbound leaks, PrincipalPort crossing, and sentinel echo on write (0ms)
+=== Summary: 10 passed, 0 failed ===

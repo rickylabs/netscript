@@ -1,0 +1,50 @@
+{
+  "lock": false,
+  "nodeModulesDir": "auto",
+  "unstable": ["raw-imports", "kv"],
+  "workspace": [
+    "./apps/web",
+    "./packages/local-plugin"
+  ],
+  "links": [
+    "../../../../../packages/fresh",
+    "../../../../../packages/telemetry",
+    "../../../../../packages/sdk"
+  ],
+  "imports": {
+    "preact": "npm:preact@^10.29.2"
+  },
+  "catalog": {
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/instrumentation": "0.223.0",
+    "@preact/signals": "2.11.3",
+    "@tailwindcss/vite": "^4.3.3",
+    "preact": "^10.29.2",
+    "preact-render-to-string": "^6.8.0",
+    "tailwindcss": "^4.3.3",
+    "vite": "7.2.2",
+    "zod": "^4.6.5"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "precompile",
+    "jsxImportSource": "preact",
+    "jsxPrecompileSkipElements": [
+      "a",
+      "img",
+      "source",
+      "body",
+      "html",
+      "head",
+      "title",
+      "meta",
+      "script",
+      "link",
+      "style",
+      "base",
+      "noscript",
+      "template"
+    ],
+    "lib": ["dom", "dom.asynciterable", "dom.iterable", "deno.ns", "deno.unstable"]
+  }
+}

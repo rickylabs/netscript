@@ -1,0 +1,26 @@
+@layer ns-plugins {
+  .ns-cascade-target {
+    color: rgb(220, 38, 38);
+    background-color: rgb(254, 242, 242);
+    border: 2px solid rgb(220, 38, 38);
+    padding: 12px;
+  }
+
+  .plugin-route-panel {
+    border: 1px solid rgb(100, 116, 139);
+    padding: 16px;
+    border-radius: 6px;
+  }
+
+  /* Simulated substantial plugin UI surface styles (tables, badges, charts, drawers) */
+  .plugin-grid-01 { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .plugin-grid-02 { display: grid; gap: 16px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .plugin-card-01 { padding: 16px; border: 1px solid currentColor; border-radius: 8px; }
+  .plugin-card-02 { padding: 20px; border: 1px solid currentColor; border-radius: 10px; }
+  .plugin-table-01 { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .plugin-table-01 th, .plugin-table-01 td { padding: 8px 12px; border-bottom: 1px solid rgba(128,128,128,0.2); }
+  .plugin-badge-ok { display: inline-flex; align-items: center; padding: 2px 8px; font-size: 12px; }
+  .plugin-badge-warn { display: inline-flex; align-items: center; padding: 2px 8px; font-size: 12px; }
+  .plugin-timeline-item { display: flex; gap: 12px; align-items: flex-start; padding-block: 10px; }
+  .plugin-chart-bar { height: 24px; border-radius: 4px; transition: width 150ms ease; }
+}
