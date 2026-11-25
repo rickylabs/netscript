@@ -1,7 +1,7 @@
 ---
-rfc: 0000            # assigned by a maintainer at acceptance; keep 0000 while drafting
+rfc: 0008
 title: Opt-in rolling quotas for protected service reads
-status: Draft        # Draft | Discussion | FCP | Accepted | Rejected | Withdrawn
+status: Accepted
 authors: ['@rickylabs']
 created: 2026-11-24
 tracking-issue: https://github.com/rickylabs/netscript/issues/2653
@@ -12,7 +12,7 @@ target-milestone: 0.0.10
 
 ## Summary
 
-This RFC proposes an opt-in rolling quota policy for both first-party rate-limit stores in
+This RFC defines an opt-in rolling quota policy for both first-party rate-limit stores in
 `@netscript/service/rate-limit` (`createMemoryRateLimitStore` and `createKvRateLimitStore`), while
 preserving the existing fixed-window policy as the unchanged default. Callers sharing a rolling
 store or KV prefix operate under a **single-coherent-policy precondition** via an optional `policy`
@@ -25,9 +25,14 @@ version-checked KV atomic commit per attempt (with Redis commit confirmation con
 option): each admitted KV write retains the record for its remaining active rolling horizon plus a
 fixed `5_000` ms clock-skew bound (`GCRA_CLOCK_SKEW_BOUND_MS`), standalone `MemoryRateLimitStore`
 applies the same `resetAt + GCRA_CLOCK_SKEW_BOUND_MS <= now` eviction horizon so cross-key backward
-clock steps `< 5_000` ms preserve debt identically across memory and KV, and upfront validation
-enforces a `365`-day ceiling (`MAX_GCRA_TTL_MS = 31_536_000_000` ms) aligned with Deno KV's adapter
-TTL limits so no accepted rolling configuration can ever emit a backend-rejected TTL.
+clock steps `< 5_000` ms preserve debt identically across memory and KV, and startup validation —
+enforced at store construction for `policy`/`burst`, at middleware construction via an optional
+`RateLimitStore.validate({ limit, windowMs })` hook (and directly callable at startup for
+non-middleware callers), and retained upfront in `consume()` as defense-in-depth — validates the
+`(burst, limit, windowMs)` combination against a `365`-day retention ceiling
+(`MAX_GCRA_TTL_MS = 31_536_000_000` ms) aligned with Deno KV's adapter TTL limits so misconfigured
+rolling policies fail fast at startup rather than throwing `RangeError` on every request and no
+accepted rolling configuration can ever emit a backend-rejected TTL.
 `RateLimitDecision` preserves `resetAt` as full quota recovery (epoch-aligned window end for fixed
 windows; full bucket recovery for GCRA) and adds an optional `retryAt` field carrying the exact
 earliest representable next eligible epoch millisecond on quota-exhaustion denials (or throwing
@@ -97,10 +102,10 @@ Every baseline statement below is source-inspected from `main` (`87965d80`):
 | --- | --- | --- |
 | [`packages/service/src/rate-limit/domain/rate-limit.ts`](../packages/service/src/rate-limit/domain/rate-limit.ts) (lines 4–39) | `RateLimitRequest` takes `{ key, limit, windowMs, now, signal? }` with positive safe integer `limit`/`windowMs` and non-negative safe integer epoch ms `now`; `limit` JSDoc says *"Maximum reservations in one window"*. `RateLimitDecision` is `{ allowed: boolean; resetAt: number }`, documenting `resetAt` as *"Epoch milliseconds at which this fixed window ends."* `rateLimitWindow()` validates inputs and computes `now - now % windowMs + windowMs`. | Any rolling policy must define compatible `resetAt` semantics, distinguish exact vs advisory retry timing without breaking `{ allowed, resetAt }` consumers, and update policy-dependent JSDoc on `RateLimitRequest`. |
 | [`packages/service/src/rate-limit/middleware/options.ts`](../packages/service/src/rate-limit/middleware/options.ts) (lines 20–40) | `ServiceRateLimitOptions.limit` JSDoc says *"Maximum accepted requests per key per fixed window"* and `windowMs` says *"Epoch-aligned window duration in milliseconds."* | Implementation must update these JSDoc descriptions to cover both fixed-window and opt-in rolling stores. |
-| [`packages/service/src/rate-limit/ports/rate-limit-store.ts`](../packages/service/src/rate-limit/ports/rate-limit-store.ts) (lines 17–20) | `RateLimitStore` exposes a single method `consume(request: RateLimitRequest): Promise<RateLimitDecision>`. | Keeping the port method signature unchanged preserves drop-in compatibility with custom stores and `ServiceRateLimitOptions`. |
+| [`packages/service/src/rate-limit/ports/rate-limit-store.ts`](../packages/service/src/rate-limit/ports/rate-limit-store.ts) (lines 17–20) | `RateLimitStore` exposes a single method `consume(request: RateLimitRequest): Promise<RateLimitDecision>`. | Keeping `consume()` unchanged and adding only an optional `validate?(config)` hook preserves drop-in compatibility with custom stores while enabling startup validation of rolling policies. |
 | [`packages/service/src/rate-limit/adapters/memory-rate-limit-store.ts`](../packages/service/src/rate-limit/adapters/memory-rate-limit-store.ts) (lines 10–68) | `MemoryRateLimitStoreOptions` has `{ maxKeys?: number }` (default `10_000`). Stores `{ count, resetAt }` keyed by `JSON.stringify([request.key, request.windowMs])`, performs synchronous reservations, evicts up to 32 expired entries (`counter.resetAt <= request.now`) via rotating `Map` scan, rejects new keys at capacity without evicting live quotas, and holds no timers. | Rolling memory state must remain O(1) per key so `maxKeys` continues to bound standalone memory-store usage without timers or extra eviction passes. |
 | [`packages/service/src/rate-limit/adapters/kv-rate-limit-store.ts`](../packages/service/src/rate-limit/adapters/kv-rate-limit-store.ts) (lines 11–69) | `KvRateLimitStoreOptions` has `{ prefix: KvKey; maxAttempts?: number }` (default `8`, max `32`). Requires `kv.atomic` at construction. Uses single-key `kv.get` + `kv.atomic([{ key, versionstamp }], [{ type: 'set', key, value: count + 1, expireIn: resetAt - request.now }])` on `[...prefix, request.key, request.windowMs, resetAt]`. No `kv.list()` scans; rejects without writing when exhausted; throws `TypeError` on corrupt KV state. | Rolling KV state must preserve single-key CAS, zero scans, zero writes on rejection, bounded `maxAttempts`, positive `expireIn` within backend adapter limits, and fixed-window zero-margin regression parity. |
-| [`packages/service/src/rate-limit/middleware/rate-limit-middleware.ts`](../packages/service/src/rate-limit/middleware/rate-limit-middleware.ts) (lines 29–96) | Calls `store.consume(...)` with `now()`, and on `!decision.allowed` sets `Retry-After` to `String(Math.max(1, Math.ceil((decision.resetAt - now()) / 1000)))` and returns `429` JSON `{ error: 'RATE_LIMITED' }`. | Middleware must prefer an explicit retry timestamp (`decision.retryAt ?? decision.resetAt`) so rolling rejections emit accurate `Retry-After` headers while custom fixed-window stores stay unchanged. |
+| [`packages/service/src/rate-limit/middleware/rate-limit-middleware.ts`](../packages/service/src/rate-limit/middleware/rate-limit-middleware.ts) (lines 29–96) | Validates `limit`/`windowMs` at construction (`rateLimitWindow({ key: '', limit, windowMs, now: 0 })`, line 31), calls `store.consume(...)` with `now()`, and on `!decision.allowed` sets `Retry-After` to `String(Math.max(1, Math.ceil((decision.resetAt - now()) / 1000)))` and returns `429` JSON `{ error: 'RATE_LIMITED' }`. | Middleware must invoke `store.validate?.({ limit, windowMs })` at construction so misconfigured rolling policies fail fast at startup (not with 5xx on every request) and prefer `decision.retryAt ?? decision.resetAt` for `Retry-After` while custom fixed-window stores stay unchanged. |
 | [`packages/service/src/builder/service-builder-impl.ts`](../packages/service/src/builder/service-builder-impl.ts) (lines 310–313, 458–461, 515–524) | `.withRateLimit()` delegates to `this.use()`, which runs before `build()` installs `authn`/`authz`. | Pre-auth route quotas work automatically via `.withRateLimit()`; post-auth principal-keyed protected reads call `store.consume()` directly after authentication. Both paths rely on the same `RateLimitStore` and `RateLimitDecision` contract. |
 | [`packages/kv/types/kv-store.ts`](../packages/kv/types/kv-store.ts) (lines 149–196) | `KvStore` offers `get`, optional `getMany`, and optional `atomic(checks, mutations)` where `AtomicMutation` is `set` (with `expireIn?`), `delete`, `sum`, `min`, `max`. Combine mutations (`sum`/`min`/`max`) are `bigint`-only and carry no `expireIn` or conditional clamp. | Atomic rolling reservations must use `get` + versionstamp-checked `atomic([{ key, versionstamp }], [{ type: 'set', ..., expireIn }])`. |
 | [`packages/kv/adapters/deno-kv.adapter.ts`](../packages/kv/adapters/deno-kv.adapter.ts) (lines 202–235), [`packages/kv/adapters/redis.adapter.ts`](../packages/kv/adapters/redis.adapter.ts) (lines 273–435), [`packages/kv/adapters/memory.adapter.ts`](../packages/kv/adapters/memory.adapter.ts) (lines 197–219, 504–522, 586–601) | `DenoKvAdapter` passes `{ expireIn: mutation.expireIn }` verbatim to `Deno.Kv.atomic().set()` (`deno-kv.adapter.ts:216`), which enforces Deno KV's 64 KiB per-value cap and rejects `expireIn` values whose `Utc::now() + expireIn` exceeds `chrono::DateTime<Utc>::MAX_DATETIME` (`TypeError: Invalid mutation: expireIn is too large`). `RedisKvAdapter` serializes in-process `atomic()` via `atomicTail`, uses `WATCH`/`MGET`/`MULTI`/`EXEC` with up to `REDIS_ATOMIC_MAX_ATTEMPTS = 5` retries on null `EXEC` (`packages/kv/adapters/redis/types.ts:103`), JSON-encodes values via `encodeStoredValue`, and maps `expireIn` with `if (mutation.type === 'set' && mutation.expireIn) multi.psetex(...)` (`redis.adapter.ts:425`). **Crucially, `redis.adapter.ts:352–361` checks only `(await multi.exec()) === null` and reports `{ ok: true }` even when a queued command inside `EXEC` returned an error** (tracked in [#2648](https://github.com/rickylabs/netscript/issues/2648)). `MemoryKvAdapter` checks `expireIn ? Date.now() + expireIn : undefined` (`memory.adapter.ts:513`) and pushes an `expirationHeap` entry per expiring write, purging stale entries during its 1-second sweep. | (1) Shared-KV guarantees on `RedisKvAdapter` MUST be conditional on confirmed write outcomes (`#2648`). (2) Both `RedisKvAdapter` and `MemoryKvAdapter` treat `expireIn: 0` as falsy (no TTL — permanent key!), while `DenoKvAdapter` rejects oversized `expireIn` with `TypeError`, so rolling KV validation MUST bound `1 <= expireIn <= MAX_GCRA_TTL_MS` upfront before IO. (3) O(1) memory claims must be scoped to the stored quota record and standalone `MemoryRateLimitStore`, not `MemoryKvAdapter`'s transient expiration heap. |
@@ -118,9 +123,10 @@ Every baseline statement below is source-inspected from `main` (`87965d80`):
 3. Scope rolling quota sharing to a single-coherent-policy caller precondition per store/prefix with
    an O(1) four-field stored quota record per key (and O(1) per-key memory in standalone
    `MemoryRateLimitStore`) across arbitrary positive safe integer `limit` values, subject to a
-   single documented `365`-day retention TTL ceiling aligned with `DenoKvAdapter` (requests with
-   different `(limit, windowMs, burst)` tuples hit independent policy-scoped buckets rather than
-   being rejected at runtime).
+   single documented `365`-day retention TTL ceiling aligned with `DenoKvAdapter` that is validated
+   at startup when the middleware or store is constructed (requests with different
+   `(limit, windowMs, burst)` tuples hit independent policy-scoped buckets rather than being
+   rejected at runtime).
 4. Derive GCRA physical KV retention from the active rolling horizon plus a fixed `5_000` ms
    clock-skew bound (`GCRA_CLOCK_SKEW_BOUND_MS`) with no retention configuration option, preventing
    premature TTL loss under bounded clock skew independent of emission interval.
@@ -239,9 +245,10 @@ Setting `burst: 1` enforces minimum spacing of `windowMs / limit` between accept
 
 ### Direct store callers (principal-keyed protected reads)
 
-Protected service handlers that enforce per-principal quotas after authentication call
-`store.consume()` directly and read `decision.retryAt ?? decision.resetAt` for retry timing (exact
-on quota exhaustion under unchanged state and bounded skew, advisory backoff on contention or
+Protected service handlers that enforce per-principal quotas after authentication validate their
+static `(limit, windowMs)` tuple once at startup via `store.validate?.({ limit, windowMs })`, then
+call `store.consume()` per request and read `decision.retryAt ?? decision.resetAt` for retry timing
+(exact on quota exhaustion under unchanged state and bounded skew, advisory backoff on contention or
 capacity saturation):
 
 ```ts
@@ -250,6 +257,9 @@ import type { RateLimitStore } from '@netscript/service/rate-limit';
 
 declare const store: RateLimitStore;
 declare const principalSubject: string;
+
+// Fail fast at startup if (burst, limit, windowMs) exceeds MAX_GCRA_TTL_MS:
+store.validate?.({ limit: 30, windowMs: 60_000 });
 
 const now = Date.now();
 const decision = await store.consume({
@@ -282,13 +292,13 @@ and [`docs/architecture/doctrine/07-composition-and-extension.md`](../docs/archi
 | Module | Layer | Responsibility |
 | --- | --- | --- |
 | `packages/service/src/rate-limit/domain/rate-limit.ts` | `domain` | `RateLimitRequest` (updating `limit` and `windowMs` JSDoc for both policies), `RateLimitDecision` (adding optional `retryAt` with exact vs advisory JSDoc), `RATE_LIMIT_POLICY_KINDS`, `RateLimitPolicyKind`, `RateLimitPolicy`, input validation, fixed-window calculation, and policy validation. Imports no adapters or I/O. |
-| `packages/service/src/rate-limit/domain/gcra.ts` | `domain` | Fixed retention constants (`GCRA_CLOCK_SKEW_BOUND_MS`, `MAX_GCRA_TTL_MS`), pure GCRA state representation (`StoredGcraState`), exact `BigInt` rational transition `evaluateGcra()`, upfront TTL-ceiling and safe-time/next-commit representability checks, advisory contention/capacity fallback helpers, and KV state validation. Shared verbatim by both stores. |
-| `packages/service/src/rate-limit/ports/rate-limit-store.ts` | `ports` | Unchanged `RateLimitStore` interface (JSDoc updated to cover both fixed-window and rolling policies). |
-| `packages/service/src/rate-limit/adapters/memory-rate-limit-store.ts` | `adapters` | `MemoryRateLimitStoreOptions.policy?`; dispatches fixed-window (default) or GCRA using `evaluateGcra()`. |
-| `packages/service/src/rate-limit/adapters/kv-rate-limit-store.ts` | `adapters` | `KvRateLimitStoreOptions.policy?`; dispatches fixed-window (default, zero-margin TTL unchanged) or GCRA single-key CAS using `evaluateGcra()` and fixed retention. |
+| `packages/service/src/rate-limit/domain/gcra.ts` | `domain` | Fixed retention constants (`GCRA_CLOCK_SKEW_BOUND_MS`, `MAX_GCRA_TTL_MS`), pure GCRA state representation (`StoredGcraState`), startup/upfront policy-and-retention validator (`validateGcraPolicy()`), exact `BigInt` rational transition `evaluateGcra()`, safe-time/next-commit representability checks, advisory contention/capacity fallback helpers, and KV state validation. Shared verbatim by both stores. |
+| `packages/service/src/rate-limit/ports/rate-limit-store.ts` | `ports` | `RateLimitPolicyConfig` and `RateLimitStore` (`consume()` unchanged; adds optional synchronous `validate?(config: RateLimitPolicyConfig): void` startup hook and updates JSDoc for fixed-window and rolling policies). |
+| `packages/service/src/rate-limit/adapters/memory-rate-limit-store.ts` | `adapters` | `MemoryRateLimitStoreOptions.policy?`; validates `policy`/`burst` at construction, implements `validate({ limit, windowMs })` for startup checks, and dispatches fixed-window (default) or GCRA using `evaluateGcra()`. |
+| `packages/service/src/rate-limit/adapters/kv-rate-limit-store.ts` | `adapters` | `KvRateLimitStoreOptions.policy?`; validates `policy`/`burst` at construction, implements `validate({ limit, windowMs })` for zero-IO startup checks, and dispatches fixed-window (default, zero-margin TTL unchanged) or GCRA single-key CAS using `evaluateGcra()` and fixed retention. |
 | `packages/service/src/rate-limit/middleware/options.ts` | `middleware` | Updates `ServiceRateLimitOptions.limit` and `ServiceRateLimitOptions.windowMs` JSDoc to describe both fixed-window and rolling policies accurately. |
-| `packages/service/src/rate-limit/middleware/rate-limit-middleware.ts` | `middleware` | Computes `Retry-After` from `decision.retryAt ?? decision.resetAt`. |
-| `packages/service/src/rate-limit/mod.ts` | subpath manifest | Exports `RATE_LIMIT_POLICY_KINDS`, `type RateLimitPolicyKind`, `type RateLimitPolicy` alongside existing exports. |
+| `packages/service/src/rate-limit/middleware/rate-limit-middleware.ts` | `middleware` | Calls `store.validate?.({ limit, windowMs })` synchronously at middleware construction right after `rateLimitWindow(...)` so rolling misconfigurations fail fast at startup, and computes `Retry-After` from `decision.retryAt ?? decision.resetAt`. |
+| `packages/service/src/rate-limit/mod.ts` | subpath manifest | Exports `RATE_LIMIT_POLICY_KINDS`, `type RateLimitPolicyKind`, `type RateLimitPolicy`, `type RateLimitPolicyConfig` alongside existing exports. |
 | `packages/service/mod.ts` | root manifest | Continues re-exporting `RateLimitDecision` (automatically gaining optional `retryAt?: number`); store factories and policy types remain on `@netscript/service/rate-limit` to keep the root surface lean ([`docs/architecture/doctrine/02-public-surface.md`](../docs/architecture/doctrine/02-public-surface.md)). |
 
 `RateLimitPolicy` is modeled as a named, typed extension axis (Doctrine Axiom A11) with a finite
@@ -379,6 +389,30 @@ export interface RateLimitDecision {
   readonly retryAt?: number;
 }
 
+/** Static quota parameters validated against a store's policy at startup. */
+export interface RateLimitPolicyConfig {
+  /** Quota budget per `windowMs`; a positive safe integer. */
+  readonly limit: number;
+  /** Quota window duration in milliseconds; a positive safe integer. */
+  readonly windowMs: number;
+}
+
+/** Persistent or in-memory store for atomic rate-limit reservations. */
+export interface RateLimitStore {
+  /** Atomically consumes one quota slot for `request.key`, or denies without consuming. */
+  consume(request: RateLimitRequest): Promise<RateLimitDecision>;
+  /**
+   * Optional synchronous startup validation hook invoked by
+   * `createRateLimitMiddleware()` (and callable directly at startup by
+   * non-middleware callers) to validate `(limit, windowMs)` against this
+   * store's configured policy — including the GCRA retention ceiling and
+   * `(burst, limit, windowMs)` combination — before any request arrives.
+   * Performs no I/O. Existing custom stores omitting `validate` stay source-
+   * and runtime-compatible.
+   */
+  readonly validate?: (config: RateLimitPolicyConfig) => void;
+}
+
 export interface MemoryRateLimitStoreOptions {
   /** Maximum retained client keys, including expired keys awaiting eviction. Default 10,000. */
   readonly maxKeys?: number;
@@ -424,12 +458,44 @@ Fixed internal GCRA retention constants (shared by both stores for validation pa
 
 Validation rules:
 
-1. **At store construction**:
+1. **At store construction (`createMemoryRateLimitStore` / `createKvRateLimitStore`)**:
    - `policy === undefined` normalizes to `{ kind: 'fixed-window' }`.
-   - Any non-object `policy` or `policy.kind` outside `RATE_LIMIT_POLICY_KINDS` throws `TypeError`.
+   - Any non-object `policy` or `policy.kind` outside `RATE_LIMIT_POLICY_KINDS` throws `TypeError`
+     synchronously.
    - For `{ kind: 'gcra', burst }`, if `burst !== undefined`, `burst` must be a positive safe integer
-     (`Number.isSafeInteger(burst) && burst >= 1`), else throws `RangeError`.
-2. **At `consume(request)` (shared upfront checks before state access)**:
+     (`Number.isSafeInteger(burst) && burst >= 1`), else throws `RangeError` synchronously.
+   - Both first-party stores attach a synchronous, zero-I/O `validate(config: RateLimitPolicyConfig)`
+     method that validates `config.limit` and `config.windowMs` as positive safe integers (matching
+     `rateLimitWindow({ key: '', limit, windowMs, now: 0 })`) and, for `{ kind: 'gcra', burst }`,
+     validates the `(burst, limit, windowMs)` combination against the retention ceiling
+     `ceilDiv(BigInt(policy.burst ?? limit) * BigInt(windowMs), BigInt(limit)) + BigInt(GCRA_CLOCK_SKEW_BOUND_MS) <= BigInt(MAX_GCRA_TTL_MS)`
+     — throwing `RangeError('rateLimit retention exceeds maximum supported TTL')` synchronously on
+     violation. Because `limit` and `windowMs` live on `RateLimitRequest` / `ServiceRateLimitOptions`
+     rather than duplicating quota parameters inside store options, store construction validates
+     `policy`/`burst` immediately and exposes `store.validate({ limit, windowMs })` for
+     startup-time validation of the full `(burst, limit, windowMs)` combination without introducing
+     duplicate store-vs-request quota configuration that could drift.
+2. **At middleware construction (`createRateLimitMiddleware` / `ServiceBuilder.withRateLimit`) and direct-store startup**:
+   - Immediately after `rateLimitWindow({ key: '', limit, windowMs, now: 0 })` in
+     `packages/service/src/rate-limit/middleware/rate-limit-middleware.ts` (line 31),
+     `createRateLimitMiddleware()` synchronously invokes `store.validate?.({ limit, windowMs })`.
+   - Any misconfigured rolling policy — whether `windowMs` exceeds the 365-day ceiling with default
+     `burst = limit` (for example `limit: 1, windowMs: 31_535_995_001` or `400` days), `burst > limit`
+     pushes `ceilDiv(B * W, L) + 5_000 > MAX_GCRA_TTL_MS` (for example `limit: 1, windowMs: 10_000_000_000, burst: 4`),
+     or non-divisible `ceilDiv(B * W, L)` crosses the ceiling (for example `limit: 3, windowMs: 94_607_985_001, burst: 1`) —
+     fails fast with `RangeError('rateLimit retention exceeds maximum supported TTL')` at service /
+     middleware startup with zero requests dispatched and zero KV I/O, rather than booting cleanly
+     and throwing `RangeError` (HTTP `500`) on every `consume()`.
+   - Conversely, valid boundary combinations such as `limit: 1, windowMs: 31_535_995_000` (exact
+     `MAX_GCRA_TTL_MS`) or `burst < limit` reducing the horizon under the ceiling (for example
+     `limit: 10, windowMs: 40_000_000_000, burst: 1`, whose worst-case retention is `4_000_005_000` ms)
+     pass startup validation cleanly.
+   - Custom `RateLimitStore` implementations that omit `validate` remain 100% source- and
+     runtime-compatible (middleware calls `store.validate?.({ limit, windowMs })` optionally).
+   - Direct `store.consume()` callers (such as post-authentication principal-keyed protected reads
+     bypassing `createRateLimitMiddleware`) call `store.validate?.({ limit, windowMs })` once at
+     startup right after constructing the store.
+3. **At `consume(request)` (shared defense-in-depth upfront checks before state access)**:
    - Existing `limit`, `windowMs`, `now`, and `signal` checks apply identically across policies:
      `limit` and `windowMs` must be positive safe integers; `now` must be a non-negative safe
      integer; `request.signal?.throwIfAborted()` runs before state access and between KV attempts.
@@ -438,12 +504,15 @@ Validation rules:
    - For `{ kind: 'gcra' }`, evaluated in arbitrary-precision `BigInt` (`L = BigInt(limit)`,
      `W = BigInt(windowMs)`, `B = BigInt(policy.burst ?? limit)`, `N = BigInt(now) * L`,
      `MAX_SAFE = BigInt(Number.MAX_SAFE_INTEGER)`):
-     - **Upfront TTL-ceiling check (aligned with Deno KV adapter limits)**: Compute the worst-case
-       GCRA KV retention `maxTtlMs = ceilDiv(B * W, L) + BigInt(GCRA_CLOCK_SKEW_BOUND_MS)`. If
+     - **Upfront TTL-ceiling check (defense-in-depth aligned with Deno KV adapter limits)**: Runs
+       the exact same `validateGcraPolicy()` check as `store.validate({ limit, windowMs })`:
+       compute the worst-case GCRA KV retention
+       `maxTtlMs = ceilDiv(B * W, L) + BigInt(GCRA_CLOCK_SKEW_BOUND_MS)`. If
        `maxTtlMs > BigInt(MAX_GCRA_TTL_MS)`, throw
        `RangeError('rateLimit retention exceeds maximum supported TTL')` **before any state lookup
        or KV I/O** (enforced identically in `MemoryRateLimitStore` and `KvRateLimitStore` so memory
-       and KV accept the exact same rolling configurations). Because every admitted GCRA write
+       and KV accept the exact same rolling configurations, including direct callers that skip
+       `store.validate()`). Because every admitted GCRA write
        satisfies `1 <= resetAt - request.now <= ceilDiv(B * W, L)`, every KV write has
        `5_001 <= expireIn <= MAX_GCRA_TTL_MS`, which is unconditionally accepted by `DenoKvAdapter`
        ([`packages/kv/adapters/deno-kv.adapter.ts:216`](../packages/kv/adapters/deno-kv.adapter.ts#L216),
@@ -458,7 +527,7 @@ Validation rules:
      - **Upfront safe-time check**: If `ceilDiv(N + W, L) > MAX_SAFE` (meaning even one emission
        interval from `request.now` cannot produce a safe `resetAt` or `retryAt`), throw
        `RangeError('rateLimit window exceeds safe time')`.
-3. **Exact `retryAt` representability at the safe-time overflow edge**:
+4. **Exact `retryAt` representability at the safe-time overflow edge**:
    - Inside `evaluateGcra()`, admission versus quota-exhaustion denial is decided in `BigInt`:
      - On an **admission** (`newTat - N <= B * W`): check `ceilDiv(newTat, L) <= MAX_SAFE`; if it
        overflows, throw `RangeError('rateLimit window exceeds safe time')` before mutating state or
@@ -983,7 +1052,8 @@ existing fixed-window tests passing unmodified):
 | 6b. Safe-time overflow oracle, Deno KV TTL-ceiling & cross-key backward step | **Overflow oracle (through advertised `retryAt`)** with `limit = windowMs = burst = 2` (`M = Number.MAX_SAFE_INTEGER`): (a) at `now = M - 2`: Req 1 admits (`resetAt = M - 1`), Req 2 admits (`resetAt = M`), Req 3 **throws `RangeError`** (no representable next commit instant; zero state mutation/KV write); (b) at `now = M - 3`: Req 1 admits (`M - 2`), Req 2 admits (`M - 1`), Req 3 denies cleanly (`{ allowed: false, resetAt: M - 1, retryAt: M - 2 }`), **Req 4 at advertised `retryAt = M - 2` admits cleanly** (`{ allowed: true, resetAt: M }`, KV `expireIn = 5_002`), Req 5 at `M - 2` **throws `RangeError`**; (c) `now = M` throws `RangeError` upfront. **Deno KV TTL-ceiling gate**: `windowMs = 31_535_995_000, limit = burst = 1` (`expireIn = MAX_GCRA_TTL_MS = 31_536_000_000`) commits with `ok: true` on `DenoKvAdapter(Deno.openKv(':memory:'))` and `MemoryKvAdapter`; `windowMs = 31_535_995_001` (`MAX_GCRA_TTL_MS + 1`) and `windowMs = M - 10` throw `RangeError('rateLimit retention exceeds maximum supported TTL')` **before any KV IO** in both `MemoryRateLimitStore` and `KvRateLimitStore`. **Cross-key backward clock step parity**: with `L = B = 1, W = 1_000`, admit key `"a"` at `now = 100`, consume key `"b"` at `now = 1_100`, then consume `"a"` at `now = 1_099` → **denied** (`retryAt = 1_100, resetAt = 1_100`) on **both** `MemoryRateLimitStore` (skew-bounded rotating scan retains `"a"` until `resetAt + 5_000 = 6_100`) and clock-controlled `KvRateLimitStore`. | Pure domain + `MemoryRateLimitStore` + `KvRateLimitStore(MemoryKvAdapter)` + `KvRateLimitStore(DenoKvAdapter)` |
 | 7. Memory `maxKeys` saturation (advisory) & skew-bounded rotating eviction | With `maxKeys: 1`, key `"a"` admitted to `resetAt = 60_000`, new key `"b"` at `now = 1` (`limit: 2, windowMs: 60_000`) returns **advisory fallback** `{ allowed: false, retryAt: 30_001, resetAt: 60_001 }` without evicting `"a"`, and retrying `"b"` at `now = 30_001` or `now = 60_000` is STILL denied while `"a"` stays within its `5_000` ms skew retention horizon; once `now = 65_000` (`resetAt + GCRA_CLOCK_SKEW_BOUND_MS`), rotating eviction reclaims `"a"` and admits `"b"`. | `MemoryRateLimitStore` |
 | 8. Corrupt state, adapter `null` distinction & cancellation | Non-null malformed KV values (bare number, missing tag, `tatRem >= limit`, negative `tatMs`, `tatMs === Number.MAX_SAFE_INTEGER && tatRem > 0`) throw `TypeError` across all KV adapters. Persisted literal `null` value: on `MemoryKvAdapter` (`entry = { value: null, versionstamp }`) throws `TypeError`; on `DenoKvAdapter` (`entry === null` per `deno-kv.adapter.ts:84–96`) fails absent-versionstamp CAS and resolves via conservative CAS contention fallback after `maxAttempts` (never admits). Invalid `policy` throws `TypeError`; aborted `AbortSignal` rejects before IO and between CAS attempts without admitting. | Memory + `MemoryKvAdapter` + `DenoKvAdapter` |
-| 9. Middleware `Retry-After` integration | Rolling quota denial sets whole-second `Retry-After` from `decision.retryAt` (rounded up at response-time `now()`); fixed-window and custom stores without `retryAt` fall back to `decision.resetAt`; CORS headers wrap `429`; unselected routes perform zero store IO. | `createService().withRateLimit()` + `createRateLimitMiddleware()` |
+| 9a. Middleware `Retry-After` integration | Rolling quota denial sets whole-second `Retry-After` from `decision.retryAt` (rounded up at response-time `now()`); fixed-window and custom stores without `retryAt` fall back to `decision.resetAt`; CORS headers wrap `429`; unselected routes perform zero store IO. | `createService().withRateLimit()` + `createRateLimitMiddleware()` |
+| 9b. Startup construction-time policy validation | **Store construction**: invalid `policy` throws `TypeError` and invalid `burst` (`0`, `-1`, `0.5`, `NaN`, `Infinity`) throws `RangeError` synchronously with zero KV IO. **Middleware construction (`createRateLimitMiddleware()` and `createService().withRateLimit()`)**: synchronously calls `store.validate?.({ limit, windowMs })` with zero requests dispatched and zero KV IO (verified with a mock KV whose `get`/`atomic` throw if called); throws `RangeError('rateLimit retention exceeds maximum supported TTL')` on both `MemoryRateLimitStore` and `KvRateLimitStore` for `limit: 1, windowMs: 31_535_995_001` (default `burst`), `limit: 1, windowMs: 400 * 86_400_000`, `limit: 1, windowMs: 10_000_000_000, burst: 4` (`burst > limit` exceeding 365 days), and non-divisible `limit: 3, windowMs: 94_607_985_001, burst: 1`; constructs cleanly for exact boundary `limit: 1, windowMs: 31_535_995_000`, `limit: 3, windowMs: 94_607_985_000, burst: 1`, `limit: 10, windowMs: 40_000_000_000, burst: 1` (`burst < limit` under ceiling), default fixed-window stores, and custom `RateLimitStore` objects omitting `validate`. **Direct-store startup**: `store.validate({ limit, windowMs })` enforces identical positive-integer and retention-ceiling checks with zero KV IO, while `store.consume()` keeps the upfront check as defense-in-depth for callers that skip `validate()`. | `createMemoryRateLimitStore`, `createKvRateLimitStore`, `createRateLimitMiddleware`, `createService().withRateLimit()`, custom `RateLimitStore` |
 | 10. Default fixed-window compatibility & zero-margin TTL regression | Existing `packages/service/tests/rate-limit_test.ts` and `rate-limit-address-key_test.ts` pass unmodified, including exact deep equality `{ allowed: false, resetAt: 5000 }` on default fixed-window stores, PLUS explicit assertion that default `{ kind: 'fixed-window' }` `KvRateLimitStore` writes pass exact zero-margin `expireIn === resetAt - request.now` (no `+ 5_000` skew margin added). | Existing test suite + `KvRateLimitStore` |
 | 11. Static, docs, quality, publish gates | Scoped `run-deno-check.ts`, `run-deno-lint.ts`, `run-deno-fmt.ts`, `deno task doc:lint --root packages/service`, `deno task docs:jsdoc-examples`, `deno task quality:gate`, and `deno publish --dry-run --allow-dirty` in `packages/service` all exit `0`. | Repository tooling |
 
@@ -1048,8 +1118,8 @@ existing fixed-window tests passing unmodified):
    Deno KV/Redis read-encode-write payload, widening the optimistic CAS conflict window under
    concurrency, and multiplying `MemoryRateLimitStore`'s heap footprint (`maxKeys × limit`, e.g.,
    `10_000 × 5_000` numbers). A production sliding-window log therefore requires a much lower
-   explicit product cap (such as `maxLimit <= 256` or `<= 1_000`) that cannot be validated at
-   middleware construction time without leaking store-specific limits onto `RateLimitStore`. GCRA
+   explicit product cap (such as `maxLimit <= 256` or `<= 1_000`) to avoid linear payload, CAS, and
+   memory degradation. GCRA
    keeps the stored quota record (`4` fields, `90`–`123` bytes in Redis codec encoding) and
    standalone memory-store entry (`3` numbers) strictly O(1) for every `limit` up to
    `Number.MAX_SAFE_INTEGER`, bounded only by the `365`-day `MAX_GCRA_TTL_MS` retention ceiling.
@@ -1087,23 +1157,30 @@ This RFC introduces **no breaking changes**:
   `{ kind: 'fixed-window' }` with identical key layouts, eviction, zero-margin KV TTLs, and exact
   `{ allowed, resetAt }` decision objects.
 - `RateLimitStore`, `RateLimitRequest`, and `ServiceRateLimitOptions` remain source- and
-  runtime-compatible. Custom `RateLimitStore` implementations that omit `retryAt` continue to
-  compile and work in `createRateLimitMiddleware()`.
+  runtime-compatible. Custom `RateLimitStore` implementations that omit both `validate` and
+  `retryAt` continue to compile and work in `createRateLimitMiddleware()`.
 - **Migration for opting in or changing rolling policy**:
   1. Choose a **new KV `prefix` that is disjoint after serialization** (especially on
      `RedisKvAdapter`, where `keyToRedisKey` joins unescaped `:` segments) when switching a deployed
      limiter from fixed-window to `policy: { kind: 'gcra' }`, or when changing
-     `(limit, windowMs, burst)` (remembering that prefix isolation creates independent buckets so
-     each policy's envelope applies per namespace during rolling coexistence).
+     `(limit, windowMs, burst)`. Note also that unlike fixed-window (which keys by `(key, windowMs)`
+     and shares one counter across callers passing different `limit` values), GCRA keys by
+     `(windowMs, limit, effectiveBurst)`, so callers with different `limit` values select
+     independent buckets and changing `limit` starts fresh buckets even on the same prefix; during a
+     rolling deploy while old and new replicas coexist, each policy's envelope applies strictly per
+     namespace.
   2. Pass `policy: { kind: 'gcra' }` (or `{ kind: 'gcra', burst }`) to `createMemoryRateLimitStore`
      or `createKvRateLimitStore`. Ensure NTP clock synchronization across KV-sharing hosts stays
      well within the fixed `5_000` ms `GCRA_CLOCK_SKEW_BOUND_MS` bound, and keep
-     `ceil(burst * windowMs / limit) + 5_000 <= 31_536_000_000` ms (365 days).
+     `ceil(burst * windowMs / limit) + 5_000 <= 31_536_000_000` ms (365 days) — enforced at startup
+     by `createRateLimitMiddleware()` / `.withRateLimit()` via `store.validate?.({ limit, windowMs })`
+     (and callable directly at startup by non-middleware callers).
   3. On Redis deployments, wait for [#2648](https://github.com/rickylabs/netscript/issues/2648)
      before relying on `RedisKvAdapter` for confirmed atomic reservations.
-  4. Direct callers of `store.consume()` that format `Retry-After` or `RateLimitError.retryAfter`
-     should update from `decision.resetAt` to `decision.retryAt ?? decision.resetAt`. Callers using
-     `createRateLimitMiddleware()` / `.withRateLimit()` get this automatically.
+  4. Direct callers of `store.consume()` should call `store.validate?.({ limit, windowMs })` at
+     startup and update `Retry-After` / `RateLimitError.retryAfter` formatting from
+     `decision.resetAt` to `decision.retryAt ?? decision.resetAt`. Callers using
+     `createRateLimitMiddleware()` / `.withRateLimit()` get both automatically.
 
 ## Prior art
 
@@ -1127,6 +1204,15 @@ This RFC introduces **no breaking changes**:
   prerequisite for Redis shared-KV commit guarantees in this RFC.
 
 ## Unresolved questions
+
+All design questions below are resolved as accepted in this RFC (`rfc: 0008`, `status: Accepted`):
+opt-in GCRA rolling policy (`{ kind: 'gcra', burst?: number }` on `RateLimitPolicy` discriminated
+union), optional `retryAt?: number` on `RateLimitDecision` (exact representable next commit instant
+on quota exhaustion, advisory backoff on contention/capacity), fixed `GCRA_CLOCK_SKEW_BOUND_MS = 5_000`
+ms and `MAX_GCRA_TTL_MS = 31_536_000_000` ms retention bounds, and synchronous startup validation
+of the retention ceiling and `(burst, limit, windowMs)` combination at middleware and store
+construction (`RateLimitStore.validate?` + Gate 9b). The six design trade-offs evaluated before
+acceptance are preserved below for reference:
 
 1. **Primary rolling algorithm — GCRA vs capped strict sliding-window log**: Should the initial
    rolling policy be GCRA (O(1) stored record per key, arbitrary safe-integer `limit` up to the
