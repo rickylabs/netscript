@@ -14,17 +14,20 @@ target-milestone: 0.0.10
 
 This RFC proposes an opt-in rolling quota policy for both first-party rate-limit stores in
 `@netscript/service/rate-limit` (`createMemoryRateLimitStore` and `createKvRateLimitStore`), while
-preserving the existing fixed-window policy as the unchanged default. Each store runs **one
-coherent policy** via an optional `policy` configuration accepting a discriminated union
-`RateLimitPolicy` defaulting to `{ kind: 'fixed-window' }`, with `{ kind: 'gcra', burst?: number }`
-implementing the Generic Cell Rate Algorithm (GCRA) over exact rational integer arithmetic using an
-O(1) four-field stored quota record per key (and O(1) per-key memory in the standalone memory
-store) plus a single version-checked KV atomic commit per attempt (with Redis commit confirmation
-conditional on [#2648](https://github.com/rickylabs/netscript/issues/2648)). GCRA KV retention is
-fixed (no retention option): each admitted write retains the record for its remaining active
-rolling horizon plus a fixed `5_000` ms clock-skew bound (`GCRA_CLOCK_SKEW_BOUND_MS`), validated
-upfront against a `365`-day ceiling (`MAX_GCRA_TTL_MS = 31_536_000_000` ms) aligned with Deno KV's
-adapter TTL limits so no accepted rolling configuration can ever emit a backend-rejected TTL.
+preserving the existing fixed-window policy as the unchanged default. Callers sharing a rolling
+store or KV prefix operate under a **single-coherent-policy precondition** via an optional `policy`
+configuration accepting a discriminated union `RateLimitPolicy` defaulting to
+`{ kind: 'fixed-window' }`, with `{ kind: 'gcra', burst?: number }` implementing the Generic Cell
+Rate Algorithm (GCRA) over exact rational integer arithmetic using an O(1) four-field stored quota
+record per key (and O(1) per-key memory in the standalone memory store) plus a single
+version-checked KV atomic commit per attempt (with Redis commit confirmation conditional on
+[#2648](https://github.com/rickylabs/netscript/issues/2648)). GCRA retention is fixed (no retention
+option): each admitted KV write retains the record for its remaining active rolling horizon plus a
+fixed `5_000` ms clock-skew bound (`GCRA_CLOCK_SKEW_BOUND_MS`), standalone `MemoryRateLimitStore`
+applies the same `resetAt + GCRA_CLOCK_SKEW_BOUND_MS <= now` eviction horizon so cross-key backward
+clock steps `< 5_000` ms preserve debt identically across memory and KV, and upfront validation
+enforces a `365`-day ceiling (`MAX_GCRA_TTL_MS = 31_536_000_000` ms) aligned with Deno KV's adapter
+TTL limits so no accepted rolling configuration can ever emit a backend-rejected TTL.
 `RateLimitDecision` preserves `resetAt` as full quota recovery (epoch-aligned window end for fixed
 windows; full bucket recovery for GCRA) and adds an optional `retryAt` field carrying the exact
 earliest representable next eligible epoch millisecond on quota-exhaustion denials (or throwing
@@ -112,10 +115,12 @@ Every baseline statement below is source-inspected from `main` (`87965d80`):
 2. Preserve 100% backwards compatibility for default fixed-window callers, existing custom
    `RateLimitStore` implementations, zero-margin fixed-window KV TTLs, and existing
    `RateLimitDecision` assertions.
-3. Enforce one coherent rolling policy per store/prefix with an O(1) four-field stored quota record
-   per key (and O(1) per-key memory in standalone `MemoryRateLimitStore`) across arbitrary positive
-   safe integer `limit` values, subject to a single documented `365`-day retention TTL ceiling
-   aligned with `DenoKvAdapter`.
+3. Scope rolling quota sharing to a single-coherent-policy caller precondition per store/prefix with
+   an O(1) four-field stored quota record per key (and O(1) per-key memory in standalone
+   `MemoryRateLimitStore`) across arbitrary positive safe integer `limit` values, subject to a
+   single documented `365`-day retention TTL ceiling aligned with `DenoKvAdapter` (requests with
+   different `(limit, windowMs, burst)` tuples hit independent policy-scoped buckets rather than
+   being rejected at runtime).
 4. Derive GCRA physical KV retention from the active rolling horizon plus a fixed `5_000` ms
    clock-skew bound (`GCRA_CLOCK_SKEW_BOUND_MS`) with no retention configuration option, preventing
    premature TTL loss under bounded clock skew independent of emission interval.
@@ -307,12 +312,14 @@ export type RateLimitPolicyKind = (typeof RATE_LIMIT_POLICY_KINDS)[number];
 /**
  * Quota admission policy for first-party rate-limit stores.
  *
- * Each store enforces one coherent policy; callers sharing a store/prefix
- * must use the same `(limit, windowMs, burst)` configuration.
+ * Rolling quota sharing is scoped to a single coherent policy precondition:
+ * callers sharing a store/prefix to share one quota must pass the same
+ * `(limit, windowMs, burst)` tuple; differing tuples select independent
+ * policy-scoped buckets.
  *
  * - `'fixed-window'`: epoch-aligned fixed windows (default).
  * - `'gcra'`: alignment-independent Generic Cell Rate Algorithm with an O(1)
- *   stored record per key and fixed skew-bounded KV retention; `burst`
+ *   stored record per key and fixed skew-bounded retention; `burst`
  *   defaults to the request's `limit`.
  */
 export type RateLimitPolicy =
@@ -506,12 +513,23 @@ timestamps** (contention and capacity denials):
 (`attempt === maxAttempts`), `lastObservedResetAt` is derived strictly from the **persisted** record
 read from KV — **never** from the tentative uncommitted post-write `newTat`:
 
-- If the final read observes an **absent** (`entry.value === null`) or **logically idle**
-  (`storedTat <= request.now * L`) KV entry:
+- If the final read observes an **absent** (`entry === null`, per the `KvStore.get` contract) or
+  **logically idle** (`storedTat <= request.now * L`) KV entry:
   `lastObservedResetAt = Number(BigInt(request.now) + ceilDiv(W, L))` (which equals `retryAt`, so
   `Math.max(lastObservedResetAt, retryAt) === retryAt`).
-- If the final read observes a **persisted live** record (`storedTat > request.now * L`):
+- If the final read observes a **persisted live** record (`entry !== null` with valid
+  `StoredGcraState` and `storedTat > request.now * L`):
   `lastObservedResetAt = Number(ceilDiv(storedTat, L))` (i.e. `stored.tatMs + (stored.tatRem > 0 ? 1 : 0)`).
+- **Adapter distinction for a persisted `null` value**: Under `KvStore.get`, an absent key returns
+  `entry === null`. When another writer corrupts a key by persisting a literal `null` value,
+  `MemoryKvAdapter` returns a non-null entry (`{ value: null, versionstamp }`), which fails
+  `StoredGcraState` validation and throws `TypeError`, whereas `DenoKvAdapter`
+  ([`packages/kv/adapters/deno-kv.adapter.ts:84–96`](../packages/kv/adapters/deno-kv.adapter.ts#L84-L96))
+  maps a `null` value to `null` (indistinguishable from absence at read time), causing
+  `KvRateLimitStore` to submit an absent-versionstamp CAS (`versionstamp: null`) that Deno KV
+  rejects (`{ ok: false }`) and therefore resolves via conservative CAS contention fallback after
+  `maxAttempts` rather than `TypeError`. Non-null malformed values throw `TypeError` across all
+  adapters.
 
 Concrete CAS exhaustion illustration (`limit: 3, windowMs: 60_000, burst: 3, now: 100`, where
 `ceilDiv(W, L) = 20_000`):
@@ -625,10 +643,16 @@ budget `B * (W / L)` ms is `B * W` units:
      `RangeError('rateLimit window exceeds safe time')`.
 2. **Resolve current `tat` and `lastObservedResetAt`**:
    - Default `lastObservedResetAt = Number(BigInt(request.now) + ceilDiv(W, L))`.
-   - If no stored state exists: `tat = N`.
-   - Else validate `stored`: non-null object with `v === 1`, `p === 'gcra'`, safe integers
-     `tatMs >= 0`, `0 <= tatRem < request.limit`, and `(tatMs < Number.MAX_SAFE_INTEGER || tatRem === 0)`;
-     throw `TypeError('Invalid rate-limit state in KV')` on failure.
+   - If the KV lookup returns `entry === null` (or the key is absent in `MemoryRateLimitStore`):
+     `tat = N`. (Note: on `DenoKvAdapter`, a corrupted key storing literal `null` is mapped to
+     `entry === null` at `packages/kv/adapters/deno-kv.adapter.ts:84–96`, so it enters the
+     absent-versionstamp CAS branch and rejects via CAS contention fallback rather than throwing
+     `TypeError`.)
+   - Else validate `entry.value` (`stored`): non-null object with `v === 1`, `p === 'gcra'`, safe
+     integers `tatMs >= 0`, `0 <= tatRem < request.limit`, and
+     `(tatMs < Number.MAX_SAFE_INTEGER || tatRem === 0)`; throw
+     `TypeError('Invalid rate-limit state in KV')` on failure (including `entry.value === null` on
+     adapters such as `MemoryKvAdapter` that expose a persisted `null` entry).
    - Compute `storedTat = BigInt(stored.tatMs) * L + BigInt(stored.tatRem)`.
    - If `storedTat > N`: set `tat = storedTat` and `lastObservedResetAt = Number(ceilDiv(storedTat, L))`;
      else set `tat = N` (key is logically idle / fully recovered, keeping `lastObservedResetAt = Number(BigInt(request.now) + ceilDiv(W, L))`).
@@ -674,11 +698,15 @@ GCRA is a **leaky-bucket / token-bucket rolling rate limiter**, not a strict sli
 Under a single coherent `(limit, windowMs, burst)` policy and physical retention within the
 documented skew bound:
 
-- **Shift-invariant in caller timestamps (`request.now`)**: Shifting every caller arrival timestamp
-  by any constant `c` produces identical `allowed` results and shifts `resetAt`/`retryAt` by
-  exactly `c`. Both issue #2653 alignment sequences (`[100, 200, 300, 400]` and
-  `[59_850, 59_950, 60_050, 60_150]` at `limit: 2, windowMs: 60_000`) return
-  `[true, true, false, false]`.
+- **Shift-invariant in caller timestamps (`request.now`) within safe-time representability**:
+  Shifting every caller arrival timestamp by any constant `c` that preserves safe-integer
+  representability of all inputs, outputs (`resetAt`/`retryAt`), and next-commit instants produces
+  identical `allowed` results and shifts `resetAt`/`retryAt` by exactly `c`. (Shifts that cross the
+  safe-time representability boundary are explicitly excluded: for example, shifting the
+  `now = M - 3` overflow witness by `+1` ms to `M - 2` turns its third request from a quota denial
+  into `RangeError` because no representable next commit exists.) Both issue #2653 alignment
+  sequences (`[100, 200, 300, 400]` and `[59_850, 59_950, 60_050, 60_150]` at
+  `limit: 2, windowMs: 60_000`) return `[true, true, false, false]`.
 - **Single-timestamp burst bound (`Δt = 0` in caller timestamps)**: At most `burst` (default
   `limit`) requests are ever admitted at any single caller timestamp `now`, regardless of clock
   alignment. Epoch-boundary doubling (`2 * limit` across a minute boundary) is eliminated.
@@ -709,11 +737,15 @@ documented skew bound:
   [Rationale and alternatives](#rationale-and-alternatives) and
   [Unresolved questions](#unresolved-questions).
 
-#### Single coherent policy per store and policy cutover
+#### Single coherent policy precondition and policy cutover
 
-- **One coherent policy per store/prefix**: Every caller sharing a rolling store instance or KV
-  prefix MUST use the same `(limit, windowMs, burst)` policy. Mixed-policy rollout against a shared
-  quota state is out of scope for this design and deferred to [Future work](#future-work).
+- **Single coherent policy (caller precondition)**: Sharing a rolling quota across callers sharing
+  a store instance or KV prefix requires those callers to supply the same
+  `(limit, windowMs, burst)` tuple. This is a **caller precondition**, not a runtime rejection of
+  differing tuples: because `(request.windowMs, request.limit, effectiveBurst)` is part of the
+  bucket key, requests with differing tuples select **independent** buckets rather than throwing or
+  sharing debt. Mixed-policy rollout against a shared quota state is out of scope for this design
+  and deferred to [Future work](#future-work).
 - **Policy-scoped bucket keys**: Both stores encode `(request.windowMs, request.limit, effectiveBurst)`
   in the bucket key (`JSON.stringify([request.key, request.windowMs, request.limit, effectiveBurst])`
   in memory; `[...prefix, 'v1', 'gcra', request.key, request.windowMs, request.limit, effectiveBurst]`
@@ -732,12 +764,22 @@ documented skew bound:
   numbers — **O(1) per key** and **O(`maxKeys`) total** in the standalone memory store, comparable
   to fixed-window's `{ count, resetAt }`).
 - Map key is `JSON.stringify([request.key, request.windowMs, request.limit, effectiveBurst])`.
-- Rotating eviction remains identical (`memory-rate-limit-store.ts:44–51`): on every `consume()`,
-  inspect at most 32 entries from the front of the `Map` and delete entries where
-  `entry.resetAt <= request.now`. Because `entry.resetAt === Number(ceilDiv(tat, L))` for that
-  bucket's fixed `L`, any entry with `entry.resetAt <= request.now` is already 100% idle
-  (`tat <= request.now * L`), so deletion is **lossless**.
-- Live entries (`entry.resetAt > request.now`) are never evicted to admit new keys.
+- **Skew-bounded rotating eviction for GCRA** (matching KV's fixed `GCRA_CLOCK_SKEW_BOUND_MS = 5_000`
+  ms retention horizon):
+  - Fixed-window entries keep the exact existing eviction test (`counter.resetAt <= request.now`,
+    `memory-rate-limit-store.ts:44–51`).
+  - GCRA entries are evicted during the 32-entry rotating scan **only** when
+    `BigInt(entry.resetAt) + BigInt(GCRA_CLOCK_SKEW_BOUND_MS) <= BigInt(request.now)`.
+  - Why not `entry.resetAt <= request.now`? With `L = B = 1, W = 1_000`, admitting key `"a"` at
+    `now = 100` (`resetAt = 1_100`), then consuming key `"b"` at `now = 1_100`, then consuming key
+    `"a"` at `now = 1_099` (a 1 ms backward clock step) would let `"b"`'s scan delete `"a"` and
+    over-admit `"a"` within 999 caller ms, breaking parity with KV (which retains `"a"` until
+    `+5_000` ms and denies at `1_099` with `retryAt = 1_100`). Keeping GCRA memory entries until
+    `entry.resetAt + 5_000 <= request.now` preserves live debt across cross-key backward clock steps
+    strictly smaller than `5_000` ms while remaining logically idle as soon as `request.now >= entry.resetAt`
+    (`tat <= request.now * L`).
+- Live or skew-retained entries (`BigInt(entry.resetAt) + 5_000n > BigInt(request.now)`) are never
+  evicted to admit new keys.
 - When a new key arrives and `entries.size >= maxKeys`, the store rejects conservatively without
   mutating the map and returns the **advisory fallback**
   `{ allowed: false, resetAt: Number(BigInt(now) + ceilDiv(B * W, L)), retryAt: Number(BigInt(now) + ceilDiv(W, L)) }`
@@ -800,8 +842,12 @@ documented skew bound:
     where `lastObservedResetAt` is computed from the final read attempt's **persisted** state
     (`retryAt` if absent/logically idle; stale stored `Number(ceilDiv(storedTat, L))` if live, never
     the tentative post-write `newTat`). It never admits a request without a confirmed atomic commit.
-  - Storage I/O errors, unconfirmed-commit errors (`#2648`), and corrupt stored values (`TypeError`)
-    propagate to the caller/error handler and never fail open.
+  - Storage I/O errors, unconfirmed-commit errors (`#2648`), and corrupt non-null stored values
+    (`TypeError`) propagate to the caller/error handler and never fail open. For a corrupted key
+    storing literal `null`, `MemoryKvAdapter` exposes `{ value: null, versionstamp }` and throws
+    `TypeError`, whereas `DenoKvAdapter` (`packages/kv/adapters/deno-kv.adapter.ts:84–96`) maps the
+    read to `entry === null`, causing absent-versionstamp CAS rejection and conservative contention
+    fallback after `maxAttempts` (never failing open).
 - **Cardinality note**: As with fixed-window KV counters, TTL bounds each key's lifetime rather
   than total live key count across distinct keys; backend capacity controls and bounded/canonical
   keys remain the operator's responsibility.
@@ -839,8 +885,12 @@ Under those preconditions:
    monotonic `performance.now()` epoch and callers expect epoch-ms `resetAt`/`retryAt`.
 2. **Why retention must include a clock-skew bound independent of emission interval**:
    - Logical expiry compares `tat <= request.now * L` against the caller's `request.now`.
-   - Physical KV expiry deletes the key at `backendWriteTime + expireIn` against the KV backend's
-     clock.
+   - Physical KV expiry deletes the key after `ttlAnchor + expireIn` against the KV backend's clock,
+     where `ttlAnchor` is the backend/adapter timestamp at which the expiration deadline is anchored
+     when submitting the atomic write (for example, Deno KV computes `Utc::now() + expireIn` before
+     submitting the atomic mutation in Deno 2.9.7 `ext/kv/lib.rs:840–877`, and Deno KV's expiration
+     contract permits later physical deletion after that deadline — which is safe because logical
+     idle checks treat retained expired keys as idle).
    - Without a skew margin added above `resetAt - writerNow`, **any** policy — regardless of how
      large its emission interval `windowMs / limit` is — can lose live quota early under a 1 ms
      lagging peer:
@@ -856,7 +906,8 @@ Under those preconditions:
    - Every admitted GCRA write sets `expireIn = (resetAt - writerNow) + GCRA_CLOCK_SKEW_BOUND_MS`
      with fixed `GCRA_CLOCK_SKEW_BOUND_MS = 5_000` ms (where `1 <= resetAt - writerNow <= ceilDiv(B * W, L)`,
      reaching `windowMs + 5_000` ms at full default burst).
-   - Define the clock/transit gap between write and read as
+   - Define `backendElapsed` from the adapter's TTL anchor (`ttlAnchor` at write submission) to the
+     subsequent read, and define the clock/transit gap as
      `Δ_gap = backendElapsed - (readerNow - writerNow)` (combining writer-ahead-of-reader clock
      skew, backend-vs-caller clock drift, write-to-read transit latency, and any backward clock
      step on a host).
@@ -865,15 +916,20 @@ Under those preconditions:
      `backendElapsed = (readerNow - writerNow) + Δ_gap < (resetAt - writerNow) + 5_000 = expireIn`.
      The KV record is therefore guaranteed to remain physically present throughout its entire
      logical lifetime — **completely independent of `windowMs / limit`**.
-   - In both counterexamples above:
+   - In both counterexamples above (tested without an intervening renewing write in the expiry
+     fixture, and in a separate fixture for on-time renewal):
      - `limit = windowMs = 60_000, burst = 1, writerNow = 100`: `expireIn = 5_001` ms; at
        `backendElapsed = 1` ms, a lagging peer at `readerNow = 100` still reads `tat = 101` and is
-       denied, while an on-time peer at `readerNow = 101` treats the retained record as logically
-       idle and is admitted.
+       denied (zero KV write), and without a renewing write the original key expires once
+       `backendElapsed >= 5_001` ms; in a separate fixture, an on-time peer at `readerNow = 101`
+       treats the retained record as logically idle, admits, and writes a fresh `expireIn = 5_001` ms
+       from its new write anchor.
      - `limit = burst = 1, windowMs = 1_000, writerNow = 100`: `expireIn = 6_000` ms; at
        `backendElapsed = 1_000` ms, a 1 ms-lagging peer at `readerNow = 1_099` still reads
-       `tat = 1_100` and is denied (`retryAt = 1_100, resetAt = 1_100`), while an on-time peer at
-       `readerNow = 1_100` treats the retained record as logically idle and is admitted.
+       `tat = 1_100` and is denied (`retryAt = 1_100, resetAt = 1_100`, zero KV write), and without
+       a renewing write the original key expires once `backendElapsed >= 6_000` ms; in a separate
+       fixture, an on-time peer at `readerNow = 1_100` admits and refreshes the TTL from its new
+       write anchor.
    - Because logical idle expiry still compares `tat <= request.now * L`, the fixed `5_000` ms
      retention margin **never extends logical quota** (`resetAt` and `retryAt` are unchanged).
    - If `Δ_gap >= 5_000` ms (for example, unsynchronized hosts skewed by `>= 5` seconds or a
@@ -887,9 +943,14 @@ Under those preconditions:
      `tat = max(storedTat, now * L)` ensures an ahead-of-time replica advances `tat` monotonically
      (making behind-time peers conservatively stricter) and a behind-time replica or backward clock
      step never moves `tat` backwards.
-   - In `MemoryRateLimitStore`, live entries keep `entry.resetAt > request.now` (never evicted by
-     rotating scan), so single-host backward steps of any magnitude remain conservative until `now`
-     catches up.
+   - In `MemoryRateLimitStore`, because GCRA rotating eviction retains entries until
+     `BigInt(entry.resetAt) + BigInt(GCRA_CLOCK_SKEW_BOUND_MS) <= BigInt(request.now)`, cross-key
+     backward clock steps strictly smaller than `5_000` ms preserve live debt identically to KV
+     (for example, with `L = B = 1, W = 1_000`: admitting `"a"` at `100`, consuming `"b"` at
+     `1_100`, and consuming `"a"` at `1_099` retains `"a"` and denies with `retryAt = 1_100` in
+     both stores). Backward clock steps `>= 5_000` ms after an intervening higher-timestamp request
+     can trigger rotating eviction of an entry whose `resetAt + 5_000 <= interveningNow`, matching
+     KV's `5_000` ms skew bound.
 5. **Injected test clock vs backend TTL clock**:
    - KV adapters interpret `expireIn` against the backend's own clock (`Date.now() + expireIn` in
      `MemoryKvAdapter`; server clock in Deno KV and Redis).
@@ -916,12 +977,12 @@ existing fixed-window tests passing unmodified):
 | 2. Exact rational, upper-bound & short-interval envelope | Non-divisible `limit: 3, windowMs: 1_000` (exact `334` ms eligibility, no drift over 100+ ticks); `windowMs: 1, limit: 3, burst: 3` (half-open 1 ms interval `[t, t + 1)` admits at most `3`, demonstrating `limit + burst - 1` is an upper bound); sub-ms `limit: 1_000, windowMs: 100, burst: 2` (2 admitted at `t = 0`, 3rd denied with `retryAt = 1`, 2 more admitted at `t = 1`); high `limit: 100_000, windowMs: 3_600_000` (O(1) stored record with no limit cliff). | Pure domain unit test + Memory + KV |
 | 3. Explicit `burst` behavior | Default `burst = limit`; `burst: 1` strict spacing; `burst < limit`; invalid `burst` (`0`, `-1`, `0.5`, `NaN`, `Infinity`) throws `RangeError` at construction. When `burst > limit` is supported, `limit: 1, windowMs: 1_000, burst: 5` admits 5 at `now = 0` (5th write has `resetAt: 5_000` and KV `expireIn: 10_000`) and denies the 6th with exact `retryAt: 1_000, resetAt: 5_000`. | Memory + KV |
 | 4. Shared KV concurrency (physical-expiry-free) | 30 concurrent `Promise.all` reservations at identical `now` against `limit: 5, windowMs: 60_000` (under non-expiring backend clock or within the `5_000` ms retention window) admit `0 < admitted <= 5` (never `> 5`); subsequent sequential calls at the same `now` fill exactly the remaining `5 - admitted` slots; next call denied with exact `retryAt`; `kv.list` throws if ever invoked. | `MemoryRateLimitStore`, `KvRateLimitStore(MemoryKvAdapter)`, `KvRateLimitStore(DenoKvAdapter)` |
-| 5a. KV CAS exhaustion (advisory), write-free denial & TTL | Forced `{ ok: false }` on `kv.atomic` stops after `maxAttempts` reads/commits and returns **advisory fallback** `{ allowed: false, retryAt, resetAt: Math.max(lastObservedResetAt, retryAt) }` for **both** (i) absent/idle KV entry (`limit: 3, windowMs: 60_000, burst: 3, now: 100` → `{ retryAt: 20_100, resetAt: 20_100 }`) and (ii) persisted live record after 2 prior admissions (`tatMs = 40_100` → `{ retryAt: 20_100, resetAt: 40_100 }`, asserting stale persisted `40_100` rather than tentative uncommitted `60_100`); quota-exhausted denial performs `0` `kv.atomic` writes; GCRA KV writes emit `expireIn = (resetAt - now) + 5_000`; real-clock TTL eviction removes expired KV key; two store instances sharing one `kv` and serialized-disjoint `prefix` enforce one shared rolling quota. | `KvRateLimitStore(MemoryKvAdapter)` + mock wrapper |
+| 5a. KV CAS exhaustion (advisory), write-free denial & TTL | Forced `{ ok: false }` on `kv.atomic` stops after `maxAttempts` reads/commits and returns **advisory fallback** `{ allowed: false, retryAt, resetAt: Math.max(lastObservedResetAt, retryAt) }` for **both** (i) absent/idle KV entry (`limit: 3, windowMs: 60_000, burst: 3, now: 100` → `{ retryAt: 20_100, resetAt: 20_100 }`) and (ii) persisted live record after 2 prior admissions (`tatMs = 40_100` → `{ retryAt: 20_100, resetAt: 40_100 }`, asserting stale persisted `40_100` rather than tentative uncommitted `60_100`); quota-exhausted denial performs `0` `kv.atomic` writes; GCRA KV writes emit `expireIn = (resetAt - now) + 5_000`; real-clock TTL eviction removes expired KV key; two store instances sharing one `kv`, the **same serialized `prefix`**, and the **same `(limit, windowMs, burst)` policy tuple** enforce one shared rolling quota, whereas **distinct serialized prefixes** enforce independent quotas. | `KvRateLimitStore(MemoryKvAdapter)` + mock wrapper |
 | 5b. Redis confirmed-write & two-client concurrency (prerequisite: [#2648](https://github.com/rickylabs/netscript/issues/2648)) | (a) Command error inside Redis `MULTI`/`EXEC` throws and NEVER returns `{ allowed: true }`. (b) Conflicting concurrent reservations across **two separate `RedisKvAdapter` clients** (not sharing `atomicTail`) against the same key never admit `> burst` at one timestamp. (c) Prefixes that are disjoint after Redis `:` serialization isolate independent limiters even with colon-bearing keys, and each namespace enforces its own policy envelope independently during coexistence. | `KvRateLimitStore(RedisKvAdapter)` (inert transport for EXEC error + two-client Redis/Garnet fixture when Redis is in scope) |
-| 6a. Split backend-clock & request-clock fixed retention boundary | Independently controlled backend expiry clock and caller `request.now` verifying fixed retention `expireIn = (resetAt - now) + 5_000`: (a) `limit = windowMs = 60_000, burst = 1, now = 100` writes `expireIn = 5_001` — after backend `+1` ms, lagging peer at `now = 100` still reads `tat = 101` and is denied, on-time peer at `now = 101` treats the retained record as logically idle and is admitted, and after backend `+5_001` ms key is physically evicted; (b) `limit = burst = 1, windowMs = 1_000, now = 100` writes `expireIn = 6_000` — after backend `+1_000` ms, 1 ms-lagging peer at `now = 1_099` still reads `tat = 1_100` and is denied (`retryAt = 1_100, resetAt = 1_100`), on-time peer at `now = 1_100` is admitted, and after backend `+6_000` ms key is physically evicted (lag `>= 5_000` ms crosses the documented skew bound). | `KvRateLimitStore` over clock-controlled KV test wrapper |
-| 6b. Safe-time overflow oracle & Deno KV TTL-ceiling validation | **Overflow oracle (through advertised `retryAt`)** with `limit = windowMs = burst = 2` (`M = Number.MAX_SAFE_INTEGER`): (a) at `now = M - 2`: Req 1 admits (`resetAt = M - 1`), Req 2 admits (`resetAt = M`), Req 3 **throws `RangeError`** (no representable next commit instant; zero state mutation/KV write); (b) at `now = M - 3`: Req 1 admits (`M - 2`), Req 2 admits (`M - 1`), Req 3 denies cleanly (`{ allowed: false, resetAt: M - 1, retryAt: M - 2 }`), **Req 4 at advertised `retryAt = M - 2` admits cleanly** (`{ allowed: true, resetAt: M }`, KV `expireIn = 5_002`), Req 5 at `M - 2` **throws `RangeError`**; (c) `now = M` throws `RangeError` upfront. **Deno KV TTL-ceiling gate**: `windowMs = 31_535_995_000, limit = burst = 1` (`expireIn = MAX_GCRA_TTL_MS = 31_536_000_000`) commits with `ok: true` on `DenoKvAdapter(Deno.openKv(':memory:'))` and `MemoryKvAdapter`; `windowMs = 31_535_995_001` (`MAX_GCRA_TTL_MS + 1`) and `windowMs = M - 10` throw `RangeError('rateLimit retention exceeds maximum supported TTL')` **before any KV IO** in both `MemoryRateLimitStore` and `KvRateLimitStore`. **Backward clock step** under retained state never over-admits. | Pure domain + `MemoryRateLimitStore` + `KvRateLimitStore(MemoryKvAdapter)` + `KvRateLimitStore(DenoKvAdapter)` |
-| 7. Memory `maxKeys` saturation (advisory) & rotating eviction | With `maxKeys: 1`, key `"a"` admitted to `resetAt = 60_000`, new key `"b"` at `now = 1` (`limit: 2, windowMs: 60_000`) returns **advisory fallback** `{ allowed: false, retryAt: 30_001, resetAt: 60_001 }` without evicting `"a"`, and retrying `"b"` at `now = 30_001` is STILL denied while `"a"` remains live; once `now = 60_000`, rotating eviction reclaims `"a"` and admits `"b"`. | `MemoryRateLimitStore` |
-| 8. Corrupt state & cancellation | Malformed KV values (bare number, missing tag, `tatRem >= limit`, negative `tatMs`, `tatMs === Number.MAX_SAFE_INTEGER && tatRem > 0`) throw `TypeError`; invalid `policy` throws `TypeError`; aborted `AbortSignal` rejects before IO and between CAS attempts without admitting. | Memory + KV |
+| 6a. Split backend-clock & request-clock fixed retention boundary (separate observation vs renewal fixtures) | Independently controlled backend expiry clock (measured from the adapter's write TTL anchor) and caller `request.now` verifying fixed retention `expireIn = (resetAt - now) + 5_000`, using **separate fixtures** so on-time renewal never masks original-write expiry: **(i) Original-write expiry (no intervening renewing admission):** for both `(L = W = 60_000, B = 1, now = 100 → expireIn = 5_001)` and `(L = B = 1, W = 1_000, now = 100 → expireIn = 6_000)`, after backend `+1` ms / `+1_000` ms a lagging peer at `now = 100` / `1_099` still reads the retained record and is denied (`retryAt = 101` / `1_100`, `0` KV writes), and advancing backend elapsed time to `5_001` / `6_000` ms without any renewing write physically evicts the original key; **(ii) On-time logical-idle admission & TTL refresh (fresh fixture):** for both policies, after backend `+1` ms / `+1_000` ms an on-time peer at `now = 101` / `1_100` treats the retained record as logically idle, admits, and writes a fresh `expireIn = 5_001` / `6_000` ms from the new write anchor, remaining present past the original deadline and expiring at the refreshed deadline. | `KvRateLimitStore` over clock-controlled KV test wrapper |
+| 6b. Safe-time overflow oracle, Deno KV TTL-ceiling & cross-key backward step | **Overflow oracle (through advertised `retryAt`)** with `limit = windowMs = burst = 2` (`M = Number.MAX_SAFE_INTEGER`): (a) at `now = M - 2`: Req 1 admits (`resetAt = M - 1`), Req 2 admits (`resetAt = M`), Req 3 **throws `RangeError`** (no representable next commit instant; zero state mutation/KV write); (b) at `now = M - 3`: Req 1 admits (`M - 2`), Req 2 admits (`M - 1`), Req 3 denies cleanly (`{ allowed: false, resetAt: M - 1, retryAt: M - 2 }`), **Req 4 at advertised `retryAt = M - 2` admits cleanly** (`{ allowed: true, resetAt: M }`, KV `expireIn = 5_002`), Req 5 at `M - 2` **throws `RangeError`**; (c) `now = M` throws `RangeError` upfront. **Deno KV TTL-ceiling gate**: `windowMs = 31_535_995_000, limit = burst = 1` (`expireIn = MAX_GCRA_TTL_MS = 31_536_000_000`) commits with `ok: true` on `DenoKvAdapter(Deno.openKv(':memory:'))` and `MemoryKvAdapter`; `windowMs = 31_535_995_001` (`MAX_GCRA_TTL_MS + 1`) and `windowMs = M - 10` throw `RangeError('rateLimit retention exceeds maximum supported TTL')` **before any KV IO** in both `MemoryRateLimitStore` and `KvRateLimitStore`. **Cross-key backward clock step parity**: with `L = B = 1, W = 1_000`, admit key `"a"` at `now = 100`, consume key `"b"` at `now = 1_100`, then consume `"a"` at `now = 1_099` → **denied** (`retryAt = 1_100, resetAt = 1_100`) on **both** `MemoryRateLimitStore` (skew-bounded rotating scan retains `"a"` until `resetAt + 5_000 = 6_100`) and clock-controlled `KvRateLimitStore`. | Pure domain + `MemoryRateLimitStore` + `KvRateLimitStore(MemoryKvAdapter)` + `KvRateLimitStore(DenoKvAdapter)` |
+| 7. Memory `maxKeys` saturation (advisory) & skew-bounded rotating eviction | With `maxKeys: 1`, key `"a"` admitted to `resetAt = 60_000`, new key `"b"` at `now = 1` (`limit: 2, windowMs: 60_000`) returns **advisory fallback** `{ allowed: false, retryAt: 30_001, resetAt: 60_001 }` without evicting `"a"`, and retrying `"b"` at `now = 30_001` or `now = 60_000` is STILL denied while `"a"` stays within its `5_000` ms skew retention horizon; once `now = 65_000` (`resetAt + GCRA_CLOCK_SKEW_BOUND_MS`), rotating eviction reclaims `"a"` and admits `"b"`. | `MemoryRateLimitStore` |
+| 8. Corrupt state, adapter `null` distinction & cancellation | Non-null malformed KV values (bare number, missing tag, `tatRem >= limit`, negative `tatMs`, `tatMs === Number.MAX_SAFE_INTEGER && tatRem > 0`) throw `TypeError` across all KV adapters. Persisted literal `null` value: on `MemoryKvAdapter` (`entry = { value: null, versionstamp }`) throws `TypeError`; on `DenoKvAdapter` (`entry === null` per `deno-kv.adapter.ts:84–96`) fails absent-versionstamp CAS and resolves via conservative CAS contention fallback after `maxAttempts` (never admits). Invalid `policy` throws `TypeError`; aborted `AbortSignal` rejects before IO and between CAS attempts without admitting. | Memory + `MemoryKvAdapter` + `DenoKvAdapter` |
 | 9. Middleware `Retry-After` integration | Rolling quota denial sets whole-second `Retry-After` from `decision.retryAt` (rounded up at response-time `now()`); fixed-window and custom stores without `retryAt` fall back to `decision.resetAt`; CORS headers wrap `429`; unselected routes perform zero store IO. | `createService().withRateLimit()` + `createRateLimitMiddleware()` |
 | 10. Default fixed-window compatibility & zero-margin TTL regression | Existing `packages/service/tests/rate-limit_test.ts` and `rate-limit-address-key_test.ts` pass unmodified, including exact deep equality `{ allowed: false, resetAt: 5000 }` on default fixed-window stores, PLUS explicit assertion that default `{ kind: 'fixed-window' }` `KvRateLimitStore` writes pass exact zero-margin `expireIn === resetAt - request.now` (no `+ 5_000` skew margin added). | Existing test suite + `KvRateLimitStore` |
 | 11. Static, docs, quality, publish gates | Scoped `run-deno-check.ts`, `run-deno-lint.ts`, `run-deno-fmt.ts`, `deno task doc:lint --root packages/service`, `deno task docs:jsdoc-examples`, `deno task quality:gate`, and `deno publish --dry-run --allow-dirty` in `packages/service` all exit `0`. | Repository tooling |
@@ -945,9 +1006,10 @@ existing fixed-window tests passing unmodified):
    prevent skew-induced early eviction, and caps `ceil(burst * windowMs / limit) + 5_000` at
    `31_536_000_000` ms (365 days) so no accepted configuration can exceed Deno KV's adapter TTL
    limit.
-4. **No in-place mixed-policy rollout**: Because each store enforces one coherent policy, changing
-   `(limit, windowMs, burst)` during a rolling deploy requires a new serialization-disjoint KV
-   prefix, creating independent per-namespace buckets during coexistence.
+4. **No in-place mixed-policy rollout**: Because rolling quota sharing relies on a single-coherent-policy
+   caller precondition (differing tuples hit independent buckets), changing `(limit, windowMs, burst)`
+   during a rolling deploy requires a new serialization-disjoint KV prefix, creating independent
+   per-namespace buckets during coexistence.
 5. **Redis prerequisite and prefix discipline**: Shared-KV commit guarantees on `RedisKvAdapter`
    depend on [#2648](https://github.com/rickylabs/netscript/issues/2648), and Redis's unescaped `:`
    key serialization requires operators to choose prefixes that are disjoint after serialization.
@@ -966,8 +1028,8 @@ existing fixed-window tests passing unmodified):
 | **Sequence C** `[59_850, 59_950, 89_850]` (3rd at +30s) | `[T, T, F]` (strict `<= 2` in 60s) | `est + 1 <= L`: denies `89_850`, **admits at `90_000`** (3 in 30.15s) | `[T, T, T]` (paced refill after `W/L = 30s`) | `[T, T, T]` |
 | **Sequence D** `[0, 100]` then `60_050` (>60s later) | `[T, T]` → `T` (exact) | **`F` (false deny!)** until `~90_000` (previous window assumed uniform) | `[T, T]` → `T` (exact) | `[T, T]` → `T` |
 | **Max in any half-open rolling `[t, t + windowMs)` (caller timestamps)** | **`limit` (1.0× exact)** | Up to **`2 * limit - 1`** under `est + 1 <= limit` (e.g., `L = 10, W = 1_000`: 10 at `999` + 9 at `1_900` = **19** in 901 ms!) or **`2 * limit`** under `est < limit` (10 at `999` + 10 at `1_901` = **20** in 902 ms!), **plus** false denials (Sequence D) | **Upper bound `limit + burst - 1`** (`2 * limit - 1` at `burst = limit`, paced at `W / L`; `limit` at `burst = 1`; strictly lower for tiny integer windows such as `windowMs = 1, limit = burst = 3`, which admits at most `3`) | **`2 * limit`** (2× instantaneous boundary spike) |
-| **Max burst (explicit intervals)** | `limit` at `Δt = 0` and for any `Δt < windowMs` (shift-invariant) | **Single timestamp (`Δt = 0`)**: at most `limit` under either predicate. **Across epoch boundary `[W - 1, W + 1]` (`Δt = 2` ms)**: up to `limit` (`est + 1 <= limit`) or `limit + 1` (`est < limit`). **Single timestamp late in next window** (e.g. `t = 1_900`/`1_901` after `10` at `999`): up to `limit - 1` (`est + 1 <= limit`) or `limit` (`est < limit`), totaling `19` or `20` inside `< windowMs`. | **Single timestamp (`Δt = 0`)**: **`burst`** (shift-invariant). **Closed interval `[t, t + Δt]`**: up to **`burst + floor(Δt * limit / windowMs)`** in caller timestamps (and `burst + floor((Δt_real + 2ε) * limit / windowMs)` over real elapsed time under `±ε` clock error). | **`2 * limit`** across a 2 ms epoch boundary (`[W - 1, W]`) |
-| **Storage bound per key** | **O(limit)** stored timestamps per key. **Measured on `DenoKvAdapter` (`Deno.openKv(':memory:')`, Deno `2.9.7`, plain numeric epoch-ms array `number[]`)**: `5_000` and `7_000` timestamps round-trip in one value, while `8_000` and `10_000` are rejected with `TypeError: Value too large (max 65536 bytes)`. Distinct from that 64 KiB backend ceiling, linear O(limit) payloads still inflate every Redis JSON/Deno KV read/write, widen the CAS conflict window, and multiply standalone `MemoryRateLimitStore` RAM (`maxKeys × limit`, e.g., `10_000 × 5_000` numbers), requiring a much smaller **explicit product cap** (e.g., `maxLimit <= 256` or `<= 1_000`) and total-entry cap. | **O(1)** stored record — two counters + window id (1 packed key or 2 epoch keys). | **O(1) stored quota record** (fixed four-field safe-integer object, `90`–`123` bytes in Redis codec encoding, independent of `limit` and `windowMs`) and **O(1) per-key memory** (`3` numbers) in standalone `MemoryRateLimitStore`. Zero `limit`-size cliff; bounded only by the `365`-day `MAX_GCRA_TTL_MS` ceiling. (Adapter internals such as `MemoryKvAdapter`'s `expirationHeap` retain their own sweep behavior.) | **O(1)** stored fixed-window counter + external cache/coalescing state elsewhere. |
+| **Max burst (explicit intervals)** | `limit` at `Δt = 0` and for any `Δt < windowMs` (shift-invariant within safe-time representability) | **Single timestamp (`Δt = 0`)**: at most `limit` under either predicate. **Across epoch boundary `[W - 1, W + 1]` (`Δt = 2` ms, integer `W >= 2`)**: up to **`limit + floor(limit / W)`** (`est + 1 <= limit`) or **`limit + ceil(limit / W)`** (`est < limit`) — e.g. `10` / `11` for `L = 10, W = 1_000`, and **`15`** under either predicate for `L = 10, W = 2` (`10` at `1` and `5` at `3`). **Single timestamp late in next window** (e.g. `t = 1_900`/`1_901` after `10` at `999`): up to `limit - 1` (`est + 1 <= limit`) or `limit` (`est < limit`), totaling `19` or `20` inside `< windowMs`. | **Single timestamp (`Δt = 0`)**: **`burst`** (shift-invariant within safe-time representability). **Closed interval `[t, t + Δt]`**: up to **`burst + floor(Δt * limit / windowMs)`** in caller timestamps (and `burst + floor((Δt_real + 2ε) * limit / windowMs)` over real elapsed time under `±ε` clock error). | **`2 * limit`** across a 2 ms epoch boundary (`[W - 1, W]`) |
+| **Storage bound per key** | **O(limit)** stored timestamps per key. **Measured on `DenoKvAdapter` (`Deno.openKv(':memory:')`, plain numeric epoch-ms array `number[]`)**: passing samples up to `7_280` timestamps (`5_000`, `7_000`, `7_280`) round-trip in one value, while `7_300`, `8_000`, and `10_000` are rejected with `TypeError: Value too large (max 65536 bytes)`. Distinct from that 64 KiB backend ceiling, linear O(limit) payloads still inflate every Redis JSON/Deno KV read/write, widen the CAS conflict window, and multiply standalone `MemoryRateLimitStore` RAM (`maxKeys × limit`, e.g., `10_000 × 5_000` numbers), requiring a much smaller **explicit product cap** (e.g., `maxLimit <= 256` or `<= 1_000`) and total-entry cap. | **O(1)** stored record — two counters + window id (1 packed key or 2 epoch keys). | **O(1) stored quota record** (fixed four-field safe-integer object, `90`–`123` bytes in Redis codec encoding, independent of `limit` and `windowMs`) and **O(1) per-key memory** (`3` numbers) in standalone `MemoryRateLimitStore`. Zero `limit`-size cliff; bounded only by the `365`-day `MAX_GCRA_TTL_MS` ceiling. (Adapter internals such as `MemoryKvAdapter`'s `expirationHeap` retain their own sweep behavior.) | **O(1)** stored fixed-window counter + external cache/coalescing state elsewhere. |
 | **KV atomicity & contention** | Single-key `kv.get` + `kv.atomic([check], [set])` if stored as one array, **but** O(limit) read/decode/encode/write widens the CAS conflict window linearly with `limit`. Multi-key per-timestamp storage would require `kv.list()` scans (forbidden) or multi-key atomic limits. | Two-key layout requires `getMany(2)` + 2-key `AtomicCheck` (contention across window boundary and optional `getMany` fallback). Packed 1-key layout uses 1 `get` + 1-key CAS with `expireIn: 2 * windowMs`. | Single-key `kv.get` + `kv.atomic([{ key, versionstamp }], [{ type: 'set', key, value, expireIn }])`. Constant small record minimizes CAS window; zero scans; zero writes on deny; bounded `maxAttempts` (`1..32`). Redis commit confirmation conditional on [#2648](https://github.com/rickylabs/netscript/issues/2648); Redis prefixes must be disjoint after serialization. | Unchanged single-key `kv.get` + `kv.atomic` on the epoch-aligned window key (same `#2648` Redis caveat). |
 | **Memory / KV parity** | Exact parity possible **within `maxLimit`**, given single policy, confirmed commits, and skew-bounded retention. | Exact parity possible with integer cross-multiplication **if** both use identical packed 2-window state and skew-bounded retention; two-key KV can diverge if `prev` expires early. | **Exact bit-for-bit parity** via shared pure `evaluateGcra()` (including upfront `MAX_GCRA_TTL_MS` validation) across memory, `MemoryKvAdapter`, `DenoKvAdapter`, and (post-`#2648`) `RedisKvAdapter` under single policy and `Δ_gap < 5_000` ms. | Unchanged fixed-window parity; duplicate-read reduction lives outside the store. |
 | **Clock assumptions** | Epoch ms across hosts; skewed hosts can insert out-of-order timestamps (requires sorted insert); physical TTL needs skew margin; backward jump keeps retained entries conservative. | Epoch ms across hosts; still anchored to epoch boundaries so inter-host skew near `W` splits keys and distorts `w = (W + windowMs - now) / windowMs`. | Epoch ms across hosts; **no epoch boundaries to disagree on**; fixed `(resetAt - now) + 5_000` ms retention protects live TATs against any `Δ_gap < 5_000` ms independent of `windowMs / limit`, and `tat = max(storedTat, now * L)` fails conservative under skew and backward steps. | Epoch ms across hosts; skew near epoch boundary widens 2× leakage window. |
@@ -977,12 +1039,12 @@ existing fixed-window tests passing unmodified):
 
 1. **General-purpose O(1) stored record without a `limit` cliff**: `@netscript/service/rate-limit`
    is a general framework store whose contract (`RateLimitRequest`) accepts arbitrary positive safe
-   integer `limit` values. Measured on `DenoKvAdapter` (`Deno.openKv(':memory:')`, Deno `2.9.7`), a
-   plain numeric epoch-ms timestamp array round-trips at `5_000` and `7_000` entries in one Deno KV
-   value, but hits the backend's 64 KiB cap and throws `TypeError: Value too large (max 65536 bytes)`
-   at `8_000` and `10_000` entries — ruling out high-volume quotas (such as `limit: 10_000` or
-   `100_000` per hour/day) without multi-key splitting. Separate from that measured backend ceiling,
-   linear O(limit) payloads still degrade performance even at `limit: 5_000` by amplifying every
+   integer `limit` values. Measured on `DenoKvAdapter` (`Deno.openKv(':memory:')`), a plain numeric
+   epoch-ms timestamp array round-trips for passing samples `5_000`, `7_000`, and `7_280` entries in
+   one Deno KV value, and hits the backend's 64 KiB cap (`TypeError: Value too large (max 65536 bytes)`)
+   at `7_300`, `8_000`, and `10_000` entries — ruling out high-volume quotas (such as `limit: 10_000`
+   or `100_000` per hour/day) without multi-key splitting. Separate from that measured backend
+   limit, linear O(limit) payloads still degrade performance well below 64 KiB by amplifying every
    Deno KV/Redis read-encode-write payload, widening the optimistic CAS conflict window under
    concurrency, and multiplying `MemoryRateLimitStore`'s heap footprint (`maxKeys × limit`, e.g.,
    `10_000 × 5_000` numbers). A production sliding-window log therefore requires a much lower
@@ -991,10 +1053,11 @@ existing fixed-window tests passing unmodified):
    keeps the stored quota record (`4` fields, `90`–`123` bytes in Redis codec encoding) and
    standalone memory-store entry (`3` numbers) strictly O(1) for every `limit` up to
    `Number.MAX_SAFE_INTEGER`, bounded only by the `365`-day `MAX_GCRA_TTL_MS` retention ceiling.
-2. **Eliminates clock-boundary sensitivity and cliff retries**: Under a single coherent policy,
-   GCRA is 100% shift-invariant in caller timestamps, passes both issue #2653 alignment sequences
-   identically, eliminates 2× boundary spikes, and releases capacity smoothly at one slot per
-   `windowMs / limit` instead of creating synchronized thundering-herd retries at `oldest + windowMs`.
+2. **Eliminates clock-boundary sensitivity and cliff retries**: Under a single coherent policy and
+   within safe-integer representability of inputs, outputs, and next-commit instants, GCRA is
+   shift-invariant in caller timestamps, passes both issue #2653 alignment sequences identically,
+   eliminates 2× boundary spikes, and releases capacity smoothly at one slot per `windowMs / limit`
+   instead of creating synchronized thundering-herd retries at `oldest + windowMs`.
 3. **Minimal CAS footprint in shared KV**: One small read and one single-key versionstamp CAS keeps
    serialization and round-trip cost comparable to fixed windows on `DenoKvAdapter` and (once
    `#2648` lands) `RedisKvAdapter`, with no `kv.list()` scans and no multi-key coordination.
@@ -1067,11 +1130,12 @@ This RFC introduces **no breaking changes**:
 
 1. **Primary rolling algorithm — GCRA vs capped strict sliding-window log**: Should the initial
    rolling policy be GCRA (O(1) stored record per key, arbitrary safe-integer `limit` up to the
-   365-day retention ceiling, shift-invariant single-timestamp burst `<= burst`, upper bound
-   `2 * limit - 1` paced requests in one half-open `windowMs` from idle), or do protected service
-   reads require a strict `<= limit` count in every rolling `windowMs` interval even if that
-   requires O(limit) per-key storage and an explicit product cap (e.g., `maxLimit <= 256` or
-   `<= 1_000`, below Deno KV's measured `7_000`-entry single-value ceiling)?
+   365-day retention ceiling, shift-invariant single-timestamp burst `<= burst` within safe-time
+   representability, upper bound `2 * limit - 1` paced requests in one half-open `windowMs` from
+   idle), or do protected service reads require a strict `<= limit` count in every rolling
+   `windowMs` interval even if that requires O(limit) per-key storage and an explicit product cap
+   (e.g., `maxLimit <= 256` or `<= 1_000`, distinct from Deno KV's 64 KiB single-value limit where
+   `7_280` plain epoch-ms entries passed and `7_300` were rejected)?
 2. **`RateLimitDecision` retry timing surface**: Should `RateLimitDecision` add optional
    `retryAt?: number` (exact representable next commit instant on quota exhaustion, advisory on
    contention/capacity) while keeping `resetAt` as full quota recovery (recommended), or redefine
