@@ -162,7 +162,7 @@ function SecretRowValueCell({
           ? (
             <input
               {...field.getInputProps({
-                class: 'ns-kv-editor__input ns-kv-editor__input--secret',
+                class: 'ns-kv-editor__input',
                 'aria-label': `Row ${rowIndex + 1} ${valueLabel} (secret)`,
                 'data-scope': 'key-value-editor',
                 'data-part': 'value-input',
@@ -514,7 +514,7 @@ export function KeyValueEditor({
                           else keyInputRefs.current.delete(row._uid);
                         }}
                         type='text'
-                        class='ns-kv-editor__input ns-kv-editor__input--key'
+                        class='ns-kv-editor__input'
                         name={name ? keyValueFieldName(name, index, 'key') : undefined}
                         value={row.key}
                         placeholder={keyPlaceholder}
@@ -615,7 +615,7 @@ export function KeyValueEditor({
                         </button>
                         <button
                           type='button'
-                          class='ns-kv-editor__icon-btn ns-kv-editor__icon-btn--remove'
+                          class='ns-kv-editor__icon-btn'
                           aria-label={`Remove ${rowDescriptor}`}
                           disabled={disabled || rowReadOnly}
                           data-scope='key-value-editor'

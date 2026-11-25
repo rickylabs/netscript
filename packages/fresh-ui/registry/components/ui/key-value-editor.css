@@ -20,7 +20,7 @@
   & [data-part=row][data-invalid=true] { background: var(--ns-destructive-subtle); }
   & :is([data-part=empty] td,[data-part=summary],[data-part=secret-placeholder]) { color: var(--ns-muted-fg); font-size: var(--ns-text-xs); }
   & .ns-kv-editor__input { width: 100%; min-width: var(--ns-space-20); min-height: var(--ns-control-height-sm); padding: var(--ns-space-1) var(--ns-space-2); border: var(--ns-border-width) solid var(--ns-input-border); border-radius: var(--ns-radius-input); background: var(--ns-card); color: var(--ns-fg); font-size: var(--ns-text-sm); }
-  & :is(.ns-kv-editor__input--key,.ns-kv-editor__input--secret) { font-family: var(--ns-font-mono); }
+  & :is([data-part=key-input],[data-part=input]) { font-family: var(--ns-font-mono); }
   & .ns-kv-editor__input[aria-invalid=true] { border-color: var(--ns-destructive); }
   & .ns-kv-editor__input:is(:disabled,:read-only) { background: var(--ns-muted); color: var(--ns-muted-fg); border-color: var(--ns-border); }
   & [data-part=row-error] { margin: var(--ns-space-1) 0 0; font-size: var(--ns-text-xs); color: var(--ns-destructive-text); }
@@ -40,7 +40,7 @@
   & .ns-kv-editor__icon-btn[data-pressed=true] { background: var(--ns-warning-subtle); border-color: var(--ns-warning-border); color: var(--ns-warning-text); }
   & .ns-kv-editor__add { min-height: var(--ns-control-height-sm); padding: var(--ns-space-1) var(--ns-control-padding-x-sm); }
   & button:hover:not(:disabled) { background: var(--ns-hover); color: var(--ns-fg); border-color: var(--ns-border-hover); }
-  & .ns-kv-editor__icon-btn--remove:hover:not(:disabled) { background: var(--ns-destructive-subtle); border-color: var(--ns-destructive-border); color: var(--ns-destructive-text); }
+  & [data-part=remove]:hover:not(:disabled) { background: var(--ns-destructive-subtle); border-color: var(--ns-destructive-border); color: var(--ns-destructive-text); }
   & :is(input,button):focus-visible { outline: var(--ns-space-0-5) solid var(--ns-ring); outline-offset: var(--ns-space-0-5); }
   & button:disabled { opacity: 0.5; cursor: not-allowed; }
   & .ns-kv-editor__sr { position: absolute; width: var(--ns-space-px); height: var(--ns-space-px); overflow: hidden; clip-path: inset(50%); }
