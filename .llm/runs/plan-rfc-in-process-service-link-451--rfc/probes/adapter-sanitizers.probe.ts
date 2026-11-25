@@ -421,12 +421,14 @@ Deno.test('non-OTel AsyncLocalStorage and @netscript/logger contexts detach acro
   }
 });
 
-Deno.test('resolveInProcessOrigin maps distinct serviceNames to collision-free .in-process.localhost origins', () => {
+Deno.test('resolveInProcessOrigin maps distinct serviceNames (including xn-- Punycode) to collision-free .in-process.localhost origins', () => {
   const orders = resolveInProcessOrigin('orders');
   const billing = resolveInProcessOrigin('billing');
   const upperOrders = resolveInProcessOrigin('Orders');
   const underscored = resolveInProcessOrigin('orders_v2');
   const reservedPrefix = resolveInProcessOrigin('x-orders');
+  const invalidPunycode = resolveInProcessOrigin('xn--zzzz');
+  const punycodePrefix = resolveInProcessOrigin('xn--bcher-kva');
   const longName = resolveInProcessOrigin('a'.repeat(80));
 
   assertEquals(orders.origin, 'https://orders.in-process.localhost');
@@ -434,9 +436,20 @@ Deno.test('resolveInProcessOrigin maps distinct serviceNames to collision-free .
   assert(upperOrders.hostname.startsWith('x-'));
   assert(underscored.hostname.startsWith('x-'));
   assert(reservedPrefix.hostname.startsWith('x-'));
+  assert(invalidPunycode.hostname.startsWith('x-'));
+  assert(punycodePrefix.hostname.startsWith('x-'));
   assert(longName.hostname.startsWith('x-'));
 
-  const all = [orders, billing, upperOrders, underscored, reservedPrefix, longName];
+  const all = [
+    orders,
+    billing,
+    upperOrders,
+    underscored,
+    reservedPrefix,
+    invalidPunycode,
+    punycodePrefix,
+    longName,
+  ];
   const uniqueOrigins = new Set(all.map((u) => u.origin));
   assertEquals(uniqueOrigins.size, all.length);
   for (const u of all) {

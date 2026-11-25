@@ -25,12 +25,16 @@ explicitly declared parity boundaries. The in-process link reuses the SDK's sing
 transport policy, RFC 0001 contribution preparation pipeline, response-cache partitioning, and
 transport-owned W3C trace injection, varying only per-service `.in-process.localhost` origin
 derivation, epoch-pinned destination resolution, and an abort-aware, redirect-refusing,
-`AsyncLocalStorage.snapshot()`- and `ROOT_CONTEXT`-detached `app.fetch(request)` adapter housed in
-the server/host-runtime subpath `@netscript/sdk/in-process`. The default transport remains `http`,
-`SdkClientTransportDescriptor.kind` stays `'http'` with an additive optional `inProcess?: boolean`
-flag (Option B recommended), universal browser-safe SDK entrypoints add only one port type with zero
-`node:` edges, and an explicit HTTP-versus-in-process parity and edge-control suite gates
-implementation.
+composition-root `AsyncLocalStorage.snapshot()`- (never module-load) and `ROOT_CONTEXT`-detached
+`app.fetch(request)` adapter housed in the server/host-runtime subpath `@netscript/sdk/in-process`.
+The default transport remains `http`, `SdkClientTransportDescriptor.kind` stays `'http'` with an
+additive optional `inProcess?: boolean` flag (Option B recommended), universal browser-safe SDK
+entrypoints add only one port type (`ServiceClientTransport`) with zero `node:` edges, the
+`createServiceClient({ transport })` seam stays open so a future router-client transport can plug
+into the same client API without breaking callers, the shared link and adapter remain
+forward-compatible with oRPC v2 link changes, the measured ~0.2–0.4 ms per-call fetch-link overhead
+is recorded as an accepted trade-off for full HTTP-stack parity, and an explicit HTTP-versus-in-process
+parity and edge-control suite gates implementation.
 
 ## Motivation
 
@@ -49,9 +53,9 @@ verified baseline facts:
 | `createService(...).build()` returns a non-listening `ServiceApp` (`fetch` + `request`); `serve()` returns `RunningService { app, addr, stop }` exposing the same `ServiceApp` instance.                                                | Source-inspected: `packages/service/src/types.ts:20-31,46-55`; `packages/service/src/builder/service-builder-impl.ts:515-524`; `packages/service/src/builder/service-listener.ts:207-213` | One built `ServiceApp` can back both an HTTP listener and an in-process link simultaneously for exact parity verification.                                                             |
 | `@netscript/sdk` already depends on `@netscript/service` in `packages/sdk/deno.json` for leaf subpaths (`./rpc-path`, `./internal-credential`); `@netscript/service` has zero imports of `@netscript/sdk`.                                | Source-inspected: `packages/sdk/deno.json:33`; `packages/sdk/src/client/service-client.ts:8`; `packages/sdk/src/client/internal-credential-contribution.ts:11`; `packages/service/deno.json` | No circular package dependency exists, yet root `@netscript/service` imports remain forbidden for universal SDK entrypoints.                                                           |
 | Baseline `deno info --json packages/sdk/mod.ts` resolves 113 modules with 0 logger/kv/hono/`node:` edges; adding `import type { ServiceApp } from '@netscript/service'` expands to 215 modules pulling `packages/logger/`, `packages/kv/`, `hono`, and `node:*`, and exposes `Deno.Addr`. | Measured: `deno info --json` against `main` `87965d80` (Deno 2.9.7); source-inspected: `packages/service/src/types.ts:15-18`, `packages/sdk/tests/query/define-services-browser-import_test.ts:38-63,103-110` | `@netscript/sdk` must define a minimal, runtime-neutral structural port (`InProcessServiceApp`) rather than importing `ServiceApp` from `@netscript/service` root.                     |
-| `SdkClientTransportDescriptor` on `main` declares `readonly kind: 'http'`, `origin: URL`, `rpcPath: string`, `secure: boolean`; bearer and internal-credential contributions allow credentials when `transport.secure` or loopback origin holds. | Source-inspected: `packages/sdk/src/ports/sdk-client-contribution.ts:30-39`; `packages/plugin-auth-core/src/sdk/bearer-contribution.ts:87-95`; `packages/sdk/src/client/internal-credential-contribution.ts:118-129` | In-process transport reports `secure: true` with a deterministic per-service RFC 6761 `.in-process.localhost` synthetic origin (`https://<serviceName>.in-process.localhost` or `https://x-<sha256Hex32>.in-process.localhost`) as an explicit host trust decision, keeping origin-scoped contributions isolated per service while recommending non-breaking `kind: 'http'` + optional `inProcess?: boolean`. |
+| `SdkClientTransportDescriptor` on `main` declares `readonly kind: 'http'`, `origin: URL`, `rpcPath: string`, `secure: boolean`; bearer and internal-credential contributions allow credentials when `transport.secure` or loopback origin holds. | Source-inspected: `packages/sdk/src/ports/sdk-client-contribution.ts:30-39`; `packages/plugin-auth-core/src/sdk/bearer-contribution.ts:87-95`; `packages/sdk/src/client/internal-credential-contribution.ts:118-129`; measured: `new URL('https://xn--zzzz.in-process.localhost')` throws `TypeError` | In-process transport reports `secure: true` with a deterministic per-service RFC 6761 `.in-process.localhost` synthetic origin (`https://<serviceName>.in-process.localhost` excluding `x-` and Punycode `xn--`, else `https://x-<sha256Hex32>.in-process.localhost`) as an explicit host trust decision, keeping origin-scoped contributions isolated per service while recommending non-breaking `kind: 'http'` + optional `inProcess?: boolean`. |
 | Naive `app.fetch(new Request(req, init))` delivers `request.signal` abort to the mounted handler, **but does not reject the caller promise** (measured: caller resolved `{ done: true }` after abort on both cooperative and non-cooperative handlers). | Measured: parity probes against `main` `87965d80` (Deno 2.9.7, locked `@orpc/client@1.15.5`, `jsr:@hono/hono@4.13.13`)                                                               | The in-process fetch adapter must subscribe before dispatch, race `app.fetch(request)` against `signal`, fail closed on locked/disturbed bodies, release the owned reader lock and abort listener on every terminal path, and guarantee at most one `body.cancel()`. |
-| Same-process `app.fetch(request)` inherits **every** active `AsyncLocalStorage` store in the process — not only OpenTelemetry's `AsyncLocalStorageContextManager`, but also `@netscript/logger`'s LogTape `contextLocalStorage`, `plugins/auth/services`'s `authRequestStorage`, `packages/plugin-triggers-core`'s `#callbackScope`, and arbitrary application `AsyncLocalStorage` stores — across `app.fetch`, deferred `Response.body` reads/cancellations, and late cleanup callbacks. | Source-inspected: `packages/logger/config.ts:19,76`, `plugins/auth/services/src/request-context.ts:13-22`, `packages/plugin-triggers-core/src/adapters/watchers-file-watcher-adapter.ts:35-46`; measured on `main` `87965d80` (`AsyncLocalStorage.snapshot()` captured at module load detached pre- and post-load user ALS, LogTape `withContext`, and OTel spans simultaneously). | The in-process fetch adapter (housed in server/host subpath `@netscript/sdk/in-process`) must run `app.fetch(request)`, late-settlement registration, redirect body cancellation, and wrapped source `read()`/`cancel()` inside `AsyncLocalStorage.snapshot()` composed with `withContext(extractContext({}), ...)` so only explicit `Request`/`Response` state crosses the hop while keeping universal SDK entrypoints free of `node:*` imports. |
+| Same-process `app.fetch(request)` inherits **every** active `AsyncLocalStorage` store in the process — not only OpenTelemetry's `AsyncLocalStorageContextManager`, but also `@netscript/logger`'s LogTape `contextLocalStorage`, `plugins/auth/services`'s `authRequestStorage`, `packages/plugin-triggers-core`'s `#callbackScope`, and arbitrary application `AsyncLocalStorage` stores — across `app.fetch`, deferred `Response.body` reads/cancellations, and late cleanup callbacks. Moreover, calling `AsyncLocalStorage.snapshot()` at module load captures an active request's stores if the module is first loaded via lazy dynamic `import()` inside a request, leaking Request 1's stores into later requests. | Source-inspected: `packages/logger/config.ts:19,76`, `plugins/auth/services/src/request-context.ts:12`, `packages/plugin-triggers-core/src/adapters/watchers-file-watcher-adapter.ts:103`; measured on `main` `87965d80` (`snapshot-lazy-import.probe.ts`: lazy-import module-load snapshot leaked `'tenant-A-session'`, LogTape context, and Request 1's span into Request 2; composition-root capture leaked zero stores) | The in-process fetch adapter (housed in server/host subpath `@netscript/sdk/in-process`) MUST NOT capture `AsyncLocalStorage.snapshot()` at module load; it must capture once at a guaranteed composition root (with a fail-closed active-context guard via `hasActiveSpan()` + registered ALS probes) and run `app.fetch(request)`, late-settlement registration, redirect body cancellation, and wrapped source `read()`/`cancel()` inside that root snapshot composed with `withContext(extractContext({}), ...)` so only explicit `Request`/`Response` state crosses the hop while keeping universal SDK entrypoints free of `node:*` imports. |
 | Locked `@orpc/client@1.15.5` `StandardRPCLinkCodec.decode()` checks `status >= 400`, so a raw `302` empty-body redirect returned to `RPCLink` decodes as `isSuccess: true, data: null`; meanwhile `http-client-link.ts` sets no `redirect` option on HTTP `fetch` so HTTP follows `3xx` redirects. | Source-inspected: `packages/sdk/src/client/http-client-link.ts:192-197`; measured: frozen probe against `main` `87965d80` (`@orpc/client@1.15.5`)                                                                                                             | `createInProcessFetch()` must explicitly intercept WHATWG redirect statuses (`301, 302, 303, 307, 308`), cancel the body once detached, and reject without following redirects — declared explicitly as an intentional security boundary vs HTTP. |
 | On current `main`, `DedupeRequestsPlugin` in `http-client-link.ts` strips `context` (`cache: 'no-store'`, `signal`, and internal symbols) before `fetch` on `GET` and keys dedup only on wire request `(method, URL, body, headers)`. Issue [#2610](https://github.com/rickylabs/netscript/issues/2610) / PR [#2611](https://github.com/rickylabs/netscript/pull/2611) owns the `no-store`/`signal` repair. | Source-inspected: `packages/sdk/src/client/http-client-link.ts:168-177`, `packages/sdk/src/internal/transport-policy.ts:183-187`; measured: frozen probes (`hasSignal: false`, `wireCallsObserved: 1` for identical-header distinct partitions on `GET`, `handlerEntries: 2` on `POST`) | This RFC does not redesign `GET` transport or deduplication. Epoch-pinned dispatch uses an SDK-private per-epoch binding (`resolveEpoch`) paired with a per-app `WeakMap<InProcessServiceApp, ClientLinkPort>` so binding isolation is immune to both `DedupeRequestsPlugin` context stripping and retained public descriptors; shared-SDK `DedupeRequestsPlugin` partition-keying is a hard prerequisite for full identical-header `GET` parity. |
 | `RPCLink` compares full absolute URL length (`origin + rpcPath + query`) against `maxUrlLength: 2083`; `Deno.serve` passes `{ remoteAddr }` and HTTP `fetch()` synthesizes `host`/`content-length`/`user-agent`/`accept*` headers, whereas one-argument `app.fetch(req)` omits `remoteAddr` and Fetch-synthesized headers while `withBodyLimit` enforces `413` via its streaming byte counter (`body-limit.ts:116-143`). | Source-inspected: `packages/sdk/src/internal/transport-policy.ts:197`, `packages/service/src/builder/service-listener.ts:113-114`, `packages/service/src/rate-limit/middleware/rate-limit-middleware.ts:61-91`, `packages/service/src/primitives/body-limit.ts:108-143`; measured: frozen parity & edge-controls probes | All seven transport boundaries (URL-length overflow, socket peer metadata, HTTP redirect refusal, request authority & Fetch-synthesized headers, per-service origin identity, `withBodyLimit` streaming-path `413` parity, and `AbortSignal.reason` by reference) are explicitly declared and gated. |
@@ -278,15 +282,15 @@ and introduces no new package.
 | File (proposed)                                               | Visibility                                                 | Role                                                                                                                                      |
 | ------------------------------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/sdk/src/ports/service-client.ts`                    | Public (`./ports`, `./client`, `./presets`, `./in-process`, `.`) | Existing browser-safe port file (382 LOC baseline): adds ONLY `ServiceClientTransport` (`+1` type across all 4 pre-existing barrels, zero `node:*` imports, keeping `ports/` at 12 immediate children). |
-| `packages/sdk/src/internal/in-process-transport-symbol.ts`    | Package-private (browser-safe, zero `node:*` imports)      | Shared package-private symbol (`IN_PROCESS_TRANSPORT_FACTORY`) connecting `createInProcessTransport()` to `createServiceClient()` without any static or dynamic import from browser-safe `client/` into server-only `in-process/`. |
-| `packages/sdk/src/in-process/mod.ts`                          | Public (`./in-process` **server/host-runtime subpath**; **13 symbols ≤ 20 F-5 cap**, or **9 ≤ 20** without default helpers) | Focused server/host barrel (permitted `node:async_hooks` and `node:crypto`, mirroring `@netscript/logger/config.ts` and `plugins/auth/services/src/request-context.ts`; intentionally NOT re-exported on `.`, `./client`, `./presets`, or `./ports`) exporting `InProcessServiceApp`, `InProcessServiceRegistry`, `ServiceClientTransport`, `InProcessServiceError`, `InProcessServiceErrorCode`, `CreateInProcessServiceClientOptions`, `createInProcessTransport`, `createInProcessServiceClient`, `createInProcessServiceRegistry`, and (if retained) default-registry helpers. |
+| `packages/sdk/src/internal/client-transport-symbol.ts`        | Package-private (browser-safe, zero `node:*` imports)      | Shared package-private symbol (`SDK_CLIENT_TRANSPORT_FACTORY`) connecting non-HTTP transport handles (including `createInProcessTransport()` and any future router-client transport handle) to `createServiceClient()` without any static or dynamic import from browser-safe `client/` into server-only `in-process/`. |
+| `packages/sdk/src/in-process/mod.ts`                          | Public (`./in-process` **server/host-runtime subpath**; **14 symbols ≤ 20 F-5 cap**, or **10 ≤ 20** without default helpers) | Focused server/host barrel (permitted `node:async_hooks` and `node:crypto`, mirroring `@netscript/logger/config.ts` and `plugins/auth/services/src/request-context.ts`; intentionally NOT re-exported on `.`, `./client`, `./presets`, or `./ports`) exporting `InProcessServiceApp`, `InProcessServiceRegistry`, `ServiceClientTransport`, `InProcessServiceError`, `InProcessServiceErrorCode`, `CreateInProcessServiceClientOptions`, `captureInProcessRootSnapshot`, `createInProcessTransport`, `createInProcessServiceClient`, `createInProcessServiceRegistry`, and (if retained) default-registry helpers. |
 | `packages/sdk/src/in-process/registry.ts`                     | Public via `./in-process`                                  | `InProcessServiceApp`, `InProcessServiceRegistry`, `InProcessServiceError`, `createInProcessServiceRegistry()`, and default registry helpers (`register`/`unregister`/`resolve`/`clear`). |
 | `packages/sdk/src/in-process/create-client.ts`                | Public via `./in-process`                                  | `createInProcessTransport()`, `CreateInProcessServiceClientOptions`, and `createInProcessServiceClient()` delegating directly to `createServiceClient()`. |
-| `packages/sdk/src/in-process/client-link.ts`                  | Package-private (server/host subpath)                      | Captures `AsyncLocalStorage.snapshot()` at module root (`node:async_hooks`), derives deterministic per-service `.in-process.localhost` origins (`node:crypto`), and provides `createInProcessClientLink()` (SDK-private per-epoch `resolveEpoch` + per-app `WeakMap<InProcessServiceApp, ClientLinkPort>`) and `createInProcessFetch()`. |
-| `packages/sdk/src/internal/fetch-rpc-link.ts`                 | Package-private (browser-safe)                             | Shared `RPCLink` + `ClientRetryPlugin` + `DedupeRequestsPlugin` + `withSpan(RPC_CLIENT)` + `createStableV1ClientLink` builder.            |
+| `packages/sdk/src/in-process/client-link.ts`                  | Package-private (server/host subpath)                      | Never captures `AsyncLocalStorage.snapshot()` at module load; provides `captureInProcessRootSnapshot()` (`node:async_hooks` + fail-closed active-context guard via `hasActiveSpan()` and registered ALS probes), derives deterministic per-service `.in-process.localhost` origins (`node:crypto`, excluding `x-` and `xn--`), and provides `createInProcessClientLink()` (SDK-private per-epoch `resolveEpoch` + per-app `WeakMap<InProcessServiceApp, ClientLinkPort>`) and `createInProcessFetch()`. |
+| `packages/sdk/src/internal/fetch-rpc-link.ts`                 | Package-private (browser-safe)                             | Shared `RPCLink` + `ClientRetryPlugin` + `DedupeRequestsPlugin` + `withSpan(RPC_CLIENT)` + `createStableV1ClientLink` builder, with oRPC v2-compatible `(input: string \| URL \| Request, init)` header merging. |
 | `packages/sdk/src/internal/client-contributions/stable-v1-adapter.ts` | Package-private (browser-safe)                     | Adds optional package-private `resolveEpoch` hook to `StableV1ClientLinkOptions` so per-epoch app bindings stay local to `startEpoch()` and never attach to public `SdkClientTransportDescriptor`. |
 | `packages/sdk/src/client/http-client-link.ts`                 | Package-private (browser-safe)                             | Thin HTTP specialization delegating to `fetch-rpc-link.ts` with `resolveServiceUrl` and `globalThis.fetch`.                               |
-| `packages/sdk/src/client/service-client.ts`                   | Public (`./client`, `.`; browser-safe)                     | Branches on `transport.kind` (`'http'` default vs `'in-process'` via package-private `[IN_PROCESS_TRANSPORT_FACTORY]`); zero imports of `src/in-process/*` and `+0` new runtime exports on `./client` or `.`. |
+| `packages/sdk/src/client/service-client.ts`                   | Public (`./client`, `.`; browser-safe)                     | Branches on `transport.kind` (`'http'` default vs any non-`'http'` transport handle resolved via package-private `[SDK_CLIENT_TRANSPORT_FACTORY]`); keeps the `createServiceClient({ transport })` seam open for future non-Fetch transports (such as a router-client transport); zero imports of `src/in-process/*` and `+0` new runtime exports on `./client` or `.`. |
 | `packages/sdk/src/presets/define-services.ts`                 | Public (`./presets`, `.`; browser-safe)                    | Adds `transport?: ServiceClientTransport` to `DefineServiceConfig` and forwards it to `createServiceClient()`.                            |
 
 Folder cardinality and file-size check against doctrine R-FOLD-CARD and F-1
@@ -300,7 +304,7 @@ Folder cardinality and file-size check against doctrine R-FOLD-CARD and F-1
 - `packages/sdk/src/ports/` stays at 12 immediate children (`+0` children; `service-client.ts` stays
   below the 500 LOC F-1 threshold).
 - `packages/sdk/src/internal/` grows from 2 to 4 immediate children (`fetch-rpc-link.ts`,
-  `in-process-transport-symbol.ts`).
+  `client-transport-symbol.ts`).
 
 **Why `createInProcessClientLink` stays package-private:**
 `packages/sdk/tests/client-contribution-private-surface_test.ts:4-19,90-109` enforces that
@@ -399,7 +403,7 @@ export type ServiceClientTransport =
   }
   | {
     /**
-     * Dispatch RPC requests to a mounted in-process service app.
+     * Dispatch RPC requests to a mounted in-process service app via the Web Fetch link.
      * Constructed exclusively via `createInProcessTransport()` from `@netscript/sdk/in-process`.
      */
     readonly kind: 'in-process';
@@ -407,6 +411,20 @@ export type ServiceClientTransport =
     readonly mode: 'direct' | 'registry';
   };
 ```
+
+**Keeping the `createServiceClient({ transport })` seam open for future transports:**
+`ServiceClientTransport` is intentionally a closed-for-callers, SDK-extensible discriminated union
+dispatched through the package-private `[SDK_CLIENT_TRANSPORT_FACTORY]` symbol inside
+`createServiceClient()`. `createServiceClient()` MUST NOT hardcode Fetch/`RPCLink` internals into
+its public `transport` contract or prevent additive transport arms. In particular, a later
+oRPC router-client transport (proposed for Stage 2 of companion draft RFC `#2673` / `#2671`, once
+its procedure-pipeline security requirements are accepted) can plug into the exact same
+`createServiceClient({ contract, serviceName, contributions, transport })` and `defineServices()`
+API as an additive transport handle carrying `[SDK_CLIENT_TRANSPORT_FACTORY]`, preserving
+`contributionRuntimeByClient` cache partitioning, `direct-only` omission, and typed `ServiceClient`
+inference without breaking existing callers or splitting callers across unrelated client APIs.
+This RFC does not specify or authorize a router-client transport; it only keeps the transport seam
+open so future transports compose cleanly.
 
 #### Server/host in-process port, transport factory, registry, and error API (`@netscript/sdk/in-process`)
 
@@ -443,14 +461,32 @@ export interface InProcessServiceRegistry {
 }
 
 /**
+ * Capture the clean root `AsyncLocalStorage.snapshot()` at a guaranteed composition root
+ * (outside any active request scope, never at module load). Fails closed with
+ * `InProcessServiceError('IN_PROCESS_ROOT_CONTEXT_ACTIVE')` if an OpenTelemetry span or
+ * any registered framework/application ALS store is active at capture time.
+ */
+export function captureInProcessRootSnapshot(): <T>(fn: () => T) => T;
+
+/**
  * Create a frozen `ServiceClientTransport` handle for `createServiceClient()` or `defineServices()`.
- * Stamps a package-private symbol binding to `createInProcessClientLink()` so browser-safe SDK
- * entrypoints never import server runtime async-context modules (`node:async_hooks`, `node:crypto`).
+ * Stamps a package-private symbol binding (`[SDK_CLIENT_TRANSPORT_FACTORY]`) to
+ * `createInProcessClientLink()` so browser-safe SDK entrypoints never import server runtime
+ * async-context modules (`node:async_hooks`, `node:crypto`). Optionally accepts an explicit
+ * guaranteed-root `rootSnapshot` for isolated test harnesses.
  */
 export function createInProcessTransport(
   options?:
-    | { readonly app: InProcessServiceApp; readonly registry?: never }
-    | { readonly app?: never; readonly registry?: InProcessServiceRegistry },
+    | {
+      readonly app: InProcessServiceApp;
+      readonly registry?: never;
+      readonly rootSnapshot?: <T>(fn: () => T) => T;
+    }
+    | {
+      readonly app?: never;
+      readonly registry?: InProcessServiceRegistry;
+      readonly rootSnapshot?: <T>(fn: () => T) => T;
+    },
 ): ServiceClientTransport;
 
 /** Stable error codes emitted by the in-process service transport and registry. */
@@ -459,7 +495,8 @@ export type InProcessServiceErrorCode =
   | 'IN_PROCESS_SERVICE_DUPLICATE'
   | 'IN_PROCESS_SERVICE_NOT_FOUND'
   | 'IN_PROCESS_REDIRECT_UNSUPPORTED'
-  | 'IN_PROCESS_BODY_UNUSABLE';
+  | 'IN_PROCESS_BODY_UNUSABLE'
+  | 'IN_PROCESS_ROOT_CONTEXT_ACTIVE';
 
 /** Package-owned error for invalid, duplicate, missing, redirected, or unusable-body in-process calls. */
 export class InProcessServiceError extends Error {
@@ -568,6 +605,7 @@ export function createInProcessServiceClient<
 | `createInProcessTransport` called with invalid `registry`                           | Throw `TypeError` (must expose `resolve`).                                                                               |
 | `transport.kind === 'in-process'` combined with `resolveServiceUrl`                 | Throw `TypeError` (`resolveServiceUrl` applies only to HTTP transport).                                                  |
 | `transport.kind === 'http'` with unexpected `app`, `registry`, or `mode` fields     | Throw `TypeError` (avoid silently ignoring in-process bindings).                                                         |
+| `captureInProcessRootSnapshot()` or uninitialized `createInProcessTransport()` called inside an active OTel span or registered framework ALS store | Throw `InProcessServiceError` (`IN_PROCESS_ROOT_CONTEXT_ACTIVE`) without caching a contaminated snapshot. |
 
 #### Public export delta and bounded F-5 subpath budget
 
@@ -577,10 +615,10 @@ exported symbols at **`<= 20` per `mod.ts`** (or split into focused subpaths). O
 already exceed 20 symbols, while `./desktop` and `./auto-update` already establish the package's
 focused-subpath precedent (`packages/sdk/deno.json:8-9`, `packages/sdk/mod.ts:43-50`).
 
-This design places **all in-process port, transport-factory, error, registry, and convenience-factory
-exports** on one new focused server/host subpath **`@netscript/sdk/in-process`**
-(`packages/sdk/src/in-process/mod.ts` — **13 total symbols, strictly within F-5's `<= 20` cap**, or
-**9 symbols** if the 4 default process-scoped registry helpers are omitted per
+This design places **all in-process port, root-snapshot, transport-factory, error, registry, and
+convenience-factory exports** on one new focused server/host subpath **`@netscript/sdk/in-process`**
+(`packages/sdk/src/in-process/mod.ts` — **14 total symbols, strictly within F-5's `<= 20` cap**, or
+**10 symbols** if the 4 default process-scoped registry helpers are omitted per
 [Unresolved questions](#unresolved-questions) item 4), and adds ONLY the **1-type minimal JSR type
 closure** (`ServiceClientTransport`) required by `CreateServiceClientOptions.transport` and
 `DefineServiceConfig.transport` on the four pre-existing over-cap barrels (**`+0` runtime exports**
@@ -588,7 +626,7 @@ on `.`, `./client`, `./presets`, and `./ports`):
 
 | Entrypoint (`packages/sdk`)               | Measured baseline | Proposed delta | Net total | F-5 disposition                                                                                                                | Added symbols                                                                                                                                                                                    |
 | ----------------------------------------- | ----------------: | -------------: | --------: | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `./in-process` (`src/in-process/mod.ts`)  | `0` (new)         | `+13` (or `+9` without default helpers) | `13` (or `9`) | **Compliant (`<= 20`, zero F-5 debt); server/host runtime subpath**                                                            | `InProcessServiceApp`, `InProcessServiceRegistry`, `ServiceClientTransport`, `InProcessServiceError`, `InProcessServiceErrorCode`, `CreateInProcessServiceClientOptions`, `createInProcessTransport`, `createInProcessServiceClient`, `createInProcessServiceRegistry`, plus optional `registerInProcessService`, `unregisterInProcessService`, `resolveInProcessService`, `clearInProcessServices` |
+| `./in-process` (`src/in-process/mod.ts`)  | `0` (new)         | `+14` (or `+10` without default helpers) | `14` (or `10`) | **Compliant (`<= 20`, zero F-5 debt); server/host runtime subpath**                                                            | `InProcessServiceApp`, `InProcessServiceRegistry`, `ServiceClientTransport`, `InProcessServiceError`, `InProcessServiceErrorCode`, `CreateInProcessServiceClientOptions`, `captureInProcessRootSnapshot`, `createInProcessTransport`, `createInProcessServiceClient`, `createInProcessServiceRegistry`, plus optional `registerInProcessService`, `unregisterInProcessService`, `resolveInProcessService`, `clearInProcessServices` |
 | `./ports` (`src/ports/mod.ts`)            | `96`              | `+1` (type)    | `97`      | **Pre-existing over-cap barrel; bounded `+1` type-closure debt disposition required in the architecture-debt ledger**          | `ServiceClientTransport`                                                                                                                                                                         |
 | `./presets` (`src/presets/mod.ts`)        | `94`              | `+1` (type)    | `95`      | **Pre-existing over-cap barrel; bounded `+1` type-closure debt disposition required in the architecture-debt ledger**          | `ServiceClientTransport` (JSR type closure for `DefineServiceConfig.transport`)                                                                                                                  |
 | `./client` (`src/client/mod.ts`)          | `54`              | `+1` (type)    | `55`      | **Pre-existing over-cap barrel; bounded `+1` type-closure debt disposition required in the architecture-debt ledger; `+0` runtime symbols** | `ServiceClientTransport` (JSR type closure for `CreateServiceClientOptions.transport`)                                                                                                           |
@@ -597,7 +635,7 @@ on `.`, `./client`, `./presets`, and `./ports`):
 Every entrypoint total above is enforced as a hard upper bound by an automated `deno doc --frozen --json`
 export-count gate in [Acceptance Gate #4](#4-type-jsr-browser-safety-and-doctrine-gates). Whether to
 retain this bounded `./in-process` subpath plan (recommended) and whether to omit the 4 default
-process-scoped registry helpers (`9 <= 20` symbols, zero global state) is recorded in
+process-scoped registry helpers (`10 <= 20` symbols, zero global state) is recorded in
 [Unresolved questions](#unresolved-questions) item 4.
 
 ### Link mechanism and shared transport pipeline
@@ -621,18 +659,23 @@ createServiceClient(options)
   │              link: createFetchRpcClientLink({ fetch: globalThis.fetch, ...shared }),
   │              ...shared
   │            })
-  └─ transport.kind === 'in-process' (factory resolved via [IN_PROCESS_TRANSPORT_FACTORY])
-       └─ createInProcessClientLink(...)
-            └─ createStableV1ClientLink({
-                 resolveEpoch: () => {
-                   const app = boundApp ?? activeRegistry.resolve(serviceName);
-                   return {
-                     transport: resolveInProcessTransport(serviceName, rpcPath),
-                     link: getOrCreateFetchRpcLinkForApp(app),
-                   };
-                 },
-                 ...shared
-               })
+  └─ non-'http' transport handle (factory resolved via [SDK_CLIENT_TRANSPORT_FACTORY])
+       ├─ kind === 'in-process' (this RFC — Web Fetch link)
+       │    └─ createInProcessClientLink(...)
+       │         └─ createStableV1ClientLink({
+       │              resolveEpoch: () => {
+       │                const app = boundApp ?? activeRegistry.resolve(serviceName);
+       │                return {
+       │                  transport: resolveInProcessTransport(serviceName, rpcPath),
+       │                  link: getOrCreateFetchRpcLinkForApp(app),
+       │                };
+       │              },
+       │              ...shared
+       │            })
+       └─ future additive transport arm (e.g., RFC A Stage 2 router-client transport)
+            └─ supplies its own package-private ClientLinkPort through the exact same
+               [SDK_CLIENT_TRANSPORT_FACTORY] seam, reusing contribution validation and
+               contributionRuntimeByClient cache-partition registration unchanged
 ```
 
 Everything inside `createFetchRpcClientLink` is 100% shared between HTTP and in-process:
@@ -666,7 +709,11 @@ per-service RFC 6761 `.localhost` origin**:
 const FAST_PATH_LABEL_RE = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 
 function resolveInProcessOrigin(serviceName: string): URL {
-  if (FAST_PATH_LABEL_RE.test(serviceName) && !serviceName.startsWith('x-')) {
+  if (
+    FAST_PATH_LABEL_RE.test(serviceName) &&
+    !serviceName.startsWith('x-') &&
+    !serviceName.startsWith('xn--')
+  ) {
     return new URL(`https://${serviceName}.in-process.localhost`);
   }
   const digest = createHash('sha256').update(serviceName).digest('hex').slice(0, 32);
@@ -691,16 +738,21 @@ Why per-service `https://<label>.in-process.localhost` is normative:
 
 - **Per-service origin isolation:** Distinct mounted services receive distinct origins
   (`https://orders.in-process.localhost` vs `https://billing.in-process.localhost`), and
-  case-/character-distinct names (`Orders` vs `orders`, `orders_v2` vs `orders`, `x-orders`) never
-  collide because the `x-` prefix is reserved exclusively for SHA-256 encoded names. Origin-scoped
-  RFC 0001 contributions can distinguish mounted services cleanly.
+  case-/character-distinct names (`Orders` vs `orders`, `orders_v2` vs `orders`, `x-orders`,
+  `xn--zzzz`) never collide because the `x-` prefix is reserved exclusively for SHA-256 encoded
+  names. Origin-scoped RFC 0001 contributions can distinguish mounted services cleanly.
 - **RFC 6761 §6.3 `.localhost` reservation:** All subdomains of `.localhost` are reserved for
   local-only use and never resolve against external DNS.
-- **Safe for arbitrary `serviceName` values:** Every valid lowercase LDH service name (`<= 63`
-  chars, not starting with `x-`) maps to a human-readable subdomain; any uppercase, underscore,
-  dotted, `x-`-prefixed, Unicode, or `> 63`-char name maps synchronously (via `node:crypto` inside
-  server-only `@netscript/sdk/in-process`) to a 34-char RFC 1123 label `x-<32-hex>`, so `new URL(...)`
-  never throws and never silently normalizes two distinct names onto the same origin.
+- **Safe for arbitrary `serviceName` values (including invalid Punycode `xn--`):** Every valid
+  lowercase LDH service name (`<= 63` chars, not starting with `x-` or Punycode `xn--`) maps to a
+  human-readable subdomain. Excluding `xn--` alongside `x-` is required because WHATWG `URL`
+  validates IDNA/Punycode labels and throws `TypeError: Invalid URL` on malformed Punycode names
+  such as `xn--zzzz` (measured on Deno `2.9.5`: `new URL('https://xn--zzzz.in-process.localhost')`
+  throws `TypeError`). Any uppercase, underscore, dotted, `x-`-prefixed, `xn--`-prefixed, Unicode,
+  or `> 63`-char name therefore maps synchronously (via `node:crypto` inside server-only
+  `@netscript/sdk/in-process`) to a 34-char RFC 1123 label `x-<32-hex>`, so `resolveInProcessOrigin`
+  is total over arbitrary strings, never throws, and never silently normalizes two distinct names
+  onto the same origin.
 - **Confidentiality consistency:** `origin.protocol === 'https:'` agrees with `secure: true`,
   reflecting that the in-process hop does not traverse a cleartext network.
 
@@ -773,6 +825,40 @@ shipped credential contributions (`createBearerSdkClientContribution` and
      and redirects never silently decode as `null`.
    - Hosts mounting custom forwarding proxies as an `InProcessServiceApp` remain responsible for not
      forwarding synthetic-origin credentials onto cleartext remote network hops.
+
+#### Forward compatibility with oRPC v2 link changes
+
+This RFC remains on stable oRPC v1 (`@orpc/*@^1.15.5`) and does not migrate `@netscript/sdk` to
+oRPC v2. Consistent with companion draft RFC `#2674` (tracking `#2672`, oRPC v2 readiness based on
+`@orpc/*@2.0.0-beta.53`), the shared `fetch-rpc-link.ts` builder and `createInProcessFetch()` MUST
+satisfy three defensive rules so the later v2 GA cut-over requires zero public API changes and zero
+behavioral regressions:
+
+1. **Custom `fetch(url, init)` receives a URL `string` rather than a `Request`:** On current `main`,
+   `packages/sdk/src/client/http-client-link.ts:185` reads
+   `new Headers(request instanceof Request ? request.headers : undefined)`. In oRPC v2
+   (`2.0.0-beta.53`, measured in `#2674`), `RPCLink` invokes its custom `fetch` with `(url: string, init: RequestInit)`
+   and places headers on `init.headers` — so checking only `request instanceof Request` would
+   silently drop authentication, contribution, and content-type headers at runtime.
+   - `packages/sdk/src/internal/fetch-rpc-link.ts` MUST accept `input: string | URL | Request`,
+     derive `requestUrl` from `typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url`,
+     and construct `headers` by merging `input instanceof Request ? input.headers : undefined` with
+     `init?.headers` before injecting W3C `traceparent`/`tracestate`.
+   - `createInProcessFetch(app)` MUST continue accepting `(input: string | URL | Request, init?: RequestInit)`
+     via `new Request(input, init)` and reading `signal` from
+     `init && 'signal' in init ? (init.signal ?? undefined) : (input instanceof Request ? input.signal : undefined)`
+     (verified in `snapshot-lazy-import.probe.ts` with `string` URL + `init.headers`).
+2. **`RPCLink` `url` / `origin` option split:** In oRPC v2, `RPCLink` splits full-URL resolution
+   into `origin` (scheme + authority) plus a path-prefix `url`. Because this RFC already separates
+   `origin: URL` (`resolveInProcessOrigin(serviceName)`) and `rpcPath: string`
+   (`buildServiceRpcPath(...)`) on `SdkClientTransportDescriptor` and `resolveEpoch()`, adapting to
+   v2's `origin` / `url` split stays completely isolated inside package-private `fetch-rpc-link.ts`
+   with zero change to public descriptors, registries, or callers.
+3. **Explicit redirect refusal independent of `redirect: 'manual'`:** In oRPC v2, `RPCLink` no
+   longer sets `redirect: 'manual'` on outbound requests. `createInProcessFetch()` ALREADY refuses
+   WHATWG redirect statuses (`301, 302, 303, 307, 308`) with `IN_PROCESS_REDIRECT_UNSUPPORTED`;
+   implementation MUST keep this status check **unconditional and explicit** (never relying on
+   `RPCLink` supplying `redirect: 'manual'` and never toggling redirect refusal on `init?.redirect`).
 
 ### Reconciliation with RFC 0001 (client contributions and cache partitions)
 
@@ -889,40 +975,113 @@ multiple first-party `AsyncLocalStorage` carriers plus application-owned stores:
 | --- | --- | --- |
 | OpenTelemetry `AsyncLocalStorageContextManager` | `@netscript/telemetry` / `@hono/otel` (`packages/telemetry/src/hono/otel-middleware.ts:50-80`) | Parents the mounted app's SERVER span to the caller's CLIENT span even when `propagateTraceContext: false`, and leaks caller spans into deferred `Response.body` `pull()` / `cancel()` callbacks. |
 | `@netscript/logger` (LogTape `contextLocalStorage`) | `packages/logger/config.ts:19,76` (`new AsyncLocalStorage<Record<string, unknown>>()`) | Caller `withContext({ requestId, tenantId, ... })` structured log properties leak into every log record emitted by the mounted service (and into deferred body/cleanup logs). |
-| Auth request context (`authRequestStorage`) | `plugins/auth/services/src/request-context.ts:13-22` (`new AsyncLocalStorage`) | Caller service's authenticated principal / session context leaks implicitly into a callee service handling an unauthenticated or different-principal RPC call. |
-| Triggers watcher callback scope (`#callbackScope`) | `packages/plugin-triggers-core/src/adapters/watchers-file-watcher-adapter.ts:35-46` (`new AsyncLocalStorage`) | Caller watcher re-entrancy scope leaks into the mounted service. |
+| Auth request context (`authRequestStorage`) | `plugins/auth/services/src/request-context.ts:12` (`new AsyncLocalStorage`) | Caller service's authenticated principal / session context leaks implicitly into a callee service handling an unauthenticated or different-principal RPC call. |
+| Triggers watcher callback scope (`#callbackScope`) | `packages/plugin-triggers-core/src/adapters/watchers-file-watcher-adapter.ts:103` (`new AsyncLocalStorage`) | Caller watcher re-entrancy scope leaks into the mounted service. |
 | Application / user `AsyncLocalStorage` stores | Consuming apps (DB transaction scopes, unit-of-work, tenant context) | Caller ambient transaction or tenant stores leak implicitly into callee handlers and body callbacks, creating subtle bugs that vanish over HTTP. |
 
-**Normative boundary mechanism (`AsyncLocalStorage.snapshot()` + OTel `ROOT_CONTEXT`):**
+**Normative boundary mechanism (composition-root `AsyncLocalStorage.snapshot()` + OTel `ROOT_CONTEXT`):**
 
 1. **Boundary contract:** **Only** wire-explicit Web Platform `Request`/`Response` state (HTTP method,
    URL, headers — including RFC 0001 contributed headers and W3C `traceparent`/`tracestate` when
    `propagateTraceContext: true` — body bytes, and `AbortSignal`) crosses the in-process hop. Zero
    ambient `AsyncLocalStorage` state crosses from caller to mounted service.
-2. **Capture a root snapshot once at module load:** Inside the server/host-runtime module
-   `packages/sdk/src/in-process/client-link.ts`, capture:
+2. **Never capture `AsyncLocalStorage.snapshot()` at module load (lazy-import snapshot hazard):**
+   - **Measured hazard (`snapshot-lazy-import.probe.ts`, Deno `2.9.5`):** Calling
+     `const rootAsyncSnapshot = AsyncLocalStorage.snapshot()` at top-level module evaluation
+     captures whatever `AsyncLocalStorage` stores are active when the module first evaluates. When
+     `@netscript/sdk/in-process` is loaded via a lazy dynamic `import()` inside an HTTP request
+     (for example, a lazy Fresh route or on-demand plugin loader), module evaluation runs inside
+     Request 1's active async context. Measured in `snapshot-lazy-import.probe.ts`: Request 1's
+     active user ALS (`'tenant-A-session'`), `@netscript/logger` context (`{ tenant: 'tenant-A', requestId: 'req-1' }`),
+     and active OTel span were all captured into the module-load snapshot and **leaked into
+     Request 2's callee** (and even into subsequent calls outside any request).
+   - **Where and when the snapshot MUST be taken:**
+     1. **Zero module-load capture:** `packages/sdk/src/in-process/client-link.ts` MUST NOT invoke
+        `AsyncLocalStorage.snapshot()` during top-level module evaluation.
+     2. **Guaranteed composition-root capture:** Hosts MUST capture the clean root snapshot once at
+        process / composition-root startup (outside any request or `AsyncLocalStorage.run()` scope,
+        before accepting requests — e.g. at server entry or first `createService(...)` bootstrap)
+        by calling `captureInProcessRootSnapshot()`, which stores the clean snapshot in the
+        process-root slot `Symbol.for('@netscript/sdk/in-process/root-snapshot')`. Isolated tests
+        and custom harnesses may also pass an explicit `rootSnapshot` directly to
+        `createInProcessTransport({ ..., rootSnapshot })` without mutating process-root state.
+        Because the snapshot is taken before any request runs, even a later lazy dynamic `import()`
+        of `@netscript/sdk/in-process` inside Request 1 reuses the clean composition-root snapshot
+        and detaches both framework stores and arbitrary unregistered user `AsyncLocalStorage`
+        stores.
+     3. **Fail-closed capture guard:** Whenever `captureInProcessRootSnapshot()` (or first-time
+        construction of `createInProcessFetch()` when no snapshot has been captured yet) captures a
+        snapshot, it MUST first verify that no ambient request context is active:
+        - `hasActiveSpan()` from `@netscript/telemetry/context`
+          (`packages/telemetry/src/context/helpers.ts:66`) MUST be `false`; and
+        - every registered probe in the zero-dependency process guard set
+          `Symbol.for('@netscript/async-context/active-store-probes')` (where `@netscript/logger`,
+          `plugins/auth/services`, `packages/plugin-triggers-core`, and application-owned stores can
+          register `() => store.getStore() !== undefined` without introducing any `@netscript/sdk`
+          import edge onto `@netscript/logger`, `@netscript/kv`, or `plugins/*`) MUST report
+          inactive.
+        If any active store is detected, capture MUST throw
+        `InProcessServiceError('IN_PROCESS_ROOT_CONTEXT_ACTIVE')` and MUST NOT cache a contaminated
+        snapshot.
    ```ts
    import { AsyncLocalStorage } from 'node:async_hooks';
-   import { type Context, extractContext, withContext } from '@netscript/telemetry/context';
+   import {
+     type Context,
+     extractContext,
+     hasActiveSpan,
+     withContext,
+   } from '@netscript/telemetry/context';
 
-   const rootAsyncSnapshot = AsyncLocalStorage.snapshot();
+   const ROOT_SNAPSHOT_SYMBOL = Symbol.for('@netscript/sdk/in-process/root-snapshot');
+   const ACTIVE_STORE_PROBES_SYMBOL = Symbol.for('@netscript/async-context/active-store-probes');
 
-   function runDetached<T>(serviceCtx: Context, fn: () => T): T {
-     return rootAsyncSnapshot(() => withContext(serviceCtx, fn));
+   export function captureInProcessRootSnapshot(): <T>(fn: () => T) => T {
+     const host = globalThis as Record<symbol, unknown>;
+     const existing = host[ROOT_SNAPSHOT_SYMBOL] as (<T>(fn: () => T) => T) | undefined;
+     if (existing) return existing;
+
+     const active: string[] = [];
+     if (hasActiveSpan()) active.push('otel.activeSpan');
+     const probes = host[ACTIVE_STORE_PROBES_SYMBOL] as
+       | Set<{ readonly name: string; readonly isActive: () => boolean }>
+       | undefined;
+     if (probes) {
+       for (const probe of probes) {
+         if (probe.isActive()) active.push(probe.name);
+       }
+     }
+     if (active.length > 0) {
+       throw new InProcessServiceError(
+         'IN_PROCESS_ROOT_CONTEXT_ACTIVE',
+         `Refused to capture in-process root snapshot inside active async context (${active.join(', ')}).`,
+       );
+     }
+     const snapshot = AsyncLocalStorage.snapshot() as <T>(fn: () => T) => T;
+     host[ROOT_SNAPSHOT_SYMBOL] = snapshot;
+     return snapshot;
+   }
+
+   function runDetached<T>(
+     snapshot: <TResult>(fn: () => TResult) => TResult,
+     serviceCtx: Context,
+     fn: () => T,
+   ): T {
+     return snapshot(() => withContext(serviceCtx, fn));
    }
    ```
-   - Empirically verified on `main` (`87965d80`, Deno 2.9.7): `AsyncLocalStorage.snapshot()` captured
-     at module load (outside any request scope) detaches **every** `AsyncLocalStorage` instance in
-     the process simultaneously — including OTel's `AsyncLocalStorageContextManager`,
-     `@netscript/logger`'s LogTape `contextLocalStorage`, `authRequestStorage`, and user
-     `AsyncLocalStorage` instances instantiated **before or after** module load.
-   - Composing `rootAsyncSnapshot` with `withContext(extractContext({}), ...)` (`ROOT_CONTEXT` via
-     existing `@netscript/telemetry/context` exports at `packages/telemetry/src/context/w3c.ts:201-202`
-     and `packages/telemetry/src/context/helpers.ts:37-39`, zero direct `@opentelemetry/api` imports
-     in `@netscript/sdk`, zero changes to `@netscript/telemetry`) additionally guarantees OpenTelemetry
+   - Empirically verified on `main` (`87965d80`, Deno `2.9.5` & `2.9.7`): once captured at a clean
+     composition root, `snapshot` detaches **every** `AsyncLocalStorage` instance in the process
+     simultaneously — including OTel's `AsyncLocalStorageContextManager`, `@netscript/logger`'s
+     LogTape `contextLocalStorage`, `authRequestStorage`, and user `AsyncLocalStorage` instances
+     instantiated **before or after** capture — even when the adapter module is subsequently
+     evaluated via lazy dynamic `import()` inside an active request (`snapshot-lazy-import.probe.ts`).
+   - Composing `snapshot` with `withContext(extractContext({}), ...)` (`ROOT_CONTEXT` via existing
+     `@netscript/telemetry/context` exports at `packages/telemetry/src/context/w3c.ts:201-202` and
+     `packages/telemetry/src/context/helpers.ts:37-39`, zero direct `@opentelemetry/api` imports in
+     `@netscript/sdk`, zero changes to `@netscript/telemetry`) additionally guarantees OpenTelemetry
      detachment even if a host installs a custom non-ALS OTel `ContextManager`.
 3. **Full-lifecycle coverage (all 4 sites):** Every in-process call MUST run all four of the
-   following through `runDetached(serviceCtx, ...)`:
+   following through `runDetached(snapshot, serviceCtx, ...)`:
    1. invoking `app.fetch(request)`;
    2. registering the single `dispatch.then(...)` settlement callback and `signal.addEventListener`
       (so late cleanup never captures or retains any caller ALS store and runs `cancelLateBodyOnce`
@@ -936,12 +1095,13 @@ multiple first-party `AsyncLocalStorage` carriers plus application-owned stores:
      `@netscript/logger/config.ts` and `plugins/auth/services/src/request-context.ts`).
    - Browser-safe entrypoints (`packages/sdk/mod.ts`, `src/presets/mod.ts`, `src/client/mod.ts`,
      `src/ports/mod.ts`) NEVER import `src/in-process/*`, `node:async_hooks`, or `node:crypto`:
-     `createInProcessTransport()` attaches a package-private symbol (`IN_PROCESS_TRANSPORT_FACTORY`)
+     `createInProcessTransport()` attaches a package-private symbol (`SDK_CLIENT_TRANSPORT_FACTORY`)
      consumed dynamically by `createServiceClient()`. Consequently, `define-services-browser-import_test.ts`
      remains 100% green with **0 `/packages/kv/`, 0 `/packages/logger/`, and 0 `node:` edges** on
      all universal entrypoints, while every in-process call unconditionally enforces
-     `AsyncLocalStorage.snapshot()` detachment with zero runtime feature-detection gaps.
-5. **Measured results with positive caller controls (`main` `87965d80`):**
+     composition-root `AsyncLocalStorage.snapshot()` detachment with zero runtime feature-detection
+     gaps.
+5. **Measured results with positive caller controls & lazy-import probe (`main` `87965d80`):**
    - With `propagateTraceContext: true`: `@hono/otel` extracts the parent exclusively from W3C
      `traceparent`/`tracestate` HTTP headers (`serverSpan.parentSpanId === rpcClientSpan.spanId`),
      while caller `@netscript/logger` properties (`{ callerOnlyField: 'caller-log-ctx', callerTenant: 'tenant-secret' }`,
@@ -952,6 +1112,14 @@ multiple first-party `AsyncLocalStorage` carriers plus application-owned stores:
      (`parentSpanId: null`, distinct `traceId`), and every callee/body/cleanup callback observes
      `trace.getSpan(context.active()) === undefined`, `{}` log properties, and `undefined` user ALS —
      exact parity with HTTP.
+   - **Lazy-import probe (`snapshot-lazy-import.probe.ts`, 4/4 passing under Deno sanitizers):**
+     (a) Negative control without the rule reproduces Request 1's `'tenant-A-session'`, LogTape
+     `{ tenant: 'tenant-A', requestId: 'req-1' }`, and `req-1` span leaking into Request 2;
+     (b) With `captureInProcessRootSnapshot()` called at composition root, a fresh dynamic
+     `import()` of the adapter inside Request 1 produces `userStore: undefined`, `otelSpan: undefined`,
+     and `{}` log properties across Request 1, Request 2, and Request 3;
+     (c) Without composition-root capture, attempting capture or transport creation inside an active
+     OTel span or registered framework ALS probe fails closed with `IN_PROCESS_ROOT_CONTEXT_ACTIVE`.
 
 ### Denial, error, and middleware parity
 
@@ -1144,17 +1312,33 @@ pending dispatch, and unfinished response-body consumption with a single cleanup
 
 ```ts
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { type Context, extractContext, withContext } from '@netscript/telemetry/context';
+import {
+  type Context,
+  extractContext,
+  hasActiveSpan,
+  withContext,
+} from '@netscript/telemetry/context';
 
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
+const ROOT_SNAPSHOT_SYMBOL = Symbol.for('@netscript/sdk/in-process/root-snapshot');
+const ACTIVE_STORE_PROBES_SYMBOL = Symbol.for('@netscript/async-context/active-store-probes');
 
-// Captured once at module load outside any request scope so every in-process
-// hop detaches ALL AsyncLocalStorage stores in the process (OTel, @netscript/logger,
-// auth request storage, trigger scopes, and user ALS stores).
-const rootAsyncSnapshot = AsyncLocalStorage.snapshot();
+type RootAsyncSnapshot = <T>(fn: () => T) => T;
 
-function runDetached<T>(serviceCtx: Context, fn: () => T): T {
-  return rootAsyncSnapshot(() => withContext(serviceCtx, fn));
+// Never capture AsyncLocalStorage.snapshot() at module load. Resolve the
+// composition-root snapshot captured via captureInProcessRootSnapshot(),
+// an explicit test-supplied rootSnapshot, or fail closed if called inside
+// an active request context.
+function resolveRootAsyncSnapshot(explicit?: RootAsyncSnapshot): RootAsyncSnapshot {
+  if (explicit) return explicit;
+  const existing = (globalThis as Record<symbol, unknown>)[ROOT_SNAPSHOT_SYMBOL] as
+    | RootAsyncSnapshot
+    | undefined;
+  return existing ?? captureInProcessRootSnapshot();
+}
+
+function runDetached<T>(snapshot: RootAsyncSnapshot, serviceCtx: Context, fn: () => T): T {
+  return snapshot(() => withContext(serviceCtx, fn));
 }
 
 function abortReason(signal: AbortSignal): unknown {
@@ -1172,10 +1356,11 @@ function releaseReaderSafely(reader: ReadableStreamDefaultReader<Uint8Array>): v
 function cancelUnownedBodyInContext(
   body: ReadableStream<Uint8Array> | null,
   reason: unknown,
+  snapshot: RootAsyncSnapshot,
   serviceCtx: Context,
 ): void {
   if (body === null || body.locked) return;
-  runDetached(serviceCtx, () => {
+  runDetached(snapshot, serviceCtx, () => {
     try {
       void body.cancel(reason).catch(() => {});
     } catch {
@@ -1187,10 +1372,12 @@ function cancelUnownedBodyInContext(
 function rejectIfRedirect(
   response: Response,
   serviceName: string,
+  snapshot: RootAsyncSnapshot,
   serviceCtx: Context,
 ): Response {
+  // Explicit, unconditional redirect refusal (never depends on RPCLink redirect: 'manual').
   if (REDIRECT_STATUSES.has(response.status)) {
-    cancelUnownedBodyInContext(response.body, undefined, serviceCtx);
+    cancelUnownedBodyInContext(response.body, undefined, snapshot, serviceCtx);
     throw new InProcessServiceError(
       'IN_PROCESS_REDIRECT_UNSUPPORTED',
       `In-process service "${serviceName}" returned HTTP ${response.status} redirect; redirects are not followed in-process.`,
@@ -1203,6 +1390,7 @@ function rejectIfRedirect(
 function wrapInProcessResponse(
   response: Response,
   serviceName: string,
+  snapshot: RootAsyncSnapshot,
   serviceCtx: Context,
   signal?: AbortSignal,
 ): Response {
@@ -1230,7 +1418,7 @@ function wrapInProcessResponse(
       return Promise.resolve();
     }
     cancelSent = true;
-    return runDetached(serviceCtx, () => {
+    return runDetached(snapshot, serviceCtx, () => {
       try {
         return reader.cancel(reason).catch(() => {});
       } finally {
@@ -1258,7 +1446,7 @@ function wrapInProcessResponse(
     start(controller) {
       streamController = controller;
       if (signal) {
-        runDetached(serviceCtx, () => {
+        runDetached(snapshot, serviceCtx, () => {
           signal.addEventListener('abort', onBodyAbort, { once: true });
         });
         if (signal.aborted) {
@@ -1272,7 +1460,7 @@ function wrapInProcessResponse(
         return;
       }
       try {
-        const { done, value } = await runDetached(serviceCtx, () => reader.read());
+        const { done, value } = await runDetached(snapshot, serviceCtx, () => reader.read());
         if (terminal) {
           releaseReaderSafely(reader);
           return;
@@ -1310,7 +1498,10 @@ function wrapInProcessResponse(
 function createInProcessFetch(
   app: InProcessServiceApp,
   serviceName: string,
+  rootSnapshot?: RootAsyncSnapshot,
 ): typeof globalThis.fetch {
+  const snapshot = resolveRootAsyncSnapshot(rootSnapshot);
+
   return (input, init) => {
     const signal = init && 'signal' in init
       ? (init.signal ?? undefined)
@@ -1325,11 +1516,12 @@ function createInProcessFetch(
     if (signal === undefined) {
       try {
         const request = new Request(input, init);
-        return runDetached(serviceCtx, () =>
+        return runDetached(snapshot, serviceCtx, () =>
           Promise.resolve(app.fetch(request)).then((response) =>
             wrapInProcessResponse(
-              rejectIfRedirect(response, serviceName, serviceCtx),
+              rejectIfRedirect(response, serviceName, snapshot, serviceCtx),
               serviceName,
+              snapshot,
               serviceCtx,
             )
           ));
@@ -1345,7 +1537,7 @@ function createInProcessFetch(
       const cancelLateBodyOnce = (response: Response, reason: unknown): void => {
         if (lateBodyCancelled) return;
         lateBodyCancelled = true;
-        cancelUnownedBodyInContext(response.body, reason, serviceCtx);
+        cancelUnownedBodyInContext(response.body, reason, snapshot, serviceCtx);
       };
 
       const onAbort = (): void => {
@@ -1356,14 +1548,14 @@ function createInProcessFetch(
 
       // Subscribe BEFORE constructing Request or invoking app.fetch so a
       // synchronous abort triggered during setup is never missed.
-      runDetached(serviceCtx, () => {
+      runDetached(snapshot, serviceCtx, () => {
         signal.addEventListener('abort', onAbort, { once: true });
       });
 
       let dispatch: Promise<Response>;
       try {
         const request = new Request(input, init);
-        dispatch = runDetached(serviceCtx, () => Promise.resolve(app.fetch(request)));
+        dispatch = runDetached(snapshot, serviceCtx, () => Promise.resolve(app.fetch(request)));
       } catch (error) {
         if (!settled) {
           settled = true;
@@ -1373,10 +1565,10 @@ function createInProcessFetch(
         return;
       }
 
-      // Register the single settlement path inside the detached snapshot +
+      // Register the single settlement path inside the composition-root snapshot +
       // ROOT_CONTEXT so late cleanup never captures or executes under any
       // caller AsyncLocalStorage store.
-      runDetached(serviceCtx, () => {
+      runDetached(snapshot, serviceCtx, () => {
         dispatch.then(
           (response) => {
             if (settled || signal.aborted) {
@@ -1394,8 +1586,9 @@ function createInProcessFetch(
             try {
               resolve(
                 wrapInProcessResponse(
-                  rejectIfRedirect(response, serviceName, serviceCtx),
+                  rejectIfRedirect(response, serviceName, snapshot, serviceCtx),
                   serviceName,
+                  snapshot,
                   serviceCtx,
                   signal,
                 ),
@@ -1548,6 +1741,15 @@ Assert exact HTTP ↔ in-process parity across every case:
      streaming `pull()` / post-headers `abort cancel` / `late-body cancel`). Assert callee log
      records carry `{}` (zero caller fields) and `userAls.getStore() === undefined` across every
      callback on both transports.
+   - **Lazy-import snapshot hazard & fail-closed guard gate (`snapshot-lazy-import.probe.ts`):**
+     (a) Assert that capturing at composition root via `captureInProcessRootSnapshot()` before
+     Request 1 guarantees zero cross-request leakage (`userAls.getStore() === undefined`,
+     `logProperties === {}`, `otelSpan === undefined`) across Request 1, Request 2, and Request 3
+     even when `@netscript/sdk/in-process` is dynamically imported inside Request 1 while active
+     user ALS, LogTape, and OTel spans are live; and (b) assert that attempting uninitialized
+     capture or transport creation inside an active OTel span or active registered framework ALS
+     store throws `InProcessServiceError('IN_PROCESS_ROOT_CONTEXT_ACTIVE')` without caching a
+     poisoned snapshot.
 4. **Cache isolation and cross-partition non-sharing gate:**
    - Calling through `defineServices()` / `createQueryFactory()` backed by `CacheQuery(new MemoryCacheStore())`
      populates distinct `$netscript.sdk-context` keys for context A and context B; neither transport
@@ -1607,8 +1809,9 @@ Assert exact HTTP ↔ in-process parity across every case:
 - **Trusted in-process credential delivery & per-service origin isolation:**
   - Both `createBearerSdkClientContribution` and `createInternalCredentialSdkClientContribution`
     succeed on an explicitly trusted in-process mount without `allowInsecureTransport`.
-  - Distinct mounted service names (`echo`, `billing`, `echo_v2`, `Orders`, `x-echo`, and a `> 63`-char
-    name) receive distinct, valid `https://*.in-process.localhost` origins (each label `<= 63` chars),
+  - Distinct mounted service names (`echo`, `billing`, `echo_v2`, `Orders`, `x-echo`, invalid
+    Punycode `xn--zzzz`, `xn--bcher-kva`, and a `> 63`-char name) receive distinct, valid
+    `https://*.in-process.localhost` origins (each label `<= 63` chars, zero `TypeError: Invalid URL`),
     so an origin-scoped RFC 0001 contribution observes distinct `transport.origin` values per service.
 - **Cleartext non-loopback HTTP refusal negative control:** Both contributions refuse
   `http://api.example.test` before dispatch (`dispatched === 0`, `SdkClientContributionError`) when
@@ -1628,11 +1831,13 @@ Assert exact HTTP ↔ in-process parity across every case:
     epoch 1's headers; `app2` receives 0 calls from epoch 1); and (b) an async-iterator reconnect
     after stream drop + `{ replace: true }` starts a fresh epoch, re-resolves `app2`, re-runs
     `prepare()`, forwards `Last-Event-ID`, and yields subsequent events from `app2`.
-- **Redirect refusal control:** Mounted app returns `302 Found` with an external `Location` header
-  and a body whose `cancel()` rejects; assert the client rejects with `InProcessServiceError`
-  (`IN_PROCESS_REDIRECT_UNSUPPORTED`), does not silently resolve `null`, invokes redirect body
-  `cancel()` once (in `ROOT_CONTEXT`, zero unhandled rejection), and triggers zero
-  `globalThis.fetch` calls.
+- **Redirect refusal & oRPC v2 custom-fetch control:** Mounted app returns `302 Found` with an
+  external `Location` header and a body whose `cancel()` rejects; assert the client rejects with
+  `InProcessServiceError` (`IN_PROCESS_REDIRECT_UNSUPPORTED`), does not silently resolve `null`,
+  invokes redirect body `cancel()` once (in `ROOT_CONTEXT`, zero unhandled rejection), and triggers
+  zero `globalThis.fetch` calls — both when invoked with a `Request` (oRPC v1) and when invoked
+  with `(url: string, init)` omitting `redirect: 'manual'` (oRPC v2). Also assert `fetch-rpc-link.ts`
+  preserves headers supplied on `init.headers` when `input` is a `string` URL.
 - **Near-2083 URL-length boundary controls (method-insensitive AND method-sensitive authorizers):**
   - Choose an input payload whose serialized full URL stays `<= 2083` over the loopback HTTP origin
     (`GET`) and exceeds `2083` over `https://<serviceName>.in-process.localhost` (`POST`):
@@ -1677,7 +1882,7 @@ Assert exact HTTP ↔ in-process parity across every case:
   `createInProcessClientLink` and `createFetchRpcClientLink` in `PRIVATE_ADAPTER_NAMES` (and cover
   `./in-process`) and green.
 - **Automated F-5 per-entrypoint export-count gate (`deno doc --frozen --json`):** Assert exported
-  symbol counts satisfy `./in-process <= 20` (exact target `13`, or `9` if default helpers are
+  symbol counts satisfy `./in-process <= 20` (exact target `14`, or `10` if default helpers are
   omitted), `./ports <= 97`, `./presets <= 95`, `./client <= 55`, and `. <= 160`, with zero
   in-process runtime/error/registry helpers exported from `.` or `./client`, and with the bounded
   `+1` type-closure delta on the four pre-existing over-cap barrels recorded in the
@@ -1698,10 +1903,31 @@ Assert exact HTTP ↔ in-process parity across every case:
 
 ## Drawbacks
 
-- **Full Request/Response serialization overhead in-process:** Routing through `RPCLink` and
-  `ServiceApp.fetch(new Request(req, init))` still serializes/deserializes payloads and builds Web
-  Fetch objects in memory. That overhead is paid intentionally as the exact cost of preventing
-  HTTP/in-process semantic divergence.
+- **Measured per-call Request/Response serialization overhead (accepted trade-off):** Routing
+  through `RPCLink` and `ServiceApp.fetch(new Request(req, init))` eliminates TCP loopback sockets
+  (roughly halving loopback HTTP's `~0.47–1.0 ms` per-call latency), but still serializes and
+  deserializes payloads, allocates Web Fetch `Request`/`Response` objects, and executes Hono
+  routing and middleware in memory. Measured against locked `@orpc/*@1.15.5` (Deno `2.9.5`) using
+  the authenticating-path benchmark in companion draft RFC `#2673` (run folder
+  `.llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/probes/overhead-benchmark.probe.ts` and
+  `overhead-results.json`, plus independent warm re-runs across small unary and 100-item / 12.8 KiB
+  list payloads with full authentication, scope authorization, logical rate-limit consumption, and
+  Zod validation):
+  - **Fetch-link (this RFC):** about **0.2–0.4 ms** per call (`~212–435 µs` in independent re-runs;
+    `259.3 µs` small unary / `380.6 µs` medium list in `overhead-results.json`).
+  - **Router client on the authenticating path (RFC `#2673` prototype):** about **0.03–0.07 ms**
+    per call (`~34–72 µs` in warm independent re-runs; `~40–56 µs` with full per-call interceptors;
+    `48.1–78.7 µs` in `overhead-results.json`), saving roughly `0.17–0.3 ms` per call when using an
+    in-memory authenticator (with the ratio shrinking toward `1×` whenever real I/O authenticators
+    or database queries dominate).
+  - **Accepted trade-off:** Paying `~0.2–0.4 ms` per in-process call is explicitly accepted by this
+    RFC as the cost of reusing the entire HTTP middleware stack (authn, path/contract authz, body
+    limits, rate limits, `Set-Cookie`, raw routes, and HTTP wire error shapes) with identical
+    behavior by construction — suitable for SSR loaders, integration tests, and moderate
+    single-process fan-out. Workloads with high in-process fan-out where `0.2–0.3 ms` per call
+    matters can adopt a future router-client transport (RFC `#2673` Stage 2) through the open
+    `createServiceClient({ transport })` seam once its procedure-pipeline security design is
+    accepted.
 - **Server/host-only subpath constraint:** Because enforcing a complete `AsyncLocalStorage` boundary
   (`AsyncLocalStorage.snapshot()`) and synchronous collision-free per-service origin hashing requires
   `node:async_hooks` and `node:crypto`, `@netscript/sdk/in-process` is intentionally a server/host
@@ -1746,7 +1972,14 @@ construction, but sacrifices almost every parity guarantee:
   propagation; and
 - cannot target a built `ServiceApp` (requires raw router internals).
 
-Rejected because it violates the core HTTP transport parity requirement.
+Rejected because bare router invocation violates the core HTTP transport parity requirement.
+A security-complete procedure-pipeline router client (explored separately in companion draft RFC
+`#2673` / `#2671` to reduce per-call overhead from ~0.2–0.4 ms to ~0.03–0.07 ms on the
+authenticating path) requires moving authentication, contract authorization, and logical rate
+limiting into oRPC procedure middleware and solving additional security boundaries before it is
+safe to ship. This RFC therefore lands the HTTP-parity fetch-link independently while keeping
+`createServiceClient({ transport })` open so a later router-client transport can coexist as an
+additive transport arm rather than superseding this design.
 
 ### Alternative 2: HTTP over loopback (`http://localhost:<ephemeral-port>`)
 
@@ -1853,14 +2086,17 @@ The following technical design choices remain open before acceptance:
    package-private (parallel to `createHttpClientLink` and `client-contribution-private-surface_test.ts`)
    rather than promoting `ClientLinkPort` to a public export in this change.
 4. **Bounded `@netscript/sdk/in-process` server subpath & default process-scoped helpers (F-5 budget):**
-   Confirm placing all in-process ports, `createInProcessTransport`, errors, registry, and
-   convenience-factory exports exclusively on the server/host subpath `@netscript/sdk/in-process`
-   while limiting the four pre-existing over-cap barrels (`./ports`, `./presets`, `./client`, `.`)
-   to the `+1` minimal JSR type-closure (`ServiceClientTransport`: `97`, `95`, `55`, `160` with
-   recorded arch-debt disposition). Also confirm whether to **omit the 4 default process-scoped
-   registry helpers in v1** (reducing `@netscript/sdk/in-process` from `13` to **`9 <= 20`** symbols
-   and eliminating mutable module-level global state in favor of explicit `app` /
-   `createInProcessServiceRegistry()`) or ship them alongside isolated registries.
+   Confirm placing all in-process ports, `captureInProcessRootSnapshot`, `createInProcessTransport`,
+   errors, registry, and convenience-factory exports exclusively on the server/host subpath
+   `@netscript/sdk/in-process` while limiting the four pre-existing over-cap barrels (`./ports`,
+   `./presets`, `./client`, `.`) to the `+1` minimal JSR type-closure (`ServiceClientTransport`:
+   `97`, `95`, `55`, `160` with recorded arch-debt disposition). Also confirm whether to **omit the
+   4 default process-scoped registry helpers in v1** (reducing `@netscript/sdk/in-process` from
+   `14` to **`10 <= 20`** symbols and eliminating mutable module-level global state in favor of
+   explicit `app` / `createInProcessServiceRegistry()`) or ship them alongside isolated registries.
+   Separately, confirm whether `captureInProcessRootSnapshot()` should be invoked explicitly at host
+   entrypoints only, or also bootstrapped automatically on first `createService(...)` construction
+   outside a request scope.
 5. **Duplicate registration default:** Confirm rejecting duplicate `serviceName` registrations by
    default (`IN_PROCESS_SERVICE_DUPLICATE`) with opt-in `{ replace: true }`, versus silent overwrite.
 6. **Optional telemetry additions:**
@@ -1879,6 +2115,12 @@ The following technical design choices remain open before acceptance:
    - **Option A (wait for full `GET` + `POST` parity gate):** Hold implementation until both `#2611`
      (`GET` `no-store` / `signal` forwarding) and the shared-SDK `DedupeRequestsPlugin`
      partition-key fix have landed so both `POST` and `GET` close in one pass.
+8. **Transport seam extensibility for a future router-client transport (RFC `#2673` Stage 2):**
+   Confirm keeping `createServiceClient({ transport })` and `ServiceClientTransport` open via the
+   package-private `[SDK_CLIENT_TRANSPORT_FACTORY]` dispatch seam so a future oRPC router-client
+   transport (`#2673` / `#2671` Stage 2, once its procedure-pipeline security blockers are resolved)
+   can plug into the exact same `createServiceClient()` and `defineServices()` API without breaking
+   callers or introducing a parallel client constructor.
 
 ## Future possibilities
 
