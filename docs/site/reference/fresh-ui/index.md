@@ -305,7 +305,56 @@ and empty-state parts.
 | `SheetNamespace` / `SheetRootProps` / `SheetTriggerProps` / `SheetContentProps` / `SheetTitleProps` / `SheetDescriptionProps` / `SheetCloseProps` | type alias | Sheet | Public namespace and structural-part props. |
 | `TabsNamespace` / `TabsRootProps` / `TabsListProps` / `TabsTriggerProps` / `TabsContentProps` | type alias | Tabs | Public namespace and tab/list/content props. |
 | `TooltipNamespace` / `TooltipRootProps` / `TooltipTriggerProps` / `TooltipPositionerProps` / `TooltipContentProps` / `TooltipArrowProps` / `TooltipArrowTipProps` | type alias | Tooltip | Public namespace, positioning, content, and arrow contracts. |
+| `useSecretField` / `deriveSecretFieldState` / `deriveSecretFieldAction` / `resolveSecretHiddenValue` / `resolveSecretFieldSubmission` / `SECRET_FIELD_STATES` / `SECRET_FIELD_UNCHANGED_TOKEN` / `SECRET_FIELD_CLEAR_TOKEN` | function / const | Secret field | Write-only credential state machine, form-submit scrubbing, sentinel constants, and server-side keep/replace/clear resolver. |
+| `SecretFieldState` / `SecretFieldUnchangedMode` / `SecretFieldAction` / `SecretFieldSubmission` / `DeriveSecretFieldStateInput` / `ResolveSecretFieldOptions` / `UseSecretFieldOptions` / `UseSecretFieldReturn` / `SecretFieldInputElementProps` / `SecretFieldHiddenInputProps` / `SecretFieldButtonElementProps` | type alias / interface | Secret field | Public options, return shape, prop getters, and server submission contracts for write-only secrets. |
+| `keyValueFieldName` / `validateKeyValueRows` / `parseKeyValueFormData` / `HTTP_HEADER_NAME_PATTERN` / `KeyValueFormSubfield` / `KeyValueRowBase` / `KeyValuePlainRow` / `KeyValueSecretRow` / `KeyValueRow` / `KeyValueRowError` / `KeyValueRowErrorCode` / `KeyValueValidationOptions` / `ParseKeyValueFormDataOptions` / `KeyValueParsedRow` | function / const / type alias / interface | Key-value editor | Indexed form field naming (`${name}[${index}][key\|value\|secret\|id\|action]`), write-only discriminated row contracts, duplicate/empty/pattern validation (including RFC 9110 HTTP header token syntax), and fail-closed server `FormData` parser with per-row secret semantics. |
+| `splitChipText` / `validateEmailChip` / `evaluateChipValidation` / `normalizeChipSuggestions` / `commitChipTokens` / `ChipsInputItem` / `ChipsInputSuggestion` / `ChipsInputRejection` / `ChipValidator` / `ChipsInputInvalidBehavior` / `ChipsInputSubmitFormat` / `CommitChipTokensOptions` / `CommitChipTokensResult` | function / type alias / interface | Chips input | Delimiter/paste tokenization, per-chip validation, suggestion normalization, and commit helpers backing `ChipsInput`. |
 | `FreshUiAttributeValue` / `FreshUiChild` / `FreshUiChildren` / `FreshUiElementProps` / `FreshUiEventHandler` / `FreshUiStyle` | type alias | Shared | Framework-neutral child, attribute, event, element-prop, and style contracts shared by the interactive primitives. |
+
+### Secret field, key-value editor, and chips input registry components
+
+Install the `forms-core` collection with `netscript ui:add forms-core`, or install individual items
+one at a time (`netscript ui:add secret-field`, `netscript ui:add key-value-editor`,
+`netscript ui:add chips-input`).
+
+- **`SecretField`** renders a write-only credential input (`data-state="unset | set | rotating | invalid | readonly"`) that never displays a stored secret and exposes no reveal toggle. The native password input enforces `autocomplete="new-password"` and `spellcheck={false}`, rejects untyped `value`/`defaultValue` props fail-closed, never places a secret value in `data-*` or `aria-*` attributes, and scrubs replacement drafts after form serialization (`formdata`) or `reset`. When a stored secret is untouched, it submits `SECRET_FIELD_UNCHANGED_TOKEN` (`__ns_secret_unchanged__`) by default or omits the field when `unchangedMode="omit"`; explicit clear submits `SECRET_FIELD_CLEAR_TOKEN` (`__ns_secret_clear__`). Interpret submitted values on the server with `resolveSecretFieldSubmission(formData.get('api_key'), { hadStoredSecret, action })` and reject `{ mode: 'invalid' }` results.
+- **`KeyValueEditor`** renders an accessible key-value table with per-row write-only secret mode (backed by `useSecretField`), discriminated `KeyValuePlainRow | KeyValueSecretRow` contracts, duplicate/empty/pattern validation (`HTTP_HEADER_NAME_PATTERN` for HTTP headers), keyboard focus management on add/remove, and indexed form inputs (`${name}[${index}][key|value|secret|id|action]`). Parse submissions fail-closed on the server with `parseKeyValueFormData(formData, 'headers', { storedSecretIds })`, deriving `storedSecretIds` strictly from server-owned authorized records.
+- **`ChipsInput`** renders a wrapping multi-value input that commits tokens on `Enter`, comma, or paste-split (`[,;\r\n]+`), removes chips via `Backspace` on an empty input or `Delete`/`Backspace` on a focused chip, announces changes in a polite live region, supports per-chip validation (`validateEmailChip`), and optionally pairs with L1 `Combobox` suggestions.
+
+```ts
+import {
+  parseKeyValueFormData,
+  resolveSecretFieldSubmission,
+} from '@netscript/fresh-ui/interactive';
+
+const formData = new FormData();
+formData.set('webhook_secret', '__ns_secret_unchanged__');
+formData.set('webhook_secret_action', 'keep');
+const secretResult = resolveSecretFieldSubmission(formData.get('webhook_secret'), {
+  hadStoredSecret: true,
+  action: formData.get('webhook_secret_action'),
+});
+if (secretResult.mode === 'invalid') {
+  throw new Error(secretResult.reason);
+}
+// secretResult.mode === 'keep' -> keep existing encrypted secret unchanged
+
+// Derive storedSecretIds from server-owned records authorized for the current caller.
+const authorizedStoredSecretIds = new Set(['hdr-auth']);
+formData.set('headers[0][id]', 'hdr-auth');
+formData.set('headers[0][key]', 'Authorization');
+formData.set('headers[0][secret]', 'true');
+formData.set('headers[0][value]', '__ns_secret_unchanged__');
+formData.set('headers[0][action]', 'keep');
+const headers = parseKeyValueFormData(formData, 'headers', {
+  storedSecretIds: authorizedStoredSecretIds,
+});
+for (const row of headers) {
+  if (row.secret && row.secretSubmission?.mode === 'invalid') {
+    throw new Error(row.secretSubmission.reason);
+  }
+}
+```
 
 ## Desktop chrome
 

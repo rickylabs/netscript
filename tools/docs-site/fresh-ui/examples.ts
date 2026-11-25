@@ -13,6 +13,12 @@ const RICH_EXAMPLES: Readonly<Record<string, string>> = {
   'slider': '<C label="Discount" />',
   'calendar': '<C aria-label="Delivery date" defaultMonth="2026-11-01" />',
   'date-picker': '<C label="Delivery date" defaultMonth="2026-11-01" />',
+  'secret-field':
+    '<C name="webhook_secret" label="Webhook signing secret" hasValue helpText="Stored value is never shown; replace or clear explicitly." />',
+  'key-value-editor':
+    '<C name="headers" label="Request headers" defaultRows={[{id:"h1",key:"Accept",value:"application/json"},{id:"h2",key:"Authorization",secret:true,hasValue:true}]} />',
+  'chips-input':
+    '<C name="recipients" label="Alert recipients" defaultValue={["ops@example.com","oncall@example.com"]} suggestions={["ops@example.com","oncall@example.com","security@example.com"]} />',
   'location-marker': '<span>Current section <C /></span>',
   'navigation-menu':
     '<C label="Order navigation" items={[{id:"orders",label:"Orders",href:"#orders"}]} />',

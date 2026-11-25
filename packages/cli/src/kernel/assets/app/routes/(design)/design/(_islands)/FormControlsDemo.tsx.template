@@ -1,0 +1,51 @@
+import { ChipsInput, KeyValueEditor, SecretField } from '@app/components/ui/mod.ts';
+
+type FormControlsDemoProps = {
+  kind: 'secret-field' | 'key-value-editor' | 'chips-input';
+};
+
+export function FormControlsDemo({ kind }: FormControlsDemoProps) {
+  if (kind === 'secret-field') {
+    return (
+      <div class='ns-gallery-stack'>
+        <SecretField
+          id='gallery-secret-set'
+          name='gallery_api_key'
+          label='API signing secret'
+          hasValue
+          helpText='Stored credentials remain write-only and are never revealed.'
+        />
+        <SecretField
+          id='gallery-secret-unset'
+          name='gallery_webhook_secret'
+          label='Webhook secret'
+          placeholder='Enter new signing secret'
+        />
+      </div>
+    );
+  }
+
+  if (kind === 'key-value-editor') {
+    return (
+      <KeyValueEditor
+        id='gallery-kv-headers'
+        name='gallery_headers'
+        label='Outbound headers'
+        defaultRows={[
+          { id: 'hdr-1', key: 'Accept', value: 'application/json' },
+          { id: 'hdr-2', key: 'Authorization', secret: true, hasValue: true },
+        ]}
+      />
+    );
+  }
+
+  return (
+    <ChipsInput
+      id='gallery-chips-recipients'
+      name='gallery_recipients'
+      label='Notification recipients'
+      defaultValue={['ops@example.com', 'alerts@example.com']}
+      placeholder='Add recipient email'
+    />
+  );
+}

@@ -78,6 +78,15 @@ Deno.test('Icon renders an accessible title when provided', () => {
   assertStrictEquals(path.props.d, ICON_PATHS.search[0]);
 });
 
+Deno.test('Icon supports key-round, lock, and lock-open credential icons', () => {
+  for (const name of ['key-round', 'lock', 'lock-open'] as const) {
+    const rendered = asVNode(Icon({ name, size: 16 }));
+    assertStrictEquals(rendered.type, 'svg');
+    const children = rendered.props.children as unknown[];
+    assertStrictEquals(children.length, ICON_PATHS[name].length + 1);
+  }
+});
+
 // @ts-expect-error fill is package-token driven, not caller-overridable.
 Icon({ name: 'check', fill: 'red' });
 

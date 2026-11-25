@@ -114,3 +114,64 @@ export type {
   TooltipRootProps,
   TooltipTriggerProps,
 } from './src/runtime/tooltip/tooltip.types.ts';
+
+export { useSecretField } from './src/runtime/secret-field/use-secret-field.ts';
+export {
+  deriveSecretFieldAction,
+  deriveSecretFieldState,
+  resolveSecretFieldSubmission,
+  resolveSecretHiddenValue,
+} from './src/runtime/secret-field/secret-field.utils.ts';
+export type { DeriveSecretFieldStateInput } from './src/runtime/secret-field/secret-field.utils.ts';
+export {
+  type ResolveSecretFieldOptions,
+  SECRET_FIELD_CLEAR_TOKEN,
+  SECRET_FIELD_STATES,
+  SECRET_FIELD_UNCHANGED_TOKEN,
+  type SecretFieldAction,
+  type SecretFieldButtonElementProps,
+  type SecretFieldHiddenInputProps,
+  type SecretFieldInputElementProps,
+  type SecretFieldState,
+  type SecretFieldSubmission,
+  type SecretFieldUnchangedMode,
+  type UseSecretFieldOptions,
+  type UseSecretFieldReturn,
+} from './src/runtime/secret-field/secret-field.types.ts';
+
+export {
+  keyValueFieldName,
+  parseKeyValueFormData,
+  validateKeyValueRows,
+} from './src/runtime/key-value-editor/key-value-editor.utils.ts';
+export {
+  HTTP_HEADER_NAME_PATTERN,
+  type KeyValueFormSubfield,
+  type KeyValueParsedRow,
+  type KeyValuePlainRow,
+  type KeyValueRow,
+  type KeyValueRowBase,
+  type KeyValueRowError,
+  type KeyValueRowErrorCode,
+  type KeyValueSecretRow,
+  type KeyValueValidationOptions,
+  type ParseKeyValueFormDataOptions,
+} from './src/runtime/key-value-editor/key-value-editor.types.ts';
+
+export {
+  commitChipTokens,
+  evaluateChipValidation,
+  normalizeChipSuggestions,
+  splitChipText,
+  validateEmailChip,
+} from './src/runtime/chips-input/chips-input.utils.ts';
+export type {
+  ChipsInputInvalidBehavior,
+  ChipsInputItem,
+  ChipsInputRejection,
+  ChipsInputSubmitFormat,
+  ChipsInputSuggestion,
+  ChipValidator,
+  CommitChipTokensOptions,
+  CommitChipTokensResult,
+} from './src/runtime/chips-input/chips-input.types.ts';

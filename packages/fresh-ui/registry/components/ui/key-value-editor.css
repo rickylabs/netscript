@@ -1,0 +1,53 @@
+.ns-kv-editor {
+  display: flex;
+  flex-direction: column;
+  border: var(--ns-border-width) solid var(--ns-border);
+  border-radius: var(--ns-radius-card);
+  background: var(--ns-card);
+  color: var(--ns-fg);
+  min-width: 0;
+  overflow: hidden;
+  &[data-state=invalid] { border-color: var(--ns-destructive); }
+  &:is([data-state=readonly],[data-state=disabled]) { background: var(--ns-surface); }
+  & :is([data-part=header],[data-part=footer]) { display: flex; align-items: center; justify-content: space-between; gap: var(--ns-control-gap); padding: var(--ns-space-2) var(--ns-table-cell-padding-x); background: var(--ns-surface); }
+  & [data-part=header] { border-bottom: var(--ns-border-width) solid var(--ns-border); }
+  & [data-part=label] { font: var(--ns-weight-label) var(--ns-text-label)/var(--ns-leading-label) var(--ns-font-label); }
+  & [data-part=scroll] { overflow-x: auto; }
+  & table { width: 100%; border-collapse: collapse; }
+  & :is(th,td) { padding: var(--ns-space-1-5) var(--ns-table-cell-padding-x); border-bottom: var(--ns-border-width) solid var(--ns-table-row-rule); }
+  & th { text-align: start; border-color: var(--ns-table-head-rule); background: var(--ns-surface); color: var(--ns-muted-fg); font: var(--ns-weight-label) var(--ns-text-xs)/var(--ns-leading-snug) var(--ns-font-label); text-transform: uppercase; letter-spacing: var(--ns-tracking-label); }
+  & td { vertical-align: top; }
+  & [data-part=row][data-invalid=true] { background: var(--ns-destructive-subtle); }
+  & :is([data-part=empty] td,[data-part=summary],[data-part=secret-placeholder]) { color: var(--ns-muted-fg); font-size: var(--ns-text-xs); }
+  & .ns-kv-editor__input { width: 100%; min-width: var(--ns-space-20); min-height: var(--ns-control-height-sm); padding: var(--ns-space-1) var(--ns-space-2); border: var(--ns-border-width) solid var(--ns-input-border); border-radius: var(--ns-radius-input); background: var(--ns-card); color: var(--ns-fg); font-size: var(--ns-text-sm); }
+  & :is([data-part=key-input],[data-part=input]) { font-family: var(--ns-font-mono); }
+  & .ns-kv-editor__input[aria-invalid=true] { border-color: var(--ns-destructive); }
+  & .ns-kv-editor__input:is(:disabled,:read-only) { background: var(--ns-muted); color: var(--ns-muted-fg); border-color: var(--ns-border); }
+  & [data-part=row-error] { margin: var(--ns-space-1) 0 0; font-size: var(--ns-text-xs); color: var(--ns-destructive-text); }
+  & [data-part=secret-value] { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ns-space-1-5); min-height: var(--ns-control-height-sm); }
+  & .ns-kv-editor__secret-main { flex: 1; min-width: var(--ns-space-20); display: flex; align-items: center; }
+  & [data-part=secret-mask] { width: var(--ns-space-20); height: var(--ns-space-2); color: var(--ns-muted-fg); background: radial-gradient(circle,currentColor var(--ns-space-0-5),transparent var(--ns-space-0-5)) left/var(--ns-space-2) var(--ns-space-2) repeat-x; }
+  & :is([data-part=secret-status],button) { display: inline-flex; align-items: center; justify-content: center; gap: var(--ns-space-1); border: var(--ns-border-width) solid var(--ns-border); font: var(--ns-weight-label) var(--ns-text-xs)/var(--ns-leading-snug) var(--ns-font-label); white-space: nowrap; }
+  & [data-part=secret-status] { padding: var(--ns-space-0-5) var(--ns-badge-padding-x); border-radius: var(--ns-radius-badge); background: var(--ns-muted); color: var(--ns-muted-fg); }
+  & [data-part=secret-status][data-secret-state=set] { background: var(--ns-success-subtle); border-color: var(--ns-success-border); color: var(--ns-fg); }
+  & [data-part=secret-status][data-secret-state=rotating] { background: var(--ns-warning-subtle); border-color: var(--ns-warning-border); color: var(--ns-fg); }
+  & [data-part=secret-status][data-secret-state=invalid] { background: var(--ns-destructive-subtle); border-color: var(--ns-destructive-border); color: var(--ns-destructive-text); }
+  & .ns-kv-editor__status-dot { width: var(--ns-space-1-5); height: var(--ns-space-1-5); border-radius: var(--ns-radius-full); background: currentColor; }
+  & [data-part=secret-status][data-secret-state=set] .ns-kv-editor__status-dot { background: var(--ns-success); }
+  & [data-part=secret-status][data-secret-state=rotating] .ns-kv-editor__status-dot { background: var(--ns-warning); }
+  & :is(.ns-kv-editor__secret-actions,.ns-kv-editor__row-actions) { display: inline-flex; align-items: center; gap: var(--ns-space-1); }
+  & button { border-radius: var(--ns-radius-control); background: var(--ns-card); color: var(--ns-fg); cursor: pointer; }
+  & .ns-kv-editor__mini-btn { min-height: var(--ns-control-height-xs); padding: var(--ns-space-0-5) var(--ns-space-1-5); }
+  & .ns-kv-editor__icon-btn { width: var(--ns-control-height-sm); height: var(--ns-control-height-sm); color: var(--ns-muted-fg); }
+  & .ns-kv-editor__icon-btn[data-pressed=true] { background: var(--ns-warning-subtle); border-color: var(--ns-warning-border); color: var(--ns-fg); }
+  & .ns-kv-editor__add { min-height: var(--ns-control-height-sm); padding: var(--ns-space-1) var(--ns-control-padding-x-sm); }
+  & button:hover:not(:disabled) { background: var(--ns-hover); color: var(--ns-fg); border-color: var(--ns-border-hover); }
+  & [data-part=remove]:hover:not(:disabled) { background: var(--ns-destructive-subtle); border-color: var(--ns-destructive-border); color: var(--ns-destructive-text); }
+  & :is(input,button):focus-visible { outline: var(--ns-space-0-5) solid var(--ns-ring); outline-offset: var(--ns-space-0-5); }
+  & button:disabled { background: var(--ns-muted); color: var(--ns-muted-fg); border-color: var(--ns-border); cursor: not-allowed; }
+  & .ns-kv-editor__sr { position: absolute; width: var(--ns-space-px); height: var(--ns-space-px); overflow: hidden; clip-path: inset(50%); }
+}
+:root[data-theme]:not([data-theme=ns-one]):not([data-theme=light]):not([data-theme=dark]) .ns-kv-editor {
+  & [data-part=secret-status][data-secret-state=set] { color: var(--ns-success-text); }
+  & :is([data-part=secret-status][data-secret-state=rotating],.ns-kv-editor__icon-btn[data-pressed=true]) { color: var(--ns-warning-text); }
+}

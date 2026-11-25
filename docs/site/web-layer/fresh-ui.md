@@ -197,6 +197,28 @@ Copied components are yours, so they get no automatic upstream updates. Re-runni
 customization in your own components. Run <code>netscript ui:add --help</code> for the full options.
 {{ /comp }}
 
+### Write-only secrets, key-value maps, and chips
+
+For operational settings forms that handle credentials, headers, or recipient lists, install the
+`forms-core` collection (`netscript ui:add forms-core`) or add each item individually
+(`netscript ui:add secret-field`, `netscript ui:add key-value-editor`,
+`netscript ui:add chips-input`):
+
+- **Keep stored secrets write-only.** Never serialize stored secret values into HTML, JSON props, or
+  browser state. Pass only a boolean `hasValue` flag to `SecretField` (or a secret row in
+  `KeyValueEditor`). The component never reveals stored values and submits a new value only when the
+  user explicitly replaces it; untouched secrets send `SECRET_FIELD_UNCHANGED_TOKEN`
+  (`__ns_secret_unchanged__`) or omit the field (`unchangedMode="omit"`), and explicit clears send
+  `SECRET_FIELD_CLEAR_TOKEN` (`__ns_secret_clear__`).
+- **Resolve submissions fail-closed on the server.** Use `resolveSecretFieldSubmission` and
+  `parseKeyValueFormData` from `@netscript/fresh-ui/interactive` inside your route handler so
+  `mode === 'keep'` preserves the existing encrypted credential, `mode === 'replace'` writes the new
+  value, `mode === 'clear'` removes it, and `mode === 'invalid'` rejects conflicting or malformed
+  payloads with HTTP 400. Always derive `storedSecretIds` from server-owned authorized records and
+  verify ownership of any submitted row `id` before mutating. See
+  [Build a server-validated form](/web-layer/how-to/build-a-server-validated-form/#keep-stored-secrets-write-only)
+  and the [`@netscript/fresh-ui` reference](/reference/fresh-ui/).
+
 ## Scope
 
 The dashboard is a working, contract-wired showcase, not a finished product UI. It ships the `users`

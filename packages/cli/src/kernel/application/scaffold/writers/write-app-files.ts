@@ -79,6 +79,7 @@ export async function writeNormalizedAppFiles(
     appDesignCompositionViewTemplate,
     appDesignCssTemplate,
     appDesignFloatingSurfaceDemoTemplate,
+    appDesignFormControlsDemoTemplate,
     appDesignIndexRouteTemplate,
     appDesignLayoutTemplate,
     appDesignMiddlewareTemplate,
@@ -223,7 +224,15 @@ export async function writeNormalizedAppFiles(
   );
   const uiInstall = await installUiRegistryItems({
     projectRoot: appDir,
-    names: [...DEFAULT_UI_INIT_ITEMS, 'command-palette', 'chart-block', 'donut'],
+    names: [
+      ...DEFAULT_UI_INIT_ITEMS,
+      'command-palette',
+      'chart-block',
+      'donut',
+      'secret-field',
+      'key-value-editor',
+      'chips-input',
+    ],
     theme: UI_DEFAULT_THEME,
     overwrite: true,
   }, { fs: context.fs });
@@ -259,6 +268,10 @@ export async function writeNormalizedAppFiles(
   await write(
     join(designIslandsDir, 'FloatingSurfaceDemo.tsx'),
     appDesignFloatingSurfaceDemoTemplate,
+  );
+  await write(
+    join(designIslandsDir, 'FormControlsDemo.tsx'),
+    appDesignFormControlsDemoTemplate,
   );
   await write(
     join(designIslandsDir, 'TokenClipboard.tsx'),

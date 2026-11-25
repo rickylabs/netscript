@@ -36,6 +36,7 @@ const APP_TEMPLATE_URLS: TemplateUrlMap = {
   appDesignMiddlewareTemplate: TEMPLATE_KEYS.appRoutesDesignMiddleware,
   appDesignRegistryTemplate: TEMPLATE_KEYS.appRoutesDesignSharedRegistry,
   appDesignFloatingSurfaceDemoTemplate: TEMPLATE_KEYS.appRoutesDesignIslandsFloatingSurfaceDemo,
+  appDesignFormControlsDemoTemplate: TEMPLATE_KEYS.appRoutesDesignIslandsFormControlsDemo,
   appDesignTokenClipboardTemplate: TEMPLATE_KEYS.appRoutesDesignIslandsTokenClipboard,
   appDesignThemeTemplate: TEMPLATE_KEYS.appRoutesDesignSharedTheme,
   appDesignTokensLibTemplate: TEMPLATE_KEYS.appRoutesDesignSharedTokens,

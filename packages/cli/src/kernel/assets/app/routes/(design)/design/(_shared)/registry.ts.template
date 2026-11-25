@@ -28,7 +28,7 @@ export const registryMeta = {
   'name': 'fresh-ui-foundation',
   'version': '0.1.0',
   'packageName': '@netscript/fresh-ui',
-  'total': 114,
+  'total': 117,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -765,6 +765,27 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     'layer': 2,
     'description': 'Manual native scroll-snap carousel with stable-focus boundary controls.',
   },
+  {
+    'name': 'secret-field',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'Write-only credential input that never reveals stored values and emits an explicit keep, replace, or clear form contract.',
+  },
+  {
+    'name': 'key-value-editor',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'Accessible key-value table editor with per-row write-only secret mode, duplicate and pattern validation, and indexed form submission.',
+  },
+  {
+    'name': 'chips-input',
+    'kind': 'component',
+    'layer': 2,
+    'description':
+      'Wrapping multi-value token input with delimiter and paste splitting, per-chip validation, and optional Combobox suggestions.',
+  },
 ];
 
 export const registryCollections: readonly RegistryCatalogCollection[] = [
@@ -858,6 +879,9 @@ export const registryCollections: readonly RegistryCatalogCollection[] = [
       'slider',
       'calendar',
       'date-picker',
+      'secret-field',
+      'key-value-editor',
+      'chips-input',
     ],
   },
   {

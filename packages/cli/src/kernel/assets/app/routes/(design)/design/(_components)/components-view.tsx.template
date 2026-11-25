@@ -44,6 +44,7 @@ import {
 } from '../(_shared)/registry.ts';
 import { tokenManifestMeta } from '../(_shared)/tokens.ts';
 import { FloatingSurfaceDemo } from '../(_islands)/FloatingSurfaceDemo.tsx';
+import { FormControlsDemo } from '../(_islands)/FormControlsDemo.tsx';
 import DesktopOnly from '@app/islands/ui/DesktopOnly.tsx';
 
 const SECTIONS = [
@@ -105,7 +106,7 @@ const NEUTRAL_COMPONENT_LABELS = new Set([
   'button-group', 'toggle', 'toggle-group', 'radio-group', 'input-group', 'input-otp',
   'slider', 'calendar', 'date-picker', 'location-marker', 'navigation-menu', 'stepper',
   'menubar', 'alert-dialog', 'hover-card', 'context-menu', 'item', 'kbd', 'collapsible',
-  'chart', 'carousel',
+  'chart', 'carousel', 'secret-field', 'key-value-editor', 'chips-input',
 ]);
 
 /** Style seams are demonstrated by the items rendered above them. */
@@ -690,6 +691,12 @@ function renderDemo(name: string): VNode | null {
           </Button>
         </div>
       );
+    case 'secret-field':
+      return <FormControlsDemo kind='secret-field' />;
+    case 'key-value-editor':
+      return <FormControlsDemo kind='key-value-editor' />;
+    case 'chips-input':
+      return <FormControlsDemo kind='chips-input' />;
     default:
       return null;
   }

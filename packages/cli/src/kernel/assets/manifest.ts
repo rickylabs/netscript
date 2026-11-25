@@ -65,6 +65,8 @@ export const TEMPLATE_KEYS = {
   appComponentsUiMod: 'app/components/ui/mod.ts.template',
   appRoutesDesignIslandsFloatingSurfaceDemo:
     'app/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx.template',
+  appRoutesDesignIslandsFormControlsDemo:
+    'app/routes/(design)/design/(_islands)/FormControlsDemo.tsx.template',
   appRoutesDesignIslandsTokenClipboard:
     'app/routes/(design)/design/(_islands)/TokenClipboard.tsx.template',
   appRoutesDesignSharedRegistry: 'app/routes/(design)/design/(_shared)/registry.ts.template',

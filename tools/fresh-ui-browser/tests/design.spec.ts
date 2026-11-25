@@ -71,6 +71,43 @@ for (const destination of ['Home', 'Components', 'Gallery button']) {
   });
 }
 
+test('/design/components hydrates SecretField, KeyValueEditor, and ChipsInput islands', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+
+  const response = await page.goto('/design/components');
+  expect(response?.status()).toBe(200);
+
+  // SecretField island hydrates: Replace enters rotating mode & focuses password input; Escape cancels.
+  const secretRoot = page.locator('#gallery-secret-set');
+  await expect(secretRoot).toHaveAttribute('data-state', 'set');
+  await secretRoot.getByRole('button', { name: 'Replace' }).click();
+  await expect(secretRoot).toHaveAttribute('data-state', 'rotating');
+  await expect(secretRoot.locator('input[type="password"]')).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(secretRoot).toHaveAttribute('data-state', 'set');
+
+  // KeyValueEditor island hydrates: Add row appends a 3rd row and focuses its key input.
+  const kvRoot = page.locator('#gallery-kv-headers');
+  const kvRows = kvRoot.locator('[data-part="row"]');
+  await expect(kvRows).toHaveCount(2);
+  await kvRoot.getByRole('button', { name: 'Add row' }).click();
+  await expect(kvRows).toHaveCount(3);
+  await expect(kvRows.nth(2).locator('[data-part="key-input"]')).toBeFocused();
+
+  // ChipsInput island hydrates: typing + Enter commits a new chip.
+  const chipsRoot = page.locator('#gallery-chips-recipients');
+  const chipsInput = chipsRoot.locator('[data-part="input"]');
+  await expect(chipsRoot.locator('[data-part="chip"]')).toHaveCount(2);
+  await chipsInput.focus();
+  await page.keyboard.type('team@example.com');
+  await page.keyboard.press('Enter');
+  await expect(chipsRoot.locator('[data-part="chip"]')).toHaveCount(3);
+  await expect(chipsRoot.locator('[data-part="chip"]').nth(2)).toContainText('team@example.com');
+
+  expect(errors).toEqual([]);
+});
+
 for (const route of ROUTES) {
   for (const control of controls) {
     test(
