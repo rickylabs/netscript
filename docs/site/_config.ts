@@ -254,6 +254,19 @@ site.addEventListener('afterRender', () => {
       }
       const viewport = figure.querySelector('.ns-diagram__viewport');
       if (!viewport) throw new Error(`Diagram viewport missing on ${sourceUrl}`);
+      const src = image.getAttribute('src');
+      if (src && /^\/assets\/diagrams\/[a-z0-9-]+\.svg$/.test(src)) {
+        const rawSvg = Deno.readTextFileSync(new URL(`.${src}`, import.meta.url));
+        for (const tag of ['rect', 'text', 'path'] as const) {
+          const expectedCount = (rawSvg.match(new RegExp(`<${tag}\\b`, 'g')) ?? []).length;
+          const actualCount = svg.querySelectorAll(tag).length;
+          if (actualCount !== expectedCount) {
+            throw new Error(
+              `Diagram ${src} on ${sourceUrl} lost <${tag}> elements during Markdown rendering (${actualCount}/${expectedCount}); remove blank lines from the SVG source.`,
+            );
+          }
+        }
+      }
       viewport.innerHTML = inlineUtilityDiagram(
         svg.outerHTML,
         image.getAttribute('alt')!,

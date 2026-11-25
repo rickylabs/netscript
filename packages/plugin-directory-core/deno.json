@@ -20,7 +20,6 @@
   "publish": {
     "include": [
       "README.md",
-      "CHANGELOG.md",
       "deno.json",
       "mod.ts",
       "src/**/*.ts"

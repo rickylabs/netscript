@@ -5,7 +5,8 @@
  * @module
  */
 
-import type { DirectoryConsistencyBudget, DirectoryUser } from './entities.ts';
+import type { DirectoryConsistencyBudget } from './consistency.ts';
+import type { DirectoryUser } from './entities.ts';
 
 /** Minimum positive page size accepted by bounded directory searches. */
 export const DIRECTORY_MIN_SEARCH_LIMIT: number = 1;
@@ -48,11 +49,50 @@ export function normalizeDirectorySearchLimit(
   return Math.min(limit, maxLimit);
 }
 
+const RFC3339_WITH_OFFSET_RE =
+  /^(\d{4})-(\d{2})-(\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:[Zz]|([+-])(\d{2}):(\d{2}))$/;
+
+function parseStrictRfc3339Ms(value: string): number | undefined {
+  const match = RFC3339_WITH_OFFSET_RE.exec(value);
+  if (!match) {
+    return undefined;
+  }
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const hour = Number(match[4]);
+  const minute = Number(match[5]);
+  const second = Number(match[6]);
+  if (
+    month < 1 || month > 12 || day < 1 || day > 31 || hour > 23 || minute > 59 || second > 59
+  ) {
+    return undefined;
+  }
+  if (match[8] !== undefined && match[9] !== undefined) {
+    const offsetHour = Number(match[8]);
+    const offsetMinute = Number(match[9]);
+    if (offsetHour > 23 || offsetMinute > 59) {
+      return undefined;
+    }
+  }
+  const calendarCheck = new Date(Date.UTC(year, month - 1, day));
+  if (
+    calendarCheck.getUTCFullYear() !== year ||
+    calendarCheck.getUTCMonth() !== month - 1 ||
+    calendarCheck.getUTCDate() !== day
+  ) {
+    return undefined;
+  }
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 /**
  * Evaluates whether a directory user account is active at `nowMs`.
  *
- * Fails closed: returns `false` when `user.enabled` is false, when `user.expiresAt` is
- * unparseable, or when `Date.parse(user.expiresAt) <= nowMs`.
+ * Fails closed: returns `false` unless `user.enabled === true` and, when `user.expiresAt` is
+ * present, `user.expiresAt` is a valid RFC 3339 timestamp with explicit timezone (`Z` or
+ * `±HH:MM`) strictly in the future relative to `nowMs`.
  *
  * @param user - Normalized directory user record.
  * @param nowMs - Current epoch timestamp in milliseconds.
@@ -79,12 +119,15 @@ export function isDirectoryUserActive(user: DirectoryUser, nowMs: number): boole
   if (!Number.isFinite(nowMs)) {
     return false;
   }
-  if (!user.enabled) {
+  if (user.enabled !== true) {
     return false;
   }
   if (user.expiresAt !== undefined) {
-    const expiresAtMs = Date.parse(user.expiresAt);
-    if (!Number.isFinite(expiresAtMs) || expiresAtMs <= nowMs) {
+    if (typeof user.expiresAt !== 'string') {
+      return false;
+    }
+    const expiresAtMs = parseStrictRfc3339Ms(user.expiresAt);
+    if (expiresAtMs === undefined || expiresAtMs <= nowMs) {
       return false;
     }
   }

@@ -1,29 +1,19 @@
 /**
  * Deterministic clock primitives for directory adapters and conformance tests.
  *
+ * Production wall-clock primitives (`DirectoryClock`, `createSystemDirectoryClock`) live in
+ * `@netscript/plugin-directory-core/ports` and are re-exported here for testing convenience.
+ *
  * @module
  */
 
+import { createSystemDirectoryClock, type DirectoryClock } from '../ports/mod.ts';
+
+export { createSystemDirectoryClock };
+export type { DirectoryClock };
+
 /** Default initial ISO-8601 UTC instant used by {@link createDeterministicClock}. */
 export const DEFAULT_DETERMINISTIC_CLOCK_ISO: string = '2026-06-01T12:00:00.000Z';
-
-/**
- * Clock port used by directory adapters and test doubles for wall-clock reads.
- *
- * @example
- * ```ts
- * import { createSystemDirectoryClock } from '@netscript/plugin-directory-core/testing';
- *
- * const clock = createSystemDirectoryClock();
- * console.log(clock.nowIso());
- * ```
- */
-export interface DirectoryClock {
-  /** Returns the current wall-clock timestamp in epoch milliseconds. */
-  nowMs(): number;
-  /** Returns the current wall-clock timestamp formatted as an ISO-8601 UTC string. */
-  nowIso(): string;
-}
 
 /**
  * Controllable deterministic clock for testing expiry boundaries and `evaluatedAt` timestamps.
@@ -90,30 +80,6 @@ export function createDeterministicClock(
     },
     set(instant: number | string | Date): void {
       currentMs = parseInstantMs(instant);
-    },
-  };
-}
-
-/**
- * Creates a wall-clock {@link DirectoryClock} backed by `Date.now()`.
- *
- * @returns Live system clock.
- *
- * @example
- * ```ts
- * import { createSystemDirectoryClock } from '@netscript/plugin-directory-core/testing';
- *
- * const clock = createSystemDirectoryClock();
- * console.log(clock.nowMs() > 0);
- * ```
- */
-export function createSystemDirectoryClock(): DirectoryClock {
-  return {
-    nowMs(): number {
-      return Date.now();
-    },
-    nowIso(): string {
-      return new Date(Date.now()).toISOString();
     },
   };
 }

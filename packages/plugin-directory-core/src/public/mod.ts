@@ -28,15 +28,23 @@ export type {
   UserLookup,
 } from '../domain/mod.ts';
 export {
+  assertDirectoryCallContext,
+  classifyDirectoryAbortError,
+  createSystemDirectoryClock,
   DIRECTORY_ERROR_CODES,
+  DIRECTORY_MAX_TIMEOUT_MS,
   DirectoryError,
   DirectoryTimeout,
   DirectoryUnauthorized,
   DirectoryUnavailable,
   DirectoryUnsupported,
   isDirectoryError,
+  resolveDirectoryTimeoutMs,
+  runWithDirectoryDeadline,
 } from '../ports/mod.ts';
 export type {
+  DirectoryClock,
+  DirectoryDeadlineParams,
   DirectoryErrorCode,
   DirectoryPort,
   DirectoryTimeoutOptions,

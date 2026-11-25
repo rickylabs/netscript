@@ -159,7 +159,7 @@ docs/site/ai/agent-tooling.md	doc:public-page	S11	prose sweep + #1000 terminolog
 docs/site/ai/how-to/build-a-durable-chat.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/assets/diagrams/architecture-overview.svg	doc:generated-asset	derived	diagrams:render output; gate diagrams:check
 docs/site/assets/diagrams/aspire-resource-graph.svg	doc:generated-asset	derived	diagrams:render output; gate diagrams:check
-docs/site/assets/diagrams/directory-architecture.svg	doc:generated-asset	derived	diagrams:render output; gate diagrams:check
+docs/site/assets/diagrams/directory-architecture.svg	doc:hand-authored-diagram	S11	hand-authored SVG diagram (no .mmd source); verified by docs build SVG element-count parity gate
 docs/site/background-processing/how-to/tune-worker-runtime.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/background-processing/workers.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/cli-reference.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint

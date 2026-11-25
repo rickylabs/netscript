@@ -94,6 +94,7 @@ export type DirectoryConformanceDataset = Readonly<{
   /** Canonical group immutable identifiers referenced by the conformance assertions. */
   groupIds: Readonly<{
     domainUsers: string;
+    allStaff: string;
     engParent: string;
     engChild: string;
     engLeaf: string;
@@ -109,6 +110,7 @@ export type DirectoryConformanceDataset = Readonly<{
   /** Canonical user immutable identifiers referenced by the conformance assertions. */
   userIds: Readonly<{
     alice: string;
+    aliceAdmin: string;
     bobDisabled: string;
     carolExpired: string;
     danaExpiringSoon: string;
@@ -132,6 +134,7 @@ export const DIRECTORY_CONFORMANCE_ADVANCE_EXPIRE_MS: number = 3_600_000;
 
 const GROUP_IDS = {
   domainUsers: '10000000-0000-4000-8000-000000000001',
+  allStaff: '10000000-0000-4000-8000-000000000012',
   engParent: '10000000-0000-4000-8000-000000000002',
   engChild: '10000000-0000-4000-8000-000000000003',
   engLeaf: '10000000-0000-4000-8000-000000000004',
@@ -147,6 +150,7 @@ const GROUP_IDS = {
 
 const USER_IDS = {
   alice: '20000000-0000-4000-8000-000000000001',
+  aliceAdmin: '20000000-0000-4000-8000-000000000009',
   bobDisabled: '20000000-0000-4000-8000-000000000002',
   carolExpired: '20000000-0000-4000-8000-000000000003',
   danaExpiringSoon: '20000000-0000-4000-8000-000000000004',
@@ -181,6 +185,15 @@ export const DIRECTORY_CONFORMANCE_DATASET: DirectoryConformanceDataset = {
       primaryGroupId: GROUP_IDS.domainUsers,
     },
     {
+      immutableId: USER_IDS.aliceAdmin,
+      enabled: true,
+      displayName: 'Alice Admin',
+      userPrincipalName: 'adm-alice@example.test',
+      mail: 'alice@example.test',
+      username: 'adm-alice',
+      primaryGroupId: GROUP_IDS.domainUsers,
+    },
+    {
       immutableId: USER_IDS.bobDisabled,
       enabled: false,
       displayName: 'Bob Disabled',
@@ -212,7 +225,7 @@ export const DIRECTORY_CONFORMANCE_DATASET: DirectoryConformanceDataset = {
     {
       immutableId: USER_IDS.erinHostile,
       enabled: true,
-      displayName: 'Erin (O*Connor) \\ Ops',
+      displayName: 'Erin \'O*Connor\' "Ops" \\ (Test)',
       userPrincipalName: 'erin@example.test',
       mail: 'erin@example.test',
       username: 'erin',
@@ -251,6 +264,12 @@ export const DIRECTORY_CONFORMANCE_DATASET: DirectoryConformanceDataset = {
       immutableId: GROUP_IDS.domainUsers,
       displayName: 'Domain Users',
       description: 'Primary group assigned via primaryGroupId rather than explicit member entries.',
+    },
+    {
+      immutableId: GROUP_IDS.allStaff,
+      displayName: 'All Staff',
+      description: 'Group nesting Domain Users to verify transitive primary-group evaluation.',
+      memberGroupIds: [GROUP_IDS.domainUsers],
     },
     {
       immutableId: GROUP_IDS.engParent,

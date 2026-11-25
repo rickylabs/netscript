@@ -90,29 +90,31 @@ const report = await verifyDirectoryConformance({
   name: 'in-memory',
   createFixture: () => {
     const clock = createDeterministicClock(DIRECTORY_CONFORMANCE_DATASET.initialTimeIso);
+    const base = {
+      directoryInstance: DIRECTORY_CONFORMANCE_DATASET.directoryInstance,
+      clock,
+      maxSearchLimit: 3,
+      users: DIRECTORY_CONFORMANCE_DATASET.users,
+      groups: DIRECTORY_CONFORMANCE_DATASET.groups,
+    };
     return {
       clock,
       maxSearchLimit: 3,
-      port: createInMemoryDirectoryPort({
-        directoryInstance: DIRECTORY_CONFORMANCE_DATASET.directoryInstance,
-        clock,
-        maxSearchLimit: 3,
-        users: DIRECTORY_CONFORMANCE_DATASET.users,
-        groups: DIRECTORY_CONFORMANCE_DATASET.groups,
-      }),
+      port: createInMemoryDirectoryPort(base),
+      timeoutPort: createInMemoryDirectoryPort({ ...base, operationDelayMs: 250 }),
     };
   },
 });
-console.log(report.suiteName, report.passed);
+console.log(report.suiteName, report.passed, report.failed);
 ```
 
 ## Public surface
 
 | Entry       | What it gives you                                                                  |
 | ----------- | ---------------------------------------------------------------------------------- |
-| `.`         | Curated root exports: `DirectoryPort`, `DirectoryRef`, domain helpers, and errors  |
+| `.`         | Curated root exports: `DirectoryPort`, `DirectoryRef`, clock, deadlines, & errors  |
 | `./domain`  | `DirectoryRef`, `DirectoryUser`, `DirectoryGroup`, `Page`, `DirectoryHealth`, caps |
-| `./ports`   | `DirectoryPort`, query/result contracts, and the four typed directory errors       |
+| `./ports`   | `DirectoryPort`, `DirectoryClock`, deadline helpers, queries, and typed errors     |
 | `./testing` | In-memory `DirectoryPort`, deterministic clock, dataset, and conformance suite     |
 
 The always-current symbol list is

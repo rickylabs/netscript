@@ -1,6 +1,6 @@
 /**
  * In-memory `DirectoryPort` test double with deterministic time, nested and primary-group
- * evaluation, bounded search truncation, and controllable failure/timeout hooks.
+ * evaluation, bounded search truncation, exact-id semantics, and controllable failure/timeout hooks.
  *
  * @module
  */
@@ -20,16 +20,17 @@ import {
   type UserLookup,
 } from '../domain/mod.ts';
 import {
+  assertDirectoryCallContext,
+  type DirectoryClock,
   type DirectoryPort,
-  DirectoryTimeout,
-  DirectoryUnavailable,
   DirectoryUnsupported,
   type MemberOfAnyQuery,
   type MemberOfAnyResult,
+  runWithDirectoryDeadline,
   type SearchGroupsQuery,
   type SearchUsersQuery,
 } from '../ports/mod.ts';
-import { createDeterministicClock, type DirectoryClock } from './clock.ts';
+import { createDeterministicClock } from './clock.ts';
 import type { InMemoryDirectoryGroup, InMemoryDirectoryUser } from './conformance-dataset.ts';
 
 /**
@@ -99,123 +100,29 @@ export type InMemoryDirectoryOptions = Readonly<{
   simulateFailure?: (operation: DirectoryOperationName, ctx: CallContext) => Error | undefined;
 }>;
 
-type TimerHandle = ReturnType<typeof setTimeout>;
-
-function isTimeoutReason(reason: unknown): boolean {
-  if (reason instanceof DirectoryTimeout) return true;
-  if (reason instanceof DOMException && reason.name === 'TimeoutError') return true;
-  if (reason instanceof Error && reason.name === 'TimeoutError') return true;
-  return false;
-}
-
-function abortError(
-  directoryName: string,
-  operation: DirectoryOperationName,
-  reason: unknown,
-  timeoutMs?: number,
-): Error {
-  if (isTimeoutReason(reason)) {
-    return new DirectoryTimeout(
-      directoryName,
-      operation,
-      'Directory call aborted due to timeout.',
-      {
-        cause: reason,
-        timeoutMs,
-      },
-    );
-  }
-  return new DirectoryUnavailable(
-    directoryName,
-    operation,
-    'Directory call was aborted by the caller.',
-    { cause: reason },
-  );
-}
-
-function checkContext(
-  directoryName: string,
-  operation: DirectoryOperationName,
-  ctx: CallContext,
+function validateHealthConfig(
+  healthStatus: DirectoryHealthStatus,
+  reachableHosts: number,
+  totalHosts: number,
 ): void {
-  if (ctx.timeoutMs !== undefined && (!Number.isFinite(ctx.timeoutMs) || ctx.timeoutMs <= 0)) {
-    throw new DirectoryTimeout(
-      directoryName,
-      operation,
-      'Call timeout budget must be a positive finite number.',
-      { timeoutMs: ctx.timeoutMs },
+  if (!Number.isInteger(totalHosts) || totalHosts < 1) {
+    throw new RangeError('InMemoryDirectoryOptions.totalHosts must be a positive integer.');
+  }
+  if (!Number.isInteger(reachableHosts) || reachableHosts < 0 || reachableHosts > totalHosts) {
+    throw new RangeError(
+      'InMemoryDirectoryOptions.reachableHosts must be an integer in [0, totalHosts].',
     );
   }
-  if (ctx.signal?.aborted) {
-    throw abortError(directoryName, operation, ctx.signal.reason, ctx.timeoutMs);
+  if (healthStatus === 'healthy' && reachableHosts < totalHosts) {
+    throw new RangeError(
+      'InMemoryDirectoryOptions.healthStatus="healthy" requires reachableHosts === totalHosts.',
+    );
   }
-}
-
-async function applyOperationDelay(
-  directoryName: string,
-  operation: DirectoryOperationName,
-  delayMs: number,
-  ctx: CallContext,
-): Promise<void> {
-  if (delayMs <= 0) return;
-  const effectiveTimeoutMs = ctx.timeoutMs;
-  await new Promise<void>((resolve, reject) => {
-    let settled = false;
-    let timeoutTimer: TimerHandle | undefined;
-
-    const cleanup = (delayTimer?: TimerHandle): void => {
-      if (delayTimer !== undefined) clearTimeout(delayTimer);
-      if (timeoutTimer !== undefined) clearTimeout(timeoutTimer);
-      ctx.signal?.removeEventListener('abort', onAbort);
-    };
-
-    const fail = (error: Error, delayTimer?: TimerHandle): void => {
-      if (settled) return;
-      settled = true;
-      cleanup(delayTimer);
-      reject(error);
-    };
-
-    const onAbort = (): void => {
-      fail(
-        abortError(directoryName, operation, ctx.signal?.reason, effectiveTimeoutMs),
-        delayTimer,
-      );
-    };
-
-    const delayTimer: TimerHandle = setTimeout(() => {
-      if (settled) return;
-      settled = true;
-      cleanup();
-      resolve();
-    }, delayMs);
-
-    if (ctx.signal) {
-      if (ctx.signal.aborted) {
-        onAbort();
-        return;
-      }
-      ctx.signal.addEventListener('abort', onAbort, { once: true });
-    }
-
-    if (effectiveTimeoutMs !== undefined) {
-      timeoutTimer = setTimeout(() => {
-        fail(
-          new DirectoryTimeout(
-            directoryName,
-            operation,
-            `Directory call exceeded timeout budget of ${effectiveTimeoutMs}ms.`,
-            { timeoutMs: effectiveTimeoutMs },
-          ),
-          delayTimer,
-        );
-      }, effectiveTimeoutMs);
-    }
-  });
-}
-
-function normalizeId(value: string): string {
-  return value.trim().toLowerCase();
+  if (healthStatus === 'unhealthy' && reachableHosts > 0) {
+    throw new RangeError(
+      'InMemoryDirectoryOptions.healthStatus="unhealthy" requires reachableHosts === 0.',
+    );
+  }
 }
 
 function toDirectoryUser(directoryInstance: string, seed: InMemoryDirectoryUser): DirectoryUser {
@@ -248,12 +155,30 @@ function includesLiteral(haystack: string | undefined, needleLower: string): boo
   return haystack !== undefined && haystack.toLowerCase().includes(needleLower);
 }
 
+function delayWithCancel(delayMs: number): { promise: Promise<void>; cancel: () => void } {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const promise = new Promise<void>((resolve) => {
+    timer = setTimeout(() => {
+      timer = undefined;
+      resolve();
+    }, delayMs);
+  });
+  const cancel = (): void => {
+    if (timer !== undefined) {
+      clearTimeout(timer);
+      timer = undefined;
+    }
+  };
+  return { promise, cancel };
+}
+
 /**
  * Creates an in-memory {@link DirectoryPort} suitable for unit tests and contract verification.
  *
  * Implements mandatory capped search limits, literal non-injectable substring matching,
- * direct + primary + cycle-safe transitive group membership, fail-closed disabled/expired checks,
- * and deterministic wall-clock timestamps.
+ * fail-closed ambiguous attribute lookups, exact opaque immutable identifiers, direct + primary +
+ * cycle-safe transitive group membership, fail-closed disabled/expired checks, shared deadline
+ * handling, and deterministic wall-clock timestamps.
  *
  * @param options - Optional seed records, clock, capabilities, limits, and failure hooks.
  * @returns An in-memory {@link DirectoryPort}.
@@ -293,19 +218,32 @@ export function createInMemoryDirectoryPort(
   const groups: readonly InMemoryDirectoryGroup[] = [...(options.groups ?? [])];
   const delayMs = options.operationDelayMs ?? 0;
   const healthStatus: DirectoryHealthStatus = options.healthStatus ?? 'healthy';
+  const totalHosts = options.totalHosts ?? 1;
+  const reachableHosts = options.reachableHosts ?? (healthStatus === 'unhealthy' ? 0 : totalHosts);
+  validateHealthConfig(healthStatus, reachableHosts, totalHosts);
 
-  const usersById = new Map(users.map((u) => [normalizeId(u.immutableId), u]));
-  const groupsById = new Map(groups.map((g) => [normalizeId(g.immutableId), g]));
+  const usersById = new Map(users.map((u) => [u.immutableId, u]));
+  const groupsById = new Map(groups.map((g) => [g.immutableId, g]));
 
   async function enterOperation(
     operation: DirectoryOperationName,
     ctx: CallContext,
   ): Promise<void> {
-    checkContext(name, operation, ctx);
+    const timeoutMs = assertDirectoryCallContext(name, operation, ctx);
     const simulated = options.simulateFailure?.(operation, ctx);
     if (simulated) throw simulated;
-    if (delayMs > 0) await applyOperationDelay(name, operation, delayMs, ctx);
-    checkContext(name, operation, ctx);
+    if (delayMs > 0) {
+      const waiter = delayWithCancel(delayMs);
+      await runWithDirectoryDeadline({
+        directoryName: name,
+        operation,
+        timeoutMs,
+        signal: ctx.signal,
+        onCancel: waiter.cancel,
+        task: () => waiter.promise,
+      });
+    }
+    assertDirectoryCallContext(name, operation, ctx);
   }
 
   function isMemberOfGroup(
@@ -313,27 +251,22 @@ export function createInMemoryDirectoryPort(
     candidateGroupId: string,
     allowTransitive: boolean,
   ): boolean {
-    const normalizedUserId = normalizeId(user.immutableId);
-    const normalizedPrimary = user.primaryGroupId !== undefined
-      ? normalizeId(user.primaryGroupId)
-      : undefined;
-    const targetId = normalizeId(candidateGroupId);
-    const rootGroup = groupsById.get(targetId);
+    const rootGroup = groupsById.get(candidateGroupId);
     if (!rootGroup) return false;
 
-    const visited = new Set<string>([targetId]);
+    const visited = new Set<string>([candidateGroupId]);
     const queue: InMemoryDirectoryGroup[] = [rootGroup];
     while (queue.length > 0) {
       const current = queue.shift()!;
-      const currentId = normalizeId(current.immutableId);
-      if (normalizedPrimary !== undefined && normalizedPrimary === currentId) return true;
-      if (current.memberUserIds?.some((id) => normalizeId(id) === normalizedUserId)) return true;
+      if (user.primaryGroupId !== undefined && user.primaryGroupId === current.immutableId) {
+        return true;
+      }
+      if (current.memberUserIds?.includes(user.immutableId)) return true;
       if (!allowTransitive) break;
       for (const childId of current.memberGroupIds ?? []) {
-        const normalizedChild = normalizeId(childId);
-        if (visited.has(normalizedChild)) continue;
-        visited.add(normalizedChild);
-        const child = groupsById.get(normalizedChild);
+        if (visited.has(childId)) continue;
+        visited.add(childId);
+        const child = groupsById.get(childId);
         if (child) queue.push(child);
       }
     }
@@ -407,23 +340,30 @@ export function createInMemoryDirectoryPort(
       await enterOperation('getUser', ctx);
       if (ref.directoryInstance !== directoryInstance) return undefined;
 
-      let found: InMemoryDirectoryUser | undefined;
       if ('immutableId' in ref && typeof ref.immutableId === 'string') {
-        const key = normalizeId(ref.immutableId);
-        if (key.length > 0) found = usersById.get(key);
-      } else if ('userPrincipalName' in ref) {
+        if (ref.immutableId.trim().length === 0) return undefined;
+        const found = usersById.get(ref.immutableId);
+        return found ? toDirectoryUser(directoryInstance, found) : undefined;
+      }
+
+      let matches: InMemoryDirectoryUser[] = [];
+      if ('userPrincipalName' in ref && typeof ref.userPrincipalName === 'string') {
         const needle = ref.userPrincipalName.trim().toLowerCase();
         if (needle.length > 0) {
-          found = users.find((u) => u.userPrincipalName?.toLowerCase() === needle);
+          matches = users.filter((u) => u.userPrincipalName?.toLowerCase() === needle);
         }
-      } else if ('mail' in ref) {
+      } else if ('mail' in ref && typeof ref.mail === 'string') {
         const needle = ref.mail.trim().toLowerCase();
-        if (needle.length > 0) found = users.find((u) => u.mail?.toLowerCase() === needle);
-      } else if ('username' in ref) {
+        if (needle.length > 0) {
+          matches = users.filter((u) => u.mail?.toLowerCase() === needle);
+        }
+      } else if ('username' in ref && typeof ref.username === 'string') {
         const needle = ref.username.trim().toLowerCase();
-        if (needle.length > 0) found = users.find((u) => u.username?.toLowerCase() === needle);
+        if (needle.length > 0) {
+          matches = users.filter((u) => u.username?.toLowerCase() === needle);
+        }
       }
-      return found ? toDirectoryUser(directoryInstance, found) : undefined;
+      return matches.length === 1 ? toDirectoryUser(directoryInstance, matches[0]!) : undefined;
     },
 
     async memberOfAny(q: MemberOfAnyQuery, ctx: CallContext): Promise<MemberOfAnyResult> {
@@ -435,8 +375,9 @@ export function createInMemoryDirectoryPort(
       if (q.user.directoryInstance !== directoryInstance) {
         return { memberOf: [], evaluatedAt, consistency };
       }
-      const userKey = normalizeId(q.user.immutableId);
-      const seedUser = userKey.length > 0 ? usersById.get(userKey) : undefined;
+      const seedUser = q.user.immutableId.trim().length > 0
+        ? usersById.get(q.user.immutableId)
+        : undefined;
       if (
         !seedUser || !isDirectoryUserActive(toDirectoryUser(directoryInstance, seedUser), nowMs)
       ) {
@@ -446,13 +387,11 @@ export function createInMemoryDirectoryPort(
       const seen = new Set<string>();
       const memberOf: string[] = [];
       const allowTransitive = capabilities.has('transitive-membership');
-      for (const rawGroupId of q.candidateGroupIds) {
-        const normalizedCandidate = normalizeId(rawGroupId);
-        if (normalizedCandidate.length === 0 || seen.has(normalizedCandidate)) continue;
-        seen.add(normalizedCandidate);
-        const group = groupsById.get(normalizedCandidate);
-        if (group && isMemberOfGroup(seedUser, group.immutableId, allowTransitive)) {
-          memberOf.push(group.immutableId);
+      for (const candidateId of q.candidateGroupIds) {
+        if (candidateId.trim().length === 0 || seen.has(candidateId)) continue;
+        seen.add(candidateId);
+        if (isMemberOfGroup(seedUser, candidateId, allowTransitive)) {
+          memberOf.push(candidateId);
         }
       }
       return { memberOf, evaluatedAt, consistency };
@@ -474,8 +413,8 @@ export function createInMemoryDirectoryPort(
       return {
         status: healthStatus,
         checkedAt: clock.nowIso(),
-        reachableHosts: options.reachableHosts ?? (healthStatus === 'unhealthy' ? 0 : 1),
-        totalHosts: options.totalHosts ?? 1,
+        reachableHosts,
+        totalHosts,
         probes,
       };
     },

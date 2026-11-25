@@ -100,14 +100,16 @@ clock (`createDeterministicClock`), an invented `example.test` conformance datas
 (`DIRECTORY_CONFORMANCE_DATASET`), and `runDirectoryConformanceSuite`. Every directory adapter runs
 the same one-call suite to verify:
 
-- direct, multi-level nested, and cyclic group membership;
-- Active Directory-style primary-group membership not listed in group `member` attributes;
+- direct, multi-level nested, and cyclic group membership (including non-members against cycles);
+- Active Directory-style primary-group membership (direct and nested) and never-expiring accounts;
 - disabled users and clock-driven expired users failing closed on `memberOfAny`;
-- mandatory search limit validation, ceiling capping, and `truncated` reporting;
-- hostile search payloads (LDAP metacharacters, wildcards, hex escapes, NUL bytes, blank queries);
-- unknown and duplicated `candidateGroupIds`;
-- timeout budgets and aborted timeout signals throwing `DirectoryTimeout`;
-- redacted `health()` output with no credentials or distinguished names.
+- mandatory search limit validation, ceiling capping, exact-fit boundaries, and `truncated`
+  reporting;
+- hostile payloads (LDAP, OData, SCIM, URL, CR/LF, NUL, blank) across search, `getUser`, and
+  `memberOfAny`, plus ambiguous secondary `getUser` lookups failing closed;
+- unknown, duplicated, and large (>40) `candidateGroupIds` batches;
+- deadlines, timeouts, and caller aborts across all five methods (including `health()`);
+- redacted `health()` and error outputs verified against caller-supplied `sensitiveValues`.
 
 ```ts
 import {
@@ -121,26 +123,28 @@ const report = await verifyDirectoryConformance({
   name: 'in-memory',
   createFixture: () => {
     const clock = createDeterministicClock(DIRECTORY_CONFORMANCE_DATASET.initialTimeIso);
+    const base = {
+      directoryInstance: DIRECTORY_CONFORMANCE_DATASET.directoryInstance,
+      clock,
+      maxSearchLimit: 3,
+      users: DIRECTORY_CONFORMANCE_DATASET.users,
+      groups: DIRECTORY_CONFORMANCE_DATASET.groups,
+    };
     return {
       clock,
       maxSearchLimit: 3,
-      port: createInMemoryDirectoryPort({
-        directoryInstance: DIRECTORY_CONFORMANCE_DATASET.directoryInstance,
-        clock,
-        maxSearchLimit: 3,
-        users: DIRECTORY_CONFORMANCE_DATASET.users,
-        groups: DIRECTORY_CONFORMANCE_DATASET.groups,
-      }),
+      port: createInMemoryDirectoryPort(base),
+      timeoutPort: createInMemoryDirectoryPort({ ...base, operationDelayMs: 250 }),
     };
   },
 });
 
-console.log(report.passed);
+console.log(report.passed, report.failed);
 ```
 
 ## Next steps
 
-- {{ comp.xref({ key: "ref:plugin-directory-core", text: "@netscript/plugin-directory-core reference" }) }}:
-  complete symbol inventory for the root, domain, ports, and testing entrypoints.
-- {{ comp.xref({ key: "cap:auth", text: "Authentication" }) }}: session sign-in and `Principal`
-  verification through `@netscript/plugin-auth`.
+- [@netscript/plugin-directory-core reference](/reference/plugin-directory-core/): complete symbol
+  inventory for the root, domain, ports, and testing entrypoints.
+- [Authentication](/identity-access/auth/): session sign-in and `Principal` verification through
+  `@netscript/plugin-auth`.

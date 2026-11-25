@@ -25,11 +25,13 @@
  */
 
 export type {
-  CallContext,
   ConsistencyInfo,
   ConsistencySource,
-  DirectoryCapability,
   DirectoryConsistencyBudget,
+} from './consistency.ts';
+export type {
+  CallContext,
+  DirectoryCapability,
   DirectoryGroup,
   DirectoryRef,
   DirectoryUser,

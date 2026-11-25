@@ -1,62 +1,51 @@
 /**
- * Conformance scenario definitions executed by {@link runDirectoryConformanceSuite}.
+ * Identity and membership conformance scenarios combined with search and resilience scenarios
+ * executed by {@link runDirectoryConformanceSuite}.
  *
  * @module
  */
 
-import { assert, assertEquals, assertRejects } from '@std/assert';
-import { DIRECTORY_MAX_SEARCH_LIMIT } from '../domain/mod.ts';
-import { DirectoryTimeout } from '../ports/mod.ts';
-import type { DirectoryConformanceFixture } from './conformance.ts';
+import { assert, assertEquals } from '@std/assert';
 import {
   DIRECTORY_CONFORMANCE_ADVANCE_EXPIRE_MS,
   DIRECTORY_CONFORMANCE_DATASET,
 } from './conformance-dataset.ts';
+import {
+  assertIsoTimestamp,
+  assertNoSensitiveLeak,
+  HOSTILE_FILTER_PAYLOADS,
+} from './conformance-helpers.ts';
+import { type ConformanceCase, SEARCH_AND_RESILIENCE_CASES } from './conformance-search-cases.ts';
 
-export interface ConformanceCase {
-  readonly name: string;
-  readonly run: (fixture: DirectoryConformanceFixture) => Promise<void>;
-}
+export type { ConformanceCase };
 
 const DS = DIRECTORY_CONFORMANCE_DATASET;
 
-function assertIsoTimestamp(value: string, label: string): void {
-  const parsed = Date.parse(value);
-  assert(
-    Number.isFinite(parsed) && value.includes('T'),
-    `${label} must be a valid ISO-8601 timestamp, received: ${JSON.stringify(value)}`,
-  );
+function buildSyntheticGroupIds(count: number): string[] {
+  const out: string[] = [];
+  for (let i = 1; i <= count; i++) {
+    const suffix = String(i).padStart(12, '0');
+    out.push(`18888888-0000-4000-8000-${suffix}`);
+  }
+  return out;
 }
 
-function createTimedOutSignal(): AbortSignal {
-  const controller = new AbortController();
-  controller.abort(new DOMException('Directory call timed out.', 'TimeoutError'));
-  return controller.signal;
-}
-
-export const CONFORMANCE_CASES: readonly ConformanceCase[] = [
+const IDENTITY_AND_MEMBERSHIP_CASES: readonly ConformanceCase[] = [
   {
-    name: 'metadata and redacted health probe',
-    async run({ port, clock }) {
+    name: 'metadata, redacted health probe, and sensitive value hygiene',
+    async run({ port, clock, sensitiveValues }) {
       assert(port.name.trim().length > 0, 'DirectoryPort.name must be non-empty');
       assert(port.capabilities instanceof Set, 'DirectoryPort.capabilities must be a Set');
       const health = await port.health({});
       assertEquals(health.status, 'healthy');
       assertEquals(health.checkedAt, clock.nowIso());
       assertIsoTimestamp(health.checkedAt, 'health.checkedAt');
-      const serialized = JSON.stringify(health);
-      assert(
-        !/\b(?:cn|ou|dc)=/i.test(serialized),
-        `health() output must not leak LDAP DNs: ${serialized}`,
-      );
-      assert(
-        !/password|secret|bindpw/i.test(serialized),
-        `health() output must not leak credential names or values: ${serialized}`,
-      );
+      assertNoSensitiveLeak(JSON.stringify(health), sensitiveValues, 'health()');
     },
   },
   {
-    name: 'getUser returns normalized immutable identity and account state',
+    name:
+      'getUser returns immutable identity, secondary lookups, ambiguity fail-closed, and isolation',
     async run({ port }) {
       const alice = await port.getUser(
         { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.alice },
@@ -78,6 +67,29 @@ export const CONFORMANCE_CASES: readonly ConformanceCase[] = [
       );
       assertEquals(aliceByUpn?.immutableId, DS.userIds.alice);
 
+      const frankByMail = await port.getUser(
+        { directoryInstance: DS.directoryInstance, mail: 'frank@example.test' },
+        {},
+      );
+      assertEquals(frankByMail?.immutableId, DS.userIds.frank);
+
+      const aliceByUsername = await port.getUser(
+        { directoryInstance: DS.directoryInstance, username: 'alice' },
+        {},
+      );
+      assertEquals(aliceByUsername?.immutableId, DS.userIds.alice);
+
+      // Ambiguous secondary lookup: alice and aliceAdmin share mail='alice@example.test'.
+      const ambiguousMail = await port.getUser(
+        { directoryInstance: DS.directoryInstance, mail: 'alice@example.test' },
+        {},
+      );
+      assertEquals(
+        ambiguousMail,
+        undefined,
+        'Ambiguous secondary getUser lookup matching multiple accounts must fail closed (undefined)',
+      );
+
       const bob = await port.getUser(
         { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.bobDisabled },
         {},
@@ -93,21 +105,95 @@ export const CONFORMANCE_CASES: readonly ConformanceCase[] = [
       assertEquals(carol.enabled, true);
       assertEquals(carol.expiresAt, '2026-05-01T00:00:00.000Z');
 
-      const missing = await port.getUser(
-        { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.unknown },
-        {},
+      assertEquals(
+        await port.getUser(
+          { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.unknown },
+          {},
+        ),
+        undefined,
       );
-      assertEquals(missing, undefined);
 
-      const wrongInstance = await port.getUser(
-        { directoryInstance: 'other-example', immutableId: DS.userIds.alice },
-        {},
+      // Wrong directoryInstance must isolate all four selectors.
+      assertEquals(
+        await port.getUser(
+          { directoryInstance: 'other-example', immutableId: DS.userIds.alice },
+          {},
+        ),
+        undefined,
       );
-      assertEquals(wrongInstance, undefined);
+      assertEquals(
+        await port.getUser(
+          { directoryInstance: 'other-example', userPrincipalName: 'alice@example.test' },
+          {},
+        ),
+        undefined,
+      );
+      assertEquals(
+        await port.getUser(
+          { directoryInstance: 'other-example', mail: 'frank@example.test' },
+          {},
+        ),
+        undefined,
+      );
+      assertEquals(
+        await port.getUser(
+          { directoryInstance: 'other-example', username: 'alice' },
+          {},
+        ),
+        undefined,
+      );
     },
   },
   {
-    name: 'nested groups resolve transitively and handle cycles safely',
+    name: 'getUser and memberOfAny reject hostile and blank selectors without injection',
+    async run({ port }) {
+      const payloads = ['', '   ', ...HOSTILE_FILTER_PAYLOADS];
+      const aliceRef = { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.alice };
+
+      for (const payload of payloads) {
+        assertEquals(
+          await port.getUser({ directoryInstance: DS.directoryInstance, immutableId: payload }, {}),
+          undefined,
+          `getUser(immutableId=${JSON.stringify(payload)}) must return undefined`,
+        );
+        assertEquals(
+          await port.getUser(
+            { directoryInstance: DS.directoryInstance, userPrincipalName: payload },
+            {},
+          ),
+          undefined,
+          `getUser(userPrincipalName=${JSON.stringify(payload)}) must return undefined`,
+        );
+        assertEquals(
+          await port.getUser({ directoryInstance: DS.directoryInstance, mail: payload }, {}),
+          undefined,
+          `getUser(mail=${JSON.stringify(payload)}) must return undefined`,
+        );
+        assertEquals(
+          await port.getUser({ directoryInstance: DS.directoryInstance, username: payload }, {}),
+          undefined,
+          `getUser(username=${JSON.stringify(payload)}) must return undefined`,
+        );
+        const byHostileUser = await port.memberOfAny(
+          {
+            user: { directoryInstance: DS.directoryInstance, immutableId: payload },
+            candidateGroupIds: [DS.groupIds.domainUsers, DS.groupIds.engLeaf],
+          },
+          {},
+        );
+        assertEquals(byHostileUser.memberOf, []);
+      }
+
+      const hostileCandidates = await port.memberOfAny(
+        { user: aliceRef, candidateGroupIds: payloads },
+        {},
+      );
+      assertEquals(hostileCandidates.memberOf, []);
+    },
+  },
+  {
+    name:
+      'nested groups honor transitive-membership capability and terminate cycles for non-members',
     async run({ port, clock }) {
       const aliceRef = { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.alice };
       const result = await port.memberOfAny(
@@ -137,23 +223,64 @@ export const CONFORMANCE_CASES: readonly ConformanceCase[] = [
         assert(matched.has(DS.groupIds.engChild), '2-level nested group must match');
         assert(matched.has(DS.groupIds.engParent), '3-level nested group must match');
         assert(matched.has(DS.groupIds.cycleA), 'Cyclic nested group must match without looping');
+      } else {
+        assert(
+          !matched.has(DS.groupIds.engChild) &&
+            !matched.has(DS.groupIds.engParent) &&
+            !matched.has(DS.groupIds.cycleA),
+          'Adapter without transitive-membership must not match nested-only groups',
+        );
       }
+
+      // Non-member evaluated against cyclic groups must terminate cleanly without stack overflow.
+      const frankCycle = await port.memberOfAny(
+        {
+          user: { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.frank },
+          candidateGroupIds: [DS.groupIds.cycleA, DS.groupIds.cycleB],
+        },
+        {},
+      );
+      assertEquals(frankCycle.memberOf, []);
     },
   },
   {
-    name: 'primary group membership is included without explicit member entry',
+    name: 'primary group (direct and nested) and never-expiring accounts resolve accurately',
     async run({ port, clock }) {
       const aliceRef = { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.alice };
-      const result = await port.memberOfAny(
+      const aliceDirect = await port.memberOfAny(
         {
           user: aliceRef,
           candidateGroupIds: [DS.groupIds.domainUsers, DS.groupIds.finance],
         },
         {},
       );
-      assertEquals(result.memberOf, [DS.groupIds.domainUsers]);
-      assertEquals(result.evaluatedAt, clock.nowIso());
-      assertEquals(result.consistency, { source: 'live', ageMs: 0 });
+      assertEquals(aliceDirect.memberOf, [DS.groupIds.domainUsers]);
+      assertEquals(aliceDirect.evaluatedAt, clock.nowIso());
+      assertEquals(aliceDirect.consistency, { source: 'live', ageMs: 0 });
+
+      // Frank has no expiresAt (never expires) and must be active.
+      const frankDirect = await port.memberOfAny(
+        {
+          user: { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.frank },
+          candidateGroupIds: [DS.groupIds.domainUsers, DS.groupIds.finance],
+        },
+        {},
+      );
+      assertEquals(frankDirect.memberOf, [DS.groupIds.domainUsers]);
+
+      // All Staff nests Domain Users; transitive adapters must follow primary group into nesting.
+      const nestedPrimary = await port.memberOfAny(
+        {
+          user: aliceRef,
+          candidateGroupIds: [DS.groupIds.allStaff, DS.groupIds.finance],
+        },
+        {},
+      );
+      if (port.capabilities.has('transitive-membership')) {
+        assertEquals(nestedPrimary.memberOf, [DS.groupIds.allStaff]);
+      } else {
+        assertEquals(nestedPrimary.memberOf, []);
+      }
     },
   },
   {
@@ -220,7 +347,7 @@ export const CONFORMANCE_CASES: readonly ConformanceCase[] = [
     },
   },
   {
-    name: 'candidateGroupIds handles empty, unknown, and duplicated ids',
+    name: 'candidateGroupIds handles empty, unknown, duplicated, and 60-candidate batches',
     async run({ port }) {
       const aliceRef = { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.alice };
 
@@ -252,6 +379,18 @@ export const CONFORMANCE_CASES: readonly ConformanceCase[] = [
         [...duplicated.memberOf].sort(),
         [DS.groupIds.domainUsers, DS.groupIds.engLeaf].sort(),
       );
+
+      // 60-candidate batch with real matches placed beyond positions 20 and 40.
+      const batch = buildSyntheticGroupIds(60);
+      batch[0] = DS.groupIds.engLeaf;
+      batch[25] = DS.groupIds.domainUsers;
+      batch[45] = DS.groupIds.engParent;
+      batch[55] = DS.groupIds.cycleB;
+      const largeBatch = await port.memberOfAny({ user: aliceRef, candidateGroupIds: batch }, {});
+      const expected = port.capabilities.has('transitive-membership')
+        ? [DS.groupIds.cycleB, DS.groupIds.domainUsers, DS.groupIds.engLeaf, DS.groupIds.engParent]
+        : [DS.groupIds.cycleB, DS.groupIds.domainUsers, DS.groupIds.engLeaf];
+      assertEquals([...largeBatch.memberOf].sort(), expected.sort());
     },
   },
   {
@@ -276,158 +415,9 @@ export const CONFORMANCE_CASES: readonly ConformanceCase[] = [
       assertEquals(wrongInstance.memberOf, []);
     },
   },
-  {
-    name: 'searchUsers enforces mandatory capped limit and reports truncation',
-    async run({ port, clock, maxSearchLimit = DIRECTORY_MAX_SEARCH_LIMIT }) {
-      for (const badLimit of [0, -1, Number.NaN, Number.POSITIVE_INFINITY, 1.5]) {
-        await assertRejects(
-          () => port.searchUsers({ text: 'Example', limit: badLimit }, {}),
-          RangeError,
-        );
-      }
+];
 
-      const paged = await port.searchUsers({ text: 'Example', limit: 2 }, {});
-      assertEquals(paged.items.length, 2);
-      assertEquals(paged.truncated, true);
-      assertEquals(paged.evaluatedAt, clock.nowIso());
-
-      const exact = await port.searchUsers({ text: 'Alice Example', limit: 5 }, {});
-      assertEquals(exact.items.length, 1);
-      assertEquals(exact.items[0]?.immutableId, DS.userIds.alice);
-      assertEquals(exact.truncated, false);
-
-      const capped = await port.searchUsers({ text: 'Example', limit: 10_000 }, {});
-      assert(
-        capped.items.length <= maxSearchLimit,
-        `Expected at most ${maxSearchLimit} items, got ${capped.items.length}`,
-      );
-      if (maxSearchLimit < 5) {
-        assertEquals(capped.items.length, maxSearchLimit);
-        assertEquals(capped.truncated, true);
-      }
-    },
-  },
-  {
-    name: 'searchGroups enforces mandatory capped limit and reports truncation',
-    async run({ port, clock, maxSearchLimit = DIRECTORY_MAX_SEARCH_LIMIT }) {
-      for (const badLimit of [0, -3, Number.NaN, Number.POSITIVE_INFINITY, 2.5]) {
-        await assertRejects(
-          () => port.searchGroups({ text: 'Ops', limit: badLimit }, {}),
-          RangeError,
-        );
-      }
-
-      const paged = await port.searchGroups({ text: 'Ops', limit: 2 }, {});
-      assertEquals(paged.items.length, 2);
-      assertEquals(paged.truncated, true);
-      assertEquals(paged.evaluatedAt, clock.nowIso());
-
-      const exact = await port.searchGroups({ text: 'Finance', limit: 5 }, {});
-      assertEquals(exact.items.length, 1);
-      assertEquals(exact.items[0]?.immutableId, DS.groupIds.finance);
-      assertEquals(exact.truncated, false);
-
-      const capped = await port.searchGroups({ text: 'Ops', limit: 10_000 }, {});
-      assert(
-        capped.items.length <= maxSearchLimit,
-        `Expected at most ${maxSearchLimit} items, got ${capped.items.length}`,
-      );
-      if (maxSearchLimit < 4) {
-        assertEquals(capped.items.length, maxSearchLimit);
-        assertEquals(capped.truncated, true);
-      }
-    },
-  },
-  {
-    name: 'hostile search strings cannot inject filters or dump directory entries',
-    async run({ port }) {
-      for (const blank of ['', '   ']) {
-        const blankUsers = await port.searchUsers({ text: blank, limit: 10 }, {});
-        assertEquals(blankUsers.items, []);
-        assertEquals(blankUsers.truncated, false);
-
-        const blankGroups = await port.searchGroups({ text: blank, limit: 10 }, {});
-        assertEquals(blankGroups.items, []);
-        assertEquals(blankGroups.truncated, false);
-      }
-
-      const injectionStrings = [
-        '*)(|(objectClass=*)',
-        'alice)(|(uid=*',
-        '\\2a',
-        'admin\0ignored',
-      ];
-      for (const payload of injectionStrings) {
-        const users = await port.searchUsers({ text: payload, limit: 10 }, {});
-        assertEquals(
-          users.items,
-          [],
-          `Hostile user search ${JSON.stringify(payload)} must not match unintended records`,
-        );
-        const groups = await port.searchGroups({ text: payload, limit: 10 }, {});
-        assertEquals(
-          groups.items,
-          [],
-          `Hostile group search ${JSON.stringify(payload)} must not match unintended records`,
-        );
-      }
-
-      const literalWildcard = await port.searchUsers({ text: '*', limit: 10 }, {});
-      assertEquals(
-        literalWildcard.items.map((u) => u.immutableId),
-        [DS.userIds.erinHostile],
-        'Literal "*" must only match Erin (O*Connor) and must never act as a wildcard',
-      );
-
-      const literalParens = await port.searchUsers({ text: '(O*Connor)', limit: 10 }, {});
-      assertEquals(literalParens.items.map((u) => u.immutableId), [DS.userIds.erinHostile]);
-
-      const literalBackslash = await port.searchUsers({ text: '\\ Ops', limit: 10 }, {});
-      assertEquals(literalBackslash.items.map((u) => u.immutableId), [DS.userIds.erinHostile]);
-    },
-  },
-  {
-    name: 'timeout fails closed with DirectoryTimeout',
-    async run({ port, timeoutPort }) {
-      const aliceRef = { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.alice };
-      const timedOutCtx = { signal: createTimedOutSignal() };
-
-      await assertRejects(
-        () => port.searchUsers({ text: 'alice', limit: 5 }, timedOutCtx),
-        DirectoryTimeout,
-      );
-      await assertRejects(() => port.getUser(aliceRef, timedOutCtx), DirectoryTimeout);
-      await assertRejects(
-        () =>
-          port.memberOfAny(
-            { user: aliceRef, candidateGroupIds: [DS.groupIds.domainUsers] },
-            timedOutCtx,
-          ),
-        DirectoryTimeout,
-      );
-      await assertRejects(
-        () => port.searchUsers({ text: 'alice', limit: 5 }, { timeoutMs: 0 }),
-        DirectoryTimeout,
-      );
-
-      if (timeoutPort) {
-        await assertRejects(
-          () => timeoutPort.searchUsers({ text: 'alice', limit: 5 }, { timeoutMs: 25 }),
-          DirectoryTimeout,
-        );
-        await assertRejects(
-          () => timeoutPort.getUser(aliceRef, { timeoutMs: 25 }),
-          DirectoryTimeout,
-        );
-        await assertRejects(
-          () =>
-            timeoutPort.memberOfAny(
-              { user: aliceRef, candidateGroupIds: [DS.groupIds.domainUsers] },
-              { timeoutMs: 25 },
-            ),
-          DirectoryTimeout,
-        );
-      }
-    },
-  },
+export const CONFORMANCE_CASES: readonly ConformanceCase[] = [
+  ...IDENTITY_AND_MEMBERSHIP_CASES,
+  ...SEARCH_AND_RESILIENCE_CASES,
 ];

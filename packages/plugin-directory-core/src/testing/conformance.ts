@@ -22,16 +22,18 @@ import { CONFORMANCE_CASES, type ConformanceCase } from './conformance-cases.ts'
  *
  * function createFixture(): DirectoryConformanceFixture {
  *   const clock = createDeterministicClock(DIRECTORY_CONFORMANCE_DATASET.initialTimeIso);
+ *   const base = {
+ *     directoryInstance: DIRECTORY_CONFORMANCE_DATASET.directoryInstance,
+ *     clock,
+ *     maxSearchLimit: 3,
+ *     users: DIRECTORY_CONFORMANCE_DATASET.users,
+ *     groups: DIRECTORY_CONFORMANCE_DATASET.groups,
+ *   };
  *   return {
  *     clock,
  *     maxSearchLimit: 3,
- *     port: createInMemoryDirectoryPort({
- *       directoryInstance: DIRECTORY_CONFORMANCE_DATASET.directoryInstance,
- *       clock,
- *       maxSearchLimit: 3,
- *       users: DIRECTORY_CONFORMANCE_DATASET.users,
- *       groups: DIRECTORY_CONFORMANCE_DATASET.groups,
- *     }),
+ *     port: createInMemoryDirectoryPort(base),
+ *     timeoutPort: createInMemoryDirectoryPort({ ...base, operationDelayMs: 250 }),
  *   };
  * }
  * console.log(typeof createFixture);
@@ -42,10 +44,22 @@ export type DirectoryConformanceFixture = Readonly<{
   port: DirectoryPort;
   /** Deterministic clock controlling `port` timestamps and expiry evaluation. */
   clock: DeterministicDirectoryClock;
-  /** Effective max search limit configured on `port` (defaults to `DIRECTORY_MAX_SEARCH_LIMIT`). */
+  /**
+   * Effective max search limit configured on `port`. Required (and must be `< 4`, `>= 2`) when
+   * `port.capabilities.has('search')` so truncation at the ceiling is actively proven.
+   */
   maxSearchLimit?: number;
-  /** Optional slow/hanging adapter instance used to verify timeout enforcement end-to-end. */
-  timeoutPort?: DirectoryPort;
+  /** Slow/hanging adapter instance used to verify timeout and mid-flight abort enforcement. */
+  timeoutPort: DirectoryPort;
+  /** Optional adapter configured to fail with `DirectoryUnavailable` (used to verify redaction). */
+  unavailablePort?: DirectoryPort;
+  /** Optional adapter configured to fail with `DirectoryUnauthorized` (used to verify redaction). */
+  unauthorizedPort?: DirectoryPort;
+  /**
+   * Sensitive strings (bind passwords, secret file paths, bind DNs, hostnames) that MUST NEVER
+   * appear in `health()` payloads or thrown `DirectoryError` messages/reasons.
+   */
+  sensitiveValues?: readonly string[];
   /** Optional cleanup hook called after each conformance case. */
   teardown?: () => void | Promise<void>;
 }>;
@@ -66,16 +80,18 @@ export type DirectoryConformanceFixture = Readonly<{
  *   name: 'memory',
  *   createFixture: () => {
  *     const clock = createDeterministicClock(DIRECTORY_CONFORMANCE_DATASET.initialTimeIso);
+ *     const base = {
+ *       directoryInstance: DIRECTORY_CONFORMANCE_DATASET.directoryInstance,
+ *       clock,
+ *       maxSearchLimit: 3,
+ *       users: DIRECTORY_CONFORMANCE_DATASET.users,
+ *       groups: DIRECTORY_CONFORMANCE_DATASET.groups,
+ *     };
  *     return {
  *       clock,
  *       maxSearchLimit: 3,
- *       port: createInMemoryDirectoryPort({
- *         directoryInstance: DIRECTORY_CONFORMANCE_DATASET.directoryInstance,
- *         clock,
- *         maxSearchLimit: 3,
- *         users: DIRECTORY_CONFORMANCE_DATASET.users,
- *         groups: DIRECTORY_CONFORMANCE_DATASET.groups,
- *       }),
+ *       port: createInMemoryDirectoryPort(base),
+ *       timeoutPort: createInMemoryDirectoryPort({ ...base, operationDelayMs: 250 }),
  *     };
  *   },
  * };
@@ -105,6 +121,8 @@ export type DirectoryConformanceCaseResult = Readonly<{
   name: string;
   /** Whether all assertions in the scenario passed. */
   passed: boolean;
+  /** Error message captured when `passed` is `false`. */
+  error?: string;
 }>;
 
 /**
@@ -114,8 +132,13 @@ export type DirectoryConformanceCaseResult = Readonly<{
  * ```ts
  * import type { DirectoryConformanceReport } from '@netscript/plugin-directory-core/testing';
  *
- * const report: DirectoryConformanceReport = { suiteName: 'memory', passed: 12, cases: [] };
- * console.log(report.suiteName, report.passed);
+ * const report: DirectoryConformanceReport = {
+ *   suiteName: 'memory',
+ *   passed: 13,
+ *   failed: 0,
+ *   cases: [],
+ * };
+ * console.log(report.suiteName, report.passed, report.failed);
  * ```
  */
 export type DirectoryConformanceReport = Readonly<{
@@ -123,6 +146,8 @@ export type DirectoryConformanceReport = Readonly<{
   suiteName: string;
   /** Total number of passing conformance scenarios. */
   passed: number;
+  /** Total number of failing conformance scenarios. */
+  failed: number;
   /** Ordered scenario outcomes. */
   cases: readonly DirectoryConformanceCaseResult[];
 }>;
@@ -140,10 +165,12 @@ async function executeCase(
 }
 
 /**
- * Executes every {@link DirectoryPort} conformance scenario directly and returns a structured report.
+ * Executes every {@link DirectoryPort} conformance scenario programmatically and returns a
+ * structured report capturing both passing and failing scenarios without aborting on the first
+ * failure.
  *
  * @param options - Adapter name and fixture factory.
- * @returns Conformance execution report when all scenarios pass.
+ * @returns Conformance execution report with per-scenario pass/fail status.
  *
  * @example
  * ```ts
@@ -158,33 +185,48 @@ async function executeCase(
  *   name: 'memory',
  *   createFixture: () => {
  *     const clock = createDeterministicClock(DIRECTORY_CONFORMANCE_DATASET.initialTimeIso);
+ *     const base = {
+ *       directoryInstance: DIRECTORY_CONFORMANCE_DATASET.directoryInstance,
+ *       clock,
+ *       maxSearchLimit: 3,
+ *       users: DIRECTORY_CONFORMANCE_DATASET.users,
+ *       groups: DIRECTORY_CONFORMANCE_DATASET.groups,
+ *     };
  *     return {
  *       clock,
  *       maxSearchLimit: 3,
- *       port: createInMemoryDirectoryPort({
- *         directoryInstance: DIRECTORY_CONFORMANCE_DATASET.directoryInstance,
- *         clock,
- *         maxSearchLimit: 3,
- *         users: DIRECTORY_CONFORMANCE_DATASET.users,
- *         groups: DIRECTORY_CONFORMANCE_DATASET.groups,
- *       }),
+ *       port: createInMemoryDirectoryPort(base),
+ *       timeoutPort: createInMemoryDirectoryPort({ ...base, operationDelayMs: 250 }),
  *     };
  *   },
  * });
- * console.log(report.passed);
+ * console.log(report.passed, report.failed);
  * ```
  */
 export async function verifyDirectoryConformance(
   options: DirectoryConformanceSuiteOptions,
 ): Promise<DirectoryConformanceReport> {
   const results: DirectoryConformanceCaseResult[] = [];
+  let passed = 0;
+  let failed = 0;
   for (const suiteCase of CONFORMANCE_CASES) {
-    await executeCase(suiteCase, options.createFixture);
-    results.push({ name: suiteCase.name, passed: true });
+    try {
+      await executeCase(suiteCase, options.createFixture);
+      results.push({ name: suiteCase.name, passed: true });
+      passed += 1;
+    } catch (err) {
+      results.push({
+        name: suiteCase.name,
+        passed: false,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      failed += 1;
+    }
   }
   return {
     suiteName: options.name,
-    passed: results.length,
+    passed,
+    failed,
     cases: results,
   };
 }
@@ -210,16 +252,18 @@ export async function verifyDirectoryConformance(
  *   name: 'memory',
  *   createFixture: () => {
  *     const clock = createDeterministicClock(DIRECTORY_CONFORMANCE_DATASET.initialTimeIso);
+ *     const base = {
+ *       directoryInstance: DIRECTORY_CONFORMANCE_DATASET.directoryInstance,
+ *       clock,
+ *       maxSearchLimit: 3,
+ *       users: DIRECTORY_CONFORMANCE_DATASET.users,
+ *       groups: DIRECTORY_CONFORMANCE_DATASET.groups,
+ *     };
  *     return {
  *       clock,
  *       maxSearchLimit: 3,
- *       port: createInMemoryDirectoryPort({
- *         directoryInstance: DIRECTORY_CONFORMANCE_DATASET.directoryInstance,
- *         clock,
- *         maxSearchLimit: 3,
- *         users: DIRECTORY_CONFORMANCE_DATASET.users,
- *         groups: DIRECTORY_CONFORMANCE_DATASET.groups,
- *       }),
+ *       port: createInMemoryDirectoryPort(base),
+ *       timeoutPort: createInMemoryDirectoryPort({ ...base, operationDelayMs: 250 }),
  *     };
  *   },
  * });

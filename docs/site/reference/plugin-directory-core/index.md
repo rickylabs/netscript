@@ -14,7 +14,7 @@ conformance testing kit shared by NetScript directory adapters. Zero provider SD
 | --- | --- | --- |
 | `@netscript/plugin-directory-core` | `./mod.ts` | Curated root contract: `DirectoryPort`, domain types, invariants, and typed errors. |
 | `@netscript/plugin-directory-core/domain` | `./src/domain/mod.ts` | [Domain types, health shapes, and invariants](#domain-types-and-invariants). |
-| `@netscript/plugin-directory-core/ports` | `./src/ports/mod.ts` | [`DirectoryPort`, queries, and typed errors](#port-and-typed-errors). |
+| `@netscript/plugin-directory-core/ports` | `./src/ports/mod.ts` | [`DirectoryPort`, queries, clock, deadlines, and typed errors](#port-and-typed-errors). |
 | `@netscript/plugin-directory-core/testing` | `./src/testing/mod.ts` | [In-memory port, deterministic clock, dataset, and conformance suite](#testing-kit). |
 
 ## Port and typed errors
@@ -22,6 +22,14 @@ conformance testing kit shared by NetScript directory adapters. Zero provider SD
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `DirectoryPort` | interface | Provider-neutral directory query port (`searchUsers`, `searchGroups`, `getUser`, `memberOfAny`, `health`). |
+| `DirectoryClock` | interface | Wall-clock interface (`nowMs`, `nowIso`) shared by production adapters and test doubles. |
+| `createSystemDirectoryClock` | function | Create a live wall clock backed by `Date.now()`. |
+| `DIRECTORY_MAX_TIMEOUT_MS` | const | Maximum safe 32-bit timer delay accepted for `CallContext.timeoutMs` (`2_147_483_647` ms). |
+| `DirectoryDeadlineParams` | type alias | Parameters accepted by `runWithDirectoryDeadline`. |
+| `resolveDirectoryTimeoutMs` | function | Validates `CallContext.timeoutMs` or default timeout against `DIRECTORY_MAX_TIMEOUT_MS`. |
+| `classifyDirectoryAbortError` | function | Maps `AbortSignal.reason` to `DirectoryTimeout` (timeout) or `DirectoryUnavailable` (caller abort). |
+| `assertDirectoryCallContext` | function | Validates `CallContext` before directory I/O (`RangeError`, `DirectoryTimeout`, or `DirectoryUnavailable`). |
+| `runWithDirectoryDeadline` | function | Races an async directory operation against `timeoutMs` and `AbortSignal` with guaranteed cleanup. |
 | `SearchUsersQuery` | type alias | Bounded user search input (`{ text, limit }`). |
 | `SearchGroupsQuery` | type alias | Bounded group search input (`{ text, limit }`). |
 | `MemberOfAnyQuery` | type alias | Bounded candidate-group membership query (`{ user, candidateGroupIds }`). |

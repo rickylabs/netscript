@@ -50,3 +50,16 @@ deno task diagrams:check
 `render.ts` shells out to the pinned Mermaid CLI via `npx`. If that toolchain is
 unavailable it prints instructions and exits non-zero; it never runs implicitly
 inside the docs build.
+
+## Hand-authored SVGs
+
+Diagrams with complex layered layouts that cannot be expressed cleanly in Mermaid
+(such as `assets/diagrams/directory-architecture.svg`) may be committed directly
+under `assets/diagrams/*.svg` without a `.mmd` source. Hand-authored SVGs must:
+
+1. Contain **no blank lines** so CommonMark does not terminate the inlined `<svg>` HTML block early.
+2. Pair every `var(--ns-*)` color reference with an explicit light-mode hex fallback (and a canvas
+   background rect) so standalone `<img>` views and Markdown twins render legibly outside the site
+   stylesheet.
+3. Pass the docs build element-count parity check (`<rect>`, `<text>`, `<path>`) and
+   `tools/docs-site/inline-diagram_test.ts`.

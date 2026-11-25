@@ -32,6 +32,15 @@ export type DirectoryRef = Readonly<{
 /**
  * Capability declared by a `DirectoryPort` adapter.
  *
+ * - `'search'`: `searchUsers` and `searchGroups` execute bounded queries. When absent, both
+ *   methods MUST reject with `DirectoryUnsupported` instead of returning empty pages.
+ * - `'transitive-membership'`: `memberOfAny` resolves nested groups and groups nesting the user's
+ *   primary group transitively (cycle-safe). When absent, `memberOfAny` evaluates direct and
+ *   direct primary-group membership only; callers that require transitive semantics must inspect
+ *   `capabilities.has('transitive-membership')` and fail closed with `DirectoryUnsupported`.
+ * - `'change-events'`: Reserved capability indicating the adapter can emit directory change
+ *   events in future extensions.
+ *
  * @example
  * ```ts
  * import type { DirectoryCapability } from '@netscript/plugin-directory-core/domain';
@@ -43,7 +52,15 @@ export type DirectoryRef = Readonly<{
 export type DirectoryCapability = 'search' | 'transitive-membership' | 'change-events';
 
 /**
- * Per-call execution context passed to every directory operation.
+ * Per-call execution context passed to every directory operation (including `health`).
+ *
+ * Deadline and cancellation contract:
+ * - `timeoutMs`: optional finite number in `(0, 2_147_483_647]` (`DIRECTORY_MAX_TIMEOUT_MS`).
+ *   Non-finite values (`NaN`, `±Infinity`) or values above `2_147_483_647` throw `RangeError`.
+ *   Values `<= 0` fail closed with `DirectoryTimeout`.
+ * - `signal`: when aborted with a timeout reason (`DirectoryTimeout` or an `Error`/`DOMException`
+ *   whose `name === 'TimeoutError'`), operations reject with `DirectoryTimeout`. When aborted for
+ *   any other caller cancellation reason, operations reject with `DirectoryUnavailable`.
  *
  * @example
  * ```ts
@@ -57,7 +74,7 @@ export type DirectoryCapability = 'search' | 'transitive-membership' | 'change-e
 export type CallContext = Readonly<{
   /** Optional abort signal propagated to outbound directory IO. */
   signal?: AbortSignal;
-  /** Optional per-call timeout budget in milliseconds. */
+  /** Optional per-call timeout budget in milliseconds (`(0, 2_147_483_647]`). */
   timeoutMs?: number;
   /** Optional caller correlation identifier for diagnostics. */
   requestId?: string;
@@ -162,8 +179,16 @@ export type DirectoryGroup = Readonly<{
 /**
  * Selector accepted by `DirectoryPort.getUser`.
  *
- * Prefer looking up by {@link DirectoryRef} whenever an immutable identifier is known;
- * secondary attribute selectors remain scoped to `directoryInstance`.
+ * Exactly one lookup key (`immutableId`, `userPrincipalName`, `mail`, or `username`) may be
+ * provided alongside `directoryInstance`. Prefer {@link DirectoryRef} whenever an immutable
+ * identifier is known.
+ *
+ * Contract semantics for all adapters:
+ * - Selectors match literally; adapters MUST escape all protocol metacharacters (LDAP, OData,
+ *   SCIM, URL).
+ * - Empty or whitespace-only selector values return `undefined`.
+ * - Secondary attribute lookups (`userPrincipalName`, `mail`, `username`) that match more than one
+ *   account MUST fail closed by returning `undefined` rather than returning an arbitrary account.
  *
  * @example
  * ```ts
@@ -181,7 +206,17 @@ export type DirectoryGroup = Readonly<{
  * ```
  */
 export type UserLookup =
-  | DirectoryRef
+  | (
+    & DirectoryRef
+    & Readonly<{
+      /** Disallowed when looking up by `immutableId`. */
+      userPrincipalName?: undefined;
+      /** Disallowed when looking up by `immutableId`. */
+      mail?: undefined;
+      /** Disallowed when looking up by `immutableId`. */
+      username?: undefined;
+    }>
+  )
   | Readonly<{
     /** Logical identifier of the configured directory instance. */
     directoryInstance: string;
@@ -189,6 +224,10 @@ export type UserLookup =
     userPrincipalName: string;
     /** Disallowed when looking up by `userPrincipalName`. */
     immutableId?: undefined;
+    /** Disallowed when looking up by `userPrincipalName`. */
+    mail?: undefined;
+    /** Disallowed when looking up by `userPrincipalName`. */
+    username?: undefined;
   }>
   | Readonly<{
     /** Logical identifier of the configured directory instance. */
@@ -197,6 +236,10 @@ export type UserLookup =
     mail: string;
     /** Disallowed when looking up by `mail`. */
     immutableId?: undefined;
+    /** Disallowed when looking up by `mail`. */
+    userPrincipalName?: undefined;
+    /** Disallowed when looking up by `mail`. */
+    username?: undefined;
   }>
   | Readonly<{
     /** Logical identifier of the configured directory instance. */
@@ -205,64 +248,8 @@ export type UserLookup =
     username: string;
     /** Disallowed when looking up by `username`. */
     immutableId?: undefined;
+    /** Disallowed when looking up by `username`. */
+    userPrincipalName?: undefined;
+    /** Disallowed when looking up by `username`. */
+    mail?: undefined;
   }>;
-
-/**
- * Origin of a membership evaluation result.
- *
- * @example
- * ```ts
- * import type { ConsistencySource } from '@netscript/plugin-directory-core/domain';
- *
- * const source: ConsistencySource = 'live';
- * console.log(source);
- * ```
- */
-export type ConsistencySource = 'live' | 'cache';
-
-/**
- * Freshness metadata returned alongside every `memberOfAny` evaluation.
- *
- * @example
- * ```ts
- * import type { ConsistencyInfo } from '@netscript/plugin-directory-core/domain';
- *
- * const consistency: ConsistencyInfo = { source: 'live', ageMs: 0 };
- * console.log(consistency.source, consistency.ageMs);
- * ```
- */
-export type ConsistencyInfo = Readonly<{
-  /** Whether the evaluation came directly from the directory or from a cache. */
-  source: ConsistencySource;
-  /** Age of the evaluated result in milliseconds (`0` for live directory queries). */
-  ageMs: number;
-}>;
-
-/**
- * Revocation and staleness budget configuration for directory membership consumers.
- *
- * `revocation_bound = replicationAllowanceMs + membershipCacheTtlMs`.
- *
- * @example
- * ```ts
- * import {
- *   computeRevocationBoundMs,
- *   type DirectoryConsistencyBudget,
- * } from '@netscript/plugin-directory-core/domain';
- *
- * const budget: DirectoryConsistencyBudget = {
- *   replicationAllowanceMs: 30_000,
- *   membershipCacheTtlMs: 60_000,
- *   maxStalenessMs: 120_000,
- * };
- * console.log(computeRevocationBoundMs(budget));
- * ```
- */
-export type DirectoryConsistencyBudget = Readonly<{
-  /** Expected directory replication lag allowance in milliseconds. */
-  replicationAllowanceMs: number;
-  /** Maximum membership cache TTL in milliseconds. */
-  membershipCacheTtlMs: number;
-  /** Maximum acceptable result staleness in milliseconds. */
-  maxStalenessMs: number;
-}>;
