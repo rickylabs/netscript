@@ -113,6 +113,7 @@ during construction, before the first request.
 | ------------- | ------------------------------------------------------------------------------------- |
 | `.`           | `baseContract`, procedure metadata, error + pagination schemas, schema factories      |
 | `./commands`  | Opt-in command error schemas/map, `commandBaseContract`, typed routes and safe error mapping |
+| `./streams`   | Runtime-free SSE stream endpoint contracts (`defineStreamEndpoint`, `buildStreamEndpointUrl`, `isValidStreamOffset`) |
 | `./crud`      | `createCrudContract`, `createReadOnlyContract`, `createListOnlyContract`              |
 | `./query`     | Filter/search schemas, `buildPrismaWhere`, `createPaginatedOutput`, cursor pagination |
 | `./transform` | `createTransformer`, `composeTransformers`, pick/omit transformer factories           |
