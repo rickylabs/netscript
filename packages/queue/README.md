@@ -286,13 +286,20 @@ file-backed persistence contention according to commit certainty:
     `executionState` transitions read-only, while keeping post-success telemetry and diagnostic
     reporting best-effort behind the `executionSucceeded` latch so no post-success fault overwrites
     a completed row, dead-letters, releases the claim, or triggers a counted `nack`.
-- **External-effect boundary:** Recoverable known-uncommitted local settlement contention and
-  verified ambiguous local commits execute the provider call once with zero false dead letters
-  while the worker stays alive. Local worker idempotency **cannot guarantee exactly-once external
-  effects in general**: if the process dies after an external provider succeeds and before local
-  completion becomes durable, redelivery can invoke the external provider again. End-to-end
-  single-effect execution across crashes requires a stable provider-side idempotency key or an
-  atomic transactional boundary with the downstream store.
+- **External-effect boundary & interim unconfirmed post-effect behavior:** Recoverable
+  known-uncommitted local settlement contention and verified ambiguous local commits execute the
+  provider call once with zero false dead letters while the worker stays alive. **Explicit interim
+  behavior:** if a post-effect worker settlement write (`idempotency.markApplied` or
+  `executionState.complete`) remains unconfirmed after bounded retries or an unverified unknown
+  commit outcome, the worker logs the failure and acknowledges the queue delivery without replaying
+  the external provider, leaving the execution row in `running`. Durable post-effect settlement
+  recovery (Case (a) completion repair and Case (b) quarantine with an in-process settlement-only
+  latch) is tracked in [#2667](https://github.com/rickylabs/netscript/issues/2667). Local worker
+  idempotency **cannot guarantee exactly-once external effects in general**: if the process dies
+  after an external provider succeeds and before local completion becomes durable, redelivery can
+  invoke the external provider again. End-to-end single-effect execution across crashes requires a
+  stable provider-side idempotency key or an atomic transactional boundary with the downstream
+  store.
 
 ## Compatibility
 
