@@ -77,6 +77,37 @@ function FieldError(props: { errors?: readonly string[] }) {
 }
 ```
 
+## Keep stored secrets write-only
+
+When a form edits an existing API key, webhook signing secret, or secret HTTP header, pass only a
+boolean `hasValue` indicator to `SecretField` or `KeyValueEditor` — never return the stored secret
+value to the browser. On `POST`, resolve the submitted field with `resolveSecretFieldSubmission`
+(or `parseKeyValueFormData` for indexed key-value rows) from `@netscript/fresh-ui/interactive`:
+
+- `mode: 'keep'` (`__ns_secret_unchanged__` or omitted field when a secret is already stored): leave
+  the stored secret untouched.
+- `mode: 'replace'`: encrypt and persist `submission.value`.
+- `mode: 'clear'` (`__ns_secret_clear__`): delete the stored secret explicitly.
+- `mode: 'unset'`: no secret was stored and none was provided.
+
+```ts
+import { resolveSecretFieldSubmission } from '@netscript/fresh-ui/interactive';
+
+export function resolveWebhookSecretUpdate(
+  formData: FormData,
+  existingCiphertext: string | null,
+): { action: 'keep' | 'replace' | 'clear' | 'unset'; nextPlaintext?: string } {
+  const result = resolveSecretFieldSubmission(formData.get('webhook_secret'), {
+    hadStoredSecret: existingCiphertext !== null,
+    action: formData.get('webhook_secret_action'),
+  });
+  if (result.mode === 'replace') {
+    return { action: 'replace', nextPlaintext: result.value };
+  }
+  return { action: result.mode };
+}
+```
+
 ## Test the page definition
 
 Keep one unit test on the builder chain so the method, schema and layer ids stay wired:

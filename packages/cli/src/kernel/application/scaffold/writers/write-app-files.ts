@@ -223,7 +223,15 @@ export async function writeNormalizedAppFiles(
   );
   const uiInstall = await installUiRegistryItems({
     projectRoot: appDir,
-    names: [...DEFAULT_UI_INIT_ITEMS, 'command-palette', 'chart-block', 'donut'],
+    names: [
+      ...DEFAULT_UI_INIT_ITEMS,
+      'command-palette',
+      'chart-block',
+      'donut',
+      'secret-field',
+      'key-value-editor',
+      'chips-input',
+    ],
     theme: UI_DEFAULT_THEME,
     overwrite: true,
   }, { fs: context.fs });

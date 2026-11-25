@@ -42,4 +42,7 @@ export { StatsGrid } from './stats-grid.tsx';
 export { Switch, type SwitchProps } from './switch.tsx';
 export { Textarea } from './textarea.tsx';
 export { ChartBlock } from './chart-block.tsx';
+export { ChipsInput, type ChipsInputProps } from './chips-input.tsx';
 export { Donut } from './donut.tsx';
+export { KeyValueEditor, type KeyValueEditorProps } from './key-value-editor.tsx';
+export { SecretField, type SecretFieldProps } from './secret-field.tsx';

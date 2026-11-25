@@ -227,9 +227,24 @@ native/pseudo parts distinguish specified anatomy from a rendering implementatio
 adds registry components with real render and browser keyboard coverage; it preserves token values.
 
 The `actions` collection includes ButtonGroup, Toggle and ToggleGroup. The `forms-core`
-collection includes RadioGroup, InputGroup, InputOTP, Slider, Calendar and DatePicker.
-Install individual items with `netscript ui:add calendar` or `netscript ui:add date-picker`.
+collection includes RadioGroup, InputGroup, InputOTP, Slider, Calendar, DatePicker, SecretField,
+KeyValueEditor and ChipsInput.
+Install individual items with `netscript ui:add secret-field key-value-editor chips-input`.
 Hydrate interactive controls inside a Fresh island.
+
+`SecretField` is a write-only credential input (`data-state="unset | set | rotating | invalid | readonly"`)
+that never displays a stored value and provides no reveal control. Pass only `hasValue` from the
+server; untouched stored secrets submit `SECRET_FIELD_UNCHANGED_TOKEN` (`__ns_secret_unchanged__`)
+or omit the field (`unchangedMode="omit"`), explicit clear submits `SECRET_FIELD_CLEAR_TOKEN`
+(`__ns_secret_clear__`), and replacement drafts scrub after form submit or reset. Resolve submitted
+values on the server with `resolveSecretFieldSubmission` from `@netscript/fresh-ui/interactive`.
+`KeyValueEditor` edits dynamic key-value tables with per-row write-only secret mode (reusing
+`useSecretField`), duplicate/empty/pattern validation (`HTTP_HEADER_NAME_PATTERN`), focus
+management on add/remove, and indexed form fields parsed with `parseKeyValueFormData`. `ChipsInput`
+commits tokens on Enter, comma, or paste-split, removes via Backspace/Delete, validates chips
+(`validateEmailChip`), announces changes politely, and optionally composes L1 `Combobox`
+suggestions. The existing Icon primitive also adds `key-round`, `lock`, and `lock-open`, sourced
+from [Lucide](https://lucide.dev/) with its Lucide/Feather notices retained in source.
 
 Calendar accepts ordered ISO date strings through `value`/`defaultValue`, plus
 `mode='single' | 'range'`, `months={1 | 2}`, `caption='label' | 'dropdown'`,
