@@ -62,22 +62,20 @@ Quoted verbatim from the owner's batch directive. `[…]` marks elided text that
 
 Design-only deliverable (`rfcs/0000-in-process-service-link.md`); no files under `packages/` or `plugins/` are modified in this run.
 
-1. **Proposed public surface (`@netscript/sdk/ports`, `./client`, `./presets`, `.`):**
-   - `InProcessServiceApp` (structural port: `fetch(request: Request): Response | Promise<Response>`)
-   - `InProcessServiceRegistry` (`register` with inline `{ readonly replace?: boolean }`, `unregister`, `resolve`, `has`, `clear`)
-   - `ServiceClientTransport` (inlined 3-arm discriminated union — trimming 5 redundant arm/options type aliases across all barrels)
-   - `InProcessServiceError`, `InProcessServiceErrorCode` (`IN_PROCESS_SERVICE_INVALID`, `IN_PROCESS_SERVICE_DUPLICATE`, `IN_PROCESS_SERVICE_NOT_FOUND`, `IN_PROCESS_REDIRECT_UNSUPPORTED`)
-   - `createInProcessServiceRegistry`, `registerInProcessService`, `unregisterInProcessService`, `resolveInProcessService`, `clearInProcessServices`
-   - `transport?: ServiceClientTransport` on `CreateServiceClientOptions` and `DefineServiceConfig` (default `{ kind: 'http' }`)
-   - `CreateInProcessServiceClientOptions`, `createInProcessServiceClient`
+1. **Proposed public surface (bounded F-5 subpath `@netscript/sdk/in-process` + `+3` minimal type closure on existing barrels):**
+   - `@netscript/sdk/in-process` (`src/in-process/mod.ts`, **12 symbols ≤ 20 F-5 cap**, zero new F-5 debt): `InProcessServiceApp`, `InProcessServiceRegistry`, `ServiceClientTransport`, `InProcessServiceError`, `InProcessServiceErrorCode` (`IN_PROCESS_SERVICE_INVALID`, `IN_PROCESS_SERVICE_DUPLICATE`, `IN_PROCESS_SERVICE_NOT_FOUND`, `IN_PROCESS_REDIRECT_UNSUPPORTED`, `IN_PROCESS_BODY_UNUSABLE`), `CreateInProcessServiceClientOptions`, `createInProcessServiceClient`, `createInProcessServiceRegistry`, `registerInProcessService`, `unregisterInProcessService`, `resolveInProcessService`, `clearInProcessServices`.
+   - `./ports` (`96 → 99`), `./presets` (`94 → 97`), `./client` (`54 → 57`), `.` (`159 → 162`): `+3` minimal JSR type closure only (`+0` runtime helpers on `.` or `./client`; recorded arch-debt disposition + automated `deno doc --frozen --json` export-count gate).
+   - `transport?: ServiceClientTransport` on `CreateServiceClientOptions` and `DefineServiceConfig` (default `{ kind: 'http' }`).
 2. **Proposed package-private seams (excluded from `deno doc`):**
    - `packages/sdk/src/internal/fetch-rpc-link.ts` (`createFetchRpcClientLink` shared by HTTP and in-process)
-   - `packages/sdk/src/client/in-process-client-link.ts` (`createInProcessClientLink` with epoch-pinned `WeakMap<InProcessServiceApp, ClientLinkPort>` dispatch + `createInProcessFetch` with pre-dispatch abort subscription, post-headers `wrapAbortableResponse`, single late-body cancel path, redirect refusal, and `withContextAsync(extractContext({}), ...)` `ROOT_CONTEXT` detachment)
+   - `packages/sdk/src/internal/client-contributions/stable-v1-adapter.ts` (optional package-private `resolveEpoch` hook keeping per-epoch app bindings local to `startEpoch()` and off public `SdkClientTransportDescriptor`)
+   - `packages/sdk/src/in-process/client-link.ts` (`createInProcessClientLink` with per-app `WeakMap<InProcessServiceApp, ClientLinkPort>` + `createInProcessFetch` with pre-dispatch abort subscription, `IN_PROCESS_BODY_UNUSABLE` locked/disturbed body refusal, unconditional synchronous `reader.releaseLock()` on every terminal path even when `cancel()` stalls/rejects, single late-body cancel path, redirect refusal, and full-body-lifecycle `withContext(extractContext({}), ...)` `ROOT_CONTEXT` detachment)
 3. **Ports & dependency direction:** Structural `InProcessServiceApp` in `@netscript/sdk/ports` (no root `@netscript/service` import, preserving 0 browser-unsafe edges and Deno-free universal ports); retain existing `@netscript/service/rpc-path` leaf import for `buildServiceRpcPath`.
 4. **Commit slices (design draft PR):**
    - S1 (Round 1): Write initial `rfcs/0000-in-process-service-link.md` + update run `worklog.md` and `drift.md` with baseline evidence.
    - S2 (Round 2): Address all 6 accepted DESIGN-EVAL blockers and 3 accepted advisories (preserving the verbatim owner authorization excerpt at lines 19–25), commit runnable frozen probe fixtures under `.llm/runs/plan-rfc-in-process-service-link-451--rfc/probes/`, and re-verify all gates.
-5. **Deferred scope:** Implementation under `packages/sdk` awaits owner RFC acceptance; GET transport/dedup repair remains owned by `#2611` (`#2610`); deployment/host composition remains orthogonal under `#891`.
+   - S3 (Round 3): Owner-approved Neon continuation (`gemini-4-neon`, separate-session review to follow) closing all 7 round-2 blockers and PR-body advisory — (1) unconditional `reader.releaseLock()` + `'abort'` listener removal on EOF, abort, consumer cancel, and source error even when `cancel()` stalls/rejects, fail-closed `IN_PROCESS_BODY_UNUSABLE` on locked/disturbed bodies, sanitizer-enabled test suite (`probes/adapter-sanitizers.probe.ts`, 8/8 pass), and both-transport abort barriers in `parity-probe.ts`; (2) require `handlerEntries === 2` + distinct generated results on both transports for concurrent identical-header two-partition calls (recording shared-SDK `DedupeRequestsPlugin` partition-key fix alongside `#2611` as a hard prerequisite for `GET` parity); (3) scope near-2083 parity to method-insensitive policies and gate method-sensitive authorizer divergence (`GET` 200 vs `POST` 403) + `transportPolicy: { method: () => 'POST' }` restoration; (4) move the `breaking` PR/release-notes classification note from RFC body to this run record (if Option A widening of `SdkClientTransportDescriptor.kind` is adopted, the implementing PR and release notes must carry the `breaking` label/classification); (5) replace `WeakMap<SdkClientTransportDescriptor, ...>` with SDK-private `resolveEpoch()` local epoch binding + retained-descriptor control and real shared-link unary retry pinning + iterator reconnect re-resolution in `edge-controls-probe.ts`; (6) extend `withContext(extractContext({}), ...)` `ROOT_CONTEXT` detachment across `app.fetch`, `dispatch.then` registration, redirect cancel, and every wrapped source `reader.read()`/`reader.cancel()` under both `propagateTraceContext: false` and `true`; (7) adopt bounded `@netscript/sdk/in-process` subpath (`12 <= 20`) with explicit per-entrypoint F-5 deltas (`99`/`97`/`57`/`162`), arch-debt disposition, and `deno doc --frozen --json` export-count gate.
+5. **Deferred scope:** Implementation under `packages/sdk` awaits owner RFC acceptance; GET transport/dedup repair remains owned by `#2611` (`#2610`); deployment/host composition remains orthogonal under `#891`. Note for implementation: if Option A (`SdkClientTransportDescriptor.kind: 'http' | 'in-process'`) is adopted, the implementing PR and release notes must carry the `breaking` classification.
 
 ## Research & Measured Evidence
 
@@ -111,34 +109,40 @@ All baseline and round-2 probes ran against `main` `87965d800b7d61312e8612c82bdb
   - Current `main` `DedupeRequestsPlugin` stripped `context.signal` (`hasSignal: false`) and internal context symbols (`hasSym: false` in `RPCLink.fetch`) on deduped `GET` requests (`#2610`/`#2611`).
   - Locked `@orpc/client@1.15.5` `StandardRPCLinkCodec.decode()` decoded a raw `302` empty-body redirect response as `[null, null, false, true]` (`isSuccess: true, data: null`), proving `createInProcessFetch()` must explicitly refuse WHATWG redirect statuses (`301, 302, 303, 307, 308`).
 
-### Probe 4 — Committed runnable frozen parity & abort-barrier probe (Round 2)
+### Probe 4 — Committed runnable frozen parity, both-transport abort-barrier, body-lifecycle telemetry & sanitizer suites (Round 3)
 
 - Files:
   - `.llm/runs/plan-rfc-in-process-service-link-451--rfc/probes/in-process-fetch-adapter.ts`
   - `.llm/runs/plan-rfc-in-process-service-link-451--rfc/probes/parity-probe.ts`
-- Command: `deno run --frozen -A .llm/runs/plan-rfc-in-process-service-link-451--rfc/probes/parity-probe.ts` (exit `0`, zero `deno.lock` changes).
+  - `.llm/runs/plan-rfc-in-process-service-link-451--rfc/probes/adapter-sanitizers.probe.ts`
+- Commands:
+  - `deno test --frozen -A .llm/runs/plan-rfc-in-process-service-link-451--rfc/probes/adapter-sanitizers.probe.ts` (exit `0`, **8 passed | 0 failed** with Deno resource & ops sanitizers ON: EOF unlock, stalled/rejecting abort cancel unlock, stalled/rejecting consumer cancel unlock, source error unlock, locked/disturbed body → `IN_PROCESS_BODY_UNUSABLE` with 0 foreign cancels, late `app.fetch` rejection absorbed, OTel caller context detachment through deferred `pull`, abort `cancel`, and late-body `cancel`).
+  - `deno run --frozen -A .llm/runs/plan-rfc-in-process-service-link-451--rfc/probes/parity-probe.ts` (exit `0`, zero `deno.lock` changes).
 - Measured outputs:
-  - Single-app parity (`running.app` backing both loopback HTTP and round-2 `createInProcessFetch`):
+  - Single-app parity (`running.app` backing both loopback HTTP and round-3 `createInProcessFetch`):
     - Identical path `/api/rpc/v1/vault/readSecret`, `ownerA: "alice"`, `ownerB: "bob"`, `deny401: { isDefined: false, code: "UNAUTHORIZED", status: 401 }`, `deny403: { isDefined: false, code: "FORBIDDEN", status: 403 }`, `cached403IsNull: true`, and **measured contract-defined error** `definedError: { isDefined: true, code: "VAULT_LOCKED", status: 409, data: { vaultId: "locked", reason: "maintenance" } }`.
-  - Tracing parity:
-    - `propagateTraceContext: true`: both HTTP and in-process `sameTrace: true`, `serverParentEqualsClient: true`, `serverParentIsNull: false`, `tracestate: "ns=round2"`.
+  - Tracing parity & full body-lifecycle telemetry boundary:
+    - `propagateTraceContext: true`: both HTTP and in-process `sameTrace: true`, `serverParentEqualsClient: true`, `serverParentIsNull: false`, `tracestate: "ns=round3"`.
     - `propagateTraceContext: false`: both HTTP and in-process `sameTrace: false`, `serverParentEqualsClient: false`, `serverParentIsNull: true`, `tracestate: null`.
-  - Abort-lifecycle barriers (all assertions passed):
-    - `preAbortedEntered: false`
-    - `syncAbortMessage: "sync-setup-abort"`, `syncAbortBodyCancels: 1`
-    - `abandonedMessage: "barrier-abort"`, `freshSucceededBeforeRelease: true`, `cachePreservedAfterAbandonedRelease: true`, `lateTrackedBodyCancels: 1`
-    - `postHeadersStreamAbortMessage: "mid-stream-abort"`, `postHeadersStreamCancelCount: 1`
+    - Body lifecycle under BOTH `propagate_false` and `propagate_true`: `observedFetchSpanId: null`, `observedPullSpanId: null`, `observedPostHeadersAbortCancelSpanId: null`, `observedConsumerCancelSpanId: null`, `observedLateBodyCancelSpanId: null` (`observedPullSawTraceHeader: false / true`).
+  - Both-transport abort barriers (all assertions passed):
+    - `preAbortedEntered: false`; `syncAbortMessage: "sync-setup-abort"`, `syncAbortBodyCancels: 1`.
+    - `bothTransports.http`: `abandonedMessage: "barrier-abort-http"`, `handlerObservedAbortBeforeRelease: true`, `freshSucceededBeforeRelease: true`, `cachePreservedAfterAbandonedRelease: true`.
+    - `bothTransports.in-process`: `abandonedMessage: "barrier-abort-in-process"`, `handlerObservedAbortBeforeRelease: true`, `freshSucceededBeforeRelease: true`, `cachePreservedAfterAbandonedRelease: true`, `lateTrackedBodyCancels: 1`.
+    - `postHeadersStreamAbortMessage: "mid-stream-abort"`, `postHeadersStreamCancelCount: 1`, `postHeadersSourceUnlocked: true`.
 
-### Probe 5 — Committed runnable frozen edge-controls probe (Round 2)
+### Probe 5 — Committed runnable frozen edge-controls probe (Round 3)
 
 - File: `.llm/runs/plan-rfc-in-process-service-link-451--rfc/probes/edge-controls-probe.ts`
 - Command: `deno run --frozen -A .llm/runs/plan-rfc-in-process-service-link-451--rfc/probes/edge-controls-probe.ts` (exit `0`, zero `deno.lock` changes).
 - Measured outputs:
   - Credential trust: `cleartextBearerRefusedBeforeDispatch: true`, `cleartextInternalRefusedBeforeDispatch: true`, `trustedBearerSucceeded: true`, `trustedInternalSucceeded: true`.
-  - Mid-epoch replacement race (`WeakMap<InProcessServiceApp, ClientLinkPort>`): `epoch1AppId: "app-1"`, `epoch2AppId: "app-2"`, `app1Seen: ["Bearer epoch-1-app1-cred"]`, `app2Seen: ["Bearer epoch-2-app2-cred"]`.
-  - Redirect refusal: `failedWithoutFollowing: true`, `outboundFetchCalls: 0`.
-  - Concurrent identical-header two-partition `GET`: `wireCallsObserved: 1`, `coalescedUnderCurrentMain: true` (confirming shared-SDK `DedupeRequestsPlugin` coalescing prerequisite while cache layer isolates keys).
-  - Near-2083 URL-length boundary: `payloadLen: 1989`, `httpFullUrlLen: 2082` (`GET`), `inProcFullUrlLen: 2088` (`POST`), `decodedPayloadIdentical: true`.
+  - SDK-private per-epoch binding, retained-descriptor & shared-link retry/reconnect controls: `epoch1AppId: "app-1"`, `epoch2AppId: "app-2"`, `retainedDescriptorsCount: 6` (0 symbols, 0 WeakMap refs), `activeEpochBindingsAfterAllExits: 0`, `unaryRetryAttemptsPinnedToApp1: 2`, `streamReconnectEvents: [{ appId: "app-1", seq: 1, lastEventId: null }, { appId: "app-2", seq: 2, lastEventId: "ev-1" }]`, `streamReconnectRepreparedHeader: true`.
+  - Redirect refusal (with rejecting redirect-body `cancel()`): `failedWithoutFollowing: true`, `outboundFetchCalls: 0`, `redirectBodyCancels: 1`.
+  - Cross-partition identical-header control: `postNonSharingBothTransports: { http: { handlerEntries: 2, distinctResults: true }, in-process: { handlerEntries: 2, distinctResults: true } }`; baseline `currentMainGetWireCallsUnmetPrerequisite: 1` (confirming shared-SDK `DedupeRequestsPlugin` partition-key prerequisite for `GET`).
+  - Near-2083 URL-length boundary:
+    - Method-insensitive: `payloadLen: 1989`, `httpFullUrlLen: 2082` (`GET`), `inProcFullUrlLen: 2088` (`POST`), `decodedPayloadIdentical: true`.
+    - Method-sensitive (`GET`-only authorizer): `httpAllowedGet: true`, `inProcPostDenied403: true`, `fixedPostMethodParityBoth403: true` (via `transportPolicy: { method: () => 'POST' }`).
   - Peer-metadata `withRateLimit()` boundary:
     - Default socket-keyed: HTTP `[200, 429]`, in-process separate `'unknown'` bucket `[200, 429]` (with service warning logged).
     - Logical principal-keyed (`x-principal`): HTTP `user-42` `200`, in-process `user-42` `429` (`Retry-After` present), in-process `user-99` `200`.
@@ -152,6 +156,7 @@ All baseline and round-2 probes ran against `main` `87965d800b7d61312e8612c82bdb
 | 2026-11-24 | S1 | draft | Authored `rfcs/0000-in-process-service-link.md` from template with full parity spec, O-1 decision, RFC 0001 reconciliation, abort/trace proofs, acceptance tests, alternatives, and unresolved questions. |
 | 2026-11-24 | S1 | validate | Internal doc link check (`rfcs/0000-in-process-service-link.md` + default internal doc roots), close-gate keyword parser (`extractClosingIssues`), process-language check, and leak scan all exit `0` clean; restored incidental `deno.lock` churn from probe. |
 | 2026-11-24 | S2 | revision-round-2 | Addressed all 6 accepted DESIGN-EVAL round-1 blockers and 3 accepted advisories (preserving verbatim owner model authorization at lines 19–25); measured barrel export counts, `DedupeRequestsPlugin` context stripping, and `302` oRPC decode behavior; committed and ran frozen probes (`probes/in-process-fetch-adapter.ts`, `probes/parity-probe.ts`, `probes/edge-controls-probe.ts`); revised `rfcs/0000-in-process-service-link.md`, `worklog.md`, and `drift.md`; re-ran all doc/hygiene/link/lock checks. |
+| 2026-11-25 | S3 | revision-round-3 | Owner-approved Neon continuation closing all 7 DESIGN-EVAL round-2 blockers (`issuecomment-7127229591`): unconditional terminal `reader.releaseLock()` + `IN_PROCESS_BODY_UNUSABLE` + `probes/adapter-sanitizers.probe.ts` (8/8 pass under Deno sanitizers) + both-transport abort barriers; strict `handlerEntries === 2` cross-partition non-sharing gate + POST two-transport proof + shared-SDK `GET` prerequisite; method-sensitive URL-length boundary scope & control; moved `breaking` PR/release-notes note from RFC to worklog; SDK-private `resolveEpoch()` replacing public-descriptor `WeakMap` + retained-descriptor & shared-link retry/reconnect controls; full-body-lifecycle `ROOT_CONTEXT` detachment (`app.fetch`, `dispatch.then`, redirect cancel, `reader.read`, `reader.cancel`) verified under both propagation modes; bounded `@netscript/sdk/in-process` F-5 subpath (`12 <= 20`) with explicit per-entrypoint deltas (`99`/`97`/`57`/`162`), arch-debt disposition, and automated export-count gate. |
 
 ## Decisions
 

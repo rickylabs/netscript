@@ -47,10 +47,10 @@ verified baseline facts:
 | `@netscript/sdk` already depends on `@netscript/service` in `packages/sdk/deno.json` for leaf subpaths (`./rpc-path`, `./internal-credential`); `@netscript/service` has zero imports of `@netscript/sdk`.                                | Source-inspected: `packages/sdk/deno.json:33`; `packages/sdk/src/client/service-client.ts:8`; `packages/sdk/src/client/internal-credential-contribution.ts:11`; `packages/service/deno.json` | No circular package dependency exists, yet root `@netscript/service` imports remain forbidden for universal SDK entrypoints.                                                           |
 | Baseline `deno info --json packages/sdk/mod.ts` resolves 113 modules with 0 logger/kv/hono/`node:` edges; adding `import type { ServiceApp } from '@netscript/service'` expands to 215 modules pulling `packages/logger/`, `packages/kv/`, `hono`, and `node:*`, and exposes `Deno.Addr`. | Measured: `deno info --json` against `main` `87965d80` (Deno 2.9.7); source-inspected: `packages/service/src/types.ts:15-18`, `packages/sdk/tests/query/define-services-browser-import_test.ts:38-63,103-110` | `@netscript/sdk` must define a minimal, runtime-neutral structural port (`InProcessServiceApp`) rather than importing `ServiceApp` from `@netscript/service` root.                     |
 | `SdkClientTransportDescriptor` on `main` declares `readonly kind: 'http'`, `origin: URL`, `rpcPath: string`, `secure: boolean`; bearer and internal-credential contributions allow credentials when `transport.secure` or loopback origin holds. | Source-inspected: `packages/sdk/src/ports/sdk-client-contribution.ts:30-39`; `packages/plugin-auth-core/src/sdk/bearer-contribution.ts:87-95`; `packages/sdk/src/client/internal-credential-contribution.ts:118-129` | In-process transport reports `secure: true` with a canonical RFC 6761 `.localhost` synthetic origin (`https://in-process.localhost`) as an explicit host trust decision; widening `kind` is a compatibility trade-off analyzed explicitly below. |
-| Naive `app.fetch(new Request(req, init))` delivers `request.signal` abort to the mounted handler, **but does not reject the caller promise** (measured: caller resolved `{ done: true }` after abort on both cooperative and non-cooperative handlers). | Measured: parity probes against `main` `87965d80` (Deno 2.9.7, locked `@orpc/client@1.15.5`, `jsr:@hono/hono@4.13.13`)                                                               | The in-process fetch adapter must subscribe before dispatch, race `app.fetch(request)` against `signal`, enforce abort through unread/streaming `Response.body`, and guarantee at most one `body.cancel()`. |
-| Calling `app.fetch(request)` directly inside `withSpan(SpanNames.RPC_CLIENT)` leaks the caller's active OpenTelemetry trace into the mounted app via same-process `AsyncLocalStorage` even when `propagateTraceContext: false`.          | Measured: trace-isolation probes against `main` `87965d80` (SERVER span inherited caller `traceId` without detachment; detached to fresh root trace with `ROOT_CONTEXT`)              | The in-process fetch adapter must invoke `app.fetch(request)` inside a detached root telemetry context (`withContextAsync(extractContext({}), ...)`).                                  |
-| Locked `@orpc/client@1.15.5` `StandardRPCLinkCodec.decode()` checks `status >= 400`, so a raw `302` empty-body redirect returned to `RPCLink` decodes as `isSuccess: true, data: null`.                                                 | Measured: frozen probe against `main` `87965d80` (`@orpc/client@1.15.5`)                                                                                                             | `createInProcessFetch()` must explicitly intercept WHATWG redirect statuses (`301, 302, 303, 307, 308`), cancel the body once, and reject without following redirects.                 |
-| On current `main`, `DedupeRequestsPlugin` in `http-client-link.ts` strips `context` (`cache: 'no-store'`, `signal`, and internal symbols) before `fetch` on `GET` and keys dedup only on wire request `(method, URL, body, headers)`. Issue [#2610](https://github.com/rickylabs/netscript/issues/2610) / PR [#2611](https://github.com/rickylabs/netscript/pull/2611) owns the `no-store`/`signal` repair. | Source-inspected: `packages/sdk/src/client/http-client-link.ts:168-177`, `packages/sdk/src/internal/transport-policy.ts:183-187`; measured: frozen probes (`hasSignal: false`, `wireCallsObserved: 1` for identical-header distinct partitions) | This RFC does not redesign `GET` transport or deduplication. Epoch-pinned dispatch uses a per-app `RPCLink` (`WeakMap<InProcessServiceApp, ClientLinkPort>`) so binding isolation is immune to `DedupeRequestsPlugin` context stripping; full non-coalescing for identical-header distinct partitions on unsignalled `GET` is recorded as a shared-SDK prerequisite. |
+| Naive `app.fetch(new Request(req, init))` delivers `request.signal` abort to the mounted handler, **but does not reject the caller promise** (measured: caller resolved `{ done: true }` after abort on both cooperative and non-cooperative handlers). | Measured: parity probes against `main` `87965d80` (Deno 2.9.7, locked `@orpc/client@1.15.5`, `jsr:@hono/hono@4.13.13`)                                                               | The in-process fetch adapter must subscribe before dispatch, race `app.fetch(request)` against `signal`, fail closed on locked/disturbed bodies, release the owned reader lock and abort listener on every terminal path, and guarantee at most one `body.cancel()`. |
+| Calling `app.fetch(request)` directly inside `withSpan(SpanNames.RPC_CLIENT)` leaks the caller's active OpenTelemetry trace into the mounted app via same-process `AsyncLocalStorage` even when `propagateTraceContext: false` — and deferred `Response.body` reads/cancellations or late cleanup callbacks inherit the caller's ALS context unless also detached. | Measured: trace-isolation probes against `main` `87965d80` (SERVER span and deferred body callbacks inherited caller context without detachment; detached to `ROOT_CONTEXT` with `withContext(extractContext({}), ...)`) | The in-process fetch adapter must execute `app.fetch(request)`, register the single late-settlement hook, and run all wrapped source stream `read()` / `cancel()` operations inside `withContext(extractContext({}), ...)`. |
+| Locked `@orpc/client@1.15.5` `StandardRPCLinkCodec.decode()` checks `status >= 400`, so a raw `302` empty-body redirect returned to `RPCLink` decodes as `isSuccess: true, data: null`.                                                 | Measured: frozen probe against `main` `87965d80` (`@orpc/client@1.15.5`)                                                                                                             | `createInProcessFetch()` must explicitly intercept WHATWG redirect statuses (`301, 302, 303, 307, 308`), cancel the body once in `ROOT_CONTEXT`, and reject without following redirects. |
+| On current `main`, `DedupeRequestsPlugin` in `http-client-link.ts` strips `context` (`cache: 'no-store'`, `signal`, and internal symbols) before `fetch` on `GET` and keys dedup only on wire request `(method, URL, body, headers)`. Issue [#2610](https://github.com/rickylabs/netscript/issues/2610) / PR [#2611](https://github.com/rickylabs/netscript/pull/2611) owns the `no-store`/`signal` repair. | Source-inspected: `packages/sdk/src/client/http-client-link.ts:168-177`, `packages/sdk/src/internal/transport-policy.ts:183-187`; measured: frozen probes (`hasSignal: false`, `wireCallsObserved: 1` for identical-header distinct partitions on `GET`, `handlerEntries: 2` on `POST`) | This RFC does not redesign `GET` transport or deduplication. Epoch-pinned dispatch uses an SDK-private per-epoch binding (`resolveEpoch`) paired with a per-app `WeakMap<InProcessServiceApp, ClientLinkPort>` so binding isolation is immune to both `DedupeRequestsPlugin` context stripping and retained public descriptors; shared-SDK `DedupeRequestsPlugin` partition-keying is a hard prerequisite for full identical-header `GET` parity. |
 | `RPCLink` compares full absolute URL length (`origin + rpcPath + query`) against `maxUrlLength: 2083` before `GET`→`POST` fallback; `Deno.serve` passes `{ remoteAddr }` to `app.fetch(req, env)` while one-argument `app.fetch(req)` omits socket peer metadata. | Source-inspected: `packages/sdk/src/internal/transport-policy.ts:197`, `packages/service/src/builder/service-listener.ts:113-114`, `packages/service/src/rate-limit/middleware/rate-limit-middleware.ts:61-91`; measured: frozen edge-controls probe | Exact parity boundaries are explicitly defined for near-2083 verb fallback and socket-metadata-dependent middleware (`withRateLimit()`), with required acceptance controls for both. |
 | The historical `design/E-desktop/epic-and-issues.md` file referenced in issue `#451` is no longer present in the repository; PR `#822` closed unmerged, `#824`/`#850` are superseded, and `#891` (deploy plugin RFC) keeps in-process SDK transport orthogonal. | Source-inspected: repository tree (`design/` absent); GitHub issue/PR records `#822`, `#824`, `#850`, `#891`                                                                         | This RFC stands on its own against current `main` and accepted RFC 0001, without building on superseded single-runtime drafts.                                                         |
 
@@ -143,7 +143,8 @@ When the caller already holds a built `ServiceApp` (from `createService(...).bui
 
 ```ts
 import { createService } from '@netscript/service';
-import { createInProcessServiceClient, createServiceClient } from '@netscript/sdk/client';
+import { createServiceClient } from '@netscript/sdk/client';
+import { createInProcessServiceClient } from '@netscript/sdk/in-process';
 import { ordersContract } from './contracts/orders.ts';
 import { ordersRouter } from './services/orders/router.ts';
 
@@ -158,7 +159,7 @@ const orders = createServiceClient({
   transport: { kind: 'in-process', app: ordersApp },
 });
 
-// Option 2: convenience wrapper (identical behavior and contribution inference)
+// Option 2: convenience wrapper on @netscript/sdk/in-process (identical behavior and inference)
 const ordersDirect = createInProcessServiceClient({
   contract: ordersContract,
   serviceName: 'orders',
@@ -170,16 +171,14 @@ const order = await orders.get({ id: 'ord_123' });
 
 ### Scoped registry for parallel tests and explicit composition
 
-Use `createInProcessServiceRegistry()` to wire multiple mounted services with explicit lifetime and
-registry lookup isolation across concurrent tests (note: shared server or TanStack caches remain
-keyed by resource/action/input/partition and should still be isolated per test when mounting
-different implementations):
+Use `createInProcessServiceRegistry()` from `@netscript/sdk/in-process` to wire multiple mounted
+services with explicit lifetime and registry lookup isolation across concurrent tests (note: shared
+server or TanStack caches remain keyed by resource/action/input/partition and should still be
+isolated per test when mounting different implementations):
 
 ```ts
-import {
-  createInProcessServiceRegistry,
-  defineServices,
-} from '@netscript/sdk';
+import { defineServices } from '@netscript/sdk/presets';
+import { createInProcessServiceRegistry } from '@netscript/sdk/in-process';
 
 const registry = createInProcessServiceRegistry();
 registry.register('orders', ordersApp);
@@ -210,11 +209,11 @@ clients with `transport: { kind: 'in-process' }` (no explicit `app` or `registry
 resolves `serviceName` lazily from the default registry:
 
 ```ts
+import { createServiceClient } from '@netscript/sdk/client';
 import {
   clearInProcessServices,
-  createServiceClient,
   registerInProcessService,
-} from '@netscript/sdk/client';
+} from '@netscript/sdk/in-process';
 
 // At composition root startup:
 registerInProcessService('orders', ordersApp);
@@ -250,27 +249,29 @@ Integration, current verdict `Keep` in
 [10-codebase-verdict-and-handoff.md](../docs/architecture/doctrine/10-codebase-verdict-and-handoff.md))
 and introduces no new package.
 
-| File (proposed)                                     | Visibility                                       | Role                                                                                                                                      |
-| --------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/sdk/src/ports/service-client.ts`          | Public (`./ports`, `./client`, `./presets`, `.`) | Existing port file (382 LOC baseline): adds upstream-free `InProcessServiceApp`, `InProcessServiceRegistry`, and `ServiceClientTransport` while keeping `ports/` at 12 immediate children. |
-| `packages/sdk/src/client/in-process-registry.ts`    | Public (`./client`, `.`)                         | `InProcessServiceError`, `createInProcessServiceRegistry()`, and default registry helpers (`register`/`unregister`/`resolve`/`clear`).    |
-| `packages/sdk/src/client/in-process-client-link.ts` | Package-private                                  | `createInProcessClientLink()` (epoch-pinned per-app `WeakMap<InProcessServiceApp, ClientLinkPort>`) and `createInProcessFetch()` adapter. |
-| `packages/sdk/src/internal/fetch-rpc-link.ts`       | Package-private                                  | Shared `RPCLink` + `ClientRetryPlugin` + `DedupeRequestsPlugin` + `withSpan(RPC_CLIENT)` + `createStableV1ClientLink` builder.            |
-| `packages/sdk/src/client/http-client-link.ts`       | Package-private                                  | Thin HTTP specialization delegating to `fetch-rpc-link.ts` with `resolveServiceUrl` and `globalThis.fetch`.                               |
-| `packages/sdk/src/client/service-client.ts`         | Public (`./client`, `.`)                         | Branches on `transport.kind` (`'http'` default vs `'in-process'`); adds `createInProcessServiceClient()`.                                 |
-| `packages/sdk/src/presets/define-services.ts`       | Public (`./presets`, `.`)                        | Adds `transport?: ServiceClientTransport` to `DefineServiceConfig` and forwards it to `createServiceClient()`.                            |
+| File (proposed)                                               | Visibility                                                 | Role                                                                                                                                      |
+| ------------------------------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/sdk/src/ports/service-client.ts`                    | Public (`./ports`, `./client`, `./presets`, `./in-process`, `.`) | Existing port file (382 LOC baseline): adds upstream-free `InProcessServiceApp`, `InProcessServiceRegistry`, and `ServiceClientTransport` while keeping `ports/` at 12 immediate children. |
+| `packages/sdk/src/in-process/mod.ts`                          | Public (`./in-process` focused subpath; **12 symbols ≤ 20 F-5 cap**) | Bounded public barrel exporting `InProcessServiceError`, `InProcessServiceErrorCode`, `createInProcessServiceClient`, `CreateInProcessServiceClientOptions`, `createInProcessServiceRegistry`, default-registry helpers, and the 3 port types — intentionally NOT re-exported on `.` or `./client` (matching `./desktop` and `./auto-update`). |
+| `packages/sdk/src/in-process/registry.ts`                     | Public via `./in-process`                                  | `InProcessServiceError`, `createInProcessServiceRegistry()`, and default registry helpers (`register`/`unregister`/`resolve`/`clear`).    |
+| `packages/sdk/src/in-process/create-client.ts`                | Public via `./in-process`                                  | `CreateInProcessServiceClientOptions` and `createInProcessServiceClient()` delegating directly to `createServiceClient()`.                |
+| `packages/sdk/src/in-process/client-link.ts`                  | Package-private                                            | `createInProcessClientLink()` (SDK-private per-epoch `resolveEpoch` + per-app `WeakMap<InProcessServiceApp, ClientLinkPort>`) and `createInProcessFetch()`. |
+| `packages/sdk/src/internal/fetch-rpc-link.ts`                 | Package-private                                            | Shared `RPCLink` + `ClientRetryPlugin` + `DedupeRequestsPlugin` + `withSpan(RPC_CLIENT)` + `createStableV1ClientLink` builder.            |
+| `packages/sdk/src/internal/client-contributions/stable-v1-adapter.ts` | Package-private                                    | Adds optional package-private `resolveEpoch` hook to `StableV1ClientLinkOptions` so per-epoch app bindings stay local to `startEpoch()` and never attach to public `SdkClientTransportDescriptor`. |
+| `packages/sdk/src/client/http-client-link.ts`                 | Package-private                                            | Thin HTTP specialization delegating to `fetch-rpc-link.ts` with `resolveServiceUrl` and `globalThis.fetch`.                               |
+| `packages/sdk/src/client/service-client.ts`                   | Public (`./client`, `.`)                                   | Branches on `transport.kind` (`'http'` default vs `'in-process'`); adds zero new runtime exports to `./client` or `.`.                    |
+| `packages/sdk/src/presets/define-services.ts`                 | Public (`./presets`, `.`)                                  | Adds `transport?: ServiceClientTransport` to `DefineServiceConfig` and forwards it to `createServiceClient()`.                            |
 
 Folder cardinality and file-size check against doctrine R-FOLD-CARD and F-1
 (`docs/architecture/doctrine/05-folder-structure.md:167-185`, `09-anti-patterns-and-fitness-functions.md:201-205`):
 
-- `packages/sdk/src/client/` currently has 10 immediate children (7 `.ts` files + 3 `stream-*`
-  subdirectories; source-inspected); adding `in-process-registry.ts` and `in-process-client-link.ts`
-  brings it to 12 immediate children (within the 12-child cap).
-- `packages/sdk/src/ports/` currently has 12 immediate children (source-inspected). Extending
-  `packages/sdk/src/ports/service-client.ts` (382 LOC baseline, staying below the 500 LOC F-1
-  threshold) keeps `packages/sdk/src/ports/` at 12 immediate children with zero cardinality debt.
-- `packages/sdk/src/internal/` currently has 2 immediate children (`client-contributions/` and
-  `transport-policy.ts`; source-inspected); adding `fetch-rpc-link.ts` brings it to 3.
+- `packages/sdk/src/in-process/` is a new focused subpath directory (following `src/desktop/` and
+  `src/auto-update/` in `packages/sdk/deno.json:8-9`) containing 4 immediate children (`mod.ts`,
+  `registry.ts`, `create-client.ts`, `client-link.ts`) — well within the 12-child cap.
+- `packages/sdk/src/client/` stays at 10 immediate children (`+0` children).
+- `packages/sdk/src/ports/` stays at 12 immediate children (`+0` children; `service-client.ts` stays
+  below the 500 LOC F-1 threshold).
+- `packages/sdk/src/internal/` grows from 2 to 3 immediate children (`fetch-rpc-link.ts`).
 
 **Why `createInProcessClientLink` stays package-private:**
 `packages/sdk/tests/client-contribution-private-surface_test.ts:4-19,90-109` enforces that
@@ -410,7 +411,7 @@ export type ServiceClientTransport =
   };
 ```
 
-#### Registry and error API (`@netscript/sdk/client`, re-exported from `.`)
+#### Registry and error API (`@netscript/sdk/in-process`)
 
 ```ts
 /** Stable error codes emitted by the in-process service transport and registry. */
@@ -418,9 +419,10 @@ export type InProcessServiceErrorCode =
   | 'IN_PROCESS_SERVICE_INVALID'
   | 'IN_PROCESS_SERVICE_DUPLICATE'
   | 'IN_PROCESS_SERVICE_NOT_FOUND'
-  | 'IN_PROCESS_REDIRECT_UNSUPPORTED';
+  | 'IN_PROCESS_REDIRECT_UNSUPPORTED'
+  | 'IN_PROCESS_BODY_UNUSABLE';
 
-/** Package-owned error for invalid, duplicate, missing, or redirected in-process service calls. */
+/** Package-owned error for invalid, duplicate, missing, redirected, or unusable-body in-process calls. */
 export class InProcessServiceError extends Error {
   readonly code: InProcessServiceErrorCode;
   readonly serviceName?: string;
@@ -484,7 +486,7 @@ field:
 readonly transport?: ServiceClientTransport;
 ```
 
-Convenience factory on `@netscript/sdk/client` (re-exported from `.`):
+Convenience factory on `@netscript/sdk/in-process` (intentionally NOT re-exported from `./client` or `.`):
 
 ```ts
 export type CreateInProcessServiceClientOptions<
@@ -526,25 +528,34 @@ so that `resolveTransportPolicy`, `validateSdkClientContributions`, `buildServic
 | `transport.kind === 'in-process'` combined with `resolveServiceUrl`     | Throw `TypeError` (`resolveServiceUrl` applies only to HTTP transport).        |
 | `transport.kind === 'http'` with unexpected `app` or `registry` fields  | Throw `TypeError` (avoid silently ignoring in-process bindings).               |
 
-#### Public export delta and F-5 barrel budget
+#### Public export delta and bounded F-5 subpath budget
 
-No new subpath entry in `packages/sdk/deno.json` is required unless default-registry helpers are
-split out (see [Unresolved questions](#unresolved-questions) item 4). Baseline exported symbol
-counts measured via `deno doc --frozen --json` on `main` (`87965d80`) and net proposed additions:
+Doctrine F-5 (`docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md:234-243`) caps
+exported symbols at **`<= 20` per `mod.ts`** (or split into focused subpaths). On current `main`
+(`87965d80`), `@netscript/sdk`'s four existing barrels (`./ports`, `./presets`, `./client`, `.`)
+already exceed 20 symbols, while `./desktop` and `./auto-update` already establish the package's
+focused-subpath precedent (`packages/sdk/deno.json:8-9`, `packages/sdk/mod.ts:43-50`).
 
-| Entrypoint (`packages/sdk`)        | Measured baseline | Proposed delta | Net total | Added symbols                                                                                                                                                                                    |
-| ---------------------------------- | ----------------: | -------------: | --------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `./ports` (`src/ports/mod.ts`)     | `96`              | `+3`           | `99`      | `InProcessServiceApp`, `InProcessServiceRegistry`, `ServiceClientTransport`                                                                                                                      |
-| `./presets` (`src/presets/mod.ts`) | `94`              | `+3`           | `97`      | `InProcessServiceApp`, `InProcessServiceRegistry`, `ServiceClientTransport` (minimum type closure for `DefineServiceConfig.transport`)                                                           |
-| `./client` (`src/client/mod.ts`)   | `54`              | `+12`          | `66`      | The 3 port types + `InProcessServiceError`, `InProcessServiceErrorCode`, `CreateInProcessServiceClientOptions`, `createInProcessServiceClient`, `createInProcessServiceRegistry`, `registerInProcessService`, `unregisterInProcessService`, `resolveInProcessService`, `clearInProcessServices` |
-| `.` (`mod.ts`)                     | `159`             | `+12`          | `171`     | Inherited via `export * from './src/client/mod.ts'` (`packages/sdk/mod.ts:55`)                                                                                                                   |
+This design places **all 9 runtime, error, registry, and convenience-factory exports** on one new
+focused subpath **`@netscript/sdk/in-process`** (`packages/sdk/src/in-process/mod.ts` — **12 total
+symbols, strictly within F-5's `<= 20` cap**), and adds ONLY the **3-type minimal JSR type closure**
+(`InProcessServiceApp`, `InProcessServiceRegistry`, `ServiceClientTransport`) required by
+`CreateServiceClientOptions.transport` and `DefineServiceConfig.transport` on the four pre-existing
+over-cap barrels (**`+0` runtime exports** on `.`, `./client`, `./presets`, and `./ports`):
 
-Doctrine F-5 (`docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md:241`) sets a
-20-symbol target per `mod.ts`; `packages/sdk/mod.ts` already stands at 159 symbols on `main`
-(existing root-barrel debt). Inlining transport arm interfaces and `register` options avoids 5
-redundant type exports on every barrel; whether default-registry helpers should stay scoped to
-`./client` (or a dedicated `./in-process` subpath) rather than expanding root `.` is listed in
-[Unresolved questions](#unresolved-questions) item 4.
+| Entrypoint (`packages/sdk`)               | Measured baseline | Proposed delta | Net total | F-5 disposition                                                                                                                | Added symbols                                                                                                                                                                                    |
+| ----------------------------------------- | ----------------: | -------------: | --------: | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `./in-process` (`src/in-process/mod.ts`)  | `0` (new)         | `+12`          | `12`      | **Compliant (`12 <= 20`, zero F-5 debt)**                                                                                      | `InProcessServiceApp`, `InProcessServiceRegistry`, `ServiceClientTransport`, `InProcessServiceError`, `InProcessServiceErrorCode`, `CreateInProcessServiceClientOptions`, `createInProcessServiceClient`, `createInProcessServiceRegistry`, `registerInProcessService`, `unregisterInProcessService`, `resolveInProcessService`, `clearInProcessServices` |
+| `./ports` (`src/ports/mod.ts`)            | `96`              | `+3` (types)   | `99`      | **Pre-existing over-cap barrel; bounded `+3` type-closure debt disposition required in the architecture-debt ledger**     | `InProcessServiceApp`, `InProcessServiceRegistry`, `ServiceClientTransport`                                                                                                                      |
+| `./presets` (`src/presets/mod.ts`)        | `94`              | `+3` (types)   | `97`      | **Pre-existing over-cap barrel; bounded `+3` type-closure debt disposition required in the architecture-debt ledger**     | `InProcessServiceApp`, `InProcessServiceRegistry`, `ServiceClientTransport` (JSR type closure for `DefineServiceConfig.transport`)                                                               |
+| `./client` (`src/client/mod.ts`)          | `54`              | `+3` (types)   | `57`      | **Pre-existing over-cap barrel; bounded `+3` type-closure debt disposition required in the architecture-debt ledger; `+0` runtime symbols** | `InProcessServiceApp`, `InProcessServiceRegistry`, `ServiceClientTransport` (JSR type closure for `CreateServiceClientOptions.transport`)                                                        |
+| `.` (`mod.ts`)                            | `159`             | `+3` (types)   | `162`     | **Pre-existing over-cap barrel; bounded `+3` type-closure debt disposition required in the architecture-debt ledger; `+0` runtime symbols** | Inherited via `export * from './src/client/mod.ts'` (`packages/sdk/mod.ts:55`); zero runtime helpers re-exported from `./in-process`                                                             |
+
+Every entrypoint total above is enforced as a hard upper bound by an automated `deno doc --frozen --json`
+export-count gate in [Acceptance Gate #4](#4-type-jsr-browser-safety-and-doctrine-gates). Whether to
+retain this bounded `./in-process` subpath plan (recommended) or additionally re-export the 9
+runtime/error symbols from `./client` and `.` (growing them to `66` and `171` under a wider F-5 debt
+grant) is recorded in [Unresolved questions](#unresolved-questions) item 4.
 
 ### Link mechanism and shared transport pipeline
 
@@ -570,17 +581,12 @@ createServiceClient(options)
   └─ transport.kind === 'in-process'
        └─ createInProcessClientLink(...)
             └─ createStableV1ClientLink({
-                 resolveTransport: () => {
+                 resolveEpoch: () => {
                    const app = boundApp ?? activeRegistry.resolve(serviceName);
-                   const descriptor = resolveInProcessTransport(rpcPath);
-                   epochAppByTransport.set(descriptor, app);
-                   return descriptor;
-                 },
-                 link: {
-                   call(path, input, callOptions) {
-                     const app = epochAppByTransport.get(callOptions.preparedCall.call.transport);
-                     return getOrCreateFetchRpcLinkForApp(app).call(path, input, callOptions);
-                   },
+                   return {
+                     transport: resolveInProcessTransport(rpcPath),
+                     link: getOrCreateFetchRpcLinkForApp(app),
+                   };
                  },
                  ...shared
                })
@@ -642,44 +648,59 @@ credential contributions (`createBearerSdkClientContribution` and
    an explicit host/composition-root trust decision designating `app` as the trusted recipient of
    credentials prepared for `serviceName`. Replacing a registry entry via `{ replace: true }`
    explicitly transfers credential trust for subsequent logical epochs to the replacement app.
-2. **Epoch-pinned binding (immune to mid-epoch replacement and `GET` dedup):**
+2. **Epoch-pinned binding via SDK-private `resolveEpoch()` (immune to retained descriptors, mid-epoch replacement, and `GET` dedup):**
    - For direct binding (`transport: { kind: 'in-process', app }`), a single `createFetchRpcClientLink`
      is closed directly over `app` for the lifetime of the client.
-   - For registry binding (`transport: { kind: 'in-process', registry? }`), `resolveTransport()`
-     resolves `const app = activeRegistry.resolve(serviceName)` **once** per logical call epoch,
-     **before** `options.preparation.prepare(logicalCall)` — mirroring HTTP's missing-discovery-URL
-     failure order (`packages/sdk/src/internal/client-contributions/stable-v1-adapter.ts:239-243`;
-     `packages/sdk/tests/integration/service-url-resolver_test.ts:151-166`).
-   - The resolved `app` is stored in a package-private `WeakMap<SdkClientTransportDescriptor, InProcessServiceApp>`
-     keyed by that epoch's frozen descriptor (never exposed on the public descriptor). Before
-     entering `RPCLink`, the outer `ClientLinkPort.call()` looks up that epoch's pinned `app` from
-     `callOptions.preparedCall.call.transport` and dispatches through a per-client
-     `WeakMap<InProcessServiceApp, ClientLinkPort>` cache whose `createFetchRpcClientLink` is closed
-     directly over `createInProcessFetch(app)`.
-   - **Why per-app `WeakMap` instead of looking up `app` inside `RPCLink.fetch`:** Measured on
-     `main` (`87965d80`), `DedupeRequestsPlugin` replaces `options.context` before invoking `fetch`
-     on deduped `GET` requests, stripping `context[stableV1PreparedCall]`. Closing each `RPCLink`
-     directly over its pinned `InProcessServiceApp` guarantees:
-     - **Zero mid-epoch credential cross-delivery:** If `register(serviceName, app2, { replace: true })`
-       runs after epoch 1 resolved `app1` (including while epoch 1's async `prepare()` is awaiting a
-       credential), epoch 1 and all of its unary retries stay strictly pinned to `app1` and **never**
-       dispatch epoch 1's prepared credentials to `app2` — nor can epoch 1 coalesce with an epoch 2
-       `GET` call in `app2`'s `DedupeRequestsPlugin`.
-     - **Clean post-replacement epochs:** New logical calls and iterator-phase stream reconnect
-       epochs (`startEpoch` in `stable-v1-adapter.ts:271`) resolve `app2` from the registry and
-       re-prepare headers specifically for `app2`.
-     - **Zero retention of replaced apps:** Because both maps are `WeakMap`s, a replaced `app1` and
-       its cached `RPCLink` become garbage-collectible as soon as `app1`'s in-flight epochs finish.
+   - For registry binding (`transport: { kind: 'in-process', registry? }`), package-private
+     `StableV1ClientLinkOptions` (`packages/sdk/src/internal/client-contributions/stable-v1-adapter.ts:227-250`)
+     accepts an optional package-private `resolveEpoch()` callback invoked **once** at the start of
+     each `startEpoch()` call, **before** `options.preparation.prepare(logicalCall)` — mirroring
+     HTTP's missing-discovery-URL failure order
+     (`stable-v1-adapter.ts:239-243`; `packages/sdk/tests/integration/service-url-resolver_test.ts:151-166`).
+   - `resolveEpoch()` resolves `const app = activeRegistry.resolve(serviceName)`, obtains the
+     per-app `ClientLinkPort` from a per-client `WeakMap<InProcessServiceApp, ClientLinkPort>` whose
+     `createFetchRpcClientLink` is closed directly over `createInProcessFetch(app)`, and returns
+     `{ transport: resolveInProcessTransport(rpcPath), link }`.
+   - **Never key any `WeakMap` or `Map` by the public `SdkClientTransportDescriptor`:** Because
+     `logicalCall.transport` is delivered directly to user contribution `prepare(snapshot)`
+     (`packages/sdk/src/internal/client-contributions/prepared-call.ts:462-471`), a contribution can
+     retain `snapshot.transport` strongly past call completion; keying a `WeakMap` by `transport`
+     would keep a replaced `app1` and its cached `RPCLink` reachable indefinitely. Holding `epoch.link`
+     strictly as an SDK-private local binding inside `startEpoch()` (or, in adapters outside
+     `stable-v1-adapter.ts`, an SDK-private `Map<symbol, InProcessServiceApp>` whose entry is
+     explicitly deleted in `finally` on every exit including preparation failure and abort)
+     guarantees:
+     - **Zero retention via retained public descriptors:** `snapshot.transport` is a plain frozen
+       `{ kind, origin, rpcPath, secure }` object with zero attached symbols and zero map/WeakMap
+       references to `app` or `epoch.link`. Once `startEpoch()` exits (on normal completion,
+       preparation failure, abort, or iterator close), `epoch.link` becomes immediately unreachable.
+     - **Zero mid-epoch credential cross-delivery (including unary retries and deduped `GET`):**
+       Measured on `main` (`87965d80`), `DedupeRequestsPlugin` replaces `options.context` before
+       invoking `fetch` on deduped `GET` requests, stripping `context[stableV1PreparedCall]`.
+       Because `createTransportPolicy(epoch.link, ...).dispatch(prepared)` passes `epoch.link`
+       directly into its unary retry loop (`stable-v1-adapter.ts:196-207`) and each `epoch.link` is
+       closed directly over `app1`, calling `register(serviceName, app2, { replace: true })` during
+       async `prepare()` OR between unary retry attempts keeps epoch 1 strictly pinned to `app1`
+       (`app2` never receives epoch 1's credentials and epoch 1 never coalesces in `app2`'s
+       `DedupeRequestsPlugin`).
+     - **Clean post-replacement epochs and iterator reconnect:** New logical calls and
+       iterator-phase stream reconnect epochs (`startEpoch(lastEventId)` at
+       `stable-v1-adapter.ts:271`) invoke `resolveEpoch()` anew, resolving `app2` from the registry
+       and re-preparing contribution headers specifically for `app2`.
+     - **Prompt GC of replaced apps:** Because `linksByApp` is a `WeakMap<InProcessServiceApp, ClientLinkPort>`
+       and no public descriptor holds a map edge to `app1`, a replaced `app1` and its cached
+       `RPCLink` become garbage-collectible as soon as `app1`'s in-flight epochs finish.
 3. **Strict locality — redirect refusal and zero network fallback:**
    - `createInProcessFetch()` NEVER calls `globalThis.fetch` and NEVER falls back to HTTP discovery.
    - Measured on `main` (`87965d80`, locked `@orpc/client@1.15.5`): `StandardRPCLinkCodec.decode()`
      only treats `response.status >= 400` as an error, so returning a raw `302 Found` empty-body
      response directly to `RPCLink` silently succeeds with `{ isSuccess: true, data: null }`.
    - Therefore, `createInProcessFetch()` MUST intercept WHATWG redirect statuses
-     (`301`, `302`, `303`, `307`, `308`), cancel `response.body` once, and reject with
-     `InProcessServiceError` (`code: 'IN_PROCESS_REDIRECT_UNSUPPORTED'`, omitting `Location` query
-     parameters/credentials from the error message). Synthetic-origin credentials are never followed
-     onto external URLs and redirects never silently decode as `null`.
+     (`301`, `302`, `303`, `307`, `308`), cancel any unlocked `response.body` once inside
+     `ROOT_CONTEXT` (suppressing cancellation rejections), and reject with `InProcessServiceError`
+     (`code: 'IN_PROCESS_REDIRECT_UNSUPPORTED'`, omitting `Location` query parameters/credentials
+     from the error message). Synthetic-origin credentials are never followed onto external URLs
+     and redirects never silently decode as `null`.
    - Hosts mounting custom forwarding proxies as an `InProcessServiceApp` remain responsible for not
      forwarding synthetic-origin credentials onto cleartext remote network hops.
 
@@ -779,37 +800,50 @@ inside `createFetchRpcClientLink`:
 - When `propagateTraceContext: false`: neither `traceparent` nor `tracestate` is attached to the
   request headers.
 
-#### Mandatory OpenTelemetry context detachment (`ROOT_CONTEXT` boundary)
+#### Mandatory OpenTelemetry context detachment across the full request and body lifecycle (`ROOT_CONTEXT` boundary)
 
 Empirical measurement on `main` (`87965d80`, Deno 2.9.7, `@hono/otel`, `@opentelemetry/context-async-hooks`)
-uncovered an in-process-only telemetry parity trap:
+uncovered two in-process-only telemetry parity traps:
 
-- **Without detachment (measured failure):** Because `app.fetch(request)` runs inside the same
-  process and inside `withSpan(SpanNames.RPC_CLIENT)`'s `AsyncLocalStorage` scope, when
-  `propagateTraceContext: false` omits `traceparent`, Hono's `createHonoTracingMiddleware`
+- **Trap 1 — Direct `app.fetch(request)` ALS leakage (measured failure):** Because `app.fetch(request)`
+  runs inside the same process and inside `withSpan(SpanNames.RPC_CLIENT)`'s `AsyncLocalStorage`
+  scope, when `propagateTraceContext: false` omits `traceparent`, Hono's `createHonoTracingMiddleware`
   (`packages/telemetry/src/hono/otel-middleware.ts:50-80` → `@hono/otel`) falls back to
   `context.active()` and **accidentally parents the mounted app's SERVER span to the caller's CLIENT
   span** (same `traceId`, non-null `parentSpanId`), diverging from HTTP where the network boundary
   breaks `AsyncLocalStorage` and yields a fresh root SERVER trace.
-- **With detachment (measured parity):** Invoking `app.fetch(request)` inside a clean root
-  OpenTelemetry context via existing `@netscript/telemetry/context` exports:
-  ```ts
-  withContextAsync(extractContext({}), async () => await app.fetch(request))
-  ```
-  (`packages/telemetry/src/context/w3c.ts:201-202` runs `propagation.extract(ROOT_CONTEXT, {}, ...)`
-  which returns `ROOT_CONTEXT`, and `packages/telemetry/src/context/helpers.ts:44-46` executes
-  within `context.with(ctx, fn)` — requiring zero direct `@opentelemetry/api` imports in
-  `@netscript/sdk` and zero changes to `@netscript/telemetry`).
-  Measured results with detachment:
+- **Trap 2 — Post-headers body and late-cleanup ALS leakage (measured failure):** Detaching only
+  `app.fetch(request)` is insufficient. When the caller later consumes or aborts a streaming
+  `Response.body`, or when a `dispatch.then(...)` late-cleanup callback was registered inside the
+  caller's active span, `AsyncLocalStorage` restores the **caller's** OTel context during deferred
+  source `pull()`, post-headers `abort` cancellation, consumer `cancel()`, and late-body `cancel()`
+  after caller rejection — leaking caller telemetry into server stream callbacks AND retaining the
+  caller's OTel context inside the settlement hook.
+- **Full-lifecycle detachment (measured parity):** Capture `const serviceCtx = extractContext({})`
+  (`ROOT_CONTEXT`, via existing `@netscript/telemetry/context` exports `extractContext` and
+  `withContext` at `packages/telemetry/src/context/w3c.ts:201-202` and
+  `packages/telemetry/src/context/helpers.ts:37-39` — zero direct `@opentelemetry/api` imports in
+  `@netscript/sdk` and zero changes to `@netscript/telemetry`) and run **all** of the following
+  inside `withContext(serviceCtx, ...)`:
+  1. invoking `app.fetch(request)`;
+  2. registering the single `dispatch.then(...)` settlement callback (so late cleanup never captures
+     or retains the caller's OTel context and runs `cancelLateBodyOnce` strictly under `ROOT_CONTEXT`);
+  3. cancelling redirect bodies in `rejectIfRedirect`; and
+  4. wrapping every non-null `Response.body` (on **both** signalled and unsignalled calls) so
+     `reader.read()`, `reader.cancel(reason)`, and `'abort'` listener registration execute inside
+     `withContext(serviceCtx, ...)`.
+  Measured results with full-lifecycle detachment:
   - When `propagateTraceContext: true`: `@hono/otel` extracts the parent exclusively from the
     injected W3C `traceparent` / `tracestate` HTTP headers. The mounted service handler receives
     identical `context.traceHeaders.traceparent` and `context.traceHeaders.tracestate`
-    (`packages/service/src/builder/service-builder-impl.ts:323-333`), and the exported SERVER span
-    shares the caller's `traceId` with `parentSpanId === rpcClientSpan.spanId` — exact parity with
-    HTTP.
+    (`packages/service/src/builder/service-builder-impl.ts:323-333`), the exported SERVER span
+    shares the caller's `traceId` with `parentSpanId === rpcClientSpan.spanId`, and deferred source
+    `pull()` / post-headers `cancel()` / late-body `cancel()` NEVER inherit the caller's active
+    `caller.op` or `rpc.client` span.
   - When `propagateTraceContext: false`: `@hono/otel` sees neither W3C headers nor an active caller
-    span, starting a fresh root SERVER span (`parentSpanId: null`, distinct `traceId`) — exact
-    parity with HTTP.
+    span, starting a fresh root SERVER span (`parentSpanId: null`, distinct `traceId`), and deferred
+    source `pull()` / post-headers `cancel()` / late-body `cancel()` all observe `ROOT_CONTEXT`
+    (`trace.getSpan(context.active()) === undefined`) — exact parity with HTTP.
 
 ### Denial, error, and middleware parity
 
@@ -856,14 +890,24 @@ implicit:
   falling inside that origin-length window (measured: 1989-char payload → 2082-char HTTP URL vs
   2088-char in-process URL) dispatches as `GET` over HTTP and falls back to `POST` in-process.
 - **Parity contract:**
-  - **In scope:** Identical effective RPC pathname (`url.pathname`), byte-identical decoded output
-    and error semantics, identical authn/authz decisions, and identical cache keys even across the
-    overflow threshold.
-  - **Out of scope:** Identical HTTP method (`GET` vs `POST` overflow fallback) for inputs within
-    the origin-length delta of `2083` characters — the exact same origin-length variation already
-    exists between any two HTTP origins of different lengths (for example `http://localhost:3000`
-    versus `https://api.example.com`). Callers that require a fixed verb independent of origin
-    length can configure `transportPolicy.method`.
+  - **In scope (method-insensitive policies):** Identical effective RPC pathname (`url.pathname`),
+    byte-identical decoded output and error semantics, identical cache keys, and identical
+    authn/authz decisions for **method-insensitive policies** (policies that authorize an oRPC
+    procedure identically across its declared `GET` method and its oRPC `POST` overflow fallback,
+    such as contract-path/scope rules).
+  - **Out of scope (verb choice & method-sensitive policies within the overflow window):** Identical
+    HTTP method (`GET` vs `POST` overflow fallback) — and therefore authorization or middleware
+    decisions that inspect `req.method` (note: shipped `createAuthzMiddleware` passes `c.req.method`
+    to `authorizer.authorize(...)` at `packages/service/src/auth/auth-middleware.ts:127-147`) — are
+    **outside** the parity guarantee for inputs falling inside the origin-length delta around
+    `2083` characters. Measured on a single mounted service with a `GET`-only authorizer at the
+    boundary: HTTP (`GET`, 2082 chars) returned `200`, while in-process (`POST`, 2088 chars)
+    returned `403 FORBIDDEN`. This is the exact same origin-length variation that already exists
+    between any two HTTP origins of different lengths (for example `http://localhost:3000` versus
+    `https://api.example.com`). Callers requiring strict verb and method-sensitive authorization
+    parity across that window MUST hold the verb constant via `transportPolicy: { method: () => 'POST' }`
+    (measured: restores identical `403` / output parity on both transports) or declare `POST` on
+    the contract procedure.
 
 #### 2. Socket peer metadata (`ServiceEnvironment.remoteAddr`) and peer-dependent middleware
 
@@ -915,8 +959,9 @@ parity on `main` (`87965d80`, measured under Deno 2.9.7, `jsr:@hono/hono@4.13.13
 #### Normative in-process fetch adapter contract
 
 The package-private `createInProcessFetch(app)` adapter in
-`packages/sdk/src/client/in-process-client-link.ts` MUST enforce WHATWG Fetch abort semantics across
-pre-dispatch, synchronous setup, pending dispatch, redirect refusal, and unfinished response-body
+`packages/sdk/src/in-process/client-link.ts` MUST enforce WHATWG Fetch abort semantics, body-ownership
+integrity, unconditional reader unlock, redirect refusal, and full-body-lifecycle `ROOT_CONTEXT`
+detachment across pre-dispatch, synchronous setup, pending dispatch, and unfinished response-body
 consumption with a single cleanup path:
 
 ```ts
@@ -926,9 +971,36 @@ function abortReason(signal: AbortSignal): unknown {
   return signal.reason ?? new DOMException('The operation was aborted', 'AbortError');
 }
 
-function rejectIfRedirect(response: Response, serviceName: string): Response {
+function releaseReaderSafely(reader: ReadableStreamDefaultReader<Uint8Array>): void {
+  try {
+    reader.releaseLock();
+  } catch {
+    // Already unlocked.
+  }
+}
+
+function cancelUnownedBodyInContext(
+  body: ReadableStream<Uint8Array> | null,
+  reason: unknown,
+  serviceCtx: Context,
+): void {
+  if (body === null || body.locked) return;
+  withContext(serviceCtx, () => {
+    try {
+      void body.cancel(reason).catch(() => {});
+    } catch {
+      // Ignore synchronous cancel failures from foreign streams.
+    }
+  });
+}
+
+function rejectIfRedirect(
+  response: Response,
+  serviceName: string,
+  serviceCtx: Context,
+): Response {
   if (REDIRECT_STATUSES.has(response.status)) {
-    void response.body?.cancel().catch(() => {});
+    cancelUnownedBodyInContext(response.body, undefined, serviceCtx);
     throw new InProcessServiceError(
       'IN_PROCESS_REDIRECT_UNSUPPORTED',
       `In-process service "${serviceName}" returned HTTP ${response.status} redirect; redirects are not followed in-process.`,
@@ -938,10 +1010,23 @@ function rejectIfRedirect(response: Response, serviceName: string): Response {
   return response;
 }
 
-function wrapAbortableResponse(response: Response, signal: AbortSignal): Response {
+function wrapInProcessResponse(
+  response: Response,
+  serviceName: string,
+  serviceCtx: Context,
+  signal?: AbortSignal,
+): Response {
   const rawBody = response.body;
-  if (rawBody === null || rawBody.locked) {
+  if (rawBody === null) {
     return response;
+  }
+  // Fail closed if app.fetch() violated response-body ownership (already locked or disturbed).
+  if (response.bodyUsed || rawBody.locked) {
+    throw new InProcessServiceError(
+      'IN_PROCESS_BODY_UNUSABLE',
+      `In-process service "${serviceName}" returned a Response whose body was already locked or disturbed.`,
+      serviceName,
+    );
   }
 
   const reader = rawBody.getReader();
@@ -950,20 +1035,30 @@ function wrapAbortableResponse(response: Response, signal: AbortSignal): Respons
   let streamController: ReadableStreamDefaultController<Uint8Array> | undefined;
 
   const cancelSourceOnce = (reason: unknown): Promise<void> => {
-    if (cancelSent) return Promise.resolve();
+    if (cancelSent) {
+      releaseReaderSafely(reader);
+      return Promise.resolve();
+    }
     cancelSent = true;
-    return reader.cancel(reason).catch(() => {});
+    return withContext(serviceCtx, () => {
+      try {
+        return reader.cancel(reason).catch(() => {});
+      } finally {
+        // Unlocks rawBody synchronously even when source cancel() stalls or rejects.
+        releaseReaderSafely(reader);
+      }
+    });
   };
 
   const finish = (): void => {
     if (terminal) return;
     terminal = true;
-    signal.removeEventListener('abort', onBodyAbort);
+    signal?.removeEventListener('abort', onBodyAbort);
   };
 
   const onBodyAbort = (): void => {
     if (terminal) return;
-    const reason = abortReason(signal);
+    const reason = abortReason(signal!);
     finish();
     streamController?.error(reason);
     void cancelSourceOnce(reason);
@@ -972,26 +1067,40 @@ function wrapAbortableResponse(response: Response, signal: AbortSignal): Respons
   const wrappedBody = new ReadableStream<Uint8Array>({
     start(controller) {
       streamController = controller;
-      signal.addEventListener('abort', onBodyAbort, { once: true });
-      if (signal.aborted) {
-        onBodyAbort();
+      if (signal) {
+        withContext(serviceCtx, () => {
+          signal.addEventListener('abort', onBodyAbort, { once: true });
+        });
+        if (signal.aborted) {
+          onBodyAbort();
+        }
       }
     },
     async pull(controller) {
-      if (terminal) return;
+      if (terminal) {
+        releaseReaderSafely(reader);
+        return;
+      }
       try {
-        const { done, value } = await reader.read();
-        if (terminal) return;
+        const { done, value } = await withContext(serviceCtx, () => reader.read());
+        if (terminal) {
+          releaseReaderSafely(reader);
+          return;
+        }
         if (done) {
           finish();
-          reader.releaseLock();
+          releaseReaderSafely(reader);
           controller.close();
           return;
         }
         controller.enqueue(value);
       } catch (error) {
-        if (terminal) return;
+        if (terminal) {
+          releaseReaderSafely(reader);
+          return;
+        }
         finish();
+        releaseReaderSafely(reader);
         controller.error(error);
       }
     },
@@ -1021,11 +1130,19 @@ function createInProcessFetch(
       return Promise.reject(abortReason(signal));
     }
 
+    const serviceCtx = extractContext({});
+
     if (signal === undefined) {
       try {
         const request = new Request(input, init);
-        return withContextAsync(extractContext({}), async () => await app.fetch(request))
-          .then((response) => rejectIfRedirect(response, serviceName));
+        return withContext(serviceCtx, () =>
+          Promise.resolve(app.fetch(request)).then((response) =>
+            wrapInProcessResponse(
+              rejectIfRedirect(response, serviceName, serviceCtx),
+              serviceName,
+              serviceCtx,
+            )
+          ));
       } catch (error) {
         return Promise.reject(error);
       }
@@ -1036,9 +1153,9 @@ function createInProcessFetch(
       let lateBodyCancelled = false;
 
       const cancelLateBodyOnce = (response: Response, reason: unknown): void => {
-        if (lateBodyCancelled || response.body === null) return;
+        if (lateBodyCancelled) return;
         lateBodyCancelled = true;
-        void response.body.cancel(reason).catch(() => {});
+        cancelUnownedBodyInContext(response.body, reason, serviceCtx);
       };
 
       const onAbort = (): void => {
@@ -1049,15 +1166,14 @@ function createInProcessFetch(
 
       // Subscribe BEFORE constructing Request or invoking app.fetch so a
       // synchronous abort triggered during setup is never missed.
-      signal.addEventListener('abort', onAbort, { once: true });
+      withContext(serviceCtx, () => {
+        signal.addEventListener('abort', onAbort, { once: true });
+      });
 
       let dispatch: Promise<Response>;
       try {
         const request = new Request(input, init);
-        dispatch = withContextAsync(
-          extractContext({}),
-          async () => await app.fetch(request),
-        );
+        dispatch = withContext(serviceCtx, () => Promise.resolve(app.fetch(request)));
       } catch (error) {
         if (!settled) {
           settled = true;
@@ -1067,73 +1183,93 @@ function createInProcessFetch(
         return;
       }
 
-      // Single settlement path: handles both normal completion and late
-      // post-abort settlements with at most one body.cancel() invocation.
-      dispatch.then(
-        (response) => {
-          if (settled || signal.aborted) {
-            const reason = abortReason(signal);
-            if (!settled) {
-              settled = true;
-              signal.removeEventListener('abort', onAbort);
-              reject(reason);
+      // Register the single settlement path INSIDE ROOT_CONTEXT so late cleanup
+      // never captures or executes under the caller's OpenTelemetry context.
+      withContext(serviceCtx, () => {
+        dispatch.then(
+          (response) => {
+            if (settled || signal.aborted) {
+              const reason = abortReason(signal);
+              if (!settled) {
+                settled = true;
+                signal.removeEventListener('abort', onAbort);
+                reject(reason);
+              }
+              cancelLateBodyOnce(response, reason);
+              return;
             }
-            cancelLateBodyOnce(response, reason);
-            return;
-          }
-          settled = true;
-          signal.removeEventListener('abort', onAbort);
-          try {
-            resolve(wrapAbortableResponse(rejectIfRedirect(response, serviceName), signal));
-          } catch (error) {
+            settled = true;
+            signal.removeEventListener('abort', onAbort);
+            try {
+              resolve(
+                wrapInProcessResponse(
+                  rejectIfRedirect(response, serviceName, serviceCtx),
+                  serviceName,
+                  serviceCtx,
+                  signal,
+                ),
+              );
+            } catch (error) {
+              reject(error);
+            }
+          },
+          (error) => {
+            if (settled) return;
+            settled = true;
+            signal.removeEventListener('abort', onAbort);
             reject(error);
-          }
-        },
-        (error) => {
-          if (settled) return;
-          settled = true;
-          signal.removeEventListener('abort', onAbort);
-          reject(error);
-        },
-      );
+          },
+        );
+      });
     });
   };
 }
 ```
 
-Normative lifecycle guarantees (all empirically verified by frozen probes on `main` `87965d80`):
+Normative lifecycle guarantees (all empirically verified by frozen probes and sanitizer-enabled tests
+on `main` `87965d80`):
 
 1. **Pre-aborted signal:** Rejects immediately with `abortReason(signal)` before constructing
    `Request` or calling `app.fetch(request)` (`handlerEntered === false`).
 2. **Synchronous abort during setup:** Because `signal.addEventListener('abort', onAbort, { once: true })`
    executes **before** `new Request(input, init)` and `app.fetch(request)`, a synchronous
    `controller.abort(reason)` triggered inside `app.fetch` setup rejects the caller immediately with
-   `reason` and cancels any returned `Response.body` exactly once.
+   `reason` and cancels any returned unlocked `Response.body` exactly once in `ROOT_CONTEXT`.
 3. **In-flight handler observation and prompt caller rejection:** `new Request(input, init)` links
    `request.signal` into Hono (`c.req.raw`) and oRPC `RPCHandler`'s `{ signal }`. Aborting the
    caller's `AbortController` delivers `signal.aborted === true` to the handler and rejects the
    caller immediately with `abortReason(signal)` — even while a non-cooperative handler remains
    blocked.
 4. **Single cleanup path (at most one `body.cancel()`):** `onAbort` does not attach a second
-   `dispatch.then(...)` chain. Only the single `dispatch.then(...)` handler drains late responses
-   through `cancelLateBodyOnce()`, guaranteeing `response.body.cancel()` runs **at most once** and
-   suppressing unhandled rejections from late handler failures.
-5. **Post-headers response-body abort:** When `app.fetch(request)` resolves with a non-null
-   `Response.body` and `signal` is present, `wrapAbortableResponse()` proxies the stream so aborting
-   `signal` after headers settle immediately errors any pending or subsequent `read()` / `text()` /
-   `json()` / `arrayBuffer()` / SSE read with `abortReason(signal)` and cancels the underlying
-   source stream **exactly once**. Completing, erroring, or cancelling the stream immediately
-   removes the `'abort'` listener (and null-body responses attach no body listener at all).
-   `createStableV1ClientLink()` additionally prevents iterator-phase reconnect epochs after abort
-   (`packages/sdk/tests/integration/client-contribution-adapter_test.ts:329-367`).
+   `dispatch.then(...)` chain. Only the single `dispatch.then(...)` handler (registered inside
+   `withContext(serviceCtx, ...)`) drains late responses through `cancelLateBodyOnce()`,
+   guaranteeing an unlocked late `response.body.cancel()` runs **at most once** under `ROOT_CONTEXT`,
+   ignoring foreign-locked late bodies without throwing, and suppressing unhandled rejections from
+   late handler failures.
+5. **Body ownership & unconditional terminal unlock (all paths, signalled and unsignalled):**
+   - A compliant `InProcessServiceApp.fetch()` transfers an unlocked, undisturbed `Response.body`
+     to the adapter. If `response.body !== null && (response.bodyUsed || response.body.locked)`,
+     `wrapInProcessResponse` MUST fail closed with `InProcessServiceError('IN_PROCESS_BODY_UNUSABLE')`
+     (never silently passing an already-locked body through without abort protection, and never
+     calling `cancel()` on a foreign-locked stream).
+   - Every non-null owned `Response.body` is wrapped on **both** signalled and unsignalled calls so
+     every `reader.read()` and `reader.cancel(reason)` runs inside `withContext(serviceCtx, ...)`
+     (never inheriting caller OTel context).
+   - On **every** terminal path — **EOF**, **signal abort**, **consumer `cancel()`**, and **source
+     error** — the adapter detaches `signal.removeEventListener('abort', onBodyAbort)` and executes
+     `reader.releaseLock()` synchronously, **even when `reader.cancel(reason)` stalls indefinitely
+     or rejects** (verified under Deno resource & ops sanitizers: `rawBody.locked === false`
+     immediately with zero unhandled rejections). Null-body responses attach no body listener.
+   - `createStableV1ClientLink()` additionally prevents iterator-phase reconnect epochs after abort
+     (`packages/sdk/tests/integration/client-contribution-adapter_test.ts:329-367`).
 6. **Bounded SDK retention while an abandoned handler is pending:** JavaScript cannot preempt an
    already-running handler that ignores `request.signal`. While a non-cooperative handler has not
    yet settled its `app.fetch(request)` promise, the SDK retains **only** the single lightweight
-   `dispatch.then` settlement callback required to cancel a late `Response.body` once and absorb a
-   late rejection — holding zero references to caller context, contribution projections, procedure
-   input, cache entries, or any adapter/registry map entry. The moment the abandoned `app.fetch`
-   promise settles, that single callback cancels any late body once and drops all remaining
-   references.
+   `dispatch.then` settlement callback registered under `ROOT_CONTEXT` — holding zero references to
+   caller context, caller OpenTelemetry `AsyncLocalStorage` context, contribution projections,
+   procedure input, cache entries, or any adapter/registry map entry. The moment the abandoned
+   `app.fetch` promise settles, that single callback cancels any late body once under `ROOT_CONTEXT`
+   and drops all remaining references.
 
 #### Relationship to `#2611` (`#2610`) — GET transport and deduplication boundary
 
@@ -1163,8 +1299,8 @@ boundaries. Implementation and tests MUST treat each layer's guarantee accuratel
 | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Server cache (`createQueryFactory` / `CacheQuery`)  | Full key appends `['$netscript.sdk-context', JSON.stringify(sortedPairs)]` (`packages/sdk/src/internal/client-contributions/prepared-call.ts:418-421`). Distinct valid partitions NEVER share cache entries even when prepared headers are identical. Denied/aborted `queryFn` calls never populate cache entries. | Keyed by `(resource, action, input, partition)` — NOT by mounted app instance. Replacing a binding (`{ replace: true }`) does not auto-invalidate previously cached responses.         |
 | TanStack Query (`createServiceQueryUtils`)          | Recursive proxy appends `['$netscript.sdk-context', ...sortedPairs]` to full read keys (`packages/sdk/src/query-client/create-service-query-utils.ts:49-92`). Identical across HTTP and in-process.          | Same cache-lifetime boundary: callers reusing one `QueryClient` across binding replacements must invalidate explicitly.                                                                |
-| Transport in-flight dedup (`DedupeRequestsPlugin`)  | Shared across HTTP and in-process inside `createFetchRpcClientLink`. Prepared contribution headers are attached before dedup (`client-contribution-adapter_test.ts:454-499`), so calls with distinct `authorization` / `accept-language` headers do not coalesce. Per-app `WeakMap<InProcessServiceApp, ClientLinkPort>` ensures replaced mounts never coalesce with prior mounts. | **Shared-SDK prerequisite (measured on `main` `87965d80`):** `DedupeRequestsPlugin` keys only on wire request `(method, URL, body, headers)` and **does coalesce** concurrent unsignalled `GET` calls from two distinct valid RFC 0001 partitions when both emit identical (or empty) prepared headers (`wireCallsObserved: 1`). `#2611` repairs signalled/`no-store` `GET` forwarding while retaining unsignalled `GET` coalescing; full transport-level non-coalescing for distinct partitions with identical headers on unsignalled `GET` is a shared-SDK dedup-key prerequisite owned outside `#451`, not an in-process divergence. |
-| In-process registry & fetch adapter                 | Registry stores only `serviceName → InProcessServiceApp`. Per-app `WeakMap` holds no caller context/results. Fetch adapter removes `'abort'` listeners on terminal completion, cancels late/aborted `Response.body` once, and retains only the single settlement hook while a non-cooperative handler is still running. | Bounded retention while an abandoned non-cooperative handler remains pending; zero cross-call state once settled.                                                                      |
+| Transport in-flight dedup (`DedupeRequestsPlugin`)  | Shared across HTTP and in-process inside `createFetchRpcClientLink`. Prepared contribution headers are attached before dedup (`client-contribution-adapter_test.ts:454-499`), so calls with distinct `authorization` / `accept-language` headers do not coalesce. Non-deduped (`POST`) calls with identical prepared headers across distinct partitions execute independently (`handlerEntries === 2`, measured on both transports). Per-app `WeakMap<InProcessServiceApp, ClientLinkPort>` ensures replaced mounts never coalesce with prior mounts. | **Hard shared-SDK prerequisite for unsignalled `GET` parity (measured on `main` `87965d80`):** `DedupeRequestsPlugin` currently keys only on wire request `(method, URL, body, headers)` and **coalesces** concurrent unsignalled `GET` calls from two distinct valid RFC 0001 partitions when both emit identical prepared headers (`wireCallsObserved: 1`). `#2611` repairs signalled/`no-store` `GET` forwarding while intentionally retaining unsignalled `GET` coalescing; full `GET` cross-partition non-sharing therefore requires a shared-SDK `DedupeRequestsPlugin` partition-key prerequisite (outside `#451`) OR an explicit acceptance scope decision restricting v1 identical-header non-sharing parity to non-deduped (`POST`) / partition-distinguished calls. |
+| In-process registry & fetch adapter                 | Registry stores only `serviceName → InProcessServiceApp`. SDK-private `resolveEpoch()` binds `epoch.link` locally without keying any map on public `SdkClientTransportDescriptor`. Fetch adapter removes `'abort'` listeners and unlocks `reader.releaseLock()` on every terminal path (even if `cancel()` stalls or rejects), fails closed on locked/disturbed bodies (`IN_PROCESS_BODY_UNUSABLE`), and runs all source/cleanup callbacks inside `ROOT_CONTEXT`. | Bounded retention (lightweight `ROOT_CONTEXT` settlement hook only) while an abandoned non-cooperative handler remains pending; zero cross-call state or caller OTel context retained once settled. |
 
 ### Acceptance tests and implementation gates
 
@@ -1195,7 +1331,7 @@ Assert exact HTTP ↔ in-process parity across every case:
    - Contract-defined errors (`ORPCError` with `defined: true`, typed `data`) narrow via
      `isDefinedError()` and match identically (`isDefined: true`, `code`, `status`, `data`) across
      HTTP and in-process.
-3. **Trace propagation and isolation:**
+3. **Trace propagation and full body-lifecycle isolation:**
    - With `propagateTraceContext: true` under an active parent span carrying W3C `tracestate`: both
      transports emit an `rpc.client` (`SpanKind.CLIENT`) span under the parent, deliver `traceparent`
      (containing the caller's `traceId` and the `rpc.client` `spanId`) plus `tracestate` to the
@@ -1203,7 +1339,12 @@ Assert exact HTTP ↔ in-process parity across every case:
    - With `propagateTraceContext: false`: neither transport attaches `traceparent`/`tracestate`, and
      on **both** transports the mounted service's `SERVER` span starts a fresh detached root trace
      (`parentSpanId === null`, `serverTraceId !== callerTraceId`).
-4. **Cache isolation and identical-wire two-partition control:**
+   - **Full body-lifecycle telemetry boundary (both `propagateTraceContext: false` AND `true`):**
+     Execute streaming reads (signalled and unsignalled), post-headers `controller.abort()`, consumer
+     `reader.cancel()`, and late-body `cancel()` after caller rejection while inside an active caller
+     OTel span; assert the caller's OTel span is **never** active inside deferred source `pull()`,
+     post-headers abort `cancel()`, consumer `cancel()`, or late-body `cancel()`.
+4. **Cache isolation and cross-partition non-sharing gate:**
    - Calling through `defineServices()` / `createQueryFactory()` backed by `CacheQuery(new MemoryCacheStore())`
      populates distinct `$netscript.sdk-context` keys for context A and context B; neither transport
      shares a cached result between the two contexts.
@@ -1212,38 +1353,52 @@ Assert exact HTTP ↔ in-process parity across every case:
    - `createServiceQueryUtils()` produces identical partitioned `queryKey` tuples across both
      transports, and `direct-only` contributions omit `queries` and `queryUtils` identically on both
      transports.
-   - **Concurrent identical-wire two-partition control:** Issue two concurrent `GET` calls with two
-     distinct valid RFC 0001 partitions that emit identical prepared headers; assert distinct
-     `$netscript.sdk-context` cache keys on both transports and assert identical transport-dedup
-     behavior across HTTP and in-process (documenting the shared-SDK `DedupeRequestsPlugin`
-     coalescing prerequisite until any shared dedup-key change lands).
-5. **Observable abort-lifecycle barrier suite (pre-dispatch, setup, in-flight, post-headers):**
-   - **Explicit entry / abort-observed / release barriers** on a non-cooperative mounted handler:
+   - **Concurrent identical-wire two-partition non-sharing requirement:** Issue two concurrent calls
+     from two distinct valid RFC 0001 partitions emitting identical prepared headers against a
+     stateful/sequence-generating handler; assert **two independent handler entries
+     (`handlerEntries === 2`) and independently generated results (`resA.sequence !== resB.sequence`)
+     on BOTH HTTP and in-process transports** (equal coalescing is NOT an acceptable pass!).
+     - For non-deduped (`POST`) procedures, this assertion passes immediately on both transports.
+     - For unsignalled `GET` procedures with identical prepared headers across distinct partitions,
+       landing the shared-SDK `DedupeRequestsPlugin` partition-key fix (alongside `#2611`) is a
+       **hard implementation prerequisite** unless v1 acceptance is explicitly narrowed (see
+       [Unresolved questions](#unresolved-questions) item 7).
+5. **Observable abort-lifecycle barrier suite (both transports, all terminal paths, sanitizers ON):**
+   - **Explicit entry / abort-observed / release barriers across BOTH HTTP and in-process** on a
+     non-cooperative mounted handler:
      1. Await `entryBarrier` (confirming handler entry), then call `controller.abort(reason)`.
      2. Await `abortObservedBarrier` (confirming `request.signal.aborted === true` inside handler).
      3. Assert the caller promise rejects with `reason` **before** releasing `releaseBarrier`.
      4. Execute a **fresh same-key dispatch** and assert it succeeds **before** releasing
         `releaseBarrier`.
-     5. Release `releaseBarrier` and assert: (a) **no cache write** from the abandoned call
-        (fresh call's cached entry is preserved), and (b) **exactly one** late-body `cancel()`
-        invocation (`lateBodyCancels === 1`).
+     5. Release `releaseBarrier` and assert: (a) **no cache write** from the abandoned call on both
+        transports (fresh call's cached entry is preserved), and (b) on the in-process transport,
+        **exactly one** late-body `cancel()` invocation (`lateBodyCancels === 1`).
    - **Synchronous abort during `app.fetch` setup:** Handler calls `controller.abort(reason)`
      synchronously before returning a `Response`; assert caller rejects with `reason` and
      `lateBodyCancels === 1`.
-   - **Post-headers non-cooperative streaming `Response.body` abort:** Handler returns a `200`
-     response with a blocked `ReadableStream` that ignores `request.signal`; consumer initiates
-     `reader.read()`, then calls `controller.abort(reason)`; assert `reader.read()` rejects
-     immediately with `reason` and underlying stream `cancel()` is invoked **exactly once**.
+   - **Sanitizer-enabled terminal-path matrix (EOF, abort, consumer cancel, source error, unusable
+     body, late rejection):** Verify under Deno's built-in resource and ops sanitizers (`sanitizeOps: true`,
+     `sanitizeResources: true`):
+     - Normal EOF unlocks source (`rawBody.locked === false`) and removes `'abort'` listener;
+     - Post-headers `controller.abort(reason)` immediately rejects pending `read()` with `reason`,
+       calls source `cancel()` once, and unlocks `rawBody.locked === false` **immediately even when
+       source `cancel()` stalls indefinitely or rejects**;
+     - Consumer `wrappedReader.cancel()` unlocks `rawBody.locked === false` immediately even when
+       source `cancel()` stalls or rejects;
+     - Source `pull()` error propagates to consumer and unlocks `rawBody.locked === false`;
+     - Already-locked and already-disturbed (`bodyUsed === true`) `Response.body` streams fail
+       closed with `InProcessServiceError('IN_PROCESS_BODY_UNUSABLE')` on both signalled and
+       unsignalled calls without cancelling the foreign-locked stream;
+     - Late `app.fetch` rejection after caller abort is absorbed cleanly with zero unhandled
+       rejections.
    - **Pre-aborted negative control:** Aborted signal rejects immediately with `signal.reason` with
      `handlerEntered === false`.
-   - Deno's built-in ops and resource sanitizers MUST remain enabled and green across every abort
-     case.
-   - *(Sequencing note)* For `GET` procedures, the in-flight abort case additionally depends on
-     `#2611`'s shared `DedupeRequestsPlugin` repair landing; implementation covers `POST` abort
-     parity immediately and enables `GET` abort parity once `#2611` merges (see
-     [Unresolved questions](#unresolved-questions) item 7).
+   - *(Sequencing note)* For `GET` procedures, in-flight abort parity is explicitly gated on the
+     actual landed `#2611` shared fix and its supported caller path (`cache: 'no-store'` / signalled
+     `GET` once `#2611` merges; see [Unresolved questions](#unresolved-questions) item 7).
 
-#### 2. Credential trust, replacement, redirect, and transport-boundary controls
+#### 2. Credential trust, epoch binding, replacement, redirect, and transport-boundary controls
 
 - **Trusted in-process credential delivery:** Both `createBearerSdkClientContribution` and
   `createInternalCredentialSdkClientContribution` succeed on an explicitly trusted in-process mount
@@ -1251,19 +1406,35 @@ Assert exact HTTP ↔ in-process parity across every case:
 - **Cleartext non-loopback HTTP refusal negative control:** Both contributions refuse
   `http://api.example.test` before dispatch (`dispatched === 0`, `SdkClientContributionError`) when
   `allowInsecureTransport` is omitted.
-- **Mid-epoch registry replacement race:** Start epoch 1 against `app1` with an async `prepare()`
-  held on a barrier; call `registry.register(name, app2, { replace: true })`; release epoch 1 while
-  concurrently starting epoch 2; assert epoch 1's prepared credentials reach **`app1` only**
-  (`app2` never sees epoch 1's credentials) and epoch 2 resolves and reaches `app2` with epoch 2's
-  credentials.
-- **Redirect refusal control:** Mounted app returns `302 Found` with an external `Location` header;
-  assert the client rejects with `InProcessServiceError` (`IN_PROCESS_REDIRECT_UNSUPPORTED`), does
-  not silently resolve `null`, cancels any redirect body once, and triggers zero `globalThis.fetch`
-  calls.
-- **Near-2083 URL-length boundary control:** Choose an input payload whose serialized full URL stays
-  `<= 2083` over the loopback HTTP origin (`GET`) and exceeds `2083` over
-  `https://in-process.localhost` (`POST`); assert decoded responses, auth decisions, and cache keys
-  remain byte-identical despite the overflow verb fallback.
+- **Mid-epoch replacement, retained-descriptor control, and real shared-link retry/reconnect:**
+  - **Mid-epoch replacement race:** Start epoch 1 against `app1` with an async `prepare()` held on a
+    barrier; call `registry.register(name, app2, { replace: true })`; release epoch 1 while
+    concurrently starting epoch 2; assert epoch 1's prepared credentials reach **`app1` only** and
+    epoch 2 reaches `app2` with epoch 2's credentials.
+  - **Retained-descriptor control:** Contribution retains every `snapshot.transport` descriptor
+    strongly across (a) successful completion, (b) throwing `prepare()`, and (c) aborted `prepare()`;
+    assert zero hidden symbols on retained descriptors, zero active epoch bindings remaining after
+    every exit, and no map keyed by `snapshot.transport` keeping a replaced `app1` reachable.
+  - **Real shared-link unary retry (`retry: 1`) + async-iterator reconnect (`eventIterator`) across
+    `{ replace: true }`:** Verify on the actual shared `createStableV1ClientLink` + `RPCLink` stack
+    that: (a) a unary retry after mid-retry `{ replace: true }` stays pinned to `app1` (replaying
+    epoch 1's headers; `app2` receives 0 calls from epoch 1); and (b) an async-iterator reconnect
+    after stream drop + `{ replace: true }` starts a fresh epoch, re-resolves `app2`, re-runs
+    `prepare()`, forwards `Last-Event-ID`, and yields subsequent events from `app2`.
+- **Redirect refusal control:** Mounted app returns `302 Found` with an external `Location` header
+  and a body whose `cancel()` rejects; assert the client rejects with `InProcessServiceError`
+  (`IN_PROCESS_REDIRECT_UNSUPPORTED`), does not silently resolve `null`, invokes redirect body
+  `cancel()` once (in `ROOT_CONTEXT`, zero unhandled rejection), and triggers zero
+  `globalThis.fetch` calls.
+- **Near-2083 URL-length boundary controls (method-insensitive AND method-sensitive authorizers):**
+  - Choose an input payload whose serialized full URL stays `<= 2083` over the loopback HTTP origin
+    (`GET`) and exceeds `2083` over `https://in-process.localhost` (`POST`):
+    - Under a **method-insensitive** policy, assert decoded responses and cache keys remain
+      byte-identical despite the overflow verb fallback.
+    - Under a **method-sensitive** authorizer allowing `GET` only, assert HTTP (`GET`) returns `200`
+      and in-process (`POST`) returns `403 FORBIDDEN` (documenting the explicit scope boundary), and
+      assert that configuring `transportPolicy: { method: () => 'POST' }` restores exact parity
+      across both transports.
 - **Peer-metadata `withRateLimit()` boundary control:** Against a single mounted `ServiceApp`:
   - with default socket-keyed `withRateLimit()`, assert HTTP and in-process bucket separately
     (documenting the intentional `'unknown'` fallback boundary when `remoteAddr` is absent);
@@ -1295,9 +1466,15 @@ Assert exact HTTP ↔ in-process parity across every case:
     types and preserve `defineServices()` `queries` / `queryUtils` / `direct-only` omission;
   - mutually exclusive `app` vs `registry` arms fail compilation via `@ts-expect-error`.
 - `packages/sdk/tests/client-contribution-private-surface_test.ts` updated to include
-  `createInProcessClientLink` and `createFetchRpcClientLink` in `PRIVATE_ADAPTER_NAMES` and green.
+  `createInProcessClientLink` and `createFetchRpcClientLink` in `PRIVATE_ADAPTER_NAMES` (and cover
+  `./in-process`) and green.
+- **Automated F-5 per-entrypoint export-count gate (`deno doc --frozen --json`):** Assert exported
+  symbol counts satisfy `./in-process <= 20` (exact target `12`), `./ports <= 99`, `./presets <= 97`,
+  `./client <= 57`, and `. <= 162`, with zero in-process runtime/error/registry helpers exported
+  from `.` or `./client`, and with the bounded `+3` type-closure delta on the four pre-existing
+  over-cap barrels recorded in the architecture-debt ledger.
 - `packages/sdk/tests/query/define-services-browser-import_test.ts` remains green (0 logger/kv/`node:`
-  edges on `mod.ts` and `src/presets/mod.ts`).
+  edges on `mod.ts`, `src/presets/mod.ts`, and `src/in-process/mod.ts`).
 - `packages/sdk/tests/integration/service-url-resolver_test.ts` (`no-deno-runtime-client.ts`)
   remains green (no `Deno.*` global access or types required on universal SDK entrypoints).
 - Scoped `run-deno-check.ts`, `run-deno-test.ts`, `run-deno-lint.ts`, `run-deno-fmt.ts`,
@@ -1414,8 +1591,7 @@ tracing, and serialization behavior).
     (`createBearerSdkClientContribution`, `createInternalCredentialSdkClientContribution`,
     `createLocaleSdkClientContribution`) do not narrow `transport.kind` to `'http'` and compile
     unchanged. Migration for affected external contributions: handle `'in-process'` (or check
-    `options.transport.secure` / `origin` instead of assuming `kind === 'http'`). If Option A is
-    adopted, the implementing PR/release notes must carry the `breaking` classification.
+    `options.transport.secure` / `origin` instead of assuming `kind === 'http'`).
   - **Non-breaking alternative (Option B):** Keep `readonly kind: 'http'` on v1
     `SdkClientTransportDescriptor` (since both transports speak Fetch HTTP `Request`/`Response`
     semantics) and optionally expose an additive `readonly inProcess?: boolean` field, yielding zero
@@ -1462,26 +1638,31 @@ The following technical design choices remain open before acceptance:
 3. **Package-private `createInProcessClientLink`:** Confirm keeping `createInProcessClientLink`
    package-private (parallel to `createHttpClientLink` and `client-contribution-private-surface_test.ts`)
    rather than promoting `ClientLinkPort` to a public export in this change.
-4. **Default process-scoped registry and root-barrel F-5 budget:** Should the SDK ship both isolated
-   `createInProcessServiceRegistry()` and the default process-scoped helpers
-   (`registerInProcessService` / `unregisterInProcessService` / `resolveInProcessService` /
-   `clearInProcessServices`), and should those helpers re-export from root `@netscript/sdk`
-   (`159 → 171` symbols) or live only on `@netscript/sdk/client` (or a dedicated
-   `@netscript/sdk/in-process` subpath) to avoid expanding root `mod.ts`?
+4. **Bounded `@netscript/sdk/in-process` subpath vs `./client` / `.` re-exports (F-5 budget):**
+   Confirm placing all 9 in-process runtime, error, registry, and convenience-factory exports
+   exclusively on the new F-5-compliant subpath `@netscript/sdk/in-process` (`12 <= 20` symbols)
+   while limiting the four pre-existing over-cap barrels (`./ports`, `./presets`, `./client`, `.`)
+   to the `+3` minimal JSR type-closure (`99`, `97`, `57`, `162` with recorded arch-debt
+   disposition), versus additionally re-exporting runtime/registry helpers from `./client` and `.`
+   (`66` and `171` symbols, requiring broader F-5 debt approval), and confirm whether the default
+   process-scoped helpers should ship alongside isolated `createInProcessServiceRegistry()`.
 5. **Duplicate registration default:** Confirm rejecting duplicate `serviceName` registrations by
    default (`IN_PROCESS_SERVICE_DUPLICATE`) with opt-in `{ replace: true }`, versus silent overwrite.
 6. **Optional telemetry additions:**
    - Keep `'netscript.rpc.transport': 'orpc'` and optionally add
      `'netscript.rpc.transport.mode': 'http' | 'in-process'` on the `rpc.client` span?
-   - Reuse existing `withContextAsync(extractContext({}), ...)` from `@netscript/telemetry/context`
+   - Reuse existing `withContext(extractContext({}), ...)` from `@netscript/telemetry/context`
      (zero changes to `@netscript/telemetry`), or also add a dedicated `withRootContext()` helper in
      `@netscript/telemetry/context`?
-7. **Sequencing of `GET` abort-in-flight and identical-header dedup prerequisites:**
-   - Should implementation wait for `#2611` to land so the acceptance parity suite asserts both `GET`
-     and `POST` abort-in-flight cancellation in one PR, or land with `POST` abort parity first and
-     enable `GET` abort parity once `#2611` merges?
-   - Should transport-level non-coalescing for distinct RFC 0001 partitions with identical prepared
-     headers on unsignalled `GET` remain a separate shared-SDK `DedupeRequestsPlugin` follow-up?
+7. **Sequencing of `GET` abort-in-flight and identical-header cross-partition `GET` prerequisites:**
+   - **Option A (full `GET` + `POST` parity gate):** Wait for both `#2611` (`GET` `no-store` /
+     `signal` forwarding) and a shared-SDK `DedupeRequestsPlugin` partition-key fix to land so the
+     implementation closes both `GET` abort-in-flight and concurrent identical-header two-partition
+     `GET` non-sharing (`handlerEntries === 2`) in one pass.
+   - **Option B (narrowed v1 `POST`-first acceptance):** Explicitly narrow v1 acceptance to `POST` /
+     distinct-header parity (where `handlerEntries === 2` and both-transport abort barriers already
+     pass on `main`), and gate `GET` abort-in-flight + identical-header `GET` non-sharing on the
+     shared-SDK `#2611` + `DedupeRequestsPlugin` prerequisite landing.
 
 ## Future possibilities
 

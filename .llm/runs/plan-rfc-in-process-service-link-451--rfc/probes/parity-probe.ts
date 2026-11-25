@@ -1,5 +1,6 @@
 /**
- * Runnable RFC 0000 parity and abort-lifecycle verification probe.
+ * Runnable RFC 0000 parity, both-transport abort-barrier, and full-body-lifecycle
+ * OpenTelemetry boundary verification probe.
  *
  * Run with:
  *   deno run --frozen -A .llm/runs/plan-rfc-in-process-service-link-451--rfc/probes/parity-probe.ts
@@ -284,7 +285,7 @@ try {
   }
   assertEquals(results['http'], results['in-process']);
 
-  // 2. Trace propagation (true) and OTel ROOT_CONTEXT detachment (false).
+  // 2. Trace propagation (true) and OTel ROOT_CONTEXT detachment (false) across unary + full body lifecycle.
   const traceReport: Record<string, unknown> = {};
   const tracer = trace.getTracer('probe-caller');
   for (const propagate of [true, false]) {
@@ -295,7 +296,7 @@ try {
       const client = createORPCClient(link as any) as any;
       const parentCtx = propagation.extract(otelContext.active(), {
         traceparent: '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
-        tracestate: 'ns=round2',
+        tracestate: 'ns=round3',
       });
       const response = await otelContext.with(parentCtx, async () =>
         await tracer.startActiveSpan('caller.op', async (span) => {
@@ -316,7 +317,7 @@ try {
       if (propagate) {
         assertEquals(serverSpan.spanContext().traceId, callerSpan.spanContext().traceId);
         assertEquals(serverSpan.parentSpanContext?.spanId, clientSpan.spanContext().spanId);
-        assertEquals(response.tracestate, 'ns=round2');
+        assertEquals(response.tracestate, 'ns=round3');
       } else {
         assertNotEquals(serverSpan.spanContext().traceId, callerSpan.spanContext().traceId);
         assertEquals(serverSpan.parentSpanContext?.spanId ?? null, null);
@@ -333,7 +334,138 @@ try {
     }
   }
 
-  // 3. Blocker 2 barrier suite:
+  // 2b. Full body-lifecycle telemetry boundary (deferred pull, post-headers abort cancel,
+  //     consumer cancel, and late-body cancel after caller rejection) under both propagation modes.
+  const bodyLifecycleTelemetry: Record<string, unknown> = {};
+  for (const propagate of [false, true]) {
+    let observedFetchSpanId: string | null = null;
+    let observedPullSpanId: string | null = null;
+    let observedPostHeadersAbortCancelSpanId: string | null = null;
+    let observedConsumerCancelSpanId: string | null = null;
+    let observedLateBodyCancelSpanId: string | null = null;
+    let observedPullSawTraceHeader = false;
+
+    const lateFetchRelease = deferred<void>();
+
+    const streamingApp = {
+      fetch(req: Request) {
+        observedFetchSpanId = trace.getSpan(otelContext.active())?.spanContext().spanId ?? null;
+        const url = new URL(req.url);
+        const kind = url.searchParams.get('kind');
+        const hasTraceparent = req.headers.has('traceparent');
+        if (kind === 'late') {
+          return lateFetchRelease.promise.then(() =>
+            new Response(
+              new ReadableStream<Uint8Array>({
+                cancel() {
+                  observedLateBodyCancelSpanId =
+                    trace.getSpan(otelContext.active())?.spanContext().spanId ?? null;
+                },
+              }),
+            )
+          );
+        }
+        let sentFirst = false;
+        const body = new ReadableStream<Uint8Array>({
+          pull(controller) {
+            observedPullSpanId = trace.getSpan(otelContext.active())?.spanContext().spanId ?? null;
+            observedPullSawTraceHeader = hasTraceparent;
+            if (!sentFirst) {
+              sentFirst = true;
+              controller.enqueue(new TextEncoder().encode('chunk-1'));
+              return;
+            }
+            return new Promise(() => {});
+          },
+          cancel() {
+            const activeSpanId = trace.getSpan(otelContext.active())?.spanContext().spanId ?? null;
+            if (kind === 'abort') {
+              observedPostHeadersAbortCancelSpanId = activeSpanId;
+            } else {
+              observedConsumerCancelSpanId = activeSpanId;
+            }
+          },
+        });
+        return new Response(body, { status: 200 });
+      },
+    };
+
+    const inProcFetch = createInProcessFetch(streamingApp);
+    const parentCtx = propagation.extract(otelContext.active(), {
+      traceparent: '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+      tracestate: 'ns=body',
+    });
+
+    await otelContext.with(parentCtx, async () =>
+      await tracer.startActiveSpan('caller.body.op', async (span) => {
+        try {
+          const baseHeaders = propagate
+            ? { traceparent: `00-${span.spanContext().traceId}-${span.spanContext().spanId}-01` }
+            : {};
+
+          // (i) Post-headers pull + abort cancel inside active caller span.
+          const abortCtrl = new AbortController();
+          const res1 = await inProcFetch('https://in-process.localhost/stream?kind=abort', {
+            headers: baseHeaders,
+            signal: abortCtrl.signal,
+          });
+          const reader1 = res1.body!.getReader();
+          const first = await reader1.read();
+          assertEquals(new TextDecoder().decode(first.value), 'chunk-1');
+          const pendingSecond = reader1.read();
+          abortCtrl.abort(new Error('body-otel-abort'));
+          try {
+            await pendingSecond;
+          } catch {
+            // Expected abort rejection.
+          }
+
+          // (ii) Unsignalled stream pull + consumer cancel inside active caller span.
+          const res2 = await inProcFetch('https://in-process.localhost/stream?kind=consumer', {
+            headers: baseHeaders,
+          });
+          const reader2 = res2.body!.getReader();
+          await reader2.read();
+          await reader2.cancel('done');
+
+          // (iii) Late-body cancel after caller rejection inside active caller span.
+          const lateCtrl = new AbortController();
+          const lateReq = inProcFetch('https://in-process.localhost/stream?kind=late', {
+            headers: baseHeaders,
+            signal: lateCtrl.signal,
+          });
+          lateCtrl.abort(new Error('late-otel-abort'));
+          try {
+            await lateReq;
+          } catch {
+            // Expected abort rejection.
+          }
+          lateFetchRelease.resolve();
+          await new Promise((r) => setTimeout(r, 15));
+        } finally {
+          span.end();
+        }
+      })
+    );
+
+    assertEquals(observedFetchSpanId, null);
+    assertEquals(observedPullSpanId, null);
+    assertEquals(observedPostHeadersAbortCancelSpanId, null);
+    assertEquals(observedConsumerCancelSpanId, null);
+    assertEquals(observedLateBodyCancelSpanId, null);
+    assertEquals(observedPullSawTraceHeader, propagate);
+
+    bodyLifecycleTelemetry[`propagate_${propagate}`] = {
+      observedFetchSpanId,
+      observedPullSpanId,
+      observedPostHeadersAbortCancelSpanId,
+      observedConsumerCancelSpanId,
+      observedLateBodyCancelSpanId,
+      observedPullSawTraceHeader,
+    };
+  }
+
+  // 3. Blocker 1/2 barrier suite across BOTH HTTP and in-process transports:
   // (a) Pre-aborted zero-dispatch
   let preAbortedEntered = false;
   const preAbortFetch = createInProcessFetch({
@@ -383,107 +515,117 @@ try {
   assertEquals(syncAbortBodyCancels, 1);
 
   // (c) Explicit entry / abort-observed / release barriers with fresh same-key
-  //     dispatch BEFORE release, zero abandoned cache write, and single late-body cancel.
-  holdEntry = deferred<void>();
-  holdAbortObserved = deferred<void>();
-  holdRelease = deferred<void>();
-  let lateTrackedBodyCancels = 0;
-  const trackedApp: ServiceApp = {
-    async fetch(request, env) {
-      const response = await running.app.fetch(request, env);
-      const cloneBytes = new Uint8Array(await response.arrayBuffer());
-      let sent = false;
-      const trackedBody = new ReadableStream<Uint8Array>({
-        pull(controller) {
-          if (!sent) {
-            sent = true;
-            controller.enqueue(cloneBytes);
-          }
-          controller.close();
-        },
-        cancel() {
-          lateTrackedBodyCancels += 1;
-        },
-      });
-      return new Response(trackedBody, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      });
-    },
-    request: running.app.request,
-  };
+  //     dispatch BEFORE release and zero abandoned cache write across BOTH HTTP and in-process.
+  const bothTransportBarriers: Record<string, unknown> = {};
+  for (const mode of ['http', 'in-process'] as const) {
+    holdEntry = deferred<void>();
+    holdAbortObserved = deferred<void>();
+    holdRelease = deferred<void>();
+    let lateTrackedBodyCancels = 0;
+    const trackedApp: ServiceApp = {
+      async fetch(request, env) {
+        const response = await running.app.fetch(request, env);
+        const cloneBytes = new Uint8Array(await response.arrayBuffer());
+        let sent = false;
+        const trackedBody = new ReadableStream<Uint8Array>({
+          pull(controller) {
+            if (!sent) {
+              sent = true;
+              controller.enqueue(cloneBytes);
+            }
+            controller.close();
+          },
+          cancel() {
+            lateTrackedBodyCancels += 1;
+          },
+        });
+        return new Response(trackedBody, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers,
+        });
+      },
+      request: running.app.request,
+    };
 
-  const inProcLink = buildLink('in-process', false, trackedApp);
-  // deno-lint-ignore no-explicit-any
-  const inProcClient = createORPCClient(inProcLink as any) as any;
-  const abortCacheStore = new MemoryCacheStore();
-  const abortCacheQuery = new CacheQuery(abortCacheStore);
-  const abortCtrl = new AbortController();
+    const link = buildLink(mode, false, mode === 'in-process' ? trackedApp : running.app);
+    // deno-lint-ignore no-explicit-any
+    const client = createORPCClient(link as any) as any;
+    const abortCacheStore = new MemoryCacheStore();
+    const abortCacheQuery = new CacheQuery(abortCacheStore);
+    const abortCtrl = new AbortController();
 
-  const abandonedPromise = abortCacheQuery.query(['vault', 'gatedPost', 'same-key'], {
-    queryFn: () =>
-      inProcClient.gatedPost(
-        { key: 'same-key', hold: true },
-        { context: { token: 'tok-alice', partition: 'ctx-alice', signal: abortCtrl.signal } },
-      ),
-  });
+    const cacheKey = ['vault', 'gatedPost', `${mode}-same-key`] as const;
+    const abandonedResult = abortCacheQuery.query(cacheKey, {
+      queryFn: () =>
+        client.gatedPost(
+          { key: `${mode}-same-key`, hold: true },
+          { context: { token: 'tok-alice', partition: 'ctx-alice', signal: abortCtrl.signal } },
+        ),
+    }).then(
+      (value) => ({ ok: true as const, value }),
+      (error) => ({ ok: false as const, error }),
+    );
 
-  // Wait for handler entry barrier, then abort.
-  await holdEntry.promise;
-  abortCtrl.abort(new Error('barrier-abort'));
+    // Wait for handler entry barrier, then abort.
+    await holdEntry.promise;
+    abortCtrl.abort(new Error(`barrier-abort-${mode}`));
 
-  // Assert handler observed abort AND caller rejected BEFORE releasing holdRelease.
-  await holdAbortObserved.promise;
-  let abandonedErr: unknown;
-  try {
-    await abandonedPromise;
-  } catch (err) {
-    abandonedErr = err;
+    // Assert handler observed abort AND caller rejected BEFORE releasing holdRelease.
+    await holdAbortObserved.promise;
+    const settledAbandoned = await abandonedResult;
+    assertEquals(settledAbandoned.ok, false);
+    const abandonedErr = settledAbandoned.ok ? undefined : settledAbandoned.error;
+    assertEquals((abandonedErr as Error).message, `barrier-abort-${mode}`);
+    assertEquals(await abortCacheQuery.getCachedData(cacheKey), null);
+
+    // Fresh same-key dispatch succeeds BEFORE releasing the abandoned handler.
+    const freshRes = await abortCacheQuery.query(cacheKey, {
+      queryFn: () =>
+        client.gatedPost(
+          { key: `${mode}-same-key`, hold: false },
+          { context: { token: 'tok-alice', partition: 'ctx-alice' } },
+        ),
+    });
+    assertEquals(freshRes.key, `${mode}-same-key`);
+    assertEquals(freshRes.owner, 'alice');
+    const freshSequence = freshRes.sequence;
+
+    // Now release the abandoned handler; verify zero cache overwrite (+ 1 late cancel on in-process).
+    holdRelease.resolve();
+    await new Promise((r) => setTimeout(r, 30));
+    const cachedAfterRelease = await abortCacheQuery.getCachedData<{ sequence: number }>(cacheKey);
+    assertEquals(cachedAfterRelease?.sequence, freshSequence);
+    if (mode === 'in-process') {
+      assertEquals(lateTrackedBodyCancels, 1);
+    }
+
+    bothTransportBarriers[mode] = {
+      abandonedMessage: (abandonedErr as Error).message,
+      handlerObservedAbortBeforeRelease: true,
+      freshSucceededBeforeRelease: freshRes.sequence === freshSequence,
+      cachePreservedAfterAbandonedRelease: cachedAfterRelease?.sequence === freshSequence,
+      ...(mode === 'in-process' ? { lateTrackedBodyCancels } : {}),
+    };
   }
-  assertEquals((abandonedErr as Error).message, 'barrier-abort');
-  assertEquals(
-    await abortCacheQuery.getCachedData(['vault', 'gatedPost', 'same-key']),
-    null,
-  );
 
-  // Fresh same-key dispatch succeeds BEFORE releasing the abandoned handler.
-  const freshRes = await abortCacheQuery.query(['vault', 'gatedPost', 'same-key'], {
-    queryFn: () =>
-      inProcClient.gatedPost(
-        { key: 'same-key', hold: false },
-        { context: { token: 'tok-alice', partition: 'ctx-alice' } },
-      ),
-  });
-  assertEquals(freshRes.key, 'same-key');
-  assertEquals(freshRes.owner, 'alice');
-  const freshSequence = freshRes.sequence;
-
-  // Now release the abandoned handler; verify zero cache overwrite and exactly 1 late-body cancel.
-  holdRelease.resolve();
-  await new Promise((r) => setTimeout(r, 25));
-  const cachedAfterRelease = await abortCacheQuery.getCachedData<{ sequence: number }>([
-    'vault',
-    'gatedPost',
-    'same-key',
-  ]);
-  assertEquals(cachedAfterRelease?.sequence, freshSequence);
-  assertEquals(lateTrackedBodyCancels, 1);
-
-  // (d) Post-headers non-cooperative streaming Response.body abort.
+  // (d) Post-headers non-cooperative streaming Response.body abort + immediate unlock check.
   let streamCancelCount = 0;
+  let sourceStream!: ReadableStream<Uint8Array>;
   const hungStreamFetch = createInProcessFetch({
     fetch() {
-      const hungBody = new ReadableStream<Uint8Array>({
+      sourceStream = new ReadableStream<Uint8Array>({
         pull() {
-          // Intentionally never resolves and ignores request.signal.
           return new Promise(() => {});
         },
         cancel() {
           streamCancelCount += 1;
         },
       });
-      return new Response(hungBody, { status: 200, headers: { 'content-type': 'text/event-stream' } });
+      return new Response(sourceStream, {
+        status: 200,
+        headers: { 'content-type': 'text/event-stream' },
+      });
     },
   });
   const bodyCtrl = new AbortController();
@@ -502,22 +644,22 @@ try {
   await new Promise((r) => setTimeout(r, 15));
   assertEquals((streamReadErr as Error).message, 'mid-stream-abort');
   assertEquals(streamCancelCount, 1);
+  assertEquals(sourceStream.locked, false);
 
   console.log(
     JSON.stringify(
       {
         parity: results,
         tracing: traceReport,
+        bodyLifecycleTelemetry,
         abortBarriers: {
           preAbortedEntered,
           syncAbortMessage: (syncAbortErr as Error).message,
           syncAbortBodyCancels,
-          abandonedMessage: (abandonedErr as Error).message,
-          freshSucceededBeforeRelease: freshRes.sequence === freshSequence,
-          cachePreservedAfterAbandonedRelease: cachedAfterRelease?.sequence === freshSequence,
-          lateTrackedBodyCancels,
+          bothTransports: bothTransportBarriers,
           postHeadersStreamAbortMessage: (streamReadErr as Error).message,
           postHeadersStreamCancelCount: streamCancelCount,
+          postHeadersSourceUnlocked: !sourceStream.locked,
         },
       },
       null,

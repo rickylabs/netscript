@@ -1,9 +1,9 @@
 /**
- * Round-2 reference implementation of the abort-aware, ROOT_CONTEXT-detached
+ * Round-3 reference implementation of the abort-aware, ROOT_CONTEXT-detached
  * in-process fetch adapter used by the RFC 0000 design verification probes.
  */
 
-import { extractContext, withContextAsync } from '@netscript/telemetry/context';
+import { type Context, extractContext, withContext } from '@netscript/telemetry/context';
 
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
 
@@ -15,18 +15,45 @@ export function abortReason(signal: AbortSignal): unknown {
   return signal.reason ?? new DOMException('The operation was aborted', 'AbortError');
 }
 
+export type ProbeInProcessServiceErrorCode =
+  | 'IN_PROCESS_REDIRECT_UNSUPPORTED'
+  | 'IN_PROCESS_BODY_UNUSABLE';
+
 export class ProbeInProcessServiceError extends Error {
-  readonly code: 'IN_PROCESS_REDIRECT_UNSUPPORTED';
-  constructor(code: 'IN_PROCESS_REDIRECT_UNSUPPORTED', message: string) {
+  readonly code: ProbeInProcessServiceErrorCode;
+  constructor(code: ProbeInProcessServiceErrorCode, message: string) {
     super(message);
     this.name = 'InProcessServiceError';
     this.code = code;
   }
 }
 
-function rejectIfRedirect(response: Response): Response {
+function releaseReaderSafely(reader: ReadableStreamDefaultReader<Uint8Array>): void {
+  try {
+    reader.releaseLock();
+  } catch {
+    // Already unlocked.
+  }
+}
+
+function cancelUnownedBodyInContext(
+  body: ReadableStream<Uint8Array> | null,
+  reason: unknown,
+  serviceCtx: Context,
+): void {
+  if (body === null || body.locked) return;
+  withContext(serviceCtx, () => {
+    try {
+      void body.cancel(reason).catch(() => {});
+    } catch {
+      // Ignore synchronous cancel failures from foreign streams.
+    }
+  });
+}
+
+function rejectIfRedirect(response: Response, serviceCtx: Context): Response {
   if (REDIRECT_STATUSES.has(response.status)) {
-    void response.body?.cancel().catch(() => {});
+    cancelUnownedBodyInContext(response.body, undefined, serviceCtx);
     throw new ProbeInProcessServiceError(
       'IN_PROCESS_REDIRECT_UNSUPPORTED',
       `In-process service link refused HTTP ${response.status} redirect without following it.`,
@@ -35,10 +62,30 @@ function rejectIfRedirect(response: Response): Response {
   return response;
 }
 
-function wrapAbortableResponse(response: Response, signal: AbortSignal): Response {
+/**
+ * Wraps any non-null Response.body so:
+ * 1. Locked or disturbed bodies returned by app.fetch() fail closed with
+ *    IN_PROCESS_BODY_UNUSABLE (never silently bypassing abort protection).
+ * 2. Every source read/cancel runs inside `serviceCtx` (ROOT_CONTEXT), never
+ *    leaking the caller's active OpenTelemetry AsyncLocalStorage context.
+ * 3. Every terminal path (EOF, abort, consumer cancel, source error) removes
+ *    the abort listener and releases the owned reader lock synchronously — even
+ *    if underlying source cancel() stalls or rejects.
+ */
+function wrapInProcessResponse(
+  response: Response,
+  serviceCtx: Context,
+  signal?: AbortSignal,
+): Response {
   const rawBody = response.body;
-  if (rawBody === null || rawBody.locked) {
+  if (rawBody === null) {
     return response;
+  }
+  if (response.bodyUsed || rawBody.locked) {
+    throw new ProbeInProcessServiceError(
+      'IN_PROCESS_BODY_UNUSABLE',
+      'In-process service app returned a Response whose body was already locked or disturbed.',
+    );
   }
 
   const reader = rawBody.getReader();
@@ -47,20 +94,29 @@ function wrapAbortableResponse(response: Response, signal: AbortSignal): Respons
   let streamController: ReadableStreamDefaultController<Uint8Array> | undefined;
 
   const cancelSourceOnce = (reason: unknown): Promise<void> => {
-    if (cancelSent) return Promise.resolve();
+    if (cancelSent) {
+      releaseReaderSafely(reader);
+      return Promise.resolve();
+    }
     cancelSent = true;
-    return reader.cancel(reason).catch(() => {});
+    return withContext(serviceCtx, () => {
+      try {
+        return reader.cancel(reason).catch(() => {});
+      } finally {
+        releaseReaderSafely(reader);
+      }
+    });
   };
 
   const finish = (): void => {
     if (terminal) return;
     terminal = true;
-    signal.removeEventListener('abort', onBodyAbort);
+    signal?.removeEventListener('abort', onBodyAbort);
   };
 
   const onBodyAbort = (): void => {
     if (terminal) return;
-    const reason = abortReason(signal);
+    const reason = abortReason(signal!);
     finish();
     streamController?.error(reason);
     void cancelSourceOnce(reason);
@@ -69,26 +125,40 @@ function wrapAbortableResponse(response: Response, signal: AbortSignal): Respons
   const wrappedBody = new ReadableStream<Uint8Array>({
     start(controller) {
       streamController = controller;
-      signal.addEventListener('abort', onBodyAbort, { once: true });
-      if (signal.aborted) {
-        onBodyAbort();
+      if (signal) {
+        withContext(serviceCtx, () => {
+          signal.addEventListener('abort', onBodyAbort, { once: true });
+        });
+        if (signal.aborted) {
+          onBodyAbort();
+        }
       }
     },
     async pull(controller) {
-      if (terminal) return;
+      if (terminal) {
+        releaseReaderSafely(reader);
+        return;
+      }
       try {
-        const { done, value } = await reader.read();
-        if (terminal) return;
+        const { done, value } = await withContext(serviceCtx, () => reader.read());
+        if (terminal) {
+          releaseReaderSafely(reader);
+          return;
+        }
         if (done) {
           finish();
-          reader.releaseLock();
+          releaseReaderSafely(reader);
           controller.close();
           return;
         }
         controller.enqueue(value);
       } catch (error) {
-        if (terminal) return;
+        if (terminal) {
+          releaseReaderSafely(reader);
+          return;
+        }
         finish();
+        releaseReaderSafely(reader);
         controller.error(error);
       }
     },
@@ -117,12 +187,15 @@ export function createInProcessFetch(
       return Promise.reject(abortReason(signal));
     }
 
+    const serviceCtx = extractContext({});
+
     if (signal === undefined) {
       try {
         const request = new Request(input, init);
-        return withContextAsync(extractContext({}), async () => await app.fetch(request)).then(
-          rejectIfRedirect,
-        );
+        return withContext(serviceCtx, () =>
+          Promise.resolve(app.fetch(request)).then((response) =>
+            wrapInProcessResponse(rejectIfRedirect(response, serviceCtx), serviceCtx)
+          ));
       } catch (error) {
         return Promise.reject(error);
       }
@@ -133,9 +206,9 @@ export function createInProcessFetch(
       let lateBodyCancelled = false;
 
       const cancelLateBodyOnce = (response: Response, reason: unknown): void => {
-        if (lateBodyCancelled || response.body === null) return;
+        if (lateBodyCancelled) return;
         lateBodyCancelled = true;
-        void response.body.cancel(reason).catch(() => {});
+        cancelUnownedBodyInContext(response.body, reason, serviceCtx);
       };
 
       const onAbort = (): void => {
@@ -146,15 +219,14 @@ export function createInProcessFetch(
 
       // Subscribe before constructing Request or invoking app.fetch so a
       // synchronous abort during setup is never missed.
-      signal.addEventListener('abort', onAbort, { once: true });
+      withContext(serviceCtx, () => {
+        signal.addEventListener('abort', onAbort, { once: true });
+      });
 
       let dispatch: Promise<Response>;
       try {
         const request = new Request(input, init);
-        dispatch = withContextAsync(
-          extractContext({}),
-          async () => await app.fetch(request),
-        );
+        dispatch = withContext(serviceCtx, () => Promise.resolve(app.fetch(request)));
       } catch (error) {
         if (!settled) {
           settled = true;
@@ -164,35 +236,39 @@ export function createInProcessFetch(
         return;
       }
 
-      // Single settlement path: handles both normal responses and late
-      // post-abort settlements with at most one body.cancel() invocation.
-      dispatch.then(
-        (response) => {
-          if (settled || signal.aborted) {
-            const reason = abortReason(signal);
-            if (!settled) {
-              settled = true;
-              signal.removeEventListener('abort', onAbort);
-              reject(reason);
+      // Register the single settlement path inside ROOT_CONTEXT so late cleanup
+      // never captures or executes under the caller's OpenTelemetry context.
+      withContext(serviceCtx, () => {
+        dispatch.then(
+          (response) => {
+            if (settled || signal.aborted) {
+              const reason = abortReason(signal);
+              if (!settled) {
+                settled = true;
+                signal.removeEventListener('abort', onAbort);
+                reject(reason);
+              }
+              cancelLateBodyOnce(response, reason);
+              return;
             }
-            cancelLateBodyOnce(response, reason);
-            return;
-          }
-          settled = true;
-          signal.removeEventListener('abort', onAbort);
-          try {
-            resolve(wrapAbortableResponse(rejectIfRedirect(response), signal));
-          } catch (error) {
+            settled = true;
+            signal.removeEventListener('abort', onAbort);
+            try {
+              resolve(
+                wrapInProcessResponse(rejectIfRedirect(response, serviceCtx), serviceCtx, signal),
+              );
+            } catch (error) {
+              reject(error);
+            }
+          },
+          (error) => {
+            if (settled) return;
+            settled = true;
+            signal.removeEventListener('abort', onAbort);
             reject(error);
-          }
-        },
-        (error) => {
-          if (settled) return;
-          settled = true;
-          signal.removeEventListener('abort', onAbort);
-          reject(error);
-        },
-      );
+          },
+        );
+      });
     });
   };
 }
