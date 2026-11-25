@@ -1,10 +1,10 @@
 ---
-rfc: 0000
+rfc: 0009
 title: Revocable authorizing stream proxy for bearer and cookie clients
-status: Draft
+status: Accepted
 authors: ['@rickylabs']
 created: 2026-11-24
-tracking-issue: https://github.com/rickylabs/netscript/issues/2146 # reference feature issue pending maintainer decision on a companion RFC tracking issue
+tracking-issue: https://github.com/rickylabs/netscript/issues/2146
 target-milestone: 0.0.10
 ---
 
@@ -12,7 +12,7 @@ target-milestone: 0.0.10
 
 ## Summary
 
-This RFC proposes a generic, revocable authorizing Server-Sent Events (SSE) stream proxy for
+This RFC defines a generic, revocable authorizing Server-Sent Events (SSE) stream proxy for
 NetScript Durable Streams:
 
 1. A runtime-free stream endpoint contract (`defineStreamEndpoint`, `buildStreamEndpointUrl`, and
@@ -1254,7 +1254,10 @@ Every request executes this exact sequence before returning `200 text/event-stre
    `maxActiveReaders` (default `1_000`), reject immediately **before** calling `authorize` or
    opening upstream with `503 Service Unavailable`, `Retry-After: 5`, `cache-control: no-store`, and
    `reason: 'max_active_readers_exceeded'`. Otherwise reserve one slot (released unconditionally by
-   `abortSetupOnce` or `closeOnce`).
+   `abortSetupOnce` or `closeOnce`). Every early fail-closed exit in Steps 2, 3, and 5 (`400`,
+   `401`, `403`, or `500`) MUST also route through `abortSetupOnce(...)` so the reserved
+   `maxActiveReaders` (and, in Step 5, `maxReadersPerKey`) slot and any armed timers are
+   unconditionally released.
 2. **Deterministic credential selection & CSRF/Origin guard** (see
    [Credential selection, headers, and CSRF/Origin handling](#credential-selection-headers-and-csrforigin-handling)):
    - When mounted via `defineService` / `ServiceBuilder.withStreamProxy`, this step ALREADY executed
@@ -2709,6 +2712,15 @@ implementation should land in four auditable slices:
   explicit opt-in composition across existing archetypes.
 
 ## Unresolved questions
+
+All design questions below are resolved as accepted in this RFC (`rfc: 0009`, `status: Accepted`):
+direct `404` / conditional `410` passthrough, offset-only framing without `id:` injection, clean
+EOF on mid-stream revocation, `30_000` ms default `recheckEveryMs`, SSE-only v1 scope,
+`bindStreamEventSourceV1` `retryable: readyState !== 2` with opt-in `createFetchStreamEventSourceV1`
+`terminalStatuses`, proposed resource-bound defaults (`maxActiveReaders: 1_000`,
+`maxPendingBatchBytes: 4 MiB`, opt-in `maxReadersPerKey`), and default
+`clientAuth: 'bearer-or-cookie'`. The eight design trade-offs evaluated before acceptance are
+preserved below for reference:
 
 1. **Missing-stream `404` on `live=sse` (fresh-stream race)**: `DurableStreamTestServer` currently
    returns `404` for `live=sse` on a not-yet-created stream (measured at `87965d80`), and
