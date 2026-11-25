@@ -2,8 +2,14 @@
  * Route-scoped service rate limits, atomic stores, and client-address policy.
  * @module
  */
-export type { RateLimitDecision, RateLimitRequest } from './domain/rate-limit.ts';
-export type { RateLimitStore } from './ports/rate-limit-store.ts';
+export {
+  RATE_LIMIT_POLICY_KINDS,
+  type RateLimitDecision,
+  type RateLimitPolicy,
+  type RateLimitPolicyKind,
+  type RateLimitRequest,
+} from './domain/rate-limit.ts';
+export type { RateLimitPolicyConfig, RateLimitStore } from './ports/rate-limit-store.ts';
 export type { ServiceProxyTrust, ServiceRateLimitOptions } from './middleware/options.ts';
 export { resolveServiceClientAddress } from './middleware/client-address.ts';
 export { createRateLimitMiddleware } from './middleware/rate-limit-middleware.ts';
