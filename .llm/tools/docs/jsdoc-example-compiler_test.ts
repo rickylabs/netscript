@@ -81,7 +81,7 @@ function analysis(blocks: JsdocExampleBlock[]): JsdocExampleAnalysis {
 
 Deno.test('published-only workspace resolver excludes publish:false members', async () => {
   const surface = await resolveWorkspaceSurface(repositoryRoot, {}, { publishedOnly: true });
-  assertEquals(surface.memberCount, 35);
+  assertEquals(surface.memberCount, 37);
   assertEquals(surface.imports['@netscript/cli-e2e'], undefined);
   assertEquals(surface.imports['@netscript/bench'], undefined);
 });

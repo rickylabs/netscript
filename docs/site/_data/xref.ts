@@ -49,6 +49,7 @@ const REFERENCE_UNITS = [
   'contracts',
   'cron',
   'database',
+  'directory-ldap',
   'fresh',
   'fresh-ui',
   'kv',
@@ -59,6 +60,7 @@ const REFERENCE_UNITS = [
   'plugin-ai-core',
   'plugin-auth',
   'plugin-auth-core',
+  'plugin-directory-core',
   'plugin-sagas-core',
   'plugin-streams-core',
   'plugin-triggers-core',
@@ -95,6 +97,7 @@ export const xref: Record<string, XrefTarget> = {
   'cap:kv-queues-cron': { href: '/data-persistence/kv-queues-cron/', label: 'KV, queues & cron' },
   'cap:telemetry': { href: '/observability/telemetry/', label: 'Telemetry & logging' },
   'cap:auth': { href: '/identity-access/auth/', label: 'Authentication' },
+  'cap:directory': { href: '/identity-access/directory/', label: 'Directory queries' },
   'cap:fresh-ui': { href: '/web-layer/fresh-ui/', label: 'Fresh UI & design' },
   // v3 NEW Build guides
   'cap:fresh-framework': { href: '/web-layer/', label: 'Fresh meta-framework' },

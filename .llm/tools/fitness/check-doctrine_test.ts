@@ -25,7 +25,7 @@ Deno.test('doctrine root discovery equals the independently enumerated publishab
   const expected = await expectedDoctrineRoots(repoRoot);
   const actual = await discoverDoctrineRoots(repoRoot);
 
-  assertEquals(expected.length, 36);
+  assertEquals(expected.length, 38);
   assertEquals(actual, expected);
   assertEquals(actual.includes('packages/plugin-streams-core'), true);
   assertEquals(actual.includes('packages/cli/e2e'), false);

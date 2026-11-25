@@ -16,11 +16,14 @@ error instead of falling back to an anonymous session.
 
 {{ comp.cardsGrid({ columns: 3, cards: [
   { eyebrow: "Concept", title: "Authentication", body: "The auth plugin: one active backend, the `auth-api` surface, typed failures and the audit surface.", href: "/identity-access/auth/" },
+  { eyebrow: "Concept", title: "Directory queries", body: "Live enterprise directory lookups and bounded transitive group membership through `DirectoryPort`.", href: "/identity-access/directory/" },
   { eyebrow: "Concept", title: "better-auth plugins", body: "Mount better-auth plugins through a typed passthrough, and what each kind needs to run.", href: "/identity-access/better-auth-plugins/" },
   { eyebrow: "Concept", title: "Session lifecycles", body: "Mount handlers, redirect, handle callbacks, check return URLs and forward refreshed cookies.", href: "/identity-access/session-lifecycles/" },
   { eyebrow: "How-to", title: "Add authentication", body: "Install the auth plugin in a workspace and sign in through the generated app.", href: "/identity-access/how-to/add-authentication/" },
   { eyebrow: "Recipes", title: "Recipes", body: "Task recipes for this area, one problem each.", href: "/identity-access/how-to/" },
   { eyebrow: "Tutorial", title: "Workspace auth", body: "Add authentication in the Team Workspace tutorial, then authorize routes on it.", href: "/tutorials/workspace/02-auth/" },
   { eyebrow: "Explanation", title: "Auth model", body: "Principal, session, backend and authorization: why auth is a pure-backend port.", href: "/explanation/auth-model/" },
-  { eyebrow: "Reference", title: "Auth packages", body: "The auth plugin, its core contracts, and the three backend adapters.", href: "/reference/plugin-auth/" }
+  { eyebrow: "Reference", title: "Auth packages", body: "The auth plugin, its core contracts, and the three backend adapters.", href: "/reference/plugin-auth/" },
+  { eyebrow: "Reference", title: "Directory core", body: "Provider-neutral `DirectoryPort`, domain invariants, typed errors, and conformance testing kit.", href: "/reference/plugin-directory-core/" },
+  { eyebrow: "Reference", title: "LDAP directory adapter", body: "Active Directory / LDAP `DirectoryPort` over strict TLS, `*_FILE` bind secrets, and `ldapts` filters.", href: "/reference/directory-ldap/" }
 ] }) }}

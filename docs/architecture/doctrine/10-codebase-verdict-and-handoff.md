@@ -35,6 +35,7 @@ not separate units. Paths, rather than remembered package names, are the executa
 | `packages/contracts` | `@netscript/contracts` | 1 | Keep | Keep contract primitives free of runtime ownership. |
 | `packages/cron` | `@netscript/cron` | 2 | Keep | Preserve the runtime-agnostic scheduling seam. |
 | `packages/database` | `@netscript/database` | 2 | Refactor | Finish the adapter/extension file splits without changing its port contract. |
+| `packages/directory-ldap` | `@netscript/directory-ldap` | 2 | Keep | Keep LDAP/AD transport, strict TLS, and `ldapts` filters behind `DirectoryPort`. |
 | `packages/fresh` | `@netscript/fresh` | 4 | Keep | Preserve per-concern builders and route contracts. |
 | `packages/fresh-ui` | `@netscript/fresh-ui` | 4 | Keep | Keep registry and interactive foundations explicit. |
 | `packages/kv` | `@netscript/kv` | 2 | Refactor | Split oversized adapters while preserving the provider-neutral port. |
@@ -43,6 +44,7 @@ not separate units. Paths, rather than remembered package names, are the executa
 | `packages/plugin` | `@netscript/plugin` | 4 | Keep | Preserve manifest, discovery, validation, and host contracts. |
 | `packages/plugin-ai-core` | `@netscript/plugin-ai-core` | 1 | Keep | Keep the versioned AI contract surface contract-only. |
 | `packages/plugin-auth-core` | `@netscript/plugin-auth-core` | 2 | Keep | Preserve auth contracts, backend ports, and testing seams. |
+| `packages/plugin-directory-core` | `@netscript/plugin-directory-core` | 2 | Keep | Preserve directory contracts, `DirectoryPort`, typed errors, and conformance testing seams. |
 | `packages/plugin-sagas-core` | `@netscript/plugin-sagas-core` | 3 | Keep | Preserve saga state-machine/runtime ownership. |
 | `packages/plugin-streams-core` | `@netscript/plugin-streams-core` | 3 | Keep | Preserve producer, schema, telemetry, and diagnostics seams. |
 | `packages/plugin-triggers-core` | `@netscript/plugin-triggers-core` | 3 | Keep | Preserve trigger DSL/runtime ports and adapters. |
@@ -90,7 +92,7 @@ with `git rev-parse --is-shallow-repository`; when it reports `true`, use the Gi
 ## Doctrine gate coverage
 
 Both `deno task arch:check` and `deno task arch:check:repo` iterate `discoverDoctrineRoots()` and
-therefore gate exactly the 36 paths in the verdict table above. The nested `packages/cli/e2e`
+therefore gate exactly the 38 paths in the verdict table above. The nested `packages/cli/e2e`
 workspace is intentionally outside that set: it is the CLI's end-to-end harness, not a top-level
 published doctrine unit. See the corresponding [F-19 exclusion](./09-anti-patterns-and-fitness-functions.md#f-19-scoped-source-gate-runners).
 

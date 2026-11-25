@@ -29,6 +29,8 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 
   "@netscript/database": [".","./adapters","./adapters/mssql","./adapters/mysql","./adapters/postgres","./commands","./commands/postgres","./connection-strings/postgres","./extensions","./ports","./scripts","./testing","./tracing"],
 
+  "@netscript/directory-ldap": ["."],
+
   "@netscript/fresh": [".","./ai","./ai/sandbox","./builders","./defer","./defer/island","./desktop","./error","./form","./interactive","./navigation","./query","./route","./server","./streams","./testing","./vite"],
 
   "@netscript/fresh-ui": [".","./ai/render-ui","./contracts","./contracts.json","./desktop","./interactive","./primitives","./registry","./registry-v2","./token-config","./tokens"],
@@ -48,6 +50,8 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
   "@netscript/plugin-auth": [".","./adapter-cli","./authenticator","./contracts","./plugin","./public","./scaffold","./services","./streams","./streams/server"],
 
   "@netscript/plugin-auth-core": [".","./authenticator","./config","./contracts/v1","./domain","./ports","./presets","./sdk","./streams","./telemetry","./testing"],
+
+  "@netscript/plugin-directory-core": [".","./domain","./ports","./testing"],
 
   "@netscript/plugin-sagas": [".","./adapter-cli","./aspire","./cli","./contracts","./doctor","./e2e","./plugin","./public","./runtime","./scaffold","./services","./streams","./streams/server"],
 

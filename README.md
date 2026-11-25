@@ -204,6 +204,7 @@ The monorepo publishes **29 packages and 6 first-party plugins** to JSR as small
 | [`@netscript/plugin`](packages/plugin/README.md)                             | [![JSR](https://jsr.io/badges/@netscript/plugin)](https://jsr.io/@netscript/plugin)                             | Plugin manifest builder, validation, discovery, and host-context contracts             |
 | [`@netscript/plugin-ai-core`](packages/plugin-ai-core/README.md)             | [![JSR](https://jsr.io/badges/@netscript/plugin-ai-core)](https://jsr.io/@netscript/plugin-ai-core)             | Contract-only core for the AI plugin: typed routes for chat, models, tools, embeddings |
 | [`@netscript/plugin-auth-core`](packages/plugin-auth-core/README.md)         | [![JSR](https://jsr.io/badges/@netscript/plugin-auth-core)](https://jsr.io/@netscript/plugin-auth-core)         | Auth plugin contracts, backend ports, stream/config schemas, testing primitives        |
+| [`@netscript/plugin-directory-core`](packages/plugin-directory-core/README.md) | [![JSR](https://jsr.io/badges/@netscript/plugin-directory-core)](https://jsr.io/@netscript/plugin-directory-core) | Provider-neutral `DirectoryPort`, immutable refs, typed errors, conformance suite      |
 | [`@netscript/plugin-workers-core`](packages/plugin-workers-core/README.md)   | [![JSR](https://jsr.io/badges/@netscript/plugin-workers-core)](https://jsr.io/@netscript/plugin-workers-core)   | Job / task / workflow / runtime / config / testing primitives for workers              |
 | [`@netscript/plugin-sagas-core`](packages/plugin-sagas-core/README.md)       | [![JSR](https://jsr.io/badges/@netscript/plugin-sagas-core)](https://jsr.io/@netscript/plugin-sagas-core)       | Saga DSL, runtime ports, adapters, telemetry, config, testing primitives               |
 | [`@netscript/plugin-triggers-core`](packages/plugin-triggers-core/README.md) | [![JSR](https://jsr.io/badges/@netscript/plugin-triggers-core)](https://jsr.io/@netscript/plugin-triggers-core) | Trigger DSL, runtime ports, adapters, telemetry, config, testing primitives            |
@@ -227,6 +228,12 @@ The monorepo publishes **29 packages and 6 first-party plugins** to JSR as small
 | [`@netscript/auth-kv-oauth`](packages/auth-kv-oauth/README.md)       | [![JSR](https://jsr.io/badges/@netscript/auth-kv-oauth)](https://jsr.io/@netscript/auth-kv-oauth)       | KV-backed OAuth2 / OIDC `AuthBackendPort` backend          |
 | [`@netscript/auth-workos`](packages/auth-workos/README.md)           | [![JSR](https://jsr.io/badges/@netscript/auth-workos)](https://jsr.io/@netscript/auth-workos)           | WorkOS AuthKit authenticators                              |
 | [`@netscript/auth-better-auth`](packages/auth-better-auth/README.md) | [![JSR](https://jsr.io/badges/@netscript/auth-better-auth)](https://jsr.io/@netscript/auth-better-auth) | [better-auth](https://better-auth.com) integration helpers |
+
+### Directory adapters
+
+| Package                                                            | JSR                                                                                                 | Capability                                                                                |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [`@netscript/directory-ldap`](packages/directory-ldap/README.md)   | [![JSR](https://jsr.io/badges/@netscript/directory-ldap)](https://jsr.io/@netscript/directory-ldap) | Active Directory and Samba AD `DirectoryPort` over strict LDAPS/StartTLS (`ldapts` ASTs) |
 
 ### Application surface
 
