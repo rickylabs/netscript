@@ -98,6 +98,23 @@ stream, not individual records. Use absolute expiry or scheduled whole-stream/da
 under a background service identity for a hard bound, and monitor disk capacity. Automatic log
 compaction and archival are not provided.
 
+In file mode, sliding TTL reads renew immediately for live expiry checks. The companion releases
+a successful GET or SSE delivery only after LMDB has committed the renewal or a later access to
+that stream. This applies to SSE reads on wakeup, including heartbeat controls. On restart after
+a process kill on the same boot, the recovered access time for a completed read has zero staleness
+from coalescing. A read still waiting for persistence when the process exits may need to be retried.
+
+Read renewals use a 25 ms batching interval and keep one pending access per stream. An in-flight
+batch, scheduler delays and disk I/O can add to read latency. The append's own metadata
+transaction records its access time. A bare close, including a repeated close, renews in the native
+close write. A duplicate append that performs no data write uses its own metadata renewal. Append
+acknowledgements do not wait for the read renewal queue. HEAD and same-stream PUT leave the deadline
+as it was. Absolute expiry uses the original deadline.
+
+Clean shutdown flushes outstanding renewals. The companion logs and retries renewal failures.
+A failed batch can fail a pending GET or end its SSE response so a client can retry. Shutdown
+reports a failed final flush.
+
 Recovery preserves complete native frames and discards an incomplete final frame; truncated writes
 can lose the final event. Missing segment files can read empty and corrupt LMDB metadata can prevent
 startup: the startup probe checks directory I/O, not the integrity of every historical record. Do
@@ -119,8 +136,9 @@ requested by the caller; cold historical offsets may scan earlier framing header
 headers, payloads, or trailers stop at the last complete native offset, including fork bases.
 
 The service composes the native LMDB store with a local bounded I/O adapter. It preserves the append
-log format, producer state, fork stitching and JSON response formatting. The adapter checks the two
-upstream I/O hooks at construction and changes only its own subclass. Upstream tracking:
+log format, producer state, fork stitching and JSON response formatting. The adapter checks the
+upstream storage hooks at construction and scopes them to its subclass and owned store.
+Upstream tracking:
 [durable-streams/durable-streams#420](https://github.com/durable-streams/durable-streams/issues/420).
 Contributors can start at `services/src/bounded-file-store.ts`; framing and the large-log RSS
 regression sit beside it.

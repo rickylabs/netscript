@@ -157,6 +157,8 @@ export interface StreamsProxyOptions {
    * read from the environment; overridable for tests.
    */
   readonly liveCreateWait?: LiveCreateWaitConfig;
+  /** Outstanding file-backed access commits, consulted only while delivering reads. */
+  readonly waitForRead?: (path: string) => Promise<void> | undefined;
 }
 
 /**
@@ -168,7 +170,7 @@ export interface StreamsProxyOptions {
 export function createStreamsProxyHandler(
   options: StreamsProxyOptions,
 ): (c: Context) => Promise<Response> {
-  const { internalPort } = options;
+  const { internalPort, waitForRead } = options;
   const liveCreateWait = options.liveCreateWait ?? resolveLiveCreateWaitConfig();
 
   const forward = (c: Context, target: string): Promise<Response> => {
@@ -181,6 +183,23 @@ export function createStreamsProxyHandler(
     return fetch(new Request(target, requestInit));
   };
 
+  const deliver = async (method: string, path: string, response: Response): Promise<Response> => {
+    if (!waitForRead || method !== 'GET' || (!response.ok && response.status !== 304)) {
+      return sanitizeProxyResponse(response);
+    }
+    if (response.headers.get('content-type')?.startsWith('text/event-stream')) {
+      // The native server touches access before emitting a read's data and control frames.
+      return sanitizeProxyResponse(response, () => waitForRead(path));
+    }
+    try {
+      await waitForRead(path);
+      return sanitizeProxyResponse(response);
+    } catch (error) {
+      await response.body?.cancel();
+      throw error;
+    }
+  };
+
   return async (c: Context): Promise<Response> => {
     const url = new URL(c.req.url);
     const target = `http://127.0.0.1:${internalPort}${url.pathname}${url.search}`;
@@ -191,7 +210,7 @@ export function createStreamsProxyHandler(
       // (header-sanitized). This preserves snapshot 404s, the gzip-header fix, and
       // every non-error response byte-for-byte.
       if (first.status !== 404 || !isLiveLongPollRead(c.req.method, url)) {
-        return sanitizeProxyResponse(first);
+        return await deliver(c.req.method, url.pathname, first);
       }
 
       // Live-poll of a not-yet-created stream: the 404 body is discarded and we
@@ -210,7 +229,7 @@ export function createStreamsProxyHandler(
         const next = await forward(c, target);
         if (next.status !== 404) {
           // Stream now exists — hand off to the upstream's live machinery.
-          return sanitizeProxyResponse(next);
+          return await deliver(c.req.method, url.pathname, next);
         }
         await next.body?.cancel();
       }
