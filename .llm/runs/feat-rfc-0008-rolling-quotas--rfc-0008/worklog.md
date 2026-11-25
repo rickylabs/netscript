@@ -97,7 +97,10 @@ To add a new rolling quota policy kind (for example a future capped `'sliding-lo
 
 | Time | Slice | Step | Notes |
 | ---- | ----- | ---- | ----- |
-| 2026-11-25 | S0 | Bootstrap & Plan | Read skills, RFC 0008, rate-limit source/tests, CI workflows; created native sub-issues `#2675` (S1) and `#2676` (S2) under `#2653` on milestone `0.0.10`; moved `#2653` to `status:impl`; wrote run artifacts with `PLAN-EVAL: N/A`. |
+| 2026-11-25 | S0 | Bootstrap & Plan | Read skills, RFC 0008, rate-limit source/tests, CI workflows; created native sub-issues `#2675` (S1) and `#2676` (S2) under `#2653` on milestone `0.0.10`; moved `#2653` to `status:impl`; wrote run artifacts with `PLAN-EVAL: N/A` (`4b26b7dfc`). |
+| 2026-11-25 | S2 | Core implementation | Implemented `domain/gcra.ts`, `domain/rate-limit.ts`, `ports/rate-limit-store.ts`, `adapters/memory-rate-limit-store.ts`, `adapters/kv-rate-limit-store.ts`, `middleware/options.ts`, `middleware/rate-limit-middleware.ts`, `src/rate-limit/mod.ts`, and `packages/service/mod.ts` (`f7d675e20`). Reconcile: verified `#2648` still open, zero open PR overlaps on `packages/service/**`, zero `deno-lint-ignore` or `any` casts. |
+| 2026-11-25 | S3 | Gates 1–10 test suite | Added `rate-limit-gcra-domain_test.ts`, `rate-limit-gcra-stores_test.ts`, `rate-limit-gcra-boundaries_test.ts`, `rate-limit-gcra-middleware_test.ts` covering Gates 1–4, 5a, 5b(b)–(c), 6a–6b, 7–8, 9a–9b, and 10 without modifying existing `rate-limit_test.ts` or `rate-limit-address-key_test.ts` (`07734cc04`). Reconcile: fixed `memory-rate-limit-store.ts` GCRA `consume()` to return rejected `Promise` via `try/catch` (zero `deno-lint-ignore`), matching `kv-rate-limit-store.ts` and RFC line 379/543. |
+| 2026-11-25 | S4 | Docs & generated corpora | Updated `packages/service/README.md`, `docs/site/reference/service/index.md`, `docs/site/services-sdk/how-to/protect-an-anonymous-route.md` (`5e4cb3916`); regenerated `export-surface-corpus.generated.ts`, `agent-docs-prose.generated.ts`, and `publish-assets.generated.ts`; verified full local gate battery green. |
 
 ## Decisions
 
@@ -105,12 +108,15 @@ To add a new rolling quota policy kind (for example a future capped `'sliding-lo
 | -------- | ------ | ------ |
 | `PLAN-EVAL: N/A` | Accepted RFC 0008 already passed DESIGN-EVAL + Claude Fable 5.2 PLAN-EVAL APPROVED (PR #2656) | `rfcs/0008-rolling-service-quotas.md`, `run-loop.md` §4 |
 | Split `#2653` into `#2675` (S1) and `#2676` (S2) | Prerequisite `#2648` is still open; S1 lands full implementation + Gates 1–11 except `#2648`-blocked Gate 5b(a) | `rfcs/0008-rolling-service-quotas.md` § Gate 5b & Non-goals |
+| Re-export `type RateLimitPolicyConfig` from `packages/service/mod.ts` | Eliminates standalone `private-type-ref` diagnostic on `./mod.ts` from `RateLimitStore.validate?` in `deno doc --lint` | `deno task doc:lint --root packages/service`, `drift.md` |
+| Wrap GCRA `MemoryRateLimitStore.consume()` in `try/catch` returning `Promise.reject(error)` | Preserves synchronous single-turn reservation with zero `deno-lint-ignore` while ensuring `consume()` rejects with `RangeError` / `AbortError` identically to `KvRateLimitStore` | `rfcs/0008-rolling-service-quotas.md` lines 379, 543 |
 
 ## Drift
 
 | Drift | Severity | Logged in drift.md |
 | ----- | -------- | ------------------ |
 | Owner model/evaluator override + T3 dispatch | minor | yes |
+| Re-export `type RateLimitPolicyConfig` on `packages/service/mod.ts` for `deno doc --lint` | minor | yes |
 
 ## Gate Results
 
@@ -118,33 +124,38 @@ To add a new rolling quota policy kind (for example a future capped `'sliding-lo
 
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
-| Scoped check | `run-deno-check.ts --root packages/service --ext ts,tsx` | NOT_RUN | Pending implementation |
-| Scoped lint | `run-deno-lint.ts --root packages/service --ext ts,tsx` | NOT_RUN | Pending implementation |
-| Scoped fmt | `run-deno-fmt.ts --root packages/service --ext ts,tsx` | NOT_RUN | Pending implementation |
-| Doc lint | `deno task doc:lint --root packages/service --pretty` | NOT_RUN | Pending implementation |
-| JSDoc examples | `deno task docs:jsdoc-examples` | NOT_RUN | Pending implementation |
-| README fences | `deno task docs:readme-fences` | NOT_RUN | Pending implementation |
-| Publish dry-run | `(cd packages/service && deno publish --dry-run --allow-dirty)` | NOT_RUN | Pending implementation |
+| Scoped check | `run-deno-check.ts --root packages/service --ext ts,tsx` | PASS | 136/136 files, 0 errors |
+| Scoped lint | `run-deno-lint.ts --root packages/service --ext ts,tsx` | PASS | 136/136 files, 0 occurrences |
+| Scoped fmt | `run-deno-fmt.ts --root packages/service --ext ts,tsx` | PASS | 136/136 files, 0 findings |
+| Doc lint | `deno task doc:lint --root packages/service --pretty` | PASS | 8/8 entrypoints exit 0, 0 `privateTypeRef`, 0 `missingJSDoc` |
+| JSDoc examples | `deno task docs:jsdoc-examples` | PASS | 498/498 checked, 0 failures |
+| README fences | `deno task docs:readme-fences` | PASS | 118/118 checked, 0 syntax errors, 0 new failures |
+| Docs accuracy & links | `deno task docs:accuracy && deno task docs:links` | PASS | 105 docs, 0 broken links/anchors/orphans |
+| Publish dry-run | `(cd packages/service && deno publish --dry-run --allow-dirty)` | PASS | `Success Dry run complete` |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| `quality:gate` (`quality:scan` + `arch:check`) | NOT_RUN | pending | — |
-| `audit-jsr-package.ts --root packages/service` | NOT_RUN | pending | Baseline `dry-run: OK`, 0 blocking findings |
+| `quality:gate` (`quality:scan` + `arch:check`) | PASS | Exit 0 | Zero `any`, zero `as unknown as`, zero new `deno-lint-ignore`, zero new doctrine findings |
+| `audit-jsr-package.ts --root packages/service` | PASS | Exit 0 | `dry-run: OK`, 0 blocking findings |
+| Lock hygiene | PASS | `git diff --exit-code deno.lock` | Zero `deno.lock` churn |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| RFC 0008 Gates 1–10 tests | NOT_RUN | pending | Baseline 28/28 existing rate-limit tests pass |
+| Full `packages/service/tests/` (Gates 1–10) | PASS | `run-deno-test.ts -- --allow-all packages/service/tests/` | 668 passed, 0 failed, 3 ignored locally (includes Gate 5b(b)-(c) Redis test which runs in CI with `NETSCRIPT_TEST_REDIS_URL`); `rate-limit_test.ts` and `rate-limit-address-key_test.ts` verified unmodified |
+| Gate 5b(a) Redis `EXEC` command-error confirmation | DEFERRED (`#2676`) | Blocked on `#2648` | Tracked in native sub-issue `#2676` (milestone `0.0.10`) |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| MCP export corpus & agent docs freshness | NOT_RUN | pending | `check:mcp-export-corpus`, `check:agent-docs-prose`, `check:assets-barrel` |
+| MCP export corpus & agent docs freshness | PASS | `check:mcp-export-corpus`, `check:agent-docs-prose`, `check:publish-assets`, `packages/mcp/tests/release-embedded-docs-corpus_test.ts` (4/4) | All exit 0 |
 
 ## Handoff Notes
 
-- Pending implementation slices S2–S4 before separate-session Claude Fable 5.2 IMPL-EVAL.
+- Inspect `packages/service/src/rate-limit/domain/gcra.ts`, `domain/rate-limit.ts`, `ports/rate-limit-store.ts`, `adapters/{memory,kv}-rate-limit-store.ts`, `middleware/{options,rate-limit-middleware}.ts`, `src/rate-limit/mod.ts`, and `packages/service/mod.ts` against `rfcs/0008-rolling-service-quotas.md`.
+- Verify fixed-window defaults and zero-margin TTL remain byte-for-byte unchanged (`rate-limit_test.ts` and `rate-limit-address-key_test.ts` untouched + Gate 10 regression).
+- Verify startup validation (Gate 9b), exact `BigInt` overflow oracle (Gate 6b), split-clock retention boundary (Gate 6a), and transport-agnostic store boundary.
