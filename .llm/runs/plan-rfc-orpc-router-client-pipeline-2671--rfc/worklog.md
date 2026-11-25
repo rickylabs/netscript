@@ -44,3 +44,32 @@
 | Lockfile untouched | `git diff --stat deno.lock` | PASS (empty diff) |
 | Scoped internal doc links | `mise exec -- deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --root rfcs/0000-orpc-router-client-pipeline.md --pretty` | PASS (`broken-links=0 broken-anchors=0`) |
 | Privacy & closing-keyword scan | Pattern scan on all modified/added files | PASS (`0 hits`) |
+
+## Round-2 Review (Gemini Hydrogen) & Round-2 Fix Evidence Ledger
+
+- Gemini Hydrogen Round-2 PLAN-EVAL (`issuecomment-7172432834`, reviewed head `af194d79a080b2b3efb83e6574deac3979642a38`) confirmed **B1**, **B2**, and core **B4** resolved, **B3**, **B5**, and **B6** partial, confirmed the warm benchmark headline (`6.6×` small unary, `7.8×` medium list on shared host), and raised six blocking findings (**N1–N6**) plus five advisories.
+
+### 1. Additional Source & Upstream Verification (Round 2)
+
+- Re-inspected `packages/service/src/primitives/handlers.ts:112`, `packages/service/tests/cors-response-authority_test.ts:442-480`, `packages/service/src/primitives/body-limit.ts:28` (`PAYLOAD_TOO_LARGE`), `packages/service/src/rate-limit/middleware/{rate-limit-middleware.ts:29-96,client-address.ts:59-80}`, `packages/service/src/auth/{static-credential-authenticator.ts:91-100,internal-credential/internal-credential-authenticator.ts:15,84,contract/contract-authorizer.ts:129-140}`, `packages/plugin/src/service/presentation/create-plugin-service.ts:185-210`, `packages/auth-kv-oauth/src/backend.ts:154-164`, `packages/auth-workos/src/workos-authenticator.ts:289-330`, all repo `new AsyncLocalStorage` sites (`packages/logger/config.ts:19`, `plugins/auth/services/src/request-context.ts:12`, `packages/plugin-triggers-core/src/adapters/watchers-file-watcher-adapter.ts:103`, `plugins/streams/services/src/sliding-stream-access.ts:64`), accepted `rfcs/0008-rolling-service-quotas.md`, PR `#2659` (`f8c8d8fd`, shared `Symbol.for('@netscript/async-context/active-store-probes')`), and PR `#2674` (`6501e41c`, §2 row 3 & §4.4 CORS decision).
+- Verified empirically on locked `@orpc/server@1.15.5` (`ResponseHeadersPlugin`, `RPCHandler`, `OpenAPIHandler`, `RPCLink`, `withEventMeta`/`getEventMeta`, `AsyncIteratorClass[Symbol.asyncDispose]`), `@opentelemetry/api@^1.9.1` (`ROOT_CONTEXT.setValue` vs `trace.getActiveSpan()`), and cached `@orpc/server@2.0.0-beta.53/plugins` (`ResponseHeadersHandlerPlugin` export).
+
+### 2. Round-2 Probes & Failing-Then-Passing Proofs (`probes/router-client-parity.probe.ts` & `probes/overhead-benchmark.probe.ts`)
+
+- **N1 (`CORSPlugin` deferred to `0.1.0`):** Removed `CORSPlugin` removal from Stage 1a (`0.0.10`) across Summary, §1, Rationale, Downstream consumers, and Breaking changes; aligned Stage 2 (`0.1.0`) with companion PR `#2674` (`6501e41c` §4.4).
+- **N2 (RFC 0008 + HTTP `429` `Retry-After` + disjoint stores + IPv6 `/64` + `PAYLOAD_TOO_LARGE`):** Failing-then-passing Test 3 proves bare `RPCHandler@1.15.5` returns `retry-after: null` on `ORPCError('RATE_LIMITED')`, whereas `ResponseHeadersPlugin` emits `429` + `Retry-After: 5` (from `decision.retryAt` `+5s`, not `resetAt` `+60s`) + typed oRPC envelope decoded by `RPCLink` (`isDefinedError === true`); proves synchronous construction-time `store.validate()` rejection (>365-day GCRA ceiling), `2×` double-counting on shared store vs `1×` each on disjoint stores, `413 PAYLOAD_TOO_LARGE`, and IPv6 `/64` `rateLimitAddressKey` bucketing.
+- **N3 (Nested router double wrapping):** Failing-then-passing Test 6 reproduces `2×` execution under outer-only `WeakSet` on `{ v1: { orders: wrappedChild } }`, then proves per-leaf `WRAPPED_PROCEDURE_SERVICE` + per-invocation `PIPELINE_EXECUTED_SYMBOL` executes `1×` and fails closed on cross-service remount (`ROUTER_CLIENT_CROSS_SERVICE_MOUNT`).
+- **N4 (`WeakMap<Principal, VerifiedPrincipalRecord>` hazards):** Failing-then-passing Test 4 proves rejection of overlapping live brands on shared `Principal` references (preserving `INTERNAL_PRINCIPALS` identity), immediate `WeakMap.delete()` on `requestScope.end()`, fail-closed `Number.isFinite` checks on `NaN` `expiresAtMs` and `claims.exp`, and private `record.internalAudience` + deep-freezing defeating shallow-frozen `claims.audience` mutation.
+- **N5 (Unified root snapshot + non-span OTel + `[Symbol.asyncDispose]`):** Eliminated bare top-level `AsyncLocalStorage.snapshot()` from both probes; unified on PR `#2659`'s `Symbol.for('@netscript/async-context/active-store-probes')`; failing-then-passing Test 5 proves `ROOT_CONTEXT.setValue` bypasses `trace.getActiveSpan()` but is caught by `otelContext.active() !== ROOT_CONTEXT`, and proves `wrapDetachedAsyncIterator` isolates `next()`, `return()`, `throw()`, and `[Symbol.asyncDispose]()` while preserving `withEventMeta`/`getEventMeta`.
+- **N6 (Pre-`authenticate()` cookie-sink check):** Failing-then-passing Test 6 proves post-`authenticate()` checking burns a single-use refresh token, whereas pre-`authenticate()` cookie/capability checking throws `500 authn.set-cookies-sink-required` with `authenticateCalls === 0` (token untouched!), construction-time `ROUTER_CLIENT_COOKIE_SINK_REQUIRED`, and atomic post-check preventing partial side effects.
+- **Advisory #4:** Test 6 adds custom Hono `.use()` fail-closed (`ROUTER_CLIENT_HTTP_MIDDLEWARE_UNSUPPORTED`) and real `start()`/`stop()` lifecycle draining in-flight calls before reverse `onShutdown` hooks and DB disposal.
+
+## Validation Table (Round-2 Fix)
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Frozen typecheck (both probes) | `mise exec -- deno check --frozen .llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/probes/overhead-benchmark.probe.ts .llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/probes/router-client-parity.probe.ts` | PASS (exit 0) |
+| Round-2 Parity & Counter-Probes (B1–B6 + N2–N6) | `mise exec -- deno test --frozen -A .llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/probes/router-client-parity.probe.ts` | PASS (`6 passed \| 0 failed`, 68 ms) |
+| Lockfile untouched | `git diff --stat deno.lock` | PASS (empty diff) |
+| Scoped internal doc links | `mise exec -- deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --root rfcs/0000-orpc-router-client-pipeline.md --pretty` | PASS (`docs=1 broken-links=0 broken-anchors=0 orphans=0`) |
+| Privacy, closing-keyword & stale-symbol scans | Pattern scans on RFC + `.llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/` | PASS (`0 hits`) |

@@ -1,27 +1,41 @@
 /**
- * RFC A Empirical Probe 2 (Round-1 Revision) — Comprehensive procedure-pipeline parity & security proofs.
+ * RFC A Empirical Probe 2 (Round-2 Revision) — Comprehensive procedure-pipeline parity & security proofs.
  *
- * Covers every Round-1 blocker (B1–B6) and advisory finding against locked `@orpc/*@1.15.5`:
+ * Covers every Round-1 blocker (B1–B6), Round-2 blocker (N2–N6), and advisory finding against locked `@orpc/*@1.15.5`:
  *   - B1: Unmarked procedures (missing `meta.access`) fail closed with `403 authz.no-matching-rule` on BOTH HTTP & router-client
  *   - B2: Construction-time fail-closed for path-based authorizers (scope, custom, authn-only, overlay w/ unmarked);
  *         exact HTTP <-> router-client parity for procedure-aware fallback
- *   - B3: HTTP edge status/body parity: 401-before-413, 403-before-413 (body never read!), 401-before-404/410,
- *         404 `procedure_not_found`, 410 `procedure_retired`, `findInternalGuard` (HEAD on internal OpenAPI route),
- *         and 429 `RATE_LIMITED` + `Retry-After`
- *   - B4: Scoped `VerifiedPrincipalRecord` defeats ALL THREE measured attacks (failing-then-passing):
+ *   - B3 + N2: HTTP edge status/body parity (401<413, 403<413, 401<404/410, 404 `procedure_not_found`,
+ *         410 `procedure_retired`, `findInternalGuard`, 413 `PAYLOAD_TOO_LARGE`, edge 429 `{ error: 'RATE_LIMITED' }` + `Retry-After`)
+ *         PLUS failing-then-passing N2 proofs:
+ *         (a) default `RPCHandler@1.15.5` omits `Retry-After` on `ORPCError('RATE_LIMITED')`, whereas `ResponseHeadersPlugin`
+ *             emits HTTP `429` + `Retry-After` (from `decision.retryAt ?? decision.resetAt` on rolling GCRA stores) + typed oRPC envelope
+ *             decoded by `RPCLink` (`isDefinedError === true`);
+ *         (b) startup `store.validate?.({ limit, windowMs })` fails fast at construction;
+ *         (c) disjoint stores prevent 2x double-counting between HTTP `withRateLimit` and `withProcedureRateLimit`;
+ *         (d) IPv6 `/64` bucketing via `rateLimitAddressKey(clientAddress, ipv6Prefix)` matches `rate-limit-middleware.ts:77`
+ *   - B4 + N4: Scoped `VerifiedPrincipalRecord` defeats ALL SIX measured attacks (failing-then-passing):
  *         (1) Service A principal with expired `exp` replayed on Service B bare `call()`;
  *         (2) `orders` internal principal replayed on `billing` `audience: 'internal'` procedure;
- *         (3) captured principal replayed in closure/deferred job after originating request ends / revocation
- *   - B5: (1) On-demand root ALS snapshot capture inside an active request fails closed (no tenant-A leak);
- *         (2) Streaming async-generator (`eventIterator`) detaches caller ALS on ALL `next()` pulls and `return()`
- *   - B6: (1) Refresh-on-read `setCookies` fails closed without explicit sink & forwards when sink is wired;
- *         (2) Public procedure rate limit uses explicit `clientAddress` key (no shared anon bucket collapse),
- *             and existing `withRateLimit` without `withProcedureRateLimit` fails closed at construction;
- *         (3) `onStartup` hooks require explicit `start()`, and `stop()` drains/blocks subsequent calls;
- *         (4) Idempotent wrapping prevents double-execution / double-quota on `withRPC({ rpcRouter })` / nested mounts
- *   - Advisory: Real RFC 0001 contribution header projection + `CacheQuery` partitioning, authenticator-level
- *               call counting (proving true single-authn on HTTP), unified `requestId` into `LoggingPlugin`,
- *               AbortSignal cancellation, auth-before-input-validation, and Zod output cloning vs reference pass-through.
+ *         (3) captured principal replayed after request end or revocation;
+ *         (4) N4a: overlapping live brand on a shared `Principal` reference rejected (never overwrites Request 1's scope)
+ *             and `requestScope.end()` deletes the `WeakMap` entry immediately (zero closure retention);
+ *         (5) N4b: `NaN` / non-finite `expiresAtMs` and `claims.exp` fail CLOSED (unlike naive `nowMs >= NaN`);
+ *         (6) N4c: mutating shallow-frozen `principal.claims.audience = 'billing'` cannot bypass private `record.internalAudience`
+ *   - B5 + N5: Unified composition-root snapshot (`Symbol.for('@netscript/async-context/active-store-probes')`, matching PR #2659)
+ *         + failing-then-passing proofs for:
+ *         (1) lazy-import snapshot poisoning vs `captureCleanAsyncRootOrThrow()`;
+ *         (2) non-span OTel context (`ROOT_CONTEXT.setValue(...)` Baggage) missed by `trace.getActiveSpan()` vs caught by `otelContext.active() !== ROOT_CONTEXT`;
+ *         (3) streaming `wrapDetachedAsyncIterator` detaching `next()`, `return()`, `throw()`, AND `[Symbol.asyncDispose]()` (`await using`),
+ *             while preserving oRPC `withEventMeta` / `getEventMeta` metadata
+ *   - B6 + N3 + N6 + Advisory #4:
+ *         (1) N6 failing-then-passing: post-`authenticate()` check burns single-use refresh token, whereas pre-`authenticate()`
+ *             capability/cookie check fails closed with `authenticateCalls === 0` (token preserved!) and atomic post-check avoids partial side effects;
+ *         (2) N3 failing-then-passing: outer-only `WeakSet` runs middleware 2x on nested `{ v1: { orders: wrappedChild } }`,
+ *             whereas per-leaf `WRAPPED_PROCEDURE_SERVICE` + per-invocation `PIPELINE_EXECUTED_SYMBOL` runs 1x (and blocks cross-service mount);
+ *         (3) Custom Hono `.use()` fails closed at construction (`ROUTER_CLIENT_HTTP_MIDDLEWARE_UNSUPPORTED`);
+ *         (4) Real `start()` / `stop()` lifecycle drains in-flight calls, blocks new calls, runs `onShutdown` in reverse order, and disposes DBs;
+ *         (5) `AbortSignal`, auth-before-validation, RFC 0001 contributions, and Zod strict vs `z.unknown()` aliasing.
  *
  * Usage:
  *   mise exec -- deno test --frozen -A .llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/probes/router-client-parity.probe.ts
@@ -29,12 +43,31 @@
 
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { assert, assertEquals, assertNotEquals, assertRejects, assertThrows } from '@std/assert';
-import { context as otelContext, propagation, ROOT_CONTEXT, SpanKind, trace } from 'npm:@opentelemetry/api@^1.9.1';
+import {
+  context as otelContext,
+  createContextKey,
+  propagation,
+  ROOT_CONTEXT,
+  SpanKind,
+  trace,
+} from 'npm:@opentelemetry/api@^1.9.1';
 import { BasicTracerProvider, InMemorySpanExporter, SimpleSpanProcessor } from 'npm:@opentelemetry/sdk-trace-base@^2.7.1';
 import { AsyncLocalStorageContextManager } from 'npm:@opentelemetry/context-async-hooks@^2.9.0';
 import { W3CTraceContextPropagator } from 'npm:@opentelemetry/core@^2.7.1';
-import { isDefinedError, ORPCError, safe } from 'npm:@orpc/client@^1.15.5';
-import { call, createRouterClient, eventIterator, implement, os } from 'npm:@orpc/server@^1.15.5';
+import { createORPCClient, isDefinedError, ORPCError, safe } from 'npm:@orpc/client@^1.15.5';
+import { RPCLink } from 'npm:@orpc/client@^1.15.5/fetch';
+import {
+  call,
+  createRouterClient,
+  eventIterator,
+  getEventMeta,
+  implement,
+  os,
+  withEventMeta,
+} from 'npm:@orpc/server@^1.15.5';
+import { RPCHandler } from 'npm:@orpc/server@^1.15.5/fetch';
+import { OpenAPIHandler } from 'npm:@orpc/openapi@^1.15.5/fetch';
+import { ResponseHeadersPlugin } from 'npm:@orpc/server@^1.15.5/plugins';
 import { ORPCInstrumentation } from 'npm:@orpc/otel@^1.15.5';
 import { baseContract } from '@netscript/contracts';
 import { createService } from '@netscript/service';
@@ -59,20 +92,49 @@ import {
 } from '@netscript/service/internal-credential';
 import { authorizeProcedurePolicy } from '../../../../packages/service/src/auth/contract/procedure-policy-decision.ts';
 import type { ProcedureAccessPolicy } from '../../../../packages/service/src/auth/contract/contract-policy.ts';
-import { createMemoryRateLimitStore, type RateLimitStore } from '@netscript/service/rate-limit';
+import { rateLimitAddressKey } from '../../../../packages/service/src/rate-limit/middleware/client-address.ts';
+import {
+  createMemoryRateLimitStore,
+  type RateLimitDecision,
+  type RateLimitRequest,
+  type RateLimitStore,
+} from '@netscript/service/rate-limit';
 import { createBearerSdkClientContribution } from '@netscript/plugin-auth-core/sdk';
 import { createLocaleSdkClientContribution } from '@netscript/sdk/client';
 import { extractContext, withContext } from '@netscript/telemetry/context';
 import { z } from 'npm:zod@^4.6.5';
 
 // ---------------------------------------------------------------------------
-// B5: Guaranteed bootstrap root ALS snapshot + framework ALS registry
+// B5 + N5: Unified composition-root snapshot & global ALS probe registry
+//          (same Symbol.for registry key as PR #2659's in-process-fetch-adapter)
 // ---------------------------------------------------------------------------
-const userAls = new AsyncLocalStorage<string>();
-const frameworkRegistryAls = new Set<AsyncLocalStorage<unknown>>([userAls]);
+const ACTIVE_STORE_PROBES_SYMBOL = Symbol.for('@netscript/async-context/active-store-probes');
 
-// Captured at true process bootstrap (guaranteed empty stores).
-const BOOTSTRAP_CLEAN_SNAPSHOT = AsyncLocalStorage.snapshot();
+interface ActiveAsyncStoreProbe {
+  readonly name: string;
+  readonly isActive: () => boolean;
+}
+
+type GlobalProbeHost = typeof globalThis & {
+  [ACTIVE_STORE_PROBES_SYMBOL]?: Set<ActiveAsyncStoreProbe>;
+};
+
+function getGlobalAsyncStoreProbes(): Set<ActiveAsyncStoreProbe> {
+  const host = globalThis as GlobalProbeHost;
+  return host[ACTIVE_STORE_PROBES_SYMBOL] ??= new Set<ActiveAsyncStoreProbe>();
+}
+
+function registerActiveAsyncStoreProbe(probe: ActiveAsyncStoreProbe): () => void {
+  const registry = getGlobalAsyncStoreProbes();
+  registry.add(probe);
+  return () => registry.delete(probe);
+}
+
+const userAls = new AsyncLocalStorage<string>();
+registerActiveAsyncStoreProbe({
+  name: 'probe.userAls',
+  isActive: () => userAls.getStore() !== undefined,
+});
 
 class AsyncContextRootCaptureError extends Error {
   constructor(message: string) {
@@ -82,36 +144,57 @@ class AsyncContextRootCaptureError extends Error {
 }
 
 /**
- * Models NetScript's on-demand root snapshot guard: if any registered framework ALS or active OTel span
- * is populated when capture is attempted (e.g., lazy dynamic import inside a request), fail closed!
+ * Models NetScript's composition-root snapshot guard (shared with PR #2659):
+ * fails closed if ANY registered ALS probe is populated OR if an OpenTelemetry span OR
+ * non-span OpenTelemetry context value (e.g., Baggage) is active (`otelContext.active() !== ROOT_CONTEXT`).
  */
 function captureCleanAsyncRootOrThrow(
-  knownStores: Iterable<AsyncLocalStorage<unknown>> = frameworkRegistryAls,
+  probes: Iterable<ActiveAsyncStoreProbe> = getGlobalAsyncStoreProbes(),
 ): <T>(fn: () => T) => T {
-  for (const store of knownStores) {
-    if (store.getStore() !== undefined) {
-      throw new AsyncContextRootCaptureError(
-        '[netscript.service] Cannot capture clean AsyncLocalStorage root inside an active request store; initialize at composition root.',
-      );
+  const violations: string[] = [];
+  for (const probe of probes) {
+    if (probe.isActive()) {
+      violations.push(probe.name);
     }
   }
   if (trace.getActiveSpan() !== undefined) {
+    violations.push('otel.activeSpan');
+  } else if (otelContext.active() !== ROOT_CONTEXT) {
+    violations.push('otel.activeContext');
+  }
+  if (violations.length > 0) {
     throw new AsyncContextRootCaptureError(
-      '[netscript.service] Cannot capture clean AsyncLocalStorage root while an OpenTelemetry span is active; initialize at composition root.',
+      `[netscript.service] Cannot capture clean AsyncLocalStorage root inside active async context (${violations.join(', ')}); initialize at composition root.`,
     );
   }
   return AsyncLocalStorage.snapshot();
 }
 
+// Configure in-memory OpenTelemetry tracer + ORPCInstrumentation once BEFORE composition-root capture.
+const spanExporter = new InMemorySpanExporter();
+const tracerProvider = new BasicTracerProvider({
+  spanProcessors: [new SimpleSpanProcessor(spanExporter)],
+});
+const contextManager = new AsyncLocalStorageContextManager().enable();
+otelContext.setGlobalContextManager(contextManager);
+trace.setGlobalTracerProvider(tracerProvider);
+propagation.setGlobalPropagator(new W3CTraceContextPropagator());
+const orpcInstrumentation = new ORPCInstrumentation();
+orpcInstrumentation.enable();
+
+// N5: Captured via guarded composition-root helper (NEVER bare top-level AsyncLocalStorage.snapshot()!).
+const BOOTSTRAP_CLEAN_SNAPSHOT = captureCleanAsyncRootOrThrow();
+
 /**
- * Wraps an AsyncIteratorObject so every `next()`, `return()`, and `throw()` executes inside
- * the detached ALS snapshot + explicit OTel context (fixing B5 streaming pull leakage).
+ * N5: Wraps an AsyncIterator so every `next()`, `return()`, `throw()`, AND `[Symbol.asyncDispose]()`
+ * executes inside the detached ALS snapshot + explicit OTel context, while forwarding yielded values
+ * unmodified so oRPC `withEventMeta`/`getEventMeta` metadata is preserved intact.
  */
 function wrapDetachedAsyncIterator<T>(
-  iterator: AsyncIterator<T>,
+  iterator: AsyncIterator<T> & { [Symbol.asyncDispose]?: () => PromiseLike<void> | void },
   runDetached: <R>(fn: () => R) => R,
-): AsyncIterableIterator<T> {
-  const wrapped: AsyncIterableIterator<T> = {
+): AsyncIterableIterator<T> & AsyncDisposable {
+  const wrapped: AsyncIterableIterator<T> & AsyncDisposable = {
     next(...args: [] | [unknown]) {
       return runDetached(() => iterator.next(...args));
     },
@@ -127,6 +210,13 @@ function wrapDetachedAsyncIterator<T>(
       }
       return Promise.reject(err);
     },
+    async [Symbol.asyncDispose]() {
+      if (typeof iterator[Symbol.asyncDispose] === 'function') {
+        await runDetached(() => iterator[Symbol.asyncDispose]!());
+      } else if (typeof iterator.return === 'function') {
+        await runDetached(() => iterator.return!());
+      }
+    },
     [Symbol.asyncIterator]() {
       return wrapped;
     },
@@ -134,7 +224,9 @@ function wrapDetachedAsyncIterator<T>(
   return wrapped;
 }
 
-function isAsyncIteratorLike(value: unknown): value is AsyncIterator<unknown> {
+function isAsyncIteratorLike(
+  value: unknown,
+): value is AsyncIterator<unknown> & { [Symbol.asyncDispose]?: () => PromiseLike<void> | void } {
   return (
     value !== null &&
     typeof value === 'object' &&
@@ -143,36 +235,35 @@ function isAsyncIteratorLike(value: unknown): value is AsyncIterator<unknown> {
   );
 }
 
-// Configure in-memory OpenTelemetry tracer + ORPCInstrumentation once.
-const spanExporter = new InMemorySpanExporter();
-const tracerProvider = new BasicTracerProvider({
-  spanProcessors: [new SimpleSpanProcessor(spanExporter)],
-});
-const contextManager = new AsyncLocalStorageContextManager().enable();
-otelContext.setGlobalContextManager(contextManager);
-trace.setGlobalTracerProvider(tracerProvider);
-propagation.setGlobalPropagator(new W3CTraceContextPropagator());
-const orpcInstrumentation = new ORPCInstrumentation();
-orpcInstrumentation.enable();
-
 // ---------------------------------------------------------------------------
-// B4: Scoped, request-bound, audience-checked, expiry-checked brand record
+// B4 + N4: Scoped, request-bound, audience-checked, finite-expiry brand record
+//          with overlapping-brand refusal, unconditional delete on end(), & deep-freeze
 // ---------------------------------------------------------------------------
 interface RequestLifetimeScope {
   readonly signal: AbortSignal;
   readonly active: () => boolean;
   readonly end: () => void;
+  readonly onEnd: (fn: () => void) => void;
 }
 
 function createRequestLifetimeScope(): RequestLifetimeScope {
   const controller = new AbortController();
+  const endCallbacks: Array<() => void> = [];
   let isActive = true;
   return {
     signal: controller.signal,
     active: () => isActive && !controller.signal.aborted,
+    onEnd: (fn: () => void) => {
+      if (!isActive) {
+        fn();
+      } else {
+        endCallbacks.push(fn);
+      }
+    },
     end: () => {
       if (!isActive) return;
       isActive = false;
+      for (const cb of endCallbacks.splice(0)) cb();
       controller.abort(new Error('originating-request-ended'));
     },
   };
@@ -190,18 +281,55 @@ interface VerifiedPrincipalRecord {
 }
 
 const VERIFIED_PRINCIPALS = new WeakMap<Principal, VerifiedPrincipalRecord>();
-const WRAPPED_ROUTER_MARKER = new WeakSet<object>();
 
+function deepFreezeValue(value: unknown, seen = new WeakSet<object>()): void {
+  if (value === null || typeof value !== 'object') return;
+  if (seen.has(value)) return;
+  seen.add(value);
+  if (!Object.isFrozen(value)) {
+    Object.freeze(value);
+  }
+  for (const prop of Object.values(value as Record<string, unknown>)) {
+    deepFreezeValue(prop, seen);
+  }
+}
+
+/**
+ * N4: Stamps a scoped brand WITHOUT blindly cloning `principal` (preserving `INTERNAL_PRINCIPALS` WeakSet identity).
+ * - Rejects overlapping live brands on a shared `Principal` reference (prevents Request 1 `end()` killing Request 2);
+ * - Deletes the WeakMap entry unconditionally on `requestScope.end()` (zero closure memory retention);
+ * - Deep-freezes `claims`/`scopes`/`roles` in-place when extensible to prevent post-auth mutation.
+ */
 function brandVerifiedPrincipal(
   principal: Principal,
   record: VerifiedPrincipalRecord,
 ): Principal {
-  VERIFIED_PRINCIPALS.set(principal, record);
+  const existing = VERIFIED_PRINCIPALS.get(principal);
+  if (existing && existing.requestScope.active()) {
+    throw new Error(
+      '[netscript.service.auth] Overlapping active brand on shared Principal reference; authenticators must return a fresh Principal object per authentication.',
+    );
+  }
+  deepFreezeValue(principal.claims);
+  deepFreezeValue(principal.scopes);
+  deepFreezeValue(principal.roles);
+
+  const frozenRecord = Object.freeze({ ...record });
+  VERIFIED_PRINCIPALS.set(principal, frozenRecord);
+  record.requestScope.onEnd(() => {
+    if (VERIFIED_PRINCIPALS.get(principal) === frozenRecord) {
+      VERIFIED_PRINCIPALS.delete(principal);
+    }
+  });
   return principal;
 }
 
+function hasVerifiedPrincipalBrand(principal: Principal): boolean {
+  return VERIFIED_PRINCIPALS.has(principal);
+}
+
 // ---------------------------------------------------------------------------
-// B2 & B6: Typed construction errors & procedure-aware authorizer contract
+// B2, B6, N2, N3, N6: Typed construction errors, RFC 0008 store port, & pipeline config
 // ---------------------------------------------------------------------------
 class RouterClientConfigError extends Error {
   readonly code: string;
@@ -210,6 +338,22 @@ class RouterClientConfigError extends Error {
     this.name = 'RouterClientConfigError';
     this.code = code;
   }
+}
+
+/** RFC 0008 extended RateLimitDecision & RateLimitStore (backward-compatible with fixed-window). */
+interface Rfc0008RateLimitDecision extends RateLimitDecision {
+  readonly retryAt?: number;
+}
+
+interface Rfc0008RateLimitStore extends RateLimitStore {
+  consume(request: RateLimitRequest): Promise<Rfc0008RateLimitDecision>;
+  validate?(config: { readonly limit: number; readonly windowMs: number }): void;
+}
+
+/** Extended AuthenticatorPort with optional N6 capability declarations. */
+interface CapabilityAuthenticatorPort extends AuthenticatorPort {
+  readonly mayEmitSetCookies?: boolean;
+  readonly mayEmitResponseHeaders?: boolean;
 }
 
 interface ProcedureFallbackAuthorizer {
@@ -235,12 +379,16 @@ interface AuthnSideEffectSink {
   onSetCookies?: (cookies: readonly string[]) => void;
 }
 
+const PIPELINE_EXECUTED_SYMBOL = Symbol('netscript.pipeline.executed');
+
 interface ProcedurePipelineContext {
   readonly headers?: Readonly<Record<string, string>>;
   readonly principal?: Principal;
   readonly requestId?: string;
   readonly clientAddress?: string;
   readonly authnSideEffects?: AuthnSideEffectSink;
+  readonly resHeaders?: Headers; // Populated on HTTP by oRPC ResponseHeadersPlugin
+  readonly [PIPELINE_EXECUTED_SYMBOL]?: ReadonlySet<symbol>;
   readonly onHandlerEnter?: (observed: {
     readonly traceId: string | undefined;
     readonly userAlsValue: string | undefined;
@@ -251,15 +399,18 @@ interface ProcedurePipelineContext {
 interface PipelineConfig {
   readonly serviceId: symbol;
   readonly serviceName: string;
-  readonly authenticator: AuthenticatorPort;
+  readonly authenticator: CapabilityAuthenticatorPort;
   readonly authzMode: ServiceAuthzMode;
   readonly trustSharedPrincipal?: boolean;
   readonly trustedVerifiers?: ReadonlySet<AuthenticatorPort>;
   readonly hasHttpOnlyRateLimit?: boolean;
+  readonly hasCustomHttpMiddleware?: boolean;
+  readonly allowHttpMiddlewareSkip?: boolean;
   readonly rateLimit?: {
-    readonly store: RateLimitStore;
+    readonly store: Rfc0008RateLimitStore;
     readonly limit: number;
     readonly windowMs: number;
+    readonly ipv6Prefix?: number;
     readonly key?: (args: {
       readonly principal?: Principal;
       readonly clientAddress?: string;
@@ -282,18 +433,34 @@ interface PipelineConfig {
 
 function assertRouterClientEligible(
   config: PipelineConfig,
-  lifecycle?: { readonly hasStartupHooks: boolean; readonly started: boolean },
+  options?: {
+    readonly hasStartupHooks?: boolean;
+    readonly started?: boolean;
+    readonly hasSetCookiesSink?: boolean;
+  },
 ): void {
-  if (lifecycle?.hasStartupHooks && !lifecycle.started) {
+  if (options?.hasStartupHooks && !options.started) {
     throw new RouterClientConfigError(
       'ROUTER_CLIENT_SERVICE_NOT_STARTED',
       `Service "${config.serviceName}" declares onStartup hooks; call await service.start() before createRouterClient().`,
+    );
+  }
+  if (config.hasCustomHttpMiddleware && !config.allowHttpMiddlewareSkip) {
+    throw new RouterClientConfigError(
+      'ROUTER_CLIENT_HTTP_MIDDLEWARE_UNSUPPORTED',
+      `Service "${config.serviceName}" registers custom Hono .use() middleware; mark it transport-only or use #2659 fetch-link.`,
     );
   }
   if (config.hasHttpOnlyRateLimit && !config.rateLimit) {
     throw new RouterClientConfigError(
       'ROUTER_CLIENT_RATE_LIMIT_MISMATCH',
       `Service "${config.serviceName}" configures HTTP withRateLimit() without withProcedureRateLimit(); refusing to drop quotas silently in-process.`,
+    );
+  }
+  if (config.authenticator.mayEmitSetCookies && !options?.hasSetCookiesSink) {
+    throw new RouterClientConfigError(
+      'ROUTER_CLIENT_COOKIE_SINK_REQUIRED',
+      `Service "${config.serviceName}" uses a cookie-rotating authenticator without an authnSideEffects.onSetCookies sink; use #2659 fetch-link or wire an explicit sink.`,
     );
   }
   if (config.authzMode.kind !== 'contract') {
@@ -340,7 +507,7 @@ function toRequestlessAuthnRequest(
   const cookieHeader = h.get('cookie') ?? undefined;
   return {
     method: 'IN_PROCESS',
-    // Distinct non-HTTP URI so no HTTP path rule can accidentally match it
+    // Advisory #5: Consistent `orpc://<serviceName>/<procedure>` where procedure = `path.join('.')`
     path: `orpc://${serviceName}/${procedurePath.join('.')}`,
     header: (name) => h.get(name) ?? undefined,
     headers: () => new Headers(h),
@@ -355,6 +522,13 @@ function toRequestlessAuthnRequest(
   };
 }
 
+/**
+ * N4: Hardened scoped-brand evaluation:
+ * - Finite `nowMs` and `expiresAtMs` (`!(nowMs < expiresAtMs)` fails closed on `NaN`/non-finite);
+ * - Finite `claims.exp` when present;
+ * - Enforces private `record.internalAudience === config.serviceName` for `audience: 'internal'`
+ *   so mutating shallow-frozen `claims.audience` can NEVER bypass internal audience checks!
+ */
 function evaluateScopedBrand(
   principal: Principal | undefined,
   config: PipelineConfig,
@@ -369,10 +543,18 @@ function evaluateScopedBrand(
   if (!record.requestScope.active()) return { trusted: false };
   if (record.isRevoked?.()) return { trusted: false };
 
-  // Hard expiry & JWT-like `exp` check (B4 attack 1)
-  if (nowMs >= record.expiresAtMs) return { trusted: false };
-  if (typeof principal.claims.exp === 'number' && nowMs >= principal.claims.exp * 1000) {
+  // N4b: Strict finite-time check (NaN / Infinity ALWAYS fail closed!)
+  if (!Number.isFinite(nowMs) || !Number.isFinite(record.expiresAtMs) || !(nowMs < record.expiresAtMs)) {
     return { trusted: false };
+  }
+  if ('exp' in principal.claims && principal.claims.exp !== undefined) {
+    if (
+      typeof principal.claims.exp !== 'number' ||
+      !Number.isFinite(principal.claims.exp) ||
+      !(nowMs < principal.claims.exp * 1000)
+    ) {
+      return { trusted: false };
+    }
   }
 
   // Service-instance binding (B4 attack 1)
@@ -383,30 +565,70 @@ function evaluateScopedBrand(
 
   if (!sameService && !explicitlyDelegated) return { trusted: false };
 
-  // Internal audience procedures NEVER accept cross-service delegated principals (B4 attack 2)
-  if (policy?.audience === 'internal' && !sameService) {
-    return { trusted: false };
+  // B4 attack 2 + N4c: Internal audience checks private `record.internalAudience === config.serviceName`
+  if (policy?.audience === 'internal') {
+    if (!sameService || record.internalAudience !== config.serviceName) {
+      return { trusted: false };
+    }
   }
 
   return { trusted: true, record };
 }
 
+// ---------------------------------------------------------------------------
+// N3: Per-leaf procedure wrapping + per-invocation context-symbol guard
+// ---------------------------------------------------------------------------
+const WRAPPED_PROCEDURE_SERVICE = new WeakMap<object, symbol>();
+
+function isOrpcLeafProcedure(value: unknown): value is { readonly '~orpc': { readonly handler: unknown } } {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    '~orpc' in value &&
+    typeof (value as { readonly '~orpc': { readonly handler?: unknown } })['~orpc']?.handler === 'function'
+  );
+}
+
 /**
- * Wraps a router idempotently with NetScript's oRPC-native procedure pipeline.
- * Advisory #5: idempotent via `WRAPPED_ROUTER_MARKER` so double-wrapping (e.g., nested mounts or
- * `withRPC({ rpcRouter })`) never executes middleware or consumes rate-limit quota twice.
+ * Wraps a router tree idempotently at the LEAF procedure level + per-invocation context symbol,
+ * so arbitrary nested mounts (`{ v1: { orders: wrappedChild } }`) and dual `rpcRouter` bindings
+ * NEVER execute middleware or consume rate-limit quota twice (even on oRPC v2 without middleware dedup).
+ * Also calls RFC 0008 `store.validate?.({ limit, windowMs })` synchronously at construction (N2).
  */
 function wrapRouterIdempotent<TRouter extends object>(
   router: TRouter,
   config: PipelineConfig,
 ): TRouter {
-  if (WRAPPED_ROUTER_MARKER.has(router)) {
-    return router;
+  // N2: Synchronous RFC 0008 startup validation at middleware construction
+  let validatedIpv6Prefix = 64;
+  if (config.rateLimit) {
+    if (!Number.isSafeInteger(config.rateLimit.limit) || config.rateLimit.limit <= 0) {
+      throw new RangeError('rateLimit.limit must be a positive safe integer');
+    }
+    if (!Number.isSafeInteger(config.rateLimit.windowMs) || config.rateLimit.windowMs <= 0) {
+      throw new RangeError('rateLimit.windowMs must be a positive safe integer');
+    }
+    validatedIpv6Prefix = config.rateLimit.ipv6Prefix ?? 64;
+    if (!Number.isInteger(validatedIpv6Prefix) || validatedIpv6Prefix < 0 || validatedIpv6Prefix > 128) {
+      throw new RangeError('Rate-limit ipv6Prefix must be an integer from 0 to 128');
+    }
+    config.rateLimit.store.validate?.({
+      limit: config.rateLimit.limit,
+      windowMs: config.rateLimit.windowMs,
+    });
   }
 
   const mw = os
     .$context<ProcedurePipelineContext>()
     .use(async function netscriptProcedurePipeline({ context, path, procedure, signal, next }) {
+      // N3 Layer 2: Per-invocation context-symbol guard (belt-and-suspenders, works on v1 AND v2)
+      const executed = context[PIPELINE_EXECUTED_SYMBOL];
+      if (executed?.has(config.serviceId)) {
+        return await next();
+      }
+      const nextExecuted = new Set(executed);
+      nextExecuted.add(config.serviceId);
+
       if (config.executionCounter) config.executionCounter.count += 1;
       const nowMs = (config.now ?? Date.now)();
       const procedureName = path.join('.');
@@ -422,16 +644,41 @@ function wrapRouterIdempotent<TRouter extends object>(
 
       // 1. Authentication (runs before input validation because router-level os.use shifts inputValidationIndex)
       let principal: Principal | undefined;
+      let trustedInternalAudience: string | undefined;
+
       if (policy?.authentication !== 'none') {
         const brandCheck = evaluateScopedBrand(context.principal, config, policy, nowMs);
         if (brandCheck.trusted && context.principal) {
           principal = context.principal;
+          trustedInternalAudience = brandCheck.record?.internalAudience;
         } else {
+          const authnReq = toRequestlessAuthnRequest(context.headers, config.serviceName, path);
+
+          // N6: Validate side-effect sinks BEFORE invoking `authenticate()` so refresh-on-read authenticators
+          //     never burn a single-use refresh token only to throw 500 afterward!
+          const hasIncomingCookie = Boolean(authnReq.header('cookie'));
+          if (
+            (config.authenticator.mayEmitSetCookies || hasIncomingCookie) &&
+            !context.authnSideEffects?.onSetCookies
+          ) {
+            throw new ORPCError('INTERNAL_SERVER_ERROR', {
+              status: 500,
+              message: 'authn.set-cookies-sink-required',
+            });
+          }
+          if (
+            config.authenticator.mayEmitResponseHeaders &&
+            !context.authnSideEffects?.onResponseHeaders
+          ) {
+            throw new ORPCError('INTERNAL_SERVER_ERROR', {
+              status: 500,
+              message: 'authn.response-headers-sink-required',
+            });
+          }
+
           let result: AuthnResult;
           try {
-            result = await config.authenticator.authenticate(
-              toRequestlessAuthnRequest(context.headers, config.serviceName, path),
-            );
+            result = await config.authenticator.authenticate(authnReq);
           } catch {
             config.onAuditLog?.({
               stage: 'authn',
@@ -470,27 +717,35 @@ function wrapRouterIdempotent<TRouter extends object>(
             });
           }
 
-          // B6: Never silently drop refresh-on-read `setCookies` or `responseHeaders` in-process!
-          if (result.setCookies?.length) {
-            if (!context.authnSideEffects?.onSetCookies) {
-              throw new ORPCError('INTERNAL_SERVER_ERROR', {
-                status: 500,
-                message: 'authn.set-cookies-sink-required',
-              });
-            }
-            context.authnSideEffects.onSetCookies(result.setCookies);
+          // N6 Defense-in-depth: validate BOTH sinks atomically BEFORE invoking EITHER callback!
+          const hasSetCookies = Boolean(result.setCookies?.length);
+          const hasResponseHeaders = Boolean(
+            result.responseHeaders && Object.keys(result.responseHeaders).length > 0,
+          );
+          if (hasSetCookies && !context.authnSideEffects?.onSetCookies) {
+            throw new ORPCError('INTERNAL_SERVER_ERROR', {
+              status: 500,
+              message: 'authn.set-cookies-sink-required',
+            });
           }
-          if (result.responseHeaders && Object.keys(result.responseHeaders).length > 0) {
-            if (!context.authnSideEffects?.onResponseHeaders) {
-              throw new ORPCError('INTERNAL_SERVER_ERROR', {
-                status: 500,
-                message: 'authn.response-headers-sink-required',
-              });
-            }
-            context.authnSideEffects.onResponseHeaders(result.responseHeaders);
+          if (hasResponseHeaders && !context.authnSideEffects?.onResponseHeaders) {
+            throw new ORPCError('INTERNAL_SERVER_ERROR', {
+              status: 500,
+              message: 'authn.response-headers-sink-required',
+            });
+          }
+          if (hasSetCookies) {
+            context.authnSideEffects!.onSetCookies!(result.setCookies!);
+          }
+          if (hasResponseHeaders) {
+            context.authnSideEffects!.onResponseHeaders!(result.responseHeaders!);
           }
 
           principal = result.principal;
+          // Capture internal audience from verified freshly-authenticated internal principal before exposure
+          if (isInternalServicePrincipal(principal) && typeof principal.claims.audience === 'string') {
+            trustedInternalAudience = principal.claims.audience;
+          }
           config.onAuditLog?.({
             stage: 'authn',
             decision: 'allow',
@@ -547,9 +802,11 @@ function wrapRouterIdempotent<TRouter extends object>(
             });
           }
         } else {
-          // B4 FIX: Internal audience MUST check BOTH internal-principal WeakSet brand AND exact service audience!
+          // B4 + N4c FIX: Internal audience MUST check `isInternalServicePrincipal(p)` AND private `trustedInternalAudience === config.serviceName`!
           const isInternalForThisService = (p: Principal): boolean =>
-            isInternalServicePrincipal(p) && p.claims.audience === config.serviceName;
+            isInternalServicePrincipal(p) &&
+            trustedInternalAudience === config.serviceName &&
+            p.claims.audience === config.serviceName;
 
           const decision = authorizeProcedurePolicy(
             { principal, method: 'IN_PROCESS', path: `orpc://${config.serviceName}/${procedureName}` },
@@ -584,7 +841,7 @@ function wrapRouterIdempotent<TRouter extends object>(
         }
       }
 
-      // 3. Post-auth / procedure rate limiting (B6 FIX: applies to BOTH authenticated AND public procedures!)
+      // 3. Post-auth / public procedure rate limiting (N2 + Advisory #3: RFC 0008 retryAt, IPv6 /64, ResponseHeadersPlugin Retry-After)
       if (config.rateLimit) {
         let bucketKey: string;
         if (config.rateLimit.key) {
@@ -599,8 +856,9 @@ function wrapRouterIdempotent<TRouter extends object>(
             : 'global';
           bucketKey = `${tenantId}:${principal.subject}`;
         } else {
-          // B6 FIX: Public procedures partition by explicit clientAddress rather than collapsing into one global 'anon' bucket!
-          bucketKey = context.clientAddress ? `addr:${context.clientAddress}` : 'addr:unknown';
+          bucketKey = context.clientAddress
+            ? `addr:${rateLimitAddressKey(context.clientAddress, validatedIpv6Prefix)}`
+            : 'addr:unknown';
         }
 
         const quota = await config.rateLimit.store.consume({
@@ -611,13 +869,15 @@ function wrapRouterIdempotent<TRouter extends object>(
           signal,
         });
         if (!quota.allowed) {
+          // N2: RFC 0008 requires deriving Retry-After from `decision.retryAt ?? decision.resetAt`!
+          const retryTargetMs = quota.retryAt ?? quota.resetAt;
+          const retryAfter = Math.max(1, Math.ceil((retryTargetMs - nowMs) / 1000));
+          // N2: Populate HTTP Retry-After header via oRPC's native ResponseHeadersPlugin!
+          context.resHeaders?.set('Retry-After', String(retryAfter));
           throw new ORPCError('RATE_LIMITED', {
             status: 429,
             message: 'Too many requests',
-            data: {
-              retryAfter: Math.max(1, Math.ceil((quota.resetAt - nowMs) / 1000)),
-              limit: config.rateLimit.limit,
-            },
+            data: { retryAfter, limit: config.rateLimit.limit },
             defined: isContractDefined('RATE_LIMITED'),
           });
         }
@@ -627,19 +887,46 @@ function wrapRouterIdempotent<TRouter extends object>(
         context: {
           principal,
           requestId,
+          [PIPELINE_EXECUTED_SYMBOL]: nextExecuted,
         },
       });
     });
 
-  // deno-lint-ignore no-explicit-any
-  const wrapped = mw.router(router as any) as unknown as TRouter;
-  WRAPPED_ROUTER_MARKER.add(wrapped as object);
-  return wrapped;
+  // N3 Layer 1: Recursive per-leaf walk skipping already-wrapped leaves for this serviceId,
+  //             and failing closed if a leaf was already wrapped for a DIFFERENT serviceId!
+  function walkAndWrap(node: Record<string, unknown>): Record<string, unknown> {
+    const out: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(node)) {
+      if (isOrpcLeafProcedure(value)) {
+        const ownerService = WRAPPED_PROCEDURE_SERVICE.get(value);
+        if (ownerService === config.serviceId) {
+          out[key] = value;
+        } else if (ownerService !== undefined) {
+          throw new RouterClientConfigError(
+            'ROUTER_CLIENT_CROSS_SERVICE_MOUNT',
+            `Procedure "${key}" is already wrapped by another service pipeline and cannot be remounted under "${config.serviceName}".`,
+          );
+        } else {
+          // deno-lint-ignore no-explicit-any
+          const wrappedLeaf = (mw.router({ __leaf: value as any }) as any).__leaf as object;
+          WRAPPED_PROCEDURE_SERVICE.set(wrappedLeaf, config.serviceId);
+          out[key] = wrappedLeaf;
+        }
+      } else if (typeof value === 'object' && value !== null) {
+        out[key] = walkAndWrap(value as Record<string, unknown>);
+      } else {
+        out[key] = value;
+      }
+    }
+    return out;
+  }
+
+  return walkAndWrap(router as Record<string, unknown>) as unknown as TRouter;
 }
 
 // ---------------------------------------------------------------------------
 // Synthetic contract covering public, protected, unmarked (B1), internal (B4),
-// streaming (B5), and cancellable procedures.
+// streaming (B5 + N5 EventMeta + throw + asyncDispose), and cancellable procedures.
 // ---------------------------------------------------------------------------
 const OrdersContract = {
   health: baseContract
@@ -715,14 +1002,16 @@ const BillingContract = {
     .output(z.object({ charged: z.boolean(), audience: z.string() })),
 };
 
-function wrapAuthenticatorWithCounter(inner: AuthenticatorPort): {
-  readonly authenticator: AuthenticatorPort;
+function wrapAuthenticatorWithCounter(inner: CapabilityAuthenticatorPort): {
+  readonly authenticator: CapabilityAuthenticatorPort;
   readonly calls: { count: number };
 } {
   const calls = { count: 0 };
   return {
     calls,
     authenticator: {
+      mayEmitSetCookies: inner.mayEmitSetCookies,
+      mayEmitResponseHeaders: inner.mayEmitResponseHeaders,
       async authenticate(request: AuthnRequest): Promise<AuthnResult> {
         calls.count += 1;
         return await inner.authenticate(request);
@@ -733,12 +1022,14 @@ function wrapAuthenticatorWithCounter(inner: AuthenticatorPort): {
 
 async function createOrdersFixture(overrides?: {
   readonly rateLimitQuota?: number;
+  readonly rateLimitStore?: Rfc0008RateLimitStore;
   readonly authzMode?: ServiceAuthzMode;
   readonly trustSharedPrincipal?: boolean;
   readonly trustedVerifiers?: ReadonlySet<AuthenticatorPort>;
   readonly now?: () => number;
-  readonly extraAuthenticators?: readonly AuthenticatorPort[];
+  readonly extraAuthenticators?: readonly CapabilityAuthenticatorPort[];
   readonly onStreamReturn?: () => void;
+  readonly onStreamThrow?: (observedAls: string | undefined, err: unknown) => void;
 }) {
   const secretBytes = new Uint8Array(32).fill(7);
   const installationSecret = await createInstallationSecret(secretBytes);
@@ -771,14 +1062,18 @@ async function createOrdersFixture(overrides?: {
       },
     },
   });
-  const baseAuth = createCompositeAuthenticator([
-    ...(overrides?.extraAuthenticators ?? []),
-    internalAuth,
-    staticAuth,
-  ]);
-  // Advisory #4 FIX: count invocations directly at the AuthenticatorPort!
+  const baseAuth: CapabilityAuthenticatorPort = {
+    mayEmitSetCookies: overrides?.extraAuthenticators?.some((a) => a.mayEmitSetCookies),
+    mayEmitResponseHeaders: overrides?.extraAuthenticators?.some((a) => a.mayEmitResponseHeaders),
+    authenticate: createCompositeAuthenticator([
+      ...(overrides?.extraAuthenticators ?? []),
+      internalAuth,
+      staticAuth,
+    ]).authenticate,
+  };
   const { authenticator, calls: authnCalls } = wrapAuthenticatorWithCounter(baseAuth);
-  const sharedRateLimitStore = createMemoryRateLimitStore();
+  const procedureRateLimitStore: Rfc0008RateLimitStore =
+    overrides?.rateLimitStore ?? createMemoryRateLimitStore();
   const serviceId = Symbol('service:orders');
   const procedureStartEvents: Array<{ procedure: string; requestId: string }> = [];
   const executionCounter = { count: 0 };
@@ -812,8 +1107,14 @@ async function createOrdersFixture(overrides?: {
     streamEvents: impl.streamEvents.handler(async function* () {
       try {
         for (let seq = 1; seq <= 3; seq++) {
-          yield { seq, observedAls: userAls.getStore() ?? null };
+          yield withEventMeta(
+            { seq, observedAls: userAls.getStore() ?? null },
+            { id: `evt-${seq}`, retry: 2500 },
+          );
         }
+      } catch (err) {
+        overrides?.onStreamThrow?.(userAls.getStore(), err);
+        throw err;
       } finally {
         overrides?.onStreamReturn?.();
       }
@@ -843,7 +1144,7 @@ async function createOrdersFixture(overrides?: {
     trustSharedPrincipal: overrides?.trustSharedPrincipal,
     trustedVerifiers: overrides?.trustedVerifiers,
     rateLimit: overrides?.rateLimitQuota !== undefined
-      ? { store: sharedRateLimitStore, limit: overrides.rateLimitQuota, windowMs: 60_000 }
+      ? { store: procedureRateLimitStore, limit: overrides.rateLimitQuota, windowMs: 60_000 }
       : undefined,
     now: overrides?.now,
     onProcedureStart: (e) => procedureStartEvents.push(e),
@@ -857,7 +1158,7 @@ async function createOrdersFixture(overrides?: {
     installationSecret,
     authenticator,
     authnCalls,
-    sharedRateLimitStore,
+    procedureRateLimitStore,
     pipelineConfig,
     pipelineRouter,
     procedureStartEvents,
@@ -872,7 +1173,6 @@ Deno.test('B1 + Parity 1: unmarked procedures denied 403 authz.no-matching-rule 
   const { installationSecret, authenticator, pipelineRouter, procedureStartEvents } = await createOrdersFixture();
   const internalToken = await deriveInternalCredential(installationSecret, 'orders');
 
-  // Verify HTTP baseline on unmarkedOp returns 403 authz.no-matching-rule
   const mountedRouter = { v1: { orders: pipelineRouter } };
   const mountedContract = { v1: { orders: OrdersContract } };
   const httpApp = createService(mountedRouter, { name: 'orders-b1' })
@@ -892,7 +1192,6 @@ Deno.test('B1 + Parity 1: unmarked procedures denied 403 authz.no-matching-rule 
   const httpUnmarkedBody = await httpUnmarkedRes.json();
   assertEquals(httpUnmarkedBody.message, 'authz.no-matching-rule');
 
-  // Real RFC 0001 contributions projecting headers without a Request!
   const bearerContribution = createBearerSdkClientContribution<{ readonly token?: string }>({
     context: { token: 'optional' },
     unmarked: 'optional',
@@ -914,8 +1213,6 @@ Deno.test('B1 + Parity 1: unmarked procedures denied 403 authz.no-matching-rule 
     };
     const procKey = procedurePath[0] as keyof typeof OrdersContract | undefined;
     const rawMeta = procKey ? OrdersContract[procKey]['~orpc'].meta : {};
-    // When testing missing credentials on a protected procedure, omit auth header instead of failing client-side
-    // when token is absent, or let bearerContribution emit headers whenever token is present.
     const bearerPrepared = callerCtx.token
       ? await bearerContribution.prepare?.({
         procedure: { path: procedurePath, meta: rawMeta },
@@ -938,7 +1235,6 @@ Deno.test('B1 + Parity 1: unmarked procedures denied 403 authz.no-matching-rule 
     return out;
   }
 
-  // Also prove RFC 0001 CacheQuery partition suffixes are derived synchronously from the same contributions
   assertEquals(
     bearerContribution.responseCache.mode === 'partitioned'
       ? bearerContribution.responseCache.partition({
@@ -956,8 +1252,6 @@ Deno.test('B1 + Parity 1: unmarked procedures denied 403 authz.no-matching-rule 
     'de-CH',
   );
 
-  // Use a real createRouterClient interceptor so RFC 0001 contributions receive the ACTUAL `options.path`
-  // and contract procedure metadata on every call (proving public `health` receives NO Authorization header!).
   const observedAuthHeadersByPath: Record<string, string | undefined> = {};
   const client = createRouterClient(pipelineRouter, {
     context: (caller: { readonly token?: string; readonly locale?: string; readonly requestId?: string }): ProcedurePipelineContext & {
@@ -981,11 +1275,11 @@ Deno.test('B1 + Parity 1: unmarked procedures denied 403 authz.no-matching-rule 
     ],
   });
 
-  // Public health succeeds anonymously AND RFC 0001 bearerContribution emits NO Authorization header even when token is passed!
+  // Public health succeeds anonymously AND RFC 0001 bearerContribution emits NO Authorization header even when token is passed
   assertEquals(await client.health(undefined, { context: { token: 'alice-token' } }), { ok: true });
   assertEquals(observedAuthHeadersByPath['health'], undefined);
 
-  // B1: Unmarked procedure via createRouterClient MUST return 403 authz.no-matching-rule (identical to HTTP!)
+  // B1: Unmarked procedure via createRouterClient and bare call() MUST return 403 authz.no-matching-rule
   const [unmarkedErr] = await safe(
     client.unmarkedOp({ value: 'hi' }, { context: { token: 'alice-token' } }),
   );
@@ -994,7 +1288,6 @@ Deno.test('B1 + Parity 1: unmarked procedures denied 403 authz.no-matching-rule 
   assertEquals(unmarkedErr.status, 403);
   assertEquals(unmarkedErr.message, 'authz.no-matching-rule');
 
-  // B1: Unmarked procedure via bare call() ALSO returns 403 authz.no-matching-rule!
   const [bareUnmarkedErr] = await safe(
     call(pipelineRouter.unmarkedOp, { value: 'hi' }, {
       context: { headers: { authorization: 'Bearer alice-token' } },
@@ -1004,10 +1297,7 @@ Deno.test('B1 + Parity 1: unmarked procedures denied 403 authz.no-matching-rule 
   assertEquals(bareUnmarkedErr.code, 'FORBIDDEN');
   assertEquals(bareUnmarkedErr.message, 'authz.no-matching-rule');
 
-  // Public health succeeds anonymously
-  assertEquals(await client.health(undefined, { context: {} }), { ok: true });
-
-  // Unauthenticated getOrder fails closed 401 UNAUTHORIZED (defined: true via commonErrorMap data schema)
+  // Unauthenticated getOrder fails closed 401 UNAUTHORIZED (defined: true via commonErrorMap)
   const [unauthErr, , unauthDefined] = await safe(client.getOrder({ orderId: 'ord-1' }, { context: {} }));
   assert(unauthErr instanceof ORPCError);
   assertEquals(unauthErr.code, 'UNAUTHORIZED');
@@ -1064,7 +1354,6 @@ Deno.test('B2: createRouterClient fails closed for path-based authorizers and ma
         : { allow: false, reason: 'authz.path-denied' },
   };
 
-  // All 4 path-dependent modes MUST fail closed at construction (no fake RPC path mismatch!)
   for (const mode of [
     { kind: 'scope-path', authorizer: pathScopeAuthz } as const,
     { kind: 'custom-path', authorizer: customPathAuthz } as const,
@@ -1085,7 +1374,6 @@ Deno.test('B2: createRouterClient fails closed for path-based authorizers and ma
     );
   }
 
-  // Procedure-aware fallback on contract authorizer IS eligible and enforces exact rule on unmarkedOp
   const procedureFallback: ProcedureFallbackAuthorizer = {
     authorizeProcedure({ principal, procedurePath }) {
       if (procedurePath.join('.') === 'unmarkedOp') {
@@ -1105,9 +1393,7 @@ Deno.test('B2: createRouterClient fails closed for path-based authorizers and ma
     }),
   });
 
-  // Alice has orders:read -> fallback admits unmarkedOp
   assertEquals(await client.unmarkedOp({ value: 'ok' }, { context: { token: 'alice-token' } }), { echoed: 'ok' });
-  // Bob lacks orders:read -> fallback denies unmarkedOp with exact reason
   const [bobErr] = await safe(client.unmarkedOp({ value: 'no' }, { context: { token: 'bob-noscope' } }));
   assert(bobErr instanceof ORPCError);
   assertEquals(bobErr.code, 'FORBIDDEN');
@@ -1115,11 +1401,17 @@ Deno.test('B2: createRouterClient fails closed for path-based authorizers and ma
 });
 
 // ===========================================================================
-// TEST 3 (B3): HTTP edge ordering & error-code parity (401<413, 403<413, 401<404/410,
-//              404 procedure_not_found, 410 procedure_retired, findInternalGuard, 429 Retry-After)
+// TEST 3 (B3 + N2): HTTP edge ordering/codes + N2 failing-then-passing 429 Retry-After,
+//                   RFC 0008 validate() & retryAt, disjoint stores, and IPv6 /64 parity
 // ===========================================================================
-Deno.test('B3: HTTP edge preserves 401/403-before-413, 401-before-404/410, findInternalGuard, procedure_not_found/retired, and 429 Retry-After', async () => {
-  const { authenticator, pipelineRouter, sharedRateLimitStore } = await createOrdersFixture({ rateLimitQuota: 100 });
+Deno.test('B3 + N2: HTTP edge ordering/codes (incl. PAYLOAD_TOO_LARGE) AND procedure 429 Retry-After via ResponseHeadersPlugin + RFC 0008 validate/retryAt + disjoint stores + IPv6 /64', async () => {
+  const fakeNow = 1_700_000_000_000;
+  // N2: Use DISJOINT stores for HTTP edge `withRateLimit` vs `withProcedureRateLimit`!
+  const edgeRateLimitStore = createMemoryRateLimitStore();
+  const { authenticator, pipelineRouter } = await createOrdersFixture({
+    rateLimitQuota: 100,
+    now: () => fakeNow,
+  });
   const mountedRouter = { v1: { orders: pipelineRouter } };
   const mountedContract = { v1: { orders: OrdersContract } };
   const retiredPath = '/api/rpc/v1/orders/legacyRemoved';
@@ -1129,7 +1421,7 @@ Deno.test('B3: HTTP edge preserves 401/403-before-413, 401-before-404/410, findI
       routes: ['/api/rpc/v1/orders/health'],
       limit: 1,
       windowMs: 60_000,
-      store: sharedRateLimitStore,
+      store: edgeRateLimitStore,
       key: () => 'http-health-key',
     })
     .withAuthn({ authenticator })
@@ -1164,7 +1456,7 @@ Deno.test('B3: HTTP edge preserves 401/403-before-413, 401-before-404/410, findI
   );
   assertEquals(r403Over413.status, 403);
 
-  // 3. Authenticated WITH scope + oversized body -> 413
+  // 3. Authenticated WITH scope + oversized body -> 413 PAYLOAD_TOO_LARGE (body-limit.ts:28)
   const r413 = await app.fetch(
     new Request('http://orders.local/api/rpc/v1/orders/getOrder', {
       method: 'POST',
@@ -1173,12 +1465,11 @@ Deno.test('B3: HTTP edge preserves 401/403-before-413, 401-before-404/410, findI
     }),
   );
   assertEquals(r413.status, 413);
+  assertEquals((await r413.json()).error, 'PAYLOAD_TOO_LARGE');
 
   // 4. Unauthenticated unknown & retired paths -> 401 (no availability oracle!)
-  const rUnauthUnknown = await app.fetch(new Request('http://orders.local/api/rpc/v1/orders/doesNotExist', { method: 'POST' }));
-  assertEquals(rUnauthUnknown.status, 401);
-  const rUnauthRetired = await app.fetch(new Request(`http://orders.local${retiredPath}`, { method: 'POST' }));
-  assertEquals(rUnauthRetired.status, 401);
+  assertEquals((await app.fetch(new Request('http://orders.local/api/rpc/v1/orders/doesNotExist', { method: 'POST' }))).status, 401);
+  assertEquals((await app.fetch(new Request(`http://orders.local${retiredPath}`, { method: 'POST' }))).status, 401);
 
   // 5. Authenticated unknown -> 404 procedure_not_found; retired -> 410 procedure_retired
   const r404 = await app.fetch(
@@ -1199,7 +1490,7 @@ Deno.test('B3: HTTP edge preserves 401/403-before-413, 401-before-404/410, findI
   assertEquals(r410.status, 410);
   assertEquals((await r410.json()).code, 'procedure_retired');
 
-  // 6. findInternalGuard: HEAD and unserved methods (e.g. DELETE) on internal OpenAPI path fail closed (403, not 404/405!)
+  // 6. findInternalGuard: HEAD and DELETE on internal OpenAPI path fail closed (403 authz.internal-audience)
   const rHeadInternal = await app.fetch(
     new Request('http://orders.local/api/orders/internal/reindex', {
       method: 'HEAD',
@@ -1216,23 +1507,198 @@ Deno.test('B3: HTTP edge preserves 401/403-before-413, 401-before-404/410, findI
   assertEquals(rDeleteInternal.status, 403);
   assertEquals((await rDeleteInternal.json()).message, 'authz.internal-audience');
 
-  // 7. Public procedure passes anonymously, and second call hits 429 with Retry-After header
+  // 7. HTTP edge pre-auth withRateLimit -> byte-identical 429 `{ error: 'RATE_LIMITED' }` + Retry-After
   const rPub1 = await app.fetch(new Request('http://orders.local/api/rpc/v1/orders/health', { method: 'POST' }));
   assertEquals(rPub1.status, 200);
   const rPub2 = await app.fetch(new Request('http://orders.local/api/rpc/v1/orders/health', { method: 'POST' }));
   assertEquals(rPub2.status, 429);
+  assertEquals((await rPub2.json()).error, 'RATE_LIMITED');
   assert(Number(rPub2.headers.get('retry-after')) >= 1);
+
+  // --- N2 FAILING-THEN-PASSING PROOFS ---
+  // N2a: RFC 0008 `store.validate?.({ limit, windowMs })` fails fast at construction on >365-day GCRA retention!
+  const MAX_GCRA_TTL_MS = 31_536_000_000;
+  let validateCalled = false;
+  const rollingGcraStore: Rfc0008RateLimitStore = {
+    validate({ limit, windowMs }) {
+      validateCalled = true;
+      if (windowMs > MAX_GCRA_TTL_MS || limit <= 0) {
+        throw new RangeError('RFC 0008 rolling GCRA retention exceeds 365-day ceiling');
+      }
+    },
+    consume({ now }) {
+      // Models rolling GCRA denial where earliest next eligible commit (`retryAt` = +5s)
+      // differs sharply from full bucket recovery (`resetAt` = +60s)!
+      return Promise.resolve({
+        allowed: false,
+        retryAt: now + 5_000,
+        resetAt: now + 60_000,
+      });
+    },
+  };
+  assertThrows(
+    () =>
+      wrapRouterIdempotent(
+        { ping: os.handler(() => ({ ok: true })) },
+        {
+          serviceId: Symbol('svc:bad-gcra'),
+          serviceName: 'bad-gcra',
+          authenticator,
+          authzMode: { kind: 'contract' },
+          rateLimit: { store: rollingGcraStore, limit: 10, windowMs: MAX_GCRA_TTL_MS + 1 },
+        },
+      ),
+    RangeError,
+    '365-day ceiling',
+  );
+  assert(validateCalled);
+
+  // N2b: Failing control — RPCHandler@1.15.5 WITHOUT ResponseHeadersPlugin omits Retry-After on ORPCError('RATE_LIMITED')!
+  const gcraFixture = await createOrdersFixture({
+    rateLimitQuota: 10,
+    rateLimitStore: rollingGcraStore,
+    now: () => fakeNow,
+  });
+  const rpcWithoutPlugin = new RPCHandler(gcraFixture.pipelineRouter);
+  const resNoHeader = await rpcWithoutPlugin.handle(
+    new Request('http://orders.local/health', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ json: {} }),
+    }),
+  );
+  assertEquals(resNoHeader.response?.status, 429);
+  assertEquals(resNoHeader.response?.headers.get('retry-after'), null); // Reproduces N2 failing control!
+
+  // N2c: Passing proof — RPCHandler + OpenAPIHandler WITH native ResponseHeadersPlugin emits
+  //      HTTP 429 + `Retry-After: 5` (from `decision.retryAt`, NOT `resetAt` 60s!) + typed oRPC envelope
+  //      decoded seamlessly by RPCLink as `isDefinedError === true`!
+  const rpcWithPlugin = new RPCHandler(gcraFixture.pipelineRouter, {
+    plugins: [new ResponseHeadersPlugin()],
+  });
+  const resRpcWithHeader = await rpcWithPlugin.handle(
+    new Request('http://orders.local/health', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ json: {} }),
+    }),
+  );
+  assertEquals(resRpcWithHeader.response?.status, 429);
+  assertEquals(resRpcWithHeader.response?.headers.get('retry-after'), '5'); // Derived from retryAt (+5s), NOT resetAt (+60s)!
+  const rpc429Body = await resRpcWithHeader.response?.json();
+  assertEquals(rpc429Body.json.code, 'RATE_LIMITED');
+  assertEquals(rpc429Body.json.defined, true);
+  assertEquals(rpc429Body.json.data, { retryAfter: 5, limit: 10 });
+
+  const openApiWithPlugin = new OpenAPIHandler(gcraFixture.pipelineRouter, {
+    plugins: [new ResponseHeadersPlugin()],
+  });
+  const resOaWithHeader = await openApiWithPlugin.handle(
+    new Request('http://orders.local/orders/health', { method: 'GET' }),
+  );
+  assertEquals(resOaWithHeader.response?.status, 429);
+  assertEquals(resOaWithHeader.response?.headers.get('retry-after'), '5');
+
+  const decodedRpcLink = createORPCClient(
+    new RPCLink({
+      url: 'http://orders.local',
+      fetch: async (req, init) => (await rpcWithPlugin.handle(new Request(req, init))).response!,
+    }),
+  ) as { health: () => Promise<{ ok: boolean }> };
+  const [link429Err, , link429Defined] = await safe(decodedRpcLink.health());
+  assert(link429Err instanceof ORPCError);
+  assert(isDefinedError(link429Err));
+  assertEquals(link429Defined, true);
+  assertEquals(link429Err.code, 'RATE_LIMITED');
+  assertEquals(link429Err.data, { retryAfter: 5, limit: 10 });
+
+  // N2d: Failing-then-passing disjoint-store proof — sharing one store between HTTP withRateLimit and
+  //      withProcedureRateLimit double-counts on HTTP (2 consumptions on 1 call), while disjoint stores count 1 each!
+  const sharedBadStore = createMemoryRateLimitStore();
+  let sharedConsumeCount = 0;
+  const countedSharedStore: Rfc0008RateLimitStore = {
+    consume(req) {
+      sharedConsumeCount += 1;
+      return sharedBadStore.consume(req);
+    },
+  };
+  const sharedFixture = await createOrdersFixture({
+    rateLimitQuota: 1,
+    rateLimitStore: countedSharedStore,
+    now: () => fakeNow,
+  });
+  const badSharedApp = createService({ v1: { orders: sharedFixture.pipelineRouter } }, { name: 'orders-shared-bad' })
+    .withRateLimit({
+      routes: ['/api/rpc/v1/orders/health'],
+      limit: 1,
+      windowMs: 60_000,
+      store: countedSharedStore,
+      key: () => 'addr:unknown',
+      now: () => fakeNow,
+    })
+    .withRPC({ rpcPath: '/api/rpc' })
+    .build();
+  const badSharedRes = await badSharedApp.fetch(
+    new Request('http://orders.local/api/rpc/v1/orders/health', { method: 'POST' }),
+  );
+  // First HTTP call is rejected 429 because edge consumed #1 and procedure consumed #2 on the same store/key!
+  assertEquals(badSharedRes.status, 429);
+  assertEquals(sharedConsumeCount, 2);
+
+  // Disjoint stores: 1 consumption on edge store, 1 on procedure store -> first call 200, second call 429!
+  const separateEdgeStore = createMemoryRateLimitStore();
+  const separateProcStore = createMemoryRateLimitStore();
+  const goodDisjointFixture = await createOrdersFixture({
+    rateLimitQuota: 1,
+    rateLimitStore: separateProcStore,
+    now: () => fakeNow,
+  });
+  const goodDisjointApp = createService({ v1: { orders: goodDisjointFixture.pipelineRouter } }, { name: 'orders-disjoint' })
+    .withRateLimit({
+      routes: ['/api/rpc/v1/orders/health'],
+      limit: 1,
+      windowMs: 60_000,
+      store: separateEdgeStore,
+      key: () => 'edge:health',
+      now: () => fakeNow,
+    })
+    .withRPC({ rpcPath: '/api/rpc' })
+    .build();
+  assertEquals(
+    (await goodDisjointApp.fetch(new Request('http://orders.local/api/rpc/v1/orders/health', { method: 'POST' }))).status,
+    200,
+  );
+  assertEquals(
+    (await goodDisjointApp.fetch(new Request('http://orders.local/api/rpc/v1/orders/health', { method: 'POST' }))).status,
+    429,
+  );
+
+  // Advisory #3: IPv6 /64 bucketing parity via `rateLimitAddressKey`
+  const ipv6Fixture = await createOrdersFixture({ rateLimitQuota: 1, now: () => fakeNow });
+  const ipv6Client = createRouterClient(ipv6Fixture.pipelineRouter, {
+    context: (caller: { readonly clientAddress: string }): ProcedurePipelineContext => ({
+      clientAddress: caller.clientAddress,
+    }),
+  });
+  assertEquals(await ipv6Client.health(undefined, { context: { clientAddress: '2001:db8:1:2:aaaa::1' } }), { ok: true });
+  // Different interface ID in SAME /64 prefix shares bucket -> 429!
+  const [samePrefixErr] = await safe(
+    ipv6Client.health(undefined, { context: { clientAddress: '2001:db8:1:2:bbbb::2' } }),
+  );
+  assert(samePrefixErr instanceof ORPCError);
+  assertEquals(samePrefixErr.code, 'RATE_LIMITED');
+  // Different /64 prefix gets its own bucket -> 200!
+  assertEquals(await ipv6Client.health(undefined, { context: { clientAddress: '2001:db8:1:3::1' } }), { ok: true });
 });
 
 // ===========================================================================
-// TEST 4 (B4): Scoped brand defeats ALL THREE measured attacks + true single-authn count
+// TEST 4 (B4 + N4): Scoped brand defeats all B4 attacks + N4 shared-ref/cleanup/NaN/shallow-freeze
 // ===========================================================================
-Deno.test('B4: scoped VerifiedPrincipalRecord defeats cross-service expired replay, cross-service internal audience leak, and post-request/revoked closure replay', async () => {
-  let fakeNow = 1_700_000_000_000;
+Deno.test('B4 + N4: scoped VerifiedPrincipalRecord defeats cross-service/expired/internal/closure attacks AND N4 shared-ref overwrite, cleanup, NaN expiry, and shallow-frozen claims mutation', async () => {
+  const fakeNow = 1_700_000_000_000;
   let revoked = false;
   const orders = await createOrdersFixture({ now: () => fakeNow });
 
-  // Build second co-located service (`billing`) with its OWN internal-credential authenticator & serviceId
   const billingInternalAuth = createInternalCredentialAuthenticator({
     secret: orders.installationSecret,
     service: 'billing',
@@ -1254,57 +1720,21 @@ Deno.test('B4: scoped VerifiedPrincipalRecord defeats cross-service expired repl
       serviceName: 'billing',
       authenticator: billingAuth,
       authzMode: { kind: 'contract' },
-      // Even if trustSharedPrincipal were explicitly enabled, internal audience & service binding still block attacks!
       trustSharedPrincipal: true,
       trustedVerifiers: new Set([orders.authenticator]),
       now: () => fakeNow,
     },
   );
 
-  // --- Failing-then-passing demonstration of the OLD unscoped WeakSet model vs NEW scoped brand ---
-  // Under the Round-0 unscoped WeakSet, ALL THREE attacks erroneously passed:
-  const legacyUnscopedBrand = new WeakSet<Principal>();
-  const legacyExpired = Object.freeze({
-    subject: 'user:alice',
-    scopes: ['orders:read'],
-    roles: ['member'],
-    scheme: 'bearer' as const,
-    claims: { tenantId: 'tenant-a', exp: Math.floor((fakeNow - 5_000) / 1000) },
-  });
-  legacyUnscopedBrand.add(legacyExpired);
-  assertEquals(legacyUnscopedBrand.has(legacyExpired), true); // Old model: accepted cross-service + expired!
-
-  const ordersInternalTokenPre = await deriveInternalCredential(orders.installationSecret, 'orders');
-  const ordersInternalAuthPre = await orders.authenticator.authenticate({
-    method: 'IN_PROCESS',
-    path: 'orpc://orders/internalReindex',
-    header: (n) => (n.toLowerCase() === 'authorization' ? `Bearer ${ordersInternalTokenPre}` : undefined),
-    headers: () => new Headers({ authorization: `Bearer ${ordersInternalTokenPre}` }),
-    cookie: () => undefined,
-  });
-  assert(ordersInternalAuthPre.ok);
-  // Old global `isInternalServicePrincipal` does NOT check `claims.audience === 'billing'`:
-  assertEquals(
-    authorizeProcedurePolicy(
-      { principal: ordersInternalAuthPre.principal, method: 'IN_PROCESS', path: 'orpc://billing/internalCharge' },
-      { authentication: 'required', audience: 'internal', requiredScopes: [], requiredRoles: [] },
-      isInternalServicePrincipal,
-    ).allow,
-    true, // Old model: erroneously admitted `orders` internal principal on `billing`!
-  );
-  // Old model also kept admitting captured principals after logout/request-end because WeakSet has no scope/revocation:
-  assertEquals(legacyUnscopedBrand.has(legacyExpired), true);
-
-  // --- Now prove the NEW scoped VerifiedPrincipalRecord + service-scoped audience check defeats ALL THREE attacks ---
-  // Mint an `orders`-verified user principal with an EXPIRED `exp` claim
+  // --- B4 Attacks 1, 2, 3 ---
   const scopeA = createRequestLifetimeScope();
-  const expiredUserPrincipal: Principal = Object.freeze({
+  const expiredUserPrincipal: Principal = {
     subject: 'user:alice',
     scopes: ['orders:read'],
     roles: ['member'],
     scheme: 'bearer',
     claims: { tenantId: 'tenant-a', exp: Math.floor((fakeNow - 5_000) / 1000) },
-  });
+  };
   brandVerifiedPrincipal(expiredUserPrincipal, {
     serviceId: orders.serviceId,
     serviceName: 'orders',
@@ -1314,26 +1744,21 @@ Deno.test('B4: scoped VerifiedPrincipalRecord defeats cross-service expired repl
     requestScope: scopeA,
   });
 
-  // ATTACK 1: Pass `orders`-verified expired principal to bare `call()` on `billing` (and on `orders`!)
-  // Must be REJECTED (triggers authenticator -> fails closed 401 UNAUTHORIZED, NOT accepted!)
   const [attack1BillingErr] = await safe(
-    call(billingRouter.internalCharge, { invoiceId: 'inv-1' }, {
-      context: { principal: expiredUserPrincipal },
-    }),
+    call(billingRouter.internalCharge, { invoiceId: 'inv-1' }, { context: { principal: expiredUserPrincipal } }),
   );
   assert(attack1BillingErr instanceof ORPCError);
   assertEquals(attack1BillingErr.code, 'UNAUTHORIZED');
-  assertEquals(billingAuthCalls.count, 1); // Authenticator WAS invoked (expired brand ignored)!
+  assertEquals(billingAuthCalls.count, 1);
 
   const [attack1OrdersErr] = await safe(
-    call(orders.pipelineRouter.getOrder, { orderId: 'ord-1' }, {
-      context: { principal: expiredUserPrincipal },
-    }),
+    call(orders.pipelineRouter.getOrder, { orderId: 'ord-1' }, { context: { principal: expiredUserPrincipal } }),
   );
   assert(attack1OrdersErr instanceof ORPCError);
   assertEquals(attack1OrdersErr.code, 'UNAUTHORIZED');
+  scopeA.end();
 
-  // ATTACK 2: Mint a GENUINE `orders` internal-service principal and pass it to `billing`'s `audience: 'internal'` procedure!
+  // Attack 2: Genuine orders internal principal on orders vs billing
   const ordersInternalToken = await deriveInternalCredential(orders.installationSecret, 'orders');
   const ordersAuthRes = await orders.authenticator.authenticate({
     method: 'IN_PROCESS',
@@ -1353,36 +1778,35 @@ Deno.test('B4: scoped VerifiedPrincipalRecord defeats cross-service expired repl
     requestScope: scopeInternal,
     internalAudience: 'orders',
   });
-  // `orders` internal principal MUST succeed on `orders`...
-  const okOnOrders = await call(orders.pipelineRouter.internalReindex, { batchId: 'b-1' }, {
-    context: { principal: ordersAuthRes.principal },
-  });
-  assertEquals(okOnOrders.accepted, true);
-  // ...but MUST FAIL CLOSED on `billing` (even though `isInternalServicePrincipal` is true globally and `trustSharedPrincipal: true`!)
+  assertEquals(
+    (await call(orders.pipelineRouter.internalReindex, { batchId: 'b-1' }, { context: { principal: ordersAuthRes.principal } })).accepted,
+    true,
+  );
   const [attack2Err] = await safe(
-    call(billingRouter.internalCharge, { invoiceId: 'inv-evil' }, {
-      context: { principal: ordersAuthRes.principal },
-    }),
+    call(billingRouter.internalCharge, { invoiceId: 'inv-evil' }, { context: { principal: ordersAuthRes.principal } }),
   );
   assert(attack2Err instanceof ORPCError);
-  assertEquals(attack2Err.code, 'UNAUTHORIZED'); // Rejected by scoped brand -> billing authenticator rejects missing billing credential!
+  assertEquals(attack2Err.code, 'UNAUTHORIZED');
+  scopeInternal.end();
 
-  // Genuine `billing` internal credential succeeds on `billing`
+  // Genuine billing internal credential succeeds on billing
   const billingInternalToken = await deriveInternalCredential(orders.installationSecret, 'billing');
-  const okOnBilling = await call(billingRouter.internalCharge, { invoiceId: 'inv-good' }, {
-    context: { headers: { authorization: `Bearer ${billingInternalToken}` } },
-  });
-  assertEquals(okOnBilling, { charged: true, audience: 'billing' });
+  assertEquals(
+    await call(billingRouter.internalCharge, { invoiceId: 'inv-good' }, {
+      context: { headers: { authorization: `Bearer ${billingInternalToken}` } },
+    }),
+    { charged: true, audience: 'billing' },
+  );
 
-  // ATTACK 3: Principal captured in a closure / queued job AFTER originating request ends OR logout/revocation
+  // Attack 3: Revocation & originating request scope end
   const liveScope = createRequestLifetimeScope();
-  const capturedPrincipal: Principal = Object.freeze({
+  const capturedPrincipal: Principal = {
     subject: 'user:alice',
     scopes: ['orders:read'],
     roles: ['member'],
     scheme: 'bearer',
     claims: { tenantId: 'tenant-a', exp: Math.floor((fakeNow + 60_000) / 1000) },
-  });
+  };
   brandVerifiedPrincipal(capturedPrincipal, {
     serviceId: orders.serviceId,
     serviceName: 'orders',
@@ -1393,36 +1817,158 @@ Deno.test('B4: scoped VerifiedPrincipalRecord defeats cross-service expired repl
     isRevoked: () => revoked,
   });
 
-  // While request is active and unrevoked -> succeeds with 0 extra authenticator calls
   const beforeCount = orders.authnCalls.count;
-  const liveRes = await call(orders.pipelineRouter.getOrder, { orderId: 'live-1' }, {
-    context: { principal: capturedPrincipal },
-  });
-  assertEquals(liveRes.subject, 'user:alice');
+  assertEquals(
+    (await call(orders.pipelineRouter.getOrder, { orderId: 'live-1' }, { context: { principal: capturedPrincipal } })).subject,
+    'user:alice',
+  );
   assertEquals(orders.authnCalls.count, beforeCount);
 
-  // Case 3a: Session revoked (logout) while scope is still open -> immediately rejected 401!
   revoked = true;
   const [revokedErr] = await safe(
-    call(orders.pipelineRouter.getOrder, { orderId: 'after-logout' }, {
-      context: { principal: capturedPrincipal },
-    }),
+    call(orders.pipelineRouter.getOrder, { orderId: 'after-logout' }, { context: { principal: capturedPrincipal } }),
   );
   assert(revokedErr instanceof ORPCError);
   assertEquals(revokedErr.code, 'UNAUTHORIZED');
 
-  // Case 3b: Originating request ends (closure / queued job outlives request) -> immediately rejected 401!
   revoked = false;
   liveScope.end();
+  // N4a cleanup proof: ending requestScope immediately deletes the WeakMap entry (zero closure memory retention)!
+  assertEquals(hasVerifiedPrincipalBrand(capturedPrincipal), false);
   const [postRequestErr] = await safe(
-    call(orders.pipelineRouter.getOrder, { orderId: 'queued-job' }, {
-      context: { principal: capturedPrincipal },
-    }),
+    call(orders.pipelineRouter.getOrder, { orderId: 'queued-job' }, { context: { principal: capturedPrincipal } }),
   );
   assert(postRequestErr instanceof ORPCError);
   assertEquals(postRequestErr.code, 'UNAUTHORIZED');
 
-  // Verify true single-authn on HTTP (counting at AuthenticatorPort, branding inside edge middleware — NOT .withContext())
+  // --- N4 FAILING-THEN-PASSING PROOFS ---
+  // N4a: Overlapping live brand on a shared Principal reference MUST be rejected (never silently overwrite Request 1's scope!)
+  const sharedPrincipal: Principal = {
+    subject: 'user:cached',
+    scopes: ['orders:read'],
+    roles: ['member'],
+    scheme: 'bearer',
+    claims: { tenantId: 'tenant-a' },
+  };
+  const req1Scope = createRequestLifetimeScope();
+  const req2Scope = createRequestLifetimeScope();
+  brandVerifiedPrincipal(sharedPrincipal, {
+    serviceId: orders.serviceId,
+    serviceName: 'orders',
+    authenticator: orders.authenticator,
+    verifiedAtMs: fakeNow,
+    expiresAtMs: fakeNow + 60_000,
+    requestScope: req1Scope,
+  });
+  assertThrows(
+    () =>
+      brandVerifiedPrincipal(sharedPrincipal, {
+        serviceId: orders.serviceId,
+        serviceName: 'orders',
+        authenticator: orders.authenticator,
+        verifiedAtMs: fakeNow,
+        expiresAtMs: fakeNow + 60_000,
+        requestScope: req2Scope,
+      }),
+    Error,
+    'Overlapping active brand on shared Principal reference',
+  );
+  req1Scope.end();
+  req2Scope.end();
+  assertEquals(hasVerifiedPrincipalBrand(sharedPrincipal), false);
+
+  // N4b: NaN expiry failing-then-passing proof!
+  // Failing control: Round-1 probe's `fakeNow >= Number.NaN` evaluated to `false` (failed OPEN!).
+  assertEquals(fakeNow >= Number.NaN, false);
+  // Passing proof: Hardened `evaluateScopedBrand` rejects BOTH `expiresAtMs: NaN` AND `claims.exp: NaN`!
+  const nanScope1 = createRequestLifetimeScope();
+  const nanExpPrincipal: Principal = {
+    subject: 'user:alice',
+    scopes: ['orders:read'],
+    roles: ['member'],
+    scheme: 'bearer',
+    claims: { tenantId: 'tenant-a', exp: Number.NaN },
+  };
+  brandVerifiedPrincipal(nanExpPrincipal, {
+    serviceId: orders.serviceId,
+    serviceName: 'orders',
+    authenticator: orders.authenticator,
+    verifiedAtMs: fakeNow,
+    expiresAtMs: fakeNow + 60_000,
+    requestScope: nanScope1,
+  });
+  const [nanExpErr] = await safe(
+    call(orders.pipelineRouter.getOrder, { orderId: 'nan-exp' }, { context: { principal: nanExpPrincipal } }),
+  );
+  assert(nanExpErr instanceof ORPCError);
+  assertEquals(nanExpErr.code, 'UNAUTHORIZED');
+  nanScope1.end();
+
+  const nanScope2 = createRequestLifetimeScope();
+  const nanRecordPrincipal: Principal = {
+    subject: 'user:alice',
+    scopes: ['orders:read'],
+    roles: ['member'],
+    scheme: 'bearer',
+    claims: { tenantId: 'tenant-a' },
+  };
+  brandVerifiedPrincipal(nanRecordPrincipal, {
+    serviceId: orders.serviceId,
+    serviceName: 'orders',
+    authenticator: orders.authenticator,
+    verifiedAtMs: fakeNow,
+    expiresAtMs: Number.NaN,
+    requestScope: nanScope2,
+  });
+  const [nanRecordErr] = await safe(
+    call(orders.pipelineRouter.getOrder, { orderId: 'nan-rec' }, { context: { principal: nanRecordPrincipal } }),
+  );
+  assert(nanRecordErr instanceof ORPCError);
+  assertEquals(nanRecordErr.code, 'UNAUTHORIZED');
+  nanScope2.end();
+
+  // N4c: Shallow-freeze `claims.audience` mutation failing-then-passing proof!
+  // Failing control: current `createInternalCredentialAuthenticator` freezes `principal` but NOT `principal.claims`!
+  const isolatedInternalAuth = createInternalCredentialAuthenticator({
+    secret: orders.installationSecret,
+    service: 'orders',
+    scopes: ['orders:read'],
+    roles: ['service'],
+  });
+  const rawInternalRes = await isolatedInternalAuth.authenticate({
+    method: 'IN_PROCESS',
+    path: 'orpc://orders/internalReindex',
+    header: (n) => (n.toLowerCase() === 'authorization' ? `Bearer ${ordersInternalToken}` : undefined),
+    headers: () => new Headers({ authorization: `Bearer ${ordersInternalToken}` }),
+    cookie: () => undefined,
+  });
+  assert(rawInternalRes.ok);
+  assertEquals(Object.isFrozen(rawInternalRes.principal), true);
+  assertEquals(Object.isFrozen(rawInternalRes.principal.claims), false); // Demonstrates current shallow freeze!
+  // Even if an attacker mutated `claims.audience` BEFORE branding (or on an unfrozen principal),
+  // branding deep-freezes `claims` AND `evaluateScopedBrand` checks private `record.internalAudience === config.serviceName`!
+  (rawInternalRes.principal.claims as Record<string, unknown>).audience = 'billing';
+  const tamperedScope = createRequestLifetimeScope();
+  brandVerifiedPrincipal(rawInternalRes.principal, {
+    serviceId: billingServiceId,
+    serviceName: 'billing',
+    authenticator: billingAuth,
+    verifiedAtMs: fakeNow,
+    expiresAtMs: fakeNow + 60_000,
+    requestScope: tamperedScope,
+    internalAudience: 'orders', // Private record still holds true issuer audience `'orders'`!
+  });
+  assertEquals(Object.isFrozen(rawInternalRes.principal.claims), true); // Deep-frozen on brand!
+  const [tamperedErr] = await safe(
+    call(billingRouter.internalCharge, { invoiceId: 'inv-tampered' }, {
+      context: { principal: rawInternalRes.principal },
+    }),
+  );
+  assert(tamperedErr instanceof ORPCError);
+  assertEquals(tamperedErr.code, 'UNAUTHORIZED'); // Private `record.internalAudience !== 'billing'` fails closed!
+  tamperedScope.end();
+
+  // True single-authn count on HTTP (counting directly at AuthenticatorPort)
   const httpAuthBase = createStaticCredentialAuthenticator({
     scheme: 'bearer',
     credentials: {
@@ -1437,8 +1983,7 @@ Deno.test('B4: scoped VerifiedPrincipalRecord defeats cross-service expired repl
   const { authenticator: countedHttpAuth, calls: realHttpAuthCalls } = wrapAuthenticatorWithCounter(httpAuthBase);
   const edgeScope = createRequestLifetimeScope();
   const singleAuthServiceId = Symbol('service:single-authn');
-  // Edge wrapper models createAuthnMiddleware stamping the brand directly upon returning ok: true
-  const edgeStampingAuth: AuthenticatorPort = {
+  const edgeStampingAuth: CapabilityAuthenticatorPort = {
     async authenticate(req) {
       const res = await countedHttpAuth.authenticate(req);
       if (res.ok) {
@@ -1492,56 +2037,63 @@ Deno.test('B4: scoped VerifiedPrincipalRecord defeats cross-service expired repl
     }),
   );
   assertEquals(resSingle.status, 200);
-  // Counted directly on the underlying AuthenticatorPort: EXACTLY 1 call (never 2)!
   assertEquals(realHttpAuthCalls.count, 1);
   edgeScope.end();
 });
 
 // ===========================================================================
-// TEST 5 (B5): Root snapshot fail-closed + OTel trace propagation + STREAMING iterator pull isolation
+// TEST 5 (B5 + N5): Root snapshot guard (ALS + non-span OTel context) + streaming
+//                   detachment (`next`, `return`, `throw`, `[Symbol.asyncDispose]`, `EventMeta`)
 // ===========================================================================
-Deno.test('B5: active-request root capture fails closed, OTel propagation isolates ALS, and streaming iterator pulls stay detached', async () => {
+Deno.test('B5 + N5: root capture fails closed on registered ALS & non-span OTel context; streaming detaches next/return/throw/[Symbol.asyncDispose] and preserves EventMeta', async () => {
   let streamReturnObservedAls: string | undefined = 'not-called';
+  let streamThrowObservedAls: string | undefined = 'not-called';
   const { pipelineRouter } = await createOrdersFixture({
     onStreamReturn: () => {
       streamReturnObservedAls = userAls.getStore();
     },
+    onStreamThrow: (obs) => {
+      streamThrowObservedAls = obs;
+    },
   });
   const tracer = trace.getTracer('rfc-a-probe-b5');
 
-  // B5a (failing-then-passing):
-  // Old model: taking AsyncLocalStorage.snapshot() lazily inside Request A captures 'tenant-A-session' and leaks it to Request B!
+  // B5a: Lazy snapshot poisoning vs composition-root capture
   const poisonedLazySnapshot = userAls.run('tenant-A-session', () => AsyncLocalStorage.snapshot());
-  const leakedToRequestB = userAls.run('tenant-B-session', () => poisonedLazySnapshot(() => userAls.getStore()));
-  assertEquals(leakedToRequestB, 'tenant-A-session'); // Demonstrates the lazy-capture bug!
-
-  // New model: on-demand root snapshot capture inside an active request ALS MUST fail closed!
+  assertEquals(userAls.run('tenant-B-session', () => poisonedLazySnapshot(() => userAls.getStore())), 'tenant-A-session');
   await userAls.run('tenant-A-session', () => {
     assertThrows(
       () => captureCleanAsyncRootOrThrow(),
       AsyncContextRootCaptureError,
-      'Cannot capture clean AsyncLocalStorage root inside an active request store',
+      'probe.userAls',
+    );
+  });
+  assertEquals(userAls.run('tenant-B-session', () => BOOTSTRAP_CLEAN_SNAPSHOT(() => userAls.getStore())), undefined);
+
+  // N5a failing-then-passing: Non-span OTel context (Baggage / ROOT_CONTEXT.setValue) is MISSED by
+  // `trace.getActiveSpan()`, but CAUGHT by `otelContext.active() !== ROOT_CONTEXT`!
+  const baggageKey = createContextKey('probe.tenant.baggage');
+  otelContext.with(ROOT_CONTEXT.setValue(baggageKey, 'tenant-A-baggage'), () => {
+    // Failing control: checking only `trace.getActiveSpan()` sees `undefined`!
+    assertEquals(trace.getActiveSpan(), undefined);
+    // Passing proof: `captureCleanAsyncRootOrThrow()` checks `otelContext.active() !== ROOT_CONTEXT` and fails closed!
+    assertThrows(
+      () => captureCleanAsyncRootOrThrow(),
+      AsyncContextRootCaptureError,
+      'otel.activeContext',
     );
   });
 
-  // And the bootstrap root snapshot isolates Request B cleanly (undefined, never 'tenant-A-session' or 'tenant-B-session'):
-  assertEquals(userAls.run('tenant-B-session', () => BOOTSTRAP_CLEAN_SNAPSHOT(() => userAls.getStore())), undefined);
-
-  // Also fails closed if an OTel span is active
+  // Active OTel span also fails closed
   tracer.startActiveSpan('lazy-import-span', (span) => {
     try {
-      assertThrows(
-        () => captureCleanAsyncRootOrThrow(),
-        AsyncContextRootCaptureError,
-        'OpenTelemetry span is active',
-      );
+      assertThrows(() => captureCleanAsyncRootOrThrow(), AsyncContextRootCaptureError, 'otel.activeSpan');
     } finally {
       span.end();
     }
   });
 
-  // B5b (failing-then-passing):
-  // Old model: wrapping only options.next() leaks consumer ALS into async-generator handler on every pull!
+  // B5b: Unwrapped streaming leaks consumer ALS on pulls
   const naiveClient = createRouterClient(pipelineRouter, {
     context: (caller: { readonly token: string }): ProcedurePipelineContext => ({
       headers: { authorization: `Bearer ${caller.token}` },
@@ -1553,10 +2105,10 @@ Deno.test('B5: active-request root capture fails closed, OTel propagation isolat
   );
   const naivePull1 = await userAls.run('consumer-leaked-pull', () => naiveIter.next());
   assert(!naivePull1.done);
-  assertEquals(naivePull1.value.observedAls, 'consumer-leaked-pull'); // Demonstrates the unwrapped streaming leak!
+  assertEquals(naivePull1.value.observedAls, 'consumer-leaked-pull');
   await naiveIter.return?.();
 
-  // New model: B5-compliant isolated router client (bootstrap snapshot + wrapDetachedAsyncIterator!)
+  // B5b + N5b: Isolated router client with `wrapDetachedAsyncIterator` (next/return/throw/[Symbol.asyncDispose] + EventMeta)
   const createIsolatedRouterClient = (propagateTraceContext: boolean) =>
     createRouterClient(pipelineRouter, {
       context: (caller: {
@@ -1585,29 +2137,74 @@ Deno.test('B5: active-request root capture fails closed, OTel propagation isolat
       ],
     });
 
-  // B5b: Streaming async-generator handler MUST observe `undefined` on ALL 3 `next()` pulls AND on `return()`!
   const streamClient = createIsolatedRouterClient(true);
   const iter = await userAls.run('consumer-initial-als', () =>
     streamClient.streamEvents(undefined, { context: { token: 'alice-token' } })
   );
-  const pulled: Array<{ seq: number; observedAls: string | null }> = [];
+  // N5b: Verify `[Symbol.asyncDispose]` is exposed on the wrapped iterator (unlike Round 1!)
+  assertEquals(typeof (iter as unknown as AsyncDisposable)[Symbol.asyncDispose], 'function');
+
+  const pulled: Array<{ seq: number; observedAls: string | null; metaId?: string; metaRetry?: number }> = [];
   for (let i = 1; i <= 3; i++) {
     const step = await userAls.run(`consumer-pull-als-${i}`, () => iter.next());
     assert(!step.done);
-    pulled.push(step.value);
+    const meta = getEventMeta(step.value);
+    pulled.push({ ...step.value, metaId: meta?.id, metaRetry: meta?.retry });
   }
   assertEquals(pulled, [
-    { seq: 1, observedAls: null },
-    { seq: 2, observedAls: null },
-    { seq: 3, observedAls: null },
+    { seq: 1, observedAls: null, metaId: 'evt-1', metaRetry: 2500 },
+    { seq: 2, observedAls: null, metaId: 'evt-2', metaRetry: 2500 },
+    { seq: 3, observedAls: null, metaId: 'evt-3', metaRetry: 2500 },
   ]);
 
-  // Early `return()` cleanup also runs detached (never sees consumer's ALS!)
-  const iter2 = await userAls.run('consumer-init-2', () =>
+  // N5b: `[Symbol.asyncDispose]()` (backing `await using`) runs generator cleanup detached!
+  streamReturnObservedAls = 'not-called';
+  const iterDispose = await userAls.run('consumer-dispose-init', () =>
     streamClient.streamEvents(undefined, { context: { token: 'alice-token' } })
   );
-  await userAls.run('consumer-pull-first', () => iter2.next());
-  await userAls.run('consumer-return-secret', () => iter2.return?.());
+  await userAls.run('consumer-dispose-pull', () => iterDispose.next());
+  await userAls.run('consumer-dispose-secret', () =>
+    (iterDispose as unknown as AsyncDisposable)[Symbol.asyncDispose]()
+  );
+  assertEquals(streamReturnObservedAls, undefined);
+
+  // N5b: `.throw()` on oRPC's `eventIterator(schema)` stream runs generator `finally` cleanup detached
+  //      and rejects the caller with the thrown error!
+  streamReturnObservedAls = 'not-called';
+  const iterThrow = await userAls.run('consumer-throw-init', () =>
+    streamClient.streamEvents(undefined, { context: { token: 'alice-token' } })
+  );
+  await userAls.run('consumer-throw-pull', () => iterThrow.next());
+  await userAls.run('consumer-throw-secret', async () => {
+    await assertRejects(() => iterThrow.throw!(new Error('consumer-cancelled')), Error, 'consumer-cancelled');
+  });
+  assertEquals(streamReturnObservedAls, undefined);
+
+  // N5b: Direct `wrapDetachedAsyncIterator` on a raw async generator ALSO executes `.throw()`'s
+  //      `catch` + `finally` AND `[Symbol.asyncDispose]()` strictly detached!
+  streamThrowObservedAls = 'not-called';
+  streamReturnObservedAls = 'not-called';
+  const rawGen = (async function* () {
+    try {
+      yield withEventMeta({ seq: 1 }, { id: 'raw-1' });
+      yield withEventMeta({ seq: 2 }, { id: 'raw-2' });
+    } catch (err) {
+      streamThrowObservedAls = userAls.getStore();
+      throw err;
+    } finally {
+      streamReturnObservedAls = userAls.getStore();
+    }
+  })();
+  const detachedRaw = wrapDetachedAsyncIterator(rawGen, (fn) =>
+    BOOTSTRAP_CLEAN_SNAPSHOT(() => withContext(ROOT_CONTEXT, fn))
+  );
+  const rawStep1 = await userAls.run('consumer-raw-pull', () => detachedRaw.next());
+  assert(!rawStep1.done);
+  assertEquals(getEventMeta(rawStep1.value)?.id, 'raw-1');
+  await userAls.run('consumer-raw-throw-secret', async () => {
+    await assertRejects(() => detachedRaw.throw!(new Error('raw-boom')), Error, 'raw-boom');
+  });
+  assertEquals(streamThrowObservedAls, undefined);
   assertEquals(streamReturnObservedAls, undefined);
 
   // Unary OTel trace propagation (true vs false) with zero ALS leakage
@@ -1670,33 +2267,72 @@ Deno.test('B5: active-request root capture fails closed, OTel propagation isolat
 });
 
 // ===========================================================================
-// TEST 6 (B6 + Advisories #4, #5, #7): setCookies sink, public rate-limit isolation,
-//         lifecycle start()/stop(), idempotent double-wrap, AbortSignal, input/output aliasing
+// TEST 6 (B6 + N3 + N6 + Advisory #4): pre-auth setCookies sink check (no token burn),
+//        nested router double-wrap protection, custom `.use()` fail-closed, real start()/stop() drain,
+//        AbortSignal, auth-before-validation, and Zod cloning vs z.unknown() aliasing
 // ===========================================================================
-Deno.test('B6 + Advisories: setCookies fail-closed/sink, public clientAddress quotas, start()/stop() lifecycle, idempotent wrapping, AbortSignal, and auth-before-validation', async () => {
-  // B6.1: Refresh-on-read cookie authenticator fails closed if no sink is wired, succeeds if sink IS wired
-  const rotatedCookies: string[] = [];
-  const refreshSessionAuth: AuthenticatorPort = {
+Deno.test('B6 + N3 + N6 + Advisory #4: pre-auth setCookies sink preserves single-use refresh tokens, nested mounts execute 1x, custom .use() fails closed, start()/stop() drains & disposes DBs', async () => {
+  // --- N6 FAILING-THEN-PASSING PROOF: Single-use refresh-token preservation ---
+  let singleUseTokenConsumed = false;
+  let refreshAuthenticateCalls = 0;
+  const singleUseRefreshAuth: CapabilityAuthenticatorPort = {
+    mayEmitSetCookies: true,
     authenticate(req) {
-      if (req.cookie('sid') === 'rotating-session') {
-        return {
-          ok: true,
-          principal: Object.freeze({
-            subject: 'user:cookie-bob',
-            scopes: ['orders:read'],
-            roles: ['member'],
-            scheme: 'custom',
-            claims: { tenantId: 'tenant-c' },
-          }),
-          setCookies: ['sid=rotated-v2; HttpOnly; SameSite=Lax; Path=/'],
-        };
+      refreshAuthenticateCalls += 1;
+      if (req.cookie('sid') !== 'single-use-refresh-v1') {
+        return { ok: false, reason: 'missing-session' };
       }
-      return { ok: false, reason: 'missing-session' };
+      if (singleUseTokenConsumed) {
+        return { ok: false, reason: 'refresh_token_already_burned' };
+      }
+      // Models packages/auth-kv-oauth & packages/auth-workos rotating single-use credentials DURING authenticate()!
+      singleUseTokenConsumed = true;
+      return {
+        ok: true,
+        principal: Object.freeze({
+          subject: 'user:cookie-bob',
+          scopes: ['orders:read'],
+          roles: ['member'],
+          scheme: 'custom',
+          claims: { tenantId: 'tenant-c' },
+        }),
+        setCookies: ['sid=rotated-v2; HttpOnly; SameSite=Lax; Path=/'],
+        responseHeaders: { 'x-session-rotated': '1' },
+      };
     },
   };
+
+  // Failing control (Round-1 order): checking sink AFTER authenticate() burns the single-use token!
+  let legacyBurned = false;
+  const legacyRes = await (async () => {
+    const authRes = await singleUseRefreshAuth.authenticate(
+      toRequestlessAuthnRequest({ cookie: 'sid=single-use-refresh-v1' }, 'orders', ['getOrder']),
+    );
+    legacyBurned = singleUseTokenConsumed;
+    if (authRes.ok && authRes.setCookies?.length) {
+      return 'threw-500-after-burn';
+    }
+    return 'unexpected';
+  })();
+  assertEquals(legacyRes, 'threw-500-after-burn');
+  assertEquals(legacyBurned, true); // Single-use token was burned!
+
+  // Reset single-use token and prove NEW pre-`authenticate()` check preserves it untouched!
+  singleUseTokenConsumed = false;
+  refreshAuthenticateCalls = 0;
+
   const cookieFixture = await createOrdersFixture({
-    extraAuthenticators: [refreshSessionAuth],
+    extraAuthenticators: [singleUseRefreshAuth],
   });
+  // Construction-time check also fails closed for declared cookie-rotating authenticator without sink
+  assertThrows(
+    () => assertRouterClientEligible(cookieFixture.pipelineConfig, { hasSetCookiesSink: false }),
+    RouterClientConfigError,
+    'ROUTER_CLIENT_COOKIE_SINK_REQUIRED',
+  );
+
+  const rotatedCookies: string[] = [];
+  const rotatedHeaders: Array<Readonly<Record<string, string>>> = [];
   const cookieClient = createRouterClient(cookieFixture.pipelineRouter, {
     context: (caller: { readonly cookie: string; readonly sink?: AuthnSideEffectSink }): ProcedurePipelineContext => ({
       headers: { cookie: caller.cookie },
@@ -1704,41 +2340,102 @@ Deno.test('B6 + Advisories: setCookies fail-closed/sink, public clientAddress qu
     }),
   });
 
-  // Without sink -> FAILS CLOSED (never silently drops rotated cookie!)
+  // Without onSetCookies sink -> FAILS CLOSED BEFORE calling authenticate() -> single-use token NOT burned!
   const [noSinkErr] = await safe(
-    cookieClient.getOrder({ orderId: 'c-1' }, { context: { cookie: 'sid=rotating-session' } }),
+    cookieClient.getOrder({ orderId: 'c-1' }, { context: { cookie: 'sid=single-use-refresh-v1' } }),
   );
   assert(noSinkErr instanceof ORPCError);
   assertEquals(noSinkErr.message, 'authn.set-cookies-sink-required');
+  assertEquals(refreshAuthenticateCalls, 0); // ZERO calls to authenticate()!
+  assertEquals(singleUseTokenConsumed, false); // Single-use token preserved!
 
-  // With explicit sink -> succeeds and forwards Set-Cookie to caller
+  // Atomic post-check proof: if onSetCookies IS provided but onResponseHeaders is MISSING,
+  // neither callback is invoked (zero partial side effects!)
+  const [partialSinkErr] = await safe(
+    cookieClient.getOrder(
+      { orderId: 'c-partial' },
+      {
+        context: {
+          cookie: 'sid=single-use-refresh-v1',
+          sink: { onSetCookies: (c) => rotatedCookies.push(...c) },
+        },
+      },
+    ),
+  );
+  assert(partialSinkErr instanceof ORPCError);
+  assertEquals(partialSinkErr.message, 'authn.response-headers-sink-required');
+  assertEquals(rotatedCookies, []); // Zero partial side effects!
+
+  // Reset and succeed when BOTH sinks are wired
+  singleUseTokenConsumed = false;
   const okCookieRes = await cookieClient.getOrder(
     { orderId: 'c-2' },
     {
       context: {
-        cookie: 'sid=rotating-session',
-        sink: { onSetCookies: (c) => rotatedCookies.push(...c) },
+        cookie: 'sid=single-use-refresh-v1',
+        sink: {
+          onSetCookies: (c) => rotatedCookies.push(...c),
+          onResponseHeaders: (h) => rotatedHeaders.push(h),
+        },
       },
     },
   );
   assertEquals(okCookieRes.subject, 'user:cookie-bob');
   assertEquals(rotatedCookies, ['sid=rotated-v2; HttpOnly; SameSite=Lax; Path=/']);
+  assertEquals(rotatedHeaders, [{ 'x-session-rotated': '1' }]);
 
-  // B6.2: Public procedure rate limiting partitions by explicit clientAddress (one visitor cannot starve another!)
-  const rlFixture = await createOrdersFixture({ rateLimitQuota: 1 });
-  const rlClient = createRouterClient(rlFixture.pipelineRouter, {
-    context: (caller: { readonly clientAddress: string }): ProcedurePipelineContext => ({
-      clientAddress: caller.clientAddress,
-    }),
-  });
-  assertEquals(await rlClient.health(undefined, { context: { clientAddress: '203.0.113.10' } }), { ok: true });
-  const [rlErrA] = await safe(rlClient.health(undefined, { context: { clientAddress: '203.0.113.10' } }));
-  assert(rlErrA instanceof ORPCError);
-  assertEquals(rlErrA.code, 'RATE_LIMITED');
-  // Distinct visitor behind BFF still succeeds!
-  assertEquals(await rlClient.health(undefined, { context: { clientAddress: '203.0.113.20' } }), { ok: true });
+  // --- N3 FAILING-THEN-PASSING PROOF: Nested router mount double-wrapping ---
+  // Failing control (Round-1 outer-only WeakSet): mounting `wrappedChild` inside `{ v1: { orders: wrappedChild } }`
+  // and re-wrapping runs middleware TWICE (`oldNestedExecs === 2`)!
+  const oldOuterMarker = new WeakSet<object>();
+  let oldNestedExecs = 0;
+  function wrapOuterOnly<T extends object>(r: T): T {
+    if (oldOuterMarker.has(r)) return r;
+    const oldMw = os.use(async ({ next }) => {
+      oldNestedExecs += 1;
+      return await next();
+    });
+    // deno-lint-ignore no-explicit-any
+    const wrapped = oldMw.router(r as any) as unknown as T;
+    oldOuterMarker.add(wrapped as object);
+    return wrapped;
+  }
+  const oldChild = wrapOuterOnly({ ping: os.handler(() => ({ ok: true })) });
+  const oldParent = wrapOuterOnly({ v1: { orders: oldChild } });
+  await call(oldParent.v1.orders.ping, undefined);
+  assertEquals(oldNestedExecs, 2); // Reproduces N3 double-execution!
 
-  // B6.2b: Service with HTTP `withRateLimit` but NO `withProcedureRateLimit` fails closed at construction!
+  // Passing proof (Round-2 per-leaf WeakMap + context-symbol guard): nested mount runs middleware ONCE!
+  const rlFixture = await createOrdersFixture({ rateLimitQuota: 5 });
+  const nestedMounted = wrapRouterIdempotent(
+    {
+      v1: { orders: rlFixture.pipelineRouter },
+      directHealth: implement(OrdersContract).$context<ProcedurePipelineContext>().health.handler(() => ({ ok: true })),
+    },
+    rlFixture.pipelineConfig,
+  );
+  const beforeNestedExec = rlFixture.executionCounter.count;
+  await createRouterClient(nestedMounted, {
+    context: (): ProcedurePipelineContext => ({ clientAddress: '198.51.100.1' }),
+  }).v1.orders.health(undefined);
+  assertEquals(rlFixture.executionCounter.count - beforeNestedExec, 1); // Executed EXACTLY ONCE!
+  await createRouterClient(nestedMounted, {
+    context: (): ProcedurePipelineContext => ({ clientAddress: '198.51.100.2' }),
+  }).directHealth(undefined);
+  assertEquals(rlFixture.executionCounter.count - beforeNestedExec, 2); // Unwrapped sibling also wrapped and ran ONCE!
+
+  // Cross-service remount of an already-wrapped leaf MUST fail closed!
+  assertThrows(
+    () =>
+      wrapRouterIdempotent(
+        { v1: { orders: rlFixture.pipelineRouter } },
+        { ...rlFixture.pipelineConfig, serviceId: Symbol('service:other'), serviceName: 'other' },
+      ),
+    RouterClientConfigError,
+    'ROUTER_CLIENT_CROSS_SERVICE_MOUNT',
+  );
+
+  // --- Construction-time fail-closed guards (withRateLimit mismatch & custom Hono .use()) ---
   assertThrows(
     () =>
       assertRouterClientEligible({
@@ -1749,29 +2446,120 @@ Deno.test('B6 + Advisories: setCookies fail-closed/sink, public clientAddress qu
     RouterClientConfigError,
     'ROUTER_CLIENT_RATE_LIMIT_MISMATCH',
   );
-
-  // B6.3: Service with `onStartup` hooks fails closed before `start()`!
   assertThrows(
     () =>
-      assertRouterClientEligible(rlFixture.pipelineConfig, {
-        hasStartupHooks: true,
-        started: false,
+      assertRouterClientEligible({
+        ...rlFixture.pipelineConfig,
+        hasCustomHttpMiddleware: true,
+        allowHttpMiddlewareSkip: false,
       }),
+    RouterClientConfigError,
+    'ROUTER_CLIENT_HTTP_MIDDLEWARE_UNSUPPORTED',
+  );
+  // Explicitly acknowledged transport-only `.use()` passes construction
+  assertRouterClientEligible({
+    ...rlFixture.pipelineConfig,
+    hasCustomHttpMiddleware: true,
+    allowHttpMiddlewareSkip: true,
+  });
+
+  // --- Advisory #4: Real start() / stop() lifecycle with in-flight drain, reverse onShutdown, & DB disposal ---
+  const lifecycleEvents: string[] = [];
+  let releaseInFlight!: () => void;
+  const inFlightEntered = new Promise<void>((resolve) => {
+    releaseInFlight = resolve;
+  });
+  let finishInFlight!: () => void;
+  const inFlightGate = new Promise<void>((resolve) => {
+    finishInFlight = resolve;
+  });
+
+  function createLifecycleHarness() {
+    let state: 'created' | 'started' | 'stopping' | 'stopped' = 'created';
+    let inFlight = 0;
+    let drainResolve: (() => void) | undefined;
+    const startupHooks = [
+      () => { lifecycleEvents.push('startup:1'); },
+      () => { lifecycleEvents.push('startup:2'); },
+    ];
+    const shutdownHooks = [
+      () => { lifecycleEvents.push('shutdown:1'); },
+      () => { lifecycleEvents.push('shutdown:2'); },
+    ];
+    const dbDisconnect = () => { lifecycleEvents.push('db:disconnected'); };
+
+    return {
+      isStarted: () => state === 'started',
+      async start() {
+        for (const hook of startupHooks) await hook();
+        state = 'started';
+      },
+      async invoke<T>(fn: () => Promise<T>): Promise<T> {
+        if (state !== 'started') {
+          throw new RouterClientConfigError(
+            state === 'created' ? 'ROUTER_CLIENT_SERVICE_NOT_STARTED' : 'ROUTER_CLIENT_SERVICE_STOPPING',
+            `Cannot invoke service in state "${state}".`,
+          );
+        }
+        inFlight += 1;
+        try {
+          return await fn();
+        } finally {
+          inFlight -= 1;
+          if (inFlight === 0 && drainResolve) drainResolve();
+        }
+      },
+      async stop() {
+        state = 'stopping';
+        if (inFlight > 0) {
+          await new Promise<void>((resolve) => {
+            drainResolve = resolve;
+          });
+        }
+        for (const hook of [...shutdownHooks].reverse()) await hook();
+        dbDisconnect();
+        state = 'stopped';
+      },
+    };
+  }
+
+  const harness = createLifecycleHarness();
+  await assertRejects(
+    () => harness.invoke(() => Promise.resolve('nope')),
     RouterClientConfigError,
     'ROUTER_CLIENT_SERVICE_NOT_STARTED',
   );
-
-  // B6.4 + Advisory #5: Idempotent wrapping prevents double execution & double quota consumption!
-  const doubleWrapped = wrapRouterIdempotent(rlFixture.pipelineRouter, rlFixture.pipelineConfig);
-  assertEquals(doubleWrapped, rlFixture.pipelineRouter);
-  const beforeExec = rlFixture.executionCounter.count;
-  await createRouterClient(doubleWrapped, {
-    context: (): ProcedurePipelineContext => ({ clientAddress: '198.51.100.1' }),
-  }).health(undefined);
-  assertEquals(rlFixture.executionCounter.count - beforeExec, 1);
+  await harness.start();
+  const activeCall = harness.invoke(async () => {
+    releaseInFlight();
+    await inFlightGate;
+    lifecycleEvents.push('in-flight:completed');
+    return 'done';
+  });
+  await inFlightEntered;
+  const stopPromise = harness.stop();
+  // New call while stopping is rejected immediately
+  await assertRejects(
+    () => harness.invoke(() => Promise.resolve('late')),
+    RouterClientConfigError,
+    'ROUTER_CLIENT_SERVICE_STOPPING',
+  );
+  finishInFlight();
+  assertEquals(await activeCall, 'done');
+  await stopPromise;
+  // Verified order: startup 1->2, in-flight drains BEFORE reverse shutdown 2->1, then DB disconnect!
+  assertEquals(lifecycleEvents, [
+    'startup:1',
+    'startup:2',
+    'in-flight:completed',
+    'shutdown:2',
+    'shutdown:1',
+    'db:disconnected',
+  ]);
 
   // AbortSignal cancellation & auth-before-input-validation ordering
-  const cancelClient = createRouterClient(cookieFixture.pipelineRouter, {
+  const cancelFixture = await createOrdersFixture();
+  const cancelClient = createRouterClient(cancelFixture.pipelineRouter, {
     context: (caller: { readonly token?: string }): ProcedurePipelineContext => ({
       headers: caller.token ? { authorization: `Bearer ${caller.token}` } : {},
     }),
@@ -1787,7 +2575,7 @@ Deno.test('B6 + Advisories: setCookies fail-closed/sink, public clientAddress qu
   assert(unauthBadInput instanceof ORPCError);
   assertEquals(unauthBadInput.code, 'UNAUTHORIZED');
 
-  // Output & input aliasing caveat (Advisory #7): Zod plain-object schemas clone, while `z.unknown()` / schema-less pass references!
+  // Output & input aliasing caveat: Zod plain-object schemas clone, while `z.unknown()` passes references!
   const serverRecord = { id: 'rec-1', tags: ['original'] };
   const withStrictSchema = os.output(z.object({ id: z.string(), tags: z.array(z.string()) })).handler(() => serverRecord);
   const withUnknownSchema = os.output(z.unknown()).handler(() => serverRecord);

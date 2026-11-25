@@ -19,6 +19,7 @@
  */
 
 import { AsyncLocalStorage } from 'node:async_hooks';
+import { context as otelContext, ROOT_CONTEXT, trace } from 'npm:@opentelemetry/api@^1.9.1';
 import { createORPCClient, ORPCError } from 'npm:@orpc/client@^1.15.5';
 import { RPCLink } from 'npm:@orpc/client@^1.15.5/fetch';
 import { createRouterClient, implement, os } from 'npm:@orpc/server@^1.15.5';
@@ -31,14 +32,37 @@ import {
   type AuthnRequest,
   type Principal,
 } from '@netscript/service/auth';
-import { createMemoryRateLimitStore } from '@netscript/service/rate-limit';
+import { createMemoryRateLimitStore, type RateLimitDecision } from '@netscript/service/rate-limit';
 import { createServiceClient } from '@netscript/sdk/client';
 import { createBearerSdkClientContribution } from '@netscript/plugin-auth-core/sdk';
 import { extractContext, withContext } from '@netscript/telemetry/context';
 import { z } from 'npm:zod@^4.6.5';
 
-// Captured at composition root before any request executes.
-const cleanAlsSnapshot = AsyncLocalStorage.snapshot();
+// N5: Shared composition-root capture guard (aligned with PR #2659's global probe symbol).
+const ACTIVE_STORE_PROBES_SYMBOL = Symbol.for('@netscript/async-context/active-store-probes');
+interface ActiveAsyncStoreProbe {
+  readonly name: string;
+  readonly isActive: () => boolean;
+}
+function captureCleanAsyncRootOrThrow(): <T>(fn: () => T) => T {
+  const probes = (globalThis as Record<symbol, Set<ActiveAsyncStoreProbe> | undefined>)[
+    ACTIVE_STORE_PROBES_SYMBOL
+  ];
+  if (probes) {
+    for (const probe of probes) {
+      if (probe.isActive()) {
+        throw new Error(`[netscript.service] Active ALS store (${probe.name}) during root snapshot capture.`);
+      }
+    }
+  }
+  if (trace.getActiveSpan() !== undefined || otelContext.active() !== ROOT_CONTEXT) {
+    throw new Error('[netscript.service] Active OpenTelemetry context during root snapshot capture.');
+  }
+  return AsyncLocalStorage.snapshot();
+}
+
+// Captured via guarded composition-root helper before any request executes.
+const cleanAlsSnapshot = captureCleanAsyncRootOrThrow();
 
 const ItemSchema = z.object({
   id: z.string(),
@@ -124,17 +148,23 @@ const authenticator = createStaticCredentialAuthenticator({
   },
 });
 
-const rateLimitStore = createMemoryRateLimitStore();
+// N2: Disjoint rate-limit stores for HTTP edge vs procedure pipeline (RFC 0008 single-policy invariant).
+const httpRateLimitStore = createMemoryRateLimitStore();
+const procedureRateLimitStore = createMemoryRateLimitStore();
 const HUGE_LIMIT = 10_000_000;
+(procedureRateLimitStore as { validate?: (cfg: { limit: number; windowMs: number }) => void }).validate?.({
+  limit: HUGE_LIMIT,
+  windowMs: 60_000,
+});
 
 // Silent logger injected into BOTH Hono apps AND router-client pipelines so terminal I/O
 // never skews latency while preserving identical SHA-256 subject hashing & audit work.
 const silentLogger = {
-  debug: () => {},
-  info: () => {},
-  warn: () => {},
-  error: () => {},
-  fatal: () => {},
+  debug: (..._args: unknown[]) => {},
+  info: (..._args: unknown[]) => {},
+  warn: (..._args: unknown[]) => {},
+  error: (..._args: unknown[]) => {},
+  fatal: (..._args: unknown[]) => {},
   getChild: () => silentLogger,
   with: () => silentLogger,
 };
@@ -186,7 +216,7 @@ const serviceApp = createService(mountedRouter, { name: 'bench' })
     routes: ['/api/*'],
     limit: HUGE_LIMIT,
     windowMs: 60_000,
-    store: rateLimitStore,
+    store: httpRateLimitStore,
     key: (c) => c.req.header('authorization') ?? 'anon',
   })
   .withAuthn({ authenticator })
@@ -200,7 +230,7 @@ const running = await createService(mountedRouter, { name: 'bench-http' })
     routes: ['/api/*'],
     limit: HUGE_LIMIT,
     windowMs: 60_000,
-    store: rateLimitStore,
+    store: httpRateLimitStore,
     key: (c) => c.req.header('authorization') ?? 'anon',
   })
   .withAuthn({ authenticator })
@@ -237,7 +267,7 @@ const inProcessFetchLink = new RPCLink<{ readonly token: string }>({
     );
   },
 });
-const fetchLinkClient = createORPCClient(inProcessFetchLink) as typeof httpClient;
+const fetchLinkClient = createORPCClient(inProcessFetchLink) as unknown as typeof httpClient;
 
 // 4. Build oRPC-native procedure pipeline router (with scoped brand verification + deny-by-default)
 const procedurePipelineRouter = os
@@ -256,7 +286,7 @@ const procedurePipelineRouter = os
 
     let principal: Principal | undefined;
     if (access.authentication !== 'none') {
-      if (isTrustedForBench(context.principal)) {
+      if (isTrustedForBench(context.principal) && context.principal) {
         principal = context.principal;
       } else {
         const authResult = await authenticator.authenticate(
@@ -283,17 +313,18 @@ const procedurePipelineRouter = os
       silentLogger.info('auth decision allow', { stage: 'authz', subjectHash, procedure: path.join('.') });
     }
 
-    const decision = await rateLimitStore.consume({
+    const decision = await procedureRateLimitStore.consume({
       key: principal ? `${principal.subject}:${path.join('.')}` : `anon:${path.join('.')}`,
       limit: HUGE_LIMIT,
       windowMs: 60_000,
       now: Date.now(),
-    });
+    }) as RateLimitDecision & { readonly retryAt?: number };
     if (!decision.allowed) {
+      const retryTarget = decision.retryAt ?? decision.resetAt;
       throw new ORPCError('RATE_LIMITED', {
         status: 429,
         message: 'Too many requests',
-        data: { retryAfter: Math.max(1, Math.ceil((decision.resetAt - Date.now()) / 1000)), limit: HUGE_LIMIT },
+        data: { retryAfter: Math.max(1, Math.ceil((retryTarget - Date.now()) / 1000)), limit: HUGE_LIMIT },
       });
     }
 
