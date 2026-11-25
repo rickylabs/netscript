@@ -1,5 +1,3 @@
-import type { FreshUiElementProps, FreshUiEventHandler } from '../_internal/public-props.ts';
-
 /** Supported `data-state` values for write-only secret controls. */
 export const SECRET_FIELD_STATES = [
   'unset',
@@ -84,7 +82,11 @@ export interface UseSecretFieldOptions {
 }
 
 /** Element props returned for the write-only password input. */
-export type SecretFieldInputElementProps = FreshUiElementProps & {
+export interface SecretFieldInputElementProps {
+  /** Element identifier. */
+  id?: string;
+  /** CSS class name. */
+  class?: string;
   /** Form field name when submitting directly. */
   name?: string;
   /** Native password input type. */
@@ -94,9 +96,9 @@ export type SecretFieldInputElementProps = FreshUiElementProps & {
   /** Disables spellchecking on credential entries. */
   spellcheck?: boolean;
   /** Disables auto-capitalization on touch keyboards. */
-  autocapitalize?: string;
+  autocapitalize?: 'off' | 'none' | 'on' | 'sentences' | 'words' | 'characters';
   /** Disables auto-correction on touch keyboards. */
-  autocorrect?: string;
+  autocorrect?: 'off' | 'on';
   /** Disables the input control. */
   disabled?: boolean;
   /** Marks the input read-only. */
@@ -111,37 +113,51 @@ export type SecretFieldInputElementProps = FreshUiElementProps & {
   'aria-describedby'?: string;
   /** Accessible name when no visible label is associated. */
   'aria-label'?: string;
+  /** Component scope marker. */
+  'data-scope'?: string;
+  /** Component part marker. */
+  'data-part'?: string;
   /** Input event listener. */
-  onInput?: FreshUiEventHandler<Event>;
+  onInput?: (event: Event) => void;
   /** Keydown event listener. */
-  onKeyDown?: FreshUiEventHandler<KeyboardEvent>;
+  onKeyDown?: (event: KeyboardEvent) => void;
   /** Ref callback for attaching the rendered input element. */
   ref?: (node: HTMLInputElement | null) => void;
-};
+}
 
 /** Element props returned for hidden form contract inputs. */
-export type SecretFieldHiddenInputProps = {
+export interface SecretFieldHiddenInputProps {
   /** Native hidden input type. */
   readonly type: 'hidden';
   /** Form field name. */
   readonly name: string;
   /** Sentinel token or action string. */
   readonly value: string;
-};
+}
 
 /** Element props returned for action buttons (`Replace`, `Cancel`, `Clear`, `Keep`). */
-export type SecretFieldButtonElementProps = FreshUiElementProps & {
+export interface SecretFieldButtonElementProps {
+  /** Element identifier. */
+  id?: string;
+  /** CSS class name. */
+  class?: string;
   /** Native button type. */
   type?: 'button';
   /** Disables the action button. */
   disabled?: boolean;
   /** Accessible label override. */
   'aria-label'?: string;
+  /** Component scope marker. */
+  'data-scope'?: string;
+  /** Component part marker. */
+  'data-part'?: string;
+  /** Semantic action marker. */
+  'data-action'?: string;
   /** Click event handler. */
-  onClick?: FreshUiEventHandler<MouseEvent>;
+  onClick?: (event: MouseEvent) => void;
   /** Ref callback for attaching the rendered button element. */
   ref?: (node: HTMLButtonElement | null) => void;
-};
+}
 
 /** Return surface of the L1 {@link useSecretField} hook. */
 export interface UseSecretFieldReturn {
