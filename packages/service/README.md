@@ -787,16 +787,61 @@ const app = createService({}, { name: 'device' })
 ```
 
 A rejected request receives JSON `{ error: 'RATE_LIMITED' }` and `Retry-After` in whole seconds
-rounded up to the window end. For shared production state, import `createKvRateLimitStore` from
-`@netscript/service/rate-limit` and pass a `@netscript/kv` store with atomic support and a dedicated
-`prefix`. Each request makes at most eight read/CAS attempts (sixteen KV round trips); contention
-budget exhaustion rejects conservatively. Store failures propagate to the service error handler.
+rounded up from `decision.retryAt ?? decision.resetAt`. For shared production state, import
+`createKvRateLimitStore` from `@netscript/service/rate-limit` and pass a `@netscript/kv` store with
+atomic support and a dedicated `prefix`. Each request makes at most eight read/CAS attempts (sixteen
+KV round trips); contention budget exhaustion rejects conservatively. Store failures propagate to
+the service error handler.
+
+Pass `policy: { kind: 'gcra', burst? }` to either `createMemoryRateLimitStore` or
+`createKvRateLimitStore` to opt into alignment-independent rolling quotas (Generic Cell Rate
+Algorithm) with an O(1) stored record per key while keeping `{ kind: 'fixed-window' }` as the
+unchanged default. `burst` defaults to `limit`. On GCRA quota exhaustion, `RateLimitDecision.retryAt`
+reports the exact earliest representable next eligible epoch millisecond (and advisory backoff on KV
+CAS contention or memory capacity saturation), so middleware emits `Retry-After` from `retryAt`
+rather than waiting for full bucket recovery (`resetAt`).
+
+```ts
+import { getKv } from '@netscript/kv';
+import { createService } from '@netscript/service';
+import { createKvRateLimitStore } from '@netscript/service/rate-limit';
+
+const kv = await getKv();
+const readStore = createKvRateLimitStore(kv, {
+  prefix: ['protected-reads-gcra', 'items'],
+  policy: { kind: 'gcra', burst: 5 },
+});
+readStore.validate?.({ limit: 60, windowMs: 60_000 });
+
+const app = createService({}, { name: 'catalog' })
+  .withRateLimit({
+    routes: ['/api/items', '/api/rpc/items/*'],
+    limit: 60,
+    windowMs: 60_000,
+    store: readStore,
+  })
+  .route('get', '/api/items', (c) => c.json({ items: [] }))
+  .build();
+void app;
+```
+
+Rolling quota sharing assumes callers sharing a store/prefix use one coherent
+`(limit, windowMs, burst)` policy; differing tuples hit independent policy-scoped buckets. GCRA adds
+a fixed `5_000` ms clock-skew retention bound (`expireIn = (resetAt - now) + 5_000` in KV, matched
+by rotating eviction in memory) and enforces a 365-day (`31_536_000_000` ms) retention ceiling
+synchronously at startup via `store.validate?.({ limit, windowMs })` (invoked automatically by
+`createRateLimitMiddleware()` / `.withRateLimit()` and callable directly for post-auth
+`store.consume()` callers). Use prefixes that are disjoint after backend serialization when
+migrating or changing policy (especially on Redis, which joins key parts with unescaped `:`).
+Shared-KV confirmed-write certification on `RedisKvAdapter` requires Redis `EXEC` command-error
+rejection (`#2648`).
 
 The memory store is for tests/development: it performs synchronous reservations, evicts expired keys
 in bounded batches, and rejects new keys when its `maxKeys` cap is full. It holds no timers. Neither
-adapter evicts a live quota to admit another key. Windows are aligned to epoch time; a client can
-use two windows' quota around a boundary. Separate limiters must use separate stores or KV prefixes
-unless they intentionally share a quota. Hosts sharing a store need synchronized clocks.
+adapter evicts a live quota to admit another key. Default fixed windows are aligned to epoch time; a
+client can use two windows' quota around a boundary unless `policy: { kind: 'gcra' }` is enabled.
+Separate limiters must use separate stores or KV prefixes unless they intentionally share a quota.
+Hosts sharing a store need synchronized clocks (well within `5_000` ms for GCRA).
 
 `serve()` supplies `{ remoteAddr: info.remoteAddr }` to Hono on HTTP and TLS listeners, so Hono's
 Deno `getConnInfo` sees the socket peer. A mounting host can pass the same `ServiceEnvironment` to

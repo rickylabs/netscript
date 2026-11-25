@@ -120,9 +120,15 @@ per request, and caps retained keys at `maxKeys` (default 10,000). It rejects ne
 and never evicts a live quota to admit another client. There are no timers to shut down. Use it for
 tests/development; separate instances have separate quotas.
 
-Fixed windows permit up to two windows' quota near a boundary. This primitive controls a shared
-request quota; separate start and poll quotas can use additional stages with separate stores or
-prefixes and custom keys. A minimum interval between polls needs a separate policy.
+Fixed windows remain the default and permit up to two windows' quota near an epoch boundary. To
+eliminate boundary doubling on protected reads, pass `policy: { kind: 'gcra' }` (with an optional
+`burst` cap) to `createKvRateLimitStore` or `createMemoryRateLimitStore` under a dedicated,
+serialization-disjoint KV prefix. GCRA keeps an O(1) record per key, validates the 365-day retention
+ceiling synchronously at middleware startup via `store.validate?.({ limit, windowMs })`, retains KV
+keys for `resetAt - now + 5_000` ms to tolerate bounded clock skew, and computes `Retry-After` from
+`decision.retryAt ?? decision.resetAt`. Separate start and poll quotas can use additional stages
+with separate stores or prefixes and custom keys. Dynamic per-credential poll cadence needs a
+separate policy.
 
 ## Next steps
 

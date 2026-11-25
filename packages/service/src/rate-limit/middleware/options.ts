@@ -20,9 +20,15 @@ export type ServiceProxyTrust = false | ((address: string) => boolean);
 export interface ServiceRateLimitOptions {
   /** Exact URL paths, or subtree patterns ending in `/*`. Matches every method. */
   readonly routes: readonly string[];
-  /** Maximum accepted requests per key per fixed window. */
+  /**
+   * Quota budget per `windowMs` (maximum accepted requests per fixed window, or
+   * sustained rate numerator `limit / windowMs` and default burst for GCRA stores).
+   */
   readonly limit: number;
-  /** Epoch-aligned window duration in milliseconds. */
+  /**
+   * Quota window duration in milliseconds (epoch-aligned for fixed-window stores,
+   * or rate denominator `limit / windowMs` for GCRA stores).
+   */
   readonly windowMs: number;
   /** Atomic store; share it across instances for a distributed quota. */
   readonly store: RateLimitStore;

@@ -213,6 +213,9 @@ export type { LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 // Layer 3: Presets
 export { defineService, type DefineServiceOptions } from './src/presets/define-service.ts';
 export type { ServiceRateLimitOptions } from './src/rate-limit/middleware/options.ts';
-export type { RateLimitStore } from './src/rate-limit/ports/rate-limit-store.ts';
+export type {
+  RateLimitPolicyConfig,
+  RateLimitStore,
+} from './src/rate-limit/ports/rate-limit-store.ts';
 export type { RateLimitDecision, RateLimitRequest } from './src/rate-limit/domain/rate-limit.ts';
 export type { ServiceProxyTrust } from './src/rate-limit/middleware/options.ts';
