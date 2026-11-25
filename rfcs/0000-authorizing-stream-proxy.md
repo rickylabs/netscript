@@ -31,10 +31,16 @@ NetScript Durable Streams:
 3. First-class, authoritative mounting in `@netscript/service` (`ServiceBuilder.withStreamProxy`,
    `DefineServiceOptions.streamProxies`, authoritative contract-policy binding for both
    `createContractAuthorizer` and `createContractOverlayAuthorizer`, dispatch-consistent
-   path-pattern intersection checks, `remoteAddr` forwarding for trusted proxy-origin checks, and a
-   pre-drain shutdown `AbortSignal` so active SSE readers close cleanly on `RunningService.stop()`).
+   path-pattern intersection checks covering all routes including `ServiceBuilder.route()`,
+   raw-vs-decoded static-segment canonicalization, a pre-authn credential-selection and cookie
+   Origin/Fetch-Metadata guard binding `withAuthn` strictly to the chosen credential, final mounted
+   response header/`Set-Cookie` ownership across `withAuthn` and CORS, `remoteAddr` forwarding for
+   trusted proxy-origin checks, and a pre-drain shutdown `AbortSignal` so active SSE readers close
+   cleanly on `RunningService.stop()`).
 4. A single-offset-authority `proxyUrl` option on `createNetScriptStreamEventSourceV1`
-   (`@netscript/fresh/streams`) with an explicit dispose-and-rebuild reconnect contract, plus a
+   (`@netscript/fresh/streams`) plus terminal-vs-retryable `readyState` propagation on
+   `bindStreamEventSourceV1` (`@netscript/plugin-streams-core/sse`) so browser consumers commit
+   strictly on `control` and dispose-and-rebuild without spinning on terminal HTTP refusals, plus a
    backward-compatible, non-breaking relationship with `createNetScriptChatStreamProxy`
    (`@netscript/fresh/ai`) that preserves legacy defaults unchanged and adds opt-in revocable SSE
    delegation.
@@ -259,11 +265,14 @@ const running = await defineService(router, {
 });
 ```
 
-### 3. Consume from a browser cookie client (`EventSource`) with dispose-and-rebuild resume
+### 3. Consume from a browser cookie client (`EventSource`) with control-committed delivery and terminal-error stop
 
 A Fresh island builds the base endpoint URL from the contract (leaving `offset` to
-`createNetScriptStreamEventSourceV1` as the single offset authority) and handles transport drops by
-disposing the old `EventSource` and rebuilding from `binding.snapshot().lastCommittedOffset`:
+`createNetScriptStreamEventSourceV1` as the single offset authority), buffers incoming `event: data`
+payloads until their committing `event: control` arrives so application effects never commit
+uncommitted data, and inspects `event.payload.retryable` (derived from `source.readyState !== 2`
+(`EventSource.CLOSED`)) so terminal admission refusals stop cleanly without spinning while
+transient disconnects dispose and rebuild from `lastCommittedOffset`:
 
 ```ts
 // islands/ProjectFeed.tsx
@@ -273,7 +282,11 @@ import {
   type NetScriptStreamEventSourceBindingV1,
 } from '@netscript/fresh/streams';
 
-function startProjectFeed(projectId: string, onCommittedBatch: (changes: unknown) => void) {
+function startProjectFeed(
+  projectId: string,
+  onCommittedBatch: (batches: readonly unknown[], committedOffset: string) => void,
+  onTerminalError: (code: string) => void,
+) {
   const baseProxyUrl = buildStreamEndpointUrl(projectFeedStream, {
     baseUrl: location.origin,
     params: { projectId },
@@ -284,38 +297,57 @@ function startProjectFeed(projectId: string, onCommittedBatch: (changes: unknown
   let currentCursor: string | undefined;
   let binding: NetScriptStreamEventSourceBindingV1 | undefined;
   let stopped = false;
+  let consecutiveFailures = 0;
+  let reconnectTimer: number | undefined;
+  const maxConsecutiveFailures = 5;
 
   function open() {
     if (stopped) return;
+    let uncommitted: unknown[] = [];
     binding = createNetScriptStreamEventSourceV1({
       proxyUrl: baseProxyUrl,
       offset: currentOffset,
       lastObservedCursor: currentCursor,
       onEvent(event) {
+        if (event.event === 'data') {
+          // Hold data uncommitted until its matching `control` frame commits the offset.
+          uncommitted.push(event.payload);
+          return;
+        }
         if (event.event === 'control' || event.event === 'heartbeat') {
+          consecutiveFailures = 0;
           const snap = binding!.snapshot();
           currentOffset = snap.lastCommittedOffset ?? currentOffset;
           currentCursor = snap.lastObservedCursor;
-          if (event.event === 'control' && event.payload.streamClosed) {
-            stopped = true;
-            binding?.dispose();
+          if (event.event === 'control') {
+            if (uncommitted.length > 0) {
+              const committed = uncommitted;
+              uncommitted = [];
+              onCommittedBatch(committed, currentOffset);
+            }
+            if (event.payload.streamClosed) {
+              stopped = true;
+              binding?.dispose();
+            }
           }
           return;
         }
-        if (event.event === 'data') {
-          // Buffer or apply idempotently; lastCommittedOffset advances only on `control`.
-          onCommittedBatch(event.payload);
-          return;
-        }
-        if (event.event === 'error' && event.payload.code === 'transport-error') {
-          // Dispose so native EventSource never auto-retries the stale initial URL.
+        if (event.event === 'error') {
           const snap = binding!.snapshot();
           currentOffset = snap.lastCommittedOffset ?? currentOffset;
           currentCursor = snap.lastObservedCursor;
+          uncommitted = []; // Discard any uncommitted data received without control.
           binding?.dispose();
           binding = undefined;
-          // Schedule bounded backoff reconnect (stops permanently if fresh admission returns 401/403).
-          setTimeout(open, 500);
+          // Terminal error (e.g. EventSource.CLOSED on 401/403/404/410, or malformed frame):
+          // stop permanently without spinning.
+          if (!event.payload.retryable || ++consecutiveFailures > maxConsecutiveFailures) {
+            stopped = true;
+            onTerminalError(event.payload.code);
+            return;
+          }
+          // Bounded backoff rebuild from lastCommittedOffset (never reusing native stale URL).
+          reconnectTimer = setTimeout(open, Math.min(500 * consecutiveFailures, 5_000));
         }
       },
     });
@@ -324,10 +356,16 @@ function startProjectFeed(projectId: string, onCommittedBatch: (changes: unknown
   open();
   return () => {
     stopped = true;
+    if (reconnectTimer !== undefined) clearTimeout(reconnectTimer);
     binding?.dispose();
   };
 }
 ```
+
+Note: native browser `EventSource` exposes `readyState === EventSource.CLOSED` (`2`) on terminal
+non-`200` HTTP refusals (`401`/`403`/`404`/`410`) without revealing the numeric status code.
+Browser consumers that must distinguish `401` (re-authenticate) from `410` (resync snapshot) can
+use credentialed `fetch(..., { credentials: 'same-origin' })` with `createFetchStreamEventSourceV1`.
 
 ### 4. Consume from a bearer client (`fetch`) with offset resume
 
@@ -484,8 +522,10 @@ export interface StreamEndpointDefinition<
 }
 
 export interface StreamEndpointContract<
-  TParams = Record<never, never>,
-  TQuery = Record<never, never>,
+  TParamsOutput = Record<never, never>,
+  TQueryOutput = Record<never, never>,
+  TParamsInput = TParamsOutput,
+  TQueryInput = TQueryOutput,
 > {
   readonly protocol: StreamEndpointProtocol;
   readonly method: 'GET';
@@ -496,11 +536,17 @@ export interface StreamEndpointContract<
   readonly query?: ContractObjectSchemaLike;
   readonly clientAuth: StreamEndpointClientAuthMode;
   readonly access: NonNullable<NetScriptProcedureMeta['access']>;
+  /** Optional documentation metadata reserved for docs and future OpenAPI/service-info projection. */
   readonly summary?: string;
   readonly description?: string;
   readonly tags?: readonly string[];
-  /** Type-only carrier for inferred params and query types; never populated at runtime. */
-  readonly '~types'?: { readonly params: TParams; readonly query: TQuery };
+  /** Type-only carrier for inferred params and query input/output types; never populated at runtime. */
+  readonly '~types'?: {
+    readonly params: TParamsOutput;
+    readonly query: TQueryOutput;
+    readonly paramsInput: TParamsInput;
+    readonly queryInput: TQueryInput;
+  };
 }
 
 export function defineStreamEndpoint<
@@ -510,7 +556,9 @@ export function defineStreamEndpoint<
   definition: StreamEndpointDefinition<TParams, TQuery>,
 ): StreamEndpointContract<
   TParams extends ContractObjectSchemaLike ? ContractSchemaOutput<TParams> : Record<never, never>,
-  TQuery extends ContractObjectSchemaLike ? ContractSchemaOutput<TQuery> : Record<never, never>
+  TQuery extends ContractObjectSchemaLike ? ContractSchemaOutput<TQuery> : Record<never, never>,
+  TParams extends ContractObjectSchemaLike ? ContractSchemaInput<TParams> : Record<never, never>,
+  TQuery extends ContractObjectSchemaLike ? ContractSchemaInput<TQuery> : Record<never, never>
 >;
 ```
 
@@ -545,40 +593,60 @@ and mounted via `streamProxies` on `defineService` / `createService().withStream
 #### Typed URL builder (`buildStreamEndpointUrl`)
 
 ```ts
-export function buildStreamEndpointUrl<TParams, TQuery>(
-  endpoint: StreamEndpointContract<TParams, TQuery>,
+export function buildStreamEndpointUrl<
+  TParamsInput,
+  TParamsOutput,
+  TQueryInput,
+  TQueryOutput,
+>(
+  endpoint: StreamEndpointContract<TParamsOutput, TQueryOutput, TParamsInput, TQueryInput>,
   input: Readonly<{
     readonly baseUrl: string;
-    readonly params?: TParams;
-    readonly query?: TQuery;
+    readonly params?: TParamsInput;
+    readonly query?: TQueryInput;
     readonly offset?: string;
     readonly cursor?: string;
   }>,
 ): string;
 ```
 
-`buildStreamEndpointUrl` validates `params` and `query` (when schemas are present), URL-encodes each
-`{param}` segment, appends validated application query pairs, sets `offset` when provided (omitting
+**Wire input vs schema output rules for transforms**: `ContractObjectSchemaLike`
+([`schema-types.ts:6-15,54-71`](../packages/contracts/src/domain/schema-types.ts#L6-L15)) exposes
+`_input`, `_output`, `shape`, and synchronous `parse(value: unknown): TOutput`. `buildStreamEndpointUrl`
+accepts the schema's **input** types (`ContractSchemaInput`), calls `schema.parse(...)` synchronously
+to validate the caller's values (throwing if validation fails or if `offset` fails
+`isValidStreamOffset`), and serializes the **caller's validated wire input** (not the transformed
+`TOutput`) into URL path segments and query parameters — throwing `TypeError` if any input field is
+not wire-serializable (`string | number | boolean` for `params`; additionally `readonly string[]` or
+`undefined` for `query`). On the server, `bindStreamProxy` calls `schema.parse(...)` on the decoded
+URL string parameters and hands the parsed **schema output** (`ContractSchemaOutput`) to `authorize`
+and `resolvePath`. This preserves transforms that convert wire strings into domain values (for
+example, `z.string().transform(...)` or `z.coerce.number()`), and requires `params`/`query` schemas
+to accept decoded URL string inputs so client URL construction and server validation agree. Omitting
 `offset` lets either `createNetScriptStreamEventSourceV1` or the proxy's `defaultOffset` supply the
-single authoritative offset), and sets optional `cursor`. It never appends `live=sse` to the public
-proxy URL because the proxy always enforces `live=sse` on the upstream Durable Streams hop.
+single authoritative offset. It never appends `live=sse` to the public proxy URL because the proxy
+always enforces `live=sse` on the upstream Durable Streams hop.
 
 ### Service mounting, authoritative contract policy, and shutdown (`@netscript/service`)
 
 #### Structural mount contract
 
 `@netscript/service` defines a runtime-neutral mount interface so `@netscript/service` stays free of
-`@netscript/plugin-streams-core`:
+`@netscript/plugin-streams-core`. In v1, every stream proxy mounted on a `defineService` /
+`ServiceBuilder` app executes inside service `withAuthn` + `withAuthz` (deferred self-contained
+global-authn bypass is moved to [Future possibilities](#future-possibilities) so global middleware
+never yields to an arbitrary structural handler):
 
 ```ts
-export type StreamProxyAdmissionMode =
-  | 'service-auth'
-  | 'proxy-self-contained';
-
 export interface StreamProxyMountContext {
   /** Decoded path parameters matched by the Hono route. */
   readonly params: Readonly<Record<string, string>>;
-  /** Authenticated principal set by `withAuthn`, when present. */
+  /**
+   * Exact credential transport selected BEFORE `withAuthn` ran (`'bearer'` or `'cookie'`).
+   * Guarantees `principal` was authenticated strictly from this credential mode.
+   */
+  readonly credentialMode: 'bearer' | 'cookie';
+  /** Authenticated principal set by `withAuthn` strictly from `credentialMode`, when present. */
   readonly principal?: Principal;
   /** Socket peer metadata from `ServiceEnvironment.remoteAddr`, used for trusted proxy-origin checks. */
   readonly remoteAddr?: Deno.Addr;
@@ -589,12 +657,15 @@ export interface StreamProxyMountContext {
 export interface StreamProxyMount {
   readonly endpoint: StreamEndpointContract<unknown, unknown>;
   /**
-   * Controls whether service `withAuthn`/`withAuthz` authenticate the request before calling
-   * `handle` (`'service-auth'`, default) or explicitly delegate exact GET stream admission to
-   * `handle` (`'proxy-self-contained'`, which still enforces `endpoint.access` scopes/roles inside
-   * the proxy).
+   * Pre-authn guard configuration read by `ServiceBuilder` to run deterministic credential
+   * selection and cookie Origin/Fetch-Metadata checks BEFORE `withAuthn` touches credentials or
+   * refreshes sessions.
    */
-  readonly admission: StreamProxyAdmissionMode;
+  readonly guardConfig?: Readonly<{
+    readonly allowedOrigins?: readonly string[];
+    readonly trustProxy?: ServiceProxyTrust;
+    readonly allowDirectNavigation?: boolean;
+  }>;
   /** Handles one matched GET request for this stream endpoint. */
   handle(request: Request, context: StreamProxyMountContext): Promise<Response>;
 }
@@ -611,13 +682,51 @@ export interface StreamProxyMount {
      and registered as a `GET` route **after** `installAuth()` and `installBodyLimit()` and
      **before** `notFound`, matching the deferred-route lifecycle
      ([service-builder-impl.ts:515-524](../packages/service/src/builder/service-builder-impl.ts#L515-L524)).
-   - The Hono route handler forwards `remoteAddr: c.env?.remoteAddr`, `principal: c.get('principal')`,
-     `params: c.req.param()`, and the service's pre-drain `shutdownSignal` into
-     `mount.handle(c.req.raw, context)`.
-   - Before invoking `mount.handle`, the route wrapper rejects percent-encoded path-separator
-     smuggling (`%2F`, `%2f`, `%5C`, `%5c`) or `..` segments in the undecoded `rawPathname` with
-     HTTP `400` so Hono's decoded `c.req.path` and the policy resolver's `rawPathname` match the
-     exact same segment structure.
+   - **Pre-authn stream canonicalization & credential-selection middleware (runs BEFORE `withAuthn`)**:
+     1. Matches BOTH `rawPathname` and decoded `c.req.path` against the mounted stream table. If
+        either matches a mounted stream endpoint, verifies that `rawPathname` contains no
+        percent-encoded path separators (`%2F`, `%2f`, `%5C`, `%5c`), no `..` segments, AND that
+        every **static** (non-parameter) segment of `rawPathname` matches the exact static literal
+        in the endpoint template (rejecting percent-encoded static literals such as
+        `/api/%73treams/...` where raw and decoded matching could diverge) with HTTP `400` BEFORE
+        auth middleware runs.
+     2. For matched `GET` stream requests, runs deterministic credential selection (`clientAuth`,
+        RFC 6750 Bearer grammar, malformed/empty/duplicate/mixed header rejection → `401`) and —
+        when `credentialMode === 'cookie'` — the Cookie Origin & Fetch Metadata guard (with
+        `trustProxy` + `remoteAddr` → `403`) **BEFORE `withAuthn` runs**.
+     3. Stores the selected `credentialMode` on the Hono context and scopes the `AuthnRequest`
+        handed to `withAuthn` to **only** that selected credential (hiding `Cookie` headers when
+        `credentialMode === 'bearer'`, and verifying `Authorization` is absent when
+        `credentialMode === 'cookie'`). Consequently, `createCompositeAuthenticator`
+        ([composite-authenticator.ts:49-59](../packages/service/src/auth/composite-authenticator.ts#L49-L59))
+        can NEVER fall through from a rejected bearer token to a cookie principal, and cookie
+        refresh never runs on cross-site/rejected requests!
+   - **Final mounted response header & `Set-Cookie` ownership (runs around `mount.handle`)**:
+     - Under Hono, `createAuthnMiddleware`'s `applyAuthnResponse(c, result.responseHeaders, result.setCookies)`
+       ([auth-middleware.ts:81-82,268-279](../packages/service/src/auth/auth-middleware.ts#L81-L82))
+       mutates `c.res` headers via `c.header(...)`, which can overwrite handler-set headers
+       (such as replacing `cache-control: no-store` with `cache-control: public`) and drop handler
+       `Set-Cookie` values when combined with `createServiceCorsMiddleware`
+       ([service-cors.ts:70-91](../packages/service/src/middleware/service-cors.ts#L70-L91)).
+     - For matched stream endpoints, `createAuthnMiddleware` records `result.responseHeaders` and
+       `result.setCookies` in a request-scoped context slot instead of calling `c.header(...)`
+       directly before `next()`. After `mount.handle` returns a `Response`, `ServiceBuilder`'s
+       stream route wrapper constructs the final `Response` cleanly:
+       - If `result.responseHeaders` contains any proxy-reserved header (framing, hop-by-hop,
+         `cache-control`, `pragma`, `expires`, `x-content-type-options`, `x-accel-buffering`,
+         `vary`, `access-control-*`, `cross-origin-*`, `authorization`, `www-authenticate`,
+         `set-cookie`, or protocol replay metadata `stream-*`/`etag`), fail closed with redacted
+         `503` and cancel the stream body immediately!
+       - Apply non-reserved `AuthnResult.responseHeaders` strictly underneath Tier 3 proxy mandatory
+         headers (`content-type`, `cache-control: no-store, no-cache, no-transform`,
+         `x-content-type-options: nosniff`, `x-accel-buffering: no`, `vary`).
+       - Compose BOTH `AuthnResult.setCookies` AND `mount.handle`'s `Set-Cookie` headers additively
+         via `finalHeaders.append('set-cookie', cookie)` (zero dropped cookies).
+       - Outermost `createServiceCorsMiddleware` then applies `Access-Control-*` and merges `Vary`
+         via `unionVary` without touching `cache-control` or `Set-Cookie`.
+   - The Hono route handler forwards `remoteAddr: c.env?.remoteAddr`, `credentialMode`,
+     `principal: c.get('principal')`, `params: c.req.param()`, and the service's pre-drain
+     `shutdownSignal` into `mount.handle(c.req.raw, context)`.
 
 #### Authoritative contract-policy registration (single rule, fail closed)
 
@@ -625,8 +734,7 @@ Two existing behaviors in `@netscript/service` make naive dual registration unsa
 
 - Under [auth-middleware.ts:192-201](../packages/service/src/auth/auth-middleware.ts#L192-L201),
   `requiresAuthentication` returns `resolution.policy?.authentication !== 'none'` whenever
-  `resolution?.matched` is `true`, **bypassing** `authn.protect` and `allowAnonymous`. Therefore,
-  moving a matched required-auth stream route outside `authn.protect` does **not** skip `withAuthn`.
+  `resolution?.matched` is `true`, **bypassing** `authn.protect` and `allowAnonymous`.
 - Under
   [contract-overlay-authorizer.ts:94-98](../packages/service/src/auth/contract/contract-overlay-authorizer.ts#L94-L98),
   any request that is **unmatched** by the overlay resolver falls through to
@@ -640,7 +748,7 @@ registration rule**:
 1. **Mounted `streamProxies` are the single runtime source of truth at `build()`**:
    - Extend `ContractPolicyBindingOptions`
      ([contract-policy.ts:82-91](../packages/service/src/auth/contract/contract-policy.ts#L82-L91))
-     with `readonly streamMounts?: readonly Pick<StreamProxyMount, 'endpoint' | 'admission'>[]`.
+     with `readonly streamMounts?: readonly Pick<StreamProxyMount, 'endpoint'>[]`.
    - In `ServiceBuilder.bindContractPolicy()`
      ([service-builder-impl.ts:553-562](../packages/service/src/builder/service-builder-impl.ts#L553-L562)),
      the builder ALWAYS passes all mounted `streamProxies` into `authorizer.bind(...)` — covering
@@ -651,8 +759,9 @@ registration rule**:
 2. **Strict cross-check when `options.streamEndpoints` is also explicitly declared**:
    - `ContractAuthorizerOptions` and `ContractOverlayAuthorizerOptions`
      ([options.ts:96-128](../packages/service/src/auth/options.ts#L96-L128)) MAY accept an optional
-     `readonly streamEndpoints?: readonly StreamEndpointContract<unknown, unknown>[]` for callers
-     that instantiate or unit-test an authorizer standalone or want compile-time pinning.
+     `readonly streamEndpoints?: readonly StreamEndpointContract<unknown, unknown>[]` specifically
+     for standalone authorizer unit tests (which construct an authorizer without calling
+     `ServiceBuilder.build()`) or compile-time pinning of the expected stream policy set.
    - Whenever `options.streamEndpoints` is explicitly provided AND `bind()` receives `streamMounts`,
      `bind()` MUST cross-check exact set equality by `id`, normalized `path`, `clientAuth`, and
      deep-equal normalized `access` policy (`authentication`, `scopes`, `roles`, `audience`).
@@ -665,50 +774,28 @@ registration rule**:
      ALWAYS `matched: true` and enforced through `authorizeProcedurePolicy` (scopes, roles,
      audience) — it can **never** fall through to the unmatched `{ allow: true }` default at
      [contract-overlay-authorizer.ts:97](../packages/service/src/auth/contract/contract-overlay-authorizer.ts#L97).
-   - Non-`GET` requests targeting a mounted stream path are NOT delegated; under
+   - Non-`GET` requests targeting a mounted stream path are NOT matched as stream endpoints; under
      `createContractAuthorizer` they return `404 procedure_not_found` after auth, and under
      `createContractOverlayAuthorizer` any stream endpoint with `audience: 'internal'` is also
      registered in `internalRoutes` so `HEAD`/extension methods fail closed identically to internal
      oRPC procedures ([contract-procedure-index.ts:109-111](../packages/service/src/auth/contract/contract-procedure-index.ts#L109-L111)).
-4. **Fail-closed posture & explicit admission delegation (`service-auth` vs `proxy-self-contained`)**:
-   - **`admission: 'service-auth'` (default)**:
-     - Service `withAuthn` authenticates the request and populates `principal`; service `withAuthz`
-       enforces `endpoint.access` (`authentication`, `scopes`, `roles`, `audience`); then
-       `mount.handle` receives `context.principal` and executes `authorize` for resource-level
-       ownership and revocable `grant` creation.
-     - Mounting an endpoint with `endpoint.access.authentication === 'required'` on a service with
-       `withAuthn` omitted (for example `auth: { public: true }`) throws at `build()` — preventing a
-       required-auth stream contract from accidentally running unauthenticated unless
-       `admission: 'proxy-self-contained'` is explicitly chosen.
-     - If a service mounts `withAuthn` with a **non-contract** custom `AuthorizerPort` (no `bind`)
-       or no `withAuthz`, the `ServiceBuilder` stream route wrapper itself verifies
-       `endpoint.access` against `c.get('principal')` before calling `mount.handle`, failing closed
-       with `401`/`403` when `principal` is missing or lacks declared `scopes`/`roles`/`audience`.
-     - For dual bearer + cookie services, the **recommended** configuration is `'service-auth'` with
-       a `withAuthn` authenticator that resolves both bearer and cookie credentials (such as
-       `createCompositeAuthenticator` from `@netscript/service/auth` or an `AuthBackendPort`
-       resolving bearer-over-cookie per
-       [ports/mod.ts:281-285](../packages/plugin-auth-core/src/ports/mod.ts#L281-L285)).
-   - **`admission: 'proxy-self-contained'` (explicit opt-in delegation)**:
-     - Intended for a bearer-only API service that mounts a cookie-accepting stream endpoint whose
-       proxy `authorize` verifies the cookie session directly.
-     - **Build-time guardrails**: `admission: 'proxy-self-contained'` is ONLY allowed when
-       `endpoint.access.authentication === 'required'` AND `endpoint.access.audience !== 'internal'`.
-       Combining `'proxy-self-contained'` with `audience: 'internal'` throws at `build()`.
-     - **Middleware contract**: `ProcedurePolicyResolution` gains an explicit
-       `readonly delegatedToStreamProxy?: true` marker set **only** for exact `GET` requests
-       matching a `'proxy-self-contained'` stream endpoint. `createAuthnMiddleware` and
-       `createAuthzMiddleware` defer authentication/authorization to `mount.handle` ONLY when
-       `resolution.matched && resolution.delegatedToStreamProxy === true` (and never for `POST`,
-       `HEAD`, or any non-`GET` method on that path, which still fail closed at `withAuthn`/`withAuthz`).
-     - **In-proxy enforcement (fail closed)**: Inside `bindStreamProxy`, when
-       `admission === 'proxy-self-contained'` and `endpoint.access.authorization` declares non-empty
-       `scopes` or `roles`, `authorize` MUST return `{ allow: true, grant, principal, ... }`
-       carrying the authenticated `Principal`. `bindStreamProxy` enforces
-       `endpoint.access.authorization.scopes` and `roles` against `decision.principal` using the
-       exact same predicate as `authorizeProcedurePolicy` and fails closed with HTTP `403` if
-       `decision.principal` is missing or lacks any required scope/role. Contract `access` metadata
-       therefore remains authoritative even under delegated admission.
+4. **Fail-closed posture (no unverified auth delegation in v1)**:
+   - Every mounted stream proxy with `endpoint.access.authentication === 'required'` requires
+     service `withAuthn` (mounting on a service without `withAuthn`, such as `auth: { public: true }`,
+     throws synchronously at `build()`).
+   - Service `withAuthn` authenticates strictly from the pre-selected `credentialMode` and populates
+     `principal`; service `withAuthz` enforces `endpoint.access` (`authentication`, `scopes`,
+     `roles`, `audience`); then `mount.handle` receives `context.credentialMode` and
+     `context.principal` and executes `authorize` for resource-level ownership and revocable `grant`
+     creation.
+   - If a service mounts `withAuthn` with a **non-contract** custom `AuthorizerPort` (no `bind`)
+     or no `withAuthz`, the `ServiceBuilder` stream route wrapper itself unconditionally verifies
+     `endpoint.access` against `c.get('principal')` before calling `mount.handle`, failing closed
+     with `401`/`403` when `principal` is missing or lacks declared `scopes`/`roles`/`audience`.
+     Even a custom structural `StreamProxyMount` cannot bypass `endpoint.access` enforcement!
+   - Standalone Fresh 2.x BFF routes that do not use `defineService` `withAuthn` use
+     `createNetScriptStreamProxy` directly (which runs the identical credential-selection and
+     Cookie Origin/Fetch-Metadata guards before invoking `authorize`).
 
 #### Dispatch-consistent path-pattern intersection checks
 
@@ -738,6 +825,11 @@ checking** matching real dispatch semantics (`rou3` / oRPC `toRou3Pattern` + Hon
    path overlaps ...`) if ANY of the following intersect:
    - Two mounted stream endpoints (`mountA.endpoint.path` vs `mountB.endpoint.path`), or duplicate
      `endpoint.id`.
+   - Any stream endpoint vs ANY **ordinary Hono route registered on `ServiceBuilder`** (including
+     deferred `ServiceBuilder.route(path, ...)` registrations tracked at
+     [service-builder-impl.ts:463-476,526-562,590-609](../packages/service/src/builder/service-builder-impl.ts#L463-L476)
+     — inspecting registered method/path pairs on the Hono app and rejecting any overlapping path
+     pattern, including wildcards like `/api/streams/*` that could shadow a stream endpoint).
    - Any stream endpoint vs ANY oRPC OpenAPI route (any HTTP method, prefixed by `apiPath` —
      catching concrete-inside-template such as `GET /api/streams/projects/summary` inside
      `/api/streams/projects/{projectId}`, template-inside-concrete, template-vs-template such as
@@ -792,16 +884,11 @@ export type StreamProxyAuthDecision<TGrant = unknown> =
   | {
       readonly allow: true;
       readonly grant: TGrant;
-      /**
-       * Authenticated principal for `admission: 'proxy-self-contained'` when the contract declares
-       * `access.authorization` scopes or roles.
-       */
-      readonly principal?: Principal;
       /** Optional finite absolute expiry instant in epoch milliseconds (`Number.isFinite`). */
       readonly expiresAtMs?: number;
       /**
        * Optional non-reserved headers to attach to the 200 admission response.
-       * Reserved framing, cache, CORS, auth, and `Set-Cookie` headers fail closed.
+       * Reserved framing, cache, CORS, auth, protocol replay metadata, and `Set-Cookie` headers fail closed.
        */
       readonly responseHeaders?: Readonly<Record<string, string>>;
       /** Optional app-owned Set-Cookie values for refresh-on-read session authenticators. */
@@ -1029,10 +1116,8 @@ export function createNetScriptStreamProxy<TGrant = unknown>(
 ): StreamProxyHandler;
 
 export function bindStreamProxy<TParams, TQuery, TGrant = unknown>(
-  endpoint: StreamEndpointContract<TParams, TQuery>,
-  options: Omit<StreamProxyOptions<TGrant, TParams, TQuery>, 'clientAuth'> & {
-    readonly admission?: StreamProxyAdmissionMode;
-  },
+  endpoint: StreamEndpointContract<TParams, TQuery, unknown, unknown>,
+  options: Omit<StreamProxyOptions<TGrant, TParams, TQuery>, 'clientAuth'>,
 ): StreamProxyMount;
 ```
 
@@ -1050,17 +1135,17 @@ export function bindStreamProxy<TParams, TQuery, TGrant = unknown>(
 - `allowedOrigins` MUST NOT contain `'*'` or `'null'`, and each entry MUST be an exact `http:` or
   `https:` origin (`URL.parse(entry)?.origin === entry`), matching
   [service-cors.ts:31-51](../packages/service/src/middleware/service-cors.ts#L31-L51).
-- In `bindStreamProxy`, `admission: 'proxy-self-contained'` paired with
-  `endpoint.access.audience === 'internal'` or `endpoint.access.authentication === 'none'` throws
-  `TypeError` at construction.
 
 ### Admission, setup cancellation, and subscription catch-up
 
 Every incoming request owns one `setupAbortController` linked immediately to `request.signal` and
-`context.shutdownSignal`. Every async step during setup receives `setupAbortController.signal`
-combined with a `ClockPort`-scheduled timeout (`policyTimeoutMs` for policy/path/subscribe/auth
-hooks; `upstreamConnectTimeoutMs` for upstream `fetch`), and attaches late-settlement disposal
-handlers so aborting during setup never leaks subscriptions, upstream connections, timers, or
+`context.shutdownSignal`, plus a single idempotent setup terminal transition
+`abortSetupOnce(reason, status)` that sets `setupClosed = true`, aborts `setupAbortController`,
+cancels all setup timers, removes abort listeners, invokes `unsubscribe()` if already registered,
+and guarantees late-resolving `subscribe` or `fetch` results are disposed cleanly. Every async step
+during setup receives `setupAbortController.signal` combined with a `ClockPort`-scheduled timeout
+(`policyTimeoutMs` for policy/path/subscribe/auth hooks; `upstreamConnectTimeoutMs` for upstream
+`fetch`), so aborting during setup never leaks subscriptions, upstream connections, timers, or
 unhandled rejections.
 
 Every request executes this exact sequence before returning `200 text/event-stream`:
@@ -1069,18 +1154,21 @@ Every request executes this exact sequence before returning `200 text/event-stre
    If `request.signal.aborted || shutdownSignal.aborted`, return immediately with zero work.
 2. **Deterministic credential selection & CSRF/Origin guard** (see
    [Credential selection, headers, and CSRF/Origin handling](#credential-selection-headers-and-csrforigin-handling)):
-   - Resolves `credentialMode: 'bearer' | 'cookie'` deterministically from `clientAuth` and request
-     headers, failing closed (`401`) on missing/malformed `Authorization` or disallowed mixed
-     credentials.
-   - Whenever `credentialMode === 'cookie'`, enforces Origin (with `trustProxy`-aware effective
-     origin resolution) and Fetch Metadata (`Sec-Fetch-Site`, `Sec-Fetch-Dest`) checks, failing
-     closed (`403`) before calling `authorize`.
-3. **Parameter and query validation**:
+   - When mounted via `defineService` / `ServiceBuilder.withStreamProxy`, this step ALREADY executed
+     in the pre-authn stream guard middleware BEFORE `withAuthn`, passing `context.credentialMode`
+     and the credential-bound `context.principal` into `mount.handle`.
+   - When invoked standalone (Fresh 2.x route handler), `createNetScriptStreamProxy` runs the exact
+     same deterministic credential selection (`401` on missing/malformed/empty/duplicate/mixed
+     `Authorization`) and Cookie Origin + Fetch Metadata guard (`403` on failure) before `authorize`.
+3. **Parameter, query, and shared offset validation**:
    - When bound via `bindStreamProxy(endpoint, ...)`, validate `params` and application `query`
      against `endpoint.params` and `endpoint.query`; validation failures return `400 Bad Request`
      with a structured, non-secret error payload.
-   - Validate optional `?offset=` and `?cursor=` query values: reject duplicate `?offset=` keys or
-     values containing CR/LF/NUL or exceeding 512 UTF-8 bytes with `400`.
+   - Validate optional `?offset=` and `?cursor=` query values using the shared `isValidStreamOffset`
+     validator: reject duplicate `?offset=` keys, empty strings, values containing ASCII control
+     characters (`[\x00-\x1F\x7F]`, including CR/LF/NUL), or values exceeding `512` UTF-8 bytes
+     with `400`. (The exact same validator governs upstream `event: control` `streamNextOffset` so a
+     control frame can never commit an offset this proxy rejects on resume.)
 4. **Application admission (`authorize`) and immediate deadline activation**:
    - Invoke `authorize({ request, params, query, credentialMode, principal, signal })` bounded by
      `ClockPort` `policyTimeoutMs`.
@@ -1090,23 +1178,20 @@ Every request executes this exact sequence before returning `200 text/event-stre
    - If `authorize` throws, rejects, times out, or returns a malformed decision, fail closed with
      redacted HTTP `503 Service Unavailable`.
    - **Validate `decision.responseHeaders` and `decision.setCookies`** against the reserved-header
-     table immediately (see [Response header ownership](#response-header-ownership)); any reserved or
-     malformed header fails closed with redacted `503` without proceeding.
-   - **Enforce `endpoint.access` in `'proxy-self-contained'` mode**: when bound with
-     `admission: 'proxy-self-contained'` and non-empty `endpoint.access.authorization` `scopes` or
-     `roles`, verify `decision.principal` is present and satisfies every required scope/role;
-     otherwise return `403` without proceeding.
+     table immediately (see [Response header ownership](#response-header-ownership)); any reserved
+     (including protocol replay metadata `stream-*` / `etag`) or malformed header fails closed with
+     redacted `503` without proceeding.
    - **Immediate finite expiry validation & timer arming**:
      - If `decision.expiresAtMs !== undefined`:
        - Require `typeof decision.expiresAtMs === 'number' && Number.isFinite(decision.expiresAtMs)`
          (otherwise fail closed with redacted `503`).
        - If `decision.expiresAtMs <= clock.nowMs()`, reject admission immediately with `401`
          (`reason: 'session_expired'`).
-       - Otherwise **arm the `ClockPort` expiry timer immediately** for
-         `Math.max(0, decision.expiresAtMs - clock.nowMs())`. From this instant onward — across
-         `resolvePath`, `subscribe`, `'post-subscribe'` `recheck`, `upstreamAuth`, and upstream
-         `fetch` — reaching `expiresAtMs` aborts `setupAbortController` and terminates setup
-         promptly!
+       - Otherwise set `currentExpiresAtMs = decision.expiresAtMs` and **arm the `ClockPort` expiry
+         timer immediately** for `Math.max(0, currentExpiresAtMs - clock.nowMs())`. From this
+         instant onward — across `resolvePath`, `subscribe`, `'post-subscribe'` `recheck`,
+         `upstreamAuth`, and upstream `fetch` — reaching `currentExpiresAtMs` invokes
+         `abortSetupOnce('expired', 401)` and terminates setup promptly.
 5. **Path resolution (`resolvePath`)**:
    - Invoke `resolvePath({ request, params, query, grant, signal })` bounded by `policyTimeoutMs`
      and `setupAbortController.signal`.
@@ -1118,23 +1203,31 @@ Every request executes this exact sequence before returning `200 text/event-stre
         and `setupAbortController.signal`.
         - If `setupAbortController` aborts while `subscribe` is pending, exit immediately AND attach
           `.then((lateUnsub) => { try { lateUnsub(); } catch {} }, () => {})` so a late-resolving
-          subscription is disposed immediately and never leaks!
-     2. If `onSignal` already fired with `action: 'revoked'` during registration, invoke
-        `unsubscribe()`, cancel timers, and return `401` without opening upstream.
+          subscription is disposed immediately and never leaks.
+     2. If `onSignal` already fired with `action: 'revoked'` during registration, `abortSetupOnce('revoked', 401)`
+        disposes `unsubscribe()`, cancels timers, and returns `401` without opening upstream.
      3. **Mandatory `'post-subscribe'` catch-up `recheck`**: Immediately after `subscribe` resolves
-        (and BEFORE `upstreamAuth` or upstream `fetch`), execute the fenced
-        `recheck({ grant, streamPath, reason: 'post-subscribe', signal })` loop:
-        - Record `startEpoch = invalidationEpoch` before calling `recheck`.
-        - If `recheck` denies (`{ allow: false }`), fails/times out, or returns invalid / expired
-          `expiresAtMs <= clock.nowMs()`, invoke `unsubscribe()`, cancel timers, and return `401`
-          (or `403`/`503`) with zero upstream connections opened.
-        - If `invalidationEpoch !== startEpoch` when `recheck` resolves (a `'recheck'` wake arrived
-          during catch-up), re-run the catch-up check (bounded by `maxRefenceAttempts`).
+        (and BEFORE `upstreamAuth` or upstream `fetch`), execute the bounded fenced catch-up loop
+        (`attempts <= maxRefenceAttempts = 8`):
+        - Record `startEpoch = invalidationEpoch` before calling
+          `recheck({ grant, streamPath, reason: 'post-subscribe', signal })`.
+        - Post-await checks (zero awaits before decision):
+          - If `setupClosed`: return the recorded terminal setup status (`401`/`503`).
+          - If `recheck` throws/times out: `abortSetupOnce('policy-error', 503)` → return `503`.
+          - If `!decision.allow`: `abortSetupOnce('revoked', 401)` → return `401`.
+          - If `invalidationEpoch !== startEpoch`: **do NOT apply `decision.expiresAtMs`**; bump
+            `attempts` and repeat catch-up. If `attempts > maxRefenceAttempts`, fail closed via
+            `abortSetupOnce('policy-error', 503)` with zero upstream connections opened.
+          - Validate `decision.expiresAtMs` (if provided, must be finite) and check post-await
+            `effectiveExpiresAtMs !== undefined && clock.nowMs() >= effectiveExpiresAtMs`; if
+            expired, fail closed via `abortSetupOnce('expired', 401)` with zero upstream connections.
+          - Otherwise commit `currentExpiresAtMs`, record `setupEpoch = startEpoch`, and proceed.
         - **Why this closes the gap**: any revocation committed *before* `subscribe` finished
           registering is observed by `'post-subscribe'` `recheck`'s shared-state read; any
           revocation committed *after* `subscribe` registered triggers `onSignal`. No revocation can
-          slip between admission and subscription!
-7. **Upstream auth & upstream connect (with late-result disposal)**:
+          slip between admission and subscription.
+7. **Upstream auth & upstream connect (with epoch fence and late-result disposal)**:
+   - Capture `setupEpoch = invalidationEpoch` if no `revocationSource` ran step 6.
    - Invoke `upstreamAuth({ signal })` bounded by `policyTimeoutMs` and
      `setupAbortController.signal`.
    - Build upstream URL: `buildStreamUrl(streamPath, resolvedBaseUrl)` with `?offset=<offset>&live=sse`
@@ -1144,22 +1237,33 @@ Every request executes this exact sequence before returning `200 text/event-stre
      never carries the upstream bearer secret to another origin), bounded by `ClockPort`
      `upstreamConnectTimeoutMs`.
    - If `setupAbortController` aborts while `fetch` is pending (client disconnect, `shutdownSignal`,
-     expiry, or push `'revoked'`): clean up timers + `unsubscribe()`, attach
+     expiry, or push `'revoked'`): `abortSetupOnce(...)` cleans up timers + `unsubscribe()`, attaches
      `fetchPromise.then((res) => res.body?.cancel('setup-aborted').catch(() => {}), () => {})` to
-     dispose any late upstream response body cleanly, and return immediately (`401` if revoked or
+     dispose any late upstream response body cleanly, and returns immediately (`401` if revoked or
      expired during setup; `503` on shutdown/timeout).
-   - Verify upstream status (also re-checking `!closed && !expired && invalidationEpoch` before
-     flushing `200`; if revoked/expired while `fetch` connected, cancel `upstream.body`,
-     unsubscribe, and return `401`!):
-     - `200` with `content-type` starting with `text/event-stream` and non-null `body`: construct
-       the 3-tier sanitized response headers and return `200` with the pull-driven SSE stream.
+   - **Pre-`200` epoch & expiry fence (catches wakes arriving while `upstreamAuth` or `fetch` was pending)**:
+     - If `setupClosed` or `(currentExpiresAtMs !== undefined && clock.nowMs() >= currentExpiresAtMs)`:
+       cancel `upstream.body`, execute `abortSetupOnce('expired' | 'revoked', 401)`, and return `401`
+       (never sending `200`).
+     - If `invalidationEpoch !== setupEpoch` (a `'recheck'` push wake arrived while `upstreamAuth`
+       or `fetch` was in flight): run the bounded fenced `recheck` loop (`attempts <= maxRefenceAttempts = 8`)
+       against shared policy **before** sending `200`. If denied, expired, error/timeout, or
+       re-fence cap exhausted, cancel `upstream.body`, execute `abortSetupOnce(...)`, and return
+       `401` (denial/expiry) or `503` (policy error / re-fence exhaustion) — zero `200` sent and
+       upstream body cleanly released.
+   - Verify upstream status:
+     - `200` with `content-type` starting with `text/event-stream` and non-null `body`: transition
+       from setup to streaming, construct the 3-tier sanitized response headers, and return `200`
+       with the pull-driven SSE stream.
      - Upstream `401` or `403`: **never** forward upstream auth failure as client `401`/`403`;
-       cancel body, unsubscribe, and return redacted `502 Bad Gateway`.
-     - Upstream `404`: cancel body, unsubscribe, and return `404 Not Found`.
-     - Upstream `410` (retention-trimmed offset) or `400` (invalid offset): cancel body,
-       unsubscribe, and return `410`/`400` with sanitized headers.
+       cancel body, call `abortSetupOnce('upstream-error', 502)`, and return redacted `502 Bad Gateway`.
+     - Upstream `404`: cancel body, clean up via `abortSetupOnce`, and return `404 Not Found`
+       (standard status for absent or whole-stream-expired Durable Streams).
+     - Upstream `410` (conditionally returned by a compatible upstream for a soft-deleted stream on
+       the pinned server or an external offset-trimming upstream) or `400` (invalid offset): cancel
+       body, clean up via `abortSetupOnce`, and pass through `410`/`400` with sanitized headers.
      - Upstream `3xx`, `5xx`, non-SSE `content-type`, null body, or network failure: cancel body,
-       unsubscribe, and return redacted `502`/`503`.
+       call `abortSetupOnce('upstream-error', 502)`, and return redacted `502`/`503`.
 
 ### Bounded SSE parser, delivery-unit framing, and fenced revocation during delivery
 
@@ -1202,17 +1306,21 @@ handling delimiters and multi-byte UTF-8 code points split across arbitrary chun
      missing `data:` fails closed with `closeOnce('upstream-error')`. The `data:` payload bytes are
      preserved verbatim and not restricted to State Protocol change schemas, allowing both
      `STREAM_SSE_CONTRACT_V1` feeds and chat/generic JSON Durable Streams to flow through cleanly.
-4. **Mandatory committing `control` validation BEFORE release**:
+4. **Mandatory committing `control` validation & replayable offset check BEFORE release**:
    - When an `event: control` block completes, the proxy concatenates its `data:` lines with `\n`,
      parses JSON, and validates the payload against `STREAM_SSE_CONTRACT_V1.schemas.control`
      ([sse-contract-v1.ts:195-200,236](../packages/plugin-streams-core/src/domain/sse-contract-v1.ts#L195-L200)):
-     - MUST be a JSON object with a non-empty string `streamNextOffset`.
+     - MUST be a JSON object with a non-empty string `streamNextOffset` that ALSO satisfies the
+       shared `isValidStreamOffset(streamNextOffset)` predicate (`1..512` UTF-8 bytes, zero ASCII
+       control characters `[\x00-\x1F\x7F]` including CR/LF/NUL — the exact same rule applied to
+       incoming `?offset=` query values so a control frame can never commit an offset the same proxy
+       would reject on resume).
      - Optional fields MUST match their types (`streamCursor?: string`, `upToDate?: boolean`,
        `streamClosed?: boolean`).
-   - If JSON parsing fails or `STREAM_SSE_CONTRACT_V1.schemas.control` rejects the payload (for
-     example, missing `streamNextOffset`, empty `streamNextOffset: ""`, or non-string offset), the
-     proxy MUST NOT release `pendingDataFrames` or the malformed `control` frame: it discards the
-     entire uncommitted unit (emitting zero bytes) and executes `closeOnce('upstream-error')`.
+   - If JSON parsing fails, `STREAM_SSE_CONTRACT_V1.schemas.control` rejects the payload, or
+     `isValidStreamOffset(streamNextOffset)` returns `false`, the proxy MUST NOT release
+     `pendingDataFrames` or the malformed `control` frame: it discards the entire uncommitted unit
+     (emitting zero bytes) and executes `closeOnce('upstream-error')`.
 5. **EOF handling**:
    - If upstream reaches EOF (`done: true`) with `pendingDataFrames.length === 0` AND
      `activeBlockBytes === 0` (no trailing partial line, partial frame, or uncommitted `data`):
@@ -1231,7 +1339,9 @@ at $t_3$. Without fencing, consuming that stale `allow` at $t_3$ would emit a po
 
 To eliminate stale delivery decisions, each admitted reader maintains:
 
-- `closed: boolean` (initially `false`)
+- `closed: boolean` (initially `false`; mutated **exclusively inside `closeOnce(reason)`** during
+  streaming, with `setupClosed` mutated **exclusively inside `abortSetupOnce(reason, status)`**
+  during setup)
 - `invalidationEpoch: number` (monotonically increasing integer, initially `0`)
 - `pendingWakeReason: 'revocation-signal' | 'expiry' | null`
 - `activeRecheck: Promise<void> | null` (enforcing **at most one** in-flight `recheck` at a time)
@@ -1239,8 +1349,11 @@ To eliminate stale delivery decisions, each admitted reader maintains:
 
 **Exact invalidation rules:**
 
-- On `notify({ action: 'revoked' })`: immediately set `closed = true`, abort the in-flight
-  `recheck` signal, discard any pending delivery unit, and execute `closeOnce('revoked')`.
+- On `notify({ action: 'revoked' })`: discard any pending delivery unit and invoke the single
+  terminal transition — `abortSetupOnce('revoked', 401)` if still in setup, or `closeOnce('revoked')`
+  if streaming (which sets `closed = true`, cancels timers, removes listeners, closes downstream EOF
+  synchronously, aborts in-flight `recheck`/upstream, calls `unsubscribe()` once, and cancels the
+  upstream reader). **Never** set `closed = true` before calling `closeOnce('revoked')`.
 - On `notify({ action: 'recheck' })` (or `notify()` with default action), expiry deadline tick, or
   idle-interval tick: **synchronously increment `invalidationEpoch += 1`** and update
   `pendingWakeReason` (`'expiry'` takes precedence over `'revocation-signal'`).
@@ -1249,13 +1362,14 @@ To eliminate stale delivery decisions, each admitted reader maintains:
     - For `'recheck'` push wake: leave the in-flight call bounded by `policyTimeoutMs`; the bumped
       `invalidationEpoch` **fences** its eventual `allow` result!
     - For `'expiry'` tick during a non-expiry `recheck`: also abort the in-flight non-expiry check's
-      per-check `AbortController` immediately (see
-      [Expiry contention with a pending serialized check](#expiry-contention-with-a-pending-serialized-check)).
+      per-check `AbortController` immediately and enforce one shared hard expiry budget
+      `expiresAtMs + policyTimeoutMs` (see
+      [Expiry contention with a pending serialized check](#expiry-contention-with-a-pending-serialized-check-single-policytimeoutms-hard-budget)).
 
-**Exact fenced delivery-unit commit loop (no `await` between fence check and enqueue):**
+**Exact fenced delivery-unit commit loop (no `await` between post-await fence/expiry checks and enqueue):**
 
 ```text
-upstream chunks ─▶ bounded incremental SSE parser ─▶ validate `event: control` (streamNextOffset)
+upstream chunks ─▶ bounded incremental SSE parser ─▶ validate `event: control` (schema + isValidStreamOffset)
                                                                │
                                                                ▼
                                           DeliveryUnit U = concatBytes([...pendingDataFrames, controlFrame])
@@ -1264,30 +1378,44 @@ upstream chunks ─▶ bounded incremental SSE parser ─▶ validate `event: co
                                        ┌───────────────────────────────────────────────────┐
                                        │  loop (attempts <= maxRefenceAttempts = 8):       │
                                        │   1. If closed -> discard U; return               │
-                                       │   2. If expired (nowMs >= expiresAtMs) ->         │
-                                       │        run expiry check / closeOnce('expired')    │
+                                       │   2. If currentExpiresAtMs !== undefined &&       │
+                                       │        clock.nowMs() >= currentExpiresAtMs ->     │
+                                       │        reason = 'expiry'                          │
                                        │   3. startEpoch = invalidationEpoch               │
                                        │   4. decision = await runSerializedRecheck(       │
-                                       │        reason, bounded by ClockPort policyTimeout)│
+                                       │        reason, bounded by remaining ClockPort     │
+                                       │        budget)                                    │
                                        │   ── SYNCHRONOUS CRITICAL SECTION (zero awaits) ──│
                                        │   5. If closed -> discard U; return               │
                                        │   6. If error/timeout -> closeOnce('policy-error')│
                                        │   7. If !decision.allow -> closeOnce(revoked|exp) │
-                                       │   8. Validate & apply decision.expiresAtMs        │
-                                       │      (non-finite -> policy-error; <= now -> exp)  │
-                                       │   9. If invalidationEpoch !== startEpoch ->       │
-                                       │        // STALE ALLOW FENCED! Do NOT enqueue U.   │
+                                       │   8. If invalidationEpoch !== startEpoch ->       │
+                                       │        // STALE ALLOW FENCED BEFORE ANY MUTATION! │
+                                       │        // Do NOT apply expiresAtMs or enqueue U.  │
                                        │        reason = pendingWakeReason ?? 'revocation- │
                                        │                 signal'; continue loop            │
+                                       │   9. Post-await expiry validation & check:        │
+                                       │        - Validate decision.expiresAtMs (finite;   │
+                                       │          required > nowMs when reason==='expiry') │
+                                       │        - eff = decision.expiresAtMs ??            │
+                                       │                currentExpiresAtMs                 │
+                                       │        - If eff !== undefined &&                  │
+                                       │            clock.nowMs() >= eff ->                │
+                                       │            if reason === 'expiry':                │
+                                       │              closeOnce('expired'); return         │
+                                       │            reason = 'expiry'; continue loop       │
+                                       │        - Commit currentExpiresAtMs = eff & re-arm │
                                        │  10. controller.enqueue(U)   // atomic, 1 chunk   │
                                        │      deliveredUnits += 1; break loop              │
                                        └───────────────────────────────────────────────────┘
 ```
 
-1. **Atomic synchronous commit**: Steps 5–10 execute inside a single JavaScript microtask turn with
-   **zero `await` boundaries**. No `notify` callback, `ClockPort` timer, or `AbortSignal` listener
-   can interleave between checking `!closed && invalidationEpoch === startEpoch` and calling
-   `controller.enqueue(U)`.
+1. **Atomic synchronous commit & epoch-before-mutation**: Steps 5–10 execute inside a single
+   JavaScript microtask turn with **zero `await` boundaries**. Step 8 checks
+   `invalidationEpoch === startEpoch` **before** validating or mutating `currentExpiresAtMs`, so a
+   stale `allow` can never extend an expired/revoked grant's deadline. Step 9 checks
+   `clock.nowMs() >= eff` **after** `await` so a promise resuming after the deadline has already
+   passed never enqueues `U` even before a timer callback fires.
 2. **Pull-driven `highWaterMark: 0` (zero speculative pre-buffering)**: The downstream
    `ReadableStream<Uint8Array>` uses `{ highWaterMark: 0 }` and concatenates each authorized
    delivery unit into one single `Uint8Array` enqueued strictly in response to `pull(controller)`.
@@ -1354,26 +1482,34 @@ Long-lived SSE streams frequently sit idle between events. Two naive strategies 
        `expiresAtMs <= clock.nowMs()`, immediately execute `closeOnce('expired')` with zero bytes
        emitted; otherwise update `currentExpiresAtMs` and re-arm the expiry timer.
 
-#### Expiry contention with a pending serialized check
+#### Expiry contention with a pending serialized check (single `policyTimeoutMs` hard budget)
 
-If the `ClockPort` expiry timer fires while a non-expiry `recheck` (for example a paused
-`'before-delivery'` or `'idle-interval'` call) is already in flight:
+If the `ClockPort` expiry timer fires at `expiresAtMs` while a non-expiry `recheck` (for example a
+paused `'before-delivery'` or `'idle-interval'` call) is already in flight, the proxy enforces ONE
+shared hard deadline `expiryHardDeadlineMs = expiresAtMs + policyTimeoutMs` covering **both** the
+aborted in-flight check and any subsequent `'expiry'` re-check:
 
-1. Synchronously increment `invalidationEpoch += 1` and record `pendingWakeReason = 'expiry'`.
+1. Synchronously increment `invalidationEpoch += 1`, record `pendingWakeReason = 'expiry'`, and arm
+   a `ClockPort` hard-deadline timer at `expiryHardDeadlineMs = expiresAtMs + policyTimeoutMs`.
 2. **Immediately abort the in-flight non-expiry check's per-check `AbortController`** so cooperative
    policy hooks stop waiting immediately. Do **not** launch a second concurrent `recheck`.
-3. **Cooperative settlement path**: Once the aborted check settles (within its `ClockPort`-bounded
-   `policyTimeoutMs`), its result is **fenced** (any `{ allow: true }` is discarded; zero bytes of
-   any pending delivery unit are enqueued). The reader then runs ONE serialized
-   `recheck(..., 'expiry')` (bounded by `ClockPort` `policyTimeoutMs`):
-   - Only a valid sliding extension (finite `expiresAtMs > clock.nowMs()`) keeps the reader open and
-     allows the delivery loop to re-check and continue.
-   - Denial, error, timeout, or missing/non-future `expiresAtMs` executes `closeOnce('expired')`
-     immediately.
+3. **Cooperative settlement path (within the single remaining budget)**: Once the aborted check
+   settles, its result is **fenced** (any `{ allow: true }` and any `expiresAtMs` are discarded;
+   zero bytes of any pending delivery unit are enqueued). Compute
+   `remaining = Math.max(0, expiryHardDeadlineMs - clock.nowMs())`:
+   - If `remaining === 0`, immediately execute `closeOnce('expired')` without starting another call.
+   - If `remaining > 0`, run ONE serialized `recheck(..., 'expiry')` bounded strictly by `remaining`
+     (NOT a second full `policyTimeoutMs`!). Only a valid sliding extension (finite
+     `expiresAtMs > clock.nowMs()`, checked after `await` and with unchanged `invalidationEpoch`)
+     keeps the reader open; denial, error, timeout at `expiryHardDeadlineMs`, or missing/non-future
+     `expiresAtMs` executes `closeOnce('expired')` immediately.
 4. **Non-cooperative / hung hook path**: If the paused check ignores `signal` and does not settle
-   before its `ClockPort` `policyTimeoutMs` timer expires, the proxy **abandons** the hung promise
+   before `expiryHardDeadlineMs`, the hard-deadline timer fires, **abandons** the hung promise
    (attaching `.catch(() => {})` and ignoring any late settlement), emits zero bytes, and executes
    `closeOnce('expired')` immediately.
+
+Consequently, across **both** cooperative and non-cooperative paths, an expired reader is
+unconditionally guaranteed to close no later than **`expiresAtMs + policyTimeoutMs`**.
 
 #### Idle-interval bound (including policy check budget)
 
@@ -1443,16 +1579,25 @@ application-provided shared revocation source (e.g. Deno KV, Postgres, Redis, or
    - Upstream requests always carry `live=sse` enforced by the proxy (`offset` defaults to
      `options.defaultOffset ?? '-1'`). Clients cannot downgrade an SSE proxy endpoint to
      `live=false` or `live=long-poll`.
-3. **Retention condition for gap-free resume**:
+3. **Retention condition, `404` whole-stream expiry, and conditional `410` passthrough**:
    - Because a withheld delivery unit emits neither `event: data` nor `event: control`, a reader
      revoked before batch $N$ retains `lastCommittedOffset` from batch $N-1$.
    - Gap-free resume from `lastCommittedOffset` (for example after re-authentication with a fresh
-     session, or after a transient disconnect) holds **if and only if `lastCommittedOffset` remains
-     within the upstream Durable Streams server's retention window**.
-   - If the stream compacted or trimmed past `lastCommittedOffset`, upstream responds with HTTP
-     `410 Gone` (or `400` for an invalid offset). After admission succeeds, the proxy propagates
-     `410`/`400` cleanly so the client knows incremental resume is no longer possible and must reset
-     to a fresh snapshot or `offset: '-1'`.
+     session, or after a transient disconnect) holds **if and only if the stream still exists and
+     `lastCommittedOffset` remains retained by the upstream Durable Streams server**.
+   - **Shipped NetScript retention behavior** (source-inspected in
+     [`docs/site/reference/plugin-streams-core/index.md:139-146`](../docs/site/reference/plugin-streams-core/index.md#L139-L146)
+     and [`docs/site/durable-workflows/how-to/bound-stream-retention.md:160-165`](../docs/site/durable-workflows/how-to/bound-stream-retention.md#L160-L165)):
+     shipped NetScript retention expires **whole streams** rather than trimming individual offsets;
+     pinned `@durable-streams/server@0.3.9` returns HTTP `404` for an absent or expired stream and
+     HTTP `410` for a soft-deleted stream.
+   - **Proxy passthrough & recovery contract**: After admission succeeds, the proxy passes through
+     HTTP `404` for absent/expired whole streams, passes through HTTP `410 Gone` **conditionally
+     whenever a compatible upstream actually returns `410`** (soft-deleted stream on the pinned
+     server or an external offset-trimming upstream), and passes through `400` for an invalid
+     offset. On `404` or `410`, incremental offset resume is no longer available and the client
+     must recover via a fresh authoritative snapshot / resync (or recreate / re-subscribe from
+     `offset: '-1'` once the stream exists again).
 
 #### One offset authority in `@netscript/fresh/streams` (`proxyUrl` mode)
 
@@ -1473,84 +1618,116 @@ strict **single-offset-authority** validation:
      prepended) and `live=sse` is NOT forced onto the public proxy URL.
    - Providing both `proxyUrl` and `streamPath` (or `baseUrl`) throws `TypeError` synchronously.
 
-#### Native `EventSource` reconnect behavior and uncommitted `data` frames
+#### Native `EventSource` terminal-error propagation, reconnect behavior, and uncommitted `data` frames
 
 Because upstream Durable Streams SSE emits no SSE `id:` field (measured at `87965d80`) and v1
 preserves upstream framing in offset-only mode:
 
-1. **Native `EventSource` auto-reconnect caveat**: On a transport drop, native `EventSource`
-   automatically retries the **exact URL passed to `new EventSource(url)`** — which still holds the
-   *initial* `?offset=` rather than the latest `binding.snapshot().lastCommittedOffset`.
-2. **Required dispose-and-rebuild reconnect pattern**: On `event.event === 'error'` with
-   `payload.code === 'transport-error'`, the reconnect controller MUST:
-   - Read `const { lastCommittedOffset, lastObservedCursor } = binding.snapshot()`.
-   - Call `binding.dispose()` immediately (removing listeners and closing the old `EventSource` so
-     native auto-retry of the stale URL is cancelled).
-   - Construct a fresh `createNetScriptStreamEventSourceV1({ proxyUrl: baseProxyUrl, offset: lastCommittedOffset ?? initialOffset, lastObservedCursor, ... })`
-     after bounded backoff.
-   - On fresh admission `401`/`403`, the WHATWG `EventSource` spec permanently transitions the
-     connection to `CLOSED` without retry; the reconnect controller checks/handles auth failure
-     without spinning.
-3. **Fate of `data` received without its committing `control` frame**:
-   - On the **proxy** side, revocation, expiry, malformed `control`, or upstream EOF before `control`
-     emits **zero** `event: data` bytes downstream.
+1. **Terminal vs retryable `readyState` propagation in `bindStreamEventSourceV1`**:
+   - Per the WHATWG HTML Standard for `EventSource`, a terminal non-`200` HTTP response (such as
+     fresh-admission `401`, `403`, `404`, or `410`, or an invalid MIME type) transitions
+     `eventSource.readyState` immediately to `EventSource.CLOSED` (`2`) before firing `error`,
+     whereas a retryable transport disconnect leaves `readyState === EventSource.CONNECTING` (`0`).
+   - `StreamEventSourceV1` ([stream-sse-v1.ts:158-165](../packages/plugin-streams-core/src/application/stream-sse-v1.ts#L158-L165))
+     gains an optional `readonly readyState?: number` property (satisfied natively by browser
+     `EventSource` and backward-compatible with existing test mocks that omit it).
+   - `bindStreamEventSourceV1`'s `onError` handler ([stream-sse-v1.ts:209-219](../packages/plugin-streams-core/src/application/stream-sse-v1.ts#L209-L219))
+     sets `retryable: options.source.readyState !== 2` (emitting `retryable: false` when
+     `readyState === EventSource.CLOSED` (`2`), and keeping `retryable: true` when `readyState` is
+     `0`, `1`, or `undefined`).
+2. **Native `EventSource` auto-reconnect caveat & required dispose-and-rebuild pattern**:
+   - On a transient transport drop (`readyState === 0`), native `EventSource` would automatically
+     retry the **initial** URL passed to `new EventSource(url)`, carrying the stale initial
+     `?offset=`.
+   - On `event.event === 'error'`, the reconnect controller MUST immediately discard buffered
+     uncommitted `data` frames, read `lastCommittedOffset` / `lastObservedCursor` from
+     `binding.snapshot()`, and call `binding.dispose()`.
+   - If **`!event.payload.retryable`** (terminal `readyState === 2` on `401`/`403`/`404`/`410`, or
+     malformed/unsupported frame): **stop permanently** and notify the app (zero retry spin).
+   - If **`event.payload.retryable`** (transient drop or clean EOF after mid-stream revocation):
+     schedule bounded backoff rebuild from `lastCommittedOffset` with a maximum consecutive failure
+     cap. If the session was revoked mid-stream, that single fresh-admission attempt receives
+     `401`/`403`, transitions `readyState === 2` (`retryable: false`), and terminates cleanly.
+   - Browser consumers that need the exact numeric HTTP status (`401` vs `403` vs `410`) rather than
+     `EventSource.CLOSED` can use credentialed `fetch` via `createFetchStreamEventSourceV1`.
+3. **Commit strictly on `control` (fate of `data` received without its committing `control` frame)**:
+   - On the **proxy** side, revocation, expiry, malformed/unresumable `control`, or upstream EOF
+     before `control` emits **zero** `event: data` bytes downstream.
    - On the **client/transport** side, a TCP disconnect mid-transmission can still interrupt an
      already-authorized delivery unit after the client parses `event: data` and before it receives
      the trailing `event: control`.
    - Per `reduceStreamSseReplayStateV1`
      ([stream-sse-v1.ts:118-142](../packages/plugin-streams-core/src/application/stream-sse-v1.ts#L118-L142)),
-     the uncommitted batch sits in `binding.snapshot().pendingBatches` while `lastCommittedOffset`
-     remains at `offset_{N-1}`.
-   - When the client disposes the interrupted binding and rebuilds at `offset_{N-1}`, the old
-     `pendingBatches` are discarded and the proxy replays batch `N` followed by its committing
-     `event: control` (`offset_N`). Consumer handlers therefore treat `event: data` as uncommitted
-     until `event: control` arrives (or apply mutations idempotently by `(type, key)` /
-     `correlationId`).
+     uncommitted batches stay in `binding.snapshot().pendingBatches` while `lastCommittedOffset`
+     remains at `offset_{N-1}`. Application consumers MUST buffer `event: data` payloads and commit
+     application side effects **strictly when `event: control` arrives** (never inside the `data`
+     handler!), discarding buffered uncommitted frames on `error`/`dispose` so rebuilding from
+     `offset_{N-1}` never applies interrupted data twice.
 
 ### Credential selection, headers, and CSRF/Origin handling
 
-#### Deterministic credential selection (malformed `Authorization` and mixed credentials)
+#### Deterministic credential selection (RFC 6750 grammar, empty/duplicate `Authorization`, and mixed credentials)
 
-Before calling `authorize`, the proxy parses `Authorization` and `Cookie` headers and selects
-`credentialMode` strictly according to `clientAuth`. A **well-formed Bearer header** matches
-`/^Bearer[ \t]+([\x21-\x7E]+)$/i` (case-insensitive `Bearer` scheme, ASCII space/tab separator,
-single non-empty printable ASCII token with no whitespace or control characters). Any other
-non-empty `Authorization` header (e.g. `Basic ...`, `Bearer` with no token, `Bearer a b`, or
-control chars) is **malformed/unsupported**.
+**Before `withAuthn` or `authorize` runs** (in `ServiceBuilder`'s pre-authn stream guard for mounted
+services, and at the entry of `createNetScriptStreamProxy` for standalone Fresh handlers), the guard
+parses `Authorization` and `Cookie` headers and selects `credentialMode` strictly according to
+`clientAuth`:
 
-| `clientAuth` | Incoming `Authorization` | Incoming `Cookie` | Proxy action before `authorize` |
+- **RFC 6750 §2.1 Bearer token syntax**: A **well-formed Bearer header** matches
+  `/^Bearer[ \t]+([A-Za-z0-9._~+/-]+=*)$/i` (`b64token = 1*( ALPHA / DIGIT / "-" / "." / "_" / "~" / "+" / "/" ) *"="`,
+  per [RFC 6750 §2.1](https://www.rfc-editor.org/rfc/rfc6750.html#section-2.1)).
+- **Absent vs malformed `Authorization`**:
+  - Absent means `!request.headers.has('authorization')` (no `Authorization` header present).
+  - An **empty or whitespace-only** `Authorization` header (`""`, `"   "`), **duplicate**
+    `Authorization` headers (which Fetch `Headers.get('authorization')` joins with `", "`, failing
+    the single-token RFC 6750 grammar), non-Bearer schemes (`Basic ...`), missing tokens
+    (`Bearer`), extra whitespace/segments (`Bearer a b`), or characters outside `b64token` are ALL
+    **malformed** and fail closed `401` (`invalid_authorization_header`) with zero fallback to
+    `Cookie` and zero calls to `withAuthn` or `authorize`.
+
+| `clientAuth` | Incoming `Authorization` | Incoming `Cookie` | Action BEFORE `withAuthn` / `authorize` |
 | --- | --- | --- | --- |
-| `'bearer'` | Absent | Any | Reject `401` (`bearer_required`). Zero `authorize` / upstream calls. |
-| `'bearer'` | Malformed / non-Bearer | Any | Reject `401` (`invalid_authorization_header`). Zero `authorize` / upstream calls. |
-| `'bearer'` | Well-formed Bearer | Any (ignored) | Select `credentialMode: 'bearer'`. Skip cookie CSRF guard. `authorize` MUST verify Bearer only. |
-| `'cookie'` | Present (any value) | Any | Reject `401` (`bearer_not_allowed`). Fail closed on mixed/disallowed credentials. |
-| `'cookie'` | Absent | Present or absent | Run Cookie Origin & Fetch Metadata guard (`403` on failure). Select `credentialMode: 'cookie'`. |
-| `'bearer-or-cookie'` | Malformed / non-Bearer | Any | Reject `401` (`invalid_authorization_header`). **Never** fall back to `Cookie`. |
-| `'bearer-or-cookie'` | Well-formed Bearer | Any (ignored for auth) | Select `credentialMode: 'bearer'` (strict bearer-over-cookie precedence per [ports/mod.ts:281-285](../packages/plugin-auth-core/src/ports/mod.ts#L281-L285)). Skip cookie CSRF guard. If Bearer is invalid/revoked, `authorize` MUST fail `401` and **never** fall back to `Cookie`. |
-| `'bearer-or-cookie'` | Absent | Present or absent | Run Cookie Origin & Fetch Metadata guard (`403` on failure). Select `credentialMode: 'cookie'`. |
+| `'bearer'` | Absent | Any | Reject `401` (`bearer_required`). Zero `withAuthn` / `authorize` / upstream calls. |
+| `'bearer'` | Malformed / empty / duplicate / non-Bearer | Any | Reject `401` (`invalid_authorization_header`). Zero `withAuthn` / `authorize` / upstream calls. |
+| `'bearer'` | Well-formed RFC 6750 Bearer | Any (ignored & stripped from `AuthnRequest`) | Select `credentialMode: 'bearer'`. Skip cookie CSRF guard. `withAuthn` and `authorize` verify Bearer ONLY (no cookie fallback). |
+| `'cookie'` | Present (any value, including empty) | Any | Reject `401` (`bearer_not_allowed`). Fail closed on mixed/disallowed credentials before `withAuthn`. |
+| `'cookie'` | Absent | Present or absent | Run Cookie Origin & Fetch Metadata guard (`403` on failure BEFORE `withAuthn`/session refresh). Select `credentialMode: 'cookie'`. |
+| `'bearer-or-cookie'` | Malformed / empty / duplicate / non-Bearer | Any | Reject `401` (`invalid_authorization_header`). **Never** fall back to `Cookie`. |
+| `'bearer-or-cookie'` | Well-formed RFC 6750 Bearer | Any (ignored & stripped from `AuthnRequest`) | Select `credentialMode: 'bearer'` (strict bearer-over-cookie precedence per [ports/mod.ts:281-285](../packages/plugin-auth-core/src/ports/mod.ts#L281-L285)). Skip cookie CSRF guard. If Bearer is invalid/revoked, `withAuthn`/`authorize` MUST fail `401` and **never** fall back to `Cookie` (even under `createCompositeAuthenticator`). |
+| `'bearer-or-cookie'` | Absent | Present or absent | Run Cookie Origin & Fetch Metadata guard (`403` on failure BEFORE `withAuthn`/session refresh). Select `credentialMode: 'cookie'`. |
 
 Tokens in query strings (`?token=...`) are never read by the proxy and are explicitly discouraged.
 
 #### Cookie Origin and Fetch Metadata guard (including trusted proxy-origin resolution)
 
-Whenever `credentialMode === 'cookie'`, the proxy MUST run BOTH Fetch Metadata and Origin checks
-before calling `authorize`:
+Whenever `credentialMode === 'cookie'`, the guard MUST run BOTH Fetch Metadata and Origin checks
+**before** calling `withAuthn` (so session refresh never executes on cross-site requests) or
+`authorize`:
 
 1. **Effective target origin resolution (`trustProxy`)**:
    - **Default (`trustProxy: false`)**: `effectiveOrigin = new URL(request.url).origin`. Forwarded
      headers (`X-Forwarded-Proto`, `X-Forwarded-Host`, `Forwarded`) are **strictly ignored** so
      untrusted callers cannot spoof same-origin status.
-   - **Trusted reverse proxy (`trustProxy: ServiceProxyTrust`)**: Following
-     [client-address.ts:27-48](../packages/service/src/rate-limit/middleware/client-address.ts#L27-L48),
-     missing socket metadata (`context.remoteAddr`) **never** permits forwarded-header trust. Only
-     when `remoteAddr` has `'hostname' in remoteAddr` AND `trustProxy(remoteAddr.hostname)` returns
-     `true` may the proxy consult forwarded origin headers:
-     - `X-Forwarded-Proto`: if present, MUST be a single token `'http'` or `'https'` (case-insensitive);
-       multiple or invalid values fail closed `403` (`invalid_forwarded_origin`).
-     - `X-Forwarded-Host`: if present, MUST be a single valid `host[:port]` authority (no commas,
-       whitespace, userinfo `@`, path `/`, `?`, `#`, or control chars); invalid values fail closed
-       `403` (`invalid_forwarded_origin`).
-     - Construct canonical `effectiveOrigin = new URL(`${proto}://${host}`).origin`.
+   - **Trusted reverse proxy (`trustProxy: ServiceProxyTrust`)**:
+     - **Edge precondition**: When `trustProxy` is configured, the trusted edge proxy MUST strip or
+       overwrite any client-supplied `X-Forwarded-Proto` and `X-Forwarded-Host` headers before
+       forwarding requests to NetScript.
+     - Following
+       [client-address.ts:27-48](../packages/service/src/rate-limit/middleware/client-address.ts#L27-L48),
+       missing socket metadata (`context.remoteAddr`) **never** permits forwarded-header trust. Only
+       when `remoteAddr` has `'hostname' in remoteAddr` AND `trustProxy(remoteAddr.hostname)` returns
+       `true` may the guard consult forwarded origin headers:
+       - `X-Forwarded-Proto`: if present, MUST be a single token `'http'` or `'https'`
+         (case-insensitive); multiple comma-separated or invalid values fail closed `403`
+         (`invalid_forwarded_origin`).
+       - `X-Forwarded-Host`: if present, MUST be a single valid `host[:port]` authority (no commas,
+         whitespace, userinfo `@`, path `/`, `?`, `#`, or control chars); multiple or invalid values
+         fail closed `403` (`invalid_forwarded_origin`).
+       - **Partial-pair rule**: If both headers are absent, use `new URL(request.url).origin`. If
+         only `X-Forwarded-Proto` is present, combine validated `proto` with
+         `new URL(request.url).host`. If only `X-Forwarded-Host` is present, combine
+         `new URL(request.url).protocol.slice(0, -1)` with validated `host`. Construct canonical
+         `effectiveOrigin = new URL(`${proto}://${host}`).origin`.
 2. **`Origin` header check**:
    - If `Origin` is present:
      - `Origin === 'null'` (opaque/sandboxed origin) is **always denied `403`**.
@@ -1605,9 +1782,10 @@ starting from a clean `new Headers()` (never blindly copying upstream headers):
      `www-authenticate`, `set-cookie`, `authorization`, `server`, `via`, and unlisted `x-*` headers
      — is **dropped by default** (so `DurableStreamTestServer`'s wildcard
      `access-control-allow-origin: *` measured at `87965d80` can never leak).
-2. **Tier 2 — Application admission overlay (`decision.responseHeaders` and `decision.setCookies`)**:
-   - The following **reserved response headers** are exclusively owned by the proxy or gateway
-     middleware and MUST NOT appear in `decision.responseHeaders` (case-insensitive):
+2. **Tier 2 — Application admission overlay (`decision.responseHeaders`, `decision.setCookies`, and mounted `AuthnResult`)**:
+   - The following **reserved response headers** are exclusively owned by the proxy, upstream
+     protocol metadata tier, or gateway CORS middleware and MUST NOT appear in
+     `decision.responseHeaders` OR mounted `AuthnResult.responseHeaders` (case-insensitive):
      - Framing / encoding / hop-by-hop: `content-type`, `content-encoding`, `content-length`,
        `transfer-encoding`, `connection`, `keep-alive`, `proxy-authenticate`,
        `proxy-authorization`, `te`, `trailer`, `upgrade`.
@@ -1615,24 +1793,27 @@ starting from a clean `new Headers()` (never blindly copying upstream headers):
        `x-content-type-options`, `x-accel-buffering`, `vary`.
      - CORS / cross-origin / auth / cookie ownership: any `access-control-*` header, any
        `cross-origin-*` header, `authorization`, `www-authenticate`, `set-cookie`.
-   - If `decision.responseHeaders` contains any reserved header name/prefix, invalid HTTP header
-     token, or CR/LF/NUL characters, admission **fails closed** with redacted `503` (zero upstream
-     requests opened).
+     - Protocol replay metadata (Tier 1 owned): `stream-next-offset`, `stream-cursor`,
+       `stream-up-to-date`, `stream-closed`, `etag`.
+   - If `decision.responseHeaders` or mounted `AuthnResult.responseHeaders` contains any reserved
+     header name/prefix, invalid HTTP header token, or CR/LF/NUL characters, admission **fails
+     closed** with redacted `503` (cancelling any opened upstream body / never emitting `200`).
    - App-owned cookie refresh/rotation headers (e.g. rolling session cookies) are supplied
-     exclusively via `decision.setCookies`, validated against CR/LF/NUL, and appended with
-     `headers.append('set-cookie', cookie)`. (On `defineService`, `Set-Cookie` headers emitted by
-     `withAuthn` via `applyAuthnResponse` at
-     [auth-middleware.ts:268-279](../packages/service/src/auth/auth-middleware.ts#L268-L279) are
-     likewise preserved by Hono.)
-3. **Tier 3 — Proxy-owned mandatory headers (written LAST, non-overridable)**:
+     exclusively via `decision.setCookies` (and `AuthnResult.setCookies` on `defineService`),
+     validated against CR/LF/NUL, and composed **additively** on the final mounted `Response` via
+     `headers.append('set-cookie', cookie)` (eliminating Hono's `c.header(...)` overwrite collision
+     with `applyAuthnResponse` at
+     [auth-middleware.ts:268-279](../packages/service/src/auth/auth-middleware.ts#L268-L279)).
+3. **Tier 3 — Proxy-owned mandatory headers (written LAST on the final response before CORS, non-overridable)**:
    - `content-type: text/event-stream; charset=utf-8`
    - `cache-control: no-store, no-cache, no-transform`
    - `x-content-type-options: nosniff`
    - `x-accel-buffering: no`
-   - `vary: Authorization, Cookie, Origin, Sec-Fetch-Site, Sec-Fetch-Dest` (preserved and merged
-     with gateway CORS `Vary` tokens by `createServiceCorsMiddleware`'s `unionVary` at
+   - `vary: Authorization, Cookie, Origin, Sec-Fetch-Site, Sec-Fetch-Dest` (merged outermost with
+     gateway CORS `Vary` tokens by `createServiceCorsMiddleware`'s `unionVary` at
      [service-cors.ts:84-91](../packages/service/src/middleware/service-cors.ts#L84-L91), which also
-     solely owns any `Access-Control-*` response headers).
+     solely owns any `Access-Control-*` response headers without disturbing `cache-control` or
+     composed `Set-Cookie` headers).
 4. **Redaction**: Never log or echo bearer tokens, cookie values, `upstreamAuth()` values, query
    parameters, `TGrant`, or raw thrown error messages from `authorize`/`recheck`. Emit only
    `streamPath`, endpoint `id`, HTTP status, stable non-secret `reason` / `StreamProxyCloseReason`,
@@ -1779,18 +1960,39 @@ bypasses on proxy unit/conformance suites).
      state (holding an already-computed `{ allow: true }` snapshot) and **before** returning to the
      proxy. While paused at Barrier 2, initiate revocation of `session-B` on **Gateway 2**, writing
      revoked state to the shared source and emitting `notify({ action: 'recheck' })` (specifically
-     `'recheck'`, NOT `'revoked'`) to `Gateway 1`. Release Barrier 2.
+     `'recheck'`, NOT `'revoked'`) to `Gateway 1`. **Await Gateway 1's actual observation of the
+     `'recheck'` wake** (synchronizing on the proxy's wake/epoch observer or `revocationSource`
+     delivery promise) **before** releasing Barrier 2.
      - Assert `Gateway 1` fences `session-B`'s stale `allow` snapshot (because `invalidationEpoch`
-       advanced), executes a fresh serialized `recheck` against shared state, receives `{ allow: false }`,
-       emits **neither** batch 2 **nor** `control` (`offset_2`), closes `session-B` cleanly, cancels
-       and releases its upstream reader, and rejects fresh admission on both gateways.
+       advanced), does NOT mutate `expiresAtMs` from the stale allow, executes a fresh serialized
+       `recheck` against shared state, receives `{ allow: false }`, emits **neither** batch 2
+       **nor** `control` (`offset_2`), closes `session-B` cleanly, cancels and releases its upstream
+       reader, and rejects fresh admission on both gateways.
      - Assert `session-A` receives batch 2 and its cursor-advancing `control` (`offset_2`).
+   - **Confirmed push `notify({ action: 'revoked' })` terminal-transition gate (both streaming AND setup)**:
+     - **Streaming reader**: Admit `session-C`, receive batch 1 + `offset_1`, leave reader idle (or
+       paused in `before-delivery` with pending batch 2), then emit `notify({ action: 'revoked' })`.
+       Assert `closeOnce('revoked')` executes its full cleanup (never skipped by an early `closed`
+       flag): downstream reaches EOF with zero pending bytes emitted, `revocationSource` unsubscribe
+       disposer is invoked **exactly once**, all timers and abort listeners are cleared, and the
+       upstream reader is cancelled and released.
+     - **Setup-phase reader**: Pause `upstreamAuth` or upstream `fetch` during setup, then emit
+       `notify({ action: 'revoked' })`. Assert `abortSetupOnce('revoked', 401)` aborts setup
+       immediately, returns redacted `401`, invokes the unsubscribe disposer **exactly once**, and
+       disposes any late-resolving upstream `Response.body` with zero leaked resources.
+   - **Repeated `'recheck'` wakes exhausting `maxRefenceAttempts` (both setup AND delivery)**:
+     - Emit a deterministic `'recheck'` wake inside every `recheck` invocation until
+       `maxRefenceAttempts` (`8`) is exceeded. Assert: (a) during `'post-subscribe'` / pre-`200`
+       setup catch-up, the proxy aborts setup cleanly, unsubscribes once, cancels any opened
+       upstream body, and returns redacted `503` (zero `200` headers emitted); (b) during active
+       delivery, the proxy closes via `closeOnce('policy-error')` with zero pending bytes emitted
+       and releases its upstream reader.
    - **Pull-only observation-limit control**: Repeat Barrier 2 **without** `revocationSource` where
      `Gateway 2` revokes `session-B` *after* `Gateway 1`'s batch 2 read already returned
      `{ allow: true }` and *before* batch 3 is published; assert batch 2 (admitted prior to
      observation) may drain cleanly on `session-B`, while batch 3 and `offset_3` are strictly
      withheld and `session-B` closes before batch 3.
-2. **Idle reader at expiry, expiry during paused check, setup cancellation & subscription catch-up** (using injected fake `ClockPort` and deferred hooks):
+2. **Idle reader at expiry, expiry during paused check, setup cancellation, late wake & subscription catch-up** (using injected fake `ClockPort` and deferred hooks):
    - **Idle expiry + sliding extension**: Admit reader with `expiresAtMs = T0 + 60_000` on an idle
      stream (pending upstream `read()`). Advance fake clock to `T0 + 60_000`; assert
      `recheck(..., 'expiry')` runs without any upstream event, closes downstream cleanly, cancels and
@@ -1798,18 +2000,34 @@ bypasses on proxy unit/conformance suites).
      where `recheck(..., 'expiry')` returns `{ allow: true, expiresAtMs: T0 + 120_000 }` (stays open
      until `T0 + 120_000`), and negative controls where `recheck(..., 'expiry')` omits `expiresAtMs`,
      returns `expiresAtMs <= clock.nowMs()`, or returns `NaN`/`Infinity` (all fail closed immediately).
-   - **Expiry during a paused `before-delivery` check**: Pause `recheck(..., 'before-delivery')` on
-     a deferred promise while `expiresAtMs` arrives on the fake clock. Verify BOTH sub-cases:
-     (a) cooperative hook observing aborted `signal` → stale `allow` fenced, zero bytes of pending
-     batch emitted, serialized `'expiry'` check runs and closes reader; (b) non-cooperative hung
-     hook ignoring `signal` → after `policyTimeoutMs` on fake clock, proxy abandons the hung promise,
-     closes reader `'expired'` with zero bytes emitted, and discards late resolution with zero
-     unhandled rejections.
+   - **Expiry during a paused `before-delivery` check (single hard budget `expiresAtMs + policyTimeoutMs`)**:
+     Pause `recheck(..., 'before-delivery')` on a deferred promise while `expiresAtMs` arrives on
+     the fake clock. Verify ALL sub-cases:
+     - (a) **Cooperative hook** observing aborted `signal` within `remaining = deadline - clock.nowMs()`
+       → stale `allow` fenced (post-await expiry + epoch check), zero bytes of pending batch emitted,
+       serialized `'expiry'` check runs strictly within the **single** remaining budget
+       (`clock.nowMs() <= expiresAtMs + policyTimeoutMs`) and closes reader `'expired'` (or extends
+       only if fresh `expiresAtMs > clock.nowMs()` resolves before that single deadline);
+     - (b) **Non-cooperative hung hook** ignoring `signal` → at `expiresAtMs + policyTimeoutMs` on
+       fake clock, proxy abandons the hung promise without spawning a second budget, closes reader
+       `'expired'` with zero bytes emitted, and discards late resolution with zero unhandled
+       rejections;
+     - (c) **Post-await expiry without timer firing first**: fake clock advances past `expiresAtMs`
+       immediately before a non-expiry `recheck` resolves `{ allow: true }` (no sliding extension) →
+       post-await `clock.nowMs() >= expiresAtMs` check refuses emission and transitions immediately
+       to `'expired'` with zero bytes emitted.
    - **Revocation between admission and `subscribe` registration**: Pause
      `revocationSource.subscribe` on a deferred promise after `authorize` returned `{ allow: true }`.
      Revoke the session in the shared store *before* `subscribe` finishes registering (so the push
      broadcast is missed). Release `subscribe`. Assert `'post-subscribe'` catch-up `recheck` catches
      the revocation, calls `unsubscribe()`, opens **zero** upstream connections, and returns `401`.
+   - **`'recheck'` wake arriving after `'post-subscribe'` while upstream `fetch` is pending**:
+     Complete `'post-subscribe'` catch-up cleanly, pause upstream `fetch` on a deferred promise,
+     revoke the session in shared state and emit `notify({ action: 'recheck' })`, then resolve
+     upstream `fetch` with a live `200` `Response` carrying a tracked `ReadableStream` body. Assert
+     the pre-`200` epoch check detects `invalidationEpoch !== postSubscribeEpoch`, runs bounded
+     re-fencing `recheck` (observing `{ allow: false }`), cancels and disposes the late upstream
+     `Response.body`, invokes `unsubscribe()` once, and returns `401` (never emitting `200`).
    - **Shutdown / abort during setup (`resolvePath`, `subscribe`, `upstreamAuth`, upstream `fetch` open)**:
      Trigger `shutdownSignal` (and separately client `request.signal` abort) while each setup hook
      is paused on a deferred promise. Assert the handler returns promptly, late-resolving `subscribe`
@@ -1836,15 +2054,18 @@ bypasses on proxy unit/conformance suites).
      closed with `frame-limit-exceeded` and emits **zero** bytes of preceding `data` or `control`.
    - **Oversize unterminated comment**: `:keepalive...` exceeding `maxPendingBatchBytes` without a
      blank-line terminator fails closed with `frame-limit-exceeded`.
-   - **Malformed `control` frame**: `event: control` with invalid JSON, missing `streamNextOffset`,
-     empty `streamNextOffset: ""`, or invalid field type fails closed with `upstream-error` and
-     releases **zero** bytes of preceding `pendingDataFrames` or `control`.
+   - **Malformed or unresumable `control` frame**: `event: control` with invalid JSON, missing
+     `streamNextOffset`, empty `streamNextOffset: ""`, invalid field type, OR a non-empty
+     `streamNextOffset` violating the shared `isValidStreamOffset` grammar (exceeding 256 bytes,
+     containing whitespace, control characters, `?`/`#`/`&`, or non-token characters that the same
+     proxy rejects as `?offset=`) fails closed with `upstream-error` and releases **zero** bytes of
+     preceding `pendingDataFrames` or `control`.
    - **Unsupported / malformed frames**: omitted `event:` (`message`), unknown `event: custom`, or
      `event: data` with no `data:` line fails closed with `upstream-error` and zero output.
    - **EOF before `control` and EOF mid-frame**: upstream closes after sending `event: data` with no
      committing `control` (or truncated mid-frame) → closes with `upstream-error` and emits **zero**
      uncommitted bytes.
-5. **Offset resume, single offset authority, and interrupted-delivery reconnect**:
+5. **Offset resume, single offset authority, control-only commit, terminal stop, and retention passthrough**:
    - **Bearer and cookie manual resume**: Both a bearer client (`Authorization: Bearer <token-1>`)
      and a cookie client (`Cookie: __Host-ns_session=<cookie-1>`, `Sec-Fetch-Site: same-origin`)
      connect to the same `defineService` endpoint with `?offset=-1`, commit batch 1 (`offset_1`),
@@ -1855,52 +2076,86 @@ bypasses on proxy unit/conformance suites).
      `proxyUrl` carrying `?offset=old` and `options.offset: 'new'` (and duplicate `?offset=a&offset=b`)
      throws `TypeError` synchronously; omitting `?offset=` or matching `?offset=same` succeeds with
      matching URL `?offset=` and `binding.snapshot().lastCommittedOffset`.
-   - **Interrupted-delivery reconnect test**: Connect via `createNetScriptStreamEventSourceV1` in
-     `proxyUrl` mode, commit batch 1 (`offset_1`), deliver `event: data` for batch 2 WITHOUT its
-     committing `event: control`, then trigger `transport-error`. Assert
+   - **Control-only commit & interrupted-delivery reconnect test**: Connect via
+     `createNetScriptStreamEventSourceV1` in `proxyUrl` mode (with the guide's reconnect wrapper),
+     commit batch 1 (`offset_1`, asserting `onCommittedBatch` fires once on `control`), deliver
+     `event: data` for batch 2 WITHOUT its committing `event: control` (asserting
+     `onCommittedBatch` has **NOT** fired for batch 2), then trigger a transient `transport-error`
+     with `readyState !== 2` (`retryable: true`). Assert
      `binding.snapshot().lastCommittedOffset === offset_1` and `pendingBatches.length === 1`. Dispose
      the interrupted binding and rebuild via `createNetScriptStreamEventSourceV1` from `offset_1`;
      assert the new connection requests `?offset=<offset_1>` (NOT original `-1`), receives batch 2 +
-     `control(offset_2)`, and commits `offset_2` with zero gap.
-   - **Retention-trimmed `410` resume**: Resuming with a trimmed offset after admission propagates
-     HTTP `410` cleanly.
+     `control(offset_2)`, fires `onCommittedBatch` for batch 2 **exactly once**, and commits
+     `offset_2` with zero gap and zero duplicate side effects.
+   - **Terminal fresh-admission stop test**: Trigger an `EventSource` error where
+     `eventSource.readyState === 2` (`CLOSED`, simulating `401`/`403`/non-SSE admission rejection).
+     Assert the binding reports `{ kind: 'transport-error', retryable: false }`, invokes
+     `onTerminalError`, disposes the binding, and schedules **zero** reconnect attempts (no spin
+     loop).
+   - **Conditional `410` passthrough (synthetic upstream) & whole-stream `404` expiry**: Against a
+     synthetic upstream returning `410 Gone` after admission, assert the proxy propagates HTTP `410`
+     cleanly (with proxy redaction/headers and zero body corruption). Against real
+     `DurableStreamTestServer` for an absent or retention-expired whole stream, assert HTTP `404`
+     propagates cleanly after admission so the client executes its full snapshot resync / recovery
+     path.
 
 #### Security, contract-policy, and compatibility conformance gates
 
-6. **Credential selection, Origin/Fetch Metadata, proxy trust, and response header ownership**:
+6. **Credential selection, Origin/Fetch Metadata, proxy trust, and final mounted response ownership**:
    - Upstream receives `Authorization: Bearer <streams-secret>` and `accept-encoding: identity`;
      client `Cookie` and client `Authorization` NEVER appear on upstream requests; upstream `302`
      redirect is NOT followed (`redirect: 'manual'`, returns `502` without sending `upstreamAuth` to
      redirect target); upstream `401`/`403` maps to redacted `502`.
-   - **Mixed and malformed credentials**:
-     - `bearer-or-cookie`: malformed `Authorization: Basic abc` or `Authorization: Bearer` paired
-       with valid `Cookie` → `401` (`invalid_authorization_header`), zero `authorize` calls.
-     - `bearer-or-cookie`: invalid/revoked `Authorization: Bearer bad` paired with valid `Cookie` →
-       `401` (no silent downgrade to `Cookie`).
+   - **Mixed, malformed, empty, duplicate, and mounted-composite credentials**:
+     - `bearer-or-cookie`: malformed `Authorization: Basic abc`, empty `Authorization: `,
+       `Authorization: Bearer`, duplicate `Authorization` headers, or non-RFC-6750 bearer token
+       syntax (e.g., whitespace/control characters) paired with valid `Cookie` → `401`
+       (`invalid_authorization_header`), zero `authorize` calls.
+     - `bearer-or-cookie` **mounted on `defineService` with `createCompositeAuthenticator` (distinct
+       synthetic bearer and cookie authenticators/principals)**:
+       - Invalid/revoked `Authorization: Bearer bad` paired with valid `Cookie` (for `cookie-user`) →
+         `401` with **zero** fallback to the cookie authenticator or `cookie-user` principal.
+       - Valid `Authorization: Bearer <bearer-tok>` (for `bearer-user`) paired with valid `Cookie`
+         (for `cookie-user`) → `200` where BOTH `servicePrincipal` and proxy `authorize` bind to
+         `bearer-user` (never mixing service scopes from `cookie-user` with a grant for
+         `bearer-user`).
      - `clientAuth: 'cookie'`: any `Authorization` header → `401` (`bearer_not_allowed`).
      - `clientAuth: 'bearer'`: cookie-only request → `401` (`bearer_required`); valid Bearer +
        `Cookie` → `200` with `credentialMode: 'bearer'` and no cookie forwarded upstream.
-   - **Cookie Origin / Fetch Metadata / `trustProxy`**:
+   - **Cookie Origin / Fetch Metadata / `trustProxy` (including partial & untrusted forwarded values)**:
      - `Sec-Fetch-Site: cross-site` (no allowlisted `Origin`), `Origin` not in `allowedOrigins`
        (symbolic `<cross-site-origin>`), `Origin: null`, and `Sec-Fetch-Site: none` /
        `Sec-Fetch-Dest: document` → `403`, zero `authorize`/upstream calls.
      - `Origin` matching an exact entry in `allowedOrigins` → admitted `200`; `allowedOrigins: ['*']`
        or `['null']` throws `TypeError` at construction.
      - `trustProxy: false` (default): spoofed `X-Forwarded-Proto` + `X-Forwarded-Host` ignored →
-       `403`. With trusted `remoteAddr` matching `trustProxy(ip) === true`, valid forwarded origin
-       resolves same-origin `200`; with untrusted `remoteAddr` or missing `remoteAddr`, forwarded
-       headers ignored → `403`.
-   - **Response header ownership & dynamic `Connection` stripping**:
-     - Upstream returns `Connection: keep-alive, X-Internal-Hop`, `X-Internal-Hop: secret`,
-       `X-Unlisted: leak`, `access-control-allow-origin: *`, `content-encoding: gzip`,
-       `content-length: 5`, `www-authenticate: Bearer`, `set-cookie: upstream=1`, plus safe
-       `etag: "v1"` and `stream-next-offset: o1`. Assert ONLY allowlisted safe metadata + proxy
-       mandatory headers survive; dynamic `Connection`-nominated and unlisted headers are stripped;
-       >1 KiB SSE stream passes uncorrupted (`#219`/`#239` fence).
+       `403`. With trusted `remoteAddr` matching `trustProxy(ip) === true`, valid complete
+       (`X-Forwarded-Proto` + `X-Forwarded-Host`) forwarded origin resolves same-origin `200`; with
+       untrusted `remoteAddr`, missing `remoteAddr`, or **partial / malformed / multi-value**
+       forwarded pairs (e.g., `X-Forwarded-Proto` alone without `X-Forwarded-Host`, or comma-list
+       `X-Forwarded-Host`), forwarded headers are rejected/ignored → `403`.
+   - **Final mounted response header ownership, CORS + multi-cookie composition & dynamic `Connection` stripping**:
+     - Upstream returns `Connection: keep-alive, etag`, `etag: "v1"` (an otherwise allowlisted
+       metadata header nominated by `Connection`!), `X-Unlisted: leak`,
+       `access-control-allow-origin: *`, `content-encoding: gzip`, `content-length: 5`,
+       `www-authenticate: Bearer`, `set-cookie: upstream=1`, plus safe `stream-next-offset: o1`.
+       Assert `stream-next-offset: o1` and proxy mandatory headers survive while **both**
+       `Connection`-nominated `etag` and unlisted/forbidden headers are stripped; >1 KiB SSE stream
+       passes uncorrupted (`#219`/`#239` fence).
      - `authorize` returning reserved `responseHeaders` (`cache-control`, `content-type`,
-       `access-control-allow-origin`, `vary`, `set-cookie`) fails closed `503` with zero upstream
-       calls; valid `decision.setCookies` emits `Set-Cookie` on the `200` SSE response.
-7. **Authoritative `defineService` contract policy, overlap detection, and graceful shutdown**:
+       `access-control-allow-origin`, `vary`, `set-cookie`, `stream-next-offset`, `stream-cursor`,
+       `etag`) fails closed `503` with zero upstream calls.
+     - **Mounted `defineService` + `withCors({ origin: [...], credentials: true })` + `withAuthn`
+       response-ownership gate**:
+       - When `withAuthn` returns `AuthnResult.setCookies: ['authn=1; Path=/; HttpOnly']` and proxy
+         `authorize` returns `decision.setCookies: ['proxy=2; Path=/; HttpOnly']`, the final mounted
+         `200` response preserves **both** `Set-Cookie` headers additively, preserves
+         `cache-control: no-store, no-cache, no-transform`, emits gateway-owned
+         `Access-Control-Allow-Origin` / `Access-Control-Allow-Credentials: true`, and unions `Vary`.
+       - When `withAuthn` returns reserved `AuthnResult.responseHeaders: { 'cache-control': 'public' }`
+         (or any other reserved header/prefix), the mounted stream route fails closed with redacted
+         `503` (never emitting `200` with `cache-control: public`).
+7. **Authoritative `defineService` contract policy, structural mount enforcement, overlap detection, and graceful shutdown**:
    - Mounting `streamProxies: [feedProxy]` with `createContractAuthorizer(contract)` (single
      registration) enforces `access` (`401` unauthenticated, `403` wrong scope/role/audience, `200`
      authorized).
@@ -1909,17 +2164,23 @@ bypasses on proxy unit/conformance suites).
      `{ allow: true }` default).
    - Explicitly passing `options.streamEndpoints` to either authorizer with an **omitted** mounted
      endpoint or a **mismatched** `access`/`clientAuth`/`path` throws at `build()`.
-   - Explicit `admission: 'proxy-self-contained'` enforces `endpoint.access` scopes/roles inside
-     `bindStreamProxy` (`403` when `principal` is missing or lacks required scope), fails closed on
-     non-`GET` methods at service auth middleware, and throws at `build()` if combined with
-     `audience: 'internal'`.
-   - **Dispatch-consistent path-pattern overlap tests**:
+   - **Arbitrary structural `StreamProxyMount` enforcement**: Mounting a hand-written structural
+     `StreamProxyMount` (not produced by `bindStreamProxy`) via `streamProxies: [customMount]` STILL
+     executes under `ServiceBuilder`'s mandatory authn/authz and credential-selection middleware
+     (`401` unauthenticated, `403` wrong scope/role, zero bypass of `endpoint.access`).
+   - **Dispatch-consistent path-pattern overlap and raw/decoded parity tests**:
      - Concrete-inside-template: oRPC route `GET /api/streams/projects/summary` + stream endpoint
        `/api/streams/projects/{projectId}` throws at `build()`.
      - Template-vs-template: `/api/streams/{a}/feed` + `/api/streams/projects/{b}` throws at
        `build()`.
+     - **Ordinary `ServiceBuilder.route()` overlap**: registering an ordinary Hono / deferred
+       `ServiceBuilder.route()` handler whose path intersects a mounted stream endpoint (e.g.
+       `GET /api/streams/projects/custom` or `ALL /api/streams/*`) throws at `build()`.
      - RPC-mount overlap: `/api/rpc/{feedId}` throws at `build()`.
-     - Encoded slash smuggling (`/api/streams/projects/a%2Fb`) fails closed `400`.
+     - **Raw-vs-decoded disagreement & encoded slash smuggling**: encoded static-segment request
+       (`/api/%73treams/projects/p1`) and encoded slash smuggling (`/api/streams/projects/a%2Fb`)
+       both fail closed `400` before authn/dispatch so raw policy matching and Hono decoded dispatch
+       cannot disagree.
    - Calling `running.stop()` while an SSE reader is open and idle closes the reader promptly via
      pre-drain `shutdownSignal`, cancels its upstream reader, and resolves `stop()` well below
      `drainTimeoutMs`.
@@ -1983,11 +2244,12 @@ bypasses on proxy unit/conformance suites).
 | Symbol / package | Disposition | Rationale |
 | --- | --- | --- |
 | `defineStreamEndpoint`, `buildStreamEndpointUrl`, `StreamEndpointContract`, `StreamEndpointClientAuthMode` (`@netscript/contracts/streams`) | **Included in v1** | Required to declare parameterized stream routes in a runtime-free contract and construct type-checked proxy URLs for both cookie and bearer clients. |
-| `StreamProxyMount`, `StreamProxyMountContext`, `StreamProxyAdmissionMode`, `ServiceBuilder.withStreamProxy`, `DefineServiceOptions.streamProxies`, `ContractPolicyBindingOptions.streamMounts`, `streamEndpoints` cross-check option (`@netscript/service`) | **Included in v1** | Minimum structural seam keeping `@netscript/service` acyclic with `@netscript/plugin-streams-core`, making mounted contract policy authoritative in both authorizers, exposing `remoteAddr` for `trustProxy`, and providing pre-drain `shutdownSignal`. |
-| `createNetScriptStreamProxy`, `bindStreamProxy` and their option/port/decision types (`@netscript/plugin-streams-core/proxy`) | **Included in v1** | Core revocable SSE proxy runtime usable from both `defineService` and Fresh 2.x handlers. |
+| `StreamProxyMount`, `StreamProxyMountContext`, `ServiceBuilder.withStreamProxy`, `DefineServiceOptions.streamProxies`, `ContractPolicyBindingOptions.streamMounts`, `streamEndpoints` cross-check option (`@netscript/service`) | **Included in v1** | Minimum structural seam keeping `@netscript/service` acyclic with `@netscript/plugin-streams-core`, running pre-authn credential selection, making mounted contract policy authoritative in both authorizers (`streamEndpoints` supports standalone authorizer unit tests and compile-time pinning), enforcing final response header/`Set-Cookie` ownership, exposing `remoteAddr` for `trustProxy`, and providing pre-drain `shutdownSignal`. |
+| `createNetScriptStreamProxy`, `bindStreamProxy`, `StreamEventSourceV1.readyState` (`@netscript/plugin-streams-core/{proxy,sse}`) | **Included in v1** | Core revocable SSE proxy runtime usable from both `defineService` and Fresh 2.x handlers, plus optional `readyState` propagation on `bindStreamEventSourceV1` so browser consumers distinguish terminal HTTP refusals from retryable drops. |
 | `proxyUrl` on `CreateNetScriptStreamEventSourceOptionsV1` (`@netscript/fresh/streams`) | **Included in v1** | Single additive option eliminating the forced `/v1/stream/netscript` prefix and enforcing one offset authority between URL and `initialState.lastCommittedOffset`. |
 | Opt-in `authorize` / `recheck` options on `NetScriptChatStreamProxyOptions` (`@netscript/fresh/ai`) | **Included in v1** | Non-breaking bridge allowing existing durable-chat routes to opt into revocable SSE delivery without breaking legacy callers. |
-| OpenAPI `createOpenAPISpec` SSE projection & `/` `serviceInfoEndpoints()` entries (`@netscript/service`) | **Deferred to follow-up** | Not required for runtime revocation, admission, or contract enforcement; deferring keeps `@netscript/service` changes strictly focused on mounting, policy authority, and shutdown. |
+| Self-contained global-authn bypass (`admission: 'proxy-self-contained'`) | **Deferred to follow-up** | Eliminates the risk of global authn/authz yielding to an arbitrary structural `handle`; v1 mounts always execute under authoritative service `withAuthn` + `withAuthz`, while standalone Fresh BFF routes use `createNetScriptStreamProxy` directly. |
+| OpenAPI `createOpenAPISpec` SSE projection & `/` `serviceInfoEndpoints()` entries (`@netscript/service`) | **Deferred to follow-up** | Not required for runtime revocation, admission, or contract enforcement; optional `summary`/`description`/`tags` stay metadata-only in v1 so future projection needs no contract break. |
 | Public sanitizer / re-streaming helper exports (`STRIPPED_STREAM_PROXY_RESPONSE_HEADERS`, `sanitizeStreamProxyResponseHeaders`, `restreamUpstreamBody`) | **Deferred (kept package-internal)** | Internal hygiene detail of `@netscript/plugin-streams-core/proxy`; no external consumer requirement justifies freezing these names in the public JSR API. |
 | `PluginServiceConfig.streamProxies` (`@netscript/plugin/service`) | **Deferred to follow-up** | Application services mount authorizing stream proxies via `defineService` / `createService`; plugin services can add forwarding when a first-party plugin needs it. |
 
@@ -2017,8 +2279,9 @@ This RFC is **fully additive** and introduces **no breaking changes**:
    via `defineService(router, { streamProxies: [...] })` (or `createNetScriptStreamProxy` in a
    Fresh 2.x route handler).
 4. Update browser `EventSource` consumers to construct base URLs via `buildStreamEndpointUrl`, pass
-   `proxyUrl` and `offset` to `createNetScriptStreamEventSourceV1`, and dispose-and-rebuild from
-   `binding.snapshot().lastCommittedOffset` on `transport-error`.
+   `proxyUrl` and `offset` to `createNetScriptStreamEventSourceV1`, commit side effects only on
+   `event: control`, dispose-and-rebuild from `binding.snapshot().lastCommittedOffset` on retryable
+   `transport-error`, and stop on terminal (`retryable: false`) admission errors.
 
 ### Migration from `createNetScriptChatStreamProxy` for authorized GET SSE reads
 
@@ -2088,6 +2351,9 @@ This RFC is **fully additive** and introduces **no breaking changes**:
 
 ## Future possibilities
 
+- **Self-contained global-authn delegation (`admission: 'proxy-self-contained'`)** once a
+  dispatch-bound internal marker guarantees global authn/authz can only yield to a verified
+  `bindStreamProxy` handler that unconditionally enforces `endpoint.access`.
 - **OpenAPI `text/event-stream` spec projection & service-info listing** generated automatically from
   mounted `streamProxies` in `@netscript/service`.
 - **`PluginServiceConfig.streamProxies`** forwarding in `@netscript/plugin/service` once a
