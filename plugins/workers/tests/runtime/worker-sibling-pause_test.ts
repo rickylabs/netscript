@@ -135,14 +135,15 @@ Deno.test('production Worker.pause() parks waiting jobs with a live sibling and 
             triggeredBy: 'queue',
             idempotencyKey: 'sp-1',
           });
+          // Wait until job-1 is admitted and held before enqueuing job-2 so same-ms Deno KV
+          // queue ordering cannot deliver job-2 first.
+          await firstEntered.promise;
           await producer.enqueue({
             jobId: 'job-2',
             topic: 'jobs',
             triggeredBy: 'queue',
             idempotencyKey: 'sp-2',
           });
-
-          await firstEntered.promise;
           await delay(60);
 
           // Pause production Worker while job-2 is waiting and sibling listener remains live.

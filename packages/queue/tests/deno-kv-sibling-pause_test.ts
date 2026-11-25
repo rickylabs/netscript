@@ -78,8 +78,8 @@ Deno.test('file-backed paused queue parks unadmitted delivery without dead-lette
 
     try {
       await dispatcher.enqueue(createEnvelope(1, undefined, 'paused'));
-      await dispatcher.enqueue(createEnvelope(2, undefined, 'paused'));
       await firstEntered.promise;
+      await dispatcher.enqueue(createEnvelope(2, undefined, 'paused'));
       await delay(60);
 
       // Explicitly pause 'paused' while msg 2 is unadmitted and 'sibling' remains registered.
