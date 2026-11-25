@@ -35,7 +35,7 @@ Deno.test('verdict table rows name directories that exist', async () => {
   const verdict = await Deno.readTextFile(VERDICT_PATH);
   const paths = unitPaths(section(verdict, 'Verdict per package'));
 
-  assertEquals(paths.length, 37);
+  assertEquals(paths.length, 38);
   assertEquals(new Set(paths).size, paths.length);
   for (const path of paths) assertEquals((await Deno.stat(path)).isDirectory, true, path);
 });
@@ -65,7 +65,7 @@ Deno.test('archetype assignments and documented gate set equal the measured verd
   assertEquals(archetypePaths, verdictPaths);
   assertEquals(documentedAssignments, verdictAssignments);
   assertEquals(verdictPaths, await discoverDoctrineRoots());
-  assertStringIncludes(gateCoverage, 'exactly the 37 paths in the verdict table above');
+  assertStringIncludes(gateCoverage, 'exactly the 38 paths in the verdict table above');
   assertStringIncludes(gateCoverage, 'packages/cli/e2e');
   assertStringIncludes(gateCoverage, 'published doctrine unit');
 });

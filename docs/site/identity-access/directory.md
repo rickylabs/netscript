@@ -142,9 +142,50 @@ const report = await verifyDirectoryConformance({
 console.log(report.passed, report.failed);
 ```
 
+## Active Directory & Samba AD adapter (`@netscript/directory-ldap`)
+
+`@netscript/directory-ldap` implements `DirectoryPort` for Active Directory and Samba AD on
+`ldapts` with strict production defaults:
+
+- **Strict TLS by default.** Uses `ldaps://` or explicit StartTLS (`tls: { mode: 'starttls' }`) with
+  `rejectUnauthorized: true` and optional custom enterprise CA bundles via `tls.caFile`. Plaintext
+  `ldap://` is refused unless `tls.allowInsecurePlaintextDev: true` is explicitly opted in.
+- **`*_FILE` bind secrets only.** Service-account bind passwords are read once at startup from
+  `bindPasswordFile`; inline passwords and URL credentials are rejected, and errors/health probes
+  never echo passwords or distinguished names.
+- **Pure filter ASTs & bounded wire reads.** Every query constructs `ldapts` filter objects
+  (`AndFilter`, `OrFilter`, `NotFilter`, `EqualityFilter`, `SubstringFilter`, `ExtensibleFilter`)
+  rather than concatenating LDAP filter strings, and `searchUsers`/`searchGroups` iterate
+  `searchPaginated` to stop strictly at `limit + 1` entries on the wire.
+- **Transitive membership & AD primary group.** `memberOfAny` evaluates
+  `LDAP_MATCHING_RULE_IN_CHAIN` (`1.2.840.113556.1.4.1941`) strictly bounded to
+  `candidateGroupIds` (recorded via `'transitive-membership'` in `capabilities`) and resolves
+  Active Directory `primaryGroupID` against group `objectSid` RIDs under `baseDn`.
+- **Multi-host failover & health.** Ordered `urls` slice timeout budgets across remaining hosts,
+  prefer the last healthy host, fail fast on unauthorized credentials or bad base DNs, and probe
+  both RootDSE and configured base DNs in `health()`.
+
+```ts
+import { createLdapDirectoryPort } from '@netscript/directory-ldap';
+
+const connectDirectory = () =>
+  createLdapDirectoryPort({
+    directoryInstance: 'corp-example',
+    urls: ['ldaps://dc1.example.test:636', 'ldaps://dc2.example.test:636'],
+    baseDn: 'DC=example,DC=test',
+    bindDn: 'CN=svc-directory,OU=ServiceAccounts,DC=example,DC=test',
+    bindPasswordFile: '/run/secrets/ldap_bind_password',
+    tls: { caFile: '/etc/ssl/certs/corp-root-ca.pem' },
+  });
+
+console.log(typeof connectDirectory);
+```
+
 ## Next steps
 
 - [@netscript/plugin-directory-core reference](/reference/plugin-directory-core/): complete symbol
   inventory for the root, domain, ports, and testing entrypoints.
+- [@netscript/directory-ldap reference](/reference/directory-ldap/): Active Directory and Samba AD
+  adapter configuration, codecs, and transport seams.
 - [Authentication](/identity-access/auth/): session sign-in and `Principal` verification through
   `@netscript/plugin-auth`.
