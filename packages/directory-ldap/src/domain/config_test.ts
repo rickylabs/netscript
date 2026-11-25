@@ -125,4 +125,22 @@ Deno.test('resolveLdapConfig rejects disabled certificate verification, inline p
     () => resolveLdapConfig(validOptions({ defaultTimeoutMs: 0 })),
     RangeError,
   );
+  assertThrows(
+    () => resolveLdapConfig(validOptions({ defaultTimeoutMs: 2_147_483_648 })),
+    RangeError,
+  );
+  assertThrows(
+    () => resolveLdapConfig(validOptions({ connectTimeoutMs: 2_147_483_648 })),
+    RangeError,
+  );
+  assertThrows(
+    () =>
+      resolveLdapConfig(
+        validOptions({
+          tls: { mode: 'bogus-mode' } as unknown as LdapStaticConfigOptions['tls'],
+        }),
+      ),
+    RangeError,
+    'tls.mode',
+  );
 });

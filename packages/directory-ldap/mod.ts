@@ -1,10 +1,11 @@
 /**
- * Active Directory and LDAP adapter implementing NetScript's `DirectoryPort`.
+ * Active Directory and Samba AD adapter implementing NetScript's `DirectoryPort`.
  *
  * Connects over strict TLS (`ldaps://` or StartTLS with `rejectUnauthorized: true` and optional
  * `tls.caFile`), loads service-account bind passwords strictly from a `*_FILE` path at startup,
- * builds every LDAP filter from `ldapts` filter AST classes with zero string concatenation, and
- * evaluates bounded transitive membership including Active Directory `primaryGroupID` resolution.
+ * builds every LDAP filter from `ldapts` filter AST classes with zero string concatenation,
+ * bounds paged searches on the wire via `searchPaginated`, and evaluates bounded transitive
+ * membership including Active Directory `primaryGroupID` resolution.
  *
  * @example
  * ```ts
@@ -43,6 +44,9 @@ export {
   derivePrimaryGroupSid,
   encodeAdAccountExpires,
   encodeAdObjectGuid,
+  isLdapBaseDnMisconfigurationError,
+  isNonLdapProgramError,
+  LDAP_CAP_ACTIVE_DIRECTORY_OID,
   LDAP_MATCHING_RULE_IN_CHAIN_OID,
   type LdapAttributeMap,
   type LdapStaticConfigOptions,
@@ -59,10 +63,10 @@ export {
 } from './src/domain/mod.ts';
 
 export type {
+  LdapBoundedSearchParams,
   LdapClientConnectOptions,
   LdapClientFactory,
   LdapClientPort,
-  LdapDirectoryClock,
   LdapFilterNode,
   LdapRawEntry,
   LdapSearchParams,
@@ -77,6 +81,7 @@ export type {
   ConsistencySource,
   DIRECTORY_ERROR_CODES,
   DirectoryCapability,
+  DirectoryClock,
   DirectoryError,
   DirectoryErrorCode,
   DirectoryGroup,

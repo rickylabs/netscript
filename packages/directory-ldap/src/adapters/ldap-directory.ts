@@ -1,15 +1,17 @@
 /**
- * Active Directory / LDAP implementation of NetScript's `DirectoryPort`.
+ * Active Directory and Samba AD implementation of NetScript's `DirectoryPort`.
  *
  * @module
  */
 
 import {
+  assertDirectoryCallContext,
   type CallContext,
+  createSystemDirectoryClock,
   type DirectoryCapability,
+  type DirectoryClock,
   type DirectoryGroup,
   type DirectoryHealth,
-  type DirectoryHealthProbe,
   type DirectoryPort,
   type DirectoryUser,
   isDirectoryUserActive,
@@ -24,35 +26,32 @@ import {
 import {
   derivePrimaryGroupSid,
   type LdapStaticConfigOptions,
-  mapLdapError,
   type ResolvedLdapConfig,
   resolveLdapConfig,
   tryEncodeAdObjectGuid,
 } from '../domain/mod.ts';
-import type { LdapClientFactory, LdapDirectoryClock } from '../ports/mod.ts';
+import type { LdapClientFactory } from '../ports/mod.ts';
 import { mapLdapGroupEntry, mapLdapUserEntry, readEntryImmutableId } from './ldap-entry-mapper.ts';
 import {
   buildBoundedMembershipFilter,
   buildGroupSearchFilter,
-  buildHealthProbeFilter,
   buildPrimaryGroupBySidFilter,
   buildUserLookupFilter,
   buildUserSearchFilter,
 } from './ldap-filters.ts';
+import { runLdapHealthCheck } from './ldap-health.ts';
 import {
-  assertNotTimedOutOrAborted,
   createLdapSessionRunner,
   readCaFileAtStartup,
   readSecretFileAtStartup,
-  resolveCallTimeoutMs,
 } from './ldap-session.ts';
 import { defaultLdapClientFactory } from './ldapts-client.ts';
 
 /**
  * Options accepted by {@link createLdapDirectoryPort}.
  *
- * Bind credentials are supplied strictly via `bindPasswordFile` (`*_FILE` path read once at
- * startup) and TLS defaults to strict certificate verification (`rejectUnauthorized: true`).
+ * Targets Active Directory and Samba AD over strict TLS (`rejectUnauthorized: true`), reading
+ * bind credentials strictly from `bindPasswordFile` (`*_FILE`) once at startup.
  */
 export type LdapDirectoryOptions =
   & LdapStaticConfigOptions
@@ -60,13 +59,8 @@ export type LdapDirectoryOptions =
     /** Optional injectable LDAP client factory (defaults to `npm:ldapts`). */
     clientFactory?: LdapClientFactory;
     /** Optional injectable clock for deterministic tests (defaults to system UTC clock). */
-    clock?: LdapDirectoryClock;
+    clock?: DirectoryClock;
   }>;
-
-const SYSTEM_CLOCK: LdapDirectoryClock = {
-  nowMs: () => Date.now(),
-  nowIso: () => new Date().toISOString(),
-};
 
 function uniqueStrings(values: readonly string[]): string[] {
   const seen = new Set<string>();
@@ -81,11 +75,11 @@ function uniqueStrings(values: readonly string[]): string[] {
 }
 
 /**
- * Creates a configured Active Directory / LDAP {@link DirectoryPort}.
+ * Creates a configured Active Directory / Samba AD {@link DirectoryPort}.
  *
- * Reads `bindPasswordFile` (and optional `tls.caFile`) once at startup, validates strict TLS
- * settings (refusing plaintext `ldap://` unless `tls.allowInsecurePlaintextDev` is explicitly
- * `true`), and returns an immutable {@link DirectoryPort} ready for bounded directory queries.
+ * Reads `bindPasswordFile` (and optional PEM-validated `tls.caFile`) once at startup, validates
+ * strict TLS settings (refusing plaintext `ldap://` unless `tls.allowInsecurePlaintextDev` is
+ * explicitly `true`), and returns an immutable {@link DirectoryPort} ready for bounded queries.
  *
  * @param options - LDAP hosts, base DNs, `bindPasswordFile`, strict TLS config, and optional seams.
  * @returns Configured {@link DirectoryPort} instance.
@@ -113,7 +107,7 @@ export async function createLdapDirectoryPort(
   const bindPassword = await readSecretFileAtStartup(config.bindPasswordFile);
   const caPem = config.caFile !== undefined ? await readCaFileAtStartup(config.caFile) : undefined;
   const clientFactory = options.clientFactory ?? defaultLdapClientFactory;
-  const clock = options.clock ?? SYSTEM_CLOCK;
+  const clock: DirectoryClock = options.clock ?? createSystemDirectoryClock();
   const session = createLdapSessionRunner(config, bindPassword, caPem, clientFactory);
 
   const capabilities = new Set<DirectoryCapability>(['search']);
@@ -144,6 +138,7 @@ export async function createLdapDirectoryPort(
     config.attributes.mail,
   ]);
   const groupBinaryAttributes = [config.attributes.immutableId];
+  const probeBaseDns = uniqueStrings([config.baseDn, config.usersBaseDn, config.groupsBaseDn]);
 
   return {
     name: config.name,
@@ -151,8 +146,7 @@ export async function createLdapDirectoryPort(
 
     async searchUsers(q: SearchUsersQuery, ctx: CallContext): Promise<Page<DirectoryUser>> {
       const appliedLimit = normalizeDirectorySearchLimit(q.limit, config.maxSearchLimit);
-      const timeoutMs = resolveCallTimeoutMs(ctx, config.defaultTimeoutMs);
-      assertNotTimedOutOrAborted(config.name, 'searchUsers', ctx, timeoutMs);
+      assertDirectoryCallContext(config.name, 'searchUsers', ctx, config.defaultTimeoutMs);
 
       const term = q.text.trim();
       if (term.length === 0) {
@@ -163,12 +157,13 @@ export async function createLdapDirectoryPort(
       const requestSize = appliedLimit + 1;
 
       const entries = await session.withFailover('searchUsers', ctx, async (client, timeLimit) => {
-        const res = await client.search(config.usersBaseDn, {
+        const res = await client.searchBounded(config.usersBaseDn, {
           scope: 'sub',
           filter,
           attributes: userAttributes,
           explicitBufferAttributes: userBinaryAttributes,
-          sizeLimit: requestSize,
+          sizeLimit: 0,
+          maxEntries: requestSize,
           timeLimit,
           paged: { pageSize: Math.min(config.pageSize, requestSize) },
         });
@@ -182,9 +177,9 @@ export async function createLdapDirectoryPort(
           mapped.push(record.user);
         }
       }
-      const truncated = mapped.length > appliedLimit;
+      const truncated = entries.length > appliedLimit || mapped.length > appliedLimit;
       return {
-        items: truncated ? mapped.slice(0, appliedLimit) : mapped,
+        items: mapped.length > appliedLimit ? mapped.slice(0, appliedLimit) : mapped,
         truncated,
         evaluatedAt: clock.nowIso(),
       };
@@ -192,8 +187,7 @@ export async function createLdapDirectoryPort(
 
     async searchGroups(q: SearchGroupsQuery, ctx: CallContext): Promise<Page<DirectoryGroup>> {
       const appliedLimit = normalizeDirectorySearchLimit(q.limit, config.maxSearchLimit);
-      const timeoutMs = resolveCallTimeoutMs(ctx, config.defaultTimeoutMs);
-      assertNotTimedOutOrAborted(config.name, 'searchGroups', ctx, timeoutMs);
+      assertDirectoryCallContext(config.name, 'searchGroups', ctx, config.defaultTimeoutMs);
 
       const term = q.text.trim();
       if (term.length === 0) {
@@ -204,12 +198,13 @@ export async function createLdapDirectoryPort(
       const requestSize = appliedLimit + 1;
 
       const entries = await session.withFailover('searchGroups', ctx, async (client, timeLimit) => {
-        const res = await client.search(config.groupsBaseDn, {
+        const res = await client.searchBounded(config.groupsBaseDn, {
           scope: 'sub',
           filter,
           attributes: groupAttributes,
           explicitBufferAttributes: groupBinaryAttributes,
-          sizeLimit: requestSize,
+          sizeLimit: 0,
+          maxEntries: requestSize,
           timeLimit,
           paged: { pageSize: Math.min(config.pageSize, requestSize) },
         });
@@ -223,17 +218,16 @@ export async function createLdapDirectoryPort(
           mapped.push(record.group);
         }
       }
-      const truncated = mapped.length > appliedLimit;
+      const truncated = entries.length > appliedLimit || mapped.length > appliedLimit;
       return {
-        items: truncated ? mapped.slice(0, appliedLimit) : mapped,
+        items: mapped.length > appliedLimit ? mapped.slice(0, appliedLimit) : mapped,
         truncated,
         evaluatedAt: clock.nowIso(),
       };
     },
 
     async getUser(ref: UserLookup, ctx: CallContext): Promise<DirectoryUser | undefined> {
-      const timeoutMs = resolveCallTimeoutMs(ctx, config.defaultTimeoutMs);
-      assertNotTimedOutOrAborted(config.name, 'getUser', ctx, timeoutMs);
+      assertDirectoryCallContext(config.name, 'getUser', ctx, config.defaultTimeoutMs);
 
       if (ref.directoryInstance !== config.directoryInstance) {
         return undefined;
@@ -244,28 +238,32 @@ export async function createLdapDirectoryPort(
         return undefined;
       }
 
+      // Request 2 entries for secondary attribute selectors so ambiguous matches fail closed.
+      const isImmutableSelector = 'immutableId' in ref && ref.immutableId !== undefined;
+      const maxEntries = isImmutableSelector ? 1 : 2;
+
       const entries = await session.withFailover('getUser', ctx, async (client, timeLimit) => {
-        const res = await client.search(config.usersBaseDn, {
+        const res = await client.searchBounded(config.usersBaseDn, {
           scope: 'sub',
           filter,
           attributes: userAttributes,
           explicitBufferAttributes: userBinaryAttributes,
-          sizeLimit: 1,
+          sizeLimit: 0,
+          maxEntries,
           timeLimit,
+          paged: { pageSize: maxEntries },
         });
         return res.searchEntries;
       });
 
-      const first = entries[0];
-      if (!first) {
+      if (entries.length !== 1) {
         return undefined;
       }
-      return mapLdapUserEntry(first, config.directoryInstance, config.attributes)?.user;
+      return mapLdapUserEntry(entries[0]!, config.directoryInstance, config.attributes)?.user;
     },
 
     async memberOfAny(q: MemberOfAnyQuery, ctx: CallContext): Promise<MemberOfAnyResult> {
-      const timeoutMs = resolveCallTimeoutMs(ctx, config.defaultTimeoutMs);
-      assertNotTimedOutOrAborted(config.name, 'memberOfAny', ctx, timeoutMs);
+      assertDirectoryCallContext(config.name, 'memberOfAny', ctx, config.defaultTimeoutMs);
 
       const emptyResult = (): MemberOfAnyResult => ({
         memberOf: [],
@@ -307,13 +305,15 @@ export async function createLdapDirectoryPort(
         'memberOfAny',
         ctx,
         async (client, timeLimit) => {
-          const userResult = await client.search(config.usersBaseDn, {
+          const userResult = await client.searchBounded(config.usersBaseDn, {
             scope: 'sub',
             filter: userFilter,
             attributes: userAttributes,
             explicitBufferAttributes: userBinaryAttributes,
-            sizeLimit: 1,
+            sizeLimit: 0,
+            maxEntries: 1,
             timeLimit,
+            paged: { pageSize: 1 },
           });
           const rawUser = userResult.searchEntries[0];
           if (!rawUser) {
@@ -333,13 +333,17 @@ export async function createLdapDirectoryPort(
               mappedUser.primaryGroupRid,
             );
             if (primaryGroupSid) {
-              const primaryRes = await client.search(config.groupsBaseDn, {
+              // Resolve primary group by exact binary SID under baseDn so narrowed groupsBaseDn
+              // cannot hide Domain Users or break groups nesting the primary group.
+              const primaryRes = await client.searchBounded(config.baseDn, {
                 scope: 'sub',
                 filter: buildPrimaryGroupBySidFilter(primaryGroupSid, config.attributes),
                 attributes: [config.attributes.immutableId],
                 explicitBufferAttributes: groupBinaryAttributes,
-                sizeLimit: 1,
+                sizeLimit: 0,
+                maxEntries: 1,
                 timeLimit,
+                paged: { pageSize: 1 },
               });
               const primaryEntry = primaryRes.searchEntries[0];
               if (primaryEntry) {
@@ -368,12 +372,13 @@ export async function createLdapDirectoryPort(
               supportsInChainMatching: config.supportsInChainMatching,
               attributes: config.attributes,
             });
-            const groupResult = await client.search(config.groupsBaseDn, {
+            const groupResult = await client.searchBounded(config.groupsBaseDn, {
               scope: 'sub',
               filter,
               attributes: [config.attributes.immutableId],
               explicitBufferAttributes: groupBinaryAttributes,
-              sizeLimit: batch.length,
+              sizeLimit: 0,
+              maxEntries: batch.length,
               timeLimit,
               paged: { pageSize: Math.min(config.pageSize, batch.length) },
             });
@@ -390,9 +395,11 @@ export async function createLdapDirectoryPort(
       );
 
       const memberOf: string[] = [];
+      const emittedNormalized = new Set<string>();
       for (const candidateId of uniqueCandidates) {
         const normalized = candidateId.trim().toLowerCase();
-        if (matchedNormalized.has(normalized)) {
+        if (matchedNormalized.has(normalized) && !emittedNormalized.has(normalized)) {
+          emittedNormalized.add(normalized);
           memberOf.push(candidateId);
         }
       }
@@ -404,64 +411,8 @@ export async function createLdapDirectoryPort(
       };
     },
 
-    async health(ctx: CallContext): Promise<DirectoryHealth> {
-      const timeoutMs = resolveCallTimeoutMs(ctx, config.defaultTimeoutMs);
-      assertNotTimedOutOrAborted(config.name, 'health', ctx, timeoutMs);
-
-      const perHostTimeoutMs = Math.max(1, Math.floor(timeoutMs / config.hosts.length));
-      const probes: DirectoryHealthProbe[] = [];
-      let reachableHosts = 0;
-
-      for (const host of config.hosts) {
-        const startedWallMs = Date.now();
-        try {
-          await session.runOnHost(
-            host,
-            'health',
-            perHostTimeoutMs,
-            ctx.signal,
-            async (client, timeLimit) => {
-              await client.search('', {
-                scope: 'base',
-                filter: buildHealthProbeFilter(),
-                attributes: ['supportedCapabilities'],
-                sizeLimit: 1,
-                timeLimit,
-              });
-            },
-          );
-          reachableHosts += 1;
-          probes.push({
-            name: host.probeName,
-            status: 'pass',
-            message: 'Directory host answered TLS bind and RootDSE probe.',
-            latencyMs: Math.max(0, Date.now() - startedWallMs),
-          });
-        } catch (err) {
-          const mapped = mapLdapError(err, config.name, 'health', perHostTimeoutMs);
-          probes.push({
-            name: host.probeName,
-            status: 'fail',
-            message: mapped.reason,
-            latencyMs: Math.max(0, Date.now() - startedWallMs),
-          });
-        }
-      }
-
-      const totalHosts = config.hosts.length;
-      const status = reachableHosts === totalHosts
-        ? 'healthy'
-        : reachableHosts > 0
-        ? 'degraded'
-        : 'unhealthy';
-
-      return {
-        status,
-        checkedAt: clock.nowIso(),
-        reachableHosts,
-        totalHosts,
-        probes,
-      };
+    health(ctx: CallContext): Promise<DirectoryHealth> {
+      return runLdapHealthCheck(config, session, clock, probeBaseDns, ctx);
     },
   };
 }

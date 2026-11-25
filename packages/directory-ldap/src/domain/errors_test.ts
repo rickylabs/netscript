@@ -9,11 +9,47 @@ import {
   InappropriateMatchingError,
   InsufficientAccessError,
   InvalidCredentialsError,
+  InvalidDNSyntaxError,
+  NoSuchObjectError,
   TimeLimitExceededError,
   TLSNotSupportedError,
   UnavailableError,
 } from 'ldapts';
-import { mapLdapError } from './errors.ts';
+import {
+  isLdapBaseDnMisconfigurationError,
+  isNonLdapProgramError,
+  mapLdapError,
+} from './errors.ts';
+
+Deno.test('mapLdapError prioritizes structured name/code over message text and classifies base-DN errors', () => {
+  // InvalidCredentialsError whose server text mentions "timed out" must still be DirectoryUnauthorized.
+  const badCredsWithTimeoutWord = mapLdapError(
+    new InvalidCredentialsError(
+      'Invalid credentials for CN=svc-secret,DC=example,DC=test (auth timed out)',
+    ),
+    'ldap',
+    'getUser',
+  );
+  assertInstanceOf(badCredsWithTimeoutWord, DirectoryUnauthorized);
+  assert(!badCredsWithTimeoutWord.message.includes('CN=svc-secret'));
+
+  const noSuch = new NoSuchObjectError('No such object DC=typo,DC=test');
+  assertEquals(isLdapBaseDnMisconfigurationError(noSuch), true);
+  const mappedNoSuch = mapLdapError(noSuch, 'ldap', 'searchUsers');
+  assertInstanceOf(mappedNoSuch, DirectoryUnavailable);
+  assert(mappedNoSuch.reason.includes('base DN'));
+  assert(!mappedNoSuch.message.includes('DC=typo'));
+
+  const badDn = new InvalidDNSyntaxError('Invalid DN syntax');
+  assertEquals(isLdapBaseDnMisconfigurationError(badDn), true);
+
+  const abortErr = new DOMException('Aborted', 'AbortError');
+  assertInstanceOf(mapLdapError(abortErr, 'ldap', 'getUser'), DirectoryUnavailable);
+
+  assertEquals(isNonLdapProgramError(new TypeError('bug')), true);
+  assertEquals(isNonLdapProgramError(new RangeError('range')), true);
+  assertEquals(isNonLdapProgramError(new UnavailableError('down')), false);
+});
 
 Deno.test('mapLdapError maps ldapts and transport errors to canonical typed core errors', () => {
   const badCreds = mapLdapError(

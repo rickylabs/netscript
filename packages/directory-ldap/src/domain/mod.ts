@@ -25,6 +25,7 @@ export {
   DEFAULT_LDAP_CANDIDATE_BATCH_SIZE,
   DEFAULT_LDAP_PAGE_SIZE,
   DEFAULT_LDAP_TIMEOUT_MS,
+  LDAP_CAP_ACTIVE_DIRECTORY_OID,
   LDAP_MATCHING_RULE_IN_CHAIN_OID,
   type LdapAttributeMap,
   type LdapStaticConfigOptions,
@@ -36,4 +37,8 @@ export {
 } from './config-types.ts';
 
 export { resolveLdapConfig } from './config.ts';
-export { mapLdapError } from './errors.ts';
+export {
+  isLdapBaseDnMisconfigurationError,
+  isNonLdapProgramError,
+  mapLdapError,
+} from './errors.ts';

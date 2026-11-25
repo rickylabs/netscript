@@ -7,7 +7,10 @@
  * @module
  */
 
-import { DIRECTORY_MAX_SEARCH_LIMIT } from '@netscript/plugin-directory-core';
+import {
+  DIRECTORY_MAX_SEARCH_LIMIT,
+  DIRECTORY_MAX_TIMEOUT_MS,
+} from '@netscript/plugin-directory-core';
 import {
   DEFAULT_LDAP_CANDIDATE_BATCH_SIZE,
   DEFAULT_LDAP_PAGE_SIZE,
@@ -20,6 +23,12 @@ import {
   type ResolvedLdapHost,
 } from './config-types.ts';
 
+const VALID_TLS_MODES: ReadonlySet<string> = new Set([
+  'ldaps',
+  'starttls',
+  'insecure-plaintext-dev',
+]);
+
 function requireNonEmptyString(value: unknown, fieldName: string): string {
   if (typeof value !== 'string' || value.trim().length === 0) {
     throw new RangeError(`LDAP configuration "${fieldName}" must be a non-empty string.`);
@@ -31,10 +40,16 @@ function requirePositiveInt(
   value: number | undefined,
   fallback: number,
   fieldName: string,
+  maxValue?: number,
 ): number {
   const effective = value ?? fallback;
   if (!Number.isInteger(effective) || effective < 1) {
     throw new RangeError(`LDAP configuration "${fieldName}" must be a positive integer.`);
+  }
+  if (maxValue !== undefined && effective > maxValue) {
+    throw new RangeError(
+      `LDAP configuration "${fieldName}" must be <= ${maxValue}.`,
+    );
   }
   return effective;
 }
@@ -168,6 +183,12 @@ export function resolveLdapConfig(options: LdapStaticConfigOptions): ResolvedLda
         'LDAP TLS certificate verification (rejectUnauthorized: true) cannot be disabled; pass tls.caFile for private CAs.',
       );
     }
+    const rawMode = (tls as Record<string, unknown>).mode;
+    if (rawMode !== undefined && (typeof rawMode !== 'string' || !VALID_TLS_MODES.has(rawMode))) {
+      throw new RangeError(
+        'LDAP configuration "tls.mode" must be "ldaps", "starttls", or "insecure-plaintext-dev".',
+      );
+    }
     if (tls.mode === 'insecure-plaintext-dev' && tls.allowInsecurePlaintextDev !== true) {
       throw new RangeError(
         'tls.mode="insecure-plaintext-dev" requires tls.allowInsecurePlaintextDev=true.',
@@ -206,11 +227,13 @@ export function resolveLdapConfig(options: LdapStaticConfigOptions): ResolvedLda
     options.defaultTimeoutMs,
     DEFAULT_LDAP_TIMEOUT_MS,
     'defaultTimeoutMs',
+    DIRECTORY_MAX_TIMEOUT_MS,
   );
   const connectTimeoutMs = requirePositiveInt(
     options.connectTimeoutMs,
     Math.min(defaultTimeoutMs, 3_000),
     'connectTimeoutMs',
+    DIRECTORY_MAX_TIMEOUT_MS,
   );
   const candidateBatchSize = requirePositiveInt(
     options.candidateBatchSize,

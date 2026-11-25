@@ -1,7 +1,7 @@
 {
   "name": "@netscript/directory-ldap",
   "version": "0.0.9",
-  "description": "Active Directory and LDAP adapter implementing NetScript's DirectoryPort.",
+  "description": "Active Directory and Samba AD adapter implementing NetScript's DirectoryPort over strict TLS.",
   "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts"
@@ -20,7 +20,6 @@
   "publish": {
     "include": [
       "README.md",
-      "CHANGELOG.md",
       "deno.json",
       "mod.ts",
       "src/**/*.ts"

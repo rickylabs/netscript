@@ -3,13 +3,15 @@
  *
  * Strictly separates direct `ldaps://` (`tlsOptions` on `Client`) from `ldap://` StartTLS
  * (plain TCP `Client` followed by `client.startTLS(...)`) because `ldapts` switches to direct TLS
- * whenever `tlsOptions` has any defined property.
+ * whenever `tlsOptions` has any defined property. Uses `client.searchPaginated` in
+ * `searchBounded` so broad directory queries stop reading pages once `maxEntries` are collected.
  *
  * @module
  */
 
 import { Client, type Entry, Filter } from 'ldapts';
 import type {
+  LdapBoundedSearchParams,
   LdapClientConnectOptions,
   LdapClientFactory,
   LdapClientPort,
@@ -48,6 +50,13 @@ function normalizeEntry(entry: Entry): LdapRawEntry {
   return out as LdapRawEntry;
 }
 
+function assertFilterAst(filter: unknown): Filter {
+  if (!(filter instanceof Filter)) {
+    throw new TypeError('LDAP search filter must be an ldapts Filter AST instance.');
+  }
+  return filter;
+}
+
 /**
  * Creates an {@link LdapClientPort} wrapping `ldapts.Client`.
  *
@@ -84,12 +93,10 @@ export function createLdaptsClient(connectOptions: LdapClientConnectOptions): Ld
       await client.bind(dn, password);
     },
     async search(baseDn: string, params: LdapSearchParams): Promise<LdapSearchResult> {
-      if (!(params.filter instanceof Filter)) {
-        throw new TypeError('LDAP search filter must be an ldapts Filter AST instance.');
-      }
+      const filter = assertFilterAst(params.filter);
       const result = await client.search(baseDn, {
         scope: params.scope,
-        filter: params.filter,
+        filter,
         attributes: [...params.attributes],
         ...(params.explicitBufferAttributes !== undefined
           ? { explicitBufferAttributes: [...params.explicitBufferAttributes] }
@@ -101,6 +108,41 @@ export function createLdaptsClient(connectOptions: LdapClientConnectOptions): Ld
       return {
         searchEntries: result.searchEntries.map(normalizeEntry),
       };
+    },
+    async searchBounded(
+      baseDn: string,
+      params: LdapBoundedSearchParams,
+    ): Promise<LdapSearchResult> {
+      const filter = assertFilterAst(params.filter);
+      if (!Number.isInteger(params.maxEntries) || params.maxEntries < 1) {
+        throw new RangeError('LDAP bounded search maxEntries must be a positive integer.');
+      }
+      const pageSize = Math.max(
+        1,
+        Math.min(params.paged?.pageSize ?? params.maxEntries, params.maxEntries),
+      );
+      const collected: LdapRawEntry[] = [];
+      const pages = client.searchPaginated(baseDn, {
+        scope: params.scope,
+        filter,
+        attributes: [...params.attributes],
+        ...(params.explicitBufferAttributes !== undefined
+          ? { explicitBufferAttributes: [...params.explicitBufferAttributes] }
+          : {}),
+        sizeLimit: 0,
+        timeLimit: params.timeLimit,
+        paged: { pageSize },
+      });
+
+      for await (const page of pages) {
+        for (const entry of page.searchEntries) {
+          collected.push(normalizeEntry(entry));
+          if (collected.length >= params.maxEntries) {
+            return { searchEntries: collected };
+          }
+        }
+      }
+      return { searchEntries: collected };
     },
     async unbind(): Promise<void> {
       await client.unbind();

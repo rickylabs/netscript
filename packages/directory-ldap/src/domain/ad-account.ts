@@ -81,10 +81,10 @@ export function decodeAdAccountExpires(rawValue: string | undefined): string | u
   } catch {
     return '1970-01-01T00:00:00.000Z';
   }
-  if (ticks === 0n || ticks >= FILETIME_NEVER_EXPIRES_MAX) {
+  if (ticks === 0n || ticks === FILETIME_NEVER_EXPIRES_MAX) {
     return undefined;
   }
-  if (ticks < FILETIME_UNIX_EPOCH_TICKS) {
+  if (ticks > FILETIME_NEVER_EXPIRES_MAX || ticks < FILETIME_UNIX_EPOCH_TICKS) {
     return '1970-01-01T00:00:00.000Z';
   }
   const unixMsBig = (ticks - FILETIME_UNIX_EPOCH_TICKS) / FILETIME_TICKS_PER_MS;

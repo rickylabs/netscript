@@ -7,6 +7,9 @@
 /** Active Directory matching rule OID for transitive membership (`LDAP_MATCHING_RULE_IN_CHAIN`). */
 export const LDAP_MATCHING_RULE_IN_CHAIN_OID: string = '1.2.840.113556.1.4.1941';
 
+/** Active Directory / Samba AD RootDSE capability OID (`LDAP_CAP_ACTIVE_DIRECTORY_OID`). */
+export const LDAP_CAP_ACTIVE_DIRECTORY_OID: string = '1.2.840.113556.1.4.800';
+
 /** Default per-operation LDAP timeout in milliseconds when `CallContext.timeoutMs` is omitted. */
 export const DEFAULT_LDAP_TIMEOUT_MS: number = 5_000;
 

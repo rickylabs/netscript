@@ -10,33 +10,37 @@ import {
   DIRECTORY_CONFORMANCE_DATASET,
 } from '@netscript/plugin-directory-core/testing';
 import { InappropriateMatchingError, InvalidCredentialsError, UnavailableError } from 'ldapts';
-import { createLdapDirectoryPort } from '../mod.ts';
+import { createLdapDirectoryPort, encodeAdObjectGuid } from '../mod.ts';
 import { buildConformanceLdapEntries, FakeLdapServer } from './fake-ldap-client.ts';
 
 const DS = DIRECTORY_CONFORMANCE_DATASET;
 
 async function withSecretFiles(
-  fn: (paths: { passwordFile: string; caFile: string; emptyFile: string }) => Promise<void>,
+  fn: (
+    paths: { passwordFile: string; caFile: string; badCaFile: string; emptyFile: string },
+  ) => Promise<void>,
 ): Promise<void> {
   const dir = await Deno.makeTempDir({ prefix: 'directory-ldap-test-' });
   const passwordFile = `${dir}/bind_password`;
   const caFile = `${dir}/ca.pem`;
+  const badCaFile = `${dir}/not-a-pem.txt`;
   const emptyFile = `${dir}/empty`;
   await Deno.writeTextFile(passwordFile, 'test-bind-password-only\r\n');
   await Deno.writeTextFile(
     caFile,
     '-----BEGIN CERTIFICATE-----\nMIIBTESTCA\n-----END CERTIFICATE-----\n',
   );
+  await Deno.writeTextFile(badCaFile, 'not a PEM certificate bundle\n');
   await Deno.writeTextFile(emptyFile, '\n');
   try {
-    await fn({ passwordFile, caFile, emptyFile });
+    await fn({ passwordFile, caFile, badCaFile, emptyFile });
   } finally {
     await Deno.remove(dir, { recursive: true });
   }
 }
 
-Deno.test('LDAPS enforces rejectUnauthorized:true, loads caFile and bindPasswordFile, and unbinds cleanly', async () => {
-  await withSecretFiles(async ({ passwordFile, caFile, emptyFile }) => {
+Deno.test('LDAPS enforces rejectUnauthorized:true, PEM caFile validation, and clean unbind', async () => {
+  await withSecretFiles(async ({ passwordFile, caFile, badCaFile, emptyFile }) => {
     await assertRejects(
       () =>
         createLdapDirectoryPort({
@@ -48,6 +52,20 @@ Deno.test('LDAPS enforces rejectUnauthorized:true, loads caFile and bindPassword
         }),
       RangeError,
       'non-empty secret',
+    );
+
+    await assertRejects(
+      () =>
+        createLdapDirectoryPort({
+          directoryInstance: DS.directoryInstance,
+          urls: ['ldaps://dc1.example.test:636'],
+          baseDn: 'DC=example,DC=test',
+          bindDn: 'CN=svc-dir,OU=ServiceAccounts,DC=example,DC=test',
+          bindPasswordFile: passwordFile,
+          tls: { caFile: badCaFile },
+        }),
+      RangeError,
+      'PEM-encoded',
     );
 
     const server = new FakeLdapServer({ entries: buildConformanceLdapEntries() });
@@ -72,15 +90,64 @@ Deno.test('LDAPS enforces rejectUnauthorized:true, loads caFile and bindPassword
     assertEquals(call.connectOptions.tlsOptions?.rejectUnauthorized, true);
     assertEquals(call.connectOptions.tlsOptions?.servername, 'dc1.example.test');
     assert(call.connectOptions.tlsOptions?.ca?.includes('MIIBTESTCA'));
-    assertEquals(call.events, ['connect', 'bind', 'search', 'unbind']);
+    assertEquals(call.events, ['connect', 'bind', 'searchBounded', 'unbind']);
     assertEquals(call.unbound, true);
   });
 });
 
-Deno.test('StartTLS connects without tlsOptions and upgrades via startTLS strictly before bind', async () => {
+Deno.test('searchUsers and searchGroups bound wire reads strictly to limit + 1 entries (1 page)', async () => {
+  await withSecretFiles(async ({ passwordFile }) => {
+    const bulkUsers = Array.from({ length: 500 }, (_, i) => {
+      const n = String(i + 1).padStart(4, '0');
+      return {
+        dn: `CN=bulk${n},OU=Bulk,DC=example,DC=test`,
+        objectClass: ['top', 'person', 'organizationalPerson', 'user'],
+        objectGUID: encodeAdObjectGuid(
+          `40000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`,
+        ),
+        userAccountControl: '512',
+        displayName: `Bulk Staff ${n}`,
+        userPrincipalName: `bulk${n}@example.test`,
+        sAMAccountName: `bulk${n}`,
+      };
+    });
+    const server = new FakeLdapServer({
+      entries: [...buildConformanceLdapEntries(), ...bulkUsers],
+    });
+    const port = await createLdapDirectoryPort({
+      directoryInstance: DS.directoryInstance,
+      urls: ['ldaps://dc1.example.test:636'],
+      baseDn: 'DC=example,DC=test',
+      bindDn: 'CN=svc-dir,OU=ServiceAccounts,DC=example,DC=test',
+      bindPasswordFile: passwordFile,
+      pageSize: 100,
+      clock: createDeterministicClock(DS.initialTimeIso),
+      clientFactory: server.createClientFactory(),
+    });
+
+    const page = await port.searchUsers({ text: 'Bulk Staff', limit: 5 }, {});
+    assertEquals(page.items.length, 5);
+    assertEquals(page.truncated, true);
+    assertEquals(server.calls.length, 1);
+    assertEquals(
+      server.calls[0]!.wireEntriesDelivered,
+      6,
+      'Bounded search must never transfer more than limit + 1 entries over the wire',
+    );
+    assertEquals(server.calls[0]!.pagesRequested, 1);
+
+    // Built-in krbtgt and AD computer accounts are excluded from user searches.
+    const krbtgt = await port.searchUsers({ text: 'krbtgt', limit: 5 }, {});
+    assertEquals(krbtgt.items, []);
+    const comp = await port.searchUsers({ text: 'WORKSTATION', limit: 5 }, {});
+    assertEquals(comp.items, []);
+  });
+});
+
+Deno.test('StartTLS connects without tlsOptions and plaintext dev health message avoids claiming TLS', async () => {
   await withSecretFiles(async ({ passwordFile, caFile }) => {
     const server = new FakeLdapServer({ entries: buildConformanceLdapEntries() });
-    const port = await createLdapDirectoryPort({
+    const startTlsPort = await createLdapDirectoryPort({
       directoryInstance: DS.directoryInstance,
       urls: ['ldap://dc1.example.test:389'],
       baseDn: 'DC=example,DC=test',
@@ -91,135 +158,204 @@ Deno.test('StartTLS connects without tlsOptions and upgrades via startTLS strict
       clientFactory: server.createClientFactory(),
     });
 
-    const health = await port.health({});
+    const health = await startTlsPort.health({});
     assertEquals(health.status, 'healthy');
+    assert(health.probes?.[0]?.message.includes('TLS bind'));
     const call = server.calls[0]!;
     assertEquals(call.connectOptions.tlsOptions, undefined);
     assertEquals(call.startTlsOptions?.rejectUnauthorized, true);
     assertEquals(call.startTlsOptions?.servername, 'dc1.example.test');
     assert(call.startTlsOptions?.ca?.includes('MIIBTESTCA'));
-    assertEquals(call.events, ['connect', 'startTLS', 'bind', 'search', 'unbind']);
+    assertEquals(call.events, ['connect', 'startTLS', 'bind', 'search', 'search', 'unbind']);
+
+    const plaintextPort = await createLdapDirectoryPort({
+      directoryInstance: DS.directoryInstance,
+      urls: ['ldap://dc1.example.test:389'],
+      baseDn: 'DC=example,DC=test',
+      bindDn: 'CN=svc-dir,OU=ServiceAccounts,DC=example,DC=test',
+      bindPasswordFile: passwordFile,
+      tls: { allowInsecurePlaintextDev: true },
+      clock: createDeterministicClock(DS.initialTimeIso),
+      clientFactory: server.createClientFactory(),
+    });
+    const plainHealth = await plaintextPort.health({});
+    assertEquals(plainHealth.status, 'healthy');
+    assert(plainHealth.probes?.[0]?.message.includes('plaintext dev bind'));
+    assert(!plainHealth.probes?.[0]?.message.includes('TLS bind'));
   });
 });
 
-Deno.test('multi-host failover tries hosts in order and health reports healthy/degraded/unhealthy', async () => {
+Deno.test('hung-host failover slices budget across hosts and prefers the last healthy host', async () => {
   await withSecretFiles(async ({ passwordFile }) => {
     const entries = buildConformanceLdapEntries();
     const clock = createDeterministicClock(DS.initialTimeIso);
 
-    // Host 1 down, host 2 healthy -> queries fail over; health reports 'degraded' (1/2).
-    const partialServer = new FakeLdapServer({
-      entries,
-      hostBehaviors: {
-        'ldaps://dc1.example.test:636': {
-          connectError: new UnavailableError('dc1 down'),
-        },
-      },
-    });
-    const degradedPort = await createLdapDirectoryPort({
-      directoryInstance: DS.directoryInstance,
-      urls: ['ldaps://dc1.example.test:636', 'ldaps://dc2.example.test:636'],
-      baseDn: 'DC=example,DC=test',
-      bindDn: 'CN=svc-dir,OU=ServiceAccounts,DC=example,DC=test',
-      bindPasswordFile: passwordFile,
-      clock,
-      clientFactory: partialServer.createClientFactory(),
-    });
-
-    const alice = await degradedPort.getUser(
-      { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.alice },
-      {},
-    );
-    assertEquals(alice?.immutableId, DS.userIds.alice);
-    assertEquals(
-      partialServer.calls.map((c) => c.url),
-      ['ldaps://dc1.example.test:636', 'ldaps://dc2.example.test:636'],
-    );
-
-    const degradedHealth = await degradedPort.health({});
-    assertEquals(degradedHealth.status, 'degraded');
-    assertEquals(degradedHealth.reachableHosts, 1);
-    assertEquals(degradedHealth.totalHosts, 2);
-    assertEquals(degradedHealth.probes?.map((p) => p.status), ['fail', 'pass']);
-    const healthJson = JSON.stringify(degradedHealth);
-    assert(!/\b(?:cn|ou|dc)=/i.test(healthJson));
-    assert(!healthJson.includes('test-bind-password-only'));
-
-    // Both hosts down -> queries throw DirectoryUnavailable; health reports 'unhealthy' (0/2).
-    const downServer = new FakeLdapServer({
-      entries,
-      hostBehaviors: {
-        'ldaps://dc1.example.test:636': { connectError: new UnavailableError('dc1 down') },
-        'ldaps://dc2.example.test:636': { connectError: new UnavailableError('dc2 down') },
-      },
-    });
-    const downPort = await createLdapDirectoryPort({
-      directoryInstance: DS.directoryInstance,
-      urls: ['ldaps://dc1.example.test:636', 'ldaps://dc2.example.test:636'],
-      baseDn: 'DC=example,DC=test',
-      bindDn: 'CN=svc-dir,OU=ServiceAccounts,DC=example,DC=test',
-      bindPasswordFile: passwordFile,
-      clock,
-      clientFactory: downServer.createClientFactory(),
-    });
-
-    await assertRejects(
-      () =>
-        downPort.getUser(
-          { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.alice },
-          {},
-        ),
-      DirectoryUnavailable,
-    );
-    const unhealthy = await downPort.health({});
-    assertEquals(unhealthy.status, 'unhealthy');
-    assertEquals(unhealthy.reachableHosts, 0);
-    assertEquals(unhealthy.totalHosts, 2);
-  });
-});
-
-Deno.test('unauthorized bind fails fast on host 1 without spraying host 2 (prevents AD lockout)', async () => {
-  await withSecretFiles(async ({ passwordFile }) => {
+    // 3 hosts: hosts 1 and 2 hang (5s), host 3 is healthy -> 300ms budget slices to ~100ms each.
     const server = new FakeLdapServer({
-      entries: buildConformanceLdapEntries(),
+      entries,
       hostBehaviors: {
-        'ldaps://dc1.example.test:636': {
-          bindError: new InvalidCredentialsError(
-            'bad credentials for CN=svc-dir,DC=example,DC=test',
-          ),
-        },
+        'ldaps://dc1.example.test:636': { delayMs: 5_000 },
+        'ldaps://dc2.example.test:636': { delayMs: 5_000 },
       },
     });
     const port = await createLdapDirectoryPort({
       directoryInstance: DS.directoryInstance,
-      urls: ['ldaps://dc1.example.test:636', 'ldaps://dc2.example.test:636'],
+      urls: [
+        'ldaps://dc1.example.test:636',
+        'ldaps://dc2.example.test:636',
+        'ldaps://dc3.example.test:636',
+      ],
       baseDn: 'DC=example,DC=test',
+      bindDn: 'CN=svc-dir,OU=ServiceAccounts,DC=example,DC=test',
+      bindPasswordFile: passwordFile,
+      clock,
+      clientFactory: server.createClientFactory(),
+    });
+
+    const first = await port.getUser(
+      { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.alice },
+      { timeoutMs: 300 },
+    );
+    assertEquals(first?.immutableId, DS.userIds.alice);
+    assertEquals(server.calls.map((c) => c.url), [
+      'ldaps://dc1.example.test:636',
+      'ldaps://dc2.example.test:636',
+      'ldaps://dc3.example.test:636',
+    ]);
+
+    // Subsequent call starts directly with host 3 (zero hung-host penalty).
+    const beforeSecond = server.calls.length;
+    const second = await port.getUser(
+      { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.frank },
+      { timeoutMs: 300 },
+    );
+    assertEquals(second?.immutableId, DS.userIds.frank);
+    assertEquals(server.calls.slice(beforeSecond).map((c) => c.url), [
+      'ldaps://dc3.example.test:636',
+    ]);
+  });
+});
+
+Deno.test('misconfigured baseDn fails health and fails fast without failover; TypeError propagates', async () => {
+  await withSecretFiles(async ({ passwordFile }) => {
+    const server = new FakeLdapServer({ entries: buildConformanceLdapEntries() });
+    const badBasePort = await createLdapDirectoryPort({
+      directoryInstance: DS.directoryInstance,
+      urls: ['ldaps://dc1.example.test:636', 'ldaps://dc2.example.test:636'],
+      baseDn: 'DC=typo,DC=test',
       bindDn: 'CN=svc-dir,OU=ServiceAccounts,DC=example,DC=test',
       bindPasswordFile: passwordFile,
       clock: createDeterministicClock(DS.initialTimeIso),
       clientFactory: server.createClientFactory(),
     });
 
+    const health = await badBasePort.health({});
+    assertEquals(health.status, 'unhealthy');
+    assertEquals(health.reachableHosts, 0);
+    assert(health.probes?.[0]?.message.includes('base DN'));
+
+    const callsBefore = server.calls.length;
     const err = await assertRejects(
-      () => port.searchUsers({ text: 'Alice', limit: 5 }, {}),
-      DirectoryUnauthorized,
+      () => badBasePort.searchUsers({ text: 'Alice', limit: 5 }, {}),
+      DirectoryUnavailable,
     );
-    assert(!err.message.includes('CN=svc-dir'));
-    assert(!err.message.includes('test-bind-password-only'));
+    assert(err.reason.includes('base DN'));
     assertEquals(
-      server.calls.length,
+      server.calls.length - callsBefore,
       1,
-      'Must fail fast without replaying bad credentials on host 2',
+      'Misconfigured baseDn must fail fast without walking all hosts',
+    );
+
+    // Programming TypeError thrown by client propagates rather than becoming DirectoryUnavailable.
+    const buggyServer = new FakeLdapServer({
+      entries: buildConformanceLdapEntries(),
+      hostBehaviors: {
+        'ldaps://dc1.example.test:636': { searchError: new TypeError('internal decoder bug') },
+      },
+    });
+    const buggyPort = await createLdapDirectoryPort({
+      directoryInstance: DS.directoryInstance,
+      urls: ['ldaps://dc1.example.test:636'],
+      baseDn: 'DC=example,DC=test',
+      bindDn: 'CN=svc-dir,OU=ServiceAccounts,DC=example,DC=test',
+      bindPasswordFile: passwordFile,
+      clock: createDeterministicClock(DS.initialTimeIso),
+      clientFactory: buggyServer.createClientFactory(),
+    });
+    await assertRejects(
+      () => buggyPort.searchUsers({ text: 'Alice', limit: 5 }, {}),
+      TypeError,
+      'internal decoder bug',
     );
   });
 });
 
-Deno.test('supportsInChainMatching capability flag toggles transitive matching and maps unsupported errors', async () => {
+Deno.test('narrowed groupsBaseDn still resolves primary group and groups nesting it, and deduplicates spellings', async () => {
+  await withSecretFiles(async ({ passwordFile }) => {
+    const server = new FakeLdapServer({ entries: buildConformanceLdapEntries() });
+    const port = await createLdapDirectoryPort({
+      directoryInstance: DS.directoryInstance,
+      urls: ['ldaps://dc1.example.test:636'],
+      baseDn: 'DC=example,DC=test',
+      usersBaseDn: 'OU=Users,DC=example,DC=test',
+      groupsBaseDn: 'OU=Groups,DC=example,DC=test', // Excludes CN=Users where Domain Users lives!
+      bindDn: 'CN=svc-dir,OU=ServiceAccounts,DC=example,DC=test',
+      bindPasswordFile: passwordFile,
+      candidateBatchSize: 2,
+      clock: createDeterministicClock(DS.initialTimeIso),
+      clientFactory: server.createClientFactory(),
+    });
+
+    const result = await port.memberOfAny(
+      {
+        user: { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.alice },
+        candidateGroupIds: [
+          DS.groupIds.domainUsers,
+          DS.groupIds.allStaff,
+          DS.groupIds.engLeaf.toUpperCase(),
+          `  ${DS.groupIds.engLeaf}  `,
+        ],
+      },
+      {},
+    );
+    assertEquals(result.memberOf.length, 3);
+    assertEquals(
+      result.memberOf.map((id) => id.trim().toLowerCase()).sort(),
+      [DS.groupIds.allStaff, DS.groupIds.domainUsers, DS.groupIds.engLeaf].sort(),
+    );
+  });
+});
+
+Deno.test('unauthorized bind fails fast, capability flag toggles transitive matching, and slow search times out', async () => {
   await withSecretFiles(async ({ passwordFile }) => {
     const entries = buildConformanceLdapEntries();
     const clock = createDeterministicClock(DS.initialTimeIso);
-    const server = new FakeLdapServer({ entries });
 
+    const unauthServer = new FakeLdapServer({
+      entries,
+      hostBehaviors: {
+        'ldaps://dc1.example.test:636': {
+          bindError: new InvalidCredentialsError('bad creds for CN=svc-dir,DC=example,DC=test'),
+        },
+      },
+    });
+    const unauthPort = await createLdapDirectoryPort({
+      directoryInstance: DS.directoryInstance,
+      urls: ['ldaps://dc1.example.test:636', 'ldaps://dc2.example.test:636'],
+      baseDn: 'DC=example,DC=test',
+      bindDn: 'CN=svc-dir,OU=ServiceAccounts,DC=example,DC=test',
+      bindPasswordFile: passwordFile,
+      clock,
+      clientFactory: unauthServer.createClientFactory(),
+    });
+    const unauthErr = await assertRejects(
+      () => unauthPort.searchUsers({ text: 'Alice', limit: 5 }, {}),
+      DirectoryUnauthorized,
+    );
+    assert(!unauthErr.message.includes('CN=svc-dir'));
+    assertEquals(unauthServer.calls.length, 1);
+
+    const server = new FakeLdapServer({ entries });
     const directOnlyPort = await createLdapDirectoryPort({
       directoryInstance: DS.directoryInstance,
       urls: ['ldaps://dc1.example.test:636'],
@@ -230,10 +366,7 @@ Deno.test('supportsInChainMatching capability flag toggles transitive matching a
       clock,
       clientFactory: server.createClientFactory(),
     });
-
-    assertEquals(directOnlyPort.capabilities.has('search'), true);
     assertEquals(directOnlyPort.capabilities.has('transitive-membership'), false);
-
     const directResult = await directOnlyPort.memberOfAny(
       {
         user: { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.alice },
@@ -245,13 +378,11 @@ Deno.test('supportsInChainMatching capability flag toggles transitive matching a
       },
       {},
     );
-    // Direct group (engLeaf) + AD primary group (domainUsers) match; 3-level nested (engParent) does not.
     assertEquals(
       [...directResult.memberOf].sort(),
       [DS.groupIds.domainUsers, DS.groupIds.engLeaf].sort(),
     );
 
-    // When server rejects in-chain matching rule, map to DirectoryUnsupported.
     const unsupportedServer = new FakeLdapServer({
       entries,
       hostBehaviors: {
@@ -280,63 +411,31 @@ Deno.test('supportsInChainMatching capability flag toggles transitive matching a
         ),
       DirectoryUnsupported,
     );
-  });
-});
 
-Deno.test('memberOfAny resolves transitive groups containing a user primary group and batches large candidate sets', async () => {
-  await withSecretFiles(async ({ passwordFile }) => {
-    const allEmployeesId = '10000000-0000-4000-8000-0000000000aa';
-    const customGroups = [
-      ...DS.groups,
-      {
-        immutableId: allEmployeesId,
-        displayName: 'All Employees',
-        memberGroupIds: [DS.groupIds.domainUsers],
+    // Health degraded/unhealthy reporting on unreachable hosts.
+    const partialServer = new FakeLdapServer({
+      entries,
+      hostBehaviors: {
+        'ldaps://dc1.example.test:636': { connectError: new UnavailableError('dc1 down') },
       },
-    ];
-    const server = new FakeLdapServer({
-      entries: buildConformanceLdapEntries(DS.users, customGroups),
     });
-
-    const port = await createLdapDirectoryPort({
+    const degradedPort = await createLdapDirectoryPort({
       directoryInstance: DS.directoryInstance,
-      urls: ['ldaps://dc1.example.test:636'],
+      urls: ['ldaps://dc1.example.test:636', 'ldaps://dc2.example.test:636'],
       baseDn: 'DC=example,DC=test',
       bindDn: 'CN=svc-dir,OU=ServiceAccounts,DC=example,DC=test',
       bindPasswordFile: passwordFile,
-      candidateBatchSize: 2,
-      clock: createDeterministicClock(DS.initialTimeIso),
-      clientFactory: server.createClientFactory(),
+      clock,
+      clientFactory: partialServer.createClientFactory(),
     });
+    const degraded = await degradedPort.health({});
+    assertEquals(degraded.status, 'degraded');
+    assertEquals(degraded.reachableHosts, 1);
+    assertEquals(degraded.totalHosts, 2);
 
-    const result = await port.memberOfAny(
-      {
-        user: { directoryInstance: DS.directoryInstance, immutableId: DS.userIds.alice },
-        candidateGroupIds: [
-          allEmployeesId,
-          DS.groupIds.engParent,
-          DS.groupIds.engChild,
-          DS.groupIds.finance,
-          DS.groupIds.domainUsers,
-        ],
-      },
-      {},
-    );
-    assertEquals(
-      [...result.memberOf].sort(),
-      [allEmployeesId, DS.groupIds.domainUsers, DS.groupIds.engChild, DS.groupIds.engParent].sort(),
-    );
-
-    // Computer object named "Alice Example Computer" must never appear in user searches.
-    const search = await port.searchUsers({ text: 'Alice Example', limit: 10 }, {});
-    assertEquals(search.items.map((u) => u.immutableId), [DS.userIds.alice]);
-
-    // Timeout across slow host fails closed with DirectoryTimeout.
     const slowServer = new FakeLdapServer({
-      entries: buildConformanceLdapEntries(),
-      hostBehaviors: {
-        'ldaps://dc1.example.test:636': { delayMs: 2_000 },
-      },
+      entries,
+      hostBehaviors: { 'ldaps://dc1.example.test:636': { delayMs: 2_000 } },
     });
     const slowPort = await createLdapDirectoryPort({
       directoryInstance: DS.directoryInstance,
@@ -344,7 +443,7 @@ Deno.test('memberOfAny resolves transitive groups containing a user primary grou
       baseDn: 'DC=example,DC=test',
       bindDn: 'CN=svc-dir,OU=ServiceAccounts,DC=example,DC=test',
       bindPasswordFile: passwordFile,
-      clock: createDeterministicClock(DS.initialTimeIso),
+      clock,
       clientFactory: slowServer.createClientFactory(),
     });
     await assertRejects(

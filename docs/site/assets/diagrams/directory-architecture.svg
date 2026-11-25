@@ -67,9 +67,9 @@
   <rect x="498" y="284" width="428" height="56" rx="8" class="node-success-featured" />
   <text x="712" y="308" text-anchor="middle" class="title-fg">DirectoryPort + conformance suite</text>
   <text x="712" y="328" text-anchor="middle" class="eyebrow-success" font-family="var(--ns-font-mono, ui-monospace, monospace)">@netscript/plugin-directory-core</text>
-  <rect x="498" y="366" width="134" height="62" rx="8" class="node-success-planned" />
+  <rect x="498" y="366" width="134" height="62" rx="8" class="node-success" />
   <text x="565" y="393" text-anchor="middle" class="title-fg">directory-ldap</text>
-  <text x="565" y="414" text-anchor="middle" class="sub-fg">AD / Samba · planned</text>
+  <text x="565" y="414" text-anchor="middle" class="sub-fg">ldapts · AD / Samba</text>
   <rect x="645" y="366" width="134" height="62" rx="8" class="node-success-planned" />
   <text x="712" y="393" text-anchor="middle" class="title-fg">directory-entra</text>
   <text x="712" y="414" text-anchor="middle" class="sub-fg">Graph · planned</text>
@@ -79,7 +79,7 @@
   <!-- Zone 3: Enterprise directories (read-only) -->
   <rect x="498" y="482" width="446" height="118" rx="10" class="zone-info" />
   <text x="721" y="507" text-anchor="middle" class="eyebrow-info">Enterprise directories (read-only)</text>
-  <rect x="516" y="522" width="198" height="62" rx="8" class="node-info-planned" />
+  <rect x="516" y="522" width="198" height="62" rx="8" class="node-info" />
   <text x="615" y="549" text-anchor="middle" class="title-fg">Active Directory / Samba</text>
   <text x="615" y="570" text-anchor="middle" class="sub-fg">LDAPS / StartTLS, strict CA</text>
   <rect x="730" y="522" width="196" height="62" rx="8" class="node-info-planned" />
@@ -108,7 +108,7 @@
   <path d="M 712 340 L 569 363" class="edge-success" marker-end="url(#dir-arrow-success)" />
   <path d="M 712 340 L 712 362" class="edge-success" marker-end="url(#dir-arrow-success)" />
   <path d="M 712 340 L 855 363" class="edge-success" marker-end="url(#dir-arrow-success)" />
-  <path d="M 552 428 L 552 518" class="edge-info-dashed" marker-end="url(#dir-arrow-info)" />
+  <path d="M 552 428 L 552 518" class="edge-info" marker-end="url(#dir-arrow-info)" />
   <path d="M 712 428 L 712 470 L 854 470 L 854 518" class="edge-info-dashed" marker-end="url(#dir-arrow-info)" />
   <path d="M 298 738 L 344 738" class="edge-info" marker-end="url(#dir-arrow-info)" />
   <path d="M 662 738 L 616 738" class="edge-info" marker-end="url(#dir-arrow-info)" />

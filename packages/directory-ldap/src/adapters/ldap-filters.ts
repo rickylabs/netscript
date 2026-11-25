@@ -1,5 +1,5 @@
 /**
- * Pure `ldapts` filter AST builders for all directory queries.
+ * Pure `ldapts` filter AST builders for Active Directory / Samba AD queries.
  *
  * Every filter is constructed strictly from `ldapts` filter classes (`AndFilter`, `OrFilter`,
  * `NotFilter`, `EqualityFilter`, `SubstringFilter`, `PresenceFilter`, `ExtensibleFilter`).
@@ -26,9 +26,13 @@ import {
   tryEncodeAdObjectGuid,
 } from '../domain/mod.ts';
 
-function buildUserClassFilter(attributes: ResolvedLdapAttributeMap): Filter {
+function buildUserClassFilter(
+  attributes: ResolvedLdapAttributeMap,
+  excludeServiceBuiltins: boolean,
+): Filter {
   const filters: Filter[] = [
     new EqualityFilter({ attribute: 'objectClass', value: attributes.userObjectClass }),
+    new PresenceFilter({ attribute: attributes.immutableId }),
   ];
   for (const excluded of attributes.excludeUserObjectClasses) {
     filters.push(
@@ -37,11 +41,23 @@ function buildUserClassFilter(attributes: ResolvedLdapAttributeMap): Filter {
       }),
     );
   }
-  return filters.length === 1 ? filters[0]! : new AndFilter({ filters });
+  if (excludeServiceBuiltins && attributes.userObjectClass.toLowerCase() === 'user') {
+    filters.push(
+      new NotFilter({
+        filter: new EqualityFilter({ attribute: attributes.username, value: 'krbtgt' }),
+      }),
+    );
+  }
+  return new AndFilter({ filters });
 }
 
 function buildGroupClassFilter(attributes: ResolvedLdapAttributeMap): Filter {
-  return new EqualityFilter({ attribute: 'objectClass', value: attributes.groupObjectClass });
+  return new AndFilter({
+    filters: [
+      new EqualityFilter({ attribute: 'objectClass', value: attributes.groupObjectClass }),
+      new PresenceFilter({ attribute: attributes.immutableId }),
+    ],
+  });
 }
 
 function uniqueAttributes(names: readonly string[]): string[] {
@@ -61,8 +77,9 @@ function uniqueAttributes(names: readonly string[]): string[] {
  * Builds an injection-safe `ldapts` filter AST for searching users by substring across
  * `displayName`, `userPrincipalName`, `mail`, and `username` (`sAMAccountName`).
  *
- * `SubstringFilter` encodes every character (including `*`, `(`, `)`, `\`, and `\0`) literally
- * via BER octet strings and RFC 4515 escaping.
+ * Excludes AD computer accounts and the built-in `krbtgt` account and requires a present
+ * `immutableId` (`objectGUID`). `SubstringFilter` encodes every character (including `*`, `(`,
+ * `)`, `\`, and `\0`) literally via BER octet strings.
  */
 export function buildUserSearchFilter(
   searchText: string,
@@ -83,7 +100,7 @@ export function buildUserSearchFilter(
     ),
   });
   return new AndFilter({
-    filters: [buildUserClassFilter(attributes), matchAnyField],
+    filters: [buildUserClassFilter(attributes, true), matchAnyField],
   });
 }
 
@@ -118,14 +135,14 @@ export function buildGroupSearchFilter(
  * Builds an injection-safe `ldapts` filter AST for looking up a single user by immutable
  * `objectGUID` (binary) or by secondary attribute (`userPrincipalName`, `mail`, or `username`).
  *
- * Returns `undefined` when looking up by `immutableId` that is not a valid canonical UUID.
+ * Returns `undefined` when looking up by an invalid UUID `immutableId` or a blank secondary value.
  */
 export function buildUserLookupFilter(
   lookup: UserLookup,
   attributes: ResolvedLdapAttributeMap,
 ): Filter | undefined {
   let selector: Filter;
-  if (lookup.immutableId !== undefined) {
+  if ('immutableId' in lookup && lookup.immutableId !== undefined) {
     const guidBytes = tryEncodeAdObjectGuid(lookup.immutableId);
     if (!guidBytes) {
       return undefined;
@@ -134,24 +151,35 @@ export function buildUserLookupFilter(
       attribute: attributes.immutableId,
       value: Buffer.from(guidBytes),
     });
-  } else if ('userPrincipalName' in lookup) {
+  } else if ('userPrincipalName' in lookup && lookup.userPrincipalName !== undefined) {
+    if (lookup.userPrincipalName.trim().length === 0) {
+      return undefined;
+    }
     selector = new EqualityFilter({
       attribute: attributes.userPrincipalName,
       value: lookup.userPrincipalName,
     });
-  } else if ('mail' in lookup) {
+  } else if ('mail' in lookup && lookup.mail !== undefined) {
+    if (lookup.mail.trim().length === 0) {
+      return undefined;
+    }
     selector = new EqualityFilter({
       attribute: attributes.mail,
       value: lookup.mail,
     });
-  } else {
+  } else if ('username' in lookup && lookup.username !== undefined) {
+    if (lookup.username.trim().length === 0) {
+      return undefined;
+    }
     selector = new EqualityFilter({
       attribute: attributes.username,
       value: lookup.username,
     });
+  } else {
+    return undefined;
   }
   return new AndFilter({
-    filters: [buildUserClassFilter(attributes), selector],
+    filters: [buildUserClassFilter(attributes, false), selector],
   });
 }
 
@@ -237,7 +265,7 @@ export function buildBoundedMembershipFilter(
 }
 
 /**
- * Builds a minimal `(objectClass=*)` presence filter for RootDSE health probes.
+ * Builds a minimal `(objectClass=*)` presence filter for RootDSE and base-DN health probes.
  */
 export function buildHealthProbeFilter(): Filter {
   return new PresenceFilter({ attribute: 'objectClass' });

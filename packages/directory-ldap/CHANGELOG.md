@@ -6,7 +6,7 @@ All notable changes to `@netscript/directory-ldap` are documented in this file.
 
 ### Added
 
-- Initial `DirectoryPort` adapter backed by `ldapts@9.3.1` for Active Directory and LDAP directories.
+- Initial `DirectoryPort` adapter backed by `ldapts@9.3.1` for Active Directory and Samba AD.
 - Strict TLS defaults (`ldaps://` or StartTLS with `rejectUnauthorized: true` and custom CA file
   loading; plaintext `ldap://` refused unless explicit dev opt-in is configured).
 - `*_FILE`-only service-account bind password loading at startup with redacted errors and health

@@ -119,7 +119,9 @@ Deno.test('Windows FILETIME accountExpires codec handles never-expires, BigInt p
   assertEquals(filetime, '134432352000000000');
   assertEquals(decodeAdAccountExpires(filetime), iso);
 
-  // Malformed FILETIME fails closed to Unix epoch (expired).
+  // Malformed or > Int64.Max FILETIME fails closed to Unix epoch (expired).
+  assertEquals(decodeAdAccountExpires('9223372036854775808'), '1970-01-01T00:00:00.000Z');
+  assertEquals(decodeAdAccountExpires('99999999999999999999'), '1970-01-01T00:00:00.000Z');
   assertEquals(decodeAdAccountExpires('garbage'), '1970-01-01T00:00:00.000Z');
   assertEquals(decodeAdAccountExpires('1000'), '1970-01-01T00:00:00.000Z');
 

@@ -2,7 +2,9 @@
  * Redacted error classification mapping LDAP/TLS/network/timeout errors to
  * `@netscript/plugin-directory-core` typed errors.
  *
- * Never echoes credentials, bind passwords, secret file paths, or distinguished names in messages.
+ * Classifies strictly by `ldapts` error name and RFC 4511 / system error code FIRST before
+ * consulting fallback message patterns, and never echoes credentials, bind passwords, secret file
+ * paths, or distinguished names in messages.
  *
  * @module
  */
@@ -23,6 +25,8 @@ const LDAP_STRONG_AUTH_REQUIRED = 8;
 const LDAP_UNAVAILABLE_CRITICAL_EXTENSION = 12;
 const LDAP_CONFIDENTIALITY_REQUIRED = 13;
 const LDAP_INAPPROPRIATE_MATCHING = 18;
+const LDAP_NO_SUCH_OBJECT = 32;
+const LDAP_INVALID_DN_SYNTAX = 34;
 const LDAP_INAPPROPRIATE_AUTHENTICATION = 48;
 const LDAP_INVALID_CREDENTIALS = 49;
 const LDAP_INSUFFICIENT_ACCESS_RIGHTS = 50;
@@ -33,6 +37,9 @@ const LDAP_UNWILLING_TO_PERFORM = 53;
 const TIMEOUT_ERROR_NAMES = new Set([
   'TimeLimitExceededError',
   'TimeoutError',
+]);
+
+const ABORT_ERROR_NAMES = new Set([
   'AbortError',
 ]);
 
@@ -51,6 +58,11 @@ const UNSUPPORTED_ERROR_NAMES = new Set([
   'TLSNotSupportedError',
 ]);
 
+const BASE_DN_MISCONFIG_ERROR_NAMES = new Set([
+  'NoSuchObjectError',
+  'InvalidDNSyntaxError',
+]);
+
 const TLS_ERROR_CODES = new Set([
   'UNABLE_TO_VERIFY_LEAF_SIGNATURE',
   'SELF_SIGNED_CERT_IN_CHAIN',
@@ -65,7 +77,6 @@ const TLS_ERROR_CODES = new Set([
 const TIMEOUT_SYSTEM_CODES = new Set([
   'ETIMEDOUT',
   'ESOCKETTIMEDOUT',
-  'ABORT_ERR',
 ]);
 
 function readErrorCode(err: unknown): number | string | undefined {
@@ -99,8 +110,39 @@ function readErrorMessage(err: unknown): string {
 }
 
 /**
+ * Returns `true` when `err` is an internal JavaScript programming error (`TypeError`,
+ * `RangeError`, `ReferenceError`, `SyntaxError`) that must propagate rather than be masked as a
+ * directory outage.
+ */
+export function isNonLdapProgramError(err: unknown): boolean {
+  return (
+    err instanceof TypeError ||
+    err instanceof RangeError ||
+    err instanceof ReferenceError ||
+    err instanceof SyntaxError
+  );
+}
+
+/**
+ * Returns `true` when `err` represents an LDAP base-DN misconfiguration (`noSuchObject` / code 32
+ * or `invalidDNSyntax` / code 34) that should fail fast without failover.
+ */
+export function isLdapBaseDnMisconfigurationError(err: unknown): boolean {
+  const name = readErrorName(err);
+  const code = readErrorCode(err);
+  return (
+    BASE_DN_MISCONFIG_ERROR_NAMES.has(name) ||
+    code === LDAP_NO_SUCH_OBJECT ||
+    code === LDAP_INVALID_DN_SYNTAX
+  );
+}
+
+/**
  * Classifies an unknown LDAP client, TLS, socket, or timeout failure into one of the four
  * canonical `@netscript/plugin-directory-core` typed errors with a redacted message.
+ *
+ * Classifies by structured `ldapts` error name and numeric/system code first; fallback message
+ * patterns only apply when no structured name or code matched.
  *
  * @param err - Caught unknown error.
  * @param directoryName - Adapter name (`DirectoryPort.name`).
@@ -122,20 +164,7 @@ export function mapLdapError(
   const code = readErrorCode(err);
   const message = readErrorMessage(err);
 
-  if (
-    TIMEOUT_ERROR_NAMES.has(name) ||
-    code === LDAP_TIME_LIMIT_EXCEEDED ||
-    (typeof code === 'string' && TIMEOUT_SYSTEM_CODES.has(code)) ||
-    /\b(?:timed?\s*out|timeout)\b/i.test(message)
-  ) {
-    return new DirectoryTimeout(
-      directoryName,
-      operation,
-      'LDAP directory operation exceeded its timeout budget.',
-      timeoutMs !== undefined ? { timeoutMs } : undefined,
-    );
-  }
-
+  // 1. Structured name/code classification (takes precedence over raw server message text).
   if (
     UNAUTHORIZED_ERROR_NAMES.has(name) ||
     code === LDAP_INVALID_CREDENTIALS ||
@@ -162,11 +191,39 @@ export function mapLdapError(
     return new DirectoryUnsupported(directoryName, operation, reason);
   }
 
+  if (isLdapBaseDnMisconfigurationError(err)) {
+    return new DirectoryUnavailable(
+      directoryName,
+      operation,
+      'Configured LDAP search base DN does not exist or has invalid syntax.',
+    );
+  }
+
+  if (
+    TIMEOUT_ERROR_NAMES.has(name) ||
+    code === LDAP_TIME_LIMIT_EXCEEDED ||
+    (typeof code === 'string' && TIMEOUT_SYSTEM_CODES.has(code))
+  ) {
+    return new DirectoryTimeout(
+      directoryName,
+      operation,
+      'LDAP directory operation exceeded its timeout budget.',
+      timeoutMs !== undefined ? { timeoutMs } : undefined,
+    );
+  }
+
+  if (ABORT_ERROR_NAMES.has(name) || code === 'ABORT_ERR') {
+    return new DirectoryUnavailable(
+      directoryName,
+      operation,
+      'Directory operation was aborted.',
+    );
+  }
+
   if (
     code === LDAP_CONFIDENTIALITY_REQUIRED ||
     name === 'ConfidentialityRequiredError' ||
-    (typeof code === 'string' && TLS_ERROR_CODES.has(code)) ||
-    /\b(?:certificate|tls|ssl|handshake|altnames?)\b/i.test(message)
+    (typeof code === 'string' && TLS_ERROR_CODES.has(code))
   ) {
     return new DirectoryUnavailable(
       directoryName,
@@ -181,6 +238,25 @@ export function mapLdapError(
       operation,
       'Directory server reported busy or unavailable status.',
     );
+  }
+
+  // 2. Fallback message classification only when no structured LDAP error name/code matched.
+  if (typeof code !== 'number') {
+    if (/\b(?:certificate|tls|ssl|handshake|altnames?)\b/i.test(message)) {
+      return new DirectoryUnavailable(
+        directoryName,
+        operation,
+        'TLS handshake or certificate verification failed.',
+      );
+    }
+    if (/\b(?:timed?\s*out|timeout)\b/i.test(message)) {
+      return new DirectoryTimeout(
+        directoryName,
+        operation,
+        'LDAP directory operation exceeded its timeout budget.',
+        timeoutMs !== undefined ? { timeoutMs } : undefined,
+      );
+    }
   }
 
   return new DirectoryUnavailable(

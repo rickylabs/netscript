@@ -4,15 +4,17 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**Active Directory and LDAP adapter implementing NetScript's `DirectoryPort` over strict TLS.**
+**Active Directory and Samba AD adapter implementing NetScript's `DirectoryPort` over strict TLS.**
 
-This Archetype 2 Integration package connects NetScript services to Active Directory, Samba AD, or
-LDAP directories behind `@netscript/plugin-directory-core`'s `DirectoryPort`. It builds every LDAP
+This Archetype 2 Integration package connects NetScript services to Active Directory and Samba AD
+directories behind `@netscript/plugin-directory-core`'s `DirectoryPort`. It builds every LDAP
 filter using `ldapts` filter AST classes (never string concatenation), enforces strict TLS defaults
-(`ldaps://` or StartTLS with `rejectUnauthorized: true` and custom CA file loading), reads bind
-credentials exclusively from a `*_FILE` path at startup, decodes binary AD `objectGUID` and
-`objectSid` attributes, and evaluates bounded transitive group membership including Active Directory
-`primaryGroupID` resolution.
+(`ldaps://` or StartTLS with `rejectUnauthorized: true` and PEM-validated custom CA file loading),
+reads bind credentials exclusively from a `*_FILE` path at startup, bounds paged searches strictly
+on the wire via `searchPaginated`, decodes binary AD `objectGUID` and `objectSid` attributes, and
+evaluates bounded transitive group membership including Active Directory `primaryGroupID`
+resolution. Generic OpenLDAP string-UUID and POSIX account-state support is tracked separately on
+RFC #2664.
 
 ## Why teams use it
 

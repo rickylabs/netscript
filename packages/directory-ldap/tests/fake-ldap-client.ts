@@ -1,7 +1,8 @@
 /**
  * Deterministic in-memory LDAP server and `LdapClientPort` fake that evaluates genuine `ldapts`
  * `Filter` AST trees (`AndFilter`, `OrFilter`, `NotFilter`, `EqualityFilter`, `SubstringFilter`,
- * `PresenceFilter`, and `ExtensibleFilter` for `LDAP_MATCHING_RULE_IN_CHAIN`).
+ * `PresenceFilter`, and `ExtensibleFilter` for `LDAP_MATCHING_RULE_IN_CHAIN`) and emulates
+ * RFC 2696 paging semantics (ignoring `sizeLimit` on unbounded paged searches like real AD/Samba).
  */
 
 import { Buffer } from 'node:buffer';
@@ -11,6 +12,7 @@ import {
   ExtensibleFilter,
   Filter,
   InvalidCredentialsError,
+  NoSuchObjectError,
   NotFilter,
   OrFilter,
   PresenceFilter,
@@ -24,9 +26,11 @@ import {
 import {
   encodeAdAccountExpires,
   encodeAdObjectGuid,
+  LDAP_CAP_ACTIVE_DIRECTORY_OID,
   LDAP_MATCHING_RULE_IN_CHAIN_OID,
 } from '../src/domain/mod.ts';
 import type {
+  LdapBoundedSearchParams,
   LdapClientConnectOptions,
   LdapClientFactory,
   LdapClientPort,
@@ -42,6 +46,7 @@ export type FakeLdapHostBehavior = Readonly<{
   bindError?: Error;
   searchError?: Error;
   delayMs?: number;
+  rootDseCapabilities?: readonly string[];
 }>;
 
 export type FakeLdapCallRecord = Readonly<{
@@ -50,11 +55,14 @@ export type FakeLdapCallRecord = Readonly<{
   startTlsOptions?: LdapTransportTlsOptions;
   events: string[];
   searches: LdapSearchParams[];
+  pagesRequested: number;
+  wireEntriesDelivered: number;
   unbound: boolean;
 }>;
 
 export interface FakeLdapServerOptions {
   readonly baseDn?: string;
+  readonly validBaseDns?: readonly string[];
   readonly expectedBindDn?: string;
   readonly expectedBindPassword?: string;
   readonly entries: readonly LdapRawEntry[];
@@ -213,11 +221,24 @@ function projectEntry(entry: LdapRawEntry, params: LdapSearchParams): LdapRawEnt
   return out as LdapRawEntry;
 }
 
+function deriveContainerDns(baseDn: string, entries: readonly LdapRawEntry[]): Set<string> {
+  const containers = new Set<string>([baseDn.toLowerCase()]);
+  for (const entry of entries) {
+    const parts = entry.dn.split(',');
+    for (let i = 0; i < parts.length; i++) {
+      const suffix = parts.slice(i).join(',').trim().toLowerCase();
+      if (suffix.length > 0) containers.add(suffix);
+    }
+  }
+  return containers;
+}
+
 export class FakeLdapServer {
   readonly baseDn: string;
   readonly calls: FakeLdapCallRecord[] = [];
   readonly #entries: readonly LdapRawEntry[];
   readonly #entriesByDn: Map<string, LdapRawEntry>;
+  readonly #validBaseDns: Set<string>;
   readonly #expectedBindDn: string;
   readonly #expectedBindPassword: string;
   readonly #hostBehaviors: Readonly<Record<string, FakeLdapHostBehavior>>;
@@ -226,10 +247,38 @@ export class FakeLdapServer {
     this.baseDn = options.baseDn ?? 'DC=example,DC=test';
     this.#entries = options.entries;
     this.#entriesByDn = new Map(options.entries.map((entry) => [entry.dn.toLowerCase(), entry]));
+    this.#validBaseDns = options.validBaseDns
+      ? new Set(options.validBaseDns.map((dn) => dn.toLowerCase()))
+      : deriveContainerDns(this.baseDn, options.entries);
     this.#expectedBindDn = options.expectedBindDn ??
       'CN=svc-dir,OU=ServiceAccounts,DC=example,DC=test';
     this.#expectedBindPassword = options.expectedBindPassword ?? 'test-bind-password-only';
     this.#hostBehaviors = options.hostBehaviors ?? {};
+  }
+
+  #assertBaseExists(baseDn: string): void {
+    const baseLower = baseDn.toLowerCase();
+    if (baseLower.length > 0 && !this.#validBaseDns.has(baseLower)) {
+      throw new NoSuchObjectError(`No such object: ${baseDn}`);
+    }
+  }
+
+  #collectMatches(baseDn: string, params: LdapSearchParams): LdapRawEntry[] {
+    if (!(params.filter instanceof Filter)) {
+      throw new TypeError('LDAP filter must be a genuine ldapts Filter AST instance.');
+    }
+    this.#assertBaseExists(baseDn);
+    const baseLower = baseDn.toLowerCase();
+    const matched: LdapRawEntry[] = [];
+    for (const entry of this.#entries) {
+      if (baseLower.length > 0 && !entry.dn.toLowerCase().endsWith(baseLower)) {
+        continue;
+      }
+      if (evaluateFilter(params.filter, entry, this.#entriesByDn)) {
+        matched.push(projectEntry(entry, params));
+      }
+    }
+    return matched;
   }
 
   createClientFactory(): LdapClientFactory {
@@ -241,12 +290,16 @@ export class FakeLdapServer {
         startTlsOptions?: LdapTransportTlsOptions;
         events: string[];
         searches: LdapSearchParams[];
+        pagesRequested: number;
+        wireEntriesDelivered: number;
         unbound: boolean;
       } = {
         url: connectOptions.url,
         connectOptions,
         events: ['connect'],
         searches: [],
+        pagesRequested: 0,
+        wireEntriesDelivered: 0,
         unbound: false,
       };
       this.calls.push(record);
@@ -310,29 +363,70 @@ export class FakeLdapServer {
             throw behavior.searchError;
           }
           if (!(params.filter instanceof Filter)) {
-            throw new Error('LDAP filter must be a genuine ldapts Filter AST instance.');
+            throw new TypeError('LDAP filter must be a genuine ldapts Filter AST instance.');
           }
           if (params.scope === 'base' && baseDn === '') {
             return {
               searchEntries: [
-                { dn: '', supportedCapabilities: [LDAP_MATCHING_RULE_IN_CHAIN_OID] },
+                {
+                  dn: '',
+                  supportedCapabilities: behavior.rootDseCapabilities ??
+                    [LDAP_CAP_ACTIVE_DIRECTORY_OID],
+                },
               ],
             };
           }
-          const baseLower = baseDn.toLowerCase();
-          const matched: LdapRawEntry[] = [];
-          for (const entry of this.#entries) {
-            if (baseLower.length > 0 && !entry.dn.toLowerCase().endsWith(baseLower)) {
-              continue;
-            }
-            if (evaluateFilter(params.filter, entry, this.#entriesByDn)) {
-              matched.push(projectEntry(entry, params));
-              if (params.sizeLimit > 0 && matched.length >= params.sizeLimit) {
-                break;
+          if (params.scope === 'base') {
+            this.#assertBaseExists(baseDn);
+            return { searchEntries: [{ dn: baseDn, distinguishedName: baseDn }] };
+          }
+          const allMatches = this.#collectMatches(baseDn, params);
+          // Emulate real AD/Samba: paged client.search pulls every page ignoring sizeLimit.
+          const delivered = params.paged !== undefined
+            ? allMatches
+            : params.sizeLimit > 0
+            ? allMatches.slice(0, params.sizeLimit)
+            : allMatches;
+          const pageSize = params.paged?.pageSize ?? Math.max(1, delivered.length);
+          record.pagesRequested += Math.max(1, Math.ceil(delivered.length / pageSize));
+          record.wireEntriesDelivered += delivered.length;
+          return { searchEntries: delivered };
+        },
+        searchBounded: async (
+          baseDn: string,
+          params: LdapBoundedSearchParams,
+        ): Promise<LdapSearchResult> => {
+          assertConnected();
+          record.events.push('searchBounded');
+          record.searches.push(params);
+          await waitDelay();
+          if (behavior.searchError) {
+            throw behavior.searchError;
+          }
+          if (!Number.isInteger(params.maxEntries) || params.maxEntries < 1) {
+            throw new RangeError('maxEntries must be a positive integer.');
+          }
+          const allMatches = this.#collectMatches(baseDn, params);
+          const pageSize = Math.max(
+            1,
+            Math.min(params.paged?.pageSize ?? params.maxEntries, params.maxEntries),
+          );
+          const collected: LdapRawEntry[] = [];
+          for (let offset = 0; offset < allMatches.length || offset === 0; offset += pageSize) {
+            const page = allMatches.slice(offset, offset + pageSize);
+            record.pagesRequested += 1;
+            record.wireEntriesDelivered += page.length;
+            for (const entry of page) {
+              collected.push(entry);
+              if (collected.length >= params.maxEntries) {
+                return { searchEntries: collected };
               }
             }
+            if (offset + pageSize >= allMatches.length) {
+              break;
+            }
           }
-          return { searchEntries: matched };
+          return { searchEntries: collected };
         },
         unbind: (): Promise<void> => {
           record.events.push('unbind');
@@ -346,8 +440,8 @@ export class FakeLdapServer {
 }
 
 /**
- * Builds AD-shaped LDAP entries from `DIRECTORY_CONFORMANCE_DATASET` (plus an AD computer account
- * that must be excluded from user searches).
+ * Builds AD-shaped LDAP entries from `DIRECTORY_CONFORMANCE_DATASET` (including `Domain Users`
+ * under `CN=Users`, a computer object, and a `krbtgt` built-in account to verify exclusions).
  */
 export function buildConformanceLdapEntries(
   users: readonly InMemoryDirectoryUser[] = DIRECTORY_CONFORMANCE_DATASET.users,
@@ -358,11 +452,11 @@ export function buildConformanceLdapEntries(
   const groupRidById = new Map<string, number>();
 
   groups.forEach((group, idx) => {
-    const rid = group.immutableId === DIRECTORY_CONFORMANCE_DATASET.groupIds.domainUsers
-      ? 513
-      : 2000 + idx;
+    const isDomainUsers = group.immutableId === DIRECTORY_CONFORMANCE_DATASET.groupIds.domainUsers;
+    const rid = isDomainUsers ? 513 : 2000 + idx;
     groupRidById.set(group.immutableId, rid);
-    groupDnById.set(group.immutableId, `CN=${group.displayName},OU=Groups,${baseDn}`);
+    const container = isDomainUsers ? `CN=Users,${baseDn}` : `OU=Groups,${baseDn}`;
+    groupDnById.set(group.immutableId, `CN=${group.displayName},${container}`);
   });
 
   const userDnById = new Map<string, string>();
@@ -397,7 +491,7 @@ export function buildConformanceLdapEntries(
     });
   });
 
-  // Add an AD computer object (objectClass includes `user` AND `computer`) to prove exclusion.
+  // AD computer object (objectClass includes `user` AND `computer`) — excluded from user searches.
   entries.push({
     dn: `CN=WORKSTATION-01,OU=Computers,${baseDn}`,
     objectClass: ['top', 'person', 'organizationalPerson', 'user', 'computer'],
@@ -406,6 +500,17 @@ export function buildConformanceLdapEntries(
     userAccountControl: '4096',
     displayName: 'Alice Example Computer',
     sAMAccountName: 'WORKSTATION-01$',
+  });
+
+  // AD built-in krbtgt service account — excluded from user searches.
+  entries.push({
+    dn: `CN=krbtgt,CN=Users,${baseDn}`,
+    objectClass: ['top', 'person', 'organizationalPerson', 'user'],
+    objectGUID: encodeAdObjectGuid('30000000-0000-4000-8000-000000000098'),
+    objectSid: makeBinarySid(502),
+    userAccountControl: '514',
+    displayName: 'krbtgt',
+    sAMAccountName: 'krbtgt',
   });
 
   groups.forEach((group) => {
