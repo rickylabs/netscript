@@ -201,3 +201,52 @@ Owner-approved Neon continuation (`gemini-4-neon`, separate-session independent 
   `run-deno-test.ts -- --allow-all plugins/streams/tests/docs/native-event-source-example_test.ts`,
   `deno task --cwd docs/site check:source-format`, and `git diff --check` (all verified exit 0
   before push; CI `Deploy docs site to Pages` builds the site on Deno 2.9.7).
+
+## Fix round 1 (2026-11-25)
+
+Rebased onto `origin/main` (`af5107b8d1038cd35d0b2835e012bc80ba4447ac`, which includes `#2662`
+`f201c9134` resolving `#2661`), re-ran the full nine-trial benchmark at the new base, replaced
+`results.json` and the published figures in `docs/site/durable-workflows/streams.md`, marked
+`#2661` resolved by `#2662`, and addressed all five advisories from IMPL-EVAL round 1:
+
+- **Re-run results (Deno 2.9.5, Linux x86_64, 16 logical CPUs, 92.1 GiB RAM, 9m 06s):**
+  9 completed trials, 3,180 verified deliveries, 0 gaps, 0 duplicates, 0 out-of-order commits,
+  0 reconnects, HTTP/1.1 only, all 540 offered writes acknowledged on attempt 1 within 60.1 s
+  (max 60,009.1 ms). Peak companion RSS 235.3 MiB, highest phase-average CPU 1.90%, peak open
+  FDs 146, largest end-of-window logical storage 63,443 bytes, 0/0 open SSE responses/waiters
+  after reader cancellation and explicit stream close across all 9 phases, clean child exit and
+  verified temp-dir removal.
+- **Docs updates:**
+  - `docs/site/durable-workflows/streams.md`: replaced all 9 table rows and resource/timing prose
+    with exact values independently recomputed from the new `results.json`; stated Deno 2.9.5,
+    hardware, single-trial shared-host noise and storage-sync caveats, co-located clients/harness,
+    and slow-reader 2-frame (~500 ms) delay; marked `#2661` resolved by `#2662` and removed the
+    stale pre-fix defect/unpatched/re-run wording; pointed the Firefox connection preference link
+    to `https://searchfox.org/firefox-release/source/modules/libpref/init/all.js`.
+  - `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`: kept the reviewed decision
+    table; clarified in the push row that the shipped Streams service checks authorization at
+    request start and does not re-check an open SSE response (browser reader disposal is cleanup,
+    not revocation enforcement; tracked in `#2146`), and named the focus-refetch mechanisms
+    (`refetchOnWindowFocus: true` on the query client or a visibility handler calling `refetch()`).
+  - `tools/streams-subscriber-capacity/README.md`: formatted with `deno fmt` so
+    `deno fmt --check tools/streams-subscriber-capacity` passes on all 6 files.
+- **Validation (all exit 0):**
+  - `deno run -A --frozen tools/streams-subscriber-capacity/main.ts` — exit 0, 9 trials, 555,861 B.
+  - Independent recomputation & hygiene script against `results.json`, `streams.md`, and
+    `03-sdk-cache-first-query.md` — exit 0 (all 9 table rows, all prose numbers, 0 leaks, 0
+    forbidden/process phrases).
+  - `run-deno-check.ts --root tools/streams-subscriber-capacity --ext ts,tsx --pretty` — exit 0 (5 files).
+  - `run-deno-fmt.ts --root tools/streams-subscriber-capacity --ext ts,tsx --pretty` — exit 0 (5 files).
+  - `deno fmt --check tools/streams-subscriber-capacity` — exit 0 (6 files).
+  - `deno lint` (root rules, no `tools/` exclusion) on `tools/streams-subscriber-capacity/*.ts` — exit 0 (5 files).
+  - `deno test --frozen -A tools/streams-subscriber-capacity/reader_test.ts` — exit 0 (3 passed).
+  - `deno task docs:links` — exit 0 (105 docs, 0 broken links/anchors).
+  - `deno task docs:accuracy` — exit 0.
+  - `deno task docs:exports-drift` — exit 0 (35/35).
+  - `deno task docs:snippets` — exit 0 (708 scanned, 36 checked, 0 malformed).
+  - `deno task release:preflight` — exit 0.
+  - `deno task --cwd docs/site check:source-format` — exit 0; `test:source-format` — exit 0 (39 passed).
+  - `deno test --frozen -A plugins/streams/tests/docs/native-event-source-example_test.ts` — exit 0 (1 passed).
+  - `tools/docs-site/generate-tokens.ts --check` + 7 style-policy test suites — exit 0 (16 passed).
+  - `(cd docs/site && mise exec deno@2.9.7 -- deno task verify)` — exit 0 (build:fresh-ui, Lume 1,198 files, registry 116 artifacts, rendered-output 338 HTML files, fresh-ui check PASS, 37,904 internal links, 13 caveat markers).
+  - `git diff --exit-code origin/main -- packages plugins deno.json deno.lock` and `git diff --check` — exit 0.

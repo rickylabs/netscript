@@ -423,43 +423,53 @@ from the repository root on Linux:
 deno run -A --frozen tools/streams-subscriber-capacity/main.ts
 ```
 
-One isolated companion used a file-backed store in a temporary directory. Readers used
+One isolated companion used a file-backed store in a temporary directory. Readers, the producer,
+and the harness ran co-located in one process against the separate companion process. Readers used
 HTTP/1.1 SSE over loopback. Each phase opened its readers and waited for each opening control.
 The harness then offered one small numbered upsert per second for 60 seconds, round-robin
 across that phase's streams. It counted a delivery when the reader received the committing
 control. The slow-reader layout delayed one client's processing by 250 ms per SSE frame.
 
-All 9 trials completed on Deno 2.9.7 on Linux x86_64 with
+All 9 trials completed on Deno 2.9.5 on Linux x86_64 with
 16 available logical CPUs and 92.1 GiB of reported system memory. The trials recorded
-3,180 verified deliveries, 0 delivery gaps, and 0 reconnects. Latency includes
-the time from enqueue through the last expected reader’s committing control.
+3,180 verified deliveries, 0 delivery gaps, 0 duplicates, 0 out-of-order commits, and 0 reconnects.
+All 540 offered writes across the 9 trials were acknowledged on the first attempt within 60.1 s
+(maximum 60,009.1 ms for the 60th one-second offer). Latency includes the time from enqueue
+through the last expected reader’s committing control.
 
 | Layout | Readers | Streams | Deliveries | Append to last reader p50 / p95 / max (ms) | Open SSE responses / waiters after reader cancellation and explicit stream close |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Single | 1 | 1 | 60 | 105.9 / 149.0 / 833.3 | 0 / 0 |
-| Single | 8 | 1 | 480 | 548.5 / 4,310.4 / 4,489.3 | 0 / 0 |
-| Single (defect [#2661](https://github.com/rickylabs/netscript/issues/2661)) | 32 | 1 | 1,920 | 106,832.9 / 149,612.9 / 156,139.8 | 0 / 0 |
-| Spread | 1 | 1 | 60 | 117.9 / 356.3 / 562.3 | 0 / 0 |
-| Spread | 8 | 8 | 60 | 112.2 / 442.0 / 883.0 | 0 / 0 |
-| Spread | 32 | 8 | 240 | 243.5 / 488.2 / 992.9 | 0 / 0 |
-| Spread, one slow | 1 | 1 | 60 | 613.0 / 911.5 / 1,199.1 | 0 / 0 |
-| Spread, one slow | 8 | 8 | 60 | 104.4 / 607.2 / 615.7 | 0 / 0 |
-| Spread, one slow | 32 | 8 | 240 | 257.9 / 1,259.6 / 2,283.5 | 0 / 0 |
+| Single | 1 | 1 | 60 | 7.7 / 70.7 / 118.7 | 0 / 0 |
+| Single | 8 | 1 | 480 | 5.8 / 11.7 / 73.7 | 0 / 0 |
+| Single | 32 | 1 | 1,920 | 9.6 / 22.2 / 26.2 | 0 / 0 |
+| Spread | 1 | 1 | 60 | 4.2 / 10.3 / 23.5 | 0 / 0 |
+| Spread | 8 | 8 | 60 | 4.3 / 43.4 / 140.5 | 0 / 0 |
+| Spread | 32 | 8 | 240 | 5.2 / 18.9 / 32.6 | 0 / 0 |
+| Spread, one slow | 1 | 1 | 60 | 506.7 / 520.0 / 596.0 | 0 / 0 |
+| Spread, one slow | 8 | 8 | 60 | 5.2 / 510.1 / 520.2 | 0 / 0 |
+| Spread, one slow | 32 | 8 | 240 | 5.6 / 510.3 / 527.5 | 0 / 0 |
 
-The largest sampled companion RSS was 150.1 MiB, the highest phase-average CPU use was
-1.76% of one logical CPU, and the largest sampled file-descriptor count was 144.
+Each table row is one trial (60 offered writes over 60 seconds) on a shared Linux host.
+Single-trial tail latency reflects host scheduling noise and synchronous storage persistence
+(LMDB metadata and segment writes) on the append path, so a smaller reader count can show a
+higher isolated spike than a larger count in one run. In the slow-reader layouts, delaying one
+client by 250 ms per SSE frame adds about 500 ms across each revision’s data and
+committing-control frames on that reader’s stream: every revision in the 1-stream layout, and one
+of eight streams in the 8-stream layouts (leaving median latency low while p95 and max reflect
+the delayed stream).
+
+The largest sampled companion RSS was 235.3 MiB, the highest phase-average CPU use was
+1.90% of one logical CPU, and the largest sampled file-descriptor count was 146.
 The largest end-of-window logical storage size was 63,443 bytes. The companion exited
 cleanly and the temporary directory was removed.
 
-**Single-topic 32-reader result is a known defect, not expected steady-state capacity.**
-In the 32-reader single-stream phase, the unpatched file-backed companion did not sustain
-one write per second under the tested workload: the last producer acknowledgement arrived
-216.1 s after the start of the one-minute offered-write window, and the 149,612.9 ms p95
-reflects that append backlog rather than expected fan-out latency. This behaviour is caused
-by the [single-topic SSE fan-out defect (#2661)](https://github.com/rickylabs/netscript/issues/2661),
-where the file-backed companion synchronously writes access-time metadata for each waking
-reader on the append path. Once #2661 is fixed, re-run the benchmark above to establish
-post-fix single-topic fan-out latency on the updated companion.
+**Per-reader access-time persistence ([#2661](https://github.com/rickylabs/netscript/issues/2661),
+resolved by [#2662](https://github.com/rickylabs/netscript/pull/2662)).** Earlier file-backed
+builds synchronously wrote per-reader access-time metadata on the append path, causing
+multi-reader append backlogs under fan-out. [#2662](https://github.com/rickylabs/netscript/pull/2662)
+resolved [#2661](https://github.com/rickylabs/netscript/issues/2661) by keeping per-reader access
+persistence off the append path. The measurements above come from the fixed file-backed companion;
+append latency still depends on the cost of synchronous storage persistence on the append path.
 
 These measurements describe this workload. Replays of larger histories, bursts, more active
 streams, and browser or ingress behavior each call for measurements under those conditions.
@@ -475,7 +485,7 @@ is negotiated end to end. HTTPS can still carry HTTP/1.1. Check the negotiated p
 on each connection in the serving path, including any proxy or load balancer. Over TLS,
 HTTP/2 typically uses ALPN, and HTTP/3 negotiates over QUIC with TLS.
 [Chromium socket pool](https://chromium.googlesource.com/chromium/src/%2B/HEAD/net/socket/client_socket_pool_manager.cc),
-[Firefox connection default (`network.http.max-persistent-connections-per-server`)](https://github.com/mozilla/gecko-dev/blob/master/modules/libpref/init/all.js),
+[Firefox connection default (`network.http.max-persistent-connections-per-server`)](https://searchfox.org/firefox-release/source/modules/libpref/init/all.js),
 [HTTP/2 negotiation](https://www.rfc-editor.org/rfc/rfc9113.html#section-3.2),
 [HTTP/3 negotiation](https://www.rfc-editor.org/rfc/rfc9114.html#section-3.2).
 
