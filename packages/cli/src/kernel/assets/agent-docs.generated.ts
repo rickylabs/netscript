@@ -49,6 +49,8 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 
   "@netscript/plugin-auth-core": [".","./authenticator","./config","./contracts/v1","./domain","./ports","./presets","./sdk","./streams","./telemetry","./testing"],
 
+  "@netscript/plugin-directory-core": [".","./domain","./ports","./testing"],
+
   "@netscript/plugin-sagas": [".","./adapter-cli","./aspire","./cli","./contracts","./doctor","./e2e","./plugin","./public","./runtime","./scaffold","./services","./streams","./streams/server"],
 
   "@netscript/plugin-sagas-core": [".","./abstracts","./adapters","./agent","./builders","./config","./contracts/v1","./discovery","./domain","./integration/commands","./integration/publisher","./integration/workers","./middleware","./ports","./presets","./runtime","./stores","./stores/backends","./streams","./telemetry","./testing","./transports"],
