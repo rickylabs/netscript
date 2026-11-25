@@ -380,8 +380,9 @@ A CLI, mobile client, or backend service connects to the exact same endpoint wit
 Because the shipped `createFetchStreamEventSourceV1` (`@netscript/sdk/streams/consumer`,
 [create-fetch-stream-event-source.ts:18-19](../packages/sdk/src/client/stream-source/application/create-fetch-stream-event-source.ts#L18-L19))
 retries every non-2xx response by default (including `401`/`403`/`404`), bearer clients targeting an
-authorizing proxy MUST pass opt-in `terminalStatuses` (or `onHttpError` returning `'stop'`) so a
-revoked or denied token stops cleanly instead of looping on admission:
+authorizing proxy MUST pass opt-in `terminalStatuses` so a revoked or denied token stops cleanly
+instead of looping on admission, and MAY pass `onHttpError` (a pure synchronous observer invoked on
+every non-2xx, non-`204` HTTP response) to inspect `{ status, retryAfter, terminal, lastCommittedOffset }`:
 
 ```ts
 import { buildStreamEndpointUrl } from '@netscript/contracts/streams';
@@ -392,14 +393,14 @@ import {
 
 declare const API_ORIGIN: string;
 declare const accessToken: string;
-declare const lastCommittedOffset: string;
+declare const initialOffset: string;
 declare const signal: AbortSignal;
 declare function onHttpTerminal(status: number, offset?: string): void;
 
 const url = buildStreamEndpointUrl(projectFeedStream, {
   baseUrl: API_ORIGIN,
   params: { projectId: 'proj-42' },
-  offset: lastCommittedOffset,
+  offset: initialOffset,
 });
 
 const source = createFetchStreamEventSourceV1({
@@ -409,9 +410,10 @@ const source = createFetchStreamEventSourceV1({
   authHeaders: () => ({ authorization: `Bearer ${accessToken}` }),
   // Stop permanently on terminal admission/retention statuses instead of looping on authorize().
   terminalStatuses: [400, 401, 403, 404, 405, 410],
-  onHttpError: ({ status, lastCommittedOffset: offset }) => {
-    onHttpTerminal(status, offset); // Distinguish 401 re-auth vs 403 denied vs 404/410 resync.
-    return 'stop';
+  onHttpError: ({ status, terminal, lastCommittedOffset }) => {
+    if (terminal) {
+      onHttpTerminal(status, lastCommittedOffset); // Distinguish 401 re-auth vs 403 denied vs 404/410 resync.
+    }
   },
 });
 
@@ -1278,26 +1280,34 @@ Every request executes this exact sequence before returning `200 text/event-stre
 4. **Application admission (`authorize`), per-key reader cap, and immediate deadline activation**:
    - Invoke `authorize({ request, params, query, credentialMode, principal, signal })` bounded by
      `ClockPort` `policyTimeoutMs`.
-   - If `authorize` returns `{ allow: false, status, reason }`, return JSON `{ error, reason }`
-     with HTTP `status` (`401` or `403`), `cache-control: no-store`, and `vary`. No upstream fetch
-     is initiated.
-   - If `authorize` throws, rejects, times out, or returns a malformed decision, fail closed with
+   - If `authorize` returns `{ allow: false, status, reason }`, invoke
+     `abortSetupOnce('revoked', status)` (releasing the global `maxActiveReaders` slot reserved in
+     step 1) and return JSON `{ error, reason }` with HTTP `status` (`401` or `403`),
+     `cache-control: no-store`, and `vary`. No upstream fetch is initiated.
+   - If `authorize` throws, rejects, times out, or returns a malformed decision, invoke
+     `abortSetupOnce('policy-error', 503)` (releasing the global slot) and fail closed with
      redacted HTTP `503 Service Unavailable`.
    - **Per-key reader cap (`maxReadersPerKey`)**: If configured, compute `const key = maxReadersPerKey.key(decision.grant)`.
-     If the active+admitting count for `key` has reached `maxReadersPerKey.max`, reject immediately
-     (before `resolvePath`, `subscribe`, or upstream connect) with `429 Too Many Requests`,
-     `Retry-After: 5`, `cache-control: no-store`, and `reason: 'reader_limit_exceeded'`. Otherwise
-     reserve one per-key slot (released unconditionally by `abortSetupOnce` or `closeOnce`).
+     If `maxReadersPerKey.key` throws or returns a non-string, fail closed via
+     `abortSetupOnce('policy-error', 503)`. If the active+admitting count for `key` has reached
+     `maxReadersPerKey.max`, invoke `abortSetupOnce('policy-error', 429)` (releasing the global
+     slot) and reject immediately (before `resolvePath`, `subscribe`, or upstream connect) with
+     `429 Too Many Requests`, `Retry-After: 5`, `cache-control: no-store`, and
+     `reason: 'reader_limit_exceeded'`. Otherwise reserve one per-key slot (released unconditionally
+     by `abortSetupOnce` or `closeOnce`).
    - **Validate `decision.responseHeaders` and `decision.setCookies`** against the reserved-header
      table immediately (see [Response header ownership](#response-header-ownership)); any reserved
-     (including protocol replay metadata `stream-*` / `etag`) or malformed header fails closed with
-     redacted `503` without proceeding.
+     (including protocol replay metadata `stream-*` / `etag`) or malformed header invokes
+     `abortSetupOnce('policy-error', 503)` — releasing BOTH the global `maxActiveReaders` slot and
+     the reserved `maxReadersPerKey` slot — and fails closed with redacted `503` without proceeding.
    - **Immediate finite expiry validation & timer arming**:
      - If `decision.expiresAtMs !== undefined`:
-       - Require `typeof decision.expiresAtMs === 'number' && Number.isFinite(decision.expiresAtMs)`
-         (otherwise fail closed with redacted `503`).
-       - If `decision.expiresAtMs <= clock.nowMs()`, reject admission immediately with `401`
-         (`reason: 'session_expired'`).
+       - Require `typeof decision.expiresAtMs === 'number' && Number.isFinite(decision.expiresAtMs)`;
+         otherwise invoke `abortSetupOnce('policy-error', 503)` (freeing both global and
+         `maxReadersPerKey` slots) and fail closed with redacted `503`.
+       - If `decision.expiresAtMs <= clock.nowMs()`, invoke `abortSetupOnce('expired', 401)`
+         (freeing both global and `maxReadersPerKey` slots) and reject admission immediately with
+         `401` (`reason: 'session_expired'`).
        - Otherwise set `currentExpiresAtMs = decision.expiresAtMs` and **arm the `ClockPort` expiry
          timer immediately** for `Math.max(0, currentExpiresAtMs - clock.nowMs())`. From this
          instant onward — across `resolvePath`, `subscribe`, `'post-subscribe'` `recheck`,
@@ -1826,39 +1836,94 @@ preserves upstream framing in offset-only mode:
 3. **Bearer and fetch client terminal-status contract (`@netscript/sdk/streams/consumer`)**:
    - Shipped `createFetchStreamEventSourceV1`
      ([create-fetch-stream-event-source.ts:18-19](../packages/sdk/src/client/stream-source/application/create-fetch-stream-event-source.ts#L18-L19),
-     [connection.ts:19-45](../packages/sdk/src/client/stream-source/internal/connection.ts#L19-L45))
-     currently treats every non-2xx HTTP status identically to a transient transport error and
-     retries forever after firing plain `{ type: 'error' }`, leaving `readyState` absent.
+     [connection.ts:59-66](../packages/sdk/src/client/stream-source/internal/connection.ts#L59-L66))
+     currently treats every non-2xx (non-`204`) HTTP status identically to a transient transport
+     error and retries forever after firing plain `{ type: 'error' }`, leaving `readyState` absent.
+     Its host fetch response port `StreamFetchResponseV1`
+     ([fetch-stream-source.ts:4](../packages/sdk/src/client/stream-source/ports/fetch-stream-source.ts#L4))
+     is `Pick<Response, 'ok' | 'status' | 'headers' | 'body'>` and intentionally excludes
+     `statusText`; this RFC keeps `StreamFetchResponseV1` unchanged (omitting `statusText`).
    - To give bearer and credentialed-`fetch` consumers the same bounded stop-on-revocation semantics
      as browser `EventSource` **without** breaking existing callers that rely on the current retry
      default, this RFC proposes additive, opt-in members on `FetchStreamEventSourceOptionsV1` and
      `FetchStreamEventSourceV1` (`@netscript/sdk/streams/consumer`):
      ```ts
      export interface FetchStreamHttpErrorInfoV1 {
+       /** Numeric HTTP status code returned by the stream endpoint (e.g. 401, 403, 404, 410, 503). */
        readonly status: number;
-       readonly statusText: string;
+       /** Raw `Retry-After` response header value when present. */
        readonly retryAfter?: string;
+       /** `true` when `status` matched `options.terminalStatuses` and the source closed; `false` when it will retry. */
        readonly terminal: boolean;
+       /**
+        * Most recent `streamNextOffset` committed by a schema-valid `control` frame on this source,
+        * or `undefined` if no `control` frame has committed yet.
+        */
+       readonly lastCommittedOffset?: string;
      }
 
      // Additive optional fields on FetchStreamEventSourceOptionsV1:
-     readonly terminalStatuses?: readonly number[]; // opt-in; recommended for proxies: [400, 401, 403, 404, 410]
+     /**
+      * Declarative opt-in list of non-2xx HTTP status codes that close the source permanently
+      * instead of retrying (recommended for authorizing proxies: `[400, 401, 403, 404, 405, 410]`).
+      * Omission preserves the shipped retry-all non-2xx behavior.
+      */
+     readonly terminalStatuses?: readonly number[];
+     /**
+      * Optional pure synchronous observer invoked on every non-2xx (non-204) HTTP response after
+      * cancelling the response body and before dispatching the `'error'` event. Returns `void`;
+      * stopping is decided declaratively by `terminalStatuses` (or imperatively via `source.close()`
+      * / aborting `options.signal`). An uncaught throw closes the source (`readyState = 2`) and
+      * rejects `done`, matching listener exceptions.
+      */
      readonly onHttpError?: (info: FetchStreamHttpErrorInfoV1) => void;
 
      // Additive readonly property on FetchStreamEventSourceV1 (compatible with StreamEventSourceV1):
      readonly readyState: 0 | 1 | 2; // 0 = CONNECTING, 1 = OPEN, 2 = CLOSED
      ```
-   - When `terminalStatuses` is omitted, `createFetchStreamEventSourceV1` preserves its existing
-     retry behavior verbatim (`readyState` remains `0` across retries until `close()`).
-   - When the server responds with a status listed in `terminalStatuses` (for example `401`, `403`,
-     `404`, or `410`):
-     1. `createFetchStreamEventSourceV1` transitions `readyState` synchronously to `2` (`CLOSED`)
-        and disarms internal reconnection so zero further HTTP requests are issued.
-     2. If `onHttpError` is supplied, it invokes `onHttpError({ status, statusText, retryAfter, terminal: true })`
-        synchronously before dispatching the `'error'` event.
-     3. It dispatches `{ type: 'error' }`; `bindStreamEventSourceV1` observes `source.readyState === 2`
-        and emits `{ event: 'error', payload: { message, retryable: false } }`, stopping the
-        consumer cleanly with zero retry spin.
+   - **Non-2xx (non-`204`) HTTP response handling**:
+     1. Cancel `response.body` (`await response.body?.cancel().catch(() => {})`).
+     2. Compute `terminal = Boolean(options.terminalStatuses?.includes(response.status))`,
+        `retryAfter = response.headers.get('retry-after') ?? undefined`, and `lastCommittedOffset`
+        (the latest `streamNextOffset` committed by a valid `control` frame via
+        [replay-buffer.ts:60](../packages/sdk/src/client/stream-source/internal/replay-buffer.ts#L60),
+        or `undefined` if no `control` frame has committed yet).
+     3. **When `terminal === true`** (`response.status` is in `options.terminalStatuses`):
+        - Synchronously transition `readyState` to `2` (`CLOSED`) and disarm internal reconnection
+          so zero further HTTP requests are scheduled.
+        - If `onHttpError` is supplied, invoke
+          `onHttpError({ status: response.status, retryAfter, terminal: true, lastCommittedOffset })`
+          synchronously (an uncaught throw clears listeners, aborts lifetime, and rejects `done`).
+        - Dispatch `{ type: 'error' }` to currently registered listeners **before** clearing
+          listeners so `bindStreamEventSourceV1` observes `source.readyState === 2` and emits
+          `{ event: 'error', payload: { message, retryable: false } }`, stopping the consumer
+          cleanly with zero retry spin; then clear listeners, abort internal lifetime, and resolve
+          `source.done` cleanly.
+     4. **When `terminal === false`** (`terminalStatuses` omitted or does not contain
+        `response.status`):
+        - Keep `readyState` at `0` (`CONNECTING`).
+        - If `onHttpError` is supplied, invoke
+          `onHttpError({ status: response.status, retryAfter, terminal: false, lastCommittedOffset })`
+          synchronously (an uncaught throw transitions `readyState` to `2`, closes the source, and
+          rejects `done`; if the observer explicitly calls `source.close()` or aborts `signal`,
+          `readyState` becomes `2` and the loop exits without reconnecting).
+        - Otherwise proceed with the shipped retryable `{ type: 'error' }` dispatch
+          (`source.readyState === 0` → `retryable: true`) and exponential backoff reconnect loop.
+   - **Complete `readyState` (`0 | 1 | 2`) transition table** (matching
+     [fetch-stream-source.ts:28-179](../packages/sdk/src/client/stream-source/application/fetch-stream-source.ts#L28-L179)):
+
+     | Transition | Trigger | `done` outcome & reconnect behavior |
+     | --- | --- | --- |
+     | Initial → `0` (`CONNECTING`) | Construction when `options.signal?.aborted` is falsy. | Enters connection loop on microtask. |
+     | Initial → `2` (`CLOSED`) | Construction when `options.signal?.aborted === true`. | Resolves cleanly; zero `fetch` calls. |
+     | `0 → 1` (`CONNECTING → OPEN`) | `fetch` resolves with `response.ok === true`, `response.status === 200`, non-null `response.body`, and `content-type` media type `'text/event-stream'` (set before reading chunks). | Active SSE read loop. |
+     | `1 → 0` (`OPEN → CONNECTING`) | Retryable mid-stream disconnect (unexpected EOF without terminal `control`, stream read error, heartbeat silence timeout, or non-terminal frame/buffer limit error while not closing). | Set synchronously to `0` **before** dispatching `{ type: 'error' }` (`retryable: true`) and entering backoff wait. |
+     | `0 → 0` (stays `CONNECTING`) | Retryable pre-open failure (network/`fetch` rejection, `authHeaders` rejection, non-2xx non-`204` status NOT in `terminalStatuses`, or `200` with non-`text/event-stream` `content-type` / null `body`). | Dispatches `{ type: 'error' }` (`retryable: true`) and enters exponential backoff wait. |
+     | `0 \| 1 → 2` (`CLOSED`, irreversible) | `source.close()` / `binding.dispose()`, `options.signal` abort, HTTP `204 No Content`, or terminal `event: control` with `streamClosed: true`. | Cancels timers/reader, releases listeners, resolves `done` cleanly, zero further `fetch` calls. |
+     | `0 → 2` (`CLOSED`, irreversible) | Non-2xx status matching `options.terminalStatuses`. | Invokes `onHttpError(..., terminal: true)`, dispatches `{ type: 'error' }` with `readyState === 2` (`retryable: false`), releases listeners, resolves `done` cleanly, zero further `fetch` calls. |
+     | `0 \| 1 → 2` (`CLOSED`, irreversible) | Uncaught exception thrown by an event listener (`emit()`) or by `options.onHttpError`. | Releases listeners/timers/reader and **rejects** `done` with the thrown error; zero further `fetch` calls. |
+
+     Once `readyState` reaches `2` (`CLOSED`), it never transitions back to `0` or `1`.
    - Because `FetchStreamSource`
      ([fetch-stream-source.ts:33](../packages/sdk/src/client/stream-source/application/fetch-stream-source.ts#L33))
      always attaches `?live=sse` to the target URL, the proxy's explicit `?live=sse` acceptance rule
@@ -2323,14 +2388,24 @@ bypasses on proxy unit/conformance suites).
      `bindStreamEventSourceV1` emits `{ code: 'transport-error', retryable: false }`, invokes
      `onTerminalError`, disposes the binding, and schedules **zero** reconnect attempts (no spin
      loop).
-   - **Bearer `createFetchStreamEventSourceV1` terminal-status gate**: Connect a bearer client via
-     `createFetchStreamEventSourceV1` with `terminalStatuses: [400, 401, 403, 404, 405, 410]` and
-     `onHttpError`, revoke the bearer session mid-stream (closing the stream), and let the single
-     reconnect attempt hit `401`. Assert `onHttpError` receives `{ status: 401, lastCommittedOffset }`,
-     `source.readyState === 2`, `bindStreamEventSourceV1` emits `{ code: 'transport-error', retryable: false }`,
-     `source.done` resolves cleanly, and **zero** additional `fetch` / `authorize` calls occur. Also
-     verify legacy `createFetchStreamEventSourceV1` callers omitting `terminalStatuses`/`onHttpError`
-     preserve existing retry-all behavior unchanged.
+   - **Bearer `createFetchStreamEventSourceV1` terminal-status & `readyState` gate**: Connect a
+     bearer client via `createFetchStreamEventSourceV1` with
+     `terminalStatuses: [400, 401, 403, 404, 405, 410]` and `onHttpError` (using shipped
+     `StreamFetchResponseV1` without `statusText`), verify `source.readyState` starts at `0`,
+     transitions `0 → 1` on `200 text/event-stream`, commits batch 1 (`offset_1`), then revoke the
+     bearer session mid-stream (closing the stream so `readyState` transitions `1 → 0` before
+     reconnect) and let the single reconnect attempt hit `401`. Assert `onHttpError` receives
+     `{ status: 401, terminal: true, lastCommittedOffset: offset_1 }` (returning `void`),
+     `source.readyState === 2`, `bindStreamEventSourceV1` emits
+     `{ code: 'transport-error', retryable: false }`, `source.done` resolves cleanly, and **zero**
+     additional `fetch` / `authorize` calls occur. Also verify: (a) a non-terminal status (such as
+     `503` with `Retry-After: 5`) invokes `onHttpError` with
+     `{ status: 503, retryAfter: '5', terminal: false, lastCommittedOffset }`, keeps
+     `source.readyState === 0` (`retryable: true`), and retries; (b) `source.readyState` transitions
+     to `2` (`CLOSED`) on `close()`, `signal` abort, HTTP `204`, terminal `control`
+     (`streamClosed: true`), and listener / `onHttpError` exception (rejecting `done`); and
+     (c) legacy `createFetchStreamEventSourceV1` callers omitting `terminalStatuses` preserve
+     existing retry-all behavior unchanged.
    - **Conditional `410` passthrough (synthetic upstream) & whole-stream `404` expiry**: Against a
      synthetic upstream returning `410 Gone` after admission, assert the proxy propagates HTTP `410`
      cleanly (with proxy redaction/headers and zero body corruption). Against real
@@ -2556,8 +2631,10 @@ All other proposed surfaces are strictly additive:
 - `@netscript/contracts/streams`, `ServiceBuilder.withStreamProxy` / `DefineServiceOptions.streamProxies`,
   `createNetScriptStreamProxy` / `bindStreamProxy`, and `CreateNetScriptStreamEventSourceOptionsV1.proxyUrl`
   are new exports or optional properties.
-- `createFetchStreamEventSourceV1` (`@netscript/sdk/streams/consumer`) preserves its exact shipped
-  retry-all non-2xx behavior whenever `terminalStatuses` and `onHttpError` are omitted.
+- `createFetchStreamEventSourceV1` (`@netscript/sdk/streams/consumer`) keeps `StreamFetchResponseV1`
+  unchanged and preserves its exact shipped retry-all non-2xx behavior whenever `terminalStatuses`
+  is omitted (including when `onHttpError` is used solely to observe non-2xx responses without
+  calling `source.close()` or throwing).
 - `createNetScriptChatStreamProxy` (`@netscript/fresh/ai`) preserves all legacy defaults (`POST`,
   non-SSE `GET`, response headers, and legacy request-header forwarding) unchanged whenever
   `authorize` / `recheck` are omitted.
