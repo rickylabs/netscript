@@ -259,7 +259,7 @@ export function useSecretField({
         readOnly: readOnly || Boolean(overrides.readOnly),
         required: required && action !== 'keep',
         placeholder: overrides.placeholder ?? placeholder,
-        'aria-invalid': state === 'invalid' ? true : undefined,
+        'aria-invalid': state === 'invalid' ? 'true' : undefined,
         'aria-describedby': describedByParts.length > 0 ? describedByParts.join(' ') : undefined,
         onInput: composeEventHandlers(
           overrides.onInput,

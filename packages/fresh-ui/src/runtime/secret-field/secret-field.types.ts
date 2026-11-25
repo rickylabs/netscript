@@ -108,7 +108,7 @@ export interface SecretFieldInputElementProps {
   /** Placeholder text shown when empty. */
   placeholder?: string;
   /** Marks the input invalid for assistive technology. */
-  'aria-invalid'?: boolean;
+  'aria-invalid'?: 'true' | 'false';
   /** Associates status and error descriptions with the input. */
   'aria-describedby'?: string;
   /** Accessible name when no visible label is associated. */

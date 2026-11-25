@@ -408,7 +408,7 @@ export function ChipsInput({
               placeholder={items.length === 0 ? placeholder : undefined}
               disabled={disabled}
               readOnly={readOnly}
-              aria-invalid={activeError ? true : undefined}
+              aria-invalid={activeError ? 'true' : undefined}
               aria-describedby={describedBy}
               data-scope='chips-input'
               data-part='input'
@@ -437,7 +437,7 @@ export function ChipsInput({
               placeholder={items.length === 0 ? placeholder : undefined}
               disabled={disabled}
               readOnly={readOnly}
-              aria-invalid={activeError ? true : undefined}
+              aria-invalid={activeError ? 'true' : undefined}
               aria-describedby={describedBy}
               data-scope='chips-input'
               data-part='input'

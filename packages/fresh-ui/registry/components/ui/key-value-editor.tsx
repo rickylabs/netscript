@@ -522,7 +522,7 @@ export function KeyValueEditor({
                         readOnly={rowReadOnly}
                         spellcheck={false}
                         aria-label={`Row ${index + 1} ${keyLabel}`}
-                        aria-invalid={isRowInvalid ? true : undefined}
+                        aria-invalid={isRowInvalid ? 'true' : undefined}
                         aria-describedby={rowErrorId}
                         data-scope='key-value-editor'
                         data-part='key-input'
@@ -601,7 +601,7 @@ export function KeyValueEditor({
                         <button
                           type='button'
                           class='ns-kv-editor__icon-btn'
-                          aria-pressed={Boolean(row.secret)}
+                          aria-pressed={row.secret ? 'true' : 'false'}
                           aria-label={row.secret
                             ? `Disable secret mode for ${rowDescriptor}`
                             : `Enable secret mode for ${rowDescriptor}`}

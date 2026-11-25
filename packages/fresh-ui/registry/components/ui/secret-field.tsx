@@ -162,7 +162,7 @@ export function SecretField({
     .join(' ');
   const statusText = statusLabels?.[field.state] ??
     (field.state === 'readonly'
-      ? (field.hasStoredValue ? 'Set' : 'Not set')
+      ? (field.hasStoredValue ? 'Read-only' : 'Not set (read-only)')
       : field.isCleared && field.state === 'unset'
       ? 'Cleared'
       : DEFAULT_STATUS_LABELS[field.state]);
@@ -170,6 +170,7 @@ export function SecretField({
   return (
     <div
       {...props}
+      id={id}
       ref={field.attachRoot}
       class={cn('ns-secret-field', className)}
       data-scope='secret-field'
@@ -208,7 +209,6 @@ export function SecretField({
         role={field.isEditable ? undefined : 'group'}
         aria-labelledby={field.isEditable ? undefined : field.labelId}
         aria-describedby={field.isEditable ? undefined : describedBy}
-        aria-readonly={field.state === 'readonly' ? 'true' : undefined}
       >
         <span
           class='ns-secret-field__icon'

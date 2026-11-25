@@ -124,6 +124,9 @@ const combobox: VNode = (
 const primitives: VNode = (
   <Show when>
     <Icon name='check' title='Complete' />
+    <Icon name='key-round' />
+    <Icon name='lock' />
+    <Icon name='lock-open' />
     <VisuallyHidden>hidden</VisuallyHidden>
     <SrOnly>screen-reader only</SrOnly>
   </Show>
