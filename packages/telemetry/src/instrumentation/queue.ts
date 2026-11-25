@@ -246,23 +246,32 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
       // Pass the context WITH the queue span so child spans are properly linked
       const tracedCtx = this.createTracedContext(ctx, span, contextWithQueueSpan);
 
+      let handlerSucceeded = false;
       try {
         // Run handler within the queue span context so all child spans are linked
         await otelContext.with(contextWithQueueSpan, async () => {
           await handler(message, tracedCtx);
         });
-
-        setSpanOk(span);
-        span.setAttribute(NetScriptAttributeDomains.OUTCOME, 'completed');
-        addSpanEvent(span, 'message.processed');
+        handlerSucceeded = true;
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        setSpanError(span, message, error instanceof Error ? error : undefined);
-        span.setAttribute(NetScriptAttributeDomains.OUTCOME, 'failed');
-        addSpanEvent(span, 'message.failed', { 'error.message': message });
+        bestEffortSpan(() => {
+          const message = error instanceof Error ? error.message : String(error);
+          setSpanError(span, message, error instanceof Error ? error : undefined);
+          span.setAttribute(NetScriptAttributeDomains.OUTCOME, 'failed');
+          addSpanEvent(span, 'message.failed', { 'error.message': message });
+        });
         throw error;
       } finally {
-        span.end();
+        if (handlerSucceeded) {
+          bestEffortSpan(() => {
+            setSpanOk(span);
+            span.setAttribute(NetScriptAttributeDomains.OUTCOME, 'completed');
+            addSpanEvent(span, 'message.processed');
+          });
+        }
+        bestEffortSpan(() => {
+          span.end();
+        });
       }
     };
 
@@ -307,15 +316,21 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
             },
           );
 
+          let settled = false;
           try {
             await ctx.ack();
-            setSpanOk(ackSpan);
+            settled = true;
           } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            setSpanError(ackSpan, message);
+            bestEffortSpan(() => {
+              const message = error instanceof Error ? error.message : String(error);
+              setSpanError(ackSpan, message);
+            });
             throw error;
           } finally {
-            ackSpan.end();
+            if (settled) {
+              bestEffortSpan(() => setSpanOk(ackSpan));
+            }
+            bestEffortSpan(() => ackSpan.end());
           }
         } else {
           await ctx.ack();
@@ -338,15 +353,21 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
             },
           );
 
+          let settled = false;
           try {
             await ctx.nack(options);
-            setSpanOk(nackSpan);
+            settled = true;
           } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            setSpanError(nackSpan, message);
+            bestEffortSpan(() => {
+              const message = error instanceof Error ? error.message : String(error);
+              setSpanError(nackSpan, message);
+            });
             throw error;
           } finally {
-            nackSpan.end();
+            if (settled) {
+              bestEffortSpan(() => setSpanOk(nackSpan));
+            }
+            bestEffortSpan(() => nackSpan.end());
           }
         } else {
           await ctx.nack(options);
@@ -362,6 +383,14 @@ function correlationIdFromMessage(message: unknown): string | undefined {
   }
   const correlationId = message.correlationId;
   return typeof correlationId === 'string' ? correlationId : undefined;
+}
+
+function bestEffortSpan(operation: () => void): void {
+  try {
+    operation();
+  } catch {
+    // Queue telemetry faults must never alter delivery settlement or mask handler errors.
+  }
 }
 
 // ============================================================================

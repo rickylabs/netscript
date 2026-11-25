@@ -94,12 +94,16 @@ export class KvWorkerIdempotencyStore implements WorkerIdempotencyPort {
   ): Promise<void> {
     const activeKey = this.#activeKey(key);
     const appliedKey = this.#appliedKey(key);
+    const appliedMarker: AppliedMarker = {
+      appliedAt: this.#now().toISOString(),
+      ...(token ? { token } : {}),
+    };
     const mutations: AtomicMutation[] = [{ type: 'delete', key: activeKey }];
     if (ttlMs > 0) {
       mutations.push({
         type: 'set',
         key: appliedKey,
-        value: { appliedAt: this.#now().toISOString() },
+        value: appliedMarker,
         expireIn: ttlMs,
       });
     } else {
@@ -109,10 +113,18 @@ export class KvWorkerIdempotencyStore implements WorkerIdempotencyPort {
     if (this.#kv.atomic) {
       const active = token ? await this.#kv.get<ActiveClaim>(activeKey) : null;
       if (token && active?.value.token !== token) throw new Error('Worker idempotency claim lost');
-      const result = await this.#kv.atomic(
-        token ? [{ key: activeKey, versionstamp: active!.versionstamp }] : [],
-        mutations,
-      );
+      let result: AtomicResult;
+      try {
+        result = await this.#kv.atomic(
+          token ? [{ key: activeKey, versionstamp: active!.versionstamp }] : [],
+          mutations,
+        );
+      } catch (error) {
+        if (ttlMs > 0 && await this.#isCommittedApplied(appliedKey, token)) {
+          return;
+        }
+        throw error;
+      }
       if (!result.ok) throw new Error('Worker idempotency claim lost');
       return;
     }
@@ -122,7 +134,14 @@ export class KvWorkerIdempotencyStore implements WorkerIdempotencyPort {
     }
     await this.#kv.delete(activeKey);
     if (ttlMs > 0) {
-      await this.#kv.set(appliedKey, { appliedAt: this.#now().toISOString() }, { expireIn: ttlMs });
+      try {
+        await this.#kv.set(appliedKey, appliedMarker, { expireIn: ttlMs });
+      } catch (error) {
+        if (await this.#isCommittedApplied(appliedKey, token)) {
+          return;
+        }
+        throw error;
+      }
     } else {
       await this.#kv.delete(appliedKey);
     }
@@ -214,6 +233,17 @@ export class KvWorkerIdempotencyStore implements WorkerIdempotencyPort {
   #appliedKey(key: string): KvKey {
     return [...this.#prefix, 'applied', key];
   }
+
+  /** Read-only verification after an ambiguous write failure; preserves original error on read fault. */
+  async #isCommittedApplied(appliedKey: KvKey, token?: string): Promise<boolean> {
+    try {
+      const applied = await this.#kv.get<AppliedMarker>(appliedKey);
+      if (!applied) return false;
+      return token === undefined || applied.value.token === token;
+    } catch {
+      return false;
+    }
+  }
 }
 
 function assertDurableKv(kv: WorkerIdempotencyKvStore): void {
@@ -251,4 +281,10 @@ type ActiveClaim = Readonly<{
   token: string;
   messageId?: string;
   deliveryCount?: number;
+}>;
+
+/** Applied completion marker recording the applying claim owner token when supplied. */
+type AppliedMarker = Readonly<{
+  appliedAt: string;
+  token?: string;
 }>;

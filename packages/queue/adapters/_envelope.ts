@@ -80,7 +80,8 @@ export function createEnvelope<T>(
  * Normalize a raw transport message into an envelope addressed to a queue name.
  *
  * Legacy envelopes without a queue name, and raw non-envelope payloads, are addressed to
- * {@link DEFAULT_QUEUE_NAME}.
+ * {@link DEFAULT_QUEUE_NAME}. Each raw non-envelope payload receives a fresh unique `messageId`
+ * so distinct messages with identical content are never conflated.
  */
 export function toAddressedEnvelope<T>(
   rawMessage: unknown,
