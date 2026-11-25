@@ -15,17 +15,18 @@ target-milestone: 0.0.10
 This RFC proposes a generic, revocable authorizing Server-Sent Events (SSE) stream proxy for
 NetScript Durable Streams:
 
-1. A runtime-free stream endpoint contract (`defineStreamEndpoint` and `buildStreamEndpointUrl`) in
-   `@netscript/contracts/streams` that declares parameterized stream proxy routes, path and query
-   schemas, `access` metadata, and accepted client authentication transports (`bearer`, `cookie`, or
-   `bearer-or-cookie`).
+1. A runtime-free stream endpoint contract (`defineStreamEndpoint`, `buildStreamEndpointUrl`, and
+   canonical `isValidStreamOffset`) in `@netscript/contracts/streams` that declares parameterized
+   stream proxy routes, path and query schemas, `access` metadata, and accepted client
+   authentication transports (`bearer`, `cookie`, or `bearer-or-cookie`).
 2. A revocable SSE proxy runtime (`createNetScriptStreamProxy` and `bindStreamProxy`) in
    `@netscript/plugin-streams-core/proxy` that delegates session identity, admission, re-check, and
    revocation decisions exclusively to an application-supplied policy — the proxy never owns
    sessions. Authorization is checked on admission, immediately after revocation-source subscription,
    and **before each validated SSE batch and its cursor-advancing `control` frame are released**,
-   with monotonic invalidation fencing so a revoked or expired reader never receives a batch
-   admitted after observed revocation, never advances its committed offset past withheld data,
+   with monotonic invalidation fencing, bounded active reader caps (`maxActiveReaders`,
+   `maxReadersPerKey`), and wake-storm coalescing so a revoked or expired reader never receives a
+   batch admitted after observed revocation, never advances its committed offset past withheld data,
    closes downstream cleanly and synchronously without waiting on upstream cleanup, releases its
    upstream reader, and fails fresh admission.
 3. First-class, authoritative mounting in `@netscript/service` (`ServiceBuilder.withStreamProxy`,
@@ -38,12 +39,14 @@ NetScript Durable Streams:
    trusted proxy-origin checks, and a pre-drain shutdown `AbortSignal` so active SSE readers close
    cleanly on `RunningService.stop()`).
 4. A single-offset-authority `proxyUrl` option on `createNetScriptStreamEventSourceV1`
-   (`@netscript/fresh/streams`) plus terminal-vs-retryable `readyState` propagation on
-   `bindStreamEventSourceV1` (`@netscript/plugin-streams-core/sse`) so browser consumers commit
-   strictly on `control` and dispose-and-rebuild without spinning on terminal HTTP refusals, plus a
-   backward-compatible, non-breaking relationship with `createNetScriptChatStreamProxy`
-   (`@netscript/fresh/ai`) that preserves legacy defaults unchanged and adds opt-in revocable SSE
-   delegation.
+   (`@netscript/fresh/streams`), opt-in `terminalStatuses` / `onHttpError` / `readyState` on
+   `createFetchStreamEventSourceV1` (`@netscript/sdk/streams/consumer`) for bearer and
+   credentialed-fetch clients, terminal-vs-retryable `readyState` propagation on
+   `bindStreamEventSourceV1` (`@netscript/plugin-streams-core/sse`, documented as an intentional
+   behavioral change in [Breaking changes and migration](#breaking-changes-and-migration)) so
+   consumers commit strictly on `control` and stop cleanly on terminal HTTP refusals, plus a
+   backward-compatible relationship with `createNetScriptChatStreamProxy` (`@netscript/fresh/ai`)
+   that preserves legacy defaults unchanged and adds opt-in revocable SSE delegation.
 
 ## Motivation
 
@@ -364,21 +367,34 @@ function startProjectFeed(
 
 Note: native browser `EventSource` exposes `readyState === EventSource.CLOSED` (`2`) on terminal
 non-`200` HTTP refusals (`401`/`403`/`404`/`410`) without revealing the numeric status code.
-Browser consumers that must distinguish `401` (re-authenticate) from `410` (resync snapshot) can
-use credentialed `fetch(..., { credentials: 'same-origin' })` with `createFetchStreamEventSourceV1`.
+Browser consumers that must distinguish `401` (re-authenticate) from `403` (forbidden) or
+`404`/`410` (resync snapshot) can use credentialed `fetch(..., { credentials: 'same-origin' })`
+with `createFetchStreamEventSourceV1` and its opt-in `terminalStatuses` / `onHttpError` options
+(below).
 
-### 4. Consume from a bearer client (`fetch`) with offset resume
+### 4. Consume from a bearer client (`fetch` / `createFetchStreamEventSourceV1`) with terminal denial stop and offset resume
 
 A CLI, mobile client, or backend service connects to the exact same endpoint with an
-`Authorization: Bearer <token>` header and resumes with `?offset=<lastCommittedOffset>`:
+`Authorization: Bearer <token>` header and resumes with `?offset=<lastCommittedOffset>`.
+
+Because the shipped `createFetchStreamEventSourceV1` (`@netscript/sdk/streams/consumer`,
+[create-fetch-stream-event-source.ts:18-19](../packages/sdk/src/client/stream-source/application/create-fetch-stream-event-source.ts#L18-L19))
+retries every non-2xx response by default (including `401`/`403`/`404`), bearer clients targeting an
+authorizing proxy MUST pass opt-in `terminalStatuses` (or `onHttpError` returning `'stop'`) so a
+revoked or denied token stops cleanly instead of looping on admission:
 
 ```ts
 import { buildStreamEndpointUrl } from '@netscript/contracts/streams';
+import {
+  bindStreamEventSourceV1,
+  createFetchStreamEventSourceV1,
+} from '@netscript/sdk/streams/consumer';
 
 declare const API_ORIGIN: string;
 declare const accessToken: string;
 declare const lastCommittedOffset: string;
 declare const signal: AbortSignal;
+declare function onHttpTerminal(status: number, offset?: string): void;
 
 const url = buildStreamEndpointUrl(projectFeedStream, {
   baseUrl: API_ORIGIN,
@@ -386,14 +402,34 @@ const url = buildStreamEndpointUrl(projectFeedStream, {
   offset: lastCommittedOffset,
 });
 
-const response = await fetch(url, {
-  headers: {
-    accept: 'text/event-stream',
-    authorization: `Bearer ${accessToken}`,
-  },
+const source = createFetchStreamEventSourceV1({
+  url,
+  fetch: (input, init) => fetch(input, init),
   signal,
+  authHeaders: () => ({ authorization: `Bearer ${accessToken}` }),
+  // Stop permanently on terminal admission/retention statuses instead of looping on authorize().
+  terminalStatuses: [400, 401, 403, 404, 405, 410],
+  onHttpError: ({ status, lastCommittedOffset: offset }) => {
+    onHttpTerminal(status, offset); // Distinguish 401 re-auth vs 403 denied vs 404/410 resync.
+    return 'stop';
+  },
 });
+
+const binding = bindStreamEventSourceV1({
+  source,
+  onEvent(event) {
+    // Commit application state on `control`; stop on `error` with `retryable === false`.
+    if (event.event === 'error' && !event.payload.retryable) {
+      binding.dispose();
+    }
+  },
+});
+await source.done;
 ```
+
+Callers using bare `fetch(url, { headers: { accept: 'text/event-stream', authorization: \`Bearer \${accessToken}\` }, signal })`
+inspect `response.status` directly before reading the SSE body and stop without retrying on
+`401`/`403`/`404`/`410`.
 
 ### 5. Standalone Fresh 2.x BFF route handler
 
@@ -452,9 +488,10 @@ This design spans existing NetScript archetypes and adds **zero new packages**:
 
 | Package / subpath | Archetype | Responsibility |
 | --- | --- | --- |
-| `@netscript/contracts/streams` | 1 — Small Contract | Runtime-free `defineStreamEndpoint`, `StreamEndpointContract`, `StreamEndpointClientAuthMode`, and `buildStreamEndpointUrl`. Zero runtime/IO imports. |
+| `@netscript/contracts/streams` | 1 — Small Contract | Runtime-free `defineStreamEndpoint`, `StreamEndpointContract`, `StreamEndpointClientAuthMode`, `isValidStreamOffset` (single canonical offset validator), and `buildStreamEndpointUrl`. Zero runtime/IO imports. |
 | `@netscript/service` | 4 — Public DSL/Builder | Structural `StreamProxyMount` + `StreamProxyMountContext` (including `remoteAddr` and pre-drain `shutdownSignal`), `ServiceBuilder.withStreamProxy`, `DefineServiceOptions.streamProxies`, authoritative stream-endpoint binding in `createContractAuthorizer` and `createContractOverlayAuthorizer`, and dispatch-consistent path-pattern intersection checks. Zero dependency on `@netscript/plugin-streams-core`. |
-| `@netscript/plugin-streams-core/proxy` | 3 — Runtime/Behavior | `createNetScriptStreamProxy`, `bindStreamProxy`, bounded incremental SSE delivery-unit parser and `control` validator, monotonic invalidation-epoch fencing, `ClockPort` expiry/idle/timeout scheduling, optional revocation-source subscription with `'post-subscribe'` catch-up, deterministic credential/Origin/Fetch-Metadata guards, strict 3-tier response header ownership, and decoupled downstream/upstream teardown. Internal header-hygiene helpers remain package-private. |
+| `@netscript/plugin-streams-core/{proxy,sse}` | 3 — Runtime/Behavior | `createNetScriptStreamProxy`, `bindStreamProxy`, bounded incremental SSE delivery-unit parser and `control` validator, monotonic invalidation-epoch fencing, reader concurrency bounds (`maxActiveReaders`, `maxReadersPerKey`), `ClockPort` expiry/idle/timeout scheduling, optional revocation-source subscription with `'post-subscribe'` catch-up, deterministic credential/Origin/Fetch-Metadata guards, strict 3-tier response header ownership, decoupled downstream/upstream teardown, and `StreamEventSourceV1.readyState` terminal detection in `bindStreamEventSourceV1`. Internal header-hygiene helpers remain package-private. |
+| `@netscript/sdk/streams/consumer` | 2 — Integration | Opt-in `terminalStatuses`, `onHttpError`, and `readyState` (`0 \| 1 \| 2`) on `createFetchStreamEventSourceV1` so bearer and credentialed-fetch clients terminate cleanly on `401`/`403`/`404`/`410` without backoff loops while inspecting exact HTTP status codes. |
 | `@netscript/fresh/streams` | 4 — Public DSL/Builder | Additive `proxyUrl` option on `createNetScriptStreamEventSourceV1` enforcing one offset authority with `options.offset`. |
 | `@netscript/fresh/ai` | 4 — Public DSL/Builder | Preserves legacy `createNetScriptChatStreamProxy` defaults unchanged (`POST`, non-SSE `GET`, headers); adds opt-in `authorize` + `recheck` support delegating `live=sse` `GET` reads to `@netscript/plugin-streams-core/proxy` while preserving `target`, `streamPath`, `query`, `auth`, and `fetch` overrides. |
 
@@ -465,7 +502,7 @@ Because `packages/plugin-streams-core/deno.json:18` already depends on `@netscri
 strictly acyclic:
 
 ```text
-@netscript/contracts/streams (leaf: types, schemas, URL builder)
+@netscript/contracts/streams (leaf: types, schemas, isValidStreamOffset, URL builder)
         ▲                               ▲
         │                               │
 @netscript/service (structural mount,   │
@@ -474,10 +511,11 @@ strictly acyclic:
         ▲                               │
         └───────────────┬───────────────┘
                         │
-        @netscript/plugin-streams-core/proxy (revocable SSE proxy runtime)
+        @netscript/plugin-streams-core/{proxy,sse} (revocable SSE proxy + SSE binding)
                         ▲
-                        │
-              @netscript/fresh/{ai,streams}
+              ┌─────────┴──────────┐
+              │                    │
+@netscript/sdk/streams/consumer   @netscript/fresh/{ai,streams}
 ```
 
 ### Contract surface (`@netscript/contracts/streams`)
@@ -590,6 +628,42 @@ oRPC router traversal and `OpenAPIGenerator.generate(router)`. Stream endpoints 
 declared as explicit sibling exports (e.g., `export const projectFeedStream = defineStreamEndpoint(...)`)
 and mounted via `streamProxies` on `defineService` / `createService().withStreamProxy(...)`.
 
+#### Canonical offset grammar (`isValidStreamOffset`, owned by `@netscript/contracts/streams`)
+
+`@netscript/contracts/streams` owns and exports **one** pure, runtime-free validator used identically
+by `buildStreamEndpointUrl`, the proxy's `?offset=` / `?cursor=` admission validator, the proxy's
+committing `event: control` `streamNextOffset` check, and `createNetScriptStreamEventSourceV1`:
+
+```ts
+/** Maximum accepted ASCII/UTF-8 byte length for an opaque stream offset or cursor token. */
+export const STREAM_OFFSET_MAX_BYTES = 512;
+
+/**
+ * Validate an opaque Durable Streams offset (or cursor) token under the single canonical grammar:
+ * - non-empty string with length in `1..512` bytes;
+ * - printable non-whitespace ASCII only (`0x21..0x7E`, rejecting all control chars CR/LF/NUL,
+ *   spaces, tabs, and non-ASCII bytes);
+ * - excludes URL query/fragment delimiters `?`, `#`, and `&`.
+ */
+export function isValidStreamOffset(value: unknown): value is string;
+```
+
+Exact predicate:
+`typeof value === 'string' && value.length >= 1 && value.length <= 512 && /^[\x21-\x7E]+$/.test(value) && !/[?#&]/.test(value)`.
+(Because every permitted character is single-byte ASCII `0x21..0x7E`, `value.length` equals exact
+UTF-8 byte length.)
+
+**Why this single grammar:**
+- Accepts every token emitted or accepted by pinned `@durable-streams/server@0.3.9` — including `-1`,
+  `now`, and live emitted offsets such as `0000000000000000_0000000000000170` (measured on `main`
+  `87965d80`) — as well as future base64, base64url, UUID, decimal, or colon/dot/slash-delimited
+  opaque cursors.
+- Eliminates CR/LF/NUL framing hazards, whitespace ambiguity, unescaped query/fragment delimiters
+  (`?`, `#`, `&`), and oversized query payloads (`> 512` bytes).
+- Because both committing `event: control` validation and incoming `?offset=` admission call the
+  exact same exported function from `@netscript/contracts/streams`, a committed control offset is
+  guaranteed to be accepted by the same proxy on resume.
+
 #### Typed URL builder (`buildStreamEndpointUrl`)
 
 ```ts
@@ -614,7 +688,7 @@ export function buildStreamEndpointUrl<
 ([`schema-types.ts:6-15,54-71`](../packages/contracts/src/domain/schema-types.ts#L6-L15)) exposes
 `_input`, `_output`, `shape`, and synchronous `parse(value: unknown): TOutput`. `buildStreamEndpointUrl`
 accepts the schema's **input** types (`ContractSchemaInput`), calls `schema.parse(...)` synchronously
-to validate the caller's values (throwing if validation fails or if `offset` fails
+to validate the caller's values (throwing if validation fails or if `offset`/`cursor` fails
 `isValidStreamOffset`), and serializes the **caller's validated wire input** (not the transformed
 `TOutput`) into URL path segments and query parameters — throwing `TypeError` if any input field is
 not wire-serializable (`string | number | boolean` for `params`; additionally `readonly string[]` or
@@ -624,8 +698,11 @@ and `resolvePath`. This preserves transforms that convert wire strings into doma
 example, `z.string().transform(...)` or `z.coerce.number()`), and requires `params`/`query` schemas
 to accept decoded URL string inputs so client URL construction and server validation agree. Omitting
 `offset` lets either `createNetScriptStreamEventSourceV1` or the proxy's `defaultOffset` supply the
-single authoritative offset. It never appends `live=sse` to the public proxy URL because the proxy
-always enforces `live=sse` on the upstream Durable Streams hop.
+single authoritative offset. `buildStreamEndpointUrl` never appends `live=sse` to the public proxy
+URL; on incoming requests, the proxy accepts omitted `?live=` OR single `?live=sse` (compatible with
+`createFetchStreamEventSourceV1`, which appends `live=sse` at
+[fetch-stream-source.ts:33](../packages/sdk/src/client/stream-source/application/fetch-stream-source.ts#L33))
+and rejects any other or duplicate `?live=` value with HTTP `400`.
 
 ### Service mounting, authoritative contract policy, and shutdown (`@netscript/service`)
 
@@ -1078,6 +1155,23 @@ export interface StreamProxyOptions<
   readonly maxPendingBatchBytes?: number;
 
   /**
+   * Maximum concurrent active readers permitted on this proxy instance. Defaults to `1_000`.
+   * Exceeding rejects new admissions BEFORE `authorize` / upstream connect with `503` + `Retry-After`.
+   */
+  readonly maxActiveReaders?: number;
+
+  /**
+   * Optional per-principal / per-session / per-grant concurrent reader cap enforced immediately
+   * after `authorize` (before `subscribe` or upstream connect). Exceeding rejects with `429` +
+   * `Retry-After` without affecting other keys. When omitted, the application is responsible for
+   * limiting per-principal concurrency and replay abuse via `authorize` and `withRateLimit()`.
+   */
+  readonly maxReadersPerKey?: Readonly<{
+    readonly key: (grant: TGrant) => string;
+    readonly max: number;
+  }>;
+
+  /**
    * Optional Durable Streams base URL override (defaults to `getStreamsUrl()`).
    */
   readonly baseUrl?: string | (() => string);
@@ -1132,6 +1226,8 @@ export function bindStreamProxy<TParams, TQuery, TGrant = unknown>(
 - `policyTimeoutMs` and `upstreamConnectTimeoutMs` MUST be finite positive integers
   (`<= 2_147_483_647`).
 - `maxPendingBatchBytes` MUST be a finite positive integer (`>= 1024`).
+- `maxActiveReaders` (when provided) MUST be a finite positive integer (`>= 1`; default `1_000`).
+- `maxReadersPerKey` (when provided) MUST supply a `key` function and finite positive integer `max >= 1`.
 - `allowedOrigins` MUST NOT contain `'*'` or `'null'`, and each entry MUST be an exact `http:` or
   `https:` origin (`URL.parse(entry)?.origin === entry`), matching
   [service-cors.ts:31-51](../packages/service/src/middleware/service-cors.ts#L31-L51).
@@ -1141,17 +1237,22 @@ export function bindStreamProxy<TParams, TQuery, TGrant = unknown>(
 Every incoming request owns one `setupAbortController` linked immediately to `request.signal` and
 `context.shutdownSignal`, plus a single idempotent setup terminal transition
 `abortSetupOnce(reason, status)` that sets `setupClosed = true`, aborts `setupAbortController`,
-cancels all setup timers, removes abort listeners, invokes `unsubscribe()` if already registered,
-and guarantees late-resolving `subscribe` or `fetch` results are disposed cleanly. Every async step
-during setup receives `setupAbortController.signal` combined with a `ClockPort`-scheduled timeout
-(`policyTimeoutMs` for policy/path/subscribe/auth hooks; `upstreamConnectTimeoutMs` for upstream
-`fetch`), so aborting during setup never leaks subscriptions, upstream connections, timers, or
-unhandled rejections.
+cancels all setup timers, removes abort listeners, releases any reserved reader-cap slots, invokes
+`unsubscribe()` if already registered, and guarantees late-resolving `subscribe` or `fetch` results
+are disposed cleanly. Every async step during setup receives `setupAbortController.signal` combined
+with a `ClockPort`-scheduled timeout (`policyTimeoutMs` for policy/path/subscribe/auth hooks;
+`upstreamConnectTimeoutMs` for upstream `fetch`), so aborting during setup never leaks
+subscriptions, reader slots, upstream connections, timers, or unhandled rejections.
 
 Every request executes this exact sequence before returning `200 text/event-stream`:
 
-1. **Method check**: Only `GET` is admitted (`405 Method Not Allowed` with `Allow: GET` otherwise).
-   If `request.signal.aborted || shutdownSignal.aborted`, return immediately with zero work.
+1. **Method check and global reader cap**: Only `GET` is admitted (`405 Method Not Allowed` with
+   `Allow: GET` otherwise). If `request.signal.aborted || shutdownSignal.aborted`, return
+   immediately with zero work. If the proxy's active+admitting reader count has reached
+   `maxActiveReaders` (default `1_000`), reject immediately **before** calling `authorize` or
+   opening upstream with `503 Service Unavailable`, `Retry-After: 5`, `cache-control: no-store`, and
+   `reason: 'max_active_readers_exceeded'`. Otherwise reserve one slot (released unconditionally by
+   `abortSetupOnce` or `closeOnce`).
 2. **Deterministic credential selection & CSRF/Origin guard** (see
    [Credential selection, headers, and CSRF/Origin handling](#credential-selection-headers-and-csrforigin-handling)):
    - When mounted via `defineService` / `ServiceBuilder.withStreamProxy`, this step ALREADY executed
@@ -1160,16 +1261,21 @@ Every request executes this exact sequence before returning `200 text/event-stre
    - When invoked standalone (Fresh 2.x route handler), `createNetScriptStreamProxy` runs the exact
      same deterministic credential selection (`401` on missing/malformed/empty/duplicate/mixed
      `Authorization`) and Cookie Origin + Fetch Metadata guard (`403` on failure) before `authorize`.
-3. **Parameter, query, and shared offset validation**:
+3. **Parameter, query, `?live=`, and canonical offset validation**:
    - When bound via `bindStreamProxy(endpoint, ...)`, validate `params` and application `query`
      against `endpoint.params` and `endpoint.query`; validation failures return `400 Bad Request`
      with a structured, non-secret error payload.
-   - Validate optional `?offset=` and `?cursor=` query values using the shared `isValidStreamOffset`
-     validator: reject duplicate `?offset=` keys, empty strings, values containing ASCII control
-     characters (`[\x00-\x1F\x7F]`, including CR/LF/NUL), or values exceeding `512` UTF-8 bytes
-     with `400`. (The exact same validator governs upstream `event: control` `streamNextOffset` so a
-     control frame can never commit an offset this proxy rejects on resume.)
-4. **Application admission (`authorize`) and immediate deadline activation**:
+   - **Client-supplied `?live=` handling**: If `?live=` is omitted OR appears once with value
+     `'sse'` (compatible with `createFetchStreamEventSourceV1`'s outbound URL at
+     [fetch-stream-source.ts:33](../packages/sdk/src/client/stream-source/application/fetch-stream-source.ts#L33)),
+     accept it. If `?live=` appears more than once or carries any other value (such as `'false'`,
+     `'long-poll'`, or empty string), reject fail-closed with `400 Bad Request`
+     (`reason: 'unsupported_live_mode'`).
+   - **Canonical `?offset=` / `?cursor=` validation**: Reject duplicate `?offset=` or `?cursor=`
+     query keys with `400`. Validate present `?offset=` and `?cursor=` values with the single
+     canonical `isValidStreamOffset` from `@netscript/contracts/streams` (`1..512` printable
+     non-whitespace ASCII bytes `0x21..0x7E`, excluding `?`, `#`, `&`; `400` on failure).
+4. **Application admission (`authorize`), per-key reader cap, and immediate deadline activation**:
    - Invoke `authorize({ request, params, query, credentialMode, principal, signal })` bounded by
      `ClockPort` `policyTimeoutMs`.
    - If `authorize` returns `{ allow: false, status, reason }`, return JSON `{ error, reason }`
@@ -1177,6 +1283,11 @@ Every request executes this exact sequence before returning `200 text/event-stre
      is initiated.
    - If `authorize` throws, rejects, times out, or returns a malformed decision, fail closed with
      redacted HTTP `503 Service Unavailable`.
+   - **Per-key reader cap (`maxReadersPerKey`)**: If configured, compute `const key = maxReadersPerKey.key(decision.grant)`.
+     If the active+admitting count for `key` has reached `maxReadersPerKey.max`, reject immediately
+     (before `resolvePath`, `subscribe`, or upstream connect) with `429 Too Many Requests`,
+     `Retry-After: 5`, `cache-control: no-store`, and `reason: 'reader_limit_exceeded'`. Otherwise
+     reserve one per-key slot (released unconditionally by `abortSetupOnce` or `closeOnce`).
    - **Validate `decision.responseHeaders` and `decision.setCookies`** against the reserved-header
      table immediately (see [Response header ownership](#response-header-ownership)); any reserved
      (including protocol replay metadata `stream-*` / `etag`) or malformed header fails closed with
@@ -1311,10 +1422,11 @@ handling delimiters and multi-byte UTF-8 code points split across arbitrary chun
      parses JSON, and validates the payload against `STREAM_SSE_CONTRACT_V1.schemas.control`
      ([sse-contract-v1.ts:195-200,236](../packages/plugin-streams-core/src/domain/sse-contract-v1.ts#L195-L200)):
      - MUST be a JSON object with a non-empty string `streamNextOffset` that ALSO satisfies the
-       shared `isValidStreamOffset(streamNextOffset)` predicate (`1..512` UTF-8 bytes, zero ASCII
-       control characters `[\x00-\x1F\x7F]` including CR/LF/NUL — the exact same rule applied to
-       incoming `?offset=` query values so a control frame can never commit an offset the same proxy
-       would reject on resume).
+       single canonical `isValidStreamOffset(streamNextOffset)` predicate exported by
+       `@netscript/contracts/streams` (`1..512` printable non-whitespace ASCII characters
+       `0x21..0x7E`, excluding `?`, `#`, and `&` — the exact same rule applied to incoming
+       `?offset=` query values and `buildStreamEndpointUrl` so a control frame can never commit an
+       offset the same proxy would reject on resume).
      - Optional fields MUST match their types (`streamCursor?: string`, `upToDate?: boolean`,
        `streamClosed?: boolean`).
    - If JSON parsing fails, `STREAM_SSE_CONTRACT_V1.schemas.control` rejects the payload, or
@@ -1421,9 +1533,14 @@ upstream chunks ─▶ bounded incremental SSE parser ─▶ validate `event: co
    delivery unit into one single `Uint8Array` enqueued strictly in response to `pull(controller)`.
    Because `highWaterMark` is `0`, the proxy never speculatively pre-authorizes and pre-enqueues a
    second unrequested delivery unit into the `ReadableStream` internal queue.
-3. **Bounded re-fence attempts**: If continuous push invalidations repeatedly bump
-   `invalidationEpoch` during re-checks (`attempts > 8`), the proxy fails closed with
-   `closeOnce('policy-error')` and emits zero bytes rather than spinning indefinitely.
+3. **Bounded re-fence attempts and push `'recheck'` worst-case close latency**: If continuous push
+   invalidations repeatedly bump `invalidationEpoch` during re-checks (`attempts > 8`), the proxy
+   fails closed with `closeOnce('policy-error')` and emits zero bytes rather than spinning
+   indefinitely. Consequently, worst-case close latency on the push `'recheck'` path is bounded by
+   **`(maxRefenceAttempts + 1) * policyTimeoutMs`** (45 s at default `maxRefenceAttempts = 8`,
+   `policyTimeoutMs = 5_000` ms) — zero unauthorized bytes are released during that window (it is
+   strictly a liveness bound; confirmed `notify({ action: 'revoked' })` closes synchronously in 0
+   policy round-trips).
 4. **No fabricated protocol frames**: On revocation, expiry, malformed frame, or policy error, the
    proxy emits zero bytes of the withheld unit, NEVER fabricates `event: control` with
    `streamClosed: true`, and NEVER emits undeclared event names.
@@ -1564,6 +1681,59 @@ application-provided shared revocation source (e.g. Deno KV, Postgres, Redis, or
 4. **Fresh admission**: Both gateways consult the same shared source in `authorize`, so fresh
    admission immediately fails on every gateway after revocation.
 
+### Resource bounds, fan-out cost model, and wake-storm behavior
+
+#### Per-reader and fan-out cost model
+
+Until future upstream connection coalescing lands, each active reader holds:
+
+| Resource | Per-reader upper bound | N-reader fan-out on one topic |
+| --- | --- | --- |
+| Upstream Durable Streams connection | `1` HTTP/SSE connection + `1` `ReadableStreamDefaultReader` | `N` upstream SSE connections and `N` upstream wakes per append |
+| Parser & uncommitted-unit buffer | `<= maxPendingBatchBytes` (default `4 MiB`) | `<= N * maxPendingBatchBytes` worst-case buffered memory (at default 4 MiB, 32 readers cap at 128 MiB worst case; typical State Protocol batches are a few KiB) |
+| Policy evaluations (`recheck`) | `1` per delivered unit + `1` `'post-subscribe'` + `1` per `recheckEveryMs` while idle | `N` policy evaluations per topic append |
+| Timers & subscriptions | Up to `3` `ClockPort` timers (`expiresAtMs`, `recheckEveryMs`, active timeout) + `1` optional `revocationSource` subscription | `<= 3N` timers + `N` subscriptions (all cleared synchronously in `closeOnce` / `abortSetupOnce`) |
+
+Companion Durable Streams server fan-out capacity and per-reader persistence behavior are measured
+and tracked separately in [#2650](https://github.com/rickylabs/netscript/issues/2650) and
+[#2661](https://github.com/rickylabs/netscript/issues/2661); end-to-end subscriber latency through
+the proxy is the sum of upstream Durable Streams fan-out latency plus one `recheck` policy call per
+reader.
+
+#### Reader caps and replay-abuse boundary
+
+1. **Per-proxy active-reader cap (`maxActiveReaders`, default `1_000`)**: Enforced before
+   `authorize` and upstream connect so overload sheds traffic cheaply with `503 Service Unavailable`
+   and `Retry-After: 5`, bounding total upstream connections and worst-case parser memory per
+   gateway process.
+2. **Optional per-principal / per-session / per-grant cap (`maxReadersPerKey`)**: Enforced right
+   after `authorize` (before `subscribe` or upstream connect), rejecting excess concurrent readers
+   for one key with `429 Too Many Requests` and `Retry-After: 5`. When `maxReadersPerKey` is
+   omitted, the application MUST enforce per-principal connection quotas in `authorize` or gateway
+   `withRateLimit()`.
+3. **Full-replay (`?offset=-1`) abuse**: A client reconnecting repeatedly with `?offset=-1` forces
+   admission plus upstream replay from stream start. Because retention/replay policy belongs to the
+   application, gateways SHOULD pair stream proxy routes with `withRateLimit()` on admission and
+   applications MAY reject or throttle repeated `-1` replays inside `authorize` (which receives the
+   request URL and validated `?offset=`).
+
+#### Wake-storm behavior
+
+- **Narrow wake scoping (normative recommendation)**: Applications wiring `revocationSource` MUST
+  scope push wakes to the revoked session/grant (never broadcasting a global `'recheck'` to every
+  unrelated active reader on the gateway).
+- **Wake coalescing & re-fence cap**: Multiple `'recheck'` wakes arriving while one `recheck` is
+  already in flight only increment `invalidationEpoch` and do NOT queue `K` extra serial policy
+  calls; they coalesce into the next single re-fence pass. If continuous wakes still exceed
+  `maxRefenceAttempts` (`8`), the reader closes fail-closed via `closeOnce('policy-error')` (with
+  worst-case push `'recheck'` close latency `(maxRefenceAttempts + 1) * policyTimeoutMs` = 45 s at
+  defaults, zero unauthorized bytes emitted).
+- **Reconnect storm protection**: Because closing readers causes clients to reconnect and re-run
+  `authorize`, both browser (`Guide #3`) and bearer (`createFetchStreamEventSourceV1`) consumers use
+  bounded exponential backoff + terminal-error stop (`401`/`403` never spin), while gateway
+  `withRateLimit()` + `maxActiveReaders` protect `authorize` and upstream Durable Streams during a
+  broad outage or wake burst.
+
 ### Offset, cursor, and replay-state agreement on resume
 
 #### Wire and proxy offset rules
@@ -1577,8 +1747,10 @@ application-provided shared revocation source (e.g. Deno KV, Postgres, Redis, or
      cookie clients (`EventSource` or credentialed `fetch` on `GET <proxyUrl>?offset=<token>`)
      resume identically via `?offset=<opaque>` (and optional `?cursor=<opaque>`).
    - Upstream requests always carry `live=sse` enforced by the proxy (`offset` defaults to
-     `options.defaultOffset ?? '-1'`). Clients cannot downgrade an SSE proxy endpoint to
-     `live=false` or `live=long-poll`.
+     `options.defaultOffset ?? '-1'`). On incoming client requests, omitted `?live=` and single
+     `?live=sse` are accepted (compatible with `createFetchStreamEventSourceV1`); any other value
+     (`live=false`, `live=long-poll`, empty) or duplicate `?live=` is rejected `400`
+     (`unsupported_live_mode`), so clients can never downgrade an SSE proxy endpoint.
 3. **Retention condition, `404` whole-stream expiry, and conditional `410` passthrough**:
    - Because a withheld delivery unit emits neither `event: data` nor `event: control`, a reader
      revoked before batch $N$ retains `lastCommittedOffset` from batch $N-1$.
@@ -1649,8 +1821,50 @@ preserves upstream framing in offset-only mode:
      cap. If the session was revoked mid-stream, that single fresh-admission attempt receives
      `401`/`403`, transitions `readyState === 2` (`retryable: false`), and terminates cleanly.
    - Browser consumers that need the exact numeric HTTP status (`401` vs `403` vs `410`) rather than
-     `EventSource.CLOSED` can use credentialed `fetch` via `createFetchStreamEventSourceV1`.
-3. **Commit strictly on `control` (fate of `data` received without its committing `control` frame)**:
+     `EventSource.CLOSED` can use credentialed `fetch` via `createFetchStreamEventSourceV1` (see
+     item 3 below).
+3. **Bearer and fetch client terminal-status contract (`@netscript/sdk/streams/consumer`)**:
+   - Shipped `createFetchStreamEventSourceV1`
+     ([create-fetch-stream-event-source.ts:18-19](../packages/sdk/src/client/stream-source/application/create-fetch-stream-event-source.ts#L18-L19),
+     [connection.ts:19-45](../packages/sdk/src/client/stream-source/internal/connection.ts#L19-L45))
+     currently treats every non-2xx HTTP status identically to a transient transport error and
+     retries forever after firing plain `{ type: 'error' }`, leaving `readyState` absent.
+   - To give bearer and credentialed-`fetch` consumers the same bounded stop-on-revocation semantics
+     as browser `EventSource` **without** breaking existing callers that rely on the current retry
+     default, this RFC proposes additive, opt-in members on `FetchStreamEventSourceOptionsV1` and
+     `FetchStreamEventSourceV1` (`@netscript/sdk/streams/consumer`):
+     ```ts
+     export interface FetchStreamHttpErrorInfoV1 {
+       readonly status: number;
+       readonly statusText: string;
+       readonly retryAfter?: string;
+       readonly terminal: boolean;
+     }
+
+     // Additive optional fields on FetchStreamEventSourceOptionsV1:
+     readonly terminalStatuses?: readonly number[]; // opt-in; recommended for proxies: [400, 401, 403, 404, 410]
+     readonly onHttpError?: (info: FetchStreamHttpErrorInfoV1) => void;
+
+     // Additive readonly property on FetchStreamEventSourceV1 (compatible with StreamEventSourceV1):
+     readonly readyState: 0 | 1 | 2; // 0 = CONNECTING, 1 = OPEN, 2 = CLOSED
+     ```
+   - When `terminalStatuses` is omitted, `createFetchStreamEventSourceV1` preserves its existing
+     retry behavior verbatim (`readyState` remains `0` across retries until `close()`).
+   - When the server responds with a status listed in `terminalStatuses` (for example `401`, `403`,
+     `404`, or `410`):
+     1. `createFetchStreamEventSourceV1` transitions `readyState` synchronously to `2` (`CLOSED`)
+        and disarms internal reconnection so zero further HTTP requests are issued.
+     2. If `onHttpError` is supplied, it invokes `onHttpError({ status, statusText, retryAfter, terminal: true })`
+        synchronously before dispatching the `'error'` event.
+     3. It dispatches `{ type: 'error' }`; `bindStreamEventSourceV1` observes `source.readyState === 2`
+        and emits `{ event: 'error', payload: { message, retryable: false } }`, stopping the
+        consumer cleanly with zero retry spin.
+   - Because `FetchStreamSource`
+     ([fetch-stream-source.ts:33](../packages/sdk/src/client/stream-source/application/fetch-stream-source.ts#L33))
+     always attaches `?live=sse` to the target URL, the proxy's explicit `?live=sse` acceptance rule
+     (see § Offset, cursor, and replay-state agreement on resume) ensures `createFetchStreamEventSourceV1`
+     works out of the box against any `defineStreamEndpoint` URL.
+4. **Commit strictly on `control` (fate of `data` received without its committing `control` frame)**:
    - On the **proxy** side, revocation, expiry, malformed/unresumable `control`, or upstream EOF
      before `control` emits **zero** `event: data` bytes downstream.
    - On the **client/transport** side, a TCP disconnect mid-transmission can still interrupt an
@@ -1750,6 +1964,13 @@ Whenever `credentialMode === 'cookie'`, the guard MUST run BOTH Fetch Metadata a
      `withCors({ origin: [...], credentials: true })` (which already rejects wildcard `*` with
      credentials at build time per
      [service-cors.ts:44-51](../packages/service/src/middleware/service-cors.ts#L44-L51)).
+4. **Absent `Origin` and `Sec-Fetch-Site` edge (`SameSite` assumption)**:
+   - A cookie-mode request carrying **neither** `Origin` **nor** `Sec-Fetch-Site` (for example a
+     non-browser cookie client or legacy browser that omits Fetch Metadata on `GET`) passes the
+     browser cross-site header checks above and relies on the application's session cookie carrying
+     `SameSite=Lax` or `SameSite=Strict` (preventing cross-site cookie attachment) plus `authorize`.
+     Endpoints restricted strictly to modern browsers MAY enforce `Sec-Fetch-Site` presence inside
+     `authorize` (or configure `clientAuth: 'bearer'` when cookies are not needed).
 
 #### Upstream secret isolation and request header allowlist
 
@@ -1969,13 +2190,14 @@ bypasses on proxy unit/conformance suites).
        **nor** `control` (`offset_2`), closes `session-B` cleanly, cancels and releases its upstream
        reader, and rejects fresh admission on both gateways.
      - Assert `session-A` receives batch 2 and its cursor-advancing `control` (`offset_2`).
-   - **Confirmed push `notify({ action: 'revoked' })` terminal-transition gate (both streaming AND setup)**:
+   - **Confirmed push `notify({ action: 'revoked' })` terminal-transition & real-clock latency gate (both streaming AND setup)**:
      - **Streaming reader**: Admit `session-C`, receive batch 1 + `offset_1`, leave reader idle (or
        paused in `before-delivery` with pending batch 2), then emit `notify({ action: 'revoked' })`.
        Assert `closeOnce('revoked')` executes its full cleanup (never skipped by an early `closed`
-       flag): downstream reaches EOF with zero pending bytes emitted, `revocationSource` unsubscribe
-       disposer is invoked **exactly once**, all timers and abort listeners are cleared, and the
-       upstream reader is cancelled and released.
+       flag): downstream reaches EOF promptly on wall clock (real-clock push latency check, well
+       below 1 s) with zero pending bytes emitted, `revocationSource` unsubscribe disposer is
+       invoked **exactly once**, all timers and abort listeners are cleared, and the upstream reader
+       is cancelled and released.
      - **Setup-phase reader**: Pause `upstreamAuth` or upstream `fetch` during setup, then emit
        `notify({ action: 'revoked' })`. Assert `abortSetupOnce('revoked', 401)` aborts setup
        immediately, returns redacted `401`, invokes the unsubscribe disposer **exactly once**, and
@@ -2054,21 +2276,28 @@ bypasses on proxy unit/conformance suites).
      closed with `frame-limit-exceeded` and emits **zero** bytes of preceding `data` or `control`.
    - **Oversize unterminated comment**: `:keepalive...` exceeding `maxPendingBatchBytes` without a
      blank-line terminator fails closed with `frame-limit-exceeded`.
-   - **Malformed or unresumable `control` frame**: `event: control` with invalid JSON, missing
-     `streamNextOffset`, empty `streamNextOffset: ""`, invalid field type, OR a non-empty
-     `streamNextOffset` violating the shared `isValidStreamOffset` grammar (exceeding 256 bytes,
-     containing whitespace, control characters, `?`/`#`/`&`, or non-token characters that the same
-     proxy rejects as `?offset=`) fails closed with `upstream-error` and releases **zero** bytes of
-     preceding `pendingDataFrames` or `control`.
+   - **Canonical `isValidStreamOffset` & malformed/unresumable `control` frame**:
+     - Positive offset fixture: assert `@netscript/contracts/streams`'s `isValidStreamOffset` accepts
+       `'-1'`, `'now'`, and actual live `streamNextOffset` tokens emitted by pinned
+       `@durable-streams/server@0.3.9` (such as `0000000000000000_0000000000000170`), and that
+       every committed `control` offset passes `?offset=` admission on resume.
+     - Negative offset fixture (applied identically to `?offset=` → `400` and `control.streamNextOffset`
+       → `upstream-error` with **zero** bytes of preceding `pendingDataFrames` or `control` emitted):
+       invalid JSON, missing `streamNextOffset`, empty `""`, length `513` bytes (`> 512`), ASCII
+       control characters (`\r`, `\n`, `\0`, `\x1f`, `\x7f`), whitespace (`" "`, `"\t"`), query/fragment
+       delimiters (`?`, `#`, `&`), and non-ASCII bytes.
    - **Unsupported / malformed frames**: omitted `event:` (`message`), unknown `event: custom`, or
      `event: data` with no `data:` line fails closed with `upstream-error` and zero output.
    - **EOF before `control` and EOF mid-frame**: upstream closes after sending `event: data` with no
      committing `control` (or truncated mid-frame) → closes with `upstream-error` and emits **zero**
      uncommitted bytes.
-5. **Offset resume, single offset authority, control-only commit, terminal stop, and retention passthrough**:
-   - **Bearer and cookie manual resume**: Both a bearer client (`Authorization: Bearer <token-1>`)
-     and a cookie client (`Cookie: __Host-ns_session=<cookie-1>`, `Sec-Fetch-Site: same-origin`)
-     connect to the same `defineService` endpoint with `?offset=-1`, commit batch 1 (`offset_1`),
+5. **Offset resume, `?live=` handling, single offset authority, control-only commit, bearer & cookie terminal stop, and retention passthrough**:
+   - **Bearer and cookie manual resume & `?live=` handling**: Both a bearer client
+     (`Authorization: Bearer <token-1>`) and a cookie client
+     (`Cookie: __Host-ns_session=<cookie-1>`, `Sec-Fetch-Site: same-origin`) connect to the same
+     `defineService` endpoint with `?offset=-1` (and with `?offset=-1&live=sse`, verifying single
+     `live=sse` is accepted while `?live=long-poll`, `?live=false`, empty `?live=`, and duplicate
+     `?live=sse&live=sse` return `400` `unsupported_live_mode`), commit batch 1 (`offset_1`),
      disconnect, publish batch 2, reconnect with `?offset=<offset_1>`, and receive only batch 2 +
      `control` (`offset_2`), parsing cleanly through `parseStreamSseEventV1` and
      `reduceStreamSseReplayStateV1`.
@@ -2087,11 +2316,21 @@ bypasses on proxy unit/conformance suites).
      assert the new connection requests `?offset=<offset_1>` (NOT original `-1`), receives batch 2 +
      `control(offset_2)`, fires `onCommittedBatch` for batch 2 **exactly once**, and commits
      `offset_2` with zero gap and zero duplicate side effects.
-   - **Terminal fresh-admission stop test**: Trigger an `EventSource` error where
-     `eventSource.readyState === 2` (`CLOSED`, simulating `401`/`403`/non-SSE admission rejection).
-     Assert the binding reports `{ kind: 'transport-error', retryable: false }`, invokes
+   - **Terminal fresh-admission stop test (cookie `EventSource` — unit + real-browser check)**:
+     Trigger an `EventSource` error where `eventSource.readyState === 2` (`CLOSED`, simulating
+     `401`/`403`/non-SSE admission rejection) AND verify in a real headless-browser check that
+     native `EventSource` reports `readyState === 2` after a non-`200` proxy denial. Assert
+     `bindStreamEventSourceV1` emits `{ code: 'transport-error', retryable: false }`, invokes
      `onTerminalError`, disposes the binding, and schedules **zero** reconnect attempts (no spin
      loop).
+   - **Bearer `createFetchStreamEventSourceV1` terminal-status gate**: Connect a bearer client via
+     `createFetchStreamEventSourceV1` with `terminalStatuses: [400, 401, 403, 404, 405, 410]` and
+     `onHttpError`, revoke the bearer session mid-stream (closing the stream), and let the single
+     reconnect attempt hit `401`. Assert `onHttpError` receives `{ status: 401, lastCommittedOffset }`,
+     `source.readyState === 2`, `bindStreamEventSourceV1` emits `{ code: 'transport-error', retryable: false }`,
+     `source.done` resolves cleanly, and **zero** additional `fetch` / `authorize` calls occur. Also
+     verify legacy `createFetchStreamEventSourceV1` callers omitting `terminalStatuses`/`onHttpError`
+     preserve existing retry-all behavior unchanged.
    - **Conditional `410` passthrough (synthetic upstream) & whole-stream `404` expiry**: Against a
      synthetic upstream returning `410 Gone` after admission, assert the proxy propagates HTTP `410`
      cleanly (with proxy redaction/headers and zero body corruption). Against real
@@ -2155,6 +2394,11 @@ bypasses on proxy unit/conformance suites).
        - When `withAuthn` returns reserved `AuthnResult.responseHeaders: { 'cache-control': 'public' }`
          (or any other reserved header/prefix), the mounted stream route fails closed with redacted
          `503` (never emitting `200` with `cache-control: public`).
+   - **Redaction gate**: Capture structured logger records and HTTP error response bodies across
+     `401`/`403` denial, `authorize`/`recheck` throw (`503`), upstream `401`/`502`, and reserved-header
+     `503` failure paths; assert synthetic bearer tokens, cookie values, `upstreamAuth` secret
+     values, raw query-string values, and raw thrown policy error messages NEVER appear in any
+     emitted log record or response body.
 7. **Authoritative `defineService` contract policy, structural mount enforcement, overlap detection, and graceful shutdown**:
    - Mounting `streamProxies: [feedProxy]` with `createContractAuthorizer(contract)` (single
      registration) enforces `access` (`401` unauthenticated, `403` wrong scope/role/audience, `200`
@@ -2198,13 +2442,30 @@ bypasses on proxy unit/conformance suites).
      `streamPath` (including embedded query params), `query` (`id`-dropping, repeated keys,
      collision precedence), `auth`, and `fetch` overrides, keeps `POST` and non-SSE `GET` working
      behind admission `authorize`, and never forwards client `Cookie` upstream.
-9. **Static, JSR, and doctrine gates**:
-   - Scoped `run-deno-check`, `run-deno-lint`, `run-deno-fmt`, `deno task quality:gate`,
-     `deno task doc:lint`, `deno publish --dry-run --allow-dirty`, and JSR audits on
-     `@netscript/contracts`, `@netscript/service`, `@netscript/plugin-streams-core`, and
-     `@netscript/fresh`.
-   - Type fixtures verifying zero `@orpc/*` leakage in `@netscript/contracts/streams` and
-     `@netscript/plugin-streams-core/proxy` public declarations (`deno doc --json`).
+9. **Resource bounds, wake-storm, and concurrent fan-out soak gate**:
+   - **Global reader cap (`maxActiveReaders`)**: Configure `maxActiveReaders: 2`, open 2 active
+     readers, and assert a 3rd request fails closed BEFORE `authorize` / upstream connect with
+     `503 Service Unavailable`, `Retry-After`, and `reason: 'max_active_readers_exceeded'`; close
+     one reader and assert the next request succeeds `200`.
+   - **Per-key reader cap (`maxReadersPerKey`)**: Configure `max: 1` keyed by `grant.sessionId`,
+     open 1 reader for `session-A`, assert a 2nd concurrent reader for `session-A` returns
+     `429 Too Many Requests` + `Retry-After` (`zero` upstream connections opened), while a reader
+     for `session-B` succeeds `200`.
+   - **Wake-storm coalescing**: Trigger a burst of multiple `'recheck'` wakes while a single
+     `before-delivery` `recheck` is in flight; assert they coalesce into one re-fence cycle (not
+     `K` queued serial checks) and release zero bytes while fencing.
+   - **Concurrent fan-out soak (32 readers on one stream at 1 update/s, aligned with `#2661`)**:
+     Run 32 concurrent readers on one durable stream with synthetic `recheck` + mid-run revocations
+     and reconnect churn; assert zero delivery gaps on authorized readers, zero post-revocation
+     deliveries, zero leaked timers/listeners/upstream readers under Deno sanitizers, active-reader
+     count returning to `0` on shutdown, and record measured p95 delivery latency.
+10. **Static, JSR, and doctrine gates**:
+    - Scoped `run-deno-check`, `run-deno-lint`, `run-deno-fmt`, `deno task quality:gate`,
+      `deno task doc:lint`, `deno publish --dry-run --allow-dirty`, and JSR audits on
+      `@netscript/contracts`, `@netscript/service`, `@netscript/plugin-streams-core`,
+      `@netscript/sdk`, and `@netscript/fresh`.
+    - Type fixtures verifying zero `@orpc/*` leakage in `@netscript/contracts/streams` and
+      `@netscript/plugin-streams-core/proxy` public declarations (`deno doc --json`).
 
 ## Drawbacks
 
@@ -2237,15 +2498,17 @@ bypasses on proxy unit/conformance suites).
 | **3. Enforce end-user auth directly at the Durable Streams server (`plugins/streams`)** | Removes one proxy hop for direct readers. | Violates separation of concerns and browser topology: (a) `@durable-streams/server` has no per-batch SSE frame re-check hook for application policies; (b) pushing every service's tenant/resource authorization rules and session backends into the shared infrastructure `plugins/streams` utility turns a utility process into an auth monolith; (c) browser `EventSource` cannot send bearer headers, and NetScript's BFF topology keeps first-party cookies on the app/gateway origin. |
 | **4. Short-lived signed stream URLs (HMAC/JWT token in query string)** | Works with native browser `EventSource` without cookies; avoids per-request header limitations. | Fails real-time revocation and introduces URL-secret exposure: (a) a signed URL remains valid until TTL expiry unless the server still checks a revocation source during delivery — so it does not eliminate the revocable proxy; (b) secrets in query strings leak into access logs, proxy logs, browser history, `Referer` headers, and error reports; (c) short TTLs force extra minting endpoints and reconnect churn while leaving an unauthorized delivery window until expiry. |
 | **5. Bridge Durable Streams through oRPC `eventIterator` procedures** | Automatic oRPC contract, authorizer, and OpenAPI integration. | Incompatible wire protocol: oRPC `eventIterator` emits oRPC-framed SSE rather than `STREAM_SSE_CONTRACT_V1` (`event: data` + `event: control` with `streamNextOffset`, `streamCursor`, `upToDate`, `streamClosed`), breaking `bindStreamEventSourceV1`, `createNetScriptStreamEventSourceV1`, and `@durable-streams/client`. |
-| **6. Narrower variant (contract + mount + runtime only, using existing `bindStreamEventSourceV1` directly with no `proxyUrl`, no OpenAPI/service-info projection, and no extra sanitizer exports)** | Smallest possible public API diff; zero changes to `@netscript/fresh/streams` or OpenAPI. | **Mostly adopted, with one deliberate retention**: this RFC adopts the narrower variant's deferrals (deferring OpenAPI projection, service-info changes, `PluginServiceConfig.streamProxies`, and public sanitizer helper exports), while retaining ONLY the single additive `proxyUrl` option on `createNetScriptStreamEventSourceV1` because forcing every browser caller to drop down to `new EventSource(url)` + `bindStreamEventSourceV1` re-introduces the measured `/v1/stream/netscript` trap and lets request `?offset=` silently drift from `initialState.lastCommittedOffset`. |
+| **6. Narrower variant (contract + mount + runtime only, using existing `bindStreamEventSourceV1` directly with no `proxyUrl`, no OpenAPI/service-info projection, and no extra sanitizer exports)** | Smallest possible public API diff; zero changes to `@netscript/fresh/streams` or OpenAPI. | **Mostly adopted, with deliberate retentions**: this RFC adopts the narrower variant's deferrals (deferring OpenAPI projection, service-info changes, `PluginServiceConfig.streamProxies`, and public sanitizer helper exports), while retaining `proxyUrl` on `createNetScriptStreamEventSourceV1` (eliminating the `/v1/stream/netscript` trap and offset drift) and opt-in `terminalStatuses`/`onHttpError` on `createFetchStreamEventSourceV1` (preventing bearer clients from looping on `401`/`403` admission). |
+| **7. Admission-only check with short bounded connection lifetime (force re-admission every `T` seconds)** | Zero per-delivery-unit `recheck` overhead during an active burst; cheaper policy load for high-throughput, low-sensitivity feeds. | **Rejected for revocable streams**: leaves an unrevoked delivery window up to the full connection TTL `T` — batches published right after revocation still stream to the revoked reader until the connection closes, violating the zero-delivery-after-observed-revocation acceptance requirement. High-throughput apps that want cheap `recheck` calls should back `recheck` with an in-process revocation cache updated by `revocationSource` rather than dropping pre-delivery checks. |
 
 ### Public export justification and deferrals
 
 | Symbol / package | Disposition | Rationale |
 | --- | --- | --- |
-| `defineStreamEndpoint`, `buildStreamEndpointUrl`, `StreamEndpointContract`, `StreamEndpointClientAuthMode` (`@netscript/contracts/streams`) | **Included in v1** | Required to declare parameterized stream routes in a runtime-free contract and construct type-checked proxy URLs for both cookie and bearer clients. |
+| `defineStreamEndpoint`, `buildStreamEndpointUrl`, `isValidStreamOffset`, `STREAM_OFFSET_MAX_BYTES`, `StreamEndpointContract`, `StreamEndpointClientAuthMode` (`@netscript/contracts/streams`) | **Included in v1** | Required to declare parameterized stream routes in a runtime-free leaf contract, construct type-checked proxy URLs, and enforce one canonical offset grammar across URL construction, proxy admission, and committing `control` validation. |
 | `StreamProxyMount`, `StreamProxyMountContext`, `ServiceBuilder.withStreamProxy`, `DefineServiceOptions.streamProxies`, `ContractPolicyBindingOptions.streamMounts`, `streamEndpoints` cross-check option (`@netscript/service`) | **Included in v1** | Minimum structural seam keeping `@netscript/service` acyclic with `@netscript/plugin-streams-core`, running pre-authn credential selection, making mounted contract policy authoritative in both authorizers (`streamEndpoints` supports standalone authorizer unit tests and compile-time pinning), enforcing final response header/`Set-Cookie` ownership, exposing `remoteAddr` for `trustProxy`, and providing pre-drain `shutdownSignal`. |
-| `createNetScriptStreamProxy`, `bindStreamProxy`, `StreamEventSourceV1.readyState` (`@netscript/plugin-streams-core/{proxy,sse}`) | **Included in v1** | Core revocable SSE proxy runtime usable from both `defineService` and Fresh 2.x handlers, plus optional `readyState` propagation on `bindStreamEventSourceV1` so browser consumers distinguish terminal HTTP refusals from retryable drops. |
+| `createNetScriptStreamProxy`, `bindStreamProxy`, `StreamProxyOptions` (incl. `maxActiveReaders`, `maxReadersPerKey`), `StreamEventSourceV1.readyState` (`@netscript/plugin-streams-core/{proxy,sse}`) | **Included in v1** | Core revocable SSE proxy runtime with bounded reader concurrency usable from both `defineService` and Fresh 2.x handlers, plus `readyState` terminal detection on `bindStreamEventSourceV1` so browser consumers stop on `401`/`403`/`404`/`410`. |
+| `FetchStreamHttpErrorInfoV1`, opt-in `terminalStatuses` / `onHttpError`, `readyState` on `FetchStreamEventSourceOptionsV1` / `FetchStreamEventSourceV1` (`@netscript/sdk/streams/consumer`) | **Included in v1** | Prevents revoked bearer and credentialed-fetch clients on `createFetchStreamEventSourceV1` from looping forever on `401`/`403`/`404`/`410` while preserving exact legacy retry-all behavior when omitted. |
 | `proxyUrl` on `CreateNetScriptStreamEventSourceOptionsV1` (`@netscript/fresh/streams`) | **Included in v1** | Single additive option eliminating the forced `/v1/stream/netscript` prefix and enforcing one offset authority between URL and `initialState.lastCommittedOffset`. |
 | Opt-in `authorize` / `recheck` options on `NetScriptChatStreamProxyOptions` (`@netscript/fresh/ai`) | **Included in v1** | Non-breaking bridge allowing existing durable-chat routes to opt into revocable SSE delivery without breaking legacy callers. |
 | Self-contained global-authn bypass (`admission: 'proxy-self-contained'`) | **Deferred to follow-up** | Eliminates the risk of global authn/authz yielding to an arbitrary structural `handle`; v1 mounts always execute under authoritative service `withAuthn` + `withAuthz`, while standalone Fresh BFF routes use `createNetScriptStreamProxy` directly. |
@@ -2262,13 +2525,60 @@ delivering events to revoked or expired sessions.
 
 ## Breaking changes and migration
 
-This RFC is **fully additive** and introduces **no breaking changes**:
+### Behavioral change in `bindStreamEventSourceV1` (`@netscript/plugin-streams-core/sse`)
 
-- Existing `@netscript/contracts`, `@netscript/service`, `@netscript/plugin-streams-core`, and
-  `@netscript/fresh` exports remain unchanged in behavior and signature.
+Shipped `bindStreamEventSourceV1`
+([stream-sse-v1.ts:209-219](../packages/plugin-streams-core/src/application/stream-sse-v1.ts#L209-L219))
+unconditionally emits `retryable: true` on every `transport-error` event.
+
+- **Proposed default-on change (recommended):** `bindStreamEventSourceV1` inspects optional
+  `options.source.readyState` and emits `retryable: options.source.readyState !== 2`.
+  - **Impact on existing consumers:** Existing native browser `EventSource` callers — including
+    existing callers of `createNetScriptStreamEventSourceV1` and any custom `StreamEventSourceV1`
+    that sets `readyState = 2` (`EventSource.CLOSED`) on terminal non-`200` HTTP or MIME failures —
+    will now receive `retryable: false` instead of `retryable: true` when the connection closes
+    terminally. Existing custom sources and test doubles that omit `readyState` continue to receive
+    `retryable: true` (`undefined !== 2`).
+  - **Migration:** Consumers that intentionally relied on `retryable: true` for all `transport-error`
+    events (for example, implementing their own status probe or unconditional retry loop) should
+    check `event.payload.code === 'transport-error'` directly rather than assuming `retryable` is
+    always `true`. Consumers following the standard reconnect pattern immediately stop spinning on
+    terminal `401`/`403`/`404`/`410` refusals.
+  - **Opt-in alternative:** Keep `bindStreamEventSourceV1` emitting `retryable: true` by default and
+    gate `readyState !== 2` behind an opt-in option (`detectTerminalClose?: boolean`, default
+    `false`, enabled automatically in `proxyUrl` mode). See
+    [Unresolved questions](#unresolved-questions) item 6.
+
+### Additive / non-breaking changes
+
+All other proposed surfaces are strictly additive:
+
+- `@netscript/contracts/streams`, `ServiceBuilder.withStreamProxy` / `DefineServiceOptions.streamProxies`,
+  `createNetScriptStreamProxy` / `bindStreamProxy`, and `CreateNetScriptStreamEventSourceOptionsV1.proxyUrl`
+  are new exports or optional properties.
+- `createFetchStreamEventSourceV1` (`@netscript/sdk/streams/consumer`) preserves its exact shipped
+  retry-all non-2xx behavior whenever `terminalStatuses` and `onHttpError` are omitted.
 - `createNetScriptChatStreamProxy` (`@netscript/fresh/ai`) preserves all legacy defaults (`POST`,
   non-SSE `GET`, response headers, and legacy request-header forwarding) unchanged whenever
   `authorize` / `recheck` are omitted.
+
+### Recommended staged rollout order
+
+Because this design spans five packages and modifies `@netscript/service` auth middleware,
+implementation should land in four auditable slices:
+
+1. **Stage 1 — Core runtime & canonical offset grammar:** `@netscript/contracts/streams`
+   (`isValidStreamOffset`, `defineStreamEndpoint`, `buildStreamEndpointUrl`) +
+   `@netscript/plugin-streams-core/proxy` (`createNetScriptStreamProxy`, fenced revocation, bounded
+   parser, reader caps, redaction, and full revocation/load conformance suite).
+2. **Stage 2 — Service mount & authoritative policy:** `@netscript/service` (`StreamProxyMount`,
+   pre-authn credential selection, authorizer/overlay binding, overlap checks, final response
+   ownership, pre-drain `shutdownSignal`) + `bindStreamProxy`.
+3. **Stage 3 — Consumer bindings & Fresh helper:** `bindStreamEventSourceV1` `readyState` handling,
+   `@netscript/sdk/streams/consumer` opt-in `terminalStatuses`/`onHttpError`, and
+   `@netscript/fresh/streams` `proxyUrl` + real-browser terminal-close check.
+4. **Stage 4 — Chat proxy opt-in delegation:** `@netscript/fresh/ai` opt-in `authorize` + `recheck`
+   delegation with full legacy regression suite.
 
 ### Migration from a hand-written application SSE proxy
 
@@ -2348,6 +2658,21 @@ This RFC is **fully additive** and introduces **no breaking changes**:
    Should v1 remain strictly SSE (`live=sse`), leaving an authorizing `StreamDB` long-poll proxy
    to a follow-up, or should the same endpoint contract support a `mode: 'sse' | 'state-protocol'`
    flag?
+6. **Client terminal-error defaults (`bindStreamEventSourceV1` & `createFetchStreamEventSourceV1`)**:
+   - Should `bindStreamEventSourceV1` change its default `transport-error` `retryable` flag to
+     `source.readyState !== 2` (recommended, documented behavioral change with migration note), or
+     gate it behind an opt-in `detectTerminalClose?: boolean` option?
+   - Should `createFetchStreamEventSourceV1` keep `terminalStatuses` opt-in (recommended, preserving
+     shipped retry-all non-2xx behavior by default), or make `[401, 403, 404, 410]` terminal by
+     default?
+7. **Resource-bound defaults (`maxActiveReaders`, `maxPendingBatchBytes`, `maxReadersPerKey`)**:
+   Confirm the proposed defaults (`maxActiveReaders: 1_000`, `maxPendingBatchBytes: 4 MiB`,
+   `maxReadersPerKey` opt-in with application responsibility when omitted), or adjust defaults /
+   require explicit `maxReadersPerKey` on every proxy.
+8. **Explicit `clientAuth` vs `'bearer-or-cookie'` default**: Because `'bearer-or-cookie'` accepts
+   ambient cookies when `Authorization` is absent, should `defineStreamEndpoint` and
+   `createNetScriptStreamProxy` require an explicit `clientAuth` choice rather than defaulting to
+   `'bearer-or-cookie'`?
 
 ## Future possibilities
 
