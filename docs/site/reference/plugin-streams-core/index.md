@@ -20,6 +20,7 @@ and sessions into durable topics.
 | --- | --- | --- |
 | `@netscript/plugin-streams-core` | `./mod.ts` | Schema definition, the durable producer, endpoint resolution, diagnostics, and the v1 producer port vocabulary. See [details](#root-surface-netscriptplugin-streams-core). |
 | `@netscript/plugin-streams-core/admin` | `./admin.ts` | Upstream whole-stream administrative adapter and signature types; helpers live in the root. See [details](#bounded-streams-retention-and-trim). |
+| `@netscript/plugin-streams-core/proxy` | `./proxy.ts` | Revocable authorizing SSE stream proxy runtime with fail-closed admission, credential/CSRF guards, bounded SSE framing, monotonic invalidation fencing, and reader caps. See [details](#revocable-stream-proxy-netscriptplugin-streams-coreproxy). |
 | `@netscript/plugin-streams-core/sse` | `./src/sse/mod.ts` | The single versioned authority for the stream SSE wire contract: named-frame parsing, validated consumer outcomes, and replay state. See [details](#the-sse-contract-netscriptplugin-streams-coresse). |
 | `@netscript/plugin-streams-core/telemetry` | `./src/telemetry/mod.ts` | Telemetry registration, span names, attribute keys, and the meter/counter/gauge ports used by reconnect metrics. See [details](#telemetry-and-testing). |
 | `@netscript/plugin-streams-core/testing` | `./src/testing/mod.ts` | An in-memory producer and a small schema fixture for tests that must not open network sockets. See [details](#telemetry-and-testing). |
@@ -211,6 +212,27 @@ Replay progress commits **only on a control frame**: `reduceStreamSseReplayState
 data frame without advancing the committed offset, so a consumer that reconnects mid-batch replays
 from the last acknowledged control point rather than skipping the tail of an interrupted batch.
 Errors are normalized into `StreamSseErrorPayloadV1` and never advance replay state.
+
+## Revocable stream proxy (`@netscript/plugin-streams-core/proxy`)
+
+The `./proxy` subpath provides a revocable authorizing Server-Sent Events (SSE) stream proxy
+runtime for bearer and cookie clients (`createNetScriptStreamProxy`). Application policy owns
+admission, periodic/pre-delivery re-checks, and cross-gateway revocation signals while the proxy
+enforces RFC 6750 credential selection, Cookie Origin/Fetch-Metadata/`trustProxy` guards,
+3-tier response header ownership, bounded incremental SSE delivery-unit framing, monotonic
+`invalidationEpoch` fencing, finite single-budget expiry contention, reader concurrency caps
+(`503`/`429` with `Retry-After`), and decoupled synchronous teardown.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createNetScriptStreamProxy` | function | Create a revocable authorizing SSE stream proxy handler for Fresh routes and HTTP services. |
+| `StreamProxyOptions` | interface | Configuration for admission, re-check, path resolution, credential/origin guards, limits, and teardown. |
+| `StreamProxyHandler` | type alias | Request handler accepting `Request` or Fresh `{ req: Request }` plus optional request context. |
+| `StreamProxyAuthDecision` | type alias | Fail-closed admission decision granting access with an opaque grant or denying with `401`/`403`. |
+| `StreamProxyRecheckDecision` | type alias | Re-check decision allowing continued delivery (with optional `expiresAtMs`) or revoking the reader. |
+| `StreamProxyRevocationSource` | interface | Application-supplied push revocation subscription port for cross-gateway teardown. |
+| `StreamProxyClockPort` | interface | Deterministic epoch clock and cancelable timer port used by expiry, idle, and timeout guards. |
+| `StreamProxyCloseEvent` | interface | Structured reader-close telemetry event with `streamPath`, `reason`, and `deliveredUnits`. |
 
 ## Telemetry and testing
 
