@@ -23,7 +23,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 
   "@netscript/config": [".","./merge","./paths","./schema/plugins"],
 
-  "@netscript/contracts": [".","./commands","./crud","./query","./transform"],
+  "@netscript/contracts": [".","./commands","./crud","./query","./streams","./transform"],
 
   "@netscript/cron": [".","./adapters","./ports","./testing"],
 
@@ -59,7 +59,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 
   "@netscript/plugin-streams": [".","./adapter-cli","./aspire","./cli","./e2e","./scaffold","./service","./services"],
 
-  "@netscript/plugin-streams-core": [".","./admin","./discovery","./integration/commands","./sse","./telemetry","./testing"],
+  "@netscript/plugin-streams-core": [".","./admin","./discovery","./integration/commands","./proxy","./sse","./telemetry","./testing"],
 
   "@netscript/plugin-triggers": [".","./adapter-cli","./aspire","./cli","./plugin","./public","./runtime","./scaffold","./services","./streams","./streams/server"],
 
