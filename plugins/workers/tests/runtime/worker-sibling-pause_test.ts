@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assert, assertEquals } from '@std/assert';
 import { delay } from '@std/async';
 import { DenoKvAdapter as KvStorageAdapter } from '@netscript/kv';
 import { createQueue, QueueProvider } from '@netscript/queue';
@@ -195,5 +195,156 @@ Deno.test('production Worker.pause() parks waiting jobs with a live sibling and 
         stateKvRaw.close();
       }
     });
+  });
+});
+
+Deno.test('paused production Worker with 100 parked jobs does not starve 30 live sibling jobs under default policy', async () => {
+  const PARKED_JOBS = 100;
+  const SIBLING_JOBS = 30;
+  const SIBLING_COMPLETION_BUDGET_MS = 35_000;
+
+  await withTempKvPath(async (path) => {
+    const stateKvRaw = await Deno.openKv(path);
+    const storage = new KvStorageAdapter(stateKvRaw);
+    const idempotency = new KvWorkerIdempotencyStore({ kv: storage });
+
+    const settlementFailures: string[] = [];
+    const originalConsoleError = console.error;
+    console.error = (...args: unknown[]) => {
+      const line = args.map(String).join(' ');
+      if (line.includes('settlement failed')) {
+        settlementFailures.push(line.slice(0, 160));
+      }
+      originalConsoleError(...args);
+    };
+
+    const makeWorker = (name: string, executed: string[]) => {
+      const executionState = new KvExecutionState({ kv: storage, workerId: name });
+      const jobsQueueName = `${name}-jobs`;
+      const deadLetters = new KvDeadLetterStore<JobMessage>({
+        kv: storage,
+        queueName: jobsQueueName,
+      });
+      const options = {
+        provider: QueueProvider.DenoKv,
+        autoDiscover: false,
+        disableAutoTracing: true,
+        connection: { denoKv: { path } },
+      } as const;
+      const queue = createQueue<JobMessage>(jobsQueueName, {
+        ...options,
+        deadLetterStore: deadLetters,
+      });
+      const taskQueue = createQueue<TaskMessage>(`${name}-tasks`, options);
+      const producer = createQueue<JobMessage>(jobsQueueName, options);
+      const dispatch = recoveryContext(idempotency, {
+        execute: (definition) => {
+          executed.push(definition.id);
+          return Promise.resolve({ success: true, duration: 1 });
+        },
+      });
+      const worker = new Worker({
+        ...dispatch,
+        workerId: name,
+        queueName: jobsQueueName,
+        concurrency: 1,
+        queue,
+        taskQueue,
+        executionState,
+        deadLetters,
+      });
+      return { worker, producer, executionState, deadLetters };
+    };
+
+    const executedA: string[] = [];
+    const executedB: string[] = [];
+    const workerA = makeWorker('paused-backlog-a', executedA);
+    const workerB = makeWorker('live-sibling-b', executedB);
+    const startedA = workerA.worker.start();
+    const startedB = workerB.worker.start();
+    void startedA.catch(() => {});
+    void startedB.catch(() => {});
+
+    try {
+      await delay(300);
+      workerA.worker.pause();
+      await delay(200);
+
+      let producerFailures = 0;
+      const enqueueMeasuring = async (
+        producer: { enqueue(message: JobMessage): Promise<void> },
+        message: JobMessage,
+      ): Promise<void> => {
+        for (let attempt = 0; attempt < 5; attempt++) {
+          try {
+            await producer.enqueue(message);
+            return;
+          } catch {
+            producerFailures += 1;
+            await delay(100);
+          }
+        }
+        throw new Error(`Producer enqueue exhausted retries for ${message.jobId}`);
+      };
+
+      for (let i = 0; i < PARKED_JOBS; i++) {
+        await enqueueMeasuring(workerA.producer, {
+          jobId: `parked-a-${i}`,
+          topic: 'jobs',
+          triggeredBy: 'queue',
+          idempotencyKey: `parked-a-${i}`,
+        });
+      }
+
+      const began = performance.now();
+      for (let i = 0; i < SIBLING_JOBS; i++) {
+        await enqueueMeasuring(workerB.producer, {
+          jobId: `sibling-b-${i}`,
+          topic: 'jobs',
+          triggeredBy: 'queue',
+          idempotencyKey: `sibling-b-${i}`,
+        });
+        await delay(250);
+      }
+
+      await until(
+        async () => (await workerB.executionState.listByStatus('completed')).length >= SIBLING_JOBS,
+        Math.max(1_000, SIBLING_COMPLETION_BUDGET_MS - Math.round(performance.now() - began)),
+      );
+      const elapsedMs = Math.round(performance.now() - began);
+
+      assert(
+        elapsedMs <= SIBLING_COMPLETION_BUDGET_MS,
+        `expected 30 sibling jobs to complete within ${SIBLING_COMPLETION_BUDGET_MS} ms, took ${elapsedMs} ms`,
+      );
+      assertEquals(producerFailures, 0, 'paused backlog must not cause producer enqueue failures');
+      assertEquals(
+        settlementFailures,
+        [],
+        'paused backlog must not cause post-effect settlement failures on sibling worker',
+      );
+      assertEquals((await workerB.executionState.listByStatus('completed')).length, SIBLING_JOBS);
+      assertEquals(
+        (await workerB.executionState.listByStatus('running')).length,
+        0,
+        'no sibling execution row may be stranded in running state',
+      );
+      assertEquals((await workerB.executionState.listByStatus('failed')).length, 0);
+      assertEquals(await workerB.deadLetters.depth(), 0);
+      assertEquals(executedB.length, SIBLING_JOBS);
+      assertEquals(new Set(executedB).size, SIBLING_JOBS);
+      assertEquals(executedA.length, 0, 'paused worker must not execute parked jobs while paused');
+      assertEquals(await workerA.deadLetters.depth(), 0);
+    } finally {
+      console.error = originalConsoleError;
+      await Promise.allSettled([workerA.worker.stop(), workerB.worker.stop()]);
+      await Promise.allSettled([
+        startedA,
+        startedB,
+        workerA.producer.stop(),
+        workerB.producer.stop(),
+      ]);
+      stateKvRaw.close();
+    }
   });
 });

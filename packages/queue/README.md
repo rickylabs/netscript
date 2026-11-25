@@ -246,12 +246,14 @@ before opening KV connections). The bound covers **whole deliveries** — handle
 `ack`/`nack` settlement — including cancellation and drain. Excess deliveries on a file-backed
 database queue behind the registration's active slots while keeping their native KV delivery
 unacknowledged. Aborting `options.signal` on a live `DenoKvAdapter` (the path used by
-`Worker.pause()`) drains admitted deliveries and holds queued work for that queue at hop `0` while
-sibling routes remain live, clearing automatically on resume (`listen()`) or permanent `stop()`.
-Permanent retirement (`stop()`, `Worker.stop()`, or closing an unpaused dispatcher listener) clears
-pause state so fresh work targeting the stopped queue while a sibling stays live follows the
-bounded reroute policy and dead-letters with reason `unroutable` without leaking any cross-restart
-parking flag.
+`Worker.pause()`) drains admitted deliveries quietly and parks queued work for that queue once in
+durable KV storage (`__netscript_kv_queue_parked`) at hop `0` while sibling routes remain live —
+eliminating periodic SQLite re-enqueue churn for the duration of the pause — and wakes parked
+envelopes atomically (`check + delete + enqueue`) on resume (`listen()`), `stop()`, `close()`, or
+startup after a crash. Permanent retirement (`stop()`, `Worker.stop()`, or closing an unpaused
+dispatcher listener) clears pause state so fresh work targeting the stopped queue while a sibling
+stays live follows the bounded reroute policy and dead-letters with reason `unroutable` without
+leaking any cross-restart parking flag.
 
 Local Deno KV queue writes, `KvDeadLetterStore.append`, and first-party worker settlement handle
 file-backed persistence contention according to commit certainty:
@@ -259,8 +261,10 @@ file-backed persistence contention according to commit certainty:
 - **Known-uncommitted SQLite lock contention** (`SQLITE_BUSY*`, `SQLITE_LOCKED*`, or locked-database
   errors without an explicit non-busy SQLite code) retries within a bounded policy: up to 6 total
   attempts with a 2,000 ms monotonic retry-start deadline (no retry begins at or after the deadline;
-  an already-started write completes unless the operation supports cancellation), exponential
-  backoff from 15 ms to 250 ms with equal jitter, and immediate cancellation when aborted.
+  an already-started write completes unless the operation supports cancellation, so under sustained
+  contention where a single write takes longer than 2,000 ms before failing, no second attempt is
+  started), exponential backoff from 15 ms to 250 ms with equal jitter, and immediate cancellation
+  when aborted.
 - **Refused compare-and-swap preconditions** (`{ ok: false }` or claim-loss errors) stay conflicts
   and are never retried as transient.
 - **Unknown commit outcomes** (including explicit non-busy SQLite codes such as `SQLITE_IOERR_WRITE`)

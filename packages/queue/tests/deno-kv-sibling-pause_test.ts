@@ -1,8 +1,11 @@
-import { assertEquals } from '@std/assert';
+import { assert, assertEquals } from '@std/assert';
 import { delay } from '@std/async';
 import { createEnvelope, type MessageEnvelope } from '../adapters/_envelope.ts';
 import { createKvQueueConnection } from '../adapters/_kv-queue/connection.ts';
 import { KvQueueDispatcher } from '../adapters/_kv-queue/dispatcher.ts';
+import { KV_QUEUE_PARKED_PREFIX } from '../adapters/_kv-queue/parked.ts';
+import { retryKnownUncommittedWrite } from '../adapters/_kv-queue/write-retry.ts';
+import { DenoKvAdapter } from '../adapters/deno-kv.adapter.ts';
 import { KvDeadLetterStore } from '../adapters/kv-dead-letter-store.ts';
 
 async function withTempKvPath(run: (path: string) => Promise<void>): Promise<void> {
@@ -260,6 +263,167 @@ Deno.test('explicit pause cleared by stopQueue or dispatcher restart resumes bou
       siblingB.abort();
       await siblingBListen;
       await restarted.close();
+    }
+  });
+});
+
+Deno.test('default-policy paused backlog of 100 messages does not saturate SQLite or drop/duplicate work on resume', async () => {
+  const BACKLOG = 100;
+  const PAUSE_OBSERVE_MS = 5_000;
+
+  await withTempKvPath(async (path) => {
+    const paused = new DenoKvAdapter<number>({ path, queueName: 'paused-backlog' });
+    const sibling = new DenoKvAdapter<number>({ path, queueName: 'live-sibling' });
+    const stateKv = await Deno.openKv(path);
+
+    let nativeEnqueueCalls = 0;
+    const realNativeEnqueue = Deno.Kv.prototype.enqueue;
+    Deno.Kv.prototype.enqueue = function (
+      this: Deno.Kv,
+      ...args: Parameters<typeof realNativeEnqueue>
+    ) {
+      nativeEnqueueCalls += 1;
+      return realNativeEnqueue.apply(this, args);
+    } as typeof realNativeEnqueue;
+
+    const seen = new Map<number, number>();
+    let pausedController = new AbortController();
+    const pausedHandler = (message: number) => {
+      seen.set(message, (seen.get(message) ?? 0) + 1);
+      return Promise.resolve();
+    };
+    let pausedListen = paused.listen(pausedHandler, {
+      concurrency: 1,
+      signal: pausedController.signal,
+    });
+
+    const siblingController = new AbortController();
+    let siblingSeen = 0;
+    const siblingListen = sibling.listen(
+      () => {
+        siblingSeen += 1;
+        return Promise.resolve();
+      },
+      { concurrency: 1, signal: siblingController.signal },
+    );
+
+    try {
+      await delay(200);
+      pausedController.abort();
+      await pausedListen;
+
+      for (let i = 0; i < BACKLOG; i++) {
+        await paused.enqueue(i);
+      }
+
+      // Allow any immediate in-flight park writes to settle before measuring steady-state pause load.
+      await delay(300);
+      const nativeEnqueuesAtSteadyStart = nativeEnqueueCalls;
+      let stateWrites = 0;
+      let stateExhausted = 0;
+      let siblingEnqueueFailures = 0;
+      const pauseDeadline = performance.now() + PAUSE_OBSERVE_MS;
+      while (performance.now() < pauseDeadline) {
+        const idx = stateWrites;
+        stateWrites += 1;
+        try {
+          const committed = await retryKnownUncommittedWrite(() =>
+            stateKv.atomic().set(['sibling-state', idx], { at: idx }).commit()
+          );
+          if (!committed.ok) {
+            stateExhausted += 1;
+          }
+        } catch {
+          stateExhausted += 1;
+        }
+        try {
+          await sibling.enqueue(idx);
+        } catch {
+          siblingEnqueueFailures += 1;
+        }
+        await delay(50);
+      }
+
+      const unexpectedParkEnqueues = nativeEnqueueCalls - nativeEnqueuesAtSteadyStart -
+        (stateWrites - siblingEnqueueFailures);
+      assertEquals(
+        unexpectedParkEnqueues,
+        0,
+        `expected zero periodic parking re-enqueues during steady pause, saw ${unexpectedParkEnqueues}`,
+      );
+      assertEquals(stateExhausted, 0, 'bounded writes on second connection must not exhaust');
+      assertEquals(siblingEnqueueFailures, 0, 'sibling enqueues must not fail during pause');
+      assert(
+        stateWrites >= 20,
+        `expected healthy write throughput during pause, saw ${stateWrites}`,
+      );
+      await until(() => siblingSeen >= stateWrites, 10_000);
+      assertEquals(seen.size, 0, 'paused queue must not deliver while paused');
+
+      // Resume paused queue and verify every parked message is delivered once without duplicates.
+      pausedController = new AbortController();
+      pausedListen = paused.listen(pausedHandler, {
+        concurrency: 1,
+        signal: pausedController.signal,
+      });
+      await until(() => seen.size === BACKLOG, 20_000);
+      await delay(300);
+
+      const duplicates = [...seen.values()].filter((count) => count > 1).length;
+      assertEquals(seen.size, BACKLOG);
+      assertEquals(duplicates, 0, 'resumed paused backlog must deliver each message once');
+      const dlq = new KvDeadLetterStore<unknown>({
+        queueName: 'paused-backlog',
+        denoKv: stateKv,
+      });
+      assertEquals(await dlq.depth(), 0);
+    } finally {
+      Deno.Kv.prototype.enqueue = realNativeEnqueue;
+      pausedController.abort();
+      siblingController.abort();
+      await Promise.allSettled([pausedListen, siblingListen]);
+      await Promise.allSettled([paused.stop(), sibling.stop()]);
+      stateKv.close();
+    }
+  });
+});
+
+Deno.test('parked KV rows left by an unclean process exit recover automatically on startup sweep', async () => {
+  await withTempKvPath(async (path) => {
+    const seedKv = await Deno.openKv(path);
+    try {
+      for (let i = 0; i < 5; i++) {
+        const env = {
+          ...createEnvelope(i, undefined, 'crash-recovered'),
+          queueName: 'crash-recovered',
+        };
+        await seedKv.set(
+          [KV_QUEUE_PARKED_PREFIX, 'crash-recovered', env.enqueuedAt, i, env.messageId],
+          env,
+        );
+      }
+    } finally {
+      seedKv.close();
+    }
+
+    const adapter = new DenoKvAdapter<number>({ path, queueName: 'crash-recovered' });
+    const controller = new AbortController();
+    const received: number[] = [];
+    const listening = adapter.listen(
+      (message) => {
+        received.push(message);
+        return Promise.resolve();
+      },
+      { concurrency: 1, signal: controller.signal },
+    );
+
+    try {
+      await until(() => received.length === 5, 5_000);
+      assertEquals(received.slice().sort((a, b) => a - b), [0, 1, 2, 3, 4]);
+    } finally {
+      controller.abort();
+      await listening;
+      await adapter.stop();
     }
   });
 });

@@ -20,6 +20,7 @@
 import { DenoKvMessageQueue } from '@fedify/denokv';
 import { type MessageEnvelope, toAddressedEnvelope, toDeadLetterRecord } from '../_envelope.ts';
 import { closeQuietly, type KvQueueConnection } from './connection.ts';
+import { KvParkedQueueStore } from './parked.ts';
 import {
   type KvEnvelopeHandler,
   KvQueueRegistration,
@@ -80,8 +81,6 @@ interface KvListenLoop {
  * the envelope during `yieldToAcks()`, short enough that pause/resume picks it up promptly.
  */
 const DEDICATED_HANDBACK_DELAY_MS = 25;
-/** Bounded park delay for paused queues re-dequeued while a sibling queue stays live. */
-const PAUSED_HANDBACK_PARK_DELAY_MS = 100;
 const EXPLICIT_PAUSE_TOKEN = Symbol('explicit-pause');
 
 /**
@@ -95,6 +94,7 @@ export class KvQueueDispatcher {
   readonly #admittedByQueue = new Map<string, number>();
   readonly #inFlight = new Set<Promise<void>>();
   readonly #stopping = new Set<Promise<void>>();
+  readonly #parked: KvParkedQueueStore;
   #admittedDeliveries = 0;
   #routingChanged = Promise.withResolvers<void>();
   #writer: { readonly kv: Deno.Kv; readonly queue: DenoKvMessageQueue } | null = null;
@@ -109,6 +109,17 @@ export class KvQueueDispatcher {
   constructor(connection: KvQueueConnection, policy: UnroutablePolicy = DEFAULT_UNROUTABLE_POLICY) {
     this.#connection = connection;
     this.#policy = policy;
+    this.#parked = new KvParkedQueueStore({
+      getKv: () => this.kv(),
+      shouldStayParked: (queueName) => this.#isPaused(queueName) && !this.#routes.has(queueName),
+      onCommittedQueues: (queueNames) => {
+        for (const queueName of queueNames) {
+          if (!this.#isPaused(queueName) || this.#routes.has(queueName)) {
+            void this.#parked.scheduleUnpark(queueName);
+          }
+        }
+      },
+    });
   }
 
   /**
@@ -128,6 +139,17 @@ export class KvQueueDispatcher {
    * @param delayMs - Optional availability delay.
    */
   async enqueue(envelope: MessageEnvelope<unknown>, delayMs?: number): Promise<void> {
+    const queueName = envelope.queueName;
+    if (
+      !delayMs &&
+      queueName !== undefined &&
+      this.#isPaused(queueName) &&
+      !this.#routes.has(queueName) &&
+      !this.#routes.isEmpty
+    ) {
+      await this.#parked.park({ ...envelope, queueName });
+      return;
+    }
     const kv = await this.kv();
     if (this.#writer?.kv !== kv) {
       this.#writer = { kv, queue: new DenoKvMessageQueue(kv) };
@@ -155,6 +177,9 @@ export class KvQueueDispatcher {
     if (tokens.size === 0) {
       this.#pausedQueues.delete(queueName);
       this.#wakeRoutingWaiters();
+      if (this.#parked.hasActivity) {
+        void this.#parked.scheduleUnpark(queueName);
+      }
     }
   }
 
@@ -172,6 +197,9 @@ export class KvQueueDispatcher {
   stopQueue(queueName: string): void {
     if (this.#pausedQueues.delete(queueName)) {
       this.#wakeRoutingWaiters();
+      if (this.#parked.hasActivity) {
+        void this.#parked.scheduleUnpark(queueName);
+      }
     }
   }
 
@@ -223,6 +251,9 @@ export class KvQueueDispatcher {
     this.#routes.add(queueName, registration);
     this.#wakeRoutingWaiters();
     this.#startLoop();
+    if (this.#parked.hasActivity) {
+      void this.#parked.scheduleUnpark(queueName);
+    }
     return promise;
   }
 
@@ -244,6 +275,7 @@ export class KvQueueDispatcher {
       this.#retainStop(loop);
     }
     await Promise.all([...this.#stopping]);
+    await this.#parked.flushAndUnparkAllForClose();
     this.#writer = null;
     if (await this.#connection.close() && this.#loop) {
       await this.#loop.done;
@@ -271,6 +303,7 @@ export class KvQueueDispatcher {
       closeQuietly(kv);
       return;
     }
+    void this.#parked.scheduleStartupRecoverySweep();
     // Only a dedicated listener connection may be closed on stop; Fedify closes it on abort.
     await new DenoKvMessageQueue(kv).listen(
       (rawMessage) => this.#dispatch(rawMessage),
@@ -380,10 +413,9 @@ export class KvQueueDispatcher {
         if (this.#routes.has(envelope.queueName) || !this.#isPaused(envelope.queueName)) {
           continue;
         }
-        await this.enqueue(
-          envelope,
-          Math.min(PAUSED_HANDBACK_PARK_DELAY_MS, this.#policy.parkDelayMs),
-        );
+        // Park once in durable KV storage so a paused backlog creates zero periodic SQLite
+        // re-enqueue writes while sibling queues remain live, then wake atomically on resume/stop.
+        await this.#parked.park(envelope);
         return;
       }
       if (cancelledHandback) {
