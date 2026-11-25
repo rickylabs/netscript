@@ -2,33 +2,29 @@
 
 - **Run ID:** `plan-rfc-orpc-router-client-pipeline-2671--rfc`
 - **Issue:** `https://github.com/rickylabs/netscript/issues/2671`
+- **Draft PR:** `https://github.com/rickylabs/netscript/pull/2673`
+- **Companion RFC:** PR `#2674` (tracking issue `#2672`)
 - **Branch:** `plan/rfc-orpc-router-client-pipeline-2671`
 - **Base commit:** `87965d800b7d61312e8612c82bdb0cb98bdf5b29` (`main`)
+- **Milestone:** `0.0.10`
 - **Primary deliverable:** `rfcs/0000-orpc-router-client-pipeline.md`
-- **Status:** Draft evaluation RFC ready for round-1 review (Fable 5.2; subsequent rounds: Gemini Hydrogen).
+- **Status:** Round-1 fix complete addressing all 6 Fable 5.2 blockers (B1–B6) and advisory items; ready for Round-2 review by Gemini Hydrogen.
 
 ## Route & Lane Assignment
 
 | Role | Assigned model / lane | Notes |
 | --- | --- | --- |
-| Author / research lane | Neon | Drafts RFC A + empirical probes against locked `@orpc/*@1.15.5`; zero edits to `packages/`, `plugins/`, `docs/site/`, `.github/`, or `deno.lock`. |
-| Round-1 reviewer | Fable 5.2 | Single initial review pass covering architecture, security parity, #2659 comparison, and generic downstream consumer impact. |
-| Subsequent review rounds | Gemini Hydrogen | Follow-up review passes after round-1 revision. |
+| Author / research lane | Neon | Drafted RFC A + empirical probes against locked `@orpc/*@1.15.5`; completed Round-1 fixes addressing all 6 Fable 5.2 blockers; zero edits to `packages/`, `plugins/`, `docs/site/`, `.github/`, `deno.json`, or `deno.lock`. |
+| Round-1 reviewer | Fable 5.2 | Returned `CHANGES_REQUESTED` (`issuecomment-7170492509`) with 6 blockers (B1–B6, 4 reproduced with counter-probes), warm benchmark verification, and 8 advisory points. |
+| Round-2+ reviewer | Gemini Hydrogen | Re-checks Round-1 revision and subsequent rounds per owner routing. |
 
-## Scope Boundaries
+## Round-1 Blocker Closure Checklist
 
-- **In scope:** `rfcs/0000-orpc-router-client-pipeline.md` and `.llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/*` (including runnable `--frozen` probes and captured JSON results).
-- **Out of scope:** Implementation edits under `packages/`, `plugins/`, `docs/site/`, `.github/`, `deno.json`, or `deno.lock`; merging PRs; referencing any private consumer repository.
-- **Public privacy compliance:** All downstream consumer impact is stated generically ("downstream applications"); zero private project prefixes, personal names, hostnames, or local machine paths appear in committed files.
-
-## Deliverable Checklist
-
-- [x] Complete Hono middleware & service primitive inventory (`transport-only` / `procedure-level` / `split`)
-- [x] Request-less oRPC context + RFC 0001 client contribution projection design
-- [x] Procedure-based contract authorization preserving all 6 HTTP/in-process security invariants
-- [x] Explicit matrix of in-process guarantees vs deliberate omissions and safety rationale
-- [x] Empirical overhead benchmark (HTTP loopback vs #2659 fetch-link vs `createRouterClient`) with silent-logger apples-to-apples controls
-- [x] Empirical parity probe (5/5 tests passing with `--frozen`: authn/authz/internal-audience/defined-errors/anti-forging, shared post-auth rate limit + single-authn proof, OTel tracing + ALS detachment, `AbortSignal` + bare `call()` + auth-before-validation, Zod output cloning vs schema-less aliasing)
-- [x] Explicit comparison against PR #2659 and recommendation (**Option 3 — Stage into Coexistence**)
-- [x] Mandatory `## Downstream consumers` section
-- [x] Scoped internal doc-link check + privacy/closing-keyword scans + DCO commit
+- [x] **B1:** Unmarked procedures (`meta.access` absent) fail closed with `403 authz.no-matching-rule` (or delegate to procedure-aware fallback), matching `contract-authorizer.ts` verbatim; proven on HTTP, `createRouterClient`, and bare `call()` in Test 1.
+- [x] **B2:** All 5 authorizer modes specified (`createContractAuthorizer` pure, contract + `ProcedureAuthorizerPort` fallback, path-based `createScopeAuthorizer`, custom path `AuthorizerPort`, `createContractOverlayAuthorizer`, `authn`-only path guards); non-HTTP `method: 'IN_PROCESS'` / `path: 'orpc://<service>/<proc>'` defined; path-dependent modes fail closed at construction (`ROUTER_CLIENT_PATH_AUTHZ_UNSUPPORTED`); proven in Test 2.
+- [x] **B3:** HTTP edge pre-dispatch index explicitly retained (retracting the Round-0 Stage 1 deletion claim); `findInternalGuard`, `claims()`, `retiredPaths`, `procedure_not_found`, `procedure_retired`, and **403-before-413** added to inventory & status/body parity table; v2 migration via native `RPCMatcher` + `OpenAPIMatcher` verified on `2.0.0-beta.53`; proven in Test 3.
+- [x] **B4:** Process-wide `WeakSet<Principal>` replaced by scoped `WeakMap<Principal, VerifiedPrincipalRecord>` bound to `(serviceId, serviceName, authenticator, verifiedAtMs, expiresAtMs, requestScope, isRevoked, internalAudience)`; internal audience re-checked against callee `serviceName`; enforced identically on bare `call()`; all 3 attacks proven failing-then-passing + true `AuthenticatorPort`-level single-authn count in Test 4.
+- [x] **B5:** Bootstrap clean root ALS snapshot + fail-closed `captureCleanAsyncRootOrThrow` against lazy-import poisoning; `wrapDetachedAsyncIterator` detaching every streaming `next()`/`return()`/`throw()` pull; both proven failing-then-passing in Test 5.
+- [x] **B6:** `setCookies`/`responseHeaders` fail-closed without explicit sink; `withRateLimit`-without-`withProcedureRateLimit` fail-closed + public procedure `clientAddress` key partitioning + accurate RFC 0008 relationship; non-listening `service.start()`/`stop()` lifecycle; `withRPC({ rpcRouter })` idempotent wrapping (`WRAPPED_ROUTER_MARKER`) + canonical router binding; all proven in Test 6.
+- [x] **Split Stage 1:** Stage 1a (`0.0.10`, decoupled from #2659 & auth move) / Stage 1b (`0.0.11`, gated on B1–B4) / Stage 2 (`0.1.0`, unified `createServiceClient({ transport })` aligned with PR #2674).
+- [x] **Benchmark & process fixes:** 2,000/5,000 warm runs + design-complete row; default authenticating path as headline (`5.6×–7.2×`, ~0.17–0.30 ms saved/call); trusted-principal marked off-by-default; static-authenticator qualification stated; front matter milestone updated to `0.0.10`; companion PR `#2674` / tracker `#2672` cited accurately; `orpc-plugin.ts:371`, v2 wording, and input/output aliasing caveats fixed.

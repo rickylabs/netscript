@@ -1,9 +1,10 @@
 # Worklog — RFC A: oRPC-native procedure pipeline and router client
 
 - **Date:** 2026-11-25
-- **Tracking issue:** `#2671`
+- **Tracking issue:** `#2671` (`0.0.10`)
+- **Draft PR:** `#2673`
 - **Base `main` SHA:** `87965d800b7d61312e8612c82bdb0cb98bdf5b29`
-- **Companion RFC:** `#2672` (oRPC v2 readiness and migration strategy)
+- **Companion RFC:** PR `#2674` (tracking issue `#2672`)
 
 ## Owner Mandate (verbatim, private prefix elided for public repository)
 
@@ -11,50 +12,35 @@
 
 *(Note: the private repository prefix in the owner's prompt is elided as `[…]` for public-repo hygiene, matching existing RFC worklog precedent.)*
 
-## Evidence Ledger
+## Round-0 Baseline & Round-1 Review (Fable 5.2)
 
-### 1. Source Inspection & Official Documentation
+- Round-0 draft committed at `8f4bc6af21984759ba52e7dbd0449167628830c5` on PR `#2673`.
+- Fable 5.2 PLAN-EVAL (`issuecomment-7170492509`) returned `CHANGES_REQUESTED` with 6 concrete blockers (B1–B6; 4 reproduced via counter-probes), warm benchmark cross-check (2,000/5,000 iterations), 8 advisory findings, and a recommendation to amend and take PR #2659 off hold independently.
 
-- **NetScript MCP `find_guidance`** (`@netscript/mcp@0.0.9`): queried service pipeline and SDK architecture docs (`pages/reference/service`, `pages/reference/sdk`).
-- **Locked oRPC inspection (`deno doc --frozen` + npm cache source on `@orpc/server@1.15.5`, `@orpc/otel@1.15.5`):**
-  - Confirmed `createProcedureClient` runs `runWithSpan('call_procedure')` and `intercept(options.interceptors, ...)` identically to handler client interceptors.
-  - Confirmed `os.use(...).router(router)` (`enhanceRouter`) shifts `inputValidationIndex` forward so router-level middleware runs *before* input schema validation across `RPCHandler`, `OpenAPIHandler`, `createRouterClient`, and bare `call()`.
-  - Confirmed `ORPCInstrumentation` hooks `call_procedure`, `middleware.<name>`, and `handler` spans on `createRouterClient`.
-- **Official oRPC docs reviewed:** `client/server-side`, `best-practices/optimize-ssr`, `integrations/opentelemetry`, `context`, `middleware`, `error-handling`, `rpc-handler`, `rpc-link`, `migrations/from-v1`.
-- **NetScript codebase source-inspected:**
-  - `packages/service/src/`: `builder/{service-builder-impl.ts,service-rpc.ts,service-listener.ts}`, `primitives/{handlers.ts,openapi.ts,body-limit.ts,health.ts,orpc-router.ts,rpc-path.ts}`, `middleware/service-cors.ts`, `rate-limit/middleware/rate-limit-middleware.ts`, `auth/{auth-middleware.ts,types.ts,options.ts,scope-authorizer.ts,composite-authenticator.ts,trusted-header-authenticator.ts,internal-credential/*,contract/*}`, `tests/body-limit_test.ts`.
-  - `packages/telemetry/src/`: `orpc/{tracing-plugin.ts,error-plugin.ts}`, `hono/otel-middleware.ts`.
-  - `packages/logger/`: `middleware.ts`, `orpc-plugin.ts`.
-  - `packages/sdk/src/`: `client/{service-client.ts,http-client-link.ts,errors.ts}`, `internal/client-contributions/{stable-v1-adapter.ts,prepared-call.ts}`, `ports/sdk-client-contribution.ts`.
-  - `packages/contracts/src/`: `application/contract-primitives.ts`, `domain/{procedure-meta.ts,schemas.ts}`.
-  - First-party plugins: `plugins/auth`, `plugins/streams`, `plugins/workers`, `plugins/sagas`, `plugins/triggers`, `plugins/ai`.
-  - Draft PR #2659 (`rfcs/0000-in-process-service-link.md`, head `d2c0e05b63b258e8513c4b4e9ec0362cf8241492`).
+## Round-1 Revision Evidence Ledger
 
-### 2. Empirical Probes (run against locked `@orpc/*@1.15.5`, Deno `2.9.5`, `--frozen`)
+### 1. Additional Source & Upstream Verification
 
-1. **Overhead benchmark** (`probes/overhead-benchmark.probe.ts`, raw JSON in `probes/overhead-results.json`):
-   - Apples-to-apples control: silenced LogTape console output across both Hono apps and router-client, and added identical SHA-256 subject-hash audit work in the router-client pipeline so console I/O did not skew HTTP/fetch-link measurements.
-   - **Small unary (~100 B, 500 iters):** HTTP loopback `536.5 µs` mean (`466.1 µs` p50, `1,864 ops/s`); fetch-link #2659 `259.3 µs` mean (`211.0 µs` p50, `3,856 ops/s`, 2.1×); `createRouterClient` w/ authn `78.7 µs` mean (`52.1 µs` p50, `12,701 ops/s`, 3.3× vs fetch-link / 6.8× vs HTTP); `createRouterClient` w/ verified principal `24.5 µs` mean (`20.2 µs` p50, `40,815 ops/s`, 10.6× vs fetch-link / 21.9× vs HTTP).
-   - **Medium list (100 items / 12,822 B JSON, 500 iters):** HTTP loopback `745.6 µs` (`1,341 ops/s`); fetch-link `380.6 µs` (`2,627 ops/s`, 2.0×); `createRouterClient` w/ authn `48.1 µs` (`20,800 ops/s`, 7.9× vs fetch-link / 15.5× vs HTTP); `createRouterClient` w/ verified principal `36.4 µs` (`27,448 ops/s`, 10.5× vs fetch-link / 20.5× vs HTTP).
-   - **Concurrent burst (20 × 25 = 500 calls):** HTTP loopback `5,191 ops/s`; fetch-link `8,574 ops/s`; `createRouterClient` w/ authn `30,828 ops/s` (3.6× vs fetch-link / 5.9× vs HTTP); `createRouterClient` w/ verified principal `68,324 ops/s` (8.0× vs fetch-link / 13.2× vs HTTP).
-2. **Parity & security probe** (`probes/router-client-parity.probe.ts`):
-   - `mise exec -- deno test --frozen -A ...`: **5 passed | 0 failed** (71 ms, resource & ops sanitizers ON).
-   - Surfaced two concrete implementation subtleties incorporated into the RFC:
-     - Router-level `ORPCError` throws must populate `data` conforming to `commonErrorMap`'s Zod schemas (`unauthorizedErrorSchema`, `forbiddenErrorSchema`, `rateLimitErrorSchema`, `serviceUnavailableErrorSchema`) and set `defined` against `procedure['~orpc'].errorMap`, or oRPC downgrades `defined` to `false` and breaks `isDefinedError()` narrowing.
-     - `ServiceBuilderImpl.buildRpcContext()` spreads `...this.contextFactory(c)` before overwriting `principal` with `c.get('principal')`; HTTP-edge principal branding must therefore brand the `Principal` object stored on Hono context directly inside `createAuthnMiddleware`.
+- Re-inspected `packages/service/src/auth/contract/{contract-authorizer.ts,contract-overlay-authorizer.ts,contract-procedure-index.ts,procedure-policy-decision.ts}`, `packages/service/src/auth/{auth-middleware.ts,scope-authorizer.ts,types.ts,internal-credential/internal-credential-authenticator.ts}`, `packages/service/src/rate-limit/middleware/rate-limit-middleware.ts`, `packages/plugin/src/service/presentation/{create-plugin-service.ts,plugin-contract-binder.ts}`, `packages/plugin-auth-core/src/sdk/bearer-contribution.ts`, `packages/sdk/src/ports/sdk-client-contribution.ts`, `packages/logger/orpc-plugin.ts` (`createRequestId()` at line 371), and `origin/main:rfcs/0008-rolling-service-quotas.md` (lines 109, 246–250).
+- Inspected locked `@orpc/server@1.15.5/standard` (`StandardRPCMatcher`), `@orpc/openapi@1.15.5/standard` (`StandardOpenAPIMatcher`), and cached `2.0.0-beta.53` `@orpc/server/standard` (`RPCMatcher`), `@orpc/openapi/standard` (`OpenAPIMatcher`), and `@orpc/server/adapters/standard/handler.js` (confirming `StandardHandler.interceptors` runs post-`resolveProcedure` and pre-`decodeInput`).
 
-## Key Decisions
+### 2. Updated Empirical Probes (locked `@orpc/*@1.15.5`, Deno `2.9.5`, `--frozen`)
 
-1. **Recommendation: Option 3 (Stage into Coexistence)** rather than replacing #2659 or shipping a throwaway v1 router-client surface right before oRPC v2.
-2. **Dual-layer HTTP auth with `VERIFIED_PRINCIPAL_BRAND`:** Preserves 401-before-413, 404/410 anti-oracle, raw routes, and `Set-Cookie` on HTTP while running authentication exactly once per request and preventing unbranded `Principal` spoofing on `createRouterClient`.
-3. **Explicit ALS detachment + opt-in trace propagation:** `AsyncLocalStorage.snapshot()` prevents accidental caller ALS leakage on every in-process call while allowing explicit W3C trace continuity.
+1. **Warm overhead benchmark** (`probes/overhead-benchmark.probe.ts`, raw JSON in `probes/overhead-results.json`):
+   - Parameters upgraded to **2,000 warm-up / 5,000 measured** iterations, eliminating the Round-0 JIT warm-up artefact, and adding the **design-complete** authenticating router-client mode (root ALS snapshot + OTel detachment + logging/error/tracing interceptors + per-call `requestId` + scoped brand check + SHA-256 audit + `MemoryRateLimitStore`).
+   - **Small unary (~100 B):** HTTP loopback `386.4 µs` (`2,588 ops/s`); fetch-link #2659 `212.2 µs` (`4,713 ops/s`); **router-client authenticating design-complete `38.2 µs` (`26,193 ops/s`, 5.6× vs fetch-link, ~0.17 ms/call saved, 10.1× vs HTTP)**; authenticating minimal `32.4 µs` (`30,834 ops/s`, 6.5× vs fetch-link); *off-by-default trusted-principal `22.3 µs` (`44,744 ops/s`, 9.5× vs fetch-link)*.
+   - **Medium list (100 items, 12,822 B JSON):** HTTP loopback `590.5 µs` (`1,693 ops/s`); fetch-link `345.0 µs` (`2,899 ops/s`); **router-client authenticating design-complete `47.7 µs` (`20,952 ops/s`, 7.2× vs fetch-link, ~0.30 ms/call saved, 12.4× vs HTTP)**; authenticating minimal `43.4 µs` (`23,050 ops/s`, 7.9× vs fetch-link); *off-by-default trusted-principal `32.1 µs` (`31,123 ops/s`, 10.7× vs fetch-link)*.
+   - **Concurrent burst (20 × 50 = 1,000 calls):** HTTP `4,290 ops/s`; fetch-link `8,524 ops/s`; **authenticating design-complete `42,301 ops/s` (5.0× vs fetch-link)**; *off-by-default trusted-principal `76,889 ops/s` (9.0× vs fetch-link)*.
+   - Design-complete interceptor overhead measured at **+4.3 to +5.8 µs** (consistent with reviewer's 5–10 µs measurement).
+2. **Comprehensive parity & security counter-probe suite** (`probes/router-client-parity.probe.ts`):
+   - Covers B1 (unmarked → `403 authz.no-matching-rule`), B2 (5 path-based modes fail closed at construction + procedure fallback parity), B3 (401/403-before-413, 401-before-404/410, `procedure_not_found`, `procedure_retired`, `findInternalGuard`, `429` + `Retry-After`), B4 (failing-then-passing proofs for all 3 measured attacks + `AuthenticatorPort`-level single-authn count), B5 (failing-then-passing proofs for lazy snapshot capture & streaming pull isolation across all 3 `next()` pulls + `return()`), B6 (`setCookies` fail-closed/sink, public `clientAddress` quotas, `withRateLimit` mismatch fail-closed, `onStartup` fail-closed, idempotent double-wrap protection), and real RFC 0001 `bearer` + `locale` contribution projection with `options.path`.
 
-## Validation Table
+## Validation Table (Round-1 Fix)
 
 | Check | Command | Result |
 | --- | --- | --- |
-| RFC A Parity Probe | `mise exec -- deno test --frozen -A .llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/probes/router-client-parity.probe.ts` | PASS (`5 passed \| 0 failed`, 71 ms) |
-| RFC A Overhead Benchmark | `mise exec -- deno run --frozen -A .llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/probes/overhead-benchmark.probe.ts` | PASS (exit 0; results saved) |
+| Warm Overhead Benchmark (2,000 / 5,000) | `mise exec -- deno run --frozen -A .llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/probes/overhead-benchmark.probe.ts` | PASS (exit 0; valid JSON saved to `probes/overhead-results.json`) |
+| Round-1 Parity & Counter-Probes (B1–B6) | `mise exec -- deno test --frozen -A .llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/probes/router-client-parity.probe.ts` | PASS (`6 passed \| 0 failed`, 117 ms) |
 | Lockfile untouched | `git diff --stat deno.lock` | PASS (empty diff) |
 | Scoped internal doc links | `mise exec -- deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --root rfcs/0000-orpc-router-client-pipeline.md --pretty` | PASS (`broken-links=0 broken-anchors=0`) |
-| Privacy & closing-keyword scan | Pattern scan on all added files | PASS (`0 hits`) |
+| Privacy & closing-keyword scan | Pattern scan on all modified/added files | PASS (`0 hits`) |
