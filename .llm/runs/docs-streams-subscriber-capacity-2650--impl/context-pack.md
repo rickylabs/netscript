@@ -12,4 +12,6 @@ the start of the 60-second offered-write window. The two site pages and the benc
 carry the corresponding caveats and usage advice.
 
 The Phase B matched controls and upstream inspection are in phase-b.md. The server-side
-defect is tracked separately in #2661.
+defect is tracked separately in #2661. The Streams guide explicitly flags the 32-reader
+single-topic 149,612.9 ms p95 row as defect #2661 (failed to sustain 1 write/s, not expected
+steady-state capacity).

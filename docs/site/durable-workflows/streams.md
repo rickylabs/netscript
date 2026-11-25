@@ -438,7 +438,7 @@ the time from enqueue through the last expected reader’s committing control.
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Single | 1 | 1 | 60 | 105.9 / 149.0 / 833.3 | 0 / 0 |
 | Single | 8 | 1 | 480 | 548.5 / 4,310.4 / 4,489.3 | 0 / 0 |
-| Single | 32 | 1 | 1,920 | 106,832.9 / 149,612.9 / 156,139.8 | 0 / 0 |
+| Single (defect [#2661](https://github.com/rickylabs/netscript/issues/2661)) | 32 | 1 | 1,920 | 106,832.9 / 149,612.9 / 156,139.8 | 0 / 0 |
 | Spread | 1 | 1 | 60 | 117.9 / 356.3 / 562.3 | 0 / 0 |
 | Spread | 8 | 8 | 60 | 112.2 / 442.0 / 883.0 | 0 / 0 |
 | Spread | 32 | 8 | 240 | 243.5 / 488.2 / 992.9 | 0 / 0 |
@@ -451,12 +451,15 @@ The largest sampled companion RSS was 150.1 MiB, the highest phase-average CPU u
 The largest end-of-window logical storage size was 63,443 bytes. The companion exited
 cleanly and the temporary directory was removed.
 
-In the 32-reader single-stream phase, the last producer acknowledgement arrived 216.1 s
-after the start of the one-minute offered-write window. The latency figures include that backlog.
-
-The [known single-topic SSE fan-out defect (#2661)](https://github.com/rickylabs/netscript/issues/2661)
-can delay append acknowledgements on the file-backed companion while it writes
-access-time metadata synchronously for waking readers.
+**Single-topic 32-reader result is a known defect, not expected steady-state capacity.**
+In the 32-reader single-stream phase, the unpatched file-backed companion did not sustain
+one write per second under the tested workload: the last producer acknowledgement arrived
+216.1 s after the start of the one-minute offered-write window, and the 149,612.9 ms p95
+reflects that append backlog rather than expected fan-out latency. This behaviour is caused
+by the [single-topic SSE fan-out defect (#2661)](https://github.com/rickylabs/netscript/issues/2661),
+where the file-backed companion synchronously writes access-time metadata for each waking
+reader on the append path. Once #2661 is fixed, re-run the benchmark above to establish
+post-fix single-topic fan-out latency on the updated companion.
 
 These measurements describe this workload. Replays of larger histories, bursts, more active
 streams, and browser or ingress behavior each call for measurements under those conditions.
@@ -472,7 +475,7 @@ is negotiated end to end. HTTPS can still carry HTTP/1.1. Check the negotiated p
 on each connection in the serving path, including any proxy or load balancer. Over TLS,
 HTTP/2 typically uses ALPN, and HTTP/3 negotiates over QUIC with TLS.
 [Chromium socket pool](https://chromium.googlesource.com/chromium/src/%2B/HEAD/net/socket/client_socket_pool_manager.cc),
-[Firefox connection default](https://github.com/mozilla/gecko-dev/blob/master/modules/libpref/init/all.js#L1042-L1045),
+[Firefox connection default (`network.http.max-persistent-connections-per-server`)](https://github.com/mozilla/gecko-dev/blob/master/modules/libpref/init/all.js),
 [HTTP/2 negotiation](https://www.rfc-editor.org/rfc/rfc9113.html#section-3.2),
 [HTTP/3 negotiation](https://www.rfc-editor.org/rfc/rfc9114.html#section-3.2).
 

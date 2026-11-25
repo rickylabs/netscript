@@ -184,3 +184,20 @@ flush, filesystem I/O and scheduler waits remain unseparated.
 - `deno task release:preflight` — exit 0.
 - `git diff --check` and `git diff --cached --check` — exit 0.
 - [Related issue reference on #2650](https://github.com/rickylabs/netscript/issues/2650#issuecomment-7123584626).
+
+## Polish slice (2026-11-25)
+
+Owner-approved Neon continuation (`gemini-4-neon`, separate-session independent reviewer to follow):
+
+- Marked the single-topic 32-reader table row and accompanying prose in
+  `docs/site/durable-workflows/streams.md` explicitly as defect #2661 (did not sustain one write
+  per second under the tested workload; not expected steady-state fan-out capacity) while keeping
+  every published number sourced verbatim from `results.json`.
+- Replaced the drifting `gecko-dev` `master` line-range anchor with an un-anchored file link naming
+  `network.http.max-persistent-connections-per-server`, and normalized paragraph wrapping in
+  `tools/streams-subscriber-capacity/README.md` (addressing the remaining Phase B IMPL-EVAL
+  advisories).
+- Validation: `deno task docs:links`, `deno task docs:accuracy`, `deno task release:preflight`,
+  `run-deno-test.ts -- --allow-all plugins/streams/tests/docs/native-event-source-example_test.ts`,
+  `deno task --cwd docs/site check:source-format`, and `git diff --check` (all verified exit 0
+  before push; CI `Deploy docs site to Pages` builds the site on Deno 2.9.7).

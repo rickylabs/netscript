@@ -7,8 +7,8 @@ deno run -A --frozen tools/streams-subscriber-capacity/main.ts > results.json
 ```
 
 The command offers writes for nine minutes, plus setup and drain time, and writes a single JSON
-report to stdout. Progress goes to stderr. Add `--smoke` for a short wiring check with a different workload. The default
-command is the capacity measurement.
+report to stdout. Progress goes to stderr. Add `--smoke` for a short wiring check with a different
+workload. The default command is the capacity measurement.
 
 The harness starts one loopback Streams companion with an ephemeral port and a fresh file-backed
 data directory. It runs three layouts in order, each with 1, 8, then 32 total readers:
@@ -24,13 +24,13 @@ numbered upsert per second for 60 seconds, round-robin across that phase's strea
 client consumes the same small messages and models delayed frame processing. This workload
 does not establish a socket backpressure threshold.
 
-Per-revision latency starts when the harness calls the producer's append enqueue and ends at
-the last expected reader's committing control. The report includes each expected reader's
-latency or `null` for a missing commit, nearest-rank p50 and p95, and the maximum over complete
-latency samples. A gap is an expected revision that never commits for a reader during the
-phase. Duplicate or out-of-order commits are reported separately. The reconnect count records
-additional HTTP attempts after EOF or a retryable transport error, resuming from the last
-committed opaque offset. HTTP versions come from the SSE responses.
+Per-revision latency starts when the harness calls the producer's append enqueue and ends at the
+last expected reader's committing control. The report includes each expected reader's latency or
+`null` for a missing commit, nearest-rank p50 and p95, and the maximum over complete latency
+samples. A gap is an expected revision that never commits for a reader during the phase. Duplicate
+or out-of-order commits are reported separately. The reconnect count records additional HTTP
+attempts after EOF or a retryable transport error, resuming from the last committed opaque
+offset. HTTP versions come from the SSE responses.
 
 The companion's RSS and open file descriptors are sampled at the start, each append, and the
 end of the delivery window. Average CPU uses that same interval and Linux procfs accounting
