@@ -1,9 +1,10 @@
 # Worklog — RFC B: oRPC v2 readiness and migration strategy
 
 - **Date:** 2026-11-25
-- **Tracking issue:** `#2672`
+- **Tracking issue:** `#2672` (`0.0.10`)
+- **Draft PR:** `#2674`
 - **Base `main` SHA:** `87965d800b7d61312e8612c82bdb0cb98bdf5b29`
-- **Companion RFC:** `#2671` (oRPC-native procedure pipeline and router client)
+- **Companion RFC:** PR `#2673` (tracking issue `#2671`)
 
 ## Owner Mandate (verbatim, private prefix elided for public repository)
 
@@ -11,48 +12,36 @@
 
 *(Note: the private repository prefix in the owner's prompt is elided as `[…]` for public-repo hygiene, matching existing RFC worklog precedent.)*
 
-## Evidence Ledger
+## Round-0 Baseline & Round-1 Review (Fable 5.2)
 
-### 1. Upstream Verification (2026-11-25)
+- Round-0 draft committed at `1349e509aeb748f6dd5872429dbb05ca9c2113f7` on PR `#2674`.
+- Fable 5.2 PLAN-EVAL (`issuecomment-7170652451`) returned `CHANGES_REQUESTED` with 8 blockers (B1–B8), a `1.16.5` baseline run, Phase 0a/0b split guidance, and advisory items.
 
-- **npm registry dist-tags verified directly against `registry.npmjs.org`:**
-  - `@orpc/{client,contract,openapi,server,tanstack-query,zod,json-schema,opentelemetry,ratelimit,pino,publisher,hibernation}`: `beta = 2.0.0-beta.53` (published 2026-11-23), `latest = 1.16.6` (published 2026-11-25).
-  - `@orpc/otel`: `latest = 1.16.6`, **no `beta` tag** (superseded by `@orpc/opentelemetry@2.0.0-beta.53`).
-- **GitHub releases verified on `middleapi/orpc` up to `v2.0.0-beta.53`:** noted recent churn (#2523 readonly `ORPCError.code`/`data`, #2525 `RetryAfterLinkPlugin.shouldRetry`, #2533 `TimeoutError`/`ConnectionClosedError` on MessagePort/WS links, #2514 custom refusal errors, #2544 dedupe ignoring trace headers).
-- **Official v1→v2 migration guide read in full:** `https://orpc.dev/docs/migrations/from-v1` (1,278 lines), plus `rpc-handler`, `rpc-link`, `error-handling`, `middleware`, `context`, and `integrations/opentelemetry`.
+## Round-1 Revision Evidence Ledger
 
-### 2. Repository `@orpc/*` Inventory (`main` `87965d800`)
+### 1. Source & Upstream Verification (`2.0.0-beta.53` & `main` `87965d800`)
 
-- **179 non-`.llm`, non-lock files** across 21 workspace groups (plus 8 lockfiles; 19 `@orpc/*` npm entries in root `deno.lock`, including stale `1.15.0` pins for `@orpc/client` and `@orpc/tanstack-query`).
-- Verified 11 workspace `deno.json` manifests repeat explicit `npm:@orpc/*@^1.15.5` instead of `catalog:`, and `packages/sdk/tests/type-fixtures/service-query-utils-upstream_type.ts` pins `@1.15.5` inline.
-- Verified no top-level `samples/` or `examples/` directory exists; showcase/sample templates live in `packages/cli/src/kernel/assets/showcase/`, `packages/cli/tests/showcase-ai/`, `packages/cli/e2e/fixtures/`, and `packages/bench/tasks/`.
+- Inspected `@orpc/tanstack-query@2.0.0-beta.53/dist/procedure-utils.d.ts` confirming exact method names `streamedKey`, `streamedOptions`, `liveKey`, `liveOptions`.
+- Inspected `@orpc/openapi@2.0.0-beta.53/dist/extensions/route.d.ts` confirming `@orpc/openapi/extensions/route` module augmentation restoring `.route(meta: OpenAPIMeta)`.
+- Inspected `@orpc/server@2.0.0-beta.53/dist/plugins/get-method-csrf-protection.js` and `adapters/standard/rpc-handler-codec.js` (confirming `GetMethodCsrfProtectionHandlerPlugin.isAllowed` Fetch Metadata logic and `status: getOwn(this.errorStatusMap, error.code) ?? 400`).
+- Inspected `@orpc/contract@2.0.0-beta.53/dist/{error-utils.d.ts,meta-utils.d.ts}` confirming `reconcileORPCError(map, error)` and `defineMeta(name, merge)`.
+- Inspected NetScript files: `packages/sdk/src/internal/transport-policy.ts`, `packages/sdk/src/client/http-client-link.ts`, `packages/sdk/src/query-client/create-service-query-utils.ts`, `packages/service/src/primitives/{handlers.ts,openapi.ts}`, `packages/service/tests/cors-response-authority_test.ts`, `packages/telemetry/src/orpc/{tracing-plugin.ts,error-plugin.ts}`, `plugins/auth/services/src/routers/v1-handlers.ts:97`, `packages/cli/e2e/src/application/gates/scaffold/{install-generated-probe_test.ts,locked-probes_test.ts,service-client-runtime-probe.ts}`.
+- Executed `.llm/tools/deps/scan-npm-catalog-compliance.ts` (read-only) confirming existing `WARN DEPS-NPM-CATALOG` coverage across all 11 workspace manifests and inline `@orpc/*` test pins.
 
-### 3. Throwaway `2.0.0-beta.53` Prototype Execution & Cleanup
+### 2. Standalone Empirical Behavior Probes (`probes/v2-behavior-probes.ts`)
 
-- Created detached throwaway worktree at `87965d800`, bumped 13 manifests (`deno.json` + 11 workspace `deno.json` + `packages/telemetry/package.json`) to `2.0.0-beta.53` (`@orpc/otel` → `@orpc/opentelemetry` + `@orpc/json-schema`), ran `mise exec -- deno install`.
-- **Compiler fallout (`deno check --unstable-kv`):** **411 TypeScript diagnostics across 13/13 failing target groups**, plus **37 errors** in `packages/cli/bin/netscript.ts`.
-- **Runtime fallout (`deno test --no-check --allow-all --unstable-kv`):**
-  - `packages/contracts/tests`: 18 passed | 5 failed (`TypeError: oc.$meta is not a function`).
-  - `packages/logger/tests/orpc-plugin_test.ts`: 1 passed | 4 failed (`TypeError: Cannot read properties of undefined (reading 'routingInterceptors')` — exposed v2's return-based `StandardHandlerPlugin.init(options)` requirement!).
-  - `packages/fresh/.../bind-desktop-rpc-window_test.ts`: 0 passed | 1 failed (`SyntaxError: isContractProcedure` missing from `@orpc/contract`).
-  - `packages/{telemetry,service,sdk,plugin,plugin-auth-core}`: immediate `@orpc/otel` import failure; secondary pass swapping only `@orpc/otel` → `@orpc/opentelemetry` exposed `ORPCError` missing from `@orpc/contract`, `isContractProcedure` missing, `@orpc/zod/zod4` `ERR_PACKAGE_PATH_NOT_EXPORTED`, and `fallbackContractConfig` missing.
-- **Direct `.d.ts` & runtime probe on `2.0.0-beta.53`:**
-  - Confirmed `ORPCError` retains `defined: boolean` at runtime (`toJSON: { defined, code, message, data }`) while dropping `status` (`"status" in err === false`), uncovering the silent `Extract<TError, DefinedErrorLike>` → `never` narrowing hazard in `packages/sdk/src/client/errors.ts`.
-  - Confirmed `safe()` 4-tuple changed index 2 from `isDefined: boolean` to `definedError | null` (and removed `isDefined` property).
-  - Confirmed `@orpc/zod@2.0.0-beta.53` exports `.` only (deleting `./zod4` and `ZodSmartCoercionPlugin`).
-- Recorded full diff stats and fallout breakdown in `evidence/v2-beta53-prototype-summary.md` and deleted the throwaway worktree via `git worktree remove --force`.
+- Executed with `mise exec -- deno test --no-lock --no-config -A` (zero edits to `deno.json` / `deno.lock`):
+  - **B1:** Reproduced `1.15.5` `RPCLink` → `2.0.0-beta.53` `RPCHandler` `bigint` `10n` → `"10"` and `"nope"` → `"Not Found"`, verified `X-NetScript-RPC-Protocol` `426` guard (explicit v1, missing header, reverse v2→v1), and verified `OpenAPILink@1.15.5` → `OpenAPIHandler@2.0.0-beta.53` for JSON-safe payloads.
+  - **B2:** Verified default `RPCHandler` rejects `GET` (`matched: false`), and verified explicit contract `GET` allow-list + `GetMethodCsrfProtectionHandlerPlugin` across all 6 request shapes.
+  - **B4:** Verified `rootInterceptors` silently ignored vs `routingInterceptors` executing; unmapped error code returning HTTP `400`; `defined: true` ignored vs `reconcileORPCError`; duplicate middleware running twice on v2 vs context-symbol guard running once.
+  - **B6:** Verified `@orpc/openapi/extensions/route` + `defineMeta` powering `.route(...)` + `.meta(accessMeta(...))`.
+  - **B7:** Verified default v2 `RPCLink` follows cross-origin `307` leaking `x-api-key`, `traceparent`, and body; `redirect: 'manual'` resolves `undefined`; `redirect: 'error'` throws `TypeError` with 0 foreign hits.
 
-## Key Decisions
-
-1. **Recommendation: Three-phase staged readiness** (Phase 0 v1 prep → Phase 1 weekly dual-line shadow CI → Phase 2 coordinated `2.0.0` GA cut-over with codemod) — never cut over `main` during beta churn.
-2. **Coordinate with RFC A (`#2671`):** Land RFC A Stage 1 on v1 (eliminating `contract-procedure-index.ts`'s 4 v2-broken imports) and align RFC A Stage 2 (`service.createRouterClient`) with RFC B Phase 2 so downstream applications migrate once.
-3. **Preserve NetScript-owned security & error guards:** Explicitly retain `redirect: 'manual'`/`'error'` on `http-client-link.ts`, remove handler-level `CORSPlugin` before v2's `origin: '*'` default lands, and relax `DefinedErrorLike` in `@netscript/sdk/client` before v2 drops `ORPCError.status`.
-
-## Validation Table
+## Validation Table (Round-1 Fix)
 
 | Check | Command | Result |
 | --- | --- | --- |
-| Throwaway `2.0.0-beta.53` prototype & removal | `git worktree remove --force ... && git worktree list` | PASS (removed cleanly; summary captured in `evidence/v2-beta53-prototype-summary.md`) |
-| Main & RFC B branches free of lock/dep edits | `git status -s` | PASS (docs & `.llm/runs/` only) |
+| Standalone v2 Behavior Probes (B1, B2, B4, B6, B7) | `mise exec -- deno test --no-lock --no-config -A .llm/runs/plan-rfc-orpc-v2-readiness-2672--rfc/probes/v2-behavior-probes.ts` | PASS (`5 passed \| 0 failed`, 33 ms) |
+| Workspace `deno.json` & `deno.lock` untouched | `git status -s` | PASS (docs & `.llm/runs/` only) |
 | Scoped internal doc links | `mise exec -- deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --root rfcs/0000-orpc-v2-readiness.md --pretty` | PASS (`broken-links=0 broken-anchors=0`) |
-| Privacy & closing-keyword scan | Pattern scan on all added files | PASS (`0 hits`) |
+| Privacy & closing-keyword scan | Pattern scan on all modified/added files | PASS (`0 hits`) |
