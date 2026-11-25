@@ -445,6 +445,13 @@ const RULES: readonly Rule[] = [
     disposition: 'diagrams:render if S6/S8 add nodes',
   },
   {
+    test: (p) => p === 'docs/site/assets/diagrams/directory-architecture.svg',
+    cls: 'doc:hand-authored-diagram',
+    owner: 'S11',
+    disposition:
+      'hand-authored SVG diagram (no .mmd source); verified by docs build SVG element-count parity gate',
+  },
+  {
     test: starts('docs/site/assets/'),
     cls: 'doc:generated-asset',
     owner: 'derived',

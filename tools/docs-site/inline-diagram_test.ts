@@ -29,3 +29,22 @@ Deno.test('diagram instance and accessible-name contracts fail closed', () => {
     'identifier',
   );
 });
+
+Deno.test('hand-authored directory-architecture SVG has no blank lines, keeps elements, and emits zero raw colors', async () => {
+  const source = await Deno.readTextFile(
+    new URL('../../docs/site/assets/diagrams/directory-architecture.svg', import.meta.url),
+  );
+  assert(
+    !/\n[ \t]*\n/.test(source),
+    'SVG must not contain blank lines (breaks CommonMark HTML blocks)',
+  );
+  const inlined = inlineUtilityDiagram(source, 'Directory architecture', 'dir-arch');
+  for (const tag of ['rect', 'text', 'path']) {
+    const rawCount = (source.match(new RegExp(`<${tag}\\b`, 'g')) ?? []).length;
+    const inlinedCount = (inlined.match(new RegExp(`<${tag}\\b`, 'g')) ?? []).length;
+    assertEquals(inlinedCount, rawCount, `Mismatch for <${tag}> elements`);
+  }
+  assert(!/(?:fill|stroke|color)\s*[:=]\s*["']?(?:#[\da-f]{3,8}|rgba?\()/i.test(inlined));
+  const styleBlock = inlined.match(/<style>[\s\S]*?<\/style>/)?.[0] ?? '';
+  assert(!/#[\da-f]{3,8}\b/i.test(styleBlock), 'Inlined SVG <style> must not leak raw hex colors');
+});

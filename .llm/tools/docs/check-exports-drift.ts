@@ -163,6 +163,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     },
   },
   {
+    name: 'plugin-directory-core',
+    packagePath: 'packages/plugin-directory-core',
+    docPath: 'docs/site/reference/plugin-directory-core/index.md',
+    packageName: '@netscript/plugin-directory-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'complete',
+      reason:
+        'The page inventories every exported entrypoint and symbol across the root, domain, ports, and testing surfaces.',
+    },
+  },
+  {
     name: 'plugin-auth',
     packagePath: 'plugins/auth',
     docPath: 'docs/site/reference/plugin-auth/index.md',

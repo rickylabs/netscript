@@ -373,6 +373,11 @@
           "jsr:@std/async@1"
         ]
       },
+      "jsr:@netscript/plugin-directory-core@0.0.9": {
+        "dependencies": [
+          "jsr:@std/assert@1"
+        ]
+      },
       "jsr:@netscript/plugin-sagas-core@0.0.9": {
         "dependencies": [
           "jsr:@hono/hono@4.13.13",

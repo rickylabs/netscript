@@ -43,6 +43,7 @@ not separate units. Paths, rather than remembered package names, are the executa
 | `packages/plugin` | `@netscript/plugin` | 4 | Keep | Preserve manifest, discovery, validation, and host contracts. |
 | `packages/plugin-ai-core` | `@netscript/plugin-ai-core` | 1 | Keep | Keep the versioned AI contract surface contract-only. |
 | `packages/plugin-auth-core` | `@netscript/plugin-auth-core` | 2 | Keep | Preserve auth contracts, backend ports, and testing seams. |
+| `packages/plugin-directory-core` | `@netscript/plugin-directory-core` | 2 | Keep | Preserve directory contracts, `DirectoryPort`, typed errors, and conformance testing seams. |
 | `packages/plugin-sagas-core` | `@netscript/plugin-sagas-core` | 3 | Keep | Preserve saga state-machine/runtime ownership. |
 | `packages/plugin-streams-core` | `@netscript/plugin-streams-core` | 3 | Keep | Preserve producer, schema, telemetry, and diagnostics seams. |
 | `packages/plugin-triggers-core` | `@netscript/plugin-triggers-core` | 3 | Keep | Preserve trigger DSL/runtime ports and adapters. |
@@ -90,7 +91,7 @@ with `git rev-parse --is-shallow-repository`; when it reports `true`, use the Gi
 ## Doctrine gate coverage
 
 Both `deno task arch:check` and `deno task arch:check:repo` iterate `discoverDoctrineRoots()` and
-therefore gate exactly the 36 paths in the verdict table above. The nested `packages/cli/e2e`
+therefore gate exactly the 37 paths in the verdict table above. The nested `packages/cli/e2e`
 workspace is intentionally outside that set: it is the CLI's end-to-end harness, not a top-level
 published doctrine unit. See the corresponding [F-19 exclusion](./09-anti-patterns-and-fitness-functions.md#f-19-scoped-source-gate-runners).
 
