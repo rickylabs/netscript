@@ -1,4 +1,4 @@
-import type { JSX } from 'preact';
+import type { JSX, Ref } from 'preact';
 import type { MachineDataAttributes } from '../_internal/dom-types.ts';
 import type { FreshUiChildren } from '../_internal/public-props.ts';
 
@@ -52,7 +52,10 @@ export type ComboboxRootProps = UseComboboxOptions & {
 };
 
 /** Props for the combobox input. */
-export type ComboboxInputProps = JSX.InputHTMLAttributes<HTMLInputElement>;
+export type ComboboxInputProps = JSX.InputHTMLAttributes<HTMLInputElement> & {
+  /** Ref forwarded to the underlying native `<input>` element. */
+  inputRef?: Ref<HTMLInputElement>;
+};
 
 /** Props for the combobox listbox content. */
 export type ComboboxContentProps = JSX.HTMLAttributes<HTMLDivElement> & {

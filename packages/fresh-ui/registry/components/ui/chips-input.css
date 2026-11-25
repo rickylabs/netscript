@@ -17,7 +17,8 @@
   & [data-part=chip-remove] { display: inline-flex; padding: var(--ns-space-0-5); border: 0; border-radius: var(--ns-radius-sm); background: transparent; color: inherit; cursor: pointer; }
   & [data-part=chip-remove]:hover { background: var(--ns-hover); }
   & [data-part=input] { flex: 1; min-width: var(--ns-space-20); min-height: var(--ns-control-height-xs); border: 0; outline: 0; background: transparent; color: inherit; font-size: var(--ns-text-sm); }
-  & :is([data-part=input]::placeholder,[data-part=empty],[data-part=description]) { color: var(--ns-muted-fg); }
+  & :is([data-part=empty],[data-part=description]) { color: var(--ns-muted-fg); }
+  & [data-part=input]::placeholder { color: var(--ns-muted-fg); }
   & [data-part=suggestions] { margin-top: var(--ns-space-1); padding: var(--ns-space-1); border: var(--ns-border-width) solid var(--ns-border); border-radius: var(--ns-radius-card); background: var(--ns-surface-raised); box-shadow: var(--ns-shadow-md); z-index: var(--ns-z-dropdown); }
   & [data-part=suggestion] { padding: var(--ns-space-1-5) var(--ns-space-2); border-radius: var(--ns-radius-sm); font-size: var(--ns-text-sm); cursor: pointer; }
   & [data-part=suggestion]:is([data-highlighted=true],:hover) { background: var(--ns-hover); }

@@ -96,6 +96,53 @@ const DEFAULT_STATUS_LABELS: Readonly<Record<SecretFieldState, string>> = {
   readonly: 'Read-only',
 };
 
+const SAFE_ROOT_PROP_KEYS = new Set([
+  'dir',
+  'hidden',
+  'lang',
+  'role',
+  'slot',
+  'tabIndex',
+  'title',
+  'onBlur',
+  'onClick',
+  'onFocus',
+  'onKeyDown',
+  'onKeyUp',
+  'onPointerDown',
+  'onPointerUp',
+]);
+
+const OWNED_ROOT_DATA_KEYS = new Set([
+  'data-scope',
+  'data-part',
+  'data-state',
+  'data-disabled',
+]);
+
+function pickSafeRootProps(rawProps: object): Record<string, unknown> {
+  if (
+    Reflect.get(rawProps, 'value') !== undefined ||
+    Reflect.get(rawProps, 'defaultValue') !== undefined
+  ) {
+    throw new TypeError(
+      'SecretField is write-only and forbids passing "value" or "defaultValue". Pass "hasValue" instead.',
+    );
+  }
+  const safe: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(rawProps)) {
+    if (value === undefined) continue;
+    if (
+      SAFE_ROOT_PROP_KEYS.has(key) ||
+      key.startsWith('aria-') ||
+      (key.startsWith('data-') && !OWNED_ROOT_DATA_KEYS.has(key))
+    ) {
+      safe[key] = value;
+    }
+  }
+  return safe;
+}
+
 /**
  * Write-only credential input that never displays a stored value and provides no reveal control.
  *
@@ -132,6 +179,7 @@ export function SecretField({
   class: className,
   ...props
 }: SecretFieldProps): VNode {
+  const safeRootProps = pickSafeRootProps(props);
   const field = useSecretField({
     id,
     name,
@@ -169,7 +217,7 @@ export function SecretField({
 
   return (
     <div
-      {...props}
+      {...safeRootProps}
       id={id}
       ref={field.attachRoot}
       class={cn('ns-secret-field', className)}
@@ -216,7 +264,7 @@ export function SecretField({
           data-part='icon'
           aria-hidden='true'
         >
-          <Icon name={field.state === 'readonly' ? 'lock' : 'key-round'} size='1em' />
+          <Icon name={field.state === 'readonly' ? 'lock' : 'key-round'} />
         </span>
 
         <span

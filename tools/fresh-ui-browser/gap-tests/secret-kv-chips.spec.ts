@@ -7,11 +7,19 @@ const SENTINEL_SHA256 = createHash('sha256').update(SENTINEL_SECRET).digest('hex
 const UNCHANGED_SHA256 = createHash('sha256').update('__ns_secret_unchanged__').digest('hex');
 const CLEAR_SHA256 = createHash('sha256').update('__ns_secret_clear__').digest('hex');
 
+let pageErrors: string[] = [];
+
 test.beforeEach(async ({ page }, info) => {
+  pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.goto(`/?scheme=${info.project.name.startsWith('dark') ? 'dark' : 'light'}`);
   await expect(
     page.getByRole('heading', { name: 'Secret, key-value, and chips components' }),
   ).toBeVisible();
+});
+
+test.afterEach(() => {
+  expect(pageErrors).toEqual([]);
 });
 
 test('secret-field/no-reveal-guarantee-keyboard-and-form-contract', async ({ page }) => {
@@ -114,11 +122,17 @@ test('secret-field/no-reveal-guarantee-keyboard-and-form-contract', async ({ pag
     sessionStorageHit: false,
   });
 
-  // 6. Explicit Clear submits clear sentinel; Keep restores stored state.
+  // 6. Explicit Clear submits clear sentinel; Keep restores stored state; reset restores state.
   await root.getByRole('button', { name: 'Clear' }).click();
   await expect(root).toHaveAttribute('data-state', 'unset');
   await root.getByRole('button', { name: 'Keep' }).click();
   await expect(root).toHaveAttribute('data-state', 'set');
+
+  await root.getByRole('button', { name: 'Replace' }).click();
+  await page.keyboard.type('draft-before-reset');
+  await tokenForm.getByRole('button', { name: 'Reset token secret' }).click();
+  await expect(root).toHaveAttribute('data-state', 'set');
+  await expect(root.locator('input[type="password"]')).toHaveCount(0);
 
   await root.getByRole('button', { name: 'Clear' }).click();
   await tokenForm.getByRole('button', { name: 'Save token secret' }).click();
@@ -130,14 +144,51 @@ test('secret-field/no-reveal-guarantee-keyboard-and-form-contract', async ({ pag
       digest: CLEAR_SHA256,
     }),
   );
+  await expect(root).toHaveAttribute('data-state', 'unset');
 
-  // 7. Invalid & readonly snapshots.
-  const invalidRoot = page.locator('#sf-invalid');
-  await expect(invalidRoot).toHaveAttribute('data-state', 'invalid');
-  await expect(invalidRoot.locator('input[type="password"]')).toHaveAttribute(
-    'aria-invalid',
-    'true',
+  // 7. Native <form method="post"> receives SENTINEL_SECRET cleanly (no microtask race) and scrubs.
+  const nativeForm = page.locator('#secret-form-native-post');
+  const nativeRoot = nativeForm.locator('[data-scope="secret-field"][data-part="root"]');
+  await nativeRoot.getByRole('button', { name: 'Replace' }).click();
+  await nativeRoot.locator('input[type="password"]').fill(SENTINEL_SECRET);
+  await nativeForm.getByRole('button', { name: 'Submit native POST' }).click();
+  const frameEcho = page.frameLocator('iframe[name="native-post-frame"]').locator('#echo');
+  await expect(frameEcho).toHaveText(
+    JSON.stringify({
+      action: 'replace',
+      hasField: true,
+      digest: SENTINEL_SHA256,
+    }),
   );
+  await expect(nativeRoot).toHaveAttribute('data-state', 'set');
+  await expect(nativeRoot.locator('input[type="password"]')).toHaveCount(0);
+
+  // 8. Prevented/rejected save scrubs draft without optimistically flipping unset->set or set->unset.
+  const failForm = page.locator('#secret-form-fail');
+  const failUnsetRoot = page.locator('#sf-fail-unset');
+  const failSetRoot = page.locator('#sf-fail-set');
+  const failUnsetInput = failUnsetRoot.locator('input[type="password"]');
+  await failUnsetInput.fill('rejected-secret-draft');
+  await failSetRoot.locator('[data-action="clear"]').click();
+  await failForm.getByRole('button', { name: 'Attempt rejected save' }).click();
+  await expect(page.getByLabel('Rejected secret status')).toContainText('"rejected":true');
+  // Unset field remains unset (NOT falsely 'set') and its draft input is scrubbed.
+  await expect(failUnsetRoot).toHaveAttribute('data-state', 'unset');
+  await expect(failUnsetInput).toHaveValue('');
+  // Cleared field keeps undo ('Keep') available because server did NOT acknowledge clear.
+  await expect(failSetRoot.getByRole('button', { name: 'Keep' })).toBeVisible();
+
+  // 9. Invalid retry scrubs draft on submit; readonly hides actions.
+  const invalidForm = page.locator('#secret-form-invalid');
+  const invalidRoot = page.locator('#sf-invalid');
+  const invalidInput = invalidRoot.locator('input[type="password"]');
+  await expect(invalidRoot).toHaveAttribute('data-state', 'invalid');
+  await expect(invalidInput).toHaveAttribute('aria-invalid', 'true');
+  await invalidInput.fill('too-short-retry-draft');
+  await invalidForm.getByRole('button', { name: 'Retry invalid secret' }).click();
+  await expect(page.getByLabel('Invalid retry count')).toHaveText('1');
+  await expect(invalidInput).toHaveValue('');
+
   const readonlyRoot = page.locator('#sf-readonly');
   await expect(readonlyRoot).toHaveAttribute('data-state', 'readonly');
   await expect(readonlyRoot.locator('[data-part="action"]')).toHaveCount(0);
@@ -205,6 +256,13 @@ test('key-value-editor/add-remove-focus-validation-secret-row-and-form', async (
   );
   expect(leakedRowSecret).toBe(false);
 
+  // Secret row state transitions surface live announcements to assistive tech.
+  const kvLive = editor.locator('[data-part="live"]');
+  await rows.nth(1).locator('[data-part="secret-replace"]').click();
+  await expect(kvLive).toContainText('Entering replacement secret');
+  await rows.nth(1).locator('[data-part="secret-cancel"]').click();
+  await expect(kvLive).toContainText('Secret replacement cancelled');
+
   // Remove middle row -> focus moves to next row's key input.
   await rows.nth(1).locator('[data-part="remove"]').click();
   await expect(rows).toHaveCount(2);
@@ -215,6 +273,20 @@ test('key-value-editor/add-remove-focus-validation-secret-row-and-form', async (
   await rows.nth(0).locator('[data-part="remove"]').click();
   await expect(rows).toHaveCount(0);
   await expect(addButton).toBeFocused();
+
+  // Form reset restores uncontrolled rows back to defaultRows.
+  await form.getByRole('button', { name: 'Reset headers' }).click();
+  await expect(rows).toHaveCount(2);
+  await expect(rows.nth(0).locator('[data-part="key-input"]')).toHaveValue('Accept');
+
+  // Controlled KeyValueEditor: Add row focuses newly appended row and never emits value on secret rows.
+  const controlled = page.locator('#kv-controlled');
+  const controlledRows = controlled.locator('[data-part="row"]');
+  await expect(controlledRows).toHaveCount(2);
+  await controlled.getByRole('button', { name: 'Add row' }).click();
+  await expect(controlledRows).toHaveCount(3);
+  await expect(controlledRows.nth(2).locator('[data-part="key-input"]')).toBeFocused();
+  await expect(page.getByLabel('Controlled secret value leak')).toHaveText('false');
 });
 
 test('chips-input/enter-comma-paste-validation-backspace-delete-and-combobox', async ({ page }) => {
@@ -270,7 +342,7 @@ test('chips-input/enter-comma-paste-validation-backspace-delete-and-combobox', a
     JSON.stringify(['one@example.com', 'two@example.com', 'three@example.com']),
   );
 
-  // Optional Combobox suggestions seam via keyboard.
+  // Optional Combobox suggestions seam via keyboard: focus stays on native input & draft clears.
   const suggBox = page.locator('#chips-sugg-box');
   const suggInput = suggBox.locator('[data-part="input"]');
   await suggInput.focus();
@@ -280,6 +352,14 @@ test('chips-input/enter-comma-paste-validation-backspace-delete-and-combobox', a
   await page.keyboard.press('Enter');
   await expect(suggBox.locator('[data-part="chip"]')).toHaveCount(1);
   await expect(suggBox.locator('[data-part="chip"]').nth(0)).toContainText('security@example.com');
+  await expect(suggInput).toBeFocused();
+  await expect(suggInput).toHaveValue('');
+
+  // Mobile-style atomic delimiter-bearing input event commits token and leaves input empty.
+  await suggInput.fill('mobile@example.com,');
+  await expect(suggBox.locator('[data-part="chip"]')).toHaveCount(2);
+  await expect(suggBox.locator('[data-part="chip"]').nth(1)).toContainText('mobile@example.com');
+  await expect(suggInput).toHaveValue('');
 });
 
 test('secret-kv-chips/strict-accessibility-focus-rings-and-light-dark', async ({ page }) => {
@@ -310,6 +390,22 @@ test('secret-kv-chips/strict-accessibility-focus-rings-and-light-dark', async ({
   expect(chipsControlOutline.style).not.toBe('none');
   expect(chipsControlOutline.width).not.toBe('0px');
   await checkFocusRing(page.locator('#chips-email [data-part="chip-remove"]').first());
+
+  // Verify standalone ::placeholder rules parse cleanly and bind --ns-muted-fg.
+  const placeholderMatchesMutedFg = await page.evaluate(() => {
+    const probe = document.createElement('span');
+    probe.style.color = 'var(--ns-muted-fg)';
+    document.body.append(probe);
+    const mutedColor = getComputedStyle(probe).color;
+    probe.remove();
+    const secretInput = document.querySelector('#sf-unset [data-part="input"]') as HTMLElement;
+    const chipsText = document.querySelector('#chips-email [data-part="input"]') as HTMLElement;
+    return {
+      secretOk: getComputedStyle(secretInput, '::placeholder').color === mutedColor,
+      chipsOk: getComputedStyle(chipsText, '::placeholder').color === mutedColor,
+    };
+  });
+  expect(placeholderMatchesMutedFg).toEqual({ secretOk: true, chipsOk: true });
 
   // Strict axe-core scan on the entire #secret-kv-chips section in light & dark, 390 & 1280.
   const result = await new AxeBuilder({ page }).include('#secret-kv-chips').analyze();

@@ -1,6 +1,7 @@
 import { createContext } from 'preact';
 import type { ComponentChildren, VNode } from 'preact';
 import { useContext } from 'preact/hooks';
+import { composeRefs } from '../_internal/compose-refs.ts';
 import { useCombobox } from './use-combobox.ts';
 import type {
   ComboboxContentProps,
@@ -30,9 +31,10 @@ function ComboboxRoot({ children, ...options }: ComboboxRootProps): VNode {
   );
 }
 
-function ComboboxInput(props: ComboboxInputProps): VNode {
+function ComboboxInput({ inputRef, ...props }: ComboboxInputProps): VNode {
   const combobox = useComboboxContext('Combobox.Input');
-  return <input {...combobox.getInputProps(props)} />;
+  const inputProps = combobox.getInputProps(props);
+  return <input {...inputProps} ref={composeRefs(inputProps.ref, inputRef)} />;
 }
 
 function ComboboxContent({ children, ...props }: ComboboxContentProps): VNode {

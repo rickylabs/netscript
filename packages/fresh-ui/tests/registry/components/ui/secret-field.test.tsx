@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertFalse, assertStringIncludes } from '@std/assert';
+import { assert, assertEquals, assertFalse, assertStringIncludes, assertThrows } from '@std/assert';
 import { render } from 'npm:preact-render-to-string@^6.7.0';
 import {
   deriveSecretFieldAction,
@@ -274,10 +274,110 @@ Deno.test('resolveSecretFieldSubmission interprets keep, replace, clear, and uns
   );
 });
 
-Deno.test('SecretField type contract rejects passing stored secret values', () => {
+Deno.test('resolveSecretFieldSubmission fails closed on conflicting actions, unknown actions, and File entries', () => {
+  // action='replace' must NEVER delete when value equals clearToken or unchangedToken or empty.
+  assertEquals(
+    resolveSecretFieldSubmission(SECRET_FIELD_CLEAR_TOKEN, {
+      hadStoredSecret: true,
+      action: 'replace',
+    }).mode,
+    'invalid',
+  );
+  assertEquals(
+    resolveSecretFieldSubmission(SECRET_FIELD_UNCHANGED_TOKEN, {
+      hadStoredSecret: true,
+      action: 'replace',
+    }).mode,
+    'invalid',
+  );
+  assertEquals(
+    resolveSecretFieldSubmission('', { hadStoredSecret: true, action: 'replace' }).mode,
+    'invalid',
+  );
+  assertEquals(
+    resolveSecretFieldSubmission(null, { hadStoredSecret: true, action: 'replace' }).mode,
+    'invalid',
+  );
+
+  // action='clear' must reject non-empty replacement values.
+  assertEquals(
+    resolveSecretFieldSubmission('real-secret', { hadStoredSecret: true, action: 'clear' }).mode,
+    'invalid',
+  );
+
+  // action='keep' must reject non-empty replacement or clear values.
+  assertEquals(
+    resolveSecretFieldSubmission('real-secret', { hadStoredSecret: true, action: 'keep' }).mode,
+    'invalid',
+  );
+  assertEquals(
+    resolveSecretFieldSubmission(SECRET_FIELD_CLEAR_TOKEN, {
+      hadStoredSecret: true,
+      action: 'keep',
+    }).mode,
+    'invalid',
+  );
+
+  // action='unset' must reject stored secrets or non-empty values.
+  assertEquals(
+    resolveSecretFieldSubmission('', { hadStoredSecret: true, action: 'unset' }).mode,
+    'invalid',
+  );
+  assertEquals(
+    resolveSecretFieldSubmission('real-secret', { hadStoredSecret: false, action: 'unset' }).mode,
+    'invalid',
+  );
+
+  // Unknown actions must fail closed instead of falling through to replace.
+  assertEquals(
+    resolveSecretFieldSubmission('real-secret', { hadStoredSecret: true, action: 'bogus' }).mode,
+    'invalid',
+  );
+
+  // Non-text FormData File entries must fail closed.
+  assertEquals(
+    resolveSecretFieldSubmission(new File(['payload'], 'secret.txt'), {
+      hadStoredSecret: true,
+    }).mode,
+    'invalid',
+  );
+  assertEquals(
+    resolveSecretFieldSubmission('', {
+      hadStoredSecret: true,
+      action: new File(['clear'], 'action.txt'),
+    }).mode,
+    'invalid',
+  );
+});
+
+Deno.test('SecretField type and runtime contracts fail closed on stored secret values and unknown root props', () => {
   // @ts-expect-error value is intentionally disallowed on SecretFieldProps.
   const disallowedValue = <SecretField label='Secret' value='leaked' />;
   // @ts-expect-error defaultValue is intentionally disallowed on SecretFieldProps.
   const disallowedDefault = <SecretField label='Secret' defaultValue='leaked' />;
   assert(Boolean(disallowedValue) && Boolean(disallowedDefault));
+
+  const untypedWithValue = {
+    label: 'Secret',
+    hasValue: true,
+    value: 'sk_live_canary_value_must_not_leak',
+  } as unknown as Parameters<typeof SecretField>[0];
+  assertThrows(() => render(<SecretField {...untypedWithValue} />), TypeError);
+
+  const untypedWithDefault = {
+    label: 'Secret',
+    defaultValue: 'sk_live_canary_default_must_not_leak',
+  } as unknown as Parameters<typeof SecretField>[0];
+  assertThrows(() => render(<SecretField {...untypedWithDefault} />), TypeError);
+
+  // Non-allowlisted custom props must not serialize onto root <div>.
+  const untypedWithArbitrary = {
+    label: 'Secret',
+    hasValue: true,
+    secretPayload: 'canary_arbitrary_prop',
+    'data-testid': 'safe-data-attr',
+  } as unknown as Parameters<typeof SecretField>[0];
+  const html = render(<SecretField {...untypedWithArbitrary} />);
+  assertStringIncludes(html, 'data-testid="safe-data-attr"');
+  assertFalse(html.includes('canary_arbitrary_prop'));
 });

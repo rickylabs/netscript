@@ -41,6 +41,7 @@ export const {
   appDesignCompositionViewTemplate,
   appDesignCssTemplate,
   appDesignFloatingSurfaceDemoTemplate,
+  appDesignFormControlsDemoTemplate,
   appDesignIndexRouteTemplate,
   appDesignLayoutTemplate,
   appDesignRegistryTemplate,

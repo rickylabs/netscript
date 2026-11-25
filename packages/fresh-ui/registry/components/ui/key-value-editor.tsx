@@ -8,8 +8,10 @@ import type { JSX, VNode } from 'preact';
 import { useEffect, useId, useRef, useState } from 'preact/hooks';
 import {
   keyValueFieldName,
+  type KeyValuePlainRow,
   type KeyValueRow,
   type KeyValueRowError,
+  type KeyValueSecretRow,
   type KeyValueValidationOptions,
   SECRET_FIELD_CLEAR_TOKEN,
   SECRET_FIELD_UNCHANGED_TOKEN,
@@ -21,10 +23,17 @@ import { Icon } from '@netscript/fresh-ui/primitives';
 import { cn } from '../../lib/cn.ts';
 
 /** Internal row state holding a stable client key for reconciliation and focus management. */
-interface ManagedRow extends KeyValueRow {
+type ManagedPlainRow = KeyValuePlainRow & {
   readonly _uid: string;
   readonly _touched?: boolean;
-}
+};
+
+type ManagedSecretRow = KeyValueSecretRow & {
+  readonly _uid: string;
+  readonly _touched?: boolean;
+};
+
+type ManagedRow = ManagedPlainRow | ManagedSecretRow;
 
 /** Props for the {@link KeyValueEditor} component. */
 export interface KeyValueEditorProps
@@ -88,7 +97,7 @@ interface SecretRowValueCellProps {
   readonly rowIndex: number;
   readonly rowKey: string;
   readonly name?: string;
-  readonly row: ManagedRow;
+  readonly row: ManagedSecretRow;
   readonly valueLabel: string;
   readonly secretPlaceholder: string;
   readonly readOnly: boolean;
@@ -96,6 +105,7 @@ interface SecretRowValueCellProps {
   readonly unchangedMode: SecretFieldUnchangedMode;
   readonly unchangedToken: string;
   readonly clearToken: string;
+  readonly onAnnounce: (message: string) => void;
 }
 
 /**
@@ -116,6 +126,7 @@ function SecretRowValueCell({
   unchangedMode,
   unchangedToken,
   clearToken,
+  onAnnounce,
 }: SecretRowValueCellProps): VNode {
   const fieldName = name ? keyValueFieldName(name, rowIndex, 'value') : undefined;
   const actionName = name ? keyValueFieldName(name, rowIndex, 'action') : undefined;
@@ -133,6 +144,12 @@ function SecretRowValueCell({
     clearToken,
     placeholder: secretPlaceholder,
   });
+
+  useEffect(() => {
+    if (field.announcement) {
+      onAnnounce(field.announcement);
+    }
+  }, [field.announcement, onAnnounce]);
 
   const hiddenProps = field.getHiddenInputProps();
   const actionInputProps = field.getActionInputProps();
@@ -256,8 +273,70 @@ function SecretRowValueCell({
   );
 }
 
+function sanitizeRow(
+  row: KeyValueRow,
+  uid: string,
+  touched: boolean,
+  requireSecretId: boolean,
+): ManagedRow {
+  if (row.secret) {
+    const rawValue: unknown = Reflect.get(row, 'value');
+    if (rawValue !== undefined && rawValue !== '') {
+      throw new TypeError(
+        'KeyValueEditor secret rows are write-only and forbid passing a non-empty "value". Pass "hasValue" instead.',
+      );
+    }
+    if (requireSecretId && (!row.id || row.id.trim().length === 0)) {
+      throw new Error(
+        'KeyValueEditor controlled secret rows require a non-empty stable "id" to prevent draft values moving across reorders.',
+      );
+    }
+    return {
+      ...(row.id !== undefined ? { id: row.id } : {}),
+      key: row.key,
+      secret: true,
+      ...(row.hasValue !== undefined ? { hasValue: row.hasValue } : {}),
+      ...(row.readOnly !== undefined ? { readOnly: row.readOnly } : {}),
+      ...(row.secretState !== undefined ? { secretState: row.secretState } : {}),
+      ...(row.error !== undefined ? { error: row.error } : {}),
+      _uid: uid,
+      _touched: touched,
+    };
+  }
+  return {
+    ...(row.id !== undefined ? { id: row.id } : {}),
+    key: row.key,
+    secret: false,
+    value: row.value ?? '',
+    ...(row.readOnly !== undefined ? { readOnly: row.readOnly } : {}),
+    ...(row.error !== undefined ? { error: row.error } : {}),
+    _uid: uid,
+    _touched: touched,
+  };
+}
+
 function stripInternal(rows: readonly ManagedRow[]): readonly KeyValueRow[] {
-  return rows.map(({ _uid: _u, _touched: _t, ...row }) => row);
+  return rows.map((row): KeyValueRow => {
+    if (row.secret) {
+      return {
+        ...(row.id !== undefined ? { id: row.id } : {}),
+        key: row.key,
+        secret: true,
+        ...(row.hasValue !== undefined ? { hasValue: row.hasValue } : {}),
+        ...(row.readOnly !== undefined ? { readOnly: row.readOnly } : {}),
+        ...(row.secretState !== undefined ? { secretState: row.secretState } : {}),
+        ...(row.error !== undefined ? { error: row.error } : {}),
+      };
+    }
+    return {
+      ...(row.id !== undefined ? { id: row.id } : {}),
+      key: row.key,
+      secret: false,
+      value: row.value ?? '',
+      ...(row.readOnly !== undefined ? { readOnly: row.readOnly } : {}),
+      ...(row.error !== undefined ? { error: row.error } : {}),
+    };
+  });
 }
 
 /**
@@ -302,23 +381,23 @@ export function KeyValueEditor({
   const nextUid = () => `r${++uidCounter.current}`;
 
   const [localRows, setLocalRows] = useState<readonly ManagedRow[]>(() =>
-    defaultRows.map((row, index) => ({
-      ...row,
-      _uid: row.id ?? `init-${index}`,
-    }))
+    defaultRows.map((row, index) => sanitizeRow(row, row.id ?? `init-${index}`, false, false))
   );
+  const [resetEpoch, setResetEpoch] = useState(0);
   const [announcement, setAnnouncement] = useState('');
 
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const defaultRowsRef = useRef(defaultRows);
+  defaultRowsRef.current = defaultRows;
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const keyInputRefs = useRef(new Map<string, HTMLInputElement | null>());
   const addButtonRef = useRef<HTMLButtonElement | null>(null);
-  const pendingFocus = useRef<{ type: 'row'; uid: string } | { type: 'add' } | null>(null);
+  const pendingFocus = useRef<
+    { type: 'row'; uid: string } | { type: 'index'; index: number } | { type: 'add' } | null
+  >(null);
 
   const managedRows: readonly ManagedRow[] = controlledRows
-    ? controlledRows.map((row, index) => ({
-      ...row,
-      _uid: row.id ?? `ctrl-${index}`,
-      _touched: true,
-    }))
+    ? controlledRows.map((row, index) => sanitizeRow(row, row.id ?? `ctrl-${index}`, true, true))
     : localRows;
 
   useEffect(() => {
@@ -327,10 +406,44 @@ export function KeyValueEditor({
     pendingFocus.current = null;
     if (target.type === 'row') {
       keyInputRefs.current.get(target.uid)?.focus();
+    } else if (target.type === 'index') {
+      const uid = managedRows[target.index]?._uid;
+      if (uid) keyInputRefs.current.get(uid)?.focus();
     } else {
       addButtonRef.current?.focus();
     }
   }, [managedRows.length]);
+
+  useEffect(() => {
+    const form = rootRef.current?.closest('form');
+    if (!form) return;
+    const handleReset = () => {
+      if (controlledRows !== undefined) return;
+      if (resetTimerRef.current !== undefined) {
+        clearTimeout(resetTimerRef.current);
+      }
+      // Run after the browser's synchronous native form reset step so restored
+      // Preact input values are not immediately cleared back to empty defaultValue.
+      resetTimerRef.current = setTimeout(() => {
+        resetTimerRef.current = undefined;
+        setLocalRows(
+          defaultRowsRef.current.map((row, index) =>
+            sanitizeRow(row, row.id ?? `init-${index}`, false, false)
+          ),
+        );
+        setResetEpoch((epoch) => epoch + 1);
+        setAnnouncement('Key-value rows reset');
+      }, 0);
+    };
+    form.addEventListener('reset', handleReset);
+    return () => {
+      if (resetTimerRef.current !== undefined) {
+        clearTimeout(resetTimerRef.current);
+        resetTimerRef.current = undefined;
+      }
+      form.removeEventListener('reset', handleReset);
+    };
+  }, [controlledRows !== undefined]);
 
   const commitRows = (next: readonly ManagedRow[]) => {
     if (controlledRows === undefined) setLocalRows(next);
@@ -382,7 +495,9 @@ export function KeyValueEditor({
       ...managedRows,
       { key: '', value: '', secret: false, _uid: uid, _touched: false },
     ];
-    pendingFocus.current = { type: 'row', uid };
+    pendingFocus.current = controlledRows !== undefined
+      ? { type: 'index', index: managedRows.length }
+      : { type: 'row', uid };
     setAnnouncement(`Added row ${next.length}`);
     commitRows(next);
   };
@@ -391,10 +506,14 @@ export function KeyValueEditor({
     if (readOnly || disabled) return;
     const removed = managedRows[index];
     const next = managedRows.filter((_, i) => i !== index);
-    const focusCandidate = next[index] ?? next[index - 1];
-    pendingFocus.current = focusCandidate
-      ? { type: 'row', uid: focusCandidate._uid }
-      : { type: 'add' };
+    if (next.length === 0) {
+      pendingFocus.current = { type: 'add' };
+    } else if (controlledRows !== undefined) {
+      pendingFocus.current = { type: 'index', index: Math.min(index, next.length - 1) };
+    } else {
+      const focusCandidate = next[index] ?? next[index - 1];
+      pendingFocus.current = { type: 'row', uid: focusCandidate._uid };
+    }
     setAnnouncement(
       removed?.key.trim() ? `Removed row ${removed.key.trim()}` : `Removed row ${index + 1}`,
     );
@@ -402,7 +521,7 @@ export function KeyValueEditor({
   };
 
   const handleKeyInput = (index: number, nextKey: string) => {
-    const next = managedRows.map((row, i) =>
+    const next = managedRows.map((row, i): ManagedRow =>
       i === index ? { ...row, key: nextKey, _touched: true } : row
     );
     commitRows(next);
@@ -413,13 +532,13 @@ export function KeyValueEditor({
     const target = managedRows[index];
     if (!target || target._touched) return;
     setLocalRows(
-      managedRows.map((row, i) => i === index ? { ...row, _touched: true } : row),
+      managedRows.map((row, i): ManagedRow => i === index ? { ...row, _touched: true } : row),
     );
   };
 
   const handlePlainValueInput = (index: number, nextValue: string) => {
-    const next = managedRows.map((row, i) =>
-      i === index ? { ...row, value: nextValue, _touched: true } : row
+    const next = managedRows.map((row, i): ManagedRow =>
+      i === index && !row.secret ? { ...row, value: nextValue, _touched: true } : row
     );
     commitRows(next);
   };
@@ -431,18 +550,31 @@ export function KeyValueEditor({
     const nextSecret = !target.secret;
     // Security invariant: switching away from secret never exposes a stored secret;
     // switching into secret clears plain text so no clear-text value lingers.
-    const next = managedRows.map((row, i) =>
-      i === index
-        ? {
-          ...row,
-          secret: nextSecret,
-          value: '',
+    const next = managedRows.map((row, i): ManagedRow => {
+      if (i !== index) return row;
+      if (nextSecret) {
+        return {
+          ...(row.id !== undefined ? { id: row.id } : {}),
+          key: row.key,
+          secret: true,
           hasValue: false,
-          secretState: undefined,
+          ...(row.readOnly !== undefined ? { readOnly: row.readOnly } : {}),
+          ...(row.error !== undefined ? { error: row.error } : {}),
+          _uid: row._uid,
           _touched: true,
-        }
-        : row
-    );
+        };
+      }
+      return {
+        ...(row.id !== undefined ? { id: row.id } : {}),
+        key: row.key,
+        secret: false,
+        value: '',
+        ...(row.readOnly !== undefined ? { readOnly: row.readOnly } : {}),
+        ...(row.error !== undefined ? { error: row.error } : {}),
+        _uid: row._uid,
+        _touched: true,
+      };
+    });
     const descriptor = target.key.trim() || `row ${index + 1}`;
     setAnnouncement(
       nextSecret ? `${descriptor} marked as secret` : `${descriptor} changed to plain value`,
@@ -453,6 +585,7 @@ export function KeyValueEditor({
   return (
     <div
       {...props}
+      ref={rootRef}
       id={id}
       class={cn('ns-kv-editor', className)}
       data-scope='key-value-editor'
@@ -500,7 +633,7 @@ export function KeyValueEditor({
 
                 return (
                   <tr
-                    key={row._uid}
+                    key={`${resetEpoch}-${row._uid}`}
                     class='ns-kv-editor__row'
                     data-scope='key-value-editor'
                     data-part='row'
@@ -558,6 +691,7 @@ export function KeyValueEditor({
                             unchangedMode={unchangedMode}
                             unchangedToken={unchangedToken}
                             clearToken={clearToken}
+                            onAnnounce={setAnnouncement}
                           />
                         )
                         : (
@@ -611,7 +745,7 @@ export function KeyValueEditor({
                           data-pressed={row.secret ? 'true' : 'false'}
                           onClick={() => handleToggleSecret(index)}
                         >
-                          <Icon name={row.secret ? 'lock' : 'lock-open'} size='1em' />
+                          <Icon name={row.secret ? 'lock' : 'lock-open'} />
                         </button>
                         <button
                           type='button'
@@ -622,7 +756,7 @@ export function KeyValueEditor({
                           data-part='remove'
                           onClick={() => handleRemoveRow(index)}
                         >
-                          <Icon name='trash' size='1em' />
+                          <Icon name='trash' />
                         </button>
                       </div>
                     </td>
@@ -644,7 +778,7 @@ export function KeyValueEditor({
             data-part='add'
             onClick={handleAddRow}
           >
-            <Icon name='plus' size='1em' />
+            <Icon name='plus' />
             <span>{addLabel}</span>
           </button>
         )}

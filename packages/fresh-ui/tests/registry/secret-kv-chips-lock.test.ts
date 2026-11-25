@@ -80,6 +80,37 @@ Deno.test('netscript ui:add installs secret-field, key-value-editor, and chips-i
         `${name}.tsx must not import @/components/ui/* L2 components`,
       );
     }
+
+    // Verify the copied components type-check cleanly against the release package exports
+    // (simulating the post-release consumer pin once 0.0.10-canary / 0.0.10 is published).
+    const rootConfig = JSON.parse(await Deno.readTextFile(join(repo, 'deno.json')));
+    const freshUiDir = join(repo, 'packages/fresh-ui');
+    delete denoConfig.name;
+    denoConfig.catalog = rootConfig.catalog;
+    denoConfig.imports['@netscript/fresh-ui'] = `${freshUiDir}/mod.ts`;
+    denoConfig.imports['@netscript/fresh-ui/interactive'] = `${freshUiDir}/interactive.ts`;
+    denoConfig.imports['@netscript/fresh-ui/primitives'] = `${freshUiDir}/primitives.tsx`;
+    await Deno.writeTextFile(join(root, 'deno.json'), `${JSON.stringify(denoConfig, null, 2)}\n`);
+
+    const checkResult = await new Deno.Command(Deno.execPath(), {
+      cwd: root,
+      args: [
+        'check',
+        '--no-lock',
+        'components/ui/secret-field.tsx',
+        'components/ui/key-value-editor.tsx',
+        'components/ui/chips-input.tsx',
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(
+      checkResult.code,
+      0,
+      `copied components must type-check against current @netscript/fresh-ui exports:\n${
+        new TextDecoder().decode(checkResult.stderr)
+      }`,
+    );
   } finally {
     await Deno.remove(root, { recursive: true });
   }

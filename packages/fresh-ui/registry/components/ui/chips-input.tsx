@@ -263,6 +263,13 @@ export function ChipsInput({
     }
   };
 
+  const syncDraft = (next: string) => {
+    setDraft(next);
+    if (inputRef.current && inputRef.current.value !== next) {
+      inputRef.current.value = next;
+    }
+  };
+
   const handleInputText = (nextValue: string) => {
     if (!interactive) return;
     setLocalError(undefined);
@@ -274,13 +281,18 @@ export function ChipsInput({
       const endsWithDelimiter = delimiters.some((delimiter) => nextValue.endsWith(delimiter));
       if (endsWithDelimiter) {
         const committed = commitTokens(parts);
-        if (committed) setDraft('');
+        if (committed) {
+          syncDraft('');
+          setComboOpen(false);
+        } else {
+          syncDraft(nextValue);
+        }
       } else if (parts.length > 1) {
         const tail = parts[parts.length - 1];
         const committed = commitTokens(parts.slice(0, -1));
-        if (committed) setDraft(tail);
+        syncDraft(committed ? tail : nextValue);
       } else {
-        setDraft(nextValue);
+        syncDraft(nextValue);
       }
       return;
     }
@@ -386,7 +398,7 @@ export function ChipsInput({
                     removeChipAt(index, 'neighbor');
                   }}
                 >
-                  <Icon name='x' size='0.875em' />
+                  <Icon name='x' />
                 </button>
               )}
             </span>
@@ -399,9 +411,7 @@ export function ChipsInput({
           ? (
             <Combobox.Input
               id={inputId}
-              ref={(node: HTMLInputElement | null) => {
-                inputRef.current = node;
-              }}
+              inputRef={inputRef}
               class='ns-chips-input__input'
               type='text'
               value={draft}
@@ -412,7 +422,6 @@ export function ChipsInput({
               aria-describedby={describedBy}
               data-scope='chips-input'
               data-part='input'
-              onInput={(event) => handleInputText(event.currentTarget.value)}
               onKeyDown={handleInputKeyDown}
               onPaste={handlePaste}
               onFocus={() => setFocused(true)}
@@ -422,7 +431,7 @@ export function ChipsInput({
                   const committed = commitTokens(
                     splitChipText(draft, delimiters, pasteSplitPattern),
                   );
-                  if (committed) setDraft('');
+                  if (committed) syncDraft('');
                 }
               }}
             />
@@ -451,7 +460,7 @@ export function ChipsInput({
                   const committed = commitTokens(
                     splitChipText(draft, delimiters, pasteSplitPattern),
                   );
-                  if (committed) setDraft('');
+                  if (committed) syncDraft('');
                 }
               }}
             />
@@ -498,13 +507,13 @@ export function ChipsInput({
             open={comboOpen}
             onOpenChange={setComboOpen}
             inputValue={draft}
-            onInputValueChange={setDraft}
+            onInputValueChange={handleInputText}
             value=''
             onValueChange={(selected) => {
               if (!selected) return;
               const committed = commitTokens([selected]);
               if (committed) {
-                setDraft('');
+                syncDraft('');
                 setComboOpen(false);
                 inputRef.current?.focus();
               }

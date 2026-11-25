@@ -27,7 +27,8 @@ export type SecretFieldSubmission =
   | { readonly mode: 'keep' }
   | { readonly mode: 'replace'; readonly value: string }
   | { readonly mode: 'clear' }
-  | { readonly mode: 'unset' };
+  | { readonly mode: 'unset' }
+  | { readonly mode: 'invalid'; readonly reason: string };
 
 /** Options for resolving a submitted write-only secret form entry on the server. */
 export interface ResolveSecretFieldOptions {

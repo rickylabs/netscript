@@ -89,6 +89,11 @@ value to the browser. On `POST`, resolve the submitted field with `resolveSecret
 - `mode: 'replace'`: encrypt and persist `submission.value`.
 - `mode: 'clear'` (`__ns_secret_clear__`): delete the stored secret explicitly.
 - `mode: 'unset'`: no secret was stored and none was provided.
+- `mode: 'invalid'`: conflicting action/value, unknown action, or non-text payload — reject the
+  request (HTTP 400) without mutating stored credentials.
+
+Always authorize submitted row IDs against records owned by the authenticated caller before reading
+or updating stored secrets.
 
 ```ts
 import { resolveSecretFieldSubmission } from '@netscript/fresh-ui/interactive';
@@ -96,15 +101,20 @@ import { resolveSecretFieldSubmission } from '@netscript/fresh-ui/interactive';
 export function resolveWebhookSecretUpdate(
   formData: FormData,
   existingCiphertext: string | null,
-): { action: 'keep' | 'replace' | 'clear' | 'unset'; nextPlaintext?: string } {
+):
+  | { ok: true; action: 'keep' | 'replace' | 'clear' | 'unset'; nextPlaintext?: string }
+  | { ok: false; error: string } {
   const result = resolveSecretFieldSubmission(formData.get('webhook_secret'), {
     hadStoredSecret: existingCiphertext !== null,
     action: formData.get('webhook_secret_action'),
   });
-  if (result.mode === 'replace') {
-    return { action: 'replace', nextPlaintext: result.value };
+  if (result.mode === 'invalid') {
+    return { ok: false, error: result.reason };
   }
-  return { action: result.mode };
+  if (result.mode === 'replace') {
+    return { ok: true, action: 'replace', nextPlaintext: result.value };
+  }
+  return { ok: true, action: result.mode };
 }
 ```
 

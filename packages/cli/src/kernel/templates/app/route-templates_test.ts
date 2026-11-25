@@ -23,6 +23,7 @@ import {
   appDesignCompositionViewTemplate,
   appDesignCssTemplate,
   appDesignFloatingSurfaceDemoTemplate,
+  appDesignFormControlsDemoTemplate,
   appDesignIndexRouteTemplate,
   appDesignLayoutTemplate,
   appDesignRegistryTemplate,
@@ -476,6 +477,10 @@ describe('app route template rendering', () => {
       appDesignComponentsViewTemplate,
       "from '../(_islands)/FloatingSurfaceDemo.tsx';",
     );
+    assertStringIncludes(
+      appDesignComponentsViewTemplate,
+      "from '../(_islands)/FormControlsDemo.tsx';",
+    );
     assertStringIncludes(appDesignComponentsViewTemplate, 'responsive-table');
     assertStringIncludes(appDesignCompositionViewTemplate, 'Composition');
     const catalog = await import(
@@ -491,6 +496,10 @@ describe('app route template rendering', () => {
     assertStringIncludes(
       appDesignFloatingSurfaceDemoTemplate,
       "import { Popover, Sheet, Tooltip } from '@netscript/fresh-ui/interactive';",
+    );
+    assertStringIncludes(
+      appDesignFormControlsDemoTemplate,
+      "import { ChipsInput, KeyValueEditor, SecretField } from '@app/components/ui/mod.ts';",
     );
     assertStringIncludes(appDesignTokenClipboardTemplate, '[data-token-copy]');
     assertStringIncludes(appDesignCssTemplate, '.ns-tokens-page');

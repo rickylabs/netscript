@@ -17,13 +17,25 @@ import {
   resolveSecretHiddenValue,
 } from './secret-field.utils.ts';
 
+function assertNoSecretValueOverrides(overrides: object): void {
+  if (
+    Reflect.get(overrides, 'value') !== undefined ||
+    Reflect.get(overrides, 'defaultValue') !== undefined
+  ) {
+    throw new TypeError(
+      'useSecretField.getInputProps is write-only and forbids passing "value" or "defaultValue". Pass "hasValue" instead.',
+    );
+  }
+}
+
 /**
  * L1 headless behavior and prop getters for write-only secret controls.
  *
  * Guarantees write-only hygiene: never accepts or displays a stored value,
  * enforces `type="password"`, `autocomplete="new-password"`, and `spellcheck={false}`,
  * keeps values out of `data-*` and `aria-*` attributes, and scrubs any entered draft
- * immediately after form submission or reset.
+ * after form serialization (`formdata`) or `reset` without optimistically mutating
+ * server-owned stored status.
  */
 export function useSecretField({
   id,
@@ -61,21 +73,36 @@ export function useSecretField({
   const [isCleared, setIsCleared] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
   const [announcement, setAnnouncement] = useState('');
+  const [focusSeq, setFocusSeq] = useState(0);
+  const [rootNode, setRootNode] = useState<HTMLElement | null>(null);
 
   const rootNodeRef = useRef<HTMLElement | null>(null);
   const inputNodeRef = useRef<HTMLInputElement | null>(null);
   const replaceButtonRef = useRef<HTMLButtonElement | null>(null);
+  const clearButtonRef = useRef<HTMLButtonElement | null>(null);
   const focusTargetRef = useRef<'input' | 'replace' | null>(null);
-  const stateRef = useRef<SecretFieldState>('unset');
-  const actionRef = useRef<'keep' | 'replace' | 'clear' | 'unset'>('unset');
+  const scrubTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const hasDraftRef = useRef(false);
+
+  const cancelPendingScrub = useCallback(() => {
+    if (scrubTimerRef.current !== undefined) {
+      clearTimeout(scrubTimerRef.current);
+      scrubTimerRef.current = undefined;
+    }
+  }, []);
+
+  const requestFocus = useCallback((target: 'input' | 'replace') => {
+    focusTargetRef.current = target;
+    setFocusSeq((seq) => seq + 1);
+  }, []);
 
   useEffect(() => {
     setStoredFlag(hasValue || explicitState === 'set');
+    setIsCleared(false);
     if (explicitState === 'rotating' || explicitState === 'invalid') {
       setIsRotating(true);
-    } else if (explicitState === 'set' || explicitState === 'readonly') {
+    } else if (explicitState === 'set' || explicitState === 'readonly' || hasValue) {
       setIsRotating(false);
-      setIsCleared(false);
     }
   }, [hasValue, explicitState]);
 
@@ -105,8 +132,7 @@ export function useSecretField({
     clearToken,
   });
 
-  stateRef.current = state;
-  actionRef.current = action;
+  hasDraftRef.current = hasDraft;
 
   const previousStateRef = useRef<SecretFieldState>(state);
   useEffect(() => {
@@ -122,12 +148,13 @@ export function useSecretField({
     focusTargetRef.current = null;
     if (target === 'input') {
       inputNodeRef.current?.focus();
-    } else if (target === 'replace') {
-      replaceButtonRef.current?.focus();
+    } else {
+      (replaceButtonRef.current ?? clearButtonRef.current ?? inputNodeRef.current)?.focus();
     }
-  }, [state, isEditable]);
+  }, [focusSeq, state, isEditable]);
 
   const scrub = useCallback((nextHasStoredValue?: boolean) => {
+    cancelPendingScrub();
     if (inputNodeRef.current) {
       inputNodeRef.current.value = '';
     }
@@ -138,19 +165,21 @@ export function useSecretField({
       setIsCleared(false);
     }
     onDraftChange?.(false);
-  }, [onDraftChange]);
+  }, [cancelPendingScrub, onDraftChange]);
 
   const startRotate = useCallback(() => {
     if (readOnly || disabled) return;
+    cancelPendingScrub();
     setIsCleared(false);
     setIsRotating(true);
     setAnnouncement('Entering replacement secret');
-    focusTargetRef.current = 'input';
+    requestFocus('input');
     inputNodeRef.current?.focus();
-  }, [readOnly, disabled]);
+  }, [cancelPendingScrub, disabled, readOnly, requestFocus]);
 
   const cancelRotate = useCallback(() => {
     if (readOnly || disabled) return;
+    cancelPendingScrub();
     if (inputNodeRef.current) {
       inputNodeRef.current.value = '';
     }
@@ -161,12 +190,21 @@ export function useSecretField({
     setAnnouncement(
       effectiveStored ? 'Secret replacement cancelled, stored secret kept' : 'Entry cleared',
     );
-    focusTargetRef.current = effectiveStored ? 'replace' : 'input';
+    requestFocus(effectiveStored ? 'replace' : 'input');
     onCancel?.();
-  }, [readOnly, disabled, effectiveStored, onDraftChange, onCancel]);
+  }, [
+    cancelPendingScrub,
+    disabled,
+    effectiveStored,
+    onCancel,
+    onDraftChange,
+    readOnly,
+    requestFocus,
+  ]);
 
   const clear = useCallback(() => {
     if (readOnly || disabled) return;
+    cancelPendingScrub();
     if (inputNodeRef.current) {
       inputNodeRef.current.value = '';
     }
@@ -175,12 +213,13 @@ export function useSecretField({
     setIsCleared(true);
     onDraftChange?.(false);
     setAnnouncement('Stored secret marked for removal');
-    focusTargetRef.current = 'input';
+    requestFocus('input');
     onClear?.();
-  }, [readOnly, disabled, onDraftChange, onClear]);
+  }, [cancelPendingScrub, disabled, onClear, onDraftChange, readOnly, requestFocus]);
 
   const restoreStored = useCallback(() => {
     if (readOnly || disabled || !effectiveStored) return;
+    cancelPendingScrub();
     if (inputNodeRef.current) {
       inputNodeRef.current.value = '';
     }
@@ -189,34 +228,39 @@ export function useSecretField({
     setIsCleared(false);
     onDraftChange?.(false);
     setAnnouncement('Keeping stored secret');
-    focusTargetRef.current = 'replace';
-  }, [readOnly, disabled, effectiveStored, onDraftChange]);
+    requestFocus('replace');
+  }, [cancelPendingScrub, disabled, effectiveStored, onDraftChange, readOnly, requestFocus]);
 
   const attachFormListeners = useCallback((node: HTMLElement | null) => {
+    if (rootNodeRef.current === node) return;
     rootNodeRef.current = node;
+    setRootNode(node);
   }, []);
 
   useEffect(() => {
-    const root = rootNodeRef.current;
-    const form = root?.closest('form');
+    const form = rootNode?.closest('form');
     if (!form) return;
 
-    const handleFormSubmit = () => {
-      if (stateRef.current === 'invalid') return;
-      const submittedAction = actionRef.current;
-      // Run after synchronous submit listeners have constructed FormData(form).
-      queueMicrotask(() => {
-        if (submittedAction === 'replace') {
-          scrub(true);
-          setAnnouncement('Secret submitted');
-        } else if (submittedAction === 'clear') {
-          scrub(false);
-          setAnnouncement('Secret cleared');
-        } else {
-          if (inputNodeRef.current) inputNodeRef.current.value = '';
-          setHasDraft(false);
+    const handleFormData = () => {
+      // `formdata` fires synchronously after native POST or `new FormData(form)` has
+      // captured the control value. Schedule a macrotask to scrub only the local draft
+      // (including invalid retries) without racing form serialization or optimistically
+      // flipping server-owned stored status.
+      const hadDraftAtSerialize = hasDraftRef.current ||
+        (inputNodeRef.current?.value.length ?? 0) > 0;
+      cancelPendingScrub();
+      scrubTimerRef.current = setTimeout(() => {
+        scrubTimerRef.current = undefined;
+        if (inputNodeRef.current) {
+          inputNodeRef.current.value = '';
         }
-      });
+        setHasDraft(false);
+        setIsRotating(false);
+        onDraftChange?.(false);
+        if (hadDraftAtSerialize) {
+          setAnnouncement('Secret draft cleared after submission');
+        }
+      }, 0);
     };
 
     const handleFormReset = () => {
@@ -224,16 +268,18 @@ export function useSecretField({
       setAnnouncement('Secret field reset');
     };
 
-    form.addEventListener('submit', handleFormSubmit);
+    form.addEventListener('formdata', handleFormData);
     form.addEventListener('reset', handleFormReset);
     return () => {
-      form.removeEventListener('submit', handleFormSubmit);
+      cancelPendingScrub();
+      form.removeEventListener('formdata', handleFormData);
       form.removeEventListener('reset', handleFormReset);
     };
-  }, [scrub, hasValue, explicitState, state]);
+  }, [cancelPendingScrub, explicitState, hasValue, onDraftChange, rootNode, scrub]);
 
   const getInputProps = useCallback(
     (overrides: SecretFieldInputElementProps = {}): SecretFieldInputElementProps => {
+      assertNoSecretValueOverrides(overrides);
       const describedByParts = [
         statusId,
         error ? errorId : undefined,
@@ -247,8 +293,8 @@ export function useSecretField({
         (hasDraft || (!effectiveStored && !isCleared && unchangedMode === 'token'));
 
       return {
-        ...overrides,
         id: overrides.id ?? inputId,
+        class: overrides.class,
         name: submitDirectly ? name : undefined,
         type: 'password',
         autocomplete: 'new-password',
@@ -261,9 +307,13 @@ export function useSecretField({
         placeholder: overrides.placeholder ?? placeholder,
         'aria-invalid': state === 'invalid' ? 'true' : undefined,
         'aria-describedby': describedByParts.length > 0 ? describedByParts.join(' ') : undefined,
+        'aria-label': overrides['aria-label'],
+        'data-scope': overrides['data-scope'],
+        'data-part': overrides['data-part'],
         onInput: composeEventHandlers(
           overrides.onInput,
           (event: Event) => {
+            cancelPendingScrub();
             const target = event.currentTarget as HTMLInputElement | null;
             const nextHasDraft = (target?.value.length ?? 0) > 0;
             if (nextHasDraft !== hasDraft) {
@@ -291,6 +341,7 @@ export function useSecretField({
     },
     [
       action,
+      cancelPendingScrub,
       cancelRotate,
       disabled,
       effectiveStored,
@@ -358,6 +409,9 @@ export function useSecretField({
       type: 'button',
       disabled: disabled || readOnly || Boolean(overrides.disabled),
       onClick: composeEventHandlers(overrides.onClick, () => clear()),
+      ref: composeRefs(overrides.ref, (node: HTMLButtonElement | null) => {
+        clearButtonRef.current = node;
+      }),
     }),
     [disabled, readOnly, clear],
   );

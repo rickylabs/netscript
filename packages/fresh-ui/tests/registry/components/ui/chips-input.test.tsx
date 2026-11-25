@@ -1,6 +1,8 @@
 import { assertEquals, assertFalse, assertStringIncludes } from '@std/assert';
+import { createRef } from 'preact';
 import { render } from 'npm:preact-render-to-string@^6.7.0';
 import {
+  Combobox,
   commitChipTokens,
   normalizeChipSuggestions,
   splitChipText,
@@ -64,6 +66,17 @@ Deno.test('ChipsInput omits empty role="list", supports csv format, readonly, an
   );
   assertStringIncludes(comboboxHtml, 'role="combobox"');
   assertStringIncludes(comboboxHtml, 'aria-autocomplete="list"');
+
+  const inputRef = createRef<HTMLInputElement>();
+  const directComboHtml = render(
+    <Combobox.Root>
+      <Combobox.Input inputRef={inputRef} aria-label='Filter' />
+      <Combobox.Content>
+        <Combobox.Item value='alpha'>Alpha</Combobox.Item>
+      </Combobox.Content>
+    </Combobox.Root>,
+  );
+  assertStringIncludes(directComboHtml, 'role="combobox"');
 });
 
 Deno.test('splitChipText, validateEmailChip, normalizeChipSuggestions, and commitChipTokens handle edge cases', () => {

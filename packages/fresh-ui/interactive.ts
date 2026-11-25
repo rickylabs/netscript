@@ -148,9 +148,12 @@ export {
   HTTP_HEADER_NAME_PATTERN,
   type KeyValueFormSubfield,
   type KeyValueParsedRow,
+  type KeyValuePlainRow,
   type KeyValueRow,
+  type KeyValueRowBase,
   type KeyValueRowError,
   type KeyValueRowErrorCode,
+  type KeyValueSecretRow,
   type KeyValueValidationOptions,
   type ParseKeyValueFormDataOptions,
 } from './src/runtime/key-value-editor/key-value-editor.types.ts';

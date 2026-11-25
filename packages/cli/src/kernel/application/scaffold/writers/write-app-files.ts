@@ -79,6 +79,7 @@ export async function writeNormalizedAppFiles(
     appDesignCompositionViewTemplate,
     appDesignCssTemplate,
     appDesignFloatingSurfaceDemoTemplate,
+    appDesignFormControlsDemoTemplate,
     appDesignIndexRouteTemplate,
     appDesignLayoutTemplate,
     appDesignMiddlewareTemplate,
@@ -267,6 +268,10 @@ export async function writeNormalizedAppFiles(
   await write(
     join(designIslandsDir, 'FloatingSurfaceDemo.tsx'),
     appDesignFloatingSurfaceDemoTemplate,
+  );
+  await write(
+    join(designIslandsDir, 'FormControlsDemo.tsx'),
+    appDesignFormControlsDemoTemplate,
   );
   await write(
     join(designIslandsDir, 'TokenClipboard.tsx'),

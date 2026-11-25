@@ -44,7 +44,7 @@
   & button:hover:not(:disabled) { background: var(--ns-hover); color: var(--ns-fg); border-color: var(--ns-border-hover); }
   & [data-part=remove]:hover:not(:disabled) { background: var(--ns-destructive-subtle); border-color: var(--ns-destructive-border); color: var(--ns-destructive-text); }
   & :is(input,button):focus-visible { outline: var(--ns-space-0-5) solid var(--ns-ring); outline-offset: var(--ns-space-0-5); }
-  & button:disabled { opacity: 0.5; cursor: not-allowed; }
+  & button:disabled { background: var(--ns-muted); color: var(--ns-muted-fg); border-color: var(--ns-border); cursor: not-allowed; }
   & .ns-kv-editor__sr { position: absolute; width: var(--ns-space-px); height: var(--ns-space-px); overflow: hidden; clip-path: inset(50%); }
 }
 :root[data-theme]:not([data-theme=ns-one]):not([data-theme=light]):not([data-theme=dark]) .ns-kv-editor {

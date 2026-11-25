@@ -1,8 +1,9 @@
-import { assertEquals, assertFalse, assertStringIncludes } from '@std/assert';
+import { assert, assertEquals, assertFalse, assertStringIncludes, assertThrows } from '@std/assert';
 import { render } from 'npm:preact-render-to-string@^6.7.0';
 import {
   HTTP_HEADER_NAME_PATTERN,
   keyValueFieldName,
+  type KeyValueRow,
   parseKeyValueFormData,
   SECRET_FIELD_CLEAR_TOKEN,
   SECRET_FIELD_UNCHANGED_TOKEN,
@@ -191,4 +192,83 @@ Deno.test('keyValueFieldName and parseKeyValueFormData round-trip plain and secr
       value: '',
     },
   ]);
+});
+
+Deno.test('parseKeyValueFormData fails closed on non-canonical indices, duplicate subfields, File entries, and invalid secret flags', () => {
+  const leadingZero = new FormData();
+  leadingZero.set('headers[00][key]', 'Authorization');
+  leadingZero.set('headers[00][value]', 'Bearer token');
+  assertThrows(
+    () => parseKeyValueFormData(leadingZero, 'headers'),
+    Error,
+    'canonical non-negative integer',
+  );
+
+  const duplicateSubfield = new FormData();
+  duplicateSubfield.append('headers[0][key]', 'Authorization');
+  duplicateSubfield.append('headers[0][value]', 'first');
+  duplicateSubfield.append('headers[0][value]', 'second');
+  assertThrows(
+    () => parseKeyValueFormData(duplicateSubfield, 'headers'),
+    Error,
+    'Duplicate key-value field',
+  );
+
+  const fileValue = new FormData();
+  fileValue.set('headers[0][key]', 'Authorization');
+  fileValue.set('headers[0][value]', new File(['secret'], 'secret.txt'));
+  assertThrows(
+    () => parseKeyValueFormData(fileValue, 'headers'),
+    Error,
+    'expected text value',
+  );
+
+  const badSecretFlag = new FormData();
+  badSecretFlag.set('headers[0][key]', 'Authorization');
+  badSecretFlag.set('headers[0][secret]', 'yes');
+  assertThrows(
+    () => parseKeyValueFormData(badSecretFlag, 'headers'),
+    Error,
+    'expected "true" or "false"',
+  );
+});
+
+Deno.test('KeyValueEditor rejects secret rows carrying plaintext values and controlled secret rows missing stable ids', () => {
+  // @ts-expect-error secret rows forbid passing plaintext value.
+  const invalidSecretRow: KeyValueRow = { key: 'Authorization', secret: true, value: 'leaked' };
+  // @ts-expect-error plain rows forbid passing hasValue.
+  const invalidPlainRow: KeyValueRow = { key: 'Accept', hasValue: true };
+  assert(Boolean(invalidSecretRow) && Boolean(invalidPlainRow));
+
+  assertThrows(
+    () =>
+      render(
+        <KeyValueEditor
+          label='Headers'
+          defaultRows={[
+            {
+              id: 'r1',
+              key: 'Authorization',
+              secret: true,
+              value: 'sk_live_kv_canary_must_not_leak',
+            } as unknown as KeyValueRow,
+          ]}
+        />,
+      ),
+    TypeError,
+  );
+
+  assertThrows(
+    () =>
+      render(
+        <KeyValueEditor
+          label='Controlled headers'
+          rows={[
+            { key: 'Authorization', secret: true, hasValue: true },
+          ]}
+        />,
+      ),
+    Error,
+    'stable "id"',
+  );
 });

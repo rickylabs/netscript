@@ -20,25 +20,44 @@ export interface KeyValueRowError {
 /** Form field suffix names emitted for each indexed key-value row. */
 export type KeyValueFormSubfield = 'key' | 'value' | 'secret' | 'id' | 'action';
 
-/** Declarative row data passed to key-value editors and validators. */
-export interface KeyValueRow {
+/** Shared fields for both plain-text and write-only secret key-value rows. */
+export interface KeyValueRowBase {
   /** Stable row identifier preserved across reorders and form submissions. */
   readonly id?: string;
   /** Row key name (for example an HTTP header or environment variable name). */
   readonly key: string;
-  /** Plain-text value for non-secret rows. Ignored for stored secret rows. */
-  readonly value?: string;
-  /** Whether the row's value uses write-only secret semantics. */
-  readonly secret?: boolean;
-  /** Whether a secret row already has a stored value on the server. */
-  readonly hasValue?: boolean;
   /** Marks the row read-only. */
   readonly readOnly?: boolean;
-  /** Optional explicit secret state snapshot for preview or server-invalid rendering. */
-  readonly secretState?: SecretFieldState;
   /** Optional caller-supplied error message for this row. */
   readonly error?: string;
 }
+
+/** Plain-text key-value row. */
+export interface KeyValuePlainRow extends KeyValueRowBase {
+  /** Marks this row as plain text (`false` or omitted). */
+  readonly secret?: false;
+  /** Plain-text value for non-secret rows. */
+  readonly value?: string;
+  /** Disallowed on plain-text rows; applies only to `secret: true` rows. */
+  readonly hasValue?: never;
+  /** Disallowed on plain-text rows; applies only to `secret: true` rows. */
+  readonly secretState?: never;
+}
+
+/** Write-only secret key-value row that never accepts a stored plaintext value. */
+export interface KeyValueSecretRow extends KeyValueRowBase {
+  /** Marks this row as a write-only secret row. */
+  readonly secret: true;
+  /** Whether a secret row already has a stored value on the server. */
+  readonly hasValue?: boolean;
+  /** Optional explicit secret state snapshot for preview or server-invalid rendering. */
+  readonly secretState?: SecretFieldState;
+  /** Disallowed by design: stored secrets must never be passed into the browser. */
+  readonly value?: never;
+}
+
+/** Declarative row data passed to key-value editors and validators. */
+export type KeyValueRow = KeyValuePlainRow | KeyValueSecretRow;
 
 /** Validation rules for {@link validateKeyValueRows}. */
 export interface KeyValueValidationOptions {

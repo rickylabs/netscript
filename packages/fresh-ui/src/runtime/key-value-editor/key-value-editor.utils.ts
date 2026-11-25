@@ -63,9 +63,8 @@ export function validateKeyValueRows(
     const row = rows[index];
     const trimmed = row.key.trim();
     const isBlank = trimmed.length === 0 &&
-      !(row.value && row.value.length > 0) &&
-      !row.hasValue &&
-      !row.secret;
+      !row.secret &&
+      !(row.value && row.value.length > 0);
 
     if (trimmed.length === 0) {
       if (!allowEmptyKeys && !(ignoreBlankRows && isBlank)) {
@@ -98,6 +97,8 @@ export function validateKeyValueRows(
 /**
  * Parse indexed key-value rows from a `FormData` payload produced by `KeyValueEditor`.
  *
+ * Enforces canonical non-negative integer indices (`0` or `[1-9]\d*`), rejects duplicate
+ * `(index, subfield)` entries, non-text (`File`) entries, and malformed `secret` flags.
  * Secret rows are resolved through {@link resolveSecretFieldSubmission} so servers can
  * implement keep, replace, and clear safely without exposing stored credentials.
  */
@@ -107,15 +108,33 @@ export function parseKeyValueFormData(
   options: ParseKeyValueFormDataOptions = {},
 ): readonly KeyValueParsedRow[] {
   const escaped = baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const matcher = new RegExp(`^${escaped}\\[(\\d+)\\]\\[(key|value|secret|id|action)\\]$`);
+  const candidateMatcher = new RegExp(
+    `^${escaped}\\[([^\\]]+)\\]\\[(key|value|secret|id|action)\\]$`,
+  );
+  const canonicalIndexPattern = /^(?:0|[1-9]\d*)$/;
   const buckets = new Map<number, Partial<Record<KeyValueFormSubfield, string>>>();
 
   for (const [fieldName, raw] of formData.entries()) {
-    const match = matcher.exec(fieldName);
-    if (!match || typeof raw !== 'string') continue;
-    const index = Number(match[1]);
+    const match = candidateMatcher.exec(fieldName);
+    if (!match) continue;
+    const indexRaw = match[1];
+    if (!canonicalIndexPattern.test(indexRaw)) {
+      throw new Error(
+        `Invalid key-value field index in "${fieldName}": expected canonical non-negative integer.`,
+      );
+    }
+    if (typeof raw !== 'string') {
+      throw new Error(`Invalid key-value field "${fieldName}": expected text value.`);
+    }
+    const index = Number(indexRaw);
+    if (!Number.isSafeInteger(index)) {
+      throw new Error(`Invalid key-value field index in "${fieldName}": index out of range.`);
+    }
     const subfield = match[2] as KeyValueFormSubfield;
     const bucket = buckets.get(index) ?? {};
+    if (Object.prototype.hasOwnProperty.call(bucket, subfield)) {
+      throw new Error(`Duplicate key-value field "${fieldName}" for row index ${index}.`);
+    }
     bucket[subfield] = raw;
     buckets.set(index, bucket);
   }
@@ -127,6 +146,15 @@ export function parseKeyValueFormData(
     const bucket = buckets.get(index)!;
     const key = bucket.key ?? '';
     const id = bucket.id;
+    if (
+      bucket.secret !== undefined &&
+      bucket.secret !== 'true' &&
+      bucket.secret !== 'false'
+    ) {
+      throw new Error(
+        `Invalid key-value secret flag for row index ${index}: expected "true" or "false".`,
+      );
+    }
     const secret = bucket.secret === 'true';
 
     if (secret) {
