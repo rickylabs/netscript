@@ -6,6 +6,7 @@
  *   deno run --frozen -A .llm/runs/plan-rfc-in-process-service-link-451--rfc/probes/parity-probe.ts
  */
 
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { assert, assertEquals, assertNotEquals } from '@std/assert';
 import { oc } from 'npm:@orpc/contract@^1.15.5';
 import { implement } from 'npm:@orpc/server@^1.15.5';
@@ -19,6 +20,11 @@ import {
   SimpleSpanProcessor,
 } from 'npm:@opentelemetry/sdk-trace-base@^2.7.1';
 import { W3CTraceContextPropagator } from 'npm:@opentelemetry/core@^2.7.1';
+import {
+  configure as configureLogger,
+  getLogger,
+  withContext as withLogContext,
+} from '@netscript/logger';
 import { createService, type ServiceApp } from '@netscript/service';
 import {
   createScopeAuthorizer,
@@ -34,7 +40,10 @@ import {
 import { createHttpClientLink } from '../../../../packages/sdk/src/client/http-client-link.ts';
 import { resolveTransportPolicy } from '../../../../packages/sdk/src/internal/transport-policy.ts';
 import { MemoryCacheStore } from '../../../../packages/sdk/tests/test-helpers.ts';
-import { createInProcessFetch } from './in-process-fetch-adapter.ts';
+import {
+  createInProcessFetch,
+  resolveInProcessOrigin,
+} from './in-process-fetch-adapter.ts';
 
 function deferred<T = void>() {
   let resolve!: (value: T | PromiseLike<T>) => void;
@@ -170,6 +179,7 @@ const authContribution = defineSdkClientContribution<{
 
 const transportPolicy = resolveTransportPolicy(vaultContract);
 const httpOrigin = `http://localhost:${running.addr.port}`;
+const vaultInProcessOrigin = resolveInProcessOrigin('vault').origin;
 
 function buildLink(mode: 'http' | 'in-process', propagateTraceContext: boolean, app: ServiceApp) {
   return createHttpClientLink({
@@ -179,7 +189,7 @@ function buildLink(mode: 'http' | 'in-process', propagateTraceContext: boolean, 
     protocol: mode === 'http' ? 'http' : 'https',
     propagateTraceContext,
     getTraceHeaders: () => ({}),
-    resolveServiceUrl: () => mode === 'http' ? httpOrigin : 'https://in-process.localhost',
+    resolveServiceUrl: () => mode === 'http' ? httpOrigin : vaultInProcessOrigin,
     contributions: [authContribution] as const,
     fetch: mode === 'http' ? globalThis.fetch : createInProcessFetch(app),
   });
@@ -405,7 +415,7 @@ try {
 
           // (i) Post-headers pull + abort cancel inside active caller span.
           const abortCtrl = new AbortController();
-          const res1 = await inProcFetch('https://in-process.localhost/stream?kind=abort', {
+          const res1 = await inProcFetch(`${vaultInProcessOrigin}/stream?kind=abort`, {
             headers: baseHeaders,
             signal: abortCtrl.signal,
           });
@@ -421,7 +431,7 @@ try {
           }
 
           // (ii) Unsignalled stream pull + consumer cancel inside active caller span.
-          const res2 = await inProcFetch('https://in-process.localhost/stream?kind=consumer', {
+          const res2 = await inProcFetch(`${vaultInProcessOrigin}/stream?kind=consumer`, {
             headers: baseHeaders,
           });
           const reader2 = res2.body!.getReader();
@@ -430,7 +440,7 @@ try {
 
           // (iii) Late-body cancel after caller rejection inside active caller span.
           const lateCtrl = new AbortController();
-          const lateReq = inProcFetch('https://in-process.localhost/stream?kind=late', {
+          const lateReq = inProcFetch(`${vaultInProcessOrigin}/stream?kind=late`, {
             headers: baseHeaders,
             signal: lateCtrl.signal,
           });
@@ -465,6 +475,149 @@ try {
     };
   }
 
+  // 2c. Non-OTel AsyncLocalStorage & @netscript/logger detachment, withBodyLimit 413
+  //     streaming-path parity, and measured authority / implicit Fetch header boundary.
+  const calleeLogRecords: Record<string, Record<string, unknown>[]> = {
+    http: [],
+    'in-process': [],
+  };
+  const callerLogControlRecords: Record<string, unknown>[] = [];
+  let activeBoundaryMode: 'http' | 'in-process' = 'http';
+  await configureLogger({
+    reset: true,
+    contextLocalStorage: new AsyncLocalStorage(),
+    sinks: {
+      boundaryMem: (record) => {
+        calleeLogRecords[activeBoundaryMode].push({ ...record.properties });
+      },
+      callerCtrlMem: (record) => {
+        callerLogControlRecords.push({ ...record.properties });
+      },
+    },
+    loggers: [
+      { category: ['logtape', 'meta'], sinks: [], lowestLevel: 'fatal' },
+      { category: ['probe', 'parity-boundary'], sinks: ['boundaryMem'], lowestLevel: 'info' },
+      { category: ['probe', 'parity-caller-ctrl'], sinks: ['callerCtrlMem'], lowestLevel: 'info' },
+    ],
+  });
+  const callerUserAls = new AsyncLocalStorage<string>();
+  const boundaryLogger = getLogger(['probe', 'parity-boundary']);
+  const callerCtrlLogger = getLogger(['probe', 'parity-caller-ctrl']);
+  const boundaryContract = {
+    echoBounded: oc
+      .route({ method: 'POST' })
+      .input(z.object({ text: z.string() }))
+      .output(
+        z.object({
+          text: z.string(),
+          alsStore: z.string().nullable(),
+          origin: z.string(),
+          headerKeys: z.array(z.string()),
+        }),
+      ),
+  };
+  const bOs = implement(boundaryContract);
+  const boundaryRpcPath = buildServiceRpcPath({ routerName: 'bounded' });
+  const boundaryRunning = await createService(
+    bOs.router({
+      echoBounded: bOs.echoBounded.handler(({ input, context }) => {
+        const req = (context as { request: Request }).request;
+        boundaryLogger.info('bounded-handler');
+        return {
+          text: input.text,
+          alsStore: callerUserAls.getStore() ?? null,
+          origin: new URL(req.url).origin,
+          headerKeys: [...req.headers.keys()].sort(),
+        };
+      }),
+    }),
+    { name: 'bounded' },
+  )
+    .withContext((c) => ({ request: c.req.raw }))
+    .withBodyLimit({ maxBytes: 64 })
+    .withRPC({ rpcPath: boundaryRpcPath })
+    .serve({ port: 0, hostname: 'localhost', handleSignals: false });
+
+  const alsAndBodyLimitReport: Record<string, unknown> = {};
+  try {
+    const boundaryPolicy = resolveTransportPolicy(boundaryContract);
+    const boundaryHttpOrigin = `http://localhost:${boundaryRunning.addr.port}`;
+    const boundaryInProcOrigin = resolveInProcessOrigin('bounded').origin;
+    for (const mode of ['http', 'in-process'] as const) {
+      activeBoundaryMode = mode;
+      const bLink = createHttpClientLink({
+        transportPolicy: boundaryPolicy,
+        serviceName: 'bounded',
+        rpcPath: boundaryRpcPath,
+        protocol: mode === 'http' ? 'http' : 'https',
+        propagateTraceContext: false,
+        getTraceHeaders: () => ({}),
+        resolveServiceUrl: () => mode === 'http' ? boundaryHttpOrigin : boundaryInProcOrigin,
+        fetch: mode === 'http' ? globalThis.fetch : createInProcessFetch(boundaryRunning.app),
+      });
+      // deno-lint-ignore no-explicit-any
+      const bClient = createORPCClient(bLink as any) as any;
+
+      const smallOut = await withLogContext(
+        { callerOnlyField: 'caller-log-ctx', callerTenant: 'tenant-secret' },
+        () =>
+          callerUserAls.run('caller-tx-ctx', () => {
+            callerCtrlLogger.info(`caller-before-${mode}`);
+            assertEquals(callerUserAls.getStore(), 'caller-tx-ctx');
+            return bClient.echoBounded({ text: 'ok' });
+          }),
+      );
+      const oversizeRaw = await (mode === 'http'
+        ? globalThis.fetch(`${boundaryHttpOrigin}${boundaryRpcPath}/echoBounded`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ json: { text: 'x'.repeat(200) } }),
+        })
+        : createInProcessFetch(boundaryRunning.app)(
+          `${boundaryInProcOrigin}${boundaryRpcPath}/echoBounded`,
+          {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ json: { text: 'x'.repeat(200) } }),
+          },
+        ));
+      const oversizeBody = await oversizeRaw.json();
+      const oversizeRpc = await safe(bClient.echoBounded({ text: 'x'.repeat(200) }));
+
+      assertEquals(smallOut.alsStore, null);
+      assertEquals(calleeLogRecords[mode].length, 1);
+      assertEquals(calleeLogRecords[mode][0], {});
+      assertEquals(callerLogControlRecords.at(-1), {
+        callerOnlyField: 'caller-log-ctx',
+        callerTenant: 'tenant-secret',
+      });
+      assertEquals(oversizeRaw.status, 413);
+      assertEquals(oversizeBody, {
+        error: 'PAYLOAD_TOO_LARGE',
+        message: 'Request body exceeds 64 bytes',
+        maxBytes: 64,
+      });
+      assertEquals(oversizeRpc.isSuccess, false);
+      if (!oversizeRpc.isSuccess) {
+        assertEquals((oversizeRpc.error as { status?: number }).status, 413);
+      }
+
+      alsAndBodyLimitReport[mode] = {
+        alsStore: smallOut.alsStore,
+        calleeLogProperties: calleeLogRecords[mode][0],
+        origin: smallOut.origin,
+        headerKeys: smallOut.headerKeys,
+        oversizeStatus: oversizeRaw.status,
+        oversizeBody,
+        oversizeRpcStatus: !oversizeRpc.isSuccess
+          ? (oversizeRpc.error as { status?: number }).status
+          : null,
+      };
+    }
+  } finally {
+    await boundaryRunning.stop();
+  }
+
   // 3. Blocker 1/2 barrier suite across BOTH HTTP and in-process transports:
   // (a) Pre-aborted zero-dispatch
   let preAbortedEntered = false;
@@ -478,7 +631,7 @@ try {
   preCtrl.abort(new Error('already-aborted'));
   let preAbortErr: unknown;
   try {
-    await preAbortFetch('https://in-process.localhost/api/rpc/v1/vault/x', {
+    await preAbortFetch(`${vaultInProcessOrigin}/api/rpc/v1/vault/x`, {
       signal: preCtrl.signal,
     });
   } catch (err) {
@@ -504,7 +657,7 @@ try {
   });
   let syncAbortErr: unknown;
   try {
-    await syncAbortFetch('https://in-process.localhost/api/rpc/v1/vault/x', {
+    await syncAbortFetch(`${vaultInProcessOrigin}/api/rpc/v1/vault/x`, {
       signal: syncCtrl.signal,
     });
   } catch (err) {
@@ -629,7 +782,7 @@ try {
     },
   });
   const bodyCtrl = new AbortController();
-  const streamResponse = await hungStreamFetch('https://in-process.localhost/api/rpc/v1/vault/stream', {
+  const streamResponse = await hungStreamFetch(`${vaultInProcessOrigin}/api/rpc/v1/vault/stream`, {
     signal: bodyCtrl.signal,
   });
   const reader = streamResponse.body!.getReader();
@@ -652,6 +805,7 @@ try {
         parity: results,
         tracing: traceReport,
         bodyLifecycleTelemetry,
+        alsAndBodyLimitParity: alsAndBodyLimitReport,
         abortBarriers: {
           preAbortedEntered,
           syncAbortMessage: (syncAbortErr as Error).message,

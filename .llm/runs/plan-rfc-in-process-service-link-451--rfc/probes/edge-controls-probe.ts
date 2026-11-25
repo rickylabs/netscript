@@ -49,7 +49,10 @@ import { MemoryCacheStore } from '../../../../packages/sdk/tests/test-helpers.ts
 import {
   createInProcessFetch,
   type InProcessServiceAppLike,
+  resolveInProcessOrigin,
 } from './in-process-fetch-adapter.ts';
+
+const echoInProcessOrigin = resolveInProcessOrigin('echo').origin;
 
 function deferred<T = void>() {
   let resolve!: (value: T | PromiseLike<T>) => void;
@@ -171,7 +174,7 @@ const trustedBearerLink = createHttpClientLink({
   protocol: 'https',
   propagateTraceContext: false,
   getTraceHeaders: () => ({}),
-  resolveServiceUrl: () => 'https://in-process.localhost',
+  resolveServiceUrl: () => echoInProcessOrigin,
   contributions: [bearerContribution] as const,
   fetch: createInProcessFetch(trustedApp),
 });
@@ -191,7 +194,7 @@ const trustedInternalLink = createHttpClientLink({
   protocol: 'https',
   propagateTraceContext: false,
   getTraceHeaders: () => ({}),
-  resolveServiceUrl: () => 'https://in-process.localhost',
+  resolveServiceUrl: () => echoInProcessOrigin,
   contributions: [internalContribution] as const,
   fetch: createInProcessFetch(trustedApp),
 });
@@ -206,6 +209,43 @@ assert(
     observedAuthorizationHeader.startsWith('Bearer ') &&
     observedAuthorizationHeader.length > 20,
 );
+
+// 1b. Per-service origin identity: distinct mounted services receive distinct
+//     RFC 6761 .in-process.localhost origins so origin-scoped contributions distinguish them.
+const observedOriginScopedAudiences: string[] = [];
+const originScopedContribution = defineSdkClientContribution<Record<string, never>>()({
+  protocol: { family: 'netscript.sdk-client', major: 1 },
+  id: 'probe:origin-scoped-aud',
+  context: {},
+  headerKeys: ['x-origin-audience'],
+  responseCache: { mode: 'direct-only' },
+  prepare: ({ transport }) => {
+    observedOriginScopedAudiences.push(transport.origin.origin);
+    return { headers: { 'x-origin-audience': transport.origin.hostname } };
+  },
+});
+const billingOrigin = resolveInProcessOrigin('billing').origin;
+const nonLdhOrigin = resolveInProcessOrigin('echo_v2').origin;
+assertEquals(echoInProcessOrigin, 'https://echo.in-process.localhost');
+assertEquals(billingOrigin, 'https://billing.in-process.localhost');
+assert(nonLdhOrigin.startsWith('https://x-') && nonLdhOrigin.endsWith('.in-process.localhost'));
+assertEquals(new Set([echoInProcessOrigin, billingOrigin, nonLdhOrigin]).size, 3);
+for (const origin of [echoInProcessOrigin, billingOrigin, nonLdhOrigin]) {
+  const originScopedLink = createHttpClientLink({
+    transportPolicy,
+    serviceName: 'echo',
+    rpcPath,
+    protocol: 'https',
+    propagateTraceContext: false,
+    getTraceHeaders: () => ({}),
+    resolveServiceUrl: () => origin,
+    contributions: [originScopedContribution] as const,
+    fetch: createInProcessFetch(trustedApp),
+  });
+  // deno-lint-ignore no-explicit-any
+  await (createORPCClient(originScopedLink as any) as any).echo({ text: 'origin-check' }, { context: {} });
+}
+assertEquals(observedOriginScopedAudiences, [echoInProcessOrigin, billingOrigin, nonLdhOrigin]);
 
 // 2. Blocker 5 (New-1): SDK-private per-epoch binding (no WeakMap keyed by public descriptor!),
 //    retained-descriptor control across success/prep-error/abort, AND real shared-link
@@ -337,7 +377,7 @@ function buildEpochPinnedSharedLink() {
         protocol: 'https',
         propagateTraceContext: false,
         getTraceHeaders: () => ({}),
-        resolveServiceUrl: () => 'https://in-process.localhost',
+        resolveServiceUrl: () => echoInProcessOrigin,
         fetch: (req, init) => {
           const headers = new Headers(init?.headers ?? (req instanceof Request ? req.headers : undefined));
           if (currentAttemptHeaders) {
@@ -408,7 +448,7 @@ function buildEpochPinnedSharedLink() {
       epochMap.set(token, app);
       return Object.freeze({
         kind: 'http' as const,
-        origin: new URL('https://in-process.localhost'),
+        origin: resolveInProcessOrigin('echo'),
         rpcPath,
         secure: true,
       });
@@ -581,7 +621,7 @@ const redirectLink = createHttpClientLink({
   protocol: 'https',
   propagateTraceContext: false,
   getTraceHeaders: () => ({}),
-  resolveServiceUrl: () => 'https://in-process.localhost',
+  resolveServiceUrl: () => echoInProcessOrigin,
   contributions: [bearerContribution] as const,
   fetch: createInProcessFetch(redirectApp),
 });
@@ -676,7 +716,7 @@ try {
       resolveServiceUrl: () =>
         mode === 'http'
           ? `http://localhost:${identicalHeaderRunning.addr.port}`
-          : 'https://in-process.localhost',
+          : echoInProcessOrigin,
       contributions: [sameHeaderPartitionContrib] as const,
       fetch: mode === 'http' ? globalThis.fetch : createInProcessFetch(identicalHeaderRunning.app),
     });
@@ -710,7 +750,7 @@ try {
     protocol: 'https',
     propagateTraceContext: false,
     getTraceHeaders: () => ({}),
-    resolveServiceUrl: () => 'https://in-process.localhost',
+    resolveServiceUrl: () => echoInProcessOrigin,
     contributions: [sameHeaderPartitionContrib] as const,
     fetch: createInProcessFetch(identicalHeaderRunning.app),
   });
@@ -765,7 +805,7 @@ const methodSensitiveRunning = await createService(trustedRouter, { name: 'echo'
 let urlLengthReport: Record<string, unknown>;
 try {
   const shortHttpOrigin = `http://localhost:${lengthRunning.addr.port}`;
-  const longSyntheticOrigin = 'https://in-process.localhost';
+  const longSyntheticOrigin = echoInProcessOrigin;
   assert(longSyntheticOrigin.length > shortHttpOrigin.length);
 
   const emptyQueryLen = `?data=${encodeURIComponent(JSON.stringify({ json: { text: '' } }))}`.length;
@@ -936,11 +976,11 @@ try {
   );
   const inProcFetch = createInProcessFetch(defaultRlRunning.app);
   const inProcRes1 = await inProcFetch(
-    `https://in-process.localhost${rpcPath}/echo`,
+    `${echoInProcessOrigin}${rpcPath}/echo`,
     { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ json: { text: '3' } }) },
   );
   const inProcRes2 = await inProcFetch(
-    `https://in-process.localhost${rpcPath}/echo`,
+    `${echoInProcessOrigin}${rpcPath}/echo`,
     { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ json: { text: '4' } }) },
   );
   await httpRes1.body?.cancel();
@@ -983,7 +1023,7 @@ try {
   );
   const inProcFetch = createInProcessFetch(logicalRlRunning.app);
   const inProcSecond = await inProcFetch(
-    `https://in-process.localhost${rpcPath}/echo`,
+    `${echoInProcessOrigin}${rpcPath}/echo`,
     {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-principal': 'user-42' },
@@ -991,7 +1031,7 @@ try {
     },
   );
   const inProcOther = await inProcFetch(
-    `https://in-process.localhost${rpcPath}/echo`,
+    `${echoInProcessOrigin}${rpcPath}/echo`,
     {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-principal': 'user-99' },
@@ -1024,6 +1064,7 @@ console.log(
         cleartextInternalRefusedBeforeDispatch: !cleartextInternalRes.isSuccess && cleartextInternalDispatched === 0,
         trustedBearerSucceeded: trustedBearerOut.appId === 'trusted-app',
         trustedInternalSucceeded: trustedInternalOut.appId === 'trusted-app',
+        perServiceOriginsDistinct: observedOriginScopedAudiences,
       },
       epochBindingAndReplacement: {
         epoch1AppId: epoch1Out.appId,

@@ -1,11 +1,40 @@
 /**
- * Round-3 reference implementation of the abort-aware, ROOT_CONTEXT-detached
- * in-process fetch adapter used by the RFC 0000 design verification probes.
+ * Round-4 reference implementation of the abort-aware, full-AsyncLocalStorage &
+ * ROOT_CONTEXT-detached in-process fetch adapter and per-service synthetic
+ * origin resolver used by the RFC 0000 design verification probes.
  */
 
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { createHash } from 'node:crypto';
 import { type Context, extractContext, withContext } from '@netscript/telemetry/context';
 
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
+const FAST_PATH_LABEL_RE = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
+
+// Captured once at module initialization (outside any request scope) so every
+// in-process hop detaches ALL AsyncLocalStorage stores in the process —
+// OpenTelemetry, @netscript/logger (LogTape), auth request storage, trigger
+// callback scopes, and any application/user AsyncLocalStorage stores created
+// before or after module load.
+const rootAsyncSnapshot = AsyncLocalStorage.snapshot();
+
+function runDetached<T>(serviceCtx: Context, fn: () => T): T {
+  return rootAsyncSnapshot(() => withContext(serviceCtx, fn));
+}
+
+/**
+ * Deterministic, collision-free per-service RFC 6761 `.localhost` synthetic origin.
+ * Valid lowercase LDH service names (not starting with `x-`) map directly to
+ * `https://<serviceName>.in-process.localhost`; all other names map to
+ * `https://x-<sha256Hex32>.in-process.localhost`.
+ */
+export function resolveInProcessOrigin(serviceName: string): URL {
+  if (FAST_PATH_LABEL_RE.test(serviceName) && !serviceName.startsWith('x-')) {
+    return new URL(`https://${serviceName}.in-process.localhost`);
+  }
+  const digest = createHash('sha256').update(serviceName).digest('hex').slice(0, 32);
+  return new URL(`https://x-${digest}.in-process.localhost`);
+}
 
 export interface InProcessServiceAppLike {
   fetch(request: Request): Response | Promise<Response>;
@@ -42,7 +71,7 @@ function cancelUnownedBodyInContext(
   serviceCtx: Context,
 ): void {
   if (body === null || body.locked) return;
-  withContext(serviceCtx, () => {
+  runDetached(serviceCtx, () => {
     try {
       void body.cancel(reason).catch(() => {});
     } catch {
@@ -66,8 +95,9 @@ function rejectIfRedirect(response: Response, serviceCtx: Context): Response {
  * Wraps any non-null Response.body so:
  * 1. Locked or disturbed bodies returned by app.fetch() fail closed with
  *    IN_PROCESS_BODY_UNUSABLE (never silently bypassing abort protection).
- * 2. Every source read/cancel runs inside `serviceCtx` (ROOT_CONTEXT), never
- *    leaking the caller's active OpenTelemetry AsyncLocalStorage context.
+ * 2. Every source read/cancel runs inside `rootAsyncSnapshot` + `serviceCtx`
+ *    (`ROOT_CONTEXT`), never leaking caller OTel, @netscript/logger, auth,
+ *    or application AsyncLocalStorage context.
  * 3. Every terminal path (EOF, abort, consumer cancel, source error) removes
  *    the abort listener and releases the owned reader lock synchronously — even
  *    if underlying source cancel() stalls or rejects.
@@ -99,7 +129,7 @@ function wrapInProcessResponse(
       return Promise.resolve();
     }
     cancelSent = true;
-    return withContext(serviceCtx, () => {
+    return runDetached(serviceCtx, () => {
       try {
         return reader.cancel(reason).catch(() => {});
       } finally {
@@ -126,7 +156,7 @@ function wrapInProcessResponse(
     start(controller) {
       streamController = controller;
       if (signal) {
-        withContext(serviceCtx, () => {
+        runDetached(serviceCtx, () => {
           signal.addEventListener('abort', onBodyAbort, { once: true });
         });
         if (signal.aborted) {
@@ -140,7 +170,7 @@ function wrapInProcessResponse(
         return;
       }
       try {
-        const { done, value } = await withContext(serviceCtx, () => reader.read());
+        const { done, value } = await runDetached(serviceCtx, () => reader.read());
         if (terminal) {
           releaseReaderSafely(reader);
           return;
@@ -192,7 +222,7 @@ export function createInProcessFetch(
     if (signal === undefined) {
       try {
         const request = new Request(input, init);
-        return withContext(serviceCtx, () =>
+        return runDetached(serviceCtx, () =>
           Promise.resolve(app.fetch(request)).then((response) =>
             wrapInProcessResponse(rejectIfRedirect(response, serviceCtx), serviceCtx)
           ));
@@ -219,14 +249,14 @@ export function createInProcessFetch(
 
       // Subscribe before constructing Request or invoking app.fetch so a
       // synchronous abort during setup is never missed.
-      withContext(serviceCtx, () => {
+      runDetached(serviceCtx, () => {
         signal.addEventListener('abort', onAbort, { once: true });
       });
 
       let dispatch: Promise<Response>;
       try {
         const request = new Request(input, init);
-        dispatch = withContext(serviceCtx, () => Promise.resolve(app.fetch(request)));
+        dispatch = runDetached(serviceCtx, () => Promise.resolve(app.fetch(request)));
       } catch (error) {
         if (!settled) {
           settled = true;
@@ -236,9 +266,10 @@ export function createInProcessFetch(
         return;
       }
 
-      // Register the single settlement path inside ROOT_CONTEXT so late cleanup
-      // never captures or executes under the caller's OpenTelemetry context.
-      withContext(serviceCtx, () => {
+      // Register the single settlement path inside the detached snapshot +
+      // ROOT_CONTEXT so late cleanup never captures or executes under any
+      // caller AsyncLocalStorage store.
+      runDetached(serviceCtx, () => {
         dispatch.then(
           (response) => {
             if (settled || signal.aborted) {

@@ -6,13 +6,20 @@
  *   deno test --frozen -A .llm/runs/plan-rfc-in-process-service-link-451--rfc/probes/adapter-sanitizers.probe.ts
  */
 
-import { assertEquals, assertRejects } from '@std/assert';
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { assert, assertEquals, assertNotEquals, assertRejects } from '@std/assert';
 import { context as otelContext, trace } from 'npm:@opentelemetry/api@^1.9.1';
 import { AsyncLocalStorageContextManager } from 'npm:@opentelemetry/context-async-hooks@^2.9.0';
 import { BasicTracerProvider } from 'npm:@opentelemetry/sdk-trace-base@^2.7.1';
 import {
+  configure,
+  getLogger,
+  withContext as withLogContext,
+} from '@netscript/logger';
+import {
   createInProcessFetch,
   ProbeInProcessServiceError,
+  resolveInProcessOrigin,
 } from './in-process-fetch-adapter.ts';
 
 function deferred<T = void>() {
@@ -302,4 +309,141 @@ Deno.test('caller OTel context never leaks into deferred pull, abort cancel, or 
     await provider.shutdown();
     ctxMgr.disable();
   }
+});
+
+Deno.test('non-OTel AsyncLocalStorage and @netscript/logger contexts detach across fetch, pull, abort cancel, and late-body cancel', async () => {
+  const capturedRecords: Array<{ message: readonly unknown[]; properties: Record<string, unknown> }> =
+    [];
+  const callerControlRecords: Array<Record<string, unknown>> = [];
+  await configure({
+    reset: true,
+    contextLocalStorage: new AsyncLocalStorage(),
+    sinks: {
+      mem: (record) => {
+        capturedRecords.push({
+          message: record.message,
+          properties: { ...record.properties },
+        });
+      },
+      callerCtrl: (record) => {
+        callerControlRecords.push({ ...record.properties });
+      },
+    },
+    loggers: [
+      { category: ['logtape', 'meta'], sinks: [], lowestLevel: 'fatal' },
+      { category: ['probe', 'als-callee'], sinks: ['mem'], lowestLevel: 'info' },
+      { category: ['probe', 'als-caller-ctrl'], sinks: ['callerCtrl'], lowestLevel: 'info' },
+    ],
+  });
+
+  // Created AFTER in-process-fetch-adapter.ts captured AsyncLocalStorage.snapshot()
+  // to prove snapshot() detaches even subsequently constructed AsyncLocalStorage instances.
+  const postLoadAls = new AsyncLocalStorage<string>();
+  const calleeLogger = getLogger(['probe', 'als-callee']);
+  const callerCtrlLogger = getLogger(['probe', 'als-caller-ctrl']);
+
+  let fetchAls: string | undefined = 'unset';
+  let pullAls: string | undefined = 'unset';
+  let abortCancelAls: string | undefined = 'unset';
+  let lateCancelAls: string | undefined = 'unset';
+  const lateGate = deferred<void>();
+
+  const inProcFetch = createInProcessFetch({
+    fetch(req) {
+      fetchAls = postLoadAls.getStore();
+      calleeLogger.info('callee-fetch');
+      if (req.url.endsWith('/late')) {
+        return lateGate.promise.then(() =>
+          new Response(
+            new ReadableStream<Uint8Array>({
+              cancel() {
+                lateCancelAls = postLoadAls.getStore();
+                calleeLogger.info('callee-late-cancel');
+              },
+            }),
+          )
+        );
+      }
+      let sent = false;
+      return new Response(
+        new ReadableStream<Uint8Array>({
+          pull(c) {
+            pullAls = postLoadAls.getStore();
+            calleeLogger.info('callee-pull');
+            if (!sent) {
+              sent = true;
+              c.enqueue(new Uint8Array([7]));
+              return;
+            }
+            return new Promise(() => {});
+          },
+          cancel() {
+            abortCancelAls = postLoadAls.getStore();
+            calleeLogger.info('callee-abort-cancel');
+          },
+        }),
+      );
+    },
+  });
+
+  await withLogContext({ callerRequestId: 'caller-req-1', callerTenant: 'tenant-A' }, async () => {
+    await postLoadAls.run('caller-tx-scope', async () => {
+      // Positive control: prove BOTH caller log context and postLoadAls are live on caller side.
+      callerCtrlLogger.info('caller-active');
+      assertEquals(postLoadAls.getStore(), 'caller-tx-scope');
+
+      const origin = resolveInProcessOrigin('orders').origin;
+      const ctrl = new AbortController();
+      const res = await inProcFetch(`${origin}/stream`, { signal: ctrl.signal });
+      const reader = res.body!.getReader();
+      await reader.read();
+      const second = reader.read();
+      ctrl.abort(new Error('stop-als'));
+      await assertRejects(() => second, Error, 'stop-als');
+
+      const lateCtrl = new AbortController();
+      const lateReq = inProcFetch(`${origin}/late`, { signal: lateCtrl.signal });
+      lateCtrl.abort(new Error('stop-als-late'));
+      await assertRejects(() => lateReq, Error, 'stop-als-late');
+      lateGate.resolve();
+      await new Promise((r) => setTimeout(r, 15));
+    });
+  });
+
+  assertEquals(callerControlRecords, [{ callerRequestId: 'caller-req-1', callerTenant: 'tenant-A' }]);
+  assertEquals(fetchAls, undefined);
+  assertEquals(pullAls, undefined);
+  assertEquals(abortCancelAls, undefined);
+  assertEquals(lateCancelAls, undefined);
+  assert(capturedRecords.length >= 4);
+  for (const record of capturedRecords) {
+    assertEquals(record.properties, {});
+  }
+});
+
+Deno.test('resolveInProcessOrigin maps distinct serviceNames to collision-free .in-process.localhost origins', () => {
+  const orders = resolveInProcessOrigin('orders');
+  const billing = resolveInProcessOrigin('billing');
+  const upperOrders = resolveInProcessOrigin('Orders');
+  const underscored = resolveInProcessOrigin('orders_v2');
+  const reservedPrefix = resolveInProcessOrigin('x-orders');
+  const longName = resolveInProcessOrigin('a'.repeat(80));
+
+  assertEquals(orders.origin, 'https://orders.in-process.localhost');
+  assertEquals(billing.origin, 'https://billing.in-process.localhost');
+  assert(upperOrders.hostname.startsWith('x-'));
+  assert(underscored.hostname.startsWith('x-'));
+  assert(reservedPrefix.hostname.startsWith('x-'));
+  assert(longName.hostname.startsWith('x-'));
+
+  const all = [orders, billing, upperOrders, underscored, reservedPrefix, longName];
+  const uniqueOrigins = new Set(all.map((u) => u.origin));
+  assertEquals(uniqueOrigins.size, all.length);
+  for (const u of all) {
+    assertEquals(u.protocol, 'https:');
+    assert(u.hostname.endsWith('.in-process.localhost'));
+    const label = u.hostname.slice(0, -'.in-process.localhost'.length);
+    assert(label.length >= 1 && label.length <= 63);
+  }
+  assertNotEquals(orders.origin, billing.origin);
 });
