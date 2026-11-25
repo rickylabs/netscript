@@ -143,9 +143,9 @@ Deno.test('live repository census and configured task coverage stay explicit', a
   const report = await checkRootCoverage();
 
   assertEquals(report.census, {
-    workspaceMembers: 38,
-    membersInsideBoundary: 38,
-    publishableMembersInsideBoundary: 36,
+    workspaceMembers: 39,
+    membersInsideBoundary: 39,
+    publishableMembersInsideBoundary: 37,
   });
   assertEquals(report.excludedNonPublishableMembers, [
     { path: 'packages/bench', reason: 'publish:false' },

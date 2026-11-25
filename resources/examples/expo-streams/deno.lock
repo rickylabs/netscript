@@ -348,6 +348,12 @@
         ]
       },
       "jsr:@netscript/database@0.0.9": {},
+      "jsr:@netscript/directory-ldap@0.0.9": {
+        "dependencies": [
+          "jsr:@netscript/plugin-directory-core@0.0.9",
+          "jsr:@std/assert@1"
+        ]
+      },
       "jsr:@netscript/fresh-ui@0.0.9": {
         "dependencies": [
           "jsr:@netscript/sdk@0.0.9",

@@ -24,5 +24,6 @@ error instead of falling back to an anonymous session.
   { eyebrow: "Tutorial", title: "Workspace auth", body: "Add authentication in the Team Workspace tutorial, then authorize routes on it.", href: "/tutorials/workspace/02-auth/" },
   { eyebrow: "Explanation", title: "Auth model", body: "Principal, session, backend and authorization: why auth is a pure-backend port.", href: "/explanation/auth-model/" },
   { eyebrow: "Reference", title: "Auth packages", body: "The auth plugin, its core contracts, and the three backend adapters.", href: "/reference/plugin-auth/" },
-  { eyebrow: "Reference", title: "Directory core", body: "Provider-neutral `DirectoryPort`, domain invariants, typed errors, and conformance testing kit.", href: "/reference/plugin-directory-core/" }
+  { eyebrow: "Reference", title: "Directory core", body: "Provider-neutral `DirectoryPort`, domain invariants, typed errors, and conformance testing kit.", href: "/reference/plugin-directory-core/" },
+  { eyebrow: "Reference", title: "LDAP directory adapter", body: "Active Directory / LDAP `DirectoryPort` over strict TLS, `*_FILE` bind secrets, and `ldapts` filters.", href: "/reference/directory-ldap/" }
 ] }) }}

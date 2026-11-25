@@ -368,7 +368,7 @@ archetypes.
 
 ## Archetype assignments for current packages
 
-Measured 2026-08-12. This table uses the same 37 top-level paths as the verdict table in
+Measured 2026-08-12. This table uses the same 38 top-level paths as the verdict table in
 [`10-codebase-verdict-and-handoff.md`](./10-codebase-verdict-and-handoff.md).
 
 | Path | Archetype |
@@ -384,6 +384,7 @@ Measured 2026-08-12. This table uses the same 37 top-level paths as the verdict 
 | `packages/contracts` | 1 — Small Contract |
 | `packages/cron` | 2 — Integration |
 | `packages/database` | 2 — Integration |
+| `packages/directory-ldap` | 2 — Integration |
 | `packages/fresh` | 4 — DSL/Builder |
 | `packages/fresh-ui` | 4 — DSL/Builder |
 | `packages/kv` | 2 — Integration |

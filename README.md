@@ -229,6 +229,12 @@ The monorepo publishes **29 packages and 6 first-party plugins** to JSR as small
 | [`@netscript/auth-workos`](packages/auth-workos/README.md)           | [![JSR](https://jsr.io/badges/@netscript/auth-workos)](https://jsr.io/@netscript/auth-workos)           | WorkOS AuthKit authenticators                              |
 | [`@netscript/auth-better-auth`](packages/auth-better-auth/README.md) | [![JSR](https://jsr.io/badges/@netscript/auth-better-auth)](https://jsr.io/@netscript/auth-better-auth) | [better-auth](https://better-auth.com) integration helpers |
 
+### Directory adapters
+
+| Package                                                            | JSR                                                                                                 | Capability                                                                                |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [`@netscript/directory-ldap`](packages/directory-ldap/README.md)   | [![JSR](https://jsr.io/badges/@netscript/directory-ldap)](https://jsr.io/@netscript/directory-ldap) | Active Directory and Samba AD `DirectoryPort` over strict LDAPS/StartTLS (`ldapts` ASTs) |
+
 ### Application surface
 
 | Package                                              | JSR                                                                                     | Capability                                                                         |

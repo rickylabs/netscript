@@ -49,6 +49,7 @@ const REFERENCE_UNITS = [
   'contracts',
   'cron',
   'database',
+  'directory-ldap',
   'fresh',
   'fresh-ui',
   'kv',

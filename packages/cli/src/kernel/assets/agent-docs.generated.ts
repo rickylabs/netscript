@@ -29,6 +29,8 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
 
   "@netscript/database": [".","./adapters","./adapters/mssql","./adapters/mysql","./adapters/postgres","./commands","./commands/postgres","./connection-strings/postgres","./extensions","./ports","./scripts","./testing","./tracing"],
 
+  "@netscript/directory-ldap": ["."],
+
   "@netscript/fresh": [".","./ai","./ai/sandbox","./builders","./defer","./defer/island","./desktop","./error","./form","./interactive","./navigation","./query","./route","./server","./streams","./testing","./vite"],
 
   "@netscript/fresh-ui": [".","./ai/render-ui","./contracts","./contracts.json","./desktop","./interactive","./primitives","./registry","./registry-v2","./token-config","./tokens"],

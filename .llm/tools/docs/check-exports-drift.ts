@@ -175,6 +175,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     },
   },
   {
+    name: 'directory-ldap',
+    packagePath: 'packages/directory-ldap',
+    docPath: 'docs/site/reference/directory-ldap/index.md',
+    packageName: '@netscript/directory-ldap',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'complete',
+      reason:
+        'The page inventories every exported symbol from the root entrypoint including factory, config, AD codecs, error mapper, transport seams, and re-exported core types.',
+    },
+  },
+  {
     name: 'plugin-auth',
     packagePath: 'plugins/auth',
     docPath: 'docs/site/reference/plugin-auth/index.md',

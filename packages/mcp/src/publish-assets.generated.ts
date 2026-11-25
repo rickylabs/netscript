@@ -202,6 +202,7 @@ export const MCP_EMBEDDED_DOCS_PROVENANCE:
       'pages/reference/contracts/index.md',
       'pages/reference/cron/index.md',
       'pages/reference/database/index.md',
+      'pages/reference/directory-ldap/index.md',
       'pages/reference/fresh-ui/index.md',
       'pages/reference/fresh/index.md',
       'pages/reference/index.md',
@@ -309,7 +310,7 @@ export const MCP_EMBEDDED_DOCS_PROVENANCE:
       'pages/web-layer/vite/index.md',
       'pages/why/index.md',
     ],
-    sourceBytes: 3296460,
-    documentCount: 288,
-    sha256: 'd3a1e3b298e822af0e498a3838954d4a1491fa5bd6acb1f82a4942e25073a71d',
+    sourceBytes: 3307881,
+    documentCount: 289,
+    sha256: 'b7ebb32970b37d83fef36ed0851cf968ee5d82ffdc9ecafc800389286ae08d83',
   };
