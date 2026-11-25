@@ -7,6 +7,7 @@
 import { DenoKvAdapter, getKv, type KvKey, type WatchableKv } from '@netscript/kv';
 import type { DeadLetterRecord, DeadLetterStorePort } from '../ports/dead-letter.ts';
 import { QueueConfigurationError } from '../ports/errors.ts';
+import { retryKnownUncommittedWrite } from './_kv-queue/write-retry.ts';
 
 const DLQ_PREFIX = 'queue:dlq';
 const DLQ_IDENTITY_PREFIX = 'queue:dlq:identity';
@@ -65,12 +66,30 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
     }
     // A redelivery has a new failedAt; the identity index makes concurrent appends idempotent.
     // Both writes commit together, so no marker can suppress a record that was never persisted.
-    await kv.atomic(
-      [{ key: this.identityKey(record.messageId), versionstamp: null }],
-      [
-        { type: 'set', key: this.identityKey(record.messageId), value: this.recordKey(record) },
-        { type: 'set', key: this.recordKey(record), value: record },
-      ],
+    // Known-uncommitted SQLite busy errors retry within the bounded policy; CAS refusals
+    // (`{ ok: false }`) remain conflicts without retry, and unknown commit outcomes verify
+    // persisted state before deciding.
+    const atomic = kv.atomic.bind(kv);
+    const identityKey = this.identityKey(record.messageId);
+    const recordKey = this.recordKey(record);
+    await retryKnownUncommittedWrite(
+      () =>
+        atomic(
+          [{ key: identityKey, versionstamp: null }],
+          [
+            { type: 'set', key: identityKey, value: recordKey },
+            { type: 'set', key: recordKey, value: record },
+          ],
+        ),
+      {
+        verifyCommitted: async () => {
+          const existing = await kv.get<KvKey>(identityKey);
+          if (existing && sameKvKey(existing.value, recordKey)) {
+            return { committed: true, value: { ok: true as const } };
+          }
+          return { committed: false };
+        },
+      },
     );
   }
 
@@ -243,4 +262,16 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
   private identityKey(messageId: string): KvKey {
     return [DLQ_IDENTITY_PREFIX, this.queueName, messageId];
   }
+}
+
+function sameKvKey(left: KvKey, right: KvKey): boolean {
+  return left.length === right.length &&
+    left.every((part, index) => equalKvKeyPart(part, right[index]));
+}
+
+function equalKvKeyPart(left: Deno.KvKeyPart, right: Deno.KvKeyPart): boolean {
+  if (left instanceof Uint8Array && right instanceof Uint8Array) {
+    return left.length === right.length && left.every((byte, index) => byte === right[index]);
+  }
+  return Object.is(left, right);
 }

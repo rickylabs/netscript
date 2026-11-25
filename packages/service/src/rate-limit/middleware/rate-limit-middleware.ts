@@ -13,7 +13,7 @@ const RATE_LIMIT_LOGGER = createPackageLogger('service');
  * requests perform no store IO. Selected routes share the quota of each key.
  * Custom keys override address resolution; absent socket metadata shares `unknown`.
  *
- * @param options - Routes, fixed-window quota, store, and optional client key/clock.
+ * @param options - Routes, quota parameters, store, and optional client key/clock.
  * @returns Middleware that reserves a slot before calling the next stage.
  * @example
  * ```ts
@@ -29,6 +29,7 @@ const RATE_LIMIT_LOGGER = createPackageLogger('service');
 export function createRateLimitMiddleware(options: ServiceRateLimitOptions): ServiceMiddleware {
   const { limit, windowMs, store, key, trustProxy } = options;
   rateLimitWindow({ key: '', limit, windowMs, now: 0 });
+  store.validate?.({ limit, windowMs });
   const ipv6Prefix = options.ipv6Prefix ?? 64;
   if (!Number.isInteger(ipv6Prefix) || ipv6Prefix < 0 || ipv6Prefix > 128) {
     throw new RangeError('Rate-limit ipv6Prefix must be an integer from 0 to 128');
@@ -84,9 +85,10 @@ export function createRateLimitMiddleware(options: ServiceRateLimitOptions): Ser
       signal: context.req.raw.signal,
     });
     if (!decision.allowed) {
+      const retryAt = decision.retryAt ?? decision.resetAt;
       context.header(
         'Retry-After',
-        String(Math.max(1, Math.ceil((decision.resetAt - now()) / 1000))),
+        String(Math.max(1, Math.ceil((retryAt - now()) / 1000))),
       );
       return context.json({ error: 'RATE_LIMITED' }, 429);
     }

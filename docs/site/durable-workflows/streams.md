@@ -67,7 +67,7 @@ one path and one wire format.
   {
     label: "Consume over HTTP/SSE (Fresh client)",
     lang: "ts",
-    code: "// islands/ExecutionsView.tsx — read the durable log directly\nimport { buildStreamUrl, getStreamsUrl } from '@netscript/plugin-streams-core';\nimport { bindStreamEventSourceV1 } from '@netscript/fresh/streams';\n\n// Native EventSource needs the real stream route, an opaque replay offset, and\n// live=sse. It cannot attach arbitrary authorization headers, so use this from\n// a same-origin/cookie-compatible route or proxy when the service is protected.\nconst url = new URL(buildStreamUrl('/workers/executions', getStreamsUrl()));\nurl.searchParams.set('offset', '-1');\nurl.searchParams.set('live', 'sse');\nconst source = new EventSource(url);\n\nconst latest = new Map<string, unknown>();\nconst binding = bindStreamEventSourceV1({\n  source,\n  onEvent(event) {\n    // The helper registers named data/control listeners and validates both\n    // payload schemas before delivering this exhaustive outcome union.\n    if (event.event === 'error') { latest.set('$error', event.payload); return; }\n    if (event.event !== 'data') return; // control / derived heartbeat\n    for (const change of event.payload) { // data is always an ordered array\n      if (change.headers.operation === 'delete') latest.delete(change.key);\n      else latest.set(change.key, change.value);\n    }\n  },\n});\n\n// An island should call binding.dispose() from its effect cleanup. This plain\n// browser example closes on page teardown; W3-A owns reconnect policy.\naddEventListener('pagehide', () => binding.dispose(), { once: true });"
+    code: "// islands/ExecutionsView.tsx — read the durable log directly\nimport { buildStreamUrl, getStreamsUrl } from '@netscript/plugin-streams-core';\nimport { bindStreamEventSourceV1 } from '@netscript/fresh/streams';\n\n// This example uses a public stream. Authorize each connection and replay\n// for a protected stream. For bearer headers, use the reader header resolver\n// shown below because native EventSource cannot attach arbitrary headers.\nconst url = new URL(buildStreamUrl('/workers/executions', getStreamsUrl()));\nurl.searchParams.set('offset', '-1');\nurl.searchParams.set('live', 'sse');\nconst source = new EventSource(url);\n\nconst latest = new Map<string, unknown>();\nconst binding = bindStreamEventSourceV1({\n  source,\n  onEvent(event) {\n    // The helper registers named data/control listeners and validates both\n    // payload schemas before delivering this exhaustive outcome union.\n    if (event.event === 'error') { latest.set('$error', event.payload); return; }\n    if (event.event !== 'data') return; // control / derived heartbeat\n    for (const change of event.payload) { // data is always an ordered array\n      if (change.headers.operation === 'delete') latest.delete(change.key);\n      else latest.set(change.key, change.value);\n    }\n  },\n});\n\n// An island should call binding.dispose() from its effect cleanup. This plain\n// browser example closes on page teardown.\naddEventListener('pagehide', () => binding.dispose(), { once: true });"
   }
 ] }) }}
 
@@ -414,9 +414,97 @@ in the retained log, but this is not a separate progress-history API.
 
 ## Known limitations
 
-{{ comp callout { type: "warning", title: "Local HTTP limits stream consumers" } }}
-The local AppHost serves the generated app over <code>http://</code>. Under HTTP/1.1, browsers typically allow about six concurrent connections per origin, so several long-lived HTTP/SSE streams from one Fresh page can starve later requests or stream subscriptions. Use HTTPS for HTTP/2 when a local dashboard needs many simultaneous stream consumers.
-{{ /comp }}
+### Measured subscriber workload
+
+Run the [Streams subscriber benchmark](https://github.com/rickylabs/netscript/tree/main/tools/streams-subscriber-capacity)
+from the repository root on Linux:
+
+```sh
+deno run -A --frozen tools/streams-subscriber-capacity/main.ts
+```
+
+One isolated companion used a file-backed store in a temporary directory. Readers, the producer,
+and the harness ran co-located in one process against the separate companion process. Readers used
+HTTP/1.1 SSE over loopback. Each phase opened its readers and waited for each opening control.
+The harness then offered one small numbered upsert per second for 60 seconds, round-robin
+across that phase's streams. It counted a delivery when the reader received the committing
+control. The slow-reader layout delayed one client's processing by 250 ms per SSE frame.
+
+All 9 trials completed on Deno 2.9.5 on Linux x86_64 with
+16 available logical CPUs and 92.1 GiB of reported system memory. The trials recorded
+3,180 verified deliveries, 0 delivery gaps, 0 duplicates, 0 out-of-order commits, and 0 reconnects.
+All 540 offered writes across the 9 trials were acknowledged on the first attempt within 60.1 s
+(maximum 60,009.1 ms for the 60th one-second offer). Latency includes the time from enqueue
+through the last expected reader’s committing control.
+
+| Layout | Readers | Streams | Deliveries | Append to last reader p50 / p95 / max (ms) | Open SSE responses / waiters after reader cancellation and explicit stream close |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Single | 1 | 1 | 60 | 7.7 / 70.7 / 118.7 | 0 / 0 |
+| Single | 8 | 1 | 480 | 5.8 / 11.7 / 73.7 | 0 / 0 |
+| Single | 32 | 1 | 1,920 | 9.6 / 22.2 / 26.2 | 0 / 0 |
+| Spread | 1 | 1 | 60 | 4.2 / 10.3 / 23.5 | 0 / 0 |
+| Spread | 8 | 8 | 60 | 4.3 / 43.4 / 140.5 | 0 / 0 |
+| Spread | 32 | 8 | 240 | 5.2 / 18.9 / 32.6 | 0 / 0 |
+| Spread, one slow | 1 | 1 | 60 | 506.7 / 520.0 / 596.0 | 0 / 0 |
+| Spread, one slow | 8 | 8 | 60 | 5.2 / 510.1 / 520.2 | 0 / 0 |
+| Spread, one slow | 32 | 8 | 240 | 5.6 / 510.3 / 527.5 | 0 / 0 |
+
+Each table row is one trial (60 offered writes over 60 seconds) on a shared Linux host.
+Single-trial tail latency reflects host scheduling noise and synchronous storage persistence
+(LMDB metadata and segment writes) on the append path, so a smaller reader count can show a
+higher isolated spike than a larger count in one run. In the slow-reader layouts, delaying one
+client by 250 ms per SSE frame adds about 500 ms across each revision’s data and
+committing-control frames on that reader’s stream: every revision in the 1-stream layout, and one
+of eight streams in the 8-stream layouts (leaving median latency low while p95 and max reflect
+the delayed stream).
+
+The largest sampled companion RSS was 235.3 MiB, the highest phase-average CPU use was
+1.90% of one logical CPU, and the largest sampled file-descriptor count was 146.
+The largest end-of-window logical storage size was 63,443 bytes. The companion exited
+cleanly and the temporary directory was removed.
+
+**Per-reader access-time persistence ([#2661](https://github.com/rickylabs/netscript/issues/2661),
+resolved by [#2662](https://github.com/rickylabs/netscript/pull/2662)).** Earlier file-backed
+builds synchronously wrote per-reader access-time metadata on the append path, causing
+multi-reader append backlogs under fan-out. [#2662](https://github.com/rickylabs/netscript/pull/2662)
+resolved [#2661](https://github.com/rickylabs/netscript/issues/2661) by keeping per-reader access
+persistence off the append path. The measurements above come from the fixed file-backed companion;
+append latency still depends on the cost of synchronous storage persistence on the append path.
+
+These measurements describe this workload. Replays of larger histories, bursts, more active
+streams, and browser or ingress behavior each call for measurements under those conditions.
+Last-subscriber reclamation on a still-open idle topic is outside the measured workload.
+
+### Browser connection limits
+
+**Source and standards.** Over HTTP/1.1, browsers commonly allow about six concurrent
+connections per origin. Several long-lived `EventSource` subscriptions can occupy that
+pool and stall other requests to the same origin. Share one subscription within a page
+or a group of tabs with the same authorization, or use multiplexing when HTTP/2 or HTTP/3
+is negotiated end to end. HTTPS can still carry HTTP/1.1. Check the negotiated protocol
+on each connection in the serving path, including any proxy or load balancer. Over TLS,
+HTTP/2 typically uses ALPN, and HTTP/3 negotiates over QUIC with TLS.
+[Chromium socket pool](https://chromium.googlesource.com/chromium/src/%2B/HEAD/net/socket/client_socket_pool_manager.cc),
+[Firefox connection default (`network.http.max-persistent-connections-per-server`)](https://searchfox.org/firefox-release/source/modules/libpref/init/all.js),
+[HTTP/2 negotiation](https://www.rfc-editor.org/rfc/rfc9113.html#section-3.2),
+[HTTP/3 negotiation](https://www.rfc-editor.org/rfc/rfc9114.html#section-3.2).
+
+Each benchmark reader used an independent client. Its reader counts describe the load on
+one companion under the tested workload. The browser pool governs how many connections
+one browser can use for an origin.
+
+### Source-inspected resource limits
+
+The server in `@durable-streams/server@0.3.9/dist/index.js` keeps each SSE response open
+and the file store tracks caught-up waits by stream path. Replayed payloads also occupy
+memory while being read and sent. Size a deployment for its connection and file-descriptor
+budgets, write rate, fan-out, and replay depth, including the resources and limits of the
+client and any intermediary.
+[Upstream pin (`deno.lock`)](https://github.com/rickylabs/netscript/blob/main/deno.lock),
+[bounded segment reader (`bounded-segment-log.ts`)](https://github.com/rickylabs/netscript/blob/main/plugins/streams/services/src/bounded-segment-log.ts).
+
+For a screen that can refresh on an interval, the next access, or focus, see
+[how an open screen gets fresh data](/tutorials/live-dashboard/03-sdk-cache-first-query/#choose-how-an-open-screen-gets-fresh-data).
 
 ## Endpoints and manifest
 

@@ -238,6 +238,69 @@ cancellation to the host instead when the handler should finish and acknowledge 
 must respect their application's cancellation signal; the drain cannot terminate JavaScript or undo
 effects. First-party workers retain their existing per-delivery renewal and cancellation policy.
 
+## Local Deno KV concurrency and transient contention
+
+`DenoKvAdapter.listen(handler, { concurrency })` honors `ListenOptions.concurrency` (default `1`,
+positive safe integer through `2,147,483,647`; invalid values fail with `QueueConfigurationError`
+before opening KV connections). The bound covers **whole deliveries** — handler execution plus
+`ack`/`nack` settlement — including cancellation and drain. Excess deliveries on a file-backed
+database queue behind the registration's active slots while keeping their native KV delivery
+unacknowledged. Aborting `options.signal` on a live `DenoKvAdapter` (the path used by
+`Worker.pause()`) drains admitted deliveries quietly and parks queued work for that queue once in
+durable KV storage (`__netscript_kv_queue_parked`) at hop `0` while sibling routes remain live —
+eliminating periodic SQLite re-enqueue churn for the duration of the pause — and wakes parked
+envelopes atomically (`check + delete + enqueue`) on resume (`listen()`), `stop()`, `close()`, or
+startup after a crash. Permanent retirement (`stop()`, `Worker.stop()`, or closing an unpaused
+dispatcher listener) clears pause state so fresh work targeting the stopped queue while a sibling
+stays live follows the bounded reroute policy and dead-letters with reason `unroutable` without
+leaking any cross-restart parking flag.
+
+Local Deno KV queue writes, `KvDeadLetterStore.append`, and first-party worker settlement handle
+file-backed persistence contention according to commit certainty:
+
+- **Known-uncommitted SQLite lock contention** (`SQLITE_BUSY*`, `SQLITE_LOCKED*`, or locked-database
+  errors without an explicit non-busy SQLite code) retries within a bounded policy: up to 6 total
+  attempts with a 2,000 ms monotonic retry-start deadline (no retry begins at or after the deadline;
+  an already-started write completes unless the operation supports cancellation, so under sustained
+  contention where a single write takes longer than 2,000 ms before failing, no second attempt is
+  started), exponential backoff from 15 ms to 250 ms with equal jitter, and immediate cancellation
+  when aborted.
+- **Refused compare-and-swap preconditions** (`{ ok: false }` or claim-loss errors) stay conflicts
+  and are never retried as transient.
+- **Unknown commit outcomes** (including explicit non-busy SQLite codes such as `SQLITE_IOERR_WRITE`)
+  never trigger a blind replay:
+  - `DenoKvAdapter` and `KvQueueDispatcher` never retry an ambiguous `enqueue`, `nack({ requeue: true })`,
+    routing hop, parking write, or cancellation handback, and `DenoKvAdapter` retains any attempted
+    settlement promise so a failed explicit `nack` never triggers a second counted `nack`. Instead,
+    the callback rejects so Deno KV's native recovery retains the unacknowledged source receipt.
+    Delivery is explicitly **at least once**: if a write committed before failing or before a crash
+    prior to native acknowledgement, both the committed replacement and native source redelivery
+    can arrive (enveloped retries retain the same `messageId` so consumer idempotency deduplicates
+    them). Raw non-envelope legacy payloads always receive a fresh unique `messageId` on dequeue so
+    distinct legacy messages with identical content are never dropped; because raw legacy payloads
+    carry no transport-supplied identity, native redelivery after an ambiguous write is likewise
+    at-least-once and relies on consumer idempotency.
+  - `KvDeadLetterStore.append` verifies its identity index read-only instead of replaying writes.
+  - First-party workers verify ambiguous `markApplied` outcomes read-only inside
+    `KvWorkerIdempotencyStore` (matching the claim owner token with zero mutations) and verify
+    `executionState` transitions read-only, while keeping post-success telemetry and diagnostic
+    reporting best-effort behind the `executionSucceeded` latch so no post-success fault overwrites
+    a completed row, dead-letters, releases the claim, or triggers a counted `nack`.
+- **External-effect boundary & interim unconfirmed post-effect behavior:** Recoverable
+  known-uncommitted local settlement contention and verified ambiguous local commits execute the
+  provider call once with zero false dead letters while the worker stays alive. **Explicit interim
+  behavior:** if a post-effect worker settlement write (`idempotency.markApplied` or
+  `executionState.complete`) remains unconfirmed after bounded retries or an unverified unknown
+  commit outcome, the worker logs the failure and acknowledges the queue delivery without replaying
+  the external provider, leaving the execution row in `running`. Durable post-effect settlement
+  recovery (Case (a) completion repair and Case (b) quarantine with an in-process settlement-only
+  latch) is tracked in [#2667](https://github.com/rickylabs/netscript/issues/2667). Local worker
+  idempotency **cannot guarantee exactly-once external effects in general**: if the process dies
+  after an external provider succeeds and before local completion becomes durable, redelivery can
+  invoke the external provider again. End-to-end single-effect execution across crashes requires a
+  stable provider-side idempotency key or an atomic transactional boundary with the downstream
+  store.
+
 ## Compatibility
 
 Redis delayed-message promotion is at most once across listeners sharing a delayed key. The adapter

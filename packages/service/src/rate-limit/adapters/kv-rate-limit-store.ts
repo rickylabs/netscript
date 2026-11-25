@@ -1,34 +1,55 @@
 /** KV-backed quota reservations. @module */
 import type { KvKey, KvStore } from '@netscript/kv';
 import {
+  evaluateGcra,
+  gcraContentionFallback,
+  parseStoredGcraState,
+  prepareGcraRequest,
+  validateGcraPolicy,
+} from '../domain/gcra.ts';
+import {
+  normalizeRateLimitPolicy,
   type RateLimitDecision,
+  type RateLimitPolicy,
   type RateLimitRequest,
   rateLimitWindow,
+  validateRateLimitBounds,
 } from '../domain/rate-limit.ts';
-import type { RateLimitStore } from '../ports/rate-limit-store.ts';
+import type { RateLimitPolicyConfig, RateLimitStore } from '../ports/rate-limit-store.ts';
 
 /** Configuration for an isolated KV quota namespace. */
 export interface KvRateLimitStoreOptions {
-  /** Dedicated namespace; separate independent limiters with different prefixes. */
+  /**
+   * Dedicated namespace; separate independent limiters and policy changes with
+   * prefixes that are disjoint after backend serialization.
+   */
   readonly prefix: KvKey;
   /** Maximum read/CAS attempts per reservation. Default 8, maximum 32. */
   readonly maxAttempts?: number;
+  /** Quota policy. Defaults to `{ kind: 'fixed-window' }`. */
+  readonly policy?: RateLimitPolicy;
 }
 
 /**
- * Creates a fixed-window store using `@netscript/kv` version checks and `expireIn`.
- * The caller owns the KV connection. Failed CAS attempts are retried within a
+ * Creates a KV-backed quota store using `@netscript/kv` version checks and `expireIn`.
+ * Defaults to epoch-aligned fixed windows; pass `policy: { kind: 'gcra', burst? }`
+ * for alignment-independent rolling quotas with single-key CAS and fixed skew-bounded
+ * retention. The caller owns the KV connection. Failed CAS attempts are retried within a
  * fixed budget, then rejected conservatively. Missing atomic support fails at construction.
  *
  * @param kv - KV store with atomic compare-and-set support.
- * @param options - Dedicated key prefix and bounded retry budget.
+ * @param options - Dedicated key prefix, bounded retry budget, and optional quota policy.
  * @returns Atomic quota store; it never closes the supplied KV connection.
  * @example
  * ```ts
  * import { getKv } from '@netscript/kv';
  * import { createKvRateLimitStore } from '@netscript/service/rate-limit';
  * const kv = await getKv();
- * const store = createKvRateLimitStore(kv, { prefix: ['device', 'throttle'] });
+ * const store = createKvRateLimitStore(kv, {
+ *   prefix: ['device', 'throttle'],
+ *   policy: { kind: 'gcra' },
+ * });
+ * store.validate?.({ limit: 5, windowMs: 60_000 });
  * await store.consume({ key: '192.0.2.1', limit: 5, windowMs: 60_000, now: Date.now() });
  * ```
  */
@@ -43,27 +64,70 @@ export function createKvRateLimitStore(
   if (!Number.isSafeInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 32) {
     throw new RangeError('Rate-limit maxAttempts must be an integer from 1 to 32');
   }
+  const policy = normalizeRateLimitPolicy(options.policy);
   const atomic = kv.atomic.bind(kv);
+
+  if (policy.kind === 'fixed-window') {
+    return {
+      validate(config: RateLimitPolicyConfig): void {
+        validateRateLimitBounds(config.limit, config.windowMs);
+      },
+      async consume(request: RateLimitRequest): Promise<RateLimitDecision> {
+        const resetAt = rateLimitWindow(request);
+        const key: KvKey = [...prefix, request.key, request.windowMs, resetAt];
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+          request.signal?.throwIfAborted();
+          const entry = await kv.get<number>(key);
+          request.signal?.throwIfAborted();
+          const count = entry?.value ?? 0;
+          if (!Number.isSafeInteger(count) || count < 0) {
+            throw new TypeError('Invalid rate-limit counter in KV');
+          }
+          if (count >= request.limit) return { allowed: false, resetAt };
+          const result = await atomic(
+            [{ key, versionstamp: entry?.versionstamp ?? null }],
+            [{ type: 'set', key, value: count + 1, expireIn: resetAt - request.now }],
+          );
+          if (result.ok) return { allowed: true, resetAt };
+        }
+        return { allowed: false, resetAt };
+      },
+    };
+  }
+
   return {
+    validate(config: RateLimitPolicyConfig): void {
+      validateGcraPolicy(config.limit, config.windowMs, policy.burst);
+    },
     async consume(request: RateLimitRequest): Promise<RateLimitDecision> {
-      const resetAt = rateLimitWindow(request);
-      const key: KvKey = [...prefix, request.key, request.windowMs, resetAt];
+      const prepared = prepareGcraRequest(request, policy.burst);
+      const key: KvKey = [
+        ...prefix,
+        'v1',
+        'gcra',
+        request.key,
+        request.windowMs,
+        request.limit,
+        prepared.effectiveBurst,
+      ];
+      let lastObservedResetAt = prepared.defaultResetAt;
       for (let attempt = 0; attempt < maxAttempts; attempt++) {
         request.signal?.throwIfAborted();
-        const entry = await kv.get<number>(key);
+        const entry = await kv.get<unknown>(key);
         request.signal?.throwIfAborted();
-        const count = entry?.value ?? 0;
-        if (!Number.isSafeInteger(count) || count < 0) {
-          throw new TypeError('Invalid rate-limit counter in KV');
-        }
-        if (count >= request.limit) return { allowed: false, resetAt };
+        const stored = entry === null
+          ? undefined
+          : parseStoredGcraState(entry.value, request.limit);
+        const evaluation = evaluateGcra(prepared, stored);
+        lastObservedResetAt = evaluation.lastObservedResetAt;
+        if (!evaluation.allowed) return evaluation.decision;
         const result = await atomic(
           [{ key, versionstamp: entry?.versionstamp ?? null }],
-          [{ type: 'set', key, value: count + 1, expireIn: resetAt - request.now }],
+          [{ type: 'set', key, value: evaluation.nextState, expireIn: evaluation.expireIn }],
         );
-        if (result.ok) return { allowed: true, resetAt };
+        if (result.ok) return evaluation.decision;
       }
-      return { allowed: false, resetAt };
+      return gcraContentionFallback(prepared, lastObservedResetAt);
     },
   };
 }

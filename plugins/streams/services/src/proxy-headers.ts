@@ -89,22 +89,28 @@ export function sanitizeProxyResponseHeaders(source: Headers): Headers {
  */
 export function restreamUpstreamBody(
   upstreamBody: ReadableStream<Uint8Array>,
+  beforeChunk?: () => Promise<void> | undefined,
 ): ReadableStream<Uint8Array> {
   const reader = upstreamBody.getReader();
+  let canceled = false;
   return new ReadableStream<Uint8Array>({
     async pull(controller) {
       try {
         const { done, value } = await reader.read();
+        if (canceled) return;
         if (done) {
           controller.close();
           reader.releaseLock();
           return;
         }
-        controller.enqueue(value);
+        const pending = beforeChunk?.();
+        if (pending) await pending;
+        if (!canceled) controller.enqueue(value);
       } catch (error) {
         // The upstream read failed (e.g. the upstream connection dropped):
         // surface it as a stream error and release the reader lock.
-        controller.error(error);
+        if (!canceled) controller.error(error);
+        await reader.cancel(error).catch(() => undefined);
         try {
           reader.releaseLock();
         } catch {
@@ -117,7 +123,8 @@ export function restreamUpstreamBody(
       // mid-stream and `Deno.serve` cancelled the response body. Cancel the
       // upstream reader so the upstream `fetch` connection is released cleanly
       // instead of being abandoned and surfacing as an uncaught `AbortError`.
-      return reader.cancel(reason);
+      canceled = true;
+      return reader.cancel(reason).finally(() => reader.releaseLock());
     },
   });
 }
@@ -132,8 +139,11 @@ export function restreamUpstreamBody(
  * upstream reader cleanly rather than aborting the upstream `fetch`. A null
  * upstream body (e.g. a `204`/`304`) is forwarded as `null` unchanged.
  */
-export function sanitizeProxyResponse(upstream: Response): Response {
-  const body = upstream.body === null ? null : restreamUpstreamBody(upstream.body);
+export function sanitizeProxyResponse(
+  upstream: Response,
+  beforeChunk?: () => Promise<void> | undefined,
+): Response {
+  const body = upstream.body === null ? null : restreamUpstreamBody(upstream.body, beforeChunk);
   return new Response(body, {
     status: upstream.status,
     statusText: upstream.statusText,

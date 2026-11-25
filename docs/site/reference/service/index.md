@@ -121,23 +121,27 @@ before deferred health routes and both RPC/REST projections, including when adde
 be limited. Repeated calls add stages. Configure health checks before building.
 
 The root also exports `ServiceRateLimitOptions`, `ServiceProxyTrust`, `RateLimitStore`,
-`RateLimitRequest`, and `RateLimitDecision` for builder/port contracts.
+`RateLimitPolicyConfig`, `RateLimitRequest`, and `RateLimitDecision` for builder/port contracts.
 
 The `@netscript/service/rate-limit` subpath exposes:
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `createRateLimitMiddleware` | function | Creates route-scoped quota middleware returning JSON 429 and whole-second Retry-After. |
-| `createKvRateLimitStore` | function | Uses KV atomic compare-and-set plus TTL in a dedicated prefix, with a bounded retry budget. |
-| `createMemoryRateLimitStore` | function | Creates a synchronous, capped development store with bounded TTL eviction. |
+| `RATE_LIMIT_POLICY_KINDS` | const | Supported first-party quota policy kinds: `['fixed-window', 'gcra']`. |
+| `RateLimitPolicyKind` | type alias | Union of supported policy kind identifiers (`'fixed-window' \| 'gcra'`). |
+| `RateLimitPolicy` | type alias | Discriminated union selecting `{ kind: 'fixed-window' }` (default) or `{ kind: 'gcra', burst? }`. |
+| `RateLimitPolicyConfig` | interface | Static `{ limit, windowMs }` tuple validated synchronously at startup by `RateLimitStore.validate?`. |
+| `createRateLimitMiddleware` | function | Creates route-scoped quota middleware invoking `store.validate?`, returning JSON 429 and whole-second Retry-After from `retryAt ?? resetAt`. |
+| `createKvRateLimitStore` | function | Uses KV atomic compare-and-set plus TTL in a dedicated prefix, supporting fixed-window (default) and opt-in GCRA rolling policies with a bounded retry budget. |
+| `createMemoryRateLimitStore` | function | Creates a synchronous, capped development store supporting fixed-window (default) and opt-in GCRA rolling policies with bounded TTL eviction. |
 | `resolveServiceClientAddress` | function | Resolves the socket peer or explicitly trusted XFF hops, walking right to left. |
 | `ServiceRateLimitOptions` | interface | `routes`, `limit`, `windowMs`, `store`, and optional `key`, `trustProxy`, `ipv6Prefix`, `now`. |
 | `ServiceProxyTrust` | type alias | `false` or an address predicate identifying trusted proxy hops; default off. |
-| `RateLimitStore` | interface | Port reserving one slot atomically with `consume(request)`. |
-| `RateLimitRequest` | interface | Key, quota, window, epoch milliseconds, and optional request cancellation signal. |
-| `RateLimitDecision` | interface | Whether a slot was reserved and the epoch-millisecond window end. |
-| `KvRateLimitStoreOptions` | interface | Dedicated `prefix` and optional `maxAttempts` (default 8, maximum 32). |
-| `MemoryRateLimitStoreOptions` | interface | Optional retained-key cap `maxKeys` (default 10,000). |
+| `RateLimitStore` | interface | Port reserving one slot atomically with `consume(request)` and optional zero-IO startup hook `validate?(config)`. |
+| `RateLimitRequest` | interface | Key, quota budget (`limit`, `windowMs`), epoch milliseconds, and optional request cancellation signal. |
+| `RateLimitDecision` | interface | Reservation outcome (`allowed`), full quota recovery (`resetAt`), and optional GCRA `retryAt` (exact next eligible ms on quota exhaustion; advisory on contention/capacity). |
+| `KvRateLimitStoreOptions` | interface | Dedicated `prefix`, optional `maxAttempts` (default 8, maximum 32), and optional `policy`. |
+| `MemoryRateLimitStoreOptions` | interface | Optional retained-key cap `maxKeys` (default 10,000) and optional `policy`. |
 
 The subpath also re-exports the first-party integration types `ServiceContext`,
 `ServiceEnvironment`, `ServiceMiddleware`, `KvStore`, `KvKey`, `KvEntry`, `KvListOptions`,
@@ -145,11 +149,18 @@ The subpath also re-exports the first-party integration types `ServiceContext`,
 The `KvStore` port references the six KV types through its public methods, so they are re-exported
 with it rather than duplicated.
 
-Selected routes share one quota per key and epoch-aligned window. Paths are exact or end in `/*` for
-a subtree (including its root). Rejections return `{ error: 'RATE_LIMITED' }` with `429` and
-`Retry-After` rounded up to the remaining whole seconds. Unmatched paths perform no store IO.
-Separate policies use separate memory stores or KV prefixes unless sharing a quota is intended. CAS
-retry exhaustion or memory capacity pressure rejects conservatively; store failures throw.
+Selected routes share one quota per key under the store's configured policy (epoch-aligned fixed
+windows by default, or opt-in rolling GCRA via `policy: { kind: 'gcra', burst? }`). Paths are exact
+or end in `/*` for a subtree (including its root). Rejections return `{ error: 'RATE_LIMITED' }`
+with `429` and `Retry-After` rounded up to remaining whole seconds from `decision.retryAt ?? decision.resetAt`.
+Unmatched paths perform no store IO. Separate policies use separate memory stores or
+serialization-disjoint KV prefixes unless sharing a quota is intended. Under GCRA, callers sharing a
+store/prefix use one coherent `(limit, windowMs, burst)` tuple, KV writes add a fixed `5_000` ms
+clock-skew retention margin (matched by memory rotating eviction), and startup validation enforces
+the 365-day (`31_536_000_000` ms) retention ceiling synchronously with zero KV IO. Shared-KV
+confirmed-write certification on `RedisKvAdapter` requires Redis `EXEC` command-error rejection
+(`#2648`). CAS retry exhaustion or memory capacity pressure rejects conservatively; store failures
+throw.
 
 `ServiceEnvironment` is exported from the root entrypoint. `ServiceApp.fetch(request, env)` and
 `ServiceApp.request(input, init, env)` accept it. The listener supplies `remoteAddr` on plain and

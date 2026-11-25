@@ -27,6 +27,7 @@ import {
   type KvQueueDispatcher,
   type KvQueueDispatcherLease,
 } from './_kv-queue/dispatcher.ts';
+import { validateKvQueueConcurrency } from './_kv-queue/routes.ts';
 import { KvDeadLetterStore } from './kv-dead-letter-store.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
@@ -87,6 +88,8 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
   private activeListener:
     | { readonly controller: AbortController; readonly done: Promise<void> }
     | null = null;
+  private pauseToken: symbol | null = null;
+  private stopping = false;
   private readonly queueName: string;
   private readonly path?: string;
   private readonly useShared: boolean;
@@ -239,6 +242,9 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
   /**
    * Listen for messages addressed to this queue name until stopped or aborted.
    *
+   * Honors `options.concurrency` (default `1`) across whole deliveries (handler
+   * execution plus `ack`/`nack`), including cancellation and drain.
+   *
    * @param handler - Async callback invoked for each message.
    * @param options - Listener concurrency and cancellation options.
    */
@@ -246,23 +252,43 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     handler: (message: T, context: MessageContext) => Promise<void>,
     options?: ListenOptions,
   ): Promise<void> {
-    const dispatcher = await this.ensureDispatcher();
+    const concurrency = validateKvQueueConcurrency(options?.concurrency);
 
     if (this.activeListener) {
       throw new QueueError('Queue is already listening', QueueErrorCode.CONFIGURATION_ERROR);
     }
 
+    if (options?.signal?.aborted) {
+      return;
+    }
+
+    const dispatcher = await this.ensureDispatcher();
+    if (this.pauseToken) {
+      dispatcher.clearPause(this.queueName, this.pauseToken);
+      this.pauseToken = null;
+    }
     const controller = new AbortController();
     const signal = options?.signal;
-    const stopListening = () => controller.abort();
+    const stopListening = () => {
+      // Aborting `options.signal` without calling `stop()` pauses intake while this adapter
+      // remains alive and leased (the path used by `Worker.pause()`). Mark paused before
+      // closing the registration so waiting deliveries park at hop 0 instead of dead-lettering
+      // while sibling queues stay live; `stop()` clears this token for permanent retirement.
+      if (!this.stopping && this.pauseToken === null) {
+        this.pauseToken = Symbol('deno-kv-pause');
+        dispatcher.markPaused(this.queueName, this.pauseToken);
+      }
+      controller.abort();
+    };
     signal?.addEventListener('abort', stopListening, { once: true });
     if (signal?.aborted) {
-      controller.abort();
+      stopListening();
     }
     const done = dispatcher.listen(
       this.queueName,
       (envelope) => this.deliver(envelope, handler),
       controller.signal,
+      concurrency,
     );
     const listener = { controller, done };
     this.activeListener = listener;
@@ -292,18 +318,27 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
    * adapter's claim on the shared database connection.
    */
   async stop(): Promise<void> {
-    const listener = this.activeListener;
-    this.activeListener = null;
-    if (listener) {
-      listener.controller.abort();
-      await listener.done.catch(() => undefined);
+    this.stopping = true;
+    try {
+      const lease = this.lease;
+      if (this.pauseToken && lease) {
+        lease.dispatcher.clearPause(this.queueName, this.pauseToken);
+      }
+      this.pauseToken = null;
+      const listener = this.activeListener;
+      this.activeListener = null;
+      if (listener) {
+        listener.controller.abort();
+        await listener.done.catch(() => undefined);
+      }
+      this.lease = null;
+      if (!this.explicitDeadLetterStore) {
+        this.deadLetterStore = null;
+      }
+      await lease?.release();
+    } finally {
+      this.stopping = false;
     }
-    const lease = this.lease;
-    this.lease = null;
-    if (!this.explicitDeadLetterStore) {
-      this.deadLetterStore = null;
-    }
-    await lease?.release();
   }
 
   /**
@@ -343,8 +378,8 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
       await handler(payload, context);
       await context.ack();
     } catch {
-      // Publish the counted retry before native acknowledgement; failed persistence
-      // still throws to the native queue so the original delivery is retained.
+      // Reuse any already-attempted settlement or publish one atomic requeue before native
+      // acknowledgement; an unresolved failure rejects so native recovery retains the receipt.
       await context.nack({ requeue: true });
     }
   }
@@ -362,10 +397,7 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
   ): MessageContext {
     let settlement: Promise<void> | undefined;
     const settle = (operation: () => Promise<void>): Promise<void> => {
-      return settlement ??= operation().catch((error: unknown) => {
-        settlement = undefined;
-        throw error;
-      });
+      return settlement ??= operation();
     };
     return createMessageContext(
       messageId,
@@ -376,11 +408,14 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
       (options: NackOptions = {}) =>
         settle(async () => {
           if (options.requeue ?? true) {
-            const addressed = envelope ?? {
-              ...createEnvelope(payload, { headers }, this.queueName),
-              messageId,
-              enqueuedAt: enqueuedAt.toISOString(),
-            };
+            const addressed: MessageEnvelope<unknown> & { queueName: string } = envelope
+              ? { ...envelope, queueName: envelope.queueName ?? this.queueName }
+              : {
+                ...createEnvelope(payload, { headers }, this.queueName),
+                messageId,
+                enqueuedAt: enqueuedAt.toISOString(),
+                queueName: this.queueName,
+              };
             const dispatcher = await this.ensureDispatcher();
             await dispatcher.enqueue({
               ...addressed,
