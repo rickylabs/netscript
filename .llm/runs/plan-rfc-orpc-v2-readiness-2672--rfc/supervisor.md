@@ -8,15 +8,24 @@
 - **Base commit:** `87965d800b7d61312e8612c82bdb0cb98bdf5b29` (`main`)
 - **Milestone:** `0.0.10` (Phase 0a targets `0.0.10`; Phase 2 cut-over targets `0.1.0`)
 - **Primary deliverable:** `rfcs/0000-orpc-v2-readiness.md`
-- **Status:** Round-1 fix complete addressing all 8 Fable 5.2 blockers (B1–B8) and advisory items; ready for Round-2 review by Gemini Hydrogen.
+- **Status:** Round-2 fix complete addressing all 5 Gemini Hydrogen Round-2 blockers (N1–N5) and all 3 advisories; ready for Round-3 PLAN-EVAL by Gemini Hydrogen.
 
 ## Route & Lane Assignment
 
 | Role | Assigned model / lane | Notes |
 | --- | --- | --- |
-| Author / research lane | Neon | Drafted RFC B + throwaway `2.0.0-beta.53` prototype (deleted cleanly); completed Round-1 fixes + standalone v2 behavior probes (`probes/v2-behavior-probes.ts`); zero committed edits to `packages/`, `plugins/`, `docs/site/`, `.github/`, `deno.json`, or `deno.lock`. |
+| Author / research lane | Neon | Drafted RFC B + throwaway `2.0.0-beta.53` prototype (deleted cleanly); completed Round-1 (B1–B8) and Round-2 (N1–N5 + Advisories #1–#3) fixes + standalone v2 behavior probes (`probes/v2-behavior-probes.ts`); zero committed edits to `packages/`, `plugins/`, `docs/site/`, `.github/`, `deno.json`, or `deno.lock`. |
 | Round-1 reviewer | Fable 5.2 | Returned `CHANGES_REQUESTED` (`issuecomment-7170652451`) with 8 blockers (B1–B8), `1.16.5` verification, and advisory items. |
-| Round-2+ reviewer | Gemini Hydrogen | Re-checks Round-1 revision and subsequent rounds per owner routing. |
+| Round-2+ reviewer | Gemini Hydrogen | Round-2 PLAN-EVAL (`6501e41c`) confirmed B3/B5/B7 resolved, B1/B2/B4/B6/B8 partial, and raised N1–N5 + 3 advisories; re-checks Round-2 revision in Round 3. |
+
+## Round-2 Blocker Closure Checklist (N1–N5 + Advisories #1–#3)
+
+- [x] **N1 (B1 CORS preflight):** Made Phase 0a (`0.0.10`) server-only (`withCors({ allowHeaders })` auto-includes `X-NetScript-RPC-Protocol`, v1 `OPTIONS`-exempt reverse `426` guard, `Vary` on `200`/`426`, zero new client header so cross-origin `GET` stays preflight-free and `OMITTED_CONTRIBUTION_BASELINE` stays untouched); at `0.1.0`, v2 `RPCLink` emits `orpc-v2`, `RPCHandlerConfig.cors` auto-includes the header, v2 `426` guard exempts `OPTIONS` (returning `204`), and emits `Vary: X-NetScript-RPC-Protocol` on `200` GET & `426`. Proven failing-then-passing in Probe B1.
+- [x] **N2 (Phase 0a item 4 + B4):** Kept v1 runtime interceptor attachment on `rootInterceptors` behind shared NetScript helper `attachRootHandlerInterceptor` (flipping to `routingInterceptors` only at `0.1.0`), mounting plugins into a real `RPCHandler` in `plugin_test.ts:101`; moved `500` unmapped-code normalization to unconditional `createDefault500ErrorStatusMap` Proxy on `createRPCHandler`/`createOpenAPIHandler` (works even without `serviceName` or with `errorHandling: false`, preserves custom `err.code`); wired `errorStatusMap` into `TracingPluginOptions`/`LoggingPluginOptions`/`ErrorHandlingPluginOptions`; added full v1-vs-v2 interceptor, `error.status`, `resolveErrorHttpStatus`, conflict-merge, and standalone `500` checks to Probe B4.
+- [x] **N3 (B2 verbs & `allowGetRpc: false` pairing):** Specified mandatory paired client `transportPolicy: { method: () => 'POST' }` when a service sets `allowGetRpc: false`; preserved `POST`/`PUT`/`PATCH`/`DELETE` (`RPC_DEFAULT_ALLOW_METHODS`) + contract `GET`/`HEAD` in server `allowMethods` and `GET`/`HEAD→GET`/`POST`/`PUT`/`PATCH`/`DELETE` in SDK inference (`transport-policy_test.ts:35`, `create-crud-contract.ts:367-378`). Proven in Probe B2.
+- [x] **N4 (B6 server-free contracts, `policyMeta`, & key alignment):** Removed `@orpc/openapi/extensions/route` from `@netscript/contracts` (avoiding `@orpc/server` runtime dependency in browser bundles and `import type`/direct `oc` hazards); adopted server-free `routeMeta` (`defineMeta('~openapi', ...)`), `accessMeta` (`defineMeta('access', ...)` → `.meta.access`), and `policyMeta` (`defineMeta('policy', ...)` → `.meta.policy`) keeping `packages/contracts/deno.json` strictly on `[@orpc/contract, zod]`. Proven against `getOpenAPIMeta` and `OpenAPIGenerator` in Probe B6.
+- [x] **N5 (B8 e2e lock fixtures & scoped CI gate):** Updated Phase 0a item 1 so isolated temp-dir tests (`locked-probes_test.ts`, `install-generated-probe_test.ts`) read an active locked `@orpc/client` entry before pruning `1.15.0`, and scoped `.llm/tools/deps/scan-npm-catalog-compliance.ts` CI failures specifically to `@orpc/*`.
+- [x] **Advisories #1–#3:** Refreshed PR `#2674` body with non-empty `## Breaking change and migration` section passing `check-breaking-migration.ts`; aligned §5 with RFC A head `bd8d51c0` & Prior Art with PR `#2659` head `f8c8d8fd`; updated Unresolved Question #1, `0.0.12+` `release/orpc-v1` numbering, and `plugins/sagas/services/src/routers/v1-handlers.ts:193`.
 
 ## Round-1 Blocker Closure Checklist
 

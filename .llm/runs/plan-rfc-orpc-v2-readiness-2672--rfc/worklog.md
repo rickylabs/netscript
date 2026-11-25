@@ -45,3 +45,30 @@
 | Workspace `deno.json` & `deno.lock` untouched | `git status -s` | PASS (docs & `.llm/runs/` only) |
 | Scoped internal doc links | `mise exec -- deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --root rfcs/0000-orpc-v2-readiness.md --pretty` | PASS (`broken-links=0 broken-anchors=0`) |
 | Privacy & closing-keyword scan | Pattern scan on all modified/added files | PASS (`0 hits`) |
+
+## Round-2 Review (Gemini Hydrogen) & Round-2 Fix Evidence Ledger
+
+- Gemini Hydrogen Round-2 PLAN-EVAL (reviewed head `6501e41c1793af2564094fccb9b9d6b390f79094`) confirmed **B3**, **B5**, and **B7** resolved, **B1**, **B2**, **B4**, **B6**, and **B8** partial, reproduced the `186 raw` → `99 unique sites` in `25 files` count and `--isolatedDeclarations` trial, and raised five blocking findings (**N1–N5**) plus three advisories.
+
+### 1. Additional Source & Upstream Verification (Round 2)
+
+- Re-inspected `packages/service/src/middleware/service-cors.ts:17-26`, `packages/sdk/tests/integration/client-contribution-adapter_test.ts:25-30,389-406` (`OMITTED_CONTRIBUTION_BASELINE`), `packages/telemetry/tests/orpc/plugin_test.ts:85-130`, `packages/telemetry/src/orpc/{tracing-plugin.ts:23-65,276,error-plugin.ts:164-275}`, `packages/service/src/primitives/handlers.ts:77-191`, `packages/sdk/src/internal/transport-policy.ts`, `packages/sdk/tests/transport-policy_test.ts:1-60`, `packages/contracts/{deno.json,src/domain/procedure-meta.ts,src/application/contract-primitives.ts,crud/create-crud-contract.ts:351-378,tests/procedure-meta-independence_test.ts}`, `packages/sdk/src/internal/client-contributions/stable-v1-adapter.ts:64-106`, `plugins/sagas/services/src/routers/v1-handlers.ts:186-198`, `packages/cli/e2e/src/application/gates/scaffold/{locked-probes_test.ts:1-40,install-generated-probe_test.ts:1-55}`, `.llm/tools/deps/scan-npm-catalog-compliance.ts`, and `.llm/tools/validation/check-breaking-migration.ts`.
+- Inspected cached `@orpc/openapi@2.0.0-beta.53/dist/{extensions/route.js,meta.js,index.js}` and `package.json` (confirming `route.js:3` imports `@orpc/server` at runtime while `getOpenAPIMeta` reads `meta['~openapi']`), and `@orpc/server@2.0.0-beta.53/dist/adapters/standard/rpc-handler-codec.js` (confirming `getOwn(this.errorStatusMap, error.code) ?? 400`).
+
+### 2. Round-2 Standalone Behavior Probes (`probes/v2-behavior-probes.ts`)
+
+- **B1 + N1:** Reproduced naive `426` guard returning `426` on CORS `OPTIONS` preflight, then verified `OPTIONS`-exempt guard + `CORSHandlerPlugin` with `withProtocolHeaderAllowed(...)` returning `204` with `Access-Control-Allow-Headers: Authorization, Content-Type, X-NetScript-RPC-Protocol`, `Vary: X-NetScript-RPC-Protocol` on BOTH `200` `GET` and `426` responses, and `426` rejection of headerless v1 clients (allowing `0.0.10` to stay zero-preflight / server-only).
+- **B2 + N3:** Verified `PUT`, `PATCH`, `DELETE`, and `HEAD→GET` parity (`200`) under updated `allowMethods` and SDK inference helper (`transport-policy_test.ts:35`, `create-crud-contract.ts:367-378`), plus verified `allowGetRpc: false` rejects unpaired `GET` (`404`) and succeeds (`200`) when paired with client `transportPolicy: { method: () => 'POST' }`.
+- **B4 + N2:** Verified in real `RPCHandler` instances that v1 `1.15.5` runs `rootInterceptors` and ignores `routingInterceptors` while v2 runs `routingInterceptors` and ignores `rootInterceptors`; verified `mergeErrorStatusMaps` fail-fast on conflict; verified unconditional `createDefault500ErrorStatusMap` Proxy on standalone `RPCHandlerV2` and `OpenAPIHandlerV2` (zero `ErrorHandlingPlugin`) returns HTTP `500` while preserving `code: 'CUSTOM_INFRA_FAILURE'`; verified `'status' in err === false` and `resolveErrorHttpStatus` for `TracingPlugin`/`LoggingPlugin`/`ErrorHandlingPlugin`.
+- **B6 + N4:** Verified server-free `routeMeta` (`defineMeta('~openapi', ...)`), `accessMeta` (`defineMeta('access', ...)`), and `policyMeta` (`defineMeta('policy', ...)`) using ONLY `@orpc/contract` produce exact `.meta.access` & `.meta.policy` keys, match `getOpenAPIMeta`, and generate OpenAPI `3.2.0` documents via `OpenAPIGenerator` (`{ base: { info } }`) with zero `@orpc/server` dependency in `@netscript/contracts`.
+- **N5 & Advisories #1–#3:** Separated isolated temp-dir e2e tests (`locked-probes_test.ts`, `install-generated-probe_test.ts`) from workspace `catalog:` consolidation, scoped catalog CI failure to `@orpc/*`, refreshed PR `#2674` body with `## Breaking change and migration`, aligned §5 with RFC A head `bd8d51c0` & Prior Art with PR `#2659` head `f8c8d8fd`, aligned `0.0.12+` `release/orpc-v1` numbering, and cited `plugins/sagas/services/src/routers/v1-handlers.ts:193`.
+
+## Validation Table (Round-2 Fix)
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Standalone v2 Behavior Probes typecheck (`--no-lock --no-config`) | `mise exec -- deno check --no-lock --no-config .llm/runs/plan-rfc-orpc-v2-readiness-2672--rfc/probes/v2-behavior-probes.ts` | PASS (exit 0) |
+| Standalone v2 Behavior Probes (B1+N1, B2+N3, B4+N2, B6+N4, B7) | `mise exec -- deno test --no-lock --no-config -A .llm/runs/plan-rfc-orpc-v2-readiness-2672--rfc/probes/v2-behavior-probes.ts` | PASS (`5 passed \| 0 failed`, 32 ms) |
+| Workspace `deno.json` & `deno.lock` untouched | `git status -s` / `git diff --stat deno.lock deno.json` | PASS (docs & `.llm/runs/` only) |
+| Scoped internal doc links | `mise exec -- deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --root rfcs/0000-orpc-v2-readiness.md --pretty` | PASS (`docs=1 broken-links=0 broken-anchors=0 orphans=0`) |
+| Privacy & closing-keyword scan | Pattern scan on RFC + `.llm/runs/plan-rfc-orpc-v2-readiness-2672--rfc/` | PASS (`0 hits`) |
