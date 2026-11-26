@@ -193,6 +193,17 @@ archetype.
 The remedy is constructor injection of the appropriate port. The archetype docs name the exact path
 constraints; the doctrine records the universal prohibition.
 
+### AP-26. Downstream or private consumer references in framework artifacts
+
+Code under `packages/` or `plugins/`, public docs, RFCs, probes, or tracked `.llm/runs/` artifacts
+that reference a real downstream or private consumer repository, consumer product/app name,
+private issue number, internal consumer path, or consumer-specific schema/config namespace instead
+of staying framework-generic.
+
+The remedy is simple: keep NetScript abstractions consumer-agnostic and use `acme` placeholders
+(`acme`, `acme-connector`, `x-acme-ui`, `acme.example`) whenever illustrating or testing
+downstream consumer scenarios. See [`02-public-surface.md`](./02-public-surface.md#consumer-agnostic-examples-and-naming).
+
 ## Fitness functions — the executable gates
 
 Each anti-pattern above maps to a check. The doctrine declares the check; the next engineering doc

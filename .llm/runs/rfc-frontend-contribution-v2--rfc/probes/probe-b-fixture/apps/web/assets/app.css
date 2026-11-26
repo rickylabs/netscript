@@ -1,0 +1,12 @@
+@layer ns-app {
+  .app-shell-frame {
+    font-family: system-ui, sans-serif;
+    padding: 16px;
+  }
+
+  /* Same selector + specificity as plugin's .ns-cascade-target in @layer ns-plugins */
+  .ns-cascade-target {
+    color: rgb(22, 163, 74);
+    border: 2px solid rgb(22, 163, 74);
+  }
+}

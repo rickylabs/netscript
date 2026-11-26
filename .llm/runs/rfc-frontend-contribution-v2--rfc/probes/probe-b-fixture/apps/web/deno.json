@@ -1,0 +1,59 @@
+{
+  "name": "@probe-b/web",
+  "version": "0.1.0",
+  "exports": "./main.ts",
+  "tasks": {
+    "dev": "deno run -A npm:vite --configLoader native",
+    "build": "deno run -A npm:vite --configLoader native build",
+    "start": "deno serve -A _fresh/server.js"
+  },
+  "exclude": ["**/_fresh/*"],
+  "imports": {
+    "@app/": "./",
+    "@acme/local-plugin": "../../packages/local-plugin/mod.ts",
+    "@acme/local-plugin/island": "../../packages/local-plugin/island.tsx",
+    "@acme/local-plugin/island.css": "../../packages/local-plugin/island.css",
+    "@acme/local-plugin/route": "../../packages/local-plugin/route.tsx",
+    "@acme/local-plugin/route-raw": "../../packages/local-plugin/route-raw.tsx",
+    "@acme/local-plugin/route.css": "../../packages/local-plugin/route.css",
+    "@netscript/fresh": "../../../../../../../packages/fresh/mod.ts",
+    "@netscript/fresh/builders": "../../../../../../../packages/fresh/src/application/builders/mod.ts",
+    "@netscript/fresh/defer": "../../../../../../../packages/fresh/src/application/defer/mod.ts",
+    "@netscript/fresh/defer/island": "../../../../../../../packages/fresh/src/application/defer/island.ts",
+    "@netscript/fresh/route": "../../../../../../../packages/fresh/src/application/route/mod.ts",
+    "@netscript/fresh/server": "../../../../../../../packages/fresh/src/runtime/server/mod.ts",
+    "@netscript/fresh/vite": "../../../../../../../packages/fresh/src/application/vite/vite.ts",
+    "@netscript/fresh-ui": "../../../../../../../packages/fresh-ui/mod.ts",
+    "@netscript/telemetry/tracer": "../../../../../../../packages/telemetry/tracer.ts",
+    "@netscript/sdk/cache": "../../../../../../../packages/sdk/src/cache/mod.ts",
+    "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.1.2",
+    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.3.3",
+    "tailwindcss": "npm:tailwindcss@^4.3.3",
+    "fresh": "jsr:@fresh/core@^2.3.3",
+    "preact": "npm:preact@^10.29.2",
+    "@preact/signals": "npm:@preact/signals@2.11.3",
+    "vite": "npm:vite@7.2.2",
+    "zod": "catalog:"
+  },
+  "compilerOptions": {
+    "lib": ["dom", "dom.asynciterable", "dom.iterable", "deno.ns", "deno.unstable"],
+    "jsx": "precompile",
+    "jsxImportSource": "preact",
+    "jsxPrecompileSkipElements": [
+      "a",
+      "img",
+      "source",
+      "body",
+      "html",
+      "head",
+      "title",
+      "meta",
+      "script",
+      "link",
+      "style",
+      "base",
+      "noscript",
+      "template"
+    ]
+  }
+}
