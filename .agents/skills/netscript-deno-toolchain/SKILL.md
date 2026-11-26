@@ -16,7 +16,7 @@ never `deno outdated --latest` for "latest" (see the trap below). This skill is 
 home** for the command map and the gotchas; other skills (e.g. `netscript-tools`) cross-reference
 here rather than restate them.
 
-Repo is on **Deno 2.9.7** (Windows + WSL). Targeted `deno check` must pass `--unstable-kv`.
+Repo is on **Deno 2.9.8** (Windows + WSL). Targeted `deno check` must pass `--unstable-kv`.
 
 ## Fresh explicit prereleases
 
@@ -101,7 +101,7 @@ Keeping the old peer-suffixed IDs can cause `ERR_MODULE_NOT_FOUND` at runtime ev
 and frozen installs pass. This is a lock migration, not a dependency upgrade: the resolved
 `package@version` sets and integrity hashes must remain unchanged.
 
-For a consumer workspace, select Deno 2.9.7 and run `deno install --lockfile-only`. Deno reuses
+For a consumer workspace, select Deno 2.9.8 and run `deno install --lockfile-only`. Deno reuses
 recorded IDs when no resolution is needed, so an unchanged lock does not prove migration. To force
 native re-resolution, temporarily add a `package.json` npm override for a package already resolved
 to one version, using that **same exact version**. Run `deno install --lockfile-only`, restore the
