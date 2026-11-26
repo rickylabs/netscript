@@ -1,8 +1,10 @@
-# oRPC `2.0.0-beta.53` Prototype & v1 `1.16.5` Fallout Summary
+# oRPC `2.0.0-beta.53` Prototype & v1 `1.16.5` Fallout Summary (Historical `87965d800` Snapshot)
+
+> **Historical baseline note (2026-11-26):** Sections 1–5 below record the original throwaway `2.0.0-beta.53` prototype and v1 `1.16.5` verification measured on 2026-11-25 against `main` `87965d800` (Deno `2.9.5`, `@orpc/*@^1.15.5`). On current `origin/main` (`00325a531`), `#2689` pinned Deno `2.9.8` and `#2690` landed `@orpc/*@^1.16.6` (with fixture lock refreshes, while retaining stale `1.15.0` entries in root `deno.lock`). Live Round-3 behavior probes (`probes/v2-behavior-probes.ts`) are verified on Deno `2.9.8` against `@orpc/*@1.16.6` vs `2.0.0-beta.53`.
 
 - **Prototype date:** 2026-11-25
 - **Base commit (`main`):** `87965d800b7d61312e8612c82bdb0cb98bdf5b29`
-- **Target versions tested:** `@orpc/*@2.0.0-beta.53` (published 2026-11-23), `@orpc/*@1.15.5` (locked baseline), and `@orpc/*@1.16.5` (v1 target; `1.16.6` published 2026-11-25 is blocked on publication day by Deno's `minimumDependencyAge` policy).
+- **Target versions tested (historical):** `@orpc/*@2.0.0-beta.53` (published 2026-11-23), `@orpc/*@1.15.5` (historical locked baseline), and `@orpc/*@1.16.5` (v1 target before `#2690` landed `1.16.6`).
 - **Runtime:** Deno `2.9.5`, TypeScript `6.0.3` (from workspace `.mise.toml`).
 - **Workspace hygiene:** Executed in a throwaway detached git worktree, then deleted via `git worktree remove --force`. Zero dependency or lockfile changes were committed to `main` or either RFC branch.
 
