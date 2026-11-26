@@ -1,5 +1,5 @@
 import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
-import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { render } from 'npm:preact-render-to-string@^6.8.3';
 import { Chart } from '../../registry/components/ui/chart.tsx';
 
 Deno.test('Chart rejects mismatched and non-finite data instead of drawing misleading geometry', () => {

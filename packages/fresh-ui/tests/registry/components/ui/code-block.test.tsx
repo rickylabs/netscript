@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
-import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { render } from 'npm:preact-render-to-string@^6.8.3';
 import { CodeBlock } from '../../../../registry/components/ui/code-block.tsx';
 
 Deno.test('CodeBlock preserves native chrome, classes and escaped exact clipboard source', () => {

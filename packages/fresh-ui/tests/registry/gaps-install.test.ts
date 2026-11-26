@@ -114,7 +114,7 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
       join(root, 'render-audited.ts'),
       `
 import { h } from 'preact';
-import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { render } from 'npm:preact-render-to-string@^6.8.3';
 import { CodeBlock } from './components/ui/code-block.tsx';
 import { Label } from './components/ui/label.tsx';
 import { Card } from './components/ui/card.tsx';

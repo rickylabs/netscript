@@ -64,7 +64,7 @@ for (const version of ['1.2.4', '1.2.4-canary.1']) {
       assertStringIncludes(bumped, `jsr:@netscript/sdk@${version}/auto-update`);
       assertStringIncludes(bumped, `jsr:@netscript/sdk@${version}/desktop`);
       assertStringIncludes(bumped, `jsr:@netscript/ai@${version}`);
-      assertStringIncludes(bumped, 'npm:preact@^10.29.2');
+      assertStringIncludes(bumped, 'npm:preact@^10.29.8');
       assertEquals(await findVersionResidue(root, '1.2.3'), []);
       assertEquals(await findVersionResidue(root, manifest.version), []);
 

@@ -1,5 +1,5 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
-import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { render } from 'npm:preact-render-to-string@^6.8.3';
 import { FRESH_UI_REGISTRY_CONTENT } from '../../../../registry.generated.ts';
 import { freshUiRegistryManifest } from '../../../../registry.manifest.ts';
 import { DesktopUpdatePrompt } from '../../../../registry/components/ui/desktop-update-prompt.tsx';

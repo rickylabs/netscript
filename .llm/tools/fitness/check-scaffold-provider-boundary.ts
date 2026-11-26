@@ -1,7 +1,7 @@
 /** Build the shipped scaffold loader without traversing optional server providers. */
 import { join, toFileUrl } from '@std/path';
 // deno-lint-ignore no-import-prefix -- Tool-only import uses the existing root catalog pin without changing consumer import maps.
-import { build } from 'npm:vite@7.2.2';
+import { build } from 'npm:vite@7.3.8';
 import { readTemplateAssetSync } from '../../../packages/cli/src/kernel/adapters/templates/template-asset.ts';
 import { TEMPLATE_KEYS } from '../../../packages/cli/src/kernel/assets/manifest.ts';
 
@@ -80,7 +80,7 @@ export function providerBoundaryFixture(source: string): string {
     .replace("import { buildStreamUrl } from '@netscript/plugin-streams-core';", '')
     .replace("import { scaffoldServiceClient } from './scaffold-service-context.ts';", '')
     .replaceAll('{{serviceName}}', 'members')
-    .replace("'zod'", JSON.stringify(import.meta.resolve('npm:zod@^4.6.5')));
+    .replace("'zod'", JSON.stringify(import.meta.resolve('npm:zod@^4.6.7')));
 }
 
 /** Check the real Vite graph; the negative control restores the original provider glob edge. */
@@ -121,7 +121,7 @@ export async function checkScaffoldProviderBoundary(negativeControl = false): Pr
         ssr: true,
         write: false,
         minify: false,
-        rollupOptions: { input: entry, external: [import.meta.resolve('npm:zod@^4.6.5')] },
+        rollupOptions: { input: entry, external: [import.meta.resolve('npm:zod@^4.6.7')] },
       },
     });
     if ('on' in result) throw new Error('Expected completed build, received watcher');

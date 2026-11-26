@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
-import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { render } from 'npm:preact-render-to-string@^6.8.3';
 import { Alert } from '../../registry/components/ui/alert.tsx';
 
 Deno.test('Alert keeps native attributes, roles and custom legacy content', () => {

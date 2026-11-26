@@ -1,5 +1,5 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
-import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { render } from 'npm:preact-render-to-string@^6.8.3';
 import { PageHeader } from '../../registry/components/ui/page-header.tsx';
 import { renderedElements } from './contract-render.ts';
 

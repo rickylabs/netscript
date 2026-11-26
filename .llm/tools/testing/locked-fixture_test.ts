@@ -107,13 +107,13 @@ Deno.test('open-ended instrumentation stays on its recorded compatible release',
     );
     await prepareLockedFixture(directory);
     const config = JSON.parse(await Deno.readTextFile(`${directory}/deno.json`));
-    assertEquals(config.imports.instrumentation, 'npm:@opentelemetry/instrumentation@0.223.0');
+    assertEquals(config.imports.instrumentation, 'npm:@opentelemetry/instrumentation@0.223.2');
     const lock = JSON.parse(await Deno.readTextFile(`${directory}/deno.lock`));
     const versions = Object.keys(lock.npm).filter((id) =>
       id.startsWith('@opentelemetry/instrumentation@')
     );
     assertEquals(versions.length, 1);
-    assert(versions[0].startsWith('@opentelemetry/instrumentation@0.223.0'));
+    assert(versions[0].startsWith('@opentelemetry/instrumentation@0.223.2'));
   } finally {
     await Deno.remove(directory, { recursive: true });
   }
