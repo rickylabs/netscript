@@ -189,3 +189,54 @@ Deno.test('Gate 4 malformed/unresumable control offsets, unsupported frames, inv
     assertEquals(upstream.activeCount, 0);
   }
 });
+
+Deno.test('Gate 4 UTF-8 BOM handling: strips stream-start BOM only and fails closed on mid-stream BOM before event: control', async () => {
+  const encoder = new TextEncoder();
+  const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+  const concat = (...parts: readonly Uint8Array[]): Uint8Array => {
+    const total = parts.reduce((sum, p) => sum + p.byteLength, 0);
+    const out = new Uint8Array(total);
+    let off = 0;
+    for (const p of parts) {
+      out.set(p, off);
+      off += p.byteLength;
+    }
+    return out;
+  };
+
+  // 1. Stream-start UTF-8 BOM is stripped and the delivery unit succeeds
+  const closedOk: StreamProxyCloseEvent[] = [];
+  const upstreamOk = createControlledUpstream();
+  const proxyOk = createParserProxy(upstreamOk.fetch, 4096, (e) => closedOk.push(e));
+  const resOk = await proxyOk(new Request('https://app.example.test/stream', { headers: BEARER }));
+  const unitText = sseDataBlock(makeStateChange('bom-start', { ok: true })) +
+    sseControlBlock({ streamNextOffset: 'bom_1' });
+  const okReadP = readAllText(resOk.body);
+  upstreamOk.readers[0]!.push(concat(bom, encoder.encode(unitText)));
+  upstreamOk.readers[0]!.close();
+  const receivedOk = await okReadP;
+  assertEquals(receivedOk.includes('bom_1'), true);
+  assertEquals(closedOk[0]!.reason, 'completed');
+  assertEquals(closedOk[0]!.deliveredUnits, 1);
+
+  // 2. Mid-stream UTF-8 BOM before `event: control` MUST NOT be stripped -> fails closed upstream-error
+  const closedBad: StreamProxyCloseEvent[] = [];
+  const upstreamBad = createControlledUpstream();
+  const proxyBad = createParserProxy(upstreamBad.fetch, 4096, (e) => closedBad.push(e));
+  const resBad = await proxyBad(
+    new Request('https://app.example.test/stream', { headers: BEARER }),
+  );
+  const badReadP = readAllText(resBad.body);
+  upstreamBad.readers[0]!.push(
+    concat(
+      encoder.encode(sseDataBlock(makeStateChange('bom-mid', { v: 1 }))),
+      bom,
+      encoder.encode(sseControlBlock({ streamNextOffset: 'bom_2' })),
+    ),
+  );
+  upstreamBad.readers[0]!.close();
+  assertEquals(await badReadP, '');
+  assertEquals(closedBad[0]!.reason, 'upstream-error');
+  await flushMicrotasks();
+  assertEquals(upstreamBad.activeCount, 0);
+});

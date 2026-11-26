@@ -1,4 +1,5 @@
 import { isValidStreamOffset } from '@netscript/contracts/streams';
+import { STREAMS_URL_PREFIX } from '../../domain/constants.ts';
 import {
   DEFAULT_STREAM_PROXY_MAX_ACTIVE_READERS,
   DEFAULT_STREAM_PROXY_MAX_PENDING_BATCH_BYTES,
@@ -14,6 +15,24 @@ import { validateAllowedOrigins } from './credentials.ts';
 const MAX_SAFE_TIMER_MS = 2_147_483_647;
 const UNSAFE_RESOLVED_PATH_CHARS = /[?#\r\n\0\\]/;
 const ENCODED_SEPARATOR_PATTERN = /%(?:2f|5c)/i;
+const RESERVED_PROTOCOL_QUERY_KEYS: ReadonlySet<string> = new Set(['offset', 'live', 'cursor']);
+
+/** Unwraps either a raw `Request` or a Fresh route `{ req: Request }` context. */
+export function unwrapProxyRequest(input: Request | { readonly req: Request }): Request {
+  return input instanceof Request ? input : input.req;
+}
+
+/** Extracts first-value non-protocol query parameters for schema-less proxy handlers. */
+export function extractDefaultProxyQuery(
+  searchParams: URLSearchParams,
+): Readonly<Record<string, string>> {
+  const record: Record<string, string> = {};
+  for (const [key, value] of searchParams.entries()) {
+    if (RESERVED_PROTOCOL_QUERY_KEYS.has(key)) continue;
+    if (!Object.hasOwn(record, key)) record[key] = value;
+  }
+  return record;
+}
 
 /** Validated, normalized runtime configuration for a stream proxy instance. */
 export interface NormalizedStreamProxyConfig {
@@ -155,20 +174,84 @@ export function isValidResolvedStreamPath(value: unknown): value is string {
   return normalized !== null && normalized.pathname === value;
 }
 
-/** Structural runtime guard for an admission `authorize` decision. */
-export function isValidAuthDecision<TGrant>(
+/**
+ * Parse and validate an upstream `http:`/`https:` base URL with no userinfo, query, or fragment,
+ * then compose the full Durable Streams SSE upstream URL safely without raw string concatenation.
+ */
+export function composeValidatedUpstreamUrl(
+  rawBaseUrl: unknown,
+  streamPath: string,
+  offset: string,
+  cursor: string | undefined,
+): URL {
+  if (
+    typeof rawBaseUrl !== 'string' ||
+    rawBaseUrl.length === 0 ||
+    rawBaseUrl.includes('?') ||
+    rawBaseUrl.includes('#')
+  ) {
+    throw new TypeError('invalid_upstream_base_url');
+  }
+  const base = URL.parse(rawBaseUrl);
+  if (
+    !base ||
+    (base.protocol !== 'http:' && base.protocol !== 'https:') ||
+    base.username !== '' ||
+    base.password !== '' ||
+    base.search !== '' ||
+    base.hash !== ''
+  ) {
+    throw new TypeError('invalid_upstream_base_url');
+  }
+  const normalizedBasePath = base.pathname.replace(/\/+$/, '');
+  const composed = new URL(base.origin);
+  composed.pathname = `${normalizedBasePath}${STREAMS_URL_PREFIX}${streamPath}`;
+  composed.searchParams.set('offset', offset);
+  composed.searchParams.set('live', 'sse');
+  if (cursor !== undefined) composed.searchParams.set('cursor', cursor);
+  return composed;
+}
+
+/**
+ * Exception-safe single-read snapshot of an admission `authorize` decision.
+ * Reads every decision property at most once inside `try/catch` so throwing or mutating getters
+ * cannot escape the bounded hook boundary.
+ */
+export function snapshotAuthDecision<TGrant>(
   value: unknown,
-): value is StreamProxyAuthDecision<TGrant> {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
-  const allow = Reflect.get(value, 'allow');
-  if (allow === true) {
-    return Object.hasOwn(value, 'grant');
+): StreamProxyAuthDecision<TGrant> | null {
+  try {
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
+    const allow = Reflect.get(value, 'allow');
+    if (allow === true) {
+      if (!Object.hasOwn(value, 'grant')) return null;
+      const grant = Reflect.get(value, 'grant') as TGrant;
+      const expiresAtMs = Reflect.get(value, 'expiresAtMs');
+      if (expiresAtMs !== undefined && typeof expiresAtMs !== 'number') return null;
+      const responseHeaders = Reflect.get(value, 'responseHeaders') as
+        | Readonly<Record<string, string>>
+        | undefined;
+      const setCookies = Reflect.get(value, 'setCookies') as readonly string[] | undefined;
+      return {
+        allow: true,
+        grant,
+        ...(expiresAtMs !== undefined ? { expiresAtMs } : {}),
+        ...(responseHeaders !== undefined ? { responseHeaders } : {}),
+        ...(setCookies !== undefined ? { setCookies } : {}),
+      };
+    }
+    if (allow === false) {
+      const status = Reflect.get(value, 'status');
+      const reason = Reflect.get(value, 'reason');
+      if ((status === 401 || status === 403) && typeof reason === 'string') {
+        return { allow: false, status, reason };
+      }
+      return null;
+    }
+    return null;
+  } catch {
+    return null;
   }
-  if (allow === false) {
-    const status = Reflect.get(value, 'status');
-    return (status === 401 || status === 403) && typeof Reflect.get(value, 'reason') === 'string';
-  }
-  return false;
 }
 
 /** Validated Durable Streams SSE protocol query parameters (`live`, `offset`, `cursor`). */
@@ -198,16 +281,25 @@ export function validateProtocolQueryParams(
   return { ok: true, offset, cursor };
 }
 
-/** Structural runtime guard for a `recheck` decision. */
-export function isValidRecheckDecision(value: unknown): value is StreamProxyRecheckDecision {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
-  const allow = Reflect.get(value, 'allow');
-  if (allow === true) {
-    const expiresAtMs = Reflect.get(value, 'expiresAtMs');
-    return expiresAtMs === undefined || typeof expiresAtMs === 'number';
+/**
+ * Exception-safe single-read snapshot of a `recheck` decision.
+ * Reads every property at most once inside `try/catch` so throwing getters fail closed.
+ */
+export function snapshotRecheckDecision(value: unknown): StreamProxyRecheckDecision | null {
+  try {
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
+    const allow = Reflect.get(value, 'allow');
+    if (allow === true) {
+      const expiresAtMs = Reflect.get(value, 'expiresAtMs');
+      if (expiresAtMs !== undefined && typeof expiresAtMs !== 'number') return null;
+      return expiresAtMs !== undefined ? { allow: true, expiresAtMs } : { allow: true };
+    }
+    if (allow === false) {
+      const reason = Reflect.get(value, 'reason');
+      return typeof reason === 'string' ? { allow: false, reason } : null;
+    }
+    return null;
+  } catch {
+    return null;
   }
-  if (allow === false) {
-    return typeof Reflect.get(value, 'reason') === 'string';
-  }
-  return false;
 }

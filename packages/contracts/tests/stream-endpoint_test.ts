@@ -96,6 +96,17 @@ Deno.test('defineStreamEndpoint: rejects invalid ids, paths, duplicate/missing p
     '/api/streams/prefix-{id}',
     '/api/streams/{123bad}',
     '/api/streams/{id}/{id}',
+    // Non-RFC-3986 pchar characters that URL serialization percent-encodes or rejects
+    '/api/streams/caf\u00e9',
+    '/api/streams/a"b',
+    '/api/streams/a<b',
+    '/api/streams/a>b',
+    '/api/streams/a`b',
+    '/api/streams/a[b]',
+    '/api/streams/a^b',
+    '/api/streams/a|b',
+    '/api/streams/a b',
+    '/api/streams/a\\b',
   ];
   for (const badPath of invalidPaths) {
     assertThrows(
@@ -110,6 +121,21 @@ Deno.test('defineStreamEndpoint: rejects invalid ids, paths, duplicate/missing p
       `expected path rejection: ${badPath}`,
     );
   }
+
+  // Valid ASCII RFC 3986 pchar literals (minus % and *) serialize verbatim through URL
+  const pcharEndpoint = defineStreamEndpoint({
+    id: 'test.pchar-literals',
+    path: "/api/v1.0/projects:live/team@org/a-b_c~1!$&'()+,;=/{id}",
+    params: z.object({ id: z.string().min(1) }),
+  });
+  const builtPchar = buildStreamEndpointUrl(pcharEndpoint, {
+    baseUrl: 'https://api.example.test',
+    params: { id: 'p1' },
+  });
+  assertEquals(
+    new URL(builtPchar).pathname,
+    "/api/v1.0/projects:live/team@org/a-b_c~1!$&'()+,;=/p1",
+  );
 
   // Missing params schema when path has parameters
   assertThrows(

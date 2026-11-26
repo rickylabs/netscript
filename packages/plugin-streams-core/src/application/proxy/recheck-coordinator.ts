@@ -4,7 +4,7 @@ import type {
   StreamProxyRecheckReason,
 } from '../../domain/stream-proxy-contract.ts';
 import type { StreamProxyClockPort } from '../../ports/stream-proxy-ports.ts';
-import { isValidRecheckDecision } from './options.ts';
+import { snapshotRecheckDecision } from './options.ts';
 
 /** Outcome of running one serialized `recheck` call against policy. */
 export type RecheckCallOutcome =
@@ -246,7 +246,28 @@ export async function runBoundedSetupStep<T>(
   return { ok: false, kind: 'error' };
 }
 
-/** Validates a raw recheck result into a typed {@link RecheckCallOutcome}. */
+/** Validates and snapshots a raw recheck result into a typed {@link RecheckCallOutcome}. */
 export function normalizeRecheckDecision(value: unknown): RecheckCallOutcome {
-  return isValidRecheckDecision(value) ? { kind: 'decision', decision: value } : { kind: 'error' };
+  const decision = snapshotRecheckDecision(value);
+  return decision !== null ? { kind: 'decision', decision } : { kind: 'error' };
+}
+
+/** Aborts an `AbortController` without propagating secondary abort listener exceptions. */
+export function abortQuietly(controller: AbortController | null, reason: string): void {
+  try {
+    controller?.abort(reason);
+  } catch {
+    // Ignore abort errors.
+  }
+}
+
+/** Closes a `ReadableStreamDefaultController` without propagating already-closed errors. */
+export function closeControllerQuietly(
+  controller: ReadableStreamDefaultController<Uint8Array> | null,
+): void {
+  try {
+    controller?.close();
+  } catch {
+    // Already closed.
+  }
 }

@@ -336,3 +336,37 @@ export function createSharedRevocationHub(): SharedRevocationHub {
     },
   };
 }
+
+/**
+ * Stops `DurableStreamTestServer` cleanly under Deno `--sanitize-ops --sanitize-resources`.
+ * `@durable-streams/server@0.3.9`'s `StreamStore.cancelAllWaits()` mutates `pendingLongPolls`
+ * via `splice()` inside `for..of` and then clears the array, skipping and orphaning alternate
+ * long-poll timers whenever >= 2 readers are waiting. Snapshotting `pendingLongPolls` with
+ * `isShuttingDown = true` before `server.stop()` clears every timer deterministically.
+ */
+export async function stopDurableStreamTestServerCleanly(
+  server: {
+    stop(): Promise<void>;
+    readonly store: {
+      cancelAllWaits(): void;
+    };
+  },
+): Promise<void> {
+  Reflect.set(server, 'isShuttingDown', true);
+  const drainSnapshot = (): void => {
+    const raw = Reflect.get(server.store, 'pendingLongPolls');
+    if (!Array.isArray(raw)) return;
+    const snapshot = [...raw];
+    for (const pending of snapshot) {
+      if (pending && typeof pending === 'object') {
+        const timeoutId = Reflect.get(pending, 'timeoutId');
+        if (timeoutId !== undefined) clearTimeout(timeoutId as ReturnType<typeof setTimeout>);
+        const resolve = Reflect.get(pending, 'resolve');
+        if (typeof resolve === 'function') resolve([]);
+      }
+    }
+  };
+  drainSnapshot();
+  await server.stop();
+  drainSnapshot();
+}

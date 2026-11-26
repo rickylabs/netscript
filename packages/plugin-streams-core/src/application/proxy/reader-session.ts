@@ -10,6 +10,8 @@ import {
 } from '../../domain/stream-proxy-contract.ts';
 import type { StreamProxyClockPort } from '../../ports/stream-proxy-ports.ts';
 import {
+  abortQuietly,
+  closeControllerQuietly,
   evaluateRecheckDecisionSync,
   normalizeRecheckDecision,
   type RecheckCallOutcome,
@@ -17,24 +19,6 @@ import {
 import { BoundedSseDeliveryUnitParser, type SseDeliveryUnit } from './sse-parser.ts';
 
 const PROXY_LOGGER = createLogger(['netscript', 'streams', 'proxy']);
-
-function abortQuietly(controller: AbortController | null, reason: string): void {
-  try {
-    controller?.abort(reason);
-  } catch {
-    // Ignore abort errors.
-  }
-}
-
-function closeControllerQuietly(
-  controller: ReadableStreamDefaultController<Uint8Array> | null,
-): void {
-  try {
-    controller?.close();
-  } catch {
-    // Already closed.
-  }
-}
 
 /** Parameters transferred atomically from setup into a streaming reader session. */
 export interface StreamingReaderSessionInit<TGrant> {
@@ -93,11 +77,8 @@ export function createStreamingReaderSession<TGrant>(
   let cancelExpiryHardDeadlineTimer: (() => void) | null = null;
   let cancelIdleTimer: (() => void) | null = null;
   let downstreamController: ReadableStreamDefaultController<Uint8Array> | null = null;
-
-  let resolveClosedSignal: (() => void) | null = null;
-  const closedSignalPromise = new Promise<void>((resolve) => {
-    resolveClosedSignal = resolve;
-  });
+  // Removable close listeners prevent unbounded Promise reaction retention across long streams.
+  const closeListeners = new Set<() => void>();
 
   const onRequestAbort = (): void => closeOnce('client-cancelled');
   const onShutdownAbort = (): void => closeOnce('shutdown');
@@ -134,8 +115,13 @@ export function createStreamingReaderSession<TGrant>(
     downstreamController = null;
     closeControllerQuietly(controller);
 
-    resolveClosedSignal?.();
-    resolveClosedSignal = null;
+    const pendingCloseListeners = [...closeListeners];
+    closeListeners.clear();
+    for (const listener of pendingCloseListeners) {
+      try {
+        listener();
+      } catch { /* ignore */ }
+    }
     abortQuietly(activeRecheckAbort, reason);
     abortQuietly(init.upstreamAbortController, reason);
 
@@ -229,6 +215,25 @@ export function createStreamingReaderSession<TGrant>(
     }
   }
 
+  function raceWithClose<T>(
+    closedValue: T,
+    start: (finish: (value: T) => void) => void,
+  ): Promise<T> {
+    if (closed) return Promise.resolve(closedValue);
+    return new Promise<T>((resolve) => {
+      let done = false;
+      const onClose = (): void => finish(closedValue);
+      const finish = (value: T): void => {
+        if (done) return;
+        done = true;
+        closeListeners.delete(onClose);
+        resolve(value);
+      };
+      closeListeners.add(onClose);
+      start(finish);
+    });
+  }
+
   async function invokeSingleRecheck(
     reason: StreamProxyRecheckReason,
     timeoutMs: number,
@@ -247,19 +252,6 @@ export function createStreamingReaderSession<TGrant>(
     });
 
     let timedOut = false;
-    let resolveTimeout: (() => void) | null = null;
-    const timeoutPromise = new Promise<'timeout'>((resolve) => {
-      resolveTimeout = () => resolve('timeout');
-    });
-
-    cancelActiveRecheckTimer?.();
-    cancelActiveRecheckTimer = init.clock.schedule(Math.max(0, timeoutMs), () => {
-      cancelActiveRecheckTimer = null;
-      timedOut = true;
-      abortQuietly(perCheckAbort, 'timeout');
-      resolveTimeout?.();
-    });
-
     let rawPromise: Promise<StreamProxyRecheckDecision>;
     try {
       rawPromise = Promise.resolve(
@@ -273,7 +265,6 @@ export function createStreamingReaderSession<TGrant>(
     } catch {
       rawPromise = Promise.reject(new Error('recheck_sync_throw'));
     }
-    void rawPromise.catch(() => {});
 
     type RaceValue =
       | { readonly tag: 'ok'; readonly value: StreamProxyRecheckDecision }
@@ -281,14 +272,19 @@ export function createStreamingReaderSession<TGrant>(
       | { readonly tag: 'timeout' }
       | { readonly tag: 'closed' };
 
-    const settled: RaceValue = await Promise.race<RaceValue>([
+    const settled = await raceWithClose<RaceValue>({ tag: 'closed' }, (finish) => {
+      cancelActiveRecheckTimer?.();
+      cancelActiveRecheckTimer = init.clock.schedule(Math.max(0, timeoutMs), () => {
+        cancelActiveRecheckTimer = null;
+        timedOut = true;
+        abortQuietly(perCheckAbort, 'timeout');
+        finish({ tag: 'timeout' });
+      });
       rawPromise.then(
-        (value): RaceValue => ({ tag: 'ok', value }),
-        (): RaceValue => ({ tag: 'err' }),
-      ),
-      timeoutPromise.then((): RaceValue => ({ tag: 'timeout' })),
-      closedSignalPromise.then((): RaceValue => ({ tag: 'closed' })),
-    ]);
+        (value) => finish({ tag: 'ok', value }),
+        () => finish({ tag: 'err' }),
+      );
+    });
 
     const wasAbortedForExpiry = activeRecheckAbortedForExpiry;
     cancelActiveRecheckTimer?.();
@@ -413,16 +409,12 @@ export function createStreamingReaderSession<TGrant>(
         | { readonly tag: 'err' }
         | { readonly tag: 'closed' };
 
-      const readPromise = upstreamReader.read();
-      void readPromise.catch(() => {});
-
-      const settled = await Promise.race<ReadResult>([
-        readPromise.then(
-          (result): ReadResult => ({ tag: 'read', result }),
-          (): ReadResult => ({ tag: 'err' }),
-        ),
-        closedSignalPromise.then((): ReadResult => ({ tag: 'closed' })),
-      ]);
+      const settled = await raceWithClose<ReadResult>({ tag: 'closed' }, (finish) => {
+        upstreamReader.read().then(
+          (result) => finish({ tag: 'read', result }),
+          () => finish({ tag: 'err' }),
+        );
+      });
 
       if (closed || settled.tag === 'closed') return null;
       if (settled.tag === 'err') {

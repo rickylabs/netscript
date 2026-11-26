@@ -3,7 +3,9 @@ import {
   createNetScriptStreamProxy,
   type StreamProxyCloseEvent,
   type StreamProxyRecheckDecision,
+  type StreamProxyRevocationSignal,
 } from '../../proxy.ts';
+import { scheduleChunkedDelay } from '../../src/adapters/system-stream-proxy-clock.ts';
 import {
   createControlledUpstream,
   createDeferred,
@@ -550,4 +552,240 @@ Deno.test('Gate 8 backpressure (highWaterMark: 0) and fail-closed policy errors'
   assertEquals(await readAllText(resR.body), '');
   await flushMicrotasks();
   assertEquals(upstream2.activeCount, 0);
+});
+
+Deno.test('Finding 3c: scheduleChunkedDelay chunks delays > maxChunkMs, handles early wakeups, and supports mid-chain cancel', () => {
+  interface FakeTimer {
+    readonly id: number;
+    readonly delayMs: number;
+    readonly callback: () => void;
+    canceled: boolean;
+  }
+
+  let now = 1_000;
+  let nextId = 1;
+  const timers: FakeTimer[] = [];
+  const scheduledDelays: number[] = [];
+  const clearedIds: number[] = [];
+
+  const deps = {
+    nowMs: () => now,
+    setTimer: (callback: () => void, ms: number): ReturnType<typeof setTimeout> => {
+      const entry: FakeTimer = { id: nextId++, delayMs: ms, callback, canceled: false };
+      timers.push(entry);
+      scheduledDelays.push(ms);
+      return entry.id as unknown as ReturnType<typeof setTimeout>;
+    },
+    clearTimer: (id: ReturnType<typeof setTimeout>): void => {
+      const numericId = id as unknown as number;
+      clearedIds.push(numericId);
+      const entry = timers.find((t) => t.id === numericId);
+      if (entry) entry.canceled = true;
+    },
+    maxChunkMs: 10_000,
+  };
+
+  // 1. 25_000ms delay splits into [10_000, 10_000, 5_000] and never fires early
+  let fired = 0;
+  scheduleChunkedDelay(25_000, () => {
+    fired += 1;
+  }, deps);
+  assertEquals(scheduledDelays, [10_000]);
+  assertEquals(fired, 0);
+
+  // Simulate early wakeup at +8_000ms (still 17_000ms left -> re-arms 10_000ms)
+  now += 8_000;
+  timers[0]!.callback();
+  assertEquals(fired, 0);
+  assertEquals(scheduledDelays, [10_000, 10_000]);
+
+  // Advance +10_000ms (still 7_000ms left -> re-arms 7_000ms)
+  now += 10_000;
+  timers[1]!.callback();
+  assertEquals(fired, 0);
+  assertEquals(scheduledDelays, [10_000, 10_000, 7_000]);
+
+  // Final chunk reaches deadline -> fires exactly once
+  now += 7_000;
+  timers[2]!.callback();
+  assertEquals(fired, 1);
+
+  // 2. Mid-chain cancellation clears active chunk timer and never invokes onFire
+  let canceledFired = 0;
+  const cancel = scheduleChunkedDelay(25_000, () => {
+    canceledFired += 1;
+  }, deps);
+  now += 10_000;
+  timers[3]!.callback(); // Arms chunk 2 (timers[4])
+  assertEquals(canceledFired, 0);
+  cancel();
+  assertEquals(clearedIds, [timers[4]!.id]);
+  now += 20_000;
+  // Even if host invokes stale callback after clearTimer, guard prevents firing
+  timers[4]!.callback();
+  assertEquals(canceledFired, 0);
+});
+
+Deno.test('Finding 3a: pre-200 microtask-window revocation, expiry, and abort fail closed without emitting 200 or Set-Cookie', async () => {
+  // (a) Second 'recheck' wake arriving during first pre-200 refence re-loops and fails closed 401 with zero Set-Cookie
+  {
+    const hub = createSharedRevocationHub();
+    const fetchStarted = createDeferred<void>();
+    const fetchDeferred = createDeferred<Response>();
+    let bodyCanceled = false;
+    let notifyRef: ((s?: StreamProxyRevocationSignal) => void) | undefined;
+    let revSignalCalls = 0;
+
+    const proxy = createNetScriptStreamProxy<TestGrant>({
+      baseUrl: 'http://streams.internal',
+      upstreamAuth: () => ({}),
+      maxActiveReaders: 1,
+      revocationSource: {
+        subscribe(grant, notify) {
+          notifyRef = notify;
+          return hub.revocationSource.subscribe(grant, notify);
+        },
+      },
+      fetch: () => {
+        fetchStarted.resolve();
+        return fetchDeferred.promise;
+      },
+      authorize: () => ({
+        allow: true,
+        grant: { sessionId: 'pre200-micro' },
+        setCookies: ['__Host-session=rotated; Path=/; HttpOnly'],
+      }),
+      recheck: ({ grant, reason }) => {
+        if (reason === 'revocation-signal') {
+          revSignalCalls += 1;
+          if (revSignalCalls === 1) {
+            // Simulate revocation + wake landing on the resume microtask of refence #1
+            queueMicrotask(() => {
+              hub.revoke('pre200-micro', 'recheck');
+              notifyRef?.({ action: 'recheck' });
+            });
+            return { allow: true };
+          }
+        }
+        return hub.isActive(grant.sessionId)
+          ? { allow: true }
+          : { allow: false, reason: 'session_revoked' };
+      },
+      resolvePath: () => '/projects/pre200-micro/events',
+    });
+
+    const resP = proxy(new Request('https://app.example.test/stream', { headers: BEARER }));
+    await fetchStarted.promise;
+    // Trigger initial pre-200 epoch bump without revoking yet so refence #1 runs
+    notifyRef?.({ action: 'recheck' });
+    fetchDeferred.resolve(
+      new Response(
+        new ReadableStream({
+          cancel() {
+            bodyCanceled = true;
+          },
+        }),
+        { status: 200, headers: { 'content-type': 'text/event-stream' } },
+      ),
+    );
+
+    const res = await resP;
+    assertEquals(res.status, 401);
+    assertEquals(res.headers.getSetCookie(), []);
+    assertEquals(bodyCanceled, true);
+    assert(revSignalCalls >= 2, `expected microtask re-fence loop, got ${revSignalCalls}`);
+    assertEquals(hub.unsubscribeCount('pre200-micro'), 1);
+  }
+
+  // (b) Clock expiry occurring before handoff without timer firing -> 401, zero Set-Cookie, upstream canceled, slot freed
+  {
+    const clock = new FakeClock(10_000);
+    const fetchStarted = createDeferred<void>();
+    const fetchDeferred = createDeferred<Response>();
+    let bodyCanceled = false;
+
+    const proxy = createNetScriptStreamProxy<TestGrant>({
+      baseUrl: 'http://streams.internal',
+      clock,
+      upstreamAuth: () => ({}),
+      maxActiveReaders: 1,
+      fetch: () => {
+        fetchStarted.resolve();
+        return fetchDeferred.promise;
+      },
+      authorize: () => ({
+        allow: true,
+        grant: { sessionId: 'pre200-exp' },
+        expiresAtMs: 15_000,
+        setCookies: ['__Host-session=rotated; Path=/; HttpOnly'],
+      }),
+      recheck: () => ({ allow: true }),
+      resolvePath: () => '/projects/pre200-exp/events',
+    });
+
+    const resP = proxy(new Request('https://app.example.test/stream', { headers: BEARER }));
+    await fetchStarted.promise;
+    clock.setNowWithoutFiring(15_000);
+    fetchDeferred.resolve(
+      new Response(
+        new ReadableStream({
+          cancel() {
+            bodyCanceled = true;
+          },
+        }),
+        { status: 200, headers: { 'content-type': 'text/event-stream' } },
+      ),
+    );
+    const res = await resP;
+    assertEquals(res.status, 401);
+    assertEquals(res.headers.getSetCookie(), []);
+    assertEquals(bodyCanceled, true);
+    assertEquals(clock.pendingCount, 0);
+  }
+});
+
+Deno.test('Finding 4: 500-unit streaming session cleans up per-iteration close listeners and closes cleanly', async () => {
+  const upstream = createControlledUpstream();
+  const hub = createSharedRevocationHub();
+  const closed: StreamProxyCloseEvent[] = [];
+
+  const proxy = createNetScriptStreamProxy<TestGrant>({
+    baseUrl: 'http://streams.internal',
+    fetch: upstream.fetch,
+    revocationSource: hub.revocationSource,
+    recheckEveryMs: null,
+    upstreamAuth: () => ({}),
+    authorize: () => ({ allow: true, grant: { sessionId: 'long-500' } }),
+    recheck: ({ grant }) =>
+      hub.isActive(grant.sessionId) ? { allow: true } : { allow: false, reason: 'revoked' },
+    resolvePath: () => '/projects/long/events',
+    onClose: (e) => closed.push(e),
+  });
+
+  const res = await proxy(new Request('https://app.example.test/stream', { headers: BEARER }));
+  assertEquals(res.status, 200);
+  const reader = res.body!.getReader();
+
+  for (let i = 1; i <= 500; i += 1) {
+    upstream.readers[0]!.push(
+      sseDataBlock(makeStateChange(`u${i}`, { i })) +
+        sseControlBlock({ streamNextOffset: `off_${i}` }),
+    );
+    const chunk = await readOneChunkText(reader);
+    assertFalse(chunk.done);
+    assertStringIncludes(chunk.text, `off_${i}`);
+  }
+
+  const idleRead = readOneChunkText(reader);
+  hub.revoke('long-500', 'revoked');
+  const eof = await idleRead;
+  assertEquals(eof.done, true);
+  assertEquals(eof.text, '');
+  reader.releaseLock();
+  await flushMicrotasks();
+  assertEquals(upstream.activeCount, 0);
+  assertEquals(hub.unsubscribeCount('long-500'), 1);
+  assertEquals(closed.length, 1);
+  assertEquals(closed[0]!.reason, 'revoked');
+  assertEquals(closed[0]!.deliveredUnits, 500);
 });

@@ -99,47 +99,71 @@ function isValidHeaderName(name: string): boolean {
 }
 
 function isSafeHeaderValue(value: unknown): value is string {
-  return typeof value === 'string' && !UNSAFE_HEADER_VALUE_CHARS.test(value);
+  if (typeof value !== 'string' || UNSAFE_HEADER_VALUE_CHARS.test(value)) return false;
+  for (let i = 0; i < value.length; i += 1) {
+    const code = value.charCodeAt(i);
+    if (code > 0xff || (code < 0x20 && code !== 0x09) || code === 0x7f) return false;
+  }
+  return true;
 }
 
-/** Validates Tier 2 `decision.responseHeaders` and `decision.setCookies` before proceeding. */
+/**
+ * Validates Tier 2 `decision.responseHeaders` and `decision.setCookies` during admission using
+ * native Fetch `Headers`, snapshotting all values into plain arrays so getters never run again.
+ */
 export function validateAppOverlayHeaders(
   responseHeaders: Readonly<Record<string, string>> | undefined,
   setCookies: readonly string[] | undefined,
 ): ValidatedAppHeadersResult {
-  const entries: Array<readonly [string, string]> = [];
-  if (responseHeaders !== undefined) {
-    if (
-      typeof responseHeaders !== 'object' || responseHeaders === null ||
-      Array.isArray(responseHeaders)
-    ) {
-      return { ok: false, reason: 'invalid_response_headers' };
-    }
-    for (const [name, value] of Object.entries(responseHeaders)) {
-      if (!isValidHeaderName(name) || !isSafeHeaderValue(value)) {
-        return { ok: false, reason: 'invalid_response_header_value' };
+  try {
+    const probe = new Headers();
+    const entries: Array<readonly [string, string]> = [];
+    if (responseHeaders !== undefined) {
+      if (
+        typeof responseHeaders !== 'object' || responseHeaders === null ||
+        Array.isArray(responseHeaders)
+      ) {
+        return { ok: false, reason: 'invalid_response_headers' };
       }
-      if (isReservedStreamProxyResponseHeader(name)) {
-        return { ok: false, reason: 'reserved_response_header' };
+      for (const [name, value] of Object.entries(responseHeaders)) {
+        if (!isValidHeaderName(name) || !isSafeHeaderValue(value)) {
+          return { ok: false, reason: 'invalid_response_header_value' };
+        }
+        if (isReservedStreamProxyResponseHeader(name)) {
+          return { ok: false, reason: 'reserved_response_header' };
+        }
+        try {
+          probe.set(name, value);
+        } catch {
+          return { ok: false, reason: 'invalid_response_header_value' };
+        }
+        entries.push([name, value]);
       }
-      entries.push([name, value]);
     }
-  }
 
-  const cookies: string[] = [];
-  if (setCookies !== undefined) {
-    if (!Array.isArray(setCookies)) {
-      return { ok: false, reason: 'invalid_set_cookies' };
-    }
-    for (const cookie of setCookies) {
-      if (!isSafeHeaderValue(cookie) || cookie.trim().length === 0) {
-        return { ok: false, reason: 'invalid_set_cookie_value' };
+    const cookies: string[] = [];
+    if (setCookies !== undefined) {
+      if (!Array.isArray(setCookies)) {
+        return { ok: false, reason: 'invalid_set_cookies' };
       }
-      cookies.push(cookie);
+      for (let i = 0; i < setCookies.length; i += 1) {
+        const cookie: unknown = setCookies[i];
+        if (!isSafeHeaderValue(cookie) || cookie.trim().length === 0) {
+          return { ok: false, reason: 'invalid_set_cookie_value' };
+        }
+        try {
+          probe.append('set-cookie', cookie);
+        } catch {
+          return { ok: false, reason: 'invalid_set_cookie_value' };
+        }
+        cookies.push(cookie);
+      }
     }
-  }
 
-  return { ok: true, headers: entries, setCookies: cookies };
+    return { ok: true, headers: entries, setCookies: cookies };
+  } catch {
+    return { ok: false, reason: 'invalid_response_headers' };
+  }
 }
 
 function collectDynamicHopByHopHeaders(upstreamHeaders: Headers): Set<string> {

@@ -18,6 +18,12 @@ import {
 const ENDPOINT_ID_PATTERN = /^[a-z0-9][a-z0-9._-]*$/i;
 const PATH_FORBIDDEN_PRINTABLE = /[?#*%\\]/;
 const PARAM_SEGMENT_PATTERN = /^\{([A-Za-z_][A-Za-z0-9_]*)\}$/;
+/**
+ * Strict RFC 3986 §3.3 `pchar` allowlist for literal path segments minus `pct-encoded` (`%`)
+ * and `*` (which RFC 0009 forbids). Every matching character is outside the WHATWG URL path
+ * percent-encode set, so URL serialization preserves the declared route verbatim.
+ */
+const LITERAL_SEGMENT_PATTERN = /^[A-Za-z0-9\-._~!$&'()+,;=:@]+$/;
 const RESERVED_QUERY_SET: ReadonlySet<string> = new Set(RESERVED_STREAM_QUERY_PARAMS);
 
 function hasForbiddenPathChars(value: string): boolean {
@@ -82,6 +88,10 @@ function parseAndValidatePath(path: unknown): {
       }
       seenParams.add(paramName);
       paramNames.push(paramName);
+    } else if (!LITERAL_SEGMENT_PATTERN.test(segment)) {
+      throw new TypeError(
+        `[netscript.contracts.streams] invalid literal segment '${segment}' in path: ${path}`,
+      );
     }
   }
 

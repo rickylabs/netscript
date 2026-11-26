@@ -78,7 +78,7 @@ function concatFrames(frames: readonly Uint8Array[], trailing: Uint8Array): Uint
  */
 export class BoundedSseDeliveryUnitParser {
   readonly #maxBytes: number;
-  readonly #decoder = new TextDecoder('utf-8', { fatal: true });
+  readonly #decoder = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
 
   #chunk: Uint8Array | null = null;
   #cursor = 0;

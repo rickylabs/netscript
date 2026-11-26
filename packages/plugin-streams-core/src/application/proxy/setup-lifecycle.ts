@@ -1,11 +1,13 @@
 import {
   DEFAULT_STREAM_PROXY_MAX_REFENCE_ATTEMPTS,
+  DEFAULT_STREAM_PROXY_RETRY_AFTER_SECONDS,
   type StreamProxyCloseReason,
+  type StreamProxyKeyLimit,
   type StreamProxyOptions,
 } from '../../domain/stream-proxy-contract.ts';
 import type { StreamProxyClockPort } from '../../ports/stream-proxy-ports.ts';
 import { createProxyErrorResponse, sanitizeDiagnosticReason } from './headers.ts';
-import { isValidRecheckDecision } from './options.ts';
+import { snapshotRecheckDecision } from './options.ts';
 import { type BoundedSetupOutcome, runBoundedSetupStep } from './recheck-coordinator.ts';
 
 /** Maps HTTP failure statuses used by the stream proxy to standard error labels. */
@@ -216,12 +218,13 @@ export class StreamProxySetupLifecycle {
       readonly streamPath: string;
       readonly policyTimeoutMs: number;
       readonly recheck: StreamProxyOptions<TGrant>['recheck'];
+      readonly initialAttempts?: number;
     }>,
   ): Promise<
-    | { readonly ok: true; readonly verifiedEpoch: number }
+    | { readonly ok: true; readonly verifiedEpoch: number; readonly attemptsUsed: number }
     | { readonly ok: false; readonly response: Response }
   > {
-    let attempts = 0;
+    let attempts = input.initialAttempts ?? 0;
     while (true) {
       if (this.closed) return { ok: false, response: this.abortResponse() };
       if (this.currentExpiresAtMs !== undefined && this.#clock.nowMs() >= this.currentExpiresAtMs) {
@@ -229,6 +232,13 @@ export class StreamProxySetupLifecycle {
         return {
           ok: false,
           response: createProxyErrorResponse(401, 'UNAUTHORIZED', 'session_expired'),
+        };
+      }
+      if (attempts > DEFAULT_STREAM_PROXY_MAX_REFENCE_ATTEMPTS) {
+        this.abortOnce('policy-error', 503, 'policy_refence_exhausted');
+        return {
+          ok: false,
+          response: createProxyErrorResponse(503, 'SERVICE_UNAVAILABLE', 'policy_unavailable'),
         };
       }
 
@@ -241,7 +251,8 @@ export class StreamProxySetupLifecycle {
           signal,
         }));
       if (this.closed) return { ok: false, response: this.abortResponse() };
-      if (!outcome.ok || !isValidRecheckDecision(outcome.value)) {
+      const decision = outcome.ok ? snapshotRecheckDecision(outcome.value) : null;
+      if (decision === null) {
         this.abortOnce('policy-error', 503, 'policy_unavailable');
         return {
           ok: false,
@@ -249,7 +260,6 @@ export class StreamProxySetupLifecycle {
         };
       }
 
-      const decision = outcome.value;
       if (!decision.allow) {
         const safeReason = sanitizeDiagnosticReason(decision.reason, 'session_revoked');
         this.abortOnce('revoked', 401, safeReason);
@@ -287,8 +297,39 @@ export class StreamProxySetupLifecycle {
         };
       }
       if (decision.expiresAtMs !== undefined) this.armExpiryTimer();
-      return { ok: true, verifiedEpoch: startEpoch };
+      return { ok: true, verifiedEpoch: startEpoch, attemptsUsed: attempts };
     }
+  }
+
+  /**
+   * Synchronous pre-`200` state check verifying closed/abort/expiry/epoch invariants so zero
+   * `await`s separate `'ok'` from streaming handoff.
+   */
+  checkPre200Sync(
+    verifiedEpoch: number,
+    requestSignal: AbortSignal,
+    shutdownSignal: AbortSignal | undefined,
+    cancelUpstreamAndAbort: (
+      reason: StreamProxyCloseReason,
+      status: number,
+      diagnosticReason: string,
+    ) => Response,
+    cancelUpstreamQuietly: (reason: string) => void,
+  ): 'ok' | 'need-refence' | Response {
+    if (this.closed) {
+      cancelUpstreamQuietly('setup-aborted');
+      return this.abortResponse();
+    }
+    if (requestSignal.aborted) {
+      return cancelUpstreamAndAbort('client-cancelled', 503, 'client_cancelled');
+    }
+    if (shutdownSignal?.aborted) {
+      return cancelUpstreamAndAbort('shutdown', 503, 'service_shutdown');
+    }
+    if (this.currentExpiresAtMs !== undefined && this.#clock.nowMs() >= this.currentExpiresAtMs) {
+      return cancelUpstreamAndAbort('expired', 401, 'session_expired');
+    }
+    return this.invalidationEpoch === verifiedEpoch ? 'ok' : 'need-refence';
   }
 }
 
@@ -325,6 +366,73 @@ export function classifyUpstreamSseFailure(upstream: Response): UpstreamResponse
       warnMessage: 'stream proxy rejected non-SSE or unexpected upstream status',
       warnReason: 'upstream_invalid_response',
     };
+  }
+  return null;
+}
+
+/** Execute a bounded upstream SSE `fetch` wired to both setup abort and late-body cancellation. */
+export function fetchUpstreamSse(
+  setup: StreamProxySetupLifecycle,
+  doFetch: typeof fetch,
+  upstreamUrl: string,
+  upstreamHeaders: Headers,
+  timeoutMs: number,
+): Promise<BoundedSetupOutcome<Response>> {
+  return setup.runStep(
+    timeoutMs,
+    (stepSignal) => {
+      const onStepAbort = (): void => {
+        try {
+          setup.upstreamAbortController.abort('setup-step-aborted');
+        } catch {
+          // Ignore.
+        }
+      };
+      stepSignal.addEventListener('abort', onStepAbort, { once: true });
+      return Promise.resolve(
+        doFetch(upstreamUrl, {
+          method: 'GET',
+          headers: upstreamHeaders,
+          redirect: 'manual',
+          signal: setup.upstreamAbortController.signal,
+        }),
+      ).finally(() => stepSignal.removeEventListener('abort', onStepAbort));
+    },
+    (lateResponse) => {
+      void lateResponse.body?.cancel('setup-aborted').catch(() => {});
+    },
+  );
+}
+
+/**
+ * Reserves an optional per-key reader slot after admission, returning a failure `Response`
+ * (`503` on key callback error or `429` + `Retry-After` when the key limit is reached).
+ */
+export function reservePerKeyReaderSlot<TGrant>(
+  setup: StreamProxySetupLifecycle,
+  tryReserveKey: (key: string, max: number) => boolean,
+  grant: TGrant,
+  limit: StreamProxyKeyLimit<TGrant> | undefined,
+  onLimitExceeded: () => void,
+): Response | null {
+  if (limit === undefined) return null;
+  let key: unknown;
+  try {
+    key = limit.key(grant);
+  } catch {
+    setup.abortOnce('policy-error', 503, 'policy_unavailable');
+    return createProxyErrorResponse(503, 'SERVICE_UNAVAILABLE', 'policy_unavailable');
+  }
+  if (typeof key !== 'string') {
+    setup.abortOnce('policy-error', 503, 'policy_unavailable');
+    return createProxyErrorResponse(503, 'SERVICE_UNAVAILABLE', 'policy_unavailable');
+  }
+  if (!tryReserveKey(key, limit.max)) {
+    setup.abortOnce('policy-error', 429, 'reader_limit_exceeded');
+    onLimitExceeded();
+    return createProxyErrorResponse(429, 'TOO_MANY_REQUESTS', 'reader_limit_exceeded', {
+      'retry-after': DEFAULT_STREAM_PROXY_RETRY_AFTER_SECONDS,
+    });
   }
   return null;
 }

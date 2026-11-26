@@ -17,6 +17,7 @@ import {
   readOneChunkText,
   sseControlBlock,
   sseDataBlock,
+  stopDurableStreamTestServerCleanly,
   type TestGrant,
 } from './_test_helpers.ts';
 
@@ -216,7 +217,144 @@ Deno.test('Gate 1 Barrier 1 (real DurableStreamTestServer): revoking session-B w
     readerA.releaseLock();
     readerB.releaseLock();
   } finally {
-    await server.stop();
+    await stopDurableStreamTestServerCleanly(server);
+  }
+});
+
+Deno.test('Gate 1 Barrier 2 (real DurableStreamTestServer): Gateway 1 + Gateway 2 post-allow-snapshot stale allow fenced by push recheck wake', async () => {
+  const server = new DurableStreamTestServer({ port: 0 });
+  const baseUrl = await server.start();
+  const streamPath = '/projects/live-barrier-2/events';
+  const fullUpstreamUrl = `${baseUrl}/v1/stream/netscript${streamPath}`;
+
+  try {
+    const createRes = await fetch(fullUpstreamUrl, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(makeStateChange('seed-b2', { step: 1 })),
+    });
+    assert(createRes.ok, `PUT failed: ${createRes.status}`);
+    await createRes.body?.cancel();
+
+    const hub = createSharedRevocationHub();
+    const barrier = createDeferred<void>();
+    let barrierArmed = false;
+    let paused = 0;
+    const bothPaused = createDeferred<void>();
+    const wakeObserved = createDeferred<void>();
+    let recheckCallsB = 0;
+
+    const instrumentedSource = {
+      subscribe(
+        grant: TestGrant,
+        notify: (signal?: StreamProxyRevocationSignal) => void,
+      ) {
+        return hub.revocationSource.subscribe(grant, (sig) => {
+          notify(sig);
+          if (grant.sessionId === 'session-B' && sig?.action === 'recheck') {
+            wakeObserved.resolve();
+          }
+        });
+      },
+    };
+
+    const makeGateway = (source: typeof instrumentedSource | undefined) =>
+      createNetScriptStreamProxy<TestGrant>({
+        baseUrl,
+        recheckEveryMs: null,
+        revocationSource: source,
+        upstreamAuth: () => ({}),
+        authorize: ({ request }) => {
+          const auth = request.headers.get('authorization') ?? '';
+          const sessionId = auth.endsWith('session-A') ? 'session-A' : 'session-B';
+          return hub.isActive(sessionId)
+            ? { allow: true, grant: { sessionId }, expiresAtMs: Date.now() + 60_000 }
+            : { allow: false, status: 401, reason: 'session_revoked' };
+        },
+        recheck: async ({ grant, reason }) => {
+          if (grant.sessionId === 'session-B' && reason !== 'post-subscribe') {
+            recheckCallsB += 1;
+          }
+          // Snapshot shared revocation state BEFORE blocking at Barrier 2
+          const activeSnapshot = hub.isActive(grant.sessionId);
+          if (reason === 'before-delivery' && barrierArmed) {
+            paused += 1;
+            if (paused === 2) bothPaused.resolve();
+            await barrier.promise;
+            return activeSnapshot
+              ? { allow: true, expiresAtMs: Date.now() + 999_999 }
+              : { allow: false, reason: 'session_revoked' };
+          }
+          return activeSnapshot ? { allow: true } : { allow: false, reason: 'session_revoked' };
+        },
+        resolvePath: () => streamPath,
+      });
+
+    const gateway1 = makeGateway(instrumentedSource);
+    const gateway2 = makeGateway(undefined);
+
+    const resA = await gateway1(
+      new Request('https://app.example.test/stream', { headers: BEARER_A }),
+    );
+    const resB = await gateway1(
+      new Request('https://app.example.test/stream', { headers: BEARER_B }),
+    );
+    assertEquals(resA.status, 200);
+    assertEquals(resB.status, 200);
+
+    const readerA = resA.body!.getReader();
+    const readerB = resB.body!.getReader();
+    const initA = await readOneChunkText(readerA);
+    const initB = await readOneChunkText(readerB);
+    assertStringIncludes(initA.text, 'seed-b2');
+    assertStringIncludes(initB.text, 'seed-b2');
+
+    // Arm Barrier 2 and append live batch 2 to real DurableStreamTestServer
+    barrierArmed = true;
+    const nextAPromise = readOneChunkText(readerA);
+    const nextBPromise = readOneChunkText(readerB);
+
+    const appendRes = await fetch(fullUpstreamUrl, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(makeStateChange('live-b2-secret', { step: 2 })),
+    });
+    assert(appendRes.ok, `POST failed: ${appendRes.status}`);
+    await appendRes.body?.cancel();
+
+    await bothPaused.promise;
+    // Gateway 2 revokes session-B with push 'recheck' wake (NOT 'revoked')
+    hub.revoke('session-B', 'recheck');
+    await wakeObserved.promise;
+    barrier.resolve();
+
+    const liveA = await nextAPromise;
+    const liveB = await nextBPromise;
+    assertFalse(liveA.done);
+    assertStringIncludes(liveA.text, 'live-b2-secret');
+    assertStringIncludes(liveA.text, 'event: control');
+
+    assertEquals(liveB.done, true);
+    assertEquals(liveB.text, '');
+    assert(recheckCallsB >= 2, `expected fenced recheck after stale allow, got ${recheckCallsB}`);
+    assertEquals(hub.unsubscribeCount('session-B'), 1);
+
+    assertEquals(
+      (await gateway1(new Request('https://app.example.test/stream', { headers: BEARER_B })))
+        .status,
+      401,
+    );
+    assertEquals(
+      (await gateway2(new Request('https://app.example.test/stream', { headers: BEARER_B })))
+        .status,
+      401,
+    );
+
+    await readerA.cancel('done');
+    readerA.releaseLock();
+    readerB.releaseLock();
+  } finally {
+    await stopDurableStreamTestServerCleanly(server);
   }
 });
 

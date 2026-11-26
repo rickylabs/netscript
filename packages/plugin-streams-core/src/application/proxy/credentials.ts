@@ -53,7 +53,7 @@ export interface StreamProxyCredentialGuardOptions {
 /** Result of pre-admission credential selection and cookie cross-site checks. */
 export type CredentialGuardResult =
   | { readonly ok: true; readonly credentialMode: StreamProxyCredentialMode }
-  | { readonly ok: false; readonly status: 401 | 403; readonly reason: string };
+  | { readonly ok: false; readonly status: 401 | 403 | 503; readonly reason: string };
 
 /** Validates `allowedOrigins` at proxy construction time; rejects `*`, `null`, and non-origins. */
 export function validateAllowedOrigins(
@@ -89,14 +89,20 @@ export function validateAllowedOrigins(
 
 type OriginResolutionResult =
   | { readonly ok: true; readonly origin: string }
-  | { readonly ok: false; readonly reason: string };
+  | { readonly ok: false; readonly status: 403 | 503; readonly reason: string };
 
-function isTrustedProxyPeer(
+function evaluateTrustedProxyPeer(
   remoteAddr: Deno.Addr | undefined,
   trustProxy: ServiceProxyTrust,
-): boolean {
-  if (!trustProxy || !remoteAddr || !('hostname' in remoteAddr)) return false;
-  return trustProxy(remoteAddr.hostname) === true;
+): { readonly ok: true; readonly trusted: boolean } | { readonly ok: false } {
+  if (!trustProxy || !remoteAddr || !('hostname' in remoteAddr)) {
+    return { ok: true, trusted: false };
+  }
+  try {
+    return { ok: true, trusted: trustProxy(remoteAddr.hostname) === true };
+  } catch {
+    return { ok: false };
+  }
 }
 
 function parseForwardedHost(proto: string, rawHost: string): string | undefined {
@@ -121,7 +127,11 @@ function resolveEffectiveTargetOrigin(
   trustProxy: ServiceProxyTrust,
 ): OriginResolutionResult {
   const requestUrl = new URL(request.url);
-  if (!isTrustedProxyPeer(remoteAddr, trustProxy)) {
+  const peerTrust = evaluateTrustedProxyPeer(remoteAddr, trustProxy);
+  if (!peerTrust.ok) {
+    return { ok: false, status: 503, reason: 'policy_unavailable' };
+  }
+  if (!peerTrust.trusted) {
     return { ok: true, origin: requestUrl.origin };
   }
 
@@ -135,7 +145,7 @@ function resolveEffectiveTargetOrigin(
   if (hasProto) {
     const rawProto = (request.headers.get('x-forwarded-proto') ?? '').trim();
     if (!VALID_FORWARDED_PROTO.test(rawProto)) {
-      return { ok: false, reason: 'invalid_forwarded_origin' };
+      return { ok: false, status: 403, reason: 'invalid_forwarded_origin' };
     }
     proto = rawProto.toLowerCase();
   }
@@ -144,7 +154,7 @@ function resolveEffectiveTargetOrigin(
     const rawHost = (request.headers.get('x-forwarded-host') ?? '').trim();
     const origin = parseForwardedHost(proto, rawHost);
     if (!origin) {
-      return { ok: false, reason: 'invalid_forwarded_origin' };
+      return { ok: false, status: 403, reason: 'invalid_forwarded_origin' };
     }
     return { ok: true, origin };
   }
@@ -152,7 +162,7 @@ function resolveEffectiveTargetOrigin(
   // Partial-pair rule: only X-Forwarded-Proto present -> combine with requestUrl.host.
   const combined = URL.parse(`${proto}://${requestUrl.host}`);
   if (!combined) {
-    return { ok: false, reason: 'invalid_forwarded_origin' };
+    return { ok: false, status: 403, reason: 'invalid_forwarded_origin' };
   }
   return { ok: true, origin: combined.origin };
 }
@@ -164,7 +174,7 @@ function checkCookieOriginAndFetchMetadata(
 ): CredentialGuardResult {
   const target = resolveEffectiveTargetOrigin(request, remoteAddr, options.trustProxy);
   if (!target.ok) {
-    return { ok: false, status: 403, reason: target.reason };
+    return { ok: false, status: target.status, reason: target.reason };
   }
   const effectiveOrigin = target.origin;
 

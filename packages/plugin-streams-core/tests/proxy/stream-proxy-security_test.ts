@@ -8,6 +8,7 @@ import {
 } from '../../src/sse/mod.ts';
 import {
   createNetScriptStreamProxy,
+  type StreamProxyAuthDecision,
   type StreamProxyCloseEvent,
   type StreamProxyRevocationSignal,
 } from '../../proxy.ts';
@@ -21,6 +22,7 @@ import {
   readOneChunkText,
   sseControlBlock,
   sseDataBlock,
+  stopDurableStreamTestServerCleanly,
   type TestGrant,
 } from './_test_helpers.ts';
 
@@ -443,7 +445,282 @@ Deno.test('Gate 5 real DurableStreamTestServer: 404 absent stream & bearer/cooki
     assertFalse(chunk2.text.includes('item-1'));
     assert(chunk2.text.includes('item-2'));
   } finally {
-    await server.stop();
+    await stopDurableStreamTestServerCleanly(server);
+  }
+});
+
+Deno.test('Finding 2 adversarial fail-closed matrix: non-ByteString headers, throwing getters, throwing trustProxy, and invalid upstream baseUrl', async () => {
+  // 2a: Non-ByteString responseHeaders / setCookies and invalid header names fail closed 503 with 0 upstream & freed slots
+  {
+    const upstream = createControlledUpstream();
+    let mode: 'bad-header-val' | 'bad-cookie-val' | 'bad-header-name' | 'ok' = 'bad-header-val';
+    const proxy = createNetScriptStreamProxy<TestGrant>({
+      baseUrl: 'http://streams.internal',
+      fetch: upstream.fetch,
+      recheckEveryMs: null,
+      maxActiveReaders: 1,
+      maxReadersPerKey: { key: (g) => g.sessionId, max: 1 },
+      upstreamAuth: () => ({}),
+      authorize: (): StreamProxyAuthDecision<TestGrant> => {
+        if (mode === 'bad-header-val') {
+          return {
+            allow: true,
+            grant: { sessionId: 'h1' },
+            responseHeaders: { 'x-app-note': 'caf\u0100' },
+          };
+        }
+        if (mode === 'bad-cookie-val') {
+          return {
+            allow: true,
+            grant: { sessionId: 'h1' },
+            setCookies: ['__Host-s=bad\u0100val; Path=/'],
+          };
+        }
+        if (mode === 'bad-header-name') {
+          return {
+            allow: true,
+            grant: { sessionId: 'h1' },
+            responseHeaders: { 'bad name': 'ok' },
+          };
+        }
+        return { allow: true, grant: { sessionId: 'h1' } };
+      },
+      recheck: () => ({ allow: true }),
+      resolvePath: () => '/projects/h/events',
+    });
+
+    for (const m of ['bad-header-val', 'bad-cookie-val', 'bad-header-name'] as const) {
+      mode = m;
+      const res = await proxy(
+        new Request('https://app.example.test/stream', { headers: { authorization: 'Bearer h1' } }),
+      );
+      assertEquals(res.status, 503, `mode=${m} must fail closed 503`);
+    }
+    assertEquals(upstream.totalOpened, 0);
+
+    // Follow-up valid request proves both global (max=1) and per-key (max=1) slots were released
+    mode = 'ok';
+    const okRes = await proxy(
+      new Request('https://app.example.test/stream', { headers: { authorization: 'Bearer h1' } }),
+    );
+    assertEquals(okRes.status, 200);
+    await okRes.body?.cancel();
+    await flushMicrotasks();
+    assertEquals(upstream.activeCount, 0);
+  }
+
+  // 2b: Hostile / throwing decision getters in authorize, setup recheck, and streaming recheck
+  {
+    const upstream = createControlledUpstream();
+    const throwingAuthDecisions: unknown[] = [
+      Object.defineProperty({}, 'allow', {
+        get() {
+          throw new Error('AUTH_ALLOW_GETTER_SECRET');
+        },
+      }),
+      Object.defineProperty({ allow: true }, 'grant', {
+        get() {
+          throw new Error('AUTH_GRANT_GETTER_SECRET');
+        },
+      }),
+      Object.defineProperty({ allow: true, grant: { sessionId: 'g1' } }, 'responseHeaders', {
+        get() {
+          throw new Error('AUTH_HEADERS_GETTER_SECRET');
+        },
+      }),
+      Object.defineProperty({ allow: true, grant: { sessionId: 'g1' } }, 'setCookies', {
+        get() {
+          throw new Error('AUTH_COOKIES_GETTER_SECRET');
+        },
+      }),
+      Object.defineProperty({ allow: true, grant: { sessionId: 'g1' } }, 'expiresAtMs', {
+        get() {
+          throw new Error('AUTH_EXPIRY_GETTER_SECRET');
+        },
+      }),
+    ];
+    let idx = 0;
+    const proxy = createNetScriptStreamProxy<TestGrant>({
+      baseUrl: 'http://streams.internal',
+      fetch: upstream.fetch,
+      maxActiveReaders: 1,
+      upstreamAuth: () => ({}),
+      authorize: () =>
+        idx < throwingAuthDecisions.length
+          ? (throwingAuthDecisions[idx++] as never)
+          : { allow: true, grant: { sessionId: 'ok' } },
+      recheck: () => ({ allow: true }),
+      resolvePath: () => '/projects/g/events',
+    });
+
+    for (let i = 0; i < throwingAuthDecisions.length; i += 1) {
+      const res = await proxy(
+        new Request('https://app.example.test/stream', { headers: { authorization: 'Bearer g1' } }),
+      );
+      assertEquals(res.status, 503);
+      assertFalse((await res.text()).includes('GETTER_SECRET'));
+    }
+    assertEquals(upstream.totalOpened, 0);
+    const recovery = await proxy(
+      new Request('https://app.example.test/stream', { headers: { authorization: 'Bearer g1' } }),
+    );
+    assertEquals(recovery.status, 200);
+    await recovery.body?.cancel();
+
+    // Setup post-subscribe throwing recheck getter -> 503, unsubscribed, 0 upstream
+    const hubSetup = createSharedRevocationHub();
+    const setupGetterProxy = createNetScriptStreamProxy<TestGrant>({
+      baseUrl: 'http://streams.internal',
+      fetch: upstream.fetch,
+      maxActiveReaders: 1,
+      revocationSource: hubSetup.revocationSource,
+      upstreamAuth: () => ({}),
+      authorize: () => ({ allow: true, grant: { sessionId: 'setup-g' } }),
+      recheck: () =>
+        Object.defineProperty({ allow: true }, 'expiresAtMs', {
+          get() {
+            throw new Error('SETUP_RECHECK_GETTER');
+          },
+        }) as never,
+      resolvePath: () => '/projects/g/events',
+    });
+    const setupRes = await setupGetterProxy(
+      new Request('https://app.example.test/stream', { headers: { authorization: 'Bearer g1' } }),
+    );
+    assertEquals(setupRes.status, 503);
+    assertEquals(hubSetup.unsubscribeCount('setup-g'), 1);
+
+    // Streaming before-delivery throwing recheck getter -> closeOnce('policy-error'), 0 bytes emitted
+    const streamUpstream = createControlledUpstream();
+    const closed: StreamProxyCloseEvent[] = [];
+    const streamGetterProxy = createNetScriptStreamProxy<TestGrant>({
+      baseUrl: 'http://streams.internal',
+      fetch: streamUpstream.fetch,
+      recheckEveryMs: null,
+      upstreamAuth: () => ({}),
+      authorize: () => ({ allow: true, grant: { sessionId: 'stream-g' } }),
+      recheck: () =>
+        Object.defineProperty({}, 'allow', {
+          get() {
+            throw new Error('STREAM_RECHECK_GETTER');
+          },
+        }) as never,
+      resolvePath: () => '/projects/g/events',
+      onClose: (e) => closed.push(e),
+    });
+    const streamRes = await streamGetterProxy(
+      new Request('https://app.example.test/stream', { headers: { authorization: 'Bearer g1' } }),
+    );
+    assertEquals(streamRes.status, 200);
+    streamUpstream.readers[0]!.push(
+      sseDataBlock(makeStateChange('secret', { v: 1 })) +
+        sseControlBlock({ streamNextOffset: 'o1' }),
+    );
+    assertEquals(await readAllText(streamRes.body), '');
+    assertEquals(closed.length, 1);
+    assertEquals(closed[0]!.reason, 'policy-error');
+    await flushMicrotasks();
+    assertEquals(streamUpstream.activeCount, 0);
+  }
+
+  // 2c: Throwing trustProxy predicate fails closed 503, redacts message, frees slot
+  {
+    const upstream = createControlledUpstream();
+    let shouldThrow = true;
+    const proxy = createNetScriptStreamProxy({
+      baseUrl: 'http://streams.internal',
+      fetch: upstream.fetch,
+      clientAuth: 'cookie',
+      maxActiveReaders: 1,
+      trustProxy: () => {
+        if (shouldThrow) throw new Error('TRUST_PROXY_SECRET_CRASH');
+        return true;
+      },
+      upstreamAuth: () => ({}),
+      authorize: () => ({ allow: true, grant: {} }),
+      recheck: () => ({ allow: true }),
+      resolvePath: () => '/projects/tp/events',
+    });
+
+    const errRes = await proxy(
+      new Request('http://127.0.0.1:3001/stream', {
+        headers: {
+          origin: 'https://public.example.test',
+          'sec-fetch-site': 'same-origin',
+          'x-forwarded-proto': 'https',
+          'x-forwarded-host': 'public.example.test',
+        },
+      }),
+      { remoteAddr: { transport: 'tcp', hostname: '10.0.0.1', port: 4444 } },
+    );
+    assertEquals(errRes.status, 503);
+    assertFalse((await errRes.text()).includes('TRUST_PROXY_SECRET_CRASH'));
+    assertEquals(upstream.totalOpened, 0);
+
+    shouldThrow = false;
+    const okRes = await proxy(
+      new Request('http://127.0.0.1:3001/stream', {
+        headers: {
+          origin: 'https://public.example.test',
+          'sec-fetch-site': 'same-origin',
+          'x-forwarded-proto': 'https',
+          'x-forwarded-host': 'public.example.test',
+        },
+      }),
+      { remoteAddr: { transport: 'tcp', hostname: '10.0.0.1', port: 4444 } },
+    );
+    assertEquals(okRes.status, 200);
+    await okRes.body?.cancel();
+    await flushMicrotasks();
+    assertEquals(upstream.activeCount, 0);
+  }
+
+  // 2d: Invalid upstream baseUrl (query, fragment, userinfo, non-HTTP(S), malformed) -> 502, 0 fetch calls, slot freed
+  {
+    const upstream = createControlledUpstream();
+    const badBaseUrls = [
+      'http://streams.internal?injected=1',
+      'http://streams.internal#frag',
+      'http://user:pass@streams.internal',
+      'ftp://streams.internal',
+      'not a valid url',
+    ];
+    let currentBase = badBaseUrls[0]!;
+    const proxy = createNetScriptStreamProxy({
+      baseUrl: () => currentBase,
+      fetch: upstream.fetch,
+      recheckEveryMs: null,
+      maxActiveReaders: 1,
+      upstreamAuth: () => ({}),
+      authorize: () => ({ allow: true, grant: {} }),
+      recheck: () => ({ allow: true }),
+      resolvePath: () => '/projects/url/events',
+    });
+
+    for (const bad of badBaseUrls) {
+      currentBase = bad;
+      const res = await proxy(
+        new Request('https://app.example.test/stream', {
+          headers: { authorization: 'Bearer ok' },
+        }),
+      );
+      assertEquals(res.status, 502, `bad baseUrl ${bad} must fail closed 502`);
+    }
+    assertEquals(upstream.totalOpened, 0);
+
+    // Valid prefixed baseUrl composes cleanly and proves slot was released
+    currentBase = 'http://streams.internal/prefix/';
+    const okRes = await proxy(
+      new Request('https://app.example.test/stream', { headers: { authorization: 'Bearer ok' } }),
+    );
+    assertEquals(okRes.status, 200);
+    assertEquals(
+      upstream.readers[0]!.url,
+      'http://streams.internal/prefix/v1/stream/netscript/projects/url/events?offset=-1&live=sse',
+    );
+    await okRes.body?.cancel();
+    await flushMicrotasks();
+    assertEquals(upstream.activeCount, 0);
   }
 });
 
@@ -707,138 +984,231 @@ Deno.test('Gate 9 reader caps (maxActiveReaders 503 + maxReadersPerKey 429 + ear
   assertEquals(stormUpstream.activeCount, 0);
 });
 
-Deno.test('Gate 9 32-reader concurrent fan-out soak with mid-run revocations and reconnect churn', async () => {
-  const upstream = createControlledUpstream();
+Deno.test('Gate 9 32-reader real DurableStreamTestServer soak: 1 update/s cadence, mid-run revocations, and offset-resume reconnects', async () => {
+  const server = new DurableStreamTestServer({ port: 0 });
+  const baseUrl = await server.start();
+  const streamPath = '/projects/soak-real/events';
+  const fullUrl = `${baseUrl}/v1/stream/netscript${streamPath}`;
   const hub = createSharedRevocationHub();
   const closedEvents: StreamProxyCloseEvent[] = [];
 
-  const proxy = createNetScriptStreamProxy<TestGrant>({
-    baseUrl: 'http://streams.internal',
-    fetch: upstream.fetch,
-    revocationSource: hub.revocationSource,
-    recheckEveryMs: null,
-    maxActiveReaders: 64,
-    upstreamAuth: () => ({}),
-    authorize: ({ request }) => {
-      const sid = (request.headers.get('authorization') ?? '').slice('Bearer '.length);
-      return hub.isActive(sid)
-        ? { allow: true, grant: { sessionId: sid } }
-        : { allow: false, status: 401, reason: 'revoked' };
-    },
-    recheck: ({ grant }) =>
-      hub.isActive(grant.sessionId) ? { allow: true } : { allow: false, reason: 'revoked' },
-    resolvePath: () => '/projects/soak/events',
-    onClose: (e) => closedEvents.push(e),
-  });
+  type ReplayState = ReturnType<typeof createStreamSseReplayStateV1>;
+  const readNextDataKeys = async (
+    reader: ReadableStreamDefaultReader<Uint8Array>,
+    initialState: ReplayState,
+  ): Promise<
+    { readonly done: boolean; readonly keys: readonly string[]; readonly state: ReplayState }
+  > => {
+    let state = initialState;
+    while (true) {
+      const chunk = await readOneChunkText(reader);
+      if (chunk.done) return { done: true, keys: [], state };
+      const keys: string[] = [];
+      for (const block of chunk.text.trim().split('\n\n')) {
+        if (!block.trim()) continue;
+        const lines = block.split('\n');
+        const eventLine = lines.find((l) => l.startsWith('event:'));
+        if (!eventLine) continue;
+        const eventName = eventLine.slice(6).trim();
+        const data = lines
+          .filter((l) => l.startsWith('data:'))
+          .map((l) => l.slice(5).trim())
+          .join('\n');
+        const parsed = parseStreamSseEventV1({
+          eventName,
+          data,
+          lastCommittedOffset: state.lastCommittedOffset,
+        });
+        assertEquals(parsed.ok, true, `failed to parse SSE block: ${block}`);
+        if (!parsed.ok) continue;
+        if (parsed.frame.event === 'data') {
+          for (const item of parsed.frame.payload) {
+            keys.push(item.key);
+          }
+        }
+        state = reduceStreamSseReplayStateV1(state, parsed.frame).state;
+      }
+      if (keys.length > 0) return { done: false, keys, state };
+    }
+  };
 
-  const READER_COUNT = 32;
-  const TOTAL_UPDATES = 6;
-  const REVOKE_AT_UPDATE = 3;
-  const latenciesMs: number[] = [];
+  try {
+    const seedRes = await fetch(fullUrl, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(makeStateChange('seed-0', { step: 0 })),
+    });
+    assert(seedRes.ok, `PUT seed failed: ${seedRes.status}`);
+    await seedRes.body?.cancel();
 
-  const readers: Array<{
-    readonly sid: string;
-    readonly index: number;
-    readonly reader: ReadableStreamDefaultReader<Uint8Array>;
-    readonly receivedOffsets: string[];
-    revoked: boolean;
-  }> = [];
+    const proxy = createNetScriptStreamProxy<TestGrant>({
+      baseUrl,
+      revocationSource: hub.revocationSource,
+      recheckEveryMs: null,
+      maxActiveReaders: 64,
+      upstreamAuth: () => ({}),
+      authorize: ({ request }) => {
+        const sid = (request.headers.get('authorization') ?? '').slice('Bearer '.length);
+        return hub.isActive(sid)
+          ? { allow: true, grant: { sessionId: sid } }
+          : { allow: false, status: 401, reason: 'revoked' };
+      },
+      recheck: ({ grant }) =>
+        hub.isActive(grant.sessionId) ? { allow: true } : { allow: false, reason: 'revoked' },
+      resolvePath: () => streamPath,
+      onClose: (e) => closedEvents.push(e),
+    });
 
-  for (let i = 0; i < READER_COUNT; i += 1) {
-    const sid = `soak-reader-${i}`;
-    const res = await proxy(
-      new Request('https://app.example.test/stream', {
-        headers: { authorization: `Bearer ${sid}` },
+    const READER_COUNT = 32;
+    const TOTAL_LIVE_UPDATES = 5;
+    const REVOKE_BEFORE_UPDATE = 3;
+    const RECONNECT_BEFORE_UPDATE = 4;
+    const RECONNECT_INDICES = new Set([1, 3]);
+    const CADENCE_MS = 1_000;
+    const latenciesMs: number[] = [];
+
+    const readers: Array<{
+      readonly sid: string;
+      readonly index: number;
+      reader: ReadableStreamDefaultReader<Uint8Array>;
+      replayState: ReplayState;
+      readonly receivedKeys: string[];
+      revoked: boolean;
+    }> = [];
+
+    for (let i = 0; i < READER_COUNT; i += 1) {
+      const sid = `soak-reader-${i}`;
+      const res = await proxy(
+        new Request('https://app.example.test/stream?offset=-1&live=sse', {
+          headers: { authorization: `Bearer ${sid}` },
+        }),
+      );
+      assertEquals(res.status, 200);
+      readers.push({
+        sid,
+        index: i,
+        reader: res.body!.getReader(),
+        replayState: createStreamSseReplayStateV1(),
+        receivedKeys: [],
+        revoked: false,
+      });
+    }
+
+    // Drain initial seed-0 unit on all 32 readers
+    await Promise.all(
+      readers.map(async (r) => {
+        const out = await readNextDataKeys(r.reader, r.replayState);
+        assertFalse(out.done);
+        r.replayState = out.state;
+        r.receivedKeys.push(...out.keys);
+        assert(r.replayState.lastCommittedOffset !== undefined);
       }),
     );
-    assertEquals(res.status, 200);
-    readers.push({
-      sid,
-      index: i,
-      reader: res.body!.getReader(),
-      receivedOffsets: [],
-      revoked: false,
-    });
-  }
-  assertEquals(upstream.activeCount, READER_COUNT);
 
-  // Deliver updates 1..6; revoke even-indexed readers before update 3 and churn one authorized reader reconnect at update 4
-  for (let u = 1; u <= TOTAL_UPDATES; u += 1) {
-    if (u === REVOKE_AT_UPDATE) {
-      for (const r of readers) {
-        if (r.index % 2 === 0) {
-          r.revoked = true;
-          hub.revoke(r.sid, 'revoked');
+    // Publish 5 live updates paced at 1 update/s with mid-run revocation & mid-run offset-resume reconnects
+    let lastPublishAtMs = performance.now();
+    for (let u = 1; u <= TOTAL_LIVE_UPDATES; u += 1) {
+      if (u === REVOKE_BEFORE_UPDATE) {
+        for (const r of readers) {
+          if (r.index % 2 === 0) {
+            r.revoked = true;
+            hub.revoke(r.sid, 'revoked');
+          }
+        }
+        await Promise.all(
+          readers
+            .filter((r) => r.revoked)
+            .map(async (r) => {
+              const eof = await readOneChunkText(r.reader);
+              assertEquals(eof.done, true);
+              assertEquals(eof.text, '');
+              r.reader.releaseLock();
+              const retry = await proxy(
+                new Request('https://app.example.test/stream', {
+                  headers: { authorization: `Bearer ${r.sid}` },
+                }),
+              );
+              assertEquals(retry.status, 401);
+            }),
+        );
+      }
+
+      if (u === RECONNECT_BEFORE_UPDATE) {
+        await Promise.all(
+          readers
+            .filter((r) => RECONNECT_INDICES.has(r.index))
+            .map(async (r) => {
+              const resumeOffset = r.replayState.lastCommittedOffset!;
+              await r.reader.cancel('mid-run-reconnect');
+              r.reader.releaseLock();
+              const resumedRes = await proxy(
+                new Request(
+                  `https://app.example.test/stream?offset=${
+                    encodeURIComponent(resumeOffset)
+                  }&live=sse`,
+                  { headers: { authorization: `Bearer ${r.sid}` } },
+                ),
+              );
+              assertEquals(resumedRes.status, 200);
+              r.reader = resumedRes.body!.getReader();
+            }),
+        );
+      }
+
+      if (u > 1) {
+        const waitMs = Math.max(0, CADENCE_MS - (performance.now() - lastPublishAtMs));
+        if (waitMs > 0) {
+          await new Promise<void>((resolve) => setTimeout(resolve, waitMs));
         }
       }
-      // Verify revoked readers reach EOF immediately with zero extra deliveries
-      await Promise.all(
-        readers
-          .filter((r) => r.revoked)
-          .map(async (r) => {
-            const eof = await readOneChunkText(r.reader);
-            assertEquals(eof.done, true);
-            r.reader.releaseLock();
-            const retry = await proxy(
-              new Request('https://app.example.test/stream', {
-                headers: { authorization: `Bearer ${r.sid}` },
-              }),
-            );
-            assertEquals(retry.status, 401);
-          }),
-      );
+
+      const activeList = readers.filter((r) => !r.revoked);
+      const readPromises = activeList.map(async (r) => {
+        const out = await readNextDataKeys(r.reader, r.replayState);
+        return { r, out, receivedAtMs: performance.now() };
+      });
+
+      const publishStartMs = performance.now();
+      lastPublishAtMs = publishStartMs;
+      const postRes = await fetch(fullUrl, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(makeStateChange(`u${u}`, { u })),
+      });
+      assert(postRes.ok, `POST u${u} failed: ${postRes.status}`);
+      await postRes.body?.cancel();
+
+      const results = await Promise.all(readPromises);
+      for (const { r, out, receivedAtMs } of results) {
+        assertFalse(out.done, `authorized reader ${r.sid} closed unexpectedly at u${u}`);
+        latenciesMs.push(Math.max(0, receivedAtMs - publishStartMs));
+        r.replayState = out.state;
+        r.receivedKeys.push(...out.keys);
+      }
     }
 
-    const block = sseDataBlock(makeStateChange(`u${u}`, { u })) +
-      sseControlBlock({ streamNextOffset: `off_${u}` });
-    const startMs = performance.now();
-
-    const activeList = readers.filter((r) => !r.revoked);
-    for (const r of activeList) {
-      upstream.readers[r.index]!.push(block);
+    // Verify exact zero-gap, zero-duplicate history on authorized readers and zero post-revocation deliveries
+    for (const r of readers) {
+      if (r.revoked) {
+        assertEquals(r.receivedKeys, ['seed-0', 'u1', 'u2']);
+        assertEquals(hub.unsubscribeCount(r.sid), 1);
+      } else {
+        assertEquals(r.receivedKeys, ['seed-0', 'u1', 'u2', 'u3', 'u4', 'u5']);
+        await r.reader.cancel('shutdown');
+        r.reader.releaseLock();
+        const expectedUnsubs = RECONNECT_INDICES.has(r.index) ? 2 : 1;
+        assertEquals(hub.unsubscribeCount(r.sid), expectedUnsubs);
+      }
     }
 
-    await Promise.all(
-      activeList.map(async (r) => {
-        const chunk = await readOneChunkText(r.reader);
-        assertFalse(chunk.done);
-        latenciesMs.push(performance.now() - startMs);
-        assert(chunk.text.includes(`off_${u}`), `reader ${r.sid} missed off_${u}`);
-        r.receivedOffsets.push(`off_${u}`);
-      }),
-    );
+    latenciesMs.sort((a, b) => a - b);
+    const p95 =
+      latenciesMs[Math.min(latenciesMs.length - 1, Math.floor(latenciesMs.length * 0.95))] ?? 0;
+    assert(p95 < 1_000, `32-reader soak p95 delivery latency too high: ${p95.toFixed(2)}ms`);
+    assertEquals(closedEvents.length, READER_COUNT + RECONNECT_INDICES.size);
+  } finally {
+    await stopDurableStreamTestServerCleanly(server);
   }
-
-  // Verify zero gaps on authorized readers and zero post-revocation deliveries on revoked readers
-  for (const r of readers) {
-    if (r.revoked) {
-      assertEquals(r.receivedOffsets, ['off_1', 'off_2']);
-      assertEquals(hub.unsubscribeCount(r.sid), 1);
-    } else {
-      assertEquals(r.receivedOffsets, ['off_1', 'off_2', 'off_3', 'off_4', 'off_5', 'off_6']);
-      await r.reader.cancel('shutdown');
-      r.reader.releaseLock();
-      assertEquals(hub.unsubscribeCount(r.sid), 1);
-    }
-  }
-
-  // Reconnect churn verification on a fresh authorized reader
-  const churnRes = await proxy(
-    new Request('https://app.example.test/stream?offset=off_6', {
-      headers: { authorization: 'Bearer soak-churn' },
-    }),
-  );
-  assertEquals(churnRes.status, 200);
-  await churnRes.body?.cancel();
-
-  await flushMicrotasks();
-  assertEquals(upstream.activeCount, 0);
-
-  latenciesMs.sort((a, b) => a - b);
-  const p95 =
-    latenciesMs[Math.min(latenciesMs.length - 1, Math.floor(latenciesMs.length * 0.95))] ?? 0;
-  assert(p95 < 1_000, `32-reader soak p95 delivery latency too high: ${p95.toFixed(2)}ms`);
-  assertEquals(closedEvents.length, READER_COUNT + 1);
 });
 
 Deno.test('Gate 10: @netscript/plugin-streams-core/proxy public declarations have zero @orpc leakage', async () => {
