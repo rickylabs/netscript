@@ -11,6 +11,8 @@ order: 1
 
 Content uses semantic tones. Each header has one label beside its icon, with the body aligned to the same text column. Navigation, links and focus stay in ink.
 
+The legacy `danger` and `error` aliases keep their destructive tone and labels in HTML. Their Markdown twins use GitHub's supported `CAUTION` marker, including alerts authored with `[!DANGER]` or `[!ERROR]`.
+
 ## Default labels
 
 {{ comp callout { type: "NOTE" } }}

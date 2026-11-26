@@ -10,8 +10,8 @@ export interface StyleSource {
   roleCheckOnly?: boolean;
   /** Bundled raw token definitions must exactly match the verified standalone token layer. */
   generatedTokenBundle?: boolean;
-  /** Independently resolved non-red Figma ramp values on a verified token layer only. */
-  nonRedTokenValues?: Record<string, string>;
+  /** Only the number-kind role may exempt its independently resolved orange-12 value. */
+  nonRedTokenValues?: { '--ns-studio-api-kind-number-text'?: string };
 }
 export interface StyleFinding {
   path: string;
@@ -140,20 +140,19 @@ export function analyzeStylePolicy(sources: StyleSource[]): StyleFinding[] {
     const hue = (((g - b) / delta * 60) + 360) % 360;
     return hue <= 18 || hue >= 340;
   }
-  const nonRedTokens = new Map<string, Set<string>>();
+  const nonRedTokenName = '--ns-studio-api-kind-number-text';
+  const nonRedTokenValues = new Set<string>();
   for (const file of sources.filter((file) => file.tokenLayer)) {
-    for (const [name, value] of Object.entries(file.nonRedTokenValues ?? {})) {
-      const values = nonRedTokens.get(name) ?? new Set<string>();
-      values.add(value.trim().toLowerCase());
-      nonRedTokens.set(name, values);
-    }
+    const value = file.nonRedTokenValues?.[nonRedTokenName];
+    if (value !== undefined) nonRedTokenValues.add(value.trim().toLowerCase());
   }
   function red(value: string, trail: string[] = []): boolean {
     if (literalRed(value)) return true;
     return references(value).some((name) =>
       !trail.includes(name) &&
       [...(variables.get(name) ?? [])].some((next) =>
-        !nonRedTokens.get(name)?.has(next.trim().toLowerCase()) && red(next, [...trail, name])
+        !(name === nonRedTokenName && nonRedTokenValues.has(next.trim().toLowerCase())) &&
+        red(next, [...trail, name])
       )
     );
   }
