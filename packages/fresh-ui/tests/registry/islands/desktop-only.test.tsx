@@ -1,6 +1,6 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { h } from 'preact';
-import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { render } from 'npm:preact-render-to-string@^6.8.3';
 import DesktopOnly, { isDesktopBindingAvailable } from '../../../registry/islands/DesktopOnly.tsx';
 
 Deno.test('isDesktopBindingAvailable uses a local structural binding check', () => {

@@ -95,7 +95,7 @@ Deno.test('upstream Deno caches include version and lock hash and skip unused br
   assertEquals(matrix.includes("hashFiles('deno.lock') }}-${{ matrix.lane }}"), false);
 });
 
-Deno.test('matrix preserves type checks, browser policy, receipts and required Redis tests', async () => {
+Deno.test('matrix preserves type checks, browser policy, receipts and required Garnet/Redis tests', async () => {
   const block = job(await workflow(), 'check-test-shard');
   assertStringIncludes(block, 'fail-fast: false');
   assertEquals(block.includes('continue-on-error'), false);
@@ -110,16 +110,23 @@ Deno.test('matrix preserves type checks, browser policy, receipts and required R
   assertStringIncludes(block, "needs.classify.result != 'success'");
   assertStringIncludes(
     block,
+    "NETSCRIPT_TEST_GARNET_URL: ${{ matrix.index > 0 && 'redis://127.0.0.1:6379' || '' }}",
+  );
+  assertStringIncludes(
+    block,
     "NETSCRIPT_TEST_REDIS_URL: ${{ matrix.index > 0 && 'redis://127.0.0.1:6379' || '' }}",
   );
   assertStringIncludes(block, 'docker load --input "$image_cache"');
-  assertStringIncludes(block, 'docker pull "$CI_REDIS_IMAGE"');
-  assertStringIncludes(block, 'docker tag "$CI_REDIS_IMAGE" netscript-ci-redis:locked');
-  assertStringIncludes(block, '--publish 6379:6379 netscript-ci-redis:locked');
-  assertStringIncludes(block, 'docker save --output "$image_cache" netscript-ci-redis:locked');
-  assertStringIncludes(block, 'key: ${{ runner.os }}-ci-image-${{ env.CI_REDIS_IMAGE }}-v1');
-  assert(/CI_REDIS_IMAGE: redis:7-alpine@sha256:[a-f0-9]{64}/.test(await workflow()));
-  assertStringIncludes(block, 'CI Redis $mode:');
+  assertStringIncludes(block, 'docker pull "$CI_GARNET_IMAGE"');
+  assertStringIncludes(block, 'docker tag "$CI_GARNET_IMAGE" netscript-ci-garnet:locked');
+  assertStringIncludes(
+    block,
+    '--publish 6379:6379 netscript-ci-garnet:locked --bind 0.0.0.0 --port 6379 --auth ACL --lua --lua-transaction-mode',
+  );
+  assertStringIncludes(block, 'docker save --output "$image_cache" netscript-ci-garnet:locked');
+  assertStringIncludes(block, 'key: ${{ runner.os }}-ci-image-${{ env.CI_GARNET_IMAGE }}-v1');
+  assert(/CI_GARNET_IMAGE: ghcr\.io\/microsoft\/garnet:2\.\d+\.\d+@sha256:[a-f0-9]{64}/.test(await workflow()));
+  assertStringIncludes(block, 'CI Garnet $mode:');
   assertStringIncludes(block, '$GITHUB_STEP_SUMMARY');
 });
 

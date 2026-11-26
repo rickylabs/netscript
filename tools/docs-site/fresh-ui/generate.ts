@@ -99,9 +99,9 @@ async function prepareSources(items: readonly RegistryItem[]): Promise<string> {
     ...Object.fromEntries(
       Object.entries(root.catalog).map(([name, version]) => [name, `npm:${name}@${version}`]),
     ),
-    preact: 'npm:preact@^10.29.2',
-    'preact/hooks': 'npm:preact@^10.29.2/hooks',
-    'preact/jsx-runtime': 'npm:preact@^10.29.2/jsx-runtime',
+    preact: 'npm:preact@^10.29.8',
+    'preact/hooks': 'npm:preact@^10.29.8/hooks',
+    'preact/jsx-runtime': 'npm:preact@^10.29.8/jsx-runtime',
     '@preact/signals': root.imports['@preact/signals'] ?? 'npm:@preact/signals@2.11.3',
     zod: `npm:zod@${root.catalog.zod}`,
     '@netscript/fresh-ui/interactive':

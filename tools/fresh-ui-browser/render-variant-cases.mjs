@@ -1,6 +1,6 @@
-import { Fragment, h } from 'npm:preact@^10.29.2';
+import { Fragment, h } from 'npm:preact@^10.29.8';
 globalThis.React = { createElement: h, Fragment };
-import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { render } from 'npm:preact-render-to-string@^6.8.3';
 import { toFileUrl } from 'jsr:@std/path@^1';
 const root = Deno.args[0], output = Deno.args[1];
 const cases = [];

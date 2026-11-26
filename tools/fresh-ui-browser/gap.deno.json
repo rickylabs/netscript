@@ -10,7 +10,7 @@
     ]
   },
   "imports": {
-    "preact": "npm:preact@^10.29.2",
+    "preact": "npm:preact@^10.29.8",
     "clsx": "npm:clsx@^2.1.1",
     "tailwind-merge": "npm:tailwind-merge@^3.7.0",
     "@netscript/fresh-ui/interactive": "../../packages/fresh-ui/interactive.ts",

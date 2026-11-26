@@ -165,10 +165,10 @@ Deno.test({
               '@netscript/telemetry/otel':
                 new URL('packages/telemetry/src/adapters/otel/mod.ts', repoRoot).href,
               '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.1',
-              '@tanstack/react-db': 'npm:@tanstack/react-db@0.5.8',
+              '@tanstack/react-db': 'npm:@tanstack/react-db@0.5.12',
               fresh: 'jsr:@fresh/core@^2.3.3',
-              preact: 'npm:preact@^10.29.2',
-              'preact/hooks': 'npm:preact@^10.29.2/hooks',
+              preact: 'npm:preact@^10.29.8',
+              'preact/hooks': 'npm:preact@^10.29.8/hooks',
               zod: 'catalog:',
             },
             compilerOptions: {

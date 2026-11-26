@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
-import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { render } from 'npm:preact-render-to-string@^6.8.3';
 import { Label } from '../../registry/components/ui/label.tsx';
 import { Card } from '../../registry/components/ui/card.tsx';
 import { Pagination } from '../../registry/components/ui/pagination.tsx';

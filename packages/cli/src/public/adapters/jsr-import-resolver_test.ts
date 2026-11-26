@@ -38,7 +38,7 @@ describe('JsrImportResolver', () => {
     const resolver = new JsrImportResolver();
 
     assertEquals(resolver.resolveImport(SCAFFOLD_PACKAGES.STD_PATH), 'jsr:@std/path@^1.0.0');
-    assertEquals(resolver.resolveImport(SCAFFOLD_PACKAGES.ZOD), 'npm:zod@^4.6.5');
+    assertEquals(resolver.resolveImport(SCAFFOLD_PACKAGES.ZOD), 'npm:zod@^4.6.7');
   });
 
   it('resolves selected imports as an import-map fragment', () => {

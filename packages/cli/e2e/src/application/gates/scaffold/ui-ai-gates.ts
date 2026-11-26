@@ -137,7 +137,7 @@ function uiSourceScript(): string {
 }
 
 const UI_RENDER_ASSERTION_SCRIPT = [
-  'import { render } from "npm:preact-render-to-string@^6.7.0";',
+  'import { render } from "npm:preact-render-to-string@^6.8.3";',
   'import { RENDER_UI_MAX_DEPTH, renderUiPayload } from "./lib/ai/render-ui.tsx";',
   'const nested = render(renderUiPayload({',
   '  component: "section",',
@@ -171,7 +171,7 @@ function mcpWidgetRoundtripScript(mcpModuleSpecifier: string): string {
   return [
     `import { createMcpTransportPool } from ${JSON.stringify(mcpModuleSpecifier)};`,
     'import McpUiWidget, { mcpUiFrameAttributes } from "./islands/ui/McpUiWidget.tsx";',
-    'import { render } from "npm:preact-render-to-string@^6.7.0";',
+    'import { render } from "npm:preact-render-to-string@^6.8.3";',
     'const sessionId = "fai9-e2e";',
     'const server = Deno.serve({ hostname: "127.0.0.1", port: 0, onListen: () => {} }, async (request) => {',
     '  if (request.method !== "POST") return new Response("method not allowed", { status: 405 });',

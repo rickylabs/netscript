@@ -71,8 +71,8 @@ Deno.test('copied Markdown type-checks and renders directly through Preact', asy
             name: '@netscript/fresh-ui-markdown-test',
             version: '0.0.0',
             imports: {
-              preact: 'npm:preact@^10.29.2',
-              'preact-render-to-string': 'npm:preact-render-to-string@^6.7.0',
+              preact: 'npm:preact@^10.29.8',
+              'preact-render-to-string': 'npm:preact-render-to-string@^6.8.3',
             },
             compilerOptions: {
               lib: ['dom', 'dom.asynciterable', 'dom.iterable', 'deno.ns'],

@@ -1,5 +1,5 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
-import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { render } from 'npm:preact-render-to-string@^6.8.3';
 import { Accordion } from '../../../src/runtime/accordion/Accordion.tsx';
 
 Deno.test('Accordion renders a typed summary trigger with disabled item semantics', () => {

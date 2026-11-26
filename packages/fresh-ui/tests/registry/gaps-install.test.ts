@@ -40,8 +40,8 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
         name: '@netscript/actions-contract-test',
         version: '0.0.0',
         imports: {
-          preact: 'npm:preact@^10.29.2',
-          '@preact/signals': 'npm:@preact/signals@2.11.3',
+          preact: 'npm:preact@^10.29.8',
+          '@preact/signals': 'npm:@preact/signals@2.11.4',
         },
         compilerOptions: {
           jsx: 'precompile',
@@ -114,7 +114,7 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
       join(root, 'render-audited.ts'),
       `
 import { h } from 'preact';
-import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { render } from 'npm:preact-render-to-string@^6.8.3';
 import { CodeBlock } from './components/ui/code-block.tsx';
 import { Label } from './components/ui/label.tsx';
 import { Card } from './components/ui/card.tsx';

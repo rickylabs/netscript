@@ -26,7 +26,7 @@ Deno.test('init --from rejects unregistered presets before writing', async () =>
   );
 });
 
-Deno.test('init defaults cache on with redis backend in non-interactive mode', async () => {
+Deno.test('init defaults cache on with garnet backend in non-interactive mode', async () => {
   const validated = await validateOptions(fakeInitContext(), {
     name: 'cache-defaults',
     importMode: 'jsr',
@@ -39,7 +39,7 @@ Deno.test('init defaults cache on with redis backend in non-interactive mode', a
   });
 
   assertEquals(validated.cache, true);
-  assertEquals(validated.cacheBackend, 'redis');
+  assertEquals(validated.cacheBackend, 'garnet');
   assertEquals(validated.modelName, 'User');
 });
 
@@ -202,7 +202,7 @@ Deno.test('interactive init prompts for all missing scaffold choices', async () 
     'input:Example service name:users',
     'input:Frontend application name:interactive-app-web',
     'confirm:Scaffold a shared cache?:true',
-    'select:Cache backend:redis',
+    'select:Cache backend:garnet',
   ]);
 });
 

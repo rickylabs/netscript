@@ -61,7 +61,7 @@ const EXTERNAL_DEPS: Readonly<Record<string, string>> = {
   [SCAFFOLD_PACKAGES.STD_PATH]: 'jsr:@std/path@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_FS]: 'jsr:@std/fs@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_ASSERT]: 'jsr:@std/assert@^1.0.0',
-  [SCAFFOLD_PACKAGES.ZOD]: 'npm:zod@^4.6.5',
+  [SCAFFOLD_PACKAGES.ZOD]: 'npm:zod@^4.6.7',
 };
 
 /** Maintainer resolver for monorepo-local NetScript package imports. */

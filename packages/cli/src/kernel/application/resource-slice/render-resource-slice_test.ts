@@ -383,9 +383,9 @@ async function writeConsumerFixture(root: string): Promise<void> {
             workspaceConfig.catalog['@opentelemetry/api']
           }`,
           '@preact/signals': 'npm:@preact/signals@2.9.2',
-          'preact': 'npm:preact@^10.29.2',
-          'preact/': 'npm:/preact@^10.29.2/',
-          'zod': 'npm:zod@^4.6.5',
+          'preact': 'npm:preact@^10.29.8',
+          'preact/': 'npm:/preact@^10.29.8/',
+          'zod': 'npm:zod@^4.6.7',
         },
         compilerOptions: {
           strict: true,

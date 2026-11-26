@@ -32,7 +32,7 @@ Deno.test('scratch probe rejects npm requirement drift without rewriting its ref
     assertEquals(await Deno.readTextFile(lockPath), locked);
     // The newer exact npm requirement is absent from the reference lock. Frozen resolution must
     // reject it even when the registry/cache could satisfy it; no age-policy timing is involved.
-    config.imports.dependency = 'npm:@orpc/client@1.15.5';
+    config.imports.dependency = 'npm:@orpc/client@1.16.6';
     await Deno.writeTextFile(configPath, JSON.stringify(config));
     await assertRejects(
       () => runLockedProbe([probe], root, root),

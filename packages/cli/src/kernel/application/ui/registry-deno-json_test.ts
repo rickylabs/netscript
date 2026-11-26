@@ -60,7 +60,9 @@ Deno.test('existing workspace imports are never overwritten', async () => {
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(
     '/app/deno.json',
-    JSON.stringify({ imports: { '@netscript/sdk': `jsr:@netscript/sdk@${PRIOR_RELEASE_VERSION}` } }),
+    JSON.stringify({
+      imports: { '@netscript/sdk': `jsr:@netscript/sdk@${PRIOR_RELEASE_VERSION}` },
+    }),
   );
   await mergeDenoJsonImports(
     '/app',
@@ -93,7 +95,7 @@ Deno.test('importEntryForDependency normalises every specifier shape', () => {
     ],
     // A version-less subpath still has to lose the subpath, or the alias doubles it.
     ['jsr:@netscript/sdk/desktop', { key: '@netscript/sdk', value: 'jsr:@netscript/sdk' }],
-    ['npm:preact@^10.29.2', { key: 'preact', value: 'npm:preact@^10.29.2' }],
+    ['npm:preact@^10.29.8', { key: 'preact', value: 'npm:preact@^10.29.8' }],
     [
       'npm:@preact/signals@^2.0.1/runtime',
       { key: '@preact/signals', value: 'npm:@preact/signals@^2.0.1' },

@@ -1,5 +1,5 @@
 import { assert, assertEquals } from '@std/assert';
-import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { render } from 'npm:preact-render-to-string@^6.8.3';
 import { componentContracts } from '../../contracts.ts';
 import { basicFixtures } from './utility-basic.tsx';
 import { renderViolations } from './contract-render.ts';

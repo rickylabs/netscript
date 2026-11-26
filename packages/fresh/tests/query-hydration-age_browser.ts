@@ -24,7 +24,7 @@ Deno.test({
         'run',
         '--no-lock',
         '-A',
-        'npm:vite@7.2.2',
+        'npm:vite@7.3.8',
         '--config',
         'vite.config.ts',
         '--host',

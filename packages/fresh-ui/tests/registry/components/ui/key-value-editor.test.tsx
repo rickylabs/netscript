@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertFalse, assertStringIncludes, assertThrows } from '@std/assert';
-import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { render } from 'npm:preact-render-to-string@^6.8.3';
 import {
   HTTP_HEADER_NAME_PATTERN,
   keyValueFieldName,

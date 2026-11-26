@@ -7,10 +7,10 @@
     "jsr:@std/internal@^1.0.14": "1.0.14",
     "jsr:@std/path@1": "1.1.6",
     "npm:@opentelemetry/api@^1.9.1": "1.9.1",
-    "npm:@orpc/client@^1.15.5": "1.15.5_@opentelemetry+api@1.9.1",
-    "npm:@orpc/contract@^1.15.5": "1.15.5_@opentelemetry+api@1.9.1",
-    "npm:@orpc/server@^1.15.5": "1.15.5_@opentelemetry+api@1.9.1",
-    "npm:zod@^4.6.5": "4.6.5"
+    "npm:@orpc/client@^1.16.6": "1.16.6_@opentelemetry+api@1.9.1",
+    "npm:@orpc/contract@^1.16.6": "1.16.6_@opentelemetry+api@1.9.1",
+    "npm:@orpc/server@^1.16.6": "1.16.6_@opentelemetry+api@1.9.1",
+    "npm:zod@^4.6.7": "4.6.7"
   },
   "jsr": {
     "@standard-schema/spec@1.1.0": {
@@ -36,8 +36,8 @@
     "@opentelemetry/api@1.9.1": {
       "integrity": "sha512-gLyJlPHPZYdAk1JENA9LeHejZe1Ti77/pTeFm/nMXmQH/HFZlcS/O2XJB+L8fkbrNSqhdtlvjBVjxwUYanNH5Q=="
     },
-    "@orpc/client@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-0usheWO9w5HRHG20+nGB5AJlOQfea/fEmOX1KKHneBTkLpFTBSTkyJSqAN6ugJbhWm8BKVs9caimFQr8vcI0Ig==",
+    "@orpc/client@1.16.6_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-AEPeHfZJ+rT3U7jNZ7nV2AHHXfI4pycNoU66zlC023K6A7EvujhM1CGhv8YXAi3weXsk0EUzwuP6IvCvLY9p6g==",
       "dependencies": [
         "@orpc/shared",
         "@orpc/standard-server",
@@ -45,8 +45,8 @@
         "@orpc/standard-server-peer"
       ]
     },
-    "@orpc/contract@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-VAT6NOusDZrvp3e6GqW1Xo7mTpMrCZCVqg0oCGuRjFfsVoCTOMeEoqP7IqA4SbThzim0iA3laC198aYYM0lvcg==",
+    "@orpc/contract@1.16.6_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-wpT3SDO9RpLMKK+DmGFVz0Uv9aE3tngxkCc6RKibF1JNiZk6VhW7DjXr6f/g/zrqZaTdbWUFZMrUMq2BQ+GYog==",
       "dependencies": [
         "@orpc/client",
         "@orpc/shared",
@@ -54,11 +54,11 @@
         "openapi-types"
       ]
     },
-    "@orpc/interop@1.15.5": {
-      "integrity": "sha512-VA9FQLt2jHY5MN8aMQ0Eg6muPZViOWBZaOmreARt8A/3AN8HaUOR43ccma6iTHVzojX7T1rz/9YXSY7zfUbDqw=="
+    "@orpc/interop@1.16.6": {
+      "integrity": "sha512-AR16TKLuhCBzHErQ1oDCkOdtvx3XlB59GYJnlnZxneCkLzCqv1ud+yc9H3VdFmzJAK0RyBhZDzWG5dS/+GCAyQ=="
     },
-    "@orpc/server@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-sH69dyk4M7nHGlRMGVx3WUBRBhGP+usSPjI9XnIxMxnqcyuib4zuLZARdFaeSWL1HSb0hWsGWMEheHxAMfuduQ==",
+    "@orpc/server@1.16.6_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-CTuVWPn4E2RGenrXByWJq0QJlWj0hjP177zu5Yj+iLoyQlx+KjyTmwZEO0odXR7JDauCeYNJHasaYb9ozLm6YA==",
       "dependencies": [
         "@orpc/client",
         "@orpc/contract",
@@ -73,8 +73,8 @@
         "cookie"
       ]
     },
-    "@orpc/shared@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-5Vrvnf0DUUMibXtyI5crUR6e7dZAflJ1rg4kIUnyqGyNCZS3grd96OauGnSfjV6PXDX/FfVRlVe0UU1tv2UWuA==",
+    "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-GI3v4zj/Q6DvLUEwudosMGcQchpLrhR0vftn0O1zIt/4tk2JAeN6zVDfnEqaac7a7zj9kKu7jpHj5la3UVs8Hg==",
       "dependencies": [
         "@opentelemetry/api",
         "radash",
@@ -84,8 +84,8 @@
         "@opentelemetry/api"
       ]
     },
-    "@orpc/standard-server-aws-lambda@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-YM3Tc40g2veqTVu42FcFPzZpk3T9qFjEbi8hDBVTVpwDnupL5F/OYZW3F+yvDytWTUBmm+DivTEXHBWqJs7bsw==",
+    "@orpc/standard-server-aws-lambda@1.16.6_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-zllEa9CUnOw5BTpzD3ED2SIojaG/eBUq4GWChJwTAQvsuFz+aLDqMUcZvknQCO0XLkKm6sJLLBZPNvba13xmcg==",
       "dependencies": [
         "@orpc/shared",
         "@orpc/standard-server",
@@ -93,38 +93,38 @@
         "@orpc/standard-server-node"
       ]
     },
-    "@orpc/standard-server-fastify@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-4jmMiKfalBG07YDzV82uw5gfxZXVkNJr192EbReEqCmT1g84DNXVnFpSlg4jKDE9VNCM3noykKmsLPKg1HluMA==",
+    "@orpc/standard-server-fastify@1.16.6_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-EdnZUuvql9CxIK53AN2KwJK8il22nPBsS9FXSQdIUjKLjeijOWUer0Pmj8I8HFZVptKJBqshehDKeGyn3dapgg==",
       "dependencies": [
         "@orpc/shared",
         "@orpc/standard-server",
         "@orpc/standard-server-node"
       ]
     },
-    "@orpc/standard-server-fetch@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-VK1XxCi58tkEv0Ak4Syy+7uyZq5ZCqNTMKjFyUnk3ihy7PEq+29zdukZzH3ppO7qxF+Bi9Qzu/6Gu75B+3oxaQ==",
+    "@orpc/standard-server-fetch@1.16.6_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-oOtiftOsrPIUh5paWKUCunjzAGberLZAKX9XqZ3brvk+fzz4LM75pJJ9PiIx2bVKAgT817z0eItWzTDKNsEGsg==",
       "dependencies": [
         "@orpc/shared",
         "@orpc/standard-server"
       ]
     },
-    "@orpc/standard-server-node@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-tE3KnpdL7+13zSwEwcAZcDubJmomtJN9NpcT9KeykEiZcFDfrXs7pN25JAa5JVLYN1RQdIN20rmYp+uWFA2H/g==",
+    "@orpc/standard-server-node@1.16.6_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-l4oEqRGpmDlVQHwUGWkkufJB8GwTd9nw4GQa4g4xxlr6vc/VWXsYzmA0LGn40+NwYZwoJGeiN1ffqYjGFUS5LA==",
       "dependencies": [
         "@orpc/shared",
         "@orpc/standard-server",
         "@orpc/standard-server-fetch"
       ]
     },
-    "@orpc/standard-server-peer@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-6bDF2CSezKTIvKb5TWCksklrf/lMSUixoBF59uYFakhOCuocplFE1qTb5mmI3ZPfHFgpgSjeVtQf6r1JnLPAXg==",
+    "@orpc/standard-server-peer@1.16.6_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-b1dTTy9Xpas+kjgxejvudcDgF9AeRuKHsn7FbY3iQywaUxHA0ZbJjETBrL/c1Wr1V7aLlZycCFfonHTwc39SXg==",
       "dependencies": [
         "@orpc/shared",
         "@orpc/standard-server"
       ]
     },
-    "@orpc/standard-server@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-P+9tyTbYAIVjeS15fYA4jdpazojRcEmUwLKK1x7UtiEBAgmDQ8FpCkNXSYHqJMV3i2H5fcXFFlqm4u5ea9An7g==",
+    "@orpc/standard-server@1.16.6_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-brJQEljgoUIlPq7do4awqgMNCcw5+HBtBU+LfS4wnuxqbztv4Y12drpxUIyuFxLHmXqZiQrGATsOUTMbS2b+3g==",
       "dependencies": [
         "@orpc/shared"
       ]
@@ -150,8 +150,8 @@
         "tagged-tag"
       ]
     },
-    "zod@4.6.5": {
-      "integrity": "sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q=="
+    "zod@4.6.7": {
+      "integrity": "sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg=="
     }
   },
   "workspace": {
@@ -159,10 +159,10 @@
       "jsr:@std/assert@1",
       "jsr:@std/path@1",
       "npm:@opentelemetry/api@^1.9.1",
-      "npm:@orpc/client@^1.15.5",
-      "npm:@orpc/contract@^1.15.5",
-      "npm:@orpc/server@^1.15.5",
-      "npm:zod@^4.6.5"
+      "npm:@orpc/client@^1.16.6",
+      "npm:@orpc/contract@^1.16.6",
+      "npm:@orpc/server@^1.16.6",
+      "npm:zod@^4.6.7"
     ],
     "links": {
       "jsr:@netscript/ai@0.0.9": {
@@ -189,7 +189,7 @@
       },
       "jsr:@netscript/auth-kv-oauth@0.0.9": {
         "dependencies": [
-          "jsr:@panva/oauth4webapi@^3.8.8",
+          "jsr:@panva/oauth4webapi@^3.8.9",
           "jsr:@std/assert@1"
         ]
       },
@@ -206,7 +206,7 @@
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
           "jsr:@std/streams@1",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/cli-e2e@0.0.9": {
@@ -216,7 +216,7 @@
           "jsr:@std/assert@1",
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/cli@0.0.9": {
@@ -258,7 +258,7 @@
       },
       "jsr:@netscript/contracts@0.0.9": {
         "dependencies": [
-          "npm:@orpc/contract@^1.15.5"
+          "npm:@orpc/contract@^1.16.6"
         ]
       },
       "jsr:@netscript/cron@0.0.9": {
@@ -279,7 +279,7 @@
           "jsr:@netscript/sdk@0.0.9",
           "jsr:@std/assert@1",
           "npm:highlight.js@11",
-          "npm:preact@^10.29.2"
+          "npm:preact@^10.29.8"
         ]
       },
       "jsr:@netscript/fresh@0.0.9": {
@@ -297,17 +297,17 @@
           "npm:@durable-streams/client@0.2.7",
           "npm:@durable-streams/state@0.3.2",
           "npm:@durable-streams/tanstack-ai-transport@0.0.10",
-          "npm:@orpc/server@^1.15.5",
-          "npm:@preact/signals@2.11.3",
+          "npm:@orpc/server@^1.16.6",
+          "npm:@preact/signals@2.11.4",
           "npm:@tanstack/ai-client@0.39.2",
           "npm:@tanstack/ai-preact@0.20.3",
           "npm:@tanstack/ai@0.68.0",
-          "npm:@tanstack/preact-query@^5.104.1",
-          "npm:@tanstack/query-core@^5.104.1",
-          "npm:@tanstack/react-db@0.5.8",
-          "npm:preact-render-to-string@^6.8.0",
-          "npm:preact@^10.29.2",
-          "npm:vite@7.2.2"
+          "npm:@tanstack/preact-query@^5.108.4",
+          "npm:@tanstack/query-core@^5.108.4",
+          "npm:@tanstack/react-db@0.5.12",
+          "npm:preact-render-to-string@^6.8.3",
+          "npm:preact@^10.29.8",
+          "npm:vite@7.3.8"
         ]
       },
       "jsr:@netscript/kv@0.0.9": {
@@ -322,10 +322,10 @@
       },
       "jsr:@netscript/logger@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@logtape/logtape@2",
           "jsr:@std/assert@1",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/mcp@0.0.9": {
@@ -344,8 +344,8 @@
           "jsr:@netscript/ai@0.0.9",
           "jsr:@netscript/plugin@0.0.9",
           "jsr:@std/assert@1",
-          "npm:@orpc/contract@^1.15.5",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/contract@^1.16.6",
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/plugin-ai@0.0.9": {
@@ -359,8 +359,8 @@
         "dependencies": [
           "jsr:@netscript/plugin-streams-core@0.0.9",
           "jsr:@std/assert@1",
-          "npm:@orpc/contract@^1.15.5",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/contract@^1.16.6",
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/plugin-auth@0.0.9": {
@@ -386,7 +386,7 @@
       },
       "jsr:@netscript/plugin-sagas-core@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@netscript/database@0.0.9",
           "jsr:@netscript/kv@0.0.9",
           "jsr:@netscript/plugin-streams-core@0.0.9",
@@ -399,7 +399,7 @@
       },
       "jsr:@netscript/plugin-sagas@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@netscript/config@0.0.9",
           "jsr:@netscript/contracts@0.0.9",
           "jsr:@netscript/kv@0.0.9",
@@ -421,7 +421,7 @@
       },
       "jsr:@netscript/plugin-streams@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@netscript/aspire@0.0.9",
           "jsr:@netscript/contracts@0.0.9",
           "jsr:@netscript/plugin-streams-core@0.0.9",
@@ -442,7 +442,7 @@
       },
       "jsr:@netscript/plugin-triggers@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@netscript/config@0.0.9",
           "jsr:@netscript/contracts@0.0.9",
           "jsr:@netscript/kv@0.0.9",
@@ -468,13 +468,13 @@
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
-          "npm:@orpc/contract@^1.15.5",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/contract@^1.16.6",
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/plugin-workers@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@netscript/config@0.0.9",
           "jsr:@netscript/contracts@0.0.9",
           "jsr:@netscript/cron@0.0.9",
@@ -499,17 +499,17 @@
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
           "jsr:@std/semver@1",
-          "npm:@orpc/contract@^1.15.5",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/contract@^1.16.6",
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/prisma-adapter-mysql@0.0.9": {},
       "jsr:@netscript/queue@0.0.9": {
         "dependencies": [
-          "jsr:@fedify/amqp@^2.4.2",
-          "jsr:@fedify/denokv@^2.4.2",
-          "jsr:@fedify/fedify@^2.4.2",
-          "jsr:@fedify/redis@^2.4.2",
+          "jsr:@fedify/amqp@^2.4.6",
+          "jsr:@fedify/denokv@^2.4.6",
+          "jsr:@fedify/fedify@^2.4.6",
+          "jsr:@fedify/redis@^2.4.6",
           "jsr:@std/assert@1",
           "jsr:@std/async@1"
         ]
@@ -525,41 +525,41 @@
           "jsr:@netscript/service@0.0.9",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@orpc/client@^1.15.5",
-          "npm:@orpc/contract@^1.15.5",
-          "npm:@orpc/openapi@^1.15.5",
-          "npm:@orpc/server@^1.15.5",
-          "npm:@orpc/tanstack-query@^1.15.5",
-          "npm:@orpc/zod@^1.15.5",
-          "npm:@tanstack/db@0.13.0",
-          "npm:@tanstack/query-core@^5.104.1",
-          "npm:@tanstack/query-db-collection@1.4.3",
-          "npm:@tanstack/react-db@0.5.8",
-          "npm:react@^19.2.3"
+          "npm:@orpc/client@^1.16.6",
+          "npm:@orpc/contract@^1.16.6",
+          "npm:@orpc/openapi@^1.16.6",
+          "npm:@orpc/server@^1.16.6",
+          "npm:@orpc/tanstack-query@^1.16.6",
+          "npm:@orpc/zod@^1.16.6",
+          "npm:@tanstack/db@0.15.2",
+          "npm:@tanstack/query-core@^5.108.4",
+          "npm:@tanstack/query-db-collection@1.4.8",
+          "npm:@tanstack/react-db@0.5.12",
+          "npm:react@^19.3.1"
         ]
       },
       "jsr:@netscript/service@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@netscript/database@0.0.9",
           "jsr:@netscript/kv@0.0.9",
           "jsr:@netscript/telemetry@0.0.9",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@orpc/client@^1.15.5",
-          "npm:@orpc/contract@^1.15.5",
-          "npm:@orpc/openapi@^1.15.5",
-          "npm:@orpc/server@^1.15.5",
-          "npm:@orpc/zod@^1.15.5",
+          "npm:@orpc/client@^1.16.6",
+          "npm:@orpc/contract@^1.16.6",
+          "npm:@orpc/openapi@^1.16.6",
+          "npm:@orpc/server@^1.16.6",
+          "npm:@orpc/zod@^1.16.6",
           "npm:rou3@~0.7.12"
         ]
       },
       "jsr:@netscript/telemetry@0.0.9": {
         "dependencies": [
-          "jsr:@hono/otel@^1.2.0",
+          "jsr:@hono/otel@^1.4.0",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@opentelemetry/semantic-conventions@1.43.0"
+          "npm:@opentelemetry/semantic-conventions@1.45.0"
         ]
       },
       "jsr:@netscript/watchers@0.0.9": {
