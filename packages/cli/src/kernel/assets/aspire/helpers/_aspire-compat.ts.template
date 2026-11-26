@@ -669,6 +669,15 @@ export function resolveDataPath(
 }
 
 /**
+ * Ensures a host bind-mount data directory exists before container startup so
+ * Docker does not auto-create it as `root:root` on Linux.
+ */
+export function ensureContainerDataPath(dataPath: string): string {
+  mkdirSync(dataPath, { recursive: true });
+  return dataPath;
+}
+
+/**
  * Returns one project-scoped database password for the resident AppHost graph.
  */
 export function ensureDatabasePassword(appHostDir: string, resourceName: string): string {
@@ -906,6 +915,60 @@ export function shouldUseContainerCache(): boolean {
   if (override === 'Container') return true;
   if (override === 'Executable') return false;
   return isDockerAvailable();
+}
+
+/**
+ * Reports whether the active Linux container runtime uses rootless user
+ * namespaces (Docker rootless or rootless Podman), where container UID 0 maps
+ * to the host user rather than container UID `<hostUid>`.
+ */
+export function isRootlessContainerRuntime(
+  runtime: string = process.env.ASPIRE_CONTAINER_RUNTIME?.trim() ||
+    process.env.DOTNET_ASPIRE_CONTAINER_RUNTIME?.trim() ||
+    'docker',
+): boolean {
+  try {
+    const format = runtime === 'podman' ? '{{.Host.Security.Rootless}}' : '{{.SecurityOptions}}';
+    const output = execFileSync(runtime, ['info', '--format', format], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+      timeout: 3000,
+    });
+    if (typeof output !== 'string') return false;
+    return runtime === 'podman'
+      ? output.trim().toLowerCase() === 'true'
+      : output.toLowerCase().includes('rootless');
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Returns container runtime arguments needed so a non-root container image
+ * (such as Garnet `APP_UID=1654`) can write to a host bind-mounted `DataPath`
+ * on Linux without leaving root or foreign-UID files behind on cleanup.
+ *
+ * macOS and Windows Docker Desktop translate bind-mount ownership natively and
+ * require no extra arguments.
+ */
+export function resolveContainerBindMountRuntimeArgs(
+  options?: {
+    readonly platform?: string;
+    readonly getUid?: (() => number) | null;
+    readonly getGid?: (() => number) | null;
+    readonly isRootless?: () => boolean;
+  },
+): string[] {
+  const platform = options?.platform ?? process.platform;
+  const defaultUid = typeof process.getuid === 'function' ? () => process.getuid!() : undefined;
+  const defaultGid = typeof process.getgid === 'function' ? () => process.getgid!() : undefined;
+  const getUid = options && 'getUid' in options ? options.getUid : defaultUid;
+  const getGid = options && 'getGid' in options ? options.getGid : defaultGid;
+  if (platform !== 'linux' || typeof getUid !== 'function' || typeof getGid !== 'function') {
+    return [];
+  }
+  const isRootless = options?.isRootless ?? isRootlessContainerRuntime;
+  return isRootless() ? ['--user', '0:0'] : ['--user', `${getUid()}:${getGid()}`];
 }
 
 /**
