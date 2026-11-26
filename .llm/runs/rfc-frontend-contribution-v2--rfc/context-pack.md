@@ -37,7 +37,7 @@ Unified Fresh-2-anchored / Fresh-3-&-GPUIX-portable RFC updated at [`rfcs/0000-f
 | --- | --- | --- |
 | Zero Fresh/Preact/Vite/DOM deps in `@netscript/plugin-frontend-core` (Archetype 1) + separated `./loaders/...` | Owner requirement, `B7`, & `RFC 0007` | Fresh 2.3.3 isolated in `@netscript/fresh/plugins` + `@netscript/fresh/vite`; Fresh 3.x is explicitly an unexercised migration target; `./loaders/...` proven across Fresh 2 & GPUIX `RouteModule` |
 | Preserve canonical `RFC 0005` spine wire schema (`F-1` / `F-2` defaults) | Accepted `RFC 0005`, `B1`, `B2` | `FamilyRef = { family, major }`, `ContributionEnvelope`, host-assigned `ContributionIdentity`, `{ export: './frontend', framework: 'fresh' }` pointer, `anchors[]`, `(order ?? 0, mountId, id)`, 6-state taxonomy, host-owned policy |
-| Presence-only redaction + `#2670` write protocol + HTTP-only W2 P5 gateway | `B3`, `B4`, `B5`, `M4`, `F-4` | Zero browser SHA-256 digests; recursive schema traversal (`z.array`/`z.record`/overlay); real `workersContract` `(principal, resource)` grants; unary HTTP-only W2 |
+| Presence-only redaction + `#2670` write protocol + HTTP-only W2 P5 gateway | `B3`, `B4`, `B5`, `M4`, `F-4` | Zero browser SHA-256 digests; recursive schema traversal (`z.array`/`z.record`, strict `x-ns-ui` only per `F-3` Option B); real `workersContract` `(principal, resource)` grants; unary HTTP-only W2 |
 | `@layer ns-plugins, ns-app;` prelude + package-owned route CSS | Probe B `C2` & `M5` | Fixes inverted `@layer ns-app, ns-plugins;` from PR `#890` |
 | Break `#933` <-> `#940` cycle & forbid closing Wave-0 issues on RFC acceptance | `B8` | W3a `#940` uses an independent fixture + failing-budget control and closes on W3b `#933` Workers CI green |
 
@@ -56,7 +56,7 @@ Unified Fresh-2-anchored / Fresh-3-&-GPUIX-portable RFC updated at [`rfcs/0000-f
 | Static | `PASS` | `deno task docs:links`, scoped `check-internal-doc-links.ts`, `deno task docs:accuracy` |
 | Fitness | `N/A` | Docs & probe packaging only |
 | Runtime | `PASS` | Probe A `19/19` runtime (`exit 0`, loader/adapter `--check exit=0`, harness `--check exit=1` visible), Probe B `19` rows (`11 PASS, 5 CAVEAT, 3 FAIL`, `exit 0`), Probe C `13/13` (`--check exit=0`) |
-| Consumer | `Spec-verified + redaction probed` | `eis-etl#63/#421/#422/#426/#438/#448/#450/#453` + merged `#2670` (`resolveSecretFieldSubmission`) verified in RFC & Probe C `3.1`–`3.2` |
+| Consumer | `Spec-verified + redaction probed` | Downstream consumer requirements (`acme` workflow patterns) + merged `#2670` (`resolveSecretFieldSubmission`) verified in RFC & Probe C `3.1`–`3.2` |
 
 ## Open Questions
 

@@ -2,7 +2,7 @@
  * Wave-0 Empirical Probe C:
  *   1. Manifest evolution (.passthrough() forward-compat #1474) & path containment (#1473)
  *   2. Deny-by-default procedure gateway + RFC 0009 authorizing stream-proxy composition (P5)
- *   3. Server-side secret-redaction boundary + write-only secret handles (eis-etl#450, #453)
+ *   3. Server-side secret-redaction boundary + write-only secret handles (B3, M4, #2670)
  *
  * Executed against real repository modules on origin/main (`af5107b8d`) without modifying any
  * tracked package, plugin, app, example, or lock files.
@@ -3003,7 +3003,7 @@ probeTest('2.5 [Transport separation boundary]: compileProcedures excludes non-o
 });
 
 // ============================================================================
-// PART 3: SECRET-REDACTION BOUNDARY (eis-etl#450, #453) & #2670 WRITE PROTOCOL
+// PART 3: SECRET-REDACTION BOUNDARY (B3, M4) & #2670 WRITE PROTOCOL
 // ============================================================================
 
 const REDACTED_SECRET_SENTINEL = '__NS_REDACTED_SECRET__' as const;
@@ -3048,19 +3048,10 @@ function makeSecretHandle(value: unknown): RedactedSecretHandle {
 
 function readUiMetaFromRecord(meta: unknown): Record<string, unknown> | undefined {
   if (!meta || typeof meta !== 'object') return undefined;
+  // Strict canonical `x-ns-ui` only (F-3 Option B): no framework-level vendor overlay key.
   const nsUi = Reflect.get(meta, 'x-ns-ui');
-  const eisUi = Reflect.get(meta, 'x-eis-ui');
-  const nsSecret = nsUi && typeof nsUi === 'object' && Reflect.get(nsUi, 'secret') === true;
-  const eisSecret = eisUi && typeof eisUi === 'object' && Reflect.get(eisUi, 'secret') === true;
-  const merged: Record<string, unknown> = {
-    ...(eisUi && typeof eisUi === 'object' ? (eisUi as Record<string, unknown>) : {}),
-    ...(nsUi && typeof nsUi === 'object' ? (nsUi as Record<string, unknown>) : {}),
-  };
-  // Strict overlay precedence (F-3): overlay can never weaken `secret: true`.
-  if (nsSecret || eisSecret) {
-    merged.secret = true;
-  }
-  return Object.keys(merged).length > 0 ? merged : undefined;
+  if (!nsUi || typeof nsUi !== 'object') return undefined;
+  return { ...(nsUi as Record<string, unknown>) };
 }
 
 function unwrapSchemaLayers(schema: unknown): readonly unknown[] {
@@ -3483,7 +3474,7 @@ async function sha256HexPrefix(secret: string): Promise<string> {
     .join('');
 }
 
-probeTest('3.1 [eis-etl#450/#453 redaction]: presence-only handles (0 digests), recursive arrays/records/JSON-Schema + non-sensitive field "notes", and real Fresh island SSR/partial serialization', async () => {
+probeTest('3.1 [acme / #2670 redaction]: presence-only handles (0 digests), recursive arrays/records/JSON-Schema + non-sensitive field "notes", and real Fresh island SSR/partial serialization', async () => {
   const ConnectorSchema = z.object({
     name: z.string(),
     endpointUrl: z.string(),
@@ -3500,7 +3491,7 @@ probeTest('3.1 [eis-etl#450/#453 redaction]: presence-only handles (0 digests), 
       z.string(),
       z.object({
         region: z.string(),
-        notes: z.string().optional().meta({ 'x-eis-ui': { secret: true } }),
+        notes: z.string().optional().meta({ 'x-ns-ui': { secret: true } }),
       }),
     ),
   });
@@ -3536,12 +3527,12 @@ probeTest('3.1 [eis-etl#450/#453 redaction]: presence-only handles (0 digests), 
   const serverRecord = {
     name: 'warehouse-sync',
     endpointUrl: `https://${RAW_USER}:${RAW_PASS}@db.internal.example:8443/ingest?token=${RAW_QUERY_TOKEN}`,
-    dsnUrl: `postgres://${RAW_USER}:${RAW_DSN_PASS}@pg.internal.example:5432/eis`,
+    dsnUrl: `postgres://${RAW_USER}:${RAW_DSN_PASS}@pg.internal.example:5432/acme`,
     headers: {
       Authorization: RAW_BEARER,
       Cookie: RAW_COOKIE,
       'X-Api-Key': RAW_API_KEY,
-      'X-Trace-Source': 'eis-etl',
+      'X-Trace-Source': 'acme-connector',
     },
     webhookSecret: RAW_WEBHOOK_SECRET,
     optionalToken: undefined,
@@ -3556,8 +3547,8 @@ probeTest('3.1 [eis-etl#450/#453 redaction]: presence-only handles (0 digests), 
 
   // 1. PluginClientContext boundary (serializable, presence-only redacted, zero digest).
   const rawPluginClientContext = {
-    mountId: 'eis-etl',
-    base: '/etl',
+    mountId: 'acme',
+    base: '/acme',
     locale: 'en-US',
     direction: 'ltr',
     timeZone: 'UTC',
@@ -3609,7 +3600,7 @@ probeTest('3.1 [eis-etl#450/#453 redaction]: presence-only handles (0 digests), 
     const c = props.connector as Record<string, unknown>;
     return h(
       'div',
-      { 'data-ns-plugin': 'eis-etl', 'data-connector-island': 'true' },
+      { 'data-ns-plugin': 'acme', 'data-connector-island': 'true' },
       h('h2', null, String(c.name)),
       h('span', { class: 'secret-status' }, `isSet=${String((c.webhookSecret as RedactedSecretHandle).isSet)}`),
     );
@@ -3698,7 +3689,7 @@ probeTest('3.1 [eis-etl#450/#453 redaction]: presence-only handles (0 digests), 
   }
 });
 
-probeTest('3.2 [eis-etl#450/#453 negative assertions & #2670 write protocol]: blocks unredacted notes/spoofed handles, enforces replace|keep|clear|unset|invalid', async () => {
+probeTest('3.2 [acme / #2670 negative assertions & write protocol]: blocks unredacted notes/spoofed handles, enforces replace|keep|clear|unset|invalid', async () => {
   const ItemWithNotesSchema = z.object({
     items: z.array(z.object({
       notes: z.string().meta({ 'x-ns-ui': { secret: true } }),

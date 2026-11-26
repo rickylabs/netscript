@@ -35,7 +35,7 @@ full requirement.
 
 ### Constants
 
-- `REDACTED_SECRET_SENTINEL = '__NS_REDACTED_SECRET__'` (presence-only `{ __nsRedacted: true, sentinel, isSet }` — zero SHA-256 digests exposed to browser/HTML; merged PR `#2670` form tokens `'__ns_secret_unchanged__'` / `'__ns_secret_clear__'`)
+- `REDACTED_SECRET_SENTINEL = '__NS_REDACTED_SECRET__'` (presence-only `{ __nsSecretHandle: true, sentinel, isSet }` — zero SHA-256 digests exposed to browser/HTML; merged PR `#2670` form tokens `'__ns_secret_unchanged__'` / `'__ns_secret_clear__'`)
 - CSS cascade prelude: `@layer ns-plugins, ns-app;` (verified fixing PR `#890` inversion)
 - Order bounds: integer `[-100, 100]`
 - Contribution anchors: `<mountId>/<id>/v<apiMajor>` (`anchors[]` pins before `(order ?? 0, mountId, id)`)
@@ -61,10 +61,11 @@ full requirement.
 | --- | --- | --- | --- |
 | `2026-11-25T20:15Z` | `1` | Checkout branch & stage probes | Created `docs/rfc-frontend-contribution-v2` off `af5107b8d`; copied probe sources/fixtures excluding build caches; updated relative repo depths & added temp-dir staging in `probe-b-vite-islands-css.ts` |
 | `2026-11-25T20:25Z` | `1` | Execute Wave-0 Probes A/B/C | Initial baseline run: Probe A `18/18 PASS` runtime (`--check` failed `TS2322`); Probe B 19 matrix rows (`11 PASS, 5 CAVEAT, 3 FAIL`, exit `0`; initial RFC/worklog misreported `15`); Probe C `10/10 PASS` (`--check` passed, exit `0`) |
-| `2026-11-25T20:26Z` | `2` | Query live GitHub board & draft RFC/run files | Verified exact live titles/states/milestones for `#922`–`#946`, PR `#890`, PR `#2670`, `#1465`, `#1469`–`#1476`, `#400`, `#427`, `#432`, `#1520`–`#1521`, `#2491`/`#2531`/`#2556`/`#2561`/`#2565`/`#2568`, and `eis-etl` `#63`/`#421`/`#422`/`#425`/`#426`/`#438`/`#448`/`#450`/`#453`; authored Draft PR `#2684` (`d05d2346`) |
+| `2026-11-25T20:26Z` | `2` | Query live GitHub board & draft RFC/run files | Verified exact live titles/states/milestones for `#922`–`#946`, PR `#890`, PR `#2670`, `#1465`, `#1469`–`#1476`, `#400`, `#427`, `#432`, `#1520`–`#1521`, `#2491`/`#2531`/`#2556`/`#2561`/`#2565`/`#2568`, and downstream consumer patterns (`acme`); authored Draft PR `#2684` (`d05d2346`) |
 | `2026-11-25T20:33Z` | `2` | Rebase cleanly onto live `origin/main` (`f54542169`) & re-verify | Clean rebase onto `f54542169` so `git diff --name-only origin/main` stayed scoped to docs & `.llm/runs/rfc-frontend-contribution-v2--rfc/**` |
 | `2026-11-26T05:37Z` | `2` | Persist GPT-6.2 Astra Pass-1 review & integrate findings | Recorded verbatim `openrouter/openai/gpt-6.2-astra#xhigh` (`OpenCode CLI v2.3.2`) review in `plan-eval.md` (`CHANGES_REQUESTED`); triaged all `B1`–`B8`, `M1`–`M6`, `N1`–`N3`, `F-1`–`F-5` in `astra-review-triage.md`; inspected merged `#2670` on `origin/main` (`906da5188`) via `git show` |
 | `2026-11-26T06:45Z` | `1, 2` | Fix Probe A & Probe C gaps, rewrite RFC, & re-verify | Added Probe A `P2d` + separated `portable-jobs-loader.ts`/`fresh-jobs-adapter.tsx` (`deno check exit=0`) + dynamic `6.8.3` in `P4e` (`19/19 PASS` runtime, visible `--check exit=1`); updated Probe C (`13/13 PASS`, `--check exit=0`: canonical RFC 0005 spine + 2 installations + host-owned policy + root-anchored containment above `.netscript/generated/` + real `workersContract` authz + presence-only Fresh island redaction + verbatim `#2670` write protocol); re-ran Probe B cleanly (`19 rows: 11 PASS, 5 CAVEAT, 3 FAIL`, exit `0`); revised `rfcs/0000-frontend-contribution.md` |
+| `2026-11-26T12:00Z` | `2` | Scrub private consumer refs & set `F-3` Option B | Anonymized all private consumer repo/issue/file citations to `acme` across RFC, run artifacts, and Probe C; defaulted `F-3` to strict canonical `x-ns-ui` only (removing vendor overlay fallback from Probe C); fixed two clerical typos (`zone: 'app.routes/v1'`, `__nsSecretHandle: true`); re-ran Probe C & doc gates |
 
 ## Decisions
 
@@ -116,7 +117,7 @@ full requirement.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| `eis-etl` (`#63`, `#421`, `#422`, `#426`, `#438`, `#448`, `#450`, `#453`) + PR `#2670` (`906da5188`) | `PASS` (RFC spec coverage + Probe C `3.1`–`3.2` `#2670`/redaction proof) | Verified requirements integrated into [`rfcs/0000-frontend-contribution.md`](../../../rfcs/0000-frontend-contribution.md) + [`probes/probe-c.log`](./probes/probe-c.log) | Runtime dogfood executes in `0.0.10` W2/W3 |
+| Downstream consumer patterns (`acme`) + PR `#2670` (`906da5188`) | `PASS` (RFC spec coverage + Probe C `3.1`–`3.2` `#2670`/redaction proof) | Verified requirements integrated into [`rfcs/0000-frontend-contribution.md`](../../../rfcs/0000-frontend-contribution.md) + [`probes/probe-c.log`](./probes/probe-c.log) | Runtime dogfood executes in `0.0.10` W2/W3 |
 
 ## Handoff Notes
 
