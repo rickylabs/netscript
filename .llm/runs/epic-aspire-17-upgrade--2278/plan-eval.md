@@ -1,5 +1,59 @@
 VERDICT: FAIL_PLAN
 
+## Pass 2 — independent re-check, 2026-11-27
+
+The proposed legacy guard still permits partial workspace changes. In particular, `db remove --purge` can delete a database workspace before the guard runs. The telemetry policy also breaks startup without a dashboard or HTTP collector, and the fixture slice exceeds the harness limit once its consumers are counted. S1 remains gated.
+
+Reviewed all six revised run artifacts at `1c5356cafdd060f842101ec44e9df6d9768016a6`. The merge base and remote `refs/heads/main` both resolved to `6d7f10338a5e1ec6e957ee2199f3bc912ca9ee7b`. The diff from that base contains only the seven run documents. This is cycle 2 of 2 at the `feature` tier. The requested and observed evaluator route was Codex / GPT-6.2 Astra / xhigh, first choice, session `01a21a2f-f8f6-7d11-a12f-772667fc5b22`. The supervisor records an Antigravity/Gemini generator. S0 timings and live observations are attributed to the generator.
+
+### Pass 1 blockers re-checked
+
+| Finding | Pass 2 result | What the revision establishes |
+| --- | --- | --- |
+| B1 | Open | S1 includes the correct main baseline and tier, the Redis-to-JavaScript docs checker and both pages, Aspire-specific parity and mixed-version rejection, the manifest and offline tests. It specifies per-job NuGet, CLI and Deno caching, miss-only install, unconditional PATH setup and exact CLI preflight. The bump command's write scope remains undefined. |
+| B2 | Open | L4 specifies app-relative `main.ts` for every task, desktop build/run and the run's `--backend cef`. It retains explicit `PORT` and the endpoint rules. L5 specifies the version/instance attribute merge and the background opt-out. Its unconditional exporter conflicts with dashboard-free startup. |
+| B3 | Open | L1 maps the bare import and four exported subpaths for workspace, external-local and JSR consumers, and covers `--no-aspire`. L2 names the native check with explicit selected files and the KV fixture. L3 specifies the Zod pipe, explicit `Omit` type and template-local MCP exclusion constant. The proposed guard is too late for public mutation commands. |
+| B4 | Open | L6 identifies all seven contracts, including populated-sibling CORS, infrastructure context and `Promise<false>`. L7 places REPL on each server before its database child and covers the MSSQL import predicate, secret parameter, complexity and old literal assertions. First creation and migration still need a safe credential handoff. |
+| B5 | Addressed | L11 places the diagnostic in generated AppHost readiness after 10,000 ms of consecutive loopback failures for container-backed resources. It specifies a cached, cancellable 3,000 ms probe, Docker context/host precedence, preservation of the listener error for local or inconclusive results, and secondary CLI enrichment through `DenoProcess`. These match the existing topology classification and process adapter. |
+| B6 | Open | L10 retires automatic upstream init and assigns the guidance, dogfood, mirror-cleanup and skills-doc edits. L9 covers both passwords at the raw snapshot boundary, the reversed environment-leak test and hosted acceptance. L12 narrows recovery to exit 16 plus the stop-failure diagnostic, the same AppHost and one attempt. The recovery transitions and Studio proof remain incomplete. |
+| B7 | Open | The SDK gzip lands in S2, the MCP transcript in S4, and each of S2–S4 rebuilds the asset barrel before tests. S5b gives the canonical prose → export corpus → asset barrel → publish assets → manifest order. S5a's 26-file inventory omits at least four direct fixture consumers. |
+| B8 | Open | The AP codes, both sub-500-LOC splits, F-16 boundaries and all four debt dispositions are identified. S6 requires non-skipped hosted static/Postgres/SQLite execution at the checked-out SHA, with exits, report steps and cleanup. The local matrix still misattributes gates and S6 limits the evaluator's verdict choices. |
+
+### Corrections required before implementation
+
+1. **B1 — define what `aspire:bump --apply` may change.** Plan lines 22 and 82 define the switch and default. S1's file list covers the entire upgrade, including the validation code and workflows, so it cannot serve as a write allowlist. Name the files and Aspire fields the command owns, including the separately versioned Browsers preview and generated outputs, if any. Require offline tests to compare the exact diff, preserve unrelated pins, prove a no-write dry run and a no-op second apply. Include the missing-pin, wrong-patch/preview and cache-key-suffix controls alongside the mixed 13/17 case. The current parity check at `check-aspire-version-parity.ts:110` only rejects unexpected tokens it finds.
+
+2. **B2 — keep Deno's endpoint-conditional exporter.** L5 adds `withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf })` and sets `OTEL_DENO=true` unconditionally. Aspire's Deno defaults already register optional HTTP export. The extra call registers a required exporter whose endpoint resolver throws when no dashboard HTTP endpoint is available or configured. Use the existing optional registration, append `service.version` while preserving existing attributes and the instance ID, and retain the disabled-background override. Give S3 distinct checks for an exported request, startup with neither dashboard nor configured HTTP endpoint, and opt-out. [Aspire 17 Deno defaults](https://github.com/microsoft/aspire/blob/v17.0.0/src/Aspire.Hosting.JavaScript/JavaScriptHostingExtensions.cs) · [Exporter registration](https://github.com/microsoft/aspire/blob/v17.0.0/src/Aspire.Hosting/OtlpConfigurationExtensions.cs) · [HTTP endpoint resolver](https://github.com/microsoft/aspire/blob/v17.0.0/src/Shared/OtlpEndpointResolver.cs)
+
+3. **B3 — run the migration preflight before the first command mutation.** `add-db.ts:50` renders the workspace and then edits both root manifests before calling `regenerateAspireConfig` at line 61. `remove-db-command.ts:38` edits appsettings and line 50 can delete the workspace before regeneration at line 55. `add-service.ts:85` also changes appsettings before regenerating at line 120. Put the shared legacy/coexisting-manifest check at the first mutation boundary of each affected public flow, retaining helper-level checks for direct callers. Test add, remove/purge and service regeneration through their command entry points against both legacy shapes. Verify the diagnostic and compare the complete workspace, including credentials, before and after.
+
+4. **B4 — publish a complete password atomically and specify the old-volume migration.** L7's `wx` on the final path followed by an `EEXIST` reread can expose a newly created empty file before the writer fills it. The loser then throws the intended permanent-empty-file error. The repository already writes a complete private temporary secret and publishes it without clobbering the winner in `installation-secret.ts.template:65`. Use that pattern or an equivalent guarantee and test two first creators. For a pre-upgrade MSSQL volume initialized with the former literal and no password file, specify how the existing credential is installed or migrated *before* random generation. Cover restart with that same volume and preserve existing Postgres/MySQL credentials.
+
+5. **B6 — make restart recovery depend on observed state and identify #2259 evidence.** L12 omits `Stopped`, a terminal state in `operation-runner-helpers.ts:18`, and treats `null` as safe to start. A fixed one-second pause after stop does not establish that the resource stopped. Revalidate the exact executable on recovery, handle an unsuccessful stop, and wait for a confirmed startable state under the original deadline. A missing, ambiguous, unknown or still-transitioning target must have a defined outcome. Cover these cases with one recovery maximum and the original diagnostic. For #2259, S6 describes a working Studio connection and dashboard masking but identifies no assertion or receipt for either. The E2E fixture that names Studio in `aspire-structured-evidence_test.ts:134` checks nullable resource state. Name or add a hosted or manual observation that actually connects Studio to Postgres and verifies masking, without recording either secret.
+
+6. **B7 — split the fixtures by their real consumers.** Four tests outside the 26 listed S5a files directly open paths scheduled for deletion: `verify-live-db-endpoint_test.ts:20`, `aspire-structured-evidence_test.ts:10`, `leak-check_test.ts:149` and `phase-b-live-snapshot_test.ts:45`. Including them gives **at least 30 files even counting each rename once**. The current gate runs the first two tests, which would lose their inputs, and omits the latter two. Split S5a, put each loader and recorded fixture in the same commit and run all four tests. Expand S2 lines 161–175 into distinct paths as well, including compiler doubles and both mutator test suites. S4's proving command should select `packages/cli/e2e/tests/application/gates/aspire-mcp-smoke_test.ts`, which opens the transcript at line 37 and asserts the baseline at line 176. Preserve S5b's regeneration order.
+
+7. **B8 — map each required gate to the check that performs it.** Plan §6 labels typecheck as F-2, which the matrix defines as helper reinvention. Root `deno.json:59` runs only `quality:scan` and `arch:check` under `quality:gate`. `quality:cli` is a lint/format ratchet, and its wrapper invocation at `cli-quality.ts:46` uses the explicit CLI configuration missing from the standalone commands. Name `deps:check`, `docs:links`, the per-package `audit-jsr-package.ts --root <pkg>` and a compiling consumer import check for the planned subpaths. Map applicable F-CLI checks, particularly asset/registry parity (F-CLI-24), to a command, manual evidence or accepted debt. Keep the hosted SHA and non-skip requirements. Remove S6's restriction to “PASS or FAIL_FIX” so the evaluator can also issue the protocol's rescope or debt verdict.
+
+### Plan-Gate checklist
+
+| Item | Result | Evidence |
+| --- | --- | --- |
+| Research present and current | Checked | Research §§1–4, verified merge base and remote main, reviewed the Aspire 17 source and repository callers. |
+| Decisions locked | Unchecked | L2, L5, L7 and L12 still permit the failure paths above. |
+| Open-decision sweep | Unchecked | B1–B4 and B6 identify the write scope, activation, mutation ordering, credential migration and recovery decisions that affect behavior. |
+| Ordered commits below 30 files, with proof | Unchecked | S5a reaches at least 30. S2 and S4 also need explicit consumer/test assignments. |
+| Risk register | Checked | Plan §4 identifies runtime, fixture, CI and hosted evidence risks. |
+| Gate set selected | Unchecked | Plan §§5–6 cover hosted execution. B7–B8 identify missing or misattributed checks. |
+| Deferred scope explicit | Checked | Plan §1 keeps server v2, publication and live MySQL/MSSQL acceptance with their stated owners. |
+| Planned JSR public-surface audit | Checked | Research §4 and L1/L3 identify the affected exports, schema adapter, slow-type risk and template-local constant. B8 concerns the proving commands. |
+
+This exhausts the two `feature` PLAN-EVAL cycles. The dispatch authorizes changes only to this verdict file, so the cycle-two evaluator edit of `plan.md` requires an owner decision. Implementation remains gated. No implementation or hosted runtime gate was run in this review.
+
+---
+
+## Pass 1 — historical findings, 2026-11-27 (FAIL_PLAN)
+
 The first task-based web app in L4 would prevent the generated AppHost from building its resource graph. The proposed legacy fallback can also write Deno-only helpers into a Node AppHost. Both decisions affect consumers and need to be resolved before S1 starts.
 
 ## Review scope
