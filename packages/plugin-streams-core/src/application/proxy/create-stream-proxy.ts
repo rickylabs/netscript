@@ -11,7 +11,7 @@ import {
 } from '../../domain/stream-proxy-contract.ts';
 import type { StreamProxyClockPort } from '../../ports/stream-proxy-ports.ts';
 import { getStreamsAuth, getStreamsUrl } from '../stream-url-resolver.ts';
-import { selectCredentialAndGuard } from './credentials.ts';
+import { selectCredentialAndGuard, validateHandedCredentialMode } from './credentials.ts';
 import {
   buildStreamProxySseResponseHeaders,
   buildUpstreamRequestHeaders,
@@ -113,34 +113,31 @@ export function buildStreamProxyHandler<
 
     try {
       // Step 2: Deterministic credential selection & Cookie Origin/Fetch-Metadata guard.
-      let credentialMode: StreamProxyCredentialMode;
-      if (context?.credentialMode !== undefined) {
-        credentialMode = context.credentialMode;
-      } else {
-        const guard = selectCredentialAndGuard(request, context?.remoteAddr, {
+      const guard = context?.credentialMode !== undefined
+        ? validateHandedCredentialMode(context.credentialMode, config.clientAuth)
+        : selectCredentialAndGuard(request, context?.remoteAddr, {
           clientAuth: config.clientAuth,
           allowedOrigins: config.allowedOrigins,
           trustProxy: config.trustProxy,
           allowDirectNavigation: config.allowDirectNavigation,
         });
-        if (!guard.ok) {
-          setup.abortOnce(
-            guard.status === 503 ? 'policy-error' : 'revoked',
-            guard.status,
-            guard.reason,
-          );
-          PROXY_LOGGER.warn('stream proxy rejected admission at credential/origin guard', {
-            status: guard.status,
-            reason: guard.reason,
-          });
-          return createProxyErrorResponse(
-            guard.status,
-            statusToErrorLabel(guard.status),
-            guard.reason,
-          );
-        }
-        credentialMode = guard.credentialMode;
+      if (!guard.ok) {
+        setup.abortOnce(
+          guard.status === 503 ? 'policy-error' : 'revoked',
+          guard.status,
+          guard.reason,
+        );
+        PROXY_LOGGER.warn('stream proxy rejected admission at credential/origin guard', {
+          status: guard.status,
+          reason: guard.reason,
+        });
+        return createProxyErrorResponse(
+          guard.status,
+          statusToErrorLabel(guard.status),
+          guard.reason,
+        );
       }
+      const credentialMode: StreamProxyCredentialMode = guard.credentialMode;
 
       // Step 3: Parameter, query, `?live=`, and canonical offset/cursor validation.
       let parsedUrl: URL;

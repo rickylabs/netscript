@@ -280,6 +280,38 @@ or `exitOnSignal: false` when the host owns termination and resource disposal.
 | `ServiceErrorHandler` | interface | Error handler used by service applications. |
 | `FetchHandler` | interface | Structural fetch handler used by RPC and OpenAPI service adapters. |
 | `FetchHandlerResult` | interface | Result returned by oRPC-compatible fetch handlers. |
+| `StreamProxyMount` | interface | Structural authorizing SSE stream proxy mount accepted by `ServiceBuilder.withStreamProxy()` and `DefineServiceOptions.streamProxies`. |
+| `StreamProxyMountContext` | interface | Per-request context passed to `StreamProxyMount.handle()` (`params`, `credentialMode`, `principal`, `remoteAddr`, and pre-drain `shutdownSignal`). |
+
+### Authorizing stream proxy mounts
+
+`ServiceBuilder.withStreamProxy(mount)` and `DefineServiceOptions.streamProxies` mount revocable
+SSE stream endpoints (`StreamProxyMount`, typically created via `bindStreamProxy()` from
+`@netscript/plugin-streams-core/proxy`) without coupling `@netscript/service` to the streams
+runtime:
+
+- **Pre-authn canonicalization & credential scoping**: Matched stream routes reject `%2F`/`%5C`,
+  `.`/`..`, and percent-encoded static segments with HTTP `400` before `withAuthn`, run
+  deterministic `clientAuth` selection and Cookie Origin/Fetch-Metadata/`trustProxy` guards
+  (`401`/`403`/`503`) before `withAuthn`, and scope `AuthnRequest` strictly to `credentialMode`
+  so `createCompositeAuthenticator` never falls back from an invalid Bearer token to a Cookie.
+- **Authoritative policy & symmetric overlap checks**: `build()` passes mounted `streamMounts`
+  into `createContractAuthorizer` and `createContractOverlayAuthorizer` (failing closed on overlay
+  and cross-checking explicit `options.streamEndpoints`), enforces `endpoint.access` even on
+  non-contract or structural mounts, and rejects symmetric `patternsIntersect` overlaps against
+  other stream mounts, `ServiceBuilder.route()`, built-in routes, oRPC routes, RPC mounts,
+  `rawRoutes`, and `retiredPaths`.
+- **Final mounted response ownership & pre-drain shutdown**: `AuthnResult.responseHeaders` fails
+  closed with redacted `503` on proxy-reserved headers, non-reserved headers sit underneath proxy
+  Tier 3 headers, `AuthnResult.setCookies` and proxy `Set-Cookie` compose additively underneath
+  `withCors()`, and `ServiceEnvironment.shutdownSignal` aborts before `server.shutdown()` waits so
+  open SSE readers drain promptly.
+
+To keep public documentation self-contained, the root and `./auth` entrypoints also re-export the
+sibling `@netscript/contracts/streams` types referenced by `StreamProxyMount` and authorizer
+options: `StreamEndpointContract`, `StreamEndpointProtocol`, `StreamEndpointClientAuthMode`,
+`ContractObjectSchemaLike`, `ContractSchemaLike`, `NetScriptProcedureMeta`,
+`NetScriptAuthenticationRequirement`, and `NetScriptProcedureAudience`.
 
 ## Health types
 

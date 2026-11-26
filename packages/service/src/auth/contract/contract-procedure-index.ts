@@ -18,6 +18,7 @@
 import { toHttpPath } from '@orpc/client/standard';
 import { fallbackContractConfig, type HTTPMethod } from '@orpc/contract';
 import { toRou3Pattern } from '@orpc/openapi/standard';
+import { isLazy } from '@orpc/server';
 import { addRoute, createRouter, findRoute } from 'rou3';
 import { isWithinPrefix, normalizePath } from './contract-path.ts';
 import type {
@@ -26,6 +27,7 @@ import type {
   ProcedureAccessPolicy,
   ProcedurePolicyRequest,
 } from './contract-policy.ts';
+import { joinMountPattern } from './stream-endpoint-policy.ts';
 
 const OPTIONAL_AUTHENTICATION_ERROR =
   '[netscript.service.contract-policy] optional authentication is unsupported';
@@ -64,6 +66,8 @@ export interface ProcedureIndex {
   findInternalGuard(request: ProcedurePolicyRequest): IndexedProcedure | undefined;
   /** Reports whether the RPC mount or any OpenAPI route (any method) already serves a path. */
   claims(path: string): boolean;
+  /** Mounted oRPC OpenAPI routes and RPC mount prefixes for symmetric stream-overlap checks. */
+  readonly overlapPatterns: readonly { readonly label: string; readonly pattern: string }[];
 }
 
 /**
@@ -103,15 +107,30 @@ export function bindProcedureIndex(
   const restRoutes = createRouter<IndexedProcedure>();
   const anyMethodRoutes = createRouter<IndexedProcedure>();
   const internalRoutes = createRouter<IndexedProcedure>();
+  const overlapPatterns: Array<{ readonly label: string; readonly pattern: string }> = [];
+  for (const mount of rpcMounts) {
+    overlapPatterns.push({ label: 'RPC mount', pattern: joinMountPattern(mount, '/**') });
+  }
+  for (const deprecated of binding.deprecatedRpcRoutes ?? []) {
+    overlapPatterns.push({
+      label: 'deprecated RPC mount',
+      pattern: joinMountPattern(toMountPrefix(deprecated.pathPrefix), '/**'),
+    });
+  }
   for (const procedure of procedures) {
     addRoute(restRoutes, procedure.restMethod, procedure.restPattern, procedure);
     addRoute(anyMethodRoutes, '', procedure.restPattern, procedure);
+    overlapPatterns.push({
+      label: `oRPC procedure ${procedure.routerPath.join('.')}`,
+      pattern: joinMountPattern(apiMount, procedure.restPattern),
+    });
     if (procedure.policy?.audience === 'internal') {
       addRoute(internalRoutes, '', procedure.restPattern, procedure);
     }
   }
 
   return Object.freeze({
+    overlapPatterns: Object.freeze(overlapPatterns),
     claims(path: string): boolean {
       const rpcPathname = remapDeprecatedRpcPath(path, binding);
       if (rpcMounts.some((mount) => stripMount(rpcPathname, mount) !== undefined)) return true;
@@ -189,6 +208,13 @@ function traverseContract(
   routerPath: readonly string[],
   visit: (procedure: ContractProcedure, path: readonly string[]) => void,
 ): void {
+  if (isLazy(contract)) {
+    throw new Error(
+      `[netscript.service.contract-policy] unresolved lazy oRPC route in contract: ${
+        routerPath.length ? routerPath.join('.') : '<root>'
+      }`,
+    );
+  }
   if (isContractProcedure(contract)) {
     visit(contract, routerPath);
     return;

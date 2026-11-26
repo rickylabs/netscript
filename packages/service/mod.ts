@@ -206,8 +206,22 @@ export {
   type ServiceBuilder,
   type ServiceConfig,
 } from './src/builder/service-builder.ts';
+export type {
+  StreamProxyMount,
+  StreamProxyMountContext,
+} from './src/builder/stream-proxy-mount.ts';
 
-// Re-export logger types for convenience
+// Re-export sibling @netscript/* contract types referenced in public service signatures
+export type {
+  ContractObjectSchemaLike,
+  ContractSchemaLike,
+  NetScriptAuthenticationRequirement,
+  NetScriptProcedureAudience,
+  NetScriptProcedureMeta,
+  StreamEndpointClientAuthMode,
+  StreamEndpointContract,
+  StreamEndpointProtocol,
+} from '@netscript/contracts/streams';
 export type { LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 
 // Layer 3: Presets

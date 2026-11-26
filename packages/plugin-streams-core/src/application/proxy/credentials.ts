@@ -274,3 +274,23 @@ export function selectCredentialAndGuard(
 
   return checkCookieOriginAndFetchMetadata(request, remoteAddr, options);
 }
+
+/**
+ * Verifies a pre-selected `context.credentialMode` handed in from a mount host against the
+ * proxy's configured `clientAuth` policy before admission (`authorize`).
+ */
+export function validateHandedCredentialMode(
+  handedMode: unknown,
+  clientAuth: StreamEndpointClientAuthMode,
+): CredentialGuardResult {
+  if (handedMode !== 'bearer' && handedMode !== 'cookie') {
+    return { ok: false, status: 401, reason: 'invalid_credential_mode' };
+  }
+  if (clientAuth === 'bearer' && handedMode !== 'bearer') {
+    return { ok: false, status: 401, reason: 'bearer_required' };
+  }
+  if (clientAuth === 'cookie' && handedMode !== 'cookie') {
+    return { ok: false, status: 401, reason: 'bearer_not_allowed' };
+  }
+  return { ok: true, credentialMode: handedMode };
+}

@@ -32,6 +32,16 @@
  * @module
  */
 
+export type {
+  ContractObjectSchemaLike,
+  ContractSchemaLike,
+  NetScriptAuthenticationRequirement,
+  NetScriptProcedureAudience,
+  NetScriptProcedureMeta,
+  StreamEndpointClientAuthMode,
+  StreamEndpointContract,
+  StreamEndpointProtocol,
+} from '@netscript/contracts/streams';
 export type { ServiceEnv, ServiceVariables } from './hono-context.ts';
 export type {
   AnonymousRequestMatch,

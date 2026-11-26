@@ -111,7 +111,7 @@ export function startServiceListener(
     });
   };
   const handler = (request: Request, info: Deno.ServeHandlerInfo): Response | Promise<Response> =>
-    app.fetch(request, { remoteAddr: info.remoteAddr });
+    app.fetch(request, { remoteAddr: info.remoteAddr, shutdownSignal: controller.signal });
 
   // Passing `cert`/`key` makes Deno serve HTTPS and auto-negotiate HTTP/2 via
   // ALPN; the plain-TCP branch keeps the unchanged HTTP/1.1 default. Both
