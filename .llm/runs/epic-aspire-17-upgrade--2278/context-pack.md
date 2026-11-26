@@ -1,18 +1,22 @@
 # Context Pack — `epic-aspire-17-upgrade--2278`
 
-- **Branch:** `epic/aspire-17-upgrade` (base `origin/main` `36a464c23`)
-- **Current Phase:** `plan-eval` (S0 spike complete; run artifacts bootstrapped; zero product code edited yet)
-- **Active Slice:** None (blocked on PLAN-EVAL `PASS`)
+- **Branch:** `epic/aspire-17-upgrade` (merged `origin/main` `6d7f10338` at `9c899ea10`)
+- **Draft PR:** https://github.com/rickylabs/netscript/pull/2693
+- **Workload Tier:** `feature` (PLAN-EVAL max 2 cycles, IMPL-EVAL max 5 cycles; owner override: GPT-6.2 Astra `xhigh` first, Gemini 4 Hydrogen `xhigh` fallback)
+- **Current Phase:** `plan-eval` (Pass 1 returned `FAIL_PLAN` with B1–B8; all 8 findings fixed in revised plan; dispatching Pass 2)
+- **Active Slice:** None (strictly gated on PLAN-EVAL `PASS`)
 - **Pinned Target Versions:**
   - `Aspire.Cli`, `Aspire.Hosting.AppHost`, `Aspire.Hosting.JavaScript`, `Aspire.Hosting.PostgreSQL`, `Aspire.Hosting.MySql`, `Aspire.Hosting.SqlServer`: `17.0.0`
   - `Aspire.Hosting.Browsers`: `17.0.0-preview.1.26567.5`
-- **Key Verified Facts:**
-  - `features.appHostServerV2: true` → NO-GO on `17.0.0` (refuses managed integration assemblies).
-  - `#2259` → Aspire `17.0.0` redacts composed `DATABASE_URL` / `ConnectionStrings__*` / `APPDB_URI` to `null` in `aspire describe`; restore whole-snapshot scan in `credential-secret-surfaces.ts` and verify on hosted Postgres `scaffold-runtime`.
-  - Native Deno AppHost (`aspire/deno.json`) requires `"./aspire"` in generated root `deno.json` `workspace` + `"sloppy-imports"` in root `unstable` for zero-warning resolution of `@netscript/aspire` (`zod: "catalog:"`) and Aspire `.mjs`→`.mts` imports.
-  - `aspire agent init` `17.0.0` removed `--skill-locations` and old 4 skill IDs (`aspire-init`, `aspire-orchestration`, `aspire-monitoring`, `aspire-deployment`).
-  - `aspire agent mcp` `17.0.0` exposes 15 tools (`wait_for_resources` added).
+- **Key Locked Contracts:**
+  - `L1`: `./aspire` workspace member + root `unstable: ["raw-imports", "kv", "sloppy-imports"]` when `!noAspire`; all 3 scaffold import modes mapped explicitly.
+  - `L2`: Fail-closed pre-write guard on legacy `aspire/package.json` (alone or coexisting with `aspire/deno.json`).
+  - `L3`: `_aspire-compat.ts.template` split into `<350`-LOC `_apphost-readiness.ts.template` + `<350`-LOC `_aspire-compat.ts.template`; zero `@netscript/aspire` public API churn; `.pipe(z.looseObject(...))` `ProjectConfigSchema`.
+  - `L4`/`L5`: `addDenoApp` with non-empty `'main.ts'` `scriptPath` for task-mode apps + explicit `render-http-endpoint.ts` + `withEnvironmentCallback` preserving `service.instance.id` + `service.version`.
+  - `L6`/`L7`: `EndpointProperty.BrowserOrigins`, all 7 real `#2174` empty helper contracts, `.withRepl()` on server builder before `addDatabase`, complexity-safe MSSQL `ensureDatabasePassword` preserving existing files.
+  - `L9`/`L10`/`L11`/`L12`: `#2259` raw-snapshot scan at `verify-credential-rejection.ts:59`, native NetScript agent wiring retiring obsolete 13.5 `aspire agent init`, `#2202` on AppHost health path (`_apphost-readiness.mts`) + CLI timeout, single-retry exit-16 recovery scoped to `/failed to stop resource/i`.
 - **Slice Status:**
   - S0 (Live verification spike): **DONE**
-  - PLAN-EVAL: **PENDING**
-  - S1–S6: **PENDING**
+  - PLAN-EVAL Pass 1: **`FAIL_PLAN`** (B1–B8 resolved)
+  - PLAN-EVAL Pass 2: **DISPATCHING**
+  - S1, S2, S3, S4, S5a, S5b, S6: **PENDING**

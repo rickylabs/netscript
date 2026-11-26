@@ -4,26 +4,31 @@
 - **Owner / Mission:** Top-level main lane upgrading NetScript from pinned Aspire `13.5.3` to Aspire `17.0.0` for the next `0.0.10` canary (following green `v0.0.10-canary.6`).
 - **Repository Root / Worktree:** `/home/agent/.t3/worktrees/repo/epic-aspire-17-upgrade-3ee1336cc437c55d`
 - **Branch:** `epic/aspire-17-upgrade`
-- **Base Commit (`origin/main`):** `36a464c23` (1 commit ahead of `v0.0.10-canary.6` `00325a531`)
+- **Integrated Main Baseline (`origin/main`):** `6d7f10338` (merged into branch at `9c899ea10`; includes RFC 0009 S2 shared-carrier updates `agent-docs-prose.generated.ts`, `export-surface-corpus.generated.ts`, `publish-assets.generated.ts`).
+- **Draft PR:** https://github.com/rickylabs/netscript/pull/2693 (`type:feat`, `area:aspire`, `area:cli`, `status:plan-eval`)
 - **Primary Epic:** `#2278` (`Part of #2278` — never `Closes` on an epic)
 - **Linked Leaf / Related Issues:**
-  - `#319` — Layer A: native Deno TypeScript AppHost (`aspire/deno.json`, zero Node/npm) (`Closes #319`)
+  - `#319` — Layer A: native Deno TypeScript AppHost (`aspire/deno.json`, zero AppHost `node_modules`) (`Closes #319`)
   - `#320` — Layer B: first-party `AddDenoApp` / `DenoAppResource` adoption (`Closes #320`)
-  - `#295` — Full NetScript framework dogfood proof on native Deno AppHost + `AddDenoApp` (`Closes #295`)
+  - `#295` — Full NetScript framework dogfood proof on native Deno AppHost + `AddDenoApp` (`Closes #295`, gated on hosted dual-tier `e2e-cli` execution)
   - `#2174` — Empty-section Aspire helper lint across all 7 helpers (`Closes #2174`)
-  - `#2202` — Fail loudly when an AppHost health wait targets a foreign Docker daemon's loopback (`Closes #2202`)
-  - `#2259` — `aspire describe` password exposure (`Closes #2259` gated on hosted `scaffold-runtime` whole-snapshot verification proving zero leaks across Postgres container + consumer env on Aspire `17.0.0`)
-  - `#1726` / `#2184` — Partial/prereq progress: replace hardcoded `MSSQL_SA_PASSWORD` with `ensureDatabasePassword` and document Aspire `17.0.0` native C# MySQL/MSSQL health checks (partial ref only; do not auto-close unless full MySQL/MSSQL live container proof is added)
-- **Archetypes & Overlays:**
-  - Primary: **Archetype 6 (CLI / Tooling)** (`packages/cli`, `.llm/tools/*`, `.github/workflows/*`)
-  - Secondary: **Archetype 2 (Integration / Adapter Package)** (`packages/aspire`, `packages/mcp`)
-  - Overlays: `SCOPE-docs`, `SCOPE-service` (generated consumer runtime/AppHost surface)
-- **Owner-Mandated Evaluation Chain Override (recorded verbatim):**
-  - First-pass PLAN-EVAL & IMPL-EVAL: **GPT-6.2 Astra (`xhigh`)** via T3 `delegate_task` (`providerInstanceId: "codex"`, `model: "gpt-6.2-astra"`, `options: { reasoningEffort: "xhigh" }`).
-  - Second-pass fallback (only if needed): **Gemini 4 Hydrogen (`xhigh`)** via T3 `delegate_task` (`providerInstanceId: "antigravity"`, `model: "gemini-4-hydrogen"`, `options: { thought_level: "xhigh" }`).
-  - Evaluator session/family independence invariant remains strictly intact: generator (main lane) never self-evaluates.
-- **Draft PR:** To be opened immediately after the run-dir bootstrap commit and linked via `link_pull_request`.
+  - `#2202` — Fail loudly on AppHost health path (and CLI wait) when targeting a foreign Docker daemon's loopback (`Closes #2202`)
+  - `#2259` — `aspire describe` password exposure (`Closes #2259` strictly gated on hosted `scaffold-runtime` Postgres whole-snapshot verification + DB/consumer/Studio proof; if any leak appears on hosted Postgres, remove `Closes #2259` and keep issue open)
+  - `#1726` / `#2184` — Partial/prereq progress (`Refs #1726, #2184` only): replace hardcoded `MSSQL_SA_PASSWORD` with complexity-safe `ensureDatabasePassword` and adopt `.withRepl()`; full live MySQL/MSSQL container E2E remains deferred on `#2184`.
+- **Archetypes & Overlays (Doctrine §10 Verdicts):**
+  - Primary: **Archetype 6 (CLI / Tooling)** — `packages/cli` (Doctrine §10 verdict: **6 / Keep**), `.llm/tools/*`, `.github/workflows/*`
+  - Secondary: **Archetype 2 (Integration / Adapter Package)** — `packages/aspire` (**2 / Keep**), `packages/mcp` (**2 / Keep**)
+  - Overlays: `SCOPE-docs`, `SCOPE-service`
+- **Workload Tier & Evaluation Policy (`.llm/harness/workflow/lane-policy.md`):**
+  - **Tier:** `feature` (owner-capped standard tier; owner authorized an evaluation model override rather than requesting a privileged `complex`/`architecture` row).
+  - **Evaluation Loop Limits (`feature`):** PLAN-EVAL max 2 cycles (pass 1 failed `FAIL_PLAN` with B1–B8; pass 2 is this revised evaluation); IMPL-EVAL max 5 cycles (notify owner after 3).
+  - **Generator Route:** Antigravity / Gemini (main top-level lane).
+  - **Owner-Mandated Evaluation Chain Override (recorded verbatim):**
+    - First-pass PLAN-EVAL & IMPL-EVAL: **GPT-6.2 Astra (`xhigh`)** via T3 `delegate_task` (`providerInstanceId: "codex"`, `model: "gpt-6.2-astra"`, `options: { reasoningEffort: "xhigh" }`).
+    - Second-pass fallback (only if needed): **Gemini 4 Hydrogen (`xhigh`)** via T3 `delegate_task` (`providerInstanceId: "antigravity"`, `model: "gemini-4-hydrogen"`, `options: { thought_level: "xhigh" }`).
+    - Separate-session and different-vendor-family independence strictly maintained (`Antigravity/Gemini` generator vs `Codex/GPT-6.2 Astra` evaluator).
+  - **Pass 1 Evaluator Receipt:** Codex session `01a21a21-b73c-7be0-8b45-d7389b80cda9` (`gpt-6.2-astra`, `xhigh`) evaluated `c09ef7c0a` → `VERDICT: FAIL_PLAN` (B1–B8 recorded in `plan-eval.md`).
 - **Host Constraints:**
-  - Local environment has `deno 2.9.8`, `dotnet 10.0.400` (via `mise x dotnet@10.0.400`), scratch `Aspire.Cli@17.0.0` at `.llm/tmp/aspire-17-spike/bin/aspire` (deleted before handoff), and NO running local Docker daemon (`unix:///var/run/docker.sock` unavailable).
-  - Local runtime verification covers unit/contract suites, generated project check/lint/fmt, native Deno AppHost restore/start/wait/describe/telemetry/MCP/stop, and local SQLite/Garnet executable smoke.
-  - Docker/Postgres runtime proof (`scaffold-runtime`) and full dual-tier merge-readiness run on hosted GitHub Actions `e2e-cli` (`e2e-cli-gate` / `ci:full`).
+  - Local environment: `deno 2.9.8`, `dotnet 10.0.400` (`mise x dotnet@10.0.400`), scratch `Aspire.Cli@17.0.0` at `.llm/tmp/aspire-17-spike/bin/aspire` (deleted before final push/handoff), and NO running local Docker daemon (`unix:///var/run/docker.sock` unavailable).
+  - Local runtime proof covers unit/contract suites, SDK compile proof (`aspire-sdk-17.0.0.json.gz`), static E2E suites (`scaffold.{service,contracts,plugins}`), native Deno AppHost restore/start/wait/describe/telemetry/MCP/stop, and local SQLite + Garnet executable smoke.
+  - Docker/Postgres runtime proof (`scaffold.runtime --cleanup`) and dual-tier merge-readiness proof (`scaffold.runtime.sqlite --cleanup`) execute non-skipped on hosted GitHub Actions `e2e-cli` (`e2e-cli-gate`).
