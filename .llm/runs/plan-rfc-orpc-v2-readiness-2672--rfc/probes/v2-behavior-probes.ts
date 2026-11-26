@@ -839,15 +839,18 @@ Deno.test('B4 + N2: v1.16.6 rootInterceptors vs v2 routingInterceptors, complete
   );
 
   function createDefault500ErrorStatusMap(base: Readonly<Record<string, number>>): Record<string, number> {
-    // Always preserve every built-in upstream oRPC error status before falling back to 500 for unknown codes.
+    // Always preserve every built-in upstream oRPC error status before falling back to 500 for unknown codes,
+    // and never intercept `Object.prototype` properties (`toString`, `valueOf`, `constructor`).
     const seeded: Record<string, number> = { ...COMMON_ERROR_STATUS_MAP, ...base };
     return new Proxy(seeded, {
       get(target, prop, receiver) {
-        if (typeof prop === 'string' && !Object.hasOwn(target, prop)) return 500;
+        if (typeof prop === 'string' && !Object.hasOwn(target, prop) && !(prop in Object.prototype)) {
+          return 500;
+        }
         return Reflect.get(target, prop, receiver);
       },
       getOwnPropertyDescriptor(target, prop) {
-        if (typeof prop === 'string' && !Object.hasOwn(target, prop)) {
+        if (typeof prop === 'string' && !Object.hasOwn(target, prop) && !(prop in Object.prototype)) {
           return { configurable: true, enumerable: true, value: 500, writable: false };
         }
         return Reflect.getOwnPropertyDescriptor(target, prop);
@@ -861,6 +864,12 @@ Deno.test('B4 + N2: v1.16.6 rootInterceptors vs v2 routingInterceptors, complete
     { ORDER_LOCKED: 409 },
   );
   const standaloneStatusMap = createDefault500ErrorStatusMap(mergedStatuses);
+
+  // Guard `Object.prototype` properties so `toString` / `valueOf` / `constructor` & `String(proxy)` work cleanly!
+  assertEquals(typeof standaloneStatusMap.toString, 'function');
+  assertEquals(typeof standaloneStatusMap.valueOf, 'function');
+  assertEquals(standaloneStatusMap.constructor, Object);
+  assertEquals(String(standaloneStatusMap), '[object Object]');
 
   const standaloneRouter = {
     unmappedErr: osV2.handler(() => {

@@ -99,3 +99,20 @@
 | Scoped internal doc links | `mise exec -- deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --root rfcs/0000-orpc-v2-readiness.md --pretty` | PASS (`docs=1 broken-links=0 broken-anchors=0 orphans=0`) |
 | Breaking-migration PR body gate | `mise exec -- deno run --no-lock -A .llm/tools/validation/check-breaking-migration.ts --repo rickylabs/netscript --pr 2674` | PASS (`ok: true`) |
 | Workspace `deno.json` & `deno.lock` untouched + closing-keyword scan | `git diff --stat origin/plan/rfc-orpc-v2-readiness-2672 -- deno.lock deno.json` & pattern scan | PASS (`0` diff, `0` closing-keyword hits) |
+
+## Round-4 Review (Gemini Hydrogen xhigh) & Fix Round 4 Evidence Ledger
+
+- Gemini Hydrogen xhigh Round-4 PLAN-EVAL (`issuecomment-7203578723`, reviewed head `8f1255382a19e973a07247ed48165d33a312adba` against `origin/main` `00325a531`) confirmed **N2**, **N4**, **N5**, **§4.6 semver**, and **`#2690` main drift** **100% Resolved**, raising one remaining Phase 0a contradiction in **N1** plus two advisories:
+  1. **N1 Phase 0a CORS/Vary reconciliation:** Inspected `origin/main` `packages/service/README.md:167-169`, `packages/service/src/builder/service-builder-impl.ts`, and `packages/service/tests/cors-response-authority_test.ts:197,267,304,432,476`. Scoped Phase 0a `X-NetScript-RPC-Protocol` `allowHeaders` preflight allowance and `Vary: X-NetScript-RPC-Protocol` strictly to mounted RPC paths (`rpcPath` / `rpcAliases`, default `/api/rpc/*`) so non-RPC routes (`/raw`, `/health`, `/api/status` OpenAPI) stay completely untouched (keeping line `432` and all non-RPC cases at lines `197`, `267`, `304`, `476` unchanged). Removed §4.4's false *"stays 100% green"* claim and explicitly listed the planned Phase 0a updates to `packages/service/README.md:167-169` and the `/api/rpc/ping` assertions at `packages/service/tests/cors-response-authority_test.ts:197,267,304,476` across §2 rows 1 & 3, §4.1 Phase 0a item 5, §4.2, §4.4, Downstream consumers, and PR #2674 body.
+  2. **Advisory 1 (`Object.prototype` Proxy guard):** Added `!(prop in Object.prototype)` to `createDefault500ErrorStatusMap`'s `get` and `getOwnPropertyDescriptor` traps in `probes/v2-behavior-probes.ts` and RFC §2 row 6, asserting `typeof proxy.toString === 'function'`, `typeof proxy.valueOf === 'function'`, `proxy.constructor === Object`, and `String(proxy) === '[object Object]'` in Probe B4.
+  3. **Advisory 2 (`supervisor.md` refresh):** Updated `.llm/runs/plan-rfc-orpc-v2-readiness-2672--rfc/supervisor.md` status and review routing table through Round 4 / Fix Round 4.
+
+## Validation Table (Round-4 Fix, Deno `2.9.8`)
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Standalone v2 Behavior Probes typecheck (`--no-lock --no-config`) | `mise exec -- deno check --no-lock --no-config .llm/runs/plan-rfc-orpc-v2-readiness-2672--rfc/probes/v2-behavior-probes.ts` | PASS (exit `0`) |
+| Standalone v2 Behavior Probes (`1.16.6` vs `2.0.0-beta.53`) | `mise exec -- deno test --no-lock --no-config -A .llm/runs/plan-rfc-orpc-v2-readiness-2672--rfc/probes/v2-behavior-probes.ts` | PASS (`5 passed \| 0 failed`, `55ms`) |
+| Scoped internal doc links | `mise exec -- deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --root rfcs/0000-orpc-v2-readiness.md --pretty` | PASS (`docs=1 broken-links=0 broken-anchors=0 orphans=0`) |
+| Breaking-migration PR body gate | `mise exec -- deno run --no-lock -A .llm/tools/validation/check-breaking-migration.ts --repo rickylabs/netscript --pr 2674` | PASS (`ok: true`) |
+| Workspace `deno.json` & `deno.lock` untouched + closing-keyword scan | `git diff --stat origin/main...HEAD -- deno.lock deno.json` & pattern scan | PASS (`0` diff, `0` closing-keyword hits) |
