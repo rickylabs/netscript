@@ -1,0 +1,29 @@
+# Supervisor — `epic-aspire-17-upgrade--2278`
+
+- **Run ID:** `epic-aspire-17-upgrade--2278`
+- **Owner / Mission:** Top-level main lane upgrading NetScript from pinned Aspire `13.5.3` to Aspire `17.0.0` for the next `0.0.10` canary (following green `v0.0.10-canary.6`).
+- **Repository Root / Worktree:** `/home/agent/.t3/worktrees/repo/epic-aspire-17-upgrade-3ee1336cc437c55d`
+- **Branch:** `epic/aspire-17-upgrade`
+- **Base Commit (`origin/main`):** `36a464c23` (1 commit ahead of `v0.0.10-canary.6` `00325a531`)
+- **Primary Epic:** `#2278` (`Part of #2278` — never `Closes` on an epic)
+- **Linked Leaf / Related Issues:**
+  - `#319` — Layer A: native Deno TypeScript AppHost (`aspire/deno.json`, zero Node/npm) (`Closes #319`)
+  - `#320` — Layer B: first-party `AddDenoApp` / `DenoAppResource` adoption (`Closes #320`)
+  - `#295` — Full NetScript framework dogfood proof on native Deno AppHost + `AddDenoApp` (`Closes #295`)
+  - `#2174` — Empty-section Aspire helper lint across all 7 helpers (`Closes #2174`)
+  - `#2202` — Fail loudly when an AppHost health wait targets a foreign Docker daemon's loopback (`Closes #2202`)
+  - `#2259` — `aspire describe` password exposure (`Closes #2259` gated on hosted `scaffold-runtime` whole-snapshot verification proving zero leaks across Postgres container + consumer env on Aspire `17.0.0`)
+  - `#1726` / `#2184` — Partial/prereq progress: replace hardcoded `MSSQL_SA_PASSWORD` with `ensureDatabasePassword` and document Aspire `17.0.0` native C# MySQL/MSSQL health checks (partial ref only; do not auto-close unless full MySQL/MSSQL live container proof is added)
+- **Archetypes & Overlays:**
+  - Primary: **Archetype 6 (CLI / Tooling)** (`packages/cli`, `.llm/tools/*`, `.github/workflows/*`)
+  - Secondary: **Archetype 2 (Integration / Adapter Package)** (`packages/aspire`, `packages/mcp`)
+  - Overlays: `SCOPE-docs`, `SCOPE-service` (generated consumer runtime/AppHost surface)
+- **Owner-Mandated Evaluation Chain Override (recorded verbatim):**
+  - First-pass PLAN-EVAL & IMPL-EVAL: **GPT-6.2 Astra (`xhigh`)** via T3 `delegate_task` (`providerInstanceId: "codex"`, `model: "gpt-6.2-astra"`, `options: { reasoningEffort: "xhigh" }`).
+  - Second-pass fallback (only if needed): **Gemini 4 Hydrogen (`xhigh`)** via T3 `delegate_task` (`providerInstanceId: "antigravity"`, `model: "gemini-4-hydrogen"`, `options: { thought_level: "xhigh" }`).
+  - Evaluator session/family independence invariant remains strictly intact: generator (main lane) never self-evaluates.
+- **Draft PR:** To be opened immediately after the run-dir bootstrap commit and linked via `link_pull_request`.
+- **Host Constraints:**
+  - Local environment has `deno 2.9.8`, `dotnet 10.0.400` (via `mise x dotnet@10.0.400`), scratch `Aspire.Cli@17.0.0` at `.llm/tmp/aspire-17-spike/bin/aspire` (deleted before handoff), and NO running local Docker daemon (`unix:///var/run/docker.sock` unavailable).
+  - Local runtime verification covers unit/contract suites, generated project check/lint/fmt, native Deno AppHost restore/start/wait/describe/telemetry/MCP/stop, and local SQLite/Garnet executable smoke.
+  - Docker/Postgres runtime proof (`scaffold-runtime`) and full dual-tier merge-readiness run on hosted GitHub Actions `e2e-cli` (`e2e-cli-gate` / `ci:full`).
