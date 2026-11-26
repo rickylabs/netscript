@@ -20,11 +20,13 @@ import {
 } from '@std/assert';
 import { isAbsolute, join, relative, resolve } from '@std/path';
 import { z } from 'zod';
-import { oc } from 'npm:@orpc/contract@^1.15.5';
+import { getEventIteratorSchemaDetails, oc } from 'npm:@orpc/contract@^1.15.5';
 import { eventIterator } from 'npm:@orpc/server@^1.15.5';
 import { DurableStreamTestServer } from 'npm:@durable-streams/server@0.3.9';
+import { App, page, type PageProps } from 'jsr:@fresh/core@^2.3.3';
+import { Partial } from 'jsr:@fresh/core@^2.3.3/runtime';
+import { ProdBuildCache, setBuildCache } from 'jsr:@fresh/core@^2.3.3/internal';
 import { h } from 'npm:preact@^10.29.2';
-import { render as renderToString } from 'npm:preact-render-to-string@^6.8.0';
 
 import {
   parsePluginManifest,
@@ -37,13 +39,18 @@ import {
   type NetScriptProcedureMeta,
 } from '../../../../packages/contracts/mod.ts';
 import { authContract } from '../../../../packages/plugin-auth-core/src/contracts/v1/mod.ts';
+import { workersContract } from '../../../../packages/plugin-workers-core/src/contracts/v1/workers.contract-definition.ts';
 import {
   compileProcedures,
   type IndexedProcedure,
 } from '../../../../packages/service/src/auth/contract/contract-procedure-index.ts';
+import {
+  createContractAuthorizer,
+  createScopeAuthorizer,
+} from '../../../../packages/service/src/auth/mod.ts';
 import { authorizeProcedurePolicy } from '../../../../packages/service/src/auth/contract/procedure-policy-decision.ts';
 import { isInternalServicePrincipal } from '../../../../packages/service/src/auth/internal-credential/internal-credential-authenticator.ts';
-import type { Principal } from '../../../../packages/service/src/auth/types.ts';
+import type { AuthzDecision, Principal } from '../../../../packages/service/src/auth/types.ts';
 import { createStableV1ProcedureMetadataPort } from '../../../../packages/sdk/src/internal/client-contributions/stable-v1-adapter.ts';
 import { buildStreamUrl, createDurableStream } from '../../../../packages/plugin-streams-core/mod.ts';
 import {
@@ -330,20 +337,52 @@ function assertLexicallyContained(root: string, candidate: string): string {
 
 async function physicalPath(path: string): Promise<string> {
   const normalized = resolve(path);
+  let existsAsLstat = false;
   try {
     await Deno.lstat(normalized);
-    return await Deno.realPath(normalized);
+    existsAsLstat = true;
   } catch (error) {
-    if (!(error instanceof Deno.errors.NotFound)) throw error;
-    const parent = resolve(normalized, '..');
-    if (parent === normalized) throw error;
-    const base = normalized.slice(parent.length).replace(/^[/\\]+/, '');
-    return join(await physicalPath(parent), base);
+    if (!(error instanceof Deno.errors.NotFound)) {
+      throw new Error(
+        `PATH_CONTAINMENT_REJECTED: unable to stat "${normalized}": ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+  }
+  if (existsAsLstat) {
+    try {
+      return await Deno.realPath(normalized);
+    } catch (error) {
+      // Fail closed on dangling/broken symlinks or realPath errors on existing entries.
+      throw new Error(
+        `PATH_CONTAINMENT_REJECTED: unresolved physical path for "${normalized}": ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+  }
+  const parent = resolve(normalized, '..');
+  if (parent === normalized) {
+    throw new Error(`PATH_CONTAINMENT_REJECTED: no resolvable ancestor for "${normalized}"`);
+  }
+  const base = normalized.slice(parent.length).replace(/^[/\\]+/, '');
+  return join(await physicalPath(parent), base);
+}
+
+async function trustedRealRoot(root: string, label: string): Promise<string> {
+  try {
+    return await Deno.realPath(resolve(root));
+  } catch (error) {
+    throw new Error(
+      `PATH_CONTAINMENT_REJECTED: ${label} "${root}" cannot be resolved: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
   }
 }
 
-async function assertPhysicalContainment(root: string, target: string): Promise<string> {
-  const realRoot = await physicalPath(root);
+async function assertPhysicalContainment(realRoot: string, target: string): Promise<string> {
   const realTarget = await physicalPath(target);
   const rel = relative(realRoot, realTarget);
   if (
@@ -354,7 +393,7 @@ async function assertPhysicalContainment(root: string, target: string): Promise<
     rel.startsWith('..\\')
   ) {
     throw new Error(
-      `PATH_CONTAINMENT_REJECTED: symlink or physical path "${target}" escapes root "${root}"`,
+      `PATH_CONTAINMENT_REJECTED: symlink or physical path "${target}" escapes trusted root "${realRoot}"`,
     );
   }
   return realTarget;
@@ -365,6 +404,7 @@ async function deriveGeneratedArtifactPath(
   familyDir: string,
   mountId: string,
   fileName: string,
+  options?: { readonly stagingTxId?: string },
 ): Promise<string> {
   assertCleanPathToken(familyDir, 'familyDir');
   if (familyDir.includes('/') || familyDir === '.' || familyDir === '..') {
@@ -375,10 +415,33 @@ async function deriveGeneratedArtifactPath(
   if (fileName.includes('/') || fileName === '.' || fileName === '..') {
     throw new Error(`PATH_CONTAINMENT_REJECTED: invalid generated fileName "${fileName}"`);
   }
-  const generatedBase = resolve(projectRoot, '.netscript', 'generated', familyDir);
-  const target = resolve(generatedBase, safeMountId, fileName);
-  assertLexicallyContained(generatedBase, target);
-  await assertPhysicalContainment(resolve(projectRoot, '.netscript', 'generated'), target);
+  const trustedProjectRoot = await trustedRealRoot(projectRoot, 'projectRoot');
+  const netscriptDir = resolve(projectRoot, '.netscript');
+  const generatedRoot = resolve(netscriptDir, 'generated');
+  await assertPhysicalContainment(trustedProjectRoot, netscriptDir);
+  await assertPhysicalContainment(trustedProjectRoot, generatedRoot);
+
+  let target: string;
+  if (options?.stagingTxId !== undefined) {
+    assertCleanPathToken(options.stagingTxId, 'stagingTxId');
+    if (
+      options.stagingTxId.includes('/') ||
+      options.stagingTxId === '.' ||
+      options.stagingTxId === '..' ||
+      !/^[a-z0-9-]+$/.test(options.stagingTxId)
+    ) {
+      throw new Error(`PATH_CONTAINMENT_REJECTED: invalid stagingTxId "${options.stagingTxId}"`);
+    }
+    const stagingDir = resolve(generatedRoot, '.staging', `${familyDir}-${options.stagingTxId}`);
+    await assertPhysicalContainment(trustedProjectRoot, stagingDir);
+    target = resolve(stagingDir, safeMountId, fileName);
+  } else {
+    const familyRoot = resolve(generatedRoot, familyDir);
+    await assertPhysicalContainment(trustedProjectRoot, familyRoot);
+    target = resolve(familyRoot, safeMountId, fileName);
+  }
+  assertLexicallyContained(generatedRoot, target);
+  await assertPhysicalContainment(trustedProjectRoot, target);
   return target;
 }
 
@@ -400,9 +463,10 @@ async function resolveContainedModuleRef(packageRoot: string, moduleRef: string)
   if (segments.some((s) => s.length === 0 || s === '.' || s === '..')) {
     throw new Error(`PATH_CONTAINMENT_REJECTED: invalid segment in ModuleRef: ${moduleRef}`);
   }
+  const trustedPkgRoot = await trustedRealRoot(packageRoot, 'packageRoot');
   const target = resolve(packageRoot, subPath);
   assertLexicallyContained(packageRoot, target);
-  await assertPhysicalContainment(packageRoot, target);
+  await assertPhysicalContainment(trustedPkgRoot, target);
   return target;
 }
 
@@ -463,10 +527,18 @@ probeTest('1.2 [#1474 evolution]: .passthrough() (schemaVersion: 1) parses clean
   assertEquals(genLegacy, { ok: true, pointer: null });
 
   // 3) Malformed frontend pointer DOES NOT fail installer manifest parse, but fails strictly at generate time!
+  //    Also verify the unamended draft RFC guide manifest (omitting framework + adding extra keys) is rejected!
   const malformedPointerFixtures = [
     { export: '../escape', framework: 'fresh' },
     { export: './frontend', framework: 'react' },
     { export: './frontend', framework: 'fresh', unknownFlag: true },
+    {
+      export: './frontend',
+      mountPrefix: '/plugins/workers',
+      mountId: 'workers',
+      defaultOnInvalid: 'fail-install',
+      budgets: { maxInitialClientJsBytes: 12288, maxRouteCssBytes: 8192 },
+    },
     'not-an-object',
   ];
   for (const badFrontend of malformedPointerFixtures) {
@@ -598,7 +670,7 @@ probeTest('1.3 [#1473 containment]: rejects ../ traversal, backslashes, null byt
       );
     }
 
-    // Physical symlink escape check: symlink inside .netscript/generated/frontend -> outsideRoot.
+    // Physical symlink escape check 1: symlink below .netscript/generated/frontend -> outsideRoot.
     const symlinkDir = join(projectRoot, '.netscript', 'generated', 'frontend');
     await Deno.symlink(outsideRoot, symlinkDir);
     await assertRejects(
@@ -606,6 +678,71 @@ probeTest('1.3 [#1473 containment]: rejects ../ traversal, backslashes, null byt
       Error,
       'PATH_CONTAINMENT_REJECTED',
     );
+    await Deno.remove(symlinkDir);
+
+    // Physical symlink escape check 2 (B6): symlink ABOVE .netscript/generated (.netscript/generated -> outsideRoot)
+    // AND .netscript -> outsideRoot MUST both fail anchored against trusted Deno.realPath(projectRoot).
+    const generatedDir = join(projectRoot, '.netscript', 'generated');
+    await Deno.remove(generatedDir);
+    await Deno.symlink(outsideRoot, generatedDir);
+    await assertRejects(
+      () => deriveGeneratedArtifactPath(projectRoot, 'frontend', 'crons', 'frontend.registry.ts'),
+      Error,
+      'PATH_CONTAINMENT_REJECTED',
+    );
+    await assertRejects(
+      () =>
+        deriveGeneratedArtifactPath(projectRoot, 'frontend', 'crons', 'frontend.registry.ts', {
+          stagingTxId: 'tx-1',
+        }),
+      Error,
+      'PATH_CONTAINMENT_REJECTED',
+    );
+    await Deno.remove(generatedDir);
+
+    // Broken/dangling symlink at .netscript/generated MUST fail closed (never treated as missing path).
+    const brokenTarget = join(tempDir, 'nonexistent-outside-target');
+    await Deno.symlink(brokenTarget, generatedDir);
+    await assertRejects(
+      () => deriveGeneratedArtifactPath(projectRoot, 'frontend', 'crons', 'frontend.registry.ts'),
+      Error,
+      'PATH_CONTAINMENT_REJECTED',
+    );
+    await Deno.remove(generatedDir);
+
+    // Symlink at .netscript itself -> outsideRoot MUST also fail against trusted projectRoot.
+    const dotNetscriptDir = join(projectRoot, '.netscript');
+    await Deno.remove(dotNetscriptDir);
+    await Deno.symlink(outsideRoot, dotNetscriptDir);
+    await assertRejects(
+      () => deriveGeneratedArtifactPath(projectRoot, 'frontend', 'crons', 'frontend.registry.ts'),
+      Error,
+      'PATH_CONTAINMENT_REJECTED',
+    );
+    await Deno.remove(dotNetscriptDir);
+    await Deno.mkdir(generatedDir, { recursive: true });
+
+    // Valid staged destination resolves cleanly inside trusted projectRoot.
+    const validStaged = await deriveGeneratedArtifactPath(
+      projectRoot,
+      'frontend',
+      'acme-crons',
+      'frontend.registry.ts',
+      { stagingTxId: 'tx-42' },
+    );
+    assertEquals(
+      validStaged,
+      resolve(
+        projectRoot,
+        '.netscript',
+        'generated',
+        '.staging',
+        'frontend-tx-42',
+        'acme-crons',
+        'frontend.registry.ts',
+      ),
+    );
+
     const outsideEntries = [];
     for await (const entry of Deno.readDir(outsideRoot)) {
       outsideEntries.push(entry.name);
@@ -614,6 +751,337 @@ probeTest('1.3 [#1473 containment]: rejects ../ traversal, backslashes, null byt
   } finally {
     await Deno.remove(tempDir, { recursive: true });
   }
+});
+
+// RFC 0005 canonical spine contracts + matching/ordering/failure policy (#1471 / B1 / B2)
+const FamilyRefSchema = z.object({
+  family: z.string().min(1),
+  major: z.number().int().positive(),
+}).strict();
+
+const ContributionEnvelopeSchema = z.object({
+  contract: FamilyRefSchema,
+  pluginKind: z.string().min(1),
+  base: z.string().min(1).optional(),
+  contributions: z.array(z.unknown()),
+  requires: z.object({
+    procedures: z.array(z.string().min(1)).optional(),
+  }).strict().optional(),
+  budgets: z.object({
+    initialJsKb: z.number().positive().optional(),
+    islands: z.number().int().nonnegative().optional(),
+    panelRenderMs: z.number().positive().optional(),
+  }).strict().optional(),
+}).strict();
+
+interface CanonicalContributionIdentity {
+  readonly packageName: string;
+  readonly pluginKind: string;
+  readonly installationId: string;
+  readonly mountId: string;
+}
+
+interface CanonicalZoneDescriptor {
+  readonly id: string; // `<zoneName>/v<major>`
+  readonly capacity?: number;
+  readonly anchors?: readonly string[]; // `<mountId>/<id>/v<apiMajor>`
+}
+
+interface CanonicalResolvedContribution {
+  readonly family: string;
+  readonly id: string;
+  readonly apiMajor: number;
+  readonly zone: string;
+  readonly order?: number;
+  readonly identity: CanonicalContributionIdentity;
+  readonly fullyQualifiedId: string; // `${identity.mountId}/${id}/v${apiMajor}`
+}
+
+function toFullyQualifiedContributionId(
+  identity: CanonicalContributionIdentity,
+  id: string,
+  apiMajor: number,
+): string {
+  return `${identity.mountId}/${id}/v${apiMajor}`;
+}
+
+function orderRfc0005Contributions(
+  zone: CanonicalZoneDescriptor,
+  items: readonly CanonicalResolvedContribution[],
+): { readonly ordered: readonly CanonicalResolvedContribution[]; readonly warnings: readonly string[] } {
+  for (const item of items) {
+    if (item.order !== undefined && (!Number.isInteger(item.order) || item.order < -100 || item.order > 100)) {
+      throw new Error(
+        `ORDER_OUT_OF_RANGE: contribution "${item.fullyQualifiedId}" order=${item.order} must be an integer in [-100, 100]`,
+      );
+    }
+  }
+  const presentIds = new Set(items.map((item) => item.fullyQualifiedId));
+  const warnings: string[] = [];
+  for (const anchor of zone.anchors ?? []) {
+    if (!presentIds.has(anchor)) {
+      warnings.push(`UNMATCHED_ANCHOR: zone "${zone.id}" anchor "${anchor}" matched no contribution`);
+    }
+  }
+  const rank = new Map((zone.anchors ?? []).map((fq, i) => [fq, i]));
+  const anchored: CanonicalResolvedContribution[] = [];
+  const rest: CanonicalResolvedContribution[] = [];
+  for (const item of items) {
+    (rank.has(item.fullyQualifiedId) ? anchored : rest).push(item);
+  }
+  anchored.sort((a, b) => rank.get(a.fullyQualifiedId)! - rank.get(b.fullyQualifiedId)!);
+  rest.sort((a, b) =>
+    (a.order ?? 0) - (b.order ?? 0) ||
+    (a.identity.mountId < b.identity.mountId ? -1 : a.identity.mountId > b.identity.mountId ? 1 : 0) ||
+    (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
+  );
+  return { ordered: [...anchored, ...rest], warnings };
+}
+
+type CanonicalDiagnosisState =
+  | 'unknown-zone'
+  | 'known-but-unmounted'
+  | 'capacity-rejected'
+  | 'window-mismatch'
+  | 'load-failure'
+  | 'zone-contract-mismatch';
+
+function diagnoseZoneTarget(options: {
+  readonly contract: { readonly family: string; readonly major: number };
+  readonly supportedFamilyMajors: ReadonlyMap<string, readonly number[]>;
+  readonly familyVocabulary: ReadonlySet<string>;
+  readonly hostZones: ReadonlyMap<string, CanonicalZoneDescriptor>;
+  readonly targetZone: string;
+}): 'matched' | CanonicalDiagnosisState {
+  const majors = options.supportedFamilyMajors.get(options.contract.family) ?? [];
+  if (!majors.includes(options.contract.major)) {
+    return 'window-mismatch';
+  }
+  if (options.hostZones.has(options.targetZone)) {
+    return 'matched';
+  }
+  if (options.familyVocabulary.has(options.targetZone)) {
+    return 'known-but-unmounted';
+  }
+  const match = /^(.+)\/v(\d+)$/.exec(options.targetZone);
+  if (match) {
+    const [, zoneBase] = match;
+    const knownBase = [...options.familyVocabulary, ...options.hostZones.keys()].some((id) =>
+      id.startsWith(`${zoneBase}/v`)
+    );
+    if (knownBase) {
+      return 'zone-contract-mismatch';
+    }
+  }
+  return 'unknown-zone';
+}
+
+probeTest('1.4 [#928/#1471 RFC 0005 spine]: canonical ContributionEnvelope, mixed-family [app + devtools] export, and 2 installations of 1 package without collision', () => {
+  // 1) Verbatim guide manifest uses single parse-only `{ export: './frontend', framework: 'fresh' }`.
+  const pointerResult = validateFrontendPointerAtGenerateTime(
+    { frontend: { export: './frontend', framework: 'fresh' } },
+    '@netscript/plugin-workers',
+  );
+  assertEquals(pointerResult, {
+    ok: true,
+    pointer: { export: './frontend', framework: 'fresh' },
+  });
+
+  // 2) Mixed-family ContributionEnvelope[] (`app` + `devtools`) exported behind that single pointer.
+  const mixedExport: unknown[] = [
+    {
+      contract: { family: 'app', major: 1 },
+      pluginKind: 'workers',
+      base: '/plugins/workers',
+      contributions: [{ kind: 'zone', id: 'jobs-panel', apiMajor: 1, zone: 'app.dashboard.panels/v1' }],
+      requires: { procedures: ['getJob', 'triggerJob'] },
+    },
+    {
+      contract: { family: 'devtools', major: 1 },
+      pluginKind: 'workers',
+      contributions: [{ kind: 'panel', id: 'jobs-panel', apiMajor: 1, zone: 'workers.console/v1' }],
+    },
+  ];
+  const parsedEnvelopes = mixedExport.map((env) => ContributionEnvelopeSchema.parse(env));
+  assertEquals(parsedEnvelopes[0].contract, { family: 'app', major: 1 });
+  assertEquals(parsedEnvelopes[1].contract, { family: 'devtools', major: 1 });
+
+  // 3) Reject non-RFC-0005 `{ id, version }` envelope shape.
+  assertEquals(
+    ContributionEnvelopeSchema.safeParse({
+      family: { id: 'frontend', version: 1 },
+      contributions: [],
+    }).success,
+    false,
+  );
+
+  // 4) Two installations of the SAME package (@netscript/plugin-workers) receive distinct host-assigned
+  //    installationId / mountId values, yielding non-colliding fully-qualified keys, routes, and gateways.
+  const installA: CanonicalContributionIdentity = {
+    packageName: '@netscript/plugin-workers',
+    pluginKind: 'workers',
+    installationId: 'workers-east',
+    mountId: 'workers-east',
+  };
+  const installB: CanonicalContributionIdentity = {
+    packageName: '@netscript/plugin-workers',
+    pluginKind: 'workers',
+    installationId: 'workers-west',
+    mountId: 'workers-west',
+  };
+  const keyA = toFullyQualifiedContributionId(installA, 'jobs-panel', 1);
+  const keyB = toFullyQualifiedContributionId(installB, 'jobs-panel', 1);
+  assertEquals(keyA, 'workers-east/jobs-panel/v1');
+  assertEquals(keyB, 'workers-west/jobs-panel/v1');
+  assertNotEquals(keyA, keyB);
+});
+
+probeTest('1.5 [#1471 ordering, zone matching, diagnosis, & host-owned failure policy]', () => {
+  const workersIdentity: CanonicalContributionIdentity = {
+    packageName: '@netscript/plugin-workers',
+    pluginKind: 'workers',
+    installationId: 'workers',
+    mountId: 'workers',
+  };
+  const sagasIdentity: CanonicalContributionIdentity = {
+    packageName: '@netscript/plugin-sagas',
+    pluginKind: 'sagas',
+    installationId: 'sagas',
+    mountId: 'sagas',
+  };
+
+  // 1) Pinned anchors render first, remainder sorted by (order ?? 0, mountId, id); capacity winners deterministic.
+  const zone: CanonicalZoneDescriptor = {
+    id: 'app.dashboard.panels/v1',
+    capacity: 2,
+    anchors: ['workers/pinned-late/v1', 'missing/phantom-anchor/v1'],
+  };
+  const items: CanonicalResolvedContribution[] = [
+    {
+      family: 'app',
+      id: 'alpha',
+      apiMajor: 1,
+      zone: 'app.dashboard.panels/v1',
+      order: -50,
+      identity: sagasIdentity,
+      fullyQualifiedId: toFullyQualifiedContributionId(sagasIdentity, 'alpha', 1),
+    },
+    {
+      family: 'app',
+      id: 'pinned-late',
+      apiMajor: 1,
+      zone: 'app.dashboard.panels/v1',
+      order: 90,
+      identity: workersIdentity,
+      fullyQualifiedId: toFullyQualifiedContributionId(workersIdentity, 'pinned-late', 1),
+    },
+    {
+      family: 'app',
+      id: 'beta',
+      apiMajor: 1,
+      zone: 'app.dashboard.panels/v1',
+      order: -50,
+      identity: workersIdentity,
+      fullyQualifiedId: toFullyQualifiedContributionId(workersIdentity, 'beta', 1),
+    },
+  ];
+  const { ordered, warnings } = orderRfc0005Contributions(zone, items);
+  assertEquals(ordered.map((i) => i.fullyQualifiedId), [
+    'workers/pinned-late/v1',
+    'sagas/alpha/v1',
+    'workers/beta/v1',
+  ]);
+  assertEquals(warnings.length, 1);
+  assertStringIncludes(warnings[0], 'UNMATCHED_ANCHOR');
+  const winners = ordered.slice(0, zone.capacity);
+  const losers = ordered.slice(zone.capacity);
+  assertEquals(winners.map((i) => i.fullyQualifiedId), ['workers/pinned-late/v1', 'sagas/alpha/v1']);
+  assertEquals(losers.map((i) => i.fullyQualifiedId), ['workers/beta/v1']);
+
+  // 2) Out-of-range order throws generate-time error (never silently clamped).
+  assertThrows(
+    () =>
+      orderRfc0005Contributions(zone, [{ ...items[0], order: 101 }]),
+    Error,
+    'ORDER_OUT_OF_RANGE',
+  );
+
+  // 3) Distinct 6-state diagnosis for family major vs absent known zone vs unserved zone major vs unknown zone.
+  const supportedFamilyMajors = new Map<string, readonly number[]>([
+    ['app', [1]],
+    ['devtools', [1]],
+  ]);
+  const familyVocabulary = new Set([
+    'app.dashboard.panels/v1',
+    'pipeline.inspector.sections/v1',
+  ]);
+  const hostZones = new Map<string, CanonicalZoneDescriptor>([
+    ['app.dashboard.panels/v1', zone],
+  ]);
+
+  assertEquals(
+    diagnoseZoneTarget({
+      contract: { family: 'app', major: 2 },
+      supportedFamilyMajors,
+      familyVocabulary,
+      hostZones,
+      targetZone: 'app.dashboard.panels/v1',
+    }),
+    'window-mismatch',
+  );
+  assertEquals(
+    diagnoseZoneTarget({
+      contract: { family: 'app', major: 1 },
+      supportedFamilyMajors,
+      familyVocabulary,
+      hostZones,
+      targetZone: 'pipeline.inspector.sections/v1',
+    }),
+    'known-but-unmounted',
+  );
+  assertEquals(
+    diagnoseZoneTarget({
+      contract: { family: 'app', major: 1 },
+      supportedFamilyMajors,
+      familyVocabulary,
+      hostZones,
+      targetZone: 'app.dashboard.panels/v2',
+    }),
+    'zone-contract-mismatch',
+  );
+  assertEquals(
+    diagnoseZoneTarget({
+      contract: { family: 'app', major: 1 },
+      supportedFamilyMajors,
+      familyVocabulary,
+      hostZones,
+      targetZone: 'plugin.invented/v1',
+    }),
+    'unknown-zone',
+  );
+
+  // 4) Host-owned failure policy: invalid devtools item alongside valid app item excludes & diagnoses
+  //    without failing install, whereas invalid app item fails install (no per-contributor override).
+  const evaluateInstall = (
+    envelopes: readonly { readonly family: 'app' | 'devtools'; readonly valid: boolean }[],
+  ) => {
+    const diagnostics: { readonly family: string; readonly outcome: string }[] = [];
+    for (const env of envelopes) {
+      if (env.valid) continue;
+      if (env.family === 'app') {
+        throw new Error('APP_INSTALL_FAILED: broken app contribution fails install');
+      }
+      diagnostics.push({ family: env.family, outcome: 'exclude-and-diagnose' });
+    }
+    return { installed: true, diagnostics };
+  };
+  const mixedInstallResult = evaluateInstall([
+    { family: 'app', valid: true },
+    { family: 'devtools', valid: false },
+  ]);
+  assertEquals(mixedInstallResult.installed, true);
+  assertEquals(mixedInstallResult.diagnostics, [{ family: 'devtools', outcome: 'exclude-and-diagnose' }]);
+  assertThrows(() => evaluateInstall([{ family: 'app', valid: false }]), Error, 'APP_INSTALL_FAILED');
 });
 
 // ============================================================================
@@ -634,18 +1102,70 @@ export interface GatewayAuditEntry {
   readonly correlationId: string;
 }
 
+export interface GatewayProcedureGrant {
+  readonly procedureId: string;
+  readonly owningService: string;
+  readonly allowedQueryParams?: readonly string[];
+  readonly pathParamsSchema?: z.ZodObject<Record<string, z.ZodType<string>>>;
+  readonly authorizeService?: (request: {
+    readonly principal: Principal;
+    readonly method: string;
+    readonly path: string;
+    readonly rawPath: string;
+  }) => Promise<AuthzDecision> | AuthzDecision;
+  readonly authorizeResource?: (
+    principal: Principal,
+    resource: Readonly<Record<string, string>>,
+  ) => AuthzDecision;
+}
+
 interface GeneratedGatewayRoute {
   readonly procedureId: string;
+  readonly owningService: string;
   readonly method: string;
-  readonly upstreamPath: string;
+  readonly restPattern: string;
+  readonly pathParamNames: readonly string[];
+  readonly allowedQueryParams: readonly string[];
+  readonly pathParamsSchema?: z.ZodObject<Record<string, z.ZodType<string>>>;
   readonly indexed: IndexedProcedure;
+  readonly authorizeService?: GatewayProcedureGrant['authorizeService'];
+  readonly authorizeResource?: GatewayProcedureGrant['authorizeResource'];
   readonly cachePolicy: 'no-store' | 'default' | 'force-cache';
+}
+
+function extractRestPatternParamNames(restPattern: string): readonly string[] {
+  const names: string[] = [];
+  for (const segment of restPattern.split('/')) {
+    if (segment.startsWith(':') && segment.length > 1) {
+      names.push(segment.slice(1));
+    }
+  }
+  return names;
+}
+
+function bindTypedUpstreamPath(
+  restPattern: string,
+  paramNames: readonly string[],
+  params: Readonly<Record<string, string>>,
+): string {
+  if (paramNames.length === 0) return restPattern;
+  return restPattern.split('/').map((segment) => {
+    if (!segment.startsWith(':')) return segment;
+    const key = segment.slice(1);
+    const val = params[key];
+    if (typeof val !== 'string' || val.length === 0 || /[/?#\\]|\.\./.test(val)) {
+      throw new Error(`GATEWAY_INVALID_PATH_PARAM: invalid parameter "${key}"`);
+    }
+    return encodeURIComponent(val);
+  }).join('/');
 }
 
 function generateGatewayRouteTable(options: {
   readonly mountId: string;
+  readonly owningService?: string;
   readonly contract: Record<string, unknown>;
-  readonly requiresProcedures: readonly string[];
+  readonly requiresProcedures: readonly (string | GatewayProcedureGrant)[];
+  readonly allowEventIterator?: boolean;
 }): ReadonlyMap<string, GeneratedGatewayRoute> {
   const safeMountId = validateMountId(options.mountId);
   const compiled = compileProcedures(options.contract as Parameters<typeof compileProcedures>[0]);
@@ -655,7 +1175,11 @@ function generateGatewayRouteTable(options: {
   }
 
   const routes = new Map<string, GeneratedGatewayRoute>();
-  for (const procId of options.requiresProcedures) {
+  for (const entry of options.requiresProcedures) {
+    const grant: GatewayProcedureGrant = typeof entry === 'string'
+      ? { procedureId: entry, owningService: options.owningService ?? safeMountId }
+      : entry;
+    const procId = grant.procedureId;
     const proc = byId.get(procId);
     if (!proc) {
       throw new Error(
@@ -670,21 +1194,40 @@ function generateGatewayRouteTable(options: {
     if (routes.has(procId)) {
       throw new Error(`GATEWAY_GENERATION_ERROR: duplicate procedure "${procId}"`);
     }
-    // Extract optional policy.cache directly from the contract procedure node (since
-    // compileProcedures normalizes access policy).
     let node: unknown = options.contract;
     for (const seg of proc.routerPath) {
       node = typeof node === 'object' && node !== null ? Reflect.get(node, seg) : undefined;
     }
-    const meta = (typeof node === 'object' && node !== null && '~orpc' in node)
-      ? (Reflect.get(Reflect.get(node, '~orpc') as object, 'meta') as NetScriptProcedureMeta | undefined)
+    const orpcMetaNode = (typeof node === 'object' && node !== null && '~orpc' in node)
+      ? (Reflect.get(node, '~orpc') as Record<string, unknown>)
       : undefined;
+    if (!options.allowEventIterator && orpcMetaNode?.outputSchema) {
+      const iterDetails = getEventIteratorSchemaDetails(orpcMetaNode.outputSchema as never);
+      if (iterDetails !== undefined) {
+        throw new Error(
+          `GATEWAY_EVENT_ITERATOR_DEFERRED_W2: eventIterator procedure "${procId}" is excluded from HTTP-only W2 gateway`,
+        );
+      }
+    }
+    const meta = orpcMetaNode?.meta as NetScriptProcedureMeta | undefined;
+    const pathParamNames = extractRestPatternParamNames(proc.restPattern);
+    if (pathParamNames.length > 0 && !grant.pathParamsSchema) {
+      throw new Error(
+        `GATEWAY_PARAMETER_BINDING_REQUIRED: parameterized procedure "${procId}" (${proc.restPattern}) requires typed pathParamsSchema`,
+      );
+    }
 
     routes.set(procId, {
       procedureId: procId,
+      owningService: grant.owningService,
       method: proc.restMethod.toUpperCase(),
-      upstreamPath: proc.restPattern,
+      restPattern: proc.restPattern,
+      pathParamNames,
+      allowedQueryParams: [...(grant.allowedQueryParams ?? [])],
+      pathParamsSchema: grant.pathParamsSchema,
       indexed: proc,
+      authorizeService: grant.authorizeService,
+      authorizeResource: grant.authorizeResource,
       cachePolicy: meta?.policy?.cache ?? 'no-store',
     });
   }
@@ -827,8 +1370,14 @@ function createPluginGatewayHandler(options: {
   readonly routes: ReadonlyMap<string, GeneratedGatewayRoute>;
   readonly hostOrigin: string;
   readonly serviceOrigin: string;
+  readonly serviceApiMount?: string;
   readonly principalPort: PrincipalPort;
-  readonly getServerUpstreamAuth: () => Record<string, string>;
+  readonly getServerUpstreamAuth: (ctx: {
+    readonly principal: Principal | null;
+    readonly procedureId: string;
+    readonly owningService: string;
+    readonly resource: Readonly<Record<string, string>>;
+  }) => Record<string, string>;
   readonly maxRequestBytes?: number;
   readonly maxResponseBytes?: number;
   readonly timeoutMs?: number;
@@ -837,6 +1386,7 @@ function createPluginGatewayHandler(options: {
 }): (request: Request) => Promise<Response> {
   const safeMountId = validateMountId(options.mountId);
   const gatewayPrefix = `/api/plugins/${safeMountId}/`;
+  const serviceApiMount = (options.serviceApiMount ?? '').replace(/\/$/, '');
   const maxReqBytes = options.maxRequestBytes ?? 64 * 1024;
   const maxResBytes = options.maxResponseBytes ?? 512 * 1024;
   const timeoutMs = options.timeoutMs ?? 5_000;
@@ -920,49 +1470,14 @@ function createPluginGatewayHandler(options: {
       return Response.json({ error: 'FORBIDDEN', reason: csrf.reason }, { status: 403 });
     }
 
-    // Server-side PrincipalPort authentication + NetScriptProcedureMeta authorization.
-    let principal: Principal | null = null;
-    if (route.indexed.policy?.authentication !== 'none') {
-      principal = await options.principalPort.resolve(request, request.signal);
-      if (!principal) {
-        emitAudit({
-          procedure: procedureId,
-          subject: null,
-          status: 401,
-          outcome: 'deny',
-          reason: 'unauthenticated',
-          correlationId,
-        });
-        return Response.json({ error: 'UNAUTHORIZED', reason: 'unauthenticated' }, { status: 401 });
-      }
-      const decision = route.indexed.policy
-        ? authorizeProcedurePolicy(
-          { principal, method, path: rawPath, rawPath },
-          route.indexed.policy,
-          isInternalServicePrincipal,
-        )
-        : { allow: false as const, reason: 'authz.missing_policy' };
-      if (!decision.allow) {
-        emitAudit({
-          procedure: procedureId,
-          subject: principal.subject,
-          status: 403,
-          outcome: 'deny',
-          reason: decision.reason,
-          correlationId,
-        });
-        return Response.json({ error: 'FORBIDDEN', reason: decision.reason }, { status: 403 });
-      }
-    }
-
-    // Request body size limit (both declared Content-Length and streaming body check).
+    // Read bounded request body early so typed parameter binding & authz never exceed payload caps.
     const contentLengthHeader = request.headers.get('content-length');
     if (contentLengthHeader !== null) {
       const parsedLen = Number(contentLengthHeader);
       if (!Number.isFinite(parsedLen) || parsedLen < 0 || parsedLen > maxReqBytes) {
         emitAudit({
           procedure: procedureId,
-          subject: principal?.subject ?? null,
+          subject: null,
           status: 413,
           outcome: 'deny',
           reason: 'request_body_too_large',
@@ -978,13 +1493,108 @@ function createPluginGatewayHandler(options: {
     if (!reqBody.ok) {
       emitAudit({
         procedure: procedureId,
-        subject: principal?.subject ?? null,
+        subject: null,
         status: 413,
         outcome: 'deny',
         reason: 'request_body_too_large',
         correlationId,
       });
       return Response.json({ error: 'PAYLOAD_TOO_LARGE', reason: 'request_body_too_large' }, { status: 413 });
+    }
+
+    // Typed parameter binding BEFORE authz/upstream so raw router patterns like `/jobs/:id` never reach upstream.
+    const incomingUrl = new URL(request.url);
+    let boundParams: Record<string, string> = {};
+    let resolvedUpstreamRelativePath = route.restPattern;
+    if (route.pathParamNames.length > 0 && route.pathParamsSchema) {
+      let bodyParams: Record<string, unknown> = {};
+      if (reqBody.bytes.byteLength > 0) {
+        try {
+          const decoded = JSON.parse(new TextDecoder().decode(reqBody.bytes));
+          if (decoded && typeof decoded === 'object' && !Array.isArray(decoded)) {
+            bodyParams = decoded as Record<string, unknown>;
+          }
+        } catch {
+          return Response.json({ error: 'BAD_REQUEST', reason: 'invalid_json_body' }, { status: 400 });
+        }
+      }
+      const rawCandidateParams: Record<string, unknown> = {};
+      for (const name of route.pathParamNames) {
+        rawCandidateParams[name] = incomingUrl.searchParams.get(name) ?? bodyParams[name];
+      }
+      const parsedParams = route.pathParamsSchema.safeParse(rawCandidateParams);
+      if (!parsedParams.success) {
+        emitAudit({
+          procedure: procedureId,
+          subject: null,
+          status: 400,
+          outcome: 'deny',
+          reason: 'invalid_typed_path_params',
+          correlationId,
+        });
+        return Response.json({ error: 'BAD_REQUEST', reason: 'invalid_typed_path_params' }, { status: 400 });
+      }
+      boundParams = parsedParams.data;
+      try {
+        resolvedUpstreamRelativePath = bindTypedUpstreamPath(
+          route.restPattern,
+          route.pathParamNames,
+          boundParams,
+        );
+      } catch {
+        return Response.json({ error: 'BAD_REQUEST', reason: 'invalid_typed_path_params' }, { status: 400 });
+      }
+    }
+    const upstreamPathname = `${serviceApiMount}${resolvedUpstreamRelativePath}`;
+
+    // Server-side PrincipalPort authentication + contract policy / published service authorizer + resource policy.
+    let principal: Principal | null = null;
+    if (route.indexed.policy?.authentication !== 'none') {
+      principal = await options.principalPort.resolve(request, request.signal);
+      if (!principal) {
+        emitAudit({
+          procedure: procedureId,
+          subject: null,
+          status: 401,
+          outcome: 'deny',
+          reason: 'unauthenticated',
+          correlationId,
+        });
+        return Response.json({ error: 'UNAUTHORIZED', reason: 'unauthenticated' }, { status: 401 });
+      }
+      let decision: AuthzDecision;
+      if (route.indexed.policy) {
+        decision = authorizeProcedurePolicy(
+          { principal, method, path: upstreamPathname, rawPath: upstreamPathname },
+          route.indexed.policy,
+          isInternalServicePrincipal,
+        );
+      } else if (route.authorizeService) {
+        decision = await route.authorizeService({
+          principal,
+          method,
+          path: upstreamPathname,
+          rawPath: upstreamPathname,
+        });
+      } else {
+        decision = { allow: false, reason: 'authz.missing_policy' };
+      }
+
+      if (decision.allow && route.authorizeResource) {
+        decision = route.authorizeResource(principal, boundParams);
+      }
+
+      if (!decision.allow) {
+        emitAudit({
+          procedure: procedureId,
+          subject: principal.subject,
+          status: 403,
+          outcome: 'deny',
+          reason: decision.reason,
+          correlationId,
+        });
+        return Response.json({ error: 'FORBIDDEN', reason: decision.reason }, { status: 403 });
+      }
     }
 
     // Build allowlisted upstream request headers (NEVER forward browser Cookie / Authorization).
@@ -996,15 +1606,25 @@ function createPluginGatewayHandler(options: {
     if (traceparent) upstreamHeaders.set('traceparent', traceparent);
     upstreamHeaders.set('x-correlation-id', correlationId);
     upstreamHeaders.set('x-netscript-subject', principal?.subject ?? 'anonymous');
-    for (const [k, v] of Object.entries(options.getServerUpstreamAuth())) {
+    for (
+      const [k, v] of Object.entries(
+        options.getServerUpstreamAuth({
+          principal,
+          procedureId,
+          owningService: route.owningService,
+          resource: boundParams,
+        }),
+      )
+    ) {
       upstreamHeaders.set(k, v);
     }
 
-    const upstreamUrl = new URL(route.upstreamPath, options.serviceOrigin);
-    // Preserve non-url query params? Only if safe; never read upstream URL from input.
-    const incomingUrl = new URL(request.url);
-    for (const [k, v] of incomingUrl.searchParams) {
-      upstreamUrl.searchParams.append(k, v);
+    // Strict allowlisted query-parameter binding (NEVER blind-copy arbitrary incoming query parameters).
+    const upstreamUrl = new URL(upstreamPathname, options.serviceOrigin);
+    for (const allowedKey of route.allowedQueryParams) {
+      for (const val of incomingUrl.searchParams.getAll(allowedKey)) {
+        upstreamUrl.searchParams.append(allowedKey, val);
+      }
     }
 
     const controller = new AbortController();
@@ -1106,8 +1726,9 @@ function createPluginGatewayHandler(options: {
   };
 }
 
-// Contract fixture built with real `baseContract` + `NetScriptProcedureMeta`.
-const CRON_READ_META = {
+// Synthetic contract fixture (explicitly labeled synthetic!) built with real `baseContract` + `NetScriptProcedureMeta`
+// to test explicit metadata policy enforcement, internal-audience rejection, and SDK metadata stripping.
+const SYNTHETIC_CRON_READ_META = {
   access: {
     authentication: 'required',
     authorization: { scopes: ['crons:read'] },
@@ -1115,53 +1736,53 @@ const CRON_READ_META = {
   policy: { cache: 'no-store' },
 } as const satisfies NetScriptProcedureMeta;
 
-const CRON_WRITE_META = {
+const SYNTHETIC_CRON_WRITE_META = {
   access: {
     authentication: 'required',
     authorization: { scopes: ['crons:write'], roles: ['operator'] },
   },
 } as const satisfies NetScriptProcedureMeta;
 
-const CRON_ADMIN_META = {
+const SYNTHETIC_CRON_ADMIN_META = {
   access: {
     authentication: 'required',
     authorization: { scopes: ['crons:admin'] },
   },
 } as const satisfies NetScriptProcedureMeta;
 
-const CRON_INTERNAL_META = {
+const SYNTHETIC_CRON_INTERNAL_META = {
   access: {
     authentication: 'required',
     audience: 'internal',
   },
 } as const satisfies NetScriptProcedureMeta;
 
-const cronsContract = {
+const SYNTHETIC_CRONS_CONTRACT = {
   list: baseContract
     .route({ method: 'GET', path: '/crons' })
-    .meta(CRON_READ_META)
+    .meta(SYNTHETIC_CRON_READ_META)
     .output(z.object({ jobs: z.array(z.string()) })),
   pause: baseContract
     .route({ method: 'POST', path: '/crons/pause' })
-    .meta(CRON_WRITE_META)
+    .meta(SYNTHETIC_CRON_WRITE_META)
     .input(z.object({ jobId: z.string().min(1) }))
     .output(z.object({ paused: z.boolean() })),
   deleteAll: baseContract
     .route({ method: 'POST', path: '/crons/delete-all' })
-    .meta(CRON_ADMIN_META)
+    .meta(SYNTHETIC_CRON_ADMIN_META)
     .output(z.object({ deleted: z.number() })),
   internalSync: baseContract
     .route({ method: 'POST', path: '/crons/internal-sync' })
-    .meta(CRON_INTERNAL_META)
+    .meta(SYNTHETIC_CRON_INTERNAL_META)
     .output(z.object({ synced: z.boolean() })),
   tailEvents: oc
-    .$meta<NetScriptProcedureMeta>(CRON_READ_META)
+    .$meta<NetScriptProcedureMeta>(SYNTHETIC_CRON_READ_META)
     .route({ method: 'GET', path: '/crons/tail' })
     .output(eventIterator(z.object({ tick: z.number() }))),
 };
 
-probeTest('2.1 [P5 gateway]: real authContract + cronsContract compilation and internal-audience rejection', () => {
-  // Real repo authContract compiles cleanly via compileProcedures.
+probeTest('2.1 [P5 gateway]: real authContract + real workersContract + synthetic cronsContract compilation and internal-audience rejection', () => {
+  // 1) Real repo authContract compiles cleanly via compileProcedures.
   const compiledAuth = compileProcedures(authContract);
   const revokeProc = compiledAuth.find((p) => p.routerPath.join('.') === 'revokeSession');
   assertExists(revokeProc);
@@ -1169,29 +1790,42 @@ probeTest('2.1 [P5 gateway]: real authContract + cronsContract compilation and i
   assertEquals(revokeProc.policy?.authentication, 'required');
   assertEquals(revokeProc.policy?.requiredScopes, ['auth:sessions:revoke']);
 
-  // Gateway generator compiles only granted procedures.
+  // 2) Real repo workersContract declares getJob & triggerJob WITHOUT meta.access (`policy === undefined`).
+  const compiledWorkers = compileProcedures(workersContract as never);
+  const getJobProc = compiledWorkers.find((p) => p.routerPath.join('.') === 'getJob');
+  const triggerJobProc = compiledWorkers.find((p) => p.routerPath.join('.') === 'triggerJob');
+  assertExists(getJobProc);
+  assertExists(triggerJobProc);
+  assertEquals(getJobProc.restPattern, '/jobs/:id');
+  assertEquals(getJobProc.policy, undefined);
+  assertEquals(triggerJobProc.restPattern, '/jobs/:id/trigger');
+  assertEquals(triggerJobProc.policy, undefined);
+
+  // 3) Synthetic cronsContract compiles only granted procedures (HTTP-only W2 mode excludes eventIterator).
   const routes = generateGatewayRouteTable({
     mountId: 'crons',
-    contract: cronsContract,
+    owningService: 'crons-synthetic',
+    contract: SYNTHETIC_CRONS_CONTRACT,
     requiresProcedures: ['list', 'pause'],
   });
   assertEquals([...routes.keys()], ['list', 'pause']);
   assertEquals(routes.get('list')?.method, 'GET');
   assertEquals(routes.get('pause')?.method, 'POST');
 
-  // Verify SDK stable-v1 adapter's normalizeProcedureMeta currently drops scopes/roles/audience
-  // compared to compileProcedures — proving the gateway generator must consume full NetScriptProcedureMeta.
+  // 4) Verify SDK stable-v1 adapter's normalizeProcedureMeta strips authorization/audience in client
+  //    transport metadata (distinct from server compileProcedures / createContractAuthorizer).
   const sdkMetaPort = createStableV1ProcedureMetadataPort();
-  const sdkDesc = sdkMetaPort.describe(cronsContract.pause, ['pause']);
+  const sdkDesc = sdkMetaPort.describe(SYNTHETIC_CRONS_CONTRACT.pause, ['pause']);
   assertEquals(sdkDesc.meta.access?.authentication, 'required');
   assertEquals(sdkDesc.meta.access?.authorization, undefined);
 
-  // Internal-audience procedure MUST be rejected at generation time.
+  // 5) Internal-audience procedure MUST be rejected at generation time.
   assertThrows(
     () =>
       generateGatewayRouteTable({
         mountId: 'crons',
-        contract: cronsContract,
+        owningService: 'crons-synthetic',
+        contract: SYNTHETIC_CRONS_CONTRACT,
         requiresProcedures: ['internalSync'],
       }),
     Error,
@@ -1199,11 +1833,15 @@ probeTest('2.1 [P5 gateway]: real authContract + cronsContract compilation and i
   );
 });
 
-probeTest('2.2 [P5 gateway]: deny-by-default, PrincipalPort auth (no browser Cookie/Auth leak), CSRF, redirect manual, response-header allowlist, audit log', async () => {
+probeTest('2.2 [P5 gateway]: synthetic crons HTTP controls (CSRF, method, redirect manual, response headers, audit log)', async () => {
   const routes = generateGatewayRouteTable({
     mountId: 'crons',
-    contract: cronsContract,
-    requiresProcedures: ['list', 'pause'],
+    owningService: 'crons-synthetic',
+    contract: SYNTHETIC_CRONS_CONTRACT,
+    requiresProcedures: [
+      { procedureId: 'list', owningService: 'crons-synthetic', allowedQueryParams: ['triggerRedirect'] },
+      { procedureId: 'pause', owningService: 'crons-synthetic' },
+    ],
   });
 
   let upstreamHitCount = 0;
@@ -1461,11 +2099,198 @@ probeTest('2.2 [P5 gateway]: deny-by-default, PrincipalPort auth (no browser Coo
   }
 });
 
+probeTest('2.2b [P5 + real workersContract]: host-approved procedure x owning service x (principal, resource) policy + typed param binding', async () => {
+  const workersAuthorizer = createContractAuthorizer(workersContract as never, {
+    fallback: createScopeAuthorizer({
+      rules: [
+        {
+          match: (req) => req.method === 'GET' && req.path.startsWith('/api/workers/jobs/'),
+          requireScopes: ['workers:jobs:read'],
+        },
+        {
+          match: (req) => req.method === 'POST' && req.path.endsWith('/trigger'),
+          requireScopes: ['workers:jobs:trigger'],
+          requireRoles: ['operator'],
+        },
+      ],
+    }),
+  });
+  workersAuthorizer.bind({ apiPath: '/api/workers', rpcPath: '/rpc/workers' });
+
+  const jobIdParamsSchema = z.object({
+    id: z.string().regex(/^[a-z0-9-]+$/),
+  });
+
+  const authorizeJobResource = (
+    principal: Principal,
+    resource: Readonly<Record<string, string>>,
+  ): AuthzDecision => {
+    const allowed = principal.claims?.allowedJobIds;
+    if (!Array.isArray(allowed) || !allowed.includes(resource.id)) {
+      return { allow: false, reason: `authz.resource_denied:${resource.id ?? '<none>'}` };
+    }
+    return { allow: true };
+  };
+
+  const routes = generateGatewayRouteTable({
+    mountId: 'workers',
+    owningService: 'workers',
+    contract: workersContract as unknown as Record<string, unknown>,
+    requiresProcedures: [
+      {
+        procedureId: 'getJob',
+        owningService: 'workers',
+        pathParamsSchema: jobIdParamsSchema,
+        allowedQueryParams: [], // strictly no blind query forwarding
+        authorizeService: (req) => workersAuthorizer.authorize(req),
+        authorizeResource: authorizeJobResource,
+      },
+      {
+        procedureId: 'triggerJob',
+        owningService: 'workers',
+        pathParamsSchema: jobIdParamsSchema,
+        allowedQueryParams: [],
+        authorizeService: (req) => workersAuthorizer.authorize(req),
+        authorizeResource: authorizeJobResource,
+      },
+    ],
+  });
+
+  const upstreamRequests: { path: string; search: string; service: string | null; resource: string | null; auth: string | null }[] = [];
+  const gateway = createPluginGatewayHandler({
+    mountId: 'workers',
+    routes,
+    hostOrigin: 'https://app.example.test',
+    serviceOrigin: 'http://workers.internal.test',
+    serviceApiMount: '/api/workers',
+    principalPort: {
+      resolve: () =>
+        Promise.resolve({
+          subject: 'user:alice',
+          scopes: ['workers:jobs:read', 'workers:jobs:trigger'],
+          roles: ['operator'],
+          scheme: 'custom',
+          claims: { allowedJobIds: ['job-alpha'] },
+        }),
+    },
+    getServerUpstreamAuth: ({ owningService, resource }) => ({
+      authorization: `Bearer svc:${owningService}:${resource.id ?? 'none'}`,
+      'x-netscript-service': owningService,
+      'x-netscript-resource': `job:${resource.id ?? 'none'}`,
+    }),
+    fetchImpl: (input) => {
+      const req = input as Request;
+      const url = new URL(req.url);
+      upstreamRequests.push({
+        path: url.pathname,
+        search: url.search,
+        service: req.headers.get('x-netscript-service'),
+        resource: req.headers.get('x-netscript-resource'),
+        auth: req.headers.get('authorization'),
+      });
+      if (url.pathname === '/api/workers/jobs/job-alpha') {
+        return Promise.resolve(Response.json({ id: 'job-alpha', enabled: true }));
+      }
+      if (url.pathname === '/api/workers/jobs/job-alpha/trigger') {
+        return Promise.resolve(Response.json({ jobId: 'job-alpha', triggered: true }));
+      }
+      return Promise.resolve(new Response('unexpected path', { status: 500 }));
+    },
+  });
+
+  // 1) Authorized resource succeeds with exact bound path & stripped unallowlisted query params
+  const rGetAlpha = await gateway(
+    new Request('https://app.example.test/api/plugins/workers/getJob?id=job-alpha&extraEvil=1', {
+      method: 'GET',
+      headers: { 'sec-fetch-site': 'same-origin' },
+    }),
+  );
+  assertEquals(rGetAlpha.status, 200);
+  assertEquals(await rGetAlpha.json(), { id: 'job-alpha', enabled: true });
+
+  const rTriggerAlpha = await gateway(
+    new Request('https://app.example.test/api/plugins/workers/triggerJob', {
+      method: 'POST',
+      headers: {
+        origin: 'https://app.example.test',
+        'sec-fetch-site': 'same-origin',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ id: 'job-alpha', payload: { dryRun: true } }),
+    }),
+  );
+  assertEquals(rTriggerAlpha.status, 200);
+  assertEquals(await rTriggerAlpha.json(), { jobId: 'job-alpha', triggered: true });
+  assertEquals(upstreamRequests, [
+    {
+      path: '/api/workers/jobs/job-alpha',
+      search: '',
+      service: 'workers',
+      resource: 'job:job-alpha',
+      auth: 'Bearer svc:workers:job-alpha',
+    },
+    {
+      path: '/api/workers/jobs/job-alpha/trigger',
+      search: '',
+      service: 'workers',
+      resource: 'job:job-alpha',
+      auth: 'Bearer svc:workers:job-alpha',
+    },
+  ]);
+
+  // 2) Same authenticated principal targeting unauthorized resource `job-beta` fails 403 with 0 upstream hits
+  const hitsBeforeDenied = upstreamRequests.length;
+  const rGetBeta = await gateway(
+    new Request('https://app.example.test/api/plugins/workers/getJob?id=job-beta', {
+      method: 'GET',
+      headers: { 'sec-fetch-site': 'same-origin' },
+    }),
+  );
+  assertEquals(rGetBeta.status, 403);
+  const rTriggerBeta = await gateway(
+    new Request('https://app.example.test/api/plugins/workers/triggerJob', {
+      method: 'POST',
+      headers: {
+        origin: 'https://app.example.test',
+        'sec-fetch-site': 'same-origin',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ id: 'job-beta' }),
+    }),
+  );
+  assertEquals(rTriggerBeta.status, 403);
+  assertEquals(upstreamRequests.length, hitsBeforeDenied);
+
+  // 3) Ungranted real Workers procedure (`deleteJob`) -> 404, 0 upstream hits
+  const rDelete = await gateway(
+    new Request('https://app.example.test/api/plugins/workers/deleteJob?id=job-alpha', {
+      method: 'DELETE',
+      headers: { origin: 'https://app.example.test', 'sec-fetch-site': 'same-origin' },
+    }),
+  );
+  assertEquals(rDelete.status, 404);
+  assertEquals(upstreamRequests.length, hitsBeforeDenied);
+
+  // 4) Unsafe path param (`../admin`) rejected by typed binding -> 400, 0 upstream hits
+  const rBadParam = await gateway(
+    new Request('https://app.example.test/api/plugins/workers/getJob?id=../admin', {
+      method: 'GET',
+      headers: { 'sec-fetch-site': 'same-origin' },
+    }),
+  );
+  assertEquals(rBadParam.status, 400);
+  assertEquals(upstreamRequests.length, hitsBeforeDenied);
+});
+
 probeTest('2.3 [P5 gateway]: request/response body limits, timeout (504), and AbortSignal propagation', async () => {
   const routes = generateGatewayRouteTable({
     mountId: 'crons',
-    contract: cronsContract,
-    requiresProcedures: ['list', 'pause'],
+    owningService: 'crons-synthetic',
+    contract: SYNTHETIC_CRONS_CONTRACT,
+    requiresProcedures: [
+      { procedureId: 'list', owningService: 'crons-synthetic', allowedQueryParams: ['mode'] },
+      { procedureId: 'pause', owningService: 'crons-synthetic' },
+    ],
   });
 
   let upstreamHits = 0;
@@ -1576,7 +2401,9 @@ probeTest('2.3 [P5 gateway]: request/response body limits, timeout (504), and Ab
   assertEquals(upstreamAborted, true);
 });
 
-// RFC 0009 canonical stream offset & delivery-unit-fenced authorizing SSE proxy prototype
+// Probe-local SSE proxy prototype for offset resume & pre-batch withholding on DurableStreamTestServer.
+// NOTE (B5): `packages/plugin-streams-core/deno.json` does not yet export `./proxy`; this prototype does NOT
+// prove RFC 0009 runtime exports, `invalidationEpoch` stale-allow race fencing, idle expiry, or pre-drain shutdown.
 const STREAM_OFFSET_MAX_BYTES = 512;
 
 function isValidStreamOffset(value: unknown): value is string {
@@ -1595,7 +2422,7 @@ interface ParsedSseBlock {
   readonly rawBytes: Uint8Array;
 }
 
-function createRfc0009AuthorizingSseProxy(options: {
+function createProbeLocalSseProxyPrototype(options: {
   readonly hostOrigin: string;
   readonly streamsBaseUrl: string;
   readonly upstreamAuth: () => Record<string, string>;
@@ -1851,7 +2678,7 @@ function createRfc0009AuthorizingSseProxy(options: {
 }
 
 probeTest(
-  '2.4 [P5 + RFC 0009]: real DurableStreamTestServer SSE delivery-unit fencing, mid-stream revocation, ?offset= resume, and abort propagation',
+  '2.4 [Streams boundary prototype — NOT RFC 0009 runtime export]: probe-local SSE proxy demonstrates offset resume & pre-batch withholding on DurableStreamTestServer',
   async () => {
     const previousUrl = Deno.env.get('DURABLE_STREAMS_URL');
     const upstreamPort = getFreePort();
@@ -1871,7 +2698,7 @@ probeTest(
     let lastUpstreamSeenHeaders: Headers | undefined;
     let upstreamCancelledCount = 0;
 
-    const proxyHandler = createRfc0009AuthorizingSseProxy({
+    const proxyHandler = createProbeLocalSseProxyPrototype({
       hostOrigin: 'https://app.example.test',
       streamsBaseUrl: streamsBase,
       upstreamAuth: () => ({ authorization: 'Bearer streams-server-secret' }),
@@ -2052,7 +2879,7 @@ probeTest(
       assert(upstreamCancelledCount > prevCancels, 'expected upstream reader cancellation on client abort');
 
       // 6b. Missing stream on DurableStreamTestServer returns 404 after admission (not 200/500).
-      const missingStreamProxy = createRfc0009AuthorizingSseProxy({
+      const missingStreamProxy = createProbeLocalSseProxyPrototype({
         hostOrigin: 'https://app.example.test',
         streamsBaseUrl: streamsBase,
         upstreamAuth: () => ({ authorization: 'Bearer streams-server-secret' }),
@@ -2130,38 +2957,62 @@ probeTest(
   },
 );
 
-probeTest('2.5 [P5 + RFC 0009 boundary]: proves oRPC router traversal excludes stream contracts & AI proxy stays specialized', () => {
-  // 1. oRPC compileProcedures handles ordinary + eventIterator procedures, while a non-oRPC StreamEndpointContract
-  //    would crash oRPC contract traversal if placed inside an oRPC router (RFC 0009 §Why stream endpoints stay outside).
-  const compiled = compileProcedures(cronsContract);
+probeTest('2.5 [Transport separation boundary]: compileProcedures excludes non-oRPC stream contracts; W2 HTTP gateway excludes eventIterator procedures', () => {
+  // 1. oRPC compileProcedures indexes ordinary & eventIterator procedures at the metadata level, while a
+  //    non-oRPC StreamEndpointContract throws in oRPC traversal if placed inside an oRPC router.
+  const compiled = compileProcedures(SYNTHETIC_CRONS_CONTRACT);
   const tailProc = compiled.find((p) => p.routerPath.join('.') === 'tailEvents');
   assertExists(tailProc);
   assertEquals(tailProc.restMethod, 'GET');
   assertEquals(tailProc.restPattern, '/crons/tail');
 
+  // 2. W2 HTTP-only gateway generation (F-4 Option B) rejects eventIterator procedures (`subscribe`, `tailEvents`)
+  //    because incremental first-frame delivery & abort/reconnect under real auth policy remain deferred beyond W2.
+  assertThrows(
+    () =>
+      generateGatewayRouteTable({
+        mountId: 'crons',
+        owningService: 'crons-synthetic',
+        contract: SYNTHETIC_CRONS_CONTRACT,
+        requiresProcedures: ['tailEvents'],
+      }),
+    Error,
+    'GATEWAY_EVENT_ITERATOR_DEFERRED_W2',
+  );
+  assertThrows(
+    () =>
+      generateGatewayRouteTable({
+        mountId: 'workers',
+        owningService: 'workers',
+        contract: workersContract as unknown as Record<string, unknown>,
+        requiresProcedures: ['subscribe'],
+      }),
+    Error,
+    'GATEWAY_EVENT_ITERATOR_DEFERRED_W2',
+  );
+
   const syntheticBrokenRouterWithStreamEndpoint = {
-    ...cronsContract,
+    ...SYNTHETIC_CRONS_CONTRACT,
     badNestedStreamEndpoint: { protocol: { family: 'netscript.durable-stream-sse', major: 1 }, id: 'crons.feed' },
   };
   assertThrows(() => compileProcedures(syntheticBrokenRouterWithStreamEndpoint as never));
 
-  // 2. Verify @netscript/fresh/ai createNetScriptChatStreamProxy preserves legacy specialized chat behavior
-  //    (separate from generic gateway and RFC 0009 until opt-in authorize/recheck lands).
+  // 3. @netscript/fresh/ai createNetScriptChatStreamProxy stays specialized in Lane 3.
   assertEquals(typeof createNetScriptChatStreamProxy, 'function');
   assertEquals(STREAM_SSE_CONTRACT_V1.wireEventNames, ['data', 'control']);
 });
 
 // ============================================================================
-// PART 3: SECRET-REDACTION BOUNDARY (eis-etl#450, #453)
+// PART 3: SECRET-REDACTION BOUNDARY (eis-etl#450, #453) & #2670 WRITE PROTOCOL
 // ============================================================================
 
 const REDACTED_SECRET_SENTINEL = '__NS_REDACTED_SECRET__' as const;
 
-interface RedactedSecretHandle {
+// Presence-only browser handle: ZERO digest or fingerprint exposed to client/HTML (B3).
+export interface RedactedSecretHandle {
   readonly __nsSecretHandle: true;
   readonly sentinel: typeof REDACTED_SECRET_SENTINEL;
   readonly isSet: boolean;
-  readonly digest: string | null;
 }
 
 const SENSITIVE_HEADER_NAMES = new Set([
@@ -2186,58 +3037,116 @@ const SENSITIVE_QUERY_KEYS = new Set([
   'passwd',
 ]);
 
-async function computeSecretDigest(secret: string): Promise<string> {
-  const bytes = new TextEncoder().encode(secret);
-  const hash = await crypto.subtle.digest('SHA-256', bytes);
-  const hex = Array.from(new Uint8Array(hash))
-    .slice(0, 8)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
-  return `sha256:${hex}`;
-}
-
-async function makeSecretHandle(value: unknown): Promise<RedactedSecretHandle> {
-  if (typeof value === 'string' && value.length > 0) {
-    return Object.freeze({
-      __nsSecretHandle: true,
-      sentinel: REDACTED_SECRET_SENTINEL,
-      isSet: true,
-      digest: await computeSecretDigest(value),
-    });
-  }
+function makeSecretHandle(value: unknown): RedactedSecretHandle {
+  const isSet = typeof value === 'string' && value.length > 0;
   return Object.freeze({
     __nsSecretHandle: true,
     sentinel: REDACTED_SECRET_SENTINEL,
-    isSet: false,
-    digest: null,
+    isSet,
   });
 }
 
-function isSecretMarkedZodSchema(schema: unknown): boolean {
-  if (!schema || typeof schema !== 'object') return false;
-  const candidate = schema as { meta?: () => unknown; unwrap?: () => unknown };
-  if (typeof candidate.meta === 'function') {
-    const meta = candidate.meta();
-    if (meta && typeof meta === 'object') {
-      const ui = Reflect.get(meta, 'x-ns-ui');
-      if (ui && typeof ui === 'object' && Reflect.get(ui, 'secret') === true) {
-        return true;
-      }
+function readUiMetaFromRecord(meta: unknown): Record<string, unknown> | undefined {
+  if (!meta || typeof meta !== 'object') return undefined;
+  const nsUi = Reflect.get(meta, 'x-ns-ui');
+  const eisUi = Reflect.get(meta, 'x-eis-ui');
+  const nsSecret = nsUi && typeof nsUi === 'object' && Reflect.get(nsUi, 'secret') === true;
+  const eisSecret = eisUi && typeof eisUi === 'object' && Reflect.get(eisUi, 'secret') === true;
+  const merged: Record<string, unknown> = {
+    ...(eisUi && typeof eisUi === 'object' ? (eisUi as Record<string, unknown>) : {}),
+    ...(nsUi && typeof nsUi === 'object' ? (nsUi as Record<string, unknown>) : {}),
+  };
+  // Strict overlay precedence (F-3): overlay can never weaken `secret: true`.
+  if (nsSecret || eisSecret) {
+    merged.secret = true;
+  }
+  return Object.keys(merged).length > 0 ? merged : undefined;
+}
+
+function unwrapSchemaLayers(schema: unknown): readonly unknown[] {
+  const layers: unknown[] = [];
+  let current: unknown = schema;
+  const seen = new Set<unknown>();
+  while (current && typeof current === 'object' && !seen.has(current)) {
+    seen.add(current);
+    layers.push(current);
+    const candidate = current as {
+      unwrap?: () => unknown;
+      def?: { innerType?: unknown };
+    };
+    if (typeof candidate.unwrap === 'function') {
+      current = candidate.unwrap();
+    } else if (candidate.def && typeof candidate.def === 'object' && candidate.def.innerType) {
+      current = candidate.def.innerType;
+    } else {
+      break;
     }
   }
-  if (typeof candidate.unwrap === 'function') {
-    return isSecretMarkedZodSchema(candidate.unwrap());
+  return layers;
+}
+
+function isSecretMarkedSchema(schema: unknown): boolean {
+  for (const layer of unwrapSchemaLayers(schema)) {
+    if (!layer || typeof layer !== 'object') continue;
+    // Zod v4 `.meta()`
+    const maybeMetaFn = Reflect.get(layer, 'meta');
+    if (typeof maybeMetaFn === 'function') {
+      const ui = readUiMetaFromRecord((maybeMetaFn as () => unknown).call(layer));
+      if (ui?.secret === true) return true;
+    }
+    // JSON Schema object produced by `z.toJSONSchema(...)`
+    const jsonUi = readUiMetaFromRecord(layer);
+    if (jsonUi?.secret === true) return true;
   }
   return false;
 }
 
-function getObjectSchemaShape(schema: unknown): Record<string, unknown> | undefined {
-  if (!schema || typeof schema !== 'object') return undefined;
-  const shape = Reflect.get(schema, 'shape');
-  return shape && typeof shape === 'object' ? (shape as Record<string, unknown>) : undefined;
+function getObjectSchemaProperties(schema: unknown): Record<string, unknown> | undefined {
+  for (const layer of unwrapSchemaLayers(schema)) {
+    if (!layer || typeof layer !== 'object') continue;
+    const shape = Reflect.get(layer, 'shape');
+    if (shape && typeof shape === 'object') return shape as Record<string, unknown>;
+    const props = Reflect.get(layer, 'properties');
+    if (props && typeof props === 'object') return props as Record<string, unknown>;
+  }
+  return undefined;
 }
 
-async function redactUrlStringIfNeeded(input: string): Promise<unknown> {
+function getArrayElementSchema(schema: unknown): unknown {
+  for (const layer of unwrapSchemaLayers(schema)) {
+    if (!layer || typeof layer !== 'object') continue;
+    // Zod v4 array
+    const element = Reflect.get(layer, 'element');
+    if (element && typeof element === 'object') return element;
+    const def = Reflect.get(layer, 'def');
+    if (def && typeof def === 'object' && Reflect.get(def, 'type') === 'array') {
+      return Reflect.get(def, 'element');
+    }
+    // JSON Schema array
+    if (Reflect.get(layer, 'type') === 'array') {
+      const items = Reflect.get(layer, 'items');
+      if (items && typeof items === 'object' && !Array.isArray(items)) return items;
+    }
+  }
+  return undefined;
+}
+
+function getRecordValueSchema(schema: unknown): unknown {
+  for (const layer of unwrapSchemaLayers(schema)) {
+    if (!layer || typeof layer !== 'object') continue;
+    // Zod v4 record
+    const def = Reflect.get(layer, 'def');
+    if (def && typeof def === 'object' && Reflect.get(def, 'type') === 'record') {
+      return Reflect.get(def, 'valueType');
+    }
+    // JSON Schema object with additionalProperties schema
+    const addProps = Reflect.get(layer, 'additionalProperties');
+    if (addProps && typeof addProps === 'object') return addProps;
+  }
+  return undefined;
+}
+
+function redactUrlStringIfNeeded(input: string): unknown {
   const urlMatch = /^(?:https?|postgres(?:ql)?|redis|rediss|amqps?):\/\/\S+$/i.test(input);
   if (!urlMatch) return input;
   let parsed: URL;
@@ -2255,8 +3164,6 @@ async function redactUrlStringIfNeeded(input: string): Promise<unknown> {
   }
   if (!hasUserinfo && !hasSensitiveQuery) return input;
 
-  const rawCredentialMaterial = `${parsed.username}:${parsed.password}`;
-  const digest = await computeSecretDigest(rawCredentialMaterial);
   if (parsed.username) parsed.username = REDACTED_SECRET_SENTINEL;
   if (parsed.password) parsed.password = REDACTED_SECRET_SENTINEL;
   for (const key of [...parsed.searchParams.keys()]) {
@@ -2266,36 +3173,35 @@ async function redactUrlStringIfNeeded(input: string): Promise<unknown> {
   }
   return {
     redactedUrl: parsed.href,
-    credential: {
+    credential: Object.freeze({
       __nsSecretHandle: true,
       sentinel: REDACTED_SECRET_SENTINEL,
       isSet: true,
-      digest,
-    } satisfies RedactedSecretHandle,
+    }) satisfies RedactedSecretHandle,
   };
 }
 
-async function redactValueForClient(
+function redactValueForClient(
   value: unknown,
   schema?: unknown,
   seen = new WeakSet<object>(),
-): Promise<unknown> {
+): unknown {
   if (typeof value === 'function') {
     throw new TypeError('NON_SERIALIZABLE_PORT_BLOCKED: functions/ports cannot cross into client context');
   }
-  if (isSecretMarkedZodSchema(schema)) {
-    return await makeSecretHandle(value);
+  if (isSecretMarkedSchema(schema)) {
+    return makeSecretHandle(value);
   }
   if (value === null || value === undefined || typeof value === 'boolean' || typeof value === 'number') {
     return value;
   }
   if (typeof value === 'string') {
-    return await redactUrlStringIfNeeded(value);
+    return redactUrlStringIfNeeded(value);
   }
   if (value instanceof Headers) {
     const clean: Record<string, unknown> = {};
     for (const [k, v] of value.entries()) {
-      clean[k] = SENSITIVE_HEADER_NAMES.has(k.toLowerCase()) ? await makeSecretHandle(v) : v;
+      clean[k] = SENSITIVE_HEADER_NAMES.has(k.toLowerCase()) ? makeSecretHandle(v) : v;
     }
     return clean;
   }
@@ -2308,33 +3214,56 @@ async function redactValueForClient(
   seen.add(value);
 
   if (Array.isArray(value)) {
-    const out: unknown[] = [];
-    for (const item of value) {
-      out.push(await redactValueForClient(item, undefined, seen));
-    }
-    return out;
+    const elemSchema = getArrayElementSchema(schema);
+    return value.map((item) => redactValueForClient(item, elemSchema, seen));
   }
 
-  const shape = getObjectSchemaShape(schema);
+  const properties = getObjectSchemaProperties(schema);
+  const recordValueSchema = getRecordValueSchema(schema);
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(value)) {
     const lower = k.toLowerCase();
     if (SENSITIVE_HEADER_NAMES.has(lower)) {
-      out[k] = await makeSecretHandle(typeof v === 'string' ? v : JSON.stringify(v));
+      out[k] = makeSecretHandle(typeof v === 'string' ? v : JSON.stringify(v));
       continue;
     }
-    const fieldSchema = shape?.[k];
-    out[k] = await redactValueForClient(v, fieldSchema, seen);
+    const fieldSchema = properties?.[k] ?? recordValueSchema;
+    out[k] = redactValueForClient(v, fieldSchema, seen);
   }
   return out;
 }
 
-function assertNoUnredactedSecrets(value: unknown, path = '$'): void {
+function isStrictAllowlistedSecretHandle(value: unknown): value is RedactedSecretHandle {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const keys = Object.keys(value);
+  if (keys.length !== 3) return false;
+  if (!keys.every((k) => k === '__nsSecretHandle' || k === 'sentinel' || k === 'isSet')) {
+    return false;
+  }
+  return (
+    Reflect.get(value, '__nsSecretHandle') === true &&
+    Reflect.get(value, 'sentinel') === REDACTED_SECRET_SENTINEL &&
+    typeof Reflect.get(value, 'isSet') === 'boolean'
+  );
+}
+
+function assertNoUnredactedSecrets(
+  value: unknown,
+  schema?: unknown,
+  path = '$',
+): void {
   if (typeof value === 'function') {
     throw new Error(`UNREDACTED_SECRET_SERIALIZATION_BLOCKED: function/port at ${path}`);
   }
+  if (isSecretMarkedSchema(schema)) {
+    if (!isStrictAllowlistedSecretHandle(value)) {
+      throw new Error(
+        `UNREDACTED_SECRET_SERIALIZATION_BLOCKED: secret-marked schema field at ${path} is not a strict presence-only RedactedSecretHandle`,
+      );
+    }
+    return;
+  }
   if (typeof value === 'string') {
-    // Reject URLs still carrying plaintext userinfo (where username/password !== REDACTED_SECRET_SENTINEL).
     if (/^[a-z][a-z0-9+.-]*:\/\/[^/\s@]+:[^/\s@]+@/i.test(value)) {
       const parsed = URL.parse(value);
       if (
@@ -2345,6 +3274,9 @@ function assertNoUnredactedSecrets(value: unknown, path = '$'): void {
         throw new Error(`UNREDACTED_SECRET_SERIALIZATION_BLOCKED: raw URL userinfo at ${path}`);
       }
     }
+    if (/^sha256:[0-9a-f]{8,}$/i.test(value)) {
+      throw new Error(`UNREDACTED_SECRET_SERIALIZATION_BLOCKED: secret digest/fingerprint at ${path}`);
+    }
     return;
   }
   if (!value || typeof value !== 'object') return;
@@ -2352,70 +3284,206 @@ function assertNoUnredactedSecrets(value: unknown, path = '$'): void {
     throw new Error(`UNREDACTED_SECRET_SERIALIZATION_BLOCKED: raw Headers instance at ${path}`);
   }
   if (Array.isArray(value)) {
-    value.forEach((item, idx) => assertNoUnredactedSecrets(item, `${path}[${idx}]`));
+    const elemSchema = getArrayElementSchema(schema);
+    value.forEach((item, idx) => assertNoUnredactedSecrets(item, elemSchema, `${path}[${idx}]`));
     return;
   }
-  if (isRedactedSecretHandle(value)) {
+  if (isStrictAllowlistedSecretHandle(value)) {
     return;
   }
+  if (Reflect.get(value, '__nsSecretHandle') === true) {
+    // Reject handle-shaped objects carrying extra keys (e.g. `digest`, `fingerprint`, or `leakedRaw`).
+    throw new Error(
+      `UNREDACTED_SECRET_SERIALIZATION_BLOCKED: non-allowlisted secret handle shape at ${path}`,
+    );
+  }
+  const properties = getObjectSchemaProperties(schema);
+  const recordValueSchema = getRecordValueSchema(schema);
   for (const [k, v] of Object.entries(value)) {
-    if (SENSITIVE_HEADER_NAMES.has(k.toLowerCase()) && !isRedactedSecretHandle(v)) {
+    if (k === 'digest' || k === 'fingerprint') {
+      throw new Error(`UNREDACTED_SECRET_SERIALIZATION_BLOCKED: forbidden "${k}" field at ${path}.${k}`);
+    }
+    if (SENSITIVE_HEADER_NAMES.has(k.toLowerCase()) && !isStrictAllowlistedSecretHandle(v)) {
       throw new Error(`UNREDACTED_SECRET_SERIALIZATION_BLOCKED: unredacted header "${k}" at ${path}.${k}`);
     }
-    assertNoUnredactedSecrets(v, `${path}.${k}`);
+    const fieldSchema = properties?.[k] ?? recordValueSchema;
+    assertNoUnredactedSecrets(v, fieldSchema, `${path}.${k}`);
   }
 }
 
-function isRedactedSecretHandle(value: unknown): value is RedactedSecretHandle {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    Reflect.get(value, '__nsSecretHandle') === true &&
-    Reflect.get(value, 'sentinel') === REDACTED_SECRET_SENTINEL
-  );
+// Verbatim merged `#2670` write-only secret submission types & resolver
+// (`origin/main:packages/fresh-ui/src/runtime/secret-field/secret-field.{types,utils}.ts`).
+// Vendored here read-only because this branch tracks PR `#2684` prior to `#2670` merge.
+const SECRET_FIELD_UNCHANGED_TOKEN = '__ns_secret_unchanged__';
+const SECRET_FIELD_CLEAR_TOKEN = '__ns_secret_clear__';
+
+type SecretFieldSubmission =
+  | { readonly mode: 'keep' }
+  | { readonly mode: 'replace'; readonly value: string }
+  | { readonly mode: 'clear' }
+  | { readonly mode: 'unset' }
+  | { readonly mode: 'invalid'; readonly reason: string };
+
+interface ResolveSecretFieldOptions {
+  readonly hadStoredSecret?: boolean;
+  readonly unchangedToken?: string;
+  readonly clearToken?: string;
+  readonly action?: FormDataEntryValue | string | null | undefined;
 }
 
-type SecretWriteInput =
-  | { readonly mode: 'keep' }
-  | { readonly mode: 'clear' }
-  | { readonly mode: 'set'; readonly value: string }
-  | string
-  | null
-  | undefined;
+function resolveSecretFieldSubmission(
+  rawValue: FormDataEntryValue | string | null | undefined,
+  options: ResolveSecretFieldOptions = {},
+): SecretFieldSubmission {
+  const unchangedToken = options.unchangedToken ?? SECRET_FIELD_UNCHANGED_TOKEN;
+  const clearToken = options.clearToken ?? SECRET_FIELD_CLEAR_TOKEN;
+  const hadStoredSecret = options.hadStoredSecret ?? false;
 
-function applySecretFieldWrite(
+  if (rawValue !== null && rawValue !== undefined && typeof rawValue !== 'string') {
+    return { mode: 'invalid', reason: 'Secret field value must be text.' };
+  }
+  if (
+    options.action !== null &&
+    options.action !== undefined &&
+    typeof options.action !== 'string'
+  ) {
+    return { mode: 'invalid', reason: 'Secret action must be text.' };
+  }
+
+  const value = typeof rawValue === 'string' ? rawValue : undefined;
+  const action = typeof options.action === 'string' && options.action.length > 0
+    ? options.action
+    : undefined;
+
+  if (action !== undefined) {
+    switch (action) {
+      case 'replace':
+        if (value === undefined || value === '') {
+          return { mode: 'invalid', reason: 'Replacement secret value is required.' };
+        }
+        if (value === clearToken || value === unchangedToken) {
+          return {
+            mode: 'invalid',
+            reason: 'Replacement secret value conflicts with a reserved sentinel token.',
+          };
+        }
+        return { mode: 'replace', value };
+      case 'clear':
+        if (value !== undefined && value !== '' && value !== clearToken) {
+          return {
+            mode: 'invalid',
+            reason: 'Clear action cannot carry a replacement secret value.',
+          };
+        }
+        return { mode: 'clear' };
+      case 'keep':
+        if (value !== undefined && value !== '' && value !== unchangedToken) {
+          return {
+            mode: 'invalid',
+            reason: 'Keep action cannot carry a replacement or clear value.',
+          };
+        }
+        return hadStoredSecret ? { mode: 'keep' } : { mode: 'unset' };
+      case 'unset':
+        if (value !== undefined && value !== '') {
+          return { mode: 'invalid', reason: 'Unset action cannot carry a secret value.' };
+        }
+        if (hadStoredSecret) {
+          return {
+            mode: 'invalid',
+            reason: 'Unset action conflicts with an existing stored secret.',
+          };
+        }
+        return { mode: 'unset' };
+      default:
+        return { mode: 'invalid', reason: `Unknown secret action "${action}".` };
+    }
+  }
+
+  if (value === clearToken) {
+    return { mode: 'clear' };
+  }
+  if (value === unchangedToken || value === undefined || value === '') {
+    return hadStoredSecret ? { mode: 'keep' } : { mode: 'unset' };
+  }
+  return { mode: 'replace', value };
+}
+
+function applySecretFieldSubmission(
   existingValue: string | null,
-  incoming: SecretWriteInput,
+  submission: SecretFieldSubmission,
   fieldPath: string,
 ): string | null {
-  if (incoming === undefined || (typeof incoming === 'object' && incoming !== null && 'mode' in incoming && incoming.mode === 'keep')) {
-    return existingValue;
+  switch (submission.mode) {
+    case 'keep':
+      return existingValue;
+    case 'unset':
+      return null;
+    case 'clear':
+      return null;
+    case 'replace': {
+      if (submission.value.includes(REDACTED_SECRET_SENTINEL)) {
+        throw new Error(
+          `SECRET_SENTINEL_ECHO_REJECTED: write to "${fieldPath}" attempted to echo redaction sentinel`,
+        );
+      }
+      if (submission.value.trim().length === 0) {
+        throw new Error(
+          `SECRET_VALUE_EMPTY: write to "${fieldPath}" requires non-empty secret`,
+        );
+      }
+      return submission.value;
+    }
+    case 'invalid':
+      throw new Error(`SECRET_SUBMISSION_INVALID (${fieldPath}): ${submission.reason}`);
   }
-  if (incoming === null || (typeof incoming === 'object' && incoming !== null && 'mode' in incoming && incoming.mode === 'clear')) {
-    return null;
-  }
-  const candidate = typeof incoming === 'string'
-    ? incoming
-    : (typeof incoming === 'object' && incoming !== null && 'mode' in incoming && incoming.mode === 'set'
-      ? incoming.value
-      : JSON.stringify(incoming));
+}
 
+function assertStrictJsonSecretWritePayload(
+  existingValue: string | null,
+  incoming: unknown,
+  fieldPath: string,
+): string | null {
+  // Explicitly reject raw strings and raw `null` shortcuts (M4): deletion or rotation must be intentional.
+  if (incoming === null || typeof incoming === 'string') {
+    throw new Error(
+      `SECRET_WRITE_PROTOCOL_REQUIRED: "${fieldPath}" rejects raw ${
+        incoming === null ? 'null' : 'string'
+      } shortcuts; submit structured #2670 SecretFieldSubmission`,
+    );
+  }
   if (
-    typeof candidate !== 'string' ||
-    candidate.includes(REDACTED_SECRET_SENTINEL) ||
-    (typeof incoming === 'object' && incoming !== null && Reflect.get(incoming, 'sentinel') === REDACTED_SECRET_SENTINEL)
+    incoming &&
+    typeof incoming === 'object' &&
+    Reflect.get(incoming, 'sentinel') === REDACTED_SECRET_SENTINEL
   ) {
     throw new Error(
       `SECRET_SENTINEL_ECHO_REJECTED: write to "${fieldPath}" attempted to echo redaction sentinel`,
     );
   }
-  if (candidate.trim().length === 0) {
-    throw new Error(`SECRET_VALUE_EMPTY: write to "${fieldPath}" requires non-empty secret or mode=clear`);
+  if (!incoming || typeof incoming !== 'object' || !('mode' in incoming)) {
+    throw new Error(`SECRET_WRITE_PROTOCOL_REQUIRED: invalid write payload for "${fieldPath}"`);
   }
-  return candidate;
+  const mode = Reflect.get(incoming, 'mode');
+  if (mode === 'keep' || mode === 'clear' || mode === 'unset' || mode === 'replace') {
+    return applySecretFieldSubmission(
+      existingValue,
+      incoming as SecretFieldSubmission,
+      fieldPath,
+    );
+  }
+  throw new Error(`SECRET_SUBMISSION_INVALID (${fieldPath}): unsupported mode "${String(mode)}"`);
 }
 
-probeTest('3.1 [eis-etl#450/#453 redaction]: deep-redacts URL userinfo, sensitive headers, and x-ns-ui:{secret:true} across PluginClientContext, SSR HTML, and island hydration props', async () => {
+async function sha256HexPrefix(secret: string): Promise<string> {
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(secret));
+  return Array.from(new Uint8Array(hash))
+    .slice(0, 8)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+probeTest('3.1 [eis-etl#450/#453 redaction]: presence-only handles (0 digests), recursive arrays/records/JSON-Schema + non-sensitive field "notes", and real Fresh island SSR/partial serialization', async () => {
   const ConnectorSchema = z.object({
     name: z.string(),
     endpointUrl: z.string(),
@@ -2424,7 +3492,19 @@ probeTest('3.1 [eis-etl#450/#453 redaction]: deep-redacts URL userinfo, sensitiv
     webhookSecret: z.string().meta({ 'x-ns-ui': { secret: true } }),
     optionalToken: z.string().optional().meta({ 'x-ns-ui': { secret: true } }),
     preOptionalSecret: z.string().meta({ 'x-ns-ui': { secret: true } }).optional(),
+    endpoints: z.array(z.object({
+      label: z.string(),
+      notes: z.string().meta({ 'x-ns-ui': { secret: true } }),
+    })),
+    envConfigs: z.record(
+      z.string(),
+      z.object({
+        region: z.string(),
+        notes: z.string().optional().meta({ 'x-eis-ui': { secret: true } }),
+      }),
+    ),
   });
+  const ConnectorJsonSchema = z.toJSONSchema(ConnectorSchema);
 
   const RAW_USER = 'etl_svc';
   const RAW_PASS = 'super_secret_db_pw_999';
@@ -2435,6 +3515,23 @@ probeTest('3.1 [eis-etl#450/#453 redaction]: deep-redacts URL userinfo, sensitiv
   const RAW_API_KEY = 'sk_live_raw_api_key_555';
   const RAW_WEBHOOK_SECRET = 'whsec_raw_signing_secret_444';
   const RAW_PRE_OPT_SECRET = 'tok_pre_optional_secret_333';
+  const RAW_NOTES_ARRAY_SECRET = 'nested_array_secret_under_notes_222';
+  const RAW_NOTES_RECORD_SECRET = 'nested_record_secret_under_notes_111';
+
+  const allSecrets = [
+    RAW_USER,
+    RAW_PASS,
+    RAW_DSN_PASS,
+    RAW_QUERY_TOKEN,
+    RAW_BEARER,
+    RAW_COOKIE,
+    RAW_API_KEY,
+    RAW_WEBHOOK_SECRET,
+    RAW_PRE_OPT_SECRET,
+    RAW_NOTES_ARRAY_SECRET,
+    RAW_NOTES_RECORD_SECRET,
+  ];
+  const forbiddenDigestPrefixes = await Promise.all(allSecrets.map(sha256HexPrefix));
 
   const serverRecord = {
     name: 'warehouse-sync',
@@ -2449,9 +3546,15 @@ probeTest('3.1 [eis-etl#450/#453 redaction]: deep-redacts URL userinfo, sensitiv
     webhookSecret: RAW_WEBHOOK_SECRET,
     optionalToken: undefined,
     preOptionalSecret: RAW_PRE_OPT_SECRET,
+    endpoints: [
+      { label: 'primary', notes: RAW_NOTES_ARRAY_SECRET },
+    ],
+    envConfigs: {
+      prod: { region: 'us-east-1', notes: RAW_NOTES_RECORD_SECRET },
+    },
   };
 
-  // 1. PluginClientContext boundary (serializable, redacted, no PrincipalPort).
+  // 1. PluginClientContext boundary (serializable, presence-only redacted, zero digest).
   const rawPluginClientContext = {
     mountId: 'eis-etl',
     base: '/etl',
@@ -2461,75 +3564,187 @@ probeTest('3.1 [eis-etl#450/#453 redaction]: deep-redacts URL userinfo, sensitiv
     subject: { signedIn: true, display: serverRecord.endpointUrl },
     capabilities: ['etl:read'],
   };
-  const safeClientContext = await redactValueForClient(rawPluginClientContext) as Record<string, unknown>;
+  const safeClientContext = redactValueForClient(rawPluginClientContext) as Record<string, unknown>;
   assertNoUnredactedSecrets(safeClientContext);
-  const clientContextJson = JSON.stringify(safeClientContext);
-  for (const rawSecret of [RAW_USER, RAW_PASS, RAW_QUERY_TOKEN]) {
-    assertEquals(clientContextJson.includes(rawSecret), false);
-  }
 
-  // 2. Fresh island hydration props boundary.
-  const redactedConnector = await redactValueForClient(serverRecord, ConnectorSchema) as Record<string, unknown>;
-  assertNoUnredactedSecrets(redactedConnector);
+  // 2. Redact via Zod schema AND JSON Schema conversion, checking objects, arrays, records, & `notes`.
+  const redactedConnector = redactValueForClient(serverRecord, ConnectorSchema) as Record<string, unknown>;
+  const redactedViaJsonSchema = redactValueForClient(serverRecord, ConnectorJsonSchema) as Record<string, unknown>;
+  assertEquals(redactedConnector, redactedViaJsonSchema);
+  assertNoUnredactedSecrets(redactedConnector, ConnectorSchema);
+  assertNoUnredactedSecrets(redactedViaJsonSchema, ConnectorJsonSchema);
 
   const webhookHandle = redactedConnector.webhookSecret as RedactedSecretHandle;
-  assertEquals(webhookHandle.__nsSecretHandle, true);
-  assertEquals(webhookHandle.sentinel, REDACTED_SECRET_SENTINEL);
-  assertEquals(webhookHandle.isSet, true);
-  assertMatch(webhookHandle.digest ?? '', /^sha256:[0-9a-f]{16}$/);
+  assertEquals(webhookHandle, {
+    __nsSecretHandle: true,
+    sentinel: REDACTED_SECRET_SENTINEL,
+    isSet: true,
+  });
+  assertEquals('digest' in webhookHandle, false);
+  assertEquals('fingerprint' in webhookHandle, false);
 
   const optionalHandle = redactedConnector.optionalToken as RedactedSecretHandle;
-  assertEquals(optionalHandle.isSet, false);
-  assertEquals(optionalHandle.digest, null);
+  assertEquals(optionalHandle, {
+    __nsSecretHandle: true,
+    sentinel: REDACTED_SECRET_SENTINEL,
+    isSet: false,
+  });
 
-  const preOptionalHandle = redactedConnector.preOptionalSecret as RedactedSecretHandle;
-  assertEquals(preOptionalHandle.__nsSecretHandle, true);
-  assertEquals(preOptionalHandle.isSet, true);
-  assertMatch(preOptionalHandle.digest ?? '', /^sha256:[0-9a-f]{16}$/);
+  const redactedEndpoints = redactedConnector.endpoints as { label: string; notes: RedactedSecretHandle }[];
+  assertEquals(redactedEndpoints[0].notes, {
+    __nsSecretHandle: true,
+    sentinel: REDACTED_SECRET_SENTINEL,
+    isSet: true,
+  });
 
-  const redactedHeaders = redactedConnector.headers as Record<string, unknown>;
-  assertEquals((redactedHeaders.Authorization as RedactedSecretHandle).isSet, true);
-  assertEquals((redactedHeaders.Cookie as RedactedSecretHandle).isSet, true);
-  assertEquals((redactedHeaders['X-Api-Key'] as RedactedSecretHandle).isSet, true);
-  assertEquals(redactedHeaders['X-Trace-Source'], 'eis-etl');
+  const redactedEnvConfigs = redactedConnector.envConfigs as Record<string, { region: string; notes: RedactedSecretHandle }>;
+  assertEquals(redactedEnvConfigs.prod.notes, {
+    __nsSecretHandle: true,
+    sentinel: REDACTED_SECRET_SENTINEL,
+    isSet: true,
+  });
 
-  // 3. SSR HTML + serialized island hydration script via real Preact + preact-render-to-string.
-  const islandPropsJson = JSON.stringify({ connector: redactedConnector, client: safeClientContext });
-  const ssrVnode = h(
-    'div',
-    { 'data-ns-plugin': 'eis-etl' },
-    h('h2', null, String(redactedConnector.name)),
-    h('span', { class: 'secret-status' }, `Webhook secret set=${String(webhookHandle.isSet)} (${webhookHandle.digest})`),
-    h('script', {
-      type: 'application/json',
-      id: '__FRSH_ISLAND_PROPS',
-      dangerouslySetInnerHTML: { __html: islandPropsJson },
-    }),
-  );
-  const ssrHtml = renderToString(ssrVnode);
+  // 3. Real Fresh 2.3.3 App SSR + Island Serialization (`boot(...)`) + `?fresh-partial=true` (`__FRSH_STATE_`).
+  function ConnectorSettingsIsland(props: { readonly connector: unknown; readonly client: unknown }) {
+    const c = props.connector as Record<string, unknown>;
+    return h(
+      'div',
+      { 'data-ns-plugin': 'eis-etl', 'data-connector-island': 'true' },
+      h('h2', null, String(c.name)),
+      h('span', { class: 'secret-status' }, `isSet=${String((c.webhookSecret as RedactedSecretHandle).isSet)}`),
+    );
+  }
 
-  assertStringIncludes(ssrHtml, REDACTED_SECRET_SENTINEL);
-  assertStringIncludes(ssrHtml, webhookHandle.digest!);
-  for (
-    const secret of [
-      RAW_USER,
-      RAW_PASS,
-      RAW_DSN_PASS,
-      RAW_QUERY_TOKEN,
-      RAW_BEARER,
-      RAW_COOKIE,
-      RAW_API_KEY,
-      RAW_WEBHOOK_SECRET,
-      RAW_PRE_OPT_SECRET,
-    ]
-  ) {
-    assertEquals(ssrHtml.includes(secret), false, `SSR HTML leaked secret: ${secret}`);
-    assertEquals(islandPropsJson.includes(secret), false, `Island JSON leaked secret: ${secret}`);
+  const app = new App();
+  const islands = new Map();
+  islands.set(ConnectorSettingsIsland, {
+    name: 'ConnectorSettingsIsland',
+    fn: ConnectorSettingsIsland,
+    file: '/islands/ConnectorSettingsIsland.tsx',
+    chunk: '/_fresh/js/ConnectorSettingsIsland.js',
+    exportName: 'default',
+    css: [],
+  });
+  type FsRouteEntry = ConstructorParameters<typeof ProdBuildCache>[1]['fsRoutes'][number];
+  setBuildCache(app, new ProdBuildCache('.', {
+    version: 'probe-c-redaction',
+    clientEntry: '/_fresh/js/client.js',
+    fsRoutes: [
+      {
+        id: '/_layout',
+        filePath: 'routes/_layout.tsx',
+        mod: {
+          default: ({ Component, isPartial }: PageProps<unknown>) =>
+            isPartial
+              ? h(Partial, { name: 'main' }, h(Component, null))
+              : h('div', { 'data-shell': 'true' }, h(Partial, { name: 'main' }, h(Component, null))),
+        },
+        pattern: '*',
+        type: 'layout' as FsRouteEntry['type'],
+        routePattern: '*',
+        overrideConfig: undefined,
+        css: [],
+      },
+      {
+        id: '/connectors/[id]',
+        filePath: 'routes/connectors/[id].tsx',
+        mod: {
+          handler: () => {
+            // Gateway/service boundary validation before SSR render
+            assertNoUnredactedSecrets(redactedConnector, ConnectorSchema);
+            assertNoUnredactedSecrets(safeClientContext);
+            return page({ connector: redactedConnector, client: safeClientContext });
+          },
+          default: ({ data }: PageProps<unknown>) => {
+            const typed = data as { connector: unknown; client: unknown };
+            return h(ConnectorSettingsIsland, { connector: typed.connector, client: typed.client });
+          },
+        },
+        pattern: '/connectors/:id',
+        type: 'route' as FsRouteEntry['type'],
+        routePattern: '/connectors/:id',
+        overrideConfig: undefined,
+        css: [],
+      },
+    ],
+    staticFiles: new Map(),
+    islands,
+    entryAssets: [],
+  }), 'production');
+  app.fsRoutes();
+  const handler = app.handler();
+
+  const fullRes = await handler(new Request('http://localhost/connectors/wh-1'));
+  const fullHtml = await fullRes.text();
+  assertEquals(fullRes.status, 200);
+  assertStringIncludes(fullHtml, '<!--frsh:island:ConnectorSettingsIsland:');
+  assertStringIncludes(fullHtml, 'boot({ConnectorSettingsIsland}');
+  assertStringIncludes(fullHtml, REDACTED_SECRET_SENTINEL);
+
+  const partialRes = await handler(new Request('http://localhost/connectors/wh-1?fresh-partial=true'));
+  const partialHtml = await partialRes.text();
+  assertEquals(partialRes.status, 200);
+  assertStringIncludes(partialHtml, '__FRSH_STATE_');
+  assertStringIncludes(partialHtml, REDACTED_SECRET_SENTINEL);
+
+  for (const payload of [fullHtml, partialHtml]) {
+    assertEquals(payload.includes('sha256:'), false, 'HTML/partial payload must NEVER include sha256 fingerprint');
+    for (const secret of allSecrets) {
+      assertEquals(payload.includes(secret), false, `Payload leaked raw secret: ${secret}`);
+    }
+    for (const digestHex of forbiddenDigestPrefixes) {
+      assertEquals(payload.includes(digestHex), false, `Payload leaked secret SHA-256 hex digest: ${digestHex}`);
+    }
   }
 });
 
-probeTest('3.2 [eis-etl#450/#453 negative assertions]: rejects unredacted outbound leaks, PrincipalPort crossing, and sentinel echo on write', async () => {
-  // 1. Outbound serialization guard catches unredacted secrets & server-only PrincipalPort functions.
+probeTest('3.2 [eis-etl#450/#453 negative assertions & #2670 write protocol]: blocks unredacted notes/spoofed handles, enforces replace|keep|clear|unset|invalid', async () => {
+  const ItemWithNotesSchema = z.object({
+    items: z.array(z.object({
+      notes: z.string().meta({ 'x-ns-ui': { secret: true } }),
+    })),
+    envConfigs: z.record(
+      z.string(),
+      z.object({
+        notes: z.string().meta({ 'x-ns-ui': { secret: true } }),
+      }),
+    ),
+  });
+
+  // 1. Outbound serialization guard catches unredacted secrets under non-sensitive field names (`notes`)
+  //    in arrays & records when schema is checked, AND rejects handle-shaped objects with extra/digest keys!
+  assertThrows(
+    () =>
+      assertNoUnredactedSecrets(
+        { items: [{ notes: 'plain-secret-under-notes' }], envConfigs: {} },
+        ItemWithNotesSchema,
+      ),
+    Error,
+    'UNREDACTED_SECRET_SERIALIZATION_BLOCKED',
+  );
+  assertThrows(
+    () =>
+      assertNoUnredactedSecrets(
+        { items: [], envConfigs: { prod: { notes: 'plain-record-secret' } } },
+        ItemWithNotesSchema,
+      ),
+    Error,
+    'UNREDACTED_SECRET_SERIALIZATION_BLOCKED',
+  );
+  assertThrows(
+    () =>
+      assertNoUnredactedSecrets({
+        webhookSecret: {
+          __nsSecretHandle: true,
+          sentinel: REDACTED_SECRET_SENTINEL,
+          isSet: true,
+          digest: 'sha256:0123456789abcdef',
+          leakedRaw: 'secret-smuggled-inside-handle',
+        },
+      }),
+    Error,
+    'UNREDACTED_SECRET_SERIALIZATION_BLOCKED',
+  );
   assertThrows(
     () =>
       assertNoUnredactedSecrets({
@@ -2546,7 +3761,7 @@ probeTest('3.2 [eis-etl#450/#453 negative assertions]: rejects unredacted outbou
     Error,
     'UNREDACTED_SECRET_SERIALIZATION_BLOCKED',
   );
-  await assertRejects(
+  assertThrows(
     () =>
       redactValueForClient({
         principal: { resolve: () => Promise.resolve(null) },
@@ -2555,45 +3770,126 @@ probeTest('3.2 [eis-etl#450/#453 negative assertions]: rejects unredacted outbou
     'NON_SERIALIZABLE_PORT_BLOCKED',
   );
 
-  // 2. Write-only secret-handle convention rejects echoing back the redaction sentinel.
+  // 2. Merged #2670 resolveSecretFieldSubmission protocol: replace | keep | clear | unset | invalid
   const storedSecret = 'whsec_original_secret_value';
-  assertThrows(
-    () => applySecretFieldWrite(storedSecret, REDACTED_SECRET_SENTINEL, 'webhookSecret'),
-    Error,
-    'SECRET_SENTINEL_ECHO_REJECTED',
+
+  assertEquals(
+    resolveSecretFieldSubmission(SECRET_FIELD_UNCHANGED_TOKEN, { hadStoredSecret: true, action: 'keep' }),
+    { mode: 'keep' },
+  );
+  assertEquals(
+    resolveSecretFieldSubmission('', { hadStoredSecret: false, action: 'unset' }),
+    { mode: 'unset' },
+  );
+  assertEquals(
+    resolveSecretFieldSubmission(SECRET_FIELD_CLEAR_TOKEN, { hadStoredSecret: true, action: 'clear' }),
+    { mode: 'clear' },
+  );
+  assertEquals(
+    resolveSecretFieldSubmission('whsec_rotated_999', { hadStoredSecret: true, action: 'replace' }),
+    { mode: 'replace', value: 'whsec_rotated_999' },
+  );
+
+  // Conflicting action/value pairs and non-text entries fail closed with `invalid`
+  assertEquals(
+    resolveSecretFieldSubmission('', { hadStoredSecret: true, action: 'unset' }).mode,
+    'invalid',
+  );
+  assertEquals(
+    resolveSecretFieldSubmission('whsec_rotated_999', { hadStoredSecret: true, action: 'clear' }).mode,
+    'invalid',
+  );
+  assertEquals(
+    resolveSecretFieldSubmission(SECRET_FIELD_UNCHANGED_TOKEN, { hadStoredSecret: true, action: 'replace' }).mode,
+    'invalid',
+  );
+  assertEquals(
+    resolveSecretFieldSubmission(new File(['x'], 'secret.txt'), { hadStoredSecret: true }).mode,
+    'invalid',
+  );
+
+  // Applying all 5 modes + sentinel echo rejection
+  assertEquals(
+    applySecretFieldSubmission(
+      storedSecret,
+      resolveSecretFieldSubmission(SECRET_FIELD_UNCHANGED_TOKEN, { hadStoredSecret: true, action: 'keep' }),
+      'webhookSecret',
+    ),
+    storedSecret,
+  );
+  assertEquals(
+    applySecretFieldSubmission(
+      storedSecret,
+      resolveSecretFieldSubmission('whsec_rotated_999', { hadStoredSecret: true, action: 'replace' }),
+      'webhookSecret',
+    ),
+    'whsec_rotated_999',
+  );
+  assertEquals(
+    applySecretFieldSubmission(
+      storedSecret,
+      resolveSecretFieldSubmission(SECRET_FIELD_CLEAR_TOKEN, { hadStoredSecret: true, action: 'clear' }),
+      'webhookSecret',
+    ),
+    null,
+  );
+  assertEquals(
+    applySecretFieldSubmission(
+      null,
+      resolveSecretFieldSubmission('', { hadStoredSecret: false, action: 'unset' }),
+      'optionalToken',
+    ),
+    null,
   );
   assertThrows(
     () =>
-      applySecretFieldWrite(
+      applySecretFieldSubmission(
         storedSecret,
-        `https://${REDACTED_SECRET_SENTINEL}:${REDACTED_SECRET_SENTINEL}@db.internal/app`,
-        'endpointUrl',
-      ),
-    Error,
-    'SECRET_SENTINEL_ECHO_REJECTED',
-  );
-  assertThrows(
-    () =>
-      applySecretFieldWrite(
-        storedSecret,
-        { sentinel: REDACTED_SECRET_SENTINEL, isSet: true } as unknown as SecretWriteInput,
+        resolveSecretFieldSubmission(REDACTED_SECRET_SENTINEL, { hadStoredSecret: true, action: 'replace' }),
         'webhookSecret',
       ),
     Error,
     'SECRET_SENTINEL_ECHO_REJECTED',
   );
-
-  // 3. Valid write-only handle transitions: keep, set (rotate), clear.
-  assertEquals(applySecretFieldWrite(storedSecret, { mode: 'keep' }, 'webhookSecret'), storedSecret);
-  assertEquals(
-    applySecretFieldWrite(storedSecret, { mode: 'set', value: 'whsec_rotated_999' }, 'webhookSecret'),
-    'whsec_rotated_999',
-  );
-  assertEquals(applySecretFieldWrite(storedSecret, { mode: 'clear' }, 'webhookSecret'), null);
   assertThrows(
-    () => applySecretFieldWrite(storedSecret, '   ', 'webhookSecret'),
+    () =>
+      applySecretFieldSubmission(
+        storedSecret,
+        resolveSecretFieldSubmission('', { hadStoredSecret: true, action: 'unset' }),
+        'webhookSecret',
+      ),
     Error,
-    'SECRET_VALUE_EMPTY',
+    'SECRET_SUBMISSION_INVALID',
+  );
+
+  // Strict JSON write adapter rejects raw string & raw null shortcuts (requires explicit protocol).
+  assertThrows(
+    () => assertStrictJsonSecretWritePayload(storedSecret, null, 'webhookSecret'),
+    Error,
+    'SECRET_WRITE_PROTOCOL_REQUIRED',
+  );
+  assertThrows(
+    () => assertStrictJsonSecretWritePayload(storedSecret, 'raw-unstructured-secret', 'webhookSecret'),
+    Error,
+    'SECRET_WRITE_PROTOCOL_REQUIRED',
+  );
+  assertThrows(
+    () =>
+      assertStrictJsonSecretWritePayload(
+        storedSecret,
+        { sentinel: REDACTED_SECRET_SENTINEL, isSet: true },
+        'webhookSecret',
+      ),
+    Error,
+    'SECRET_SENTINEL_ECHO_REJECTED',
+  );
+  assertEquals(
+    assertStrictJsonSecretWritePayload(storedSecret, { mode: 'clear' }, 'webhookSecret'),
+    null,
+  );
+  assertEquals(
+    assertStrictJsonSecretWritePayload(storedSecret, { mode: 'replace', value: 'whsec_new_1' }, 'webhookSecret'),
+    'whsec_new_1',
   );
 });
 

@@ -8,7 +8,7 @@ documentation.
 - **What:** Implementation builders and PR/RFC evaluators for the `#922` initiative override the default `lane-policy.md` Codex/Sol/Astra cells.
 - **Source:** Owner directive relayed via parent run instructions; [`supervisor.md`](./supervisor.md).
 - **Expected:** Default `lane-policy.md` matrix (`sol`/`astra` + `fable_5_1`/`muse_spark_1_3`/`grok_4_7`).
-- **Actual:** Zero Claude spend during this authoring turn; scheduled Friday 23:30 UTC adversarial RFC evaluation by `Fable 5.2`; `0.0.10` W1–W3 builders on Neon (`antigravity/gemini-4-neon`, `xhigh`, zero Codex) with two-pass PR review by `Opus 5.5` (`xhigh`) and `Hydrogen` (`xhigh`), preserving independent vendor families and separate sessions.
+- **Actual:** Zero Claude spend during RFC authoring or Pass-1 integration; initial `plan_eval` plan queued an adversarial evaluation slot (`Fable 5.2`, later superseded by `2026-11-26` owner override to `openrouter/openai/gpt-6.2-astra#xhigh` Pass 1 and planned Gemini 4 `Hydrogen` Pass 2); `0.0.10` W1–W3 builders on Neon (`antigravity/gemini-4-neon`, `xhigh`, zero Codex) with two-pass PR review by `Opus 5.5` (`xhigh`) and `Hydrogen` (`xhigh`), preserving independent vendor families and separate sessions.
 - **Severity:** minor
 - **Action:** accept (documented in `supervisor.md` and `worklog.md`).
 - **Evidence:** [`supervisor.md`](./supervisor.md), [`worklog.md`](./worklog.md).
@@ -35,10 +35,10 @@ documentation.
 
 ## 2026-11-25 — Probe A passes `18/18` at runtime (`--no-lock -A`) while failing `deno --check` on contravariant `PageProps` test fixtures
 
-- **What:** Running `probe-a-fresh-mount.ts` with `deno run --no-lock --check -A` surfaces `TS2322` on inline route fixture `{ component: ({ data }: PageProps<T>) => ... }` due to Fresh `2.3.3` `RouteComponent` contravariance over `PageProps<unknown, State>`; running without `--check` (`deno run --no-lock -A`) executes cleanly with `18/18 PASS` (`exit 0`).
+- **What:** Initial `2026-11-25` run executed `18/18` at runtime (`--no-lock -A`) while failing `deno --check` on contravariant `PageProps` test fixtures (`TS2322`); see `2026-11-26` entry below for added `P2d` (`portable-jobs-loader.ts` + `fresh-jobs-adapter.tsx` passing `--check exit=0`) and `19/19` runtime status.
 - **Source:** [`probes/probe-a-fresh-mount.ts`](./probes/probe-a-fresh-mount.ts) & [`probes/probe-a.log`](./probes/probe-a.log).
 - **Expected:** Probe A verifies Fresh `2.3.3` runtime behavior (`SRC/probe-a.log` was produced without `--check`).
-- **Actual:** Preserved probe fixture intact and recorded the exact runtime invocation (`deno run --no-lock -A`) honestly.
+- **Actual:** Preserved legacy `P1`/`P4` runtime harness while surfacing `probe-a-fresh-mount.ts` `--check exit=1` visibly in [`probes/probe-a.log`](./probes/probe-a.log) and adding `--check`-clean separated loader/adapter fixtures (`P2d`).
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** [`probes/probe-a.log`](./probes/probe-a.log).
@@ -66,3 +66,23 @@ documentation.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** `git diff --name-only origin/main` (`54` files, zero package/plugin/lock changes).
+
+## 2026-11-26 — Owner-authorized `PLAN-EVAL` Pass 1 (`gpt-6.2-astra#xhigh`) & upcoming `Hydrogen` (`xhigh`) Pass 2
+
+- **What:** Ran adversarial Pass-1 RFC evaluation on Draft PR `#2684` (`d05d2346`) using `openrouter/openai/gpt-6.2-astra#xhigh` via OpenCode CLI `v2.3.2` (`CHANGES_REQUESTED`), superseding the earlier queued `Fable 5.2` slot, with Pass-2 re-check assigned to Gemini 4 `Hydrogen` (`xhigh`).
+- **Source:** Owner directive; [`plan-eval.md`](./plan-eval.md); [`astra-review-triage.md`](./astra-review-triage.md).
+- **Expected:** Earlier draft deferred `plan_eval` to `Fable 5.2`.
+- **Actual:** Executed Pass 1 immediately on `gpt-6.2-astra#xhigh`, preserving independent model family and separate session from the Antigravity `self` RFC author and Neon `0.0.10` builders.
+- **Severity:** minor
+- **Action:** accept (updated `supervisor.md`, `worklog.md`, `research.md`, and `context-pack.md`).
+- **Evidence:** [`plan-eval.md`](./plan-eval.md), [`astra-review-triage.md`](./astra-review-triage.md).
+
+## 2026-11-26 — Astra Pass-1 `CHANGES_REQUESTED` remediation (`B1`–`B8`, `M1`–`M6`, `N1`–`N3`, `F-1`–`F-5`) & probe recount
+
+- **What:** Initial RFC/worklog misstated Probe B as 15 matrix cells (actual `probe-b.log` contains **19 matrix rows: 11 PASS, 5 CAVEAT, 3 FAIL**) and Probe A `P4e` hardcoded `6.8.0` (actual resolved `preact-render-to-string@6.8.3` under `--no-lock` vs `6.8.0` in `deno.lock`). Astra also flagged wire divergence from `RFC 0005` (`B1`–`B2`), browser-visible SHA-256 digests (`B3`), unanchored root containment (`B6`), non-`workersContract` / non-HTTP-separated gateway proofs (`B4`–`B5`), coupled `P2c` route ABI (`B7`), overclaimed Wave-0/acyclic closures (`B8`), and merged `#2670` status (`M4`).
+- **Source:** [`plan-eval.md`](./plan-eval.md) & `git show origin/main:packages/fresh-ui/src/runtime/secret-field/secret-field.utils.ts` (`906da5188`).
+- **Expected:** Full alignment with accepted `RFC 0005`, merged `#2670`, verified Wave-0 proofs, and explicit non-closure of Wave-0 issues on RFC acceptance.
+- **Actual:** Fixed Probe A (`19/19 PASS` runtime, `--check` status logged cleanly, `P2d` framework-free loader + GPUIX PoC ABI proof, `P4e` dynamic `6.8.3` detection), fixed Probe C (`13/13 PASS`, `--check` exit `0`), re-verified Probe B (`19` rows, exit `0`), inspected `#2670` via `git show` without rebasing Draft PR `#2684` onto `origin/main`, and rewrote `rfcs/0000-frontend-contribution.md` + `astra-review-triage.md`.
+- **Severity:** major
+- **Action:** accept (all Pass-1 findings resolved cleanly within docs + `.llm/runs/rfc-frontend-contribution-v2--rfc/`).
+- **Evidence:** [`astra-review-triage.md`](./astra-review-triage.md), [`probes/probe-a.log`](./probes/probe-a.log), [`probes/probe-b.log`](./probes/probe-b.log), [`probes/probe-c.log`](./probes/probe-c.log).

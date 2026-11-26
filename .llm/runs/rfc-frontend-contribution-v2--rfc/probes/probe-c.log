@@ -1,12 +1,16 @@
-=== Wave-0 Empirical Probe C (10 tests) ===
+Check .llm/runs/rfc-frontend-contribution-v2--rfc/probes/probe-c-manifest-gateway-redaction.ts
+=== Wave-0 Empirical Probe C (13 tests) ===
 PASS 1.1 [#1474 baseline]: real parsePluginManifest (.strict()) rejects unknown top-level "frontend" block (6ms)
-PASS 1.2 [#1474 evolution]: .passthrough() (schemaVersion: 1) parses cleanly while generate-time validator catches malformed frontend block (3ms)
-PASS 1.3 [#1473 containment]: rejects ../ traversal, backslashes, null bytes, absolute paths, smuggling, and symlink escapes (5ms)
-PASS 2.1 [P5 gateway]: real authContract + cronsContract compilation and internal-audience rejection (1ms)
-PASS 2.2 [P5 gateway]: deny-by-default, PrincipalPort auth (no browser Cookie/Auth leak), CSRF, redirect manual, response-header allowlist, audit log (15ms)
-PASS 2.3 [P5 gateway]: request/response body limits, timeout (504), and AbortSignal propagation (100ms)
-PASS 2.4 [P5 + RFC 0009]: real DurableStreamTestServer SSE delivery-unit fencing, mid-stream revocation, ?offset= resume, and abort propagation (66ms)
-PASS 2.5 [P5 + RFC 0009 boundary]: proves oRPC router traversal excludes stream contracts & AI proxy stays specialized (60ms)
-PASS 3.1 [eis-etl#450/#453 redaction]: deep-redacts URL userinfo, sensitive headers, and x-ns-ui:{secret:true} across PluginClientContext, SSR HTML, and island hydration props (2ms)
-PASS 3.2 [eis-etl#450/#453 negative assertions]: rejects unredacted outbound leaks, PrincipalPort crossing, and sentinel echo on write (0ms)
-=== Summary: 10 passed, 0 failed ===
+PASS 1.2 [#1474 evolution]: .passthrough() (schemaVersion: 1) parses cleanly while generate-time validator catches malformed frontend block (2ms)
+PASS 1.3 [#1473 containment]: rejects ../ traversal, backslashes, null bytes, absolute paths, smuggling, and symlink escapes (8ms)
+PASS 1.4 [#928/#1471 RFC 0005 spine]: canonical ContributionEnvelope, mixed-family [app + devtools] export, and 2 installations of 1 package without collision (1ms)
+PASS 1.5 [#1471 ordering, zone matching, diagnosis, & host-owned failure policy] (1ms)
+PASS 2.1 [P5 gateway]: real authContract + real workersContract + synthetic cronsContract compilation and internal-audience rejection (1ms)
+PASS 2.2 [P5 gateway]: synthetic crons HTTP controls (CSRF, method, redirect manual, response headers, audit log) (16ms)
+PASS 2.2b [P5 + real workersContract]: host-approved procedure x owning service x (principal, resource) policy + typed param binding (2ms)
+PASS 2.3 [P5 gateway]: request/response body limits, timeout (504), and AbortSignal propagation (99ms)
+PASS 2.4 [Streams boundary prototype — NOT RFC 0009 runtime export]: probe-local SSE proxy demonstrates offset resume & pre-batch withholding on DurableStreamTestServer (59ms)
+PASS 2.5 [Transport separation boundary]: compileProcedures excludes non-oRPC stream contracts; W2 HTTP gateway excludes eventIterator procedures (39ms)
+PASS 3.1 [eis-etl#450/#453 redaction]: presence-only handles (0 digests), recursive arrays/records/JSON-Schema + non-sensitive field "notes", and real Fresh island SSR/partial serialization (14ms)
+PASS 3.2 [eis-etl#450/#453 negative assertions & #2670 write protocol]: blocks unredacted notes/spoofed handles, enforces replace|keep|clear|unset|invalid (1ms)
+=== Summary: 13 passed, 0 failed ===

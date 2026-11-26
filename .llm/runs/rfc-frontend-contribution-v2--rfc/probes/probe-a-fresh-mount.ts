@@ -2,9 +2,11 @@ import {
   assert,
   assertEquals,
   assertMatch,
+  assertNotEquals,
   assertStringIncludes,
   assertThrows,
 } from 'jsr:@std/assert@1';
+import { dirname, fromFileUrl, join } from 'jsr:@std/path@1';
 import {
   App,
   type Context,
@@ -36,6 +38,7 @@ interface ProbeState {
   p2?: boolean;
   hostMw?: boolean;
   tenant?: string;
+  correlationId?: string;
 }
 
 type RouteLike = Parameters<App<ProbeState>['route']>[1];
@@ -1494,6 +1497,172 @@ async function main(): Promise<void> {
     },
   );
 
+  await runCase(
+    'P2d',
+    'P2',
+    'Framework-free portable loader executes identically across GPUIX-shaped RouteModule and Fresh 2 without resolving Fresh view',
+    async () => {
+      const loaderPath = join(
+        dirname(fromFileUrl(import.meta.url)),
+        'probe-a-fixtures',
+        'portable-jobs-loader.ts',
+      );
+      const loaderSource = await Deno.readTextFile(loaderPath);
+      for (const forbidden of ['fresh', '@fresh/', 'preact', 'RouteConfig', 'isPartial']) {
+        assert(
+          !loaderSource.includes(forbidden),
+          `Portable loader must not import or reference "${forbidden}"`,
+        );
+      }
+
+      // 1) Standalone type-check of portable loader with zero Fresh/Preact dependencies
+      const checkCmd = await new Deno.Command('deno', {
+        args: ['check', '--no-lock', loaderPath],
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+      assertEquals(
+        checkCmd.code,
+        0,
+        `Standalone deno check failed for portable loader: ${new TextDecoder().decode(checkCmd.stderr)}`,
+      );
+
+      // 2) Execute portable loader through GPUIX-shaped RouteModule (matching .llm/runs/rfc-gpuix-desktop--rfc/poc/app/client/router.ts:14-30)
+      //    BEFORE any Fresh adapter import — proving the Fresh view adapter is never resolved!
+      assertEquals(getModuleLoadCount('fresh-jobs-adapter'), 0);
+
+      interface GpuixRouteContext {
+        readonly url: URL;
+        readonly params: Record<string, string>;
+        readonly state: Record<string, unknown>;
+      }
+      type GpuixHandlerResult<T> = { data: T } | { redirect: string };
+      interface GpuixRouteModule<T = unknown> {
+        readonly pattern: string;
+        readonly title: string;
+        readonly handler?: (
+          ctx: GpuixRouteContext,
+        ) => GpuixHandlerResult<T> | Promise<GpuixHandlerResult<T>>;
+        readonly page: (
+          props: {
+            data: T;
+            params: Record<string, string>;
+            url: URL;
+            navigate: (href: string) => void;
+          },
+        ) => unknown;
+      }
+
+      const portableLoader = await import('./probe-a-fixtures/portable-jobs-loader.ts');
+      const gpuixRoute: GpuixRouteModule<
+        import('./probe-a-fixtures/portable-jobs-loader.ts').WorkersJobsData
+      > = {
+        pattern: '/plugins/workers/jobs/:id',
+        title: 'Workers Jobs',
+        handler: (ctx) => portableLoader.loadWorkersJobsData(ctx),
+        page: ({ data, params }) => ({
+          kind: 'gpuix-native-view',
+          jobId: data.jobId,
+          paramId: params.id,
+          filter: data.filter,
+          correlationId: data.correlationId,
+          jobs: data.jobs,
+        }),
+      };
+
+      const gpuixOk = await gpuixRoute.handler!({
+        url: new URL('app://desktop/plugins/workers/jobs/nightly?status=running'),
+        params: { id: 'nightly' },
+        state: { correlationId: 'corr-b7' },
+      });
+      assert('data' in gpuixOk, 'Expected data result on GPUIX route');
+      const gpuixRendered = gpuixRoute.page({
+        data: gpuixOk.data,
+        params: { id: 'nightly' },
+        url: new URL('app://desktop/plugins/workers/jobs/nightly?status=running'),
+        navigate: () => {},
+      }) as { jobId: string; filter: string; correlationId: string; jobs: unknown[] };
+      assertEquals(gpuixRendered.jobs.length, 1);
+
+      const gpuixRedirect = await gpuixRoute.handler!({
+        url: new URL('app://desktop/plugins/workers/jobs/nightly?unauth=1'),
+        params: { id: 'nightly' },
+        state: {},
+      });
+      assertEquals(gpuixRedirect, { redirect: '/login' });
+      assertEquals(
+        getModuleLoadCount('fresh-jobs-adapter'),
+        0,
+        'GPUIX route execution must never resolve Fresh view adapter module',
+      );
+
+      // 3) Now mount Fresh 2 adapter lazily over the exact same portable loader
+      const app = new App<ProbeState>();
+      attachHostFsRoutes(app, {
+        appWrapper: hostAppWrapperMod.PartialAwareHostAppWrapper,
+        rootLayout: hostLayoutsMod.PartialAwareHostRootLayout,
+        pluginsLayout: hostLayoutsMod.PartialAwareShellPluginsLayout,
+      });
+      app.fsRoutes();
+
+      const workersSub = new GuardedPluginApp<ProbeState>('reject');
+      workersSub.use(async (ctx) => {
+        ctx.state.correlationId = 'corr-b7';
+        return await ctx.next();
+      });
+      workersSub.route(
+        '/jobs/:id',
+        () =>
+          import('./probe-a-fixtures/fresh-jobs-adapter.tsx').then((mod) =>
+            normalizeFreshRouteModule<ProbeState>(mod, 'fresh-jobs-adapter.tsx')
+          ),
+      );
+      app.mountApp('/plugins/workers', workersSub);
+
+      const handler = app.handler();
+      assertEquals(getModuleLoadCount('fresh-jobs-adapter'), 0);
+
+      const freshRes = await handler(
+        new Request('http://localhost/plugins/workers/jobs/nightly?status=running'),
+      );
+      const freshHtml = await freshRes.text();
+      assertEquals(freshRes.status, 200);
+      assertEquals(getModuleLoadCount('fresh-jobs-adapter'), 1);
+      assertMatch(freshHtml, /<link rel="stylesheet" href="\/plugins\/workers\/jobs\.css"\s*\/?>/);
+      assertStringIncludes(freshHtml, 'data-fresh-jobs-adapter="true"');
+      assertStringIncludes(freshHtml, 'data-job-id="nightly"');
+      assertStringIncludes(freshHtml, 'data-filter="running"');
+      assertStringIncludes(freshHtml, 'data-correlation-id="corr-b7"');
+      assertStringIncludes(freshHtml, 'data-is-partial="false"');
+
+      // Extract serialized jobs attribute from Fresh HTML and verify parity with GPUIX output
+      const jobsAttrMatch = /data-jobs-json="([^"]+)"/.exec(freshHtml);
+      assert(jobsAttrMatch, 'Missing data-jobs-json attribute in Fresh HTML');
+      const decodedJobs = JSON.parse(jobsAttrMatch[1].replaceAll('&quot;', '"'));
+      assertEquals(decodedJobs, gpuixOk.data.jobs);
+
+      // Partial request works identically with zero shell chrome
+      const freshPartialRes = await handler(
+        new Request('http://localhost/plugins/workers/jobs/nightly?status=running&fresh-partial=true'),
+      );
+      const freshPartialHtml = await freshPartialRes.text();
+      const partialExtract = extractPartialRegion(freshPartialHtml, 'main');
+      assertEquals(freshPartialRes.status, 200);
+      assert(partialExtract.found);
+      assertEquals(partialExtract.rawBodyHasShellChrome, false);
+      assertStringIncludes(partialExtract.content, 'data-is-partial="true"');
+
+      // Unauthenticated redirect matches GPUIX `{ redirect: '/login' }`
+      const freshRedirectRes = await handler(
+        new Request('http://localhost/plugins/workers/jobs/nightly?unauth=1'),
+      );
+      assertEquals(freshRedirectRes.status, 302);
+      assertEquals(freshRedirectRes.headers.get('location'), '/login');
+
+      return 'Standalone framework-free loader (0 fresh/preact imports, deno check exit 0) produced identical { data } and { redirect: "/login" } across GPUIX-shaped RouteModule (Fresh adapter load count=0) and Fresh 2 normalizeFreshRouteModule (full + ?fresh-partial=true).';
+    },
+  );
+
   // ---------------------------------------------------------------------------
   // P4: SSR failure containment
   // ---------------------------------------------------------------------------
@@ -1868,10 +2037,41 @@ async function main(): Promise<void> {
     'P4e',
     'P4',
     'Confirm exact Fresh 2.3.3 + preact-render-to-string SSR containment contract',
-    () => {
+    async () => {
+      const repoRoot = join(dirname(fromFileUrl(import.meta.url)), '..', '..', '..', '..');
+      const lockText = await Deno.readTextFile(join(repoRoot, 'deno.lock'));
+      const lockJson = JSON.parse(lockText) as {
+        readonly specifiers?: Readonly<Record<string, string>>;
+      };
+      const freshCoreSpec = lockJson.specifiers?.['jsr:@fresh/core@^2.3.3'] ?? 'unknown';
+      const lockedPreRenderSpec = lockJson.specifiers?.['npm:preact-render-to-string@^6.8.0'] ??
+        'unknown';
+
+      let resolvedPreRenderVersion = 'unknown';
+      const resolvedUrl = import.meta.resolve('npm:preact-render-to-string@^6.8.0');
+      if (resolvedUrl.startsWith('file://')) {
+        let dir = dirname(fromFileUrl(resolvedUrl));
+        for (let i = 0; i < 4; i++) {
+          try {
+            const pkg = JSON.parse(await Deno.readTextFile(join(dir, 'package.json'))) as {
+              name?: string;
+              version?: string;
+            };
+            if (pkg.name === 'preact-render-to-string' && typeof pkg.version === 'string') {
+              resolvedPreRenderVersion = pkg.version;
+              break;
+            }
+          } catch {
+            // continue walking up
+          }
+          dir = dirname(dir);
+        }
+      }
+
       const contract = {
-        freshCoreVersion: '2.3.3',
-        preactRenderToStringVersion: '6.8.0',
+        freshCoreVersion: freshCoreSpec,
+        preactRenderToStringVersion: resolvedPreRenderVersion,
+        denoLockPreRenderPin: lockedPreRenderSpec,
         freshEnablesPreactErrorBoundaries: false,
         preactOptionsErrorBoundariesDefault: (preactOptions as { errorBoundaries?: unknown })
           .errorBoundaries,
@@ -1882,6 +2082,7 @@ async function main(): Promise<void> {
         hostPreRenderDataTryCatchContainment: true,
       };
       assertEquals(contract.preactOptionsErrorBoundariesDefault, undefined);
+      assertNotEquals(resolvedPreRenderVersion, 'unknown');
       return JSON.stringify(contract);
     },
   );

@@ -19,9 +19,10 @@ operating identity is discoverable without chat memory.
 
 | Task lane | Provider / model / effort | Role in this run |
 | --- | --- | --- |
-| `rfc_author` (current run) | Antigravity Google / parent-inherited `self` | Unified RFC authoring, Wave-0 probe packaging & re-verification, Draft PR opening |
+| `rfc_author` (initial + review integration) | Antigravity Google / parent-inherited `self` (`5520f29f`, resumed `371f9272`) | Unified RFC authoring, GPT-6.2 Astra review triage, Wave-0 probe fixes, Draft PR `#2684` updates |
 | `implementation` (`0.0.10` W1–W3 builders, planned) | `antigravity/gemini-4-neon` / `xhigh` | Neon builders on Antigravity Google plan for acyclic W1/W2/W3 PRs |
-| `plan_eval` (RFC adversarial review, queued) | Claude / `Fable 5.2` | Scheduled Friday 23:30 UTC adversarial RFC evaluation after Claude sub reset |
+| `plan_eval` (Pass 1 executed `2026-11-26`) | `openrouter/openai/gpt-6.2-astra#xhigh` (OpenCode CLI `v2.3.2`) | Adversarial RFC review Pass 1 on PR `#2684` (`d05d2346` -> `CHANGES_REQUESTED`); verbatim in [`plan-eval.md`](./plan-eval.md), triaged in [`astra-review-triage.md`](./astra-review-triage.md) |
+| `plan_eval` (Pass 2 planned) | Gemini 4 `Hydrogen` / `xhigh` | Post-integration Pass-2 verification review of updated Draft PR `#2684` |
 | `impl_eval` (PR review Pass 1, planned) | `Opus 5.5` / `xhigh` | Pass-1 PR implementation review (independent vendor/session from Neon builders) |
 | `impl_eval` (PR review Pass 2, planned) | `Hydrogen` / `xhigh` | Pass-2 PR implementation review |
 
@@ -29,5 +30,5 @@ Reference [`.llm/harness/workflow/lane-policy.md`](../../harness/workflow/lane-p
 
 ## Recorded lane/eval overrides
 
-- **Zero Claude spend during RFC authoring:** Strictly no `claude` invocations or subagent spawns during RFC drafting; scheduled adversarial RFC evaluation (`Fable 5.2`) is explicitly deferred to Friday 23:30 after the Claude subscription reset.
-- **Owner-directed builder & evaluator stack for `0.0.10`:** Implementation uses Neon builders (`antigravity/gemini-4-neon` at `xhigh`) instead of Codex defaults (`zero Codex` policy for this initiative), with adversarial RFC review by `Fable 5.2` and two-pass PR review by `Opus 5.5` (`xhigh`) and `Hydrogen` (`xhigh`). Preserves `lane-policy.md` § Independence and session rules (different vendor families and separate sessions between builders and evaluators). Mirrored in [`drift.md`](./drift.md) and [`worklog.md`](./worklog.md).
+- **Zero Claude / Codex spend during RFC authoring & Pass-1 review integration:** Strictly zero `claude` invocations or subagent spawns in authoring/integration sessions.
+- **Owner-authorized `plan_eval` override (`2026-11-26`):** Replaced the earlier queued `Fable 5.2` slot with `openrouter/openai/gpt-6.2-astra#xhigh` via OpenCode CLI `v2.3.2` for Pass-1 adversarial RFC evaluation ([`plan-eval.md`](./plan-eval.md)) and Gemini 4 `Hydrogen` (`xhigh`) for Pass-2 verification, preserving `lane-policy.md` cross-family / separate-session independence from the Antigravity `self` RFC author and Neon `0.0.10` builders (`antigravity/gemini-4-neon` at `xhigh`, zero Codex, with `Opus 5.5` `xhigh` + `Hydrogen` `xhigh` PR reviews). Mirrored in [`drift.md`](./drift.md) and [`worklog.md`](./worklog.md).
