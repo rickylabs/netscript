@@ -1,0 +1,11 @@
+@layer ns-plugins, ns-app;
+@import 'tailwindcss';
+@source '../../../../../../../../packages/fresh-ui/registry';
+@source '../../../../../../../../packages/fresh-ui/src';
+@import '../../../../../../../../packages/fresh-ui/registry/theme/tokens.css';
+@import '../../../../../../../../packages/fresh-ui/registry/theme/theme-bridge.css';
+@import '../../../../../../../../packages/cli/src/kernel/assets/app/assets/design.css.template';
+@import '../../../../../../../../packages/cli/src/kernel/assets/app/assets/workspace.css.template';
+@import './app.css';
+@import '../../../packages/local-plugin/route.css';
+@import '../../../packages/local-plugin/island.css';

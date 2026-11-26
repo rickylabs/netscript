@@ -201,6 +201,16 @@ const rpcHandler = createRPCHandler(router);
 `deno task docs:jsdoc-examples` compiles every published example against its public specifiers; an
 undeclared name fails it.
 
+### Consumer-agnostic examples and naming
+
+Anything shipped in NetScript's public framework surface — code under `packages/` or `plugins/`,
+JSDoc `@example` blocks, docs, RFCs, empirical probes, and tracked `.llm/runs/` artifacts — MUST
+stay free of downstream or private consumer names. Never cite a private repository URL, consumer
+org/app name, private issue number, internal consumer file path, or consumer-specific metadata
+namespace anywhere in framework-land. Whenever an example or test needs a concrete non-framework
+consumer app, host route, plugin mount, or custom namespace placeholder, use `acme` (for example
+`acme`, `acme-connector`, `x-acme-ui`, or `acme.example`).
+
 ## What does not belong on the surface
 
 - **Implementation classes that exist only because we needed to share

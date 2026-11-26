@@ -1,0 +1,5 @@
+@layer ns-plugins, ns-app;
+@import 'tailwindcss';
+@import '../../../../../../../../packages/fresh-ui/registry/theme/tokens.css';
+@import '../../../../../../../../packages/fresh-ui/registry/theme/theme-bridge.css';
+@import './app.css';

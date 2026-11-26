@@ -1,0 +1,13 @@
+@layer ns-plugins {
+  .ns-cascade-target {
+    color: rgb(220, 38, 38);
+    background-color: rgb(254, 242, 242);
+    border: 2px solid rgb(220, 38, 38);
+    padding: 12px;
+  }
+
+  .plugin-explicit-box {
+    border: 2px dashed rgb(14, 165, 233);
+    padding: 16px;
+  }
+}

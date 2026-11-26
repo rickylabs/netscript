@@ -3,7 +3,7 @@
 Quick evaluator reference. Doctrine source:
 `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md#anti-pattern-catalog`.
 
-Reference trust note: this catalog follows the current doctrine range `AP-1` through `AP-25`.
+Reference trust note: this catalog follows the current doctrine range `AP-1` through `AP-26`.
 Historical checker refs such as `F-DOCT-*`, `A8/AP-9` for file size, or `AP-19` for default exports
 must be translated through
 `docs/architecture/doctrine/ref-migration-map.md` before an evaluator treats them as trusted refs.
@@ -35,6 +35,7 @@ must be translated through
 | AP-23 | Inline command body in composition                   | composition root containing `.command()`/`.option()`/`.action()`/route/handler bodies instead of wiring-only |
 | AP-24 | Switch-over-tagged-union instead of registry         | `switch` over a variant union returning implementations instead of a typed registry |
 | AP-25 | Side effect in non-edge file                         | `Deno.*`/`console.*`/`fetch`/`Date.now`/`setTimeout` in a non-edge file instead of injected port |
+| AP-26 | Downstream or private consumer references in framework artifacts | real downstream/private repo, app, issue, path, or vendor key instead of generic `acme` placeholder |
 
 ## Evaluator Use
 

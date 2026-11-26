@@ -1,0 +1,22 @@
+{
+  "name": "@acme/local-plugin",
+  "version": "0.1.0",
+  "exports": {
+    ".": "./mod.ts",
+    "./island": "./island.tsx",
+    "./island.css": "./island.css",
+    "./route": "./route.tsx",
+    "./route-raw": "./route-raw.tsx",
+    "./route-explicit": "./route-explicit.tsx",
+    "./route.css": "./route.css"
+  },
+  "imports": {
+    "fresh": "jsr:@fresh/core@^2.3.3",
+    "preact": "npm:preact@^10.29.2",
+    "@preact/signals": "npm:@preact/signals@2.11.3"
+  },
+  "compilerOptions": {
+    "jsx": "precompile",
+    "jsxImportSource": "preact"
+  }
+}

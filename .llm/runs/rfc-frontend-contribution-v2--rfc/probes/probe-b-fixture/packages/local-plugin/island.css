@@ -1,0 +1,8 @@
+@layer ns-plugins {
+  .local-plugin-island {
+    border: 2px solid rgb(16, 185, 129);
+    background-color: rgb(236, 253, 245);
+    color: rgb(6, 95, 70);
+    padding: 12px;
+  }
+}

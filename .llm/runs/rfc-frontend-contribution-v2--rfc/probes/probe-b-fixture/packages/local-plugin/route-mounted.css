@@ -1,0 +1,22 @@
+@layer ns-plugins {
+  .ns-cascade-target {
+    color: rgb(220, 38, 38);
+    background-color: rgb(254, 242, 242);
+    border: 2px solid rgb(220, 38, 38);
+    padding: 12px;
+  }
+
+  .plugin-route-panel {
+    border: 1px solid rgb(100, 116, 139);
+    padding: 16px;
+    border-radius: 6px;
+  }
+
+  /* Distinct CSS file for mounted route probe so @fresh/plugin-vite@1.1.2 server_entry rename does not race */
+  .plugin-mounted-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: rgb(254, 226, 226);
+  }
+}

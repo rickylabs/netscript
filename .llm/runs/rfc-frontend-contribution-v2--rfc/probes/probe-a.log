@@ -1,0 +1,75 @@
+=== Probe A Type-Check Status (visible per N1) ===
+probe-a-fresh-mount.ts deno check --no-lock exit=1
+TS9031 [ERROR]:     Add a return type to the function declaration.
+    export default function InvalidCssRoute() {
+                            ~~~~~~~~~~~~~~~
+        at file:///home/agent/.t3/userdata/providers/antigravity/ac0a3dfd6dddb20962cecff6ee5fe65e19d3923be20e52c5ab52ff877f7e4c32/antigravity-acp/worktrees/f4a0a476-52b4-4a01-b49b-770a059482e0/subagent-RFC-Review-Findings-Integrator-self-ba37e191-repo/.llm/runs/rfc-frontend-contribution-v2--rfc/probes/probe-a-fixtures/plugin-route-invalid-css.tsx:3:25
+
+Found 44 errors.
+
+error: Type checking failed.
+portable-jobs-loader.ts + fresh-jobs-adapter.tsx deno check --no-lock exit=0
+
+=== NetScript Wave-0 Probe A: Fresh 2.3.3 Mount, Partials, Lazy Loaders & SSR Containment ===
+Deno: 2.9.7, V8: 15.0.245.2-rusty, TS: 6.0.3
+[PASS] P0.1 (P0) — Preact options.errorBoundaries default in Fresh 2.3.3
+       preactOptions.errorBoundaries=undefined (Fresh 2.3.3 does NOT enable errorBoundaries)
+[PASS] P1.0 (P1) — Pre-fsRoutes vs Post-fsRoutes mount ordering
+       Pre-fsRoutes missed _app/_layout/_middleware; post-fsRoutes mountApp & app.route both inherited all 3.
+[PASS] P1a (P1) — Host _app wrapper wraps mounted plugin routes (mountApp vs app.route)
+       Both post-fsRoutes mountApp and prefixed app.route receive host _app wrapper (<html data-host-app>, <body f-client-nav>).
+[PASS] P1b-naive (P1) — Nested host _layout (<Partial name="main"> inside shell, WITHOUT isPartial guard) on ?fresh-partial
+       Inside <!--frsh:partial:main--> markers: hasShellInPartial===false for ?fresh-partial and ?fresh-partial=true; raw HTTP response still includes outer shell unless _layout/_app branch on ctx.isPartial.
+[PASS] P1b-aware (P1) — Nested host _layout (<Partial name="main"> inside shell, WITH isPartial guard) on ?fresh-partial
+       With isPartial-aware _layout/_app: hasShellInPartial===false AND rawBodyHasShellChrome===false across mountApp & app.route; inner distinct sub-partial works; duplicate "main" throws 500; outer-<Partial> anti-pattern proves hasShellInPartial===true.
+[PASS] P1c (P1) — Host basePath composition (mountApp vs app.route)
+       Host basePath="/console" composes cleanly onto /console/plugins/p1, /console/plugins/p1/items/42, and prefixed app.route; unprefixed /plugins/p1 returns 404.
+[PASS] P1d (P1) — Plugin middleware execution order (mountApp vs prefixed app.route + /* trap)
+       mountApp preserves subApp.use() order (host-mw -> p1-mw -> nested-mw -> handler); prefixed app.route requires manual app.use("/prefix") and silently drops app.use("/prefix/*") due to patternToSegments creating literal "*" child segment.
+[PASS] P1e (P1) — Plugin 404 behavior inside mounted sub-app vs host 404
+       Unmatched /plugins/p1/missing & HttpError(404) invoke host _404 (NOTE: component-only _404 without handler returns 200 in Fresh 2.3.3 newNotFoundCmd; handler returning status:404 gives 404); plugin can opt into scoped 404 via subApp.all("/*").
+[PASS] P1f (P1) — Two co-mounted plugins (/p1, /p2) without middleware bleed
+       Co-mounted /p1 and /p2 isolate middleware state and headers cleanly with zero bleed onto each other or /host-page.
+[PASS] P1g (P1) — Raw App.mountApp child command leak vs GuardedPluginApp reject/strip enforcement
+       Raw App.mountApp clobbers root.notFound globally and overwrites root.app for all subsequent routes/plugins (App.#commands is private ES field); GuardedPluginApp rejects or strips notFound/appWrapper/onError leaving host shell/404/onError intact.
+[PASS] P2a (P2) — Literal dynamic import().then(normalizeFreshRouteModule) end-to-end on mounted plugin route (css + handlers + caching)
+       Literal lazy import().then(normalizeFreshRouteModule) loads lazily on 1st request (count 0->1->1), runs GET/POST handlers, injects route.css <link> into <head>, and honors lazy config.skipAppWrapper/skipInheritedLayouts.
+[PASS] P2c (P2) — Fresh-3-compatible middleware -> handler({ data }) -> pure page shape (no inline ctx.render()) via normalizer + mountApp
+       Fresh-3-compatible middleware -> handler({ data }) -> pure page (zero inline ctx.render()) works cleanly through normalizeFreshRouteModule + mountApp on both full and ?fresh-partial=true requests.
+[PASS] P2b (P2) — normalizeFreshRouteModule rejects unknown/invalid/empty/ambiguous exports with structured errors
+       Rejected unknownExports=[rogueExport], ambiguous handler+handlers, empty module, and invalid css with structured FreshRouteModuleError (surfaced cleanly in lazy route onError).
+[PASS] P2d (P2) — Framework-free portable loader executes identically across GPUIX-shaped RouteModule and Fresh 2 without resolving Fresh view
+       Standalone framework-free loader (0 fresh/preact imports, deno check exit 0) produced identical { data } and { redirect: "/login" } across GPUIX-shaped RouteModule (Fresh adapter load count=0) and Fresh 2 normalizeFreshRouteModule (full + ?fresh-partial=true).
+[PASS] P4a (P4) — Host-side pre-render data-phase resolver try/catch renders quarantine fallback card cleanly
+       Pre-render Promise.all + try/catch returned HTTP 200 with healthy sibling zone intact and quarantined fallback card for failing zone.
+[PASS] P4b (P4) — Sync throw inside a zone SSR component during render (Fresh default vs explicit errorBoundaries=true)
+       Under Fresh 2.3.3 default (options.errorBoundaries=undefined), Preact ErrorBoundary does NOT catch sync SSR throws — renderToString throws and App.handler() fails whole page with HTTP 500 "Internal server error". Only explicit global preactOptions.errorBoundaries=true catches sync class-boundary throws (partial-inside-EB status=200).
+[PASS] P4c (P4) — Async throw inside top-level async component vs child async component in render path
+       Top-level async route component rejection is awaited by Fresh renderRouteComponent and caught by onError (500); nested <AsyncChildZone /> is NOT awaited by sync renderToString — renders empty <div></div> (200) and leaks an unhandledrejection!
+[PASS] P4d (P4) — Route-level onError behavior for plugin routes vs host shell (_layout / _app)
+       Root onError catches plugin errors (popping /plugins layout); scoped onError("/plugins/p2") isolates per-plugin; onError("/plugins/p3/*") misses due to patternToSegments; _error needs skipAppWrapper+skipInheritedLayouts to survive root _app/_layout throws.
+[PASS] P4e (P4) — Confirm exact Fresh 2.3.3 + preact-render-to-string SSR containment contract
+       {"freshCoreVersion":"2.3.3","preactRenderToStringVersion":"6.8.3","denoLockPreRenderPin":"6.8.0_preact@10.29.2","freshEnablesPreactErrorBoundaries":false,"freshCtxRenderUsesSyncRenderToString":true,"syncRenderThrowContainedByErrorBoundary":false,"asyncChildComponentAwaitedByCtxRender":false,"topLevelAsyncComponentAwaitedByFresh":true,"hostPreRenderDataTryCatchContainment":true}
+
+=== PROBE A SUMMARY MATRIX ===
+PASS | P0.1       | Preact options.errorBoundaries default in Fresh 2.3.3 :: preactOptions.errorBoundaries=undefined (Fresh 2.3.3 does NOT enable errorBoundaries)
+PASS | P1.0       | Pre-fsRoutes vs Post-fsRoutes mount ordering :: Pre-fsRoutes missed _app/_layout/_middleware; post-fsRoutes mountApp & app.route both inherited all 3.
+PASS | P1a        | Host _app wrapper wraps mounted plugin routes (mountApp vs app.route) :: Both post-fsRoutes mountApp and prefixed app.route receive host _app wrapper (<html data-host-app>, <body f-client-nav>).
+PASS | P1b-naive  | Nested host _layout (<Partial name="main"> inside shell, WITHOUT isPartial guard) on ?fresh-partial :: Inside <!--frsh:partial:main--> markers: hasShellInPartial===false for ?fresh-partial and ?fresh-partial=true; raw HTTP response still includes outer shell unless _layout/_app branch on ctx.isPartial.
+PASS | P1b-aware  | Nested host _layout (<Partial name="main"> inside shell, WITH isPartial guard) on ?fresh-partial :: With isPartial-aware _layout/_app: hasShellInPartial===false AND rawBodyHasShellChrome===false across mountApp & app.route; inner distinct sub-partial works; duplicate "main" throws 500; outer-<Partial> anti-pattern proves hasShellInPartial===true.
+PASS | P1c        | Host basePath composition (mountApp vs app.route) :: Host basePath="/console" composes cleanly onto /console/plugins/p1, /console/plugins/p1/items/42, and prefixed app.route; unprefixed /plugins/p1 returns 404.
+PASS | P1d        | Plugin middleware execution order (mountApp vs prefixed app.route + /* trap) :: mountApp preserves subApp.use() order (host-mw -> p1-mw -> nested-mw -> handler); prefixed app.route requires manual app.use("/prefix") and silently drops app.use("/prefix/*") due to patternToSegments creating literal "*" child segment.
+PASS | P1e        | Plugin 404 behavior inside mounted sub-app vs host 404 :: Unmatched /plugins/p1/missing & HttpError(404) invoke host _404 (NOTE: component-only _404 without handler returns 200 in Fresh 2.3.3 newNotFoundCmd; handler returning status:404 gives 404); plugin can opt into scoped 404 via subApp.all("/*").
+PASS | P1f        | Two co-mounted plugins (/p1, /p2) without middleware bleed :: Co-mounted /p1 and /p2 isolate middleware state and headers cleanly with zero bleed onto each other or /host-page.
+PASS | P1g        | Raw App.mountApp child command leak vs GuardedPluginApp reject/strip enforcement :: Raw App.mountApp clobbers root.notFound globally and overwrites root.app for all subsequent routes/plugins (App.#commands is private ES field); GuardedPluginApp rejects or strips notFound/appWrapper/onError leaving host shell/404/onError intact.
+PASS | P2a        | Literal dynamic import().then(normalizeFreshRouteModule) end-to-end on mounted plugin route (css + handlers + caching) :: Literal lazy import().then(normalizeFreshRouteModule) loads lazily on 1st request (count 0->1->1), runs GET/POST handlers, injects route.css <link> into <head>, and honors lazy config.skipAppWrapper/skipInheritedLayouts.
+PASS | P2c        | Fresh-3-compatible middleware -> handler({ data }) -> pure page shape (no inline ctx.render()) via normalizer + mountApp :: Fresh-3-compatible middleware -> handler({ data }) -> pure page (zero inline ctx.render()) works cleanly through normalizeFreshRouteModule + mountApp on both full and ?fresh-partial=true requests.
+PASS | P2b        | normalizeFreshRouteModule rejects unknown/invalid/empty/ambiguous exports with structured errors :: Rejected unknownExports=[rogueExport], ambiguous handler+handlers, empty module, and invalid css with structured FreshRouteModuleError (surfaced cleanly in lazy route onError).
+PASS | P2d        | Framework-free portable loader executes identically across GPUIX-shaped RouteModule and Fresh 2 without resolving Fresh view :: Standalone framework-free loader (0 fresh/preact imports, deno check exit 0) produced identical { data } and { redirect: "/login" } across GPUIX-shaped RouteModule (Fresh adapter load count=0) and Fresh 2 normalizeFreshRouteModule (full + ?fresh-partial=true).
+PASS | P4a        | Host-side pre-render data-phase resolver try/catch renders quarantine fallback card cleanly :: Pre-render Promise.all + try/catch returned HTTP 200 with healthy sibling zone intact and quarantined fallback card for failing zone.
+PASS | P4b        | Sync throw inside a zone SSR component during render (Fresh default vs explicit errorBoundaries=true) :: Under Fresh 2.3.3 default (options.errorBoundaries=undefined), Preact ErrorBoundary does NOT catch sync SSR throws — renderToString throws and App.handler() fails whole page with HTTP 500 "Internal server error". Only explicit global preactOptions.errorBoundaries=true catches sync class-boundary throws (partial-inside-EB status=200).
+PASS | P4c        | Async throw inside top-level async component vs child async component in render path :: Top-level async route component rejection is awaited by Fresh renderRouteComponent and caught by onError (500); nested <AsyncChildZone /> is NOT awaited by sync renderToString — renders empty <div></div> (200) and leaks an unhandledrejection!
+PASS | P4d        | Route-level onError behavior for plugin routes vs host shell (_layout / _app) :: Root onError catches plugin errors (popping /plugins layout); scoped onError("/plugins/p2") isolates per-plugin; onError("/plugins/p3/*") misses due to patternToSegments; _error needs skipAppWrapper+skipInheritedLayouts to survive root _app/_layout throws.
+PASS | P4e        | Confirm exact Fresh 2.3.3 + preact-render-to-string SSR containment contract :: {"freshCoreVersion":"2.3.3","preactRenderToStringVersion":"6.8.3","denoLockPreRenderPin":"6.8.0_preact@10.29.2","freshEnablesPreactErrorBoundaries":false,"freshCtxRenderUsesSyncRenderToString":true,"syncRenderThrowContainedByErrorBoundary":false,"asyncChildComponentAwaitedByCtxRender":false,"topLevelAsyncComponentAwaitedByFresh":true,"hostPreRenderDataTryCatchContainment":true}
+
+Total: 19, Passed: 19, Failed: 0
