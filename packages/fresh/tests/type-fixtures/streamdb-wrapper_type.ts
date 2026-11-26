@@ -7,6 +7,7 @@ import {
   useLiveQuery,
 } from '@netscript/fresh/streams';
 import type {
+  CreateNetScriptStreamEventSourceOptionsV1,
   NetScriptStreamDBReconnectOptions,
   NetScriptStreamDBStatus,
 } from '@netscript/fresh/streams';
@@ -105,5 +106,15 @@ const invalidCombinedCheck = () =>
     offset: '-1',
     onEvent: () => undefined,
   });
+const directWrapperCheck = (
+  options: Omit<CreateNetScriptStreamEventSourceOptionsV1, 'streamPath' | 'proxyUrl'>,
+) => createNetScriptStreamEventSourceV1({ ...options, streamPath: '/people' });
+const directWrapperWithBaseUrl = () =>
+  directWrapperCheck({
+    baseUrl: 'https://streams.example.test',
+    offset: '-1',
+    onEvent: () => undefined,
+  });
 void proxyEventSourceCheck;
 void invalidCombinedCheck;
+void directWrapperWithBaseUrl;

@@ -55,7 +55,7 @@ export function %%DB_EXPORT%%(options: { readonly baseUrl?: string } = {}) {
 
 /** Bind the versioned named-event SSE consumer for %%STREAM_PATH%%. */
 export function %%SUBSCRIBE_EXPORT%%(
-  options: Omit<CreateNetScriptStreamEventSourceOptionsV1, 'streamPath'>,
+  options: Omit<CreateNetScriptStreamEventSourceOptionsV1, 'streamPath' | 'proxyUrl'>,
 ) {
   return createNetScriptStreamEventSourceV1({ ...options, streamPath: '%%STREAM_PATH%%' });
 }
