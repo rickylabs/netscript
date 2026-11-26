@@ -1,7 +1,11 @@
 import type { HeadersRecord } from '@durable-streams/client';
 import { createStateSchema } from '@durable-streams/state';
 import { createStreamDB } from '@durable-streams/state/db';
-import { createNetScriptStreamDB, useLiveQuery } from '@netscript/fresh/streams';
+import {
+  createNetScriptStreamDB,
+  createNetScriptStreamEventSourceV1,
+  useLiveQuery,
+} from '@netscript/fresh/streams';
 import type {
   NetScriptStreamDBReconnectOptions,
   NetScriptStreamDBStatus,
@@ -85,3 +89,21 @@ void status;
 void preload;
 void withHeaders;
 void viaPort;
+
+// Contract: proxyUrl and streamPath/baseUrl are mutually exclusive on createNetScriptStreamEventSourceV1.
+const proxyEventSourceCheck = () =>
+  createNetScriptStreamEventSourceV1({
+    proxyUrl: 'https://app.example.test/api/streams/people',
+    offset: '-1',
+    onEvent: () => undefined,
+  });
+const invalidCombinedCheck = () =>
+  // @ts-expect-error proxyUrl cannot be combined with streamPath
+  createNetScriptStreamEventSourceV1({
+    proxyUrl: 'https://app.example.test/api/streams/people',
+    streamPath: '/people',
+    offset: '-1',
+    onEvent: () => undefined,
+  });
+void proxyEventSourceCheck;
+void invalidCombinedCheck;

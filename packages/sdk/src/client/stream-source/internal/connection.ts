@@ -52,18 +52,22 @@ export async function readSseConnection(options: {
   signal: AbortSignal;
   bufferLimit: number;
   lastEventId: string;
+  onOpen?: () => void;
   onBytes: () => void;
   onBlock: (block: SseBlock) => void;
   onRetry: (delay: number) => void;
 }): Promise<void> {
   if (
-    !options.response.ok || !options.response.body ||
+    !options.response.ok ||
+    options.response.status !== 200 ||
+    !options.response.body ||
     options.response.headers.get('content-type')?.split(';')[0].trim().toLowerCase() !==
       'text/event-stream'
   ) {
-    await options.response.body?.cancel();
+    await options.response.body?.cancel().catch(() => {});
     throw new Error('Expected a successful streaming text/event-stream response');
   }
+  options.onOpen?.();
   const reader = options.response.body.getReader();
   const cancelReader = (): void => {
     void reader.cancel().catch(() => {});

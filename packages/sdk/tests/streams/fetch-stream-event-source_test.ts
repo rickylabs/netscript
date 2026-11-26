@@ -1,8 +1,11 @@
 import { assert, assertEquals, assertRejects, assertThrows } from '@std/assert';
 import type {
   FetchStreamEventSourceOptionsV1,
+  FetchStreamHttpErrorInfoV1,
+  StreamFetchResponseV1,
   StreamFetchV1,
   StreamSourceSchedulerV1,
+  StreamSseConsumerEventV1,
 } from '../../src/client/stream-source/mod.ts';
 
 class ManualScheduler implements StreamSourceSchedulerV1 {
@@ -471,4 +474,341 @@ Deno.test('all non-2xx statuses retry and resolve credentials on each connect', 
     await source.done;
     assertEquals(scheduler.timers.size, 0);
   }
+});
+
+Deno.test('Gate 5 bearer fetch source: readyState lifecycle, mid-stream revocation -> 401 terminal stop, and non-terminal 503 retry', async () => {
+  const api = await import('../../src/client/stream-source/mod.ts');
+  const scheduler = new ManualScheduler();
+  const observedErrors: FetchStreamHttpErrorInfoV1[] = [];
+  const observedReadyStatesInHttpError: Array<0 | 1 | 2> = [];
+  const consumerEvents: StreamSseConsumerEventV1[] = [];
+  const observedReadyStatesOnErrorEvent: Array<0 | 1 | 2> = [];
+  let fetchCalls = 0;
+  let firstController!: ReadableStreamDefaultController<Uint8Array<ArrayBuffer>>;
+
+  // Strictly use StreamFetchResponseV1 (no statusText) to verify port contract compatibility.
+  const hostFetch: StreamFetchV1 = (_url, _init): Promise<StreamFetchResponseV1> => {
+    fetchCalls += 1;
+    if (fetchCalls === 1) {
+      const body = new ReadableStream<Uint8Array<ArrayBuffer>>({
+        start(c) {
+          firstController = c;
+        },
+      });
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'content-type': 'text/event-stream; charset=utf-8' }),
+        body,
+      });
+    }
+    if (fetchCalls === 2) {
+      return Promise.resolve({
+        ok: false,
+        status: 503,
+        headers: new Headers({ 'retry-after': '5' }),
+        body: null,
+      });
+    }
+    return Promise.resolve({
+      ok: false,
+      status: 401,
+      headers: new Headers({ 'cache-control': 'no-store' }),
+      body: null,
+    });
+  };
+
+  const source = api.createFetchStreamEventSourceV1({
+    url: 'https://api.example.test/api/streams/projects/p1?offset=-1',
+    fetch: hostFetch,
+    scheduler,
+    reconnectDelayMs: 10,
+    maxReconnectDelayMs: 50,
+    heartbeatTimeoutMs: 100,
+    authHeaders: () => ({ authorization: 'Bearer tok-1' }),
+    terminalStatuses: [400, 401, 403, 404, 405, 410],
+    onHttpError: (info) => {
+      observedErrors.push(info);
+      observedReadyStatesInHttpError.push(source.readyState);
+    },
+  });
+
+  // Initial readyState is 0 (CONNECTING)
+  assertEquals(source.readyState, 0);
+
+  const binding = api.bindStreamEventSourceV1({
+    source,
+    onEvent: (event) => {
+      consumerEvents.push(event);
+      if (event.event === 'error') {
+        observedReadyStatesOnErrorEvent.push(source.readyState);
+      }
+    },
+  });
+
+  await settle();
+  // Opened 200 text/event-stream -> 0 -> 1 (OPEN)
+  assertEquals(fetchCalls, 1);
+  assertEquals(source.readyState, 1);
+
+  // Commit batch 1 at offset_1
+  firstController.enqueue(new TextEncoder().encode(data('b1') + control('offset_1')));
+  await settle();
+  assertEquals(binding.snapshot().lastCommittedOffset, 'offset_1');
+
+  // Revoke session mid-stream: upstream closes cleanly -> 1 -> 0 BEFORE emitting retryable error
+  firstController.close();
+  await settle();
+  assertEquals(source.readyState, 0);
+  assertEquals(observedReadyStatesOnErrorEvent, [0]);
+  const disconnectErr = consumerEvents.at(-1)!;
+  assertEquals(disconnectErr.event, 'error');
+  if (disconnectErr.event === 'error') {
+    assertEquals(disconnectErr.payload.retryable, true);
+    assertEquals(disconnectErr.payload.lastCommittedOffset, 'offset_1');
+  }
+
+  // Reconnect #2 returns non-terminal 503 with Retry-After: 5 -> stays 0, retries!
+  assertEquals(scheduler.delays(), [10]);
+  scheduler.advance(10);
+  await settle();
+  assertEquals(fetchCalls, 2);
+  assertEquals(source.readyState, 0);
+  assertEquals(observedErrors, [{
+    status: 503,
+    retryAfter: '5',
+    terminal: false,
+    lastCommittedOffset: 'offset_1',
+  }]);
+  assertEquals(observedReadyStatesInHttpError, [0]);
+  assertEquals(observedReadyStatesOnErrorEvent, [0, 0]);
+  const retryable503 = consumerEvents.at(-1)!;
+  assertEquals(retryable503.event, 'error');
+  if (retryable503.event === 'error') {
+    assertEquals(retryable503.payload.retryable, true);
+  }
+
+  // Reconnect #3 returns terminal 401 -> 0 -> 2 (CLOSED), onHttpError(terminal: true),
+  // bindStreamEventSourceV1 emits retryable: false, done resolves cleanly, ZERO further fetches!
+  assertEquals(scheduler.delays(), [20]);
+  scheduler.advance(20);
+  await source.done;
+  assertEquals(fetchCalls, 3);
+  assertEquals(source.readyState, 2);
+  assertEquals(observedErrors.at(-1), {
+    status: 401,
+    terminal: true,
+    lastCommittedOffset: 'offset_1',
+  });
+  assertEquals(observedReadyStatesInHttpError, [0, 2]);
+  assertEquals(observedReadyStatesOnErrorEvent, [0, 0, 2]);
+  const terminal401 = consumerEvents.at(-1)!;
+  assertEquals(terminal401.event, 'error');
+  if (terminal401.event === 'error') {
+    assertEquals(terminal401.payload.code, 'transport-error');
+    assertEquals(terminal401.payload.retryable, false);
+    assertEquals(terminal401.payload.lastCommittedOffset, 'offset_1');
+  }
+
+  // Zero pending timers and zero further fetches after terminal close
+  assertEquals(scheduler.timers.size, 0);
+  scheduler.advance(100_000);
+  await settle();
+  assertEquals(fetchCalls, 3);
+  binding.dispose();
+});
+
+Deno.test('Gate 5 fetch source readyState transition table, initial undefined lastCommittedOffset, observer controls & errors, and legacy default', async () => {
+  const api = await import('../../src/client/stream-source/mod.ts');
+
+  // 1. Pre-aborted signal -> readyState starts at 2 (CLOSED), zero fetch calls
+  {
+    const abort = new AbortController();
+    abort.abort();
+    let fetched = 0;
+    const source = api.createFetchStreamEventSourceV1({
+      url: 'https://api.example.test/stream?offset=-1',
+      signal: abort.signal,
+      fetch: () => {
+        fetched += 1;
+        return Promise.resolve(new Response(null, { status: 204 }));
+      },
+    });
+    assertEquals(source.readyState, 2);
+    await source.done;
+    assertEquals(fetched, 0);
+  }
+
+  // 2. Terminal 401 before any control commit -> lastCommittedOffset is undefined (NOT '-1' from URL)
+  {
+    const infos: FetchStreamHttpErrorInfoV1[] = [];
+    const bodyCancelled = { value: false };
+    const source = api.createFetchStreamEventSourceV1({
+      url: 'https://api.example.test/stream?offset=-1',
+      terminalStatuses: [401],
+      onHttpError: (info) => infos.push(info),
+      fetch: () =>
+        Promise.resolve({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+          body: new ReadableStream({
+            cancel() {
+              bodyCancelled.value = true;
+            },
+          }),
+        }),
+    });
+    await source.done;
+    assertEquals(bodyCancelled.value, true);
+    assertEquals(source.readyState, 2);
+    assertEquals(infos, [{ status: 401, terminal: true }]);
+    assertEquals(infos[0]!.lastCommittedOffset, undefined);
+  }
+
+  // 3. 200 with non-text/event-stream content-type stays readyState 0, does NOT call onHttpError, and retries
+  {
+    const scheduler = new ManualScheduler();
+    let httpErrors = 0;
+    let calls = 0;
+    const source = api.createFetchStreamEventSourceV1({
+      url: 'https://api.example.test/stream?offset=-1',
+      scheduler,
+      reconnectDelayMs: 10,
+      onHttpError: () => {
+        httpErrors += 1;
+      },
+      fetch: () => {
+        calls += 1;
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'content-type': 'application/json' }),
+          body: new ReadableStream({}),
+        });
+      },
+    });
+    await settle();
+    assertEquals(calls, 1);
+    assertEquals(source.readyState, 0);
+    assertEquals(httpErrors, 0);
+    assertEquals(scheduler.delays(), [10]);
+    source.close();
+    assertEquals(source.readyState, 2);
+    await source.done;
+  }
+
+  // 4. HTTP 204 and terminal control (streamClosed: true) both transition readyState to 2
+  {
+    const s204 = api.createFetchStreamEventSourceV1({
+      url: 'https://api.example.test/stream?offset=-1',
+      fetch: () => Promise.resolve(new Response(null, { status: 204 })),
+    });
+    await s204.done;
+    assertEquals(s204.readyState, 2);
+
+    const { source, transport } = await create();
+    assertEquals(source.readyState, 1);
+    transport.send(control('end-1', true));
+    await source.done;
+    assertEquals(source.readyState, 2);
+  }
+
+  // 5. onHttpError calling source.close() on a non-terminal status stops without reconnecting
+  {
+    const scheduler = new ManualScheduler();
+    let calls = 0;
+    const closeRef: { close?: () => void } = {};
+    const source = api.createFetchStreamEventSourceV1({
+      url: 'https://api.example.test/stream?offset=-1',
+      scheduler,
+      reconnectDelayMs: 10,
+      onHttpError: (info) => {
+        assertEquals(info.terminal, false);
+        closeRef.close?.();
+      },
+      fetch: () => {
+        calls += 1;
+        return Promise.resolve(new Response(null, { status: 503 }));
+      },
+    });
+    closeRef.close = () => source.close();
+    await source.done;
+    assertEquals(source.readyState, 2);
+    assertEquals(calls, 1);
+    assertEquals(scheduler.timers.size, 0);
+  }
+
+  // 6. Throwing onHttpError (both terminal and non-terminal) transitions readyState to 2 and rejects done
+  for (const terminal of [true, false]) {
+    const scheduler = new ManualScheduler();
+    const source = api.createFetchStreamEventSourceV1({
+      url: 'https://api.example.test/stream?offset=-1',
+      scheduler,
+      ...(terminal ? { terminalStatuses: [403] } : {}),
+      onHttpError: () => {
+        throw new Error(`observer boom ${terminal}`);
+      },
+      fetch: () => Promise.resolve(new Response(null, { status: 403 })),
+    });
+    await assertRejects(() => source.done, Error, `observer boom ${terminal}`);
+    assertEquals(source.readyState, 2);
+    assertEquals(scheduler.timers.size, 0);
+  }
+
+  // 7. Legacy caller omitting terminalStatuses (even with observer-only onHttpError) retries all non-2xx
+  {
+    const scheduler = new ManualScheduler();
+    const seen: number[] = [];
+    const source = api.createFetchStreamEventSourceV1({
+      url: 'https://api.example.test/stream?offset=-1',
+      scheduler,
+      reconnectDelayMs: 10,
+      maxReconnectDelayMs: 25,
+      onHttpError: (info) => {
+        assertEquals(info.terminal, false);
+        seen.push(info.status);
+      },
+      fetch: () => Promise.resolve(new Response(null, { status: 401 })),
+    });
+    await settle();
+    scheduler.advance(10);
+    await settle();
+    assertEquals(seen, [401, 401]);
+    assertEquals(source.readyState, 0);
+    source.close();
+    assertEquals(source.readyState, 2);
+    await source.done;
+  }
+
+  // 8. Construction validation rejects invalid terminalStatuses and non-function onHttpError
+  for (const bad of [[200], [204], [99], [600], [NaN]]) {
+    assertThrows(
+      () =>
+        api.createFetchStreamEventSourceV1({
+          url: 'https://api.example.test/stream',
+          fetch: () => Promise.resolve(new Response(null, { status: 204 })),
+          terminalStatuses: bad,
+        }),
+      RangeError,
+    );
+  }
+  assertThrows(
+    () =>
+      api.createFetchStreamEventSourceV1({
+        url: 'https://api.example.test/stream',
+        fetch: () => Promise.resolve(new Response(null, { status: 204 })),
+        terminalStatuses: '401' as unknown as readonly number[],
+      }),
+    TypeError,
+  );
+  assertThrows(
+    () =>
+      api.createFetchStreamEventSourceV1({
+        url: 'https://api.example.test/stream',
+        fetch: () => Promise.resolve(new Response(null, { status: 204 })),
+        onHttpError: 'nope' as unknown as (info: FetchStreamHttpErrorInfoV1) => void,
+      }),
+    TypeError,
+  );
 });

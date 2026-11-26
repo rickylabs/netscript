@@ -386,15 +386,19 @@ described in the [Expo streams how-to](/durable-workflows/expo-streams/).
 
 Use `@netscript/sdk/streams/consumer` for the fetch source and binding in shared/browser/React
 Native code. Its import graph excludes telemetry, OTel, and modules using `Deno.*`. The wider
-`./streams` facade retains server producer exports. Every non-2xx response (including 401/403/404)
-retries with fresh per-connect credentials. Server `retry:` is clamped to the configured initial
-back-off floor and cap. HTTP 204 and terminal control stop permanently.
+`./streams` facade retains server producer exports. By default every non-2xx response (including
+401/403/404) retries with fresh per-connect credentials; supply opt-in `terminalStatuses` (for
+example `[400, 401, 403, 404, 405, 410]`) to transition `readyState` to `2` (`CLOSED`) and stop
+permanently on terminal HTTP refusals, and optional `onHttpError` to observe non-2xx responses.
+Server `retry:` is clamped to the configured initial back-off floor and cap. HTTP 204 and terminal
+control stop permanently.
 
-| Symbol                            | Kind       | Description                                                                         |
-| --------------------------------- | ---------- | ----------------------------------------------------------------------------------- |
-| `createFetchStreamEventSourceV1`  | function   | Create a reconnecting source over injected WHATWG streaming fetch.                  |
-| `FetchStreamEventSourceOptionsV1` | interface  | URL, fetch, auth provider, abort signal, timer port, and bounded transport budgets. |
-| `FetchStreamEventSourceV1`        | interface  | EventSource-compatible source with awaitable `done` shutdown.                       |
+| Symbol                            | Kind       | Description                                                                           |
+| --------------------------------- | ---------- | ------------------------------------------------------------------------------------- |
+| `createFetchStreamEventSourceV1`  | function   | Create a reconnecting source over injected WHATWG streaming fetch.                    |
+| `FetchStreamEventSourceOptionsV1` | interface  | URL, fetch, auth provider, abort signal, timer port, opt-in terminal statuses/observer, and bounded transport budgets. |
+| `FetchStreamEventSourceV1`        | interface  | EventSource-compatible source with `readyState` (`0 \| 1 \| 2`) and awaitable `done`. |
+| `FetchStreamHttpErrorInfoV1`      | interface  | Diagnostic status, optional `retryAfter`, `terminal` flag, and `lastCommittedOffset`. |
 | `StreamFetchV1`                   | type alias | Host-injected transport returning the consumed response subset.                     |
 | `StreamFetchResponseV1`           | type alias | Portable `ok`, `status`, `headers`, and streaming `body` response contract.         |
 | `StreamSourceSchedulerV1`         | interface  | Schedule a timer and return its cancellation function.                              |
