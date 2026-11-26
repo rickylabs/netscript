@@ -12,11 +12,11 @@ Deno.test('database scaffolds keep every Prisma executable and adapter on the qu
     })) as { imports: Record<string, string>; tasks: Record<string, string> };
     assertEquals(config.imports['@std/path'], 'jsr:@std/path@^1.0.0');
     for (const name of ['prisma', '@prisma/client', '@prisma/instrumentation-contract']) {
-      assertEquals(config.imports[name], `npm:${name}@^7.10.0`, `${engine}: ${name}`);
+      assertEquals(config.imports[name], `npm:${name}@^7.10.1`, `${engine}: ${name}`);
     }
     for (const [name, value] of Object.entries(config.imports)) {
       if (name.startsWith('@prisma/adapter-')) {
-        assertEquals(value, `npm:${name}@^7.10.0`, `${engine}: ${name}`);
+        assertEquals(value, `npm:${name}@^7.10.1`, `${engine}: ${name}`);
       }
     }
     const prismaTasks = Object.values(config.tasks).filter((task) => task.includes('npm:prisma@'));
@@ -27,7 +27,7 @@ Deno.test('database scaffolds keep every Prisma executable and adapter on the qu
 });
 
 Deno.test('Fresh scaffolds carry the qualified Tailwind and signals pins', () => {
-  assertEquals(SCAFFOLD_APP_CATALOG.TAILWINDCSS, '^4.3.3');
-  assertEquals(SCAFFOLD_APP_CATALOG.TAILWINDCSS_VITE, '^4.3.3');
-  assertEquals(SCAFFOLD_APP_CATALOG.PREACT_SIGNALS, '2.11.3');
+  assertEquals(SCAFFOLD_APP_CATALOG.TAILWINDCSS, '^4.3.5');
+  assertEquals(SCAFFOLD_APP_CATALOG.TAILWINDCSS_VITE, '^4.3.5');
+  assertEquals(SCAFFOLD_APP_CATALOG.PREACT_SIGNALS, '2.11.4');
 });
