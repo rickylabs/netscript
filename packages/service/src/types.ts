@@ -15,6 +15,8 @@ export type ServiceRouter = Record<string, unknown>;
 export interface ServiceEnvironment {
   /** Socket peer address, preserved for Hono's Deno getConnInfo adapter. */
   readonly remoteAddr?: Deno.Addr;
+  /** Service-owned pre-drain shutdown signal aborted before `server.shutdown()` waits. */
+  readonly shutdownSignal?: AbortSignal;
 }
 
 /** Minimal mountable service application returned by `build()`. */

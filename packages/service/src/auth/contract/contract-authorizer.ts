@@ -17,6 +17,11 @@ import { normalizePath } from './contract-path.ts';
 import { bindProcedureIndex, compileProcedures } from './contract-procedure-index.ts';
 import { compileRawRoutes } from './contract-raw-routes.ts';
 import { compileRetiredPaths, RETIRED_PROCEDURE_POLICY } from './retired-procedures.ts';
+import {
+  assertNoStreamPathOverlap,
+  createBoundStreamEndpointIndex,
+  resolveAuthoritativeStreamEndpoints,
+} from './stream-endpoint-policy.ts';
 import { isInternalServicePrincipal } from '../internal-credential/internal-credential-authenticator.ts';
 import { authorizeProcedurePolicy } from './procedure-policy-decision.ts';
 import type { AuthzDecision, AuthzRequest } from '../types.ts';
@@ -72,6 +77,10 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
   const rawRoutes = compileRawRoutes(options.rawRoutes ?? []);
   const retiredPaths = compileRetiredPaths(options.retiredPaths ?? []);
   const isInternalCaller = options.isInternalCaller ?? isInternalServicePrincipal;
+  // Validate explicit streamEndpoints eagerly at authorizer construction.
+  if (options.streamEndpoints !== undefined) {
+    resolveAuthoritativeStreamEndpoints(undefined, options.streamEndpoints);
+  }
   let resolver: ProcedurePolicyResolver | undefined;
 
   return {
@@ -80,16 +89,31 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
       for (const path of rawRoutes.keys()) {
         if (index.claims(path)) throw new Error(`${RAW_ROUTE_OVERLAP_ERROR}: ${path}`);
       }
+      const streamEndpoints = resolveAuthoritativeStreamEndpoints(
+        binding.streamMounts,
+        options.streamEndpoints,
+      );
+      const streamExternalPatterns: Array<{ readonly label: string; readonly pattern: string }> = [
+        ...index.overlapPatterns,
+        ...[...rawRoutes.keys()].map((path) => ({ label: 'rawRoute', pattern: path })),
+        ...[...retiredPaths.values()].map((path) => ({ label: 'retiredPath', pattern: path })),
+      ];
+      assertNoStreamPathOverlap(streamEndpoints, streamExternalPatterns);
+      const streamIndex = createBoundStreamEndpointIndex(streamEndpoints);
+
       resolver = Object.freeze({
-        // Precedence follows real dispatch: the builder mounts the oRPC handlers before raw
-        // routes, so a raw route only runs when oRPC serves nothing for the request.
+        // Precedence follows real dispatch: oRPC handlers and mounted GET stream endpoints are
+        // mutually disjoint (verified at bind), followed by raw routes and internal guards.
         resolve(request: ProcedurePolicyRequest): ProcedurePolicyResolution {
           const procedure = index.find(request);
           if (procedure) return { matched: true, policy: procedure.policy };
+          const stream = streamIndex.find(request);
+          if (stream) return { matched: true, policy: stream.policy };
           // Raw routes are Hono routes: look them up by the path Hono dispatches on.
           const rawPolicy = rawRoutes.get(normalizePath(request.routePath ?? request.path));
           if (rawPolicy) return { matched: true, policy: rawPolicy };
-          const guarded = index.findInternalGuard(request);
+          const guarded = index.findInternalGuard(request) ??
+            streamIndex.findInternalGuard(request);
           if (guarded) return { matched: true, policy: guarded.policy };
           // Use the undecoded path: retirement never expands to encoded or sibling spellings.
           if (retiredPaths.has(request.path)) {

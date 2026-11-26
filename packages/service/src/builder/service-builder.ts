@@ -50,6 +50,7 @@ import type {
   ShutdownHook,
 } from '../types.ts';
 import { ServiceBuilderImpl } from './service-builder-impl.ts';
+import type { StreamProxyMount } from './stream-proxy-mount.ts';
 
 /**
  * Service configuration options.
@@ -223,6 +224,13 @@ export interface ServiceBuilder<
     path: string,
     handler: ServiceHandler,
   ): ServiceBuilder<TRouter, TCustom>;
+
+  /**
+   * Registers an authorizing SSE stream proxy mount governed by service authentication,
+   * authoritative contract/overlay policy binding, pre-authn canonicalization/credential guards,
+   * and pre-drain `shutdownSignal`.
+   */
+  withStreamProxy(mount: StreamProxyMount): ServiceBuilder<TRouter, TCustom>;
 
   /** Configures the root service information endpoint. */
   withServiceInfo(): ServiceBuilder<TRouter, TCustom>;

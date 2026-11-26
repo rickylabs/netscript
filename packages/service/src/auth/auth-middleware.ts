@@ -27,6 +27,10 @@ import type {
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
 } from './contract/contract-policy.ts';
+import {
+  getStreamProxyRequestState,
+  type StreamProxyRequestState,
+} from './contract/stream-request-state.ts';
 import type { AuthnRequest, AuthnResult, Principal } from './types.ts';
 import { PROCEDURE_ERROR_CODES } from './types.ts';
 
@@ -49,14 +53,15 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
   const guard = normalizeGuard(options);
 
   return async (c, next) => {
+    const streamState = getStreamProxyRequestState(c.req.raw);
     const policy = resolvePolicy(options.policyResolver, c);
-    if (!requiresAuthentication(c, guard, policy)) {
+    if (!requiresAuthentication(c, guard, policy, streamState)) {
       return await next();
     }
 
     let result: AuthnResult;
     try {
-      result = await options.authenticator.authenticate(toAuthnRequest(c));
+      result = await options.authenticator.authenticate(toAuthnRequest(c, streamState));
     } catch {
       await logAuthDecision(c, {
         stage: 'authn',
@@ -79,7 +84,12 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
     }
 
     c.set('principal', result.principal);
-    applyAuthnResponse(c, result.responseHeaders, result.setCookies);
+    if (streamState !== undefined) {
+      streamState.authnResponseHeaders = result.responseHeaders;
+      streamState.authnSetCookies = result.setCookies;
+    } else {
+      applyAuthnResponse(c, result.responseHeaders, result.setCookies);
+    }
     await logAuthDecision(c, {
       stage: 'authn',
       decision: 'allow',
@@ -193,9 +203,13 @@ function requiresAuthentication(
   c: Context,
   guard: RequestGuard,
   resolution: ProcedurePolicyResolution | undefined,
+  streamState: StreamProxyRequestState | undefined,
 ): boolean {
   if (resolution?.matched) {
     return resolution.policy?.authentication !== 'none';
+  }
+  if (streamState !== undefined) {
+    return streamState.authenticationRequired;
   }
   return isGuardedRequest(c, guard);
 }
@@ -255,7 +269,36 @@ function matchesPrefix(path: string, prefix: string): boolean {
   return path === prefix || path.startsWith(prefix.endsWith('/') ? prefix : `${prefix}/`);
 }
 
-function toAuthnRequest(c: Context): AuthnRequest {
+function toAuthnRequest(
+  c: Context,
+  streamState: StreamProxyRequestState | undefined,
+): AuthnRequest {
+  if (streamState?.credentialMode === 'bearer') {
+    return {
+      method: c.req.method,
+      path: c.req.path,
+      header: (name) => (name.toLowerCase() === 'cookie' ? undefined : c.req.header(name)),
+      headers: () => {
+        const scoped = new Headers(c.req.raw.headers);
+        scoped.delete('cookie');
+        return scoped;
+      },
+      cookie: () => undefined,
+    };
+  }
+  if (streamState?.credentialMode === 'cookie') {
+    return {
+      method: c.req.method,
+      path: c.req.path,
+      header: (name) => (name.toLowerCase() === 'authorization' ? undefined : c.req.header(name)),
+      headers: () => {
+        const scoped = new Headers(c.req.raw.headers);
+        scoped.delete('authorization');
+        return scoped;
+      },
+      cookie: (name) => readCookie(c.req.header('cookie'), name),
+    };
+  }
   return {
     method: c.req.method,
     path: c.req.path,
