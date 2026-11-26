@@ -9,6 +9,7 @@ import { dirname, fromFileUrl, join, relative, resolve, toFileUrl } from '@std/p
 import { artifactText, collectInstallArtifacts } from '@netscript/plugin/adapter';
 import type { NetScriptPlugin } from '@netscript/plugin/adapter';
 import { aiAdapterPlugin } from '@netscript/plugin-ai/adapter';
+import { emitMcpServer } from '../../../../../../plugins/ai/src/adapter/resources/mcp-server/mcp-server.ts';
 import { authAdapterPlugin } from '../../../../../../plugins/auth/src/adapter/plugin.ts';
 import { sagasAdapterPlugin } from '../../../../../../plugins/sagas/src/adapter/plugin.ts';
 import { streamsAdapterPlugin } from '../../../../../../plugins/streams/src/adapter/plugin.ts';
@@ -1151,7 +1152,12 @@ Deno.test('first-party generated namespaces have complete imports in JSR and loc
   ]);
 
   for (const plugin of FIRST_PARTY_PLUGIN_CASES) {
-    const artifacts = collectInstallArtifacts(plugin.adapter);
+    const artifacts = [
+      ...collectInstallArtifacts(plugin.adapter),
+      ...(plugin.kind === 'ai'
+        ? [emitMcpServer({ id: 'orders', transport: 'service', service: 'orders-mcp' })]
+        : []),
+    ];
     const emittedSources = artifacts
       .filter((artifact) => artifact.path.endsWith('.ts') || artifact.path.endsWith('.tsx'))
       .map((artifact) => ({ path: artifact.path, source: artifactText(artifact) }));
@@ -1271,6 +1277,7 @@ Deno.test('PluginWorkspaceMutator writes no ai kind-source jsr pins into local-s
   for (
     const specifier of [
       '@netscript/ai',
+      '@netscript/sdk',
       '@netscript/plugin-ai',
       '@netscript/plugin-ai-core',
       '@netscript/fresh',
