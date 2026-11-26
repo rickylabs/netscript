@@ -1,13 +1,13 @@
 {
   "name": "@netscript/directory-ldap",
-  "version": "0.0.9",
+  "version": "0.0.10-canary.5",
   "description": "Active Directory and Samba AD adapter implementing NetScript's DirectoryPort over strict TLS.",
   "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts"
   },
   "imports": {
-    "@netscript/plugin-directory-core": "jsr:@netscript/plugin-directory-core@0.0.9",
+    "@netscript/plugin-directory-core": "jsr:@netscript/plugin-directory-core@0.0.10-canary.5",
     "@std/assert": "jsr:@std/assert@^1"
   },
   "tasks": {

@@ -2344,7 +2344,7 @@
       ],
       "dependencies": [
         "npm:highlight.js@^11",
-        "jsr:@netscript/fresh-ui@0.0.9"
+        "jsr:@netscript/fresh-ui@0.0.10-canary.5"
       ],
       "type": "registry:component",
       "files": [
@@ -2725,7 +2725,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.9"
+        "jsr:@netscript/fresh-ui@0.0.10-canary.5"
       ]
     },
     {
@@ -2886,7 +2886,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.9"
+        "jsr:@netscript/fresh-ui@0.0.10-canary.5"
       ]
     },
     {
@@ -3389,7 +3389,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.9"
+        "jsr:@netscript/fresh-ui@0.0.10-canary.5"
       ]
     },
     {
@@ -3801,7 +3801,7 @@
         "theme-seed"
       ],
       "dependencies": [
-        "jsr:@netscript/sdk@0.0.9/auto-update"
+        "jsr:@netscript/sdk@0.0.10-canary.5/auto-update"
       ],
       "type": "registry:component",
       "files": [
@@ -3843,7 +3843,7 @@
         "theme-seed"
       ],
       "dependencies": [
-        "jsr:@netscript/sdk@0.0.9/desktop",
+        "jsr:@netscript/sdk@0.0.10-canary.5/desktop",
         "npm:preact@^10.29.8"
       ],
       "type": "registry:component",
@@ -3919,7 +3919,7 @@
         "card"
       ],
       "dependencies": [
-        "jsr:@netscript/ai@0.0.9",
+        "jsr:@netscript/ai@0.0.10-canary.5",
         "npm:preact@^10.29.8"
       ],
       "type": "registry:lib",
@@ -4861,7 +4861,7 @@
         "calendar"
       ],
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.9"
+        "jsr:@netscript/fresh-ui@0.0.10-canary.5"
       ]
     },
     {
@@ -5023,7 +5023,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.9"
+        "jsr:@netscript/fresh-ui@0.0.10-canary.5"
       ]
     },
     {
@@ -5068,7 +5068,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.9"
+        "jsr:@netscript/fresh-ui@0.0.10-canary.5"
       ]
     },
     {
@@ -5112,7 +5112,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.9"
+        "jsr:@netscript/fresh-ui@0.0.10-canary.5"
       ]
     },
     {
@@ -5157,7 +5157,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.9"
+        "jsr:@netscript/fresh-ui@0.0.10-canary.5"
       ]
     },
     {
@@ -5202,7 +5202,7 @@
         }
       },
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.9"
+        "jsr:@netscript/fresh-ui@0.0.10-canary.5"
       ]
     },
     {
@@ -5413,7 +5413,7 @@
       "description": "Write-only credential input that never reveals stored values and emits an explicit keep, replace, or clear form contract.",
       "author": "NetScript",
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.9"
+        "jsr:@netscript/fresh-ui@0.0.10-canary.5"
       ],
       "files": [
         {
@@ -5456,7 +5456,7 @@
       "description": "Accessible key-value table editor with per-row write-only secret mode, duplicate and pattern validation, and indexed form submission.",
       "author": "NetScript",
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.9"
+        "jsr:@netscript/fresh-ui@0.0.10-canary.5"
       ],
       "files": [
         {
@@ -5499,7 +5499,7 @@
       "description": "Wrapping multi-value token input with delimiter and paste splitting, per-chip validation, and optional Combobox suggestions.",
       "author": "NetScript",
       "dependencies": [
-        "jsr:@netscript/fresh-ui@0.0.9"
+        "jsr:@netscript/fresh-ui@0.0.10-canary.5"
       ],
       "files": [
         {
