@@ -125,7 +125,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: denoland/setup-deno@v2
         with:
-          deno-version: '2.9.7'
+          deno-version: '2.9.8'
       - uses: actions/checkout@v5
         with:
           repository: rickylabs/netscript

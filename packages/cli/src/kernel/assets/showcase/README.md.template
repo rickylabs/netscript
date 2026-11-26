@@ -7,7 +7,7 @@ Money is stored in integer minor units; totals come from the saved line items.
 
 ## Start the showcase
 
-Install Deno 2.9.7, the pinned Aspire CLI and .NET SDK. Docker is needed for
+Install Deno 2.9.8, the pinned Aspire CLI and .NET SDK. Docker is needed for
 PostgreSQL; SQLite can use the supported local Garnet fallback. Private chat
 currently requires a POSIX host and the same OS user for setup and runtime. Run:
 

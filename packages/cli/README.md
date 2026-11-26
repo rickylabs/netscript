@@ -111,7 +111,7 @@ The Assistant uses durable private conversations and read-only order MCP tools. 
 credential it renders provider setup. Real model and OAuth/OIDC credentials are external
 prerequisites for signed-in chat; CI uses a stub provider. Private chat currently requires a POSIX
 host for credential-file permissions. SQLite uses the local Garnet fallback when Docker is absent;
-PostgreSQL requires Docker. Deno 2.9.7 and the pinned Aspire/.NET toolchain are required.
+PostgreSQL requires Docker. Deno 2.9.8 and the pinned Aspire/.NET toolchain are required.
 
 ## Managed Garnet durability
 
