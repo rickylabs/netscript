@@ -91,13 +91,12 @@ Each engine supports a specific set of modes:
 
 | Engine   | Modes                                         | Provisioned as                                                                                   | Wire protocol                |
 | -------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------- |
-| `Redis`  | `Container`, `External`, `Auto`               | `redis:7` container (tcp:6379), or a connection string you supply                                | Redis                        |
-| `Garnet` | `Container`, `Executable`, `External`, `Auto` | Garnet container (tcp:6379), `dotnet tool run garnet-server` (no Docker), or a connection string | Redis                        |
+| `Redis`  | `Container`, `External`, `Auto`               | `redis:8` container (tcp:6379), or a connection string you supply                                | Redis                        |
+| `Garnet` | `Container`, `Executable`, `External`, `Auto` | Garnet 2.x container (tcp:6379), `dotnet tool run garnet-server` (no Docker), or a connection string | Redis                        |
 | `DenoKv` | `Local`, `Container`, `Auto`                  | In-process `Deno.openKv()` (no resource), or a `ghcr.io/denoland/denokv` container (http:4512)   | Deno KV (embedded / Connect) |
 
-Two defaults exist, and they differ: a hand-written `CacheEntry` that omits fields validates to the
-schema default `Engine: 'Garnet', Mode: 'Container'`, while `netscript init` scaffolds a workspace
-with `Engine: 'Redis', Mode: 'Container'`. `Auto` is opt-in: it defers the hosting choice to AppHost
+Both the schema default for a hand-written `CacheEntry` that omits fields and `netscript init`
+default to `Engine: 'Garnet', Mode: 'Container'`. `Auto` is opt-in: it defers the hosting choice to AppHost
 start, where a Docker probe picks the container arm when Docker is present and falls back to the
 Garnet dotnet-tool executable otherwise — Redis and Garnet arms all speak the Redis wire protocol,
 so the selection is transparent to consumers. Set `NETSCRIPT_CACHE_MODE` to `Container` or

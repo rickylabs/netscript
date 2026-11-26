@@ -4,13 +4,15 @@
     "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/async@1": "1.5.1",
     "jsr:@std/internal@^1.0.12": "1.0.14",
-    "npm:@tanstack/db@0.13.0": "0.13.0_typescript@7.0.2",
-    "npm:@tanstack/react-db@0.5.8": "0.5.8_react@19.2.3_typescript@7.0.2",
+    "npm:@tanstack/db@0.15.2": "0.15.2_typescript@7.0.2",
+    "npm:@tanstack/react-db@0.5.12": "0.5.12_react@19.3.1_typescript@7.0.2",
     "npm:@types/react-test-renderer@19.1.0": "19.1.0",
     "npm:@types/react@19.2.17": "19.2.17",
-    "npm:react-test-renderer@19.2.3": "19.2.3_react@19.2.3",
+    "npm:react-test-renderer@19.2.3": "19.2.3_react@19.3.1",
     "npm:react@19.2.3": "19.2.3",
-    "npm:react@^19.2.3": "19.2.3"
+    "npm:react@19.3.1": "19.3.1",
+    "npm:react@^19.2.3": "19.3.1",
+    "npm:react@^19.3.1": "19.3.1"
   },
   "jsr": {
     "@std/assert@1.0.19": {
@@ -30,16 +32,15 @@
     "@standard-schema/spec@1.1.0": {
       "integrity": "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="
     },
-    "@tanstack/db-ivm@0.1.26_typescript@7.0.2": {
-      "integrity": "sha512-Td2HbR68RfpMPv4zyMNQk83z/5gTjGl/I1LA/07A26LXMEPGh+hTsNbfPSr5YPZhq6KXX9lDFjDzv3Qz3DjV5w==",
+    "@tanstack/db-ivm@0.2.0_typescript@7.0.2": {
+      "integrity": "sha512-AuMuGzVdWR5qzJPRYajmrUp95vMo0duvMZ0zBjMOvaI9rkh2GHZWCsJ/p7s81UN4Lep6HHJjahnYUF+XVL0+AQ==",
       "dependencies": [
         "fractional-indexing",
-        "sorted-btree",
         "typescript"
       ]
     },
-    "@tanstack/db@0.13.0_typescript@7.0.2": {
-      "integrity": "sha512-Opp8m9K/5cw2N8WXK59W0WeV0yD+hV8zreqQv6U8GLSQAssnOPvrC5j0UwIyl8SfT6LslGFYNFGfnVN5V0oWmg==",
+    "@tanstack/db@0.15.2_typescript@7.0.2": {
+      "integrity": "sha512-s7CR8kOgkF1oPEGyKWItWHsg7U3hhQQu+k9CPjjAWwS6wzWVvjCbHbu/xnJvO1aPe7v3SBwo1tf6CMyKjNPNxg==",
       "dependencies": [
         "@standard-schema/spec",
         "@tanstack/db-ivm",
@@ -50,11 +51,11 @@
     "@tanstack/pacer-lite@0.2.2": {
       "integrity": "sha512-eQ1MyLKCHyXiH7NbdmB80W77OhiMgGBUb+qDx/8WMGbwg5Lf/NlfD0TfNYAqY77i8V3AxoDoYdICrQE5ADw4Yw=="
     },
-    "@tanstack/react-db@0.5.8_react@19.2.3_typescript@7.0.2": {
-      "integrity": "sha512-CpNBCW+jdAwTCJTP9b6u8S5ZfX+x5KtAKwcJ4hb+Y4zDJptbFy2teGxYk7oaIguGXdZreMd7lJH7jm3+NZBECA==",
+    "@tanstack/react-db@0.5.12_react@19.3.1_typescript@7.0.2": {
+      "integrity": "sha512-Sq5qtW/vJRzV3+vSFnr5dEk3GHOc/x7aG3lte6Y1wnC3GwsbnrBm1xy7XccPIvkeV8AU88Bo9QJwQXoElYqKLg==",
       "dependencies": [
         "@tanstack/db",
-        "react"
+        "react@19.3.1"
       ]
     },
     "@types/react-test-renderer@19.1.0": {
@@ -178,10 +179,10 @@
     "react-is@19.3.0": {
       "integrity": "sha512-UpMYezM4v5/18F28aC66AEsjXIgE02kyEMH6yLdgLXu/UTfa1Ntwck/nNLrbqJsEXW7gPb0coNO9FQse9WTovA=="
     },
-    "react-test-renderer@19.2.3_react@19.2.3": {
+    "react-test-renderer@19.2.3_react@19.3.1": {
       "integrity": "sha512-TMR1LnSFiWZMJkCgNf5ATSvAheTT2NvKIwiVwdBPHxjBI7n/JbWd4gaZ16DVd9foAXdvDz+sB5yxZTwMjPRxpw==",
       "dependencies": [
-        "react",
+        "react@19.3.1",
         "react-is",
         "scheduler"
       ]
@@ -189,11 +190,11 @@
     "react@19.2.3": {
       "integrity": "sha512-Ku/hhYbVjOQnXDZFv2+RibmLFGwFdeeKHFcOTlrt7xplBnya5OGn/hIRDsqDiSUcfORsDC7MPxwork8jBwsIWA=="
     },
+    "react@19.3.1": {
+      "integrity": "sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw=="
+    },
     "scheduler@0.27.0": {
       "integrity": "sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q=="
-    },
-    "sorted-btree@1.8.1": {
-      "integrity": "sha512-395+XIP+wqNn3USkFSrNz7G3Ss/MXlZEqesxvzCRFwL14h6e8LukDHdLBePn5pwbm5OQ9vGu8mDyz2lLDIqamQ=="
     },
     "typescript@7.0.2": {
       "integrity": "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA==",
@@ -227,13 +228,13 @@
       "jsr:@std/assert@1",
       "jsr:@std/async@1",
       "jsr:@std/fs@1",
-      "npm:@tanstack/db@0.13.0",
-      "npm:@tanstack/react-db@0.5.8",
+      "npm:@tanstack/db@0.15.2",
+      "npm:@tanstack/react-db@0.5.12",
       "npm:@types/react@19.2.17",
       "npm:expo@57.0.27",
       "npm:react-native@0.86.3",
       "npm:react-test-renderer@19.2.3",
-      "npm:react@19.2.3"
+      "npm:react@19.3.1"
     ],
     "packageJson": {
       "dependencies": [
@@ -269,7 +270,7 @@
       },
       "jsr:@netscript/auth-kv-oauth@0.0.9": {
         "dependencies": [
-          "jsr:@panva/oauth4webapi@^3.8.8",
+          "jsr:@panva/oauth4webapi@^3.8.9",
           "jsr:@std/assert@1"
         ]
       },
@@ -286,7 +287,7 @@
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
           "jsr:@std/streams@1",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/cli-e2e@0.0.9": {
@@ -296,7 +297,7 @@
           "jsr:@std/assert@1",
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/cli@0.0.9": {
@@ -338,7 +339,7 @@
       },
       "jsr:@netscript/contracts@0.0.9": {
         "dependencies": [
-          "npm:@orpc/contract@^1.15.5"
+          "npm:@orpc/contract@^1.16.6"
         ]
       },
       "jsr:@netscript/cron@0.0.9": {
@@ -359,7 +360,7 @@
           "jsr:@netscript/sdk@0.0.9",
           "jsr:@std/assert@1",
           "npm:highlight.js@11",
-          "npm:preact@^10.29.2"
+          "npm:preact@^10.29.8"
         ]
       },
       "jsr:@netscript/fresh@0.0.9": {
@@ -377,17 +378,17 @@
           "npm:@durable-streams/client@0.2.7",
           "npm:@durable-streams/state@0.3.2",
           "npm:@durable-streams/tanstack-ai-transport@0.0.10",
-          "npm:@orpc/server@^1.15.5",
-          "npm:@preact/signals@2.11.3",
+          "npm:@orpc/server@^1.16.6",
+          "npm:@preact/signals@2.11.4",
           "npm:@tanstack/ai-client@0.39.2",
           "npm:@tanstack/ai-preact@0.20.3",
           "npm:@tanstack/ai@0.68.0",
-          "npm:@tanstack/preact-query@^5.104.1",
-          "npm:@tanstack/query-core@^5.104.1",
-          "npm:@tanstack/react-db@0.5.8",
-          "npm:preact-render-to-string@^6.8.0",
-          "npm:preact@^10.29.2",
-          "npm:vite@7.2.2"
+          "npm:@tanstack/preact-query@^5.108.4",
+          "npm:@tanstack/query-core@^5.108.4",
+          "npm:@tanstack/react-db@0.5.12",
+          "npm:preact-render-to-string@^6.8.3",
+          "npm:preact@^10.29.8",
+          "npm:vite@7.3.8"
         ]
       },
       "jsr:@netscript/kv@0.0.9": {
@@ -402,10 +403,10 @@
       },
       "jsr:@netscript/logger@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@logtape/logtape@2",
           "jsr:@std/assert@1",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/mcp@0.0.9": {
@@ -424,8 +425,8 @@
           "jsr:@netscript/ai@0.0.9",
           "jsr:@netscript/plugin@0.0.9",
           "jsr:@std/assert@1",
-          "npm:@orpc/contract@^1.15.5",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/contract@^1.16.6",
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/plugin-ai@0.0.9": {
@@ -439,8 +440,8 @@
         "dependencies": [
           "jsr:@netscript/plugin-streams-core@0.0.9",
           "jsr:@std/assert@1",
-          "npm:@orpc/contract@^1.15.5",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/contract@^1.16.6",
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/plugin-auth@0.0.9": {
@@ -466,7 +467,7 @@
       },
       "jsr:@netscript/plugin-sagas-core@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@netscript/database@0.0.9",
           "jsr:@netscript/kv@0.0.9",
           "jsr:@netscript/plugin-streams-core@0.0.9",
@@ -479,7 +480,7 @@
       },
       "jsr:@netscript/plugin-sagas@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@netscript/config@0.0.9",
           "jsr:@netscript/contracts@0.0.9",
           "jsr:@netscript/kv@0.0.9",
@@ -501,7 +502,7 @@
       },
       "jsr:@netscript/plugin-streams@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@netscript/aspire@0.0.9",
           "jsr:@netscript/contracts@0.0.9",
           "jsr:@netscript/plugin-streams-core@0.0.9",
@@ -522,7 +523,7 @@
       },
       "jsr:@netscript/plugin-triggers@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@netscript/config@0.0.9",
           "jsr:@netscript/contracts@0.0.9",
           "jsr:@netscript/kv@0.0.9",
@@ -548,13 +549,13 @@
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
-          "npm:@orpc/contract@^1.15.5",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/contract@^1.16.6",
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/plugin-workers@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@netscript/config@0.0.9",
           "jsr:@netscript/contracts@0.0.9",
           "jsr:@netscript/cron@0.0.9",
@@ -579,17 +580,17 @@
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
           "jsr:@std/semver@1",
-          "npm:@orpc/contract@^1.15.5",
-          "npm:@orpc/server@^1.15.5"
+          "npm:@orpc/contract@^1.16.6",
+          "npm:@orpc/server@^1.16.6"
         ]
       },
       "jsr:@netscript/prisma-adapter-mysql@0.0.9": {},
       "jsr:@netscript/queue@0.0.9": {
         "dependencies": [
-          "jsr:@fedify/amqp@^2.4.2",
-          "jsr:@fedify/denokv@^2.4.2",
-          "jsr:@fedify/fedify@^2.4.2",
-          "jsr:@fedify/redis@^2.4.2",
+          "jsr:@fedify/amqp@^2.4.6",
+          "jsr:@fedify/denokv@^2.4.6",
+          "jsr:@fedify/fedify@^2.4.6",
+          "jsr:@fedify/redis@^2.4.6",
           "jsr:@std/assert@1",
           "jsr:@std/async@1"
         ]
@@ -605,41 +606,41 @@
           "jsr:@netscript/service@0.0.9",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@orpc/client@^1.15.5",
-          "npm:@orpc/contract@^1.15.5",
-          "npm:@orpc/openapi@^1.15.5",
-          "npm:@orpc/server@^1.15.5",
-          "npm:@orpc/tanstack-query@^1.15.5",
-          "npm:@orpc/zod@^1.15.5",
-          "npm:@tanstack/db@0.13.0",
-          "npm:@tanstack/query-core@^5.104.1",
-          "npm:@tanstack/query-db-collection@1.4.3",
-          "npm:@tanstack/react-db@0.5.8",
-          "npm:react@^19.2.3"
+          "npm:@orpc/client@^1.16.6",
+          "npm:@orpc/contract@^1.16.6",
+          "npm:@orpc/openapi@^1.16.6",
+          "npm:@orpc/server@^1.16.6",
+          "npm:@orpc/tanstack-query@^1.16.6",
+          "npm:@orpc/zod@^1.16.6",
+          "npm:@tanstack/db@0.15.2",
+          "npm:@tanstack/query-core@^5.108.4",
+          "npm:@tanstack/query-db-collection@1.4.8",
+          "npm:@tanstack/react-db@0.5.12",
+          "npm:react@^19.3.1"
         ]
       },
       "jsr:@netscript/service@0.0.9": {
         "dependencies": [
-          "jsr:@hono/hono@4.13.13",
+          "jsr:@hono/hono@4.13.22",
           "jsr:@netscript/database@0.0.9",
           "jsr:@netscript/kv@0.0.9",
           "jsr:@netscript/telemetry@0.0.9",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@orpc/client@^1.15.5",
-          "npm:@orpc/contract@^1.15.5",
-          "npm:@orpc/openapi@^1.15.5",
-          "npm:@orpc/server@^1.15.5",
-          "npm:@orpc/zod@^1.15.5",
+          "npm:@orpc/client@^1.16.6",
+          "npm:@orpc/contract@^1.16.6",
+          "npm:@orpc/openapi@^1.16.6",
+          "npm:@orpc/server@^1.16.6",
+          "npm:@orpc/zod@^1.16.6",
           "npm:rou3@~0.7.12"
         ]
       },
       "jsr:@netscript/telemetry@0.0.9": {
         "dependencies": [
-          "jsr:@hono/otel@^1.2.0",
+          "jsr:@hono/otel@^1.4.0",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@opentelemetry/semantic-conventions@1.43.0"
+          "npm:@opentelemetry/semantic-conventions@1.45.0"
         ]
       },
       "jsr:@netscript/watchers@0.0.9": {

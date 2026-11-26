@@ -33,7 +33,7 @@ export function generateDatabaseDenoJson(
   const imports = resolveNetScriptImports(options.importMode, options.localBase);
   const scriptTasks = [
     'deno task db:clear-seeded-client',
-    `${DENO_SCRIPT_RUN} npm:prisma@^7.10.0 generate --generator client --config prisma.config.ts`,
+    `${DENO_SCRIPT_RUN} npm:prisma@^7.10.1 generate --generator client --config prisma.config.ts`,
   ];
   if (provider.capabilities.hasZodGeneration) {
     scriptTasks.push(`${DENO_SCRIPT_RUN} scripts/generate-zod.ts`);
@@ -53,43 +53,43 @@ export function generateDatabaseDenoJson(
     [`db:migrate:${provider.engine}`]: 'deno task db:migrate',
     'db:migrate:all': 'deno task db:migrate',
     'db:migrate:deploy':
-      `${DENO_SCRIPT_RUN} npm:prisma@^7.10.0 migrate deploy --config prisma.config.ts`,
+      `${DENO_SCRIPT_RUN} npm:prisma@^7.10.1 migrate deploy --config prisma.config.ts`,
     [`db:deploy:${provider.engine}`]: 'deno task db:migrate:deploy',
     'db:deploy:all': 'deno task db:migrate:deploy',
-    'db:push': `${DENO_SCRIPT_RUN} npm:prisma@^7.10.0 db push --config prisma.config.ts`,
+    'db:push': `${DENO_SCRIPT_RUN} npm:prisma@^7.10.1 db push --config prisma.config.ts`,
     'db:studio':
-      `${DENO_SCRIPT_RUN} npm:prisma@^7.10.0 studio --config prisma.config.ts --port 5555`,
+      `${DENO_SCRIPT_RUN} npm:prisma@^7.10.1 studio --config prisma.config.ts --port 5555`,
     [`db:studio:${provider.engine}`]: 'deno task db:studio',
     'db:studio:all': 'deno task db:studio',
     'db:seed': `${DENO_SCRIPT_RUN} ./scripts/seed.ts`,
     [`db:seed:${provider.engine}`]: 'deno task db:seed',
     'db:seed:all': 'deno task db:seed',
-    'db:introspect': `${DENO_SCRIPT_RUN} npm:prisma@^7.10.0 db pull --config prisma.config.ts`,
+    'db:introspect': `${DENO_SCRIPT_RUN} npm:prisma@^7.10.1 db pull --config prisma.config.ts`,
     [`db:introspect:${provider.engine}`]: 'deno task db:introspect',
     'db:introspect:all': 'deno task db:introspect',
     'db:reset':
-      `${DENO_SCRIPT_RUN} npm:prisma@^7.10.0 migrate reset --force --config prisma.config.ts`,
+      `${DENO_SCRIPT_RUN} npm:prisma@^7.10.1 migrate reset --force --config prisma.config.ts`,
     [`db:reset:${provider.engine}`]: 'deno task db:reset',
     'db:reset:all': 'deno task db:reset',
-    'db:status': `${DENO_SCRIPT_RUN} npm:prisma@^7.10.0 migrate status --config prisma.config.ts`,
+    'db:status': `${DENO_SCRIPT_RUN} npm:prisma@^7.10.1 migrate status --config prisma.config.ts`,
     [`db:status:${provider.engine}`]: 'deno task db:status',
     'db:status:all': 'deno task db:status',
-    'db:validate': `${DENO_SCRIPT_RUN} npm:prisma@^7.10.0 validate --schema schema/schema.prisma`,
+    'db:validate': `${DENO_SCRIPT_RUN} npm:prisma@^7.10.1 validate --schema schema/schema.prisma`,
     [`db:validate:${provider.engine}`]: 'deno task db:validate',
     'db:validate:all': 'deno task db:validate',
     'db:resolve-applied':
-      `${DENO_SCRIPT_RUN} npm:prisma@^7.10.0 migrate resolve --applied=$PRISMA_MIGRATION_NAME --config prisma.config.ts`,
+      `${DENO_SCRIPT_RUN} npm:prisma@^7.10.1 migrate resolve --applied=$PRISMA_MIGRATION_NAME --config prisma.config.ts`,
     [`db:resolve-applied:${provider.engine}`]: 'deno task db:resolve-applied',
     'db:resolve-applied:all': 'deno task db:resolve-applied',
     'db:resolve-rolled-back':
-      `${DENO_SCRIPT_RUN} npm:prisma@^7.10.0 migrate resolve --rolled-back=$PRISMA_MIGRATION_NAME --config prisma.config.ts`,
+      `${DENO_SCRIPT_RUN} npm:prisma@^7.10.1 migrate resolve --rolled-back=$PRISMA_MIGRATION_NAME --config prisma.config.ts`,
     [`db:resolve-rolled-back:${provider.engine}`]: 'deno task db:resolve-rolled-back',
     'db:resolve-rolled-back:all': 'deno task db:resolve-rolled-back',
   };
 
   if (provider.capabilities.hasPrismaFormat) {
     tasks['db:format'] =
-      `${DENO_SCRIPT_RUN} npm:prisma@^7.10.0 format --schema schema/schema.prisma`;
+      `${DENO_SCRIPT_RUN} npm:prisma@^7.10.1 format --schema schema/schema.prisma`;
   }
   if (provider.capabilities.hasZodGeneration) {
     tasks['db:zod'] = `${DENO_SCRIPT_RUN} scripts/generate-zod.ts`;
@@ -123,12 +123,12 @@ export function generateDatabaseDenoJson(
     tasks,
     imports: {
       [SCAFFOLD_PACKAGES.STD_PATH]: imports[SCAFFOLD_PACKAGES.STD_PATH],
-      prisma: 'npm:prisma@^7.10.0',
-      '@prisma/client': 'npm:@prisma/client@^7.10.0',
-      '@prisma/instrumentation-contract': 'npm:@prisma/instrumentation-contract@^7.10.0',
+      prisma: 'npm:prisma@^7.10.1',
+      '@prisma/client': 'npm:@prisma/client@^7.10.1',
+      '@prisma/instrumentation-contract': 'npm:@prisma/instrumentation-contract@^7.10.1',
       '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.0',
       dotenv: 'npm:dotenv@^16.4.7',
-      zod: 'npm:zod@^4.6.5',
+      zod: 'npm:zod@^4.6.7',
       ...databaseImports,
       [SCAFFOLD_PACKAGES.NETSCRIPT_SDK]: imports[SCAFFOLD_PACKAGES.NETSCRIPT_SDK],
       ...adapterImports(provider.engine, imports),
@@ -148,7 +148,7 @@ function adapterImports(
 ): Record<string, string> {
   if (engine === 'postgres') {
     return {
-      '@prisma/adapter-pg': 'npm:@prisma/adapter-pg@^7.10.0',
+      '@prisma/adapter-pg': 'npm:@prisma/adapter-pg@^7.10.1',
       pg: 'npm:pg@^8.23.1',
     };
   }
@@ -159,10 +159,10 @@ function adapterImports(
     };
   }
   if (engine === 'mssql') {
-    return { '@prisma/adapter-mssql': 'npm:@prisma/adapter-mssql@^7.10.0' };
+    return { '@prisma/adapter-mssql': 'npm:@prisma/adapter-mssql@^7.10.1' };
   }
   if (engine === 'sqlite') {
-    return { '@prisma/adapter-libsql': 'npm:@prisma/adapter-libsql@^7.10.0' };
+    return { '@prisma/adapter-libsql': 'npm:@prisma/adapter-libsql@^7.10.1' };
   }
   return {};
 }

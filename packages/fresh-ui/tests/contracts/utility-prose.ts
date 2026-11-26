@@ -47,7 +47,7 @@ export async function renderCopiedProse(
         name: '@netscript/prose-contract-fixture',
         version: '0.0.0',
         imports: {
-          preact: 'npm:preact@^10.29.2',
+          preact: 'npm:preact@^10.29.8',
           'preact-render-to-string': 'npm:preact-render-to-string@^6.7.0',
         },
         compilerOptions: {

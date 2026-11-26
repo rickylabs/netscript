@@ -12,7 +12,7 @@ export const postgresProvider: DbEngineProvider = Object.freeze({
   dirName: 'postgres',
   aspireMethod: 'addPostgres',
   supportsContainerMode: true,
-  defaultImageTag: '17',
+  defaultImageTag: '18',
   capabilities: Object.freeze({
     hasZodGeneration: true,
     hasPrismaFormat: true,

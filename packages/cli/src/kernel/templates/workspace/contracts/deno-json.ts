@@ -10,10 +10,10 @@ import { netscriptJsrSpecifier } from '../../../constants/jsr-specifiers.ts';
  * packages regardless of import mode.
  */
 const CONTRACTS_DIRECT_DEPS: Readonly<Record<string, string>> = {
-  '@orpc/contract': 'npm:@orpc/contract@^1.15.5',
-  '@orpc/server': 'npm:@orpc/server@^1.15.5',
+  '@orpc/contract': 'npm:@orpc/contract@^1.16.6',
+  '@orpc/server': 'npm:@orpc/server@^1.16.6',
   '@netscript/contracts': netscriptJsrSpecifier('contracts'),
-  'zod': 'npm:zod@^4.6.5',
+  'zod': 'npm:zod@^4.6.7',
 };
 
 /**

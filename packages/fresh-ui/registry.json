@@ -1287,7 +1287,7 @@
       "author": "NetScript",
       "dependencies": [
         "npm:clsx@^2.1.1",
-        "npm:tailwind-merge@^3.7.0"
+        "npm:tailwind-merge@^3.7.1"
       ],
       "type": "registry:lib",
       "files": [
@@ -3844,7 +3844,7 @@
       ],
       "dependencies": [
         "jsr:@netscript/sdk@0.0.9/desktop",
-        "npm:preact@^10.29.2"
+        "npm:preact@^10.29.8"
       ],
       "type": "registry:component",
       "files": [
@@ -3920,7 +3920,7 @@
       ],
       "dependencies": [
         "jsr:@netscript/ai@0.0.9",
-        "npm:preact@^10.29.2"
+        "npm:preact@^10.29.8"
       ],
       "type": "registry:lib",
       "files": [

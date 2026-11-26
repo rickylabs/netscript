@@ -76,7 +76,7 @@ async function server() {
     `netscript.test-owner=${owner}`,
     '--publish',
     '0.0.0.0::6379',
-    'redis:7',
+    'redis:8',
     'sh',
     '-c',
     'exec sleep infinity',

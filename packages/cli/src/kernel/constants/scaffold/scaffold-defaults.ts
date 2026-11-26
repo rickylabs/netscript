@@ -9,7 +9,7 @@ export const SCAFFOLD_DEFAULTS = {
   SERVICE_NAME: 'users',
   DB_ENGINE: 'none' as const,
   CACHE_ENABLED: true,
-  CACHE_BACKEND: 'redis' as const,
+  CACHE_BACKEND: 'garnet' as const,
   EDITOR: 'none' as const,
   ASPIRE_TS_APPHOST_PATH: 'aspire/apphost.mts',
   COMPILER_OPTIONS: {

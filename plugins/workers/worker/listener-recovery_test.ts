@@ -128,7 +128,7 @@ Deno.test({
     });
     try {
       // Only this ephemeral ACL user's rights change; no CONFIG, flush or shared-user mutation.
-      await admin.acl('SETUSER', name, 'on', `>${password}`, '~*', '&*', '+@all');
+      await admin.acl('SETUSER', name, 'on', `>${password}`, '~*', '+@all');
       listener.start();
       started = true;
       await producer.enqueue(0);

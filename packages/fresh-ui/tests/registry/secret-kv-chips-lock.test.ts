@@ -15,8 +15,8 @@ Deno.test('netscript ui:add installs secret-field, key-value-editor, and chips-i
         name: '@netscript/secret-kv-lock-test',
         version: '0.0.0',
         imports: {
-          preact: 'npm:preact@^10.29.2',
-          '@preact/signals': 'npm:@preact/signals@2.11.3',
+          preact: 'npm:preact@^10.29.8',
+          '@preact/signals': 'npm:@preact/signals@2.11.4',
         },
         compilerOptions: {
           jsx: 'precompile',

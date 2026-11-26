@@ -40,8 +40,8 @@ Deno.test('Phase-two registry gaps preserve installed source and consumer APIs',
         name: '@netscript/actions-contract-test',
         version: '0.0.0',
         imports: {
-          preact: 'npm:preact@^10.29.2',
-          '@preact/signals': 'npm:@preact/signals@2.11.3',
+          preact: 'npm:preact@^10.29.8',
+          '@preact/signals': 'npm:@preact/signals@2.11.4',
         },
         compilerOptions: {
           jsx: 'precompile',

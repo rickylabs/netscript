@@ -1,7 +1,7 @@
 {
   "workspace": [],
   "catalog": {
-    "zod": "^4.6.5"
+    "zod": "^4.6.7"
   },
   "imports": {
     "@durable-streams/client": "npm:@durable-streams/client@0.2.7",
@@ -10,8 +10,8 @@
     "@netscript/fresh/streams": "../../src/runtime/streams/mod.ts",
     "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.4",
     "@opentelemetry/api": "npm:@opentelemetry/api@1.9.1",
-    "@tanstack/db": "npm:@tanstack/db@0.13.0",
-    "@tanstack/react-db": "npm:@tanstack/react-db@0.5.8",
+    "@tanstack/db": "npm:@tanstack/db@0.15.2",
+    "@tanstack/react-db": "npm:@tanstack/react-db@0.5.12",
     "zod": "catalog:"
   },
   "compilerOptions": {

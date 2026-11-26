@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from 'jsr:@std/assert@^1';
-import { PrismaPg } from 'npm:@prisma/adapter-pg@7.10.0';
+import { PrismaPg } from 'npm:@prisma/adapter-pg@7.10.1';
 
 import type {
   SagaCorrelationKey,

@@ -10,7 +10,7 @@ import { AmqpAdapter } from '@netscript/queue/adapters/amqp';
 import { MemoryDeadLetterStore, MemoryQueueAdapter } from '@netscript/queue/testing';
 import { Pool } from 'npm:pg@^8.23.1';
 // @ts-types="npm:@types/amqplib@^0.10.7"
-import { connect } from 'npm:amqplib@^2.2.0';
+import { connect } from 'npm:amqplib@^2.4.1';
 import { bounded } from '../../../packages/queue/tests/_fixtures/redis-lease-harness.ts';
 import { recoveryContext } from './test_utils/redis-worker-context.ts';
 import { Worker } from './worker.ts';

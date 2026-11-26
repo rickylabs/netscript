@@ -21,7 +21,7 @@ Deno.test('database scaffolds keep every Prisma executable and adapter on the qu
     }
     const prismaTasks = Object.values(config.tasks).filter((task) => task.includes('npm:prisma@'));
     assert(prismaTasks.length > 0);
-    for (const task of prismaTasks) assertStringIncludes(task, 'npm:prisma@^7.10.0 ');
+    for (const task of prismaTasks) assertStringIncludes(task, 'npm:prisma@^7.10.1 ');
     if (engine === 'postgres') assertEquals(config.imports.pg, 'npm:pg@^8.23.1');
   }
 });

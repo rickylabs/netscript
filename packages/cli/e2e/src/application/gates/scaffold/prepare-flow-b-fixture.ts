@@ -63,9 +63,9 @@ const publishedImports = {
 };
 const sharedNpmImports = {
   '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.1',
-  '@orpc/client': 'npm:@orpc/client@^1.15.5',
-  '@orpc/contract': 'npm:@orpc/contract@^1.15.5',
-  '@orpc/otel': 'npm:@orpc/otel@^1.15.5',
+  '@orpc/client': 'npm:@orpc/client@^1.16.6',
+  '@orpc/contract': 'npm:@orpc/contract@^1.16.6',
+  '@orpc/otel': 'npm:@orpc/otel@^1.16.6',
 };
 const localSourcePackages = [
   [

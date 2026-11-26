@@ -11,9 +11,9 @@ Deno.test('generated Prisma bridge retains model delegates and excludes all root
       JSON.stringify({
         compilerOptions: { strict: true, isolatedDeclarations: false },
         imports: {
-          '@prisma/client': 'npm:@prisma/client@^7.10.0',
-          '@prisma/adapter-pg': 'npm:@prisma/adapter-pg@^7.10.0',
-          prisma: 'npm:prisma@7.10.0',
+          '@prisma/client': 'npm:@prisma/client@^7.10.1',
+          '@prisma/adapter-pg': 'npm:@prisma/adapter-pg@^7.10.1',
+          prisma: 'npm:prisma@7.10.1',
         },
       }),
     );
@@ -26,7 +26,7 @@ Deno.test('generated Prisma bridge retains model delegates and excludes all root
         '--config',
         temp + '/deno.json',
         '-A',
-        'npm:prisma@7.10.0',
+        'npm:prisma@7.10.1',
         'generate',
         '--schema',
         temp + '/schema.prisma',

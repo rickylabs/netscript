@@ -1,7 +1,7 @@
 /** Focused execution of the generated credential carrier against the builder port. */
 import { assert, assertEquals, assertRejects } from '@std/assert';
 import { dirname, join } from '@std/path';
-import { os } from 'npm:@orpc/server@^1.15.5';
+import { os } from 'npm:@orpc/server@^1.16.6';
 import { createService } from '@netscript/service';
 import {
   createCompositeAuthenticator,

@@ -66,7 +66,7 @@ Deno.test('dependency mutation installs into the existing lock before frozen con
     await runLockedProbe([probe], root, root);
     assertEquals(await Deno.readTextFile(lock), installed);
     // Installing a legitimate mutation does not grant subsequent runs permission to drift.
-    await Deno.writeTextFile(probe, "import 'npm:@orpc/client@1.15.5';\n");
+    await Deno.writeTextFile(probe, "import 'npm:@orpc/client@1.16.6';\n");
     await assertRejects(() => runLockedProbe([probe], root, root), Error);
     assertEquals(await Deno.readTextFile(lock), installed);
   } finally {
