@@ -18,6 +18,7 @@
 import { toHttpPath } from '@orpc/client/standard';
 import { fallbackContractConfig, type HTTPMethod } from '@orpc/contract';
 import { toRou3Pattern } from '@orpc/openapi/standard';
+import { isLazy } from '@orpc/server';
 import { addRoute, createRouter, findRoute } from 'rou3';
 import { isWithinPrefix, normalizePath } from './contract-path.ts';
 import type {
@@ -207,6 +208,13 @@ function traverseContract(
   routerPath: readonly string[],
   visit: (procedure: ContractProcedure, path: readonly string[]) => void,
 ): void {
+  if (isLazy(contract)) {
+    throw new Error(
+      `[netscript.service.contract-policy] unresolved lazy oRPC route in contract: ${
+        routerPath.length ? routerPath.join('.') : '<root>'
+      }`,
+    );
+  }
   if (isContractProcedure(contract)) {
     visit(contract, routerPath);
     return;

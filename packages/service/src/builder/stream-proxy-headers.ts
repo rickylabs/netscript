@@ -75,12 +75,24 @@ function isSafeHeaderValue(value: unknown): value is string {
   return true;
 }
 
-/** Validates deferred `AuthnResult.responseHeaders` and `AuthnResult.setCookies` fail-closed. */
+/**
+ * Validates deferred `AuthnResult.responseHeaders` and `AuthnResult.setCookies` fail-closed.
+ * Reads all fields strictly inside a protected `try/catch` boundary so throwing getters return
+ * a redacted `503` instead of escaping to Hono's generic `500` error handler.
+ */
 export function validateAuthnStreamOverlayHeaders(
-  responseHeaders: Readonly<Record<string, string>> | undefined,
-  setCookies: readonly string[] | undefined,
+  authnResult: unknown,
 ): ValidatedAuthnOverlayResult {
   try {
+    if (authnResult === undefined) {
+      return { ok: true, headers: [], setCookies: [] };
+    }
+    if (typeof authnResult !== 'object' || authnResult === null) {
+      return { ok: false, reason: 'invalid_authn_response_headers' };
+    }
+    const responseHeaders: unknown = Reflect.get(authnResult, 'responseHeaders');
+    const setCookies: unknown = Reflect.get(authnResult, 'setCookies');
+
     const probe = new Headers();
     const entries: Array<readonly [string, string]> = [];
     if (responseHeaders !== undefined) {
@@ -159,9 +171,7 @@ export function composeMountedStreamResponse(
   }
 
   if (proxyResponse.status === 200) {
-    if (!finalHeaders.get('content-type')?.toLowerCase().startsWith('text/event-stream')) {
-      finalHeaders.set('content-type', 'text/event-stream; charset=utf-8');
-    }
+    finalHeaders.set('content-type', 'text/event-stream; charset=utf-8');
     finalHeaders.set('cache-control', STREAM_MOUNT_SSE_CACHE_CONTROL);
     finalHeaders.set('x-content-type-options', 'nosniff');
     finalHeaders.set('x-accel-buffering', 'no');

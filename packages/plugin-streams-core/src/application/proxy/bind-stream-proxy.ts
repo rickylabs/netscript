@@ -17,6 +17,30 @@ interface SyncParseableSchema {
   };
 }
 
+function isThenableAndConsume(value: unknown): boolean {
+  if (value === null || (typeof value !== 'object' && typeof value !== 'function')) {
+    return false;
+  }
+  let thenFn: unknown;
+  try {
+    thenFn = Reflect.get(value, 'then');
+  } catch {
+    // A throwing `.then` getter cannot safely be treated as validated synchronous output.
+    return true;
+  }
+  if (typeof thenFn !== 'function') {
+    return false;
+  }
+  // Attach a no-op rejection handler so an async-rejecting Promise/thenable never triggers
+  // an unhandled rejection after we fail closed synchronously.
+  try {
+    Reflect.apply(thenFn, value, [undefined, () => {}]);
+  } catch {
+    // Ignore synchronous throw from hostile thenable.
+  }
+  return true;
+}
+
 function parseSchemaSync(
   schema: unknown,
   input: unknown,
@@ -25,7 +49,11 @@ function parseSchemaSync(
   const candidate = schema as SyncParseableSchema;
   if (typeof candidate.parse === 'function') {
     try {
-      return { ok: true, value: candidate.parse(input) };
+      const parsed = candidate.parse(input);
+      if (isThenableAndConsume(parsed)) {
+        return { ok: false };
+      }
+      return { ok: true, value: parsed };
     } catch {
       return { ok: false };
     }
@@ -35,10 +63,9 @@ function parseSchemaSync(
     try {
       const result = validate(input);
       if (
+        isThenableAndConsume(result) ||
         typeof result !== 'object' ||
-        result === null ||
-        result instanceof Promise ||
-        typeof (result as { then?: unknown }).then === 'function'
+        result === null
       ) {
         return { ok: false };
       }
@@ -46,7 +73,11 @@ function parseSchemaSync(
         return { ok: false };
       }
       if ('value' in result) {
-        return { ok: true, value: (result as { value: unknown }).value };
+        const value = (result as { value: unknown }).value;
+        if (isThenableAndConsume(value)) {
+          return { ok: false };
+        }
+        return { ok: true, value };
       }
     } catch {
       return { ok: false };
@@ -104,13 +135,24 @@ function buildBoundInputValidator<TParams, TQuery>(
     validate(rawParams: Readonly<Record<string, string>>, rawQuery: URLSearchParams) {
       let validatedParams: TParams;
       if (endpoint.params !== undefined) {
-        const paramObject: Record<string, string> = {};
+        if (typeof rawParams !== 'object' || rawParams === null) {
+          return { ok: false, reason: 'invalid_stream_params' };
+        }
+        const paramObject: Record<string, string> = Object.create(null);
         for (const name of endpoint.paramNames) {
-          const val = rawParams[name];
+          if (!Object.hasOwn(rawParams, name)) {
+            return { ok: false, reason: 'invalid_stream_params' };
+          }
+          const val: unknown = Reflect.get(rawParams, name);
           if (typeof val !== 'string') {
             return { ok: false, reason: 'invalid_stream_params' };
           }
-          paramObject[name] = val;
+          Object.defineProperty(paramObject, name, {
+            value: val,
+            enumerable: true,
+            writable: true,
+            configurable: true,
+          });
         }
         const parsed = parseSchemaSync(endpoint.params, paramObject);
         if (!parsed.ok) {
@@ -130,9 +172,14 @@ function buildBoundInputValidator<TParams, TQuery>(
           if (list) list.push(value);
           else grouped.set(key, [value]);
         }
-        const queryObject: Record<string, string | readonly string[]> = {};
+        const queryObject: Record<string, string | readonly string[]> = Object.create(null);
         for (const [key, values] of grouped.entries()) {
-          queryObject[key] = values.length === 1 ? values[0]! : values;
+          Object.defineProperty(queryObject, key, {
+            value: values.length === 1 ? values[0]! : values,
+            enumerable: true,
+            writable: true,
+            configurable: true,
+          });
         }
         const parsed = parseSchemaSync(endpoint.query, queryObject);
         if (!parsed.ok) {
@@ -183,7 +230,7 @@ export function buildBoundStreamProxyMount<TParams, TQuery, TGrant = unknown>(
         : {}),
       ...(options.trustProxy !== undefined ? { trustProxy: options.trustProxy } : {}),
       ...(options.allowDirectNavigation !== undefined
-        ? { allowDirectNavigation: options.allowDirectNavigation }
+        ? { allowDirectNavigation: options.allowDirectNavigation === true }
         : {}),
     })
     : undefined;

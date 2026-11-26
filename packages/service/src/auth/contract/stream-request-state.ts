@@ -17,10 +17,12 @@ export interface StreamProxyRequestState {
   readonly credentialMode: 'bearer' | 'cookie';
   /** Whether the matched stream endpoint requires authentication (`authentication !== 'none'`). */
   readonly authenticationRequired: boolean;
-  /** Deferred `AuthnResult.responseHeaders` recorded by `createAuthnMiddleware` for final ownership checks. */
-  authnResponseHeaders?: Readonly<Record<string, string>>;
-  /** Deferred `AuthnResult.setCookies` recorded by `createAuthnMiddleware` for additive composition. */
-  authnSetCookies?: readonly string[];
+  /**
+   * Raw `AuthnResult` object handed to the mounted stream route wrapper without reading its
+   * `responseHeaders` or `setCookies` properties outside the protected fail-closed validation
+   * boundary (so throwing getters produce redacted `503` instead of `500`).
+   */
+  authnResult?: unknown;
 }
 
 const STREAM_REQUEST_STATES = new WeakMap<Request, StreamProxyRequestState>();

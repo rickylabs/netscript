@@ -21,8 +21,10 @@ import {
 } from '../middleware/service-cors.ts';
 import type {
   ContractPolicyAuthorizerPort,
+  InternalCallerPredicate,
   ProcedurePolicyResolver,
 } from '../auth/contract/contract-policy.ts';
+import { getBoundContractAuthorizer } from '../auth/contract/procedure-policy-decision.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import type { AuthorizerPort } from '../auth/types.ts';
 import {
@@ -119,7 +121,7 @@ export class ServiceBuilderImpl<
   private deferredRoutesInstalled = false;
   private serviceInfoConfigured = false;
   private streamProxies: StreamProxyMount[] = [];
-  private hasBoundContractPolicy = false;
+  private boundInternalCaller: InternalCallerPredicate | undefined;
 
   constructor(router: TRouter, config: ServiceConfig) {
     this.app = new Hono();
@@ -559,7 +561,8 @@ export class ServiceBuilderImpl<
   private installAuth(preparedStreams: readonly PreparedStreamProxyMount[]): void {
     if (this.authInstalled) return;
     const policyResolver = this.bindContractPolicy();
-    this.hasBoundContractPolicy = policyResolver !== undefined;
+    const boundContract = getBoundContractAuthorizer(policyResolver);
+    this.boundInternalCaller = boundContract?.isInternalCaller;
     if (preparedStreams.length > 0) {
       this.app.use('*', createPreAuthnStreamGuardMiddleware(preparedStreams));
     }
@@ -569,6 +572,7 @@ export class ServiceBuilderImpl<
     const authz = this.authzOptions
       ? createAuthzMiddleware({
         ...this.authzOptions,
+        authorizer: boundContract?.authorizer ?? this.authzOptions.authorizer,
         protect: this.authnOptions?.protect,
         allowAnonymous: this.authnOptions?.allowAnonymous,
         policyResolver,
@@ -604,7 +608,7 @@ export class ServiceBuilderImpl<
     this.deferredRoutesInstalled = true;
 
     if (preparedStreams.length > 0) {
-      installStreamProxyRoutes(this.app, preparedStreams, this.hasBoundContractPolicy);
+      installStreamProxyRoutes(this.app, preparedStreams, this.boundInternalCaller);
     }
 
     if (this.openApiConfigured) {

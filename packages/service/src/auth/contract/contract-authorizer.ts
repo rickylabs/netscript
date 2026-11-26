@@ -23,8 +23,11 @@ import {
   resolveAuthoritativeStreamEndpoints,
 } from './stream-endpoint-policy.ts';
 import { isInternalServicePrincipal } from '../internal-credential/internal-credential-authenticator.ts';
-import { authorizeProcedurePolicy } from './procedure-policy-decision.ts';
-import type { AuthzDecision, AuthzRequest } from '../types.ts';
+import {
+  authorizeProcedurePolicy,
+  registerBoundContractAuthorizer,
+} from './procedure-policy-decision.ts';
+import type { AuthorizerPort, AuthzDecision, AuthzRequest } from '../types.ts';
 import { PROCEDURE_ERROR_CODES } from '../types.ts';
 
 const RAW_ROUTE_OVERLAP_ERROR =
@@ -81,7 +84,44 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
   if (options.streamEndpoints !== undefined) {
     resolveAuthoritativeStreamEndpoints(undefined, options.streamEndpoints);
   }
-  let resolver: ProcedurePolicyResolver | undefined;
+  let lastResolver: ProcedurePolicyResolver | undefined;
+
+  async function authorizeWithResolver(
+    activeResolver: ProcedurePolicyResolver,
+    request: AuthzRequest,
+  ): Promise<AuthzDecision> {
+    const resolution = activeResolver.resolve({
+      method: request.method,
+      path: request.rawPath ?? request.path,
+      routePath: request.path,
+    });
+    if (!resolution.matched) {
+      return {
+        allow: false,
+        reason: 'authz.no-contract-procedure',
+        code: PROCEDURE_ERROR_CODES.NOT_FOUND,
+      };
+    }
+    if (resolution.retired) {
+      return {
+        allow: false,
+        reason: 'authz.procedure-retired',
+        code: PROCEDURE_ERROR_CODES.RETIRED,
+      };
+    }
+
+    if (!resolution.policy) {
+      const fallback = options.fallback;
+      if (!fallback) {
+        return deny('authz.no-matching-rule');
+      }
+
+      const fallbackResult = await fallback.authorizeMatch(request);
+      return fallbackResult.matched ? fallbackResult.decision : deny('authz.no-matching-rule');
+    }
+
+    return authorizeProcedurePolicy(request, resolution.policy, isInternalCaller);
+  }
 
   return {
     bind(binding: ContractPolicyBindingOptions): ProcedurePolicyResolver {
@@ -101,7 +141,7 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
       assertNoStreamPathOverlap(streamEndpoints, streamExternalPatterns);
       const streamIndex = createBoundStreamEndpointIndex(streamEndpoints);
 
-      resolver = Object.freeze({
+      const boundResolver: ProcedurePolicyResolver = Object.freeze({
         // Precedence follows real dispatch: oRPC handlers and mounted GET stream endpoints are
         // mutually disjoint (verified at bind), followed by raw routes and internal guards.
         resolve(request: ProcedurePolicyRequest): ProcedurePolicyResolution {
@@ -122,45 +162,22 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
           return { matched: false };
         },
       });
-      return resolver;
+      const boundAuthorizer: AuthorizerPort = Object.freeze({
+        authorize: (request: AuthzRequest) => authorizeWithResolver(boundResolver, request),
+      });
+      registerBoundContractAuthorizer(boundResolver, {
+        authorizer: boundAuthorizer,
+        isInternalCaller,
+      });
+      lastResolver = boundResolver;
+      return boundResolver;
     },
 
     async authorize(request: AuthzRequest): Promise<AuthzDecision> {
-      if (!resolver) {
+      if (!lastResolver) {
         return deny('authz.contract-policy-unbound');
       }
-
-      const resolution = resolver.resolve({
-        method: request.method,
-        path: request.rawPath ?? request.path,
-        routePath: request.path,
-      });
-      if (!resolution.matched) {
-        return {
-          allow: false,
-          reason: 'authz.no-contract-procedure',
-          code: PROCEDURE_ERROR_CODES.NOT_FOUND,
-        };
-      }
-      if (resolution.retired) {
-        return {
-          allow: false,
-          reason: 'authz.procedure-retired',
-          code: PROCEDURE_ERROR_CODES.RETIRED,
-        };
-      }
-
-      if (!resolution.policy) {
-        const fallback = options.fallback;
-        if (!fallback) {
-          return deny('authz.no-matching-rule');
-        }
-
-        const fallbackResult = await fallback.authorizeMatch(request);
-        return fallbackResult.matched ? fallbackResult.decision : deny('authz.no-matching-rule');
-      }
-
-      return authorizeProcedurePolicy(request, resolution.policy, isInternalCaller);
+      return await authorizeWithResolver(lastResolver, request);
     },
   };
 }

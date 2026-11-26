@@ -332,3 +332,270 @@ Deno.test('End-to-end mounted bindStreamProxy + ServiceBuilder + real DurableStr
     await stopDurableStreamTestServerCleanly(server);
   }
 });
+
+Deno.test('Regression item 5: bindStreamProxy rejects conflicting credentialMode, Promise/thenable parse(), and prototype-inherited params', async () => {
+  const upstream = createControlledUpstream();
+  let authorizeCalls = 0;
+
+  // 1. Conflicting credentialMode handoff rejected BEFORE authorize (both bearer-only and cookie-only)
+  const bearerMount = bindStreamProxy(bearerOnlyEndpoint, {
+    baseUrl: 'http://streams.internal',
+    fetch: upstream.fetch,
+    upstreamAuth: () => ({}),
+    authorize: () => {
+      authorizeCalls += 1;
+      return { allow: true, grant: {} };
+    },
+    recheck: () => ({ allow: true }),
+    resolvePath: () => '/projects/b/events',
+  });
+  const bearerWithCookieCtx = await bearerMount.handle(
+    new Request('https://api.example.test/api/streams/bearer/abc'),
+    {
+      params: { id: 'abc' },
+      credentialMode: 'cookie',
+      shutdownSignal: new AbortController().signal,
+    },
+  );
+  assertEquals(bearerWithCookieCtx.status, 401);
+  assertEquals((await bearerWithCookieCtx.json()).reason, 'bearer_required');
+  assertEquals(authorizeCalls, 0);
+
+  const cookieOnlyEndpoint = defineStreamEndpoint({
+    id: 'projects.cookie_only',
+    path: '/api/streams/cookie/{id}',
+    params: z.object({ id: z.string().min(1) }),
+    clientAuth: 'cookie',
+  });
+  const cookieMount = bindStreamProxy(cookieOnlyEndpoint, {
+    baseUrl: 'http://streams.internal',
+    fetch: upstream.fetch,
+    upstreamAuth: () => ({}),
+    authorize: () => {
+      authorizeCalls += 1;
+      return { allow: true, grant: {} };
+    },
+    recheck: () => ({ allow: true }),
+    resolvePath: () => '/projects/c/events',
+  });
+  const cookieWithBearerCtx = await cookieMount.handle(
+    new Request('https://api.example.test/api/streams/cookie/abc', {
+      headers: { authorization: 'Bearer tok' },
+    }),
+    {
+      params: { id: 'abc' },
+      credentialMode: 'bearer',
+      shutdownSignal: new AbortController().signal,
+    },
+  );
+  assertEquals(cookieWithBearerCtx.status, 401);
+  assertEquals((await cookieWithBearerCtx.json()).reason, 'bearer_not_allowed');
+  assertEquals(authorizeCalls, 0);
+
+  const invalidModeCtx = await cookieMount.handle(
+    new Request('https://api.example.test/api/streams/cookie/abc'),
+    {
+      params: { id: 'abc' },
+      credentialMode: 'api-key' as unknown as 'cookie',
+      shutdownSignal: new AbortController().signal,
+    },
+  );
+  assertEquals(invalidModeCtx.status, 401);
+  assertEquals((await invalidModeCtx.json()).reason, 'invalid_credential_mode');
+  assertEquals(authorizeCalls, 0);
+
+  // 2. Promise-returning (resolving AND rejecting) and custom-thenable parse() MUST fail 400 before authorize
+  const asyncResolvingParamsEndpoint = {
+    ...bearerOnlyEndpoint,
+    params: {
+      parse: (value: unknown) => Promise.resolve(value),
+    },
+  };
+  const asyncResolveMount = bindStreamProxy(asyncResolvingParamsEndpoint as never, {
+    baseUrl: 'http://streams.internal',
+    fetch: upstream.fetch,
+    upstreamAuth: () => ({}),
+    authorize: () => {
+      authorizeCalls += 1;
+      return { allow: true, grant: {} };
+    },
+    recheck: () => ({ allow: true }),
+    resolvePath: () => '/projects/a/events',
+  });
+  const asyncResolveRes = await asyncResolveMount.handle(
+    new Request('https://api.example.test/api/streams/bearer/abc', {
+      headers: { authorization: 'Bearer tok' },
+    }),
+    {
+      params: { id: 'abc' },
+      credentialMode: 'bearer',
+      shutdownSignal: new AbortController().signal,
+    },
+  );
+  assertEquals(asyncResolveRes.status, 400);
+  assertEquals((await asyncResolveRes.json()).reason, 'invalid_stream_params');
+  assertEquals(authorizeCalls, 0);
+
+  // Rejecting Promise from parse() must be consumed (no unhandled rejection) and return 400
+  const asyncRejectingParamsEndpoint = {
+    ...bearerOnlyEndpoint,
+    params: {
+      parse: () => Promise.reject(new Error('async schema reject')),
+    },
+  };
+  const asyncRejectMount = bindStreamProxy(asyncRejectingParamsEndpoint as never, {
+    baseUrl: 'http://streams.internal',
+    fetch: upstream.fetch,
+    upstreamAuth: () => ({}),
+    authorize: () => {
+      authorizeCalls += 1;
+      return { allow: true, grant: {} };
+    },
+    recheck: () => ({ allow: true }),
+    resolvePath: () => '/projects/a/events',
+  });
+  const asyncRejectRes = await asyncRejectMount.handle(
+    new Request('https://api.example.test/api/streams/bearer/abc', {
+      headers: { authorization: 'Bearer tok' },
+    }),
+    {
+      params: { id: 'abc' },
+      credentialMode: 'bearer',
+      shutdownSignal: new AbortController().signal,
+    },
+  );
+  assertEquals(asyncRejectRes.status, 400);
+  assertEquals((await asyncRejectRes.json()).reason, 'invalid_stream_params');
+  await flushMicrotasks();
+  assertEquals(authorizeCalls, 0);
+
+  // Custom thenable from query parse() returns 400 invalid_stream_query
+  const thenableQueryEndpoint = {
+    ...bearerOnlyEndpoint,
+    query: {
+      parse: () => ({
+        then(onFulfilled: (v: unknown) => void) {
+          onFulfilled({});
+        },
+      }),
+    },
+  };
+  const thenableQueryMount = bindStreamProxy(thenableQueryEndpoint as never, {
+    baseUrl: 'http://streams.internal',
+    fetch: upstream.fetch,
+    upstreamAuth: () => ({}),
+    authorize: () => {
+      authorizeCalls += 1;
+      return { allow: true, grant: {} };
+    },
+    recheck: () => ({ allow: true }),
+    resolvePath: () => '/projects/a/events',
+  });
+  const thenableQueryRes = await thenableQueryMount.handle(
+    new Request('https://api.example.test/api/streams/bearer/abc?view=all', {
+      headers: { authorization: 'Bearer tok' },
+    }),
+    {
+      params: { id: 'abc' },
+      credentialMode: 'bearer',
+      shutdownSignal: new AbortController().signal,
+    },
+  );
+  assertEquals(thenableQueryRes.status, 400);
+  assertEquals((await thenableQueryRes.json()).reason, 'invalid_stream_query');
+  assertEquals(authorizeCalls, 0);
+
+  // 3. Prototype-inherited keys cannot satisfy missing params, and schema inputs use null-prototype records
+  let paramsInputProto: unknown = 'unset';
+  let queryInputProto: unknown = 'unset';
+  const protoShape: Record<string, unknown> = Object.create(null);
+  protoShape['toString'] = {};
+  protoShape['__proto__'] = {};
+  const protoParamEndpoint = defineStreamEndpoint({
+    id: 'projects.proto_check',
+    path: '/api/streams/proto/{toString}/{__proto__}',
+    params: {
+      shape: protoShape,
+      parse(value: unknown) {
+        paramsInputProto = Object.getPrototypeOf(value);
+        return value as { readonly toString: string; readonly __proto__: string };
+      },
+    } as never,
+    query: {
+      shape: {},
+      parse(value: unknown) {
+        queryInputProto = Object.getPrototypeOf(value);
+        return value as Readonly<Record<string, string>>;
+      },
+    } as never,
+    clientAuth: 'bearer',
+  });
+
+  const protoMount = bindStreamProxy(protoParamEndpoint, {
+    baseUrl: 'http://streams.internal',
+    fetch: upstream.fetch,
+    recheckEveryMs: null,
+    upstreamAuth: () => ({}),
+    authorize: ({ params, query }) => {
+      authorizeCalls += 1;
+      return { allow: true, grant: { params, query } };
+    },
+    recheck: () => ({ allow: true }),
+    resolvePath: () => '/projects/proto/events',
+  });
+
+  // Missing own properties on plain `{}` (even though toString / __proto__ exist on Object.prototype) -> 400!
+  const inheritedOnly = await protoMount.handle(
+    new Request('https://api.example.test/api/streams/proto/a/b', {
+      headers: { authorization: 'Bearer tok' },
+    }),
+    {
+      params: {},
+      credentialMode: 'bearer',
+      shutdownSignal: new AbortController().signal,
+    },
+  );
+  assertEquals(inheritedOnly.status, 400);
+  assertEquals((await inheritedOnly.json()).reason, 'invalid_stream_params');
+  assertEquals(authorizeCalls, 0);
+
+  // Inherited string property via prototype chain also rejected by Object.hasOwn
+  const protoWithString = Object.create({ toString: 'inherited', __proto__: 'inherited' });
+  const inheritedStringRes = await protoMount.handle(
+    new Request('https://api.example.test/api/streams/proto/a/b', {
+      headers: { authorization: 'Bearer tok' },
+    }),
+    {
+      params: protoWithString,
+      credentialMode: 'bearer',
+      shutdownSignal: new AbortController().signal,
+    },
+  );
+  assertEquals(inheritedStringRes.status, 400);
+  assertEquals(authorizeCalls, 0);
+
+  // Actual own properties (including `__proto__` and `?__proto__=safe`) pass via null-prototype records safely
+  const ownParams: Record<string, string> = Object.create(null);
+  ownParams['toString'] = 'val1';
+  ownParams['__proto__'] = 'val2';
+  const ownOk = await protoMount.handle(
+    new Request(
+      'https://api.example.test/api/streams/proto/val1/val2?__proto__=safe&constructor=ok',
+      {
+        headers: { authorization: 'Bearer tok' },
+      },
+    ),
+    {
+      params: ownParams,
+      credentialMode: 'bearer',
+      shutdownSignal: new AbortController().signal,
+    },
+  );
+  assertEquals(ownOk.status, 200);
+  assertEquals(authorizeCalls, 1);
+  assertEquals(paramsInputProto, null);
+  assertEquals(queryInputProto, null);
+  await ownOk.body?.cancel();
+  await flushMicrotasks();
+  assertEquals(upstream.activeCount, 0);
+});

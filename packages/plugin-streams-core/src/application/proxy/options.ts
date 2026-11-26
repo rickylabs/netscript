@@ -26,10 +26,17 @@ export function unwrapProxyRequest(input: Request | { readonly req: Request }): 
 export function extractDefaultProxyQuery(
   searchParams: URLSearchParams,
 ): Readonly<Record<string, string>> {
-  const record: Record<string, string> = {};
+  const record: Record<string, string> = Object.create(null);
   for (const [key, value] of searchParams.entries()) {
     if (RESERVED_PROTOCOL_QUERY_KEYS.has(key)) continue;
-    if (!Object.hasOwn(record, key)) record[key] = value;
+    if (!Object.hasOwn(record, key)) {
+      Object.defineProperty(record, key, {
+        value,
+        enumerable: true,
+        writable: true,
+        configurable: true,
+      });
+    }
   }
   return record;
 }

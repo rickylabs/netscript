@@ -12,6 +12,15 @@ import type {
 import { addRoute, createRouter, findRoute } from 'rou3';
 import { normalizePath } from './contract-path.ts';
 import type { ProcedureAccessPolicy, ProcedurePolicyRequest } from './contract-policy.ts';
+import { patternsIntersect } from './stream-path-pattern.ts';
+
+export {
+  joinMountPattern,
+  type NormalizedPatternSegment,
+  parsePathPatternSegments,
+  patternsIntersect,
+  regexSourceCanMatchSlash,
+} from './stream-path-pattern.ts';
 
 const INVALID_STREAM_ENDPOINT_ERROR = '[netscript.service.contract-policy] invalid stream endpoint';
 const STREAM_POLICY_MISMATCH_ERROR =
@@ -22,14 +31,6 @@ const STREAM_PATH_OVERLAP_ERROR =
 const STREAM_ID_PATTERN = /^[a-z0-9][a-z0-9._-]*$/i;
 const PARAM_SEGMENT_PATTERN = /^\{([A-Za-z_][A-Za-z0-9_]*)\}$/;
 const LITERAL_SEGMENT_PATTERN = /^[A-Za-z0-9\-._~!$&'()+,;=:@]+$/;
-const HONO_PARAM_PATTERN = /^:[A-Za-z_][A-Za-z0-9_]*(\{[^}]*\})?(\?)?$/;
-
-/** Parsed segment of a route template used for symmetric pattern-intersection checking. */
-export type NormalizedPatternSegment =
-  | { readonly kind: 'static'; readonly value: string }
-  | { readonly kind: 'param' }
-  | { readonly kind: 'optional-param' }
-  | { readonly kind: 'wildcard' };
 
 /** Segment descriptor of a validated stream endpoint template. */
 export type StreamTemplateSegment =
@@ -58,91 +59,6 @@ export interface BoundStreamEndpointIndex {
   find(request: ProcedurePolicyRequest): NormalizedStreamEndpoint | undefined;
   /** Matches any-method requests targeting a stream endpoint with `audience: 'internal'`. */
   findInternalGuard(request: ProcedurePolicyRequest): NormalizedStreamEndpoint | undefined;
-}
-
-/** Parses any OpenAPI (`{param}`), Hono (`:param`, `:param?`, `*`), or `rou3` (`**`, `**:name`) path pattern. */
-export function parsePathPatternSegments(pattern: string): readonly NormalizedPatternSegment[] {
-  const normalized = normalizePath(pattern);
-  if (normalized === '/') return Object.freeze([]);
-  const rawSegments = normalized.slice(1).split('/');
-  const parsed: NormalizedPatternSegment[] = [];
-  for (const segment of rawSegments) {
-    if (
-      segment === '*' ||
-      segment === '**' ||
-      segment.startsWith('**:') ||
-      segment.startsWith('**{') ||
-      segment.includes('*')
-    ) {
-      parsed.push({ kind: 'wildcard' });
-      continue;
-    }
-    if (PARAM_SEGMENT_PATTERN.test(segment)) {
-      parsed.push({ kind: 'param' });
-      continue;
-    }
-    const honoParam = HONO_PARAM_PATTERN.exec(segment);
-    if (honoParam) {
-      parsed.push(honoParam[2] === '?' ? { kind: 'optional-param' } : { kind: 'param' });
-      continue;
-    }
-    parsed.push({ kind: 'static', value: segment });
-  }
-  return Object.freeze(parsed);
-}
-
-/**
- * Symmetric segment-level unification determining whether there exists at least one concrete
- * request pathname matched by both `leftPattern` and `rightPattern`.
- */
-export function patternsIntersect(leftPattern: string, rightPattern: string): boolean {
-  const left = parsePathPatternSegments(leftPattern);
-  const right = parsePathPatternSegments(rightPattern);
-  const memo = new Map<number, boolean>();
-  const stride = right.length + 1;
-
-  function match(i: number, j: number): boolean {
-    const key = i * stride + j;
-    const cached = memo.get(key);
-    if (cached !== undefined) return cached;
-
-    let result = false;
-    if (i === left.length && j === right.length) {
-      result = true;
-    } else if (i < left.length && left[i]?.kind === 'wildcard') {
-      result = match(i + 1, j) || (j < right.length && match(i, j + 1));
-    } else if (j < right.length && right[j]?.kind === 'wildcard') {
-      result = match(i, j + 1) || (i < left.length && match(i + 1, j));
-    } else if (i < left.length && left[i]?.kind === 'optional-param') {
-      result = match(i + 1, j) || (j < right.length && match(i + 1, j + 1));
-    } else if (j < right.length && right[j]?.kind === 'optional-param') {
-      result = match(i, j + 1) || (i < left.length && match(i + 1, j + 1));
-    } else if (i < left.length && j < right.length) {
-      const l = left[i];
-      const r = right[j];
-      if (l !== undefined && r !== undefined) {
-        if (l.kind === 'static' && r.kind === 'static') {
-          result = l.value === r.value && match(i + 1, j + 1);
-        } else {
-          result = match(i + 1, j + 1);
-        }
-      }
-    }
-
-    memo.set(key, result);
-    return result;
-  }
-
-  return match(0, 0);
-}
-
-/** Joins an API mount prefix (`/api`) with a relative `rou3` pattern (`/streams/:id`). */
-export function joinMountPattern(mountPrefix: string, relativePattern: string): string {
-  const cleanMount = mountPrefix.replace(/\/+$/, '');
-  const cleanRel = relativePattern.startsWith('/') ? relativePattern : `/${relativePattern}`;
-  if (cleanMount.length === 0 || cleanMount === '/') return normalizePath(cleanRel);
-  if (cleanRel === '/') return cleanMount;
-  return `${cleanMount}${cleanRel}`;
 }
 
 /** Validates and normalizes one structural `StreamEndpointContract`. */

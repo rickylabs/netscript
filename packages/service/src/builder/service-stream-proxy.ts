@@ -9,7 +9,9 @@
 import type { Context, Hono } from 'hono';
 import { toHttpPath } from '@orpc/client/standard';
 import { toRou3Pattern } from '@orpc/openapi/standard';
+import { isLazy, traverseContractProcedures } from '@orpc/server';
 import { createLogger } from '@netscript/logger';
+import type { InternalCallerPredicate } from '../auth/contract/contract-policy.ts';
 import { isInternalServicePrincipal } from '../auth/internal-credential/internal-credential-authenticator.ts';
 import { authorizeProcedurePolicy } from '../auth/contract/procedure-policy-decision.ts';
 import {
@@ -23,6 +25,7 @@ import {
   setStreamProxyRequestState,
 } from '../auth/contract/stream-request-state.ts';
 import type { Principal } from '../auth/types.ts';
+import { isOrpcRouter } from '../primitives/orpc-router.ts';
 import type { ServiceMiddleware, ServiceRouter } from '../types.ts';
 import type { RpcWiringOptions } from './service-rpc.ts';
 import { resolveRpcWiringPaths } from './service-rpc.ts';
@@ -98,7 +101,7 @@ export function prepareStreamProxyMounts(
         `[netscript.service.stream-proxy] guardConfig.trustProxy must be false or a predicate on '${endpoint.id}'`,
       );
     }
-    const allowDirectNavigation = mount.guardConfig?.allowDirectNavigation ?? false;
+    const allowDirectNavigation = mount.guardConfig?.allowDirectNavigation === true;
     return Object.freeze({
       mount,
       endpoint,
@@ -162,49 +165,36 @@ export function prepareStreamProxyMounts(
 }
 
 /**
- * Best-effort extraction of oRPC OpenAPI route patterns from a `ServiceRouter` so stream-vs-oRPC
- * overlap is caught at `build()` even when the service does not install a contract authorizer.
+ * Extracts oRPC OpenAPI route patterns from a `ServiceRouter` using `@orpc/server`'s canonical
+ * traversal (unwrapping hidden contracts when attached) and fails closed if any unresolved lazy
+ * oRPC route prevents build-time overlap verification.
  */
 function extractRouterOpenApiPatterns(
   router: ServiceRouter,
   apiPath: string,
 ): readonly string[] {
-  const patterns: string[] = [];
-  const visited = new Set<unknown>();
-
-  function walk(node: unknown, path: readonly string[]): void {
-    if (typeof node !== 'object' || node === null || visited.has(node)) return;
-    visited.add(node);
-
-    if (Object.hasOwn(node, '~orpc')) {
-      const orpc = Reflect.get(node, '~orpc');
-      if (typeof orpc === 'object' && orpc !== null) {
-        const contract = Reflect.get(orpc, 'contract');
-        const source = typeof contract === 'object' && contract !== null &&
-            Object.hasOwn(contract, '~orpc')
-          ? Reflect.get(contract, '~orpc')
-          : orpc;
-        const route = typeof source === 'object' && source !== null
-          ? Reflect.get(source, 'route')
-          : undefined;
-        const rawHttpPath = typeof route === 'object' && route !== null
-          ? Reflect.get(route, 'path')
-          : undefined;
-        const httpPath: `/${string}` = typeof rawHttpPath === 'string' && rawHttpPath.length > 0
-          ? (rawHttpPath.startsWith('/') ? `/${rawHttpPath.slice(1)}` : `/${rawHttpPath}`)
-          : toHttpPath(path);
-        const rou3Pattern = toRou3Pattern(httpPath);
-        patterns.push(joinMountPattern(apiPath, rou3Pattern));
-      }
-      return;
-    }
-
-    for (const [key, child] of Object.entries(node)) {
-      walk(child, [...path, key]);
-    }
+  if (isLazy(router)) {
+    throw new Error(
+      "[netscript.service.stream-proxy] cannot verify stream endpoint path overlap against unresolved lazy oRPC route at '<root>'; pass an eager router or unlazy before build()",
+    );
   }
+  if (!isOrpcRouter(router)) return [];
 
-  walk(router, []);
+  const patterns: string[] = [];
+  const lazyNodes = traverseContractProcedures({ router, path: [] }, ({ contract, path }) => {
+    const rawHttpPath = contract['~orpc'].route.path;
+    const httpPath: `/${string}` = typeof rawHttpPath === 'string' && rawHttpPath.length > 0
+      ? (rawHttpPath.startsWith('/') ? `/${rawHttpPath.slice(1)}` : `/${rawHttpPath}`)
+      : toHttpPath(path);
+    const rou3Pattern = toRou3Pattern(httpPath);
+    patterns.push(joinMountPattern(apiPath, rou3Pattern));
+  });
+  if (lazyNodes.length > 0) {
+    const firstPath = lazyNodes[0]!.path.join('.') || '<root>';
+    throw new Error(
+      `[netscript.service.stream-proxy] cannot verify stream endpoint path overlap against unresolved lazy oRPC route at '${firstPath}'; pass an eager router or unlazy before build()`,
+    );
+  }
   return patterns;
 }
 
@@ -264,7 +254,7 @@ export function createPreAuthnStreamGuardMiddleware(
 export function installStreamProxyRoutes(
   app: Hono,
   prepared: readonly PreparedStreamProxyMount[],
-  boundContractPolicy: boolean,
+  isInternalCaller: InternalCallerPredicate = isInternalServicePrincipal,
 ): void {
   for (const item of prepared) {
     app.get(item.endpoint.routePattern, async (c: Context) => {
@@ -274,13 +264,10 @@ export function installStreamProxyRoutes(
       }
 
       const principal = readPrincipal(c);
-      const accessFailure = enforceMountAccess(c, item.endpoint, principal, boundContractPolicy);
+      const accessFailure = enforceMountAccess(c, item.endpoint, principal, isInternalCaller);
       if (accessFailure !== null) return accessFailure;
 
-      const validatedAuthn = validateAuthnStreamOverlayHeaders(
-        state.authnResponseHeaders,
-        state.authnSetCookies,
-      );
+      const validatedAuthn = validateAuthnStreamOverlayHeaders(state.authnResult);
       if (!validatedAuthn.ok) {
         STREAM_MOUNT_LOGGER.warn('stream proxy rejected reserved or invalid AuthnResult headers', {
           endpointId: item.endpoint.id,
@@ -327,16 +314,11 @@ function enforceMountAccess(
   c: Context,
   endpoint: NormalizedStreamEndpoint,
   principal: Principal | undefined,
-  boundContractPolicy: boolean,
+  isInternalCaller: InternalCallerPredicate,
 ): Response | null {
   if (endpoint.policy.authentication === 'none') return null;
   if (!principal) {
     return createStreamGuardErrorResponse(401, 'UNAUTHORIZED', 'missing-principal');
-  }
-  if (boundContractPolicy) {
-    // Contract authorizer already ran `authorizeProcedurePolicy` with its configured
-    // `isInternalCaller` inside `createAuthzMiddleware`.
-    return null;
   }
   const decision = authorizeProcedurePolicy(
     {
@@ -346,7 +328,7 @@ function enforceMountAccess(
       rawPath: readRawPathname(c),
     },
     endpoint.policy,
-    isInternalServicePrincipal,
+    isInternalCaller,
   );
   if (!decision.allow) {
     return createStreamGuardErrorResponse(403, 'FORBIDDEN', decision.reason);

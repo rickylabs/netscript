@@ -1,10 +1,12 @@
 import { assert, assertEquals, assertFalse, assertThrows } from '@std/assert';
+import { lazy, os } from '@orpc/server';
 import { baseContract, SuccessSchema } from '@netscript/contracts';
 import { defineStreamEndpoint, type StreamEndpointContract } from '@netscript/contracts/streams';
 import { z } from 'zod';
 import {
   type AuthenticatorPort,
   type AuthorizerPort,
+  type ContractPolicyAuthorizerPort,
   createContractAuthorizer,
   createContractOverlayAuthorizer,
   createService,
@@ -18,6 +20,7 @@ import {
   createInstallationSecret,
   createInternalCredentialAuthenticator,
   createStaticCredentialAuthenticator,
+  createTrustedHeaderAuthenticator,
 } from '../../src/auth/mod.ts';
 import { patternsIntersect } from '../../src/auth/contract/stream-endpoint-policy.ts';
 import { matchAndCanonicalizeStreamRequest } from '../../src/builder/stream-proxy-guard.ts';
@@ -898,5 +901,444 @@ Deno.test('Gate 7 live serve(): running.stop() aborts pre-drain shutdownSignal a
     );
   } finally {
     await running.stop();
+  }
+});
+
+Deno.test('Regression item 2: stream authn strips non-selected credential headers (X-API-Key, trusted headers) and requires literal allowDirectNavigation === true', async () => {
+  const cookieOnlyEndpoint = defineStreamEndpoint({
+    id: 'projects.cookie_only',
+    path: '/api/streams/cookie/{projectId}',
+    params: z.object({ projectId: z.string().min(1) }),
+    clientAuth: 'cookie',
+    access: {
+      authentication: 'required',
+      authorization: { scopes: ['projects:read'], roles: ['member'] },
+    },
+  });
+
+  const staticAuth = createStaticCredentialAuthenticator({
+    credentials: {
+      'secret-api-key': { subject: 'svc:api-key', scopes: ['projects:read'], roles: ['member'] },
+    },
+  });
+  const trustedHeaderAuth = createTrustedHeaderAuthenticator({
+    subjectHeader: 'x-authenticated-user',
+    scopesHeader: 'x-authenticated-scopes',
+    rolesHeader: 'x-authenticated-roles',
+  });
+
+  let handleCalls = 0;
+  let seenHeadersInCookieAuth: Headers | undefined;
+  const cookieSessionAuth: AuthenticatorPort = {
+    authenticate(req) {
+      seenHeadersInCookieAuth = req.headers();
+      if (req.cookie('__Host-s') === 'valid-cookie') {
+        return {
+          ok: true,
+          principal: makePrincipal({ subject: 'user:cookie-ok', scheme: 'custom' }),
+        };
+      }
+      return { ok: false, reason: 'missing-credential' };
+    },
+  };
+
+  const app = createService({}, { name: 'cookie-strict-scope' })
+    .withAuthn({
+      authenticator: createCompositeAuthenticator([
+        staticAuth,
+        trustedHeaderAuth,
+        cookieSessionAuth,
+      ]),
+    })
+    .withAuthz({ authorizer: createContractAuthorizer(baseApiContract) })
+    .withStreamProxy(
+      makeStructuralMount(cookieOnlyEndpoint, {
+        onHandle() {
+          handleCalls += 1;
+          return new Response('event: control\ndata: {"streamNextOffset":"o1"}\n\n', {
+            status: 200,
+            headers: { 'content-type': 'text/event-stream; charset=utf-8' },
+          });
+        },
+      }),
+    )
+    .build();
+
+  // 1. First-party static authenticator MUST NOT admit X-API-Key on a cookie-only mount
+  const apiKeyDenied = await app.request('/api/streams/cookie/p1', {
+    headers: {
+      'x-api-key': 'secret-api-key',
+      'sec-fetch-site': 'same-origin',
+    },
+  });
+  assertEquals(apiKeyDenied.status, 401);
+  assertEquals(handleCalls, 0);
+
+  // 2. First-party trusted-header authenticator MUST NOT admit custom identity headers on stream mounts
+  const trustedDenied = await app.request('/api/streams/cookie/p1', {
+    headers: {
+      'x-authenticated-user': 'admin:spoofed',
+      'x-authenticated-scopes': 'projects:read',
+      'x-authenticated-roles': 'member',
+      'sec-fetch-site': 'same-origin',
+    },
+  });
+  assertEquals(trustedDenied.status, 401);
+  assertEquals(handleCalls, 0);
+
+  // 3. Valid cookie succeeds while non-selected credential headers stay stripped and allowed metadata passes through
+  const cookieOk = await app.request('/api/streams/cookie/p1', {
+    headers: {
+      cookie: '__Host-s=valid-cookie',
+      'x-api-key': 'secret-api-key',
+      'x-authenticated-user': 'admin:spoofed',
+      'user-agent': 'NetScriptTest/1.0',
+      'x-forwarded-proto': 'https',
+      'sec-fetch-site': 'same-origin',
+    },
+  });
+  assertEquals(cookieOk.status, 200);
+  assertEquals(handleCalls, 1);
+  assertEquals(seenHeadersInCookieAuth?.has('x-api-key'), false);
+  assertEquals(seenHeadersInCookieAuth?.has('x-authenticated-user'), false);
+  assertEquals(seenHeadersInCookieAuth?.has('authorization'), false);
+  assertEquals(seenHeadersInCookieAuth?.get('user-agent'), 'NetScriptTest/1.0');
+  assertEquals(seenHeadersInCookieAuth?.get('x-forwarded-proto'), 'https');
+  await cookieOk.body?.cancel();
+
+  // 4. Non-boolean truthy guardConfig.allowDirectNavigation must NOT enable direct navigation
+  for (const truthyValue of ['true', 1, {}] as unknown as boolean[]) {
+    const nonLiteralApp = createService({}, { name: 'direct-nav-literal' })
+      .withAuthn({ authenticator: cookieSessionAuth })
+      .withStreamProxy(
+        makeStructuralMount(cookieOnlyEndpoint, {
+          guardConfig: { allowDirectNavigation: truthyValue },
+        }),
+      )
+      .build();
+    const res = await nonLiteralApp.request('/api/streams/cookie/p1', {
+      headers: {
+        cookie: '__Host-s=valid-cookie',
+        'sec-fetch-site': 'none',
+        'sec-fetch-dest': 'document',
+      },
+    });
+    assertEquals(res.status, 403, `truthy ${String(truthyValue)} must not enable direct nav`);
+  }
+
+  // Literal `true` enables direct navigation
+  const literalTrueApp = createService({}, { name: 'direct-nav-true' })
+    .withAuthn({ authenticator: cookieSessionAuth })
+    .withStreamProxy(
+      makeStructuralMount(cookieOnlyEndpoint, {
+        guardConfig: { allowDirectNavigation: true },
+      }),
+    )
+    .build();
+  const directOk = await literalTrueApp.request('/api/streams/cookie/p1', {
+    headers: {
+      cookie: '__Host-s=valid-cookie',
+      'sec-fetch-site': 'none',
+      'sec-fetch-dest': 'document',
+    },
+  });
+  assertEquals(directOk.status, 200);
+  await directOk.body?.cancel();
+});
+
+Deno.test('Regression item 3: service-local overlay/contract binding, custom bind() access enforcement, Hono regex routes, and lazy oRPC routes', async () => {
+  const staticAuth = createStaticCredentialAuthenticator({
+    credentials: {
+      'ok-token': { subject: 'u:ok', scopes: ['projects:read'], roles: ['member'] },
+      'wrong-scope': { subject: 'u:nos', scopes: ['other:read'], roles: ['member'] },
+      'wrong-role': { subject: 'u:nor', scopes: ['projects:read'], roles: ['guest'] },
+    },
+  });
+
+  // 1. Shared createContractOverlayAuthorizer bound to TWO services keeps bindings strictly service-local
+  const sharedOverlay = createContractOverlayAuthorizer(baseApiContract);
+  const serviceA = createService({}, { name: 'overlay-svc-a' })
+    .withAuthn({ authenticator: staticAuth, allowAnonymous: ['/api'] })
+    .withAuthz({ authorizer: sharedOverlay })
+    .withStreamProxy(makeStructuralMount(projectsFeedEndpoint))
+    .build();
+  const serviceB = createService({}, { name: 'overlay-svc-b' })
+    .withAuthn({ authenticator: staticAuth, allowAnonymous: ['/api'] })
+    .withAuthz({ authorizer: sharedOverlay })
+    .build();
+  assert(serviceB !== undefined);
+
+  // Service A MUST still return 403 on wrong-scope / wrong-role and 401 unauthenticated (never flip 403 -> 200!)
+  assertEquals((await serviceA.request('/api/streams/projects/p1')).status, 401);
+  assertEquals(
+    (await serviceA.request('/api/streams/projects/p1', {
+      headers: { authorization: 'Bearer wrong-scope' },
+    })).status,
+    403,
+  );
+  assertEquals(
+    (await serviceA.request('/api/streams/projects/p1', {
+      headers: { authorization: 'Bearer wrong-role' },
+    })).status,
+    403,
+  );
+  const svcAOk = await serviceA.request('/api/streams/projects/p1', {
+    headers: { authorization: 'Bearer ok-token' },
+  });
+  assertEquals(svcAOk.status, 200);
+  await svcAOk.body?.cancel();
+
+  // Same service-local isolation for shared createContractAuthorizer
+  const sharedContract = createContractAuthorizer(baseApiContract);
+  const strictA = createService({}, { name: 'strict-svc-a' })
+    .withAuthn({ authenticator: staticAuth })
+    .withAuthz({ authorizer: sharedContract })
+    .withStreamProxy(makeStructuralMount(projectsFeedEndpoint))
+    .build();
+  createService({}, { name: 'strict-svc-b' })
+    .withAuthn({ authenticator: staticAuth })
+    .withAuthz({ authorizer: sharedContract })
+    .build();
+  assertEquals(
+    (await strictA.request('/api/streams/projects/p1', {
+      headers: { authorization: 'Bearer wrong-scope' },
+    })).status,
+    403,
+  );
+  const strictAOk = await strictA.request('/api/streams/projects/p1', {
+    headers: { authorization: 'Bearer ok-token' },
+  });
+  assertEquals(strictAOk.status, 200);
+  await strictAOk.body?.cancel();
+
+  // 2. Custom authorizer with `bind()` returning allow (even claiming authentication: 'none') STILL enforces mount access
+  const permissiveBoundAuthorizer: ContractPolicyAuthorizerPort = {
+    bind() {
+      return {
+        resolve: () => ({
+          matched: true,
+          policy: { authentication: 'none', requiredScopes: [], requiredRoles: [] },
+        }),
+      };
+    },
+    authorize() {
+      return { allow: true };
+    },
+  };
+  const customBoundApp = createService({}, { name: 'custom-bind-stream' })
+    .withAuthn({ authenticator: staticAuth })
+    .withAuthz({ authorizer: permissiveBoundAuthorizer })
+    .withStreamProxy(makeStructuralMount(projectsFeedEndpoint))
+    .withStreamProxy(makeStructuralMount(internalEventsEndpoint))
+    .build();
+  assertEquals((await customBoundApp.request('/api/streams/projects/p1')).status, 401);
+  assertEquals(
+    (await customBoundApp.request('/api/streams/projects/p1', {
+      headers: { authorization: 'Bearer wrong-scope' },
+    })).status,
+    403,
+  );
+  assertEquals(
+    (await customBoundApp.request('/api/streams/projects/p1', {
+      headers: { authorization: 'Bearer wrong-role' },
+    })).status,
+    403,
+  );
+  assertEquals(
+    (await customBoundApp.request('/api/streams/internal/jobs', {
+      headers: { authorization: 'Bearer ok-token' },
+    })).status,
+    403,
+  );
+  const customBoundOk = await customBoundApp.request('/api/streams/projects/p1', {
+    headers: { authorization: 'Bearer ok-token' },
+  });
+  assertEquals(customBoundOk.status, 200);
+  await customBoundOk.body?.cancel();
+
+  // 3. Hono slash-spanning constraints MUST be rejected as overlapping
+  for (
+    const collidingPattern of [
+      '/api/streams/:rest{.*}',
+      '/api/streams/:rest{.+}',
+      '/api/:sub{streams/projects}/:id',
+      '/api/streams/:path{[^0-9]+}',
+    ]
+  ) {
+    assertEquals(
+      patternsIntersect(collidingPattern, '/api/streams/projects/{projectId}'),
+      true,
+      `${collidingPattern} must intersect /api/streams/projects/{projectId}`,
+    );
+    assertThrows(
+      () =>
+        createService({}, { name: 'hono-slash-overlap' })
+          .withAuthn({ authenticator: staticAuth })
+          .route('get', collidingPattern, (c) => c.text('shadow'))
+          .withStreamProxy(makeStructuralMount(projectsFeedEndpoint))
+          .build(),
+      Error,
+      'stream endpoint path overlaps',
+    );
+  }
+
+  // 4. Disjoint numeric Hono route MUST NOT be falsely rejected, and both routes dispatch cleanly
+  const staticLiveStream = defineStreamEndpoint({
+    id: 'streams.live',
+    path: '/api/streams/live',
+    access: { authentication: 'required', authorization: { scopes: ['projects:read'] } },
+  });
+  assertEquals(patternsIntersect('/api/streams/:id{[0-9]+}', '/api/streams/live'), false);
+  assertEquals(
+    patternsIntersect('/api/streams/:id{[0-9]+}/events', '/api/streams/projects/{projectId}'),
+    false,
+  );
+  assertEquals(patternsIntersect('/api/streams/:id{[0-9]+}', '/api/streams/123'), true);
+  assertEquals(patternsIntersect('/api/streams/:id{[0-9]+}', '/api/streams/{projectId}'), true);
+
+  const disjointApp = createService({}, { name: 'hono-numeric-disjoint' })
+    .withAuthn({ authenticator: staticAuth })
+    .route('get', '/api/streams/:id{[0-9]+}', (c) => c.text(`num:${c.req.param('id')}`))
+    .route('get', '/api/streams/:id{[0-9]+}/events', (c) => c.text(`ev:${c.req.param('id')}`))
+    .withStreamProxy(makeStructuralMount(staticLiveStream))
+    .withStreamProxy(makeStructuralMount(projectsFeedEndpoint))
+    .build();
+
+  const numRes = await disjointApp.request('/api/streams/42', {
+    headers: { authorization: 'Bearer ok-token' },
+  });
+  assertEquals(numRes.status, 200);
+  assertEquals(await numRes.text(), 'num:42');
+
+  const liveStreamRes = await disjointApp.request('/api/streams/live', {
+    headers: { authorization: 'Bearer ok-token' },
+  });
+  assertEquals(liveStreamRes.status, 200);
+  assertEquals(liveStreamRes.headers.get('content-type'), 'text/event-stream; charset=utf-8');
+  await liveStreamRes.body?.cancel();
+
+  // 5. Lazy oRPC routes MUST fail closed at build() time (unresolved route metadata cannot bypass overlap checks)
+  const eagerCollisionProc = os
+    .route({ method: 'GET', path: '/streams/projects/summary' })
+    .handler(() => ({ ok: true }));
+  const lazySubRouter = {
+    streams: lazy(() => Promise.resolve({ default: { summary: eagerCollisionProc } })),
+  };
+  assertThrows(
+    () =>
+      createService(lazySubRouter, { name: 'lazy-orpc-sub' })
+        .withAuthn({ authenticator: staticAuth })
+        .withRPC()
+        .withStreamProxy(makeStructuralMount(projectsFeedEndpoint))
+        .build(),
+    Error,
+    'unresolved lazy oRPC route',
+  );
+  const lazyRootRouter = lazy(() => Promise.resolve({ default: { summary: eagerCollisionProc } }));
+  assertThrows(
+    () =>
+      createService(lazyRootRouter as unknown as Record<string, unknown>, {
+        name: 'lazy-orpc-root',
+      })
+        .withAuthn({ authenticator: staticAuth })
+        .withRPC()
+        .withStreamProxy(makeStructuralMount(projectsFeedEndpoint))
+        .build(),
+    Error,
+    'unresolved lazy oRPC route',
+  );
+});
+
+Deno.test('Regression item 4: throwing AuthnResult getters fail closed 503 (never 500) and 200 always enforces exact SSE Content-Type', async () => {
+  let mode: 'throw-headers' | 'throw-cookies' | 'throw-nested' | 'ok' = 'throw-headers';
+  let handleCalls = 0;
+
+  const getterAuth: AuthenticatorPort = {
+    authenticate() {
+      const principal = makePrincipal();
+      if (mode === 'throw-headers') {
+        return {
+          ok: true,
+          principal,
+          get responseHeaders(): Readonly<Record<string, string>> {
+            throw new Error('SECRET_HEADERS_GETTER_CRASH');
+          },
+        };
+      }
+      if (mode === 'throw-cookies') {
+        return {
+          ok: true,
+          principal,
+          get setCookies(): readonly string[] {
+            throw new Error('SECRET_COOKIES_GETTER_CRASH');
+          },
+        };
+      }
+      if (mode === 'throw-nested') {
+        return {
+          ok: true,
+          principal,
+          responseHeaders: {
+            get ['x-boom'](): string {
+              throw new Error('SECRET_NESTED_GETTER_CRASH');
+            },
+          },
+        };
+      }
+      return { ok: true, principal };
+    },
+  };
+
+  let mountContentType = 'text/event-stream-evil';
+  const app = createService({}, { name: 'getter-and-ct' })
+    .withAuthn({ authenticator: getterAuth })
+    .withAuthz({ authorizer: createContractAuthorizer(baseApiContract) })
+    .withStreamProxy(
+      makeStructuralMount(projectsFeedEndpoint, {
+        onHandle() {
+          handleCalls += 1;
+          return new Response('event: control\ndata: {"streamNextOffset":"o1"}\n\n', {
+            status: 200,
+            headers: { 'content-type': mountContentType },
+          });
+        },
+      }),
+    )
+    .build();
+
+  // 1. Throwing getters on responseHeaders / setCookies / nested header -> redacted 503, zero mount.handle calls!
+  for (const m of ['throw-headers', 'throw-cookies', 'throw-nested'] as const) {
+    mode = m;
+    const res = await app.request('/api/streams/projects/p1', {
+      headers: { authorization: 'Bearer tok' },
+    });
+    assertEquals(res.status, 503, `mode ${m} must return 503 instead of 500`);
+    assertEquals(res.headers.get('cache-control'), 'no-store');
+    assertEquals(res.headers.get('x-content-type-options'), 'nosniff');
+    const body = await res.text();
+    assertFalse(body.includes('SECRET_'));
+  }
+  assertEquals(handleCalls, 0);
+
+  // 2. Structural mount returning invalid 200 Content-Type -> enforced exact text/event-stream; charset=utf-8
+  mode = 'ok';
+  for (
+    const invalidCt of [
+      'text/event-stream-evil',
+      'text/event-stream; charset=iso-8859-1',
+      'text/plain',
+    ]
+  ) {
+    mountContentType = invalidCt;
+    const res = await app.request('/api/streams/projects/p1', {
+      headers: { authorization: 'Bearer tok' },
+    });
+    assertEquals(res.status, 200);
+    assertEquals(
+      res.headers.get('content-type'),
+      'text/event-stream; charset=utf-8',
+      `invalid 200 Content-Type ${invalidCt} must be overwritten with exact SSE Content-Type`,
+    );
+    await res.body?.cancel();
   }
 });

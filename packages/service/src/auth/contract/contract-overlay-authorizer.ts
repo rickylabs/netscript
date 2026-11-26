@@ -20,8 +20,11 @@ import {
   resolveAuthoritativeStreamEndpoints,
 } from './stream-endpoint-policy.ts';
 import { isInternalServicePrincipal } from '../internal-credential/internal-credential-authenticator.ts';
-import { authorizeProcedurePolicy } from './procedure-policy-decision.ts';
-import type { AuthzDecision, AuthzRequest } from '../types.ts';
+import {
+  authorizeProcedurePolicy,
+  registerBoundContractAuthorizer,
+} from './procedure-policy-decision.ts';
+import type { AuthorizerPort, AuthzDecision, AuthzRequest } from '../types.ts';
 
 /**
  * Creates an authorizer that overlays procedure access metadata on the service's own policy.
@@ -75,7 +78,21 @@ export function createContractOverlayAuthorizer<TContract extends ContractPolicy
   if (options.streamEndpoints !== undefined) {
     resolveAuthoritativeStreamEndpoints(undefined, options.streamEndpoints);
   }
-  let resolver: ProcedurePolicyResolver | undefined;
+  let lastResolver: ProcedurePolicyResolver | undefined;
+
+  async function authorizeWithResolver(
+    activeResolver: ProcedurePolicyResolver,
+    request: AuthzRequest,
+  ): Promise<AuthzDecision> {
+    const resolution = activeResolver.resolve({
+      method: request.method,
+      path: request.rawPath ?? request.path,
+    });
+    if (resolution.matched && resolution.policy) {
+      return authorizeProcedurePolicy(request, resolution.policy, isInternalCaller);
+    }
+    return options.fallback ? await options.fallback.authorize(request) : { allow: true };
+  }
 
   return {
     bind(binding: ContractPolicyBindingOptions): ProcedurePolicyResolver {
@@ -87,7 +104,7 @@ export function createContractOverlayAuthorizer<TContract extends ContractPolicy
       assertNoStreamPathOverlap(streamEndpoints, index.overlapPatterns);
       const streamIndex = createBoundStreamEndpointIndex(streamEndpoints);
 
-      resolver = Object.freeze({
+      const boundResolver: ProcedurePolicyResolver = Object.freeze({
         resolve(request: ProcedurePolicyRequest): ProcedurePolicyResolution {
           const policy = (
             index.find(request) ??
@@ -100,22 +117,22 @@ export function createContractOverlayAuthorizer<TContract extends ContractPolicy
           return policy ? { matched: true, policy } : { matched: false };
         },
       });
-      return resolver;
+      const boundAuthorizer: AuthorizerPort = Object.freeze({
+        authorize: (request: AuthzRequest) => authorizeWithResolver(boundResolver, request),
+      });
+      registerBoundContractAuthorizer(boundResolver, {
+        authorizer: boundAuthorizer,
+        isInternalCaller,
+      });
+      lastResolver = boundResolver;
+      return boundResolver;
     },
 
     async authorize(request: AuthzRequest): Promise<AuthzDecision> {
-      if (!resolver) {
+      if (!lastResolver) {
         return { allow: false, reason: 'authz.contract-policy-unbound' };
       }
-
-      const resolution = resolver.resolve({
-        method: request.method,
-        path: request.rawPath ?? request.path,
-      });
-      if (resolution.matched && resolution.policy) {
-        return authorizeProcedurePolicy(request, resolution.policy, isInternalCaller);
-      }
-      return options.fallback ? await options.fallback.authorize(request) : { allow: true };
+      return await authorizeWithResolver(lastResolver, request);
     },
   };
 }
