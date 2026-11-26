@@ -226,6 +226,9 @@ enforces RFC 6750 credential selection, Cookie Origin/Fetch-Metadata/`trustProxy
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `createNetScriptStreamProxy` | function | Create a revocable authorizing SSE stream proxy handler for Fresh routes and HTTP services. |
+| `bindStreamProxy` | function | Bind a `StreamEndpointContract` to a frozen `StreamProxyMount` validating `params`/`query` schemas and enforcing `endpoint.clientAuth`. |
+| `StreamProxyMount` | interface | Structural service mount returned by `bindStreamProxy` (re-exported from `@netscript/service`). |
+| `StreamProxyMountContext` | interface | Per-request context forwarded by `@netscript/service` into `StreamProxyMount.handle` (re-exported from `@netscript/service`). |
 | `StreamProxyOptions` | interface | Configuration for admission, re-check, path resolution, credential/origin guards, limits, and teardown. |
 | `StreamProxyHandler` | type alias | Request handler accepting `Request` or Fresh `{ req: Request }` plus optional request context. |
 | `StreamProxyAuthDecision` | type alias | Fail-closed admission decision granting access with an opaque grant or denying with `401`/`403`. |
@@ -233,6 +236,12 @@ enforces RFC 6750 credential selection, Cookie Origin/Fetch-Metadata/`trustProxy
 | `StreamProxyRevocationSource` | interface | Application-supplied push revocation subscription port for cross-gateway teardown. |
 | `StreamProxyClockPort` | interface | Deterministic epoch clock and cancelable timer port used by expiry, idle, and timeout guards. |
 | `StreamProxyCloseEvent` | interface | Structured reader-close telemetry event with `streamPath`, `reason`, and `deliveredUnits`. |
+
+To keep public JSR documentation self-contained, `./proxy` also re-exports the sibling
+`@netscript/contracts/streams` types referenced by `bindStreamProxy`: `StreamEndpointContract`,
+`StreamEndpointProtocol`, `StreamEndpointClientAuthMode`, `ContractObjectSchemaLike`,
+`ContractSchemaLike`, `NetScriptProcedureMeta`, `NetScriptAuthenticationRequirement`, and
+`NetScriptProcedureAudience`.
 
 ## Telemetry and testing
 

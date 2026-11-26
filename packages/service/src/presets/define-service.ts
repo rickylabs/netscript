@@ -33,6 +33,7 @@
  */
 
 import { createService, type ServiceConfig } from '../builder/service-builder.ts';
+import type { StreamProxyMount } from '../builder/stream-proxy-mount.ts';
 import type { ServiceAuthPolicy } from '../auth/options.ts';
 import { assertServiceAuthPolicy } from '../auth/service-auth-policy.ts';
 import { createDatabaseConnectivityStartupHook } from '../diagnostics/database-connectivity.ts';
@@ -172,6 +173,11 @@ export interface DefineServiceOptions extends ServiceConfig {
    * applied.
    */
   readonly bodyLimit?: ServiceBodyLimitOptions;
+  /**
+   * Authorizing SSE stream proxy mounts registered on the service via
+   * `ServiceBuilder.withStreamProxy()`.
+   */
+  readonly streamProxies?: readonly StreamProxyMount[];
 }
 
 /**
@@ -335,6 +341,10 @@ export async function defineService<T extends ServiceRouter>(
 
   if (options.bodyLimit) {
     builder.withBodyLimit(options.bodyLimit);
+  }
+
+  for (const mount of options.streamProxies ?? []) {
+    builder.withStreamProxy(mount);
   }
 
   return await builder.withHealth().serve({ hostname: options.hostname, tls: options.tls });

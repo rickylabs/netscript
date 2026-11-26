@@ -27,6 +27,10 @@ import type {
   ProcedurePolicyResolution,
   ProcedurePolicyResolver,
 } from './contract/contract-policy.ts';
+import {
+  getStreamProxyRequestState,
+  type StreamProxyRequestState,
+} from './contract/stream-request-state.ts';
 import type { AuthnRequest, AuthnResult, Principal } from './types.ts';
 import { PROCEDURE_ERROR_CODES } from './types.ts';
 
@@ -37,6 +41,32 @@ export const DEFAULT_PROTECTED_PREFIXES: readonly string[] = ['/api'];
 export const DEFAULT_ANONYMOUS_PREFIXES: readonly string[] = ['/health'];
 
 const AUTH_LOGGER = createLogger(['netscript', 'service', 'auth']);
+
+const STREAM_AUTHN_ERROR_VARY = 'Authorization, Cookie, Origin, Sec-Fetch-Site, Sec-Fetch-Dest';
+
+/**
+ * Explicitly permitted non-credential request metadata headers forwarded to `withAuthn` on
+ * matched stream requests. Every other header (including `x-api-key`, `x-authenticated-*`, and
+ * the unselected credential transport) is omitted so authenticators can only authenticate using
+ * the pre-selected `credentialMode`.
+ */
+const STREAM_AUTHN_METADATA_HEADERS: ReadonlySet<string> = new Set([
+  'accept',
+  'accept-language',
+  'forwarded',
+  'host',
+  'origin',
+  'referer',
+  'sec-fetch-dest',
+  'sec-fetch-mode',
+  'sec-fetch-site',
+  'traceparent',
+  'tracestate',
+  'user-agent',
+  'x-forwarded-host',
+  'x-forwarded-proto',
+  'x-request-id',
+]);
 
 /** Authn middleware options with an optional bound contract-policy resolver. */
 export interface AuthnMiddlewareOptions extends AuthnOptions {
@@ -49,41 +79,66 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
   const guard = normalizeGuard(options);
 
   return async (c, next) => {
+    const streamState = getStreamProxyRequestState(c.req.raw);
     const policy = resolvePolicy(options.policyResolver, c);
-    if (!requiresAuthentication(c, guard, policy)) {
+    if (!requiresAuthentication(c, guard, policy, streamState)) {
       return await next();
     }
 
-    let result: AuthnResult;
+    let outcome:
+      | {
+        readonly ok: true;
+        readonly principal: Principal;
+        readonly raw: AuthnResult;
+        readonly responseHeaders?: Readonly<Record<string, string>>;
+        readonly setCookies?: readonly string[];
+      }
+      | { readonly ok: false; readonly reason: string };
     try {
-      result = await options.authenticator.authenticate(toAuthnRequest(c));
+      const result = await options.authenticator.authenticate(toAuthnRequest(c, streamState));
+      if (result.ok) {
+        outcome = streamState !== undefined
+          ? { ok: true, principal: result.principal, raw: result }
+          : {
+            ok: true,
+            principal: result.principal,
+            raw: result,
+            responseHeaders: result.responseHeaders,
+            setCookies: result.setCookies,
+          };
+      } else {
+        outcome = { ok: false, reason: result.reason };
+      }
     } catch {
       await logAuthDecision(c, {
         stage: 'authn',
         decision: 'deny',
         reason: 'authn.error',
       });
-      return c.json({
-        error: 'SERVICE_UNAVAILABLE',
-        message: 'Authentication service unavailable',
-      }, 503);
+      return authnUnavailable(c, streamState);
     }
 
-    if (!result.ok) {
+    if (!outcome.ok) {
       await logAuthDecision(c, {
         stage: 'authn',
         decision: 'deny',
-        reason: result.reason,
+        reason: outcome.reason,
       });
-      return unauthorized(c, result.reason);
+      return unauthorized(c, outcome.reason);
     }
 
-    c.set('principal', result.principal);
-    applyAuthnResponse(c, result.responseHeaders, result.setCookies);
+    c.set('principal', outcome.principal);
+    if (streamState !== undefined) {
+      // Hand off the raw AuthnResult without reading `responseHeaders`/`setCookies` outside the
+      // stream route wrapper's protected validation boundary (so throwing getters yield 503).
+      streamState.authnResult = outcome.raw;
+    } else {
+      applyAuthnResponse(c, outcome.responseHeaders, outcome.setCookies);
+    }
     await logAuthDecision(c, {
       stage: 'authn',
       decision: 'allow',
-      principal: result.principal,
+      principal: outcome.principal,
     });
     return await next();
   };
@@ -106,12 +161,13 @@ export function createAuthzMiddleware(options: AuthzMiddlewareOptions): Middlewa
 
   return async (c, next) => {
     const principal = c.get('principal');
+    const streamState = getStreamProxyRequestState(c.req.raw);
     try {
       const policy = resolvePolicy(options.policyResolver, c);
-      if (isPublicProcedure(policy)) {
+      if (isPublicProcedure(policy) && !streamState?.authenticationRequired) {
         return await next();
       }
-      if (!policy?.matched && !isGuardedRequest(c, guard)) {
+      if (!policy?.matched && !streamState?.authenticationRequired && !isGuardedRequest(c, guard)) {
         return await next();
       }
 
@@ -193,7 +249,11 @@ function requiresAuthentication(
   c: Context,
   guard: RequestGuard,
   resolution: ProcedurePolicyResolution | undefined,
+  streamState: StreamProxyRequestState | undefined,
 ): boolean {
+  if (streamState !== undefined) {
+    return streamState.authenticationRequired;
+  }
   if (resolution?.matched) {
     return resolution.policy?.authentication !== 'none';
   }
@@ -255,7 +315,37 @@ function matchesPrefix(path: string, prefix: string): boolean {
   return path === prefix || path.startsWith(prefix.endsWith('/') ? prefix : `${prefix}/`);
 }
 
-function toAuthnRequest(c: Context): AuthnRequest {
+function toAuthnRequest(
+  c: Context,
+  streamState: StreamProxyRequestState | undefined,
+): AuthnRequest {
+  if (streamState !== undefined) {
+    const allowedCredentialHeader = streamState.credentialMode === 'bearer'
+      ? 'authorization'
+      : 'cookie';
+    const isAllowedHeader = (name: string): boolean => {
+      const lower = name.toLowerCase();
+      return lower === allowedCredentialHeader || STREAM_AUTHN_METADATA_HEADERS.has(lower);
+    };
+    return {
+      method: c.req.method,
+      path: c.req.path,
+      header: (name) => (isAllowedHeader(name) ? c.req.header(name) : undefined),
+      headers: () => {
+        const scoped = new Headers();
+        for (const [name, value] of c.req.raw.headers.entries()) {
+          if (isAllowedHeader(name)) {
+            scoped.append(name, value);
+          }
+        }
+        return scoped;
+      },
+      cookie: (name) =>
+        streamState.credentialMode === 'cookie'
+          ? readCookie(c.req.header('cookie'), name)
+          : undefined,
+    };
+  }
   return {
     method: c.req.method,
     path: c.req.path,
@@ -263,6 +353,30 @@ function toAuthnRequest(c: Context): AuthnRequest {
     headers: () => new Headers(c.req.raw.headers),
     cookie: (name) => readCookie(c.req.header('cookie'), name),
   };
+}
+
+function authnUnavailable(
+  c: Context,
+  streamState: StreamProxyRequestState | undefined,
+): Response {
+  if (streamState !== undefined) {
+    return new Response(
+      JSON.stringify({ error: 'SERVICE_UNAVAILABLE', reason: 'authn_unavailable' }),
+      {
+        status: 503,
+        headers: new Headers({
+          'content-type': 'application/json; charset=utf-8',
+          'cache-control': 'no-store',
+          'x-content-type-options': 'nosniff',
+          'vary': STREAM_AUTHN_ERROR_VARY,
+        }),
+      },
+    );
+  }
+  return c.json({
+    error: 'SERVICE_UNAVAILABLE',
+    message: 'Authentication service unavailable',
+  }, 503);
 }
 
 function applyAuthnResponse(

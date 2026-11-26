@@ -22,11 +22,24 @@
  *
  * @module
  */
+import type { StreamEndpointContract } from '@netscript/contracts/streams';
+import type { StreamProxyMount } from '@netscript/service';
 import { createSystemStreamProxyClock } from './src/adapters/system-stream-proxy-clock.ts';
+import { buildBoundStreamProxyMount } from './src/application/proxy/bind-stream-proxy.ts';
 import { buildStreamProxyHandler } from './src/application/proxy/create-stream-proxy.ts';
 import type { StreamProxyHandler, StreamProxyOptions } from './src/domain/stream-proxy-contract.ts';
 
-export type { StreamEndpointClientAuthMode } from '@netscript/contracts/streams';
+export type {
+  ContractObjectSchemaLike,
+  ContractSchemaLike,
+  NetScriptAuthenticationRequirement,
+  NetScriptProcedureAudience,
+  NetScriptProcedureMeta,
+  StreamEndpointClientAuthMode,
+  StreamEndpointContract,
+  StreamEndpointProtocol,
+} from '@netscript/contracts/streams';
+export type { StreamProxyMount, StreamProxyMountContext } from '@netscript/service';
 export type { Principal } from '@netscript/service/auth';
 export type { ServiceProxyTrust } from '@netscript/service/rate-limit';
 export type { StreamSseOffsetV1 } from './src/domain/sse-contract-v1.ts';
@@ -68,4 +81,18 @@ export function createNetScriptStreamProxy<TGrant = unknown>(
   options: StreamProxyOptions<TGrant>,
 ): StreamProxyHandler {
   return buildStreamProxyHandler(options, createSystemStreamProxyClock());
+}
+
+/**
+ * Bind a typed {@link StreamEndpointContract} to a revocable SSE stream proxy mount for
+ * `ServiceBuilder.withStreamProxy()` and `defineService({ streamProxies })`.
+ *
+ * Enforces `endpoint.clientAuth` and validates decoded path `params` and application `query`
+ * parameters synchronously against `endpoint.params` and `endpoint.query` before `authorize`.
+ */
+export function bindStreamProxy<TParams, TQuery, TGrant = unknown>(
+  endpoint: StreamEndpointContract<TParams, TQuery, unknown, unknown>,
+  options: Omit<StreamProxyOptions<TGrant, TParams, TQuery>, 'clientAuth'>,
+): StreamProxyMount {
+  return buildBoundStreamProxyMount(endpoint, options, createSystemStreamProxyClock());
 }

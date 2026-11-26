@@ -14,9 +14,17 @@ import type {
   ProcedurePolicyResolver,
 } from './contract-policy.ts';
 import { bindProcedureIndex, compileProcedures } from './contract-procedure-index.ts';
+import {
+  assertNoStreamPathOverlap,
+  createBoundStreamEndpointIndex,
+  resolveAuthoritativeStreamEndpoints,
+} from './stream-endpoint-policy.ts';
 import { isInternalServicePrincipal } from '../internal-credential/internal-credential-authenticator.ts';
-import { authorizeProcedurePolicy } from './procedure-policy-decision.ts';
-import type { AuthzDecision, AuthzRequest } from '../types.ts';
+import {
+  authorizeProcedurePolicy,
+  registerBoundContractAuthorizer,
+} from './procedure-policy-decision.ts';
+import type { AuthorizerPort, AuthzDecision, AuthzRequest } from '../types.ts';
 
 /**
  * Creates an authorizer that overlays procedure access metadata on the service's own policy.
@@ -67,34 +75,64 @@ export function createContractOverlayAuthorizer<TContract extends ContractPolicy
 ): ContractPolicyAuthorizerPort {
   const procedures = compileProcedures(contract);
   const isInternalCaller = options.isInternalCaller ?? isInternalServicePrincipal;
-  let resolver: ProcedurePolicyResolver | undefined;
+  if (options.streamEndpoints !== undefined) {
+    resolveAuthoritativeStreamEndpoints(undefined, options.streamEndpoints);
+  }
+  let lastResolver: ProcedurePolicyResolver | undefined;
+
+  async function authorizeWithResolver(
+    activeResolver: ProcedurePolicyResolver,
+    request: AuthzRequest,
+  ): Promise<AuthzDecision> {
+    const resolution = activeResolver.resolve({
+      method: request.method,
+      path: request.rawPath ?? request.path,
+    });
+    if (resolution.matched && resolution.policy) {
+      return authorizeProcedurePolicy(request, resolution.policy, isInternalCaller);
+    }
+    return options.fallback ? await options.fallback.authorize(request) : { allow: true };
+  }
 
   return {
     bind(binding: ContractPolicyBindingOptions): ProcedurePolicyResolver {
       const index = bindProcedureIndex(procedures, binding);
-      resolver = Object.freeze({
+      const streamEndpoints = resolveAuthoritativeStreamEndpoints(
+        binding.streamMounts,
+        options.streamEndpoints,
+      );
+      assertNoStreamPathOverlap(streamEndpoints, index.overlapPatterns);
+      const streamIndex = createBoundStreamEndpointIndex(streamEndpoints);
+
+      const boundResolver: ProcedurePolicyResolver = Object.freeze({
         resolve(request: ProcedurePolicyRequest): ProcedurePolicyResolution {
-          const policy = (index.find(request) ?? index.findInternalGuard(request))?.policy;
-          // Unmarked procedures are deliberately unmatched: the service's own policy applies.
+          const policy = (
+            index.find(request) ??
+              streamIndex.find(request) ??
+              index.findInternalGuard(request) ??
+              streamIndex.findInternalGuard(request)
+          )?.policy;
+          // Unmarked oRPC procedures are deliberately unmatched: the service's own policy applies.
+          // Mounted stream endpoints always carry a normalized policy and never fall through.
           return policy ? { matched: true, policy } : { matched: false };
         },
       });
-      return resolver;
+      const boundAuthorizer: AuthorizerPort = Object.freeze({
+        authorize: (request: AuthzRequest) => authorizeWithResolver(boundResolver, request),
+      });
+      registerBoundContractAuthorizer(boundResolver, {
+        authorizer: boundAuthorizer,
+        isInternalCaller,
+      });
+      lastResolver = boundResolver;
+      return boundResolver;
     },
 
     async authorize(request: AuthzRequest): Promise<AuthzDecision> {
-      if (!resolver) {
+      if (!lastResolver) {
         return { allow: false, reason: 'authz.contract-policy-unbound' };
       }
-
-      const resolution = resolver.resolve({
-        method: request.method,
-        path: request.rawPath ?? request.path,
-      });
-      if (resolution.matched && resolution.policy) {
-        return authorizeProcedurePolicy(request, resolution.policy, isInternalCaller);
-      }
-      return options.fallback ? await options.fallback.authorize(request) : { allow: true };
+      return await authorizeWithResolver(lastResolver, request);
     },
   };
 }

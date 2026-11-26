@@ -4,6 +4,7 @@
  * @module
  */
 
+import type { StreamEndpointContract } from '@netscript/contracts/streams';
 import type { ContractAuthorizerOptions } from '../options.ts';
 import type { AuthorizerPort, Principal } from '../types.ts';
 
@@ -88,6 +89,10 @@ export interface ContractPolicyBindingOptions {
   readonly rpcAliases?: readonly string[];
   /** Deprecated procedure prefixes accepted by the RPC projection. */
   readonly deprecatedRpcRoutes?: readonly ContractPolicyRpcRouteAlias[];
+  /** Authoritative mounted stream endpoints passed by `ServiceBuilder.build()`. */
+  readonly streamMounts?: readonly {
+    readonly endpoint: StreamEndpointContract<unknown, unknown, unknown, unknown>;
+  }[];
 }
 
 /** Opt-in authorizer adapter that binds one compiled contract policy to service projection paths. */

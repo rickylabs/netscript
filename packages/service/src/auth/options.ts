@@ -17,6 +17,7 @@
  * @module
  */
 
+import type { StreamEndpointContract } from '@netscript/contracts/streams';
 import type { InternalCallerPredicate } from './contract/contract-policy.ts';
 import type { AuthenticatorPort, AuthorizerPort, MatchAwareAuthorizerPort } from './types.ts';
 
@@ -111,6 +112,13 @@ export interface ContractAuthorizerOptions {
    * `isInternalServicePrincipal`, which accepts only internal-credential principals.
    */
   readonly isInternalCaller?: InternalCallerPredicate;
+  /**
+   * Optional explicit stream endpoint contracts for standalone authorizer unit tests or
+   * compile-time policy pinning. When mounted via `ServiceBuilder.build()`, exact set equality
+   * with mounted `streamMounts` is cross-checked by `id`, normalized `path`, `clientAuth`, and
+   * normalized `access`.
+   */
+  readonly streamEndpoints?: readonly StreamEndpointContract<unknown, unknown, unknown, unknown>[];
 }
 
 /** Options for constructing the contract-overlay authorizer. */
@@ -125,6 +133,13 @@ export interface ContractOverlayAuthorizerOptions {
    * `isInternalServicePrincipal`, which accepts only internal-credential principals.
    */
   readonly isInternalCaller?: InternalCallerPredicate;
+  /**
+   * Optional explicit stream endpoint contracts for standalone authorizer unit tests or
+   * compile-time policy pinning. When mounted via `ServiceBuilder.build()`, exact set equality
+   * with mounted `streamMounts` is cross-checked by `id`, normalized `path`, `clientAuth`, and
+   * normalized `access`.
+   */
+  readonly streamEndpoints?: readonly StreamEndpointContract<unknown, unknown, unknown, unknown>[];
 }
 
 /** Explicit service posture using the native authentication and authorization stages. */

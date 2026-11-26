@@ -21,8 +21,10 @@ import {
 } from '../middleware/service-cors.ts';
 import type {
   ContractPolicyAuthorizerPort,
+  InternalCallerPredicate,
   ProcedurePolicyResolver,
 } from '../auth/contract/contract-policy.ts';
+import { getBoundContractAuthorizer } from '../auth/contract/procedure-policy-decision.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import type { AuthorizerPort } from '../auth/types.ts';
 import {
@@ -64,6 +66,13 @@ import {
   registerServiceDatabases,
   type ServiceDatabaseResource,
 } from './service-resources.ts';
+import type { StreamProxyMount } from './stream-proxy-mount.ts';
+import {
+  createPreAuthnStreamGuardMiddleware,
+  installStreamProxyRoutes,
+  type PreparedStreamProxyMount,
+  prepareStreamProxyMounts,
+} from './service-stream-proxy.ts';
 
 interface DeferredRoute {
   readonly method: ServiceRouteMethod;
@@ -110,6 +119,9 @@ export class ServiceBuilderImpl<
   private deferredRoutes: DeferredRoute[] = [];
   private installedRoutes: readonly DeferredRoute[] = [];
   private deferredRoutesInstalled = false;
+  private serviceInfoConfigured = false;
+  private streamProxies: StreamProxyMount[] = [];
+  private boundInternalCaller: InternalCallerPredicate | undefined;
 
   constructor(router: TRouter, config: ServiceConfig) {
     this.app = new Hono();
@@ -476,10 +488,17 @@ export class ServiceBuilderImpl<
     return this;
   }
 
+  /** Registers an authorizing SSE stream proxy mount on the service. */
+  withStreamProxy(mount: StreamProxyMount): ServiceBuilder<TRouter, TCustom> {
+    this.streamProxies.push(mount);
+    return this;
+  }
+
   /**
    * Configures the service root endpoint with service info.
    */
   withServiceInfo(): ServiceBuilder<TRouter, TCustom> {
+    this.serviceInfoConfigured = true;
     this.app.get('/', (c: Context) =>
       c.json({
         service: this.config.name,
@@ -514,24 +533,46 @@ export class ServiceBuilderImpl<
    */
   build(): ServiceApp {
     for (const options of this.corsOptions) assertServiceCorsOptions(options);
-    this.installAuth();
+    const preparedStreams = this.prepareStreamProxies();
+    this.installAuth(preparedStreams);
     this.installBodyLimit();
     this.installHealth();
-    this.installDeferredRoutes();
+    this.installDeferredRoutes(preparedStreams);
     this.app.notFound(createNotFoundHandler(this.config.name));
     this.app.onError(createErrorHandler(this.config.name));
     return this.app;
   }
 
-  private installAuth(): void {
+  private prepareStreamProxies(): readonly PreparedStreamProxyMount[] {
+    return prepareStreamProxyMounts({
+      mounts: this.streamProxies,
+      hasAuthn: this.authnOptions !== null,
+      deferredRoutes: this.deferredRoutes,
+      healthConfigured: this.healthConfigured,
+      openApiConfigured: this.openApiConfigured,
+      docsConfigured: this.docsConfigured,
+      serviceInfoConfigured: this.serviceInfoConfigured,
+      rpcConfigured: this.rpcConfigured,
+      rpcOptions: this.rpcOptions,
+      router: this.router,
+    });
+  }
+
+  private installAuth(preparedStreams: readonly PreparedStreamProxyMount[]): void {
     if (this.authInstalled) return;
     const policyResolver = this.bindContractPolicy();
+    const boundContract = getBoundContractAuthorizer(policyResolver);
+    this.boundInternalCaller = boundContract?.isInternalCaller;
+    if (preparedStreams.length > 0) {
+      this.app.use('*', createPreAuthnStreamGuardMiddleware(preparedStreams));
+    }
     const authn = this.authnOptions
       ? createAuthnMiddleware({ ...this.authnOptions, policyResolver })
       : undefined;
     const authz = this.authzOptions
       ? createAuthzMiddleware({
         ...this.authzOptions,
+        authorizer: boundContract?.authorizer ?? this.authzOptions.authorizer,
         protect: this.authnOptions?.protect,
         allowAnonymous: this.authnOptions?.allowAnonymous,
         policyResolver,
@@ -558,12 +599,17 @@ export class ServiceBuilderImpl<
       ...resolveRpcWiringPaths(this.rpcOptions ?? undefined),
       rpcAliases: this.rpcOptions?.rpcAliases,
       deprecatedRpcRoutes: this.rpcOptions?.deprecatedRpcRoutes,
+      streamMounts: this.streamProxies,
     });
   }
 
-  private installDeferredRoutes(): void {
+  private installDeferredRoutes(preparedStreams: readonly PreparedStreamProxyMount[]): void {
     if (this.deferredRoutesInstalled) return;
     this.deferredRoutesInstalled = true;
+
+    if (preparedStreams.length > 0) {
+      installStreamProxyRoutes(this.app, preparedStreams, this.boundInternalCaller);
+    }
 
     if (this.openApiConfigured) {
       this.app.get(
