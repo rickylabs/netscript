@@ -86,6 +86,11 @@ export function generateRegisterInfrastructure(
     ['Redis', 'Garnet'].includes(entry.Engine) &&
     !['External', 'Local'].includes(entry.Mode ?? 'Container')
   );
+  const usesGarnetContainerDataPath = cacheEntries.some(([, entry]) =>
+    entry.Engine === 'Garnet' &&
+    Boolean(entry.DataPath) &&
+    !['External', 'Local', 'Executable'].includes(entry.Mode ?? 'Container')
+  );
   const sdkValueImports = [
     ...(hasPersistentContainerDatabase ? ['ContainerLifetime'] : []),
     ...(cacheEntries.some(([, entry]) => !['External', 'Local'].includes(entry.Mode ?? 'Container'))
@@ -97,6 +102,7 @@ export function generateRegisterInfrastructure(
     ...(usesDatabaseListenerReadiness ? ['createEndpointListenerReadinessCheck'] : []),
     ...(usesPostgresCredentialReadiness ? ['createPostgresCredentialReadinessCheck'] : []),
     ...(usesRespReadiness ? ['createRespPingCheck'] : []),
+    ...(usesGarnetContainerDataPath ? ['ensureContainerDataPath'] : []),
     ...(dbEntries.some(([, entry]) =>
         ['Postgres', 'Mysql'].includes(entry.Engine) &&
         (entry.Mode ?? 'Container') === 'Container'
@@ -110,6 +116,7 @@ export function generateRegisterInfrastructure(
       ? ['ensureGarnetToolManifest']
       : []),
     ...(usesDenoKvContainer ? ['generateAccessToken as _generateAccessToken'] : []),
+    ...(usesGarnetContainerDataPath ? ['resolveContainerBindMountRuntimeArgs'] : []),
     ...(usesResolvedDataPath(dbEntries, cacheEntries) ? ['resolveDataPath'] : []),
     ...(cacheEntries.some(([, entry]) => entry.Mode === 'Auto') ? ['shouldUseContainerCache'] : []),
   ];
@@ -545,8 +552,17 @@ function redisGarnetContainerSetup(
   const tag = entry.ImageTag ?? image.tag;
   const imageRef = `${image.image}:${tag}`;
   const provider = entry.Engine === 'Garnet' ? 'garnet' : 'redis';
+  const hasGarnetDataPath = entry.Engine === 'Garnet' && Boolean(entry.DataPath);
   const lines: string[] = [];
 
+  if (hasGarnetDataPath) {
+    lines.push(
+      `  const ${id}_dataPath = ensureContainerDataPath(resolveDataPath(appHostDir, ${
+        JSON.stringify(entry.DataPath)
+      }, ${JSON.stringify(name)}));`,
+    );
+    lines.push(`  const ${id}_runtimeArgs = resolveContainerBindMountRuntimeArgs();`);
+  }
   lines.push(
     `  const ${id} = await builder.addContainer(${JSON.stringify(name)}, ${
       JSON.stringify(imageRef)
@@ -568,14 +584,22 @@ function redisGarnetContainerSetup(
   }
   if (entry.DataPath) {
     lines.push(
-      `    .withBindMount(resolveDataPath(appHostDir, ${JSON.stringify(entry.DataPath)}, ${
-        JSON.stringify(name)
-      }), '/data')`,
+      hasGarnetDataPath
+        ? `    .withBindMount(${id}_dataPath, '/data')`
+        : `    .withBindMount(resolveDataPath(appHostDir, ${JSON.stringify(entry.DataPath)}, ${
+          JSON.stringify(name)
+        }), '/data')`,
     );
   }
 
   const lastIdx = lines.length - 1;
   lines[lastIdx] = lines[lastIdx] + ';';
+
+  if (hasGarnetDataPath) {
+    lines.push(`  if (${id}_runtimeArgs.length > 0) {`);
+    lines.push(`    await ${id}.withContainerRuntimeArgs(${id}_runtimeArgs);`);
+    lines.push(`  }`);
+  }
 
   lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`);
   lines.push(

@@ -44,6 +44,8 @@ export interface EndpointReference {
 export interface AspireResource {
   withEndpoint(options: { name: string; scheme: string; port?: number; targetPort?: number }): AspireResource;
   withArgs(args: string[]): AspireResource;
+  withBindMount(source: string, target: string): AspireResource;
+  withContainerRuntimeArgs(args: string[]): Promise<AspireResource>;
   withArgsCallback(callback: (context: CommandLineArgsCallbackContext) => Promise<void>): Promise<AspireResource>;
   waitFor(resource: AspireResource): AspireResource;
   withReference(resource: AspireResource): AspireResource;
@@ -101,6 +103,18 @@ export function ensureGarnetToolManifest(_root: string, _version: string): strin
   return 'fixture-workdir';
 }
 
+export function resolveDataPath(_root: string, dataPath: string | undefined, name: string): string {
+  return dataPath ?? name;
+}
+
+export function ensureContainerDataPath(dataPath: string): string {
+  return dataPath;
+}
+
+export function resolveContainerBindMountRuntimeArgs(): string[] {
+  return [];
+}
+
 export function shouldUseContainerCache(): boolean { return false; }
 
 export function createRespPingCheck(_options: { host: string; port: number }): () => Promise<{ status: string }> {
@@ -151,6 +165,12 @@ Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contr
       Databases: { main: MINIMAL_DATABASE },
       Cache: {
         container: { Enabled: true, Engine: 'Garnet', Mode: 'Container' },
+        persistentContainer: {
+          Enabled: true,
+          Engine: 'Garnet',
+          Mode: 'Container',
+          DataPath: '.data/garnet',
+        },
         executable: { Enabled: true, Engine: 'Garnet', Mode: 'Executable' },
         auto: { Enabled: true, Engine: 'Garnet', Mode: 'Auto', Port: 6385 },
       },
