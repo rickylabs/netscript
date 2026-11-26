@@ -18,6 +18,7 @@ that doesn't match is rejected before your code runs, and the same contract type
 | `@netscript/contracts/commands` | `./commands.ts` | [Opt-in command transport errors](#command-contracts). |
 | `@netscript/contracts/crud` | `./crud.ts` | [CRUD contract generators](#netscriptcontractscrud). |
 | `@netscript/contracts/query` | `./query.ts` | [Query, filter, and pagination helpers](#netscriptcontractsquery). |
+| `@netscript/contracts/streams` | `./streams.ts` | [Runtime-free stream endpoint contracts and canonical offset grammar](#netscriptcontractsstreams). |
 | `@netscript/contracts/transform` | `./transform.ts` | [Typed transformer factories](#netscriptcontractstransform). |
 
 ## Base contract
@@ -281,6 +282,26 @@ metadata. Importing the root contract keeps its own error map.
 | `CommandInProgressSchema`    | const      | Strict in-progress data schema.                     |
 | `IdempotencyKeyReuseData`    | type alias | Redacted reused-key data.                           |
 | `IdempotencyKeyReuseSchema`  | const      | Strict reused-key data schema.                      |
+
+## `@netscript/contracts/streams`
+
+Runtime-free Durable Streams SSE endpoint contracts and canonical offset/cursor validation, shared
+across servers, clients, and Fresh routes without importing oRPC or runtime adapters.
+
+| Symbol | Kind | Signature | Description |
+| --- | --- | --- | --- |
+| `defineStreamEndpoint` | function | `function defineStreamEndpoint<TParams, TQuery>(definition: StreamEndpointDefinition<TParams, TQuery>): StreamEndpointContract<TParams, TQuery>` | Validates and freezes a parameterized stream proxy endpoint contract. |
+| `buildStreamEndpointUrl` | function | `function buildStreamEndpointUrl<TParams, TQuery>(endpoint: StreamEndpointContract<TParams, TQuery>, input: StreamEndpointUrlInput<TParams, TQuery>): string` | Builds a validated SSE proxy URL with encoded path params, non-reserved query params, and canonical `offset`/`cursor`. |
+| `isValidStreamOffset` | function | `function isValidStreamOffset(value: string): boolean` | Canonical Durable Streams offset/cursor grammar guard (non-empty printable ASCII without whitespace/NUL, max 512 bytes). |
+| `STREAM_OFFSET_MAX_BYTES` | const | `512` | Maximum accepted byte length for an opaque stream offset or cursor token. |
+| `STREAM_ENDPOINT_PROTOCOL_V1` | const | `Readonly<{ family: 'netscript.durable-stream-sse'; major: 1 }>` | Canonical protocol version metadata for v1 Durable Streams SSE endpoints. |
+| `STREAM_ENDPOINT_CLIENT_AUTH_MODES` | const | `readonly ['bearer', 'cookie', 'bearer-or-cookie']` | Finite set of valid client credential transport modes. |
+| `RESERVED_STREAM_QUERY_PARAMS` | const | `readonly ['offset', 'live', 'cursor']` | Query parameter names reserved by the Durable Streams SSE proxy protocol. |
+| `StreamEndpointClientAuthMode` | type alias | `'bearer' \| 'cookie' \| 'bearer-or-cookie'` | Allowed client credential transport mode declared on an endpoint. |
+| `StreamEndpointProtocol` | interface | `interface StreamEndpointProtocol { readonly family: 'netscript.durable-stream-sse'; readonly major: 1; }` | Protocol discriminator identifying a NetScript Durable Streams SSE endpoint contract. |
+| `StreamEndpointDefinition` | interface | `interface StreamEndpointDefinition<TParams, TQuery>` | Input definition accepted by `defineStreamEndpoint`. |
+| `StreamEndpointContract` | interface | `interface StreamEndpointContract<TParams, TQuery>` | Immutable validated stream endpoint contract returned by `defineStreamEndpoint`. |
+| `StreamEndpointUrlInput` | interface | `interface StreamEndpointUrlInput<TParams, TQuery>` | Input options accepted by `buildStreamEndpointUrl`. |
 
 ## Examples
 

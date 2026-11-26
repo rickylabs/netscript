@@ -146,6 +146,7 @@ console.log(report.summary); // e.g. ".../workers/executions: 1 stream collectio
 | Entry         | What it gives you                                                                                                         |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `.`           | `defineStreamSchema`, `createDurableStream`, per-write correlation context, endpoint resolution, and `inspectStreamTopic` |
+| `./proxy`     | Revocable authorizing SSE stream proxy runtime (`createNetScriptStreamProxy`) for bearer and cookie clients               |
 | `./sse`       | Versioned wire schemas, named-frame parser, replay reducer, and native `EventSource` binding                              |
 | `./telemetry` | Span names, attribute keys, and instrumentation registration                                                              |
 | `./testing`   | `MemoryStreamProducer` and `createStreamTopicFixture` for socket-free tests                                               |
