@@ -71,6 +71,37 @@ accessible theme control for the keyboard contract. Change `settings.ts` to exte
 theme matrix; change `tests/design.spec.ts` to add another interaction contract. Dependencies,
 including the axe adapter's Playwright peer, are pinned in package-lock.json.
 
+## Dependency ownership
+
+This private npm project and its package-lock.json are separate from the Deno workspace. Dependabot
+owns `/tools/fresh-ui-browser`; paired Playwright and axe pins update together, retaining exact
+versions. An axe engine update intentionally trips the reviewed baseline engine-version contract.
+Re-review that baseline through its owning process rather than silently accepting a new engine.
+
+From the repository root, select the owning project explicitly:
+
+```sh
+deno task deps:census --project tools/fresh-ui-browser
+deno task deps:latest --project tools/fresh-ui-browser
+deno task deps:outdated --project tools/fresh-ui-browser
+deno task deps:why --project tools/fresh-ui-browser playwright-core
+deno task deps:audit --project tools/fresh-ui-browser --fail-on-find
+```
+
+Census reads the manifest and v3 lock directly. Freshness uses `locked-stable`: compare locked direct
+dependencies with the existing stable-channel resolver. It covers direct declarations, not transitive
+freshness or semver-wanted upgrades. Native `npm outdated` can report an empty result on a cold project,
+so it cannot prove lock-only freshness. Provenance uses native lock-only `npm ls`; audit uses native
+`npm audit` with development dependencies included and reports its covered package count. Neither
+command installs dependencies or rewrites the lock. Source-based dead-import inference and
+`deps:prod-install --project` are unsupported for this development-only tool. Default workspace
+reports announce this separate scope; census also inventories it.
+
+Selected-mode exits: 0 for a completed report, 1 for opted-in behind/advisory findings, 2 for invalid
+selection/usage or unsupported production install, and 3 for operational/lookup/lock failures. A failed
+lookup never means up to date. Root tests inject processes and lookups; native probes belong in run
+evidence. The contributor entrypoint is `.llm/tools/deps/standalone-projects.ts`.
+
 ## Before screenshots
 
 S0 captures screenshots as review evidence; it does not fail on pixel differences. A future pixel

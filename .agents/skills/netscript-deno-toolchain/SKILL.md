@@ -62,6 +62,27 @@ pre-release filtered). Never trust `--latest` alone.
 Dead-import sweep: `deps:why <pkg>` → `fullyRemovable: true` (no source usage + not in graph) means
 the import-map entry is safe to delete.
 
+## Standalone browser npm project
+
+The private `tools/fresh-ui-browser` npm manifest/lock is separate from the Deno workspace. Root
+`deps:census`, `deps:latest`, `deps:outdated`, `deps:why` and `deps:audit` accept
+`--project tools/fresh-ui-browser`; put the package after or before the selector for `deps:why`.
+The internal root router keeps shipped consumer `outdated.ts`/`why.ts` byte-identical. Default
+workspace reports identify the excluded project and selection command; census inventories it too.
+
+Selected census reads the owning v3 lock. Latest and outdated use the existing stable resolver with
+locked direct versions (`locked-stable`), not native cold `npm outdated`, which can return a false-clean
+empty report without node_modules. No transitive freshness or semver-wanted upgrade is claimed.
+Provenance uses `npm ls <pkg> --all --package-lock-only --json`; audit uses
+`npm audit --package-lock-only --include=dev --ignore-scripts --json --audit-level=<level>` and
+preserves advisory data and covered counts. These inspections do not install or rewrite locks.
+Project-mode source-pruning inference and production install are explicitly unsupported.
+
+Selected exits: report0; opted-in `--fail-behind`/`--fail-on-find`1; invalid usage/selector or
+unsupported mode2; operational/lookup/lock error3. Failed lookups never mean up to date. The native
+npm and fetch interfaces are injected in root tests; live probes go in run evidence. Exact examples
+and paired Dependabot/baseline engine ownership are in `tools/fresh-ui-browser/README.md`.
+
 ## Install / CI commands
 
 | Command                                    | Use                                                                                                                                                                      |
