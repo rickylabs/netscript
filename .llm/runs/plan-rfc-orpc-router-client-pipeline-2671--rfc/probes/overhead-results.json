@@ -1,0 +1,167 @@
+{
+  "runtime": "Deno 2.9.5",
+  "orpcVersion": "1.15.5 (locked)",
+  "warmupIterations": 2000,
+  "measuredIterations": 5000,
+  "mediumPayloadJsonBytes": 12822,
+  "qualification": "In-memory static authenticator; real cryptographic/network authenticators add fixed cost to all authenticating modes and shrink relative speedup ratios toward 1x.",
+  "sequential": [
+    {
+      "mode": "http-loopback",
+      "scenario": "small-unary",
+      "warmup": 2000,
+      "iterations": 5000,
+      "totalMs": 1932.07,
+      "meanUs": 386.4,
+      "p50Us": 343,
+      "p95Us": 568.2,
+      "p99Us": 962,
+      "opsPerSec": 2588
+    },
+    {
+      "mode": "fetch-link-in-process",
+      "scenario": "small-unary",
+      "warmup": 2000,
+      "iterations": 5000,
+      "totalMs": 1060.93,
+      "meanUs": 212.2,
+      "p50Us": 176,
+      "p95Us": 323.2,
+      "p99Us": 801.4,
+      "opsPerSec": 4713
+    },
+    {
+      "mode": "router-client-authenticating",
+      "scenario": "small-unary",
+      "warmup": 2000,
+      "iterations": 5000,
+      "totalMs": 162.16,
+      "meanUs": 32.4,
+      "p50Us": 28,
+      "p95Us": 46.3,
+      "p99Us": 77.6,
+      "opsPerSec": 30834
+    },
+    {
+      "mode": "router-client-design-complete",
+      "scenario": "small-unary",
+      "warmup": 2000,
+      "iterations": 5000,
+      "totalMs": 190.89,
+      "meanUs": 38.2,
+      "p50Us": 31,
+      "p95Us": 60.1,
+      "p99Us": 95.1,
+      "opsPerSec": 26193
+    },
+    {
+      "mode": "router-client-trusted-principal-opt-in",
+      "scenario": "small-unary",
+      "warmup": 2000,
+      "iterations": 5000,
+      "totalMs": 111.75,
+      "meanUs": 22.3,
+      "p50Us": 18.5,
+      "p95Us": 32.3,
+      "p99Us": 54.3,
+      "opsPerSec": 44744
+    },
+    {
+      "mode": "http-loopback",
+      "scenario": "medium-100-items",
+      "warmup": 2000,
+      "iterations": 5000,
+      "totalMs": 2952.73,
+      "meanUs": 590.5,
+      "p50Us": 512.2,
+      "p95Us": 1001,
+      "p99Us": 1387.8,
+      "opsPerSec": 1693
+    },
+    {
+      "mode": "fetch-link-in-process",
+      "scenario": "medium-100-items",
+      "warmup": 2000,
+      "iterations": 5000,
+      "totalMs": 1724.91,
+      "meanUs": 345,
+      "p50Us": 293.7,
+      "p95Us": 554.9,
+      "p99Us": 1028.5,
+      "opsPerSec": 2899
+    },
+    {
+      "mode": "router-client-authenticating",
+      "scenario": "medium-100-items",
+      "warmup": 2000,
+      "iterations": 5000,
+      "totalMs": 216.92,
+      "meanUs": 43.4,
+      "p50Us": 39.2,
+      "p95Us": 60.1,
+      "p99Us": 115.7,
+      "opsPerSec": 23050
+    },
+    {
+      "mode": "router-client-design-complete",
+      "scenario": "medium-100-items",
+      "warmup": 2000,
+      "iterations": 5000,
+      "totalMs": 238.64,
+      "meanUs": 47.7,
+      "p50Us": 43.3,
+      "p95Us": 70.2,
+      "p99Us": 109.8,
+      "opsPerSec": 20952
+    },
+    {
+      "mode": "router-client-trusted-principal-opt-in",
+      "scenario": "medium-100-items",
+      "warmup": 2000,
+      "iterations": 5000,
+      "totalMs": 160.65,
+      "meanUs": 32.1,
+      "p50Us": 28.9,
+      "p95Us": 42.2,
+      "p99Us": 74.6,
+      "opsPerSec": 31123
+    }
+  ],
+  "concurrent": [
+    {
+      "mode": "http-loopback",
+      "scenario": "small-20x50-concurrent",
+      "totalCalls": 1000,
+      "totalMs": 233.11,
+      "opsPerSec": 4290
+    },
+    {
+      "mode": "fetch-link-in-process",
+      "scenario": "small-20x50-concurrent",
+      "totalCalls": 1000,
+      "totalMs": 117.31,
+      "opsPerSec": 8524
+    },
+    {
+      "mode": "router-client-authenticating",
+      "scenario": "small-20x50-concurrent",
+      "totalCalls": 1000,
+      "totalMs": 23.49,
+      "opsPerSec": 42579
+    },
+    {
+      "mode": "router-client-design-complete",
+      "scenario": "small-20x50-concurrent",
+      "totalCalls": 1000,
+      "totalMs": 23.64,
+      "opsPerSec": 42301
+    },
+    {
+      "mode": "router-client-trusted-principal-opt-in",
+      "scenario": "small-20x50-concurrent",
+      "totalCalls": 1000,
+      "totalMs": 13.01,
+      "opsPerSec": 76889
+    }
+  ]
+}
