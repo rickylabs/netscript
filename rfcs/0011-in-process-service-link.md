@@ -1,20 +1,20 @@
 ---
-rfc: 0000
+rfc: 0011
 title: In-process service link with HTTP transport parity
-status: Draft
+status: Accepted
 authors: ['@rickylabs']
 created: 2026-11-24
-tracking-issue: pending (reference issue: https://github.com/rickylabs/netscript/issues/451)
+tracking-issue: https://github.com/rickylabs/netscript/issues/451
 target-milestone: 0.0.10
 ---
 
 # In-process service link with HTTP transport parity
 
-> **Status: Draft.** No accepted governing RFC covers the in-process service link, and the
-> referenced feature issue (`#451`) does not constitute RFC acceptance. This draft specifies the
-> proposed design only and does not authorize implementation under `packages/` or `plugins/`. Code
-> snippets below illustrate the proposed API as if shipped; none of the proposed symbols exist on
-> `main` yet.
+> **Status: Accepted (`rfc: 0011`).** Accepted by **Owner decision 2026-11-27: Accept and merge**.
+> Tracking issue [#451](https://github.com/rickylabs/netscript/issues/451) (`Part of #327`) stays
+> open to track separate implementation PRs under `packages/` and `plugins/`. Code snippets below
+> illustrate the target API contract; none of the proposed symbols exist on `main` at the time of
+> acceptance.
 
 ## Summary
 
@@ -417,8 +417,8 @@ export type ServiceClientTransport =
 dispatched through the package-private `[SDK_CLIENT_TRANSPORT_FACTORY]` symbol inside
 `createServiceClient()`. `createServiceClient()` MUST NOT hardcode Fetch/`RPCLink` internals into
 its public `transport` contract or prevent additive transport arms. In particular, a later
-oRPC router-client transport (proposed for Stage 2 of companion draft RFC `#2673` / `#2671`, once
-its procedure-pipeline security requirements are accepted) can plug into the exact same
+oRPC router-client transport (specified for Stage 2 of companion RFC 0012 (`#2673` / `#2671`)) can
+plug into the exact same
 `createServiceClient({ contract, serviceName, contributions, transport })` and `defineServices()`
 API as an additive transport handle carrying `[SDK_CLIENT_TRANSPORT_FACTORY]`, preserving
 `contributionRuntimeByClient` cache partitioning, `direct-only` omission, and typed `ServiceClient`
@@ -829,7 +829,7 @@ shipped credential contributions (`createBearerSdkClientContribution` and
 #### Forward compatibility with oRPC v2 link changes
 
 This RFC remains on stable oRPC v1 (`@orpc/*@^1.15.5`) and does not migrate `@netscript/sdk` to
-oRPC v2. Consistent with companion draft RFC `#2674` (tracking `#2672`, oRPC v2 readiness based on
+oRPC v2. Consistent with companion RFC 0013 (`#2674`, tracking `#2672`, oRPC v2 readiness based on
 `@orpc/*@2.0.0-beta.53`), the shared `fetch-rpc-link.ts` builder and `createInProcessFetch()` MUST
 satisfy three defensive rules so the later v2 GA cut-over requires zero public API changes and zero
 behavioral regressions:
@@ -1908,14 +1908,14 @@ Assert exact HTTP ↔ in-process parity across every case:
   (roughly halving loopback HTTP's `~0.47–1.0 ms` per-call latency), but still serializes and
   deserializes payloads, allocates Web Fetch `Request`/`Response` objects, and executes Hono
   routing and middleware in memory. Measured against locked `@orpc/*@1.15.5` (Deno `2.9.5`) using
-  the authenticating-path benchmark in companion draft RFC `#2673` (run folder
+  the authenticating-path benchmark in companion RFC 0012 (`#2673`, run folder
   `.llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/probes/overhead-benchmark.probe.ts` and
   `overhead-results.json`, plus independent warm re-runs across small unary and 100-item / 12.8 KiB
   list payloads with full authentication, scope authorization, logical rate-limit consumption, and
   Zod validation):
   - **Fetch-link (this RFC):** about **0.2–0.4 ms** per call (`~212–435 µs` in independent re-runs;
     `259.3 µs` small unary / `380.6 µs` medium list in `overhead-results.json`).
-  - **Router client on the authenticating path (RFC `#2673` prototype):** about **0.03–0.07 ms**
+  - **Router client on the authenticating path (RFC 0012 / `#2673` prototype):** about **0.03–0.07 ms**
     per call (`~34–72 µs` in warm independent re-runs; `~40–56 µs` with full per-call interceptors;
     `48.1–78.7 µs` in `overhead-results.json`), saving roughly `0.17–0.3 ms` per call when using an
     in-memory authenticator (with the ratio shrinking toward `1×` whenever real I/O authenticators
@@ -1925,9 +1925,8 @@ Assert exact HTTP ↔ in-process parity across every case:
     limits, rate limits, `Set-Cookie`, raw routes, and HTTP wire error shapes) with identical
     behavior by construction — suitable for SSR loaders, integration tests, and moderate
     single-process fan-out. Workloads with high in-process fan-out where `0.2–0.3 ms` per call
-    matters can adopt a future router-client transport (RFC `#2673` Stage 2) through the open
-    `createServiceClient({ transport })` seam once its procedure-pipeline security design is
-    accepted.
+    matters can adopt a future router-client transport (RFC 0012 / `#2673` Stage 2) through the open
+    `createServiceClient({ transport })` seam.
 - **Server/host-only subpath constraint:** Because enforcing a complete `AsyncLocalStorage` boundary
   (`AsyncLocalStorage.snapshot()`) and synchronous collision-free per-service origin hashing requires
   `node:async_hooks` and `node:crypto`, `@netscript/sdk/in-process` is intentionally a server/host
@@ -1973,8 +1972,8 @@ construction, but sacrifices almost every parity guarantee:
 - cannot target a built `ServiceApp` (requires raw router internals).
 
 Rejected because bare router invocation violates the core HTTP transport parity requirement.
-A security-complete procedure-pipeline router client (explored separately in companion draft RFC
-`#2673` / `#2671` to reduce per-call overhead from ~0.2–0.4 ms to ~0.03–0.07 ms on the
+A security-complete procedure-pipeline router client (specified separately in companion RFC 0012
+(`#2673` / `#2671`) to reduce per-call overhead from ~0.2–0.4 ms to ~0.03–0.07 ms on the
 authenticating path) requires moving authentication, contract authorization, and logical rate
 limiting into oRPC procedure middleware and solving additional security boundaries before it is
 safe to ship. This RFC therefore lands the HTTP-parity fetch-link independently while keeping
@@ -2072,7 +2071,15 @@ tracing, and serialization behavior).
 
 ## Unresolved questions
 
-The following technical design choices remain open before acceptance:
+Accepted in this RFC (`rfc: 0011`, `status: Accepted`, **Owner decision 2026-11-27: Accept and
+merge**) with the recommended options recorded below (Option B non-breaking `kind: 'http'` +
+optional `inProcess?: boolean`, 1-method `InProcessServiceApp`, package-private
+`createInProcessClientLink`, bounded `@netscript/sdk/in-process` server subpath,
+`IN_PROCESS_SERVICE_DUPLICATE` default with opt-in `{ replace: true }`, reuse of
+`withContext(extractContext({}), ...)` + `AsyncLocalStorage.snapshot()`, Option B `POST`-first /
+distinct-header v1 acceptance alongside a companion shared-SDK `GET` dedup follow-up, and the open
+`[SDK_CLIENT_TRANSPORT_FACTORY]` seam for companion RFC 0012 Stage 2). The eight design trade-offs
+evaluated before acceptance are preserved below for reference:
 
 1. **`SdkClientTransportDescriptor.kind` non-breaking Option B (recommended) vs breaking Option A:**
    Confirm the recommended **Option B** — retaining `readonly kind: 'http'` and adding optional
@@ -2115,10 +2122,10 @@ The following technical design choices remain open before acceptance:
    - **Option A (wait for full `GET` + `POST` parity gate):** Hold implementation until both `#2611`
      (`GET` `no-store` / `signal` forwarding) and the shared-SDK `DedupeRequestsPlugin`
      partition-key fix have landed so both `POST` and `GET` close in one pass.
-8. **Transport seam extensibility for a future router-client transport (RFC `#2673` Stage 2):**
+8. **Transport seam extensibility for a future router-client transport (RFC 0012 / `#2673` Stage 2):**
    Confirm keeping `createServiceClient({ transport })` and `ServiceClientTransport` open via the
    package-private `[SDK_CLIENT_TRANSPORT_FACTORY]` dispatch seam so a future oRPC router-client
-   transport (`#2673` / `#2671` Stage 2, once its procedure-pipeline security blockers are resolved)
+   transport (RFC 0012 / `#2673` / `#2671` Stage 2)
    can plug into the exact same `createServiceClient()` and `defineServices()` API without breaking
    callers or introducing a parallel client constructor.
 
