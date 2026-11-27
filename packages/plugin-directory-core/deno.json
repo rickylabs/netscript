@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-directory-core",
-  "version": "0.0.9",
+  "version": "0.0.10-canary.7",
   "description": "Provider-neutral directory port, domain contracts, typed errors, and conformance testing kit for NetScript.",
   "license": "Apache-2.0",
   "exports": {
