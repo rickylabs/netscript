@@ -26,18 +26,25 @@ await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 class Resource {
   readonly environment: Record<string, string> = {};
-  constructor(readonly name: string, readonly args: string[]) {}
+  readonly permissions: string[] = [];
+  constructor(readonly name: string) {}
   withEnvironment(key: string, value: string): this {
     this.environment[key] = value;
+    return this;
+  }
+  withDenoConfig(): this {
+    return this;
+  }
+  withDenoNodeModulesDir(): this {
+    return this;
+  }
+  withDenoRuntimeArgs(): this {
     return this;
   }
   withHttpEndpoint(): this {
     return this;
   }
   withHttpHealthCheck(): this {
-    return this;
-  }
-  withOtlpExporter(): this {
     return this;
   }
   getEndpoint(): Promise<string> {
@@ -85,19 +92,19 @@ async function generatedCarrier(
     await Deno.mkdir(join(root, '.aspire/modules'), { recursive: true });
     await Deno.writeTextFile(
       join(root, '.aspire/modules/aspire.mts'),
-      "export const OtlpProtocol = { HttpProtobuf: 'http' }; export class ReferenceExpression {}\n",
+      "export const DenoNodeModulesDirMode = { None: 'None' }; export class ReferenceExpression {}\n",
     );
     // Keep registration helpers real; isolate unrelated dashboard/infrastructure ports.
     await Deno.writeTextFile(
       join(root, '.helpers/_aspire-compat.mts'),
       `
 import { resolve } from 'node:path';
+export async function applyDenoPermissions(resource, perms) { resource.permissions.push(...perms); }
 export function resolveWorkspacePath(root, path) { return resolve(root, path); }
 export function resolvePermissions(entry, defaults) { return entry ?? defaults; }
 export function buildDatabaseUriEnvKey() { return null; }
 export function buildDatabaseProviderEnvVars() { return {}; }
 export function buildSqliteDatabaseUrl() { throw new Error('unexpected database'); }
-export function buildOtelEnvVars() { return {}; }
 export function buildViteEnvVarName() { throw new Error("unexpected app"); }
 export function withCacheReference() { throw new Error("unexpected cache"); }
 export function extractPluginReferences(entry) { return entry.PluginReferences ?? []; }
@@ -132,13 +139,12 @@ export function extractServiceReferences(entry) { return entry.ServiceReferences
         parameters.push({ name, ...options });
         return Promise.resolve({});
       },
-      addExecutable: (
+      addDenoApp: (
         name: string,
-        _executable: string,
         _workdir: string,
-        args: string[],
+        _scriptPath: string,
       ) => {
-        const resource = new Resource(name, args);
+        const resource = new Resource(name);
         resources.push(resource);
         return resource;
       },
@@ -167,9 +173,9 @@ export function extractServiceReferences(entry) { return entry.ServiceReferences
         resource.environment.NETSCRIPT_INSTALLATION_SECRET_FILE,
         secretFile,
       );
-      assert(resource.args.includes(`--allow-read=./config,${secretFile}`));
+      assert(resource.permissions.includes(`--allow-read=./config,${secretFile}`));
       assert(
-        resource.args.includes(
+        resource.permissions.includes(
           '--allow-env=PORT,NETSCRIPT_INSTALLATION_SECRET_FILE',
         ),
       );

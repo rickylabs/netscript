@@ -2,41 +2,27 @@
 
 {{dataDirectoryImports}}import { installationSecretPermissions } from './installation-secret.mts';
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
-{{otlpImport}}import type { NetScriptConfig } from '{{__slot2__}}';
+{{denoSdkImport}}import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mts';
 import {
 {{compatImports}}
 } from '{{__slot3__}}';
 
-type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutable']>;
+type DenoResource = ReturnType<DistributedApplicationBuilder['addDenoApp']>;
 
 /**
- * Registers plugins with the Aspire SDK builder using a two-pass approach.
- *
- * - Pass 1: Create all plugin resources via `addExecutable()` with resolved
- *   permissions, working directory, HTTP endpoint, executable-mode OTEL
- *   telemetry, infrastructure dependencies, and service references
- *   via endpoint env vars (`getEndpoint('http')` + `withEnvironment()`).
- * - Pass 2: Wire `PluginReferences` (plugin→plugin) via endpoint env vars
- *   (`getEndpoint('http')` + `withEnvironment()`) to avoid forward-reference
- *   issues.
- *
- * @param builder - The Aspire distributed application builder
- * @param config - Parsed NetScript configuration
- * @param infrastructure - Infrastructure context with database/cache resources
- * @param services - Map of registered service resources (for endpoint env vars)
- * @param appHostDir - Absolute path to the AppHost directory
- * @returns Map of registered plugin resources keyed by name
+ * Registers plugins with the Aspire SDK builder using a two-pass approach
+ * via first-party `addDenoApp()`.
  */
 export async function registerPlugins(
   builder: DistributedApplicationBuilder,
   config: NetScriptConfig,
   {{infrastructureParameter}}: InfrastructureContext,
-  _services: Map<string, ExecutableResource>,
+  _services: Map<string, DenoResource>,
   appHostDir: string,
   installationSecretFile: string | undefined = undefined,
-): Promise<Map<string, ExecutableResource>> {
-  const plugins = new Map<string, ExecutableResource>();
+): Promise<Map<string, DenoResource>> {
+  const plugins = new Map<string, DenoResource>();
 {{databaseBindings}}
   // --- Pass 1: Create all plugin resources ---
 {{__slot4__}}

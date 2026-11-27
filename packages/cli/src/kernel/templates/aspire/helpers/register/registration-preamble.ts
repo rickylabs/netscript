@@ -3,7 +3,7 @@
  *
  * Shared preamble for the populated `register-background.mts` and
  * `register-plugins.mts` helpers. The registration blocks consume database,
- * telemetry, and cache wiring only for the entries that declare it, so each
+ * Deno runtime, and cache wiring only for the entries that declare it, so each
  * preamble piece (import, binding, parameter) is emitted only when some block
  * reads it. Generated output therefore stays `deno lint`-clean for every
  * entry mix, not only the empty one.
@@ -21,7 +21,7 @@ export interface RegistrationEntryNeeds {
 export interface RegistrationPreambleNeeds {
   /** Database env bindings and the SQLite URL helper. */
   readonly database: boolean;
-  /** `buildOtelEnvVars` and `OtlpProtocol`. */
+  /** Whether any entry emits telemetry env vars. */
   readonly telemetry: boolean;
   /** The cache-reference helper. */
   readonly cache: boolean;
@@ -29,7 +29,7 @@ export interface RegistrationPreambleNeeds {
 
 /** Module specifiers and the cache-helper import form a generator emits. */
 export interface RegistrationPreambleImports {
-  /** Aspire SDK module that exports `OtlpProtocol`. */
+  /** Aspire SDK module that exports `DenoNodeModulesDirMode`. */
   readonly sdkModule: string;
   /** Named import for the cache-reference helper, e.g. `withCacheReference`. */
   readonly cacheImport: string;
@@ -37,8 +37,8 @@ export interface RegistrationPreambleImports {
 
 /** Template slots that carry the preamble. */
 export interface RegistrationPreambleSlots extends Record<string, string> {
-  /** `OtlpProtocol` import line, or empty. */
-  readonly otlpImport: string;
+  /** `DenoNodeModulesDirMode` import line. */
+  readonly denoSdkImport: string;
   /** Named imports from the Aspire compat module, one per line. */
   readonly compatImports: string;
   /** Name of the infrastructure parameter; underscore-prefixed when unread. */
@@ -77,17 +77,17 @@ export function renderRegistrationPreamble(
   imports: RegistrationPreambleImports,
 ): RegistrationPreambleSlots {
   const compatImports = [
+    'applyDenoPermissions',
     ...(needs.database
       ? ['buildDatabaseUriEnvKey', 'buildDatabaseProviderEnvVars', 'buildSqliteDatabaseUrl']
       : []),
-    ...(needs.telemetry ? ['buildOtelEnvVars'] : []),
     'resolvePermissions',
     'resolveWorkspacePath',
     ...(needs.cache ? [imports.cacheImport] : []),
   ];
 
   return {
-    otlpImport: needs.telemetry ? `import { OtlpProtocol } from '${imports.sdkModule}';\n` : '',
+    denoSdkImport: `import { DenoNodeModulesDirMode } from '${imports.sdkModule}';\n`,
     compatImports: compatImports.map((name) => `  ${name},`).join('\n'),
     infrastructureParameter: needs.database || needs.cache ? 'infrastructure' : '_infrastructure',
     databaseBindings: needs.database

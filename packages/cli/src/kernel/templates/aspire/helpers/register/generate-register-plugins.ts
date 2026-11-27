@@ -120,15 +120,21 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       lines.push(`    }`);
     }
 
-    // Register via addExecutable with HTTP endpoint
+    // Register via first-party addDenoApp with Deno runtime flags and HTTP endpoint
     lines.push(
-      `    const resource = builder.addExecutable(${
-        JSON.stringify(name)
-      }, 'deno', workdir, ['run', '--config', 'deno.json', '--minimum-dependency-age=0', '${DENO_NO_LEGACY_ABORT_FLAG}', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...installationSecretPermissions(perms, installationSecretFile), ${
+      `    const resource = builder.addDenoApp(${JSON.stringify(name)}, workdir, ${
         JSON.stringify(entrypoint)
-      }])`,
+      });`,
     );
-    lines.push(`      .${renderHttpEndpointCall(entry)};`);
+    lines.push(
+      `    await applyDenoPermissions(resource, [...installationSecretPermissions(perms, installationSecretFile), '${DENO_NO_LEGACY_ABORT_FLAG}']);`,
+    );
+    lines.push(`    await resource.withDenoConfig('deno.json');`);
+    lines.push(
+      `    await resource.withDenoNodeModulesDir({ mode: DenoNodeModulesDirMode.None });`,
+    );
+    lines.push(`    await resource.withDenoRuntimeArgs(['--minimum-dependency-age=0']);`);
+    lines.push(`    await resource.${renderHttpEndpointCall(entry)};`);
 
     if (entry.HealthCheckPath !== false) {
       const healthCheckPath = entry.HealthCheckPath ?? RESOURCE_DEFAULTS.AppHealthCheckPath;
@@ -185,17 +191,12 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     );
     lines.push(`    }`);
 
-    // OTEL telemetry (full executable env set)
+    // OTEL telemetry (endpoint-conditional via Aspire AddDenoApp defaults)
     lines.push(``);
-    lines.push(`    // OTEL telemetry (full executable env set)`);
+    lines.push(`    // OTEL telemetry (endpoint-conditional via Aspire AddDenoApp defaults)`);
+    lines.push(`    await resource.withEnvironment('OTEL_SERVICE_NAME', ${JSON.stringify(name)});`);
     lines.push(
-      `    const otel = buildOtelEnvVars(${JSON.stringify(name)}, config.Version, 'executable');`,
-    );
-    lines.push(`    for (const [key, value] of Object.entries(otel)) {`);
-    lines.push(`      await resource.withEnvironment(key, value);`);
-    lines.push(`    }`);
-    lines.push(
-      `    await resource.withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf });`,
+      "    await resource.withEnvironment('OTEL_RESOURCE_ATTRIBUTES', `service.version=${config.Version}`);",
     );
 
     // Database dependency

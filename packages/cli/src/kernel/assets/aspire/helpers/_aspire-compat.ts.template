@@ -6,6 +6,7 @@ import { pathToFileURL } from 'node:url';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import process from 'node:process';
+import { DenoPermissionKind } from '../.aspire/modules/aspire.mts';
 import type { NetScriptConfig } from '@netscript/aspire/types';
 
 export type {
@@ -65,14 +66,81 @@ export type {
 
 const GARNET_TOOL_RESTORE_TIMEOUT_MS = 10_000;
 
-// ============================================================================
-// Path & secret helpers (1-level root-relative contract)
-// ============================================================================
+const DENO_PERMISSION_KINDS: Readonly<Record<string, DenoPermissionKind>> = {
+  net: DenoPermissionKind.Net,
+  read: DenoPermissionKind.Read,
+  write: DenoPermissionKind.Write,
+  run: DenoPermissionKind.Run,
+  env: DenoPermissionKind.Env,
+  import: DenoPermissionKind.Import,
+  sys: DenoPermissionKind.Sys,
+  ffi: DenoPermissionKind.Ffi,
+};
 
-export function resolveWorkspacePath(
-  appHostDir: string,
-  relativePath: string,
-): string {
+interface DenoPermissionTarget {
+  withDenoAllowAll(options?: { enabled?: boolean }): PromiseLike<unknown>;
+  withDenoAllow(kind: DenoPermissionKind, values: string[]): PromiseLike<unknown>;
+  withDenoDeny(kind: DenoPermissionKind, values: string[]): PromiseLike<unknown>;
+  withDenoWatch(options?: { hmr?: boolean }): PromiseLike<unknown>;
+  withDenoUnstable(features: string[]): PromiseLike<unknown>;
+  withDenoRuntimeArgs(args: string[]): PromiseLike<unknown>;
+}
+
+/** Applies NetScript Deno permission/runtime flag strings onto an Aspire 17 `addDenoApp` resource. */
+export async function applyDenoPermissions(
+  resource: DenoPermissionTarget,
+  permissions: readonly string[],
+): Promise<void> {
+  const allowAll = permissions.some((flag) => flag === '-A' || flag === '--allow-all');
+  const allows = new Map<DenoPermissionKind, string[] | null>();
+  const denies = new Map<DenoPermissionKind, string[] | null>();
+  const unstable: string[] = [];
+  const runtimeArgs: string[] = [];
+  let watchMode: 'none' | 'watch' | 'hmr' = 'none';
+  for (const flag of permissions) {
+    if (!flag || flag === '-A' || flag === '--allow-all') continue;
+    if (flag === '--watch-hmr') {
+      watchMode = 'hmr';
+      continue;
+    }
+    if (flag === '--watch') {
+      if (watchMode === 'none') watchMode = 'watch';
+      continue;
+    }
+    if (flag.startsWith('--unstable-')) {
+      const feature = flag.slice('--unstable-'.length);
+      if (feature && !unstable.includes(feature)) unstable.push(feature);
+      continue;
+    }
+    if (/^--(node-modules-dir|config)(=|$)|^--minimum-dependency-age=/.test(flag)) continue;
+    const permMatch = /^--(allow|deny)-([a-z]+)(?:=(.*))?$/.exec(flag);
+    const kind = permMatch ? DENO_PERMISSION_KINDS[permMatch[2]] : undefined;
+    if (permMatch && kind !== undefined) {
+      const map = permMatch[1] === 'allow' ? allows : denies;
+      if (permMatch[3] === undefined) {
+        map.set(kind, null);
+      } else if (map.get(kind) !== null) {
+        const next = map.get(kind) ?? [];
+        for (const v of permMatch[3].split(',').map((s) => s.trim()).filter(Boolean)) {
+          if (!next.includes(v)) next.push(v);
+        }
+        map.set(kind, next);
+      }
+      continue;
+    }
+    runtimeArgs.push(flag);
+  }
+  await resource.withDenoAllowAll({ enabled: allowAll });
+  if (!allowAll) {
+    for (const [kind, values] of allows) await resource.withDenoAllow(kind, values ?? []);
+    for (const [kind, values] of denies) await resource.withDenoDeny(kind, values ?? []);
+  }
+  if (watchMode !== 'none') await resource.withDenoWatch({ hmr: watchMode === 'hmr' });
+  if (unstable.length > 0) await resource.withDenoUnstable(unstable);
+  if (runtimeArgs.length > 0) await resource.withDenoRuntimeArgs(runtimeArgs);
+}
+
+export function resolveWorkspacePath(appHostDir: string, relativePath: string): string {
   return resolve(appHostDir, relativePath);
 }
 
@@ -81,22 +149,14 @@ export function resolveDataPath(
   dataPath: string | undefined,
   resourceName: string,
 ): string {
-  const relativePath = dataPath ?? join('.data', resourceName);
-  return resolveWorkspacePath(appHostDir, relativePath);
+  return resolveWorkspacePath(appHostDir, dataPath ?? join('.data', resourceName));
 }
 
-/**
- * Ensures a host bind-mount data directory exists before container startup so
- * Docker does not auto-create it as `root:root` on Linux.
- */
 export function ensureContainerDataPath(dataPath: string): string {
   mkdirSync(dataPath, { recursive: true });
   return dataPath;
 }
 
-/**
- * Returns one project-scoped database password for the resident AppHost graph.
- */
 export function ensureDatabasePassword(appHostDir: string, resourceName: string): string {
   const secretsDir = resolveWorkspacePath(appHostDir, join('.data', 'aspire-secrets'));
   const passwordPath = join(secretsDir, `${resourceName}.password`);
@@ -116,17 +176,10 @@ export function ensureDatabasePassword(appHostDir: string, resourceName: string)
   return password;
 }
 
-// ============================================================================
-// Database environment helpers
-// ============================================================================
-
 export function buildDatabaseUriEnvKey(
   config: Pick<NetScriptConfig, 'PrimaryDatabase'>,
 ): string | null {
-  if (!config.PrimaryDatabase) {
-    return null;
-  }
-
+  if (!config.PrimaryDatabase) return null;
   const prefix = config.PrimaryDatabase
     .replace(/[^a-z0-9]+/gi, '_')
     .replace(/^_+|_+$/g, '')
@@ -138,10 +191,7 @@ export function buildDatabaseProviderEnvVars(
   config: Pick<NetScriptConfig, 'PrimaryDatabase'>,
 ): Record<string, string> {
   if (!config.PrimaryDatabase) return {};
-  return {
-    DB_PROVIDER: config.PrimaryDatabase,
-    DATABASE_PROVIDER: config.PrimaryDatabase,
-  };
+  return { DB_PROVIDER: config.PrimaryDatabase, DATABASE_PROVIDER: config.PrimaryDatabase };
 }
 
 export function buildSqliteDatabaseUrl(
@@ -154,21 +204,10 @@ export function buildSqliteDatabaseUrl(
   ).href;
 }
 
-// ============================================================================
-// Cache wiring (shared-cache consumer injection seam)
-// ============================================================================
-
-/**
- * Describes how a consumer resource attaches to the primary shared cache.
- */
 export interface CacheWiring {
-  /** Cache resource to await readiness on (null for Local/in-process). */
   readonly resource: unknown;
-  /** Passed to withReference — an endpoint reference or the resource (null for Local). */
   readonly reference: unknown;
-  /** Explicit env pairs consumers receive (access token, provider, host:port refs). */
   readonly env: Record<string, unknown>;
-  /** Local mode (DenoKv in-process): consumers inject nothing. */
   readonly local: boolean;
 }
 
@@ -178,22 +217,14 @@ interface CacheConsumerBuilder {
   waitFor(resource: unknown): unknown;
 }
 
-/**
- * Generates a crypto-random base64 access token for the DenoKv Connect container.
- */
 export function generateAccessToken(): string {
   const bytes = new Uint8Array(15);
   crypto.getRandomValues(bytes);
   let binary = '';
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
   return btoa(binary);
 }
 
-/**
- * Probes whether a live container runtime is reachable for the `Auto` cache arm.
- */
 export function isDockerAvailable(): boolean {
   try {
     execFileSync('docker', ['info'], { stdio: 'ignore', timeout: 3000 });
@@ -203,9 +234,6 @@ export function isDockerAvailable(): boolean {
   }
 }
 
-/**
- * Resolves the environment-aware cache backend for `Auto` mode.
- */
 export function shouldUseContainerCache(): boolean {
   const override = process.env.NETSCRIPT_CACHE_MODE;
   if (override === 'Container') return true;
@@ -213,9 +241,6 @@ export function shouldUseContainerCache(): boolean {
   return isDockerAvailable();
 }
 
-/**
- * Reports whether the active Linux container runtime uses rootless user namespaces.
- */
 export function isRootlessContainerRuntime(
   runtime: string = process.env.ASPIRE_CONTAINER_RUNTIME?.trim() ||
     process.env.DOTNET_ASPIRE_CONTAINER_RUNTIME?.trim() ||
@@ -237,10 +262,6 @@ export function isRootlessContainerRuntime(
   }
 }
 
-/**
- * Returns container runtime arguments needed so non-root images (e.g. Garnet) can write
- * to a host bind-mounted `DataPath` on Linux without leaving foreign-UID files behind.
- */
 export function resolveContainerBindMountRuntimeArgs(
   options?: {
     readonly platform?: string;
@@ -261,32 +282,20 @@ export function resolveContainerBindMountRuntimeArgs(
   return isRootless() ? ['--user', '0:0'] : ['--user', `${getUid()}:${getGid()}`];
 }
 
-/**
- * Ensures the apphost carries a local `garnet-server` dotnet tool manifest and restores it.
- */
-export function ensureGarnetToolManifest(
-  appHostDir: string,
-  version: string,
-): string {
+export function ensureGarnetToolManifest(appHostDir: string, version: string): string {
   const configDir = join(appHostDir, '.config');
   const manifestPath = join(configDir, 'dotnet-tools.json');
-
   let manifest: {
     version: number;
     isRoot: boolean;
     tools: Record<string, { version: string; commands: string[] }>;
-  };
+  } = { version: 1, isRoot: true, tools: {} };
   if (existsSync(manifestPath)) {
     try {
       manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
-      if (!manifest.tools) manifest.tools = {};
-    } catch {
-      manifest = { version: 1, isRoot: true, tools: {} };
-    }
-  } else {
-    manifest = { version: 1, isRoot: true, tools: {} };
+      manifest.tools ??= {};
+    } catch { /* fall back to default manifest */ }
   }
-
   const garnetTool = manifest.tools['garnet-server'];
   if (!garnetTool || garnetTool.version !== version) {
     manifest.tools['garnet-server'] = {
@@ -297,39 +306,24 @@ export function ensureGarnetToolManifest(
     mkdirSync(configDir, { recursive: true });
     writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf-8');
   }
-
   try {
     execFileSync('dotnet', ['tool', 'restore'], {
       cwd: appHostDir,
       stdio: 'ignore',
       timeout: GARNET_TOOL_RESTORE_TIMEOUT_MS,
     });
-  } catch {
-    // Restore failures surface when the executable resource starts.
-  }
-
+  } catch { /* restore failures surface when the executable resource starts */ }
   return appHostDir;
 }
 
-/**
- * Wires a shared-cache dependency into a consumer builder through a single seam.
- */
 export async function withCacheReference<T>(
   builder: T,
   wiring: CacheWiring | undefined | null,
 ): Promise<T> {
-  if (!wiring || wiring.local) {
-    return builder;
-  }
+  if (!wiring || wiring.local) return builder;
   const target = builder as unknown as CacheConsumerBuilder;
-  if (wiring.reference) {
-    await target.withReference(wiring.reference);
-  }
-  for (const key of Object.keys(wiring.env)) {
-    await target.withEnvironment(key, wiring.env[key]);
-  }
-  if (wiring.resource) {
-    await target.waitFor(wiring.resource);
-  }
+  if (wiring.reference) await target.withReference(wiring.reference);
+  for (const key of Object.keys(wiring.env)) await target.withEnvironment(key, wiring.env[key]);
+  if (wiring.resource) await target.waitFor(wiring.resource);
   return builder;
 }

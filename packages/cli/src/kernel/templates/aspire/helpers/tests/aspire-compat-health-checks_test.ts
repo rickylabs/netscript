@@ -73,6 +73,17 @@ export interface HealthCheckResult {
   data?: Record<string, string>;
 }
 
+export enum DenoPermissionKind {
+  Net = 'Net',
+  Read = 'Read',
+  Write = 'Write',
+  Run = 'Run',
+  Env = 'Env',
+  Import = 'Import',
+  Sys = 'Sys',
+  Ffi = 'Ffi',
+}
+
 export interface EndpointReference {
   /** Gets the port for this endpoint. */
   port(): Promise<number>;

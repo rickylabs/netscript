@@ -1,29 +1,10 @@
 {{__slot0__}}
 
-import type { DistributedApplicationBuilder } from '{{__slot1__}}';
-import { OtlpProtocol, ReferenceExpression } from '{{__slot1__}}';
-import type { EndpointReference } from '{{__slot1__}}';
-import type { NetScriptConfig } from '{{__slot2__}}';
+import type { DistributedApplicationBuilder{{sdkTypeImports}} } from '{{__slot1__}}';
+{{sdkValueImport}}import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mts';
-import {
-  buildOtelEnvVars,
-  buildViteEnvVarName,
-  resolveWorkspacePath,
-  withCacheReference as _withCacheReference,
-} from '{{__slot3__}}';
-
-interface EndpointProvider {
-  getEndpoint(protocol: string): PromiseLike<EndpointReference> | EndpointReference;
-}
-
-async function getResourceEndpoint(resource: unknown, protocol: string): Promise<EndpointReference | undefined> {
-  if (!resource || typeof resource !== 'object' || !('getEndpoint' in resource)) {
-    return undefined;
-  }
-  return await (resource as EndpointProvider).getEndpoint(protocol);
-}
-
-interface EnvironmentTarget {
+{{compatImportBlock}}
+{{endpointHelperBlock}}interface EnvironmentTarget {
   withEnvironment(key: string, value: unknown): unknown;
 }
 
@@ -46,38 +27,20 @@ function declaredCorsOrigins(entry: unknown): string | undefined {
 }
 
 /**
- * Registers application resources (web apps, Tauri desktop apps, and tasks)
- * with the Aspire SDK builder.
- *
- * - `app` type: registered via `addExecutable()` with VITE env var injection
- *   for service discovery (full, shorthand, and server-side formats).
- * - `tauri` type: registered via `addExecutable()` with optional remote
- *   app reference.
- * - `task` type: registered via `addExecutable()` with simple config.
- *
- * All types receive OTEL telemetry (full executable env set), optional
- * HTTP endpoint binding, and optional KV cache dependency injection.
- *
- * @param builder - The Aspire distributed application builder
- * @param config - Parsed NetScript configuration
- * @param infrastructure - Infrastructure context with database/cache resources
- * @param services - Map of registered service resources (for endpoint-based env var wiring and VITE injection)
- * @param plugins - Map of registered plugin resources (for endpoint-based env var wiring and VITE injection)
- * @param appHostDir - Absolute path to the AppHost directory
- * @returns Map of registered app resources keyed by name
+ * Registers application resources (web apps, Tauri desktop apps, Deno Desktop
+ * apps, and tasks) with the Aspire SDK builder via first-party `addDenoApp()`.
  */
 export async function registerApps(
-  builder: DistributedApplicationBuilder,
+  {{builderParameter}}: DistributedApplicationBuilder,
   config: NetScriptConfig,
   _infrastructure: InfrastructureContext,
   _services: Map<string, unknown>,
   _plugins: Map<string, unknown>,
-  appHostDir: string,
+  {{appHostDirParameter}}: string,
   _backgroundProcessors: ReadonlyMap<string, unknown> = new Map(),
 ): Promise<Map<string, unknown>> {
   const apps = new Map<string, unknown>();
-  let corsOrigins: ReferenceExpression | undefined;
-
+{{corsOriginsDecl}}
 {{__slot4__}}
 
   // Workspace web origins extend explicitly declared service/plugin origins.
@@ -88,9 +51,7 @@ export async function registerApps(
         throw new TypeError('Service/plugin resource cannot receive the workspace CORS allowlist');
       }
       const extra = declaredCorsOrigins(entries[name]);
-      const origins = extra && corsOrigins
-        ? ReferenceExpression.create`${corsOrigins},${extra}`
-        : corsOrigins ?? extra ?? '';
+{{corsMergeExpr}}
       await resource.withEnvironment('NETSCRIPT_CORS_ORIGINS', origins);
     }
   }

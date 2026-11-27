@@ -249,14 +249,17 @@ describe('HelpersGeneratorPipeline', () => {
       (f) => f.path === '.helpers/register-services.mts',
     );
     assert(regServices, 'register-services.mts should exist');
-    assertStringIncludes(regServices!.content, "builder.addExecutable('users'");
     assertStringIncludes(
       regServices!.content,
-      "buildOtelEnvVars('users', config.Version, 'executable')",
+      "builder.addDenoApp('users', workdir, 'src/main.ts');",
     );
     assertStringIncludes(
       regServices!.content,
-      'withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf })',
+      "await resource.withEnvironment('OTEL_SERVICE_NAME', 'users');",
+    );
+    assert(
+      !regServices!.content.includes('withOtlpExporter'),
+      'service OTEL should rely on Aspire 17 AddDenoApp optional exporter',
     );
     assert(
       !regServices!.content.includes('config.Otel.HttpEndpoint'),
@@ -276,10 +279,10 @@ describe('HelpersGeneratorPipeline', () => {
       (f) => f.path === '.helpers/register-plugins.mts',
     );
     assert(regPlugins, 'register-plugins.mts should exist');
-    assertStringIncludes(regPlugins!.content, 'builder.addExecutable("auth"');
-    assertStringIncludes(
-      regPlugins!.content,
-      'withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf })',
+    assertStringIncludes(regPlugins!.content, 'builder.addDenoApp("auth", workdir,');
+    assert(
+      !regPlugins!.content.includes('withOtlpExporter'),
+      'plugin OTEL should rely on Aspire 17 AddDenoApp optional exporter',
     );
     assert(
       !regPlugins!.content.includes('config.Otel.HttpEndpoint'),

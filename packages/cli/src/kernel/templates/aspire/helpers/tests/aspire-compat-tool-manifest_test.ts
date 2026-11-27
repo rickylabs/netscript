@@ -14,7 +14,7 @@ assertEquals(source.split(processImport).length, 2);
 await Deno.mkdir(join(root, '.aspire/modules'), { recursive: true });
 await Deno.writeTextFile(
   join(root, '.aspire/modules/aspire.mts'),
-  "export const HealthStatus = { Healthy: 'Healthy', Unhealthy: 'Unhealthy' };\n",
+  "export const HealthStatus = { Healthy: 'Healthy', Unhealthy: 'Unhealthy' };\nexport const DenoPermissionKind = { Net: 'Net', Read: 'Read', Write: 'Write', Run: 'Run', Env: 'Env', Import: 'Import', Sys: 'Sys', Ffi: 'Ffi' };\n",
 );
 // Match the helper's relative SDK and readiness import shape.
 await Deno.mkdir(join(root, '.helpers'));
@@ -40,7 +40,9 @@ await Deno.writeTextFile(
     "import { execFileSync } from 'data:text/javascript,export function execFileSync() {}';",
   ),
 );
-const { ensureGarnetToolManifest } = await import(toFileUrl(generatedPath).href);
+const { applyDenoPermissions, ensureGarnetToolManifest } = await import(
+  toFileUrl(generatedPath).href
+);
 const version = SCAFFOLD_VERSIONS.GARNET_TOOL;
 const garnet = { version, commands: ['garnet-server'] };
 
@@ -123,5 +125,66 @@ Deno.test('generated Garnet tool manifest: explicit requested version overrides 
     await Deno.readTextFile(join(appHostDir, '.config/dotnet-tools.json')),
   );
   assertEquals(manifest.tools['garnet-server'].version, '1.0.61');
+});
+Deno.test('applyDenoPermissions maps granular permissions, watch, unstable, and allow-all without duplicate managed flags', async () => {
+  const calls: Array<readonly [string, ...unknown[]]> = [];
+  const target = {
+    withDenoAllowAll(options?: { enabled?: boolean }) {
+      calls.push(['allowAll', options]);
+      return Promise.resolve();
+    },
+    withDenoAllow(kind: string, values: string[]) {
+      calls.push(['allow', kind, values]);
+      return Promise.resolve();
+    },
+    withDenoDeny(kind: string, values: string[]) {
+      calls.push(['deny', kind, values]);
+      return Promise.resolve();
+    },
+    withDenoWatch(options?: { hmr?: boolean }) {
+      calls.push(['watch', options]);
+      return Promise.resolve();
+    },
+    withDenoUnstable(features: string[]) {
+      calls.push(['unstable', features]);
+      return Promise.resolve();
+    },
+    withDenoRuntimeArgs(args: string[]) {
+      calls.push(['runtimeArgs', args]);
+      return Promise.resolve();
+    },
+  };
+
+  await applyDenoPermissions(target, [
+    '--allow-net',
+    '--allow-read=./config,/tmp/secret',
+    '--allow-read=./extra',
+    '--deny-write=/etc',
+    '--watch',
+    '--watch-hmr',
+    '--unstable-kv',
+    '--unstable-worker-options',
+    '--unstable-kv',
+    '--node-modules-dir=none',
+    '--config',
+    '--minimum-dependency-age=0',
+    '--cached-only',
+  ]);
+  assertEquals(calls, [
+    ['allowAll', { enabled: false }],
+    ['allow', 'Net', []],
+    ['allow', 'Read', ['./config', '/tmp/secret', './extra']],
+    ['deny', 'Write', ['/etc']],
+    ['watch', { hmr: true }],
+    ['unstable', ['kv', 'worker-options']],
+    ['runtimeArgs', ['--cached-only']],
+  ]);
+
+  calls.length = 0;
+  await applyDenoPermissions(target, ['-A', '--watch']);
+  assertEquals(calls, [
+    ['allowAll', { enabled: true }],
+    ['watch', { hmr: false }],
+  ]);
 });
 afterAll(() => Deno.remove(root, { recursive: true }));

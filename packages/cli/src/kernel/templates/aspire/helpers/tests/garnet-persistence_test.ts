@@ -28,7 +28,7 @@ async function loadCompatBindMountHelpers(): Promise<{
   await Deno.mkdir(join(root, '.aspire/modules'), { recursive: true });
   await Deno.writeTextFile(
     join(root, '.aspire/modules/aspire.mts'),
-    "export const HealthStatus = { Healthy: 'Healthy', Unhealthy: 'Unhealthy' };\n",
+    "export const HealthStatus = { Healthy: 'Healthy', Unhealthy: 'Unhealthy' };\nexport const DenoPermissionKind = { Net: 'Net', Read: 'Read', Write: 'Write', Run: 'Run', Env: 'Env', Import: 'Import', Sys: 'Sys', Ffi: 'Ffi' };\n",
   );
   await Deno.mkdir(join(root, '.helpers'));
   const readinessSource = await Deno.readTextFile(

@@ -2,21 +2,7 @@
  * @module
  *
  * Generator for `.helpers/register-services.mts` — registers service resources
- * with the Aspire SDK builder via `addExecutable()`.
- *
- * Uses a **two-pass cross-reference pattern** to avoid forward-reference issues
- * when services reference each other:
- *
- * - **Pass 1:** Create ALL service resources — `addExecutable()` + working dir +
- *   HTTP endpoint + executable-mode OTEL telemetry +
- *   infrastructure dependencies (`waitFor` primary database).
- * - **Pass 2:** Wire `ServiceReferences` and `PluginReferences` via
- *   `getEndpoint('http')` + `withEnvironment()` after services and plugins
- *   both exist. Uses Aspire service-discovery env var convention:
- *   `services__{name}__http__0`.
- *
- * Services use `--watch-hmr` for watch mode (HMR-capable), unlike background
- * processors and apps which use `--watch`.
+ * with the Aspire SDK builder via first-party `addDenoApp()`.
  */
 
 import type { RegisterServicesOptions } from '../types.ts';
@@ -34,9 +20,6 @@ import { renderDeclaredEnvironmentLines } from './resolve-resource-environment.t
  * Generates the `register-services.mts` file content for a scaffolded Aspire
  * project. Produces a two-pass registration function that creates all service
  * resources first, then wires cross-references in a second pass.
- *
- * @param options - Service entries, version, and Deno defaults from parsed config
- * @returns Generated TypeScript source as a string
  */
 export function generateRegisterServices(options: RegisterServicesOptions): string {
   const { services, version: _version, denoDefaults, databaseEngine } = options;
@@ -75,11 +58,16 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
     // Resolve working directory
     lines.push(`    const workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
 
-    // Register via addExecutable with HTTP endpoint
+    // Register via first-party addDenoApp with Deno runtime flags and HTTP endpoint
+    lines.push(`    const resource = builder.addDenoApp('${name}', workdir, '${entrypoint}');`);
     lines.push(
-      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...installationSecretPermissions(perms, installationSecretFile), '${entrypoint}'])`,
+      `    await applyDenoPermissions(resource, installationSecretPermissions(perms, installationSecretFile));`,
     );
-    lines.push(`      .${renderHttpEndpointCall(entry)};`);
+    lines.push(
+      `    await resource.withDenoNodeModulesDir({ mode: DenoNodeModulesDirMode.None });`,
+    );
+    lines.push(`    await resource.withDenoRuntimeArgs(['--minimum-dependency-age=0']);`);
+    lines.push(`    await resource.${renderHttpEndpointCall(entry)};`);
 
     if (entry.HealthCheckPath !== false) {
       const healthCheckPath = entry.HealthCheckPath ?? RESOURCE_DEFAULTS.AppHealthCheckPath;
@@ -105,17 +93,13 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
     );
     lines.push(`    }`);
 
-    // OTEL telemetry (full executable env set)
+    // OTEL telemetry — Aspire 17 AddDenoApp registers an optional HTTP OTLP exporter
+    // and preserves service.instance.id alongside service.version.
     lines.push(``);
-    lines.push(`    // OTEL telemetry (full executable env set)`);
+    lines.push(`    // OTEL telemetry (endpoint-conditional via Aspire AddDenoApp defaults)`);
+    lines.push(`    await resource.withEnvironment('OTEL_SERVICE_NAME', '${name}');`);
     lines.push(
-      `    const otel = buildOtelEnvVars('${name}', config.Version, 'executable');`,
-    );
-    lines.push(`    for (const [key, value] of Object.entries(otel)) {`);
-    lines.push(`      await resource.withEnvironment(key, value);`);
-    lines.push(`    }`);
-    lines.push(
-      `    await resource.withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf });`,
+      "    await resource.withEnvironment('OTEL_RESOURCE_ATTRIBUTES', `service.version=${config.Version}`);",
     );
 
     // Database dependency — all services wait for the primary database.
@@ -156,35 +140,68 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
     pass1Blocks.push(lines.join('\n'));
   }
 
-  // --- Compose full output ---
-  const pass1Content = pass1Blocks.length > 0
-    ? pass1Blocks.join('\n\n')
-    : '  // No services configured';
+  const hasServices = entries.length > 0;
+  const pass1Content = hasServices ? pass1Blocks.join('\n\n') : '  // No services configured';
+  const wireBody = hasServices
+    ? `  for (const [name, entry] of Object.entries(config.Services)) {
+    const resource = services.get(name);
+    if (!resource) continue;
+
+    for (const ref of extractServiceReferences(entry)) {
+      const endpoint = await services.get(ref)?.getEndpoint('http');
+      if (endpoint) {
+        await resource.withEnvironment(\`services__\${ref}__http__0\`, endpoint);
+      }
+    }
+
+    for (const ref of extractPluginReferences(entry)) {
+      const endpoint = await plugins.get(ref)?.getEndpoint('http');
+      if (endpoint) {
+        await resource.withEnvironment(\`services__\${ref}__http__0\`, endpoint);
+      }
+    }
+  }`
+    : '  return Promise.resolve();';
+
+  const compatImportBlock = hasServices
+    ? `import {
+  applyDenoPermissions,
+  buildDatabaseUriEnvKey,
+  buildDatabaseProviderEnvVars,
+  buildSqliteDatabaseUrl,
+  extractPluginReferences,
+  extractServiceReferences,
+  resolvePermissions,
+  resolveWorkspacePath,
+} from '${SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT}';\n`
+    : '';
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterServices1, {
-    executionImports: entries.length
+    executionImports: hasServices
       ? "import { installationSecretPermissions } from './installation-secret.mts';\n"
       : '',
-    otlpImport: entries.length
-      ? `import { OtlpProtocol } from '${SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS}';\n`
+    denoSdkImport: hasServices
+      ? `import { DenoNodeModulesDirMode } from '${SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS}';\n`
       : '',
-    executionCompatImports: entries.length
-      ? '  buildDatabaseUriEnvKey,\n  buildDatabaseProviderEnvVars,\n  buildSqliteDatabaseUrl,\n  buildOtelEnvVars,\n  resolvePermissions,\n  resolveWorkspacePath,\n'
-      : '',
-    asyncModifier: entries.length ? 'async ' : '',
-    builderParameter: entries.length ? 'builder' : '_builder',
-    configParameter: entries.length ? 'config' : '_config',
-    infrastructureParameter: entries.length ? 'infrastructure' : '_infrastructure',
-    appHostDirParameter: entries.length ? 'appHostDir' : '_appHostDir',
-    secretParameter: entries.length ? 'installationSecretFile' : '_installationSecretFile',
-    databaseBindings: entries.length
+    compatImportBlock,
+    asyncModifier: hasServices ? 'async ' : '',
+    builderParameter: hasServices ? 'builder' : '_builder',
+    configParameter: hasServices ? 'config' : '_config',
+    infrastructureParameter: hasServices ? 'infrastructure' : '_infrastructure',
+    appHostDirParameter: hasServices ? 'appHostDir' : '_appHostDir',
+    secretParameter: hasServices ? 'installationSecretFile' : '_installationSecretFile',
+    databaseBindings: hasServices
       ? '  const databaseEnvKey = buildDatabaseUriEnvKey(config);\n  const databaseProviderEnv = buildDatabaseProviderEnvVars(config);\n'
       : '',
-    registrationResult: entries.length ? 'services' : 'Promise.resolve(services)',
+    registrationResult: hasServices ? 'services' : 'Promise.resolve(services)',
+    wireAsyncModifier: hasServices ? 'async ' : '',
+    wireConfigParameter: hasServices ? 'config' : '_config',
+    wireServicesParameter: hasServices ? 'services' : '_services',
+    wirePluginsParameter: hasServices ? 'plugins' : '_plugins',
+    wireBody,
     __slot0__: String(fileHeader('register-services.mts')),
     __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
     __slot2__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
-    __slot3__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
     __slot4__: String(pass1Content),
   });
 }

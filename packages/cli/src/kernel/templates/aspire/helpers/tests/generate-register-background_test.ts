@@ -52,21 +52,21 @@ interface EndpointResource {
 interface RecordingResource extends EndpointResource {
   readonly environment: Array<readonly [string, unknown]>;
   readonly probes: Array<{ path: string; endpointName: string }>;
+  withDenoNodeModulesDir(options: unknown): Promise<RecordingResource>;
+  withDenoRuntimeArgs(args: readonly string[]): Promise<RecordingResource>;
   withHttpEndpoint(options: { env: string }): Promise<RecordingResource>;
   withHttpHealthCheck(
     options: { path: string; endpointName: string },
   ): Promise<RecordingResource>;
-  withOtlpExporter(options: unknown): Promise<RecordingResource>;
   withEnvironment(key: string, value: unknown): Promise<RecordingResource>;
 }
 
 interface RecordingBuilder {
   readonly registrations: string[];
-  addExecutable(
+  addDenoApp(
     name: string,
-    command: string,
     workdir: string,
-    args: string[],
+    scriptPath: string,
   ): RecordingResource;
 }
 
@@ -122,7 +122,7 @@ function createRecordingBuilder(endpoint?: string): RecordingBuilder {
   const registrations: string[] = [];
   return {
     registrations,
-    addExecutable(name: string): RecordingResource {
+    addDenoApp(name: string): RecordingResource {
       registrations.push(name);
       const environment: Array<readonly [string, unknown]> = [];
       let endpointRegistered = false;
@@ -130,6 +130,12 @@ function createRecordingBuilder(endpoint?: string): RecordingBuilder {
       return {
         environment,
         probes,
+        withDenoNodeModulesDir(): Promise<RecordingResource> {
+          return Promise.resolve(this);
+        },
+        withDenoRuntimeArgs(): Promise<RecordingResource> {
+          return Promise.resolve(this);
+        },
         withHttpEndpoint(options): Promise<RecordingResource> {
           assertEquals(options, { env: 'PORT' });
           endpointRegistered = true;
@@ -138,9 +144,6 @@ function createRecordingBuilder(endpoint?: string): RecordingBuilder {
         withHttpHealthCheck(options): Promise<RecordingResource> {
           assert(endpointRegistered, 'probe must follow its endpoint');
           probes.push(options);
-          return Promise.resolve(this);
-        },
-        withOtlpExporter(): Promise<RecordingResource> {
           return Promise.resolve(this);
         },
         getEndpoint: (_endpointName: string): Promise<string | undefined> =>
@@ -184,13 +187,13 @@ async function loadGeneratedModule(
   await Deno.writeTextFile(
     `${sdkDir}/aspire.mts`,
     [
-      `export const OtlpProtocol = { HttpProtobuf: 'http/protobuf' } as const;`,
-      `export interface ExecutableResource {`,
+      `export const DenoNodeModulesDirMode = { None: 'None' } as const;`,
+      `export interface DenoAppResource {`,
       `  getEndpoint(name: string): Promise<string | undefined>;`,
-      `  withEnvironment(key: string, value: unknown): Promise<ExecutableResource>;`,
+      `  withEnvironment(key: string, value: unknown): Promise<DenoAppResource>;`,
       `}`,
       `export interface DistributedApplicationBuilder {`,
-      `  addExecutable(name: string, command: string, workdir: string, args: string[]): ExecutableResource;`,
+      `  addDenoApp(name: string, workdir: string, scriptPath: string): DenoAppResource;`,
       `}`,
       ``,
     ].join('\n'),
@@ -198,10 +201,10 @@ async function loadGeneratedModule(
   await Deno.writeTextFile(
     `${helpersDir}/_aspire-compat.mts`,
     [
+      `export async function applyDenoPermissions(): Promise<void> {}`,
       `export function buildDatabaseUriEnvKey(): undefined { return undefined; }`,
       `export function buildDatabaseProviderEnvVars(): Record<string, string> { return {}; }`,
       `export function buildSqliteDatabaseUrl(): string { return 'file:unused'; }`,
-      `export function buildOtelEnvVars(): Record<string, string> { return {}; }`,
       `export function resolvePermissions(): string[] { return []; }`,
       `export function resolveWorkspacePath(root: string, relative: string): string { return root + '/' + relative; }`,
       `export async function withCacheReference<T>(resource: T): Promise<T> { return await Promise.resolve(resource); }`,
@@ -340,8 +343,8 @@ describe('generateRegisterBackground declared references (#1371)', () => {
     });
 
     assertStringIncludes(output, `config.BackgroundProcessors[${quotedName}]`);
-    assertStringIncludes(output, `builder.addExecutable(${quotedName}`);
-    assertStringIncludes(output, `buildOtelEnvVars(${quotedName}`);
+    assertStringIncludes(output, `builder.addDenoApp(${quotedName}`);
+    assertStringIncludes(output, `withEnvironment('OTEL_SERVICE_NAME', ${quotedName})`);
     assertStringIncludes(output, `backgroundProcessors.set(${quotedName}`);
   });
 
@@ -450,7 +453,7 @@ describe('generateRegisterBackground declared references (#1371)', () => {
     });
   }
 
-  it('emits both reference preflights before addExecutable', () => {
+  it('emits both reference preflights before addDenoApp', () => {
     const output = generateRegisterBackground({
       processors: {
         [PROCESSOR_NAME]: backgroundEntry({
@@ -462,7 +465,7 @@ describe('generateRegisterBackground declared references (#1371)', () => {
       denoDefaults: MINIMAL_DENO_DEFAULTS,
     });
     const registration = output.indexOf(
-      `builder.addExecutable("${PROCESSOR_NAME}"`,
+      `builder.addDenoApp("${PROCESSOR_NAME}"`,
     );
 
     const serviceError = configurationError('service');

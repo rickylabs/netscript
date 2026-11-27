@@ -1,33 +1,19 @@
 {{__slot0__}}
 
-{{executionImports}}
-import type { DistributedApplicationBuilder } from '{{__slot1__}}';
-{{otlpImport}}
-import type { NetScriptConfig } from '{{__slot2__}}';
+{{executionImports}}import type { DistributedApplicationBuilder } from '{{__slot1__}}';
+{{denoSdkImport}}import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mts';
-import {
-{{executionCompatImports}}
-  extractPluginReferences,
-  extractServiceReferences,
-} from '{{__slot3__}}';
-
-type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutable']>;
+{{compatImportBlock}}
+type DenoResource = ReturnType<DistributedApplicationBuilder['addDenoApp']>;
 
 /**
- * Registers services with the Aspire SDK builder using a two-pass approach.
+ * Registers services with the Aspire SDK builder using first-party `addDenoApp()`.
  *
- * - Pass 1: Create all service resources via `addExecutable()` with resolved
- *   permissions, working directory, HTTP endpoint, OTEL telemetry (3 vars
- *   via `denoApp` mode), and infrastructure dependencies.
+ * - Pass 1: Create all service resources via `addDenoApp()` with resolved
+ *   permissions, working directory, HTTP endpoint, endpoint-conditional OTEL
+ *   identity, and infrastructure dependencies.
  * - Reference wiring is completed by `wireServiceReferences(...)` after
- *   services and plugins have both been created, so service -> plugin API
- *   discovery uses the same endpoint environment convention as other resources.
- *
- * @param builder - The Aspire distributed application builder
- * @param config - Parsed NetScript configuration
- * @param infrastructure - Infrastructure context with database/cache resources
- * @param appHostDir - Absolute path to the AppHost directory
- * @returns Map of registered service resources keyed by name
+ *   services and plugins have both been created.
  */
 export {{asyncModifier}}function registerServices(
   {{builderParameter}}: DistributedApplicationBuilder,
@@ -35,10 +21,9 @@ export {{asyncModifier}}function registerServices(
   {{infrastructureParameter}}: InfrastructureContext,
   {{appHostDirParameter}}: string,
   {{secretParameter}}: string | undefined = undefined,
-): Promise<Map<string, ExecutableResource>> {
-  const services = new Map<string, ExecutableResource>();
+): Promise<Map<string, DenoResource>> {
+  const services = new Map<string, DenoResource>();
 {{databaseBindings}}
-
   // --- Pass 1: Create all service resources ---
 {{__slot4__}}
 
@@ -47,37 +32,11 @@ export {{asyncModifier}}function registerServices(
 
 /**
  * Wires endpoint environment variables for service references.
- *
- * Services can reference plain services through `ServiceReferences` and plugin
- * API resources through `PluginReferences`. Plugin resources are created after
- * services, so this pass runs from the AppHost orchestrator after
- * `registerPlugins(...)` returns.
- *
- * @param config - Parsed NetScript configuration
- * @param services - Registered service resources
- * @param plugins - Registered plugin API resources
  */
-export async function wireServiceReferences(
-  config: NetScriptConfig,
-  services: Map<string, ExecutableResource>,
-  plugins: Map<string, ExecutableResource>,
+export {{wireAsyncModifier}}function wireServiceReferences(
+  {{wireConfigParameter}}: NetScriptConfig,
+  {{wireServicesParameter}}: Map<string, DenoResource>,
+  {{wirePluginsParameter}}: Map<string, DenoResource>,
 ): Promise<void> {
-  for (const [name, entry] of Object.entries(config.Services)) {
-    const resource = services.get(name);
-    if (!resource) continue;
-
-    for (const ref of extractServiceReferences(entry)) {
-      const endpoint = await services.get(ref)?.getEndpoint('http');
-      if (endpoint) {
-        await resource.withEnvironment(`services__${ref}__http__0`, endpoint);
-      }
-    }
-
-    for (const ref of extractPluginReferences(entry)) {
-      const endpoint = await plugins.get(ref)?.getEndpoint('http');
-      if (endpoint) {
-        await resource.withEnvironment(`services__${ref}__http__0`, endpoint);
-      }
-    }
-  }
+{{wireBody}}
 }

@@ -4,16 +4,16 @@ import type { DistributedApplicationBuilder } from '{{sdk}}';
 import type { NetScriptConfig } from '{{compat}}';
 import type { InfrastructureContext } from './register-infrastructure.mts';
 
-type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutable']>;
+type DenoResource = ReturnType<DistributedApplicationBuilder['addDenoApp']>;
 
 /** No contributions are configured; preserve the asynchronous registration contract. */
 export function {{functionName}}(
   _builder: DistributedApplicationBuilder,
   _config: NetScriptConfig,
   _infrastructure: InfrastructureContext,
-  _services: Map<string, ExecutableResource>,
+  _services: Map<string, DenoResource>,
 {{pluginParameter}}  _appHostDir: string,
   _installationSecretFile: string | undefined = undefined,
-): Promise<Map<string, ExecutableResource>> {
-  return Promise.resolve(new Map<string, ExecutableResource>());
+): Promise<Map<string, DenoResource>> {
+  return Promise.resolve(new Map<string, DenoResource>());
 }
