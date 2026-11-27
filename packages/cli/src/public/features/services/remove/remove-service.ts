@@ -1,4 +1,5 @@
 import type { DoctorReport } from '@netscript/plugin/adapter';
+import { assertNativeDenoAppHost } from '../../../../kernel/adapters/aspire/apphost-package-dependencies.ts';
 import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import { join } from '@std/path';
@@ -48,6 +49,7 @@ export async function removeService(
   dependencies: RemoveServiceDependencies,
 ): Promise<RemoveServiceResult> {
   validateResourceName(request.name, 'service');
+  await assertNativeDenoAppHost(dependencies.fs, request.projectRoot);
   const serviceDir = join(request.projectRoot, SCAFFOLD_DIRS.SERVICES, request.name);
   const removedConfig = await removeServiceAppsettingsEntry(
     request.projectRoot,

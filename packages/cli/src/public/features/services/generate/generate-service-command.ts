@@ -1,3 +1,4 @@
+import { assertNativeDenoAppHost } from '../../../../kernel/adapters/aspire/apphost-package-dependencies.ts';
 import { regenerateAspireHelpersWithDependencies } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import type { CliffyCommand } from '../../../../kernel/presentation/command-types.ts';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
@@ -46,6 +47,7 @@ export function createServiceGenerateCommand(
         dependencies.resolveProjectRoot,
         options.projectRoot,
       );
+      await assertNativeDenoAppHost(dependencies.generateAspireDependencies.fs, projectRoot);
       const dryRun = options.dryRun ?? false;
       const force = options.force ?? false;
       const generateClients = dependencies.generateClients ?? generateServiceClients;
