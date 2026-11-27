@@ -8,6 +8,8 @@ import type { SseBlock } from './sse-parser.ts';
 export interface StreamReplayProgress {
   readonly url: URL;
   lastEventId: string;
+  /** Most recent `streamNextOffset` committed by a schema-valid `control` frame, if any. */
+  lastCommittedOffset?: string;
 }
 
 /** Connection-local delivery transaction committed by the existing v1 control schema. */
@@ -58,6 +60,7 @@ export class StreamReplayBuffer {
     this.emit(block);
     if (this.signal.aborted) return;
     this.progress.url.searchParams.set('offset', parsed.frame.payload.streamNextOffset);
+    this.progress.lastCommittedOffset = parsed.frame.payload.streamNextOffset;
     this.progress.lastEventId = block.lastEventId;
     this.onControl(parsed.frame.payload.streamClosed === true);
   }

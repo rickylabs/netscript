@@ -158,3 +158,46 @@ Deno.test('native binding registers named events and preserves replay state on e
   binding.dispose();
   assertEquals(source.closed, true);
 });
+
+Deno.test('bindStreamEventSourceV1 sets transport-error retryable from source.readyState !== 2', () => {
+  class StatefulFakeEventSource extends EventTarget implements StreamEventSourceV1 {
+    readyState?: number;
+    closed = false;
+    constructor(initialReadyState?: number) {
+      super();
+      this.readyState = initialReadyState;
+    }
+    close(): void {
+      this.closed = true;
+      this.readyState = 2;
+    }
+  }
+
+  for (
+    const [readyState, expectedRetryable] of [
+      [undefined, true],
+      [0, true],
+      [1, true],
+      [2, false],
+    ] as const
+  ) {
+    const source = new StatefulFakeEventSource(readyState);
+    const events: StreamSseConsumerEventV1[] = [];
+    const binding = bindStreamEventSourceV1({
+      source,
+      initialState: createStreamSseReplayStateV1({ lastCommittedOffset: 'offset:42' }),
+      onEvent: (event) => events.push(event),
+    });
+
+    source.dispatchEvent(new Event('error'));
+    assertEquals(events.length, 1);
+    const errorEvent = events[0]!;
+    assertEquals(errorEvent.event, 'error');
+    if (errorEvent.event === 'error') {
+      assertEquals(errorEvent.payload.code, 'transport-error');
+      assertEquals(errorEvent.payload.retryable, expectedRetryable);
+      assertEquals(errorEvent.payload.lastCommittedOffset, 'offset:42');
+    }
+    binding.dispose();
+  }
+});

@@ -156,6 +156,12 @@ export type StreamSourceListenerV1 = (event: StreamSourceEventV1) => void;
 
 /** Minimal EventSource-compatible surface used at browser and non-DOM edges. */
 export interface StreamEventSourceV1 {
+  /**
+   * Optional WHATWG EventSource readyState (`0` = CONNECTING, `1` = OPEN, `2` = CLOSED).
+   * Satisfied natively by browser `EventSource` and `FetchStreamEventSourceV1`; omitted test
+   * doubles continue to emit `retryable: true` (`undefined !== 2`).
+   */
+  readonly readyState?: number;
   /** Register a named SSE or transport listener. */
   addEventListener(type: string, listener: StreamSourceListenerV1): void;
   /** Remove a previously registered listener. */
@@ -213,7 +219,7 @@ export function bindStreamEventSourceV1(
         code: 'transport-error',
         eventName: 'error',
         message: 'EventSource transport error',
-        retryable: true,
+        retryable: options.source.readyState !== 2,
         lastCommittedOffset: state.lastCommittedOffset,
       },
     });

@@ -201,7 +201,7 @@ event names a validated binding delivers, so a consumer never branches on an unv
 | `bindStreamEventSourceV1` | function | Bind named `data` and `control` listeners using schema-validated v1 outcomes. |
 | `createStreamSseReplayStateV1` | function | Create an empty or caller-seeded v1 replay snapshot. |
 | `reduceStreamSseReplayStateV1` | function | Apply one valid frame while committing replay progress only on a control frame. |
-| `StreamEventSourceV1` | interface | Minimal native or DOM-independent EventSource-compatible surface. |
+| `StreamEventSourceV1` | interface | Minimal native or DOM-independent EventSource-compatible surface (with optional `readyState`). |
 | `StreamSourceEventV1` | interface | Structural event with a type, optional data, and optional last event ID. |
 | `StreamSourceListenerV1` | type alias | Listener accepting structural stream events. |
 | `StreamEventSourceBindingV1` | interface | Disposable browser binding and immutable replay snapshot accessor. |
@@ -211,7 +211,10 @@ event names a validated binding delivers, so a consumer never branches on an unv
 Replay progress commits **only on a control frame**: `reduceStreamSseReplayStateV1` applies a valid
 data frame without advancing the committed offset, so a consumer that reconnects mid-batch replays
 from the last acknowledged control point rather than skipping the tail of an interrupted batch.
-Errors are normalized into `StreamSseErrorPayloadV1` and never advance replay state.
+Errors are normalized into `StreamSseErrorPayloadV1` and never advance replay state. On transport
+`error` events, `bindStreamEventSourceV1` emits `retryable: options.source.readyState !== 2` so
+native `EventSource` and `FetchStreamEventSourceV1` terminal closures (`readyState === 2`) stop
+consumers cleanly without spinning while omitted `readyState` mocks stay retryable.
 
 ## Revocable stream proxy (`@netscript/plugin-streams-core/proxy`)
 
