@@ -191,6 +191,11 @@ Deno.test('all emitted AppHost helpers compile cleanly against the real recorded
     const registerPlugins = await Deno.readTextFile(join(helpersDir, 'register-plugins.mts'));
     assertStringIncludes(registerPlugins, 'resolveDenoScriptUrl(workdir,');
 
+    const registerTools = await Deno.readTextFile(join(helpersDir, 'register-tools.mts'));
+    assertStringIncludes(registerTools, 'await resource.onResourceStopped(');
+    assert(!registerTools.includes('waitForResourceState'));
+    assert(!registerTools.includes('subscribeAfterResourcesCreated'));
+
     const dbCliMode = await Deno.readTextFile(join(helpersDir, 'db-cli-mode.mts'));
     assertStringIncludes(dbCliMode, ".withEnvironment('DATABASE_URL', target.resource)");
     assertStringIncludes(dbCliMode, 'return await executeDbCliResource(');
@@ -216,6 +221,7 @@ Deno.test('all emitted AppHost helpers compile cleanly against the real recorded
         'register-infrastructure.mts',
         'register-services.mts',
         'register-apps.mts',
+        'register-tools.mts',
         'db-cli-mode.mts',
       ]
     ) {

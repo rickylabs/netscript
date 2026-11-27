@@ -55,8 +55,8 @@ describe('generateRegisterTools', () => {
     assertStringIncludes(output, 'buildDatabaseUriEnvKey');
     assertStringIncludes(output, 'resolveWorkspacePath');
     assertStringIncludes(output, "from './_aspire-compat.mts'");
-    assertStringIncludes(output, 'type AfterResourcesCreatedEvent = Parameters<');
-    assertStringIncludes(output, 'event: AfterResourcesCreatedEvent');
+    assertStringIncludes(output, 'type ToolStoppedEvent = Parameters<');
+    assertStringIncludes(output, 'event: ToolStoppedEvent');
   });
 
   it('should register tools via addExecutable with deno task', () => {
@@ -76,10 +76,14 @@ describe('generateRegisterTools', () => {
       "['run', '--allow-run', '--allow-write', toolRunnerPath, tool_0_errorFile, \"studio\"]",
     );
     assertStringIncludes(output, 'aspire/.helpers/run-tool.mts');
-    assertStringIncludes(output, 'monitorToolFailure(builder, tool_0, tool_0_errorFile);');
-    assertStringIncludes(output, "targetState: 'Finished'");
+    assertStringIncludes(output, 'await monitorToolFailure(tool_0, tool_0_errorFile);');
+    assertStringIncludes(
+      output,
+      'await resource.onResourceStopped(async (event: ToolStoppedEvent) => {',
+    );
     assertStringIncludes(output, 'publishResourceUpdate(resource, {');
-    assertStringIncludes(output, 'catch(() => undefined)');
+    assert(!output.includes('waitForResourceState'));
+    assert(!output.includes('subscribeAfterResourcesCreated'));
     assert(!output.includes('--minimum-dependency-age=0'));
   });
 

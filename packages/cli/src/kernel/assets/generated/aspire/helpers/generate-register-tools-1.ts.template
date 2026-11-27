@@ -7,9 +7,7 @@ import type { InfrastructureContext } from './register-infrastructure.mts';
 import { buildDatabaseUriEnvKey, resolveWorkspacePath } from '{{__slot3__}}';
 
 type ToolResource = Awaited<ReturnType<DistributedApplicationBuilder['addExecutable']>>;
-type AfterResourcesCreatedEvent = Parameters<
-  Parameters<DistributedApplicationBuilder['subscribeAfterResourcesCreated']>[0]
->[0];
+type ToolStoppedEvent = Parameters<Parameters<ToolResource['onResourceStopped']>[0]>[0];
 
 /**
  * Registers development tools (e.g., Prisma Studio) with the Aspire SDK
@@ -40,24 +38,18 @@ export async function registerTools(
 {{__slot4__}}
 }
 
-function monitorToolFailure(
-  builder: DistributedApplicationBuilder,
+async function monitorToolFailure(
   resource: ToolResource,
   errorFile: string,
-): void {
-  builder.subscribeAfterResourcesCreated((event: AfterResourcesCreatedEvent) => {
-    const notifications = event.services().getResourceNotificationService();
-    return (async () => {
-      const resourceName = await resource.getResourceName();
-      await notifications.waitForResourceState(resourceName, { targetState: 'Finished' });
-      const detail = (await readFile(errorFile, 'utf8').catch(() => '')).trim();
-      if (detail) {
-        await notifications.publishResourceUpdate(resource, {
-          state: detail,
-          stateStyle: 'error',
-        });
-      }
-    })().catch(() => undefined);
+): Promise<void> {
+  await resource.onResourceStopped(async (event: ToolStoppedEvent) => {
+    const detail = (await readFile(errorFile, 'utf8').catch(() => '')).trim();
+    if (!detail) return;
+    const notifications = await event.services().getResourceNotificationService();
+    await notifications.publishResourceUpdate(resource, {
+      state: detail,
+      stateStyle: 'error',
+    });
   });
 }
 
