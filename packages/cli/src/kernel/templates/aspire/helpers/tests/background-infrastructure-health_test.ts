@@ -59,6 +59,10 @@ class RecordingResource {
   addDatabase(name: string): RecordingResource {
     return new RecordingResource(name);
   }
+
+  withRepl(): this {
+    return this;
+  }
 }
 
 class RecordingBuilder {

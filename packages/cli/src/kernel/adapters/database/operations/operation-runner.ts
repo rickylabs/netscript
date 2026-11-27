@@ -9,6 +9,9 @@ import {
 
 import { join } from '@std/path';
 import { DenoFileSystem } from '../../runtime/file-system/deno-file-system.ts';
+import { DenoProcess } from '../../runtime/process/deno-process.ts';
+import { DockerCliTopologyInspector } from '../../aspire/docker-topology-inspector.ts';
+import type { DockerTopologyInspector } from '../../../domain/docker-topology.ts';
 import type { FileSystemPort } from '../../../ports/file-system-port.ts';
 import { refreshGeneratedClientConsumers } from './refresh-generated-client-consumers.ts';
 
@@ -39,6 +42,7 @@ import {
 } from './operation-runner-helpers.ts';
 
 const DEFAULT_POLL_INTERVAL_MS = 1_000;
+const DOCKER_DIAGNOSTIC_TIMEOUT_MS = 3_000;
 const WAIT_TIMEOUT_EXIT_CODES: ReadonlySet<number> = new Set([17, 18]);
 
 interface DbOperationRunnerOptions {
@@ -46,6 +50,7 @@ interface DbOperationRunnerOptions {
   readonly realPath?: (path: string) => Promise<string>;
   readonly executor?: AspireCommandExecutor;
   readonly lifecycleLock?: AppHostLifecycleLock;
+  readonly dockerTopologyInspector?: Pick<DockerTopologyInspector, 'inspectEndpoint'>;
   readonly pollIntervalMs?: number;
   readonly timeoutMs?: number;
   readonly sleep?: (ms: number) => Promise<void>;
@@ -60,6 +65,7 @@ export class DbOperationRunner implements DbOperationExecutor {
   private readonly realPath: (path: string) => Promise<string>;
   private readonly executor: AspireCommandExecutor;
   private readonly lifecycleLock: AppHostLifecycleLock;
+  private readonly dockerTopologyInspector: Pick<DockerTopologyInspector, 'inspectEndpoint'>;
   private readonly pollIntervalMs: number;
   private readonly timeoutMs: number;
   private readonly sleep: (ms: number) => Promise<void>;
@@ -75,6 +81,10 @@ export class DbOperationRunner implements DbOperationExecutor {
     this.realPath = options.realPath ?? Deno.realPath;
     this.executor = options.executor ?? new DenoAspireCommandExecutor();
     this.lifecycleLock = options.lifecycleLock ?? new FileAppHostLifecycleLock();
+    this.dockerTopologyInspector = options.dockerTopologyInspector ??
+      new DockerCliTopologyInspector(new DenoProcess(), {
+        timeoutMs: DOCKER_DIAGNOSTIC_TIMEOUT_MS,
+      });
     this.pollIntervalMs = options.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS;
     this.timeoutMs = options.timeoutMs ?? resolveDbCliTimeoutSeconds() * 1_000;
     this.sleep = options.sleep ??
@@ -157,7 +167,7 @@ export class DbOperationRunner implements DbOperationExecutor {
       if (runningAppHost) {
         const code = await this.executeOnAppHost(
           request,
-          database.configKey,
+          database,
           apphostPath,
           aspireDir,
           env,
@@ -185,7 +195,7 @@ export class DbOperationRunner implements DbOperationExecutor {
       }
       return await this.executeStandalone(
         request,
-        database.configKey,
+        database,
         apphostPath,
         aspireDir,
         env,
@@ -212,7 +222,7 @@ export class DbOperationRunner implements DbOperationExecutor {
 
   private async executeStandalone(
     request: DbOperationRequest,
-    configKey: string,
+    database: DiscoveredDatabase,
     apphostPath: string,
     aspireDir: string,
     env: Record<string, string>,
@@ -227,7 +237,7 @@ export class DbOperationRunner implements DbOperationExecutor {
     try {
       return await this.executeOnAppHost(
         request,
-        configKey,
+        database,
         apphostPath,
         aspireDir,
         env,
@@ -240,14 +250,15 @@ export class DbOperationRunner implements DbOperationExecutor {
 
   private async executeOnAppHost(
     request: DbOperationRequest,
-    configKey: string,
+    database: DiscoveredDatabase,
     apphostPath: string,
     aspireDir: string,
     env: Record<string, string>,
     signal: AbortSignal,
   ): Promise<number> {
+    const configKey = database.configKey;
     outputText(`Starting db ${request.operation} for ${configKey}...`);
-    await this.waitForDatabase(configKey, apphostPath, aspireDir, signal);
+    await this.waitForDatabase(database, apphostPath, aspireDir, signal);
 
     if (isTypedResourceOperation(request.operation) && !request.migrationName) {
       return await this.executeTypedResourceCommand(
@@ -281,11 +292,12 @@ export class DbOperationRunner implements DbOperationExecutor {
   }
 
   private async waitForDatabase(
-    configKey: string,
+    database: DiscoveredDatabase,
     apphostPath: string,
     aspireDir: string,
     signal: AbortSignal,
   ): Promise<void> {
+    const configKey = database.configKey;
     const timeoutSeconds = Math.max(1, Math.ceil(this.timeoutMs / 1_000));
     const output = await this.executor.output(
       [
@@ -306,13 +318,32 @@ export class DbOperationRunner implements DbOperationExecutor {
 
     const details = commandDetails(output);
     if (WAIT_TIMEOUT_EXIT_CODES.has(output.code)) {
+      const foreignDockerNote = database.engine === 'sqlite'
+        ? ''
+        : await this.inspectForeignDockerDiagnostic();
       throw new Error(
         `Database resource ${configKey} did not become healthy within ${timeoutSeconds} seconds ` +
-          `(aspire wait exit ${output.code}). Check its resource logs and listener readiness. ` +
-          `Aspire reported: ${details}`,
+          `(aspire wait exit ${output.code}). Check its resource logs and listener readiness.` +
+          `${foreignDockerNote} Aspire reported: ${details}`,
       );
     }
     throw new Error(`aspire wait failed with exit code ${output.code}: ${details}`);
+  }
+
+  private async inspectForeignDockerDiagnostic(): Promise<string> {
+    try {
+      const endpoint = await this.dockerTopologyInspector.inspectEndpoint();
+      if (endpoint.locality !== 'remote') return '';
+      const context = endpoint.context ? `, context "${endpoint.context}"` : '';
+      const origin = `${endpoint.host ?? endpoint.daemonHost ?? 'remote'} ` +
+        `(from ${endpoint.source ?? 'docker'}${context})`;
+      const daemonHost = endpoint.daemonHost ?? endpoint.host ?? 'the remote Docker host';
+      return ` Foreign Docker daemon detected: ${origin}. Aspire publishes container ports on ` +
+        `${daemonHost}, not local loopback. Run \`netscript plugin doctor\` or switch to a local ` +
+        `Docker daemon.`;
+    } catch {
+      return '';
+    }
   }
 
   private async executeTypedResourceCommand(

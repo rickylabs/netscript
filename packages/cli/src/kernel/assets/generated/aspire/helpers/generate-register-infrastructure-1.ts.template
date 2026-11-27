@@ -34,10 +34,10 @@ export interface InfrastructureContext {
  * @param appHostDir - Absolute path to the AppHost directory
  * @returns Infrastructure context with resource maps and primary references
  */
-export async function registerInfrastructure(
-  builder: DistributedApplicationBuilder,
+export {{asyncKeyword}}function registerInfrastructure(
+  {{builderParam}}: DistributedApplicationBuilder,
   _config: NetScriptConfig,
-  appHostDir: string,
+  {{appHostDirParam}}: string,
 ): Promise<InfrastructureContext> {
   const databases = new Map<string, AspireResource>();
   const databaseConnectionStrings = new Map<string, DatabaseConnectionStringResolver>();
@@ -58,15 +58,5 @@ export async function registerInfrastructure(
 {{__slot9__}}
 {{__slot10__}}
 
-  return {
-    databases,
-    databaseConnectionStrings,
-    caches,
-    cacheEndpoints,
-    cacheWiring,
-    primaryDatabase,
-    primaryCache,
-    primaryCacheEndpoint,
-    primaryCacheWiring,
-  };
+{{returnStatement}}
 }

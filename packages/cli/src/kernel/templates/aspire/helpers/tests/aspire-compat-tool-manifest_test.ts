@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assert, assertEquals, assertMatch } from '@std/assert';
 import { join, toFileUrl } from '@std/path';
 import { afterAll } from '@std/testing/bdd';
 import { SCAFFOLD_VERSIONS } from '../../../../constants/scaffold/scaffold-versions.ts';
@@ -40,7 +40,7 @@ await Deno.writeTextFile(
     "import { execFileSync } from 'data:text/javascript,export function execFileSync() {}';",
   ),
 );
-const { applyDenoPermissions, ensureGarnetToolManifest } = await import(
+const { applyDenoPermissions, ensureDatabasePassword, ensureGarnetToolManifest } = await import(
   toFileUrl(generatedPath).href
 );
 const version = SCAFFOLD_VERSIONS.GARNET_TOOL;
@@ -186,5 +186,52 @@ Deno.test('applyDenoPermissions maps granular permissions, watch, unstable, and 
     ['allowAll', { enabled: true }],
     ['watch', { hmr: false }],
   ]);
+});
+Deno.test('ensureDatabasePassword creates atomic complexity-safe passwords, honors env handoff, and reuses existing files', async () => {
+  const appHostDir = join(root, 'db-passwords');
+  await Deno.mkdir(appHostDir, { recursive: true });
+
+  const [a, b, c] = await Promise.all([
+    Promise.resolve().then(() =>
+      ensureDatabasePassword(appHostDir, 'mssql', { requireComplexity: true })
+    ),
+    Promise.resolve().then(() =>
+      ensureDatabasePassword(appHostDir, 'mssql', { requireComplexity: true })
+    ),
+    Promise.resolve().then(() =>
+      ensureDatabasePassword(appHostDir, 'mssql', { requireComplexity: true })
+    ),
+  ]);
+  assertEquals(a, b);
+  assertEquals(b, c);
+  assertEquals(a.length, 32);
+  assertMatch(a, /[A-Z]/);
+  assertMatch(a, /[a-z]/);
+  assertMatch(a, /[0-9]/);
+  assertMatch(a, /[!@#%^\-_=+]/);
+  assert(!/['"`$\\;\s]/.test(a));
+
+  const secretsDir = join(appHostDir, '.data', 'aspire-secrets');
+  const entries: string[] = [];
+  for await (const entry of Deno.readDir(secretsDir)) entries.push(entry.name);
+  assertEquals(entries, ['mssql.password']);
+
+  // Pre-upgrade env handoff seeds `.password` once, then reuses persisted file after env unset.
+  const handoffKey = 'NETSCRIPT_DB_PASSWORD_LEGACY_MSSQL';
+  const priorValue = Deno.env.get(handoffKey);
+  Deno.env.set(handoffKey, 'PreUpgrade!Pass2026');
+  try {
+    assertEquals(
+      ensureDatabasePassword(appHostDir, 'legacy-mssql', { requireComplexity: true }),
+      'PreUpgrade!Pass2026',
+    );
+  } finally {
+    if (priorValue === undefined) Deno.env.delete(handoffKey);
+    else Deno.env.set(handoffKey, priorValue);
+  }
+  assertEquals(
+    ensureDatabasePassword(appHostDir, 'legacy-mssql', { requireComplexity: true }),
+    'PreUpgrade!Pass2026',
+  );
 });
 afterAll(() => Deno.remove(root, { recursive: true }));

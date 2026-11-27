@@ -82,7 +82,7 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
         lines.push(``);
         lines.push(`    // Workspace CORS allowlist: this enabled web app's browser origins.`);
         lines.push(
-          `    const ${id}_origin = (await ${id}.getEndpoint('http')).property(EndpointProperty.BrowserOrigins);`,
+          `    const ${id}_origin = await (await ${id}.getEndpoint('http')).property(EndpointProperty.BrowserOrigins);`,
         );
         lines.push(`    corsOrigins = corsOrigins`);
         lines.push('      ? ReferenceExpression.create`${corsOrigins},${' + id + '_origin}`');

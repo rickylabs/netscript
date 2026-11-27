@@ -204,9 +204,16 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, 'register-infrastructure.mts');
   });
 
-  it('should export registerInfrastructure async function', () => {
-    const output = generateRegisterInfrastructure(emptyOptions);
-    assertStringIncludes(output, 'export async function registerInfrastructure(');
+  it('should export registerInfrastructure function preserving the Promise contract', () => {
+    const emptyOutput = generateRegisterInfrastructure(emptyOptions);
+    assertStringIncludes(emptyOutput, 'export function registerInfrastructure(');
+    assertStringIncludes(emptyOutput, '): Promise<InfrastructureContext>');
+    assertStringIncludes(emptyOutput, 'return Promise.resolve({');
+    const populatedOutput = generateRegisterInfrastructure({
+      databases: { main: fixtures.MINIMAL_DATABASE },
+      caches: {},
+    });
+    assertStringIncludes(populatedOutput, 'export async function registerInfrastructure(');
   });
 
   it('should export InfrastructureContext interface', () => {

@@ -3,7 +3,7 @@
 
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, linkSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import process from 'node:process';
 import { DenoPermissionKind } from '../.aspire/modules/aspire.mts';
@@ -53,6 +53,7 @@ export {
   createRespPingCheck,
 } from './_apphost-readiness.mts';
 export type {
+  DockerLocalityProbe,
   EndpointListenerReadinessCheckOptions,
   ListenerEndpoint,
   ListenerReadinessCheckOptions,
@@ -65,7 +66,7 @@ export type {
 } from './_apphost-postgres-readiness.mts';
 
 const GARNET_TOOL_RESTORE_TIMEOUT_MS = 10_000;
-
+const PW_SETS = ['ABCDEFGHJKLMNPQRSTUVWXYZ', 'abcdefghijkmnopqrstuvwxyz', '23456789', '!@#%^-_=+'];
 const DENO_PERMISSION_KINDS: Readonly<Record<string, DenoPermissionKind>> = {
   net: DenoPermissionKind.Net,
   read: DenoPermissionKind.Read,
@@ -91,7 +92,7 @@ export async function applyDenoPermissions(
   resource: DenoPermissionTarget,
   permissions: readonly string[],
 ): Promise<void> {
-  const allowAll = permissions.some((flag) => flag === '-A' || flag === '--allow-all');
+  const allowAll = permissions.some((f) => f === '-A' || f === '--allow-all');
   const allows = new Map<DenoPermissionKind, string[] | null>();
   const denies = new Map<DenoPermissionKind, string[] | null>();
   const unstable: string[] = [];
@@ -117,9 +118,8 @@ export async function applyDenoPermissions(
     const kind = permMatch ? DENO_PERMISSION_KINDS[permMatch[2]] : undefined;
     if (permMatch && kind !== undefined) {
       const map = permMatch[1] === 'allow' ? allows : denies;
-      if (permMatch[3] === undefined) {
-        map.set(kind, null);
-      } else if (map.get(kind) !== null) {
+      if (permMatch[3] === undefined) map.set(kind, null);
+      else if (map.get(kind) !== null) {
         const next = map.get(kind) ?? [];
         for (const v of permMatch[3].split(',').map((s) => s.trim()).filter(Boolean)) {
           if (!next.includes(v)) next.push(v);
@@ -157,41 +157,64 @@ export function ensureContainerDataPath(dataPath: string): string {
   return dataPath;
 }
 
-export function ensureDatabasePassword(appHostDir: string, resourceName: string): string {
+function generateComplexDatabasePassword(): string {
+  const all = PW_SETS.join('');
+  const bytes = new Uint8Array(64);
+  crypto.getRandomValues(bytes);
+  const chars = PW_SETS.map((set, i) => set[bytes[i] % set.length]);
+  for (let i = chars.length; i < 32; i++) chars.push(all[bytes[i] % all.length]);
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = bytes[32 + i] % (i + 1);
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  return chars.join('');
+}
+
+export function ensureDatabasePassword(
+  appHostDir: string,
+  resourceName: string,
+  options?: { readonly requireComplexity?: boolean },
+): string {
   const secretsDir = resolveWorkspacePath(appHostDir, join('.data', 'aspire-secrets'));
   const passwordPath = join(secretsDir, `${resourceName}.password`);
   mkdirSync(secretsDir, { recursive: true, mode: 0o700 });
-
   if (!existsSync(passwordPath)) {
-    const password = crypto.randomUUID().replaceAll('-', '');
+    const suffix = resourceName.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '').toUpperCase();
+    const seed = suffix ? process.env[`NETSCRIPT_DB_PASSWORD_${suffix}`]?.trim() : undefined;
+    const value = seed ||
+      (options?.requireComplexity
+        ? generateComplexDatabasePassword()
+        : crypto.randomUUID().replaceAll('-', ''));
+    const pending = join(secretsDir, `.${resourceName}.${crypto.randomUUID()}.pending`);
     try {
-      writeFileSync(passwordPath, password, { encoding: 'utf8', flag: 'wx', mode: 0o600 });
-    } catch (error) {
-      if (!(error instanceof Error) || !('code' in error) || error.code !== 'EEXIST') throw error;
+      writeFileSync(pending, value, { encoding: 'utf8', flag: 'wx', mode: 0o600 });
+      try {
+        linkSync(pending, passwordPath);
+      } catch (e) {
+        if (!(e instanceof Error) || !('code' in e) || e.code !== 'EEXIST') throw e;
+      }
+    } finally {
+      try {
+        unlinkSync(pending);
+      } catch { /* already removed */ }
     }
   }
-
   const password = readFileSync(passwordPath, 'utf8').trim();
   if (!password) throw new Error(`Database password file is empty: ${passwordPath}`);
   return password;
 }
 
-export function buildDatabaseUriEnvKey(
-  config: Pick<NetScriptConfig, 'PrimaryDatabase'>,
-): string | null {
-  if (!config.PrimaryDatabase) return null;
-  const prefix = config.PrimaryDatabase
-    .replace(/[^a-z0-9]+/gi, '_')
-    .replace(/^_+|_+$/g, '')
-    .toUpperCase();
-  return prefix ? `${prefix}_URI` : null;
+export function buildDatabaseUriEnvKey(c: Pick<NetScriptConfig, 'PrimaryDatabase'>): string | null {
+  const p = c.PrimaryDatabase?.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '').toUpperCase();
+  return p ? `${p}_URI` : null;
 }
 
 export function buildDatabaseProviderEnvVars(
   config: Pick<NetScriptConfig, 'PrimaryDatabase'>,
 ): Record<string, string> {
-  if (!config.PrimaryDatabase) return {};
-  return { DB_PROVIDER: config.PrimaryDatabase, DATABASE_PROVIDER: config.PrimaryDatabase };
+  return config.PrimaryDatabase
+    ? { DB_PROVIDER: config.PrimaryDatabase, DATABASE_PROVIDER: config.PrimaryDatabase }
+    : {};
 }
 
 export function buildSqliteDatabaseUrl(
@@ -220,9 +243,7 @@ interface CacheConsumerBuilder {
 export function generateAccessToken(): string {
   const bytes = new Uint8Array(15);
   crypto.getRandomValues(bytes);
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-  return btoa(binary);
+  return btoa(String.fromCharCode(...bytes));
 }
 
 export function isDockerAvailable(): boolean {
@@ -235,51 +256,49 @@ export function isDockerAvailable(): boolean {
 }
 
 export function shouldUseContainerCache(): boolean {
-  const override = process.env.NETSCRIPT_CACHE_MODE;
-  if (override === 'Container') return true;
-  if (override === 'Executable') return false;
-  return isDockerAvailable();
+  const mode = process.env.NETSCRIPT_CACHE_MODE;
+  return mode === 'Container' ? true : mode === 'Executable' ? false : isDockerAvailable();
 }
 
 export function isRootlessContainerRuntime(
   runtime: string = process.env.ASPIRE_CONTAINER_RUNTIME?.trim() ||
-    process.env.DOTNET_ASPIRE_CONTAINER_RUNTIME?.trim() ||
-    'docker',
+    process.env.DOTNET_ASPIRE_CONTAINER_RUNTIME?.trim() || 'docker',
 ): boolean {
   try {
     const format = runtime === 'podman' ? '{{.Host.Security.Rootless}}' : '{{.SecurityOptions}}';
-    const output = execFileSync(runtime, ['info', '--format', format], {
+    const out = execFileSync(runtime, ['info', '--format', format], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
       timeout: 3000,
     });
-    if (typeof output !== 'string') return false;
-    return runtime === 'podman'
-      ? output.trim().toLowerCase() === 'true'
-      : output.toLowerCase().includes('rootless');
+    return typeof out === 'string' &&
+      (runtime === 'podman'
+        ? out.trim().toLowerCase() === 'true'
+        : out.toLowerCase().includes('rootless'));
   } catch {
     return false;
   }
 }
 
-export function resolveContainerBindMountRuntimeArgs(
-  options?: {
-    readonly platform?: string;
-    readonly getUid?: (() => number) | null;
-    readonly getGid?: (() => number) | null;
-    readonly isRootless?: () => boolean;
-  },
-): string[] {
+export function resolveContainerBindMountRuntimeArgs(options?: {
+  readonly platform?: string;
+  readonly getUid?: (() => number) | null;
+  readonly getGid?: (() => number) | null;
+  readonly isRootless?: () => boolean;
+}): string[] {
   const platform = options?.platform ?? process.platform;
-  const defaultUid = typeof process.getuid === 'function' ? () => process.getuid!() : undefined;
-  const defaultGid = typeof process.getgid === 'function' ? () => process.getgid!() : undefined;
-  const getUid = options && 'getUid' in options ? options.getUid : defaultUid;
-  const getGid = options && 'getGid' in options ? options.getGid : defaultGid;
+  const getUid = options && 'getUid' in options
+    ? options.getUid
+    : (typeof process.getuid === 'function' ? () => process.getuid!() : undefined);
+  const getGid = options && 'getGid' in options
+    ? options.getGid
+    : (typeof process.getgid === 'function' ? () => process.getgid!() : undefined);
   if (platform !== 'linux' || typeof getUid !== 'function' || typeof getGid !== 'function') {
     return [];
   }
-  const isRootless = options?.isRootless ?? isRootlessContainerRuntime;
-  return isRootless() ? ['--user', '0:0'] : ['--user', `${getUid()}:${getGid()}`];
+  return (options?.isRootless ?? isRootlessContainerRuntime)()
+    ? ['--user', '0:0']
+    : ['--user', `${getUid()}:${getGid()}`];
 }
 
 export function ensureGarnetToolManifest(appHostDir: string, version: string): string {

@@ -3,18 +3,21 @@
  *
  * Generator for `.helpers/register-infrastructure.mts` — registers databases
  * and caches with the Aspire SDK builder. Handles engine dispatch, container
- * vs external mode, persistent lifetime, data bind mounts, and primary
- * resource resolution.
+ * vs external mode, persistent lifetime, data bind mounts, `.withRepl()`, and
+ * primary resource resolution.
  */
 
 import type { CacheEntry } from '@netscript/aspire/types';
 import type { RegisterInfrastructureOptions } from '../types.ts';
 import { fileHeader } from '../_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';
-import { SCAFFOLD_VERSIONS } from '../../../../constants/scaffold/scaffold-versions.ts';
-import { SCAFFOLD_CACHE_CONTAINER_IMAGES } from '../../../../constants/scaffold/scaffold-container-images.ts';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
+import {
+  denokvContainerSetup,
+  garnetExecutableSetup,
+  redisGarnetContainerSetup,
+} from './register-infrastructure-cache.ts';
 
 /** Maps database engine names to SDK builder method names. */
 const DB_ENGINE_METHODS: Record<string, string> = {
@@ -25,34 +28,6 @@ const DB_ENGINE_METHODS: Record<string, string> = {
 
 const MSSQL_CONTAINER_IMAGE = 'mssql/server';
 const MSSQL_CONTAINER_TAG = '2022-latest';
-const MSSQL_SA_PASSWORD = 'NetscriptE2e!Sql2026';
-
-/** Redis-compatible TCP port inside cache containers. */
-const CACHE_DEFAULT_PORT = 6379;
-
-/** Queue receipts require atomic Lua in every managed Garnet launch mode. */
-const GARNET_LEASE_ARGS = ['--lua', '--lua-transaction-mode'] as const;
-
-/** DataPath opts into recoverable writes and portable checkpoint/device alignment. */
-const GARNET_PERSISTENCE_ARGS = [
-  '--aof',
-  '--recover',
-  '--aof-commit-freq',
-  '0',
-  '--aof-commit-wait',
-  '--storage-tier',
-  '--device-type',
-  'FileStream',
-] as const;
-
-/** Deno KV Connect container image (shared KV over HTTP). */
-const DENOKV_CONTAINER = {
-  image: 'ghcr.io/denoland/denokv',
-  tag: '0.11.0',
-} as const;
-
-/** Deno KV Connect HTTP port inside the container. */
-const DENOKV_HTTP_PORT = 4512;
 
 /**
  * Generates the register-infrastructure.mts file content.
@@ -104,7 +79,7 @@ export function generateRegisterInfrastructure(
     ...(usesRespReadiness ? ['createRespPingCheck'] : []),
     ...(usesGarnetContainerDataPath ? ['ensureContainerDataPath'] : []),
     ...(dbEntries.some(([, entry]) =>
-        ['Postgres', 'Mysql'].includes(entry.Engine) &&
+        ['Postgres', 'Mysql', 'Mssql'].includes(entry.Engine) &&
         (entry.Mode ?? 'Container') === 'Container'
       )
       ? ['ensureDatabasePassword']
@@ -144,7 +119,15 @@ export function generateRegisterInfrastructure(
   databases.set(${JSON.stringify(name)}, ${id});
   databaseConnectionStrings.set(
     ${JSON.stringify(name)},
-    async () => await builder.getConfiguration().getConnectionString(${JSON.stringify(name)}),
+    async () => {
+      const value = await builder.getConfiguration().getConnectionString(${JSON.stringify(name)});
+      if (!value) {
+        throw new Error(${
+        JSON.stringify(`Connection string for database '${name}' is not configured.`)
+      });
+      }
+      return value;
+    },
   );`);
       continue;
     }
@@ -160,34 +143,18 @@ export function generateRegisterInfrastructure(
     // resolved resource — otherwise the runtime rejects with
     // "Argument 'source' is a Promise-like value". So we `await` the entire
     // chain here.
-    if (entry.Engine === 'Postgres' || entry.Engine === 'Mysql') {
-      // Read once: the secret parameter and the credential check must see the same value.
-      lines.push(
-        `  const ${id}_password_value = ensureDatabasePassword(appHostDir, ${
-          JSON.stringify(name)
-        });`,
-      );
+    if (entry.Engine === 'Postgres' || entry.Engine === 'Mysql' || entry.Engine === 'Mssql') {
+      // Read once: the secret parameter and readiness/env consumers must see the same value.
+      const passwordCall = entry.Engine === 'Mssql'
+        ? `ensureDatabasePassword(appHostDir, ${JSON.stringify(name)}, { requireComplexity: true })`
+        : `ensureDatabasePassword(appHostDir, ${JSON.stringify(name)})`;
+      lines.push(`  const ${id}_password_value = ${passwordCall};`);
       lines.push(
         `  const ${id}_password = await builder.addParameter(${
           JSON.stringify(`${name}-password`)
         }, {`,
       );
       lines.push(`    value: ${id}_password_value,`);
-      lines.push(`    secret: true,`);
-      lines.push(`  });`);
-      lines.push(`  const ${id}_server = await builder.${method}(${JSON.stringify(name)}, {`);
-      if (entry.Port !== undefined) {
-        lines.push(`    port: ${entry.Port},`);
-      }
-      lines.push(`    password: ${id}_password,`);
-      lines.push(`  })`);
-    } else if (entry.Engine === 'Mssql') {
-      lines.push(
-        `  const ${id}_password = await builder.addParameter(${
-          JSON.stringify(`${name}-password`)
-        }, {`,
-      );
-      lines.push(`    value: '${MSSQL_SA_PASSWORD}',`);
       lines.push(`    secret: true,`);
       lines.push(`  });`);
       lines.push(`  const ${id}_server = await builder.${method}(${JSON.stringify(name)}, {`);
@@ -221,10 +188,11 @@ export function generateRegisterInfrastructure(
         `    .withImageTag(${JSON.stringify(entry.ImageTag ?? MSSQL_CONTAINER_TAG)})`,
       );
       lines.push(`    .withEnvironment('ACCEPT_EULA', 'Y')`);
-      lines.push(`    .withEnvironment('SA_PASSWORD', '${MSSQL_SA_PASSWORD}')`);
-      lines.push(
-        `    .withEnvironment('MSSQL_SA_PASSWORD', '${MSSQL_SA_PASSWORD}')`,
-      );
+      lines.push(`    .withEnvironment('SA_PASSWORD', ${id}_password_value)`);
+      lines.push(`    .withEnvironment('MSSQL_SA_PASSWORD', ${id}_password_value)`);
+    }
+    if (['Postgres', 'Mysql', 'Mssql'].includes(entry.Engine)) {
+      lines.push(`    .withRepl()`);
     }
 
     // Close the server chain with semicolon
@@ -237,6 +205,7 @@ export function generateRegisterInfrastructure(
       lines.push(`    return await createEndpointListenerReadinessCheck({`);
       lines.push(`      kind: ${JSON.stringify(entry.Engine.toLowerCase())},`);
       lines.push(`      endpoint: () => ${id}_server.getEndpoint('tcp'),`);
+      lines.push(`      containerBacked: true,`);
       lines.push(`    })();`);
       lines.push(`  });`);
       lines.push(`  await ${id}_server.withHealthCheck(${JSON.stringify(healthCheckKey)});`);
@@ -286,12 +255,7 @@ export function generateRegisterInfrastructure(
       continue;
     }
 
-    // Auto — environment-aware at apphost runtime (D5/D6). Docker present →
-    // the configured container backend (DenoKv Connect for DenoKv, else the
-    // Redis-compatible Garnet/Redis container). Docker absent → the Garnet
-    // dotnet-tool executable (cross-fallback for the Docker-less bare-metal
-    // host, #372). Both branches emit inline so the generated apphost decides
-    // at `aspire start` without regeneration.
+    // Auto — environment-aware at apphost runtime (D5/D6).
     if (mode === 'Auto') {
       const container = entry.Engine === 'DenoKv'
         ? denokvContainerSetup(id, name, entry)
@@ -318,36 +282,40 @@ export function generateRegisterInfrastructure(
     // DenoKv Container — Deno KV Connect over HTTP with an access token.
     if (entry.Engine === 'DenoKv') {
       const setup = denokvContainerSetup(id, name, entry);
-      const lines = [
+      cacheBlocks.push([
         `  // cache ${cacheIndex} (DenoKv, Container — Deno KV Connect)`,
         ...setup.lines,
         `  cacheWiring.set(${JSON.stringify(name)}, ${setup.wiring});`,
-      ];
-      cacheBlocks.push(lines.join('\n'));
+      ].join('\n'));
       continue;
     }
 
     // Garnet Executable — Docker-less self-provisioned dotnet tool (#372).
     if (entry.Engine === 'Garnet' && mode === 'Executable') {
       const setup = garnetExecutableSetup(id, name, entry);
-      const lines = [
+      cacheBlocks.push([
         `  // cache ${cacheIndex} (Garnet, Executable — Docker-less dotnet tool)`,
         ...setup.lines,
         `  cacheWiring.set(${JSON.stringify(name)}, ${setup.wiring});`,
-      ];
-      cacheBlocks.push(lines.join('\n'));
+      ].join('\n'));
       continue;
     }
 
     // Redis / Garnet Container — Redis-compatible TCP endpoint.
     const setup = redisGarnetContainerSetup(id, name, entry);
-    const lines = [
+    cacheBlocks.push([
       `  // cache ${cacheIndex} (Container)`,
       ...setup.lines,
       `  cacheWiring.set(${JSON.stringify(name)}, ${setup.wiring});`,
-    ];
-    cacheBlocks.push(lines.join('\n'));
+    ].join('\n'));
   }
+
+  const allBlocks = [...dbBlocks, ...cacheBlocks];
+  const usesBuilder = hasPersistentContainerDatabase ||
+    allBlocks.some((block) => block.includes('builder.'));
+  const usesAppHostDir = allBlocks.some((block) => block.includes('appHostDir'));
+  const usesAwait = hasPersistentContainerDatabase ||
+    allBlocks.some((block) => block.includes('await '));
 
   // Primary resolution
   const primaryDbLine = primaryDatabase
@@ -362,6 +330,18 @@ export function generateRegisterInfrastructure(
   const primaryCacheWiringLine = primaryCache
     ? `  const primaryCacheWiring = cacheWiring.get(${JSON.stringify(primaryCache)}) ?? null;`
     : `  const primaryCacheWiring = null;`;
+
+  const returnExpression = `{
+    databases,
+    databaseConnectionStrings,
+    caches,
+    cacheEndpoints,
+    cacheWiring,
+    primaryDatabase,
+    primaryCache,
+    primaryCacheEndpoint,
+    primaryCacheWiring,
+  }`;
 
   return renderTemplateAssetSync(
     TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterInfrastructure1,
@@ -396,6 +376,12 @@ export function generateRegisterInfrastructure(
           ? `  const isolatedStart = (await builder.getConfiguration()\n    .getConfigValue('DcpPublisher:RandomizePorts'))?.toLowerCase() === 'true';`
           : '',
       ),
+      asyncKeyword: usesAwait ? 'async ' : '',
+      builderParam: usesBuilder ? 'builder' : '_builder',
+      appHostDirParam: usesAppHostDir ? 'appHostDir' : '_appHostDir',
+      returnStatement: usesAwait
+        ? `  return ${returnExpression};`
+        : `  return Promise.resolve(${returnExpression});`,
     },
   );
 }
@@ -420,209 +406,10 @@ function usesResolvedDataPath(
 }
 
 /**
- * Emits the DenoKv Connect container setup lines (shared by the Container arm
- * and the Docker branch of the Auto arm). Returns the setup lines plus the
- * `CacheWiring` object-literal expression so callers control where it is stored
- * (direct `cacheWiring.set` vs. an Auto `let`-binding).
- */
-function denokvContainerSetup(
-  id: string,
-  name: string,
-  entry: CacheEntry,
-): { lines: string[]; wiring: string } {
-  const tag = entry.ImageTag ?? DENOKV_CONTAINER.tag;
-  const imageRef = `${DENOKV_CONTAINER.image}:${tag}`;
-  const lines: string[] = [];
-
-  lines.push(`  const ${id}_token = _generateAccessToken();`);
-  lines.push(
-    `  const ${id} = await builder.addContainer(${JSON.stringify(name)}, ${
-      JSON.stringify(imageRef)
-    })`,
-  );
-  lines.push(
-    `    .withEndpoint({ name: 'http', targetPort: ${DENOKV_HTTP_PORT}, scheme: 'http' })`,
-  );
-  lines.push(`    .withContainerRuntimeArgs(['--init'])`);
-  lines.push(`    .withArgs(['--sqlite-path', '/data/denokv.sqlite', 'serve'])`);
-  lines.push(`    .withEnvironment('DENO_KV_ACCESS_TOKEN', ${id}_token)`);
-  if (entry.DataPath) {
-    lines.push(
-      `    .withBindMount(resolveDataPath(appHostDir, ${JSON.stringify(entry.DataPath)}, ${
-        JSON.stringify(name)
-      }), '/data')`,
-    );
-  }
-
-  const lastIdx = lines.length - 1;
-  lines[lastIdx] = lines[lastIdx] + ';';
-
-  lines.push(`  const ${id}_httpEndpoint = await ${id}.getEndpoint('http');`);
-  lines.push(
-    `  const ${id}_httpUrl = ${id}_httpEndpoint.property(EndpointProperty.Url);`,
-  );
-  lines.push(`  caches.set(${JSON.stringify(name)}, ${id});`);
-  lines.push(`  cacheEndpoints.set(${JSON.stringify(name)}, ${id}_httpEndpoint);`);
-
-  // DENO_KV_URL is injected explicitly (scheme-complete, via EndpointProperty.Url)
-  // so the consumer's autoDetectProvider() resolves the KV Connect URL from an env
-  // key regardless of the resource name — mirroring how the Redis/Garnet arms inject
-  // GARNET_URI/REDIS_URI. Without it, auto-detect only finds a DenoKv URL when the
-  // resource is literally named 'kv' (services__kv__http__0), silently falling back
-  // to in-process Deno.openKv() otherwise.
-  const wiring =
-    `{ resource: ${id}, reference: ${id}_httpEndpoint, env: { DENO_KV_URL: ${id}_httpUrl, DENO_KV_ACCESS_TOKEN: ${id}_token, CACHE_PROVIDER: 'denokv' }, local: false }`;
-  return { lines, wiring };
-}
-
-/**
- * Emits the Garnet executable setup lines (shared by the Executable arm and the
- * Docker-less branch of the Auto arm). Runs `garnet-server` as a self-provisioned
- * dotnet tool (no Docker) over a Redis-compatible TCP endpoint. The tool
- * version pins from `CacheEntry.ToolVersion`, falling back to the scaffold pin.
- */
-function garnetExecutableSetup(
-  id: string,
-  name: string,
-  entry: CacheEntry,
-): { lines: string[]; wiring: string } {
-  const version = entry.ToolVersion ?? SCAFFOLD_VERSIONS.GARNET_TOOL;
-  const lines: string[] = [];
-
-  lines.push(
-    `  const ${id}_workdir = ensureGarnetToolManifest(appHostDir, ${JSON.stringify(version)});`,
-  );
-  if (entry.DataPath) {
-    lines.push(
-      `  const ${id}_dataPath = resolveDataPath(appHostDir, ${JSON.stringify(entry.DataPath)}, ${
-        JSON.stringify(name)
-      });`,
-    );
-  }
-  lines.push(
-    `  const ${id} = await builder.addExecutable(${
-      JSON.stringify(name)
-    }, 'dotnet', ${id}_workdir, ['tool', 'run', 'garnet-server'])`,
-  );
-  lines.push(
-    `    .withEndpoint(${cacheExecutableEndpointOptions(entry.Port)});`,
-  );
-  lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`);
-  lines.push(`  await ${id}.withArgsCallback(async (context) => {`);
-  lines.push(`    const args = await context.args();`);
-  lines.push(`    await args.add('--port');`);
-  lines.push(`    await args.add(${id}_tcpEndpoint.property(EndpointProperty.TargetPort));`);
-  const args = [...GARNET_LEASE_ARGS, ...(entry.DataPath ? GARNET_PERSISTENCE_ARGS : [])];
-  for (const arg of args) {
-    lines.push(`    await args.add(${JSON.stringify(arg)});`);
-  }
-  if (entry.DataPath) {
-    for (const flag of ['--logdir', '--checkpointdir']) {
-      lines.push(`    await args.add(${JSON.stringify(flag)});`);
-      lines.push(`    await args.add(${id}_dataPath);`);
-    }
-  }
-  lines.push(`  });`);
-  lines.push(
-    `  const ${id}_hostPort = ${id}_tcpEndpoint.property(EndpointProperty.HostAndPort);`,
-  );
-  if (['Redis', 'Garnet'].includes(entry.Engine)) {
-    appendRespReadinessLines(lines, id, name);
-  }
-  lines.push(`  caches.set(${JSON.stringify(name)}, ${id});`);
-  lines.push(`  cacheEndpoints.set(${JSON.stringify(name)}, ${id}_tcpEndpoint);`);
-
-  const wiring =
-    `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: 'garnet' }, local: false }`;
-  return { lines, wiring };
-}
-
-/**
- * Emits the Redis-compatible container setup lines for Redis/Garnet (shared by
- * the Container arm and the Docker branch of a Redis/Garnet Auto arm). Wires a
- * `GARNET_URI`/`REDIS_URI` host:port pair plus the provider tag.
- */
-function redisGarnetContainerSetup(
-  id: string,
-  name: string,
-  entry: CacheEntry,
-): { lines: string[]; wiring: string } {
-  const image = SCAFFOLD_CACHE_CONTAINER_IMAGES[entry.Engine] ??
-    SCAFFOLD_CACHE_CONTAINER_IMAGES.Redis;
-  const tag = entry.ImageTag ?? image.tag;
-  const imageRef = `${image.image}:${tag}`;
-  const provider = entry.Engine === 'Garnet' ? 'garnet' : 'redis';
-  const hasGarnetDataPath = entry.Engine === 'Garnet' && Boolean(entry.DataPath);
-  const lines: string[] = [];
-
-  if (hasGarnetDataPath) {
-    lines.push(
-      `  const ${id}_dataPath = ensureContainerDataPath(resolveDataPath(appHostDir, ${
-        JSON.stringify(entry.DataPath)
-      }, ${JSON.stringify(name)}));`,
-    );
-    lines.push(`  const ${id}_runtimeArgs = resolveContainerBindMountRuntimeArgs();`);
-  }
-  lines.push(
-    `  const ${id} = await builder.addContainer(${JSON.stringify(name)}, ${
-      JSON.stringify(imageRef)
-    })`,
-  );
-  lines.push(`    .withEndpoint(${cacheEndpointOptions(entry.Port)})`);
-  if (entry.Engine === 'Garnet') {
-    const args = entry.DataPath
-      ? [
-        ...GARNET_LEASE_ARGS,
-        ...GARNET_PERSISTENCE_ARGS,
-        '--logdir',
-        '/data',
-        '--checkpointdir',
-        '/data',
-      ]
-      : GARNET_LEASE_ARGS;
-    lines.push(`    .withArgs(${JSON.stringify(args)})`);
-  }
-  if (entry.DataPath) {
-    lines.push(
-      hasGarnetDataPath
-        ? `    .withBindMount(${id}_dataPath, '/data')`
-        : `    .withBindMount(resolveDataPath(appHostDir, ${JSON.stringify(entry.DataPath)}, ${
-          JSON.stringify(name)
-        }), '/data')`,
-    );
-  }
-
-  const lastIdx = lines.length - 1;
-  lines[lastIdx] = lines[lastIdx] + ';';
-
-  if (hasGarnetDataPath) {
-    lines.push(`  if (${id}_runtimeArgs.length > 0) {`);
-    lines.push(`    await ${id}.withContainerRuntimeArgs(${id}_runtimeArgs);`);
-    lines.push(`  }`);
-  }
-
-  lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`);
-  lines.push(
-    `  const ${id}_hostPort = ${id}_tcpEndpoint.property(EndpointProperty.HostAndPort);`,
-  );
-  if (['Redis', 'Garnet'].includes(entry.Engine)) {
-    appendRespReadinessLines(lines, id, name);
-  }
-  lines.push(`  caches.set(${JSON.stringify(name)}, ${id});`);
-  lines.push(`  cacheEndpoints.set(${JSON.stringify(name)}, ${id}_tcpEndpoint);`);
-
-  const wiring =
-    `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: ${
-      JSON.stringify(provider)
-    } }, local: false }`;
-  return { lines, wiring };
-}
-
-/**
  * Emits the `<name>_auth` check beside the listener check. A listener accepts the socket
  * before the server accepts the login, so only this check proves consumers can connect.
  * The password travels as the in-memory value already given to the secret parameter —
- * Aspire 13.5.3 rejects `ReferenceExpression.getValue()` inside AppHost callbacks.
+ * Aspire ATS rejects `ReferenceExpression.getValue()` inside AppHost callbacks.
  */
 function appendPostgresCredentialReadinessLines(lines: string[], id: string, name: string): void {
   const healthCheckKey = `${name}_auth`;
@@ -635,36 +422,4 @@ function appendPostgresCredentialReadinessLines(lines: string[], id: string, nam
   lines.push(`    password: ${id}_password_value,`);
   lines.push(`  }));`);
   lines.push(`  await ${id}_server.withHealthCheck(${JSON.stringify(healthCheckKey)});`);
-}
-
-function appendRespReadinessLines(lines: string[], id: string, name: string): void {
-  const healthCheckKey = `${name}_resp`;
-  lines.push(`  builder.addHealthCheck(${JSON.stringify(healthCheckKey)}, async () => {`);
-  lines.push(`    const endpoint = await ${id}.getEndpoint('tcp');`);
-  lines.push(`    const host = await endpoint.host();`);
-  lines.push(`    const port = await endpoint.port();`);
-  lines.push(`    return createRespPingCheck({ host, port })();`);
-  lines.push(`  });`);
-  lines.push(`  await ${id}.withHealthCheck(${JSON.stringify(healthCheckKey)});`);
-}
-
-function cacheEndpointOptions(port: number | undefined): string {
-  const options = [
-    "name: 'tcp'",
-    `targetPort: ${CACHE_DEFAULT_PORT}`,
-    "scheme: 'tcp'",
-  ];
-  if (port !== undefined) {
-    options.unshift(`port: ${port}`);
-  }
-  return `{ ${options.join(', ')} }`;
-}
-
-/** Executable target ports are allocated per run; Port only opts into a host proxy pin. */
-function cacheExecutableEndpointOptions(port: number | undefined): string {
-  const options = ["name: 'tcp'", "scheme: 'tcp'"];
-  if (port !== undefined) {
-    options.unshift(`port: ${port}`);
-  }
-  return `{ ${options.join(', ')} }`;
 }

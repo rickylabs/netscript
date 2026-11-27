@@ -62,11 +62,13 @@ describe('generateRegisterInfrastructure', () => {
 
       assert(!output.includes('EndpointProperty'));
       assertStringIncludes(output, 'createEndpointListenerReadinessCheck');
+      assertStringIncludes(output, '.withRepl()');
       assertStringIncludes(
         block,
         `return await createEndpointListenerReadinessCheck({\n` +
           `      kind: ${JSON.stringify(fixture.kind)},\n` +
           `      endpoint: () => ${server}.getEndpoint('tcp'),\n` +
+          `      containerBacked: true,\n` +
           `    })();`,
       );
       assert(!block.includes('await endpoint.host()'));
@@ -113,7 +115,12 @@ describe('generateRegisterInfrastructure', () => {
       assertStringIncludes(block, `const endpoint = await ${identifier}.getEndpoint('tcp');`);
       assertStringIncludes(block, 'const host = await endpoint.host();');
       assertStringIncludes(block, 'const port = await endpoint.port();');
-      assertStringIncludes(block, 'return createRespPingCheck({ host, port })();');
+      assertStringIncludes(
+        block,
+        fixture.mode === 'Executable'
+          ? 'return createRespPingCheck({ host, port })();'
+          : 'return createRespPingCheck({ host, port, containerBacked: true })();',
+      );
       assert(!block.toLowerCase().includes('password'));
       assert(!block.toLowerCase().includes('username'));
     }
@@ -145,6 +152,7 @@ describe('generateRegisterInfrastructure', () => {
 
     assert(!output.includes('sqlite_listener'));
     assert(!output.includes('external_listener'));
+    assert(!output.includes('.withRepl()'));
     assert(!output.includes('deno-kv_listener'));
     assert(!output.includes('deno-kv_resp'));
     assert(!output.includes('deno-kv-auto_listener'));
@@ -330,7 +338,11 @@ describe('generateRegisterInfrastructure', () => {
         assertStringIncludes(output, 'await args.add("--lua-transaction-mode");');
       }
       assertEquals(
-        countOccurrences(output, 'return createRespPingCheck({ host, port })();'),
+        countOccurrences(
+          output,
+          'return createRespPingCheck({ host, port, containerBacked: true })();',
+        ) +
+          countOccurrences(output, 'return createRespPingCheck({ host, port })();'),
         Mode === 'Auto' ? 2 : 1,
       );
       assert(!output.includes('addGarnet('));
@@ -626,7 +638,7 @@ describe('generateRegisterInfrastructure', () => {
     );
   });
 
-  it('registers SQL Server containers with explicit image and password policy env', () => {
+  it('registers SQL Server containers with explicit image, .withRepl(), and complexity-safe persisted password', () => {
     const output = generateRegisterInfrastructure({
       databases: {
         mssql: {
@@ -642,28 +654,28 @@ describe('generateRegisterInfrastructure', () => {
       primaryDatabase: 'mssql',
     });
 
+    assert(!output.includes('NetscriptE2e!Sql2026'));
+    assertStringIncludes(
+      output,
+      'const db_0_password_value = ensureDatabasePassword(appHostDir, "mssql", { requireComplexity: true });',
+    );
     assertStringIncludes(output, 'builder.addParameter("mssql-password", {');
-    assertStringIncludes(output, "value: 'NetscriptE2e!Sql2026'");
+    assertStringIncludes(output, 'value: db_0_password_value,');
     assertStringIncludes(output, 'secret: true');
     assertStringIncludes(output, 'builder.addSqlServer("mssql", {');
     assertStringIncludes(output, 'password: db_0_password');
     assertStringIncludes(output, ".withImage('mssql/server')");
     assertStringIncludes(output, '.withImageTag("2022-latest")');
     assertStringIncludes(output, ".withEnvironment('ACCEPT_EULA', 'Y')");
-    assertStringIncludes(
-      output,
-      ".withEnvironment('SA_PASSWORD', 'NetscriptE2e!Sql2026')",
-    );
-    assertStringIncludes(
-      output,
-      ".withEnvironment('MSSQL_SA_PASSWORD', 'NetscriptE2e!Sql2026')",
-    );
+    assertStringIncludes(output, ".withEnvironment('SA_PASSWORD', db_0_password_value)");
+    assertStringIncludes(output, ".withEnvironment('MSSQL_SA_PASSWORD', db_0_password_value)");
+    assertStringIncludes(output, '.withRepl()');
     assertStringIncludes(output, 'db_0_server.addDatabase("app-mssql-db")');
     assertStringIncludes(output, 'databases.set("mssql", db_0);');
   });
 
   it('persists container database credentials for resident AppHost restarts', () => {
-    for (const Engine of ['Postgres', 'Mysql'] as const) {
+    for (const Engine of ['Postgres', 'Mysql', 'Mssql'] as const) {
       const name = Engine.toLowerCase();
       const output = generateRegisterInfrastructure({
         databases: { [name]: { Enabled: true, Engine, Mode: 'Container', Persistent: true } },
@@ -672,17 +684,24 @@ describe('generateRegisterInfrastructure', () => {
       });
 
       assertStringIncludes(output, `builder.addParameter(${JSON.stringify(`${name}-password`)}, {`);
-      assertStringIncludes(
-        output,
-        `const db_0_password_value = ensureDatabasePassword(appHostDir, ${JSON.stringify(name)});`,
-      );
+      const expectedCall = Engine === 'Mssql'
+        ? `const db_0_password_value = ensureDatabasePassword(appHostDir, ${
+          JSON.stringify(name)
+        }, { requireComplexity: true });`
+        : `const db_0_password_value = ensureDatabasePassword(appHostDir, ${
+          JSON.stringify(name)
+        });`;
+      assertStringIncludes(output, expectedCall);
       assertStringIncludes(output, 'value: db_0_password_value,');
       assertEquals(countOccurrences(output, 'ensureDatabasePassword(appHostDir'), 1);
-      assertStringIncludes(
-        output,
-        `builder.${Engine === 'Postgres' ? 'addPostgres' : 'addMySql'}(${JSON.stringify(name)}, {`,
-      );
+      const method = Engine === 'Postgres'
+        ? 'addPostgres'
+        : Engine === 'Mysql'
+        ? 'addMySql'
+        : 'addSqlServer';
+      assertStringIncludes(output, `builder.${method}(${JSON.stringify(name)}, {`);
       assertStringIncludes(output, 'password: db_0_password');
+      assertStringIncludes(output, '.withRepl()');
     }
   });
 
