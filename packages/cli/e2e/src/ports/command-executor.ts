@@ -10,6 +10,12 @@ export interface CommandRequest {
   readonly failureHint?: string;
 }
 
+/** Actual existing cancellation state, sampled immediately after native settlement. */
+export interface CommandSignalAtSettlement {
+  readonly abortRequested: boolean;
+  readonly deadlineExpired: boolean;
+}
+
 /** Captured subprocess result. */
 export interface CommandResult {
   readonly command: readonly string[];
@@ -18,6 +24,7 @@ export interface CommandResult {
   readonly stdout: string;
   readonly stderr: string;
   readonly timedOut: boolean;
+  readonly signalAtSettlement?: CommandSignalAtSettlement;
 }
 
 /** Port for running external commands. */

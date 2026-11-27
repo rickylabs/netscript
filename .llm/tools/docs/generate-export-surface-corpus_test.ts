@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertMatch } from '@std/assert';
 import { EmbeddedExportSurfaceCorpus } from '../../../packages/mcp/mod.ts';
+import { assertExactCorpusBytes } from './assert-corpus-bytes.ts';
 import {
   colorInvariantChildEnv,
   createGeneratedAsset,
@@ -270,7 +271,7 @@ Deno.test('write mode generates the artifact from a clean committed tree', async
 
     const generated = await runGenerator(worktree);
     assertEquals(generated.code, 0, generated.stderr);
-    assertEquals(await Deno.readFile(corpusPath(worktree)), before);
+    await assertExactCorpusBytes(await Deno.readFile(corpusPath(worktree)), before);
     await assertArtifactWasWritten(worktree, oldTime);
   });
 });

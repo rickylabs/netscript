@@ -1,7 +1,7 @@
 import type { Evidence } from './evidence.ts';
 import type { RunContext } from './run-context.ts';
 import type { GateId, GatePhase } from './cli-surface.ts';
-import type { CommandOutputMode } from '../ports/command-executor.ts';
+import type { CommandOutputMode, CommandResult } from '../ports/command-executor.ts';
 import type { ExecutionPlatform } from './platform.ts';
 import type { HttpExchangeContract } from './http-contract.ts';
 
@@ -42,6 +42,14 @@ export type CommandFactory = (context: RunContext) => readonly string[];
 
 /** Resolve a working directory from the current run context. */
 export type WorkingDirectoryFactory = (context: RunContext) => string;
+
+/** Evidence from the original awaited executor; observers never own another process. */
+export interface CommandObservation {
+  readonly context: RunContext;
+  readonly result: CommandResult;
+  readonly startedAt: string;
+  readonly completedAt: string;
+}
 
 /** Resolve an HTTP URL from the current run context. */
 export type UrlFactory = (context: RunContext) => string;
@@ -85,6 +93,8 @@ export interface CommandGateDefinition extends BaseGateDefinition {
   readonly timeoutMs?: number;
   /** Stable failure class for commands whose boundary is known before execution. */
   readonly failureClass?: GateFailureClass;
+  /** Optional evidence only; a failed observer must preserve the original command result. */
+  readonly afterCommand?: (observation: CommandObservation) => Promise<void>;
 }
 
 /**
