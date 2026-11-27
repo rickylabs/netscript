@@ -139,6 +139,16 @@ The proxy always sends `Accept-Encoding: identity` to durable-streams before
 sanitizing response headers. That prevents Deno's auto-decoder from failing
 before the proxy can strip a mislabeled `content-encoding: gzip` header.
 
+Unconfigured callers (omitting `authorize` and `recheck`) retain legacy
+request-header forwarding (including client `Cookie`) and have no authorization
+gate. For production routes, either opt into `authorize` + `recheck` on
+`createNetScriptChatStreamProxy` (dropping client `Cookie` / `Authorization`,
+delegating `GET` `live=sse` to `@netscript/plugin-streams-core/proxy` for
+revocable delivery-unit enforcement, and guarding `POST` / non-SSE `GET` behind
+admission + Cookie Origin/Fetch-Metadata checks) or split `POST`
+(`toNetScriptChatResponse({ authorize, ... })`) and `GET`
+(`createNetScriptStreamProxy`).
+
 ```ts
 export const streamHandler = createNetScriptChatStreamProxy({
   target: (req) => ({ sessionId: sessionIdFrom(req) }),

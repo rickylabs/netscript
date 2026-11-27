@@ -501,6 +501,7 @@ Client SDK for end-to-end durable streams backed by a TanStack DB StreamDB.
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
 | `createNetScriptStreamDB` | function | `createNetScriptStreamDB(options: NetScriptStreamDBOptions): NetScriptStreamDB` | Create a NetScript-configured TanStack DB-backed StreamDB. |
+| `createNetScriptStreamEventSourceV1` | function | `createNetScriptStreamEventSourceV1(options: CreateNetScriptStreamEventSourceOptionsV1): NetScriptStreamEventSourceBindingV1` | Create a schema-validated native `EventSource` binding in direct (`streamPath`) or authorizing proxy (`proxyUrl`) single-offset-authority mode. |
 | `useLiveQuery` | function | `useLiveQuery(queryFactory: NetScriptLiveQueryFactory, deps?): NetScriptLiveQueryResult` | Run a TanStack DB live query through the NetScript Fresh streams surface. |
 | `useLiveSuspenseQuery` | function | `useLiveSuspenseQuery(queryFactory: NetScriptLiveQueryFactory, deps?): NetScriptLiveQueryResult` | Run a TanStack DB suspense live query through the NetScript Fresh streams surface. |
 
@@ -508,6 +509,9 @@ Client SDK for end-to-end durable streams backed by a TanStack DB StreamDB.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
+| `CreateNetScriptStreamEventSourceOptionsV1` | type alias | Mutually exclusive direct (`streamPath`/`baseUrl`) or proxy (`proxyUrl`) options with single authoritative `offset`. |
+| `NetScriptEventSourceFactoryV1` | type alias | Factory seam for constructing native `EventSource` or compatible test doubles. |
+| `NetScriptStreamEventSourceBindingV1` | interface | Disposable `EventSource` binding plus the resolved SSE URL it consumes. |
 | `NetScriptLiveQueryFactory` | type alias | Function that builds a live query from the upstream query builder. |
 | `NetScriptLiveQueryResult` | interface | Result returned by NetScript live-query wrappers. |
 | `NetScriptStateSchema` | type alias | NetScript-owned state schema accepted by the stream DB factory. |

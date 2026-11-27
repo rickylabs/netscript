@@ -12,6 +12,21 @@ export interface StreamSourceSchedulerV1 {
   schedule(callback: () => void, delayMs: number): () => void;
 }
 
+/** Diagnostic metadata observed on a non-2xx (non-204) HTTP response from a fetch stream source. */
+export interface FetchStreamHttpErrorInfoV1 {
+  /** Numeric HTTP status code returned by the stream endpoint (e.g. 401, 403, 404, 410, 503). */
+  readonly status: number;
+  /** Raw `Retry-After` response header value when present. */
+  readonly retryAfter?: string;
+  /** `true` when `status` matched `options.terminalStatuses` and the source closed; `false` when it will retry. */
+  readonly terminal: boolean;
+  /**
+   * Most recent `streamNextOffset` committed by a schema-valid `control` frame on this source,
+   * or `undefined` if no `control` frame has committed yet.
+   */
+  readonly lastCommittedOffset?: string;
+}
+
 /** Configuration for a DOM-independent durable-stream fetch source. */
 export interface FetchStreamEventSourceOptionsV1 {
   /** Full stream URL; `live=sse` is set and the existing `offset` is preserved until control. */
@@ -36,10 +51,26 @@ export interface FetchStreamEventSourceOptionsV1 {
   readonly lastEventId?: string;
   /** Host timer override; defaults to `setTimeout` / `clearTimeout`. */
   readonly scheduler?: StreamSourceSchedulerV1;
+  /**
+   * Declarative opt-in list of non-2xx HTTP status codes that close the source permanently
+   * instead of retrying (recommended for authorizing proxies: `[400, 401, 403, 404, 405, 410]`).
+   * Omission preserves the shipped retry-all non-2xx behavior.
+   */
+  readonly terminalStatuses?: readonly number[];
+  /**
+   * Optional pure synchronous observer invoked on every non-2xx (non-204) HTTP response after
+   * cancelling the response body and before dispatching the `'error'` event. Returns `void`;
+   * stopping is decided declaratively by `terminalStatuses` (or imperatively via `source.close()`
+   * / aborting `options.signal`). An uncaught throw closes the source (`readyState = 2`) and
+   * rejects `done`, matching listener exceptions.
+   */
+  readonly onHttpError?: (info: FetchStreamHttpErrorInfoV1) => void;
 }
 
-/** Existing stream-source port with an awaitable resource shutdown. */
+/** Existing stream-source port with an awaitable resource shutdown and EventSource readyState. */
 export interface FetchStreamEventSourceV1 extends StreamEventSourceV1 {
-  /** Resolves after close, abort, HTTP 204, or a terminal control has released resources. */
+  /** WHATWG EventSource-compatible connection state (`0` = CONNECTING, `1` = OPEN, `2` = CLOSED). */
+  readonly readyState: 0 | 1 | 2;
+  /** Resolves after close, abort, HTTP 204, terminal status, or terminal control has released resources. */
   readonly done: Promise<void>;
 }

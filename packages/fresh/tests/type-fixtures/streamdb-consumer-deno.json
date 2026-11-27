@@ -7,6 +7,7 @@
     "@durable-streams/client": "npm:@durable-streams/client@0.2.7",
     "@durable-streams/state": "npm:@durable-streams/state@0.3.2",
     "@durable-streams/state/db": "npm:@durable-streams/state@0.3.2/db",
+    "@netscript/contracts/streams": "../../../contracts/streams.ts",
     "@netscript/fresh/streams": "../../src/runtime/streams/mod.ts",
     "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.4",
     "@opentelemetry/api": "npm:@opentelemetry/api@1.9.1",

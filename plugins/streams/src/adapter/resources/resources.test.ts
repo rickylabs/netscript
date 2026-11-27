@@ -143,6 +143,27 @@ Deno.test({
       assertEquals((await discoverStreamTopics(root)).map((topic) => topic.streamPath), [
         '/billing/invoices',
       ]);
+      // Verify emitted direct subscriber accepts direct variable options and rejects proxyUrl variables at compile time.
+      const subscriberTypeCheckPath = 'streams/invoices-subscriber_type.ts';
+      await Deno.writeTextFile(
+        `${root}/${subscriberTypeCheckPath}`,
+        `import { subscribeInvoicesStream } from './invoices-db.ts';
+const directOpts = {
+  baseUrl: 'https://streams.example.test',
+  offset: '-1',
+  onEvent: () => undefined,
+};
+const proxyOpts = {
+  proxyUrl: 'https://app.example.test/api/streams/invoices',
+  offset: '-1',
+  onEvent: () => undefined,
+};
+void (() => subscribeInvoicesStream(directOpts));
+// @ts-expect-error emitted direct subscriber must reject proxyUrl even via variable arguments
+void (() => subscribeInvoicesStream(proxyOpts));
+`,
+      );
+      const allFiles = [...files, subscriberTypeCheckPath];
       const repoRoot = new URL('../../../../../', import.meta.url);
       await Deno.writeTextFile(
         `${root}/deno.json`,
@@ -154,6 +175,8 @@ Deno.test({
             imports: {
               '@durable-streams/client': 'npm:@durable-streams/client@0.2.7',
               '@durable-streams/state': 'npm:@durable-streams/state@0.3.2',
+              '@netscript/contracts/streams':
+                new URL('packages/contracts/streams.ts', repoRoot).href,
               '@netscript/plugin-streams-core':
                 new URL('packages/plugin-streams-core/mod.ts', repoRoot).href,
               '@netscript/plugin-streams-core/sse':
@@ -182,7 +205,7 @@ Deno.test({
           2,
         ),
       );
-      const frozen = await prepareLockedFixture(root, files.map((file) => `${root}/${file}`));
+      const frozen = await prepareLockedFixture(root, allFiles.map((file) => `${root}/${file}`));
       const output = await checkGeneratedFiles({
         args: [
           'check',
@@ -190,7 +213,7 @@ Deno.test({
           '--unstable-kv',
           '--config',
           `${root}/deno.json`,
-          ...files.map((file) => `${root}/${file}`),
+          ...allFiles.map((file) => `${root}/${file}`),
         ],
       });
       if (output.code !== 0) {
