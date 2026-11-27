@@ -217,7 +217,7 @@ finding into a debt entry.
 - **Target:** Close on PR #2693 merge once both hosted `e2e-cli` runtime tiers pass at exact HEAD.
 - **Linked plan:** `.llm/runs/epic-aspire-17-upgrade--2278/plan.md` (S2c/S3a/S3b/S6).
 - **Created:** 2026-06-27
-- **Status:** resolved-pending-hosted-proof (epic #2278 / PR #2693).
+- **Status:** resolved (epic #2278 / PR #2693 — proven by hosted `e2e-cli` run `46021010832` at `d8fbcbbf7`: `scaffold-runtime` 124/124, `scaffold-runtime-sqlite` 115/115 + `scaffold.showcase` 7/7, `RUN=true`).
 - **Gate:** Close after hosted `e2e-cli` (`scaffold-runtime` + `scaffold-runtime-sqlite`, `RUN=true`)
   passes at PR #2693 HEAD with `addDenoApp` live and D-7 retired.
 
@@ -1795,7 +1795,7 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Target:** Close on PR #2693 merge once both hosted `e2e-cli` runtime tiers pass at exact HEAD.
 - **Linked plan:** `.llm/runs/epic-aspire-17-upgrade--2278/plan.md` (S2a/S2b/S6).
 - **Created:** 2026-06-25.
-- **Status:** resolved-pending-hosted-proof (epic #2278 / PR #2693).
+- **Status:** resolved (epic #2278 / PR #2693 — proven by hosted `e2e-cli` run `46021010832` at `d8fbcbbf7`: `scaffold-runtime` 124/124, `scaffold-runtime-sqlite` 115/115 + `scaffold.showcase` 7/7, `RUN=true`, zero `aspire/package.json` npm island emitted).
 - **Gate:** Close after hosted `e2e-cli` (`scaffold-runtime` + `scaffold-runtime-sqlite`, `RUN=true`)
   passes with zero `aspire/package.json` npm island emitted.
 
