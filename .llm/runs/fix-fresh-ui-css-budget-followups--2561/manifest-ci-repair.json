@@ -1,0 +1,9 @@
+{
+  "failureRun": 41293022496,
+  "failedJob": 124808157894,
+  "gate": "check:aspire-version-parity",
+  "cause": "new tracked .llm/tools/css/README.md absent from pre-stage inventory",
+  "repair": "canonical one-row manifest refresh",
+  "exitCode": 0,
+  "outcome": "PASS"
+}

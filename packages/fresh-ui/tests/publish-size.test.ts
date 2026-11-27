@@ -17,10 +17,11 @@ Deno.test('shipped component CSS stays within raw and gzip budgets', async (t) =
     const entry of walk(new URL('registry/', root), {
       exts: ['.css'],
       includeDirs: false,
-      skip: [/[/\\]theme(?:[/\\]|$)/],
     })
   ) {
-    sources.push(relative(fromFileUrl(root), entry.path).replaceAll('\\', '/'));
+    const rel = relative(fromFileUrl(root), entry.path).replaceAll('\\', '/');
+    if (rel.startsWith('registry/theme/')) continue;
+    sources.push(rel);
   }
   const shipped = Object.keys(FRESH_UI_REGISTRY_CONTENT)
     .filter((path) => path.endsWith('.css') && !path.startsWith('registry/theme/'))
