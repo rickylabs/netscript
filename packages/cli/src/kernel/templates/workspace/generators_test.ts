@@ -42,7 +42,7 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
     importMode: 'jsr',
   }));
 
-  assertEquals(result.workspace, ['./contracts', './plugins']);
+  assertEquals(result.workspace, ['./contracts', './plugins', './aspire']);
   assertEquals(result.imports, {
     '@netscript/config': netscriptJsrSpecifier('config'),
     '@netscript/contracts': netscriptJsrSpecifier('contracts'),
@@ -55,7 +55,7 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
     exclude: SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) => `jsr:@netscript/${packageName}`),
   });
   assertEquals(result.nodeModulesDir, 'auto');
-  assertEquals(result.unstable, ['raw-imports', 'kv']);
+  assertEquals(result.unstable, ['raw-imports', 'kv', 'sloppy-imports']);
   assertEquals(result.exclude, [
     '**/node_modules',
     '**/.data',
@@ -276,7 +276,7 @@ Deno.test('generateDenoJson keeps the same root-only shape in local mode', () =>
     localBase: '../..',
   }));
 
-  assertEquals(result.workspace, ['./contracts', './plugins']);
+  assertEquals(result.workspace, ['./contracts', './plugins', './aspire']);
   assertEquals(
     result.tasks.dev,
     'deno task deps:closure && deno task deps:verify && deno run --allow-all apps/dashboard/main.ts',
@@ -288,6 +288,19 @@ Deno.test('generateDenoJson keeps the same root-only shape in local mode', () =>
     !('minimumDependencyAge' in result),
     'local root deno.json must not carry registry age policy',
   );
+});
+
+Deno.test('generateDenoJson omits ./aspire and sloppy-imports when noAspire is true', () => {
+  const result = JSON.parse(generateDenoJson({
+    name: 'test-project',
+    appName: 'dashboard',
+    workspaceMembers: ['contracts', 'plugins'],
+    importMode: 'jsr',
+    noAspire: true,
+  }));
+
+  assertEquals(result.workspace, ['./contracts', './plugins']);
+  assertEquals(result.unstable, ['raw-imports', 'kv']);
 });
 
 Deno.test('generateDenoJson maps the detached Aspire runner dependency in public modes', () => {
@@ -320,8 +333,8 @@ Deno.test('generateDenoJson expands copied workspace packages in stable order', 
     dbEngines: ['mysql'],
   }));
 
-  assertEquals(result.workspace.slice(0, 2), ['./contracts', './plugins']);
-  assertEquals(result.workspace.slice(2, 7), [
+  assertEquals(result.workspace.slice(0, 3), ['./contracts', './plugins', './aspire']);
+  assertEquals(result.workspace.slice(3, 8), [
     './packages/ai',
     './packages/aspire',
     './packages/cli',

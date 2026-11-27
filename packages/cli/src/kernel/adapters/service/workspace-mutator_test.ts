@@ -205,9 +205,9 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
   }
 });
 
-Deno.test('Aspire helper regeneration declares pg for an existing PostgreSQL AppHost', async () => {
+Deno.test('Aspire helper regeneration declares pg in aspire/deno.json for an existing PostgreSQL AppHost', async () => {
   // Regression (#1726 IMPL-EVAL): the regenerated helpers emit `postgres_auth`, which loads `pg`;
-  // an AppHost scaffolded before this check existed must gain the dependency on the same path.
+  // an AppHost without `pg` declared in aspire/deno.json must gain the import on the same path.
   const root = await Deno.makeTempDir();
   const fs = new DenoFileSystem();
   const templateAdapter = new StringTemplateAdapter(fs);
@@ -218,12 +218,14 @@ Deno.test('Aspire helper regeneration declares pg for an existing PostgreSQL App
       join(root, 'appsettings.json'),
       appsettings({ main: { Engine: 'Postgres', Mode: 'Container', DatabaseName: 'main' } }),
     );
-    const packageJsonPath = join(root, 'aspire', 'package.json');
-    const legacyPackageJson = JSON.stringify({
-      name: 'shop-apphost',
-      dependencies: { 'vscode-jsonrpc': '8.2.0', 'left-pad': '1.3.0' },
+    const denoJsonPath = join(root, 'aspire', 'deno.json');
+    const initialDenoJson = JSON.stringify({
+      imports: {
+        'vscode-jsonrpc/node.js': 'npm:vscode-jsonrpc@8.2.0/node.js',
+        'left-pad': 'npm:left-pad@1.3.0',
+      },
     });
-    await fs.writeFile(packageJsonPath, legacyPackageJson);
+    await fs.writeFile(denoJsonPath, initialDenoJson);
 
     const dryRun = await regenerateAspireHelpersWithDependencies(
       root,
@@ -235,8 +237,8 @@ Deno.test('Aspire helper regeneration declares pg for an existing PostgreSQL App
         formatter: new DenoGeneratedSourceFormatter(new DenoProcess()),
       },
     );
-    assertEquals(dryRun.includes(packageJsonPath), true);
-    assertEquals(await fs.readFile(packageJsonPath), legacyPackageJson);
+    assertEquals(dryRun.includes(denoJsonPath), true);
+    assertEquals(await fs.readFile(denoJsonPath), initialDenoJson);
 
     const written = await regenerateAspireHelpersWithDependencies(
       root,
@@ -249,11 +251,11 @@ Deno.test('Aspire helper regeneration declares pg for an existing PostgreSQL App
       join(root, 'aspire', '.helpers', 'register-infrastructure.mts'),
     );
     assertEquals(helper.includes("withHealthCheck('main_auth')"), true);
-    assertEquals(written.includes(packageJsonPath), true);
-    assertEquals(JSON.parse(await fs.readFile(packageJsonPath)).dependencies, {
-      'vscode-jsonrpc': '8.2.0',
-      'left-pad': '1.3.0',
-      pg: SCAFFOLD_VERSIONS.APPHOST_PG,
+    assertEquals(written.includes(denoJsonPath), true);
+    assertEquals(JSON.parse(await fs.readFile(denoJsonPath)).imports, {
+      'vscode-jsonrpc/node.js': 'npm:vscode-jsonrpc@8.2.0/node.js',
+      'left-pad': 'npm:left-pad@1.3.0',
+      pg: `npm:pg@${SCAFFOLD_VERSIONS.APPHOST_PG}`,
     });
 
     const again = await regenerateAspireHelpersWithDependencies(
@@ -263,10 +265,39 @@ Deno.test('Aspire helper regeneration declares pg for an existing PostgreSQL App
       templateAdapter,
       { formatter: new DenoGeneratedSourceFormatter(new DenoProcess()) },
     );
-    assertEquals(again.includes(packageJsonPath), false);
+    assertEquals(again.includes(denoJsonPath), false);
   } finally {
     await Deno.remove(root, { recursive: true });
   }
+});
+
+Deno.test('Aspire helper regeneration refuses legacy Node.js aspire/package.json workspaces before any write', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile('/project/appsettings.json', appsettings());
+  await fs.writeFile('/project/aspire/package.json', JSON.stringify({ name: 'legacy' }));
+  const writes: string[] = [];
+  const writeFile = fs.writeFile.bind(fs);
+  fs.writeFile = async (path, content) => {
+    writes.push(path);
+    await writeFile(path, content);
+  };
+  const templateAdapter = new StringTemplateAdapter(fs);
+
+  for (const regenerate of [regenerateAspireHelpers, regenerateAspireHelpersWithDependencies]) {
+    await assertRejects(
+      () =>
+        regenerate(
+          '/project',
+          fs,
+          new Scaffolder(templateAdapter, fs),
+          templateAdapter,
+          { formatter: new DenoGeneratedSourceFormatter(new DenoProcess()) },
+        ),
+      ScaffoldValidationError,
+      'Legacy Node.js Aspire AppHost detected',
+    );
+  }
+  assertEquals(writes, []);
 });
 
 Deno.test('Aspire regeneration formats all 15 outputs with two bounded subprocesses with byte-identical results', async () => {

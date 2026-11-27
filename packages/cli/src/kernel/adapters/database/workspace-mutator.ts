@@ -14,6 +14,7 @@ import { generateTsAspireConfig } from '../../templates/aspire/generate-aspire-c
 import { regenerateAspireHelpersWithDependencies } from '../service/workspace-mutator.ts';
 import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 import {
+  assertNativeDenoAppHost,
   collectConfiguredDbEngines,
   reconcileAppHostPackageDependencies,
 } from '../aspire/apphost-package-dependencies.ts';
@@ -181,6 +182,7 @@ export class DatabaseWorkspaceMutator {
     if (!(await this.fs.exists(aspireDir))) {
       return;
     }
+    await assertNativeDenoAppHost(this.fs, projectRoot);
 
     const { config } = await parseAppSettings(join(projectRoot, SCAFFOLD_FILES.APPSETTINGS));
     const aspireConfigContent = generateTsAspireConfig({
@@ -196,6 +198,7 @@ export class DatabaseWorkspaceMutator {
     if (!(await this.fs.exists(aspireDir))) {
       return [];
     }
+    await assertNativeDenoAppHost(this.fs, projectRoot);
 
     return await regenerateAspireHelpersWithDependencies(
       projectRoot,

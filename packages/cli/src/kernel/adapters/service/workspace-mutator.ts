@@ -8,7 +8,10 @@ import { basename, join } from '@std/path';
 import { parseAppSettings } from '@netscript/aspire/config';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import { type AspireSurfaceRenderOptions, renderAspireSurface } from './aspire-surface-renderer.ts';
-import { reconcileAppHostPackageDependencies } from '../aspire/apphost-package-dependencies.ts';
+import {
+  assertNativeDenoAppHost,
+  reconcileAppHostPackageDependencies,
+} from '../aspire/apphost-package-dependencies.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { addWorkspaceMember, removeWorkspaceMember } from '../scaffold/workspace-writer.ts';
@@ -152,6 +155,7 @@ export async function regenerateAspireHelpers(
       { projectRoot, aspireDir },
     );
   }
+  await assertNativeDenoAppHost(fs, projectRoot);
 
   const files = await renderAspireSurface(projectRoot, fs, templateAdapter, options);
   const written: string[] = [];

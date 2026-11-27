@@ -81,7 +81,7 @@ Deno.test('generated quality runner selects TS, TSX, and AppHost MTS while exclu
       ['sagas/example/runtime.ts', 'export const saga = true;\n'],
       ['services/users/main.ts', 'export const service = true;\n'],
       ['streams/example/runtime.ts', 'export const stream = true;\n'],
-      ['tests/smoke_test.ts', 'Deno.test(\'smoke\', () => {});\n'],
+      ['tests/smoke_test.ts', "Deno.test('smoke', () => {});\n"],
       ['triggers/example/runtime.ts', 'export const trigger = true;\n'],
       ['workers/example/runtime.ts', 'export const worker = true;\n'],
       ['.agents/skip.ts', 'const skipped = true;\n'],
@@ -186,11 +186,45 @@ Deno.test('generated quality runner is itself lint and format clean in its consu
   });
 });
 
-Deno.test('generated quality runner checks AppHost source through its restored TypeScript project', () => {
+Deno.test('generated quality runner checks native Deno AppHost source via aspire/deno.json and keeps read-only legacy tsc fallback', async () => {
   const source = generateQualityRunner();
   assertStringIncludes(source, "path === 'aspire/apphost.mts'");
   assertStringIncludes(source, "path.startsWith('aspire/.helpers/')");
   assertStringIncludes(source, "path !== 'aspire/.helpers/run-tool.mts'");
+  assertStringIncludes(source, "'aspire/deno.json'");
+  assertStringIncludes(source, "'--config'");
   assertStringIncludes(source, "'aspire/node_modules/typescript/bin/tsc'");
   assertStringIncludes(source, "'aspire/tsconfig.apphost.json'");
+
+  await withTempRoots(async (projectRoot, runnerRoot) => {
+    await Deno.writeTextFile(
+      join(projectRoot, 'deno.json'),
+      JSON.stringify({ workspace: ['./aspire'] }),
+    );
+    await Deno.mkdir(join(projectRoot, 'aspire/.helpers'), { recursive: true });
+    await Deno.writeTextFile(
+      join(projectRoot, 'aspire/deno.json'),
+      JSON.stringify({ imports: {} }),
+    );
+    await Deno.writeTextFile(
+      join(projectRoot, 'aspire/apphost.mts'),
+      'export const ok: boolean = true;\n',
+    );
+    await Deno.writeTextFile(
+      join(projectRoot, 'aspire/.helpers/helper.mts'),
+      'export const helper: number = 1;\n',
+    );
+
+    const passing = await runQuality(projectRoot, 'check', runnerRoot);
+    assertEquals(passing.code, 0, JSON.stringify(passing.report));
+    assertEquals(passing.report.ok, true);
+
+    await Deno.writeTextFile(
+      join(projectRoot, 'aspire/apphost.mts'),
+      'export const broken: string = 1;\n',
+    );
+    const failing = await runQuality(projectRoot, 'check', runnerRoot);
+    assertEquals(failing.code, 1);
+    assertEquals(failing.report.ok, false);
+  });
 });

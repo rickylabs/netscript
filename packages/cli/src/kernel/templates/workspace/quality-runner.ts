@@ -194,8 +194,10 @@ async function runAppHostCheck(
   projectRoot: string,
   files: readonly string[],
 ): Promise<BatchResult> {
-  const output = await new Deno.Command('deno', {
-    args: [
+  const nativeConfig = resolve(projectRoot, 'aspire/deno.json');
+  const args = (await isFile(nativeConfig))
+    ? ['check', '--unstable-kv', '--config', 'aspire/deno.json', ...files]
+    : [
       'run',
       '--allow-read',
       '--allow-env',
@@ -203,7 +205,9 @@ async function runAppHostCheck(
       '--noEmit',
       '-p',
       'aspire/tsconfig.apphost.json',
-    ],
+    ];
+  const output = await new Deno.Command('deno', {
+    args,
     cwd: projectRoot,
     stdout: 'piped',
     stderr: 'piped',
