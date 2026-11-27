@@ -40,7 +40,7 @@ const registerPlugins = await Deno.readTextFile(registerPluginsPath);
 // (@netscript/sdk/client, @netscript/telemetry/tracer) for the injected
 // callback. The release version is read from the generated workers resource pin.
 const publishedVersion = registerPlugins.match(
-  /jsr:@netscript\/plugin-workers@([^/']+)\/services/,
+  /jsr:@netscript\/plugin-workers@([^/'"]+)\/services/,
 )?.[1];
 if (mode === 'published' && !publishedVersion) {
   throw new Error('generated register-plugins.mts did not reveal the published release version');
@@ -294,7 +294,7 @@ await Deno.writeTextFile(flowBJobPath, updatedFlowBJob);
 const registerBackgroundPath = `${projectRoot}/aspire/.helpers/register-background.mts`;
 const registerBackground = await Deno.readTextFile(registerBackgroundPath);
 const workersBackgroundRange = locateWorkersBackgroundBlock(registerBackground);
-// The locator anchors the block on `const <id> = builder.addExecutable('workers', ...)`, but the
+// The locator anchors the block on `const <id> = builder.addDenoApp('workers', ...)`, but the
 // generator emits the processor's `if (config.BackgroundProcessors[...])` guard *before* that line.
 // Slicing from the locator's start therefore excludes the guard, and every downstream edit here
 // operates on the sliced block. Anchor the start on the processor's own config line instead — it is
@@ -315,7 +315,7 @@ const workersBackgroundBlock = registerBackground.slice(
 // binding identifier still has to be extracted from within it. Quote-agnostic on purpose: the
 // generator emits JSON.stringify'd names after this slice's source-safety change.
 const workersExecutablePattern =
-  /const ([A-Za-z_$][\w$]*) = builder\.addExecutable\((["'])workers\2,/;
+  /const ([A-Za-z_$][\w$]*) = builder\.(?:addDenoApp|addExecutable)\(\s*(["'])workers\2,/;
 const workersExecutableMatch = workersExecutablePattern.exec(workersBackgroundBlock);
 if (!workersExecutableMatch) {
   throw new Error('generated register-background.mts did not contain the workers resource block');

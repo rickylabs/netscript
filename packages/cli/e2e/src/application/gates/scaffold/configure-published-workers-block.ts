@@ -7,12 +7,31 @@ export const workersServiceSource = 'plugins/workers/services/src/main.ts';
 export function configurePublishedWorkersBlock(workersBlock: string): string {
   const configuredBlock = configureWorkersDenoConfig(workersBlock);
 
-  return configuredBlock.includes("'--minimum-dependency-age=0'")
-    ? configuredBlock
-    : configuredBlock.replace(
-      /(\[\s*(?:'run'|"run")\s*,)/,
-      "$1 '--minimum-dependency-age=0',",
+  if (
+    configuredBlock.includes("'--minimum-dependency-age=0'") ||
+    configuredBlock.includes('"--minimum-dependency-age=0"')
+  ) {
+    return configuredBlock;
+  }
+  if (/\.withDenoRuntimeArgs\(\s*\[/.test(configuredBlock)) {
+    return configuredBlock.replace(
+      /(\.withDenoRuntimeArgs\(\s*\[)/,
+      "$1'--minimum-dependency-age=0', ",
     );
+  }
+  const denoAppMatch = configuredBlock.match(
+    /const\s+([A-Za-z_$][\w$]*)\s*=\s*builder\.addDenoApp\(/,
+  );
+  if (denoAppMatch) {
+    return configuredBlock.replace(
+      /(\.withDenoConfig\([^)]+\);)/,
+      `$1\n    await ${denoAppMatch[1]}.withDenoRuntimeArgs(['--minimum-dependency-age=0']);`,
+    );
+  }
+  return configuredBlock.replace(
+    /(\[\s*(?:'run'|"run")\s*,)/,
+    "$1 '--minimum-dependency-age=0',",
+  );
 }
 
 /** Preserve a generated local service path or resolve the legacy published launch through its alias. */
@@ -38,8 +57,20 @@ export function configureLocalWorkersBlock(
   return configuredBlock;
 }
 
-/** Change only the config value across compact and formatted Deno argument arrays. */
+/** Change only the config value across Aspire 17 `withDenoConfig` and legacy argument arrays. */
 function configureWorkersDenoConfig(workersBlock: string): string {
+  if (/\.withDenoConfig\(\s*(?:'deno\.json'|"deno\.json")\s*\)/.test(workersBlock)) {
+    return workersBlock.replace(
+      /(\.withDenoConfig\(\s*)(?:'deno\.json'|"deno\.json")(\s*\))/,
+      "$1'.netscript-flow-b-deno.json'$2",
+    );
+  }
+  if (
+    /\.withDenoConfig\(\s*(?:'\.netscript-flow-b-deno\.json'|"\.netscript-flow-b-deno\.json")\s*\)/
+      .test(workersBlock)
+  ) {
+    return workersBlock;
+  }
   const configuredBlock = workersBlock.replace(
     /((?:'--config'|"--config")\s*,\s*)(?:'deno\.json'|"deno\.json")/,
     "$1'.netscript-flow-b-deno.json'",

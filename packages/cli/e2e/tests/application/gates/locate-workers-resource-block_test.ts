@@ -44,12 +44,12 @@ Deno.test('locates workers-api in real generator output, between sibling plugins
   const range = locateWorkersResourceBlock(source);
   const block = source.slice(range.start, range.end);
 
-  // The plugins generator emits names via JSON.stringify (double quotes); the background
-  // generator emits them single-quoted. The locator is quote-agnostic, and both are covered here.
-  assertStringIncludes(block, 'addExecutable("workers-api"');
+  // The plugins generator emits names via JSON.stringify (double quotes); the locator is
+  // quote-agnostic, and both are covered here.
+  assertStringIncludes(block, 'addDenoApp("workers-api"');
   assertStringIncludes(block, 'plugins.set("workers-api", resource);');
   // The span must not widen across either neighbour.
-  assertEquals(block.split('builder.addExecutable(').length - 1, 1);
+  assertEquals(block.split('builder.addDenoApp(').length - 1, 1);
   assertEquals(block.split('plugins.set(').length - 1, 1);
   assertEquals(block.includes('streams-api'), false);
   assertEquals(block.includes('sagas-api'), false);
@@ -72,9 +72,9 @@ Deno.test('locates workers in real register-background output', () => {
   // Quote-agnostic on purpose: the locator matches (['"])name, and this branch routes user-supplied
   // names through JSON.stringify, so emission is now double-quoted. Asserting a quote style here
   // would couple the test to emission cosmetics -- the #1837 consumer-coupling defect.
-  assertMatch(block, /addExecutable\((["'])workers\1/);
+  assertMatch(block, /addDenoApp\((["'])workers\1/);
   assertMatch(block, /backgroundProcessors\.set\((["'])workers\1/);
-  assertEquals(block.split('builder.addExecutable(').length - 1, 1);
+  assertEquals(block.split('builder.addDenoApp(').length - 1, 1);
   assertEquals(block.split('backgroundProcessors.set(').length - 1, 1);
   assertNotMatch(block, /(["'])streams\1/);
   assertNotMatch(block, /(["'])triggers\1/);
@@ -113,7 +113,7 @@ Deno.test('locates the background workers block even with the name comment remov
   // Quote-agnostic on purpose: the locator matches (['"])name, and this branch routes user-supplied
   // names through JSON.stringify, so emission is now double-quoted. Asserting a quote style here
   // would couple the test to emission cosmetics -- the #1837 consumer-coupling defect.
-  assertMatch(block, /addExecutable\((["'])workers\1/);
+  assertMatch(block, /addDenoApp\((["'])workers\1/);
   assertMatch(block, /backgroundProcessors\.set\((["'])workers\1/);
   assertNotMatch(block, /(["'])streams\1/);
   assertNotMatch(block, /(["'])triggers\1/);

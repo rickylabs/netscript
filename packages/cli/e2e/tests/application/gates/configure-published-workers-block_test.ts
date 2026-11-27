@@ -91,13 +91,32 @@ Deno.test('local workers rewrite accepts formatted real generator output and pre
   const generated = new TextDecoder().decode(formatted.stdout);
   const range = locateWorkersResourceBlock(generated);
   const block = generated.slice(range.start, range.end);
-  assertMatch(block, /'--config',\s*\n\s*'deno\.json'/);
+  assertMatch(block, /\.withDenoConfig\(["']deno\.json["']\)/);
 
   const configured = configureLocalWorkersBlock(block, sourceRoot);
-  assertMatch(configured, /'--config',\s*'\.netscript-flow-b-deno\.json'/);
+  assertMatch(configured, /\.withDenoConfig\(['"]\.netscript-flow-b-deno\.json['"]\)/);
   assertStringIncludes(configured, entrypoint.replaceAll('\\', '\\\\'));
-  assertEquals(countOccurrences(configured, dependencyAgeArgument), 1);
+  assertEquals(
+    countOccurrences(configured, "'--minimum-dependency-age=0'") +
+      countOccurrences(configured, '"--minimum-dependency-age=0"'),
+    1,
+  );
   assertEquals(configureLocalWorkersBlock(configured, sourceRoot), configured);
+});
+
+Deno.test('published workers rewrite handles Aspire 17 addDenoApp blocks', () => {
+  const block =
+    `const resource = builder.addDenoApp("workers-api", workdir, "jsr:@netscript/plugin-workers@0.0.10/services");
+    await resource.withDenoConfig("deno.json");
+    await resource.withDenoRuntimeArgs(["--minimum-dependency-age=0"]);
+    plugins.set("workers-api", resource);`;
+  const configured = configurePublishedWorkersBlock(block);
+  assertStringIncludes(configured, ".withDenoConfig('.netscript-flow-b-deno.json')");
+  assertEquals(
+    countOccurrences(configured, "'--minimum-dependency-age=0'") +
+      countOccurrences(configured, '"--minimum-dependency-age=0"'),
+    1,
+  );
 });
 
 Deno.test('local workers rewrite keeps legacy JSR launch fixtures on the declared local alias', () => {
