@@ -10,7 +10,7 @@
 - **Linked Leaf / Related Issues:**
   - `#319` — Layer A: native Deno TypeScript AppHost (`aspire/deno.json`, zero AppHost `node_modules`) (`Closes #319`)
   - `#320` — Layer B: first-party `AddDenoApp` / `DenoAppResource` adoption (`Closes #320`)
-  - `#295` — Full NetScript framework dogfood proof on native Deno AppHost + `AddDenoApp` (`Closes #295`, gated on hosted dual-tier `e2e-cli` execution)
+  - `#295` — Full NetScript framework dogfood proof on native Deno AppHost + `AddDenoApp` (`Refs #295` only — owner comment `#issuecomment-4871769509` designates `#295` as an umbrella tracking `#319` and `#320`; close manually after child leaves merge)
   - `#2174` — Empty-section Aspire helper lint across all 7 helpers (`Closes #2174`)
   - `#2202` — Fail loudly on AppHost health path (and CLI wait) when targeting a foreign Docker daemon's loopback (`Closes #2202`)
   - `#2259` — `aspire describe` password exposure (`Closes #2259` strictly gated on hosted `scaffold-runtime` Postgres whole-snapshot verification + DB/consumer/Studio proof; if any leak appears on hosted Postgres, remove `Closes #2259` and keep issue open)
