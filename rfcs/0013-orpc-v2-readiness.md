@@ -1,7 +1,7 @@
 ---
-rfc: 0000
+rfc: 0013
 title: oRPC v2 readiness and migration strategy
-status: Draft
+status: Accepted
 authors: ["@rickylabs"]
 created: 2026-11-25
 tracking-issue: https://github.com/rickylabs/netscript/issues/2672
@@ -10,7 +10,7 @@ target-milestone: 0.0.10
 
 # oRPC v2 readiness and migration strategy
 
-> **Draft evaluation notice.** This document is a **Draft** evaluation RFC produced for technical review. It does not authorize implementation, dependency, or lockfile changes under `packages/`, `plugins/`, `docs/site/`, `.github/`, `deno.json`, or `deno.lock`. Every statement about current NetScript or oRPC behavior below is tagged as **source-inspected** or **measured** (baseline inventory refreshed to `origin/main` `00325a531` with `@orpc/*@^1.16.6` and Deno `2.9.8`; historical `87965d800` / `^1.15.5` / `1.16.5` throwaway `2.0.0-beta.53` prototype measurements preserved in `.llm/runs/plan-rfc-orpc-v2-readiness-2672--rfc/evidence/v2-beta53-prototype-summary.md`; standalone probes in `probes/v2-behavior-probes.ts` verified on `1.16.6` vs `2.0.0-beta.53` under Deno `2.9.8`); proposed architecture and migration steps are tagged as **derived**. Phase 0a targets milestone `0.0.10`; Phase 2 (oRPC v2 GA cut-over) targets `0.1.0`. Companion pipeline evaluation: draft PR #2673 (tracking issue #2671).
+> **Status: Accepted (`rfc: 0013`).** Accepted by **Owner decision 2026-11-27: Accept and merge**. Tracking issue [#2672](https://github.com/rickylabs/netscript/issues/2672) stays open to track separate implementation PRs under `packages/` and `plugins/`. Every statement about current NetScript or oRPC behavior below is tagged as **source-inspected** or **measured** (baseline inventory refreshed to `origin/main` `00325a531` with `@orpc/*@^1.16.6` and Deno `2.9.8`; historical `87965d800` / `^1.15.5` / `1.16.5` throwaway `2.0.0-beta.53` prototype measurements preserved in `.llm/runs/plan-rfc-orpc-v2-readiness-2672--rfc/evidence/v2-beta53-prototype-summary.md`; standalone probes in `probes/v2-behavior-probes.ts` verified on `1.16.6` vs `2.0.0-beta.53` under Deno `2.9.8`); target architecture and migration steps are tagged as **derived**. Phase 0a targets milestone `0.0.10`; Phase 2 (oRPC v2 GA cut-over) targets `0.1.0`. Companion RFCs: RFC 0011 (PR #2659 / tracking issue #451, in-process service link) and RFC 0012 (PR #2673 / tracking issue #2671, oRPC-native procedure pipeline and router client).
 
 ## Summary
 
@@ -337,10 +337,12 @@ Labeled `breaking` because `0.1.0` (Phase 2) upgrades to `@orpc/*@^2.0.0`, remov
 
 - **oRPC v1→v2 migration guide:** <https://orpc.dev/docs/migrations/from-v1> (read in full, covering up to `2.0.0-beta.53`).
 - **Accepted RFC 0001** (`rfcs/0001-sdk-client-contributions.md`) — adapter boundary keeping raw oRPC classes off NetScript's public surface.
-- **Companion RFC A** (draft PR #2673, head `bd8d51c0`, tracking issue #2671) — oRPC-native procedure pipeline & router client (aligned on `CORSPlugin` deferral to `0.1.0` and v2 `RPCMatcher`/`OpenAPIMatcher`).
-- **Draft PR #2659** (`rfcs/0000-in-process-service-link.md`, head `f8c8d8fd`) — in-process fetch-link sharing the `redirect: 'error'` and v2 `fetch(url, init)` alignment.
+- **Accepted RFC 0012 (Companion RFC A)** (PR #2673, `rfcs/0012-orpc-router-client-pipeline.md`, tracking issue #2671) — oRPC-native procedure pipeline & router client (aligned on `CORSPlugin` deferral to `0.1.0` and v2 `RPCMatcher`/`OpenAPIMatcher`).
+- **Accepted RFC 0011** (PR #2659, `rfcs/0011-in-process-service-link.md`, tracking issue #451) — in-process fetch-link sharing the `redirect: 'error'` and v2 `fetch(url, init)` alignment.
 
 ## Unresolved questions
+
+Accepted in this RFC (`rfc: 0013`, `status: Accepted`, **Owner decision 2026-11-27: Accept and merge**) under the staged Phase 0a (`0.0.10`) / Phase 0b (`0.0.11`) → Phase 1 (`chore/orpc-v2-shadow`) → Phase 2 (`0.1.0` oRPC v2 GA) strategy coordinated with companion RFC 0012 (PR #2673). The three Phase 1 / `0.1.0` verification items below are preserved for confirmation on `chore/orpc-v2-shadow` before the `0.1.0` cut-over:
 
 1. **Contract metadata `~openapi` key stability across oRPC v2 beta → GA:** `deno publish --dry-run` (`--isolatedDeclarations`) has already been verified passing on `2.0.0-beta.53` with explicit `defineMeta` / `BaseContractRoute` annotations, and `routeMeta` via `defineMeta('~openapi', ...)` keeps `@netscript/contracts` free of `@orpc/server`. Verify in Phase 1 (`chore/orpc-v2-shadow`) that oRPC `2.0.0` GA preserves `'~openapi'` as the public `openapi` meta key (or adopt an official browser-safe `@orpc/openapi/meta` subpath if upstream splits it out before GA).
 2. **Scalar UI compatibility with OpenAPI `3.2.0`:** Verify in Phase 1 whether NetScript's bundled `/api/docs/scalar.js` renders OpenAPI `3.2.0` documents cleanly or requires pinning `3.1.0` in `OpenAPIGenerator` options.

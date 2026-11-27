@@ -2,9 +2,9 @@
 
 - **Date:** 2026-11-25
 - **Tracking issue:** `#2672` (`0.0.10`)
-- **Draft PR:** `#2674`
+- **PR:** `#2674` (accepted as **RFC 0013**, `rfcs/0013-orpc-v2-readiness.md`)
 - **Base `main` SHA:** `87965d800b7d61312e8612c82bdb0cb98bdf5b29`
-- **Companion RFC:** PR `#2673` (tracking issue `#2671`)
+- **Companion RFCs:** RFC 0011 (PR `#2659` / tracking issue `#451`), RFC 0012 (PR `#2673` / tracking issue `#2671`)
 
 ## Owner Mandate (verbatim, private prefix elided for public repository)
 
@@ -116,3 +116,8 @@
 | Scoped internal doc links | `mise exec -- deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --root rfcs/0000-orpc-v2-readiness.md --pretty` | PASS (`docs=1 broken-links=0 broken-anchors=0 orphans=0`) |
 | Breaking-migration PR body gate | `mise exec -- deno run --no-lock -A .llm/tools/validation/check-breaking-migration.ts --repo rickylabs/netscript --pr 2674` | PASS (`ok: true`) |
 | Workspace `deno.json` & `deno.lock` untouched + closing-keyword scan | `git diff --stat origin/main...HEAD -- deno.lock deno.json` & pattern scan | PASS (`0` diff, `0` closing-keyword hits) |
+
+## Round-5 PLAN-EVAL & Acceptance (2026-11-27)
+
+- Gemini 4 Hydrogen xhigh Round-5 PLAN-EVAL returned **`APPROVED`** on exact head `ff19a3d78ec7e8fb8a59f0e3bfa8859aa0e7e7b5`.
+- **Owner decision 2026-11-27: Accept and merge:** Assigned next free RFC number `0013` (`0001`–`0010` on `main`, `0011` in PR `#2659`, `0012` in PR `#2673`), renamed `rfcs/0000-orpc-v2-readiness.md` → `rfcs/0013-orpc-v2-readiness.md` (`rfc: 0013`, `status: Accepted`), updated companion RFC references (`RFC 0011` `#2659`, `RFC 0012` `#2673`), recorded accepted resolution note in `## Unresolved questions`, verified tracking issue `#2672` keeps the `rfc` label (open for implementation), and updated PR `#2674` title/body (`Refs #2672` only — zero closing keywords; preserving `## Breaking change and migration`), `status:ready-merge` label (keeping `breaking`), and ready-for-review state (not merged here; awaiting Hydrogen pre-merge verification).
