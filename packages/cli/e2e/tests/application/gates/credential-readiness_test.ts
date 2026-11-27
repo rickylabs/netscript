@@ -408,7 +408,7 @@ Deno.test('credential readiness gates wait on postgres_auth and run the rejectio
     '/workspace/app/aspire/apphost.mts',
     '/workspace/app',
   ]);
-  assertEquals(rejected.command(runContext()).includes('--allow-net=localhost,127.0.0.1'), true);
+  assertEquals(rejected.command(runContext()).includes('--allow-all'), true);
   assertEquals(
     rejected.command(runContext()).includes('--unsafely-ignore-certificate-errors=localhost'),
     true,
