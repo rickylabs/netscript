@@ -253,3 +253,129 @@ For a released-file migration, test a stock file and a body-only customization w
 | --- | --- |
 | Verdict | **FAIL_FIX** |
 | Rationale | Stock migration, same-train validation, hosted database-identity proof and the five issue-closing claims are supported. Customized-runner preservation and the legacy pre-write guarantee still fail at the public entry point. This third feature-tier result is due for owner notification. |
+
+## Round 4 — independent IMPL-EVAL, 2026-11-27
+
+**FAIL_DEBT** at `21077ac3bfc248e2e6ec793d351a8917ee484948`. All three Round-3 findings are fixed, and each fix reproduced through the public CLI on a workspace scaffolded by the published `jsr:@netscript/cli@0.0.9`. This pass found no product defect. It fails on bookkeeping: the PR pushes one directory over the folder-cardinality cap and deepens a second, with no debt entry for either. It also carries a source change to `@netscript/plugin-streams-core` that the plan, the run records and the PR body never mention. Every required action is a registry, run-record or PR-body edit; no product file needs to change.
+
+### Metadata and process verification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Evaluator and scope | PASS | Feature tier, cycle 4, single pass under the owner override recorded in `worklog.md`, `supervisor.md` and `drift.md`. Requested `claudeAgent` / `claude-fable-5-2` / `xhigh`. Observed model `claude-fable-5-2`, session `19874bc6-d3fd-4cef-9e95-4790a566cbe9`, first route. The effort setting cannot be read from inside the session; the launch record is its source. Generator was Antigravity/Gemini, so session and vendor family both differ. A6 CLI/tooling, supporting A2 integrations, docs and service overlays. The pass ran into 2026-11-28. |
+| Plan and design authority | PASS | Both PLAN-EVAL records say `FAIL_PLAN`. Git orders the owner's direct approval at `36f896a64` before S1 at `452a24f80`. The worklog has the Design section. The evaluation brief carries a `## SKILL` chapter. |
+| Checkout and hosted provenance | PASS | Local HEAD, `origin/epic/aspire-17-upgrade` and the PR head all equal the SHA above, 36 ahead and 0 behind `origin/main` `7eecfe51f`. The only local modifications are the three disclosed run files; nothing outside `.llm/runs/` differs from HEAD. GitHub's test merge `68889cb812e7617c02ee7de7bb26ca50438fa510` has parents `7eecfe51f` and the head, and its tree `ec7f4b1d695fb670475115bcd5843c0f673131a0` equals the head tree. Both workflow runs report this head SHA at attempt 1. |
+| Round-3 findings | PASS | High #1, Medium #2 and Low #3 are each closed. Evidence is in the consumer and static tables below. `worklog.md:106` now gives wrapper exit 1 and combined child exit 0. |
+| Commit trail and drift record | FAIL | The PR has a remediation comment for `d3844f98c`, and `21077ac3b` is recorded in the worklog. Four earlier commits are not itemised anywhere in the worklog: `3bf3cc56f`, `8fd152efc`, `b8397d8b5` and `af25a56ec`. One of them changes a package outside the plan. See Findings. [Round-3 remediation comment](https://github.com/rickylabs/netscript/pull/2693#issuecomment-7228823282) |
+| Close-gate | FAIL | Expected before closeout. The PR is mergeable, `status:implementing`, no milestone. `check:review-threads` returned 0 threads and 0 unanswered. The close-gate log names seven unchecked acceptance boxes across #2174, #2202 and #2259 and nothing else. The mirror did not run because the PR lacks `status:ready-merge`. Evidence for all seven boxes exists and is listed under Consumer gates. |
+| Release-gate class | N/A | This PR is not a cut. Canary and published-consumer proof follow the merge. |
+
+### Static gates
+
+All local results are raw exit codes from Deno 2.9.8 in this worktree. `git status` after every chain showed only the three disclosed run files, and `deno.lock` was untouched.
+
+| Gate | Command or check | Result | Evidence |
+| --- | --- | --- | --- |
+| Narrow typecheck | `deno check --frozen --unstable-kv` on the four changed CLI sources and the two changed streams-core sources | PASS | Exit 0. Hosted `check-test-shard (check)` succeeded at the head. |
+| Lint and format | `deno task quality:cli` | PASS | 1,299 lint and 1,181 format files, zero findings, zero refusals. Hosted `quality` succeeded. |
+| Architecture and quality scan | `deno task quality:gate`, `deno task check:scaffold-provider-boundary` | PASS | Both exit 0. `arch:check` reports `FAIL=0` in every package. Its F-16 warnings are assessed under Fitness gates. The whole PR adds no `deno-lint-ignore`, `as unknown as` or `any` to non-test product code. |
+| Aspire pins | `deno task check:aspire-version-parity`, default and `-- --phase 2` | PASS | Each checked 1,053 surfaces: 0 failed, 0 deferred, 0 missing, manifest fresh. `check:scaffold-versions`, `check:aspire-host-ports` and `check:netscript-jsr-specifiers` exited 0. |
+| Bumper | `deno task aspire:bump --offline`, `-- --dry-run --offline`, `-- --dry-run --offline --version 18.0.0` | PASS | The first two exited 0 with 0/7 files changed. The crossed-train form exited 1 with `Incompatible Aspire trains` raised from `assertSameAspireTrain`. |
+| Generated carriers | `check:assets-barrel`, `check:agent-docs-prose`, `check:mcp-export-corpus`, `check:publish-assets`, `maint:dogfood-skills:check` | PASS | All five exited 0 and left the tree unchanged. |
+| Links and docs accuracy | `deno task docs:links`, `deno task docs:accuracy` | PASS | 105 docs, 0 broken links, anchors or orphans. Accuracy reported PASS. |
+| Publish dry-run | `deno task publish:dry-run` | PASS | Exit 0, `Success Dry run complete`. |
+| Doc lint | `deno task doc:lint --root packages/<name>` | FAIL | CLI and MCP exited 0. Aspire exited 1 on per-subpath private-type references 2/9/36/2 with combined child exit 0. `plugin-streams-core` also exited 1, with 1, 3 and 6 references in `./mod.ts`, `./src/telemetry/mod.ts` and `./src/testing/mod.ts` and combined child exit 0. Both are baseline: the Aspire tree is `ea9a1d8174d6fc70ba9940119e3754a06ed688f7` at base and head, and this PR changes none of those three streams-core files. |
+| JSR audit | `audit-jsr-package.ts --root packages/<name>` | FAIL | CLI, MCP and `plugin-streams-core` exited 0. Aspire exited 1 on the four baseline missing `@module` tags. |
+| README standard | `deno task docs:readme:check` | FAIL | Exit 1 on the unchanged `packages/bench/README.md` Install section. Baseline. |
+| Focused tests | `deno test --frozen --allow-all --unstable-kv` in four invocations | PASS | Remediation and preflight files: 45 passed. Bumper, parity, fixture and workflow-policy tools: 49 passed. Aspire helper templates, credential readiness and DB operations: 140 passed, 302 steps, 3 ignored. Fresh AI browser-import guard and streams-core proxy tests: 30 passed. Zero failures. `version-drift_test.ts` passes with the derived specifier. |
+
+### Fitness gates
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| F-1 file size | PASS | The remediation's sources are 241, 244, 110 and 24 lines. Every F-1 warning from `arch:check` in the three touched packages matches a file already over its cap on `origin/main`. The only growth is generated carriers and the recorded 824→826 plugin installer. |
+| F-2 through F-4 | PASS | `quality:gate` and the provider-boundary check exited 0. The new preservation warning writes through the existing `outputWarning`, which goes to stderr. Seventeen CLI adapters already import that output module on main. |
+| F-5 and F-6 | PASS | The Aspire package tree is identical at base and head. The streams-core change adds one import-map entry and no export. Publish dry-run exited 0. |
+| F-7 package documentation | FAIL | Baseline only. See doc lint and JSR audit above. |
+| F-8 through F-15, F-17 through F-19 | PASS | Typecheck, quality scan and CLI quality wrappers passed. Hosted runtime exercised background consumers, sagas and telemetry. No new abstract family or public sub-barrel. |
+| F-10 test shape | PASS | The new mutator test's body-only case asserts zero rewrites and identical bytes, which by inspection the Round-3 string checks could not satisfy. The new preflight test asserts the composition validator is never called and that the workspace tree is unchanged. Both controls also reproduced live. |
+| F-16 folder cardinality | FAIL | Two directories grew past the cap with no debt entry. `packages/cli/src/kernel/templates/aspire` went from 11 to 13 immediate children. `packages/cli/e2e/src/application/gates/scaffold/runtime` went from 29 to 31. The two parents the plan named stayed at 19 and 94, which is all Rounds 1 to 3 measured. See Findings. |
+
+### Runtime gates
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Artifact integrity | PASS | Downloaded `15233929058`, `15235276207` and `15234862287`. Their SHA-256 values match both the Actions API digests and the brief: `6c1e57fd…`, `0feef948…` and `a3fcbc84…`. |
+| Hosted static scaffold | PASS | Service 8/8, contracts 5/5, plugins 18/18. Zero failed, skipped or retried. The job's `Skipped by policy` step was itself skipped, so the lane ran. |
+| Hosted Postgres and Docker | PASS | 124/124, zero failed, skipped or retried. The policy-skip step was skipped and the Aspire CLI came from cache with the preflight step succeeding. `runtime.health.credential-rejected` exited 0 in 30,423 ms. `agent.aspire-mcp-smoke`, `behavior.otel.traces`, `behavior.streams.producer-reconnect` and `cleanup.aspire-stop` (7,022 ms) passed. [Postgres job](https://github.com/rickylabs/netscript/actions/runs/46074769676/job/140760192326) |
+| Hosted SQLite and Garnet | PASS | 116/116 and showcase 8/8, zero failed, skipped or retried. The browser gate exited 0. MCP smoke, OTel traces, streams reconnect and cleanup passed. [SQLite job](https://github.com/rickylabs/netscript/actions/runs/46074769676/job/140760192217) |
+| Hosted core CI | PASS | `quality`, `check-test` and all eight shards succeeded. Of 34 check runs at the head, 26 succeeded, 7 were skipped and only `close-gate` failed. [Core CI](https://github.com/rickylabs/netscript/actions/runs/46074769741) |
+| Desktop native | N/A | The job concluded `success` in four seconds through its `Skipped by policy` step. Checkout, packaging, install, update and rollback were all skipped. The lane runs only on release or manual events, or with `desktop-native-gate` or `ci:full`. The plan does not require it, but it is not a pass. See Findings. [Desktop job](https://github.com/rickylabs/netscript/actions/runs/46074769676/job/140760192092) |
+| Local runtime and cleanup | N/A | No AppHost was started locally. The only Aspire command run was `aspire restore` from a scratch CLI `17.0.0+2d325b13` with a scratch `ASPIRE_HOME`. No process remained afterwards. |
+
+### Consumer gates
+
+Every control below used a workspace created by `jsr:@netscript/cli@0.0.9` with `init --db sqlite --service --service-name users`, run outside the monorepo with `--no-config --no-lock --node-modules-dir=none`. The candidate CLI ran from source with the repository's frozen lock. Snapshots list every directory and file with mode and SHA-256.
+
+| Consumer | Result | Evidence |
+| --- | --- | --- |
+| Control A: zero-side-effect preflight | PASS | On the pristine legacy workspace, `generate aspire` and `generate aspire --check` each exited 246 with `Legacy Node.js Aspire AppHost detected`. The 298-entry snapshot was identical afterwards and no `node_modules/` existed. This held through both the public `netscript.ts` entry and the `netscript-dev.ts` entry, each with `--project-root` and from inside the project. |
+| Control A, other entry points | PASS | Twelve more invocations were each run on a fresh pristine copy: `service add`, `service remove`, `service set`, `service generate`, `service ref add`, `db add`, `db remove --purge`, `plugin install` for workers, streams and auth, `plugin remove` and `plugin update`. All exited 246 with the legacy diagnostic, zero changed entries and no `node_modules/`. |
+| Control A sensitivity | PASS | `generate plugins` does not touch Aspire and is not refused. On the same pristine workspace it exited 0 and created a 279 MiB `node_modules/`, the size Round 3 reported. Configuration loading therefore does install dependencies here, so its absence above is meaningful. |
+| Control B: body-edited runner | PASS | After the guide's §2 edits, one `'jobs'` entry was added to `SOURCE_ROOTS` with the generated header kept. `generate aspire` printed the preservation warning on a first run that rewrote 13 helpers and on a second run that rewrote none. The runner's SHA-256 stayed `3c0b9fce…` and the entry remained. |
+| Control B, manual path | PASS | With that customized runner the root `deno task check` exited 1 on the removed compiler, as the warning says. After applying the guide's `runAppHostCheck` snippet the warning stopped, the runner was still preserved, and `deno task check` exited 0 across 160 files. |
+| Control C: stock migration | PASS | The scaffolded runner hashed `3704a834…`. After §2, `generate aspire` rewrote 14 files and the runner became `9a5b786e…`, the digest of `generateQualityRunner()` at this head. A second run rewrote none. `aspire restore` exited 0. After Prisma `db:generate`, `generate aspire --check` reported the surface current over 17 outputs, and the literal root `deno task check` exited 0: 145 workspace files and 15 AppHost files. The worklog records 161 files; this run and Round 3 both saw 160. |
+| Legacy digest set | PASS | The template has four commits. Evaluating `generateQualityRunner()` at each gives `f6ea6468…` at `1455231b0` and `3704a834…` at `01e096049`, `v0.0.7`, `v0.0.8`, `v0.0.9`, `v0.0.10-canary.1`, `v0.0.10-canary.7` and `origin/main`. The exported set holds exactly those two. |
+| Pre-publication substitution | PASS | The guide pins `@netscript/aspire@^0.0.10`, which is unpublished. The controls used published `0.0.9`. Between `v0.0.9` and this head the package differs only in `README.md`, so the source and manifest are identical. The trees are not, contrary to the worklog's "tree-identical". |
+| #319 and #320 | PASS | Unchanged since Round 3. Native-member and first-party hosting tests passed again locally and both hosted tiers restored and started. Neither issue has acceptance checkboxes. |
+| #2174 | PASS | `empty-registration_test.ts` runs `deno lint --no-config` on each of the seven emitted helpers in empty, all-empty and populated-sibling graphs, and passed. This covers both acceptance boxes. |
+| #2202 | PASS | The generated readiness helper returns `FOREIGN_DOCKER_LOOPBACK` naming the daemon host and pointing at `netscript plugin doctor`. The stubbed remote and local topology tests passed. This covers both boxes. |
+| #2259 | PASS | The hosted receipt reads `describe=redacted`, `studioDb=plugin-smoke-20261127-221055-db`, which matches this run's workspace, and masked dashboard details for `users` and `prisma-studio`. `database.init`, `generate`, `seed`, `codegen` and `migration-artifacts` passed. This covers all three boxes. |
+| Issue references | PASS | The body has exactly five closing keywords, for #319, #320, #2174, #2202 and #2259, plus `Part of #2278` and `Refs #295, #1726, #2184`. The close-gate resolved the same five. |
+
+### Anti-pattern check
+
+| AP | Status | Evidence |
+| --- | --- | --- |
+| AP-1 | CLEAR | No source file crosses or deepens a size cap in this remediation. |
+| AP-19 | CLEAR | Unchanged since Round 2. The mixed-permission tests passed again. |
+| AP-21 | VIOLATION | Two directories exceed the cap of 12 after growing in this PR, and neither growth is recorded. The two directories under `cli-showcase-cardinality-2571` are unchanged at 19 and 94 and remain DEBT_ACCEPTED. |
+| AP-2, AP-9 through AP-16, AP-18, AP-22, AP-25, AP-26 | CLEAR | Reviewed the digest helper, the reordered guard, the warning path and the streams-core logger swap. |
+| AP-3 through AP-8, AP-17, AP-20, AP-23, AP-24 | N/A | No corresponding surface changed. |
+
+### Arch-debt delta
+
+| Metric | Count | Evidence |
+| --- | --- | --- |
+| New entries | 0 | The remediation does not touch `arch-debt.md`. Across the PR, three existing Aspire rows were revised. |
+| Resolved entries | 2 | Unchanged from Round 1. |
+| Deepened violations | 1 | `gates/scaffold/runtime`, 29→31, from `dashboard-resource-masking.ts` and `live-db-authority.ts` in `600ea1ac8`. |
+| Unrecorded violations | 2 | The deepening above, and the new crossing in `kernel/templates/aspire`, 11→13, from `generate-apphost-deno-json.ts` and its test in `8b4864b1b`. |
+
+### Findings
+
+| Severity | Finding | Evidence | Required action |
+| --- | --- | --- | --- |
+| Blocking — debt record | **A new F-16 crossing has no debt entry.** S2a put two planned files in `packages/cli/src/kernel/templates/aspire`, taking it from 11 to 13 children. | `git ls-tree` gives 11 on `origin/main` and 13 at the head. `arch:check` prints `directory has 13 immediate children; doctrine cap is 12 (src/kernel/templates/aspire)`. Archetype 6 names no override for this folder. Neither `arch-debt.md` nor the CLI README mentions it. | Add a debt entry with reason, owner, target, linked plan, status and closing gate. Moving the pair into a bounded subfolder also clears it, but that changes product files and needs fresh hosted proof. |
+| Blocking — debt record | **An over-cap gate directory was deepened without a record.** The Round-1 remediation added two files under `gates/scaffold/runtime`, 29→31. The worklog states F-16 was preserved because the parent stayed at 94. | Same measurement method. `cli-showcase-cardinality-2571` says it covers only its two showcase additions. `scaffold-runtime-a8-f16-1333` targets a split before the next gate or probe is added. | Record the deepening in the registry, in a new entry or by extending `scaffold-runtime-a8-f16-1333`, and correct the worklog sentence. |
+| Medium — required record | **The PR changes `@netscript/plugin-streams-core` outside the plan and says so nowhere.** `8fd152efc` swaps `createLogger` from `@netscript/logger` for `getLogger` from `@logtape/logtape` in two proxy modules, adds the import-map entry, adds `packages/fresh/tests/ai-browser-import_test.ts` and adds one line to four lock files. | The plan, worklog, drift log, context pack, PR body and all six PR comments have no mention of it. No earlier round reviewed it. On the merits it is sound: `createLogger` with an array category returns `getLogger` of the same array (`packages/logger/creators.ts:119`), the new guard and the proxy tests pass, and the JSR audit and publish dry-run exit 0. | Add a drift row and a worklog entry that name the commit, the reason and the files. List the three sibling commits too. Add the change to the PR body's scope. |
+| Low — evidence record | **Hosted results are overstated.** The worklog and brief say 33 non-close-gate checks passed and that `desktop-native-linux` passed. | 26 succeeded and 7 were skipped. The desktop job was a policy skip, as were the desktop jobs in the Round 1 to 3 runs: each finished in three or four seconds with checkout skipped. | State 26 succeeded and 7 skipped, and record desktop as policy-skipped. S3a changed desktop app registration, which has compile-level proof only until that lane runs at the canary cut. |
+| Low — closeout | **The PR body is not ready for the close-gate.** Its `## Status` box still names `c312e2beb` and Round 2. It has no Definition of Done, Validation or Drift/Debt section. It describes the dependency reconciler as serving legacy Node AppHosts, which are now refused. | PR body at the head. `status:implementing` is also absent from `.github/labels.yml`. | Rewrite the body to the `netscript-pr` template and add the `acceptance-evidence` blocks for the seven boxes before applying `status:ready-merge`. |
+| Low — advisory | **Small gaps in the new warning path.** The warning and the guard error cite a repository docs path that a consumer workspace does not contain. The unit test checks preserved bytes but not that the warning is emitted. The guide's snippet omits replacing the inline `args: [...]` with `args`. | `workspace-mutator.ts:191`, `workspace-mutator_test.ts:518`, guide §2. The live controls confirmed the behavior. | Optional follow-up. Does not block. |
+
+### Lessons for promotion
+
+| Lesson | Applies to | Confidence |
+| --- | --- | --- |
+| Measure folder cardinality for every directory that gains a file. Checking only the parents a plan names lets growth move to a sibling or child unnoticed. | All archetypes, F-16 | High |
+| Read step-level conclusions before recording a hosted job as passed. A job-level `success` can be a policy skip. | Hosted gate evidence | High |
+| Diff a PR against its base by package before accepting its scope. An unblocking fix in another package needs a drift row in the same commit. | Harness runs | High |
+
+### Verdict
+
+| Field | Value |
+| --- | --- |
+| Verdict | **FAIL_DEBT** |
+| Rationale | The approved scope is implemented and verified, and the three Round-3 findings are closed. Two folder-cardinality growths are unrecorded, which the verdict rules do not allow under `PASS`. The fix is two debt entries plus the drift, evidence and PR-body corrections above, all outside product code. The tree outside `.llm/` can stay as verified here, so a confirmation limited to those records, or the owner's direct acceptance, is enough to clear it. |
+
+PR https://github.com/rickylabs/netscript/pull/2693, head 21077ac3bfc248e2e6ec793d351a8917ee484948, checks and reviews 26 succeeded, 7 skipped, close-gate failing by design, 0 review threads; IMPL-EVAL Round 4 FAIL_DEBT

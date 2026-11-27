@@ -29,6 +29,61 @@
   906-line registry is now 362 lines at showcase candidate `04149cb`; this entry does not claim
   that old monolith still exists or close the remaining over-cap gate-directory debt.
 
+## packages/cli — Aspire template directory crosses F-16 cap (`cli-aspire-templates-cardinality-2278`)
+
+- **ID:** `cli-aspire-templates-cardinality-2278`.
+- **Reason:** Epic #2278 S2a (`8b4864b1b`) added `generate-apphost-deno-json.ts` and
+  `generate-apphost-deno-json_test.ts` to `packages/cli/src/kernel/templates/aspire`, taking it
+  from **11 to 13** immediate children against the F-16 / R-FOLD-CARD cap of 12 (`git ls-tree`
+  against `origin/main` `7eecfe51f`; `deno task arch:check` warning). Legacy
+  `generate-apphost-package-json.ts` and `generate-apphost-package-json_test.ts` remain as
+  compatibility templates/tests.
+- **Why deferred / cost:** Relocating the new files after Round-4 verification would churn imports
+  and require fresh hosted proof for a +1 sibling crossing; zero layering, permission, or
+  public-contract exception is accepted.
+- **Owner:** CLI Aspire scaffold maintainers.
+- **Target:** Before adding another template module under `packages/cli/src/kernel/templates/aspire`,
+  remove the retired `generate-apphost-package-json.ts` + `generate-apphost-package-json_test.ts`
+  pair or group AppHost manifest templates into a bounded subfolder (at most 12 immediate children).
+- **Linked plan:** `.llm/runs/epic-aspire-17-upgrade--2278/plan.md` (S2a, L1);
+  `.llm/runs/epic-aspire-17-upgrade--2278/evaluate.md` (Round 4 `FAIL_DEBT`); epic #2278;
+  PR #2693.
+- **Created:** 2026-11-28.
+- **Status:** open, DEBT_ACCEPTED (recorded to clear Round-4 IMPL-EVAL `FAIL_DEBT` pending owner
+  acceptance on PR #2693).
+- **Gate:** `packages/cli/src/kernel/templates/aspire` holds at most 12 immediate children
+  (`git ls-tree` and `deno task arch:check` report zero F-16 warning on
+  `src/kernel/templates/aspire`), with `deno task quality:cli`, focused Aspire template tests, and
+  hosted `scaffold.runtime` green.
+
+## packages/cli/e2e — scaffold runtime probe directory deepens past F-16 cap (`cli-e2e-scaffold-runtime-cardinality-2278`)
+
+- **ID:** `cli-e2e-scaffold-runtime-cardinality-2278`.
+- **Reason:** Round-1 IMPL-EVAL remediation (`600ea1ac8`) added `dashboard-resource-masking.ts`
+  (live `#2259` Prisma Studio `/bff` DB query + headless Chrome CDP Aspire Dashboard masking) and
+  `live-db-authority.ts` (F-1 extraction keeping `verify-live-db-endpoint.ts` at 377 LOC < 623
+  baseline) under `packages/cli/e2e/src/application/gates/scaffold/runtime`, deepening that
+  already-over-cap directory from **29 to 31** immediate children (`git ls-tree` vs `origin/main`
+  `7eecfe51f`) while parent `gates/scaffold` stayed at 94 and `kernel/adapters` stayed at 19.
+- **Why deferred / cost:** Bundling a full E2E runtime probe reorganization with the Aspire 17
+  upgrade would mix structural churn into behavioral verification; accepted cost is 2 additional
+  siblings in the existing over-cap folder, with zero behavioral or layering exception.
+- **Owner:** CLI E2E scaffold-runtime maintainers.
+- **Target:** Before adding another probe or helper module under
+  `packages/cli/e2e/src/application/gates/scaffold/runtime`, group runtime probes into bounded
+  concern subfolders (`credential/`, `database/`, `health/`, `telemetry/`) alongside
+  `scaffold-runtime-a8-f16-1333`.
+- **Linked plan:** `.llm/runs/epic-aspire-17-upgrade--2278/plan.md` (L9/S6);
+  `.llm/runs/epic-aspire-17-upgrade--2278/evaluate.md` (Round 4 `FAIL_DEBT`); epic #2278;
+  PR #2693.
+- **Created:** 2026-11-28.
+- **Status:** open, DEBT_ACCEPTED (recorded to clear Round-4 IMPL-EVAL `FAIL_DEBT` pending owner
+  acceptance on PR #2693; extends `scaffold-runtime-a8-f16-1333` for these two files only).
+- **Gate:** `packages/cli/e2e/src/application/gates/scaffold/runtime` holds at most 12 immediate
+  children with all `#2259` credential/Studio/dashboard masking gates,
+  `behavior.live-db-endpoint`, `deno task quality:cli`, `deno task arch:check`, and both hosted
+  `scaffold.runtime` tiers remaining green.
+
 ## packages/plugin-workers-core — WORKERS-RETRY-DOMAIN-CARDINALITY (13 immediate domain children)
 
 - **Reason:** A cohesive retry-policy schema and resolver are a separate domain concern. This adds
@@ -218,7 +273,7 @@ finding into a debt entry.
 - **Target:** Close on PR #2693 merge once both hosted `e2e-cli` runtime tiers pass at exact HEAD.
 - **Linked plan:** `.llm/runs/epic-aspire-17-upgrade--2278/plan.md` (S2c/S3a/S3b/S6).
 - **Created:** 2026-06-27
-- **Status:** resolved-pending-hosted-proof (epic #2278 / PR #2693 — proven at `d8fbcbbf7` `run/46021010832`; awaiting post-`FAIL_FIX` hosted re-proof).
+- **Status:** closed 2026-11-28 (epic #2278 / PR #2693) — proven at `21077ac3b` in hosted `e2e-cli` `run/46074769676` (`scaffold-runtime` Postgres `124/124` artifact `15234862287`, `scaffold-runtime-sqlite` `116/116` + showcase `8/8` artifact `15235276207`, `0` skipped; Round-4 independent `IMPL-EVAL` verified zero product defects).
 - **Gate:** Close after hosted `e2e-cli` (`scaffold-runtime` + `scaffold-runtime-sqlite`, `RUN=true`)
   passes at PR #2693 HEAD with `addDenoApp` live and D-7 retired.
 
@@ -1796,7 +1851,7 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Target:** Close on PR #2693 merge once both hosted `e2e-cli` runtime tiers pass at exact HEAD.
 - **Linked plan:** `.llm/runs/epic-aspire-17-upgrade--2278/plan.md` (S2a/S2b/S6).
 - **Created:** 2026-06-25.
-- **Status:** resolved-pending-hosted-proof (epic #2278 / PR #2693 — proven at `d8fbcbbf7` `run/46021010832`; awaiting post-`FAIL_FIX` hosted re-proof).
+- **Status:** closed 2026-11-28 (epic #2278 / PR #2693) — proven at `21077ac3b` in hosted `e2e-cli` `run/46074769676` (`scaffold-runtime` Postgres `124/124` artifact `15234862287`, `scaffold-runtime-sqlite` `116/116` + showcase `8/8` artifact `15235276207`, `0` skipped; Round-4 independent `IMPL-EVAL` verified zero product defects).
 - **Gate:** Close after hosted `e2e-cli` (`scaffold-runtime` + `scaffold-runtime-sqlite`, `RUN=true`)
   passes with zero `aspire/package.json` npm island emitted.
 
@@ -2408,6 +2463,11 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   subdirectory. IMPL-EVAL cycle 1 had measured 943 lines and 48 children before this correction. The
   entry stays **open**: the pre-existing 906-line registry and 43 over-cap children are untouched,
   so the full split is still owed, and the next gate faces the same condition.
+- **Deepening note — PR #2693 / epic #2278 (2026-11-28):** Round-1 remediation (`600ea1ac8`) added
+  `dashboard-resource-masking.ts` and `live-db-authority.ts` under
+  `packages/cli/e2e/src/application/gates/scaffold/runtime`, deepening that subdirectory from **29
+  to 31** immediate children (`gates/scaffold` remained at 94). Tracked in
+  `cli-e2e-scaffold-runtime-cardinality-2278`.
 
 ## packages/aspire — `config.ts` grows further past the 500-line cap (`aspire-config-length-1447`)
 
