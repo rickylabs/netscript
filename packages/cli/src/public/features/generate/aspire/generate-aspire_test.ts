@@ -12,6 +12,7 @@ import { Scaffolder } from '../../../../kernel/adapters/scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../../../../kernel/adapters/scaffold/template-adapter.ts';
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../../../kernel/constants/scaffold/scaffold-app-catalog.ts';
 import { ConfigError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
+import { netscriptJsrSpecifier } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { PLUGIN_COMPOSITION_INVALID_EXIT_CODE } from '../../../../kernel/application/plugin/plugin-composition.ts';
 
 Deno.test('generateAspire applies dry-run and force to helper regeneration', async () => {
@@ -124,7 +125,7 @@ Deno.test('generateAspire and public generate aspire commands refuse legacy work
       JSON.stringify({
         nodeModulesDir: 'auto',
         imports: {
-          '@netscript/config': 'jsr:@netscript/config@^0.0.9',
+          '@netscript/config': netscriptJsrSpecifier('config'),
         },
       }),
     );
