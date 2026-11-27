@@ -20,6 +20,17 @@ import { verifyGeneratedCrudAcceptance } from './verify-live-db-endpoint.ts';
 
 const COMMAND_CEILING_MS = 330_000;
 const DEFAULT_ASPIRE_START_TIMEOUT_SECONDS = 300;
+const DIAG = {
+  describeStderr: 250,
+  ps: 200,
+  seed: 300,
+  stream: 300,
+  startCmd: 250,
+  seedCmd: 350,
+  detachLog: 1_900,
+  leewayMs: 10_000,
+  psTimeoutMs: 15_000,
+} as const;
 const seedRequest = z.object({ version: z.literal(1), seedId: z.string().uuid() });
 type Outcome = { readonly passed: true; readonly id: string } | {
   readonly passed: false;
@@ -33,10 +44,17 @@ interface WorkerPidContext {
   readonly phase: string;
   readonly seed?: Outcome;
   readonly stream?: Outcome;
+  readonly aspireStart?: CommandOutput;
+  readonly dbSeed?: CommandOutput;
+  readonly variantStartedAtMs?: number;
 }
 
-const DIAGNOSTIC_TAIL_CHARS = 3_000;
-const DIAGNOSTIC_PS_TIMEOUT_MS = 15_000;
+const aspireScope = (appHost: string): readonly string[] => [
+  '--apphost',
+  appHost,
+  '--non-interactive',
+  '--nologo',
+];
 
 async function runCommandOutput(
   executable: string,
@@ -136,17 +154,37 @@ async function activity(appHost: string, projectRoot: string): Promise<string> {
 
 function redactAspireTokens(text: string): string {
   return text
-    .replace(/([?&](?:t|token|auth|key|secret|code)=)[^&\s"'\`\\]+/gi, '$1<REDACTED>')
-    .replace(/("(?:token|password|secret|authorization)"\s*:\s*)"[^"]*"/gi, '$1"<REDACTED>"');
+    .replace(/([?&](?:t|token|auth|key|secret|code)=)[^&\s"'`\\]+/gi, '$1<REDACTED>')
+    .replace(
+      /("(?:token|password|secret|authorization|connectionString)"\s*:\s*)"[^"]*"/gi,
+      '$1"<REDACTED>"',
+    )
+    .replace(
+      /\b(postgres(?:ql)?|mysql|redis|amqp|https?):\/\/([^:@\s/"']+):([^@\s/"']+)@/gi,
+      '$1://$2:<REDACTED>@',
+    )
+    .replace(/(Password=)[^;\s"']+/gi, '$1<REDACTED>')
+    .replace(/\b(Bearer\s+)\S+/gi, '$1<REDACTED>');
 }
 
-function summarizeOutcome(label: string, result: Outcome | undefined): string {
+function summarizeOutcome(label: string, result: Outcome | undefined, maxChars: number): string {
   if (!result) return `${label}=not-run`;
   if (result.passed) return `${label}=passed(${result.id})`;
   const detail = result.error instanceof Error
     ? `${result.error.name}: ${result.error.message}`
     : String(result.error);
-  return `${label}=failed(${redactAspireTokens(detail).slice(0, 1_000)})`;
+  return `${label}=failed(${redactAspireTokens(detail).slice(0, maxChars)})`;
+}
+
+function summarizeCommand(
+  label: string,
+  output: CommandOutput | undefined,
+  maxChars: number,
+): string {
+  if (!output) return `${label}=<none>`;
+  const combined = redactAspireTokens(`${output.stdout.trim()}\n${output.stderr.trim()}`)
+    .replace(/\s+/g, ' ').trim();
+  return combined ? `${label}=${JSON.stringify(combined.slice(-maxChars))}` : `${label}=<empty>`;
 }
 
 async function captureAspirePsSummary(cwd: string): Promise<string> {
@@ -157,36 +195,68 @@ async function captureAspirePsSummary(cwd: string): Promise<string> {
       stdin: 'null',
       stdout: 'piped',
       stderr: 'piped',
-      signal: AbortSignal.timeout(DIAGNOSTIC_PS_TIMEOUT_MS),
+      signal: AbortSignal.timeout(DIAG.psTimeoutMs),
     }).output();
     const stdout = redactAspireTokens(new TextDecoder().decode(result.stdout).trim());
     const stderr = redactAspireTokens(new TextDecoder().decode(result.stderr).trim());
     if (!result.success) {
-      const detail = (stderr || stdout || '(empty)').slice(-DIAGNOSTIC_TAIL_CHARS);
-      return `exited ${result.code}: ${detail}`;
+      return `exited ${result.code}: ${(stderr || stdout || '(empty)').slice(-DIAG.ps)}`;
     }
-    if (!stdout) {
-      return stderr ? `(empty stdout; stderr=${stderr.slice(-DIAGNOSTIC_TAIL_CHARS)})` : '(empty)';
-    }
-    return stdout.slice(0, DIAGNOSTIC_TAIL_CHARS);
+    if (!stdout) return stderr ? `(empty stdout; stderr=${stderr.slice(-DIAG.ps)})` : '(empty)';
+    return stdout.slice(0, DIAG.ps);
   } catch (error) {
     return `unavailable(${error instanceof Error ? error.message : String(error)})`;
   }
 }
 
-async function workerPid(
-  appHost: string,
-  cwd: string,
-  context: WorkerPidContext,
-): Promise<number> {
+async function captureDetachLogTail(
+  aspireStart?: CommandOutput,
+  startedAtMs?: number,
+): Promise<string> {
+  const startText = `${aspireStart?.stdout ?? ''}\n${aspireStart?.stderr ?? ''}`;
+  const explicit = [
+    startText.match(/[^\s"'`]+_detach-child_[^\s"'`]+\.log/i)?.[0],
+    startText.match(/[^\s"'`]+\.log/i)?.[0],
+  ].filter((value): value is string => Boolean(value));
+  const minMtimeMs = (startedAtMs ?? 0) - DIAG.leewayMs;
+  const home = Deno.env.get('HOME');
+  const logDirs = home ? [join(home, '.aspire/logs'), join(home, '.local/logs')] : [];
+  const scanned: { path: string; mtimeMs: number; detach: boolean }[] = [];
+  for (const dir of logDirs) {
+    try {
+      for await (const entry of Deno.readDir(dir)) {
+        if (!entry.isFile || !entry.name.endsWith('.log')) continue;
+        const path = join(dir, entry.name);
+        const stat = await Deno.stat(path).catch(() => null);
+        scanned.push({
+          path,
+          mtimeMs: stat?.mtime?.getTime() ?? 0,
+          detach: entry.name.includes('_detach-child_'),
+        });
+      }
+    } catch { /* Missing or unreadable log directory */ }
+  }
+  scanned.sort((a, b) => b.mtimeMs - a.mtimeMs);
+  const detachFiles = scanned.filter((e) => e.detach && e.mtimeMs >= minMtimeMs).map((e) => e.path);
+  for (const path of [...new Set([...explicit, ...detachFiles])]) {
+    try {
+      const redacted = redactAspireTokens(await Deno.readTextFile(path)).trim();
+      if (redacted) {
+        const prefix = `${path} => `;
+        return `${prefix}${redacted.slice(-Math.max(0, DIAG.detachLog - prefix.length))}`;
+      }
+    } catch { /* Try next log candidate */ }
+  }
+  const recent = scanned.slice(0, 5).map((entry) => entry.path);
+  return recent.length > 0 ? `none; recentLogs=${JSON.stringify(recent)}` : '<none>';
+}
+
+async function workerPid(appHost: string, cwd: string, context: WorkerPidContext): Promise<number> {
   const { stdout, stderr } = await runCommandOutput('aspire', [
     'describe',
-    '--apphost',
-    appHost,
     '--format',
     'Json',
-    '--non-interactive',
-    '--nologo',
+    ...aspireScope(appHost),
   ], cwd);
   let parsed: unknown;
   try {
@@ -195,17 +265,19 @@ async function workerPid(
     }
     parsed = JSON.parse(stdout);
   } catch (error) {
-    const psSummary = await captureAspirePsSummary(cwd);
+    const psSummary = (await captureAspirePsSummary(cwd)).slice(0, DIAG.ps);
     const parseDetail = error instanceof Error ? error.message : String(error);
-    const stderrTail = redactAspireTokens(stderr.trim()).slice(-DIAGNOSTIC_TAIL_CHARS);
-    const stdoutTail = redactAspireTokens(stdout.trim()).slice(-DIAGNOSTIC_TAIL_CHARS);
-    const seedSummary = summarizeOutcome('seed', context.seed);
-    const streamSummary = summarizeOutcome('stream', context.stream);
+    const stderrTail = redactAspireTokens(stderr.trim()).slice(-DIAG.describeStderr);
+    const seedSummary = summarizeOutcome('seed', context.seed, DIAG.seed);
+    const streamSummary = summarizeOutcome('stream', context.stream, DIAG.stream);
+    const startSummary = summarizeCommand('startCmd', context.aspireStart, DIAG.startCmd);
+    const seedCmdSummary = summarizeCommand('seedCmd', context.dbSeed, DIAG.seedCmd);
+    const detachLog = await captureDetachLogTail(context.aspireStart, context.variantStartedAtMs);
     throw new Error(
       `workerPid(${context.phase}) expected JSON from aspire describe for ${appHost}: ` +
-        `${parseDetail}; describe.stderr=${JSON.stringify(stderrTail)}; ` +
-        `describe.stdout=${JSON.stringify(stdoutTail)}; aspirePs=${psSummary}; ` +
-        `${seedSummary}; ${streamSummary}`,
+        `${parseDetail}; describe.stderr=${JSON.stringify(stderrTail)}; aspirePs=${psSummary}; ` +
+        `${seedSummary}; ${streamSummary}; ${startSummary}; ${seedCmdSummary}; ` +
+        `detachLog=${JSON.stringify(detachLog)}`,
     );
   }
   const snapshot = z.object({
@@ -224,12 +296,16 @@ async function workerPid(
 
 async function cleanup(repoRoot: string, projectRoot: string): Promise<void> {
   const receiptPath = join(projectRoot, '.netscript/e2e-cleanup.json');
+  const cleanupScript = join(
+    repoRoot,
+    'packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts',
+  );
   await command(Deno.execPath(), [
     'run',
     '--allow-read',
     '--allow-write',
     '--allow-run=aspire,docker',
-    join(repoRoot, 'packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts'),
+    cleanupScript,
     join(projectRoot, 'aspire/apphost.mts'),
     projectRoot,
     'true',
@@ -249,15 +325,13 @@ async function cleanup(repoRoot: string, projectRoot: string): Promise<void> {
   if (observed.ownedContainers.length || observed.ownedProcesses.length) {
     throw new Error('The documented workspace has owned runtime survivors');
   }
-  console.info(
-    JSON.stringify({
-      cleanup: 'PASS',
-      exactAppHostStopped: true,
-      foreignOrUnknownLeftAlone: observed.foreignContainers.length +
-        observed.unprovenContainers.length +
-        observed.foreignProcesses.length + observed.unprovenProcesses.length,
-    }),
-  );
+  console.info(JSON.stringify({
+    cleanup: 'PASS',
+    exactAppHostStopped: true,
+    foreignOrUnknownLeftAlone: observed.foreignContainers.length +
+      observed.unprovenContainers.length +
+      observed.foreignProcesses.length + observed.unprovenProcesses.length,
+  }));
 }
 
 async function runVariant(
@@ -274,6 +348,9 @@ async function runVariant(
   console.info(`${variant}: executing the documented command block`);
   let cwd = root;
   let beforeSeedPid: number | undefined;
+  let aspireStart: CommandOutput | undefined;
+  let dbSeed: CommandOutput | undefined;
+  const variantStartedAtMs = Date.now();
   let appHostStarted = false;
   let primaryFailure: { readonly error: unknown } | undefined;
   try {
@@ -309,33 +386,36 @@ async function runVariant(
           'healthy',
           '--timeout',
           '180',
-          '--apphost',
-          appHost,
-          '--non-interactive',
-          '--nologo',
+          ...aspireScope(appHost),
         ], cwd);
-        beforeSeedPid = await workerPid(appHost, cwd, { phase: 'beforeSeedPid' });
+        beforeSeedPid = await workerPid(appHost, cwd, {
+          phase: 'beforeSeedPid',
+          aspireStart,
+          variantStartedAtMs,
+        });
       }
       if (words[0] === 'aspire' && args[0] === 'start') appHostStarted = true;
-      await command(
+      const netscriptArgs = cliEntrypoint.startsWith('jsr:')
+        ? ['run', '-A', '--minimum-dependency-age=0', cliEntrypoint, ...args]
+        : ['run', '-A', cliEntrypoint, ...args];
+      const output = await runCommandOutput(
         words[0] === 'netscript' ? Deno.execPath() : 'aspire',
-        words[0] === 'netscript'
-          ? [
-            'run',
-            '-A',
-            ...(cliEntrypoint.startsWith('jsr:@netscript/cli@')
-              ? ['--minimum-dependency-age=0']
-              : []),
-            cliEntrypoint,
-            ...args,
-          ]
-          : args,
+        words[0] === 'netscript' ? netscriptArgs : args,
         cwd,
       );
+      if (words[0] === 'aspire' && args[0] === 'start') aspireStart = output;
+      if (words[0] === 'netscript' && args[0] === 'db' && args[1] === 'seed') dbSeed = output;
     }
     const seed = await outcome(() => seedExecution(appHost, projectRoot));
     const stream = await outcome(() => activity(appHost, projectRoot));
-    const afterSeedPid = await workerPid(appHost, cwd, { phase: 'afterSeedPid', seed, stream });
+    const afterSeedPid = await workerPid(appHost, cwd, {
+      phase: 'afterSeedPid',
+      seed,
+      stream,
+      aspireStart,
+      dbSeed,
+      variantStartedAtMs,
+    });
     if (beforeSeedPid === undefined || beforeSeedPid !== afterSeedPid) {
       throw new Error('Workers restarted between seed and acceptance');
     }
@@ -365,15 +445,13 @@ async function runVariant(
         'The restored documented scaffold failed acceptance',
       );
     }
-    console.info(
-      JSON.stringify({
-        variant,
-        verdict: 'PASS',
-        seed: seed.passed ? seed.id : 'RED: missing handoff',
-        activity: stream.passed ? stream.id : 'RED: missing link',
-        residentWorkerPreserved: true,
-      }),
-    );
+    console.info(JSON.stringify({
+      variant,
+      verdict: 'PASS',
+      seed: seed.passed ? seed.id : 'RED: missing handoff',
+      activity: stream.passed ? stream.id : 'RED: missing link',
+      residentWorkerPreserved: true,
+    }));
   } catch (error) {
     primaryFailure = { error };
   }
