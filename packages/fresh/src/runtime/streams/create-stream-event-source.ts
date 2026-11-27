@@ -66,8 +66,11 @@ function defaultEventSourceFactory(url: string): StreamEventSourceV1 {
   return new EventSource(url);
 }
 
-function resolveStreamEventSourceUrl(options: CreateNetScriptStreamEventSourceOptionsV1): URL {
-  if (!isValidStreamOffset(options.offset)) {
+function resolveStreamEventSourceUrl(
+  options: CreateNetScriptStreamEventSourceOptionsV1,
+  offset: StreamSseOffsetV1,
+): URL {
+  if (!isValidStreamOffset(offset)) {
     throw new TypeError(
       '[netscript.fresh.streams] invalid offset: must satisfy canonical stream offset grammar',
     );
@@ -99,20 +102,20 @@ function resolveStreamEventSourceUrl(options: CreateNetScriptStreamEventSourceOp
     const existingOffsets = url.searchParams.getAll('offset');
     if (
       existingOffsets.length > 1 ||
-      (existingOffsets.length === 1 && existingOffsets[0] !== options.offset)
+      (existingOffsets.length === 1 && existingOffsets[0] !== offset)
     ) {
       throw new TypeError(
         '[netscript.fresh.streams] conflicting offset between proxyUrl and options.offset',
       );
     }
     if (existingOffsets.length === 0) {
-      url.searchParams.set('offset', options.offset);
+      url.searchParams.set('offset', offset);
     }
     return url;
   }
 
   const url = new URL(buildStreamUrl(options.streamPath!, options.baseUrl ?? getStreamsUrl()));
-  url.searchParams.set('offset', options.offset);
+  url.searchParams.set('offset', offset);
   url.searchParams.set('live', 'sse');
   return url;
 }
@@ -128,14 +131,18 @@ function resolveStreamEventSourceUrl(options: CreateNetScriptStreamEventSourceOp
 export function createNetScriptStreamEventSourceV1(
   options: CreateNetScriptStreamEventSourceOptionsV1,
 ): NetScriptStreamEventSourceBindingV1 {
-  const url = resolveStreamEventSourceUrl(options);
-  const source = (options.createEventSource ?? defaultEventSourceFactory)(url.href);
+  const offset = options.offset;
+  const lastObservedCursor = options.lastObservedCursor;
+  const onEvent = options.onEvent;
+  const createEventSource = options.createEventSource ?? defaultEventSourceFactory;
+  const url = resolveStreamEventSourceUrl(options, offset);
+  const source = createEventSource(url.href);
   const binding = bindStreamEventSourceV1({
     source,
-    onEvent: options.onEvent,
+    onEvent,
     initialState: createStreamSseReplayStateV1({
-      lastCommittedOffset: options.offset,
-      lastObservedCursor: options.lastObservedCursor,
+      lastCommittedOffset: offset,
+      lastObservedCursor,
     }),
   });
   return { ...binding, url: url.href };

@@ -107,14 +107,25 @@ const invalidCombinedCheck = () =>
     onEvent: () => undefined,
   });
 const directWrapperCheck = (
-  options: Omit<CreateNetScriptStreamEventSourceOptionsV1, 'streamPath' | 'proxyUrl'>,
+  options: Omit<CreateNetScriptStreamEventSourceOptionsV1, 'streamPath' | 'proxyUrl'> & {
+    readonly proxyUrl?: never;
+  },
 ) => createNetScriptStreamEventSourceV1({ ...options, streamPath: '/people' });
-const directWrapperWithBaseUrl = () =>
-  directWrapperCheck({
-    baseUrl: 'https://streams.example.test',
-    offset: '-1',
-    onEvent: () => undefined,
-  });
+const directWrapperOptionsVar = {
+  baseUrl: 'https://streams.example.test',
+  offset: '-1',
+  onEvent: () => undefined,
+};
+const directWrapperWithBaseUrl = () => directWrapperCheck(directWrapperOptionsVar);
+const proxyOptionsVar = {
+  proxyUrl: 'https://app.example.test/api/streams/people',
+  offset: '-1',
+  onEvent: () => undefined,
+};
+const invalidDirectWrapperVarCheck = () =>
+  // @ts-expect-error direct subscriber wrappers forbid proxyUrl even via variable arguments
+  directWrapperCheck(proxyOptionsVar);
 void proxyEventSourceCheck;
 void invalidCombinedCheck;
 void directWrapperWithBaseUrl;
+void invalidDirectWrapperVarCheck;

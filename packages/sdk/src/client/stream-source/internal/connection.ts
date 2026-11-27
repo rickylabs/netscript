@@ -46,6 +46,21 @@ export function createHeartbeatDeadline(
   };
 }
 
+/** Cancel a response body without stalling shutdown when cancellation is blocked (e.g. teed stream). */
+export async function cancelBodyUntilAborted(
+  body: ReadableStream<Uint8Array> | null,
+  signal: AbortSignal,
+): Promise<void> {
+  if (!body) return;
+  const cancel = body.cancel().catch(() => {});
+  if (signal.aborted) return;
+  try {
+    await untilAborted(cancel, signal);
+  } catch {
+    // Cancellation continues asynchronously; closing or aborting must never stall shutdown.
+  }
+}
+
 /** Read bounded UTF-8 slices without flushing incomplete SSE blocks at disconnect. */
 export async function readSseConnection(options: {
   response: StreamFetchResponseV1;
@@ -64,7 +79,7 @@ export async function readSseConnection(options: {
     options.response.headers.get('content-type')?.split(';')[0].trim().toLowerCase() !==
       'text/event-stream'
   ) {
-    await options.response.body?.cancel().catch(() => {});
+    await cancelBodyUntilAborted(options.response.body, options.signal);
     throw new Error('Expected a successful streaming text/event-stream response');
   }
   options.onOpen?.();
@@ -79,6 +94,7 @@ export async function readSseConnection(options: {
     options.lastEventId,
     options.onBlock,
     options.onRetry,
+    () => options.signal.aborted,
   );
   try {
     while (!options.signal.aborted) {

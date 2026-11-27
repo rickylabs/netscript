@@ -812,3 +812,132 @@ Deno.test('Gate 5 fetch source readyState transition table, initial undefined la
     TypeError,
   );
 });
+
+Deno.test('Gate 5 regression: teed 401 denial body cancellation aborts promptly on close(), signal abort, and heartbeat', async () => {
+  const api = await import('../../src/client/stream-source/mod.ts');
+
+  // (a) close() and (b) options.signal abort while denial-body cancel() is blocked on a teed branch
+  for (const mode of ['close', 'abort'] as const) {
+    const scheduler = new ManualScheduler();
+    const ac = new AbortController();
+    const raw = new ReadableStream<Uint8Array<ArrayBuffer>>({
+      start() {},
+    });
+    const [branch1, branch2] = raw.tee();
+    let cancelStarted = false;
+    const trackedBody = new ReadableStream<Uint8Array<ArrayBuffer>>({
+      start() {},
+      cancel(reason) {
+        cancelStarted = true;
+        return branch1.cancel(reason);
+      },
+    });
+    let httpErrors = 0;
+    const source = api.createFetchStreamEventSourceV1({
+      url: 'https://api.example.test/stream?offset=-1',
+      scheduler,
+      heartbeatTimeoutMs: 100,
+      signal: ac.signal,
+      terminalStatuses: [401],
+      onHttpError: () => {
+        httpErrors += 1;
+      },
+      fetch: () => Promise.resolve(new Response(trackedBody, { status: 401 })),
+    });
+    await settle();
+    assertEquals(cancelStarted, true);
+    assertEquals(scheduler.timers.size, 1);
+
+    if (mode === 'close') {
+      source.close();
+    } else {
+      ac.abort(new Error('caller cancelled'));
+    }
+
+    // readyState becomes 2 and heartbeat timer is disarmed immediately; done settles WITHOUT waiting for branch2
+    assertEquals(source.readyState, 2);
+    assertEquals(scheduler.timers.size, 0);
+    await source.done;
+    assertEquals(httpErrors, 0);
+
+    // Clean up second tee branch so Deno resource/op sanitizers stay clean.
+    await branch2.cancel();
+  }
+
+  // (c) Heartbeat deadline unblocks a hung teed 401 denial body and still completes terminal closure cleanly
+  {
+    const scheduler = new ManualScheduler();
+    const raw = new ReadableStream<Uint8Array<ArrayBuffer>>({
+      start() {},
+    });
+    const [branch1, branch2] = raw.tee();
+    const seen: FetchStreamHttpErrorInfoV1[] = [];
+    const source = api.createFetchStreamEventSourceV1({
+      url: 'https://api.example.test/stream?offset=-1',
+      scheduler,
+      heartbeatTimeoutMs: 100,
+      terminalStatuses: [401],
+      onHttpError: (info) => {
+        // Deadline must already be disarmed before onHttpError runs on terminal status
+        assertEquals(scheduler.timers.size, 0);
+        seen.push(info);
+      },
+      fetch: () => Promise.resolve(new Response(branch1, { status: 401 })),
+    });
+    await settle();
+    assertEquals(scheduler.timers.size, 1);
+    scheduler.advance(100);
+    await source.done;
+    assertEquals(source.readyState, 2);
+    assertEquals(scheduler.timers.size, 0);
+    assertEquals(seen, [{ status: 401, terminal: true }]);
+    await branch2.cancel();
+  }
+});
+
+Deno.test('Gate 5 regression: re-entrant close() in message/control listener stops trailing chunk parsing without rejecting done', async () => {
+  const api = await import('../../src/client/stream-source/mod.ts');
+
+  // 1. Re-entrant close() on 'message' with > maxBufferSize trailing bytes in the same chunk resolves done cleanly
+  {
+    const { source, transport, scheduler } = await create({ maxBufferSize: 64 });
+    const received: unknown[] = [];
+    source.addEventListener('message', (event) => {
+      received.push(event.data);
+      source.close();
+    });
+    transport.send(`data: ok\n\n${'x'.repeat(200)}`);
+    await source.done;
+    assertEquals(received, ['ok']);
+    assertEquals(source.readyState, 2);
+    assertEquals(scheduler.timers.size, 0);
+  }
+
+  // 2. Re-entrant close() on 'control' with > maxBufferSize trailing bytes in the same chunk resolves done cleanly
+  {
+    const { source, transport, scheduler } = await create({ maxBufferSize: 128 });
+    let closedInControl = false;
+    source.addEventListener('control', () => {
+      closedInControl = true;
+      source.close();
+    });
+    transport.send(`${control('off-1')}${'y'.repeat(300)}`);
+    await source.done;
+    assertEquals(closedInControl, true);
+    assertEquals(source.readyState, 2);
+    assertEquals(scheduler.timers.size, 0);
+  }
+
+  // 3. Genuine listener exception on the same oversized trailing chunk still rejects done with the listener error
+  {
+    const { source, transport, scheduler } = await create({ maxBufferSize: 64 });
+    source.addEventListener('message', () => {
+      throw new Error('listener boom');
+    });
+    transport.send(`data: ok\n\n${'x'.repeat(200)}`);
+    await assertRejects(() => source.done, Error, 'listener boom');
+    assertEquals(source.readyState, 2);
+    assertEquals(scheduler.timers.size, 0);
+  }
+  void api;
+});

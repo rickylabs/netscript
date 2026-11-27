@@ -295,3 +295,53 @@ Deno.test('Gate 5 control-only commit, interrupted-delivery reconnect from lastC
   assertEquals(reconnectScheduled, 1); // ZERO new reconnect attempts scheduled!
   assertEquals(stopped, true);
 });
+
+Deno.test('Gate 5 regression: options.offset is captured once so factory mutations or getters cannot split URL and replay offsets', () => {
+  // 1. Mutating options.offset inside injected createEventSource (proxyUrl mode)
+  {
+    const mutableOptions: {
+      proxyUrl: string;
+      offset: string;
+      lastObservedCursor?: string;
+      onEvent: (event: StreamSseConsumerEventV1) => void;
+      createEventSource: (url: string) => StreamEventSourceV1;
+    } = {
+      proxyUrl: 'https://app.example.test/api/streams/projects/p1',
+      offset: 'start',
+      lastObservedCursor: 'cur-start',
+      onEvent: () => undefined,
+      createEventSource: () => {
+        mutableOptions.offset = 'other';
+        mutableOptions.lastObservedCursor = 'cur-other';
+        return new FakeEventSource();
+      },
+    };
+    const binding = createNetScriptStreamEventSourceV1(mutableOptions);
+    assertEquals(binding.url, 'https://app.example.test/api/streams/projects/p1?offset=start');
+    assertEquals(binding.snapshot().lastCommittedOffset, 'start');
+    assertEquals(binding.snapshot().lastObservedCursor, 'cur-start');
+    binding.dispose();
+  }
+
+  // 2. Non-idempotent getter for options.offset (direct streamPath mode)
+  {
+    let reads = 0;
+    const binding = createNetScriptStreamEventSourceV1({
+      baseUrl: 'https://streams.example.test',
+      streamPath: '/projects/p1',
+      get offset(): string {
+        reads += 1;
+        return reads === 1 ? 'start' : 'other';
+      },
+      createEventSource: () => new FakeEventSource(),
+      onEvent: () => undefined,
+    });
+    assertEquals(reads, 1);
+    assertEquals(
+      binding.url,
+      'https://streams.example.test/v1/stream/netscript/projects/p1?offset=start&live=sse',
+    );
+    assertEquals(binding.snapshot().lastCommittedOffset, 'start');
+    binding.dispose();
+  }
+});

@@ -9,6 +9,7 @@ import type {
   StreamFetchResponseV1,
 } from '../ports/fetch-stream-source.ts';
 import {
+  cancelBodyUntilAborted,
   createHeartbeatDeadline,
   readSseConnection,
   untilAborted,
@@ -116,8 +117,12 @@ export class FetchStreamSource implements FetchStreamEventSourceV1 {
     );
   }
 
-  private async handleNonOkResponse(response: StreamFetchResponseV1): Promise<void> {
-    await response.body?.cancel().catch(() => {});
+  private async handleNonOkResponse(
+    response: StreamFetchResponseV1,
+    signal: AbortSignal,
+    disposeDeadline: () => void,
+  ): Promise<void> {
+    await cancelBodyUntilAborted(response.body, signal);
     if (this.lifetime.signal.aborted) return;
 
     const retryAfter = response.headers.get('retry-after') ?? undefined;
@@ -132,10 +137,11 @@ export class FetchStreamSource implements FetchStreamEventSourceV1 {
     };
 
     if (terminal) {
-      // Transition readyState to CLOSED (2) BEFORE invoking onHttpError and dispatching
-      // `{ type: 'error' }` so bindStreamEventSourceV1 observes readyState === 2 (`retryable: false`),
-      // then clear listeners and abort lifetime cleanly so zero reconnects occur.
+      // Transition readyState to CLOSED (2) and disarm the heartbeat deadline BEFORE invoking
+      // onHttpError and dispatching `{ type: 'error' }` so bindStreamEventSourceV1 observes
+      // readyState === 2 (`retryable: false`) and no timer stays armed, then close cleanly.
       this._readyState = 2;
+      disposeDeadline();
       try {
         if (this.options.onHttpError) {
           try {
@@ -172,13 +178,20 @@ export class FetchStreamSource implements FetchStreamEventSourceV1 {
 
   private async connect(): Promise<void> {
     const controller = new AbortController();
-    const abort = (): void => controller.abort(this.lifetime.signal.reason);
-    this.lifetime.signal.addEventListener('abort', abort, { once: true });
     const deadline = createHeartbeatDeadline(
       this.settings.scheduler,
       this.settings.heartbeatMs,
       controller,
     );
+    const abort = (): void => {
+      deadline.dispose();
+      controller.abort(this.lifetime.signal.reason);
+    };
+    this.lifetime.signal.addEventListener('abort', abort, { once: true });
+    if (this.lifetime.signal.aborted) {
+      deadline.dispose();
+      return;
+    }
     const replay = new StreamReplayBuffer(
       this.progress,
       this.settings,
@@ -193,12 +206,12 @@ export class FetchStreamSource implements FetchStreamEventSourceV1 {
       deadline.touch();
       const response = await this.request(controller.signal);
       if (response.status === 204) {
-        await response.body?.cancel().catch(() => {});
+        await cancelBodyUntilAborted(response.body, controller.signal);
         this.close();
         return;
       }
       if (!response.ok) {
-        await this.handleNonOkResponse(response);
+        await this.handleNonOkResponse(response, controller.signal, () => deadline.dispose());
         return;
       }
       await readSseConnection({

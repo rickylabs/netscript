@@ -19,13 +19,16 @@ export class SseParser {
     initialId: string,
     private readonly onBlock: (block: SseBlock) => void,
     private readonly onRetry: (delay: number) => void,
+    private readonly shouldStop: () => boolean = () => false,
   ) {
     this.id = initialId;
   }
 
   feed(chunk: string): void {
+    if (this.shouldStop()) return;
     let start = 0;
     for (let index = 0; index < chunk.length; index++) {
+      if (this.shouldStop()) return;
       const character = chunk[index];
       if (this.skipLf) {
         this.skipLf = false;
@@ -37,9 +40,11 @@ export class SseParser {
       if (character !== '\r' && character !== '\n') continue;
       this.append(chunk.slice(start, index));
       this.consumeLine();
+      if (this.shouldStop()) return;
       this.skipLf = character === '\r';
       start = index + 1;
     }
+    if (this.shouldStop()) return;
     this.append(chunk.slice(start));
   }
 
