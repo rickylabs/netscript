@@ -62,7 +62,7 @@ function processEvidence(environment: Record<string, string>) {
 
 function describeOutput(
   resource: Record<string, unknown>,
-  banner = 'Aspire CLI 13.4.6\n',
+  banner = 'Aspire CLI 17.0.0\n',
 ): string {
   return `${banner}${JSON.stringify({ resources: [resource] })}`;
 }
@@ -102,8 +102,8 @@ Deno.test('topology evidence: accepts a running resource that honors the contrac
   assertEquals(collectTopologyFailures(evidence, SERVICE, CASES), []);
 });
 
-Deno.test('topology evidence: accepts the bannerless Aspire 13.5.3 describe shape', () => {
-  // The S2 V5 receipt was captured with `--nologo`; its environment is object-shaped.
+Deno.test('topology evidence: accepts the bannerless Aspire 17.0.0 describe shape', () => {
+  // Live Aspire 17.0.0 describe with `--nologo`; its environment is object-shaped.
   const evidence = readDescribedResource(describeOutput(healthyResource(), ''), SERVICE);
 
   assertEquals(collectTopologyFailures(evidence, SERVICE, CASES), []);

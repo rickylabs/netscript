@@ -1,3 +1,3 @@
 {"name":"postgres","displayName":"postgres","state":"Starting","health":"Healthy"}
-{"name":"workers","displayName":"workers","state":"Running","health":"Healthy"}
+{"name":"workers","displayName":"workers","resourceType":"Executable","resourceTypeDisplayName":"Deno","state":"Running","health":"Healthy"}
 {"name":"postgres","displayName":"postgres","state":"Running","health":"Healthy"}

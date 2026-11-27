@@ -19,14 +19,14 @@ Deno.test('Aspire telemetry adapter groups documented CLI spans by traceId', asy
     (args) => {
       cliCalls.push([...args]);
       if (args[1] === 'traces') {
-        // Aspire 13.5.3 has no MCP span tool: trace summaries have no inline spans.
+        // Aspire 17.0.0 has no MCP span tool: trace summaries have no inline spans.
         return Promise.resolve([{
           traceId: '0123456789abcdef0123456789abcdef',
           timestamp: '2026-09-02T10:00:00Z',
         }]);
       }
       // Input fields are exactly the span field list documented in
-      // .agents/skills/aspire/SKILL.md under "A request fails..." (13.5.3 evidence).
+      // .agents/skills/aspire/SKILL.md under "A request fails..." (17.0.0 evidence).
       return Promise.resolve([
         {
           traceId: '0123456789abcdef0123456789abcdef',

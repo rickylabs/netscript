@@ -4,14 +4,20 @@
       "category": "aspire",
       "name": "cli-version",
       "status": "pass",
-      "message": "Aspire CLI version 13.5.3 (channel: stable)",
-      "metadata": { "currentVersion": "13.5.3", "identityChannel": "stable" }
+      "message": "Aspire CLI version 17.0.0 (channel: stable)",
+      "metadata": { "currentVersion": "17.0.0", "identityChannel": "stable" }
     },
     {
       "category": "environment",
       "name": "operating-system",
       "status": "pass",
-      "message": "Operating system: Linux Debian 12"
+      "message": "Operating system: Linux Debian 12",
+      "metadata": {
+        "osType": "Linux",
+        "displayName": "Linux Debian",
+        "version": "12",
+        "description": "Debian GNU/Linux 12 (bookworm)"
+      }
     },
     {
       "category": "sdk",
@@ -53,16 +59,20 @@
   "summary": { "passed": 5, "warnings": 3, "failed": 0 },
   "installations": [
     {
-      "path": "/home/agent/.local/share/mise/installs/aspire/13.5.3/aspire",
-      "version": "13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688",
+      "path": "/home/agent/.local/share/mise/installs/aspire/17.0.0/aspire",
+      "canonicalPath": "/home/agent/.local/share/mise/installs/aspire/17.0.0/aspire",
+      "version": "17.0.0+2d325b13709752ba6d9a943635c5e2940a2530c0",
       "channel": "stable",
+      "route": "dotnet-tool",
       "pathStatus": "active",
       "status": "ok"
     },
     {
       "path": "/home/agent/.local/aspire/aspire",
-      "version": "13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688",
+      "canonicalPath": "/home/agent/.local/aspire/aspire",
+      "version": "17.0.0+2d325b13709752ba6d9a943635c5e2940a2530c0",
       "channel": "stable",
+      "route": "script",
       "pathStatus": "shadowed",
       "status": "ok"
     }

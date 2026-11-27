@@ -15,15 +15,15 @@ const realHealthResponse = await Deno.readTextFile(
 const unhealthyHealthResponse = await Deno.readTextFile(
   new URL('./fixtures/users-health-unhealthy-response.json', import.meta.url),
 );
-const aspire1353Describe = JSON.parse(
+const aspire1700Describe = JSON.parse(
   await Deno.readTextFile(
-    new URL('./fixtures/aspire-13.5.3-describe-postgres.json', import.meta.url),
+    new URL('./fixtures/aspire-17.0.0-describe-postgres.json', import.meta.url),
   ),
 );
 const passwordFirstDescribe = JSON.parse(
   await Deno.readTextFile(
     new URL(
-      './fixtures/aspire-13.5.3-describe-postgres-password-first.json',
+      './fixtures/aspire-17.0.0-describe-postgres-password-first.json',
       import.meta.url,
     ),
   ),
@@ -82,11 +82,11 @@ Deno.test('database endpoint resolver reports ambiguous candidate names and type
   assertStringIncludes(message, 'type=ContainerReplica');
 });
 
-Deno.test('second receipt accepts the live Aspire 13.5 persistent allocation', () => {
+Deno.test('second receipt accepts the live Aspire 17.0.0 persistent allocation', () => {
   assertEquals(
     compareSecondReceiptWithLiveTopology(
       'postgres://localhost:10538',
-      aspire1353Describe,
+      aspire1700Describe,
       'postgres',
     ),
     {
@@ -100,7 +100,7 @@ Deno.test('second receipt accepts the live Aspire 13.5 persistent allocation', (
 Deno.test('second receipt rejects a literal endpoint absent from the live second start', () => {
   const result = compareSecondReceiptWithLiveTopology(
     'postgres://localhost:5432',
-    aspire1353Describe,
+    aspire1700Describe,
     'postgres',
   );
 
