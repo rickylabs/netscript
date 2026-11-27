@@ -1,4 +1,4 @@
-import { createLogger } from '@netscript/logger';
+import { getLogger } from '@logtape/logtape';
 import {
   DEFAULT_STREAM_PROXY_MAX_REFENCE_ATTEMPTS,
   DEFAULT_STREAM_PROXY_RETRY_AFTER_SECONDS,
@@ -38,7 +38,7 @@ import {
   StreamProxySetupLifecycle,
 } from './setup-lifecycle.ts';
 
-const PROXY_LOGGER = createLogger(['netscript', 'streams', 'proxy']);
+const PROXY_LOGGER = getLogger(['netscript', 'streams', 'proxy']);
 
 /** Internal hook allowing `bindStreamProxy` (Stage 2) to inject contract param/query validation. */
 export interface StreamProxyInputValidator<TParams, TQuery> {

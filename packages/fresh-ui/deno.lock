@@ -4939,6 +4939,7 @@
       },
       "packages/plugin-streams-core": {
         "dependencies": [
+          "jsr:@logtape/logtape@2",
           "jsr:@netscript/service@0.0.9",
           "jsr:@netscript/telemetry@0.0.9",
           "jsr:@std/assert@1"

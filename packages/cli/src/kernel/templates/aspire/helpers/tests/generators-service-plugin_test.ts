@@ -583,7 +583,7 @@ describe('generateRegisterPlugins', () => {
         'src/main.ts',
         './main.ts',
         'a/../b/main.ts',
-        'jsr:@netscript/plugin-workers@0.0.10/services',
+        netscriptJsrSpecifier('plugin-workers', '/services'),
         'file:///tmp/main.ts',
         'https://example.com/main.ts',
         '@netscript/plugin-workers/services',
@@ -599,7 +599,7 @@ describe('generateRegisterPlugins', () => {
       plugins: {
         'workers-api': {
           ...fixtures.MINIMAL_PLUGIN,
-          Entrypoint: 'jsr:@netscript/plugin-workers@0.0.10/services',
+          Entrypoint: netscriptJsrSpecifier('plugin-workers', '/services'),
         },
       },
     });

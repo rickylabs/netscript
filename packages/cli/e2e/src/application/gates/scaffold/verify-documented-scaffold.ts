@@ -25,8 +25,24 @@ type Outcome = { readonly passed: true; readonly id: string } | {
   readonly passed: false;
   readonly error: unknown;
 };
+interface CommandOutput {
+  readonly stdout: string;
+  readonly stderr: string;
+}
+interface WorkerPidContext {
+  readonly phase: string;
+  readonly seed?: Outcome;
+  readonly stream?: Outcome;
+}
 
-async function command(executable: string, args: readonly string[], cwd: string): Promise<string> {
+const DIAGNOSTIC_TAIL_CHARS = 3_000;
+const DIAGNOSTIC_PS_TIMEOUT_MS = 15_000;
+
+async function runCommandOutput(
+  executable: string,
+  args: readonly string[],
+  cwd: string,
+): Promise<CommandOutput> {
   const startingAspire = executable === 'aspire' && args[0] === 'start';
   const startTimeout = Deno.env.get('ASPIRE_CLI_START_TIMEOUT') ??
     String(DEFAULT_ASPIRE_START_TIMEOUT_SECONDS);
@@ -43,14 +59,19 @@ async function command(executable: string, args: readonly string[], cwd: string)
     ...(startingAspire ? { env: { ASPIRE_CLI_START_TIMEOUT: startTimeout } } : {}),
   }).output();
   const stdout = new TextDecoder().decode(result.stdout);
+  const stderr = new TextDecoder().decode(result.stderr);
   if (!result.success) {
     throw new Error(
-      `${executable} ${args.join(' ')} exited ${result.code}: ${
-        new TextDecoder().decode(result.stderr).slice(-6000)
-      }\n${stdout.slice(-6000)}`,
+      `${executable} ${args.join(' ')} exited ${result.code}: ${stderr.slice(-6000)}\n${
+        stdout.slice(-6000)
+      }`,
     );
   }
-  return stdout;
+  return { stdout, stderr };
+}
+
+async function command(executable: string, args: readonly string[], cwd: string): Promise<string> {
+  return (await runCommandOutput(executable, args, cwd)).stdout;
 }
 
 async function responseJson(url: string | URL): Promise<unknown> {
@@ -113,23 +134,86 @@ async function activity(appHost: string, projectRoot: string): Promise<string> {
   }, mutation.representativeId);
 }
 
-async function workerPid(appHost: string, cwd: string): Promise<number> {
+function redactAspireTokens(text: string): string {
+  return text
+    .replace(/([?&](?:t|token|auth|key|secret|code)=)[^&\s"'\`\\]+/gi, '$1<REDACTED>')
+    .replace(/("(?:token|password|secret|authorization)"\s*:\s*)"[^"]*"/gi, '$1"<REDACTED>"');
+}
+
+function summarizeOutcome(label: string, result: Outcome | undefined): string {
+  if (!result) return `${label}=not-run`;
+  if (result.passed) return `${label}=passed(${result.id})`;
+  const detail = result.error instanceof Error
+    ? `${result.error.name}: ${result.error.message}`
+    : String(result.error);
+  return `${label}=failed(${redactAspireTokens(detail).slice(0, 1_000)})`;
+}
+
+async function captureAspirePsSummary(cwd: string): Promise<string> {
+  try {
+    const result = await new Deno.Command('aspire', {
+      args: ['ps', '--format', 'Json', '--non-interactive', '--nologo'],
+      cwd,
+      stdin: 'null',
+      stdout: 'piped',
+      stderr: 'piped',
+      signal: AbortSignal.timeout(DIAGNOSTIC_PS_TIMEOUT_MS),
+    }).output();
+    const stdout = redactAspireTokens(new TextDecoder().decode(result.stdout).trim());
+    const stderr = redactAspireTokens(new TextDecoder().decode(result.stderr).trim());
+    if (!result.success) {
+      const detail = (stderr || stdout || '(empty)').slice(-DIAGNOSTIC_TAIL_CHARS);
+      return `exited ${result.code}: ${detail}`;
+    }
+    if (!stdout) {
+      return stderr ? `(empty stdout; stderr=${stderr.slice(-DIAGNOSTIC_TAIL_CHARS)})` : '(empty)';
+    }
+    return stdout.slice(0, DIAGNOSTIC_TAIL_CHARS);
+  } catch (error) {
+    return `unavailable(${error instanceof Error ? error.message : String(error)})`;
+  }
+}
+
+async function workerPid(
+  appHost: string,
+  cwd: string,
+  context: WorkerPidContext,
+): Promise<number> {
+  const { stdout, stderr } = await runCommandOutput('aspire', [
+    'describe',
+    '--apphost',
+    appHost,
+    '--format',
+    'Json',
+    '--non-interactive',
+    '--nologo',
+  ], cwd);
+  let parsed: unknown;
+  try {
+    if (stdout.trim().length === 0) {
+      throw new SyntaxError('Unexpected empty stdout from aspire describe');
+    }
+    parsed = JSON.parse(stdout);
+  } catch (error) {
+    const psSummary = await captureAspirePsSummary(cwd);
+    const parseDetail = error instanceof Error ? error.message : String(error);
+    const stderrTail = redactAspireTokens(stderr.trim()).slice(-DIAGNOSTIC_TAIL_CHARS);
+    const stdoutTail = redactAspireTokens(stdout.trim()).slice(-DIAGNOSTIC_TAIL_CHARS);
+    const seedSummary = summarizeOutcome('seed', context.seed);
+    const streamSummary = summarizeOutcome('stream', context.stream);
+    throw new Error(
+      `workerPid(${context.phase}) expected JSON from aspire describe for ${appHost}: ` +
+        `${parseDetail}; describe.stderr=${JSON.stringify(stderrTail)}; ` +
+        `describe.stdout=${JSON.stringify(stdoutTail)}; aspirePs=${psSummary}; ` +
+        `${seedSummary}; ${streamSummary}`,
+    );
+  }
   const snapshot = z.object({
     resources: z.array(z.object({
       displayName: z.string(),
       properties: z.record(z.string(), z.unknown()),
     })),
-  }).parse(JSON.parse(
-    await command('aspire', [
-      'describe',
-      '--apphost',
-      appHost,
-      '--format',
-      'Json',
-      '--non-interactive',
-      '--nologo',
-    ], cwd),
-  ));
+  }).parse(parsed);
   const workers = snapshot.resources.filter((resource) => resource.displayName === 'workers');
   const pid = workers.length === 1 ? workers[0].properties['executable.pid'] : undefined;
   if (typeof pid !== 'number' || pid <= 0) {
@@ -230,7 +314,7 @@ async function runVariant(
           '--non-interactive',
           '--nologo',
         ], cwd);
-        beforeSeedPid = await workerPid(appHost, cwd);
+        beforeSeedPid = await workerPid(appHost, cwd, { phase: 'beforeSeedPid' });
       }
       if (words[0] === 'aspire' && args[0] === 'start') appHostStarted = true;
       await command(
@@ -251,7 +335,7 @@ async function runVariant(
     }
     const seed = await outcome(() => seedExecution(appHost, projectRoot));
     const stream = await outcome(() => activity(appHost, projectRoot));
-    const afterSeedPid = await workerPid(appHost, cwd);
+    const afterSeedPid = await workerPid(appHost, cwd, { phase: 'afterSeedPid', seed, stream });
     if (beforeSeedPid === undefined || beforeSeedPid !== afterSeedPid) {
       throw new Error('Workers restarted between seed and acceptance');
     }
