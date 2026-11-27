@@ -39,6 +39,11 @@
 
 import { getStreamsAuth } from '@netscript/plugin-streams-core';
 import {
+  type ChatProxyInput,
+  type ChatProxyRequestContext,
+  createAuthorizedChatStreamProxy,
+} from '../../internal/authorized-chat-stream-proxy.ts';
+import {
   type NetScriptChatSessionTarget,
   resolveChatSessionUrl,
 } from './create-chat-connection.ts';
@@ -85,16 +90,39 @@ function sanitizeUpstreamResponse(upstream: Response): Response {
 
 /**
  * A Fresh-compatible chat-stream proxy handler. Accepts either a bare `Request`
- * or a Fresh route context (anything with a `.req` `Request`), so it can be used
- * directly as a `Handler`/`Handlers` entry (`{ POST: handler }`) or called with
- * a `Request` in tests.
+ * or a Fresh route context (anything with a `.req` `Request` and optional
+ * `.info.remoteAddr`), plus optional request-scoped transport context, so it can
+ * be used directly as a `Handler`/`Handlers` entry (`{ POST: handler, GET: handler }`)
+ * or called with a `Request` in tests.
  */
 export type NetScriptChatStreamProxyHandler = (
-  input: Request | { readonly req: Request },
+  input:
+    | Request
+    | {
+      readonly req: Request;
+      readonly info?: { readonly remoteAddr?: Deno.Addr };
+    },
+  context?: Readonly<{
+    readonly remoteAddr?: Deno.Addr;
+    readonly shutdownSignal?: AbortSignal;
+  }>,
 ) => Promise<Response>;
 
-/** Options for {@link createNetScriptChatStreamProxy}. */
-export interface NetScriptChatStreamProxyOptions {
+/**
+ * Options for {@link createNetScriptChatStreamProxy}.
+ *
+ * - **Legacy default mode** (`authorize` and `recheck` omitted): preserves
+ *   unchanged wire behavior (no authorization gate; legacy request header
+ *   forwarding retained). Production applications should either opt into
+ *   `authorize` + `recheck` below or split `GET` live SSE onto
+ *   `createNetScriptStreamProxy` from `@netscript/plugin-streams-core/proxy`.
+ * - **Opt-in authorized mode** (both `authorize` and `recheck` supplied): drops
+ *   client `Cookie` / `Authorization` before proxying upstream, delegates `GET`
+ *   `live=sse` to `@netscript/plugin-streams-core/proxy` for revocable delivery-unit
+ *   enforcement, and guards `POST` and non-SSE `GET` behind admission `authorize`
+ *   plus Cookie Origin / Fetch-Metadata checks.
+ */
+export interface NetScriptChatStreamProxyOptions<TGrant = unknown> {
   /** The chat session to proxy, or a resolver deriving it from the request. */
   readonly target:
     | NetScriptChatSessionTarget
@@ -128,7 +156,132 @@ export interface NetScriptChatStreamProxyOptions {
    * `fetch`. Injectable so tests can drive body/header/abort behavior.
    */
   readonly fetch?: typeof fetch;
+  /**
+   * Opt-in admission policy enabling revocable authorization mode. MUST be paired
+   * with `recheck`; supplying only one throws `TypeError` at construction.
+   * Structurally compatible with `StreamProxyOptions['authorize']` from
+   * `@netscript/plugin-streams-core/proxy`.
+   */
+  readonly authorize?: (
+    context: Readonly<{
+      readonly request: Request;
+      readonly params: Readonly<Record<string, string>>;
+      readonly query: Readonly<Record<string, string>>;
+      readonly credentialMode: 'bearer' | 'cookie';
+      readonly principal?: undefined;
+      readonly signal: AbortSignal;
+    }>,
+  ) =>
+    | {
+      readonly allow: true;
+      readonly grant: TGrant;
+      readonly expiresAtMs?: number;
+      readonly responseHeaders?: Readonly<Record<string, string>>;
+      readonly setCookies?: readonly string[];
+    }
+    | {
+      readonly allow: false;
+      readonly status: 401 | 403;
+      readonly reason: string;
+    }
+    | Promise<
+      | {
+        readonly allow: true;
+        readonly grant: TGrant;
+        readonly expiresAtMs?: number;
+        readonly responseHeaders?: Readonly<Record<string, string>>;
+        readonly setCookies?: readonly string[];
+      }
+      | {
+        readonly allow: false;
+        readonly status: 401 | 403;
+        readonly reason: string;
+      }
+    >;
+  /**
+   * Opt-in re-authorization policy required whenever `authorize` is provided.
+   * Enforced on delegated `GET` `live=sse` streams before delivery units, on
+   * expiry, on idle intervals, and on revocation wakes. Structurally compatible
+   * with `StreamProxyOptions['recheck']` from `@netscript/plugin-streams-core/proxy`.
+   */
+  readonly recheck?: (
+    context: Readonly<{
+      readonly grant: TGrant;
+      readonly streamPath: string;
+      readonly reason:
+        | 'post-subscribe'
+        | 'before-delivery'
+        | 'idle-interval'
+        | 'expiry'
+        | 'revocation-signal';
+      readonly signal: AbortSignal;
+    }>,
+  ) =>
+    | { readonly allow: true; readonly expiresAtMs?: number }
+    | { readonly allow: false; readonly reason: string }
+    | Promise<
+      | { readonly allow: true; readonly expiresAtMs?: number }
+      | { readonly allow: false; readonly reason: string }
+    >;
+  /**
+   * Accepted client credential transport mode in opt-in authorized mode
+   * (defaults to `'bearer-or-cookie'`). Requires `authorize` + `recheck`.
+   */
+  readonly clientAuth?: 'bearer' | 'cookie' | 'bearer-or-cookie';
+  /**
+   * Explicit cross-origin allowlist for cookie-authenticated requests in opt-in
+   * authorized mode (defaults to strict same-origin). Requires `authorize` + `recheck`.
+   */
+  readonly allowedOrigins?: readonly string[];
+  /**
+   * Explicit trusted reverse-proxy peer predicate for resolving forwarded origin
+   * headers in opt-in authorized mode (defaults to `false`). Requires `authorize` + `recheck`.
+   */
+  readonly trustProxy?: false | ((address: string) => boolean);
+  /**
+   * Periodic idle re-check interval in milliseconds (or `null`) for delegated
+   * `GET` `live=sse` streams. Requires `authorize` + `recheck`.
+   */
+  readonly recheckEveryMs?: number | null;
+  /**
+   * Optional shared application revocation channel for immediate invalidation on
+   * delegated `GET` `live=sse` streams. Structurally compatible with
+   * `StreamProxyRevocationSource<TGrant>`. Requires `authorize` + `recheck`.
+   */
+  readonly revocationSource?: Readonly<{
+    subscribe(
+      grant: TGrant,
+      notify: (
+        signal?: Readonly<{ readonly action?: 'recheck' | 'revoked'; readonly reason?: string }>,
+      ) => void,
+      options?: Readonly<{ readonly signal: AbortSignal }>,
+    ): (() => void) | Promise<() => void>;
+  }>;
+  /**
+   * Maximum time in milliseconds any policy/auth hook may take before failing
+   * closed in opt-in authorized mode (defaults to `5_000`). Requires `authorize` + `recheck`.
+   */
+  readonly policyTimeoutMs?: number;
+  /**
+   * Optional clock port for deterministic expiry, idle, and policy timeout
+   * scheduling in opt-in authorized mode. Structurally compatible with
+   * `StreamProxyClockPort`. Requires `authorize` + `recheck`.
+   */
+  readonly clock?: Readonly<{
+    nowMs(): number;
+    schedule(delayMs: number, onFire: () => void): () => void;
+  }>;
 }
+
+const AUTHORIZED_ONLY_OPTION_KEYS = [
+  'clientAuth',
+  'allowedOrigins',
+  'trustProxy',
+  'recheckEveryMs',
+  'revocationSource',
+  'policyTimeoutMs',
+  'clock',
+] as const;
 
 /** Narrow a bare `Request` or a Fresh-style context to its `Request`. */
 function toRequest(input: Request | { readonly req: Request }): Request {
@@ -145,7 +298,13 @@ function toRequest(input: Request | { readonly req: Request }): Request {
  * and propagates the client `AbortSignal` so a disconnect tears the upstream
  * fetch down (F-13).
  *
- * @param options Chat session `target` plus optional `auth`/`fetch` overrides.
+ * **Security note:** Unconfigured callers (omitting `authorize` and `recheck`)
+ * retain legacy request-header forwarding (including client `Cookie`) with no
+ * authorization gate for backward compatibility. Production applications should
+ * either opt into `authorize` + `recheck` or split `GET` SSE onto
+ * `createNetScriptStreamProxy` from `@netscript/plugin-streams-core/proxy`.
+ *
+ * @param options Chat session `target`, optional `auth`/`fetch` overrides, and opt-in revocable auth hooks.
  * @returns A Fresh `Handler`/`Handlers`-compatible chat-stream proxy function.
  *
  * @example
@@ -163,9 +322,42 @@ function toRequest(input: Request | { readonly req: Request }): Request {
  * export const handler = { POST: proxy, GET: proxy };
  * ```
  */
-export function createNetScriptChatStreamProxy(
-  options: NetScriptChatStreamProxyOptions,
+export function createNetScriptChatStreamProxy<TGrant = unknown>(
+  options: NetScriptChatStreamProxyOptions<TGrant>,
 ): NetScriptChatStreamProxyHandler {
+  if (typeof options !== 'object' || options === null || Array.isArray(options)) {
+    throw new TypeError('[netscript.fresh.ai] options must be an object');
+  }
+  const hasAuthorize = options.authorize !== undefined;
+  const hasRecheck = options.recheck !== undefined;
+  if (hasAuthorize !== hasRecheck) {
+    throw new TypeError(
+      '[netscript.fresh.ai] authorize and recheck must both be provided together',
+    );
+  }
+  if (hasAuthorize && hasRecheck) {
+    if (typeof options.authorize !== 'function' || typeof options.recheck !== 'function') {
+      throw new TypeError(
+        '[netscript.fresh.ai] authorize and recheck must be functions when provided',
+      );
+    }
+    const authorizedHandler = createAuthorizedChatStreamProxy<TGrant>({
+      ...options,
+      authorize: options.authorize,
+      recheck: options.recheck,
+    });
+    return (input: ChatProxyInput, context?: ChatProxyRequestContext) =>
+      authorizedHandler(input, context);
+  }
+
+  for (const key of AUTHORIZED_ONLY_OPTION_KEYS) {
+    if (options[key] !== undefined) {
+      throw new TypeError(
+        `[netscript.fresh.ai] option '${key}' requires both authorize and recheck`,
+      );
+    }
+  }
+
   const resolveAuth = options.auth ?? getStreamsAuth;
   const doFetch = options.fetch ?? fetch;
 
