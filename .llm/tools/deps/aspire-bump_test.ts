@@ -1,10 +1,18 @@
-import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
-import { dirname, join } from 'jsr:@std/path@^1';
+import {
+  assertEquals,
+  assertRejects,
+  assertStringIncludes,
+  assertThrows,
+} from 'jsr:@std/assert@^1';
+import { dirname, fromFileUrl, join } from 'jsr:@std/path@^1';
 
 import {
   ASPIRE_BUMP_ALLOWLIST,
+  ASPIRE_STABLE_PACKAGES,
+  highestCommonStableVersion,
   latestBrowsersVersionForTrain,
   latestStableVersion,
+  parseCliArgs,
   planOrApplyAspireBump,
 } from './aspire-bump.ts';
 
@@ -48,9 +56,9 @@ NETSCRIPT_ASPIRE_SDK_VERSION=17.0.0
           key: nuget-aspire-\${{ runner.os }}-17.0.0-v1
       - uses: actions/cache@v4
         with:
-          path: ~/.aspire/bin
+          path: ~/.dotnet/aspire-cli
           key: aspire-cli-\${{ runner.os }}-17.0.0-v1
-      - run: dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 17.0.0
+      - run: dotnet tool install Aspire.Cli --tool-path "$HOME/.dotnet/aspire-cli" --version 17.0.0
       - run: |
           case "$aspire_version" in
             17.0.0|17.0.0+*) ;;
@@ -66,9 +74,9 @@ NETSCRIPT_ASPIRE_SDK_VERSION=17.0.0
           key: nuget-aspire-\${{ runner.os }}-17.0.0-v1
       - uses: actions/cache@v4
         with:
-          path: ~/.aspire/bin
+          path: ~/.dotnet/aspire-cli
           key: aspire-cli-\${{ runner.os }}-17.0.0-v1
-      - run: dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 17.0.0
+      - run: dotnet tool install Aspire.Cli --tool-path "$HOME/.dotnet/aspire-cli" --version 17.0.0
       - run: |
           case "$aspire_version" in
             17.0.0|17.0.0+*) ;;
@@ -84,9 +92,9 @@ NETSCRIPT_ASPIRE_SDK_VERSION=17.0.0
           key: nuget-aspire-\${{ runner.os }}-17.0.0-v1
       - uses: actions/cache@v4
         with:
-          path: ~/.aspire/bin
+          path: ~/.dotnet/aspire-cli
           key: aspire-cli-\${{ runner.os }}-17.0.0-v1
-      - run: dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 17.0.0
+      - run: dotnet tool install Aspire.Cli --tool-path "$HOME/.dotnet/aspire-cli" --version 17.0.0
       - run: |
           case "$aspire_version" in
             17.0.0|17.0.0+*) ;;
@@ -232,4 +240,115 @@ Deno.test('rejects invalid prerelease targetVersion fail-closed', async () => {
   } finally {
     await Deno.remove(root, { recursive: true });
   }
+});
+
+Deno.test('real checked-in repository workflows match offline bump plan with zero drift', async () => {
+  const repoRoot = join(dirname(fromFileUrl(import.meta.url)), '../../..');
+  const report = await planOrApplyAspireBump({ repoRoot, apply: false, offline: true });
+  assertEquals(report.targetVersion, '17.0.0');
+  assertEquals(report.changedFiles, []);
+});
+
+Deno.test('apply pre-validates all 7 files before writing so later failures leave earlier files untouched', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await seedFixtureRepo(root);
+    const brokenWorkflow = join(root, '.github/workflows/e2e-cli-prod-local.yml');
+    await Deno.writeTextFile(brokenWorkflow, 'name: broken\n');
+    const beforeFiles = await Promise.all(
+      ASPIRE_BUMP_ALLOWLIST.map((p) => Deno.readTextFile(join(root, p))),
+    );
+
+    await assertRejects(
+      () =>
+        planOrApplyAspireBump({
+          repoRoot: root,
+          apply: true,
+          offline: true,
+          targetVersion: '17.0.1',
+          targetBrowsersVersion: '17.0.1-preview.1.26600.1',
+        }),
+      Error,
+      'Expected exact pin pattern not found',
+    );
+
+    const afterFiles = await Promise.all(
+      ASPIRE_BUMP_ALLOWLIST.map((p) => Deno.readTextFile(join(root, p))),
+    );
+    assertEquals(afterFiles, beforeFiles);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('online resolver selects highest common intersection and rejects cross-major Browsers fallback', async () => {
+  assertEquals(
+    highestCommonStableVersion([
+      ['17.0.0', '17.0.2'],
+      ['17.0.0', '17.0.1'],
+      ['17.0.0', '17.0.1', '17.0.2'],
+    ]),
+    '17.0.0',
+  );
+  assertEquals(
+    latestBrowsersVersionForTrain(['13.5.3-preview.1', '18.0.0-preview.1'], '17.0.0'),
+    null,
+  );
+  assertEquals(
+    latestBrowsersVersionForTrain(['17.0.0-preview.1.26567.5', '18.0.0-preview.1'], '17.0.1'),
+    '17.0.0-preview.1.26567.5',
+  );
+
+  const root = await Deno.makeTempDir();
+  try {
+    await seedFixtureRepo(root);
+    const report = await planOrApplyAspireBump({
+      repoRoot: root,
+      apply: false,
+      fetchPackageVersions: (pkg) => {
+        if (pkg === ASPIRE_STABLE_PACKAGES[0]) return Promise.resolve(['17.0.0', '17.0.2']);
+        if (pkg === 'Aspire.Hosting.Browsers') {
+          return Promise.resolve(['17.0.0-preview.1.26567.5', '18.0.0-preview.1']);
+        }
+        return Promise.resolve(['17.0.0', '17.0.1']);
+      },
+    });
+    assertEquals(report.targetVersion, '17.0.0');
+    assertEquals(report.targetBrowsersVersion, '17.0.0-preview.1.26567.5');
+
+    await assertRejects(
+      () =>
+        planOrApplyAspireBump({
+          repoRoot: root,
+          apply: false,
+          fetchPackageVersions: (pkg) =>
+            Promise.resolve(
+              pkg === 'Aspire.Hosting.Browsers'
+                ? ['13.5.3-preview.1', '18.0.0-preview.1']
+                : ['17.0.0'],
+            ),
+        }),
+      Error,
+      'No compatible same-train Aspire.Hosting.Browsers',
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('parseCliArgs handles -- separator, --dry-run, and conflicting --apply + --dry-run', () => {
+  const parsed = parseCliArgs(['--', '--dry-run', '--offline', '--json']);
+  assertEquals(parsed, {
+    help: false,
+    apply: false,
+    offline: true,
+    json: true,
+    targetVersion: undefined,
+    targetBrowsersVersion: undefined,
+  });
+  assertThrows(
+    () => parseCliArgs(['--', '--dry-run', '--apply']),
+    Error,
+    'Cannot combine --apply and --dry-run',
+  );
 });

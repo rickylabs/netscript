@@ -85,7 +85,7 @@ export async function assertMcpResourcesHaveNoSecrets(
   }
 }
 
-/** Scan live Aspire Dashboard API resources and logs payloads without echoing credentials. */
+/** Scan live Aspire Dashboard API resources and logs payloads and require authentic target structure. */
 export async function assertDashboardApiHasNoSecrets(
   dashboardUrl: string,
   secrets: readonly string[],
@@ -102,6 +102,29 @@ export async function assertDashboardApiHasNoSecrets(
       throw new Error(`aspire dashboard api ${path} returned ${response.status}`);
     }
     assertNoSecretBytes(`aspire dashboard api (${path})`, text, secrets);
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      throw new Error(`aspire dashboard api (${path}) returned invalid JSON`);
+    }
+    if (path === 'resources') {
+      const entries = Array.isArray(parsed)
+        ? parsed
+        : (isRecord(parsed) && Array.isArray(parsed.data) ? parsed.data : undefined);
+      if (!entries || !entries.some((entry) => isRecord(entry) && entry.name === 'users')) {
+        throw new Error('aspire dashboard api (resources) omitted target resource users');
+      }
+    } else {
+      const resourceLogs = isRecord(parsed) && Array.isArray(parsed.resourceLogs)
+        ? parsed.resourceLogs
+        : (isRecord(parsed) && isRecord(parsed.data) && Array.isArray(parsed.data.resourceLogs)
+          ? parsed.data.resourceLogs
+          : undefined);
+      if (!resourceLogs) {
+        throw new Error('aspire dashboard api (logs) omitted resourceLogs payload');
+      }
+    }
   }
   return endpoints;
 }
@@ -109,7 +132,13 @@ export async function assertDashboardApiHasNoSecrets(
 /** Verify users and prisma-studio are Running with redacted DB connection env vars in describe. */
 export function assertConsumerConnectionStringsRedacted(
   topology: unknown,
-): { readonly postgresPort: number; readonly prismaStudioPid: number | undefined } {
+): {
+  readonly postgresPort: number;
+  readonly prismaStudioPid: number | undefined;
+  readonly usersResourceName: string;
+  readonly prismaStudioResourceName: string;
+  readonly prismaStudioUrl: string | undefined;
+} {
   const resources = isRecord(topology) && Array.isArray(topology.resources)
     ? topology.resources.filter(isRecord)
     : undefined;
@@ -139,14 +168,25 @@ export function assertConsumerConnectionStringsRedacted(
     }
   }
 
+  const users = findExactResource(resources, 'users')!;
   const prismaStudio = findExactResource(resources, 'prisma-studio')!;
+  const usersResourceName = typeof users.name === 'string' ? users.name : 'users';
+  const prismaStudioResourceName = typeof prismaStudio.name === 'string'
+    ? prismaStudio.name
+    : 'prisma-studio';
   const rawPid = isRecord(prismaStudio.properties)
     ? prismaStudio.properties['executable.pid']
     : undefined;
   const prismaStudioPid = typeof rawPid === 'number' && Number.isInteger(rawPid) && rawPid > 0
     ? rawPid
     : undefined;
-  return { postgresPort, prismaStudioPid };
+  return {
+    postgresPort,
+    prismaStudioPid,
+    usersResourceName,
+    prismaStudioResourceName,
+    prismaStudioUrl: extractOptionalHttpUrl(prismaStudio),
+  };
 }
 
 /** Verify live consumer process env carries working Postgres port and password without leaking it. */
@@ -195,6 +235,15 @@ function findExactResource(
   target: string,
 ): Record<string, unknown> | undefined {
   return resources.find((entry) => entry.displayName === target || entry.name === target);
+}
+
+function extractOptionalHttpUrl(resource: Record<string, unknown>): string | undefined {
+  const urls = Array.isArray(resource.urls) ? resource.urls : [];
+  for (const item of urls) {
+    const raw = isRecord(item) ? item.url : item;
+    if (typeof raw === 'string' && /^https?:\/\//.test(raw)) return raw;
+  }
+  return undefined;
 }
 
 function extractTcpPort(resource: Record<string, unknown>): number {

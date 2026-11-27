@@ -37,10 +37,33 @@ describe('DbWorkspaceResolver', () => {
     assertEquals(databases.length, 2);
     assertEquals(databases[0].configKey, 'primary');
     assertEquals(databases[0].engine, 'postgres');
+    assertEquals(databases[0].mode, 'Container');
     assertEquals(databases[0].databaseName, 'app-db');
     assertEquals(databases[0].enabled, true);
     assertEquals(databases[1].engine, 'mssql');
+    assertEquals(databases[1].mode, 'Container');
     assertEquals(databases[1].enabled, false);
+  });
+
+  it('preserves configured External and File modes across discovered databases', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    await fs.writeFile(
+      '/project/appsettings.json',
+      JSON.stringify({
+        NetScript: {
+          Databases: {
+            externalPg: { Enabled: true, Engine: 'Postgres', Mode: 'External' },
+            localSqlite: { Enabled: true, Engine: 'Sqlite' },
+          },
+        },
+      }),
+    );
+
+    const databases = await new DbWorkspaceResolver(fs).discoverDatabases('/project');
+    assertEquals(databases.map((d) => [d.configKey, d.mode]), [
+      ['externalPg', 'External'],
+      ['localSqlite', 'File'],
+    ]);
   });
 
   it('resolves all enabled databases and skips disabled entries', () => {

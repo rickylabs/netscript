@@ -25,6 +25,10 @@ import {
   assertProcessDatabaseConnection,
 } from '../../../src/application/gates/scaffold/runtime/credential-secret-surfaces.ts';
 import {
+  assertPrismaStudioDatabaseRead,
+  verifyDashboardResourceDetailObservation,
+} from '../../../src/application/gates/scaffold/runtime/dashboard-resource-masking.ts';
+import {
   ASPIRE_WAIT_TIMEOUT_EXIT_CODE,
   assertBoundedWaitRejected,
   assertCredentialRejectionEvidence,
@@ -449,6 +453,9 @@ Deno.test('#2259 consumer connection masking checks users and prisma-studio in d
   assertEquals(assertConsumerConnectionStringsRedacted(validTopology), {
     postgresPort: 55432,
     prismaStudioPid: 4242,
+    usersResourceName: 'users-22222222',
+    prismaStudioResourceName: 'prisma-studio-33333333',
+    prismaStudioUrl: undefined,
   });
 
   const leakedUrl = structuredClone(validTopology);
@@ -506,18 +513,63 @@ Deno.test('#2259 live process DB check supports URL and Npgsql dialects without 
   assertEquals(wrongSecretError.message.includes(WRONG_PASSWORD), false);
 });
 
-Deno.test('#2259 dashboard API scanner checks resources and logs and rejects leaked secrets', async () => {
+Deno.test('#2259 dashboard API scanner checks resources and logs contracts and rejects leaked secrets', async () => {
   const visited: string[] = [];
+  const validResources = [{ name: 'users', instanceId: 'u1', hasLogs: true }];
+  const validLogs = { data: { resourceLogs: [] }, totalCount: 0, returnedCount: 0 };
   const clean = await assertDashboardApiHasNoSecrets(
     'https://localhost:18888/?t=token',
     SECRETS,
     () => (path) => {
       visited.push(path);
-      return Promise.resolve(new Response(JSON.stringify({ ok: true, path }), { status: 200 }));
+      return Promise.resolve(
+        new Response(JSON.stringify(path === 'resources' ? validResources : validLogs), {
+          status: 200,
+        }),
+      );
     },
   );
   assertEquals(clean, ['resources', 'logs']);
   assertEquals(visited, ['resources', 'logs']);
+
+  await assertRejects(
+    () =>
+      assertDashboardApiHasNoSecrets(
+        'https://localhost:18888/?t=token',
+        SECRETS,
+        () => () => Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 })),
+      ),
+    Error,
+    'omitted target resource users',
+  );
+  await assertRejects(
+    () =>
+      assertDashboardApiHasNoSecrets(
+        'https://localhost:18888/?t=token',
+        SECRETS,
+        () => (path) =>
+          Promise.resolve(
+            new Response(JSON.stringify(path === 'resources' ? [] : validLogs), { status: 200 }),
+          ),
+      ),
+    Error,
+    'omitted target resource users',
+  );
+  await assertRejects(
+    () =>
+      assertDashboardApiHasNoSecrets(
+        'https://localhost:18888/?t=token',
+        SECRETS,
+        () => (path) =>
+          Promise.resolve(
+            new Response(JSON.stringify(path === 'resources' ? validResources : { ok: true }), {
+              status: 200,
+            }),
+          ),
+      ),
+    Error,
+    'omitted resourceLogs payload',
+  );
 
   for (const leakPath of ['resources', 'logs'] as const) {
     const leakError = await assertRejects(
@@ -528,7 +580,9 @@ Deno.test('#2259 dashboard API scanner checks resources and logs and rejects lea
           () => (path) =>
             Promise.resolve(
               new Response(
-                path === leakPath ? `postgres:${REAL_PASSWORD}` : '{"ok":true}',
+                path === leakPath
+                  ? `postgres:${REAL_PASSWORD}`
+                  : JSON.stringify(path === 'resources' ? validResources : validLogs),
                 { status: 200 },
               ),
             ),
@@ -538,6 +592,147 @@ Deno.test('#2259 dashboard API scanner checks resources and logs and rejects lea
     );
     assertEquals(leakError.message.includes(REAL_PASSWORD), false);
   }
+});
+
+Deno.test('#2259 Prisma Studio /bff read proves live DB query success and rejects failures or leaks', async () => {
+  const receipt = await assertPrismaStudioDatabaseRead(
+    'http://127.0.0.1:5555',
+    SECRETS,
+    {
+      fetchImpl: () =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify([null, [{ database_name: 'postgres', name: 'Seed User' }]]),
+            { status: 200 },
+          ),
+        ),
+      timeoutMs: 0,
+      delayMs: 0,
+    },
+  );
+  assertEquals(receipt, {
+    url: 'http://127.0.0.1:5555',
+    databaseName: 'postgres',
+    sampledRecordName: 'Seed User',
+  });
+
+  await assertRejects(
+    () =>
+      assertPrismaStudioDatabaseRead('http://127.0.0.1:5555', SECRETS, {
+        fetchImpl: () => Promise.resolve(new Response(JSON.stringify([null, []]), { status: 200 })),
+        timeoutMs: 0,
+        delayMs: 0,
+      }),
+    Error,
+    'zero rows',
+  );
+  await assertRejects(
+    () =>
+      assertPrismaStudioDatabaseRead('http://127.0.0.1:5555', SECRETS, {
+        fetchImpl: () =>
+          Promise.resolve(
+            new Response(JSON.stringify([{ message: 'relation missing' }]), { status: 200 }),
+          ),
+        timeoutMs: 0,
+        delayMs: 0,
+      }),
+    Error,
+    'SQL error: relation missing',
+  );
+  const leakErr = await assertRejects(
+    () =>
+      assertPrismaStudioDatabaseRead('http://127.0.0.1:5555', SECRETS, {
+        fetchImpl: () =>
+          Promise.resolve(new Response(`postgres:${REAL_PASSWORD}`, { status: 200 })),
+        timeoutMs: 0,
+        delayMs: 0,
+      }),
+    Error,
+    'prisma-studio bff output contains credential',
+  );
+  assertEquals(leakErr.message.includes(REAL_PASSWORD), false);
+});
+
+Deno.test('#2259 dashboard resource detail observation requires exact target and masked connection rows', () => {
+  const validRows = [
+    { name: 'ConnectionStrings__postgres', valueText: '••••••••', masked: true },
+    { name: 'DATABASE_URL', valueText: '••••••••', masked: true },
+    { name: 'POSTGRES_URI', valueText: '••••••••', masked: true },
+  ];
+  assertEquals(
+    verifyDashboardResourceDetailObservation(
+      {
+        resourceName: 'users-22222222',
+        html: '<div>••••••••</div>',
+        text: 'DATABASE_URL ••••••••',
+        envRows: validRows,
+      },
+      'users-22222222',
+      SECRETS,
+    ),
+    ['DATABASE_URL', 'POSTGRES_URI', 'ConnectionStrings__postgres'],
+  );
+
+  assertThrows(
+    () =>
+      verifyDashboardResourceDetailObservation(
+        { resourceName: 'wrong-resource', html: '<div/>', text: 'x', envRows: validRows },
+        'users-22222222',
+        SECRETS,
+      ),
+    Error,
+    'aspire dashboard detail resource',
+  );
+  assertThrows(
+    () =>
+      verifyDashboardResourceDetailObservation(
+        {
+          resourceName: 'prisma-studio-33333333',
+          html: '<div/>',
+          text: 'x',
+          envRows: validRows.slice(0, 2),
+        },
+        'prisma-studio-33333333',
+        SECRETS,
+      ),
+    Error,
+    'omitted POSTGRES_URI',
+  );
+  assertThrows(
+    () =>
+      verifyDashboardResourceDetailObservation(
+        {
+          resourceName: 'prisma-studio-33333333',
+          html: '<div/>',
+          text: 'x',
+          envRows: [
+            validRows[0],
+            { name: 'DATABASE_URL', valueText: '••••••••', masked: false },
+            validRows[2],
+          ],
+        },
+        'prisma-studio-33333333',
+        SECRETS,
+      ),
+    Error,
+    'did not mask DATABASE_URL',
+  );
+  const leakHtmlErr = assertThrows(
+    () =>
+      verifyDashboardResourceDetailObservation(
+        {
+          resourceName: 'users-22222222',
+          html: `<span data-tooltip="postgres://postgres:${REAL_PASSWORD}@localhost/app"></span>`,
+          text: 'ok',
+          envRows: validRows,
+        },
+        'users-22222222',
+        SECRETS,
+      ),
+    Error,
+    'contains credential #0',
+  );
+  assertEquals(leakHtmlErr.message.includes(REAL_PASSWORD), false);
 });
 
 function postgresInfrastructure(): string {

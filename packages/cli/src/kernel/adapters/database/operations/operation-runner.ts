@@ -36,8 +36,14 @@ import {
 import {
   buildAspireArgs,
   buildDbCliEnv,
+  commandDetails,
   findRunningAppHost,
+  inspectForeignDockerDiagnostic,
+  isTypedResourceOperation,
+  registerSignalAbort,
   resolveDbCliTimeoutSeconds,
+  stopOperationResource,
+  stopStandaloneAppHost,
   watchExecutableCompletion,
 } from './operation-runner-helpers.ts';
 
@@ -244,7 +250,7 @@ export class DbOperationRunner implements DbOperationExecutor {
         signal,
       );
     } finally {
-      await this.stopStandaloneAppHost(apphostPath, aspireDir);
+      await stopStandaloneAppHost(this.executor, apphostPath, aspireDir);
     }
   }
 
@@ -318,9 +324,11 @@ export class DbOperationRunner implements DbOperationExecutor {
 
     const details = commandDetails(output);
     if (WAIT_TIMEOUT_EXIT_CODES.has(output.code)) {
-      const foreignDockerNote = database.engine === 'sqlite'
-        ? ''
-        : await this.inspectForeignDockerDiagnostic();
+      const foreignDockerNote = await inspectForeignDockerDiagnostic(
+        database,
+        details,
+        this.dockerTopologyInspector,
+      );
       throw new Error(
         `Database resource ${configKey} did not become healthy within ${timeoutSeconds} seconds ` +
           `(aspire wait exit ${output.code}). Check its resource logs and listener readiness.` +
@@ -328,22 +336,6 @@ export class DbOperationRunner implements DbOperationExecutor {
       );
     }
     throw new Error(`aspire wait failed with exit code ${output.code}: ${details}`);
-  }
-
-  private async inspectForeignDockerDiagnostic(): Promise<string> {
-    try {
-      const endpoint = await this.dockerTopologyInspector.inspectEndpoint();
-      if (endpoint.locality !== 'remote') return '';
-      const context = endpoint.context ? `, context "${endpoint.context}"` : '';
-      const origin = `${endpoint.host ?? endpoint.daemonHost ?? 'remote'} ` +
-        `(from ${endpoint.source ?? 'docker'}${context})`;
-      const daemonHost = endpoint.daemonHost ?? endpoint.host ?? 'the remote Docker host';
-      return ` Foreign Docker daemon detected: ${origin}. Aspire publishes container ports on ` +
-        `${daemonHost}, not local loopback. Run \`netscript plugin doctor\` or switch to a local ` +
-        `Docker daemon.`;
-    } catch {
-      return '';
-    }
   }
 
   private async executeTypedResourceCommand(
@@ -415,7 +407,9 @@ export class DbOperationRunner implements DbOperationExecutor {
       return code;
     } finally {
       try {
-        if (startRequested) await this.stopResource(resourceName, apphostPath, aspireDir);
+        if (startRequested) {
+          await stopOperationResource(this.executor, resourceName, apphostPath, aspireDir);
+        }
       } finally {
         await this.removeOperationRequest(operationRequestPath);
       }
@@ -447,42 +441,6 @@ export class DbOperationRunner implements DbOperationExecutor {
     }
   }
 
-  private async stopResource(
-    resourceName: string,
-    apphostPath: string,
-    aspireDir: string,
-  ): Promise<void> {
-    const output = await this.executor.output(
-      [
-        'resource',
-        resourceName,
-        'stop',
-        '--apphost',
-        apphostPath,
-        '--non-interactive',
-        '--nologo',
-      ],
-      { cwd: aspireDir },
-    );
-    if (output.code !== 0) {
-      outputWarning(
-        `Failed to stop database operation resource ${resourceName}: ${commandDetails(output)}`,
-      );
-    }
-  }
-
-  private async stopStandaloneAppHost(apphostPath: string, aspireDir: string): Promise<void> {
-    const output = await this.executor.output(
-      ['stop', '--apphost', apphostPath, '--non-interactive', '--nologo'],
-      { cwd: aspireDir },
-    );
-    if (output.code !== 0) {
-      outputWarning(
-        `Failed to stop standalone Aspire AppHost ${apphostPath}: ${commandDetails(output)}`,
-      );
-    }
-  }
-
   private async runAspire(
     args: readonly string[],
     options: AspireCommandOptions,
@@ -507,22 +465,4 @@ export class DbOperationRunner implements DbOperationExecutor {
       );
     }
   }
-}
-
-function isTypedResourceOperation(
-  operation: DbOperationRequest['operation'],
-): operation is 'migrate' | 'seed' | 'reset' {
-  return operation === 'migrate' || operation === 'seed' || operation === 'reset';
-}
-
-function commandDetails(output: CommandOutput): string {
-  return output.stderr.trim() || output.stdout.trim() || 'unknown Aspire error';
-}
-
-function registerSignalAbort(abort: () => void): () => void {
-  const signals: Deno.Signal[] = Deno.build.os === 'windows' ? ['SIGINT'] : ['SIGINT', 'SIGTERM'];
-  for (const signal of signals) Deno.addSignalListener(signal, abort);
-  return () => {
-    for (const signal of signals) Deno.removeSignalListener(signal, abort);
-  };
 }

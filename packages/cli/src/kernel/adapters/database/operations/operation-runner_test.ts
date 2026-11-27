@@ -388,36 +388,56 @@ describe('DbOperationRunner', () => {
     });
   }
 
-  it('skips Docker locality inspection on wait timeout for SQLite databases', async () => {
-    let inspected = false;
-    const executor = new FakeAspireExecutor([
-      running(),
-      output(17, '', 'resource remains unhealthy'),
-    ]);
-    const sqliteRequest: DbOperationRequest = {
-      operation: 'seed',
-      target: {
-        kind: 'single',
-        database: { ...DATABASE, configKey: 'sqlite', engine: 'sqlite' },
-      },
-      projectRoot: PROJECT_ROOT,
-    };
+  it('skips Docker locality inspection on wait timeout for SQLite, External DBs, and non-loopback endpoints', async () => {
+    for (
+      const [label, dbOverride, waitStderr] of [
+        [
+          'sqlite',
+          { configKey: 'sqlite', engine: 'sqlite' as const, mode: 'File' as const },
+          'resource remains unhealthy',
+        ],
+        ['external postgres', {
+          configKey: 'ext',
+          engine: 'postgres' as const,
+          mode: 'External' as const,
+        }, 'resource remains unhealthy'],
+        ['non-loopback endpoint', {
+          configKey: 'postgres',
+          engine: 'postgres' as const,
+          mode: 'Container' as const,
+        }, 'listener ECONNREFUSED at db.internal.example:5432 after 1000 ms'],
+      ] as const
+    ) {
+      let inspected = false;
+      const executor = new FakeAspireExecutor([
+        running(),
+        output(17, '', waitStderr),
+      ]);
+      const scopedRequest: DbOperationRequest = {
+        operation: 'seed',
+        target: {
+          kind: 'single',
+          database: { ...DATABASE, ...dbOverride },
+        },
+        projectRoot: PROJECT_ROOT,
+      };
 
-    const error = await assertRejects(
-      () =>
-        runner(executor, {
-          dockerTopologyInspector: {
-            inspectEndpoint: () => {
-              inspected = true;
-              return Promise.resolve({ locality: 'remote', daemonHost: 'remote.example' });
+      const error = await assertRejects(
+        () =>
+          runner(executor, {
+            dockerTopologyInspector: {
+              inspectEndpoint: () => {
+                inspected = true;
+                return Promise.resolve({ locality: 'remote', daemonHost: 'remote.example' });
+              },
             },
-          },
-        }).execute(sqliteRequest),
-      Error,
-      'Database resource sqlite did not become healthy',
-    );
-    assertEquals(inspected, false);
-    assertEquals(error.message.includes('Foreign Docker daemon detected'), false);
+          }).execute(scopedRequest),
+        Error,
+        `Database resource ${dbOverride.configKey} did not become healthy`,
+      );
+      assertEquals(inspected, false, `expected Docker inspection skipped for ${label}`);
+      assertEquals(error.message.includes('Foreign Docker daemon detected'), false);
+    }
   });
 
   it('reports non-timeout wait failures without misclassifying them', async () => {

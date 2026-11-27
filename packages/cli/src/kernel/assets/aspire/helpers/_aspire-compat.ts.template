@@ -130,8 +130,8 @@ export async function applyDenoPermissions(
   await resource.withDenoAllowAll({ enabled: allowAll });
   if (!allowAll) {
     for (const [kind, values] of allows) await resource.withDenoAllow(kind, values ?? []);
-    for (const [kind, values] of denies) await resource.withDenoDeny(kind, values ?? []);
   }
+  for (const [kind, values] of denies) await resource.withDenoDeny(kind, values ?? []);
   if (watchMode !== 'none') await resource.withDenoWatch({ hmr: watchMode === 'hmr' });
   if (unstable.length > 0) await resource.withDenoUnstable(unstable);
   if (runtimeArgs.length > 0) await resource.withDenoRuntimeArgs(runtimeArgs);

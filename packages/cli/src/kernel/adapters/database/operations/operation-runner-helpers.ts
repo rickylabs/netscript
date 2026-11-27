@@ -1,5 +1,7 @@
-import type { DbOperationRequest } from '../../../domain/db-engine.ts';
-import type { AspireCommandExecutor } from './aspire-command-executor.ts';
+import type { DbOperationRequest, DiscoveredDatabase } from '../../../domain/db-engine.ts';
+import type { DockerTopologyInspector } from '../../../domain/docker-topology.ts';
+import { outputWarning } from '../../../presentation/output/default-output.ts';
+import type { AspireCommandExecutor, CommandOutput } from './aspire-command-executor.ts';
 
 interface AspireResourceStatus {
   readonly displayName?: string;
@@ -245,4 +247,101 @@ function isResourceStatus(value: unknown): value is AspireResourceStatus {
 
 function normalisePath(path: string): string {
   return path.replaceAll('/', '\\').toLowerCase();
+}
+
+/** Emit a remote-Docker-daemon note only for container-backed loopback database waits. */
+export async function inspectForeignDockerDiagnostic(
+  database: Pick<DiscoveredDatabase, 'engine' | 'mode'>,
+  details: string,
+  inspector: Pick<DockerTopologyInspector, 'inspectEndpoint'>,
+): Promise<string> {
+  if (database.engine === 'sqlite' || database.mode === 'External' || database.mode === 'File') {
+    return '';
+  }
+  if (hasExplicitNonLoopbackEndpoint(details)) return '';
+  try {
+    const endpoint = await inspector.inspectEndpoint();
+    if (endpoint.locality !== 'remote') return '';
+    const context = endpoint.context ? `, context "${endpoint.context}"` : '';
+    const origin = `${endpoint.host ?? endpoint.daemonHost ?? 'remote'} ` +
+      `(from ${endpoint.source ?? 'docker'}${context})`;
+    const daemonHost = endpoint.daemonHost ?? endpoint.host ?? 'the remote Docker host';
+    return ` Foreign Docker daemon detected: ${origin}. Aspire publishes container ports on ` +
+      `${daemonHost}, not local loopback. Run \`netscript plugin doctor\` or switch to a local ` +
+      `Docker daemon.`;
+  } catch {
+    return '';
+  }
+}
+
+function hasExplicitNonLoopbackEndpoint(details: string): boolean {
+  const match = /\bat\s+(?:(\[[^\]]+\])|([^\s:]+)):\d+/i.exec(details);
+  if (!match) return false;
+  const host = (match[1] ?? match[2] ?? '').toLowerCase();
+  return host.length > 0 &&
+    host !== 'localhost' &&
+    host !== '127.0.0.1' &&
+    host !== '::1' &&
+    host !== '[::1]';
+}
+
+export function isTypedResourceOperation(
+  operation: DbOperationRequest['operation'],
+): operation is 'migrate' | 'seed' | 'reset' {
+  return operation === 'migrate' || operation === 'seed' || operation === 'reset';
+}
+
+export function commandDetails(output: CommandOutput): string {
+  return output.stderr.trim() || output.stdout.trim() || 'unknown Aspire error';
+}
+
+export function registerSignalAbort(abort: () => void): () => void {
+  const signals: Deno.Signal[] = Deno.build.os === 'windows' ? ['SIGINT'] : ['SIGINT', 'SIGTERM'];
+  for (const signal of signals) Deno.addSignalListener(signal, abort);
+  return () => {
+    for (const signal of signals) Deno.removeSignalListener(signal, abort);
+  };
+}
+
+/** Stop an ephemeral database-operation resource via Aspire CLI, logging a warning on failure. */
+export async function stopOperationResource(
+  executor: AspireCommandExecutor,
+  resourceName: string,
+  apphostPath: string,
+  aspireDir: string,
+): Promise<void> {
+  const output = await executor.output(
+    [
+      'resource',
+      resourceName,
+      'stop',
+      '--apphost',
+      apphostPath,
+      '--non-interactive',
+      '--nologo',
+    ],
+    { cwd: aspireDir },
+  );
+  if (output.code !== 0) {
+    outputWarning(
+      `Failed to stop database operation resource ${resourceName}: ${commandDetails(output)}`,
+    );
+  }
+}
+
+/** Stop a scoped standalone Aspire AppHost instance, logging a warning on failure. */
+export async function stopStandaloneAppHost(
+  executor: AspireCommandExecutor,
+  apphostPath: string,
+  aspireDir: string,
+): Promise<void> {
+  const output = await executor.output(
+    ['stop', '--apphost', apphostPath, '--non-interactive', '--nologo'],
+    { cwd: aspireDir },
+  );
+  if (output.code !== 0) {
+    outputWarning(
+      `Failed to stop standalone Aspire AppHost ${apphostPath}: ${commandDetails(output)}`,
+    );
+  }
 }

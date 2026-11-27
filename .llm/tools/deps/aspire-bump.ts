@@ -108,6 +108,21 @@ export function latestStableVersion(versions: readonly string[]): string | null 
   return stable.at(-1) ?? null;
 }
 
+export function highestCommonStableVersion(
+  packageVersionLists: readonly (readonly string[])[],
+): string | null {
+  if (packageVersionLists.length === 0) return null;
+  let common = new Set<string>(
+    packageVersionLists[0].filter((v) => STABLE_SEMVER_RE.test(v)),
+  );
+  for (const list of packageVersionLists.slice(1)) {
+    const stable = new Set(list.filter((v) => STABLE_SEMVER_RE.test(v)));
+    common = new Set<string>([...common].filter((v) => stable.has(v)));
+  }
+  if (common.size === 0) return null;
+  return [...common].sort(compareSemver).at(-1) ?? null;
+}
+
 export function latestBrowsersVersionForTrain(
   versions: readonly string[],
   trainVersion: string,
@@ -118,8 +133,16 @@ export function latestBrowsersVersionForTrain(
     .filter((v) => v.startsWith(`${trainVersion}-preview.`))
     .sort(compareSemver);
   if (trainPreviews.length > 0) return trainPreviews.at(-1) ?? null;
-  const anyValid = versions.filter((v) => ANY_SEMVER_RE.test(v)).sort(compareSemver);
-  return anyValid.at(-1) ?? null;
+  const [maj, min] = trainVersion.split('.');
+  const minorPrefix = `${maj}.${min}.`;
+  const sameMinor = versions
+    .filter((v) =>
+      ANY_SEMVER_RE.test(v) &&
+      v.startsWith(minorPrefix) &&
+      (STABLE_SEMVER_RE.test(v) || v.includes('-preview.'))
+    )
+    .sort(compareSemver);
+  return sameMinor.at(-1) ?? null;
 }
 
 async function fetchNugetVersions(packageId: string): Promise<readonly string[]> {
@@ -211,7 +234,7 @@ function transformWorkflow(source: string, targetVersion: string, path: string):
   );
   out = replaceRequired(
     out,
-    /(dotnet tool install Aspire\.Cli --tool-path "\$HOME\/\.aspire\/bin" --version )[^\s]+/g,
+    /(dotnet tool install Aspire\.Cli --tool-path "\$HOME\/\.dotnet\/aspire-cli" --version )[^\s]+/g,
     `$1${targetVersion}`,
     `${path} dotnet tool install Aspire.Cli`,
   );
@@ -292,18 +315,45 @@ export async function planOrApplyAspireBump(
     for (const [pkg, list] of stableResults) {
       nugetVersions[pkg] = latestStableVersion(list);
     }
-    if (!options.targetVersion) {
-      const commonStable = stableResults.map(([, list]) => latestStableVersion(list));
-      if (commonStable.some((v) => v === null)) {
-        throw new Error('One or more Aspire stable packages returned no stable NuGet version');
+    if (options.targetVersion) {
+      assertValidVersion(options.targetVersion, 'targetVersion', true);
+      const missing = stableResults
+        .filter(([, list]) => !list.includes(options.targetVersion!))
+        .map(([pkg]) => pkg);
+      if (missing.length > 0) {
+        throw new Error(
+          `Target Aspire version ${options.targetVersion} is missing from NuGet for: ${
+            missing.join(', ')
+          }`,
+        );
       }
-      // Choose the highest version present across every required stable package.
-      const sorted = [...new Set(commonStable as string[])].sort(compareSemver);
-      resolvedVersion = sorted[0];
+      resolvedVersion = options.targetVersion;
+    } else {
+      const common = highestCommonStableVersion(stableResults.map(([, list]) => list));
+      if (!common) {
+        throw new Error(
+          'No common stable NuGet version exists across all six Aspire stable packages',
+        );
+      }
+      resolvedVersion = common;
     }
+
     const browsersLatest = latestBrowsersVersionForTrain(browsersAll, resolvedVersion);
     nugetVersions[ASPIRE_PREVIEW_PACKAGE] = browsersLatest;
-    if (!options.targetBrowsersVersion && browsersLatest) {
+    if (options.targetBrowsersVersion) {
+      assertValidVersion(options.targetBrowsersVersion, 'targetBrowsersVersion', false);
+      if (!browsersAll.includes(options.targetBrowsersVersion)) {
+        throw new Error(
+          `Target ${ASPIRE_PREVIEW_PACKAGE} version ${options.targetBrowsersVersion} was not found on NuGet`,
+        );
+      }
+      resolvedBrowsersVersion = options.targetBrowsersVersion;
+    } else {
+      if (!browsersLatest) {
+        throw new Error(
+          `No compatible same-train ${ASPIRE_PREVIEW_PACKAGE} version found for ${resolvedVersion}`,
+        );
+      }
       resolvedBrowsersVersion = browsersLatest;
     }
   }
@@ -311,7 +361,7 @@ export async function planOrApplyAspireBump(
   assertValidVersion(resolvedVersion, 'targetVersion', true);
   assertValidVersion(resolvedBrowsersVersion, 'targetBrowsersVersion', false);
 
-  const updates: AspirePinUpdate[] = [];
+  const planned: Array<{ readonly absPath: string; readonly update: AspirePinUpdate }> = [];
   for (const relPath of ASPIRE_BUMP_ALLOWLIST) {
     const absPath = join(repoRoot, relPath);
     const before = await Deno.readTextFile(absPath);
@@ -336,11 +386,18 @@ export async function planOrApplyAspireBump(
         break;
     }
     const changed = before !== after;
-    if (apply && changed) {
-      await Deno.writeTextFile(absPath, after);
-    }
-    updates.push({ path: relPath, changed, before, after });
+    planned.push({ absPath, update: { path: relPath, changed, before, after } });
   }
+
+  if (apply) {
+    for (const item of planned) {
+      if (item.update.changed) {
+        await Deno.writeTextFile(item.absPath, item.update.after);
+      }
+    }
+  }
+
+  const updates = planned.map((item) => item.update);
 
   return {
     mode: apply ? 'apply' : 'dry-run',
@@ -356,7 +413,7 @@ export async function planOrApplyAspireBump(
   };
 }
 
-function parseCliArgs(argv: readonly string[]): {
+export function parseCliArgs(argv: readonly string[]): {
   help: boolean;
   apply: boolean;
   offline: boolean;
@@ -366,6 +423,7 @@ function parseCliArgs(argv: readonly string[]): {
 } {
   let help = false;
   let apply = false;
+  let dryRun = false;
   let offline = false;
   let json = false;
   let targetVersion: string | undefined;
@@ -373,8 +431,10 @@ function parseCliArgs(argv: readonly string[]): {
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
+    if (arg === '--') continue;
     if (arg === '--help' || arg === '-h') help = true;
     else if (arg === '--apply') apply = true;
+    else if (arg === '--dry-run') dryRun = true;
     else if (arg === '--offline') offline = true;
     else if (arg === '--json') json = true;
     else if (arg === '--pretty') json = false;
@@ -387,6 +447,9 @@ function parseCliArgs(argv: readonly string[]): {
     } else {
       throw new Error(`Unknown argument: ${arg}`);
     }
+  }
+  if (apply && dryRun) {
+    throw new Error('Cannot combine --apply and --dry-run');
   }
   return { help, apply, offline, json, targetVersion, targetBrowsersVersion };
 }

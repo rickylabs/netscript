@@ -186,7 +186,7 @@ async function interactWithHeadlessChromeForRefetch(
   });
 }
 
-async function withHeadlessChrome<T>(
+export async function withHeadlessChrome<T>(
   profileName: string,
   interact: (client: CdpClient) => Promise<T>,
 ): Promise<T> {
@@ -199,6 +199,7 @@ async function withHeadlessChrome<T>(
       '--disable-gpu',
       '--disable-dev-shm-usage',
       '--disable-background-networking',
+      '--ignore-certificate-errors',
       '--no-sandbox',
       `--remote-debugging-port=${port}`,
       `--user-data-dir=${profile}`,
@@ -225,7 +226,7 @@ async function withHeadlessChrome<T>(
   }
 }
 
-class CdpClient {
+export class CdpClient {
   readonly #socket: WebSocket;
   readonly #pending = new Map<number, {
     resolve: (value: unknown) => void;
@@ -352,10 +353,11 @@ async function waitForPageTarget(port: number): Promise<string> {
   throw new Error(`headless Chromium did not expose a page target at ${endpoint}`);
 }
 
-async function waitForEvaluation<T>(
+export async function waitForEvaluation<T>(
   client: CdpClient,
   expression: string,
   predicate: (value: T | undefined) => boolean,
+  label = 'generated island DOM state',
 ): Promise<T> {
   const started = Date.now();
   let lastValue: T | undefined;
@@ -365,9 +367,7 @@ async function waitForEvaluation<T>(
     await delay(50);
   }
   throw new Error(
-    `timed out waiting for generated island DOM state; last observation ${
-      JSON.stringify(lastValue)
-    }`,
+    `timed out waiting for ${label}; last observation ${JSON.stringify(lastValue)}`,
   );
 }
 

@@ -28,6 +28,11 @@ import {
   assertProcessDatabaseConnection,
   readProcessEnvironmentByPid,
 } from './credential-secret-surfaces.ts';
+import {
+  assertDashboardResourceDetailsMasked,
+  assertPrismaStudioDatabaseRead,
+  PRISMA_STUDIO_DEFAULT_URL,
+} from './dashboard-resource-masking.ts';
 
 export { assertNoSecretBytes } from './credential-secret-surfaces.ts';
 
@@ -197,7 +202,13 @@ export async function verifyCredentialRejection(
 
   // #2259 consumer & dashboard verification: redacted in describe/dashboard, live on Postgres port.
   const topology: unknown = JSON.parse(rawSnapshot);
-  const { postgresPort, prismaStudioPid } = assertConsumerConnectionStringsRedacted(topology);
+  const {
+    postgresPort,
+    prismaStudioPid,
+    usersResourceName,
+    prismaStudioResourceName,
+    prismaStudioUrl,
+  } = assertConsumerConnectionStringsRedacted(topology);
   const studioErrorFile = `${projectRoot}/database/postgres/.netscript-prisma-studio.error`;
   const studioErrorText = await Deno.readTextFile(studioErrorFile).then(
     (text) => text.trim(),
@@ -207,7 +218,10 @@ export async function verifyCredentialRejection(
     },
   );
   if (studioErrorText) {
-    throw new Error(`prisma-studio reported an error file diagnostic: ${studioErrorText}`);
+    assertNoSecretBytes('prisma-studio error file', studioErrorText, secrets);
+    throw new Error(
+      `prisma-studio reported an error file diagnostic (${studioErrorText.length} bytes; raw content withheld)`,
+    );
   }
   if (Deno.build.os !== 'linux') {
     throw new Error('prisma-studio live /proc/<pid>/environ proof requires Linux');
@@ -217,6 +231,10 @@ export async function verifyCredentialRejection(
   }
   const studioEnv = await readProcessEnvironmentByPid(prismaStudioPid);
   assertProcessDatabaseConnection(studioEnv, postgresPort, secrets[0], 'prisma-studio');
+  const studioReadReceipt = await assertPrismaStudioDatabaseRead(
+    prismaStudioUrl ?? PRISMA_STUDIO_DEFAULT_URL,
+    secrets,
+  );
 
   const studioLogs = await runAspire([
     'logs',
@@ -242,10 +260,20 @@ export async function verifyCredentialRejection(
     startMetadata.dashboardUrl,
     secrets,
   );
+  const dashboardDetailMasked = await assertDashboardResourceDetailsMasked(
+    startMetadata.dashboardUrl,
+    [
+      { label: 'users', resourceName: usersResourceName },
+      { label: 'prisma-studio', resourceName: prismaStudioResourceName },
+    ],
+    secrets,
+  );
   console.info(
     `#2259 proof: consumers=[users, prisma-studio] describe=redacted ` +
       `prismaStudioPid=${prismaStudioPid} postgresPort=${postgresPort} ` +
-      `dashboardApi=${dashboardApiScanned.join(',')}`,
+      `studioDb=${studioReadReceipt.databaseName} dashboardDetailsMasked=${
+        dashboardDetailMasked.join(',')
+      } dashboardApi=${dashboardApiScanned.join(',')}`,
   );
 
   const receiptDir = `${projectRoot}/.netscript/e2e`;
@@ -267,6 +295,8 @@ export async function verifyCredentialRejection(
             'healthReports / healthChecks',
             'MCP list_resources',
             'aspire dashboard api',
+            'aspire dashboard resource details ui',
+            'prisma-studio /bff query',
             'prisma-studio logs',
           ],
           consumerMasking: {
@@ -275,6 +305,8 @@ export async function verifyCredentialRejection(
             postgresPort,
             prismaStudioPid,
             prismaStudioErrorFileEmpty: true,
+            prismaStudioDatabaseRead: studioReadReceipt.databaseName,
+            dashboardDetailMasked,
             dashboardApiScanned,
           },
         },

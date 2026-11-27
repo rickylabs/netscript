@@ -37,13 +37,14 @@ Remove the legacy Node.js AppHost files from `aspire/`:
 rm -rf aspire/package.json aspire/tsconfig.apphost.json aspire/node_modules
 ```
 
-Update your root `deno.json` so Deno manages the AppHost as a workspace member and resolves the
-extensionless imports emitted by the Aspire TypeScript SDK:
+Update your root `deno.json` **preserving all existing `"workspace"` entries and `"unstable"`
+flags** (such as `"raw-imports"` and `"kv"`), adding `"./aspire"` to `"workspace"` and
+`"sloppy-imports"` to `"unstable"`:
 
 ```json
 {
-  "workspace": ["./aspire", "./packages/contracts", "./services/*", "./apps/*"],
-  "unstable": ["kv", "sloppy-imports"]
+  "workspace": ["./aspire", "./packages/contracts", "./database/*", "./services/*", "./apps/*"],
+  "unstable": ["raw-imports", "kv", "sloppy-imports"]
 }
 ```
 
@@ -62,6 +63,38 @@ Create `aspire/deno.json` (include `"pg"` when using a container PostgreSQL data
 }
 ```
 
+Update `aspire/aspire.config.json` to target the Aspire `17.0.0` SDK and integration packages
+(`netscript generate aspire` regenerates `apphost.mts` and `.helpers/*`, whereas
+`aspire/aspire.config.json` holds your SDK and NuGet pins):
+
+- Set `"sdk.version"` to `"17.0.0"` (replacing the prior SDK pin), preserving your existing `"profiles"` block.
+- Add `"Aspire.Hosting.JavaScript": "17.0.0"` under `"packages"` (required for first-party
+  `addDenoApp`).
+- Bump any configured database integrations (`"Aspire.Hosting.PostgreSQL"`,
+  `"Aspire.Hosting.MySql"`, `"Aspire.Hosting.SqlServer"`) to `"17.0.0"` and set
+  `"Aspire.Hosting.Browsers"` to `"17.0.0-preview.1.26567.5"`.
+- Remove retired `"Aspire.Hosting.Redis"` or `"Aspire.Hosting.Garnet"` entries from `"packages"`
+  (NetScript `0.0.10` models caches with core SDK primitives).
+
+Example updated `aspire/aspire.config.json` (include only the database package matching your
+workspace):
+
+```json
+{
+  "appHost": {
+    "path": "apphost.mts",
+    "language": "typescript/nodejs"
+  },
+  "sdk": {
+    "version": "17.0.0"
+  },
+  "packages": {
+    "Aspire.Hosting.JavaScript": "17.0.0",
+    "Aspire.Hosting.Browsers": "17.0.0-preview.1.26567.5"
+  }
+}
+```
+
 Then regenerate the AppHost helpers and restore the Aspire 17.0.0 SDK modules:
 
 ```bash
@@ -72,9 +105,9 @@ netscript generate aspire
 ## 3. Preserve pre-existing container SQL Server passwords
 
 Aspire 17.0.0 NetScript workspaces generate complexity-safe passwords for container databases and
-persist them atomically under `.data/aspire-secrets/<name>.password`. If you have an existing
-SQL Server data volume initialized with a previous password, hand that password off before your
-first `aspire start` using either method:
+persist them atomically under `.data/aspire-secrets/<name>.password`. If you have an existing SQL
+Server data volume initialized with a previous password, hand that password off before your first
+`aspire start` using either method:
 
 1. **Secret file (recommended):** write the existing password to
    `.data/aspire-secrets/<resource-name>.password` with mode `0600` (`chmod 600`), **or**

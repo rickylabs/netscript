@@ -186,24 +186,78 @@ Deno.test('applyDenoPermissions maps granular permissions, watch, unstable, and 
     ['allowAll', { enabled: true }],
     ['watch', { hmr: false }],
   ]);
+
+  calls.length = 0;
+  await applyDenoPermissions(target, [
+    '-A',
+    '--allow-net',
+    '--deny-read=/etc/shadow',
+    '--deny-write',
+  ]);
+  assertEquals(calls, [
+    ['allowAll', { enabled: true }],
+    ['deny', 'Read', ['/etc/shadow']],
+    ['deny', 'Write', []],
+  ]);
+
+  calls.length = 0;
+  await applyDenoPermissions(target, ['--allow-all', '--deny-env=SECRET']);
+  assertEquals(calls, [
+    ['allowAll', { enabled: true }],
+    ['deny', 'Env', ['SECRET']],
+  ]);
+
+  // Verify `deno run` (unlike `deno eval`) enforces explicit --deny-read when combined with -A.
+  const deniedFile = join(root, 'denied-secret.txt');
+  const probeScript = join(root, 'deny-read-probe.ts');
+  await Deno.writeTextFile(deniedFile, 'secret');
+  await Deno.writeTextFile(
+    probeScript,
+    'try {\n  Deno.readTextFileSync(Deno.args[0]);\n  console.log("ALLOWED");\n} catch (e) {\n  console.log(e instanceof Error ? e.name : String(e));\n  Deno.exit(42);\n}\n',
+  );
+  const probe = await new Deno.Command(Deno.execPath(), {
+    args: [
+      'run',
+      '-A',
+      `--deny-read=${deniedFile}`,
+      probeScript,
+      deniedFile,
+    ],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  assertEquals(probe.code, 42);
+  assertMatch(new TextDecoder().decode(probe.stdout), /NotCapable|PermissionDenied/);
 });
-Deno.test('ensureDatabasePassword creates atomic complexity-safe passwords, honors env handoff, and reuses existing files', async () => {
+Deno.test('ensureDatabasePassword creates atomic complexity-safe passwords across concurrent processes, honors env handoff, and reuses existing files', async () => {
   const appHostDir = join(root, 'db-passwords');
   await Deno.mkdir(appHostDir, { recursive: true });
 
-  const [a, b, c] = await Promise.all([
-    Promise.resolve().then(() =>
-      ensureDatabasePassword(appHostDir, 'mssql', { requireComplexity: true })
+  const workerScript =
+    `import { ensureDatabasePassword } from ${JSON.stringify(toFileUrl(generatedPath).href)};\n` +
+    `console.log(ensureDatabasePassword(Deno.args[0], 'mssql', { requireComplexity: true }));`;
+  const results = await Promise.all(
+    [0, 1, 2, 3].map(() =>
+      new Deno.Command(Deno.execPath(), {
+        args: ['eval', workerScript, appHostDir],
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output()
     ),
-    Promise.resolve().then(() =>
-      ensureDatabasePassword(appHostDir, 'mssql', { requireComplexity: true })
-    ),
-    Promise.resolve().then(() =>
-      ensureDatabasePassword(appHostDir, 'mssql', { requireComplexity: true })
-    ),
-  ]);
+  );
+  const decoder = new TextDecoder();
+  const passwords = results.map((res, index) => {
+    assertEquals(
+      res.code,
+      0,
+      `worker ${index} failed (${res.code}): ${decoder.decode(res.stderr)}`,
+    );
+    return decoder.decode(res.stdout).trim();
+  });
+  const [a, b, c, d] = passwords;
   assertEquals(a, b);
   assertEquals(b, c);
+  assertEquals(c, d);
   assertEquals(a.length, 32);
   assertMatch(a, /[A-Z]/);
   assertMatch(a, /[a-z]/);
