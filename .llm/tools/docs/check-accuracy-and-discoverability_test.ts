@@ -23,6 +23,8 @@ Deno.test('Aspire scaffold docs track the live CLI version pins', async () => {
   ]);
 
   checkAspireScaffoldVersionDocs(explanation, deployLocal);
+  assertEquals(explanation.includes('17.0.0'), true);
+  assertEquals(deployLocal.includes('17.0.0'), true);
   assertThrows(
     () => checkAspireScaffoldVersionDocs(`${explanation}\n13.5.3`, deployLocal),
     Error,

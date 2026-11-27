@@ -77,7 +77,7 @@ async function seedLegacyWorkspace(root: string, shape: LegacyShape): Promise<vo
       null,
       2,
     ) + '\n',
-    'aspire/aspire.config.json': JSON.stringify({ sdk: { version: '13.5.3' } }, null, 2) + '\n',
+    'aspire/aspire.config.json': JSON.stringify({ sdk: { version: '17.0.0' } }, null, 2) + '\n',
   };
   if (shape === 'coexisting-package-and-deno-json') {
     files['aspire/deno.json'] = JSON.stringify({ imports: {} }, null, 2) + '\n';

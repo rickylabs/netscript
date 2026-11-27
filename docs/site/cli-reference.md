@@ -118,7 +118,7 @@ Every `init` flag — including `--app-name`, `--no-git`, `--force`, `--json`, a
 
 ## Aspire orchestration CLI
 
-Run these Aspire CLI (13.5.3) commands from inside the `aspire/` folder:
+Run these Aspire CLI (17.0.0) commands from inside the `aspire/` folder:
 
 {{ comp.apiTable({
   caption: "Aspire orchestration commands",
