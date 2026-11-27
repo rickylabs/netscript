@@ -21,13 +21,13 @@ import { verifyGeneratedCrudAcceptance } from './verify-live-db-endpoint.ts';
 const COMMAND_CEILING_MS = 330_000;
 const DEFAULT_ASPIRE_START_TIMEOUT_SECONDS = 300;
 const DIAG = {
-  describeStderr: 250,
-  ps: 200,
-  seed: 300,
-  stream: 300,
-  startCmd: 250,
-  seedCmd: 350,
-  detachLog: 1_900,
+  describeStderr: 150,
+  ps: 80,
+  seed: 200,
+  stream: 200,
+  startCmd: 120,
+  seedCmd: 120,
+  detachLog: 2_400,
   leewayMs: 10_000,
   psTimeoutMs: 15_000,
 } as const;
@@ -241,10 +241,20 @@ async function captureDetachLogTail(
   for (const path of [...new Set([...explicit, ...detachFiles])]) {
     try {
       const redacted = redactAspireTokens(await Deno.readTextFile(path)).trim();
-      if (redacted) {
-        const prefix = `${path} => `;
-        return `${prefix}${redacted.slice(-Math.max(0, DIAG.detachLog - prefix.length))}`;
-      }
+      if (!redacted) continue;
+      const compact = redacted
+        .replace(
+          /\[\d{4}-\d{2}-\d{2} (\d{2}:\d{2}:\d{2}\.\d{3})\] \[DBUG\] \[PrebuiltAppHostServer\] PrebuiltAppHostServer\(\d+\) /g,
+          '[$1 Host] ',
+        )
+        .replace(/\[\d{4}-\d{2}-\d{2} (\d{2}:\d{2}:\d{2}\.\d{3})\] /g, '[$1] ');
+      const prefix = `${path.split('/').at(-1) ?? path} => `;
+      const shutdownIdx = compact.lastIndexOf('Application is shutting down');
+      const budget = Math.max(0, DIAG.detachLog - prefix.length);
+      const logSlice = shutdownIdx > 0
+        ? compact.slice(Math.max(0, shutdownIdx - Math.max(0, budget - 80)), shutdownIdx + 80)
+        : compact.slice(-budget);
+      return `${prefix}${logSlice}`;
     } catch { /* Try next log candidate */ }
   }
   const recent = scanned.slice(0, 5).map((entry) => entry.path);
@@ -419,31 +429,26 @@ async function runVariant(
     if (beforeSeedPid === undefined || beforeSeedPid !== afterSeedPid) {
       throw new Error('Workers restarted between seed and acceptance');
     }
+    const failedErrors = [
+      !seed.passed ? seed.error : undefined,
+      !stream.passed ? stream.error : undefined,
+    ].filter(Boolean);
     if (variant === 'skip-seed-handoff') {
       if (seed.passed || !(seed.error instanceof SeedHandoffAcceptanceError) || !stream.passed) {
         throw new AggregateError(
-          [!seed.passed ? seed.error : undefined, !stream.passed ? stream.error : undefined].filter(
-            Boolean,
-          ),
+          failedErrors,
           `Seed control did not isolate the missing handoff (seed=${seed.passed}, activity=${stream.passed})`,
         );
       }
     } else if (variant === 'drop-link') {
       if (!seed.passed || stream.passed || !(stream.error instanceof StreamLinkAcceptanceError)) {
         throw new AggregateError(
-          [!seed.passed ? seed.error : undefined, !stream.passed ? stream.error : undefined].filter(
-            Boolean,
-          ),
+          failedErrors,
           `Link control did not isolate the missing stream link (seed=${seed.passed}, activity=${stream.passed})`,
         );
       }
     } else if (!seed.passed || !stream.passed) {
-      throw new AggregateError(
-        [!seed.passed ? seed.error : undefined, !stream.passed ? stream.error : undefined].filter(
-          Boolean,
-        ),
-        'The restored documented scaffold failed acceptance',
-      );
+      throw new AggregateError(failedErrors, 'The restored documented scaffold failed acceptance');
     }
     console.info(JSON.stringify({
       variant,
