@@ -5,10 +5,12 @@ const destination = join(repo, '.agents', 'generated', 'consumer-skills');
 const check = Deno.args.includes('--check');
 
 await Deno.mkdir(join(repo, '.llm', 'tmp'), { recursive: true });
-const generated = await Deno.makeTempDir({
+const tempParent = await Deno.makeTempDir({
   dir: join(repo, '.llm', 'tmp'),
   prefix: 'dogfood-consumer-skills-',
 });
+const generated = join(tempParent, 'consumer-skills');
+await Deno.mkdir(generated);
 
 try {
   await generate(generated);
@@ -30,7 +32,7 @@ try {
     console.log(`Consumer agent bundle installed at ${destination}`);
   }
 } finally {
-  await removeIfPresent(generated);
+  await removeIfPresent(tempParent);
 }
 
 async function generate(projectRoot: string): Promise<void> {
