@@ -68,15 +68,15 @@ entry point `aspire start` executes. It builds an Aspire builder, hands it your 
   {
     label: "aspire/aspire.config.json (generated)",
     lang: "json",
-    code: "{\n  \"appHost\": {\n    \"path\": \"apphost.mts\",\n    \"language\": \"typescript/nodejs\"\n  },\n  \"sdk\": {\n    \"version\": \"13.5.3\"\n  },\n  \"profiles\": {\n    \"https\": {\n      \"applicationUrl\": \"https://localhost:0;http://localhost:0\",\n      \"environmentVariables\": {\n        \"ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL\": \"http://localhost:0\",\n        \"ASPIRE_ALLOW_UNSECURED_TRANSPORT\": \"true\",\n        \"ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS\": \"true\",\n        \"ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL\": \"https://localhost:0\"\n      }\n    }\n  },\n  \"packages\": {\n    \"Aspire.Hosting.PostgreSQL\": \"13.5.3\",\n    \"Aspire.Hosting.Redis\": \"13.5.3\",\n    \"Aspire.Hosting.Browsers\": \"13.5.3-preview.1.26425.3\"\n  }\n}"
+    code: "{\n  \"appHost\": {\n    \"path\": \"apphost.mts\",\n    \"language\": \"typescript/nodejs\"\n  },\n  \"sdk\": {\n    \"version\": \"17.0.0\"\n  },\n  \"profiles\": {\n    \"https\": {\n      \"applicationUrl\": \"https://localhost:0;http://localhost:0\",\n      \"environmentVariables\": {\n        \"ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL\": \"http://localhost:0\",\n        \"ASPIRE_ALLOW_UNSECURED_TRANSPORT\": \"true\",\n        \"ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS\": \"true\",\n        \"ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL\": \"https://localhost:0\"\n      }\n    }\n  },\n  \"packages\": {\n    \"Aspire.Hosting.PostgreSQL\": \"17.0.0\",\n    \"Aspire.Hosting.JavaScript\": \"17.0.0\",\n    \"Aspire.Hosting.Browsers\": \"17.0.0-preview.1.26567.5\"\n  }\n}"
   }
 ] }) }}
 
 {{ comp callout { type: "note", title: "Scaffold version pins" } }}
-The current <code>netscript init</code> scaffold emits <code>13.5.3</code> for
+The current <code>netscript init</code> scaffold emits <code>17.0.0</code> for
 <code>sdk.version</code>, <code>Aspire.Hosting.PostgreSQL</code>, and
-<code>Aspire.Hosting.Redis</code>. It emits <code>Aspire.Hosting.Browsers</code> at
-<code>13.5.3-preview.1.26425.3</code>. The CLI and AppHost SDK must stay on the same release train.
+<code>Aspire.Hosting.JavaScript</code>. It emits <code>Aspire.Hosting.Browsers</code> at
+<code>17.0.0-preview.1.26567.5</code>. The CLI and AppHost SDK must stay on the same release train.
 {{ /comp }}
 
 {{ comp callout { type: "important", title: "Use the URL Aspire prints" } }}
@@ -432,7 +432,7 @@ The default path has three more trade-offs:
 - **Remote Docker daemons are unsupported.** `plugin doctor` exits with an error when the daemon
   is remote: published loopback ports belong to the daemon host, while the AppHost probes its own
   localhost. Use a local daemon or run the AppHost on the Docker host. Aspire's
-  [`AppHost:ContainerHostname`](https://github.com/microsoft/aspire/blob/v13.5.3/src/Aspire.Hosting/Dcp/DcpExecutor.cs)
+  [`AppHost:ContainerHostname`](https://github.com/microsoft/aspire/blob/v17.0.0/src/Aspire.Hosting/Dcp/DcpExecutor.cs)
   controls container-to-host discovery, not access to remote loopback-published ports.
 - **The wiring is implicit.** The two-pass reference resolution is invisible at authoring time, so
   inspect the generated environment variables and the resource graph when you debug service

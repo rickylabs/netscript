@@ -1,9 +1,10 @@
 /**
  * Checks manifest-owned Aspire literals against the scaffold SDK pin.
  *
- * Phase 1 fails only scaffold constants, CI, and root config. Phase 2 is the
- * complete non-archival enforcement contract and is intentionally not enabled
- * in CI until the S13 slice.
+ * Phase 1 enforces scaffold constants, CI, and root config (requiring every
+ * locked pin to be present and rejecting unauthorized 13.x / 17.x tokens).
+ * Phase 2 enforces the complete non-archival Aspire 17.0.0 contract across the
+ * tracked repository surface.
  */
 import { SCAFFOLD_VERSIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
 import { buildAspireSurfaceManifest } from './aspire-surface-manifest.ts';
@@ -14,7 +15,7 @@ export const ASPIRE_SURFACE_MANIFEST_PATH =
 
 export type ParityPhase = 1 | 2;
 export type FindingStatus = 'fail' | 'deferred' | 'info';
-export const PHASE_TWO_COMPAT_VERSION = '13.5.3';
+export const PHASE_TWO_COMPAT_VERSION = '17.0.0';
 
 export interface ManifestRow {
   path: string;
@@ -63,27 +64,57 @@ interface EvaluateOptions {
   generatedManifestUnmatched?: readonly string[];
 }
 
-const STALE_PATTERNS = [/13\.[0-4]\.[0-9]+/g, /Aspire 13\.[0-4]/g] as const;
+interface PhaseOnePinPolicy {
+  readonly allowed: readonly string[];
+  readonly required: readonly string[];
+}
+
+const STALE_PATTERNS = [/13\.[0-9]+\.[0-9]+/g, /Aspire 13\.[0-9]+/g] as const;
 const VERSION_LITERAL_PATTERN =
-  /(?<![0-9A-Za-z.])13\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?![0-9A-Za-z.-])/g;
+  /(?<![0-9A-Za-z.])(?:13|17)\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?![0-9A-Za-z-]|\.[0-9A-Za-z])/g;
+const SEVENTEEN_LITERAL_PATTERN =
+  /(?<![0-9A-Za-z.])17\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?![0-9A-Za-z-]|\.[0-9A-Za-z])/g;
+const ALLOWED_ASPIRE_17_VERSIONS: readonly string[] = [
+  '17.0.0',
+  '17.0.0-preview.1.26567.5',
+  '17.0.0-v1',
+];
+const ASPIRE_CONTEXT_LINE = /\baspire\b|Aspire\.Hosting|ASPIRE_SDK|ASPIRE_CLI|17\.0\.0-preview/i;
 
 export const EXACT_ASPIRE_VERSION_TOKEN_MATCH = (
   candidate: string,
   expectedVersion: string,
 ): boolean => candidate.trim() === expectedVersion.trim();
 
-const PHASE_ONE_EXACT_VERSIONS: Readonly<Record<string, readonly string[]>> = {
-  'packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts': ['13.5.3', '13.5.0'],
-  'packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts': [
-    '13.5.3',
-    '13.5.0',
-    '13.5.3-preview.1.26425.3',
-  ],
-  '.github/toolchain.env': ['13.5.3'],
-  '.github/scripts/aspire-nuget-cache-policy.test.ts': ['13.5.3', '13.5.3-v1'],
-  '.github/workflows/e2e-cli.yml': ['13.5.3', '13.5.3-v1'],
-  '.github/workflows/e2e-cli-prod.yml': ['13.5.3', '13.5.3-v1'],
-  '.github/workflows/e2e-cli-prod-local.yml': ['13.5.3', '13.5.3-v1'],
+export const PHASE_ONE_EXACT_VERSIONS: Readonly<Record<string, PhaseOnePinPolicy>> = {
+  'packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts': {
+    allowed: ['17.0.0'],
+    required: ['17.0.0'],
+  },
+  'packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts': {
+    allowed: ['17.0.0', '17.0.0-preview.1.26567.5'],
+    required: ['17.0.0', '17.0.0-preview.1.26567.5'],
+  },
+  '.github/toolchain.env': {
+    allowed: ['17.0.0'],
+    required: ['17.0.0'],
+  },
+  '.github/scripts/aspire-nuget-cache-policy.test.ts': {
+    allowed: ['17.0.0', '17.0.0-v1'],
+    required: ['17.0.0', '17.0.0-v1'],
+  },
+  '.github/workflows/e2e-cli.yml': {
+    allowed: ['17.0.0', '17.0.0-v1'],
+    required: ['17.0.0', '17.0.0-v1'],
+  },
+  '.github/workflows/e2e-cli-prod.yml': {
+    allowed: ['17.0.0', '17.0.0-v1'],
+    required: ['17.0.0', '17.0.0-v1'],
+  },
+  '.github/workflows/e2e-cli-prod-local.yml': {
+    allowed: ['17.0.0', '17.0.0-v1'],
+    required: ['17.0.0', '17.0.0-v1'],
+  },
 };
 
 /** Remove only syntax explicitly permitted by the manifest-owned context. */
@@ -93,7 +124,7 @@ function pinSource(source: string, className: string): string {
     // guard statement with an identifier input and literal/identifier location.
     // Unfamiliar syntax remains fail-closed.
     return source.replace(
-      /^(\s*forbidText\(\s*[A-Za-z_$][\w$]*\s*,\s*)(['"])(13\.[0-4]\.[0-9]+)\2(?=\s*,\s*(?:[A-Za-z_$][\w$]*|'[^'\r\n]*'|"[^"\r\n]*")\s*,?\s*\)\s*;\s*$)/gm,
+      /^(\s*forbidText\(\s*[A-Za-z_$][\w$]*\s*,\s*)(['"])(13\.[0-9]+\.[0-9]+)\2(?=\s*,\s*(?:[A-Za-z_$][\w$]*|'[^'\r\n]*'|"[^"\r\n]*")\s*,?\s*\)\s*;\s*$)/gm,
       '$1$2<forbidden version>$2',
     );
   }
@@ -108,15 +139,36 @@ function staleMatches(source: string, className: string): string[] {
 }
 
 function unexpectedPhaseOneVersions(path: string, source: string): string[] {
-  const allowed = PHASE_ONE_EXACT_VERSIONS[path];
-  if (!allowed) return [];
+  const policy = PHASE_ONE_EXACT_VERSIONS[path];
+  if (!policy) return [];
   return [
     ...new Set(
       [...source.matchAll(VERSION_LITERAL_PATTERN)]
         .map((match) => match[0])
-        .filter((version) => !allowed.includes(version)),
+        .filter((version) => !policy.allowed.includes(version)),
     ),
   ];
+}
+
+function missingPhaseOneVersions(path: string, source: string): string[] {
+  const policy = PHASE_ONE_EXACT_VERSIONS[path];
+  if (!policy) return [];
+  return policy.required.filter((requiredVersion) =>
+    !containsExactAspireVersionToken(source, requiredVersion)
+  );
+}
+
+function unexpectedContextualSeventeenVersions(source: string): string[] {
+  const found = new Set<string>();
+  for (const line of source.split(/\r?\n/)) {
+    if (!ASPIRE_CONTEXT_LINE.test(line)) continue;
+    for (const match of line.matchAll(SEVENTEEN_LITERAL_PATTERN)) {
+      if (!ALLOWED_ASPIRE_17_VERSIONS.includes(match[0])) {
+        found.add(match[0]);
+      }
+    }
+  }
+  return [...found];
 }
 
 function containsExactAspireVersionToken(source: string, expectedVersion: string): boolean {
@@ -210,31 +262,84 @@ export async function evaluateAspireVersionParity(
       }
       continue;
     }
-    const exactMismatches = options.phase === 1 ? unexpectedPhaseOneVersions(row.path, source) : [];
-    const matches = [...new Set([...staleMatches(source, row.class), ...exactMismatches])];
 
     if (row.owner === 'archival' || row.class.startsWith('archival:')) {
-      if (matches.length > 0) {
+      const archivalMatches = staleMatches(source, row.class);
+      if (archivalMatches.length > 0) {
         findings.push(
-          parityFinding(row, 'info', matches, 'archival owner is informational only'),
+          parityFinding(row, 'info', archivalMatches, 'archival owner is informational only'),
         );
       }
       continue;
     }
+
+    if (row.class === 'validation-test-fixture') {
+      if (options.phase === 2) {
+        const hasExpectedVersion = containsExactAspireVersionToken(
+          source,
+          PHASE_TWO_COMPAT_VERSION,
+        );
+        findings.push(parityFinding(
+          row,
+          hasExpectedVersion ? 'info' : 'fail',
+          hasExpectedVersion ? [] : [PHASE_TWO_COMPAT_VERSION],
+          hasExpectedVersion
+            ? `validation test fixture covers the required ${PHASE_TWO_COMPAT_VERSION} literal`
+            : `validation test fixture is missing the required ${PHASE_TWO_COMPAT_VERSION} literal`,
+        ));
+      }
+      continue;
+    }
+
+    const missingExactPins = missingPhaseOneVersions(row.path, source);
+    if (missingExactPins.length > 0) {
+      findings.push(parityFinding(
+        row,
+        'fail',
+        missingExactPins,
+        'required Aspire pin is missing from locked exact-pin surface',
+      ));
+    }
+
+    const exactMismatches = unexpectedPhaseOneVersions(row.path, source);
+    const contextualSeventeenMismatches = row.path in PHASE_ONE_EXACT_VERSIONS
+      ? []
+      : unexpectedContextualSeventeenVersions(source);
+    const matches = [
+      ...new Set([
+        ...staleMatches(source, row.class),
+        ...exactMismatches,
+        ...contextualSeventeenMismatches,
+      ]),
+    ];
 
     if (options.phase === 2 && row.class === 'compat-fixture') {
       const hasExpectedVersion = containsExactAspireVersionToken(
         source,
         PHASE_TWO_COMPAT_VERSION,
       );
-      findings.push(parityFinding(
-        row,
-        hasExpectedVersion ? 'info' : 'fail',
-        matches,
-        hasExpectedVersion
-          ? `compat fixture contains the required ${PHASE_TWO_COMPAT_VERSION} literal`
-          : `compat fixture is missing the required ${PHASE_TWO_COMPAT_VERSION} literal`,
-      ));
+      if (!hasExpectedVersion) {
+        findings.push(parityFinding(
+          row,
+          'fail',
+          matches.length > 0 ? matches : [PHASE_TWO_COMPAT_VERSION],
+          `compat fixture is missing the required ${PHASE_TWO_COMPAT_VERSION} literal`,
+        ));
+      } else if (matches.length > 0) {
+        findings.push(parityFinding(
+          row,
+          'fail',
+          matches,
+          `compat fixture contains stale or unauthorized Aspire literal alongside ${PHASE_TWO_COMPAT_VERSION}`,
+        ));
+      } else {
+        findings.push(parityFinding(
+          row,
+          'info',
+          [],
+          `compat fixture contains the required ${PHASE_TWO_COMPAT_VERSION} literal`,
+        ));
+      }
       continue;
     }
 
@@ -246,6 +351,8 @@ export async function evaluateAspireVersionParity(
       matches,
       exactMismatches.length > 0
         ? 'Aspire literal is outside the locked phase-1 pin policy'
+        : contextualSeventeenMismatches.length > 0
+        ? `unauthorized Aspire 17 literal conflicts with ${options.expectedVersion}`
         : fail
         ? `stale Aspire literal conflicts with ${options.expectedVersion}`
         : `stale Aspire literal is deferred to manifest owner ${row.owner}`,

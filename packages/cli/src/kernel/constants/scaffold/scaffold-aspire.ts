@@ -12,30 +12,22 @@ export const SCAFFOLD_ASPIRE_MODULES = {
 export const SCAFFOLD_ASPIRE_INTEGRATIONS = {
   POSTGRES: {
     PACKAGE_ID: 'Aspire.Hosting.PostgreSQL',
-    VERSION: '13.5.3',
+    VERSION: '17.0.0',
   },
   MYSQL: {
     PACKAGE_ID: 'Aspire.Hosting.MySql',
-    VERSION: '13.5.3',
+    VERSION: '17.0.0',
   },
   MSSQL: {
     PACKAGE_ID: 'Aspire.Hosting.SqlServer',
-    VERSION: '13.5.3',
+    VERSION: '17.0.0',
   },
-  REDIS: {
-    PACKAGE_ID: 'Aspire.Hosting.Redis',
-    VERSION: '13.5.3',
-  },
-  GARNET: {
-    PACKAGE_ID: 'Aspire.Hosting.Garnet',
-    VERSION: '13.5.3',
+  JAVASCRIPT: {
+    PACKAGE_ID: 'Aspire.Hosting.JavaScript',
+    VERSION: '17.0.0',
   },
   BROWSERS: {
     PACKAGE_ID: 'Aspire.Hosting.Browsers',
-    VERSION: '13.5.3-preview.1.26425.3',
-  },
-  DENO_KV: {
-    PACKAGE_ID: 'CommunityToolkit.Aspire.Hosting.Deno',
-    VERSION: '13.5.0',
+    VERSION: '17.0.0-preview.1.26567.5',
   },
 } as const;

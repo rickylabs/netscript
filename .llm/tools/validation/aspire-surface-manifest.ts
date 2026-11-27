@@ -120,16 +120,22 @@ const RULES: readonly Rule[] = [
       'inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6',
   },
   {
-    // The parity checker's own test data and the compat-fixture test both MUST contain old
-    // literals — that is what they assert against. Classifying them by their directory made the
-    // raw sweep flag its own enforcement mechanism.
+    // The parity checker, compat-fixture test, and aspire-bump test suites intentionally hold
+    // synthetic stale literals to assert rejection; phase 2 requires 17.0.0 coverage in them.
     test: re(
-      /^\.llm\/tools\/validation\/(check-aspire-version-parity_test|check-compat-fixtures_test)\.ts$/,
+      /^\.llm\/tools\/(validation\/(check-aspire-version-parity_test|check-compat-fixtures_test)|deps\/aspire-bump_test)\.ts$/,
     ),
-    cls: 'compat-fixture',
-    owner: 'S7/S13',
+    cls: 'validation-test-fixture',
+    owner: 'S1',
     disposition:
-      'validation test data: the 13.4.6 literals are fixtures the parity/compat checkers assert on, kept beside their 13.5.3 cases; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6',
+      'validation test data asserting stale-version rejection alongside current 17.0.0 assertions; phase 2 asserts 17.0.0 coverage',
+  },
+  {
+    test: (p) => p === '.llm/tools/deps/aspire-bump.ts',
+    cls: 'tooling:aspire-bump',
+    owner: 'S1',
+    disposition:
+      'allowlisted 7-file Aspire pin bumper and NuGet version checker; parity phase 2 enforce',
   },
   {
     test: re(/^\.llm\/tools\/maint\/teardown\/__fixtures__\/README\.md$/),

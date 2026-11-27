@@ -52,6 +52,8 @@ path	class	owner	disposition
 .llm/tools/CLEANUP-PLAYBOOK.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/consumer-README.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/consumer-tools.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/deps/aspire-bump_test.ts	validation-test-fixture	S1	validation test data asserting stale-version rejection alongside current 17.0.0 assertions; phase 2 asserts 17.0.0 coverage
+.llm/tools/deps/aspire-bump.ts	tooling:aspire-bump	S1	allowlisted 7-file Aspire pin bumper and NuGet version checker; parity phase 2 enforce
 .llm/tools/docs/app-router-support_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-accuracy-and-discoverability_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-accuracy-and-discoverability.ts	negative-version-guard	S7/S13	negative docs enforcement: retain only direct forbidText second-argument version literals, enforce all other references
@@ -107,9 +109,9 @@ path	class	owner	disposition
 .llm/tools/validation/check-aspire-host-ports.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/check-aspire-resource-polling_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/check-aspire-resource-polling.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
-.llm/tools/validation/check-aspire-version-parity_test.ts	compat-fixture	S7/S13	validation test data: the 13.4.6 literals are fixtures the parity/compat checkers assert on, kept beside their 13.5.3 cases; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
+.llm/tools/validation/check-aspire-version-parity_test.ts	validation-test-fixture	S1	validation test data asserting stale-version rejection alongside current 17.0.0 assertions; phase 2 asserts 17.0.0 coverage
 .llm/tools/validation/check-aspire-version-parity.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
-.llm/tools/validation/check-compat-fixtures_test.ts	compat-fixture	S7/S13	validation test data: the 13.4.6 literals are fixtures the parity/compat checkers assert on, kept beside their 13.5.3 cases; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
+.llm/tools/validation/check-compat-fixtures_test.ts	validation-test-fixture	S1	validation test data asserting stale-version rejection alongside current 17.0.0 assertions; phase 2 asserts 17.0.0 coverage
 .llm/tools/validation/check-scaffold-versions.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/fixtures/aspire-surface-manifest.tsv	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/fresh-ui-quality_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus

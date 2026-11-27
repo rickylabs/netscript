@@ -24,9 +24,6 @@ import { SCAFFOLD_VERSIONS } from '../../../packages/cli/src/kernel/constants/sc
 /** Keys whose pins feed the Aspire/.NET scaffold surface (LD-7 scope). */
 const ASPIRE_KEYS = new Set<string>([
   'ASPIRE_SDK',
-  'ASPIRE_HOSTING_DENO',
-  'ASPIRE_HOSTING_SQLITE',
-  'SCALAR_ASPIRE',
 ]);
 
 interface Args {

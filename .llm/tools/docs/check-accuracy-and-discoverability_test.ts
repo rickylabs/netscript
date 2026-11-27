@@ -23,6 +23,16 @@ Deno.test('Aspire scaffold docs track the live CLI version pins', async () => {
   ]);
 
   checkAspireScaffoldVersionDocs(explanation, deployLocal);
+  assertThrows(
+    () => checkAspireScaffoldVersionDocs(`${explanation}\n13.5.3`, deployLocal),
+    Error,
+    '13.5.3',
+  );
+  assertThrows(
+    () => checkAspireScaffoldVersionDocs(explanation, `${deployLocal}\n13.5.3`),
+    Error,
+    '13.5.3',
+  );
 });
 
 Deno.test('detached-start page documents dashboard discovery and token redaction (#1642)', async () => {
