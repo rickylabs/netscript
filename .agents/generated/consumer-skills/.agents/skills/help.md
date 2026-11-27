@@ -4,7 +4,7 @@ A symptom-to-action playbook for the non-deterministic problems: things that han
 silently do nothing. **Reach for this before you start guessing**, and before you conclude the
 framework is broken.
 
-Aspire-specific commands here were re-verified against **Aspire CLI 13.5.3**; see the receipt index
+Aspire-specific commands here were verified against **Aspire CLI 17.0.0**; see the receipt index
 in `aspire/SKILL.md`. Where a command does not exist, this file says so.
 
 > **The one rule this file exists to teach.** In the last round five agents lost hours to problems
