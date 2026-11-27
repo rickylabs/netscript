@@ -1,27 +1,19 @@
 # Aspire CLI fixtures
 
-Aspire-shaped test data is versioned so adapter compatibility remains explicit. Never replace an
-older case when a newer CLI is captured.
+Aspire-shaped test data targets the pinned Aspire release (**17.0.0**).
 
-## Aspire 13.5.3 describe fixture
+## Aspire 17.0.0 describe fixture
 
-- Capture date: 2026-08-29
-- CLI/SDK version: 13.5.3
+- Capture date: 2026-11-27
+- CLI/SDK version: `17.0.0+2d325b13709752ba6d9a943635c5e2940a2530c0`
 - Command: `aspire describe --apphost <exact-apphost-path> --format Json --non-interactive --nologo`
-- Source receipt:
-  `origin/test/aspire-13-5-s2-runtime-verification:.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/02-v5-aspire-describe-final.json`
-- Inline fixture: `../service-endpoint-source-fixtures.ts`
+- Inline fixture: `../service-endpoint-source-fixtures.ts` (`ASPIRE_DESCRIBE_17_0_0_FIXTURE`)
 
-S2 captured the describe JSON without a banner because the command used `--nologo`. The independent
-13.5.3 inline snapshot therefore remains bannerless; the retained 13.4.6 banner case continues to
-exercise legacy noise tolerance and DCP-suffix fallback separately.
+The `17.0.0` inline snapshot is bannerless (captured with `--nologo`) and records the live native
+Deno AppHost shape (`resourceTypeDisplayName: "Deno"`, `resource.launchConfigurationType: "deno"`,
+`OTEL_RESOURCE_ATTRIBUTES` carrying both `service.version` and `service.instance.id`). The separate
+`ASPIRE_DESCRIBE_FIXTURE` exercises leading-banner noise tolerance and DCP-suffix fallback.
 
-The inline snapshot selects the receipt's `users` resource and retains its top-level
-`{ resources: [...] }` shape, URL entry, string-valued environment, resource metadata, health
-report, and commands. It intentionally omits the receipt keys `creationTimestamp`, `startTimestamp`,
-`source`, `exitCode`, and `stopTimestamp`. Nested properties and environment are trimmed to
-representative adapter inputs; the worktree path, process ID, certificate path, and sensitive
-environment values are deterministic or `REDACTED`.
-
-Dashboard telemetry envelope provenance is documented separately in `telemetry/README.md`; a CLI
-describe receipt is not a substitute for those dashboard API captures.
+Worktree paths, PIDs, certificate paths, and sensitive environment values are deterministic or
+`REDACTED`. Dashboard telemetry envelope provenance is documented separately in
+`telemetry/README.md`.

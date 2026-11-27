@@ -1,5 +1,5 @@
-/** Aspire 13.4.6-style describe output with banner noise and top-level resources. */
-export const ASPIRE_DESCRIBE_FIXTURE = `Aspire CLI 13.4.6
+/** Generic banner-prefixed describe output exercising leading-banner noise tolerance. */
+export const ASPIRE_DESCRIBE_FIXTURE = `Aspire CLI 17.0.0
 {
   "resources": [
     {
@@ -21,39 +21,50 @@ export const ASPIRE_DESCRIBE_FIXTURE = `Aspire CLI 13.4.6
   ]
 }`;
 
-/** Bannerless Aspire 13.5.3 describe snapshot derived from the S2 V5 receipt. */
-export const ASPIRE_DESCRIBE_13_5_3_FIXTURE: string = `{
+/** Bannerless Aspire 17.0.0 describe snapshot captured from a live native-Deno AppHost. */
+export const ASPIRE_DESCRIBE_17_0_0_FIXTURE: string = `{
   "resources": [
     {
-      "name": "users-yvbcumea",
+      "name": "users-aqctbjac",
       "displayName": "users",
       "resourceType": "Executable",
+      "resourceTypeDisplayName": "Deno",
       "state": "Running",
       "healthStatus": "Healthy",
-      "dashboardUrl": "https://localhost:42501/?resource=users-yvbcumea",
+      "dashboardUrl": "https://localhost:35797/?resource=users-aqctbjac",
       "relationships": [
-        { "type": "Reference", "resourceName": "aspire-13-5-postgres-db" },
-        { "type": "WaitFor", "resourceName": "aspire-13-5-postgres-db" }
+        { "type": "Reference", "resourceName": "cap-web-sddmysmn" }
       ],
-      "urls": [{ "name": "http", "url": "http://localhost:3001" }],
+      "urls": [{ "name": "http", "url": "http://localhost:45215" }],
       "volumes": [],
       "properties": {
         "executable.path": "deno",
         "executable.pid": 4312,
         "executable.workDir": "/project/services/users",
-        "resource.appArgs": ["run", "--allow-net", "src/main.ts"],
-        "resource.appArgsSensitivity": [0, 0, 0]
+        "resource.appArgs": [
+          "run",
+          "--allow-net",
+          "--allow-read",
+          "--allow-env",
+          "--node-modules-dir=none",
+          "--minimum-dependency-age=0",
+          "src/main.ts"
+        ],
+        "resource.appArgsSensitivity": [0, 0, 0, 0, 0, 0, 0],
+        "resource.launchConfigurationType": "deno"
       },
       "environment": {
-        "DATABASE_PROVIDER": "postgres",
+        "DATABASE_PROVIDER": "sqlite",
         "DATABASE_URL": "REDACTED",
-        "DB_PROVIDER": "postgres",
-        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:42043",
-        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=yvbcumea",
+        "DB_PROVIDER": "sqlite",
+        "NETSCRIPT_CORS_ORIGINS": "http://localhost:36775",
+        "OTEL_DENO": "true",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:41791",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.version=1.0.0,service.instance.id=aqctbjac",
         "OTEL_SERVICE_NAME": "users",
-        "PORT": "43515",
-        "POSTGRES_URI": "REDACTED",
-        "SSL_CERT_DIR": "/tmp/aspire-dcp-REDACTED/users-yvbcumea/certs:/usr/lib/ssl/certs"
+        "PORT": "25603",
+        "SQLITE_URI": "REDACTED",
+        "SSL_CERT_DIR": "/tmp/aspire-dcp-REDACTED/users-aqctbjac/certs:/usr/lib/ssl/certs"
       },
       "healthReports": {
         "users_http_/health_200_check": { "status": "Healthy" }

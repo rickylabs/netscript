@@ -10,13 +10,9 @@ import { createResolvedTelemetryQuery } from '../src/infrastructure/telemetry/te
 import { validateSchema } from '../src/domain/schema.ts';
 import { TOOL_OUTPUT_SCHEMAS } from '../src/domain/tool-contracts.ts';
 import {
-  aspireDashboardResourcesFixture,
-  aspireDashboardSpansFixture,
-} from './fixtures/telemetry/aspire-13.4.6-fixture.ts';
-import {
-  aspireDashboardResources1353Fixture,
-  aspireDashboardSpans1353Fixture,
-} from './fixtures/telemetry/aspire-13.5.3-fixture.ts';
+  aspireDashboardResources1700Fixture,
+  aspireDashboardSpans1700Fixture,
+} from './fixtures/telemetry/aspire-17.0.0-fixture.ts';
 
 function jsonResponse(value: unknown): Response {
   return new Response(JSON.stringify(value), {
@@ -37,16 +33,6 @@ function createFixtureFetch(resourcesFixture: unknown, spansFixture: unknown): t
   };
 }
 
-// See fixtures/telemetry/README.md § "Current capture". This brief-scoped relay capture omitted
-// database.codegen and the streams plugin, so it has only the trigger producer trace: no worker
-// consumer/job.execute span, listed run, or last-job result. The `service.name === "workers"`
-// assertion is satisfied by workers-api's @hono/otel span attribute, not a worker-runtime span.
-const ASPIRE_1353_CAPTURED_WITHOUT_CONSUMER = {
-  workerSpanKind: 'producer',
-  listedRunCount: 0,
-  jobFound: false,
-} as const;
-
 async function assertCapturedTelemetryShape(options: {
   resourcesFixture: unknown;
   spansFixture: unknown;
@@ -66,6 +52,7 @@ async function assertCapturedTelemetryShape(options: {
   assertEquals(spans.length, options.spanCount);
   assertEquals(resources.length, options.resourceCount);
   assert(spans.some((span) => span.attributes['service.name'] === 'workers'));
+  assert(spans.some((span) => span.attributes['service.version'] === '1.0.0'));
   assert(spans.some((span) => span.kind === options.workerSpanKind));
   assert(resources.some((resource) => resource.serviceInstanceId !== undefined));
 
@@ -97,26 +84,15 @@ async function assertCapturedTelemetryShape(options: {
   assert((await createAnalyzeDbBottlenecksFlow(query, () => options.captureNow)({})).ok);
 }
 
-Deno.test('MCP adapter and telemetry flows consume the captured Aspire 13.4.6 shape', async () => {
+Deno.test('MCP adapter and telemetry flows consume the captured Aspire 17.0.0 shape', async () => {
   await assertCapturedTelemetryShape({
-    resourcesFixture: aspireDashboardResourcesFixture,
-    spansFixture: aspireDashboardSpansFixture,
+    resourcesFixture: aspireDashboardResources1700Fixture,
+    spansFixture: aspireDashboardSpans1700Fixture,
     spanCount: 17,
     resourceCount: 11,
     workerSpanKind: 'consumer',
     captureNow: 1_784_264_560_000,
     listedRunCount: 2,
     jobFound: true,
-  });
-});
-
-Deno.test('MCP adapter and telemetry flows consume the captured Aspire 13.5.3 shape', async () => {
-  await assertCapturedTelemetryShape({
-    resourcesFixture: aspireDashboardResources1353Fixture,
-    spansFixture: aspireDashboardSpans1353Fixture,
-    spanCount: 29,
-    resourceCount: 4,
-    captureNow: 1_788_114_300_000,
-    ...ASPIRE_1353_CAPTURED_WITHOUT_CONSUMER,
   });
 });
