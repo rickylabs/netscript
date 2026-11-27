@@ -1,10 +1,11 @@
 import { join } from '@std/path';
 import { createLiveAspireTelemetryQuery } from './aspire-dashboard-telemetry.ts';
+import { requireResourceProcesses, scanResourceProcesses } from './service-env/process-evidence.ts';
 
 interface EndpointReceipt {
   readonly allocation: 'first' | 'second';
   readonly postgresUrl: string;
-  readonly usersDatabaseUrl: string;
+  readonly usersDatabaseUrl: string | null;
 }
 
 interface DatabaseEndpointPortComparison {
@@ -80,9 +81,18 @@ async function verifyLiveDbEndpoint(): Promise<void> {
     database,
   );
   if (!liveSecondEndpoint.ok) throw new Error(liveSecondEndpoint.error);
-  const liveUsersDatabaseUrl = assertLiveUsersDatabaseAuthority(
+  const usersDir = join(projectRoot, 'services', 'users');
+  const liveUsersDatabaseUrl = await resolveLiveUsersDatabaseAuthority(
     liveTopology,
     liveSecondEndpoint.livePostgresUrl,
+    async () => {
+      const processes = requireResourceProcesses(
+        await scanResourceProcesses(usersDir, 'users'),
+        'users',
+        usersDir,
+      );
+      return processes.map((process) => process.environment.get('DATABASE_URL'));
+    },
   );
 
   const usersUrl = liveHttpUrl(liveTopology, 'users');
@@ -104,8 +114,8 @@ async function verifyLiveDbEndpoint(): Promise<void> {
     receiptPath,
     JSON.stringify(
       {
-        first,
-        second,
+        first: redactEndpointReceipt(first),
+        second: redactEndpointReceipt(second),
         liveSecondPostgresUrl: liveSecondEndpoint.livePostgresUrl,
         liveUsersDatabaseUrl,
         health: JSON.parse(healthBody),
@@ -239,11 +249,66 @@ async function readReceipt(allocation: 'first' | 'second'): Promise<EndpointRece
 }
 
 function assertDatabaseAuthority(receipt: EndpointReceipt): void {
+  if (receipt.usersDatabaseUrl === null) {
+    if (databasePort(receipt.postgresUrl) === undefined) {
+      throw new Error(
+        `${receipt.allocation} could not parse live Postgres port from ${
+          JSON.stringify(receipt.postgresUrl)
+        }`,
+      );
+    }
+    return;
+  }
+  const safeUsersUrl = redactDatabaseConnectionUrl(receipt.usersDatabaseUrl);
   const comparison = compareDatabaseEndpointPorts(
     receipt.postgresUrl,
-    receipt.usersDatabaseUrl,
+    safeUsersUrl,
   );
   if (!comparison.ok) throw new Error(`${receipt.allocation} ${comparison.error}`);
+}
+
+function redactEndpointReceipt(receipt: EndpointReceipt): EndpointReceipt {
+  return {
+    ...receipt,
+    usersDatabaseUrl: receipt.usersDatabaseUrl === null
+      ? null
+      : redactDatabaseConnectionUrl(receipt.usersDatabaseUrl),
+  };
+}
+
+/**
+ * Strip embedded credentials and query params from a PostgreSQL connection string
+ * while preserving the endpoint host, port, and database name for diagnostics/receipts.
+ */
+export function redactDatabaseConnectionUrl(connection: string): string {
+  const value = unquoteConnectionValue(connection);
+  try {
+    const url = new URL(value);
+    if (url.protocol && url.host) {
+      url.username = '';
+      url.password = '';
+      url.search = '';
+      url.hash = '';
+      return url.toString();
+    }
+  } catch {
+    // Try Npgsql semicolon key/value form below.
+  }
+  if (value.includes(';') || /^\s*[a-z ]+\s*=/i.test(value)) {
+    const secretKeys = new Set(['password', 'pwd', 'username', 'user id', 'user']);
+    const kept = value
+      .split(';')
+      .map((segment) => segment.trim())
+      .filter((segment) => {
+        if (!segment) return false;
+        const eq = segment.indexOf('=');
+        if (eq <= 0) return true;
+        const key = segment.slice(0, eq).trim().replace(/\s+/g, ' ').toLowerCase();
+        return !secretKeys.has(key);
+      });
+    return kept.join(';');
+  }
+  return '[redacted-unparseable-connection]';
 }
 
 /** Proves that the second receipt names the Postgres endpoint in the live second-start topology. */
@@ -288,17 +353,39 @@ export function compareSecondReceiptWithLiveTopology(
   return { ok: true, receiptPostgresUrl, livePostgresUrl };
 }
 
-function assertLiveUsersDatabaseAuthority(
+/**
+ * Verify `users` `DATABASE_URL` port parity from `aspire describe` when unredacted, or from the
+ * running OS process `/proc/<pid>/environ` when Aspire 17.0.0 redacts describe `environment` to
+ * `null`, and return a credential-free URL for the E2E receipt.
+ */
+export async function resolveLiveUsersDatabaseAuthority(
   liveTopology: unknown,
   livePostgresUrl: string | undefined,
-): string {
+  readProcessDatabaseUrls: () => Promise<readonly (string | undefined)[]>,
+): Promise<string> {
   const users = findResource(liveTopology, 'users');
   if (!users) throw new Error('live second-start topology omitted users resource');
   if (!livePostgresUrl) throw new Error('live second-start topology omitted Postgres URL');
-  const usersDatabaseUrl = environmentValue(users, 'DATABASE_URL');
-  const comparison = compareDatabaseEndpointPorts(livePostgresUrl, usersDatabaseUrl);
-  if (!comparison.ok) throw new Error(`live second-start ${comparison.error}`);
-  return usersDatabaseUrl;
+  const describedUrl = environmentValue(users, 'DATABASE_URL');
+  if (describedUrl !== null) {
+    const safeUrl = redactDatabaseConnectionUrl(describedUrl);
+    const comparison = compareDatabaseEndpointPorts(livePostgresUrl, safeUrl);
+    if (!comparison.ok) throw new Error(`live second-start ${comparison.error}`);
+    return safeUrl;
+  }
+  const processUrls = await readProcessDatabaseUrls();
+  if (processUrls.length === 0) {
+    throw new Error('live second-start users process scan returned no processes');
+  }
+  const redacted: string[] = [];
+  for (const candidate of processUrls) {
+    if (!candidate) throw new Error('live second-start users process omitted DATABASE_URL');
+    const safeUrl = redactDatabaseConnectionUrl(candidate);
+    const comparison = compareDatabaseEndpointPorts(livePostgresUrl, safeUrl);
+    if (!comparison.ok) throw new Error(`live second-start ${comparison.error}`);
+    redacted.push(safeUrl);
+  }
+  return redacted[0];
 }
 
 /**
@@ -515,11 +602,20 @@ function tcpUrl(resource: Record<string, unknown>): string {
   throw new Error('Postgres resource exposed no TCP URL');
 }
 
-function environmentValue(resource: Record<string, unknown>, key: string): string {
+function environmentValue(resource: Record<string, unknown>, key: string): string | null {
   const environment = resource.environment;
   if (isRecord(environment) && key in environment) {
     const value = environment[key];
+    if (value === null) return null;
     return typeof value === 'string' ? value : JSON.stringify(value);
+  }
+  if (Array.isArray(environment)) {
+    for (const entry of environment) {
+      if (isRecord(entry) && entry.name === key && ('value' in entry)) {
+        if (entry.value === null) return null;
+        if (typeof entry.value === 'string') return entry.value;
+      }
+    }
   }
   const text = JSON.stringify(resource);
   const match = new RegExp(`${key}[^a-z0-9]+([^"\\s]+)`, 'i').exec(text);

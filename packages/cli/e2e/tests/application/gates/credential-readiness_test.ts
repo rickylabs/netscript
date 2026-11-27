@@ -17,9 +17,12 @@ import {
 import { createCredentialReadinessGates } from '../../../src/application/gates/scaffold/runtime/credential-readiness-gates.ts';
 import { injectListenerFaultHealthChecks } from '../../../src/application/gates/scaffold/runtime/prepare-readiness-fixture.ts';
 import {
+  assertConsumerConnectionStringsRedacted,
+  assertDashboardApiHasNoSecrets,
   assertGeneratedHelpersHaveNoSecrets,
   assertHealthReportsHaveNoSecrets,
   assertMcpTranscriptHasNoSecrets,
+  assertProcessDatabaseConnection,
 } from '../../../src/application/gates/scaffold/runtime/credential-secret-surfaces.ts';
 import {
   ASPIRE_WAIT_TIMEOUT_EXIT_CODE,
@@ -405,6 +408,136 @@ Deno.test('credential readiness gates wait on postgres_auth and run the rejectio
     '/workspace/app/aspire/apphost.mts',
     '/workspace/app',
   ]);
+  assertEquals(rejected.command(runContext()).includes('--allow-net=localhost,127.0.0.1'), true);
+  assertEquals(
+    rejected.command(runContext()).includes('--unsafely-ignore-certificate-errors=localhost'),
+    true,
+  );
+});
+
+Deno.test('#2259 consumer connection masking checks users and prisma-studio in describe', () => {
+  const validTopology = {
+    resources: [
+      {
+        name: 'postgres-11111111',
+        displayName: 'postgres',
+        urls: [{ name: 'tcp', url: 'tcp://localhost:55432' }],
+      },
+      {
+        name: 'users-22222222',
+        displayName: 'users',
+        state: 'Running',
+        environment: {
+          DATABASE_URL: null,
+          POSTGRES_URI: null,
+          ConnectionStrings__postgres: null,
+        },
+      },
+      {
+        name: 'prisma-studio-33333333',
+        displayName: 'prisma-studio',
+        state: 'Running',
+        properties: { 'executable.pid': 4242 },
+        environment: {
+          DATABASE_URL: null,
+          POSTGRES_URI: null,
+          ConnectionStrings__postgres: null,
+        },
+      },
+    ],
+  };
+  assertEquals(assertConsumerConnectionStringsRedacted(validTopology), {
+    postgresPort: 55432,
+    prismaStudioPid: 4242,
+  });
+
+  const leakedUrl = structuredClone(validTopology);
+  (leakedUrl.resources[1].environment as Record<string, string | null>).DATABASE_URL =
+    'postgres://postgres:secret@localhost:55432/app';
+  assertThrows(
+    () => assertConsumerConnectionStringsRedacted(leakedUrl),
+    Error,
+    'users DATABASE_URL is not redacted',
+  );
+
+  const missingStudio = structuredClone(validTopology);
+  missingStudio.resources.pop();
+  assertThrows(
+    () => assertConsumerConnectionStringsRedacted(missingStudio),
+    Error,
+    'omitted prisma-studio',
+  );
+
+  const stoppedStudio = structuredClone(validTopology);
+  stoppedStudio.resources[2].state = 'Exited';
+  assertThrows(
+    () => assertConsumerConnectionStringsRedacted(stoppedStudio),
+    Error,
+    'expected "Running"',
+  );
+});
+
+Deno.test('#2259 live process DB check supports URL and Npgsql dialects without echoing secrets', () => {
+  const urlEnv = new Map([
+    ['DATABASE_URL', `postgresql://postgres:${REAL_PASSWORD}@127.0.0.1:55432/app`],
+    ['POSTGRES_URI', `postgresql://postgres:${REAL_PASSWORD}@127.0.0.1:55432/app`],
+  ]);
+  assertProcessDatabaseConnection(urlEnv, 55432, REAL_PASSWORD, 'prisma-studio');
+
+  const npgsqlEnv = new Map([
+    ['DATABASE_URL', `Host=127.0.0.1;Port=55432;Database=app;Password=${REAL_PASSWORD}`],
+    ['POSTGRES_URI', `Host=127.0.0.1;Port=55432;Database=app;Password=${REAL_PASSWORD}`],
+  ]);
+  assertProcessDatabaseConnection(npgsqlEnv, 55432, REAL_PASSWORD, 'prisma-studio');
+
+  const wrongPortError = assertThrows(
+    () => assertProcessDatabaseConnection(urlEnv, 5432, REAL_PASSWORD, 'prisma-studio'),
+    Error,
+    '55432',
+  );
+  assertEquals(wrongPortError.message.includes(REAL_PASSWORD), false);
+
+  const wrongSecretError = assertThrows(
+    () => assertProcessDatabaseConnection(urlEnv, 55432, WRONG_PASSWORD, 'prisma-studio'),
+    Error,
+    'did not match expected credential',
+  );
+  assertEquals(wrongSecretError.message.includes(REAL_PASSWORD), false);
+  assertEquals(wrongSecretError.message.includes(WRONG_PASSWORD), false);
+});
+
+Deno.test('#2259 dashboard API scanner checks resources and logs and rejects leaked secrets', async () => {
+  const visited: string[] = [];
+  const clean = await assertDashboardApiHasNoSecrets(
+    'https://localhost:18888/?t=token',
+    SECRETS,
+    () => (path) => {
+      visited.push(path);
+      return Promise.resolve(new Response(JSON.stringify({ ok: true, path }), { status: 200 }));
+    },
+  );
+  assertEquals(clean, ['resources', 'logs']);
+  assertEquals(visited, ['resources', 'logs']);
+
+  for (const leakPath of ['resources', 'logs'] as const) {
+    const leakError = await assertRejects(
+      () =>
+        assertDashboardApiHasNoSecrets(
+          'https://localhost:18888/?t=token',
+          SECRETS,
+          () => (path) =>
+            Promise.resolve(
+              new Response(
+                path === leakPath ? `postgres:${REAL_PASSWORD}` : '{"ok":true}',
+                { status: 200 },
+              ),
+            ),
+        ),
+      Error,
+      `aspire dashboard api (${leakPath}) output contains credential #0`,
+    );
+    assertEquals(leakError.message.includes(REAL_PASSWORD), false);
+  }
 });
 
 function postgresInfrastructure(): string {

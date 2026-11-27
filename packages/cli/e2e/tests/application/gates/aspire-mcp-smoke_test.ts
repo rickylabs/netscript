@@ -431,7 +431,7 @@ Deno.test('documented-unobserved tool appearance is informational', async () => 
   assertEquals(receipt.documentedUnobservedObserved, ['get_integration_docs']);
 });
 
-Deno.test('Aspire MCP smoke proves parameter nulling and excludes plaintext secrets', async () => {
+Deno.test('Aspire MCP smoke proves parameter redaction across 17.0.0 omitted fields and rejects leaks', async () => {
   const receipt = await runAspireMcpSmoke(
     input(),
     dependencies(passingPrimary(), transport(fixture.dashboardTools, {})),
@@ -439,6 +439,71 @@ Deno.test('Aspire MCP smoke proves parameter nulling and excludes plaintext secr
   assertEquals(receipt.redaction, { secretParamsNull: true, plaintextLeak: false });
   assertEquals(JSON.stringify(receipt).includes('fixture-secret-never-persist'), false);
   assertEquals(receipt.entryPoint.cwd.includes('raw-dashboard-token'), false);
+
+  const legacyNullResources = [
+    { display_name: 'postgres' },
+    { display_name: 'fixture-web' },
+    { display_name: 'users' },
+    {
+      display_name: 'postgres-password',
+      resource_type: 'Parameter',
+      properties: { Value: null },
+      environment: {},
+    },
+  ];
+  const legacyReceipt = await runAspireMcpSmoke(
+    input(),
+    dependencies(
+      transport(fixture.tools, {
+        list_apphosts: fixture.apphosts,
+        doctor: fixture.doctor,
+        list_resources: legacyNullResources,
+        'list_console_logs:postgres-cli': fixture.excludedConsole,
+        'list_console_logs:users': fixture.usersConsole,
+        list_structured_logs: fixture.structuredLogs,
+      }),
+      transport(fixture.dashboardTools, {}),
+    ),
+  );
+  assertEquals(legacyReceipt.redaction, { secretParamsNull: true, plaintextLeak: false });
+
+  for (
+    const leakedParam of [
+      {
+        display_name: 'postgres-password',
+        resource_type: 'Parameter',
+        properties: { Value: 'leaked' },
+      },
+      {
+        display_name: 'postgres-password',
+        resource_type: 'Parameter',
+        environment: { PASSWORD: 'leaked' },
+      },
+      { display_name: 'postgres-password', resource_type: 'Parameter', value: 'leaked' },
+      { display_name: 'postgres-password', resource_type: 'Parameter', properties: 'leaked' },
+    ]
+  ) {
+    await assertRejects(
+      () =>
+        runAspireMcpSmoke(
+          input(),
+          dependencies(
+            transport(fixture.tools, {
+              list_apphosts: fixture.apphosts,
+              doctor: fixture.doctor,
+              list_resources: [
+                { display_name: 'postgres' },
+                { display_name: 'fixture-web' },
+                { display_name: 'users' },
+                leakedParam,
+              ],
+            }),
+            transport(fixture.dashboardTools, {}),
+          ),
+        ),
+      Error,
+    );
+  }
 });
 
 Deno.test('Aspire MCP timeout rejects after persisting a partial receipt', async () => {

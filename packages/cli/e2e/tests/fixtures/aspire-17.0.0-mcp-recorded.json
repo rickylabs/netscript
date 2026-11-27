@@ -37,15 +37,10 @@
     "summary": { "passed": 6, "warnings": 4, "failed": 0 }
   },
   "resources": [
-    { "display_name": "postgres", "environment": {} },
-    { "display_name": "fixture-web", "environment": { "PORT": null } },
-    { "display_name": "users", "environment": { "DATABASE_URL": null } },
-    {
-      "display_name": "postgres-password",
-      "resource_type": "Parameter",
-      "properties": { "Value": null },
-      "environment": {}
-    }
+    { "display_name": "postgres", "resource_type": "Container" },
+    { "display_name": "fixture-web", "resource_type": "Executable" },
+    { "display_name": "users", "resource_type": "Executable" },
+    { "display_name": "postgres-password", "resource_type": "Parameter" }
   ],
   "usersConsole": { "lines": ["users service listening"] },
   "excludedConsole": { "lines": [] },

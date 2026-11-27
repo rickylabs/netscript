@@ -39,6 +39,8 @@ export function createCredentialReadinessGates(): readonly GateDefinition[] {
         '--allow-read',
         '--allow-write',
         '--allow-run=aspire',
+        '--allow-net=localhost,127.0.0.1',
+        '--unsafely-ignore-certificate-errors=localhost',
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/verify-credential-rejection.ts`,
         context.project.appHost,
         context.project.projectRoot,

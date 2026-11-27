@@ -5,7 +5,9 @@ import {
   correlateUsersTelemetry,
   matchesDatabaseHealthContract,
   pollUsersTelemetryCorrelation,
+  redactDatabaseConnectionUrl,
   resolveDatabaseEndpointResource,
+  resolveLiveUsersDatabaseAuthority,
   verifyGeneratedCrudAcceptance,
 } from '../../../src/application/gates/scaffold/verify-live-db-endpoint.ts';
 
@@ -276,3 +278,57 @@ function jsonResponse(body: unknown, status = 200): Response {
     headers: { 'content-type': 'application/json' },
   });
 }
+
+Deno.test('redactDatabaseConnectionUrl strips URL credentials/query and Npgsql secret fields', () => {
+  assertEquals(
+    redactDatabaseConnectionUrl(
+      'postgres://postgres:supersecret@localhost:10538/appdb?sslmode=disable',
+    ),
+    'postgres://localhost:10538/appdb',
+  );
+  assertEquals(
+    redactDatabaseConnectionUrl(
+      'Host=localhost;Port=10538;Username=postgres;Password=supersecret;Database=appdb',
+    ),
+    'Host=localhost;Port=10538;Database=appdb',
+  );
+});
+
+Deno.test('resolveLiveUsersDatabaseAuthority verifies live process URLs when describe redacts DATABASE_URL to null', async () => {
+  const topology = {
+    resources: [
+      { name: 'postgres', displayName: 'postgres', urls: [{ url: 'tcp://localhost:10538' }] },
+      { name: 'users', displayName: 'users', environment: { DATABASE_URL: null } },
+    ],
+  };
+  const redacted = await resolveLiveUsersDatabaseAuthority(
+    topology,
+    'postgres://localhost:10538',
+    () => Promise.resolve(['postgresql://postgres:topsecret@127.0.0.1:10538/app?sslmode=disable']),
+  );
+  assertEquals(redacted, 'postgresql://127.0.0.1:10538/app');
+  assertEquals(redacted.includes('topsecret'), false);
+
+  const mismatchError = await assertRejects(
+    () =>
+      resolveLiveUsersDatabaseAuthority(
+        topology,
+        'postgres://localhost:10538',
+        () => Promise.resolve(['postgresql://postgres:topsecret@127.0.0.1:54321/app']),
+      ),
+    Error,
+    '54321',
+  );
+  assertEquals(mismatchError.message.includes('topsecret'), false);
+
+  await assertRejects(
+    () =>
+      resolveLiveUsersDatabaseAuthority(
+        topology,
+        'postgres://localhost:10538',
+        () => Promise.resolve([undefined]),
+      ),
+    Error,
+    'omitted DATABASE_URL',
+  );
+});

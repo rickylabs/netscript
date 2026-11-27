@@ -1,9 +1,8 @@
+import { dirname, join } from '@std/path';
 import { readDescribedResource } from './service-env/service-env-evidence.ts';
+import { requireResourceProcesses, scanResourceProcesses } from './service-env/process-evidence.ts';
 
-/** Select the live PostgreSQL URL without exposing credentials in diagnostics. */
-export function sagaProcessDatabaseUrl(describeOutput: string): string {
-  const resource = readDescribedResource(describeOutput, 'users');
-  const value = resource.environment.get('DATABASE_URL');
+function validatePostgresDatabaseUrl(value: string | undefined): string {
   if (!value) throw new Error('Saga process gate requires the users DATABASE_URL');
   let url: URL;
   try {
@@ -17,6 +16,22 @@ export function sagaProcessDatabaseUrl(describeOutput: string): string {
   return value;
 }
 
+/** Select the live PostgreSQL URL without exposing credentials in diagnostics. */
+export function sagaProcessDatabaseUrl(describeOutput: string): string {
+  const resource = readDescribedResource(describeOutput, 'users');
+  return validatePostgresDatabaseUrl(resource.environment.get('DATABASE_URL'));
+}
+
+/** Resolve users DATABASE_URL from describe when unredacted, else from the running OS process. */
+export async function resolveSagaProcessDatabaseUrl(
+  describeOutput: string,
+  readProcessDatabaseUrl: () => Promise<string | undefined>,
+): Promise<string> {
+  const described = readDescribedResource(describeOutput, 'users').environment.get('DATABASE_URL');
+  if (described) return validatePostgresDatabaseUrl(described);
+  return validatePostgresDatabaseUrl(await readProcessDatabaseUrl());
+}
+
 if (import.meta.main) {
   const [appHost, repoRoot] = Deno.args;
   if (!appHost || !repoRoot) throw new Error('expected apphost and repo root');
@@ -28,7 +43,18 @@ if (import.meta.main) {
   if (!describe.success) {
     throw new Error(`Saga process topology discovery failed (${describe.code})`);
   }
-  const databaseUrl = sagaProcessDatabaseUrl(new TextDecoder().decode(describe.stdout));
+  const databaseUrl = await resolveSagaProcessDatabaseUrl(
+    new TextDecoder().decode(describe.stdout),
+    async () => {
+      const usersDir = join(dirname(dirname(appHost)), 'services', 'users');
+      const processes = requireResourceProcesses(
+        await scanResourceProcesses(usersDir, 'users'),
+        'users',
+        usersDir,
+      );
+      return processes[0].environment.get('DATABASE_URL');
+    },
+  );
   // Provider-borrowing conformance: repository saga/router fixtures run against the users
   // allocation in an owned schema and service PIDs; this does not exercise generated sagas-api.
   const proof = await new Deno.Command(Deno.execPath(), {
