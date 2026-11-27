@@ -101,7 +101,7 @@ Deno.test('Aspire check inventories every selected output, uses canonical genera
     const report = await inspect(root);
     assertEquals(report.status, 'current');
     assertEquals(report.version, 1);
-    assertEquals(report.outputs.length, 15);
+    assertEquals(report.outputs.length, 17);
     assert(report.outputs.some((entry) => entry.path === 'aspire/apphost.mts'));
     assertEquals(
       report.outputs.map((entry) => entry.path).sort(),
@@ -360,16 +360,20 @@ Deno.test('Postgres generation and inspection preserve authored AppHost dependen
     };
     const authoredSettings = '  ' + JSON.stringify(settings) + '\n\n';
     await Deno.writeTextFile(settingsPath, authoredSettings);
-    const packagePath = join(root, 'aspire', 'package.json');
-    const authoredPackage = '  ' + JSON.stringify({
-      name: 'inspection-apphost',
-      dependencies: { 'vscode-jsonrpc': '8.2.0', 'left-pad': '1.3.0' },
+    const denoJsonPath = join(root, 'aspire', 'deno.json');
+    const authoredDenoJson = '  ' + JSON.stringify({
+      imports: {
+        net: 'node:net',
+        'vscode-jsonrpc/node.js': 'npm:vscode-jsonrpc@8.2.0/node.js',
+        zod: 'catalog:',
+        'left-pad': 'npm:left-pad@1.3.0',
+      },
     }) + '\n\n';
-    await Deno.writeTextFile(packagePath, authoredPackage);
+    await Deno.writeTextFile(denoJsonPath, authoredDenoJson);
     const generated = await command(root);
     assertEquals(generated.code, 0, new TextDecoder().decode(generated.stderr));
     assertEquals(await Deno.readTextFile(settingsPath), authoredSettings);
-    assertEquals(await Deno.readTextFile(packagePath), authoredPackage);
+    assertEquals(await Deno.readTextFile(denoJsonPath), authoredDenoJson);
     assert(
       (await Deno.readTextFile(join(root, 'aspire/.helpers/register-infrastructure.mts'))).includes(
         "withHealthCheck('main_auth')",
@@ -401,10 +405,12 @@ Deno.test('Postgres generation and inspection preserve authored AppHost dependen
     assertEquals(await snapshot(root), before);
     const written = await serviceGenerate();
     assertEquals(written.code, 0, new TextDecoder().decode(written.stderr));
-    assertEquals(JSON.parse(await Deno.readTextFile(packagePath)).dependencies, {
-      'vscode-jsonrpc': '8.2.0',
-      'left-pad': '1.3.0',
-      pg: SCAFFOLD_VERSIONS.APPHOST_PG,
+    assertEquals(JSON.parse(await Deno.readTextFile(denoJsonPath)).imports, {
+      net: 'node:net',
+      'vscode-jsonrpc/node.js': 'npm:vscode-jsonrpc@8.2.0/node.js',
+      zod: 'catalog:',
+      'left-pad': 'npm:left-pad@1.3.0',
+      pg: `npm:pg@${SCAFFOLD_VERSIONS.APPHOST_PG}`,
     });
     assertEquals(await Deno.readTextFile(settingsPath), authoredSettings);
     assertEquals((await inspect(root)).status, 'current');

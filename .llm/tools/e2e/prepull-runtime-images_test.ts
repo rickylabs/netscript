@@ -186,14 +186,23 @@ Deno.test('both CI tiers prepare images before the unchanged one-pass suite with
 });
 
 Deno.test('scaffold generator reads the shared cache image source rather than a parallel copy', async () => {
-  const generator = await Deno.readTextFile(
-    new URL(
-      '../../../packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts',
-      import.meta.url,
+  const [infraGenerator, cacheGenerator] = await Promise.all([
+    Deno.readTextFile(
+      new URL(
+        '../../../packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts',
+        import.meta.url,
+      ),
     ),
-  );
-  assertStringIncludes(generator, 'SCAFFOLD_CACHE_CONTAINER_IMAGES[entry.Engine]');
-  assertEquals(generator.includes("image: 'ghcr.io/microsoft/garnet'"), false);
+    Deno.readTextFile(
+      new URL(
+        '../../../packages/cli/src/kernel/templates/aspire/helpers/register/register-infrastructure-cache.ts',
+        import.meta.url,
+      ),
+    ),
+  ]);
+  assertStringIncludes(cacheGenerator, 'SCAFFOLD_CACHE_CONTAINER_IMAGES[entry.Engine]');
+  assertEquals(infraGenerator.includes("image: 'ghcr.io/microsoft/garnet'"), false);
+  assertEquals(cacheGenerator.includes("image: 'ghcr.io/microsoft/garnet'"), false);
 });
 
 Deno.test('calibrated pull budget bounds an exhausted timed pull without changing its failure', async () => {

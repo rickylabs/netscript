@@ -52,10 +52,12 @@ Create `aspire/deno.json` (include `"pg"` when using a container PostgreSQL data
 
 ```json
 {
-  "name": "@my-app/aspire",
-  "exports": "./apphost.mts",
   "imports": {
-    "pg": "npm:pg@^8.16.0"
+    "net": "node:net",
+    "vscode-jsonrpc/node.js": "npm:vscode-jsonrpc@8.2.0/node.js",
+    "zod": "catalog:",
+    "pg": "npm:pg@^8.16.0",
+    "@netscript/aspire": "jsr:@netscript/aspire@^0.0.10"
   }
 }
 ```

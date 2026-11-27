@@ -281,13 +281,14 @@ default. Run `playwright-cli --help` for available commands.
 
 ## 17.0.0 evidence
 
-- V17-MCP-STATIC: `packages/cli/e2e/tests/fixtures/aspire-17.0.0-mcp-recorded.json` (15 tools,
-  `aspire agent mcp` from `Aspire.Cli 17.0.0`)
-- V17-DOCTOR: `packages/cli/e2e/tests/application/gates/fixtures/aspire-doctor-17.0.0.json`
-- V17-DESCRIBE: `packages/cli/e2e/tests/application/gates/fixtures/aspire-17.0.0-describe-postgres.json`
-- V17-FOLLOW: `packages/cli/e2e/tests/application/gates/fixtures/aspire-describe-follow-17.0.0.ndjson`
-- V17-TELEMETRY: `packages/mcp/tests/fixtures/telemetry/aspire-17.0.0-fixture.ts`
-- V17-PS: `.llm/tools/maint/teardown/__fixtures__/aspire-ps-17.0.0.json`
+Verified against `Aspire.Cli 17.0.0` recorded contract captures:
+
+- V17-MCP-STATIC: 15-tool `aspire agent mcp` JSON-RPC surface (`wait_for_resources` added)
+- V17-DOCTOR: `aspire doctor --format Json` output shape
+- V17-DESCRIBE: `aspire describe --format Json` PostgreSQL + Deno resource snapshot
+- V17-FOLLOW: `aspire describe --follow --format Json` NDJSON transition stream
+- V17-TELEMETRY: Aspire dashboard `/api/telemetry/{resources,spans}` payload shape
+- V17-PS: `aspire ps --format Json` running AppHost descriptor (`sdkVersion: "17.0.0"`)
 
 ### Upstream cleanup of networks and anonymous volumes (issue #1855)
 
