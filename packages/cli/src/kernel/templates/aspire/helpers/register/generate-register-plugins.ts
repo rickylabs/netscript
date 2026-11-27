@@ -32,6 +32,8 @@ import {
   renderDeclaredEnvironmentLines,
 } from './resolve-resource-environment.ts';
 import {
+  isExternalDenoEntrypoint,
+  renderDenoScriptPathArg,
   renderRegistrationPreamble,
   resolveRegistrationPreambleNeeds,
 } from './registration-preamble.ts';
@@ -123,7 +125,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     // Register via first-party addDenoApp with Deno runtime flags and HTTP endpoint
     lines.push(
       `    const resource = builder.addDenoApp(${JSON.stringify(name)}, workdir, ${
-        JSON.stringify(entrypoint)
+        renderDenoScriptPathArg('workdir', entrypoint)
       });`,
     );
     lines.push(
@@ -339,6 +341,9 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     ...renderRegistrationPreamble(preambleNeeds, {
       sdkModule: aspireImport,
       cacheImport: 'withCacheReference',
+      externalEntrypoint: entries.some(([, entry]) =>
+        entry.Entrypoint !== undefined && isExternalDenoEntrypoint(entry.Entrypoint)
+      ),
     }),
   });
 }

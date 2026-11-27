@@ -62,10 +62,16 @@ const publishedImports = {
     `jsr:@netscript/plugin-sagas-core@${publishedVersion}/domain`,
 };
 const sharedNpmImports = {
+  '@hono/otel': 'jsr:@hono/otel@^1.4.0',
   '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.1',
+  '@opentelemetry/instrumentation': 'npm:@opentelemetry/instrumentation@0.223.2',
+  '@opentelemetry/semantic-conventions': 'npm:@opentelemetry/semantic-conventions@1.45.0',
   '@orpc/client': 'npm:@orpc/client@^1.16.6',
   '@orpc/contract': 'npm:@orpc/contract@^1.16.6',
   '@orpc/otel': 'npm:@orpc/otel@^1.16.6',
+  '@saga-bus/core': 'npm:@saga-bus/core@^0.2.2',
+  '@tanstack/db': 'npm:@tanstack/db@0.15.2',
+  'ioredis': 'npm:ioredis@^5.11.1',
 };
 const localSourcePackages = [
   [

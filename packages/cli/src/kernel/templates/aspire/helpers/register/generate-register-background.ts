@@ -24,6 +24,8 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 import { withDatabasePermissions } from './database-permissions.ts';
 import {
+  isExternalDenoEntrypoint,
+  renderDenoScriptPathArg,
   renderRegistrationPreamble,
   resolveRegistrationPreambleNeeds,
 } from './registration-preamble.ts';
@@ -132,7 +134,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     // Register via first-party addDenoApp
     lines.push(
       `    const ${id} = builder.addDenoApp(${JSON.stringify(name)}, ${id}_workdir, ${
-        JSON.stringify(entrypoint)
+        renderDenoScriptPathArg(`${id}_workdir`, entrypoint)
       });`,
     );
     lines.push(
@@ -305,6 +307,9 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     ...renderRegistrationPreamble(preambleNeeds, {
       sdkModule: SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS,
       cacheImport: 'withCacheReference as _withCacheReference',
+      externalEntrypoint: entries.some(([name, entry]) =>
+        isExternalDenoEntrypoint(entry.Entrypoint ?? `${name}/runtime.ts`)
+      ),
     }),
   });
 }

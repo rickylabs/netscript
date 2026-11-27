@@ -14,6 +14,7 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 import { withDatabasePermissions } from './database-permissions.ts';
 import { renderHttpEndpointCall } from './render-http-endpoint.ts';
+import { isExternalDenoEntrypoint } from './registration-preamble.ts';
 import { renderDeclaredEnvironmentLines } from './resolve-resource-environment.ts';
 
 /**
@@ -59,7 +60,13 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
     lines.push(`    const workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
 
     // Register via first-party addDenoApp with Deno runtime flags and HTTP endpoint
-    lines.push(`    const resource = builder.addDenoApp('${name}', workdir, '${entrypoint}');`);
+    lines.push(
+      isExternalDenoEntrypoint(entrypoint)
+        ? `    const resource = builder.addDenoApp('${name}', workdir, resolveDenoScriptUrl(workdir, ${
+          JSON.stringify(entrypoint)
+        }));`
+        : `    const resource = builder.addDenoApp('${name}', workdir, '${entrypoint}');`,
+    );
     lines.push(
       `    await applyDenoPermissions(resource, installationSecretPermissions(perms, installationSecretFile));`,
     );
@@ -163,6 +170,9 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
   }`
     : '  return Promise.resolve();';
 
+  const hasExternalEntrypoint = entries.some(([, entry]) =>
+    isExternalDenoEntrypoint(entry.Entrypoint ?? RESOURCE_DEFAULTS.ServiceEntrypoint)
+  );
   const compatImportBlock = hasServices
     ? `import {
   applyDenoPermissions,
@@ -171,7 +181,7 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
   buildSqliteDatabaseUrl,
   extractPluginReferences,
   extractServiceReferences,
-  resolvePermissions,
+${hasExternalEntrypoint ? '  resolveDenoScriptUrl,\n' : ''}  resolvePermissions,
   resolveWorkspacePath,
 } from '${SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT}';\n`
     : '';

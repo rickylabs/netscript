@@ -100,12 +100,9 @@ export async function applyDenoPermissions(
   let watchMode: 'none' | 'watch' | 'hmr' = 'none';
   for (const flag of permissions) {
     if (!flag || flag === '-A' || flag === '--allow-all') continue;
-    if (flag === '--watch-hmr') {
-      watchMode = 'hmr';
-      continue;
-    }
-    if (flag === '--watch') {
-      if (watchMode === 'none') watchMode = 'watch';
+    if (flag === '--watch-hmr' || flag === '--watch') {
+      if (flag === '--watch-hmr') watchMode = 'hmr';
+      else if (watchMode === 'none') watchMode = 'watch';
       continue;
     }
     if (flag.startsWith('--unstable-')) {
@@ -142,6 +139,10 @@ export async function applyDenoPermissions(
 
 export function resolveWorkspacePath(appHostDir: string, relativePath: string): string {
   return resolve(appHostDir, relativePath);
+}
+
+export function resolveDenoScriptUrl(workdir: string, entrypoint: string): string {
+  return pathToFileURL(resolve(workdir, entrypoint)).href;
 }
 
 export function resolveDataPath(
@@ -222,9 +223,7 @@ export function buildSqliteDatabaseUrl(
   databaseKey: string,
   databaseName: string,
 ): string {
-  return pathToFileURL(
-    resolveWorkspacePath(appHostDir, join('database', databaseKey, databaseName)),
-  ).href;
+  return resolveDenoScriptUrl(appHostDir, join('database', databaseKey, databaseName));
 }
 
 export interface CacheWiring {

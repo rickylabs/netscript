@@ -233,6 +233,18 @@ describe('generated Aspire listener readiness helpers', () => {
     );
   });
 
+  it('resolves external and escaping Deno script paths to file:// URLs', async () => {
+    const mod = await import(`${toFileUrl(compatPath).href}?test=${crypto.randomUUID()}`);
+    assertEquals(
+      mod.resolveDenoScriptUrl('/project', '/external/plugins/workers/services/src/main.ts'),
+      toFileUrl('/external/plugins/workers/services/src/main.ts').href,
+    );
+    assertEquals(
+      mod.resolveDenoScriptUrl('/project/sub', '../shared/main.ts'),
+      toFileUrl('/project/shared/main.ts').href,
+    );
+  });
+
   it('reports a local TCP listener as Healthy', async () => {
     const server = await startServer();
     try {

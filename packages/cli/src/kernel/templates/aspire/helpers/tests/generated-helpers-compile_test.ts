@@ -115,6 +115,11 @@ Deno.test('all emitted AppHost helpers compile cleanly against the real recorded
       Plugins: {
         auth: MINIMAL_PLUGIN,
         'workers-api': PLUGIN_WITH_REFS,
+        'local-external': {
+          ...MINIMAL_PLUGIN,
+          Port: 4410,
+          Entrypoint: '/tmp/netscript-external/plugins/workers/services/src/main.ts',
+        },
       },
       BackgroundProcessors: {
         workers: MINIMAL_BACKGROUND,
@@ -182,6 +187,9 @@ Deno.test('all emitted AppHost helpers compile cleanly against the real recorded
     assertStringIncludes(registerApps, 'builder.addDenoApp(');
     assertStringIncludes(registerApps, '.withDenoTask(');
     assertStringIncludes(registerApps, 'EndpointProperty.BrowserOrigins');
+
+    const registerPlugins = await Deno.readTextFile(join(helpersDir, 'register-plugins.mts'));
+    assertStringIncludes(registerPlugins, 'resolveDenoScriptUrl(workdir,');
 
     const dbCliMode = await Deno.readTextFile(join(helpersDir, 'db-cli-mode.mts'));
     assertStringIncludes(dbCliMode, ".withEnvironment('DATABASE_URL', target.resource)");

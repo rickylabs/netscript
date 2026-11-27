@@ -10,6 +10,8 @@ import type { SagaProjectionBackend as HostingSagaProjectionBackend } from '@net
 import type { SagaProjectionBackend } from '@netscript/plugin-sagas-core/stores/backends';
 import { generateRegisterServices } from '../register/generate-register-services.ts';
 import { generateRegisterPlugins } from '../register/generate-register-plugins.ts';
+import { generateRegisterBackground } from '../register/generate-register-background.ts';
+import { isExternalDenoEntrypoint } from '../register/registration-preamble.ts';
 import * as fixtures from './generators-test-support.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
 import { netscriptJsrSpecifier } from '../../../../constants/jsr-specifiers.ts';
@@ -262,6 +264,29 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, '// No services configured');
     assertStringIncludes(output, 'export function wireServiceReferences(');
     assertStringIncludes(output, 'return Promise.resolve();');
+  });
+
+  it('wraps external service entrypoints via resolveDenoScriptUrl while leaving in-workdir entrypoints raw', () => {
+    const relativeOut = generateRegisterServices({
+      ...emptyOptions,
+      services: { users: fixtures.MINIMAL_SERVICE },
+    });
+    assert(!relativeOut.includes('resolveDenoScriptUrl'));
+
+    const externalOut = generateRegisterServices({
+      ...emptyOptions,
+      services: {
+        users: {
+          ...fixtures.MINIMAL_SERVICE,
+          Entrypoint: '/external/services/users/src/main.ts',
+        },
+      },
+    });
+    assertStringIncludes(externalOut, 'resolveDenoScriptUrl,');
+    assertStringIncludes(
+      externalOut,
+      'builder.addDenoApp(\'users\', workdir, resolveDenoScriptUrl(workdir, "/external/services/users/src/main.ts"));',
+    );
   });
 });
 // generateRegisterPlugins
@@ -539,6 +564,79 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, 'Promise.resolve(new Map<string, DenoResource>())');
     assert(!output.includes('builder.addDenoApp('));
     assert(!output.includes('/services'));
+  });
+
+  it('classifies external vs in-workdir Deno entrypoints for Aspire 17 addDenoApp', () => {
+    for (
+      const external of [
+        '/home/runner/work/netscript/plugins/workers/services/src/main.ts',
+        'C:\\workspace\\plugins\\workers\\services\\src\\main.ts',
+        '\\\\server\\share\\plugins\\workers\\main.ts',
+        '../outside/main.ts',
+        'a/../../outside.ts',
+      ]
+    ) {
+      assertEquals(isExternalDenoEntrypoint(external), true, external);
+    }
+    for (
+      const inWorkdir of [
+        'src/main.ts',
+        './main.ts',
+        'a/../b/main.ts',
+        'jsr:@netscript/plugin-workers@0.0.10/services',
+        'file:///tmp/main.ts',
+        'https://example.com/main.ts',
+        '@netscript/plugin-workers/services',
+      ]
+    ) {
+      assertEquals(isExternalDenoEntrypoint(inWorkdir), false, inWorkdir);
+    }
+  });
+
+  it('wraps external plugin and background entrypoints in resolveDenoScriptUrl while keeping relative and jsr entrypoints unwrapped', () => {
+    const jsrPlugin = generateRegisterPlugins({
+      ...emptyOptions,
+      plugins: {
+        'workers-api': {
+          ...fixtures.MINIMAL_PLUGIN,
+          Entrypoint: 'jsr:@netscript/plugin-workers@0.0.10/services',
+        },
+      },
+    });
+    assert(!jsrPlugin.includes('resolveDenoScriptUrl'));
+
+    const absPlugin = generateRegisterPlugins({
+      ...emptyOptions,
+      plugins: {
+        'workers-api': {
+          ...fixtures.MINIMAL_PLUGIN,
+          Entrypoint: '/home/runner/work/netscript/plugins/workers/services/src/main.ts',
+        },
+        shared: { ...fixtures.MINIMAL_PLUGIN, Entrypoint: '../shared/main.ts' },
+      },
+    });
+    assertStringIncludes(absPlugin, 'resolveDenoScriptUrl,');
+    assertStringIncludes(
+      absPlugin,
+      'builder.addDenoApp("workers-api", workdir, resolveDenoScriptUrl(workdir, "/home/runner/work/netscript/plugins/workers/services/src/main.ts"));',
+    );
+    assertStringIncludes(
+      absPlugin,
+      'builder.addDenoApp("shared", workdir, resolveDenoScriptUrl(workdir, "../shared/main.ts"));',
+    );
+
+    const bgOut = generateRegisterBackground({
+      version: '1.0.0',
+      denoDefaults: fixtures.MINIMAL_DENO_DEFAULTS,
+      processors: {
+        ext: { ...fixtures.MINIMAL_BACKGROUND, Entrypoint: '../external-worker/runtime.ts' },
+      },
+    });
+    assertStringIncludes(bgOut, 'resolveDenoScriptUrl,');
+    assertStringIncludes(
+      bgOut,
+      'builder.addDenoApp("ext", bg_0_workdir, resolveDenoScriptUrl(bg_0_workdir, "../external-worker/runtime.ts"));',
+    );
   });
 });
 // generateRegisterBackground

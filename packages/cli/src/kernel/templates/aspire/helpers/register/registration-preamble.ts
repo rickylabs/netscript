@@ -33,6 +33,41 @@ export interface RegistrationPreambleImports {
   readonly sdkModule: string;
   /** Named import for the cache-reference helper, e.g. `withCacheReference`. */
   readonly cacheImport: string;
+  /** Whether any entry resolves an out-of-workdir entrypoint through `resolveDenoScriptUrl`. */
+  readonly externalEntrypoint?: boolean;
+}
+
+/**
+ * Returns whether `entrypoint` points outside `workdir` (absolute, drive-qualified, or leading
+ * `..` segments) and must be converted to a `file://` URL for Aspire 17 `addDenoApp`.
+ */
+export function isExternalDenoEntrypoint(entrypoint: string): boolean {
+  const normalized = entrypoint.replaceAll('\\', '/');
+  if (normalized.startsWith('/') || /^[A-Za-z]:/.test(normalized)) {
+    return true;
+  }
+  if (/^[A-Za-z][A-Za-z0-9+.-]*:/.test(normalized)) {
+    return false;
+  }
+  let depth = 0;
+  for (const segment of normalized.split('/')) {
+    if (!segment || segment === '.') continue;
+    if (segment === '..') {
+      if (depth === 0) return true;
+      depth -= 1;
+      continue;
+    }
+    depth += 1;
+  }
+  return false;
+}
+
+/** Renders the third argument (`scriptPath`) passed to `builder.addDenoApp`. */
+export function renderDenoScriptPathArg(workdirExpr: string, entrypoint: string): string {
+  const literal = JSON.stringify(entrypoint);
+  return isExternalDenoEntrypoint(entrypoint)
+    ? `resolveDenoScriptUrl(${workdirExpr}, ${literal})`
+    : literal;
 }
 
 /** Template slots that carry the preamble. */
@@ -81,6 +116,7 @@ export function renderRegistrationPreamble(
     ...(needs.database
       ? ['buildDatabaseUriEnvKey', 'buildDatabaseProviderEnvVars', 'buildSqliteDatabaseUrl']
       : []),
+    ...(imports.externalEntrypoint ? ['resolveDenoScriptUrl'] : []),
     'resolvePermissions',
     'resolveWorkspacePath',
     ...(needs.cache ? [imports.cacheImport] : []),
