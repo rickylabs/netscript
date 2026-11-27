@@ -1,5 +1,8 @@
-/** Upstream workflow skills installed beside NetScript's canonical `aspire` skill. */
-export const ASPIRE_WORKFLOW_SKILLS: readonly string[] = [
+/**
+ * Retired Aspire 13.5 workflow skills no longer installed by `netscript agent init`.
+ * Retained solely so Claude mirror cleanup can identify legacy `.claude/skills/aspire-*` copies.
+ */
+export const RETIRED_ASPIRE_WORKFLOW_SKILLS: readonly string[] = [
   'aspire-init',
   'aspire-orchestration',
   'aspire-monitoring',

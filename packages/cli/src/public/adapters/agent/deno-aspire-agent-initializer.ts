@@ -4,9 +4,8 @@ import type {
   AspireAgentInitializationResult,
   AspireAgentInitializer,
 } from '../../features/agent/init/aspire-agent-initializer.ts';
-import { ASPIRE_WORKFLOW_SKILLS } from '../../features/agent/init/aspire-agent-initializer.ts';
 
-/** Exact non-interactive upstream workflow-skill selection used by agent init. */
+/** Non-interactive Aspire 17.0.0 `agent init` flags when invoked directly. */
 export function aspireAgentInitArgs(projectRoot: string): string[] {
   return [
     'agent',
@@ -15,10 +14,6 @@ export function aspireAgentInitArgs(projectRoot: string): string[] {
     '--nologo',
     '--workspace-root',
     projectRoot,
-    '--skill-locations',
-    'standard',
-    '--skills',
-    ASPIRE_WORKFLOW_SKILLS.join(','),
   ];
 }
 

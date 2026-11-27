@@ -221,18 +221,38 @@ Deno.test('rejection evidence refuses a non-auth failure or a degraded real serv
   );
 });
 
-Deno.test('describe environment projection is deferred to #2259; health descriptions still fail', () => {
+Deno.test('#2259 raw aspire describe snapshot rejects secrets in environment, sibling, nested, and health fields', () => {
   for (const secret of SECRETS) {
-    assertCredentialRejectionEvidence(
-      snapshot({ extraEnvironment: `Password=${secret}` }),
-      SECRETS,
+    const envError = assertThrows(
+      () =>
+        assertCredentialRejectionEvidence(
+          snapshot({ extraEnvironment: `Password=${secret}` }),
+          SECRETS,
+        ),
+      Error,
+      'aspire describe output contains credential',
     );
-    const error = assertThrows(
+    assertEquals(envError.message.includes(secret), false);
+
+    const healthError = assertThrows(
       () => assertCredentialRejectionEvidence(snapshot({ rejectedDescription: secret }), SECRETS),
       Error,
-      'health evidence output contains credential',
+      'aspire describe output contains credential',
     );
-    assertEquals(error.message.includes(secret), false);
+    assertEquals(healthError.message.includes(secret), false);
+
+    const nested = JSON.parse(snapshot());
+    nested.resources.push({
+      name: 'users',
+      state: 'Running',
+      properties: { connection: { uri: `postgres://postgres:${secret}@localhost:5432/app` } },
+    });
+    const siblingError = assertThrows(
+      () => assertCredentialRejectionEvidence(JSON.stringify(nested), SECRETS),
+      Error,
+      'aspire describe output contains credential',
+    );
+    assertEquals(siblingError.message.includes(secret), false);
   }
 });
 
@@ -325,9 +345,13 @@ Deno.test('bounded wait maps Running Unhealthy to timeout 17, never resource fai
 
 Deno.test('wrong-credential probe and dependant reject even transient Healthy updates', () => {
   for (const name of [CREDENTIAL_FAULT_PROBE_RESOURCE, CREDENTIAL_FAULT_DEPENDENT_RESOURCE]) {
-    const update = (healthStatus: string | null, healthReports = {}) => ({
+    const update = (
+      healthStatus: string | null,
+      healthReports = {},
+      extra: Record<string, unknown> = {},
+    ) => ({
       rawLine: '',
-      resource: { name, healthStatus, healthReports },
+      resource: { name, healthStatus, healthReports, ...extra },
     });
     assertCredentialResourceNotHealthy(update(null), SECRETS);
     assertCredentialResourceNotHealthy(update('Unhealthy'), SECRETS);
@@ -345,9 +369,21 @@ Deno.test('wrong-credential probe and dependant reject even transient Healthy up
           SECRETS,
         ),
       Error,
-      'health evidence output contains credential',
+      'aspire describe stream output contains credential',
     );
     assertEquals(error.message.includes(WRONG_PASSWORD), false);
+    const envLeakError = assertThrows(
+      () =>
+        assertCredentialResourceNotHealthy(
+          update('Unhealthy', {}, {
+            environment: [`DATABASE_URL=postgres://postgres:${REAL_PASSWORD}@localhost:5432/app`],
+          }),
+          SECRETS,
+        ),
+      Error,
+      'aspire describe stream output contains credential',
+    );
+    assertEquals(envLeakError.message.includes(REAL_PASSWORD), false);
   }
 });
 

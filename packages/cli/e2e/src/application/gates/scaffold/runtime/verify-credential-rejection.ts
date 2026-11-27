@@ -29,7 +29,7 @@ export { assertNoSecretBytes } from './credential-secret-surfaces.ts';
 
 const POSTGRES_RESOURCE = 'postgres';
 const POSTGRES_LISTENER_HEALTH_KEY = 'postgres_listener';
-/** Aspire 13.5.3 WaitTimeout: an Unhealthy resource remains Running, not Failed (exit 18). */
+/** Aspire 17.0.0 WaitTimeout: an Unhealthy resource remains Running, not Failed (exit 18). */
 export const ASPIRE_WAIT_TIMEOUT_EXIT_CODE = 17;
 /** Bounded `aspire wait` budget; the probe can never become Healthy, so this is the whole wait. */
 const BOUNDED_WAIT_SECONDS = 10;
@@ -54,12 +54,14 @@ export interface BoundedWaitResult {
 
 /**
  * Require the wrong-credential report to be auth-classified, the real listener and credential
- * checks to stay Healthy, and all health evidence to carry no credential bytes.
+ * checks to stay Healthy, and the complete raw `aspire describe` snapshot to carry no credential
+ * bytes.
  */
 export function assertCredentialRejectionEvidence(
   rawSnapshot: string,
   secrets: readonly string[],
 ): CredentialRejectionEvidence {
+  assertNoSecretBytes('aspire describe', rawSnapshot, secrets);
   const topology: unknown = JSON.parse(rawSnapshot);
   assertHealthReportsHaveNoSecrets(topology, secrets);
   const rejected = readListenerHealthReport(
@@ -115,11 +117,12 @@ export function assertBoundedWaitRejected(
   }
 }
 
-/** Reject even transient Healthy updates, including credentials in their health evidence. */
+/** Reject even transient Healthy updates and any credential bytes anywhere in the resource update. */
 export function assertCredentialResourceNotHealthy(
   update: ResourceUpdate,
   secrets: readonly string[],
 ): void {
+  assertNoSecretBytes('aspire describe stream', JSON.stringify(update.resource), secrets);
   assertHealthReportsHaveNoSecrets(update.resource, secrets);
   if (healthStatusOf(update) === 'healthy') {
     throw new Error('wrong-credential probe or dependant reported Healthy during observation');
@@ -202,6 +205,7 @@ export async function verifyCredentialRejection(
           scannedCredentials: secrets.length,
           scannedSurfaces: [
             'generated helpers',
+            'full aspire describe snapshot',
             'healthReports / healthChecks',
             'MCP list_resources',
           ],

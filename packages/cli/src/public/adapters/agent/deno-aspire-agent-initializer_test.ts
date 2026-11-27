@@ -1,11 +1,10 @@
 import { assertEquals } from '@std/assert';
-import { ASPIRE_WORKFLOW_SKILLS } from '../../features/agent/init/aspire-agent-initializer.ts';
 import {
   aspireAgentInitArgs,
   DenoAspireAgentInitializer,
 } from './deno-aspire-agent-initializer.ts';
 
-Deno.test('#2008 Aspire agent init selects only the standard location and four non-colliding workflow skills', () => {
+Deno.test('Aspire 17.0.0 agent init passes non-interactive workspace-root flags without removed 13.5 options', () => {
   const args = aspireAgentInitArgs('/workspace/project');
   assertEquals(args, [
     'agent',
@@ -14,15 +13,9 @@ Deno.test('#2008 Aspire agent init selects only the standard location and four n
     '--nologo',
     '--workspace-root',
     '/workspace/project',
-    '--skill-locations',
-    'standard',
-    '--skills',
-    'aspire-init,aspire-orchestration,aspire-monitoring,aspire-deployment',
   ]);
-  const selected = args[args.indexOf('--skills') + 1].split(',');
-  assertEquals(selected, ASPIRE_WORKFLOW_SKILLS);
-  assertEquals(selected.includes('aspire'), false);
-  assertEquals(selected.includes('all'), false);
+  assertEquals(args.includes('--skill-locations'), false);
+  assertEquals(args.includes('--skills'), false);
 });
 
 for (const override of [undefined, '', '/toolchain/pinned aspire']) {

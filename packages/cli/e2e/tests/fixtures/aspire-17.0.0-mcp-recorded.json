@@ -1,10 +1,11 @@
 {
-  "source": "origin/test/aspire-13-5-s2-runtime-verification receipt 03-v8-mcp-transcript.json, minimized to assertion fields",
+  "source": "Live Aspire 17.0.0+2d325b13 aspire agent mcp initialize/tools/list/doctor capture (S4), minimized to assertion fields",
   "initialize": {
-    "serverInfo": { "name": "aspire-mcp-server", "version": "13.5.3" }
+    "serverInfo": { "name": "aspire-mcp-server", "version": "17.0.0" }
   },
   "tools": [
     "list_resources",
+    "wait_for_resources",
     "list_console_logs",
     "execute_resource_command",
     "list_structured_logs",
@@ -26,9 +27,11 @@
   "doctor": {
     "checks": [
       {
+        "category": "aspire",
         "name": "cli-version",
         "status": "pass",
-        "metadata": { "currentVersion": "13.5.3" }
+        "message": "Aspire CLI version 17.0.0 (channel: stable)",
+        "metadata": { "currentVersion": "17.0.0", "identityChannel": "stable" }
       }
     ],
     "summary": { "passed": 6, "warnings": 4, "failed": 0 }

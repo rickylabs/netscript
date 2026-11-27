@@ -91,9 +91,9 @@ Deno.test('readiness app splice namespaces fixture bindings in a real generated 
   assertEquals(duplicateConstBindings(injected), []);
   await assertGeneratedModuleChecks(injected);
   assertStringIncludes(injected, 'const readiness_fixture_app_0_workdir');
-  assertStringIncludes(injected, 'const readiness_fixture_app_0_otel');
+  assertStringIncludes(injected, 'const readiness_fixture_app_0 = builder.addDenoApp');
   assertStringIncludes(injected, 'const readiness_fixture_app_1_workdir');
-  assertStringIncludes(injected, 'const readiness_fixture_app_1_otel');
+  assertStringIncludes(injected, 'const readiness_fixture_app_1 = builder.addDenoApp');
   assertStringIncludes(injected, 'apps.set("readiness-dead-port"');
   assertStringIncludes(injected, 'apps.set("listener-fault-controller"');
   assertThrows(
@@ -235,27 +235,41 @@ async function assertGeneratedModuleChecks(source: string): Promise<void> {
     // Mirror the generated module's local imports so this stays a compile check, not a runtime test.
     await Deno.writeTextFile(
       `${modules}/aspire.mts`,
-      `// Relevant public declarations verified against the restored Aspire 13.5.3 SDK.
+      `// Relevant public declarations verified against the restored Aspire 17.0.0 SDK.
 // aspire.mts re-exports ReferenceExpression from base.mjs; getEndpoint returns a reference.
 export declare class ReferenceExpression {
   static create(strings: TemplateStringsArray, ...values: unknown[]): ReferenceExpression;
 }
+export const EndpointProperty = { BrowserOrigins: 'BrowserOrigins' } as const;
+export type EndpointProperty = (typeof EndpointProperty)[keyof typeof EndpointProperty];
+export interface EndpointReferenceExpression {}
 export interface EndpointReference {
   host(): Promise<string>;
   port(): Promise<number>;
+  property(property: EndpointProperty): Promise<EndpointReferenceExpression>;
+}
+export interface EnvironmentCallbackContext {
+  environmentVariables: Record<string, string | ReferenceExpression | EndpointReference>;
 }
 export interface ExecutableResource {
-  withEnvironment(key: string, value: string | ReferenceExpression | EndpointReference): Promise<void>;
-  withOtlpExporter(options: { protocol: string }): Promise<void>;
-  withHttpEndpoint(options: unknown): Promise<void>;
-  withBrowserLogs(): Promise<void>;
-  withHttpHealthCheck(options: unknown): Promise<void>;
+  withDenoTask(taskName: string): Promise<ExecutableResource>;
+  withDenoScriptArgs(args: string[]): Promise<ExecutableResource>;
+  withEnvironment(
+    key: string,
+    value: string | ReferenceExpression | EndpointReference | EndpointReferenceExpression,
+  ): Promise<ExecutableResource>;
+  withEnvironmentCallback(
+    callback: (context: EnvironmentCallbackContext) => void | Promise<void>,
+  ): Promise<ExecutableResource>;
+  withHttpEndpoint(options: unknown): Promise<ExecutableResource>;
+  withBrowserLogs(): Promise<ExecutableResource>;
+  withHttpHealthCheck(options: unknown): Promise<ExecutableResource>;
   getEndpoint(name: string): Promise<EndpointReference>;
 }
 export interface DistributedApplicationBuilder {
   addExecutable(name: string, command: string, workdir: string, args: string[]): ExecutableResource;
+  addDenoApp(name: string, workingDirectory: string, scriptPath: string): ExecutableResource;
 }
-export const OtlpProtocol = { HttpProtobuf: 'http-protobuf' } as const;
 `,
     );
     await Deno.writeTextFile(

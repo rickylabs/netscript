@@ -112,7 +112,7 @@ export function structuredLogEvidence(
   };
 }
 
-/** Match the exact hosted 13.5.3 payload on a dashboard-gated call. */
+/** Match the exact hosted 17.0.0 payload on a dashboard-gated call. */
 export function isDashboardUnavailableError(toolName: string, error: unknown): boolean {
   if (!ASPIRE_MCP_DASHBOARD_GATED_CALLS.includes(toolName)) return false;
   if (!(error instanceof Error)) return false;

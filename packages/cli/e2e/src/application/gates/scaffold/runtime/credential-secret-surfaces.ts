@@ -17,8 +17,6 @@ export function assertHealthReportsHaveNoSecrets(
   topology: unknown,
   secrets: readonly string[],
 ): void {
-  // #1726's named surfaces exclude aspire describe's resolved resource.environment projection.
-  // That pre-existing connection-string exposure is #2259; restore the whole-snapshot scan there.
   const visit = (value: unknown): void => {
     if (value === null || typeof value !== 'object') return;
     for (const [key, child] of Object.entries(value)) {

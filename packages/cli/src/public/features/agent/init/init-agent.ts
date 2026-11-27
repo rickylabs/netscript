@@ -19,7 +19,10 @@ import {
 import { generateEditorConfigFiles } from '../../../../kernel/adapters/scaffold/editor-config.ts';
 import type { AgentDocsGenerator } from './agent-docs-generator.ts';
 import type { AgentInitFileSystem } from './agent-init-file-system.ts';
-import { ASPIRE_WORKFLOW_SKILLS, type AspireAgentInitializer } from './aspire-agent-initializer.ts';
+import {
+  type AspireAgentInitializer,
+  RETIRED_ASPIRE_WORKFLOW_SKILLS,
+} from './aspire-agent-initializer.ts';
 import type { InitAgentInput, InitAgentResult } from './init-agent-input.ts';
 import {
   AGENT_PROJECT_MARKERS,
@@ -47,8 +50,6 @@ function agentsSection(withDocs: boolean): string {
     docs,
   ).trimEnd();
 }
-const ASPIRE_INIT_TIMEOUT_MS = 60_000;
-
 /** Embedded skill bundle accepted by the installer and its integrity test seam. */
 export interface AgentSkillBundle {
   readonly files: Readonly<Record<string, string>>;
@@ -63,7 +64,8 @@ export interface AgentToolBundle extends AgentSkillBundle {
 /** Dependencies for the agent installer use case. */
 export interface InitAgentDependencies {
   readonly fs: AgentInitFileSystem;
-  readonly aspireAgentInitializer: AspireAgentInitializer;
+  /** Retained optional compatibility field; NetScript 0.0.10+ owns all project agent wiring natively. */
+  readonly aspireAgentInitializer?: AspireAgentInitializer;
   readonly aspireTimeoutMs?: number;
   readonly bundle?: AgentSkillBundle;
   readonly toolBundle?: AgentToolBundle;
@@ -175,17 +177,16 @@ export async function initAgent(
   );
   if (hosts.includes('claude')) {
     const skillNames = [
-      ...new Set([
-        ...(skillManifest.files ?? []).filter((path) => path.endsWith('/SKILL.md')).map(
+      ...new Set(
+        (skillManifest.files ?? []).filter((path) => path.endsWith('/SKILL.md')).map(
           (path) => path.split('/')[0],
         ),
-        ...ASPIRE_WORKFLOW_SKILLS,
-      ]),
+      ),
     ];
     messages.push(
       ...await cleanClaudeSkillMirrors(
         input.projectRoot,
-        skillNames,
+        [...skillNames, ...RETIRED_ASPIRE_WORKFLOW_SKILLS],
         dependencies.fs,
         changedFiles,
       ),
@@ -242,28 +243,6 @@ export async function initAgent(
   for (const write of openCodeWrites) {
     await writeChanged(dependencies.fs, write.path, write.content, changedFiles);
   }
-  if (
-    hosts.includes('claude') &&
-    !await hasAspireWorkflowSkills(input.projectRoot, dependencies.fs)
-  ) {
-    const signal = AbortSignal.timeout(
-      dependencies.aspireTimeoutMs ?? ASPIRE_INIT_TIMEOUT_MS,
-    );
-    try {
-      const result = await dependencies.aspireAgentInitializer.initialize(
-        input.projectRoot,
-        signal,
-      );
-      if (!result.ok) messages.push(aspireSkipped(result.reason));
-    } catch (error) {
-      const reason = signal.aborted
-        ? 'aspire agent init timed out'
-        : error instanceof Error
-        ? error.message
-        : String(error);
-      messages.push(aspireSkipped(reason));
-    }
-  }
   if (docs) {
     messages.push(
       `Installed offline NetScript ${docs.frameworkVersion} documentation at .netscript/docs (${docs.proseFileCount} prose files, ${docs.apiPackageCount} API packages / ${docs.apiExportCount} export subpaths).`,
@@ -306,16 +285,6 @@ function materializeSkillFiles(
       return [path, rendered] as const;
     },
   );
-}
-
-async function hasAspireWorkflowSkills(
-  projectRoot: string,
-  fs: AgentInitFileSystem,
-): Promise<boolean> {
-  for (const skill of ASPIRE_WORKFLOW_SKILLS) {
-    if (!await fs.exists(join(projectRoot, '.agents', 'skills', skill, 'SKILL.md'))) return false;
-  }
-  return true;
 }
 
 /** Read both OpenCode config files and plan their writes before any project file is touched. */
@@ -443,10 +412,6 @@ function netscriptMcpArgs(
     projectRoot,
     ...(docsRoot ? ['--docs-root', docsRoot] : []),
   ];
-}
-
-function aspireSkipped(reason: string): string {
-  return `Aspire agent wiring was skipped: ${reason.replace(/[.]+$/, '')}.`;
 }
 
 async function writeChanged(

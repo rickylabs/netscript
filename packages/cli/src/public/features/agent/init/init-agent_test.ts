@@ -14,7 +14,10 @@ import { format, increment, parse } from '@std/semver';
 import { NETSCRIPT_RELEASE_VERSION } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { EMBEDDED_SKILL_FILES } from '../../../../kernel/assets/skills.generated.ts';
 import { DenoAgentInitFileSystem } from './agent-init-file-system.ts';
-import { ASPIRE_WORKFLOW_SKILLS, type AspireAgentInitializer } from './aspire-agent-initializer.ts';
+import {
+  type AspireAgentInitializer,
+  RETIRED_ASPIRE_WORKFLOW_SKILLS,
+} from './aspire-agent-initializer.ts';
 import { initAgent } from './init-agent.ts';
 import { TOOL_NAMES } from '@netscript/mcp';
 import { describeAgentInitResolution } from './hosts/agent-host-resolution.ts';
@@ -506,44 +509,40 @@ Deno.test('installed skill routing resolves to installed skills or help', async 
   }
 });
 
-Deno.test('aspire delegation installs four workflow skills without changing canonical aspire', async () => {
+Deno.test('Aspire 17.0.0 agent init owns project wiring natively without invoking aspire agent init', async () => {
   const root = await Deno.makeTempDir();
   try {
     const fs = new DenoAgentInitFileSystem();
     let calls = 0;
-    let canonicalHashDuringInit = '';
     const initializer: AspireAgentInitializer = {
-      async initialize(projectRoot) {
+      initialize() {
         calls++;
-        canonicalHashDuringInit = await sha256(
-          await Deno.readTextFile(join(projectRoot, '.agents/skills/aspire/SKILL.md')),
-        );
-        for (const skill of ASPIRE_WORKFLOW_SKILLS) {
-          await fs.writeText(
-            join(projectRoot, '.agents/skills', skill, 'SKILL.md'),
-            `# ${skill}\n`,
-          );
-        }
-        return { ok: true };
+        return Promise.resolve({ ok: true });
       },
     };
-    await initAgent({ projectRoot: root, host: 'claude' }, {
+    const first = await initAgent({ projectRoot: root, host: 'claude' }, {
       fs,
       aspireAgentInitializer: initializer,
     });
+    const canonicalHash = await sha256(
+      await Deno.readTextFile(join(root, '.agents/skills/aspire/SKILL.md')),
+    );
     const second = await initAgent({ projectRoot: root, host: 'claude' }, {
       fs,
       aspireAgentInitializer: initializer,
     });
-    assertEquals(calls, 1);
+    assertEquals(calls, 0);
+    assertEquals(first.messages, []);
     assertEquals(
       await sha256(await Deno.readTextFile(join(root, '.agents/skills/aspire/SKILL.md'))),
-      canonicalHashDuringInit,
+      canonicalHash,
     );
-    for (const skill of ASPIRE_WORKFLOW_SKILLS) {
-      assert(await fs.exists(join(root, '.agents', 'skills', skill, 'SKILL.md')));
+    for (const skill of RETIRED_ASPIRE_WORKFLOW_SKILLS) {
+      assertFalse(await fs.exists(join(root, '.agents', 'skills', skill, 'SKILL.md')));
       assertFalse(await fs.exists(join(root, '.claude', 'skills', skill, 'SKILL.md')));
     }
+    const config = JSON.parse(await Deno.readTextFile(join(root, '.mcp.json')));
+    assertEquals(config.mcpServers.aspire, { command: 'aspire', args: ['agent', 'mcp'] });
     assertEquals(second.changedFiles, []);
     assertEquals(second.messages, []);
   } finally {
@@ -556,47 +555,36 @@ async function sha256(text: string): Promise<string> {
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
-Deno.test('aspire delegation timeout is swallowed after cancelling the fake', async () => {
+Deno.test('agent init writes Aspire MCP config cleanly even without an Aspire initializer dependency', async () => {
   const root = await Deno.makeTempDir();
   try {
-    let cancelled = false;
-    const hanging: AspireAgentInitializer = {
-      initialize(_projectRoot, signal) {
-        return new Promise((_resolve, reject) => {
-          signal.addEventListener('abort', () => {
-            cancelled = true;
-            reject(signal.reason);
-          }, { once: true });
-        });
-      },
-    };
     const result = await initAgent({ projectRoot: root, host: 'claude' }, {
       fs: new DenoAgentInitFileSystem(),
-      aspireAgentInitializer: hanging,
-      aspireTimeoutMs: 1,
     });
-    assert(cancelled);
-    assertStringIncludes(result.messages[0], 'timed out');
+    assertEquals(result.messages, []);
     const config = JSON.parse(await Deno.readTextFile(join(root, '.mcp.json')));
-    assertEquals(config.mcpServers.aspire.command, 'aspire');
+    assertEquals(config.mcpServers.aspire, { command: 'aspire', args: ['agent', 'mcp'] });
   } finally {
     await Deno.remove(root, { recursive: true });
   }
 });
 
-Deno.test('aspire delegation errors are swallowed with unconditional MCP config', async () => {
+Deno.test('agent init does not invoke failing or hanging legacy Aspire initializers', async () => {
   const root = await Deno.makeTempDir();
   try {
+    let calls = 0;
     const throwing: AspireAgentInitializer = {
-      initialize: () => Promise.reject(new Error('aspire is unavailable')),
+      initialize: () => {
+        calls++;
+        return Promise.reject(new Error('aspire is unavailable'));
+      },
     };
     const result = await initAgent({ projectRoot: root, host: 'claude' }, {
       fs: new DenoAgentInitFileSystem(),
       aspireAgentInitializer: throwing,
     });
-    assertEquals(result.messages, [
-      'Aspire agent wiring was skipped: aspire is unavailable.',
-    ]);
+    assertEquals(calls, 0);
+    assertEquals(result.messages, []);
     const config = JSON.parse(await Deno.readTextFile(join(root, '.mcp.json')));
     assertEquals(config.mcpServers.aspire.args, ['agent', 'mcp']);
   } finally {
@@ -1368,8 +1356,8 @@ Deno.test('#2007 AGENTS.md addresses skills by registered name, never by SKILL.m
     for (const skill of manifest.skills) {
       assertMatch(section, new RegExp(`[Cc]all the \`${skill}\` skill`));
     }
-    for (const skill of ASPIRE_WORKFLOW_SKILLS) {
-      assertStringIncludes(section, `\`${skill}\``);
+    for (const skill of RETIRED_ASPIRE_WORKFLOW_SKILLS) {
+      assertFalse(section.includes(skill), `AGENTS.md must not advertise retired ${skill}`);
     }
   } finally {
     await Deno.remove(root, { recursive: true });

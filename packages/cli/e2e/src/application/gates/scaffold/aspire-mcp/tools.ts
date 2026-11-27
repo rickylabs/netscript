@@ -1,5 +1,6 @@
 export const ASPIRE_MCP_BASELINE_TOOLS: readonly string[] = [
   'list_resources',
+  'wait_for_resources',
   'list_console_logs',
   'list_structured_logs',
   'list_traces',
@@ -24,7 +25,7 @@ export const ASPIRE_MCP_DASHBOARD_TOOLS: readonly string[] = [
   'list_trace_structured_logs',
 ];
 
-/** AppHost-mode calls backed by the Aspire Dashboard in 13.5.3. */
+/** AppHost-mode calls backed by the Aspire Dashboard in 17.0.0. */
 export const ASPIRE_MCP_DASHBOARD_GATED_CALLS: readonly string[] = [
   'list_resources',
   'list_console_logs',

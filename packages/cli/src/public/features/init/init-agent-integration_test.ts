@@ -200,7 +200,7 @@ Deno.test('init integration: default agent installation is idempotent on repeate
     assert(results[0].changedFiles.length > 0);
     assertEquals(results[1].changedFiles, []);
     assertEquals(await Deno.readTextFile(join(root, 'AGENTS.md')), before);
-    assertStringIncludes(results[0].messages.join('\n'), 'fixture unavailable');
+    assertEquals(results[0].messages, []);
   });
 });
 
