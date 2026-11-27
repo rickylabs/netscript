@@ -65,18 +65,25 @@ export function sanitizeDiagnosticReason(reason: unknown, fallback: string): str
 }
 
 /** Constructs a redacted JSON error response with proxy cache/security headers. */
-export function createChatProxyErrorResponse(status: number, reason: string): Response {
+export function createChatProxyErrorResponse(
+  status: number,
+  reason: string,
+  extraHeaders?: Readonly<Record<string, string>>,
+): Response {
+  const headers = new Headers({
+    'content-type': 'application/json; charset=utf-8',
+    'cache-control': 'no-store',
+    'x-content-type-options': 'nosniff',
+    'vary': CHAT_PROXY_VARY_HEADER,
+  });
+  if (extraHeaders) {
+    for (const [name, value] of Object.entries(extraHeaders)) {
+      headers.set(name, value);
+    }
+  }
   return new Response(
     JSON.stringify({ error: ERROR_LABELS[status] ?? 'SERVICE_UNAVAILABLE', reason }),
-    {
-      status,
-      headers: {
-        'content-type': 'application/json; charset=utf-8',
-        'cache-control': 'no-store',
-        'x-content-type-options': 'nosniff',
-        'vary': CHAT_PROXY_VARY_HEADER,
-      },
-    },
+    { status, headers },
   );
 }
 

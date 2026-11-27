@@ -871,3 +871,474 @@ Deno.test('Gate 8 live HTTP upstream: authorized POST duplex:half and redacted u
     await server.finished.catch(() => undefined);
   }
 });
+
+Deno.test('Gate 8 regression #1: shared SSE proxy enforces 1,000-reader cap before policy/upstream and releases slots on cancel', async () => {
+  const clock = new FakeClock();
+  let authorizeCalls = 0;
+  let fetchCalls = 0;
+  const openReaders: Response[] = [];
+
+  const handler = createNetScriptChatStreamProxy({
+    target: { sessionId: 'cap-chat', baseUrl: 'http://upstream.test' },
+    auth: () => ({}),
+    clientAuth: 'bearer',
+    clock,
+    recheckEveryMs: null,
+    authorize: () => {
+      authorizeCalls += 1;
+      return { allow: true, grant: { idx: authorizeCalls } };
+    },
+    recheck: () => ({ allow: true }),
+    fetch: () => {
+      fetchCalls += 1;
+      const upstream = new ControlledSseUpstream();
+      return Promise.resolve(
+        new Response(upstream.stream, {
+          status: 200,
+          headers: { 'content-type': 'text/event-stream; charset=utf-8' },
+        }),
+      );
+    },
+  });
+
+  try {
+    for (let i = 0; i < 1_000; i += 1) {
+      const res = await handler(
+        new Request(`https://app.example.test/api/chat/cap-chat?live=sse&n=${i}`, {
+          headers: { authorization: `Bearer tok-${i}` },
+        }),
+      );
+      assertEquals(res.status, 200);
+      openReaders.push(res);
+    }
+    assertEquals(authorizeCalls, 1_000);
+    assertEquals(fetchCalls, 1_000);
+
+    // Request 1,001 MUST fail closed with 503 + Retry-After: 5 BEFORE authorize or upstream fetch!
+    const overflow = await handler(
+      new Request('https://app.example.test/api/chat/cap-chat?live=sse&n=1001', {
+        headers: { authorization: 'Bearer tok-overflow' },
+      }),
+    );
+    assertEquals(overflow.status, 503);
+    assertEquals(overflow.headers.get('retry-after'), '5');
+    assertEquals((await overflow.json()).reason, 'max_active_readers_exceeded');
+    assertEquals(authorizeCalls, 1_000);
+    assertEquals(fetchCalls, 1_000);
+
+    // Releasing one active reader frees a slot so request 1,002 succeeds.
+    const freed = openReaders.pop()!;
+    await freed.body?.cancel();
+    const admitted = await handler(
+      new Request('https://app.example.test/api/chat/cap-chat?live=sse&n=1002', {
+        headers: { authorization: 'Bearer tok-1002' },
+      }),
+    );
+    assertEquals(admitted.status, 200);
+    openReaders.push(admitted);
+    assertEquals(authorizeCalls, 1_001);
+    assertEquals(fetchCalls, 1_001);
+  } finally {
+    await Promise.all(openReaders.map((res) => res.body?.cancel()));
+  }
+});
+
+Deno.test('Gate 8 regression #2: request-derived target(req).headers never forwards client Cookie or Authorization on SSE GET, non-SSE GET, or POST', async () => {
+  const seenRequests: Request[] = [];
+
+  const handler = createNetScriptChatStreamProxy({
+    target: (req) => ({
+      sessionId: 'cred-strip',
+      baseUrl: 'http://upstream.test',
+      headers: {
+        ...Object.fromEntries(req.headers.entries()),
+        'x-safe-target': 'kept',
+      },
+    }),
+    auth: () => ({}),
+    authorize: () => ({ allow: true, grant: 'g1' }),
+    recheck: () => ({ allow: true }),
+    fetch: (input) => {
+      const req = input as Request;
+      seenRequests.push(req);
+      if (new URL(req.url).searchParams.get('live') === 'sse') {
+        const u = new ControlledSseUpstream();
+        u.close();
+        return Promise.resolve(
+          new Response(u.stream, {
+            status: 200,
+            headers: { 'content-type': 'text/event-stream; charset=utf-8' },
+          }),
+        );
+      }
+      return Promise.resolve(
+        new Response(JSON.stringify({ ok: true }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+      );
+    },
+  });
+
+  const clientHeaders = {
+    cookie: '__Host-session=client-cookie-secret',
+    authorization: 'Bearer client-bearer-secret',
+    'proxy-authorization': 'Basic c2VjcmV0',
+    'x-forwarded-for': '203.0.113.9',
+    'sec-fetch-site': 'same-origin',
+    'content-type': 'application/json',
+  };
+
+  const sseRes = await handler(
+    new Request('https://app.example.test/api/chat/cred-strip?live=sse', {
+      method: 'GET',
+      headers: clientHeaders,
+    }),
+  );
+  assertEquals(sseRes.status, 200);
+  await readAllText(sseRes.body);
+
+  const pollRes = await handler(
+    new Request('https://app.example.test/api/chat/cred-strip?live=long-poll', {
+      method: 'GET',
+      headers: clientHeaders,
+    }),
+  );
+  assertEquals(pollRes.status, 200);
+  await pollRes.body?.cancel();
+
+  const postRes = await handler(
+    new Request('https://app.example.test/api/chat/cred-strip', {
+      method: 'POST',
+      headers: clientHeaders,
+      body: JSON.stringify({ text: 'hello' }),
+    }),
+  );
+  assertEquals(postRes.status, 200);
+  await postRes.body?.cancel();
+
+  assertEquals(seenRequests.length, 3);
+  for (const upstreamReq of seenRequests) {
+    assertEquals(upstreamReq.headers.get('cookie'), null);
+    assertEquals(upstreamReq.headers.get('authorization'), null);
+    assertEquals(upstreamReq.headers.get('proxy-authorization'), null);
+    assertEquals(upstreamReq.headers.get('x-forwarded-for'), null);
+    assertEquals(upstreamReq.headers.get('sec-fetch-site'), null);
+    assertEquals(upstreamReq.headers.get('x-safe-target'), 'kept');
+  }
+});
+
+Deno.test('Gate 8 regression #3: enforces GET/POST method boundary (405) and rejects combined/ambiguous SSE Content-Type on GET and POST', async () => {
+  let authorizeCalls = 0;
+  let fetchCalls = 0;
+  let nextHeaders: HeadersInit = { 'content-type': 'application/json' };
+
+  const handler = createNetScriptChatStreamProxy({
+    target: { sessionId: 'mime-fence', baseUrl: 'http://upstream.test' },
+    auth: () => ({ Authorization: 'Bearer server-secret' }),
+    authorize: () => {
+      authorizeCalls += 1;
+      return { allow: true, grant: 'g1' };
+    },
+    recheck: () => ({ allow: true }),
+    fetch: () => {
+      fetchCalls += 1;
+      return Promise.resolve(
+        new Response('event: data\ndata: {"leaked":true}\n\n', {
+          status: 200,
+          headers: nextHeaders,
+        }),
+      );
+    },
+  });
+
+  // 1. Non-GET/POST methods MUST fail closed with 405 + Allow: GET, POST BEFORE policy or upstream
+  for (const method of ['HEAD', 'OPTIONS', 'PUT', 'PATCH', 'DELETE']) {
+    const res = await handler(
+      new Request('https://app.example.test/api/chat/mime-fence', {
+        method,
+        headers: { authorization: 'Bearer client-tok' },
+      }),
+    );
+    assertEquals(res.status, 405, `expected 405 for ${method}`);
+    assertEquals(res.headers.get('allow'), 'GET, POST');
+    assertEquals((await res.json()).reason, 'method_not_allowed');
+  }
+  assertEquals(authorizeCalls, 0);
+  assertEquals(fetchCalls, 0);
+
+  // 2. Duplicate/combined Content-Type headers (application/json, text/event-stream) and raw SSE
+  //    MUST fail closed with redacted 502 on BOTH non-SSE GET and POST!
+  const duplicateSseHeaders = new Headers();
+  duplicateSseHeaders.append('content-type', 'application/json');
+  duplicateSseHeaders.append('content-type', 'text/event-stream');
+
+  for (
+    const badHeaders of [
+      duplicateSseHeaders,
+      { 'content-type': 'application/json, text/event-stream' },
+      { 'content-type': 'application/json, text/plain' },
+      { 'content-type': 'text/event-stream; charset=utf-8' },
+    ]
+  ) {
+    nextHeaders = badHeaders;
+    for (const method of ['GET', 'POST'] as const) {
+      const res = await handler(
+        new Request('https://app.example.test/api/chat/mime-fence', {
+          method,
+          headers: { authorization: 'Bearer client-tok' },
+          body: method === 'POST' ? '{"msg":"hi"}' : undefined,
+        }),
+      );
+      assertEquals(res.status, 502);
+      const bodyText = await res.text();
+      assertFalse(bodyText.includes('leaked'));
+      assertEquals(JSON.parse(bodyText).reason, 'unexpected_sse_response');
+    }
+  }
+});
+
+Deno.test('Gate 8 regression #4: stalled body.cancel() never blocks 502, malformed Connection token never throws, and abort in auth() skips fetch', async () => {
+  const pendingCancels: Array<() => void> = [];
+  let fetchCalls = 0;
+  let nextUpstream!: () => Response;
+  let onAuth: (() => void) | undefined;
+
+  const makeStalledBody = (): ReadableStream<Uint8Array> =>
+    new ReadableStream<Uint8Array>({
+      cancel() {
+        return new Promise<void>((resolve) => {
+          pendingCancels.push(resolve);
+        });
+      },
+    });
+
+  const handler = createNetScriptChatStreamProxy({
+    target: { sessionId: 'cleanup-fence', baseUrl: 'http://upstream.test' },
+    auth: () => {
+      onAuth?.();
+      return { Authorization: 'Bearer server-secret' };
+    },
+    authorize: () => ({ allow: true, grant: 'g1' }),
+    recheck: () => ({ allow: true }),
+    fetch: () => {
+      fetchCalls += 1;
+      return Promise.resolve(nextUpstream());
+    },
+  });
+
+  // 1. All four 502 paths (401, 403, 302, unexpected SSE) return immediately even while body.cancel() is pending
+  const cases: Array<{ readonly factory: () => Response; readonly reason: string }> = [
+    {
+      factory: () => new Response(makeStalledBody(), { status: 401 }),
+      reason: 'upstream_auth_failed',
+    },
+    {
+      factory: () => new Response(makeStalledBody(), { status: 403 }),
+      reason: 'upstream_auth_failed',
+    },
+    {
+      factory: () =>
+        new Response(makeStalledBody(), {
+          status: 302,
+          headers: { location: 'https://evil.example.test' },
+        }),
+      reason: 'upstream_redirect_blocked',
+    },
+    {
+      factory: () =>
+        new Response(makeStalledBody(), {
+          status: 200,
+          headers: { 'content-type': 'text/event-stream' },
+        }),
+      reason: 'unexpected_sse_response',
+    },
+  ];
+
+  for (const item of cases) {
+    nextUpstream = item.factory;
+    const res = await handler(
+      new Request('https://app.example.test/api/chat/cleanup-fence', {
+        headers: { authorization: 'Bearer client-tok' },
+      }),
+    );
+    assertEquals(res.status, 502);
+    assertEquals((await res.json()).reason, item.reason);
+  }
+  assertEquals(pendingCancels.length, 4);
+  for (const release of pendingCancels) release();
+
+  // 2. Malformed Connection header token (`invalid name`) does not throw TypeError and still strips valid tokens
+  nextUpstream = () =>
+    new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: {
+        'content-type': 'application/json',
+        connection: 'keep-alive, invalid name, x-hop-strip',
+        'x-hop-strip': 'must-go',
+        'stream-next-offset': 'off-99',
+      },
+    });
+  const sanitizedRes = await handler(
+    new Request('https://app.example.test/api/chat/cleanup-fence', {
+      headers: { authorization: 'Bearer client-tok' },
+    }),
+  );
+  assertEquals(sanitizedRes.status, 200);
+  assertEquals(sanitizedRes.headers.get('x-hop-strip'), null);
+  assertEquals(sanitizedRes.headers.get('stream-next-offset'), 'off-99');
+  assertEquals(await sanitizedRes.json(), { ok: true });
+
+  // 3. Aborting req.signal inside auth() skips upstream fetch completely (on both non-SSE and SSE)
+  const beforeAbortFetches = fetchCalls;
+  const acNonSse = new AbortController();
+  onAuth = () => acNonSse.abort('client-gone');
+  nextUpstream = () => new Response(null, { status: 204 });
+  const abortedNonSse = await handler(
+    new Request('https://app.example.test/api/chat/cleanup-fence', {
+      method: 'POST',
+      headers: { authorization: 'Bearer client-tok' },
+      signal: acNonSse.signal,
+    }),
+  );
+  assertEquals(abortedNonSse.status, 503);
+  assertEquals((await abortedNonSse.json()).reason, 'client_cancelled');
+  assertEquals(fetchCalls, beforeAbortFetches);
+
+  const acSse = new AbortController();
+  onAuth = () => acSse.abort('client-gone');
+  const abortedSse = await handler(
+    new Request('https://app.example.test/api/chat/cleanup-fence?live=sse', {
+      method: 'GET',
+      headers: { authorization: 'Bearer client-tok' },
+      signal: acSse.signal,
+    }),
+  );
+  assertEquals(abortedSse.status, 503);
+  assertEquals((await abortedSse.json()).reason, 'client_cancelled');
+  assertEquals(fetchCalls, beforeAbortFetches);
+});
+
+Deno.test('Gate 8 regression #5: construction binds clock/revocationSource ports immutably and rejects Set allowedOrigins or invalid shapes', async () => {
+  // 1. Invalid shapes throw TypeError at construction
+  assertThrows(
+    () =>
+      createNetScriptChatStreamProxy({
+        target: { sessionId: 's1', baseUrl: 'http://upstream.test' },
+        authorize: () => ({ allow: true, grant: 'g1' }),
+        recheck: () => ({ allow: true }),
+        allowedOrigins: new Set(['https://trusted.example.test']) as never,
+      }),
+    TypeError,
+  );
+  assertThrows(
+    () =>
+      createNetScriptChatStreamProxy({
+        target: { sessionId: 's1', baseUrl: 'http://upstream.test' },
+        authorize: () => ({ allow: true, grant: 'g1' }),
+        recheck: () => ({ allow: true }),
+        revocationSource: { subscribe: null } as never,
+      }),
+    TypeError,
+  );
+  assertThrows(
+    () =>
+      createNetScriptChatStreamProxy({
+        target: { sessionId: 's1', baseUrl: 'http://upstream.test' },
+        authorize: () => ({ allow: true, grant: 'g1' }),
+        recheck: () => ({ allow: true }),
+        clock: { nowMs: () => 0, schedule: null } as never,
+      }),
+    TypeError,
+  );
+  for (
+    const badNullOption of [
+      { clientAuth: null as never },
+      { trustProxy: null as never },
+      { policyTimeoutMs: null as never },
+    ]
+  ) {
+    assertThrows(
+      () =>
+        createNetScriptChatStreamProxy({
+          target: { sessionId: 's1', baseUrl: 'http://upstream.test' },
+          authorize: () => ({ allow: true, grant: 'g1' }),
+          recheck: () => ({ allow: true }),
+          ...badNullOption,
+        }),
+      TypeError,
+    );
+  }
+
+  // 2. Mutating clock.schedule / clock.nowMs / revocationSource.subscribe after construction is ignored
+  const fakeClock = new FakeClock();
+  let originalScheduleCalls = 0;
+  let mutatedScheduleCalls = 0;
+  let originalSubscribeCalls = 0;
+  let mutatedSubscribeCalls = 0;
+  let notifyFn: ((signal?: StreamProxyRevocationSignal) => void) | undefined;
+
+  const mutableClock = {
+    nowMs() {
+      return fakeClock.nowMs();
+    },
+    schedule(delayMs: number, onFire: () => void) {
+      originalScheduleCalls += 1;
+      return fakeClock.schedule(delayMs, onFire);
+    },
+  };
+  const mutableRevocationSource = {
+    subscribe(_grant: string, notify: (signal?: StreamProxyRevocationSignal) => void) {
+      originalSubscribeCalls += 1;
+      notifyFn = notify;
+      return () => {
+        notifyFn = undefined;
+      };
+    },
+  };
+
+  const upstream = new ControlledSseUpstream();
+  const handler = createNetScriptChatStreamProxy<string>({
+    target: { sessionId: 'immut', baseUrl: 'http://upstream.test' },
+    auth: () => ({}),
+    clock: mutableClock,
+    revocationSource: mutableRevocationSource,
+    recheckEveryMs: 5_000,
+    authorize: () => ({ allow: true, grant: 'g-immut' }),
+    recheck: () => ({ allow: true }),
+    fetch: () =>
+      Promise.resolve(
+        new Response(upstream.stream, {
+          status: 200,
+          headers: { 'content-type': 'text/event-stream; charset=utf-8' },
+        }),
+      ),
+  });
+
+  // Tamper with the caller-owned objects AFTER construction
+  mutableClock.schedule = () => {
+    mutatedScheduleCalls += 1;
+    return () => {};
+  };
+  mutableClock.nowMs = () => Number.NaN;
+  mutableRevocationSource.subscribe = () => {
+    mutatedSubscribeCalls += 1;
+    return () => {};
+  };
+
+  const res = await handler(
+    new Request('https://app.example.test/api/chat/immut?live=sse', {
+      headers: { authorization: 'Bearer tok-immut' },
+    }),
+  );
+  assertEquals(res.status, 200);
+  assert(originalScheduleCalls > 0);
+  assertEquals(originalSubscribeCalls, 1);
+  assertEquals(mutatedScheduleCalls, 0);
+  assertEquals(mutatedSubscribeCalls, 0);
+
+  notifyFn!({ action: 'revoked', reason: 'done' });
+  assertEquals(await readAllText(res.body), '');
+  assertEquals(upstream.cancelled, true);
+  assertEquals(fakeClock.timers.size, 0);
+});

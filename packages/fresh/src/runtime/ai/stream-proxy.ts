@@ -325,6 +325,9 @@ function toRequest(input: Request | { readonly req: Request }): Request {
 export function createNetScriptChatStreamProxy<TGrant = unknown>(
   options: NetScriptChatStreamProxyOptions<TGrant>,
 ): NetScriptChatStreamProxyHandler {
+  if (typeof options !== 'object' || options === null || Array.isArray(options)) {
+    throw new TypeError('[netscript.fresh.ai] options must be an object');
+  }
   const hasAuthorize = options.authorize !== undefined;
   const hasRecheck = options.recheck !== undefined;
   if (hasAuthorize !== hasRecheck) {
