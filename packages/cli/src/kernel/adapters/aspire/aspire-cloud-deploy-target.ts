@@ -194,7 +194,7 @@ export class AspireCloudDeployTarget implements DeployTargetPort {
   }
 
   /**
-   * Tear down the target through Aspire or Cloud Run. Aspire 13.5 exposes
+   * Tear down the target through Aspire or Cloud Run. Aspire 17.0.0 exposes
    * `--yes` only on `destroy`, so the non-interactive AppHost path supplies it
    * here and never on `publish` or `deploy`.
    */

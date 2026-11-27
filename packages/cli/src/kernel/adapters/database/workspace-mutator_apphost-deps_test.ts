@@ -85,7 +85,7 @@ Deno.test('regenerating Aspire config refuses a legacy Node.js aspire/package.js
       JSON.stringify({ name: 'shop-apphost' }),
     );
     const configPath = join(root, 'aspire', 'aspire.config.json');
-    const beforeConfig = '{"sdk":{"version":"13.5.3"}}\n';
+    const beforeConfig = '{"sdk":{"version":"legacy-node"}}\n';
     await Deno.writeTextFile(configPath, beforeConfig);
 
     const mutator = new DatabaseWorkspaceMutator(

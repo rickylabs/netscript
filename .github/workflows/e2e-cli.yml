@@ -352,16 +352,16 @@ jobs:
         if: env.RUN == 'true'
         uses: actions/cache@v4
         with:
-          path: ~/.aspire/bin
+          path: ~/.dotnet/aspire-cli
           key: aspire-cli-${{ runner.os }}-17.0.0-v1
 
       - name: Install Aspire CLI
         if: env.RUN == 'true' && steps.aspire_cli_cache.outputs.cache-hit != 'true'
-        run: dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 17.0.0
+        run: dotnet tool install Aspire.Cli --tool-path "$HOME/.dotnet/aspire-cli" --version 17.0.0
 
       - name: Expose Aspire CLI on PATH
         if: env.RUN == 'true'
-        run: echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
+        run: echo "$HOME/.dotnet/aspire-cli" >> "$GITHUB_PATH"
 
       - name: Aspire CLI preflight
         if: env.RUN == 'true'
@@ -474,16 +474,16 @@ jobs:
         if: env.RUN == 'true'
         uses: actions/cache@v4
         with:
-          path: ~/.aspire/bin
+          path: ~/.dotnet/aspire-cli
           key: aspire-cli-${{ runner.os }}-17.0.0-v1
 
       - name: Install Aspire CLI
         if: env.RUN == 'true' && steps.aspire_cli_cache.outputs.cache-hit != 'true'
-        run: dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 17.0.0
+        run: dotnet tool install Aspire.Cli --tool-path "$HOME/.dotnet/aspire-cli" --version 17.0.0
 
       - name: Expose Aspire CLI on PATH
         if: env.RUN == 'true'
-        run: echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
+        run: echo "$HOME/.dotnet/aspire-cli" >> "$GITHUB_PATH"
 
       - name: Aspire CLI preflight
         if: env.RUN == 'true'

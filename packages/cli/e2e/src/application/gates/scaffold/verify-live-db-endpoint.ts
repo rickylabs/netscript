@@ -433,7 +433,7 @@ function findResource(value: unknown, name: string): Record<string, unknown> | u
 /**
  * Resolve a database endpoint resource without confusing its parameter siblings for the container.
  *
- * Aspire 13.5 emits `postgres-password` and the DCP-named Postgres container in the same resource
+ * Aspire 17.0.0 emits `postgres-password` and the DCP-named Postgres container in the same resource
  * array. Exact public identity wins regardless of array order. Older captures that omit the public
  * display name may fall back only to one DCP-suffixed resource that actually exposes a supported
  * database endpoint; an arbitrary prefix match is never evidence of the live database.

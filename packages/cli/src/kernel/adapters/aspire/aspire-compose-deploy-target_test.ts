@@ -71,7 +71,7 @@ Deno.test('plan/emit delegate to `aspire publish --output-path` (authors no YAML
   ]);
 });
 
-Deno.test('publish follows the Aspire 13.5 environment/non-interactive contract', async () => {
+Deno.test('publish follows the Aspire 17.0.0 environment/non-interactive contract', async () => {
   const process = new FakeProcess();
   const adapter = new AspireComposeDeployTarget({ key: 'compose', process });
 
@@ -117,7 +117,7 @@ Deno.test('docker `up` delegates the apply to `aspire deploy`', async () => {
   assertEquals(process.calls[0].args, ['deploy']);
 });
 
-Deno.test('deploy follows the Aspire 13.5 contract without destroy-only --yes', async () => {
+Deno.test('deploy follows the Aspire 17.0.0 contract without destroy-only --yes', async () => {
   const process = new FakeProcess();
   const adapter = new AspireComposeDeployTarget({ key: 'docker', process });
 

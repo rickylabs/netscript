@@ -100,7 +100,7 @@ Deno.test('up uses configured AppHost and outputPath from request config', async
   ]);
 });
 
-Deno.test('down uses the Aspire 13.5 non-interactive destroy contract', async () => {
+Deno.test('down uses the Aspire 17.0.0 non-interactive destroy contract', async () => {
   const process = new FakeProcess();
   const adapter = new AspireCloudDeployTarget({
     key: 'azure-aks',

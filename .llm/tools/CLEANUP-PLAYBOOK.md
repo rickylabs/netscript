@@ -47,10 +47,10 @@ checklist, not a narrative — execute the phases in order, honor every guardrai
    outcome to be **zero deletions** — epics usually leave a flat layout, not dead files.
 7. Commit slice 1: the inventory doc alone.
 
-## Aspire 13.5 teardown semantics
+## Aspire 17.0.0 teardown semantics
 
 The maintainer leak reporter and teardown controller deliberately separate **relevance** from
-**ownership**. Aspire 13.5 can leave DCP helpers and `aspire-managed` descendants re-parented to PID
+**ownership**. Aspire can leave DCP helpers and `aspire-managed` descendants re-parented to PID
 1 after the launching CLI exits. A process is relevant when its edge-captured facts contain a DCP
 environment path, an exact `--apphost <path>` argument, or a Unix socket opened by that PID whose
 path is under an AppHost root. PPID 1, a process name, or text that merely mentions those tokens is
@@ -61,7 +61,7 @@ the authorization boundary. Resolve paths before comparison. Foreign and unknown
 reported and left untouched; a root broad enough to cover other runs is refused. The protected
 `aspire agent mcp` command family is never classified as a cleanup target.
 
-Aspire 13.5.3 lifecycle receipts establish these operating facts:
+Aspire 17.0.0 lifecycle operating facts:
 
 - `aspire ps` and scoped `aspire stop --apphost <exact>` prune orphan registration and backchannel
   sockets automatically. S2 V6 observed the DCP helper exit 385 ms after the CLI disappeared, so

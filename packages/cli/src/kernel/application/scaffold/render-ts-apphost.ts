@@ -28,7 +28,7 @@ export async function scaffoldTsAppHost(
   const filesSkipped: string[] = [];
   const targetPath = options.targetPath;
 
-  // All TS AppHost files live here — isolated from the Deno workspace root.
+  // All TS AppHost files live here as a native Deno workspace member.
   const aspireDir = join(targetPath, SCAFFOLD_DIRS.ASPIRE_TS);
   await context.scaffolder.createDir(aspireDir);
   directoriesCreated.push(aspireDir);

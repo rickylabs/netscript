@@ -731,7 +731,7 @@ describe('generateRegisterInfrastructure', () => {
       output.indexOf('const db_0_password_value') < output.indexOf(registration),
       'the check must reuse the value already given to the secret parameter',
     );
-    // Aspire 13.5.3 rejects ReferenceExpression.getValue() inside AppHost callbacks (#1754).
+    // Aspire 17.0.0 rejects ReferenceExpression.getValue() inside AppHost callbacks (#1754).
     assert(!output.includes('connectionStringExpression()'));
     assert(!output.includes('.getValue()'));
   });

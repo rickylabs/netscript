@@ -1,5 +1,5 @@
 /**
- * Retired Aspire 13.5 workflow skills no longer installed by `netscript agent init`.
+ * Retired prior-generation Aspire workflow skills no longer installed by `netscript agent init`.
  * Retained solely so Claude mirror cleanup can identify legacy `.claude/skills/aspire-*` copies.
  */
 export const RETIRED_ASPIRE_WORKFLOW_SKILLS: readonly string[] = [

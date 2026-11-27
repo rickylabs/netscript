@@ -23,7 +23,7 @@ export function resourceCommandContract(): ResourceCommandContract {
   };
 }
 
-/** Exercise stable Aspire 13.5 resource commands, recording an explicit skip or command receipt. */
+/** Exercise stable Aspire 17.0.0 resource commands, recording an explicit skip or command receipt. */
 export async function runResourceCommands(
   appHost: string,
   projectRoot: string,

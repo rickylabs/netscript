@@ -100,7 +100,7 @@ export function generateReadme(options: ReadmeOptions): string {
   lines.push('├── plugins/          # Plugin registry and implementations');
   if (!options.noAspire) {
     lines.push(
-      '├── aspire/           # Aspire TypeScript orchestration (isolated Node.js runtime)',
+      '├── aspire/           # Aspire TypeScript orchestration (native Deno runtime)',
     );
     lines.push('│   ├── apphost.mts   # Entry point for `aspire start`');
     lines.push('│   ├── .helpers/     # Generated register-*.mts helpers');
@@ -108,7 +108,7 @@ export function generateReadme(options: ReadmeOptions): string {
       '│   ├── .aspire/      # Aspire SDK modules (aspire restore output)',
     );
     lines.push(
-      '│   └── package.json  # tsx + vscode-jsonrpc (isolated from the Deno workspace)',
+      '│   └── deno.json     # AppHost import map (native Deno workspace member)',
     );
   }
   if (!options.noAspire) {
@@ -145,9 +145,15 @@ export function generateReadme(options: ReadmeOptions): string {
   }
   if (!options.noAspire) {
     lines.push('| `cd aspire && aspire restore` | Restore Aspire SDK modules (run once) |');
-    lines.push('| `deno task aspire:start` | Start Aspire orchestration with the configurable cold-start budget |');
-    lines.push('| `deno task aspire:otel -- traces <resource>` | Query detached AppHost telemetry with automatic dashboard fallback |');
-    lines.push('| `deno task aspire:export -- -o telemetry.zip` | Export detached AppHost telemetry with automatic dashboard fallback |');
+    lines.push(
+      '| `deno task aspire:start` | Start Aspire orchestration with the configurable cold-start budget |',
+    );
+    lines.push(
+      '| `deno task aspire:otel -- traces <resource>` | Query detached AppHost telemetry with automatic dashboard fallback |',
+    );
+    lines.push(
+      '| `deno task aspire:export -- -o telemetry.zip` | Export detached AppHost telemetry with automatic dashboard fallback |',
+    );
   }
 
   lines.push('| `deno task check` | Type-check all workspace members |');

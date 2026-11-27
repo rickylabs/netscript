@@ -8,7 +8,7 @@
  *
  * Usage:
  *   deno task aspire:bump [--pretty|--json] [--offline]
- *   deno task aspire:bump --version 17.0.1 --browsers-version 17.0.1-preview.1.26600.1 --apply
+ *   deno task aspire:bump --version <version> --browsers-version <browsers-preview-version> --apply
  */
 import { join } from 'jsr:@std/path@^1';
 

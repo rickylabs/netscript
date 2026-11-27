@@ -147,7 +147,7 @@ function structuredLogsResult(
         isError,
       };
     } catch {
-      // The static 13.5.3 receipts do not establish a structured-log response shape.
+      // Static 17.0.0 receipts do not establish a structured-log response shape.
     }
   }
   return { isError };

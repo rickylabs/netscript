@@ -9,7 +9,7 @@
  * excluded entirely, including this run's own evidence. Transient working copies are also excluded
  * by the shared Aspire scan scope. The committed files are retained; exclusion is not deletion.
  * Parity semantics per class: owner `archival` → info only; class `compat-fixture` → phase 2 checks
- * that a 13.5.3 case exists beside the kept 13.4.6 case; class `lockfile` → excluded from literal
+ * that a 17.0.0 case exists with no stale literals; class `lockfile` → excluded from literal
  * sweeps; negative-version-guard → ignore only its narrowly recognized context,
  * then fail on every remaining stale literal; every other row → phase 2 fail on a stale literal.
  *
@@ -92,10 +92,10 @@ const RULES: readonly Rule[] = [
     disposition: 'exempt — RFC body; dated addenda only',
   },
   {
-    test: re(/(^|\/)[^/]*13\.4\.6[^/]*$/),
-    cls: 'archival:version-suffixed-fixture',
+    test: re(/(^|\/)CHANGELOG\.md$/),
+    cls: 'archival:changelog',
     owner: 'archival',
-    disposition: 'exempt — 13.4.6 compat fixture kept beside the 13.5.3 capture (S3)',
+    disposition: 'exempt — dated release changelog entries are historical evidence',
   },
   {
     test: re(/agent\/init\/fixtures\/prior-release\.mcp\.json$/),
@@ -112,18 +112,18 @@ const RULES: readonly Rule[] = [
   },
   {
     test: re(
-      /^(packages\/cli\/e2e\/src\/application\/gates\/scaffold\/service-env\/service-env-evidence_test\.ts|packages\/cli\/e2e\/tests\/application\/gates\/generated-app-endpoint_test\.ts|packages\/mcp\/tests\/service-endpoint-source-fixtures\.ts|packages\/mcp\/tests\/telemetry-live-fixture_test\.ts|packages\/mcp\/tests\/fixtures\/README\.md|packages\/mcp\/tests\/fixtures\/telemetry\/README\.md|packages\/mcp\/tests\/fixtures\/telemetry\/aspire-13\.5\.3-fixture\.ts|\.llm\/tools\/maint\/teardown\/probes_test\.ts)$/,
+      /^(packages\/cli\/e2e\/src\/application\/gates\/scaffold\/service-env\/service-env-evidence_test\.ts|packages\/cli\/e2e\/tests\/application\/gates\/generated-app-endpoint_test\.ts|packages\/mcp\/tests\/service-endpoint-source-fixtures\.ts|packages\/mcp\/tests\/telemetry-live-fixture_test\.ts|packages\/mcp\/tests\/fixtures\/README\.md|packages\/mcp\/tests\/fixtures\/telemetry\/README\.md|packages\/mcp\/tests\/fixtures\/telemetry\/aspire-17\.0\.0-fixture\.ts|\.llm\/tools\/maint\/teardown\/probes_test\.ts)$/,
     ),
     cls: 'compat-fixture',
     owner: 'S3',
     disposition:
-      'inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6',
+      'Aspire 17.0.0 fixture and generic leading-banner parser test; parity phase 2 asserts 17.0.0 coverage and zero stale literals',
   },
   {
-    // The parity checker, compat-fixture test, and aspire-bump test suites intentionally hold
-    // synthetic stale literals to assert rejection; phase 2 requires 17.0.0 coverage in them.
+    // The parity checker, compat-fixture test, docs-accuracy test, and aspire-bump test suites
+    // intentionally hold synthetic stale literals to assert rejection; phase 2 requires 17.0.0 coverage.
     test: re(
-      /^\.llm\/tools\/(validation\/(check-aspire-version-parity_test|check-compat-fixtures_test)|deps\/aspire-bump_test)\.ts$/,
+      /^\.llm\/tools\/(validation\/(check-aspire-version-parity_test|check-compat-fixtures_test)|deps\/aspire-bump_test|docs\/check-accuracy-and-discoverability_test)\.ts$/,
     ),
     cls: 'validation-test-fixture',
     owner: 'S1',
@@ -142,7 +142,7 @@ const RULES: readonly Rule[] = [
     cls: 'compat-fixture',
     owner: 'S7',
     disposition:
-      'documents why the version-suffixed 13.4.6 teardown fixture is retained and names its 13.5.3 counterpart; parity phase 2 asserts the 13.5.3 case exists',
+      'documents the version-suffixed 17.0.0 teardown fixtures; parity phase 2 asserts 17.0.0 coverage and zero stale literals',
   },
   {
     test: re(/^notes\.md$/),
@@ -155,7 +155,7 @@ const RULES: readonly Rule[] = [
     cls: 'compat-fixture',
     owner: 'S13',
     disposition:
-      'migration worked example and retained old/new fixtures; phase 2 requires the exact 13.5.3 counterpart',
+      'Aspire upgrade procedure and pin map; phase 2 requires 17.0.0 coverage and zero stale literals',
   },
   {
     test: re(/^\.llm\/tools\/docs\/check-accuracy-and-discoverability\.ts$/),
@@ -176,7 +176,7 @@ const RULES: readonly Rule[] = [
     test: starts('packages/cli/src/kernel/constants/scaffold/'),
     cls: 'scaffold-constants',
     owner: 'S1',
-    disposition: 'atomic 13.5.3 pin bump (A-SCAFFOLD); parity phase 1 enforce',
+    disposition: 'atomic 17.0.0 pin bump (A-SCAFFOLD); parity phase 1 enforce',
   },
   {
     test: re(/^packages\/cli\/src\/kernel\/templates\/aspire\/.*_test\.ts$/),
@@ -247,14 +247,14 @@ const RULES: readonly Rule[] = [
     cls: 'cli-adapter:deploy',
     owner: 'S4',
     disposition:
-      'verify the 13.5 aspire publish|deploy|destroy argv contract (--apphost, --output-path, --environment, --non-interactive; docs also list --yes, --clear-cache, --pipeline-log-level, --include-exception-details) against sources; adapter tests updated; S2 V12 --help receipts (D-15)',
+      'verify the aspire publish|deploy|destroy argv contract (--apphost, --output-path, --environment, --non-interactive; --yes destroy-only) against sources; adapter tests updated',
   },
   {
     test: starts('packages/cli/src/kernel/adapters/aspire/'),
     cls: 'cli-adapter:doctor',
     owner: 'S4',
     disposition:
-      'aspire ps --format Json parsing unchanged in 13.5 (BC-3 removed only ps --resources); grep-verified in the S4 member table',
+      'aspire ps --format Json parsing and native Deno AppHost dependency/preflight guards',
   },
   {
     test: starts('packages/cli/src/kernel/adapters/database/'),
@@ -289,7 +289,7 @@ const RULES: readonly Rule[] = [
     cls: 'e2e',
     owner: 'S2/S3/S10',
     disposition:
-      'runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)',
+      'runtime verification (S2); 17.0.0 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)',
   },
   {
     test: starts('packages/cli/'),
@@ -307,7 +307,7 @@ const RULES: readonly Rule[] = [
     test: starts('packages/mcp/tests/'),
     cls: 'mcp:fixtures',
     owner: 'S3',
-    disposition: 'add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat',
+    disposition: '17.0.0 describe/telemetry/ps fixtures and generic banner tolerance tests',
   },
   {
     test: starts('packages/mcp/'),
@@ -320,7 +320,7 @@ const RULES: readonly Rule[] = [
     test: starts('packages/telemetry/'),
     cls: 'telemetry-bridge',
     owner: 'S3',
-    disposition: 'dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff',
+    disposition: 'dashboard /api/telemetry adapter; verified against 17.0.0 telemetry fixtures',
   },
   {
     test: starts('packages/aspire/'),
@@ -359,7 +359,7 @@ const RULES: readonly Rule[] = [
     cls: 'skill:shipped',
     owner: 'S9',
     disposition:
-      'receipt-cited 13.5.3 text; embedded via gen:assets-barrel; parity phase 2 enforce',
+      'receipt-cited 17.0.0 text; embedded via gen:assets-barrel; parity phase 2 enforce',
   },
   {
     test: starts('.agents/generated/'),
@@ -377,7 +377,7 @@ const RULES: readonly Rule[] = [
     test: re(/^\.(agents|claude)\/skills\/codex-wsl-remote\//),
     cls: 'skill:internal',
     owner: 'S13',
-    disposition: 'replace 13.3.0 toolchain snapshot with toolchain.env reference',
+    disposition: 'toolchain.env reference for Aspire CLI pin',
   },
   {
     test: re(/^\.(agents|claude)\/skills\/netscript-pr\//),
@@ -402,7 +402,7 @@ const RULES: readonly Rule[] = [
     test: starts('.github/workflows/'),
     cls: 'ci:workflow',
     owner: 'S1',
-    disposition: 'single 13.5.3 train, cache key, preflight; parity phase 1 enforce',
+    disposition: 'single 17.0.0 train, cache key, preflight; parity phase 1 enforce',
   },
   {
     test: (p) => p === '.github/scripts/ci-test-shards.json',
@@ -434,7 +434,7 @@ const RULES: readonly Rule[] = [
     test: starts('.llm/tools/maint/teardown/'),
     cls: 'teardown',
     owner: 'S7',
-    disposition: 'orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture',
+    disposition: 'orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 17.0.0 fixture',
   },
   {
     test: starts('.llm/tools/'),

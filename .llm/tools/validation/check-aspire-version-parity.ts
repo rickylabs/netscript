@@ -158,12 +158,19 @@ function missingPhaseOneVersions(path: string, source: string): string[] {
   );
 }
 
+const FIXTURE_FILENAME_SUFFIX = /^17\.0\.0-[A-Za-z0-9._-]+\.(?:json|ndjson|ts|mts|js|mjs|gz|md)$/i;
+
+function normalizeContextualSeventeenToken(token: string): string {
+  return FIXTURE_FILENAME_SUFFIX.test(token) ? '17.0.0' : token;
+}
+
 function unexpectedContextualSeventeenVersions(source: string): string[] {
   const found = new Set<string>();
   for (const line of source.split(/\r?\n/)) {
     if (!ASPIRE_CONTEXT_LINE.test(line)) continue;
     for (const match of line.matchAll(SEVENTEEN_LITERAL_PATTERN)) {
-      if (!ALLOWED_ASPIRE_17_VERSIONS.includes(match[0])) {
+      const normalized = normalizeContextualSeventeenToken(match[0]);
+      if (!ALLOWED_ASPIRE_17_VERSIONS.includes(normalized)) {
         found.add(match[0]);
       }
     }
@@ -173,7 +180,7 @@ function unexpectedContextualSeventeenVersions(source: string): string[] {
 
 function containsExactAspireVersionToken(source: string, expectedVersion: string): boolean {
   return [...source.matchAll(VERSION_LITERAL_PATTERN)]
-    .map((match) => match[0])
+    .map((match) => normalizeContextualSeventeenToken(match[0]))
     .some((candidate) => EXACT_ASPIRE_VERSION_TOKEN_MATCH(candidate, expectedVersion));
 }
 
