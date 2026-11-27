@@ -1,38 +1,29 @@
 # Aspire teardown fixtures
 
-These files are version-suffixed snapshots consumed by teardown probe tests. Keep older versions as
-compatibility cases.
+These files are version-suffixed snapshots targeting the pinned Aspire release (**17.0.0**) and
+consumed by teardown probe tests.
 
-## Aspire 13.5.3
+## Aspire 17.0.0
 
-- Capture date: 2026-08-29
-- CLI/SDK version: 13.5.3
+- Capture date: 2026-11-27
+- CLI/SDK version: `17.0.0+2d325b13709752ba6d9a943635c5e2940a2530c0`
 - Command: `aspire ps --format Json --non-interactive --nologo`
-- Source receipt:
-  `origin/test/aspire-13-5-s2-runtime-verification:.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/02-v5-aspire-ps-final.json`
 
-The JSON was copied from that receipt before redaction. To preserve the established 13.4.6 fixture
-conventions and deterministic assertions, worktree paths, PIDs, dashboard port, and the new
-`logFilePath` value are replaced with the existing stable fixture values or `REDACTED`. The 13.5.3
-shape difference remains explicit: `logFilePath` is present and `sdkVersion` is `13.5.3`.
+`aspire-ps-17.0.0.json` matches the live Aspire `17.0.0` `aspire ps --format Json` envelope
+(`appHostPath`, `appHostPid`, `status`, `sdkVersion: "17.0.0"`, `cliPid`, `dashboardUrl`,
+`logFilePath`) with deterministic paths/PIDs and redacted log file paths.
 
-The Docker inspect fixture remains named `docker-inspect-13.4.6.json`; S2's V5 shape comparison did
-not identify a Docker envelope change, and this slice does not fabricate a new Docker capture.
+`docker-inspect-17.0.0.json` exercises DCP container label ownership extraction.
 
 ## Orphaned process tree
 
-`process-tree-13.5.3-orphaned.json` is synthetic, not a live capture. Its PIDs, worktree, and
-process facts are shaped from S2 V6's launcher-orphan lifecycle receipt and #1429's observed
-`aspire-managed` PPID-1 helpers. The three rows isolate the evidence modes the classifier must
-support: DCP environment label, exact `--apphost` argv, and contained backchannel socket path.
+`process-tree-17.0.0-orphaned.json` isolates the three evidence modes the orphan classifier must
+support for PPID-1 Aspire descendants: DCP environment label, exact `--apphost` argv, and contained
+backchannel socket path.
 
 ## Phase-B live process tree
 
-`process-tree-13.5.3-phase-b-live.json` copies the relevant process rows from receipts archived at
-commit `d8187e5a8656de8f9443f4e33f0a91ece56a7dd2`. PIDs, start-time ticks, AppHost paths,
-managed-server `--contentRoot` argv, and post-SIGKILL PPIDs are preserved exactly; the
-already-redacted log path remains redacted.
-
-The fixture separately labels its DCP-label/socket/cwd entries as `derivedContainmentVectors`. Those
-values exercise the Phase-A evidence contract using the exact leased and foreign roots; they are not
-represented as fields observed by the live `/proc` capture.
+`process-tree-17.0.0-phase-b-live.json` models leased vs. foreign AppHost containment across
+`aspire-managed server`, native Deno AppHost execution (`leased-run-apphost-deno`), DCP apiserver /
+controllers, and dashboard processes, with explicit `derivedContainmentVectors` covering argv, cwd,
+socket, and DCP-label ownership checks.

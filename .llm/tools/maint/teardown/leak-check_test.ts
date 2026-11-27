@@ -143,10 +143,10 @@ Deno.test('a resource outside the sibling root has no apparent owner', () => {
   assertEquals(report.survivors[0].owner, 'unknown');
 });
 
-Deno.test('13.5.3 orphaned PPID-1 Aspire descendants are reported', async () => {
+Deno.test('17.0.0 orphaned PPID-1 Aspire descendants are reported', async () => {
   const snapshot: unknown = JSON.parse(
     await Deno.readTextFile(
-      new URL('./__fixtures__/process-tree-13.5.3-orphaned.json', import.meta.url),
+      new URL('./__fixtures__/process-tree-17.0.0-orphaned.json', import.meta.url),
     ),
   );
   if (!Array.isArray(snapshot)) throw new Error('process snapshot fixture must be an array');

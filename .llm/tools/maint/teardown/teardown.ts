@@ -52,9 +52,8 @@ export interface TeardownOptions {
   readonly processProbe?: () => Promise<readonly ProcessCandidate[]>;
 }
 
-// S2 `02-v6-aspire-ps-after-kill.time.txt` observed Aspire 13.5.3 orphan registration cleanup in
-// 385 ms. Six probes spaced 500 ms bound confirmation to 2.5 s while allowing more than six times
-// the observed cleanup latency.
+// Observed Aspire orphan registration cleanup completes in ~385 ms. Six probes spaced 500 ms
+// bound confirmation to 2.5 s while allowing more than six times the observed cleanup latency.
 const DEFAULT_CONFIRM_ATTEMPTS = 6;
 const DEFAULT_CONFIRM_INTERVAL_MS = 500;
 const MIN_ORPHAN_PROCESS_AGE_MS = 30_000;

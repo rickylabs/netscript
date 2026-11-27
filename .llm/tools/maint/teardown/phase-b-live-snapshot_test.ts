@@ -42,7 +42,7 @@ interface PhaseBLiveFixture {
 
 const fixture = JSON.parse(
   await Deno.readTextFile(
-    new URL('./__fixtures__/process-tree-13.5.3-phase-b-live.json', import.meta.url),
+    new URL('./__fixtures__/process-tree-17.0.0-phase-b-live.json', import.meta.url),
   ),
 ) as PhaseBLiveFixture;
 
