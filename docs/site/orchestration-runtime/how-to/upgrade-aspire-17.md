@@ -105,11 +105,27 @@ netscript generate aspire
 ```
 
 `netscript generate aspire` regenerates `aspire/apphost.mts`, `aspire/.helpers/*`, and
-`.netscript/aspire-cli.ts`, and automatically upgrades a generated prior-release
+`.netscript/aspire-cli.ts`, and automatically upgrades an **unmodified** prior-release
 `.netscript/quality-runner.ts` so `deno task check` checks AppHost files natively with
-`deno check --unstable-kv --config aspire/deno.json` instead of the removed Node compiler. (If you
-customized `.netscript/quality-runner.ts` and removed its generated header, update `runAppHostCheck`
-to use `deno check --unstable-kv --config aspire/deno.json` when `aspire/deno.json` exists.)
+`deno check --unstable-kv --config aspire/deno.json` instead of the removed Node compiler. Any
+customized `.netscript/quality-runner.ts` (even if it kept the generated header) is preserved
+untouched with a warning; update `runAppHostCheck` in your customized runner when `aspire/deno.json`
+is present:
+
+```ts
+const nativeConfig = resolve(projectRoot, 'aspire/deno.json');
+const args = (await isFile(nativeConfig))
+  ? ['check', '--unstable-kv', '--config', 'aspire/deno.json', ...files]
+  : [
+    'run',
+    '--allow-read',
+    '--allow-env',
+    'aspire/node_modules/typescript/bin/tsc',
+    '--noEmit',
+    '-p',
+    'aspire/tsconfig.apphost.json',
+  ];
+```
 
 ## 3. Preserve pre-existing container SQL Server passwords
 
