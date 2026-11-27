@@ -2,9 +2,9 @@
 
 - **Date:** 2026-11-25
 - **Tracking issue:** `#2671` (`0.0.10`)
-- **Draft PR:** `#2673`
+- **PR:** `#2673` (accepted as **RFC 0012**, `rfcs/0012-orpc-router-client-pipeline.md`)
 - **Base `main` SHA:** `87965d800b7d61312e8612c82bdb0cb98bdf5b29`
-- **Companion RFC:** PR `#2674` (tracking issue `#2672`)
+- **Companion RFCs:** RFC 0011 (PR `#2659` / tracking issue `#451`), RFC 0013 (PR `#2674` / tracking issue `#2672`)
 
 ## Owner Mandate (verbatim, private prefix elided for public repository)
 
@@ -73,3 +73,8 @@
 | Lockfile untouched | `git diff --stat deno.lock` | PASS (empty diff) |
 | Scoped internal doc links | `mise exec -- deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --root rfcs/0000-orpc-router-client-pipeline.md --pretty` | PASS (`docs=1 broken-links=0 broken-anchors=0 orphans=0`) |
 | Privacy, closing-keyword & stale-symbol scans | Pattern scans on RFC + `.llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/` | PASS (`0 hits`) |
+
+## Round-3 PLAN-EVAL & Acceptance (2026-11-27)
+
+- Gemini 4 Hydrogen Round-3 PLAN-EVAL returned **`APPROVED`** on head `bd8d51c012abf1d8903860cdf6115196e547d214`.
+- **Owner decision 2026-11-27: Accept and merge:** Assigned next free RFC number `0012` (`0001`–`0010` on `main`, `0011` in PR `#2659`), renamed `rfcs/0000-orpc-router-client-pipeline.md` → `rfcs/0012-orpc-router-client-pipeline.md` (`rfc: 0012`, `status: Accepted`), updated companion RFC references (`RFC 0011` `#2659`, `RFC 0013` `#2674`), recorded accepted resolution note in `## Unresolved questions`, verified tracking issue `#2671` keeps the `rfc` label (open for implementation), and updated PR `#2673` title/body (`Refs #2671` only — zero closing keywords), `status:ready-merge` label, and ready-for-review state (not merged here; awaiting Hydrogen pre-merge verification).

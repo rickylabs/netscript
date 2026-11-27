@@ -1,7 +1,7 @@
 ---
-rfc: 0000
+rfc: 0012
 title: oRPC-native procedure pipeline and router client
-status: Draft
+status: Accepted
 authors: ["@rickylabs"]
 created: 2026-11-25
 tracking-issue: https://github.com/rickylabs/netscript/issues/2671
@@ -10,7 +10,7 @@ target-milestone: 0.0.10
 
 # oRPC-native procedure pipeline and router client
 
-> **Draft evaluation notice.** This document is a **Draft** evaluation RFC produced for technical review. It does not authorize implementation changes under `packages/`, `plugins/`, `docs/site/`, `.github/`, `deno.json`, or `deno.lock`. Every statement about current NetScript or oRPC behavior below is tagged as **source-inspected** or **measured** (from the locked `@orpc/*@1.15.5` runtime probes in `.llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/probes/`); proposed designs are tagged as **derived**. Companion oRPC v2 evaluation: draft PR #2674 (tracking issue #2672).
+> **Status: Accepted (`rfc: 0012`).** Accepted by **Owner decision 2026-11-27: Accept and merge**. Tracking issue [#2671](https://github.com/rickylabs/netscript/issues/2671) stays open to track separate implementation PRs under `packages/` and `plugins/`. Every statement about current NetScript or oRPC behavior below is tagged as **source-inspected** or **measured** (from the locked `@orpc/*@1.15.5` runtime probes in `.llm/runs/plan-rfc-orpc-router-client-pipeline-2671--rfc/probes/`); target designs are tagged as **derived**. Companion RFCs: RFC 0011 (PR #2659 / tracking issue #451, in-process fetch-link transport) and RFC 0013 (PR #2674 / tracking issue #2672, oRPC v2 readiness and migration strategy).
 
 ## Summary
 
@@ -32,7 +32,7 @@ In current `main` (`87965d800`), `ServiceBuilderImpl` (`packages/service/src/bui
 
 Because procedure controls live exclusively in Hono:
 
-1. **Direct `createRouterClient` / `call()` bypasses security and observability.** Draft PR #2659 (`rfcs/0000-in-process-service-link.md`, "Alternative 1") rejected `@orpc/server` `call()` for this exact reason and proposed an in-memory Fetch link (`RPCLink` custom `fetch` → `ServiceApp.fetch`).
+1. **Direct `createRouterClient` / `call()` bypasses security and observability.** Companion RFC 0011 (PR #2659, `rfcs/0011-in-process-service-link.md`, "Alternative 1") rejected `@orpc/server` `call()` for this exact reason and proposed an in-memory Fetch link (`RPCLink` custom `fetch` → `ServiceApp.fetch`).
 2. **Fetch-link still pays full HTTP framing per call.** Eliminating TCP sockets cuts HTTP loopback latency roughly in half (**measured**: `386.4 µs` → `212.2 µs` small unary; `590.5 µs` → `345.0 µs` for 100-item / 12.8 KiB payload), which is completely acceptable for ordinary SSR pages (1–3 calls) and tests, but adds 4–15 ms on high-fan-out loaders (20–50 internal calls per render), tight worker/saga batch orchestrations, and high-frequency `eventIterator` streams.
 
 ### What this enables (**derived**)
@@ -414,12 +414,14 @@ Stage 1a (`0.0.10`) and Stage 1b (`0.0.11`) introduce **no breaking changes** on
 ## Prior art
 
 - **oRPC official docs** ([Server-Side Client](https://orpc.dev/docs/client/server-side), [Optimize SSR](https://orpc.dev/docs/best-practices/optimize-ssr)) — notes `.callable` is no longer built in on v2 (opt-in extension), preferring `call`/`createRouterClient` for efficiency and fetch links for full HTTP plugin compatibility.
-- **Draft PR #2659** (`rfcs/0000-in-process-service-link.md`, head `f8c8d8fd`) — recommended to be amended and taken off hold independently, providing full HTTP-stack parity via fetch-link and sharing the `Symbol.for('@netscript/async-context/active-store-probes')` root-snapshot probe registry.
+- **Accepted RFC 0011** (PR #2659, `rfcs/0011-in-process-service-link.md`, tracking issue #451) — provides full HTTP-stack parity via fetch-link and shares the `Symbol.for('@netscript/async-context/active-store-probes')` root-snapshot probe registry.
 - **Accepted RFC 0001** (`rfcs/0001-sdk-client-contributions.md`) — transport-neutral client contributions without exposing raw oRPC links.
 - **Accepted RFC 0008** (`rfcs/0008-rolling-service-quotas.md`) — defines `RateLimitStore`, `store.validate()`, `RateLimitDecision.retryAt`, single-coherent-policy / disjoint-prefix invariants, and post-auth `store.consume()` usage that `withProcedureRateLimit` wraps declaratively.
-- **Companion RFC B** (draft PR #2674, head `6501e41c`, tracking issue #2672) — oRPC v2 readiness, CORS tightening at `0.1.0`, and prototype evidence (`2.0.0-beta.53`).
+- **Accepted RFC 0013 (Companion RFC B)** (PR #2674, `rfcs/0013-orpc-v2-readiness.md`, tracking issue #2672) — oRPC v2 readiness, CORS tightening at `0.1.0`, and prototype evidence (`2.0.0-beta.53`).
 
 ## Unresolved questions
+
+Accepted in this RFC (`rfc: 0012`, `status: Accepted`, **Owner decision 2026-11-27: Accept and merge**) under Option 3 (Split-Stage into Coexistence: Stage 1a `0.0.10`, Stage 1b `0.0.11`, Stage 2 `0.1.0` coordinated with companion RFC 0013 / PR #2674). The four implementation-level trade-offs evaluated before acceptance are preserved below for confirmation in their respective stage PRs:
 
 1. **Strict input/output cloning policy:** For procedures using `z.unknown()`, `z.any()`, or `z.custom()`, should `createRouterClientTransport` default to `structuredClone()` on inputs and outputs in development/test, or reject non-plain schemas at construction unless explicitly opted in?
 2. **`plugins/auth` cookie-free in-process mode:** Should `plugins/auth` expose a dedicated cookie-free introspection/verification service handle while keeping cookie-mutating `login`/`logout`/`refresh` strictly HTTP/fetch-link, or wire `authnSideEffects.onSetCookies` in Fresh SSR loaders?
