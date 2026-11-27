@@ -183,7 +183,7 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
       templateAdapter,
       { process, formatter: new DenoGeneratedSourceFormatter(nativeProcess) },
     );
-    assertEquals(written.length, 15);
+    assertEquals(written.length, 17);
     const before = await readFiles(fs, written);
     const report = await checkAspire(root, {
       fs,
@@ -300,7 +300,7 @@ Deno.test('Aspire helper regeneration refuses legacy Node.js aspire/package.json
   assertEquals(writes, []);
 });
 
-Deno.test('Aspire regeneration formats all 15 outputs with two bounded subprocesses with byte-identical results', async () => {
+Deno.test('Aspire regeneration formats all 17 outputs with two bounded subprocesses with byte-identical results', async () => {
   const controlModule = Deno.env.get('NETSCRIPT_ASPIRE_REGEN_MODULE');
   const regenerate: typeof regenerateAspireHelpers = controlModule
     ? (await import(controlModule)).regenerateAspireHelpers
@@ -349,7 +349,7 @@ export default defineConfig({ name: 'shop', databases: { config: [] }, plugins: 
       formatter,
       process,
     });
-    assertEquals(files.length, 15);
+    assertEquals(files.length, 17);
     assertEquals(formattingProcesses, 2);
     const parsed = await parseAppSettings(join(root, 'appsettings.json'));
     const raw = await new HelpersGeneratorPipeline(templates).execute({

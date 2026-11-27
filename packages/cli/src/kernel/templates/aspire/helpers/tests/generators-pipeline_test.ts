@@ -16,16 +16,16 @@ describe('HelpersGeneratorPipeline', () => {
   it('should generate all AppHost project files when enabled', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });
-    assertEquals(files.length, 14);
+    assertEquals(files.length, 16);
   });
 
-  it('should generate 11 files without apphost', async () => {
+  it('should generate 15 files without apphost', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({
       config: fixtures.POPULATED_CONFIG,
       generateAppHost: false,
     });
-    assertEquals(files.length, 13);
+    assertEquals(files.length, 15);
   });
 
   it('should produce files with non-empty paths and content', async () => {
@@ -182,48 +182,45 @@ describe('HelpersGeneratorPipeline', () => {
     assertStringIncludes(dashboard!.content, "'true'");
   });
 
-  it('should mirror dashboard env constants in the Aspire compat helper', async () => {
+  it('should re-export canonical @netscript/aspire contracts without D-7 duplication', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });
     const compat = files.find((f) => f.path === '.helpers/_aspire-compat.mts');
+    const readiness = files.find((f) => f.path === '.helpers/_apphost-readiness.mts');
+    const postgresReadiness = files.find(
+      (f) => f.path === '.helpers/_apphost-postgres-readiness.mts',
+    );
 
     assert(compat, 'compat helper should exist in output');
-    assertStringIncludes(
-      compat!.content,
-      "OTLP_HTTP_ENDPOINT: 'ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL'",
-    );
-    assertStringIncludes(
-      compat!.content,
-      "ALLOW_UNSECURED_TRANSPORT: 'ASPIRE_ALLOW_UNSECURED_TRANSPORT'",
-    );
-    assertStringIncludes(
-      compat!.content,
-      "UNSECURED_ALLOW_ANONYMOUS: 'ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS'",
-    );
-  });
-
-  it('should include the Aspire compat helper with VITE env-var export', async () => {
-    const pipeline = new HelpersGeneratorPipeline();
-    const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });
-    const compat = files.find((f) => f.path === '.helpers/_aspire-compat.mts');
-
-    assert(compat, 'compat helper should exist in output');
-    assertStringIncludes(compat!.content, 'export function buildViteEnvVarName(');
-    assertStringIncludes(compat!.content, 'normalizeViteIdentifierSegment(resourceName)');
-    assertStringIncludes(compat!.content, 'normalizeViteIdentifierSegment(endpointName)');
-    assertStringIncludes(
-      compat!.content,
-      'VITE_services__${normalisedResource}__${normalisedEndpoint}__0',
-    );
-    assertStringIncludes(compat!.content, 'VITE_${normalisedResource.toUpperCase()}_URL');
+    assert(readiness, 'readiness helper should exist in output');
+    assert(postgresReadiness, 'postgres readiness helper should exist in output');
+    assertStringIncludes(compat!.content, "from '@netscript/aspire/config'");
+    assertStringIncludes(compat!.content, "from '@netscript/aspire/constants'");
+    assertStringIncludes(compat!.content, "from '@netscript/aspire/types'");
+    assertStringIncludes(compat!.content, "from '@netscript/aspire/application'");
+    assertStringIncludes(compat!.content, "from './_apphost-readiness.mts'");
+    assertStringIncludes(compat!.content, "from './_apphost-postgres-readiness.mts'");
+    assertStringIncludes(compat!.content, 'DASHBOARD_ENV_VARS');
+    assertStringIncludes(compat!.content, 'buildViteEnvVarName');
+    assertStringIncludes(compat!.content, 'NetScriptConfigSchema');
     assertStringIncludes(compat!.content, 'export function buildDatabaseProviderEnvVars(');
     assertStringIncludes(compat!.content, 'DATABASE_PROVIDER: config.PrimaryDatabase');
     assertStringIncludes(compat!.content, 'export function buildSqliteDatabaseUrl(');
     assertStringIncludes(compat!.content, 'pathToFileURL(');
-    assertStringIncludes(compat!.content, 'export const NetScriptConfigSchema =');
-    assertStringIncludes(compat!.content, 'export const AppEntrySchema =');
-    assertStringIncludes(compat!.content, 'export const BackgroundProcessorEntrySchema =');
-    assertStringIncludes(compat!.content, 'export const ToolEntrySchema =');
+    assert(!compat!.content.includes('D-7 workaround'));
+    assert(!compat!.content.includes('export interface NetScriptConfig'));
+    assert(
+      compat!.content.split('\n').length < 350,
+      'F-1: _aspire-compat.mts must stay under 350 LOC',
+    );
+    assert(
+      readiness!.content.split('\n').length < 350,
+      'F-1: _apphost-readiness.mts must stay under 350 LOC',
+    );
+    assert(
+      postgresReadiness!.content.split('\n').length < 350,
+      'F-1: _apphost-postgres-readiness.mts must stay under 350 LOC',
+    );
   });
 
   it('should bound best-effort Garnet tool restore', async () => {
@@ -245,7 +242,7 @@ describe('HelpersGeneratorPipeline', () => {
       (f) => f.path === '.helpers/config-schema.mts',
     );
     assert(configSchema, 'config-schema.mts should exist');
-    assertStringIncludes(configSchema!.content, 'users: ServiceEntrySchema');
+    assertStringIncludes(configSchema!.content, 'users: asZodSchema(ServiceEntrySchema)');
 
     // Register services should include our service
     const regServices = files.find(
@@ -303,7 +300,7 @@ describe('HelpersGeneratorPipeline', () => {
   it('should handle empty config producing valid no-op output', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.EMPTY_CONFIG });
-    assertEquals(files.length, 14);
+    assertEquals(files.length, 16);
 
     const regServices = files.find(
       (f) => f.path === '.helpers/register-services.mts',
@@ -337,7 +334,7 @@ describe('HelpersGeneratorPipeline', () => {
 describe('generateHelpers', () => {
   it('should return the same file count as pipeline.execute()', async () => {
     const files = await generateHelpers({ config: fixtures.POPULATED_CONFIG });
-    assertEquals(files.length, 14);
+    assertEquals(files.length, 16);
   });
 
   it('should support generateAppHost: false', async () => {
@@ -345,7 +342,7 @@ describe('generateHelpers', () => {
       config: fixtures.POPULATED_CONFIG,
       generateAppHost: false,
     });
-    assertEquals(files.length, 13);
+    assertEquals(files.length, 15);
     const paths = files.map((f) => f.path);
     assert(!paths.includes('apphost.mts'));
   });

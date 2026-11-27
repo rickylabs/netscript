@@ -189,12 +189,15 @@ describe('generateDbCliMode', () => {
   });
 
   it('uses the shared emitted tool runner and named MCP-exclusion default', async () => {
-    const [runTool, aspireCompat] = await Promise.all([
+    const [runTool, dbCliTemplate] = await Promise.all([
       Deno.readTextFile(
         new URL('../../../../assets/aspire/helpers/run-tool.ts.template', import.meta.url),
       ),
       Deno.readTextFile(
-        new URL('../../../../assets/aspire/helpers/_aspire-compat.ts.template', import.meta.url),
+        new URL(
+          '../../../../assets/generated/aspire/helpers/generate-db-cli-mode-1.ts.template',
+          import.meta.url,
+        ),
       ),
     ]);
 
@@ -204,7 +207,7 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(runTool, 'readonly actionableStdout: readonly string[]');
     assertStringIncludes(runTool, 'stripVTControlCharacters(line)');
     assertStringIncludes(runTool, "child.kill('SIGTERM')");
-    assertStringIncludes(aspireCompat, 'DbCliModeExcludeFromMcp: true');
+    assertStringIncludes(dbCliTemplate, 'const DB_CLI_MODE_EXCLUDE_FROM_MCP = true;');
   });
 
   it('registers CLI resources without short-circuiting the resident graph', () => {
@@ -233,7 +236,7 @@ describe('generateDbCliMode', () => {
 
     assertStringIncludes(output, '`${target.configKey}-cli`');
     assertEquals(output.match(/\.excludeFromMcp\(\)/g)?.length ?? 0, 1);
-    assertStringIncludes(output, 'RESOURCE_DEFAULTS.DbCliModeExcludeFromMcp');
+    assertStringIncludes(output, 'if (DB_CLI_MODE_EXCLUDE_FROM_MCP)');
     assert(!output.includes('.withHidden('));
     const cliResource = output.indexOf('`${target.configKey}-cli`');
     const exclusion = output.indexOf('.excludeFromMcp()');

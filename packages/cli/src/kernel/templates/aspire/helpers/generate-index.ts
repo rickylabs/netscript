@@ -50,7 +50,7 @@ export function generateIndex(): string {
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateIndex1, {
     __slot0__: String(fileHeader(HELPERS_FILES.INDEX)),
-    __slot1__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
+    __slot1__: '@netscript/aspire/config',
     __slot2__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
     __slot3__: String(configDashboardModule),
     __slot4__: String(infraModule),

@@ -91,9 +91,7 @@ async function generatedCarrier(
     await Deno.writeTextFile(
       join(root, '.helpers/_aspire-compat.mts'),
       `
-import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-export function parseAppSettings(path) { return { config: JSON.parse(readFileSync(path, 'utf8')) }; }
 export function resolveWorkspacePath(root, path) { return resolve(root, path); }
 export function resolvePermissions(entry, defaults) { return entry ?? defaults; }
 export function buildDatabaseUriEnvKey() { return null; }
@@ -119,7 +117,7 @@ export function extractServiceReferences(entry) { return entry.ServiceReferences
       'export async function tryHandleDbCliMode() { return false; }',
     );
     const configPath = join(root, 'config.json');
-    await Deno.writeTextFile(configPath, JSON.stringify(config));
+    await Deno.writeTextFile(configPath, JSON.stringify({ NetScript: config }));
     const module: GeneratedAppHost = await import(
       new URL(`file://${join(root, '.helpers/index.mts')}`).href
     );

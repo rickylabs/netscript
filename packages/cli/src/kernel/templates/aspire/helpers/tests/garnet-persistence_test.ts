@@ -31,11 +31,22 @@ async function loadCompatBindMountHelpers(): Promise<{
     "export const HealthStatus = { Healthy: 'Healthy', Unhealthy: 'Unhealthy' };\n",
   );
   await Deno.mkdir(join(root, '.helpers'));
-  const compatPath = join(root, '.helpers/_aspire-compat.mts');
-  await Deno.writeTextFile(
-    compatPath,
-    source.replace("from 'zod';", `from '${import.meta.resolve('zod')}';`),
+  const readinessSource = await Deno.readTextFile(
+    new URL('../../../../assets/aspire/helpers/_apphost-readiness.ts.template', import.meta.url),
   );
+  const postgresReadinessSource = await Deno.readTextFile(
+    new URL(
+      '../../../../assets/aspire/helpers/_apphost-postgres-readiness.ts.template',
+      import.meta.url,
+    ),
+  );
+  await Deno.writeTextFile(join(root, '.helpers/_apphost-readiness.mts'), readinessSource);
+  await Deno.writeTextFile(
+    join(root, '.helpers/_apphost-postgres-readiness.mts'),
+    postgresReadinessSource,
+  );
+  const compatPath = join(root, '.helpers/_aspire-compat.mts');
+  await Deno.writeTextFile(compatPath, source);
   const mod = await import(toFileUrl(compatPath).href);
   return {
     ensureContainerDataPath: mod.ensureContainerDataPath,

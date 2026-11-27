@@ -249,11 +249,11 @@ describe('generateIndex', () => {
     assertStringIncludes(output, 'configPath: string');
   });
 
-  it('should import parseAppSettings from _aspire-compat', () => {
+  it('should import parseAppSettings from @netscript/aspire/config', () => {
     const output = generateIndex();
     assertStringIncludes(
       output,
-      "import { parseAppSettings } from './_aspire-compat.mts'",
+      "import { parseAppSettings } from '@netscript/aspire/config'",
     );
   });
 

@@ -8,7 +8,7 @@ import {
   InputType,
   type DistributedApplicationBuilder,
 } from '{{__slot1__}}';
-import { RESOURCE_DEFAULTS, type NetScriptConfig } from '{{__slot2__}}';
+import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mts';
 
 interface DbCliTarget {
@@ -47,6 +47,7 @@ const DB_CLI_COMMANDS: readonly DbCliCommand[] = [
   { name: 'reset', displayName: 'Reset database', iconName: 'DatabaseLightning' },
 ];
 
+const DB_CLI_MODE_EXCLUDE_FROM_MCP = true;
 const DEFAULT_COMMAND_TIMEOUT_SECONDS = 300;
 const RESOURCE_RESULT_GRACE_MS = 30_000;
 const RESOURCE_RESULT_POLL_MS = 100;
@@ -195,7 +196,7 @@ export async function tryHandleDbCliMode(
       );
     }
 
-    if (RESOURCE_DEFAULTS.DbCliModeExcludeFromMcp) {
+    if (DB_CLI_MODE_EXCLUDE_FROM_MCP) {
       await resource.excludeFromMcp();
     }
   }

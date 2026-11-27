@@ -16,16 +16,29 @@ await Deno.writeTextFile(
   join(root, '.aspire/modules/aspire.mts'),
   "export const HealthStatus = { Healthy: 'Healthy', Unhealthy: 'Unhealthy' };\n",
 );
-// Match the helper's relative SDK import shape.
+// Match the helper's relative SDK and readiness import shape.
 await Deno.mkdir(join(root, '.helpers'));
+const readinessSource = await Deno.readTextFile(
+  new URL('../../../../assets/aspire/helpers/_apphost-readiness.ts.template', import.meta.url),
+);
+const postgresReadinessSource = await Deno.readTextFile(
+  new URL(
+    '../../../../assets/aspire/helpers/_apphost-postgres-readiness.ts.template',
+    import.meta.url,
+  ),
+);
+await Deno.writeTextFile(join(root, '.helpers/_apphost-readiness.mts'), readinessSource);
+await Deno.writeTextFile(
+  join(root, '.helpers/_apphost-postgres-readiness.mts'),
+  postgresReadinessSource,
+);
 const generatedPath = join(root, '.helpers/_aspire-compat.mts');
 await Deno.writeTextFile(
   generatedPath,
   source.replace(
     processImport,
     "import { execFileSync } from 'data:text/javascript,export function execFileSync() {}';",
-  )
-    .replace("from 'zod';", `from '${import.meta.resolve('zod')}';`),
+  ),
 );
 const { ensureGarnetToolManifest } = await import(toFileUrl(generatedPath).href);
 const version = SCAFFOLD_VERSIONS.GARNET_TOOL;

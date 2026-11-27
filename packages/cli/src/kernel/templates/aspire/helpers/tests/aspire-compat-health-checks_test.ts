@@ -13,6 +13,18 @@ import { createServer, type Server, type Socket } from 'node:net'
 import { fromFileUrl, resolve, toFileUrl } from 'jsr:@std/path@^1'
 import { type FakePostgresServer, startFakePostgresServer } from './fake-postgres-server.ts'
 
+const readinessContent = await Deno.readTextFile(
+  new URL(
+    '../../../../assets/aspire/helpers/_apphost-readiness.ts.template',
+    import.meta.url,
+  ),
+)
+const postgresReadinessContent = await Deno.readTextFile(
+  new URL(
+    '../../../../assets/aspire/helpers/_apphost-postgres-readiness.ts.template',
+    import.meta.url,
+  ),
+)
 const compatContent = await Deno.readTextFile(
   new URL(
     '../../../../assets/aspire/helpers/_aspire-compat.ts.template',
@@ -44,9 +56,7 @@ await writeGeneratedHelperFixture(generatedRoot, EMPTY_CONFIG)
 await Deno.mkdir(modulesDir, { recursive: true })
 await Deno.writeTextFile(
   `${modulesDir}/aspire.mts`,
-  `// Verbatim 13.5.3 declarations from the restored aspire.mts module:
-// HealthStatus l.619-624; HealthCheckResult l.1013-1021;
-// EndpointReference l.4696-4701; EndpointReferencePromise l.4763-4768.
+  `// Verbatim 17.0.0 declarations from the restored aspire.mts module:
 export enum HealthStatus {
   Unhealthy = "Unhealthy",
   Degraded = "Degraded",
@@ -79,16 +89,30 @@ export interface EndpointReferencePromise extends PromiseLike<EndpointReference>
 `,
 )
 const compatPath = `${helpersDir}/_aspire-compat.mts`
-const runtimeCompatPath = `${helpersDir}/_aspire-compat.runtime.mts`
+const readinessPath = `${helpersDir}/_apphost-readiness.mts`
+const postgresReadinessPath = `${helpersDir}/_apphost-postgres-readiness.mts`
+const runtimePostgresPath = `${helpersDir}/_apphost-postgres-readiness.runtime.mts`
 const generatedConfigPath = `${generatedRoot}/deno.json`
 const zodSpecifier = import.meta.resolve('zod')
+const aspirePackageRoot = new URL('../../../../../../../../packages/aspire/', import.meta.url)
 await Deno.writeTextFile(
   generatedConfigPath,
   `${
     JSON.stringify(
       {
         lock: false,
-        imports: { zod: zodSpecifier },
+        catalog: {
+          zod: workspaceConfig.catalog.zod,
+        },
+        imports: {
+          zod: zodSpecifier,
+          '@netscript/aspire': new URL('mod.ts', aspirePackageRoot).href,
+          '@netscript/aspire/config': new URL('config.ts', aspirePackageRoot).href,
+          '@netscript/aspire/constants': new URL('constants.ts', aspirePackageRoot).href,
+          '@netscript/aspire/types': new URL('types.ts', aspirePackageRoot).href,
+          '@netscript/aspire/application': new URL('src/application/mod.ts', aspirePackageRoot)
+            .href,
+        },
         compilerOptions: {
           strict: true,
           noImplicitAny: true,
@@ -108,23 +132,24 @@ await Deno.writeTextFile(
     )
   }\n`,
 )
+await Deno.writeTextFile(readinessPath, readinessContent)
+await Deno.writeTextFile(postgresReadinessPath, postgresReadinessContent)
 await Deno.writeTextFile(compatPath, compatContent)
-// The generated helper loads `pg` from the AppHost's node_modules; the test resolves the
+// The generated helper loads `pg` from aspire/deno.json; the test resolves the
 // same bare specifier to the workspace-locked npm package instead.
 const POSTGRES_CLIENT_MODULE_DECLARATION = "const POSTGRES_CLIENT_MODULE = 'pg';"
-assertEquals(compatContent.split(POSTGRES_CLIENT_MODULE_DECLARATION).length, 2)
-const runtimeCompatContent = compatContent.replace("from 'zod';", `from '${zodSpecifier}';`)
+assertEquals(postgresReadinessContent.split(POSTGRES_CLIENT_MODULE_DECLARATION).length, 2)
 await Deno.writeTextFile(
-  runtimeCompatPath,
-  runtimeCompatContent.replace(
+  runtimePostgresPath,
+  postgresReadinessContent.replace(
     POSTGRES_CLIENT_MODULE_DECLARATION,
     `const POSTGRES_CLIENT_MODULE = ${JSON.stringify(postgresClientSpecifier)};`,
   ),
 )
-const clientlessCompatPath = `${helpersDir}/_aspire-compat.clientless.mts`
+const clientlessPostgresPath = `${helpersDir}/_apphost-postgres-readiness.clientless.mts`
 await Deno.writeTextFile(
-  clientlessCompatPath,
-  runtimeCompatContent.replace(
+  clientlessPostgresPath,
+  postgresReadinessContent.replace(
     POSTGRES_CLIENT_MODULE_DECLARATION,
     "const POSTGRES_CLIENT_MODULE = 'data:text/javascript,export default {}';",
   ),
@@ -133,11 +158,15 @@ await Deno.writeTextFile(
   `${generatedRoot}/format-sentinel.ts`,
   'export const formatSentinel = true;\n',
 )
-const compatModule = await import(
-  `${toFileUrl(runtimeCompatPath).href}?test=${crypto.randomUUID()}`
+const readinessModule = await import(
+  `${toFileUrl(readinessPath).href}?test=${crypto.randomUUID()}`
 )
+const postgresModule = await import(
+  `${toFileUrl(runtimePostgresPath).href}?test=${crypto.randomUUID()}`
+)
+const compatModule = { ...readinessModule, ...postgresModule }
 const clientlessCompatModule = await import(
-  `${toFileUrl(clientlessCompatPath).href}?test=${crypto.randomUUID()}`
+  `${toFileUrl(clientlessPostgresPath).href}?test=${crypto.randomUUID()}`
 )
 
 afterAll(async () => {
@@ -153,13 +182,15 @@ afterAll(async () => {
 })
 
 describe('generated Aspire listener readiness helpers', () => {
-  it('type-checks the emitted helper in a generated workspace shape', async () => {
+  it('type-checks the emitted helpers in a generated workspace shape', async () => {
     const result = await checkGeneratedFiles({
       args: [
         'check',
         '--config',
         generatedConfigPath,
         '--no-lock',
+        readinessPath,
+        postgresReadinessPath,
         compatPath,
       ],
     })
@@ -167,7 +198,7 @@ describe('generated Aspire listener readiness helpers', () => {
     assertEquals(result.code, 0, new TextDecoder().decode(result.stderr))
   })
 
-  it('formats the emitted helper as generated TypeScript', async () => {
+  it('formats the emitted helpers as generated TypeScript', async () => {
     const result = await new Deno.Command(Deno.execPath(), {
       args: [
         'fmt',
@@ -175,6 +206,8 @@ describe('generated Aspire listener readiness helpers', () => {
         '--config',
         generatedConfigPath,
         'format-sentinel.ts',
+        '.helpers/_apphost-readiness.mts',
+        '.helpers/_apphost-postgres-readiness.mts',
         '.helpers/_aspire-compat.mts',
       ],
       cwd: generatedRoot,

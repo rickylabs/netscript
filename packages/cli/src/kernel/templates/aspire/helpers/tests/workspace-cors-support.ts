@@ -4,6 +4,7 @@ import { assert, assertEquals } from '@std/assert';
 import { toFileUrl } from '@std/path';
 import type { NetScriptConfig } from '@netscript/aspire/types';
 import { generateRegisterApps } from '../register/generate-register-apps.ts';
+import { SCAFFOLD_WORKSPACE_CATALOG } from '../../../../constants/scaffold/scaffold-app-catalog.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 
@@ -48,18 +49,12 @@ export interface DistributedApplicationBuilder {
 }
 `;
 
-// Use the shipped config/resource interfaces, whose extension fields are unknown.
-// A narrower Environment double would hide errors in the rendered helper.
-const compatTemplate = await Deno.readTextFile(
-  new URL('../../../../assets/aspire/helpers/_aspire-compat.ts.template', import.meta.url),
-);
-const compatTypes = compatTemplate.match(
-  /export interface NetScriptConfig\s*\{[\s\S]*?(?=export interface ResourceDependencies)/,
-);
-assert(compatTypes, 'The shipped compatibility config interfaces must be present');
+// Use the canonical @netscript/aspire config/resource types directly.
+const aspireTypesUrl = new URL('../../../../../../../../packages/aspire/types.ts', import.meta.url)
+  .href;
 
 const COMPAT_DOUBLE = `
-${compatTypes[0]}
+export type { NetScriptConfig } from '${aspireTypesUrl}';
 export function buildOtelEnvVars(_name: string, _version: string, _mode: string): Record<string, string> { return {}; }
 export function buildViteEnvVarName(name: string) { return { full: name, shorthand: name }; }
 export function resolveWorkspacePath(root: string, path: string) { return root + '/' + path; }
@@ -155,8 +150,17 @@ export async function registerWorkspace(
         denoDefaults: config.Defaults.Deno,
       }),
     );
+    const configPath = `${root}/deno.json`;
+    await Deno.writeTextFile(
+      configPath,
+      JSON.stringify({
+        lock: false,
+        catalog: SCAFFOLD_WORKSPACE_CATALOG,
+        imports: { zod: 'catalog:' },
+      }),
+    );
     const checked = await checkGeneratedFiles({
-      args: ['check', '--no-config', '--no-lock', '--unstable-kv', path],
+      args: ['check', '--config', configPath, '--no-lock', '--unstable-kv', path],
     });
     assertEquals(checked.code, 0, new TextDecoder().decode(checked.stderr));
     const module: unknown = await import(toFileUrl(path).href);
