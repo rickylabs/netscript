@@ -189,13 +189,19 @@ export function assertConsumerConnectionStringsRedacted(
   };
 }
 
-/** Verify live consumer process env carries working Postgres port and password without leaking it. */
+/** Verified Postgres database identity parsed from a consumer process connection string. */
+export interface VerifiedProcessDatabaseConnection {
+  /** Target database name carried by the consumer process connection strings. */
+  readonly databaseName: string;
+}
+
+/** Verify live consumer process env carries working Postgres port, database, and password without leaking it. */
 export function assertProcessDatabaseConnection(
   env: ReadonlyMap<string, string>,
   expectedPort: number,
   expectedPassword: string,
   label: string,
-): void {
+): VerifiedProcessDatabaseConnection {
   const databaseUrl = env.get('DATABASE_URL');
   if (!databaseUrl) throw new Error(`${label} process omitted DATABASE_URL`);
   const postgresUri = env.get('POSTGRES_URI');
@@ -217,12 +223,28 @@ export function assertProcessDatabaseConnection(
       } did not match expected Postgres port ${expectedPort}`,
     );
   }
+  const urlDbName = parseConnectionDatabaseName(databaseUrl);
+  if (!urlDbName) {
+    throw new Error(`${label} process DATABASE_URL omitted a target database name`);
+  }
+  const uriDbName = parseConnectionDatabaseName(postgresUri);
+  if (!uriDbName) {
+    throw new Error(`${label} process POSTGRES_URI omitted a target database name`);
+  }
+  if (urlDbName !== uriDbName) {
+    throw new Error(
+      `${label} process DATABASE_URL (${JSON.stringify(urlDbName)}) and POSTGRES_URI (${
+        JSON.stringify(uriDbName)
+      }) targeted different databases`,
+    );
+  }
   if (
     !databaseUrl.includes(expectedPassword) ||
     (postgresUri !== databaseUrl && !postgresUri.includes(expectedPassword))
   ) {
     throw new Error(`${label} process connection string did not match expected credential`);
   }
+  return { databaseName: urlDbName };
 }
 
 /** Read and parse a running Linux process's /proc/<pid>/environ without exposing secret bytes. */
@@ -272,6 +294,25 @@ function parseConnectionPort(connection: string): number | undefined {
     if (match) {
       const port = Number(match[1]);
       if (Number.isInteger(port) && port >= 1 && port <= 65_535) return port;
+    }
+  }
+  return undefined;
+}
+
+function parseConnectionDatabaseName(connection: string): string | undefined {
+  try {
+    const url = new URL(connection.trim());
+    const rawSegment = url.pathname.replace(/^\/+/, '').split('/')[0] ?? '';
+    const decoded = rawSegment ? decodeURIComponent(rawSegment).trim() : '';
+    if (decoded) return decoded;
+  } catch {
+    // Check Npgsql keyword/value dialect below.
+  }
+  for (const segment of connection.split(';')) {
+    const match = /^\s*(?:database|initial\s+catalog)\s*=\s*(.+?)\s*$/i.exec(segment);
+    if (match) {
+      const value = match[1].replace(/^['"]|['"]$/g, '').trim();
+      if (value) return value;
     }
   }
   return undefined;

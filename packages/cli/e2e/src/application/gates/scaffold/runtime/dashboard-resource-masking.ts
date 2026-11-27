@@ -34,16 +34,20 @@ export interface DashboardMaskingTarget {
   readonly resourceName: string;
 }
 
-/** Execute a read-only SQL query through Prisma Studio's `/bff` endpoint against seeded Postgres data. */
+/** Execute a read-only SQL query through Prisma Studio's `/bff` endpoint against the expected seeded Postgres database. */
 export async function assertPrismaStudioDatabaseRead(
   baseUrl: string = PRISMA_STUDIO_DEFAULT_URL,
   secrets: readonly string[],
   options: {
+    readonly expectedDatabaseName: string;
     readonly fetchImpl?: typeof fetch;
     readonly timeoutMs?: number;
     readonly delayMs?: number;
-  } = {},
+  },
 ): Promise<PrismaStudioReadReceipt> {
+  if (!options.expectedDatabaseName.trim()) {
+    throw new Error('assertPrismaStudioDatabaseRead requires a non-empty expectedDatabaseName');
+  }
   const fetchImpl = options.fetchImpl ?? fetch;
   const timeoutMs = options.timeoutMs ?? STUDIO_RETRY_TIMEOUT_MS;
   const delayMs = options.delayMs ?? STUDIO_RETRY_DELAY_MS;
@@ -121,6 +125,13 @@ export async function assertPrismaStudioDatabaseRead(
         `prisma-studio /bff returned unexpected row: db=${JSON.stringify(databaseName)} name=${
           JSON.stringify(sampledRecordName)
         }`,
+      );
+    }
+    if (databaseName !== options.expectedDatabaseName) {
+      throw new Error(
+        `prisma-studio /bff connected to unexpected database ${
+          JSON.stringify(databaseName)
+        } (expected ${JSON.stringify(options.expectedDatabaseName)})`,
       );
     }
     return { url: endpoint.origin, databaseName, sampledRecordName };

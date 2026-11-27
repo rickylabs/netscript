@@ -13,14 +13,16 @@ AppHost (`aspire/deno.json`) and first-party Deno hosting (`builder.addDenoApp` 
 `Aspire.Hosting.JavaScript`). Existing workspaces scaffolded with a legacy Node.js
 `aspire/package.json` AppHost fail closed before any CLI mutation until migrated.
 
-## 1. Install Aspire CLI `17.0.0`
+## 1. Install Aspire CLI `17.0.0` and NetScript `0.0.10`
 
-Install or update the pinned Aspire CLI and confirm the toolchain is healthy:
+Install or update the pinned Aspire CLI and NetScript CLI, and confirm the toolchain is healthy:
 
 ```bash
 dotnet tool update -g Aspire.Cli --version 17.0.0
 # or, for a fresh install:
 dotnet tool install -g Aspire.Cli --version 17.0.0
+
+deno install --global --allow-all --force --name netscript jsr:@netscript/cli@^0.0.10
 
 aspire --version
 aspire doctor --non-interactive --nologo
@@ -101,6 +103,13 @@ Then regenerate the AppHost helpers and restore the Aspire 17.0.0 SDK modules:
 netscript generate aspire
 (cd aspire && aspire restore)
 ```
+
+`netscript generate aspire` regenerates `aspire/apphost.mts`, `aspire/.helpers/*`, and
+`.netscript/aspire-cli.ts`, and automatically upgrades a generated prior-release
+`.netscript/quality-runner.ts` so `deno task check` checks AppHost files natively with
+`deno check --unstable-kv --config aspire/deno.json` instead of the removed Node compiler. (If you
+customized `.netscript/quality-runner.ts` and removed its generated header, update `runAppHostCheck`
+to use `deno check --unstable-kv --config aspire/deno.json` when `aspire/deno.json` exists.)
 
 ## 3. Preserve pre-existing container SQL Server passwords
 

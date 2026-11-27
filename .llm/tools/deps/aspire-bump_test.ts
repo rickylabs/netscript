@@ -352,3 +352,65 @@ Deno.test('parseCliArgs handles -- separator, --dry-run, and conflicting --apply
     'Cannot combine --apply and --dry-run',
   );
 });
+
+Deno.test('offline and explicit crossed-train SDK/Browsers pairs reject fail-closed across all paths', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await seedFixtureRepo(root);
+    const beforeFiles = await Promise.all(
+      ASPIRE_BUMP_ALLOWLIST.map((p) => Deno.readTextFile(join(root, p))),
+    );
+
+    // Offline major bump without matching --browsers-version would keep 17.0.0-preview.*; must fail.
+    await assertRejects(
+      () =>
+        planOrApplyAspireBump({
+          repoRoot: root,
+          apply: true,
+          offline: true,
+          targetVersion: '18.0.0',
+        }),
+      Error,
+      'Incompatible Aspire trains',
+    );
+
+    // Online explicit Browsers pin from 16.0.0 train with 17.0.0 SDK must fail even if present on NuGet.
+    await assertRejects(
+      () =>
+        planOrApplyAspireBump({
+          repoRoot: root,
+          apply: false,
+          offline: false,
+          targetVersion: '17.0.0',
+          targetBrowsersVersion: '16.0.0-preview.1',
+          fetchPackageVersions: (pkg) =>
+            Promise.resolve(
+              pkg === 'Aspire.Hosting.Browsers'
+                ? ['16.0.0-preview.1', '17.0.0-preview.1.26567.5']
+                : ['17.0.0'],
+            ),
+        }),
+      Error,
+      'Incompatible Aspire trains',
+    );
+
+    const afterFailure = await Promise.all(
+      ASPIRE_BUMP_ALLOWLIST.map((p) => Deno.readTextFile(join(root, p))),
+    );
+    assertEquals(afterFailure, beforeFiles);
+
+    // Offline major bump with explicit same-train --browsers-version succeeds cleanly.
+    const matched = await planOrApplyAspireBump({
+      repoRoot: root,
+      apply: false,
+      offline: true,
+      targetVersion: '18.0.0',
+      targetBrowsersVersion: '18.0.0-preview.1.27000.1',
+    });
+    assertEquals(matched.targetVersion, '18.0.0');
+    assertEquals(matched.targetBrowsersVersion, '18.0.0-preview.1.27000.1');
+    assertEquals(matched.changedFiles, [...ASPIRE_BUMP_ALLOWLIST]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});

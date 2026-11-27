@@ -489,13 +489,32 @@ Deno.test('#2259 live process DB check supports URL and Npgsql dialects without 
     ['DATABASE_URL', `postgresql://postgres:${REAL_PASSWORD}@127.0.0.1:55432/app`],
     ['POSTGRES_URI', `postgresql://postgres:${REAL_PASSWORD}@127.0.0.1:55432/app`],
   ]);
-  assertProcessDatabaseConnection(urlEnv, 55432, REAL_PASSWORD, 'prisma-studio');
+  assertEquals(assertProcessDatabaseConnection(urlEnv, 55432, REAL_PASSWORD, 'prisma-studio'), {
+    databaseName: 'app',
+  });
 
   const npgsqlEnv = new Map([
     ['DATABASE_URL', `Host=127.0.0.1;Port=55432;Database=app;Password=${REAL_PASSWORD}`],
     ['POSTGRES_URI', `Host=127.0.0.1;Port=55432;Database=app;Password=${REAL_PASSWORD}`],
   ]);
-  assertProcessDatabaseConnection(npgsqlEnv, 55432, REAL_PASSWORD, 'prisma-studio');
+  assertEquals(assertProcessDatabaseConnection(npgsqlEnv, 55432, REAL_PASSWORD, 'prisma-studio'), {
+    databaseName: 'app',
+  });
+
+  assertThrows(
+    () =>
+      assertProcessDatabaseConnection(
+        new Map([
+          ['DATABASE_URL', `postgresql://postgres:${REAL_PASSWORD}@127.0.0.1:55432/app`],
+          ['POSTGRES_URI', `postgresql://postgres:${REAL_PASSWORD}@127.0.0.1:55432/other_db`],
+        ]),
+        55432,
+        REAL_PASSWORD,
+        'prisma-studio',
+      ),
+    Error,
+    'targeted different databases',
+  );
 
   const wrongPortError = assertThrows(
     () => assertProcessDatabaseConnection(urlEnv, 5432, REAL_PASSWORD, 'prisma-studio'),
@@ -599,6 +618,7 @@ Deno.test('#2259 Prisma Studio /bff read proves live DB query success and reject
     'http://127.0.0.1:5555',
     SECRETS,
     {
+      expectedDatabaseName: 'postgres',
       fetchImpl: () =>
         Promise.resolve(
           new Response(
@@ -619,6 +639,27 @@ Deno.test('#2259 Prisma Studio /bff read proves live DB query success and reject
   await assertRejects(
     () =>
       assertPrismaStudioDatabaseRead('http://127.0.0.1:5555', SECRETS, {
+        expectedDatabaseName: 'postgres',
+        fetchImpl: () =>
+          Promise.resolve(
+            new Response(
+              JSON.stringify([null, [{
+                database_name: 'unrelated-scaffold-db',
+                name: 'Seed User',
+              }]]),
+              { status: 200 },
+            ),
+          ),
+        timeoutMs: 0,
+        delayMs: 0,
+      }),
+    Error,
+    'unexpected database',
+  );
+  await assertRejects(
+    () =>
+      assertPrismaStudioDatabaseRead('http://127.0.0.1:5555', SECRETS, {
+        expectedDatabaseName: 'postgres',
         fetchImpl: () => Promise.resolve(new Response(JSON.stringify([null, []]), { status: 200 })),
         timeoutMs: 0,
         delayMs: 0,
@@ -629,6 +670,7 @@ Deno.test('#2259 Prisma Studio /bff read proves live DB query success and reject
   await assertRejects(
     () =>
       assertPrismaStudioDatabaseRead('http://127.0.0.1:5555', SECRETS, {
+        expectedDatabaseName: 'postgres',
         fetchImpl: () =>
           Promise.resolve(
             new Response(JSON.stringify([{ message: 'relation missing' }]), { status: 200 }),
@@ -642,6 +684,7 @@ Deno.test('#2259 Prisma Studio /bff read proves live DB query success and reject
   const leakErr = await assertRejects(
     () =>
       assertPrismaStudioDatabaseRead('http://127.0.0.1:5555', SECRETS, {
+        expectedDatabaseName: 'postgres',
         fetchImpl: () =>
           Promise.resolve(new Response(`postgres:${REAL_PASSWORD}`, { status: 200 })),
         timeoutMs: 0,

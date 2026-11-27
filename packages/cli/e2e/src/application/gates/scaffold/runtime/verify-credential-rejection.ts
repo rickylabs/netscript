@@ -230,10 +230,16 @@ export async function verifyCredentialRejection(
     throw new Error('aspire describe omitted prisma-studio executable.pid');
   }
   const studioEnv = await readProcessEnvironmentByPid(prismaStudioPid);
-  assertProcessDatabaseConnection(studioEnv, postgresPort, secrets[0], 'prisma-studio');
+  const { databaseName: expectedStudioDb } = assertProcessDatabaseConnection(
+    studioEnv,
+    postgresPort,
+    secrets[0],
+    'prisma-studio',
+  );
   const studioReadReceipt = await assertPrismaStudioDatabaseRead(
     prismaStudioUrl ?? PRISMA_STUDIO_DEFAULT_URL,
     secrets,
+    { expectedDatabaseName: expectedStudioDb },
   );
 
   const studioLogs = await runAspire([

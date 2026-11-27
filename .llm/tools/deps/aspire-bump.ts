@@ -86,14 +86,27 @@ function assertValidVersion(value: string, label: string, stableOnly: boolean): 
   }
 }
 
+function parseSemver(v: string): { maj: number; min: number; pat: number; pre: string | null } {
+  const [core, pre] = v.split('-', 2);
+  const [maj, min, pat] = core.split('.').map(Number);
+  return { maj, min, pat, pre: pre ?? null };
+}
+
+export function assertSameAspireTrain(sdkVersion: string, browsersVersion: string): void {
+  const sdk = parseSemver(sdkVersion);
+  const browsers = parseSemver(browsersVersion);
+  if (sdk.maj !== browsers.maj || sdk.min !== browsers.min) {
+    throw new Error(
+      `Incompatible Aspire trains: SDK ${sdkVersion} (${sdk.maj}.${sdk.min}) cannot be paired ` +
+        `with ${ASPIRE_PREVIEW_PACKAGE} ${browsersVersion} (${browsers.maj}.${browsers.min}). ` +
+        `Pass a matching ${sdk.maj}.${sdk.min}.x --browsers-version.`,
+    );
+  }
+}
+
 export function compareSemver(left: string, right: string): number {
-  const parse = (v: string) => {
-    const [core, pre] = v.split('-', 2);
-    const [maj, min, pat] = core.split('.').map(Number);
-    return { maj, min, pat, pre: pre ?? null };
-  };
-  const a = parse(left);
-  const b = parse(right);
+  const a = parseSemver(left);
+  const b = parseSemver(right);
   if (a.maj !== b.maj) return a.maj - b.maj;
   if (a.min !== b.min) return a.min - b.min;
   if (a.pat !== b.pat) return a.pat - b.pat;
@@ -360,6 +373,7 @@ export async function planOrApplyAspireBump(
 
   assertValidVersion(resolvedVersion, 'targetVersion', true);
   assertValidVersion(resolvedBrowsersVersion, 'targetBrowsersVersion', false);
+  assertSameAspireTrain(resolvedVersion, resolvedBrowsersVersion);
 
   const planned: Array<{ readonly absPath: string; readonly update: AspirePinUpdate }> = [];
   for (const relPath of ASPIRE_BUMP_ALLOWLIST) {

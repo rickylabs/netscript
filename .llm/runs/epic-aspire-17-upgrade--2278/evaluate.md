@@ -129,3 +129,70 @@ Commands below ran locally with Deno 2.9.8 unless a hosted job is named. Status 
 | --- | --- |
 | Verdict | **FAIL_FIX** |
 | Rationale | The approved plan is implementable. Product and migration fixes and stronger #2259 evidence are required. Keep the PR in implementation and bring the corrected candidate and its hosted runtime receipts back for independent re-evaluation. |
+
+---
+
+## Round 2 — independent IMPL-EVAL, 2026-11-27
+
+**FAIL_FIX** on `c312e2beba95e36e7ed4e9089e672a19911ca83f`. Two Round-1 fixes remain incomplete. The documented migration leaves the released workspace's check command pointing at a deleted compiler. The pin bumper accepts incompatible SDK and Browsers trains through explicit and offline inputs. Both hosted runtime tiers passed on the candidate tree.
+
+### Metadata and process verification
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Evaluator | PASS | Feature tier, cycle 2. Requested and observed Codex / GPT-6.2 Astra / xhigh, independent session `01a21e8b-986f-74b1-8199-76fe1c8a2bd1`, first route. Generator was Antigravity/Gemini. A6 CLI/tooling and A2 integration, with docs and service overlays. |
+| Plan and design | PASS | Both PLAN-EVAL records say `FAIL_PLAN`. The owner approved the seven corrections at `36f896a64`, an ancestor of S1 at `452a24f80`. The worklog contains the design checkpoint and the S1–S6 evidence. |
+| Checkout and CI provenance | PASS | Initial raw Git status was clean. The local and PR heads both equaled the full SHA above. The Postgres job checked out GitHub test merge `6b7ecae249c13dbf5eaf80d233f9bb9737a3f3a3` over `7eecfe51f9fadcae79927ebd69898003dcdd27ab`. Its tree and the candidate tree both equal `155d42e62460c37e222fc1dc4fe86e19e8da00d2`. [Postgres job](https://github.com/rickylabs/netscript/actions/runs/46053272427/job/140689861659) |
+| Implementation review trail | PASS | The PR carries a consolidated remediation comment. Git confirms S3a changed 28 files at `f0e762124`. The 29-file S5b commit was `b8e900f77` (S5b-2c). The worklog cites `c527abb3a`, which changed 12 files (S5b-2e). The comment establishes the remediation review, while contemporaneous per-slice PR reviews remain unverified. [Implementation comment](https://github.com/rickylabs/netscript/pull/2693#issuecomment-7226055490) |
+| Close-gate | FAIL | PR was mergeable, zero behind, `status:implementing`, milestone unset. The review-thread gate returned zero threads and zero unanswered. Across 34 check runs, 26 succeeded, seven skipped and only `close-gate` failed. Acceptance mirroring, milestone `0.0.10`, ready-merge and close-gate rerun remain with the coordinator after a passing evaluation. [PR](https://github.com/rickylabs/netscript/pull/2693) |
+
+### Static and fitness gates
+
+All local results below are raw exit codes with Deno 2.9.8. Runtime receipts are identified separately.
+
+| Gate | Result | Independent evidence |
+| --- | --- | --- |
+| Version parity and current pins | PASS | `deno task check:aspire-version-parity`, default and `--phase 2`, each checked 1,053 surfaces with a fresh manifest, zero failures, deferred or missing entries. Both requested `aspire:bump` offline invocations exited 0 with 0/7 files changed. |
+| Bumper contract | FAIL | The real workflows match the new installation path. The seven transforms finish before the write loop. Tests cover validation failure without partial writes, the six-package intersection, and automatic Browsers selection. Explicit and offline target selection still accept mixed trains, as detailed below. |
+| Typecheck, tests, lint and format | PASS | Hosted quality and all eight check/test shards, including browser, succeeded. Local `quality:cli` processed 1,299 lint and 1,181 format files with zero findings. Two local `deno test --frozen --allow-all --unstable-kv` runs exited 0. The 18 remediation/contract files passed 170 tests (45 steps). Five Docker topology, generated health and doctor files passed 46 tests (25 steps). [Core CI](https://github.com/rickylabs/netscript/actions/runs/46053272509) |
+| Carriers, docs and publication | PASS | `check:assets-barrel`, `check:agent-docs-prose`, `check:mcp-export-corpus`, `check:publish-assets`, `maint:dogfood-skills:check`, `docs:links`, `docs:accuracy` and `publish:dry-run` each exited 0. The link checker examined 105 docs with zero broken links, anchors or orphans. |
+| F-1, F-2–6, F-8, F-11–15, F-17–19 | PASS | `quality:gate` ran `quality:scan` and `arch:check`. Both it and `check:scaffold-provider-boundary` exited 0. The compat/TCP/Postgres templates are 347/343/183 lines. The DB runner and extracted helper are 468/347. The live verifier and extracted authority helper are 377/361. The 824→826-line public plugin installer adds the pre-mutation guard and its import. |
+| F-7 and README baseline | FAIL | `doc:lint --root packages/aspire` exits **1**. The combined doc invocation exits 0, but the adapters/application/public/testing entrypoints report 2/9/36/2 private-type references. The Aspire JSR audit exits 1 on four missing module tags. `docs:readme:check` exits 1 on the bench Install section. The Aspire tree is `ea9a1d8174d6fc70ba9940119e3754a06ed688f7` at base and head, and the bench README has no diff. These failures predate the PR. |
+| F-9 permissions and credential creation | PASS | The emitted adapter applies the deny map after the blanket/granular allow branch. The tests observe the builder calls and a real Deno child denying the targeted read with exit 42. Aspire 17's argument builder emits deny flags with the blanket grant. The four-process first-creation test passed. [Aspire 17 source](https://github.com/microsoft/aspire/blob/v17.0.0/src/Aspire.Hosting.JavaScript/DenoHostingExtensions.cs#L600-L614) |
+| F-10 behavioral coverage | FAIL | Fresh-scaffold runtime and masking controls pass. The released-workspace check and crossed-train cases below still fail their contracts. |
+| F-16 | DEBT_ACCEPTED | Raw Git tree counts at base and head are 19→19 immediate children in CLI adapters and 94→94 in scaffold gates. Existing entry `cli-showcase-cardinality-2571` applies. |
+
+### Runtime and consumer gates
+
+| Gate or closing target | Result | Independent evidence |
+| --- | --- | --- |
+| Hosted scaffold, runtime and desktop | PASS | Downloaded artifacts `15224864385`, `15225864327` and `15225983169`. Static service/contracts/plugins passed 8/5/18 steps. Postgres passed 124/124, SQLite passed 116/116 and its showcase passed 8/8, all with zero skips. MCP, OTel traces, streams reconnect and cleanup exited 0 in both runtime reports. The Postgres log shows `RUN: true` and all three cache hits. Desktop and lane visibility succeeded. Hosted jobs supply Docker evidence. [E2E run](https://github.com/rickylabs/netscript/actions/runs/46053272427) |
+| #319 native AppHost and #320 first-party hosting | PASS | For **fresh scaffolds**, the generated-member compile tests, pre-mutation legacy refusal, first-party registration, mixed permission tests and both hosted starts support these NetScript adoption targets. The existing-workspace migration is a separate blocking deliverable below. |
+| #2174 empty helpers and #2202 foreign Docker | PASS | `empty-registration_test.ts` linted the generated variants. Generated health tests exercised remote-loopback and local-daemon behavior. The DB resolver carries mode into the operation runner. The timeout tests skip Docker inspection for SQLite, External and explicit non-loopback targets. The helper also excludes File mode. |
+| #2259 masking and connected consumers | PASS | In the Postgres artifact, `runtime.health.credential-rejected` exited 0 in 21,847 ms. Its stdout identifies `studioDb=plugin-smoke-20261127-185937-db`, matching the run workspace, and masked resource details for `users-asrcbrac` and `prisma-studio-ndnwuesf`. The gate scans raw describe bytes, reads the seeded row through Studio's SQL endpoint, inspects the rendered dashboard env rows via Chrome and validates the telemetry resources/logs shape. Studio error-file content is withheld. Cleanup exited 0 in 5,809 ms. The receipt supports this candidate. See the advisory below for future runs. [Postgres artifact](https://github.com/rickylabs/netscript/actions/runs/46053272427/artifacts/15225864327) |
+| Migration from published `v0.0.9` | FAIL | The released CLI generated a SQLite/users workspace with the Node island. The candidate CLI refused it before migration. After the documented edits, root members, unstable flags and profiles were preserved, generation succeeded and `generate aspire --check` accepted 17 outputs. The guide's next command, `deno task check`, failed on the removed `aspire/node_modules/typescript/bin/tsc`. |
+| Reference-only targets | PASS | The body has exactly five closing keywords, `Part of #2278`, and `Refs #295, #1726, #2184`. The owner identifies #295 as the umbrella. Broader credential-readiness and MySQL/SQL Server work remains with #1726 and #2184. [Owner's #295 comment](https://github.com/rickylabs/netscript/issues/295#issuecomment-4871769509) |
+
+### Anti-patterns and architecture debt
+
+AP-19 is **CLEAR** for the mixed permission case. The Round-1 AP-1 file-size findings on the DB runner and live verifier are cleared by the splits. AP-21 remains **DEBT_ACCEPTED** at the unchanged directory counts. The corrected debt rationale matches the generator's SQLite `addParameter` and External `addConnectionString` branches. The Browsers preview entry remains applicable. No new architecture debt is needed for the two implementation fixes.
+
+### Findings
+
+| Severity | Finding | Required action or disposition |
+| --- | --- | --- |
+| High — blocking | **The migration guide leaves the released quality runner installed.** Guide §2 deletes the compiler and its config. Section 4 invokes the root task whose `v0.0.9` runner still calls them. Candidate `generate aspire` updated the helpers and left that runner byte-identical. The verbatim trial also hit the unpublished `@netscript/aspire@^0.0.10` during dependency setup, even though Aspire restore exited 0. To isolate the runner, a second copy used the published `@netscript/aspire@0.0.9` whose package source and manifest match this head, generated the Prisma client, and completed restore and direct native AppHost checking. The guide's root check then passed its 145 ordinary files and failed its 15 AppHost files solely on the missing compiler. Replacing only the runner with the candidate-generated version made the same root task pass all 160. | Document or implement how an existing workspace receives the native quality runner, identify the candidate NetScript CLI prerequisite, and validate the guide's literal root task on a scaffold created by the released CLI. Record any pre-publication dependency substitution. |
+| Medium — blocking | **The bumper's same-train rule covers automatic online selection only.** Read-only `deno task aspire:bump -- --dry-run --offline --version 18.0.0` exited 0 and proposed seven changes while keeping Browsers `17.0.0-preview.1.26567.5`. An injected online index with all six stable packages at `17.0.0` and an explicit, available Browsers `16.0.0-preview.1` also returned a successful plan. Both cases reach the same validated update list used by `--apply`. | Validate the final SDK/Browsers pair on every input path before constructing updates. Add negative controls for a crossed-train explicit online version and an offline major bump retaining the old Browsers pin. |
+| Medium — advisory | **The Studio gate can credit a different seeded scaffold.** When Aspire omits Studio's HTTP URL the gate uses port 5555. The SQL assertion accepts any nonempty database name with `Seed User`. An independent injected response naming `unrelated-scaffold-db` returned a successful receipt. The hosted artifact itself identifies the expected database. | Match `current_database()` against the expected database from this workspace or the verified process connection and add a wrong-database negative control. |
+| Low — evidence record | The S5b SHA for the 29-file change and the aggregate Aspire doc-lint command status need the distinctions recorded above. | Use `b8e900f77` and wrapper exit 1 in the next worklog summary. |
+
+### Lessons for promotion
+
+Run migration instructions on a project generated by the last published CLI. Preserve its generated maintenance scripts and invoke the exact verification task from the guide. For version bumpers, test an actual train change through each supported target-selection path.
+
+### Verdict
+
+| Field | Value |
+| --- | --- |
+| Verdict | **FAIL_FIX** |
+| Rationale | The approved scope remains valid. Correct the legacy migration and mixed-train bumper paths, then re-evaluate the repaired candidate. Keep PR #2693 in implementation. |
