@@ -1,8 +1,8 @@
 /**
  * oRPC v1 server-side RPC protocol guard (`X-NetScript-RPC-Protocol`).
  *
- * Phase 0a (`0.0.10`) prepares v1 RPC servers ahead of the `0.1.0` oRPC v2 cut-over:
- * - Allows headerless and `orpc-v1` requests (v1 SDKs remain header-neutral in `0.0.10`).
+ * Prepares oRPC v1 (`0.0.x`) RPC servers ahead of the `0.1.0` oRPC v2 cut-over:
+ * - Allows headerless and `orpc-v1` requests (v1 SDKs remain header-neutral on `0.0.x`).
  * - Exempts `OPTIONS` preflights (and runs at `order = 0 < 9e6` inside v1 `CORSPlugin` so
  *   cross-origin browsers can read `426` rejections cleanly).
  * - Only guards matched RPC procedures (via `StandardRPCMatcher`), preserving fallthrough
@@ -214,8 +214,8 @@ export class ProtocolGuardPluginV1 implements ServiceHandlerPlugin {
    * Attach the v1 protocol guard onto `rootInterceptors` and return `handlerOptions`.
    *
    * On oRPC v1 (`^1.16.6`), `StandardHandler` only executes `rootInterceptors`.
-   * Phase 2 (`0.1.0`) replaces this with `ProtocolGuardHandlerPlugin` (`before: ['~cors']`)
-   * attached to `routingInterceptors`.
+   * The `0.1.0` oRPC v2 cut-over replaces this with `ProtocolGuardHandlerPlugin`
+   * (`before: ['~cors']`) attached to `routingInterceptors`.
    */
   init(handlerOptions: unknown, router?: unknown): unknown {
     const options = handlerOptions as RootInterceptorHandlerOptions;
