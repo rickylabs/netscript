@@ -72,30 +72,17 @@ function appendHeaderCaseInsensitive(headers: readonly string[], headerName: str
   return [...headers, headerName];
 }
 
-function isRpcRequestPath(requestPath: string, rpcPrefixes: readonly string[]): boolean {
-  for (const rawPrefix of rpcPrefixes) {
-    const trimmed = rawPrefix.trim();
-    if (!trimmed) continue;
-    const normalized = trimmed === '/' ? '/' : trimmed.replace(/\/+$/, '');
-    if (normalized === '/') return true;
-    if (requestPath === normalized || requestPath.startsWith(`${normalized}/`)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 /**
  * Preserve Hono's once-resolved CORS decision across handlers and proxied responses.
  * Snapshot all six headers, including absence, before downstream code runs; restore
  * them on the final response and retain the union of checkpoint and final Vary tokens.
- * Native preflight short-circuits unchanged, except mounted RPC paths append
+ * Native preflight short-circuits unchanged, except matched RPC procedure paths append
  * `X-NetScript-RPC-Protocol` (case-insensitively deduplicated) to explicit `allowHeaders`
  * without mutating non-RPC routes. Credentialed resolvers cannot emit '*'.
  */
 export function createServiceCorsMiddleware(
   options: ResolvedCorsOptions,
-  getRpcPrefixes?: () => readonly string[],
+  isRpcPreflightTarget?: (requestPath: string) => boolean | Promise<boolean>,
 ): ServiceMiddleware {
   const upstream = buildCorsHandler(options);
   const rpcPreflightUpstream = options.allowHeaders && options.allowHeaders.length > 0
@@ -108,7 +95,7 @@ export function createServiceCorsMiddleware(
   return async (c, next) => {
     const activeUpstream = rpcPreflightUpstream &&
         c.req.method === 'OPTIONS' &&
-        isRpcRequestPath(c.req.path, getRpcPrefixes?.() ?? [])
+        (await isRpcPreflightTarget?.(c.req.path)) === true
       ? rpcPreflightUpstream
       : upstream;
 

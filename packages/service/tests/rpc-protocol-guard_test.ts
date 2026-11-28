@@ -316,3 +316,170 @@ test('withCors deduplicates X-NetScript-RPC-Protocol case-insensitively and leav
   );
   await nonRpcPreflight.arrayBuffer();
 });
+
+test('overlapping OpenAPI and raw routes under the RPC prefix preserve fallthrough and untouched preflight allowHeaders', async () => {
+  const overlappingRouter = os.router({
+    ping: os.handler(() => ({ ok: true })),
+    restUnderRpcPrefix: os
+      .route({ method: 'GET', path: '/rpc/rest-only' })
+      .handler(() => ({ source: 'openapi' })),
+  });
+
+  const app = createService(overlappingRouter, { name: 'rpc-prefix-overlap' })
+    .withCors({
+      origin: [allowedOrigin],
+      allowHeaders: ['Authorization'],
+    })
+    .withRPC()
+    .route('get', '/api/rpc/raw-only', (c) => c.json({ source: 'raw' }))
+    .build();
+
+  // Overlapping OpenAPI and raw routes under /api/rpc/* keep 200 fallthrough even with orpc-v2
+  // and never gain X-NetScript-RPC-Protocol on preflight allowHeaders or Vary.
+  for (
+    const [path, expectedSource] of [
+      ['/api/rpc/rest-only', 'openapi'],
+      ['/api/rpc/raw-only', 'raw'],
+    ] as const
+  ) {
+    const preflight = await app.request(path, {
+      method: 'OPTIONS',
+      headers: {
+        origin: allowedOrigin,
+        'access-control-request-method': 'GET',
+      },
+    });
+    assertEquals(preflight.status, 204);
+    assertEquals(preflight.headers.get('access-control-allow-headers'), 'Authorization');
+    await preflight.arrayBuffer();
+
+    const response = await app.request(path, {
+      method: 'GET',
+      headers: {
+        origin: allowedOrigin,
+        [RPC_PROTOCOL_HEADER]: 'orpc-v2',
+      },
+    });
+    assertEquals(response.status, 200);
+    assertEquals(varyTokens(response), ['origin']);
+    assertEquals(await response.json(), { source: expectedSource });
+  }
+
+  // Real RPC procedure under the same prefix still enforces 426 and RPC preflight allowHeaders.
+  const rpcPreflight = await app.request('/api/rpc/ping', {
+    method: 'OPTIONS',
+    headers: { origin: allowedOrigin, 'access-control-request-method': 'POST' },
+  });
+  assertEquals(rpcPreflight.status, 204);
+  assertEquals(
+    rpcPreflight.headers.get('access-control-allow-headers'),
+    'Authorization,X-NetScript-RPC-Protocol',
+  );
+  await rpcPreflight.arrayBuffer();
+
+  const rpcRejected = await app.request('/api/rpc/ping', {
+    method: 'POST',
+    headers: {
+      origin: allowedOrigin,
+      'content-type': 'application/json',
+      [RPC_PROTOCOL_HEADER]: 'orpc-v2',
+    },
+    body: '{}',
+  });
+  assertEquals(rpcRejected.status, 426);
+  assertEquals(varyTokens(rpcRejected), ['origin', 'x-netscript-rpc-protocol']);
+  await rpcRejected.arrayBuffer();
+});
+
+test('mutating caller rpcAliases after withRPC/build does not move preflight allowance', async () => {
+  const callerAliases = ['/legacy/rpc'];
+  const app = createService(router, { name: 'alias-snapshot' })
+    .withCors({
+      origin: [allowedOrigin],
+      allowHeaders: ['Authorization'],
+    })
+    .withRPC({ rpcAliases: callerAliases })
+    .build();
+
+  // Mutate the caller-owned array after build().
+  callerAliases[0] = '/new/rpc';
+
+  const mountedPreflight = await app.request('/legacy/rpc/ping', {
+    method: 'OPTIONS',
+    headers: { origin: allowedOrigin, 'access-control-request-method': 'POST' },
+  });
+  assertEquals(mountedPreflight.status, 204);
+  assertEquals(
+    mountedPreflight.headers.get('access-control-allow-headers'),
+    'Authorization,X-NetScript-RPC-Protocol',
+  );
+  await mountedPreflight.arrayBuffer();
+
+  const unmountedPreflight = await app.request('/new/rpc/ping', {
+    method: 'OPTIONS',
+    headers: { origin: allowedOrigin, 'access-control-request-method': 'POST' },
+  });
+  assertEquals(unmountedPreflight.status, 204);
+  assertEquals(unmountedPreflight.headers.get('access-control-allow-headers'), 'Authorization');
+  await unmountedPreflight.arrayBuffer();
+
+  const mountedPost = await app.request('/legacy/rpc/ping', {
+    method: 'POST',
+    headers: { origin: allowedOrigin, 'content-type': 'application/json' },
+    body: '{}',
+  });
+  assertEquals(mountedPost.status, 200);
+  await mountedPost.arrayBuffer();
+
+  const unmountedPost = await app.request('/new/rpc/ping', {
+    method: 'POST',
+    headers: { origin: allowedOrigin, 'content-type': 'application/json' },
+    body: '{}',
+  });
+  assertEquals(unmountedPost.status, 404);
+  await unmountedPost.arrayBuffer();
+});
+
+test('ProtocolGuardPluginV1 rejects Unicode whitespace around protocol tokens and preserves exact rejected value', async () => {
+  const handler = createRPCHandler(router);
+
+  // Standard ASCII HTTP OWS (SP/HTAB) around orpc-v1 is normalized by Fetch/HTTP and accepted.
+  const asciiOws = await handler.handle(
+    new Request('http://localhost/api/rpc/ping', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        [RPC_PROTOCOL_HEADER]: ' \torpc-v1\t ',
+      },
+      body: '{}',
+    }),
+    { prefix: '/api/rpc' },
+  );
+  assert(asciiOws.matched && asciiOws.response);
+  assertEquals(asciiOws.response.status, 200);
+  await asciiOws.response.arrayBuffer();
+
+  // Non-breaking space (U+00A0) is NOT HTTP OWS: must reject with 426 and preserve exact value.
+  for (const invalidToken of ['\u00a0orpc-v1\u00a0', '\u00a0orpc-v2\u00a0']) {
+    const rejected = await handler.handle(
+      new Request('http://localhost/api/rpc/ping', {
+        method: 'POST',
+        headers: {
+          origin: allowedOrigin,
+          'content-type': 'application/json',
+          [RPC_PROTOCOL_HEADER]: invalidToken,
+        },
+        body: '{}',
+      }),
+      { prefix: '/api/rpc' },
+    );
+    assert(rejected.matched && rejected.response);
+    assertEquals(rejected.response.status, 426);
+    const payload = await rejected.response.json() as {
+      json: { code: string; data: { expectedProtocol: string; receivedProtocol: string } };
+    };
+    assertEquals(payload.json.code, 'CLIENT_PROTOCOL_UNSUPPORTED');
+    assertEquals(payload.json.data.expectedProtocol, RPC_PROTOCOL_V1);
+    assertEquals(payload.json.data.receivedProtocol, invalidToken);
+  }
+});

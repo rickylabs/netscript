@@ -47,6 +47,7 @@ import {
 } from '../primitives/health.ts';
 import { createOpenAPISpec, createScalarDocs, createScalarJs } from '../primitives/openapi.ts';
 import { createErrorHandler, createNotFoundHandler } from '../primitives/handlers.ts';
+import { createRpcPathMatcher } from '../primitives/rpc-protocol-guard.ts';
 import type {
   ContextFactory,
   CorsOptions,
@@ -129,6 +130,7 @@ export class ServiceBuilderImpl<
   private bodyLimitInstalled = false;
   private corsOptions: NonNullable<CorsOptions>[] = [];
   private rpcOptions: (RpcWiringOptions & { traceContext?: boolean }) | null = null;
+  private rpcPreflightMatcher: ((requestPath: string) => Promise<boolean>) | null = null;
   private openApiOptions: { title?: string; description?: string } | null = null;
   private docsOptions: { specUrl?: string } | null = null;
   private deferredRoutes: DeferredRoute[] = [];
@@ -158,14 +160,13 @@ export class ServiceBuilderImpl<
   withCors(options?: CorsOptions): ServiceBuilder<TRouter, TCustom> {
     const resolved = resolveServiceCorsOptions(options);
     this.corsOptions.push(resolved);
-    this.use(createServiceCorsMiddleware(resolved, () => this.resolveMountedRpcPrefixes()));
+    this.use(
+      createServiceCorsMiddleware(
+        resolved,
+        (path) => this.rpcPreflightMatcher?.(path) ?? false,
+      ),
+    );
     return this;
-  }
-
-  private resolveMountedRpcPrefixes(): readonly string[] {
-    if (!this.rpcConfigured) return [];
-    const { rpcPath } = resolveRpcWiringPaths(this.rpcOptions ?? undefined);
-    return [rpcPath, ...(this.rpcOptions?.rpcAliases ?? [])];
   }
 
   /**
@@ -311,7 +312,15 @@ export class ServiceBuilderImpl<
   ): ServiceBuilder<TRouter, TCustom> {
     if (this.rpcConfigured) return this;
     this.rpcConfigured = true;
-    this.rpcOptions = options ?? {};
+    this.rpcOptions = options
+      ? {
+        ...options,
+        ...(options.rpcAliases ? { rpcAliases: [...options.rpcAliases] } : {}),
+        ...(options.deprecatedRpcRoutes
+          ? { deprecatedRpcRoutes: options.deprecatedRpcRoutes.map((route) => ({ ...route })) }
+          : {}),
+      }
+      : {};
 
     return this;
   }
@@ -710,6 +719,7 @@ export class ServiceBuilderImpl<
 
     if (this.rpcConfigured) {
       const traceContext = this.rpcOptions?.traceContext !== false;
+      const { rpcPath } = resolveRpcWiringPaths(this.rpcOptions ?? undefined);
       const pipelineConfig = {
         serviceId: this.serviceId,
         serviceName: this.config.name,
@@ -728,6 +738,10 @@ export class ServiceBuilderImpl<
         )
         : undefined;
       const enableResponseHeaders = this.procedureRateLimitStages.length > 0;
+      this.rpcPreflightMatcher = createRpcPathMatcher(
+        wrappedRpcRouter ?? wrappedRouter,
+        [rpcPath, ...(this.rpcOptions?.rpcAliases ?? [])],
+      );
       wireRpc(
         this.app,
         wrappedRouter,

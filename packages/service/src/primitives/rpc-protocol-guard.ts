@@ -5,9 +5,11 @@
  * - Allows headerless and `orpc-v1` requests (v1 SDKs remain header-neutral in `0.0.10`).
  * - Exempts `OPTIONS` preflights (and runs at `order = 0 < 9e6` inside v1 `CORSPlugin` so
  *   cross-origin browsers can read `426` rejections cleanly).
- * - Rejects any other `X-NetScript-RPC-Protocol` value (for example `orpc-v2`) with HTTP `426`
- *   and a v2-compatible `ORPCError` JSON envelope omitting `"status"` (`defined: false`,
- *   `code: 'CLIENT_PROTOCOL_UNSUPPORTED'`).
+ * - Only guards matched RPC procedures (via `StandardRPCMatcher`), preserving fallthrough
+ *   for overlapping OpenAPI or raw routes mounted under the same path prefix.
+ * - Rejects any non-`orpc-v1` `X-NetScript-RPC-Protocol` value (for example `orpc-v2` or
+ *   non-ASCII-whitespace-wrapped tokens) with HTTP `426` and a v2-compatible `ORPCError`
+ *   JSON envelope omitting `"status"` (`defined: false`, `code: 'CLIENT_PROTOCOL_UNSUPPORTED'`).
  * - Appends `Vary: X-NetScript-RPC-Protocol` on matched RPC responses (including `426`).
  *
  * Mounted strictly on `createRPCHandler` (never `createOpenAPIHandler`).
@@ -15,7 +17,9 @@
  * @module
  */
 
+import { StandardRPCMatcher } from '@orpc/server/standard';
 import type { ServiceHandlerPlugin } from '../types.ts';
+import { isOrpcRouter } from './orpc-router.ts';
 
 /** Canonical RPC protocol negotiation header name. */
 export const RPC_PROTOCOL_HEADER = 'X-NetScript-RPC-Protocol';
@@ -28,6 +32,7 @@ export const RPC_PROTOCOL_V1 = 'orpc-v1';
 
 interface StandardLikeRequest {
   readonly method: string;
+  readonly url?: URL;
   readonly headers: Readonly<Record<string, string | string[] | undefined>>;
 }
 
@@ -44,6 +49,7 @@ interface StandardLikeHandleResult {
 
 interface RootInterceptorOptions {
   readonly request: StandardLikeRequest;
+  readonly prefix?: string;
   next(): Promise<StandardLikeHandleResult>;
 }
 
@@ -51,6 +57,15 @@ type RootInterceptor = (options: RootInterceptorOptions) => Promise<StandardLike
 
 interface RootInterceptorHandlerOptions {
   rootInterceptors?: RootInterceptor[];
+}
+
+/**
+ * Strip strictly HTTP optional whitespace (ASCII SP `0x20` and HTAB `0x09`, RFC 9110 §5.5).
+ * Unlike `String.prototype.trim()`, this preserves non-ASCII whitespace such as `\u00a0`
+ * so invalid protocol tokens are rejected verbatim rather than coerced to `orpc-v1`.
+ */
+function trimHttpOws(value: string): string {
+  return value.replace(/^[ \t]+|[ \t]+$/g, '');
 }
 
 function readHeaderCaseInsensitive(
@@ -70,9 +85,72 @@ function readHeaderCaseInsensitive(
     return undefined;
   }
   if (Array.isArray(raw)) {
-    return raw.length === 0 ? undefined : raw.join(', ').trim();
+    return raw.length === 0 ? undefined : trimHttpOws(raw.join(', '));
   }
-  return raw.trim();
+  return trimHttpOws(raw);
+}
+
+function normalizePrefix(rawPrefix: string | undefined): string | undefined {
+  if (!rawPrefix) return undefined;
+  const stripped = rawPrefix.replace(/\/+$/, '');
+  return stripped.length === 0 ? undefined : stripped;
+}
+
+function extractRelativeRpcPathname(
+  requestPathname: string,
+  rawPrefix: string | undefined,
+): `/${string}` | undefined {
+  const prefix = normalizePrefix(rawPrefix);
+  if (prefix === undefined) {
+    return `/${requestPathname.replace(/^\/|\/$/g, '')}`;
+  }
+  if (requestPathname !== prefix && !requestPathname.startsWith(`${prefix}/`)) {
+    return undefined;
+  }
+  const remainder = requestPathname.slice(prefix.length);
+  return `/${remainder.replace(/^\/|\/$/g, '')}`;
+}
+
+function initRpcMatcher(router: unknown): StandardRPCMatcher | undefined {
+  if (!isOrpcRouter(router)) {
+    return undefined;
+  }
+  const matcher = new StandardRPCMatcher();
+  matcher.init(router);
+  return matcher;
+}
+
+/**
+ * Build an immutable path predicate that returns `true` only when `requestPath`
+ * matches a real RPC procedure on `router` under one of the snapshotted `prefixes`.
+ */
+export function createRpcPathMatcher(
+  router: unknown,
+  prefixes: readonly string[],
+): (requestPath: string) => Promise<boolean> {
+  const snapshotPrefixes = prefixes
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0)
+    .map((entry) => (entry === '/' ? '/' : entry.replace(/\/+$/, '')));
+
+  const matcher = snapshotPrefixes.length > 0 ? initRpcMatcher(router) : undefined;
+  if (!matcher) {
+    return () => Promise.resolve(false);
+  }
+
+  return async (requestPath: string): Promise<boolean> => {
+    for (const prefix of snapshotPrefixes) {
+      const relative = extractRelativeRpcPathname(
+        requestPath,
+        prefix === '/' ? undefined : prefix,
+      );
+      if (relative === undefined) continue;
+      if (await matcher.match('OPTIONS', relative)) {
+        return true;
+      }
+    }
+    return false;
+  };
 }
 
 function appendVaryToken(
@@ -119,7 +197,8 @@ function appendVaryToken(
 
 /**
  * v1 RPC handler plugin enforcing fail-closed `426 CLIENT_PROTOCOL_UNSUPPORTED`
- * for mismatched `X-NetScript-RPC-Protocol` headers while keeping CORS outside.
+ * for mismatched `X-NetScript-RPC-Protocol` headers on matched RPC procedures
+ * while keeping CORS outside and preserving fallthrough for non-RPC routes.
  */
 export class ProtocolGuardPluginV1 implements ServiceHandlerPlugin {
   /** Stable plugin name for oRPC plugin ordering diagnostics. */
@@ -138,8 +217,10 @@ export class ProtocolGuardPluginV1 implements ServiceHandlerPlugin {
    * Phase 2 (`0.1.0`) replaces this with `ProtocolGuardHandlerPlugin` (`before: ['~cors']`)
    * attached to `routingInterceptors`.
    */
-  init(handlerOptions: unknown, _router?: unknown): unknown {
+  init(handlerOptions: unknown, router?: unknown): unknown {
     const options = handlerOptions as RootInterceptorHandlerOptions;
+    const matcher = initRpcMatcher(router);
+
     options.rootInterceptors ??= [];
     options.rootInterceptors.push(async (interceptorOptions) => {
       // Defense-in-depth: never reject CORS preflights even if CORSPlugin is absent.
@@ -153,6 +234,21 @@ export class ProtocolGuardPluginV1 implements ServiceHandlerPlugin {
       );
 
       if (receivedProtocol !== undefined && receivedProtocol !== RPC_PROTOCOL_V1) {
+        if (matcher && interceptorOptions.request.url) {
+          const relativePath = extractRelativeRpcPathname(
+            interceptorOptions.request.url.pathname,
+            interceptorOptions.prefix,
+          );
+          if (
+            relativePath === undefined ||
+            !(await matcher.match(interceptorOptions.request.method, relativePath))
+          ) {
+            // Path does not match any RPC procedure — preserve fallthrough to overlapping
+            // OpenAPI or raw routes rather than returning a spurious 426.
+            return await interceptorOptions.next();
+          }
+        }
+
         return {
           matched: true,
           response: {
