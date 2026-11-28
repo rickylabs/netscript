@@ -33,6 +33,36 @@ import {
 } from './contract/stream-request-state.ts';
 import type { AuthnRequest, AuthnResult, Principal } from './types.ts';
 import { PROCEDURE_ERROR_CODES } from './types.ts';
+import {
+  brandVerifiedPrincipal,
+  createRequestPrincipalScope,
+  type RequestPrincipalScope,
+} from '../runtime/verified-principal.ts';
+
+/**
+ * Private registry tracking live Hono request contexts whose edge authorization
+ * already succeeded for a specific `serviceId`. Keyed by Hono `Context` (not
+ * `c.req.raw`, which downstream middleware such as `withBodyLimit` may replace)
+ * and cleared unconditionally in `finally`.
+ */
+const HTTP_AUTHZ_VERIFIED_SERVICES = new WeakMap<object, Set<symbol>>();
+
+/**
+ * Private registry tracking live Hono request contexts that `createAuthnMiddleware`
+ * explicitly exempted (for example via `allowAnonymous` or unguarded prefixes).
+ * Cleared unconditionally in `finally`.
+ */
+const HTTP_AUTHN_EXEMPT_SERVICES = new WeakMap<object, Set<symbol>>();
+
+/** Reports whether the live HTTP `context` passed `createAuthzMiddleware` for `serviceId`. */
+export function isHttpAuthzVerifiedForService(context: object, serviceId: symbol): boolean {
+  return HTTP_AUTHZ_VERIFIED_SERVICES.get(context)?.has(serviceId) === true;
+}
+
+/** Reports whether the live HTTP `context` was exempted by `createAuthnMiddleware` for `serviceId`. */
+export function isHttpAuthnExemptForService(context: object, serviceId: symbol): boolean {
+  return HTTP_AUTHN_EXEMPT_SERVICES.get(context)?.has(serviceId) === true;
+}
 
 /** Default path prefixes guarded by auth middleware. */
 export const DEFAULT_PROTECTED_PREFIXES: readonly string[] = ['/api'];
@@ -72,6 +102,12 @@ const STREAM_AUTHN_METADATA_HEADERS: ReadonlySet<string> = new Set([
 export interface AuthnMiddlewareOptions extends AuthnOptions {
   /** Shared resolver used to make matched public procedures anonymous. */
   readonly policyResolver?: ProcedurePolicyResolver;
+  /** Owning service instance symbol used to stamp scoped verified principal records. */
+  readonly serviceId?: symbol;
+  /** Owning service name bound onto stamped verified principal records. */
+  readonly serviceName?: string;
+  /** Clock returning epoch milliseconds for principal trust ceilings. */
+  readonly now?: () => number;
 }
 
 /** Creates Hono middleware that authenticates guarded requests. */
@@ -82,7 +118,24 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
     const streamState = getStreamProxyRequestState(c.req.raw);
     const policy = resolvePolicy(options.policyResolver, c);
     if (!requiresAuthentication(c, guard, policy, streamState)) {
-      return await next();
+      if (options.serviceId === undefined) {
+        return await next();
+      }
+      const serviceId = options.serviceId;
+      let exempt = HTTP_AUTHN_EXEMPT_SERVICES.get(c);
+      if (!exempt) {
+        exempt = new Set<symbol>();
+        HTTP_AUTHN_EXEMPT_SERVICES.set(c, exempt);
+      }
+      exempt.add(serviceId);
+      try {
+        return await next();
+      } finally {
+        exempt.delete(serviceId);
+        if (exempt.size === 0) {
+          HTTP_AUTHN_EXEMPT_SERVICES.delete(c);
+        }
+      }
     }
 
     let outcome:
@@ -94,9 +147,21 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
         readonly setCookies?: readonly string[];
       }
       | { readonly ok: false; readonly reason: string };
+    let principalScope: RequestPrincipalScope | undefined;
     try {
       const result = await options.authenticator.authenticate(toAuthnRequest(c, streamState));
       if (result.ok) {
+        if (options.serviceId !== undefined && options.serviceName !== undefined) {
+          principalScope = createRequestPrincipalScope(c.req.raw.signal);
+          brandVerifiedPrincipal(result.principal, {
+            serviceId: options.serviceId,
+            serviceName: options.serviceName,
+            authenticator: options.authenticator,
+            verifiedAtMs: (options.now ?? Date.now)(),
+            maxTrustTtlMs: options.maxTrustTtlMs,
+            requestScope: principalScope,
+          });
+        }
         outcome = streamState !== undefined
           ? { ok: true, principal: result.principal, raw: result }
           : {
@@ -110,6 +175,7 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
         outcome = { ok: false, reason: result.reason };
       }
     } catch {
+      principalScope?.end();
       await logAuthDecision(c, {
         stage: 'authn',
         decision: 'deny',
@@ -127,20 +193,24 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
       return unauthorized(c, outcome.reason);
     }
 
-    c.set('principal', outcome.principal);
-    if (streamState !== undefined) {
-      // Hand off the raw AuthnResult without reading `responseHeaders`/`setCookies` outside the
-      // stream route wrapper's protected validation boundary (so throwing getters yield 503).
-      streamState.authnResult = outcome.raw;
-    } else {
-      applyAuthnResponse(c, outcome.responseHeaders, outcome.setCookies);
+    try {
+      c.set('principal', outcome.principal);
+      if (streamState !== undefined) {
+        // Hand off the raw AuthnResult without reading `responseHeaders`/`setCookies` outside the
+        // stream route wrapper's protected validation boundary (so throwing getters yield 503).
+        streamState.authnResult = outcome.raw;
+      } else {
+        applyAuthnResponse(c, outcome.responseHeaders, outcome.setCookies);
+      }
+      await logAuthDecision(c, {
+        stage: 'authn',
+        decision: 'allow',
+        principal: outcome.principal,
+      });
+      return await next();
+    } finally {
+      principalScope?.end();
     }
-    await logAuthDecision(c, {
-      stage: 'authn',
-      decision: 'allow',
-      principal: outcome.principal,
-    });
-    return await next();
   };
 }
 
@@ -152,6 +222,8 @@ export interface AuthzMiddlewareOptions extends AuthzOptions {
   readonly allowAnonymous?: readonly AnonymousRule[];
   /** Shared resolver used to recognize matched public procedures before principal lookup. */
   readonly policyResolver?: ProcedurePolicyResolver;
+  /** Owning service instance symbol recorded on live authorized HTTP requests. */
+  readonly serviceId?: symbol;
 }
 
 /** Creates Hono middleware that authorizes guarded requests. */
@@ -159,16 +231,41 @@ export function createAuthzMiddleware(options: AuthzMiddlewareOptions): Middlewa
   const guard = normalizeGuard(options);
   const denyByDefault = options.denyByDefault ?? true;
 
+  const runWithVerifiedHttpAuthz = async (
+    context: Context,
+    next: () => Promise<void>,
+  ): Promise<void> => {
+    const serviceId = options.serviceId;
+    if (serviceId === undefined) {
+      await next();
+      return;
+    }
+    let verified = HTTP_AUTHZ_VERIFIED_SERVICES.get(context);
+    if (!verified) {
+      verified = new Set<symbol>();
+      HTTP_AUTHZ_VERIFIED_SERVICES.set(context, verified);
+    }
+    verified.add(serviceId);
+    try {
+      await next();
+    } finally {
+      verified.delete(serviceId);
+      if (verified.size === 0) {
+        HTTP_AUTHZ_VERIFIED_SERVICES.delete(context);
+      }
+    }
+  };
+
   return async (c, next) => {
     const principal = c.get('principal');
     const streamState = getStreamProxyRequestState(c.req.raw);
     try {
       const policy = resolvePolicy(options.policyResolver, c);
       if (isPublicProcedure(policy) && !streamState?.authenticationRequired) {
-        return await next();
+        return await runWithVerifiedHttpAuthz(c, next);
       }
       if (!policy?.matched && !streamState?.authenticationRequired && !isGuardedRequest(c, guard)) {
-        return await next();
+        return await runWithVerifiedHttpAuthz(c, next);
       }
 
       if (!principal) {
@@ -208,7 +305,7 @@ export function createAuthzMiddleware(options: AuthzMiddlewareOptions): Middlewa
         decision: 'allow',
         principal,
       });
-      return await next();
+      return await runWithVerifiedHttpAuthz(c, next);
     } catch {
       await logAuthDecision(c, {
         stage: 'authz',
@@ -216,7 +313,7 @@ export function createAuthzMiddleware(options: AuthzMiddlewareOptions): Middlewa
         principal,
         reason: 'authz.error',
       });
-      return denyByDefault ? forbidden(c, 'authz.error') : await next();
+      return denyByDefault ? forbidden(c, 'authz.error') : await runWithVerifiedHttpAuthz(c, next);
     }
   };
 }

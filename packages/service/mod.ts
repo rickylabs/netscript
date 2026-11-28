@@ -116,12 +116,15 @@ export type {
   AuthenticatorPort,
   AuthnRequest,
   AuthnResult,
+  AuthnSideEffects,
   AuthorizerMatch,
   AuthorizerPort,
   AuthzDecision,
   AuthzRequest,
   MatchAwareAuthorizerPort,
   Principal,
+  ProcedureAuthorizerPort,
+  ProcedureAuthzRequest,
   ProcedureErrorCode,
 } from './src/auth/types.ts';
 export { PROCEDURE_ERROR_CODES } from './src/auth/types.ts';
@@ -185,7 +188,14 @@ export type {
   ShutdownHookOutcome,
   ShutdownReason,
   ShutdownReport,
+  StartedService,
+  StartOptions,
 } from './src/types.ts';
+
+export {
+  type ActiveAsyncStoreProbe,
+  AsyncContextRootCaptureError,
+} from './src/runtime/async-context-isolation.ts';
 
 export {
   createRuntimeHost,

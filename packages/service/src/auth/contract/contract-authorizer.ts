@@ -25,6 +25,8 @@ import {
 import { isInternalServicePrincipal } from '../internal-credential/internal-credential-authenticator.ts';
 import {
   authorizeProcedurePolicy,
+  isMatchAwareAuthorizerPort,
+  isProcedureAuthorizerPort,
   registerBoundContractAuthorizer,
 } from './procedure-policy-decision.ts';
 import type { AuthorizerPort, AuthzDecision, AuthzRequest } from '../types.ts';
@@ -32,6 +34,10 @@ import { PROCEDURE_ERROR_CODES } from '../types.ts';
 
 const RAW_ROUTE_OVERLAP_ERROR =
   '[netscript.service.contract-policy] raw route overlaps the contract projection';
+const DUAL_FALLBACK_ERROR =
+  '[netscript.service.contract-policy] fallback authorizer cannot implement both authorizeMatch and authorizeProcedure; choose one dispatch contract.';
+const INVALID_FALLBACK_ERROR =
+  '[netscript.service.contract-policy] fallback authorizer must implement either authorizeMatch or authorizeProcedure.';
 
 /**
  * Creates an opt-in authorizer whose decisions come from procedure-local contract metadata.
@@ -76,25 +82,49 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
   contract: TContract,
   options: ContractAuthorizerOptions = {},
 ): ContractPolicyAuthorizerPort {
+  if (options.fallback !== undefined) {
+    const hasMatch = isMatchAwareAuthorizerPort(options.fallback);
+    const hasProcedure = isProcedureAuthorizerPort(options.fallback);
+    if (hasMatch && hasProcedure) {
+      throw new TypeError(DUAL_FALLBACK_ERROR);
+    }
+    if (!hasMatch && !hasProcedure) {
+      throw new TypeError(INVALID_FALLBACK_ERROR);
+    }
+  }
+
   const procedures = compileProcedures(contract);
+  const policiesByPath = new Map(
+    procedures.map((procedure) => [procedure.routerPath.join('.'), procedure.policy] as const),
+  );
   const rawRoutes = compileRawRoutes(options.rawRoutes ?? []);
   const retiredPaths = compileRetiredPaths(options.retiredPaths ?? []);
   const isInternalCaller = options.isInternalCaller ?? isInternalServicePrincipal;
+  const usesDefaultInternalPredicate = options.isInternalCaller === undefined;
   // Validate explicit streamEndpoints eagerly at authorizer construction.
   if (options.streamEndpoints !== undefined) {
     resolveAuthoritativeStreamEndpoints(undefined, options.streamEndpoints);
   }
-  let lastResolver: ProcedurePolicyResolver | undefined;
+  let lastBinding:
+    | {
+      readonly resolver: ProcedurePolicyResolver;
+      readonly findProcedurePath: (
+        request: ProcedurePolicyRequest,
+      ) => readonly string[] | undefined;
+    }
+    | undefined;
 
   async function authorizeWithResolver(
     activeResolver: ProcedurePolicyResolver,
+    findProcedurePath: (request: ProcedurePolicyRequest) => readonly string[] | undefined,
     request: AuthzRequest,
   ): Promise<AuthzDecision> {
-    const resolution = activeResolver.resolve({
+    const policyRequest: ProcedurePolicyRequest = {
       method: request.method,
       path: request.rawPath ?? request.path,
       routePath: request.path,
-    });
+    };
+    const resolution = activeResolver.resolve(policyRequest);
     if (!resolution.matched) {
       return {
         allow: false,
@@ -114,6 +144,18 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
       const fallback = options.fallback;
       if (!fallback) {
         return deny('authz.no-matching-rule');
+      }
+
+      if (isProcedureAuthorizerPort(fallback)) {
+        const procedurePath = findProcedurePath(policyRequest);
+        if (!procedurePath) {
+          return deny('authz.no-matching-rule');
+        }
+        const fallbackResult = await fallback.authorizeProcedure({
+          principal: request.principal,
+          procedurePath,
+        });
+        return fallbackResult.matched ? fallbackResult.decision : deny('authz.no-matching-rule');
       }
 
       const fallbackResult = await fallback.authorizeMatch(request);
@@ -162,22 +204,33 @@ export function createContractAuthorizer<TContract extends ContractPolicyContrac
           return { matched: false };
         },
       });
+      const findProcedurePath = (request: ProcedurePolicyRequest): readonly string[] | undefined =>
+        index.find(request)?.routerPath;
       const boundAuthorizer: AuthorizerPort = Object.freeze({
-        authorize: (request: AuthzRequest) => authorizeWithResolver(boundResolver, request),
+        authorize: (request: AuthzRequest) =>
+          authorizeWithResolver(boundResolver, findProcedurePath, request),
       });
       registerBoundContractAuthorizer(boundResolver, {
         authorizer: boundAuthorizer,
         isInternalCaller,
+        mode: 'strict',
+        policiesByPath,
+        fallback: options.fallback,
+        usesDefaultInternalPredicate,
       });
-      lastResolver = boundResolver;
+      lastBinding = { resolver: boundResolver, findProcedurePath };
       return boundResolver;
     },
 
     async authorize(request: AuthzRequest): Promise<AuthzDecision> {
-      if (!lastResolver) {
+      if (!lastBinding) {
         return deny('authz.contract-policy-unbound');
       }
-      return await authorizeWithResolver(lastResolver, request);
+      return await authorizeWithResolver(
+        lastBinding.resolver,
+        lastBinding.findProcedurePath,
+        request,
+      );
     },
   };
 }

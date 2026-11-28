@@ -6,7 +6,11 @@
 
 import { type InstallationSecret, installationSecretKey } from './installation-secret.ts';
 import { assertServiceName, deriveInternalCredential } from './internal-credential.ts';
-import { createStaticCredentialAuthenticator } from '../static-credential-authenticator.ts';
+import {
+  createStaticCredentialAuthenticator,
+  deepCloneAndFreezeRecord,
+  deepCloneAndFreezeStringArray,
+} from '../static-credential-authenticator.ts';
 import type { AuthenticatorPort, AuthnRequest, AuthnResult, Principal } from '../types.ts';
 
 /** Subject carried by every internal service principal. */
@@ -81,7 +85,13 @@ export function createInternalCredentialAuthenticator(
       const result = await (await resolveDelegate()).authenticate(request);
       if (!result.ok) return result;
 
-      const principal = Object.freeze({ ...result.principal });
+      const principal: Principal = Object.freeze({
+        subject: result.principal.subject,
+        scopes: deepCloneAndFreezeStringArray(result.principal.scopes),
+        roles: deepCloneAndFreezeStringArray(result.principal.roles),
+        scheme: result.principal.scheme,
+        claims: deepCloneAndFreezeRecord(result.principal.claims),
+      });
       INTERNAL_PRINCIPALS.add(principal);
       return { ok: true, principal };
     },

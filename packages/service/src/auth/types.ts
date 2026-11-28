@@ -75,6 +75,30 @@ export interface AuthnRequest {
 export interface AuthenticatorPort {
   /** Authenticates a request and returns a principal or a rejection reason. */
   authenticate(request: AuthnRequest): Promise<AuthnResult> | AuthnResult;
+  /**
+   * Optional capability declaration for non-HTTP callers. When `true`, the
+   * procedure pipeline requires an explicit `authnSideEffects.onSetCookies`
+   * sink *before* calling `authenticate()` so single-use refresh tokens are
+   * never burned.
+   */
+  readonly mayEmitSetCookies?: boolean;
+  /**
+   * Optional capability declaration for non-HTTP callers. When `true`, the
+   * procedure pipeline requires an explicit `authnSideEffects.onResponseHeaders`
+   * sink *before* calling `authenticate()`.
+   */
+  readonly mayEmitResponseHeaders?: boolean;
+}
+
+/**
+ * Optional side-effect sinks passed by non-HTTP callers to receive headers or
+ * cookies emitted by refresh-on-read authenticators.
+ */
+export interface AuthnSideEffects {
+  /** Called with non-cookie response headers emitted by the authenticator. */
+  readonly onResponseHeaders?: (headers: Readonly<Record<string, string>>) => void;
+  /** Called with `Set-Cookie` values emitted by the authenticator. */
+  readonly onSetCookies?: (cookies: readonly string[]) => void;
 }
 
 /** Authorization decision input. */
@@ -140,4 +164,27 @@ export type AuthorizerMatch =
 export interface MatchAwareAuthorizerPort extends AuthorizerPort {
   /** Authorizes a matching request or reports that no fallback rule matched. */
   authorizeMatch(request: AuthzRequest): Promise<AuthorizerMatch> | AuthorizerMatch;
+}
+
+/** Transport-neutral authorization input keyed by canonical oRPC procedure path segments. */
+export interface ProcedureAuthzRequest {
+  /** Authenticated principal being authorized. */
+  readonly principal: Principal;
+  /** Canonical oRPC procedure path segments (for example `['v1', 'orders', 'getOrder']`). */
+  readonly procedurePath: readonly string[];
+}
+
+/**
+ * Transport-neutral fallback authorizer that decides access from canonical
+ * procedure paths rather than HTTP URLs.
+ *
+ * Supported identically by HTTP `createContractAuthorizer()` and NetScript's
+ * oRPC procedure pipeline. Must not be combined with `authorizeMatch` on the
+ * same fallback object.
+ */
+export interface ProcedureAuthorizerPort {
+  /** Authorizes a matching procedure or reports that no fallback rule matched. */
+  authorizeProcedure(
+    request: ProcedureAuthzRequest,
+  ): Promise<AuthorizerMatch> | AuthorizerMatch;
 }

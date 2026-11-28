@@ -112,6 +112,8 @@ W3C trace-context propagation across job subprocesses and message headers.
 | `getTraceId` | function | `function getTraceId(ctx?): string \| undefined` | Get the trace id from a context. |
 | `getSpanId` | function | `function getSpanId(ctx?): string \| undefined` | Get the span id from a context. |
 | `hasActiveSpan` | function | `function hasActiveSpan(ctx?): boolean` | Whether a context carries an active span. |
+| `getRootContext` | function | `function getRootContext(): Context` | Return the empty OpenTelemetry root context carrying no spans or baggage. |
+| `isActiveContextRoot` | function | `function isActiveContextRoot(): boolean` | Whether the currently active OpenTelemetry context is the clean root context. |
 | `injectContext` | function | `function injectContext(headers, ctx?): PropagationHeaders` | Inject context into propagation headers. |
 | `extractContext` | function | `function extractContext(headers): Context` | Extract a context from propagation headers. |
 | `createMessageHeaders` | function | `function createMessageHeaders(additionalHeaders): PropagationHeaders` | Build message headers with trace context. |

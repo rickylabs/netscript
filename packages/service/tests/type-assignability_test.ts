@@ -1,9 +1,16 @@
 import { assertEquals } from '@std/assert';
 import { baseContract, SuccessSchema } from '@netscript/contracts';
-import { createService, SERVICE_PIPELINE_ERROR_CODES, ServicePipelineConfigError } from '../mod.ts';
+import {
+  AsyncContextRootCaptureError,
+  createService,
+  SERVICE_PIPELINE_ERROR_CODES,
+  ServicePipelineConfigError,
+} from '../mod.ts';
 import { createScopeAuthorizer } from '../src/auth/mod.ts';
 import { createMemoryRateLimitStore } from '../src/rate-limit/mod.ts';
 import type {
+  ActiveAsyncStoreProbe,
+  AuthnSideEffects,
   AuthorizerPort,
   AuthzOptions,
   ContextFactory,
@@ -18,6 +25,8 @@ import type {
   MatchAwareAuthorizerPort,
   Principal,
   ProcedureAccessPolicy,
+  ProcedureAuthorizerPort,
+  ProcedureAuthzRequest,
   ProcedurePolicyResolver,
   ProcedureRateLimitKeyContext,
   ServiceBuilder,
@@ -27,6 +36,8 @@ import type {
   ServicePipelineErrorCode,
   ServiceProcedureRateLimitOptions,
   ServiceRouter,
+  StartedService,
+  StartOptions,
 } from '../mod.ts';
 
 Deno.test('public structural types are assignable through builder APIs', () => {
@@ -102,6 +113,28 @@ Deno.test('public structural types are assignable through builder APIs', () => {
   const contractAuthorizerOptions: ContractAuthorizerOptions = {
     fallback: matchAwareFallback,
   };
+  const procedureFallback: ProcedureAuthorizerPort = {
+    authorizeProcedure: (_req: ProcedureAuthzRequest) => ({
+      matched: true,
+      decision: { allow: true },
+    }),
+  };
+  const procedureContractAuthorizerOptions: ContractAuthorizerOptions = {
+    fallback: procedureFallback,
+  };
+  const authnSideEffects: AuthnSideEffects = {
+    onResponseHeaders: () => {},
+    onSetCookies: () => {},
+  };
+  const startOptions: StartOptions = { drainTimeoutMs: 5_000, disposeDatabases: true };
+  const probe: ActiveAsyncStoreProbe = { name: 'test-probe', isActive: () => false };
+  const captureErr = new AsyncContextRootCaptureError([probe.name]);
+  const startFn: (opts?: StartOptions) => Promise<StartedService> = builder.start.bind(builder);
+  assertEquals(captureErr.code, 'ASYNC_CONTEXT_ROOT_CAPTURE_FAILED');
+  assertEquals(typeof startFn, 'function');
+  assertEquals(typeof procedureContractAuthorizerOptions.fallback, 'object');
+  assertEquals(typeof authnSideEffects.onSetCookies, 'function');
+  assertEquals(startOptions.drainTimeoutMs, 5_000);
   const _invalidContractAuthorizerOptions: ContractAuthorizerOptions = {
     // @ts-expect-error Contract fallbacks must distinguish no match from an explicit deny.
     fallback: standaloneAuthorizer,

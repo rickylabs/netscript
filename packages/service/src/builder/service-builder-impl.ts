@@ -30,9 +30,14 @@ import type {
   InternalCallerPredicate,
   ProcedurePolicyResolver,
 } from '../auth/contract/contract-policy.ts';
-import { getBoundContractAuthorizer } from '../auth/contract/procedure-policy-decision.ts';
+import {
+  type BoundContractAuthorizerEntry,
+  getBoundContractAuthorizer,
+} from '../auth/contract/procedure-policy-decision.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import type { AuthorizerPort } from '../auth/types.ts';
+import type { ProcedureAuthConfig } from '../middleware/procedure-auth.ts';
+import { type ServiceLifecycleTracker, startServiceLifecycle } from '../runtime/started-service.ts';
 import {
   createBodyLimitMiddleware,
   type ServiceBodyLimitOptions,
@@ -62,6 +67,8 @@ import type {
   ServiceRouteMethod,
   ServiceRouter,
   ShutdownHook,
+  StartedService,
+  StartOptions,
 } from '../types.ts';
 import { createRateLimitMiddleware } from '../rate-limit/middleware/rate-limit-middleware.ts';
 import {
@@ -137,6 +144,10 @@ export class ServiceBuilderImpl<
   private serviceInfoConfigured = false;
   private streamProxies: StreamProxyMount[] = [];
   private boundInternalCaller: InternalCallerPredicate | undefined;
+  private boundContractAuth: BoundContractAuthorizerEntry | undefined;
+  private lifecycleTracker: ServiceLifecycleTracker | undefined;
+  private wrappedCanonicalRouter: TRouter | undefined;
+  private started = false;
   private readonly serviceId: symbol;
   private readonly httpRateLimitStores = new Set<RateLimitStore>();
   private readonly procedureRateLimitStages: PreparedProcedureRateLimitStage[] = [];
@@ -398,14 +409,18 @@ export class ServiceBuilderImpl<
     const principal = c.get('principal');
     const rawRequest = 'raw' in c.req && c.req.raw instanceof Request ? c.req.raw : undefined;
     const rawLogger = c.get('logger');
-    const httpMeta: HttpRequestMetadata | undefined =
-      rawRequest && this.procedureRateLimitStages.length > 0
-        ? {
-          request: rawRequest,
-          env: 'env' in c ? c.env as ServiceEnvironment | undefined : undefined,
-          logger: isLoggerLike(rawLogger) ? rawLogger : undefined,
-        }
-        : undefined;
+    const needsHttpMeta = this.procedureRateLimitStages.length > 0 ||
+      this.authnOptions !== null ||
+      this.authzOptions !== null ||
+      this.lifecycleTracker !== undefined;
+    const httpMeta: HttpRequestMetadata | undefined = rawRequest && needsHttpMeta
+      ? {
+        request: rawRequest,
+        httpContext: c,
+        env: 'env' in c ? c.env as ServiceEnvironment | undefined : undefined,
+        logger: isLoggerLike(rawLogger) ? rawLogger : undefined,
+      }
+      : undefined;
 
     return {
       ...customContext,
@@ -632,11 +647,17 @@ export class ServiceBuilderImpl<
     const policyResolver = this.bindContractPolicy();
     const boundContract = getBoundContractAuthorizer(policyResolver);
     this.boundInternalCaller = boundContract?.isInternalCaller;
+    this.boundContractAuth = boundContract;
     if (preparedStreams.length > 0) {
       this.app.use('*', createPreAuthnStreamGuardMiddleware(preparedStreams));
     }
     const authn = this.authnOptions
-      ? createAuthnMiddleware({ ...this.authnOptions, policyResolver })
+      ? createAuthnMiddleware({
+        ...this.authnOptions,
+        policyResolver,
+        serviceId: this.serviceId,
+        serviceName: this.config.name,
+      })
       : undefined;
     const authz = this.authzOptions
       ? createAuthzMiddleware({
@@ -645,6 +666,7 @@ export class ServiceBuilderImpl<
         protect: this.authnOptions?.protect,
         allowAnonymous: this.authnOptions?.allowAnonymous,
         policyResolver,
+        serviceId: this.serviceId,
       })
       : undefined;
     if (authn) this.app.use('*', authn);
@@ -704,16 +726,13 @@ export class ServiceBuilderImpl<
 
     if (this.rpcConfigured) {
       const traceContext = this.rpcOptions?.traceContext !== false;
-      const pipelineConfig = {
-        serviceId: this.serviceId,
-        serviceName: this.config.name,
-        rateLimitStages: this.procedureRateLimitStages,
-      };
+      const pipelineConfig = this.buildPipelineConfig();
       const wrappedRouter = wrapRouterWithProcedurePipeline(
         this.router,
         pipelineConfig,
         this.wrappedLeavesCache,
       );
+      this.wrappedCanonicalRouter = wrappedRouter;
       const wrappedRpcRouter = this.rpcOptions?.rpcRouter
         ? wrapRouterWithProcedurePipeline(
           this.rpcOptions.rpcRouter,
@@ -746,6 +765,94 @@ export class ServiceBuilderImpl<
       }
     }
     this.installedRoutes = routes;
+  }
+
+  private buildPipelineConfig(): {
+    readonly serviceId: symbol;
+    readonly serviceName: string;
+    readonly auth?: ProcedureAuthConfig;
+    readonly rateLimitStages: readonly PreparedProcedureRateLimitStage[];
+    readonly lifecycle?: ServiceLifecycleTracker;
+  } {
+    const auth = this.buildProcedureAuthConfig();
+    return {
+      serviceId: this.serviceId,
+      serviceName: this.config.name,
+      ...(auth ? { auth } : {}),
+      rateLimitStages: this.procedureRateLimitStages,
+      ...(this.lifecycleTracker ? { lifecycle: this.lifecycleTracker } : {}),
+    };
+  }
+
+  private buildProcedureAuthConfig(): ProcedureAuthConfig | undefined {
+    const hasAuthn = this.authnOptions !== null;
+    const hasAuthz = this.authzOptions !== null;
+    if (!hasAuthn && !hasAuthz) {
+      return undefined;
+    }
+    return {
+      serviceId: this.serviceId,
+      serviceName: this.config.name,
+      authenticator: this.authnOptions?.authenticator,
+      trustSharedPrincipal: this.authnOptions?.trustSharedPrincipal,
+      trustedVerifiers: this.authnOptions?.trustedVerifiers,
+      maxTrustTtlMs: this.authnOptions?.maxTrustTtlMs,
+      contractAuth: this.boundContractAuth
+        ? {
+          mode: this.boundContractAuth.mode,
+          policiesByPath: this.boundContractAuth.policiesByPath,
+          fallback: this.boundContractAuth.fallback,
+          isInternalCaller: this.boundContractAuth.isInternalCaller,
+          usesDefaultInternalPredicate: this.boundContractAuth.usesDefaultInternalPredicate,
+        }
+        : undefined,
+      hasNonContractAuthz: hasAuthz && this.boundContractAuth === undefined,
+    };
+  }
+
+  /**
+   * Captures a clean composition-root async snapshot, runs startup hooks, and
+   * returns a non-listening {@link StartedService} handle with in-flight
+   * draining and graceful `stop()`.
+   */
+  async start(options?: StartOptions): Promise<StartedService> {
+    if (this.started) {
+      throw new Error(
+        `[netscript.service] ServiceBuilder.start() was already called for "${this.config.name}".`,
+      );
+    }
+    if (this.deferredRoutesInstalled) {
+      throw new Error(
+        `[netscript.service] ServiceBuilder.start() must be called before build() for "${this.config.name}".`,
+      );
+    }
+    this.started = true;
+    try {
+      return await startServiceLifecycle({
+        serviceId: this.serviceId,
+        serviceName: this.config.name,
+        startupHooks: this.startupHooks,
+        shutdownHooks: this.shutdownHooks,
+        databaseResources: this.databaseResources,
+        options,
+        buildWithLifecycle: (tracker) => {
+          this.lifecycleTracker = tracker;
+          const app = this.build();
+          const wrappedRouter = this.wrappedCanonicalRouter ??
+            wrapRouterWithProcedurePipeline(
+              this.router,
+              this.buildPipelineConfig(),
+              this.wrappedLeavesCache,
+            );
+          this.wrappedCanonicalRouter = wrappedRouter;
+          return { app, wrappedRouter };
+        },
+      });
+    } catch (error) {
+      this.started = false;
+      this.lifecycleTracker = undefined;
+      throw error;
+    }
   }
 
   /**

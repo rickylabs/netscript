@@ -21,6 +21,114 @@
 
 import type { AuthenticatorPort, AuthnRequest, AuthnResult, Principal } from './types.ts';
 
+/**
+ * Recursively clones a plain claim record and deep-freezes the clone so
+ * authenticators never share mutable claim references across requests.
+ *
+ * @internal
+ */
+export function deepCloneAndFreezeRecord(
+  value: Readonly<Record<string, unknown>>,
+): Readonly<Record<string, unknown>> {
+  const seen = new WeakMap<object, unknown>();
+  return cloneAndFreezeRecord(value, seen);
+}
+
+/**
+ * Clones and freezes a string array (scopes or roles) so authenticators never
+ * share mutable grant arrays across requests.
+ *
+ * @internal
+ */
+export function deepCloneAndFreezeStringArray(values: readonly string[]): readonly string[] {
+  return Object.freeze([...values]);
+}
+
+/**
+ * Deep-freezes nested objects and arrays in place without replacing object references.
+ *
+ * @internal
+ */
+export function deepFreezeInPlace(value: unknown): void {
+  const seen = new WeakSet<object>();
+  freezeInPlace(value, seen);
+}
+
+function cloneAndFreezeRecord(
+  value: Readonly<Record<string, unknown>>,
+  seen: WeakMap<object, unknown>,
+): Readonly<Record<string, unknown>> {
+  const proto = Object.getPrototypeOf(value);
+  const cloned: Record<string, unknown> = proto === null ? Object.create(null) : {};
+  seen.set(value, cloned);
+  for (const key of Object.keys(value)) {
+    Object.defineProperty(cloned, key, {
+      value: cloneAndFreezeValue(Reflect.get(value, key), seen),
+      enumerable: true,
+      writable: false,
+      configurable: false,
+    });
+  }
+  return Object.freeze(cloned);
+}
+
+function cloneAndFreezeValue(value: unknown, seen: WeakMap<object, unknown>): unknown {
+  if (typeof value !== 'object' || value === null) {
+    return value;
+  }
+  if (seen.has(value)) {
+    return seen.get(value);
+  }
+  if (Array.isArray(value)) {
+    const cloned: unknown[] = [];
+    seen.set(value, cloned);
+    for (const item of value) {
+      cloned.push(cloneAndFreezeValue(item, seen));
+    }
+    return Object.freeze(cloned);
+  }
+  const proto = Object.getPrototypeOf(value);
+  if (proto === Object.prototype || proto === null) {
+    const cloned: Record<string, unknown> = proto === null ? Object.create(null) : {};
+    seen.set(value, cloned);
+    for (const key of Object.keys(value)) {
+      Object.defineProperty(cloned, key, {
+        value: cloneAndFreezeValue(Reflect.get(value, key), seen),
+        enumerable: true,
+        writable: false,
+        configurable: false,
+      });
+    }
+    return Object.freeze(cloned);
+  }
+  if (!Object.isFrozen(value)) {
+    Object.freeze(value);
+  }
+  return value;
+}
+
+function freezeInPlace(value: unknown, seen: WeakSet<object>): void {
+  if (typeof value !== 'object' || value === null || seen.has(value)) {
+    return;
+  }
+  seen.add(value);
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      freezeInPlace(item, seen);
+    }
+  } else {
+    for (const key of Reflect.ownKeys(value)) {
+      const descriptor = Object.getOwnPropertyDescriptor(value, key);
+      if (descriptor && 'value' in descriptor) {
+        freezeInPlace(descriptor.value, seen);
+      }
+    }
+  }
+  if (!Object.isFrozen(value)) {
+    Object.freeze(value);
+  }
+}
+
 /** Principal attributes attached to a configured static credential. */
 export interface StaticCredentialPrincipal {
   /** Stable subject identifier represented by this credential. */
@@ -90,13 +198,13 @@ export function createStaticCredentialAuthenticator(
 
       return {
         ok: true,
-        principal: {
+        principal: Object.freeze({
           subject: matched.subject,
-          scopes: matched.scopes ?? [],
-          roles: matched.roles ?? [],
+          scopes: deepCloneAndFreezeStringArray(matched.scopes ?? []),
+          roles: deepCloneAndFreezeStringArray(matched.roles ?? []),
           scheme: options.scheme ?? presented.scheme,
-          claims: matched.claims ?? {},
-        },
+          claims: deepCloneAndFreezeRecord(matched.claims ?? {}),
+        }),
       };
     },
   };

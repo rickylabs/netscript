@@ -1,4 +1,4 @@
-import { context, type Span as OtelSpan, trace } from '@opentelemetry/api';
+import { context, ROOT_CONTEXT, type Span as OtelSpan, trace } from '@opentelemetry/api';
 import type { Context, Span } from '../application/mod.ts';
 
 function assertOtelSpan(span: Span): asserts span is Span & OtelSpan {
@@ -79,4 +79,19 @@ export function getTraceId(ctx?: Context): string | undefined {
  */
 export function getSpanId(ctx?: Context): string | undefined {
   return trace.getSpan(ctx ?? context.active())?.spanContext().spanId;
+}
+
+/**
+ * Return the empty OpenTelemetry root context carrying no spans or baggage.
+ */
+export function getRootContext(): Context {
+  return ROOT_CONTEXT;
+}
+
+/**
+ * Report whether the currently active OpenTelemetry context is the clean root
+ * context (no active span and no non-span context values such as baggage).
+ */
+export function isActiveContextRoot(): boolean {
+  return context.active() === ROOT_CONTEXT && trace.getActiveSpan() === undefined;
 }

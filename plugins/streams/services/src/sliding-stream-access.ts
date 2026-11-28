@@ -2,6 +2,23 @@
 
 import { AsyncLocalStorage } from 'node:async_hooks';
 
+const ACTIVE_STORE_PROBES_SYMBOL = Symbol.for('@netscript/async-context/active-store-probes');
+
+interface ActiveAsyncStoreProbe {
+  readonly name: string;
+  readonly isActive: () => boolean;
+}
+
+function getActiveStoreProbeRegistry(): Set<ActiveAsyncStoreProbe> {
+  const existing: unknown = Reflect.get(globalThis, ACTIVE_STORE_PROBES_SYMBOL);
+  if (existing instanceof Set) {
+    return existing as Set<ActiveAsyncStoreProbe>;
+  }
+  const created = new Set<ActiveAsyncStoreProbe>();
+  Reflect.set(globalThis, ACTIVE_STORE_PROBES_SYMBOL, created);
+  return created;
+}
+
 const FLUSH_INTERVAL_MS = 25;
 const RETRY_INTERVAL_MS = 100;
 const STREAM_PREFIX = 'stream:';
@@ -62,6 +79,7 @@ export class SlidingStreamAccess {
   readonly #topics = new Map<string, Topic>();
   readonly #dirty = new Set<Topic>();
   readonly #append = new AsyncLocalStorage<AppendAccess>();
+  readonly #activeStoreProbe: ActiveAsyncStoreProbe;
   #write: Promise<void> | undefined;
   #closing = false;
   #retrying = false;
@@ -71,6 +89,11 @@ export class SlidingStreamAccess {
   constructor(db: unknown, private readonly reportFailure: (error: unknown) => void) {
     assertNativeDatabase(db);
     this.#db = db;
+    this.#activeStoreProbe = Object.freeze({
+      name: '@netscript/plugin-streams.slidingStreamAccess',
+      isActive: () => this.#append.getStore() !== undefined,
+    });
+    getActiveStoreProbeRegistry().add(this.#activeStoreProbe);
     // Native append builds a whole metadata snapshot before doing file I/O.
     // Keep access metadata current when it submits the snapshot, and give a
     // confirmed append its own renewal in that existing transaction.
@@ -164,11 +187,18 @@ export class SlidingStreamAccess {
   /** Drain outstanding renewals before closing the native store. */
   async close(): Promise<void> {
     this.#closing = true;
-    await this.#write?.catch(() => undefined);
     try {
-      await this.#flush();
-    } catch (cause) {
-      throw new Error('Could not flush Streams sliding TTL renewals at shutdown', { cause });
+      await this.#write?.catch(() => undefined);
+      try {
+        await this.#flush();
+      } catch (cause) {
+        throw new Error('Could not flush Streams sliding TTL renewals at shutdown', { cause });
+      }
+    } finally {
+      const registry: unknown = Reflect.get(globalThis, ACTIVE_STORE_PROBES_SYMBOL);
+      if (registry instanceof Set) {
+        registry.delete(this.#activeStoreProbe);
+      }
     }
   }
 
