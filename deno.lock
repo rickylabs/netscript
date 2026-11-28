@@ -129,14 +129,12 @@
     "npm:@opentelemetry/semantic-conventions@1.45.0": "1.45.0",
     "npm:@opentelemetry/semantic-conventions@^1.28.0": "1.45.0",
     "npm:@opentelemetry/semantic-conventions@^1.40.0": "1.45.0",
-    "npm:@orpc/client@1.15.0": "1.15.0_@opentelemetry+api@1.9.1",
     "npm:@orpc/client@1.16.6": "1.16.6_@opentelemetry+api@1.9.1",
     "npm:@orpc/client@^1.16.6": "1.16.6_@opentelemetry+api@1.9.1",
     "npm:@orpc/contract@^1.16.6": "1.16.6_@opentelemetry+api@1.9.1",
     "npm:@orpc/openapi@^1.16.6": "1.16.6_@opentelemetry+api@1.9.1",
     "npm:@orpc/otel@^1.16.6": "1.16.6_@opentelemetry+api@1.9.1_@opentelemetry+instrumentation@0.223.2",
     "npm:@orpc/server@^1.16.6": "1.16.6_@opentelemetry+api@1.9.1",
-    "npm:@orpc/tanstack-query@1.15.0": "1.15.0_@orpc+client@1.16.6_@tanstack+query-core@5.108.4",
     "npm:@orpc/tanstack-query@1.16.6": "1.16.6_@orpc+client@1.16.6_@tanstack+query-core@5.108.4_@opentelemetry+api@1.9.1",
     "npm:@orpc/tanstack-query@^1.16.6": "1.16.6_@orpc+client@1.16.6_@tanstack+query-core@5.108.4_@opentelemetry+api@1.9.1",
     "npm:@orpc/zod@^1.16.6": "1.16.6_@orpc+contract@1.16.6_@orpc+server@1.16.6_zod@4.6.7_@opentelemetry+api@1.9.1",
@@ -1872,15 +1870,6 @@
     "@opentelemetry/semantic-conventions@1.45.0": {
       "integrity": "sha512-aOP45mbcOKbQVvFWfQmgoOPT8R2iwbbbgl83k4CujGV9BrJhFr3qG55MFpwFs4YLabpuW3HhzUY9eQxPlDqaZw=="
     },
-    "@orpc/client@1.15.0_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-Qt0FdPSGySdQwy83iUWOq+Iqhw2gM9qHtyxfBbcw1mwOz1s4O2BwUFA3ymVTLIRRNYRgPrQLaBZhp8CacqeePg==",
-      "dependencies": [
-        "@orpc/shared@1.15.5_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server@1.15.5_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server-fetch@1.15.5_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server-peer@1.15.5_@opentelemetry+api@1.9.1"
-      ]
-    },
     "@orpc/client@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-AEPeHfZJ+rT3U7jNZ7nV2AHHXfI4pycNoU66zlC023K6A7EvujhM1CGhv8YXAi3weXsk0EUzwuP6IvCvLY9p6g==",
       "dependencies": [
@@ -1960,17 +1949,6 @@
         "cookie@1.1.1"
       ]
     },
-    "@orpc/shared@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-5Vrvnf0DUUMibXtyI5crUR6e7dZAflJ1rg4kIUnyqGyNCZS3grd96OauGnSfjV6PXDX/FfVRlVe0UU1tv2UWuA==",
-      "dependencies": [
-        "@opentelemetry/api",
-        "radash",
-        "type-fest"
-      ],
-      "optionalPeers": [
-        "@opentelemetry/api"
-      ]
-    },
     "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-GI3v4zj/Q6DvLUEwudosMGcQchpLrhR0vftn0O1zIt/4tk2JAeN6zVDfnEqaac7a7zj9kKu7jpHj5la3UVs8Hg==",
       "dependencies": [
@@ -1999,13 +1977,6 @@
         "@orpc/standard-server-node"
       ]
     },
-    "@orpc/standard-server-fetch@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-VK1XxCi58tkEv0Ak4Syy+7uyZq5ZCqNTMKjFyUnk3ihy7PEq+29zdukZzH3ppO7qxF+Bi9Qzu/6Gu75B+3oxaQ==",
-      "dependencies": [
-        "@orpc/shared@1.15.5_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server@1.15.5_@opentelemetry+api@1.9.1"
-      ]
-    },
     "@orpc/standard-server-fetch@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-oOtiftOsrPIUh5paWKUCunjzAGberLZAKX9XqZ3brvk+fzz4LM75pJJ9PiIx2bVKAgT817z0eItWzTDKNsEGsg==",
       "dependencies": [
@@ -2021,13 +1992,6 @@
         "@orpc/standard-server-fetch@1.16.6_@opentelemetry+api@1.9.1"
       ]
     },
-    "@orpc/standard-server-peer@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-6bDF2CSezKTIvKb5TWCksklrf/lMSUixoBF59uYFakhOCuocplFE1qTb5mmI3ZPfHFgpgSjeVtQf6r1JnLPAXg==",
-      "dependencies": [
-        "@orpc/shared@1.15.5_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server@1.15.5_@opentelemetry+api@1.9.1"
-      ]
-    },
     "@orpc/standard-server-peer@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-b1dTTy9Xpas+kjgxejvudcDgF9AeRuKHsn7FbY3iQywaUxHA0ZbJjETBrL/c1Wr1V7aLlZycCFfonHTwc39SXg==",
       "dependencies": [
@@ -2035,24 +1999,10 @@
         "@orpc/standard-server@1.16.6_@opentelemetry+api@1.9.1"
       ]
     },
-    "@orpc/standard-server@1.15.5_@opentelemetry+api@1.9.1": {
-      "integrity": "sha512-P+9tyTbYAIVjeS15fYA4jdpazojRcEmUwLKK1x7UtiEBAgmDQ8FpCkNXSYHqJMV3i2H5fcXFFlqm4u5ea9An7g==",
-      "dependencies": [
-        "@orpc/shared@1.15.5_@opentelemetry+api@1.9.1"
-      ]
-    },
     "@orpc/standard-server@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-brJQEljgoUIlPq7do4awqgMNCcw5+HBtBU+LfS4wnuxqbztv4Y12drpxUIyuFxLHmXqZiQrGATsOUTMbS2b+3g==",
       "dependencies": [
         "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1"
-      ]
-    },
-    "@orpc/tanstack-query@1.15.0_@orpc+client@1.16.6_@tanstack+query-core@5.108.4": {
-      "integrity": "sha512-Dp2JXqdmmRjBQu21Cq6oGBhxJF0Gel5ao5qMdOSYpVb5RjdqAEaXsDO9VMj1nEj6SseKGfm9pk10ZIskuI1jjg==",
-      "dependencies": [
-        "@orpc/client@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/shared@1.15.5_@opentelemetry+api@1.9.1",
-        "@tanstack/query-core"
       ]
     },
     "@orpc/tanstack-query@1.16.6_@orpc+client@1.16.6_@tanstack+query-core@5.108.4_@opentelemetry+api@1.9.1": {
@@ -5280,9 +5230,13 @@
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
           "jsr:@std/streams@1",
-          "npm:@orpc/server@^1.16.6",
           "npm:zod@^4.6.7"
-        ]
+        ],
+        "packageJson": {
+          "dependencies": [
+            "npm:@orpc/server@^1.16.6"
+          ]
+        }
       },
       "packages/cli": {
         "dependencies": [
@@ -5316,6 +5270,7 @@
         ],
         "packageJson": {
           "dependencies": [
+            "npm:@orpc/server@^1.16.6",
             "npm:vite@7.3.8"
           ]
         }
@@ -5326,9 +5281,13 @@
           "jsr:@netscript/plugin-streams-core@0.0.9",
           "jsr:@std/assert@1",
           "jsr:@std/fs@1",
-          "jsr:@std/path@1",
-          "npm:@orpc/server@^1.16.6"
-        ]
+          "jsr:@std/path@1"
+        ],
+        "packageJson": {
+          "dependencies": [
+            "npm:@orpc/server@^1.16.6"
+          ]
+        }
       },
       "packages/config": {
         "dependencies": [
@@ -5340,12 +5299,11 @@
       },
       "packages/contracts": {
         "dependencies": [
-          "npm:@orpc/contract@^1.16.6",
           "npm:zod@^4.6.7"
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@orpc/server@^1.16.6"
+            "npm:@orpc/contract@^1.16.6"
           ]
         }
       },
@@ -5394,7 +5352,6 @@
           "npm:@durable-streams/client@0.2.7",
           "npm:@durable-streams/state@0.3.2",
           "npm:@durable-streams/tanstack-ai-transport@0.0.10",
-          "npm:@orpc/server@^1.16.6",
           "npm:@preact/signals@2.11.4",
           "npm:@tanstack/ai-client@0.39.2",
           "npm:@tanstack/ai-preact@0.20.3",
@@ -5411,6 +5368,7 @@
           "dependencies": [
             "npm:@durable-streams/client@0.2.7",
             "npm:@durable-streams/state@0.3.2",
+            "npm:@orpc/server@^1.16.6",
             "npm:@preact/signals@2.11.4",
             "npm:@tanstack/preact-query@^5.108.4",
             "npm:@tanstack/query-core@^5.108.4",
@@ -5457,9 +5415,13 @@
         "dependencies": [
           "jsr:@hono/hono@4.13.22",
           "jsr:@logtape/logtape@2",
-          "jsr:@std/assert@1",
-          "npm:@orpc/server@^1.16.6"
-        ]
+          "jsr:@std/assert@1"
+        ],
+        "packageJson": {
+          "dependencies": [
+            "npm:@orpc/server@^1.16.6"
+          ]
+        }
       },
       "packages/mcp": {
         "dependencies": [
@@ -5480,29 +5442,41 @@
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
           "jsr:@std/semver@1",
-          "npm:@orpc/contract@^1.16.6",
-          "npm:@orpc/server@^1.16.6",
           "npm:zod@^4.6.7"
-        ]
+        ],
+        "packageJson": {
+          "dependencies": [
+            "npm:@orpc/contract@^1.16.6",
+            "npm:@orpc/server@^1.16.6"
+          ]
+        }
       },
       "packages/plugin-ai-core": {
         "dependencies": [
           "jsr:@netscript/ai@0.0.9",
           "jsr:@netscript/plugin@0.0.9",
           "jsr:@std/assert@1",
-          "npm:@orpc/contract@^1.16.6",
-          "npm:@orpc/server@^1.16.6",
           "npm:zod@^4.6.7"
-        ]
+        ],
+        "packageJson": {
+          "dependencies": [
+            "npm:@orpc/contract@^1.16.6",
+            "npm:@orpc/server@^1.16.6"
+          ]
+        }
       },
       "packages/plugin-auth-core": {
         "dependencies": [
           "jsr:@netscript/plugin-streams-core@0.0.9",
           "jsr:@std/assert@1",
-          "npm:@orpc/contract@^1.16.6",
-          "npm:@orpc/server@^1.16.6",
           "npm:zod@^4.6.7"
-        ]
+        ],
+        "packageJson": {
+          "dependencies": [
+            "npm:@orpc/contract@^1.16.6",
+            "npm:@orpc/server@^1.16.6"
+          ]
+        }
       },
       "packages/plugin-directory-core": {
         "dependencies": [
@@ -5571,8 +5545,6 @@
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
-          "npm:@orpc/contract@^1.16.6",
-          "npm:@orpc/server@^1.16.6",
           "npm:zod@^4.6.7"
         ],
         "packageJson": {
@@ -5618,12 +5590,6 @@
           "jsr:@netscript/service@0.0.9",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@orpc/client@^1.16.6",
-          "npm:@orpc/contract@^1.16.6",
-          "npm:@orpc/openapi@^1.16.6",
-          "npm:@orpc/server@^1.16.6",
-          "npm:@orpc/tanstack-query@^1.16.6",
-          "npm:@orpc/zod@^1.16.6",
           "npm:@tanstack/db@0.15.2",
           "npm:@tanstack/query-core@^5.108.4",
           "npm:@tanstack/query-db-collection@1.4.8",
@@ -5652,16 +5618,13 @@
           "jsr:@netscript/telemetry@0.0.9",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@orpc/client@^1.16.6",
-          "npm:@orpc/contract@^1.16.6",
-          "npm:@orpc/openapi@^1.16.6",
-          "npm:@orpc/server@^1.16.6",
-          "npm:@orpc/zod@^1.16.6",
           "npm:rou3@~0.7.12",
           "npm:zod@^4.6.7"
         ],
         "packageJson": {
           "dependencies": [
+            "npm:@orpc/client@^1.16.6",
+            "npm:@orpc/contract@^1.16.6",
             "npm:@orpc/openapi@^1.16.6",
             "npm:@orpc/server@^1.16.6",
             "npm:@orpc/zod@^1.16.6"

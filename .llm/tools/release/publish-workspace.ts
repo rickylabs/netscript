@@ -95,7 +95,16 @@ async function publishWorkspaceInPlace(
     await assertRegularManifest(configPath);
     const source = await Deno.readTextFile(configPath);
     const config = parseJsonObject(source, configPath);
-    config.imports = materializeCatalogImports(config.imports, catalog, member.path);
+    const packageDependencies = await readMemberPackageDependencies(root, member.path);
+    const materializedImports = materializeCatalogImports(
+      config.imports,
+      catalog,
+      member.path,
+      packageDependencies,
+    );
+    if (materializedImports !== undefined) {
+      config.imports = materializedImports;
+    }
     await Deno.writeTextFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
   }
 
@@ -376,28 +385,80 @@ async function readRootCatalog(root: string): Promise<Record<string, string>> {
   return catalog;
 }
 
-function materializeCatalogImports(
+async function readMemberPackageDependencies(
+  root: string,
+  memberPath: string,
+): Promise<Record<string, string> | undefined> {
+  const packagePath = `${root}/${memberPath}/package.json`;
+  let source: string;
+  try {
+    await assertRegularManifest(packagePath);
+    source = await Deno.readTextFile(packagePath);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      return undefined;
+    }
+    throw error;
+  }
+  const pkg = parseJsonObject(source, packagePath);
+  if (!isJsonObject(pkg.dependencies)) {
+    return undefined;
+  }
+  const deps: Record<string, string> = {};
+  for (const [specifier, value] of Object.entries(pkg.dependencies)) {
+    if (typeof value === 'string') {
+      deps[specifier] = value;
+    }
+  }
+  return deps;
+}
+
+/**
+ * Materialize workspace `catalog:` references from a member's `deno.json`
+ * `imports` and `package.json` `dependencies` into explicit `npm:` specifiers
+ * for standalone JSR publication.
+ */
+export function materializeCatalogImports(
   imports: unknown,
   catalogEntries: Record<string, string>,
   memberPath: string,
+  packageDependencies?: Readonly<Record<string, string>>,
 ): unknown {
-  if (!isJsonObject(imports)) {
+  const hasDenoImports = isJsonObject(imports);
+  const catalogPackageDeps = Object.entries(packageDependencies ?? {}).filter(
+    ([, value]) => value === 'catalog:',
+  );
+  if (!hasDenoImports && catalogPackageDeps.length === 0) {
     return imports;
   }
 
   const materialized: JsonObject = {};
-  for (const [specifier, value] of Object.entries(imports)) {
-    if (value === 'catalog:') {
-      const version = catalogEntries[specifier];
-      if (!version) {
-        throw new Error(
-          `${memberPath}/deno.json imports "${specifier}" via catalog: with no root catalog entry.`,
-        );
+  if (hasDenoImports) {
+    for (const [specifier, value] of Object.entries(imports)) {
+      if (value === 'catalog:') {
+        const version = catalogEntries[specifier];
+        if (!version) {
+          throw new Error(
+            `${memberPath}/deno.json imports "${specifier}" via catalog: with no root catalog entry.`,
+          );
+        }
+        materialized[specifier] = `npm:${specifier}@${version}`;
+      } else {
+        materialized[specifier] = value;
       }
-      materialized[specifier] = `npm:${specifier}@${version}`;
-    } else {
-      materialized[specifier] = value;
     }
+  }
+  for (const [specifier] of catalogPackageDeps) {
+    if (specifier in materialized) {
+      continue;
+    }
+    const version = catalogEntries[specifier];
+    if (!version) {
+      throw new Error(
+        `${memberPath}/package.json declares "${specifier}" via catalog: with no root catalog entry.`,
+      );
+    }
+    materialized[specifier] = `npm:${specifier}@${version}`;
   }
   return materialized;
 }

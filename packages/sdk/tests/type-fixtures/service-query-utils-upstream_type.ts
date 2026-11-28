@@ -1,5 +1,5 @@
-import type { Client } from 'npm:@orpc/client@1.16.6';
-import { createTanstackQueryUtils } from 'npm:@orpc/tanstack-query@1.16.6';
+import type { Client } from '@orpc/client';
+import { createTanstackQueryUtils } from '@orpc/tanstack-query';
 import type { ContractProcedureLike, ContractSchema } from '../../src/ports/service-client.ts';
 import type { ServiceQueryUtils } from '../../src/ports/service-query-utils.ts';
 

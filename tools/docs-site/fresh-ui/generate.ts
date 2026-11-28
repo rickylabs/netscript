@@ -97,7 +97,10 @@ async function prepareSources(items: readonly RegistryItem[]): Promise<string> {
     ...root.imports,
     'lume/': site.imports['lume/'],
     ...Object.fromEntries(
-      Object.entries(root.catalog).map(([name, version]) => [name, `npm:${name}@${version}`]),
+      Object.entries(root.catalog).flatMap(([name, version]) => [
+        [name, `npm:${name}@${version}`],
+        [`${name}/`, `npm:${name}@${version}/`],
+      ]),
     ),
     preact: 'npm:preact@^10.29.8',
     'preact/hooks': 'npm:preact@^10.29.8/hooks',

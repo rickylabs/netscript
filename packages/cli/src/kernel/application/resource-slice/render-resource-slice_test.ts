@@ -358,12 +358,19 @@ async function writeConsumerFixture(root: string): Promise<void> {
   const workspaceConfig = JSON.parse(await Deno.readTextFile(join(repo, 'deno.json'))) as {
     readonly catalog: Readonly<Record<string, string>>;
   };
+  const catalogImports = Object.fromEntries(
+    Object.entries(workspaceConfig.catalog).map(([name, version]) => [
+      name,
+      `npm:${name}@${version}`,
+    ]),
+  );
   await Deno.writeTextFile(
     join(root, 'deno.json'),
     JSON.stringify(
       {
         catalog: workspaceConfig.catalog,
         imports: {
+          ...catalogImports,
           '@app/': './',
           '@netscript/fresh/builders': `${fresh}/src/application/builders/mod.ts`,
           '@netscript/fresh/form': `${fresh}/src/application/form/mod.ts`,
@@ -373,15 +380,6 @@ async function writeConsumerFixture(root: string): Promise<void> {
           '@netscript/sdk/client': `${sdk}/src/client/mod.ts`,
           '@netscript/sdk/query': `${sdk}/src/query/mod.ts`,
           '@netscript/sdk/query-client': `${sdk}/src/query-client/mod.ts`,
-          '@durable-streams/client': `npm:@durable-streams/client@${
-            workspaceConfig.catalog['@durable-streams/client']
-          }`,
-          '@durable-streams/state': `npm:@durable-streams/state@${
-            workspaceConfig.catalog['@durable-streams/state']
-          }`,
-          '@opentelemetry/api': `npm:@opentelemetry/api@${
-            workspaceConfig.catalog['@opentelemetry/api']
-          }`,
           '@preact/signals': 'npm:@preact/signals@2.9.2',
           'preact': 'npm:preact@^10.29.8',
           'preact/': 'npm:/preact@^10.29.8/',

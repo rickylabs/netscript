@@ -1,6 +1,6 @@
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
 import { parse as parseJsonc } from 'jsr:@std/jsonc@^1.0.0/parse';
-import { join, normalize, relative } from 'jsr:@std/path@^1.0.0';
+import { dirname, join, normalize, relative } from 'jsr:@std/path@^1.0.0';
 
 export type FindingLevel = 'PASS' | 'WARN' | 'FAIL' | 'INFO';
 
@@ -153,9 +153,9 @@ export async function collectWorkspaceFacts(root: string = Deno.cwd()): Promise<
   const members = await discoverWorkspaceMembers(root);
   const dependencies: DependencyUse[] = [];
   const tasks: TaskDefinition[] = [];
-  await collectDenoJson(root, rootMember, dependencies, tasks);
+  await collectDenoJson(root, rootMember, catalog, dependencies, tasks);
   for (const member of members) {
-    await collectDenoJson(root, member, dependencies, tasks);
+    await collectDenoJson(root, member, catalog, dependencies, tasks);
     await collectPackageJson(root, member, catalog, dependencies);
     await collectSourceImports(root, member, dependencies);
   }
@@ -165,6 +165,7 @@ export async function collectWorkspaceFacts(root: string = Deno.cwd()): Promise<
 async function collectDenoJson(
   root: string,
   member: WorkspaceMember,
+  catalog: Record<string, string>,
   dependencies: DependencyUse[],
   tasks: TaskDefinition[],
 ): Promise<void> {
@@ -173,11 +174,11 @@ async function collectDenoJson(
   const text = await Deno.readTextFile(abs);
   const json = parseJsonc(text) as JsonObject;
   collectTaskDefinitions(member.root === '.' ? null : member, path, text, json, tasks);
-  collectImportMap(member, path, text, json.imports, 'deno.imports', dependencies);
+  collectImportMap(member, path, text, json.imports, catalog, 'deno.imports', dependencies);
   const scopes = json.scopes;
   if (scopes && typeof scopes === 'object' && !Array.isArray(scopes)) {
     for (const value of Object.values(scopes as Record<string, unknown>)) {
-      collectImportMap(member, path, text, value, 'deno.scopes', dependencies);
+      collectImportMap(member, path, text, value, catalog, 'deno.scopes', dependencies);
     }
   }
 }
@@ -206,12 +207,27 @@ function collectImportMap(
   path: string,
   text: string,
   value: unknown,
+  catalog: Record<string, string>,
   source: 'deno.imports' | 'deno.scopes',
   dependencies: DependencyUse[],
 ): void {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return;
-  for (const specifier of Object.values(value as Record<string, unknown>)) {
+  for (const [name, specifier] of Object.entries(value as Record<string, unknown>)) {
     if (typeof specifier !== 'string') continue;
+    if (specifier === 'catalog:') {
+      dependencies.push({
+        registry: 'npm',
+        name,
+        range: catalog[name] ?? '',
+        raw: specifier,
+        source,
+        member,
+        path,
+        line: lineOf(text, `"${name}"`),
+        catalogVersion: catalog[name],
+      });
+      continue;
+    }
     const parsed = parseRegistrySpecifier(specifier);
     if (!parsed) continue;
     dependencies.push({ ...parsed, source, member, path, line: lineOf(text, specifier) });
@@ -269,9 +285,36 @@ async function collectPackageJson(
           path,
           line: lineOf(text, `"${name}"`),
         });
+      } else if (!version.startsWith('workspace:') && version.trim().length > 0) {
+        dependencies.push({
+          registry: 'npm',
+          name,
+          range: version,
+          raw: version,
+          source: 'package.json',
+          member,
+          path,
+          line: lineOf(text, `"${name}"`),
+        });
       }
     }
   }
+}
+
+function toComparablePath(path: string): string {
+  return path.replaceAll('\\', '/').replace(/\/+$/, '');
+}
+
+/** Check whether a file path resides under any directory in `directories` (POSIX and Windows safe). */
+export function isPathWithinAnyDirectory(
+  filePath: string,
+  directories: readonly string[],
+): boolean {
+  const normalizedFile = toComparablePath(filePath);
+  return directories.some((directory) => {
+    const normalizedDir = toComparablePath(directory);
+    return normalizedDir.length > 0 && normalizedFile.startsWith(`${normalizedDir}/`);
+  });
 }
 
 async function collectSourceImports(
@@ -280,29 +323,47 @@ async function collectSourceImports(
   dependencies: DependencyUse[],
 ): Promise<void> {
   const memberRoot = join(root, member.root);
+  const comparableMemberRoot = toComparablePath(memberRoot);
+  const nestedConfigDirs: string[] = [];
+  for await (
+    const entry of walk(memberRoot, {
+      match: [/(?:^|[\\/])deno\.json$/],
+      skip: [/node_modules/, /\.generated/, /_fresh/, /\.deploy/],
+    })
+  ) {
+    const dir = dirname(entry.path);
+    if (toComparablePath(dir) !== comparableMemberRoot) {
+      nestedConfigDirs.push(dir);
+    }
+  }
+  const sourcePatterns = [
+    /\b(?:import|export)\s+(?:type\s+)?(?:[^'";]*?\s+from\s+)?['"]((?:npm|jsr):[^'"]+)['"]/g,
+    /\bimport\s*\(\s*['"]((?:npm|jsr):[^'"]+)['"]\s*(?:,|\))/g,
+  ];
   for await (
     const entry of walk(memberRoot, {
       match: [/\.[cm]?tsx?$/],
       skip: [/node_modules/, /\.generated/, /_fresh/, /\.deploy/],
     })
   ) {
-    const path = normalize(relative(root, entry.path));
+    if (isPathWithinAnyDirectory(entry.path, nestedConfigDirs)) {
+      continue;
+    }
+    const path = normalize(relative(root, entry.path)).replaceAll('\\', '/');
     const text = await Deno.readTextFile(entry.path);
-    for (
-      const match of text.matchAll(
-        /\b(?:import|export)\s+(?:type\s+)?(?:[^'";]*?\s+from\s+)?['"]((?:npm|jsr):[^'"]+)['"]/g,
-      )
-    ) {
-      const raw = match[1];
-      const parsed = parseRegistrySpecifier(raw);
-      if (!parsed) continue;
-      dependencies.push({
-        ...parsed,
-        source: 'source.import',
-        member,
-        path,
-        line: text.slice(0, match.index ?? 0).split('\n').length,
-      });
+    for (const pattern of sourcePatterns) {
+      for (const match of text.matchAll(pattern)) {
+        const raw = match[1];
+        const parsed = parseRegistrySpecifier(raw);
+        if (!parsed) continue;
+        dependencies.push({
+          ...parsed,
+          source: 'source.import',
+          member,
+          path,
+          line: text.slice(0, match.index ?? 0).split('\n').length,
+        });
+      }
     }
   }
 }

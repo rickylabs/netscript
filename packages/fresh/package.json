@@ -2,6 +2,7 @@
   "dependencies": {
     "@durable-streams/client": "catalog:",
     "@durable-streams/state": "catalog:",
+    "@orpc/server": "catalog:",
     "@preact/signals": "catalog:",
     "@tanstack/preact-query": "catalog:",
     "@tanstack/query-core": "catalog:",

@@ -17,20 +17,46 @@ import {
   printFindings,
 } from './workspace.ts';
 
-interface Args {
+export interface ScanNpmCatalogArgs {
   json: boolean;
   failOnViolation: boolean;
+  failOnPackagePrefixes: readonly string[];
 }
 
-function parseArgs(argv: string[]): Args {
+export function parseArgs(argv: readonly string[]): ScanNpmCatalogArgs {
+  const failOnPackagePrefixes: string[] = [];
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg.startsWith('--fail-on-package-prefix=')) {
+      const value = arg.slice('--fail-on-package-prefix='.length).trim();
+      if (!value) {
+        throw new Error('--fail-on-package-prefix requires a non-empty package prefix');
+      }
+      failOnPackagePrefixes.push(value);
+      continue;
+    }
+    if (arg === '--fail-on-package-prefix') {
+      const value = argv[i + 1]?.trim();
+      if (!value || value.startsWith('--')) {
+        throw new Error('--fail-on-package-prefix requires a non-empty package prefix');
+      }
+      failOnPackagePrefixes.push(value);
+      i += 1;
+    }
+  }
   return {
     json: argv.includes('--json'),
     failOnViolation: argv.includes('--fail-on-violation'),
+    failOnPackagePrefixes,
   };
 }
 
-function findingLevel(args: Args): 'WARN' | 'FAIL' {
-  return args.failOnViolation ? 'FAIL' : 'WARN';
+function findingLevel(args: ScanNpmCatalogArgs, packageName: string): 'WARN' | 'FAIL' {
+  if (args.failOnViolation) return 'FAIL';
+  if (args.failOnPackagePrefixes.some((prefix) => packageName.startsWith(prefix))) {
+    return 'FAIL';
+  }
+  return 'WARN';
 }
 
 function describeCatalog(use: DependencyUse, catalog: Record<string, string>): string {
@@ -42,20 +68,24 @@ function describeCatalog(use: DependencyUse, catalog: Record<string, string>): s
   return `catalog has ${catalogVersion}`;
 }
 
-/** Analyze npm dependency uses that should flow through package.json catalog refs. */
+/** Analyze npm dependency uses that should flow through catalog: refs. */
 export function analyzeNpmCatalogCompliance(
   dependencies: DependencyUse[],
   catalog: Record<string, string>,
-  args: Args,
+  args: ScanNpmCatalogArgs,
 ): Finding[] {
   const findings: Finding[] = [];
   for (const use of dependencies) {
     if (use.registry !== 'npm') continue;
-    if (use.source === 'package.json' && use.raw === 'catalog:') {
+    if (
+      (use.source === 'package.json' || use.source === 'deno.imports' ||
+        use.source === 'deno.scopes') &&
+      use.raw === 'catalog:'
+    ) {
       if (!use.catalogVersion) {
         findings.push({
           ref: 'DEPS-NPM-CATALOG',
-          level: findingLevel(args),
+          level: findingLevel(args, use.name),
           message:
             `${use.member.root} declares ${use.name} as catalog: but the root catalog has no matching entry`,
           path: use.path,
@@ -64,10 +94,11 @@ export function analyzeNpmCatalogCompliance(
       }
       continue;
     }
+    const displayUse = use.raw.includes(use.name) ? use.raw : `${use.name}@${use.raw}`;
     findings.push({
       ref: 'DEPS-NPM-CATALOG',
-      level: findingLevel(args),
-      message: `${use.member.root} uses ${use.raw} outside package.json catalog: (${
+      level: findingLevel(args, use.name),
+      message: `${use.member.root} uses ${displayUse} outside catalog: (${
         describeCatalog(use, catalog)
       })`,
       path: use.path,
@@ -94,9 +125,10 @@ function printHelp(): void {
       '  deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts [flags]',
       '',
       'Flags:',
-      '  --json                JSON findings instead of the text report',
-      '  --fail-on-violation   emit findings at FAIL level (exit 1 on any finding)',
-      '  --help, -h            show this help',
+      '  --json                                  JSON findings instead of the text report',
+      '  --fail-on-violation                     emit all findings at FAIL level (exit 1 on any finding)',
+      '  --fail-on-package-prefix=<prefix>       emit FAIL for findings matching package prefix (repeatable)',
+      '  --help, -h                              show this help',
     ].join('\n'),
   );
 }

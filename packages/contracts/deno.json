@@ -12,7 +12,6 @@
     "./streams": "./streams.ts"
   },
   "imports": {
-    "@orpc/contract": "npm:@orpc/contract@^1.16.6",
     "zod": "catalog:"
   },
   "tasks": {

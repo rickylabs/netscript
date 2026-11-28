@@ -53,11 +53,15 @@ Deno.test('committed Expo reference lock matches its current workspace source gr
 Deno.test('reference lock guard checks scratch-probe entrypoints and rejects npm drift', async () => {
   const reference = await Deno.makeTempDir({ prefix: 'probe-reference-lock-' });
   try {
+    const rootConfig = JSON.parse(
+      await Deno.readTextFile(new URL('../../../deno.json', import.meta.url)),
+    ) as { catalog: Record<string, string> };
     const committed = JSON.parse(
       await Deno.readTextFile(new URL('../../../deno.lock', import.meta.url)),
     );
-    const specifier = 'npm:@orpc/client@1.15.0';
+    const specifier = `npm:@orpc/client@${rootConfig.catalog['@orpc/client']}`;
     const version = committed.specifiers[specifier];
+    assertEquals(typeof version, 'string', `Expected committed lock resolution for ${specifier}`);
     const lock = {
       version: committed.version,
       specifiers: { [specifier]: version },
@@ -66,12 +70,14 @@ Deno.test('reference lock guard checks scratch-probe entrypoints and rejects npm
     };
     const lockPath = join(reference, 'deno.lock');
     await Deno.writeTextFile(lockPath, `${JSON.stringify(lock, null, 2)}\n`);
-    const config = { imports: { dependency: 'npm:@orpc/client@1.15.0' } };
+    const config = { imports: { dependency: specifier } };
     await Deno.writeTextFile(join(reference, 'deno.json'), JSON.stringify(config));
     await Deno.writeTextFile(join(reference, 'probe.ts'), "import 'dependency';\n");
     const locked = await Deno.readTextFile(lockPath);
     assertEquals(await checkReferenceLock(reference, ['probe.ts']), true);
-    config.imports.dependency = 'npm:@orpc/client@1.15.5';
+    const absentSpecifier = 'npm:@orpc/client@1.16.5';
+    assertEquals(absentSpecifier in lock.specifiers, false);
+    config.imports.dependency = absentSpecifier;
     await Deno.writeTextFile(join(reference, 'deno.json'), JSON.stringify(config));
     assertEquals(await checkReferenceLock(reference, ['probe.ts']), false);
     assertEquals(await Deno.readTextFile(lockPath), locked);

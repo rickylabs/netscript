@@ -14,12 +14,19 @@ function lockedSpecifier(name: string): string {
   if (!version) throw new Error(`Missing locked fixture dependency: ${name}`);
   return `npm:${name}@${version}`;
 }
+function resolveLockedCatalogImport(id: string): string | null {
+  const parts = id.split('/');
+  const pkg = id.startsWith('@') ? parts.slice(0, 2).join('/') : parts[0];
+  if (!pkg || !workspaceConfig.catalog[pkg]) return null;
+  return `${lockedSpecifier(pkg)}${id.slice(pkg.length)}`;
+}
 const packageImports: Plugin = {
   name: 'route-purity-fixture-package-imports',
   enforce: 'post',
   async resolveId(id, importer) {
-    if (workspaceConfig.catalog[id]) {
-      return await this.resolve(lockedSpecifier(id), importer, { skipSelf: true });
+    const specifier = resolveLockedCatalogImport(id);
+    if (specifier) {
+      return await this.resolve(specifier, importer, { skipSelf: true });
     }
     return null;
   },

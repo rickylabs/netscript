@@ -42,8 +42,11 @@ Deno.test('scaffold runtime npm imports match workspace, Fresh, and SDK catalogs
       );
     }
     if (sdkRuntimeDependencies.includes(dependency)) {
+      const sdkPackageDeps = (sdkPackage as { dependencies?: Record<string, string> }).dependencies;
+      const sdkManifestSpecifier = sdk.imports?.[dependency] ??
+        (sdkPackageDeps?.[dependency] === 'catalog:' ? expected : sdkPackageDeps?.[dependency]);
       assertEquals(
-        sdk.imports?.[dependency],
+        sdkManifestSpecifier,
         expected,
         `${dependency} in the SDK manifest must match the root catalog`,
       );

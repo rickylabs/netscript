@@ -6,11 +6,20 @@ import { runLockedProbe } from './run-locked-probe.ts';
 Deno.test('dependency mutation installs into the existing lock before frozen consumers run', async () => {
   const root = await Deno.makeTempDir({ prefix: 'generated-probe-install-' });
   try {
+    const rootConfig = JSON.parse(
+      await Deno.readTextFile(new URL('../../../../../../../deno.json', import.meta.url)),
+    ) as { catalog: Record<string, string> };
     const committed = JSON.parse(
       await Deno.readTextFile(new URL('../../../../../../../deno.lock', import.meta.url)),
     );
-    const dependency = 'npm:@orpc/client@1.15.0';
+    const dependency = `npm:@orpc/client@${rootConfig.catalog['@orpc/client']}`;
+    const serverDependency = `npm:@orpc/server@${rootConfig.catalog['@orpc/server']}`;
     const resolution = committed.specifiers[dependency];
+    assertEquals(
+      typeof resolution,
+      'string',
+      `Expected committed lock resolution for ${dependency}`,
+    );
     const lock = join(root, 'deno.lock');
     await Deno.writeTextFile(
       lock,
@@ -43,7 +52,7 @@ Deno.test('dependency mutation installs into the existing lock before frozen con
         name: '@probe/second-service',
         version: '1.0.0',
         exports: './mod.ts',
-        imports: { server: 'npm:@orpc/server@1.15.0' },
+        imports: { server: serverDependency },
       }),
     );
     await Deno.writeTextFile(join(member, 'mod.ts'), "import 'server';\n");
@@ -66,7 +75,9 @@ Deno.test('dependency mutation installs into the existing lock before frozen con
     await runLockedProbe([probe], root, root);
     assertEquals(await Deno.readTextFile(lock), installed);
     // Installing a legitimate mutation does not grant subsequent runs permission to drift.
-    await Deno.writeTextFile(probe, "import 'npm:@orpc/client@1.16.6';\n");
+    const driftedSpecifier = 'npm:@orpc/client@1.16.5';
+    assertEquals(driftedSpecifier in JSON.parse(installed).specifiers, false);
+    await Deno.writeTextFile(probe, `import ${JSON.stringify(driftedSpecifier)};\n`);
     await assertRejects(() => runLockedProbe([probe], root, root), Error);
     assertEquals(await Deno.readTextFile(lock), installed);
   } finally {

@@ -1,7 +1,7 @@
 /** Focused execution of the generated credential carrier against the builder port. */
 import { assert, assertEquals, assertRejects } from '@std/assert';
 import { dirname, join } from '@std/path';
-import { os } from 'npm:@orpc/server@^1.16.6';
+import { os } from '@orpc/server';
 import { createService } from '@netscript/service';
 import {
   createCompositeAuthenticator,
@@ -346,16 +346,15 @@ Deno.test('documented internal recipe executes in the generated carrier project 
       new URL('./fixtures/internal-recipe/proof.ts.template', import.meta.url),
       join(root, 'proof.ts'),
     );
-    const config: { imports: Record<string, string> } = JSON.parse(
+    const config: { imports: Record<string, string>; catalog: Record<string, string> } = JSON.parse(
       await Deno.readTextFile(new URL('deno.json', repoRoot)),
     );
-    const serviceConfig: { imports: Record<string, string> } = JSON.parse(
-      await Deno.readTextFile(new URL('packages/service/deno.json', repoRoot)),
-    );
+    const orpcServerRange = config.catalog['@orpc/server'];
+    assert(typeof orpcServerRange === 'string', 'root deno.json catalog must pin @orpc/server');
     await Deno.writeTextFile(
       join(root, 'imports.json'),
       JSON.stringify({
-        imports: { ...config.imports, '@orpc/server': serviceConfig.imports['@orpc/server'] },
+        imports: { ...config.imports, '@orpc/server': `npm:@orpc/server@${orpcServerRange}` },
       }),
     );
     const run = () =>
