@@ -60,6 +60,8 @@ export interface RPCHandlerConfig {
   debug?: boolean;
   /** Extra field-name fragments redacted from debug-mode RPC input logs (`LoggingPlugin`). */
   redactFields?: readonly string[];
+  /** Optional error-code to HTTP-status map forwarded to tracing, logging, and error-handling plugins. */
+  errorStatusMap?: Readonly<Record<string, number>>;
 }
 
 /**
@@ -83,6 +85,7 @@ export function createRPCPlugins(config: RPCHandlerConfig): ServiceHandlerPlugin
       new TracingPlugin({
         serviceName: config.serviceName,
         recordInputKeys: true,
+        errorStatusMap: config.errorStatusMap,
       }),
     );
   }
@@ -93,6 +96,7 @@ export function createRPCPlugins(config: RPCHandlerConfig): ServiceHandlerPlugin
       new ErrorHandlingPlugin({
         serviceName: config.serviceName,
         warnOnlyCodes: config.warnOnlyCodes ?? ['NOT_FOUND', 'VALIDATION_ERROR'],
+        errorStatusMap: config.errorStatusMap,
       }),
     );
   }
@@ -104,6 +108,7 @@ export function createRPCPlugins(config: RPCHandlerConfig): ServiceHandlerPlugin
         serviceName: config.serviceName,
         debug: config.debug,
         redactFields: config.redactFields,
+        errorStatusMap: config.errorStatusMap,
       }),
     );
   }

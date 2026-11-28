@@ -1,0 +1,6 @@
+# Drift Log — RFC 0013 S2
+
+1. **Layer-2 sibling independence for `attachRootHandlerInterceptor` & `resolveErrorHttpStatus`:**
+   - `@netscript/logger` and `@netscript/telemetry` are independent Layer-2 packages with zero `@netscript/*` runtime dependencies. Rather than introducing a Layer-2 cross-dependency between them, `attachRootHandlerInterceptor` and `resolveErrorHttpStatus` (with the identical NetScript/oRPC standard status table) live in `packages/telemetry/src/orpc/_utils.ts` (shared by `TracingPlugin` and `ErrorHandlingPlugin`) and as package-local helpers in `packages/logger/orpc-plugin.ts` (keeping `@netscript/logger/orpc` free of runtime `@orpc/*` imports). Both seams attach to `rootInterceptors` on v1 `^1.16.6` and carry explicit Phase 2 `0.1.0` flip comments.
+2. **`packages/telemetry/package.json` dependency split:**
+   - Moving `ORPCError` off `@orpc/contract` in `packages/telemetry/src/orpc/error-plugin.ts` declares `"@orpc/client": "catalog:"` in `dependencies` (keeping published `@netscript/telemetry` lightweight) and `"@orpc/server": "catalog:"` strictly in `devDependencies` (for real-`RPCHandler` behavior tests in `packages/telemetry/tests/orpc/plugin_test.ts` without adding `@orpc/server` to published JSR imports).

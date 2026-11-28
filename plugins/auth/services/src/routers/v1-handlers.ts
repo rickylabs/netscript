@@ -1,5 +1,5 @@
 import { readBearerCredential } from '@netscript/plugin-auth-core/authenticator';
-import { ORPCError } from '@orpc/contract';
+import { ORPCError } from '@orpc/server';
 import { KvOAuthError } from '@netscript/auth-kv-oauth';
 import { captureAuthResponseCookies } from '../request-context.ts';
 import type { PluginCapabilities } from '@netscript/plugin/contract-base';

@@ -1,4 +1,4 @@
-import { ORPCError } from '@orpc/contract';
+import { ORPCError } from '@orpc/server';
 import { assert, assertEquals, assertRejects, assertThrows } from 'jsr:@std/assert@^1';
 import {
   ErrorHandlingPlugin,

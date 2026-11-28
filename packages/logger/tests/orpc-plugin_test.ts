@@ -8,8 +8,9 @@ import { createFieldRedactor } from '../redaction.ts';
 const CATEGORY = ['netscript-test', 'orpc'];
 
 interface HandlerPlugin {
+  readonly name?: string;
   readonly order?: number;
-  init?(options: unknown, router: unknown): void;
+  init?(options: unknown, router: unknown): unknown;
 }
 
 interface Harness {
@@ -257,4 +258,95 @@ Deno.test('createFieldRedactor matches defaults exactly and custom fragments by 
     { systemPrompt: '[REDACTED]', id: 1 },
     'plain',
   ]);
+});
+
+Deno.test('LoggingPlugin exposes stable name, return-based init, and errorStatusMap classification', async () => {
+  const records: LogRecord[] = [];
+  await configure({
+    reset: true,
+    sinks: { memory: (record: LogRecord) => records.push(record) },
+    loggers: [
+      { category: CATEGORY, sinks: ['memory'], lowestLevel: 'debug' },
+      { category: ['logtape', 'meta'], sinks: [], lowestLevel: 'warning' },
+    ],
+  });
+
+  try {
+    const plugin = new LoggingPlugin({
+      serviceName: 'orders',
+      logger: getLogger(CATEGORY),
+      errorStatusMap: { ORDER_LOCKED: 409, ORDER_BAD_MAP: 700 },
+    });
+    assertEquals(plugin.name, 'netscript-logging');
+
+    const manualOptions = {};
+    assertEquals(plugin.init(manualOptions), manualOptions);
+
+    const router = {
+      locked: os.handler(() => {
+        throw Object.assign(new Error('Order locked'), { code: 'ORDER_LOCKED' });
+      }),
+      lockedZeroStatus: os.handler(() => {
+        throw Object.assign(new Error('Order locked'), { code: 'ORDER_LOCKED', status: 0 });
+      }),
+      invalidMapped: os.handler(() => {
+        throw Object.assign(new Error('Order bad map'), { code: 'ORDER_BAD_MAP' });
+      }),
+      lengthRequired: os.handler(() => {
+        throw Object.assign(new Error('Length required'), { code: 'LENGTH_REQUIRED' });
+      }),
+      preconditionRequired: os.handler(() => {
+        throw Object.assign(new Error('Precondition required'), { code: 'PRECONDITION_REQUIRED' });
+      }),
+      tooMany: os.handler(() => {
+        throw Object.assign(new Error('Too many requests'), { code: 'TOO_MANY_REQUESTS' });
+      }),
+      unknown: os.handler(() => {
+        throw Object.assign(new Error('Backend down'), { code: 'CUSTOM_INFRA_FAILURE' });
+      }),
+    };
+
+    const handler = new RPCHandler(router, { plugins: [plugin as HandlerPlugin] });
+    for (
+      const procedure of [
+        'locked',
+        'lockedZeroStatus',
+        'invalidMapped',
+        'lengthRequired',
+        'preconditionRequired',
+        'tooMany',
+        'unknown',
+      ]
+    ) {
+      const result = await handler.handle(
+        new Request(`http://localhost/rpc/${procedure}`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ json: {} }),
+        }),
+        { prefix: '/rpc', context: {} },
+      );
+      assert(result.matched && result.response);
+      await result.response.body?.cancel();
+    }
+
+    const failures = recordsWith(records, 'RPC procedure failed');
+    assertEquals(failures.length, 7);
+    assertEquals(failures[0]?.level, 'warning');
+    assertEquals(failures[0]?.properties.status, 409);
+    assertEquals(failures[1]?.level, 'warning');
+    assertEquals(failures[1]?.properties.status, 409);
+    assertEquals(failures[2]?.level, 'error');
+    assertEquals(failures[2]?.properties.status, 500);
+    assertEquals(failures[3]?.level, 'warning');
+    assertEquals(failures[3]?.properties.status, 411);
+    assertEquals(failures[4]?.level, 'warning');
+    assertEquals(failures[4]?.properties.status, 428);
+    assertEquals(failures[5]?.level, 'warning');
+    assertEquals(failures[5]?.properties.status, 429);
+    assertEquals(failures[6]?.level, 'error');
+    assertEquals(failures[6]?.properties.status, 500);
+  } finally {
+    await reset();
+  }
 });

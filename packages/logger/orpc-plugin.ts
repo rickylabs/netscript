@@ -151,6 +151,11 @@ export interface LoggingPluginOptions {
    * Custom logger instance.
    */
   logger?: Logger;
+
+  /**
+   * Optional error-code to HTTP-status map used when thrown errors omit `.status`.
+   */
+  errorStatusMap?: Readonly<Record<string, number>>;
 }
 
 /**
@@ -177,9 +182,17 @@ export interface LoggingPluginOptions {
 export class LoggingPlugin {
   private readonly logger: Logger;
   private readonly options:
-    & Required<Omit<LoggingPluginOptions, 'logger' | 'redactFields'>>
-    & { logger?: Logger };
+    & Required<Omit<LoggingPluginOptions, 'errorStatusMap' | 'logger' | 'redactFields'>>
+    & {
+      logger?: Logger;
+      errorStatusMap?: Readonly<Record<string, number>>;
+    };
   private readonly redactor: FieldRedactor;
+
+  /**
+   * Stable plugin name used by oRPC v2 `OrderablePlugin` ordering.
+   */
+  readonly name: string = 'netscript-logging';
 
   /**
    * Plugin order. Runs after tracing and before error handling.
@@ -207,6 +220,7 @@ export class LoggingPlugin {
       maxInputKeys: options.maxInputKeys ?? 20,
       skipPaths: options.skipPaths ?? [...DEFAULT_RPC_SKIP_PATHS],
       logger: options.logger,
+      errorStatusMap: options.errorStatusMap,
     };
 
     this.logger = options.logger ?? getLogger(['netscript', 'services', serviceName, 'rpc']);
@@ -217,9 +231,11 @@ export class LoggingPlugin {
    * Initialize the plugin by adding interceptors to the handler options.
    *
    * @param handlerOptions - Mutable oRPC handler configuration.
+   * @returns The initialized handler options.
    */
-  init(handlerOptions: LoggingHandlerOptions, _router?: unknown): void {
-    const { debug, levels, logInputKeys, maxInputKeys, skipPaths, serviceName } = this.options;
+  init(handlerOptions: LoggingHandlerOptions, _router?: unknown): LoggingHandlerOptions {
+    const { debug, levels, logInputKeys, maxInputKeys, skipPaths, serviceName, errorStatusMap } =
+      this.options;
     const logger = this.logger;
     const redactor = this.redactor;
     const startLevel = levels.start ?? 'debug';
@@ -308,15 +324,16 @@ export class LoggingPlugin {
       } catch (error: unknown) {
         const duration = Math.round(performance.now() - startTime);
         const err = toLoggableError(error);
-        const isClientError = typeof err.status === 'number' && err.status >= 400 &&
-          err.status < 500;
+        const resolvedStatus = resolveErrorHttpStatus(err, errorStatusMap);
+        const isClientError = typeof resolvedStatus === 'number' && resolvedStatus >= 400 &&
+          resolvedStatus < 500;
         const level = isClientError ? clientErrorLevel : serverErrorLevel;
 
         procedureLogger[level]('RPC procedure failed', {
           code: err.code ?? 'UNKNOWN',
           duration,
           error: err.message,
-          ...(typeof err.status === 'number' ? { status: err.status } : {}),
+          ...(typeof resolvedStatus === 'number' ? { status: resolvedStatus } : {}),
           ...(err.cause !== undefined ? { cause: err.cause } : {}),
           ...(debug && err.stack ? { stack: err.stack } : {}),
         });
@@ -325,10 +342,10 @@ export class LoggingPlugin {
       }
     };
 
-    handlerOptions.rootInterceptors ??= [];
-    handlerOptions.rootInterceptors.push(rootInterceptor);
+    attachRootHandlerInterceptor(handlerOptions, rootInterceptor);
     handlerOptions.clientInterceptors ??= [];
     handlerOptions.clientInterceptors.push(clientInterceptor);
+    return handlerOptions;
   }
 }
 
@@ -475,6 +492,83 @@ function toLoggableError(error: unknown): Error & {
   }
 
   return new Error(String(error));
+}
+
+const DEFAULT_ORPC_ERROR_STATUS_MAP: Readonly<Record<string, number>> = {
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  PAYMENT_REQUIRED: 402,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  METHOD_NOT_SUPPORTED: 405,
+  NOT_ACCEPTABLE: 406,
+  TIMEOUT: 408,
+  CONFLICT: 409,
+  GONE: 410,
+  LENGTH_REQUIRED: 411,
+  PRECONDITION_FAILED: 412,
+  PAYLOAD_TOO_LARGE: 413,
+  UNSUPPORTED_MEDIA_TYPE: 415,
+  UNPROCESSABLE_CONTENT: 422,
+  UNPROCESSABLE_ENTITY: 422,
+  VALIDATION_ERROR: 422,
+  UPGRADE_REQUIRED: 426,
+  PRECONDITION_REQUIRED: 428,
+  RATE_LIMITED: 429,
+  TOO_MANY_REQUESTS: 429,
+  CLIENT_CLOSED_REQUEST: 499,
+  INTERNAL_SERVER_ERROR: 500,
+  NOT_IMPLEMENTED: 501,
+  BAD_GATEWAY: 502,
+  SERVICE_UNAVAILABLE: 503,
+  GATEWAY_TIMEOUT: 504,
+};
+
+function isValidErrorHttpStatus(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 400 && value <= 599;
+}
+
+/**
+ * Attach a root-level interceptor onto oRPC handler options.
+ *
+ * On oRPC v1 (`^1.16.6`), `StandardHandler` only executes `rootInterceptors` and
+ * ignores `routingInterceptors`. Phase 2 (`0.1.0`) flips this single seam to
+ * `routingInterceptors` when cutting over to oRPC v2.
+ */
+function attachRootHandlerInterceptor<TOptions extends LoggingHandlerOptions>(
+  handlerOptions: TOptions,
+  interceptor: RootLoggingInterceptor,
+): TOptions {
+  handlerOptions.rootInterceptors ??= [];
+  handlerOptions.rootInterceptors.push(interceptor);
+  return handlerOptions;
+}
+
+function resolveErrorHttpStatus(
+  error: { readonly code?: string; readonly status?: number },
+  errorStatusMap?: Readonly<Record<string, number>>,
+): number | undefined {
+  if (isValidErrorHttpStatus(error.status)) {
+    return error.status;
+  }
+
+  const code = error.code;
+  if (typeof code !== 'string' || code.length === 0) {
+    return undefined;
+  }
+
+  if (errorStatusMap && Object.hasOwn(errorStatusMap, code)) {
+    const mapped = errorStatusMap[code];
+    if (isValidErrorHttpStatus(mapped)) {
+      return mapped;
+    }
+  }
+
+  if (Object.hasOwn(DEFAULT_ORPC_ERROR_STATUS_MAP, code)) {
+    return DEFAULT_ORPC_ERROR_STATUS_MAP[code];
+  }
+
+  return 500;
 }
 
 function hasMatchedResult(result: unknown): result is { matched?: boolean } {

@@ -7,6 +7,8 @@ import {
   createNotFoundHandler,
   createOpenAPIHandler,
   createOpenAPISpec,
+  createRPCHandler,
+  createRPCPlugins,
   createService,
 } from '../mod.ts';
 
@@ -229,4 +231,53 @@ Deno.test('OpenAPI preserves Zod 4.6 numeric and string constraints', async () =
   assertEquals(count.schema.maximum, 23);
   assertEquals(name.schema.minLength, 2);
   assertEquals(name.schema.maxLength, 8);
+});
+
+Deno.test('createRPCPlugins exposes named return-based plugins and forwards errorStatusMap', async () => {
+  const plugins = createRPCPlugins({
+    serviceName: 'orders',
+    errorStatusMap: { ORDER_LOCKED: 409 },
+  });
+  const names = plugins.map((plugin) => plugin.name).filter((name): name is string =>
+    Boolean(name)
+  );
+  assertEquals(names, ['netscript-tracing', 'netscript-error-handling', 'netscript-logging']);
+
+  const router = os.router({
+    locked: os.handler(() => {
+      throw Object.assign(new Error('Order locked'), { code: 'ORDER_LOCKED' });
+    }),
+    unknown: os.handler(() => {
+      throw Object.assign(new Error('Unexpected backend error'), { code: 'CUSTOM_INFRA_FAILURE' });
+    }),
+  });
+  const handler = createRPCHandler(router, {
+    serviceName: 'orders',
+    logging: false,
+    errorStatusMap: { ORDER_LOCKED: 409 },
+  });
+
+  const lockedResult = await handler.handle(
+    new Request('http://localhost/api/rpc/locked', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ json: {} }),
+    }),
+    { prefix: '/api/rpc' },
+  );
+  assertEquals(lockedResult.matched, true);
+  assertEquals(lockedResult.response?.status, 409);
+  await lockedResult.response?.body?.cancel();
+
+  const unknownResult = await handler.handle(
+    new Request('http://localhost/api/rpc/unknown', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ json: {} }),
+    }),
+    { prefix: '/api/rpc' },
+  );
+  assertEquals(unknownResult.matched, true);
+  assertEquals(unknownResult.response?.status, 500);
+  await unknownResult.response?.body?.cancel();
 });
