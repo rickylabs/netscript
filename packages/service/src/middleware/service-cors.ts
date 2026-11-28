@@ -1,5 +1,6 @@
 /** NetScript CORS configuration and response authority; Hono resolves the policy. */
 import { cors } from 'hono/cors';
+import { RPC_PROTOCOL_HEADER } from '../primitives/rpc-protocol-guard.ts';
 import type { CorsOptions, ServiceMiddleware } from '../types.ts';
 
 type ResolvedCorsOptions = NonNullable<CorsOptions>;
@@ -50,15 +51,9 @@ export function assertServiceCorsOptions(options: ResolvedCorsOptions): void {
   }
 }
 
-/**
- * Preserve Hono's once-resolved CORS decision across handlers and proxied responses.
- * Snapshot all six headers, including absence, before downstream code runs; restore
- * them on the final response and retain the union of checkpoint and final Vary tokens.
- * Native preflight short-circuits unchanged. Credentialed resolvers cannot emit '*'.
- */
-export function createServiceCorsMiddleware(options: ResolvedCorsOptions): ServiceMiddleware {
+function buildCorsHandler(options: ResolvedCorsOptions): ServiceMiddleware {
   const resolveOrigin = options.origin;
-  const upstream = options.credentials && typeof resolveOrigin === 'function'
+  return options.credentials && typeof resolveOrigin === 'function'
     ? cors({
       ...options,
       origin: async (origin, context) => {
@@ -67,9 +62,58 @@ export function createServiceCorsMiddleware(options: ResolvedCorsOptions): Servi
       },
     })
     : cors(options);
+}
+
+function appendHeaderCaseInsensitive(headers: readonly string[], headerName: string): string[] {
+  const targetLower = headerName.toLowerCase();
+  if (headers.some((entry) => entry.trim().toLowerCase() === targetLower)) {
+    return [...headers];
+  }
+  return [...headers, headerName];
+}
+
+function isRpcRequestPath(requestPath: string, rpcPrefixes: readonly string[]): boolean {
+  for (const rawPrefix of rpcPrefixes) {
+    const trimmed = rawPrefix.trim();
+    if (!trimmed) continue;
+    const normalized = trimmed === '/' ? '/' : trimmed.replace(/\/+$/, '');
+    if (normalized === '/') return true;
+    if (requestPath === normalized || requestPath.startsWith(`${normalized}/`)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Preserve Hono's once-resolved CORS decision across handlers and proxied responses.
+ * Snapshot all six headers, including absence, before downstream code runs; restore
+ * them on the final response and retain the union of checkpoint and final Vary tokens.
+ * Native preflight short-circuits unchanged, except mounted RPC paths append
+ * `X-NetScript-RPC-Protocol` (case-insensitively deduplicated) to explicit `allowHeaders`
+ * without mutating non-RPC routes. Credentialed resolvers cannot emit '*'.
+ */
+export function createServiceCorsMiddleware(
+  options: ResolvedCorsOptions,
+  getRpcPrefixes?: () => readonly string[],
+): ServiceMiddleware {
+  const upstream = buildCorsHandler(options);
+  const rpcPreflightUpstream = options.allowHeaders && options.allowHeaders.length > 0
+    ? buildCorsHandler({
+      ...options,
+      allowHeaders: appendHeaderCaseInsensitive(options.allowHeaders, RPC_PROTOCOL_HEADER),
+    })
+    : undefined;
+
   return async (c, next) => {
+    const activeUpstream = rpcPreflightUpstream &&
+        c.req.method === 'OPTIONS' &&
+        isRpcRequestPath(c.req.path, getRpcPrefixes?.() ?? [])
+      ? rpcPreflightUpstream
+      : upstream;
+
     let checkpoint: { headers: Map<string, string | null>; vary: string | null } | undefined;
-    const preflight = await upstream(c, async () => {
+    const preflight = await activeUpstream(c, async () => {
       checkpoint = {
         headers: new Map(
           ACCESS_CONTROL_RESPONSE_HEADERS.map((name) => [name, c.res.headers.get(name)]),

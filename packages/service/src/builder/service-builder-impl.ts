@@ -158,8 +158,14 @@ export class ServiceBuilderImpl<
   withCors(options?: CorsOptions): ServiceBuilder<TRouter, TCustom> {
     const resolved = resolveServiceCorsOptions(options);
     this.corsOptions.push(resolved);
-    this.use(createServiceCorsMiddleware(resolved));
+    this.use(createServiceCorsMiddleware(resolved, () => this.resolveMountedRpcPrefixes()));
     return this;
+  }
+
+  private resolveMountedRpcPrefixes(): readonly string[] {
+    if (!this.rpcConfigured) return [];
+    const { rpcPath } = resolveRpcWiringPaths(this.rpcOptions ?? undefined);
+    return [rpcPath, ...(this.rpcOptions?.rpcAliases ?? [])];
   }
 
   /**
