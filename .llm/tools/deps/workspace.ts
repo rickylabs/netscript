@@ -153,9 +153,9 @@ export async function collectWorkspaceFacts(root: string = Deno.cwd()): Promise<
   const members = await discoverWorkspaceMembers(root);
   const dependencies: DependencyUse[] = [];
   const tasks: TaskDefinition[] = [];
-  await collectDenoJson(root, rootMember, dependencies, tasks);
+  await collectDenoJson(root, rootMember, catalog, dependencies, tasks);
   for (const member of members) {
-    await collectDenoJson(root, member, dependencies, tasks);
+    await collectDenoJson(root, member, catalog, dependencies, tasks);
     await collectPackageJson(root, member, catalog, dependencies);
     await collectSourceImports(root, member, dependencies);
   }
@@ -165,6 +165,7 @@ export async function collectWorkspaceFacts(root: string = Deno.cwd()): Promise<
 async function collectDenoJson(
   root: string,
   member: WorkspaceMember,
+  catalog: Record<string, string>,
   dependencies: DependencyUse[],
   tasks: TaskDefinition[],
 ): Promise<void> {
@@ -173,11 +174,11 @@ async function collectDenoJson(
   const text = await Deno.readTextFile(abs);
   const json = parseJsonc(text) as JsonObject;
   collectTaskDefinitions(member.root === '.' ? null : member, path, text, json, tasks);
-  collectImportMap(member, path, text, json.imports, 'deno.imports', dependencies);
+  collectImportMap(member, path, text, json.imports, catalog, 'deno.imports', dependencies);
   const scopes = json.scopes;
   if (scopes && typeof scopes === 'object' && !Array.isArray(scopes)) {
     for (const value of Object.values(scopes as Record<string, unknown>)) {
-      collectImportMap(member, path, text, value, 'deno.scopes', dependencies);
+      collectImportMap(member, path, text, value, catalog, 'deno.scopes', dependencies);
     }
   }
 }
@@ -206,12 +207,27 @@ function collectImportMap(
   path: string,
   text: string,
   value: unknown,
+  catalog: Record<string, string>,
   source: 'deno.imports' | 'deno.scopes',
   dependencies: DependencyUse[],
 ): void {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return;
-  for (const specifier of Object.values(value as Record<string, unknown>)) {
+  for (const [name, specifier] of Object.entries(value as Record<string, unknown>)) {
     if (typeof specifier !== 'string') continue;
+    if (specifier === 'catalog:') {
+      dependencies.push({
+        registry: 'npm',
+        name,
+        range: catalog[name] ?? '',
+        raw: specifier,
+        source,
+        member,
+        path,
+        line: lineOf(text, `"${name}"`),
+        catalogVersion: catalog[name],
+      });
+      continue;
+    }
     const parsed = parseRegistrySpecifier(specifier);
     if (!parsed) continue;
     dependencies.push({ ...parsed, source, member, path, line: lineOf(text, specifier) });
@@ -280,12 +296,28 @@ async function collectSourceImports(
   dependencies: DependencyUse[],
 ): Promise<void> {
   const memberRoot = join(root, member.root);
+  const nestedConfigDirs: string[] = [];
+  for await (
+    const entry of walk(memberRoot, {
+      match: [/(?:^|\/)deno\.json$/],
+      skip: [/node_modules/, /\.generated/, /_fresh/, /\.deploy/],
+    })
+  ) {
+    const dir = entry.path.slice(0, -'/deno.json'.length);
+    if (normalize(dir) !== normalize(memberRoot)) {
+      nestedConfigDirs.push(`${normalize(dir)}/`);
+    }
+  }
   for await (
     const entry of walk(memberRoot, {
       match: [/\.[cm]?tsx?$/],
       skip: [/node_modules/, /\.generated/, /_fresh/, /\.deploy/],
     })
   ) {
+    const normalizedEntry = normalize(entry.path);
+    if (nestedConfigDirs.some((prefix) => normalizedEntry.startsWith(prefix))) {
+      continue;
+    }
     const path = normalize(relative(root, entry.path));
     const text = await Deno.readTextFile(entry.path);
     for (

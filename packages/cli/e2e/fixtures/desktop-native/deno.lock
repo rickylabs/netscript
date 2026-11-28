@@ -205,8 +205,7 @@
           "jsr:@std/assert@1",
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
-          "jsr:@std/streams@1",
-          "npm:@orpc/server@^1.16.6"
+          "jsr:@std/streams@1"
         ]
       },
       "jsr:@netscript/cli-e2e@0.0.9": {
@@ -215,8 +214,7 @@
           "jsr:@netscript/plugin-streams-core@0.0.9",
           "jsr:@std/assert@1",
           "jsr:@std/fs@1",
-          "jsr:@std/path@1",
-          "npm:@orpc/server@^1.16.6"
+          "jsr:@std/path@1"
         ]
       },
       "jsr:@netscript/cli@0.0.9": {
@@ -256,11 +254,7 @@
           "jsr:@std/path@1"
         ]
       },
-      "jsr:@netscript/contracts@0.0.9": {
-        "dependencies": [
-          "npm:@orpc/contract@^1.16.6"
-        ]
-      },
+      "jsr:@netscript/contracts@0.0.9": {},
       "jsr:@netscript/cron@0.0.9": {
         "dependencies": [
           "jsr:@std/assert@1",
@@ -297,7 +291,6 @@
           "npm:@durable-streams/client@0.2.7",
           "npm:@durable-streams/state@0.3.2",
           "npm:@durable-streams/tanstack-ai-transport@0.0.10",
-          "npm:@orpc/server@^1.16.6",
           "npm:@preact/signals@2.11.4",
           "npm:@tanstack/ai-client@0.39.2",
           "npm:@tanstack/ai-preact@0.20.3",
@@ -324,8 +317,7 @@
         "dependencies": [
           "jsr:@hono/hono@4.13.22",
           "jsr:@logtape/logtape@2",
-          "jsr:@std/assert@1",
-          "npm:@orpc/server@^1.16.6"
+          "jsr:@std/assert@1"
         ]
       },
       "jsr:@netscript/mcp@0.0.9": {
@@ -343,9 +335,7 @@
         "dependencies": [
           "jsr:@netscript/ai@0.0.9",
           "jsr:@netscript/plugin@0.0.9",
-          "jsr:@std/assert@1",
-          "npm:@orpc/contract@^1.16.6",
-          "npm:@orpc/server@^1.16.6"
+          "jsr:@std/assert@1"
         ]
       },
       "jsr:@netscript/plugin-ai@0.0.9": {
@@ -358,9 +348,7 @@
       "jsr:@netscript/plugin-auth-core@0.0.9": {
         "dependencies": [
           "jsr:@netscript/plugin-streams-core@0.0.9",
-          "jsr:@std/assert@1",
-          "npm:@orpc/contract@^1.16.6",
-          "npm:@orpc/server@^1.16.6"
+          "jsr:@std/assert@1"
         ]
       },
       "jsr:@netscript/plugin-auth@0.0.9": {
@@ -468,9 +456,7 @@
           "jsr:@netscript/telemetry@0.0.9",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "jsr:@std/path@1",
-          "npm:@orpc/contract@^1.16.6",
-          "npm:@orpc/server@^1.16.6"
+          "jsr:@std/path@1"
         ]
       },
       "jsr:@netscript/plugin-workers@0.0.9": {
@@ -499,9 +485,7 @@
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
-          "jsr:@std/semver@1",
-          "npm:@orpc/contract@^1.16.6",
-          "npm:@orpc/server@^1.16.6"
+          "jsr:@std/semver@1"
         ]
       },
       "jsr:@netscript/prisma-adapter-mysql@0.0.9": {},
@@ -526,12 +510,6 @@
           "jsr:@netscript/service@0.0.9",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@orpc/client@^1.16.6",
-          "npm:@orpc/contract@^1.16.6",
-          "npm:@orpc/openapi@^1.16.6",
-          "npm:@orpc/server@^1.16.6",
-          "npm:@orpc/tanstack-query@^1.16.6",
-          "npm:@orpc/zod@^1.16.6",
           "npm:@tanstack/db@0.15.2",
           "npm:@tanstack/query-core@^5.108.4",
           "npm:@tanstack/query-db-collection@1.4.8",
@@ -547,11 +525,6 @@
           "jsr:@netscript/telemetry@0.0.9",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@orpc/client@^1.16.6",
-          "npm:@orpc/contract@^1.16.6",
-          "npm:@orpc/openapi@^1.16.6",
-          "npm:@orpc/server@^1.16.6",
-          "npm:@orpc/zod@^1.16.6",
           "npm:rou3@~0.7.12"
         ]
       },

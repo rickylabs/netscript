@@ -5,12 +5,16 @@ import { runLockedProbe } from './run-locked-probe.ts';
 Deno.test('scratch probe rejects npm requirement drift without rewriting its reference lock', async () => {
   const root = await Deno.makeTempDir({ prefix: 'locked-probe-' });
   try {
+    const rootConfig = JSON.parse(
+      await Deno.readTextFile(new URL('../../../../../../../deno.json', import.meta.url)),
+    ) as { catalog: Record<string, string> };
     const committed = JSON.parse(
       await Deno.readTextFile(new URL('../../../../../../../deno.lock', import.meta.url)),
     );
     // Keep the committed npm resolutions; this isolated fixture has no workspace members.
-    const specifier = 'npm:@orpc/client@1.15.0';
+    const specifier = `npm:@orpc/client@${rootConfig.catalog['@orpc/client']}`;
     const version = committed.specifiers[specifier];
+    assertEquals(typeof version, 'string', `Expected committed lock resolution for ${specifier}`);
     const lock = {
       version: committed.version,
       specifiers: { [specifier]: version },
@@ -19,7 +23,7 @@ Deno.test('scratch probe rejects npm requirement drift without rewriting its ref
     };
     const lockPath = join(root, 'deno.lock');
     await Deno.writeTextFile(lockPath, `${JSON.stringify(lock, null, 2)}\n`);
-    const config = { imports: { dependency: 'npm:@orpc/client@1.15.0' } };
+    const config = { imports: { dependency: specifier } };
     const configPath = join(root, 'deno.json');
     await Deno.writeTextFile(configPath, JSON.stringify(config));
     const probe = join(root, 'probe.ts');
@@ -30,9 +34,12 @@ Deno.test('scratch probe rejects npm requirement drift without rewriting its ref
     const locked = await Deno.readTextFile(lockPath);
     await runLockedProbe([probe], root, root);
     assertEquals(await Deno.readTextFile(lockPath), locked);
-    // The newer exact npm requirement is absent from the reference lock. Frozen resolution must
-    // reject it even when the registry/cache could satisfy it; no age-policy timing is involved.
-    config.imports.dependency = 'npm:@orpc/client@1.16.6';
+    // A distinct published npm requirement is absent from the seeded reference lock. Frozen
+    // resolution must reject it even when the registry/cache could satisfy it; no age-policy
+    // timing is involved.
+    const absentSpecifier = 'npm:@orpc/client@1.16.5';
+    assertEquals(absentSpecifier in lock.specifiers, false);
+    config.imports.dependency = absentSpecifier;
     await Deno.writeTextFile(configPath, JSON.stringify(config));
     await assertRejects(
       () => runLockedProbe([probe], root, root),

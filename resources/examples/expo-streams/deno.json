@@ -32,6 +32,12 @@
   },
   "nodeModulesDir": "none",
   "catalog": {
+    "@orpc/client": "^1.16.6",
+    "@orpc/contract": "^1.16.6",
+    "@orpc/openapi": "^1.16.6",
+    "@orpc/server": "^1.16.6",
+    "@orpc/tanstack-query": "^1.16.6",
+    "@orpc/zod": "^1.16.6",
     "zod": "^4.4.3"
   },
   "lock": false

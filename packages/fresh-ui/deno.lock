@@ -4722,6 +4722,7 @@
         ],
         "packageJson": {
           "dependencies": [
+            "npm:@orpc/server@^1.16.6",
             "npm:vite@7.3.8"
           ]
         }
@@ -4751,7 +4752,7 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@orpc/server@^1.16.6"
+            "npm:@orpc/contract@^1.16.6"
           ]
         }
       },
@@ -4817,6 +4818,7 @@
           "dependencies": [
             "npm:@durable-streams/client@0.2.7",
             "npm:@durable-streams/state@0.3.2",
+            "npm:@orpc/server@^1.16.6",
             "npm:@preact/signals@2.11.4",
             "npm:@tanstack/preact-query@^5.108.4",
             "npm:@tanstack/query-core@^5.108.4",
@@ -5068,6 +5070,8 @@
         ],
         "packageJson": {
           "dependencies": [
+            "npm:@orpc/client@^1.16.6",
+            "npm:@orpc/contract@^1.16.6",
             "npm:@orpc/openapi@^1.16.6",
             "npm:@orpc/server@^1.16.6",
             "npm:@orpc/zod@^1.16.6"

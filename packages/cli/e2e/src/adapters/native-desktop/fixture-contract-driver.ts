@@ -119,7 +119,7 @@ async function main(): Promise<void> {
         `desktop fixture import map cannot satisfy the SDK graph it maps by path.\n` +
           `${lines.join('\n')}\n` +
           `Add each specifier to packages/cli/e2e/fixtures/desktop-native/deno.json ` +
-          `at the same pin as packages/sdk/deno.json.`,
+          `at the same pin as the root deno.json catalog.`,
       );
     }
     console.log(
