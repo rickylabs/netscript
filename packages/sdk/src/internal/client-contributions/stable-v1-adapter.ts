@@ -232,14 +232,16 @@ function createTransportPolicy(
 export function createStableV1ClientLink<TContext extends object = object>(
   options: StableV1ClientLinkOptions,
 ): ClientLinkPort<ServiceClientContext & TContext> {
+  // Own outer epoch retries/reconnects whenever contributions OR per-epoch destination resolution
+  // is active, so zero-contribution resolveEpoch streams still re-resolve targets on reconnect.
+  const manageEpochRetries = options.hasContributions || options.resolveEpoch !== undefined;
+
   return {
     async call(path, input, callOptions): Promise<unknown> {
       const signal = callOptions.signal ?? callOptions.context.signal;
       if (signal?.aborted) throw abortReason(signal);
       const state: RetryState = {
-        maxAttempts: options.hasContributions
-          ? await resolveRetryCount(callOptions.context.retry)
-          : 0,
+        maxAttempts: manageEpochRetries ? await resolveRetryCount(callOptions.context.retry) : 0,
         attemptIndex: 0,
       };
 
@@ -268,14 +270,14 @@ export function createStableV1ClientLink<TContext extends object = object>(
         const prepared = await options.preparation.prepare(logicalCall);
         return await createTransportPolicy(
           epoch.link,
-          options.hasContributions,
+          manageEpochRetries,
           lastEventId,
           state,
         ).dispatch(prepared);
       };
 
       const output = await startEpoch(callOptions.lastEventId);
-      if (!options.hasContributions || !isAsyncIterator(output)) return output;
+      if (!manageEpochRetries || !isAsyncIterator(output)) return output;
 
       let current = output;
       let lastEventId = callOptions.lastEventId;

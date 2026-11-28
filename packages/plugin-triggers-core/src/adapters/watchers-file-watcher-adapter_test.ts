@@ -514,3 +514,80 @@ Deno.test('file-watcher active-store probe reports active only inside live adapt
   }
   assertEquals(probe.isActive(), false);
 });
+
+Deno.test('file-watcher active-store probe stays active if unawaited onReady outlives stop()', async () => {
+  const probeSymbol = Symbol.for('@netscript/async-context/active-store-probes');
+  const findProbe = (): { readonly name: string; readonly isActive: () => boolean } | undefined => {
+    const probes: unknown = Reflect.get(globalThis, probeSymbol);
+    if (!(probes instanceof Set)) return undefined;
+    for (const candidate of probes) {
+      if (
+        candidate !== null &&
+        typeof candidate === 'object' &&
+        'name' in candidate &&
+        candidate.name === '@netscript/plugin-triggers-core.fileWatcherCallback'
+      ) {
+        return candidate as { readonly name: string; readonly isActive: () => boolean };
+      }
+    }
+    return undefined;
+  };
+
+  const probe = findProbe();
+  assert(
+    probe !== undefined,
+    'Expected @netscript/plugin-triggers-core.fileWatcherCallback probe to be registered',
+  );
+  assertEquals(probe.isActive(), false);
+
+  const watchingEntered = Promise.withResolvers<void>();
+  const releaseWatching = Promise.withResolvers<void>();
+  const watchingDone = Promise.withResolvers<void>();
+  const stopSource = Promise.withResolvers<void>();
+
+  let activeBeforeStop = false;
+  let activeAfterStop = false;
+
+  const adapter = new WatchersFileWatcherAdapter({
+    watcherFactory: (options) => ({
+      watch() {
+        return {
+          [Symbol.asyncIterator]() {
+            return {
+              async next() {
+                // Deliberately start onReady() without awaiting it so stop() can drain the watch
+                // task while the status callback is still suspended.
+                void options.onReady?.();
+                await stopSource.promise;
+                return { done: true as const, value: undefined };
+              },
+            };
+          },
+        };
+      },
+      stop: () => stopSource.resolve(),
+    }),
+    onStatusChange: async (event) => {
+      if (event.state !== 'watching') return;
+      activeBeforeStop = probe.isActive();
+      watchingEntered.resolve();
+      await releaseWatching.promise;
+      activeAfterStop = probe.isActive();
+      watchingDone.resolve();
+    },
+  });
+
+  await adapter.watch(definition('/incoming', 'unawaited-ready'), () => Promise.resolve());
+  await deadline(watchingEntered.promise, 5_000);
+
+  // Stop drains record.task while the unawaited onReady status callback is still suspended.
+  await adapter.stop();
+  assertEquals(probe.isActive(), false);
+
+  releaseWatching.resolve();
+  await deadline(watchingDone.promise, 5_000);
+
+  assertEquals(activeBeforeStop, true);
+  assertEquals(activeAfterStop, true);
+  assertEquals(probe.isActive(), false);
+});

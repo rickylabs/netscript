@@ -350,3 +350,162 @@ Deno.test('createStableV1ClientLink resolveEpoch resolves before prepare, pins r
     { target: 'app-2', header: 'stream-2', lastEventId: 'ev-1' },
   ]);
 });
+
+Deno.test('createTracedRpcFetch preserves init.signal and init.cache when SDK context omits overrides', async () => {
+  const captured: Array<{
+    readonly cache: RequestCache | undefined;
+    readonly hasSignalKey: boolean;
+    readonly signal: AbortSignal | null | undefined;
+  }> = [];
+
+  const tracedFetch = createTracedRpcFetch({
+    serviceName: 'orders',
+    propagateTraceContext: false,
+    transportFetch: (_input, init) => {
+      captured.push({
+        cache: init?.cache,
+        hasSignalKey: init !== undefined && 'signal' in init,
+        signal: init?.signal,
+      });
+      return Promise.resolve(new Response('ok', { status: 200 }));
+    },
+  });
+
+  // 1. oRPC v2 URL-string call with init.cache and init.signal, empty SDK metadata context.
+  const v2Controller = new AbortController();
+  await tracedFetch(
+    'https://orders.in-process.localhost/api/rpc/v1/orders/echo',
+    {
+      method: 'GET',
+      cache: 'no-store',
+      signal: v2Controller.signal,
+      headers: { authorization: 'Bearer v2-sig' },
+    },
+    {},
+  );
+  assertEquals(captured[0].cache, 'no-store');
+  assertEquals(captured[0].hasSignalKey, true);
+  assertEquals(captured[0].signal, v2Controller.signal);
+  v2Controller.abort(new Error('v2-cancelled'));
+  assertEquals(captured[0].signal?.aborted, true);
+
+  // 2. oRPC v1 Request call without context.signal must omit `signal` key on init so adapters can
+  //    fall back to `request.signal` without seeing `{ signal: undefined }`.
+  const reqController = new AbortController();
+  await tracedFetch(
+    new Request('https://orders.in-process.localhost/api/rpc/v1/orders/echo', {
+      method: 'POST',
+      signal: reqController.signal,
+    }),
+    { signal: undefined, cache: undefined },
+    {},
+  );
+  assertEquals(captured[1].cache, undefined);
+  assertEquals(captured[1].hasSignalKey, false);
+  assertEquals(captured[1].signal, undefined);
+
+  // 3. Explicit SDK context overrides still take precedence when defined.
+  const ctxController = new AbortController();
+  await tracedFetch(
+    'https://orders.in-process.localhost/api/rpc/v1/orders/echo',
+    {
+      method: 'GET',
+      cache: 'default',
+      signal: v2Controller.signal,
+    },
+    {
+      context: {
+        cache: 'force-cache',
+        signal: ctxController.signal,
+      },
+    },
+  );
+  assertEquals(captured[2].cache, 'force-cache');
+  assertEquals(captured[2].signal, ctxController.signal);
+});
+
+Deno.test('createStableV1ClientLink with zero contributions re-resolves target on real shared RPCLink stream reconnect', async () => {
+  const { createFetchRpcClientLink } = await import('../../src/internal/fetch-rpc-link.ts');
+  const contract = createContract();
+  const transportPolicy = resolveTransportPolicy(contract);
+  const encoder = new TextEncoder();
+
+  const firstStream = [
+    'event: message\nid: ev-1\ndata: {"json":{"app":"app-1","seq":1}}\n\n',
+    'event: error\ndata: {"json":{"defined":false,"code":"INTERNAL_SERVER_ERROR","status":500,"message":"drop"}}\n\n',
+  ].join('');
+  const secondStream = [
+    'event: message\nid: ev-2\ndata: {"json":{"app":"app-2","seq":2}}\n\n',
+    'event: done\ndata: {"json":null}\n\n',
+  ].join('');
+
+  const observed: Array<{ readonly app: string; readonly lastEventId: string | null }> = [];
+  let activeApp: 'app-1' | 'app-2' = 'app-1';
+  let resolveEpochCount = 0;
+
+  const makeSharedLink = (appId: 'app-1' | 'app-2', body: string) =>
+    createFetchRpcClientLink({
+      transportPolicy,
+      serviceName: 'orders',
+      propagateTraceContext: false,
+      getTraceHeaders: () => ({}),
+      fetch: (input, init) => {
+        const headers = new Headers(
+          init?.headers ?? (input instanceof Request ? input.headers : undefined),
+        );
+        observed.push({ app: appId, lastEventId: headers.get('last-event-id') });
+        if (appId === 'app-1') {
+          activeApp = 'app-2';
+        }
+        return Promise.resolve(
+          new Response(encoder.encode(body), {
+            status: 200,
+            headers: { 'content-type': 'text/event-stream' },
+          }),
+        );
+      },
+    });
+
+  const links = {
+    'app-1': makeSharedLink('app-1', firstStream),
+    'app-2': makeSharedLink('app-2', secondStream),
+  };
+
+  const clientLink = createStableV1ClientLink({
+    transportPolicy,
+    preparation: createPreparedOutboundHeadersPort([]),
+    resolveEpoch: (): StableV1ResolvedEpoch => {
+      resolveEpochCount += 1;
+      return {
+        transport: Object.freeze({
+          kind: 'http' as const,
+          origin: new URL('https://orders.in-process.localhost'),
+          rpcPath: '/api/rpc/v1/orders',
+          secure: true,
+        }),
+        link: links[activeApp],
+      };
+    },
+    hasContributions: false,
+  });
+
+  const iterator = await clientLink.call(
+    ['echo'],
+    { stream: true },
+    { context: { retry: 1, retryDelay: 0 } },
+  );
+  assert(isAsyncIterator(iterator));
+  const first = await iterator.next();
+  const second = await iterator.next();
+  const third = await iterator.next();
+  await iterator.return?.();
+
+  assertEquals(first, { done: false, value: { app: 'app-1', seq: 1 } });
+  assertEquals(second, { done: false, value: { app: 'app-2', seq: 2 } });
+  assertEquals(third, { done: true, value: null });
+  assertEquals(resolveEpochCount, 2);
+  assertEquals(observed, [
+    { app: 'app-1', lastEventId: null },
+    { app: 'app-2', lastEventId: 'ev-1' },
+  ]);
+});

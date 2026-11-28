@@ -151,12 +151,21 @@ export function createTracedRpcFetch(
             headers.set(key, value);
           }
         }
-        return await options.transportFetch(request, {
+        const nextInit: RequestInit = {
           ...init,
           headers,
-          cache: context?.cache,
-          signal: context?.signal,
-        });
+        };
+        if (context?.cache !== undefined) {
+          nextInit.cache = context.cache;
+        } else if ('cache' in nextInit && nextInit.cache === undefined) {
+          delete nextInit.cache;
+        }
+        if (context?.signal !== undefined) {
+          nextInit.signal = context.signal;
+        } else if ('signal' in nextInit && nextInit.signal === undefined) {
+          delete nextInit.signal;
+        }
+        return await options.transportFetch(request, nextInit);
       },
       {
         kind: SpanKind.CLIENT,

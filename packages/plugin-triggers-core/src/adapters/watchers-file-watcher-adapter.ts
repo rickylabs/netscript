@@ -130,6 +130,7 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
   readonly #maxDelayMs: number;
   readonly #tasks = new Set<Promise<void>>();
   readonly #callbackScope = new AsyncLocalStorage<WatchCallbackScope>();
+  #activeCallbacks = 0;
   #sequence = 0;
 
   /** Create a file-watch adapter with optional watcher and clock injection. */
@@ -180,10 +181,7 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
     this.#tasks.add(record.task);
     void record.task.finally(() => {
       this.#tasks.delete(record.task);
-      if (this.#tasks.size === 0) {
-        this.#callbackScope.disable();
-        activeCallbackScopes.delete(this.#callbackScope);
-      }
+      this.#maybeDisableCallbackScope();
     });
     return handle;
   }
@@ -311,11 +309,22 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
 
   async #invokeCallback(callback: () => void | Promise<void>): Promise<void> {
     const scope: WatchCallbackScope = { active: true };
+    this.#activeCallbacks += 1;
+    activeCallbackScopes.add(this.#callbackScope);
     try {
       await this.#callbackScope.run(scope, callback);
     } finally {
       // A timer spawned by a finished callback is an external caller when it later runs.
       scope.active = false;
+      this.#activeCallbacks -= 1;
+      this.#maybeDisableCallbackScope();
+    }
+  }
+
+  #maybeDisableCallbackScope(): void {
+    if (this.#tasks.size === 0 && this.#activeCallbacks === 0) {
+      this.#callbackScope.disable();
+      activeCallbackScopes.delete(this.#callbackScope);
     }
   }
 
