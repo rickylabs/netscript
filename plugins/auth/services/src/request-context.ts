@@ -10,6 +10,28 @@ import type { AuthServiceInitialContext, AuthServiceRequest } from './routers/v1
 type AuthRequestScope = Readonly<{ request: AuthServiceRequest; responseHeaders: Headers }>;
 
 const authRequestStorage = new AsyncLocalStorage<AuthRequestScope>();
+const ACTIVE_STORE_PROBES_SYMBOL = Symbol.for('@netscript/async-context/active-store-probes');
+
+interface ActiveAsyncStoreProbe {
+  readonly name: string;
+  readonly isActive: () => boolean;
+}
+
+const AUTH_REQUEST_ACTIVE_STORE_PROBE: ActiveAsyncStoreProbe = Object.freeze({
+  name: '@netscript/plugin-auth.requestContext',
+  isActive: () => authRequestStorage.getStore() !== undefined,
+});
+
+function registerAuthRequestActiveStoreProbe(): void {
+  const existing: unknown = Reflect.get(globalThis, ACTIVE_STORE_PROBES_SYMBOL);
+  const registry = existing instanceof Set ? existing : new Set<ActiveAsyncStoreProbe>();
+  if (!(existing instanceof Set)) {
+    Reflect.set(globalThis, ACTIVE_STORE_PROBES_SYMBOL, registry);
+  }
+  registry.add(AUTH_REQUEST_ACTIVE_STORE_PROBE);
+}
+
+registerAuthRequestActiveStoreProbe();
 
 type HonoRequestContext = Readonly<{ req: { raw: Request }; res: Response }>;
 

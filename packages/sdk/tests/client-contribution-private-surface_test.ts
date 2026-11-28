@@ -3,6 +3,8 @@ import { assert, assertEquals, assertFalse } from '@std/assert';
 
 const PRIVATE_ADAPTER_NAMES = [
   'createHttpClientLink',
+  'createFetchRpcClientLink',
+  'createTracedRpcFetch',
   'ClientLinkPort',
   'ClientLinkCallOptions',
   'SdkClientLogicalCall',
@@ -11,6 +13,7 @@ const PRIVATE_ADAPTER_NAMES = [
   'PreparedOutboundHeadersPort',
   'ProcedureMetadataPort',
   'ClientTransportPolicyPort',
+  'StableV1ResolvedEpoch',
   'stableV1PreparedCall',
   'resolveTransportPolicy',
   'ResolvedTransportPolicy',
@@ -43,6 +46,7 @@ const REJECTED_PACKED_IMPORTS = [
   '@netscript/sdk/internal/client-contributions/adapter-ports',
   '@netscript/sdk/client-contributions',
   '@netscript/sdk/internal/transport-policy',
+  '@netscript/sdk/internal/fetch-rpc-link',
 ] as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {

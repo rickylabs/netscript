@@ -35,17 +35,36 @@ interface RetryState {
   lastEventRetry?: number;
 }
 
-/** Inputs needed to compose the private stable-v1 logical-call wrapper. */
-export interface StableV1ClientLinkOptions {
+/** Per-epoch resolved transport descriptor and bound link kept private to `startEpoch()`. */
+export interface StableV1ResolvedEpoch {
+  readonly transport: SdkClientTransportDescriptor;
   readonly link: ClientLinkPort<
     StableV1TransportContext<object>,
     PreparedSdkClientCall<object>
   >;
+}
+
+interface StableV1ClientLinkBaseOptions {
   readonly preparation: PreparedOutboundHeadersPort;
   readonly transportPolicy: ResolvedTransportPolicy;
-  readonly resolveTransport: () => SdkClientTransportDescriptor;
   readonly hasContributions: boolean;
 }
+
+/** Inputs needed to compose the private stable-v1 logical-call wrapper. */
+export type StableV1ClientLinkOptions =
+  | (StableV1ClientLinkBaseOptions & {
+    readonly link: ClientLinkPort<
+      StableV1TransportContext<object>,
+      PreparedSdkClientCall<object>
+    >;
+    readonly resolveTransport: () => SdkClientTransportDescriptor;
+    readonly resolveEpoch?: never;
+  })
+  | (StableV1ClientLinkBaseOptions & {
+    readonly resolveEpoch: () => StableV1ResolvedEpoch;
+    readonly link?: never;
+    readonly resolveTransport?: never;
+  });
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -213,14 +232,16 @@ function createTransportPolicy(
 export function createStableV1ClientLink<TContext extends object = object>(
   options: StableV1ClientLinkOptions,
 ): ClientLinkPort<ServiceClientContext & TContext> {
+  // Own outer epoch retries/reconnects whenever contributions OR per-epoch destination resolution
+  // is active, so zero-contribution resolveEpoch streams still re-resolve targets on reconnect.
+  const manageEpochRetries = options.hasContributions || options.resolveEpoch !== undefined;
+
   return {
     async call(path, input, callOptions): Promise<unknown> {
       const signal = callOptions.signal ?? callOptions.context.signal;
       if (signal?.aborted) throw abortReason(signal);
       const state: RetryState = {
-        maxAttempts: options.hasContributions
-          ? await resolveRetryCount(callOptions.context.retry)
-          : 0,
+        maxAttempts: manageEpochRetries ? await resolveRetryCount(callOptions.context.retry) : 0,
         attemptIndex: 0,
       };
 
@@ -231,26 +252,32 @@ export function createStableV1ClientLink<TContext extends object = object>(
           input,
           callOptions.context,
         );
+        const epoch: StableV1ResolvedEpoch = options.resolveEpoch !== undefined
+          ? options.resolveEpoch()
+          : {
+            transport: options.resolveTransport(),
+            link: options.link,
+          };
         const logicalCall: SdkClientLogicalCall<TContext> = Object.freeze({
           context: callOptions.context,
           procedurePath: transportPolicy.procedure.path,
           procedure: transportPolicy.procedure,
           transportPolicy,
-          transport: options.resolveTransport(),
+          transport: epoch.transport,
           input,
           signal,
         });
         const prepared = await options.preparation.prepare(logicalCall);
         return await createTransportPolicy(
-          options.link,
-          options.hasContributions,
+          epoch.link,
+          manageEpochRetries,
           lastEventId,
           state,
         ).dispatch(prepared);
       };
 
       const output = await startEpoch(callOptions.lastEventId);
-      if (!options.hasContributions || !isAsyncIterator(output)) return output;
+      if (!manageEpochRetries || !isAsyncIterator(output)) return output;
 
       let current = output;
       let lastEventId = callOptions.lastEventId;
