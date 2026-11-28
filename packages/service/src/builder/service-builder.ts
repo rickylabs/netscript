@@ -32,7 +32,10 @@
 
 import type { LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
-import type { ServiceRateLimitOptions } from '../rate-limit/middleware/options.ts';
+import type {
+  ServiceProcedureRateLimitOptions,
+  ServiceRateLimitOptions,
+} from '../rate-limit/middleware/options.ts';
 import type { ServiceBodyLimitOptions } from '../primitives/body-limit.ts';
 import type { HealthCheck, HealthCheckAdapterOptions } from '../primitives/health.ts';
 import type {
@@ -180,6 +183,36 @@ export interface ServiceBuilder<
    * ```
    */
   withRateLimit(options: ServiceRateLimitOptions): ServiceBuilder<TRouter, TCustom>;
+
+  /**
+   * Adds a procedure-level rate-limit stage over an RFC 0008 {@link RateLimitStore}.
+   *
+   * Runs inside the oRPC procedure pipeline after authentication and authorization
+   * (and before Zod input validation), deriving `Retry-After` from
+   * `decision.retryAt ?? decision.resetAt` and emitting HTTP `Retry-After` via
+   * oRPC's `ResponseHeadersPlugin`. Must use a disjoint `RateLimitStore` instance /
+   * serialized key prefix from any HTTP-edge `withRateLimit()` stage.
+   *
+   * @param options - Quota bounds, disjoint store, optional key resolver, and IPv6 prefix.
+   * @returns This configured builder.
+   * @example
+   * ```ts
+   * import { createService } from '@netscript/service';
+   * import { createMemoryRateLimitStore } from '@netscript/service/rate-limit';
+   * const app = createService({}, { name: 'orders' })
+   *   .withProcedureRateLimit({
+   *     limit: 120,
+   *     windowMs: 60_000,
+   *     store: createMemoryRateLimitStore(),
+   *   })
+   *   .withRPC()
+   *   .build();
+   * void app;
+   * ```
+   */
+  withProcedureRateLimit(
+    options: ServiceProcedureRateLimitOptions,
+  ): ServiceBuilder<TRouter, TCustom>;
 
   /** Sets the per-request oRPC context factory. */
   withContext<TNext extends object>(

@@ -24,11 +24,12 @@
 
 import { RPCHandler } from '@orpc/server/fetch';
 import { OpenAPIHandler } from '@orpc/openapi/fetch';
-import { CORSPlugin } from '@orpc/server/plugins';
+import { CORSPlugin, ResponseHeadersPlugin } from '@orpc/server/plugins';
 import { experimental_ZodSmartCoercionPlugin as ZodSmartCoercionPlugin } from '@orpc/zod/zod4';
 import { createServiceLogger } from '@netscript/logger';
 import { LoggingPlugin } from '@netscript/logger/orpc';
 import { ErrorHandlingPlugin, TracingPlugin } from '@netscript/telemetry/orpc';
+import { PROCEDURE_RESPONSE_HEADERS_SYMBOL } from '../middleware/procedure-pipeline.ts';
 import type {
   FetchHandler,
   ServiceErrorHandler,
@@ -62,6 +63,14 @@ export interface RPCHandlerConfig {
   redactFields?: readonly string[];
   /** Optional error-code to HTTP-status map forwarded to tracing, logging, and error-handling plugins. */
   errorStatusMap?: Readonly<Record<string, number>>;
+  /**
+   * Enable oRPC `ResponseHeadersPlugin` so procedure middleware (such as
+   * `withProcedureRateLimit()`) can emit HTTP response headers like `Retry-After`
+   * without breaking application-owned non-`Headers` `resHeaders` context fields.
+   * Defaults to `false` unless opted in (enabled automatically by `ServiceBuilder`
+   * when procedure rate limits are configured).
+   */
+  responseHeaders?: boolean;
 }
 
 /**
@@ -111,6 +120,15 @@ export function createRPCPlugins(config: RPCHandlerConfig): ServiceHandlerPlugin
         errorStatusMap: config.errorStatusMap,
       }),
     );
+  }
+
+  // Response headers plugin (enabled when opted in, e.g. by ServiceBuilder.withProcedureRateLimit()).
+  // Skip adding a second instance if the caller already supplied ResponseHeadersPlugin in config.plugins.
+  const hasCallerResponseHeadersPlugin = config.plugins?.some(
+    (plugin) => plugin instanceof ResponseHeadersPlugin,
+  ) ?? false;
+  if (config.responseHeaders === true && !hasCallerResponseHeadersPlugin) {
+    plugins.push(createSafeResponseHeadersPlugin());
   }
 
   // CORS plugin
@@ -249,4 +267,108 @@ export function createErrorHandler(serviceName: string): ServiceErrorHandler {
       500,
     );
   };
+}
+
+type UpstreamResponseHeadersInitOptions = Parameters<
+  InstanceType<typeof ResponseHeadersPlugin>['init']
+>[0];
+
+type UpstreamRootInterceptor = NonNullable<
+  UpstreamResponseHeadersInitOptions['rootInterceptors']
+>[number];
+
+interface StandardMatchedResult {
+  readonly matched: true;
+  readonly response: {
+    readonly headers: Record<string, string | string[] | undefined>;
+  };
+}
+
+/**
+ * Wraps oRPC's `ResponseHeadersPlugin` so normal requests delegate directly to
+ * upstream `context.resHeaders`, while requests whose caller context already
+ * owns a non-`Headers` `resHeaders` property keep that value intact and channel
+ * procedure-emitted headers (like `Retry-After`) through a private `Headers` slot.
+ */
+function createSafeResponseHeadersPlugin(): ServiceHandlerPlugin {
+  const upstream = new ResponseHeadersPlugin();
+
+  return {
+    name: 'netscript-response-headers',
+    init(handlerOptions: unknown): unknown {
+      if (!isUpstreamResponseHeadersInitOptions(handlerOptions)) return handlerOptions;
+      const captured: UpstreamResponseHeadersInitOptions = { rootInterceptors: [] };
+      upstream.init(captured);
+      const upstreamInterceptor = captured.rootInterceptors?.[0];
+      if (!upstreamInterceptor) return handlerOptions;
+
+      const safeInterceptor: UpstreamRootInterceptor = async (interceptorOptions) => {
+        const ctx = interceptorOptions.context as Record<PropertyKey, unknown> | undefined;
+        const callerResHeaders = ctx?.resHeaders;
+        if (callerResHeaders === undefined || callerResHeaders instanceof Headers) {
+          return await upstreamInterceptor(interceptorOptions);
+        }
+
+        const privateHeaders = new Headers();
+        const nextContext = Object.assign({}, interceptorOptions.context, {
+          [PROCEDURE_RESPONSE_HEADERS_SYMBOL]: privateHeaders,
+        });
+        const result = await interceptorOptions.next({
+          ...interceptorOptions,
+          context: nextContext,
+        });
+
+        if (!isStandardMatchedResult(result)) {
+          return result;
+        }
+
+        let hasHeaders = false;
+        const mergedHeaders: Record<string, string | string[] | undefined> = {
+          ...result.response.headers,
+        };
+        for (const [key, value] of privateHeaders) {
+          hasHeaders = true;
+          const existing = mergedHeaders[key];
+          if (Array.isArray(existing)) {
+            mergedHeaders[key] = [...existing, value];
+          } else if (existing !== undefined) {
+            mergedHeaders[key] = [existing, value];
+          } else {
+            mergedHeaders[key] = value;
+          }
+        }
+
+        if (!hasHeaders) {
+          return result;
+        }
+
+        return {
+          ...result,
+          response: {
+            ...result.response,
+            headers: mergedHeaders,
+          },
+        };
+      };
+
+      handlerOptions.rootInterceptors ??= [];
+      handlerOptions.rootInterceptors.push(safeInterceptor);
+      return handlerOptions;
+    },
+  };
+}
+
+function isUpstreamResponseHeadersInitOptions(
+  value: unknown,
+): value is UpstreamResponseHeadersInitOptions {
+  return typeof value === 'object' && value !== null;
+}
+
+function isStandardMatchedResult(value: unknown): value is StandardMatchedResult {
+  if (typeof value !== 'object' || value === null) return false;
+  if (Reflect.get(value, 'matched') !== true) return false;
+  const response = Reflect.get(value, 'response');
+  return typeof response === 'object' && response !== null &&
+    typeof Reflect.get(response, 'headers') === 'object' &&
+    Reflect.get(response, 'headers') !== null;
 }

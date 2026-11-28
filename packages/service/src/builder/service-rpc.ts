@@ -32,6 +32,8 @@ export interface RpcWiringOptions {
   }[];
   /** Optional RPC-only router; the main router remains the OpenAPI source. */
   rpcRouter?: ServiceRouter;
+  /** Enable oRPC response-header emission for procedure middleware (for example `Retry-After`). */
+  responseHeaders?: boolean;
 }
 
 const warnedLegacyRpcPaths = new Set<string>();
@@ -63,10 +65,15 @@ export function wireRpc(
   options?: RpcWiringOptions,
 ): void {
   const { rpcPath, apiPath } = resolveRpcWiringPaths(options);
-  const logging = { serviceName, debug: options?.debug, redactFields: options?.redactFields };
+  const handlerConfig = {
+    serviceName,
+    debug: options?.debug,
+    redactFields: options?.redactFields,
+    ...(options?.responseHeaders ? { responseHeaders: true } : {}),
+  };
 
-  const rpcHandler = createRPCHandler(options?.rpcRouter ?? router, logging);
-  const openApiHandler = createOpenAPIHandler(router, logging);
+  const rpcHandler = createRPCHandler(options?.rpcRouter ?? router, handlerConfig);
+  const openApiHandler = createOpenAPIHandler(router, handlerConfig);
 
   registerRpcPath(app, rpcHandler, rpcPath, buildContext, (c) => {
     for (const route of options?.deprecatedRpcRoutes ?? []) {

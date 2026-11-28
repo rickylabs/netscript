@@ -10,7 +10,13 @@ export {
   type RateLimitRequest,
 } from './domain/rate-limit.ts';
 export type { RateLimitPolicyConfig, RateLimitStore } from './ports/rate-limit-store.ts';
-export type { ServiceProxyTrust, ServiceRateLimitOptions } from './middleware/options.ts';
+export type {
+  ProcedureRateLimitKeyContext,
+  ServiceProcedureRateLimitOptions,
+  ServiceProxyTrust,
+  ServiceRateLimitOptions,
+} from './middleware/options.ts';
+export type { Principal } from '../auth/types.ts';
 export { resolveServiceClientAddress } from './middleware/client-address.ts';
 export { createRateLimitMiddleware } from './middleware/rate-limit-middleware.ts';
 export {

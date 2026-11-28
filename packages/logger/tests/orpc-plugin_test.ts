@@ -350,3 +350,131 @@ Deno.test('LoggingPlugin exposes stable name, return-based init, and errorStatus
     await reset();
   }
 });
+
+Deno.test('LoggingPlugin preserves incoming context.requestId or x-request-id header and exposes it to handlers', async () => {
+  const records: LogRecord[] = [];
+  await configure({
+    reset: true,
+    sinks: { memory: (record: LogRecord) => records.push(record) },
+    loggers: [
+      { category: CATEGORY, sinks: ['memory'], lowestLevel: 'debug' },
+      { category: ['logtape', 'meta'], sinks: [], lowestLevel: 'warning' },
+    ],
+  });
+
+  try {
+    const observedRequestIds: Array<string | undefined> = [];
+    const router = {
+      ping: os.$context<{ requestId?: string }>().handler(({ context }) => {
+        observedRequestIds.push(context.requestId);
+        return { requestId: context.requestId ?? null };
+      }),
+    };
+    const plugin: HandlerPlugin = new LoggingPlugin({
+      serviceName: 'orders',
+      debug: true,
+      logger: getLogger(CATEGORY),
+    }) as HandlerPlugin;
+    const handler = new RPCHandler(router, { plugins: [plugin] });
+
+    const invoke = async (context: Record<string, unknown>) => {
+      const request = new Request('http://localhost/rpc/ping', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ json: {} }),
+      });
+      const { matched, response } = await handler.handle(request, { prefix: '/rpc', context });
+      assert(matched && response);
+      return await response.json() as { json: { requestId: string | null } };
+    };
+
+    // 1. Direct context.requestId is preserved across root logs, procedure logs, and handler context.
+    const directBody = await invoke({ requestId: '  req-direct-1  ' });
+    assertEquals(directBody.json.requestId, 'req-direct-1');
+
+    // 2. Fallback to headers['X-Request-ID'] (case-insensitive) when requestId is blank/absent.
+    const headerBody = await invoke({
+      requestId: '   ',
+      headers: { 'X-Request-ID': 'req-header-2' },
+    });
+    assertEquals(headerBody.json.requestId, 'req-header-2');
+
+    // 3. Headers instance is also supported.
+    const headersInstanceBody = await invoke({
+      headers: new Headers({ 'x-request-id': 'req-headers-3' }),
+    });
+    assertEquals(headersInstanceBody.json.requestId, 'req-headers-3');
+
+    // 4. Absent requestId mints one shared across root log, procedure log, and handler context.
+    const beforeMinted = records.length;
+    const mintedBody = await invoke({});
+    assert(
+      typeof mintedBody.json.requestId === 'string' && mintedBody.json.requestId.length > 0,
+      'minted requestId must be non-empty',
+    );
+    const mintedRecords = records.slice(beforeMinted);
+    for (const msg of ['RPC request started', 'RPC procedure started', 'RPC request completed']) {
+      const found = recordsWith(mintedRecords, msg);
+      assertEquals(found.length, 1, `expected one "${msg}" record`);
+      assertEquals(requestIdOf(found[0]), mintedBody.json.requestId);
+    }
+
+    assertEquals(observedRequestIds.slice(0, 3), [
+      'req-direct-1',
+      'req-header-2',
+      'req-headers-3',
+    ]);
+    const allRootIds = recordsWith(records, 'RPC request started').map(requestIdOf);
+    const allProcIds = recordsWith(records, 'RPC procedure started').map(requestIdOf);
+    assertEquals(allRootIds, [
+      'req-direct-1',
+      'req-header-2',
+      'req-headers-3',
+      mintedBody.json.requestId,
+    ]);
+    assertEquals(allProcIds, allRootIds);
+
+    // 5. Incompatible caller-owned requestId (for example numeric 42) is never overwritten,
+    //    while logs still correlate via private correlation symbol or incoming header.
+    const observedNumeric: unknown[] = [];
+    const numericRouter = {
+      ping: os.$context<{ requestId: number; headers?: Record<string, string> }>().handler(
+        ({ context }) => {
+          observedNumeric.push(context.requestId);
+          return { requestId: context.requestId };
+        },
+      ),
+    };
+    const numericHandler = new RPCHandler(numericRouter, { plugins: [plugin] });
+    const beforeNumeric = records.length;
+    const numericRes = await numericHandler.handle(
+      new Request('http://localhost/rpc/ping', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ json: {} }),
+      }),
+      {
+        prefix: '/rpc',
+        context: {
+          requestId: 42,
+          headers: { 'x-request-id': 'corr-numeric-42' },
+        },
+      },
+    );
+    assert(numericRes.matched && numericRes.response);
+    const numericBody = await numericRes.response.json() as { json: { requestId: number } };
+    assertEquals(numericBody.json.requestId, 42);
+    assertEquals(observedNumeric, [42]);
+    const numericLogs = records.slice(beforeNumeric);
+    assertEquals(
+      recordsWith(numericLogs, 'RPC request started').map(requestIdOf),
+      ['corr-numeric-42'],
+    );
+    assertEquals(
+      recordsWith(numericLogs, 'RPC procedure started').map(requestIdOf),
+      ['corr-numeric-42'],
+    );
+  } finally {
+    await reset();
+  }
+});

@@ -1,7 +1,8 @@
 import { assertEquals } from '@std/assert';
 import { baseContract, SuccessSchema } from '@netscript/contracts';
-import { createService } from '../mod.ts';
+import { createService, SERVICE_PIPELINE_ERROR_CODES, ServicePipelineConfigError } from '../mod.ts';
 import { createScopeAuthorizer } from '../src/auth/mod.ts';
+import { createMemoryRateLimitStore } from '../src/rate-limit/mod.ts';
 import type {
   AuthorizerPort,
   AuthzOptions,
@@ -18,10 +19,13 @@ import type {
   Principal,
   ProcedureAccessPolicy,
   ProcedurePolicyResolver,
+  ProcedureRateLimitKeyContext,
   ServiceBuilder,
   ServiceHandlerContext,
   ServiceHandlerPlugin,
   ServiceMiddleware,
+  ServicePipelineErrorCode,
+  ServiceProcedureRateLimitOptions,
   ServiceRouter,
 } from '../mod.ts';
 
@@ -36,12 +40,24 @@ Deno.test('public structural types are assignable through builder APIs', () => {
     await next();
   };
 
+  const procedureRateLimitOptions: ServiceProcedureRateLimitOptions = {
+    limit: 60,
+    windowMs: 60_000,
+    store: createMemoryRateLimitStore(),
+    key: (ctx: ProcedureRateLimitKeyContext) =>
+      `${ctx.principal?.subject ?? ctx.clientAddress ?? 'anon'}:${ctx.procedurePath.join('.')}`,
+  };
+  const pipelineErrorCode: ServicePipelineErrorCode =
+    SERVICE_PIPELINE_ERROR_CODES.CROSS_SERVICE_MOUNT;
+  const pipelineError = new ServicePipelineConfigError(pipelineErrorCode, 'duplicate mount');
+
   const builder: ServiceBuilder<ServiceRouter, { readonly tenant: 'alpha' }> = createService(
     router,
     { name: 'types' },
   )
     .withCors(corsOptions)
     .withDatabase({ primary: database }, database)
+    .withProcedureRateLimit(procedureRateLimitOptions)
     .withContext(contextFactory)
     .use(middleware)
     .route('get', '/ping', () => new Response('pong'));
@@ -50,8 +66,15 @@ Deno.test('public structural types are assignable through builder APIs', () => {
 
   const handlerContext: ServiceHandlerContext<{ readonly tenant: 'alpha' }> = {
     tenant: 'alpha',
+    requestId: 'req-1',
     principal: undefined,
   };
+  const numericRequestIdContext: ServiceHandlerContext<{ readonly requestId: number }> = {
+    requestId: 42,
+  };
+  const preservedNumericId: number = numericRequestIdContext.requestId;
+  assertEquals(preservedNumericId, 42);
+  assertEquals(pipelineError.code, 'ROUTER_CLIENT_CROSS_SERVICE_MOUNT');
   const principal: Principal | undefined = handlerContext.principal;
 
   const policy: ProcedureAccessPolicy = {

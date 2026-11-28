@@ -116,7 +116,8 @@ export function injectLogger(ctx: LoggerMiddlewareContext, logger: Logger): void
  * @returns The request ID.
  */
 export function injectRequestId(ctx: LoggerMiddlewareContext): string {
-  const requestId = ctx.req.header(REQUEST_ID_HEADER) ?? generateRequestId();
+  const incoming = ctx.req.header(REQUEST_ID_HEADER)?.trim();
+  const requestId = incoming && incoming.length > 0 ? incoming : generateRequestId();
   ctx.set('requestId', requestId);
   return requestId;
 }
