@@ -42,14 +42,13 @@ export function generateAspireConfig(options?: AspireConfigOptions): string {
  * generated `.helpers/register-*.ts` call (e.g. `builder.addPostgres(...)`)
  * throws at runtime.
  *
- * ### Deno orchestration — intentionally no NuGet
+ * ### First-party Deno orchestration (`Aspire.Hosting.JavaScript`)
  *
- * Aspire 13.5 can project the CommunityToolkit Deno integration's
- * `addDenoApp(...)` and `addDenoTask(...)` APIs after restore. NetScript 0.0.7
- * deliberately keeps the SDK primitive `builder.addExecutable('deno', ...)`
- * until the S12 adoption slice proves the projected integration through the
- * full scaffold runtime gate. First-party Deno hosting is scheduled upstream
- * for Aspire 13.6 (aspire#18627, aspire#18628, and aspire#16218).
+ * Aspire 17.0 ships first-party Deno hosting (`addDenoApp(...)` + `withDenoTask(...)`)
+ * inside `Aspire.Hosting.JavaScript`, so every generated TypeScript AppHost declares
+ * `Aspire.Hosting.JavaScript`. Cache resources (Redis container / Garnet executable)
+ * use core SDK primitives (`addContainer` / `addExecutable`) and do not require
+ * `Aspire.Hosting.Redis` or `Aspire.Hosting.Garnet`.
  */
 export interface TsAspireConfigOptions {
   /** Selected database engine (drives Postgres/MySql packages). */
@@ -83,10 +82,6 @@ export function generateTsAspireConfig(options?: TsAspireConfigOptions): string 
   // generate-register-infrastructure.ts (Postgres/addPostgres,
   // Mysql/addMySql, Mssql/addSqlServer, Sqlite/addConnectionString
   // (no NuGet needed)).
-  // These are official Microsoft NuGets whose `[AspireExport]` wrappers are
-  // correctly re-emitted into `.aspire/modules/aspire.mts` by `aspire restore`,
-  // unlike the community Deno one — see the comment
-  // on `TsAspireConfigOptions` above.
   for (const engine of dbEngines) {
     switch (engine) {
       case 'postgres':
@@ -108,12 +103,8 @@ export function generateTsAspireConfig(options?: TsAspireConfigOptions): string 
     }
   }
 
-  if (options?.cache !== false && options?.cacheBackend !== 'deno-kv') {
-    const integration = options?.cacheBackend === 'garnet'
-      ? SCAFFOLD_ASPIRE_INTEGRATIONS.GARNET
-      : SCAFFOLD_ASPIRE_INTEGRATIONS.REDIS;
-    packages[integration.PACKAGE_ID] = integration.VERSION;
-  }
+  packages[SCAFFOLD_ASPIRE_INTEGRATIONS.JAVASCRIPT.PACKAGE_ID] =
+    SCAFFOLD_ASPIRE_INTEGRATIONS.JAVASCRIPT.VERSION;
 
   packages[SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS.PACKAGE_ID] =
     SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS.VERSION;

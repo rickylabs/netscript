@@ -140,10 +140,11 @@ interface RecordingResource {
   readonly endpointOptions: Record<string, unknown>[];
   readonly references: string[];
   readonly waits: string[];
+  withDenoNodeModulesDir(options: Record<string, unknown>): Promise<RecordingResource>;
+  withDenoRuntimeArgs(args: readonly string[]): Promise<RecordingResource>;
   withHttpEndpoint(options: Record<string, unknown>): RecordingResource;
   withHttpHealthCheck(options: Record<string, unknown>): Promise<RecordingResource>;
   withEnvironment(key: string, value: string): RecordingResource;
-  withOtlpExporter(options: Record<string, unknown>): Promise<RecordingResource>;
   withReference(target: string): RecordingResource;
   waitFor(target: string): RecordingResource;
   getEndpoint(name: string): Promise<string>;
@@ -152,11 +153,10 @@ interface RecordingResource {
 /** The subset of the Aspire builder surface the generated module calls. */
 interface RecordingBuilder {
   readonly resources: Map<string, RecordingResource>;
-  addExecutable(
+  addDenoApp(
     name: string,
-    command: string,
     workdir: string,
-    args: readonly string[],
+    scriptPath: string,
   ): RecordingResource;
 }
 
@@ -185,13 +185,15 @@ function createRecordingBuilder(): RecordingBuilder {
   const resources = new Map<string, RecordingResource>();
   return {
     resources,
-    addExecutable(name) {
+    addDenoApp(name) {
       const resource: RecordingResource = {
         name,
         environmentCalls: [],
         endpointOptions: [],
         references: [],
         waits: [],
+        withDenoNodeModulesDir: () => Promise.resolve(resource),
+        withDenoRuntimeArgs: () => Promise.resolve(resource),
         withHttpEndpoint(options) {
           resource.endpointOptions.push(options);
           return resource;
@@ -201,7 +203,6 @@ function createRecordingBuilder(): RecordingBuilder {
           resource.environmentCalls.push({ key, value });
           return resource;
         },
-        withOtlpExporter: () => Promise.resolve(resource),
         withReference(target) {
           resource.references.push(target);
           return resource;
@@ -234,21 +235,20 @@ function lastAssigned(resource: RecordingResource, key: string): string | undefi
 
 /** Stand-in for the scaffolded Aspire SDK module the generated helper imports. */
 const ASPIRE_SDK_DOUBLE = [
-  'export const OtlpProtocol = { HttpProtobuf: 1, Grpc: 0 };',
+  "export const DenoNodeModulesDirMode = { None: 'None' };",
   'export type DistributedApplicationBuilder = unknown;',
   '',
 ].join('\n');
 
 /**
- * Builds the `_aspire-compat.mts` stand-in: the three helpers that decide key
- * names or reference sets come from `@netscript/aspire/application`, so this test
- * does not invent them; the rest derive their values from the config they are
- * handed, as `_aspire-compat.ts.template` does.
+ * Builds the `_aspire-compat.mts` stand-in: reference extraction comes from
+ * `@netscript/aspire/application`; the rest derive their values from config.
  */
 function aspireCompatDouble(): string {
   const applicationModule = import.meta.resolve('@netscript/aspire/application');
   return [
-    `export { buildOtelEnvVars, extractPluginReferences, extractServiceReferences } from '${applicationModule}';`,
+    `export { extractPluginReferences, extractServiceReferences } from '${applicationModule}';`,
+    'export async function applyDenoPermissions() {}',
     'export function buildDatabaseUriEnvKey(config) {',
     '  return config.PrimaryDatabase ? `${config.PrimaryDatabase.toUpperCase()}_URI` : null;',
     '}',

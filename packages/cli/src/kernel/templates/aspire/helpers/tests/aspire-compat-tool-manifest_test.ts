@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assert, assertEquals, assertMatch } from '@std/assert';
 import { join, toFileUrl } from '@std/path';
 import { afterAll } from '@std/testing/bdd';
 import { SCAFFOLD_VERSIONS } from '../../../../constants/scaffold/scaffold-versions.ts';
@@ -14,20 +14,35 @@ assertEquals(source.split(processImport).length, 2);
 await Deno.mkdir(join(root, '.aspire/modules'), { recursive: true });
 await Deno.writeTextFile(
   join(root, '.aspire/modules/aspire.mts'),
-  "export const HealthStatus = { Healthy: 'Healthy', Unhealthy: 'Unhealthy' };\n",
+  "export const HealthStatus = { Healthy: 'Healthy', Unhealthy: 'Unhealthy' };\nexport const DenoPermissionKind = { Net: 'Net', Read: 'Read', Write: 'Write', Run: 'Run', Env: 'Env', Import: 'Import', Sys: 'Sys', Ffi: 'Ffi' };\n",
 );
-// Match the helper's relative SDK import shape.
+// Match the helper's relative SDK and readiness import shape.
 await Deno.mkdir(join(root, '.helpers'));
+const readinessSource = await Deno.readTextFile(
+  new URL('../../../../assets/aspire/helpers/_apphost-readiness.ts.template', import.meta.url),
+);
+const postgresReadinessSource = await Deno.readTextFile(
+  new URL(
+    '../../../../assets/aspire/helpers/_apphost-postgres-readiness.ts.template',
+    import.meta.url,
+  ),
+);
+await Deno.writeTextFile(join(root, '.helpers/_apphost-readiness.mts'), readinessSource);
+await Deno.writeTextFile(
+  join(root, '.helpers/_apphost-postgres-readiness.mts'),
+  postgresReadinessSource,
+);
 const generatedPath = join(root, '.helpers/_aspire-compat.mts');
 await Deno.writeTextFile(
   generatedPath,
   source.replace(
     processImport,
     "import { execFileSync } from 'data:text/javascript,export function execFileSync() {}';",
-  )
-    .replace("from 'zod';", `from '${import.meta.resolve('zod')}';`),
+  ),
 );
-const { ensureGarnetToolManifest } = await import(toFileUrl(generatedPath).href);
+const { applyDenoPermissions, ensureDatabasePassword, ensureGarnetToolManifest } = await import(
+  toFileUrl(generatedPath).href
+);
 const version = SCAFFOLD_VERSIONS.GARNET_TOOL;
 const garnet = { version, commands: ['garnet-server'] };
 
@@ -110,5 +125,167 @@ Deno.test('generated Garnet tool manifest: explicit requested version overrides 
     await Deno.readTextFile(join(appHostDir, '.config/dotnet-tools.json')),
   );
   assertEquals(manifest.tools['garnet-server'].version, '1.0.61');
+});
+Deno.test('applyDenoPermissions maps granular permissions, watch, unstable, and allow-all without duplicate managed flags', async () => {
+  const calls: Array<readonly [string, ...unknown[]]> = [];
+  const target = {
+    withDenoAllowAll(options?: { enabled?: boolean }) {
+      calls.push(['allowAll', options]);
+      return Promise.resolve();
+    },
+    withDenoAllow(kind: string, values: string[]) {
+      calls.push(['allow', kind, values]);
+      return Promise.resolve();
+    },
+    withDenoDeny(kind: string, values: string[]) {
+      calls.push(['deny', kind, values]);
+      return Promise.resolve();
+    },
+    withDenoWatch(options?: { hmr?: boolean }) {
+      calls.push(['watch', options]);
+      return Promise.resolve();
+    },
+    withDenoUnstable(features: string[]) {
+      calls.push(['unstable', features]);
+      return Promise.resolve();
+    },
+    withDenoRuntimeArgs(args: string[]) {
+      calls.push(['runtimeArgs', args]);
+      return Promise.resolve();
+    },
+  };
+
+  await applyDenoPermissions(target, [
+    '--allow-net',
+    '--allow-read=./config,/tmp/secret',
+    '--allow-read=./extra',
+    '--deny-write=/etc',
+    '--watch',
+    '--watch-hmr',
+    '--unstable-kv',
+    '--unstable-worker-options',
+    '--unstable-kv',
+    '--node-modules-dir=none',
+    '--config',
+    '--minimum-dependency-age=0',
+    '--cached-only',
+  ]);
+  assertEquals(calls, [
+    ['allowAll', { enabled: false }],
+    ['allow', 'Net', []],
+    ['allow', 'Read', ['./config', '/tmp/secret', './extra']],
+    ['deny', 'Write', ['/etc']],
+    ['watch', { hmr: true }],
+    ['unstable', ['kv', 'worker-options']],
+    ['runtimeArgs', ['--cached-only']],
+  ]);
+
+  calls.length = 0;
+  await applyDenoPermissions(target, ['-A', '--watch']);
+  assertEquals(calls, [
+    ['allowAll', { enabled: true }],
+    ['watch', { hmr: false }],
+  ]);
+
+  calls.length = 0;
+  await applyDenoPermissions(target, [
+    '-A',
+    '--allow-net',
+    '--deny-read=/etc/shadow',
+    '--deny-write',
+  ]);
+  assertEquals(calls, [
+    ['allowAll', { enabled: true }],
+    ['deny', 'Read', ['/etc/shadow']],
+    ['deny', 'Write', []],
+  ]);
+
+  calls.length = 0;
+  await applyDenoPermissions(target, ['--allow-all', '--deny-env=SECRET']);
+  assertEquals(calls, [
+    ['allowAll', { enabled: true }],
+    ['deny', 'Env', ['SECRET']],
+  ]);
+
+  // Verify `deno run` (unlike `deno eval`) enforces explicit --deny-read when combined with -A.
+  const deniedFile = join(root, 'denied-secret.txt');
+  const probeScript = join(root, 'deny-read-probe.ts');
+  await Deno.writeTextFile(deniedFile, 'secret');
+  await Deno.writeTextFile(
+    probeScript,
+    'try {\n  Deno.readTextFileSync(Deno.args[0]);\n  console.log("ALLOWED");\n} catch (e) {\n  console.log(e instanceof Error ? e.name : String(e));\n  Deno.exit(42);\n}\n',
+  );
+  const probe = await new Deno.Command(Deno.execPath(), {
+    args: [
+      'run',
+      '-A',
+      `--deny-read=${deniedFile}`,
+      probeScript,
+      deniedFile,
+    ],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  assertEquals(probe.code, 42);
+  assertMatch(new TextDecoder().decode(probe.stdout), /NotCapable|PermissionDenied/);
+});
+Deno.test('ensureDatabasePassword creates atomic complexity-safe passwords across concurrent processes, honors env handoff, and reuses existing files', async () => {
+  const appHostDir = join(root, 'db-passwords');
+  await Deno.mkdir(appHostDir, { recursive: true });
+
+  const workerScript =
+    `import { ensureDatabasePassword } from ${JSON.stringify(toFileUrl(generatedPath).href)};\n` +
+    `console.log(ensureDatabasePassword(Deno.args[0], 'mssql', { requireComplexity: true }));`;
+  const results = await Promise.all(
+    [0, 1, 2, 3].map(() =>
+      new Deno.Command(Deno.execPath(), {
+        args: ['eval', workerScript, appHostDir],
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output()
+    ),
+  );
+  const decoder = new TextDecoder();
+  const passwords = results.map((res, index) => {
+    assertEquals(
+      res.code,
+      0,
+      `worker ${index} failed (${res.code}): ${decoder.decode(res.stderr)}`,
+    );
+    return decoder.decode(res.stdout).trim();
+  });
+  const [a, b, c, d] = passwords;
+  assertEquals(a, b);
+  assertEquals(b, c);
+  assertEquals(c, d);
+  assertEquals(a.length, 32);
+  assertMatch(a, /[A-Z]/);
+  assertMatch(a, /[a-z]/);
+  assertMatch(a, /[0-9]/);
+  assertMatch(a, /[!@#%^\-_=+]/);
+  assert(!/['"`$\\;\s]/.test(a));
+
+  const secretsDir = join(appHostDir, '.data', 'aspire-secrets');
+  const entries: string[] = [];
+  for await (const entry of Deno.readDir(secretsDir)) entries.push(entry.name);
+  assertEquals(entries, ['mssql.password']);
+
+  // Pre-upgrade env handoff seeds `.password` once, then reuses persisted file after env unset.
+  const handoffKey = 'NETSCRIPT_DB_PASSWORD_LEGACY_MSSQL';
+  const priorValue = Deno.env.get(handoffKey);
+  Deno.env.set(handoffKey, 'PreUpgrade!Pass2026');
+  try {
+    assertEquals(
+      ensureDatabasePassword(appHostDir, 'legacy-mssql', { requireComplexity: true }),
+      'PreUpgrade!Pass2026',
+    );
+  } finally {
+    if (priorValue === undefined) Deno.env.delete(handoffKey);
+    else Deno.env.set(handoffKey, priorValue);
+  }
+  assertEquals(
+    ensureDatabasePassword(appHostDir, 'legacy-mssql', { requireComplexity: true }),
+    'PreUpgrade!Pass2026',
+  );
 });
 afterAll(() => Deno.remove(root, { recursive: true }));

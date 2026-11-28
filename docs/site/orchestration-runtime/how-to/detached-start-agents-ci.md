@@ -57,7 +57,7 @@ Output:
     "appHostPath": "/path/to/my-app/aspire/apphost.mts",
     "appHostPid": 48219,
     "status": "running",
-    "sdkVersion": "13.5.3",
+    "sdkVersion": "17.0.0",
     "cliPid": 48218,
     "dashboardUrl": "<dashboard-url-from-aspire>",
     "logFilePath": "/path/to/logs/cli_apphost-48219.log"
@@ -113,9 +113,9 @@ printf 'dashboard: %s\n' "${DASHBOARD_URL%%\?*}"
 
 ## Startup timeout budget versus `aspire wait`
 
-An Aspire cold start covers container provisioning (Postgres, Redis), AppHost TypeScript
-compilation and health-probe convergence. Two measured cold starts on Aspire 13.5.3 took 38.62 s
-and 24.80 s; budget accordingly. Two controls bound the wait:
+An Aspire cold start covers container provisioning (Postgres, Redis), native Deno AppHost startup,
+and health-probe convergence. Budget accordingly (cold starts vary with NuGet/Deno cache warmth and
+container pulls). Two controls bound the wait:
 
 1. **`ASPIRE_CLI_START_TIMEOUT`** sets the overall startup deadline, in seconds, that database
    operations and adapter commands wait before failing fast. It defaults to `300`:

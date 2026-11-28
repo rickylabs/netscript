@@ -1,3 +1,4 @@
+import { assertNativeDenoAppHost } from '../../../../kernel/adapters/aspire/apphost-package-dependencies.ts';
 import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { join } from '@std/path';
 import {
@@ -109,6 +110,7 @@ export async function installLocalPlugin(
   request: InstallPluginInput,
   dependencies: InstallLocalPluginDependencies,
 ): Promise<InstallPluginResult> {
+  await assertNativeDenoAppHost(dependencies.fs, request.projectRoot);
   const registry = dependencies.registry ?? new PluginKindRegistry();
   const descriptorRequest = await withDefaultLocalPath(request, dependencies);
   const resolvedPlugin = await resolvePluginDescriptorBeforePlanning(

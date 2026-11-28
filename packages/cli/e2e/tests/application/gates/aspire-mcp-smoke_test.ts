@@ -34,7 +34,7 @@ interface PersistedEvidence {
 
 const fixture: RecordedFixture = JSON.parse(
   await Deno.readTextFile(
-    new URL('../../fixtures/aspire-13.5.3-mcp-recorded.json', import.meta.url),
+    new URL('../../fixtures/aspire-17.0.0-mcp-recorded.json', import.meta.url),
   ),
 );
 
@@ -89,8 +89,8 @@ function dependencies(
 
 function input(secret = 'fixture-secret-never-persist'): Parameters<typeof runAspireMcpSmoke>[0] {
   return {
-    cliVersion: '13.5.3+b5f1433',
-    scaffoldPin: '13.5.3',
+    cliVersion: '17.0.0+2d325b13',
+    scaffoldPin: '17.0.0',
     entryPoint: {
       source: '.mcp.json',
       command: 'aspire',
@@ -125,12 +125,12 @@ function passingPrimary(
   );
 }
 
-function doctorResult(status: string, currentVersion = '13.5.3', failed = 0): unknown {
+function doctorResult(status: string, currentVersion = '17.0.0', failed = 0): unknown {
   return {
     checks: [{
       name: 'cli-version',
       status,
-      metadata: { currentVersion, latestVersion: '13.6.0' },
+      metadata: { currentVersion, latestVersion: '17.1.0' },
     }],
     summary: { passed: 6, warnings: status === 'warning' ? 1 : 0, failed },
   };
@@ -145,16 +145,16 @@ Deno.test('doctor update advisory preserves the pinned CLI and the warning recei
     ),
   );
   assertEquals(receipt.doctor.cliVersion, 'warning');
-  assertEquals(receipt.doctor.currentVersion, '13.5.3');
+  assertEquals(receipt.doctor.currentVersion, '17.0.0');
   assertEquals(receipt.doctor.summary.failed, 0);
 });
 
 for (
   const [name, status, version, failed, message] of [
-    ['failed CLI', 'fail', '13.5.3', 0, 'cli-version'],
-    ['unknown CLI status', 'unknown', '13.5.3', 0, 'cli-version'],
-    ['wrong CLI pin', 'warning', '13.6.0', 0, 'doctor currentVersion'],
-    ['failed environment check', 'warning', '13.5.3', 1, 'reported failed checks'],
+    ['failed CLI', 'fail', '17.0.0', 0, 'cli-version'],
+    ['unknown CLI status', 'unknown', '17.0.0', 0, 'cli-version'],
+    ['wrong CLI pin', 'warning', '17.1.0', 0, 'doctor currentVersion'],
+    ['failed environment check', 'warning', '17.0.0', 1, 'reported failed checks'],
   ] as const
 ) {
   Deno.test(`doctor rejects ${name} despite update-advisory handling`, async () => {
@@ -173,9 +173,10 @@ for (
   });
 }
 
-Deno.test('Aspire MCP expected set is the ratified 14-tool 13.5.3 baseline', () => {
-  assertEquals(ASPIRE_MCP_BASELINE_TOOLS.length, 14);
-  assertEquals(ASPIRE_MCP_EXPECTED_TOOLS.length, 14);
+Deno.test('Aspire MCP expected set is the ratified 15-tool 17.0.0 baseline', () => {
+  assertEquals(ASPIRE_MCP_BASELINE_TOOLS.length, 15);
+  assertEquals(ASPIRE_MCP_EXPECTED_TOOLS.length, 15);
+  assert(ASPIRE_MCP_EXPECTED_TOOLS.includes('wait_for_resources'));
   assert(ASPIRE_MCP_EXPECTED_TOOLS.includes('refresh_tools'));
   assertEquals(ASPIRE_MCP_EXPECTED_TOOLS.includes('get_integration_docs'), false);
   assertEquals(ASPIRE_MCP_DOCUMENTED_UNOBSERVED, ['get_integration_docs']);
@@ -402,7 +403,7 @@ Deno.test('missing required baseline tool fails and preserves the observation', 
   );
   assertEquals(persisted.length, 1);
   const receipt = persisted[0].receipt;
-  assertEquals(receipt.toolsObserved.length, 13);
+  assertEquals(receipt.toolsObserved.length, 14);
   assertEquals(receipt.toolsMissing, ['refresh_tools']);
   assertEquals(receipt.toolsExtra, []);
   assertEquals(receipt.baselineDiff, { added: [], removed: ['refresh_tools'] });
@@ -430,7 +431,7 @@ Deno.test('documented-unobserved tool appearance is informational', async () => 
   assertEquals(receipt.documentedUnobservedObserved, ['get_integration_docs']);
 });
 
-Deno.test('Aspire MCP smoke proves parameter nulling and excludes plaintext secrets', async () => {
+Deno.test('Aspire MCP smoke proves parameter redaction across 17.0.0 omitted fields and rejects leaks', async () => {
   const receipt = await runAspireMcpSmoke(
     input(),
     dependencies(passingPrimary(), transport(fixture.dashboardTools, {})),
@@ -438,6 +439,71 @@ Deno.test('Aspire MCP smoke proves parameter nulling and excludes plaintext secr
   assertEquals(receipt.redaction, { secretParamsNull: true, plaintextLeak: false });
   assertEquals(JSON.stringify(receipt).includes('fixture-secret-never-persist'), false);
   assertEquals(receipt.entryPoint.cwd.includes('raw-dashboard-token'), false);
+
+  const legacyNullResources = [
+    { display_name: 'postgres' },
+    { display_name: 'fixture-web' },
+    { display_name: 'users' },
+    {
+      display_name: 'postgres-password',
+      resource_type: 'Parameter',
+      properties: { Value: null },
+      environment: {},
+    },
+  ];
+  const legacyReceipt = await runAspireMcpSmoke(
+    input(),
+    dependencies(
+      transport(fixture.tools, {
+        list_apphosts: fixture.apphosts,
+        doctor: fixture.doctor,
+        list_resources: legacyNullResources,
+        'list_console_logs:postgres-cli': fixture.excludedConsole,
+        'list_console_logs:users': fixture.usersConsole,
+        list_structured_logs: fixture.structuredLogs,
+      }),
+      transport(fixture.dashboardTools, {}),
+    ),
+  );
+  assertEquals(legacyReceipt.redaction, { secretParamsNull: true, plaintextLeak: false });
+
+  for (
+    const leakedParam of [
+      {
+        display_name: 'postgres-password',
+        resource_type: 'Parameter',
+        properties: { Value: 'leaked' },
+      },
+      {
+        display_name: 'postgres-password',
+        resource_type: 'Parameter',
+        environment: { PASSWORD: 'leaked' },
+      },
+      { display_name: 'postgres-password', resource_type: 'Parameter', value: 'leaked' },
+      { display_name: 'postgres-password', resource_type: 'Parameter', properties: 'leaked' },
+    ]
+  ) {
+    await assertRejects(
+      () =>
+        runAspireMcpSmoke(
+          input(),
+          dependencies(
+            transport(fixture.tools, {
+              list_apphosts: fixture.apphosts,
+              doctor: fixture.doctor,
+              list_resources: [
+                { display_name: 'postgres' },
+                { display_name: 'fixture-web' },
+                { display_name: 'users' },
+                leakedParam,
+              ],
+            }),
+            transport(fixture.dashboardTools, {}),
+          ),
+        ),
+      Error,
+    );
+  }
 });
 
 Deno.test('Aspire MCP timeout rejects after persisting a partial receipt', async () => {
@@ -463,10 +529,11 @@ Deno.test('Aspire MCP timeout rejects after persisting a partial receipt', async
   assert(encoded.includes('SIGKILL'));
 });
 
-Deno.test('recorded 13.5.3 static fixture is the ratified 14-tool baseline', () => {
+Deno.test('recorded 17.0.0 static fixture is the ratified 15-tool baseline', () => {
   assertEquals(
     diffAspireMcpTools(fixture.tools, ASPIRE_MCP_BASELINE_TOOLS),
     { added: [], removed: [] },
   );
+  assert(fixture.tools.includes('wait_for_resources'));
   assertEquals(fixture.tools.includes('get_integration_docs'), false);
 });

@@ -17,12 +17,12 @@ Deno.test('registration preamble: a fully wired entry set renders the complete p
   const needs = resolveRegistrationPreambleNeeds([{ RequiresDb: true, RequiresKv: true }], true);
 
   assertEquals(renderRegistrationPreamble(needs, IMPORTS), {
-    otlpImport: "import { OtlpProtocol } from '../.aspire/modules/aspire.mts';\n",
+    denoSdkImport: "import { DenoNodeModulesDirMode } from '../.aspire/modules/aspire.mts';\n",
     compatImports: [
+      '  applyDenoPermissions,',
       '  buildDatabaseUriEnvKey,',
       '  buildDatabaseProviderEnvVars,',
       '  buildSqliteDatabaseUrl,',
-      '  buildOtelEnvVars,',
       '  resolvePermissions,',
       '  resolveWorkspacePath,',
       '  withCacheReference,',
@@ -37,8 +37,8 @@ Deno.test('registration preamble: unread pieces are omitted', () => {
   const needs = resolveRegistrationPreambleNeeds([{ RequiresDb: false, RequiresKv: false }], false);
 
   assertEquals(renderRegistrationPreamble(needs, IMPORTS), {
-    otlpImport: '',
-    compatImports: '  resolvePermissions,\n  resolveWorkspacePath,',
+    denoSdkImport: "import { DenoNodeModulesDirMode } from '../.aspire/modules/aspire.mts';\n",
+    compatImports: '  applyDenoPermissions,\n  resolvePermissions,\n  resolveWorkspacePath,',
     infrastructureParameter: '_infrastructure',
     databaseBindings: '',
   });

@@ -1,0 +1,57 @@
+{
+  "source": "Live Aspire 17.0.0+2d325b13 aspire agent mcp initialize/tools/list/doctor capture (S4), minimized to assertion fields",
+  "initialize": {
+    "serverInfo": { "name": "aspire-mcp-server", "version": "17.0.0" }
+  },
+  "tools": [
+    "list_resources",
+    "wait_for_resources",
+    "list_console_logs",
+    "execute_resource_command",
+    "list_structured_logs",
+    "list_traces",
+    "list_trace_structured_logs",
+    "select_apphost",
+    "list_apphosts",
+    "list_integrations",
+    "doctor",
+    "refresh_tools",
+    "list_docs",
+    "search_docs",
+    "get_doc"
+  ],
+  "apphosts": {
+    "inScope": [{ "appHostPath": "/workspace/fixture/aspire/apphost.mts" }],
+    "outOfScope": []
+  },
+  "doctor": {
+    "checks": [
+      {
+        "category": "aspire",
+        "name": "cli-version",
+        "status": "pass",
+        "message": "Aspire CLI version 17.0.0 (channel: stable)",
+        "metadata": { "currentVersion": "17.0.0", "identityChannel": "stable" }
+      }
+    ],
+    "summary": { "passed": 6, "warnings": 4, "failed": 0 }
+  },
+  "resources": [
+    { "display_name": "postgres", "resource_type": "Container" },
+    { "display_name": "fixture-web", "resource_type": "Executable" },
+    { "display_name": "users", "resource_type": "Executable" },
+    { "display_name": "postgres-password", "resource_type": "Parameter" }
+  ],
+  "usersConsole": { "lines": ["users service listening"] },
+  "excludedConsole": { "lines": [] },
+  "structuredLogs": { "items": [] },
+  "dashboardTools": [
+    "list_structured_logs",
+    "list_traces",
+    "list_trace_structured_logs"
+  ],
+  "transcript": [
+    { "direction": "request", "method": "tools/call", "tool": "list_resources" },
+    { "direction": "response", "resource": "postgres-password", "Value": null }
+  ]
+}

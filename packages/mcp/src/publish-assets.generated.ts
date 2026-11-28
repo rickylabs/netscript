@@ -190,6 +190,7 @@ export const MCP_EMBEDDED_DOCS_PROVENANCE:
       'pages/orchestration-runtime/how-to/index.md',
       'pages/orchestration-runtime/how-to/outbound-webhooks/index.md',
       'pages/orchestration-runtime/how-to/roll-out-runtime-overrides/index.md',
+      'pages/orchestration-runtime/how-to/upgrade-aspire-17/index.md',
       'pages/orchestration-runtime/index.md',
       'pages/orchestration-runtime/runtime-config/index.md',
       'pages/quickstart/index.md',
@@ -313,7 +314,7 @@ export const MCP_EMBEDDED_DOCS_PROVENANCE:
       'pages/web-layer/vite/index.md',
       'pages/why/index.md',
     ],
-    sourceBytes: 3350209,
-    documentCount: 292,
-    sha256: '3bd9f2a2ef4bd843467c91f64b44b2882a4c530993092d4adf849f9a1fdc4e92',
+    sourceBytes: 3357254,
+    documentCount: 293,
+    sha256: '37278b1cb0b80ccfbfcfa981c37d48b77fdfb6fbafc27ae479cb57fd3a89951c',
   };

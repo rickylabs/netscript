@@ -1,3 +1,4 @@
+import { assertNativeDenoAppHost } from '../../../../kernel/adapters/aspire/apphost-package-dependencies.ts';
 import { createInstalledRuntimeRegistryGenerator } from '../../generate/plugins/installed-runtime-registry-generator.ts';
 import type { GenerateInstalledPluginRegistries } from '../../generate/plugins/generate-installed-plugin-registries.ts';
 import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
@@ -127,6 +128,7 @@ export async function installPlugin(
   request: InstallPluginInput,
   dependencies: InstallPluginDependencies,
 ): Promise<InstallPluginResult> {
+  await assertNativeDenoAppHost(dependencies.fs, request.projectRoot);
   const rootDenoJsonBefore = await readOptionalRootDenoJson(request.projectRoot, dependencies.fs);
   const managedFilesBefore = await readManagedInstallFiles(request.projectRoot, dependencies.fs);
   const registry = dependencies.registry ?? new PluginKindRegistry();

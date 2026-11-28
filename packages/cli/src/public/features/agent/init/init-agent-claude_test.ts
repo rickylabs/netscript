@@ -2,7 +2,10 @@ import { assert, assertEquals, assertFalse, assertStringIncludes } from '@std/as
 import { copy, walk } from '@std/fs';
 import { basename, join, relative } from '@std/path';
 import { DenoAgentInitFileSystem } from './agent-init-file-system.ts';
-import { ASPIRE_WORKFLOW_SKILLS, type AspireAgentInitializer } from './aspire-agent-initializer.ts';
+import {
+  type AspireAgentInitializer,
+  RETIRED_ASPIRE_WORKFLOW_SKILLS,
+} from './aspire-agent-initializer.ts';
 import { initAgent } from './init-agent.ts';
 
 const CLAUDE_ROUTE =
@@ -92,13 +95,10 @@ Deno.test('#2008 CLAUDE.md import merge preserves existing bytes and is idempote
   }
 });
 
-Deno.test('#2008 canonical Aspire workflows alone skip delegation without creating mirrors', async () => {
+Deno.test('Aspire 17.0.0 Claude init never delegates to upstream aspire agent init and creates no retired mirrors', async () => {
   const root = await Deno.makeTempDir();
   try {
     const fs = new DenoAgentInitFileSystem();
-    for (const skill of ASPIRE_WORKFLOW_SKILLS) {
-      await fs.writeText(join(root, '.agents/skills', skill, 'SKILL.md'), `# ${skill}\n`);
-    }
     let calls = 0;
     const first = await initAgent({ projectRoot: root, host: 'claude' }, {
       fs,
@@ -111,8 +111,9 @@ Deno.test('#2008 canonical Aspire workflows alone skip delegation without creati
     });
     assertEquals(calls, 0);
     assertEquals(first.messages, []);
-    for (const skill of ASPIRE_WORKFLOW_SKILLS) {
+    for (const skill of RETIRED_ASPIRE_WORKFLOW_SKILLS) {
       assertFalse(await fs.exists(join(root, '.claude/skills', skill)));
+      assertFalse(await fs.exists(join(root, '.agents/skills', skill)));
     }
     assert(await fs.exists(join(root, '.claude/skills/repo-skills/SKILL.md')));
   } finally {
@@ -176,14 +177,18 @@ Deno.test('#2008 review: combined Claude guidance permits a coherent named-skill
       const name of [
         'netscript',
         'netscript-build',
+        'netscript-design',
         'netscript-operate',
         'aspire',
         'deno',
-        ...ASPIRE_WORKFLOW_SKILLS,
       ]
     ) {
       assertStringIncludes(description, name);
       assertStringIncludes(agents, `\`${name}\``);
+    }
+    for (const retired of RETIRED_ASPIRE_WORKFLOW_SKILLS) {
+      assertFalse(description.includes(retired));
+      assertFalse(agents.includes(retired));
     }
     assertStringIncludes(bridge, 'resolve its relative references from that skill directory');
   } finally {
@@ -204,7 +209,7 @@ Deno.test('#2008 review: divergent legacy NetScript and Aspire directories repor
       );
     }
     await fs.writeText(join(root, '.claude/skills/custom/SKILL.md'), '# Foreign skill\n');
-    for (const name of ASPIRE_WORKFLOW_SKILLS) {
+    for (const name of RETIRED_ASPIRE_WORKFLOW_SKILLS) {
       await fs.writeText(join(root, '.agents/skills', name, 'SKILL.md'), `# ${name}\n`);
     }
     const dependencies = { fs, aspireAgentInitializer: NO_ASPIRE };
@@ -261,11 +266,11 @@ Deno.test('#2008 cleanup: complete owned mirrors are removed and reruns keep bri
         'netscript-operate',
         'aspire',
         'deno',
-        ...ASPIRE_WORKFLOW_SKILLS,
+        ...RETIRED_ASPIRE_WORKFLOW_SKILLS,
       ]
     ) {
       const canonical = join(root, '.agents/skills', name);
-      if (ASPIRE_WORKFLOW_SKILLS.includes(name)) {
+      if (RETIRED_ASPIRE_WORKFLOW_SKILLS.includes(name)) {
         await fs.writeText(join(canonical, 'SKILL.md'), `# ${name}\n`);
       }
       await fs.writeText(join(canonical, 'references/nested/example.md'), '# Reference\n');
@@ -284,7 +289,7 @@ Deno.test('#2008 cleanup: complete owned mirrors are removed and reruns keep bri
         'netscript-operate',
         'aspire',
         'deno',
-        ...ASPIRE_WORKFLOW_SKILLS,
+        ...RETIRED_ASPIRE_WORKFLOW_SKILLS,
       ]
     ) {
       assertFalse(await fs.exists(join(skillsRoot, name)));

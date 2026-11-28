@@ -95,7 +95,7 @@ export function generateRegisterTools(options: RegisterToolsOptions): string {
     }
 
     lines.push(``);
-    lines.push(`    monitorToolFailure(builder, ${id}, ${id}_errorFile);`);
+    lines.push(`    await monitorToolFailure(${id}, ${id}_errorFile);`);
 
     lines.push(`  }`);
 

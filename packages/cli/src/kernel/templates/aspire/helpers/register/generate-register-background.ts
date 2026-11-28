@@ -24,6 +24,8 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 import { withDatabasePermissions } from './database-permissions.ts';
 import {
+  isExternalDenoEntrypoint,
+  renderDenoScriptPathArg,
   renderRegistrationPreamble,
   resolveRegistrationPreambleNeeds,
 } from './registration-preamble.ts';
@@ -44,7 +46,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       sdk: SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS,
       compat: SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT,
       functionName: 'registerBackgroundProcessors',
-      pluginParameter: '  _plugins: Map<string, ExecutableResource>,\n',
+      pluginParameter: '  _plugins: Map<string, DenoResource>,\n',
     });
   }
 
@@ -129,14 +131,19 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       }
     }
 
-    // Register via addExecutable
+    // Register via first-party addDenoApp
     lines.push(
-      `    const ${id} = builder.addExecutable(${
-        JSON.stringify(name)
-      }, 'deno', ${id}_workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', '${RESOURCE_DEFAULTS.UnstableWorkerOptionsFlag}', ...installationSecretPermissions(${id}_perms, installationSecretFile), ${
-        JSON.stringify(entrypoint)
-      }]);`,
+      `    const ${id} = builder.addDenoApp(${JSON.stringify(name)}, ${id}_workdir, ${
+        renderDenoScriptPathArg(`${id}_workdir`, entrypoint)
+      });`,
     );
+    lines.push(
+      `    await applyDenoPermissions(${id}, [...installationSecretPermissions(${id}_perms, installationSecretFile), '${RESOURCE_DEFAULTS.UnstableWorkerOptionsFlag}']);`,
+    );
+    lines.push(
+      `    await ${id}.withDenoNodeModulesDir({ mode: DenoNodeModulesDirMode.None });`,
+    );
+    lines.push(`    await ${id}.withDenoRuntimeArgs(['--minimum-dependency-age=0']);`);
     // KV-backed Deno children share the child /health transport. Capability
     // metadata survives renaming and does not depend on telemetry or plugin kind.
     if (entry.Runtime === 'deno' && entry.RequiresKv) {
@@ -186,17 +193,10 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     // Telemetry env vars
     if (telemetry) {
       lines.push(``);
-      lines.push(`    // OTEL telemetry (full executable env set)`);
+      lines.push(`    // OTEL telemetry (endpoint-conditional via Aspire AddDenoApp defaults)`);
+      lines.push(`    await ${id}.withEnvironment('OTEL_SERVICE_NAME', ${JSON.stringify(name)});`);
       lines.push(
-        `    const ${id}_otel = buildOtelEnvVars(${
-          JSON.stringify(name)
-        }, config.Version, 'executable');`,
-      );
-      lines.push(`    for (const [key, value] of Object.entries(${id}_otel)) {`);
-      lines.push(`      await ${id}.withEnvironment(key, value);`);
-      lines.push(`    }`);
-      lines.push(
-        `    await ${id}.withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf });`,
+        `    await ${id}.withEnvironment('OTEL_RESOURCE_ATTRIBUTES', \`service.version=\${config.Version}\`);`,
       );
     } else {
       lines.push(``);
@@ -307,6 +307,9 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     ...renderRegistrationPreamble(preambleNeeds, {
       sdkModule: SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS,
       cacheImport: 'withCacheReference as _withCacheReference',
+      externalEntrypoint: entries.some(([name, entry]) =>
+        isExternalDenoEntrypoint(entry.Entrypoint ?? `${name}/runtime.ts`)
+      ),
     }),
   });
 }

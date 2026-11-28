@@ -36,6 +36,10 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
     options.packagesAsWorkspaceMembers === true;
 
   const userMembers = options.workspaceMembers.map((m) => m.startsWith('./') ? m : `./${m}`);
+  const aspireMember = `./${SCAFFOLD_DIRS.ASPIRE_TS}`;
+  const aspireMembers = !options.noAspire && !userMembers.includes(aspireMember)
+    ? [aspireMember]
+    : [];
 
   const enginePackages = (options.dbEngines ?? []).flatMap(
     (engine) => SCAFFOLD_ENGINE_WORKSPACE_PACKAGES[engine] ?? [],
@@ -76,7 +80,7 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
     : undefined;
 
   const config: Record<string, unknown> = {
-    workspace: [...userMembers, ...packageMembers],
+    workspace: [...userMembers, ...aspireMembers, ...packageMembers],
     catalog: SCAFFOLD_WORKSPACE_CATALOG,
     ...(Object.keys(imports).length > 0 ? { imports } : {}),
     ...(minimumDependencyAge ? { minimumDependencyAge } : {}),
@@ -85,7 +89,8 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
     // Deno unstable features used by generated NetScript workspaces:
     // - `raw-imports`: required by dependency-owned raw asset modules.
     // - `kv`: `@netscript/kv` depends on the unstable `Deno.Kv` API.
-    unstable: ['raw-imports', 'kv'],
+    // - `sloppy-imports`: resolves Aspire 17's `.mjs` relative imports to `.mts` SDK files.
+    unstable: options.noAspire ? ['raw-imports', 'kv'] : ['raw-imports', 'kv', 'sloppy-imports'],
     tasks: {
       dev:
         `deno task deps:closure && deno task deps:verify && deno run --allow-all ${SCAFFOLD_DIRS.APPS}/${options.appName}/main.ts`,

@@ -54,21 +54,42 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-aspire-${{ runner.os }}-13.5.3-v1
+          key: nuget-aspire-${{ runner.os }}-17.0.0-v1
+
+      - name: Restore pinned Aspire CLI cache
+        id: aspire_cli_cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.dotnet/aspire-cli
+          key: aspire-cli-${{ runner.os }}-17.0.0-v1
 
       - name: Install Aspire CLI
-        run: |
-          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 13.5.3
-          echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
+        if: steps.aspire_cli_cache.outputs.cache-hit != 'true'
+        run: dotnet tool install Aspire.Cli --tool-path "$HOME/.dotnet/aspire-cli" --version 17.0.0
+
+      - name: Expose Aspire CLI on PATH
+        run: echo "$HOME/.dotnet/aspire-cli" >> "$GITHUB_PATH"
 
       - name: Aspire CLI preflight
         run: |
           aspire_version="$(aspire --version)"
           echo "$aspire_version"
           case "$aspire_version" in
-            13.5.*) ;;
-            *) echo "Expected Aspire CLI 13.5.x, got $aspire_version" >&2; exit 1 ;;
+            17.0.0|17.0.0+*) ;;
+            *) echo "Expected Aspire CLI 17.0.0, got $aspire_version" >&2; exit 1 ;;
           esac
+
+      - name: Locate Deno module cache
+        id: deno_cache
+        run: echo "path=$(deno info --json | jq -r .denoDir)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Deno module cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.deno_cache.outputs.path }}
+          key: deno-cache-${{ runner.os }}-${{ runner.arch }}-e2e-cli-${{ hashFiles('deno.lock') }}
+          restore-keys: |
+            deno-cache-${{ runner.os }}-${{ runner.arch }}-e2e-cli-
 
       - name: Wait for JSR propagation
         if: github.event_name == 'workflow_run'

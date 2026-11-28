@@ -6,6 +6,7 @@ import { assert, assertEquals } from 'jsr:@std/assert@^1';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 
 import { SCAFFOLD_ASPIRE_INTEGRATIONS } from '../../constants/scaffold/scaffold-aspire.ts';
+import { SCAFFOLD_VERSIONS } from '../../constants/scaffold/scaffold-versions.ts';
 import { generateTsAspireConfig } from './generate-aspire-config.ts';
 
 describe('generateTsAspireConfig', () => {
@@ -83,15 +84,34 @@ describe('generateTsAspireConfig', () => {
     assert(!('sqlite' in config.packages));
   });
 
-  it('includes the browser logs integration package by default', () => {
-    const config = JSON.parse(generateTsAspireConfig()) as {
+  it('includes the JavaScript and browser logs integration packages by default and omits unused cache packages', () => {
+    const config = JSON.parse(generateTsAspireConfig({
+      cache: true,
+      cacheBackend: 'redis',
+    })) as {
+      sdk?: { version?: string };
       packages?: Record<string, string>;
     };
 
+    assertEquals(config.sdk?.version, SCAFFOLD_VERSIONS.ASPIRE_SDK);
     assert(config.packages);
+    assertEquals(
+      config.packages['Aspire.Hosting.JavaScript'],
+      SCAFFOLD_ASPIRE_INTEGRATIONS.JAVASCRIPT.VERSION,
+    );
     assertEquals(
       config.packages['Aspire.Hosting.Browsers'],
       SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS.VERSION,
     );
+    assert(!('Aspire.Hosting.Redis' in config.packages));
+    assert(!('Aspire.Hosting.Garnet' in config.packages));
+
+    const garnetConfig = JSON.parse(generateTsAspireConfig({
+      cache: true,
+      cacheBackend: 'garnet',
+    })) as { packages?: Record<string, string> };
+    assert(garnetConfig.packages);
+    assert(!('Aspire.Hosting.Garnet' in garnetConfig.packages));
+    assert(!('Aspire.Hosting.Redis' in garnetConfig.packages));
   });
 });

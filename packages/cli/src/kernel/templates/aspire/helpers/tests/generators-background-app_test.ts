@@ -40,26 +40,30 @@ describe('generateRegisterBackground', () => {
   it('should export registerBackgroundProcessors async function', () => {
     const output = generateRegisterBackground(emptyOptions);
     assertStringIncludes(output, 'export function registerBackgroundProcessors(');
-    assertStringIncludes(output, 'Promise<Map<string, ExecutableResource>>');
+    assertStringIncludes(output, 'Promise<Map<string, DenoResource>>');
   });
 
-  it('should import buildOtelEnvVars and resolvePermissions', () => {
+  it('should import applyDenoPermissions and resolvePermissions', () => {
     const output = generateRegisterBackground({
       ...emptyOptions,
       processors: { workers: fixtures.MINIMAL_BACKGROUND },
     });
-    assertStringIncludes(output, 'buildOtelEnvVars,');
+    assertStringIncludes(output, 'applyDenoPermissions,');
     assertStringIncludes(output, 'resolvePermissions,');
     assertStringIncludes(output, 'resolveWorkspacePath,');
   });
 
-  it('should register processors via addExecutable', () => {
+  it('should register processors via addDenoApp', () => {
     const output = generateRegisterBackground({
       ...emptyOptions,
       processors: { workers: fixtures.MINIMAL_BACKGROUND },
     });
-    assertStringIncludes(output, 'builder.addExecutable("workers", \'deno\', bg_0_workdir,');
-    assertStringIncludes(output, "'--minimum-dependency-age=0'");
+    assertStringIncludes(output, 'builder.addDenoApp("workers", bg_0_workdir,');
+    assertStringIncludes(output, "await bg_0.withDenoRuntimeArgs(['--minimum-dependency-age=0']);");
+    assertStringIncludes(
+      output,
+      'await bg_0.withDenoNodeModulesDir({ mode: DenoNodeModulesDirMode.None });',
+    );
     assertStringIncludes(output, 'backgroundProcessors.set("workers"');
   });
 
@@ -128,16 +132,17 @@ describe('generateRegisterBackground', () => {
     );
   });
 
-  it('should include OTEL env vars when telemetry is enabled', () => {
+  it('should include endpoint-conditional OTEL identity when telemetry is enabled', () => {
     const output = generateRegisterBackground({
       ...emptyOptions,
       processors: { workers: fixtures.MINIMAL_BACKGROUND },
     });
+    assertStringIncludes(output, 'await bg_0.withEnvironment(\'OTEL_SERVICE_NAME\', "workers");');
     assertStringIncludes(
       output,
-      'buildOtelEnvVars("workers", config.Version, \'executable\')',
+      "await bg_0.withEnvironment('OTEL_RESOURCE_ATTRIBUTES', `service.version=${config.Version}`);",
     );
-    assertStringIncludes(output, '// OTEL telemetry (full executable env set)');
+    assert(!output.includes('withOtlpExporter'));
   });
 
   it('should opt out of telemetry when disabled', () => {
@@ -204,7 +209,10 @@ describe('generateRegisterBackground', () => {
     );
     assertStringIncludes(output, 'withCacheReference,');
     // EndpointProperty no longer imported — endpoint resolution moved to wiring.
-    assertStringIncludes(output, "import { OtlpProtocol } from '../.aspire/modules/aspire.mts'");
+    assertStringIncludes(
+      output,
+      "import { DenoNodeModulesDirMode } from '../.aspire/modules/aspire.mts'",
+    );
   });
 
   it('uses the typed service map parameter for background service references', () => {
@@ -218,7 +226,7 @@ describe('generateRegisterBackground', () => {
       },
     });
 
-    assertStringIncludes(output, '_services: Map<string, ExecutableResource>');
+    assertStringIncludes(output, '_services: Map<string, DenoResource>');
     assertStringIncludes(output, '_services.get("users")?.getEndpoint(\'http\')');
     assert(!output.includes(" services.get('users')"));
   });
@@ -283,7 +291,7 @@ describe('generateRegisterBackground', () => {
 
   it('should handle empty processors', () => {
     const output = generateRegisterBackground(emptyOptions);
-    assertStringIncludes(output, 'Promise.resolve(new Map<string, ExecutableResource>())');
+    assertStringIncludes(output, 'Promise.resolve(new Map<string, DenoResource>())');
   });
 });
 // generateRegisterApps
@@ -315,18 +323,24 @@ describe('generateRegisterApps', () => {
     assertStringIncludes(output, 'export async function registerApps(');
   });
 
-  it('should import buildViteEnvVarName from _aspire-compat', () => {
-    const output = generateRegisterApps(emptyOptions);
-    assertStringIncludes(output, 'buildViteEnvVarName,');
-    assertStringIncludes(output, "from './_aspire-compat.mts'");
+  it('should import buildViteEnvVarName from _aspire-compat only when web apps exist', () => {
+    const empty = generateRegisterApps(emptyOptions);
+    assert(!empty.includes('buildViteEnvVarName'));
+    const populated = generateRegisterApps({
+      ...emptyOptions,
+      apps: { frontend: fixtures.MINIMAL_APP },
+    });
+    assertStringIncludes(populated, 'buildViteEnvVarName,');
+    assertStringIncludes(populated, "from './_aspire-compat.mts'");
   });
 
-  it('should register app type with valid deno task argv', () => {
+  it('should register app type via addDenoApp and withDenoTask with non-empty scriptPath', () => {
     const output = generateRegisterApps({
       ...emptyOptions,
       apps: { frontend: fixtures.MINIMAL_APP },
     });
-    assertStringIncludes(output, 'builder.addExecutable("frontend", \'deno\',');
+    assertStringIncludes(output, 'builder.addDenoApp("frontend", app_0_workdir, \'main.ts\');');
+    assertStringIncludes(output, 'await app_0.withDenoTask("dev");');
     assert(!output.includes('--minimum-dependency-age=0'));
     assertStringIncludes(output, 'apps.set("frontend"');
   });
@@ -342,15 +356,18 @@ describe('generateRegisterApps', () => {
     );
   });
 
-  it('should include OTEL telemetry for all app types', () => {
+  it('should configure endpoint-conditional OTEL identity for all app types without forcing withOtlpExporter', () => {
     const output = generateRegisterApps({
       ...emptyOptions,
       apps: { frontend: fixtures.MINIMAL_APP },
     });
+    assertStringIncludes(output, 'await app_0.withEnvironment(\'OTEL_SERVICE_NAME\', "frontend");');
     assertStringIncludes(
       output,
-      'buildOtelEnvVars("frontend", config.Version, \'executable\')',
+      "await app_0.withEnvironment('OTEL_RESOURCE_ATTRIBUTES', `service.version=${config.Version}`);",
     );
+    assert(!output.includes('withOtlpExporter'));
+    assert(!output.includes('buildOtelEnvVars'));
   });
 
   it('should include HTTP endpoint when port is configured', () => {
@@ -361,25 +378,26 @@ describe('generateRegisterApps', () => {
     assertStringIncludes(output, ".withHttpEndpoint({ port: 8000, env: 'PORT' })");
   });
 
-  it('should enable browser logs after endpoint binding for app resources', () => {
+  it('should enable browser logs and BrowserOrigins CORS after endpoint binding for app resources', () => {
     const output = generateRegisterApps({
       ...emptyOptions,
       apps: { frontend: fixtures.MINIMAL_APP },
     });
 
     assertStringIncludes(output, 'await app_0.withBrowserLogs();');
+    assertStringIncludes(output, 'property(EndpointProperty.BrowserOrigins)');
     assert(
       output.indexOf('app_0.withHttpEndpoint(') < output.indexOf('app_0.withBrowserLogs()'),
       'browser logs must be registered after the HTTP endpoint they browse',
     );
   });
 
-  it('should use deno task for app registration', () => {
+  it('should use withDenoTask for app registration', () => {
     const output = generateRegisterApps({
       ...emptyOptions,
       apps: { frontend: fixtures.MINIMAL_APP },
     });
-    assertStringIncludes(output, '[\'task\', "dev"]');
+    assertStringIncludes(output, 'await app_0.withDenoTask("dev");');
   });
 
   it('should include VITE service-discovery injection for service references', () => {
@@ -410,13 +428,19 @@ describe('generateRegisterApps', () => {
       apps: { dashboard: fixtures.DESKTOP_APP },
     });
     const buildDeclaration =
-      'const app_0_build = builder.addExecutable("dashboard-build", \'deno\', app_0_workdir, [\'task\', "build"]);';
+      'const app_0_build = builder.addDenoApp("dashboard-build", app_0_workdir, \'main.ts\');';
+    const buildTask = 'await app_0_build.withDenoTask("build");';
     const windowDeclaration =
-      "const app_0 = builder.addExecutable(\"dashboard\", 'deno', app_0_workdir, ['task', \"desktop:predev\", '--backend', 'cef']);";
+      'const app_0 = builder.addDenoApp("dashboard", app_0_workdir, \'main.ts\');';
+    const windowTask = 'await app_0.withDenoTask("desktop:predev");';
+    const windowArgs = "await app_0.withDenoScriptArgs(['--backend', 'cef']);";
     const buildDependency = 'await app_0.waitForCompletion(app_0_build);';
 
     assertStringIncludes(output, buildDeclaration);
+    assertStringIncludes(output, buildTask);
     assertStringIncludes(output, windowDeclaration);
+    assertStringIncludes(output, windowTask);
+    assertStringIncludes(output, windowArgs);
     assertStringIncludes(output, buildDependency);
     assert(output.indexOf(buildDeclaration) < output.indexOf(windowDeclaration));
     assert(output.indexOf(windowDeclaration) < output.indexOf(buildDependency));
@@ -435,8 +459,9 @@ describe('generateRegisterApps', () => {
       },
     });
 
-    assertStringIncludes(output, '[\'task\', "build"]');
-    assertStringIncludes(output, "['task', \"desktop:predev\", '--backend', 'cef']");
+    assertStringIncludes(output, 'await app_0_build.withDenoTask("build");');
+    assertStringIncludes(output, 'await app_0.withDenoTask("desktop:predev");');
+    assertStringIncludes(output, "await app_0.withDenoScriptArgs(['--backend', 'cef']);");
   });
 
   it('should inject server-side discovery without an Aspire HTTP endpoint for desktop', () => {

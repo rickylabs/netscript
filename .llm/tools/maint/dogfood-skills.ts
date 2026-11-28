@@ -3,18 +3,14 @@ import { dirname, fromFileUrl, join } from '@std/path';
 const repo = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.url)))));
 const destination = join(repo, '.agents', 'generated', 'consumer-skills');
 const check = Deno.args.includes('--check');
-const workflowSkills = [
-  'aspire-init',
-  'aspire-orchestration',
-  'aspire-monitoring',
-  'aspire-deployment',
-];
 
 await Deno.mkdir(join(repo, '.llm', 'tmp'), { recursive: true });
-const generated = await Deno.makeTempDir({
+const tempParent = await Deno.makeTempDir({
   dir: join(repo, '.llm', 'tmp'),
   prefix: 'dogfood-consumer-skills-',
 });
+const generated = join(tempParent, 'consumer-skills');
+await Deno.mkdir(generated);
 
 try {
   await generate(generated);
@@ -36,7 +32,7 @@ try {
     console.log(`Consumer agent bundle installed at ${destination}`);
   }
 } finally {
-  await removeIfPresent(generated);
+  await removeIfPresent(tempParent);
 }
 
 async function generate(projectRoot: string): Promise<void> {
@@ -101,11 +97,8 @@ async function assertSurface(projectRoot: string): Promise<void> {
   if (configText.includes('jsr:@netscript/cli@0.0.2')) {
     throw new Error('Dogfood MCP config retained the stale 0.0.2 CLI specifier');
   }
-  for (const skill of workflowSkills) {
-    for (const root of ['.agents/skills', '.claude/skills']) {
-      await Deno.stat(join(projectRoot, root, skill, 'SKILL.md'));
-    }
-  }
+  await Deno.stat(join(projectRoot, '.agents/skills/aspire/SKILL.md'));
+  await Deno.stat(join(projectRoot, '.claude/skills/repo-skills/SKILL.md'));
 }
 
 async function diffTrees(expectedRoot: string, actualRoot: string): Promise<string[]> {

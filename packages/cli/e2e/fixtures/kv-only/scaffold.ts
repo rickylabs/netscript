@@ -114,24 +114,10 @@ export async function checkGenerated(root: string, restoredAspire = false): Prom
   const selection = files.flatMap((file) => ['--file', file]);
   const checkSelection = files.filter((file) => restoredAspire || !file.includes('/aspire/'))
     .flatMap((file) => ['--file', file]);
-  const appHostMap = join(root, '.netscript-apphost-check.json');
   if (restoredAspire) {
-    // Deno does not inherit the nested AppHost's npm package boundary. Use its declared
-    // dependency and real generated SDK source, with Node's .mjs -> .mts resolution.
-    const deno = JSON.parse(await Deno.readTextFile(join(root, 'deno.json')));
-    const appHost = JSON.parse(await Deno.readTextFile(join(root, 'aspire/package.json')));
-    assert(typeof appHost.dependencies['vscode-jsonrpc'] === 'string');
-    await Deno.writeTextFile(
-      appHostMap,
-      JSON.stringify({
-        imports: {
-          ...deno.imports,
-          'vscode-jsonrpc/node.js': `npm:vscode-jsonrpc@${
-            appHost.dependencies['vscode-jsonrpc']
-          }/node.js`,
-        },
-      }),
-    );
+    // Native Deno AppHost (aspire/deno.json) is a workspace member and declares vscode-jsonrpc.
+    const appHost = JSON.parse(await Deno.readTextFile(join(root, 'aspire/deno.json')));
+    assert(typeof appHost.imports?.['vscode-jsonrpc/node.js'] === 'string');
   }
   await command(Deno.execPath(), [
     'run',
@@ -147,9 +133,9 @@ export async function checkGenerated(root: string, restoredAspire = false): Prom
         '--deno-arg',
         '--unstable-sloppy-imports',
         '--deno-arg',
-        '--import-map',
+        '--config',
         '--deno-arg',
-        appHostMap,
+        join(root, 'aspire/deno.json'),
       ]
       : []),
     ...checkSelection,

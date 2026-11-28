@@ -4,6 +4,7 @@ import { assert, assertEquals } from '@std/assert';
 import { toFileUrl } from '@std/path';
 import type { NetScriptConfig } from '@netscript/aspire/types';
 import { generateRegisterApps } from '../register/generate-register-apps.ts';
+import { SCAFFOLD_WORKSPACE_CATALOG } from '../../../../constants/scaffold/scaffold-app-catalog.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 
@@ -21,46 +22,45 @@ DEFAULT_TEMPLATE_REGISTRY.register(
 );
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
-// Relevant restored 13.5.3 SDK contract: aspire.mts re-exports ReferenceExpression
-// from base.mjs. Its create(strings, ...values) tag preserves endpoint references
-// (including nested expressions) until AppHost allocation. The recording double
-// stores those parts so the tests can allocate endpoint values after registration.
+// Relevant restored 17.0.0 SDK contract: aspire.mts re-exports ReferenceExpression
+// and EndpointProperty (including BrowserOrigins).
 const SDK_DOUBLE = `
-export interface EndpointReference { readonly resourceName: string }
+export const EndpointProperty = { BrowserOrigins: 'BrowserOrigins' } as const;
+export interface EndpointReferenceExpression {
+  readonly resourceName: string;
+  readonly property: string;
+}
+export interface EndpointReference {
+  readonly resourceName: string;
+  property(property: string): EndpointReferenceExpression;
+}
 export class ReferenceExpression {
   private constructor(readonly strings: readonly string[], readonly values: readonly unknown[]) {}
   static create(strings: TemplateStringsArray, ...values: unknown[]): ReferenceExpression {
     return new ReferenceExpression([...strings], values);
   }
 }
-export const OtlpProtocol = { HttpProtobuf: 1 };
 export interface Resource {
+  withDenoTask(taskName: string): Resource;
+  withDenoScriptArgs(args: readonly string[]): Resource;
   withEnvironment(key: string, value: unknown): Resource;
   withHttpEndpoint(options: unknown): Resource;
   withHttpHealthCheck(options: unknown): Resource;
   withBrowserLogs(): Resource;
-  withOtlpExporter(options: unknown): Resource;
   waitForCompletion(resource: Resource): Resource;
   getEndpoint(name: string): Promise<EndpointReference>;
 }
 export interface DistributedApplicationBuilder {
-  addExecutable(name: string, command: string, workdir: string, args: readonly string[]): Resource;
+  addDenoApp(name: string, workdir: string, scriptPath: string): Resource;
 }
 `;
 
-// Use the shipped config/resource interfaces, whose extension fields are unknown.
-// A narrower Environment double would hide errors in the rendered helper.
-const compatTemplate = await Deno.readTextFile(
-  new URL('../../../../assets/aspire/helpers/_aspire-compat.ts.template', import.meta.url),
-);
-const compatTypes = compatTemplate.match(
-  /export interface NetScriptConfig\s*\{[\s\S]*?(?=export interface ResourceDependencies)/,
-);
-assert(compatTypes, 'The shipped compatibility config interfaces must be present');
+// Use the canonical @netscript/aspire config/resource types directly.
+const aspireTypesUrl = new URL('../../../../../../../../packages/aspire/types.ts', import.meta.url)
+  .href;
 
 const COMPAT_DOUBLE = `
-${compatTypes[0]}
-export function buildOtelEnvVars(_name: string, _version: string, _mode: string): Record<string, string> { return {}; }
+export type { NetScriptConfig } from '${aspireTypesUrl}';
 export function buildViteEnvVarName(name: string) { return { full: name, shorthand: name }; }
 export function resolveWorkspacePath(root: string, path: string) { return root + '/' + path; }
 export function withCacheReference(_resource: unknown, _cache: unknown) {}
@@ -69,6 +69,12 @@ export function withCacheReference(_resource: unknown, _cache: unknown) {}
 export class RecordingResource {
   readonly environment: { key: string; value: unknown }[] = [];
   constructor(readonly name: string) {}
+  withDenoTask(): this {
+    return this;
+  }
+  withDenoScriptArgs(): this {
+    return this;
+  }
   withEnvironment(key: string, value: unknown): this {
     this.environment.push({ key, value });
     return this;
@@ -82,20 +88,28 @@ export class RecordingResource {
   withBrowserLogs(): this {
     return this;
   }
-  withOtlpExporter(): this {
-    return this;
-  }
   waitForCompletion(): this {
     return this;
   }
-  getEndpoint(): Promise<{ resourceName: string }> {
-    return Promise.resolve({ resourceName: this.name });
+  getEndpoint(): Promise<{
+    resourceName: string;
+    property: (property: string) => { resourceName: string; property: string };
+  }> {
+    const endpoint = { resourceName: this.name } as {
+      resourceName: string;
+      property: (property: string) => { resourceName: string; property: string };
+    };
+    Object.defineProperty(endpoint, 'property', {
+      value: (property: string) => ({ resourceName: this.name, property }),
+      enumerable: false,
+    });
+    return Promise.resolve(endpoint);
   }
 }
 
 interface GeneratedModule {
   registerApps(
-    builder: { addExecutable(name: string): RecordingResource },
+    builder: { addDenoApp(name: string, workdir: string, scriptPath: string): RecordingResource },
     config: NetScriptConfig,
     infrastructure: object,
     services: Map<string, RecordingResource>,
@@ -155,15 +169,24 @@ export async function registerWorkspace(
         denoDefaults: config.Defaults.Deno,
       }),
     );
+    const configPath = `${root}/deno.json`;
+    await Deno.writeTextFile(
+      configPath,
+      JSON.stringify({
+        lock: false,
+        catalog: SCAFFOLD_WORKSPACE_CATALOG,
+        imports: { zod: 'catalog:' },
+      }),
+    );
     const checked = await checkGeneratedFiles({
-      args: ['check', '--no-config', '--no-lock', '--unstable-kv', path],
+      args: ['check', '--config', configPath, '--no-lock', '--unstable-kv', path],
     });
     assertEquals(checked.code, 0, new TextDecoder().decode(checked.stderr));
     const module: unknown = await import(toFileUrl(path).href);
     assert(isGeneratedModule(module));
     await module.registerApps(
       {
-        addExecutable(name) {
+        addDenoApp(name) {
           const app = new RecordingResource(name);
           apps.set(name, app);
           return app;

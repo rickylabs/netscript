@@ -1,8 +1,8 @@
 import { assert, assertStringIncludes } from '@std/assert';
 
-Deno.test('TypeScript AppHost wording describes the supported Aspire range', async () => {
+Deno.test('TypeScript AppHost wording describes the native Deno AppHost workspace member', async () => {
   const source = await Deno.readTextFile(new URL('./render-ts-apphost.ts', import.meta.url));
-  assertStringIncludes(source, 'Aspire ≥ 13.4 validates TypeScript AppHosts before startup.');
+  assertStringIncludes(source, 'All TS AppHost files live here as a native Deno workspace member.');
 });
 
 Deno.test('unused scaffold community toolkit pin is removed', async () => {

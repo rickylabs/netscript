@@ -8,9 +8,17 @@ import { basename, join } from '@std/path';
 import { parseAppSettings } from '@netscript/aspire/config';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import { type AspireSurfaceRenderOptions, renderAspireSurface } from './aspire-surface-renderer.ts';
-import { reconcileAppHostPackageDependencies } from '../aspire/apphost-package-dependencies.ts';
+import {
+  assertNativeDenoAppHost,
+  reconcileAppHostPackageDependencies,
+} from '../aspire/apphost-package-dependencies.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
+import { outputWarning } from '../../presentation/output/default-output.ts';
+import {
+  generateQualityRunner,
+  isUnmodifiedLegacyQualityRunner,
+} from '../../templates/workspace/quality-runner.ts';
 import { addWorkspaceMember, removeWorkspaceMember } from '../scaffold/workspace-writer.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts';
@@ -152,6 +160,7 @@ export async function regenerateAspireHelpers(
       { projectRoot, aspireDir },
     );
   }
+  await assertNativeDenoAppHost(fs, projectRoot);
 
   const files = await renderAspireSurface(projectRoot, fs, templateAdapter, options);
   const written: string[] = [];
@@ -162,6 +171,28 @@ export async function regenerateAspireHelpers(
     if (!changed) continue;
     written.push(path);
     if (!options.dryRun) await scaffolder.writeFile(path, file.content, true);
+  }
+  const qualityRunnerPath = join(
+    projectRoot,
+    SCAFFOLD_DIRS.NETSCRIPT,
+    SCAFFOLD_FILES.QUALITY_RUNNER,
+  );
+  if (await fs.exists(qualityRunnerPath)) {
+    const existingRunner = await fs.readFile(qualityRunnerPath);
+    if (await isUnmodifiedLegacyQualityRunner(existingRunner)) {
+      written.push(qualityRunnerPath);
+      if (!options.dryRun) {
+        await scaffolder.writeFile(qualityRunnerPath, generateQualityRunner(), true);
+      }
+    } else if (
+      existingRunner.includes('aspire/node_modules/typescript/bin/tsc') &&
+      !existingRunner.includes('aspire/deno.json')
+    ) {
+      outputWarning(
+        'Preserved customized .netscript/quality-runner.ts (still references removed Aspire Node tsc). ' +
+          'Update runAppHostCheck manually using docs/site/orchestration-runtime/how-to/upgrade-aspire-17.md.',
+      );
+    }
   }
   return written;
 }

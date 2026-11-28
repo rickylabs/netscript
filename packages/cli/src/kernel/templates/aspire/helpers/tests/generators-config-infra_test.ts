@@ -3,9 +3,12 @@
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assert, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStringIncludes, assertThrows } from 'jsr:@std/assert@^1';
+import { join, toFileUrl } from '@std/path';
 import { generateConfigSchema } from '../generate-config-schema.ts';
 import { generateRegisterInfrastructure } from '../register/generate-register-infrastructure.ts';
+import { SCAFFOLD_WORKSPACE_CATALOG } from '../../../../constants/scaffold/scaffold-app-catalog.ts';
+import { checkGeneratedFiles } from '../../../../../../../../.llm/tools/testing/check-generated-files.ts';
 import * as fixtures from './generators-test-support.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
 
@@ -39,36 +42,47 @@ describe('generateConfigSchema', () => {
     assertStringIncludes(output, 'config-schema.mts');
   });
 
-  it('should import zod and NetScriptConfigSchema from _aspire-compat', () => {
+  it('should import zod and canonical @netscript/aspire config/type contracts', () => {
     const output = generateConfigSchema(emptyOptions);
     assertStringIncludes(output, "import { z } from 'zod'");
     assertStringIncludes(output, 'NetScriptConfigSchema,');
-    assertStringIncludes(output, "from './_aspire-compat.mts'");
+    assertStringIncludes(output, "from '@netscript/aspire/config'");
+    assertStringIncludes(output, "from '@netscript/aspire/types'");
+    assert(!output.includes("from './_aspire-compat.mts'"));
   });
 
-  it('should export ProjectConfigSchema and ProjectConfig type', () => {
-    const output = generateConfigSchema(emptyOptions);
+  it('should export ProjectConfigSchema and narrowed ProjectConfig type', () => {
+    const empty = generateConfigSchema(emptyOptions);
     assertStringIncludes(
-      output,
-      'export const ProjectConfigSchema = NetScriptConfigSchema.extend(',
+      empty,
+      'export const ProjectConfigSchema: z.ZodType<ProjectConfig> = asZodSchema(NetScriptConfigSchema);',
     );
+    assertStringIncludes(empty, 'export type ProjectConfig = NetScriptConfig;');
+
+    const populated = generateConfigSchema({
+      ...emptyOptions,
+      services: { users: fixtures.MINIMAL_SERVICE },
+    });
+    assertStringIncludes(populated, 'const narrowedSectionsSchema = z.looseObject({');
+    assertStringIncludes(populated, 'asZodSchema(NetScriptConfigSchema).transform(');
     assertStringIncludes(
-      output,
-      'export type ProjectConfig = z.infer<typeof ProjectConfigSchema>',
+      populated,
+      "export type ProjectConfig = Omit<NetScriptConfig, 'Services'> & {",
     );
+    assertStringIncludes(populated, 'readonly users: ServiceEntry;');
   });
 
-  it('should include section entries as literal keys', () => {
+  it('should include section entries as literal keys wrapped with asZodSchema', () => {
     const output = generateConfigSchema({
       ...emptyOptions,
       services: { users: fixtures.MINIMAL_SERVICE, orders: fixtures.SERVICE_WITH_REFS },
       databases: { main: fixtures.MINIMAL_DATABASE },
     });
     assertStringIncludes(output, 'Services: z.object({');
-    assertStringIncludes(output, 'users: ServiceEntrySchema,');
-    assertStringIncludes(output, 'orders: ServiceEntrySchema,');
+    assertStringIncludes(output, 'users: asZodSchema(ServiceEntrySchema),');
+    assertStringIncludes(output, 'orders: asZodSchema(ServiceEntrySchema),');
     assertStringIncludes(output, 'Databases: z.object({');
-    assertStringIncludes(output, 'main: DatabaseEntrySchema,');
+    assertStringIncludes(output, 'main: asZodSchema(DatabaseEntrySchema),');
   });
 
   it('should import entry schemas only for populated sections', () => {
@@ -89,7 +103,7 @@ describe('generateConfigSchema', () => {
       ...emptyOptions,
       services: { 'workers-api': fixtures.MINIMAL_SERVICE },
     });
-    assertStringIncludes(output, "'workers-api': ServiceEntrySchema,");
+    assertStringIncludes(output, "'workers-api': asZodSchema(ServiceEntrySchema),");
   });
 
   it('should handle all empty sections with no z.object blocks', () => {
@@ -100,8 +114,74 @@ describe('generateConfigSchema', () => {
     assert(!output.includes('Databases: z.object('));
     assert(!output.includes('Cache: z.object('));
     assert(!output.includes('Tools: z.object('));
-    // Should still have the extend wrapper
-    assertStringIncludes(output, 'NetScriptConfigSchema.extend(');
+    assertStringIncludes(output, 'asZodSchema(NetScriptConfigSchema)');
+  });
+
+  it('compiles and parses valid/invalid configs while narrowing KnownServices<ProjectConfig>', async () => {
+    const output = generateConfigSchema({
+      ...emptyOptions,
+      services: { users: fixtures.MINIMAL_SERVICE, orders: fixtures.SERVICE_WITH_REFS },
+    });
+    const root = await Deno.makeTempDir({ prefix: 'netscript-config-schema-' });
+    try {
+      const aspirePackageRoot = new URL(
+        '../../../../../../../../packages/aspire/',
+        import.meta.url,
+      );
+      const configPath = join(root, 'deno.json');
+      await Deno.writeTextFile(
+        configPath,
+        JSON.stringify({
+          lock: false,
+          catalog: SCAFFOLD_WORKSPACE_CATALOG,
+          imports: {
+            zod: 'catalog:',
+            '@netscript/aspire/config': new URL('config.ts', aspirePackageRoot).href,
+            '@netscript/aspire/types': new URL('types.ts', aspirePackageRoot).href,
+          },
+        }),
+      );
+      const schemaPath = join(root, 'config-schema.mts');
+      await Deno.writeTextFile(schemaPath, output);
+      const consumerPath = join(root, 'consumer.ts');
+      await Deno.writeTextFile(
+        consumerPath,
+        `import type { KnownServices } from '@netscript/aspire/types';
+import { ProjectConfigSchema, type ProjectConfig } from './config-schema.mts';
+
+type ServiceKey = KnownServices<ProjectConfig>;
+const checkKeys = (key: ServiceKey): 'users' | 'orders' => key;
+export function parseConfig(raw: unknown): ProjectConfig {
+  const parsed = ProjectConfigSchema.parse(raw);
+  checkKeys('users');
+  checkKeys('orders');
+  return parsed;
+}
+`,
+      );
+      const checked = await checkGeneratedFiles({
+        args: ['check', '--config', configPath, '--no-lock', consumerPath],
+      });
+      assertEquals(checked.code, 0, new TextDecoder().decode(checked.stderr));
+
+      const mod = await import(`${toFileUrl(schemaPath).href}?t=${crypto.randomUUID()}`);
+      const parsed = mod.ProjectConfigSchema.parse({
+        ...fixtures.EMPTY_CONFIG,
+        Services: {
+          users: fixtures.MINIMAL_SERVICE,
+          orders: fixtures.SERVICE_WITH_REFS,
+        },
+      });
+      assertEquals(Object.keys(parsed.Services).sort(), ['orders', 'users']);
+      assertThrows(() =>
+        mod.ProjectConfigSchema.parse({
+          ...fixtures.EMPTY_CONFIG,
+          Services: { users: fixtures.MINIMAL_SERVICE },
+        })
+      );
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
   });
 });
 // generateRegisterInfrastructure
@@ -124,9 +204,16 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, 'register-infrastructure.mts');
   });
 
-  it('should export registerInfrastructure async function', () => {
-    const output = generateRegisterInfrastructure(emptyOptions);
-    assertStringIncludes(output, 'export async function registerInfrastructure(');
+  it('should export registerInfrastructure function preserving the Promise contract', () => {
+    const emptyOutput = generateRegisterInfrastructure(emptyOptions);
+    assertStringIncludes(emptyOutput, 'export function registerInfrastructure(');
+    assertStringIncludes(emptyOutput, '): Promise<InfrastructureContext>');
+    assertStringIncludes(emptyOutput, 'return Promise.resolve({');
+    const populatedOutput = generateRegisterInfrastructure({
+      databases: { main: fixtures.MINIMAL_DATABASE },
+      caches: {},
+    });
+    assertStringIncludes(populatedOutput, 'export async function registerInfrastructure(');
   });
 
   it('should export InfrastructureContext interface', () => {

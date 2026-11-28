@@ -3,7 +3,8 @@
  *
  * Compile the emitted credential carrier against unmodified, restored Aspire SDK files.
  * The gzip fixture contains aspire.mts, base.mts and transport.mts from `aspire restore`
- * in a CLI scaffold: SDK/PostgreSQL/Redis 13.5.3 and the scaffold's pinned Browsers package.
+ * in a CLI scaffold: SDK/JavaScript/PostgreSQL/MySql/SqlServer 17.0.0 and the scaffold's
+ * pinned Browsers package.
  * It is the complete generated surface, rather than a handwritten builder declaration.
  */
 
@@ -27,7 +28,7 @@ function assertChecked(code: number, diagnostics: string): void {
 
 async function restoreRecordedSdk(root: string): Promise<void> {
   const compressed = await Deno.readFile(
-    new URL('./fixtures/aspire-sdk-13.5.3.json.gz', import.meta.url),
+    new URL('./fixtures/aspire-sdk-17.0.0.json.gz', import.meta.url),
   );
   const text = await new Response(
     new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip')),

@@ -2,43 +2,28 @@
 
 import { installationSecretPermissions } from './installation-secret.mts';
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
-{{otlpImport}}import type { NetScriptConfig } from '{{__slot2__}}';
+{{denoSdkImport}}import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mts';
 import {
 {{compatImports}}
 } from '{{__slot3__}}';
 
-type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutable']>;
+type DenoResource = ReturnType<DistributedApplicationBuilder['addDenoApp']>;
 
 /**
  * Registers background processors (workers, sagas, triggers, benchmark)
- * with the Aspire SDK builder.
- *
- * Each processor is registered via `addExecutable()` from the Aspire SDK.
- * Telemetry-enabled entries receive the full executable OTEL env set;
- * telemetry-disabled entries receive explicit opt-out vars.
- *
- * Background processors do not cross-reference each other, so no two-pass
- * registration is needed.
- *
- * @param builder - The Aspire distributed application builder
- * @param config - Parsed NetScript configuration
- * @param infrastructure - Infrastructure context with database/cache resources
- * @param services - Map of registered service resources (for endpoint-based env var wiring)
- * @param plugins - Map of registered plugin resources (for endpoint-based env var wiring)
- * @param appHostDir - Absolute path to the AppHost directory
- * @returns Map of registered background processor resources keyed by name
+ * with the Aspire SDK builder via first-party `addDenoApp()`.
  */
 export async function registerBackgroundProcessors(
   builder: DistributedApplicationBuilder,
   config: NetScriptConfig,
   {{infrastructureParameter}}: InfrastructureContext,
-  _services: Map<string, ExecutableResource>,
-  _plugins: Map<string, ExecutableResource>,
+  _services: Map<string, DenoResource>,
+  _plugins: Map<string, DenoResource>,
   appHostDir: string,
   installationSecretFile: string | undefined = undefined,
-): Promise<Map<string, ExecutableResource>> {
-  const backgroundProcessors = new Map<string, ExecutableResource>();
+): Promise<Map<string, DenoResource>> {
+  const backgroundProcessors = new Map<string, DenoResource>();
 {{databaseBindings}}
 {{__slot4__}}
 

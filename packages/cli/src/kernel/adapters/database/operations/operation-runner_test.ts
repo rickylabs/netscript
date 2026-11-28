@@ -141,6 +141,9 @@ function runner(
     ...options,
     executor,
     lifecycleLock: options.lifecycleLock ?? new FakeLock(),
+    dockerTopologyInspector: options.dockerTopologyInspector ?? {
+      inspectEndpoint: () => Promise.resolve({ locality: 'local' }),
+    },
     pollIntervalMs: 0,
     timeoutMs: options.timeoutMs ?? 60_000,
     sleep: async () => {},
@@ -353,9 +356,89 @@ describe('DbOperationRunner', () => {
         `Database resource postgres did not become healthy within 60 seconds (aspire wait exit ${exitCode})`,
       );
       assertStringIncludes(error.message, 'Check its resource logs and listener readiness');
+      assertEquals(error.message.includes('Foreign Docker daemon detected'), false);
       assertEquals(executor.outputCalls.map((call) => call.args[0]), ['ps', 'wait']);
     });
+
+    it(`enriches aspire wait exit ${exitCode} with foreign Docker daemon diagnostics for container DBs`, async () => {
+      const executor = new FakeAspireExecutor([
+        running(),
+        output(exitCode, '', 'resource remains unhealthy'),
+      ]);
+
+      const error = await assertRejects(
+        () =>
+          runner(executor, {
+            dockerTopologyInspector: {
+              inspectEndpoint: () =>
+                Promise.resolve({
+                  locality: 'remote',
+                  host: 'ssh://docker-box.example',
+                  daemonHost: 'docker-box.example',
+                  source: 'DOCKER_CONTEXT',
+                  context: 'remote-dev',
+                }),
+            },
+          }).execute(request('seed')),
+        Error,
+        'Foreign Docker daemon detected',
+      );
+      assertStringIncludes(error.message, 'docker-box.example');
+      assertStringIncludes(error.message, 'netscript plugin doctor');
+    });
   }
+
+  it('skips Docker locality inspection on wait timeout for SQLite, External DBs, and non-loopback endpoints', async () => {
+    for (
+      const [label, dbOverride, waitStderr] of [
+        [
+          'sqlite',
+          { configKey: 'sqlite', engine: 'sqlite' as const, mode: 'File' as const },
+          'resource remains unhealthy',
+        ],
+        ['external postgres', {
+          configKey: 'ext',
+          engine: 'postgres' as const,
+          mode: 'External' as const,
+        }, 'resource remains unhealthy'],
+        ['non-loopback endpoint', {
+          configKey: 'postgres',
+          engine: 'postgres' as const,
+          mode: 'Container' as const,
+        }, 'listener ECONNREFUSED at db.internal.example:5432 after 1000 ms'],
+      ] as const
+    ) {
+      let inspected = false;
+      const executor = new FakeAspireExecutor([
+        running(),
+        output(17, '', waitStderr),
+      ]);
+      const scopedRequest: DbOperationRequest = {
+        operation: 'seed',
+        target: {
+          kind: 'single',
+          database: { ...DATABASE, ...dbOverride },
+        },
+        projectRoot: PROJECT_ROOT,
+      };
+
+      const error = await assertRejects(
+        () =>
+          runner(executor, {
+            dockerTopologyInspector: {
+              inspectEndpoint: () => {
+                inspected = true;
+                return Promise.resolve({ locality: 'remote', daemonHost: 'remote.example' });
+              },
+            },
+          }).execute(scopedRequest),
+        Error,
+        `Database resource ${dbOverride.configKey} did not become healthy`,
+      );
+      assertEquals(inspected, false, `expected Docker inspection skipped for ${label}`);
+      assertEquals(error.message.includes('Foreign Docker daemon detected'), false);
+    }
+  });
 
   it('reports non-timeout wait failures without misclassifying them', async () => {
     const executor = new FakeAspireExecutor([

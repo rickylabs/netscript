@@ -545,7 +545,7 @@ Deno.test('production README starts with fresh application state and permits ima
   assert(readme > 0);
   const before = source.slice(0, readme);
   assertStringIncludes(before, 'path: ~/.nuget/packages');
-  assertStringIncludes(before, 'key: nuget-aspire-${{ runner.os }}-13.5.3-v1');
+  assertStringIncludes(before, 'key: nuget-aspire-${{ runner.os }}-17.0.0-v1');
   assertEquals(
     before.includes('path: ~/.aspire'),
     false,

@@ -6,8 +6,8 @@ import {
 } from '../../../src/application/gates/scaffold/runtime/evidence/describe-follow.ts';
 
 const FIXTURES = new URL('./fixtures/', import.meta.url);
-const ASPIRE_13_5_3_CAPTURE = new URL(
-  'aspire-describe-follow-13.5.3-capture.ndjson',
+const ASPIRE_17_0_0_CAPTURE = new URL(
+  'aspire-describe-follow-17.0.0-capture.ndjson',
   FIXTURES,
 );
 const RESOURCE_JSON_NULLABLE_FIELDS: readonly string[] = [
@@ -36,7 +36,7 @@ const RESOURCE_JSON_NULLABLE_FIELDS: readonly string[] = [
 
 Deno.test('doctor receipt preserves warnings and accepts a zero-failure host', async () => {
   const fixture = JSON.parse(
-    await Deno.readTextFile(new URL('aspire-doctor-13.5.3.json', FIXTURES)),
+    await Deno.readTextFile(new URL('aspire-doctor-17.0.0.json', FIXTURES)),
   );
   const result = evaluateAspireDoctor(fixture);
   assertEquals(result.summary, { passed: 5, warnings: 3, failed: 0 });
@@ -49,7 +49,7 @@ Deno.test('doctor receipt preserves warnings and accepts a zero-failure host', a
 
 Deno.test('doctor receipt fails closed on an explicit failed check', async () => {
   const fixture = JSON.parse(
-    await Deno.readTextFile(new URL('aspire-doctor-13.5.3.json', FIXTURES)),
+    await Deno.readTextFile(new URL('aspire-doctor-17.0.0.json', FIXTURES)),
   );
   fixture.checks.push({
     category: 'container',
@@ -60,9 +60,9 @@ Deno.test('doctor receipt fails closed on an explicit failed check', async () =>
   assertThrows(() => evaluateAspireDoctor(fixture), Error, 'docker: stopped');
 });
 
-Deno.test('describe follow parses bare Aspire 13.5 ResourceJson lines with last-seen semantics', async () => {
+Deno.test('describe follow parses bare Aspire 17.0.0 ResourceJson lines with last-seen semantics', async () => {
   const stream = await Deno.readTextFile(
-    new URL('aspire-describe-follow-13.5.3.ndjson', FIXTURES),
+    new URL('aspire-describe-follow-17.0.0.ndjson', FIXTURES),
   );
   const parsed = parseDescribeFollow(stream);
   assertEquals(parsed.resources.map((entry) => [entry.name, entry.state]), [
@@ -122,7 +122,7 @@ Deno.test('describe follow accepts every nullable ResourceJson field omitted', (
 
 Deno.test('describe follow parses hosted nullable-state resource shapes as pending', async () => {
   const stream = await Deno.readTextFile(
-    new URL('aspire-describe-follow-13.5.3-nullable-state.ndjson', FIXTURES),
+    new URL('aspire-describe-follow-17.0.0-nullable-state.ndjson', FIXTURES),
   );
   assertEquals(
     parseDescribeFollow(stream).resources.map((resource) => [
@@ -180,7 +180,7 @@ Deno.test('describe follow rejects invalid ResourceJson gate fields precisely', 
 });
 
 Deno.test('describe follow treats omitted and null health-report statuses as pending', async () => {
-  const lines = (await Deno.readTextFile(ASPIRE_13_5_3_CAPTURE)).trimEnd().split(/\r?\n/);
+  const lines = (await Deno.readTextFile(ASPIRE_17_0_0_CAPTURE)).trimEnd().split(/\r?\n/);
   const earlyRunningPostgres = lines[11];
   if (!earlyRunningPostgres) throw new Error('Aspire capture omitted line 12');
 
@@ -208,8 +208,8 @@ Deno.test('describe follow treats omitted and null health-report statuses as pen
   );
 });
 
-Deno.test('describe follow applies last-seen health-report status from a real 13.5.3 capture', async () => {
-  const stream = await Deno.readTextFile(ASPIRE_13_5_3_CAPTURE);
+Deno.test('describe follow applies last-seen health-report status from a real 17.0.0 capture', async () => {
+  const stream = await Deno.readTextFile(ASPIRE_17_0_0_CAPTURE);
   const postgres = parseDescribeFollow(stream).resources.find((entry) => entry.name === 'postgres');
   assertEquals(postgres?.healthReports.postgres_check, {
     status: 'Unhealthy',

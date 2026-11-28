@@ -82,6 +82,8 @@ const ROOT_TEMPLATE_URLS: TemplateUrlMap = {
 const ASPIRE_HELPER_TEMPLATE_URLS: TemplateUrlMap = {
   apphostTemplate: TEMPLATE_KEYS.aspireHelpersApphost,
   installationSecretTemplate: TEMPLATE_KEYS.aspireHelpersInstallationSecret,
+  apphostReadinessTemplate: TEMPLATE_KEYS.aspireHelpersApphostReadiness,
+  apphostPostgresReadinessTemplate: TEMPLATE_KEYS.aspireHelpersApphostPostgresReadiness,
   aspireCompatTemplate: TEMPLATE_KEYS.aspireHelpersAspireCompat,
   configureDashboardTemplate: TEMPLATE_KEYS.aspireHelpersConfigureDashboard,
   runToolTemplate: TEMPLATE_KEYS.aspireHelpersRunTool,

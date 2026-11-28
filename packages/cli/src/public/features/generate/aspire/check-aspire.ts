@@ -1,3 +1,4 @@
+import { assertNativeDenoAppHost } from '../../../../kernel/adapters/aspire/apphost-package-dependencies.ts';
 import { checkAspireSurface } from '../../../../kernel/adapters/service/aspire-surface-checker.ts';
 import { renderAspireSurfaceForInspection } from '../../../../kernel/adapters/service/aspire-surface-renderer.ts';
 import type { AspireSurfaceReport } from '../../../../kernel/domain/aspire-generated-surface.ts';
@@ -11,6 +12,7 @@ export async function checkAspire(
     readonly process?: ProcessPort;
   },
 ): Promise<AspireSurfaceReport> {
+  await assertNativeDenoAppHost(dependencies.fs, projectRoot);
   return await checkAspireSurface(
     projectRoot,
     () =>

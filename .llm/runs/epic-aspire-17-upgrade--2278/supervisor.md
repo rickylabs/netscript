@@ -1,0 +1,36 @@
+# Supervisor — `epic-aspire-17-upgrade--2278`
+
+- **Run ID:** `epic-aspire-17-upgrade--2278`
+- **Owner / Mission:** Top-level main lane upgrading NetScript from pinned Aspire `13.5.3` to Aspire `17.0.0` for the next `0.0.10` canary (following green `v0.0.10-canary.6`).
+- **Repository Root / Worktree:** `/home/agent/.t3/worktrees/repo/epic-aspire-17-upgrade-3ee1336cc437c55d`
+- **Branch:** `epic/aspire-17-upgrade`
+- **Integrated Main Baseline (`origin/main`):** `7eecfe51f9fadcae79927ebd69898003dcdd27ab` (merged after initial `6d7f10338` baseline).
+- **PR:** https://github.com/rickylabs/netscript/pull/2693 (`type:feat`, `area:aspire`, `area:cli`, `e2e-cli-gate`, `status:impl-eval`)
+- **Primary Epic:** `#2278` (`Part of #2278` — never `Closes` on an epic)
+- **Linked Leaf / Related Issues:**
+  - `#319` — Layer A: native Deno TypeScript AppHost (`aspire/deno.json`, zero AppHost `node_modules`) (`Closes #319`)
+  - `#320` — Layer B: first-party `AddDenoApp` / `DenoAppResource` adoption (`Closes #320`)
+  - `#295` — Full NetScript framework dogfood proof on native Deno AppHost + `AddDenoApp` (`Refs #295` only — owner comment `#issuecomment-4871769509` designates `#295` as an umbrella tracking `#319` and `#320`; close manually after child leaves merge)
+  - `#2174` — Empty-section Aspire helper lint across all 7 helpers (`Closes #2174`)
+  - `#2202` — Fail loudly on AppHost health path (and CLI wait) when targeting a foreign Docker daemon's loopback (`Closes #2202`)
+  - `#2259` — `aspire describe` password exposure (`Closes #2259` strictly gated on hosted `scaffold-runtime` Postgres whole-snapshot verification + DB/consumer/Studio proof; if any leak appears on hosted Postgres, remove `Closes #2259` and keep issue open)
+  - `#1726` / `#2184` — Partial/prereq progress (`Refs #1726, #2184` only): replace hardcoded `MSSQL_SA_PASSWORD` with complexity-safe `ensureDatabasePassword` and adopt `.withRepl()`; full live MySQL/MSSQL container E2E remains deferred on `#2184`.
+- **Archetypes & Overlays (Doctrine §10 Verdicts):**
+  - Primary: **Archetype 6 (CLI / Tooling)** — `packages/cli` (Doctrine §10 verdict: **6 / Keep**), `.llm/tools/*`, `.github/workflows/*`
+  - Secondary: **Archetype 2 (Integration / Adapter Package)** — `packages/aspire` (**2 / Keep**), `packages/mcp` (**2 / Keep**)
+  - Overlays: `SCOPE-docs`, `SCOPE-service`
+- **Workload Tier & Evaluation Policy (`.llm/harness/workflow/lane-policy.md`):**
+  - **Tier:** `feature` (owner-capped standard tier; owner authorized an evaluation model override rather than requesting a privileged `complex`/`architecture` row).
+  - **Evaluation Loop Limits (`feature`):** PLAN-EVAL max 2 cycles (pass 1 failed `FAIL_PLAN` with B1–B8; pass 2 is this revised evaluation); IMPL-EVAL max 5 cycles (notify owner after 3).
+  - **Generator Route:** Antigravity / Gemini (main top-level lane).
+  - **Owner-Mandated Evaluation Chain Override (recorded verbatim):**
+    - First-pass PLAN-EVAL & IMPL-EVAL: **GPT-6.2 Astra (`xhigh`)** via T3 `delegate_task` (`providerInstanceId: "codex"`, `model: "gpt-6.2-astra"`, `options: { reasoningEffort: "xhigh" }`).
+    - Second-pass fallback (only if needed): **Gemini 4 Hydrogen (`xhigh`)** via T3 `delegate_task` (`providerInstanceId: "antigravity"`, `model: "gemini-4-hydrogen"`, `options: { thought_level: "xhigh" }`).
+    - Round-4 final `IMPL-EVAL` override (verbatim owner instruction: `"For the final impl eval do it with Fable 5.2 xhigh (1 pass only)"`): **Claude Fable 5.2 (`xhigh`)** via T3 `delegate_task` (`providerInstanceId: "claudeAgent"`, `model: "claude-fable-5-2"`, `options: { "effort": "xhigh" }`), Cycle 4, 1 pass only; separate child session and different vendor family (Anthropic Claude vs Google Gemini) strictly maintained.
+    - Separate-session and different-vendor-family independence strictly maintained (`Antigravity/Gemini` generator vs `Codex/GPT-6.2 Astra` Rounds 1–3 evaluator and `Claude/Fable 5.2` Round 4 final evaluator).
+  - **Pass 1 Evaluator Receipt:** Codex session `01a21a21-b73c-7be0-8b45-d7389b80cda9` (`gpt-6.2-astra`, `xhigh`) evaluated `c09ef7c0a` → `VERDICT: FAIL_PLAN` (B1–B8 recorded in `plan-eval.md`).
+  - **Round-4 Evaluator Receipt:** Independent Claude Fable 5.2 (`claudeAgent` / `claude-fable-5-2`, `effort: xhigh`, session `19874bc6-d3fd-4cef-9e95-4790a566cbe9`) evaluated `21077ac3bfc248e2e6ec793d351a8917ee484948` → `VERDICT: FAIL_DEBT` (zero product defects; strictly for two unrecorded F-16 cardinality growths plus bookkeeping records, recorded in `evaluate.md:257-381`).
+- **Host Constraints:**
+  - Local environment: `deno 2.9.8`, `dotnet 10.0.400` (`mise x dotnet@10.0.400`), scratch `Aspire.Cli@17.0.0` at `.llm/tmp/aspire-17-spike/bin/aspire` (deleted before final push/handoff), and NO running local Docker daemon (`unix:///var/run/docker.sock` unavailable).
+  - Local runtime proof covers unit/contract suites, SDK compile proof (`aspire-sdk-17.0.0.json.gz`), static E2E suites (`scaffold.{service,contracts,plugins}`), native Deno AppHost restore/start/wait/describe/telemetry/MCP/stop, and local SQLite + Garnet executable smoke.
+  - Docker/Postgres runtime proof (`scaffold.runtime --cleanup`) and dual-tier merge-readiness proof (`scaffold.runtime.sqlite --cleanup`) execute non-skipped on hosted GitHub Actions `e2e-cli` (`e2e-cli-gate`).

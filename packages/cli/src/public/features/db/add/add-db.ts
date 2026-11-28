@@ -1,6 +1,7 @@
+import { assertNativeDenoAppHost } from '../../../../kernel/adapters/aspire/apphost-package-dependencies.ts';
 import { DbEngineRegistry } from '../../../../kernel/application/registries/db-engine-registry.ts';
 import { UseCase } from '../../../../kernel/application/abstracts/use-case.ts';
-import { DatabaseWorkspaceMutator } from '../../../../kernel/adapters/database/workspace-mutator.ts';
+import type { DatabaseWorkspaceMutator } from '../../../../kernel/adapters/database/workspace-mutator.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { AddDbResult } from '../../../domain/db-add-plan.ts';
 import type { AddDbInput } from './add-db-input.ts';
@@ -46,6 +47,7 @@ async function executeAddDb(
 ): Promise<AddDbResult> {
   const registry = dependencies.registry ?? new DbEngineRegistry();
   const plan = await planDbAdd(request, { fs: dependencies.fs, registry });
+  await assertNativeDenoAppHost(dependencies.fs, plan.projectRoot);
   const provider = registry.get(plan.engine);
   const scaffold = await renderDbWorkspace(plan, dependencies);
 

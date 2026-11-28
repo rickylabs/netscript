@@ -134,10 +134,9 @@ Deno.test('readPinnedAppPort reports an unreadable appsettings rather than guess
 
 // ---------------------------------------------------------------------------
 // The allocated-port path parses `aspire describe --format Json`, so the parse is tested
-// without a running AppHost. This fixture is not invented: it is the real shape captured from
-// a live NetScript AppHost (Aspire 13.4.6) — DCP-suffixed `name`, human `displayName`, a
-// `dashboardUrl` deep-link, a declared `urls[]`, `relationships[]` stubs, and an `environment`
-// block carrying sibling services' URLs.
+// without a running AppHost. This fixture matches the live NetScript AppHost shape (Aspire 17.0.0)
+// — DCP-suffixed `name`, human `displayName`, a `dashboardUrl` deep-link, declared `urls[]`,
+// `relationships[]` stubs, and an `environment` block carrying sibling services' URLs.
 // ---------------------------------------------------------------------------
 const DESCRIBE_FIXTURE = JSON.stringify({
   resources: [
@@ -145,12 +144,14 @@ const DESCRIBE_FIXTURE = JSON.stringify({
       name: 'users-abcdwxyz',
       displayName: 'users',
       resourceType: 'Executable',
+      resourceTypeDisplayName: 'Deno',
       urls: [{ name: 'http', url: 'http://localhost:34100' }],
     },
     {
       name: 'dashboard-sayhwbds',
       displayName: 'dashboard',
       resourceType: 'Executable',
+      resourceTypeDisplayName: 'Deno',
       state: 'Running',
       healthStatus: 'Healthy',
       dashboardUrl: 'https://localhost:43699/?resource=dashboard-sayhwbds',
@@ -172,31 +173,34 @@ Deno.test("the app endpoint comes from the resource's declared urls[]", () => {
   ]);
 });
 
-// S2 captured 13.5.3 describe JSON with `--nologo`; this independent, bannerless case is a
-// redacted projection of `02-v5-aspire-describe-final.json`, selecting its `users` resource.
-const ASPIRE_13_5_3_DESCRIBE_FIXTURE = JSON.stringify({
+// Live Aspire 17.0.0 bannerless describe snapshot (`--nologo`), selecting the `users` resource.
+const ASPIRE_17_0_0_DESCRIBE_FIXTURE = JSON.stringify({
   resources: [
     {
-      name: 'users-yvbcumea',
+      name: 'users-aqctbjac',
       displayName: 'users',
       resourceType: 'Executable',
+      resourceTypeDisplayName: 'Deno',
       state: 'Running',
       healthStatus: 'Healthy',
-      dashboardUrl: 'https://localhost:42501/?resource=users-yvbcumea',
-      relationships: [{ type: 'Reference', resourceName: 'aspire-13-5-postgres-db' }],
-      urls: [{ name: 'http', url: 'http://localhost:3001' }],
+      dashboardUrl: 'https://localhost:35797/?resource=users-aqctbjac',
+      relationships: [{ type: 'Reference', resourceName: 'cap-web-sddmysmn' }],
+      urls: [{ name: 'http', url: 'http://localhost:45215' }],
       environment: {
-        OTEL_EXPORTER_OTLP_ENDPOINT: 'http://localhost:42043',
+        NETSCRIPT_CORS_ORIGINS: 'http://localhost:36775',
+        OTEL_DENO: 'true',
+        OTEL_EXPORTER_OTLP_ENDPOINT: 'http://localhost:41791',
+        OTEL_RESOURCE_ATTRIBUTES: 'service.version=1.0.0,service.instance.id=aqctbjac',
         OTEL_SERVICE_NAME: 'users',
-        PORT: '43515',
+        PORT: '25603',
       },
     },
   ],
 });
 
-Deno.test("13.5.3: the app endpoint comes from the captured resource's declared urls[]", () => {
-  assertEquals(appUrlsFromDescribeOutput(ASPIRE_13_5_3_DESCRIBE_FIXTURE, 'users'), [
-    'http://localhost:3001',
+Deno.test("17.0.0: the app endpoint comes from the captured resource's declared urls[]", () => {
+  assertEquals(appUrlsFromDescribeOutput(ASPIRE_17_0_0_DESCRIBE_FIXTURE, 'users'), [
+    'http://localhost:45215',
   ]);
 });
 

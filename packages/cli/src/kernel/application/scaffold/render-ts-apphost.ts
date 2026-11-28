@@ -7,7 +7,7 @@ import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import type { ScaffoldResult } from '../../domain/core-types.ts';
 import type { ValidatedInitOptions } from '../../domain/scaffold/scaffold-options.ts';
-import { generateAppHostPackageJson } from '../../templates/aspire/generate-apphost-package-json.ts';
+import { generateAppHostDenoJson } from '../../templates/aspire/generate-apphost-deno-json.ts';
 import { generateTsAspireConfig } from '../../templates/aspire/generate-aspire-config.ts';
 import {
   buildCacheBlock,
@@ -28,7 +28,7 @@ export async function scaffoldTsAppHost(
   const filesSkipped: string[] = [];
   const targetPath = options.targetPath;
 
-  // All TS AppHost files live here — isolated from the Deno workspace root.
+  // All TS AppHost files live here as a native Deno workspace member.
   const aspireDir = join(targetPath, SCAFFOLD_DIRS.ASPIRE_TS);
   await context.scaffolder.createDir(aspireDir);
   directoriesCreated.push(aspireDir);
@@ -52,57 +52,25 @@ export async function scaffoldTsAppHost(
     filesSkipped.push(aspireConfigPath);
   }
 
-  // 2. package.json — Node/TypeScript dependencies required by Aspire TS AppHost runtime.
-  //    Lives inside `aspire/` to keep the Node.js package graph isolated
-  //    from the Deno workspace at the project root.
-  const packageJsonContent = generateAppHostPackageJson({
-    name: options.name,
+  // 2. aspire/deno.json — Native Deno TypeScript AppHost member config.
+  //    Enrolled in root deno.json `workspace` so it shares root `nodeModulesDir`,
+  //    `catalog`, and `unstable: [..., "sloppy-imports"]` with zero `aspire/node_modules/`.
+  const appHostDenoJsonContent = generateAppHostDenoJson({
     dbEngines: [options.dbEngine],
+    importMode: options.importMode,
+    localBase: options.localBase,
+    packagesAsWorkspaceMembers: context.packagesAsWorkspaceMembers(options),
   });
-  const packageJsonPath = join(aspireDir, 'package.json');
-  if (await context.scaffolder.writeFile(packageJsonPath, packageJsonContent, options.force)) {
-    filesCreated.push(packageJsonPath);
-  } else {
-    filesSkipped.push(packageJsonPath);
-  }
-
-  // 3. tsconfig.apphost.json — Aspire ≥ 13.4 validates TypeScript AppHosts before startup.
-  const tsconfigApphostContent = JSON.stringify(
-    {
-      compilerOptions: {
-        target: 'ES2022',
-        module: 'NodeNext',
-        moduleResolution: 'NodeNext',
-        allowImportingTsExtensions: true,
-        esModuleInterop: true,
-        forceConsistentCasingInFileNames: true,
-        strict: true,
-        skipLibCheck: true,
-        outDir: './dist/apphost',
-        rootDir: '.',
-      },
-      include: [
-        SCAFFOLD_FILES.APPHOST_MTS,
-        `${SCAFFOLD_DIRS.HELPERS}/**/*.mts`,
-        `${SCAFFOLD_DIRS.ASPIRE_GENERATED}/${SCAFFOLD_DIRS.MODULES}/aspire.mts`,
-        `${SCAFFOLD_DIRS.ASPIRE_GENERATED}/${SCAFFOLD_DIRS.MODULES}/base.mts`,
-        `${SCAFFOLD_DIRS.ASPIRE_GENERATED}/${SCAFFOLD_DIRS.MODULES}/transport.mts`,
-      ],
-      exclude: ['node_modules', `${SCAFFOLD_DIRS.HELPERS}/run-tool.mts`],
-    },
-    null,
-    2,
-  ) + '\n';
-  const tsconfigApphostPath = join(aspireDir, SCAFFOLD_FILES.TSCONFIG_APPHOST);
+  const appHostDenoJsonPath = join(aspireDir, SCAFFOLD_FILES.DENO_JSON);
   if (
-    await context.scaffolder.writeFile(tsconfigApphostPath, tsconfigApphostContent, options.force)
+    await context.scaffolder.writeFile(appHostDenoJsonPath, appHostDenoJsonContent, options.force)
   ) {
-    filesCreated.push(tsconfigApphostPath);
+    filesCreated.push(appHostDenoJsonPath);
   } else {
-    filesSkipped.push(tsconfigApphostPath);
+    filesSkipped.push(appHostDenoJsonPath);
   }
 
-  // 4. .helpers/ directory (inside aspire/)
+  // 3. .helpers/ directory (inside aspire/)
   const helpersDir = join(aspireDir, SCAFFOLD_DIRS.HELPERS);
   await context.scaffolder.createDir(helpersDir);
   directoriesCreated.push(helpersDir);

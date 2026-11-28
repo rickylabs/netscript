@@ -438,3 +438,313 @@ for (const diagnosticStream of ['stderr', 'stdout'] as const) {
     }
   });
 }
+
+for (const startableState of ['Stopped', 'Finished', 'Exited', 'FailedToStop'] as const) {
+  Deno.test(`exit-16 stop-failure recovers directly via start when observed state is ${startableState}`, async () => {
+    const f = await fixture();
+    const observedCalls: string[][] = [];
+    let describeCount = 0;
+    const executor: RefreshGeneratedClientConsumersOptions['executor'] = {
+      ...f.options.executor,
+      output: (args) => {
+        observedCalls.push([...args]);
+        if (args[0] === 'describe') {
+          describeCount++;
+          const resources = f.resources.map((r) =>
+            r.displayName === 'orders' && describeCount > 1 ? { ...r, state: startableState } : r
+          );
+          return Promise.resolve({ code: 0, stdout: JSON.stringify({ resources }), stderr: '' });
+        }
+        if (args[0] === 'resource' && args[2] === 'restart') {
+          return Promise.resolve({
+            code: 16,
+            stdout: '',
+            stderr: 'Failed to stop resource orders before restart.',
+          });
+        }
+        return Promise.resolve({ code: 0, stdout: '', stderr: '' });
+      },
+    };
+    try {
+      await refreshGeneratedClientConsumers({
+        ...f.options,
+        executor,
+        pollIntervalMs: 1,
+        sleep: () => Promise.resolve(),
+      });
+      assertEquals(
+        observedCalls.map((args) => args.slice(0, 3)),
+        [
+          ['describe', '--format', 'Json'],
+          ['resource', 'orders', 'restart'],
+          ['describe', '--format', 'Json'],
+          ['resource', 'orders', 'start'],
+          ['wait', 'orders', '--status'],
+        ],
+      );
+      assertEquals(f.options.refreshed.has('orders'), true);
+    } finally {
+      await Deno.remove(f.root, { recursive: true });
+    }
+  });
+}
+
+for (const initialRecoveryState of ['Running', 'Stopping'] as const) {
+  Deno.test(`exit-16 stop-failure stops and polls ${initialRecoveryState} executable until Stopped before starting`, async () => {
+    const f = await fixture();
+    const observedCalls: string[][] = [];
+    const describeStates = ['Running', initialRecoveryState, 'Stopping', 'Stopped'];
+    let describeIndex = 0;
+    let sleepCalls = 0;
+    const executor: RefreshGeneratedClientConsumersOptions['executor'] = {
+      ...f.options.executor,
+      output: (args) => {
+        observedCalls.push([...args]);
+        if (args[0] === 'describe') {
+          const state = describeStates[Math.min(describeIndex++, describeStates.length - 1)];
+          const resources = f.resources.map((r) =>
+            r.displayName === 'orders' ? { ...r, state } : r
+          );
+          return Promise.resolve({ code: 0, stdout: JSON.stringify({ resources }), stderr: '' });
+        }
+        if (args[0] === 'resource' && args[2] === 'restart') {
+          return Promise.resolve({
+            code: 16,
+            stdout: 'Failed to stop resource orders',
+            stderr: '',
+          });
+        }
+        return Promise.resolve({ code: 0, stdout: '', stderr: '' });
+      },
+    };
+    try {
+      await refreshGeneratedClientConsumers({
+        ...f.options,
+        executor,
+        pollIntervalMs: 5,
+        sleep: () => {
+          sleepCalls++;
+          return Promise.resolve();
+        },
+      });
+      assertEquals(sleepCalls, 1);
+      assertEquals(
+        observedCalls.map((args) => args.slice(0, 3)),
+        [
+          ['describe', '--format', 'Json'],
+          ['resource', 'orders', 'restart'],
+          ['describe', '--format', 'Json'],
+          ['resource', 'orders', 'stop'],
+          ['describe', '--format', 'Json'],
+          ['describe', '--format', 'Json'],
+          ['resource', 'orders', 'start'],
+          ['wait', 'orders', '--status'],
+        ],
+      );
+      assertEquals(f.options.refreshed.has('orders'), true);
+    } finally {
+      await Deno.remove(f.root, { recursive: true });
+    }
+  });
+}
+
+for (const nonStartableState of [null, undefined, 'Starting', 'UnknownState'] as const) {
+  Deno.test(`exit-16 recovery fails closed on non-startable state ${String(nonStartableState)}`, async () => {
+    const f = await fixture();
+    const observedCalls: string[][] = [];
+    let describeCount = 0;
+    const executor: RefreshGeneratedClientConsumersOptions['executor'] = {
+      ...f.options.executor,
+      output: (args) => {
+        observedCalls.push([...args]);
+        if (args[0] === 'describe') {
+          describeCount++;
+          const resources = f.resources.map((r) =>
+            r.displayName === 'orders' && describeCount > 1 ? { ...r, state: nonStartableState } : r
+          );
+          return Promise.resolve({ code: 0, stdout: JSON.stringify({ resources }), stderr: '' });
+        }
+        if (args[0] === 'resource' && args[2] === 'restart') {
+          return Promise.resolve({ code: 16, stdout: '', stderr: 'Failed to stop resource' });
+        }
+        return Promise.resolve({ code: 0, stdout: '', stderr: '' });
+      },
+    };
+    try {
+      await assertRejects(
+        () =>
+          refreshGeneratedClientConsumers({
+            ...f.options,
+            executor,
+            pollIntervalMs: 1,
+            sleep: () => Promise.resolve(),
+          }),
+        Error,
+        'non-startable observed state',
+      );
+      assertEquals(observedCalls.some((args) => args[2] === 'start' || args[2] === 'stop'), false);
+    } finally {
+      await Deno.remove(f.root, { recursive: true });
+    }
+  });
+}
+
+Deno.test('exit-16 recovery fails closed on missing, ambiguous, non-executable, stop/start failure, and unrelated exit 16', async () => {
+  for (
+    const mode of [
+      'missing',
+      'ambiguous',
+      'container',
+      'stop-fail',
+      'start-fail',
+      'unrelated-16',
+    ] as const
+  ) {
+    const f = await fixture();
+    const observedCalls: string[][] = [];
+    let describeCount = 0;
+    const executor: RefreshGeneratedClientConsumersOptions['executor'] = {
+      ...f.options.executor,
+      output: (args) => {
+        observedCalls.push([...args]);
+        if (args[0] === 'describe') {
+          describeCount++;
+          if (describeCount === 1) {
+            return Promise.resolve({
+              code: 0,
+              stdout: JSON.stringify({ resources: f.resources }),
+              stderr: '',
+            });
+          }
+          if (mode === 'missing') {
+            return Promise.resolve({
+              code: 0,
+              stdout: JSON.stringify({
+                resources: f.resources.filter((r) => r.displayName !== 'orders'),
+              }),
+              stderr: '',
+            });
+          }
+          if (mode === 'ambiguous') {
+            return Promise.resolve({
+              code: 0,
+              stdout: JSON.stringify({
+                resources: [
+                  ...f.resources,
+                  {
+                    displayName: 'orders',
+                    name: 'orders-dup',
+                    resourceType: 'Executable',
+                    state: 'Stopped',
+                  },
+                ],
+              }),
+              stderr: '',
+            });
+          }
+          if (mode === 'container') {
+            return Promise.resolve({
+              code: 0,
+              stdout: JSON.stringify({
+                resources: f.resources.map((r) =>
+                  r.displayName === 'orders'
+                    ? { ...r, resourceType: 'Container', state: 'Stopped' }
+                    : r
+                ),
+              }),
+              stderr: '',
+            });
+          }
+          const state = mode === 'stop-fail' ? 'Running' : 'Stopped';
+          return Promise.resolve({
+            code: 0,
+            stdout: JSON.stringify({
+              resources: f.resources.map((r) => r.displayName === 'orders' ? { ...r, state } : r),
+            }),
+            stderr: '',
+          });
+        }
+        if (args[0] === 'resource' && args[2] === 'restart') {
+          return Promise.resolve({
+            code: 16,
+            stdout: '',
+            stderr: mode === 'unrelated-16'
+              ? 'Command unavailable on this target'
+              : 'Failed to stop resource',
+          });
+        }
+        if (args[0] === 'resource' && args[2] === 'stop' && mode === 'stop-fail') {
+          return Promise.resolve({ code: 16, stdout: '', stderr: 'stop rejected' });
+        }
+        if (args[0] === 'resource' && args[2] === 'start' && mode === 'start-fail') {
+          return Promise.resolve({ code: 16, stdout: '', stderr: 'start rejected' });
+        }
+        return Promise.resolve({ code: 0, stdout: '', stderr: '' });
+      },
+    };
+    try {
+      await assertRejects(
+        () =>
+          refreshGeneratedClientConsumers({
+            ...f.options,
+            executor,
+            pollIntervalMs: 1,
+            sleep: () => Promise.resolve(),
+          }),
+        Error,
+        'aspire resource orders restart --apphost',
+      );
+      if (mode === 'unrelated-16') {
+        assertEquals(observedCalls.length, 2);
+      } else if (mode === 'start-fail') {
+        assertEquals(observedCalls.filter((args) => args[2] === 'start').length, 1);
+        assertEquals(observedCalls.filter((args) => args[2] === 'restart').length, 1);
+      } else {
+        assertEquals(observedCalls.some((args) => args[2] === 'start'), false);
+      }
+      assertEquals(f.options.refreshed.has('orders'), false);
+    } finally {
+      await Deno.remove(f.root, { recursive: true });
+    }
+  }
+});
+
+Deno.test('exit-16 recovery stop-poll respects outer timeout cancellation', async () => {
+  const f = await fixture();
+  let describeCount = 0;
+  const executor: RefreshGeneratedClientConsumersOptions['executor'] = {
+    ...f.options.executor,
+    output: (args) => {
+      if (args[0] === 'describe') {
+        describeCount++;
+        const state = describeCount === 1 ? 'Running' : 'Stopping';
+        return Promise.resolve({
+          code: 0,
+          stdout: JSON.stringify({
+            resources: f.resources.map((r) => (r.displayName === 'orders' ? { ...r, state } : r)),
+          }),
+          stderr: '',
+        });
+      }
+      if (args[0] === 'resource' && args[2] === 'restart') {
+        return Promise.resolve({ code: 16, stdout: '', stderr: 'Failed to stop resource' });
+      }
+      return Promise.resolve({ code: 0, stdout: '', stderr: '' });
+    },
+  };
+  try {
+    await assertRejects(
+      () =>
+        refreshGeneratedClientConsumers({
+          ...f.options,
+          executor,
+          timeoutMs: 25,
+          pollIntervalMs: 200,
+        }),
+      Error,
+      'timed out',
+    );
+  } finally {
+    await Deno.remove(f.root, { recursive: true });
+  }
+});

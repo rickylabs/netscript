@@ -96,6 +96,8 @@ export interface DiscoveredDatabase {
   readonly configKey: string;
   /** Resolved CLI engine identifier. */
   readonly engine: DbEngine;
+  /** Configured provisioning mode (`Container`, `External`, or `File`). */
+  readonly mode?: 'Container' | 'External' | 'File';
   /** Concrete database resource name. */
   readonly databaseName: string;
   /** Workspace directory relative to the project root. */

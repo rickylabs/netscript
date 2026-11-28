@@ -59,13 +59,14 @@ export function doctorEvidence(value: unknown): AspireMcpSmokeReceipt['doctor'] 
   };
 }
 
-/** Extract resource display names and parameter-secret nulling evidence. */
+/** Extract resource display names and parameter-secret redaction/omission evidence. */
 export function resourceEvidence(
   value: unknown,
 ): { names: string[]; secretParamsNull: boolean } {
   if (!Array.isArray(value)) throw new Error('list_resources result is not an array');
   const names: string[] = [];
-  let secretParamsNull = false;
+  let foundSecretParam = false;
+  let allSecretParamsRedacted = true;
   for (const item of value) {
     const resource = record(item, 'resource');
     const name = Reflect.get(resource, 'display_name') ?? Reflect.get(resource, 'displayName') ??
@@ -73,12 +74,27 @@ export function resourceEvidence(
     if (typeof name !== 'string') throw new Error('resource omitted display name');
     names.push(name);
     if (!name.endsWith('-password')) continue;
-    const properties = record(Reflect.get(resource, 'properties'), 'parameter properties');
-    const environment = record(Reflect.get(resource, 'environment'), 'parameter environment');
-    secretParamsNull = Reflect.get(properties, 'Value') === null &&
-      Object.values(environment).every((entry) => entry === null);
+    foundSecretParam = true;
+    const topLevelValue = Reflect.get(resource, 'value') ?? Reflect.get(resource, 'Value');
+    if ((topLevelValue ?? null) !== null) {
+      allSecretParamsRedacted = false;
+    }
+    const rawProperties = Reflect.get(resource, 'properties');
+    if (rawProperties !== undefined) {
+      const properties = record(rawProperties, 'parameter properties');
+      if ((Reflect.get(properties, 'Value') ?? Reflect.get(properties, 'value') ?? null) !== null) {
+        allSecretParamsRedacted = false;
+      }
+    }
+    const rawEnvironment = Reflect.get(resource, 'environment');
+    if (rawEnvironment !== undefined) {
+      const environment = record(rawEnvironment, 'parameter environment');
+      if (!Object.values(environment).every((entry) => entry === null)) {
+        allSecretParamsRedacted = false;
+      }
+    }
   }
-  return { names, secretParamsNull };
+  return { names, secretParamsNull: foundSecretParam && allSecretParamsRedacted };
 }
 
 /** Return true when an MCP-excluded resource has no accessible console output. */
@@ -112,7 +128,7 @@ export function structuredLogEvidence(
   };
 }
 
-/** Match the exact hosted 13.5.3 payload on a dashboard-gated call. */
+/** Match the exact hosted 17.0.0 payload on a dashboard-gated call. */
 export function isDashboardUnavailableError(toolName: string, error: unknown): boolean {
   if (!ASPIRE_MCP_DASHBOARD_GATED_CALLS.includes(toolName)) return false;
   if (!(error instanceof Error)) return false;

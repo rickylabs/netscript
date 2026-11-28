@@ -10,6 +10,8 @@ import type { SagaProjectionBackend as HostingSagaProjectionBackend } from '@net
 import type { SagaProjectionBackend } from '@netscript/plugin-sagas-core/stores/backends';
 import { generateRegisterServices } from '../register/generate-register-services.ts';
 import { generateRegisterPlugins } from '../register/generate-register-plugins.ts';
+import { generateRegisterBackground } from '../register/generate-register-background.ts';
+import { isExternalDenoEntrypoint } from '../register/registration-preamble.ts';
 import * as fixtures from './generators-test-support.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
 import { netscriptJsrSpecifier } from '../../../../constants/jsr-specifiers.ts';
@@ -56,12 +58,16 @@ describe('generateRegisterServices', () => {
       ...emptyOptions,
       services: { users: fixtures.MINIMAL_SERVICE },
     });
-    assertStringIncludes(output, 'buildOtelEnvVars,');
+    assertStringIncludes(output, 'applyDenoPermissions,');
     assertStringIncludes(output, 'extractPluginReferences,');
     assertStringIncludes(output, 'extractServiceReferences,');
     assertStringIncludes(output, 'resolvePermissions,');
     assertStringIncludes(output, 'resolveWorkspacePath,');
     assertStringIncludes(output, "from './_aspire-compat.mts'");
+    assertStringIncludes(
+      output,
+      "import { DenoNodeModulesDirMode } from '../.aspire/modules/aspire.mts'",
+    );
   });
 
   it('should generate two-pass registration structure', () => {
@@ -73,31 +79,40 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, 'export async function wireServiceReferences(');
   });
 
-  it('should register services via addExecutable with correct port and entrypoint', () => {
+  it('should register services via addDenoApp with correct port and entrypoint', () => {
     const output = generateRegisterServices({
       ...emptyOptions,
       services: { users: fixtures.MINIMAL_SERVICE },
     });
-    assertStringIncludes(output, "builder.addExecutable('users', 'deno', workdir,");
-    assertStringIncludes(output, "'--minimum-dependency-age=0'");
-    // MINIMAL_SERVICE carries the deprecated `Port` alias, so the pin is
-    // expected here. The un-pinned default is covered in
-    // register-http-endpoint_test.ts.
-    assertStringIncludes(output, ".withHttpEndpoint({ port: 3000, env: 'PORT' });");
+    assertStringIncludes(output, "builder.addDenoApp('users', workdir, 'src/main.ts');");
+    assertStringIncludes(
+      output,
+      'await applyDenoPermissions(resource, installationSecretPermissions(perms, installationSecretFile));',
+    );
+    assertStringIncludes(
+      output,
+      'await resource.withDenoNodeModulesDir({ mode: DenoNodeModulesDirMode.None });',
+    );
+    assertStringIncludes(
+      output,
+      "await resource.withDenoRuntimeArgs(['--minimum-dependency-age=0']);",
+    );
+    assertStringIncludes(output, "await resource.withHttpEndpoint({ port: 3000, env: 'PORT' });");
     assertStringIncludes(output, "services.set('users'");
   });
 
-  it('should include full executable OTEL env vars for each service', () => {
+  it('should configure endpoint-conditional OTEL identity for each service without forcing withOtlpExporter', () => {
     const output = generateRegisterServices({
       ...emptyOptions,
       services: { users: fixtures.MINIMAL_SERVICE },
     });
+    assertStringIncludes(output, "await resource.withEnvironment('OTEL_SERVICE_NAME', 'users');");
     assertStringIncludes(
       output,
-      "buildOtelEnvVars('users', config.Version, 'executable')",
+      "await resource.withEnvironment('OTEL_RESOURCE_ATTRIBUTES', `service.version=${config.Version}`);",
     );
-    assertStringIncludes(output, 'resource.withEnvironment(key, value)');
-    assertStringIncludes(output, '// OTEL telemetry (full executable env set)');
+    assert(!output.includes('withOtlpExporter'));
+    assert(!output.includes('buildOtelEnvVars'));
   });
 
   it('should register an HTTP health probe after the endpoint for unpinned services', () => {
@@ -247,7 +262,31 @@ describe('generateRegisterServices', () => {
   it('should handle empty services', () => {
     const output = generateRegisterServices(emptyOptions);
     assertStringIncludes(output, '// No services configured');
-    assertStringIncludes(output, 'export async function wireServiceReferences(');
+    assertStringIncludes(output, 'export function wireServiceReferences(');
+    assertStringIncludes(output, 'return Promise.resolve();');
+  });
+
+  it('wraps external service entrypoints via resolveDenoScriptUrl while leaving in-workdir entrypoints raw', () => {
+    const relativeOut = generateRegisterServices({
+      ...emptyOptions,
+      services: { users: fixtures.MINIMAL_SERVICE },
+    });
+    assert(!relativeOut.includes('resolveDenoScriptUrl'));
+
+    const externalOut = generateRegisterServices({
+      ...emptyOptions,
+      services: {
+        users: {
+          ...fixtures.MINIMAL_SERVICE,
+          Entrypoint: '/external/services/users/src/main.ts',
+        },
+      },
+    });
+    assertStringIncludes(externalOut, 'resolveDenoScriptUrl,');
+    assertStringIncludes(
+      externalOut,
+      'builder.addDenoApp(\'users\', workdir, resolveDenoScriptUrl(workdir, "/external/services/users/src/main.ts"));',
+    );
   });
 });
 // generateRegisterPlugins
@@ -277,7 +316,7 @@ describe('generateRegisterPlugins', () => {
   it('should export registerPlugins with an asynchronous return contract', () => {
     const output = generateRegisterPlugins(emptyOptions);
     assertStringIncludes(output, 'export function registerPlugins(');
-    assertStringIncludes(output, 'Promise<Map<string, ExecutableResource>>');
+    assertStringIncludes(output, 'Promise<Map<string, DenoResource>>');
   });
 
   it('should generate two-pass registration structure', () => {
@@ -292,15 +331,24 @@ describe('generateRegisterPlugins', () => {
     );
   });
 
-  it('should register plugins via addExecutable with correct port', () => {
+  it('should register plugins via addDenoApp with correct port', () => {
     const output = generateRegisterPlugins({
       ...emptyOptions,
       plugins: { auth: fixtures.MINIMAL_PLUGIN },
     });
-    assertStringIncludes(output, 'builder.addExecutable("auth", \'deno\', workdir,');
-    assertStringIncludes(output, "'--minimum-dependency-age=0'");
+    assertStringIncludes(output, 'builder.addDenoApp("auth", workdir, "src/main.ts");');
+    assertStringIncludes(output, 'await applyDenoPermissions(resource,');
+    assertStringIncludes(output, "await resource.withDenoConfig('deno.json');");
+    assertStringIncludes(
+      output,
+      'await resource.withDenoNodeModulesDir({ mode: DenoNodeModulesDirMode.None });',
+    );
+    assertStringIncludes(
+      output,
+      "await resource.withDenoRuntimeArgs(['--minimum-dependency-age=0']);",
+    );
     assertStringIncludes(output, "'--unstable-no-legacy-abort'");
-    assertStringIncludes(output, ".withHttpEndpoint({ port: 4400, env: 'PORT' });");
+    assertStringIncludes(output, "await resource.withHttpEndpoint({ port: 4400, env: 'PORT' });");
     assertStringIncludes(output, 'plugins.set("auth"');
   });
 
@@ -342,17 +390,18 @@ describe('generateRegisterPlugins', () => {
     }
   });
 
-  it('should include full executable OTEL env vars for each plugin', () => {
+  it('should configure endpoint-conditional OTEL identity for each plugin without forcing withOtlpExporter', () => {
     const output = generateRegisterPlugins({
       ...emptyOptions,
       plugins: { auth: fixtures.MINIMAL_PLUGIN },
     });
+    assertStringIncludes(output, 'await resource.withEnvironment(\'OTEL_SERVICE_NAME\', "auth");');
     assertStringIncludes(
       output,
-      'buildOtelEnvVars("auth", config.Version, \'executable\')',
+      "await resource.withEnvironment('OTEL_RESOURCE_ATTRIBUTES', `service.version=${config.Version}`);",
     );
-    assertStringIncludes(output, 'resource.withEnvironment(key, value)');
-    assertStringIncludes(output, '// OTEL telemetry (full executable env set)');
+    assert(!output.includes('withOtlpExporter'));
+    assert(!output.includes('buildOtelEnvVars'));
   });
 
   it('should register an HTTP health probe after the endpoint for unpinned plugins', () => {
@@ -469,7 +518,10 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, 'withCacheReference,');
     // EndpointProperty is no longer imported — endpoint resolution moved to the
     // infrastructure wiring layer.
-    assertStringIncludes(output, "import { OtlpProtocol } from '../.aspire/modules/aspire.mts'");
+    assertStringIncludes(
+      output,
+      "import { DenoNodeModulesDirMode } from '../.aspire/modules/aspire.mts'",
+    );
   });
 
   it('should pass saga store backend appsettings to plugin env', () => {
@@ -509,9 +561,82 @@ describe('generateRegisterPlugins', () => {
 
   it('should handle empty plugins', () => {
     const output = generateRegisterPlugins(emptyOptions);
-    assertStringIncludes(output, 'Promise.resolve(new Map<string, ExecutableResource>())');
-    assert(!output.includes('builder.addExecutable('));
+    assertStringIncludes(output, 'Promise.resolve(new Map<string, DenoResource>())');
+    assert(!output.includes('builder.addDenoApp('));
     assert(!output.includes('/services'));
+  });
+
+  it('classifies external vs in-workdir Deno entrypoints for Aspire 17 addDenoApp', () => {
+    for (
+      const external of [
+        '/home/runner/work/netscript/plugins/workers/services/src/main.ts',
+        'C:\\workspace\\plugins\\workers\\services\\src\\main.ts',
+        '\\\\server\\share\\plugins\\workers\\main.ts',
+        '../outside/main.ts',
+        'a/../../outside.ts',
+      ]
+    ) {
+      assertEquals(isExternalDenoEntrypoint(external), true, external);
+    }
+    for (
+      const inWorkdir of [
+        'src/main.ts',
+        './main.ts',
+        'a/../b/main.ts',
+        netscriptJsrSpecifier('plugin-workers', '/services'),
+        'file:///tmp/main.ts',
+        'https://example.com/main.ts',
+        '@netscript/plugin-workers/services',
+      ]
+    ) {
+      assertEquals(isExternalDenoEntrypoint(inWorkdir), false, inWorkdir);
+    }
+  });
+
+  it('wraps external plugin and background entrypoints in resolveDenoScriptUrl while keeping relative and jsr entrypoints unwrapped', () => {
+    const jsrPlugin = generateRegisterPlugins({
+      ...emptyOptions,
+      plugins: {
+        'workers-api': {
+          ...fixtures.MINIMAL_PLUGIN,
+          Entrypoint: netscriptJsrSpecifier('plugin-workers', '/services'),
+        },
+      },
+    });
+    assert(!jsrPlugin.includes('resolveDenoScriptUrl'));
+
+    const absPlugin = generateRegisterPlugins({
+      ...emptyOptions,
+      plugins: {
+        'workers-api': {
+          ...fixtures.MINIMAL_PLUGIN,
+          Entrypoint: '/home/runner/work/netscript/plugins/workers/services/src/main.ts',
+        },
+        shared: { ...fixtures.MINIMAL_PLUGIN, Entrypoint: '../shared/main.ts' },
+      },
+    });
+    assertStringIncludes(absPlugin, 'resolveDenoScriptUrl,');
+    assertStringIncludes(
+      absPlugin,
+      'builder.addDenoApp("workers-api", workdir, resolveDenoScriptUrl(workdir, "/home/runner/work/netscript/plugins/workers/services/src/main.ts"));',
+    );
+    assertStringIncludes(
+      absPlugin,
+      'builder.addDenoApp("shared", workdir, resolveDenoScriptUrl(workdir, "../shared/main.ts"));',
+    );
+
+    const bgOut = generateRegisterBackground({
+      version: '1.0.0',
+      denoDefaults: fixtures.MINIMAL_DENO_DEFAULTS,
+      processors: {
+        ext: { ...fixtures.MINIMAL_BACKGROUND, Entrypoint: '../external-worker/runtime.ts' },
+      },
+    });
+    assertStringIncludes(bgOut, 'resolveDenoScriptUrl,');
+    assertStringIncludes(
+      bgOut,
+      'builder.addDenoApp("ext", bg_0_workdir, resolveDenoScriptUrl(bg_0_workdir, "../external-worker/runtime.ts"));',
+    );
   });
 });
 // generateRegisterBackground

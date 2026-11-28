@@ -19,17 +19,26 @@ import {
   readListenerHealthReport,
 } from './verify-listener-readiness.ts';
 import {
+  assertConsumerConnectionStringsRedacted,
+  assertDashboardApiHasNoSecrets,
   assertGeneratedHelpersHaveNoSecrets,
   assertHealthReportsHaveNoSecrets,
   assertMcpResourcesHaveNoSecrets,
   assertNoSecretBytes,
+  assertProcessDatabaseConnection,
+  readProcessEnvironmentByPid,
 } from './credential-secret-surfaces.ts';
+import {
+  assertDashboardResourceDetailsMasked,
+  assertPrismaStudioDatabaseRead,
+  PRISMA_STUDIO_DEFAULT_URL,
+} from './dashboard-resource-masking.ts';
 
 export { assertNoSecretBytes } from './credential-secret-surfaces.ts';
 
 const POSTGRES_RESOURCE = 'postgres';
 const POSTGRES_LISTENER_HEALTH_KEY = 'postgres_listener';
-/** Aspire 13.5.3 WaitTimeout: an Unhealthy resource remains Running, not Failed (exit 18). */
+/** Aspire 17.0.0 WaitTimeout: an Unhealthy resource remains Running, not Failed (exit 18). */
 export const ASPIRE_WAIT_TIMEOUT_EXIT_CODE = 17;
 /** Bounded `aspire wait` budget; the probe can never become Healthy, so this is the whole wait. */
 const BOUNDED_WAIT_SECONDS = 10;
@@ -54,12 +63,14 @@ export interface BoundedWaitResult {
 
 /**
  * Require the wrong-credential report to be auth-classified, the real listener and credential
- * checks to stay Healthy, and all health evidence to carry no credential bytes.
+ * checks to stay Healthy, and the complete raw `aspire describe` snapshot to carry no credential
+ * bytes.
  */
 export function assertCredentialRejectionEvidence(
   rawSnapshot: string,
   secrets: readonly string[],
 ): CredentialRejectionEvidence {
+  assertNoSecretBytes('aspire describe', rawSnapshot, secrets);
   const topology: unknown = JSON.parse(rawSnapshot);
   assertHealthReportsHaveNoSecrets(topology, secrets);
   const rejected = readListenerHealthReport(
@@ -115,11 +126,12 @@ export function assertBoundedWaitRejected(
   }
 }
 
-/** Reject even transient Healthy updates, including credentials in their health evidence. */
+/** Reject even transient Healthy updates and any credential bytes anywhere in the resource update. */
 export function assertCredentialResourceNotHealthy(
   update: ResourceUpdate,
   secrets: readonly string[],
 ): void {
+  assertNoSecretBytes('aspire describe stream', JSON.stringify(update.resource), secrets);
   assertHealthReportsHaveNoSecrets(update.resource, secrets);
   if (healthStatusOf(update) === 'healthy') {
     throw new Error('wrong-credential probe or dependant reported Healthy during observation');
@@ -144,6 +156,7 @@ export async function verifyCredentialRejection(
   };
   const subscriptions = [];
   let evidence: CredentialRejectionEvidence;
+  let rawSnapshot = '';
   let wait: BoundedWaitResult;
   try {
     const probe = await watchResourceUpdates(
@@ -166,7 +179,7 @@ export async function verifyCredentialRejection(
     );
     // Prove the blocked dependant exists; an empty stream cannot satisfy the observation.
     await dependent.waitFor(() => true, RESOURCE_TRANSITION_FAILURE_CEILING_MS);
-    evidence = await describeRejectionEvidence(appHost, secrets);
+    ({ evidence } = await describeRejectionEvidence(appHost, secrets));
     await assertGeneratedHelpersHaveNoSecrets(projectRoot, secrets);
     await assertMcpResourcesHaveNoSecrets(projectRoot, appHost, secrets);
     wait = await runAspire([
@@ -181,11 +194,93 @@ export async function verifyCredentialRejection(
     ], BOUNDED_WAIT_CEILING_MS);
     assertBoundedWaitRejected(wait, secrets);
     // Recheck classification and correct-password readiness after the complete wait.
-    evidence = await describeRejectionEvidence(appHost, secrets);
+    ({ evidence, rawSnapshot } = await describeRejectionEvidence(appHost, secrets));
   } finally {
     await Promise.all(subscriptions.map((subscription) => subscription.close(true)));
   }
   if (observationFailure) throw observationFailure;
+
+  // #2259 consumer & dashboard verification: redacted in describe/dashboard, live on Postgres port.
+  const topology: unknown = JSON.parse(rawSnapshot);
+  const {
+    postgresPort,
+    prismaStudioPid,
+    usersResourceName,
+    prismaStudioResourceName,
+    prismaStudioUrl,
+  } = assertConsumerConnectionStringsRedacted(topology);
+  const studioErrorFile = `${projectRoot}/database/postgres/.netscript-prisma-studio.error`;
+  const studioErrorText = await Deno.readTextFile(studioErrorFile).then(
+    (text) => text.trim(),
+    (error) => {
+      if (error instanceof Deno.errors.NotFound) return '';
+      throw error;
+    },
+  );
+  if (studioErrorText) {
+    assertNoSecretBytes('prisma-studio error file', studioErrorText, secrets);
+    throw new Error(
+      `prisma-studio reported an error file diagnostic (${studioErrorText.length} bytes; raw content withheld)`,
+    );
+  }
+  if (Deno.build.os !== 'linux') {
+    throw new Error('prisma-studio live /proc/<pid>/environ proof requires Linux');
+  }
+  if (prismaStudioPid === undefined) {
+    throw new Error('aspire describe omitted prisma-studio executable.pid');
+  }
+  const studioEnv = await readProcessEnvironmentByPid(prismaStudioPid);
+  const { databaseName: expectedStudioDb } = assertProcessDatabaseConnection(
+    studioEnv,
+    postgresPort,
+    secrets[0],
+    'prisma-studio',
+  );
+  const studioReadReceipt = await assertPrismaStudioDatabaseRead(
+    prismaStudioUrl ?? PRISMA_STUDIO_DEFAULT_URL,
+    secrets,
+    { expectedDatabaseName: expectedStudioDb },
+  );
+
+  const studioLogs = await runAspire([
+    'logs',
+    'prisma-studio',
+    '--tail',
+    '200',
+    '--apphost',
+    appHost,
+  ]);
+  if (studioLogs.code !== 0) {
+    assertNoSecretBytes('prisma-studio logs', studioLogs.output, secrets);
+    throw new Error(`aspire logs prisma-studio failed (${studioLogs.code}): ${studioLogs.output}`);
+  }
+  assertNoSecretBytes('prisma-studio logs', studioLogs.output, secrets);
+
+  const startMetadata = JSON.parse(
+    await Deno.readTextFile(`${projectRoot}/.netscript/e2e/aspire-start.json`),
+  ) as { readonly dashboardUrl?: unknown };
+  if (typeof startMetadata.dashboardUrl !== 'string' || !startMetadata.dashboardUrl) {
+    throw new Error('aspire-start.json omitted dashboardUrl');
+  }
+  const dashboardApiScanned = await assertDashboardApiHasNoSecrets(
+    startMetadata.dashboardUrl,
+    secrets,
+  );
+  const dashboardDetailMasked = await assertDashboardResourceDetailsMasked(
+    startMetadata.dashboardUrl,
+    [
+      { label: 'users', resourceName: usersResourceName },
+      { label: 'prisma-studio', resourceName: prismaStudioResourceName },
+    ],
+    secrets,
+  );
+  console.info(
+    `#2259 proof: consumers=[users, prisma-studio] describe=redacted ` +
+      `prismaStudioPid=${prismaStudioPid} postgresPort=${postgresPort} ` +
+      `studioDb=${studioReadReceipt.databaseName} dashboardDetailsMasked=${
+        dashboardDetailMasked.join(',')
+      } dashboardApi=${dashboardApiScanned.join(',')}`,
+  );
 
   const receiptDir = `${projectRoot}/.netscript/e2e`;
   const receiptPath = `${receiptDir}/credential-rejection-receipt.json`;
@@ -202,9 +297,24 @@ export async function verifyCredentialRejection(
           scannedCredentials: secrets.length,
           scannedSurfaces: [
             'generated helpers',
+            'full aspire describe snapshot',
             'healthReports / healthChecks',
             'MCP list_resources',
+            'aspire dashboard api',
+            'aspire dashboard resource details ui',
+            'prisma-studio /bff query',
+            'prisma-studio logs',
           ],
+          consumerMasking: {
+            consumers: ['users', 'prisma-studio'],
+            describeRedacted: true,
+            postgresPort,
+            prismaStudioPid,
+            prismaStudioErrorFileEmpty: true,
+            prismaStudioDatabaseRead: studioReadReceipt.databaseName,
+            dashboardDetailMasked,
+            dashboardApiScanned,
+          },
         },
         null,
         2,
@@ -217,13 +327,16 @@ export async function verifyCredentialRejection(
 async function describeRejectionEvidence(
   appHost: string,
   secrets: readonly string[],
-): Promise<CredentialRejectionEvidence> {
+): Promise<{ readonly evidence: CredentialRejectionEvidence; readonly rawSnapshot: string }> {
   const snapshot = await runAspire(['describe', '--apphost', appHost, '--format', 'Json']);
   if (snapshot.code !== 0) {
     assertNoSecretBytes('aspire describe', snapshot.output, secrets);
     throw new Error(`aspire describe failed (${snapshot.code}): ${snapshot.output}`);
   }
-  return assertCredentialRejectionEvidence(snapshot.stdout, secrets);
+  return {
+    evidence: assertCredentialRejectionEvidence(snapshot.stdout, secrets),
+    rawSnapshot: snapshot.stdout,
+  };
 }
 
 async function readFixtureSecrets(projectRoot: string): Promise<readonly string[]> {

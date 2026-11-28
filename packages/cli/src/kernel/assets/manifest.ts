@@ -111,6 +111,8 @@ export const TEMPLATE_KEYS = {
   appRoutesDashboard: 'app/routes/dashboard.tsx.template',
   appUtils: 'app/utils.ts.template',
   appViteConfig: 'app/vite.config.ts.template',
+  aspireHelpersApphostPostgresReadiness: 'aspire/helpers/_apphost-postgres-readiness.ts.template',
+  aspireHelpersApphostReadiness: 'aspire/helpers/_apphost-readiness.ts.template',
   aspireHelpersAspireCompat: 'aspire/helpers/_aspire-compat.ts.template',
   aspireHelpersApphost: 'aspire/helpers/apphost.ts.template',
   aspireHelpersConfigureDashboard: 'aspire/helpers/configure-dashboard.ts.template',

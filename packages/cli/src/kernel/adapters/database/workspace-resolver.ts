@@ -45,6 +45,7 @@ export class DbWorkspaceResolver {
       discovered.push({
         configKey,
         engine,
+        mode: mapDatabaseMode(entry.Mode, engine),
         databaseName: typeof entry.DatabaseName === 'string' ? entry.DatabaseName : configKey,
         workspaceDir: join('database', provider.dirName),
         enabled: entry.Enabled !== false,
@@ -111,6 +112,12 @@ export function mapEngine(engine: unknown): DbEngine {
         engine,
       });
   }
+}
+
+function mapDatabaseMode(mode: unknown, engine: DbEngine): 'Container' | 'External' | 'File' {
+  if (mode === 'External' || mode === 'external') return 'External';
+  if (mode === 'File' || mode === 'file' || engine === 'sqlite') return 'File';
+  return 'Container';
 }
 
 function asRecord(value: unknown): Record<string, unknown> {

@@ -26,12 +26,13 @@ function escapeForRegExp(value: string): string {
  * silently breaking every consumer keyed on the name. Keying on the ordinal instead would be worse:
  * it shifts with plugin order, so a stale consumer would select the *wrong* block rather than fail.
  *
- * Both register generators emit the same two-anchor shape -- a `const <id> = builder.addExecutable(
- * '<name>', ...)` creation and a matching `<registry>.set('<name>', <id>)` registration -- so the
- * block is bounded by generated code alone, independent of comment formatting. The identifier is
- * captured from the creation and required to match in the registration, and the resulting span must
- * contain exactly one creation and one registration, so it cannot silently widen across a sibling
- * resource. Ambiguity is rejected rather than resolved by position.
+ * Both register generators emit the same two-anchor shape -- a `const <id> = builder.addDenoApp(
+ * '<name>', ...)` (or legacy `builder.addExecutable(...)`) creation and a matching
+ * `<registry>.set('<name>', <id>)` registration -- so the block is bounded by generated code
+ * alone, independent of comment formatting. The identifier is captured from the creation and
+ * required to match in the registration, and the resulting span must contain exactly one creation
+ * and one registration, so it cannot silently widen across a sibling resource. Ambiguity is
+ * rejected rather than resolved by position.
  */
 export function locateGeneratedResourceBlock(
   source: string,
@@ -41,7 +42,7 @@ export function locateGeneratedResourceBlock(
   const registry = escapeForRegExp(query.registry);
 
   const creationPattern = new RegExp(
-    `^[ \\t]*const[ \\t]+([A-Za-z_$][\\w$]*)[ \\t]*=[ \\t]*builder\\.addExecutable\\([ \\t]*(['"])${name}\\2`,
+    `^[ \\t]*const[ \\t]+([A-Za-z_$][\\w$]*)[ \\t]*=[ \\t]*builder\\.(?:addDenoApp|addExecutable)\\(\\s*(['"])${name}\\2`,
     'gm',
   );
   const creations = [...source.matchAll(creationPattern)];
@@ -55,7 +56,7 @@ export function locateGeneratedResourceBlock(
   const creation = creations[0];
   const identifier = escapeForRegExp(creation[1]);
   const registrationPattern = new RegExp(
-    `^[ \\t]*${registry}\\.set\\([ \\t]*(['"])${name}\\1[ \\t]*,[ \\t]*${identifier}[ \\t]*\\);[ \\t]*$`,
+    `^[ \\t]*${registry}\\.set\\(\\s*(['"])${name}\\1\\s*,\\s*${identifier}\\s*,?\\s*\\);[ \\t]*$`,
     'gm',
   );
   const registrations = [...source.matchAll(registrationPattern)];
@@ -74,8 +75,10 @@ export function locateGeneratedResourceBlock(
   const start = creation.index;
   const end = registration.index + registration[0].length;
   const block = source.slice(start, end);
+  const creationCount = countOccurrences(block, 'builder.addDenoApp(') +
+    countOccurrences(block, 'builder.addExecutable(');
   if (
-    countOccurrences(block, 'builder.addExecutable(') !== 1 ||
+    creationCount !== 1 ||
     countOccurrences(block, `${query.registry}.set(`) !== 1
   ) {
     throw resourceBlockError(query, 'located span covers more than one resource');

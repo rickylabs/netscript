@@ -1,3 +1,4 @@
+import { assertNativeDenoAppHost } from '../../../../kernel/adapters/aspire/apphost-package-dependencies.ts';
 import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import {
@@ -62,6 +63,7 @@ export async function addService(
   dependencies: AddServiceDependencies,
 ): Promise<AddServiceResult> {
   const plan = await planServiceAdd(request, dependencies);
+  await assertNativeDenoAppHost(dependencies.fs, plan.projectRoot);
 
   if (plan.withClient && !dependencies.clientScaffolder) {
     throw new Error('Typed client scaffolding dependency is required for --with-client.');

@@ -1,4 +1,5 @@
 import type { DoctorReport } from '@netscript/plugin/adapter';
+import { assertNativeDenoAppHost } from '../../../../kernel/adapters/aspire/apphost-package-dependencies.ts';
 import { reconcileBrowserAuth } from '../../../../kernel/adapters/plugin/browser-auth-reconciler.ts';
 import { join } from '@std/path';
 
@@ -74,6 +75,7 @@ export async function removePlugin(
   input: RemovePluginInput,
   dependencies: RemovePluginDependencies,
 ): Promise<RemovePluginResult> {
+  await assertNativeDenoAppHost(dependencies.fs, input.projectRoot);
   const plan = await planPluginRemoval(
     input.projectRoot,
     input.pluginName,

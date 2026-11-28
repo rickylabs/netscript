@@ -37,7 +37,7 @@ export const FORBIDDEN_GOLDEN_PATH_TERMS: readonly string[] = [
 const ASPIRE_SCAFFOLD_DOC_PINS = {
   sdk: SCAFFOLD_VERSIONS.ASPIRE_SDK,
   postgres: SCAFFOLD_ASPIRE_INTEGRATIONS.POSTGRES,
-  redis: SCAFFOLD_ASPIRE_INTEGRATIONS.REDIS,
+  javascript: SCAFFOLD_ASPIRE_INTEGRATIONS.JAVASCRIPT,
   browsers: SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS,
 } as const;
 
@@ -58,7 +58,7 @@ export function checkAspireScaffoldVersionDocs(
   for (
     const integration of [
       ASPIRE_SCAFFOLD_DOC_PINS.postgres,
-      ASPIRE_SCAFFOLD_DOC_PINS.redis,
+      ASPIRE_SCAFFOLD_DOC_PINS.javascript,
       ASPIRE_SCAFFOLD_DOC_PINS.browsers,
     ]
   ) {
@@ -79,9 +79,15 @@ export function checkAspireScaffoldVersionDocs(
     'docs/site/orchestration-runtime/how-to/deploy-local-aspire.md',
   );
   forbidText(explanation, '13.4.6', 'docs/site/explanation/aspire.md');
+  forbidText(explanation, '13.5.3', 'docs/site/explanation/aspire.md');
   forbidText(
     deployLocal,
     '13.4.6',
+    'docs/site/orchestration-runtime/how-to/deploy-local-aspire.md',
+  );
+  forbidText(
+    deployLocal,
+    '13.5.3',
     'docs/site/orchestration-runtime/how-to/deploy-local-aspire.md',
   );
 }

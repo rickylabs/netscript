@@ -2,31 +2,8 @@
  * @module
  *
  * Generator for `.helpers/register-apps.mts` — registers application resources
- * (web apps, Tauri apps, Deno Desktop apps, and task-based apps) with the Aspire SDK
- * builder.
- *
- * Four registration modes are supported:
- *
- * | Type    | Method             | VITE Injection |
- * |---------|-------------------|----------------|
- * | `app`   | `addExecutable()`  | ✅ Yes          |
- * | `tauri` | `addExecutable()`  | ❌ No           |
- * | `desktop` | `addExecutable()` | ❌ No          |
- * | `task`  | `addExecutable()`  | ❌ No           |
- *
- * The `app` type uses the Aspire SDK's `addExecutable()` and
- * injects three flavours of service-discovery env vars per reference:
- * - `VITE_services__{name}__http__0` (full isomorphic)
- * - `VITE_{NAME}_URL` (shorthand)
- * - `services__{name}__http__0` (server-side discovery)
- *
- * All types receive executable-mode OTEL telemetry and optional
- * KV cache dependency injection.
- *
- * Every endpoint-bearing executable additionally gets an HTTP health probe.
- * Aspire falls back to "process is Running means ready" for a resource with no
- * registered health check. Set `HealthCheckPath: false` to opt out, or to a path
- * string to probe a different route.
+ * (web apps, Tauri apps, Deno Desktop apps, and task-based apps) with the
+ * Aspire SDK builder via first-party `addDenoApp()` + `.withDenoTask()`.
  */
 
 import type { RegisterAppsOptions } from '../types.ts';
@@ -39,13 +16,9 @@ import { renderTemplateAssetSync } from '../../../../adapters/templates/template
 import { renderHttpEndpointCall, resolveHostPort } from './render-http-endpoint.ts';
 import type { AppEntry, HostPortEntry } from '@netscript/aspire/types';
 
-/**
- * Whether an app entry should receive a `withHttpEndpoint(...)` registration.
- *
- * `app` entries are web servers and always need one. `tauri` and `task` entries
- * may be neither, so they opt in by configuring a host port. `desktop` entries
- * never expose an endpoint.
- */
+/** Non-empty placeholder scriptPath required by Aspire 17 `AddDenoApp` before `.withDenoTask()`. */
+const DENO_TASK_SCRIPT_PATH = 'main.ts';
+
 function needsHttpEndpoint(type: AppEntry['Type'], entry: HostPortEntry): boolean {
   if (type === 'desktop') return false;
   if (type === 'app') return true;
@@ -54,15 +27,15 @@ function needsHttpEndpoint(type: AppEntry['Type'], entry: HostPortEntry): boolea
 
 /**
  * Generates the register-apps.mts file content.
- *
- * @param options - App entries, version, and Deno defaults from parsed config
- * @returns Generated TypeScript source as a string
  */
 export function generateRegisterApps(options: RegisterAppsOptions): string {
   const { apps, version: _version } = options;
   const entries = Object.entries(apps);
 
   const registrationBlocks: string[] = [];
+  let hasWebApps = false;
+  let usesEndpointHelper = false;
+  let usesCache = false;
 
   for (const [appIndex, [name, entry]] of entries.entries()) {
     const id = `app_${appIndex}`;
@@ -71,74 +44,56 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
     const lines: string[] = [];
     lines.push(`  // --- app ${appIndex} ---`);
 
-    // Skip disabled entries
     const enabledCondition = type === 'desktop' ? '=== true' : '!== false';
     lines.push(
       `  if (config.Apps[${JSON.stringify(name)}]?.Enabled ${enabledCondition}) {`,
     );
 
     if (type === 'app') {
+      hasWebApps = true;
+      usesEndpointHelper = true;
       buildAppBlock(lines, id, name, entry, workdir);
     } else if (type === 'tauri') {
+      if (entry.Remote) usesEndpointHelper = true;
       buildTauriBlock(lines, id, name, entry, workdir);
     } else if (type === 'desktop') {
+      usesEndpointHelper = true;
       buildDesktopBlock(lines, id, name, entry, workdir);
     } else {
-      // task
       buildTaskBlock(lines, id, name, entry, workdir);
     }
 
-    // --- Common: OTEL telemetry (all types) ---
+    // OTEL telemetry — Aspire 17 AddDenoApp registers an optional HTTP OTLP exporter
+    // and preserves service.instance.id alongside service.version.
     lines.push(``);
-    lines.push(`    // OTEL telemetry (full executable env set)`);
+    lines.push(`    // OTEL telemetry (endpoint-conditional via Aspire AddDenoApp defaults)`);
+    lines.push(`    await ${id}.withEnvironment('OTEL_SERVICE_NAME', ${JSON.stringify(name)});`);
     lines.push(
-      `    const ${id}_otel = buildOtelEnvVars(${
-        JSON.stringify(name)
-      }, config.Version, 'executable');`,
-    );
-    lines.push(`    for (const [key, value] of Object.entries(${id}_otel)) {`);
-    lines.push(`      await ${id}.withEnvironment(key, value);`);
-    lines.push(`    }`);
-    lines.push(
-      `    await ${id}.withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf });`,
+      `    await ${id}.withEnvironment('OTEL_RESOURCE_ATTRIBUTES', \`service.version=\${config.Version}\`);`,
     );
 
-    // --- Common: HTTP endpoint ---
-    // A web `app` always serves HTTP, so it always gets an endpoint — Aspire
-    // allocates the ports unless the entry pins a host port. `tauri` and `task`
-    // entries are not necessarily HTTP servers, so they keep the historical
-    // behaviour of getting an endpoint only when one is configured. `desktop`
-    // entries never expose one.
     if (needsHttpEndpoint(type, entry)) {
       lines.push(``);
       lines.push(`    // HTTP endpoint`);
       lines.push(`    await ${id}.${renderHttpEndpointCall(entry)};`);
 
-      // Browser diagnostics are a frontend-app default. Keep the app-type and
-      // endpoint predicates together so task/desktop executables cannot gain a
-      // browser child without a browseable HTTP/HTTPS parent.
       if (type === 'app') {
         lines.push(`    await ${id}.withBrowserLogs();`);
         lines.push(``);
-        lines.push(`    // Workspace CORS allowlist: this enabled web app's allocated origin.`);
-        lines.push(`    const ${id}_origin = await ${id}.getEndpoint('http');`);
+        lines.push(`    // Workspace CORS allowlist: this enabled web app's browser origins.`);
+        lines.push(
+          `    const ${id}_origin = await (await ${id}.getEndpoint('http')).property(EndpointProperty.BrowserOrigins);`,
+        );
         lines.push(`    corsOrigins = corsOrigins`);
         lines.push('      ? ReferenceExpression.create`${corsOrigins},${' + id + '_origin}`');
         lines.push('      : ReferenceExpression.create`${' + id + '_origin}`;');
       }
-    }
 
-    // --- Endpoint readiness probe ---
-    // Registered after the endpoint it derives its base address from. Without a
-    // probe Aspire equates a running executable with a ready server.
-    if (needsHttpEndpoint(type, entry)) {
       buildHealthProbeBlock(lines, id, entry);
     }
 
-    // Read references at AppHost execution time so settings edits take effect on restart.
     if (type === 'desktop' || type === 'app') {
       appendDiscoveryReferences(lines, id, name, type === 'app');
-      // Match registerBackgroundProcessors' endpoint predicate; never expose child URLs to Vite.
       lines.push(`    for (const [name, resource] of _backgroundProcessors) {`);
       lines.push(`      const entry = config.BackgroundProcessors[name];`);
       lines.push(
@@ -152,8 +107,8 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       lines.push(`    }`);
     }
 
-    // --- Common: KV cache dependency ---
     if (entry.RequiresKv) {
+      usesCache = true;
       lines.push(``);
       lines.push(`    // KV cache dependency`);
       lines.push(`    await _withCacheReference(${id}, _infrastructure.primaryCacheWiring);`);
@@ -165,7 +120,6 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       );
     }
 
-    // --- tauri type: remote app reference ---
     if (type === 'tauri' && entry.Remote) {
       const remoteId = `app_remote_${appIndex}`;
       lines.push(``);
@@ -193,30 +147,58 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
     registrationBlocks.push(lines.join('\n'));
   }
 
+  const hasApps = entries.length > 0;
+  const sdkValueImports = hasWebApps ? ['EndpointProperty', 'ReferenceExpression'] : [];
+  const compatImports = [
+    ...(hasWebApps ? ['buildViteEnvVarName'] : []),
+    ...(hasApps ? ['resolveWorkspacePath'] : []),
+    ...(usesCache ? ['withCacheReference as _withCacheReference'] : []),
+  ];
+  const endpointHelperBlock = usesEndpointHelper
+    ? `interface EndpointProvider {
+  getEndpoint(protocol: string): PromiseLike<EndpointReference> | EndpointReference;
+}
+
+async function getResourceEndpoint(resource: unknown, protocol: string): Promise<EndpointReference | undefined> {
+  if (!resource || typeof resource !== 'object' || !('getEndpoint' in resource)) {
+    return undefined;
+  }
+  return await (resource as EndpointProvider).getEndpoint(protocol);
+}
+
+`
+    : '';
+
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterApps1, {
+    sdkTypeImports: usesEndpointHelper ? ', EndpointReference' : '',
+    sdkValueImport: sdkValueImports.length > 0
+      ? `import { ${
+        sdkValueImports.join(', ')
+      } } from '${SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS}';\n`
+      : '',
+    compatImportBlock: compatImports.length > 0
+      ? `import {\n${
+        compatImports.map((name) => `  ${name},`).join('\n')
+      }\n} from '${SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT}';\n`
+      : '',
+    endpointHelperBlock,
+    builderParameter: hasApps ? 'builder' : '_builder',
+    appHostDirParameter: hasApps ? 'appHostDir' : '_appHostDir',
+    corsOriginsDecl: hasWebApps ? '  let corsOrigins: ReferenceExpression | undefined;\n' : '',
+    corsMergeExpr: hasWebApps
+      ? `      const origins = extra && corsOrigins
+        ? ReferenceExpression.create\`\${corsOrigins},\${extra}\`
+        : corsOrigins ?? extra ?? '';`
+      : `      const origins = extra ?? '';`,
     __slot0__: String(fileHeader('register-apps.mts')),
     __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
     __slot2__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
-    __slot3__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
     __slot4__: String(
       registrationBlocks.length > 0 ? registrationBlocks.join('\n\n') : '  // No apps configured',
     ),
   });
 }
 
-// ---------------------------------------------------------------------------
-// Block builders — each appends lines for a specific app type
-// ---------------------------------------------------------------------------
-
-/**
- * Appends the HTTP health probe registration for an `app` entry.
- *
- * Aspire only treats a resource as healthy once its registered health checks pass; a resource
- * with no health check at all is considered ready as soon as its process reaches `Running`.
- * That fallback is what let a generated Fresh app report `Healthy` while every request failed
- * during SSR. The probe targets the app's own server-rendered health route, so a broken
- * render pipeline surfaces as `Unhealthy` instead of green-and-500.
- */
 function buildHealthProbeBlock(
   lines: string[],
   id: string,
@@ -234,10 +216,6 @@ function buildHealthProbeBlock(
   );
 }
 
-/**
- * Resolves the health probe path for an app entry, or `undefined` when the app opted out
- * with `HealthCheckPath: false`.
- */
 function resolveHealthCheckPath(
   entry: { readonly HealthCheckPath?: string | false },
 ): string | undefined {
@@ -245,10 +223,6 @@ function resolveHealthCheckPath(
   return entry.HealthCheckPath ?? RESOURCE_DEFAULTS.AppHealthCheckPath;
 }
 
-/**
- * Builds registration lines for an `app` type entry.
- * Uses `addExecutable()` with resolved permissions and working directory.
- */
 function buildAppBlock(
   lines: string[],
   id: string,
@@ -258,23 +232,17 @@ function buildAppBlock(
 ): void {
   const taskName = entry.TaskName ?? 'dev';
 
-  // Resolve working directory
   lines.push(
     `    const ${id}_workdir = resolveWorkspacePath(appHostDir, ${JSON.stringify(workdir)});`,
   );
-
-  // Register via addExecutable — Vite dev server started via deno task
   lines.push(
-    `    const ${id} = builder.addExecutable(${
+    `    const ${id} = builder.addDenoApp(${
       JSON.stringify(name)
-    }, 'deno', ${id}_workdir, ['task', ${JSON.stringify(taskName)}]);`,
+    }, ${id}_workdir, '${DENO_TASK_SCRIPT_PATH}');`,
   );
+  lines.push(`    await ${id}.withDenoTask(${JSON.stringify(taskName)});`);
 }
 
-/**
- * Builds registration lines for a `tauri` type entry.
- * Uses `addExecutable()` with resolved task name.
- */
 function buildTauriBlock(
   lines: string[],
   id: string,
@@ -288,16 +256,13 @@ function buildTauriBlock(
     `    const ${id}_workdir = resolveWorkspacePath(appHostDir, ${JSON.stringify(workdir)});`,
   );
   lines.push(
-    `    const ${id} = builder.addExecutable(${
+    `    const ${id} = builder.addDenoApp(${
       JSON.stringify(name)
-    }, 'deno', ${id}_workdir, ['task', ${JSON.stringify(taskName)}]);`,
+    }, ${id}_workdir, '${DENO_TASK_SCRIPT_PATH}');`,
   );
+  lines.push(`    await ${id}.withDenoTask(${JSON.stringify(taskName)});`);
 }
 
-/**
- * Builds registration lines for a `desktop` type entry.
- * The window waits for a successful Fresh build before Aspire launches it.
- */
 function buildDesktopBlock(
   lines: string[],
   id: string,
@@ -312,22 +277,21 @@ function buildDesktopBlock(
     `    const ${id}_workdir = resolveWorkspacePath(appHostDir, ${JSON.stringify(workdir)});`,
   );
   lines.push(
-    `    const ${id}_build = builder.addExecutable(${
+    `    const ${id}_build = builder.addDenoApp(${
       JSON.stringify(`${name}-build`)
-    }, 'deno', ${id}_workdir, ['task', ${JSON.stringify(buildTaskName)}]);`,
+    }, ${id}_workdir, '${DENO_TASK_SCRIPT_PATH}');`,
   );
+  lines.push(`    await ${id}_build.withDenoTask(${JSON.stringify(buildTaskName)});`);
   lines.push(
-    `    const ${id} = builder.addExecutable(${
+    `    const ${id} = builder.addDenoApp(${
       JSON.stringify(name)
-    }, 'deno', ${id}_workdir, ['task', ${JSON.stringify(taskName)}, '--backend', 'cef']);`,
+    }, ${id}_workdir, '${DENO_TASK_SCRIPT_PATH}');`,
   );
+  lines.push(`    await ${id}.withDenoTask(${JSON.stringify(taskName)});`);
+  lines.push(`    await ${id}.withDenoScriptArgs(['--backend', 'cef']);`);
   lines.push(`    await ${id}.waitForCompletion(${id}_build);`);
 }
 
-/**
- * Builds registration lines for a `task` type entry.
- * Uses `addExecutable()` with resolved task name — simple registration, no VITE.
- */
 function buildTaskBlock(
   lines: string[],
   id: string,
@@ -341,13 +305,13 @@ function buildTaskBlock(
     `    const ${id}_workdir = resolveWorkspacePath(appHostDir, ${JSON.stringify(workdir)});`,
   );
   lines.push(
-    `    const ${id} = builder.addExecutable(${
+    `    const ${id} = builder.addDenoApp(${
       JSON.stringify(name)
-    }, 'deno', ${id}_workdir, ['task', ${JSON.stringify(taskName)}]);`,
+    }, ${id}_workdir, '${DENO_TASK_SCRIPT_PATH}');`,
   );
+  lines.push(`    await ${id}.withDenoTask(${JSON.stringify(taskName)});`);
 }
 
-/** Both reference kinds share endpoint resolution and the established discovery variables. */
 function appendDiscoveryReferences(lines: string[], id: string, name: string, vite: boolean): void {
   lines.push(`    // ${vite ? 'VITE' : 'Server-side'} service-discovery injection`);
   for (

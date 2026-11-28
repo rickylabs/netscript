@@ -186,7 +186,7 @@ describe('declared service environment (#1447)', () => {
     const block = serviceBlock(renderServices(config), MCP_SERVICE);
 
     const declared = block.indexOf('postgres://stale/db');
-    const otel = block.indexOf('buildOtelEnvVars(');
+    const otel = block.indexOf("withEnvironment('OTEL_SERVICE_NAME'");
     const database = block.indexOf(`withEnvironment('${GENERATED_DATABASE_URL_KEY}'`);
 
     assert(declared >= 0, 'declared environment was not emitted at all');

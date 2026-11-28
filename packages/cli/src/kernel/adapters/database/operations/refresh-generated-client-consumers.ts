@@ -40,6 +40,10 @@ const snapshotSchema = z.object({
   })),
 });
 
+const STARTABLE_STATES = new Set(['Stopped', 'Finished', 'Exited', 'FailedToStop']);
+const TRANSITIONING_STOP_STATES = new Set(['Running', 'Stopping']);
+const DEFAULT_RECOVERY_POLL_INTERVAL_MS = 250;
+
 /** I/O already owned by the database operation's AppHost lifecycle lease. */
 export interface RefreshGeneratedClientConsumersOptions {
   readonly projectRoot: string;
@@ -53,6 +57,8 @@ export interface RefreshGeneratedClientConsumersOptions {
   readonly timeoutMs: number;
   readonly signal: AbortSignal;
   readonly refreshed: Set<string>;
+  readonly pollIntervalMs?: number;
+  readonly sleep?: (ms: number, signal: AbortSignal) => Promise<void>;
 }
 
 /** Restart only declared database consumers that are running in this exact AppHost. */
@@ -108,12 +114,11 @@ async function refreshConsumers(options: RefreshGeneratedClientConsumersOptions)
       commandOptions,
     );
     if (restarted.code !== 0) {
-      const diagnostic = restarted.stderr.trim() || restarted.stdout.trim();
-      throw new Error(
-        `Database client generated, but ${name} restart failed (Aspire exit ${restarted.code}). ${
-          diagnostic ? `${diagnostic}\n` : ''
-        }Run: ${remedy}`,
-      );
+      if (isStopFailureExit16(restarted)) {
+        await recoverStopFailureExit16(name, restarted, scope, commandOptions, options, remedy);
+      } else {
+        throw restartFailureError(name, restarted, remedy);
+      }
     }
     options.refreshed.add(name);
     const healthy = await options.executor.output([
@@ -215,4 +220,154 @@ function within(root: string, path: string): boolean {
   const child = relative(root, path);
   return child === '' ||
     (!isAbsolute(child) && child !== '..' && !child.startsWith('../') && !child.startsWith('..\\'));
+}
+
+interface CommandResult {
+  readonly code: number;
+  readonly stdout: string;
+  readonly stderr: string;
+}
+
+function isStopFailureExit16(result: CommandResult): boolean {
+  return result.code === 16 &&
+    /failed to stop resource/i.test(`${result.stderr}\n${result.stdout}`);
+}
+
+function diagnosticOf(result: CommandResult): string {
+  return result.stderr.trim() || result.stdout.trim();
+}
+
+function restartFailureError(
+  name: string,
+  restarted: CommandResult,
+  remedy: string,
+  recoveryDetail?: string,
+): Error {
+  const diagnostic = diagnosticOf(restarted);
+  const details = [diagnostic, recoveryDetail].filter(Boolean).join('\n');
+  return new Error(
+    `Database client generated, but ${name} restart failed (Aspire exit ${restarted.code}). ${
+      details ? `${details}\n` : ''
+    }Run: ${remedy}`,
+  );
+}
+
+async function inspectUniqueExecutableState(
+  name: string,
+  scope: readonly string[],
+  commandOptions: { readonly cwd: string; readonly signal: AbortSignal },
+  executor: AspireCommandExecutor,
+): Promise<string | null> {
+  commandOptions.signal.throwIfAborted();
+  const snapshot = await executor.output(
+    ['describe', '--format', 'Json', ...scope],
+    commandOptions,
+  );
+  if (snapshot.code !== 0) {
+    throw new Error(`describe exited ${snapshot.code}`);
+  }
+  const resources = snapshotSchema.parse(JSON.parse(snapshot.stdout)).resources;
+  const matches = resources.filter((resource) => resource.displayName === name);
+  if (matches.length === 0) {
+    throw new Error(`resource ${name} is missing from AppHost snapshot`);
+  }
+  if (matches.length > 1) {
+    throw new Error(`Ambiguous AppHost resource identity: ${name}`);
+  }
+  if (matches[0].resourceType !== 'Executable') {
+    throw new Error(
+      `resource ${name} has type ${matches[0].resourceType ?? 'unknown'}, expected Executable`,
+    );
+  }
+  return matches[0].state ?? null;
+}
+
+async function sleepWithSignal(
+  ms: number,
+  signal: AbortSignal,
+  customSleep?: (ms: number, signal: AbortSignal) => Promise<void>,
+): Promise<void> {
+  signal.throwIfAborted();
+  if (customSleep) {
+    await customSleep(ms, signal);
+    signal.throwIfAborted();
+    return;
+  }
+  await new Promise<void>((resolvePromise, reject) => {
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(signal.reason);
+    };
+    const timer = setTimeout(() => {
+      signal.removeEventListener('abort', onAbort);
+      resolvePromise();
+    }, ms);
+    signal.addEventListener('abort', onAbort, { once: true });
+  });
+}
+
+async function recoverStopFailureExit16(
+  name: string,
+  restarted: CommandResult,
+  scope: readonly string[],
+  commandOptions: { readonly cwd: string; readonly signal: AbortSignal },
+  options: RefreshGeneratedClientConsumersOptions,
+  remedy: string,
+): Promise<void> {
+  const pollIntervalMs = options.pollIntervalMs ?? DEFAULT_RECOVERY_POLL_INTERVAL_MS;
+  const inspect = async (): Promise<string | null> => {
+    try {
+      return await inspectUniqueExecutableState(name, scope, commandOptions, options.executor);
+    } catch (error) {
+      if (options.signal.aborted) throw options.signal.reason;
+      const reason = error instanceof Error ? error.message : String(error);
+      throw restartFailureError(name, restarted, remedy, `Recovery aborted: ${reason}.`);
+    }
+  };
+  let state = await inspect();
+  if (state !== null && TRANSITIONING_STOP_STATES.has(state)) {
+    options.signal.throwIfAborted();
+    const stopped = await options.executor.output(
+      ['resource', name, 'stop', ...scope],
+      commandOptions,
+    );
+    state = await inspect();
+    if (stopped.code !== 0 && !(state !== null && STARTABLE_STATES.has(state))) {
+      const stopDiag = diagnosticOf(stopped);
+      throw restartFailureError(
+        name,
+        restarted,
+        remedy,
+        `Recovery stop exited ${stopped.code}${
+          stopDiag ? ` (${stopDiag})` : ''
+        } while resource remained ${JSON.stringify(state)}.`,
+      );
+    }
+    while (state !== null && TRANSITIONING_STOP_STATES.has(state)) {
+      await sleepWithSignal(pollIntervalMs, options.signal, options.sleep);
+      state = await inspect();
+    }
+  }
+  if (state === null || !STARTABLE_STATES.has(state)) {
+    throw restartFailureError(
+      name,
+      restarted,
+      remedy,
+      `Recovery refused non-startable observed state ${JSON.stringify(state)}.`,
+    );
+  }
+  options.signal.throwIfAborted();
+  const started = await options.executor.output(
+    ['resource', name, 'start', ...scope],
+    commandOptions,
+  );
+  if (started.code !== 0) {
+    const startDiag = diagnosticOf(started);
+    throw restartFailureError(
+      name,
+      restarted,
+      remedy,
+      `Recovery start exited ${started.code}${startDiag ? ` (${startDiag})` : ''}.`,
+    );
+  }
 }

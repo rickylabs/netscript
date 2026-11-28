@@ -88,7 +88,7 @@ export const ASPIRE_CONTAINERS_INSPECT_JSON = `[
     }
 ]`;
 
-/** Recorded `aspire describe` resource fields for this AppHost (shape of the 13.5.3 fixture). */
+/** Recorded `aspire describe` resource fields for this AppHost (shape of the 17.0.0 fixture). */
 export const THIS_APPHOST_DB_INSTANCE = 'main-db-xkcdabcd';
 
 /** Instance name of the same-named database owned by another AppHost on the daemon. */

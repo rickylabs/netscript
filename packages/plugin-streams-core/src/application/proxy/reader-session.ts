@@ -1,4 +1,4 @@
-import { createLogger } from '@netscript/logger';
+import { getLogger } from '@logtape/logtape';
 import {
   DEFAULT_STREAM_PROXY_MAX_REFENCE_ATTEMPTS,
   type StreamProxyCloseEvent,
@@ -18,7 +18,7 @@ import {
 } from './recheck-coordinator.ts';
 import { BoundedSseDeliveryUnitParser, type SseDeliveryUnit } from './sse-parser.ts';
 
-const PROXY_LOGGER = createLogger(['netscript', 'streams', 'proxy']);
+const PROXY_LOGGER = getLogger(['netscript', 'streams', 'proxy']);
 
 /** Parameters transferred atomically from setup into a streaming reader session. */
 export interface StreamingReaderSessionInit<TGrant> {

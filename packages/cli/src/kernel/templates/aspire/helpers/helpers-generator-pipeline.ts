@@ -50,7 +50,15 @@ export class HelpersGeneratorPipeline {
       ? config.Databases[config.PrimaryDatabase]?.Engine
       : undefined;
 
-    // 0. Tier 2: Aspire compat shim (D-7 Node.js workaround)
+    // 0. Tier 2: AppHost readiness probes and thin @netscript/aspire runtime edge
+    files.push({
+      path: SCAFFOLD_DIRS.HELPERS + '/_apphost-readiness.mts',
+      content: templates.apphostReadinessTemplate,
+    });
+    files.push({
+      path: SCAFFOLD_DIRS.HELPERS + '/_apphost-postgres-readiness.mts',
+      content: templates.apphostPostgresReadinessTemplate,
+    });
     files.push({
       path: SCAFFOLD_DIRS.HELPERS + '/_aspire-compat.mts',
       content: templates.aspireCompatTemplate,

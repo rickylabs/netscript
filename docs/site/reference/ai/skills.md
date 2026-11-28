@@ -193,14 +193,14 @@ symptom playbook at `.agents/skills/help.md`. Hosts, generated files and re-runn
 | `aspire` | Diagnose orchestration and runtime state from symptoms with resource descriptions, console logs, structured logs, spans, traces, and targeted resource control. |
 | `deno` | Diagnose runtime and toolchain problems with focused checks, module-resolution inspection, permissions, test sanitizers, cache evidence, and API docs. |
 
-The upstream Aspire workflow skills (`aspire-init`, `aspire-orchestration`, `aspire-monitoring`,
-`aspire-deployment`) can be installed beside NetScript's `aspire` diagnostic skill by explicit name;
-they never overwrite `aspire/SKILL.md`.
+NetScript owns its Aspire diagnostic skill (`aspire/SKILL.md`) directly inside the installed skill
+bundle; `netscript agent init` writes `.mcp.json` and the NetScript skill set without delegating to
+upstream `aspire agent init` workflow bundles.
 
 Agents connect to the Aspire MCP server with `aspire agent mcp`, or with the dashboard-only form
-`aspire agent mcp --dashboard-url <url>` (plus an optional `--api-key`). Aspire 13.5.3 exposes a
-**14-tool MCP baseline**: `list_resources`, `list_console_logs`, `list_structured_logs`,
-`list_traces`, `list_trace_structured_logs`, `execute_resource_command`, `list_apphosts`,
-`select_apphost`, `list_integrations`, `list_docs`, `search_docs`, `get_doc`, `doctor`, and
-`refresh_tools`. (`get_integration_docs` is documented upstream on aspire.dev but was not observed
-at 13.5.3.)
+`aspire agent mcp --dashboard-url <url>` (plus an optional `--api-key`). Aspire 17.0.0 exposes a
+**15-tool MCP baseline**: `list_resources`, `wait_for_resources`, `list_console_logs`,
+`list_structured_logs`, `list_traces`, `list_trace_structured_logs`, `execute_resource_command`,
+`list_apphosts`, `select_apphost`, `list_integrations`, `list_docs`, `search_docs`, `get_doc`,
+`doctor`, and `refresh_tools`. (`get_integration_docs` is documented upstream on aspire.dev but was
+not observed at 17.0.0.)

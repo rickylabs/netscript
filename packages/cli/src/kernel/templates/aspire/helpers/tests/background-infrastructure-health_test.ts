@@ -23,6 +23,14 @@ class RecordingResource {
     return this;
   }
 
+  withDenoNodeModulesDir(_options: unknown): this {
+    return this;
+  }
+
+  withDenoRuntimeArgs(_args: readonly string[]): this {
+    return this;
+  }
+
   withHttpEndpoint(options: { env: string }): this {
     this.endpoint = options;
     return this;
@@ -51,6 +59,10 @@ class RecordingResource {
   addDatabase(name: string): RecordingResource {
     return new RecordingResource(name);
   }
+
+  withRepl(): this {
+    return this;
+  }
 }
 
 class RecordingBuilder {
@@ -69,6 +81,10 @@ class RecordingBuilder {
     const resource = new RecordingResource(name);
     this.resources.set(name, resource);
     return resource;
+  }
+
+  addDenoApp(name: string): RecordingResource {
+    return this.addExecutable(name);
   }
 
   addHealthCheck(key: string, callback: unknown): void {
@@ -105,7 +121,10 @@ Deno.test('generated child probes preserve PostgreSQL listener/auth checks and d
   try {
     await Deno.mkdir(`${root}/.helpers`, { recursive: true });
     await Deno.mkdir(`${root}/.aspire/modules`, { recursive: true });
-    await Deno.writeTextFile(`${root}/.aspire/modules/aspire.mts`, 'export {};\n');
+    await Deno.writeTextFile(
+      `${root}/.aspire/modules/aspire.mts`,
+      "export const DenoNodeModulesDirMode = { None: 'None' };\n",
+    );
     const processors: Record<string, BackgroundProcessorEntry> = Object.fromEntries(
       ['workers', 'sagas', 'triggers'].map((name) => [name, {
         Enabled: true,
@@ -138,6 +157,7 @@ Deno.test('generated child probes preserve PostgreSQL listener/auth checks and d
     await Deno.writeTextFile(
       `${root}/.helpers/_aspire-compat.mts`,
       [
+        'export async function applyDenoPermissions() {}',
         'export function ensureDatabasePassword() { return "test-password"; }',
         'export function createEndpointListenerReadinessCheck() { return () => {}; }',
         'export function createPostgresCredentialReadinessCheck() { return () => {}; }',

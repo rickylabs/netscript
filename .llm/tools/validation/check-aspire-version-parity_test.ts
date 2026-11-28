@@ -12,7 +12,7 @@ scaffold.ts\tscaffold-constants\tS1\tenforce
 workflow.yml\tci:workflow\tS1\tenforce
 deno.json\troot-config\tS1/S13\tenforce
 generator.ts\tgenerator\tS4\tdefer
-compat.ts\tcompat-fixture\tS3\tkeep both trains
+compat.ts\tcompat-fixture\tS3\tkeep 17.0.0 only
 history.md\tarchival:this-run\tarchival\tinfo only
 deno.lock\tlockfile\tN/A\tskip
 current.ts\tpackage:other\tS4\tcurrent
@@ -20,21 +20,21 @@ missing.ts\tpackage:other\tS4\tmissing
 `;
 
 const files = new Map<string, string>([
-  ['scaffold.ts', "export const version = '13.4.6';"],
-  ['workflow.yml', 'comment: Aspire 13.4'],
-  ['deno.json', '{"aspire":"13.3.9"}'],
-  ['generator.ts', "const legacy = '13.2.1';"],
-  ['compat.ts', "const versions = ['13.4.6', '13.5.3'];"],
-  ['history.md', 'Aspire 13.1 historical evidence'],
-  ['deno.lock', 'Aspire.Hosting@13.0.0'],
-  ['current.ts', "const version = '13.5.3';"],
+  ['scaffold.ts', "export const version = '13.5.3';"],
+  ['workflow.yml', 'comment: Aspire 13.5'],
+  ['deno.json', '{"aspire":"13.4.6"}'],
+  ['generator.ts', "const legacy = '13.5.3';"],
+  ['compat.ts', "const versions = ['17.0.0'];"],
+  ['history.md', 'Aspire 13.5 historical evidence'],
+  ['deno.lock', 'Aspire.Hosting@13.5.3'],
+  ['current.ts', "const version = '17.0.0';"],
 ]);
 
 const readText = (path: string): Promise<string | null> => Promise.resolve(files.get(path) ?? null);
 
 Deno.test('both Aspire parity phases skip all run and transient rows without reading them', async () => {
   const skipped = [
-    '.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md',
+    '.llm/runs/epic-aspire-17-upgrade--2278/plan.md',
     '.llm/runs/future/receipt.json',
     '.llm/tmp/apphost.ts',
     '.agents/generated/consumer-skills/AGENTS.md',
@@ -52,10 +52,10 @@ Deno.test('both Aspire parity phases skip all run and transient rows without rea
         disposition: 'enforce',
       })),
       phase,
-      expectedVersion: '13.5.3',
+      expectedVersion: '17.0.0',
       readText: (path) => {
         reads.push(path);
-        return Promise.resolve('13.4.6');
+        return Promise.resolve('13.5.3');
       },
     });
     assertEquals(report.skipped, skipped);
@@ -68,75 +68,93 @@ Deno.test('both Aspire parity phases skip all run and transient rows without rea
 for (
   const { name, className, source, ok } of [
     {
-      name: 'literal guard location with trailing comma',
+      name: 'literal guard location with trailing comma (13.4.6)',
       className: 'negative-version-guard',
       source: "forbidText(\n page,\n '13.4.6',\n 'docs/page.md',\n);",
       ok: true,
     },
     {
+      name: 'literal guard location with trailing comma (13.5.3)',
+      className: 'negative-version-guard',
+      source: "forbidText(\n page,\n '13.5.3',\n 'docs/page.md',\n);",
+      ok: true,
+    },
+    {
       name: 'stale third guard argument',
       className: 'negative-version-guard',
-      source: "forbidText(page, '13.4.6', '13.4.6');",
+      source: "forbidText(page, '13.5.3', '13.5.3');",
       ok: false,
     },
     {
       name: 'quoted guard is not an executable guard',
       className: 'negative-version-guard',
-      source: 'const example = "forbidText(page, \'13.4.6\', path);";',
+      source: 'const example = "forbidText(page, \'13.5.3\', path);";',
       ok: false,
     },
     {
-      name: 'unowned floor',
+      name: 'unowned Aspire 13.5 mention',
       className: 'doc:public-page',
-      source: 'Aspire 13.2+ uses rooted config.',
+      source: 'Aspire 13.5 uses rooted config.',
       ok: false,
     },
     {
-      name: 'current pin beside a floor',
+      name: 'wrong Aspire 17 patch in contextual line',
       className: 'doc:public-page',
-      source: 'Aspire 13.2+ uses rooted config. Install 13.4.6.',
+      source: 'Aspire SDK version is 17.0.1.',
       ok: false,
     },
     {
-      name: 'non-floor guidance',
+      name: 'wrong Aspire 17 preview in contextual line',
       className: 'doc:public-page',
-      source: 'Install Aspire 13.2.',
+      source: 'Aspire.Hosting.Browsers 17.0.0-preview.1.26425.3',
       ok: false,
+    },
+    {
+      name: 'allowed Aspire 17 pins pass',
+      className: 'doc:public-page',
+      source: 'Aspire SDK 17.0.0 and Aspire.Hosting.Browsers 17.0.0-preview.1.26567.5',
+      ok: true,
+    },
+    {
+      name: 'unrelated dependency versions pass',
+      className: 'doc:public-page',
+      source: 'DOTNET_SDK: 10.0.0, APPHOST_PG: 8.23.1, GARNET_TOOL: 2.2.14, dotenv: 17.4.2',
+      ok: true,
     },
     {
       name: 'negative guard literal',
       className: 'negative-version-guard',
-      source: "forbidText(page, '13.4.6', sourcePath);",
+      source: "forbidText(page, '13.5.3', sourcePath);",
       ok: true,
     },
     {
       name: 'double-quoted multiline negative guard',
       className: 'negative-version-guard',
-      source: 'forbidText(\n page,\n "13.4.6",\n sourcePath);',
+      source: 'forbidText(\n page,\n "13.5.3",\n sourcePath);',
       ok: true,
     },
     {
       name: 'positive guard',
       className: 'negative-version-guard',
-      source: "requireText(page, '13.4.6', sourcePath);",
+      source: "requireText(page, '13.5.3', sourcePath);",
       ok: false,
     },
     {
       name: 'wrong guard argument',
       className: 'negative-version-guard',
-      source: "forbidText('13.4.6', 'other', sourcePath);",
+      source: "forbidText('13.5.3', 'other', sourcePath);",
       ok: false,
     },
     {
       name: 'stale pin beside a negative guard',
       className: 'negative-version-guard',
-      source: "forbidText(page, '13.4.6', sourcePath); const version = '13.4.6';",
+      source: "forbidText(page, '13.5.3', sourcePath); const version = '13.5.3';",
       ok: false,
     },
     {
       name: 'unowned negative guard',
       className: 'tooling-doc',
-      source: "forbidText(page, '13.4.6', sourcePath);",
+      source: "forbidText(page, '13.5.3', sourcePath);",
       ok: false,
     },
   ]
@@ -150,7 +168,7 @@ for (
         disposition: 'enforce remaining pins',
       }],
       phase: 2,
-      expectedVersion: '13.5.3',
+      expectedVersion: '17.0.0',
       readText: () => Promise.resolve(source),
     });
     assertEquals(report.ok, ok);
@@ -178,7 +196,7 @@ Deno.test('phase 1 limits stale failures to owned classes and fails required mis
   const report = await evaluateAspireVersionParity({
     rows: parseManifest(manifest),
     phase: 1,
-    expectedVersion: '13.5.3',
+    expectedVersion: '17.0.0',
     readText,
   });
 
@@ -186,7 +204,7 @@ Deno.test('phase 1 limits stale failures to owned classes and fails required mis
   assertEquals(report.counts, {
     checked: 8,
     fail: 4,
-    deferred: 2,
+    deferred: 1,
     info: 1,
     skipped: 1,
     missing: 1,
@@ -196,17 +214,16 @@ Deno.test('phase 1 limits stale failures to owned classes and fails required mis
     { path: 'workflow.yml', status: 'fail', owner: 'S1' },
     { path: 'deno.json', status: 'fail', owner: 'S1/S13' },
     { path: 'generator.ts', status: 'deferred', owner: 'S4' },
-    { path: 'compat.ts', status: 'deferred', owner: 'S3' },
     { path: 'history.md', status: 'info', owner: 'archival' },
     { path: 'missing.ts', status: 'fail', owner: 'S4' },
   ]);
 });
 
-Deno.test('phase 2 fails every stale non-archival row and accepts a dual-train compat fixture', async () => {
+Deno.test('phase 2 fails every stale non-archival row and accepts a clean 17.0.0 compat fixture', async () => {
   const report = await evaluateAspireVersionParity({
     rows: parseManifest(manifest),
     phase: 2,
-    expectedVersion: '13.5.3',
+    expectedVersion: '17.0.0',
     readText,
   });
 
@@ -226,70 +243,85 @@ Deno.test('phase 2 fails every stale non-archival row and accepts a dual-train c
       class: 'compat-fixture',
       owner: 'S3',
       status: 'info',
-      matches: ['13.4.6'],
-      reason: 'compat fixture contains the required 13.5.3 literal',
+      matches: [],
+      reason: 'compat fixture contains the required 17.0.0 literal',
     },
   );
 });
 
-Deno.test('phase 2 fails a compat fixture that lacks the current train literal', async () => {
+Deno.test('phase 2 fails a mixed 13.5.3 + 17.0.0 compat fixture', async () => {
   const report = await evaluateAspireVersionParity({
     rows: parseManifest('path\tclass\towner\tdisposition\ncompat.ts\tcompat-fixture\tS3\tkeep\n'),
     phase: 2,
-    expectedVersion: '13.5.3',
-    readText: () => Promise.resolve("const legacy = '13.4.6';"),
+    expectedVersion: '17.0.0',
+    readText: () => Promise.resolve("const versions = ['13.5.3', '17.0.0'];"),
   });
 
   assertEquals(report.ok, false);
   assertEquals(report.findings[0].status, 'fail');
-  assertEquals(report.findings[0].reason, 'compat fixture is missing the required 13.5.3 literal');
+  assertEquals(report.findings[0].matches, ['13.5.3']);
+  assertEquals(
+    report.findings[0].reason,
+    'compat fixture contains stale or unauthorized Aspire literal alongside 17.0.0',
+  );
 });
 
-Deno.test('phase 2 requires the 13.5.3 compat case independently of the current scaffold pin', async () => {
+Deno.test('phase 2 fails a compat fixture that lacks the 17.0.0 literal', async () => {
   const report = await evaluateAspireVersionParity({
     rows: parseManifest('path\tclass\towner\tdisposition\ncompat.ts\tcompat-fixture\tS3\tkeep\n'),
     phase: 2,
-    expectedVersion: '13.4.6',
-    readText: () => Promise.resolve("const versions = ['13.4.6', '13.5.3'];"),
+    expectedVersion: '17.0.0',
+    readText: () => Promise.resolve("const legacy = '13.5.3';"),
   });
 
-  assertEquals(report.ok, true);
-  assertEquals(report.findings[0]?.status, 'info');
-  assertEquals(report.findings[0]?.reason, 'compat fixture contains the required 13.5.3 literal');
+  assertEquals(report.ok, false);
+  assertEquals(report.findings[0].status, 'fail');
+  assertEquals(report.findings[0].reason, 'compat fixture is missing the required 17.0.0 literal');
 });
 
 Deno.test('phase 2 rejects a longer compat peer token that only contains the required pin', async () => {
   const report = await evaluateAspireVersionParity({
     rows: parseManifest('path\tclass\towner\tdisposition\ncompat.ts\tcompat-fixture\tS3\tkeep\n'),
     phase: 2,
-    expectedVersion: '13.5.3',
-    readText: () => Promise.resolve("const versions = ['13.4.6', '13.5.30'];"),
+    expectedVersion: '17.0.0',
+    readText: () => Promise.resolve("const versions = ['17.0.00'];"),
   });
 
   assertEquals(report.ok, false);
   assertEquals(report.findings[0].status, 'fail');
-  assertEquals(report.findings[0].reason, 'compat fixture is missing the required 13.5.3 literal');
+  assertEquals(report.findings[0].reason, 'compat fixture is missing the required 17.0.0 literal');
 });
 
-Deno.test('phase 2 accepts an exact compat peer token', async () => {
-  const report = await evaluateAspireVersionParity({
-    rows: parseManifest('path\tclass\towner\tdisposition\ncompat.ts\tcompat-fixture\tS3\tkeep\n'),
+Deno.test('phase 2 allows synthetic stale literals in validation-test-fixture when 17.0.0 is also covered', async () => {
+  const passing = await evaluateAspireVersionParity({
+    rows: parseManifest(
+      'path\tclass\towner\tdisposition\ntest.ts\tvalidation-test-fixture\tS1\ttest\n',
+    ),
     phase: 2,
-    expectedVersion: '13.5.3',
-    readText: () => Promise.resolve("const versions = ['13.4.6', '13.5.3'];"),
+    expectedVersion: '17.0.0',
+    readText: () => Promise.resolve("const fixture = ['13.5.3', '17.0.0', '17.0.1'];"),
   });
+  assertEquals(passing.ok, true);
+  assertEquals(passing.findings[0]?.status, 'info');
 
-  assertEquals(report.ok, true);
-  assertEquals(report.findings[0].status, 'info');
-  assertEquals(report.findings[0].reason, 'compat fixture contains the required 13.5.3 literal');
+  const failing = await evaluateAspireVersionParity({
+    rows: parseManifest(
+      'path\tclass\towner\tdisposition\ntest.ts\tvalidation-test-fixture\tS1\ttest\n',
+    ),
+    phase: 2,
+    expectedVersion: '17.0.0',
+    readText: () => Promise.resolve("const fixture = ['13.5.3'];"),
+  });
+  assertEquals(failing.ok, false);
+  assertEquals(failing.findings[0]?.status, 'fail');
 });
 
 Deno.test('exact Aspire version comparison never accepts longer or suffixed tokens', () => {
-  assertEquals(EXACT_ASPIRE_VERSION_TOKEN_MATCH('13.5.3', '13.5.3'), true);
-  assertEquals(EXACT_ASPIRE_VERSION_TOKEN_MATCH(' 13.5.3 ', '13.5.3'), true);
-  assertEquals(EXACT_ASPIRE_VERSION_TOKEN_MATCH('13.5.30', '13.5.3'), false);
+  assertEquals(EXACT_ASPIRE_VERSION_TOKEN_MATCH('17.0.0', '17.0.0'), true);
+  assertEquals(EXACT_ASPIRE_VERSION_TOKEN_MATCH(' 17.0.0 ', '17.0.0'), true);
+  assertEquals(EXACT_ASPIRE_VERSION_TOKEN_MATCH('17.0.00', '17.0.0'), false);
   assertEquals(
-    EXACT_ASPIRE_VERSION_TOKEN_MATCH('13.5.3-preview.1.26425.3', '13.5.3'),
+    EXACT_ASPIRE_VERSION_TOKEN_MATCH('17.0.0-preview.1.26567.5', '17.0.0'),
     false,
   );
 });
@@ -300,8 +332,8 @@ Deno.test('archival classes remain informational even when their owner field is 
       'path\tclass\towner\tdisposition\nhistory.md\tarchival:rfc\tlegacy-owner\tkeep\n',
     ),
     phase: 2,
-    expectedVersion: '13.5.3',
-    readText: () => Promise.resolve('Aspire 13.2 historical evidence'),
+    expectedVersion: '17.0.0',
+    readText: () => Promise.resolve('Aspire 13.5 historical evidence'),
   });
 
   assertEquals(report.ok, true);
@@ -312,7 +344,7 @@ Deno.test('stale or unmatched manifest generation fails closed before row evalua
   const stale = await evaluateAspireVersionParity({
     rows: [],
     phase: 2,
-    expectedVersion: '13.5.3',
+    expectedVersion: '17.0.0',
     readText,
     manifestSource: 'committed',
     generatedManifestSource: 'generated',
@@ -324,7 +356,7 @@ Deno.test('stale or unmatched manifest generation fails closed before row evalua
   const unmatched = await evaluateAspireVersionParity({
     rows: [],
     phase: 2,
-    expectedVersion: '13.5.3',
+    expectedVersion: '17.0.0',
     readText,
     manifestSource: 'same',
     generatedManifestSource: 'same',
@@ -340,7 +372,7 @@ Deno.test('missing archival paths remain non-failing but missing required paths 
       'path\tclass\towner\tdisposition\nrequired.ts\tci:workflow\tS1\tenforce\nhistory.md\tarchival:this-run\tarchival\tinfo\n',
     ),
     phase: 1,
-    expectedVersion: '13.5.3',
+    expectedVersion: '17.0.0',
     readText: () => Promise.resolve(null),
   });
 
@@ -363,26 +395,91 @@ Deno.test('missing archival paths remain non-failing but missing required paths 
   });
 });
 
-Deno.test('phase 1 fails every unauthorized 13.5.x patch across the exact-pin surface', async () => {
+Deno.test('phase 1 and phase 2 fail unauthorized 17.x patches, missing required pins, and allow unrelated pins', async () => {
   const exactPinRows = [
-    ['packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts', 'scaffold-constants'],
-    ['packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts', 'scaffold-constants'],
-    ['.github/toolchain.env', 'ci:other'],
-    ['.github/scripts/aspire-nuget-cache-policy.test.ts', 'ci:policy-test'],
-    ['.github/workflows/e2e-cli.yml', 'ci:workflow'],
-    ['.github/workflows/e2e-cli-prod.yml', 'ci:workflow'],
-    ['.github/workflows/e2e-cli-prod-local.yml', 'ci:workflow'],
+    [
+      'packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts',
+      'scaffold-constants',
+      "ASPIRE_SDK: '17.0.0', DOTNET_SDK: '10.0.0', APPHOST_PG: '8.23.1', GARNET_TOOL: '2.2.14'",
+      "ASPIRE_SDK: '17.0.1'",
+      "DOTNET_SDK: '10.0.0'",
+    ],
+    [
+      'packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts',
+      'scaffold-constants',
+      "VERSION: '17.0.0', BROWSERS: '17.0.0-preview.1.26567.5'",
+      "VERSION: '17.0.0', BROWSERS: '17.0.0-preview.1.26425.3'",
+      "VERSION: '17.0.0'",
+    ],
+    [
+      '.github/toolchain.env',
+      'ci:other',
+      'NETSCRIPT_DENO_VERSION=v2.9.8\nNETSCRIPT_ASPIRE_CLI_VERSION=17.0.0\nNETSCRIPT_ASPIRE_SDK_VERSION=17.0.0',
+      'NETSCRIPT_ASPIRE_CLI_VERSION=17.0.2',
+      'NETSCRIPT_DENO_VERSION=v2.9.8',
+    ],
+    [
+      '.github/scripts/aspire-nuget-cache-policy.test.ts',
+      'ci:policy-test',
+      "const ASPIRE_VERSION = '17.0.0'; const key = 'nuget-aspire-17.0.0-v1';",
+      "const ASPIRE_VERSION = '17.0.2'; const key = 'nuget-aspire-17.0.0-v1';",
+      "const ASPIRE_VERSION = '17.0.0';",
+    ],
+    [
+      '.github/workflows/e2e-cli.yml',
+      'ci:workflow',
+      'key: nuget-aspire-${{ runner.os }}-17.0.0-v1\n--version 17.0.0',
+      'key: nuget-aspire-${{ runner.os }}-17.0.1-v1\n--version 17.0.0',
+      'key: nuget-aspire-${{ runner.os }}-17.0.0-v1',
+    ],
+    [
+      '.github/workflows/e2e-cli-prod.yml',
+      'ci:workflow',
+      'key: nuget-aspire-${{ runner.os }}-17.0.0-v1\n--version 17.0.0',
+      'key: nuget-aspire-${{ runner.os }}-17.0.0-v1\n--version 17.0.1',
+      '--version 17.0.0',
+    ],
+    [
+      '.github/workflows/e2e-cli-prod-local.yml',
+      'ci:workflow',
+      'key: nuget-aspire-${{ runner.os }}-17.0.0-v1\n--version 17.0.0',
+      'key: nuget-aspire-${{ runner.os }}-17.0.0-v2\n--version 17.0.0',
+      '--version 17.0.0',
+    ],
   ] as const;
 
-  for (const [path, className] of exactPinRows) {
-    const report = await evaluateAspireVersionParity({
-      rows: [{ path, class: className, owner: 'S1', disposition: 'enforce' }],
-      phase: 1,
-      expectedVersion: '13.5.3',
-      readText: () => Promise.resolve("const unauthorized = '13.5.2';"),
-    });
-    assertEquals(report.ok, false, path);
-    assertEquals(report.findings[0]?.status, 'fail', path);
-    assertEquals(report.findings[0]?.matches, ['13.5.2'], path);
+  for (const phase of [1, 2] as const) {
+    for (const [path, className, validSource, badPatchSource, missingPinSource] of exactPinRows) {
+      const valid = await evaluateAspireVersionParity({
+        rows: [{ path, class: className, owner: 'S1', disposition: 'enforce' }],
+        phase,
+        expectedVersion: '17.0.0',
+        readText: () => Promise.resolve(validSource),
+      });
+      assertEquals(valid.ok, true, `${path} phase=${phase} valid`);
+
+      const badPatch = await evaluateAspireVersionParity({
+        rows: [{ path, class: className, owner: 'S1', disposition: 'enforce' }],
+        phase,
+        expectedVersion: '17.0.0',
+        readText: () => Promise.resolve(badPatchSource),
+      });
+      assertEquals(badPatch.ok, false, `${path} phase=${phase} badPatch`);
+
+      const missingPin = await evaluateAspireVersionParity({
+        rows: [{ path, class: className, owner: 'S1', disposition: 'enforce' }],
+        phase,
+        expectedVersion: '17.0.0',
+        readText: () => Promise.resolve(missingPinSource),
+      });
+      assertEquals(missingPin.ok, false, `${path} phase=${phase} missingPin`);
+      assertEquals(
+        missingPin.findings.some((f) =>
+          f.reason === 'required Aspire pin is missing from locked exact-pin surface'
+        ),
+        true,
+        `${path} phase=${phase} missingPin reason`,
+      );
+    }
   }
 });

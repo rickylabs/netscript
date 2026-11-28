@@ -15,13 +15,34 @@ class Resource {
     this.environment[key] = value;
     return this;
   }
+  withDenoAllowAll(): this {
+    return this;
+  }
+  withDenoAllow(): this {
+    return this;
+  }
+  withDenoDeny(): this {
+    return this;
+  }
+  withDenoWatch(): this {
+    return this;
+  }
+  withDenoUnstable(): this {
+    return this;
+  }
+  withDenoConfig(): this {
+    return this;
+  }
+  withDenoNodeModulesDir(): this {
+    return this;
+  }
+  withDenoRuntimeArgs(): this {
+    return this;
+  }
   withHttpEndpoint(): this {
     return this;
   }
   withHttpHealthCheck(): this {
-    return this;
-  }
-  withOtlpExporter(): this {
     return this;
   }
 }
@@ -45,7 +66,7 @@ async function fixture(
   await Deno.mkdir(join(root, '.aspire/modules'), { recursive: true });
   await Deno.writeTextFile(
     join(root, '.aspire/modules/aspire.mts'),
-    "export const OtlpProtocol = { HttpProtobuf: 'http' }; export const HealthStatus = {};\n",
+    "export const DenoNodeModulesDirMode = { None: 'None' };\nexport const DenoPermissionKind = { Net: 'Net', Read: 'Read', Write: 'Write', Run: 'Run', Env: 'Env', Import: 'Import', Sys: 'Sys', Ffi: 'Ffi' };\nexport const HealthStatus = {};\n",
   );
   const compatPath = join(root, '.helpers/_aspire-compat.mts');
   await Deno.writeTextFile(
@@ -64,7 +85,7 @@ async function fixture(
     resource,
     register: () =>
       registration.registerPlugins(
-        { addExecutable: () => resource },
+        { addDenoApp: () => resource },
         config,
         {},
         new Map(),

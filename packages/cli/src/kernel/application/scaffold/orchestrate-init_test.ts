@@ -38,7 +38,7 @@ Deno.test('initNextSteps includes public database preparation steps for JSR init
 
   assertEquals(steps, [
     'cd smoke-test',
-    'cd aspire  # TS AppHost lives here, isolated from the Deno workspace',
+    'cd aspire  # native Deno TypeScript AppHost lives here',
     'aspire restore  # download TypeScript AppHost SDK modules (run once)',
     'cd ..',
     'deno task aspire:start  # 300s cold-start budget; override ASPIRE_CLI_START_TIMEOUT if needed',
@@ -79,7 +79,7 @@ Deno.test('initNextSteps includes local database preparation steps for maintaine
 
   assertEquals(steps, [
     'cd smoke-test',
-    'cd aspire  # TS AppHost lives here, isolated from the Deno workspace',
+    'cd aspire  # native Deno TypeScript AppHost lives here',
     'aspire restore  # download TypeScript AppHost SDK modules (run once)',
     'cd ..',
     'deno task aspire:start  # 300s cold-start budget; override ASPIRE_CLI_START_TIMEOUT if needed',

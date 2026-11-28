@@ -29,6 +29,61 @@
   906-line registry is now 362 lines at showcase candidate `04149cb`; this entry does not claim
   that old monolith still exists or close the remaining over-cap gate-directory debt.
 
+## packages/cli — Aspire template directory crosses F-16 cap (`cli-aspire-templates-cardinality-2278`)
+
+- **ID:** `cli-aspire-templates-cardinality-2278`.
+- **Reason:** Epic #2278 S2a (`8b4864b1b`) added `generate-apphost-deno-json.ts` and
+  `generate-apphost-deno-json_test.ts` to `packages/cli/src/kernel/templates/aspire`, taking it
+  from **11 to 13** immediate children against the F-16 / R-FOLD-CARD cap of 12 (`git ls-tree`
+  against `origin/main` `7eecfe51f`; `deno task arch:check` warning). Legacy
+  `generate-apphost-package-json.ts` and `generate-apphost-package-json_test.ts` remain as
+  compatibility templates/tests.
+- **Why deferred / cost:** Relocating the new files after Round-4 verification would churn imports
+  and require fresh hosted proof for a +1 sibling crossing; zero layering, permission, or
+  public-contract exception is accepted.
+- **Owner:** CLI Aspire scaffold maintainers.
+- **Target:** Before adding another template module under `packages/cli/src/kernel/templates/aspire`,
+  remove the retired `generate-apphost-package-json.ts` + `generate-apphost-package-json_test.ts`
+  pair or group AppHost manifest templates into a bounded subfolder (at most 12 immediate children).
+- **Linked plan:** `.llm/runs/epic-aspire-17-upgrade--2278/plan.md` (S2a, L1);
+  `.llm/runs/epic-aspire-17-upgrade--2278/evaluate.md` (Round 4 `FAIL_DEBT`); epic #2278;
+  PR #2693.
+- **Created:** 2026-11-28.
+- **Status:** open, DEBT_ACCEPTED (recorded to clear Round-4 IMPL-EVAL `FAIL_DEBT` pending owner
+  acceptance on PR #2693).
+- **Gate:** `packages/cli/src/kernel/templates/aspire` holds at most 12 immediate children
+  (`git ls-tree` and `deno task arch:check` report zero F-16 warning on
+  `src/kernel/templates/aspire`), with `deno task quality:cli`, focused Aspire template tests, and
+  hosted `scaffold.runtime` green.
+
+## packages/cli/e2e — scaffold runtime probe directory deepens past F-16 cap (`cli-e2e-scaffold-runtime-cardinality-2278`)
+
+- **ID:** `cli-e2e-scaffold-runtime-cardinality-2278`.
+- **Reason:** Round-1 IMPL-EVAL remediation (`600ea1ac8`) added `dashboard-resource-masking.ts`
+  (live `#2259` Prisma Studio `/bff` DB query + headless Chrome CDP Aspire Dashboard masking) and
+  `live-db-authority.ts` (F-1 extraction keeping `verify-live-db-endpoint.ts` at 377 LOC < 623
+  baseline) under `packages/cli/e2e/src/application/gates/scaffold/runtime`, deepening that
+  already-over-cap directory from **29 to 31** immediate children (`git ls-tree` vs `origin/main`
+  `7eecfe51f`) while parent `gates/scaffold` stayed at 94 and `kernel/adapters` stayed at 19.
+- **Why deferred / cost:** Bundling a full E2E runtime probe reorganization with the Aspire 17
+  upgrade would mix structural churn into behavioral verification; accepted cost is 2 additional
+  siblings in the existing over-cap folder, with zero behavioral or layering exception.
+- **Owner:** CLI E2E scaffold-runtime maintainers.
+- **Target:** Before adding another probe or helper module under
+  `packages/cli/e2e/src/application/gates/scaffold/runtime`, group runtime probes into bounded
+  concern subfolders (`credential/`, `database/`, `health/`, `telemetry/`) alongside
+  `scaffold-runtime-a8-f16-1333`.
+- **Linked plan:** `.llm/runs/epic-aspire-17-upgrade--2278/plan.md` (L9/S6);
+  `.llm/runs/epic-aspire-17-upgrade--2278/evaluate.md` (Round 4 `FAIL_DEBT`); epic #2278;
+  PR #2693.
+- **Created:** 2026-11-28.
+- **Status:** open, DEBT_ACCEPTED (recorded to clear Round-4 IMPL-EVAL `FAIL_DEBT` pending owner
+  acceptance on PR #2693; extends `scaffold-runtime-a8-f16-1333` for these two files only).
+- **Gate:** `packages/cli/e2e/src/application/gates/scaffold/runtime` holds at most 12 immediate
+  children with all `#2259` credential/Studio/dashboard masking gates,
+  `behavior.live-db-endpoint`, `deno task quality:cli`, `deno task arch:check`, and both hosted
+  `scaffold.runtime` tiers remaining green.
+
 ## packages/plugin-workers-core — WORKERS-RETRY-DOMAIN-CARDINALITY (13 immediate domain children)
 
 - **Reason:** A cohesive retry-policy schema and resolver are a separate domain concern. This adds
@@ -207,22 +262,20 @@ finding into a debt entry.
 
 ## packages/cli — CommunityToolkit Deno/SQLite TypeScript AppHost re-enable deferred
 
-- **Reason:** The scaffold still uses `_aspire-compat.mts` plus generated
-  `builder.addExecutable(...)` registrations for Deno resources. Aspire 13.5.3 restore evidence
-  proves `CommunityToolkit.Aspire.Hosting.Deno` projects `addDenoApp` and `addDenoTask` into the
-  TypeScript SDK, but 0.0.7 retains the proven executable path until its dedicated adoption slice.
-  First-party Deno hosting is scheduled upstream for Aspire 13.6 (aspire#18627, aspire#18628, and
-  aspire#16218). SQLite remains modeled through `builder.addConnectionString(...)`.
-- **Owner:** Aspire 13.5 S12 adoption slice.
-- **Target:** Adopt the restored CommunityToolkit Deno projection in S12/0.0.8; reassess SQLite in
-  the same dedicated integration slice without coupling it to S4 emission re-validation.
-- **Linked plan:** `.llm/runs/chore-aspire-13-5-s4-generator-revalidation--impl/plan.md` (D-4)
+- **Reason:** Originally deferred while the scaffold used `_aspire-compat.mts` plus generated
+  `builder.addExecutable(...)` registrations for Deno resources. Superseded in epic #2278 by
+  first-party `Aspire.Hosting.JavaScript@17.0.0` (`builder.addDenoApp(...)`, `.withDenoTask(...)`,
+  `.withDenoConfig(...)`, `.withDenoPermission(...)`) and direct `@netscript/aspire/*` helper
+  imports (also retiring D-7 `_aspire-compat.mts` duplication). SQLite remains modeled through a
+  non-secret file-path parameter (`builder.addParameter(...)` at `generate-register-infrastructure.ts:105`),
+  while External databases use `builder.addConnectionString(...)`.
+- **Owner:** Epic #2278 (`epic/aspire-17-upgrade`, PR #2693).
+- **Target:** Close on PR #2693 merge once both hosted `e2e-cli` runtime tiers pass at exact HEAD.
+- **Linked plan:** `.llm/runs/epic-aspire-17-upgrade--2278/plan.md` (S2c/S3a/S3b/S6).
 - **Created:** 2026-06-27
-- **Status:** open, DEBT_ACCEPTED.
-- **Gate:** Close after S12 replaces the Deno executable registration and compatibility path with
-  the restored CommunityToolkit projection, preserves documented SQLite connection-string modeling,
-  and `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` passes with the superseded
-  workaround removed.
+- **Status:** closed 2026-11-28 (epic #2278 / PR #2693) — proven at `21077ac3b` in hosted `e2e-cli` `run/46074769676` (`scaffold-runtime` Postgres `124/124` artifact `15234862287`, `scaffold-runtime-sqlite` `116/116` + showcase `8/8` artifact `15235276207`, `0` skipped; Round-4 independent `IMPL-EVAL` verified zero product defects).
+- **Gate:** Close after hosted `e2e-cli` (`scaffold-runtime` + `scaffold-runtime-sqlite`, `RUN=true`)
+  passes at PR #2693 HEAD with `addDenoApp` live and D-7 retired.
 
 ## packages/cli — ISSUE-167-PLUGIN-REMOVE-UNINSTALL
 
@@ -1790,24 +1843,17 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 ## packages/cli — scaffolded `aspire/package.json` ships no companion lock (`scaffold-aspire-npm-island-no-lock`)
 
-- **Reason:** The CLI scaffold's TypeScript AppHost generator
-  (`packages/cli/src/kernel/.../render-ts-apphost.ts:51-77`) emits an `aspire/package.json` npm
-  island into generated projects with no companion lockfile (`package-lock.json` / `deno.lock`).
-  Consumers must run a manual `npm install` in `aspire/` before the AppHost resolves, and the
-  install is unpinned. This is a pre-existing generated-project DX gap, unrelated to the Deno 2.9
-  toolchain adoption — Deno 2.9's lock/install changes do not seed a lock for an emitted npm package
-  that has no foreign lock to import. The Deno 2.9 adoption plan (D5) decided this gap out-of-scope;
-  this entry makes that "pre-existing arch-debt" citation verifiable per PLAN-EVAL finding F-3.
-- **Owner:** CLI scaffold / Aspire AppHost generator maintainers.
-- **Target:** Before advertising the generated TS AppHost as zero-manual-step; revisit alongside the
-  generated-project task DX follow-up (Deno 2.9 plan C6).
-- **Linked plan:** `.llm/tmp/run/chore-deno-2.9-adoption--adoption-plan/plan.md` (D5);
-  `.llm/tmp/run/chore-deno-2.9-adoption--adoption-plan/research.md` (npm-island note).
+- **Reason:** Previously, the CLI scaffold emitted an unpinned `aspire/package.json` npm island
+  requiring a manual `npm install`. Resolved in epic #2278 by replacing `aspire/package.json` +
+  `tsconfig.apphost.json` with a native Deno workspace member `aspire/deno.json` (plus `"./aspire"`
+  and `"sloppy-imports"` in root `deno.json`) and fail-closed legacy workspace preflight.
+- **Owner:** Epic #2278 (`epic/aspire-17-upgrade`, PR #2693).
+- **Target:** Close on PR #2693 merge once both hosted `e2e-cli` runtime tiers pass at exact HEAD.
+- **Linked plan:** `.llm/runs/epic-aspire-17-upgrade--2278/plan.md` (S2a/S2b/S6).
 - **Created:** 2026-06-25.
-- **Status:** open, DEBT_ACCEPTED.
-- **Gate:** Close when the scaffolded `aspire/package.json` ships with a pinned companion lock (or
-  the npm island is removed) so a generated AppHost resolves without an unpinned manual
-  `npm install`.
+- **Status:** closed 2026-11-28 (epic #2278 / PR #2693) — proven at `21077ac3b` in hosted `e2e-cli` `run/46074769676` (`scaffold-runtime` Postgres `124/124` artifact `15234862287`, `scaffold-runtime-sqlite` `116/116` + showcase `8/8` artifact `15235276207`, `0` skipped; Round-4 independent `IMPL-EVAL` verified zero product defects).
+- **Gate:** Close after hosted `e2e-cli` (`scaffold-runtime` + `scaffold-runtime-sqlite`, `RUN=true`)
+  passes with zero `aspire/package.json` npm island emitted.
 
 ## plugins/triggers connector — TRIGGERS-CONNECTOR-DEFERRED-ROUTES + missing triggers-core backing (#172)
 
@@ -2417,6 +2463,11 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   subdirectory. IMPL-EVAL cycle 1 had measured 943 lines and 48 children before this correction. The
   entry stays **open**: the pre-existing 906-line registry and 43 over-cap children are untouched,
   so the full split is still owed, and the next gate faces the same condition.
+- **Deepening note — PR #2693 / epic #2278 (2026-11-28):** Round-1 remediation (`600ea1ac8`) added
+  `dashboard-resource-masking.ts` and `live-db-authority.ts` under
+  `packages/cli/e2e/src/application/gates/scaffold/runtime`, deepening that subdirectory from **29
+  to 31** immediate children (`gates/scaffold` remained at 94). Tracked in
+  `cli-e2e-scaffold-runtime-cardinality-2278`.
 
 ## packages/aspire — `config.ts` grows further past the 500-line cap (`aspire-config-length-1447`)
 
@@ -2507,21 +2558,20 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `workers-doc-baseline-2066` remain open with their existing closing gates. Evidence is kept in the
   run record and PR #2313.
 
-## Aspire.Hosting.Browsers preview pin (13.5 train) (`aspire-browsers-preview-1713`)
+## Aspire.Hosting.Browsers preview pin (17.0 train) (`aspire-browsers-preview-1713`)
 
-- **Reason:** Aspire SDK, CLI, and official hosting integrations move atomically to stable 13.5.3,
-  but `Aspire.Hosting.Browsers` has no stable 13.5.x package. The accepted OF-2a fallback is
-  `13.5.3-preview.1.26425.3`, preserving a single 13.5 train without holding back the stable
-  surface.
+- **Reason:** Aspire SDK, CLI, and official hosting integrations move atomically to stable `17.0.0`,
+  but `Aspire.Hosting.Browsers` has no stable 17.x package yet. The accepted fallback on the 17.0
+  train is `17.0.0-preview.1.26567.5`, preserving a single 17.0 train without holding back the
+  stable surface.
 - **Owner:** CLI Aspire scaffold maintainers.
-- **Target:** Replace the preview pin as soon as a stable 13.5.x `Aspire.Hosting.Browsers` package
-  is available.
-- **Linked plan:** Issue #1713; epic #1712; PR #1727;
-  `.llm/runs/chore-aspire-13-5-s1-pin-bump--impl/`.
-- **Created:** 2026-08-29.
-- **Status:** open, DEBT_ACCEPTED for #1713 under research decision D-1 / OF-2a.
-- **Gate:** Drop when a stable 13.5.x Browsers package exists. E-12 (`check:scaffold-versions`)
-  scans `SCAFFOLD_VERSIONS` only and never sees `SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS`; until then,
+- **Target:** Replace the preview pin as soon as a stable 17.x `Aspire.Hosting.Browsers` package is
+  available.
+- **Linked plan:** Issue #1713; epic #2278; PR #2693;
+  `.llm/runs/epic-aspire-17-upgrade--2278/plan.md`.
+- **Created:** 2026-08-29 (updated for Aspire 17.0.0 on 2026-11-27).
+- **Status:** open, DEBT_ACCEPTED under epic #2278 (L2).
+- **Gate:** Drop when a stable 17.x `Aspire.Hosting.Browsers` package exists.
   `check:aspire-version-parity` (exact-pin allow-list), `generate-aspire-config_test.ts`, and both
   CI-owned `scaffold.runtime` tiers must retain the exact accepted preview pin and remain green.
 

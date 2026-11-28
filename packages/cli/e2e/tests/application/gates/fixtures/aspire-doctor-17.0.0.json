@@ -1,0 +1,80 @@
+{
+  "checks": [
+    {
+      "category": "aspire",
+      "name": "cli-version",
+      "status": "pass",
+      "message": "Aspire CLI version 17.0.0 (channel: stable)",
+      "metadata": { "currentVersion": "17.0.0", "identityChannel": "stable" }
+    },
+    {
+      "category": "environment",
+      "name": "operating-system",
+      "status": "pass",
+      "message": "Operating system: Linux Debian 12",
+      "metadata": {
+        "osType": "Linux",
+        "displayName": "Linux Debian",
+        "version": "12",
+        "description": "Debian GNU/Linux 12 (bookworm)"
+      }
+    },
+    {
+      "category": "sdk",
+      "name": "dotnet-sdk",
+      "status": "pass",
+      "message": ".NET 10.0.400 installed (x64)"
+    },
+    {
+      "category": "environment",
+      "name": "dev-certs",
+      "status": "warning",
+      "message": "HTTPS development certificate is only partially trusted"
+    },
+    {
+      "category": "environment",
+      "name": "dev-certs-certutil",
+      "status": "warning",
+      "message": "certutil is not available; browser certificate trust may be incomplete"
+    },
+    {
+      "category": "container",
+      "name": "docker",
+      "status": "pass",
+      "message": "Docker v28.5.2: running (auto-detected (default)) ← active"
+    },
+    {
+      "category": "aspire",
+      "name": "dcp-ephemeral-certificate",
+      "status": "pass",
+      "message": "Developer Control Plane (DCP) connection using an ephemeral DCP-managed certificate succeeded"
+    },
+    {
+      "category": "aspire",
+      "name": "dcp-developer-certificate",
+      "status": "warning",
+      "message": "No trusted developer certificate was available for the Developer Control Plane (DCP) developer certificate connection check"
+    }
+  ],
+  "summary": { "passed": 5, "warnings": 3, "failed": 0 },
+  "installations": [
+    {
+      "path": "/home/agent/.local/share/mise/installs/aspire/17.0.0/aspire",
+      "canonicalPath": "/home/agent/.local/share/mise/installs/aspire/17.0.0/aspire",
+      "version": "17.0.0+2d325b13709752ba6d9a943635c5e2940a2530c0",
+      "channel": "stable",
+      "route": "dotnet-tool",
+      "pathStatus": "active",
+      "status": "ok"
+    },
+    {
+      "path": "/home/agent/.local/aspire/aspire",
+      "canonicalPath": "/home/agent/.local/aspire/aspire",
+      "version": "17.0.0+2d325b13709752ba6d9a943635c5e2940a2530c0",
+      "channel": "stable",
+      "route": "script",
+      "pathStatus": "shadowed",
+      "status": "ok"
+    }
+  ]
+}

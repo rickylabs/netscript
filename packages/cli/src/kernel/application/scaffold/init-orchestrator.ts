@@ -110,7 +110,7 @@ export function initNextSteps(options: ValidatedInitOptions): string[] {
     : 'netscript db';
 
   if (!options.noAspire) {
-    steps.push('cd aspire  # TS AppHost lives here, isolated from the Deno workspace');
+    steps.push('cd aspire  # native Deno TypeScript AppHost lives here');
     steps.push('aspire restore  # download TypeScript AppHost SDK modules (run once)');
     steps.push('cd ..');
     steps.push(

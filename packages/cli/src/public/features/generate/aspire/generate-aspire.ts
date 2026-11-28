@@ -1,3 +1,4 @@
+import { assertNativeDenoAppHost } from '../../../../kernel/adapters/aspire/apphost-package-dependencies.ts';
 import { validateConfiguredPluginComposition } from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { UseCase } from '../../../../kernel/application/abstracts/use-case.ts';
@@ -86,6 +87,9 @@ async function executeGenerateAspire(
   request: GenerateAspireRequest,
   dependencies: GenerateAspireDependencies,
 ): Promise<GenerateAspireResult> {
+  // Enforce the legacy Node AppHost refusal before loading config or plugins so Deno never installs dependencies into an unmigrated workspace.
+  await assertNativeDenoAppHost(dependencies.fs, request.projectRoot);
+
   const validateComposition = dependencies.validateComposition ??
     ((projectRoot: string) => validateConfiguredPluginComposition(projectRoot));
   await validateComposition(request.projectRoot);

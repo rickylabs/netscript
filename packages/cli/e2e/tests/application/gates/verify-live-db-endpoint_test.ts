@@ -5,7 +5,9 @@ import {
   correlateUsersTelemetry,
   matchesDatabaseHealthContract,
   pollUsersTelemetryCorrelation,
+  redactDatabaseConnectionUrl,
   resolveDatabaseEndpointResource,
+  resolveLiveUsersDatabaseAuthority,
   verifyGeneratedCrudAcceptance,
 } from '../../../src/application/gates/scaffold/verify-live-db-endpoint.ts';
 
@@ -15,15 +17,15 @@ const realHealthResponse = await Deno.readTextFile(
 const unhealthyHealthResponse = await Deno.readTextFile(
   new URL('./fixtures/users-health-unhealthy-response.json', import.meta.url),
 );
-const aspire1353Describe = JSON.parse(
+const aspire1700Describe = JSON.parse(
   await Deno.readTextFile(
-    new URL('./fixtures/aspire-13.5.3-describe-postgres.json', import.meta.url),
+    new URL('./fixtures/aspire-17.0.0-describe-postgres.json', import.meta.url),
   ),
 );
 const passwordFirstDescribe = JSON.parse(
   await Deno.readTextFile(
     new URL(
-      './fixtures/aspire-13.5.3-describe-postgres-password-first.json',
+      './fixtures/aspire-17.0.0-describe-postgres-password-first.json',
       import.meta.url,
     ),
   ),
@@ -82,11 +84,11 @@ Deno.test('database endpoint resolver reports ambiguous candidate names and type
   assertStringIncludes(message, 'type=ContainerReplica');
 });
 
-Deno.test('second receipt accepts the live Aspire 13.5 persistent allocation', () => {
+Deno.test('second receipt accepts the live Aspire 17.0.0 persistent allocation', () => {
   assertEquals(
     compareSecondReceiptWithLiveTopology(
       'postgres://localhost:10538',
-      aspire1353Describe,
+      aspire1700Describe,
       'postgres',
     ),
     {
@@ -100,7 +102,7 @@ Deno.test('second receipt accepts the live Aspire 13.5 persistent allocation', (
 Deno.test('second receipt rejects a literal endpoint absent from the live second start', () => {
   const result = compareSecondReceiptWithLiveTopology(
     'postgres://localhost:5432',
-    aspire1353Describe,
+    aspire1700Describe,
     'postgres',
   );
 
@@ -276,3 +278,57 @@ function jsonResponse(body: unknown, status = 200): Response {
     headers: { 'content-type': 'application/json' },
   });
 }
+
+Deno.test('redactDatabaseConnectionUrl strips URL credentials/query and Npgsql secret fields', () => {
+  assertEquals(
+    redactDatabaseConnectionUrl(
+      'postgres://postgres:supersecret@localhost:10538/appdb?sslmode=disable',
+    ),
+    'postgres://localhost:10538/appdb',
+  );
+  assertEquals(
+    redactDatabaseConnectionUrl(
+      'Host=localhost;Port=10538;Username=postgres;Password=supersecret;Database=appdb',
+    ),
+    'Host=localhost;Port=10538;Database=appdb',
+  );
+});
+
+Deno.test('resolveLiveUsersDatabaseAuthority verifies live process URLs when describe redacts DATABASE_URL to null', async () => {
+  const topology = {
+    resources: [
+      { name: 'postgres', displayName: 'postgres', urls: [{ url: 'tcp://localhost:10538' }] },
+      { name: 'users', displayName: 'users', environment: { DATABASE_URL: null } },
+    ],
+  };
+  const redacted = await resolveLiveUsersDatabaseAuthority(
+    topology,
+    'postgres://localhost:10538',
+    () => Promise.resolve(['postgresql://postgres:topsecret@127.0.0.1:10538/app?sslmode=disable']),
+  );
+  assertEquals(redacted, 'postgresql://127.0.0.1:10538/app');
+  assertEquals(redacted.includes('topsecret'), false);
+
+  const mismatchError = await assertRejects(
+    () =>
+      resolveLiveUsersDatabaseAuthority(
+        topology,
+        'postgres://localhost:10538',
+        () => Promise.resolve(['postgresql://postgres:topsecret@127.0.0.1:54321/app']),
+      ),
+    Error,
+    '54321',
+  );
+  assertEquals(mismatchError.message.includes('topsecret'), false);
+
+  await assertRejects(
+    () =>
+      resolveLiveUsersDatabaseAuthority(
+        topology,
+        'postgres://localhost:10538',
+        () => Promise.resolve([undefined]),
+      ),
+    Error,
+    'omitted DATABASE_URL',
+  );
+});

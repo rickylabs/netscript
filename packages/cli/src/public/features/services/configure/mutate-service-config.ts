@@ -1,4 +1,5 @@
 import { join } from '@std/path';
+import { assertNativeDenoAppHost } from '../../../../kernel/adapters/aspire/apphost-package-dependencies.ts';
 import { regenerateAspireHelpersWithDependencies } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
@@ -57,6 +58,7 @@ async function mutateServices(
   projectRoot: string,
   mutate: (services: Record<string, MutableService>) => void,
 ): Promise<readonly string[]> {
+  await assertNativeDenoAppHost(dependencies.fs, projectRoot);
   const path = join(projectRoot, 'appsettings.json');
   const document = JSON.parse(await dependencies.fs.readFile(path)) as {
     NetScript?: { Services?: Record<string, MutableService> };
