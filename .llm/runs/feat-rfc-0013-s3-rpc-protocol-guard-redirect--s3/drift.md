@@ -1,0 +1,6 @@
+# Drift Log — RFC 0013 S3
+
+1. **`cors-response-authority_test.ts` `/api/rpc/boom` (`500`) Vary token:**
+   - `ProtocolGuardPluginV1` appends `Vary: X-NetScript-RPC-Protocol` on every matched `RPCHandler` response (both `200`, `4xx`/`500` procedure errors, and `426` protocol rejections), which is required for HTTP caching correctness (RFC 9110 §12.5.5) because the handler's decision depends on `X-NetScript-RPC-Protocol` before procedure execution. In `packages/service/tests/cors-response-authority_test.ts:197`, both `/api/rpc/ping` (`200`) and `/api/rpc/boom` (`500`) reach `RPCHandler` and therefore carry `['origin', 'x-netscript-rpc-protocol']`, while `/api/rpc/ping` (`413`, rejected by `withBodyLimit` before `RPCHandler`) and all non-RPC surfaces (`/api/status`, `/raw`, `/health`, etc.) retain their exact pre-S3 `Vary` assertions unchanged.
+2. **Deferred RPC prefix lookup in `withCors()`:**
+   - Callers routinely invoke `.withCors(...)` before `.withRPC({ rpcPath, rpcAliases })`. `createServiceCorsMiddleware` receives a `() => this.resolveMountedRpcPrefixes()` callback from `ServiceBuilderImpl` so custom `rpcPath` and `rpcAliases` are respected regardless of builder call order while services that never call `.withRPC()` resolve `[]` and never mutate explicit `allowHeaders`.

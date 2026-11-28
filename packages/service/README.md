@@ -167,8 +167,14 @@ Under `withCors()`, the service's native CORS decision is authoritative on every
 RPC/OpenAPI projections, raw routes, proxied upstreams, health and errors. All six access-control
 headers are restored to the configured decision, including absence; handler, upstream and oRPC
 headers are replaced. Declare `exposeHeaders`, `allowHeaders` and `allowMethods` on `withCors()`.
-`Vary` retains the union of tokens present before and after downstream handling, deduplicated
-case-insensitively (`*` wins). Services that never call `withCors()` are unchanged.
+On matched RPC procedure paths under `rpcPath` / `rpcAliases` (default `/api/rpc/*`), `withCors()`
+automatically appends `X-NetScript-RPC-Protocol` (case-insensitively deduplicated) to explicit
+`allowHeaders` on `OPTIONS` preflights while leaving explicit `allowHeaders` on non-RPC routes
+(`/raw`, `/health`, `/api/*` OpenAPI, and non-RPC routes sharing the prefix) unchanged, and
+`createRPCHandler()` adds `Vary: X-NetScript-RPC-Protocol` on matched RPC responses (including
+`426` protocol-mismatch rejections). `Vary` retains the union of tokens present before and after
+downstream handling, deduplicated case-insensitively (`*` wins). Services that never call
+`withCors()` are unchanged.
 
 `withCors()` and `defineService()` no longer grant `Access-Control-Allow-Origin: *` by default. An
 omitted `origin` reads `NETSCRIPT_CORS_ORIGINS` once when the builder is configured. Supply

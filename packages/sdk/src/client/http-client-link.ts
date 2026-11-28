@@ -194,6 +194,7 @@ export function createHttpClientLink<
             headers,
             cache: context?.cache as RequestCache,
             signal: context?.signal,
+            redirect: 'error',
           });
         },
         {

@@ -38,6 +38,7 @@ import type {
   ServiceRouter,
 } from '../types.ts';
 import { isOrpcRouter } from './orpc-router.ts';
+import { ProtocolGuardPluginV1 } from './rpc-protocol-guard.ts';
 
 /**
  * Configuration options for RPC handlers.
@@ -173,7 +174,7 @@ export function createRPCHandler<T extends ServiceRouter>(
     throw new TypeError('Service router must be an object');
   }
 
-  const plugins = createRPCPlugins(config ?? {});
+  const plugins = [new ProtocolGuardPluginV1(), ...createRPCPlugins(config ?? {})];
   return new RPCHandler(router, { plugins });
 }
 

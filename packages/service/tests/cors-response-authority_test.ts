@@ -196,7 +196,11 @@ for (const credentials of [true, false]) {
             ]);
             assertVary(
               response,
-              surface.path === '/raw' ? ['origin', 'accept-encoding'] : ['origin'],
+              surface.path === '/raw'
+                ? ['origin', 'accept-encoding']
+                : surface.path.startsWith('/api/rpc/') && surface.status !== 413
+                ? ['origin', 'x-netscript-rpc-protocol']
+                : ['origin'],
             );
             if (surface.path === '/raw') {
               assertEquals(response.statusText, 'Upstream Accepted');
@@ -264,7 +268,9 @@ test('CORS native preflight short-circuits all surfaces before authentication', 
             credentials ? 'true' : null,
             credentials ? 'X-Trace' : null,
             'GET,POST',
-            'Authorization,Content-Type',
+            path === '/api/rpc/ping'
+              ? 'Authorization,Content-Type,X-NetScript-RPC-Protocol'
+              : 'Authorization,Content-Type',
             '600',
           ]);
           // Native Hono varies on request headers even when allowHeaders is configured.
@@ -307,6 +313,8 @@ test('CORS wildcard preserves supplied Vary without forcing Origin', async () =>
           ? ['accept-encoding']
           : path === '/raw'
           ? ['origin', 'accept-encoding']
+          : path === '/api/rpc/ping'
+          ? ['origin', 'x-netscript-rpc-protocol']
           : ['origin'],
       );
       assertEquals(
@@ -469,11 +477,17 @@ test('no withCors and standalone RPC/OpenAPI preserve their existing CORS bounda
       headers: requestHeaders(origin),
       body: '{}',
     });
-    for (const response of [rpc.response, rest.response, built]) {
+    for (
+      const [response, expectedVary] of [
+        [rpc.response, ['origin', 'x-netscript-rpc-protocol']],
+        [rest.response, ['origin']],
+        [built, ['origin', 'x-netscript-rpc-protocol']],
+      ] as const
+    ) {
       assert(response);
       assertEquals(response.status, 200);
       assertEquals(corsValues(response), [origin ?? '', null, null, null, null, null]);
-      assertVary(response, ['origin']);
+      assertVary(response, [...expectedVary]);
       await response.arrayBuffer();
     }
   }

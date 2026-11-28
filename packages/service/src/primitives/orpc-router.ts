@@ -5,10 +5,9 @@
  */
 
 import type { Router } from '@orpc/server';
-import type { ServiceRouter } from '../types.ts';
 
 export type OrpcRouter = Router<never, Record<PropertyKey, unknown>>;
 
-export function isOrpcRouter(router: ServiceRouter): router is OrpcRouter {
+export function isOrpcRouter(router: unknown): router is OrpcRouter {
   return typeof router === 'object' && router !== null;
 }
