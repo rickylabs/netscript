@@ -8,10 +8,10 @@
     "baseline:axe": "node record-axe-baseline.ts"
   },
   "devDependencies": {
-    "@axe-core/playwright": "4.11.1",
+    "@axe-core/playwright": "4.14.0",
     "@playwright/test": "1.63.0",
     "@types/node": "26.0.1",
     "playwright-core": "1.63.0",
-    "axe-core": "4.11.4"
+    "axe-core": "4.14.1"
   }
 }
