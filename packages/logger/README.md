@@ -63,6 +63,22 @@ In development this prints readable lines under the service category
 Use `ensureLogging()` instead of `configureLogging()` on shared startup paths that may run more than
 once.
 
+### oRPC request correlation
+
+`LoggingPlugin` reuses an incoming `requestId` from oRPC context (such as the ID propagated by
+`loggerMiddleware` / `X-Request-ID` in `@netscript/service`) and falls back to a fresh per-request
+ID when absent, keeping HTTP access logs, RPC logs, and procedure handlers correlated:
+
+```typescript
+import { LoggingPlugin } from '@netscript/logger/orpc';
+
+const plugin = new LoggingPlugin({
+  serviceName: 'orders',
+  redactFields: ['brief'],
+});
+void plugin;
+```
+
 ## Public surface
 
 | Entry          | What it gives you                                                                  |

@@ -356,4 +356,8 @@ export type ServiceHandlerContext<TCustom extends object = Record<never, never>>
     readonly traceHeaders?: Readonly<Record<string, string>>;
     /** Authenticated identity, when authentication succeeds. */
     readonly principal?: Principal;
-  };
+  }
+  & ('requestId' extends keyof TCustom ? Record<never, never> : {
+    /** Unified request identifier correlated across HTTP and oRPC logs. */
+    readonly requestId?: string;
+  });

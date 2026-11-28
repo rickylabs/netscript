@@ -10,10 +10,16 @@
  */
 
 import { type Context, Hono } from 'hono';
-import { ensureLogging } from '@netscript/logger';
+import { ensureLogging, type Logger } from '@netscript/logger';
 import { loggerMiddleware, type LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 import { createHonoTracingMiddleware } from '@netscript/telemetry/hono';
 import { createAuthnMiddleware, createAuthzMiddleware } from '../auth/auth-middleware.ts';
+import {
+  CORRELATION_REQUEST_ID_SYMBOL,
+  HTTP_REQUEST_METADATA_SYMBOL,
+  type HttpRequestMetadata,
+  wrapRouterWithProcedurePipeline,
+} from '../middleware/procedure-pipeline.ts';
 import {
   assertServiceCorsOptions,
   createServiceCorsMiddleware,
@@ -49,6 +55,7 @@ import type {
   RunningService,
   ServeOptions,
   ServiceApp,
+  ServiceEnvironment,
   ServiceHandler,
   ServiceHandlerContext,
   ServiceMiddleware,
@@ -57,7 +64,15 @@ import type {
   ShutdownHook,
 } from '../types.ts';
 import { createRateLimitMiddleware } from '../rate-limit/middleware/rate-limit-middleware.ts';
-import type { ServiceRateLimitOptions } from '../rate-limit/middleware/options.ts';
+import {
+  type PreparedProcedureRateLimitStage,
+  prepareProcedureRateLimitStage,
+} from '../rate-limit/middleware/procedure-rate-limit.ts';
+import type {
+  ServiceProcedureRateLimitOptions,
+  ServiceRateLimitOptions,
+} from '../rate-limit/middleware/options.ts';
+import type { RateLimitStore } from '../rate-limit/ports/rate-limit-store.ts';
 import type { ServiceBuilder, ServiceConfig } from './service-builder.ts';
 import { resolveRpcWiringPaths, type RpcWiringOptions, wireRpc } from './service-rpc.ts';
 import { startServiceListener } from './service-listener.ts';
@@ -122,11 +137,16 @@ export class ServiceBuilderImpl<
   private serviceInfoConfigured = false;
   private streamProxies: StreamProxyMount[] = [];
   private boundInternalCaller: InternalCallerPredicate | undefined;
+  private readonly serviceId: symbol;
+  private readonly httpRateLimitStores = new Set<RateLimitStore>();
+  private readonly procedureRateLimitStages: PreparedProcedureRateLimitStage[] = [];
+  private readonly wrappedLeavesCache = new WeakMap<object, object>();
 
   constructor(router: TRouter, config: ServiceConfig) {
     this.app = new Hono();
     this.router = router;
     this.config = config;
+    this.serviceId = Symbol(`netscript:service:${config.name}`);
     this.app.use('*', createHonoTracingMiddleware({ serviceName: this.config.name }));
   }
 
@@ -321,12 +341,33 @@ export class ServiceBuilderImpl<
 
   /** Adds a route-scoped quota stage through the existing middleware seam. */
   withRateLimit(options: ServiceRateLimitOptions): ServiceBuilder<TRouter, TCustom> {
-    return this.use(createRateLimitMiddleware(options));
+    if (this.procedureRateLimitStages.some((stage) => stage.store === options.store)) {
+      throw new Error(
+        '[netscript.service.rate-limit] HTTP edge withRateLimit() and withProcedureRateLimit() must use disjoint RateLimitStore instances to avoid double-counting HTTP requests.',
+      );
+    }
+    const middleware = createRateLimitMiddleware(options);
+    this.httpRateLimitStores.add(options.store);
+    return this.use(middleware);
+  }
+
+  /** Adds a procedure-level quota stage executed inside the oRPC procedure pipeline. */
+  withProcedureRateLimit(
+    options: ServiceProcedureRateLimitOptions,
+  ): ServiceBuilder<TRouter, TCustom> {
+    if (this.httpRateLimitStores.has(options.store)) {
+      throw new Error(
+        '[netscript.service.rate-limit] withProcedureRateLimit() and HTTP edge withRateLimit() must use disjoint RateLimitStore instances to avoid double-counting HTTP requests.',
+      );
+    }
+    const stage = prepareProcedureRateLimitStage(options);
+    this.procedureRateLimitStages.push(stage);
+    return this;
   }
 
   /**
    * Builds the per-request oRPC context: custom factory output plus the optional
-   * database handle, distributed-trace headers, and authenticated principal.
+   * database handle, distributed-trace headers, unified request ID, and authenticated principal.
    */
   private buildRpcContext(
     c: Context,
@@ -344,13 +385,41 @@ export class ServiceBuilderImpl<
       }
     }
 
+    const rawRequestId = c.get('requestId') ?? c.req.header('x-request-id');
+    const httpRequestId = typeof rawRequestId === 'string' && rawRequestId.trim().length > 0
+      ? rawRequestId.trim()
+      : undefined;
+    const customContext = this.contextFactory(c);
+    const customRequestId = Reflect.get(customContext, 'requestId');
+    const hasIncompatibleRequestId = customRequestId !== undefined &&
+      typeof customRequestId !== 'string';
+    const hasExplicitStringRequestId = typeof customRequestId === 'string' &&
+      customRequestId.trim().length > 0;
     const principal = c.get('principal');
+    const rawRequest = 'raw' in c.req && c.req.raw instanceof Request ? c.req.raw : undefined;
+    const rawLogger = c.get('logger');
+    const httpMeta: HttpRequestMetadata | undefined =
+      rawRequest && this.procedureRateLimitStages.length > 0
+        ? {
+          request: rawRequest,
+          env: 'env' in c ? c.env as ServiceEnvironment | undefined : undefined,
+          logger: isLoggerLike(rawLogger) ? rawLogger : undefined,
+        }
+        : undefined;
+
     return {
-      ...this.contextFactory(c),
+      ...customContext,
       ...(this.database ? { db: this.database } : {}),
       ...(traceHeaders ? { traceHeaders } : {}),
+      ...(httpRequestId && !hasIncompatibleRequestId && !hasExplicitStringRequestId
+        ? { requestId: httpRequestId }
+        : {}),
+      ...(httpRequestId && hasIncompatibleRequestId
+        ? { [CORRELATION_REQUEST_ID_SYMBOL]: httpRequestId }
+        : {}),
       ...(principal ? { principal } : {}),
-    };
+      ...(httpMeta ? { [HTTP_REQUEST_METADATA_SYMBOL]: httpMeta } : {}),
+    } as ServiceHandlerContext<TCustom>;
   }
 
   /**
@@ -635,12 +704,36 @@ export class ServiceBuilderImpl<
 
     if (this.rpcConfigured) {
       const traceContext = this.rpcOptions?.traceContext !== false;
+      const pipelineConfig = {
+        serviceId: this.serviceId,
+        serviceName: this.config.name,
+        rateLimitStages: this.procedureRateLimitStages,
+      };
+      const wrappedRouter = wrapRouterWithProcedurePipeline(
+        this.router,
+        pipelineConfig,
+        this.wrappedLeavesCache,
+      );
+      const wrappedRpcRouter = this.rpcOptions?.rpcRouter
+        ? wrapRouterWithProcedurePipeline(
+          this.rpcOptions.rpcRouter,
+          pipelineConfig,
+          this.wrappedLeavesCache,
+        )
+        : undefined;
+      const enableResponseHeaders = this.procedureRateLimitStages.length > 0;
       wireRpc(
         this.app,
-        this.router,
+        wrappedRouter,
         this.config.name,
         (c) => this.buildRpcContext(c, traceContext),
-        this.rpcOptions ?? undefined,
+        this.rpcOptions || enableResponseHeaders
+          ? {
+            ...this.rpcOptions,
+            ...(wrappedRpcRouter ? { rpcRouter: wrappedRpcRouter } : {}),
+            ...(enableResponseHeaders ? { responseHeaders: true } : {}),
+          }
+          : undefined,
       );
     }
 
@@ -686,4 +779,11 @@ function isContractPolicyAuthorizer(
   authorizer: AuthorizerPort,
 ): authorizer is ContractPolicyAuthorizerPort {
   return 'bind' in authorizer && typeof authorizer.bind === 'function';
+}
+
+function isLoggerLike(value: unknown): value is Logger {
+  return typeof value === 'object' &&
+    value !== null &&
+    typeof Reflect.get(value, 'warn') === 'function' &&
+    typeof Reflect.get(value, 'info') === 'function';
 }

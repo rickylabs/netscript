@@ -872,3 +872,39 @@ the socket address. This client-address policy does not enable auth protocol-hea
 See
 [Protect an anonymous service route](../../docs/site/services-sdk/how-to/protect-an-anonymous-route.md)
 for a shared KV example.
+
+## Procedure-level rate limits and request correlation
+
+Use `.withProcedureRateLimit()` to enforce post-auth principal/tenant quotas or public
+IPv6-`/64`-bucketed procedure quotas inside the oRPC procedure pipeline. The stage validates
+`limit`, `windowMs`, `ipv6Prefix`, and RFC 0008 `store.validate?.({ limit, windowMs })`
+synchronously at registration, rejects sharing the same `RateLimitStore` instance with HTTP-edge
+`.withRateLimit()` (preventing `2×` HTTP double-counting), and emits HTTP `429` plus a
+`Retry-After` header (derived from `decision.retryAt ?? decision.resetAt` via oRPC's
+`ResponseHeadersPlugin`) alongside a contract-defined `ORPCError('RATE_LIMITED', ...)` envelope.
+
+```ts
+import { createService } from '@netscript/service';
+import { createMemoryRateLimitStore } from '@netscript/service/rate-limit';
+
+const app = createService({}, { name: 'orders' })
+  .withLogger()
+  .withProcedureRateLimit({
+    limit: 120,
+    windowMs: 60_000,
+    store: createMemoryRateLimitStore({ policy: { kind: 'gcra' } }),
+    key: ({ principal, clientAddress, procedurePath }) =>
+      principal
+        ? `${String(principal.claims.tenantId ?? 'global')}:${principal.subject}:${procedurePath.join('.')}`
+        : `addr:${clientAddress ?? 'unknown'}:${procedurePath.join('.')}`,
+  })
+  .withRPC()
+  .build();
+void app;
+```
+
+When `.withLogger()` and `.withRPC()` are combined, `ServiceBuilder` propagates the HTTP
+`requestId` (`X-Request-ID` or the ID minted by `loggerMiddleware`) into `LoggingPlugin` and
+`ServiceHandlerContext.requestId`, while wrapping both `router` and `withRPC({ rpcRouter })`
+leaves idempotently per service (failing closed with `ROUTER_CLIENT_CROSS_SERVICE_MOUNT` on
+cross-service remounts).

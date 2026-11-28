@@ -9,6 +9,12 @@ import { DEFAULT_RPC_SKIP_PATHS } from './constants.ts';
 import { createFieldRedactor, type FieldRedactor, REDACTED_VALUE } from './redaction.ts';
 
 /**
+ * Shared well-known context symbol for carrying the resolved string correlation ID
+ * without overwriting incompatible application-owned `context.requestId` values.
+ */
+const CORRELATION_REQUEST_ID_SYMBOL = Symbol.for('netscript.request-id');
+
+/**
  * Request-scoped oRPC context as seen by the logging interceptors.
  *
  * oRPC forwards the context a root interceptor passes to `next({ context })` to every procedure
@@ -249,7 +255,7 @@ export class LoggingPlugin {
       options: RootLoggingInterceptorOptions,
     ) => {
       const startTime = performance.now();
-      const requestId = createRequestId();
+      const requestId = readIncomingRequestId(options.context) ?? createRequestId();
       const requestLogger = logger.with({ requestId, service: serviceName });
 
       if (debug) {
@@ -257,9 +263,17 @@ export class LoggingPlugin {
       }
 
       try {
+        const existingRequestId = options.context?.requestId;
+        const preserveCallerRequestId = existingRequestId !== undefined &&
+          typeof existingRequestId !== 'string';
         const result = await options.next({
           ...options,
-          context: { ...options.context, [requestIdKey]: requestId },
+          context: {
+            ...options.context,
+            ...(preserveCallerRequestId ? {} : { requestId }),
+            [CORRELATION_REQUEST_ID_SYMBOL]: requestId,
+            [requestIdKey]: requestId,
+          },
         });
 
         if (debug && hasMatchedResult(result)) {
@@ -388,10 +402,45 @@ function createRequestId(): string {
   return crypto.randomUUID().split('-')[0];
 }
 
+/** Reads an incoming request ID from oRPC context (`requestId`, private symbol, or `headers['x-request-id']`). */
+function readIncomingRequestId(context: LoggingInterceptorContext | undefined): string | undefined {
+  const correlated = context?.[CORRELATION_REQUEST_ID_SYMBOL];
+  if (typeof correlated === 'string') {
+    const trimmed = correlated.trim();
+    if (trimmed.length > 0) return trimmed;
+  }
+
+  const direct = context?.requestId;
+  if (typeof direct === 'string') {
+    const trimmed = direct.trim();
+    if (trimmed.length > 0) return trimmed;
+  }
+
+  const headers = context?.headers;
+  if (headers instanceof Headers) {
+    const headerValue = headers.get('x-request-id')?.trim();
+    return headerValue && headerValue.length > 0 ? headerValue : undefined;
+  }
+
+  if (typeof headers === 'object' && headers !== null) {
+    for (const [key, value] of Object.entries(headers)) {
+      if (key.toLowerCase() === 'x-request-id' && typeof value === 'string') {
+        const trimmed = value.trim();
+        if (trimmed.length > 0) return trimmed;
+      }
+    }
+  }
+
+  return undefined;
+}
+
 /** Reads the request ID the root interceptor stored in this request's oRPC context. */
 function readRequestId(context: LoggingInterceptorContext | undefined, key: symbol): string {
   const requestId = context?.[key];
-  return typeof requestId === 'string' ? requestId : 'unknown';
+  if (typeof requestId === 'string' && requestId.length > 0) {
+    return requestId;
+  }
+  return readIncomingRequestId(context) ?? 'unknown';
 }
 
 function shouldSkipPath(path: string, skipPaths: readonly string[]): boolean {
