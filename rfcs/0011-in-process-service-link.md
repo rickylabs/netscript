@@ -327,7 +327,7 @@ Issue `#451` item 7 requires deciding whether `@netscript/sdk` imports `type { S
 #### Measured dependency graph evidence
 
 - **Current direction (source-inspected):** `packages/sdk/deno.json:33` already declares
-  `"@netscript/service": "jsr:@netscript/service@0.0.9"`. `packages/sdk/src/` imports ONLY two
+  `"@netscript/service": "jsr:@netscript/service@<release>"`. `packages/sdk/src/` imports ONLY two
   leaf subpaths: `@netscript/service/rpc-path` (`packages/sdk/src/client/service-client.ts:8`, zero
   imports) and `@netscript/service/internal-credential`
   (`packages/sdk/src/client/internal-credential-contribution.ts:11`, Web Crypto + `Deno.open`).
