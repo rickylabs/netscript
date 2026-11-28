@@ -94,10 +94,11 @@ export function analyzeNpmCatalogCompliance(
       }
       continue;
     }
+    const displayUse = use.raw.includes(use.name) ? use.raw : `${use.name}@${use.raw}`;
     findings.push({
       ref: 'DEPS-NPM-CATALOG',
       level: findingLevel(args, use.name),
-      message: `${use.member.root} uses ${use.raw} outside catalog: (${
+      message: `${use.member.root} uses ${displayUse} outside catalog: (${
         describeCatalog(use, catalog)
       })`,
       path: use.path,

@@ -1,9 +1,9 @@
-import { join } from "@std/path";
-import { parse as parseJsonc } from "@std/jsonc";
+import { join } from '@std/path';
+import { parse as parseJsonc } from '@std/jsonc';
 
-import { netscriptJsrSpecifier } from "../../kernel/constants/jsr-specifiers.ts";
-import { SCAFFOLD_FILES } from "../../kernel/constants/scaffold/scaffold-files.ts";
-import type { PackageSourceMode } from "../../kernel/domain/scaffold/scaffold-options.ts";
+import { netscriptJsrSpecifier } from '../../kernel/constants/jsr-specifiers.ts';
+import { SCAFFOLD_FILES } from '../../kernel/constants/scaffold/scaffold-files.ts';
+import type { PackageSourceMode } from '../../kernel/domain/scaffold/scaffold-options.ts';
 
 export async function rewriteCopiedDenoJsons(options: {
   readonly root: string;
@@ -21,7 +21,7 @@ export async function rewriteCopiedDenoJsons(options: {
         root: path,
         workspacePackageName: null,
         localProjectRoot: options.localProjectRoot
-          ? toPosixPath(join("..", options.localProjectRoot))
+          ? toPosixPath(join('..', options.localProjectRoot))
           : undefined,
       });
       continue;
@@ -40,16 +40,23 @@ export async function rewriteCopiedDenoJsons(options: {
       raw.name = options.workspacePackageName;
     }
 
-    if (raw.imports) {
+    const packageCatalogImports = options.importMode === 'local'
+      ? await readSiblingPackageCatalogDependencies(options.root)
+      : undefined;
+    const mergedImports = mergeCatalogDependencies(
+      raw.imports,
+      packageCatalogImports,
+    );
+    if (mergedImports) {
       raw.imports = rewriteImports(
-        raw.imports,
+        mergedImports,
         options.importMode,
         options.localProjectRoot,
         options.catalog,
       );
     }
 
-    await Deno.writeTextFile(path, JSON.stringify(raw, null, 2) + "\n");
+    await Deno.writeTextFile(path, JSON.stringify(raw, null, 2) + '\n');
   }
 }
 
@@ -68,7 +75,7 @@ function rewriteImports(
     )
     : imports;
 
-  if (importMode === "local") {
+  if (importMode === 'local') {
     return normalizeRegistrySubpathImports(
       materializeCatalogImports(localImports, catalog),
     );
@@ -108,7 +115,7 @@ function normalizeRegistrySubpathImports(
 }
 
 function parseRegistrySubpathTarget(target: string): {
-  readonly scheme: "npm" | "jsr";
+  readonly scheme: 'npm' | 'jsr';
   readonly packageName: string;
   readonly version: string;
   readonly subpath: string;
@@ -120,7 +127,7 @@ function parseRegistrySubpathTarget(target: string): {
     return null;
   }
   const scheme = match.groups.scheme;
-  if (scheme !== "npm" && scheme !== "jsr") {
+  if (scheme !== 'npm' && scheme !== 'jsr') {
     return null;
   }
   return {
@@ -131,13 +138,60 @@ function parseRegistrySubpathTarget(target: string): {
   };
 }
 
+function mergeCatalogDependencies(
+  imports: Record<string, string> | undefined,
+  packageCatalogDependencies: Readonly<Record<string, string>> | undefined,
+): Record<string, string> | undefined {
+  if (!imports && !packageCatalogDependencies) {
+    return undefined;
+  }
+  const merged: Record<string, string> = { ...(imports ?? {}) };
+  for (const [specifier, target] of Object.entries(packageCatalogDependencies ?? {})) {
+    if (!(specifier in merged)) {
+      merged[specifier] = target;
+    }
+  }
+  return merged;
+}
+
+async function readSiblingPackageCatalogDependencies(
+  dir: string,
+): Promise<Record<string, string> | undefined> {
+  const packageJsonPath = join(dir, 'package.json');
+  let raw: { readonly dependencies?: unknown };
+  try {
+    raw = parseJsonc(await Deno.readTextFile(packageJsonPath)) as {
+      readonly dependencies?: unknown;
+    };
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      return undefined;
+    }
+    throw error;
+  }
+
+  if (
+    !raw.dependencies || typeof raw.dependencies !== 'object' || Array.isArray(raw.dependencies)
+  ) {
+    return undefined;
+  }
+
+  const catalogDeps: Record<string, string> = {};
+  for (const [specifier, target] of Object.entries(raw.dependencies as Record<string, unknown>)) {
+    if (target === 'catalog:') {
+      catalogDeps[specifier] = target;
+    }
+  }
+  return Object.keys(catalogDeps).length > 0 ? catalogDeps : undefined;
+}
+
 function materializeCatalogImports(
   imports: Record<string, string>,
   catalog?: Readonly<Record<string, string>>,
 ): Record<string, string> {
   return Object.fromEntries(
     Object.entries(imports).map(([specifier, target]) => {
-      if (target !== "catalog:") {
+      if (target !== 'catalog:') {
         return [specifier, target];
       }
 
@@ -179,24 +233,24 @@ export async function readRootCatalog(
 }
 
 function isStringRecord(value: unknown): value is Record<string, string> {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return false;
   }
-  return Object.values(value).every((entry) => typeof entry === "string");
+  return Object.values(value).every((entry) => typeof entry === 'string');
 }
 
 const OFFICIAL_PLUGIN_DIRS = new Set([
-  "sagas",
-  "streams",
-  "triggers",
-  "workers",
+  'sagas',
+  'streams',
+  'triggers',
+  'workers',
 ]);
 
 function rewriteLocalProjectPath(
   target: string,
   localProjectRoot: string,
 ): string | null {
-  const normalized = target.replaceAll("\\", "/");
+  const normalized = target.replaceAll('\\', '/');
   const packageMatch = /^(\.\.\/)+packages\/(?<rest>.+)$/.exec(normalized);
   if (packageMatch?.groups?.rest) {
     return `${localProjectRoot}/packages/${packageMatch.groups.rest}`;
@@ -210,17 +264,15 @@ function rewriteLocalProjectPath(
     return null;
   }
 
-  return `${localProjectRoot}/plugins/${plugin}${
-    pluginMatch?.groups?.rest ?? ""
-  }`;
+  return `${localProjectRoot}/plugins/${plugin}${pluginMatch?.groups?.rest ?? ''}`;
 }
 
 function toPosixPath(path: string): string {
-  return path.replaceAll("\\", "/");
+  return path.replaceAll('\\', '/');
 }
 
 export function rewritePackagePathToJsr(target: string): string | null {
-  const normalized = target.replaceAll("\\", "/");
+  const normalized = target.replaceAll('\\', '/');
   const match = /^(\.\.\/)+(?:packages)\/(?<pkg>[^/]+)(?<rest>\/.*)?$/.exec(
     normalized,
   );
@@ -229,36 +281,36 @@ export function rewritePackagePathToJsr(target: string): string | null {
     return null;
   }
 
-  const rest = match?.groups?.rest ?? "";
-  if (pkg === "plugin-workers-core") {
-    if (rest === "/src/contracts/v1/mod.ts") {
-      return netscriptJsrSpecifier("plugin-workers-core", "/contracts");
+  const rest = match?.groups?.rest ?? '';
+  if (pkg === 'plugin-workers-core') {
+    if (rest === '/src/contracts/v1/mod.ts') {
+      return netscriptJsrSpecifier('plugin-workers-core', '/contracts');
     }
-    if (rest === "/src/domain/public-schema.ts") {
-      return netscriptJsrSpecifier("plugin-workers-core", "/schemas");
+    if (rest === '/src/domain/public-schema.ts') {
+      return netscriptJsrSpecifier('plugin-workers-core', '/schemas');
     }
-    if (rest === "/src/streams/mod.ts") {
-      return netscriptJsrSpecifier("plugin-workers-core", "/streams");
+    if (rest === '/src/streams/mod.ts') {
+      return netscriptJsrSpecifier('plugin-workers-core', '/streams');
     }
   }
-  if (pkg === "plugin-auth-core") {
-    if (rest === "/src/config/mod.ts") {
-      return netscriptJsrSpecifier("plugin-auth-core", "/config");
+  if (pkg === 'plugin-auth-core') {
+    if (rest === '/src/config/mod.ts') {
+      return netscriptJsrSpecifier('plugin-auth-core', '/config');
     }
-    if (rest === "/src/contracts/v1/mod.ts") {
-      return netscriptJsrSpecifier("plugin-auth-core", "/contracts/v1");
+    if (rest === '/src/contracts/v1/mod.ts') {
+      return netscriptJsrSpecifier('plugin-auth-core', '/contracts/v1');
     }
-    if (rest === "/src/domain/mod.ts") {
-      return netscriptJsrSpecifier("plugin-auth-core", "/domain");
+    if (rest === '/src/domain/mod.ts') {
+      return netscriptJsrSpecifier('plugin-auth-core', '/domain');
     }
-    if (rest === "/src/ports/mod.ts") {
-      return netscriptJsrSpecifier("plugin-auth-core", "/ports");
+    if (rest === '/src/ports/mod.ts') {
+      return netscriptJsrSpecifier('plugin-auth-core', '/ports');
     }
-    if (rest === "/src/streams/mod.ts") {
-      return netscriptJsrSpecifier("plugin-auth-core", "/streams");
+    if (rest === '/src/streams/mod.ts') {
+      return netscriptJsrSpecifier('plugin-auth-core', '/streams');
     }
-    if (rest === "/src/testing/mod.ts") {
-      return netscriptJsrSpecifier("plugin-auth-core", "/testing");
+    if (rest === '/src/testing/mod.ts') {
+      return netscriptJsrSpecifier('plugin-auth-core', '/testing');
     }
   }
   const subpath = toJsrSubpath(rest);
@@ -266,11 +318,9 @@ export function rewritePackagePathToJsr(target: string): string | null {
 }
 
 export function toJsrSubpath(rest: string): string {
-  if (rest === "" || rest === "/mod.ts" || rest === "/src/mod.ts") {
-    return "";
+  if (rest === '' || rest === '/mod.ts' || rest === '/src/mod.ts') {
+    return '';
   }
 
-  return `/${
-    rest.replace(/^\//, "").replace(/\/mod\.ts$/, "").replace(/\.ts$/, "")
-  }`;
+  return `/${rest.replace(/^\//, '').replace(/\/mod\.ts$/, '').replace(/\.ts$/, '')}`;
 }

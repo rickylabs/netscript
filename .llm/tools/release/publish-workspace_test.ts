@@ -6,10 +6,15 @@ Deno.test('publish dry-run isolates catalog and Deno manifest rewrites in a thro
   const sourceRoot = await Deno.makeTempDir({ prefix: 'netscript-publish-source-' });
   try {
     await writeFixture(sourceRoot);
+    await Deno.writeTextFile(
+      `${sourceRoot}/packages/service/package.json`,
+      `${JSON.stringify({ dependencies: { '@orpc/server': 'catalog:' } }, null, 2)}\n`,
+    );
     const servicePath = `${sourceRoot}/packages/service/deno.json`;
+    const servicePkgPath = `${sourceRoot}/packages/service/package.json`;
     const mcpPath = `${sourceRoot}/packages/mcp/deno.json`;
     const lockPath = `${sourceRoot}/deno.lock`;
-    const before = await readFiles([servicePath, mcpPath, lockPath]);
+    const before = await readFiles([servicePath, servicePkgPath, mcpPath, lockPath]);
 
     await publishWorkspace({
       mode: 'dry-run',
@@ -21,6 +26,7 @@ Deno.test('publish dry-run isolates catalog and Deno manifest rewrites in a thro
           `${cwd}/packages/service/deno.json`,
         );
         assertStringIncludes(materializedService, '"zod": "npm:zod@^4.4.3"');
+        assertStringIncludes(materializedService, '"@orpc/server": "npm:@orpc/server@^1.16.6"');
 
         const mcpConfig = JSON.parse(
           await Deno.readTextFile(`${cwd}/packages/mcp/deno.json`),
@@ -37,7 +43,7 @@ Deno.test('publish dry-run isolates catalog and Deno manifest rewrites in a thro
       },
     });
 
-    assertEquals(await readFiles([servicePath, mcpPath, lockPath]), before);
+    assertEquals(await readFiles([servicePath, servicePkgPath, mcpPath, lockPath]), before);
   } finally {
     await Deno.remove(sourceRoot, { recursive: true });
   }
@@ -212,7 +218,7 @@ async function writeFixture(root: string): Promise<void> {
   await Deno.writeTextFile(`${root}/plugins/.gitkeep`, '');
   await Deno.writeTextFile(
     `${root}/deno.json`,
-    `${JSON.stringify({ catalog: { zod: '^4.4.3' } }, null, 2)}\n`,
+    `${JSON.stringify({ catalog: { '@orpc/server': '^1.16.6', zod: '^4.4.3' } }, null, 2)}\n`,
   );
   await Deno.writeTextFile(`${root}/deno.lock`, '{\n  "version": "5"\n}\n');
   await Deno.writeTextFile(

@@ -10,12 +10,23 @@ const catalogSpecifier = (name: string): string => {
   return `npm:${name}@${version}`;
 };
 
+function resolveCatalogImport(id: string): string | null {
+  const parts = id.split('/');
+  const pkg = id.startsWith('@') ? parts.slice(0, 2).join('/') : parts[0];
+  if (!pkg || !workspaceConfig.catalog[pkg]) return null;
+  return `${catalogSpecifier(pkg)}${id.slice(pkg.length)}`;
+}
+
 const catalogImports: Plugin = {
   name: 'defer-navigation-fixture-catalog-imports',
   enforce: 'post',
-  resolveId(id) {
+  async resolveId(id, importer) {
     if (id === '@opentelemetry/api') {
       return '\0defer-navigation-fixture-opentelemetry';
+    }
+    const specifier = resolveCatalogImport(id);
+    if (specifier) {
+      return await this.resolve(specifier, importer, { skipSelf: true });
     }
     return null;
   },

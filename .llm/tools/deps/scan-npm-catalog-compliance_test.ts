@@ -1,7 +1,12 @@
 import { assertEquals, assertThrows } from '@std/assert';
 import { join } from '@std/path';
 import { analyzeNpmCatalogCompliance, parseArgs } from './scan-npm-catalog-compliance.ts';
-import { collectWorkspaceFacts, type DependencyUse, hasFail } from './workspace.ts';
+import {
+  collectWorkspaceFacts,
+  type DependencyUse,
+  hasFail,
+  isPathWithinAnyDirectory,
+} from './workspace.ts';
 
 const MEMBER = {
   name: '@netscript/example',
@@ -165,4 +170,104 @@ Deno.test('collectWorkspaceFacts skips nested standalone deno.json fixtures and 
   } finally {
     await Deno.remove(root, { recursive: true });
   }
+});
+
+Deno.test('collectWorkspaceFacts + scanner fail on plain package.json npm pins and literal dynamic imports while keeping unrelated deps at WARN', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'npm-catalog-negative-' });
+  try {
+    await Deno.writeTextFile(
+      join(root, 'deno.json'),
+      JSON.stringify({
+        workspace: ['packages/*'],
+        catalog: { '@orpc/client': '^1.16.6', 'preact': '^10.29.8' },
+      }),
+    );
+    await Deno.mkdir(join(root, 'packages/example/src'), { recursive: true });
+    await Deno.writeTextFile(
+      join(root, 'packages/example/deno.json'),
+      JSON.stringify({ name: '@test/example', imports: {} }),
+    );
+    await Deno.writeTextFile(
+      join(root, 'packages/example/package.json'),
+      JSON.stringify({
+        dependencies: {
+          '@orpc/client': '1.16.5',
+          'preact': '^10.29.8',
+        },
+      }),
+    );
+    await Deno.writeTextFile(
+      join(root, 'packages/example/src/dynamic.ts'),
+      [
+        "export async function loadBad() { return await import('npm:@orpc/client@1.16.5'); }",
+        "export async function loadWarn() { return await import('npm:preact@^10.29.8'); }",
+      ].join('\n'),
+    );
+
+    const facts = await collectWorkspaceFacts(root);
+    const findings = analyzeNpmCatalogCompliance(facts.dependencies, facts.catalog, {
+      json: false,
+      failOnViolation: false,
+      failOnPackagePrefixes: ['@orpc/'],
+    });
+    assertEquals(
+      findings.map((finding) => ({ path: finding.path, level: finding.level })),
+      [
+        { path: 'packages/example/package.json', level: 'FAIL' },
+        { path: 'packages/example/package.json', level: 'WARN' },
+        { path: 'packages/example/src/dynamic.ts', level: 'FAIL' },
+        { path: 'packages/example/src/dynamic.ts', level: 'WARN' },
+      ],
+    );
+    assertEquals(hasFail(findings), true);
+
+    // Also prove the real CLI entrypoint exits non-zero on a plain package.json @orpc/ pin.
+    const scriptUrl = new URL('./scan-npm-catalog-compliance.ts', import.meta.url);
+    const cli = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--no-lock',
+        '--allow-read',
+        scriptUrl.href,
+        '--fail-on-package-prefix=@orpc/',
+        '--json',
+      ],
+      cwd: root,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(cli.code, 1, new TextDecoder().decode(cli.stderr));
+    const parsed = JSON.parse(new TextDecoder().decode(cli.stdout)) as Array<{
+      level: string;
+      path: string;
+    }>;
+    assertEquals(parsed.filter((entry) => entry.level === 'FAIL').length, 2);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('isPathWithinAnyDirectory matches both POSIX and Windows backslash paths', () => {
+  const dirs = [
+    '/repo/packages/cli/e2e/fixtures/desktop-native',
+    'C:\\repo\\packages\\cli\\e2e\\fixtures\\desktop-native\\',
+  ];
+  assertEquals(
+    isPathWithinAnyDirectory('/repo/packages/cli/e2e/fixtures/desktop-native/src/router.ts', dirs),
+    true,
+  );
+  assertEquals(
+    isPathWithinAnyDirectory(
+      'C:\\repo\\packages\\cli\\e2e\\fixtures\\desktop-native\\src\\router.ts',
+      dirs,
+    ),
+    true,
+  );
+  assertEquals(
+    isPathWithinAnyDirectory(
+      'C:\\repo\\packages\\cli\\e2e\\fixtures\\desktop-native-extra\\a.ts',
+      dirs,
+    ),
+    false,
+  );
 });

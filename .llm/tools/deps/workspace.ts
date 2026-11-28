@@ -1,6 +1,6 @@
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
 import { parse as parseJsonc } from 'jsr:@std/jsonc@^1.0.0/parse';
-import { join, normalize, relative } from 'jsr:@std/path@^1.0.0';
+import { dirname, join, normalize, relative } from 'jsr:@std/path@^1.0.0';
 
 export type FindingLevel = 'PASS' | 'WARN' | 'FAIL' | 'INFO';
 
@@ -285,9 +285,36 @@ async function collectPackageJson(
           path,
           line: lineOf(text, `"${name}"`),
         });
+      } else if (!version.startsWith('workspace:') && version.trim().length > 0) {
+        dependencies.push({
+          registry: 'npm',
+          name,
+          range: version,
+          raw: version,
+          source: 'package.json',
+          member,
+          path,
+          line: lineOf(text, `"${name}"`),
+        });
       }
     }
   }
+}
+
+function toComparablePath(path: string): string {
+  return path.replaceAll('\\', '/').replace(/\/+$/, '');
+}
+
+/** Check whether a file path resides under any directory in `directories` (POSIX and Windows safe). */
+export function isPathWithinAnyDirectory(
+  filePath: string,
+  directories: readonly string[],
+): boolean {
+  const normalizedFile = toComparablePath(filePath);
+  return directories.some((directory) => {
+    const normalizedDir = toComparablePath(directory);
+    return normalizedDir.length > 0 && normalizedFile.startsWith(`${normalizedDir}/`);
+  });
 }
 
 async function collectSourceImports(
@@ -296,45 +323,47 @@ async function collectSourceImports(
   dependencies: DependencyUse[],
 ): Promise<void> {
   const memberRoot = join(root, member.root);
+  const comparableMemberRoot = toComparablePath(memberRoot);
   const nestedConfigDirs: string[] = [];
   for await (
     const entry of walk(memberRoot, {
-      match: [/(?:^|\/)deno\.json$/],
+      match: [/(?:^|[\\/])deno\.json$/],
       skip: [/node_modules/, /\.generated/, /_fresh/, /\.deploy/],
     })
   ) {
-    const dir = entry.path.slice(0, -'/deno.json'.length);
-    if (normalize(dir) !== normalize(memberRoot)) {
-      nestedConfigDirs.push(`${normalize(dir)}/`);
+    const dir = dirname(entry.path);
+    if (toComparablePath(dir) !== comparableMemberRoot) {
+      nestedConfigDirs.push(dir);
     }
   }
+  const sourcePatterns = [
+    /\b(?:import|export)\s+(?:type\s+)?(?:[^'";]*?\s+from\s+)?['"]((?:npm|jsr):[^'"]+)['"]/g,
+    /\bimport\s*\(\s*['"]((?:npm|jsr):[^'"]+)['"]\s*(?:,|\))/g,
+  ];
   for await (
     const entry of walk(memberRoot, {
       match: [/\.[cm]?tsx?$/],
       skip: [/node_modules/, /\.generated/, /_fresh/, /\.deploy/],
     })
   ) {
-    const normalizedEntry = normalize(entry.path);
-    if (nestedConfigDirs.some((prefix) => normalizedEntry.startsWith(prefix))) {
+    if (isPathWithinAnyDirectory(entry.path, nestedConfigDirs)) {
       continue;
     }
-    const path = normalize(relative(root, entry.path));
+    const path = normalize(relative(root, entry.path)).replaceAll('\\', '/');
     const text = await Deno.readTextFile(entry.path);
-    for (
-      const match of text.matchAll(
-        /\b(?:import|export)\s+(?:type\s+)?(?:[^'";]*?\s+from\s+)?['"]((?:npm|jsr):[^'"]+)['"]/g,
-      )
-    ) {
-      const raw = match[1];
-      const parsed = parseRegistrySpecifier(raw);
-      if (!parsed) continue;
-      dependencies.push({
-        ...parsed,
-        source: 'source.import',
-        member,
-        path,
-        line: text.slice(0, match.index ?? 0).split('\n').length,
-      });
+    for (const pattern of sourcePatterns) {
+      for (const match of text.matchAll(pattern)) {
+        const raw = match[1];
+        const parsed = parseRegistrySpecifier(raw);
+        if (!parsed) continue;
+        dependencies.push({
+          ...parsed,
+          source: 'source.import',
+          member,
+          path,
+          line: text.slice(0, match.index ?? 0).split('\n').length,
+        });
+      }
     }
   }
 }

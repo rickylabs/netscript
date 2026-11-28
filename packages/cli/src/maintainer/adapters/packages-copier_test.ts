@@ -1,43 +1,43 @@
-import { assertEquals } from "jsr:@std/assert@^1";
-import { join } from "@std/path";
-import { copyLocalPackages } from "./packages-copier.ts";
+import { assertEquals } from 'jsr:@std/assert@^1';
+import { join } from '@std/path';
+import { copyLocalPackages } from './packages-copier.ts';
 
 const LOCAL_PACKAGES = [
-  "ai",
-  "aspire",
-  "cli",
-  "config",
-  "cron",
-  "database",
-  "fresh",
-  "fresh-ui",
-  "kv",
-  "logger",
-  "mcp",
-  "plugin",
-  "plugin-ai-core",
-  "plugin-auth-core",
-  "auth-workos",
-  "auth-better-auth",
-  "auth-kv-oauth",
-  "plugin-sagas-core",
-  "queue",
-  "runtime-config",
-  "sdk",
-  "service",
-  "contracts",
-  "plugin-workers-core",
-  "plugin-streams-core",
-  "plugin-triggers-core",
-  "telemetry",
-  "watchers",
+  'ai',
+  'aspire',
+  'cli',
+  'config',
+  'cron',
+  'database',
+  'fresh',
+  'fresh-ui',
+  'kv',
+  'logger',
+  'mcp',
+  'plugin',
+  'plugin-ai-core',
+  'plugin-auth-core',
+  'auth-workos',
+  'auth-better-auth',
+  'auth-kv-oauth',
+  'plugin-sagas-core',
+  'queue',
+  'runtime-config',
+  'sdk',
+  'service',
+  'contracts',
+  'plugin-workers-core',
+  'plugin-streams-core',
+  'plugin-triggers-core',
+  'telemetry',
+  'watchers',
 ];
 
-Deno.test("copyLocalPackages keeps mysql adapter engine-specific while resolving database imports", async () => {
+Deno.test('copyLocalPackages keeps mysql adapter engine-specific while resolving database imports', async () => {
   const sourceRoot = await Deno.makeTempDir();
   const targetPath = await Deno.makeTempDir();
 
-  for (const packageName of [...LOCAL_PACKAGES, "prisma-adapter-mysql"]) {
+  for (const packageName of [...LOCAL_PACKAGES, 'prisma-adapter-mysql']) {
     await writePackage(sourceRoot, packageName);
   }
   await writeSourceRootDenoJson(sourceRoot);
@@ -46,45 +46,52 @@ Deno.test("copyLocalPackages keeps mysql adapter engine-specific while resolving
   await copyLocalPackages({
     sourceRoot: sourceRoot,
     targetPath,
-    dbEngines: ["postgres"],
+    dbEngines: ['postgres'],
   });
 
   assertEquals(
-    await exists(join(targetPath, "packages/prisma-adapter-mysql")),
+    await exists(join(targetPath, 'packages/prisma-adapter-mysql')),
     false,
   );
   const databaseConfig = JSON.parse(
-    await Deno.readTextFile(join(targetPath, "packages/database/deno.json")),
+    await Deno.readTextFile(join(targetPath, 'packages/database/deno.json')),
   ) as { exports: Record<string, string>; imports?: Record<string, string> };
-  assertEquals(databaseConfig.exports["./adapters/mysql"], undefined);
+  assertEquals(databaseConfig.exports['./adapters/mysql'], undefined);
   assertEquals(
-    databaseConfig.imports?.["@opentelemetry/api"],
-    "npm:@opentelemetry/api@^1.9.0",
+    databaseConfig.imports?.['@opentelemetry/api'],
+    'npm:@opentelemetry/api@^1.9.0',
+  );
+  const sdkConfig = JSON.parse(
+    await Deno.readTextFile(join(targetPath, 'packages/sdk/deno.json')),
+  ) as { imports?: Record<string, string> };
+  assertEquals(
+    sdkConfig.imports?.['@orpc/client'],
+    'npm:@orpc/client@^1.16.6',
   );
   assertEquals(
     await exists(
-      join(targetPath, "packages/database/adapters/mysql.adapter.ts"),
+      join(targetPath, 'packages/database/adapters/mysql.adapter.ts'),
     ),
     false,
   );
 
   const rootConfig = JSON.parse(
-    await Deno.readTextFile(join(targetPath, "deno.json")),
+    await Deno.readTextFile(join(targetPath, 'deno.json')),
   ) as {
     catalog?: Record<string, string>;
   };
-  assertEquals(rootConfig.catalog?.["@opentelemetry/api"], "^1.9.0");
+  assertEquals(rootConfig.catalog?.['@opentelemetry/api'], '^1.9.0');
   assertEquals(
-    await Deno.readTextFile(join(targetPath, ".netscript-source-root")),
-    sourceRoot + "\n",
+    await Deno.readTextFile(join(targetPath, '.netscript-source-root')),
+    sourceRoot + '\n',
   );
 });
 
-Deno.test("copyLocalPackages copies mysql adapter only for mysql engine", async () => {
+Deno.test('copyLocalPackages copies mysql adapter only for mysql engine', async () => {
   const sourceRoot = await Deno.makeTempDir();
   const targetPath = await Deno.makeTempDir();
 
-  for (const packageName of [...LOCAL_PACKAGES, "prisma-adapter-mysql"]) {
+  for (const packageName of [...LOCAL_PACKAGES, 'prisma-adapter-mysql']) {
     await writePackage(sourceRoot, packageName);
   }
   await writeSourceRootDenoJson(sourceRoot);
@@ -93,94 +100,106 @@ Deno.test("copyLocalPackages copies mysql adapter only for mysql engine", async 
   await copyLocalPackages({
     sourceRoot: sourceRoot,
     targetPath,
-    dbEngines: ["mysql"],
+    dbEngines: ['mysql'],
   });
 
   assertEquals(
-    await exists(join(targetPath, "packages/prisma-adapter-mysql")),
+    await exists(join(targetPath, 'packages/prisma-adapter-mysql')),
     true,
   );
   const databaseConfig = JSON.parse(
-    await Deno.readTextFile(join(targetPath, "packages/database/deno.json")),
+    await Deno.readTextFile(join(targetPath, 'packages/database/deno.json')),
   ) as { exports: Record<string, string>; imports?: Record<string, string> };
   assertEquals(
-    databaseConfig.exports["./adapters/mysql"],
-    "./adapters/mysql.adapter.ts",
+    databaseConfig.exports['./adapters/mysql'],
+    './adapters/mysql.adapter.ts',
   );
   assertEquals(
-    databaseConfig.imports?.["@netscript/prisma-adapter-mysql"],
+    databaseConfig.imports?.['@netscript/prisma-adapter-mysql'],
     undefined,
   );
   assertEquals(
     await exists(
-      join(targetPath, "packages/database/adapters/mysql.adapter.ts"),
+      join(targetPath, 'packages/database/adapters/mysql.adapter.ts'),
     ),
     true,
   );
 
   const rootConfig = JSON.parse(
-    await Deno.readTextFile(join(targetPath, "deno.json")),
+    await Deno.readTextFile(join(targetPath, 'deno.json')),
   ) as {
     workspace: string[];
   };
   assertEquals(
-    rootConfig.workspace.includes("./packages/prisma-adapter-mysql"),
+    rootConfig.workspace.includes('./packages/prisma-adapter-mysql'),
     true,
   );
 });
 
 async function writePackage(root: string, packageName: string): Promise<void> {
-  const packageRoot = join(root, "packages", packageName);
+  const packageRoot = join(root, 'packages', packageName);
   await Deno.mkdir(packageRoot, { recursive: true });
-  await Deno.writeTextFile(join(packageRoot, "mod.ts"), "export {};\n");
-  if (packageName === "database") {
-    await Deno.mkdir(join(packageRoot, "adapters"), { recursive: true });
+  await Deno.writeTextFile(join(packageRoot, 'mod.ts'), 'export {};\n');
+  if (packageName === 'database') {
+    await Deno.mkdir(join(packageRoot, 'adapters'), { recursive: true });
     await Deno.writeTextFile(
-      join(packageRoot, "adapters/mysql.adapter.ts"),
-      "export {};\n",
+      join(packageRoot, 'adapters/mysql.adapter.ts'),
+      'export {};\n',
     );
     await Deno.writeTextFile(
-      join(packageRoot, "deno.json"),
+      join(packageRoot, 'deno.json'),
       JSON.stringify({
-        name: "@netscript/database",
+        name: '@netscript/database',
         exports: {
-          ".": "./mod.ts",
-          "./adapters/mysql": "./adapters/mysql.adapter.ts",
+          '.': './mod.ts',
+          './adapters/mysql': './adapters/mysql.adapter.ts',
         },
         imports: {
-          "@opentelemetry/api": "catalog:",
+          '@opentelemetry/api': 'catalog:',
         },
-      }) + "\n",
+      }) + '\n',
     );
     return;
   }
 
+  if (packageName === 'sdk') {
+    await Deno.writeTextFile(
+      join(packageRoot, 'package.json'),
+      JSON.stringify({
+        dependencies: {
+          '@orpc/client': 'catalog:',
+        },
+      }) + '\n',
+    );
+  }
+
   await Deno.writeTextFile(
-    join(packageRoot, "deno.json"),
+    join(packageRoot, 'deno.json'),
     JSON.stringify({
       name: `@netscript/${packageName}`,
       imports: {},
-    }) + "\n",
+    }) + '\n',
   );
 }
 
 async function writeSourceRootDenoJson(sourceRoot: string): Promise<void> {
   await Deno.writeTextFile(
-    join(sourceRoot, "deno.json"),
+    join(sourceRoot, 'deno.json'),
     JSON.stringify({
       catalog: {
-        "@opentelemetry/api": "^1.9.0",
+        '@opentelemetry/api': '^1.9.0',
+        '@orpc/client': '^1.16.6',
       },
-    }) + "\n",
+    }) + '\n',
   );
 }
 
 async function writeRootDenoJson(targetPath: string): Promise<void> {
   await Deno.writeTextFile(
-    join(targetPath, "deno.json"),
+    join(targetPath, 'deno.json'),
     JSON.stringify({
-      workspace: ["./packages/database"],
-    }) + "\n",
+      workspace: ['./packages/database'],
+    }) + '\n',
   );
 }
 
