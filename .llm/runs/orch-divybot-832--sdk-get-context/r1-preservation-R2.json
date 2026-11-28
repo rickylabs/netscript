@@ -1,0 +1,13 @@
+{
+  "r1Checkpoint": "e3b5ff75ba65ee15347504896df38262332d4755",
+  "r1PlanSha256": "e304244b92f998582dbae88eeacb5d51a252adfcf7e07480a60c2a1c047e4ada",
+  "r1ManifestSha256": "4bbcc375d4bec9bf015c2608fbae3c72b5988460d8a2a7d1a577e6698b855cb0",
+  "r1VerdictSha256": "731003f7a6101fa00b594d6578f6232533ac68b2b775427e977bc7a4521d3cb1",
+  "r1Verdict": "FAIL",
+  "evaluationRoundReset": false,
+  "r1EvidenceFilesVerified": 13,
+  "protectedFilesVerified": 8,
+  "sourceAndExistingTestDiffEmpty": true,
+  "r1ReproducerSha256": "533181a9ce8544384f095402efddc5118038d6158dea40a49bd00f77f2941564",
+  "r1RedEvidenceSha256": "dacaf16e61556c0e6870f69ec5ac4bd999952e9299b839df8e234b37046aefbc"
+}

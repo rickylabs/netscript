@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "kind": "Normalized derivative, not the original command receipt",
+  "baselineHead": "e3b5ff75ba65ee15347504896df38262332d4755",
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "--frozen",
+    "--unstable-kv",
+    ".llm/runs/orch-divybot-832--sdk-get-context/api-path-controls-R2_test.ts"
+  ],
+  "exitCode": 1,
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "ignored": 0,
+    "totalResults": 4,
+    "uniqueFailures": 1
+  },
+  "originalReceiptSha256": "729db2bc7e08b7560598ab87edad3fa4f6ff882e133f1cc8c81655c4f0773081",
+  "originalChildReportSha256": "8035654950d8350293f309b9d66694122ac153d80b2f4a347c7490e57f9b919c",
+  "failures": [
+    {
+      "message": "AssertionError: Values are not equal: two signalled queryUtils executions need two fetches\n\n\n    [Diff] Actual / Expected\n\n\n-   1\n+   2\n",
+      "count": 2,
+      "tests": [
+        "RED B1: queryUtils observers with different keys use independent signalled GET fetches",
+        "RED B1: queryUtils observers with different QueryClients use independent signalled GET fetches"
+      ]
+    }
+  ],
+  "sanitizers": {
+    "sanitizeOps": true,
+    "sanitizeResources": true
+  },
+  "passedControls": [
+    "queries queryOptions remain unsignalled and coalesce across different keys",
+    "queryUtils observers for one key in one QueryClient share one TanStack execution"
+  ],
+  "notYetProven": "Separate wire abort and survivor completion assertions follow the red count and have not yet executed to completion. Product implementation and full matrix remain gated.",
+  "normalization": "Omit local cwd, timing/usage/runner identities and stack URLs; retain exact exit, assertion messages, names, counts and raw evidence digests.",
+  "explicitMatrixControls": "Different-key/same-client and same-key/different-client identity assertions precede the semantic Fetch count assertions."
+}

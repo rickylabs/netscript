@@ -1,0 +1,62 @@
+{
+  "scope": [
+    "api-path-controls-R2_test.ts",
+    "scan-leaks-R2.ts"
+  ],
+  "kind": "Normalized structured wrapper evidence; only R2 planning code",
+  "reports": {
+    "check": {
+      "exitCode": 0,
+      "originalReportSha256": "2bde305e1535a7e90101bd91f76e757d663c085af2f50c476d733c916143dbac",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "lint": {
+      "exitCode": 0,
+      "originalReportSha256": "35888a1233e57ecd9a4a71a6359cff3c00c8e0dec8f498c2c50034f10ae9882a",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 2,
+        "filesProcessed": 2,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    "fmt": {
+      "exitCode": 0,
+      "originalReportSha256": "b5a3fe10f90757064815dd9df4ef94bbf819f802e2b3cfe8744159d52f936614",
+      "summary": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 2,
+        "filesProcessed": 2,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    }
+  }
+}
