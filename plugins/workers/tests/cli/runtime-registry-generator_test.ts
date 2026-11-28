@@ -708,12 +708,19 @@ async function writeProjectDenoConfig(projectRoot: string): Promise<void> {
   ) as { imports?: Readonly<Record<string, string>> };
   const otelApiVersion = rootConfig.catalog?.['@opentelemetry/api'];
   if (!otelApiVersion) throw new Error('Root catalog has no @opentelemetry/api version');
+  const catalogImports = Object.fromEntries(
+    Object.entries(rootConfig.catalog ?? {}).map(([name, version]) => [
+      name,
+      `npm:${name}@${version}`,
+    ]),
+  );
   await write(
     join(projectRoot, 'deno.json'),
     `${
       JSON.stringify({
         catalog: rootConfig.catalog,
         imports: {
+          ...catalogImports,
           ...rootConfig.imports,
           ...configPackage.imports,
           ...workersCore.imports,
