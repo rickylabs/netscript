@@ -19,7 +19,12 @@
 
 import type { StreamEndpointContract } from '@netscript/contracts/streams';
 import type { InternalCallerPredicate } from './contract/contract-policy.ts';
-import type { AuthenticatorPort, AuthorizerPort, MatchAwareAuthorizerPort } from './types.ts';
+import type {
+  AuthenticatorPort,
+  AuthorizerPort,
+  MatchAwareAuthorizerPort,
+  ProcedureAuthorizerPort,
+} from './types.ts';
 
 /**
  * One anonymous request with an uppercase method and byte-exact absolute path.
@@ -63,6 +68,24 @@ export interface AuthnOptions {
     /** Absolute path without encoding, parameters, wildcards, query or fragment. */
     readonly path: string;
   })[];
+  /**
+   * Opt-in delegation allowing non-internal procedures to accept a live scoped
+   * principal verified by another service whose authenticator appears in
+   * `trustedVerifiers`. Defaults to `false` (each service verifies credentials
+   * independently). Never honored for `audience: 'internal'` procedures.
+   */
+  readonly trustSharedPrincipal?: boolean;
+  /**
+   * Explicit set of authenticator instances whose verified principals may be
+   * trusted when `trustSharedPrincipal` is `true`.
+   */
+  readonly trustedVerifiers?: ReadonlySet<AuthenticatorPort>;
+  /**
+   * Maximum ambient trust TTL ceiling in milliseconds for scoped verified
+   * principals (bounded further by `principal.claims.exp` when present).
+   * Defaults to 300,000 ms (5 minutes).
+   */
+  readonly maxTrustTtlMs?: number;
 }
 
 /** Authorization middleware options for `withAuthz()` and `defineService({ auth })`. */
@@ -95,8 +118,12 @@ export interface ContractAuthorizerRawRoute {
 
 /** Options for constructing the opt-in contract-policy authorizer. */
 export interface ContractAuthorizerOptions {
-  /** Match-aware legacy authorizer consulted only when matched procedure metadata is absent. */
-  readonly fallback?: MatchAwareAuthorizerPort;
+  /**
+   * Match-aware legacy path authorizer or transport-neutral procedure authorizer
+   * consulted only when matched procedure metadata is absent. A fallback object
+   * must not implement both `authorizeMatch` and `authorizeProcedure`.
+   */
+  readonly fallback?: MatchAwareAuthorizerPort | ProcedureAuthorizerPort;
   /** Raw routes mounted beside the contract router; any other unmatched route stays denied. */
   readonly rawRoutes?: readonly ContractAuthorizerRawRoute[];
   /**

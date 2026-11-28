@@ -45,8 +45,16 @@ export function createCompositeAuthenticator(
     throw new TypeError('createCompositeAuthenticator requires at least one authenticator.');
   }
   const ordered = Object.freeze([...authenticators]);
+  const mayEmitSetCookies = ordered.some((authenticator) =>
+    authenticator.mayEmitSetCookies === true
+  );
+  const mayEmitResponseHeaders = ordered.some(
+    (authenticator) => authenticator.mayEmitResponseHeaders === true,
+  );
 
   return {
+    ...(mayEmitSetCookies ? { mayEmitSetCookies: true } : {}),
+    ...(mayEmitResponseHeaders ? { mayEmitResponseHeaders: true } : {}),
     async authenticate(request: AuthnRequest): Promise<AuthnResult> {
       let rejection: string | undefined;
       for (const authenticator of ordered) {

@@ -103,12 +103,15 @@ export type {
   AuthenticatorPort,
   AuthnRequest,
   AuthnResult,
+  AuthnSideEffects,
   AuthorizerMatch,
   AuthorizerPort,
   AuthzDecision,
   AuthzRequest,
   MatchAwareAuthorizerPort,
   Principal,
+  ProcedureAuthorizerPort,
+  ProcedureAuthzRequest,
   ProcedureErrorCode,
 } from './types.ts';
 export { PROCEDURE_ERROR_CODES } from './types.ts';

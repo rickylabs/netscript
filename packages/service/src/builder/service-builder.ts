@@ -51,6 +51,8 @@ import type {
   ServiceRouteMethod,
   ServiceRouter,
   ShutdownHook,
+  StartedService,
+  StartOptions,
 } from '../types.ts';
 import { ServiceBuilderImpl } from './service-builder-impl.ts';
 import type { StreamProxyMount } from './stream-proxy-mount.ts';
@@ -270,6 +272,28 @@ export interface ServiceBuilder<
 
   /** Builds a mountable service app without starting a listener. */
   build(): ServiceApp;
+
+  /**
+   * Captures a clean composition-root async snapshot, runs `onStartup` hooks,
+   * and returns a non-listening {@link StartedService} handle with in-flight
+   * draining and graceful `stop()`.
+   *
+   * Must be called at the process composition root outside any active request
+   * `AsyncLocalStorage` or non-root OpenTelemetry context.
+   *
+   * @example
+   * ```typescript
+   * import { createService, type ServiceRouter } from '@netscript/service';
+   *
+   * declare const router: ServiceRouter;
+   *
+   * const started = await createService(router, { name: 'orders' })
+   *   .withRPC()
+   *   .start();
+   * await started.stop();
+   * ```
+   */
+  start(options?: StartOptions): Promise<StartedService>;
 
   /** Starts the service listener. */
   serve(options?: ServeOptions): Promise<RunningService>;

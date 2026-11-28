@@ -74,7 +74,11 @@ export function createContractOverlayAuthorizer<TContract extends ContractPolicy
   options: ContractOverlayAuthorizerOptions = {},
 ): ContractPolicyAuthorizerPort {
   const procedures = compileProcedures(contract);
+  const policiesByPath = new Map(
+    procedures.map((procedure) => [procedure.routerPath.join('.'), procedure.policy] as const),
+  );
   const isInternalCaller = options.isInternalCaller ?? isInternalServicePrincipal;
+  const usesDefaultInternalPredicate = options.isInternalCaller === undefined;
   if (options.streamEndpoints !== undefined) {
     resolveAuthoritativeStreamEndpoints(undefined, options.streamEndpoints);
   }
@@ -123,6 +127,9 @@ export function createContractOverlayAuthorizer<TContract extends ContractPolicy
       registerBoundContractAuthorizer(boundResolver, {
         authorizer: boundAuthorizer,
         isInternalCaller,
+        mode: 'overlay',
+        policiesByPath,
+        usesDefaultInternalPredicate,
       });
       lastResolver = boundResolver;
       return boundResolver;

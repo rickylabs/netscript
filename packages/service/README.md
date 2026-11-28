@@ -908,3 +908,44 @@ When `.withLogger()` and `.withRPC()` are combined, `ServiceBuilder` propagates 
 `ServiceHandlerContext.requestId`, while wrapping both `router` and `withRPC({ rpcRouter })`
 leaves idempotently per service (failing closed with `ROUTER_CLIENT_CROSS_SERVICE_MOUNT` on
 cross-service remounts).
+
+## Non-listening `start()` lifecycle and procedure-level auth
+
+Use `ServiceBuilder.start()` when hosting a service without binding a TCP listener. `start()`
+verifies a clean composition-root async context (`AsyncContextRootCaptureError` if called inside an
+active framework `AsyncLocalStorage` or non-root OpenTelemetry context), runs `onStartup` hooks,
+tracks in-flight calls and `eventIterator` streams, and returns a `StartedService` handle whose
+idempotent `stop()` refuses new calls, drains in-flight work within `drainTimeoutMs`, runs
+`onShutdown` hooks in reverse order, and disconnects registered databases.
+
+```ts
+import { createService } from '@netscript/service';
+import { createContractAuthorizer, type ProcedureAuthorizerPort } from '@netscript/service/auth';
+import type { ContractPolicyContract, ServiceRouter } from '@netscript/service';
+
+declare const contract: ContractPolicyContract;
+declare const router: ServiceRouter;
+
+const procedureFallback: ProcedureAuthorizerPort = {
+  authorizeProcedure: ({ principal, procedurePath }) => ({
+    matched: true,
+    decision: procedurePath[0] === 'public' || principal.scopes.includes('orders:read')
+      ? { allow: true }
+      : { allow: false, reason: 'authz.missing-scope:orders:read' },
+  }),
+};
+
+const started = await createService(router, { name: 'orders' })
+  .withAuthz({ authorizer: createContractAuthorizer(contract, { fallback: procedureFallback }) })
+  .withRPC()
+  .start({ drainTimeoutMs: 10_000 });
+
+await started.stop();
+```
+
+`ProcedureAuthorizerPort` (`authorizeProcedure`) is invoked identically by HTTP
+`createContractAuthorizer()` and the oRPC procedure pipeline for unmarked procedures (dual fallback
+objects implementing both `authorizeMatch` and `authorizeProcedure` are rejected at construction).
+Authenticated HTTP requests brand principals with a request-scoped `VerifiedPrincipalRecord` so
+`AuthenticatorPort` runs once per HTTP request while closing cross-service, expired/`NaN` `exp`,
+internal-audience, and post-request replay hazards.

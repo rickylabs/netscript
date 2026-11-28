@@ -57,6 +57,56 @@ export interface RunningService {
 }
 
 /**
+ * Options for starting a non-listening service handle via `ServiceBuilder.start()`.
+ *
+ * @example
+ * ```typescript
+ * import { createService, type ServiceRouter, type StartOptions } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
+ *
+ * const options: StartOptions = { drainTimeoutMs: 10_000, disposeDatabases: true };
+ * const started = await createService(router, { name: 'orders' }).withRPC().start(options);
+ * await started.stop();
+ * ```
+ */
+export interface StartOptions {
+  /**
+   * Maximum time in milliseconds `stop()` waits for in-flight calls and shutdown
+   * hooks to drain. Defaults to 30,000 ms.
+   */
+  readonly drainTimeoutMs?: number;
+
+  /**
+   * Whether `stop()` disconnects database clients registered via `withDatabase()`.
+   * Defaults to `true`.
+   */
+  readonly disposeDatabases?: boolean;
+
+  /** Optional external abort signal that triggers graceful `stop()`. */
+  readonly signal?: AbortSignal;
+}
+
+/**
+ * Non-listening started service handle returned by `ServiceBuilder.start()`.
+ *
+ * Guarantees `onStartup` hooks have completed and a clean composition-root
+ * async context was captured before serving requests. Calling `stop()` rejects
+ * new calls, drains in-flight calls and streams, runs `onShutdown` hooks in
+ * reverse order, and disposes registered databases.
+ */
+export interface StartedService {
+  /** Mountable service app with in-flight call tracking and stop gating. */
+  readonly app: ServiceApp;
+
+  /** Service name configured on the builder. */
+  readonly name: string;
+
+  /** Gracefully drains in-flight calls, runs reverse `onShutdown` hooks, and disposes databases. */
+  stop(): Promise<void>;
+}
+
+/**
  * Reason a service shutdown was triggered.
  *
  * @example

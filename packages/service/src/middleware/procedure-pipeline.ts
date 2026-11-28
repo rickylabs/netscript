@@ -29,9 +29,19 @@ import {
   unlazy,
 } from '@orpc/server';
 import type { Logger } from '@netscript/logger';
-import type { Principal } from '../auth/types.ts';
+import { getActiveContext } from '@netscript/telemetry';
+import type { AuthnSideEffects, Principal } from '../auth/types.ts';
 import type { PreparedProcedureRateLimitStage } from '../rate-limit/middleware/procedure-rate-limit.ts';
+import {
+  isAsyncIteratorLike,
+  wrapDetachedAsyncIterator,
+} from '../runtime/async-context-isolation.ts';
+import {
+  ADMITTED_HTTP_CALL_SYMBOL,
+  type ServiceLifecycleTracker,
+} from '../runtime/started-service.ts';
 import type { ServiceEnvironment, ServiceRouter } from '../types.ts';
+import { enforceProcedureAuth, type ProcedureAuthConfig } from './procedure-auth.ts';
 
 /**
  * Machine-readable configuration error codes emitted by NetScript's oRPC procedure pipeline.
@@ -93,6 +103,8 @@ export const CORRELATION_REQUEST_ID_SYMBOL: symbol = Symbol.for('netscript.reque
 export interface HttpRequestMetadata {
   /** Raw Web Platform request received by the service HTTP edge. */
   readonly request: Request;
+  /** Stable Hono request context identity (preserved across `withBodyLimit` `Request` replacement). */
+  readonly httpContext?: object;
   /** Optional socket/host environment attached to the HTTP request. */
   readonly env?: ServiceEnvironment;
   /** Optional request-scoped logger attached by `withLogger()`. */
@@ -105,8 +117,12 @@ export interface ProcedurePipelineConfig {
   readonly serviceId: symbol;
   /** Service name used in diagnostics. */
   readonly serviceName: string;
+  /** Optional procedure-level authentication and authorization configuration. */
+  readonly auth?: ProcedureAuthConfig;
   /** Validated declarative procedure rate-limit stages executed in registration order. */
   readonly rateLimitStages?: readonly PreparedProcedureRateLimitStage[];
+  /** Optional started-service lifecycle tracker for in-flight draining and stream detachment. */
+  readonly lifecycle?: ServiceLifecycleTracker;
 }
 
 interface ProcedurePipelineContext extends Record<PropertyKey, unknown> {
@@ -114,6 +130,7 @@ interface ProcedurePipelineContext extends Record<PropertyKey, unknown> {
   readonly requestId?: unknown;
   readonly clientAddress?: string;
   readonly headers?: Readonly<Record<string, string>> | Headers;
+  readonly authnSideEffects?: AuthnSideEffects;
   readonly resHeaders?: unknown;
   readonly [CORRELATION_REQUEST_ID_SYMBOL]?: string;
   readonly [PIPELINE_EXECUTED_SYMBOL]?: ReadonlySet<symbol>;
@@ -126,6 +143,13 @@ interface ProcedurePipelineContext extends Record<PropertyKey, unknown> {
  * `serviceId` that wrapped it. Never mutates unwrapped caller procedure objects.
  */
 const WRAPPED_PROCEDURE_SERVICE = new WeakMap<object, symbol>();
+
+/**
+ * Maps each wrapped procedure leaf back to its canonical path on the service's
+ * primary router so flat `withRPC({ rpcRouter })` aliases resolve canonical
+ * contract policies and procedure paths.
+ */
+const CANONICAL_LEAF_PATH = new WeakMap<object, readonly string[]>();
 
 /**
  * Wraps every oRPC procedure leaf in `router` with NetScript's procedure pipeline.
@@ -142,7 +166,12 @@ export function wrapRouterWithProcedurePipeline<TRouter extends ServiceRouter>(
   rawLeafCache: WeakMap<object, object> = new WeakMap<object, object>(),
 ): TRouter {
   const rateLimitStages = [...(config.rateLimitStages ?? [])];
-  const middleware = createProcedurePipelineMiddleware(config.serviceId, rateLimitStages);
+  const middleware = createProcedurePipelineMiddleware(
+    config.serviceId,
+    config.auth,
+    rateLimitStages,
+    config.lifecycle,
+  );
   const activeAncestors = new WeakSet<object>();
 
   const wrapLeaf = (leaf: AnyProcedure, path: readonly string[]): AnyProcedure => {
@@ -169,6 +198,9 @@ export function wrapRouterWithProcedurePipeline<TRouter extends ServiceRouter>(
       dedupeLeadingMiddlewares: false,
     });
     WRAPPED_PROCEDURE_SERVICE.set(wrappedLeaf, config.serviceId);
+    if (!CANONICAL_LEAF_PATH.has(wrappedLeaf)) {
+      CANONICAL_LEAF_PATH.set(wrappedLeaf, Object.freeze([...path]));
+    }
     rawLeafCache.set(leaf, wrappedLeaf);
     return wrappedLeaf;
   };
@@ -262,7 +294,9 @@ export function getWrappedProcedureServiceId(procedure: object): symbol | undefi
 
 function createProcedurePipelineMiddleware(
   serviceId: symbol,
+  authConfig: ProcedureAuthConfig | undefined,
   rateLimitStages: readonly PreparedProcedureRateLimitStage[],
+  lifecycle: ServiceLifecycleTracker | undefined,
 ): AnyMiddleware {
   return os.$context<ProcedurePipelineContext>().middleware(
     async ({ context, path, procedure, signal, next }) => {
@@ -273,47 +307,108 @@ function createProcedurePipelineMiddleware(
       const nextExecuted = new Set(executed);
       nextExecuted.add(serviceId);
 
-      const requestId = readRequestId(context) ?? createRequestId();
-      const preserveCallerRequestId = context.requestId !== undefined &&
-        typeof context.requestId !== 'string';
+      const httpMeta = context[HTTP_REQUEST_METADATA_SYMBOL];
+      const alreadyAdmittedHttp = httpMeta?.env !== undefined &&
+        Reflect.get(httpMeta.env, ADMITTED_HTTP_CALL_SYMBOL) === serviceId;
+      const leaveCall = lifecycle?.enterCall(alreadyAdmittedHttp);
+      let streamOwnsLifecycle = false;
+      let ownedScope: { readonly end: () => void } | undefined;
 
-      if (rateLimitStages.length > 0) {
-        const httpMeta = context[HTTP_REQUEST_METADATA_SYMBOL];
-        const principal = isPrincipalLike(context.principal) ? context.principal : undefined;
-        const clientAddress = typeof context.clientAddress === 'string'
-          ? context.clientAddress
+      try {
+        const requestId = readRequestId(context) ?? createRequestId();
+        const preserveCallerRequestId = context.requestId !== undefined &&
+          typeof context.requestId !== 'string';
+        const candidatePrincipal = isPrincipalLike(context.principal)
+          ? context.principal
           : undefined;
-        const resHeaders = context[PROCEDURE_RESPONSE_HEADERS_SYMBOL] instanceof Headers
-          ? context[PROCEDURE_RESPONSE_HEADERS_SYMBOL]
-          : context.resHeaders instanceof Headers
-          ? context.resHeaders
-          : undefined;
-        const isRateLimitedDefined = hasContractError(procedure, 'RATE_LIMITED');
+        const canonicalPath = CANONICAL_LEAF_PATH.get(procedure) ?? path;
 
-        for (const stage of rateLimitStages) {
-          await stage.enforce({
-            principal,
-            clientAddress,
+        let verifiedPrincipal = candidatePrincipal;
+        if (authConfig) {
+          const authOutcome = await enforceProcedureAuth(authConfig, {
+            procedure,
+            path: canonicalPath,
+            candidatePrincipal,
+            headers: context.headers,
+            authnSideEffects: isAuthnSideEffectsLike(context.authnSideEffects)
+              ? context.authnSideEffects
+              : undefined,
             httpRequest: httpMeta?.request,
-            httpEnv: httpMeta?.env,
-            procedurePath: path,
-            signal,
-            resHeaders,
+            httpContext: httpMeta?.httpContext,
             logger: httpMeta?.logger,
-            isRateLimitedDefined,
+            requestId,
+            signal,
           });
+          verifiedPrincipal = authOutcome.principal;
+          ownedScope = authOutcome.ownedScope;
+        }
+
+        if (rateLimitStages.length > 0) {
+          const clientAddress = typeof context.clientAddress === 'string'
+            ? context.clientAddress
+            : undefined;
+          const resHeaders = context[PROCEDURE_RESPONSE_HEADERS_SYMBOL] instanceof Headers
+            ? context[PROCEDURE_RESPONSE_HEADERS_SYMBOL]
+            : context.resHeaders instanceof Headers
+            ? context.resHeaders
+            : undefined;
+          const isRateLimitedDefined = hasContractError(procedure, 'RATE_LIMITED');
+
+          for (const stage of rateLimitStages) {
+            await stage.enforce({
+              principal: verifiedPrincipal,
+              clientAddress,
+              httpRequest: httpMeta?.request,
+              httpEnv: httpMeta?.env,
+              procedurePath: canonicalPath,
+              signal,
+              resHeaders,
+              logger: httpMeta?.logger,
+              isRateLimitedDefined,
+            });
+          }
+        }
+
+        const result = await next({
+          context: {
+            ...(authConfig ? { principal: verifiedPrincipal } : {}),
+            ...(preserveCallerRequestId ? {} : { requestId }),
+            [CORRELATION_REQUEST_ID_SYMBOL]: requestId,
+            [PIPELINE_EXECUTED_SYMBOL]: nextExecuted,
+          },
+        });
+
+        if (lifecycle && isAsyncIteratorLike(result.output)) {
+          const targetOtelCtx = getActiveContext();
+          streamOwnsLifecycle = true;
+          const detachedIterator = wrapDetachedAsyncIterator(
+            result.output,
+            (fn) => lifecycle.cleanAsyncRoot.runDetached(fn, targetOtelCtx),
+            leaveCall,
+          );
+          return {
+            ...result,
+            output: detachedIterator,
+          };
+        }
+
+        return result;
+      } finally {
+        ownedScope?.end();
+        if (!streamOwnsLifecycle) {
+          leaveCall?.();
         }
       }
-
-      return await next({
-        context: {
-          ...(preserveCallerRequestId ? {} : { requestId }),
-          [CORRELATION_REQUEST_ID_SYMBOL]: requestId,
-          [PIPELINE_EXECUTED_SYMBOL]: nextExecuted,
-        },
-      });
     },
   );
+}
+
+function isAuthnSideEffectsLike(value: unknown): value is AuthnSideEffects {
+  if (typeof value !== 'object' || value === null) return false;
+  const onResponseHeaders = Reflect.get(value, 'onResponseHeaders');
+  const onSetCookies = Reflect.get(value, 'onSetCookies');
+  return (onResponseHeaders === undefined || typeof onResponseHeaders === 'function') &&
+    (onSetCookies === undefined || typeof onSetCookies === 'function');
 }
 
 function isPrincipalLike(value: unknown): value is Principal {

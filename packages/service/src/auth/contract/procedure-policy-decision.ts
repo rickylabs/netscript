@@ -10,7 +10,13 @@ import type {
   ProcedurePolicyResolver,
 } from './contract-policy.ts';
 import { authorizeRequirements } from '../scope-authorizer.ts';
-import type { AuthorizerPort, AuthzDecision, AuthzRequest } from '../types.ts';
+import type {
+  AuthorizerPort,
+  AuthzDecision,
+  AuthzRequest,
+  MatchAwareAuthorizerPort,
+  ProcedureAuthorizerPort,
+} from '../types.ts';
 
 /** Service-local bound authorizer state associated with one `bind()` resolver instance. */
 export interface BoundContractAuthorizerEntry {
@@ -18,6 +24,28 @@ export interface BoundContractAuthorizerEntry {
   readonly authorizer: AuthorizerPort;
   /** Configured internal-caller predicate owned by the bound contract authorizer. */
   readonly isInternalCaller: InternalCallerPredicate;
+  /** Contract policy mode: `'strict'` (`createContractAuthorizer`) or `'overlay'` (`createContractOverlayAuthorizer`). */
+  readonly mode: 'strict' | 'overlay';
+  /** Compiled contract access policies keyed by canonical dot-joined procedure path. */
+  readonly policiesByPath: ReadonlyMap<string, ProcedureAccessPolicy | undefined>;
+  /** Optional fallback authorizer configured on `createContractAuthorizer`. */
+  readonly fallback?: MatchAwareAuthorizerPort | ProcedureAuthorizerPort;
+  /** True when the authorizer uses NetScript's default `isInternalServicePrincipal` predicate. */
+  readonly usesDefaultInternalPredicate: boolean;
+}
+
+/** Reports whether a fallback authorizer implements {@link ProcedureAuthorizerPort}. */
+export function isProcedureAuthorizerPort(value: unknown): value is ProcedureAuthorizerPort {
+  return typeof value === 'object' &&
+    value !== null &&
+    typeof Reflect.get(value, 'authorizeProcedure') === 'function';
+}
+
+/** Reports whether a fallback authorizer implements {@link MatchAwareAuthorizerPort}. */
+export function isMatchAwareAuthorizerPort(value: unknown): value is MatchAwareAuthorizerPort {
+  return typeof value === 'object' &&
+    value !== null &&
+    typeof Reflect.get(value, 'authorizeMatch') === 'function';
 }
 
 const BOUND_CONTRACT_AUTHORIZERS = new WeakMap<
