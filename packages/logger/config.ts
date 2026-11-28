@@ -17,6 +17,28 @@ import type { LoggingConfig } from './types.ts';
 
 let isConfigured = false;
 const contextLocalStorage = new AsyncLocalStorage<Record<string, unknown>>();
+const ACTIVE_STORE_PROBES_SYMBOL = Symbol.for('@netscript/async-context/active-store-probes');
+
+interface ActiveAsyncStoreProbe {
+  readonly name: string;
+  readonly isActive: () => boolean;
+}
+
+const LOGGER_ACTIVE_STORE_PROBE: ActiveAsyncStoreProbe = Object.freeze({
+  name: '@netscript/logger',
+  isActive: () => contextLocalStorage.getStore() !== undefined,
+});
+
+function registerLoggerActiveStoreProbe(): void {
+  const existing: unknown = Reflect.get(globalThis, ACTIVE_STORE_PROBES_SYMBOL);
+  const registry = existing instanceof Set ? existing : new Set<ActiveAsyncStoreProbe>();
+  if (!(existing instanceof Set)) {
+    Reflect.set(globalThis, ACTIVE_STORE_PROBES_SYMBOL, registry);
+  }
+  registry.add(LOGGER_ACTIVE_STORE_PROBE);
+}
+
+registerLoggerActiveStoreProbe();
 
 /**
  * Default logging configuration based on environment.
