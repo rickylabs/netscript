@@ -1873,17 +1873,17 @@
     "@orpc/client@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-AEPeHfZJ+rT3U7jNZ7nV2AHHXfI4pycNoU66zlC023K6A7EvujhM1CGhv8YXAi3weXsk0EUzwuP6IvCvLY9p6g==",
       "dependencies": [
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server-fetch@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server-peer@1.16.6_@opentelemetry+api@1.9.1"
+        "@orpc/shared",
+        "@orpc/standard-server",
+        "@orpc/standard-server-fetch",
+        "@orpc/standard-server-peer"
       ]
     },
     "@orpc/contract@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-wpT3SDO9RpLMKK+DmGFVz0Uv9aE3tngxkCc6RKibF1JNiZk6VhW7DjXr6f/g/zrqZaTdbWUFZMrUMq2BQ+GYog==",
       "dependencies": [
-        "@orpc/client@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1",
+        "@orpc/client",
+        "@orpc/shared",
         "@standard-schema/spec",
         "openapi-types"
       ]
@@ -1898,29 +1898,29 @@
         "@orpc/interop",
         "@orpc/openapi",
         "@orpc/server",
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1",
+        "@orpc/shared",
         "json-schema-typed"
       ]
     },
     "@orpc/openapi-client@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-EPc3sT7kxyc6hSkq/d1vjXkfOD12KReAsXgOrcDu0WGcDkgDRa2TFOnqP0HJCi2pbKTShcEcmYEiXlQ5UJTrNQ==",
       "dependencies": [
-        "@orpc/client@1.16.6_@opentelemetry+api@1.9.1",
+        "@orpc/client",
         "@orpc/contract",
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server@1.16.6_@opentelemetry+api@1.9.1"
+        "@orpc/shared",
+        "@orpc/standard-server"
       ]
     },
     "@orpc/openapi@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-fOQ/20UnaBulQ4apzG+boGNoFSHOU3MRu+p1QtkwnDizxIU5SKJpvtwbMSWU47pFL4IvLxTwFvGL9JBTf93Gbg==",
       "dependencies": [
-        "@orpc/client@1.16.6_@opentelemetry+api@1.9.1",
+        "@orpc/client",
         "@orpc/contract",
         "@orpc/interop",
         "@orpc/openapi-client",
         "@orpc/server",
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server@1.16.6_@opentelemetry+api@1.9.1",
+        "@orpc/shared",
+        "@orpc/standard-server",
         "json-schema-typed",
         "rou3@0.7.12"
       ]
@@ -1930,22 +1930,22 @@
       "dependencies": [
         "@opentelemetry/api",
         "@opentelemetry/instrumentation",
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1"
+        "@orpc/shared"
       ]
     },
     "@orpc/server@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-CTuVWPn4E2RGenrXByWJq0QJlWj0hjP177zu5Yj+iLoyQlx+KjyTmwZEO0odXR7JDauCeYNJHasaYb9ozLm6YA==",
       "dependencies": [
-        "@orpc/client@1.16.6_@opentelemetry+api@1.9.1",
+        "@orpc/client",
         "@orpc/contract",
         "@orpc/interop",
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server@1.16.6_@opentelemetry+api@1.9.1",
+        "@orpc/shared",
+        "@orpc/standard-server",
         "@orpc/standard-server-aws-lambda",
         "@orpc/standard-server-fastify",
-        "@orpc/standard-server-fetch@1.16.6_@opentelemetry+api@1.9.1",
+        "@orpc/standard-server-fetch",
         "@orpc/standard-server-node",
-        "@orpc/standard-server-peer@1.16.6_@opentelemetry+api@1.9.1",
+        "@orpc/standard-server-peer",
         "cookie@1.1.1"
       ]
     },
@@ -1963,53 +1963,53 @@
     "@orpc/standard-server-aws-lambda@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-zllEa9CUnOw5BTpzD3ED2SIojaG/eBUq4GWChJwTAQvsuFz+aLDqMUcZvknQCO0XLkKm6sJLLBZPNvba13xmcg==",
       "dependencies": [
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server-fetch@1.16.6_@opentelemetry+api@1.9.1",
+        "@orpc/shared",
+        "@orpc/standard-server",
+        "@orpc/standard-server-fetch",
         "@orpc/standard-server-node"
       ]
     },
     "@orpc/standard-server-fastify@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-EdnZUuvql9CxIK53AN2KwJK8il22nPBsS9FXSQdIUjKLjeijOWUer0Pmj8I8HFZVptKJBqshehDKeGyn3dapgg==",
       "dependencies": [
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server@1.16.6_@opentelemetry+api@1.9.1",
+        "@orpc/shared",
+        "@orpc/standard-server",
         "@orpc/standard-server-node"
       ]
     },
     "@orpc/standard-server-fetch@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-oOtiftOsrPIUh5paWKUCunjzAGberLZAKX9XqZ3brvk+fzz4LM75pJJ9PiIx2bVKAgT817z0eItWzTDKNsEGsg==",
       "dependencies": [
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server@1.16.6_@opentelemetry+api@1.9.1"
+        "@orpc/shared",
+        "@orpc/standard-server"
       ]
     },
     "@orpc/standard-server-node@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-l4oEqRGpmDlVQHwUGWkkufJB8GwTd9nw4GQa4g4xxlr6vc/VWXsYzmA0LGn40+NwYZwoJGeiN1ffqYjGFUS5LA==",
       "dependencies": [
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server-fetch@1.16.6_@opentelemetry+api@1.9.1"
+        "@orpc/shared",
+        "@orpc/standard-server",
+        "@orpc/standard-server-fetch"
       ]
     },
     "@orpc/standard-server-peer@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-b1dTTy9Xpas+kjgxejvudcDgF9AeRuKHsn7FbY3iQywaUxHA0ZbJjETBrL/c1Wr1V7aLlZycCFfonHTwc39SXg==",
       "dependencies": [
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/standard-server@1.16.6_@opentelemetry+api@1.9.1"
+        "@orpc/shared",
+        "@orpc/standard-server"
       ]
     },
     "@orpc/standard-server@1.16.6_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-brJQEljgoUIlPq7do4awqgMNCcw5+HBtBU+LfS4wnuxqbztv4Y12drpxUIyuFxLHmXqZiQrGATsOUTMbS2b+3g==",
       "dependencies": [
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1"
+        "@orpc/shared"
       ]
     },
     "@orpc/tanstack-query@1.16.6_@orpc+client@1.16.6_@tanstack+query-core@5.108.4_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-VbswW8Yj/U59tsCFpQYjc039KuydzVvIvgXn4Zl5IZMeLA/xMQYrMmS6tPjezj3jVgg3Bli9K4kwLuLL7nMWsw==",
       "dependencies": [
-        "@orpc/client@1.16.6_@opentelemetry+api@1.9.1",
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1",
+        "@orpc/client",
+        "@orpc/shared",
         "@tanstack/query-core"
       ]
     },
@@ -2020,7 +2020,7 @@
         "@orpc/json-schema",
         "@orpc/openapi",
         "@orpc/server",
-        "@orpc/shared@1.16.6_@opentelemetry+api@1.9.1",
+        "@orpc/shared",
         "escape-string-regexp",
         "wildcard-match",
         "zod@4.6.7"
@@ -5642,8 +5642,10 @@
           "dependencies": [
             "npm:@opentelemetry/api@^1.9.1",
             "npm:@opentelemetry/instrumentation@0.223.2",
+            "npm:@orpc/client@^1.16.6",
             "npm:@orpc/contract@^1.16.6",
-            "npm:@orpc/otel@^1.16.6"
+            "npm:@orpc/otel@^1.16.6",
+            "npm:@orpc/server@^1.16.6"
           ]
         }
       },

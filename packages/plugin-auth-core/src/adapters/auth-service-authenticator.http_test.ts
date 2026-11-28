@@ -1,5 +1,5 @@
 import { createService } from '@netscript/service';
-import { ORPCError } from '@orpc/contract';
+import { ORPCError } from '@orpc/server';
 import { assertEquals, assertRejects } from '@std/assert';
 import type { AuthnRequest } from '@netscript/service/auth';
 import { createPluginService } from '../../../plugin/src/service/mod.ts';

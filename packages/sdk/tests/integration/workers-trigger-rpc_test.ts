@@ -1,6 +1,5 @@
 import { assertEquals, assertRejects } from '@std/assert';
-import { ORPCError } from '@orpc/contract';
-import { os } from '@orpc/server';
+import { ORPCError, os } from '@orpc/server';
 import { assemblePluginContractRouter, createPluginService } from '@netscript/plugin/service';
 import { createServiceClient } from '../../src/client/service-client.ts';
 import { createServerServiceEnvKey } from '../../src/discovery/service-url.ts';

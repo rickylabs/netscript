@@ -14,10 +14,10 @@
  * @module
  */
 
-import { ORPCError } from '@orpc/contract';
+import { ORPCError } from '@orpc/client';
 import type { ValidationError } from '@orpc/contract';
 import type { GenericHandlerOptions } from './_types.ts';
-import { extractInputKeys } from './_utils.ts';
+import { extractInputKeys, resolveErrorHttpStatus } from './_utils.ts';
 
 // ============================================================================
 // TYPES
@@ -152,6 +152,11 @@ export interface ErrorHandlingPluginOptions {
    * Callback for custom error processing (e.g., send to error tracking service)
    */
   onError?: (error: Error, context: ErrorContext) => void | Promise<void>;
+
+  /**
+   * Optional error-code to HTTP-status map used when thrown errors omit `.status`.
+   */
+  errorStatusMap?: Readonly<Record<string, number>>;
 }
 
 // ============================================================================
@@ -161,7 +166,10 @@ export interface ErrorHandlingPluginOptions {
 /**
  * Default error classification based on error code/status
  */
-const defaultErrorClassifier: ErrorClassifier = (error: Error): ErrorClassification => {
+function classifyErrorWithStatus(
+  error: Error,
+  errorStatusMap?: Readonly<Record<string, number>>,
+): ErrorClassification {
   const err = error as Error & { code?: string; status?: number };
 
   // Known client errors
@@ -179,10 +187,11 @@ const defaultErrorClassifier: ErrorClassifier = (error: Error): ErrorClassificat
     return 'client';
   }
 
-  // Check HTTP status
-  if (err.status) {
-    if (err.status >= 400 && err.status < 500) return 'client';
-    if (err.status === 503 || err.status === 504) return 'transient';
+  // Check HTTP status (explicit or resolved via errorStatusMap / standard codes)
+  const resolvedStatus = resolveErrorHttpStatus(err, errorStatusMap);
+  if (resolvedStatus !== undefined) {
+    if (resolvedStatus >= 400 && resolvedStatus < 500) return 'client';
+    if (resolvedStatus === 503 || resolvedStatus === 504) return 'transient';
   }
 
   // Transient errors
@@ -199,7 +208,7 @@ const defaultErrorClassifier: ErrorClassifier = (error: Error): ErrorClassificat
   }
 
   return 'server';
-};
+}
 
 /**
  * Determine if we're in development mode
@@ -215,6 +224,7 @@ function isDevelopment(): boolean {
 function toORPCError(
   error: Error,
   exposeInternal: boolean,
+  errorStatusMap?: Readonly<Record<string, number>>,
 ): ORPCError<string, unknown> {
   // Already an ORPCError - return as is
   if (error instanceof ORPCError) {
@@ -231,7 +241,7 @@ function toORPCError(
 
   // Determine error code
   let code = err.code || 'INTERNAL_SERVER_ERROR';
-  let status = err.status || 500;
+  let status = resolveErrorHttpStatus(err, errorStatusMap) ?? 500;
   let message = error.message;
 
   // Handle Prisma errors
@@ -309,12 +319,18 @@ function toORPCError(
 export class ErrorHandlingPlugin {
   private readonly options:
     & Required<
-      Omit<ErrorHandlingPluginOptions, 'onError' | 'errorClassifier'>
+      Omit<ErrorHandlingPluginOptions, 'onError' | 'errorClassifier' | 'errorStatusMap'>
     >
     & {
       onError?: ErrorHandlingPluginOptions['onError'];
       errorClassifier: ErrorClassifier;
+      errorStatusMap?: Readonly<Record<string, number>>;
     };
+
+  /**
+   * Stable plugin name used by oRPC v2 `OrderablePlugin` ordering.
+   */
+  readonly name: string = 'netscript-error-handling';
 
   /**
    * Plugin order - run after tracing plugin to have span context
@@ -325,21 +341,24 @@ export class ErrorHandlingPlugin {
    * Create an oRPC error handling plugin.
    */
   constructor(options: ErrorHandlingPluginOptions = {}) {
+    const errorStatusMap = options.errorStatusMap;
     this.options = {
       serviceName: options.serviceName ?? 'unknown',
       logger: options.logger ?? defaultLogger,
       includeStack: options.includeStack ?? isDevelopment(),
       exposeInternalErrors: options.exposeInternalErrors ?? isDevelopment(),
-      errorClassifier: options.errorClassifier ?? defaultErrorClassifier,
+      errorClassifier: options.errorClassifier ??
+        ((error: Error) => classifyErrorWithStatus(error, errorStatusMap)),
       warnOnlyCodes: options.warnOnlyCodes ?? ['NOT_FOUND'],
       onError: options.onError,
+      errorStatusMap,
     };
   }
 
   /**
    * Initialize the plugin by adding interceptors to the handler options.
    */
-  init(handlerOptions: GenericHandlerOptions, _router?: unknown): void {
+  init(handlerOptions: GenericHandlerOptions, _router?: unknown): GenericHandlerOptions {
     const {
       serviceName,
       logger,
@@ -348,6 +367,7 @@ export class ErrorHandlingPlugin {
       errorClassifier,
       warnOnlyCodes,
       onError,
+      errorStatusMap,
     } = this.options;
 
     // Add client interceptor for procedure-level error handling
@@ -359,6 +379,7 @@ export class ErrorHandlingPlugin {
         return await options.next();
       } catch (error) {
         const err = error as Error & { code?: string; status?: number; meta?: unknown };
+        const resolvedStatus = resolveErrorHttpStatus(err, errorStatusMap);
 
         // Extract validation error details
         const validationIssues = (err.cause as ValidationError)?.issues
@@ -372,7 +393,7 @@ export class ErrorHandlingPlugin {
           inputKeys: extractInputKeys(options.input, 20),
           code: err.code ?? 'UNKNOWN',
           cause: err.cause as string ?? 'UNKNOWN',
-          status: err.status,
+          status: resolvedStatus,
           message: err.message,
           timestamp: new Date().toISOString(),
           ...(includeStack && err.stack ? { stack: err.stack } : {}),
@@ -403,9 +424,11 @@ export class ErrorHandlingPlugin {
         }
 
         // Transform and rethrow as ORPCError
-        throw toORPCError(err, exposeInternalErrors);
+        throw toORPCError(err, exposeInternalErrors, errorStatusMap);
       }
     });
+
+    return handlerOptions;
   }
 }
 

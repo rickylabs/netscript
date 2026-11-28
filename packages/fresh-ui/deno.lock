@@ -5098,8 +5098,10 @@
           "dependencies": [
             "npm:@opentelemetry/api@^1.9.1",
             "npm:@opentelemetry/instrumentation@0.223.2",
+            "npm:@orpc/client@^1.16.6",
             "npm:@orpc/contract@^1.16.6",
-            "npm:@orpc/otel@^1.16.6"
+            "npm:@orpc/otel@^1.16.6",
+            "npm:@orpc/server@^1.16.6"
           ]
         }
       },

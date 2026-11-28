@@ -13,7 +13,11 @@ import { type Span, SpanStatusCode, trace } from '@opentelemetry/api';
 import { ORPCInstrumentation, type ORPCInstrumentationConfig } from '@orpc/otel';
 import type { Attributes, AttributeValue } from '../application/mod.ts';
 import type { GenericHandlerOptions } from './_types.ts';
-import { extractInputKeys } from './_utils.ts';
+import {
+  attachRootHandlerInterceptor,
+  extractInputKeys,
+  resolveErrorHttpStatus,
+} from './_utils.ts';
 
 let sharedInstrumentation: ORPCInstrumentation | undefined;
 
@@ -62,6 +66,11 @@ export interface TracingPluginOptions {
    * `trace.getActiveSpan()`.
    */
   activeSpanProvider?: () => Span | undefined;
+
+  /**
+   * Optional error-code to HTTP-status map used when thrown errors omit `.status`.
+   */
+  errorStatusMap?: Readonly<Record<string, number>>;
 }
 
 interface ErrorLike {
@@ -167,11 +176,17 @@ export class TracingPlugin {
   private readonly options: Required<
     Omit<
       TracingPluginOptions,
-      'activeSpanProvider' | 'instrumentation' | 'instrumentationConfig'
+      'activeSpanProvider' | 'errorStatusMap' | 'instrumentation' | 'instrumentationConfig'
     >
   >;
+  private readonly errorStatusMap?: Readonly<Record<string, number>>;
   private readonly instrumentation: Pick<ORPCInstrumentation, 'enable'>;
   private readonly activeSpanProvider: () => Span | undefined;
+
+  /**
+   * Stable plugin name used by oRPC v2 `OrderablePlugin` ordering.
+   */
+  readonly name: string = 'netscript-tracing';
 
   /**
    * Plugin order - run early to set attributes before other processing.
@@ -185,6 +200,7 @@ export class TracingPlugin {
     this.instrumentation = options.instrumentation ??
       getOrCreateInstrumentation(options.instrumentationConfig);
     this.activeSpanProvider = options.activeSpanProvider ?? (() => trace.getActiveSpan());
+    this.errorStatusMap = options.errorStatusMap;
     this.options = {
       serviceName: options.serviceName ?? 'unknown',
       recordInputKeys: options.recordInputKeys ?? true,
@@ -197,13 +213,13 @@ export class TracingPlugin {
    * Initialize the plugin by registering upstream instrumentation and adding
    * NetScript attribute interceptors to the handler options.
    */
-  init(handlerOptions: GenericHandlerOptions, _router?: unknown): void {
+  init(handlerOptions: GenericHandlerOptions, _router?: unknown): GenericHandlerOptions {
     this.instrumentation.enable();
 
     const { serviceName, recordInputKeys, maxInputKeys, attributePrefix } = this.options;
+    const errorStatusMap = this.errorStatusMap;
 
-    handlerOptions.rootInterceptors ??= [];
-    handlerOptions.rootInterceptors.push(async (options) => {
+    attachRootHandlerInterceptor(handlerOptions, async (options) => {
       const span = this.activeSpanProvider();
       span?.setAttributes(prefixedAttributes(attributePrefix, {
         'rpc.system': 'orpc',
@@ -262,6 +278,7 @@ export class TracingPlugin {
       } catch (error) {
         if (span) {
           const err = toErrorLike(error);
+          const resolvedStatus = resolveErrorHttpStatus(err, errorStatusMap);
 
           span.setStatus({
             code: SpanStatusCode.ERROR,
@@ -273,8 +290,8 @@ export class TracingPlugin {
             'rpc.error.message': err.message ?? 'Unknown oRPC error',
           }));
 
-          if (err.status) {
-            span.setAttribute(`${attributePrefix}rpc.error.status`, err.status);
+          if (resolvedStatus !== undefined) {
+            span.setAttribute(`${attributePrefix}rpc.error.status`, resolvedStatus);
           }
 
           recordException(span, error);
@@ -287,6 +304,8 @@ export class TracingPlugin {
         throw error;
       }
     });
+
+    return handlerOptions;
   }
 }
 

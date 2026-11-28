@@ -266,14 +266,17 @@ export interface FetchHandler {
 
 /** Structural oRPC plugin accepted by service handler factories. */
 export interface ServiceHandlerPlugin {
+  /** Stable plugin name used by oRPC v2 `OrderablePlugin` ordering (`before`/`after`). */
+  readonly name?: string;
+
   /** Plugin ordering weight used by oRPC. */
   readonly order?: number;
 
   /** Initializes the plugin against the standard oRPC handler runtime. */
-  init?(options: unknown, router: unknown): void;
+  init?(options: unknown, router: unknown): unknown;
 
   /** Initializes fetch-adapter behavior when the plugin needs adapter state. */
-  initRuntimeAdapter?(options: unknown): void;
+  initRuntimeAdapter?(options: unknown): unknown;
 }
 
 /** Minimal request shape exposed to service middleware and handlers. */

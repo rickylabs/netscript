@@ -4,11 +4,12 @@ import {
   type NotFoundErrorSchema,
   SuccessSchema,
 } from '@netscript/contracts';
-import { isDefinedError as orpcIsDefinedError, safe as orpcSafe } from '@orpc/client';
+import { isDefinedError as orpcIsDefinedError, ORPCError, safe as orpcSafe } from '@orpc/client';
 import { assert, assertEquals } from '@std/assert';
 import {
   type ContractSchemaOutput,
   createServiceClient,
+  getErrorHttpStatus,
   isDefinedError,
   safe,
 } from '../src/client/mod.ts';
@@ -81,6 +82,7 @@ async function sdkSafeIsDefinedArm(client: ReturnType<typeof createProbeClient>)
   const result = await safe(client.list({ limit: 1 }));
   if (!result.isSuccess && result.isDefined) {
     type _SdkSafeArmCodes = Assert<Equal<typeof result.error.code, BaseErrorCode>>;
+    type _SdkSafeArmV1StatusPreserved = Assert<Equal<typeof result.error.status, number>>;
     // @ts-expect-error -- unused if the SDK safe() arm narrows to never.
     const _notAString: string = result.error;
     if (result.error.code === 'NOT_FOUND') {
@@ -90,6 +92,33 @@ async function sdkSafeIsDefinedArm(client: ReturnType<typeof createProbeClient>)
   }
   return undefined;
 }
+
+type V2DefinedOrderLockedError = Error & {
+  readonly defined: true;
+  readonly code: 'ORDER_LOCKED';
+  readonly data: { readonly orderId: string };
+};
+
+async function sdkV2StatuslessDefinedErrorNarrowing(
+  promise: Promise<{ readonly ok: true }> & {
+    __error?: { type: Error | V2DefinedOrderLockedError };
+  },
+) {
+  const result = await safe(promise);
+  if (!result.isSuccess && result.isDefined) {
+    type _V2CodeNarrowed = Assert<Equal<typeof result.error.code, 'ORDER_LOCKED'>>;
+    type _V2StatusOptional = Assert<Equal<typeof result.error.status, number | undefined>>;
+    // @ts-expect-error -- unused if v2 statusless defined errors collapse to never.
+    const _notAString: string = result.error;
+    return result.error.data.orderId;
+  }
+  if (!result.isSuccess && isDefinedError(result.error)) {
+    // Already excluded from the non-defined arm; verifies isDefinedError accepts statusless unions.
+    return undefined;
+  }
+  return undefined;
+}
+void sdkV2StatuslessDefinedErrorNarrowing;
 
 async function sdkIsDefinedError(client: ReturnType<typeof createProbeClient>) {
   const result = await safe(client.list({ limit: 1 }));
@@ -157,4 +186,57 @@ Deno.test('SDK safe() and isDefinedError narrow the same defined error', async (
     assertEquals(await sdkSafeIsDefinedArm(client), 'NOT_FOUND');
     assertEquals(await sdkIsDefinedError(client), 'NOT_FOUND');
   });
+});
+
+Deno.test('getErrorHttpStatus extracts HTTP status across v1 ORPCError, v2 ResponseError/MalformedResponseError, and returns undefined on non-HTTP transports', () => {
+  // v1 ORPCError carries `.status` directly.
+  const v1Error = new ORPCError('NOT_FOUND', { status: 404, message: 'Missing' });
+  assertEquals(getErrorHttpStatus(v1Error), 404);
+
+  // Outer explicit HTTP status takes precedence over inner cause status.
+  const v1WithInnerCause = new ORPCError('CLIENT_UPGRADE_REQUIRED', {
+    status: 426,
+    cause: { response: new Response(null, { status: 500 }) },
+  });
+  assertEquals(getErrorHttpStatus(v1WithInnerCause), 426);
+
+  // v2 ResponseError / MalformedResponseError thrown directly carries `.response.status`.
+  const directMalformed = Object.assign(new Error('Malformed response'), {
+    name: 'MalformedResponseError',
+    response: new Response('upgrade required', { status: 426 }),
+  });
+  assertEquals(getErrorHttpStatus(directMalformed), 426);
+
+  // v2 ORPCError (no `.status`) wrapping ResponseError via `.cause`.
+  const v2HttpWrapped = Object.assign(
+    new Error('Order locked', {
+      cause: Object.assign(new Error('HTTP 409'), {
+        name: 'ResponseError',
+        response: new Response(null, { status: 409 }),
+      }),
+    }),
+    { defined: true, code: 'ORDER_LOCKED', data: { orderId: 'ord-1' } },
+  );
+  assertEquals(getErrorHttpStatus(v2HttpWrapped), 409);
+
+  // Non-HTTP transports (MessagePort, in-process router client) carry no HTTP status.
+  const messagePortError = Object.assign(new Error('Order locked'), {
+    defined: true,
+    code: 'ORDER_LOCKED',
+    data: { orderId: 'ord-1' },
+  });
+  assertEquals(getErrorHttpStatus(messagePortError), undefined);
+
+  // Plain errors, primitives, out-of-range statuses, and cyclic cause chains return undefined.
+  assertEquals(getErrorHttpStatus(new Error('network down')), undefined);
+  assertEquals(getErrorHttpStatus(null), undefined);
+  assertEquals(getErrorHttpStatus(undefined), undefined);
+  assertEquals(getErrorHttpStatus('boom'), undefined);
+  assertEquals(getErrorHttpStatus({ status: 0 }), undefined);
+  assertEquals(getErrorHttpStatus({ status: 999 }), undefined);
+  assertEquals(getErrorHttpStatus({ status: 404.5 }), undefined);
+
+  const cyclic: { cause?: unknown } = {};
+  cyclic.cause = cyclic;
+  assertEquals(getErrorHttpStatus(cyclic), undefined);
 });

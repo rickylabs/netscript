@@ -1,4 +1,4 @@
-import { ORPCError } from '@orpc/contract';
+import { ORPCError } from '@orpc/server';
 import { createServiceClient, safe } from '@netscript/sdk/client';
 import type { AuthenticatorPort } from '@netscript/service/auth';
 import { AUTH_SESSION_STATES, authContract, SessionResponseSchema } from '../contracts/v1/mod.ts';

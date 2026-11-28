@@ -26,7 +26,7 @@ export type {
   InternalCredentialSdkClientContribution,
   InternalCredentialSdkClientContributionOptions,
 } from './internal-credential-contribution.ts';
-export { isDefinedError, safe, SdkClientContributionError } from './errors.ts';
+export { getErrorHttpStatus, isDefinedError, safe, SdkClientContributionError } from './errors.ts';
 export type {
   DefinedError,
   SafeFailure,

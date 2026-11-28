@@ -93,8 +93,8 @@ export interface DefinedError<TCode extends string = string, TData = unknown> ex
   readonly defined: true;
   /** Stable contract error code. */
   readonly code: TCode;
-  /** HTTP status associated with the error. */
-  readonly status: number;
+  /** HTTP status associated with the error when carried on the error instance (oRPC v1). */
+  readonly status?: number;
   /** Structured error payload. */
   readonly data: TData;
 }
@@ -112,7 +112,7 @@ export type SafeSuccess<TOutput> = [null, TOutput, false, true] & {
 type DefinedErrorLike = Error & {
   readonly defined: boolean;
   readonly code: string;
-  readonly status: number;
+  readonly status?: number;
   readonly data: unknown;
 };
 
@@ -149,7 +149,7 @@ export type SafeFailure<TError = Error> =
       Error & {
         readonly defined: boolean;
         readonly code: string;
-        readonly status: number;
+        readonly status?: number;
         readonly data: unknown;
       }
     >,
@@ -162,7 +162,7 @@ export type SafeFailure<TError = Error> =
       Error & {
         readonly defined: boolean;
         readonly code: string;
-        readonly status: number;
+        readonly status?: number;
         readonly data: unknown;
       }
     >;
@@ -176,7 +176,7 @@ export type SafeFailure<TError = Error> =
       Error & {
         readonly defined: boolean;
         readonly code: string;
-        readonly status: number;
+        readonly status?: number;
         readonly data: unknown;
       }
     > & DefinedError,
@@ -190,7 +190,7 @@ export type SafeFailure<TError = Error> =
         Error & {
           readonly defined: boolean;
           readonly code: string;
-          readonly status: number;
+          readonly status?: number;
           readonly data: unknown;
         }
       >
@@ -251,12 +251,69 @@ export function isDefinedError<T>(error: T): error is
     Error & {
       readonly defined: boolean;
       readonly code: string;
-      readonly status: number;
+      readonly status?: number;
       readonly data: unknown;
     }
   >
   & DefinedError {
   return orpcIsDefinedError(error);
+}
+
+function readValidHttpStatus(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 100 && value <= 599
+    ? value
+    : undefined;
+}
+
+function readDirectHttpStatus(value: object): number | undefined {
+  const record = value as { readonly status?: unknown; readonly response?: unknown };
+  const directStatus = readValidHttpStatus(record.status);
+  if (directStatus !== undefined) {
+    return directStatus;
+  }
+
+  if (record.response !== null && typeof record.response === 'object') {
+    const responseStatus = readValidHttpStatus(
+      (record.response as { readonly status?: unknown }).status,
+    );
+    if (responseStatus !== undefined) {
+      return responseStatus;
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Extract the HTTP status code associated with an RPC or transport error, when one exists.
+ *
+ * Supports both oRPC v1 (`ORPCError.status`) and oRPC v2 HTTP errors (`ResponseError` /
+ * `MalformedResponseError` exposed directly or via `error.cause`). Returns `undefined` for
+ * non-HTTP transports such as desktop MessagePort clients and in-process router clients, as well
+ * as plain non-HTTP errors.
+ *
+ * @param error - Unknown error value thrown by a client call.
+ * @returns Integer HTTP status code (`100`–`599`), or `undefined` when no HTTP status applies.
+ */
+export function getErrorHttpStatus(error: unknown): number | undefined {
+  const visited = new Set<object>();
+  let current: unknown = error;
+
+  for (let depth = 0; depth < 8 && current !== null && typeof current === 'object'; depth++) {
+    if (visited.has(current)) {
+      return undefined;
+    }
+    visited.add(current);
+
+    const status = readDirectHttpStatus(current);
+    if (status !== undefined) {
+      return status;
+    }
+
+    current = (current as { readonly cause?: unknown }).cause;
+  }
+
+  return undefined;
 }
 
 /**

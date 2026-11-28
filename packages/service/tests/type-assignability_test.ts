@@ -20,6 +20,7 @@ import type {
   ProcedurePolicyResolver,
   ServiceBuilder,
   ServiceHandlerContext,
+  ServiceHandlerPlugin,
   ServiceMiddleware,
   ServiceRouter,
 } from '../mod.ts';
@@ -141,4 +142,21 @@ Deno.test('FetchHandler mirror accepts oRPC-style handler result', async () => {
   if (result.matched) {
     assertEquals(await result.response.text(), 'ok');
   }
+});
+
+Deno.test('ServiceHandlerPlugin accepts named return-based and void v1 plugins', () => {
+  const v2ReadyPlugin: ServiceHandlerPlugin = {
+    name: 'custom-v2-ready',
+    order: 100,
+    init: (options) => options,
+    initRuntimeAdapter: (options) => options,
+  };
+  const v1VoidPlugin: ServiceHandlerPlugin = {
+    order: 200,
+    init: () => {},
+  };
+
+  assertEquals(v2ReadyPlugin.name, 'custom-v2-ready');
+  assertEquals(v2ReadyPlugin.init?.({ ok: true }, {}), { ok: true });
+  assertEquals(v1VoidPlugin.init?.({}, {}), undefined);
 });
