@@ -58,7 +58,7 @@ These symbols are available from the root export and the focused, browser-safe
 | `createServiceClient`        | function   | Type-safe service client using Aspire service discovery and oRPC. Signature: `createServiceClient<TContract>(options): ServiceClient<TContract>`. |
 | `safe`                       | function   | Resolve a promise into a result narrowed with `isSuccess` first, then `isDefined` on failure.                                                     |
 | `isDefinedError`             | function   | Narrow a typed failure error to its defined members; prefer `isSuccess` then `isDefined` on `safe` results.                                       |
-| `getErrorHttpStatus`         | function   | Extract the HTTP status code associated with an RPC or transport error, returning `undefined` for non-HTTP transports (MessagePort/router-client). |
+| `getErrorHttpStatus`         | function   | Extract an integer HTTP status (`100`–`599`) from an error or its `.cause` chain (`status` or `response.status`), returning `undefined` when no status provenance is attached.    |
 | `ServiceClient`              | type alias | Typed service client derived from a contract router.                                                                                              |
 | `ServiceClientShape`         | type alias | Recursive callable/router shape for a typed service client.                                                                                       |
 | `ServiceClientMethod`        | type alias | Typed service-client method derived from a contract procedure.                                                                                    |

@@ -17,7 +17,7 @@
 import { ORPCError } from '@orpc/client';
 import type { ValidationError } from '@orpc/contract';
 import type { GenericHandlerOptions } from './_types.ts';
-import { extractInputKeys, resolveErrorHttpStatus } from './_utils.ts';
+import { extractInputKeys, isValidErrorHttpStatus, resolveErrorHttpStatus } from './_utils.ts';
 
 // ============================================================================
 // TYPES
@@ -226,9 +226,21 @@ function toORPCError(
   exposeInternal: boolean,
   errorStatusMap?: Readonly<Record<string, number>>,
 ): ORPCError<string, unknown> {
-  // Already an ORPCError - return as is
+  // Already an ORPCError with a valid HTTP error status — return as is.
+  // If an ORPCError carries an out-of-range status (e.g. 0 or 700), sanitize it so
+  // fetch Response construction never rejects with RangeError.
   if (error instanceof ORPCError) {
-    return error;
+    if (isValidErrorHttpStatus(error.status)) {
+      return error;
+    }
+    const sanitizedStatus = resolveErrorHttpStatus(error, errorStatusMap) ?? 500;
+    return new ORPCError(error.code, {
+      defined: error.defined,
+      status: sanitizedStatus,
+      message: !exposeInternal && sanitizedStatus >= 500 ? 'Internal server error' : error.message,
+      data: error.data,
+      cause: error.cause,
+    });
   }
 
   // Check if it's an error-like object with code/status

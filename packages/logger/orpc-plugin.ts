@@ -505,6 +505,7 @@ const DEFAULT_ORPC_ERROR_STATUS_MAP: Readonly<Record<string, number>> = {
   TIMEOUT: 408,
   CONFLICT: 409,
   GONE: 410,
+  LENGTH_REQUIRED: 411,
   PRECONDITION_FAILED: 412,
   PAYLOAD_TOO_LARGE: 413,
   UNSUPPORTED_MEDIA_TYPE: 415,
@@ -512,6 +513,7 @@ const DEFAULT_ORPC_ERROR_STATUS_MAP: Readonly<Record<string, number>> = {
   UNPROCESSABLE_ENTITY: 422,
   VALIDATION_ERROR: 422,
   UPGRADE_REQUIRED: 426,
+  PRECONDITION_REQUIRED: 428,
   RATE_LIMITED: 429,
   TOO_MANY_REQUESTS: 429,
   CLIENT_CLOSED_REQUEST: 499,
@@ -521,6 +523,10 @@ const DEFAULT_ORPC_ERROR_STATUS_MAP: Readonly<Record<string, number>> = {
   SERVICE_UNAVAILABLE: 503,
   GATEWAY_TIMEOUT: 504,
 };
+
+function isValidErrorHttpStatus(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 400 && value <= 599;
+}
 
 /**
  * Attach a root-level interceptor onto oRPC handler options.
@@ -542,7 +548,7 @@ function resolveErrorHttpStatus(
   error: { readonly code?: string; readonly status?: number },
   errorStatusMap?: Readonly<Record<string, number>>,
 ): number | undefined {
-  if (typeof error.status === 'number' && Number.isInteger(error.status)) {
+  if (isValidErrorHttpStatus(error.status)) {
     return error.status;
   }
 
@@ -553,7 +559,7 @@ function resolveErrorHttpStatus(
 
   if (errorStatusMap && Object.hasOwn(errorStatusMap, code)) {
     const mapped = errorStatusMap[code];
-    if (typeof mapped === 'number' && Number.isInteger(mapped)) {
+    if (isValidErrorHttpStatus(mapped)) {
       return mapped;
     }
   }

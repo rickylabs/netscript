@@ -93,7 +93,7 @@ export interface DefinedError<TCode extends string = string, TData = unknown> ex
   readonly defined: true;
   /** Stable contract error code. */
   readonly code: TCode;
-  /** HTTP status associated with the error when carried on the error instance (oRPC v1). */
+  /** HTTP status associated with the error when carried on the error instance (populated by oRPC v1; optional for v2 compatibility). */
   readonly status?: number;
   /** Structured error payload. */
   readonly data: TData;
@@ -241,9 +241,12 @@ function createSafeFailure<TError>(error: TError): SafeFailure<TError> {
  *
  * Use this predicate when you already have a typed error union. It preserves the
  * defined members of that union; it does not infer contract errors from `unknown`.
+ * At runtime this delegates to the installed `@orpc/client` `isDefinedError` guard,
+ * while its type predicate accepts both v1 (`status: number`) and statusless v2
+ * (`status?: number`) `DefinedError` shapes.
  *
  * @param error - Error value to test.
- * @returns `true` when the error is an oRPC defined error.
+ * @returns `true` when the error is an oRPC defined error for the active `@orpc/client` runtime.
  */
 export function isDefinedError<T>(error: T): error is
   & Extract<
@@ -285,15 +288,21 @@ function readDirectHttpStatus(value: object): number | undefined {
 }
 
 /**
- * Extract the HTTP status code associated with an RPC or transport error, when one exists.
+ * Extract an integer HTTP status code (`100`–`599`) from an RPC or transport error when one is
+ * carried on the error or its `.cause` chain.
  *
- * Supports both oRPC v1 (`ORPCError.status`) and oRPC v2 HTTP errors (`ResponseError` /
- * `MalformedResponseError` exposed directly or via `error.cause`). Returns `undefined` for
- * non-HTTP transports such as desktop MessagePort clients and in-process router clients, as well
- * as plain non-HTTP errors.
+ * Checks direct `.status` (such as oRPC v1 `ORPCError.status`, which v1 populates on HTTP,
+ * MessagePort, and router-client errors alike) and attached `.response.status` (such as oRPC v2
+ * `ResponseError`, `MalformedResponseError`, or response-backed link errors carrying a
+ * `StandardResponse` cause). Returns `undefined` when neither the error nor its cause chain
+ * attaches an HTTP/response status (for example plain errors, network failures, or statusless
+ * response-less errors such as direct oRPC v2 in-process errors).
+ *
+ * Callers should handle `undefined` rather than assuming every transport attaches an HTTP status
+ * across oRPC versions.
  *
  * @param error - Unknown error value thrown by a client call.
- * @returns Integer HTTP status code (`100`–`599`), or `undefined` when no HTTP status applies.
+ * @returns Integer HTTP status code (`100`–`599`), or `undefined` when no status provenance is present.
  */
 export function getErrorHttpStatus(error: unknown): number | undefined {
   const visited = new Set<object>();

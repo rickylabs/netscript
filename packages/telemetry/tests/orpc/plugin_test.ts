@@ -256,6 +256,18 @@ Deno.test('TracingPlugin and ErrorHandlingPlugin resolve HTTP status via errorSt
         locked: os.handler(() => {
           throw createCodedError('ORDER_LOCKED', 'Order is locked');
         }),
+        lockedZeroStatus: os.handler(() => {
+          throw Object.assign(new Error('Order is locked'), { code: 'ORDER_LOCKED', status: 0 });
+        }),
+        lockedOrpcZeroStatus: os.handler(() => {
+          throw new ORPCError('ORDER_LOCKED', { status: 0, message: 'Order is locked' });
+        }),
+        lengthRequired: os.handler(() => {
+          throw createCodedError('LENGTH_REQUIRED', 'Content-Length required');
+        }),
+        preconditionRequired: os.handler(() => {
+          throw createCodedError('PRECONDITION_REQUIRED', 'If-Match header required');
+        }),
         tooLarge: os.handler(() => {
           throw createCodedError('PAYLOAD_TOO_LARGE', 'Payload exceeds limit');
         }),
@@ -320,6 +332,42 @@ Deno.test('TracingPlugin and ErrorHandlingPlugin resolve HTTP status via errorSt
   assertEquals(locked.warnings.length, 1);
   assertEquals(locked.warnings[0]?.status, 409);
   assertEquals(locked.errors.length, 0);
+
+  // Out-of-range errorStatusMap entries are ignored and fall back safely to 500 without RangeError.
+  const invalidMapped = await runCase('locked', { ORDER_LOCKED: 700 }, ['ORDER_LOCKED']);
+  assertEquals(invalidMapped.status, 500);
+  assertEquals(invalidMapped.span.attributes['rpc.error.status'], 500);
+  assertEquals(invalidMapped.errors.length, 1);
+  assertEquals(invalidMapped.errors[0]?.status, 500);
+
+  // Out-of-range explicit error.status (0) falls through to a valid errorStatusMap entry (409).
+  const invalidExplicit = await runCase('lockedZeroStatus', { ORDER_LOCKED: 409 }, [
+    'ORDER_LOCKED',
+  ]);
+  assertEquals(invalidExplicit.status, 409);
+  assertEquals(invalidExplicit.span.attributes['rpc.error.status'], 409);
+  assertEquals(invalidExplicit.warnings.length, 1);
+  assertEquals(invalidExplicit.warnings[0]?.status, 409);
+
+  // Even an ORPCError constructed with status 0 is sanitized through errorStatusMap.
+  const invalidOrpcExplicit = await runCase('lockedOrpcZeroStatus', { ORDER_LOCKED: 409 }, [
+    'ORDER_LOCKED',
+  ]);
+  assertEquals(invalidOrpcExplicit.status, 409);
+  assertEquals(invalidOrpcExplicit.span.attributes['rpc.error.status'], 409);
+  assertEquals(invalidOrpcExplicit.warnings.length, 1);
+
+  const lengthRequired = await runCase('lengthRequired', {}, ['LENGTH_REQUIRED']);
+  assertEquals(lengthRequired.status, 411);
+  assertEquals(lengthRequired.span.attributes['rpc.error.status'], 411);
+  assertEquals(lengthRequired.warnings.length, 1);
+  assertEquals(lengthRequired.warnings[0]?.status, 411);
+
+  const preconditionRequired = await runCase('preconditionRequired', {}, ['PRECONDITION_REQUIRED']);
+  assertEquals(preconditionRequired.status, 428);
+  assertEquals(preconditionRequired.span.attributes['rpc.error.status'], 428);
+  assertEquals(preconditionRequired.warnings.length, 1);
+  assertEquals(preconditionRequired.warnings[0]?.status, 428);
 
   const tooLarge = await runCase('tooLarge', {}, ['PAYLOAD_TOO_LARGE']);
   assertEquals(tooLarge.status, 413);

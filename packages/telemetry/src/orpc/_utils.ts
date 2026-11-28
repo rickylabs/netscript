@@ -15,6 +15,7 @@ export const DEFAULT_ORPC_ERROR_STATUS_MAP: Readonly<Record<string, number>> = {
   TIMEOUT: 408,
   CONFLICT: 409,
   GONE: 410,
+  LENGTH_REQUIRED: 411,
   PRECONDITION_FAILED: 412,
   PAYLOAD_TOO_LARGE: 413,
   UNSUPPORTED_MEDIA_TYPE: 415,
@@ -22,6 +23,7 @@ export const DEFAULT_ORPC_ERROR_STATUS_MAP: Readonly<Record<string, number>> = {
   UNPROCESSABLE_ENTITY: 422,
   VALIDATION_ERROR: 422,
   UPGRADE_REQUIRED: 426,
+  PRECONDITION_REQUIRED: 428,
   RATE_LIMITED: 429,
   TOO_MANY_REQUESTS: 429,
   CLIENT_CLOSED_REQUEST: 499,
@@ -31,6 +33,14 @@ export const DEFAULT_ORPC_ERROR_STATUS_MAP: Readonly<Record<string, number>> = {
   SERVICE_UNAVAILABLE: 503,
   GATEWAY_TIMEOUT: 504,
 };
+
+/**
+ * Return `true` when `value` is a valid HTTP error status code (`400`–`599` integer)
+ * safe to pass to both `ORPCError` and Web `Response`.
+ */
+export function isValidErrorHttpStatus(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 400 && value <= 599;
+}
 
 /**
  * Attach a root-level interceptor onto oRPC handler options.
@@ -53,12 +63,12 @@ export function attachRootHandlerInterceptor<TOptions extends GenericHandlerOpti
 }
 
 /**
- * Resolve an HTTP status code for a handler error across oRPC v1 (`error.status`)
- * and oRPC v2 (`error.code` + `errorStatusMap`).
+ * Resolve a valid HTTP error status code (`400`–`599`) for a handler error across
+ * oRPC v1 (`error.status`) and oRPC v2 (`error.code` + `errorStatusMap`).
  *
  * Checks:
- * 1. Explicit numeric `error.status` (v1 `ORPCError` or explicit HTTP errors).
- * 2. Caller-provided `errorStatusMap[error.code]`.
+ * 1. Explicit valid HTTP error status on `error.status` (`400`–`599` integer).
+ * 2. Valid caller-provided `errorStatusMap[error.code]` (`400`–`599` integer).
  * 3. Standard oRPC and NetScript status codes (`DEFAULT_ORPC_ERROR_STATUS_MAP`).
  * 4. Defaults unknown coded errors to `500` (returning `undefined` for uncoded errors).
  */
@@ -66,7 +76,7 @@ export function resolveErrorHttpStatus(
   error: { readonly code?: string; readonly status?: number },
   errorStatusMap?: Readonly<Record<string, number>>,
 ): number | undefined {
-  if (typeof error.status === 'number' && Number.isInteger(error.status)) {
+  if (isValidErrorHttpStatus(error.status)) {
     return error.status;
   }
 
@@ -77,7 +87,7 @@ export function resolveErrorHttpStatus(
 
   if (errorStatusMap && Object.hasOwn(errorStatusMap, code)) {
     const mapped = errorStatusMap[code];
-    if (typeof mapped === 'number' && Number.isInteger(mapped)) {
+    if (isValidErrorHttpStatus(mapped)) {
       return mapped;
     }
   }
